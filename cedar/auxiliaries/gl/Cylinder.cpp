@@ -50,9 +50,9 @@ cedar::aux::gl::Cylinder::Cylinder
   cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
   double radius,
   double height,
-  double R,
-  double G,
-  double B
+  double colorR,
+  double colorG,
+  double colorB
 )
 :
 cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Cylinder", colorR, colorG, colorB),

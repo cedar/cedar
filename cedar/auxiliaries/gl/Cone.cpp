@@ -49,9 +49,9 @@ cedar::aux::gl::Cone::Cone
   cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
   double radius,
   double height,
-  double R,
-  double G,
-  double B
+  double colorR,
+  double colorG,
+  double colorB
 )
 :
 cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Cone", colorR, colorG, colorB),

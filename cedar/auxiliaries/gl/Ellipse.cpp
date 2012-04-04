@@ -50,9 +50,9 @@ cedar::aux::gl::Ellipse::Ellipse
   double length,
   double width,
   double thickness,
-  double R,
-  double G,
-  double B
+  double colorR,
+  double colorG,
+  double colorB
 )
 :
 cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Ellipse", colorR, colorG, colorB),

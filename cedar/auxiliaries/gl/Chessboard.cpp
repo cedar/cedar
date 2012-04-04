@@ -52,9 +52,9 @@ cedar::aux::gl::Chessboard::Chessboard
   double height,
   int rows,
   int cols,
-  double R,
-  double G,
-  double B
+  double colorR,
+  double colorG,
+  double colorB
 )
 :
 cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Chessboard", colorR, colorG, colorB),
