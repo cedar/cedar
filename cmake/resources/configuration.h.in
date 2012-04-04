@@ -48,4 +48,7 @@
 #cmakedefine CEDAR_USE_AMTEC
 #cmakedefine CEDAR_USE_KUKA_LWR
 
+// Cedar settings ------------------------------------------------------------------------------------------------------
+#cmakedefine CEDAR_LIBCONFIG_LEGACY_MODE
+
 #endif // CEDAR_CONFIGURATION_H

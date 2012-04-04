@@ -36,6 +36,8 @@
 
 //!@todo built-in check, if addParameter adds a parameter that is already stored
 
+#include "cedar/configuration.h"
+
 #ifdef CEDAR_LIBCONFIG_LEGACY_MODE
 
 #include "cedar/auxiliaries/ConfigurationInterface_legacy.h"
