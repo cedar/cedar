@@ -11,6 +11,9 @@ The goal of the Configurable class is to provide a simple yet powerful tool that
 class settings away from the class programmer and into cedar while still allowing for a large amount of flexibility in
 case the provided methods are insufficient for the user's needs.
 
+@remarks The code in this tutorial is included in [your cedar]/examples/auxiliaries/Configurable/Tutorial and the
+         corresponding compiled executable in [your cedar]/bin/examples/ConfigurableTutorial.
+
 
 @section BasicUsage Beginner's Tutorial: Basic Usage
 
@@ -138,6 +141,8 @@ valueChanged() signal in your constructor:
 
 If your class inherits cedar::aux::Configurable, you can use cedar::aux::gui::PropertyPane to display it. Just write:
 @code
+#include <cedar/auxiliaries/gui/PropertyPane.h>
+// ..
   cedar::aux::gui::PropertyPane *p_pane = new cedar::aux::gui::PropertyPane();
   p_pane->show(); // makes qt show the widget
   p_pane->display(my_configurable_object);
@@ -190,7 +195,43 @@ class B : public cedar::aux::Configurable
 The declaration of mAMember means that in the configuration file, the settings of mAMember will appear within the
 settings for B, as a subnode with the name "a_member". 
 
-It is also possible to place parameters into logical groups using the addConfigurableChild method.
+It is also possible to place parameters into logical groups using the addConfigurableChild method. The process is
+straight forward: create a new configurable object, add the parameters to be grouped to it and add it as a child to your
+class:
+@code
+class GroupDemo : public cedar::aux::Configurable
+{
+  private:
+    cedar::aux::DoubleParameterPtr mAParameter;
+    
+  public:
+    GroupDemo()
+    {
+      // note that initialization of parameters is no longer done in the initializer list
+      
+      // create configurable to represent the group
+      cedar::aux::ConfigurablePtr group(new cedar::aux::Configurable());
+      
+      // add the group as a child
+      this->addConfigurableChild("my group", group);
+      
+      // add parameters to the group
+      mAParameter = cedar::aux::DoubleParameterPtr
+                    (
+                      new cedar::aux::DoubleParameter
+                      (
+                        group.get(), // this adds the parameter to the group; note, that the .get() is required but
+                                     // doesn't violate the smartpointiness of the parameter because
+                                     // cedar::aux::DoubleParameterPtr is defined as an intrusive_ptr
+                        "a parameter", // rest looks the same as introduced above
+                        1.0,
+                        0.0,
+                        100.0
+                      )
+                    );
+    }
+};
+@endcode
 
 
 @section DynamicObjectListParameters Advanced Tutorial: Storing (Lists of) Objects of Different Types
