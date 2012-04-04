@@ -101,15 +101,6 @@ public slots:
    */
   void setThickness(double value);
 
-  /*!@brief creates an object with type and name specified by the widget controls */
-  void createVisualization();
-
-  /*!@brief deletes the currently selected object */
-  void deleteVisualization();
-
-  /*!@brief deletes all objects in the scene */
-  void deleteAllVisualizations();
-
   /*!@brief set the current object according to combo box status */
   void setActiveVisualization();
 
