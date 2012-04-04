@@ -46,7 +46,7 @@
 #include "cedar/auxiliaries/gl/Torus.h"
 #include "cedar/auxiliaries/gl/Ellipse.h"
 #include "cedar/auxiliaries/gl/Chessboard.h"
-#include "cedar/auxiliaries/RigidBody.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -67,68 +67,86 @@ int main(int argc, char **argv)
   viewer.startTimer(50);
 
   // create a rectangular block and add it to the scene
-  cedar::aux::RigidBodyPtr p_block_rigid_body(new cedar::aux::RigidBody());
-  p_block_rigid_body->setPosition(3, -3, 3);
-  p_block_rigid_body->setName("Bernd the Block");
-  cedar::aux::gl::RigidBodyVisualizationPtr p_block(new cedar::aux::gl::Block(p_block_rigid_body, 1, 2, 3, 0, 1, 0.5));
-  p_scene->addRigidBodyVisualization(p_block);
-  p_block_rigid_body->rotate(0, M_PI/2);
+  cedar::aux::LocalCoordinateFramePtr p_block_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  p_block_local_coordinate_frame->setTranslation(3, -3, 3);
+  cedar::aux::gl::ObjectVisualizationPtr p_block
+  (
+    new cedar::aux::gl::Block(p_block_local_coordinate_frame, 1, 2, 3, 0, 1, 0.5)
+  );
+  p_scene->addObjectVisualization(p_block);
+  p_block_local_coordinate_frame->rotate(0, M_PI/2);
 
   // create a sphere visualization and add it to the scene
-  cedar::aux::RigidBodyPtr p_sphere_rigid_body(new cedar::aux::RigidBody());
-  p_sphere_rigid_body->setPosition(3, 3, 3);
-  p_sphere_rigid_body->setName("Susi the Sphere");
-  cedar::aux::gl::RigidBodyVisualizationPtr p_sphere(new cedar::aux::gl::Sphere(p_sphere_rigid_body, 1, 1, 0, 0.5));
-  p_scene->addRigidBodyVisualization(p_sphere);
+  cedar::aux::LocalCoordinateFramePtr p_sphere_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  p_sphere_local_coordinate_frame->setTranslation(3, 3, 3);
+  cedar::aux::gl::ObjectVisualizationPtr p_sphere
+  (
+    new cedar::aux::gl::Sphere(p_sphere_local_coordinate_frame, 1, 1, 0, 0.5)
+  );
+  p_scene->addObjectVisualization(p_sphere);
 
   // create a cone visualization and add it to the scene
-  cedar::aux::RigidBodyPtr p_cone_rigid_body(new cedar::aux::RigidBody());
-  p_cone_rigid_body->setPosition(-3, 3, 3);
-  p_cone_rigid_body->setName("Carl the Cone");
-  cedar::aux::gl::RigidBodyVisualizationPtr p_cone(new cedar::aux::gl::Cone(p_cone_rigid_body, 1, 3, 0, 0, 1));
-  p_scene->addRigidBodyVisualization(p_cone);
+  cedar::aux::LocalCoordinateFramePtr p_cone_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  p_cone_local_coordinate_frame->setTranslation(-3, 3, 3);
+  cedar::aux::gl::ObjectVisualizationPtr p_cone
+  (
+    new cedar::aux::gl::Cone(p_cone_local_coordinate_frame, 1, 3, 0, 0, 1)
+  );
+  p_scene->addObjectVisualization(p_cone);
 
   // create a cylinder visualization and add it to the scene
-  cedar::aux::RigidBodyPtr p_cylinder_rigid_body(new cedar::aux::RigidBody());
-  p_cylinder_rigid_body->setPosition(-3, -3, 3);
-  p_cylinder_rigid_body->setName("Cindy the Cylinder");
-  cedar::aux::gl::RigidBodyVisualizationPtr p_cylinder(new cedar::aux::gl::Cylinder(p_cylinder_rigid_body, 1, 3, 0, 1, 1));
-  p_scene->addRigidBodyVisualization(p_cylinder);
+  cedar::aux::LocalCoordinateFramePtr p_cylinder_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  p_cylinder_local_coordinate_frame->setTranslation(-3, -3, 3);
+  cedar::aux::gl::ObjectVisualizationPtr p_cylinder
+  (
+    new cedar::aux::gl::Cylinder(p_cylinder_local_coordinate_frame, 1, 3, 0, 1, 1)
+  );
+  p_scene->addObjectVisualization(p_cylinder);
 
   // create a pyramid visualization and add it to the scene
-  cedar::aux::RigidBodyPtr p_pyramid_rigid_body(new cedar::aux::RigidBody());
-  p_pyramid_rigid_body->setPosition( 9, -3, 3 );
-  p_pyramid_rigid_body->setName("Peter the Pyramid");
-  cedar::aux::gl::RigidBodyVisualizationPtr p_pyramid(new cedar::aux::gl::Pyramid(p_pyramid_rigid_body, 2, 1.5, 1.5, 1, 1, 0));
-  p_scene->addRigidBodyVisualization(p_pyramid);
+  cedar::aux::LocalCoordinateFramePtr p_pyramid_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  p_pyramid_local_coordinate_frame->setTranslation( 9, -3, 3 );
+  cedar::aux::gl::ObjectVisualizationPtr p_pyramid
+  (
+    new cedar::aux::gl::Pyramid(p_pyramid_local_coordinate_frame, 2, 1.5, 1.5, 1, 1, 0)
+  );
+  p_scene->addObjectVisualization(p_pyramid);
 
   // create a torus visualization and add it to the scene
-  cedar::aux::RigidBodyPtr p_prism_rigid_body(new cedar::aux::RigidBody());
-  p_prism_rigid_body->setPosition(0, 0, 5);
-  p_prism_rigid_body->setName("Pamela Prisma");
-  cedar::aux::gl::RigidBodyVisualizationPtr p_prism(new cedar::aux::gl::Prism(p_prism_rigid_body, 2, 1));
-  p_scene->addRigidBodyVisualization(p_prism);
+  cedar::aux::LocalCoordinateFramePtr p_prism_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  p_prism_local_coordinate_frame->setTranslation(0, 0, 5);
+  cedar::aux::gl::ObjectVisualizationPtr p_prism
+  (
+    new cedar::aux::gl::Prism(p_prism_local_coordinate_frame, 2, 1)
+  );
+  p_scene->addObjectVisualization(p_prism);
 
   // create a torus visualization and add it to the scene
-  cedar::aux::RigidBodyPtr p_torus_rigid_body(new cedar::aux::RigidBody());
-  p_torus_rigid_body->setPosition( -7.5, 3, 3 );
-  p_torus_rigid_body->setName("Tom the Torus");
-  cedar::aux::gl::RigidBodyVisualizationPtr p_torus(new cedar::aux::gl::Torus(p_torus_rigid_body, 2, 0.3, 1, 0.5, 0));
-  p_scene->addRigidBodyVisualization(p_torus);
+  cedar::aux::LocalCoordinateFramePtr p_torus_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  p_torus_local_coordinate_frame->setTranslation( -7.5, 3, 3 );
+  cedar::aux::gl::ObjectVisualizationPtr p_torus
+  (
+    new cedar::aux::gl::Torus(p_torus_local_coordinate_frame, 2, 0.3, 1, 0.5, 0)
+  );
+  p_scene->addObjectVisualization(p_torus);
 
   // create a torus visualization and add it to the scene
-  cedar::aux::RigidBodyPtr p_ellipse_rigid_body(new cedar::aux::RigidBody());
-  p_ellipse_rigid_body->setPosition(-7.5, -3, 3);
-  p_ellipse_rigid_body->setName("Elfriede la Ellipse");
-  cedar::aux::gl::RigidBodyVisualizationPtr p_ellipse(new cedar::aux::gl::Ellipse(p_ellipse_rigid_body, 1, 2, 0.3, 1, 1, 0));
-  p_scene->addRigidBodyVisualization(p_ellipse);
+  cedar::aux::LocalCoordinateFramePtr p_ellipse_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  p_ellipse_local_coordinate_frame->setTranslation(-7.5, -3, 3);
+  cedar::aux::gl::ObjectVisualizationPtr p_ellipse
+  (
+    new cedar::aux::gl::Ellipse(p_ellipse_local_coordinate_frame, 1, 2, 0.3, 1, 1, 0)
+  );
+  p_scene->addObjectVisualization(p_ellipse);
 
   // create a chessboard visualization and add it to the scene
-  cedar::aux::RigidBodyPtr p_chessboard_rigid_body(new cedar::aux::RigidBody());
-  p_chessboard_rigid_body->setPosition( 7.5, 1.5, 3 );
-  p_chessboard_rigid_body->setName("Caspar the checkered Chessboard");
-  cedar::aux::gl::RigidBodyVisualizationPtr p_chessboard(new cedar::aux::gl::Chessboard(p_chessboard_rigid_body, 3, 3, 0.2, 8, 8, 0, 0, 0));
-  p_scene->addRigidBodyVisualization(p_chessboard);
+  cedar::aux::LocalCoordinateFramePtr p_chessboard_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  p_chessboard_local_coordinate_frame->setTranslation( 7.5, 1.5, 3 );
+  cedar::aux::gl::ObjectVisualizationPtr p_chessboard
+  (
+    new cedar::aux::gl::Chessboard(p_chessboard_local_coordinate_frame, 3, 3, 0.2, 8, 8, 0, 0, 0)
+  );
+  p_scene->addObjectVisualization(p_chessboard);
 
   // create a widget to control the scene
   cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));

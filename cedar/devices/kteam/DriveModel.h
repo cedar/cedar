@@ -144,7 +144,7 @@ private:
 
   /*!@brief Pointer to the robot the position is calculated of.
    */
-  cedar::dev::kteam::Drive *mpeDrive;
+  cedar::dev::kteam::Drive* mpeDrive;
 
   /*!@brief Stores the last encoder-values (needed to calculate the distance the robot has moved).
    */

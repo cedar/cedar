@@ -53,8 +53,9 @@ namespace cedar
     {
       //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_AUX_CLASS(Scene);
-      CEDAR_DECLARE_AUX_CLASS(RigidBodyVisualization);
-      CEDAR_DECLARE_DEPRECATED(typedef RigidBodyVisualization Object);
+      CEDAR_DECLARE_AUX_CLASS(ObjectVisualization);
+      CEDAR_DECLARE_DEPRECATED(typedef ObjectVisualization Object);
+      CEDAR_DECLARE_DEPRECATED(typedef ObjectVisualization RigidBodyVisualization);
       CEDAR_DECLARE_AUX_CLASS(Block);
       CEDAR_DECLARE_AUX_CLASS(Sphere);
       CEDAR_DECLARE_AUX_CLASS(Cone);

@@ -35,7 +35,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/LogFile.h"
-#include "cedar/auxiliaries/RigidBody.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/gl/Prism.h"
 
 // SYSTEM INCLUDES
@@ -47,9 +47,9 @@ int main(int, char**)
   int errors = 0;
 
   // test constructors
-  cedar::aux::RigidBodyPtr p_rigid_body(new cedar::aux::RigidBody());
-  cedar::aux::gl::Prism testPrism(p_rigid_body);
-  cedar::aux::gl::Prism prism(p_rigid_body, 1, 2);
+  cedar::aux::LocalCoordinateFramePtr p_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  cedar::aux::gl::Prism testPrism(p_local_coordinate_frame);
+  cedar::aux::gl::Prism prism(p_local_coordinate_frame, 1, 2);
 
   //--------------------------------------------------------------------------------------------------------------------
   // width

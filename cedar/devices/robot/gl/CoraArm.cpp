@@ -48,9 +48,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::robot::gl::CoraArm::CoraArm(cedar::dev::robot::KinematicChainModelPtr pKinematicChainModel)
+cedar::dev::robot::gl::CoraArm::CoraArm(cedar::dev::robot::KinematicChainPtr pKinematicChain)
 :
-cedar::dev::robot::gl::AmtecChain(pKinematicChainModel)
+cedar::dev::robot::gl::AmtecChain(pKinematicChain)
 {
 
 }
@@ -71,7 +71,7 @@ void cedar::dev::robot::gl::CoraArm::drawBase()
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChainModel->getTransformation().t();
+  mTransformationTranspose = mpKinematicChain->getRootTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
 
   setMaterial(DARK_BLUE_METAL);
@@ -93,7 +93,7 @@ void cedar::dev::robot::gl::CoraArm::drawSegment(unsigned int index)
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChainModel->getJointTransformation(index).t();
+  mTransformationTranspose = mpKinematicChain->getJointTransformation(index).t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
 
   switch (index)

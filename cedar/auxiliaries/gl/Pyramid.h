@@ -39,25 +39,25 @@
 
 // CEDAR INCLUDES
 #include "namespace.h"
-#include "RigidBodyVisualization.h"
+#include "ObjectVisualization.h"
 
 // SYSTEM INCLUDES
 
 /*!@brief Simple OpenGL visualization of a pyramid with rectangular base
  *
- * This class visualizes an instance of cedar::aux::RigidBodyVisualization as a pyramid with specified dimensions
+ * This class visualizes a pyramid with specified dimensions
  *
- * @remarks To get a simple visualization of the RigidBody on screen, add an instance of this class to a
+ * @remarks To get a simple visualization of the object on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
-class cedar::aux::gl::Pyramid : public cedar::aux::gl::RigidBodyVisualization
+class cedar::aux::gl::Pyramid : public cedar::aux::gl::ObjectVisualization
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief constructor. 
-   * @param pRigidBody pointer to the aux::RigidBody being visualized
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    * @param length extension of the pyramid's base in x-direction of object coordinate frame
    * @param width extension of the pyramid's base in y-direction of object coordinate frame
    * @param height height of the pyramid, i.e. distance from base to tip
@@ -66,7 +66,7 @@ public:
    * @param colorB color, value for blue channel in RGB
    */
   Pyramid(
-           cedar::aux::RigidBodyPtr pRigidBody,
+           cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
            double length = 2.0,
            double width = 3.0,
            double height = 2.0,

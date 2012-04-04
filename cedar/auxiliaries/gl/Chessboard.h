@@ -39,28 +39,28 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
-#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/RigidBody.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 
 // SYSTEM INCLUDES
 
 
 /*!@brief Simple OpenGL visualization of a chess board
  *
- * This class visualizes an instance of cedar::aux::RigidBodyVisualization as a chess board with specified dimensions
+ * This class visualizes a chess board with specified dimensions
  *
- * @remarks To get a simple visualization of the RigidBody on screen, add an instance of this class to a
+ * @remarks To get a simple visualization of the object on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
-class cedar::aux::gl::Chessboard : public cedar::aux::gl::RigidBodyVisualization
+class cedar::aux::gl::Chessboard : public cedar::aux::gl::ObjectVisualization
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief constructor. 
-   * @param pRigidBody pointer to the aux::RigidBody being visualized
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    * @param length extension of the board in x-direction of the object coordinate frame
    * @param width extension of the board in y-direction of the object coordinate frame
    * @param height extension of the board in z-direction of the object coordinate frame
@@ -71,7 +71,7 @@ public:
    * @param colorB color, value for blue channel in RGB
    */
   Chessboard(
-              cedar::aux::RigidBodyPtr pRigidBody,
+              cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
               double length = 4.0,
               double width = 4.0,
               double height = 0.2,

@@ -39,25 +39,25 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
-#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
 
 // SYSTEM INCLUDES
 
 /*!@brief Simple OpenGL visualization of an ellipse
  *
- * This class visualizes an instance of cedar::aux::RigidBodyVisualization as a torus around an ellipse
+ * This class visualizes a torus around an ellipse
  *
- * @remarks To get a simple visualization of the RigidBody on screen, add an instance of this class to a
+ * @remarks To get a simple visualization of the object on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
-class cedar::aux::gl::Ellipse : public cedar::aux::gl::RigidBodyVisualization
+class cedar::aux::gl::Ellipse : public cedar::aux::gl::ObjectVisualization
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief constructor. 
-   * @param pRigidBody pointer to the aux::RigidBody being visualized
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    * @param length extension of the ellipse in x-direction of the object frame
    * @param width extension of the ellipse in y-direction of the object frame
    * @param thickness distance of the walls to the ellipse
@@ -66,7 +66,7 @@ public:
    * @param colorB color, value for blue channel in RGB
    */
   Ellipse(
-           cedar::aux::RigidBodyPtr pRigidBody,
+           cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
            double length = 2.0,
            double width = 3.0,
            double thickness = 0.3,
