@@ -2,7 +2,7 @@
 @page ParametersConcept Storing and loading configurations for parameters
 
 @section ParametersIntroduction Overview
-Working with dynamics and robots will put you sooner or later in the situation of having a large set of parameters for
+Working with dynamics and robots will  sooner or later put you in the situation of having a large set of parameters for
 a multitude of architecture parts, which took a lot of time figuring out and tuning to your demands. You may also want 
 to work with different sets of parameters for different scenarios, robots, or situations. For all your parameter needs,
 cedar includes an easy-to-use configuration interface based on 
@@ -22,4 +22,6 @@ saves all alterations.
 You can also create custom parameter types by using the templated class cedar::aux::ParameterTemplate or inheriting
 from cedar::aux::Parameter. Note that you may have to provide the graphical representation for your parameter, as 
 cedar cannot automatically handle custom parameters.
+
+For details of the code-side of this (including a tutorial), see @ref ConfigurableAndParameters.
 */
