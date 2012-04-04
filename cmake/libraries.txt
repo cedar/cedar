@@ -108,9 +108,8 @@ endif(OpenCV_FOUND)
 # check if legacy mode is enabled
 
 if (NOT DEFINED CEDAR_LIBCONFIG_LEGACY_MODE OR CEDAR_LIBCONFIG_LEGACY_MODE)
-      
+    set(CEDAR_LIBCONFIG_LEGACY_MODE ON)
     message("-- Searching for libconfig (LEGACY MODE)...")
-    add_definitions(-DCEDAR_LIBCONFIG_LEGACY_MODE)
     
     find_package(Libconfig REQUIRED)
     if(Libconfig_FOUND)
