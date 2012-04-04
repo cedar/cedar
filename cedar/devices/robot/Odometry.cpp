@@ -50,11 +50,11 @@
 cv::Mat cedar::dev::robot::Odometry::getTranslation() const
 {
   //construct the matrix to return
-  cv::Mat translation = cv::Mat(2,1,CV_64FC1);
+  cv::Mat translation = cv::Mat(2, 1, CV_64FC1);
 
   //store the x- and y-position in the new matrix (gets are from LocalCoordinateFrame.h)
-  translation.at<double>(0,0) = getTranslationX();
-  translation.at<double>(1,0) = getTranslationY();
+  translation.at<double>(0, 0) = getTranslationX();
+  translation.at<double>(1, 0) = getTranslationY();
   return translation;
 }
 
@@ -76,10 +76,10 @@ void cedar::dev::robot::Odometry::setRotation(double angle)
 {
   //construct a new matrix as parameter for setOrientationQuaternion
   cv::Mat rotation = cv::Mat(4, 1, CV_64FC1);
-  rotation.at<double>(0,0) = 0; //orientation is a unit-quaternion
-  rotation.at<double>(1,0) = cos(angle);
-  rotation.at<double>(2,0) = sin(angle);
-  rotation.at<double>(3,0) = 0; //no rotation in z-direction
+  rotation.at<double>(0, 0) = 0; //orientation is a unit-quaternion
+  rotation.at<double>(1, 0) = cos(angle);
+  rotation.at<double>(2, 0) = sin(angle);
+  rotation.at<double>(3, 0) = 0; //no rotation in z-direction
 
   //todo: fix this! (HR)
 //  setOrientationQuaternion(orientation_mat);

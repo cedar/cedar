@@ -65,11 +65,10 @@
 class cedar::dev::robot::KinematicChain
 :
 public cedar::dev::robot::Component,
-public cedar::aux::LoopedThread,
-#ifndef CEDAR_LIBCONFIG_LEGACY_MODE
-virtual // only needs to inherit virtually in case of non-legacy config interface
+public cedar::aux::LoopedThread
+#ifdef CEDAR_LIBCONFIG_LEGACY_MODE
+,public cedar::aux::Configurable // only needs to inherit virtually in case of non-legacy config interface
 #endif // CEDAR_LIBCONFIG_LEGACY_MODE
-public cedar::aux::Configurable
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------
