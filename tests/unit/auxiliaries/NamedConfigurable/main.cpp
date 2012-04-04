@@ -58,10 +58,19 @@ int main()
   std::string name = test_class->getName();
   if (name != "test_name")
   {
+    std::cout << "Wrong name was set; ";
+    ++errors;
+  }
+  std::cout << "Read name \"" << name << "\"." << std::endl;
+
+  test_class->readJson("test.json");
+  if (name != "name_from_file")
+  {
     std::cout << "Wrong name was read; ";
     ++errors;
   }
   std::cout << "Read name \"" << name << "\"." << std::endl;
+
 
   return errors;
 }

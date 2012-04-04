@@ -68,6 +68,7 @@ int main(int argc, char **argv)
 
   // create a rectangular block and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_block_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  p_block_local_coordinate_frame->setName("block");
   p_block_local_coordinate_frame->setTranslation(3, -3, 3);
   cedar::aux::gl::ObjectVisualizationPtr p_block
   (
@@ -78,6 +79,7 @@ int main(int argc, char **argv)
 
   // create a sphere visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_sphere_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  p_sphere_local_coordinate_frame->setName("sphere");
   p_sphere_local_coordinate_frame->setTranslation(3, 3, 3);
   cedar::aux::gl::ObjectVisualizationPtr p_sphere
   (
@@ -87,6 +89,7 @@ int main(int argc, char **argv)
 
   // create a cone visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_cone_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  p_cone_local_coordinate_frame->setName("cone");
   p_cone_local_coordinate_frame->setTranslation(-3, 3, 3);
   cedar::aux::gl::ObjectVisualizationPtr p_cone
   (
@@ -96,6 +99,7 @@ int main(int argc, char **argv)
 
   // create a cylinder visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_cylinder_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  p_cylinder_local_coordinate_frame->setName("cylinder");
   p_cylinder_local_coordinate_frame->setTranslation(-3, -3, 3);
   cedar::aux::gl::ObjectVisualizationPtr p_cylinder
   (
@@ -105,6 +109,7 @@ int main(int argc, char **argv)
 
   // create a pyramid visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_pyramid_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  p_pyramid_local_coordinate_frame->setName("pyramid");
   p_pyramid_local_coordinate_frame->setTranslation( 9, -3, 3 );
   cedar::aux::gl::ObjectVisualizationPtr p_pyramid
   (
@@ -114,6 +119,7 @@ int main(int argc, char **argv)
 
   // create a torus visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_prism_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  p_prism_local_coordinate_frame->setName("prism");
   p_prism_local_coordinate_frame->setTranslation(0, 0, 5);
   cedar::aux::gl::ObjectVisualizationPtr p_prism
   (
@@ -123,6 +129,7 @@ int main(int argc, char **argv)
 
   // create a torus visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_torus_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  p_torus_local_coordinate_frame->setName("torus");
   p_torus_local_coordinate_frame->setTranslation( -7.5, 3, 3 );
   cedar::aux::gl::ObjectVisualizationPtr p_torus
   (
@@ -132,6 +139,7 @@ int main(int argc, char **argv)
 
   // create a torus visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_ellipse_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  p_ellipse_local_coordinate_frame->setName("ellipse");
   p_ellipse_local_coordinate_frame->setTranslation(-7.5, -3, 3);
   cedar::aux::gl::ObjectVisualizationPtr p_ellipse
   (
@@ -141,6 +149,7 @@ int main(int argc, char **argv)
 
   // create a chessboard visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_chessboard_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  p_chessboard_local_coordinate_frame->setName("chess board");
   p_chessboard_local_coordinate_frame->setTranslation( 7.5, 1.5, 3 );
   cedar::aux::gl::ObjectVisualizationPtr p_chessboard
   (

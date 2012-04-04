@@ -44,7 +44,7 @@
 #include "cedar/devices/robot/namespace.h"
 #include "cedar/devices/robot/Component.h"
 #include "cedar/auxiliaries/LoopedThread.h"
-#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 
 // SYSTEM INCLUDES
@@ -64,7 +64,7 @@ class cedar::dev::robot::KinematicChain
 :
 public cedar::dev::robot::Component,
 public cedar::aux::LoopedThread,
-public cedar::aux::Configurable
+public cedar::aux::NamedConfigurable
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------
