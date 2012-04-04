@@ -51,6 +51,7 @@ class A
 
 // naming scheme for the classes: first letter is the first base, second letter the second one and so on.
 
+
 class B : virtual public A
 {
 };
@@ -171,6 +172,33 @@ void printNodeWithChildren
   } \
 }
 
+/*
+ * What the hierarchy should look like:
+ *
+ *           / BA
+ *      _ B < ---------
+ *     /   \ \ BB      |
+ * A -<     \______ D--+----- F
+ *     \     /         -- E -/
+ *      \_  /  CA ____/
+ *         C <
+ *             CB
+ *
+ * Or, in this test's print syntax:
+ * A
+ *   B
+ *     BA
+ *     BB
+ *     E
+ *       F
+ *   C
+ *     CA
+ *       E
+ *         F
+ *     CB
+ *     D
+ *       F
+ */
 int checkHierarchy(const AHierarchy& hierarchy)
 {
   int errors = 0;
@@ -180,9 +208,6 @@ int checkHierarchy(const AHierarchy& hierarchy)
     std::cout << "Tree has the wrong size: should be 9, is " << hierarchy.size() << std::endl;
     ++errors;
   }
-
-  std::cout << "Tree after inserting:" << std::endl;
-  printNodeWithChildren(hierarchy.getRootNode());
 
   FIND_NODE_CHECKED(A);
   FIND_NODE_CHECKED(B);
@@ -198,6 +223,13 @@ int checkHierarchy(const AHierarchy& hierarchy)
   CHECK_NODE_CHILDREN_SIZE(A, 2);
   CHECK_NODE_CHILDREN_SIZE(B, 4);
   CHECK_NODE_CHILDREN_SIZE(C, 3);
+  CHECK_NODE_CHILDREN_SIZE(BA, 0);
+  CHECK_NODE_CHILDREN_SIZE(BB, 0);
+  CHECK_NODE_CHILDREN_SIZE(CA, 1);
+  CHECK_NODE_CHILDREN_SIZE(CB, 0);
+  CHECK_NODE_CHILDREN_SIZE(D, 1);
+  CHECK_NODE_CHILDREN_SIZE(E, 1);
+  CHECK_NODE_CHILDREN_SIZE(F, 0);
 
 
   CHECK_ANCESTOR(B, A);
@@ -218,94 +250,141 @@ int checkHierarchy(const AHierarchy& hierarchy)
   CHECK_ANCESTOR(F, E);
   CHECK_ANCESTOR(F, D);
 
-  std::cout << "node path for D: " << std::endl;
-  printNodePath(node_D);
-
-  std::cout << "node path for E: " << std::endl;
-  printNodePath(node_E);
+//  std::cout << "node path for D: " << std::endl;
+//  printNodePath(node_D);
+//
+//  std::cout << "node path for E: " << std::endl;
+//  printNodePath(node_E);
 
   return errors;
 }
 
-int main()
+
+// helper classes for inserting data
+class Helper
+{
+  public:
+    virtual void insertInto(AHierarchy& hierarchy) = 0;
+
+    virtual std::string toString() const = 0;
+};
+
+CEDAR_GENERATE_POINTER_TYPES(Helper);
+
+template <class T>
+class HelperTemplate : public Helper
+{
+  public:
+    void insertInto(AHierarchy& hierarchy)
+    {
+      std::string data_name = "data_" + cedar::aux::typeToString<T>();
+      hierarchy.insert<T>(data_name);
+    }
+
+    std::string toString() const
+    {
+      return cedar::aux::typeToString<T>();
+    }
+};
+
+
+void permutate
+(
+  std::vector<std::vector<HelperPtr> >& orders,
+  std::set<HelperPtr> toInsert,
+  std::vector<HelperPtr> path = std::vector<HelperPtr>())
+{
+  if (toInsert.empty())
+  {
+    orders.push_back(path);
+  }
+
+  std::vector<HelperPtr> path_plus_one;
+  path_plus_one.insert(path_plus_one.begin(), path.begin(), path.end());
+  path_plus_one.push_back(HelperPtr());
+  for (std::set<HelperPtr>::iterator iter = toInsert.begin(); iter != toInsert.end(); ++iter)
+  {
+    std::set<HelperPtr> subset;
+    subset.insert(toInsert.begin(), toInsert.end());
+    subset.erase(subset.find(*iter));
+    path_plus_one.back() = *iter;
+    permutate(orders, subset, path_plus_one);
+  }
+}
+
+
+int checkHierarchy(const std::vector<HelperPtr>& insertOrder)
+{
+  AHierarchy hierarchy("data_A");
+
+  for (size_t i = 0; i < insertOrder.size(); ++i)
+  {
+    insertOrder.at(i)->insertInto(hierarchy);
+  }
+
+  int errors = checkHierarchy(hierarchy);
+
+  if (errors > 0)
+  {
+    std::cout << " ========================================================================== " << std::endl;
+    std::cout << "  Error with insert order:";
+
+    for (size_t i = 0; i < insertOrder.size(); ++i)
+    {
+      std::cout << " " << insertOrder.at(i)->toString();
+    }
+    std::cout << std::endl
+        << " ========================================================================== " << std::endl;
+
+    std::cout << std::endl << "Hierarchy:" << std::endl;
+    printNodeWithChildren(hierarchy.getRootNode());
+  }
+
+  return errors;
+}
+
+int main(int argc, char** argv)
 {
   // the number of errors encountered in this test
   int errors = 0;
 
+  // whether the test should stop on the first error.
+  bool stop_on_first_error = false;
+  if (argc > 1)
   {
-    std::cout << ">>>>>>>>>>>>>> Creating hierarchy." << std::endl;
-    AHierarchy hierarchy("data_A");
-
-    std::cout << "Inserting data." << std::endl;
-    hierarchy.insert<B>("data_B");
-    hierarchy.insert<C>("data_C");
-    hierarchy.insert<BB>("data_BB");
-    hierarchy.insert<BA>("data_BA");
-    hierarchy.insert<CA>("data_CA");
-    hierarchy.insert<CB>("data_CB");
-    hierarchy.insert<D>("data_D");
-    hierarchy.insert<E>("data_E");
-    std::cout << "Inserting F" << std::endl;
-    hierarchy.insert<F>("data_F");
-
-    errors += checkHierarchy(hierarchy);
+    stop_on_first_error = (std::string(argv[1]) == "--stop");
   }
 
+  // shuffle and create all possible orders for insertion of the hierarchy
+  std::vector<std::vector<HelperPtr> > insert_orders;
+
+  std::set<HelperPtr> classes;
+  classes.insert(HelperPtr(new HelperTemplate<B>()));
+  classes.insert(HelperPtr(new HelperTemplate<BA>()));
+  classes.insert(HelperPtr(new HelperTemplate<BB>()));
+  classes.insert(HelperPtr(new HelperTemplate<C>()));
+  classes.insert(HelperPtr(new HelperTemplate<CA>()));
+  classes.insert(HelperPtr(new HelperTemplate<CB>()));
+  classes.insert(HelperPtr(new HelperTemplate<D>()));
+  classes.insert(HelperPtr(new HelperTemplate<E>()));
+  classes.insert(HelperPtr(new HelperTemplate<F>()));
+
+  permutate(insert_orders, classes);
+
+  std::cout << "Testing " << insert_orders.size() << " trees." << std::endl;
+
+  for (size_t i = 0; i < insert_orders.size(); ++i)
   {
-    std::cout << ">>>>>>>>>>>>>> Creating hierarchy differently." << std::endl;
-    AHierarchy hierarchy("data_A");
+    errors += checkHierarchy(insert_orders.at(i));
 
-    std::cout << "Inserting data." << std::endl;
-    hierarchy.insert<F>("data_F");
-    hierarchy.insert<CA>("data_CA");
-    hierarchy.insert<BB>("data_BB");
-    hierarchy.insert<E>("data_E");
-    hierarchy.insert<C>("data_C");
-    hierarchy.insert<BA>("data_BA");
-    hierarchy.insert<B>("data_B");
-    hierarchy.insert<CB>("data_CB");
-    std::cout << "Inserting D" << std::endl;
-    hierarchy.insert<D>("data_D");
-
-    errors += checkHierarchy(hierarchy);
+    if (stop_on_first_error && errors > 0)
+    {
+      std::cout << "Stopping on test no. " << i << " with " << errors << " error(s)." << std::endl;
+      return errors;
+    }
   }
 
-  {
-    std::cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Creating hierarchy even more differently. <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
-    AHierarchy hierarchy("data_A");
-
-    std::cout << "########### Inserting data_BB." << std::endl;
-    hierarchy.insert<BB>("data_BB");
-    printNodeWithChildren(hierarchy.getRootNode());
-    std::cout << "########### Inserting data_E." << std::endl;
-    hierarchy.insert<E>("data_E");
-    printNodeWithChildren(hierarchy.getRootNode());
-    std::cout << "########### Inserting data_C." << std::endl;
-    hierarchy.insert<C>("data_C");
-    printNodeWithChildren(hierarchy.getRootNode());
-    std::cout << "########### Inserting data_BA." << std::endl;
-    hierarchy.insert<BA>("data_BA");
-    printNodeWithChildren(hierarchy.getRootNode());
-    std::cout << "########### Inserting data_F." << std::endl;
-    hierarchy.insert<F>("data_F");
-    printNodeWithChildren(hierarchy.getRootNode());
-    std::cout << "########### Inserting data_B." << std::endl;
-    hierarchy.insert<B>("data_B");
-    printNodeWithChildren(hierarchy.getRootNode());
-    std::cout << "########### Inserting data_CB." << std::endl;
-    hierarchy.insert<CB>("data_CB");
-    printNodeWithChildren(hierarchy.getRootNode());
-    std::cout << "########### Inserting data_D." << std::endl;
-    hierarchy.insert<D>("data_D");
-    printNodeWithChildren(hierarchy.getRootNode());
-    std::cout << "########### Inserting data_CA." << std::endl;
-    hierarchy.insert<CA>("data_CA");
-    printNodeWithChildren(hierarchy.getRootNode());
-
-    errors += checkHierarchy(hierarchy);
-  }
-
-  std::cout << "Test completed, there were " << errors << " errors." << std::endl;
+  std::cout << "Test completed, there were " << errors << " error(s)." << std::endl;
 
   return errors;
 }
