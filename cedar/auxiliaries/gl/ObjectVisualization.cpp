@@ -77,9 +77,13 @@ mColorR(colorR),
 mColorG(colorG),
 mColorB(colorB),
 mpLocalCoordinateFrame(pLocalCoordinateFrame),
-mTransformationTranspose(4, 4, CV_64FC1)
+mTransformationTranspose(4, 4, CV_64FC1),
+mIsVisible(true),
+mIsDrawnAsWireFrame(false),
+mIsDrawingLocalCoordinateFrame(false),
+mAxisLength(1.0),
+mResolution(10)
 {
-  init();
 }
 
 cedar::aux::gl::ObjectVisualization::~ObjectVisualization()
@@ -92,16 +96,6 @@ cedar::aux::gl::ObjectVisualization::~ObjectVisualization()
 
 void cedar::aux::gl::ObjectVisualization::initializeGl()
 {
-}
-
-void cedar::aux::gl::ObjectVisualization::init()
-{
-  //@todo (review) move this to the constructor
-  mIsVisible = true;
-  mIsDrawnAsWireFrame = false;
-  mIsDrawingLocalCoordinateFrame = false;
-  mAxisLength = 1.0;
-  mResolution = 10;
 }
 
 bool cedar::aux::gl::ObjectVisualization::isVisible() const

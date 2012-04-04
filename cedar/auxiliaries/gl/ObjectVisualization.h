@@ -203,12 +203,8 @@ protected:
   void setMaterial(int material);
 
   //--------------------------------------------------------------------------------------------------------------------
-  // private methods
+  // Qt slots
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  //!@brief initialization function
-  virtual void init();
-  
 public slots:
   //!@brief turns the visibility of the object on and off
   void setVisibility(bool state = true);
