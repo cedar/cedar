@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/gl/gl.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -88,7 +89,7 @@ public:
    */
   ObjectVisualization
   (
-    cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame
+    cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
     const std::string& objectType = "no type",
     double colorR = 1.0,
     double colorG = 0.0,

@@ -50,9 +50,9 @@ cedar::aux::gl::Prism::Prism
   cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
   double width,
   double height,
-  double R,
-  double G,
-  double B
+  double colorR,
+  double colorG,
+  double colorB
 )
 :
 cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Prism", colorR, colorG, colorB),

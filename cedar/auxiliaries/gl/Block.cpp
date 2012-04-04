@@ -50,9 +50,9 @@ cedar::aux::gl::Block::Block
 	double length,
 	double width,
   double height,
-  double R,
-  double G,
-  double B
+  double colorR,
+  double colorG,
+  double colorB
 )
 :
 cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Block", colorR, colorG, colorB),

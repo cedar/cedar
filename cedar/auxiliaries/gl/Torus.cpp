@@ -49,9 +49,9 @@ cedar::aux::gl::Torus::Torus
   cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
   double radius,
   double thickness,
-  double R,
-  double G,
-  double B
+  double colorR,
+  double colorG,
+  double colorB
 )
 :
 cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Torus", colorR, colorG, colorB),

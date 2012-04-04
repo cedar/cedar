@@ -40,7 +40,6 @@ cedar_add_library(cedaraux
   gl/ObjectVisualization.h
   gui/BaseWidget.h
   gui/BoolParameter.h
-  gui/DataPlotInterface.h
   gui/DataPlotter.h
   gui/DirectoryParameter.h
   gui/DoubleParameter.h
@@ -53,6 +52,7 @@ cedar_add_library(cedaraux
   gui/Parameter.h
   gui/LocalCoordinateFrameWidget.h
   gui/ObjectVisualizationWidget.h
+  gui/PlotInterface.h
   gui/Viewer.h
   gui/SceneWidget.h
   gui/HistoryPlot.h

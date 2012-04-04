@@ -49,9 +49,9 @@ cedar::aux::gl::Sphere::Sphere
 (
   cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
   double radius,
-  double R,
-  double G,
-  double B
+  double colorR,
+  double colorG,
+  double colorB
 )
 :
 cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Sphere", colorR, colorG, colorB),
