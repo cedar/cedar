@@ -43,7 +43,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/amtec/namespace.h"
-#include "cedar/devices/robot/ReferenceGeometry.h"
 #include "cedar/devices/robot/KinematicChain.h"
 
 // SYSTEM INCLUDES
@@ -59,8 +58,6 @@ class cedar::dev::amtec::KinematicChain : public cedar::dev::robot::KinematicCha
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr pReferenceGeometry);
-  //!@brief constructor
   KinematicChain(const std::string& configFileName);
 
   //!@brief Destructor
@@ -74,7 +71,7 @@ public:
    *
    * @return    state
    */
-  bool isMovable();
+  bool isMovable() const;
 
   /*!@brief returns the max. acceleration of a joint
    *
@@ -99,6 +96,11 @@ public:
    * */
   void setJointAngle(unsigned int index, double value, double stepTime);
 
+  /*!brief initialize the amtec device
+   * @return flag set to true if initialized successfully
+   */
+  bool initDevice();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -109,7 +111,6 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  bool initDevice();
   bool calibrateModule(unsigned int module);
   double getJointAngle(unsigned int index) const;
   double getJointVelocity(unsigned int index) const;

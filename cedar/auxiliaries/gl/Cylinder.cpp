@@ -35,9 +35,8 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gl/drawShapes.h"
-#include "cedar/auxiliaries/gl/Cylinder.h"
-#include "cedar/auxiliaries/gl/gl.h"
+#include "drawShapes.h"
+#include "Cylinder.h"
 
 // SYSTEM INCLUDES
 
@@ -45,9 +44,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+
 cedar::aux::gl::Cylinder::Cylinder
 (
-  cedar::aux::RigidBodyPtr pRigidBody,
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
   double radius,
   double height,
   double colorR,
@@ -55,7 +55,7 @@ cedar::aux::gl::Cylinder::Cylinder
   double colorB
 )
 :
-cedar::aux::gl::RigidBodyVisualization(pRigidBody, "Cylinder", colorR, colorG, colorB),
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Cylinder", colorR, colorG, colorB),
 mRadius(radius),
 mHeight(height)
 {
@@ -73,11 +73,11 @@ void cedar::aux::gl::Cylinder::draw()
   if (mIsVisible)
   {
     gl::setColor(mColorR, mColorG, mColorB);
-    drawCone(-mHeight * 0.5, mHeight * 0.5, mRadius, mRadius, mResolution * 2, mIsDrawnAsWireFrame);
-    glTranslated(0, 0, mHeight * -0.5);
-    drawDisk(0, mRadius, mResolution * 2, mResolution, true, mIsDrawnAsWireFrame);
+    drawCone(-mHeight*0.5, mHeight*0.5, mRadius, mRadius, mResolution*2, mIsDrawnAsWireFrame);
+    glTranslated(0, 0, mHeight*-0.5);
+    drawDisk(0, mRadius, mResolution*2, mResolution, true, mIsDrawnAsWireFrame);
     glTranslated(0, 0, mHeight);
-    drawDisk(0, mRadius, mResolution * 2, mResolution, false, mIsDrawnAsWireFrame);
+    drawDisk(0, mRadius, mResolution*2, mResolution, false, mIsDrawnAsWireFrame);
   }
 }
 

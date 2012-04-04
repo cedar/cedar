@@ -43,18 +43,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+
 cedar::aux::gl::Block::Block
 (
-  cedar::aux::RigidBodyPtr pRigidBody,
-  double length,
-  double width,
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+	double length,
+	double width,
   double height,
   double colorR,
   double colorG,
   double colorB
 )
 :
-cedar::aux::gl::RigidBodyVisualization(pRigidBody, "Block", colorR, colorG, colorB),
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Block", colorR, colorG, colorB),
 mLength(length),
 mWidth(width),
 mHeight(height)
@@ -72,7 +73,7 @@ void cedar::aux::gl::Block::draw()
   // draw object
   if (mIsVisible)
   {
-    gl::setColor(mColorR, mColorG, mColorB);
+    cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
     drawBlock(mLength, mWidth, mHeight, mIsDrawnAsWireFrame);
   }
 }

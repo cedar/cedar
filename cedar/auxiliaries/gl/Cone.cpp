@@ -43,9 +43,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+
 cedar::aux::gl::Cone::Cone
 (
-  cedar::aux::RigidBodyPtr pRigidBody,
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
   double radius,
   double height,
   double colorR,
@@ -53,7 +54,7 @@ cedar::aux::gl::Cone::Cone
   double colorB
 )
 :
-cedar::aux::gl::RigidBodyVisualization(pRigidBody, "Cone", colorR, colorG, colorB),
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Cone", colorR, colorG, colorB),
 mRadius(radius),
 mHeight(height)
 {

@@ -35,8 +35,6 @@
 ======================================================================================================================*/
 
 #define NOMINMAX // to avoid Windows issues
-#define GL_GLEXT_PROTOTYPES // to avoid a problem with finding some GL stuff, apparently caused by Qt
-#define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/System.h"
@@ -46,33 +44,13 @@
 #include "cedar/devices/robot/gl/namespace.h"
 #include "cedar/devices/robot/gl/KukaArm.h"
 
-// SYSTEM INCLUDES
- #include <QTextStream>
- #include <QFile>
-
-// define constants
-const float cedar::dev::robot::gl::KukaArm::mNoSpecular[3] = {0.0f, 0.0f, 0.0f};
-const float cedar::dev::robot::gl::KukaArm::mSegment_Ambient[3] = {0.0f, 0.0f, 0.0f};
-const float cedar::dev::robot::gl::KukaArm::mSegment_Diffuse[3] = {1.0f, 0.39215699f, 0.0f};
-const float cedar::dev::robot::gl::KukaArm::mSegment_Specular[3] = {0.40000001f, 0.16078401f, 0.0f};
-const float cedar::dev::robot::gl::KukaArm::mSegment_Shininess[1] = {1.0f};
-const float cedar::dev::robot::gl::KukaArm::mChrome_Ambient[3] = {0.25f, 0.25f, 0.25f};
-const float cedar::dev::robot::gl::KukaArm::mChrome_Diffuse[3] = {0.4f, 0.4f, 0.4f};
-const float cedar::dev::robot::gl::KukaArm::mChrome_Specular[3] = {0.774597f, 0.774597f, 0.774597f};
-const float cedar::dev::robot::gl::KukaArm::mChrome_Shininess[1] = {0.6f};
-const float cedar::dev::robot::gl::KukaArm::mBlack_Ambient[3] = {0.0f, 0.0f, 0.0f};
-const float cedar::dev::robot::gl::KukaArm::mBlack_Diffuse[3] = {0.01f, 0.01f, 0.01f};
-const float cedar::dev::robot::gl::KukaArm::mBlack_Specular[3] = {0.2f, 0.2f, 0.2f};
-const float cedar::dev::robot::gl::KukaArm::mBlack_Shininess[1] = {0.05f};
-
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::robot::gl::KukaArm::KukaArm(cedar::dev::robot::KinematicChainModelPtr pKinematicChainModel)
+cedar::dev::robot::gl::KukaArm::KukaArm(cedar::dev::robot::KinematicChainPtr pKinematicChain)
 :
-cedar::dev::robot::gl::KinematicChain(pKinematicChainModel)
+cedar::dev::robot::gl::KinematicChain(pKinematicChain)
 {
   loadData();
 }
@@ -90,7 +68,6 @@ void cedar::dev::robot::gl::KukaArm::initializeGl()
 {
   //!@todo The following doesn't compile on windows! Needs glext.h
 #ifndef WIN32
-  std::cout << "initializing resources for KUKA LBR4 visualization" << std::endl;
   // base segment
   glGenBuffers(1, &mBaseSegmentVertexVboId);
   glBindBuffer(GL_ARRAY_BUFFER, mBaseSegmentVertexVboId);
@@ -171,7 +148,6 @@ void cedar::dev::robot::gl::KukaArm::initializeGl()
   glGenBuffers(1, &mWristRingIndexVboId);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mWristRingIndexVboId);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, mWristRingFacesNumber*3 * sizeof(GLushort), mWristRingIndex, GL_STATIC_DRAW);
-
 #endif // WIN32
 }
 
@@ -186,9 +162,9 @@ void cedar::dev::robot::gl::KukaArm::drawBase()
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   }
-  setMaterial(SEGMENT);
+  setMaterial(cedar::aux::gl::ObjectVisualization::SEGMENT);
   this->drawElement(mBaseSegmentVertexVboId, mBaseSegmentIndexVboId, mBaseSegmentFacesNumber);
-  setMaterial(CHROME);
+  setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
   this->drawElement(mBaseRingVertexVboId, mBaseRingIndexVboId, mBaseRingFacesNumber);
   // move to the base of the block
   glRotated(-60.0, 1.0, 0.0, 0.0);
@@ -202,7 +178,7 @@ void cedar::dev::robot::gl::KukaArm::drawBase()
 
 
 
-  setMaterial(NO_MATERIAL);
+  setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
 }
 
 void cedar::dev::robot::gl::KukaArm::drawBaseBlock()
@@ -319,7 +295,7 @@ void cedar::dev::robot::gl::KukaArm::drawSegment(unsigned int index)
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChainModel->getJointTransformation(index).t();
+  mTransformationTranspose = mpKinematicChain->getJointTransformation(index).t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
 
   if (isDrawingLocalCoordinateFrame())
@@ -337,57 +313,57 @@ void cedar::dev::robot::gl::KukaArm::drawSegment(unsigned int index)
   switch (index)
   {
   case 0:
-    setMaterial(SEGMENT);
+    setMaterial(cedar::aux::gl::ObjectVisualization::SEGMENT);
     this->drawElement(mForwardSegmentVertexVboId, mForwardSegmentIndexVboId, mForwardSegmentFacesNumber);
-    setMaterial(CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     this->drawElement(mForwardRingVertexVboId, mForwardRingIndexVboId, mForwardRingFacesNumber);
-    setMaterial(NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     break;
   case 1:
     glRotated(90.0, 1.0, 0.0, 0.0);
-    setMaterial(SEGMENT);
+    setMaterial(cedar::aux::gl::ObjectVisualization::SEGMENT);
     this->drawElement(mInverseSegmentVertexVboId, mInverseSegmentIndexVboId, mInverseSegmentFacesNumber);
-    setMaterial(CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     this->drawElement(mInverseRingVertexVboId, mInverseRingIndexVboId, mInverseRingFacesNumber);
-    setMaterial(NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     break;
   case 2:
     glRotated(180.0, 0.0, 0.0, 1.0);
-    setMaterial(SEGMENT);
+    setMaterial(cedar::aux::gl::ObjectVisualization::SEGMENT);
     this->drawElement(mForwardSegmentVertexVboId, mForwardSegmentIndexVboId, mForwardSegmentFacesNumber);
-    setMaterial(CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     this->drawElement(mForwardRingVertexVboId, mForwardRingIndexVboId, mForwardRingFacesNumber);
-    setMaterial(NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     break;
   case 3:
     glRotated(90.0, 1.0, 0.0, 0.0);
     glRotated(180.0, 0.0, 1.0, 0.0);
-    setMaterial(SEGMENT);
+    setMaterial(cedar::aux::gl::ObjectVisualization::SEGMENT);
     this->drawElement(mInverseSegmentVertexVboId, mInverseSegmentIndexVboId, mInverseSegmentFacesNumber);
-    setMaterial(CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     this->drawElement(mInverseRingVertexVboId, mInverseRingIndexVboId, mInverseRingFacesNumber);
-    setMaterial(NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     break;
   case 4:
-    setMaterial(SEGMENT);
+    setMaterial(cedar::aux::gl::ObjectVisualization::SEGMENT);
     this->drawElement(mWristSegmentVertexVboId, mWristSegmentIndexVboId, mWristSegmentFacesNumber);
-    setMaterial(NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     break;
   case 5:
     glRotated(90.0, 1.0, 0.0, 0.0);
-    setMaterial(SEGMENT);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     this->drawElement(mWristSphereVertexVboId, mWristSphereIndexVboId, mWristSphereFacesNumber);
-    setMaterial(NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     break;
   case 6:
-    setMaterial(BLACK);
+    setMaterial(cedar::aux::gl::ObjectVisualization::BLACK);
     this->drawElement(mWristRingVertexVboId, mWristRingIndexVboId, mWristRingFacesNumber);
     glTranslated(0, 0, -0.007099966);
-    setMaterial(CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     cedar::aux::gl::drawCone(0.0, 0.02, 0.0315, 0.0315, 45, mIsDrawnAsWireFrame);
     glTranslated(0, 0, 0.02);
     cedar::aux::gl::drawDisk(0.0, 0.0315, 45, 10, false, mIsDrawnAsWireFrame);
-    setMaterial(NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     break;
   }
 }
@@ -395,128 +371,6 @@ void cedar::dev::robot::gl::KukaArm::drawSegment(unsigned int index)
 void cedar::dev::robot::gl::KukaArm::drawEndEffector()
 {
 
-}
-
-void cedar::dev::robot::gl::KukaArm::drawElement(const GLuint vertexVboId, const GLuint indexVboId, const unsigned int numberOfFaces)
-{
-  //!@todo The following doesn't compile on windows! Needs glext.h
-#ifndef WIN32
-  // bind the buffers
-  glBindBuffer(GL_ARRAY_BUFFER, vertexVboId);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVboId);
-
-  // set the pointers
-  glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(12));
-  glNormalPointer(GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(20));
-  glColorPointer(4, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(32));
-  glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0));
-
-  // prepare
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glEnableClientState(GL_COLOR_ARRAY);
-  glEnableClientState(GL_NORMAL_ARRAY);
-  glEnableClientState(GL_VERTEX_ARRAY);
-
-  // draw
-  glShadeModel(GL_SMOOTH);
-  glDrawElements(GL_TRIANGLES, numberOfFaces*3, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
-
-  // reset
-  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-  glDisableClientState(GL_COLOR_ARRAY);
-  glDisableClientState(GL_NORMAL_ARRAY);
-  glDisableClientState(GL_VERTEX_ARRAY);
-#endif
-}
-
-void cedar::dev::robot::gl::KukaArm::setMaterial(int material)
-{
-  switch (material)
-  {
-  case NO_MATERIAL:
-    glMaterialfv(GL_FRONT, GL_SPECULAR, mNoSpecular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, mNoSpecular); //todo: this is probably an error
-    glEnable(GL_COLOR_MATERIAL);
-    break;
-  case SEGMENT:
-    glDisable(GL_COLOR_MATERIAL);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, mSegment_Ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mSegment_Diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, mSegment_Specular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, mSegment_Shininess);
-    break;
-  case CHROME:
-    glDisable(GL_COLOR_MATERIAL);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, mChrome_Ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mChrome_Diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, mChrome_Specular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, mChrome_Shininess);
-    break;
-  case BLACK:
-    glDisable(GL_COLOR_MATERIAL);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, mBlack_Ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mBlack_Diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, mBlack_Specular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, mBlack_Shininess);
-    break;
-  }
-}
-
-void cedar::dev::robot::gl::KukaArm::loadVertexData
-(
-  const QString& dataFileName,
-  unsigned int numberOfVertices,
-  Vertex* vertices
-)
-{
-  QFile data(dataFileName);
-  if (data.open(QFile::ReadOnly))
-  {
-    QTextStream text_stream(&data);
-    QString line;
-    float scale = 0.001f; // mm -> m
-    for (unsigned int i=0; i<numberOfVertices; i++)
-    {
-      line = text_stream.readLine();
-      vertices[i].location[0] = line.section(" ", 0, 0).toFloat() * scale;
-      vertices[i].location[1] = line.section(" ", 1, 1).toFloat() * scale;
-      vertices[i].location[2] = line.section(" ", 2, 2).toFloat() * scale;
-      vertices[i].normal[0] = line.section(" ", 3, 3).toFloat();
-      vertices[i].normal[1] = line.section(" ", 4, 4).toFloat();
-      vertices[i].normal[2] = line.section(" ", 5, 5).toFloat();
-    }
-  }
-  else
-  {
-    std::cout << "failed to read vertex data from file " << dataFileName.toStdString() << std::endl;
-  }
-}
-
-void cedar::dev::robot::gl::KukaArm::loadIndexData
-(
-  const QString& dataFileName,
-  unsigned int numberOfFaces,
-  GLushort* indices
-)
-{
-  QFile data(dataFileName);
-  if (data.open(QFile::ReadOnly))
-  {
-    QTextStream text_stream(&data);
-    QString line;
-    QString number;
-    for (unsigned int i=0; i<numberOfFaces; i++)
-    {
-      line = text_stream.readLine();
-      indices[3*i] = static_cast<GLushort>(line.section(" ", 0, 0).toInt());
-      indices[3*i+1] = static_cast<GLushort>(line.section(" ", 1, 1).toInt());
-      indices[3*i+2] = static_cast<GLushort>(line.section(" ", 2, 2).toInt());
-    }
-  }
-  else
-  {
-    std::cout << "failed to read index data from file " << dataFileName.toStdString() << std::endl;
-  }
 }
 
 void cedar::dev::robot::gl::KukaArm::loadData()

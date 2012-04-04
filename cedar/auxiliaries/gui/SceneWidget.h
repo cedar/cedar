@@ -28,7 +28,7 @@
     Email:       hendrik.reimann@ini.rub.de
     Date:        2010 11 27
 
-    Description: manages a cedar::aux::gl::Scene of cedar::aux::gl::RigidBodyVisualizations
+    Description: manages a cedar::aux::gl::Scene of cedar::aux::gl::ObjectVisualizations
 
     Credits: initially designed by Denis Hakenberg
 
@@ -40,10 +40,10 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gl/Scene.h"
-#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
 #include "cedar/auxiliaries/gui/BaseWidget.h"
-#include "cedar/auxiliaries/gui/RigidBodyWidget.h"
-#include "cedar/auxiliaries/gui/RigidBodyVisualizationWidget.h"
+#include "cedar/auxiliaries/gui/LocalCoordinateFrameWidget.h"
+#include "cedar/auxiliaries/gui/ObjectVisualizationWidget.h"
 #include "cedar/auxiliaries/gui/ui_SceneWidget.h"
 
 // SYSTEM INCLUDES
@@ -102,10 +102,10 @@ public slots:
   void setThickness(double value);
 
   /*!@brief creates an object with type and name specified by the widget controls */
-  void createRigidBody();
+  void createVisualization();
 
   /*!@brief deletes the currently selected object */
-  void deleteRigidBody();
+  void deleteVisualization();
 
   /*!@brief deletes all objects in the scene */
   void deleteAllVisualizations();
@@ -134,13 +134,13 @@ private:
   cedar::aux::gl::ScenePtr mpScene;
 
   // pointer to the currently selected object
-  cedar::aux::gl::RigidBodyVisualizationPtr mpActiveVisualization;
+  cedar::aux::gl::ObjectVisualizationPtr mpActiveVisualization;
 
-  // pointer to the RigidBodyVisualizationWidget
-  cedar::aux::gui::RigidBodyVisualizationWidget* mpRigidBodyVisualizationWidget;
+  // pointer to the ObjectVisualizationWidget
+  cedar::aux::gui::ObjectVisualizationWidget* mpObjectVisualizationWidget;
 
-  // pointer to the RigidBodyWidget
-  cedar::aux::gui::RigidBodyWidget* mpRigidBodyWidget;
+  // pointer to the LocalCoordinateFrameWidget
+  cedar::aux::gui::LocalCoordinateFrameWidget* mpLocalCoordinateFrameWidget;
 
   //! checks whether the widget is currently being changed due to a switch in the selected object
   bool mSwitchingSelectedObject;

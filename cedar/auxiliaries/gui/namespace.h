@@ -53,8 +53,10 @@ namespace cedar
     {
       //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_AUX_CLASS(BaseWidget);
-      CEDAR_DECLARE_AUX_CLASS(RigidBodyWidget);
-      CEDAR_DECLARE_AUX_CLASS(RigidBodyVisualizationWidget);
+      CEDAR_DECLARE_AUX_CLASS(LocalCoordinateFrameWidget);
+      CEDAR_DECLARE_DEPRECATED(typedef LocalCoordinateFrameWidget RigidBodyWidget);
+      CEDAR_DECLARE_AUX_CLASS(ObjectVisualizationWidget);
+      CEDAR_DECLARE_DEPRECATED(typedef ObjectVisualizationWidget RigidBodyVisualizationWidget);
       CEDAR_DECLARE_AUX_CLASS(SceneWidget);
       CEDAR_DECLARE_AUX_CLASS(Viewer);
 

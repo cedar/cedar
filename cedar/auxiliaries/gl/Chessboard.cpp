@@ -37,16 +37,16 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/gl/Chessboard.h"
-#include "cedar/auxiliaries/gl/gl.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+
 cedar::aux::gl::Chessboard::Chessboard
 (
-  cedar::aux::RigidBodyPtr pRigidBody,
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
   double length,
   double width,
   double height,
@@ -57,7 +57,7 @@ cedar::aux::gl::Chessboard::Chessboard
   double colorB
 )
 :
-cedar::aux::gl::RigidBodyVisualization(pRigidBody, "Chessboard", colorR, colorG, colorB),
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Chessboard", colorR, colorG, colorB),
 mLength(length),
 mWidth(width),
 mHeight(height),

@@ -43,9 +43,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+
 cedar::aux::gl::Ellipse::Ellipse
 (
-  cedar::aux::RigidBodyPtr pRigidBody,
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
   double length,
   double width,
   double thickness,
@@ -54,7 +55,7 @@ cedar::aux::gl::Ellipse::Ellipse
   double colorB
 )
 :
-cedar::aux::gl::RigidBodyVisualization(pRigidBody, "Ellipse", colorR, colorG, colorB),
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Ellipse", colorR, colorG, colorB),
 mLength(length),
 mWidth(width),
 mThickness(thickness)
