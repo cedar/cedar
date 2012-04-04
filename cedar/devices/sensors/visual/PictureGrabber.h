@@ -67,7 +67,8 @@ public cedar::dev::sensors::visual::GrabberInterface
   :
   cedar::dev::sensors::visual::GrabberInterface::GrabberChannel
   {
-    std::string sourceFileName;  //! @brief The filenames
+    //! @brief The filenames
+    std::string mSourceFileName;
   };
 
   typedef boost::shared_ptr<PictureChannel> PictureChannelPtr;
@@ -134,19 +135,6 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // members
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-  
-protected:
-  // none yet
-
-private:
-
   ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
   inline PictureChannelPtr getChannel(unsigned int channel)
   {
@@ -169,6 +157,18 @@ private:
              cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
            );
   }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // members
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
+
+protected:
+  // none yet
+
+private:
+
 
 
   //--------------------------------------------------------------------------------------------------------------------

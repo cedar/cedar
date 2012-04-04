@@ -154,8 +154,6 @@ int main(int , char **)
   std::cout << " (" << cedar::dev::sensors::visual::CameraIsoSpeed::type().get(iso_speed).name() << ")" << std::endl;
 
 
-  //todo getCameraFrameSize
-
   //read properties of camera
   std::cout << "\n\nChannel 0 properties: Values of -1 means, that the feature \n"
             << "is not supported or not readable by the actual used camera" << std::endl;

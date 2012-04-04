@@ -46,7 +46,10 @@
 #include <dc1394/dc1394.h>
 #include <boost/lexical_cast.hpp>
 
+//todo weg
 using namespace cedar::dev::sensors::visual::grabbertools;
+
+// todo comment
 
 int main(int, char *argv[])
 {

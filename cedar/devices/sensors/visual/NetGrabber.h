@@ -76,8 +76,11 @@ public cedar::dev::sensors::visual::GrabberInterface
   :
   cedar::dev::sensors::visual::GrabberInterface::GrabberChannel
   {
-    std::string channelName;      ///! The name of the used yarp channel
-    MatNetReaderPtr matNetReader; ///! The Yarp Reader class instantiated for cv::Mat
+    //! The name of the used yarp channel
+    std::string mChannelName;
+
+    //! The Yarp Reader class instantiated for cv::Mat
+    MatNetReaderPtr mMatNetReader;
   };
 
   typedef boost::shared_ptr<NetChannel> NetChannelPtr;

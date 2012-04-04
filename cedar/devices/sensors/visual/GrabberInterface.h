@@ -112,10 +112,17 @@ protected:
   ///! @brief Structure to store all channel related stuff inside
   struct GrabberChannel
   {
-    cv::Mat imageMat;             ///! the picture frame
-    std::string snapshotName;
-    std::string recordName;
-    cv::VideoWriter videoWriter;  ///! for recordings
+    //! the picture frame
+    cv::Mat mImageMat;
+
+    //! Filename for snapshot
+    std::string mSnapshotName;
+
+    //! Filename for recording
+    std::string mRecordName;
+
+    ///! for recordings
+    cv::VideoWriter mVideoWriter;
   };
 
   typedef boost::shared_ptr<GrabberChannel> GrabberChannelPtr;
@@ -135,8 +142,6 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-  //#define CEDAR_GRABBER_THROW(Exception_type, message) doCleanUp(); CEDAR_THROW(Exception_type, message);
-  #define CEDAR_GRABBER_THROW(Exception_type, message) CEDAR_THROW(Exception_type, message);
 
   //!@endcond
 
@@ -162,7 +167,7 @@ protected:
    *
    *
    */
-  GrabberInterface(const std::string& configFileName, bool registerTerminationHandler=true);
+  GrabberInterface(const std::string& configFileName);
 
 public:
 
@@ -173,6 +178,22 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
+    /*! @brief This method does an emergency cleanup of ALL instantiated grabbers
+     *
+     *  This method is called in the crash handler. After a call of this method, all grabbers are in an invalid state
+     *  and the grabbers or your program have to be terminated.
+     */
+    static void emergencyCleanup();
+
+    /*! @brief This method register a signal handler for the signals SIGINT and SIGABRT
+     *
+     *  A crash handler should be used, especially if a firewire camera grabber is instantiated
+     *  The internal handler catch the SIGINT and SIGABRT signal and calls the emergencyCleanup() method
+     *  If you implement your own handler, call the static emergencyCleanup in your method
+     */
+    static void installCrashHandler();
+
 
     /*! @brief Get the number of currently used channels (sources).
      */
@@ -626,6 +647,23 @@ private:
      */
     static void interruptSignalHandler(int signalNo);
 
+    /*! Get the pointer to the channel structure of the specified channel
+     *  @param channel The channel number of the wanted channel structure
+     */
+    inline GrabberChannelPtr getChannel(unsigned int channel)
+    {
+      return mChannels.at(channel);
+    }
+
+    /*! Get the const pointer to the channel structure of the specified channel
+     *  @param channel The channel number of the wanted channel structure
+     */
+    inline GrabberChannelPtr getChannel(unsigned int channel) const
+    {
+      return mChannels.at(channel);
+    }
+
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -682,22 +720,6 @@ private:
 
     ///! @brief Flag, if this is the first instance of a grabber (used for the ctrl-c handler)
     bool mFirstGrabberInstance;
-
-    /*! Get the pointer to the channel structure of the specified channel
-     *  @param channel The channel number of the wanted channel structure
-     */
-    inline GrabberChannelPtr getChannel(unsigned int channel)
-    {
-      return mChannels.at(channel);
-    }
-
-    /*! Get the const pointer to the channel structure of the specified channel
-     *  @param channel The channel number of the wanted channel structure
-     */
-    inline GrabberChannelPtr getChannel(unsigned int channel) const
-    {
-      return mChannels.at(channel);
-    }
 
 
   //--------------------------------------------------------------------------------------------------------------------
