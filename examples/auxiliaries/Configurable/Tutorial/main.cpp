@@ -177,6 +177,8 @@ int main(int argc, char** argv)
   p_pane->show(); // makes qt show the widget
   p_pane->display(my_configurable_object);
 
+  my_configurable_object->writeJson("group_demo.json");
+
   app.exec();
 
   return 0;
