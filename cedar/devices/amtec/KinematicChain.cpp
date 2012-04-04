@@ -41,7 +41,6 @@
 // CEDAR INCLUDES
 #include "cedar/devices/amtec/KinematicChain.h"
 #include "cedar/auxiliaries/exceptions.h"
-#include "cedar/auxiliaries/math/LimitsParameter.h"
 
 // SYSTEM INCLUDES
 #include "AmtecDeviceDriver/m5apiw32.h"
@@ -73,15 +72,13 @@ cedar::dev::amtec::KinematicChain::~KinematicChain()
 {
   for(unsigned int i = 0; i < mModules.size(); ++i)
   {
-    setJointVelocity(i, 0.0);
+    this->setJointVelocity(i, 0.0);
   }
 
   if(mpDevice)
   {
     delete mpDevice;
   }
-
-  return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -153,10 +150,7 @@ bool cedar::dev::amtec::KinematicChain::initDevice()
 
   readOrDefaultConfiguration();
 
-  //
   // print module mapping to console
-  //
-
   std::cout << "Mapping of joints to modules:" << std::endl;
   std::cout << "amtecModuleMap = [ " << mModules[0];
   for (unsigned int i = 1; i < mModules.size(); ++i)
@@ -165,10 +159,7 @@ bool cedar::dev::amtec::KinematicChain::initDevice()
   }
   std::cout << " ];" << std::endl;
 
-  //
   // calibrate and configure the modules
-  //
-
   mutex_locker.unlock();
 
   for(unsigned int i = 0; i < mModules.size(); ++i)
@@ -185,7 +176,7 @@ bool cedar::dev::amtec::KinematicChain::initDevice()
     }
 
     // set position limits
-    //todo: replace this with applyJointLimits oder so
+    //todo: replace this with applyJointLimits oder something
     mpDevice->setMinPos(mModules[i], getJoint(i)->_mpAngleLimits->getLowerLimit());
     mpDevice->setMaxPos(mModules[i], getJoint(i)->_mpAngleLimits->getUpperLimit());
 

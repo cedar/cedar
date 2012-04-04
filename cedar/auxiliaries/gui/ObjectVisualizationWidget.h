@@ -126,13 +126,13 @@ protected:
 private:
   static const int mUpdateInterval = 100;
   cedar::aux::gl::ObjectVisualizationPtr mpObjectVisualization;
-  QCheckBox* mpVisibleCheckBox;
-  QCheckBox* mpWireFrameCheckBox;
-  QCheckBox* mpLcfCheckBox;
-  QLineEdit* mpAxisLengthLineEdit;
-  QDoubleSpinBox* mpRedDoubleSpinBox;
-  QDoubleSpinBox* mpGreenDoubleSpinBox;
-  QDoubleSpinBox* mpBlueDoubleSpinBox;
+  QCheckBox *mpVisibleCheckBox;
+  QCheckBox *mpWireFrameCheckBox;
+  QCheckBox *mpLcfCheckBox;
+  QLineEdit *mpAxisLengthLineEdit;
+  QDoubleSpinBox *mpRedDoubleSpinBox;
+  QDoubleSpinBox *mpGreenDoubleSpinBox;
+  QDoubleSpinBox *mpBlueDoubleSpinBox;
 };
 
 #endif /* CEDAR_AUX_GUI_OBJECT_VISUALIZATION_WIDGET_H */

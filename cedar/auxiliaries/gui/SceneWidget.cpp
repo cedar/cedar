@@ -39,7 +39,17 @@
 #include "cedar/auxiliaries/gui/LocalCoordinateFrameWidget.h"
 #include "cedar/auxiliaries/gui/ObjectVisualizationWidget.h"
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
+#include "cedar/auxiliaries/gl/Block.h"
+#include "cedar/auxiliaries/gl/Sphere.h"
+#include "cedar/auxiliaries/gl/Cone.h"
+#include "cedar/auxiliaries/gl/Cylinder.h"
+#include "cedar/auxiliaries/gl/Pyramid.h"
+#include "cedar/auxiliaries/gl/Prism.h"
+#include "cedar/auxiliaries/gl/Torus.h"
+#include "cedar/auxiliaries/gl/Ellipse.h"
+#include "cedar/auxiliaries/gl/Chessboard.h"
 
+// SYSTEM INCLUDES
 #include <QLabel>
 
 

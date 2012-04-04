@@ -58,26 +58,21 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief standard constructor. 
-   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
-   */
-  Cylinder(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame);
-
   /*!@brief constructor. 
    * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    * @param radius    radius of the cylinder
    * @param height    height of the cylinder
-   * @param R    color, value for red channel in RGB
-   * @param G    color, value for green channel in RGB
-   * @param B    color, value for blue channel in RGB
+   * @param colorR color, value for red channel in RGB
+   * @param colorG color, value for green channel in RGB
+   * @param colorB color, value for blue channel in RGB
    */
   Cylinder(
             cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
-            double radius,
-            double height,
-            double R = 1,
-            double G = 0,
-            double B = 0
+            double radius = 1.0,
+            double height = 2.0,
+            double colorR = 1,
+            double colorG = 0,
+            double colorB = 0
           );
   
   //--------------------------------------------------------------------------------------------------------------------

@@ -57,26 +57,21 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief standard constructor. 
-   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
-   */
-  Torus(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame);
-
   /*!@brief constructor. 
    * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    * @param radius the radius of the circle in the xy-plane
    * @param thickness distance of the torus walls to the circle
-   * @param R color, value for red channel in RGB
-   * @param G color, value for green channel in RGB
-   * @param B color, value for blue channel in RGB
+   * @param colorR color, value for red channel in RGB
+   * @param colorG color, value for green channel in RGB
+   * @param colorB color, value for blue channel in RGB
    */
   Torus(
          cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
-         double radius,
-         double thickness,
-         double R = 1,
-         double G = 0,
-         double B = 0
+         double radius = 3.0,
+         double thickness = 0.5,
+         double colorR = 1,
+         double colorG = 0,
+         double colorB = 0
        );
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -44,42 +44,20 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-/*!@brief Simple OpenGL visualization of a circular torus
- *
- * This class visualizes a circular torus with specified dimensions
- *
- * @remarks To get a simple visualization of the object on screen, add an instance of this class to a
- * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
- */
-cedar::aux::gl::Torus::Torus(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame)
+cedar::aux::gl::Torus::Torus
+(
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+  double radius,
+  double thickness,
+  double R,
+  double G,
+  double B
+)
 :
-cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Torus", colorR, colorG, colorB),
+mRadius(radius),
+mThickness(thickness)
 {
-  mRadius = 3;
-  mThickness = .5;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
-  mObjectType = "Torus";
-}
-
-cedar::aux::gl::Torus::Torus(
-                              cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
-                              double radius,
-                              double thickness,
-                              double R,
-                              double G,
-                              double B
-                            )
-:
-cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame)
-{
-  mRadius = radius;
-  mThickness = thickness;
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-  mObjectType = "Torus";
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -54,7 +54,9 @@
  */
 class cedar::aux::LocalCoordinateFrame : public QObject, public cedar::aux::Configurable
 {
-private:
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -185,6 +187,10 @@ private:
 
   std::vector<cv::Mat> mUnitAxes;
 
+  //! lock for thread safety
+  mutable QReadWriteLock mLock;
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -192,9 +198,6 @@ protected:
   // none yet
 
 private:
-  //! lock for thread safety
-  mutable QReadWriteLock mLock;
-
   cedar::aux::DoubleVectorParameterPtr _mInitialTranslation;
   cedar::aux::DoubleVectorParameterPtr _mInitialRotation;
 

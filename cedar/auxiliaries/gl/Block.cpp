@@ -44,38 +44,22 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Block::Block(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame)
+cedar::aux::gl::Block::Block
+(
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+	double length,
+	double width,
+  double height,
+  double R,
+  double G,
+  double B
+)
 :
-cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Block", colorR, colorG, colorB),
+mLength(length),
+mWidth(width),
+mHeight(height)
 {
-  mLength = 3;
-  mWidth = 2;
-  mHeight = 1;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
-  mObjectType = "Block";
-}
-
-cedar::aux::gl::Block::Block(
-              cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
-              double length,
-              double width,
-              double height,
-              double R,
-              double G,
-              double B
-            )
-:
-cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame)
-{
-  mLength = length;
-  mWidth = width;
-  mHeight = height;
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-  mObjectType = "Block";
 }
 
 //----------------------------------------------------------------------------------------------------------------------

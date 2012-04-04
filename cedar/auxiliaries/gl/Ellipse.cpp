@@ -44,38 +44,22 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Ellipse::Ellipse(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame)
+cedar::aux::gl::Ellipse::Ellipse
+(
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+  double length,
+  double width,
+  double thickness,
+  double R,
+  double G,
+  double B
+)
 :
-cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Ellipse", colorR, colorG, colorB),
+mLength(length),
+mWidth(width),
+mThickness(thickness)
 {
-  mLength = 2;
-  mWidth = 3;
-  mThickness = .3;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
-  mObjectType = "Ellipse";
-}
-
-cedar::aux::gl::Ellipse::Ellipse(
-                                  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
-                                  double length,
-                                  double width,
-                                  double thickness,
-                                  double R,
-                                  double G,
-                                  double B
-                                )
-:
-cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame)
-{
-  mLength = length;
-  mWidth = width;
-  mThickness = thickness;
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-  mObjectType = "Ellipse";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
