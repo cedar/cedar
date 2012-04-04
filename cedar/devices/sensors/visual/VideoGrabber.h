@@ -67,11 +67,15 @@ public cedar::dev::sensors::visual::GrabberInterface
   :
   cedar::dev::sensors::visual::GrabberInterface::GrabberChannel
   {
-    cv::VideoCapture videoCapture;              ///! Camera interface
-    std::string sourceFileName;                 ///! Filename of video to grab from
+    //! Camera interface
+    cv::VideoCapture mVideoCapture;
+
+    //! Filename of video to grab from
+    std::string mSourceFileName;
   };
 
-  typedef boost::shared_ptr<VideoChannel> VideoChannelPtr;
+//  typedef boost::shared_ptr<VideoChannel> VideoChannelPtr;
+  CEDAR_GENERATE_POINTER_TYPES(VideoChannel);
 
   //!@endcond
 
@@ -258,7 +262,8 @@ private:
   /*! Cast the storage vector from base channel struct "GrabberChannelPtr" to
    *  derived class VideoChannellPtr
    */
-  inline boost::shared_ptr<const VideoChannel> getChannel(unsigned int channel) const
+  //todo
+  inline ConstVideoChannelPtr getChannel(unsigned int channel) const
   {
     //!@todo: change to asserted_cast
     //return cedar::aux::asserted_cast<VideoChannelPtr>(mChannels.at(channel))

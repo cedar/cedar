@@ -94,7 +94,8 @@ public cedar::dev::sensors::visual::GrabberInterface
   :
   cedar::dev::sensors::visual::GrabberInterface::GrabberChannel
   {
-    std::string sourceFileName;  //! @brief The filenames
+    //! @brief The filenames
+    std::string mSourceFileName;
   };
 
   typedef boost::shared_ptr<TestChannel> TestChannelPtr;

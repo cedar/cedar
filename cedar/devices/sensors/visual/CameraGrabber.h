@@ -86,12 +86,23 @@ public cedar::dev::sensors::visual::GrabberInterface
   :
   cedar::dev::sensors::visual::GrabberInterface::GrabberChannel
   {
-    CameraId camId;                             ///! Unique channel id
-    std::string channelInfo;                    ///! The channel information
-    cv::VideoCapture videoCapture;              ///! Camera interface
-    QReadWriteLock* pVideoCaptureLock;          ///! The lock for the concurrent access to the cv::VideoCapture
-    CameraStateAndConfigPtr camStateAndConfig;  ///! The manager of settings and properties
-    std::string camCapabilitiesFileName;        ///! Filename for the capabilities
+    //! Unique channel id
+    CameraId mCamId;
+
+    //! The channel information
+    std::string mChannelInfo;
+
+    //! Camera interface
+    cv::VideoCapture mVideoCapture;
+
+    //! The lock for the concurrent access to the cv::VideoCapture
+    QReadWriteLock* pmVideoCaptureLock;
+
+    //! The manager of settings and properties
+    CameraStateAndConfigPtr mCamStateAndConfig;
+
+    //! Filename for the capabilities
+    std::string mCamCapabilitiesFileName;
   };
 
   ///! A smart pointer for the CameraChannel struct

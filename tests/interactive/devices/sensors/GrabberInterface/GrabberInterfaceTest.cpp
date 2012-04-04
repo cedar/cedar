@@ -45,6 +45,7 @@
 //--------------------------------------------------------------------------------------------------------------------
 //additional namespace to hide global functions
 //--------------------------------------------------------------------------------------------------------------------
+//todo change namespace lowercase
 namespace TEST_GRABBER
 {
 
@@ -127,6 +128,9 @@ int main(int , char **)
                                                               CHANNEL_0_NAME,
                                                               CHANNEL_1_NAME
                                                             );
+
+  //todo installCrashHandler in other tests
+  grabber_1->installCrashHandler();
 
   grabber_1->setName(GRABBER_NAME_1);
   std::cout << "\nGrabber created with name \""<<grabber_1->getName()<<"\"\n";

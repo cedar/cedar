@@ -58,7 +58,7 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
   readInit(1,"VideoGrabber");
 
   //overwrite configuration with constructor-values
-  getChannel(0)->sourceFileName = aviFileName;
+  getChannel(0)->mSourceFileName = aviFileName;
   applyInit();
 }
 
@@ -75,8 +75,8 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
   readInit(2,"VideoGrabber");
 
   //overwrite configuration with constructor-values
-  getChannel(0)->sourceFileName = aviFileName0;
-  getChannel(1)->sourceFileName = aviFileName1;
+  getChannel(0)->mSourceFileName = aviFileName0;
+  getChannel(1)->mSourceFileName = aviFileName1;
   applyInit();
 }
 
@@ -130,7 +130,7 @@ bool cedar::dev::sensors::visual::VideoGrabber::onInit()
     std::cout << "VideoGrabber: Initialize Grabber with " << mNumCams << " cameras ..." << std::endl;
     for (unsigned int channel = 0; channel < mNumCams; ++channel)
     {
-      std::cout << "Channel " << channel << ": capture from: " << getChannel(channel)->sourceFileName << "\n";
+      std::cout << "Channel " << channel << ": capture from: " << getChannel(channel)->mSourceFileName << "\n";
     }
     std::cout << std::flush;
   #endif
@@ -140,19 +140,19 @@ bool cedar::dev::sensors::visual::VideoGrabber::onInit()
   //open capture one by one
   for (unsigned int channel = 0; channel < mNumCams; ++channel)
   {
-    cv::VideoCapture capture(getChannel(channel)->sourceFileName);
+    cv::VideoCapture capture(getChannel(channel)->mSourceFileName);
 
     if (capture.isOpened())
     {
-      getChannel(channel)->videoCapture = capture;
+      getChannel(channel)->mVideoCapture = capture;
 
       //grab first frame to initialize the frame-memory
-      getChannel(channel)->videoCapture >> getChannel(channel)->imageMat;
+      getChannel(channel)->mVideoCapture >> getChannel(channel)->mImageMat;
     }
     else
     {
       std::cout << "[VideoGrabber::onInit] ERROR: Grabbing failed"
-                << "\tChannel " << channel << ": "<< getChannel(channel)->sourceFileName << "\n"
+                << "\tChannel " << channel << ": "<< getChannel(channel)->mSourceFileName << "\n"
                 << std::endl;
 
       return false;  //throws an initialization-exception
@@ -165,7 +165,7 @@ bool cedar::dev::sensors::visual::VideoGrabber::onInit()
   unsigned int smallest = UINT_MAX;
   for (unsigned int channel = 0; channel < mNumCams; ++channel)
   {
-    unsigned int len = getChannel(channel)->videoCapture.get(CV_CAP_PROP_FRAME_COUNT);
+    unsigned int len = getChannel(channel)->mVideoCapture.get(CV_CAP_PROP_FRAME_COUNT);
     if (len < smallest)
     {
       smallest = len;
@@ -175,10 +175,10 @@ bool cedar::dev::sensors::visual::VideoGrabber::onInit()
 
   //----------------------------------------
   //check for equal FPS
-  double fps_ch0 = getChannel(0)->videoCapture.get(CV_CAP_PROP_FPS);
+  double fps_ch0 = getChannel(0)->mVideoCapture.get(CV_CAP_PROP_FPS);
   if (mNumCams > 1)
   {
-    double fps_ch1 = getChannel(1)->videoCapture.get(CV_CAP_PROP_FPS);
+    double fps_ch1 = getChannel(1)->mVideoCapture.get(CV_CAP_PROP_FPS);
     if (fps_ch0 != fps_ch1)
     {
       std::cout << "[VideoGrabber::onInit] ERROR: Different framerates of channels 0 and 1"
@@ -205,13 +205,13 @@ bool cedar::dev::sensors::visual::VideoGrabber::onGrab()
   //grab on all channels
   for (unsigned int channel = 0; channel < mNumCams; ++channel)
   {
-    (getChannel(channel)->videoCapture) >> getChannel(channel)->imageMat;
+    (getChannel(channel)->mVideoCapture) >> getChannel(channel)->mImageMat;
 
     //check if the end of a channel is reached
-    if (getChannel(channel)->imageMat.empty())
+    if (getChannel(channel)->mImageMat.empty())
     {
 
-      unsigned int pos_Abs = getChannel(0)->videoCapture.get(CV_CAP_PROP_POS_FRAMES);
+      unsigned int pos_Abs = getChannel(0)->mVideoCapture.get(CV_CAP_PROP_POS_FRAMES);
 
       #ifdef DEBUG_VIDEOGRABBER
         std::cout << "[VideoGrabber::onGrab] Channel  :" << channel << " empty" << std::endl;
@@ -228,7 +228,7 @@ bool cedar::dev::sensors::visual::VideoGrabber::onGrab()
           setPositionAbsolute(0);
           for (unsigned int i = 0; i < mNumCams; ++i)
           {
-            (getChannel(i)->videoCapture) >> getChannel(i)->imageMat;
+            (getChannel(i)->mVideoCapture) >> getChannel(i)->mImageMat;
           }
           #ifdef DEBUG_VIDEOGRABBER
             std::cout << "[VideoGrabber::onGrab] Video restart\n";
@@ -260,14 +260,14 @@ const std::string& cedar::dev::sensors::visual::VideoGrabber::onGetSourceInfo(un
   {
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"VideoGrabber::onGetSourceInfo");
   }
-  return getChannel(channel)->sourceFileName;
+  return getChannel(channel)->mSourceFileName;
 }
 
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::VideoGrabber::setSpeedFactor(double speedFactor)
 {
   _mSpeedFactor = speedFactor;
-  double fps = getChannel(0)->videoCapture.get(CV_CAP_PROP_FPS);
+  double fps = getChannel(0)->mVideoCapture.get(CV_CAP_PROP_FPS);
 
   //set fps and restart the thread if running
   setFps(fps * _mSpeedFactor);
@@ -288,7 +288,7 @@ void cedar::dev::sensors::visual::VideoGrabber::setLoop(bool loop)
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::VideoGrabber::setPositionRelative(double newPositionRel)
 {
-  //getChannel(0)->videoCapture->set(CV_CAP_PROP_POS_AVI_RATIO,newPositionRel); //does nothing
+  //getChannel(0)->mVideoCapture->set(CV_CAP_PROP_POS_AVI_RATIO,newPositionRel); //does nothing
 
   if (newPositionRel < 0 || newPositionRel > 1)
   {
@@ -300,9 +300,11 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionRelative(double newPo
   //newPositionRel = [0..1]
   double new_pos_abs = max_pos * newPositionRel;
 
-  if (new_pos_abs > max_pos)
+  //5 frames offset from the end
+  int max_wanted_pos = max_pos-5;
+  if (new_pos_abs > max_wanted_pos)
   {
-    new_pos_abs = max_pos;
+    new_pos_abs = max_wanted_pos;
   }
 
   if (new_pos_abs < 0)
@@ -318,7 +320,7 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionRelative(double newPo
 
   for (unsigned int channel = 0; channel < mNumCams; ++channel)
   {
-    getChannel(channel)->videoCapture.set(CV_CAP_PROP_POS_FRAMES,new_pos_abs);
+    getChannel(channel)->mVideoCapture.set(CV_CAP_PROP_POS_FRAMES,new_pos_abs);
   }
 }
 
@@ -328,7 +330,7 @@ double cedar::dev::sensors::visual::VideoGrabber::getPositionRelative()
   //the shortest file defines the length of the avi
   //it is possible, that the first file isn't the shortest
   //so we use absolute positions instead of relative
-  //return  getChannel(0)->videoCapture.get(CV_CAP_PROP_POS_AVI_RATIO); //from 0..1;
+  //return  getChannel(0)->mVideoCapture.get(CV_CAP_PROP_POS_AVI_RATIO); //from 0..1;
 
   double pos_abs = static_cast<double>(this->getPositionAbsolute());
   double count   = static_cast<double>(mFramesCount);
@@ -352,7 +354,7 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionAbsolute(unsigned int
 
   for (unsigned int channel = 0; channel < mNumCams; ++channel)
   {
-    (getChannel(channel)->videoCapture).set(CV_CAP_PROP_POS_FRAMES,newPositionAbs);
+    (getChannel(channel)->mVideoCapture).set(CV_CAP_PROP_POS_FRAMES,newPositionAbs);
   }
 }
 
@@ -360,7 +362,7 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionAbsolute(unsigned int
 unsigned int cedar::dev::sensors::visual::VideoGrabber::getPositionAbsolute()
 {
   //the position in all avi's should be the same
-  return getChannel(0)->videoCapture.get(CV_CAP_PROP_POS_FRAMES);
+  return getChannel(0)->mVideoCapture.get(CV_CAP_PROP_POS_FRAMES);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -376,7 +378,7 @@ double cedar::dev::sensors::visual::VideoGrabber::getSourceProperty(unsigned int
   {
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"VideoGrabber::getAviParam");
   }
-  return getChannel(channel)->videoCapture.get(propId);
+  return getChannel(channel)->mVideoCapture.get(propId);
 }
 
 //----------------------------------------------------------------------------------------------------

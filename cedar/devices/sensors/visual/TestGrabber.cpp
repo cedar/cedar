@@ -55,7 +55,7 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
   readInit(1,"TestGrabber");
 
   //overwrite parameters from configfiles with values from constuctor
-  getChannel(0)->sourceFileName = channelName;
+  getChannel(0)->mSourceFileName = channelName;
 
   //now apply the whole configuration
   applyInit();
@@ -79,8 +79,8 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
   readInit(2,"StereoTestGrabber");
 
   //overwrite parameters from configfiles with values from constuctor
-  getChannel(0)->sourceFileName = channelName0;
-  getChannel(1)->sourceFileName = channelName1;
+  getChannel(0)->mSourceFileName = channelName0;
+  getChannel(1)->mSourceFileName = channelName1;
 
   //now apply the whole configuration
   applyInit();
@@ -117,7 +117,7 @@ bool cedar::dev::sensors::visual::TestGrabber::onInit()
 
   for (unsigned int i = 0; i < mNumCams; ++i)
   {
-    std::cout << "Channel " << i << ": " << getChannel(i)->sourceFileName << "\n";
+    std::cout << "Channel " << i << ": " << getChannel(i)->mSourceFileName << "\n";
   }
   std::cout << std::flush;
 
@@ -131,7 +131,7 @@ bool cedar::dev::sensors::visual::TestGrabber::onInit()
     cv::Mat frame=cv::Mat();
 
     //apply the new content to the channel image
-    getChannel(channel)->imageMat = frame;
+    getChannel(channel)->mImageMat = frame;
   }
 
 
@@ -181,7 +181,7 @@ const std::string& cedar::dev::sensors::visual::TestGrabber::onGetSourceInfo(uns
 
   //give some information about the used source like channelname, filename, devicename
   //or something like that
-  return getChannel(channel)->sourceFileName;
+  return getChannel(channel)->mSourceFileName;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -193,7 +193,7 @@ bool cedar::dev::sensors::visual::TestGrabber::onGrab()
   for(unsigned int channel=0; channel<mNumCams;++channel)
    {
      //apply the new content to the channel image
-     //getChannel(channel)->imageMat = <grab_new_content>;
+     //getChannel(channel)->mImageMat = <grab_new_content>;
    }
 
   //here we just want to count how often onGrab is invoked, due to a fps-check
