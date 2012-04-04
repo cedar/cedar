@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
-#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -52,7 +52,7 @@
  *
  * rigid between world coordinate frame and object coordinate frame
  */
-class cedar::aux::LocalCoordinateFrame : public QObject, public cedar::aux::Configurable
+class cedar::aux::LocalCoordinateFrame : public QObject, public cedar::aux::NamedConfigurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

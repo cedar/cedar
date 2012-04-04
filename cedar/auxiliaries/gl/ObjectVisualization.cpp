@@ -73,16 +73,16 @@ cedar::aux::gl::ObjectVisualization::ObjectVisualization
 )
 :
 mObjectType(objectType),
-mColorR(colorR),
-mColorG(colorG),
-mColorB(colorB),
-mpLocalCoordinateFrame(pLocalCoordinateFrame),
-mTransformationTranspose(4, 4, CV_64FC1),
 mIsVisible(true),
 mIsDrawnAsWireFrame(false),
 mIsDrawingLocalCoordinateFrame(false),
 mAxisLength(1.0),
-mResolution(10)
+mResolution(10),
+mColorR(colorR),
+mColorG(colorG),
+mColorB(colorB),
+mpLocalCoordinateFrame(pLocalCoordinateFrame),
+mTransformationTranspose(4, 4, CV_64FC1)
 {
 }
 

@@ -361,7 +361,10 @@ void cedar::aux::gui::SceneWidget::init()
   // fill combo box with names of objects in the scene
   for (int i=0; i<mpScene->getNumberOfObjectVisualizations(); i++)
   {
-    mpComboBoxName->addItem(QString("some object"));
+    mpComboBoxName->addItem
+    (
+      QString(mpScene->getObjectVisualization(i)->getLocalCoordinateFrame()->getName().c_str())
+    );
   }
   
   // initialize rigid body visualization widget
