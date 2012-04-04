@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_GL_SDG_H
-#define CEDAR_DEV_ROBOT_GL_SDG_H
+#ifndef CEDAR_DEV_ROBOT_GL_SDH_H
+#define CEDAR_DEV_ROBOT_GL_SDH_H
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/gl/namespace.h"
@@ -147,6 +147,6 @@ private:
   Vertex mDistalSkinVertex[mDistalSkinVertexNumber]; // vertex data
   GLushort mDistalSkinIndex[mDistalSkinFacesNumber*3]; // index data
 
-}; // class cedar::dev::robot::gl::KukaArm
-#endif // CEDAR_DEV_ROBOT_GL_KUKA_ARM_H
+}; // class cedar::dev::robot::gl::Sdh
+#endif // CEDAR_DEV_ROBOT_GL_SDH_H
 
