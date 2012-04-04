@@ -35,7 +35,6 @@
 ======================================================================================================================*/
 
 #define NOMINMAX // to avoid Windows issues
-//#define GL_GLEXT_PROTOTYPES // to avoid a problem with finding some GL stuff, apparently caused by Qt
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/System.h"
@@ -67,6 +66,8 @@ cedar::dev::robot::gl::KukaArm::~KukaArm()
 
 void cedar::dev::robot::gl::KukaArm::initializeGl()
 {
+  //!@todo The following doesn't compile on windows! Needs glext.h
+#ifndef WIN32
   // base segment
   glGenBuffers(1, &mBaseSegmentVertexVboId);
   glBindBuffer(GL_ARRAY_BUFFER, mBaseSegmentVertexVboId);
@@ -147,7 +148,7 @@ void cedar::dev::robot::gl::KukaArm::initializeGl()
   glGenBuffers(1, &mWristRingIndexVboId);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mWristRingIndexVboId);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, mWristRingFacesNumber*3 * sizeof(GLushort), mWristRingIndex, GL_STATIC_DRAW);
-
+#endif // WIN32
 }
 
 void cedar::dev::robot::gl::KukaArm::drawBase()

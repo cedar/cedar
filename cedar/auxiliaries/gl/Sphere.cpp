@@ -45,32 +45,18 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Sphere::Sphere(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame)
+cedar::aux::gl::Sphere::Sphere
+(
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+  double radius,
+  double R,
+  double G,
+  double B
+)
 :
-cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Sphere", colorR, colorG, colorB),
+mRadius(radius)
 {
-  mRadius = 2;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
-  mObjectType = "Sphere";
-}
-
-cedar::aux::gl::Sphere::Sphere(
-                                cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
-                                double radius,
-                                double R,
-                                double G,
-                                double B
-                              )
-:
-cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame)
-{
-  mRadius = radius;
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-  mObjectType = "Sphere";
 }
 
 //----------------------------------------------------------------------------------------------------------------------

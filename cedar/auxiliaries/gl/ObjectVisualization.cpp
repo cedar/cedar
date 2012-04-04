@@ -39,6 +39,7 @@
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/gl/gl.h"
 
 // SYSTEM INCLUDES
  #include <QTextStream>
@@ -62,8 +63,19 @@ const float cedar::aux::gl::ObjectVisualization::mBlack_Shininess[1] = {0.05};
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::ObjectVisualization::ObjectVisualization(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame)
+cedar::aux::gl::ObjectVisualization::ObjectVisualization
+(
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+  const std::string& objectType,
+  double colorR,
+  double colorG,
+  double colorB
+)
 :
+mObjectType(objectType),
+mColorR(colorR),
+mColorG(colorG),
+mColorB(colorB),
 mpLocalCoordinateFrame(pLocalCoordinateFrame),
 mTransformationTranspose(4, 4, CV_64FC1)
 {
@@ -72,7 +84,6 @@ mTransformationTranspose(4, 4, CV_64FC1)
 
 cedar::aux::gl::ObjectVisualization::~ObjectVisualization()
 {
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -81,20 +92,16 @@ cedar::aux::gl::ObjectVisualization::~ObjectVisualization()
 
 void cedar::aux::gl::ObjectVisualization::initializeGl()
 {
-
 }
 
 void cedar::aux::gl::ObjectVisualization::init()
 {
-  mObjectType = "no type";
+  //@todo (review) move this to the constructor
   mIsVisible = true;
   mIsDrawnAsWireFrame = false;
   mIsDrawingLocalCoordinateFrame = false;
   mAxisLength = 1.0;
   mResolution = 10;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
 }
 
 bool cedar::aux::gl::ObjectVisualization::isVisible() const

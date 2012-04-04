@@ -56,28 +56,23 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief standard constructor. 
-   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
-   */
-  Ellipse(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame);
-
   /*!@brief constructor. 
    * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    * @param length extension of the ellipse in x-direction of the object frame
    * @param width extension of the ellipse in y-direction of the object frame
    * @param thickness distance of the walls to the ellipse
-   * @param R color, value for red channel in RGB
-   * @param G color, value for green channel in RGB
-   * @param B color, value for blue channel in RGB
+   * @param colorR color, value for red channel in RGB
+   * @param colorG color, value for green channel in RGB
+   * @param colorB color, value for blue channel in RGB
    */
   Ellipse(
            cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
-           double length,
-           double width,
-           double thickness,
-           double R = 1,
-           double G = 0,
-           double B = 0
+           double length = 2.0,
+           double width = 3.0,
+           double thickness = 0.3,
+           double colorR = 1,
+           double colorG = 0,
+           double colorB = 0
          );
   
   //--------------------------------------------------------------------------------------------------------------------

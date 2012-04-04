@@ -39,7 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/DataPlotInterface.h"
+#include "cedar/auxiliaries/gui/PlotInterface.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -50,12 +50,24 @@
 
 /*!@brief A plot for images.
  */
-class cedar::aux::gui::ImagePlot : public DataPlotInterface
+class cedar::aux::gui::ImagePlot : public cedar::aux::gui::PlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  //! Enum for quickly accessing the type of the data displayed by the viewer.
+  enum DataType
+  {
+    DATA_TYPE_IMAGE,
+    DATA_TYPE_MAT,
+    DATA_TYPE_UNKNOWN
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -76,7 +88,7 @@ public:
    * @param data A pointer to the data to display. If this isn't a pointer to a cedar::aux::ImageData, the function
    *             throws.
    */
-  void display(cedar::aux::DataPtr data);
+  void plot(cedar::aux::DataPtr data, const std::string& title);
 
   /*!@brief Updates the plot periodically.
    */
@@ -117,12 +129,20 @@ private:
   QLabel *mpImageDisplay;
 
   //! Data displayed by the plot.
-  cedar::aux::ImageDataPtr mData;
+  cedar::aux::MatDataPtr mData;
 
   //! Converted image.
   QImage mImage;
 
   //! Id of the timer used for updating the plot.
   int mTimerId;
+
+  //! Type of the data.
+  DataType mDataType;
+
+  static std::vector<char> mLookupTableR;
+  static std::vector<char> mLookupTableG;
+  static std::vector<char> mLookupTableB;
+
 }; // class cedar::aux::gui::ImagePlot
 #endif // CEDAR_AUX_GUI_IMAGE_PLOT_H

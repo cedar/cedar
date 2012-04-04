@@ -63,7 +63,6 @@ public:
   
   /*!@brief the destructor */
   ~Scene();
-  //!\todo something is not destroyed properly, find out what happens and fix it
   
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

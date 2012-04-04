@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        exceptions.cpp
+    File:        PlotInterface.cpp
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 17
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.rub.de
+    Date:        2011 07 28
 
     Description:
 
@@ -38,44 +34,25 @@
 
 ======================================================================================================================*/
 
-#include "exceptions.h"
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/gui/PlotInterface.h"
 
-cedar::proc::InvalidNameException::InvalidNameException()
+// SYSTEM INCLUDES
+
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::gui::PlotInterface::PlotInterface(QWidget *pParent)
+:
+QWidget(pParent)
 {
 }
 
-cedar::proc::InvalidObjectException::InvalidObjectException()
+cedar::aux::gui::PlotInterface::~PlotInterface()
 {
 }
 
-cedar::proc::InvalidRoleException::InvalidRoleException()
-{
-}
-
-cedar::proc::InvalidCategoryException::InvalidCategoryException()
-{
-}
-
-cedar::proc::DuplicateNameException::DuplicateNameException()
-{
-}
-
-cedar::proc::MissingConnectionException::MissingConnectionException()
-{
-}
-
-cedar::proc::MissingDeclarationException::MissingDeclarationException()
-{
-}
-
-cedar::proc::InvalidArgumentsException::InvalidArgumentsException()
-{
-}
-
-cedar::proc::PluginException::PluginException()
-{
-}
-
-cedar::proc::ParseException::ParseException()
-{
-}
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------

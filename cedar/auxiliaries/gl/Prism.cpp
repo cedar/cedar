@@ -45,35 +45,20 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Prism::Prism(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame)
+cedar::aux::gl::Prism::Prism
+(
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+  double width,
+  double height,
+  double R,
+  double G,
+  double B
+)
 :
-cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Prism", colorR, colorG, colorB),
+mWidth(width),
+mHeight(height)
 {
-  mWidth = 3;
-  mHeight = 1;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
-  mObjectType = "Prism";
-}
-
-cedar::aux::gl::Prism::Prism(
-                              cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
-                              double width,
-                              double height,
-                              double R,
-                              double G,
-                              double B
-                            )
-:
-cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame)
-{
-  mWidth = width;
-  mHeight = height;
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-  mObjectType = "Prism";
 }
 
 //----------------------------------------------------------------------------------------------------------------------

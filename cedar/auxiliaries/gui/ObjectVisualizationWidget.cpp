@@ -64,7 +64,6 @@ QWidget(parent),
 mpObjectVisualization(rigidBodyVisualization)
 {
   initWindow();
-  return;
 }
 
 cedar::aux::gui::ObjectVisualizationWidget::~ObjectVisualizationWidget()
@@ -144,8 +143,6 @@ void cedar::aux::gui::ObjectVisualizationWidget::initWindow()
   this->setLayout(main_layout);
 
   update();
-  return;
-
 }
 
 void cedar::aux::gui::ObjectVisualizationWidget::update()

@@ -51,7 +51,6 @@
 #include <vector>
 #include <opencv2/opencv.hpp>
 #include <QObject>
-#include <QGLViewer/qglviewer.h>
 
 /*!@brief Base class for simple OpenGL visualizations of geometric objects
  *
@@ -87,7 +86,14 @@ public:
   /*!@brief standard constructor.
    * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    */
-  ObjectVisualization(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame);
+  ObjectVisualization
+  (
+    cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame
+    const std::string& objectType = "no type",
+    double colorR = 1.0,
+    double colorG = 0.0,
+    double colorB = 0.0
+  );
   
   /*!@brief destructor. */
   virtual ~ObjectVisualization();

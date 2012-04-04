@@ -96,14 +96,14 @@ public:
 
   /*!@brief   Reads the configuration from an INI file.
    *
-   * @remarks This method is used for providing downard compatibility to the old config interface. Please don't use it
+   * @remarks This method is used for providing downward compatibility to the old config interface. Please don't use it
    *          for anything else!
    */
   void readOldConfig(const std::string& filename);
 
   /*!@brief   Writes the configuration to an INI file.
    *
-   * @remarks This method is used for providing downard compatibility to the old config interface. Please don't use it
+   * @remarks This method is used for providing downward compatibility to the old config interface. Please don't use it
    *          for anything else!
    */
   void writeOldConfig(const std::string& filename);

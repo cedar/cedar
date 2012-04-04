@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_MOBILE_ODOMETRY_H
-#define CEDAR_DEV_ROBOT_MOBILE_ODOMETRY_H
+#ifndef CEDAR_DEV_ROBOT_ODOMETRY_H
+#define CEDAR_DEV_ROBOT_ODOMETRY_H
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/namespace.h"
@@ -126,5 +126,5 @@ protected:
 private:
   // none yet
 }; // class cedar::dev::robot::MobileRobotModel
-#endif // CEDAR_DEV_ROBOT_MOBILE_ODOMETRY_H
+#endif // CEDAR_DEV_ROBOT_ODOMETRY_H
 

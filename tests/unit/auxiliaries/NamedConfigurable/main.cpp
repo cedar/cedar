@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,37 +22,46 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataPlotInterface.cpp
+    File:        main.cpp
 
     Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.rub.de
-    Date:        2011 07 28
+    Email:       oliver.lomp@ruhr-uni-bochum.de
+    Date:        2012 04 02
 
-    Description:
+    Description: 
 
     Credits:
 
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/DataPlotInterface.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
 
 // SYSTEM INCLUDES
+#include <vector>
+#include <string>
+#include <iostream>
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-
-cedar::aux::gui::DataPlotInterface::DataPlotInterface(QWidget *pParent)
-:
-QWidget(pParent)
+class TestClass : public cedar::aux::NamedConfigurable
 {
-}
+};
 
-cedar::aux::gui::DataPlotInterface::~DataPlotInterface()
+CEDAR_GENERATE_POINTER_TYPES(TestClass);
+
+int main()
 {
-}
+  // the number of errors encountered in this test
+  int errors = 0;
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
+  TestClassPtr test_class(new TestClass());
+  test_class->setName("test_name");
+  std::string name = test_class->getName();
+  if (name != "test_name")
+  {
+    std::cout << "Wrong name was read; ";
+    ++errors;
+  }
+  std::cout << "Read name \"" << name << "\"." << std::endl;
+
+  return errors;
+}

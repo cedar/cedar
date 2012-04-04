@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataPlotInterface.h
+    File:        MultiPlotInterface.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 28
+    Date:        2012 03 27
 
     Description:
 
@@ -34,59 +34,57 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_DATA_PLOT_INTERFACE_H
-#define CEDAR_AUX_GUI_DATA_PLOT_INTERFACE_H
+#ifndef CEDAR_AUX_GUI_MULTI_PLOT_INTERFACE_H
+#define CEDAR_AUX_GUI_MULTI_PLOT_INTERFACE_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/gui/PlotInterface.h"
 
 // SYSTEM INCLUDES
-#include <QWidget>
 
-/*!@brief A unified interface for widgets that plot instances of cedar::proc::Data.
+
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::aux::gui::DataPlotInterface : public QWidget
+class cedar::aux::gui::MultiPlotInterface : public cedar::aux::gui::PlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataPlotInterface(QWidget *pParent = NULL);
-
-  //!@brief Destructor
-  virtual ~DataPlotInterface();
+  MultiPlotInterface(QWidget *pParent = NULL);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Displays the data in the plot widget.
-   *
-   *        This is the main method that is called whenever a data plotter is requested to plot a different data.
-   *
-   * @param data The data to display.
-   */
-  virtual void display(cedar::aux::DataPtr data) = 0;
+  void append(cedar::aux::DataPtr data, const std::string& title)
+  {
+    //!@todo Move into cpp file
+    //!@todo Store data/title association?
+    this->doAppend(data, title);
+  }
+
+  virtual bool canAppend(cedar::aux::ConstDataPtr data) const = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-signals:
-  //! Signal that is emitted when the plotter detects a change in data that it cannot handle.
-  void dataChanged();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  virtual void doAppend(cedar::aux::DataPtr data, const std::string& title) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -95,6 +93,7 @@ protected:
   // none yet
 private:
   // none yet
-}; // class cedar::aux::gui::DataPlotInterface
+}; // class cedar::aux::gui::MultiPlotInterface
 
-#endif // CEDAR_AUX_GUI_DATA_PLOT_INTERFACE_H
+#endif // CEDAR_AUX_GUI_MULTI_PLOT_INTERFACE_H
+

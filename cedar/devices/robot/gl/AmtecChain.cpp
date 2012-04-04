@@ -79,7 +79,7 @@ const float cedar::dev::robot::gl::AmtecChain::mBlackMetal_Shininess[1] = {0.678
 const float cedar::dev::robot::gl::AmtecChain::mChrome_Ambient[3] = {0.25f, 0.25f, 0.25f};
 const float cedar::dev::robot::gl::AmtecChain::mChrome_Diffuse[3] = {0.4f, 0.4f, 0.4f};
 const float cedar::dev::robot::gl::AmtecChain::mChrome_Specular[3] = {0.774597f, 0.774597f, 0.774597f};
-const float cedar::dev::robot::gl::AmtecChain::mChrome_Shininess[1] = {0.6};
+const float cedar::dev::robot::gl::AmtecChain::mChrome_Shininess[1] = {0.6f};
 //! \todo disambiguate white plastic from chrome
 
 //----------------------------------------------------------------------------------------------------------------------
