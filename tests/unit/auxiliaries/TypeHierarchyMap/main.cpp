@@ -191,6 +191,8 @@ void printNodeWithChildren
  *     BB
  *     E
  *       F
+ *     D
+ *       F
  *   C
  *     CA
  *       E
@@ -348,6 +350,8 @@ int main(int argc, char** argv)
   // the number of errors encountered in this test
   int errors = 0;
 
+  std::cout << "Constructing insert orders ... ";
+  std::cout.flush();
   // whether the test should stop on the first error.
   bool stop_on_first_error = false;
   if (argc > 1)
@@ -370,6 +374,8 @@ int main(int argc, char** argv)
   classes.insert(HelperPtr(new HelperTemplate<F>()));
 
   permutate(insert_orders, classes);
+
+  std::cout << "done." << std::endl;
 
   std::cout << "Testing " << insert_orders.size() << " trees." << std::endl;
 
