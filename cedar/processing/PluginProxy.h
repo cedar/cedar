@@ -115,7 +115,7 @@ private:
   std::string mFileName;
 
   //! Handle to the dynamically loaded library.
-#ifdef __unix__
+#if defined __unix__ | defined __APPLE__
   void *mpLibHandle;
 #elif defined _WIN32
   HMODULE mpLibHandle;
