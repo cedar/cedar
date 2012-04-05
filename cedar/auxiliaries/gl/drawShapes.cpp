@@ -91,9 +91,6 @@ void cedar::aux::gl::drawBlock(double l, double w, double h, bool wireFrame)
   glVertex3d(l/2, w/2, h/2);
   glVertex3d(-l/2, w/2, h/2);
   glEnd();
-  
-
-
   if (wireFrame)
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -134,11 +131,6 @@ void cedar::aux::gl::drawCone(
                                bool wireFrame
                              )
 {
-  
-  //opencv2: 
-  //error: "class cv::MatExpr" has no member named "clone"
-  //Mat line = (end-start)(Rect(0, 0, 1, 3)).clone();
-	
   cv::Mat line = (end-start)(cv::Rect(0, 0, 1, 3));
   // if start = end do nothing
   if (cv::norm(line) == 0)
@@ -163,6 +155,7 @@ void cedar::aux::gl::drawCone(
   // return to saved transformation
   glPopMatrix();
 }
+
 template CEDAR_AUX_LIB_EXPORT
   void cedar::aux::gl::drawCone<double>(
                                           const cv::Mat&,
@@ -533,7 +526,7 @@ void cedar::aux::gl::drawEllipse(
 
 
 
-  //!\todo check which of these should move to the init function
+  //!@todo check which of these should move to the init function
 //  glEnable(GL_DEPTH_TEST);
 //  glEnable(GL_MAP2_VERTEX_3);
 //  glEnable(GL_AUTO_NORMAL);
@@ -618,6 +611,7 @@ void cedar::aux::gl::drawEllipse(
 
 void cedar::aux::gl::drawAxes(double length)
 {
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   cv::Mat o = cv::Mat::zeros(3, 1, CV_64FC1);
   cv::Mat x = cv::Mat::zeros(3, 1, CV_64FC1);
   x.at<double>(0, 0) = length;
@@ -633,3 +627,21 @@ void cedar::aux::gl::drawAxes(double length)
   drawArrow<double>(o, z, length*0.015, length*0.04, length*0.2, 10);
 }
 
+void cedar::aux::gl::drawCross(double length, double width)
+{
+  glLineWidth(width);
+  glBegin(GL_LINES);
+  glVertex3d(-length, 0, 0);
+  glVertex3d(length, 0, 0);
+  glEnd();
+
+  glBegin(GL_LINES);
+  glVertex3d(0, -length, 0);
+  glVertex3d(0, length, 0);
+  glEnd();
+
+  glBegin(GL_LINES);
+  glVertex3d(0, 0, -length);
+  glVertex3d(0, 0, length);
+  glEnd();
+}

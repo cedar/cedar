@@ -33,14 +33,13 @@
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/gl/Cone.h"
 
 // SYSTEM INCLUDES
 #include <string>
-
 
 int main(int, char**)
 {
@@ -48,9 +47,9 @@ int main(int, char**)
   int errors = 0;
 
   // test constructors
-  cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
-  cedar::aux::gl::Cone testCone(p_object);
-  cedar::aux::gl::Cone cone(p_object, 1, 5);
+  cedar::aux::LocalCoordinateFramePtr p_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  cedar::aux::gl::Cone testCone(p_local_coordinate_frame);
+  cedar::aux::gl::Cone cone(p_local_coordinate_frame, 1, 5);
 
   //--------------------------------------------------------------------------------------------------------------------
   // radius

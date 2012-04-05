@@ -45,6 +45,8 @@
 #include "cedar/units/TimeUnit.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/LoopMode.h"
+#include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/System.h"
@@ -52,6 +54,34 @@
 
 // SYSTEM INCLUDES
 #include <algorithm>
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the trigger class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr looped_trigger_declaration
+    (
+      new ElementDeclarationTemplate<cedar::proc::LoopedTrigger>
+      (
+        "Triggers",
+        "cedar.processing.LoopedTrigger"
+      )
+    );
+    looped_trigger_declaration->setIconPath(":/triggers/looped_trigger.svg");
+
+    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(looped_trigger_declaration);
+
+    return true;
+  }
+
+  bool declared = declare();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -70,7 +100,8 @@ mLoopType(new cedar::aux::EnumParameter(
                                        )
          ),
 //!@todo Make a TimeParameter and use it here instead.
-mLoopTime(new cedar::aux::DoubleParameter(this, "LoopTime", 1.0, 1.0, 1000000.0))
+mLoopTime(new cedar::aux::DoubleParameter(this, "LoopTime", 1.0, 1.0, 1000000.0)),
+mWait(new cedar::aux::BoolParameter(this, "wait", true))
 {
 
   QObject::connect(this->mLoopType.get(), SIGNAL(valueChanged()), this, SLOT(loopModeChanged()));
@@ -155,5 +186,13 @@ void cedar::proc::LoopedTrigger::step(double time)
   cedar::proc::ArgumentsPtr arguments (new cedar::proc::StepTime(cedar::unit::Milliseconds(time)));
 
   this->trigger(arguments);
+
+  //!@todo What's this usleep doing here?
   usleep(100);
+
+  if (this->mWait->getValue())
+  {
+    // wait for all listeners
+    this->cedar::proc::Trigger::wait();
+  }
 }

@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/FactoryDerived.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -53,10 +54,8 @@
  */
 template
 <
-  class KeyBaseType,
-  class ValueBaseType,
-  typename KeySmartPointerType, // = boost::shared_ptr<KeyBaseType>
-  typename ValueSmartPointerType // = boost::shared_ptr<ValueBaseType>
+  typename KeyBasePtr,
+  typename ValueBasePtr
 >
 class cedar::aux::TypeBasedFactory
 {
@@ -64,18 +63,42 @@ class cedar::aux::TypeBasedFactory
   // types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! Type for a smart pointer to the key type.
-  typedef KeySmartPointerType KeyBaseTypePtr;
+  typedef typename KeyBasePtr::element_type KeyBaseType;
+  typedef typename ValueBasePtr::element_type ValueBaseType;
 
   //! Type for the factory.
-  typedef boost::shared_ptr<cedar::aux::Factory<ValueBaseType, ValueSmartPointerType> > FactoryPtr;
+  typedef boost::shared_ptr<cedar::aux::Factory<ValueBasePtr> > FactoryPtr;
 
 private:
-  //! A pair linking a type info to a factory.
-  typedef std::pair<const std::type_info*, FactoryPtr> Pair;
+  //! Struct for the entries in the factory.
+  struct Entry
+  {
+    //! Type info for identifying exact matches of types.
+    const std::type_info* mTypeInfo;
+
+    //! The factory for this type.
+    FactoryPtr mFactory;
+
+    virtual bool matches(KeyBasePtr pointer) const
+    {
+      return *this->mTypeInfo == typeid(*pointer);
+    }
+  };
+
+  CEDAR_GENERATE_POINTER_TYPES(Entry);
+
+  template <typename T>
+  struct DerivableEntry : public Entry
+  {
+    bool matches(KeyBasePtr pointer) const
+    {
+      return boost::dynamic_pointer_cast<T>(pointer);
+    }
+  };
+
 
   //! Type for the list of pairs.
-  typedef std::vector<Pair> KeyTypes;
+  typedef std::vector<EntryPtr> KeyTypes;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -91,26 +114,53 @@ public:
    *        After calling this function, the type Key can be used to create objects of the type Value.
    */
   template <class Key, class Value>
-  void add()
+  bool add()
   {
-    const std::type_info* type = &typeid(Key);
-    FactoryPtr factory(new cedar::aux::FactoryDerived<ValueBaseType, Value, boost::shared_ptr<ValueBaseType> >());
-    mKeyTypes.push_back(Pair(type, factory));
+    EntryPtr entry(new Entry());
+    entry->mTypeInfo = &typeid(Key);
+    entry->mFactory = FactoryPtr
+                      (
+                        new cedar::aux::FactoryDerived<boost::shared_ptr<ValueBaseType>, boost::shared_ptr<Value> >()
+                      );
+    mKeyTypes.push_back(entry);
+
+    // this always returns true to allow the use of static initalization for registering types.
+    return true;
+  }
+
+  /*!@brief Adds an association into the factory.
+   *
+   *        After calling this function, objects of classes inheriting the type Key can be used to create objects of the
+   *        type Value.
+   */
+  template <class Key, class Value>
+  bool addDerived()
+  {
+    DerivableEntry<Key> *entry = new DerivableEntry<Key>();
+    entry->mTypeInfo = &typeid(Key);
+    entry->mFactory = FactoryPtr
+                      (
+                        new cedar::aux::FactoryDerived<boost::shared_ptr<ValueBaseType>, boost::shared_ptr<Value> >()
+                      );
+    mKeyTypes.push_back(EntryPtr(entry));
+
+    // this always returns true to allow the use of static initalization for registering types.
+    return true;
   }
 
   /*!@brief Returns the factory associated with the type of the object pointed to by the parameter.
    */
-  FactoryPtr get(KeyBaseTypePtr pointer)
+  FactoryPtr get(KeyBasePtr pointer)
   {
     for(typename KeyTypes::iterator iter = this->mKeyTypes.begin(); iter != this->mKeyTypes.end(); ++iter)
     {
-      if (*(iter->first) == typeid(*pointer.get()))
+      if ((*iter)->matches(pointer))
       {
-        return iter->second;
+        return (*iter)->mFactory;
       }
     }
     std::string message = "Type of the base pointer (";
-    message += typeid(pointer.get()).name();
+    message += cedar::aux::objectTypeToString(pointer);
     message += ") is not handled in the TypeBasedFactory.";
     CEDAR_THROW(cedar::aux::UnknownTypeException, message);
     return FactoryPtr();

@@ -32,6 +32,7 @@ In these pages you can learn more about the structure and organization of cedar.
 We provide a number of tutorials for certain parts of cedar, for which some additional guidance may be
 beneficial or even necessary.
 - @link ProcessingFrameworkTutorial Processing framework @endlink
+- @ref ConfigurableAndParameters
 
 @section CodingStyle Coding Style
 cedar sticks to a strict @link CodingStyle coding style@endlink.

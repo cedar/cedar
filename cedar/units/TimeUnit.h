@@ -111,6 +111,23 @@ public:
     return TimeUnit<otherFactor, otherSuffix>(value);
   }
 
+  /*!@brief Comparision operator.
+   */
+  template <unsigned int otherFactor, const char* otherSuffix>
+  bool operator< (const TimeUnit<otherFactor, otherSuffix>& other) const
+  {
+    return this->mAmountInMicroSeconds < other.mAmountInMicroSeconds;
+  }
+
+  /*!@brief The addition operator.
+   */
+  template <unsigned int otherFactor, const char* otherSuffix>
+  TimeUnit& operator+= (const TimeUnit<otherFactor, otherSuffix>& other)
+  {
+    this->mAmountInMicroSeconds += other.mAmountInMicroSeconds;
+    return *this;
+  }
+
   /*!@brief star operator for multiplying a TimeUnit with a scalar value on right side
    * @return result of multiplication
    */

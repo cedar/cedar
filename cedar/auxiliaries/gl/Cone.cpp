@@ -44,35 +44,20 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Cone::Cone(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Cone::Cone
+(
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+  double radius,
+  double height,
+  double colorR,
+  double colorG,
+  double colorB
+)
 :
-cedar::aux::gl::Object(pObject)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Cone", colorR, colorG, colorB),
+mRadius(radius),
+mHeight(height)
 {
-  mRadius = 2;
-  mHeight = 2;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
-  mObjectType = "Cone";
-}
-
-cedar::aux::gl::Cone::Cone(
-                            cedar::aux::ObjectPtr pObject,
-                            double radius,
-                            double height,
-                            double R,
-                            double G,
-                            double B
-                          )
-:
-cedar::aux::gl::Object(pObject)
-{
-  mRadius = radius;
-  mHeight = height;
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-  mObjectType = "Cone";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -81,13 +66,7 @@ cedar::aux::gl::Object(pObject)
 
 void cedar::aux::gl::Cone::draw()
 {
-  // move to origin
-  glPopMatrix();
-  glPushMatrix();
-  
-  // move to object coordinates
-  mTransformationTranspose = mpObject->getTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  prepareDraw();
   
   // draw object
   if (mIsVisible)

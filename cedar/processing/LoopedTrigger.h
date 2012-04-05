@@ -140,6 +140,9 @@ private:
   //!@brief The loop time.
   cedar::aux::DoubleParameterPtr mLoopTime;
 
+  //!@brief Whether the looped trigger waits for all its listeners to finish their processing.
+  cedar::aux::BoolParameterPtr mWait;
+
 }; // class cedar::proc::LoopedTrigger
 
 #endif // CEDAR_PROC_LOOPED_TRIGGER_H

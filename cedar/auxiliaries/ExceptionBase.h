@@ -64,7 +64,7 @@ class cedar::aux::ExceptionBase : public std::exception
    *  @remarks The type passed as \em Exception_type should inherit from \em cedar::aux::exc::ExceptionBase.
    *           Do not line-break the following macro(s), or the __LINE__ specification will be wrong!
    */
-  #define CEDAR_THROW(Exception_type, message) { Exception_type exception; exception.setMessage(message); exception.setLine(__LINE__); exception.setFile(__FILE__); throw exception; }
+  #define CEDAR_THROW(Exception_type, message) { Exception_type exception; exception.setType(#Exception_type); exception.setMessage(message); exception.setLine(__LINE__); exception.setFile(__FILE__); throw exception; }
 
   /*! @def     CEDAR_THROW_EXCEPTION(Exception_type)
    *
@@ -72,20 +72,20 @@ class cedar::aux::ExceptionBase : public std::exception
    *
    *  @remarks The type thrown should be an object, not a pointer.
    */
-  #define CEDAR_THROW_EXCEPTION(exception) { exception.setLine(__LINE__); exception.setFile(__FILE__); throw exception; }
+  #define CEDAR_THROW_EXCEPTION(exception) { exception.setType(cedar::aux::unmangleName(typeid(exception))); exception.setLine(__LINE__); exception.setFile(__FILE__); throw exception; }
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ExceptionBase(void);
+  ExceptionBase();
 
   /*!@brief The destructor.
    *
    * @remarks The destructor may not throw any exception.
    */
-  virtual ~ExceptionBase(void) throw ();
+  virtual ~ExceptionBase() throw ();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -113,6 +113,15 @@ public:
    */
   void printInfo() const;
 
+  /*!@brief Sets the typename of the exception.
+   *
+   * @remarks Don't call this function; it is called automatically by the CEDAR_THROW macros.
+   */
+  void setType(const std::string& type)
+  {
+    this->mAutoType = type;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -129,10 +138,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-  //! The type-name of the exception.
-  std::string mType;
 private:
+  //! The type-name of the exception.
+  std::string mAutoType;
+
   //! The message
   std::string mMessage;
 

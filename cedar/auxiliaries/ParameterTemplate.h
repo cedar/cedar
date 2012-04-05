@@ -103,13 +103,13 @@ public:
   }
 
   //!@brief store the current value of type T in a configuration tree
-  void putTo(cedar::aux::ConfigurationNode& root) const
+  void writeToNode(cedar::aux::ConfigurationNode& root) const
   {
     root.put(this->getName(), this->mValue);
   }
 
   //!@brief load a value of type T from a configuration tree
-  void setTo(const cedar::aux::ConfigurationNode& node)
+  void readFromNode(const cedar::aux::ConfigurationNode& node)
   {
 #ifdef DEBUG
     try

@@ -36,6 +36,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/LoopedThread.h"
+#include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
 
@@ -90,17 +92,29 @@ void cedar::aux::LoopedThread::stop(unsigned int time, bool suppressWarning)
 
     if (this->isRunning())
     {
-      std::cout << "Warning: Thread is still running after call of stop()!" << std::endl;
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Thread is still running after call of stop()!",
+        "cedar::aux::LoopedThread::stop(unsigned int, bool)"
+      );
     }
 
     if (suppressWarning == false && mMaxStepsTaken > 1.01 && mSimulatedTime.total_microseconds() == 0)
     {
-      std::cout << "Warning: The system was not fast enough to stay to scheduled thread timing. ";
-      std::cout << "Consider using a larger step size." << std::endl;
-      std::cout << "Execution stats:" << std::endl;
-      std::cout << "  avg. time steps between execution: "
-        << mSumOfStepsTaken / static_cast<double>(mNumberOfSteps) << std::endl;
-      std::cout << "  max. time steps between execution: " << mMaxStepsTaken << std::endl;
+      std::string message = "The system was not fast enough to stay to scheduled thread timing. ";
+      message += "Consider using a larger step size.\n";
+      message += "Execution stats:\n";
+      message += "  avg. time steps between execution: ";
+      message += cedar::aux::toString(mSumOfStepsTaken / static_cast<double>(mNumberOfSteps));
+      message += "\n";
+      message += "  max. time steps between execution: ";
+      message += cedar::aux::toString(mMaxStepsTaken);
+
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        message,
+        "cedar::aux::LoopedThread::stop(unsigned int, bool)"
+      );
     }
   }
   return;
@@ -139,9 +153,9 @@ void cedar::aux::LoopedThread::run(void)
       }
     }
   }
-  else // if(step_size == 0)
+  else // step_size.total_microseconds() != 0
   {
-    // regular mode with time slots
+    // regular mode with fixed time
 
     // initialization
     mLastTimeStepStart = boost::posix_time::microsec_clock::universal_time();
@@ -167,15 +181,21 @@ void cedar::aux::LoopedThread::run(void)
       // calculate number of time steps taken
       double steps_taken
         = static_cast<double>(step_duration.total_microseconds()) / static_cast<double>(step_size.total_microseconds());
-      unsigned int full_steps_taken = static_cast<unsigned int>( steps_taken + 0.5 );
+      unsigned int full_steps_taken = static_cast<unsigned int>(steps_taken + 0.5);
 
       #if defined DEBUG && defined SHOW_TIMING_HELPERS
       // print warning if time steps have been skipped
       if (steps_taken > 1.01)
-        std::cerr << "WARNING: " << steps_taken << " time steps taken at once! "
-        << "Your system might be too slow for an execution interval of "
-        << step_size.total_microseconds() << " microseconds. Consider using a "
-        << "longer interval!" << std::endl;
+      {
+        cedar::aux::LogSingleton::getInstance()->debug
+        (
+          "Warning: " + cedar::aux::toString(steps_taken) + " time steps taken at once! "
+          "Your system might be too slow for an execution interval of "
+          + cedar::aux::toString(step_size.total_microseconds())
+          + " microseconds. Consider using a longer interval!",
+          "cedar::aux::LoopedThread::stop(unsigned int, bool)"
+        );
+      }
       #endif
 
       // here we have to distinguish between the different working modes of the
@@ -203,7 +223,7 @@ void cedar::aux::LoopedThread::run(void)
         }
 
       }
-      else // if(mUseFixedStepSize)
+      else
       {
         // update statistics
         updateStatistics(steps_taken);
