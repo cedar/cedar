@@ -81,7 +81,7 @@ void cedar::aux::System::openCrashFile(std::ofstream& stream, std::string& crash
 
 std::string cedar::aux::System::getUserHomeDirectory()
 {
-#ifdef __unix__
+#if defined __unix__ | defined __APPLE__
   std::string homedir = getenv("HOME");
   return homedir;
 #elif defined _WIN32
@@ -105,7 +105,7 @@ std::string cedar::aux::System::getUserHomeDirectory()
 
 std::string cedar::aux::System::getUserApplicationDataDirectory()
 {
-#ifdef __unix__
+#if defined __unix__ | defined __APPLE__
   return cedar::aux::System::getUserHomeDirectory();
 #elif defined _WIN32
   LPWSTR path = NULL;
