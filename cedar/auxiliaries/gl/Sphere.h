@@ -39,42 +39,37 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
-#include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
 
 // SYSTEM INCLUDES
 
 
 /*!@brief Simple OpenGL visualization of a sphere
  *
- * This class visualizes an instance of cedar::aux::Object as a sphere with specified dimensions
+ * This class visualizes a sphere with specified dimensions
  *
- * @remarks To get a simple visualization of the Object on screen, add an instance of this class to a
+ * @remarks To get a simple visualization of the object on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
-class cedar::aux::gl::Sphere : public cedar::aux::gl::Object
+class cedar::aux::gl::Sphere : public cedar::aux::gl::ObjectVisualization
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief standard constructor.
-   * @param pObject    pointer to the aux::Object being visualized
-   */
-  Sphere(cedar::aux::ObjectPtr pObject);
-
   /*!@brief constructor. 
-   * @param pObject pointer to the aux::Object being visualized
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    * @param radius radius of the sphere
-   * @param R color, value for red channel in RGB
-   * @param G color, value for green channel in RGB
-   * @param B color, value for blue channel in RGB
+   * @param colorR color, value for red channel in RGB
+   * @param colorG color, value for green channel in RGB
+   * @param colorB color, value for blue channel in RGB
    */
   Sphere(
-          cedar::aux::ObjectPtr pObject,
-          double radius,
-          double R = 1,
-          double G = 0,
-          double B = 0
+          cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+          double radius = 2.0,
+          double colorR = 1,
+          double colorG = 0,
+          double colorB = 0
         );
   
   //--------------------------------------------------------------------------------------------------------------------

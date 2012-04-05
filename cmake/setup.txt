@@ -80,6 +80,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CEDAR_EXE_DIR}")
 # append a 'cedar' subdirectory to the header install directory, so that the includes are bundled
 set(CEDAR_HEADER_INSTALL_DIR "${CEDAR_HEADER_INSTALL_DIR}/cedar")
 
+# set cedar's resource installation directory
+set(CEDAR_RESOURCE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/cedar")
+
 # Shared or static libraries?
 if (CEDAR_BUILD_STATIC_LIBS)
   set (CEDAR_LIB_TYPE STATIC)
@@ -99,32 +102,13 @@ include_directories(${CEDAR_HOME} ${CEDAR_TEST_DIR} ${CEDAR_BUILD_DIR})
 
 if (CMAKE_COMPILER_IS_GNUCC)
   add_definitions(-Wall -Wextra)
-  add_definitions(-DGNUCC -D__GNUCC__ -D__GCC__ -DGCC)
 elseif (MSVC)
   add_definitions(-W2)
-  add_definitions(-DMSVC)
 endif (CMAKE_COMPILER_IS_GNUCC)
 
 add_definitions(-D CEDAR_LOG_DIR=\\"${CEDAR_LOG_DIR}/\\")
 
-if (UNIX)
-  add_definitions(-DUNIX -D__UNIX__)
-  message("-- defined the UNIX constants.")
-endif (UNIX)
-
-if (APPLE)
-  add_definitions(-DAPPLE -D__APPLE__)
-  message("-- defined the APPLE constants.")
-endif (APPLE)
-
-if ("${CMAKE_SYSTEM}" MATCHES "Linux")
-  add_definitions(-DLINUX -D__LINUX__)
-  message("-- defined the LINUX constants.")
-endif ("${CMAKE_SYSTEM}" MATCHES "Linux")
-
-
 if (WIN32)
-  add_definitions(-DWINDOWS -D__WINDOWS__ -DWIN32 -D__WIN32__)
   set(CMAKE_DEBUG_POSTFIX "d") # TODO for linux too?
 endif (WIN32)
 
@@ -136,3 +120,6 @@ else(buildTypeLower MATCHES debug)
   message("-- Building in \"RELEASE\" mode.")
   add_definitions(-DRELEASE)
 endif(buildTypeLower MATCHES debug)
+
+# configure the file exposing internal cmake variables to cedar
+configure_file("${CEDAR_HOME}/cmake/resources/internals.h.in" "${CMAKE_CURRENT_BINARY_DIR}/cedar/internals.h")

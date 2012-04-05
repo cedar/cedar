@@ -50,6 +50,7 @@
 #include "cedar/processing/TriggerConnection.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
@@ -66,16 +67,12 @@
 
 cedar::proc::Network::Network()
 {
-#ifdef DEBUG
-  std::cout << "> allocated data (cedar::proc::Network, " << this << ")" << std::endl;
-#endif // DEBUG
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
 }
 
 cedar::proc::Network::~Network()
 {
-#ifdef DEBUG
-  std::cout << "> freeing data (cedar::proc::Network, " << this << ")" << std::endl;
-#endif // DEBUG
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

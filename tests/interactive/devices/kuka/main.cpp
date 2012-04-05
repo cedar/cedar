@@ -24,9 +24,9 @@
 
  ----- File:        main.cpp
 
- ----- Maintainer:  Guido Knips
- ----- Email:       guido.knips@ini.rub.de
- ----- Date:        2011 1 11
+ ----- Maintainer:  Hendrik Reimann
+ ----- Email:       hendrik.reimann@ini.rub.de
+ ----- Date:        2012 1 30
 
  ----- Description: Testing of the interface for the KUKA LBR
 
@@ -38,25 +38,39 @@
 // PROJECT INCLUDES
 #include "cedar/devices/kuka/gui/FriStatusWidget.h"
 #include "cedar/devices/robot/gui/KinematicChainWidget.h"
+#include "cedar/devices/robot/KinematicChain.h"
+#include "cedar/devices/robot/gl/KinematicChain.h"
+#include "cedar/devices/robot/SimulatedKinematicChain.h"
+#include "cedar/auxiliaries/gl/Scene.h"
+#include "cedar/auxiliaries/gui/Viewer.h"
+#include "cedar/auxiliaries/System.h"
 
 // SYSTEM INCLUDES
 #include <vector>
 #include <QApplication>
 #include <iostream>
 
+using namespace cedar::dev::kuka;
 using cedar::dev::kuka::gui::FriStatusWidget;
 using cedar::dev::robot::KinematicChainPtr;
 
 int main(int argc, char **argv)
 {
+  std::string mode = "0";
+  std::string configuration_file_old = cedar::aux::System::locateResource("configs/kuka_lwr4.conf");
+  std::string configuration_file = cedar::aux::System::locateResource("configs/kuka_lwr4.json");
   QApplication a(argc, argv);
+  FriStatusWidget* p_fri_status_widget = 0;
+  cedar::dev::robot::gui::KinematicChainWidget* p_kinematic_chain_widget = 0;
 
-  cedar::dev::kuka::KukaInterfacePtr p_kukain(new cedar::dev::kuka::KukaInterface("../../tests/interactive/devices/kuka/test_arm.conf"));
-  FriStatusWidget * p_fri_status_widget = new FriStatusWidget(p_kukain);
+  // create the hardware interface
+  KukaInterfacePtr p_arm(new cedar::dev::kuka::KukaInterface(configuration_file_old));
+  p_arm->readJson(configuration_file);
+  p_fri_status_widget = new FriStatusWidget(p_arm);
   p_fri_status_widget->startTimer(100);
   p_fri_status_widget->show();
-  cedar::dev::robot::gui::KinematicChainWidget *p_kinematic_chain_widget
-    = new cedar::dev::robot::gui::KinematicChainWidget(p_kukain, "../../tests/interactive/devices/kuka/kinematic_chain_widget.conf");
+  p_kinematic_chain_widget
+   = new cedar::dev::robot::gui::KinematicChainWidget(p_arm);
   p_kinematic_chain_widget->show();
 
   a.exec();

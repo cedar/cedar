@@ -43,8 +43,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
-#include "cedar/auxiliaries/AbstractFactory.h"
-#include "cedar/auxiliaries/AbstractFactoryDerived.h"
+#include "cedar/auxiliaries/Factory.h"
+#include "cedar/auxiliaries/FactoryDerived.h"
 
 // SYSTEM INCLUDES
 
@@ -82,10 +82,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief get a factory for this declared sigmoid type
-  cedar::aux::math::SigmoidFactoryPtr getObjectFactory()
-  {
-    return this->mpClassFactory;
-  }
+  cedar::aux::math::SigmoidFactoryPtr getObjectFactory();
 
   //!@brief get the id of the declared sigmoid class
   const std::string& getClassId() const
@@ -184,7 +181,7 @@ public:
   :
   SigmoidDeclaration
   (
-    cedar::aux::math::SigmoidFactoryPtr(new cedar::aux::AbstractFactoryDerived<cedar::aux::math::Sigmoid, DerivedClass>()),
+    cedar::aux::math::SigmoidFactoryPtr(new cedar::aux::FactoryDerived<cedar::aux::math::SigmoidPtr, DerivedClass>()),
     classId,
     category
   )

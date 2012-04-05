@@ -33,15 +33,13 @@
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
-#include "cedar/auxiliaries/Object.h"
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/gl/Block.h"
 
 // SYSTEM INCLUDES
 #include <string>
-
 
 int main(int, char**)
 {
@@ -49,9 +47,9 @@ int main(int, char**)
   int errors = 0;
 
   // test constructors
-  cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
-  cedar::aux::gl::Block test_block(p_object);
-  cedar::aux::gl::Block block(p_object, 1, 2, 3);
+  cedar::aux::LocalCoordinateFramePtr p_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  cedar::aux::gl::Block test_block(p_local_coordinate_frame);
+  cedar::aux::gl::Block block(p_local_coordinate_frame, 1, 2, 3);
 
   //--------------------------------------------------------------------------------------------------------------------
   // length

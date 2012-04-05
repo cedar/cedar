@@ -40,26 +40,24 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/DataPlotter.h"
-#include "cedar/auxiliaries/DoubleData.h"
-#include "cedar/auxiliaries/MatData.h"
-#include "cedar/auxiliaries/ImageData.h"
-#include "cedar/auxiliaries/gui/MatrixPlot.h"
-#include "cedar/auxiliaries/gui/ImagePlot.h"
-#include "cedar/auxiliaries/gui/HistoryPlot.h"
+#include "cedar/auxiliaries/gui/PlotManager.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
 
-cedar::aux::gui::DataPlotter::WidgetFactory cedar::aux::gui::DataPlotter::mTypePlotters;
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::aux::gui::DataPlotter::DataPlotter(const std::string& title, QWidget *pParent)
+cedar::aux::gui::DataPlotter::DataPlotter(QWidget *pParent)
 :
-QDockWidget(title.c_str(), pParent)
+cedar::aux::gui::MultiPlotInterface(pParent),
+mpCurrentPlot(NULL)
 {
-  this->setFloating(true);
+  QVBoxLayout *p_layout = new QVBoxLayout();
+  this->setLayout(p_layout);
+
+  this->setContentsMargins(0, 0, 0, 0);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 }
 
@@ -71,46 +69,61 @@ cedar::aux::gui::DataPlotter::~DataPlotter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gui::DataPlotter::plot(cedar::aux::DataPtr data)
+bool cedar::aux::gui::DataPlotter::canAppend(cedar::aux::ConstDataPtr data) const
 {
-  mData = data;
-  //!@todo doesn't work this way -- related to the to-do entry below.
-//  PlotWidgetInterface *p_widget = getWidgetFactory().get(data)->allocateRaw();
-//  p_widget->plot(data);
+  if (this->mpCurrentPlot != NULL)
+  {
+    if (cedar::aux::gui::MultiPlotInterface* multi_plotter
+          = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlot))
+    {
+      return multi_plotter->canAppend(data);
+    }
+  }
+  return false;
+}
 
-  //!@todo find a better solution for this!
-  cedar::aux::gui::DataPlotInterface *p_plot = NULL;
-  if (dynamic_cast<cedar::aux::ImageData*>(data.get()))
+void cedar::aux::gui::DataPlotter::doAppend(cedar::aux::DataPtr data, const std::string& title)
+{
+  if (this->mpCurrentPlot == NULL)
   {
-    p_plot = new cedar::aux::gui::ImagePlot(this);
-  }
-  else if (dynamic_cast<cedar::aux::MatData*>(data.get()))
-  {
-    p_plot = new cedar::aux::gui::MatrixPlot(this);
-  }
-  else if (dynamic_cast<cedar::aux::DoubleData*>(data.get()))
-  {
-    p_plot = new cedar::aux::gui::HistoryPlot(this);
+    this->plot(data, title);
   }
   else
   {
-    CEDAR_THROW(cedar::aux::UnhandledTypeException, "Unhandled data type in cedar::aux::gui::DataPlotter::plot.");
+    cedar::aux::gui::MultiPlotInterface* multi_plotter
+      = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlot);
+
+    CEDAR_ASSERT(multi_plotter);
+    multi_plotter->append(data, title);
   }
-  connect(p_plot, SIGNAL(dataChanged()), this, SLOT(dataChanged()));
-  p_plot->display(data);
-  this->setWidget(p_plot);
 }
 
-cedar::aux::gui::DataPlotter::WidgetFactory& cedar::aux::gui::DataPlotter::getWidgetFactory()
+void cedar::aux::gui::DataPlotter::plot(cedar::aux::DataPtr data, const std::string& title)
 {
-  if (cedar::aux::gui::DataPlotter::mTypePlotters.empty())
+  this->mData = data;
+  this->mTitle = title;
+
+  // get the declaration corresponding to the data to be plotted
+  cedar::aux::gui::PlotDeclarationPtr declaration
+    = cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(data);
+
+  // remove current plot
+  if (this->mpCurrentPlot != NULL)
   {
-    cedar::aux::gui::DataPlotter::mTypePlotters.add<cedar::aux::MatData, QWidget>();
+    delete this->mpCurrentPlot;
+    this->mpCurrentPlot = NULL;
   }
-  return cedar::aux::gui::DataPlotter::mTypePlotters;
+
+  // create the plot
+  this->mpCurrentPlot = declaration->createPlot();
+  QObject::connect(this->mpCurrentPlot, SIGNAL(dataChanged()), this, SLOT(dataChanged()));
+  this->mpCurrentPlot->plot(data, title);
+
+  // add the plot to the layout
+  this->layout()->addWidget(this->mpCurrentPlot);
 }
 
 void cedar::aux::gui::DataPlotter::dataChanged()
 {
-  this->plot(mData);
+  this->plot(mData, this->mTitle);
 }

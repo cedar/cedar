@@ -43,7 +43,7 @@
 
 CEDAR_BEGIN_PLUGIN_DECLARATION
 //!@brief Function that declares plugin exports.
-CEDAR_DYN_LIB_EXPORT void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin);
+CEDAR_DECLARE_DEPRECATED(CEDAR_DYN_LIB_EXPORT void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin));
 CEDAR_END_PLUGIN_DECLARATION
 
 #endif // CEDAR_DYN_PLUGIN_H

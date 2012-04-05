@@ -60,6 +60,7 @@ class cedar::aux::Configurable : public boost::noncopyable
   // friends
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::aux::Parameter;
+  friend class cedar::aux::ConfigurationInterface;
 
   //--------------------------------------------------------------------------------------------------------------------
   // macros and types
@@ -95,10 +96,17 @@ public:
 
   /*!@brief   Reads the configuration from an INI file.
    *
-   * @remarks This method is used for providing downard compatibility to the old config interface. Please don't use it
+   * @remarks This method is used for providing downward compatibility to the old config interface. Please don't use it
    *          for anything else!
    */
   void readOldConfig(const std::string& filename);
+
+  /*!@brief   Writes the configuration to an INI file.
+   *
+   * @remarks This method is used for providing downward compatibility to the old config interface. Please don't use it
+   *          for anything else!
+   */
+  void writeOldConfig(const std::string& filename);
 
   //!@brief write a configuration for all registered parameters to a root node of type cedar::aux::ConfigurationNode
   virtual void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
@@ -134,6 +142,16 @@ public:
 
   void copyTo(ConfigurablePtr target) const;
 
+  /*!@brief Returns the parameter associated with the path.
+   * @todo This should be const, but that conflicts with the intrusive pointers
+   */
+  cedar::aux::ParameterPtr getParameter(const std::string& path);
+
+  /*!@brief Returns the configurable child associated with the path.
+   * @todo This should be const, but that conflicts with the intrusive pointers in getParameter
+   */
+  cedar::aux::ConfigurablePtr getConfigurableChild(const std::string& path);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -152,6 +170,12 @@ private:
 
   //!@brief Transforms the old config format to one readable in the new interface.
   void oldFormatToNew(cedar::aux::ConfigurationNode& node);
+
+  //!@brief Transforms the old config format to one readable in the new interface.
+  void newFormatToOld(cedar::aux::ConfigurationNode& node);
+
+  //!@brief Sets all parameters to their default values.
+  void defaultAll();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

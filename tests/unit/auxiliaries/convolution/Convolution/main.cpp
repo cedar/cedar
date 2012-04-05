@@ -39,14 +39,15 @@
 
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/convolution/Convolution.h"
-#ifdef CEDAR_FFTW
+#ifdef CEDAR_USE_FFTW
 #include "cedar/auxiliaries/convolution/FastConvolution.h"
-#endif
+#endif // CEDAR_USE_FFTW
 #include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
+//!@todo Disable compilation of this test in the CMakeLists.txt when CEDAR_USE_FFTW is not defined
 
 int main()
 {

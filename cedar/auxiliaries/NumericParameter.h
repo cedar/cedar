@@ -38,8 +38,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_NUMERIC_PARAMETER_H
-#define CEDAR_PROC_NUMERIC_PARAMETER_H
+#ifndef CEDAR_AUX_NUMERIC_PARAMETER_H
+#define CEDAR_AUX_NUMERIC_PARAMETER_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/ParameterTemplate.h"
@@ -148,4 +148,4 @@ private:
 
 }; // class cedar::aux::NumericParameter
 
-#endif // CEDAR_PROC_NUMERIC_PARAMETER_H
+#endif // CEDAR_AUX_NUMERIC_PARAMETER_H

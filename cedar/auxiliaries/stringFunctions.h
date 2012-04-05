@@ -39,11 +39,13 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
 #include <vector>
 #include <string>
 #include <sstream>
+#include <boost/regex.hpp>
 
 namespace cedar
 {
@@ -168,6 +170,65 @@ namespace cedar
     {
       std::istringstream stream(string);
       return !(stream >> encoding >> value).fail();
+    }
+
+    /*!@brief Overloaded method, provided for convenience.
+     *
+     * @see cedar::aux::fromString
+     */
+    template <class T>
+    T fromString(const std::string& string, std::ios_base& (*encoding)(std::ios_base&))
+    {
+      T result;
+      if (!cedar::aux::fromString(result, string, encoding))
+      {
+        CEDAR_THROW
+        (
+          cedar::aux::ConversionFailedException,
+          "Could not convert the string \"" + string + "\" to the requested type."
+        );
+      }
+      return result;
+    }
+
+    /*!@brief Template function that converts a string to a simple data type.
+     *
+     * @param string The string the value will be extracted from.
+     */
+    template <class T>
+    T fromString(const std::string& string)
+    {
+      T result;
+      std::istringstream stream(string);
+      if((stream >> result).fail())
+      {
+        CEDAR_THROW
+        (
+          cedar::aux::ConversionFailedException,
+          "Could not convert the string \"" + string + "\" to the requested type."
+        );
+      }
+
+      return result;
+    }
+
+    inline std::string regexReplace(const std::string& input, const std::string& regex, const std::string& replaceText)
+    {
+      // based on http://www.boost.org/doc/libs/1_49_0/libs/regex/doc/html/boost_regex/ref/regex_replace.html
+      std::ostringstream t(std::ios::out | std::ios::binary);
+      std::ostream_iterator<char, char> oi(t);
+      boost::regex exp;
+      exp.assign(regex);
+      boost::regex_replace
+      (
+        oi, // output iterator
+        input.begin(), // input begin iterator
+        input.end(), // input end iterator
+        exp, // regex
+        replaceText, // formatter
+        boost::match_default | boost::format_all // parameter
+      );
+      return t.str();
     }
   }
 }

@@ -28,7 +28,7 @@
     Email:       hendrik.reimann@ini.rub.de
     Date:        2010 10 28
 
-    Description: Scene for organizing instances of GlObjectVisualization
+    Description: Scene for organizing instances of cedar::aux::gl::ObjectVisualization
 
     Credits:
 
@@ -71,25 +71,43 @@ double cedar::aux::gl::Scene::getSceneLimit() const
   return mSceneLimit;
 }
 
-int cedar::aux::gl::Scene::addObject(cedar::aux::gl::ObjectPtr& rpObject)
+int cedar::aux::gl::Scene::addObjectVisualization(cedar::aux::gl::ObjectVisualizationPtr pObjectVisualization)
 {
-  //!\todo prevent different objects with same names
-//  if (object name exists)
-//  {
-//    return false;
-//  }
-  mObjects.push_back(rpObject);
-  return mObjects.size() - 1;
+  mObjectVisualizations.push_back(pObjectVisualization);
+  for (int i=0; i<mViewers.size(); i++)
+  {
+    mViewers[i]->initGl(pObjectVisualization);
+  }
+  return mObjectVisualizations.size() - 1;
 }
 
-void cedar::aux::gl::Scene::deleteObject(int index)
+int cedar::aux::gl::Scene::addViewer(cedar::aux::gui::Viewer* pViewer)
 {
-  mObjects.removeAt(index);
+  mViewers.push_back(pViewer);
+  return mViewers.size() - 1;
+}
+
+int cedar::aux::gl::Scene::removeViewer(cedar::aux::gui::Viewer* pViewer)
+{
+  for (int i=0; i<mViewers.size(); i++)
+  {
+    if (mViewers[i] == pViewer)
+    {
+      mViewers.removeAt(i);
+      return i;
+    }
+  }
+  return 0;
+}
+
+void cedar::aux::gl::Scene::deleteObjectVisualization(int index)
+{
+  mObjectVisualizations.removeAt(index);
 }
 
 void cedar::aux::gl::Scene::clear()
 {
-  mObjects.clear();
+  mObjectVisualizations.clear();
 }
 
 void cedar::aux::gl::Scene::draw()
@@ -98,9 +116,9 @@ void cedar::aux::gl::Scene::draw()
   glPushMatrix();
 
   // draw all items in the scene
-  for (int i=0; i<mObjects.size(); i++)
+  for (int i = 0; i < mObjectVisualizations.size(); ++i)
   {
-    mObjects[ i ]->draw();
+    mObjectVisualizations[i]->draw();
   }
   
   // return to origin transformation
@@ -132,19 +150,19 @@ void cedar::aux::gl::Scene::draw()
   }
 }
 
-int cedar::aux::gl::Scene::numberOfObjects() const
+int cedar::aux::gl::Scene::getNumberOfObjectVisualizations() const
 {
-  return mObjects.size();
+  return mObjectVisualizations.size();
 }
 
 bool cedar::aux::gl::Scene::isEmpty() const
 {
-  return (mObjects.size() == 0);
+  return (mObjectVisualizations.size() == 0);
 }
 
-cedar::aux::gl::ObjectPtr cedar::aux::gl::Scene::getObject(int index)
+cedar::aux::gl::ObjectVisualizationPtr cedar::aux::gl::Scene::getObjectVisualization(int index)
 {
-  return mObjects[index];
+  return mObjectVisualizations[index];
 }
 
 void cedar::aux::gl::Scene::initGl()
@@ -162,13 +180,20 @@ void cedar::aux::gl::Scene::initGl()
   GLfloat ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
   GLfloat diffuseLight[] = { 0.8f, 0.8f, 0.8f, 1.0f };
   GLfloat specularLight[] = { 0.5f, 0.5f, 0.5f, 1.0f };
-  GLfloat position[] = { -0.5f, 1.0f, -1.0f, 1.0f };
+  GLfloat position[] = { 0.5f, 1.0f, 1.0f, 1.0f };
   
   // Assign created components to GL_LIGHT0
   glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
   glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
   glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
   glLightfv(GL_LIGHT0, GL_POSITION, position);
+
+  // let all items in the scene initialize their resources in the current Gl context
+  for (int i = 0; i < mObjectVisualizations.size(); ++i)
+  {
+    mObjectVisualizations[i]->initializeGl();
+  }
+
 }
 
 void cedar::aux::gl::Scene::init()

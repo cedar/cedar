@@ -46,7 +46,6 @@
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/Connectable.h"
-#include "cedar/auxiliaries/Base.h"
 
 // SYSTEM INCLUDES
 #include <QThread>
@@ -67,6 +66,9 @@
  * Processing steps also have data slots that represent inputs, outputs and buffers (temporary data that can be
  * displayed in plots). Each data slot is assigned some data pointer, input slots get external data, buffer and output
  * slots must be assigned by the user, usually during the constructor.
+ *
+ *
+ * @todo Cache the lock set used for locking the whole thread; this should give a slight speed boost to all steps.
  */
 class cedar::proc::Step : public QThread,
                           public cedar::proc::Connectable,
@@ -132,6 +134,13 @@ public:
 
   //!@brief Calls the reset signal in a thread-safe manner.
   void callReset();
+
+  /*!@brief The wait method.
+   */
+  void wait()
+  {
+    this->QThread::wait();
+  }
 
 public slots:
   //!@brief This slot is called when the step's name is changed.
