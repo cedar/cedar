@@ -463,7 +463,7 @@ cedar::proc::ConstDataSlotPtr cedar::proc::Connectable::getSlot(cedar::proc::Dat
 
 cedar::proc::ExternalDataPtr cedar::proc::Connectable::getInputSlot(const std::string& name)
 {
-  return cedar::aux::shared_asserted_cast<cedar::proc::ExternalData>(this->getSlot(cedar::proc::DataRole::INPUT, name));
+  return cedar::aux::asserted_pointer_cast<cedar::proc::ExternalData>(this->getSlot(cedar::proc::DataRole::INPUT, name));
 }
 
 cedar::proc::ConstDataSlotPtr cedar::proc::Connectable::getInputSlot(const std::string& name) const

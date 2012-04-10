@@ -35,31 +35,42 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-
 #include "ControlThread.h"
 
-// PROJECT INCLUDES
-
-#include "cedar/devices/amtec/KinematicChain.h"
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/System.h"
 
 // SYSTEM INCLUDES
+#include "cedar/devices/amtec/KinematicChain.h"
 
 //------------------------------------------------------------------------------
 // methods
 //------------------------------------------------------------------------------
 
-int main(int /* argc */, char ** /* argv[] */) {
-
-  std::string config_file("../../tests/interactive/devices/AmtecSpeedControl/cora_arm.conf");
+int main(int /* argc */, char ** /* argv[] */)
+{
+//  std::string config_file("../../tests/interactive/devices/AmtecSpeedControl/cora_arm.conf");
+  std::string configuration_file_old = cedar::aux::System::locateResource("configs/cora_arm.conf");
+  std::string configuration_file = cedar::aux::System::locateResource("configs/cora_arm.json");
 
   try
   {
-    cedar::dev::robot::KinematicChainPtr p_kinematic_chain(new cedar::dev::amtec::KinematicChain(config_file));
-    ControlThread thread(p_kinematic_chain, config_file);
+    cedar::dev::amtec::KinematicChainPtr p_kinematic_chain
+    (
+      new cedar::dev::amtec::KinematicChain(configuration_file_old)
+    );
+    p_kinematic_chain->readJson(configuration_file);
+    if(!p_kinematic_chain->initDevice())
+    {
+      std::cout << "Error initializing the Amtec module!" << std::endl;
+      CEDAR_THROW(cedar::aux::InitializationException, "Error initializing the Amtec module!");
+    }
+    ControlThread thread(p_kinematic_chain, configuration_file);
     std::cout << "moving arm for 15s just by controling velocity..." << std::endl;
     thread.start();
     thread.wait(15000);
     thread.stop();
+    thread.wait();
   }
   catch(std::exception e)
   {

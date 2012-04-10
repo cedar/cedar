@@ -87,11 +87,11 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dyn::NeuralField::NeuralField()
 :
-mActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
-mSigmoidalActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
-mLateralInteraction(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
-mInputNoise(new cedar::aux::MatData(cv::Mat::zeros(10,10,CV_32F))),
-mNeuralNoise(new cedar::aux::MatData(cv::Mat::zeros(10,10,CV_32F))),
+mActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(50, 50, CV_32F))),
+mSigmoidalActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(50, 50, CV_32F))),
+mLateralInteraction(new cedar::dyn::SpaceCode(cv::Mat::zeros(50, 50, CV_32F))),
+mInputNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
+mNeuralNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mRestingLevel(new cedar::aux::DoubleParameter(this, "restingLevel", -5.0, -100, 0)),
 mTau(new cedar::aux::DoubleParameter(this, "tau", 100.0, 1.0, 10000.0)),
 mGlobalInhibition(new cedar::aux::DoubleParameter(this, "globalInhibition", -0.01, -100.0, 100.0)),
@@ -105,7 +105,7 @@ _mSigmoid
   (
     this,
     "sigmoid",
-    cedar::aux::math::SigmoidPtr(new cedar::aux::math::AbsSigmoid(0.0, 10.0))
+    cedar::aux::math::SigmoidPtr(new cedar::aux::math::AbsSigmoid(0.0, 100.0))
   )
 )
 {

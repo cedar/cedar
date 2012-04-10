@@ -192,7 +192,6 @@ private:
   //!@brief The default object instance.
   BaseTypePtr mDefault;
 
-
 }; // class cedar::aux::ObjectParameterTemplate
 
 #endif // CEDAR_AUX_OBJECT_PARAMETER_TEMPLATE_H

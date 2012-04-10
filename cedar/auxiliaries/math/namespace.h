@@ -57,25 +57,23 @@ namespace cedar
       template <typename T> struct Limits;
 
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_CLASS(Sigmoid);
-      CEDAR_DECLARE_CLASS(AbsSigmoid);
-      CEDAR_DECLARE_CLASS(ExpSigmoid);
-      CEDAR_DECLARE_CLASS(HeavisideSigmoid);
-      CEDAR_DECLARE_CLASS(SigmoidDeclaration);
+      CEDAR_DECLARE_AUX_CLASS(Sigmoid);
+      CEDAR_DECLARE_AUX_CLASS(AbsSigmoid);
+      CEDAR_DECLARE_AUX_CLASS(ExpSigmoid);
+      CEDAR_DECLARE_AUX_CLASS(HeavisideSigmoid);
+      CEDAR_DECLARE_AUX_CLASS(SigmoidDeclaration);
       //!@endcond
 
       //!@brief a templated declaration for sigmoid function implementation
       template <class DerivedClass> class SigmoidDeclarationT;
 
       typedef cedar::aux::Factory<SigmoidPtr> SigmoidFactory;
-
-      //!@brief The manager of all sigmoind instances
-      typedef cedar::aux::FactoryManager<SigmoidPtr> SigmoidManager;
-
       CEDAR_GENERATE_POINTER_TYPES(SigmoidFactory);
 
-      //!@brief The singleton object of the SigmoidFactory.
-      typedef cedar::aux::Singleton<SigmoidManager> SigmoidManagerSingleton;
+      template <class T> class LimitsParameter;
+      typedef LimitsParameter<double> DoubleLimitsParameter;
+      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleLimitsParameter);
+
     }
   }
 }

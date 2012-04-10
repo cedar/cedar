@@ -72,8 +72,9 @@ namespace cedar
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(LogFile);
     CEDAR_DECLARE_AUX_CLASS(MatrixIterator);
-    CEDAR_DECLARE_AUX_CLASS(RigidBody);
-    CEDAR_DECLARE_DEPRECATED(typedef RigidBody Object);
+    CEDAR_DECLARE_AUX_CLASS(LocalCoordinateFrame);
+    CEDAR_DECLARE_DEPRECATED(typedef LocalCoordinateFrame Object);
+    CEDAR_DECLARE_DEPRECATED(typedef LocalCoordinateFrame RigidBody);
     CEDAR_DECLARE_AUX_CLASS(System);
     //!@endcond
 
@@ -133,6 +134,10 @@ namespace cedar
     typedef NumericVectorParameter<double> DoubleVectorParameter;
     //!@brief A concretization of NumericVectorParameter for unsigned int values.
     typedef NumericVectorParameter<unsigned int> UIntVectorParameter;
+
+    //!@brief A class for associating data with types and mapping the type hierarchy as well.
+    template <typename DataType, typename RootType> class TypeHierarchyMap;
+
     // all intrusive smart pointers
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolParameter);
@@ -171,9 +176,6 @@ namespace cedar
     //!@brief a templated version of cedar::aux::Data
     template <typename T> class DataTemplate;
 
-    //!@brief A concretization of DataTemplate for simple matrices (cv::Mat).
-    typedef DataTemplate<cv::Mat> MatData;
-
     //!@brief A concretization of DataTemplate for simple points (cv::Point).
     typedef DataTemplate<cv::Point> CvPointData;
 
@@ -181,11 +183,12 @@ namespace cedar
     typedef DataTemplate<double> DoubleData;
 
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_GENERATE_POINTER_TYPES(MatData);
+    CEDAR_DECLARE_AUX_CLASS(MatData);
     CEDAR_GENERATE_POINTER_TYPES(CvPointData);
     CEDAR_GENERATE_POINTER_TYPES(DoubleData);
     CEDAR_DECLARE_AUX_CLASS(ImageData);
     /* exceptions */
+    CEDAR_DECLARE_AUX_CLASS(ConversionFailedException);
     CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
     CEDAR_DECLARE_AUX_CLASS(FileNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(BadConnectionException);
@@ -212,10 +215,8 @@ namespace cedar
     
     // Log related classes --------------------------------------------------------------------------------------------
     CEDAR_DECLARE_AUX_CLASS(Log);
-    typedef cedar::aux::Singleton<cedar::aux::Log> LogSingleton;
     
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_GENERATE_POINTER_TYPES(LogSingleton);
     CEDAR_DECLARE_AUX_CLASS(LogInterface);
     CEDAR_DECLARE_AUX_CLASS(LogFilter);
     CEDAR_DECLARE_AUX_CLASS(ConsoleLog);

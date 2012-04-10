@@ -54,6 +54,50 @@
 // defines
 //----------------------------------------------------------------------------------------------------------------------
 
+//!@todo These defines are only temporary to fix compilation issues
+
+// Operating system ----------------------------------------------------------------------------------------------------
+#ifdef __linux
+  #ifndef __LINUX__
+    #define __LINUX__
+  #endif
+  #ifndef LINUX
+    #define LINUX
+  #endif
+#endif // __linux
+
+#ifdef __APPLE__
+  #ifndef APPLE
+    #define APPLE
+  #endif
+#endif // __APPLE__
+
+#ifdef __unix__
+  #ifndef UNIX
+    #define UNIX
+  #endif
+#endif // __unix__
+
+#ifdef _WIN32
+  #ifndef WINDOWS
+    #define WINDOWS
+  #endif
+#endif // _WIN32
+
+// Compiler ------------------------------------------------------------------------------------------------------------
+#ifdef __GNUG__
+  #ifndef GCC
+    #define GCC
+  #endif
+#endif // __GNUG__
+
+#ifdef _MSC_VER
+  #ifndef MSVC
+    #define MSVC
+  #endif
+#endif // _MSC_VER
+
+
 //----------------------------------------------------------------------------------------------------------------------
 // macros
 //----------------------------------------------------------------------------------------------------------------------
@@ -109,9 +153,9 @@
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(CLASS_NAME)
 
 
-#ifdef MSVC
+#ifdef _MSC_VER
 #define CEDAR_DECLARE_DEPRECATED(x) __declspec(deprecated) x
-#elif defined GCC
+#elif defined __GNUG__
 #define CEDAR_DECLARE_DEPRECATED(x) x __attribute__ ((deprecated))
 #else
 #error CEDAR_DECLARE_DEPRECATED is not implemented for this compiler.

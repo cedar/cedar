@@ -118,7 +118,6 @@ void cedar::proc::Trigger::wait()
   }
 }
 
-
 void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 {
   for (size_t i = 0; i < this->mListeners.size(); ++i)
