@@ -121,7 +121,7 @@ cedar::proc::FrameworkSettings::~FrameworkSettings()
 void cedar::proc::FrameworkSettings::addKnownPlugin(const std::string& file)
 {
   std::string modified_path = file;
-  std::string workspace_path = this->mPluginWorkspace->get().absolutePath().toStdString();
+  std::string workspace_path = this->mPluginWorkspace->getValue().absolutePath().toStdString();
   if (modified_path.find(workspace_path) == 0)
   {
     modified_path = modified_path.substr(workspace_path.length());
@@ -130,7 +130,7 @@ void cedar::proc::FrameworkSettings::addKnownPlugin(const std::string& file)
       return;
 
 //do not remove leading slash on apple platform
-#if !defined APPLE
+#if !defined __APPLE__
     if (modified_path.at(0) == '/')
     {
       modified_path = modified_path.substr(1);
@@ -155,7 +155,7 @@ const std::set<std::string>& cedar::proc::FrameworkSettings::getPluginDirectorie
 
 std::string cedar::proc::FrameworkSettings::getPluginWorkspace() const
 {
-  return this->mPluginWorkspace->get().absolutePath().toStdString();
+  return this->mPluginWorkspace->getValue().absolutePath().toStdString();
 }
 
 void cedar::proc::FrameworkSettings::load()

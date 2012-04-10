@@ -48,9 +48,9 @@
 // SYSTEM INCLUDES
 #include <QApplication>
 
-#ifdef MSVC
+#ifdef _MSC_VER
 #include <Windows.h>
-#endif // MSVC
+#endif // _MSC_VER
 
 
 /*!@brief The application for the processingIde.
@@ -103,7 +103,7 @@ private:
    */
   static void signalHandler(int signal);
 
-#ifdef MSVC
+#ifdef _MSC_VER
   static LONG WINAPI vcCrashHandler(LPEXCEPTION_POINTERS);
 #endif
 

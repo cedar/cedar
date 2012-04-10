@@ -106,7 +106,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief set the vector to values gathered from a configuration tree
-  void setTo(const cedar::aux::ConfigurationNode& root)
+  void readFromNode(const cedar::aux::ConfigurationNode& root)
   {
     this->mValues.clear();
     for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin(); iter != root.end(); ++iter)
@@ -115,7 +115,7 @@ public:
     }
   }
   //!@brief store the vector values in a configuration tree
-  void putTo(cedar::aux::ConfigurationNode& root) const
+  void writeToNode(cedar::aux::ConfigurationNode& root) const
   {
     cedar::aux::ConfigurationNode vector_node;
     for (typename std::vector<T>::const_iterator iter = this->mValues.begin(); iter != this->mValues.end(); ++iter)

@@ -111,7 +111,7 @@ int main()
 
   cedar::aux::math::SigmoidDeclarationPtr sigmoid_declaration
   (
-    new cedar::aux::math::SigmoidDeclarationT<cedar::aux::math::AbsSigmoid>("cedar.aux.math.AbsSigmoid")
+    new cedar::aux::math::SigmoidDeclarationT<cedar::aux::math::AbsSigmoidPtr>("cedar.aux.math.AbsSigmoid")
   );
   cedar::aux::math::SigmoidPtr my_sigmoid = sigmoid_declaration->getObjectFactory()->allocate();
   sigmoid_my_values = my_sigmoid->compute<float>(my_values);

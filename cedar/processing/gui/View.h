@@ -48,6 +48,7 @@
 // SYSTEM INCLUDES
 #include <QGraphicsView>
 #include <QGraphicsRectItem>
+#include <QTimer>
 
 
 /*!@brief Class that displays a cedar::proc::gui::Scene.
@@ -99,6 +100,9 @@ public slots:
    */
   void setZoomLevel(int newLevel);
 
+  //!@brief Handles scrolling while dragging.
+  void scrollTimerEvent();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -108,6 +112,9 @@ protected:
 
   //!@brief Handles certain mouse events.
   void wheelEvent(QWheelEvent *pEvent);
+
+  //!@brief Handles mouse move events.
+  void mouseMoveEvent(QMouseEvent *pEvent);
 
 signals:
   void zoomLevelChanged(double newZoomLevel);
@@ -130,6 +137,14 @@ private:
   //!@brief Variable to keep track of the current zoom level.
   qreal mCurrentZoomLevel;
 
+  //!@brief X direction for scrolling.
+  int mScrollDx;
+
+  //!@brief Y direction for scrolling.
+  int mScrollDy;
+
+  //!@brief Timer used for scrolling.
+  QTimer *mpScrollTimer;
 }; // class ProcessingView
 
 #endif // CEDAR_PROC_VIEW_H

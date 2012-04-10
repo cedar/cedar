@@ -40,7 +40,6 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
-#include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/EnumBase.h"
 
 // SYSTEM INCLUDES
@@ -72,9 +71,9 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief read from a configuration node
-  void setTo(const cedar::aux::ConfigurationNode& root);
+  void readFromNode(const cedar::aux::ConfigurationNode& root);
   //!@brief write to a configuration node
-  void putTo(cedar::aux::ConfigurationNode& root) const;
+  void writeToNode(cedar::aux::ConfigurationNode& root) const;
   //!@brief set enum value to default
   void makeDefault();
   //!@brief return the enum value

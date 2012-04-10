@@ -80,13 +80,13 @@ public:
    *
    * @param root root of the configuration node holding the mapping information
    */
-  void setTo(const cedar::aux::ConfigurationNode& root);
+  void readFromNode(const cedar::aux::ConfigurationNode& root);
 
   /*!@brief Write the current mapping into a configuration tree.
    *
    * @param root root of the configuration node the mapping information will be written to
    */
-  void putTo(cedar::aux::ConfigurationNode& root) const;
+  void writeToNode(cedar::aux::ConfigurationNode& root) const;
 
   /*!@brief Initialize the mapping with a given number of mappings.
    *

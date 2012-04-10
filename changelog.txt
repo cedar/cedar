@@ -40,12 +40,26 @@
   - fixed a critical bug in LoopedThread::singleStep, which used microseconds instead of milliseconds for step()
   - cedar::aux::Configurable now inherits from boost::noncopyable, explicitly stating that you should never use
     the copy constructor. Instead, you should use the functions Configurable::copyTo and Configurable::copyFrom.
+  - the cedar::aux::Base class was removed
+  - The old ConfigurationInterface is being phased out now. For this purpose, a transitional interface has been
+    developed that should mostly work with the old code. If you run into trouble, add the following line to your
+    cedar configuration file:
+    set (CEDAR_LIBCONFIG_LEGACY_MODE      1           CACHE BOOL "Use libconfig legacy mode.")
+    If you set this flag to 0, libconfig++ is no longer needed as a dependency! Some unit tests may fail, though.
+  - merged AbstractFactory and AbstractFactoryDerived with Factory and FactoryDerived (including some changes to the interfaces)
+  - introduced new FactoryManager class
+  - gl::Object has been renamed to gl::RigidBody
+  - There are some new Parameter types: ObjectListParameter and ObjectParameter. They allow dynamically selecting the type of one or more objects. For example, these allow to dynamically select the type of the Sigmoid as well as the combination of kernels in the neural field.
 
 - cedar::proc
   - added directional arrows for graphical connections in processingIde
   - when loading a plugin, the PluginProxy now also looks for a plugin description file. This file may contain some
     information about your plugin in case you don't want to hardcode it, e.g., it can contain icon paths for processing
     steps. See documentation of cedar::proc::PluginDeclaration for details.
+  - Overhauled the plotting system.
+
+- cedar::dyn
+  - NeuralField now supports changing the sigmoid type and changing the number and type of kernel modes
     
 - processingIde
   - The IDE now remembers whether or not snap to grid is active.
@@ -53,6 +67,11 @@
     the mouse wheel (hold down ctrl)
   - The property pane now indicates when parameters have been changed since the last save. 
   - more verbose tooltip for data slots
+  - the tab order in the property pane is now working correctly
+
+- build system
+  - files in the resource folder are now moved to ${CEDAR_INSTALL_PREFIX}/share/resources. Use the
+    cedar::aux::System::locateResource function to locate them.
 
 == Version 0.5.1 ==
 - cedar::proc::steps

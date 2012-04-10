@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -53,6 +54,8 @@ cedar::aux::kernel::Kernel::Kernel()
 mKernel(new cedar::aux::MatData()),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000))
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+
   mpReadWriteLockOutput = new QReadWriteLock();
   _mDimensionality->setConstant(true);
 }
@@ -60,9 +63,11 @@ _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000))
 cedar::aux::kernel::Kernel::Kernel(unsigned int dimensionality)
 :
 cedar::aux::Configurable(),
-mKernel(new cedar::aux::DataTemplate<cv::Mat>()),
+mKernel(new cedar::aux::MatData()),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000))
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+
   mpReadWriteLockOutput = new QReadWriteLock();
   _mDimensionality->setValue(dimensionality);
   _mDimensionality->setConstant(true);
@@ -70,9 +75,8 @@ _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000))
 
 cedar::aux::kernel::Kernel::~Kernel()
 {
-#ifdef DEBUG
-  std::cout << "> freeing data (Kernel)" << std::endl;
-#endif
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
+
   if (mpReadWriteLockOutput)
   {
     delete mpReadWriteLockOutput;

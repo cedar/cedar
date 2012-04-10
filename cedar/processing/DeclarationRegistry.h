@@ -144,4 +144,25 @@ private:
 
 }; // class cedar::proc::DeclarationRegistry
 
+#include "cedar/auxiliaries/Singleton.h"
+
+namespace cedar
+{
+  namespace proc
+  {
+#ifdef MSVC
+#ifdef CEDAR_LIB_EXPORTS_PROC
+    // dllexport
+    template class __declspec(dllexport) cedar::aux::Singleton<cedar::proc::DeclarationRegistry>;
+#else // CEDAR_LIB_EXPORTS_PROC
+    // dllimport
+    extern template class __declspec(dllimport) cedar::aux::Singleton<cedar::proc::DeclarationRegistry>;
+#endif // CEDAR_LIB_EXPORTS_PROC
+#endif // MSVC
+
+    //!@brief The singleton for the declaration registry.
+    typedef cedar::aux::Singleton<cedar::proc::DeclarationRegistry> DeclarationRegistrySingleton;
+  }
+}
+
 #endif // CEDAR_PROC_DECLARATION_REGISTRY_H

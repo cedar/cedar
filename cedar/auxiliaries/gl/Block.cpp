@@ -44,38 +44,22 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Block::Block(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Block::Block
+(
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+	double length,
+	double width,
+  double height,
+  double colorR,
+  double colorG,
+  double colorB
+)
 :
-cedar::aux::gl::Object(pObject)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Block", colorR, colorG, colorB),
+mLength(length),
+mWidth(width),
+mHeight(height)
 {
-  mLength = 3;
-  mWidth = 2;
-  mHeight = 1;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
-  mObjectType = "Block";
-}
-
-cedar::aux::gl::Block::Block(
-              cedar::aux::ObjectPtr pObject,
-              double length,
-              double width,
-              double height,
-              double R,
-              double G,
-              double B
-            )
-:
-cedar::aux::gl::Object(pObject)
-{
-  mLength = length;
-  mWidth = width;
-  mHeight = height;
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-  mObjectType = "Block";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -84,18 +68,12 @@ cedar::aux::gl::Object(pObject)
 
 void cedar::aux::gl::Block::draw()
 {
-  // move to origin
-  glPopMatrix();
-  glPushMatrix();
-  
-  // move to object coordinates
-  mTransformationTranspose = mpObject->getTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  prepareDraw();
   
   // draw object
   if (mIsVisible)
   {
-    gl::setColor(mColorR, mColorG, mColorB);
+    cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
     drawBlock(mLength, mWidth, mHeight, mIsDrawnAsWireFrame);
   }
 }

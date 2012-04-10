@@ -49,11 +49,15 @@
  *
  * @param BaseType Type being returned by the allocate functions.
  *
- * @remarks If the BaseType is abstract, use cedar::aux::AbstractFactory instead.
  */
-template <typename BaseType, typename SmartPointerType>
+template <typename BaseTypePtr>
 class cedar::aux::Factory
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef typename BaseTypePtr::element_type BaseType;
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -67,16 +71,10 @@ public:
    *
    * @returns A smart pointer to the newly allocated resource.
    */
-  virtual SmartPointerType allocate() const
-  {
-    return SmartPointerType (new BaseType());
-  }
+  virtual BaseTypePtr allocate() const = 0;
 
   //!@brief allocate an object without using a shared pointer to store the instance
-  virtual BaseType* allocateRaw() const
-  {
-    return new BaseType();
-  }
+  virtual BaseType* allocateRaw() const = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

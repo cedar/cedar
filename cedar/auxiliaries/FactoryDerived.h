@@ -47,14 +47,18 @@
 /*!@brief This is an implementation of the factory pattern that returns a new object of DerivedType as a BaseType
  *        pointer.
  *
- * @param BaseType         Type of the pointer returned by the allocate functions.
  * @param DerivedType      Type of the object being allocated.
- * @param SmartPointerType The smart pointer base type. This can be used to decide whether you want to use shared_ptr,
+ * @param BaseTypePtr  The smart pointer base type. This can be used to decide whether you want to use shared_ptr,
  *                         intrusive_ptr or others.
  */
-template <typename BaseType, typename DerivedType, typename SmartPointerType >
-class cedar::aux::FactoryDerived : public cedar::aux::Factory<BaseType, SmartPointerType>
+template <typename BaseTypePtr, typename DerivedTypePtr>
+class cedar::aux::FactoryDerived : public cedar::aux::Factory<BaseTypePtr>
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef typename DerivedTypePtr::element_type DerivedType;
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -66,13 +70,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief allocate an instance of type DerivedType and return this wrapped in a shared pointer of type BaseType
-  SmartPointerType allocate() const
+  BaseTypePtr allocate() const
   {
-    return SmartPointerType (new DerivedType());
+    return BaseTypePtr (new DerivedType());
   }
 
   //!@brief allocate an instance of type DerivedType and return it as pointer of type BaseType
-  BaseType* allocateRaw() const
+  DerivedType* allocateRaw() const
   {
     return new DerivedType();
   }

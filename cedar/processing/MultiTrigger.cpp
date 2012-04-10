@@ -41,10 +41,40 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/MultiTrigger.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
 
 // SYSTEM INCLUDES
 #include <algorithm>
 
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the trigger class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr multi_trigger_declaration
+    (
+      new ElementDeclarationTemplate<cedar::proc::MultiTrigger>
+      (
+        "Triggers",
+        "cedar.processing.MultiTrigger"
+      )
+    );
+    multi_trigger_declaration->setIconPath(":/triggers/multi_trigger.svg");
+
+    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(multi_trigger_declaration);
+
+    return true;
+  }
+
+  bool declared = declare();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

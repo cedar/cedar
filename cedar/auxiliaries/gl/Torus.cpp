@@ -44,35 +44,20 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Torus::Torus(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Torus::Torus
+(
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+  double radius,
+  double thickness,
+  double colorR,
+  double colorG,
+  double colorB
+)
 :
-cedar::aux::gl::Object(pObject)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Torus", colorR, colorG, colorB),
+mRadius(radius),
+mThickness(thickness)
 {
-  mRadius = 3;
-  mThickness = .5;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
-  mObjectType = "Torus";
-}
-
-cedar::aux::gl::Torus::Torus(
-                              cedar::aux::ObjectPtr pObject,
-                              double radius,
-                              double thickness,
-                              double R,
-                              double G,
-                              double B
-                            )
-:
-cedar::aux::gl::Object(pObject)
-{
-  mRadius = radius;
-  mThickness = thickness;
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-  mObjectType = "Torus";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -101,13 +86,7 @@ double cedar::aux::gl::Torus::thickness() const
 
 void cedar::aux::gl::Torus::draw()
 {
-  // move to origin
-  glPopMatrix();
-  glPushMatrix();
-  
-  // move to object coordinates
-  mTransformationTranspose = mpObject->getTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  prepareDraw();
   
   // draw the Torus
   if (mIsVisible)

@@ -71,10 +71,10 @@ private:
 
   //! Type of the trigger connection list.
   typedef std::vector<cedar::proc::TriggerConnectionPtr> TriggerConnectionVector;
-
+public:
   //! Type of the map of elements.
   typedef std::map<std::string, cedar::proc::ElementPtr> ElementMap;
-public:
+
   //! Iterator type of the element map.
   typedef ElementMap::iterator ElementMapIterator;
 

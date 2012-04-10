@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/lib.h"
 #include "cedar/auxiliaries/Singleton.h"
-#include "cedar/auxiliaries/AbstractFactory.h"
+#include "cedar/auxiliaries/Factory.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -83,13 +83,6 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS_INTRUSIVE(ProjectionMappingParameter);
     //!@endcond
 
-    //!@brief a singleton for the declaration registry
-    typedef cedar::aux::Singleton<cedar::proc::DeclarationRegistry> DeclarationRegistrySingleton;
-
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_GENERATE_POINTER_TYPES(DeclarationRegistrySingleton);
-    //!@endcond
-
     //!@cond SKIPPED_DOCUMENTATION
     template <class BaseClass, class FactoryType> class DeclarationBase;
     template <class DerivedClass> class ElementDeclarationTemplate;
@@ -98,7 +91,7 @@ namespace cedar
     //!@endcond
 
     //!@brief a factory for elements
-    typedef boost::shared_ptr<cedar::aux::AbstractFactory<Element> > ElementFactoryPtr;
+    typedef boost::shared_ptr<cedar::aux::Factory<ElementPtr> > ElementFactoryPtr;
 
     /* Exceptions */
     //!@cond SKIPPED_DOCUMENTATION

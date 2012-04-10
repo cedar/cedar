@@ -24,8 +24,8 @@
 
     File:        KTeamDrive.cpp
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
     Description: An object of this class represents the differential drive of a PWM-driven robot.
@@ -36,8 +36,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/kteam/Drive.h"
+
 // SYSTEM INCLUDES
 #include <iostream>
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -73,7 +75,7 @@ int cedar::dev::kteam::Drive::getMaximalNumberPulsesPerSecond() const
 int cedar::dev::kteam::Drive::resetEncoder()
 {
   int s = setEncoder(0,0);
-  if (s == 0 && _mDebug) //setting encoder failed
+  if (s == 0 && _mDebug) // setting encoder failed
   {
     std::cout << "KTeamDrive: Error Resetting Encoder\n";
   }
@@ -84,10 +86,10 @@ int cedar::dev::kteam::Drive::reset()
 {
   int s = setWheelSpeed(0,0); // = 1 if setting wheel speed successful, else 0
   s = s * resetEncoder(); // = 1 if setting both wheel speed and resetting encoder successful, else 0
-  if (s == 0 && _mDebug) //setting wheel speed or resetting encoder failed
+  if (s == 0 && _mDebug) // setting wheel speed or resetting encoder failed
   {
     std::cout << "KTeamDrive: Error Resetting Robot\n";
-    }
+  }
   else if (_mDebug)
   {
     std::cout << "KTeamDrive: Resetting Robot Successful\n";

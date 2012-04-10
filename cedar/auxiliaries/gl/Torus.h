@@ -39,44 +39,39 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
-#include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
 
 // SYSTEM INCLUDES
 
 
 /*!@brief Simple OpenGL visualization of a torus around a circle
  *
- * This class visualizes an instance of cedar::aux::Object as a torus with specified dimensions
+ * This class visualizes a torus with specified dimensions
  *
- * @remarks To get a simple visualization of the Object on screen, add an instance of this class to a
+ * @remarks To get a simple visualization of the object on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
-class cedar::aux::gl::Torus : public cedar::aux::gl::Object
+class cedar::aux::gl::Torus : public cedar::aux::gl::ObjectVisualization
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief standard constructor. 
-   * @param pObject pointer to the aux::Object being visualized
-   */
-  Torus(cedar::aux::ObjectPtr pObject);
-
   /*!@brief constructor. 
-   * @param pObject pointer to the aux::Object being visualized
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    * @param radius the radius of the circle in the xy-plane
    * @param thickness distance of the torus walls to the circle
-   * @param R color, value for red channel in RGB
-   * @param G color, value for green channel in RGB
-   * @param B color, value for blue channel in RGB
+   * @param colorR color, value for red channel in RGB
+   * @param colorG color, value for green channel in RGB
+   * @param colorB color, value for blue channel in RGB
    */
   Torus(
-         cedar::aux::ObjectPtr pObject,
-         double radius,
-         double thickness,
-         double R = 1,
-         double G = 0,
-         double B = 0
+         cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+         double radius = 3.0,
+         double thickness = 0.5,
+         double colorR = 1,
+         double colorG = 0,
+         double colorB = 0
        );
 
   //--------------------------------------------------------------------------------------------------------------------
