@@ -113,6 +113,8 @@ namespace cedar
     template <typename T> class ObjectParameterTemplate;
     //!@brief a template class for lists of objects of arbitrary type
     template <typename T> class ObjectListParameterTemplate;
+    //!@brief a template class for maps of objects of arbitrary type
+    template <typename T> class ObjectMapParameterTemplate;
     //!@brief A concretization of NumericParameter for double values.
     typedef NumericParameter<double> DoubleParameter;
     //!@brief A concretization of NumericParameter for unsigned int values.
