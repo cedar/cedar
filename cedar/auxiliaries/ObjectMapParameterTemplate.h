@@ -120,12 +120,7 @@ public:
   virtual void writeToNode(cedar::aux::ConfigurationNode& root) const
   {
     cedar::aux::ConfigurationNode object_map_node;
-    for
-    (
-      typename std::map<std::string, ValueTypePtr>::const_iterator iter = this->mObjectMap.begin();
-      iter != this->mObjectMap.end();
-      ++iter
-    )
+    for (const_iterator iter = this->begin(); iter != this->end(); ++iter)
     {
       const std::string& key = iter->first;
       ValueTypePtr value = iter->second;
@@ -185,7 +180,6 @@ public:
   {
     return mObjectMap[key];
   }
-
 
   /*!@brief Removes all objects from the list.
    */
@@ -257,8 +251,8 @@ private:
   void setChangedFlag(bool changed)
   {
     // set the changed flag for the objects managed by the parameter
-    typename std::map<std::string, ValueTypePtr>::iterator map_it;
-    for (map_it = mObjectMap.begin(); map_it != mObjectMap.end(); ++map_it)
+    iterator map_it;
+    for (map_it = this->begin(); map_it != this->end(); ++map_it)
     {
       map_it->second->resetChangedStates(changed);
     }

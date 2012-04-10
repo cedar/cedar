@@ -204,7 +204,7 @@ void cedar::aux::math::logAxis(const cv::Mat& rRotation, cv::Mat& rOmega, double
   }
   if (negativeTheta)
   {
-    rTheta = 2*cedar::aux::math::pi - rTheta;
+    rTheta = 2 * cedar::aux::math::pi - rTheta;
   }
   // calculate axis of rotation
   T sin_theta = sin(rTheta);
