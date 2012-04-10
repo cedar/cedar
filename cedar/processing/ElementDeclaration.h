@@ -44,10 +44,9 @@
 // CEDAR INCLUDES
 #include "cedar/processing/DeclarationBase.h"
 #include "cedar/processing/namespace.h"
-#include "cedar/auxiliaries/AbstractFactory.h"
-#include "cedar/auxiliaries/AbstractFactoryDerived.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/FactoryDerived.h"
 
 // SYSTEM INCLUDES
 
@@ -59,7 +58,8 @@
 class cedar::proc::ElementDeclaration : public cedar::proc::DeclarationBase
                                                <
                                                  cedar::proc::Element,
-                                                 cedar::aux::AbstractFactory<cedar::proc::Element>
+                                                 //!@todo With the revised factory, passing the factory type is probably unnecessary
+                                                 cedar::aux::Factory<cedar::proc::ElementPtr>
                                                >
 {
 public:
@@ -74,11 +74,12 @@ public:
                       const std::string& category
                     )
   :
-  DeclarationBase<cedar::proc::Element, cedar::aux::AbstractFactory<cedar::proc::Element> >(
-                                                                                             classFactory,
-                                                                                             classId,
-                                                                                             category
-                                                                                           )
+  DeclarationBase<cedar::proc::Element, cedar::aux::Factory<cedar::proc::ElementPtr> >
+  (
+    classFactory,
+    classId,
+    category
+  )
   {
   }
 
@@ -182,7 +183,10 @@ public:
   :
   ElementDeclaration
   (
-    cedar::proc::ElementFactoryPtr(new cedar::aux::AbstractFactoryDerived<cedar::proc::Element, DerivedClass>()),
+    cedar::proc::ElementFactoryPtr
+    (
+      new cedar::aux::FactoryDerived<cedar::proc::ElementPtr, boost::shared_ptr<DerivedClass> >()
+    ),
     classId,
     category
   )

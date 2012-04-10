@@ -39,48 +39,43 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
-#include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/Object.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 
 // SYSTEM INCLUDES
 
 
 /*!@brief Simple OpenGL visualization of a block, i.e. a parallelepiped with rectangular sides
  *
- * This class visualizes an instance of cedar::aux::Object as a block with specified dimensions
+ * This class visualizes a block with specified dimensions
  *
- * @remarks To get a simple visualization of the Object on screen, add an instance of this class to a
+ * @remarks To get a simple visualization of the object on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
-class cedar::aux::gl::Block : public cedar::aux::gl::Object
+class cedar::aux::gl::Block : public cedar::aux::gl::ObjectVisualization
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief standard constructor. 
-   * @param pObject pointer to the aux::Object being visualized
-   */
-  Block(cedar::aux::ObjectPtr pObject);
-
   /*!@brief constructor. 
-   * @param pObject pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    * @param length extension of the block in x-direction of the object coordinate frame
    * @param width extension of the block in y-direction of the object coordinate frame
    * @param height extension of the block in z-direction of the object coordinate frame
-   * @param R color, value for red channel in RGB
-   * @param G color, value for green channel in RGB
-   * @param B color, value for blue channel in RGB
+   * @param colorR color, value for red channel in RGB
+   * @param colorG color, value for green channel in RGB
+   * @param colorB color, value for blue channel in RGB
    */
   Block(
-         cedar::aux::ObjectPtr pObject,
-         double length,
-         double width,
-         double height,
-         double R=1,
-         double G=0,
-         double B=0
+         cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+         double length = 3,
+         double width = 2,
+         double height = 1,
+         double colorR = 1,
+         double colorG = 0,
+         double colorB = 0
        );
   
   //--------------------------------------------------------------------------------------------------------------------

@@ -40,8 +40,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/sources/GaussInput.h"
-#include "cedar/auxiliaries/math/functions.h"
 #include "cedar/processing/Arguments.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/auxiliaries/math/functions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/MatData.h"
@@ -50,6 +52,33 @@
 // SYSTEM INCLUDES
 #include <iostream>
 #include <vector>
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr input_decl
+    (
+      new ElementDeclarationTemplate<cedar::proc::sources::GaussInput>
+      (
+        "Sources",
+        "cedar.processing.sources.GaussInput"
+      )
+    );
+    input_decl->setIconPath(":/steps/gauss_input.svg");
+    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(input_decl);
+
+    return true;
+  }
+
+  bool declared = declare();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

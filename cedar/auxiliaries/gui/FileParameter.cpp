@@ -37,12 +37,26 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/FileParameter.h"
 #include "cedar/auxiliaries/FileParameter.h"
+#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <iostream>
 #include <QFileDialog>
+
+//----------------------------------------------------------------------------------------------------------------------
+// associate aux::gui parameter with the aux parameter
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool registered = cedar::aux::gui::ParameterFactorySingleton::getInstance()->add
+      <
+        cedar::aux::FileParameter,
+        cedar::aux::gui::FileParameter
+      >();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -118,6 +132,6 @@ void cedar::aux::gui::FileParameter::onBrowseClicked()
   }
   if (!value.isEmpty())
   {
-    parameter->set(value.toStdString());
+    parameter->setValue(value.toStdString());
   }
 }

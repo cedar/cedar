@@ -153,9 +153,9 @@
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(CLASS_NAME)
 
 
-#ifdef MSVC
+#ifdef _MSC_VER
 #define CEDAR_DECLARE_DEPRECATED(x) __declspec(deprecated) x
-#elif defined GCC
+#elif defined __GNUG__
 #define CEDAR_DECLARE_DEPRECATED(x) x __attribute__ ((deprecated))
 #else
 #error CEDAR_DECLARE_DEPRECATED is not implemented for this compiler.

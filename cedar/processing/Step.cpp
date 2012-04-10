@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/System.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/Log.h"
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
@@ -73,9 +74,7 @@ mpArgumentsLock(new QReadWriteLock()),
 // initialize parameters
 _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
 {
-#ifdef DEBUG
-  std::cout << "> allocated data (cedar::proc::Step: \"" << this->getName() << "\", " << this << ")" << std::endl;
-#endif
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
 
   // create the finished trigger singleton.
   this->getFinishedTrigger();
@@ -88,15 +87,15 @@ _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
 
 cedar::proc::Step::~Step()
 {
-#ifdef DEBUG
-  std::cout << "> freeing data (cedar::proc::Step: \"" << this->getName() << "\", " << this << ")" << std::endl;
-#endif
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 
-  if (!this->wait(5000))
+  if (!this->QThread::wait(5000))
   {
-#ifdef DEBUG
-    std::cout << "> Warning: step " << this->getName() << " is being destroyed while it is still running!" << std::endl;
-#endif
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Step \"" + this->getName() + " is being destroyed while it is still running!",
+      "cedar::proc::Step::~Step()"
+    );
   }
 
   if (mpArgumentsLock != NULL)
@@ -236,10 +235,10 @@ void cedar::proc::Step::onTrigger(cedar::proc::TriggerPtr)
   // if there are invalid inputs, stop
   if (!this->allInputsValid())
   {
-    std::string invalid_inputs = cedar::aux::join(mInvalidInputNames, ", ");
+    std::string invalid_inputs = cedar::aux::join(mInvalidInputNames, "\", \"");
 
     this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING,
-                   "Invalid inputs prevent the step from running. These are:" + invalid_inputs);
+                   "Invalid inputs prevent the step from running. These are: \"" + invalid_inputs + "\"");
     // reset the arguments (we could not process them)
     this->mpArgumentsLock->lockForWrite();
     this->mNextArguments.reset();
@@ -297,13 +296,14 @@ void cedar::proc::Step::onTrigger(cedar::proc::TriggerPtr)
       this->run();
     }
   }
-#ifdef DEBUG
   else
   {
-    std::cout << "Step \"" << this->getName() << "\" was busy during its onTrigger() call, computation skipped."
-              << std::endl;
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Step \"" + this->getName() + "\" was busy during its onTrigger() call, computation skipped.",
+      "cedar::proc::Step::onTrigger(cedar::proc::TriggerPtr)"
+    );
   }
-#endif // DEBUG
 }
 
 
@@ -369,14 +369,29 @@ void cedar::proc::Step::run()
   // catch exceptions and translate them to the given state/message
   catch(const cedar::aux::ExceptionBase& e)
   {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "An exception occurred in step \"" + this->getName() + "\": " + e.exceptionInfo(),
+      "cedar::proc::Step::run()"
+    );
     this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + e.exceptionInfo());
   }
   catch(const std::exception& e)
   {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "An exception occurred in step \"" + this->getName() + "\": " + std::string(e.what()),
+      "cedar::proc::Step::run()"
+    );
     this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + std::string(e.what()));
   }
   catch(...)
   {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "An exception of unknown type occurred in step \"" + this->getName() + "\".",
+      "cedar::proc::Step::run()"
+    );
     this->setState(cedar::proc::Step::STATE_EXCEPTION, "An unknown exception type occurred.");
   }
 

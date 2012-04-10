@@ -45,35 +45,20 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Prism::Prism(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Prism::Prism
+(
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+  double width,
+  double height,
+  double colorR,
+  double colorG,
+  double colorB
+)
 :
-cedar::aux::gl::Object(pObject)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Prism", colorR, colorG, colorB),
+mWidth(width),
+mHeight(height)
 {
-  mWidth = 3;
-  mHeight = 1;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
-  mObjectType = "Prism";
-}
-
-cedar::aux::gl::Prism::Prism(
-                              cedar::aux::ObjectPtr pObject,
-                              double width,
-                              double height,
-                              double R,
-                              double G,
-                              double B
-                            )
-:
-cedar::aux::gl::Object(pObject)
-{
-  mWidth = width;
-  mHeight = height;
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-  mObjectType = "Prism";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -82,13 +67,7 @@ cedar::aux::gl::Object(pObject)
 
 void cedar::aux::gl::Prism::draw()
 {
-  // move to origin
-  glPopMatrix();
-  glPushMatrix();
-  
-  // move to object coordinates
-  mTransformationTranspose = mpObject->getTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  prepareDraw();
   
   // draw object
   if (mIsVisible)

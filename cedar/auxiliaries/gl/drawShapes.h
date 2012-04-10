@@ -37,6 +37,8 @@
 #ifndef CEDAR_AUX_GL_DRAW_SHAPES_H
 #define CEDAR_AUX_GL_DRAW_SHAPES_H
 
+#define GL_GLEXT_PROTOTYPES // to avoid a problem with finding some GL stuff, apparently caused by Qt
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
 
@@ -213,6 +215,13 @@ namespace cedar
        */
       CEDAR_AUX_LIB_EXPORT
       void drawAxes(double length);
+
+      /*!@brief draws a hair line cross along the axes of the current coordinate frame
+       * @param length length of each line
+       * @param width width of each line
+       */
+      CEDAR_AUX_LIB_EXPORT
+      void drawCross(double length, double width = 1);
     }
   }
 }

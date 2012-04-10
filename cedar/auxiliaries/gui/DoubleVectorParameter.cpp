@@ -43,10 +43,24 @@
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
 #include <iostream>
+
+//----------------------------------------------------------------------------------------------------------------------
+// associate aux::gui parameter with the aux parameter
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool registered = cedar::aux::gui::ParameterFactorySingleton::getInstance()->add
+      <
+        cedar::aux::DoubleVectorParameter,
+        cedar::aux::gui::DoubleVectorParameter
+      >();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

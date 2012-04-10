@@ -57,15 +57,13 @@
  *
  * \todo Separate into policies according to Alexandrescu (2001) [threading model, lifetime policy].
  */
-template<class T>
+template<class InstanceType>
 class cedar::aux::Singleton
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! Type of the instance.
-  typedef T InstanceType;
 
   //! Pointer to the instance type.
   typedef typename boost::shared_ptr<InstanceType> InstanceTypePtr;
@@ -83,27 +81,29 @@ public:
    */
   static InstanceTypePtr getInstance()
   {
+    static InstanceTypePtr instance;
+
     // this implements the double-checked locking pattern, an efficient way
     // to prevent a race condition on the creation of the singleton instance.
-    if (mInstance.get() == 0)
+    if (!instance)
     {
       QMutex mutex;
       mutex.lock();
-      if (mInstance.get() == 0)
+      if (!instance)
       {
         if (mDestroyed)
         {
           //  There are ways to handle this problem without throwing. See Alexandrescu2001.
-          CEDAR_THROW(cedar::aux::DeadReferenceException, "A dead-reference occurred in a singleton.")
+          CEDAR_THROW(cedar::aux::DeadReferenceException, "A dead-reference occurred in a singleton.");
           mDestroyed = false;
         }
 
-        mInstance = InstanceTypePtr(new T);
+        instance = InstanceTypePtr(new InstanceType);
       }
       mutex.unlock();
     }
 
-    return mInstance;
+    return instance;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -129,14 +129,10 @@ private:
 protected:
   // none yet
 private:
-  //! The singleton instance.
-  static InstanceTypePtr mInstance;
-
   //! Whether the singleton object has already been destroyed.
   static bool mDestroyed;
 }; // class cedar::aux::Singleton
 
-template <class T> typename cedar::aux::Singleton<T>::InstanceTypePtr cedar::aux::Singleton<T>::mInstance;
-template <class T> bool cedar::aux::Singleton<T>::mDestroyed;
+template <class InstanceType> bool cedar::aux::Singleton<InstanceType>::mDestroyed;
 
 #endif // CEDAR_AUX_SINGLETON_H

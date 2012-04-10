@@ -43,16 +43,6 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::robot::SimulatedKinematicChain::SimulatedKinematicChain
-(
-  const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry
-)
-:
-KinematicChain(rpReferenceGeometry)
-{
-  init();
-}
-
 cedar::dev::robot::SimulatedKinematicChain::SimulatedKinematicChain(const std::string& configFileName)
 :
 KinematicChain(configFileName)
@@ -62,14 +52,23 @@ KinematicChain(configFileName)
 
 cedar::dev::robot::SimulatedKinematicChain::~SimulatedKinematicChain()
 {
-  
+  if (isRunning())
+  {
+    this->stop();
+    this->wait();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double cedar::dev::robot::SimulatedKinematicChain::getJointAngle(unsigned int index)
+bool cedar::dev::robot::SimulatedKinematicChain::isMovable() const
+{
+  return true;
+}
+
+double cedar::dev::robot::SimulatedKinematicChain::getJointAngle(unsigned int index) const
 {
   return mJointAngles.at<double>(index, 0);
 }

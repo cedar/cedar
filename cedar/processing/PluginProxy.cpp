@@ -41,9 +41,9 @@
 #include "cedar/processing/exceptions.h"
 
 // SYSTEM INCLUDES
-#ifdef UNIX
+#ifdef __unix__
 #include <dlfcn.h>
-#elif defined WINDOWS
+#elif defined _WIN32
 #include <Windows.h>
 #include <strsafe.h>
 #endif
@@ -170,7 +170,7 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   
   // OS-Dependent code for loading the plugin.
   PluginInterfaceMethod p_interface = NULL;
-#ifdef UNIX
+#ifdef __unix__
   this->mpLibHandle = dlopen(this->mFileName.c_str(), RTLD_NOW);
   if (!this->mpLibHandle)
   {
@@ -186,7 +186,7 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   }
 
   //@todo this might segfault if the function pointer points to a bad function; handle this somehow.
-#elif defined WINDOWS
+#elif defined _WIN32
   this->mpLibHandle = LoadLibraryEx(this->mFileName.c_str(), NULL, 0);
   if (!this->mpLibHandle)
   {
@@ -200,7 +200,7 @@ void cedar::proc::PluginProxy::load(const std::string& file)
     //!@todo use GetLastError to read out the error string
     CEDAR_THROW(cedar::proc::PluginException, "Error loading interface function: GetProcAddress failed: " + this->getLastError());
   }
-#endif // LINUX / WINDOWS
+#endif // __linux / _WIN32
   
   this->mDeclaration = cedar::proc::PluginDeclarationPtr(new cedar::proc::PluginDeclaration());
   (*p_interface)(this->mDeclaration);
@@ -228,7 +228,7 @@ cedar::proc::PluginDeclarationPtr cedar::proc::PluginProxy::getDeclaration()
   return this->mDeclaration;
 }
 
-#ifdef WINDOWS
+#ifdef _WIN32
 
 std::string cedar::proc::PluginProxy::getLastError()
 {
@@ -251,4 +251,4 @@ std::string cedar::proc::PluginProxy::getLastError()
   return error;
 }
 
-#endif //def WINDOWS
+#endif //def _WIN32

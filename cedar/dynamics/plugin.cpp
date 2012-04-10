@@ -48,39 +48,14 @@
 // SYSTEM INCLUDES
 
 
-void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin)
+void pluginDeclaration(cedar::proc::PluginDeclarationPtr)
 {
-  using cedar::proc::ElementDeclarationPtr;
-
-  ElementDeclarationPtr field_decl
-  (
-    new cedar::proc::ElementDeclarationTemplate<cedar::dyn::NeuralField>("Fields", "cedar.dynamics.NeuralField")
-  );
-  field_decl->setIconPath(":/steps/field_temp.svg");
-
-  // cedar::proc::PluginDeclarationPtr plugin(new cedar::proc::PluginDeclaration());
-  plugin->add(field_decl);
-
-  ElementDeclarationPtr preshape_decl
-  (
-    new cedar::proc::ElementDeclarationTemplate<cedar::dyn::Preshape>("Fields", "cedar.dynamics.Preshape")
-  );
-  preshape_decl->setIconPath(":/steps/preshape.svg");
-
-  plugin->add(preshape_decl);
-  // return plugin;
-
-  ElementDeclarationPtr noise_decl
-  (
-    new cedar::proc::ElementDeclarationTemplate<cedar::dyn::Noise>("Sources", "cedar.dynamics.Noise")
-  );
-  noise_decl->setIconPath(":/steps/noise.svg");
-
-  plugin->add(noise_decl);
-  // return plugin;
+  //!@todo Switch this to the new logging mechanism
+  std::cout << "cedardyn is no longer a plugin. Please don't include it any more!" << std::endl;
 }
 
-void cedar::dyn::getPluginDesciption(cedar::proc::PluginDeclarationPtr plugin)
+void cedar::dyn::getPluginDesciption(cedar::proc::PluginDeclarationPtr)
 {
-  ::pluginDeclaration(plugin);
+  //!@todo Switch this to the new logging mechanism
+  std::cout << "cedardyn is no longer a plugin. Please don't include it any more!" << std::endl;
 }

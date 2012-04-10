@@ -37,9 +37,35 @@
 // CEDAR INCLUDES
 #include "cedar/dynamics/fields/Preshape.h"
 #include "cedar/dynamics/SpaceCode.h"
+#include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr preshape_decl
+    (
+      new cedar::proc::ElementDeclarationTemplate<cedar::dyn::Preshape>("Fields", "cedar.dynamics.Preshape")
+    );
+    preshape_decl->setIconPath(":/steps/preshape.svg");
+
+    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(preshape_decl);
+
+    return true;
+  }
+
+  bool declared = declare();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

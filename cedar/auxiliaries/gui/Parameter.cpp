@@ -62,7 +62,6 @@ cedar::aux::gui::Parameter::~Parameter()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
 void cedar::aux::gui::Parameter::setParameter(cedar::aux::ParameterPtr pParameter)
 {
   this->mParameter = pParameter;

@@ -56,10 +56,10 @@ struct cedar::aux::math::Limits
   //!@brief The standard constructor
   Limits() {};
   //!@brief Constructor that takes a minimum and maximum value
-  Limits(const T& newMin, const T& newMax)
+  Limits(const T& newLowerLimit, const T& newUpperLimit)
   :
-  min(newMin),
-  max(newMax)
+  mLowerLimit(newLowerLimit),
+  mUpperLimit(newUpperLimit)
   {
   }
   
@@ -67,22 +67,18 @@ struct cedar::aux::math::Limits
   template <typename U>
   Limits(const Limits<U> &otherLimits)
   :
-  min(otherLimits.min),
-  max(otherLimits.max)
+  mLowerLimit(otherLimits.mLowerLimit),
+  mUpperLimit(otherLimits.mUpperLimit)
   {
   }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // methods
-  //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
   //! minimum limit
-  T min;
+  T mLowerLimit;
   //! maximum limit
-  T max;
+  T mUpperLimit;
 }; // class cedar::aux::math::Limits
 
 #endif // CEDAR_AUX_MATH_LIMITS_H

@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/StringParameter.h"
 
 // SYSTEM INCLUDES
 
