@@ -114,15 +114,6 @@ private:
   //! Button for removing a child
   QPushButton *mpEditButton;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::gui::ObjectParameter
 
 #endif // CEDAR_AUX_GUI_OBJECT_PARAMETER_H

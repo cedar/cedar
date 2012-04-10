@@ -34,8 +34,9 @@
 
 ======================================================================================================================*/
 
-// MAKE FRI OPTIONAL
-#include "cedar/devices/robot/CMakeDefines.h"
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 #ifdef CEDAR_USE_KUKA_LWR
 
 // CEDAR INCLUDES
@@ -66,9 +67,11 @@ cedar::dev::kuka::gui::FriStatusWidget::~FriStatusWidget()
 {
   //nothing yet
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
 void cedar::dev::kuka::gui::FriStatusWidget::init()
 {
   updateInformation();
@@ -79,8 +82,8 @@ void cedar::dev::kuka::gui::FriStatusWidget::updateInformation()
 {
   // Translations from status-/quality-values to text
   std::string quality_names[]
-    = { "BAD (0)", "UNACCEPTABLE (1)", "GOOD (2)", "PERFECT (3)" };
-  std::string state_names[] = { "OFF (0)", "Monitor Mode", "Command Mode" };
+    = {"BAD (0)", "UNACCEPTABLE (1)", "GOOD (2)", "PERFECT (3)"};
+  std::string state_names[] = {"OFF (0)", "Monitor Mode", "Command Mode"};
   // set Text for Fri state and Fri quality
   mpLabelStateData->setText(state_names[mpKukaIn->getFriState()].c_str());
   mpLabelQualData->setText(quality_names[mpKukaIn->getFriQuality()].c_str());

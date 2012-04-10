@@ -28,7 +28,7 @@
     Email:       hendrik.reimann@ini.rub.de
     Date:        2010 10 28
 
-    Description: Scene for organizing instances of cedar::aux::gl::RigidBodyVisualization
+    Description: Scene for organizing instances of cedar::aux::gl::ObjectVisualization
 
     Credits:
 
@@ -71,14 +71,14 @@ double cedar::aux::gl::Scene::getSceneLimit() const
   return mSceneLimit;
 }
 
-int cedar::aux::gl::Scene::addRigidBodyVisualization(cedar::aux::gl::RigidBodyVisualizationPtr pRigidBodyVisualization)
+int cedar::aux::gl::Scene::addObjectVisualization(cedar::aux::gl::ObjectVisualizationPtr pObjectVisualization)
 {
-  mRigidBodyVisualizations.push_back(pRigidBodyVisualization);
+  mObjectVisualizations.push_back(pObjectVisualization);
   for (int i=0; i<mViewers.size(); i++)
   {
-    mViewers[i]->initGl(pRigidBodyVisualization);
+    mViewers[i]->initGl(pObjectVisualization);
   }
-  return mRigidBodyVisualizations.size() - 1;
+  return mObjectVisualizations.size() - 1;
 }
 
 int cedar::aux::gl::Scene::addViewer(cedar::aux::gui::Viewer* pViewer)
@@ -100,14 +100,14 @@ int cedar::aux::gl::Scene::removeViewer(cedar::aux::gui::Viewer* pViewer)
   return 0;
 }
 
-void cedar::aux::gl::Scene::deleteRigidBodyVisualization(int index)
+void cedar::aux::gl::Scene::deleteObjectVisualization(int index)
 {
-  mRigidBodyVisualizations.removeAt(index);
+  mObjectVisualizations.removeAt(index);
 }
 
 void cedar::aux::gl::Scene::clear()
 {
-  mRigidBodyVisualizations.clear();
+  mObjectVisualizations.clear();
 }
 
 void cedar::aux::gl::Scene::draw()
@@ -116,9 +116,9 @@ void cedar::aux::gl::Scene::draw()
   glPushMatrix();
 
   // draw all items in the scene
-  for (int i = 0; i < mRigidBodyVisualizations.size(); ++i)
+  for (int i = 0; i < mObjectVisualizations.size(); ++i)
   {
-    mRigidBodyVisualizations[i]->draw();
+    mObjectVisualizations[i]->draw();
   }
   
   // return to origin transformation
@@ -150,19 +150,19 @@ void cedar::aux::gl::Scene::draw()
   }
 }
 
-int cedar::aux::gl::Scene::getNumberOfRigidBodyVisualizations() const
+int cedar::aux::gl::Scene::getNumberOfObjectVisualizations() const
 {
-  return mRigidBodyVisualizations.size();
+  return mObjectVisualizations.size();
 }
 
 bool cedar::aux::gl::Scene::isEmpty() const
 {
-  return (mRigidBodyVisualizations.size() == 0);
+  return (mObjectVisualizations.size() == 0);
 }
 
-cedar::aux::gl::RigidBodyVisualizationPtr cedar::aux::gl::Scene::getRigidBodyVisualization(int index)
+cedar::aux::gl::ObjectVisualizationPtr cedar::aux::gl::Scene::getObjectVisualization(int index)
 {
-  return mRigidBodyVisualizations[index];
+  return mObjectVisualizations[index];
 }
 
 void cedar::aux::gl::Scene::initGl()
@@ -189,9 +189,9 @@ void cedar::aux::gl::Scene::initGl()
   glLightfv(GL_LIGHT0, GL_POSITION, position);
 
   // let all items in the scene initialize their resources in the current Gl context
-  for (int i = 0; i < mRigidBodyVisualizations.size(); ++i)
+  for (int i = 0; i < mObjectVisualizations.size(); ++i)
   {
-    mRigidBodyVisualizations[i]->initializeGl();
+    mObjectVisualizations[i]->initializeGl();
   }
 
 }

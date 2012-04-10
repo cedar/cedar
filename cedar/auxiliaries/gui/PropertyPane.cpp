@@ -35,10 +35,11 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-
 #include "cedar/auxiliaries/gui/PropertyPane.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/ObjectParameter.h"
+#include "cedar/auxiliaries/ObjectListParameter.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/Log.h"
@@ -49,6 +50,7 @@
 #include <QDoubleSpinBox>
 #include <QApplication>
 #include <QHeaderView>
+#include <QScrollBar>
 #include <boost/bind.hpp>
 
 
@@ -200,6 +202,16 @@ void cedar::aux::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterPtr para
 {
   if (!parameter->isHidden())
   {
+    // check if parameter is an object parameter
+    if
+    (
+      boost::dynamic_pointer_cast<cedar::aux::ObjectParameter>(parameter)
+      || boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter)
+    )
+    {
+      this->addHeadingRow(parameter->getName());
+    }
+
     int row = this->rowCount();
     this->insertRow(row);
     QLabel *p_label = new QLabel();
@@ -221,6 +233,36 @@ void cedar::aux::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterPtr para
     this->mParameterRowIndex[parameter.get()] = row;
     QObject::connect(p_widget, SIGNAL(heightChanged()), this, SLOT(rowSizeChanged()));
     QObject::connect(parameter.get(), SIGNAL(changedFlagChanged()), this, SLOT(parameterChangeFlagChanged()));
+
+    // check if parameter is an object parameter
+    if
+    (
+      cedar::aux::ObjectParameterPtr object_parameter
+        = boost::dynamic_pointer_cast<cedar::aux::ObjectParameter>(parameter)
+    )
+    {
+      cedar::aux::ConfigurablePtr configurable = object_parameter->getConfigurable();
+      this->append(configurable->getParameters());
+      QObject::connect(object_parameter.get(), SIGNAL(valueChanged()), this, SLOT(redraw()));
+    }
+
+    // check if parameter is an object list parameter
+    if
+    (
+      cedar::aux::ObjectListParameterPtr list_parameter
+        = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter)
+    )
+    {
+      QObject::connect(list_parameter.get(), SIGNAL(valueChanged()), this, SLOT(redraw()));
+
+      for (size_t i = 0; i < list_parameter->size(); ++i)
+      {
+        cedar::aux::ConfigurablePtr configurable = list_parameter->configurableAt(i);
+        std::string label = list_parameter->getName() + "[" + cedar::aux::toString(i) + "]";
+        this->addLabelRow(label);
+        this->append(configurable->getParameters());
+      }
+    }
   }
 }
 
@@ -275,6 +317,18 @@ void cedar::aux::gui::PropertyPane::resetPointer()
 
 void cedar::aux::gui::PropertyPane::redraw()
 {
+  int current_scroll_position = 0;
+  if (QScrollBar *p_scroll_bar = this->verticalScrollBar())
+  {
+    current_scroll_position = p_scroll_bar->value();
+  }
+
+  cedar::aux::ConfigurablePtr displayed = this->mDisplayedConfigurable.lock();
   this->resetContents();
-  this->display(cedar::aux::ConfigurablePtr(this->mDisplayedConfigurable));
+  this->display(displayed);
+
+  if (QScrollBar *p_scroll_bar = this->verticalScrollBar())
+  {
+    p_scroll_bar->setValue(current_scroll_position);
+  }
 }

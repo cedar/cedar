@@ -83,7 +83,7 @@ const std::string& cedar::aux::ExceptionBase::exceptionInfo() const
   return this->mExceptionInfo;
 }
 
-void cedar::aux::ExceptionBase::printInfo(void) const
+void cedar::aux::ExceptionBase::printInfo() const
 {
   // Output the exception to std::cerr
   std::cerr << this->exceptionInfo() << "\n";
@@ -109,7 +109,7 @@ void cedar::aux::ExceptionBase::setLine(int lineNumber)
   this->mLineNumber = lineNumber;
 }
 
-const char* cedar::aux::ExceptionBase::what(void) const throw()
+const char* cedar::aux::ExceptionBase::what() const throw()
 {
   // Just use the exception info here.
   return this->exceptionInfo().c_str();

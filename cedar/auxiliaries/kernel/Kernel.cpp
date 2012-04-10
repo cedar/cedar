@@ -63,7 +63,7 @@ _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000))
 cedar::aux::kernel::Kernel::Kernel(unsigned int dimensionality)
 :
 cedar::aux::Configurable(),
-mKernel(new cedar::aux::DataTemplate<cv::Mat>()),
+mKernel(new cedar::aux::MatData()),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);

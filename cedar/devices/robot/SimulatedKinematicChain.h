@@ -38,7 +38,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/namespace.h"
-#include "cedar/devices/robot/ReferenceGeometry.h"
 #include "cedar/devices/robot/KinematicChain.h"
 
 // SYSTEM INCLUDES
@@ -56,8 +55,6 @@ class cedar::dev::robot::SimulatedKinematicChain : public cedar::dev::robot::Kin
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  SimulatedKinematicChain(const cedar::dev::robot::ReferenceGeometryPtr pReferenceGeometry);
-  //!@brief constructor
   SimulatedKinematicChain(const std::string& configFileName);
   //!@brief destructor
   ~SimulatedKinematicChain();
@@ -70,7 +67,7 @@ public:
    *
    * @return    state
    */
-  bool isMovable();
+  bool isMovable() const;
 
   /*!@brief get current state of a single joint angle
    *

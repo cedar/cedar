@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/gui/MatrixPlot1D.h"
 #include "cedar/auxiliaries/gui/MatrixPlot2D.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
+#include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -57,6 +58,30 @@
 #include <QPushButton>
 #include <iostream>
 
+//----------------------------------------------------------------------------------------------------------------------
+// type registration
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool registerPlot()
+  {
+    using cedar::aux::MatData;
+    using cedar::aux::gui::MatrixPlot;
+
+    typedef cedar::aux::gui::PlotDeclarationTemplate<MatData, MatrixPlot> DeclarationType;
+
+    boost::shared_ptr<DeclarationType> declaration(new DeclarationType());
+    cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(declaration);
+    cedar::aux::gui::PlotManagerSingleton::getInstance()->setDefault<MatData, MatrixPlot>();
+    return true;
+  }
+
+  bool registered = registerPlot();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// static members
+//----------------------------------------------------------------------------------------------------------------------
 Qwt3D::ColorVector cedar::aux::gui::MatrixPlot::mStandardColorVector;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -65,12 +90,15 @@ Qwt3D::ColorVector cedar::aux::gui::MatrixPlot::mStandardColorVector;
 
 cedar::aux::gui::MatrixPlot::MatrixPlot(QWidget *pParent)
 :
-cedar::aux::gui::DataPlotInterface(pParent),
+cedar::aux::gui::MultiPlotInterface(pParent),
 mpCurrentPlotWidget(NULL)
 {
+
   QVBoxLayout *p_layout = new QVBoxLayout();
-  p_layout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(p_layout);
+
+  this->setContentsMargins(0, 0, 0, 0);
+  p_layout->setContentsMargins(0, 0, 0, 0);
 
   if (pParent != NULL)
   {
@@ -85,7 +113,38 @@ cedar::aux::gui::MatrixPlot::~MatrixPlot()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::aux::gui::MatrixPlot::display(cedar::aux::DataPtr data)
+
+bool cedar::aux::gui::MatrixPlot::canAppend(cedar::aux::ConstDataPtr data) const
+{
+  if (this->mpCurrentPlotWidget == NULL)
+  {
+    return false;
+  }
+  else if
+  (
+    cedar::aux::gui::MultiPlotInterface *p_multi_plot
+      = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlotWidget)
+  )
+  {
+    return p_multi_plot->canAppend(data);
+  }
+  else
+  {
+    return false;
+  }
+}
+
+void cedar::aux::gui::MatrixPlot::doAppend(cedar::aux::DataPtr data, const std::string& title)
+{
+  CEDAR_DEBUG_ASSERT(this->mpCurrentPlotWidget != NULL);
+  cedar::aux::gui::MultiPlotInterface *p_multi_plot
+    = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlotWidget);
+
+  CEDAR_DEBUG_ASSERT(p_multi_plot != NULL);
+  p_multi_plot->append(data, title);
+}
+
+void cedar::aux::gui::MatrixPlot::plot(cedar::aux::DataPtr data, const std::string& title)
 {
   this->mData= boost::shared_dynamic_cast<cedar::aux::MatData>(data);
   if (!this->mData)
@@ -113,17 +172,17 @@ void cedar::aux::gui::MatrixPlot::display(cedar::aux::DataPtr data)
   switch (dims)
   {
     case 0:
-      this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData);
+      this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData, title);
       this->layout()->addWidget(this->mpCurrentPlotWidget);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
       break;
     case 1:
-      this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot1D(this->mData);
+      this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot1D(this->mData, title);
       this->layout()->addWidget(this->mpCurrentPlotWidget);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
       break;
     case 2:
-      this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot2D(this->mData);
+      this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot2D(this->mData, title);
       this->layout()->addWidget(this->mpCurrentPlotWidget);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
       break;

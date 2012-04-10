@@ -66,19 +66,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::gui::HistoryPlot0D::HistoryPlot0D(QWidget *pParent)
 :
-cedar::aux::gui::DataPlotInterface(pParent),
+cedar::aux::gui::PlotInterface(pParent),
 mpCurrentPlotWidget(NULL)
 {
   this->init();
 }
 
-cedar::aux::gui::HistoryPlot0D::HistoryPlot0D(cedar::aux::DataPtr data, QWidget *pParent)
+cedar::aux::gui::HistoryPlot0D::HistoryPlot0D(cedar::aux::DataPtr data, const std::string& title, QWidget *pParent)
 :
-cedar::aux::gui::DataPlotInterface(pParent),
+cedar::aux::gui::PlotInterface(pParent),
 mpCurrentPlotWidget(NULL)
 {
   this->init();
-  this->display(data);
+  this->plot(data, title);
 }
 
 cedar::aux::gui::HistoryPlot0D::~HistoryPlot0D()
@@ -107,7 +107,7 @@ void cedar::aux::gui::HistoryPlot0D::init()
   this->layout()->addWidget(mpPlot);
 }
 
-void cedar::aux::gui::HistoryPlot0D::display(cedar::aux::DataPtr data)
+void cedar::aux::gui::HistoryPlot0D::plot(cedar::aux::DataPtr data, const std::string& /* title */)
 {
   this->mData = data;
   this->mDoubleData = boost::shared_dynamic_cast<cedar::aux::DoubleData>(this->mData);
@@ -119,7 +119,7 @@ void cedar::aux::gui::HistoryPlot0D::display(cedar::aux::DataPtr data)
     if (!this->mMatData)
     {
       CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
-                  "Could not cast to cedar::aux::DoubleData or cedar::aux::MatData in cedar::aux::gui::HistoryPlot0D::display.");
+                  "Could not cast to cedar::aux::DoubleData or cedar::aux::MatData in cedar::aux::gui::HistoryPlot0D::plot.");
     }
   }
 
@@ -169,7 +169,7 @@ void cedar::aux::gui::HistoryPlot0D::display(cedar::aux::DataPtr data)
   this->startTimer(30); //!@todo make the refresh time configurable.
 }
 
-void cedar::aux::gui::HistoryPlot0D::timerEvent(QTimerEvent * /* pEvent */)
+void cedar::aux::gui::HistoryPlot0D::timerEvent(QTimerEvent* /* pEvent */)
 {
   if (!this->isVisible())
   {

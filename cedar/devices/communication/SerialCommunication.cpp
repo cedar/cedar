@@ -195,7 +195,7 @@ void cedar::dev::com::SerialCommunication::init()
 
   setEndOfCommandString(_mEndOfCommandString->getValue()); // sets end-of-command-string
 
-#ifndef WIN32
+#ifndef _WIN32
   // initialize communication on Linux
   if(_mOS->getValue() == "Linux") //!@todo Switch this to a #ifdef block
   {
@@ -328,14 +328,14 @@ void cedar::dev::com::SerialCommunication::init()
   {
     std::cout << "SerialCommunication: Port '" << _mDevicePath->getValue() << "' initialized\n";
   }
-#else // WIN32
+#else // _WIN32
   return;
-#endif // WIN32
+#endif // _WIN32
 }
 
 int cedar::dev::com::SerialCommunication::send(const std::string& command)
 {
-#ifndef WIN32
+#ifndef _WIN32
   if (!mInitialized)
   {
     if (_mDebug->getValue())
@@ -374,14 +374,14 @@ int cedar::dev::com::SerialCommunication::send(const std::string& command)
 
   usleep(_mLatency->getValue()); // Delay following operations
   return 1;
-#else // WIN32
+#else // _WIN32
   return 0;
-#endif // WIN32
+#endif // _WIN32
 }
 
 int cedar::dev::com::SerialCommunication::receive(std::string& answer)
 {
-#ifndef WIN32
+#ifndef _WIN32
   if (!mInitialized)
   {
     if (_mDebug->getValue())
@@ -465,7 +465,7 @@ int cedar::dev::com::SerialCommunication::receive(std::string& answer)
   return e;
 #else
   return 0;
-#endif // WIN32
+#endif // _WIN32
 }
 
 void cedar::dev::com::SerialCommunication::setEndOfCommandString(const std::string& eocString)
@@ -478,7 +478,7 @@ void cedar::dev::com::SerialCommunication::setEndOfCommandString(const std::stri
 
 void cedar::dev::com::SerialCommunication::close()
 {
-#ifndef WIN32
+#ifndef _WIN32
   int s = ::close(mFileDescriptor);
   if (_mDebug->getValue())
   {
@@ -491,5 +491,5 @@ void cedar::dev::com::SerialCommunication::close()
       std::cout << "Serial Communication: Error Closing Port '" << _mDevicePath->getValue() << "'\n";
     }
   }
-#endif // WIN32
+#endif // _WIN32
 }

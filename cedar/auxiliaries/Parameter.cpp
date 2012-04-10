@@ -74,12 +74,12 @@ cedar::aux::Parameter::~Parameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void intrusive_ptr_add_ref(cedar::aux::Parameter *pObject)
+void intrusive_ptr_add_ref(cedar::aux::Parameter* pObject)
 {
   pObject->mReferenceCount += 1;
 }
 
-void intrusive_ptr_release(cedar::aux::Parameter *pObject)
+void intrusive_ptr_release(cedar::aux::Parameter* pObject)
 {
   pObject->mReferenceCount -= 1;
 
@@ -154,4 +154,14 @@ void cedar::aux::Parameter::setConstant(bool value)
   this->mConstant = value;
 
   emit propertyChanged();
+}
+
+const std::string& cedar::aux::Parameter::getName() const
+{
+  return this->mName;
+}
+
+void cedar::aux::Parameter::setName(const std::string& name)
+{
+  this->mName = name;
 }

@@ -258,17 +258,17 @@
     </widget>
    </item>
    <item row="3" column="0" colspan="2">
-    <widget class="QGroupBox" name="">
+    <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Rigid body</string>
+      <string>Local Coordinate Frame</string>
      </property>
      <layout class="QVBoxLayout" name="mpRigidBodyWidgetLayout"/>
     </widget>
    </item>
    <item row="2" column="0" colspan="2">
-    <widget class="QGroupBox" name="">
+    <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Rigid body visualization</string>
+      <string>Object visualization</string>
      </property>
      <layout class="QVBoxLayout" name="mpRigidBodyVisualizationWidgetLayout"/>
     </widget>
