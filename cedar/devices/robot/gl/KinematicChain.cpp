@@ -93,6 +93,11 @@ void cedar::dev::robot::gl::KinematicChain::draw()
   }
 }
 
+void cedar::dev::robot::gl::KinematicChain::setDisplayBase(bool state)
+{
+  mIsDrawingBase = state;
+}
+
 void cedar::dev::robot::gl::KinematicChain::setDisplayEndEffectorVelocity(bool state)
 {
   mIsDrawingEndEffectorVelocity = state;
@@ -127,28 +132,31 @@ void cedar::dev::robot::gl::KinematicChain::setLinkRadius(double value)
 
 void cedar::dev::robot::gl::KinematicChain::drawBase()
 {
-  // move to origin
-  glPopMatrix();
-  glPushMatrix();
+  if (mIsDrawingBase)
+  {
+    // move to origin
+    glPopMatrix();
+    glPushMatrix();
 
-  // draw the link to the first joint
-  glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
-  cv::Mat proximal = mpKinematicChain->getRootTransformation()(cv::Rect(3, 0, 1, 3)).clone();
-  cv::Mat distal = mpKinematicChain->getJointTransformation(0)(cv::Rect(3, 0, 1, 3)).clone();
-  cedar::aux::gl::drawCone<double>(proximal, distal, mLinkRadius, mLinkRadius, mResolution, mIsDrawnAsWireFrame);
+    // draw the link to the first joint
+    glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
+    cv::Mat proximal = mpKinematicChain->getRootTransformation()(cv::Rect(3, 0, 1, 3)).clone();
+    cv::Mat distal = mpKinematicChain->getJointTransformation(0)(cv::Rect(3, 0, 1, 3)).clone();
+    cedar::aux::gl::drawCone<double>(proximal, distal, mLinkRadius, mLinkRadius, mResolution, mIsDrawnAsWireFrame);
 
-  // move to object coordinates
-  mTransformationTranspose = mpKinematicChain->getRootTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+    // move to object coordinates
+    mTransformationTranspose = mpKinematicChain->getRootTransformation().t();
+    glMultMatrixd((GLdouble*)mTransformationTranspose.data);
 
-  // draw the base
-  glColor4d(mColorR, mColorG, mColorB, 0);
-  cedar::aux::gl::drawTorus(0.1, 0.015, mResolution, mResolution, mIsDrawnAsWireFrame);
-  glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
-  glTranslatef(0.0f, 0.0f, 0.005f);
-  cedar::aux::gl::drawDisk(0.0, 0.1, mResolution, mResolution, false, mIsDrawnAsWireFrame);
-  glTranslatef(0.0f, 0.0f, -0.01f);
-  cedar::aux::gl::drawDisk(0.0, 0.1, mResolution, mResolution, true, mIsDrawnAsWireFrame);
+    // draw the base
+    glColor4d(mColorR, mColorG, mColorB, 0);
+    cedar::aux::gl::drawTorus(0.1, 0.015, mResolution, mResolution, mIsDrawnAsWireFrame);
+    glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
+    glTranslatef(0.0f, 0.0f, 0.005f);
+    cedar::aux::gl::drawDisk(0.0, 0.1, mResolution, mResolution, false, mIsDrawnAsWireFrame);
+    glTranslatef(0.0f, 0.0f, -0.01f);
+    cedar::aux::gl::drawDisk(0.0, 0.1, mResolution, mResolution, true, mIsDrawnAsWireFrame);
+  }
 }
 
 void cedar::dev::robot::gl::KinematicChain::drawSegment(unsigned int index)

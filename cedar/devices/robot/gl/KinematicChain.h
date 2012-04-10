@@ -70,6 +70,9 @@ public:
   void draw(void);
   
   //!@brief flags the drawing state of the end-effector velocity vector
+  void setDisplayBase(bool state);
+
+  //!@brief flags the drawing state of the end-effector velocity vector
   void setDisplayEndEffectorVelocity(bool state);
 
   //!@brief flags the drawing state of the end-effector acceleration vector
@@ -126,6 +129,8 @@ protected:
   //! model of the kinematics, used for calculating transformations to the joint and end-effector frames
   cedar::dev::robot::KinematicChainPtr mpKinematicChain;
 
+  //! decides whether the base will be drawn
+  bool mIsDrawingBase;
   //! decides whether the end-effector velocity will be drawn
   bool mIsDrawingEndEffectorVelocity;
   //! decides whether the end-effector acceleration will be drawn
