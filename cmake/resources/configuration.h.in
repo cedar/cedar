@@ -62,7 +62,7 @@
   #define CEDAR_OS_APPLE
 #endif // __APPLE__
 
-#ifdef defined __unix__ | defined __APPLE__
+#if defined __unix__ | defined __APPLE__
   #define CEDAR_OS_UNIX
 #endif // __unix__
 
