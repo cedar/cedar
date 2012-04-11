@@ -698,7 +698,7 @@ void cedar::proc::gui::Scene::removeTriggerItem(cedar::proc::gui::TriggerItem *p
   delete pTrigger;
 }
 
-void cedar::proc::gui::Scene::addElement(const std::string& classId, QPointF position)
+cedar::proc::ElementPtr cedar::proc::gui::Scene::addElement(const std::string& classId, QPointF position)
 {
   std::vector<std::string> split_class_name;
   cedar::aux::split(classId, ".", split_class_name);
@@ -710,7 +710,7 @@ void cedar::proc::gui::Scene::addElement(const std::string& classId, QPointF pos
   {
     unsigned int new_id = 1;
     adjusted_name = name;
-    while (mNetwork->network()->getElement(adjusted_name))
+    while (mNetwork->getNetwork()->getElement(adjusted_name))
     {
       std::stringstream str;
       str << name << " " << new_id;
@@ -725,12 +725,12 @@ void cedar::proc::gui::Scene::addElement(const std::string& classId, QPointF pos
 
   try
   {
-    mNetwork->network()->add(classId, adjusted_name);
+    mNetwork->getNetwork()->add(classId, adjusted_name);
     if (cedar::proc::StepPtr step = mNetwork->network()->getElement<cedar::proc::Step>(adjusted_name))
     {
       this->addProcessingStep(step, position);
     }
-    else if (cedar::proc::TriggerPtr trigger = mNetwork->network()->getElement<cedar::proc::Trigger>(adjusted_name))
+    else if (cedar::proc::TriggerPtr trigger = mNetwork->getNetwork()->getElement<cedar::proc::Trigger>(adjusted_name))
     {
       this->addTrigger(trigger, position);
     }
@@ -744,6 +744,8 @@ void cedar::proc::gui::Scene::addElement(const std::string& classId, QPointF pos
     QString message(e.exceptionInfo().c_str());
     emit exception(message);
   }
+
+  return this->mNetwork->getNetwork()->getElement(adjusted_name);
 }
 
 cedar::proc::gui::TriggerItem* cedar::proc::gui::Scene::getTriggerItemFor(cedar::proc::Trigger* trigger)
