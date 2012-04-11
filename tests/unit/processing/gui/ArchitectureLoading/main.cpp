@@ -47,6 +47,8 @@
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Network.h"
+#include "cedar/processing/gui/TriggerItem.h"
+#include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/Network.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Step.h"
@@ -117,6 +119,18 @@ int verifyArchitecture1(cedar::proc::gui::Ide *pIde)
   catch (cedar::aux::ExceptionBase& e)
   {
     std::cout << "ERROR: Exception. " << e.exceptionInfo() << std::endl;
+    ++errors;
+  }
+
+  if (!p_trigger->hasGuiConnectionTo(p_field))
+  {
+    std::cout << "ERROR: trigger is not connected to field!" << std::endl;
+    ++errors;
+  }
+
+  if (!p_gauss->hasGuiConnection("Gauss input", p_field, "input"))
+  {
+    std::cout << "ERROR: trigger is not connected to field!" << std::endl;
     ++errors;
   }
 

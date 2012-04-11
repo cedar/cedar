@@ -128,6 +128,24 @@ cedar::proc::gui::StepItem::~StepItem()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::gui::StepItem::hasGuiConnection
+     (
+       const std::string& fromSlot,
+       cedar::proc::gui::StepItem* pToItem,
+       const std::string& toSlot
+     ) const
+{
+  CEDAR_DEBUG_ASSERT(pToItem != NULL);
+
+  cedar::proc::gui::DataSlotItem const* p_source_slot = this->getSlotItem(cedar::proc::DataRole::OUTPUT, fromSlot);
+  CEDAR_DEBUG_ASSERT(p_source_slot != NULL);
+
+  cedar::proc::gui::DataSlotItem const* p_target_slot = pToItem->getSlotItem(cedar::proc::DataRole::INPUT, toSlot);
+  CEDAR_DEBUG_ASSERT(p_target_slot != NULL);
+
+  return p_source_slot->hasGuiConnectionTo(p_target_slot);
+}
+
 void cedar::proc::gui::StepItem::stepStateChanged()
 {
   switch (this->mStep->getState())
@@ -274,11 +292,23 @@ void cedar::proc::gui::StepItem::addDataItems()
 }
 
 cedar::proc::gui::DataSlotItem* cedar::proc::gui::StepItem::getSlotItem
-                                                              (
-                                                                cedar::proc::DataRole::Id role, const std::string& name
-                                                              )
+                                (
+                                  cedar::proc::DataRole::Id role, const std::string& name
+                                )
 {
-  DataSlotMap::iterator role_map = this->mSlotMap.find(role);
+  return const_cast<cedar::proc::gui::DataSlotItem*>
+         (
+           static_cast<cedar::proc::gui::StepItem const*>(this)->getSlotItem(role, name)
+         );
+}
+
+cedar::proc::gui::DataSlotItem const* cedar::proc::gui::StepItem::getSlotItem
+                                      (
+                                        cedar::proc::DataRole::Id role,
+                                        const std::string& name
+                                      ) const
+{
+  DataSlotMap::const_iterator role_map = this->mSlotMap.find(role);
 
   if (role_map == this->mSlotMap.end())
   {
@@ -287,7 +317,7 @@ cedar::proc::gui::DataSlotItem* cedar::proc::gui::StepItem::getSlotItem
                                                    );
   }
 
-  DataSlotNameMap::iterator iter = role_map->second.find(name);
+  DataSlotNameMap::const_iterator iter = role_map->second.find(name);
   if (iter == role_map->second.end())
   {
     CEDAR_THROW(cedar::proc::InvalidNameException, "No slot item named \"" + name +
@@ -299,6 +329,7 @@ cedar::proc::gui::DataSlotItem* cedar::proc::gui::StepItem::getSlotItem
 
   return iter->second;
 }
+
 
 cedar::proc::gui::StepItem::DataSlotNameMap& cedar::proc::gui::StepItem::getSlotItems(
                                                                              cedar::proc::DataRole::Id role
