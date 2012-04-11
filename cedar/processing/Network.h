@@ -275,6 +275,10 @@ public:
     boost::function<void (cedar::proc::DataSlotPtr, cedar::proc::DataSlotPtr, bool)> slot
   );
 
+  boost::signals2::connection connectToNewElementAddedSignal(boost::function<void (cedar::proc::ElementPtr)> slot);
+
+  boost::signals2::connection connectToElementRemovedSignal(boost::function<void (cedar::proc::ElementPtr)> slot);
+
   boost::signals2::connection connectToSlotChangedSignal(boost::function<void ()> slot);
 
   void processPromotedSlots();
@@ -353,6 +357,8 @@ protected:
   boost::signals2::signal<void ()> mSlotChanged;
   boost::signals2::signal<void (cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool)> mTriggerConnectionChanged;
   boost::signals2::signal<void (cedar::proc::DataSlotPtr, cedar::proc::DataSlotPtr, bool)> mDataConnectionChanged;
+  boost::signals2::signal<void (cedar::proc::ElementPtr)> mNewElementAddedSignal;
+  boost::signals2::signal<void (cedar::proc::ElementPtr)> mElementRemovedSignal;
 
   cedar::aux::StringVectorParameterPtr _mPromotedSlots;
 private:

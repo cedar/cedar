@@ -177,6 +177,10 @@ private:
 
   void checkTriggerConnection(cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool added);
 
+  void processStepAddedSignal(cedar::proc::ElementPtr);
+
+  void processStepRemovedSignal(cedar::proc::ElementPtr);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -213,6 +217,8 @@ private:
 
   //! Fit to contents-calls are temporarily disabled if this is set to true.
   bool mHoldFitToContents;
+
+
 
 }; // class cedar::proc::gui::NetworkFile
 
