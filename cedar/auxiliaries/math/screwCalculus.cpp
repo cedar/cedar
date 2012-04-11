@@ -50,6 +50,9 @@
 template<typename T>
 void cedar::aux::math::wedgeAxis(const cv::Mat& rAxis, cv::Mat& rResult)
 {
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rAxis));
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rResult));
+
   rResult.at<T>(0, 0) = 0.0;
   rResult.at<T>(0, 1) = -rAxis.at<T>(2, 0);
   rResult.at<T>(0, 2) = rAxis.at<T>(1, 0);
@@ -67,6 +70,8 @@ template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::wedgeAxis<float>(const cv::
 template<typename T>
 cv::Mat cedar::aux::math::wedgeAxis(const cv::Mat& rAxis)
 {
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rAxis));
+
   cv::Mat result = cv::Mat::zeros(3, 3, rAxis.type());
   wedgeAxis<T>(rAxis, result);
   return result;
@@ -81,6 +86,9 @@ template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::wedgeAxis<float>(const c
 template<typename T>
 void cedar::aux::math::veeAxis(const cv::Mat& rMatrix, cv::Mat& rResult)
 {
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rMatrix));
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rResult));
+
 	rResult.at<T>(0, 0) = rMatrix.at<T>(2, 1);
 	rResult.at<T>(1, 0) = rMatrix.at<T>(0, 2);
 	rResult.at<T>(2, 0) = rMatrix.at<T>(1, 0);
@@ -92,6 +100,8 @@ template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::veeAxis<float>(const cv::Ma
 template<typename T>
 cv::Mat cedar::aux::math::veeAxis(const cv::Mat& rMatrix)
 {
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rMatrix));
+
   cv::Mat result = cv::Mat::zeros(3, 1, rMatrix.type());
   veeAxis<T>(rMatrix, result);
   return result;
@@ -106,6 +116,9 @@ template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::veeAxis<float>(const cv:
 template<typename T>
 void cedar::aux::math::wedgeTwist(const cv::Mat& rTwist, cv::Mat& rResult)
 {
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rTwist));
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rResult));
+
   rResult = cv::Mat::zeros(4, 4, rTwist.type());
   rResult.at<T>(0, 1) = -rTwist.at<T>(5, 0);
   rResult.at<T>(0, 2) = rTwist.at<T>(4, 0);
@@ -125,6 +138,8 @@ template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::wedgeTwist<float>(const cv:
 template<typename T>
 cv::Mat cedar::aux::math::wedgeTwist(const cv::Mat& rTwist)
 {
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rTwist));
+
   cv::Mat result = cv::Mat::zeros(4, 4, rTwist.type());
   wedgeTwist<T>(rTwist, result);
   return result;
@@ -139,6 +154,9 @@ template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::wedgeTwist<float>(const 
 template<typename T>
 void cedar::aux::math::veeTwist(const cv::Mat& rMatrix, cv::Mat& rResult)
 {
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rMatrix));
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rResult));
+
 	// position
 	rResult.at<T>(0, 0) = rMatrix.at<T>(0, 3);
 	rResult.at<T>(1, 0) = rMatrix.at<T>(1, 3);
@@ -155,6 +173,8 @@ template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::veeTwist<float>(const cv::M
 template<typename T>
 cv::Mat cedar::aux::math::veeTwist(const cv::Mat& rMatrix)
 {
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rMatrix));
+
   cv::Mat result = cv::Mat::zeros(6, 1, rMatrix.type());
   veeTwist<T>(rMatrix, result);
   return result;
@@ -169,6 +189,9 @@ template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::veeTwist<float>(const cv
 template<typename T>
 void cedar::aux::math::expAxis(const cv::Mat& rAxis, double theta, cv::Mat& rResult)
 {
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rAxis));
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rResult));
+
   rResult = cv::Mat::eye(3, 3, rAxis.type());
   cv::Mat omega_wedge = wedgeAxis<T>(rAxis);
   rResult += (omega_wedge * sin(theta)) + (omega_wedge * omega_wedge * (1 - cos(theta)));
@@ -180,6 +203,8 @@ template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::expAxis<float>(const cv::Ma
 template<typename T>
 cv::Mat cedar::aux::math::expAxis(const cv::Mat& rAxis, double theta)
 {
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rAxis));
+
   cv::Mat result = cv::Mat::zeros(3, 3, rAxis.type());
   expAxis<T>(rAxis, theta, result);
   return result;
@@ -194,6 +219,9 @@ template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::expAxis<float>(const cv:
 template<typename T>
 void cedar::aux::math::logAxis(const cv::Mat& rRotation, cv::Mat& rOmega, double& rTheta, bool negativeTheta)
 {
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rRotation));
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rOmega));
+
   T trace = rRotation.at<T>(0, 0) + rRotation.at<T>(1, 1) + rRotation.at<T>(2, 2);
   // calculate rotation angle
   rTheta = acos((trace - 1.0) / 2.0);
@@ -253,6 +281,9 @@ template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::logAxis<float>(const cv::Ma
 template<typename T>
 void cedar::aux::math::expTwist(const cv::Mat& rXi, double theta, cv::Mat& rResult)
 {
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rXi));
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rResult));
+
   cv::Mat v = rXi(cv::Rect(0, 0, 1, 3));
   cv::Mat omega = rXi(cv::Rect(0, 3, 1, 3));
 
@@ -296,6 +327,8 @@ template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::expTwist<float>(const cv::M
 template<typename T>
 cv::Mat cedar::aux::math::expTwist(const cv::Mat& rXi, double theta)
 {
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rXi));
+
   cv::Mat result = cv::Mat::zeros(4, 4, rXi.type());
   expTwist<T>(rXi, theta, result);
   return result;
@@ -310,6 +343,9 @@ template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::expTwist<float>(const cv
 template<typename T>
 void cedar::aux::math::logTwist(const cv::Mat& rTransformation, cv::Mat& rXi, double& rTheta, bool negativeTheta)
 {
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rXi));
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rTransformation));
+
   // extract rotation and translation
   cv::Mat R = rTransformation(cv::Rect(0, 0, 3, 3));
   cv::Mat p = rTransformation(cv::Rect(3, 0, 1, 3));
@@ -341,6 +377,9 @@ template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::logTwist<float>(const cv::M
 template<typename T>
 void cedar::aux::math::rigidToAdjointTransformation(const cv::Mat& rRigidTransformation, cv::Mat& rAdjointTransformation)
 {
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rRigidTransformation));
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rAdjointTransformation));
+
   // extract componenets
   cv::Mat rot = rRigidTransformation(cv::Rect(0, 0, 3, 3));
   cv::Mat pos = rRigidTransformation(cv::Rect(3, 0, 1, 3));
@@ -385,6 +424,8 @@ template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::rigidToAdjointTransformatio
 template<typename T>
 cv::Mat cedar::aux::math::rigidToAdjointTransformation(const cv::Mat& rRigidTransformation)
 {
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rRigidTransformation));
+
   cv::Mat result = cv::Mat::zeros(6, 6, rRigidTransformation.type());
   rigidToAdjointTransformation<T>(rRigidTransformation, result);
   return result;
@@ -399,6 +440,9 @@ template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::rigidToAdjointTransforma
 template<typename T>
 void cedar::aux::math::adjointToRigidTransformation(const cv::Mat& rAdjointTransformation, cv::Mat& rRigidTransformation)
 {
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rRigidTransformation));
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rAdjointTransformation));
+
   cv::Mat rot = rAdjointTransformation(cv::Rect(0, 0, 3, 3));
   cv::Mat pos = veeAxis<T>(rAdjointTransformation(cv::Rect(3, 0, 3, 3)) * rot.inv());
   
@@ -424,6 +468,8 @@ template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::adjointToRigidTransformatio
 template<typename T>
 cv::Mat cedar::aux::math::adjointToRigidTransformation(const cv::Mat& rAdjointTransformation)
 {
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rAdjointTransformation));
+
   cv::Mat result = cv::Mat::zeros(4, 4, rAdjointTransformation.type());
   adjointToRigidTransformation<T>(rAdjointTransformation, result);
   return result;
@@ -438,6 +484,9 @@ template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::adjointToRigidTransforma
 template<typename T>
 void cedar::aux::math::invertAdjointTransformation(const cv::Mat& rAdjointTransformation, cv::Mat& rInverse)
 {
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rInverse));
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rAdjointTransformation));
+
   // calculate block matrices of the inverse
   cv::Mat rot_transpose = rAdjointTransformation(cv::Rect(0, 0, 3, 3)).t();
   cv::Mat upper_right = - rot_transpose * rAdjointTransformation(cv::Rect(3, 0, 3, 3)) * rot_transpose;
@@ -483,6 +532,8 @@ template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::invertAdjointTransformation
 template<typename T>
 cv::Mat cedar::aux::math::invertAdjointTransformation(const cv::Mat& rAdjointTransformation)
 {
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rAdjointTransformation));
+
   cv::Mat result = cv::Mat::zeros(6, 6, rAdjointTransformation.type());
   invertAdjointTransformation<T>(rAdjointTransformation, result);
   return result;
@@ -497,6 +548,9 @@ template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::invertAdjointTransformat
 template<typename T>
 cv::Mat cedar::aux::math::twistCoordinates(const cv::Mat& rSupportPoint, const cv::Mat& rAxis)
 {
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rSupportPoint));
+  CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rAxis));
+
   cv::Mat omega = rAxis(cv::Rect(0, 0, 1, 3)) * (1 / cv::norm(rAxis(cv::Rect(0, 0, 1, 3))));
   cv::Mat cross = rSupportPoint(cv::Rect(0, 0, 1, 3)).cross(omega);
   cv::Mat twist = cv::Mat::zeros(6, 1, rSupportPoint.type());

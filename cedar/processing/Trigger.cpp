@@ -47,16 +47,13 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
 #include <algorithm>
 
 // MACROS
 //#define DEBUG_TRIGGERING
-
-#ifdef DEBUG_TRIGGERING
-#  include "cedar/auxiliaries/System.h"
-#endif // DEBUG_TRIGGERING
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -130,16 +127,14 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
       if (step->setNextArguments(arguments))
       {
 #ifdef DEBUG_TRIGGERING
-        cedar::aux::System::mCOutLock.lockForWrite();
         std::cout << "Trigger " << this->getName() << " triggers " << this->mListeners.at(i)->getName() << std::endl;
-        cedar::aux::System::mCOutLock.unlock();
 #endif // DEBUG_TRIGGERING
-        this->mListeners.at(i)->onTrigger(this->shared_from_this());
+        this->mListeners.at(i)->onTrigger(boost::shared_static_cast<cedar::proc::Trigger>(this->shared_from_this()));
       }
     }
     else
     {
-      this->mListeners.at(i)->onTrigger(this->shared_from_this());
+      this->mListeners.at(i)->onTrigger(boost::shared_static_cast<cedar::proc::Trigger>(this->shared_from_this()));
     }
   }
 }
@@ -157,7 +152,7 @@ void cedar::proc::Trigger::addListener(cedar::proc::TriggerablePtr step)
     this->mListeners.push_back(step);
     if (cedar::proc::TriggerPtr trigger = boost::shared_dynamic_cast<cedar::proc::Trigger>(step))
     {
-      trigger->notifyConnected(this->shared_from_this());
+      trigger->notifyConnected(boost::shared_static_cast<cedar::proc::Trigger>(this->shared_from_this()));
     }
   }
 }
@@ -175,7 +170,7 @@ void cedar::proc::Trigger::removeListener(cedar::proc::TriggerablePtr step)
   {
     if (cedar::proc::TriggerPtr trigger = boost::shared_dynamic_cast<cedar::proc::Trigger>(step))
     {
-      trigger->notifyDisconnected(this->shared_from_this());
+      trigger->notifyDisconnected(boost::shared_static_cast<cedar::proc::Trigger>(this->shared_from_this()));
     }
     this->mListeners.erase(iter);
   }

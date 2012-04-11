@@ -39,9 +39,9 @@
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/functions.h"
-#include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/Log.h"
@@ -72,7 +72,7 @@ _mLimit(new cedar::aux::DoubleParameter(this, "limit", 5.0, 0.01, 1000.0))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   _mDimensionality->setValue(_mSigmas->size());
-
+  
   this->onInit();
 }
 

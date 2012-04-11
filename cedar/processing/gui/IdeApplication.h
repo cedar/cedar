@@ -48,9 +48,9 @@
 // SYSTEM INCLUDES
 #include <QApplication>
 
-#ifdef _MSC_VER
+#ifdef CEDAR_COMPILER_MSVC
 #include <Windows.h>
-#endif // _MSC_VER
+#endif // CEDAR_COMPILER_MSVC
 
 
 /*!@brief The application for the processingIde.
@@ -103,9 +103,9 @@ private:
    */
   static void signalHandler(int signal);
 
-#ifdef _MSC_VER
+#ifdef CEDAR_COMPILER_MSVC
   static LONG WINAPI vcCrashHandler(LPEXCEPTION_POINTERS);
-#endif
+#endif // CEDAR_COMPILER_MSVC
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

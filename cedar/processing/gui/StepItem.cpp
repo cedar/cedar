@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/Settings.h"
@@ -164,6 +165,7 @@ void cedar::proc::gui::StepItem::redraw()
 
 void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 {
+  this->setElement(step);
   this->mStep = step;
   this->mClassId = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(this->mStep);
 
@@ -176,7 +178,6 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
   this->addDataItems();
   this->addTriggerItems();
 
-//  QObject::connect(step.get(), SIGNAL(stateChanged()), this, SLOT(stepStateChanged()));
   mStateChangedConnection = step->connectToStateChanged(boost::bind(&cedar::proc::gui::StepItem::stepStateChanged, this));
   QObject::connect(step.get(), SIGNAL(nameChanged()), this, SLOT(redraw()));
 }
@@ -426,7 +427,18 @@ void cedar::proc::gui::StepItem::showPlot
 
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
+  cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+  CEDAR_DEBUG_ASSERT(p_scene);
+
   QMenu menu;
+
+  if (this->scene()->selectedItems().size() > 1)
+  {
+    p_scene->networkGroupingContextMenuEvent(menu);
+    menu.exec(event->screenPos());
+    return;
+  }
+
   QMenu *p_data = menu.addMenu("data");
 
   menu.addSeparator();
@@ -455,7 +467,11 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     }
   }
 
-  QAction *p_delete_action = menu.addAction("delete");
+  menu.addSeparator();
+  p_scene->networkGroupingContextMenuEvent(menu);
+
+  //!@todo Implement delete action.
+//  QAction *p_delete_action = menu.addAction("delete");
 
   // Actions for data plotting -----------------------------------------------------------------------------------------
   std::map<QAction*, cedar::aux::Enum> action_type_map;
@@ -539,11 +555,12 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     this->showPlot(event->screenPos(), p_plotter, slot);
   }
   // delete the step
-  else if (a == p_delete_action)
-  {
-    //!@todo
-  }
+//  else if (a == p_delete_action)
+//  {
+//    //!@todo
+//  }
 }
+
 
 void cedar::proc::gui::StepItem::plotAll(const QPoint& position)
 {
