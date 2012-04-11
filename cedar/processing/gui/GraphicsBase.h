@@ -177,6 +177,9 @@ public:
   //!@brief Removes all connections from the list of connections managed by this graphics item.
   void removeAllConnections();
 
+  //!@brief Checks whether a GUI connection to the target exists in this item's connection list.
+  bool hasGuiConnectionTo(GraphicsBase const* pTarget) const;
+
   //!\brief overwrite this function if your customized graphics item needs to disconnect some children items
   virtual void disconnect();
 
