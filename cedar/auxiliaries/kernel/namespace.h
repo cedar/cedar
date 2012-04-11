@@ -39,7 +39,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/Singleton.h"
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
@@ -61,9 +60,6 @@ namespace cedar
 
       //!@brief The factory manager for kernel classes.
       typedef cedar::aux::FactoryManager<cedar::aux::kernel::KernelPtr> FactoryManager;
-
-      //!@brief The singleton instance of the kernel factory manager.
-      typedef cedar::aux::Singleton<FactoryManager> FactoryManagerSingleton;
     }
   }
 }

@@ -74,11 +74,12 @@ public:
                       const std::string& category
                     )
   :
-  DeclarationBase<cedar::proc::Element, cedar::aux::Factory<cedar::proc::ElementPtr> >(
-                                                                                             classFactory,
-                                                                                             classId,
-                                                                                             category
-                                                                                           )
+  DeclarationBase<cedar::proc::Element, cedar::aux::Factory<cedar::proc::ElementPtr> >
+  (
+    classFactory,
+    classId,
+    category
+  )
   {
   }
 

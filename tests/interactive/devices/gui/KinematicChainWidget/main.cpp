@@ -53,7 +53,14 @@
 
 int main(int argc, char *argv[])
 {
-  cedar::dev::robot::KinematicChainPtr p_kinematic_chain(new cedar::dev::robot::SimulatedKinematicChain("../../../../tests/interactive/devices/gui/KinematicChainWidget/test_arm.conf"));
+  cedar::dev::robot::KinematicChainPtr p_kinematic_chain
+  (
+    new cedar::dev::robot::SimulatedKinematicChain
+    (
+      "../../../../tests/interactive/devices/gui/KinematicChainWidget/test_arm.conf"
+    )
+  );
+  p_kinematic_chain->readJson("../../../../tests/interactive/devices/gui/KinematicChainWidget/test_arm.json");
   QApplication app(argc, argv);
   cedar::dev::robot::gui::KinematicChainWidget widget(p_kinematic_chain);
   widget.getMonitorWidget()->setDecimals(10);

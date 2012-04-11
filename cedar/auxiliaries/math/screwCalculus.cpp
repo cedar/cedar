@@ -30,7 +30,8 @@
 
     Description: This file provides screw calculus functions for rigid body geometry.
 
-    Credits:
+    Credits:     These functions are implementations of concepts taken from the book "A mathematical introduction to
+                   robotic manipulation", by R. Murray, S. Sastry and Z. Lee
 
 ======================================================================================================================*/
 
@@ -216,7 +217,7 @@ template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::expAxis<float>(const cv:
 // log functions for axis vectors
 //----------------------------------------------------------------------------------------------------------------------
 template<typename T>
-void cedar::aux::math::logAxis(const cv::Mat& rRotation, cv::Mat& rOmega, double& rTheta, bool optionalThetaChoice)
+void cedar::aux::math::logAxis(const cv::Mat& rRotation, cv::Mat& rOmega, double& rTheta, bool negativeTheta)
 {
   CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rRotation));
   CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rOmega));
@@ -229,7 +230,7 @@ void cedar::aux::math::logAxis(const cv::Mat& rRotation, cv::Mat& rOmega, double
     // capture numeric failures for trace very close to one
     rTheta = cedar::aux::math::pi;
   }
-  if (optionalThetaChoice)
+  if (negativeTheta)
   {
     rTheta = 2*cedar::aux::math::pi - rTheta;
   }
@@ -340,7 +341,7 @@ template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::expTwist<float>(const cv
 // log functions for twists
 //----------------------------------------------------------------------------------------------------------------------
 template<typename T>
-void cedar::aux::math::logTwist(const cv::Mat& rTransformation, cv::Mat& rXi, double& rTheta, bool optionalThetaChoice)
+void cedar::aux::math::logTwist(const cv::Mat& rTransformation, cv::Mat& rXi, double& rTheta, bool negativeTheta)
 {
   CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rXi));
   CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rTransformation));
@@ -351,7 +352,7 @@ void cedar::aux::math::logTwist(const cv::Mat& rTransformation, cv::Mat& rXi, do
 
   // calculate exponential coordinates for R = exp(\wedge \omega \theta)
   cv::Mat omega = cv::Mat::zeros(3, 1, rTransformation.type());
-  logAxis<T>(R, omega, rTheta, optionalThetaChoice);
+  logAxis<T>(R, omega, rTheta, negativeTheta);
 
   // calculate v
   cv::Mat omega_wedge = wedgeAxis<T>(omega);

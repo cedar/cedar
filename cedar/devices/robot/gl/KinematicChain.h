@@ -38,8 +38,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/gl/namespace.h"
-#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
-#include "cedar/devices/robot/KinematicChainModel.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
+#include "cedar/devices/robot/KinematicChain.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -51,14 +51,14 @@
  * the chain, add an instance of this class to a scene (cedar::aux::gl::Scene) and create a viewer for that scene 
  * (cedar::aux::gl::Viewer). 
  */
-class cedar::dev::robot::gl::KinematicChain : public cedar::aux::gl::RigidBodyVisualization
+class cedar::dev::robot::gl::KinematicChain : public cedar::aux::gl::ObjectVisualization
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KinematicChain(cedar::dev::robot::KinematicChainModelPtr pKinematicChainModel);
+  KinematicChain(cedar::dev::robot::KinematicChainPtr pKinematicChain);
   //!@brief destructor
   ~KinematicChain();
   
@@ -74,6 +74,30 @@ public:
 
   //!@brief flags the drawing state of the end-effector acceleration vector
   void setDisplayEndEffectorAcceleration(bool state);
+
+  /*!@brief sets the joint radius to the new value
+   *
+   * @param value new radius
+   */
+  double getJointRadius();
+
+  /*!@brief sets the link radius to the new value
+   *
+   * @return radius
+   */
+  double getLinkRadius();
+
+  /*!@brief sets the joint radius to the new value
+   *
+   * @return radius
+   */
+  void setJointRadius(double value);
+
+  /*!@brief sets the link radius to the new value
+   *
+   * @param value new radius
+   */
+  void setLinkRadius(double value);
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -100,12 +124,18 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //! model of the kinematics, used for calculating transformations to the joint and end-effector frames
-  cedar::dev::robot::KinematicChainModelPtr mpKinematicChainModel;
+  cedar::dev::robot::KinematicChainPtr mpKinematicChain;
 
   //! decides whether the end-effector velocity will be drawn
   bool mIsDrawingEndEffectorVelocity;
   //! decides whether the end-effector acceleration will be drawn
   bool mIsDrawingEndEffectorAcceleration;
+
+private:
+  //! radius of the joints
+  double mJointRadius;
+  //! radius of the links
+  double mLinkRadius;
 
 }; // class cedar::dev::robot::gl::KinematicChain
 #endif // CEDAR_DEV_ROBOT_GL_KINEMATIC_CHAIN_H

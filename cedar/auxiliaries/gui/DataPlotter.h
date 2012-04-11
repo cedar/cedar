@@ -43,7 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/auxiliaries/gui/MultiPlotInterface.h"
 #include "cedar/auxiliaries/Data.h"
 
 // SYSTEM INCLUDES
@@ -53,7 +53,7 @@
  *
  * This class decides, which plot fits best the given data and instantiate a plot of the right type.
  */
-class cedar::aux::gui::DataPlotter : public QDockWidget
+class cedar::aux::gui::DataPlotter : public cedar::aux::gui::MultiPlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -69,7 +69,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataPlotter(const std::string& title, QWidget *pParent = NULL);
+  DataPlotter(QWidget *pParent = NULL);
 
   //!@brief Destructor
   ~DataPlotter();
@@ -79,10 +79,9 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief plot data
-  void plot(cedar::aux::DataPtr data);
+  void plot(cedar::aux::DataPtr data, const std::string& title);
 
-  //!@brief access the widget factory (not implemented)
-  static WidgetFactory& getWidgetFactory();
+  bool canAppend(cedar::aux::ConstDataPtr data) const;
 
 public slots:
   //!@brief slot that induces a redraw if data changes
@@ -98,7 +97,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void doAppend(cedar::aux::DataPtr data, const std::string& title);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -108,7 +107,12 @@ protected:
 private:
   //!@brief the displayed data
   cedar::aux::DataPtr mData;
-  //!@brief factory from data to fitting plot - not used
-  static WidgetFactory mTypePlotters;
+
+  //!@brief The title of the data being displayed.
+  std::string mTitle;
+
+  //!@brief Pointer to the current plot.
+  cedar::aux::gui::PlotInterface *mpCurrentPlot;
+
 }; // class cedar::aux::gui::DataPlotter
 #endif // CEDAR_PROC_GUI_DATA_PLOTTER_H

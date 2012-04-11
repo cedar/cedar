@@ -39,14 +39,14 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/DataPlotInterface.h"
+#include "cedar/auxiliaries/gui/PlotInterface.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
 
 /*!@brief A plot that records and displays the history of numerical data.
  */
-class cedar::aux::gui::HistoryPlot : public cedar::aux::gui::DataPlotInterface
+class cedar::aux::gui::HistoryPlot : public cedar::aux::gui::PlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -67,7 +67,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void display(cedar::aux::DataPtr data);
+  void plot(cedar::aux::DataPtr data, const std::string& title);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

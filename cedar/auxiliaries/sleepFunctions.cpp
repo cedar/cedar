@@ -77,5 +77,5 @@ void cedar::aux::sleep(unsigned int seconds)
   Sleep(1000 * static_cast<DWORD>(seconds));
 #else // CEDAR_OS_WINDOWS
   ::sleep(seconds);
-#endif
+#endif // CEDAR_OS_*
 }

@@ -135,7 +135,7 @@ public:
     return iter->second;
   }
 
-  inline void listTypes(std::vector<std::string>& types) const
+  void listTypes(std::vector<std::string>& types) const
   {
     for
     (
@@ -168,15 +168,6 @@ protected:
 private:
   std::map<std::string, FactoryTypePtr> mRegisteredFactories;
   std::map<std::string, std::string> mTypeNameMapping;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
 
 }; // class cedar::aux::FactoryManager
 
