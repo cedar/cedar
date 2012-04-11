@@ -65,8 +65,9 @@ double cedar::dev::robot::Locomotion::getTurningRate() const
 
 int cedar::dev::robot::Locomotion::stop()
 {
-  int s = setVelocity(0, 0); //stop by setting both forward velocity and turning rate to 0
-  if (s == 0 && _mDebug) //setting velocity failed
+  int s = setVelocity(0, 0); // stop by setting both forward velocity and turning rate to 0
+
+  if (s == 0 && _mDebug) // setting velocity failed
   {
     std::cout << "Locomotion: Error Stopping Robot\n";
   }
