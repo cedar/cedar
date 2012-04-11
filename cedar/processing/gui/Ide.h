@@ -194,6 +194,10 @@ public slots:
    */
   void decreaseZoomLevel();
 
+  /*!@brief Returns the architecture view used by the ide.
+   */
+  cedar::proc::gui::View* getArchitectureView();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

@@ -96,7 +96,18 @@ public:
   //!@brief read network from given file
   void read(const std::string& source);
 
-  //!@brief access the underlying cedar::proc::Network
+  /*!@brief access the underlying cedar::proc::Network
+   *
+   */
+  inline cedar::proc::NetworkPtr getNetwork()
+  {
+    return this->network();
+  }
+
+  /*!@brief access the underlying cedar::proc::Network
+   *
+   * @todo Deprecate this.
+   */
   cedar::proc::NetworkPtr network();
 
   //!@brief add all elements contained in this network to the scene
