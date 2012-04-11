@@ -59,7 +59,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
   //!@brief The get-function of both forward velocity and turning rate.
   //!@return 2-dimensional vector with mForwardVelocity [in m/s] as 1st and mTurningRate in [rad/s] as 2nd element.
   const std::vector<double>& getVelocity() const;
@@ -73,33 +72,33 @@ public:
   double getTurningRate() const;
 
   /*!@brief Sets both forward velocity and turning rate.
-   *@param forwardVelocity The forward velocity to be set [in m/s].
-   *@param turningRate The turning rate to be set [in rad/s].
-   *@return 1 if setting forward velocity and turning rate was successful and 0 otherwise.
+   * @param forwardVelocity The forward velocity to be set [in m/s].
+   * @param turningRate The turning rate to be set [in rad/s].
+   * @return 1 if setting forward velocity and turning rate was successful and 0 otherwise.
    */
   virtual int setVelocity(double forwardVelocity, double turningRate) = 0;
 
   /*!@brief Sets forward velocity only.
-   *@param forwardVelocity The forward velocity to be set [in m/s].
-   *@return 1 if setting forward velocity was successful and 0 otherwise.
+   * @param forwardVelocity The forward velocity to be set [in m/s].
+   * @return 1 if setting forward velocity was successful and 0 otherwise.
    */
   virtual int setForwardVelocity(double forwardVelocity) = 0;
 
   /*!@brief Sets turning rate only.
-   *@param turningRate The turning rate to be set [in rad/s].
-   *@return 1 if setting turning rate was successful and 0 otherwise.
+   * @param turningRate The turning rate to be set [in rad/s].
+   * @return 1 if setting turning rate was successful and 0 otherwise.
    */
   virtual int setTurningRate(double turningRate) = 0;
 
   /*!@brief Stops the robot.
-   *@return 1 if stopping the robot was successful and 0 otherwise.
+   * @return 1 if stopping the robot was successful and 0 otherwise.
    */
   int stop();
 
   /*!@brief Resets the robot.
-   *@return 1 if resetting the robot was successful and 0 otherwise.
+   * @return 1 if resetting the robot was successful and 0 otherwise.
    *
-   *This function stops the robot and resets its movement-sensors (e.g. encoders).
+   * This function stops the robot and resets its movement-sensors (e.g., encoders).
    */
   virtual int reset() = 0;
 
@@ -107,30 +106,22 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-
-public:
-
-  // none yet (hopefully never!)
-
 protected:
   //!@brief Vector with forward velocity as 1st and turning rate as 2nd element [both in m/s].
   std::vector<double> mVelocity;
 
 private:
-
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -138,7 +129,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   /*!@brief The Debug-Flag.
-   *If true, error-messages and received strings from the robot are displayed on Console, else not.
+   * If true, error-messages and received strings from the robot are displayed on Console, else not.
    */
   bool _mDebug;
 
