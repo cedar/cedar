@@ -179,6 +179,11 @@ mpLog(pLog)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::proc::gui::View* cedar::proc::gui::Ide::getArchitectureView()
+{
+  return this->mpProcessingDrawer;
+}
+
 void cedar::proc::gui::Ide::Logger::message
      (
        cedar::aux::LOG_LEVEL level,
