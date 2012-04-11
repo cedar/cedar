@@ -155,7 +155,19 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
     if ((*data_con)->getSource()->isParent(boost::shared_dynamic_cast<const cedar::proc::Connectable>(element))
         || (*data_con)->getTarget()->isParent(boost::shared_dynamic_cast<const cedar::proc::Connectable>(element)))
     {
-        data_con = this->removeDataConnection(data_con);
+      mDataConnectionChanged
+      (
+        this->getElement<cedar::proc::Connectable>
+        (
+          (*data_con)->getSource()->getParent())->getOutputSlot((*data_con)->getSource()->getName()
+        ),
+        this->getElement<cedar::proc::Connectable>
+        (
+          (*data_con)->getTarget()->getParent())->getInputSlot((*data_con)->getTarget()->getName()
+        ),
+        false
+      );
+      data_con = this->removeDataConnection(data_con);
     }
     else
     {
@@ -172,6 +184,15 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
     if ((*trigger_con)->getSourceTrigger() == boost::shared_dynamic_cast<const cedar::proc::Trigger>(element)
         || (*trigger_con)->getTarget() == boost::shared_dynamic_cast<const cedar::proc::Triggerable>(element))
     {
+      mTriggerConnectionChanged
+      (
+        this->getElement<cedar::proc::Trigger>((*trigger_con)->getSourceTrigger()->getName()),
+        this->getElement<cedar::proc::Triggerable>
+        (
+          boost::shared_dynamic_cast<const cedar::proc::Element>((*trigger_con)->getTarget())->getName()
+        ),
+        false
+      );
       trigger_con = mTriggerConnections.erase(trigger_con);
     }
     else
@@ -348,6 +369,8 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
   element->setNetwork(boost::shared_static_cast<cedar::proc::Network>(this->shared_from_this()));
 
   this->mElementAddedSignal(this, element);
+  this->mNewElementAddedSignal(element);
+  std::cout << "signal emitted" << std::endl;
 }
 
 cedar::proc::ConstElementPtr cedar::proc::Network::getElement(const std::string& name) const
@@ -1130,6 +1153,22 @@ boost::signals2::connection cedar::proc::Network::connectToDataConnectionChanged
                             )
 {
   return mDataConnectionChanged.connect(slot);
+}
+
+boost::signals2::connection cedar::proc::Network::connectToNewElementAddedSignal
+                            (
+                              boost::function<void (cedar::proc::ElementPtr)> slot
+                            )
+{
+  return mNewElementAddedSignal.connect(slot);
+}
+
+boost::signals2::connection cedar::proc::Network::connectToElementRemovedSignal
+                            (
+                              boost::function<void (cedar::proc::ElementPtr)> slot
+                            )
+{
+  return mElementRemovedSignal.connect(slot);
 }
 
 void cedar::proc::Network::processPromotedSlots()

@@ -102,6 +102,9 @@ mHoldFitToContents(false)
     boost::bind(&cedar::proc::gui::Network::checkTriggerConnection, this, _1, _2, _3)
   );
 
+  mNetwork->connectToNewElementAddedSignal(boost::bind(&cedar::proc::gui::Network::processStepAddedSignal, this, _1));
+  mNetwork->connectToElementRemovedSignal(boost::bind(&cedar::proc::gui::Network::processStepRemovedSignal, this, _1));
+
   this->update();
   this->checkSlots();
 }
@@ -346,7 +349,7 @@ void cedar::proc::gui::Network::addElementsToScene(cedar::proc::gui::Scene* pSce
   this->addNetworksToScene();
   this->addStepsToScene();
   this->addTriggersToScene();
-  this->addConnections();
+//  this->addConnections();
   if (!this->isRootNetwork())
   {
     this->fitToContents();
@@ -651,31 +654,31 @@ void cedar::proc::gui::Network::readScene(cedar::aux::ConfigurationNode& root)
     const std::string& type = iter->second.get<std::string>("type");
     if (type == "step")
     {
-      try
-      {
-        cedar::proc::gui::StepItem *p_step = new cedar::proc::gui::StepItem(this->mpMainWindow);
-        p_step->readConfiguration(iter->second);
-        try
-        {
-          std::string step_name = iter->second.get<std::string>("step");
-          cedar::proc::StepPtr step = mNetwork->getElement<cedar::proc::Step>(step_name);
-          p_step->setStep(step);
-        }
-        catch (const boost::property_tree::ptree_bad_path&)
-        {
-          CEDAR_THROW
-          (
-            cedar::proc::gui::InvalidStepNameException,
-            "Cannot read StepItem from file: no step name given."
-          );
-        }
-        this->mpStepsToAdd.push_back(p_step);
-      }
-      catch (const cedar::proc::gui::InvalidStepNameException&)
-      {
-        //!@todo warn in the gui
-        std::cout << "Invalid step item found in " << this->mFileName << std::endl;
-      }
+//      try
+//      {
+//        cedar::proc::gui::StepItem *p_step = new cedar::proc::gui::StepItem(this->mpMainWindow);
+//        p_step->readConfiguration(iter->second);
+//        try
+//        {
+//          std::string step_name = iter->second.get<std::string>("step");
+//          cedar::proc::StepPtr step = mNetwork->getElement<cedar::proc::Step>(step_name);
+//          p_step->setStep(step);
+//        }
+//        catch (const boost::property_tree::ptree_bad_path&)
+//        {
+//          CEDAR_THROW
+//          (
+//            cedar::proc::gui::InvalidStepNameException,
+//            "Cannot read StepItem from file: no step name given."
+//          );
+//        }
+//        this->mpStepsToAdd.push_back(p_step);
+//      }
+//      catch (const cedar::proc::gui::InvalidStepNameException&)
+//      {
+//        //!@todo warn in the gui
+//        std::cout << "Invalid step item found in " << this->mFileName << std::endl;
+//      }
     }
     else if (type == "trigger")
     {
@@ -945,14 +948,14 @@ void cedar::proc::gui::Network::checkTriggerConnection
        bool added
      )
 {
-  std::cout << "checkTriggerConnection" << std::endl;
   cedar::proc::gui::TriggerItem* source_element
     = dynamic_cast<cedar::proc::gui::TriggerItem*>
       (
         this->mpScene->getGraphicsItemFor
         (
           this->network()->getElement(source->getName()).get()
-        ));
+        )
+      );
   cedar::proc::gui::GraphicsBase* target_element
     = this->mpScene->getGraphicsItemFor
       (
@@ -978,4 +981,18 @@ void cedar::proc::gui::Network::checkTriggerConnection
       }
     }
   }
+}
+
+void cedar::proc::gui::Network::processStepAddedSignal(cedar::proc::ElementPtr element)
+{
+  std::cout << "Step added at " << this->mNetwork->getName() << std::endl;
+  if (cedar::proc::StepPtr step = boost::shared_dynamic_cast<cedar::proc::Step>(element))
+  {
+    this->mpScene->addProcessingStep(step, QPointF(0, 0));
+  }
+}
+
+void cedar::proc::gui::Network::processStepRemovedSignal(cedar::proc::ElementPtr)
+{
+  std::cout << "Step removed from " << this->mNetwork->getName() << std::endl;
 }
