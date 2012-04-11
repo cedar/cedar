@@ -108,14 +108,43 @@ void cedar::aux::gui::PropertyPane::disconnect(cedar::aux::ConfigurablePtr pConf
       iter != pConfigurable->getParameters().end();
       ++iter)
   {
+    cedar::aux::ParameterPtr parameter = *iter;
+
     // disconnect everything between the parameter and this
-    if (!QObject::disconnect(iter->get(), 0, this, 0))
+    if (!QObject::disconnect(parameter.get(), 0, this, 0))
     {
       cedar::aux::LogSingleton::getInstance()->warning
       (
         "Could not disconnect the slots of the Property pane.",
         "cedar::proc::gui::PropertyPane::disconnect(cedar::aux::ConfigurablePtr)"
       );
+    }
+
+    // check if parameter is an object parameter
+    if
+    (
+      cedar::aux::ObjectParameterPtr object_parameter
+        = boost::dynamic_pointer_cast<cedar::aux::ObjectParameter>(parameter)
+    )
+    {
+      cedar::aux::ConfigurablePtr configurable = object_parameter->getConfigurable();
+      this->disconnect(configurable);
+    }
+
+    // check if parameter is an object list parameter
+    if
+    (
+      cedar::aux::ObjectListParameterPtr list_parameter
+        = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter)
+    )
+    {
+      QObject::connect(list_parameter.get(), SIGNAL(valueChanged()), this, SLOT(redraw()));
+
+      for (size_t i = 0; i < list_parameter->size(); ++i)
+      {
+        cedar::aux::ConfigurablePtr configurable = list_parameter->configurableAt(i);
+        this->disconnect(configurable);
+      }
     }
   }
 
@@ -125,6 +154,7 @@ void cedar::aux::gui::PropertyPane::disconnect(cedar::aux::ConfigurablePtr pConf
   {
     this->disconnect(iter->second);
   }
+
 }
 
 std::string cedar::aux::gui::PropertyPane::getInstanceTypeId(cedar::aux::ConfigurablePtr pConfigurable) const
