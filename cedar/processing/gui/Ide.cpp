@@ -567,8 +567,6 @@ void cedar::proc::gui::Ide::logError(const std::string& message)
   this->mpLog->append("<font color=\"red\"><b>" + QString::fromStdString(message) + "</b></font>\n");
 }
 
-
-
 void cedar::proc::gui::Ide::startThreads()
 {
   cedar::proc::Manager::getInstance().startThreads();

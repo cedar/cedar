@@ -212,6 +212,7 @@ void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 
 void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEvent)
 {
+  std::cout << "cedar::proc::gui::Scene::mousePressEvent" << std::endl;
   switch (this->mMode)
   {
     default:
