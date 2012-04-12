@@ -550,6 +550,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
                   = p_source->getSlot()->getParent() + std::string(".") + p_source->getSlot()->getName();
                 std::string target_name
                   = p_data_target->getSlot()->getParent() + std::string(".") + p_data_target->getSlot()->getName();
+                std::cout << "Source,Target: " << source_name << " " << target_name << std::endl;
                 //!@todo this code is really messy, think about restructuring the GUI
                 if
                 (
@@ -694,18 +695,23 @@ void cedar::proc::gui::Scene::addElement(const std::string& classId, QPointF pos
   try
   {
     mNetwork->network()->add(classId, adjusted_name);
-    if (cedar::proc::StepPtr step = mNetwork->network()->getElement<cedar::proc::Step>(adjusted_name))
-    {
-      this->addProcessingStep(step, position);
-    }
-    else if (cedar::proc::TriggerPtr trigger = mNetwork->network()->getElement<cedar::proc::Trigger>(adjusted_name))
-    {
-      this->addTrigger(trigger, position);
-    }
-    else
-    {
-      CEDAR_THROW(cedar::proc::InvalidNameException, "name not known to network");
-    }
+    /*@todo check if this works in all cases since adding an item triggers a signal/slot chain,
+     * which may not been processed completely
+     */
+    CEDAR_DEBUG_ASSERT(mNetwork->network()->getElement<cedar::proc::Element>(adjusted_name).get());
+    this->getGraphicsItemFor(mNetwork->network()->getElement<cedar::proc::Element>(adjusted_name).get())->setPos(position);
+//    if (cedar::proc::StepPtr step = mNetwork->network()->getElement<cedar::proc::Step>(adjusted_name))
+//    {
+//      this->addProcessingStep(step, position);
+//    }
+//    else if (cedar::proc::TriggerPtr trigger = mNetwork->network()->getElement<cedar::proc::Trigger>(adjusted_name))
+//    {
+//      this->addTrigger(trigger, position);
+//    }
+//    else
+//    {
+//      CEDAR_THROW(cedar::proc::InvalidNameException, "name not known to network");
+//    }
   }
   catch(const cedar::aux::ExceptionBase& e)
   {
@@ -774,6 +780,7 @@ cedar::proc::gui::Network* cedar::proc::gui::Scene::addNetwork(const QPointF& po
   cedar::proc::gui::Network *network_item = new cedar::proc::gui::Network
                                                 (
                                                   this->mpMainWindow,
+                                                  this,
                                                   10,
                                                   10,
                                                   network
@@ -818,6 +825,7 @@ void cedar::proc::gui::Scene::addProcessingStep(cedar::proc::StepPtr step, QPoin
 
 void cedar::proc::gui::Scene::addStepItem(cedar::proc::gui::StepItem *pStep)
 {
+  std::cout << "Scene::addStepItem()" << std::endl;
   this->addItem(pStep);
   // we assume that steps are only inserted once.
   CEDAR_DEBUG_ASSERT(this->mStepMap.find(pStep->getStep().get()) == this->mStepMap.end());

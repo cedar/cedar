@@ -65,11 +65,18 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::Network::Network(QMainWindow *pMainWindow, qreal width, qreal height, cedar::proc::NetworkPtr network)
+cedar::proc::gui::Network::Network
+(
+  QMainWindow *pMainWindow,
+  cedar::proc::gui::Scene* scene,
+  qreal width,
+  qreal height,
+  cedar::proc::NetworkPtr network
+)
 :
 GraphicsBase(width, height, GRAPHICS_GROUP_NETWORK),
 mNetwork(network),
-mpScene(NULL),
+mpScene(scene),
 mpMainWindow(pMainWindow),
 mHoldFitToContents(false)
 {
@@ -341,10 +348,8 @@ const std::string& cedar::proc::gui::Network::getFileName() const
   return this->mFileName;
 }
 
-void cedar::proc::gui::Network::addElementsToScene(cedar::proc::gui::Scene* pScene)
+void cedar::proc::gui::Network::addElementsToScene()
 {
-  this->setScene(pScene);
-
   //!@todo a lot of the code in these functions should probably be cleaned up and moved to the respective classes.
   this->addNetworksToScene();
   this->addStepsToScene();
@@ -371,7 +376,7 @@ void cedar::proc::gui::Network::addNetworksToScene()
   {
     cedar::proc::gui::Network *p_network = this->mpNetworksToAdd.at(i);
     this->mpScene->addNetworkItem(p_network);
-    p_network->addElementsToScene(this->mpScene);
+    p_network->addElementsToScene();
   }
 
   this->mpNetworksToAdd.clear();
@@ -379,33 +384,33 @@ void cedar::proc::gui::Network::addNetworksToScene()
 
 void cedar::proc::gui::Network::addStepsToScene()
 {
-  for (size_t i = 0; i < this->mpStepsToAdd.size(); ++i)
-  {
-    cedar::proc::gui::StepItem *p_step_item = this->mpStepsToAdd.at(i);
-    this->mpScene->addStepItem(p_step_item);
-
-    if (!this->isRootNetwork())
-    {
-      p_step_item->setParentItem(this);
-    }
-  }
-  this->mpStepsToAdd.clear();
+//  for (size_t i = 0; i < this->mpStepsToAdd.size(); ++i)
+//  {
+//    cedar::proc::gui::StepItem *p_step_item = this->mpStepsToAdd.at(i);
+//    this->mpScene->addStepItem(p_step_item);
+//
+//    if (!this->isRootNetwork())
+//    {
+//      p_step_item->setParentItem(this);
+//    }
+//  }
+//  this->mpStepsToAdd.clear();
 
   // add StepItems for steps that don't have one yet (i.e., for which none was present in the configuration tree)
-  for (
-        cedar::proc::Network::ElementMapConstIterator it = this->mNetwork->elements().begin();
-        it != this->mNetwork->elements().end();
-        ++it
-      )
-  {
-    if (cedar::proc::StepPtr step = mNetwork->getElement<cedar::proc::Step>(it->second->getName()))
-    {
-      if (this->mpScene->stepMap().find(step.get()) == this->mpScene->stepMap().end())
-      {
-        this->mpScene->addProcessingStep(step, QPointF(0, 0));
-      }
-    }
-  }
+//  for (
+//        cedar::proc::Network::ElementMapConstIterator it = this->mNetwork->elements().begin();
+//        it != this->mNetwork->elements().end();
+//        ++it
+//      )
+//  {
+//    if (cedar::proc::StepPtr step = mNetwork->getElement<cedar::proc::Step>(it->second->getName()))
+//    {
+//      if (this->mpScene->stepMap().find(step.get()) == this->mpScene->stepMap().end())
+//      {
+//        this->mpScene->addProcessingStep(step, QPointF(0, 0));
+//      }
+//    }
+//  }
 }
 
 void cedar::proc::gui::Network::addConnections()
@@ -722,7 +727,7 @@ void cedar::proc::gui::Network::readScene(cedar::aux::ConfigurationNode& root)
           CEDAR_THROW(cedar::aux::InvalidNameException, "Cannot read NetworkItem from file: no network name given.");
         }
         cedar::proc::NetworkPtr network = this->mNetwork->getElement<cedar::proc::Network>(network_name);
-        cedar::proc::gui::Network *p_network = new cedar::proc::gui::Network(this->mpMainWindow, 10.0, 10.0, network);
+        cedar::proc::gui::Network *p_network = new cedar::proc::gui::Network(this->mpMainWindow, this->getScene(), 10.0, 10.0, network);
 
         // let the subnetwork read its ui stuff too
         try
@@ -948,14 +953,28 @@ void cedar::proc::gui::Network::checkTriggerConnection
        bool added
      )
 {
-  cedar::proc::gui::TriggerItem* source_element
-    = dynamic_cast<cedar::proc::gui::TriggerItem*>
-      (
-        this->mpScene->getGraphicsItemFor
+  /*@todo this is a quick fix: for processingDone triggers, there is no graphical representation.
+   * A signal is emitted regardless of the missing representation. This fails in finding "processingDone" in the current
+   * network and results in an InvalidNameException. This exception is caught here. A debug assert assures that no other
+   * element caused this exception.
+   */
+  cedar::proc::gui::TriggerItem* source_element;
+  try
+  {
+    source_element
+      = dynamic_cast<cedar::proc::gui::TriggerItem*>
         (
-          this->network()->getElement(source->getName()).get()
-        )
-      );
+          this->mpScene->getGraphicsItemFor
+          (
+            this->network()->getElement(source->getName()).get()
+          )
+        );
+  }
+  catch(cedar::proc::InvalidNameException& exc)
+  {
+    CEDAR_DEBUG_ASSERT(source->getName() == "processingDone");
+    return;
+  }
   cedar::proc::gui::GraphicsBase* target_element
     = this->mpScene->getGraphicsItemFor
       (
@@ -985,10 +1004,45 @@ void cedar::proc::gui::Network::checkTriggerConnection
 
 void cedar::proc::gui::Network::processStepAddedSignal(cedar::proc::ElementPtr element)
 {
-  std::cout << "Step added at " << this->mNetwork->getName() << std::endl;
+  std::cout << element->getName() << " added at " << this->mNetwork->getName() << std::endl;
+  // store the type, which can be compared to entries in a configuration node
+  std::string current_type;
   if (cedar::proc::StepPtr step = boost::shared_dynamic_cast<cedar::proc::Step>(element))
   {
     this->mpScene->addProcessingStep(step, QPointF(0, 0));
+    current_type = "step";
+  }
+  else if (cedar::proc::NetworkPtr network = boost::shared_dynamic_cast<cedar::proc::Network>(element))
+  {
+    this->mpScene->addNetwork(QPointF(0, 0), network);
+    current_type = "network";
+  }
+  else if (cedar::proc::TriggerPtr trigger = boost::shared_dynamic_cast<cedar::proc::Trigger>(element))
+  {
+    this->mpScene->addTrigger(trigger, QPointF(0, 0));
+    current_type = "trigger";
+  }
+  cedar::aux::ConfigurationNode ui = this->network()->getLastReadUINode();
+  for (cedar::aux::ConfigurationNode::iterator iter = ui.begin(); iter != ui.end(); ++iter)
+  {
+    const std::string& type = iter->second.get<std::string>("type");
+    if (type == current_type)
+    {
+      if (type == "step")
+      {
+        if (iter->second.get<std::string>("step") == element->getName())
+        {
+          this->mpScene->getStepItemFor(static_cast<cedar::proc::Step*>(element.get()))->readConfiguration(iter->second);
+        }
+      }
+      else if (type == "trigger")
+      {
+        if (iter->second.get<std::string>("trigger") == element->getName())
+        {
+          this->mpScene->getTriggerItemFor(static_cast<cedar::proc::Trigger*>(element.get()))->readConfiguration(iter->second);
+        }
+      }
+    }
   }
 }
 

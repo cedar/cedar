@@ -101,6 +101,10 @@ public:
    */
   void keyPressEvent(QKeyEvent* pEvent);
 
+  /*!@brief Resets the current scene and displays the new network.
+   */
+  void resetTo(cedar::proc::gui::NetworkPtr network);
+
 public slots:
   /*!@brief Slot that is called whenever a different item is selected in the cedar::proc::gui::Scene.
    *
@@ -155,10 +159,6 @@ public slots:
   /*!@brief Loads a network file specified by the path.
    */
   void loadFile(QString path);
-
-  /*!@brief Resets the current scene and displays the new network.
-   */
-  void resetTo(cedar::proc::gui::NetworkPtr network);
 
   /*!@brief Opens the load plugin dialog.
    */

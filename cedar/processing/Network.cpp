@@ -626,7 +626,11 @@ void cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode& root)
       "cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode&)"
     );
   }
-
+  // store latest
+  if (root.find("ui") != root.not_found())
+  {
+    mLastReadUINode = root.find("ui")->second;
+  }
   switch (format_version)
   {
     default:

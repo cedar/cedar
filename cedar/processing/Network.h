@@ -283,6 +283,11 @@ public:
 
   void processPromotedSlots();
 
+  const cedar::aux::ConfigurationNode& getLastReadUINode()
+  {
+    return this->mLastReadUINode;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -370,6 +375,8 @@ private:
 
   //! List of trigger connections in the network.
   TriggerConnectionVector mTriggerConnections;
+
+  cedar::aux::ConfigurationNode mLastReadUINode;
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals
