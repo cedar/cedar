@@ -283,7 +283,7 @@ public:
 
   void processPromotedSlots();
 
-  const cedar::aux::ConfigurationNode& getLastReadUINode()
+  cedar::aux::ConfigurationNode& getLastReadUINode()
   {
     return this->mLastReadUINode;
   }

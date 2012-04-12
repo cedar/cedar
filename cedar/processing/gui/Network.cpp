@@ -1022,7 +1022,7 @@ void cedar::proc::gui::Network::processStepAddedSignal(cedar::proc::ElementPtr e
     this->mpScene->addTrigger(trigger, QPointF(0, 0));
     current_type = "trigger";
   }
-  cedar::aux::ConfigurationNode ui = this->network()->getLastReadUINode();
+  cedar::aux::ConfigurationNode& ui = this->network()->getLastReadUINode();
   for (cedar::aux::ConfigurationNode::iterator iter = ui.begin(); iter != ui.end(); ++iter)
   {
     const std::string& type = iter->second.get<std::string>("type");
@@ -1032,14 +1032,24 @@ void cedar::proc::gui::Network::processStepAddedSignal(cedar::proc::ElementPtr e
       {
         if (iter->second.get<std::string>("step") == element->getName())
         {
-          this->mpScene->getStepItemFor(static_cast<cedar::proc::Step*>(element.get()))->readConfiguration(iter->second);
+          this->mpScene->getStepItemFor
+          (
+            static_cast<cedar::proc::Step*>(element.get())
+          )->readConfiguration(iter->second);
+          ui.erase(iter);
+          return;
         }
       }
       else if (type == "trigger")
       {
         if (iter->second.get<std::string>("trigger") == element->getName())
         {
-          this->mpScene->getTriggerItemFor(static_cast<cedar::proc::Trigger*>(element.get()))->readConfiguration(iter->second);
+          this->mpScene->getTriggerItemFor
+          (
+            static_cast<cedar::proc::Trigger*>(element.get())
+          )->readConfiguration(iter->second);
+          ui.erase(iter);
+          return;
         }
       }
     }

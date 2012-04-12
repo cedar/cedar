@@ -368,9 +368,8 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
   }
   element->setNetwork(boost::shared_static_cast<cedar::proc::Network>(this->shared_from_this()));
 
-  this->mElementAddedSignal(this, element);
   this->mNewElementAddedSignal(element);
-  std::cout << "signal emitted" << std::endl;
+  this->mElementAddedSignal(this, element);
 }
 
 cedar::proc::ConstElementPtr cedar::proc::Network::getElement(const std::string& name) const
@@ -863,10 +862,10 @@ void cedar::proc::Network::readNetworks(const cedar::aux::ConfigurationNode& roo
         (
           cedar::proc::DeclarationRegistrySingleton::getInstance()->allocateClass("cedar.processing.Network")
         );
-    network->readFrom(network_node);
     network->setName(network_name);
-    // is this enough to recursively read in the network?
     this->add(network);
+    network->readFrom(network_node);
+    // is this enough to recursively read in the network?
     network->resetChangedStates(false);
   }
 }
