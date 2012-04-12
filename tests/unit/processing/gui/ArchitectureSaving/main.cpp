@@ -54,8 +54,9 @@
 #include "cedar/processing/Step.h"
 
 // SYSTEM INCLUDES
-#include <iostream>
 #include <QApplication>
+#include <boost/filesystem.hpp>
+#include <iostream>
 
 void simulateEventLoop()
 {
@@ -90,6 +91,8 @@ int testSaving(cedar::proc::gui::Ide *pIde)
   CEDAR_DEBUG_ASSERT(!p_field_item->isSelected());
 
   p_gui_network->write("test.json");
+
+  boost::filesystem::remove("test.json");
 
   return errors;
 }
