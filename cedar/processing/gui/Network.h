@@ -74,6 +74,7 @@ public:
   Network
   (
     QMainWindow *pMainWindow,
+    cedar::proc::gui::Scene* scene,
     qreal width = 0,
     qreal height = 0,
     cedar::proc::NetworkPtr network = cedar::proc::NetworkPtr()
@@ -97,7 +98,7 @@ public:
   cedar::proc::NetworkPtr network();
 
   //!@brief add all elements contained in this network to the scene
-  void addElementsToScene(cedar::proc::gui::Scene* pScene);
+  void addElementsToScene();
 
   //!@brief get the current file, to which the network configuration can be saved
   const std::string& getFileName() const;
@@ -131,6 +132,11 @@ public:
   QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value);
 
   bool sceneEventFilter(QGraphicsItem *pWatched, QEvent *pEvent);
+
+  cedar::proc::gui::Scene* getScene()
+  {
+    return this->mpScene;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
