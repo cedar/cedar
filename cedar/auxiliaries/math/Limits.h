@@ -73,6 +73,40 @@ struct cedar::aux::math::Limits
   }
 
   //--------------------------------------------------------------------------------------------------------------------
+  // methods
+  //--------------------------------------------------------------------------------------------------------------------
+
+  /*!@brief Checks whether a given value is within the limits.
+   * @param[in] value the value to be checked
+   */
+  bool isInLimits(const T& value)
+  {
+    if (value < mLowerLimit || value > mUppperLimit)
+    {
+      return false;
+    }
+    return true;
+  }
+
+  /*!@brief Tresholds a value if it is outside of the limits.
+   * If the value is below the lower limit, the method will set the value to the lower limit.
+   * If the value is above the upper limit, the method will set the value to the upper limit.
+   * If the value is within the limits, the method will not change the value.
+   * @param[in] value the value to be thresholded
+   */
+  void threshold(const T& value)
+  {
+    if (value < mLowerLimit)
+    {
+      value = mLowerLimit;
+    }
+    else if (value > mUpperLimit)
+    {
+      value = mUpperLimit;
+    }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
   //! minimum limit
