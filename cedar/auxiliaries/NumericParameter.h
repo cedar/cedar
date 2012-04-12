@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/ParameterTemplate.h"
 
 // SYSTEM INCLUDES
+#include <boost/numeric/conversion/bounds.hpp>
 
 
 /*!@brief A base class template for numeric parameters.
@@ -60,12 +61,16 @@ class cedar::aux::NumericParameter : public cedar::aux::ParameterTemplate<T>
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The constructor.
-  NumericParameter(cedar::aux::Configurable *pOwner,
-                   const std::string& name,
-                   const T& defaultValue,
-                   const T& minimum,
-                   const T& maximum)
+  /*!@brief The constructor.
+   */
+  NumericParameter
+  (
+    cedar::aux::Configurable *pOwner,
+    const std::string& name,
+    const T& defaultValue,
+    const T& minimum,
+    const T& maximum
+  )
   :
   cedar::aux::ParameterTemplate<T>(pOwner, name, defaultValue),
   mMinimum(minimum),
@@ -73,11 +78,29 @@ public:
   {
   }
 
+  /*!@brief The constructor, with default minimum and maximum.
+   */
+  NumericParameter
+  (
+    cedar::aux::Configurable *pOwner,
+    const std::string& name,
+    const T& defaultValue
+  )
+  :
+  cedar::aux::ParameterTemplate<T>(pOwner, name, defaultValue),
+  mMinimum(boost::numeric::bounds<T>::lowest()),
+  mMaximum(boost::numeric::bounds<T>::highest())
+  {
+  }
+
   //!@brief The constructor.
-  NumericParameter(cedar::aux::Configurable *pOwner,
-                   const std::string& name,
-                   const T& minimum,
-                   const T& maximum)
+  NumericParameter
+  (
+    cedar::aux::Configurable *pOwner,
+    const std::string& name,
+    const T& minimum,
+    const T& maximum
+  )
   :
   cedar::aux::ParameterTemplate<T>(pOwner, name),
   mMinimum(minimum),
