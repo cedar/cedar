@@ -687,67 +687,67 @@ void cedar::proc::gui::Network::readScene(cedar::aux::ConfigurationNode& root)
     }
     else if (type == "trigger")
     {
-      try
-      {
-        cedar::proc::gui::TriggerItem *p_trigger = new cedar::proc::gui::TriggerItem();
-        p_trigger->readConfiguration(iter->second);
-        try
-        {
-          std::string trigger_name = iter->second.get<std::string>("trigger");
-          cedar::proc::TriggerPtr trigger = mNetwork->getElement<cedar::proc::Trigger>(trigger_name);
-          p_trigger->setTrigger(trigger);
-        }
-        catch (const boost::property_tree::ptree_bad_path&)
-        {
-          CEDAR_THROW
-          (
-            cedar::proc::gui::InvalidTriggerNameException,
-            "Cannot read TriggerItem from file: no trigger name given."
-          );
-        }
-        this->mpTriggersToAdd.push_back(p_trigger);
-      }
-      catch (const cedar::proc::gui::InvalidTriggerNameException&)
-      {
-        //!@todo warn in the gui
-        std::cout << "Invalid trigger item found in " << this->mFileName << std::endl;
-      }
+//      try
+//      {
+//        cedar::proc::gui::TriggerItem *p_trigger = new cedar::proc::gui::TriggerItem();
+//        p_trigger->readConfiguration(iter->second);
+//        try
+//        {
+//          std::string trigger_name = iter->second.get<std::string>("trigger");
+//          cedar::proc::TriggerPtr trigger = mNetwork->getElement<cedar::proc::Trigger>(trigger_name);
+//          p_trigger->setTrigger(trigger);
+//        }
+//        catch (const boost::property_tree::ptree_bad_path&)
+//        {
+//          CEDAR_THROW
+//          (
+//            cedar::proc::gui::InvalidTriggerNameException,
+//            "Cannot read TriggerItem from file: no trigger name given."
+//          );
+//        }
+//        this->mpTriggersToAdd.push_back(p_trigger);
+//      }
+//      catch (const cedar::proc::gui::InvalidTriggerNameException&)
+//      {
+//        //!@todo warn in the gui
+//        std::cout << "Invalid trigger item found in " << this->mFileName << std::endl;
+//      }
     }
     else if (type == "network")
     {
-      try
-      {
-        std::string network_name;
-        try
-        {
-          network_name = iter->second.get<std::string>("network");
-        }
-        catch(const boost::property_tree::ptree_bad_path&)
-        {
-          CEDAR_THROW(cedar::aux::InvalidNameException, "Cannot read NetworkItem from file: no network name given.");
-        }
-        cedar::proc::NetworkPtr network = this->mNetwork->getElement<cedar::proc::Network>(network_name);
-        cedar::proc::gui::Network *p_network = new cedar::proc::gui::Network(this->mpMainWindow, this->getScene(), 10.0, 10.0, network);
-
-        // let the subnetwork read its ui stuff too
-        try
-        {
-          cedar::aux::ConfigurationNode& networks = root.get_child("networks");
-          cedar::aux::ConfigurationNode& network_node = networks.get_child(network->getName());
-          p_network->readScene(network_node);
-        }
-        catch(const boost::property_tree::ptree_bad_path&)
-        {
-          std::cout << "Warninig: could not find ui node for network " << network->getName() << std::endl;
-        }
-
-        this->mpNetworksToAdd.push_back(p_network);
-      }
-      catch(const cedar::aux::InvalidNameException&)
-      {
-        //!@todo warn in the gui
-        std::cout << "Invalid network item found in " << this->mFileName << std::endl;
-      }
+//      try
+//      {
+//        std::string network_name;
+//        try
+//        {
+//          network_name = iter->second.get<std::string>("network");
+//        }
+//        catch(const boost::property_tree::ptree_bad_path&)
+//        {
+//          CEDAR_THROW(cedar::aux::InvalidNameException, "Cannot read NetworkItem from file: no network name given.");
+//        }
+//        cedar::proc::NetworkPtr network = this->mNetwork->getElement<cedar::proc::Network>(network_name);
+//        cedar::proc::gui::Network *p_network = new cedar::proc::gui::Network(this->mpMainWindow, this->getScene(), 10.0, 10.0, network);
+//
+//        // let the subnetwork read its ui stuff too
+//        try
+//        {
+//          cedar::aux::ConfigurationNode& networks = root.get_child("networks");
+//          cedar::aux::ConfigurationNode& network_node = networks.get_child(network->getName());
+//          p_network->readScene(network_node);
+//        }
+//        catch(const boost::property_tree::ptree_bad_path&)
+//        {
+//          std::cout << "Warninig: could not find ui node for network " << network->getName() << std::endl;
+//        }
+//
+//        this->mpNetworksToAdd.push_back(p_network);
+//      }
+//      catch(const cedar::aux::InvalidNameException&)
+//      {
+//        //!@todo warn in the gui
+//        std::cout << "Invalid network item found in " << this->mFileName << std::endl;
+//      }
     }
     else
     {
