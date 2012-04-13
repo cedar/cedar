@@ -43,6 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/math/Limits.h"
 
 // SYSTEM INCLUDES
 #include <boost/numeric/conversion/bounds.hpp>
@@ -54,8 +55,10 @@ template <typename T>
 class cedar::aux::NumericParameter : public cedar::aux::ParameterTemplate<T>
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef cedar::aux::math::Limits<T> LimitType;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -73,8 +76,7 @@ public:
   )
   :
   cedar::aux::ParameterTemplate<T>(pOwner, name, defaultValue),
-  mMinimum(minimum),
-  mMaximum(maximum)
+  mLimits(minimum, maximum)
   {
   }
 
@@ -84,12 +86,12 @@ public:
   (
     cedar::aux::Configurable *pOwner,
     const std::string& name,
-    const T& defaultValue
+    const T& defaultValue,
+    const LimitType& limits = LimitType::full()
   )
   :
   cedar::aux::ParameterTemplate<T>(pOwner, name, defaultValue),
-  mMinimum(boost::numeric::bounds<T>::lowest()),
-  mMaximum(boost::numeric::bounds<T>::highest())
+  mLimits(limits)
   {
   }
 
@@ -103,8 +105,20 @@ public:
   )
   :
   cedar::aux::ParameterTemplate<T>(pOwner, name),
-  mMinimum(minimum),
-  mMaximum(maximum)
+  mLimits(minimum, maximum)
+  {
+  }
+
+  //!@brief The constructor.
+  NumericParameter
+  (
+    cedar::aux::Configurable *pOwner,
+    const std::string& name,
+    const LimitType& limits = LimitType::full()
+  )
+  :
+  cedar::aux::ParameterTemplate<T>(pOwner, name),
+  mLimits(limits)
   {
   }
 
@@ -120,13 +134,13 @@ public:
   //!@brief get the minimum value of this parameter
   const T& getMinimum() const
   {
-    return this->mMinimum;
+    return this->mLimits.getLower();
   }
 
   //!@brief set the minimum value of this parameter
   void setMinimum(const T& value)
   {
-    this->mMinimum = value;
+    this->mLimits.setLower(value);
 
     this->emitPropertyChangedSignal();
   }
@@ -134,13 +148,13 @@ public:
   //!@brief get the maximum value of this parameter
   const T& getMaximum() const
   {
-    return this->mMaximum;
+    return this->mLimits.getUpper();
   }
 
   //!@brief set the maximum value of this parameter
   void setMaximum(const T& value)
   {
-    this->mMaximum = value;
+    this->mLimits.setUpper(value);
 
     this->emitPropertyChangedSignal();
   }
@@ -163,11 +177,8 @@ private:
 protected:
   // none yet
 private:
-  //!@brief The minimum value, if applicable to the type.
-  T mMinimum;
-
-  //!@brief The maximum value, if applicable to the type.
-  T mMaximum;
+  //!@brief The limits for this parameter.
+  LimitType mLimits;
 
 }; // class cedar::aux::NumericParameter
 
