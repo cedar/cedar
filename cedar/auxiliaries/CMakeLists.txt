@@ -47,6 +47,7 @@ cedar_add_library(cedaraux
   gui/EnumParameter.h
   gui/FileParameter.h
   gui/IntParameter.h
+  gui/Log.h
   gui/ObjectParameter.h
   gui/ObjectListParameter.h
   gui/Parameter.h
@@ -68,6 +69,8 @@ cedar_add_library(cedaraux
   Parameter.h
   kernel/Kernel.h
   kernel/Gauss.h
+  RESOURCES
+  gui/icons/message_icons.qrc
   LINK_LIBRARIES
   cedarunits
 )
