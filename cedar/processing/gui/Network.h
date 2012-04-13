@@ -185,7 +185,7 @@ private:
 
   void processStepAddedSignal(cedar::proc::ElementPtr);
 
-  void processStepRemovedSignal(cedar::proc::ElementPtr);
+  void processStepRemovedSignal(cedar::proc::ConstElementPtr);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

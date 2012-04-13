@@ -56,6 +56,7 @@
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 #include <QPainter>
@@ -116,6 +117,8 @@ cedar::proc::gui::StepItem::~StepItem()
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
   mStateChangedConnection.disconnect();
+
+  cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->removeStepItem(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -525,7 +525,6 @@ void cedar::proc::gui::Ide::deleteElement(QGraphicsItem* pItem)
 //    p_drawer->removeAllConnections();
     p_drawer->getStep()->getNetwork()->remove(p_drawer->getStep());
     this->mpPropertyTable->resetPointer();
-    this->mpProcessingDrawer->getScene()->removeStepItem(p_drawer);
   }
   // delete trigger
   else if (cedar::proc::gui::TriggerItem *p_trigger_drawer = dynamic_cast<cedar::proc::gui::TriggerItem*>(pItem))
@@ -533,7 +532,6 @@ void cedar::proc::gui::Ide::deleteElement(QGraphicsItem* pItem)
     p_trigger_drawer->hide();
 //    p_trigger_drawer->removeAllConnections();
     p_trigger_drawer->getTrigger()->getNetwork()->remove(p_trigger_drawer->getTrigger());
-    this->mpProcessingDrawer->getScene()->removeTriggerItem(p_trigger_drawer);
   }
   // delete network
   else if (cedar::proc::gui::Network *p_network_drawer = dynamic_cast<cedar::proc::gui::Network*>(pItem))
@@ -541,7 +539,6 @@ void cedar::proc::gui::Ide::deleteElement(QGraphicsItem* pItem)
     p_network_drawer->hide();
 //    p_network_drawer->removeAllConnections();
     p_network_drawer->network()->getNetwork()->remove(p_network_drawer->network());
-    this->mpProcessingDrawer->getScene()->removeNetworkItem(p_network_drawer);
   }
   else
   {

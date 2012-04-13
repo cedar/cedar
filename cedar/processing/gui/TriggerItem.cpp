@@ -54,6 +54,7 @@
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 #include <QPainter>
@@ -114,6 +115,7 @@ void cedar::proc::gui::TriggerItem::construct()
 cedar::proc::gui::TriggerItem::~TriggerItem()
 {
   cedar::aux::LogSingleton::getInstance()->freeing(this);
+  cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->removeTriggerItem(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
