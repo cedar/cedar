@@ -205,6 +205,7 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
   {
     mElements.erase(it);
   }
+  this->mElementRemovedSignal(element);
 }
 
 void cedar::proc::Network::add(std::string className, std::string instanceName)
@@ -354,7 +355,7 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
     CEDAR_THROW
     (
       cedar::proc::DuplicateNameException,
-      "Duplicate element name entry \"" + instanceName+ "\" in network \"" + this->getName() + "\""
+      "Duplicate element name entry \"" + instanceName + "\" in network \"" + this->getName() + "\""
     )
   }
   else
@@ -1168,7 +1169,7 @@ boost::signals2::connection cedar::proc::Network::connectToNewElementAddedSignal
 
 boost::signals2::connection cedar::proc::Network::connectToElementRemovedSignal
                             (
-                              boost::function<void (cedar::proc::ElementPtr)> slot
+                              boost::function<void (cedar::proc::ConstElementPtr)> slot
                             )
 {
   return mElementRemovedSignal.connect(slot);

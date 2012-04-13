@@ -55,6 +55,13 @@
 class cedar::proc::gui::Scene : public QGraphicsScene
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::gui::StepItem;
+  friend class cedar::proc::gui::TriggerItem;
+  friend class cedar::proc::gui::Network;
+
+  //--------------------------------------------------------------------------------------------------------------------
   // macros & types
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
@@ -70,16 +77,16 @@ public:
   };
 
   //! Type for associating cedar::proc::Steps to cedar::proc::gui::StepItems.
-  typedef std::map<cedar::proc::Step*, cedar::proc::gui::StepItem*> StepMap;
+  typedef std::map<const cedar::proc::Step*, cedar::proc::gui::StepItem*> StepMap;
 
   //! Type for associating cedar::proc::Triggers to cedar::proc::gui::TriggerItem.
-  typedef std::map<cedar::proc::Trigger*, cedar::proc::gui::TriggerItem*> TriggerMap;
+  typedef std::map<const cedar::proc::Trigger*, cedar::proc::gui::TriggerItem*> TriggerMap;
 
   //! Type for associating cedar::proc::Networks to cedar::proc::gui::Networks.
-  typedef std::map<cedar::proc::Network*, cedar::proc::gui::Network*> NetworkMap;
+  typedef std::map<const cedar::proc::Network*, cedar::proc::gui::Network*> NetworkMap;
 
   //! Type for associating cedar::proc::Elements to cedar::proc::gui::GraphicsBase.
-  typedef std::map<cedar::proc::Element*, cedar::proc::gui::GraphicsBase*> ElementMap;
+  typedef std::map<const cedar::proc::Element*, cedar::proc::gui::GraphicsBase*> ElementMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -143,11 +150,8 @@ public:
 
   /*!@brief Adds a cedar::proc::gui::StepItem to the scene.
    */
-  void addStepItem(cedar::proc::gui::StepItem *pStep);
+  void addStepItem(cedar::proc::gui::StepItem* pStep);
 
-  /*!@brief Removes a cedar::proc::gui::StepItem from the scene.
-   */
-  void removeStepItem(cedar::proc::gui::StepItem *pStep);
 
   /*!@brief Adds a cedar::proc::gui::TriggerItem for the given cedar::proc::Trigger to the scene at the given position.
    */
@@ -155,11 +159,8 @@ public:
 
   /*!@brief Adds a cedar::proc::gui::TriggerItem to the scene.
    */
-  void addTriggerItem(cedar::proc::gui::TriggerItem *pTrigger);
+  void addTriggerItem(cedar::proc::gui::TriggerItem* pTrigger);
 
-  /*!@brief Removes a cedar::proc::gui::TriggerItem from the scene.
-   */
-  void removeTriggerItem(cedar::proc::gui::TriggerItem *pTrigger);
 
   /*!@brief Adds a given network item to the scene.
    */
@@ -169,13 +170,10 @@ public:
     cedar::proc::NetworkPtr network = cedar::proc::NetworkPtr()
   );
 
-  /*!@brief Removes a given network item from the scene.
-   */
-  void removeNetworkItem(cedar::proc::gui::Network *pNetwork);
 
   /*!@brief Adds a given network item to the scene.
    */
-  void addNetworkItem(cedar::proc::gui::Network *pNetwork);
+  void addNetworkItem(cedar::proc::gui::Network* pNetwork);
 
   /*!@brief Sets the current mode, i.e., selection, connecion etc.
    */
@@ -201,6 +199,10 @@ public:
    */
   const TriggerMap& triggerMap() const;
 
+  /*!@brief Returns the gui::network that displays the given network.
+   */
+  cedar::proc::gui::Network* getNetworkFor(cedar::proc::Network* network);
+
   /*!@brief Returns the step item that displays the given step.
    */
   cedar::proc::gui::StepItem* getStepItemFor(cedar::proc::Step* step);
@@ -211,7 +213,7 @@ public:
 
   /*!@brief Returns the cedar::proc::gui::GraphicsBase item corresponding to the given element.
    */
-  cedar::proc::gui::GraphicsBase* getGraphicsItemFor(cedar::proc::Element* trigger);
+  cedar::proc::gui::GraphicsBase* getGraphicsItemFor(const cedar::proc::Element* trigger);
 
   /*!@brief Returns, whether snap-to-grid is true.
    */
@@ -274,6 +276,18 @@ private:
   /*!@brief Adds the names of networks and their subnetworks to an action.
    */
   void addNetworkNames(QMenu* pMenu, cedar::proc::ConstNetworkPtr network, std::string path) const;
+
+  /*!@brief Removes a cedar::proc::gui::TriggerItem from the scene.
+   */
+  void removeTriggerItem(cedar::proc::gui::TriggerItem* pTrigger);
+
+  /*!@brief Removes a cedar::proc::gui::StepItem from the scene.
+   */
+  void removeStepItem(cedar::proc::gui::StepItem* pStep);
+
+  /*!@brief Removes a given network item from the scene.
+   */
+  void removeNetworkItem(cedar::proc::gui::Network* pNetwork);
 
 private slots:
   void promoteElementToExistingGroup();

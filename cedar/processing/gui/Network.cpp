@@ -54,6 +54,7 @@
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 #include <QEvent>
@@ -128,6 +129,8 @@ cedar::proc::gui::Network::~Network()
   {
     mSlotConnection.disconnect();
   }
+
+  cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->removeNetworkItem(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -323,16 +326,20 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
     elems.push_back(element);
   }
   this->mHoldFitToContents = true;
-  for (const_iterator i = elements.begin(); i != elements.end(); ++i)
-  {
-    if (cedar::proc::gui::GraphicsBase *p_element = dynamic_cast<cedar::proc::gui::GraphicsBase *>(*i))
-    {
-      // add to network
-      this->addElement(p_element);
-    }
-  }
-  // move elements
   this->network()->add(elems);
+  // move elements
+//  for (const_iterator i = elements.begin(); i != elements.end(); ++i)
+//  {
+//    if (cedar::proc::gui::GraphicsBase *p_element = dynamic_cast<cedar::proc::gui::GraphicsBase *>(*i))
+//    {
+//      // add to network
+//      this->addElement(p_element);
+//    }
+//  }
+  for (std::list<cedar::proc::ElementPtr>::iterator it = elems.begin(); it != elems.end(); ++it)
+  {
+    this->addElement(this->mpScene->getGraphicsItemFor((*it).get()));
+  }
   this->mHoldFitToContents = false;
   this->fitToContents();
 }
@@ -641,7 +648,7 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, 
   }
 }
 
-
+//!@todo remove this function
 void cedar::proc::gui::Network::readScene(cedar::aux::ConfigurationNode& root)
 {
   this->mpStepsToAdd.clear();
@@ -1056,7 +1063,7 @@ void cedar::proc::gui::Network::processStepAddedSignal(cedar::proc::ElementPtr e
   }
 }
 
-void cedar::proc::gui::Network::processStepRemovedSignal(cedar::proc::ElementPtr)
+void cedar::proc::gui::Network::processStepRemovedSignal(cedar::proc::ConstElementPtr element)
 {
-  std::cout << "Step removed from " << this->mNetwork->getName() << std::endl;
+  delete this->mpScene->getGraphicsItemFor(element.get());
 }
