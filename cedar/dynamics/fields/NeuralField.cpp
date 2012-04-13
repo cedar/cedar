@@ -92,22 +92,68 @@ mSigmoidalActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(50, 50, CV_32F))),
 mLateralInteraction(new cedar::dyn::SpaceCode(cv::Mat::zeros(50, 50, CV_32F))),
 mInputNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mNeuralNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
-mRestingLevel(new cedar::aux::DoubleParameter(this, "restingLevel", -5.0, boost::numeric::bounds<double>::lowest(), 0)),
-mTau(new cedar::aux::DoubleParameter(this, "tau", 100.0, 1.0, 10000.0)),
-mGlobalInhibition(new cedar::aux::DoubleParameter(this, "globalInhibition", -0.01, -100.0, 100.0)),
+mRestingLevel
+(
+  new cedar::aux::DoubleParameter
+  (
+    this,
+    "restingLevel",
+    -5.0,
+    cedar::aux::DoubleParameter::LimitType::negativeZero()
+  )
+),
+mTau
+(
+  new cedar::aux::DoubleParameter
+  (
+    this,
+    "tau",
+    100.0,
+    cedar::aux::DoubleParameter::LimitType::positive()
+  )
+),
+mGlobalInhibition
+(
+  new cedar::aux::DoubleParameter
+  (
+    this,
+    "globalInhibition",
+    -0.01,
+    cedar::aux::DoubleParameter::LimitType::negativeZero()
+  )
+),
 // parameters
-_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 2, 0, 1000)),
-_mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000)),
-_mInputNoiseGain(
-                  new cedar::aux::DoubleParameter
-                  (
-                    this,
-                    "inputNoiseGain",
-                    0.1,
-                    0.0,
-                    boost::numeric::bounds<double>::highest()
-                  )
-                ),
+_mDimensionality
+(
+  new cedar::aux::UIntParameter
+  (
+    this,
+    "dimensionality",
+    2,
+    cedar::aux::UIntParameter::LimitType::positiveZero(1000)
+  )
+),
+_mSizes
+(
+  new cedar::aux::UIntVectorParameter
+  (
+    this,
+    "sizes",
+    2,
+    10,
+    cedar::aux::UIntParameter::LimitType::positive(1000)
+  )
+),
+_mInputNoiseGain
+(
+  new cedar::aux::DoubleParameter
+  (
+    this,
+    "inputNoiseGain",
+    0.1,
+    cedar::aux::DoubleParameter::LimitType::positive()
+  )
+),
 _mSigmoid
 (
   new cedar::dyn::NeuralField::SigmoidParameter
@@ -118,16 +164,13 @@ _mSigmoid
   )
 )
 {
-  _mSizes->makeDefault();
   //default is two modes/kernels for lateral interaction
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
-  this->declareBuffer("activation");
-  this->setBuffer("activation", mActivation);
-  this->declareBuffer("lateralInteraction");
-  this->setBuffer("lateralInteraction", mLateralInteraction);
 
-  this->declareOutput("sigmoid(activation)");
-  this->setOutput("sigmoid(activation)", mSigmoidalActivation);
+  this->declareBuffer("activation", mActivation);
+  this->declareBuffer("lateralInteraction", mLateralInteraction);
+
+  this->declareOutput("sigmoid(activation)", mSigmoidalActivation);
 
   this->declareInputCollection("input");
 
