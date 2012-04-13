@@ -45,6 +45,7 @@
 // SYSTEM INCLUDES
 #include <boost/numeric/conversion/bounds.hpp>
 #include <limits>
+#include <iostream>
 
 
 /*!@brief Structure representing the limits of an interval.
@@ -52,6 +53,15 @@
 template <typename T>
 struct cedar::aux::math::Limits
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend std::ostream& operator<<(std::ostream& stream, const cedar::aux::math::Limits<T>& limits)
+  {
+    stream << "[" << limits.getLower() << ", " << limits.getUpper() << "]";
+    return stream;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -76,6 +86,11 @@ struct cedar::aux::math::Limits
   mLowerLimit(otherLimits.mLowerLimit),
   mUpperLimit(otherLimits.mUpperLimit)
   {
+  }
+
+  inline bool includes(const T& number)
+  {
+    return number >= this->getLower() && number <= this->getUpper();
   }
 
   //!@brief Returns the lower bound of the limits.
@@ -112,7 +127,7 @@ struct cedar::aux::math::Limits
   static Limits positive(const T& upper = boost::numeric::bounds<T>::highest())
   {
     // because smallest == 0 for integers, we have to differentiate here
-    if (std::numeric_limits<T>::is_integer == true)
+    if (std::numeric_limits<T>::is_integer)
     {
       return Limits(1, upper);
     }
@@ -132,13 +147,13 @@ struct cedar::aux::math::Limits
   static Limits negative(const T& lower = boost::numeric::bounds<T>::lowest())
   {
     // because smallest == 0 for integers, we have to differentiate here
-    if (std::numeric_limits<T>::is_integer == true)
+    if (std::numeric_limits<T>::is_integer)
     {
-      return Limits(lower, 1);
+      return Limits(lower, -1);
     }
     else
     {
-      return Limits(lower, boost::numeric::bounds<T>::smallest());
+      return Limits(lower, -boost::numeric::bounds<T>::smallest());
     }
   }
 
@@ -156,5 +171,6 @@ struct cedar::aux::math::Limits
   //! maximum limit
   T mUpperLimit;
 }; // class cedar::aux::math::Limits
+
 
 #endif // CEDAR_AUX_MATH_LIMITS_H
