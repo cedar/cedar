@@ -188,7 +188,6 @@ void cedar::aux::gui::Log::message
 
   switch (level)
   {
-    case cedar::aux::LOG_LEVEL_DEBUG:
     case cedar::aux::LOG_LEVEL_MEM_DEBUG:
 #ifdef DEBUG
       CEDAR_DEBUG_ASSERT(p_level_pane != NULL);
