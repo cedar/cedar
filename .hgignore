@@ -72,3 +72,6 @@ tests/interactive/devices/sensors/PictureGrabber/PictureGrabberTest.cpp.resolve
 tests/unit/devices/sensors/visual/Grabber/grabber.config
 tests/unit/devices/sensors/visual/StereoGrabber/grabber.config
 tests/unit/processing/ArchitectureIO/architecture1.json
+
+syntax: regexp
+^cedar\.conf$
