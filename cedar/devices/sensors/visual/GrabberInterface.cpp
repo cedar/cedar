@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GrabberInterface.h
+    File:        GrabberInterface.cpp
 
     Maintainer:  Georg.Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
-    Description: Header for the @em cedar::Grabber class.
+    Description: Implementation of the @em cedar::GrabberInterface class.
 
     Credits:
 

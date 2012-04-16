@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/devices/sensors/visual/grabbertools/FirewireInterface.h"
+#include "cedar/devices/sensors/visual/grabbertools/LibDcCameraBase.h"
 
 // PROJECT INCLUDES
 
@@ -45,13 +45,19 @@
 #include <boost/lexical_cast.hpp>
 #include <fstream>
 
+
+/*! @file Main file for fwfwCameraSaveCapabilities - a tool for firewire cameras
+ *
+ *  A short program to search for all cameras on the firewire bus and save their capabilities to configuration files
+ *
+ */
+
 // ------------------------------------------------------------------------------------------------------------------
 // The filename where the capabilies of the cameras should be stored in
 // This file could be used as the capability file of this camera
 // for the cedar::dev::sensors::visual::CameraGrabber class
 #define CAP_FILE_NAME(GUID) ("camera_"+boost::lexical_cast<std::string>(GUID)+".capabilities")
 
-using namespace cedar::dev::sensors::visual::grabbertools;
 
 // ------------------------------------------------------------------------------------------------------------------
 // anon. namespace for functions
@@ -71,13 +77,13 @@ namespace
         capFile << featureName << "_is_readable"<< " = " << false << ";\n";
         break;
       
-      //@todo:
-      //case white_balance: red and blue eintragen!! 
-      // jetzt: BLUE wird eingetragen, red nicht. 
-      //  WHITE_BALANCE_RED_V
       
+        //check:
+        //case DC1394_FEATURE_WHITE_BALANCE
+        // now: only WHITE_BALANCE_BLUE_V will be inserted. WHITE_BALANCE_RED_V is ignored
+
       default:
-        
+
         capFile << featureName << "_is_supported"<< " = " << (bool)featureInfo.available << ";\n";
         capFile << featureName << "_is_readable"<< " = " << (bool)featureInfo.readout_capable << ";\n";
         capFile << featureName << "_min_value"<< " = " << featureInfo.min << ";\n";
@@ -87,31 +93,31 @@ namespace
 
         //check supported modes
         dc1394feature_modes_t& supported_modes = featureInfo.modes;
-        
+
         bool mode_auto = false;
         bool mode_manual = false;
         bool mode_one_push = false;
-        
+
         for(unsigned int i=0; i< supported_modes.num; i++)
         {
           switch (supported_modes.modes[i])
           {
-            case DC1394_FEATURE_MODE_MANUAL: 
-                          mode_manual = true; 
-                          break;
-            
-            case DC1394_FEATURE_MODE_AUTO: 
-                          mode_auto = true; 
+            case DC1394_FEATURE_MODE_MANUAL:
+                          mode_manual = true;
                           break;
 
-            case DC1394_FEATURE_MODE_ONE_PUSH_AUTO: 
-                          mode_one_push = true; 
+            case DC1394_FEATURE_MODE_AUTO:
+                          mode_auto = true;
                           break;
-            default: 
+
+            case DC1394_FEATURE_MODE_ONE_PUSH_AUTO:
+                          mode_one_push = true;
+                          break;
+            default:
                           continue;
           }
         }
-        
+
         capFile << featureName << "_is_manual_capable"<< " = " << mode_manual << ";\n";
         capFile << featureName << "_is_one_push_capable"<< " = " << mode_one_push << ";\n";
         capFile << featureName << "_is_auto_capable"<< " = " << mode_auto << ";\n";
@@ -124,7 +130,7 @@ int main(int , char**)
 {
 
   //create firewire interface
-  cedar::dev::sensors::visual::grabbertools::FirewireInterface fw_interface;
+  cedar::dev::sensors::visual::LibDcCameraBase fw_interface;
   
   if (fw_interface.getNumCams() < 1)
   {
@@ -184,7 +190,7 @@ int main(int , char**)
         }
       }
       std::cout << "done.\n";
-      
+
 
     }
     catch (...)

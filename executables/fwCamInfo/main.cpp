@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/devices/sensors/visual/grabbertools/FirewireInterface.h"
+#include "cedar/devices/sensors/visual/grabbertools/LibDcCameraBase.h"
 
 
 // PROJECT INCLUDES
@@ -45,7 +45,12 @@
 #include <dc1394/dc1394.h>
 #include <boost/lexical_cast.hpp>
 
-using namespace cedar::dev::sensors::visual::grabbertools;
+
+/*! @file Main file for fwCamInfo - a tool for firewire cameras
+ *
+ *  A short program to display informations and capabilities of the properties of a given camera on the firewire bus
+ *
+ */
 
 int main(int argc, char *argv[])
 {
@@ -77,7 +82,7 @@ int main(int argc, char *argv[])
   std::cout << "Informations on camera no. " << (int)camera_nr << "\n" <<  std::endl;
 
   //create firewire interface
-  FirewireInterface fw_interface;
+  cedar::dev::sensors::visual::LibDcCameraBase fw_interface;
   
   if (fw_interface.getNumCams() < 1)
   {
