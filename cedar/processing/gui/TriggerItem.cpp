@@ -115,7 +115,11 @@ void cedar::proc::gui::TriggerItem::construct()
 cedar::proc::gui::TriggerItem::~TriggerItem()
 {
   cedar::aux::LogSingleton::getInstance()->freeing(this);
-  cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->removeTriggerItem(this);
+
+  if (this->scene())
+  {
+    cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->removeTriggerItem(this);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

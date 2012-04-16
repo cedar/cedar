@@ -238,6 +238,10 @@ private:
 
   //! Connection to Network's slot changed signal.
   boost::signals2::connection mSlotConnection;
+  boost::signals2::connection mNewElementAddedConnection;
+  boost::signals2::connection mElementRemovedConnection;
+  boost::signals2::connection mTriggerConnectionChangedConnection;
+  boost::signals2::connection mDataConnectionChangedConnection;
 
   //! Fit to contents-calls are temporarily disabled if this is set to true.
   bool mHoldFitToContents;

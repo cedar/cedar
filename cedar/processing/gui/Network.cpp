@@ -107,17 +107,32 @@ mHoldFitToContents(false)
   mSlotConnection
     = mNetwork->connectToSlotChangedSignal(boost::bind(&cedar::proc::gui::Network::checkSlots, this));
 
-  mNetwork->connectToDataConnectionChanged
-  (
-    boost::bind(&cedar::proc::gui::Network::checkDataConnection, this, _1, _2, _3)
-  );
-  mNetwork->connectToTriggerConnectionChanged
-  (
-    boost::bind(&cedar::proc::gui::Network::checkTriggerConnection, this, _1, _2, _3)
-  );
+  mDataConnectionChangedConnection = mNetwork->connectToDataConnectionChanged
+                                     (
+                                       boost::bind(&cedar::proc::gui::Network::checkDataConnection, this, _1, _2, _3)
+                                     );
+  mTriggerConnectionChangedConnection = mNetwork->connectToTriggerConnectionChanged
+                                        (
+                                          boost::bind
+                                          (
+                                            &cedar::proc::gui::Network::checkTriggerConnection,
+                                            this,
+                                            _1,
+                                            _2,
+                                            _3
+                                          )
+                                        );
 
-  mNetwork->connectToNewElementAddedSignal(boost::bind(&cedar::proc::gui::Network::processStepAddedSignal, this, _1));
-  mNetwork->connectToElementRemovedSignal(boost::bind(&cedar::proc::gui::Network::processStepRemovedSignal, this, _1));
+  mNewElementAddedConnection
+    = mNetwork->connectToNewElementAddedSignal
+      (
+        boost::bind(&cedar::proc::gui::Network::processStepAddedSignal, this, _1)
+      );
+  mElementRemovedConnection
+    = mNetwork->connectToElementRemovedSignal
+      (
+        boost::bind(&cedar::proc::gui::Network::processStepRemovedSignal, this, _1)
+      );
 
   this->update();
   this->checkSlots();
@@ -130,6 +145,26 @@ cedar::proc::gui::Network::~Network()
   if (mSlotConnection.connected())
   {
     mSlotConnection.disconnect();
+  }
+  if (mNewElementAddedConnection.connected())
+  {
+    mNewElementAddedConnection.disconnect();
+  }
+  if (mElementRemovedConnection.connected())
+  {
+    mElementRemovedConnection.disconnect();
+  }
+  if (mElementRemovedConnection.connected())
+  {
+    mElementRemovedConnection.disconnect();
+  }
+  if (mDataConnectionChangedConnection.connected())
+  {
+    mDataConnectionChangedConnection.disconnect();
+  }
+  if (mTriggerConnectionChangedConnection.connected())
+  {
+    mTriggerConnectionChangedConnection.disconnect();
   }
   if (this->scene())
   {
@@ -924,19 +959,19 @@ cedar::proc::gui::Network::DataSlotNameMap& cedar::proc::gui::Network::getSlotIt
 void cedar::proc::gui::Network::disconnect()
 {
   // go through all DataSlots and remove connections
-  for (size_t i = 0; i < cedar::proc::DataRole::type().list().size(); ++i)
-  {
-    cedar::proc::DataRole::Id id = cedar::proc::DataRole::type().list().at(i);
-    if (id == cedar::aux::Enum::UNDEFINED)
-    {
-      continue;
-    }
-    cedar::proc::gui::Network::DataSlotNameMap& map = dynamic_cast<cedar::proc::gui::Network*>(this)->getSlotItems(id);
-    for (cedar::proc::gui::Network::DataSlotNameMap::iterator it = map.begin(); it != map.end(); ++it)
-    {
-      it->second->removeAllConnections();
-    }
-  }
+//  for (size_t i = 0; i < cedar::proc::DataRole::type().list().size(); ++i)
+//  {
+//    cedar::proc::DataRole::Id id = cedar::proc::DataRole::type().list().at(i);
+//    if (id == cedar::aux::Enum::UNDEFINED)
+//    {
+//      continue;
+//    }
+//    cedar::proc::gui::Network::DataSlotNameMap& map = dynamic_cast<cedar::proc::gui::Network*>(this)->getSlotItems(id);
+//    for (cedar::proc::gui::Network::DataSlotNameMap::iterator it = map.begin(); it != map.end(); ++it)
+//    {
+//      it->second->removeAllConnections();
+//    }
+//  }
 }
 
 void cedar::proc::gui::Network::checkDataConnection
@@ -1041,7 +1076,6 @@ void cedar::proc::gui::Network::checkTriggerConnection
 
 void cedar::proc::gui::Network::processStepAddedSignal(cedar::proc::ElementPtr element)
 {
-  std::cout << element->getName() << " added at " << this->mNetwork->getName() << std::endl;
   // store the type, which can be compared to entries in a configuration node
   std::string current_type;
   if (cedar::proc::StepPtr step = boost::shared_dynamic_cast<cedar::proc::Step>(element))

@@ -85,11 +85,18 @@ _mPromotedSlots(new cedar::aux::StringVectorParameter(this, "promotedSlots", std
 cedar::proc::Network::~Network()
 {
   cedar::aux::LogSingleton::getInstance()->freeing(this);
-  std::cout << "freeing " << this->getName() << std::endl;
+
+  // read out all elements and call this->remove for each element
+  std::vector<cedar::proc::ElementPtr> elements;
   for (ElementMapIterator it = mElements.begin(); it != mElements.end(); ++it)
   {
-    this->remove(it->second);
+    elements.push_back(it->second);
   }
+  for (unsigned int i = 0; i < elements.size(); ++i)
+  {
+    this->remove(elements.at(i));
+  }
+
   mDataConnections.clear();
   mTriggerConnections.clear();
   mElements.clear();
