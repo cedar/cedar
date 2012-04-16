@@ -49,6 +49,7 @@
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/DataConnection.h"
+#include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/Log.h"
@@ -81,22 +82,27 @@ mpScene(scene),
 mpMainWindow(pMainWindow),
 mHoldFitToContents(false)
 {
-  cedar::aux::LogSingleton::getInstance()->debug
-  (
-    "allocated data (cedar::proc::gui::Network, " + cedar::aux::toString(this) + ")",
-    "cedar::proc::gui::Network::Network()"
-  );
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
 
   if (!mNetwork)
   {
     mNetwork = cedar::proc::NetworkPtr(new cedar::proc::Network());
   }
 
+  this->setElement(mNetwork);
+
   this->mNetwork->connectToElementAdded(boost::bind(&cedar::proc::gui::Network::elementAdded, this, _1, _2));
 
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
                                );
+
+  mpNameDisplay = new QGraphicsTextItem(this);
+  this->networkNameChanged();
+
+  //!@todo This isn't really a great solution, we need a better one!
+  cedar::aux::ParameterPtr name_param = this->network()->getParameter("name");
+  QObject::connect(name_param.get(), SIGNAL(valueChanged()), this, SLOT(networkNameChanged()));
 
   mSlotConnection
     = mNetwork->connectToSlotChangedSignal(boost::bind(&cedar::proc::gui::Network::checkSlots, this));
@@ -119,23 +125,32 @@ mHoldFitToContents(false)
 
 cedar::proc::gui::Network::~Network()
 {
-  cedar::aux::LogSingleton::getInstance()->debug
-  (
-    "freeing data (cedar::proc::gui::Network, " + cedar::aux::toString(this) + ")",
-    "cedar::proc::gui::Network::~Network()"
-  );
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 
   if (mSlotConnection.connected())
   {
     mSlotConnection.disconnect();
   }
-
-  cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->removeNetworkItem(this);
+  if (this->scene())
+  {
+    cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->removeNetworkItem(this);
+  }
+  else
+  {
+//    CEDAR_DEBUG_ASSERT(this->isRootNetwork());
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Network::networkNameChanged()
+{
+  this->mpNameDisplay->setPlainText(QString::fromStdString(this->network()->getName()));
+
+  this->fitToContents();
+}
 
 QVariant cedar::proc::gui::Network::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value)
 {
@@ -202,15 +217,16 @@ bool cedar::proc::gui::Network::sceneEventFilter(QGraphicsItem * pWatched, QEven
 
 void cedar::proc::gui::Network::fitToContents()
 {
+  //!@todo This function should take the grid size into account!
   if (mHoldFitToContents)
   {
     return;
   }
 
-  qreal padding_top = static_cast<qreal>(0.0);
+  qreal padding_top = static_cast<qreal>(2.0);
   qreal padding_bottom = static_cast<qreal>(5.0);
-  qreal padding_left = static_cast<qreal>(1.0);
-  qreal padding_right = static_cast<qreal>(7.0);
+  qreal padding_left = static_cast<qreal>(5.0);
+  qreal padding_right = static_cast<qreal>(5.0);
 
   // when no children are present, we cannot fit them
   if (this->childItems().empty())
@@ -222,11 +238,11 @@ void cedar::proc::gui::Network::fitToContents()
   QSet<QGraphicsItem*> children = this->childItems().toSet();
 
   // find the bounding box of all children
-  QRectF bounds; // = this->childrenBoundingRect();
+  QRectF bounds;
   for (QSet<QGraphicsItem*>::iterator i = children.begin(); i != children.end(); ++i)
   {
     QGraphicsItem* p_item = *i;
-    if (dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_item))
+    if (dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_item) || p_item == this->mpNameDisplay)
     {
       continue;
     }
@@ -247,7 +263,15 @@ void cedar::proc::gui::Network::fitToContents()
 
 
   // adjust the bow by the paddings specified above
-  bounds.adjust(padding_left, padding_top, padding_right, padding_bottom);
+  bounds.adjust(-padding_left, -padding_top, padding_right, padding_bottom);
+
+  // extend the bounds to also fit the text properly
+  const QRectF& label_bounds = this->mpNameDisplay->boundingRect();
+  bounds.setTop(bounds.top() - label_bounds.height());
+  bounds.setWidth(std::max(bounds.width(), label_bounds.width()));
+
+  // move the name display
+  this->mpNameDisplay->setPos(bounds.topLeft());
 
   // apply the new bounding box
   this->setWidth(bounds.width());
@@ -267,6 +291,12 @@ void cedar::proc::gui::Network::fitToContents()
   }
 
   this->checkDataItems();
+
+  // finally, also resize parent item if it is a network
+  if (cedar::proc::gui::Network *p_parent_network = dynamic_cast<cedar::proc::gui::Network *>(this->parentItem()))
+  {
+    p_parent_network->fitToContents();
+  }
 }
 
 bool cedar::proc::gui::Network::isRootNetwork()
@@ -402,8 +432,8 @@ void cedar::proc::gui::Network::addStepsToScene()
 //    }
 //  }
 //  this->mpStepsToAdd.clear();
-
-  // add StepItems for steps that don't have one yet (i.e., for which none was present in the configuration tree)
+//
+//  // add StepItems for steps that don't have one yet (i.e., for which none was present in the configuration tree)
 //  for (
 //        cedar::proc::Network::ElementMapConstIterator it = this->mNetwork->elements().begin();
 //        it != this->mNetwork->elements().end();
@@ -485,56 +515,56 @@ void cedar::proc::gui::Network::addConnections()
 
 void cedar::proc::gui::Network::addTriggersToScene()
 {
-  /* restore triggers that don't have a gui description */
-  std::vector<cedar::proc::TriggerPtr> triggers_to_connect;
-
-  for (size_t i = 0; i < this->mpTriggersToAdd.size(); ++i)
-  {
-    this->mpScene->addTriggerItem(this->mpTriggersToAdd.at(i));
-    triggers_to_connect.push_back(this->mpTriggersToAdd.at(i)->getTrigger());
-  }
-  this->mpTriggersToAdd.clear();
-
-  // add TriggerItems for Triggers that don't have one yet (i.e., for which none was present in the configuration tree)
-  for
-  (
-    cedar::proc::Network::ElementMapConstIterator it = this->mNetwork->elements().begin();
-      it != this->mNetwork->elements().end();
-      ++it
-  )
-  {
-    if (cedar::proc::TriggerPtr trigger = mNetwork->getElement<cedar::proc::Trigger>(it->second->getName()))
-    {
-      if (this->mpScene->triggerMap().find(trigger.get()) == this->mpScene->triggerMap().end())
-      {
-        this->mpScene->addTrigger(trigger, QPointF(0, 0));
-        triggers_to_connect.push_back(trigger);
-      }
-    }
-  }
-
-  for (size_t i = 0; i < triggers_to_connect.size(); ++i)
-  {
-    cedar::proc::TriggerPtr& trigger = triggers_to_connect.at(i);
-    cedar::proc::gui::TriggerItem *p_trigger_item = this->mpScene->getTriggerItemFor(trigger.get());
-
-    for (size_t i = 0; i < trigger->getListeners().size(); ++i)
-    {
-      cedar::proc::TriggerablePtr target = trigger->getListeners().at(i);
-      if (cedar::proc::Step* step_pointer = dynamic_cast<cedar::proc::Step*>(target.get()))
-      {
-        cedar::proc::gui::StepItem *p_target_item = this->mpScene->getStepItemFor(step_pointer);
-        CEDAR_DEBUG_ASSERT(p_target_item);
-        p_trigger_item->connectTo(p_target_item);
-      }
-      else if (cedar::proc::Trigger* trigger_pointer = dynamic_cast<cedar::proc::Trigger*>(target.get()))
-      {
-        cedar::proc::gui::TriggerItem *p_target_item = this->mpScene->getTriggerItemFor(trigger_pointer);
-        CEDAR_DEBUG_ASSERT(p_target_item);
-        p_trigger_item->connectTo(p_target_item);
-      }
-    }
-  }
+//  /* restore triggers that don't have a gui description */
+//  std::vector<cedar::proc::TriggerPtr> triggers_to_connect;
+//
+//  for (size_t i = 0; i < this->mpTriggersToAdd.size(); ++i)
+//  {
+//    this->mpScene->addTriggerItem(this->mpTriggersToAdd.at(i));
+//    triggers_to_connect.push_back(this->mpTriggersToAdd.at(i)->getTrigger());
+//  }
+//  this->mpTriggersToAdd.clear();
+//
+//  // add TriggerItems for Triggers that don't have one yet (i.e., for which none was present in the configuration tree)
+//  for
+//  (
+//    cedar::proc::Network::ElementMapConstIterator it = this->mNetwork->elements().begin();
+//      it != this->mNetwork->elements().end();
+//      ++it
+//  )
+//  {
+//    if (cedar::proc::TriggerPtr trigger = mNetwork->getElement<cedar::proc::Trigger>(it->second->getName()))
+//    {
+//      if (this->mpScene->triggerMap().find(trigger.get()) == this->mpScene->triggerMap().end())
+//      {
+//        this->mpScene->addTrigger(trigger, QPointF(0, 0));
+//        triggers_to_connect.push_back(trigger);
+//      }
+//    }
+//  }
+//
+//  for (size_t i = 0; i < triggers_to_connect.size(); ++i)
+//  {
+//    cedar::proc::TriggerPtr& trigger = triggers_to_connect.at(i);
+//    cedar::proc::gui::TriggerItem *p_trigger_item = this->mpScene->getTriggerItemFor(trigger.get());
+//
+//    for (size_t i = 0; i < trigger->getListeners().size(); ++i)
+//    {
+//      cedar::proc::TriggerablePtr target = trigger->getListeners().at(i);
+//      if (cedar::proc::Step* step_pointer = dynamic_cast<cedar::proc::Step*>(target.get()))
+//      {
+//        cedar::proc::gui::StepItem *p_target_item = this->mpScene->getStepItemFor(step_pointer);
+//        CEDAR_DEBUG_ASSERT(p_target_item);
+//        p_trigger_item->connectTo(p_target_item);
+//      }
+//      else if (cedar::proc::Trigger* trigger_pointer = dynamic_cast<cedar::proc::Trigger*>(target.get()))
+//      {
+//        cedar::proc::gui::TriggerItem *p_target_item = this->mpScene->getTriggerItemFor(trigger_pointer);
+//        CEDAR_DEBUG_ASSERT(p_target_item);
+//        p_trigger_item->connectTo(p_target_item);
+//      }
+//    }
+//  }
 }
 
 cedar::proc::NetworkPtr cedar::proc::gui::Network::network()

@@ -43,16 +43,6 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::robot::SimulatedKinematicChain::SimulatedKinematicChain
-(
-  const cedar::dev::robot::ReferenceGeometryPtr pReferenceGeometry
-)
-:
-KinematicChain(pReferenceGeometry)
-{
-  init();
-}
-
 cedar::dev::robot::SimulatedKinematicChain::SimulatedKinematicChain(const std::string& configFileName)
 :
 KinematicChain(configFileName)
@@ -73,7 +63,7 @@ cedar::dev::robot::SimulatedKinematicChain::~SimulatedKinematicChain()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::dev::robot::SimulatedKinematicChain::isMovable()
+bool cedar::dev::robot::SimulatedKinematicChain::isMovable() const
 {
   return true;
 }

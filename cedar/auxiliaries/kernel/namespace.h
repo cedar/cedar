@@ -57,6 +57,9 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(Separable);
       CEDAR_DECLARE_AUX_CLASS(Gauss);
       //!@endcond
+
+      //!@brief The factory manager for kernel classes.
+      typedef cedar::aux::FactoryManager<cedar::aux::kernel::KernelPtr> FactoryManager;
     }
   }
 }

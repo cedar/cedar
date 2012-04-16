@@ -68,14 +68,7 @@ cedar::proc::gui::IdeApplication::IdeApplication(int& argc, char** argv)
 QApplication(argc, argv),
 mpIde (NULL)
 {
-#ifdef CEDAR_OS_LINUX
-  cedar::proc::PluginDeclarationPtr plugin(new cedar::proc::PluginDeclaration());
-  cedar::dyn::getPluginDesciption(plugin);
-  cedar::proc::Manager::getInstance().load(plugin);
-#endif // CEDAR_OS_LINUX
-
   this->mpIde = new cedar::proc::gui::Ide();
-
 
   QObject::connect(this, SIGNAL(exception(const QString&)), this->mpIde, SLOT(exception(const QString&)));
 }

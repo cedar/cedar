@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/gui/namespace.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsScene>
@@ -142,7 +143,7 @@ public:
 
   /*!@brief Creates an element of the given classId at the specified position and adds it to the scene.
    */
-  void addElement(const std::string& classId, QPointF position);
+  cedar::proc::ElementPtr addElement(const std::string& classId, QPointF position);
 
   /*!@brief Adds a cedar::proc::gui::StepItem for the given cedar::proc::Step to the scene at the given position.
    */
@@ -231,12 +232,16 @@ public:
    */
   cedar::proc::gui::NetworkPtr getRootNetwork();
   
-    /*!@brief Returns the current mode.
+  /*!@brief Returns the current mode.
    */
   MODE getMode() const
   {
     return this->mMode;
   }
+
+  /*!@brief Sets the widget used for displaying/editing the parameters of configurables.
+   */
+  void setConfigurableWidget(cedar::aux::gui::PropertyPane *pConfigurableWidget);
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals
@@ -294,6 +299,10 @@ private slots:
 
   void promoteElementToNewGroup();
 
+  /*!@brief Slot that is called whenever a different item is selected in the cedar::proc::gui::Scene.
+   */
+  void itemSelected();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -335,6 +344,9 @@ private:
 
   //! Bool representing whether the snap-to-grid function is active.
   bool mSnapToGrid;
+
+  //! The widget used to display configurables when they are selected in the scene. May be null.
+  cedar::aux::gui::PropertyPane *mpConfigurableWidget;
 
 }; // class ProcessingScene
 

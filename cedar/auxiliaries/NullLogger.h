@@ -49,7 +49,7 @@
  *         This logger can be used to filter out undesired messages. Any messages sent to this logger will not go
  *         anywhere.
  *
- * @remars The logger, it does nothing!
+ * @remarks The logger, it does nothing!
  */
 class cedar::aux::NullLogger : public cedar::aux::LogInterface
 {

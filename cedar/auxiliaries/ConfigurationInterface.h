@@ -36,6 +36,8 @@
 
 //!@todo built-in check, if addParameter adds a parameter that is already stored
 
+#include "cedar/configuration.h"
+
 #ifdef CEDAR_LIBCONFIG_LEGACY_MODE
 
 #include "cedar/auxiliaries/ConfigurationInterface_legacy.h"
@@ -184,12 +186,12 @@ private:
       {
       }
 
-      void setTo(const cedar::aux::ConfigurationNode& node)
+      void readFromNode(const cedar::aux::ConfigurationNode& node)
       {
         *mpMember = node.get_value<T>();
       }
 
-      void putTo(cedar::aux::ConfigurationNode& node) const
+      void writeToNode(cedar::aux::ConfigurationNode& node) const
       {
         node.put(this->getName(), *this->mpMember);
       }
@@ -254,7 +256,7 @@ private:
       {
       }
 
-      void setTo(const cedar::aux::ConfigurationNode& node)
+      void readFromNode(const cedar::aux::ConfigurationNode& node)
       {
         std::vector<std::string> string_values;
         std::string values = node.get_value<std::string>();
@@ -268,7 +270,7 @@ private:
         }
       }
 
-      void putTo(cedar::aux::ConfigurationNode& node) const
+      void writeToNode(cedar::aux::ConfigurationNode& node) const
       {
         std::vector<std::string> list;
         for (size_t i = 0; i < mpMember->size(); ++i)

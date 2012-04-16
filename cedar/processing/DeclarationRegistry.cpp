@@ -46,6 +46,7 @@
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/MultiTrigger.h"
 #include "cedar/processing/Network.h"
+//!@todo Check if these includes are still necessary
 #include "cedar/processing/sources/GaussInput.h"
 #include "cedar/processing/steps/StaticGain.h"
 #include "cedar/processing/steps/Projection.h"
@@ -59,6 +60,7 @@ using cedar::proc::ElementDeclarationTemplate;
 
 cedar::proc::DeclarationRegistry::DeclarationRegistry()
 {
+	//!@todo Move to Network.cpp
   ElementDeclarationPtr network_decl(
                                       new ElementDeclarationTemplate<cedar::proc::Network>
                                       (
@@ -69,75 +71,6 @@ cedar::proc::DeclarationRegistry::DeclarationRegistry()
   network_decl->setIconPath(":/network.svg");
   this->declareClass(network_decl);
 
-  ElementDeclarationPtr trigger_declaration(
-                                             new ElementDeclarationTemplate<cedar::proc::Trigger>
-                                                                                           (
-                                                                                             "Triggers",
-                                                                                             "cedar.processing.Trigger"
-                                                                                           )
-                                           );
-  trigger_declaration->setIconPath(":/triggers/trigger.svg");
-  this->declareClass(trigger_declaration);
-
-  ElementDeclarationPtr multi_trigger_declaration(
-                                                   new ElementDeclarationTemplate<cedar::proc::MultiTrigger>
-                                                   (
-                                                     "Triggers",
-                                                     "cedar.processing.MultiTrigger"
-                                                   )
-                                                 );
-  multi_trigger_declaration->setIconPath(":/triggers/multi_trigger.svg");
-  this->declareClass(multi_trigger_declaration);
-
-  ElementDeclarationPtr looped_trigger_declaration(
-                                                     new ElementDeclarationTemplate<cedar::proc::LoopedTrigger>
-                                                     (
-                                                       "Triggers",
-                                                       "cedar.processing.LoopedTrigger"
-                                                     )
-                                                  );
-  looped_trigger_declaration->setIconPath(":/triggers/looped_trigger.svg");
-  this->declareClass(looped_trigger_declaration);
-
-  ElementDeclarationPtr input_decl(
-                                     new ElementDeclarationTemplate<cedar::proc::sources::GaussInput>
-                                     (
-                                       "Sources",
-                                       "cedar.processing.sources.GaussInput"
-                                     )
-                                  );
-  input_decl->setIconPath(":/steps/gauss_input.svg");
-  this->declareClass(input_decl);
-
-  ElementDeclarationPtr static_gain_decl(
-                                           new ElementDeclarationTemplate<cedar::proc::steps::StaticGain>
-                                           (
-                                              "Utilities",
-                                              "cedar.processing.StaticGain"
-                                           )
-                                         );
-  static_gain_decl->setIconPath(":/steps/static_gain.svg");
-  this->declareClass(static_gain_decl);
-
-  ElementDeclarationPtr projection_decl(
-                                          new ElementDeclarationTemplate<cedar::proc::steps::Projection>
-                                          (
-                                            "Utilities",
-                                            "cedar.processing.Projection"
-                                          )
-                                        );
-  projection_decl->setIconPath(":/steps/projection.svg");
-  this->declareClass(projection_decl);
-
-  ElementDeclarationPtr resize_decl(
-                                      new ElementDeclarationTemplate<cedar::proc::steps::Resize>
-                                      (
-                                        "Utilities",
-                                        "cedar.processing.Resize"
-                                      )
-                                    );
-  resize_decl->setIconPath(":/steps/resize.svg");
-  this->declareClass(resize_decl);
 }
 
 void cedar::proc::DeclarationRegistry::declareClass(cedar::proc::ElementDeclarationPtr pDeclaration)

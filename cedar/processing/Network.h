@@ -46,6 +46,7 @@
 #include "cedar/processing/namespace.h"
 
 // SYSTEM INCLUDES
+#include <QObject>
 #include <vector>
 #include <boost/signals2/signal.hpp>
 #include <boost/signals2/connection.hpp>
@@ -63,8 +64,10 @@
  * @todo Add a slot which reacts to name changes of elements (update map of names to ptrs)
  * @todo Write a private eraseConnection function to avoid duplicated code in disconnectSlots and remove
  */
-class cedar::proc::Network : public cedar::proc::Connectable
+class cedar::proc::Network : public QObject, public cedar::proc::Connectable
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
@@ -354,6 +357,11 @@ private:
                                                        (
                                                          cedar::proc::Network::DataConnectionVector::iterator it
                                                        );
+
+private slots:
+  //!@brief Takes care of updating the network's name in the parent's map.
+  //!@todo Find a more generic approach, react to name changes of each contained element rather than this way around.
+  void onNameChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

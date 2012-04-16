@@ -50,6 +50,9 @@
 
 // Derived defines =====================================================================================================
 
+// Cedar settings ------------------------------------------------------------------------------------------------------
+#cmakedefine CEDAR_LIBCONFIG_LEGACY_MODE
+
 // Operating system ----------------------------------------------------------------------------------------------------
 #ifdef __linux
   #define CEDAR_OS_LINUX
@@ -59,7 +62,7 @@
   #define CEDAR_OS_APPLE
 #endif // __APPLE__
 
-#ifdef __unix__
+#if defined __unix__ | defined __APPLE__
   #define CEDAR_OS_UNIX
 #endif // __unix__
 

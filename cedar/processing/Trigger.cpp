@@ -44,6 +44,8 @@
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/Element.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 
@@ -52,6 +54,34 @@
 
 // MACROS
 //#define DEBUG_TRIGGERING
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the trigger class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr trigger_declaration
+    (
+      new ElementDeclarationTemplate<cedar::proc::Trigger>
+      (
+        "Triggers",
+        "cedar.processing.Trigger"
+      )
+    );
+    trigger_declaration->setIconPath(":/triggers/trigger.svg");
+    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(trigger_declaration);
+
+    return true;
+  }
+
+  bool declared = declare();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -84,7 +114,6 @@ void cedar::proc::Trigger::wait()
     this->mListeners.at(i)->wait();
   }
 }
-
 
 void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 {

@@ -106,12 +106,6 @@ public:
   void resetTo(cedar::proc::gui::NetworkPtr network);
 
 public slots:
-  /*!@brief Slot that is called whenever a different item is selected in the cedar::proc::gui::Scene.
-   *
-   * @todo This probably belongs somewhere else.
-   */
-  void sceneItemSelected();
-
   /*!@brief Slot that displays exceptions.
    */
   void exception(const QString& message);
@@ -199,6 +193,10 @@ public slots:
   /*!@brief Decreases the zoom level.
    */
   void decreaseZoomLevel();
+
+  /*!@brief Returns the architecture view used by the ide.
+   */
+  cedar::proc::gui::View* getArchitectureView();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

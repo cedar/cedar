@@ -100,9 +100,9 @@ public:
   void setConstant(bool value);
 
   //!@brief set this parameter to a value, read from a configuration node
-  virtual void setTo(const cedar::aux::ConfigurationNode& node) = 0;
+  virtual void readFromNode(const cedar::aux::ConfigurationNode& node) = 0;
   //!@brief write value to a configuration node
-  virtual void putTo(cedar::aux::ConfigurationNode& root) const = 0;
+  virtual void writeToNode(cedar::aux::ConfigurationNode& root) const = 0;
   //!@brief set parameter to default
   virtual void makeDefault() = 0;
 
@@ -134,7 +134,8 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  virtual void setChangedFlag(bool changed);
+
 signals:
   //!@brief a signal that is emitted each time the value of a parameter changes
   void valueChanged();
@@ -149,7 +150,7 @@ signals:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void setChangedFlag(bool changed);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

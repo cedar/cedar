@@ -213,7 +213,7 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   }
   else
   {
-    cedar::aux::LogSingleton::getInstance()->debug
+    cedar::aux::LogSingleton::getInstance()->debugMessage
     (
       "no plugin description found for \"" + file + "\"",
       "cedar::proc::PluginDeclaration::readDeclarations(const cedar::aux::ConfigurationNode&)"

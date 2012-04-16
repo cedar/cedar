@@ -79,13 +79,13 @@ void cedar::aux::EnumParameter::set(const std::string& enumId)
   this->emitChangedSignal();
 }
 
-void cedar::aux::EnumParameter::setTo(const cedar::aux::ConfigurationNode& root)
+void cedar::aux::EnumParameter::readFromNode(const cedar::aux::ConfigurationNode& root)
 {
   this->mValue = mEnumDeclaration->get(root.get_value<std::string>());
   this->emitChangedSignal();
 }
 
-void cedar::aux::EnumParameter::putTo(cedar::aux::ConfigurationNode& root) const
+void cedar::aux::EnumParameter::writeToNode(cedar::aux::ConfigurationNode& root) const
 {
   root.put(this->getName(), this->getValue().name());
 }

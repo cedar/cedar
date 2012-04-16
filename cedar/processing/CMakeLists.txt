@@ -50,10 +50,10 @@ cedar_add_library(cedarproc
   gui/PluginLoadDialog.h
   gui/PluginManagerDialog.h
   gui/ProjectionMappingParameter.h
-  gui/PropertyPane.h
   gui/Scene.h
   gui/SettingsDialog.h
   gui/StepItem.h
+  gui/Network.h
   gui/ToolBox.h
   gui/View.h
   sources/GaussInput.h
@@ -61,6 +61,7 @@ cedar_add_library(cedarproc
   steps/Projection.h
   steps/Resize.h
   LoopedTrigger.h
+  Network.h
   Step.h
   RESOURCES
   gui/icons/icons.qrc

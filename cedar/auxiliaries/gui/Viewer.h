@@ -80,7 +80,7 @@ public:
   void timerEvent(QTimerEvent* pEvent);
 
   //!@brief call this function to initialize Gl resources for the passed visualization object
-  void initGl(cedar::aux::gl::RigidBodyVisualizationPtr pVisualization);
+  void initGl(cedar::aux::gl::ObjectVisualizationPtr pVisualization);
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------

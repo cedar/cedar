@@ -36,20 +36,23 @@
 
 cedar_add_library(cedaraux
   MOC_HEADERS
-  RigidBody.h
-  gl/RigidBodyVisualization.h
+  LocalCoordinateFrame.h
+  gl/ObjectVisualization.h
   gui/BaseWidget.h
   gui/BoolParameter.h
-  gui/DataPlotInterface.h
   gui/DataPlotter.h
   gui/DirectoryParameter.h
   gui/DoubleParameter.h
   gui/DoubleVectorParameter.h
   gui/EnumParameter.h
   gui/FileParameter.h
+  gui/IntParameter.h
+  gui/ObjectParameter.h
+  gui/ObjectListParameter.h
   gui/Parameter.h
-  gui/RigidBodyWidget.h
-  gui/RigidBodyVisualizationWidget.h
+  gui/LocalCoordinateFrameWidget.h
+  gui/ObjectVisualizationWidget.h
+  gui/PlotInterface.h
   gui/Viewer.h
   gui/SceneWidget.h
   gui/HistoryPlot.h
@@ -57,6 +60,7 @@ cedar_add_library(cedaraux
   gui/MatrixPlot.h
   gui/MatrixPlot1D.h
   gui/MatrixPlot2D.h
+  gui/PropertyPane.h
   gui/ImagePlot.h
   gui/StringParameter.h
   gui/UIntParameter.h

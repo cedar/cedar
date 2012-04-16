@@ -45,35 +45,20 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Prism::Prism(cedar::aux::RigidBodyPtr pRigidBody)
+cedar::aux::gl::Prism::Prism
+(
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+  double width,
+  double height,
+  double colorR,
+  double colorG,
+  double colorB
+)
 :
-cedar::aux::gl::RigidBodyVisualization(pRigidBody)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Prism", colorR, colorG, colorB),
+mWidth(width),
+mHeight(height)
 {
-  mWidth = 3;
-  mHeight = 1;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
-  mRigidBodyType = "Prism";
-}
-
-cedar::aux::gl::Prism::Prism(
-                              cedar::aux::RigidBodyPtr pRigidBody,
-                              double width,
-                              double height,
-                              double R,
-                              double G,
-                              double B
-                            )
-:
-cedar::aux::gl::RigidBodyVisualization(pRigidBody)
-{
-  mWidth = width;
-  mHeight = height;
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-  mRigidBodyType = "Prism";
 }
 
 //----------------------------------------------------------------------------------------------------------------------

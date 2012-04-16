@@ -87,7 +87,9 @@ cedar::proc::gui::Ide::Ide()
   mpMenuWindows->addAction(this->mpPropertiesWidget->toggleViewAction());
   mpMenuWindows->addAction(this->mpLogWidget->toggleViewAction());
 
-  QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(selectionChanged()), this, SLOT(sceneItemSelected()));
+  // set the property pane as the scene's property displayer
+  this->mpProcessingDrawer->getScene()->setConfigurableWidget(this->mpPropertyTable);
+
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(exception(const QString&)),
                    this, SLOT(exception(const QString&)));
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(modeFinished()),
@@ -161,6 +163,9 @@ cedar::proc::gui::Ide::Ide()
 
 cedar::proc::gui::Ide::~Ide()
 {
+  // remove any custom loggers to prevent segmentation faults
+  //!@todo This should only remove the logger the Ide installed.
+  cedar::aux::LogSingleton::getInstance()->clearLoggers();
 }
 
 cedar::proc::gui::Ide::Logger::Logger(QTextEdit *pLog)
@@ -172,6 +177,11 @@ mpLog(pLog)
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::gui::View* cedar::proc::gui::Ide::getArchitectureView()
+{
+  return this->mpProcessingDrawer;
+}
 
 void cedar::proc::gui::Ide::Logger::message
      (
@@ -364,10 +374,15 @@ void cedar::proc::gui::Ide::showManagePluginsDialog()
 
 void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
 {
-  this->mpProcessingDrawer->getScene()->reset();
+  std::cout << "setName" << std::endl;
   network->network()->setName("root");
+  std::cout << "mNetwork = network" << std::endl;
   this->mNetwork = network;
+  std::cout << "set network at scene" << std::endl;
   this->mpProcessingDrawer->getScene()->setNetwork(network);
+  std::cout << "reset scene" << std::endl;
+  this->mpProcessingDrawer->getScene()->reset();
+  std::cout << "add elements" << std::endl;
   this->mNetwork->addElementsToScene();
 }
 
@@ -400,27 +415,6 @@ void cedar::proc::gui::Ide::resetStepList()
     p_tab->showList(
                      DeclarationRegistrySingleton::getInstance()->getCategoryEntries(category_name)
                    );
-  }
-}
-
-void cedar::proc::gui::Ide::sceneItemSelected()
-{
-  using cedar::proc::Step;
-  using cedar::proc::Manager;
-  QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
-
-  //!@ todo Handle the cases: multiple
-  this->mpPropertyTable->resetContents();
-  if (selected_items.size() == 1)
-  {
-    if (cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(selected_items[0]))
-    {
-      this->mpPropertyTable->display(p_drawer->getStep());
-    }
-    else if (cedar::proc::gui::TriggerItem *p_drawer = dynamic_cast<cedar::proc::gui::TriggerItem*>(selected_items[0]))
-    {
-      this->mpPropertyTable->display(p_drawer->getTrigger());
-    }
   }
 }
 
@@ -573,8 +567,6 @@ void cedar::proc::gui::Ide::logError(const std::string& message)
 {
   this->mpLog->append("<font color=\"red\"><b>" + QString::fromStdString(message) + "</b></font>\n");
 }
-
-
 
 void cedar::proc::gui::Ide::startThreads()
 {

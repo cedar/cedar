@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DoubleParameter.h
+    File:        UIntParameter.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
