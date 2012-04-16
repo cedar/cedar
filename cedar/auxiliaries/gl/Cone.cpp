@@ -19,80 +19,54 @@
 
 ========================================================================================================================
 
- ----- Institute:   Ruhr-Universitaet-Bochum
-                    Institut fuer Neuroinformatik
- 
- ----- File:        Cone.cpp
- 
- ----- Maintainer:  Hendrik Reimann
- ------Email:       hendrik.reimann@ini.rub.de
- ----- Date:        2010 10 29
- 
- ----- Description: visualization for a cone
- 
- ----- Credits:     
- ---------------------------------------------------------------------------------------------------------------------*/
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
 
-// LOCAL INCLUDES
-#include "drawShapes.h"
-#include "Cone.h"
+    File:        Cone.cpp
 
-// PROJECT INCLUDES
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
+    Date:        2010 11 29
+
+    Description: Visualization of a cone
+
+    Credits:
+
+======================================================================================================================*/
+
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/gl/drawShapes.h"
+#include "cedar/auxiliaries/gl/Cone.h"
 
 // SYSTEM INCLUDES
-
-using namespace cedar::aux::gl;
-using namespace std;
-using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Cone::Cone(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Cone::Cone
+(
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+  double radius,
+  double height,
+  double colorR,
+  double colorG,
+  double colorB
+)
 :
-cedar::aux::gl::Object(pObject)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Cone", colorR, colorG, colorB),
+mRadius(radius),
+mHeight(height)
 {
-  mRadius = 2;
-  mHeight = 2;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
-  mObjectType = "Cone";
-}
-
-Cone::Cone(
-            cedar::aux::ObjectPtr pObject,
-            const double radius,
-            const double height,
-            const double R,
-            const double G,
-            const double B
-          )
-:
-cedar::aux::gl::Object(pObject)
-{
-  mRadius = radius;
-  mHeight = height;
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-  mObjectType = "Cone";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void Cone::draw()
+void cedar::aux::gl::Cone::draw()
 {
-  // move to origin
-  glPopMatrix();
-  glPushMatrix();
-  
-  // move to object coordinates
-  mTransformationTranspose = mpObject->getTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  prepareDraw();
   
   // draw object
   if (mIsVisible)
@@ -102,22 +76,22 @@ void Cone::draw()
   }
 }
 
-void Cone::setRadius(double value)
+void cedar::aux::gl::Cone::setRadius(double value)
 {
   mRadius = value;
 }
 
-void Cone::setHeight(double value)
+void cedar::aux::gl::Cone::setHeight(double value)
 {
   mHeight = value;
 }
 
-double Cone::radius()
+double cedar::aux::gl::Cone::radius() const
 {
   return mRadius;
 }
 
-double Cone::height()
+double cedar::aux::gl::Cone::height() const
 {
   return mHeight;
 }

@@ -32,7 +32,7 @@
                  stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 05 23
 
-    Description:
+    Description: Header for the cedar::aux::DataTemplate.
 
     Credits:
 
@@ -41,18 +41,19 @@
 #ifndef CEDAR_AUX_DATA_TEMPLATE_H
 #define CEDAR_AUX_DATA_TEMPLATE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Data.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
 
-/*!@brief Abstract description of the class.
+/*!@brief A templated version of cedar::aux::Data.
  *
- * More detailed description of the class.
+ * @todo More detailed description of the class.
+ *
+ * @remarks Usually, you should not include the header for this class directly. Rather, include the headers of its
+ *          instantiations: e.g., for cedar::aux::MatData, include cedar/auxiliaries/MatData.h.
  */
 template <typename T>
 class cedar::aux::DataTemplate : public cedar::aux::Data
@@ -76,6 +77,7 @@ public:
   {
   }
 
+  //!@brief This constructor initializes the internal data to a value.
   DataTemplate(const T& value)
   {
     this->mData = value;
@@ -91,16 +93,19 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+  //!@brief returns the internal data
   T& getData()
   {
     return this->mData;
   }
 
+  //!@brief returns the internal data as const
   const T& getData() const
   {
     return this->mData;
   }
 
+  //!@brief sets the internal data to the given data/value
   void setData(const T& data)
   {
     this->mData = data;
@@ -121,24 +126,11 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
+  //!@brief the internal data
   T mData;
-
-private:
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
 private:
   // none yet
-
 }; // class cedar::aux::DataTemplate
 
 #endif // CEDAR_AUX_DATA_TEMPLATE_H

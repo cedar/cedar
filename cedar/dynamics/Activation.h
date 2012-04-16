@@ -41,17 +41,13 @@
 #ifndef CEDAR_DYN_ACTIVATION_H
 #define CEDAR_DYN_ACTIVATION_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/dynamics/namespace.h"
 #include "cedar/auxiliaries/DataTemplate.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief Data representing neural activation.
  */
 template <typename T>
 class cedar::dyn::Activation : public cedar::aux::DataTemplate<T>
@@ -93,24 +89,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-
-private:
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
-
 private:
   // none yet
-
 }; // class cedar::dyn::Activation
 
 #endif // CEDAR_DYN_ACTIVATION_H
-

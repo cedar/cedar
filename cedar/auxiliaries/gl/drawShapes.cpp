@@ -34,20 +34,13 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/gl.h"
 #include "cedar/auxiliaries/gl/glu.h"
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/math/constants.h"
-#include "cedar/auxiliaries/lib.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-
-
-using namespace std;
-using namespace cv;
 
 void cedar::aux::gl::setColor(double R, double G, double B)
 {
@@ -98,9 +91,6 @@ void cedar::aux::gl::drawBlock(double l, double w, double h, bool wireFrame)
   glVertex3d(l/2, w/2, h/2);
   glVertex3d(-l/2, w/2, h/2);
   glEnd();
-  
-
-
   if (wireFrame)
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -133,20 +123,15 @@ void cedar::aux::gl::drawCone(
 
 template<typename T>
 void cedar::aux::gl::drawCone(
-                               const cv::Mat start,
-                               const cv::Mat end,
+                               const cv::Mat& start,
+                               const cv::Mat& end,
                                double radiusStart,
                                double radiusEnd,
                                int slices,
                                bool wireFrame
                              )
 {
-  
-  //opencv2: 
-  //error: "class cv::MatExpr" has no member named "clone"
-  //Mat line = (end-start)(Rect(0, 0, 1, 3)).clone();
-	
-  Mat line = (end-start)(Rect(0, 0, 1, 3));
+  cv::Mat line = (end-start)(cv::Rect(0, 0, 1, 3));
   // if start = end do nothing
   if (cv::norm(line) == 0)
   {
@@ -157,12 +142,12 @@ void cedar::aux::gl::drawCone(
   // move to start of line
   glTranslated(start.at<T>(0, 0), start.at<T>(1, 0), start.at<T>(2, 0));
   // make z-axis collinear with the cone center line
-  Mat z = Mat::zeros(3, 1, start.type());
+  cv::Mat z = cv::Mat::zeros(3, 1, start.type());
   z.at<T>(2, 0) = 1;
   double alpha = acos( line.dot(z) / cv::norm(line) );
   if (alpha != 0)
   {
-    Mat axis = z.cross(line);
+    cv::Mat axis = z.cross(line);
     glRotated(alpha*180/cedar::aux::math::pi, axis.at<T>(0, 0), axis.at<T>(1, 0), axis.at<T>(2, 0));
   }
   // draw the cone
@@ -170,10 +155,11 @@ void cedar::aux::gl::drawCone(
   // return to saved transformation
   glPopMatrix();
 }
+
 template CEDAR_AUX_LIB_EXPORT
   void cedar::aux::gl::drawCone<double>(
-                                          const cv::Mat,
-                                          const cv::Mat,
+                                          const cv::Mat&,
+                                          const cv::Mat&,
                                           double,
                                           double,
                                           int,
@@ -182,8 +168,8 @@ template CEDAR_AUX_LIB_EXPORT
 
 template CEDAR_AUX_LIB_EXPORT
   void cedar::aux::gl::drawCone<float>(
-                                         const cv::Mat,
-                                         const cv::Mat,
+                                         const cv::Mat&,
+                                         const cv::Mat&,
                                          double,
                                          double,
                                          int,
@@ -192,8 +178,8 @@ template CEDAR_AUX_LIB_EXPORT
 
 template<typename T>
 void cedar::aux::gl::drawArrow(
-                                const cv::Mat start,
-                                const cv::Mat end,
+                                const cv::Mat& start,
+                                const cv::Mat& end,
                                 double shaftRadius,
                                 double headRadius,
                                 double headLength,
@@ -220,26 +206,26 @@ void cedar::aux::gl::drawArrow(
 
 }
 template CEDAR_AUX_LIB_EXPORT void cedar::aux::gl::drawArrow<float>(
-                                                const cv::Mat start,
-                                                const cv::Mat end,
-                                                double shaftRadius,
-                                                double headRadius,
-                                                double headLength,
-                                                int patches,
-                                                bool wireFrame
-                                              );
+                                                                     const cv::Mat& start,
+                                                                     const cv::Mat& end,
+                                                                     double shaftRadius,
+                                                                     double headRadius,
+                                                                     double headLength,
+                                                                     int patches,
+                                                                     bool wireFrame
+                                                                   );
 template CEDAR_AUX_LIB_EXPORT void cedar::aux::gl::drawArrow<double>(
-                                                 const cv::Mat start,
-                                                 const cv::Mat end,
-                                                 double shaftRadius,
-                                                 double headRadius,
-                                                 double headLength,
-                                                 int patches,
-                                                 bool wireFrame
-                                               );
+                                                                      const cv::Mat& start,
+                                                                      const cv::Mat& end,
+                                                                      double shaftRadius,
+                                                                      double headRadius,
+                                                                      double headLength,
+                                                                      int patches,
+                                                                      bool wireFrame
+                                                                    );
 
 void cedar::aux::gl::drawSphere(
-                                 const  double radius,
+                                 double radius,
                                  int slices,
                                  int stacks,
                                  bool wireFrame
@@ -350,12 +336,12 @@ void cedar::aux::gl::drawPrism(double width, double height, bool wireFrame)
   // bottom
   glNormal3d(0.0, 0.0, -1.0);
   glVertex3d(0, -width/2, 0);
-  glVertex3d(sqrt(3)*width/2, 0, 0);
+  glVertex3d(sqrt(3.0)*width/2, 0, 0);
   glVertex3d(0, width/2, 0);
   // top
   glNormal3d(0.0, 0.0, 1.0);
   glVertex3d(0, -width/2, height);
-  glVertex3d(sqrt(3)*width/2, 0, height);
+  glVertex3d(sqrt(3.0)*width/2, 0, height);
   glVertex3d(0, width/2, height);
   glEnd();
   
@@ -363,15 +349,15 @@ void cedar::aux::gl::drawPrism(double width, double height, bool wireFrame)
   // front left
   glNormal3d(.33, -.66, 0.0);
   glVertex3d(0, -width/2, height);
-  glVertex3d(sqrt(3)*width/2, 0, height);
-  glVertex3d(sqrt(3)*width/2, 0, 0);
+  glVertex3d(sqrt(3.0)*width/2, 0, height);
+  glVertex3d(sqrt(3.0)*width/2, 0, 0);
   glVertex3d(0, -width/2, 0);
   // front right
   glNormal3d(.33, .66, 0.0);
-  glVertex3d(sqrt(3)*width/2, 0, 0);
+  glVertex3d(sqrt(3.0)*width/2, 0, 0);
   glVertex3d(0, width/2, 0);
   glVertex3d(0, width/2, height);
-  glVertex3d(sqrt(3)*width/2, 0, height);
+  glVertex3d(sqrt(3.0)*width/2, 0, height);
   // back
   glNormal3d(-1.0, 0.0, 0.0);
   glVertex3d(0, -width/2, 0);
@@ -413,7 +399,7 @@ void cedar::aux::gl::drawEllipse(
   float b= static_cast<float>(_b);
   float t= static_cast<float>(thickness);
   //  double t = thickness;
-  float d = 4.0/3.0*(sqrt(2)-1);
+  float d = 4.0/3.0*(sqrt(2.0)-1);
 
 
 // approximates the ellipse with 16 3rd order Bezier surfaces, which is not perfect, but almost
@@ -540,7 +526,7 @@ void cedar::aux::gl::drawEllipse(
 
 
 
-  //!\todo check which of these should move to the init function
+  //!@todo check which of these should move to the init function
 //  glEnable(GL_DEPTH_TEST);
 //  glEnable(GL_MAP2_VERTEX_3);
 //  glEnable(GL_AUTO_NORMAL);
@@ -625,6 +611,7 @@ void cedar::aux::gl::drawEllipse(
 
 void cedar::aux::gl::drawAxes(double length)
 {
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   cv::Mat o = cv::Mat::zeros(3, 1, CV_64FC1);
   cv::Mat x = cv::Mat::zeros(3, 1, CV_64FC1);
   x.at<double>(0, 0) = length;
@@ -640,3 +627,21 @@ void cedar::aux::gl::drawAxes(double length)
   drawArrow<double>(o, z, length*0.015, length*0.04, length*0.2, 10);
 }
 
+void cedar::aux::gl::drawCross(double length, double width)
+{
+  glLineWidth(width);
+  glBegin(GL_LINES);
+  glVertex3d(-length, 0, 0);
+  glVertex3d(length, 0, 0);
+  glEnd();
+
+  glBegin(GL_LINES);
+  glVertex3d(0, -length, 0);
+  glVertex3d(0, length, 0);
+  glEnd();
+
+  glBegin(GL_LINES);
+  glVertex3d(0, 0, -length);
+  glVertex3d(0, 0, length);
+  glEnd();
+}

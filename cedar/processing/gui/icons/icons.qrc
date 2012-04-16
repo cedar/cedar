@@ -13,6 +13,10 @@
     <file>steps/net_reader.svg</file>
     <file>steps/resize.svg</file>
     <file>steps/net_writer.svg</file>
+    <file>steps/field_temp.svg</file>
+    <file>steps/preshape.svg</file>
+    <file>steps/projection.svg</file>
+    <file>steps/noise.svg</file>
     <file>toolbaricons/grid.svg</file>
   </qresource>
 </RCC>

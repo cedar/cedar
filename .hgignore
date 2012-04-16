@@ -11,7 +11,6 @@ Darwin-*
 debug*
 release*
 Debug*
-Release*
 moc*
 obj*
 ui*
@@ -62,16 +61,8 @@ build/*
 cedar/doc/*
 CTestTestfile.cmake
 */lib.h
-*.iproj3
 
-tests/unit/processing/ArchitectureIO/architecture1\.json$
-
-cedar/cedar.pro.user
-tests/interactive/devices/sensors/PictureGrabber/PictureGrabberTest.cpp.resolve
-
-tests/unit/devices/sensors/visual/Grabber/grabber.config
-tests/unit/devices/sensors/visual/StereoGrabber/grabber.config
-tests/unit/processing/ArchitectureIO/architecture1.json
-
+syntax: regexp
+^tests/unit/processing/ArchitectureIO/architecture1\.json$
 syntax: regexp
 ^cedar\.conf$

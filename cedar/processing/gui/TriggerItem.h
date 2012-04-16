@@ -41,23 +41,23 @@
 #ifndef CEDAR_PROC_GUI_TRIGGER_ITEM_H
 #define CEDAR_PROC_GUI_TRIGGER_ITEM_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/processing/gui/GraphicsBase.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief Representation of a cedar::proc::Trigger in a cedar::proc::gui::Scene.
  */
 class cedar::proc::gui::TriggerItem : public cedar::proc::gui::GraphicsBase
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::gui::Network;
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
@@ -113,7 +113,7 @@ public:
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
   //!@brief save configuration to a node
-  void writeConfiguration(cedar::aux::ConfigurationNode& root);
+  void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
 
   //!@brief checks for a target, if Trigger can connect to this target
   cedar::proc::gui::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
@@ -150,9 +150,8 @@ protected:
 
 private:
   //!@brief the class id of the internal trigger, used for a tooltip
-  cedar::proc::TriggerDeclarationPtr mClassId;
+  cedar::proc::ElementDeclarationPtr mClassId;
 
 }; // class TriggerItem
 
 #endif // CEDAR_PROC_GUI_TRIGGER_ITEM_H
-

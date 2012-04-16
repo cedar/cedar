@@ -34,12 +34,12 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/PluginDeclaration.h"
-
-// PROJECT INCLUDES
+#include "cedar/processing/ElementDeclaration.h"
 
 // SYSTEM INCLUDES
+#include <boost/property_tree/xml_parser.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -58,13 +58,84 @@ cedar::proc::PluginDeclaration::~PluginDeclaration()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::PluginDeclaration::add(cedar::proc::StepDeclarationPtr declaration)
+void cedar::proc::PluginDeclaration::add(cedar::proc::ElementDeclarationPtr declaration)
 {
-  this->mStepDeclarations.push_back(declaration);
+  this->mElementDeclarations.push_back(declaration);
 }
 
-const cedar::proc::PluginDeclaration::StepDeclarations& cedar::proc::PluginDeclaration::stepDeclarations() const
+void cedar::proc::PluginDeclaration::readDescription(const std::string& filePath)
 {
-  return this->mStepDeclarations;
+  cedar::aux::ConfigurationNode descriptions;
+  boost::property_tree::xml_parser::read_xml(filePath, descriptions);
+
+  if (descriptions.find("plugin") == descriptions.not_found())
+  {
+    // ok, if no root node is present, continue
+    std::cout << "Plugin description doesn't have the right root node (\"plugin\" node not found)." << std::endl;
+    return;
+  }
+
+  const cedar::aux::ConfigurationNode& root = descriptions.get_child("plugin");
+
+  for (cedar::aux::ConfigurationNode::const_iterator node_iter = root.begin();
+       node_iter != root.end();
+       ++node_iter)
+  {
+    const cedar::aux::ConfigurationNode& node = node_iter->second;
+    const std::string& type = node_iter->first;
+
+    if (type == "declarations")
+    {
+      this->readDeclarations(node);
+    }
+    else
+    {
+      std::cout << "Warning: found an unhandled node type in cedar::proc::PluginDeclaration::readDescription for \""
+          << filePath << "\". Unhandled type is: \"" << type << "\"" << std::endl;
+    }
+  }
+}
+
+void cedar::proc::PluginDeclaration::readDeclarations(const cedar::aux::ConfigurationNode& declarations)
+{
+  for (cedar::aux::ConfigurationNode::const_iterator declaration_iter = declarations.begin();
+      declaration_iter != declarations.end();
+       ++declaration_iter)
+  {
+    const std::string& type = declaration_iter->first;
+    const cedar::aux::ConfigurationNode& node = declaration_iter->second;
+
+    if (type == "element")
+    {
+      this->readElementDeclaration(node);
+    }
+    else
+    {
+      std::cout << "Warning: found an unhandled node type in cedar::proc::PluginDeclaration::readDeclarations"
+          << "Unhandled type is: \"" << type << "\"" << std::endl;
+    }
+  }
+}
+
+void cedar::proc::PluginDeclaration::readElementDeclaration(const cedar::aux::ConfigurationNode& declaration)
+{
+  const cedar::aux::ConfigurationNode& xmlattr = declaration.get_child("<xmlattr>");
+  const std::string& class_id = xmlattr.get_child("class").get_value<std::string>();
+
+  for (size_t i = 0; i < this->mElementDeclarations.size(); ++i)
+  {
+    if (this->mElementDeclarations.at(i)->getClassId() == class_id)
+    {
+      this->mElementDeclarations.at(i)->read(declaration);
+      return;
+    }
+  }
+  CEDAR_THROW(cedar::aux::InvalidNameException, "Could not find a class declaration for class \"" + class_id + "\".");
+}
+
+
+const cedar::proc::PluginDeclaration::ElementDeclarations& cedar::proc::PluginDeclaration::elementDeclarations() const
+{
+  return this->mElementDeclarations;
 }
 

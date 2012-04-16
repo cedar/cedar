@@ -34,19 +34,17 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_AUX_MATH_NAMESPACE_H
 #define CEDAR_AUX_MATH_NAMESPACE_H
 
-// LOCAL INCLUDES
-#include "namespace.h"
+// CEDAR INCLUDES
+#include "cedar/namespace.h"
 #include "cedar/auxiliaries/namespace.h"
-
-// PROJECT INCLUDES
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
+
 
 namespace cedar
 {
@@ -55,21 +53,27 @@ namespace cedar
     /*!@brief Namespace for all math classes. */
     namespace math
     {
+      //!@brief a templated class for representing limits (i.e. an interval) of some type
       template <typename T> struct Limits;
 
-      CEDAR_DECLARE_CLASS(Sigmoid);
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_AUX_CLASS(Sigmoid);
+      CEDAR_DECLARE_AUX_CLASS(AbsSigmoid);
+      CEDAR_DECLARE_AUX_CLASS(ExpSigmoid);
+      CEDAR_DECLARE_AUX_CLASS(HeavisideSigmoid);
+      CEDAR_DECLARE_AUX_CLASS(SigmoidDeclaration);
+      //!@endcond
 
-      CEDAR_DECLARE_CLASS(AbsSigmoid);
-
-      CEDAR_DECLARE_CLASS(ExpSigmoid);
-
-      CEDAR_DECLARE_CLASS(HeavysideSigmoid);
-
-      CEDAR_DECLARE_CLASS(SigmoidDeclaration);
-
+      //!@brief a templated declaration for sigmoid function implementation
       template <class DerivedClass> class SigmoidDeclarationT;
 
-      typedef boost::shared_ptr<cedar::aux::AbstractFactory<Sigmoid> > SigmoidFactoryPtr;
+      typedef cedar::aux::Factory<SigmoidPtr> SigmoidFactory;
+      CEDAR_GENERATE_POINTER_TYPES(SigmoidFactory);
+
+      template <class T> class LimitsParameter;
+      typedef LimitsParameter<double> DoubleLimitsParameter;
+      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleLimitsParameter);
+
     }
   }
 }

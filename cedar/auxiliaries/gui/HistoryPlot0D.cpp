@@ -38,14 +38,14 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/exceptions.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/DoubleData.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/assert.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
@@ -64,22 +64,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
 cedar::aux::gui::HistoryPlot0D::HistoryPlot0D(QWidget *pParent)
 :
-cedar::aux::gui::DataPlotInterface(pParent),
+cedar::aux::gui::PlotInterface(pParent),
 mpCurrentPlotWidget(NULL)
 {
   this->init();
 }
 
-cedar::aux::gui::HistoryPlot0D::HistoryPlot0D(cedar::aux::DataPtr data, QWidget *pParent)
+cedar::aux::gui::HistoryPlot0D::HistoryPlot0D(cedar::aux::DataPtr data, const std::string& title, QWidget *pParent)
 :
-cedar::aux::gui::DataPlotInterface(pParent),
+cedar::aux::gui::PlotInterface(pParent),
 mpCurrentPlotWidget(NULL)
 {
   this->init();
-  this->display(data);
+  this->plot(data, title);
 }
 
 cedar::aux::gui::HistoryPlot0D::~HistoryPlot0D()
@@ -89,7 +88,6 @@ cedar::aux::gui::HistoryPlot0D::~HistoryPlot0D()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
 void cedar::aux::gui::HistoryPlot0D::init()
 {
   mMaxHistorySize = 500;
@@ -109,14 +107,20 @@ void cedar::aux::gui::HistoryPlot0D::init()
   this->layout()->addWidget(mpPlot);
 }
 
-void cedar::aux::gui::HistoryPlot0D::display(cedar::aux::DataPtr data)
+void cedar::aux::gui::HistoryPlot0D::plot(cedar::aux::DataPtr data, const std::string& /* title */)
 {
-  this->mData = boost::shared_dynamic_cast<cedar::aux::DoubleData>(data);
+  this->mData = data;
+  this->mDoubleData = boost::shared_dynamic_cast<cedar::aux::DoubleData>(this->mData);
 
-  if (!this->mData)
+  if (!this->mDoubleData)
   {
-    CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
-                "Could not cast to cedar::aux::DoubleData in cedar::aux::gui::HistoryPlot0D::display.");
+    this->mMatData = boost::shared_dynamic_cast<cedar::aux::MatData>(this->mData);
+
+    if (!this->mMatData)
+    {
+      CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
+                  "Could not cast to cedar::aux::DoubleData or cedar::aux::MatData in cedar::aux::gui::HistoryPlot0D::plot.");
+    }
   }
 
   if (this->mpCurve != NULL)
@@ -128,7 +132,27 @@ void cedar::aux::gui::HistoryPlot0D::display(cedar::aux::DataPtr data)
 //  this->setPlotStyle(this->mpCurve);
 
   data->lockForRead();
-  double val = this->mData->getData();
+  double val;
+  if (this->mDoubleData)
+  {
+    val = this->mDoubleData->getData();
+  }
+  else
+  {
+    cv::Mat matrix = this->mMatData->getData();
+    if (matrix.type() == CV_32F)
+    {
+      val = matrix.at<float>(0,0);
+    }
+    else if (matrix.type() == CV_64F)
+    {
+      val = matrix.at<double>(0,0);
+    }
+    else
+    {
+      CEDAR_THROW(cedar::aux::UnknownTypeException, "Unhandled matrix type in cedar::aux::gui::HistoryPlot0D::display.");
+    }
+  }
   data->unlock();
   mpXValues.clear();
   mpYValues.clear();
@@ -142,11 +166,10 @@ void cedar::aux::gui::HistoryPlot0D::display(cedar::aux::DataPtr data)
 
   this->mpCurve->attach(this->mpPlot);
 
-
   this->startTimer(30); //!@todo make the refresh time configurable.
 }
 
-void cedar::aux::gui::HistoryPlot0D::timerEvent(QTimerEvent * /* pEvent */)
+void cedar::aux::gui::HistoryPlot0D::timerEvent(QTimerEvent* /* pEvent */)
 {
   if (!this->isVisible())
   {
@@ -166,8 +189,33 @@ void cedar::aux::gui::HistoryPlot0D::timerEvent(QTimerEvent * /* pEvent */)
   cedar::aux::System::mCOutLock.unlock();
 #endif // DEBUG_LOCKS
 
-  const double& val = this->mData->getData();
-
+  double val;
+  if (this->mDoubleData)
+  {
+    val = this->mDoubleData->getData();
+  }
+  else
+  {
+    cv::Mat matrix = this->mMatData->getData();
+    if (cedar::aux::math::getDimensionalityOf(matrix) != 0) // plot is no longer capable of displaying the data
+    {
+      this->mData->unlock();
+      emit dataChanged();
+      return;
+    }
+    if (matrix.type() == CV_32F)
+    {
+      val = matrix.at<float>(0,0);
+    }
+    else if (matrix.type() == CV_64F)
+    {
+      val = matrix.at<double>(0,0);
+    }
+    else
+    {
+      CEDAR_THROW(cedar::aux::UnhandledTypeException, "Cannot handle the type of the matrix.");
+    }
+  }
   mpYValues.push_back(val);
 
 #ifdef DEBUG_LOCKS

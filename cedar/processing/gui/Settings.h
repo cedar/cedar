@@ -37,13 +37,11 @@
 #ifndef CEDAR_PROC_GUI_SETTINGS_H
 #define CEDAR_PROC_GUI_SETTINGS_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/ParameterTemplate.h"
-#include "cedar/auxiliaries/VectorParameter.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <QDockWidget>
@@ -62,8 +60,6 @@ class cedar::proc::gui::Settings : public cedar::aux::Configurable
   //--------------------------------------------------------------------------------------------------------------------
 public:
   /*!@brief The docking behavior of a widget.
-   *
-   * More detailed description of the class.
    */
   class DockSettings : public cedar::aux::Configurable
   {
@@ -83,8 +79,9 @@ public:
       cedar::aux::BoolParameterPtr mFloating;
   };
 
-  //!@brief the smart pointers of class DockSettings
+  //!@cond SKIPPED_DOCUMENTATION
   CEDAR_GENERATE_POINTER_TYPES(DockSettings);
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -141,6 +138,18 @@ public:
   //!@brief returns a history of architecture files
   cedar::aux::StringVectorParameterPtr getArchitectureFileHistory();
 
+  //!@brief Whether the graphics item shadow effects are used.
+  bool useGraphicsItemShadowEffects() const;
+
+  //!@brief Sets whether the graphics item shadow effects are used.
+  void setUseGraphicsItemShadowEffects(bool useShadows);
+
+  //!@brief Get the snap to grid state.
+  bool snapToGrid() const;
+
+  //!@brief Set the snap to grid state.
+  void snapToGrid(bool snap);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -194,6 +203,12 @@ private:
 
   //!@brief History of architecture files recently loaded.
   cedar::aux::StringVectorParameterPtr mRecentArchitectureFiles;
+
+  //!@brief Disables or enables graphics item shadows.
+  cedar::aux::BoolParameterPtr mUseGraphicsItemShadowEffects;
+
+  //!@brief Disables or enables graphics item shadows.
+  cedar::aux::BoolParameterPtr mSnapToGrid;
 
 }; // class cedar::proc::gui::Settings
 

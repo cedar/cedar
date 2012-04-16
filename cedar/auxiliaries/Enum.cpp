@@ -34,7 +34,11 @@
 
 ======================================================================================================================*/
 
+// CEDAR INCLUDES
 #include "Enum.h"
+
+// SYSTEM INCLUDES
+
 
 cedar::aux::Enum::Enum()
 {
@@ -48,7 +52,7 @@ mPrettyString (prettyString)
 {
 }
 
-bool cedar::aux::Enum::operator== (const cedar::aux::Enum& other)
+bool cedar::aux::Enum::operator== (const cedar::aux::Enum& other) const
 {
   return this->mId == other.mId;
 }

@@ -34,10 +34,8 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/EnumParameter.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -78,16 +76,16 @@ cedar::aux::Enum cedar::aux::EnumParameter::getValue() const
 void cedar::aux::EnumParameter::set(const std::string& enumId)
 {
   this->mValue = this->mEnumDeclaration->get(enumId);
-  emit valueChanged();
+  this->emitChangedSignal();
 }
 
-void cedar::aux::EnumParameter::setTo(const cedar::aux::ConfigurationNode& root)
+void cedar::aux::EnumParameter::readFromNode(const cedar::aux::ConfigurationNode& root)
 {
   this->mValue = mEnumDeclaration->get(root.get_value<std::string>());
-  emit valueChanged();
+  this->emitChangedSignal();
 }
 
-void cedar::aux::EnumParameter::putTo(cedar::aux::ConfigurationNode& root)
+void cedar::aux::EnumParameter::writeToNode(cedar::aux::ConfigurationNode& root) const
 {
   root.put(this->getName(), this->getValue().name());
 }
@@ -95,5 +93,5 @@ void cedar::aux::EnumParameter::putTo(cedar::aux::ConfigurationNode& root)
 void cedar::aux::EnumParameter::makeDefault()
 {
   this->mValue = this->mDefault;
-  emit valueChanged();
+  this->emitChangedSignal();
 }

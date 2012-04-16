@@ -37,10 +37,8 @@
 #ifndef CEDAR_DEV_ROBOT_NAMESPACE_H
 #define CEDAR_DEV_ROBOT_NAMESPACE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/lib.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -58,9 +56,7 @@ namespace cedar
       CEDAR_DECLARE_DEV_CLASS(DifferentialDrive);
       CEDAR_DECLARE_DEV_CLASS(Locomotion);
       CEDAR_DECLARE_DEV_CLASS(KinematicChain);
-      CEDAR_DECLARE_DEV_CLASS(KinematicChainModel);
       CEDAR_DECLARE_DEV_CLASS(Odometry);
-      CEDAR_DECLARE_DEV_CLASS(ReferenceGeometry);
       CEDAR_DECLARE_DEV_CLASS(Robot);
       CEDAR_DECLARE_DEV_CLASS(SimulatedKinematicChain);
       //!@endcond

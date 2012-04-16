@@ -41,12 +41,11 @@
 #ifndef CEDAR_PROC_STEP_ITEM_H
 #define CEDAR_PROC_STEP_ITEM_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/GraphicsBase.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/gui/namespace.h"
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
@@ -55,14 +54,16 @@
 #include <map>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief A representation of a cedar::proc::Step object in a cedar::proc::gui::Scene.
  */
 class cedar::proc::gui::StepItem : public QObject, public cedar::proc::gui::GraphicsBase
 {
   Q_OBJECT
 
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::gui::Network;
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
@@ -110,7 +111,7 @@ public:
   //!@brief reads a configuration from a node
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
   //!@brief saves a configuration to a node
-  void writeConfiguration(cedar::aux::ConfigurationNode& root);
+  void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
 
   //!@brief resets the internal step
   void resetPointer()
@@ -124,6 +125,7 @@ public:
 public slots:
   //!@brief handles changes in the state of a step (e.g. from error to non-error state)
   void stepStateChanged();
+
   //!@brief handles a redraw of the graphical representation
   void redraw();
 
@@ -139,11 +141,29 @@ protected:
 private:
   //!@briefs adds graphical representations for all data items
   void addDataItems();
+
   //!@brief adds graphical representations for all triggers contained in the step
   void addTriggerItems();
 
   //!@brief sets the represented step
   void setStep(cedar::proc::StepPtr step);
+
+  void addRoleSeparator(const cedar::aux::Enum& e, QMenu* pMenu);
+
+  //!@brief Fills the menu with available plots
+  void fillPlots(QMenu* pMenu, std::map<QAction*, std::pair<cedar::aux::gui::PlotDeclarationPtr, cedar::aux::Enum> >& declMap);
+
+  //!@brief Opens a new DockWidget to show the plot.
+  void showPlot
+  (
+    const QPoint& position,
+    cedar::aux::gui::PlotInterface* plot,
+    cedar::proc::DataSlotPtr slot,
+    std::string title = ""
+  );
+
+  //! Opens plots for all data in this step.
+  void plotAll(const QPoint& position);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -165,13 +185,14 @@ protected:
 
 private:
   //!@brief the class id of the step
-  cedar::proc::StepDeclarationPtr mClassId;
+  cedar::proc::ElementDeclarationPtr mClassId;
   //!@brief the main window in which the current graphical representation is embedded
   QMainWindow* mpMainWindow;
   //!@brief the icon representing the contained step
   QIcon mStepIcon;
+  //!@brief connection to state changed signal of step
+  boost::signals2::connection mStateChangedConnection;
 
 }; // class StepItem
 
 #endif // CEDAR_PROC_STEP_ITEM_H
-

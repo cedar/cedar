@@ -41,32 +41,36 @@
 #ifndef CEDAR_PROC_TRIGGER_H
 #define CEDAR_PROC_TRIGGER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
+#include "cedar/processing/Element.h"
+#include "cedar/processing/Triggerable.h"
 #include "cedar/processing/namespace.h"
-#include "cedar/auxiliaries/NamedConfigurable.h"
-
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <boost/enable_shared_from_this.hpp>
 #include <vector>
 
 /*!@brief A base class for all sorts of Trigger. Trigger provides a generic interface for the trigger concept in cedar.
  * Trigger can have listeners, to which they send a trigger signal.
  *
  */
-class cedar::proc::Trigger : public virtual cedar::aux::NamedConfigurable
+class cedar::proc::Trigger : public cedar::proc::Element,
+                             public boost::enable_shared_from_this<cedar::proc::Trigger>,
+                             public cedar::proc::Triggerable
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // friends
   //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::Manager;
+  friend class cedar::proc::Network;
+  friend class cedar::proc::TriggerConnection;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Trigger(const std::string& name = "");
+  Trigger(const std::string& name = "", bool isLooped = false);
 
   //!@brief Destructor
   virtual ~Trigger();
@@ -79,51 +83,35 @@ public:
   void trigger(cedar::proc::ArgumentsPtr arguments = cedar::proc::ArgumentsPtr());
 
   //!@brief handles an incoming trigger signal if Trigger instance is listener
-  virtual void onTrigger(Trigger*);
-
-  //!@brief adds a listener, which will receive trigger signals from this instance from now on
-  void addListener(cedar::proc::StepPtr step);
-
-  //!@brief adds a Trigger, which will receive trigger signals from this instance from now on
-  void addTrigger(cedar::proc::TriggerPtr trigger);
-
-  //!@brief removes a listener, which will no longer receive trigger signals
-  void removeListener(cedar::proc::StepPtr step);
-
-  //!@brief removes a Trigger, which will no longer receive trigger signals
-  void removeTrigger(cedar::proc::TriggerPtr trigger);
+  void onTrigger(cedar::proc::TriggerPtr pSender);
 
   //!@brief a boolean check, if a given step is a listener of this Trigger instance
-  bool isListener(cedar::proc::StepPtr step);
-
-  //!@brief a boolean check, if a given Trigger is a listener of this Trigger instance
-  bool isListener(cedar::proc::TriggerPtr trigger);
+  bool isListener(cedar::proc::TriggerablePtr step) const;
 
   //!@brief returns a list of listeners
-  const std::vector<cedar::proc::StepPtr>& getListeners() const;
+  const std::vector<cedar::proc::TriggerablePtr>& getListeners() const;
 
-  //!@brief returns a list of listening triggers
-  const std::vector<cedar::proc::TriggerPtr>& getTriggerListeners() const;
+  //!@brief empty implementation of a function that gets called if a trigger connects to this instance
+  virtual void notifyConnected(cedar::proc::TriggerPtr trigger);
 
-
-  virtual void notifyConnected(cedar::proc::Trigger* trigger);
-
-  virtual void notifyDisconnected(cedar::proc::Trigger* trigger);
-
-  //!@brief reads a configuration from a ConfigurationNode
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+  //!@brief empty implementation of a function that gets called if a trigger disconnects from this instance
+  virtual void notifyDisconnected(cedar::proc::TriggerPtr trigger);
 
   //!@brief saves a configuration to a ConfigurationNode
-  void saveConfiguration(cedar::aux::ConfigurationNode& node);
+  void writeConfiguration(cedar::aux::ConfigurationNode& node);
 
-  //!@brief sets the TriggerRegistry at which this Trigger instance is stored
-  void setRegistry(cedar::proc::TriggerRegistry* pRegistry);
+  //!@brief The wait method.
+  void wait();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief removes a listener, which will no longer receive trigger signals
+  virtual void removeListener(cedar::proc::TriggerablePtr step);
+
+  //!@brief adds a listener, which will receive trigger signals from this instance from now on
+  virtual void addListener(cedar::proc::TriggerablePtr step);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -138,29 +126,11 @@ public:
   // none yet (hopefully never!)
 protected:
   //!@brief list of listeners
-  std::vector<cedar::proc::StepPtr> mListeners;
-  //!@brief list of listenings triggers
-  std::vector<cedar::proc::TriggerPtr> mTriggers;
+  std::vector<cedar::proc::TriggerablePtr> mListeners;
 private:
   //!@brief find a step in the list of listeners
-  std::vector<cedar::proc::StepPtr>::iterator find(cedar::proc::StepPtr triggerable);
-  //!@brief find a trigger in the list of trigger listeners
-  std::vector<cedar::proc::TriggerPtr>::iterator find(cedar::proc::TriggerPtr triggerableT);
-
-  //!@brief Registry managing the trigger.
-  cedar::proc::TriggerRegistry* mRegisteredAt;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
+  std::vector<cedar::proc::TriggerablePtr>::iterator find(cedar::proc::TriggerablePtr triggerable);
+  std::vector<cedar::proc::TriggerablePtr>::const_iterator find(cedar::proc::TriggerablePtr triggerable) const;
 }; // class cedar::proc::Trigger
 
 #endif // CEDAR_PROC_TRIGGER_H

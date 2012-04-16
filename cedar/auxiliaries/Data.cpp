@@ -39,10 +39,8 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/Data.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -79,14 +77,4 @@ cedar::aux::Configurable* cedar::aux::Data::getOwner() const
 void cedar::aux::Data::setOwner(cedar::aux::Configurable* step)
 {
   this->mpeOwner = step;
-}
-
-const std::string& cedar::aux::Data::connectedSlotName() const
-{
-  return this->mConnectedSlotName;
-}
-
-void cedar::aux::Data::connectedSlotName(const std::string& name)
-{
-  this->mConnectedSlotName = name;
 }

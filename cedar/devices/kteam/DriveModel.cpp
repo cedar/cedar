@@ -24,8 +24,8 @@
 
     File:        KTeamDriveModel.cpp
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
     Description: An object of this class represents the kinematics model of a differential drive robot with encoders.
@@ -34,33 +34,28 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-
-#include "DriveModel.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/devices/kteam/DriveModel.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+cedar::dev::kteam::DriveModel::DriveModel(cedar::dev::kteam::Drive *peDrive)
+{
+  mInitialized = false;
+  init(peDrive);
+}
 
-  cedar::dev::kteam::DriveModel::DriveModel(cedar::dev::kteam::Drive *peDrive)
-  {
-    mInitialized = false;
-    init(peDrive);
-  }
+cedar::dev::kteam::DriveModel::~DriveModel()
+{
 
-  cedar::dev::kteam::DriveModel::~DriveModel()
-  {
-
-  }
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
 int cedar::dev::kteam::DriveModel::init(cedar::dev::kteam::Drive *peDrive)
 {
   if(this->isInitialized())
@@ -72,20 +67,20 @@ int cedar::dev::kteam::DriveModel::init(cedar::dev::kteam::Drive *peDrive)
     return 0;
   }
 
-  //Initialization of members
+  // Initialization of members
   mpeDrive = 0;
   mOldEncoder = cv::Mat(2, 1, CV_64FC1);
-  mOldEncoder.at<double>(0,0) = 0;
-  mOldEncoder.at<double>(1,0) = 0;
+  mOldEncoder.at<double>(0, 0) = 0;
+  mOldEncoder.at<double>(1, 0) = 0;
   mpeDrive = peDrive;
   mDebug = false; //set true for debug-informations on console
 
-  //set starting-position
-  setPosition(0,0);
-  setOrientation(0);
+  // set starting-position
+  setTranslation(0, 0);
+  setRotation(0);
   mpeDrive->resetEncoder();
 
-  //start update-timer and running-time
+  // start update-timer and running-time
   startTimer(1);
 
   update();
@@ -104,17 +99,17 @@ bool cedar::dev::kteam::DriveModel::isInitialized() const
 
 void cedar::dev::kteam::DriveModel::update()
 {
-  //get new encoder-values
+  // get new encoder-values
   int left_encoder;
   int right_encoder;
   mpeDrive->getEncoder(left_encoder, right_encoder);
 
-  //calculate new position and orientation
+  // calculate new position and orientation
   calculatePositionAndOrientation(left_encoder, right_encoder);
 
-  //store encoder-values (needed for next update)
+  // store encoder-values (needed for next update)
 
-  //reset encoders if reaching maximal/minimal encoder value
+  // reset encoders if reaching maximal/minimal encoder value
   int maximal_encoder = mpeDrive->getMaximalEncoderValue();
   int minimal_encoder = mpeDrive->getMinimalEncoderValue();
   if(left_encoder > 0.9 * maximal_encoder
@@ -136,47 +131,56 @@ void cedar::dev::kteam::DriveModel::update()
 
   if(mDebug)
   {
-    //output for importing into matlab
-    std::cout << getPositionX() << " " << getPositionY() << " " << getOrientation() << "\n";
+    // output for importing into matlab
+    std::cout << getTranslationX() << " " << getTranslationY() << " " << getRotation() << "\n";
   }
 }
 
 void cedar::dev::kteam::DriveModel::calculatePositionAndOrientation(int leftEncoder, int rightEncoder)
 {
-  //calculate the moved distance since last update
+  // calculate the moved distance since last update
   double ds = calculateDifferencePosition(leftEncoder, mOldEncoder.at<int>(0,0),
                                           rightEncoder, mOldEncoder.at<int>(1,0));
-  //calculate the angle rotated since last update
+  // calculate the angle rotated since last update
   double dphi = calculateDifferenceOrientation(leftEncoder, mOldEncoder.at<int>(0,0),
                                                rightEncoder, mOldEncoder.at<int>(1,0));
-  //calculate new position on x- and y-axis
-  double new_x_position = getPositionX() + ds * getOrientationQuaternion(1);
-  double new_y_position = getPositionY() + ds * getOrientationQuaternion(2);
-  //get old orientation and calculate new orientation
-  double new_orientation = getOrientation() + dphi;
+  // calculate new position on x- and y-axis
+  //todo: changed to use matrices instead of quaternions, check whether this still works (HR)
+//  double new_x_position = getTranslationX() + ds * getOrientationQuaternion(1);
+//  double new_y_position = getTranslationY() + ds * getOrientationQuaternion(2);
+  // get old orientation and calculate new orientation
+//  double new_orientation = getOrientation() + dphi;
 
-  //update both position and orientation
-  setPosition(new_x_position, new_y_position);
-  setOrientation(new_orientation);
+  // this assumes the heading direction of the vehicle is the x-axis of the local coordinate system
+  double new_x_position = getTranslationX() + ds * getTransformation().at<double>(0, 1);
+  double new_y_position = getTranslationY() + ds * getTransformation().at<double>(1, 1);
+  // get old orientation and calculate new orientation
+  double new_orientation = getRotation() + dphi;
+
+  // update both position and orientation
+  setTranslation(new_x_position, new_y_position);
+  setRotation(new_orientation);
 }
 
-double cedar::dev::kteam::DriveModel::calculateDifferencePosition(
-                                                                                int newLeftEncoder,
-                                                                                int oldLeftEncoder,
-                                                                                int newRightEncoder,
-                                                                                int oldRightEncoder
-                                                                              )
+double cedar::dev::kteam::DriveModel::calculateDifferencePosition
+       (
+         int newLeftEncoder,
+         int oldLeftEncoder,
+         int newRightEncoder,
+         int oldRightEncoder
+       ) const
 {
   return ((newRightEncoder - oldRightEncoder)
           + (newLeftEncoder - oldLeftEncoder)) * mpeDrive->getDistancePerPulse() / 2;
 }
 
-double cedar::dev::kteam::DriveModel::calculateDifferenceOrientation(
-                                                                                   int newLeftEncoder,
-                                                                                   int oldLeftEncoder,
-                                                                                   int newRightEncoder,
-                                                                                   int oldRightEncoder
-                                                                                 )
+double cedar::dev::kteam::DriveModel::calculateDifferenceOrientation
+       (
+         int newLeftEncoder,
+         int oldLeftEncoder,
+         int newRightEncoder,
+         int oldRightEncoder
+       ) const
 {
   return ((newRightEncoder - oldRightEncoder) - (newLeftEncoder - oldLeftEncoder))
           * mpeDrive->getDistancePerPulse() / mpeDrive->getWheelDistance();

@@ -41,11 +41,9 @@
 #ifndef CEDAR_AUX_GUI_MATRIX_PLOT_H
 #define CEDAR_AUX_GUI_MATRIX_PLOT_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/DataPlotInterface.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/gui/MultiPlotInterface.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
@@ -53,12 +51,11 @@
 #include <opencv2/opencv.hpp>
 #include <qwtplot3d/qwt3d_types.h>
 
-
-/*!@brief Abstract description of the class.
+/*!@brief Base class for plots that can display matrices.
  *
- * More detailed description of the class.
+ * @todo Write more detailed description of the class here.
  */
-class cedar::aux::gui::MatrixPlot : public cedar::aux::gui::DataPlotInterface
+class cedar::aux::gui::MatrixPlot : public cedar::aux::gui::MultiPlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -79,8 +76,12 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void display(cedar::aux::DataPtr data);
+  //!@brief display a MatData
+  void plot(cedar::aux::DataPtr data, const std::string& title);
 
+  bool canAppend(cedar::aux::ConstDataPtr data) const;
+
+  //!@brief return vector of standard colors
   static const Qwt3D::ColorVector& getStandardColorVector();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -93,7 +94,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void doAppend(cedar::aux::DataPtr data, const std::string& title);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -101,24 +102,14 @@ private:
 protected:
   // none yet
 private:
+  //!@brief the displayed MatData
   cedar::aux::MatDataPtr mData;
+  //!@brief the plot widget
   QWidget *mpCurrentPlotWidget;
+  //!@brief window title
   QString mWindowTitle;
-
+  //!@brief vector filled with standard colors
   static Qwt3D::ColorVector mStandardColorVector;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::gui::MatrixPlot
 
 #endif // CEDAR_AUX_GUI_MATRIX_PLOT_H
-

@@ -37,21 +37,21 @@
     Credits:
 
 ======================================================================================================================*/
+
 #ifndef CEDAR_AUX_MATH_EXP_SIGMOID_H
 #define CEDAR_AUX_MATH_EXP_SIGMOID_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/math/sigmoids.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
 
-/*!@brief Abstract description of the sigmoid base class.
+
+/*!@brief Sigmoid function that is based on the exponential function.
  *
- * More detailed description of the sigmoid base class.
+ * @todo Put the equation in here, describe it.
  */
 class cedar::aux::math::ExpSigmoid : public cedar::aux::math::Sigmoid
 {
@@ -82,10 +82,7 @@ public:
 public:
   /*!@brief this function calculates the exp-based sigmoid function for a given double value.
    */
-  virtual double compute(double value) const
-  {
-    return cedar::aux::math::sigmoidExp(value, mBeta->getValue(), mThreshold->getValue());
-  }
+  virtual double compute(double value) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -105,19 +102,9 @@ private:
 protected:
   //!@brief steepness of the exp-sigmoid
   cedar::aux::DoubleParameterPtr mBeta;
-private:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
 
 private:
   // none yet
-
 };
-
 
 #endif  // CEDAR_AUX_MATH_EXP_SIGMOID_H

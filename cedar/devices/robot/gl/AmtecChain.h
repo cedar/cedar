@@ -37,11 +37,9 @@
 #ifndef CEDAR_DEV_ROBOT_GL_AMTEC_CHAIN_H
 #define CEDAR_DEV_ROBOT_GL_AMTEC_CHAIN_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/gl/namespace.h"
 #include "cedar/devices/robot/gl/KinematicChain.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -49,7 +47,7 @@
 /*!@brief Visualization of an arm built from blue Amtec power cubes
  *
  * This class provides a simple OpenGL visualization of the an arm built from blue Amtec power cubes. It has to be
- * provided with a pointer to an instance of KinematicChainModel of the CoRA arm, used to get the transformations to
+ * provided with a pointer to an instance of KinematicChain of the CoRA arm, used to get the transformations to
  * the joint coordinate frames. To actually display the arm, add an instance of this class to a scene
  * (cedar::aux::gl::Scene) and create a viewer for that scene (cedar::aux::gl::Viewer).
  */
@@ -64,7 +62,7 @@ class cedar::dev::robot::gl::AmtecChain : public cedar::dev::robot::gl::Kinemati
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  AmtecChain(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel);
+  AmtecChain(cedar::dev::robot::KinematicChainPtr pKinematicChain);
   //!@brief destructor
   ~AmtecChain();
 
@@ -177,16 +175,5 @@ protected:
   static const float mChrome_Specular[3];
   //!@brief material information
   static const float mChrome_Shininess[1];
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::dev::robot::gl::AmtecChain
-
 #endif // CEDAR_DEV_ROBOT_GL_AMTEC_CHAIN_H

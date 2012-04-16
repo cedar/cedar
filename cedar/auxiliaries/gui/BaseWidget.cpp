@@ -34,11 +34,8 @@
 
 ======================================================================================================================*/
 
-
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/BaseWidget.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QDesktopWidget>

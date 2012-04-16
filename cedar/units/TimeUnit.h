@@ -41,21 +41,21 @@
 #ifndef CEDAR_UNITS_TIME_UNIT_H
 #define CEDAR_UNITS_TIME_UNIT_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/units/namespace.h"
 #include "cedar/units/Time.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <iostream>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Template class for time units.
  *
- * More detailed description of the class.
+ * @todo Describe this.
  *
  * @todo Read units from strings.
+ *
+ * @see @ref UnitsConcept
  */
 template <unsigned int T_factor, const char* T_suffix>
 class cedar::unit::TimeUnit : public Time
@@ -67,7 +67,6 @@ class cedar::unit::TimeUnit : public Time
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-
   friend std::ostream& operator <<(std::ostream &stream, const TimeUnit& unit)
   {
     stream << unit.mAmountInMicroSeconds / static_cast<double>(T_factor) << " " << T_suffix;
@@ -110,6 +109,23 @@ public:
   {
     double value = this->getRawTime() / otherFactor;
     return TimeUnit<otherFactor, otherSuffix>(value);
+  }
+
+  /*!@brief Comparision operator.
+   */
+  template <unsigned int otherFactor, const char* otherSuffix>
+  bool operator< (const TimeUnit<otherFactor, otherSuffix>& other) const
+  {
+    return this->mAmountInMicroSeconds < other.mAmountInMicroSeconds;
+  }
+
+  /*!@brief The addition operator.
+   */
+  template <unsigned int otherFactor, const char* otherSuffix>
+  TimeUnit& operator+= (const TimeUnit<otherFactor, otherSuffix>& other)
+  {
+    this->mAmountInMicroSeconds += other.mAmountInMicroSeconds;
+    return *this;
   }
 
   /*!@brief star operator for multiplying a TimeUnit with a scalar value on right side
@@ -205,25 +221,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::unit::TimeUnit
 
 #endif // CEDAR_UNITS_TIME_UNIT_H
-

@@ -40,11 +40,9 @@
 #ifndef CEDAR_AUX_MATH_ALGEBRA_TOOLS_H
 #define CEDAR_AUX_MATH_ALGEBRA_TOOLS_H
 
-// LOCAL INCLUDES
-#include "cedar/auxiliaries/math/tools.h"
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -83,15 +81,16 @@ namespace cedar
        */
       CEDAR_AUX_LIB_EXPORT std::vector<double> solvePolynomial(const std::vector<double>& rCoefficients);
 
+      //!@brief function that calculates the cubic root of a floating point value
       inline double fast_cuberoot(double in)
       {
-#ifdef MSVC
+#ifdef _MSC_VER
         return std::pow(in, 1.0/3.0);
-#else // MSVC
+#else // not _MSC_VER
         return cbrt(in);
-#endif // MSVC
+#endif // _MSC_VER
       }
-    };
-  };
-};
+    }
+  }
+}
 #endif // CEDAR_AUX_MATH_ALGEBRA_TOOLS_H

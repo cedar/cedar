@@ -37,10 +37,8 @@
 #ifndef CEDAR_AUX_FACTORY_H
 #define CEDAR_AUX_FACTORY_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -49,15 +47,17 @@
  *
  * BaseType must offer at least a constructor accepting an argument of type const cedar::aux::Arguments&.
  *
- * @remarks If the BaseType is abstract, use cedar::aux::AbstractFactory instead.
+ * @param BaseType Type being returned by the allocate functions.
+ *
  */
-template <typename BaseType, typename SmartPointerType>
+template <typename BaseTypePtr>
 class cedar::aux::Factory
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-
+public:
+  typedef typename BaseTypePtr::element_type BaseType;
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -71,15 +71,10 @@ public:
    *
    * @returns A smart pointer to the newly allocated resource.
    */
-  virtual SmartPointerType allocate() const
-  {
-    return SmartPointerType (new BaseType());
-  }
+  virtual BaseTypePtr allocate() const = 0;
 
-  virtual BaseType* allocateRaw() const
-  {
-    return new BaseType();
-  }
+  //!@brief allocate an object without using a shared pointer to store the instance
+  virtual BaseType* allocateRaw() const = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -96,25 +91,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::Factory
 
 #endif // CEDAR_AUX_FACTORY_H
-

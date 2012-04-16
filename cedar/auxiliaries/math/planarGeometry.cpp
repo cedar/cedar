@@ -34,12 +34,9 @@
 
 ======================================================================================================================*/
 
-
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/math/planarGeometry.h"
 #include "cedar/auxiliaries/math/algebraTools.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <algorithm>

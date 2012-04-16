@@ -36,12 +36,9 @@
 #ifndef CEDAR_DEV_ROBOT_SIMULATED_KINEMATIC_CHAIN_H
 #define CEDAR_DEV_ROBOT_SIMULATED_KINEMATIC_CHAIN_H
 
-// LOCAL INCLUDES
-#include "namespace.h"
-#include "ReferenceGeometry.h"
-#include "KinematicChain.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/devices/robot/namespace.h"
+#include "cedar/devices/robot/KinematicChain.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -58,8 +55,6 @@ class cedar::dev::robot::SimulatedKinematicChain : public cedar::dev::robot::Kin
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  SimulatedKinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry);
-  //!@brief constructor
   SimulatedKinematicChain(const std::string& configFileName);
   //!@brief destructor
   ~SimulatedKinematicChain();
@@ -68,18 +63,24 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief check whether the kinematic chain is currently responsive to movement commands
+   *
+   * @return    state
+   */
+  bool isMovable() const;
+
   /*!@brief get current state of a single joint angle
    *
    * @return    joint angle value
    */
-  double getJointAngle(unsigned int index);
+  double getJointAngle(unsigned int index) const;
   
   /*!@brief set current state of a single joint angle
    *
    * @param index    specifies the joint
    * @param angle    new joint angle value
    */
-  void setJointAngle(unsigned int index, const double angle);
+  void setJointAngle(unsigned int index, double angle);
   
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -92,9 +93,6 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //! vector of joint angles, in radians
-  cv::Mat mJointAngles;
-  
-}; // class cedar::dev::robot::SimulatedKinematicChain
 
+}; // class cedar::dev::robot::SimulatedKinematicChain
 #endif // CEDAR_DEV_ROBOT_SIMULATED_KINEMATIC_CHAIN_H

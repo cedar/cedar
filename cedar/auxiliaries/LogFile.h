@@ -34,31 +34,23 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_AUX_LOG_FILE_H
 #define CEDAR_AUX_LOG_FILE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-
-// PROJECT INCLUDES
-#include "namespace.h"
+#include "cedar/namespace.h"
 
 // SYSTEM INCLUDES
 #include <fstream>
 #include <string>
 
-
-/*!@brief Abstract description of the class.
+/*!@brief A class for logging messages in a file.
  *
- * More detailed description of the class.
+ * @todo more descriptions.
  */
 class cedar::aux::LogFile : public std::ofstream
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -67,16 +59,16 @@ public:
   LogFile(const std::string& logFileName);
 
   //!@brief Destructor
-  virtual ~LogFile(void);
+  virtual ~LogFile();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Adds a separator line to the log file.
-  void addSeparatorLine(void);
+  void addSeparatorLine();
   //!@brief Adds a time stamp to the log file, without linefeed.
-  void addTimeStamp(void);
+  void addTimeStamp();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -92,25 +84,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::LogFile
 
 #endif // CEDAR_AUX_LOG_FILE_H
-

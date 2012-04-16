@@ -34,18 +34,14 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_AUX_MATH_FUNCTIONS_H
 #define CEDAR_AUX_MATH_FUNCTIONS_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <math.h>
-#include <stdint.h>
 
 namespace cedar
 {
@@ -64,16 +60,17 @@ namespace cedar
        */
       inline double round(double val)
       {
-        return static_cast<double>(static_cast<int64_t>(val + 0.5));
+        return static_cast<double>(static_cast<int>(val + 0.5));
       }
 
       /*!@brief Rounds a number to the closest integer.
        */
       inline float round(float val)
       {
-        return static_cast<float>(static_cast<int32_t>(val + 0.5));
+        return static_cast<float>(static_cast<int>(val + 0.5));
       }
-    };
-  };
-};
+    }
+  }
+}
+
 #endif  // CEDAR_AUX_MATH_FUNCTIONS_H

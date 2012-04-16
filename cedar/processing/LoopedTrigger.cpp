@@ -39,18 +39,49 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/StepTime.h"
 #include "cedar/units/TimeUnit.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/LoopMode.h"
+#include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/System.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
 #include <algorithm>
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the trigger class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr looped_trigger_declaration
+    (
+      new ElementDeclarationTemplate<cedar::proc::LoopedTrigger>
+      (
+        "Triggers",
+        "cedar.processing.LoopedTrigger"
+      )
+    );
+    looped_trigger_declaration->setIconPath(":/triggers/looped_trigger.svg");
+
+    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(looped_trigger_declaration);
+
+    return true;
+  }
+
+  bool declared = declare();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -59,10 +90,18 @@
 cedar::proc::LoopedTrigger::LoopedTrigger(double stepSize)
 :
 cedar::aux::LoopedThread(stepSize),
+cedar::proc::Trigger("", true),
 //!@todo Should these parameters go into cedar::aux::LoopedThread?
-mLoopType(new cedar::aux::EnumParameter(this, "LoopMode", cedar::proc::LoopMode::typePtr(), cedar::proc::LoopMode::FIXED_ADAPTIVE)),
+mLoopType(new cedar::aux::EnumParameter(
+                                         this,
+                                         "LoopMode",
+                                         cedar::proc::LoopMode::typePtr(),
+                                         cedar::proc::LoopMode::FIXED_ADAPTIVE
+                                       )
+         ),
 //!@todo Make a TimeParameter and use it here instead.
-mLoopTime(new cedar::aux::DoubleParameter(this, "LoopTime", 1.0, 1.0, 1000000.0))
+mLoopTime(new cedar::aux::DoubleParameter(this, "LoopTime", 1.0, 1.0, 1000000.0)),
+mWait(new cedar::aux::BoolParameter(this, "wait", true))
 {
 
   QObject::connect(this->mLoopType.get(), SIGNAL(valueChanged()), this, SLOT(loopModeChanged()));
@@ -71,6 +110,7 @@ mLoopTime(new cedar::aux::DoubleParameter(this, "LoopTime", 1.0, 1.0, 1000000.0)
 
 cedar::proc::LoopedTrigger::~LoopedTrigger()
 {
+  this->stopTrigger();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -103,21 +143,41 @@ void cedar::proc::LoopedTrigger::loopTimeChanged()
   this->setStepSize(this->mLoopTime->getValue());
 }
 
+void cedar::proc::LoopedTrigger::removeListener(cedar::proc::TriggerablePtr triggerable)
+{
+  this->cedar::proc::Trigger::removeListener(triggerable);
+  if (this->isRunning())
+  {
+    triggerable->callOnStop();
+  }
+}
+
+void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr triggerable)
+{
+  this->cedar::proc::Trigger::addListener(triggerable);
+  if (this->isRunning())
+  {
+    triggerable->callOnStart();
+  }
+}
+
 void cedar::proc::LoopedTrigger::startTrigger()
 {
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
-    this->mListeners.at(i)->onStart();
+    this->mListeners.at(i)->callOnStart();
   }
+  CEDAR_NON_CRITICAL_ASSERT(!this->isRunning());
   this->start();
 }
 
 void cedar::proc::LoopedTrigger::stopTrigger()
 {
-  this->stop();
+  this->stop(2000);
+
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
-    this->mListeners.at(i)->onStop();
+    this->mListeners.at(i)->callOnStop();
   }
 }
 
@@ -126,5 +186,13 @@ void cedar::proc::LoopedTrigger::step(double time)
   cedar::proc::ArgumentsPtr arguments (new cedar::proc::StepTime(cedar::unit::Milliseconds(time)));
 
   this->trigger(arguments);
+
+  //!@todo What's this usleep doing here?
   usleep(100);
+
+  if (this->mWait->getValue())
+  {
+    // wait for all listeners
+    this->cedar::proc::Trigger::wait();
+  }
 }

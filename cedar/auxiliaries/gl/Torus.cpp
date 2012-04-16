@@ -19,100 +19,74 @@
 
 ========================================================================================================================
 
- ----- Institute:   Ruhr-Universitaet-Bochum
-                    Institut fuer Neuroinformatik
- 
- ----- File:        Torus.cpp
- 
- ----- Maintainer:  Hendrik Reimann
- ------Email:       hendrik.reimann@ini.rub.de
- ----- Date:        2010 10 29
- 
- ----- Description: visualization for a torus
- 
- ----- Credits:     
- ---------------------------------------------------------------------------------------------------------------------*/
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
 
-// LOCAL INCLUDES
+    File:        Torus.cpp
+
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
+    Date:        2010 11 29
+
+    Description: Visualization of a torus
+
+    Credits:
+
+======================================================================================================================*/
+
+// CEDAR INCLUDES
 #include "drawShapes.h"
 #include "Torus.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
-using namespace cedar::aux::gl;
-using namespace std;
-using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Torus::Torus(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Torus::Torus
+(
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+  double radius,
+  double thickness,
+  double colorR,
+  double colorG,
+  double colorB
+)
 :
-cedar::aux::gl::Object(pObject)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Torus", colorR, colorG, colorB),
+mRadius(radius),
+mThickness(thickness)
 {
-  mRadius = 3;
-  mThickness = .5;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
-  mObjectType = "Torus";
-}
-
-Torus::Torus(
-              cedar::aux::ObjectPtr pObject,
-              const double radius,
-              const double thickness,
-              const double R,
-              const double G,
-              const double B
-            )
-:
-cedar::aux::gl::Object(pObject)
-{
-  mRadius = radius;
-  mThickness = thickness;
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-  mObjectType = "Torus";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void Torus::setRadius(double value)
+void cedar::aux::gl::Torus::setRadius(double value)
 {
   mRadius = value;
 }
 
-void Torus::setThickness(double value)
+void cedar::aux::gl::Torus::setThickness(double value)
 {
   mThickness = value;
 }
 
-double Torus::radius()
+double cedar::aux::gl::Torus::radius() const
 {
   return mRadius;
 }
 
-double Torus::thickness()
+double cedar::aux::gl::Torus::thickness() const
 {
   return mThickness;
 }
 
-void Torus::draw()
+void cedar::aux::gl::Torus::draw()
 {
-  // move to origin
-  glPopMatrix();
-  glPushMatrix();
-  
-  // move to object coordinates
-  mTransformationTranspose = mpObject->getTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  prepareDraw();
   
   // draw the Torus
   if (mIsVisible)

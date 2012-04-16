@@ -38,59 +38,21 @@
 
 ======================================================================================================================*/
 
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/exceptions.h"
 
-cedar::aux::UnhandledTypeException::UnhandledTypeException()
-{
-  this->mType = "UnhandledTypeException";
-}
+// SYSTEM INCLUDES
+#include "cedar/auxiliaries/math/tools.h"
 
-cedar::aux::UnknownTypeException::UnknownTypeException()
+cedar::aux::MatrixMismatchException::MatrixMismatchException(const cv::Mat& matA, const cv::Mat& matB)
 {
-  this->mType = "UnknownTypeException";
-}
+  unsigned int dim_a = cedar::aux::math::getDimensionalityOf(matA);
+  unsigned int dim_b = cedar::aux::math::getDimensionalityOf(matA);
 
-cedar::aux::ParameterNotFoundException::ParameterNotFoundException()
-{
-  this->mType = "ParameterNotFoundException";
-}
-
-cedar::aux::DuplicateIdException::DuplicateIdException()
-{
-  this->mType = "DuplicateIdException";
-}
-
-cedar::aux::DuplicateNameException::DuplicateNameException()
-{
-  this->mType = "DuplicateNameException";
-}
-
-cedar::aux::UnknownNameException::UnknownNameException()
-{
-  this->mType = "UnknownNameException";
-}
-
-cedar::aux::UnhandledValueException::UnhandledValueException()
-{
-  this->mType = "UnhandledValueException";
-}
-
-cedar::aux::RangeException::RangeException()
-{
-  this->mType = "RangeException";
-}
-
-cedar::aux::NoDefaultException::NoDefaultException()
-{
-  this->mType = "NoDefaultException";
-}
-
-cedar::aux::InvalidNameException::InvalidNameException()
-{
-  this->mType = "InvalidNameException";
-}
-
-cedar::aux::TypeMismatchException::TypeMismatchException()
-{
-  this->mType = "TypeMismatchException";
+  std::string message = "The sizes or types of the matrices mismatch.\n";
+  message += "First matrix is:\ndim: ";
+  message += cedar::aux::toString(dim_a) + ", size: " + cedar::aux::math::matrixSizeToString(matA);
+  message += "Second matrix is:\ndim: ";
+  message += cedar::aux::toString(dim_b) + ", size: " + cedar::aux::math::matrixSizeToString(matB);
+  this->setMessage(message);
 }

@@ -34,14 +34,11 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_AUX_KERNEL_NAMESPACE_H
 #define CEDAR_AUX_KERNEL_NAMESPACE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-
-// PROJECT INCLUDES
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
@@ -55,9 +52,14 @@ namespace cedar
   /*!@brief Namespace for all kernel classes. */
     namespace kernel
     {
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_AUX_CLASS(Kernel);
       CEDAR_DECLARE_AUX_CLASS(Separable);
       CEDAR_DECLARE_AUX_CLASS(Gauss);
+      //!@endcond
+
+      //!@brief The factory manager for kernel classes.
+      typedef cedar::aux::FactoryManager<cedar::aux::kernel::KernelPtr> FactoryManager;
     }
   }
 }

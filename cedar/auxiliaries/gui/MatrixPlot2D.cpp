@@ -38,15 +38,16 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+#define NOMINMAX // prevents MSVC conflicts
+
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/MatrixPlot2D.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
@@ -59,11 +60,10 @@
 
 cedar::aux::gui::MatrixPlot2D::MatrixPlot2D(QWidget *pParent)
 :
-cedar::aux::gui::DataPlotInterface(pParent)
+cedar::aux::gui::PlotInterface(pParent)
 {
   this->init();
 }
-
 
 cedar::aux::gui::MatrixPlot2D::Perspective::Perspective(const std::string& name,
                                                         double rotationX, double rotationY, double rotationZ,
@@ -85,14 +85,14 @@ mZoom(zoom)
   mShift[2]    = shiftZ;
 }
 
-cedar::aux::gui::MatrixPlot2D::MatrixPlot2D(cedar::aux::DataPtr matData, QWidget *pParent)
+cedar::aux::gui::MatrixPlot2D::MatrixPlot2D(cedar::aux::DataPtr matData, const std::string& title, QWidget *pParent)
 :
-cedar::aux::gui::DataPlotInterface(pParent),
+cedar::aux::gui::PlotInterface(pParent),
 mShowGridLines(false),
 mppArrayData(NULL)
 {
   this->init();
-  this->display(matData);
+  this->plot(matData, title);
 }
 
 cedar::aux::gui::MatrixPlot2D::~MatrixPlot2D()
@@ -122,7 +122,7 @@ void cedar::aux::gui::MatrixPlot2D::updateArrayData()
   this->mMatData->lockForRead();
   this->mMatData->getData().convertTo(data, CV_64F);
   this->mMatData->unlock();
-  if (data.rows < 2 || data.cols < 2) // plot is no longer capable of displaying the data
+  if (cedar::aux::math::getDimensionalityOf(data) != 2) // plot is no longer capable of displaying the data
   {
     emit dataChanged();
     return;
@@ -163,17 +163,17 @@ void cedar::aux::gui::MatrixPlot2D::Perspective::applyTo(Qwt3D::Plot3D* pPlot)
   pPlot->setZoom(mZoom);
 }
 
-void cedar::aux::gui::MatrixPlot2D::display(cedar::aux::DataPtr data)
+void cedar::aux::gui::MatrixPlot2D::plot(cedar::aux::DataPtr data, const std::string& /* title */)
 {
   this->mMatData = boost::shared_dynamic_cast<cedar::aux::MatData>(data);
 
   if (!this->mMatData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
-                "Could not cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot2D::display.");
+                "Could not cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot2D::plot.");
   }
 
-  this->startTimer(200); //!@todo make the refresh time configurable.
+  this->startTimer(60); //!@todo make the refresh time configurable.
 }
 
 void cedar::aux::gui::MatrixPlot2D::init()
@@ -193,6 +193,7 @@ void cedar::aux::gui::MatrixPlot2D::init()
                                             ));
   // create a new layout for the widget
   QVBoxLayout *p_layout = new QVBoxLayout();
+  p_layout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(p_layout);
 
   // create the plot object and add it to this widget
@@ -216,7 +217,10 @@ void cedar::aux::gui::MatrixPlot2D::timerEvent(QTimerEvent * /* pEvent */)
   if (this->isVisible() && this->mMatData)
   {
     this->updateArrayData();
-    CEDAR_DEBUG_ASSERT(this->mppArrayData != NULL);
+    if(this->mppArrayData == NULL)
+    {
+      return;
+    }
     this->mpPlot->createDataset(this->mppArrayData, mDataRows, mDataCols);
     this->mpPlot->updateGL();
   }

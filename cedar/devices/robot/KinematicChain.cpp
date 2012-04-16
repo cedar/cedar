@@ -34,38 +34,54 @@
 
 ======================================================================================================================*/
 
-
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/KinematicChain.h"
-#include "cedar/devices/robot/ReferenceGeometry.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/math/screwCalculus.h"
+#include "cedar/auxiliaries/math/LimitsParameter.h"
+#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/FactoryManager.h"
 
 // SYSTEM INCLUDES
 
-using namespace std;
-using namespace cedar::dev::robot;
-using namespace cv;
+namespace
+{
+  bool registeredJoint
+    = cedar::aux::Singleton
+      <
+        cedar::aux::FactoryManager<cedar::dev::robot::KinematicChain::JointPtr>
+      >
+      ::getInstance()->registerType<cedar::dev::robot::KinematicChain::JointPtr>();
+}
 
 //------------------------------------------------------------------------------
 // constructors and destructor
 //------------------------------------------------------------------------------
 
 //! constructor
-KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry)
+cedar::dev::robot::KinematicChain::KinematicChain
+(
+  const std::string& configFileName,
+  cedar::aux::LocalCoordinateFramePtr pEndEffector
+)
 :
-LoopedThread(12, 0.01), //!\todo this step size should be set different, should be a parameter, i.e. read in from configuration file
-mpReferenceGeometry(rpReferenceGeometry)
+LoopedThread(configFileName),
+mpJoints(new JointListParameter(this, "joints")),
+mpRootCoordinateFrame(new cedar::aux::LocalCoordinateFrame()),
+mpEndEffectorCoordinateFrame(pEndEffector)
 {
   setWorkingMode(ANGLE);
   mUseCurrentHardwareValues = false;
   init();
 }
 
-KinematicChain::KinematicChain(const std::string& configFileName)
+cedar::dev::robot::KinematicChain::KinematicChain(const std::string& configFileName)
 :
 LoopedThread(configFileName),
-mpReferenceGeometry(new ReferenceGeometry(configFileName))
+mpJoints(new JointListParameter(this, "joints")),
+mpRootCoordinateFrame(new cedar::aux::LocalCoordinateFrame()),
+mpEndEffectorCoordinateFrame(new cedar::aux::LocalCoordinateFrame())
 {
   setWorkingMode(ANGLE);
   mUseCurrentHardwareValues = false;
@@ -73,33 +89,97 @@ mpReferenceGeometry(new ReferenceGeometry(configFileName))
 }
 
 //! destructor
-KinematicChain::~KinematicChain()
+cedar::dev::robot::KinematicChain::~KinematicChain()
 {
+  if (isRunning())
+  {
+    this->stop();
+    this->wait();
+  }
+}
+
+//! constructor
+cedar::dev::robot::KinematicChain::Joint::Joint()
+:
+_mpPosition(new cedar::aux::DoubleVectorParameter(this, "position", -10.0, 10.0)),
+_mpAxis(new cedar::aux::DoubleVectorParameter(this, "axis", -1.0, 1.0)),
+_mpAngleLimits(new cedar::aux::math::LimitsParameter<double>(this, "angle limits", -2*M_PI, 0.0, 0.0, 2*M_PI)),
+_mpVelocityLimits(new cedar::aux::math::LimitsParameter<double>(this, "velocity limits", -2*M_PI, 0.0, 0.0, 2*M_PI))
+{
+
 }
 
 //------------------------------------------------------------------------------
 // methods
 //------------------------------------------------------------------------------
 
-const ReferenceGeometryPtr& KinematicChain::getReferenceGeometry() const
+void cedar::dev::robot::KinematicChain::timerEvent(QTimerEvent*)
 {
-  return mpReferenceGeometry;
+  updateTransformations();
 }
 
-
-unsigned int KinematicChain::getNumberOfJoints() const
+void cedar::dev::robot::KinematicChain::updateTransformations()
 {
-  return mpReferenceGeometry->getNumberOfJoints();
+  calculateTransformations();
 }
 
-
-void KinematicChain::setReferenceGeometry(const ReferenceGeometryPtr& rpGeometry)
+void cedar::dev::robot::KinematicChain::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
-  mpReferenceGeometry = rpGeometry;
+  cedar::aux::Configurable::readConfiguration(node);
+
+  // create state variables
+  mJointAngles = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+  mJointVelocities = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+  mJointAccelerations = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+
+  // transform joint geometry into twist coordinates
+  cv::Mat xi;
+  cv::Mat T;
+  cv::Mat p;
+  cv::Mat omega = cv::Mat::zeros(3, 1, CV_64FC1);
+  for (unsigned int j=0; j<getNumberOfJoints(); j++)
+  {
+    // create and store twist
+    cedar::dev::robot::KinematicChain::JointPtr joint = getJoint(j);
+    p = cv::Mat::zeros(3, 1, CV_64FC1);
+    p.at<double>(0, 0) = joint->_mpPosition->at(0);
+    p.at<double>(1, 0) = joint->_mpPosition->at(1);
+    p.at<double>(2, 0) = joint->_mpPosition->at(2);
+    omega = cv::Mat::zeros(3, 1, CV_64FC1);
+    omega.at<double>(0, 0) = joint->_mpAxis->at(0);
+    omega.at<double>(1, 0) = joint->_mpAxis->at(1);
+    omega.at<double>(2, 0) = joint->_mpAxis->at(2);
+    xi = cedar::aux::math::twistCoordinates<double>(p, omega);
+    mReferenceJointTwists.push_back(xi.clone());
+
+    // create and store transformation matrix to joint coordinate frame
+    T = cv::Mat::eye(4, 4, CV_64FC1);
+    T.at<double>(0, 3) = joint->_mpPosition->at(0);
+    T.at<double>(1, 3) = joint->_mpPosition->at(1);
+    T.at<double>(2, 3) = joint->_mpPosition->at(2);
+    mReferenceJointTransformations.push_back(T.clone());
+
+    // create storage variables for intermediate results
+    mTwistExponentials.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
+    mProductsOfExponentials.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
+    mJointTransformations.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
+    mJointTwists.push_back(cv::Mat::zeros(6, 1, CV_64FC1));
+  }
+
+  // end-effector
+  mReferenceEndEffectorTransformation = getEndEffectorCoordinateFrame()->getTransformation();
+
+  // update storage variables
+  calculateTransformations();
 }
 
+unsigned int cedar::dev::robot::KinematicChain::getNumberOfJoints() const
+{
+//  return mpReferenceGeometry->getNumberOfJoints();
+  return mpJoints->size();
+}
 
-std::vector<double> KinematicChain::getJointAngles()
+std::vector<double> cedar::dev::robot::KinematicChain::getJointAngles() const
 {
   std::vector<double> dummy(getNumberOfJoints());
 
@@ -112,11 +192,11 @@ std::vector<double> KinematicChain::getJointAngles()
 }
 
 
-Mat KinematicChain::getJointAnglesMatrix()
+cv::Mat cedar::dev::robot::KinematicChain::getJointAnglesMatrix() const
 {
-  Mat dummy = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+  cv::Mat dummy = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
 
-  for(unsigned int i = 0; i < getNumberOfJoints(); ++i)
+  for (unsigned int i = 0; i < getNumberOfJoints(); ++i)
   {
     dummy.at<double>(i,0) = getJointAngle(i);
   }
@@ -125,9 +205,9 @@ Mat KinematicChain::getJointAnglesMatrix()
 }
 
 
-double KinematicChain::getJointVelocity(unsigned int index)
+double cedar::dev::robot::KinematicChain::getJointVelocity(unsigned int index) const
 {
-  if(index >= getNumberOfJoints())
+  if (index >= getNumberOfJoints())
   {
     return 0.0;
   }
@@ -136,11 +216,11 @@ double KinematicChain::getJointVelocity(unsigned int index)
 }
 
 
-std::vector<double> KinematicChain::getJointVelocities()
+std::vector<double> cedar::dev::robot::KinematicChain::getJointVelocities() const
 {
   std::vector<double> dummy(getNumberOfJoints());
 
-  for(unsigned int i = 0; i < getNumberOfJoints(); ++i)
+  for (unsigned int i = 0; i < getNumberOfJoints(); ++i)
   {
     dummy[i] = mJointVelocities.at<double>(i,0);
   }
@@ -149,15 +229,15 @@ std::vector<double> KinematicChain::getJointVelocities()
 }
 
 
-Mat KinematicChain::getJointVelocitiesMatrix()
+cv::Mat cedar::dev::robot::KinematicChain::getJointVelocitiesMatrix() const
 {
   return mJointVelocities.clone();
 }
 
 
-double KinematicChain::getJointAcceleration(unsigned int index)
+double cedar::dev::robot::KinematicChain::getJointAcceleration(unsigned int index) const
 {
-  if(index >= getNumberOfJoints())
+  if (index >= getNumberOfJoints())
   {
     return 0.0;
   }
@@ -166,11 +246,11 @@ double KinematicChain::getJointAcceleration(unsigned int index)
 }
 
 
-std::vector<double> KinematicChain::getJointAccelerations()
+std::vector<double> cedar::dev::robot::KinematicChain::getJointAccelerations() const
 {
   std::vector<double> dummy(getNumberOfJoints());
 
-  for(unsigned int i = 0; i < getNumberOfJoints(); ++i)
+  for (unsigned int i = 0; i < getNumberOfJoints(); ++i)
   {
     dummy[i] = mJointAccelerations.at<double>(i,0);
   }
@@ -179,31 +259,31 @@ std::vector<double> KinematicChain::getJointAccelerations()
 }
 
 
-cv::Mat KinematicChain::getJointAccelerationsMatrix()
+cv::Mat cedar::dev::robot::KinematicChain::getJointAccelerationsMatrix() const
 {
   return mJointAccelerations.clone();
 }
 
 
-KinematicChain::ActionType KinematicChain::getWorkingMode()
+cedar::dev::robot::KinematicChain::ActionType cedar::dev::robot::KinematicChain::getWorkingMode()
 {
   return mCurrentWorkingMode;
 }
 
-void KinematicChain::setJointAngles(const std::vector<double>& angles)
+void cedar::dev::robot::KinematicChain::setJointAngles(const std::vector<double>& angles)
 {
   if(angles.size() != getNumberOfJoints())
   {
-    cout << "Error: You provided an vector of angles with the wrong size ("
-        << angles.size() << " != " << getNumberOfJoints() << ")!" << endl;
+    std::cout << "Error: You provided an vector of angles with the wrong size ("
+      << angles.size() << " != " << getNumberOfJoints() << ")!" << std::endl;
     return;
   }
 
   for(unsigned i = 0; i < getNumberOfJoints(); i++)
   {
     double angle = angles[i];
-    angle = max<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.min);
-    angle = min<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.max);
+    angle = std::max<double>(angle, getJoint(i)->_mpAngleLimits->getLowerLimit());
+    angle = std::min<double>(angle, getJoint(i)->_mpAngleLimits->getUpperLimit());
 
     setJointAngle(i, angle);
   }
@@ -212,22 +292,22 @@ void KinematicChain::setJointAngles(const std::vector<double>& angles)
 }
 
 
-void KinematicChain::setJointAngles(const cv::Mat& angles)
+void cedar::dev::robot::KinematicChain::setJointAngles(const cv::Mat& angles)
 {
-  if(angles.size().height != (int)getNumberOfJoints() || angles.size().width != 1)
+  if (angles.size().height != (int)getNumberOfJoints() || angles.size().width != 1)
   {
-    cout << "Error: You provided an matrix of angles with the wrong size [("
-        << angles.size().height << "," << angles.size().width
-        << ") != (" << getNumberOfJoints() << ",1)]!" << endl;
+    std::cout << "Error: You provided an matrix of angles with the wrong size [("
+      << angles.size().height << "," << angles.size().width
+      << ") != (" << getNumberOfJoints() << ",1)]!" << std::endl;
     return;
   }
 
-  for(unsigned i = 0; i < getNumberOfJoints(); i++)
+  for (unsigned i = 0; i < getNumberOfJoints(); i++)
   {
     //TODO: use applyAngleLimits() ?
     double angle = angles.at<double>(i,0);
-    angle = max<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.min);
-    angle = min<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.max);
+    angle = std::max<double>(angle, getJoint(i)->_mpAngleLimits->getLowerLimit());
+    angle = std::min<double>(angle, getJoint(i)->_mpAngleLimits->getUpperLimit());
 
     setJointAngle(i, angle);
   }
@@ -236,16 +316,16 @@ void KinematicChain::setJointAngles(const cv::Mat& angles)
 }
 
 
-bool KinematicChain::setJointVelocity(unsigned int index, double velocity)
+bool cedar::dev::robot::KinematicChain::setJointVelocity(unsigned int index, double velocity)
 {
-  if(index >= getNumberOfJoints())
+  if (index >= getNumberOfJoints())
   {
-    cout << "Error: Trying to set velocity for joint " << index << "!" << endl;
+    std::cout << "Error: Trying to set velocity for joint " << index << "!" << std::endl;
     return false;
   }
   //TODO use applyVelocityLimits()?
-  velocity = max<double>(velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.min);
-  velocity = min<double>(velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.max);
+  velocity = std::max<double>(velocity, getJoint(index)->_mpVelocityLimits->getLowerLimit());
+  velocity = std::min<double>(velocity, getJoint(index)->_mpVelocityLimits->getUpperLimit());
 
   mJointVelocities.at<double>(index,0) = velocity;
 
@@ -253,12 +333,12 @@ bool KinematicChain::setJointVelocity(unsigned int index, double velocity)
 }
 
 
-bool KinematicChain::setJointVelocities(const std::vector<double>& velocities)
+bool cedar::dev::robot::KinematicChain::setJointVelocities(const std::vector<double>& velocities)
 {
-  if(velocities.size() != getNumberOfJoints())
+  if (velocities.size() != getNumberOfJoints())
   {
-    cout << "Error: You provided an vector of velocities with the wrong size ("
-        << velocities.size() << " != " << getNumberOfJoints() << ")!" << endl;
+    std::cout << "Error: You provided an vector of velocities with the wrong size ("
+      << velocities.size() << " != " << getNumberOfJoints() << ")!" << std::endl;
     return false;
   }
 
@@ -276,21 +356,21 @@ bool KinematicChain::setJointVelocities(const std::vector<double>& velocities)
 }
 
 
-bool KinematicChain::setJointVelocities(const cv::Mat& velocities)
+bool cedar::dev::robot::KinematicChain::setJointVelocities(const cv::Mat& velocities)
 {
   if(velocities.size().height != (int)getNumberOfJoints() || velocities.size().width != 1)
   {
-    cout << "Error: You provided an matrix of velocities with the wrong size [("
+    std::cout << "Error: You provided an matrix of velocities with the wrong size [("
         << velocities.size().height << "," << velocities.size().width
-        << ") != (" << getNumberOfJoints() << ",1)]!" << endl;
+        << ") != (" << getNumberOfJoints() << ",1)]!" << std::endl;
     return false;
   }
 
   bool hardware_velocity = true;
 
-  for(unsigned i = 0; i < getNumberOfJoints(); i++)
+  for (unsigned i = 0; i < getNumberOfJoints(); i++)
   {
-    if(!setJointVelocity(i, velocities.at<double>(i, 0)))
+    if (!setJointVelocity(i, velocities.at<double>(i, 0)))
     {
       hardware_velocity = false;
     }
@@ -300,11 +380,11 @@ bool KinematicChain::setJointVelocities(const cv::Mat& velocities)
 }
 
 
-bool KinematicChain::setJointAcceleration(unsigned int index, double acceleration)
+bool cedar::dev::robot::KinematicChain::setJointAcceleration(unsigned int index, double acceleration)
 {
-  if(index >= getNumberOfJoints())
+  if (index >= getNumberOfJoints())
   {
-    cout << "Error: Trying to set acceleration for joint " << index << "!" << endl;
+    std::cout << "Error: Trying to set acceleration for joint " << index << "!" << std::endl;
     return false;
   }
 
@@ -313,12 +393,12 @@ bool KinematicChain::setJointAcceleration(unsigned int index, double acceleratio
 }
 
 
-bool KinematicChain::setJointAccelerations(const std::vector<double>& accelerations)
+bool cedar::dev::robot::KinematicChain::setJointAccelerations(const std::vector<double>& accelerations)
 {
   if(accelerations.size() != getNumberOfJoints())
   {
-    cout << "Error: You provided an matrix of accelerations with the wrong size ("
-        << accelerations.size() << " != " << getNumberOfJoints() << ")!" << endl;
+    std::cout << "Error: You provided an matrix of accelerations with the wrong size ("
+      << accelerations.size() << " != " << getNumberOfJoints() << ")!" << std::endl;
     return false;
   }
 
@@ -331,13 +411,13 @@ bool KinematicChain::setJointAccelerations(const std::vector<double>& accelerati
 }
 
 
-bool KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
+bool cedar::dev::robot::KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
 {
   if(accelerations.size().height != (int)getNumberOfJoints() || accelerations.size().width != 1)
   {
-    cout << "Error: You provided an matrix of accelerations with the wrong size [("
-        << accelerations.size().height << "," << accelerations.size().width
-        << ") != (" << getNumberOfJoints() << ",1)]!" << endl;
+    std::cout << "Error: You provided an matrix of accelerations with the wrong size [("
+      << accelerations.size().height << "," << accelerations.size().width
+      << ") != (" << getNumberOfJoints() << ",1)]!" << std::endl;
     return false;
   }
 
@@ -346,11 +426,11 @@ bool KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
 }
 
 
-void KinematicChain::step(double time)
+void cedar::dev::robot::KinematicChain::step(double time)
 {
 
   // update the angle according to working mode
-  switch(mCurrentWorkingMode)
+  switch (mCurrentWorkingMode)
   {
     case ANGLE:
 
@@ -384,21 +464,22 @@ void KinematicChain::step(double time)
       break;
 
     default:
-      cerr << "Oh oh, something went terribly wrong in cedar::dev::robot::KinematicChain::step(double)!" << endl;
+      std::cerr << "Oh oh, something went terribly wrong in cedar::dev::robot::KinematicChain::step(double)!"
+        << std::endl;
   }
 
   return;
 }
 
 
-void KinematicChain::setWorkingMode(ActionType actionType)
+void cedar::dev::robot::KinematicChain::setWorkingMode(ActionType actionType)
 {
   stop();
 
-  Mat zeros = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+  cv::Mat zeros = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
 
   // need to stop something?
-  switch(mCurrentWorkingMode)
+  switch (mCurrentWorkingMode)
   {
     case ACCELERATION:
       setJointAccelerations(zeros);
@@ -410,13 +491,14 @@ void KinematicChain::setWorkingMode(ActionType actionType)
 
   mCurrentWorkingMode = actionType;
 
-  // want to reset something?
-  switch(mCurrentWorkingMode)
+  // reset variables where necessary (HR: is that really necessary?)
+  switch (mCurrentWorkingMode)
   {
     case ACCELERATION:
-      mJointAccelerations = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+      mJointAccelerations = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
     case VELOCITY:
-      mJointVelocities = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+      mJointVelocities = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+      start();
     case ANGLE:
       break;
   }
@@ -425,60 +507,111 @@ void KinematicChain::setWorkingMode(ActionType actionType)
 }
 
 
-void KinematicChain::init()
+void cedar::dev::robot::KinematicChain::init()
 {
-  stop();
-  mJointAngles = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
-  mJointVelocities = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
-  mJointAccelerations = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
-  return;
+  // todo: integrate init() method of ReferenceGeometry
+
+  // todo: add default values for these...
+  this->addConfigurableChild("root coordinate frame", mpRootCoordinateFrame);
+  this->addConfigurableChild("end-effector coordinate frame", mpEndEffectorCoordinateFrame);
+//  this->addConfigurableChild("joints", mJoints);
+
+//  mJointAngles = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+//  mJointVelocities = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+//  mJointAccelerations = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+
+//  cv::Mat xi;
+//  cv::Mat T;
+//  cv::Mat p;
+//  cv::Mat omega = cv::Mat::zeros(3, 1, CV_64FC1);
+//  omega.at<double>(0, 0) = 1;
+//  for (unsigned int j=0; j<getNumberOfJoints(); j++)
+//  {
+//    cedar::dev::robot::ReferenceGeometry::JointPtr joint = getReferenceGeometry()->getJoint(j);
+//    p = cv::Mat::zeros(3, 1, CV_64FC1);
+//    p.at<double>(0, 0) = joint->position[0];
+//    p.at<double>(1, 0) = joint->position[1];
+//    p.at<double>(2, 0) = joint->position[2];
+//    omega = cv::Mat::zeros(3, 1, CV_64FC1);
+//    omega.at<double>(0, 0) = joint->axis[0];
+//    omega.at<double>(1, 0) = joint->axis[1];
+//    omega.at<double>(2, 0) = joint->axis[2];
+//    xi = cedar::aux::math::twistCoordinates<double>(p, omega);
+//
+//    mReferenceJointTwists.push_back(xi.clone());
+//    T = cv::Mat::eye(4, 4, CV_64FC1);
+//    T.at<double>(0, 3) = joint->position[0];
+//    T.at<double>(1, 3) = joint->position[1];
+//    T.at<double>(2, 3) = joint->position[2];
+//    mReferenceJointTransformations.push_back(T.clone());
+//    mTwistExponentials.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
+//    mProductsOfExponentials.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
+//    mJointTransformations.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
+//    mJointTwists.push_back(cv::Mat::zeros(6, 1, CV_64FC1));
+//  }
+//
+//  // end effector
+//  mReferenceEndEffectorTransformation = cv::Mat::zeros(4, 4, CV_64FC1);
+//  cedar::dev::robot::ReferenceGeometry::EndEffectorPtr endEffector
+//    = getReferenceGeometry()->getEndEffector();
+//
+//  mReferenceEndEffectorTransformation.at<double>(0, 3) = endEffector->position[0];
+//  mReferenceEndEffectorTransformation.at<double>(1, 3) = endEffector->position[1];
+//  mReferenceEndEffectorTransformation.at<double>(2, 3) = endEffector->position[2];
+//
+//  mReferenceEndEffectorTransformation.at<double>(0, 0) = endEffector->orientation[0];
+//  mReferenceEndEffectorTransformation.at<double>(0, 1) = endEffector->orientation[1];
+//  mReferenceEndEffectorTransformation.at<double>(0, 2) = endEffector->orientation[2];
+//  mReferenceEndEffectorTransformation.at<double>(1, 0) = endEffector->orientation[3];
+//  mReferenceEndEffectorTransformation.at<double>(1, 1) = endEffector->orientation[4];
+//  mReferenceEndEffectorTransformation.at<double>(1, 2) = endEffector->orientation[5];
+//  mReferenceEndEffectorTransformation.at<double>(2, 0) = endEffector->orientation[6];
+//  mReferenceEndEffectorTransformation.at<double>(2, 1) = endEffector->orientation[7];
+//  mReferenceEndEffectorTransformation.at<double>(2, 2) = endEffector->orientation[8];
+//
+//  mReferenceEndEffectorTransformation.at<double>(3, 3) = 1.0;
+//
+//  updateTransformations();
 }
 
 
-void KinematicChain::applyAngleLimits(cv::Mat &angles)
+void cedar::dev::robot::KinematicChain::applyAngleLimits(cv::Mat& /*angles*/)
 {
-
-  for(unsigned i = 0; i < getNumberOfJoints(); i++)
-  {
-    double angle = angles.at<double>(i, 0);
-    angle = max<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.min);
-    angle = min<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.max);
-    angles.at<double>(i, 0) = angle;
-  }
-
-  return;
+//  for (unsigned i = 0; i < getNumberOfJoints(); i++)
+//  {
+//    double angle = angles.at<double>(i, 0);
+//    angle = std::max<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.min);
+//    angle = std::min<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.max);
+//    angles.at<double>(i, 0) = angle;
+//  }
 }
 
 
-void KinematicChain::applyVelocityLimits(cv::Mat &velocities)
+void cedar::dev::robot::KinematicChain::applyVelocityLimits(cv::Mat& /*velocities*/)
 {
-
-  for(unsigned i = 0; i < getNumberOfJoints(); i++)
-  {
-    double velocity = velocities.at<double>(i, 0);
-    velocity = max<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min);
-    velocity = min<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.max);
-    velocities.at<double>(i, 0) = velocity;
-  }
-
-  return;
+//  for (unsigned i = 0; i < getNumberOfJoints(); i++)
+//  {
+//    double velocity = velocities.at<double>(i, 0);
+//    velocity = std::max<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min);
+//    velocity = std::min<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.max);
+//    velocities.at<double>(i, 0) = velocity;
+//  }
 }
-
 
 /*
  * Overwritten start function of QThread
  */
-void KinematicChain::start(Priority priority)
+void cedar::dev::robot::KinematicChain::start(Priority priority)
 {
-  if(isRunning())
+  if (isRunning())
   {
     return;
   }
 
-  switch(mCurrentWorkingMode)
+  switch (mCurrentWorkingMode)
   {
   case ANGLE:
-    cout << "Error: KinematicChain refuses to work as a thread in ANGLE mode!" << endl;
+    std::cout << "Error: KinematicChain refuses to work as a thread in ANGLE mode!" << std::endl;
     return;
   case VELOCITY:
   case ACCELERATION:
@@ -490,8 +623,376 @@ void KinematicChain::start(Priority priority)
   return;
 }
 
-
-void KinematicChain::useCurrentHardwareValues(bool useCurrentHardwareValues)
+void cedar::dev::robot::KinematicChain::useCurrentHardwareValues(bool useCurrentHardwareValues)
 {
   mUseCurrentHardwareValues = useCurrentHardwareValues;
+}
+
+cedar::aux::LocalCoordinateFramePtr cedar::dev::robot::KinematicChain::getEndEffectorCoordinateFrame()
+{
+  return mpEndEffectorCoordinateFrame;
+}
+
+cedar::aux::LocalCoordinateFramePtr cedar::dev::robot::KinematicChain::getRootCoordinateFrame()
+{
+  return mpRootCoordinateFrame;
+}
+
+void cedar::dev::robot::KinematicChain::setEndEffector(cedar::aux::LocalCoordinateFramePtr pEndEffector)
+{
+  mpEndEffectorCoordinateFrame = pEndEffector;
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::getJointTransformation(unsigned int index)
+{
+  cv::Mat T;
+  mTransformationsLock.lockForRead();
+  T = mpRootCoordinateFrame->getTransformation() * mJointTransformations[index];
+  mTransformationsLock.unlock();
+  return T;
+}
+
+void cedar::dev::robot::KinematicChain::calculateCartesianJacobian
+(
+  const cv::Mat& point,
+  unsigned int jointIndex,
+  cv::Mat& result,
+  unsigned int coordinateFrame
+)
+{
+  // transform to local coordinates if necessary
+  cv::Mat point_local;
+  mTransformationsLock.lockForRead();
+  switch (coordinateFrame)
+  {
+    case WORLD_COORDINATES :
+    {
+      point_local = (mpRootCoordinateFrame->getTransformation() * mJointTransformations[jointIndex]).inv() * point;
+      break;
+    }
+    case BASE_COORDINATES :
+    {
+      point_local = mJointTransformations[jointIndex].inv() * point;
+      break;
+    }
+    case LOCAL_COORDINATES :
+    {
+      point_local = point;
+      break;
+    }
+  }
+
+  // calculate Jacobian column by column
+  cv::Mat column;
+  for (unsigned int j = 0; j <=  jointIndex; j++)
+  {
+    column = cedar::aux::math::wedgeTwist<double>
+             (
+               cedar::aux::math::rigidToAdjointTransformation<double>(mpRootCoordinateFrame->getTransformation())
+               * mJointTwists[j]
+             )
+             * mpRootCoordinateFrame->getTransformation() // change point to world coordinates
+             * mJointTransformations[jointIndex] // change point to root coordinates
+             * point_local;
+    // export
+    result.at<double>(0, j) = column.at<double>(0, 0);
+    result.at<double>(1, j) = column.at<double>(1, 0);
+    result.at<double>(2, j) = column.at<double>(2, 0);
+  }
+  mTransformationsLock.unlock();
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::calculateCartesianJacobian
+        (
+          const cv::Mat& point,
+          unsigned int jointIndex,
+          unsigned int coordinateFrame
+        )
+{
+  cv::Mat J = cv::Mat::zeros(3, getNumberOfJoints(), CV_64FC1);
+  calculateCartesianJacobian(point, jointIndex, J, coordinateFrame);
+  return J;
+}
+
+void cedar::dev::robot::KinematicChain::calculateCartesianJacobianTemporalDerivative
+     (
+       const cv::Mat& point,
+       unsigned int jointIndex,
+       cv::Mat& result,
+       unsigned int coordinateFrame
+     )
+{
+  cv::Mat point_world;
+  switch (coordinateFrame)
+  {
+    case WORLD_COORDINATES :
+    {
+      point_world = point;
+      break;
+    }
+    case BASE_COORDINATES :
+    {
+      //!\todo add base coordinate treatment
+//      point_local = mJointTransformations[jointIndex].inv() * point; ...
+      break;
+    }
+    case LOCAL_COORDINATES :
+    {
+      point_world = mpRootCoordinateFrame->getTransformation() * mJointTransformations[jointIndex] * point; //... check this
+      break;
+    }
+  }
+
+  // calculate Jacobian temporal derivative column by column
+  cv::Mat column;
+  cv::Mat S1;
+  cv::Mat S2;
+  mTransformationsLock.lockForRead();
+  for (unsigned int j = 0; j <= jointIndex; j++)
+  {
+    S1 = cedar::aux::math::wedgeTwist<double>(calculateTwistTemporalDerivative(j)) * point_world;
+    S2 = cedar::aux::math::wedgeTwist<double>
+         (
+           cedar::aux::math::rigidToAdjointTransformation<double>(mpRootCoordinateFrame->getTransformation())
+           *mJointTwists[j]
+         )
+         * calculateVelocity(point_world, jointIndex, WORLD_COORDINATES);
+
+    column = S1 + S2;
+    // export
+    result.at<double>(0, j) = column.at<double>(0, 0);
+    result.at<double>(1, j) = column.at<double>(1, 0);
+    result.at<double>(2, j) = column.at<double>(2, 0);
+  }
+  mTransformationsLock.unlock();
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::calculateCartesianJacobianTemporalDerivative
+        (
+          const cv::Mat& point,
+          unsigned int jointIndex,
+          unsigned int coordinateFrame
+        )
+{
+  cv::Mat J = cv::Mat::zeros(3, getNumberOfJoints(), CV_64FC1);
+  calculateCartesianJacobianTemporalDerivative(point, jointIndex, J, coordinateFrame);
+  return J;
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::calculateVelocity
+        (
+          const cv::Mat& point,
+          unsigned int jointIndex,
+          unsigned int coordinateFrame
+        )
+{
+  cv::Mat point_world;
+  switch (coordinateFrame)
+  {
+    case WORLD_COORDINATES :
+    {
+      point_world = point;
+      break;
+    }
+    case BASE_COORDINATES :
+    {
+      //!\todo add base coordinate treatment
+//      point_local = mJointTransformations[jointIndex].inv() * point; ...
+      break;
+    }
+    case LOCAL_COORDINATES :
+    {
+      point_world = mpRootCoordinateFrame->getTransformation() * mJointTransformations[jointIndex] * point; //... check this
+      break;
+    }
+  }
+  return cedar::aux::math::wedgeTwist<double>
+         (
+           calculateSpatialJacobian(jointIndex) * getJointVelocitiesMatrix()
+         )
+         * point_world;
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::calculateAcceleration
+        (
+          const cv::Mat& point,
+          unsigned int jointIndex,
+          unsigned int coordinateFrame
+        )
+{
+  cv::Mat point_world;
+  switch (coordinateFrame)
+  {
+    case WORLD_COORDINATES :
+    {
+      point_world = point;
+      break;
+    }
+    case BASE_COORDINATES :
+    {
+      //! \todo: add base coordinate treatment
+//      point_local = mJointTransformations[jointIndex].inv() * point; ...
+      break;
+    }
+    case LOCAL_COORDINATES :
+    {
+      point_world = mpRootCoordinateFrame->getTransformation() * mJointTransformations[jointIndex] * point; //... check this
+      break;
+    }
+  }
+  cv::Mat J = calculateSpatialJacobian(jointIndex);
+  cv::Mat J_dot = calculateSpatialJacobianTemporalDerivative(jointIndex);
+  cv::Mat T1 = J_dot * getJointVelocitiesMatrix();
+  cv::Mat T2 = J * getJointAccelerationsMatrix();
+  cv::Mat S1 = cedar::aux::math::wedgeTwist<double>(T1 + T2) * point_world;
+  cv::Mat S2 = cedar::aux::math::wedgeTwist<double>(calculateSpatialJacobian(jointIndex)
+               * getJointVelocitiesMatrix())
+           * calculateVelocity(point_world, jointIndex, WORLD_COORDINATES);
+  return S1 + S2;
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::calculateSpatialJacobian(unsigned int index)
+{
+  cv::Mat jacobian = cv::Mat::zeros(6, getNumberOfJoints(), CV_64FC1);
+  mTransformationsLock.lockForRead();
+  for (unsigned int j = 0; j <= index; j++)
+  {
+    for (int i = 0; i < 6; i++)
+    {
+      jacobian.at<double>(i, j) = mJointTwists[j].at<double>(i, 0);
+    }
+  }
+  mTransformationsLock.unlock();
+  return cedar::aux::math::rigidToAdjointTransformation<double>(mpRootCoordinateFrame->getTransformation())*jacobian;
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::calculateSpatialJacobianTemporalDerivative(unsigned int index)
+{
+  // create k-th column
+  cv::Mat J = cv::Mat::zeros(6, getNumberOfJoints(), CV_64FC1);
+  for (unsigned int i=0; i<=index; i++)
+  {
+    // create i-th column
+    cv::Mat column = cv::Mat::zeros(6, 1, CV_64FC1);
+    column = calculateTwistTemporalDerivative(i);
+    // export to matrix
+    for (unsigned int j=0; j<6; j++)
+    {
+      J.at<double>(j, i) = column.at<double>(j, 0);
+    }
+  }
+  return J;
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::calculateTwistTemporalDerivative(unsigned int j)
+{
+  // calculate transformation to (j-1)-th joint frame
+  cv::Mat g = cv::Mat::zeros(4, 4, CV_64FC1);
+  // g is a product of j-1 exponentials, so the temporal derivative is a sum with j-1 summands
+  for (unsigned int k = 0; k < j; k++)
+  {
+    // for the k-th summand, we derive the k-th factor and leave the other ones
+    cv::Mat s_k = cv::Mat::eye(4, 4, CV_64FC1); // k-th summand
+    // factors before the k-th
+    for (unsigned int i = 0; i < k; i++)
+    {
+      // i-th factor stays the same for i < k
+      s_k = s_k * mTwistExponentials[i];
+    }
+    // the k-th factor of the k-th summand is derived by time
+    s_k = s_k * cedar::aux::math::wedgeTwist<double>(mReferenceJointTwists[k])
+              * mTwistExponentials[k]
+              * getJointVelocity(k);
+    // factors after the k-th
+    for (unsigned int i = k+1; i < j-1; i++)
+    {
+      // i-th factor stays the same for i > k
+      s_k = s_k * mTwistExponentials[i];
+    }
+    // add this summand to the sum
+    g = g + s_k;
+  }
+  // adjoint of the calculated sum times the j-th twist is the derivative
+  return cedar::aux::math::rigidToAdjointTransformation<double>(g) * mReferenceJointTwists[j];
+ }
+
+cv::Mat cedar::dev::robot::KinematicChain::calculateEndEffectorPosition()
+{
+  return mpEndEffectorCoordinateFrame->getTranslation();
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::getRootTransformation()
+{
+  return mpRootCoordinateFrame->getTransformation();
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::getEndEffectorTransformation()
+{
+  return mpEndEffectorCoordinateFrame->getTransformation();
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::calculateEndEffectorJacobian()
+{
+  cv::Mat p = calculateEndEffectorPosition();
+  return calculateCartesianJacobian(p, getNumberOfJoints()-1, WORLD_COORDINATES);
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::calculateEndEffectorVelocity()
+{
+  cv::Mat p = calculateEndEffectorPosition();
+  return calculateVelocity(p, getNumberOfJoints()-1, WORLD_COORDINATES);
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::calculateEndEffectorAcceleration()
+{
+  cv::Mat p = calculateEndEffectorPosition();
+  return calculateAcceleration(p, getNumberOfJoints()-1, WORLD_COORDINATES);
+}
+
+void cedar::dev::robot::KinematicChain::calculateTransformations()
+{
+  mTransformationsLock.lockForWrite();
+  // first joint
+  cedar::aux::math::expTwist<double>
+  (
+    mReferenceJointTwists[0],
+    getJointAngle(0),
+    mTwistExponentials[0]
+  );
+  mProductsOfExponentials[0] = mTwistExponentials[0].clone();
+  mJointTransformations[0] = mProductsOfExponentials[0] * mReferenceJointTransformations[0];
+  mJointTwists[0] = mReferenceJointTwists[0];
+  // other joints
+  for (unsigned int i = 1; i < getNumberOfJoints(); i++)
+  {
+    cedar::aux::math::expTwist<double>
+    (
+      mReferenceJointTwists[i],
+      getJointAngle(i),
+      mTwistExponentials[i]
+    );
+    mProductsOfExponentials[i] = mProductsOfExponentials[i - 1] * mTwistExponentials[i];
+    mJointTransformations[i] = mProductsOfExponentials[i] * mReferenceJointTransformations[i];
+    mJointTwists[i] = cedar::aux::math::rigidToAdjointTransformation<double>
+                      (
+                        mProductsOfExponentials[i]
+                      )
+                      * mReferenceJointTwists[i];
+  }
+// end-effector
+  mpEndEffectorCoordinateFrame->setTransformation
+  (
+    mpRootCoordinateFrame->getTransformation()
+    * mProductsOfExponentials[getNumberOfJoints()-1]
+    * mReferenceEndEffectorTransformation
+  );
+  mTransformationsLock.unlock();
+}
+
+const cedar::dev::robot::KinematicChain::JointPtr cedar::dev::robot::KinematicChain::getJoint
+(
+  unsigned int index
+) const
+{
+  return mpJoints->at(index);
 }

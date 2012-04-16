@@ -37,12 +37,12 @@
 #ifndef CEDAR_AUX_INTERVAL_DATA_H
 #define CEDAR_AUX_INTERVAL_DATA_H
 
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/UserData.h"
+
 // SYSTEM INCLUDES
 
-// PROJECT INCLUDES
 
-// LOCAL INCLUDES
-#include "cedar/auxiliaries/UserData.h"
 /*!
  * @brief Class for interval data mainly used by automated gui creation.
  */
@@ -71,4 +71,5 @@ class cedar::aux::IntervalData : public cedar::aux::UserData
     T mMax; //!< The maximum value for the user interface.
     T mStep; //!< The step size for the user interface.
 };
+
 #endif // CEDAR_AUX_INTERVAL_DATA_H

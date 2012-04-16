@@ -34,15 +34,11 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_DEV_ROBOT_GL_NAMESPACE_H
 #define CEDAR_DEV_ROBOT_GL_NAMESPACE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/lib.h"
-
-// PROJECT INCLUDES
-#include "namespace.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -56,10 +52,14 @@ namespace cedar
       //!@brief Namespace for widget classes.
       namespace gl
       {
+        //!@cond SKIPPED_DOCUMENTATION
         CEDAR_DECLARE_DEV_CLASS(KinematicChain);
         CEDAR_DECLARE_DEV_CLASS(AmtecChain);
         CEDAR_DECLARE_DEV_CLASS(CoraArm);
         CEDAR_DECLARE_DEV_CLASS(CoraHead);
+        CEDAR_DECLARE_DEV_CLASS(KukaArm);
+        CEDAR_DECLARE_DEV_CLASS(Sdh);
+        //!@endcond
       }
     }
   }

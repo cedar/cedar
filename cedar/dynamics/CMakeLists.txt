@@ -43,4 +43,6 @@ cedar_add_library(cedardyn
                   cedarproc
                   MOC_HEADERS
                   fields/NeuralField.h
+                  fields/Preshape.h
+                  sources/Noise.h
                   )

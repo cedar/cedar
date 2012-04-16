@@ -34,30 +34,29 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-
+// CEDAR INCLUDES
 #include "cedar/devices/kteam/EPuckDrive.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/auxiliaries/math/tools.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
-using namespace cedar::dev::kteam;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
-EPuckDrive::EPuckDrive(cedar::dev::com::SerialCommunication *peCommunication, const std::string& config)
-: cedar::aux::ConfigurationInterface(config)
+cedar::dev::kteam::EPuckDrive::EPuckDrive
+(
+  cedar::dev::com::SerialCommunication *peCommunication,
+  const std::string& config
+)
+:
+cedar::aux::ConfigurationInterface(config)
 {
   mInitialized = false;
   init(peCommunication);
 }
 
-EPuckDrive::~EPuckDrive()
+cedar::dev::kteam::EPuckDrive::~EPuckDrive()
 {
 
 }
@@ -65,8 +64,7 @@ EPuckDrive::~EPuckDrive()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-int EPuckDrive::init(cedar::dev::com::SerialCommunication *peCommunication)
+int cedar::dev::kteam::EPuckDrive::init(cedar::dev::com::SerialCommunication *peCommunication)
 {
   if(mInitialized)
   {
@@ -86,7 +84,7 @@ int EPuckDrive::init(cedar::dev::com::SerialCommunication *peCommunication)
     return 0;
   }
 
-  //initialization of members
+  // initialization of members
   mVelocity.resize(2);
   mVelocity[0] = 0;
   mVelocity[1] = 0;
@@ -104,7 +102,7 @@ int EPuckDrive::init(cedar::dev::com::SerialCommunication *peCommunication)
   mpeCommunication = 0;
   std::string dummy_answer = ""; //answer for testing the communication
 
-  //read config-parameters
+  // read config-parameters
   addParameter(&_mWheelDistance, "WheelDistance", 0.053);
   addParameter(&_mWheelRadius, "WheelRadius", 0.0205);
   addParameter(&_mPulsesPerRevolution, "PulsesPerRevolution", 1000);
@@ -114,20 +112,20 @@ int EPuckDrive::init(cedar::dev::com::SerialCommunication *peCommunication)
   addParameter(&_mDebug, "Debug", false);
   this->readOrDefaultConfiguration();
 
-  //check if distances or number of pulses per revolution are negative
+  // check if distances or number of pulses per revolution are negative
   if (_mWheelDistance <= 0 || _mWheelRadius <= 0 || _mPulsesPerRevolution <= 0 || _mMaximalNumberPulsesPerSecond <= 0)
   {
     std::cout << "EPuckDrive: Initialization failed (Invalid config-parameters (e.g. negative wheel radius))\n";
     return 0;
   }
 
-  //calculate distance per pulse and maximal wheel speed
+  // calculate distance per pulse and maximal wheel speed
   mDistancePerPulse = 2 * cedar::aux::math::pi * _mWheelRadius / _mPulsesPerRevolution;
   mMaximalWheelSpeed = _mMaximalNumberPulsesPerSecond * mDistancePerPulse;
 
   mpeCommunication = peCommunication;
 
-  //send a dummy-message
+  // send a dummy-message
   mpeCommunication->lock();
   mpeCommunication->send("A");
   mpeCommunication->receive(dummy_answer);
@@ -154,12 +152,12 @@ int EPuckDrive::init(cedar::dev::com::SerialCommunication *peCommunication)
   }
 }
 
-bool EPuckDrive::isInitialized() const
+bool cedar::dev::kteam::EPuckDrive::isInitialized() const
 {
   return mInitialized;
 }
 
-int EPuckDrive::getEncoder(int &leftEncoder, int &rightEncoder)
+int cedar::dev::kteam::EPuckDrive::getEncoder(int &leftEncoder, int &rightEncoder)
 {
   if (!mInitialized)
   {
@@ -173,13 +171,13 @@ int EPuckDrive::getEncoder(int &leftEncoder, int &rightEncoder)
   std::string answer;
   std::istringstream answer_stream;
 
-  //send command 'Q', the E-Puck command for readEncoders
+  // send command 'Q', the E-Puck command for readEncoders
   mpeCommunication->lock();
   mpeCommunication->send("Q");
   int s = mpeCommunication->receive(answer);
   mpeCommunication->unlock();
 
- if (s == 0) //communication failed
+ if (s == 0) // communication failed
   {
     if (_mDebug)
     {
@@ -244,7 +242,7 @@ int EPuckDrive::getEncoder(int &leftEncoder, int &rightEncoder)
   }
 }
 
-int EPuckDrive::getAcceleration(int &xAcceleration, int &yAcceleration, int &zAcceleration)
+int cedar::dev::kteam::EPuckDrive::getAcceleration(int &xAcceleration, int &yAcceleration, int &zAcceleration)
 {
   if (!mInitialized)
   {
@@ -258,12 +256,12 @@ int EPuckDrive::getAcceleration(int &xAcceleration, int &yAcceleration, int &zAc
   std::string answer;
   std::istringstream answer_stream;
 
-  //send command 'A', the E-Puck command for readAccelerator
+  // send command 'A', the E-Puck command for readAccelerator
   mpeCommunication->lock();
   mpeCommunication->send("A");
   int s = mpeCommunication->receive(answer);
   mpeCommunication->unlock();
-  if (s == 0) //communication failed
+  if (s == 0) // communication failed
   {
     if (_mDebug)
     {
@@ -345,7 +343,7 @@ int EPuckDrive::getAcceleration(int &xAcceleration, int &yAcceleration, int &zAc
   }
 }
 
-int EPuckDrive::setWheelSpeed(double leftWheelSpeed, double rightWheelSpeed)
+int cedar::dev::kteam::EPuckDrive::setWheelSpeed(double leftWheelSpeed, double rightWheelSpeed)
 {
   if (!mInitialized)
   {
@@ -356,12 +354,12 @@ int EPuckDrive::setWheelSpeed(double leftWheelSpeed, double rightWheelSpeed)
     return 0;
   }
 
-  //round the wheel speeds (the E-Puck only accepts integers)
-  //convert from m/s into Pulses/s (which the E-Puck expects)
+  // round the wheel speeds (the E-Puck only accepts integers)
+  // convert from m/s into Pulses/s (which the E-Puck expects)
   leftWheelSpeed = cedar::aux::math::round (leftWheelSpeed / mDistancePerPulse);
   rightWheelSpeed = cedar::aux::math::round (rightWheelSpeed / mDistancePerPulse);
 
-  //check if the speed to set exceeds the maximum speed
+  // check if the speed to set exceeds the maximum speed
   if (leftWheelSpeed > _mMaximalNumberPulsesPerSecond)
   {
     if (_mDebug)
@@ -398,13 +396,13 @@ int EPuckDrive::setWheelSpeed(double leftWheelSpeed, double rightWheelSpeed)
   std::ostringstream command;
   std::string answer;
 
-  //send string "D,x,y" with x = left wheel speed and y = right wheel speed
+  // send string "D,x,y" with x = left wheel speed and y = right wheel speed
   command << "D," << leftWheelSpeed << "," << rightWheelSpeed;
   mpeCommunication->lock();
   mpeCommunication->send(command.str());
   int s = mpeCommunication->receive(answer);
   mpeCommunication->unlock();
-  if (s == 0) //communication failed
+  if (s == 0) // communication failed
   {
     if (_mDebug)
     {
@@ -422,7 +420,7 @@ int EPuckDrive::setWheelSpeed(double leftWheelSpeed, double rightWheelSpeed)
   }
   else
   {
-    //store the wheel speed in local variable mWheelSpeed on success
+    // store the wheel speed in local variable mWheelSpeed on success
     mWheelSpeed[0] = leftWheelSpeed * mDistancePerPulse;
     mWheelSpeed[1] = rightWheelSpeed * mDistancePerPulse;
     mVelocity = calculateVelocity(mWheelSpeed[0], mWheelSpeed[1]); //update forward velocity and turning rate
@@ -434,7 +432,7 @@ int EPuckDrive::setWheelSpeed(double leftWheelSpeed, double rightWheelSpeed)
   }
 }
 
-int EPuckDrive::setEncoder(int leftEncoder, int rightEncoder)
+int cedar::dev::kteam::EPuckDrive::setEncoder(int leftEncoder, int rightEncoder)
 {
   if (!mInitialized)
   {
@@ -448,13 +446,13 @@ int EPuckDrive::setEncoder(int leftEncoder, int rightEncoder)
   std::ostringstream command;
   std::string answer;
 
-  //send string "P,x,y" with x = left encoder value and y = right encoder value
+  // send string "P,x,y" with x = left encoder value and y = right encoder value
   command << "P," << leftEncoder << "," << rightEncoder;
   mpeCommunication->lock();
   mpeCommunication->send(command.str());
   int s = mpeCommunication->receive(answer);
   mpeCommunication->unlock();
-  if (s == 0) //communication failed
+  if (s == 0) // communication failed
   {
     if (_mDebug)
     {
@@ -462,7 +460,7 @@ int EPuckDrive::setEncoder(int leftEncoder, int rightEncoder)
     }
     return 0;
   }
-  else if (s != 1 || answer[0] != 'p') //unexpected answer of the robot (not 'p')
+  else if (s != 1 || answer[0] != 'p') // unexpected answer of the robot (not 'p')
   {
     if (_mDebug)
     {

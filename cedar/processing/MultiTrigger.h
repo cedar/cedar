@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Arguments.h
+    File:        MultiTrigger.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -41,12 +41,9 @@
 #ifndef CEDAR_PROC_MULTI_TRIGGER_H
 #define CEDAR_PROC_MULTI_TRIGGER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/Trigger.h"
-
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -78,11 +75,14 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void onTrigger(Trigger* sender);
+  //!@brief process trigger event
+  void onTrigger(cedar::proc::TriggerPtr pSender);
 
-  void notifyConnected(cedar::proc::Trigger* trigger);
+  //!@brief if a trigger connects to the MultiTrigger, add it to the internal storage of sources
+  void notifyConnected(cedar::proc::TriggerPtr trigger);
 
-  void notifyDisconnected(cedar::proc::Trigger* trigger);
+  //!@brief if a trigger disconnects from a MultiTrigger, remove it from internal storage of sources
+  void notifyDisconnected(cedar::proc::TriggerPtr trigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -94,7 +94,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief check if all incoming triggers are triggered at least once before sending own trigger signal
   void checkCondition();
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -104,7 +104,8 @@ public:
 protected:
 
 private:
-  std::map<Trigger*, bool> mIncoming;
+  //!@brief internal storage of incoming triggers
+  std::map<cedar::proc::TriggerPtr, bool> mIncoming;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

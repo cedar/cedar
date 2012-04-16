@@ -45,14 +45,13 @@
 #include <string>
 #include <iostream>
 
-using namespace cedar::tests::unit::aux::ConfigurationInterface;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 //! constructor
-TestClass::TestClass(const std::string& configFileName)
+cedar::tests::unit::aux::ConfigurationInterface::TestClass::TestClass(const std::string& configFileName)
 :
 cedar::aux::ConfigurationInterface(configFileName),
 mTestBool(false),
@@ -63,7 +62,7 @@ mTestString("")
 }
 
 //! destructor
-TestClass::~TestClass()
+cedar::tests::unit::aux::ConfigurationInterface::TestClass::~TestClass()
 {
 }
 
@@ -71,12 +70,12 @@ TestClass::~TestClass()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-unsigned int TestClass::errors(void)
+unsigned int cedar::tests::unit::aux::ConfigurationInterface::TestClass::errors(void)
 {
   return mFails.size();
 }
 
-void TestClass::addStandardParameters(void)
+void cedar::tests::unit::aux::ConfigurationInterface::TestClass::addStandardParameters(void)
 {
   // test some addParameter functions
   if (addParameter(&mTestBool, "TestBool", true) != ConfigurationInterface::CONFIG_SUCCESS)
@@ -88,7 +87,7 @@ void TestClass::addStandardParameters(void)
   if (addParameter(&mTestString, "TestString", "three") != ConfigurationInterface::CONFIG_SUCCESS)
     mFails.push_back("addParameter(string, string, string) failed");
 }
-void TestClass::addVectorParametersSingleDefaults(void)
+void cedar::tests::unit::aux::ConfigurationInterface::TestClass::addVectorParametersSingleDefaults(void)
 {
   // test some addParameter functions
   if (addParameter(&mTestBoolVector, "TestBoolVector", true) != ConfigurationInterface::CONFIG_SUCCESS)
@@ -100,7 +99,7 @@ void TestClass::addVectorParametersSingleDefaults(void)
   if (addParameter(&mTestStringVector, "TestStringVector", "three") != ConfigurationInterface::CONFIG_SUCCESS)
     mFails.push_back("addParameter(std::vector<std::string>, string, std::string) failed");
 }
-void TestClass::addVectorParametersMultipleDefaults(void)
+void cedar::tests::unit::aux::ConfigurationInterface::TestClass::addVectorParametersMultipleDefaults(void)
 {
   // test some addParameter functions
   std::vector<bool> test_bool_vector;
@@ -139,7 +138,7 @@ void TestClass::addVectorParametersMultipleDefaults(void)
      )
     mFails.push_back("addParameter(std::vector<std::string>, string, std::vector<std::string>) failed");
 }
-void TestClass::addGroupParameters(void)
+void cedar::tests::unit::aux::ConfigurationInterface::TestClass::addGroupParameters(void)
 {
   // test some exotic groups
   if (addParameter(&mTestBool, "FirstGroup.TestBool", true) != ConfigurationInterface::CONFIG_SUCCESS)
@@ -185,12 +184,12 @@ void TestClass::addGroupParameters(void)
     mFails.push_back("addParameter(std::vector<std::string>, string, std::string) failed");
 }
 
-void TestClass::tryToRead(void)
+void cedar::tests::unit::aux::ConfigurationInterface::TestClass::tryToRead(void)
 {
   readOrDefaultConfiguration();
 }
 
-void TestClass::readEmptyFile(void)
+void cedar::tests::unit::aux::ConfigurationInterface::TestClass::readEmptyFile(void)
 {
   if (getErrors().size() == 0)
   {
@@ -198,7 +197,7 @@ void TestClass::readEmptyFile(void)
   }
 }
 
-void TestClass::readEmptyFileInNewFolder(void)
+void cedar::tests::unit::aux::ConfigurationInterface::TestClass::readEmptyFileInNewFolder(void)
 {
   if (getErrors().size() == 0)
   {
@@ -206,20 +205,20 @@ void TestClass::readEmptyFileInNewFolder(void)
   }
 }
 
-void TestClass::tryToReadManually(void)
+void cedar::tests::unit::aux::ConfigurationInterface::TestClass::tryToReadManually(void)
 {
   if (readConfiguration() != ConfigurationInterface::CONFIG_SUCCESS)
     mFails.push_back("readConfiguration(void) failed");
 }
-void TestClass::printErrors(cedar::aux::LogFile& rLogFile)
+void cedar::tests::unit::aux::ConfigurationInterface::TestClass::printErrors()
 {
   for (unsigned int i = 0; i < mFails.size(); i++)
   {
-    rLogFile << mFails.at(i) << std::endl;
+    std::cout << mFails.at(i) << std::endl;
   }
 }
 
-void TestClass::checkConfigurationStandardParameters(void)
+void cedar::tests::unit::aux::ConfigurationInterface::TestClass::checkConfigurationStandardParameters(void)
 {
   if (mTestBool != true)
     mFails.push_back("bool was not read successfully");
@@ -231,7 +230,7 @@ void TestClass::checkConfigurationStandardParameters(void)
     mFails.push_back("string was not read successfully");
 }
 
-void TestClass::checkConfigurationVectorParameters(void)
+void cedar::tests::unit::aux::ConfigurationInterface::TestClass::checkConfigurationVectorParameters(void)
 {
   // bool
   if (mTestBoolVector.size() == 0 || mTestBoolVector.size() > 2)
@@ -327,13 +326,13 @@ void TestClass::checkConfigurationVectorParameters(void)
   }
 }
 
-void TestClass::removeFile(std::string file)
+void cedar::tests::unit::aux::ConfigurationInterface::TestClass::removeFile(std::string file)
 {
   std::string command = "rm " + file;
   system(command.c_str());
 }
 
-void TestClass::removeDir(std::string dir)
+void cedar::tests::unit::aux::ConfigurationInterface::TestClass::removeDir(std::string dir)
 {
   std::string command = "rm -r " + dir;
   system(command.c_str());

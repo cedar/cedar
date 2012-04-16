@@ -34,19 +34,15 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_AUX_GL_NAMESPACE_H
 #define CEDAR_AUX_GL_NAMESPACE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
-
-// PROJECT INCLUDES
-#include "namespace.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
-
 
 namespace cedar
 {
@@ -55,8 +51,11 @@ namespace cedar
     /*!@brief Namespace for all gl classes. */
     namespace gl
     {
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_AUX_CLASS(Scene);
-      CEDAR_DECLARE_AUX_CLASS(Object);
+      CEDAR_DECLARE_AUX_CLASS(ObjectVisualization);
+      CEDAR_DECLARE_DEPRECATED(typedef ObjectVisualization Object);
+      CEDAR_DECLARE_DEPRECATED(typedef ObjectVisualization RigidBodyVisualization);
       CEDAR_DECLARE_AUX_CLASS(Block);
       CEDAR_DECLARE_AUX_CLASS(Sphere);
       CEDAR_DECLARE_AUX_CLASS(Cone);
@@ -66,6 +65,7 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(Torus);
       CEDAR_DECLARE_AUX_CLASS(Ellipse);
       CEDAR_DECLARE_AUX_CLASS(Chessboard);
+      //!@endcond
     }
   }
 }

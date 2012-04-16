@@ -34,14 +34,11 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_NAMESPACE_H
 #define CEDAR_NAMESPACE_H
 
-// LOCAL INCLUDES
-#include "cedar/defines.h" // IT MIGHT NOT BE A CLEAN DESIGN TO INCLUDE THIS HERE (?) ANY SUGGESTIONS?
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/defines.h" // \todo it might not be a clean design to include this here, any suggestions?
 
 // SYSTEM INCLUDES
 
@@ -49,7 +46,6 @@
 /*!@brief Namespace for cedar (top level). */
 namespace cedar
 {
-
 }
 
 #endif // CEDAR_NAMESPACE_H

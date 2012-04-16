@@ -41,19 +41,17 @@
 #ifndef CEDAR_DYN_H
 #define CEDAR_DYN_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/dynamics/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/units/TimeUnit.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief A cedar::proc::Step that approximates the solution of some dynamical system.
  *
- * More detailed description of the class.
+ * @todo Describe the concept more.
  */
 class cedar::dyn::Dynamics : public cedar::proc::Step
 {
@@ -67,8 +65,6 @@ class cedar::dyn::Dynamics : public cedar::proc::Step
 public:
   //!@brief The standard constructor.
   Dynamics();
-
-  //!@brief Destructor
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -95,25 +91,11 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
-private:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
 private:
   // none yet
 
 }; // class cedar::dyn::Dynamics
 
 #endif // CEDAR_DYN_H
-

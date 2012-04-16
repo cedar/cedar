@@ -38,17 +38,14 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/Parameter.h"
-#include "cedar/auxiliaries/exceptions.h"
-#include "cedar/auxiliaries/ParameterTemplate.h"
-#include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -60,6 +57,7 @@ mpOwner(pOwner),
 mHasDefault(hasDefault),
 mConstant(false),
 mIsHidden(false),
+mChanged(false),
 mReferenceCount(0)
 {
   CEDAR_ASSERT(this->mpOwner != NULL);
@@ -76,12 +74,12 @@ cedar::aux::Parameter::~Parameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void intrusive_ptr_add_ref(cedar::aux::Parameter *pObject)
+void intrusive_ptr_add_ref(cedar::aux::Parameter* pObject)
 {
   pObject->mReferenceCount += 1;
 }
 
-void intrusive_ptr_release(cedar::aux::Parameter *pObject)
+void intrusive_ptr_release(cedar::aux::Parameter* pObject)
 {
   pObject->mReferenceCount -= 1;
 
@@ -91,13 +89,24 @@ void intrusive_ptr_release(cedar::aux::Parameter *pObject)
   }
 }
 
+void cedar::aux::Parameter::setChangedFlag(bool changed)
+{
+  if (this->mChanged != changed)
+  {
+    this->mChanged = changed;
+    emit changedFlagChanged();
+  }
+}
+
 void cedar::aux::Parameter::emitChangedSignal()
 {
+  this->setChangedFlag(true);
   emit valueChanged();
 }
 
 void cedar::aux::Parameter::emitPropertyChangedSignal()
 {
+  this->setChangedFlag(true);
   emit propertyChanged();
 }
 
@@ -145,4 +154,14 @@ void cedar::aux::Parameter::setConstant(bool value)
   this->mConstant = value;
 
   emit propertyChanged();
+}
+
+const std::string& cedar::aux::Parameter::getName() const
+{
+  return this->mName;
+}
+
+void cedar::aux::Parameter::setName(const std::string& name)
+{
+  this->mName = name;
 }

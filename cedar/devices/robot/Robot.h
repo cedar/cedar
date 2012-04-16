@@ -37,11 +37,8 @@
 #ifndef CEDAR_DEV_ROBOT_ROBOT_H
 #define CEDAR_DEV_ROBOT_ROBOT_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/namespace.h"
-
-// PROJECT INCLUDES
-#include "cedar/auxiliaries/Base.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -49,17 +46,12 @@
 #include <set>
 #include <map>
 
-
-/*!@brief Abstract description of the class.
+/*!@brief Base class for robots.
  *
- * More detailed description of the class.
+ * @todo More detailed description of the class.
  */
-class cedar::dev::robot::Robot : public cedar::aux::Base
+class cedar::dev::robot::Robot
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -78,7 +70,7 @@ public:
    * @return Pointer to the requested component.
    * @param[in] rComponentName Name of the component that is to be returned.
    */
-  ComponentPtr& getComponent(const std::string& rComponentName);
+  ComponentPtr getComponent(const std::string& rComponentName);
 
   /*! @brief Creates a specified component.
    *
@@ -116,28 +108,17 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   //! map of pointers to all sub components
   std::map<std::string, ComponentPtr> mComponents;
+
   //! names of all components and their corresponding sub-components
   std::map<std::string, std::set<std::string> > _mSubComponentNames;
 
-private:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet
-protected:
-  // none yet
+  //! Name of the robot.
+  std::string _mName;
 
 private:
   // none yet
-
 }; // class cedar::dev::robot::Robot
-
 #endif // CEDAR_DEV_ROBOT_ROBOT_H

@@ -19,66 +19,60 @@
 
 ========================================================================================================================
 
- ----- Institute:   Ruhr-Universitaet-Bochum
-                    Institut fuer Neuroinformatik
- 
- ----- File:        Ellipse.h
- 
- ----- Maintainer:  Hendrik Reimann
- ------Email:       hendrik.reimann@ini.rub.de
- ----- Date:        2010 10 29
- 
- ----- Description: visualization for an ellipse
- 
- ----- Credits:     
- ---------------------------------------------------------------------------------------------------------------------*/
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        Ellipse.h
+
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
+    Date:        2010 11 29
+
+    Description: Visualization of an ellipse
+
+    Credits:
+
+======================================================================================================================*/
 
 #ifndef CEDAR_AUX_GL_ELLIPSE_H
 #define CEDAR_AUX_GL_ELLIPSE_H
 
-// LOCAL INCLUDES
-#include "namespace.h"
-#include "Object.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/gl/namespace.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
 
 // SYSTEM INCLUDES
 
 /*!@brief Simple OpenGL visualization of an ellipse
  *
- * This class visualizes an instance of cedar::aux::Object as a torus around an ellipse
+ * This class visualizes a torus around an ellipse
  *
- * @remarks To get a simple visualization of the Object on screen, add an instance of this class to a
+ * @remarks To get a simple visualization of the object on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
-class cedar::aux::gl::Ellipse : public cedar::aux::gl::Object
+class cedar::aux::gl::Ellipse : public cedar::aux::gl::ObjectVisualization
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief standard constructor. 
-   * @param pObject    pointer to the aux::Object being visualized
-   */
-  Ellipse(cedar::aux::ObjectPtr pObject);
-
   /*!@brief constructor. 
-   * @param pObject    pointer to the aux::Object being visualized
-   * @param length    extension of the ellipse in x-direction of the object frame
-   * @param width    extension of the ellipse in y-direction of the object frame
-   * @param thickness    distance of the walls to the ellipse
-   * @param R    color, value for red channel in RGB
-   * @param G    color, value for green channel in RGB
-   * @param B    color, value for blue channel in RGB
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
+   * @param length extension of the ellipse in x-direction of the object frame
+   * @param width extension of the ellipse in y-direction of the object frame
+   * @param thickness distance of the walls to the ellipse
+   * @param colorR color, value for red channel in RGB
+   * @param colorG color, value for green channel in RGB
+   * @param colorB color, value for blue channel in RGB
    */
   Ellipse(
-           cedar::aux::ObjectPtr pObject,
-           const double length,
-           const double width,
-           const double thickness,
-           const double R=1,
-           const double G=0,
-           const double B=0
+           cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+           double length = 2.0,
+           double width = 3.0,
+           double thickness = 0.3,
+           double colorR = 1,
+           double colorG = 0,
+           double colorB = 0
          );
   
   //--------------------------------------------------------------------------------------------------------------------
@@ -89,34 +83,34 @@ public:
   void draw();
 
   /*!@brief set extension of the ellipse in x-direction of the object frame
-   * @param value    new extension value
+   * @param value new extension value
    */
   void setLength(double value);
 
   /*!@brief set extension of the ellipse in y-direction of the object frame
-   * @param value    new extension value
+   * @param value new extension value
    */
   void setWidth(double value);
 
   /*!@brief set distance of the walls to the ellipse
-   * @param value    new thickness value
+   * @param value new thickness value
    */
   void setThickness(double value);
 
   /*!@brief get extension of the ellipse in x-direction of the object frame
-   * @return    extension value
+   * @return extension value
    */
-  double length();
+  double length() const;
 
   /*!@brief get extension of the ellipse in y-direction of the object frame
-   * @return    extension value
+   * @return extension value
    */
-  double width();
+  double width() const;
 
   /*!@brief get distance of the walls to the ellipse
-   * @return    thickness value
+   * @return thickness value
    */
-  double thickness();
+  double thickness() const;
   
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -34,14 +34,11 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_AUX_GUI_VIEWER_H
 #define CEDAR_AUX_GUI_VIEWER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-
-// PROJECT INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 
@@ -60,15 +57,14 @@
 class cedar::aux::gui::Viewer : public QGLViewer
 {
 private:
-  
-	Q_OBJECT
+  Q_OBJECT
   
 public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief the constructor */
-  Viewer(cedar::aux::gl::ScenePtr& p_scene);
+  Viewer(cedar::aux::gl::ScenePtr pScene);
 
   /*!@brief the constructor */
   ~Viewer();
@@ -83,6 +79,8 @@ public:
   /*!@brief function being called automatically when a timer is up, usually in a loop */
   void timerEvent(QTimerEvent* pEvent);
 
+  //!@brief call this function to initialize Gl resources for the passed visualization object
+  void initGl(cedar::aux::gl::ObjectVisualizationPtr pVisualization);
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -94,7 +92,5 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
   cedar::aux::gl::ScenePtr const mpScene;
-
 };
-
 #endif  // CEDAR_AUX_GUI_VIEWER_H

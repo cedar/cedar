@@ -34,23 +34,21 @@
 
 ======================================================================================================================*/
 
-
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/math/sigmoids.h"
 #include "cedar/auxiliaries/math/constants.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
+
 
 //!@todo should the template functions be moved to the header?
 
-using namespace std;
-
+//!@cond SKIPPED_DOCUMENTATION
 double cedar::aux::math::sigmoid(const double x, const double beta, const double threshold)
 {
   return sigmoidExp(x, beta, threshold);
 }
+//!@endcond
 
 double cedar::aux::math::sigmoidExp(const double x, const double beta, const double threshold)
 {
@@ -62,7 +60,7 @@ double cedar::aux::math::sigmoidAbs(const double x, const double beta, const dou
   return 0.5 * (1. + beta * (x - threshold) / (1. + beta * fabs(x - threshold)));
 }
 
-double cedar::aux::math::sigmoidHeavyside(const double x, const double threshold)
+double cedar::aux::math::sigmoidHeaviside(const double x, const double threshold)
 {
   if (x < threshold)
     return 0.0;

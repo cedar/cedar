@@ -19,80 +19,55 @@
 
 ========================================================================================================================
 
- ----- Institute:   Ruhr-Universitaet-Bochum
-                    Institut fuer Neuroinformatik
- 
- ----- File:        Prism.cpp
- 
- ----- Maintainer:  Hendrik Reimann
- ------Email:       hendrik.reimann@ini.rub.de
- ----- Date:        2010 10 29
- 
- ----- Description: visualization for a prism with equilateral triangular base
- 
- ----- Credits:     
- ---------------------------------------------------------------------------------------------------------------------*/
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
 
-// LOCAL INCLUDES
+    File:        Prism.cpp
+
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
+    Date:        2010 11 29
+
+    Description: Visualization of a prism with equilateral triangular base
+
+    Credits:
+
+======================================================================================================================*/
+
+// CEDAR INCLUDES
 #include "drawShapes.h"
 #include "Prism.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
 
-using namespace cedar::aux::gl;
-using namespace std;
-using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Prism::Prism(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Prism::Prism
+(
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+  double width,
+  double height,
+  double colorR,
+  double colorG,
+  double colorB
+)
 :
-cedar::aux::gl::Object(pObject)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Prism", colorR, colorG, colorB),
+mWidth(width),
+mHeight(height)
 {
-  mWidth = 3;
-  mHeight = 1;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
-  mObjectType = "Prism";
-}
-
-Prism::Prism(
-              cedar::aux::ObjectPtr pObject,
-              const double width,
-              const double height,
-              const double R,
-              const double G,
-              const double B
-            )
-:
-cedar::aux::gl::Object(pObject)
-{
-  mWidth = width;
-  mHeight = height;
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-  mObjectType = "Prism";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void Prism::draw()
+void cedar::aux::gl::Prism::draw()
 {
-  // move to origin
-  glPopMatrix();
-  glPushMatrix();
-  
-  // move to object coordinates
-  mTransformationTranspose = mpObject->getTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  prepareDraw();
   
   // draw object
   if (mIsVisible)
@@ -102,41 +77,22 @@ void Prism::draw()
   }
 }
 
-void Prism::setWidth(double value)
+void cedar::aux::gl::Prism::setWidth(double value)
 {
   mWidth = value;
 }
 
-void Prism::setHeight(double value)
+void cedar::aux::gl::Prism::setHeight(double value)
 {
   mHeight = value;
 }
 
-double Prism::width()
+double cedar::aux::gl::Prism::width() const
 {
   return mWidth;
 }
 
-double Prism::height()
+double cedar::aux::gl::Prism::height() const
 {
   return mHeight;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

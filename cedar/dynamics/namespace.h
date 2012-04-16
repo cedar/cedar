@@ -38,16 +38,12 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_DYN_NAMESPACE_H
 #define CEDAR_DYN_NAMESPACE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/dynamics/lib.h"
-
 #include "cedar/processing/PluginDeclaration.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -59,23 +55,23 @@ namespace cedar
   /*!@brief Namespace for all dyn classes. */
   namespace dyn
   {
-    CEDAR_DECLARE_DYN_CLASS(Dynamics);
-
+    //!@brief a template class tailored for use in all dynamics
     template <typename T> class Activation;
+    //!@brief a specialization for double values
     typedef Activation<double> DoubleActivation;
-    CEDAR_GENERATE_POINTER_TYPES(DoubleActivation);
-    typedef Activation<cv::Mat> MatActivation;
-    CEDAR_GENERATE_POINTER_TYPES(MatActivation);
 
     //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_GENERATE_POINTER_TYPES(DoubleActivation);
+    CEDAR_DECLARE_DYN_CLASS(Dynamics);
     CEDAR_DECLARE_DYN_CLASS(SpaceCode);
     CEDAR_DECLARE_DYN_CLASS(NeuralField);
+    CEDAR_DECLARE_DYN_CLASS(MatActivation);
+    CEDAR_DECLARE_DYN_CLASS(Preshape);
+    CEDAR_DECLARE_DYN_CLASS(Noise);
     //!@endcond
 
-#ifdef LINUX
-    // for msvc, this is replaced by the plugin stuff below, currently as a workaround.
-    CEDAR_DYN_LIB_EXPORT void initialize();
-#endif // GCC
+    //!@brief A function for loading the declarations of the dynamics namespace as plugin.
+    CEDAR_DECLARE_DEPRECATED(CEDAR_DYN_LIB_EXPORT void getPluginDesciption(cedar::proc::PluginDeclarationPtr plugin));
   }
 }
 

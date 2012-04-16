@@ -41,25 +41,18 @@
 #ifndef CEDAR_AUX_DATA_H
 #define CEDAR_AUX_DATA_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/Base.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
 
-/*!@brief Abstract description of the class.
+/*!@brief This is an abstract interface for all kinds of data.
  *
- * More detailed description of the class.
+ *        The main task of this base interface is to provide a lock that is available for all derived data.
  */
-class cedar::aux::Data : public cedar::aux::Base
+class cedar::aux::Data
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -74,40 +67,59 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Returns the lock associated with this data object.
   QReadWriteLock& getLock();
 
+  //!@brief Locks the data object for reading.
   inline void lockForRead()
   {
     this->mpLock->lockForRead();
   }
 
+  //!@brief Locks the data object for writing.
   inline void lockForWrite()
   {
     this->mpLock->lockForWrite();
   }
 
+  //!@brief Unlocks the data object.
   inline void unlock()
   {
     this->mpLock->unlock();
   }
 
+  /*! @brief  Attempts to cast this data object to a specific type and returns the data in that format.
+   *
+   *  @throws std::bad_cast when the object cannot be cast to the specified type.
+   */
   template <typename T>
   T& getData()
   {
     return dynamic_cast<DataTemplate<T>&>(*this).getData();
   }
+
+  //!@brief  This is the const version of cedar::aux::Data::getData
+  template <typename T>
+  const T& getData() const
+  {
+    return dynamic_cast<const DataTemplate<T>&>(*this).getData();
+  }
   
+  /*! @brief  Casts this object to a specific type.
+   *
+   *  @throws std::bad_cast if the cast fails.
+   */
   template <typename T>
   T& cast()
   {
     return dynamic_cast<T&>(*this);
   }
   
+  //!@brief Returns the owner of the data object.
   cedar::aux::Configurable* getOwner() const;
-  void setOwner(cedar::aux::Configurable* step);
 
-  const std::string& connectedSlotName() const;
-  void connectedSlotName(const std::string& name);
+  //!@brief Sets the owner of the data object.
+  void setOwner(cedar::aux::Configurable* step);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -124,28 +136,13 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
+  //!@brief the lock for this data
   QReadWriteLock *mpLock;
 
 private:
   //!@todo This should be a base*, however, right now Configurable can't be used with Base* because base has a (differently realized) name.
   cedar::aux::Configurable* mpeOwner;
-  std::string mConnectedSlotName;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::Data
 
 #endif // CEDAR_AUX_DATA_H
-

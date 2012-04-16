@@ -37,10 +37,8 @@
 #ifndef CEDAR_AUX_ENUM_H
 #define CEDAR_AUX_ENUM_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <map>
@@ -59,23 +57,29 @@ class cedar::aux::Enum
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
+  //!@brief The standard constructor, needed for std data structures.
   Enum();
 
+  //!@brief constructor with all parameters for this entry
   Enum(const cedar::aux::EnumId id, const std::string& name, const std::string& prettyString = "");
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  bool operator== (const Enum& other);
+  //!@brief comparison operator
+  bool operator== (const Enum& other) const;
 
+  //!@brief returns the identification number of this enum entry
   cedar::aux::EnumId id() const;
 
+  //!@brief returns the name of this enum entry
   const std::string& name() const;
 
+  //!@brief returns a beautified name of this enum entry
   const std::string& prettyString() const;
 
+  //!@brief returns the identification number of this enum entry
   operator cedar::aux::EnumId () const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -94,27 +98,17 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief the id for an unknown entry
   static const cedar::aux::EnumId UNDEFINED = 0xFFFF;
 protected:
   // none yet
 private:
+  //!@brief the identification number of this enum entry
   cedar::aux::EnumId mId;
-
+  //!@brief the name of this enum entry
   std::string mName;
-
+  //!@brief the beautified name of this enum entry
   std::string mPrettyString;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::Enum
 
 #endif // CEDAR_AUX_ENUM_H

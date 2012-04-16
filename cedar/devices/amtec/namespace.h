@@ -37,11 +37,11 @@
 #ifndef CEDAR_DEV_AMTEC_NAMESPACE_H
 #define CEDAR_DEV_AMTEC_NAMESPACE_H
 
-// LOCAL INCLUDES
-#include "cedar/devices/robot/CMakeDefines.h"
-#include "cedar/devices/lib.h"
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/devices/lib.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -54,7 +54,9 @@ namespace cedar
     namespace amtec
     {
 #ifdef CEDAR_USE_AMTEC
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_DEV_CLASS(KinematicChain);
+      //!@endcond
 #endif // CEDAR_USE_AMTEC
     }
   }

@@ -34,22 +34,16 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-#include "namespace.h"
-#include "AmtecChain.h"
+#define NOMINMAX // to avoid Windows issues
 
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/devices/robot/gl/namespace.h"
+#include "cedar/devices/robot/gl/AmtecChain.h"
 #include "cedar/auxiliaries/gl/gl.h"
 
 // SYSTEM INCLUDES
 
-using namespace cedar::dev::robot;
-using namespace cedar::dev::robot::gl;
-using namespace cedar::aux::gl;
-using namespace std;
-using namespace cv;
-
-
+// define constants
 const float cedar::dev::robot::gl::AmtecChain::mNoSpecular[3] = {0.0f, 0.0f, 0.0f};
 
 const float cedar::dev::robot::gl::AmtecChain::mDarkBlueMetal_Ambient[3] = {0.2f, 0.35f, 0.7f};
@@ -72,34 +66,34 @@ const float cedar::dev::robot::gl::AmtecChain::mArtificialSkin_Diffuse[3] = {0.0
 const float cedar::dev::robot::gl::AmtecChain::mArtificialSkin_Specular[3] = {0.04f, 0.04f, 0.04f};
 const float cedar::dev::robot::gl::AmtecChain::mArtificialSkin_Shininess[1] = {0.078125f};
 
-const float cedar::dev::robot::gl::AmtecChain::mWhitePlastic_Ambient[3] = {0.05f, 0.05f, 0.05f};
-const float cedar::dev::robot::gl::AmtecChain::mWhitePlastic_Diffuse[3] = {0.5f, 0.5f, 0.5f};
+const float cedar::dev::robot::gl::AmtecChain::mWhitePlastic_Ambient[3] = {0.0f, 0.0f, 0.0f};
+const float cedar::dev::robot::gl::AmtecChain::mWhitePlastic_Diffuse[3] = {0.55f, 0.55f, 0.55f};
 const float cedar::dev::robot::gl::AmtecChain::mWhitePlastic_Specular[3] = {0.7f, 0.7f, 0.7f};
-const float cedar::dev::robot::gl::AmtecChain::mWhitePlastic_Shininess[1] = {0.078125f};
+const float cedar::dev::robot::gl::AmtecChain::mWhitePlastic_Shininess[1] = {0.25f};
 
 const float cedar::dev::robot::gl::AmtecChain::mBlackMetal_Ambient[3] = {0.05f, 0.05f, 0.05f};
 const float cedar::dev::robot::gl::AmtecChain::mBlackMetal_Diffuse[3] = {0.05f, 0.05f, 0.05f};
 const float cedar::dev::robot::gl::AmtecChain::mBlackMetal_Specular[3] = {0.4f, 0.4f, 0.4f};
 const float cedar::dev::robot::gl::AmtecChain::mBlackMetal_Shininess[1] = {0.678125f};
 
-const float cedar::dev::robot::gl::AmtecChain::mChrome_Ambient[3] = {0.05f, 0.05f, 0.05f};
-const float cedar::dev::robot::gl::AmtecChain::mChrome_Diffuse[3] = {0.5f, 0.5f, 0.5f};
-const float cedar::dev::robot::gl::AmtecChain::mChrome_Specular[3] = {0.7f, 0.7f, 0.7f};
-const float cedar::dev::robot::gl::AmtecChain::mChrome_Shininess[1] = {0.078125f};
+const float cedar::dev::robot::gl::AmtecChain::mChrome_Ambient[3] = {0.25f, 0.25f, 0.25f};
+const float cedar::dev::robot::gl::AmtecChain::mChrome_Diffuse[3] = {0.4f, 0.4f, 0.4f};
+const float cedar::dev::robot::gl::AmtecChain::mChrome_Specular[3] = {0.774597f, 0.774597f, 0.774597f};
+const float cedar::dev::robot::gl::AmtecChain::mChrome_Shininess[1] = {0.6f};
 //! \todo disambiguate white plastic from chrome
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-AmtecChain::AmtecChain(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel)
+cedar::dev::robot::gl::AmtecChain::AmtecChain(cedar::dev::robot::KinematicChainPtr pKinematicChain)
 :
-gl::KinematicChain(rpKinematicChainModel)
+cedar::dev::robot::gl::KinematicChain(pKinematicChain)
 {
 
 }
 
-AmtecChain::~AmtecChain()
+cedar::dev::robot::gl::AmtecChain::~AmtecChain()
 {
 
 }
@@ -108,7 +102,7 @@ AmtecChain::~AmtecChain()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void AmtecChain::setMaterial(int material)
+void cedar::dev::robot::gl::AmtecChain::setMaterial(int material)
 {
   switch (material)
   {

@@ -37,25 +37,17 @@
 #ifndef CEDAR_PROC_GUI_PLUGIN_MANAGER_DIALOG_H
 #define CEDAR_PROC_GUI_PLUGIN_MANAGER_DIALOG_H
 
-// LOCAL INCLUDES
-#ifdef DEBUG
-  #include "cedar/processing/debug/gui/ui_PluginManagerDialog.h"
-#else
-  #include "cedar/processing/gui/ui_PluginManagerDialog.h"
-#endif
+// CEDAR INCLUDES
+#include "cedar/processing/gui/ui_PluginManagerDialog.h"
 
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/PluginProxy.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QDialog>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief A widget for managing plugins.
  */
 class cedar::proc::gui::PluginManagerDialog : public QDialog, public Ui_PluginManagerDialog
 {
@@ -77,6 +69,8 @@ public:
 public:
 
 public slots:
+  /*!@brief Slot that is called when the dialog is closed by clicking ok.
+   */
   void accepted();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -89,31 +83,21 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /*!@brief Fills the plugin list.
+   */
   void populate();
 
+  /*!@brief Adds a plugin to the list.
+   */
   void addPlugin(const std::string& path);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
 
 }; // class cedar::PluginManagerDialog
 
 #endif // CEDAR_PROC_GUI_PLUGIN_MANAGER_DIALOG_H
-

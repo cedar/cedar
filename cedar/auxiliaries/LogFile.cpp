@@ -34,30 +34,24 @@
 
 ======================================================================================================================*/
 
-
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/LogFile.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/date_time/posix_time/posix_time.hpp>
-
-using namespace cedar::aux;
-using namespace boost::posix_time;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 //! constructor
-LogFile::LogFile(const std::string& logFileName)
+cedar::aux::LogFile::LogFile(const std::string& logFileName)
 {
-  open(logFileName.c_str(), ios_base::in | ios_base::app);
+  open(logFileName.c_str(), std::ios_base::in | std::ios_base::app);
 }
 
 //! destructor
-LogFile::~LogFile()
+cedar::aux::LogFile::~LogFile()
 {
 }
 
@@ -65,17 +59,17 @@ LogFile::~LogFile()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void LogFile::addSeparatorLine(void)
+void cedar::aux::LogFile::addSeparatorLine()
 {
   *this << std::string(120, '-') << "\n";
 }
 
-void LogFile::addTimeStamp(void)
+void cedar::aux::LogFile::addTimeStamp()
 {
-  ptime time_stamp = second_clock::local_time();
+  boost::posix_time::ptime time_stamp = boost::posix_time::second_clock::local_time();
 
   if (!time_stamp.is_not_a_date_time())
   {
-    *this << to_simple_string(time_stamp) << " ";
+    *this << boost::posix_time::to_simple_string(time_stamp) << " ";
   }
 }

@@ -37,14 +37,13 @@
 #ifndef CEDAR_AUX_NAMED_CONFIGURABLE_H
 #define CEDAR_AUX_NAMED_CONFIGURABLE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/ParameterTemplate.h"
 #include "cedar/auxiliaries/Configurable.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/StringParameter.h"
 
 // SYSTEM INCLUDES
+
 
 /*!@brief This is a Configurable with a name.
  *
@@ -67,7 +66,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief set the name of this NamedConfigurable
   void setName(const std::string& name);
+  //!@brief get the name of this NamedConfigurable
   const std::string& getName() const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -91,9 +92,8 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
+  //!@brief the name of this parameter
   StringParameterPtr _mName;
 
 private:
@@ -102,4 +102,3 @@ private:
 }; // class cedar::aux::NamedConfigurable
 
 #endif // CEDAR_AUX_NAMED_CONFIGURABLE_H
-

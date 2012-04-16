@@ -34,16 +34,14 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/SetParameter.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/VectorParameter.h"
-#include "cedar/auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/System.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
@@ -87,6 +85,28 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   ui_settings->addConfigurableChild("steps", mSteps);
   ui_settings->addConfigurableChild("tools", mTools);
   ui_settings->addConfigurableChild("properties", mProperties);
+
+  this->mSnapToGrid = cedar::aux::BoolParameterPtr
+                      (
+                        new cedar::aux::BoolParameter
+                        (
+                          ui_settings.get(),
+                          "snapToGrid",
+                          false
+                        )
+                      );
+
+  cedar::aux::ConfigurablePtr display_settings(new cedar::aux::Configurable());
+  this->addConfigurableChild("displaySettings", display_settings);
+  mUseGraphicsItemShadowEffects = cedar::aux::BoolParameterPtr
+                                  (
+                                    new cedar::aux::BoolParameter
+                                    (
+                                      display_settings.get(),
+                                      "useGraphicsItemShadowEffects",
+                                      false
+                                    )
+                                  );
 
   cedar::aux::ConfigurablePtr recent_files(new cedar::aux::Configurable());
   this->addConfigurableChild("fileHistory", recent_files);
@@ -136,6 +156,26 @@ cedar::proc::gui::Settings::~Settings()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::gui::Settings::snapToGrid() const
+{
+  return this->mSnapToGrid->getValue();
+}
+
+void cedar::proc::gui::Settings::snapToGrid(bool snap)
+{
+  this->mSnapToGrid->setValue(snap);
+}
+
+bool cedar::proc::gui::Settings::useGraphicsItemShadowEffects() const
+{
+  return this->mUseGraphicsItemShadowEffects->getValue();
+}
+
+void cedar::proc::gui::Settings::setUseGraphicsItemShadowEffects(bool useShadows)
+{
+  this->mUseGraphicsItemShadowEffects->setValue(useShadows);
+}
 
 void cedar::proc::gui::Settings::appendArchitectureFileToHistory(const std::string& filePath)
 {

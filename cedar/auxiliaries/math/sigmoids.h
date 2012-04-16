@@ -33,14 +33,13 @@
     Credits:
 
 ======================================================================================================================*/
+
 #ifndef CEDAR_AUX_MATH_SIGMOIDS_H
 #define CEDAR_AUX_MATH_SIGMOIDS_H
 
-// LOCAL INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
@@ -59,8 +58,11 @@ namespace cedar
   {
     namespace math
     {
+      //!@cond SKIPPED_DOCUMENTATION
+
       //! an exponential-based sigmoid for a single double value
       CEDAR_AUX_LIB_EXPORT CEDAR_DECLARE_DEPRECATED(double sigmoid(const double x, const double beta, const double threshold = 0));
+      //!@endcond
 
       //! an exponential-based sigmoid for a single double value
       CEDAR_AUX_LIB_EXPORT double sigmoidExp(const double x, const double beta, const double threshold = 0);
@@ -69,7 +71,7 @@ namespace cedar
       CEDAR_AUX_LIB_EXPORT double sigmoidAbs(const double x, const double beta, const double threshold = 0);
 
       //! Heavyside function for a single double value
-      CEDAR_AUX_LIB_EXPORT double sigmoidHeavyside(const double x, const double threshold = 0);
+      CEDAR_AUX_LIB_EXPORT double sigmoidHeaviside(const double x, const double threshold = 0);
 
       //! a sigmoid that rises smoothly in an interval and is exactly zero resp. one outside that interval
       CEDAR_AUX_LIB_EXPORT double sigmoidInterval(const double value, const double t1, const double t2, const bool decreasing = false);
@@ -92,7 +94,8 @@ namespace cedar
 
       //! a sigmoid for a vector of doubles
       CEDAR_AUX_LIB_EXPORT std::vector<double> sigmoid(const std::vector<double>& x, const double beta, const double threshold = 0);
-    };
-  };
-};
+    }
+  }
+}
+
 #endif  // CEDAR_AUX_MATH_SIGMOIDS_H

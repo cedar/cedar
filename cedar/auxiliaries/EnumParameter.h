@@ -37,28 +37,20 @@
 #ifndef CEDAR_AUX_ENUM_PARAMETER_H
 #define CEDAR_AUX_ENUM_PARAMETER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
-#include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/EnumBase.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <set>
 
-
-/*!@brief Abstract description of the class.
+/*!@brief A parameter storing an enum value.
  *
- * More detailed description of the class.
+ * More detailed description of the class coming soon.
  */
 class cedar::aux::EnumParameter : public cedar::aux::Parameter
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -68,6 +60,7 @@ public:
                 const std::string& name,
                 boost::shared_ptr<cedar::aux::EnumBase> enumBase);
 
+  //!@brief The standard constructor, with an additional default value.
   EnumParameter(cedar::aux::Configurable *pOwner,
                 const std::string& name,
                 boost::shared_ptr<cedar::aux::EnumBase> enumBase,
@@ -77,16 +70,17 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void setTo(const cedar::aux::ConfigurationNode& root);
-
-  void putTo(cedar::aux::ConfigurationNode& root);
-
+  //!@brief read from a configuration node
+  void readFromNode(const cedar::aux::ConfigurationNode& root);
+  //!@brief write to a configuration node
+  void writeToNode(cedar::aux::ConfigurationNode& root) const;
+  //!@brief set enum value to default
   void makeDefault();
-
+  //!@brief return the enum value
   cedar::aux::Enum getValue() const;
-
+  //!@brief set enum value to a specified id
   void set(const std::string& enumId);
-
+  //!@brief get the enum from which this parameter represents an entry
   const cedar::aux::EnumBase& getEnumDeclaration()
   {
     return *(this->mEnumDeclaration);
@@ -107,28 +101,15 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
+  //!@brief the enum value of this parameter
   cedar::aux::EnumId mValue;
+  //!@brief the default value of this parameter
   cedar::aux::EnumId mDefault;
-
+  //!@brief a pointer to the enum used by this parameter
   boost::shared_ptr<cedar::aux::EnumBase> mEnumDeclaration;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::VectorParameter
 
 #endif // CEDAR_AUX_ENUM_PARAMETER_H
-

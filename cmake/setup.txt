@@ -45,6 +45,19 @@
 # set the project name
 project(cedar)
 
+# check whether this is an out-of-source build
+if( CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR AND NOT MSVC_IDE )
+  message(FATAL_ERROR "In-source builds are not allowed. Please create a directory and run cmake from there, passing
+                       the path to this source directory as the last argument. This process created the file
+                       'CMakeCache.txt' and the directory 'CMakeFiles'. Please delete them.")
+endif()
+
+if (CEDAR_BUILD_DEBUG_VERSION)
+  set (CMAKE_BUILD_TYPE debug)
+else(CEDAR_BUILD_DEBUG_VERSION)
+  set (CMAKE_BUILD_TYPE release)
+endif(CEDAR_BUILD_DEBUG_VERSION)
+
 # set the directory for source code
 set (CEDAR_SOURCE_DIR           "${CEDAR_HOME}/cedar")
 # directory for all tests
@@ -54,7 +67,9 @@ set (CEDAR_UNIT_TEST_DIR        "${CEDAR_TEST_DIR}/unit")
 # directory for all interactive tests
 set (CEDAR_INTERACTIVE_TEST_DIR "${CEDAR_TEST_DIR}/interactive")
 # directory for all tools
-set (CEDAR_EXECUTABLES_DIR            "${CEDAR_HOME}/executables")
+set (CEDAR_EXECUTABLES_DIR      "${CEDAR_HOME}/executables")
+# directory for examples
+set (CEDAR_EXAMPLES_DIR         "${CEDAR_HOME}/examples")
 
 # default output directory for lib files
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CEDAR_LIB_DIR}")
@@ -65,6 +80,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CEDAR_EXE_DIR}")
 # append a 'cedar' subdirectory to the header install directory, so that the includes are bundled
 set(CEDAR_HEADER_INSTALL_DIR "${CEDAR_HEADER_INSTALL_DIR}/cedar")
 
+# set cedar's resource installation directory
+set(CEDAR_RESOURCE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/cedar")
+
 # Shared or static libraries?
 if (CEDAR_BUILD_STATIC_LIBS)
   set (CEDAR_LIB_TYPE STATIC)
@@ -74,7 +92,7 @@ endif (CEDAR_BUILD_STATIC_LIBS)
 
 # include the cedar library directory in the library search path
 link_directories(${CEDAR_LIB_DIR})
-
+message(STATUS ${CEDAR_BUILD_DIR})
 # add the cedar home directory to the ones that need to be included
 include_directories(${CEDAR_HOME} ${CEDAR_TEST_DIR} ${CEDAR_BUILD_DIR})
 
@@ -84,32 +102,13 @@ include_directories(${CEDAR_HOME} ${CEDAR_TEST_DIR} ${CEDAR_BUILD_DIR})
 
 if (CMAKE_COMPILER_IS_GNUCC)
   add_definitions(-Wall -Wextra)
-  add_definitions(-DGNUCC -D__GNUCC__ -D__GCC__ -DGCC)
 elseif (MSVC)
   add_definitions(-W2)
-  add_definitions(-DMSVC)
 endif (CMAKE_COMPILER_IS_GNUCC)
 
 add_definitions(-D CEDAR_LOG_DIR=\\"${CEDAR_LOG_DIR}/\\")
 
-if (UNIX)
-  add_definitions(-DUNIX -D__UNIX__)
-  message("-- defined the UNIX constants.")
-endif (UNIX)
-
-if (APPLE)
-  add_definitions(-DAPPLE -D__APPLE__)
-  message("-- defined the APPLE constants.")
-endif (APPLE)
-
-if ("${CMAKE_SYSTEM}" MATCHES "Linux")
-  add_definitions(-DLINUX -D__LINUX__)
-  message("-- defined the LINUX constants.")
-endif ("${CMAKE_SYSTEM}" MATCHES "Linux")
-
-
 if (WIN32)
-  add_definitions(-DWINDOWS -D__WINDOWS__ -DWIN32 -D__WIN32__)
   set(CMAKE_DEBUG_POSTFIX "d") # TODO for linux too?
 endif (WIN32)
 
@@ -121,3 +120,6 @@ else(buildTypeLower MATCHES debug)
   message("-- Building in \"RELEASE\" mode.")
   add_definitions(-DRELEASE)
 endif(buildTypeLower MATCHES debug)
+
+# configure the file exposing internal cmake variables to cedar
+configure_file("${CEDAR_HOME}/cmake/resources/internals.h.in" "${CMAKE_CURRENT_BINARY_DIR}/cedar/internals.h")

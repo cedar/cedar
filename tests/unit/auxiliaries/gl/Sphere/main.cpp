@@ -33,45 +33,37 @@
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
-#include "cedar/auxiliaries/gl/Sphere.h"
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
+#include "cedar/auxiliaries/gl/Sphere.h"
 
 // SYSTEM INCLUDES
 #include <string>
 
-using namespace cedar::aux;
-using namespace cedar::aux::gl;
-using namespace std;
-
-int main()
+int main(int, char**)
 {
-  LogFile log_file("UnitTestSphere.log");
-  log_file.addTimeStamp();
-  log_file << std::endl;
   // the number of errors encountered in this test
   int errors = 0;
 
   // test constructors
-  cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
-  Sphere testSphere(p_object);
-  Sphere sphere(p_object, 1);
+  cedar::aux::LocalCoordinateFramePtr p_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  cedar::aux::gl::Sphere testSphere(p_local_coordinate_frame);
+  cedar::aux::gl::Sphere sphere(p_local_coordinate_frame, 1);
 
   //--------------------------------------------------------------------------------------------------------------------
   // radius
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: radius" << std::endl;
+  std::cout << "test: radius" << std::endl;
   sphere.setRadius(10.1);
   if (sphere.radius() != 10.1)
   {
     errors++;
-    log_file << "ERROR with setRadius() or radius()" << std::endl;
+    std::cout << "ERROR with setRadius() or radius()" << std::endl;
   }
 
 
-  log_file << "test finished, there were " << errors << " errors" << std::endl;
+  std::cout << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
   {
     errors = 255;

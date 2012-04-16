@@ -37,25 +37,22 @@
 
 ########################################################################################################################
 # cedar executables
-list(APPEND subdirectories ${CEDAR_EXECUTABLES_DIR})
+list(APPEND subdirectories ${CEDAR_EXECUTABLES_DIR} ${CEDAR_EXAMPLES_DIR})
 list(LENGTH subdirectories numberOfSubdirectories)
-
-while (${numberOfSubdirectories} STRGREATER 0)
+while (numberOfSubdirectories GREATER 0)
   list(GET subdirectories 0 subdirectory)
   list(REMOVE_AT subdirectories 0)
-
   cedar_get_subdirectories(${subdirectory})
-
   foreach(newSubdirectory ${returnedSubdirectories})
 
     if (EXISTS "${newSubdirectory}/CMakeLists.txt")
       add_subdirectory(${newSubdirectory})
     endif (EXISTS "${newSubdirectory}/CMakeLists.txt")
 
-    list(APPEND subdirectories ${newSubdirectory})
+  list(APPEND subdirectories ${newSubdirectory})
   endforeach(newSubdirectory)
-
-  list(LENGTH subdirectories ${numberOfSubdirectories})
-endwhile (${numberOfSubdirectories} STRGREATER 0)
+  list(LENGTH subdirectories num)
+  set(numberOfSubdirectories ${num})
+endwhile (numberOfSubdirectories GREATER 0)
 
 

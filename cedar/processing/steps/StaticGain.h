@@ -37,13 +37,11 @@
 #ifndef CEDAR_PROC_STEPS_STATIC_GAIN_H
 #define CEDAR_PROC_STEPS_STATIC_GAIN_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/steps/namespace.h"
-
-// PROJECT INCLUDES
 #include "cedar/processing/Step.h"
-#include "cedar/auxiliaries/NumericParameter.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -110,7 +108,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief MatrixData representing the input. Storing it like this saves time during computation.
-  cedar::aux::MatDataPtr mInput;
+  cedar::aux::ConstMatDataPtr mInput;
 
   //!@brief The data containing the output.
   cedar::aux::MatDataPtr mOutput;
@@ -128,4 +126,3 @@ private:
 }; // class cedar::proc::steps::StaticGain
 
 #endif // CEDAR_PROC_STEPS_STATIC_GAIN_H
-

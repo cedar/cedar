@@ -34,30 +34,28 @@
 
 ======================================================================================================================*/
 
+// CEDAR INCLUDES
 #include "cedar/dynamics/plugin.h"
 #include "cedar/dynamics/namespace.h"
 #include "cedar/dynamics/fields/NeuralField.h"
-#include "cedar/processing/StepDeclaration.h"
-#include "cedar/processing/Manager.h"
+#include "cedar/dynamics/fields/Preshape.h"
+#include "cedar/dynamics/sources/Noise.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/Singleton.h"
 
-#ifdef LINUX
-void cedar::dyn::initialize()
-#else  // workaround for circular linking
-void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin)
-#endif
+// SYSTEM INCLUDES
+
+
+void pluginDeclaration(cedar::proc::PluginDeclarationPtr)
 {
-  using cedar::proc::StepDeclarationPtr;
+  //!@todo Switch this to the new logging mechanism
+  std::cout << "cedardyn is no longer a plugin. Please don't include it any more!" << std::endl;
+}
 
-  StepDeclarationPtr field_decl
-  (
-    new cedar::proc::StepDeclarationT<cedar::dyn::NeuralField>("cedar.dynamics.NeuralField", "Fields")
-  );
-
-#ifdef LINUX
-  cedar::proc::Manager::getInstance().steps().declareClass(field_decl);
-#else
-  // cedar::proc::PluginDeclarationPtr plugin(new cedar::proc::PluginDeclaration());
-  plugin->add(field_decl);
-  // return plugin;
-#endif
+void cedar::dyn::getPluginDesciption(cedar::proc::PluginDeclarationPtr)
+{
+  //!@todo Switch this to the new logging mechanism
+  std::cout << "cedardyn is no longer a plugin. Please don't include it any more!" << std::endl;
 }

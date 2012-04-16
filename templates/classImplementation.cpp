@@ -34,9 +34,10 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 
 // SYSTEM INCLUDES
 

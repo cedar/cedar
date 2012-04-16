@@ -34,55 +34,52 @@
 
 ======================================================================================================================*/
 
-
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/Viewer.h"
-
-// PROJECT INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
 
 // SYSTEM INCLUDES
-
-using namespace cedar::aux::gui;
-using namespace cedar::aux::gl;
-using namespace std;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Viewer::Viewer(cedar::aux::gl::ScenePtr& p_scene)
+cedar::aux::gui::Viewer::Viewer(cedar::aux::gl::ScenePtr pScene)
 :
-mpScene(p_scene)
+mpScene(pScene)
 {
-
+  mpScene->addViewer(this);
 }
 
-Viewer::~Viewer()
+cedar::aux::gui::Viewer::~Viewer()
 {
-  
+  mpScene->removeViewer(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void Viewer::init()
+void cedar::aux::gui::Viewer::init()
 {
   restoreStateFromFile();
   mpScene->initGl();
 }
 
-void Viewer::draw()
+void cedar::aux::gui::Viewer::initGl(cedar::aux::gl::ObjectVisualizationPtr pVisualization)
+{
+  pVisualization->initializeGl();
+}
+
+void cedar::aux::gui::Viewer::draw()
 {
   mpScene->draw();
 }
 
-void Viewer::timerEvent(QTimerEvent*)
+void cedar::aux::gui::Viewer::timerEvent(QTimerEvent*)
 {
   if (isVisible())
   {
     update();
   }
 }
-

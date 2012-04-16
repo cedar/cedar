@@ -33,36 +33,33 @@
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES
-#include "KinematicChain.h"
+#define NOMINMAX // avoids Windows issues with cedar's min/max functions
 
-// PROJECT INCLUDES
-#include "cedar/auxiliaries/gl/gl.h"
+// CEDAR INCLUDES
+#include "cedar/devices/robot/gl/KinematicChain.h"
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/gl/gl.h"
+#include "cedar/auxiliaries/gl/namespace.h"
 
 // SYSTEM INCLUDES
-
-
-using namespace cedar::dev::robot;
-using namespace cedar::dev::robot::gl;
-using namespace cedar::aux::gl;
-using namespace std;
-using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-gl::KinematicChain::KinematicChain(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel)
+cedar::dev::robot::gl::KinematicChain::KinematicChain(cedar::dev::robot::KinematicChainPtr pKinematicChain)
 :
-cedar::aux::gl::Object(rpKinematicChainModel),
-mpKinematicChainModel(rpKinematicChainModel)
+cedar::aux::gl::ObjectVisualization(pKinematicChain->getRootCoordinateFrame()),
+mpKinematicChain(pKinematicChain),
+mJointRadius(0.05),
+mLinkRadius(0.035)
 {
-
+  mIsDrawingEndEffectorVelocity = true;
+  mIsDrawingEndEffectorAcceleration = false;
 }
 
-gl::KinematicChain::~KinematicChain()
+cedar::dev::robot::gl::KinematicChain::~KinematicChain()
 {
   
 }
@@ -71,21 +68,64 @@ gl::KinematicChain::~KinematicChain()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void gl::KinematicChain::draw()
+void cedar::dev::robot::gl::KinematicChain::draw()
 {
-  drawBase();
-  for (unsigned int j=0; j<mpKinematicChainModel->getNumberOfJoints(); j++)
+  prepareDraw();
+
+  if (mIsVisible)
   {
-    drawSegment(j);
+    drawBase();
+    for (unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); j++)
+    {
+      drawSegment(j);
+    }
+    drawEndEffector();
+    if (mIsDrawingEndEffectorVelocity)
+    {
+      drawEndEffectorVelocity();
+    }
+    if (mIsDrawingEndEffectorAcceleration)
+    {
+      drawEndEffectorAcceleration();
+    }
+
+    glPopMatrix(); //!\todo check if this is needed
   }
-  drawEndEffector();
-  drawEndEffectorVelocity();
-  drawEndEffectorAcceleration();
-  
-  glPopMatrix(); //!\todo check if this is needed
 }
 
-void gl::KinematicChain::drawBase()
+void cedar::dev::robot::gl::KinematicChain::setDisplayEndEffectorVelocity(bool state)
+{
+  mIsDrawingEndEffectorVelocity = state;
+}
+
+void cedar::dev::robot::gl::KinematicChain::setDisplayEndEffectorAcceleration(bool state)
+{
+  mIsDrawingEndEffectorAcceleration = state;
+}
+
+double cedar::dev::robot::gl::KinematicChain::getJointRadius()
+{
+  return mJointRadius;
+}
+
+double cedar::dev::robot::gl::KinematicChain::getLinkRadius()
+{
+  return mLinkRadius;
+}
+
+void cedar::dev::robot::gl::KinematicChain::setJointRadius(double value)
+{
+  mJointRadius = value;
+}
+
+void cedar::dev::robot::gl::KinematicChain::setLinkRadius(double value)
+{
+  mLinkRadius = value;
+}
+
+
+
+void cedar::dev::robot::gl::KinematicChain::drawBase()
 {
   // move to origin
   glPopMatrix();
@@ -93,37 +133,37 @@ void gl::KinematicChain::drawBase()
 
   // draw the link to the first joint
   glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
-  Mat proximal = mpKinematicChainModel->getTransformation()(Rect(3, 0, 1, 3)).clone();
-  Mat distal = mpKinematicChainModel->getJointTransformation(0)(Rect(3, 0, 1, 3)).clone();
-  drawCone<double>(proximal, distal, .035, .035, mResolution, mIsDrawnAsWireFrame);
+  cv::Mat proximal = mpKinematicChain->getRootTransformation()(cv::Rect(3, 0, 1, 3)).clone();
+  cv::Mat distal = mpKinematicChain->getJointTransformation(0)(cv::Rect(3, 0, 1, 3)).clone();
+  cedar::aux::gl::drawCone<double>(proximal, distal, mLinkRadius, mLinkRadius, mResolution, mIsDrawnAsWireFrame);
 
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChainModel->getTransformation().t();
+  mTransformationTranspose = mpKinematicChain->getRootTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
 
   // draw the base
   glColor4d(mColorR, mColorG, mColorB, 0);
-  drawTorus(0.1, 0.015, mResolution, mResolution, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawTorus(0.1, 0.015, mResolution, mResolution, mIsDrawnAsWireFrame);
   glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
   glTranslatef(0.0f, 0.0f, 0.005f);
-  drawDisk(0.0, 0.1, mResolution, mResolution, false, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawDisk(0.0, 0.1, mResolution, mResolution, false, mIsDrawnAsWireFrame);
   glTranslatef(0.0f, 0.0f, -0.01f);
-  drawDisk(0.0, 0.1, mResolution, mResolution, true, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawDisk(0.0, 0.1, mResolution, mResolution, true, mIsDrawnAsWireFrame);
 }
 
-void gl::KinematicChain::drawSegment(unsigned int index)
+void cedar::dev::robot::gl::KinematicChain::drawSegment(unsigned int index)
 {
   // move to origin transformation and resave it to the stack
   glPopMatrix();
   glPushMatrix();
   
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChainModel->getJointTransformation(index).t();
+  mTransformationTranspose = mpKinematicChain->getJointTransformation(index).t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
   
   // draw the joint
   glColor4d(mColorR, mColorG, mColorB, 0);
-  drawSphere(.05, mResolution, mResolution, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawSphere(mJointRadius, mResolution, mResolution, mIsDrawnAsWireFrame);
   
   // move to origin transformation and re-save it to the stack
   glPopMatrix();
@@ -131,52 +171,53 @@ void gl::KinematicChain::drawSegment(unsigned int index)
 
   // draw the link
   glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
-  Mat proximal = mpKinematicChainModel->getJointTransformation(index)(Rect(3, 0, 1, 3)).clone();
-  Mat distal;
-  if (index+1 < mpKinematicChainModel->getNumberOfJoints())
+  cv::Mat proximal = mpKinematicChain->getJointTransformation(index)(cv::Rect(3, 0, 1, 3)).clone();
+  cv::Mat distal;
+  if (index+1 < mpKinematicChain->getNumberOfJoints())
   {
-    distal = mpKinematicChainModel->getJointTransformation(index+1)(Rect(3, 0, 1, 3)).clone();
+    distal = mpKinematicChain->getJointTransformation(index+1)(cv::Rect(3, 0, 1, 3)).clone();
   }
   else
   {
-    distal = mpKinematicChainModel->calculateEndEffectorTransformation()(Rect(3, 0, 1, 3)).clone();
+    distal = mpKinematicChain->getEndEffectorTransformation()(cv::Rect(3, 0, 1, 3)).clone();
   }
-  drawCone<double>(proximal, distal, .035, .035, mResolution, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawCone<double>(proximal, distal, mLinkRadius, mLinkRadius, mResolution, mIsDrawnAsWireFrame);
 }
 
-void gl::KinematicChain::drawEndEffector()
+void cedar::dev::robot::gl::KinematicChain::drawEndEffector()
 {
   // move to origin
   glPopMatrix();
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChainModel->calculateEndEffectorTransformation().t();
+  mTransformationTranspose = mpKinematicChain->getEndEffectorTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
   
 	// draw the joint
   glColor4d(mColorR, mColorG, mColorB, 0);
-  drawSphere(.05, mResolution, mResolution, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawSphere(mJointRadius, mResolution, mResolution, mIsDrawnAsWireFrame);
 }
 
-void gl::KinematicChain::drawEndEffectorVelocity()
+void cedar::dev::robot::gl::KinematicChain::drawEndEffectorVelocity()
 {
   // move to origin
   glPopMatrix();
   glPushMatrix();
   glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
-  cv::Mat from = mpKinematicChainModel->calculateEndEffectorPosition();
-  cv::Mat to = from + mpKinematicChainModel->calculateEndEffectorVelocity();
-  drawArrow<double>(from, to, 0.005, 0.015, 0.05, mResolution);
+  cv::Mat from = mpKinematicChain->calculateEndEffectorPosition();
+  cv::Mat to = from + mpKinematicChain->calculateEndEffectorVelocity();
+  cedar::aux::gl::drawArrow<double>(from, to, 0.005, 0.015, 0.05, mResolution);
 }
 
-void gl::KinematicChain::drawEndEffectorAcceleration()
+void cedar::dev::robot::gl::KinematicChain::drawEndEffectorAcceleration()
 {
   // move to origin
   glPopMatrix();
   glPushMatrix();
   glColor4d(mColorR, mColorG, mColorB, 0);
-  cv::Mat from = mpKinematicChainModel->calculateEndEffectorPosition() + mpKinematicChainModel->calculateEndEffectorVelocity();
-  cv::Mat to = from + mpKinematicChainModel->calculateEndEffectorAcceleration();
-  drawArrow<double>(from, to, 0.005, 0.015, 0.05, mResolution);
+  cv::Mat from
+    = mpKinematicChain->calculateEndEffectorPosition() + mpKinematicChain->calculateEndEffectorVelocity();
+  cv::Mat to = from + mpKinematicChain->calculateEndEffectorAcceleration();
+  cedar::aux::gl::drawArrow<double>(from, to, 0.005, 0.015, 0.05, mResolution);
 }

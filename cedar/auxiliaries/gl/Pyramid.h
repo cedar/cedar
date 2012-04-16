@@ -19,66 +19,60 @@
 
 ========================================================================================================================
 
- ----- Institute:   Ruhr-Universitaet-Bochum
-                    Institut fuer Neuroinformatik
- 
- ----- File:        Pyramid.h
- 
- ----- Maintainer:  Hendrik Reimann
- ------Email:       hendrik.reimann@ini.rub.de
- ----- Date:        2010 10 29
- 
- ----- Description: visualization for a pyramid
- 
- ----- Credits:     
- ---------------------------------------------------------------------------------------------------------------------*/
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        Pyramid.h
+
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
+    Date:        2010 11 29
+
+    Description: Visualization of a pyramid
+
+    Credits:
+
+======================================================================================================================*/
 
 #ifndef CEDAR_AUX_GL_PYRAMID_H
 #define CEDAR_AUX_GL_PYRAMID_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "namespace.h"
-#include "Object.h"
-
-// PROJECT INCLUDES
+#include "ObjectVisualization.h"
 
 // SYSTEM INCLUDES
 
 /*!@brief Simple OpenGL visualization of a pyramid with rectangular base
  *
- * This class visualizes an instance of cedar::aux::Object as a pyramid with specified dimensions
+ * This class visualizes a pyramid with specified dimensions
  *
- * @remarks To get a simple visualization of the Object on screen, add an instance of this class to a
+ * @remarks To get a simple visualization of the object on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
-class cedar::aux::gl::Pyramid : public cedar::aux::gl::Object
+class cedar::aux::gl::Pyramid : public cedar::aux::gl::ObjectVisualization
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief standard constructor.
-   * @param pObject    pointer to the aux::Object being visualized
-   */
-	Pyramid(cedar::aux::ObjectPtr pObject);
-
   /*!@brief constructor. 
-   * @param pObject    pointer to the aux::Object being visualized
-   * @param length    extension of the pyramid's base in x-direction of object coordinate frame
-   * @param width    extension of the pyramid's base in y-direction of object coordinate frame
-   * @param height    height of the pyramid, i.e. distance from base to tip
-   * @param R    color, value for red channel in RGB
-   * @param G    color, value for green channel in RGB
-   * @param B    color, value for blue channel in RGB
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
+   * @param length extension of the pyramid's base in x-direction of object coordinate frame
+   * @param width extension of the pyramid's base in y-direction of object coordinate frame
+   * @param height height of the pyramid, i.e. distance from base to tip
+   * @param colorR color, value for red channel in RGB
+   * @param colorG color, value for green channel in RGB
+   * @param colorB color, value for blue channel in RGB
    */
-	Pyramid(
-      	   cedar::aux::ObjectPtr pObject,
-           const double length,
-           const double width,
-           const double height,
-           const double R=1,
-           const double G=0,
-           const double B=0
+  Pyramid(
+           cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+           double length = 2.0,
+           double width = 3.0,
+           double height = 2.0,
+           double colorR = 1,
+           double colorG = 0,
+           double colorB = 0
          );
   
   //--------------------------------------------------------------------------------------------------------------------
@@ -86,37 +80,37 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief draws a visualization of the object in the current GL context
-	void draw();
+  void draw();
 
   /*!@brief set extension of the pyramid's base in x-direction of the object coordinate frame
    * @param value    new extension value
    */
-	void setLength(double value);
-	
+  void setLength(double value);
+
   /*!@brief set extension of the pyramid's base in y-direction of the object coordinate frame
    * @param value    new extension value
    */
   void setWidth(double value);
-	
+
   /*!@brief set height of the pyramid, i.e. the distance from the base to the tip
    * @param value    new height value
    */
   void setHeight(double value);
-	
+
   /*!@brief get extension of the pyramid's base in x-direction of the object coordinate frame
    * @return    extension value
    */
-  double length();
-	
+  double length() const;
+
   /*!@brief get extension of the pyramid's base in y-direction of the object coordinate frame
    * @return    extension value
    */
-  double width();
-	
+  double width() const;
+
   /*!@brief get height of the pyramid, i.e. the distance from the base to the tip
    * @return    height value
    */
-  double height();
+  double height() const;
   
   //--------------------------------------------------------------------------------------------------------------------
   // members

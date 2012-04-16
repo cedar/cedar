@@ -34,32 +34,27 @@
 
 ======================================================================================================================*/
 
-
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/Robot.h"
 #include "cedar/devices/robot/ComponentNotAvailableException.h"
-
-// PROJECT INCLUDES
-#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
 
 // SYSTEM INCLUDES
 #include <map>
 #include <string>
 #include <set>
 
-using namespace cedar::dev::robot;
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 //! constructor
-Robot::Robot(void)
+cedar::dev::robot::Robot::Robot(void)
 {
 }
 
 //! destructor
-Robot::~Robot(void)
+cedar::dev::robot::Robot::~Robot(void)
 {
 }
 
@@ -70,13 +65,13 @@ Robot::~Robot(void)
 /*! If the component has not been initialized yet, it will be created using the abstract @em createComponent method.
  *  For that reason, the method is not const.
  */
-ComponentPtr& Robot::getComponent(const std::string& rComponentName)
+cedar::dev::robot::ComponentPtr cedar::dev::robot::Robot::getComponent(const std::string& rComponentName)
 {
   // if the requested component is not available ..
   if(!isComponentAvailable(rComponentName))
   {
     // .. throw an exception
-    CEDAR_THROW(cedar::aux::exc::ExceptionBase,
+    CEDAR_THROW(cedar::dev::robot::ComponentNotAvailableException,
       "Component with name \"" + rComponentName + "\" does not exist in the robot \"" + _mName + "\".\n");
   }
 
@@ -90,7 +85,7 @@ ComponentPtr& Robot::getComponent(const std::string& rComponentName)
   return mComponents[rComponentName];
 }
 
-bool Robot::isComponentAvailable(const std::string& rComponentName) const
+bool cedar::dev::robot::Robot::isComponentAvailable(const std::string& rComponentName) const
 {
   // search for the component name in the map
   std::map<std::string, std::set<std::string> >::const_iterator component_names_it
@@ -100,10 +95,11 @@ bool Robot::isComponentAvailable(const std::string& rComponentName) const
   return component_names_it != _mSubComponentNames.end();
 }
 
-bool Robot::isComponentAvailable(
-                                  const std::string& rComponentName,
-                                  const std::string& rParentComponentName
-                                ) const
+bool cedar::dev::robot::Robot::isComponentAvailable
+     (
+       const std::string& rComponentName,
+       const std::string& rParentComponentName
+     ) const
 {
   bool is_available = false;
 
@@ -115,7 +111,7 @@ bool Robot::isComponentAvailable(
   if (parent_component_it == _mSubComponentNames.end())
   {
     // .. throw an exception.
-    CEDAR_THROW(cedar::aux::exc::ExceptionBase,
+    CEDAR_THROW(cedar::dev::robot::ComponentNotAvailableException,
       "Parent component with name \"" + rParentComponentName + "\" does not exist in the robot.\n");
   }
 

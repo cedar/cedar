@@ -37,33 +37,27 @@
 #ifndef CEDAR_DEV_ROBOT_GL_CORA_ARM_H
 #define CEDAR_DEV_ROBOT_GL_CORA_ARM_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/gl/namespace.h"
 #include "cedar/devices/robot/gl/AmtecChain.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
 /*!@brief Visualization of the CoRA arm
  *
  * This class provides a simple OpenGL visualization of the CoRA arm. It has to be provided with a pointer to an
- * instance of KinematicChainModel of the CoRA arm, used to get the transformations to the joint coordinate frames.
+ * instance of KinematicChain of the CoRA arm, used to get the transformations to the joint coordinate frames.
  * To actually display the arm, add an instance of this class to a scene (cedar::aux::gl::Scene) and create a viewer
  * for that scene (cedar::aux::gl::Viewer).
  */
 class cedar::dev::robot::gl::CoraArm : public cedar::dev::robot::gl::AmtecChain
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
-  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  CoraArm(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel);
+  CoraArm(cedar::dev::robot::KinematicChainPtr pKinematicChain);
   //!@brief destructor
   ~CoraArm();
 
@@ -94,29 +88,13 @@ private:
 
   void drawTriangleLink(int link);
 
-
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::dev::robot::gl::CoraArm
-
 #endif // CEDAR_DEV_ROBOT_GL_CORA_ARM_H
 

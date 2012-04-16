@@ -34,14 +34,11 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_CONTROLTHREAD_H
-#define CEDAR_CONTROLTHREAD_H
+#ifndef CEDAR_CONTROL_THREAD_H
+#define CEDAR_CONTROL_THREAD_H
 
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
-
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/devices/robot/KinematicChain.h"
 
@@ -51,17 +48,11 @@
 const unsigned int JOINT = 4;
 const double TARGET = 1.5;
 
-
-/*!@brief Example of an thread controlling a joint by setting its velocity
+/*!@brief Example of a thread controlling a joint by setting its velocity
  */
 class ControlThread : public cedar::aux::LoopedThread
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
 public:
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -71,67 +62,33 @@ public:
    *@param kinematicChain pointer to the chain
    *@param configFileName path to a configuration file
    */
-  ControlThread(const cedar::dev::robot::KinematicChainPtr &kinematicChain, const std::string& configFileName);
-
-  //!@brief Destructor
-  //~ControlThread();
+  ControlThread(const cedar::dev::robot::KinematicChainPtr kinematicChain, const std::string& configFileName);
 
 //--------------------------------------------------------------------------------------------------------------------
 // public methods
 //--------------------------------------------------------------------------------------------------------------------
-
 public:
 
 //--------------------------------------------------------------------------------------------------------------------
 // protected methods
 //--------------------------------------------------------------------------------------------------------------------
-
 protected:
-
-  // none yet
 
 //--------------------------------------------------------------------------------------------------------------------
 // private methods
 //--------------------------------------------------------------------------------------------------------------------
-
 private:
-
-  void step(double stepSize);
+  void step(double);
 
 //--------------------------------------------------------------------------------------------------------------------
 // members
 //--------------------------------------------------------------------------------------------------------------------
-
-public:
-
-  // none yet (hopefully never!)
-
 protected:
-
   // none yet
 
 private:
-
   cedar::dev::robot::KinematicChainPtr mpKinematicChain;
 
+}; // class ControlThread
 
-//--------------------------------------------------------------------------------------------------------------------
-// parameters
-//--------------------------------------------------------------------------------------------------------------------
-
-public:
-
-  // none yet (hopefully never!)
-
-protected:
-
-  // none yet
-
-private:
-
-  // none yet
-
-}; // class ForwardInverseWidget
-
-
-#endif /* CEDAR_CONTROLTHREAD_H */
+#endif /* CEDAR_CONTROL_THREAD_H */

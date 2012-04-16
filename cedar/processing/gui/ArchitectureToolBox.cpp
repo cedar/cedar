@@ -38,13 +38,11 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/ArchitectureToolBox.h"
 #include "cedar/processing/gui/View.h"
-#include "cedar/processing/Manager.h"
+#include "cedar/processing/gui/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -55,32 +53,10 @@
 
 cedar::proc::gui::ArchitectureToolBox::ArchitectureToolBox(QWidget *pParent)
 :
-cedar::proc::gui::ToolBox(4, pParent),
+cedar::proc::gui::ToolBox(1, pParent),
 mpView(NULL)
 {
   this->addItem(":/modeicons/select.svg", "mode.Select", "selection mode");
-  this->addItem(":/modeicons/connect.svg", "mode.Connect", "connection mode");
-  this->addItem(":/modeicons/group.svg", "mode.Group", "grouping mode");
-  const cedar::proc::TriggerRegistry::Declarations& decls
-           = cedar::proc::Manager::getInstance().triggers().declarations();
-
-  for (cedar::proc::TriggerRegistry::Declarations::const_iterator iter = decls.begin();
-       iter != decls.end();
-       ++iter)
-  {
-    TriggerDeclarationPtr decl = iter->second;
-    std::string mode_str = "mode.CreateTrigger:" + decl->getClassId();
-    std::string tool_tip = "create trigger of type " + decl->getClassId();
-    if (decl->getIconPath().empty())
-    {
-      this->addStringItem("T", mode_str, tool_tip);
-    }
-    else
-    {
-      this->addItem(decl->getIconPath(), mode_str, tool_tip);
-    }
-  }
-
   QObject::connect(this, SIGNAL(selectionChanged(QString)), this, SLOT(selectionChanged(QString)));
 }
 
@@ -111,21 +87,17 @@ void cedar::proc::gui::ArchitectureToolBox::selectionChanged(QString data)
   CEDAR_DEBUG_ASSERT(this->mpView != NULL);
 
   cedar::proc::gui::Scene::MODE mode_val;
-  if (mode == "mode.CreateTrigger")
-  {
-    mode_val = cedar::proc::gui::Scene::MODE_CREATE_TRIGGER;
-  }
-  else if (mode == "mode.Select")
+  if (mode == "mode.Select")
   {
     mode_val = cedar::proc::gui::Scene::MODE_SELECT;
-  }
-  else if (mode == "mode.Group")
-  {
-    mode_val = cedar::proc::gui::Scene::MODE_GROUP;
   }
   else if (mode == "mode.Connect")
   {
     mode_val = cedar::proc::gui::Scene::MODE_CONNECT;
+  }
+  else
+  {
+    CEDAR_THROW(cedar::proc::gui::InvalidModeException, "This mode is not known.");
   }
 
   this->mpView->setMode(mode_val, param);

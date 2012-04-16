@@ -41,15 +41,9 @@
 #ifndef CEDAR_PROC_GUI_MAIN_WINDOW_H
 #define CEDAR_PROC_GUI_MAIN_WINDOW_H
 
-// LOCAL INCLUDES
-#ifdef DEBUG
-  #include "cedar/processing/debug/gui/ui_Ide.h"
-#else
-  #include "cedar/processing/gui/ui_Ide.h"
-#endif
+// CEDAR INCLUDES
+#include "cedar/processing/gui/ui_Ide.h"
 #include "cedar/processing/gui/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
@@ -57,9 +51,7 @@
 #include <map>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief This is the main window of the processingIde application.
  */
 class cedar::proc::gui::Ide : public QMainWindow, public Ui_Ide
 {
@@ -82,82 +74,162 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Handles key presses in the main window.
+   */
   void keyPressEvent(QKeyEvent* pEvent);
 
 public slots:
+  /*!@brief Slot that is called whenever a different item is selected in the cedar::proc::gui::Scene.
+   *
+   * @todo This probably belongs somewhere else.
+   */
   void sceneItemSelected();
 
+  /*!@brief Slot that displays exceptions.
+   */
   void exception(const QString& message);
+
+  /*!@brief Slot that displays notifications.
+   */
+  void notify(const QString& message);
+
+  /*!@brief Slot that displays errors.
+   */
   void error(const QString& message);
+
+  /*!@brief Slot that displays messages.
+   */
   void message(const QString& message);
 
+  /*!@brief Changes the mode back to select when an architecture tool is finished.
+   */
   void architectureToolFinished();
   
+  /*!@brief Starts all looped triggers (and other derivatives of looped thread).
+   */
   void startThreads();
+
+  /*!@brief Stops all looped triggers (and other derivatives of looped thread).
+   */
   void stopThreads();
 
+  /*!@brief Slot that is connected to the "new" item in the file menu.
+   */
   void newFile();
+
+  /*!@brief Slot that is connected to the "save" item in the file menu.
+   */
   void save();
+
+  /*!@brief Slot that is connected to the "save as" item in the file menu.
+   */
   void saveAs();
+
+  /*!@brief Slot that is connected to the "load" item in the file menu.
+   */
   void load();
 
+  /*!@brief Loads a network file specified by the path.
+   */
   void loadFile(QString path);
 
-  void resetTo(cedar::proc::gui::NetworkFilePtr network);
+  /*!@brief Resets the current scene and displays the new network.
+   */
+  void resetTo(cedar::proc::gui::NetworkPtr network);
 
+  /*!@brief Opens the load plugin dialog.
+   */
   void showLoadPluginDialog();
 
+  /*!@brief Opens the manage plugins dialog.
+   */
   void showManagePluginsDialog();
 
+  /*!@brief Toggles the snap to grid functionality.
+   */
   void toggleGrid(bool toggled);
 
+  /*!@brief Fills the recent files list.
+   */
   void fillRecentFilesList();
 
+  /*!@brief Slot that is connected to clicking the entries in the recent files list.
+   */
   void recentFileItemTriggered();
+
+  /*!@brief Reacts to changes in the zoom level.
+   */
+  void zoomLevelSet(double zoomLevel);
+
+  /*!@brief Resets the zoom level to 100%.
+   */
+  void resetZoomLevel();
+
+  /*!@brief Increases the zoom level.
+   */
+  void increaseZoomLevel();
+
+  /*!@brief Decreases the zoom level.
+   */
+  void decreaseZoomLevel();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  /*!@brief Deletes the list of gragics items.
+   *
+   * @todo This probably belongs somewhere else, e.g., cedar::proc::gui::Scene.
+   */
   void deleteElements(QList<QGraphicsItem*>& items);
+
+  /*!@brief Deletes the elements currently selected in the scene.
+   *
+   * @todo This probably belongs somewhere else, e.g., cedar::proc::gui::Scene.
+   */
   void deleteSelectedElements();
+
+  /*!@brief Reacts to closing the window.
+   */
   void closeEvent(QCloseEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /*!@brief Resets the list of elements.
+   */
   void resetStepList();
+
+  /*!@brief Loads the default plugins.
+   */
   void loadDefaultPlugins();
 
+  /*!@brief Stores the window state and other settings.
+   */
   void storeSettings();
+
+  /*!@brief Restores window state and other settings that were previously stored with
+   *        cedar::proc::gui::Ide::storeSettings.
+   */
   void restoreSettings();
 
+  /*!@brief Writes an error message into the log window.
+   */
+  void logError(const std::string& message);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  std::map<std::string, cedar::proc::gui::StepClassList*> mStepClassListWidgets;
+  //! Widgets for each list of element classes.
+  std::map<std::string, cedar::proc::gui::ElementClassList*> mElementClassListWidgets;
 
-  cedar::proc::gui::NetworkFilePtr mNetwork;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
+  //! The network currently displayed.
+  cedar::proc::gui::NetworkPtr mNetwork;
 
 }; // class cedar::MainWindow
 
 #endif // CEDAR_PROC_GUI_MAIN_WINDOW_H
-

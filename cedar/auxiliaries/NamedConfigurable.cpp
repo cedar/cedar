@@ -34,12 +34,12 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/NamedConfigurable.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/StringParameter.h"
 
 // SYSTEM INCLUDES
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

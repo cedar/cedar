@@ -37,25 +37,20 @@
 #ifndef CEDAR_AUX_DIRECTORY_PARAMETER_H
 #define CEDAR_AUX_DIRECTORY_PARAMETER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/namespace.h"
+#include "cedar/defines.h"
 
 // SYSTEM INCLUDES
 #include <QDir>
 #include <string>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief A parameter for directories on the file system.
  */
 class cedar::aux::DirectoryParameter : public cedar::aux::Parameter
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -67,10 +62,12 @@ public:
   {
   }
 
+  //!@brief A variant of the standard constructor, adding a default value
   DirectoryParameter(cedar::aux::Configurable *pOwner, const std::string& name, const std::string& defaultValue)
   :
   cedar::aux::Parameter(pOwner, name, true),
-  mDefault(defaultValue.c_str())
+  mValue(QString::fromStdString(defaultValue)),
+  mDefault(QString::fromStdString(defaultValue))
   {
   }
 
@@ -83,36 +80,57 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void setTo(const cedar::aux::ConfigurationNode& node)
+  //!@brief reads a directory from a configuration node
+  void readFromNode(const cedar::aux::ConfigurationNode& node)
   {
-    this->mValue.setPath(QString(node.get_value<std::string>().c_str()));
+    this->mValue.setPath(QString::fromStdString(node.get_value<std::string>()));
   }
 
-  void putTo(cedar::aux::ConfigurationNode& root)
+  //!@brief stores a directory as string in a configuration node
+  void writeToNode(cedar::aux::ConfigurationNode& root) const
   {
     root.put(this->getName(), this->mValue.absolutePath().toStdString());
   }
 
-  void set(const std::string& value)
+  //!@brief sets a new directory from string
+  void setValue(const std::string& value)
   {
-    this->mValue.setPath(QString(value.c_str()));
-    emit valueChanged();
+    this->mValue.setPath(QString::fromStdString(value));
+    this->emitChangedSignal();
   }
 
-  void set(const QDir& value)
+  //!@brief sets a new directory from QDir
+  void setValue(const QDir& value)
   {
     this->mValue = value;
-    emit valueChanged();
+    this->emitChangedSignal();
   }
 
+  //!@brief sets directory to default value
   void makeDefault()
   {
-    this->set(this->mDefault);
+    this->setValue(this->mDefault);
   }
 
-  const QDir& get() const
+  //!@brief get the directory
+  const QDir& getValue() const
   {
     return this->mValue;
+  }
+
+  CEDAR_DECLARE_DEPRECATED(void set(const std::string& value))
+  {
+    this->setValue(value);
+  }
+
+  CEDAR_DECLARE_DEPRECATED(void set(const QDir& value))
+  {
+    this->setValue(value);
+  }
+
+  CEDAR_DECLARE_DEPRECATED(const QDir& get())
+  {
+    return this->getValue();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -133,10 +151,10 @@ private:
 protected:
   // none yet
 private:
+  //!@brief a directory
   QDir mValue;
+  //!@brief a default directory
   QDir mDefault;
-
 }; // class cedar::aux::DirectoryParameter
 
 #endif // CEDAR_AUX_DIRECTORY_PARAMETER_H
-

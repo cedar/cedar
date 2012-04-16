@@ -41,17 +41,19 @@
 #ifndef CEDAR_PROC_DECLARATION_BASE_H
 #define CEDAR_PROC_DECLARATION_BASE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief A base class for declarations of types that can be allocated dynamically.
  *
- * More detailed description of the class.
+ *        This class can be used for dynamic allocation of objects of a certain type based on a string identifying the
+ *        type.
+ *
+ * @todo Can this class be merged with ElementDeclaration?
+ * @todo Should this be named cedar::proc::Declaration?
  */
 template <class BaseClass, class FactoryType>
 class cedar::proc::DeclarationBase
@@ -60,14 +62,22 @@ class cedar::proc::DeclarationBase
   // types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Pointer type for the factory of BaseClass.
   typedef boost::shared_ptr<FactoryType> BaseFactoryPtr;
+
+  //!@brief Pointer type for the BaseClass.
   typedef boost::shared_ptr<BaseClass> BasePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
+  /*!@brief The constructor.
+   *
+   * @param classFactory  Pointer to the factory that creates objects declared in this definition.
+   * @param classId       Unique name identifying the declared type.
+   * @param category      Category of the type.
+   */
   DeclarationBase
   (
     BaseFactoryPtr classFactory,
@@ -81,7 +91,7 @@ public:
   {
   }
 
-  //!@brief Destructor
+  //!@brief The destructor.
   virtual ~DeclarationBase()
   {
   }
@@ -90,16 +100,22 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Returns the object factory for this declaration.
+   */
   BaseFactoryPtr getObjectFactory()
   {
     return this->mpClassFactory;
   }
 
+  /*!@brief Returns the class id of the declaration.
+   */
   const std::string& getClassId() const
   {
     return this->mClassId;
   }
 
+  /*!@brief Returns the category of the declaration.
+   */
   const std::string& getCategory() const
   {
     return this->mCategory;
@@ -147,7 +163,12 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  /*!@brief Sets the class id of the declaration.
+   */
+  void setClassId(const std::string& classId)
+  {
+    this->mClassId = classId;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -158,23 +179,15 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
+  //! The class factory pointer.
   BaseFactoryPtr mpClassFactory;
+
+  //! The class id.
   std::string mClassId;
+
+  //! The category.
   std::string mCategory;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
 
 }; // class cedar::proc::DeclarationBase
 

@@ -38,27 +38,29 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
-#include "cedar/processing/gui/StepClassList.h"
-#include "cedar/processing/gui/NetworkFile.h"
+#include "cedar/processing/gui/ElementClassList.h"
+#include "cedar/processing/gui/Network.h"
 #include "cedar/processing/gui/PluginLoadDialog.h"
 #include "cedar/processing/gui/PluginManagerDialog.h"
+#include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/LoopedTrigger.h"
-#include "cedar/auxiliaries/VectorParameter.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/StringVectorParameter.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <boost/property_tree/detail/json_parser_error.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -66,6 +68,10 @@
 cedar::proc::gui::Ide::Ide()
 {
   this->setupUi(this);
+
+  // first, setup the log to receive messages
+  this->mpLog->installHandlers(true);
+
   this->loadDefaultPlugins();
   this->resetStepList();
 
@@ -92,6 +98,45 @@ cedar::proc::gui::Ide::Ide()
   QObject::connect(this->mpActionManagePlugins, SIGNAL(triggered()), this, SLOT(showManagePluginsDialog()));
   QObject::connect(this->mpActionShowHideGrid, SIGNAL(toggled(bool)), this, SLOT(toggleGrid(bool)));
 
+  QObject::connect
+  (
+    this->mpZoomSlider,
+    SIGNAL(valueChanged(int)),
+    this->mpProcessingDrawer,
+    SLOT(setZoomLevel(int))
+  );
+
+  QObject::connect
+  (
+    this->mpProcessingDrawer,
+    SIGNAL(zoomLevelChanged(double)),
+    this,
+    SLOT(zoomLevelSet(double))
+  );
+
+  QObject::connect
+  (
+    this->mpResetZoom,
+    SIGNAL(clicked()),
+    this,
+    SLOT(resetZoomLevel())
+  );
+
+  QObject::connect
+  (
+    this->mpZoomPlus,
+    SIGNAL(clicked()),
+    this,
+    SLOT(increaseZoomLevel())
+  );
+
+  QObject::connect
+  (
+    this->mpZoomMinus,
+    SIGNAL(clicked()),
+    this,
+    SLOT(decreaseZoomLevel())
+  );
 
   this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
@@ -105,6 +150,8 @@ cedar::proc::gui::Ide::Ide()
                    this,
                    SLOT(fillRecentFilesList()));
   fillRecentFilesList();
+
+  this->zoomLevelSet(this->mpProcessingDrawer->getZoomLevel());
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -114,6 +161,40 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::increaseZoomLevel()
+{
+  int delta = this->mpZoomSlider->pageStep();
+  this->mpZoomSlider->setValue(this->mpZoomSlider->value() + delta);
+}
+
+void cedar::proc::gui::Ide::decreaseZoomLevel()
+{
+  int delta = this->mpZoomSlider->pageStep();
+  this->mpZoomSlider->setValue(this->mpZoomSlider->value() - delta);
+}
+
+void cedar::proc::gui::Ide::resetZoomLevel()
+{
+  this->mpZoomSlider->setValue(100);
+}
+
+void cedar::proc::gui::Ide::zoomLevelSet(double zoomLevel)
+{
+  int zoom_level = static_cast<int>(zoomLevel * 100.0);
+  this->mpZoomDisplay->setText(QString("%1%").arg(zoom_level));
+
+  if (this->mpZoomSlider->value() != zoom_level)
+  {
+    this->mpZoomSlider->setValue(zoom_level);
+
+    // if the slider's value wasn't changed, apply the slider's value (this happens when the new value is out of range)
+    if (this->mpZoomSlider->value() != zoom_level)
+    {
+      this->mpProcessingDrawer->setZoomLevel(this->mpZoomSlider->value());
+    }
+  }
+}
 
 void cedar::proc::gui::Ide::toggleGrid(bool triggered)
 {
@@ -145,6 +226,8 @@ void cedar::proc::gui::Ide::storeSettings()
   cedar::proc::gui::Settings::instance().stepsSettings()->getFrom(this->mpItemsWidget);
 
   cedar::proc::gui::Settings::instance().storeMainWindow(this);
+
+  cedar::proc::gui::Settings::instance().snapToGrid(this->mpProcessingDrawer->getScene()->getSnapToGrid());
 }
 
 void cedar::proc::gui::Ide::restoreSettings()
@@ -155,12 +238,14 @@ void cedar::proc::gui::Ide::restoreSettings()
   cedar::proc::gui::Settings::instance().stepsSettings()->setTo(this->mpItemsWidget);
 
   cedar::proc::gui::Settings::instance().restoreMainWindow(this);
+
+  mpActionShowHideGrid->setChecked(cedar::proc::gui::Settings::instance().snapToGrid());
 }
 
 void cedar::proc::gui::Ide::loadDefaultPlugins()
 {
   const std::set<std::string>& plugins = cedar::proc::gui::Settings::instance().pluginsToLoad();
-  for (std::set<std::string>::iterator iter = plugins.begin(); iter != plugins.end(); ++ iter)
+  for (std::set<std::string>::const_iterator iter = plugins.begin(); iter != plugins.end(); ++ iter)
   {
     try
     {
@@ -171,7 +256,7 @@ void cedar::proc::gui::Ide::loadDefaultPlugins()
       message += ".";
       this->message(message);
     }
-    catch (const cedar::aux::exc::ExceptionBase& e)
+    catch (const cedar::aux::ExceptionBase& e)
     {
       QString message = "Error loading default plugin ";
       message += iter->c_str();
@@ -204,7 +289,7 @@ void cedar::proc::gui::Ide::showManagePluginsDialog()
   delete p_dialog;
 }
 
-void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkFilePtr network)
+void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
 {
   this->mpProcessingDrawer->getScene()->reset();
   this->mNetwork = network;
@@ -221,23 +306,26 @@ void cedar::proc::gui::Ide::resetStepList()
 {
   using cedar::proc::Manager;
 
-  for (cedar::proc::StepRegistry::CategoryList::const_iterator iter = Manager::getInstance().steps().getCategories().begin();
-       iter != Manager::getInstance().steps().getCategories().end();
+  for (cedar::proc::DeclarationRegistry::CategoryList::const_iterator iter
+         = DeclarationRegistrySingleton::getInstance()->getCategories().begin();
+       iter != DeclarationRegistrySingleton::getInstance()->getCategories().end();
        ++iter)
   {
     const std::string& category_name = *iter;
-    cedar::proc::gui::StepClassList *p_tab;
-    if (mStepClassListWidgets.find(category_name) == mStepClassListWidgets.end())
+    cedar::proc::gui::ElementClassList *p_tab;
+    if (mElementClassListWidgets.find(category_name) == mElementClassListWidgets.end())
     {
-      p_tab = new cedar::proc::gui::StepClassList();
+      p_tab = new cedar::proc::gui::ElementClassList();
       this->mpCategoryList->addTab(p_tab, QString(category_name.c_str()));
-      mStepClassListWidgets[category_name] = p_tab;
+      mElementClassListWidgets[category_name] = p_tab;
     }
     else
     {
-      p_tab = mStepClassListWidgets[category_name];
+      p_tab = mElementClassListWidgets[category_name];
     }
-    p_tab->showList(Manager::getInstance().steps().getCategoryEntries(category_name));
+    p_tab->showList(
+                     DeclarationRegistrySingleton::getInstance()->getCategoryEntries(category_name)
+                   );
   }
 }
 
@@ -278,12 +366,41 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
   for (int i = 0; i < items.size(); ++i)
   {
     // delete connections
+    //!@todo maybe create gui::TriggerConnection and gui::DataConnection
+    //!@todo maybe wrap this in connection
     if (cedar::proc::gui::Connection *p_connection = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
     {
-      //!@todo: The disconnect call should be in the Connection destructor and deleting the connection should suffice
+      if (cedar::proc::gui::DataSlotItem* source = dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_connection->getSource()))
+      {
+        if (cedar::proc::gui::DataSlotItem* target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_connection->getTarget()))
+        {
+          std::string source_slot = source->getSlot()->getParent() + std::string(".") + source->getName();
+          std::string target_slot = target->getSlot()->getParent() + std::string(".") + target->getName();
+          this->mNetwork->network()->disconnectSlots(source_slot, target_slot);
+        }
+      }
+      else if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getSource()))
+      {
+        if (cedar::proc::gui::StepItem* target = dynamic_cast<cedar::proc::gui::StepItem*>(p_connection->getTarget()))
+        {
+          this->mNetwork->network()->disconnectTrigger(source->getTrigger(), target->getStep());
+        }
+      }
+      else if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getSource()))
+      {
+        if (cedar::proc::gui::TriggerItem* target = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getTarget()))
+        {
+          this->mNetwork->network()->disconnectTrigger(source->getTrigger(), target->getTrigger());
+        }
+      }
+      else
+      {
+        CEDAR_THROW(cedar::proc::InvalidObjectException, "The source or target of a connection is not valid.");
+      }
       p_connection->disconnect();
       delete p_connection;
       items[i] = NULL;
+
     }
   }
   for (int i = 0; i < items.size(); ++i)
@@ -300,7 +417,6 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
       p_drawer->hide();
       p_drawer->removeAllConnections();
       this->mNetwork->network()->remove(p_drawer->getStep());
-      Manager::getInstance().removeStep(p_drawer->getStep());
       this->mpPropertyTable->resetPointer();
       this->mpProcessingDrawer->getScene()->removeStepItem(p_drawer);
     }
@@ -311,7 +427,6 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
       p_trigger_drawer->hide();
       p_trigger_drawer->removeAllConnections();
       this->mNetwork->network()->remove(p_trigger_drawer->getTrigger());
-      Manager::getInstance().removeTrigger(p_trigger_drawer->getTrigger());
       this->mpProcessingDrawer->getScene()->removeTriggerItem(p_trigger_drawer);
     }
   }
@@ -319,21 +434,32 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
 
 void cedar::proc::gui::Ide::exception(const QString& message)
 {
+  this->logError("Exception: " + message.toStdString());
   QMessageBox::critical(this,
                         "An exception has occurred.",
                         message);
 }
 
+void cedar::proc::gui::Ide::notify(const QString& message)
+{
+  QMessageBox::critical(this,"Notification", message);
+}
+
 void cedar::proc::gui::Ide::error(const QString& message)
 {
-  //!@todo Colors!
-  this->mpLog->append("Error: " + message + "\n");
+  this->logError("Error: " + message.toStdString());
 }
 
 void cedar::proc::gui::Ide::message(const QString& message)
 {
-  this->mpLog->append(message + "\n");
+  cedar::aux::LogSingleton::getInstance()->message(message.toStdString(), "cedar::proc::gui::Ide::message");
 }
+
+void cedar::proc::gui::Ide::logError(const std::string& message)
+{
+  cedar::aux::LogSingleton::getInstance()->error(message, "cedar::proc::gui::Ide::logError");
+}
+
 
 
 void cedar::proc::gui::Ide::startThreads()
@@ -352,7 +478,7 @@ void cedar::proc::gui::Ide::stopThreads()
 
 void cedar::proc::gui::Ide::newFile()
 {
-  this->resetTo(cedar::proc::gui::NetworkFilePtr(new cedar::proc::gui::NetworkFile(this, this->mpProcessingDrawer->getScene())));
+  this->resetTo(cedar::proc::gui::NetworkPtr(new cedar::proc::gui::Network(this, this->mpProcessingDrawer->getScene())));
 }
 
 void cedar::proc::gui::Ide::save()
@@ -363,9 +489,11 @@ void cedar::proc::gui::Ide::save()
 
 void cedar::proc::gui::Ide::saveAs()
 {
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureLoadDialogDirectory();
+
   QString file = QFileDialog::getSaveFileName(this, // parent
                                               "Select where to save", // caption
-                                              "", // initial directory; //!@todo save/restore with window settings
+                                              last_dir->getValue().absolutePath(), // initial directory;
                                               "json (*.json)" // filter(s), separated by ';;'
                                               );
 
@@ -381,6 +509,11 @@ void cedar::proc::gui::Ide::saveAs()
     cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(file.toStdString());
 
     this->mpActionSave->setEnabled(true);
+
+    cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(file.toStdString());
+    QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
+    cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureLoadDialogDirectory();
+    last_dir->setValue(path);
   }
 }
 
@@ -390,7 +523,7 @@ void cedar::proc::gui::Ide::load()
 
   QString file = QFileDialog::getOpenFileName(this, // parent
                                               "Select which file to load", // caption
-                                              last_dir->get().absolutePath(), // initial directory
+                                              last_dir->getValue().absolutePath(), // initial directory
                                               "json (*.json)" // filter(s), separated by ';;'
                                               );
 
@@ -402,20 +535,32 @@ void cedar::proc::gui::Ide::load()
 
 void cedar::proc::gui::Ide::loadFile(QString file)
 {
-  this->newFile();
-  cedar::proc::gui::NetworkFilePtr network(new cedar::proc::gui::NetworkFile(this, this->mpProcessingDrawer->getScene()));
-  network->read(file.toStdString());
+  cedar::proc::gui::NetworkPtr network(new cedar::proc::gui::Network(this, this->mpProcessingDrawer->getScene()));
+
+  try
+  {
+    network->read(file.toStdString());
+  }
+  catch(const cedar::aux::ExceptionBase& e)
+  {
+    QString message = "An exception occurred during loading of the architecture."
+                      " Your architecture has probably not been loaded correctly!"
+                      " The exception is:\n";
+    message += QString::fromStdString(e.exceptionInfo());
+    this->exception(message);
+  }
   this->mpActionSave->setEnabled(true);
   this->resetTo(network);
 
   cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(file.toStdString());
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
   cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureLoadDialogDirectory();
-  last_dir->set(path);
+  last_dir->setValue(path);
 }
 
 void cedar::proc::gui::Ide::keyPressEvent(QKeyEvent* pEvent)
 {
+  //!@todo Move this to the graphics scene (or another more appropriate place)
   switch (pEvent->key())
   {
     case Qt::Key_Delete:
@@ -441,7 +586,20 @@ void cedar::proc::gui::Ide::recentFileItemTriggered()
   CEDAR_DEBUG_ASSERT(p_sender != NULL);
 
   const QString& file = p_sender->text();
-  this->loadFile(file);
+  try
+  {
+    this->loadFile(file);
+  }
+  catch(boost::property_tree::json_parser::json_parser_error& exc)
+  {
+    // remove this file from list of recent architectures
+    cedar::aux::StringVectorParameterPtr entries = cedar::proc::gui::Settings::instance().getArchitectureFileHistory();
+    entries->eraseAll(file.toStdString());
+    std::string message = "File "
+                          + file.toStdString()
+                          + " does not seem to exist. It was therefore removed from the list of recent architectures.";
+    this->notify(QString::fromStdString(message));
+  }
 }
 
 void cedar::proc::gui::Ide::fillRecentFilesList()

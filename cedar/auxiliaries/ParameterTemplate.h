@@ -41,18 +41,17 @@
 #ifndef CEDAR_PROC_PARAMETER_TEMPLATE_H
 #define CEDAR_PROC_PARAMETER_TEMPLATE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <iostream>
 
-/*!@brief Abstract description of the class.
+/*!@brief A generic template for parameters stored in a cedar::aux::Configurable.
  *
- * More detailed description of the class.
+ *        This class stores the value of a parameter and offers access to the value via standard functions. All
+ *        parameter implementations should inherit this as a base class.
  */
 template <typename T>
 class cedar::aux::ParameterTemplate : public cedar::aux::Parameter
@@ -65,7 +64,7 @@ class cedar::aux::ParameterTemplate : public cedar::aux::Parameter
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The constructor.
+  //!@brief The constructor with default value.
   ParameterTemplate(cedar::aux::Configurable *pOwner, const std::string& name, const T& defaultValue)
   :
   cedar::aux::Parameter(pOwner, name, true),
@@ -74,6 +73,7 @@ public:
   {
   }
 
+  //!@brief The constructor.
   ParameterTemplate(cedar::aux::Configurable *pOwner, const std::string& name)
   :
   cedar::aux::Parameter(pOwner, name, false)
@@ -89,23 +89,27 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief get the current value of type T of this parameter
   const T& getValue() const
   {
     return this->mValue;
   }
 
+  //!@brief set the value of type T of this parameter
   void setValue(const T& value)
   {
     this->mValue = value;
-    emit valueChanged();
+    this->emitChangedSignal();
   }
 
-  void putTo(cedar::aux::ConfigurationNode& root)
+  //!@brief store the current value of type T in a configuration tree
+  void writeToNode(cedar::aux::ConfigurationNode& root) const
   {
     root.put(this->getName(), this->mValue);
   }
 
-  void setTo(const cedar::aux::ConfigurationNode& node)
+  //!@brief load a value of type T from a configuration tree
+  void readFromNode(const cedar::aux::ConfigurationNode& node)
   {
 #ifdef DEBUG
     try
@@ -121,6 +125,7 @@ public:
 #endif
   }
 
+  //!@brief set value to default
   void makeDefault()
   {
     this->setValue(mDefault);
@@ -141,8 +146,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -151,17 +154,6 @@ private:
 
   //! The default value of the parameter. Ignored if mHasDefault is false.
   T mDefault;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::ParameterTemplate
 
 #endif // CEDAR_PROC_PARAMETER_TEMPLATE_H
-

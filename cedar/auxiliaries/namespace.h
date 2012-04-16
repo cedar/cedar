@@ -37,14 +37,11 @@
 #ifndef CEDAR_AUX_NAMESPACE_H
 #define CEDAR_AUX_NAMESPACE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
-
-// PROJECT INCLUDES
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
-#include <sstream>
 #include <boost/smart_ptr.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <opencv2/opencv.hpp>
@@ -56,7 +53,6 @@ namespace cedar
   namespace aux
   {
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS(Base);
     CEDAR_DECLARE_AUX_CLASS(Configurable);
     CEDAR_DECLARE_AUX_CLASS(NamedConfigurable);
     CEDAR_DECLARE_AUX_CLASS(LoopedThread);
@@ -64,127 +60,190 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(UserData);
     //!@endcond
 
+    template<class T> class Singleton;
+
+    //!@todo This class may be obsolete once the ConfigurationInterface is removed.
     template <typename T> class IntervalData;
     //!@brief smart pointer for IntervalData<double>
     typedef boost::shared_ptr<IntervalData<double> > DoubleIntervalPtr;
     //!@brief smart pointer for IntervalData<int>
     typedef boost::shared_ptr<IntervalData<int> > IntIntervalPtr;
 
+    //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(LogFile);
     CEDAR_DECLARE_AUX_CLASS(MatrixIterator);
-    CEDAR_DECLARE_AUX_CLASS(Object);
+    CEDAR_DECLARE_AUX_CLASS(LocalCoordinateFrame);
+    CEDAR_DECLARE_DEPRECATED(typedef LocalCoordinateFrame Object);
+    CEDAR_DECLARE_DEPRECATED(typedef LocalCoordinateFrame RigidBody);
     CEDAR_DECLARE_AUX_CLASS(System);
+    //!@endcond
 
     //!@brief A type for identifying enum entries. Corresponds to the C++ enum int values for each enum entry.
     typedef unsigned int EnumId;
+    //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Enum);
     CEDAR_DECLARE_AUX_CLASS(EnumBase);
+    //!@endcond
     template <class T> class EnumType;
 
+    //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Arguments);
+    //!@endcond
 
-    template <class T, typename SmartPointerType> class Factory;
-    template <class T, class T2, typename SmartPointerType> class FactoryDerived;
+    template <class BaseTypePtr> class Factory;
+    template <class BaseTypePtr, class DerivedTypePtr> class FactoryDerived;
+    template <class BaseTypePtr> class FactoryManager;
 
-    template <class T> class AbstractFactory;
-    template <class T, class T2> class AbstractFactoryDerived;
-
-    template
-    <
-      class KeyBaseType,
-      class ValueBaseType,
-      typename KeySmartPointerType = boost::shared_ptr<KeyBaseType>,
-      typename ValueSmartPointerType = boost::shared_ptr<ValueBaseType>
-    >
-    class TypeBasedFactory;
-
-    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(Parameter);
-
-    template <typename T> class ParameterTemplate;
-    template <typename T> class NumericParameter;
-    template <typename T> class VectorParameter;
-    template <typename T> class NumericVectorParameter;
-    //!@ A concretization of NumericParameter for double values.
-    typedef NumericParameter<double> DoubleParameter;
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleParameter);
-    //!@ A concretization of NumericParameter for unsigned int values.
-    typedef NumericParameter<unsigned int> UIntParameter;
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntParameter);
-    //!@ A concretization of ParameterTemplate for strings.
-    typedef ParameterTemplate<std::string> StringParameter;
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringParameter);
-    //!@ A concretization of ParameterTemplate for booleans.
-    typedef ParameterTemplate<bool> BoolParameter;
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolParameter);
-    //!@ A concretization of VectorParameter for booleans.
-    typedef VectorParameter<bool> BoolVectorParameter;
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolVectorParameter);
-    //!@ A concretization of VectorParameter for strings.
-    typedef VectorParameter<std::string> StringVectorParameter;
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringVectorParameter);
-    //!@ A concretization of NumericVectorParameter for double values.
-    typedef NumericVectorParameter<double> DoubleVectorParameter;
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleVectorParameter);
-    //!@ A concretization of NumericVectorParameter for unsigned int values.
-    typedef NumericVectorParameter<unsigned int> UIntVectorParameter;
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntVectorParameter);
-    class DirectoryParameter;
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DirectoryParameter);
-    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(EnumParameter);
-
-    template <typename T> class SetParameter;
-    typedef SetParameter<std::string> StringSetParameter;
-    typedef boost::intrusive_ptr<StringSetParameter> StringSetParameterPtr;
-
-    typedef boost::property_tree::ptree ConfigurationNode;
-
-
-    /*!@brief Template method that converts simple data types to a string.
-     *
-     * @param[in] value The data value that will be converted to a string.
-     */
-    template<typename T>
-    std::string toString(const T &value)
-    {
-      std::ostringstream streamOut;
-      streamOut << value;
-      return streamOut.str();
-    }
-    //!@brief class declaration of Data
-    CEDAR_DECLARE_AUX_CLASS(Data);
-
-    template <typename T> class DataTemplate;
-
-    //!@ A concretization of DataTemplate for simple matrices (cv::Mat).
-    typedef DataTemplate<cv::Mat> MatData;
-    CEDAR_GENERATE_POINTER_TYPES(MatData);
-
-    //!@ A concretization of DataTemplate for simple points (cv::Point).
-    typedef DataTemplate<cv::Point> CvPointData;
-    CEDAR_GENERATE_POINTER_TYPES(CvPointData);
-
-    //!@ A concretization of DataTemplate for double values.
-    typedef DataTemplate<double> DoubleData;
-    CEDAR_GENERATE_POINTER_TYPES(DoubleData);
+    template <typename KeyBasePtr, typename ValueBasePtr> class TypeBasedFactory;
 
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS(ImageData);
+    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(Parameter);
+    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(ObjectParameter);
+    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(ObjectListParameter);
+    //!@endcond
 
+    //!@brief a template class for parameters
+    template <typename T> class ParameterTemplate;
+    //!@brief a template class for numeric parameters, having a minimum and maximum value
+    template <typename T> class NumericParameter;
+    //!@brief a template class for vector parameters (of same type)
+    template <typename T> class VectorParameter;
+    //!@brief a template class for vector parameters (of numeric type)
+    template <typename T> class NumericVectorParameter;
+    //!@brief a template class for storing objects that are allocated dynamically.
+    template <typename T> class ObjectParameterTemplate;
+    //!@brief a template class for lists of objects of arbitrary type
+    template <typename T> class ObjectListParameterTemplate;
+    //!@brief a template class for maps of objects of arbitrary type
+    template <typename T> class ObjectMapParameterTemplate;
+    //!@brief A concretization of NumericParameter for double values.
+    typedef NumericParameter<double> DoubleParameter;
+    //!@brief A concretization of NumericParameter for unsigned int values.
+    typedef NumericParameter<unsigned int> UIntParameter;
+    //!@brief A concretization of NumericParameter for int values.
+    typedef NumericParameter<int> IntParameter;
+    //!@brief A concretization of ParameterTemplate for strings.
+    typedef ParameterTemplate<std::string> StringParameter;
+    //!@brief A concretization of ParameterTemplate for booleans.
+    typedef ParameterTemplate<bool> BoolParameter;
+    //!@brief A concretization of VectorParameter for booleans.
+    typedef VectorParameter<bool> BoolVectorParameter;
+    //!@brief A concretization of VectorParameter for strings.
+    typedef VectorParameter<std::string> StringVectorParameter;
+    //!@brief A concretization of NumericVectorParameter for double values.
+    typedef NumericVectorParameter<double> DoubleVectorParameter;
+    //!@brief A concretization of NumericVectorParameter for unsigned int values.
+    typedef NumericVectorParameter<unsigned int> UIntVectorParameter;
+
+    //!@brief A class for associating data with types and mapping the type hierarchy as well.
+    template <typename DataType, typename RootType> class TypeHierarchyMap;
+
+    // all intrusive smart pointers
+    //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolVectorParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleVectorParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringVectorParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntVectorParameter);
+    //!@endcond
+
+    //!@brief a parameter storing a valid directory
+    class DirectoryParameter;
+    //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DirectoryParameter);
+    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(FileParameter);
+    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(EnumParameter);
+    //!@endcond
+
+    //!@brief a parameter containing a set of type T
+    template <typename T> class SetParameter;
+    //!@brief a parameter containing a set of type string
+    typedef SetParameter<std::string> StringSetParameter;
+    //!@brief an intrusive pointer to a parameter containing a set of type string
+    typedef boost::intrusive_ptr<StringSetParameter> StringSetParameterPtr;
+
+    //!@brief a better name for boost's property tree
+    typedef boost::property_tree::ptree ConfigurationNode;
+
+    //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_DECLARE_AUX_CLASS(Data);
+    //!@endcond
+
+    //!@brief a templated version of cedar::aux::Data
+    template <typename T> class DataTemplate;
+
+    //!@brief A concretization of DataTemplate for simple points (cv::Point).
+    typedef DataTemplate<cv::Point> CvPointData;
+
+    //!@brief A concretization of DataTemplate for double values.
+    typedef DataTemplate<double> DoubleData;
+
+    //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_DECLARE_AUX_CLASS(MatData);
+    CEDAR_GENERATE_POINTER_TYPES(CvPointData);
+    CEDAR_GENERATE_POINTER_TYPES(DoubleData);
+    CEDAR_DECLARE_AUX_CLASS(ImageData);
     /* exceptions */
+    CEDAR_DECLARE_AUX_CLASS(ConversionFailedException);
+    CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
+    CEDAR_DECLARE_AUX_CLASS(FileNotFoundException);
+    CEDAR_DECLARE_AUX_CLASS(BadConnectionException);
+    CEDAR_DECLARE_AUX_CLASS(DeadReferenceException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateIdException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateNameException);
+    CEDAR_DECLARE_AUX_CLASS(FailedAssertionException);
+    CEDAR_DECLARE_AUX_CLASS(IndexOutOfRangeException);
+    CEDAR_DECLARE_AUX_CLASS(InitializationException);
     CEDAR_DECLARE_AUX_CLASS(InvalidNameException);
-    CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
+    CEDAR_DECLARE_AUX_CLASS(MatrixMismatchException);
+    CEDAR_DECLARE_AUX_CLASS(NoDefaultException);
+    CEDAR_DECLARE_AUX_CLASS(NullPointerException);
+    CEDAR_DECLARE_AUX_CLASS(ParameterNotFoundException);
+    CEDAR_DECLARE_AUX_CLASS(RangeException);
+    CEDAR_DECLARE_AUX_CLASS(ResourceNotFoundException);
+    CEDAR_DECLARE_AUX_CLASS(TypeMismatchException);
     CEDAR_DECLARE_AUX_CLASS(UnhandledTypeException);
     CEDAR_DECLARE_AUX_CLASS(UnhandledValueException);
-    CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
-    CEDAR_DECLARE_AUX_CLASS(ParameterNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(UnknownNameException);
-    CEDAR_DECLARE_AUX_CLASS(RangeException);
-    CEDAR_DECLARE_AUX_CLASS(NoDefaultException);
-    CEDAR_DECLARE_AUX_CLASS(TypeMismatchException);
+    CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
+    CEDAR_DECLARE_AUX_CLASS(UnmanglingFailedException);
     //!@endcond
+    
+    // Log related classes --------------------------------------------------------------------------------------------
+    CEDAR_DECLARE_AUX_CLASS(Log);
+    
+    //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_DECLARE_AUX_CLASS(LogInterface);
+    CEDAR_DECLARE_AUX_CLASS(LogFilter);
+    CEDAR_DECLARE_AUX_CLASS(ConsoleLog);
+    CEDAR_DECLARE_AUX_CLASS(NullLogger);
+    //!@endcond
+    
+    //!@brief Enumeration that defines different log levels.
+    enum LOG_LEVEL
+    {
+      //! System information. For example, this could be to inform the user of automatically determined constants/values.
+      LOG_LEVEL_SYSTEM_INFO,
+      //! A normal message.
+      LOG_LEVEL_MESSAGE,
+      //! A warning.
+      LOG_LEVEL_WARNING,
+      //! An error.
+      LOG_LEVEL_ERROR,
+      //! A debug message. Will only be sent in debug builds!
+      LOG_LEVEL_DEBUG,
+      //! A debug message concerned with memory allocation. Will only be sent in debug builds!
+      LOG_LEVEL_MEM_DEBUG
+    };
   }
 }
+
+// Functions for boost intrusive pointer.
+extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_add_ref(cedar::aux::Parameter *pObject);
+extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_release(cedar::aux::Parameter *pObject);
 
 #endif // CEDAR_AUX_NAMESPACE_H

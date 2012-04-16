@@ -41,22 +41,26 @@
 #ifndef CEDAR_DYN_NEURAL_FIELD_H
 #define CEDAR_DYN_NEURAL_FIELD_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/dynamics/namespace.h"
 #include "cedar/dynamics/Dynamics.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/math/Sigmoid.h"
 #include "cedar/auxiliaries/kernel/namespace.h"
-#include "cedar/auxiliaries/NumericParameter.h"
-#include "cedar/auxiliaries/NumericVectorParameter.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/kernel/Kernel.h"
+#include "cedar/auxiliaries/ObjectParameterTemplate.h"
+#include "cedar/auxiliaries/ObjectListParameterTemplate.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief An implementation of Neural Fields for the processing framework.
  *
- * More detailed description of the class.
+ * @todo Put a detailed description here, including the equation of the field dynamics and references to the relevant paper(s)
  */
 class cedar::dyn::NeuralField : public cedar::dyn::Dynamics
 {
@@ -64,6 +68,17 @@ class cedar::dyn::NeuralField : public cedar::dyn::Dynamics
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel> KernelListParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(KernelListParameter);
+
+  typedef cedar::aux::ObjectParameterTemplate<cedar::aux::math::Sigmoid> SigmoidParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(SigmoidParameter);
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -71,22 +86,37 @@ public:
   //!@brief The standard constructor.
   NeuralField();
 
-  //!@brief Destructor
-
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief determine if a given Data is a valid input to the field
   cedar::proc::DataSlot::VALIDITY determineInputValidity(cedar::proc::ConstDataSlotPtr, cedar::aux::DataPtr) const;
+  void onStart();
+  void onStop();
+
+  inline cedar::dyn::ConstSpaceCodePtr getFieldOutput() const
+  {
+    return this->mSigmoidalActivation;
+  }
+
+  inline cedar::dyn::ConstSpaceCodePtr getFieldActivation() const
+  {
+    return this->mActivation;
+  }
+
+  /*!@brief   Overrides the default configuration reading.
+   *
+   * @remarks This method provides downwards-compatibility for reading fields that were written with a previous version.
+   *          Currently, it takes care of reading the kernels and the sigmoid properly.
+   */
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
 public slots:
   //!@brief handle a change in dimensionality, which leads to creating new matrices
   void dimensionalityChanged();
   //!@brief handle a change in size along dimensions, which leads to creating new matrices
   void dimensionSizeChanged();
-  //!@brief handle a change in number of lateral interaction kernels
-  void numberOfKernelsChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -110,6 +140,18 @@ private:
   //!@brief check if input fits to field in dimension and size
   bool isMatrixCompatibleInput(const cv::Mat& matrix) const;
 
+  //!@brief Resets the field.
+  void reset();
+
+  //!@brief Sets the dimensionality of the kernel.
+  void slotKernelAdded(size_t index);
+
+  //!@brief Returns the dimensionality of the field.
+  inline unsigned int getDimensionality() const
+  {
+    return this->_mDimensionality->getValue();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -120,24 +162,18 @@ protected:
   cedar::dyn::SpaceCodePtr mSigmoidalActivation;
   //!@brief this SpaceCode matrix contains the current lateral interactions of the NeuralField, i.e. convolution result
   cedar::dyn::SpaceCodePtr mLateralInteraction;
+  //!@brief this MatData contains the input noise
+  cedar::aux::MatDataPtr mInputNoise;
+  //!@brief this MatData contains the neural noise
+  cedar::aux::MatDataPtr mNeuralNoise;
   //!@brief the resting level of a field
   cedar::aux::DoubleParameterPtr mRestingLevel;
   //!@brief the relaxation rate of the field
   cedar::aux::DoubleParameterPtr mTau; //!@todo deal with units, now: milliseconds
   //!@brief the global inhibition of the field, which is not contained in the kernel
   cedar::aux::DoubleParameterPtr mGlobalInhibition;
-  //!@brief any sigmoid function
-  cedar::aux::math::SigmoidPtr mSigmoid;
-  //!@brief the lateral interaction kernel, strictly excitatory at the moment
-  std::vector<cedar::aux::kernel::GaussPtr> mKernels;
-  //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
-  cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
-  //!@brief the field sizes in each dimension
-  cedar::aux::UIntVectorParameterPtr _mSizes;
-  //!@brief the number of kernels
-  cedar::aux::UIntParameterPtr _mNumberOfKernels;
-  //!@brief the old number of kernels - needed to deal with changes in number of kernels
-  unsigned int mOldNumberOfKernels;
+  //!@brief the noise correlation kernel
+  cedar::aux::kernel::GaussPtr mNoiseCorrelationKernel;
 private:
   // none yet
 
@@ -145,12 +181,23 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
+  cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
 
+  //!@brief the field sizes in each dimension
+  cedar::aux::UIntVectorParameterPtr _mSizes;
+
+  //!@brief input noise gain
+  cedar::aux::DoubleParameterPtr _mInputNoiseGain;
+
+  //!@brief The list of kernels for this field.
+  KernelListParameterPtr _mKernels;
+
+  //!@brief any sigmoid function
+  SigmoidParameterPtr _mSigmoid;
 private:
   // none yet
 
 }; // class cedar::dyn::NeuralField
 
 #endif // CEDAR_DYN_NEURAL_FIELD_H
-

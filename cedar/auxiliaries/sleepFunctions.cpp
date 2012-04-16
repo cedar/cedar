@@ -34,14 +34,16 @@
 
 ======================================================================================================================*/
 
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/defines.h"
 
-#ifdef WINDOWS
+// SYSTEM INCLUDES
+#ifdef _WIN32
   #include <Windows.h>
 #else
   #include <unistd.h>
-#endif // WINDOWS
+#endif // _WIN32
 
 void cedar::aux::sleep(cedar::unit::Time time)
 {
@@ -52,26 +54,26 @@ void cedar::aux::sleep(cedar::unit::Time time)
 #include <iostream>
 void cedar::aux::usleep(unsigned int microseconds)
 {
-#ifdef WINDOWS
+#ifdef _WIN32
 
-#ifdef MSVC
+#ifdef _MSC_VER
 #pragma message("Warning: Windows can only sleep for milliseconds. Anything lower will be ignored!")
-#elif defined GCC
+#elif defined __GNUG__
 #warning "Warning: Windows can only sleep for milliseconds. Anything lower will be ignored!"
-#endif // MSVC/GCC
+#endif // _MSC_VER/__GNUG__
 
   Sleep(static_cast<DWORD>(microseconds/1000));
 
-#else // WINDOWS
+#else // _WIN32
 
   ::usleep(microseconds);
 
-#endif // WINDOWS
+#endif // _WIN32
 }
 
 void cedar::aux::sleep(unsigned int seconds)
 {
-#ifdef WINDOWS
+#ifdef _WIN32
   Sleep(1000 * static_cast<DWORD>(seconds));
 #else
   ::sleep(seconds);

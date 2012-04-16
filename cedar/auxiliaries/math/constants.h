@@ -37,9 +37,7 @@
 #ifndef CEDAR_AUX_MATH_CONSTANTS_H
 #define CEDAR_AUX_MATH_CONSTANTS_H
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -49,8 +47,9 @@ namespace cedar
   {
     namespace math
     {
+      //!@brief cedar's own pi
       const double pi = 3.14159265358979323846;
-    };
-  };
-};
+    }
+  }
+}
 #endif // CEDAR_AUX_MATH_ALGEBRA_TOOLS_H

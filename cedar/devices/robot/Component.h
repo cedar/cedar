@@ -38,11 +38,8 @@
 #ifndef CEDAR_DEV_ROBOT_COMPONENT_H
 #define CEDAR_DEV_ROBOT_COMPONENT_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/namespace.h"
-
-// PROJECT INCLUDES
-#include "cedar/auxiliaries/Base.h"
 #include "cedar/devices/communication/Communication.h"
 
 // SYSTEM INCLUDES
@@ -50,17 +47,12 @@
 #include <string>
 #include <set>
 
-
-/*!@brief Abstract description of the class.
+/*!@brief Base class for components of robots.
  *
- * More detailed description of the class.
+ * @todo More detailed description of the class.
  */
-class cedar::dev::robot::Component : public virtual cedar::aux::Base
+class cedar::dev::robot::Component
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -70,7 +62,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -87,8 +78,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   //! name of the category the component is in (in the configuration file)
   std::string mCategoryName;
@@ -103,14 +92,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet
 protected:
   //! name of the parent component (if it exists)
   std::string _mParentName;
 private:
   // none yet
-
 }; // class cedar::dev::robot::Component
-
 #endif // CEDAR_DEV_ROBOT_COMPONENT_H
