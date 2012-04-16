@@ -38,16 +38,17 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/DataSlot.h"
+#include "cedar/processing/ExternalData.h"
 #include "cedar/processing/DataRole.h"
 #include "cedar/processing/Manager.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/assert.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QPainter>
@@ -73,12 +74,20 @@ mpStep(pParent),
 mSlot(slot)
 {
   this->setParentItem(pParent);
+  this->generateTooltip();
+  if (cedar::proc::ExternalDataPtr ext_data = boost::shared_dynamic_cast<cedar::proc::ExternalData>(slot))
+  {
+    if (ext_data->isCollection())
+    {
+      this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_DIAMOND);
+    }
 
-  QString tool_tip;
-  tool_tip += cedar::proc::DataRole::type().get(mSlot->getRole()).prettyString().c_str();
-  tool_tip += ": ";
-  tool_tip += mSlot->getName().c_str();
-  this->setToolTip(tool_tip);
+    if (!ext_data->isMandatory())
+    {
+      this->setOutlineColor(QColor(140, 140, 140));
+    }
+  }
+
 }
 
 cedar::proc::gui::DataSlotItem::~DataSlotItem()
@@ -110,7 +119,20 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo(G
   // should only be able to connect to DataSlotItems
   CEDAR_DEBUG_ASSERT(p_target != NULL);
 
-  if (p_target->getSlot()->getData())
+  //!@todo This all seems a bit sketchy
+  // either a slot is a collection ...
+  cedar::proc::ConstExternalDataPtr target_slot
+                      = boost::shared_dynamic_cast<const cedar::proc::ExternalData>(p_target->getSlot());
+  if (target_slot && target_slot->isCollection())
+  {
+    // ... then we cannot connect only if we are already connected ...
+    if (target_slot->hasData(this->getSlot()->getData()))
+    {
+      return cedar::proc::gui::CONNECT_NO;
+    }
+  }
+  // ... or, if it already has data, then it cannot have more.
+  else if (p_target->getSlot()->getData())
   {
     return cedar::proc::gui::CONNECT_NO;
   }
@@ -147,23 +169,10 @@ void cedar::proc::gui::DataSlotItem::connectTo(cedar::proc::gui::DataSlotItem *p
   cedar::proc::gui::ConnectValidity validity = this->canConnectTo(pTarget);
   if (validity != cedar::proc::gui::CONNECT_NO)
   {
-    cedar::proc::StepPtr source, target;
-    source = cedar::aux::asserted_cast<cedar::proc::gui::StepItem*>(this->parentItem())->getStep();
-    target = cedar::aux::asserted_cast<cedar::proc::gui::StepItem*>(pTarget->parentItem())->getStep();
-    cedar::proc::Manager::getInstance().connect(source, this->getName(), target, pTarget->getName());
     cedar::proc::gui::Connection *p_connection = new cedar::proc::gui::Connection(this, pTarget);
     p_connection->setValidity(validity);
     this->scene()->addItem(p_connection);
   }
-}
-
-void cedar::proc::gui::DataSlotItem::disconnect(cedar::proc::gui::GraphicsBase* pTarget)
-{
-  cedar::proc::gui::DataSlotItem* p_target = cedar::aux::asserted_cast<cedar::proc::gui::DataSlotItem*>(pTarget);
-  cedar::proc::StepPtr source, target;
-  source = cedar::aux::asserted_cast<cedar::proc::gui::StepItem*>(this->parentItem())->getStep();
-  target = cedar::aux::asserted_cast<cedar::proc::gui::StepItem*>(p_target->parentItem())->getStep();
-  cedar::proc::Manager::getInstance().disconnect(source, this->getName(), target, p_target->getName());
 }
 
 void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * /*event*/)
@@ -177,6 +186,8 @@ const std::string& cedar::proc::gui::DataSlotItem::getName() const
 
 void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
 {
+  //todo: move this out of here and let it be called by a signal
+  this->generateTooltip();
   painter->save(); // save current painter settings
 
   this->paintFrame(painter, style, widget);
@@ -184,4 +195,31 @@ void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOption
   //! @todo make drawing pretty.
 
   painter->restore(); // restore saved painter settings
+}
+
+void cedar::proc::gui::DataSlotItem::generateTooltip()
+{
+  QString tool_tip("");
+  tool_tip += cedar::proc::DataRole::type().get(mSlot->getRole()).prettyString().c_str();
+  tool_tip += ": ";
+  tool_tip += mSlot->getName().c_str();
+  // mat info
+  if (cedar::aux::MatDataPtr mat_data = boost::shared_dynamic_cast<cedar::aux::MatData>(this->mSlot->getData()))
+  {
+    tool_tip += "<br />";
+    unsigned int dimensionality = cedar::aux::math::getDimensionalityOf(mat_data->getData());
+    tool_tip += QString("Dimensionality: %1").arg(dimensionality);
+    tool_tip += "<br />Sizes:";
+    for (unsigned int dim = 0; dim < dimensionality; ++dim)
+    {
+      tool_tip += QString(" %1").arg(mat_data->getData().size[dim]);
+    }
+  }
+  // type info
+  if (this->mSlot->getData())
+  {
+    tool_tip
+      += QString("<br />") + QString::fromStdString(cedar::aux::unmangleName(typeid(*(this->mSlot->getData().get()))));
+  }
+  this->setToolTip(tool_tip);
 }

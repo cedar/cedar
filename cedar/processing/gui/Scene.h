@@ -41,20 +41,16 @@
 #ifndef CEDAR_PROC_SCENE_H
 #define CEDAR_PROC_SCENE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QGraphicsScene>
 #include <QMainWindow>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief This is a QGraphicsScene specifically designed for drawing cedar::proc::Networks.
  */
 class cedar::proc::gui::Scene : public QGraphicsScene
 {
@@ -64,133 +60,218 @@ class cedar::proc::gui::Scene : public QGraphicsScene
   Q_OBJECT
 
 public:
+  //! Current tool mode
   enum MODE
   {
+    //! Selection mode, i.e., items can be selected, moved etc.
     MODE_SELECT,
-    MODE_CREATE_TRIGGER,
-    MODE_GROUP,
+    //! Connection mode, i.e., connections can be created.
     MODE_CONNECT
   };
 
+  //! Type for associating cedar::proc::Steps to cedar::proc::gui::StepItems.
   typedef std::map<cedar::proc::Step*, cedar::proc::gui::StepItem*> StepMap;
+  //! Type for associating cedar::proc::Triggers to cedar::proc::gui::TriggerItem.
   typedef std::map<cedar::proc::Trigger*, cedar::proc::gui::TriggerItem*> TriggerMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  Scene(QObject *pParent = NULL, QMainWindow *pMainWindow = NULL);
+  /*!@brief The scene's constructor.
+   *
+   * @param peParentView  The view currently displaying the scene.
+   * @param pParent       The parent of the QObject.
+   * @param pMainWindow   The main window containing the scene.
+   */
+  Scene(cedar::proc::gui::View* peParentView, QObject *pParent = NULL, QMainWindow *pMainWindow = NULL);
 
-  //!@brief Destructor
+  //!@brief Destructor.
   ~Scene();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Handles the drop event of the scene.
+   *
+   *        This method mainly instantiates elements that are dropped from the Element toolbar to create new items in
+   *        the scene.
+   */
   void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
+
+  /*!@brief Handles the dragEnter event of the scene.
+   *
+   *        This method determines whether the contents of the drop can be handled by
+   *        cedar::proc::gui::Scene::dropEvent.
+   */
   void dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent);
+
+  /*!@brief Handles the dragMove event of the scene.
+   *
+   *        This method determines whether the contents of the drop can be handled by
+   *        cedar::proc::gui::Scene::dropEvent.
+   */
   void dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent);
 
+  /*!@brief Handler for mouse press events that happen within the bounds of the scene.
+   */
   void mousePressEvent(QGraphicsSceneMouseEvent *pMouseEvent);
+
+  /*!@brief Handler for mouse move events that happen within the bounds of the scene.
+   */
   void mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEvent);
+
+  /*!@brief Handler for mouse release events that happen within the bounds of the scene.
+   */
   void mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouseEvent);
 
-  void addProcessingStep(const std::string& classId, QPointF position);
+  /*!@brief Creates an element of the given classId at the specified position and adds it to the scene.
+   */
+  void addElement(const std::string& classId, QPointF position);
+
+  /*!@brief Adds a cedar::proc::gui::StepItem for the given cedar::proc::Step to the scene at the given position.
+   */
   void addProcessingStep(cedar::proc::StepPtr step, QPointF position);
+
+  /*!@brief Adds a cedar::proc::gui::StepItem to the scene.
+   */
   void addStepItem(cedar::proc::gui::StepItem *pStep);
+
+  /*!@brief Removes a cedar::proc::gui::StepItem from the scene.
+   */
   void removeStepItem(cedar::proc::gui::StepItem *pStep);
-  void addTrigger(const std::string& classId, QPointF position);
+
+  /*!@brief Adds a cedar::proc::gui::TriggerItem for the given cedar::proc::Trigger to the scene at the given position.
+   */
   void addTrigger(cedar::proc::TriggerPtr trigger, QPointF position);
+
+  /*!@brief Adds a cedar::proc::gui::TriggerItem to the scene.
+   */
   void addTriggerItem(cedar::proc::gui::TriggerItem *pTrigger);
+
+  /*!@brief Removes a cedar::proc::gui::TriggerItem from the scene.
+   */
   void removeTriggerItem(cedar::proc::gui::TriggerItem *pTrigger);
 
+  /*!@brief Sets the current mode, i.e., selection, connecion etc.
+   */
   void setMode(MODE mode, const QString& param = "");
 
+  /*!@brief Sets the main window containing this scene.
+   */
   void setMainWindow(QMainWindow *pMainWindow);
 
-  void setNetwork(cedar::proc::gui::NetworkFilePtr network);
+  /*!@brief Sets the network that is displayed by this scene.
+   */
+  void setNetwork(cedar::proc::gui::NetworkPtr network);
 
+  /*!@brief Resets the network.
+   */
   void reset();
 
+  /*!@brief Returns the step map.
+   */
   const StepMap& stepMap() const;
+
+  /*!@brief Returns the trigger map.
+   */
   const TriggerMap& triggerMap() const;
 
+  /*!@brief Returns the step item that displays the given step.
+   */
   cedar::proc::gui::StepItem* getStepItemFor(cedar::proc::Step* step);
+
+  /*!@brief Returns the trigger item that displays the given trigger.
+   */
   cedar::proc::gui::TriggerItem* getTriggerItemFor(cedar::proc::Trigger* trigger);
 
+  /*!@brief Returns, whether snap-to-grid is true.
+   */
   bool getSnapToGrid() const;
+
+  /*!@brief Enables or disables the snap-to-grid function.
+   */
   void setSnapToGrid(bool snap);
+
+  /*!@brief Returns the current mode.
+   */
+  MODE getMode() const
+  {
+    return this->mMode;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals
   //--------------------------------------------------------------------------------------------------------------------
-  signals:
-    void exception(const QString& message);
-    void modeFinished();
+signals:
+  /*!@brief Signal that is emitted when an exception occurs.
+   */
+  void exception(const QString& message);
+  /*!@brief Signal that is emitted when the current mode finishes, e.g., when a connection has been made.
+   */
+  void modeFinished();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  /*!@brief Displays the context menu for the scene (if no item accepts the event).
+   */
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /* connect mode */
+  /*!@brief Mouse press event for the connect mode.
+   */
   void connectModeProcessMousePress(QGraphicsSceneMouseEvent *pMouseEvent);
-  void connectModeProcessMouseMove(QGraphicsSceneMouseEvent *pMouseEvent);
-  void connectModeProcessMouseRelease(QGraphicsSceneMouseEvent *pMouseEvent);
 
-  /* group mode */
-  void groupModeProcessMousePress(QGraphicsSceneMouseEvent *pMouseEvent);
-  void groupModeProcessMouseMove(QGraphicsSceneMouseEvent *pMouseEvent);
-  void groupModeProcessMouseRelease(QGraphicsSceneMouseEvent *pMouseEvent);
+  /*!@brief Mouse move event for the connect mode.
+   */
+  void connectModeProcessMouseMove(QGraphicsSceneMouseEvent *pMouseEvent);
+
+  /*!@brief Mouse release event for the connect mode.
+   */
+  void connectModeProcessMouseRelease(QGraphicsSceneMouseEvent *pMouseEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
+  //! The current mode.
   MODE mMode;
+
+  //! The parameter for the current mode.
   QString mModeParam;
 
-  cedar::proc::gui::NetworkFilePtr mNetwork;
+  //! The network displayed by the scene.
+  cedar::proc::gui::NetworkPtr mNetwork;
 
-  /* connect mode related */
+  //! The view displaying the scene.
+  cedar::proc::gui::View *mpeParentView;
+
+  //! The line indicating a new connection.
   QGraphicsLineItem *mpNewConnectionIndicator;
+
+  //! The item from which a new connection is started.
   cedar::proc::gui::GraphicsBase *mpConnectionStart;
 
-  /* group mode related */
-  QPointF mGroupStart;
-  QPointF mGroupEnd;
-  QGraphicsRectItem *mpGroupIndicator;
-  QList<QGraphicsItem*> mProspectiveGroupMembers;
-  QMainWindow *mpMainWindow;
-
+  //! The step map.
   StepMap mStepMap;
+
+  //! The trigger map.
   TriggerMap mTriggerMap;
 
+  //! The main window containing the scene.
+  QMainWindow *mpMainWindow;
+
+  //! Bool representing whether the snap-to-grid function is active.
   bool mSnapToGrid;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
 
 }; // class ProcessingScene
 
 #endif // CEDAR_PROC_SCENE_H
-

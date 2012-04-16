@@ -41,26 +41,21 @@
 #ifndef CEDAR_PROC_PARAMETER_H
 #define CEDAR_PROC_PARAMETER_H
 
-// LOCAL INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/Base.h"
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
 
-// Functions for boost intrusive pointer.
-extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_add_ref(cedar::aux::Parameter *pObject);
-extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_release(cedar::aux::Parameter *pObject);
 
-
-/*!@brief Abstract description of the class.
+/*!@brief Base class for all parameters.
  *
- * More detailed description of the class.
+ *        This is the base class for all parameters that can be registered in the cedar::aux::Configurable class.
+ *
+ * @see @ref ParametersConcept for a description of the parameters concept.
  */
-class cedar::aux::Parameter : public QObject, public cedar::aux::Base
+class cedar::aux::Parameter : public QObject
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -70,6 +65,8 @@ class cedar::aux::Parameter : public QObject, public cedar::aux::Base
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::aux::Configurable;
+
   friend void ::intrusive_ptr_add_ref(cedar::aux::Parameter *pObject);
   friend void ::intrusive_ptr_release(cedar::aux::Parameter *pObject);
 
@@ -87,34 +84,67 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
+  //!@brief get the flag "read automatically"
   bool getReadAutomatically() const;
+  //!@brief set the flag "read automatically"
   void setReadAutomatically(bool value);
 
+  //!@brief return if this parameter has a default value
   bool getHasDefault() const;
+  //!@brief set if this parameter has a default value
   void setHasDefault(bool value);
 
+  //!@brief return if this parameter is constant
   bool isConstant() const;
+  //!@brief set if this parameter is constant
   void setConstant(bool value);
 
-  virtual void setTo(const cedar::aux::ConfigurationNode& node) = 0;
-  virtual void putTo(cedar::aux::ConfigurationNode& root) = 0;
+  //!@brief set this parameter to a value, read from a configuration node
+  virtual void readFromNode(const cedar::aux::ConfigurationNode& node) = 0;
+  //!@brief write value to a configuration node
+  virtual void writeToNode(cedar::aux::ConfigurationNode& root) const = 0;
+  //!@brief set parameter to default
   virtual void makeDefault() = 0;
 
+  //!@brief return flag if this parameter is hidden (for GUI)
   bool isHidden() const;
+  //!@brief set flag if this parameter is hidden (for GUI)
   void setHidden(bool hide);
 
+  //!@brief emit the value changed signal
   void emitChangedSignal();
+  //!@brief emit the property changed signal
   void emitPropertyChangedSignal();
+
+  //!@brief Returns the value of the @em mChanged flag.
+  bool isChanged() const
+  {
+    return this->mChanged;
+  }
+
+  //!@brief Returns the name of the object.
+  //!@return Name of the object.
+  const std::string& getName() const;
+
+  //!@brief Sets the name of the object to the given name.
+  //!@param name New name of the object.
+  void setName(const std::string& name);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-  signals:
-    void valueChanged();
-    void propertyChanged();
+  virtual void setChangedFlag(bool changed);
+
+signals:
+  //!@brief a signal that is emitted each time the value of a parameter changes
+  void valueChanged();
+
+  //!@brief a signal that is emitted each time a characteristic of this parameter changes (for example vector size)
+  void propertyChanged();
+
+  //!@brief Signal that is emitted when mChanged is changed.
+  void changedFlagChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -131,6 +161,9 @@ private:
   //! The owner of this parameter, i.e., the object using it.
   cedar::aux::Configurable *mpOwner;
 
+  //! The name of the parameter.
+  std::string mName;
+
   //! Whether the parameter should be read automatically. If not, the user has to read it by hand.
   bool mAutoRead;
 
@@ -143,19 +176,11 @@ private:
   //! Whether this parameter is hidden. This is relevant, e.g., for the gui.
   bool mIsHidden;
 
+  //! Flag that indicates whether this parameter was changed since the last file reading.
+  bool mChanged;
+
   //! Reference counter for boost intrusive pointer.
   unsigned int mReferenceCount;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::Parameter
 
 #endif // CEDAR_PROC_PARAMETER_H
-

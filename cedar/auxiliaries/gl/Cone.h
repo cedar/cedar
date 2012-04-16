@@ -19,64 +19,58 @@
 
 ========================================================================================================================
 
- ----- Institute:   Ruhr-Universitaet-Bochum
-                    Institut fuer Neuroinformatik
- 
- ----- File:        Cone.h
- 
- ----- Maintainer:  Hendrik Reimann
- ------Email:       hendrik.reimann@ini.rub.de
- ----- Date:        2010 10 29
- 
- ----- Description: visualization for a cone
- 
- ----- Credits:     
- ---------------------------------------------------------------------------------------------------------------------*/
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        Cone.h
+
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
+    Date:        2010 11 29
+
+    Description: Visualization of a cone
+
+    Credits:
+
+======================================================================================================================*/
 
 #ifndef CEDAR_AUX_GL_CONE_H
 #define CEDAR_AUX_GL_CONE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "namespace.h"
-#include "Object.h"
-
-// PROJECT INCLUDES
+#include "ObjectVisualization.h"
 
 // SYSTEM INCLUDES
 
 /*!@brief Simple OpenGL visualization of a cone or truncated cone
  *
- * This class visualizes an instance of cedar::aux::Object as a cone with specified dimensions
+ * This class visualizes a cone with specified dimensions
  *
- * @remarks To get a simple visualization of the Object on screen, add an instance of this class to a
+ * @remarks To get a simple visualization of the object on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
-class cedar::aux::gl::Cone : public cedar::aux::gl::Object
+class cedar::aux::gl::Cone : public cedar::aux::gl::ObjectVisualization
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief standard constructor. 
-   * @param pObject    pointer to the aux::Object being visualized
-   */
-  Cone(cedar::aux::ObjectPtr pObject);
-
   /*!@brief constructor. 
-   * @param pObject    pointer to the aux::Object being visualized
-   * @param radius    radius of the cone
-   * @param height    height of the cone
-   * @param R    color, value for red channel in RGB
-   * @param G    color, value for green channel in RGB
-   * @param B    color, value for blue channel in RGB
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
+   * @param radius radius of the cone
+   * @param height height of the cone
+   * @param colorR color, value for red channel in RGB
+   * @param colorG color, value for green channel in RGB
+   * @param colorB color, value for blue channel in RGB
    */
   Cone(
-        cedar::aux::ObjectPtr pObject,
-        const double radius,
-        const double height,
-        const double R=1,
-        const double G=0,
-        const double B=0
+        cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+        double radius = 2.0,
+        double height = 2.0,
+        double colorR = 1,
+        double colorG = 0,
+        double colorB = 0
       );
   
   //--------------------------------------------------------------------------------------------------------------------
@@ -87,24 +81,24 @@ public:
   void draw();
 
   /*!@brief set radius of the cone at the base
-   * @param value    new radius
+   * @param value new radius
    */
   void setRadius(double value);
 
   /*!@brief set height of the cone, i.e. distance from base to tip
-   * @param value    new height
+   * @param value new height
    */
   void setHeight(double value);
 
   /*!@brief get radius of the cone at the base
-   * @return    radius
+   * @return radius
    */
-  double radius();
+  double radius() const;
 
   /*!@brief get height of the cone, i.e. distance from base to tip
-   * @return    height
+   * @return height
    */
-  double height();
+  double height() const;
   
   //--------------------------------------------------------------------------------------------------------------------
   // members

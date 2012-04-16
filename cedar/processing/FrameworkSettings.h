@@ -37,21 +37,17 @@
 #ifndef CEDAR_PROC_FRAMEWORK_SETTINGS_H
 #define CEDAR_PROC_FRAMEWORK_SETTINGS_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/DirectoryParameter.h"
-#include "cedar/auxiliaries/SetParameter.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <set>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief A singleton class for storing user-specific parameters related to the processing framework.
  *
- * More detailed description of the class.
+ * @todo  Write a widget for these settings.
  */
 class cedar::proc::FrameworkSettings : public cedar::aux::Configurable
 {
@@ -66,21 +62,37 @@ public:
   //!@brief The standard constructor.
   FrameworkSettings();
 
-  //!@brief Destructor
+  //!@brief The destructor.
   ~FrameworkSettings();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Loads the settings from a file in the user's home directory.
+   */
   void load();
+
+  /*!@brief Saves the settings to a file in the user's home directory.
+   */
   void save();
 
+  /*!@brief Adds a plugin to the list of plugins known by the processing framework.
+   */
   void addKnownPlugin(const std::string& file);
-  const std::set<std::string>& getKnownPlugins();
 
-  const std::set<std::string>& getPluginDirectories();
+  /*!@brief Returns the set of plugins known by the processing framework.
+   */
+  const std::set<std::string>& getKnownPlugins() const;
 
+  /*!@brief Returns the set of plugin directories known by the processing framework.
+   */
+  const std::set<std::string>& getPluginDirectories() const;
+
+  /*!@brief Returns the plugin workspace directory.
+   *
+   *        This is the first directoriy searched for a plugin.
+   */
   std::string getPluginWorkspace() const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -98,8 +110,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -109,8 +119,13 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief Parameter representing the plugin workspace.
   cedar::aux::DirectoryParameterPtr mPluginWorkspace;
+
+  //!@brief List of directories to use when looking for plugins.
   cedar::aux::StringSetParameterPtr mPluginIncludeDirectories;
+
+  //!@brief List of known plugins.
   cedar::aux::StringSetParameterPtr mKnownPlugins;
 
 private:
@@ -119,4 +134,3 @@ private:
 }; // class cedar::proc::FrameworkSettings
 
 #endif // CEDAR_PROC_FRAMEWORK_SETTINGS_H
-

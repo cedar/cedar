@@ -34,17 +34,44 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/steps/StaticGain.h"
-
-// PROJECT INCLUDES
 #include "cedar/processing/DataSlot.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
 #include <vector>
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr static_gain_decl
+    (
+      new ElementDeclarationTemplate<cedar::proc::steps::StaticGain>
+      (
+        "Utilities",
+        "cedar.processing.StaticGain"
+      )
+    );
+    static_gain_decl->setIconPath(":/steps/static_gain.svg");
+    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(static_gain_decl);
+
+    return true;
+  }
+
+  bool declared = declare();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -106,7 +133,7 @@ void cedar::proc::steps::StaticGain::inputConnectionChanged(const std::string& i
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
   // Assign the input to the member. This saves us from casting in every computation step.
-  this->mInput = boost::shared_dynamic_cast<cedar::aux::MatData>(this->getInput(inputName));
+  this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
   // This should always work since other types should not be accepted.
   CEDAR_DEBUG_ASSERT(this->mInput);
 
@@ -114,7 +141,4 @@ void cedar::proc::steps::StaticGain::inputConnectionChanged(const std::string& i
   const cv::Mat& input = this->mInput->getData();
   // Make a copy to create a matrix of the same type, dimensions, ...
   this->mOutput->setData(input.clone());
-
-  // Finally, this also requires a recomputation of the output.
-  this->onTrigger();
 }

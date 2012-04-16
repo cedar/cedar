@@ -38,12 +38,10 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/ToolBox.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QVariant>
@@ -81,7 +79,7 @@ cedar::proc::gui::ToolBox::~ToolBox()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::ToolBox::resizeEvent(QResizeEvent */* pEvent */)
+void cedar::proc::gui::ToolBox::resizeEvent(QResizeEvent * /* pEvent */)
 {
   QRect rect = this->mpLayout->contentsRect();
   int effective_area = rect.width();

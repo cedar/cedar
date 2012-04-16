@@ -40,23 +40,16 @@
 
 // PROJECT INCLUDES
 #include "cedar/devices/robot/Robot.h"
-#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>
 
 
-using namespace cedar::tests::unit::dev::robot::Robot;
-
 int main()
 {
-  cedar::aux::LogFile logFile("unitTest_robot.log");
-
-  TestRobot robot;
+  cedar::tests::unit::dev::robot::Robot::TestRobot robot;
   robot.getComponent("TestComponent1");
   robot.getComponent("TestComponent2");
-
-  logFile.close();
 
   return 0;
 }

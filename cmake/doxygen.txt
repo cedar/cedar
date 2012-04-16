@@ -52,9 +52,7 @@ endmacro()
 find_package(Doxygen)
 
 if(DOXYGEN_FOUND)
-	find_file(DOXYFILE_IN "Doxyfile.in"
-			PATHS "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_ROOT}/Modules/" ${CEDAR_CMAKE_DIR}
-			NO_DEFAULT_PATH)
+	set(DOXYFILE_IN "${CEDAR_HOME}/doc/Doxyfile.in")
 	set(DOXYFILE "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
 	include(FindPackageHandleStandardArgs)
 	find_package_handle_standard_args(DOXYFILE_IN DEFAULT_MSG "DOXYFILE_IN")

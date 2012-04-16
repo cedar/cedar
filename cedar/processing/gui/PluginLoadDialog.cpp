@@ -38,14 +38,14 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/PluginLoadDialog.h"
 #include "cedar/processing/PluginDeclaration.h"
+#include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/gui/Settings.h"
+#include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/assert.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QFileDialog>
@@ -84,11 +84,11 @@ QDialog(pParent)
 
 void cedar::proc::gui::PluginLoadDialog::browseFile()
 {
-#ifdef LINUX
+#ifdef __linux
   QString filter = "Plugins (*.so)";
-#elif defined APPLE
+#elif defined __APPLE__
   QString filter = "Plugins (*.dylib)";
-#elif defined WINDOWS
+#elif defined _WIN32
   QString filter = "Plugins (*.dll)";
 #endif
   cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastPluginLoadDialogLocation();
@@ -96,7 +96,7 @@ void cedar::proc::gui::PluginLoadDialog::browseFile()
                               (
                                 this, // parent = 0,
                                 "Select a plugin", // caption = QString(),
-                                last_dir->get().absolutePath(),
+                                last_dir->getValue().absolutePath(),
                                 filter
                               );
   if (!file.isEmpty())
@@ -105,7 +105,7 @@ void cedar::proc::gui::PluginLoadDialog::browseFile()
     this->mpFileNameEdit->lineEdit()->setText(file);
 
     QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
-    last_dir->set(path);
+    last_dir->setValue(path);
   }
 }
 
@@ -124,9 +124,9 @@ void cedar::proc::gui::PluginLoadDialog::loadFile(const std::string& file)
   cedar::proc::PluginDeclarationPtr declaration = this->mPlugin->getDeclaration();
   if (declaration)
   {
-    for (size_t i = 0; i < declaration->stepDeclarations().size(); ++i)
+    for (size_t i = 0; i < declaration->elementDeclarations().size(); ++i)
     {
-      const std::string& classId = declaration->stepDeclarations().at(i)->getClassId();
+      const std::string& classId = declaration->elementDeclarations().at(i)->getClassId();
       this->mpStepsList->addItem(QString(classId.c_str()));
     }
   }

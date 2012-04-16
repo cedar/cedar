@@ -37,33 +37,27 @@
 #ifndef CEDAR_DEV_ROBOT_GL_CORA_HEAD_H
 #define CEDAR_DEV_ROBOT_GL_CORA_HEAD_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/gl/namespace.h"
 #include "cedar/devices/robot/gl/AmtecChain.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
 /*!@brief Visualization of the CoRA arm
  *
  * This class provides a simple OpenGL visualization of the CoRA head. It has to be provided with a pointer to an
- * instance of KinematicChainModel of the CoRA head, used to get the transformations to the joint coordinate frames.
+ * instance of KinematicChain of the CoRA head, used to get the transformations to the joint coordinate frames.
  * To actually display the arm, add an instance of this class to a scene (cedar::aux::gl::Scene) and create a viewer
  * for that scene (cedar::aux::gl::Viewer).
  */
 class cedar::dev::robot::gl::CoraHead : public cedar::dev::robot::gl::AmtecChain
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
-  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  CoraHead(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel);
+  CoraHead(cedar::dev::robot::KinematicChainPtr pKinematicChain);
   //!@brief destructor
   ~CoraHead();
 
@@ -105,19 +99,6 @@ protected:
   // none yet
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::dev::robot::gl::CoraHead
-
 #endif // CEDAR_DEV_ROBOT_GL_CORA_HEAD_H
 

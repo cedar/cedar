@@ -41,11 +41,9 @@
 #ifndef CEDAR_PROC_DATA_ROLE_H
 #define CEDAR_PROC_DATA_ROLE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/processing/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -112,19 +110,6 @@ public:
 private:
   //! The base enum object.
   static cedar::aux::EnumType<cedar::proc::DataRole> mType;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::proc::DataRole
 
 #endif // CEDAR_PROC_DATA_ROLE_H
-

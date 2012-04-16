@@ -34,20 +34,18 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/LoopMode.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
 cedar::aux::EnumType<cedar::proc::LoopMode> cedar::proc::LoopMode::mType("cedar::proc::LoopMode::");
 
-#ifndef MSVC
+#ifndef _MSC_VER
 const cedar::proc::LoopMode::Id cedar::proc::LoopMode::FIXED_ADAPTIVE;
 const cedar::proc::LoopMode::Id cedar::proc::LoopMode::FIXED;
 const cedar::proc::LoopMode::Id cedar::proc::LoopMode::REALTIME;
-#endif // MSVC
+#endif // _MSC_VER
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

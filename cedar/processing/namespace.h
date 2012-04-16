@@ -34,15 +34,13 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_PROC_NAMESPACE_H
 #define CEDAR_PROC_NAMESPACE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/lib.h"
-#include "cedar/auxiliaries/AbstractFactory.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/Factory.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -52,14 +50,20 @@ namespace cedar
   /*!
    *  @brief Namespace containing main elements of cedar's processing framework.
    *
-   *  @see   @ref ProcessingIntroduction for an introduction and code tutorials.
+   *  @see   @ref ProcessingFrameworkConcept for an introduction into the concepts using within the processing framework.
    */
   namespace proc
   {
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_PROC_CLASS(Arguments);
+    CEDAR_DECLARE_PROC_CLASS(Connectable);
+    CEDAR_DECLARE_PROC_CLASS(DataConnection);
     CEDAR_DECLARE_PROC_CLASS(DataRole);
     CEDAR_DECLARE_PROC_CLASS(DataSlot);
+    CEDAR_DECLARE_PROC_CLASS(DeclarationRegistry);
+    CEDAR_DECLARE_PROC_CLASS(Element);
+    CEDAR_DECLARE_PROC_CLASS(ElementDeclaration);
+    CEDAR_DECLARE_PROC_CLASS(ExternalData);
     CEDAR_DECLARE_PROC_CLASS(LoopArguments);
     CEDAR_DECLARE_PROC_CLASS(LoopMode);
     CEDAR_DECLARE_PROC_CLASS(FrameworkSettings);
@@ -68,40 +72,32 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(Step);
     CEDAR_DECLARE_PROC_CLASS(StepTime);
     CEDAR_DECLARE_PROC_CLASS(Trigger);
-    CEDAR_DECLARE_PROC_CLASS(Group);
     CEDAR_DECLARE_PROC_CLASS(Manager);
     CEDAR_DECLARE_PROC_CLASS(Network);
+    CEDAR_DECLARE_PROC_CLASS(OwnedData);
     CEDAR_DECLARE_PROC_CLASS(PluginProxy);
     CEDAR_DECLARE_PROC_CLASS(PluginDeclaration);
-    CEDAR_DECLARE_PROC_CLASS(StepDeclaration);
-    CEDAR_DECLARE_PROC_CLASS(TriggerDeclaration);
-    CEDAR_DECLARE_PROC_CLASS(Connection);
+    CEDAR_DECLARE_PROC_CLASS(Triggerable);
+    CEDAR_DECLARE_PROC_CLASS(TriggerConnection);
+    CEDAR_DECLARE_PROC_CLASS(ProjectionMapping);
+    CEDAR_DECLARE_PROC_CLASS_INTRUSIVE(ProjectionMappingParameter);
     //!@endcond
 
+    //!@cond SKIPPED_DOCUMENTATION
     template <class BaseClass, class FactoryType> class DeclarationBase;
-    
+    template <class DerivedClass> class ElementDeclarationTemplate;
     template <class DerivedClass> class StepDeclarationT;
-
     template <class DerivedClass> class TriggerDeclarationT;
-
-    typedef boost::shared_ptr<cedar::aux::AbstractFactory<Step> > StepFactoryPtr;
-    typedef boost::shared_ptr<cedar::aux::Factory<Trigger, cedar::proc::TriggerPtr> > TriggerFactoryPtr;
-
-
-    template <class T, class T_Declaration> class Registry;
-    typedef cedar::proc::Registry<Step, StepDeclaration> StepRegistry;
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_GENERATE_POINTER_TYPES(StepRegistry);
     //!@endcond
-    typedef cedar::proc::Registry<Trigger, TriggerDeclaration> TriggerRegistry;
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_GENERATE_POINTER_TYPES(TriggerRegistry);
-    //!@endcond
+
+    //!@brief a factory for elements
+    typedef boost::shared_ptr<cedar::aux::Factory<ElementPtr> > ElementFactoryPtr;
 
     /* Exceptions */
     //!@cond SKIPPED_DOCUMENTATION
     class CEDAR_PROC_LIB_EXPORT ConnectionMemberDeletedException;
     class CEDAR_PROC_LIB_EXPORT ConnectionNotFoundException;
+    class CEDAR_PROC_LIB_EXPORT DuplicateConnectionException;
     class CEDAR_PROC_LIB_EXPORT DuplicateNameException;
     class CEDAR_PROC_LIB_EXPORT InvalidNameException;
     class CEDAR_PROC_LIB_EXPORT InvalidObjectException;
@@ -112,6 +108,7 @@ namespace cedar
     class CEDAR_PROC_LIB_EXPORT MissingDeclarationException;
     class CEDAR_PROC_LIB_EXPORT ParseException;
     class CEDAR_PROC_LIB_EXPORT PluginException;
+    class CEDAR_PROC_LIB_EXPORT NoMappingException;
     //!@endcond
   }
 }

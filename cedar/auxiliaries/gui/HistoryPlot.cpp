@@ -38,27 +38,40 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/HistoryPlot.h"
 #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
+#include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/exceptions.h"
-#include "cedar/auxiliaries/DataTemplate.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/DoubleData.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
 #include <iostream>
 
+//----------------------------------------------------------------------------------------------------------------------
+// type registration
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool registerPlot()
+  {
+    typedef cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::DoubleData, cedar::aux::gui::HistoryPlot> DeclarationType;
+    boost::shared_ptr<DeclarationType> decl(new DeclarationType());
+    cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(decl);
+    return true;
+  }
+
+  bool registered = registerPlot();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
 cedar::aux::gui::HistoryPlot::HistoryPlot(QWidget *pParent)
 :
-cedar::aux::gui::DataPlotInterface(pParent),
+cedar::aux::gui::PlotInterface(pParent),
 mpCurrentPlotWidget(NULL)
 {
   QVBoxLayout *p_layout = new QVBoxLayout();
@@ -73,8 +86,7 @@ cedar::aux::gui::HistoryPlot::~HistoryPlot()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-void cedar::aux::gui::HistoryPlot::display(cedar::aux::DataPtr data)
+void cedar::aux::gui::HistoryPlot::plot(cedar::aux::DataPtr data, const std::string& title)
 {
   //!@todo implement for matrices and more dimensions
   if (this->mpCurrentPlotWidget)
@@ -85,7 +97,7 @@ void cedar::aux::gui::HistoryPlot::display(cedar::aux::DataPtr data)
 
   if (this->mData = boost::shared_dynamic_cast<cedar::aux::DoubleData>(data))
   {
-    this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData);
+    this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData, title);
   }
   else
   {

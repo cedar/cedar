@@ -41,16 +41,11 @@
 #ifndef CEDAR_PROC_MANAGER_H
 #define CEDAR_PROC_MANAGER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/processing/namespace.h"
-#include "cedar/processing/Registry.h"
-#include "cedar/processing/StepDeclaration.h"
-#include "cedar/processing/TriggerDeclaration.h"
 #include "cedar/processing/FrameworkSettings.h"
 #include "cedar/processing/Step.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <map>
@@ -59,9 +54,10 @@
 #include <QObject>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief A manager for processing architectures.
  *
- * More detailed description of the class.
+ * @deprecated This class will probably be removed.
+ * @todo Remove this class?
  */
 class cedar::proc::Manager
 {
@@ -70,7 +66,6 @@ class cedar::proc::Manager
   //--------------------------------------------------------------------------------------------------------------------
 public:
   typedef std::set<cedar::aux::LoopedThreadPtr> ThreadRegistry; //!<@todo Use a name?
-  typedef std::set<cedar::proc::GroupPtr> GroupRegistry; //!<@todo Use a name instead?
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -83,74 +78,33 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!\brief get the singleton instance of Manager
+  //!@brief get the singleton instance of Manager
   static Manager& getInstance();
+  //!@brief access the FrameworkSettings
   cedar::proc::FrameworkSettings& settings();
 
-  //!\brief access to step registry
-  StepRegistry& steps();
-  //!\brief access to trigger registry
-  TriggerRegistry& triggers();
   //!\brief access to thread registry
   ThreadRegistry& threads();
-  //!\brief access to group registry
-  GroupRegistry& groups();
 
+  //!@brief register a thread (Manager holds a collection of threads, which can be started at once)
   void registerThread(cedar::aux::LoopedThreadPtr thread);
-  cedar::proc::GroupPtr allocateGroup();
-  void removeGroup(cedar::proc::GroupPtr group);
 
-  cedar::proc::GroupPtr getGroup(const std::string& name);
-
+  //!@brief load a plugin
   void load(cedar::proc::PluginProxyPtr plugin);
 
+  //!@brief Loads the declarations from a plugin declaration.
+  void load(cedar::proc::PluginDeclarationPtr declaration);
+
+  //!@brief start all registered threads
   void startThreads();
+
+  //!@brief stop all threads
   void stopThreads(bool wait = false);
-  void connect(
-                cedar::proc::StepPtr source,
-                const std::string& sourceName,
-                cedar::proc::StepPtr target,
-                const std::string& targetName
-              );
-  void disconnect(
-                   cedar::proc::StepPtr source,
-                   const std::string& sourceName,
-                   cedar::proc::StepPtr target,
-                   const std::string& targetName
-                 );
-  void connect(
-                cedar::proc::TriggerPtr trigger,
-                cedar::proc::StepPtr target
-              );
-  void connect(
-                cedar::proc::TriggerPtr trigger,
-                cedar::proc::TriggerPtr target
-              );
-
-  void getConnections(
-                       cedar::proc::StepPtr source,
-                       const std::string& sourceDataName,
-                       std::vector<cedar::proc::Connection*>& connections //!@todo should be const pointers?
-                     );
-
-  const std::vector<cedar::proc::Connection*>& getConnections() const
-  {
-    return this->mConnections;
-  }
-
-  //!\ remove and disconnect a step
-  void removeStep(cedar::proc::StepPtr step);
-  //!\ remove and disconnect a trigger
-  void removeTrigger(cedar::proc::TriggerPtr trigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!\brief this function disconnects all incoming and outgoing connections of a single step
-  void disconnect(cedar::proc::StepPtr deletedStep);
-  //!\brief this function disconnects all incoming and outgoing connections of a single trigger
-  void disconnect(cedar::proc::TriggerPtr deletedTrigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -158,46 +112,21 @@ protected:
 private:
   //!@brief The standard constructor.
   Manager();
-  /*!\brief this deletes a single connection from the mConnections vector. Afterwards, previously obtained iterators
-   * will become invalid, so watch out.*/
-  void deleteConnection(cedar::proc::Connection* connection);
-
-  //!@brief Removes any "dead" connections from the manager.
-  void cleanupConnections();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
   //! the manager singleton instance
   static Manager mManager;
 
-  //! a registry for all managed steps
-  StepRegistryPtr mStepRegistry;
-  //! a registry for all managed triggers
-  TriggerRegistryPtr mTriggerRegistry;
   //! a registry for all managed threads, which can be globally started or stopped (e.g., LoopedTrigger)
   ThreadRegistry mThreadRegistry;
-  //! a registry for all managed groups
-  GroupRegistry mGroupRegistry;
 
+  //!@brief the framework settings
   cedar::proc::FrameworkSettings mSettings;
-  std::vector<cedar::proc::Connection*> mConnections;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
 
 }; // class cedar::Manager
 

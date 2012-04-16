@@ -34,14 +34,14 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/kernel/Kernel.h"
-#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/Data.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/exceptions.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -51,21 +51,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::kernel::Kernel::Kernel()
 :
-mKernel(new cedar::aux::DataTemplate<cv::Mat>()),
-_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000)),
-_mKernelMatrixFile(new cedar::aux::StringParameter(this, "kernelMatrixFile", "dummy_matrix_file.yml"))
+mKernel(new cedar::aux::MatData()),
+_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000))
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+
   mpReadWriteLockOutput = new QReadWriteLock();
   _mDimensionality->setConstant(true);
 }
 
-cedar::aux::kernel::Kernel::Kernel(unsigned int dimensionality, const std::string& kernelFile)
+cedar::aux::kernel::Kernel::Kernel(unsigned int dimensionality)
 :
 cedar::aux::Configurable(),
-mKernel(new cedar::aux::DataTemplate<cv::Mat>()),
-_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000)),
-_mKernelMatrixFile(new cedar::aux::StringParameter(this, "kernelMatrixFile", kernelFile))
+mKernel(new cedar::aux::MatData()),
+_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000))
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+
   mpReadWriteLockOutput = new QReadWriteLock();
   _mDimensionality->setValue(dimensionality);
   _mDimensionality->setConstant(true);
@@ -73,9 +75,8 @@ _mKernelMatrixFile(new cedar::aux::StringParameter(this, "kernelMatrixFile", ker
 
 cedar::aux::kernel::Kernel::~Kernel()
 {
-#ifdef DEBUG
-  std::cout << "> freeing data (Kernel)" << std::endl;
-#endif
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
+
   if (mpReadWriteLockOutput)
   {
     delete mpReadWriteLockOutput;
@@ -88,10 +89,7 @@ cedar::aux::kernel::Kernel::~Kernel()
 
 cv::Mat cedar::aux::kernel::Kernel::convolveWith(const cv::Mat& mat) const
 {
-  //!@todo Implement this method.
-  //!@todo Write unit tests for this method.
-  //!@todo Implement a border type (at least wrap, constant).
-  CEDAR_THROW(cedar::aux::exc::ExceptionBase, "Sorry, but this function is not implemented yet.");
+  return cedar::aux::math::convolve(mat, this->mKernel->getData());
 }
 
 void cedar::aux::kernel::Kernel::hideDimensionality(bool hide)
@@ -106,28 +104,12 @@ QReadWriteLock* cedar::aux::kernel::Kernel::getReadWriteLock()
 
 const cv::Mat& cedar::aux::kernel::Kernel::getKernel() const
 {
-  return mKernel->getData<cv::Mat>();
+  return mKernel->getData();
 }
 
 const cedar::aux::DataPtr cedar::aux::kernel::Kernel::getKernelRaw() const
 {
   return this->mKernel;
-}
-
-void cedar::aux::kernel::Kernel::loadKernelFromFile()
-{
-  mpReadWriteLockOutput->lockForWrite();
-  cv::FileStorage fs(_mKernelMatrixFile->getValue(), cv::FileStorage::READ);
-  fs["kernel"] >> mKernel->getData<cv::Mat>();
-  mpReadWriteLockOutput->unlock();
-}
-
-void cedar::aux::kernel::Kernel::saveKernelToFile() const
-{
-  mpReadWriteLockOutput->lockForRead();
-  cv::FileStorage fs(_mKernelMatrixFile->getValue(), cv::FileStorage::WRITE);
-  fs << "kernel" << mKernel->getData<cv::Mat>();
-  mpReadWriteLockOutput->unlock();
 }
 
 unsigned int cedar::aux::kernel::Kernel::getDimensionality() const

@@ -37,14 +37,13 @@
 #ifndef CEDAR_AUX_KERNEL_GAUSS_H
 #define CEDAR_AUX_KERNEL_GAUSS_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/kernel/Separable.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
+
 
 /*!@brief Gauss kernel class.
  *
@@ -61,13 +60,13 @@ class cedar::aux::kernel::Gauss : public cedar::aux::kernel::Separable
 public:
   //!@brief The standard constructor.
   Gauss();
+  //!@brief Constructor to create an instance of Gauss directly from a set of parameters (without configuration file).
   Gauss(
          double amplitude,
          std::vector<double> sigmas,
          std::vector<double> shifts,
          double limit,
-         unsigned int dimensionality,
-         const std::string& kernelFile = "dummy_matrix_file.yml"
+         unsigned int dimensionality
        );
   //!@brief Destructor
   virtual ~Gauss();
@@ -81,6 +80,7 @@ public:
   //!@todo deal with boost PropertyTree here
   virtual void onInit();
 
+  //!\brief get the sigma of a given dimension
   double getSigma(unsigned int dimension) const;
 
   /*!\brief set the sigma of a chosen dimension and Gaussian
@@ -89,23 +89,29 @@ public:
    */
   void setSigma(unsigned int dimension, double sigma);
 
+  //!@brief get the shift of the kernel for a given dimension
   double getShift(unsigned int dimension) const;
 
+  //!@brief set the shift for a given dimension
   void setShift(unsigned int dimension, double shift);
 
+  //!@brief get the amplitude of the kernel
   double getAmplitude() const;
 
+  //!@brief set the amplitude of the kernel
   void setAmplitude(double amplitude);
 
+  //!@brief get the pixel width of the kernel
   unsigned int getWidth(unsigned int dim) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected slots:
-  /*!\brief virtual function to calculate the kernel matrix
+  /*!@brief virtual function to calculate the kernel matrix
    */
   void calculate();
+  //!@brief update the dimensionality of the kernel matrices, triggered by a signal (e.g. a changed parameter value)
   void updateDimensionality();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -118,8 +124,10 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  std::vector<unsigned int> mSizes; //!< sizes for kernel matrix
-  std::vector<int> mCenters; //!< matrix indices for kernel centers
+  //!@brief vector of pixel sizes of the kernel matrices
+  std::vector<unsigned int> mSizes;
+  //!@brief matrix indices for kernel centers
+  std::vector<int> mCenters;
 private:
   // none yet
 
@@ -127,16 +135,17 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  cedar::aux::DoubleParameterPtr _mAmplitude; //!<
-//  std::vector<double> _mSigmas; //!< index resemble dimension
-  cedar::aux::DoubleVectorParameterPtr _mSigmas; //!< index resemble dimension
-//  std::vector<double> _mShifts; //!< index resembles dimension
-  cedar::aux::DoubleVectorParameterPtr _mShifts; //!< index resemble dimension
-  cedar::aux::DoubleParameterPtr _mLimit; //!< variable that defines the precision of the numerical approximation at the borders
+  //!@brief amplitude of the kernel - after normalization of each dimension, this is applied to the first one
+  cedar::aux::DoubleParameterPtr _mAmplitude;
+  //!@brief sigmas of the Gauss function for each dimension
+  cedar::aux::DoubleVectorParameterPtr _mSigmas;
+  //!@brief shift of the Gauss function from the center for each dimension
+  cedar::aux::DoubleVectorParameterPtr _mShifts;
+  //!@brief scalar value, which is multiplied by the dimensions' sigmas to determine the pixel size
+  cedar::aux::DoubleParameterPtr _mLimit;
 private:
   // none yet
 
 }; // class cedar::aux::kernel::Gauss
 
 #endif // CEDAR_AUX_KERNEL_GAUSS_H
-

@@ -19,113 +19,86 @@
 
 ========================================================================================================================
 
- ----- Institute:   Ruhr-Universitaet-Bochum
-                    Institut fuer Neuroinformatik
- 
- ----- File:        Ellipse.cpp
- 
- ----- Maintainer:  Hendrik Reimann
- ------Email:       hendrik.reimann@ini.rub.de
- ----- Date:        2010 10 29
- 
- ----- Description: visualization for an ellipse
- 
- ----- Credits:     
- ---------------------------------------------------------------------------------------------------------------------*/
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
 
-// LOCAL INCLUDES
+    File:        Ellipse.cpp
+
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
+    Date:        2010 11 29
+
+    Description: Visualization of an ellipse
+
+    Credits:
+
+======================================================================================================================*/
+
+// CEDAR INCLUDES
 #include "drawShapes.h"
 #include "Ellipse.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
-using namespace cedar::aux::gl;
-using namespace std;
-using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Ellipse::Ellipse(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Ellipse::Ellipse
+(
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+  double length,
+  double width,
+  double thickness,
+  double colorR,
+  double colorG,
+  double colorB
+)
 :
-cedar::aux::gl::Object(pObject)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Ellipse", colorR, colorG, colorB),
+mLength(length),
+mWidth(width),
+mThickness(thickness)
 {
-  mLength = 2;
-  mWidth = 3;
-  mThickness = .3;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
-  mObjectType = "Ellipse";
-}
-
-Ellipse::Ellipse(
-                  cedar::aux::ObjectPtr pObject,
-                  const double length,
-                  const double width,
-                  const double thickness,
-                  const double R,
-                  const double G,
-                  const double B
-                )
-:
-cedar::aux::gl::Object(pObject)
-{
-  mLength = length;
-  mWidth = width;
-  mThickness = thickness;
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-  mObjectType = "Ellipse";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void Ellipse::setLength(double value)
+void cedar::aux::gl::Ellipse::setLength(double value)
 {
   mLength = value;
 }
 
-void Ellipse::setWidth(double value)
+void cedar::aux::gl::Ellipse::setWidth(double value)
 {
   mWidth = value;
 }
 
-void Ellipse::setThickness(double value)
+void cedar::aux::gl::Ellipse::setThickness(double value)
 {
   mThickness = value;
 }
 
-double Ellipse::length()
+double cedar::aux::gl::Ellipse::length() const
 {
   return mLength;
 }
 
-double Ellipse::width()
+double cedar::aux::gl::Ellipse::width() const
 {
   return mWidth;
 }
 
-double Ellipse::thickness()
+double cedar::aux::gl::Ellipse::thickness() const
 {
   return mThickness;
 }
 
-void Ellipse::draw()
+void cedar::aux::gl::Ellipse::draw()
 {
-  // move to origin
-  glPopMatrix();
-  glPushMatrix();
-  
-  // move to object coordinates
-  mTransformationTranspose = mpObject->getTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  prepareDraw();
   
   // draw the Ellipse
   if (mIsVisible)

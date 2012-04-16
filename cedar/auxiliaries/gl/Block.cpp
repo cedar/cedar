@@ -34,124 +34,76 @@
 
 ======================================================================================================================*/
 
-
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/gl/Block.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
-using namespace cedar::aux::gl;
-using namespace std;
-using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Block::Block(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Block::Block
+(
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+	double length,
+	double width,
+  double height,
+  double colorR,
+  double colorG,
+  double colorB
+)
 :
-cedar::aux::gl::Object(pObject)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Block", colorR, colorG, colorB),
+mLength(length),
+mWidth(width),
+mHeight(height)
 {
-  mLength = 3;
-  mWidth = 2;
-  mHeight = 1;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
-  mObjectType = "Block";
-}
-
-Block::Block(
-              cedar::aux::ObjectPtr pObject,
-              const double length,
-              const double width,
-              const double height,
-              const double R,
-              const double G,
-              const double B
-            )
-:
-cedar::aux::gl::Object(pObject)
-{
-  mLength = length;
-  mWidth = width;
-  mHeight = height;
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-  mObjectType = "Block";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void Block::draw()
+void cedar::aux::gl::Block::draw()
 {
-  // move to origin
-  glPopMatrix();
-  glPushMatrix();
-  
-  // move to object coordinates
-  mTransformationTranspose = mpObject->getTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  prepareDraw();
   
   // draw object
   if (mIsVisible)
   {
-    gl::setColor(mColorR, mColorG, mColorB);
+    cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
     drawBlock(mLength, mWidth, mHeight, mIsDrawnAsWireFrame);
   }
 }
 
-void Block::setLength(double value)
+void cedar::aux::gl::Block::setLength(double value)
 {
   mLength = value;
 }
 
-void Block::setWidth(double value)
+void cedar::aux::gl::Block::setWidth(double value)
 {
   mWidth = value;
 }
 
-void Block::setHeight(double value)
+void cedar::aux::gl::Block::setHeight(double value)
 {
   mHeight = value;
 }
 
-double Block::length()
+double cedar::aux::gl::Block::length() const
 {
   return mLength;
 }
 
-double Block::width()
+double cedar::aux::gl::Block::width() const
 {
   return mWidth;
 }
 
-double Block::height()
+double cedar::aux::gl::Block::height() const
 {
   return mHeight;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

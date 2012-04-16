@@ -39,13 +39,42 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/MultiTrigger.h"
-
-// PROJECT INCLUDES
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
 
 // SYSTEM INCLUDES
 #include <algorithm>
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the trigger class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr multi_trigger_declaration
+    (
+      new ElementDeclarationTemplate<cedar::proc::MultiTrigger>
+      (
+        "Triggers",
+        "cedar.processing.MultiTrigger"
+      )
+    );
+    multi_trigger_declaration->setIconPath(":/triggers/multi_trigger.svg");
+
+    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(multi_trigger_declaration);
+
+    return true;
+  }
+
+  bool declared = declare();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -59,17 +88,18 @@ cedar::proc::MultiTrigger::~MultiTrigger()
 {
 }
 
-
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::MultiTrigger::onTrigger(Trigger* sender)
+void cedar::proc::MultiTrigger::onTrigger(cedar::proc::TriggerPtr pSender)
 {
-  std::map<Trigger*, bool>::iterator iter = this->mIncoming.find(sender);
+  std::map<cedar::proc::TriggerPtr, bool>::iterator iter = this->mIncoming.find(pSender);
 
   if (iter != this->mIncoming.end())
   {
+#ifdef DEBUG_TRIGGERING
+    std::cout << "Multitrigger::onTrigger(" << pSender.get() << ")" << std::endl;
+#endif
     iter->second = true;
     this->checkCondition();
   }
@@ -78,33 +108,36 @@ void cedar::proc::MultiTrigger::onTrigger(Trigger* sender)
 void cedar::proc::MultiTrigger::checkCondition()
 {
   // Check whether all incoming triggers have triggered the multitrigger
-  for (std::map<Trigger*, bool>::iterator iter = this->mIncoming.begin(); iter != this->mIncoming.end(); ++iter)
+  for (std::map<cedar::proc::TriggerPtr, bool>::iterator iter = this->mIncoming.begin(); iter != this->mIncoming.end(); ++iter)
   {
     // if one is false, return and do nothing
     if (!iter->second)
     {
+#ifdef DEBUG_TRIGGERING
+      std::cout << "Multitrigger::checkCondition(): false: " << iter->first.get() << std::endl;
+#endif
       return;
     }
   }
 
-  // if we got here, all triggers have triggere
+  // if we got here, all triggers have triggered
   this->trigger();
 
   // reset all triggers
-  for (std::map<Trigger*, bool>::iterator iter = this->mIncoming.begin(); iter != this->mIncoming.end(); ++iter)
+  for (std::map<cedar::proc::TriggerPtr, bool>::iterator iter = this->mIncoming.begin(); iter != this->mIncoming.end(); ++iter)
   {
     iter->second = false;
   }
 }
 
-void cedar::proc::MultiTrigger::notifyConnected(cedar::proc::Trigger* trigger)
+void cedar::proc::MultiTrigger::notifyConnected(cedar::proc::TriggerPtr trigger)
 {
   mIncoming[trigger] = false;
 }
 
-void cedar::proc::MultiTrigger::notifyDisconnected(cedar::proc::Trigger* trigger)
+void cedar::proc::MultiTrigger::notifyDisconnected(cedar::proc::TriggerPtr trigger)
 {
-  std::map<Trigger*, bool>::iterator iter = this->mIncoming.find(trigger);
+  std::map<cedar::proc::TriggerPtr, bool>::iterator iter = this->mIncoming.find(trigger);
   if (iter != this->mIncoming.end())
   {
     this->mIncoming.erase(iter);

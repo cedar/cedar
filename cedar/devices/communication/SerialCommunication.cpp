@@ -34,16 +34,12 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-
+// CEDAR INCLUDES
 #include "cedar/devices/communication/SerialCommunication.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
-
-
-using namespace cedar::dev::com;
+#include <cstdio>
 
 #define clear_my(var, mask)    var &= (~(mask))
 #define set(var, mask)      var |= (mask)
@@ -52,13 +48,66 @@ using namespace cedar::dev::com;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-SerialCommunication::SerialCommunication(const std::string config) : cedar::aux::ConfigurationInterface(config)
+cedar::dev::com::SerialCommunication::SerialCommunication()
+:
+mOldConfigMode(false),
+_mName(new cedar::aux::StringParameter(this, "Name", "Serial Communication")),
+_mDevicePath(new cedar::aux::StringParameter(this, "DevicePath", "/dev/rfcomm0")),
+_mEndOfCommandString(new cedar::aux::StringParameter(this, "EndOfCommandString", "\\r\\n")),
+_mCFlag(new cedar::aux::IntParameter(this, "CFlag", 0, 0, 1)),
+_mBaudrate(new cedar::aux::UIntParameter(this, "BaudRate", 4098, 0, 1000000)),
+_mTimeOut(new cedar::aux::UIntParameter(this, "TimeOut", 250000, 0, 1000000)),
+_mLatency(new cedar::aux::UIntParameter(this, "Latency", 10000, 0, 1000000)),
+_mDebug(new cedar::aux::BoolParameter(this, "Debug", false)),
+_mOS(new cedar::aux::StringParameter(this, "OperatingSystem", "Linux"))
 {
+  // currently, paramters for this class cannot be changed online.
+  _mName->setConstant(true);
+  _mDevicePath->setConstant(true);
+  _mEndOfCommandString->setConstant(true);
+  _mCFlag->setConstant(true);
+  _mBaudrate->setConstant(true);
+  _mTimeOut->setConstant(true);
+  _mLatency->setConstant(true);
+  _mDebug->setConstant(true);
+  _mOS->setConstant(true);
+
   mInitialized = false;
-  init();
 }
 
-SerialCommunication::~SerialCommunication()
+
+cedar::dev::com::SerialCommunication::SerialCommunication(const std::string& config_file)
+:
+mOldConfigMode(true),
+_mName(new cedar::aux::StringParameter(this, "Name", "Serial Communication")),
+_mDevicePath(new cedar::aux::StringParameter(this, "DevicePath", "/dev/rfcomm0")),
+_mEndOfCommandString(new cedar::aux::StringParameter(this, "EndOfCommandString", "\\r\\n")),
+_mCFlag(new cedar::aux::IntParameter(this, "CFlag", 0, 0, 1)),
+_mBaudrate(new cedar::aux::UIntParameter(this, "BaudRate", 4098, 0, 1000000)),
+_mTimeOut(new cedar::aux::UIntParameter(this, "TimeOut", 250000, 0, 1000000)),
+_mLatency(new cedar::aux::UIntParameter(this, "Latency", 10000, 0, 1000000)),
+_mDebug(new cedar::aux::BoolParameter(this, "Debug", false)),
+_mOS(new cedar::aux::StringParameter(this, "OperatingSystem", "Linux"))
+{
+  // currently, paramters for this class cannot be changed online.
+  _mName->setConstant(true);
+  _mDevicePath->setConstant(true);
+  _mEndOfCommandString->setConstant(true);
+  _mCFlag->setConstant(true);
+  _mBaudrate->setConstant(true);
+  _mTimeOut->setConstant(true);
+  _mLatency->setConstant(true);
+  _mDebug->setConstant(true);
+  _mOS->setConstant(true);
+
+  mInitialized = false;
+
+  this->readOldConfig(config_file);
+  // this has to be called manually because the virtual function readConfiguration is not called
+//  this->init();
+}
+
+cedar::dev::com::SerialCommunication::~SerialCommunication()
 {
   if (mInitialized)
   {
@@ -74,104 +123,91 @@ SerialCommunication::~SerialCommunication()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool SerialCommunication::isInitialized() const
+bool cedar::dev::com::SerialCommunication::isInitialized() const
 {
   return mInitialized;
 }
 
-int SerialCommunication::getFileDescriptor() const
+int cedar::dev::com::SerialCommunication::getFileDescriptor() const
 {
   return mFileDescriptor;
 }
 
-const std::string& SerialCommunication::getName() const
+const std::string& cedar::dev::com::SerialCommunication::getName() const
 {
-  return _mName;
+  return _mName->getValue();
 }
 
-const std::string& SerialCommunication::getDevicePath() const
+const std::string& cedar::dev::com::SerialCommunication::getDevicePath() const
 {
-  return _mDevicePath;
+  return _mDevicePath->getValue();
 }
 
-const std::string& SerialCommunication::getEndOfCommandString() const
+const std::string& cedar::dev::com::SerialCommunication::getEndOfCommandString() const
 {
-  return _mEndOfCommandString;
+  return _mEndOfCommandString->getValue();
 }
 
-int SerialCommunication::getCFlag() const
+int cedar::dev::com::SerialCommunication::getCFlag() const
 {
-  return _mCFlag;
+  return _mCFlag->getValue();
 }
 
-unsigned int SerialCommunication::getBaudrate() const
+unsigned int cedar::dev::com::SerialCommunication::getBaudrate() const
 {
-  return _mBaudrate;
+  return _mBaudrate->getValue();
 }
 
-unsigned int SerialCommunication::getTimeOut() const
+unsigned int cedar::dev::com::SerialCommunication::getTimeOut() const
 {
-  return _mTimeOut;
+  return _mTimeOut->getValue();
 }
 
-unsigned int SerialCommunication::getLatency() const
+unsigned int cedar::dev::com::SerialCommunication::getLatency() const
 {
-  return _mLatency;
+  return _mLatency->getValue();
 }
 
-int SerialCommunication::init()
+void cedar::dev::com::SerialCommunication::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
+  // read the configuration
+  this->Configurable::readConfiguration(node);
+
+  this->init();
+}
+
+void cedar::dev::com::SerialCommunication::init()
+{
+  // initialize
   if (mInitialized)
   {
-    if (_mDebug)
+    if (_mDebug->getValue())
     {
       std::cout << "SerialCommunication: Initialization failed (already initialized)\n";
     }
-    return 0;
+    return;
   }
 
-  // initialization of members
-  mFileDescriptor = 0;
-  mInitialized = false;
-  mTimeoutTalk = 0;
-  _mName = "";
-  _mDevicePath = "";
-  _mBaudrate = 0;
-  _mEndOfCommandString = "";
-  _mCFlag = 0;
-  _mTimeOut = 0;
-  _mLatency = 0;
-  _mDebug = false;
-  mTime  = 0;
-  _mOS = "";
-
-  // reading parameters from configuration-file
-  addParameter(&_mName, "Name", "Serial Communication");
-  addParameter(&_mDevicePath, "DevicePath", "/dev/rfcomm0");
-  addParameter(&_mBaudrate, "BaudRate", 4098);
-  addParameter(&_mEndOfCommandString, "EndOfCommandString", "\r\n");
-  addParameter(&_mCFlag, "CFlag", 0);
-  addParameter(&_mTimeOut, "TimeOut", 250000);
-  addParameter(&_mLatency, "Latency", 10000);
-  addParameter(&_mDebug, "Debug", false);
-  addParameter(&_mOS, "OperatingSystem", "Linux");
-  this->readOrDefaultConfiguration();
-
-  setEndOfCommandString(_mEndOfCommandString); // sets end-of-command-string
-
-#ifndef WIN32
-  // initialize communication on Linux
-  if(_mOS == "Linux") //!@todo Switch this to a #ifdef block?
+  if (mOldConfigMode)
   {
-    mFileDescriptor = open(_mDevicePath.c_str(), O_RDWR | O_NOCTTY);
+    std::cout << "Warning: you are using the old config interface. Please switch to the new one." << std::endl;
+  }
+
+  setEndOfCommandString(_mEndOfCommandString->getValue()); // sets end-of-command-string
+
+#ifndef _WIN32
+  // initialize communication on Linux
+  if(_mOS->getValue() == "Linux") //!@todo Switch this to a #ifdef block
+  {
+    mFileDescriptor = open(_mDevicePath->getValue().c_str(), O_RDWR | O_NOCTTY);
 
     if (mFileDescriptor == -1)
     {
-      if (_mDebug)
+      if (_mDebug->getValue())
       {
         std::cout << "SerialCommunication: Error opening Port '" << _mDevicePath << "' on Linux\n";
       }
-      return 0;
+      return; //@todo Throw an exception
     }
 
     tcgetattr(mFileDescriptor, &mTerminal); // save current modem settings
@@ -187,7 +223,7 @@ int SerialCommunication::init()
 
     // Set bps rate and hardware flow control and
     // 8n2 (8 bit, no parity, 2 stop bit).
-    switch (_mCFlag)
+    switch (_mCFlag->getValue())
     {
       case 0:
       {
@@ -208,8 +244,8 @@ int SerialCommunication::init()
       }
     }
 
-    cfsetospeed(&mTerminal, _mBaudrate);
-    cfsetispeed(&mTerminal, _mBaudrate);
+    cfsetospeed(&mTerminal, _mBaudrate->getValue());
+    cfsetispeed(&mTerminal, _mBaudrate->getValue());
     mTerminal.c_cc[VMIN] = 0;
     mTerminal.c_cc[VTIME] = 0;
     tcsetattr(mFileDescriptor, TCSANOW, &mTerminal);
@@ -217,38 +253,38 @@ int SerialCommunication::init()
 
   // initialize communication on Mac
 
-  else if(_mOS == "Apple")
+  else if(_mOS->getValue() == "Apple")
   {
     // mPortId="/dev/tty.PL2303-0000101D";
-    mFileDescriptor = open(_mDevicePath.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
+    mFileDescriptor = open(_mDevicePath->getValue().c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
     if (mFileDescriptor < 0)
     {
-      if (_mDebug)
+      if (_mDebug->getValue())
       {
         std::cout << "SerialCommunication: Error opening Port '" << _mDevicePath << "' on Mac.\n";
       }
-      return 0;
+      return; //!@todo Throw exception
     }
 
     if (fcntl(mFileDescriptor, F_SETFL, 0) < 0)
     {
-      if (_mDebug)
+      if (_mDebug->getValue())
       {
         printf("SerialCommunication: Error clearing O_NDELAY %s - %s(%d).\n",
-               _mDevicePath.c_str(), strerror(errno), errno);
+               _mDevicePath->getValue().c_str(), strerror(errno), errno);
       }
-      return 0;
+      return; //!@todo Throw an exception.
     }
 
     // Get the current options and save them for later reset.
     if (tcgetattr(mFileDescriptor, &mOriginalTTYAttrs) < 0)
     {
-      if (_mDebug)
+      if (_mDebug->getValue())
       {
         printf("SerialCommunication: Error getting tty attributes %s - %s(%d).\n",
-               _mDevicePath.c_str(), strerror(errno), errno);
+               _mDevicePath->getValue().c_str(), strerror(errno), errno);
       }
-      return 0;
+      return; //!@todo Throw exception.
     }
 
     // Set raw input, one second timeout.
@@ -260,57 +296,56 @@ int SerialCommunication::init()
     mTerminal.c_cc[VMIN] = 0;
     mTimeoutTalk = 30;
     mTerminal.c_cc[VTIME] = 0; //mTimeoutTalk;
-    mTerminal.c_ispeed = _mBaudrate; //38400
-    mTerminal.c_ospeed = _mBaudrate; //38400
+    mTerminal.c_ispeed = _mBaudrate->getValue();
+    mTerminal.c_ospeed = _mBaudrate->getValue();
     clear_my(mTerminal.c_cflag, CSIZE|PARENB); // Control modes
     set(mTerminal.c_cflag, CS8 | CSTOPB);
 
     // Set the options.
     if (tcsetattr(mFileDescriptor, TCSANOW, &mTerminal) < 0)
     {
-      if (_mDebug)
+      if (_mDebug->getValue())
       {
         printf("SerialCommunication: Error setting tty attributes %s - %s(%d).\n",
-               _mDevicePath.c_str(), strerror(errno), errno);
+               _mDevicePath->getValue().c_str(), strerror(errno), errno);
       }
-      return 0;
+      return; //!@todo Throw exception.
     }
   }
 
   else
   {
-    if (_mDebug)
+    if (_mDebug->getValue())
     {
       std::cout << "SerialCommunication: Error opening Port (OS unknown)\n";
     }
-    return 0;
+    return; //!@todo Throw exception.
   }
 
   tcflush(mFileDescriptor, TCIOFLUSH);
   mInitialized = true;
-  if (_mDebug)
+  if (_mDebug->getValue())
   {
-    std::cout << "SerialCommunication: Port '" << _mDevicePath << "' initialized\n";
+    std::cout << "SerialCommunication: Port '" << _mDevicePath->getValue() << "' initialized\n";
   }
-  return 1;
-#else // WIN32
-  return 0;
-#endif // WIN32
+#else // _WIN32
+  return;
+#endif // _WIN32
 }
 
-int SerialCommunication::send(const std::string& command)
+int cedar::dev::com::SerialCommunication::send(const std::string& command)
 {
-#ifndef WIN32
+#ifndef _WIN32
   if (!mInitialized)
   {
-    if (_mDebug)
+    if (_mDebug->getValue())
     {
       std::cout << "SerialCommunication: Error Sending Data (Port not initialized)\n";
     }
     return 0;
   }
 
-  if (_mDebug)
+  if (_mDebug->getValue())
   {
     mTimer.start();
   }
@@ -318,45 +353,45 @@ int SerialCommunication::send(const std::string& command)
   std::ostringstream stream;
   int s = 0; // status-information
 
-  stream << command << _mEndOfCommandString;
+  stream << command << mTranslatedEndOfCommandString;
   s = write(mFileDescriptor, stream.str().c_str(), stream.str().length());
 
   if (s < 0) // error errno occured
   {
-    if (_mDebug)
+    if (_mDebug->getValue())
     {
       std::cout << "SerialCommunication: Error Sending Data (" << strerror(errno) << ")\n";
     }
     tcflush(mFileDescriptor, TCOFLUSH);
     return 0;
   }
-  if (_mDebug)
+  if (_mDebug->getValue())
   {
     mTime = mTimer.elapsed();
     std::cout << "SerialCommunication: Sending Data Successful (" << s << " Bytes written to '"
               << _mDevicePath << "')\n" << "Sending-Time: " << mTime << " ms\n";
   }
 
-  usleep(_mLatency); // Delay following operations
+  usleep(_mLatency->getValue()); // Delay following operations
   return 1;
-#else // WIN32
+#else // _WIN32
   return 0;
-#endif // WIN32
+#endif // _WIN32
 }
 
-int SerialCommunication::receive(std::string& answer)
+int cedar::dev::com::SerialCommunication::receive(std::string& answer)
 {
-#ifndef WIN32
+#ifndef _WIN32
   if (!mInitialized)
   {
-    if (_mDebug)
+    if (_mDebug->getValue())
     {
       std::cout << "SerialCommunication: Error Receiving Data (Port not initialized)\n";
     }
     return 0;
   }
 
-  if (_mDebug)
+  if (_mDebug->getValue())
   {
     mTimer.start();
   }
@@ -374,7 +409,7 @@ int SerialCommunication::receive(std::string& answer)
   do
   {
     tv.tv_sec = 0;
-    tv.tv_usec = _mTimeOut;
+    tv.tv_usec = _mTimeOut->getValue();
     s = select(FD_SETSIZE, &read_fds, NULL, NULL, &tv); //check if channel is ready
 
     if (s>0) // channel ready
@@ -386,7 +421,7 @@ int SerialCommunication::receive(std::string& answer)
       }
       else //reading failed
       {
-        if (_mDebug)
+        if (_mDebug->getValue())
         {
           std::cout << "SerialCommunication: Error Receiving Data (" << strerror(errno) << ")\n";
         }
@@ -396,7 +431,7 @@ int SerialCommunication::receive(std::string& answer)
     }
     else if (s==0)  //select: timeOut
     {
-      if (_mDebug)
+      if (_mDebug->getValue())
       {
         std::cout << "SerialCommunication: Error Receiving Data (TimeOut)\n";
       }
@@ -407,7 +442,7 @@ int SerialCommunication::receive(std::string& answer)
     {
       if (errno != EINTR) // error is not an interrupt
       {
-        if (_mDebug)
+        if (_mDebug->getValue())
         {
           std::cout << "SerialCommunication: Error Receiving Data (" << strerror(errno) << ")\n";
         }
@@ -415,43 +450,46 @@ int SerialCommunication::receive(std::string& answer)
         return 0;
       }
     }
-    e = ans.str().find(_mEndOfCommandString); //search End-Of-Command-String, e = -1 if not found
+    e = ans.str().find(mTranslatedEndOfCommandString); //search End-Of-Command-String, e = -1 if not found
   } while (e < 0); //End-Of-Command-String not found
 
   answer = ans.str(); // write received string to desired location
   answer.resize(e); // delete End-Of-Command-String
 
-  if (_mDebug)
+  if (_mDebug->getValue())
   {
     mTime = mTimer.elapsed();
     std::cout << "SerialCommunication: Receiving Data Successful ("
-              << e << " Byte(s) read from '" << _mDevicePath << "')\n" << "Receiving-Time: " << mTime << " ms\n";
+              << e << " Byte(s) read from '" << _mDevicePath->getValue() << "')\n" << "Receiving-Time: " << mTime << " ms\n";
   }
   return e;
 #else
   return 0;
-#endif // WIN32
+#endif // _WIN32
 }
 
-void SerialCommunication::setEndOfCommandString(const std::string& eocString)
+void cedar::dev::com::SerialCommunication::setEndOfCommandString(const std::string& eocString)
 {
-  _mEndOfCommandString = eocString;
+  mTranslatedEndOfCommandString = eocString;
+  mTranslatedEndOfCommandString = cedar::aux::replace(mTranslatedEndOfCommandString, "\\r", "\r");
+  mTranslatedEndOfCommandString = cedar::aux::replace(mTranslatedEndOfCommandString, "\\n", "\n");
+  _mEndOfCommandString->setValue(eocString);
 }
 
-void SerialCommunication::close()
+void cedar::dev::com::SerialCommunication::close()
 {
-#ifndef WIN32
+#ifndef _WIN32
   int s = ::close(mFileDescriptor);
-  if (_mDebug)
+  if (_mDebug->getValue())
   {
     if (s == 0)
     {
-      std::cout << "Serial Communication: Port '" << _mDevicePath << "' closed\n";
+      std::cout << "Serial Communication: Port '" << _mDevicePath->getValue() << "' closed\n";
     }
     else
     {
-      std::cout << "Serial Communication: Error Closing Port '" << _mDevicePath << "'\n";
+      std::cout << "Serial Communication: Error Closing Port '" << _mDevicePath->getValue() << "'\n";
     }
   }
-#endif // WIN32
+#endif // _WIN32
 }

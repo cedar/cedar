@@ -41,22 +41,19 @@
 #ifndef CEDAR_PROC_GUI_DATA_PLOTTER_H
 #define CEDAR_PROC_GUI_DATA_PLOTTER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/auxiliaries/gui/MultiPlotInterface.h"
 #include "cedar/auxiliaries/Data.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QDockWidget>
 
-
-/*!@brief Abstract description of the class.
+/*!@brief Base class for a dockable plot.
  *
- * More detailed description of the class.
+ * This class decides, which plot fits best the given data and instantiate a plot of the right type.
  */
-class cedar::aux::gui::DataPlotter : public QDockWidget
+class cedar::aux::gui::DataPlotter : public cedar::aux::gui::MultiPlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -64,14 +61,15 @@ class cedar::aux::gui::DataPlotter : public QDockWidget
   Q_OBJECT
 
 public:
-  typedef cedar::aux::TypeBasedFactory<cedar::aux::Data, QWidget> WidgetFactory;
+  //!@brief a factory, which is currently not used
+  typedef cedar::aux::TypeBasedFactory<cedar::aux::DataPtr, boost::shared_ptr<QWidget> > WidgetFactory;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataPlotter(const std::string& title, QWidget *pParent = NULL);
+  DataPlotter(QWidget *pParent = NULL);
 
   //!@brief Destructor
   ~DataPlotter();
@@ -80,11 +78,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void plot(cedar::aux::DataPtr data);
+  //!@brief plot data
+  void plot(cedar::aux::DataPtr data, const std::string& title);
 
-  static WidgetFactory& getWidgetFactory();
+  bool canAppend(cedar::aux::ConstDataPtr data) const;
 
 public slots:
+  //!@brief slot that induces a redraw if data changes
   void dataChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -97,32 +97,22 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void doAppend(cedar::aux::DataPtr data, const std::string& title);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
+  //!@brief the displayed data
   cedar::aux::DataPtr mData;
 
-  static WidgetFactory mTypePlotters;
+  //!@brief The title of the data being displayed.
+  std::string mTitle;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
+  //!@brief Pointer to the current plot.
+  cedar::aux::gui::PlotInterface *mpCurrentPlot;
 
 }; // class cedar::aux::gui::DataPlotter
-
 #endif // CEDAR_PROC_GUI_DATA_PLOTTER_H
-

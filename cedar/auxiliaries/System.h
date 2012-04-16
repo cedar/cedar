@@ -37,14 +37,13 @@
 #ifndef CEDAR_AUX_SYSTEM_H
 #define CEDAR_AUX_SYSTEM_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <string>
 #include <QReadWriteLock>
+#include <fstream>
 
 
 /*!@brief Wrapper for some functions that depend on the operating system.
@@ -64,8 +63,30 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief try to get the home directory from standard environment variables
   static std::string getUserHomeDirectory();
+  
+  //!@brief try to get the directory in which application data of cedar is stored
   static std::string getUserApplicationDataDirectory();
+  
+  /*!@brief   Finds the path to the resource.
+   *
+   *          This function locates cedar resources. These resources are usually stored in cedar's resource directory.
+   * 
+   * @param   resourcePath The path to the resource, relative to cedar's resource directory.
+   *
+   * @remarks The function looks for the resource in the following order:
+   *          First, the function looks in the current path.
+   *          Then, if the environment-variable CEDAR_RESOURCE_PATH is set, the paths stored in it are searched.
+   *          Next, the function looks in ${CEDAR_HOME}, i.e., the directory in which cedar was originally compiled.
+   *          Lastly, the function looks in the cedar install directory.
+   *
+   */
+  static std::string locateResource(const std::string& resourcePath);
+
+  /*!@brief This function opens a crash report file in a standardized location.
+   */
+  static void openCrashFile(std::ofstream& stream, std::string& fileName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -82,25 +103,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  //!@brief For debugging only.
-  static QReadWriteLock mCOutLock;
-protected:
-  // none yet
-
-private:
-
 }; // class cedar::aux::System
 
 #endif // CEDAR_AUX_SYSTEM_H
-

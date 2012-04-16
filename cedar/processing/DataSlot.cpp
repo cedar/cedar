@@ -34,10 +34,10 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/DataSlot.h"
-
-// PROJECT INCLUDES
+#include "cedar/processing/Connectable.h"
+#include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
 
@@ -45,8 +45,14 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::DataSlot::DataSlot(cedar::proc::DataRole::Id role, const std::string& name, bool isMandatory)
+cedar::proc::DataSlot::DataSlot(
+                                 cedar::proc::DataRole::Id role,
+                                 const std::string& name,
+                                 cedar::proc::Connectable* pParent,
+                                 bool isMandatory
+                               )
 :
+mpParent(pParent),
 mMandatory(isMandatory),
 mValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN),
 mName(name),
@@ -94,27 +100,6 @@ bool cedar::proc::DataSlot::isMandatory() const
   return this->mMandatory;
 }
 
-void cedar::proc::DataSlot::setData(cedar::aux::DataPtr data)
-{
-  // reset validity when the data changes.
-  if (this->mRole == cedar::proc::DataRole::INPUT)
-  {
-    this->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
-  }
-
-  this->mData = data;
-}
-
-cedar::aux::DataPtr cedar::proc::DataSlot::getData()
-{
-  return this->mData;
-}
-
-cedar::aux::ConstDataPtr cedar::proc::DataSlot::getData() const
-{
-  return this->mData;
-}
-
 cedar::proc::DataRole::Id cedar::proc::DataSlot::getRole() const
 {
   return this->mRole;
@@ -123,4 +108,21 @@ cedar::proc::DataRole::Id cedar::proc::DataSlot::getRole() const
 const std::string& cedar::proc::DataSlot::getName() const
 {
   return this->mName;
+}
+
+const std::string& cedar::proc::DataSlot::getParent() const
+{
+  // lock does always work since parent exists as long as slot exists
+  return this->mpParent->getName();
+}
+
+cedar::proc::Connectable* cedar::proc::DataSlot::getParentPtr()
+{
+  // lock does always work since parent exists as long as slot exists
+  return mpParent;
+}
+
+bool cedar::proc::DataSlot::isParent(cedar::proc::ConstConnectablePtr parent) const
+{
+  return (parent.get() == mpParent);
 }

@@ -38,10 +38,8 @@
 #ifndef CEDAR_PROC_GUI_NAMESPACE_H
 #define CEDAR_PROC_GUI_NAMESPACE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/lib.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -57,36 +55,27 @@ namespace cedar
     {
       //!@cond SKIPPED_DOCUMENTATION
       class CEDAR_PROC_LIB_EXPORT ArchitectureToolBox;
-      class CEDAR_PROC_LIB_EXPORT BoolParameter;
       class CEDAR_PROC_LIB_EXPORT Connection;
       class CEDAR_PROC_LIB_EXPORT DataSlotItem;
-      class CEDAR_PROC_LIB_EXPORT DirectoryParameter;
-      class CEDAR_PROC_LIB_EXPORT DoubleParameter;
-      class CEDAR_PROC_LIB_EXPORT DoubleVectorParameter;
-      class CEDAR_PROC_LIB_EXPORT EnumParameter;
+      class CEDAR_PROC_LIB_EXPORT ElementClassList;
       class CEDAR_PROC_LIB_EXPORT GraphicsBase;
-      class CEDAR_PROC_LIB_EXPORT GroupItem;
       class CEDAR_PROC_LIB_EXPORT Ide;
       class CEDAR_PROC_LIB_EXPORT IdeApplication;
       class CEDAR_PROC_LIB_EXPORT MatrixPlotInterface;
-      class CEDAR_PROC_LIB_EXPORT NetworkFile;
-      typedef boost::shared_ptr<NetworkFile> NetworkFilePtr;
-      class CEDAR_PROC_LIB_EXPORT Parameter;
+      CEDAR_DECLARE_PROC_CLASS(Network);
       class CEDAR_PROC_LIB_EXPORT PluginLoadDialog;
       class CEDAR_PROC_LIB_EXPORT PropertyPane;
       class CEDAR_PROC_LIB_EXPORT PluginManagerDialog;
       class CEDAR_PROC_LIB_EXPORT Scene;
       class CEDAR_PROC_LIB_EXPORT Settings;
-      class CEDAR_PROC_LIB_EXPORT StepClassList;
       class CEDAR_PROC_LIB_EXPORT StepItem;
-      class CEDAR_PROC_LIB_EXPORT StringParameter;
       class CEDAR_PROC_LIB_EXPORT ToolBox;
       class CEDAR_PROC_LIB_EXPORT TriggerItem;
       class CEDAR_PROC_LIB_EXPORT View;
-      class CEDAR_PROC_LIB_EXPORT UIntParameter;
-      class CEDAR_PROC_LIB_EXPORT UIntVectorParameter;
+      class CEDAR_PROC_LIB_EXPORT ProjectionMappingParameter;
 
       /* Exceptions */
+      class CEDAR_PROC_LIB_EXPORT InvalidModeException;
       class CEDAR_PROC_LIB_EXPORT InvalidStepNameException;
       class CEDAR_PROC_LIB_EXPORT InvalidTriggerNameException;
       //!@endcond

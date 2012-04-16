@@ -37,11 +37,9 @@
 #ifndef CEDAR_AUX_IMAGE_DATA_H
 #define CEDAR_AUX_IMAGE_DATA_H
 
-// LOCAL INCLUDES
-#include "cedar/auxiliaries/DataTemplate.h"
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -51,15 +49,11 @@
 class cedar::aux::ImageData : public cedar::aux::MatData
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
-  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ImageData(const cv::Mat& value)
+  ImageData(const cv::Mat& value = cv::Mat())
   :
   cedar::aux::MatData(value)
   {
@@ -85,14 +79,6 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
   // none yet
 
 }; // class cedar::aux::ImageData

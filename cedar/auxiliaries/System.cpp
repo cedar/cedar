@@ -34,24 +34,31 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/System.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
-#if defined LINUX || defined APPLE
+#include <boost/date_time.hpp>
+#include <boost/filesystem.hpp>
+#include <cstdlib>
+
+#if defined __unix__
 #include <stdlib.h>
 #endif
 
-#ifdef WINDOWS
+#ifdef _WIN32
 #include <Shlobj.h>
 #include <comutil.h>
 
 #pragma comment(lib, "comsuppw")
-#endif
+#endif // _WIN32
 
-QReadWriteLock cedar::aux::System::mCOutLock;
+// INTERNALS HEADER
+#define CEDAR_INTERNAL
+#include "cedar/internals.h"
+#undef CEDAR_INTERNAL
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -61,12 +68,23 @@ QReadWriteLock cedar::aux::System::mCOutLock;
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::System::openCrashFile(std::ofstream& stream, std::string& crash_file)
+{
+  crash_file = cedar::aux::System::getUserHomeDirectory() + "/.cedar/crashes/";
+  boost::filesystem::create_directories(crash_file);
+  const boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+  crash_file += "processingIde.";
+  crash_file += boost::posix_time::to_iso_string(now);
+  crash_file += ".stacktrace";
+  stream.open(crash_file.c_str());
+}
+
 std::string cedar::aux::System::getUserHomeDirectory()
 {
-#ifdef UNIX
+#if defined __unix__ | defined __APPLE__
   std::string homedir = getenv("HOME");
   return homedir;
-#elif defined WINDOWS
+#elif defined _WIN32
   LPWSTR path = NULL;
   if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Profile, KF_FLAG_CREATE, 0, &path)))
   {
@@ -87,9 +105,9 @@ std::string cedar::aux::System::getUserHomeDirectory()
 
 std::string cedar::aux::System::getUserApplicationDataDirectory()
 {
-#ifdef UNIX
+#if defined __unix__ | defined __APPLE__
   return cedar::aux::System::getUserHomeDirectory();
-#elif defined WINDOWS
+#elif defined _WIN32
   LPWSTR path = NULL;
   if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_CREATE, 0, &path)))
   {
@@ -103,7 +121,56 @@ std::string cedar::aux::System::getUserApplicationDataDirectory()
     //!@todo handle errors
   }
   return "";
-#else
+#else // _WIN32
 #error Implement me for this OS!
-#endif
+#endif // _WIN32
 }
+
+std::string cedar::aux::System::locateResource(const std::string& resourcePath)
+{
+  std::string in_home = CEDAR_HOME_DIRECTORY "/resources/" + resourcePath;
+  std::string in_install = CEDAR_RESOURCE_INSTALL_DIR "/" + resourcePath;
+  std::string cedar_resource_path;
+  char *p_resource_path = getenv("CEDAR_RESOURCE_PATH");
+  if (p_resource_path)
+  {
+    cedar_resource_path = p_resource_path;
+  }
+  
+  if (boost::filesystem::exists(resourcePath))
+  {
+    cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" locally.", "cedar::aux::System::locateResource");
+    return resourcePath;
+  }
+  
+  if (!cedar_resource_path.empty())
+  {
+    // this bool is used to avoid notifying about using the environment variable every time this function is used.
+    static bool notified_about_this = false;
+    if (!notified_about_this)
+    {
+      cedar::aux::LogSingleton::getInstance()->systemInfo("Using CEDAR_RESOURCE_PATH for finding resources.", "cedar::aux::System::locateResource");
+      notified_about_this = true;
+    }
+    std::string path = cedar_resource_path + "/" + resourcePath;
+    if (boost::filesystem::exists(path))
+    {
+      cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + path + "\".", "cedar::aux::System::locateResource");
+      return path;
+    }
+  }
+  
+  if (boost::filesystem::exists(in_home))
+  {
+    cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + in_home + "\".", "cedar::aux::System::locateResource");
+    return in_home;
+  }
+  if (boost::filesystem::exists(in_install))
+  {
+    cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + in_install + "\".", "cedar::aux::System::locateResource");
+    return in_install;
+  }
+  
+  CEDAR_THROW(cedar::aux::ResourceNotFoundException, "The resource \"" + resourcePath + "\" could not be found.");
+}
+

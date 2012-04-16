@@ -41,25 +41,23 @@
 #ifndef CEDAR_AUX_GUI_MATRIX_PLOT_1D_H
 #define CEDAR_AUX_GUI_MATRIX_PLOT_1D_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/DataPlotInterface.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/gui/MultiPlotInterface.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
 #include <QReadWriteLock>
 #include <qwt/qwt_plot.h>
 #include <qwt/qwt_plot_curve.h>
+#include <qwt/qwt_plot_marker.h>
 #include <opencv2/opencv.hpp>
 
-
-/*!@brief Abstract description of the class.
+/*!@brief Matrix plot that can display 1D matrices (i.e. vectors).
  *
- * More detailed description of the class.
+ * @todo Write more detailed description of the class here.
  */
-class cedar::aux::gui::MatrixPlot1D : public DataPlotInterface
+class cedar::aux::gui::MatrixPlot1D : public cedar::aux::gui::MultiPlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -69,6 +67,32 @@ class cedar::aux::gui::MatrixPlot1D : public DataPlotInterface
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  struct PlotSeries
+  {
+    PlotSeries()
+    :
+    mpCurve(NULL)
+    {
+    }
+
+    ~PlotSeries()
+    {
+    }
+
+    //!@brief the displayed data
+    cedar::aux::MatDataPtr mMatData;
+    //!@brief a curve inside the plot
+    QwtPlotCurve *mpCurve;
+    //!@brief the x values of the plot
+    std::vector<double> mXValues;
+    //!@brief the y values of the plot
+    std::vector<double> mYValues;
+  };
+
+  CEDAR_GENERATE_POINTER_TYPES(PlotSeries);
+
+  typedef std::vector<PlotSeriesPtr> PlotSeriesVector;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -77,7 +101,8 @@ public:
   //!@brief The standard constructor.
   MatrixPlot1D(QWidget *pParent = NULL);
 
-  MatrixPlot1D(cedar::aux::DataPtr matData, QWidget *pParent = NULL);
+  //!@brief Constructor expecting a DataPtr.
+  MatrixPlot1D(cedar::aux::DataPtr matData, const std::string& title, QWidget *pParent = NULL);
 
   //!@brief Destructor
   ~MatrixPlot1D();
@@ -86,48 +111,70 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void display(cedar::aux::DataPtr matData);
+  //!@brief display data
+  void plot(cedar::aux::DataPtr matData, const std::string& title);
+  //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
+
+  /*!
+   * @remarks This method is a temporary way to provide annotations, a more general one will be added soon.
+   */
+  void attachMarker(QwtPlotMarker *pMarker);
+
+  /*!@brief Detaches and deletes all markers added to this plot.
+   *
+   * @remarks This method is a temporary way to provide annotations, a more general one will be added soon.
+   */
+  void clearMarkers();
+
+  bool canAppend(cedar::aux::ConstDataPtr data) const;
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief create and handle the context menu
   void contextMenuEvent(QContextMenuEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief initialize
   void init();
-  void setPlotStyle(QwtPlotCurve *pCurve);
+
+  //!@brief (Re-)initializes the x and y value arrays.
+  void buildArrays(PlotSeriesPtr series, unsigned int new_size);
+
+  void doAppend(cedar::aux::DataPtr data, const std::string& title);
+
+  //!@brief Applies a plot style to a given curve.
+  static void applyStyle(size_t lineId, QwtPlotCurve *pCurve);
+
+private slots:
+  void showLegend(bool show = true);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  cedar::aux::MatDataPtr mMatData;
+  //!@brief a plot
   QwtPlot *mpPlot;
-  QwtPlotCurve *mpCurve;
-  std::vector<double> mpXValues;
-  std::vector<double> mpYValues;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
+  PlotSeriesVector mPlotSeriesVector;
 
-private:
-  // none yet
+  //! For locking the plot itself.
+  QReadWriteLock *mpLock;
+
+  //! A vector containing all the colors used for plot lines.
+  static std::vector<QColor> mLineColors;
+
+  //! A vector containing all the line stypes for the plot.
+  static std::vector<Qt::PenStyle> mLineStyles;
 
 }; // class cedar::aux::gui::MatrixPlot1D
 
 #endif // CEDAR_AUX_GUI_MATRIX_PLOT_1D_H
-

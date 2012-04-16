@@ -41,18 +41,16 @@
 #ifndef CEDAR_AUX_MATH_SIGMOID_DECLARATION_H
 #define CEDAR_AUX_MATH_SIGMOID_DECLARATION_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
-#include "cedar/auxiliaries/AbstractFactory.h"
-#include "cedar/auxiliaries/AbstractFactoryDerived.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/Factory.h"
+#include "cedar/auxiliaries/FactoryDerived.h"
 
 // SYSTEM INCLUDES
 
+
 /*!@brief A SigmoidDeclaration contains the relation of a unique class id (as string) and the corresponding factory to
- * create a sigmoid of this id. It is a concretization of DeclarationBase.
- *
+ *        create a sigmoid of this id. It is a concretization of DeclarationBase.
  */
 class cedar::aux::math::SigmoidDeclaration
 {
@@ -61,6 +59,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
+  //!@brief constructor
   SigmoidDeclaration(
                       cedar::aux::math::SigmoidFactoryPtr classFactory,
                       const std::string& classId,
@@ -73,6 +72,7 @@ public:
   {
   }
 
+  //!@brief destructor
   virtual ~SigmoidDeclaration()
   {
   }
@@ -81,16 +81,16 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  cedar::aux::math::SigmoidFactoryPtr getObjectFactory()
-  {
-    return this->mpClassFactory;
-  }
+  //!@brief get a factory for this declared sigmoid type
+  cedar::aux::math::SigmoidFactoryPtr getObjectFactory();
 
+  //!@brief get the id of the declared sigmoid class
   const std::string& getClassId() const
   {
     return this->mClassId;
   }
 
+  //!@brief get the category defined in this declaration
   const std::string& getCategory() const
   {
     return this->mCategory;
@@ -150,26 +150,17 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief pointer to a factory, which can allocate instances of ths declared class
   cedar::aux::math::SigmoidFactoryPtr mpClassFactory;
+  //!@brief a unique class id
   std::string mClassId;
+  //!@brief a category
   std::string mCategory;
-private:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
 private:
   // none yet
 };
 
-
-/*!@brief Abstract description of the class with templates.
- *
- * More detailed description of the class with templates.
+/*!@brief Template for convenient declaration of sigmoid classes.
  */
 template <class DerivedClass>
 class cedar::aux::math::SigmoidDeclarationT : public cedar::aux::math::SigmoidDeclaration
@@ -188,9 +179,9 @@ public:
                     const std::string& category = "misc."
                   )
   :
-    SigmoidDeclaration
+  SigmoidDeclaration
   (
-    cedar::aux::math::SigmoidFactoryPtr(new cedar::aux::AbstractFactoryDerived<cedar::aux::math::Sigmoid, DerivedClass>()),
+    cedar::aux::math::SigmoidFactoryPtr(new cedar::aux::FactoryDerived<cedar::aux::math::SigmoidPtr, DerivedClass>()),
     classId,
     category
   )
@@ -202,6 +193,7 @@ public:
   {
   }
 
+  //!@brief check if a given ptr to a sigmoid is of this declaration's type
   bool isObjectInstanceOf(cedar::aux::math::SigmoidPtr pointer)
   {
     return dynamic_cast<DerivedClass*>(pointer.get()) != NULL;
@@ -209,4 +201,3 @@ public:
 }; // class cedar::aux::math::SigmoidDeclarationT
 
 #endif // CEDAR_AUX_MATH_SIGMOID_DECLARATION_H
-

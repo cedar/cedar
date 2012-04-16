@@ -41,10 +41,8 @@
 #ifndef CEDAR_PROC_GUI_TOOLBOX_H
 #define CEDAR_PROC_GUI_TOOLBOX_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QWidget>
@@ -53,11 +51,7 @@
 #include <map>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
- *
- * @todo Calculate the number of columns based on the widget size and a provided button width.
+/*!@brief This is a base class for widgets that contain little boxes that represent some tools.
  */
 class cedar::proc::gui::ToolBox : public QWidget
 {
@@ -117,8 +111,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -133,18 +125,6 @@ private:
   //!@brief map of all buttons in the widget
   std::map<std::string, QToolButton*> mButtons;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::proc::gui::ToolBox
 
 #endif // CEDAR_PROC_GUI_TOOLBOX_H
-

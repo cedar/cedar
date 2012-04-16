@@ -34,33 +34,62 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/steps/Resize.h"
-
-// PROJECT INCLUDES
 #include "cedar/processing/DataSlot.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/MatrixIterator.h"
+#include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
 #include <vector>
 
 //----------------------------------------------------------------------------------------------------------------------
-// static member
+// static members
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::aux::EnumType<cedar::proc::steps::Resize::Interpolation> cedar::proc::steps::Resize::Interpolation::mType;
 
-#ifndef MSVC
+#ifndef _MSC_VER
 const cedar::proc::steps::Resize::Interpolation::Id cedar::proc::steps::Resize::Interpolation::LINEAR;
 const cedar::proc::steps::Resize::Interpolation::Id cedar::proc::steps::Resize::Interpolation::NEAREST;
 const cedar::proc::steps::Resize::Interpolation::Id cedar::proc::steps::Resize::Interpolation::AREA;
 const cedar::proc::steps::Resize::Interpolation::Id cedar::proc::steps::Resize::Interpolation::CUBIC;
 const cedar::proc::steps::Resize::Interpolation::Id cedar::proc::steps::Resize::Interpolation::LANCZOS4;
-#endif // MSVC
+#endif // _MSC_VER
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr resize_decl
+    (
+      new ElementDeclarationTemplate<cedar::proc::steps::Resize>
+      (
+        "Utilities",
+        "cedar.processing.Resize"
+      )
+    );
+    resize_decl->setIconPath(":/steps/resize.svg");
+    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(resize_decl);
+
+    return true;
+  }
+
+  bool declared = declare();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -96,31 +125,45 @@ void cedar::proc::steps::Resize::compute(const cedar::proc::Arguments&)
   const cv::Mat& input = this->mInput->getData();
   cv::Mat& output = this->mOutput->getData();
 
-  if (this->_mOutputSize->size() <= 2)
+  switch (this->_mOutputSize->size()) // switch based on the dimensionality of the input/output
   {
-    cv::Size size = this->getOutputSize();
-    cv::resize(input, output, size, 0, 0, this->_mInterpolationType->getValue());
-  }
-  else
-  {
-    CEDAR_ASSERT(this->_mInterpolationType->getValue() == cedar::proc::steps::Resize::Interpolation::LINEAR);
-
-    switch (this->_mInterpolationType->getValue())
+    case 0:
+    case 1:
     {
-      default:
-        std::cout << "Unimplemented interpolation type in cedar::proc::steps::Resize::compute. "
-                  << "Defaulting to linear interpolation."
-                  << std::endl;
-      case cedar::proc::steps::Resize::Interpolation::LINEAR:
+      cv::Size size = this->getOutputSize();
+      cv::Mat src = cedar::aux::math::canonicalColVector(input);
+      cv::resize(src, output, size, 0, 0, this->_mInterpolationType->getValue());
+      break;
+    }
+
+    case 2:
+    {
+      cv::Size size = this->getOutputSize();
+      cv::resize(input, output, size, 0, 0, this->_mInterpolationType->getValue());
+      break;
+    }
+
+    default:
+    {
+      CEDAR_ASSERT(this->_mInterpolationType->getValue() == cedar::proc::steps::Resize::Interpolation::LINEAR);
+
+      switch (this->_mInterpolationType->getValue())
       {
-        cedar::aux::MatrixIterator iter(output);
-        do
+        default:
+          std::cout << "Unimplemented interpolation type in cedar::proc::steps::Resize::compute. "
+                    << "Defaulting to linear interpolation."
+                    << std::endl;
+        case cedar::proc::steps::Resize::Interpolation::LINEAR:
         {
-          double interpolated_value = this->linearInterpolationND(input, output, iter.getCurrentIndexVector());
-          cedar::aux::math::assignMatrixEntry(output, iter.getCurrentIndexVector(), interpolated_value);
+          cedar::aux::MatrixIterator iter(output);
+          do
+          {
+            double interpolated_value = this->linearInterpolationND(input, output, iter.getCurrentIndexVector());
+            cedar::aux::math::assignMatrixEntry(output, iter.getCurrentIndexVector(), interpolated_value);
+          }
+          while (iter.increment());
+          break;
         }
-        while (iter.increment());
-        break;
       }
     }
   }
@@ -182,7 +225,7 @@ void cedar::proc::steps::Resize::linearInterpolationNDRecursion
   {
     // case 1: end of the recursion
     //         - this part interpolates between the actual values along each combination of dimensions.
-    unsigned int num = pow(2, source.dims - 1);
+    unsigned int num = 1 << (source.dims - 1); // same as 2^(dims - 1)
     interpolatedValues.resize(num);
 
     int lower_index = bounds.at(currentDimension).first;
@@ -225,7 +268,7 @@ void cedar::proc::steps::Resize::linearInterpolationNDRecursion
     double distance = interpolatedIndices.at(currentDimension) - static_cast<double>(lower_index);
 
     // process the result of the recursion
-    size_t num = pow(2, currentDimension);
+    size_t num = 1 << (source.dims - 1); // 2^(dims - 1)
     interpolatedValues.resize(num);
     for (size_t i = 0; i < num; ++i)
     {
@@ -253,8 +296,25 @@ cv::Size cedar::proc::steps::Resize::getOutputSize() const
 
 void cedar::proc::steps::Resize::outputSizeChanged()
 {
+  this->updateOutputMatrixSize();
+  this->onTrigger();
+}
+
+void cedar::proc::steps::Resize::updateOutputMatrixSize()
+{
+  if (!this->mInput)
+  {
+    return;
+  }
+
   const cv::Mat& input = this->mInput->getData();
   int size = static_cast<int>(this->_mOutputSize->size());
+
+  if (this->_mOutputSize->size() == 0)
+  {
+    return;
+  }
+
   std::vector<int> sizes;
   for (size_t i = 0; i < this->_mOutputSize->size(); ++i)
   {
@@ -262,8 +322,6 @@ void cedar::proc::steps::Resize::outputSizeChanged()
   }
   cv::Mat new_output_mat = cv::Mat(size, &sizes.at(0), input.type(), cv::Scalar(0));
   this->mOutput->setData(new_output_mat);
-
-  this->onTrigger();
 }
 
 void cedar::proc::steps::Resize::recompute()
@@ -298,7 +356,7 @@ void cedar::proc::steps::Resize::inputConnectionChanged(const std::string& input
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
   // Assign the input to the member. This saves us from casting in every computation step.
-  this->mInput = boost::shared_dynamic_cast<cedar::aux::MatData>(this->getInput(inputName));
+  this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
   // This should always work since other types should not be accepted.
   CEDAR_DEBUG_ASSERT(this->mInput);
 
@@ -309,5 +367,5 @@ void cedar::proc::steps::Resize::inputConnectionChanged(const std::string& input
   this->_mOutputSize->resize(cedar::aux::math::getDimensionalityOf(input), 1);
 
   // Finally, this also requires a recomputation of the output.
-  this->outputSizeChanged();
+  this->updateOutputMatrixSize();
 }

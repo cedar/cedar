@@ -37,21 +37,16 @@
 #ifndef CEDAR_AUX_GUI_HISTORY_PLOT_H
 #define CEDAR_AUX_GUI_HISTORY_PLOT_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/DataPlotInterface.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/gui/PlotInterface.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
 
-
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief A plot that records and displays the history of numerical data.
  */
-class cedar::aux::gui::HistoryPlot : public cedar::aux::gui::DataPlotInterface
+class cedar::aux::gui::HistoryPlot : public cedar::aux::gui::PlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -72,7 +67,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void display(cedar::aux::DataPtr data);
+  void plot(cedar::aux::DataPtr data, const std::string& title);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -94,19 +89,6 @@ protected:
 private:
   cedar::aux::DataPtr mData;
   QWidget *mpCurrentPlotWidget;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::gui::HistoryPlot
 
 #endif // CEDAR_AUX_GUI_HISTORY_PLOT_H
-

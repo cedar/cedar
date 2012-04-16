@@ -37,14 +37,12 @@
 #ifndef CEDAR_PROC_STEPS_RESIZE_H
 #define CEDAR_PROC_STEPS_RESIZE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/steps/namespace.h"
-
-// PROJECT INCLUDES
 #include "cedar/processing/Step.h"
-#include "cedar/auxiliaries/NumericVectorParameter.h"
+#include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 
@@ -188,12 +186,16 @@ private:
     std::vector<double>& interpolatedValues
   );
 
+  /*!@brief Adapts the size of the output matrix.
+   */
+  void updateOutputMatrixSize();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief MatrixData representing the input. Storing it like this saves time during computation.
-  cedar::aux::MatDataPtr mInput;
+  cedar::aux::ConstMatDataPtr mInput;
 
   //!@brief The data containing the output.
   cedar::aux::MatDataPtr mOutput;

@@ -44,28 +44,20 @@ cedar_add_library(cedarproc
   cedarunits
   MOC_HEADERS
   gui/ArchitectureToolBox.h
-  gui/BoolParameter.h
-  gui/DoubleParameter.h
-  gui/DoubleVectorParameter.h
-  gui/EnumParameter.h
+  gui/ElementClassList.h
   gui/Ide.h
   gui/IdeApplication.h
-  gui/Parameter.h
   gui/PluginLoadDialog.h
   gui/PluginManagerDialog.h
-  gui/PropertyPane.h
+  gui/ProjectionMappingParameter.h
   gui/Scene.h
   gui/StepItem.h
-  gui/StepClassList.h
-  gui/StringParameter.h
   gui/ToolBox.h
-  gui/UIntParameter.h
-  gui/UIntVectorParameter.h
-  gui/DirectoryParameter.h
   gui/View.h
-  source/GaussInput.h
+  sources/GaussInput.h
   steps/StaticGain.h
   source/NetReader.h
+  steps/Projection.h
   steps/Resize.h
   steps/NetWriter.h
   LoopedTrigger.h

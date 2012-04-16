@@ -48,15 +48,12 @@
 #include <iostream>
 
 
-using namespace cedar::tests::unit::dev::robot::Robot;
-using namespace cedar::dev::robot;
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 //! constructor
-TestRobot::TestRobot(void)
+cedar::tests::unit::dev::robot::Robot::TestRobot::TestRobot(void)
 :
 cedar::dev::robot::Robot()
 {
@@ -65,7 +62,7 @@ cedar::dev::robot::Robot()
 }
 
 //! destructor
-TestRobot::~TestRobot()
+cedar::tests::unit::dev::robot::Robot::TestRobot::~TestRobot()
 {
 }
 
@@ -73,9 +70,13 @@ TestRobot::~TestRobot()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-ComponentPtr TestRobot::createComponent(const std::string& rComponentName)
+cedar::dev::robot::ComponentPtr
+  cedar::tests::unit::dev::robot::Robot::TestRobot::createComponent(const std::string& rComponentName)
 {
-  ComponentPtr test_component(new TestComponent(rComponentName));
+  cedar::dev::robot::ComponentPtr test_component
+  (
+    new cedar::tests::unit::dev::robot::Robot::TestComponent(rComponentName)
+  );
 
   return test_component;
 }

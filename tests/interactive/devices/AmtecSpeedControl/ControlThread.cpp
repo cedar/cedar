@@ -47,7 +47,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 ControlThread::ControlThread(
-                              const cedar::dev::robot::KinematicChainPtr &kinematicChain,
+                              const cedar::dev::robot::KinematicChainPtr kinematicChain,
                               const std::string& configFileName
                             )
 :
@@ -58,7 +58,7 @@ cedar::aux::LoopedThread(100, 0.01, configFileName)
 }
 
 
-void ControlThread::step(double stepSize)
+void ControlThread::step(double)
 {
   double current_pos = mpKinematicChain->getJointAngle(JOINT);
   double current_vel = mpKinematicChain->getJointVelocity(JOINT);
@@ -66,6 +66,7 @@ void ControlThread::step(double stepSize)
   double rate_of_change = 1.0 * (TARGET - current_pos);
   rate_of_change = std::min<double>(rate_of_change, current_vel + 0.4);
 
+  //todo: use a log instead of the std::cout
   std::cout << "setting speed " << rate_of_change << std::endl;
   mpKinematicChain->setJointVelocity(JOINT, rate_of_change);
 }

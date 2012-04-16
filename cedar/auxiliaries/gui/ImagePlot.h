@@ -37,11 +37,9 @@
 #ifndef CEDAR_AUX_GUI_IMAGE_PLOT_H
 #define CEDAR_AUX_GUI_IMAGE_PLOT_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/DataPlotInterface.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/gui/PlotInterface.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -50,16 +48,26 @@
 #include <qwtplot3d/qwt3d_types.h>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief A plot for images.
  */
-class cedar::aux::gui::ImagePlot : public DataPlotInterface
+class cedar::aux::gui::ImagePlot : public cedar::aux::gui::PlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  //! Enum for quickly accessing the type of the data displayed by the viewer.
+  enum DataType
+  {
+    DATA_TYPE_IMAGE,
+    DATA_TYPE_MAT,
+    DATA_TYPE_UNKNOWN
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -68,31 +76,47 @@ public:
   //!@brief The standard constructor.
   ImagePlot(QWidget *pParent = NULL);
 
-  //!@brief Destructor
+  //!@brief Destructor.
   ~ImagePlot();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void display(cedar::aux::DataPtr data);
+  /*!@brief Displays the data.
+   *
+   * @param data A pointer to the data to display. If this isn't a pointer to a cedar::aux::ImageData, the function
+   *             throws.
+   */
+  void plot(cedar::aux::DataPtr data, const std::string& title);
+
+  /*!@brief Updates the plot periodically.
+   */
   void timerEvent(QTimerEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // to make sure the image aspect ratio is kept correct
+  /*!@brief Reacts to a resize of the plot.
+   */
   void resizeEvent(QResizeEvent *event);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /*!@brief Resizes the pixmap used to display the image data.
+   */
   void resizePixmap();
 
+  /*!@brief Converts a one-channel input matrix to a three-channel matrix that contains the one-channel matrix in all
+   *        channels.
+   */
   cv::Mat threeChannelGrayscale(const cv::Mat& in) const;
 
+  /*!@brief Creates the image based on the matrix.
+   */
   void imageFromMat(const cv::Mat& mat);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -101,21 +125,24 @@ private:
 protected:
   // none yet
 private:
+  //! Label used for displaying the image.
   QLabel *mpImageDisplay;
-  cedar::aux::ImageDataPtr mData;
+
+  //! Data displayed by the plot.
+  cedar::aux::MatDataPtr mData;
+
+  //! Converted image.
   QImage mImage;
+
+  //! Id of the timer used for updating the plot.
   int mTimerId;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
+  //! Type of the data.
+  DataType mDataType;
 
-private:
-  // none yet
+  static std::vector<char> mLookupTableR;
+  static std::vector<char> mLookupTableG;
+  static std::vector<char> mLookupTableB;
 
 }; // class cedar::aux::gui::ImagePlot
-
 #endif // CEDAR_AUX_GUI_IMAGE_PLOT_H
-

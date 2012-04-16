@@ -37,21 +37,29 @@
 #ifndef CEDAR_PROC_DATA_SLOT_H
 #define CEDAR_PROC_DATA_SLOT_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/DataRole.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief This class represents data slots in connectable objects.
  *
- * More detailed description of the class.
+ *        Connectable objects can have a number of DataSlots associated with them. These slots represent, e.g., inputs
+ *        of the connectable and are used to define what data a connectable expects as input.
+ *
+ * @todo The design of having a parent and returning a shared pointer to connect two slots is not perfect.
  */
 class cedar::proc::DataSlot
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::Connectable;
+  friend class cedar::proc::DataConnection;
+  friend class cedar::proc::Network;
+
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
@@ -75,7 +83,12 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataSlot(cedar::proc::DataRole::Id role, const std::string& name, bool isMandatory = true);
+  DataSlot(
+            cedar::proc::DataRole::Id role,
+            const std::string& name,
+            cedar::proc::Connectable* pParent,
+            bool isMandatory = true
+          );
 
   //!@brief Destructor
   virtual ~DataSlot();
@@ -84,24 +97,38 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  cedar::aux::DataPtr getData();
-  cedar::aux::ConstDataPtr getData() const;
+  //!@brief get the encapsulated DataPtr managed by this slot
+  virtual cedar::aux::DataPtr getData() = 0;
 
+  //!@brief get the encapsulated DataPtr managed by this slot as const
+  virtual cedar::aux::ConstDataPtr getData() const = 0;
+
+  //!@brief get the role (input, output...) of this slot
   cedar::proc::DataRole::Id getRole() const;
 
-  void setData(cedar::aux::DataPtr data);
-
+  //!@brief get the name of this slot
   const std::string& getName() const;
 
+  //!@brief get the name of this slot's parent
+  const std::string& getParent() const;
+
+  //!@brief set some explanatory text for this slot
   void setText(const std::string& text);
 
   //!@brief Returns the text to display to the user.
   const std::string& getText() const;
 
+  //!@brief is this a mandatory connection? i.e. there must be at least one connection using this slot
   bool isMandatory() const;
 
+  //!@brief get the current validity of this slot
   VALIDITY getValidlity() const;
+
+  //!@brief set the current validity of this slot
   void setValidity(VALIDITY validity);
+
+  //!@brief checks if this Connectable is the parent of this DataSlotItem
+  bool isParent(cedar::proc::ConstConnectablePtr parent) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -113,16 +140,23 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief set the internal DataPtr managed by this slot
+  virtual void setData(cedar::aux::DataPtr data) = 0;
+  //!@brief get the pointer of this slot's parent
+  cedar::proc::Connectable* getParentPtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //! The parent that owns the slot.
+  cedar::proc::Connectable* mpParent;
+
 private:
-  cedar::aux::DataPtr mData;
+  //!@brief flag if this slot must be connected
   bool mMandatory;
+
+  //!@brief the validity of this slot
   VALIDITY mValidity;
 
   //! Name of the slot, used to uniquely identify it among other slots of the same type in a step.
@@ -133,17 +167,6 @@ private:
 
   //! Role of the slot (input, output, ...)
   cedar::proc::DataRole::Id mRole;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::proc::DataSlot
 
 #endif // CEDAR_PROC_DATA_SLOT_H
-

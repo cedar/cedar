@@ -33,56 +33,52 @@
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES
-#include "SimulatedKinematicChain.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/devices/robot/SimulatedKinematicChain.h"
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
-
-using namespace cedar::dev::robot;
-using namespace std;
-using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-SimulatedKinematicChain::SimulatedKinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry)
-:
-KinematicChain(rpReferenceGeometry)
-{
-  init();
-}
-
-SimulatedKinematicChain::SimulatedKinematicChain(const std::string& configFileName)
+cedar::dev::robot::SimulatedKinematicChain::SimulatedKinematicChain(const std::string& configFileName)
 :
 KinematicChain(configFileName)
 {
   init();
 }
 
-SimulatedKinematicChain::~SimulatedKinematicChain()
+cedar::dev::robot::SimulatedKinematicChain::~SimulatedKinematicChain()
 {
-  
+  if (isRunning())
+  {
+    this->stop();
+    this->wait();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double SimulatedKinematicChain::getJointAngle(unsigned int index)
+bool cedar::dev::robot::SimulatedKinematicChain::isMovable() const
+{
+  return true;
+}
+
+double cedar::dev::robot::SimulatedKinematicChain::getJointAngle(unsigned int index) const
 {
   return mJointAngles.at<double>(index, 0);
 }
 
-void SimulatedKinematicChain::setJointAngle(unsigned int index, double angle)
+void cedar::dev::robot::SimulatedKinematicChain::setJointAngle(unsigned int index, double angle)
 {
   mJointAngles.at<double>(index, 0) = angle;
 }
 
-void SimulatedKinematicChain::init()
+void cedar::dev::robot::SimulatedKinematicChain::init()
 {
-  mJointAngles = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+  mJointAngles = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
 }

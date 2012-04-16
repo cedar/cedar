@@ -34,21 +34,15 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-
+// CEDAR INCLUDES
 #include "cedar/devices/kteam/gui/EPuckControlWidget.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
-using namespace cedar::dev::kteam::gui;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
-EPuckControlWidget::EPuckControlWidget(cedar::dev::kteam::EPuckDrive *peDrive, QWidget *parent)
+cedar::dev::kteam::gui::EPuckControlWidget::EPuckControlWidget(cedar::dev::kteam::EPuckDrive *peDrive, QWidget *parent)
 :
 cedar::aux::gui::BaseWidget("EPuckControlWidget", parent)
 {
@@ -62,7 +56,7 @@ cedar::aux::gui::BaseWidget("EPuckControlWidget", parent)
   startTimer(100); //timer for updating display
 }
 
-EPuckControlWidget::~EPuckControlWidget()
+cedar::dev::kteam::gui::EPuckControlWidget::~EPuckControlWidget()
 {
 
 }
@@ -70,32 +64,31 @@ EPuckControlWidget::~EPuckControlWidget()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-void EPuckControlWidget::drive()
+void cedar::dev::kteam::gui::EPuckControlWidget::drive()
 {
   mpeDrive->setVelocity(spinBoxForwardVelocity->value(), spinBoxTurningRate->value());
 }
 
-void EPuckControlWidget::stop()
+void cedar::dev::kteam::gui::EPuckControlWidget::stop()
 {
   mpeDrive->stop();
 }
 
-void EPuckControlWidget::reset()
+void cedar::dev::kteam::gui::EPuckControlWidget::reset()
 {
   mpeDrive->reset();
 }
 
-void EPuckControlWidget::timerEvent(QTimerEvent * /* event */)
+void cedar::dev::kteam::gui::EPuckControlWidget::timerEvent(QTimerEvent * /* event */)
 {
   int left_encoder;
   int right_encoder;
 
-  //get new values
+  // get new values
   std::vector<double> wheel_speed = mpeDrive->getWheelSpeed();
   mpeDrive->getEncoder(left_encoder, right_encoder);
 
-  //display new values
+  // display new values
   valueLeftWheelSpeed->display(wheel_speed[0]);
   valueRightWheelSpeed->display(wheel_speed[1]);
   valueLeftEncoder->display(left_encoder);

@@ -34,10 +34,11 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/kernel/Separable.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -47,38 +48,46 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::kernel::Separable::Separable()
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
 }
 
-cedar::aux::kernel::Separable::Separable(unsigned int dimensionality, const std::string& kernelFile)
+cedar::aux::kernel::Separable::Separable(unsigned int dimensionality)
 :
-cedar::aux::kernel::Kernel(dimensionality, kernelFile)
+cedar::aux::kernel::Kernel(dimensionality)
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+
+  this->mKernelParts.resize(dimensionality);
 }
 
 cedar::aux::kernel::Separable::~Separable()
 {
-#ifdef DEBUG
-  std::cout << "> freeing data (Separable)" << std::endl;
-#endif
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-void cedar::aux::kernel::Separable::setNumParts(unsigned int numParts)
-{
-  this->mKernelParts.resize(numParts);
-}
-
 cv::Mat cedar::aux::kernel::Separable::convolveWith(const cv::Mat& mat) const
 {
   cv::Mat tmp = mat.clone();
-  //!@todo Create a convolve function in cedar::aux(::?) and use it here. That method should also handle any dimensionaly.
-  //!@todo Parameter of the convolution must be changeable.
   for (unsigned int i = 0; i < this->mKernelParts.size(); ++i)
   {
-    const cv::Mat& kernel_part = this->getKernelPart(i);
-    cv::filter2D(tmp, tmp, -1, kernel_part);
+    cv::Mat kernel;
+    switch (i)
+    {
+      case 0:
+        kernel = this->getKernelPart(i);
+        break;
+
+      case 1:
+        kernel = this->getKernelPart(i).t();
+        break;
+
+      default:
+        CEDAR_THROW(cedar::aux::UnhandledValueException, "Cannot add more than three dimensions to a kernel (yet).");
+    }
+
+    tmp = cedar::aux::math::convolve(tmp, kernel);
   }
   return tmp;
 }

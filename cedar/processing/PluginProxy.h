@@ -37,22 +37,17 @@
 #ifndef CEDAR_PROC_PLUGIN_PROXY_H
 #define CEDAR_PROC_PLUGIN_PROXY_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <string>
 
-#ifdef WINDOWS
+#ifdef _WIN32
 #include <Windows.h>
 #endif
 
-
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief A class that encapsulates the OS dependent functionality for dynamically loading libraries.
  */
 class cedar::proc::PluginProxy
 {
@@ -60,13 +55,7 @@ class cedar::proc::PluginProxy
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-//#ifdef LINUX
   typedef void (*PluginInterfaceMethod)(cedar::proc::PluginDeclarationPtr);
-/*#elif defined WINDOWS
-  typedef cedar::proc::PluginDeclarationPtr (*PluginInterfaceMethod)();
-#else
-#error Implement me for your OS!
-#endif*/
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -74,6 +63,7 @@ private:
 public:
   //!@brief The standard constructor.
   PluginProxy();
+  //!@brief Some other constructor.
   PluginProxy(const std::string& file);
 
   //!@brief Destructor
@@ -83,9 +73,15 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief loaded a shared/dynamic library from a file path
   void load(const std::string& file);
 
+  //!@brief get declaration of this proxy
   cedar::proc::PluginDeclarationPtr getDeclaration();
+
+  /*!@brief Returns the canonical name of a plugin based on its filepath
+   */
+  static std::string getPluginNameFromPath(const std::string& path);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -97,11 +93,15 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  std::string findPluginFile(const std::string& file);
+  //!@brief search known directories for this plugin.
+  std::string findPluginFile(const std::string& file) const;
 
-#ifdef WINDOWS
+  //!@brief Searches for the plugin description file.
+  std::string findPluginDescription(const std::string& plugin_path) const;
+
+#ifdef _WIN32
   std::string getLastError();
-#endif
+#endif // _WIN32
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -109,29 +109,19 @@ private:
 protected:
   // none yet
 private:
+  //!@brief plugin declaration
   cedar::proc::PluginDeclarationPtr mDeclaration;
+  //!@brief file path to plugin
   std::string mFileName;
 
   //! Handle to the dynamically loaded library.
-#ifdef UNIX
+#if defined __unix__ | defined __APPLE__
   void *mpLibHandle;
-#elif defined WINDOWS
+#elif defined _WIN32
   HMODULE mpLibHandle;
 #else
 #error Implement me for your os!
 #endif
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::proc::PluginProxy
 
 #endif // CEDAR_PROC_PLUGIN_PROXY_H

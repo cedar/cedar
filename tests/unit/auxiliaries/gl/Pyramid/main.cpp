@@ -33,67 +33,59 @@
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
-#include "cedar/auxiliaries/gl/Pyramid.h"
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
+#include "cedar/auxiliaries/gl/Pyramid.h"
 
 // SYSTEM INCLUDES
 #include <string>
 
-using namespace cedar::aux;
-using namespace cedar::aux::gl;
-using namespace std;
-
-int main()
+int main(int, char**)
 {
-  LogFile log_file("UnitTestPyramid.log");
-  log_file.addTimeStamp();
-  log_file << std::endl;
   // the number of errors encountered in this test
   int errors = 0;
 
   // test constructors
-  cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
-  Pyramid testPyramid(p_object);
-  Pyramid pyramid(p_object, 1, 2, 3);
+  cedar::aux::LocalCoordinateFramePtr p_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  cedar::aux::gl::Pyramid testPyramid(p_local_coordinate_frame);
+  cedar::aux::gl::Pyramid pyramid(p_local_coordinate_frame, 1, 2, 3);
 
   //--------------------------------------------------------------------------------------------------------------------
   // length
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: length" << std::endl;
+  std::cout << "test: length" << std::endl;
   pyramid.setLength(10.1);
   if (pyramid.length() != 10.1)
   {
     errors++;
-    log_file << "ERROR with setLength() or length()" << std::endl;
+    std::cout << "ERROR with setLength() or length()" << std::endl;
   }
   
   //--------------------------------------------------------------------------------------------------------------------
   // width
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: width" << std::endl;
+  std::cout << "test: width" << std::endl;
   pyramid.setWidth(11.1);
   if (pyramid.width() != 11.1)
   {
     errors++;
-    log_file << "ERROR with setWidth() or width()" << std::endl;
+    std::cout << "ERROR with setWidth() or width()" << std::endl;
   }
   
   //--------------------------------------------------------------------------------------------------------------------
   // height
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: height" << std::endl;
+  std::cout << "test: height" << std::endl;
   pyramid.setHeight(111);
   if (pyramid.height() != 111.0)
   {
     errors++;
-    log_file << "ERROR with setHeight() or height()" << std::endl;
+    std::cout << "ERROR with setHeight() or height()" << std::endl;
   }
   
 
-  log_file << "test finished, there were " << errors << " errors" << std::endl;
+  std::cout << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
   {
     errors = 255;

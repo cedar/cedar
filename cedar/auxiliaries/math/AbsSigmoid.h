@@ -37,21 +37,22 @@
     Credits:
 
 ======================================================================================================================*/
+
 #ifndef CEDAR_AUX_MATH_ABS_SIGMOID_H
 #define CEDAR_AUX_MATH_ABS_SIGMOID_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/math/sigmoids.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
 
-/*!@brief Abstract description of the sigmoid base class.
+/*!@brief Sigmoid function that is based on absolute values.
  *
- * More detailed description of the sigmoid base class.
+ *        This function behaves similar to cedar::aux::math::ExpSigmoid, but computing it is less costly.
+ *
+ * @todo Put the equation in here, describe it.
  */
 class cedar::aux::math::AbsSigmoid : public cedar::aux::math::Sigmoid
 {
@@ -82,10 +83,7 @@ public:
 public:
   /*!@brief this function calculates the abs-based sigmoid function for a given double value.
    */
-  virtual double compute(double value) const
-  {
-    return cedar::aux::math::sigmoidAbs(value, mBeta->getValue(), mThreshold->getValue());
-  }
+  virtual double compute(double value) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -107,17 +105,6 @@ protected:
   cedar::aux::DoubleParameterPtr mBeta;
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 };
-
 
 #endif  // CEDAR_AUX_MATH_ABS_SIGMOID_H

@@ -22,23 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Base.cpp
+    File:        MatrixIterator.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 10 12
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.rub.de
+    Date:        2011 11 04
 
-    Description: Implementation of the @em cedar::aux::Base class.
+    Description: Implementation of the @em cedar::aux::MatrixIterator class.
 
     Credits:
 
 ======================================================================================================================*/
 
-
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/MatrixIterator.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 

@@ -34,23 +34,16 @@
 
 ======================================================================================================================*/
 
-
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/ComponentNotAvailableException.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
-using namespace cedar::dev::robot;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 //! constructor
-ComponentNotAvailableException::ComponentNotAvailableException()
+cedar::dev::robot::ComponentNotAvailableException::ComponentNotAvailableException()
 {
-  // set the type name
-  this->mType = "ComponentNotAvailableException";
 }

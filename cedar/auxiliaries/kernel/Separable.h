@@ -37,11 +37,9 @@
 #ifndef CEDAR_AUX_KERNEL_SEPARABLE_H
 #define CEDAR_AUX_KERNEL_SEPARABLE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -61,7 +59,8 @@ class cedar::aux::kernel::Separable : public cedar::aux::kernel::Kernel
 public:
   //!@brief The standard constructor.
   Separable();
-  Separable(unsigned int dimensionality, const std::string& kernelFile = "dummy_matrix_file.yml");
+  //!@brief Construct an instance of a separable kernel with some parameters.
+  Separable(unsigned int dimensionality);
   //!@brief Destructor
   virtual ~Separable();
   //--------------------------------------------------------------------------------------------------------------------
@@ -69,19 +68,20 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  /*!\brief this returns the one-dimensional part of a separable kernel for a specified dimension
-   * @param dim the desired dimension
+  /*!@brief this returns the one-dimensional part of a separable kernel for a specified dimension
+   * @param dimension the desired dimension
    */
   virtual const cv::Mat& getKernelPart(unsigned int dimension) const;
 
+  //!@brief convolve this kernel with another matrix
   cv::Mat convolveWith(const cv::Mat& mat) const;
-
-  void setNumParts(unsigned int numParts);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
-
+protected:
+  //!@brief set one kernel part of the specified dimension to the given matrix
+  void setKernelPart(unsigned int dimension, const cv::Mat& mat);
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -92,17 +92,9 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void setKernelPart(unsigned int dimension, const cv::Mat& mat);
-
+  //!@brief the kernel parts for each dimension
   //!@todo Make private?
   std::vector<cv::Mat> mKernelParts; //!< the separate parts of a separable kernel
-
-private:
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
 
 private:
   // none yet

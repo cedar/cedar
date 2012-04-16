@@ -19,88 +19,64 @@
 
 ========================================================================================================================
 
- ----- Institute:   Ruhr-Universitaet-Bochum
-                    Institut fuer Neuroinformatik
- 
- ----- File:        Sphere.cpp
- 
- ----- Maintainer:  Hendrik Reimann
- ------Email:       hendrik.reimann@ini.rub.de
- ----- Date:        2010 10 28
- 
- ----- Description: visualization for a sphere
- 
- ----- Credits:     
- ---------------------------------------------------------------------------------------------------------------------*/
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
 
-// LOCAL INCLUDES
-#include "drawShapes.h"
-#include "Sphere.h"
+    File:        Sphere.cpp
 
-// PROJECT INCLUDES
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
+    Date:        2010 11 29
+
+    Description: Visualization of a sphere
+
+    Credits:
+
+======================================================================================================================*/
+
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/gl/drawShapes.h"
+#include "cedar/auxiliaries/gl/Sphere.h"
 
 // SYSTEM INCLUDES
 
-using namespace cedar::aux::gl;
-using namespace std;
-using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Sphere::Sphere(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Sphere::Sphere
+(
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+  double radius,
+  double colorR,
+  double colorG,
+  double colorB
+)
 :
-cedar::aux::gl::Object(pObject)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Sphere", colorR, colorG, colorB),
+mRadius(radius)
 {
-  mRadius = 2;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
-  mObjectType = "Sphere";
-}
-
-Sphere::Sphere(
-                cedar::aux::ObjectPtr pObject,
-                const double radius,
-                const double R,
-                const double G,
-                const double B
-              )
-:
-cedar::aux::gl::Object(pObject)
-{
-  mRadius = radius;
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-  mObjectType = "Sphere";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void Sphere::setRadius(double value)
+void cedar::aux::gl::Sphere::setRadius(double value)
 {
   mRadius = value;
 }
 
-double Sphere::radius()
+double cedar::aux::gl::Sphere::radius() const
 {
   return mRadius;
 }
 
-void Sphere::draw()
+void cedar::aux::gl::Sphere::draw()
 {
-  // move to origin
-  glPopMatrix();
-  glPushMatrix();
+  prepareDraw();
   
-  // move to object coordinates
-  mTransformationTranspose = mpObject->getTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
-
   // draw the sphere
   if (mIsVisible)
   {

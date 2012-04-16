@@ -37,17 +37,13 @@
 #ifndef CEDAR_DYN_PLUGIN_H
 #define CEDAR_DYN_PLUGIN_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/dynamics/lib.h"
 #include "cedar/processing/PluginDeclaration.h"
 
-#ifndef LINUX // workaround for circular linking
-//!@todo Do this for GCC/linux as well?
 CEDAR_BEGIN_PLUGIN_DECLARATION
-
-CEDAR_DYN_LIB_EXPORT void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin);
-
+//!@brief Function that declares plugin exports.
+CEDAR_DECLARE_DEPRECATED(CEDAR_DYN_LIB_EXPORT void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin));
 CEDAR_END_PLUGIN_DECLARATION
-#endif // MSVC
 
 #endif // CEDAR_DYN_PLUGIN_H

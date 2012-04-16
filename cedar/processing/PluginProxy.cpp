@@ -34,22 +34,22 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/PluginProxy.h"
 #include "cedar/processing/PluginDeclaration.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/exceptions.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-#ifdef UNIX
+#ifdef __unix__
 #include <dlfcn.h>
-#elif defined WINDOWS
+#elif defined _WIN32
 #include <Windows.h>
 #include <strsafe.h>
 #endif
 
+//!@todo Make this switchable with configuration?
+#define BOOST_FILESYSTEM_VERSION 2 // we currently use boost's filesystem as version 2.
 #include <boost/filesystem.hpp>
 
 
@@ -78,7 +78,51 @@ cedar::proc::PluginProxy::~PluginProxy()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-std::string cedar::proc::PluginProxy::findPluginFile(const std::string& file)
+std::string cedar::proc::PluginProxy::getPluginNameFromPath(const std::string& path)
+{
+  boost::filesystem::path plugin_path(path);
+  std::string name = plugin_path.filename();
+  if (name.substr(0, 3) == "lib")
+  {
+    name = name.substr(3);
+  }
+  size_t ext_idx = name.rfind('.');
+  if (ext_idx != std::string::npos)
+  {
+    name = name.substr(0, ext_idx);
+  }
+  return name;
+}
+
+std::string cedar::proc::PluginProxy::findPluginDescription(const std::string& plugin_path) const
+{
+  std::string plugin_name = cedar::proc::PluginProxy::getPluginNameFromPath(plugin_path);
+  plugin_name += ".xml";
+
+  std::cout << plugin_name << std::endl;
+
+  // extract the path only
+  boost::filesystem::path plugin_dir(plugin_path);
+  plugin_dir.remove_filename();
+  plugin_dir /= plugin_name;
+
+  if (boost::filesystem::exists(plugin_dir))
+  {
+    return plugin_dir.string();
+  }
+
+  // remove filename and current directory (i.e., cd ..)
+  plugin_dir = plugin_dir.parent_path().parent_path();
+  plugin_dir /= plugin_name;
+  if (boost::filesystem::exists(plugin_dir))
+  {
+    return plugin_dir.string();
+  }
+
+  return "";
+}
+
+std::string cedar::proc::PluginProxy::findPluginFile(const std::string& file) const
 {
   std::string searched_locs;
 
@@ -126,7 +170,7 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   
   // OS-Dependent code for loading the plugin.
   PluginInterfaceMethod p_interface = NULL;
-#ifdef UNIX
+#ifdef __unix__
   this->mpLibHandle = dlopen(this->mFileName.c_str(), RTLD_NOW);
   if (!this->mpLibHandle)
   {
@@ -135,14 +179,14 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   }
 
 
-  p_interface = (PluginInterfaceMethod) (dlsym(this->mpLibHandle, "pluginDeclaration"));
+  p_interface = reinterpret_cast<PluginInterfaceMethod>(dlsym(this->mpLibHandle, "pluginDeclaration"));
   if (!p_interface)
   {
     CEDAR_THROW(cedar::proc::PluginException, "Error loading interface function: dlsym returned NULL.");
   }
 
   //@todo this might segfault if the function pointer points to a bad function; handle this somehow.
-#elif defined WINDOWS
+#elif defined _WIN32
   this->mpLibHandle = LoadLibraryEx(this->mFileName.c_str(), NULL, 0);
   if (!this->mpLibHandle)
   {
@@ -156,10 +200,24 @@ void cedar::proc::PluginProxy::load(const std::string& file)
     //!@todo use GetLastError to read out the error string
     CEDAR_THROW(cedar::proc::PluginException, "Error loading interface function: GetProcAddress failed: " + this->getLastError());
   }
-#endif // LINUX / WINDOWS
+#endif // __linux / _WIN32
   
   this->mDeclaration = cedar::proc::PluginDeclarationPtr(new cedar::proc::PluginDeclaration());
   (*p_interface)(this->mDeclaration);
+
+  // try to load the plugin description file
+  std::string description = this->findPluginDescription(this->mFileName);
+
+  if (!description.empty())
+  {
+    this->getDeclaration()->readDescription(description);
+  }
+#ifdef DEBUG
+  else
+  {
+    std::cout << "> no plugin description found for " << file << std::endl;
+  }
+#endif // DEBUG
 
   // Finally, if nothing failed, add the plugin to the list of known plugins.
   cedar::proc::Manager::getInstance().settings().addKnownPlugin(file);
@@ -170,7 +228,7 @@ cedar::proc::PluginDeclarationPtr cedar::proc::PluginProxy::getDeclaration()
   return this->mDeclaration;
 }
 
-#ifdef WINDOWS
+#ifdef _WIN32
 
 std::string cedar::proc::PluginProxy::getLastError()
 {
@@ -193,4 +251,4 @@ std::string cedar::proc::PluginProxy::getLastError()
   return error;
 }
 
-#endif //def WINDOWS
+#endif //def _WIN32

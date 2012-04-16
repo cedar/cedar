@@ -34,11 +34,8 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-
-#include "DifferentialDrive.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/devices/robot/DifferentialDrive.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -76,7 +73,11 @@ const std::vector<double>& cedar::dev::robot::DifferentialDrive::getWheelSpeed()
   return mWheelSpeed;
 }
 
-std::vector<double> cedar::dev::robot::DifferentialDrive::calculateVelocity(double leftWheelSpeed, double rightWheelSpeed)
+std::vector<double> cedar::dev::robot::DifferentialDrive::calculateVelocity
+                    (
+                      double leftWheelSpeed,
+                      double rightWheelSpeed
+                    )
 {
     //construct the vector to return
     std::vector<double> velocity;
@@ -89,7 +90,11 @@ std::vector<double> cedar::dev::robot::DifferentialDrive::calculateVelocity(doub
     return velocity;
 }
 
-std::vector<double> cedar::dev::robot::DifferentialDrive::calculateWheelSpeed(double forwardVelocity, double turningRate)
+std::vector<double> cedar::dev::robot::DifferentialDrive::calculateWheelSpeed
+                    (
+                      double forwardVelocity,
+                      double turningRate
+                    )
 {
   //construct the vector to return
   std::vector<double> wheel_speed;

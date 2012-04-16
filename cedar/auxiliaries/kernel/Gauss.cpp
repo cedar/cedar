@@ -34,21 +34,30 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/kernel/Gauss.h"
-#include "cedar/auxiliaries/NumericParameter.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/functions.h"
 #include "cedar/auxiliaries/exceptions.h"
-#include "cedar/auxiliaries/NumericVectorParameter.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.h"
+#include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/assert.h"
-#include "cedar/auxiliaries/exceptions/IndexOutOfRangeException.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
 #include <limits.h>
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declared
+    = cedar::aux::kernel::FactoryManagerSingleton::getInstance()->registerType<cedar::aux::kernel::GaussPtr>();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -56,11 +65,14 @@
 cedar::aux::kernel::Gauss::Gauss()
 :
 cedar::aux::kernel::Separable(),
-_mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", -10000.0, 10000.0)),
+_mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0, -10000.0, 10000.0)),
 _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigmas", 2, 3.0, 0.0, 10000)),
 _mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", 2, 3.0, 0.0, 10000)),
-_mLimit(new cedar::aux::DoubleParameter(this, "limit", 0.01, 1000.0))
+_mLimit(new cedar::aux::DoubleParameter(this, "limit", 5.0, 0.01, 1000.0))
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+  _mDimensionality->setValue(_mSigmas->size());
+
   this->onInit();
 }
 
@@ -69,27 +81,25 @@ cedar::aux::kernel::Gauss::Gauss(
                                   std::vector<double> sigmas,
                                   std::vector<double> shifts,
                                   double limit,
-                                  unsigned int dimensionality,
-                                  const std::string& kernelFile
+                                  unsigned int dimensionality
                                 )
 :
-cedar::aux::kernel::Separable(dimensionality, kernelFile),
+cedar::aux::kernel::Separable(dimensionality),
 _mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", amplitude, -10000.0, 10000.0)),
 _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigmas", sigmas, 0.0, 10000)),
 _mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", shifts, 0.0, 10000)),
 _mLimit(new cedar::aux::DoubleParameter(this, "limit", limit, 0.01, 1000.0))
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+
   this->mCenters.resize(dimensionality);
-  this->setNumParts(dimensionality);
   this->mSizes.resize(dimensionality);
   this->onInit();
 }
 
 cedar::aux::kernel::Gauss::~Gauss()
 {
-#ifdef DEBUG
-  std::cout << "> freeing data (Gauss)" << std::endl;
-#endif
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -115,7 +125,7 @@ void cedar::aux::kernel::Gauss::calculate()
   CEDAR_DEBUG_ASSERT(dimensionality == _mShifts->getValue().size());
   try
   {
-    this->setNumParts(dimensionality);
+    this->mKernelParts.resize(dimensionality);
     mCenters.resize(dimensionality);
     mSizes.resize(dimensionality);
     // calculate the kernel parts for every dimension
@@ -162,13 +172,13 @@ void cedar::aux::kernel::Gauss::calculate()
     }
     if (dimensionality == 1)
     {
-      mKernel->getData<cv::Mat>() = cv::Mat(sizes[0], 1, CV_32F);
+      mKernel->getData() = cv::Mat(sizes[0], 1, CV_32F);
     }
     else
     {
-      mKernel->getData<cv::Mat>() = cv::Mat(static_cast<int>(dimensionality), &sizes.at(0), CV_32F);
+      mKernel->getData() = cv::Mat(static_cast<int>(dimensionality), &sizes.at(0), CV_32F);
     }
-    cv::Mat& kernel = mKernel->getData<cv::Mat>();
+    cv::Mat& kernel = mKernel->getData();
     // now fill up the big kernel matrix
     std::vector<int> position(static_cast<size_t>(dimensionality));
     unsigned int max_index = 1;
@@ -218,7 +228,7 @@ void cedar::aux::kernel::Gauss::calculate()
     std::cerr << "> Error (kernel::Gauss) :" << error.what() << " in calculate().\n"
         << "  Check your configuration files." << std::endl;
     CEDAR_THROW(
-                 cedar::aux::exc::IndexOutOfRangeException,
+                 cedar::aux::IndexOutOfRangeException,
                  "kernel::Gauss has encountered inconsistent vector sizes, check your configuration file"
                );
   }
@@ -234,8 +244,7 @@ void cedar::aux::kernel::Gauss::setSigma(unsigned int dimension, double sigma)
   //!@todo Catch only the out-of-bounds exception here
   catch(std::exception& e)
   {
-    //!@todo Throw a proper cedar-exception here.
-    std::cout << "Error in cedar::aux::kernel::Gauss::setSigma: vector out of bounds " << std::endl;
+    CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "Error in cedar::aux::kernel::Gauss::setSigma: vector out of bounds");
   }
 }
 
@@ -253,8 +262,7 @@ void cedar::aux::kernel::Gauss::setShift(unsigned int dimension, double shift)
   //!@todo Catch only the out-of-bounds exception here
   catch(std::exception& e)
   {
-    //!@todo Throw a proper cedar-exception here.
-    std::cout << "Error in cedar::aux::kernel::Gauss::setShift: vector out of bounds " << std::endl;
+    CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "Error in cedar::aux::kernel::Gauss::setShift: vector out of bounds");
   }
 }
 
@@ -289,8 +297,10 @@ unsigned int cedar::aux::kernel::Gauss::getWidth(unsigned int dim) const
 
 void cedar::aux::kernel::Gauss::updateDimensionality()
 {
-  int new_dimensionality = static_cast<int>(_mDimensionality->getValue());
+  mpReadWriteLockOutput->lockForWrite();
+  unsigned int new_dimensionality = _mDimensionality->getValue();
   _mSigmas->resize(new_dimensionality, _mSigmas->getDefaultValue());
   _mShifts->resize(new_dimensionality, _mShifts->getDefaultValue());
+  mpReadWriteLockOutput->unlock();
   this->updateKernel();
 }

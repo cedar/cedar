@@ -37,26 +37,28 @@
 #ifndef CEDAR_AUX_FACTORY_DERIVED_H
 #define CEDAR_AUX_FACTORY_DERIVED_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Factory.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief This is an implementation of the factory pattern that returns a new object of DerivedType as a BaseType
+ *        pointer.
  *
- * More detailed description of the class.
+ * @param DerivedType      Type of the object being allocated.
+ * @param BaseTypePtr  The smart pointer base type. This can be used to decide whether you want to use shared_ptr,
+ *                         intrusive_ptr or others.
  */
-template <typename BaseType, typename DerivedType, typename SmartPointerType >
-class cedar::aux::FactoryDerived : public cedar::aux::Factory<BaseType, SmartPointerType>
+template <typename BaseTypePtr, typename DerivedTypePtr>
+class cedar::aux::FactoryDerived : public cedar::aux::Factory<BaseTypePtr>
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-
+public:
+  typedef typename DerivedTypePtr::element_type DerivedType;
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -67,12 +69,14 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  SmartPointerType allocate() const
+  //!@brief allocate an instance of type DerivedType and return this wrapped in a shared pointer of type BaseType
+  BaseTypePtr allocate() const
   {
-    return SmartPointerType (new DerivedType());
+    return BaseTypePtr (new DerivedType());
   }
 
-  BaseType* allocateRaw() const
+  //!@brief allocate an instance of type DerivedType and return it as pointer of type BaseType
+  DerivedType* allocateRaw() const
   {
     return new DerivedType();
   }
@@ -92,25 +96,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::FactoryDerived
 
 #endif // CEDAR_AUX_FACTORY_DERIVED_H
-

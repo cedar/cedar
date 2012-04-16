@@ -34,14 +34,12 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/FrameworkSettings.h"
 #include "cedar/auxiliaries/SetParameter.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/System.h"
 #include "cedar/processing/exceptions.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
@@ -123,37 +121,41 @@ cedar::proc::FrameworkSettings::~FrameworkSettings()
 void cedar::proc::FrameworkSettings::addKnownPlugin(const std::string& file)
 {
   std::string modified_path = file;
-  std::string workspace_path = this->mPluginWorkspace->get().absolutePath().toStdString();
+  std::string workspace_path = this->mPluginWorkspace->getValue().absolutePath().toStdString();
   if (modified_path.find(workspace_path) == 0)
   {
     modified_path = modified_path.substr(workspace_path.length());
+
+    if (modified_path.empty())
+      return;
+
+//do not remove leading slash on apple platform
+#if !defined __APPLE__
+    if (modified_path.at(0) == '/')
+    {
+      modified_path = modified_path.substr(1);
+    }
+#endif
   }
 
   if (modified_path.empty())
     return;
-//do not remove leading slash on apple platform
-#if !defined APPLE
-  if (modified_path.at(0) == '/')
-  {
-    modified_path = modified_path.substr(1);
-  }
-#endif
   this->mKnownPlugins->insert(modified_path);
 }
 
-const std::set<std::string>& cedar::proc::FrameworkSettings::getKnownPlugins()
+const std::set<std::string>& cedar::proc::FrameworkSettings::getKnownPlugins() const
 {
   return this->mKnownPlugins->get();
 }
 
-const std::set<std::string>& cedar::proc::FrameworkSettings::getPluginDirectories()
+const std::set<std::string>& cedar::proc::FrameworkSettings::getPluginDirectories() const
 {
   return this->mPluginIncludeDirectories->get();
 }
 
 std::string cedar::proc::FrameworkSettings::getPluginWorkspace() const
 {
-  return this->mPluginWorkspace->get().absolutePath().toStdString();
+  return this->mPluginWorkspace->getValue().absolutePath().toStdString();
 }
 
 void cedar::proc::FrameworkSettings::load()

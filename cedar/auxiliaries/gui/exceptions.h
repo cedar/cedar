@@ -37,17 +37,20 @@
 #ifndef CEDAR_AUX_GUI_EXCEPTIONS_H
 #define CEDAR_AUX_GUI_EXCEPTIONS_H
 
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
+
+// SYSTEM INCLUDES
+
 
 /*!@brief Exception that occurs when a type is not handled.
  */
-class cedar::aux::gui::InvalidPlotData : public cedar::aux::exc::ExceptionBase
+class cedar::aux::gui::InvalidPlotData : public cedar::aux::ExceptionBase
 {
 public:
   InvalidPlotData()
   {
-    this->mType = "InvalidPlotData";
   }
 }; // class cedar::aux::InvalidPlotData
 

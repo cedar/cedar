@@ -24,8 +24,8 @@
 
     File:        LoopedThread.h
 
-    Maintainer:  Bjoern Weghenkel
-    Email:       bjoern.weghenkel@ini.rub.de
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
     Date:        2010 12 02
 
     Description: Header for the @em cedar::aux::LoopedThread class.
@@ -34,21 +34,18 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_AUX_LOOPED_THREAD_H
 #define CEDAR_AUX_LOOPED_THREAD_H
 
-// LOCAL INCLUDES
-#include "namespace.h"
-#include "ConfigurationInterface.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
 #include <string>
 #include <iostream>
 #include <QThread>
-#include "boost/date_time/posix_time/posix_time_types.hpp" //no i/o just types
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 
 
 /*!@brief Cedar interface for looped threads
@@ -90,7 +87,8 @@
  *
  * \todo fill in doxygen comments for all member variables
  */
-class cedar::aux::LoopedThread : public cedar::aux::ConfigurationInterface, public QThread
+class cedar::aux::LoopedThread : public cedar::aux::ConfigurationInterface,
+                                 public QThread
 {
   //----------------------------------------------------------------------------
   // macros
@@ -141,7 +139,7 @@ public:
   LoopedThread(const char* pConfigFileName);
 
   //!@brief Destructor
-  virtual ~LoopedThread() = 0;
+  virtual ~LoopedThread();
 
   //----------------------------------------------------------------------------
   // public methods
@@ -260,8 +258,6 @@ private:
   //----------------------------------------------------------------------------
   // members
   //----------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   //!@brief desired length of a single step, in milliseconds
   boost::posix_time::time_duration mStepSize;
@@ -284,17 +280,6 @@ private:
   boost::posix_time::ptime mLastTimeStepStart;
   boost::posix_time::ptime mLastTimeStepEnd;
 
+}; // class cedar::aux::LoopedThread
 
-  //----------------------------------------------------------------------------
-  // parameters
-  //----------------------------------------------------------------------------
-public:
-  // none yet
-protected:
-  // none yet
-private:
-  // none yet
-
-}; // class cedar::aux::Thread
-
-#endif // CEDAR_AUX_THREAD_H
+#endif // CEDAR_AUX_LOOPED_THREAD_H

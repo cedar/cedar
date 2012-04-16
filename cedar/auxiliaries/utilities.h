@@ -37,35 +37,194 @@
 #ifndef CEDAR_AUX_UTILITIES_H
 #define CEDAR_AUX_UTILITIES_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/lib.h"
 #include "cedar/auxiliaries/assert.h"
-
-// PROJECT INCLUDES
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
+#include <boost/shared_ptr.hpp>
+#include <typeinfo>
 
+#ifdef _MSC_VER
+  #define NOMINMAX // don't add min and max macros!
+  #include <Windows.h>
+#endif
 
 namespace cedar
 {
   namespace aux
   {
-    /*!@brief   If you think a dynamic cast can never fail, use this cast instead.
-     *
-     *          In debug builds, it automatically checks whether you are right. In release mode, it statically casts to
-     *          the desired type.
-     *          The advantage of using this function is a speed gain: dynamic_casts are slow compared to static_casts.
-     *
-     * @remarks The syntax for using this cast is DerivedType* p2 = cedar::aux::asserted_cast<DerivedType*>(p);
-     *          The second template argument does not have to be specified; it is determined automatically by the
-     *          compiler!
+    /*!@brief Unmangles a c++ name.
      */
-    template <typename TOut, typename TIn>
-    TOut asserted_cast(TIn pIn)
+    CEDAR_AUX_LIB_EXPORT std::string unmangleName(const char* mangledName);
+
+    /*!@brief Unmangles the c++ name of a given typeinfo object.
+     */
+    CEDAR_AUX_LIB_EXPORT std::string unmangleName(const std::type_info& typeinfo);
+
+    /*!@brief Generates a type name from the type of the template argument.
+     */
+    template <typename T>
+    std::string typeToString()
     {
-      CEDAR_DEBUG_ASSERT(dynamic_cast<TOut>(pIn) != 0);
-      return static_cast<TOut>(pIn);
+      return unmangleName(typeid(T));
     }
+
+    /*!@brief Returns the type of the object pointed to by the given pointer.
+     */
+    template <typename T>
+    std::string objectTypeToString(boost::shared_ptr<T> object)
+    {
+      return unmangleName(typeid(*object));
+    }
+
+    /*!@brief Returns the type of the object pointed to by the given pointer.
+     */
+    template <typename T>
+    std::string objectTypeToString(boost::intrusive_ptr<T> object)
+    {
+      return unmangleName(typeid(*object));
+    }
+
+    /*!@brief Returns the type of the object pointed to by the given pointer.
+     */
+    template <typename T>
+    std::string objectTypeToString(T* object)
+    {
+      return unmangleName(typeid(*object));
+    }
+
+    /*!@brief Structure holding information about an frame in a stack trace.
+     */
+    struct CEDAR_AUX_LIB_EXPORT StackEntry
+    {
+      public:
+        /*!@brief Returns the symbol associated with this stack entry.
+         */
+        inline const std::string& symbol() const
+        {
+          return this->mSymbol;
+        }
+
+        /*!@brief Returns the source file associated with this stack entry.
+         */
+        inline const std::string& file() const
+        {
+          return this->mFile;
+        }
+
+        /*!@brief Sets the symbol of this stack entry.
+         */
+        inline void setSymbol(const std::string& symbol)
+        {
+          this->mSymbol = symbol;
+        }
+
+        /*!@brief Sets the source file of this stack entry.
+         */
+        inline void setFile(const std::string& file)
+        {
+          this->mFile = file;
+        }
+
+        /*!@brief Sets the address of the stack frame.
+         */
+        inline void setAddress(const std::string& address)
+        {
+          this->mAddress = address;
+        }
+
+        /*!@brief Sets the instruction offset from the symbol.
+         */
+        inline void setSymbolOffset(const std::string& offset)
+        {
+          this->mSymbolOffset = offset;
+        }
+
+#ifdef __GNUG__
+        /*!@brief Sets the raw string.
+         *
+         *        This function parses the raw string from gcc's backtrace capabilities into the relevant information.
+         */
+        void setRawString(const std::string& rawString);
+#endif
+
+        /*!@brief Operator that writes the stack entry to the given stream in a proper format.
+         */
+        friend CEDAR_AUX_LIB_EXPORT std::ostream& operator<< (std::ostream& stream, const StackEntry& trace);
+
+      private:
+        //! Source file of the current instruction in the stack frame.
+        std::string mFile;
+
+        //! Symbol (normally, the current function) of the stack frame.
+        std::string mSymbol;
+
+        //! Current instruction address.
+        std::string mAddress;
+
+        //! Offset from the current symbol.
+        std::string mSymbolOffset;
+    };
+
+    /*!@brief Structure holding information about an entire stack trace.
+     *
+     *        The stack trace is always generated at the moment the object is created.
+     */
+    struct CEDAR_AUX_LIB_EXPORT StackTrace
+    {
+      public:
+        /*!@brief The default constructor.
+         *
+         *        This constructor reads the current stack trace from the system and parses it into a list of
+         *        StackEntries.
+         */
+        StackTrace();
+#ifdef _MSC_VER
+        /*!@brief Generates a stack trace for a specific context.
+         */
+        StackTrace(CONTEXT* context);
+#endif // _MSC_VER
+
+        /*!@brief Returns the number of entries in the stack trace.
+         */
+        inline size_t size() const
+        {
+          return this->mStackTrace.size();
+        }
+
+        /*!@brief Returns the stack entry at the given index.
+         */
+        inline const cedar::aux::StackEntry& at(size_t index) const
+        {
+          return this->mStackTrace.at(index);
+        }
+
+        friend CEDAR_AUX_LIB_EXPORT std::ostream& operator<< (std::ostream& stream, const StackTrace& trace);
+
+      private:
+        /*!@brief   List of stack entries.
+         *
+         * @remarks This list is stored in the same order as the stack.
+         */
+        std::vector<cedar::aux::StackEntry> mStackTrace;
+
+#ifdef _MSC_VER
+        /*!@brief Initializes the stack trace from the given context.
+         */
+        void init(CONTEXT* context);
+#endif // _MSC_VER
+    };
+
+    /*!@brief Returns the stack entry at the given index.
+     */
+    CEDAR_AUX_LIB_EXPORT std::ostream& operator<< (std::ostream& stream, const StackEntry& trace);
+
+    /*!@brief Operator that writes the stack trace to the stream.
+     */
+    CEDAR_AUX_LIB_EXPORT std::ostream& operator<< (std::ostream& stream, const StackTrace& trace);
+    
   }
 }
 

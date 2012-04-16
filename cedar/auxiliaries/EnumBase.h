@@ -37,11 +37,9 @@
 #ifndef CEDAR_AUX_ENUM_BASE_H
 #define CEDAR_AUX_ENUM_BASE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Enum.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <map>
@@ -59,10 +57,6 @@
 class cedar::aux::EnumBase
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
-  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -78,21 +72,21 @@ public:
 public:
   /*! @brief Define a new enum value.
    */
-  void def(const Enum& rEnum);
+  void def(const cedar::aux::Enum& rEnum);
 
   /*! @brief Retrieve the enum value corresponding to id.
    */
-  const Enum& get(EnumId id) const;
+  const cedar::aux::Enum& get(cedar::aux::EnumId id) const;
 
   /*! @brief Retrieve the enum value corresponding to a string.
    *
    * @returns cedar::aux::Enum::UNDEFINED if there is no value corresponding to the string.
    */
-  const Enum& get(const std::string& id) const;
+  const cedar::aux::Enum& get(const std::string& id) const;
 
   /*! @brief Returns a list containing all enum values in this class (including cedar::aux::Enum::UNDEFINED!).
    */
-  const std::vector<Enum>& list() const
+  const std::vector<cedar::aux::Enum>& list() const
   {
     return this->mEnumList;
   }
@@ -126,18 +120,6 @@ private:
 
   //! Value for undefined/invalid enums (needed for returning a reference).
   cedar::aux::Enum mUndefined;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::EnumBase
 
 #endif // CEDAR_AUX_ENUM_BASE_H

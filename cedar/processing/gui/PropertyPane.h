@@ -37,70 +37,36 @@
 #ifndef CEDAR_PROC_PROPERTY_PANE_H
 #define CEDAR_PROC_PROPERTY_PANE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/namespace.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
-#include "cedar/processing/Step.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/gui/PropertyPane.h"
 
 // SYSTEM INCLUDES
-#include <QTableWidget>
-#include <boost/signals2/connection.hpp>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief A widget for displaying the parameters of configurables.
  *
- * More detailed description of the class.
+ *        This widget offers a quick way of creating a user interface for classes that implement the
+ *        cedar::aux::Configurable interface. Parameters of the configurable are displayed in a tabular widget by their
+ *        name and have an edit widget associated with them.
  */
-class cedar::proc::gui::PropertyPane : public QTableWidget
+class cedar::proc::gui::PropertyPane : public cedar::aux::gui::PropertyPane
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
-
-private:
-  typedef
-      cedar::aux::TypeBasedFactory
-      <
-        cedar::aux::Parameter,
-        cedar::proc::gui::Parameter,
-        cedar::aux::ParameterPtr
-      >
-      DataWidgetTypes;
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
+  /*!@brief The standard constructor.
+   */
   PropertyPane(QWidget *pParent = NULL);
-
-  //!@brief Destructor
-  ~PropertyPane();
-
-  //!@todo change from step to configuragle when the change is made in cedar::processing.
-  void display(cedar::proc::StepPtr pStep);
-
-  void display(cedar::proc::TriggerPtr pTrigger);
-
-  void display(cedar::aux::ConfigurablePtr pConfigurable);
-
-  void resetContents();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  DataWidgetTypes& dataWidgetTypes();
-
-public slots:
-  void resetPointer();
-  void redraw();
-
-  void rowSizeChanged();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -112,13 +78,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void append(cedar::proc::Step::ParameterList& parameters);
-
-  void addHeadingRow(const std::string& label);
-
-  void addLabelRow(const std::string& label);
-
-  void addPropertyRow(cedar::aux::ParameterPtr parameter);
+  std::string getInstanceTypeId(cedar::aux::ConfigurablePtr pConfigurable) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -126,23 +86,8 @@ private:
 protected:
   // none yet
 private:
-  static DataWidgetTypes mDataWidgetTypes;
-  //!@todo this should be one configurable pointer
-  boost::weak_ptr<cedar::aux::Configurable> mDisplayedConfigurable;
-
-  std::map<cedar::proc::gui::Parameter*, int> mParameterRowIndex;
-
-  boost::signals2::connection mSlotConnection;
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
   // none yet
 
 }; // class cedar::proc::gui::PropertyPane
 
 #endif // CEDAR_PROC_PROPERTY_PANE_H
-

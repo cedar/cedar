@@ -37,21 +37,18 @@
     Credits:
 
 ======================================================================================================================*/
+
 #ifndef CEDAR_AUX_MATH_SIGMOID_H
 #define CEDAR_AUX_MATH_SIGMOID_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/NumericParameter.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief Abstract description of the sigmoid base class.
- *
- * More detailed description of the sigmoid base class.
+/*!@brief Basic interface for all sigmoid functions.
  */
 class cedar::aux::math::Sigmoid : public Configurable
 {
@@ -71,9 +68,7 @@ public:
   }
 
   //!@brief Destructor
-  virtual ~Sigmoid()
-  {
-  }
+  virtual ~Sigmoid();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -87,10 +82,7 @@ public:
   /*!@brief this function calculates the sigmoid function for a given float value.
    * Included for backward-compatibility
    */
-  virtual float compute(float value) const
-  {
-    return static_cast<float>(compute(static_cast<double>(value)));
-  }
+  virtual float compute(float value) const;
 
   /*!@brief this function calculates the sigmoid function for an n-dimensional matrix.
    *
@@ -98,7 +90,7 @@ public:
    * function
    */
   template<typename T>
-  cv::Mat compute(const cv::Mat& values)
+  cv::Mat compute(const cv::Mat& values) const
   {
     cv::Mat result = values.clone();
     cv::MatConstIterator_<T> iter_src = values.begin<T>();
@@ -130,16 +122,32 @@ protected:
   cedar::aux::DoubleParameterPtr mThreshold;
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
 };
 
+#include "cedar/auxiliaries/FactoryManager.h"
 
+namespace cedar
+{
+  namespace aux
+  {
+    namespace math
+    {
+      //!@brief The manager of all sigmoind instances
+      typedef cedar::aux::FactoryManager<SigmoidPtr> SigmoidManager;
+
+#ifdef MSVC
+#ifdef CEDAR_LIB_EXPORTS_AUX
+      // dllexport
+      template class __declspec(dllexport) cedar::aux::Singleton<SigmoidManager>;
+#else // CEDAR_LIB_EXPORTS_AUX
+    // dllimport
+      extern template class __declspec(dllimport) cedar::aux::Singleton<SigmoidManager>;
+#endif // CEDAR_LIB_EXPORTS_AUX
+#endif // MSVC
+
+      //!@brief The singleton object of the SigmoidFactory.
+      typedef cedar::aux::Singleton<SigmoidManager> SigmoidManagerSingleton;
+    }
+  }
+}
 #endif  // CEDAR_AUX_MATH_SIGMOID_H

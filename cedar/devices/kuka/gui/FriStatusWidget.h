@@ -37,20 +37,15 @@
 #ifndef CEDAR_DEV_KUKA_GUI_STATUS_WIDGET_H
 #define CEDAR_DEV_KUKA_GUI_STATUS_WIDGET_H
 
-// MAKE FRI OPTIONAL
-#include "cedar/devices/robot/CMakeDefines.h"
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 #ifdef CEDAR_USE_KUKA_LWR
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "namespace.h"
-
-// PROJECT INCLUDES
 #include "cedar/devices/kuka/KukaInterface.h"
-#ifdef DEBUG
-#include "cedar/devices/debug/kuka/gui/ui_FriStatusWidget.h"
-#else
 #include "cedar/devices/kuka/gui/ui_FriStatusWidget.h"
-#endif
 #include "cedar/auxiliaries/gui/BaseWidget.h"
 
 // SYSTEM INCLUDES
@@ -61,8 +56,7 @@
  *
  * This includes the status, the connection quality, the sample time and if the robot is powered
  */
-class cedar::dev::kuka::gui::FriStatusWidget : public cedar::aux::gui::BaseWidget,
-                                                      private Ui_FriStatusWidget
+class cedar::dev::kuka::gui::FriStatusWidget : public cedar::aux::gui::BaseWidget, private Ui_FriStatusWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -78,7 +72,7 @@ public:
    * @param pKukaIn pointer to an instance of KukaInterface, where this widget gets the data
    * @param parent parent widget
    */
-  FriStatusWidget(cedar::dev::kuka::KukaInterfacePtr &pKukaIn, QWidget *parent=0);
+  FriStatusWidget(cedar::dev::kuka::KukaInterfacePtr pKukaIn, QWidget *parent=0);
 
   //!@brief Destructor
   ~FriStatusWidget();
@@ -110,27 +104,12 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
   bool mIsInit; //!<true, if object has been initialized
   cedar::dev::kuka::KukaInterfacePtr mpKukaIn; //!<this is an external reference
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::dev::kuka::gui::FriStatusWidget
 
 #endif // CEDAR_USE_KUKA_FRI
 #endif // CEDAR_DEV_KUKA_GUI_STATUS_WIDGET_H
-

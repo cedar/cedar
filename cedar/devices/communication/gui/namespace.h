@@ -37,12 +37,11 @@
 #ifndef CEDAR_DEV_COM_GUI_NAMESPACE_H
 #define CEDAR_DEV_COM_GUI_NAMESPACE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/lib.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
+
 
 #include <boost/smart_ptr.hpp>
 
@@ -52,9 +51,12 @@ namespace cedar
   {
     namespace com
     {
+      /*! @brief Namespace for gui communication classes. */
       namespace gui
       {
+        //!@cond SKIPPED_DOCUMENTATION
         CEDAR_DECLARE_DEV_CLASS(CommunicationWidget);
+        //!@endcond
       }
     }
   }

@@ -41,20 +41,17 @@
 #ifndef CEDAR_PROC_VIEW_H
 #define CEDAR_PROC_VIEW_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QGraphicsView>
 #include <QGraphicsRectItem>
+#include <QTimer>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief Class that displays a cedar::proc::gui::Scene.
  */
 class cedar::proc::gui::View : public QGraphicsView
 {
@@ -62,6 +59,11 @@ class cedar::proc::gui::View : public QGraphicsView
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // types
+  //--------------------------------------------------------------------------------------------------------------------
+  typedef QGraphicsView SuperClass;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -86,12 +88,36 @@ public:
    */
   void setMode(cedar::proc::gui::Scene::MODE mode, const QString& param = "");
 
+  /*!@brief Returns the current zoom level.
+   */
+  double getZoomLevel() const
+  {
+    return this->mCurrentZoomLevel;
+  }
+
+public slots:
+  /*!@brief Changes the current zoom level of the architecture.
+   */
+  void setZoomLevel(int newLevel);
+
+  //!@brief Handles scrolling while dragging.
+  void scrollTimerEvent();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief handles resize events
   void resizeEvent(QResizeEvent *pEvent);
+
+  //!@brief Handles certain mouse events.
+  void wheelEvent(QWheelEvent *pEvent);
+
+  //!@brief Handles mouse move events.
+  void mouseMoveEvent(QMouseEvent *pEvent);
+
+signals:
+  void zoomLevelChanged(double newZoomLevel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -102,26 +128,23 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
   //!@brief a pointer to a scene displayed by the view
   cedar::proc::gui::Scene* mpScene;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
+  //!@brief Variable to keep track of the current zoom level.
+  qreal mCurrentZoomLevel;
 
-private:
-  // none yet
+  //!@brief X direction for scrolling.
+  int mScrollDx;
 
+  //!@brief Y direction for scrolling.
+  int mScrollDy;
+
+  //!@brief Timer used for scrolling.
+  QTimer *mpScrollTimer;
 }; // class ProcessingView
 
 #endif // CEDAR_PROC_VIEW_H
-

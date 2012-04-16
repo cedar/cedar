@@ -41,22 +41,21 @@
 #ifndef CEDAR_PROC_GUI_GRAPHICS_BASE_H
 #define CEDAR_PROC_GUI_GRAPHICS_BASE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/Connection.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/NumericParameter.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QGraphicsItem>
 #include <QPen>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Base class for graphical items in the Scene.
  *
- * More detailed description of the class.
+ * @todo Write more detailed description of the class here.
+ * @todo maybe rename this class to GraphicsItem
  */
 class cedar::proc::gui::GraphicsBase : public QGraphicsItem, public cedar::aux::Configurable
 {
@@ -64,14 +63,21 @@ class cedar::proc::gui::GraphicsBase : public QGraphicsItem, public cedar::aux::
   // static constants
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief a group a GraphicsBase can belong to
+  //!@todo should be an enum
   typedef unsigned int GraphicsGroup;
+  //!@brief group NONE
   const static GraphicsGroup GRAPHICS_GROUP_NONE = 0;
+  //!@brief group STEP
   const static GraphicsGroup GRAPHICS_GROUP_STEP = 1 << 0;
+  //!@brief group TRIGGER
   const static GraphicsGroup GRAPHICS_GROUP_TRIGGER = 1 << 1;
-  const static GraphicsGroup GRAPHICS_GROUP_GROUP = 1 << 2;
-  const static GraphicsGroup GRAPHICS_GROUP_DATA_ITEM = 1 << 3;
+  //!@brief group DATA ITEM
+  const static GraphicsGroup GRAPHICS_GROUP_DATA_ITEM = 1 << 2;
+  //!@brief group UNKNOWN
   const static GraphicsGroup GRAPHICS_GROUP_UNKNOWN = 1 << 16;
 
+  //!@brief enum of highlight modes for GraphicsBase
   enum HighlightMode
   {
     HIGHLIGHTMODE_NONE,
@@ -81,10 +87,12 @@ public:
     HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER
   };
 
+  //!@brief enum  of base shapes for GraphicsBase
   enum BaseShape
   {
     BASE_SHAPE_RECT,
-    BASE_SHAPE_ROUND
+    BASE_SHAPE_ROUND,
+    BASE_SHAPE_DIAMOND
   };
 
 
@@ -105,40 +113,54 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief for a given GraphicsBase object, check if this instance can connect to it
   virtual cedar::proc::gui::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
 
+  //!@brief return flag if this GraphicsBase can - in general - connect to other GraphicsBase instances
   virtual bool canConnect() const;
 
+  //!@brief snap point for connection line in scene coordinates
   QPointF getConnectionAnchorInScene() const;
 
+  //!@brief snap point for connection line in relative coordinates (relative to the GraphicsBase's origin)
   virtual QPointF getConnectionAnchorRelative() const;
 
+  //!@brief to which graphics group does this GraphicsBase belong?
   const GraphicsGroup& getGroup() const;
 
+  //!@brief bounding box of this GraphicsBase
   QRectF boundingRect() const;
 
+  //!@brief get pen of the shape (e.g. to look up thickness of shape line)
   QPen getOutlinePen() const;
 
   //!@brief This method highlights this item according to how it can connect to the source.
   void highlightConnectionTarget(cedar::proc::gui::GraphicsBase *pConnectionSource);
 
+  //!@brief set the highlight mode (used after evaluating canConnectTo of another GraphicsBase
   void setHighlightMode(HighlightMode mode);
 
+  //!@brief get the current highlight mode
   HighlightMode getHighlightMode() const;
 
+  //!@brief width of this GraphicsBase
   qreal width() const
   {
     return static_cast<qreal>(this->mWidth->getValue());
   }
 
+  //!@brief height of this GraphicsBase
   qreal height() const
   {
     return static_cast<qreal>(this->mHeight->getValue());
   }
 
+  //!@brief set height of this GraphicsBase
   void setHeight(qreal height);
+  //!@brief set width of this GraphicsBase
   void setWidth(qreal width);
 
+  //!@brief add a Connection to this GraphicsBase
   void addConnection(Connection* pConnection);
 
   /*! @brief Removes the connection from the list of connections managed by this graphics item.
@@ -148,6 +170,7 @@ public:
    */
   void removeConnection(Connection* pConnection);
 
+  //!@brief Removes all connections from the list of connections managed by this graphics item.
   void removeAllConnections();
 
   //!\brief overwrite this function if your customized graphics item needs to disconnect some children items
@@ -156,64 +179,98 @@ public:
   //!\brief overwrite this function if your customized graphics item needs to disconnect a children items
   virtual void disconnect(cedar::proc::gui::GraphicsBase* pTarget);
 
+  //!@brief read configuration from a node (e.g. the position in a scene)
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
-  void writeConfiguration(cedar::aux::ConfigurationNode& root);
+  //!@brief write configuration to a node (e.g. the position in a scene)
+  void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
 
+  //!@brief redraw the connections if GraphicsBase instance is moved around
   void updateConnections();
 
+  //!@brief set outline fill color
   void setOutlineColor(const QColor& color);
+  //!@brief set fill color
   void setFillColor(const QColor& color);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief paint this GraphicsBase instance
   void paintFrame(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 
+  //!@brief deal with changes to this instance (e.g. position changes)
   QVariant itemChange(GraphicsItemChange change, const QVariant & value);
+
+  /*!@brief Sets the base shape of the item.
+   *
+   * @remarks This method should only be called during construction.
+   */
+  void setBaseShape(BaseShape shape);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief color for state "valid"
   static const QColor mValidityColorValid;
+  //!@brief color for state "warning"
   static const QColor mValidityColorWarning;
+  //!@brief color for state "error"
   static const QColor mValidityColorError;
   
+  //!@brief color for outline
   static const QColor mDefaultOutlineColor;
+  //!@brief fill color
   static const QColor mDefaultFillColor;
 
+  //!@brief get the right color for a certain validity
   static const QColor& getValidityColor(cedar::proc::gui::ConnectValidity validity);
 
 protected:
+  //!@brief flag if the background should be drawn
   bool mDrawBackground;
 private:
+  //!@brief the highlight mode
   cedar::proc::gui::GraphicsBase::HighlightMode mHighlightMode;
+
+  //!@brief the shape of this GraphicsBase
   BaseShape mShape;
+
+  //!@brief the current outline color
   QColor mOutlineColor;
+
+  //!@brief the current fill color
   QColor mFillColor;
+
+  //!@brief The path used for drawing this shape.
+  QPainterPath mPath;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
+  //!@brief width of the GraphicsBase
   cedar::aux::DoubleParameterPtr mWidth;
+  //!@brief height of the GraphicsBase
   cedar::aux::DoubleParameterPtr mHeight;
 
+  //!@brief group of this instance
   GraphicsGroup mGroup;
+  //!@brief all groups this instance can connect to
   GraphicsGroup mAllowedConnectTargets;
 
+  //!@brief vector of connections
   std::vector<Connection*> mConnections;
 
 }; // class cedar::proc::gui::GraphicsBase

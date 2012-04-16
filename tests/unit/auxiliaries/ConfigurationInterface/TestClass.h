@@ -42,7 +42,6 @@
 
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/ConfigurationInterface.h"
-#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -75,7 +74,7 @@ public:
   //!@brief Return number of errors in this object since creation.
   unsigned int errors(void);
   //!@brief Print all error messages.
-  void printErrors(cedar::aux::LogFile& rLogFile);
+  void printErrors();
   //!@brief Add a set of standard data types (bool, int, double, std::string).
   void addStandardParameters(void);
   //!@brief Add vectors of standard data types (bool, int, double, std::string) with a single default value.

@@ -37,28 +37,25 @@
 #ifndef CEDAR_AUX_TYPE_BASED_FACTORY_H
 #define CEDAR_AUX_TYPE_BASED_FACTORY_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/FactoryDerived.h"
 #include "cedar/auxiliaries/exceptions.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
 #include <vector>
 #include <typeinfo>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief A factory that creates objects based on types.
  *
- * More detailed description of the class.
+ * @todo This concept needs far more explanation.
  */
 template
 <
-  class KeyBaseType,
-  class ValueBaseType,
-  typename KeySmartPointerType, // = boost::shared_ptr<KeyBaseType>
-  typename ValueSmartPointerType // = boost::shared_ptr<ValueBaseType>
+  typename KeyBasePtr,
+  typename ValueBasePtr
 >
 class cedar::aux::TypeBasedFactory
 {
@@ -66,50 +63,114 @@ class cedar::aux::TypeBasedFactory
   // types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  typedef KeySmartPointerType KeyBaseTypePtr;
-  typedef boost::shared_ptr<cedar::aux::Factory<ValueBaseType, ValueSmartPointerType> > FactoryPtr;
+  typedef typename KeyBasePtr::element_type KeyBaseType;
+  typedef typename ValueBasePtr::element_type ValueBaseType;
+
+  //! Type for the factory.
+  typedef boost::shared_ptr<cedar::aux::Factory<ValueBasePtr> > FactoryPtr;
 
 private:
-  typedef std::pair<const std::type_info*, FactoryPtr> Pair;
-  typedef std::vector<Pair> KeyTypes;
+  //! Struct for the entries in the factory.
+  struct Entry
+  {
+    //! Type info for identifying exact matches of types.
+    const std::type_info* mTypeInfo;
+
+    //! The factory for this type.
+    FactoryPtr mFactory;
+
+    virtual bool matches(KeyBasePtr pointer) const
+    {
+      return *this->mTypeInfo == typeid(*pointer);
+    }
+  };
+
+  CEDAR_GENERATE_POINTER_TYPES(Entry);
+
+  template <typename T>
+  struct DerivableEntry : public Entry
+  {
+    bool matches(KeyBasePtr pointer) const
+    {
+      return boost::dynamic_pointer_cast<T>(pointer);
+    }
+  };
+
+
+  //! Type for the list of pairs.
+  typedef std::vector<EntryPtr> KeyTypes;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-
-  //!@brief Destructor
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Adds an association into the factory.
+   *
+   *        After calling this function, the type Key can be used to create objects of the type Value.
+   */
   template <class Key, class Value>
-  void add()
+  bool add()
   {
-    const std::type_info* type = &typeid(Key);
-    FactoryPtr factory(new cedar::aux::FactoryDerived<ValueBaseType, Value, boost::shared_ptr<ValueBaseType> >());
-    mKeyTypes.push_back(Pair(type, factory));
+    EntryPtr entry(new Entry());
+    entry->mTypeInfo = &typeid(Key);
+    entry->mFactory = FactoryPtr
+                      (
+                        new cedar::aux::FactoryDerived<boost::shared_ptr<ValueBaseType>, boost::shared_ptr<Value> >()
+                      );
+    mKeyTypes.push_back(entry);
+
+    // this always returns true to allow the use of static initalization for registering types.
+    return true;
   }
 
-  FactoryPtr get(KeyBaseTypePtr pointer)
+  /*!@brief Adds an association into the factory.
+   *
+   *        After calling this function, objects of classes inheriting the type Key can be used to create objects of the
+   *        type Value.
+   */
+  template <class Key, class Value>
+  bool addDerived()
+  {
+    DerivableEntry<Key> *entry = new DerivableEntry<Key>();
+    entry->mTypeInfo = &typeid(Key);
+    entry->mFactory = FactoryPtr
+                      (
+                        new cedar::aux::FactoryDerived<boost::shared_ptr<ValueBaseType>, boost::shared_ptr<Value> >()
+                      );
+    mKeyTypes.push_back(EntryPtr(entry));
+
+    // this always returns true to allow the use of static initalization for registering types.
+    return true;
+  }
+
+  /*!@brief Returns the factory associated with the type of the object pointed to by the parameter.
+   */
+  FactoryPtr get(KeyBasePtr pointer)
   {
     for(typename KeyTypes::iterator iter = this->mKeyTypes.begin(); iter != this->mKeyTypes.end(); ++iter)
     {
-      if (*(iter->first) == typeid(*pointer.get()))
+      if ((*iter)->matches(pointer))
       {
-        return iter->second;
+        return (*iter)->mFactory;
       }
     }
     std::string message = "Type of the base pointer (";
-    message += typeid(pointer.get()).name();
+    message += cedar::aux::objectTypeToString(pointer);
     message += ") is not handled in the TypeBasedFactory.";
     CEDAR_THROW(cedar::aux::UnknownTypeException, message);
     return FactoryPtr();
   }
 
-  bool empty()
+  /*!@brief Checks, whether the factory is empty.
+   *
+   * @returns True, if no associations are stored in this factory, false otherwise.
+   */
+  bool empty() const
   {
     return this->mKeyTypes.empty();
   }
@@ -132,20 +193,9 @@ private:
 protected:
   // none yet
 private:
+  //! List of associations for this factory.
   KeyTypes mKeyTypes;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
 
 }; // class cedar::aux::TypeBasedFactory
 
-#endif // CEDAR_XXX_XXX_H
-
+#endif // CEDAR_AUX_TYPE_BASED_FACTORY_H
