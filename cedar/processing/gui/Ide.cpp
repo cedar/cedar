@@ -374,15 +374,10 @@ void cedar::proc::gui::Ide::showManagePluginsDialog()
 
 void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
 {
-  std::cout << "setName" << std::endl;
   network->network()->setName("root");
-  std::cout << "mNetwork = network" << std::endl;
   this->mNetwork = network;
-  std::cout << "set network at scene" << std::endl;
   this->mpProcessingDrawer->getScene()->setNetwork(network);
-  std::cout << "reset scene" << std::endl;
   this->mpProcessingDrawer->getScene()->reset();
-  std::cout << "add elements" << std::endl;
   this->mNetwork->addElementsToScene();
 }
 

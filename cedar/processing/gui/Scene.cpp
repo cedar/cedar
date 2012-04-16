@@ -85,6 +85,7 @@ mpConfigurableWidget(NULL)
 
 cedar::proc::gui::Scene::~Scene()
 {
+  this->clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -137,11 +138,15 @@ void cedar::proc::gui::Scene::setSnapToGrid(bool snap)
 
 void cedar::proc::gui::Scene::reset()
 {
+  this->clear();
+  CEDAR_DEBUG_ASSERT(mStepMap.empty());
+  CEDAR_DEBUG_ASSERT(mTriggerMap.empty());
+  CEDAR_DEBUG_ASSERT(mNetworkMap.empty());
+  CEDAR_DEBUG_ASSERT(mElementMap.empty());
   this->mStepMap.clear();
   this->mTriggerMap.clear();
   this->mNetworkMap.clear();
   this->mElementMap.clear();
-  this->clear();
 }
 
 const cedar::proc::gui::Scene::StepMap& cedar::proc::gui::Scene::stepMap() const
@@ -707,6 +712,7 @@ void cedar::proc::gui::Scene::addTriggerItem(cedar::proc::gui::TriggerItem *pTri
 {
   this->addItem(pTrigger);
   // we assume that triggers are only inserted once.
+  CEDAR_DEBUG_ASSERT(this->mTriggerMap.find(pTrigger->getTrigger().get()) == this->mTriggerMap.end());
   this->mTriggerMap[pTrigger->getTrigger().get()] = pTrigger;
 
   CEDAR_DEBUG_ASSERT(this->mElementMap.find(pTrigger->getTrigger().get()) == this->mElementMap.end());
