@@ -34,12 +34,12 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_MOBILE_ODOMETRY_H
-#define CEDAR_DEV_ROBOT_MOBILE_ODOMETRY_H
+#ifndef CEDAR_DEV_ROBOT_ODOMETRY_H
+#define CEDAR_DEV_ROBOT_ODOMETRY_H
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/namespace.h"
-#include "cedar/auxiliaries/RigidBody.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -52,9 +52,10 @@
  * informations. Because this class has no access to the robot's sensors, it is an abstract class. The actual
  * implementation is handled in its subclasses.
  */
-//!@todo why inheriting from RigidBody here? HR: this mirrors how KinematicChainModel inherits from RigidBody
-//! - only these classes are sufficiently powerful and provide enough information to satisfy RigidBody requirements
-class cedar::dev::robot::Odometry : public cedar::aux::RigidBody
+//!@todo why inheriting from LocalCoordinateFrame here? HR: this mirrors how KinematicChainModel inherits from
+//! LocalCoordinateFrame - only these classes are sufficiently powerful and provide enough information to satisfy
+//! LocalCoordinateFrame requirements
+class cedar::dev::robot::Odometry : public cedar::aux::LocalCoordinateFrame
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -69,23 +70,23 @@ public:
   /*!@brief The get-function of the robot's current position.
    *@return Vector with position on x- (1st element) and y-axis (2nd element) [both in m]
    */
-  cv::Mat getPosition() const;
+  cv::Mat getTranslation() const;
 
   /*!@brief The get-function of the robot's current orientation.
    *@return The current orientation [in rad].
    */
-  double getOrientation();
+  double getRotation();
 
   /*!@brief The set-function of the robot's position.
-   *@param xPosition Position of the robot on the x-axis to be set [in m].
-   *@param yPosition Position of the robot on the y-axis to be set [in m].
+   *@param x new translation of the robot coordinate system on the world x-axis [in m].
+   *@param y new translation of the robot coordinate system on the world y-axis [in m].
    */
-  void setPosition(double xPosition, double yPosition);
+  void setTranslation(double x, double y);
 
   /*!@brief The set-function of the robot's orientation.
    *@param orientation Orientation of the robot [in rad].
    */
-  void setOrientation(double orientation);
+  void setRotation(double angle);
 
   //!@brief Sets the Debug-flag
   void setDebug(bool debug);
@@ -125,5 +126,5 @@ protected:
 private:
   // none yet
 }; // class cedar::dev::robot::MobileRobotModel
-#endif // CEDAR_DEV_ROBOT_MOBILE_ODOMETRY_H
+#endif // CEDAR_DEV_ROBOT_ODOMETRY_H
 

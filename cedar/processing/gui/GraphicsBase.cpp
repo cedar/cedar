@@ -226,6 +226,20 @@ void cedar::proc::gui::GraphicsBase::writeConfiguration(cedar::aux::Configuratio
   root.put("positionY", this->pos().y());
 }
 
+bool cedar::proc::gui::GraphicsBase::hasGuiConnectionTo(GraphicsBase const* pTarget) const
+{
+  for (size_t i = 0; i < this->mConnections.size(); ++i)
+  {
+    cedar::proc::gui::Connection* p_connection = this->mConnections.at(i);
+    if (p_connection->getSource() == this && p_connection->getTarget() == pTarget)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 void cedar::proc::gui::GraphicsBase::addConnection(cedar::proc::gui::Connection* pConnection)
 {
   this->mConnections.push_back(pConnection);

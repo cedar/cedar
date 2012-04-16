@@ -526,7 +526,7 @@ void cedar::aux::gl::drawEllipse(
 
 
 
-  //! todo: check which of these should move to the init function
+  //!@todo check which of these should move to the init function
 //  glEnable(GL_DEPTH_TEST);
 //  glEnable(GL_MAP2_VERTEX_3);
 //  glEnable(GL_AUTO_NORMAL);

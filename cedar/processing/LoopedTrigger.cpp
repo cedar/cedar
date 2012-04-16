@@ -45,6 +45,8 @@
 #include "cedar/units/TimeUnit.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/LoopMode.h"
+#include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/System.h"
@@ -52,6 +54,34 @@
 
 // SYSTEM INCLUDES
 #include <algorithm>
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the trigger class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr looped_trigger_declaration
+    (
+      new ElementDeclarationTemplate<cedar::proc::LoopedTrigger>
+      (
+        "Triggers",
+        "cedar.processing.LoopedTrigger"
+      )
+    );
+    looped_trigger_declaration->setIconPath(":/triggers/looped_trigger.svg");
+
+    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(looped_trigger_declaration);
+
+    return true;
+  }
+
+  bool declared = declare();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

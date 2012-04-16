@@ -53,13 +53,48 @@ namespace cedar
     {
       //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_AUX_CLASS(BaseWidget);
-      CEDAR_DECLARE_AUX_CLASS(RigidBodyWidget);
-      CEDAR_DECLARE_AUX_CLASS(RigidBodyVisualizationWidget);
+      CEDAR_DECLARE_AUX_CLASS(LocalCoordinateFrameWidget);
+      CEDAR_DECLARE_DEPRECATED(typedef LocalCoordinateFrameWidget RigidBodyWidget);
+      CEDAR_DECLARE_AUX_CLASS(ObjectVisualizationWidget);
+      CEDAR_DECLARE_DEPRECATED(typedef ObjectVisualizationWidget RigidBodyVisualizationWidget);
       CEDAR_DECLARE_AUX_CLASS(SceneWidget);
       CEDAR_DECLARE_AUX_CLASS(Viewer);
 
-      /* Plot widgets */
-      CEDAR_DECLARE_AUX_CLASS(DataPlotInterface);
+      class CEDAR_AUX_LIB_EXPORT PropertyPane;
+      CEDAR_DECLARE_AUX_CLASS(Parameter);
+
+      class CEDAR_AUX_LIB_EXPORT BoolParameter;
+      class CEDAR_AUX_LIB_EXPORT DirectoryParameter;
+      class CEDAR_AUX_LIB_EXPORT DoubleParameter;
+      class CEDAR_AUX_LIB_EXPORT DoubleVectorParameter;
+      class CEDAR_AUX_LIB_EXPORT EnumParameter;
+      class CEDAR_AUX_LIB_EXPORT FileParameter;
+      class CEDAR_AUX_LIB_EXPORT IntParameter;
+      class CEDAR_AUX_LIB_EXPORT ObjectParameter;
+      class CEDAR_AUX_LIB_EXPORT ObjectListParameter;
+      class CEDAR_AUX_LIB_EXPORT StringParameter;
+      class CEDAR_AUX_LIB_EXPORT UIntParameter;
+      class CEDAR_AUX_LIB_EXPORT UIntVectorParameter;
+
+      /* Exceptions */
+      class InvalidPlotData;
+      //!@endcond
+
+      /*! The factory for gui parameters.
+       * @todo It should be possible to add new gui parameters within a plugin.
+       */
+      typedef cedar::aux::TypeBasedFactory<cedar::aux::ParameterPtr, cedar::aux::gui::ParameterPtr> ParameterFactory;
+
+      typedef cedar::aux::Singleton<ParameterFactory> ParameterFactorySingleton;
+
+      /* Plotting related classes */
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_AUX_CLASS(PlotManager);
+      CEDAR_DECLARE_AUX_CLASS(PlotDeclaration);
+      template <class DataType, class PlotType> class PlotDeclarationTemplate;
+
+      CEDAR_DECLARE_AUX_CLASS(PlotInterface);
+      CEDAR_DECLARE_AUX_CLASS(MultiPlotInterface);
       CEDAR_DECLARE_AUX_CLASS(DataPlotter);
       CEDAR_DECLARE_AUX_CLASS(MatrixPlot);
       CEDAR_DECLARE_AUX_CLASS(MatrixPlot1D);
@@ -68,21 +103,18 @@ namespace cedar
 
       CEDAR_DECLARE_AUX_CLASS(HistoryPlot);
       CEDAR_DECLARE_AUX_CLASS(HistoryPlot0D);
-
-      class CEDAR_AUX_LIB_EXPORT BoolParameter;
-      class CEDAR_AUX_LIB_EXPORT DirectoryParameter;
-      class CEDAR_AUX_LIB_EXPORT DoubleParameter;
-      class CEDAR_AUX_LIB_EXPORT DoubleVectorParameter;
-      class CEDAR_AUX_LIB_EXPORT EnumParameter;
-      class CEDAR_AUX_LIB_EXPORT FileParameter;
-      class CEDAR_AUX_LIB_EXPORT Parameter;
-      class CEDAR_AUX_LIB_EXPORT StringParameter;
-      class CEDAR_AUX_LIB_EXPORT UIntParameter;
-      class CEDAR_AUX_LIB_EXPORT UIntVectorParameter;
-
-      /* Exceptions */
-      class InvalidPlotData;
       //!@endcond
+
+      // The manager for plot widgets
+      typedef
+          cedar::aux::TypeHierarchyMap
+          <
+            cedar::aux::Data,
+            std::vector<cedar::aux::gui::PlotDeclarationPtr>
+          >
+          PlotDeclarationManager;
+
+      typedef cedar::aux::Singleton<PlotDeclarationManager> PlotDeclarationManagerSingleton;
     }
   }
 }

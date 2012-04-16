@@ -40,4 +40,4 @@
   #include <OpenGL/glu.h>
 #else
   #include <GL/glu.h>
-#endif
+#endif // CEDAR_OS_*

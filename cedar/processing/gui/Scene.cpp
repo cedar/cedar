@@ -48,6 +48,7 @@
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/PromotedExternalData.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/gui/PropertyPane.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/stringFunctions.h"
@@ -75,8 +76,11 @@ mpeParentView(peParentView),
 mpNewConnectionIndicator(NULL),
 mpConnectionStart(NULL),
 mpMainWindow(pMainWindow),
-mSnapToGrid(false)
+mSnapToGrid(false),
+mpConfigurableWidget(NULL)
 {
+  // connect signals/slots
+  QObject::connect(this, SIGNAL(selectionChanged()), this, SLOT(itemSelected()));
 }
 
 cedar::proc::gui::Scene::~Scene()
@@ -86,6 +90,40 @@ cedar::proc::gui::Scene::~Scene()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Scene::setConfigurableWidget(cedar::aux::gui::PropertyPane *pConfigurableWidget)
+{
+  this->mpConfigurableWidget = pConfigurableWidget;
+}
+
+void cedar::proc::gui::Scene::itemSelected()
+{
+  using cedar::proc::Step;
+  using cedar::proc::Manager;
+
+  if (this->mpConfigurableWidget == NULL)
+  {
+    return;
+  }
+
+  QList<QGraphicsItem *> selected_items = this->selectedItems();
+
+  if (selected_items.size() == 1)
+  {
+    if (cedar::proc::gui::GraphicsBase *p_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected_items[0]))
+    {
+      if (p_item->getElement())
+      {
+        this->mpConfigurableWidget->display(p_item->getElement());
+      }
+    }
+  }
+  //!@ todo Handle the cases: multiple
+  else
+  {
+    this->mpConfigurableWidget->resetContents();
+  }
+}
 
 bool cedar::proc::gui::Scene::getSnapToGrid() const
 {
@@ -684,7 +722,7 @@ void cedar::proc::gui::Scene::removeTriggerItem(cedar::proc::gui::TriggerItem* p
   this->mElementMap.erase(mElementMap.find(pTrigger->getTrigger().get()));
 }
 
-void cedar::proc::gui::Scene::addElement(const std::string& classId, QPointF position)
+cedar::proc::ElementPtr cedar::proc::gui::Scene::addElement(const std::string& classId, QPointF position)
 {
   std::vector<std::string> split_class_name;
   cedar::aux::split(classId, ".", split_class_name);
@@ -696,7 +734,7 @@ void cedar::proc::gui::Scene::addElement(const std::string& classId, QPointF pos
   {
     unsigned int new_id = 1;
     adjusted_name = name;
-    while (mNetwork->network()->getElement(adjusted_name))
+    while (mNetwork->getNetwork()->getElement(adjusted_name))
     {
       std::stringstream str;
       str << name << " " << new_id;
@@ -711,7 +749,7 @@ void cedar::proc::gui::Scene::addElement(const std::string& classId, QPointF pos
 
   try
   {
-    mNetwork->network()->add(classId, adjusted_name);
+    mNetwork->getNetwork()->add(classId, adjusted_name);
     /*@todo check if this works in all cases since adding an item triggers a signal/slot chain,
      * which may not been processed completely
      */
@@ -735,6 +773,8 @@ void cedar::proc::gui::Scene::addElement(const std::string& classId, QPointF pos
     QString message(e.exceptionInfo().c_str());
     emit exception(message);
   }
+
+  return this->mNetwork->getNetwork()->getElement(adjusted_name);
 }
 
 cedar::proc::gui::TriggerItem* cedar::proc::gui::Scene::getTriggerItemFor(cedar::proc::Trigger* trigger)

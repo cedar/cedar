@@ -48,7 +48,6 @@
 
 // SYSTEM INCLUDES
 
-
 /*!@brief Sigmoid function that is based on absolute values.
  *
  *        This function behaves similar to cedar::aux::math::ExpSigmoid, but computing it is less costly.
@@ -84,10 +83,7 @@ public:
 public:
   /*!@brief this function calculates the abs-based sigmoid function for a given double value.
    */
-  virtual double compute(double value) const
-  {
-    return cedar::aux::math::sigmoidAbs(value, mBeta->getValue(), mThreshold->getValue());
-  }
+  virtual double compute(double value) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

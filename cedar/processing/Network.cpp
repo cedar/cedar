@@ -51,6 +51,7 @@
 #include "cedar/processing/PromotedExternalData.h"
 #include "cedar/processing/PromotedOwnedData.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
+#include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/assert.h"
@@ -74,11 +75,21 @@ cedar::proc::Network::Network()
 _mPromotedSlots(new cedar::aux::StringVectorParameter(this, "promotedSlots", std::vector<std::string>()))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
+
+  // promoted slots should not appear in user interfaces.
+  _mPromotedSlots->setHidden(true);
+
+  QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 }
 
 cedar::proc::Network::~Network()
 {
   cedar::aux::LogSingleton::getInstance()->freeing(this);
+  std::cout << "freeing " << this->getName() << std::endl;
+  for (ElementMapIterator it = mElements.begin(); it != mElements.end(); ++it)
+  {
+    this->remove(it->second);
+  }
   mDataConnections.clear();
   mTriggerConnections.clear();
   mElements.clear();
@@ -87,6 +98,15 @@ cedar::proc::Network::~Network()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::Network::onNameChanged()
+{
+  if (cedar::proc::ElementPtr parent_network = this->mRegisteredAt.lock())
+  {
+    // update the name in the parent network
+    boost::shared_static_cast<cedar::proc::Network>(parent_network)->updateObjectName(this);
+  }
+}
 
 boost::signals2::connection cedar::proc::Network::connectToElementAdded
                             (
@@ -110,7 +130,7 @@ std::string cedar::proc::Network::getUniqueIdentifier(const std::string& identif
     result = identifier +  " " + cedar::aux::toString(count);
     ++count;
   }
-  while(this->mElements.find(result) != this->mElements.end());
+  while (this->mElements.find(result) != this->mElements.end());
 
   return result;
 }

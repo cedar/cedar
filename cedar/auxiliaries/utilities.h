@@ -63,6 +63,37 @@ namespace cedar
      */
     CEDAR_AUX_LIB_EXPORT std::string unmangleName(const std::type_info& typeinfo);
 
+    /*!@brief Generates a type name from the type of the template argument.
+     */
+    template <typename T>
+    std::string typeToString()
+    {
+      return unmangleName(typeid(T));
+    }
+
+    /*!@brief Returns the type of the object pointed to by the given pointer.
+     */
+    template <typename T>
+    std::string objectTypeToString(boost::shared_ptr<T> object)
+    {
+      return unmangleName(typeid(*object));
+    }
+
+    /*!@brief Returns the type of the object pointed to by the given pointer.
+     */
+    template <typename T>
+    std::string objectTypeToString(boost::intrusive_ptr<T> object)
+    {
+      return unmangleName(typeid(*object));
+    }
+
+    /*!@brief Returns the type of the object pointed to by the given pointer.
+     */
+    template <typename T>
+    std::string objectTypeToString(T* object)
+    {
+      return unmangleName(typeid(*object));
+    }
 
     /*!@brief Structure holding information about an frame in a stack trace.
      */

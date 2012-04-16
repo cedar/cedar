@@ -45,7 +45,7 @@ if (CEDAR_STOP_ON_MISSING_LIBRARIES)
   message("-- Will stop when missing libraries.")
 else()
   set(CEDAR_LIB_ERROR_TYPE WARNING)
-  message("-- Will not stop if libraries are missing.")
+  message("-- Will compile despite missing libraries.")
 endif()
 
 # Qt
@@ -92,7 +92,7 @@ if(OpenCV_FOUND)
   if (CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS)
     message("   using opencv debug and release libraries.")
     set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} optimized opencv_core opencv_highgui opencv_imgproc 
-                                                       debug opencv_cored opencv_highguid opencv_imgprocd)
+                                                         debug opencv_cored opencv_highguid opencv_imgprocd)
   else(CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS)
     message("   using opencv release libraries.")
     set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} opencv_core opencv_highgui opencv_imgproc)
@@ -108,9 +108,8 @@ endif(OpenCV_FOUND)
 # check if legacy mode is enabled
 
 if (NOT DEFINED CEDAR_LIBCONFIG_LEGACY_MODE OR CEDAR_LIBCONFIG_LEGACY_MODE)
-      
     message("-- Searching for libconfig (LEGACY MODE)...")
-    add_definitions(-DCEDAR_LIBCONFIG_LEGACY_MODE)
+    set(CEDAR_LIBCONFIG_LEGACY_MODE ON)
     
     find_package(Libconfig REQUIRED)
     if(Libconfig_FOUND)

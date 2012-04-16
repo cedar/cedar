@@ -66,6 +66,7 @@ void ControlThread::step(double)
   double rate_of_change = 1.0 * (TARGET - current_pos);
   rate_of_change = std::min<double>(rate_of_change, current_vel + 0.4);
 
+  //todo: use a log instead of the std::cout
   std::cout << "setting speed " << rate_of_change << std::endl;
   mpKinematicChain->setJointVelocity(JOINT, rate_of_change);
 }

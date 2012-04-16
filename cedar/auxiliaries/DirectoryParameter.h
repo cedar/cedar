@@ -81,13 +81,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief reads a directory from a configuration node
-  void setTo(const cedar::aux::ConfigurationNode& node)
+  void readFromNode(const cedar::aux::ConfigurationNode& node)
   {
     this->mValue.setPath(QString::fromStdString(node.get_value<std::string>()));
   }
 
   //!@brief stores a directory as string in a configuration node
-  void putTo(cedar::aux::ConfigurationNode& root) const
+  void writeToNode(cedar::aux::ConfigurationNode& root) const
   {
     root.put(this->getName(), this->mValue.absolutePath().toStdString());
   }

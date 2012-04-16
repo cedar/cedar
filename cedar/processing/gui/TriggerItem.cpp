@@ -192,6 +192,7 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::TriggerItem::canConnectTo(Gr
 
 void cedar::proc::gui::TriggerItem::setTrigger(cedar::proc::TriggerPtr trigger)
 {
+  this->setElement(trigger);
   this->mTrigger = trigger;
   this->mClassId = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(mTrigger);
   

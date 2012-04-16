@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CoraArm.h
+    File:        KukaArm.h
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
@@ -37,8 +37,6 @@
 #ifndef CEDAR_DEV_ROBOT_GL_KUKA_ARM_H
 #define CEDAR_DEV_ROBOT_GL_KUKA_ARM_H
 
-#define GL_GLEXT_PROTOTYPES // to avoid a problem with finding some GL stuff, apparently caused by Qt
-
 // CEDAR INCLUDES
 #include "cedar/devices/robot/gl/namespace.h"
 #include "cedar/devices/robot/gl/KinematicChain.h"
@@ -50,37 +48,18 @@
 /*!@brief Visualization of the KUKA LWR4
  *
  * This class provides a simple OpenGL visualization of the KUKA LWR4 arm. It has to be provided with a pointer to an
- * instance of KinematicChainModel of the arm, used to get the transformations to the joint coordinate frames.
+ * instance of KinematicChain of the arm, used to get the transformations to the joint coordinate frames.
  * To actually display the arm, add an instance of this class to a scene (cedar::aux::gl::Scene) and create a viewer
  * for that scene (cedar::aux::gl::Viewer).
  */
 class cedar::dev::robot::gl::KukaArm : public cedar::dev::robot::gl::KinematicChain
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // structs
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  //!@brief container for vertex and related data
-  typedef struct
-  {
-    //!@brief position of the vertex
-    GLfloat location[3];
-    //!@brief texture coordinates
-    GLfloat tex[2];
-    //!@brief normal
-    GLfloat normal[3];
-    //!@brief color
-    GLfloat colour[4];
-    //!@brief pads the struct out to 64 bytes for performance increase
-    GLubyte padding[16];
-  } Vertex;
-
-  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KukaArm(cedar::dev::robot::KinematicChainModelPtr pKinematicChainModel);
+  KukaArm(cedar::dev::robot::KinematicChainPtr pKinematicChain);
   //!@brief destructor
   ~KukaArm();
 
@@ -108,13 +87,9 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void drawElement(const GLuint vertexVboId, const GLuint indexVboId, const unsigned int numberOfFaces);
+  //todo: the base block should not be part of the KukaArm visualization, but rather be drawn only as part of the robot
   void drawBaseBlock();
-  //todo: this should be done with a struct for material, as a member in RigidBodyVisualization
-  void setMaterial(int material);
 
-  void loadVertexData(const QString& dataFileName, unsigned int numberOfVertices, Vertex* vertices);
-  void loadIndexData(const QString& dataFileName, unsigned int numberOfFaces, GLushort* indices);
   void loadData();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -123,29 +98,7 @@ private:
 protected:
   // none yet
 private:
-  //!@brief encodes the different materials
-  enum MaterialType {
-                      NO_MATERIAL,
-                      SEGMENT,
-                      CHROME,
-                      BLACK
-                    };
-
-  static const float mNoSpecular[3];
-  static const float mSegment_Ambient[3];
-  static const float mSegment_Diffuse[3];
-  static const float mSegment_Specular[3];
-  static const float mSegment_Shininess[1];
-  static const float mChrome_Ambient[3];
-  static const float mChrome_Diffuse[3];
-  static const float mChrome_Specular[3];
-  static const float mChrome_Shininess[1];
-  static const float mBlack_Ambient[3];
-  static const float mBlack_Diffuse[3];
-  static const float mBlack_Specular[3];
-  static const float mBlack_Shininess[1];
-
-  // base
+  // base segment
   static const unsigned int mBaseSegmentVertexNumber = 2564;
   static const unsigned int mBaseSegmentFacesNumber = 3738;
   GLuint mBaseSegmentVertexVboId; // vertex buffer id

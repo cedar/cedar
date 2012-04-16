@@ -93,7 +93,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief load a set of type T from a configuration tree
-  void setTo(const cedar::aux::ConfigurationNode& root)
+  void readFromNode(const cedar::aux::ConfigurationNode& root)
   {
     this->mValues.clear();
     for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin(); iter != root.end(); ++iter)
@@ -103,7 +103,7 @@ public:
   }
 
   //!@brief store a set of type T to a configuration tree
-  void putTo(cedar::aux::ConfigurationNode& root) const
+  void writeToNode(cedar::aux::ConfigurationNode& root) const
   {
     cedar::aux::ConfigurationNode vector_node;
     for (typename std::set<T>::const_iterator iter = this->mValues.begin(); iter != this->mValues.end(); ++iter)

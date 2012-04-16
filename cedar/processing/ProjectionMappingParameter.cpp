@@ -78,7 +78,7 @@ cedar::proc::ProjectionMappingParameter::~ProjectionMappingParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::ProjectionMappingParameter::setTo(const cedar::aux::ConfigurationNode& root)
+void cedar::proc::ProjectionMappingParameter::readFromNode(const cedar::aux::ConfigurationNode& root)
 {
   mValues->initialize(0);
   for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin(); iter != root.end(); ++iter)
@@ -93,7 +93,7 @@ void cedar::proc::ProjectionMappingParameter::setTo(const cedar::aux::Configurat
   mValues->updateValidity();
 }
 
-void cedar::proc::ProjectionMappingParameter::putTo(cedar::aux::ConfigurationNode& root) const
+void cedar::proc::ProjectionMappingParameter::writeToNode(cedar::aux::ConfigurationNode& root) const
 {
   cedar::aux::ConfigurationNode map_node;
   for
