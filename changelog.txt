@@ -51,6 +51,9 @@
   - gl::Object has been renamed to gl::RigidBody
   - There are some new Parameter types: ObjectListParameter and ObjectParameter. They allow dynamically selecting the type of one or more objects. For example, these allow to dynamically select the type of the Sigmoid as well as the combination of kernels in the neural field.
   - There is a new widget for displaying log messages: cedar::aux::gui::Log.
+  - NumericParameters (DoubleParameter, IntParameter, UIntParameter) no longer need minimum and maximum values. They
+    also have a new constructor that takes a math::Limits object which is the new, recommended way of setting the
+    limits. The same is true for NumericVectorParameters.
 
 - cedar::proc
   - added directional arrows for graphical connections in processingIde
