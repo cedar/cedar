@@ -43,6 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/VectorParameter.h"
+#include "cedar/auxiliaries/math/Limits.h"
 
 // SYSTEM INCLUDES
 
@@ -53,8 +54,10 @@ template <typename T>
 class cedar::aux::NumericVectorParameter : public cedar::aux::VectorParameter<T>
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef cedar::aux::math::Limits<T> LimitType;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -70,8 +73,20 @@ public:
                         )
   :
   cedar::aux::VectorParameter<T>(pOwner, name, defaultValues),
-  mMinimum(minimum),
-  mMaximum(maximum)
+  mLimits(minimum, maximum)
+  {
+  }
+
+  //!@brief The constructor.
+  NumericVectorParameter(
+                          cedar::aux::Configurable *pOwner,
+                          const std::string& name,
+                          const std::vector<T>& defaultValues,
+                          const LimitType& limits = LimitType::full()
+                        )
+  :
+  cedar::aux::VectorParameter<T>(pOwner, name, defaultValues),
+  mLimits(limits)
   {
   }
 
@@ -86,8 +101,21 @@ public:
                         )
   :
   cedar::aux::VectorParameter<T>(pOwner, name, defaultSize, defaultValue),
-  mMinimum(minimum),
-  mMaximum(maximum)
+  mLimits(minimum, maximum)
+  {
+  }
+
+  //!@brief The constructor.
+  NumericVectorParameter(
+                          cedar::aux::Configurable *pOwner,
+                          const std::string& name,
+                          size_t defaultSize,
+                          T defaultValue,
+                          const LimitType& limits = LimitType::full()
+                        )
+  :
+  cedar::aux::VectorParameter<T>(pOwner, name, defaultSize, defaultValue),
+  mLimits(limits)
   {
   }
 
@@ -100,8 +128,19 @@ public:
                         )
   :
   cedar::aux::VectorParameter<T>(pOwner, name),
-  mMinimum(minimum),
-  mMaximum(maximum)
+  mLimits(minimum, maximum)
+  {
+  }
+
+  //!@brief The constructor.
+  NumericVectorParameter(
+                          cedar::aux::Configurable *pOwner,
+                          const std::string& name,
+                          const LimitType& limits = LimitType::full()
+                        )
+  :
+  cedar::aux::VectorParameter<T>(pOwner, name),
+  mLimits(limits)
   {
   }
 
@@ -117,7 +156,7 @@ public:
   //!@brief set the minimum value of this parameter
   void setMinimum(const T& minimum)
   {
-    this->mMinimum = minimum;
+    this->mLimits.setLower(minimum);
 
     this->emitPropertyChangedSignal();
   }
@@ -125,13 +164,13 @@ public:
   //!@brief get the minimum value of this parameter
   const T& getMinimum() const
   {
-    return this->mMinimum;
+    return this->mLimits.getLower();
   }
 
   //!@brief set the maximum value of this parameter
-  void setMaximum(const T& minimum)
+  void setMaximum(const T& maximum)
   {
-    this->mMaximum = minimum;
+    this->mLimits.setUpper(maximum);
 
     this->emitPropertyChangedSignal();
   }
@@ -139,7 +178,7 @@ public:
   //!@brief get the maximum value of this parameter
   const T& getMaximum() const
   {
-    return this->mMaximum;
+    return this->mLimits.getUpper();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -160,11 +199,8 @@ private:
 protected:
   // none yet
 private:
-  //!@brief The minimum value, if applicable to the type.
-  T mMinimum;
-
-  //!@brief The maximum value, if applicable to the type.
-  T mMaximum;
+  //!@brief The range of allowed values for the vector's entries.
+  LimitType mLimits;
 
 }; // class cedar::aux::NumericVectorParameter
 
