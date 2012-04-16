@@ -40,6 +40,13 @@
   - fixed a critical bug in LoopedThread::singleStep, which used microseconds instead of milliseconds for step()
   - cedar::aux::Configurable now inherits from boost::noncopyable, explicitly stating that you should never use
     the copy constructor. Instead, you should use the functions Configurable::copyTo and Configurable::copyFrom.
+  - Templated functions in cedar::aux::math now have an "alias" version that can be called without a template parameter.
+    This function automatically decides which template version to call based on the matrix types.
+  - Added a function cedar::aux::System::locateResource that helps with finding cedar resources (i.e., config files
+    etc.) independent of the current working directory. See the documentation for details.
+  - Added a new Log class to cedar::aux. Using this is the new standard logging mechanism (over std::cout), as it can be
+    redirected at will, e.g., to the console (default) or some user interface. To access the log, use the corresponding
+    cedar::aux::LogSingleton::getInstance().
   - the cedar::aux::Base class was removed
   - The old ConfigurationInterface is being phased out now. For this purpose, a transitional interface has been
     developed that should mostly work with the old code. If you run into trouble, add the following line to your
@@ -65,6 +72,8 @@
     information about your plugin in case you don't want to hardcode it, e.g., it can contain icon paths for processing
     steps. See documentation of cedar::proc::PluginDeclaration for details.
   - Overhauled the plotting system.
+  - added grouping functionality for processing
+  - added promotion of data slots for networks
 
 - cedar::dyn
   - NeuralField now supports changing the sigmoid type and changing the number and type of kernel modes
@@ -75,9 +84,13 @@
     the mouse wheel (hold down ctrl)
   - The property pane now indicates when parameters have been changed since the last save. 
   - more verbose tooltip for data slots
+  - there is now a settings dialog; more settings will be added later.
   - the tab order in the property pane is now working correctly
-
+  
 - build system
+  - You now no longer need to specify CEDAR_BUILD_DIR in your cedar.conf.
+  - Projects depending on cedar no longer need to define __LINUX__ etc.; this is now done automatically by the build
+    system. 
   - files in the resource folder are now moved to ${CEDAR_INSTALL_PREFIX}/share/resources. Use the
     cedar::aux::System::locateResource function to locate them.
 
