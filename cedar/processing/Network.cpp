@@ -211,15 +211,31 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
     if ((*trigger_con)->getSourceTrigger() == boost::shared_dynamic_cast<const cedar::proc::Trigger>(element)
         || (*trigger_con)->getTarget() == boost::shared_dynamic_cast<const cedar::proc::Triggerable>(element))
     {
-      mTriggerConnectionChanged
-      (
-        this->getElement<cedar::proc::Trigger>((*trigger_con)->getSourceTrigger()->getName()),
-        this->getElement<cedar::proc::Triggerable>
+      cedar::proc::TriggerPtr source_trigger;
+      try
+      {
+        source_trigger = this->getElement<cedar::proc::Trigger>((*trigger_con)->getSourceTrigger()->getName());
+        mTriggerConnectionChanged
         (
-          boost::shared_dynamic_cast<const cedar::proc::Element>((*trigger_con)->getTarget())->getName()
-        ),
-        false
-      );
+          source_trigger,
+          this->getElement<cedar::proc::Triggerable>
+          (
+            boost::shared_dynamic_cast<const cedar::proc::Element>((*trigger_con)->getTarget())->getName()
+          ),
+          false
+        );
+      }
+      catch (cedar::proc::InvalidNameException& exc)
+      {
+        CEDAR_DEBUG_ASSERT((*trigger_con)->getSourceTrigger()->getName() == "processingDone");
+        CEDAR_DEBUG_ASSERT
+        (
+          this->getElement<cedar::proc::Triggerable>
+          (
+            boost::shared_dynamic_cast<const cedar::proc::Element>((*trigger_con)->getTarget())->getName()
+          )
+        );
+      }
       trigger_con = mTriggerConnections.erase(trigger_con);
     }
     else
@@ -972,6 +988,13 @@ bool cedar::proc::Network::isConnected(const std::string& source, const std::str
 
 bool cedar::proc::Network::isConnected(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target) const
 {
+  //!@todo check if source is in any way part of this network (may be a done trigger of a step)
+  //!@todo reactivate this check
+//  CEDAR_DEBUG_ASSERT
+//  (
+//    target
+//      == this->getElement<cedar::proc::Triggerable>(boost::shared_dynamic_cast<cedar::proc::Element>(target)->getName())
+//  );
   for (size_t i = 0; i < mTriggerConnections.size(); ++i)
   {
     if (mTriggerConnections.at(i)->equals(source, target))
