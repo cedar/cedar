@@ -22,32 +22,31 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        FirewireInterface.cpp
+    File:        LibDcCameraBase.cpp
 
     Maintainer:  Georg.Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2011 12 11
 
-    Description: Implementation of the @em FirewireInterface class.
+    Description: Implementation of the @em LibDcCameraBase class.
 
 
     Credits:
 
 ======================================================================================================================*/
 
-// MAKE FIREWIRE OPTIONAL
-#include "cedar/devices/robot/CMakeDefines.h"
-#ifdef CEDAR_USE_LIB_DC1394
-
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/grabbertools/FirewireInterface.h"
+#include "cedar/devices/robot/CMakeDefines.h"   // MAKE FIREWIRE OPTIONAL
+
+#ifdef CEDAR_USE_LIB_DC1394
+#include "cedar/devices/sensors/visual/grabbertools/LibDcCameraBase.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::sensors::visual::grabbertools::FirewireInterface::FirewireInterface()
+cedar::dev::sensors::visual::LibDcCameraBase::LibDcCameraBase()
 :
 mpFwContext(NULL),
 mpCameraList(NULL),
@@ -86,7 +85,7 @@ mError(DC1394_SUCCESS)
   }
 }
 
-cedar::dev::sensors::visual::grabbertools::FirewireInterface::~FirewireInterface()
+cedar::dev::sensors::visual::LibDcCameraBase::~LibDcCameraBase()
 {
   cleanUp();
 }
@@ -95,7 +94,7 @@ cedar::dev::sensors::visual::grabbertools::FirewireInterface::~FirewireInterface
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::sensors::visual::grabbertools::FirewireInterface::cleanUp()
+void cedar::dev::sensors::visual::LibDcCameraBase::cleanUp()
 {
   if (mpCameraList)
   {
@@ -116,7 +115,7 @@ void cedar::dev::sensors::visual::grabbertools::FirewireInterface::cleanUp()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::grabbertools::FirewireInterface::resetFwBus()
+bool cedar::dev::sensors::visual::LibDcCameraBase::resetFwBus()
 {
   if (!mpCamera)
   {
@@ -129,7 +128,7 @@ bool cedar::dev::sensors::visual::grabbertools::FirewireInterface::resetFwBus()
 
 
 //----------------------------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::grabbertools::FirewireInterface::resetCam()
+bool cedar::dev::sensors::visual::LibDcCameraBase::resetCam()
 {
   if (!mpCamera)
   {
@@ -141,13 +140,13 @@ bool cedar::dev::sensors::visual::grabbertools::FirewireInterface::resetCam()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-std::string cedar::dev::sensors::visual::grabbertools::FirewireInterface::getErrorString() const
+std::string cedar::dev::sensors::visual::LibDcCameraBase::getErrorString() const
 {
   return dc1394_error_get_string(mError);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-unsigned int cedar::dev::sensors::visual::grabbertools::FirewireInterface::getNumCams()
+unsigned int cedar::dev::sensors::visual::LibDcCameraBase::getNumCams()
 {
   if (mpCameraList)
   {
@@ -157,7 +156,7 @@ unsigned int cedar::dev::sensors::visual::grabbertools::FirewireInterface::getNu
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-uint64_t cedar::dev::sensors::visual::grabbertools::FirewireInterface::getCamGuid(unsigned int camNr)
+uint64_t cedar::dev::sensors::visual::LibDcCameraBase::getCamGuid(unsigned int camNr)
 {
   if(camNr >= getNumCams())
   {
@@ -168,14 +167,14 @@ uint64_t cedar::dev::sensors::visual::grabbertools::FirewireInterface::getCamGui
 
 
 //----------------------------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::grabbertools::FirewireInterface::openCamera(uint64_t camGuid)
+bool cedar::dev::sensors::visual::LibDcCameraBase::openCamera(uint64_t camGuid)
 {
   mpCamera = dc1394_camera_new(mpFwContext, camGuid);
   return (mpCamera != NULL);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::grabbertools::FirewireInterface::closeCamera()
+void cedar::dev::sensors::visual::LibDcCameraBase::closeCamera()
 {
   if (mpCamera)
   {
@@ -187,7 +186,7 @@ void cedar::dev::sensors::visual::grabbertools::FirewireInterface::closeCamera()
 
   
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<std::string> cedar::dev::sensors::visual::grabbertools::FirewireInterface::getAllFeaturesAsString()
+std::vector<std::string> cedar::dev::sensors::visual::LibDcCameraBase::getAllFeaturesAsString()
 {
   if (! mpCamera)
   {
@@ -220,7 +219,7 @@ std::vector<std::string> cedar::dev::sensors::visual::grabbertools::FirewireInte
 
 
 //----------------------------------------------------------------------------------------------------------------------
-dc1394featureset_t cedar::dev::sensors::visual::grabbertools::FirewireInterface::getCamFeatures()
+dc1394featureset_t cedar::dev::sensors::visual::LibDcCameraBase::getCamFeatures()
 {
   if (! mpCamera)
   {
@@ -239,7 +238,7 @@ dc1394featureset_t cedar::dev::sensors::visual::grabbertools::FirewireInterface:
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::grabbertools::FirewireInterface::printAllFeatures()
+void cedar::dev::sensors::visual::LibDcCameraBase::printAllFeatures()
 {
   if (! mpCamera)
   {
@@ -271,7 +270,7 @@ void cedar::dev::sensors::visual::grabbertools::FirewireInterface::printAllFeatu
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-dc1394video_modes_t cedar::dev::sensors::visual::grabbertools::FirewireInterface::getCamVideoModes()
+dc1394video_modes_t cedar::dev::sensors::visual::LibDcCameraBase::getCamVideoModes()
 {
   if (!mpCamera)
   {
@@ -289,7 +288,7 @@ dc1394video_modes_t cedar::dev::sensors::visual::grabbertools::FirewireInterface
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-dc1394framerates_t cedar::dev::sensors::visual::grabbertools::FirewireInterface::getCamFramerates
+dc1394framerates_t cedar::dev::sensors::visual::LibDcCameraBase::getCamFramerates
 (
   dc1394video_mode_t mode
 )
@@ -307,7 +306,7 @@ dc1394framerates_t cedar::dev::sensors::visual::grabbertools::FirewireInterface:
   return mode_framerates;
 }  
 //----------------------------------------------------------------------------------------------------------------------
-std::string cedar::dev::sensors::visual::grabbertools::FirewireInterface::DC1394FrameRateToString
+std::string cedar::dev::sensors::visual::LibDcCameraBase::DC1394FrameRateToString
 (
   dc1394framerate_t framerate
 ) const
@@ -328,7 +327,7 @@ std::string cedar::dev::sensors::visual::grabbertools::FirewireInterface::DC1394
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-std::string cedar::dev::sensors::visual::grabbertools::FirewireInterface::DC1394VideoModeToString
+std::string cedar::dev::sensors::visual::LibDcCameraBase::DC1394VideoModeToString
 (
   dc1394video_mode_t mode
 ) const
@@ -374,7 +373,7 @@ std::string cedar::dev::sensors::visual::grabbertools::FirewireInterface::DC1394
 
 
 //----------------------------------------------------------------------------------------------------------------------
-std::string cedar::dev::sensors::visual::grabbertools::FirewireInterface::DC1394FeatureToString
+std::string cedar::dev::sensors::visual::LibDcCameraBase::DC1394FeatureToString
 (
   dc1394feature_t feature
 ) const
@@ -408,7 +407,7 @@ std::string cedar::dev::sensors::visual::grabbertools::FirewireInterface::DC1394
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-std::string cedar::dev::sensors::visual::grabbertools::FirewireInterface::DC1394FeatureToCameraGrabberPropertyString
+std::string cedar::dev::sensors::visual::LibDcCameraBase::DC1394FeatureToCameraGrabberPropertyString
 (
   dc1394feature_t feature
 ) const

@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/lib.h"
+#include "cedar/devices/robot/CMakeDefines.h"  // MAKE FIREWIRE OPTIONAL
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -89,6 +90,11 @@ namespace cedar
 
         ///! a pair of property enum id and his value
         typedef std::pair<unsigned int, double> CameraPropertyValuesPair;
+
+        //firewire related classes of the grabbertools
+        #ifdef CEDAR_USE_LIB_DC1394
+          CEDAR_DECLARE_CLASS(LibDcCameraBase);
+        #endif
 
         //!@endcond
       }

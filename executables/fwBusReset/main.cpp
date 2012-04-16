@@ -36,7 +36,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/devices/sensors/visual/grabbertools/FirewireInterface.h"
+#include "cedar/devices/sensors/visual/grabbertools/LibDcCameraBase.h"
 
 // PROJECT INCLUDES
 
@@ -45,14 +45,18 @@
 #include <dc1394/dc1394.h>
 
 
-using namespace cedar::dev::sensors::visual::grabbertools;
+/*! @file Main file for fwBusReset - a tool for firewire cameras
+ *
+ *  A short program to search the bus for the first available camera, then resets it and the bus itself
+ *
+ */
 
 int main(int, char *argv[])
 {
   std::cout << argv[0] << " resets the first camera on the firewire bus and the bus itself\n";
 
   //create firewire interface
-  FirewireInterface fw_interface;
+  cedar::dev::sensors::visual::LibDcCameraBase fw_interface;
 
   if (fw_interface.getNumCams() < 1)
   {

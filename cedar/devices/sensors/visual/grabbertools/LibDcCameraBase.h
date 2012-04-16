@@ -22,29 +22,28 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        FirewireInterface.h
+    File:        LibDcCameraBase.h
 
     Maintainer:  Georg.Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2011 12 11
 
-    Description: Header for the @em FirewireInterface class.
+    Description: Header for the @em LibDcCameraBase class.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef FIREWIRE_INTERFACE_H
-#define FIREWIRE_INTERFACE_H
+#ifndef CEDAR_DEV_SENSORS_VISUAL_LIBDCCAMERABASE_H
+#define CEDAR_DEV_SENSORS_VISUAL_LIBDCCAMERABASE_H
 
+// CEDAR INCLUDES
+#include "cedar/devices/robot/CMakeDefines.h"  // MAKE FIREWIRE OPTIONAL
 
-// MAKE FIREWIRE OPTIONAL
-#include "cedar/devices/robot/CMakeDefines.h"
 #ifdef CEDAR_USE_LIB_DC1394
 //#pragma message "compiling with DC1394 support"
 
-// CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/grabbertools/namespace.h"
+#include "cedar/devices/sensors/visual/namespace.h"
 
 // SYSTEM INCLUDES
 #include <inttypes.h>
@@ -64,8 +63,7 @@
  *    4. work with opened device
  *    5. close device
  */
-//grabbertool weg, LibDCTool
-class cedar::dev::sensors::visual::grabbertools::FirewireInterface
+class cedar::dev::sensors::visual::LibDcCameraBase
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -79,11 +77,11 @@ class cedar::dev::sensors::visual::grabbertools::FirewireInterface
 public:
   //!@brief The standard constructor.
   //opens the firewire bus context and query the number of available cameras
-  FirewireInterface();
+  LibDcCameraBase();
   
   //!@brief Destructor
   //close all firewire related handles
-  ~FirewireInterface();
+  ~LibDcCameraBase();
   
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -160,20 +158,15 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-
-
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
 
-
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-//todo:: public weg
-public:
-  // none yet (hopefully never!)
+
 protected:
   // none yet
 private:
@@ -201,9 +194,8 @@ protected:
 private:
   // none yet
 
-}; // cedar::dev::sensors::visual::grabbertools::FirewireInterface
+}; // cedar::dev::sensors::visual::LibDcCameraBase
 
-// MAKE FIREWIRE OPTIONAL
 #endif// CEDAR_USE_LIB_DC1394
-#endif // FIREWIRE_INTERFACE_H
+#endif // CEDAR_DEV_SENSORS_VISUAL_LIBDCCAMERABASE_H
 
