@@ -70,12 +70,8 @@ cedar::proc::gui::Ide::Ide()
 {
   this->setupUi(this);
 
-  // first of all, set the logger
-  cedar::aux::LogSingleton::getInstance()->addLogger
-  (
-    cedar::aux::LogInterfacePtr(new cedar::proc::gui::Ide::Logger(this->mpLog))
-  );
-
+  // first, setup the log to receive messages
+  this->mpLog->installHandlers(true);
 
   this->loadDefaultPlugins();
   this->resetStepList();
@@ -164,15 +160,6 @@ cedar::proc::gui::Ide::Ide()
 
 cedar::proc::gui::Ide::~Ide()
 {
-  // remove any custom loggers to prevent segmentation faults
-  //!@todo This should only remove the logger the Ide installed.
-  cedar::aux::LogSingleton::getInstance()->clearLoggers();
-}
-
-cedar::proc::gui::Ide::Logger::Logger(QTextEdit *pLog)
-:
-mpLog(pLog)
-{
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -182,62 +169,6 @@ mpLog(pLog)
 cedar::proc::gui::View* cedar::proc::gui::Ide::getArchitectureView()
 {
   return this->mpProcessingDrawer;
-}
-
-void cedar::proc::gui::Ide::Logger::message
-     (
-       cedar::aux::LOG_LEVEL level,
-       const std::string& message,
-       const std::string& title
-     )
-{
-  CEDAR_DEBUG_ASSERT(mpLog != NULL);
-
-  QString log_entry;
-
-  QString source;
-  if (!title.empty())
-  {
-    source = "[" + Qt::escape(QString::fromStdString(title)) + "] ";
-  }
-
-  QString type = "?";
-  QString left = "";
-  QString right = "";
-  switch (level)
-  {
-    case cedar::aux::LOG_LEVEL_DEBUG:
-      left = "<font color=\"blue\"><b>";
-      right = "</b></font>";
-      type = "debug";
-      break;
-
-    case cedar::aux::LOG_LEVEL_MEM_DEBUG:
-      left = "<font color=\"#A0A0A0\"><b>";
-      right = "</b></font>";
-      type = "memdbg";
-      break;
-
-    case cedar::aux::LOG_LEVEL_WARNING:
-      left = "<font color=\"#ffd800\"><b>";
-      right = "</b></font>";
-      type = "warning";
-      break;
-
-
-    case cedar::aux::LOG_LEVEL_ERROR:
-      left = "<font color=\"red\"><b>";
-      right = "</b></font>";
-      type = "error";
-      break;
-
-    default:
-      // nothing to do.
-      break;
-  }
-
-  log_entry = type + "> " + source + " " + left + Qt::escape(QString::fromStdString(message)) + right;
-  mpLog->append(log_entry);
 }
 
 void cedar::proc::gui::Ide::showSettingsDialog()
@@ -559,12 +490,12 @@ void cedar::proc::gui::Ide::error(const QString& message)
 
 void cedar::proc::gui::Ide::message(const QString& message)
 {
-  this->mpLog->append(message + "\n");
+  cedar::aux::LogSingleton::getInstance()->message(message.toStdString(), "cedar::proc::gui::Ide::message");
 }
 
 void cedar::proc::gui::Ide::logError(const std::string& message)
 {
-  this->mpLog->append("<font color=\"red\"><b>" + QString::fromStdString(message) + "</b></font>\n");
+  cedar::aux::LogSingleton::getInstance()->error(message, "cedar::proc::gui::Ide::logError");
 }
 
 void cedar::proc::gui::Ide::startThreads()

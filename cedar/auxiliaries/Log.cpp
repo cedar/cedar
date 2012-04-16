@@ -73,6 +73,23 @@ void cedar::aux::Log::addLogger(cedar::aux::LogInterfacePtr logger, cedar::aux::
   this->mHandlers.push_back(handler);
 }
 
+void cedar::aux::Log::removeLogger(cedar::aux::LogInterfacePtr logger)
+{
+  for (std::vector<LogHandler>::iterator i = this->mHandlers.begin(); i != this->mHandlers.end();)
+  {
+    const LogHandler& handler = *i;
+
+    if (handler.mpLogger == logger)
+    {
+      i = this->mHandlers.erase(i);
+    }
+    else
+    {
+      ++i;
+    }
+  }
+}
+
 void cedar::aux::Log::log(cedar::aux::LOG_LEVEL level, const std::string& message, const std::string& source, const std::string& title)
 {
   bool was_accepted = false;

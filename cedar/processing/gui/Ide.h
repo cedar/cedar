@@ -62,28 +62,6 @@ class cedar::proc::gui::Ide : public QMainWindow, public Ui_Ide
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-  class Logger : public cedar::aux::LogInterface
-  {
-    public:
-      Logger(QTextEdit *pLog);
-
-      void message
-      (
-        cedar::aux::LOG_LEVEL level,
-        const std::string& message,
-        const std::string& title
-      );
-
-    private:
-      QTextEdit *mpLog;
-  };
-
-  CEDAR_GENERATE_POINTER_TYPES(Logger);
-
-  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:

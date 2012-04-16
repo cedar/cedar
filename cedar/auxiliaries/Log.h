@@ -139,6 +139,10 @@ public:
     cedar::aux::LogFilterPtr filter = cedar::aux::LogFilterPtr(new cedar::aux::logFilter::All())
   );
   
+  /*!@brief Removes all occurrences of the logger in the message passing chain.
+   */
+  void removeLogger(cedar::aux::LogInterfacePtr logger);
+
 
   /*!@brief Sends a standard message about an object's allocation.
    */
