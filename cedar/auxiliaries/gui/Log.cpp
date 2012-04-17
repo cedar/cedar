@@ -171,6 +171,7 @@ void cedar::aux::gui::Log::postMessage
 
   pTable->setItem(row, 0, p_title_item);
   pTable->setCellWidget(row, 1, p_message_item);
+  pTable->resizeRowToContents(row);
 }
 
 void cedar::aux::gui::Log::message
