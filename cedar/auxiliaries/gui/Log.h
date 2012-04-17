@@ -113,7 +113,8 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+signals:
+  void messageReceived(int type, QString title, QString message);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -126,10 +127,14 @@ private:
   void postMessage
   (
     QTableWidget* pTable,
-    const std::string& message,
-    const std::string& title,
-    const std::string& icon = ""
+    const QString& message,
+    const QString& title,
+    const QString& icon = ""
   );
+
+private slots:
+  void printMessage(int type, QString title, QString message);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
