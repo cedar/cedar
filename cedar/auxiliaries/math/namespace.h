@@ -74,6 +74,12 @@ namespace cedar
       typedef LimitsParameter<double> DoubleLimitsParameter;
       CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleLimitsParameter);
 
+      typedef LimitsParameter<unsigned int> UIntLimitsParameter;
+      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntLimitsParameter);
+
+      typedef LimitsParameter<int> IntLimitsParameter;
+      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntLimitsParameter);
+
     }
   }
 }

@@ -40,6 +40,8 @@
 #define NOMINMAX // to avoid Windows issues
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/math/namespace.h"
 
 // SYSTEM INCLUDES
@@ -79,9 +81,9 @@ struct cedar::aux::math::Limits
   /*!@brief Checks whether a given value is within the limits.
    * @param[in] value the value to be checked
    */
-  bool isInLimits(const T& value)
+  bool isInLimits(const T& value) const
   {
-    if (value < mLowerLimit || value > mUppperLimit)
+    if (value < mLowerLimit || value > mUpperLimit)
     {
       return false;
     }
@@ -92,17 +94,51 @@ struct cedar::aux::math::Limits
    * If the value is below the lower limit, the method will set the value to the lower limit.
    * If the value is above the upper limit, the method will set the value to the upper limit.
    * If the value is within the limits, the method will not change the value.
-   * @param[in] value the value to be thresholded
+   * @param[in,out] value the value to be thresholded
    */
-  void threshold(const T& value)
+  void threshold(T& value, bool warnOnThresholding = true) const
   {
     if (value < mLowerLimit)
     {
       value = mLowerLimit;
+      if (warnOnThresholding)
+      {
+        cedar::aux::LogSingleton::getInstance()->warning
+        (
+          "Thresholding a value to the lower limit.",
+          "cedar::aux::math::Limits",
+          "Tresholding"
+        );
+      }
     }
     else if (value > mUpperLimit)
     {
       value = mUpperLimit;
+      if (warnOnThresholding)
+      {
+        cedar::aux::LogSingleton::getInstance()->warning
+        (
+          "Thresholding a value to the upper limit.",
+          "cedar::aux::math::Limits",
+          "Tresholding"
+        );
+      }
+    }
+  }
+
+  /*!@brief Tresholds a vector of values against the limits.
+   * @param[in,out] values the vector of values to be thresholded
+   */
+  void threshold(std::vector<T>& values, bool warnOnThresholding = true) const
+  {
+    for
+    (
+      typename std::vector<T>::iterator it = values.begin();
+      it != values.end();
+      ++it
+    )
+    {
+      threshold(*it, warnOnThresholding);
     }
   }
 

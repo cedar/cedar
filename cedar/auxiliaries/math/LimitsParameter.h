@@ -140,7 +140,7 @@ public:
     upper_limit_node.put_value(mLimits.mUpperLimit);
     limits_node.push_back(cedar::aux::ConfigurationNode::value_type("upper limit", upper_limit_node));
 
-    root.push_back(cedar::aux::ConfigurationNode::value_type(getName(), limits_node));
+    root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), limits_node));
   }
 
   //!@brief set value to default
@@ -150,27 +150,40 @@ public:
     this->setUpperLimit(mUpperLimitDefault);
   }
 
+  //!@brief get the current value of type T of this parameter
+  const cedar::aux::math::Limits<T>& getValue() const
+  {
+    return this->mLimits;
+  }
+
+  //!@brief set the value of type T of this parameter
+  void setValue(const cedar::aux::math::Limits<T>& value)
+  {
+    this->mLimits = value;
+    this->emitChangedSignal();
+  }
+
   void setLowerLimit(const T& value)
   {
-    this->mLimits.mLowerLimit = value;
+    mLimits.mLowerLimit = value;
     this->emitPropertyChangedSignal();
   }
 
   void setUpperLimit(const T& value)
   {
     // todo: check whether the new upper limit is inside the provided extrema
-    this->mLimits.mUpperLimit = value;
+    mLimits.mUpperLimit = value;
     this->emitPropertyChangedSignal();
   }
 
   const T& getLowerLimit() const
   {
-    return this->mLimits.mLowerLimit;
+    return mLimits.mLowerLimit;
   }
 
   const T& getUpperLimit() const
   {
-    return this->mLimits.mUpperLimit;
+    return mLimits.mUpperLimit;
   }
 
   //!@brief get the minimum value of the lower limit
@@ -259,6 +272,7 @@ private:
   //!@brief The maximum value of the upper limit
   T mUpperLimitMaximum;
 
+  //! holds the minimum and maximum limits
   cedar::aux::math::Limits<T> mLimits;
 
 }; // class cedar::aux::math::LimitsParameter

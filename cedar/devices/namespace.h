@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,39 +22,39 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        serialCommunicationTest.cpp
+    File:        namespace.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2012 04 13
 
-    Description: Interactive test-program for the SerialCommunication class.
+    Description: Namespace file for cedar::dev.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_DEV_NAMESPACE_H
+#define CEDAR_DEV_NAMESPACE_H
+
 // CEDAR INCLUDES
-#include "cedar/devices/communication/SerialCommunication.h"
-#include "cedar/devices/communication/gui/CommunicationWidget.h"
+#include "cedar/devices/lib.h"
+#include "cedar/defines.h"
 
 // SYSTEM INCLUDES
-#include <QApplication>
 
-int main(int argc, char **argv)
+
+namespace cedar
 {
-  //open the channel
-  cedar::dev::com::SerialCommunicationPtr communication(new cedar::dev::com::SerialCommunication());
-  communication->readJson("SerialCommunicationConfig.json");
-
-  // create the GUI
-  cedar::dev::com::gui::CommunicationWidgetPtr
-    communication_widget(new cedar::dev::com::gui::CommunicationWidget(communication));
-  communication_widget->show();
-
-  //start the program
-  QApplication application(argc, argv);
-  application.exec();
-
-  return 0;
+  /*!@brief Namespace for all dev classes. */
+  namespace dev
+  {
+    //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_DECLARE_DEV_CLASS(UnresponsiveRobotException);
+    CEDAR_DECLARE_DEV_CLASS(SerialCommunicationException);
+    CEDAR_DECLARE_DEV_CLASS(UnknownOperatingSystemException);
+    //!@endcond
+  }
 }
+
+#endif // CEDAR_DEV_NAMESPACE_H

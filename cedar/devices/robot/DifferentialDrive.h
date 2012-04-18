@@ -24,140 +24,143 @@
 
     File:        DifferentialDrive.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2012 04 12
 
     Description: An object of this class represents the differential drive of a robot.
 
-    Credits:
+    Credits:     Original design by Andre Bartel (2011)
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_MOBILE_DIFFERENTIAL_DRIVE_H
-#define CEDAR_DEV_ROBOT_MOBILE_DIFFERENTIAL_DRIVE_H
+#ifndef CEDAR_DEV_ROBOT_DIFFERENTIAL_DRIVE_H
+#define CEDAR_DEV_ROBOT_DIFFERENTIAL_DRIVE_H
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/Locomotion.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 /*!@brief An object of this class represents the differential drive of a robot.
  *
  * This is an abstract class with functions and attributes common to differential drives. Robots with differential
  * drives are e.g. the mobile robots by K-Team.
  */
-class cedar::dev::robot::DifferentialDrive : public cedar::dev::robot::Locomotion
+class cedar::dev::robot::DifferentialDrive
+:
+public cedar::dev::robot::Locomotion
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-  //!@brief Constructs an object which represents the differential drive of a robot.
+  //!@brief The constructor
   DifferentialDrive();
-
-  //!@brief Destructs the object.
-  virtual ~DifferentialDrive();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-  //!@brief The get-function of the distance between the 2 wheels.
-  //!@return Distance between the wheels [in m]
+  //!@brief Returns the distance between the two wheels [in m].
   double getWheelDistance() const;
 
-  //!@brief The get-function of the wheel's radius.
-  //!@return The wheel's radius [in m]
+  //!@brief Returns the radius of the wheels [in m].
   double getWheelRadius() const;
 
-  //!@brief The get-function of the maximal wheel speed.
-  //!@return The maximal wheel speed [in m/s]
-  double getMaximalWheelSpeed() const;
+  //!@brief Returns the speed limits dictated by the robotic hardware [in m/s].
+  cedar::aux::math::DoubleLimitsParameterPtr getHardwareSpeedLimits() const;
 
-  //!@brief The get-function of the current wheel speed.
-  //!@return Vector including the wheel speed of the left (1st element) and right wheel (2nd element) [both in m/s]
+  /*!@brief Returns the current speed of the wheels [in m/s].
+   * @return Vector holding the wheel speed of the left (1st element) and right wheel (2nd element) [both in m/s]
+   */
   const std::vector<double>& getWheelSpeed() const;
 
-  /*!@brief The set-function of the left and right wheel speed.
-   *@param leftWheelSpeed The wheel speed of the left wheel to be set [in m/s].
-   *@param rightWheelSpeed The wheel speed of the right wheel to be set [in m/s].
-   *@return 1 if setting wheel speeds was successful and 0 otherwise.
+  /*!@brief Sets the speed of the left and right wheel.
+   * @param[in] wheelSpeed The wheel speed of the left and right wheel to be set [in m/s].
    */
-  virtual int setWheelSpeed(double leftWheelSpeed, double rightWheelSpeed) = 0;
+  virtual void setWheelSpeed(std::vector<double>& wheelSpeed);
 
-  /*!@brief Sets both forward velocity and turning rate.
-   *@param forwardVelocity The forward velocity to be set [in m/s].
-   *@param turningRate The turning rate to be set [in rad/s].
-   *@return 1 if setting forward velocity and turning rate was successful and 0 otherwise.
+  /*!@brief Sets the speed of the wheels based on the given forward velocity.
+   * @param[in] forwardVelocity The forward velocity to be set [in m/s].
    */
-  int setVelocity(double forwardVelocity, double turningRate);
+  virtual void setForwardVelocity(double forwardVelocity);
 
-  /*!@brief Sets forward velocity only.
-   *@param forwardVelocity The forward velocity to be set [in m/s].
-   *@return 1 if setting forward velocity was successful and 0 otherwise.
+  /*!@brief Sets the speed of the wheels based on the given turning rate.
+   * @param[in] turningRate The turning rate to be set [in rad/s].
    */
-  int setForwardVelocity(double forwardVelocity);
+  virtual void setTurningRate(double turningRate);
 
-  /*!@brief Sets turning rate only.
-   *@param turningRate The turning rate to be set [in rad/s].
-   *@return 1 if setting turning rate was successful and 0 otherwise.
+  /*!@brief Sets the speed of the wheels based on the given forward velocity and turning rate.
+   * @param[in] turningRate The turning rate to be set [in rad/s].
    */
-  int setTurningRate(double turningRate);
+  virtual void setForwardVelocityAndTurningRate(double forwardVelocity, double turningRate);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-  /*!@brief This function calculates forward velocity and turning rate from wheel speeds of differential drive robots.
-   *@param leftWheelSpeed The wheel speed of the left wheel [in m/s].
-   *@param rightWheelSpeed The wheel speed of the right wheel [in m/s].
-   *@return Vector with forward velocity [in m/s] as 1st and turning rate [in rad/s] as 2nd element.
+  /*!@brief Thresholds the given wheel speeds according to the hardware limits read from the configuration file.
+   * @param[in,out] leftWheelSpeed the speed of the left wheel [m/s]
+   * @param[in,out] rightWheelSpeed the speed of the right wheel [m/s]
    */
-  std::vector<double> calculateVelocity(double leftWheelSpeed, double rightWheelSpeed);
-
-  /*!@brief This function calculates left and right wheel speed from forward velocity and turning rate.
-   *@param forwardVelocity The forward velocity of the robot [in m/s].
-   *@param turningRate The turning rate of the robot [in rad/s].
-   *@return Vector including wheel speed of left (1st element) and right (2nd element) wheel [both in m/s].
-   */
-  std::vector<double> calculateWheelSpeed(double forwardVelocity, double turningRate);
+  void thresholdToHardwareLimits(double& leftWheelSpeed, double& rightWheelSpeed);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /*!@brief Converts a given forward velocity and turning rate into wheel speeds.
+   * @param[in] forwardVelocity the given forward velocity of the robot [m/s]
+   * @param[in] turningRate the given turning rate of the robot [rad/s]
+   * @param[out] leftWheelSpeed the calculated speed of the left wheel [m/s]
+   * @param[out] rightWheelSpeed the calculated speed of the right wheel [m/s]
+   */
+  void convertToWheelSpeed
+       (
+         double forwardVelocity,
+         double turningRate,
+         double& leftWheelSpeed,
+         double& rightWheelSpeed
+       ) const;
 
-  // none yet
+  /*!@brief Converts given wheel speeds into a forward velocity and turning rate.
+   * @param[in] leftWheelSpeed the given speed of the left wheel [m/s]
+   * @param[in] rightWheelSpeed the given speed of the right wheel [m/s]
+   * @param[out] forwardVelocity the calculated forward velocity of the robot [m/s]
+   * @param[out] turningRate the calculated turning rate of the robot [rad/s]
+   */
+  void convertToForwardVelocityAndTurningRate
+       (
+         double leftWheelSpeed,
+         double rightWheelSpeed,
+         double& forwardVelocity,
+         double& turningRate
+       ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Vector including the current left (1st element) and right (2nd element) wheel's speed [both in m/s].
-  std::vector<double> mWheelSpeed;
-
-  //!@brief The maximal wheel speed [in m/s].
-  double mMaximalWheelSpeed;
+  // none yet
 
 private:
-  // none yet
+  //! vector holding the current speed of the left (1st element) and right (2nd element) wheel [in m/s]
+  std::vector<double> mWheelSpeed;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-  //!@brief The distance between the 2 wheels [in m].
-  double _mWheelDistance;
-
-  //!@brief The wheel's radius [in m].
-  double _mWheelRadius;
+  // none yet
 
 private:
-  // none yet
-}; // class cedar::dev::robot::mobile::DifferentialDrive
-#endif // CEDAR_DEV_ROBOT_MOBILE_DIFFERENTIAL_DRIVE_H
+  //! distance between the wheels [in m]
+  cedar::aux::DoubleParameterPtr _mWheelDistance;
+  //! radius of the wheel [in m]
+  cedar::aux::DoubleParameterPtr _mWheelRadius;
+  //! limits for the speed of the wheels [in m/s]
+  cedar::aux::math::DoubleLimitsParameterPtr _mHardwareSpeedLimits;
+}; // class cedar::dev::robot::DifferentialDrive
+#endif // CEDAR_DEV_ROBOT_DIFFERENTIAL_DRIVE_H
