@@ -38,6 +38,9 @@
 #define CEDAR_DEV_ROBOT_LOCOMOTION_H
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
+#include "cedar/auxiliaries/Configurable.h"
 #include "cedar/devices/robot/namespace.h"
 #include "cedar/devices/robot/Component.h"
 
@@ -48,65 +51,66 @@
  * This is an abstract class with functions and attributes common to drives of mobile robots. Mobile robots are e.g
  * robots with differential drives or walking robots.
  */
-class cedar::dev::robot::Locomotion : public cedar::dev::robot::Component
+class cedar::dev::robot::Locomotion : public cedar::dev::robot::Component, public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  Locomotion();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The get-function of both forward velocity and turning rate.
-  //!@return 2-dimensional vector with mForwardVelocity [in m/s] as 1st and mTurningRate in [rad/s] as 2nd element.
-  const std::vector<double>& getVelocity() const;
-
-  //!@brief The get-function of the forward velocity.
-  //!@return Forward Velocity [in m/s]
+  //!@brief Returns the forward velocity [in m/s] of the robot.
   double getForwardVelocity() const;
 
-  //!@brief The get-function of the turning rate.
-  //!@return Turning Rate [in rad/s]
+  //!@brief Returns the turning rate [in rad/s] of the robot.
   double getTurningRate() const;
 
-  /*!@brief Sets both forward velocity and turning rate.
-   * @param forwardVelocity The forward velocity to be set [in m/s].
-   * @param turningRate The turning rate to be set [in rad/s].
-   * @return 1 if setting forward velocity and turning rate was successful and 0 otherwise.
-   */
-  virtual int setVelocity(double forwardVelocity, double turningRate) = 0;
+  //!@brief Stops the robot.
+  virtual void stop();
 
-  /*!@brief Sets forward velocity only.
-   * @param forwardVelocity The forward velocity to be set [in m/s].
-   * @return 1 if setting forward velocity was successful and 0 otherwise.
-   */
-  virtual int setForwardVelocity(double forwardVelocity) = 0;
-
-  /*!@brief Sets turning rate only.
-   * @param turningRate The turning rate to be set [in rad/s].
-   * @return 1 if setting turning rate was successful and 0 otherwise.
-   */
-  virtual int setTurningRate(double turningRate) = 0;
-
-  /*!@brief Stops the robot.
-   * @return 1 if stopping the robot was successful and 0 otherwise.
-   */
-  int stop();
-
-  /*!@brief Resets the robot.
-   * @return 1 if resetting the robot was successful and 0 otherwise.
+  /*!@ Returns the (estimated) current forward velocity [in m/s].
    *
-   * This function stops the robot and resets its movement-sensors (e.g., encoders).
+   * This value is usually estimated based on sensors of the robot
+   * (e.g., wheel encoders) and may differ from its real forward velocity.
    */
-  virtual int reset() = 0;
+  //virtual double getEstimatedForwardVelocity() const = 0;
+
+  /*!@ Returns the (estimated) current turning rate [in rad/s].
+   *
+   * This value is usually estimated based on sensors of the robot
+   * (e.g., wheel encoders) and may differ from its real turning rate.
+   */
+  //virtual double getEstimatedTurningRate() const = 0;
+
+  //!@brief Sets the current forward velocity [in m/s] of the robot.
+  virtual void setForwardVelocity(double forwardVelocity) = 0;
+
+  //!@brief Sets the turning rate [in rad/s] of the robot.
+  virtual void setTurningRate(double turningRate) = 0;
+
+  //!@brief Sets both the forward velocity [in m/s] and turning rate [in rad/s] of the robot.
+  virtual void setForwardVelocityAndTurningRate(double forwardVelocity, double turningRate) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  /*!@brief Checks the given forward velocity against the configured limits and thresholds it if necessary.
+   * @param[in,out] forwardVelocity forward velocity to be thresholded [m/s]
+   */
+  virtual void thresholdForwardVelocity(double& forwardVelocity) const;
+
+  /*!@brief Checks the given turning rate against the configured limits and thresholds it if necessary.
+   * @param[in,out] turningRate turning rate to be thresholded [m/s]
+   */
+  virtual void thresholdTurningRate(double& turningRate) const;
+
+  //!@brief Actually sends the movement commands to the robot.
+  virtual void sendMovementCommand() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -118,8 +122,10 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Vector with forward velocity as 1st and turning rate as 2nd element [both in m/s].
-  std::vector<double> mVelocity;
+  //! desired forward velocity [m/s]
+  double mForwardVelocity;
+  //! desired turning rate of the robot [rad/s]
+  double mTurningRate;
 
 private:
   // none yet
@@ -128,12 +134,13 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief The Debug-Flag.
-   * If true, error-messages and received strings from the robot are displayed on Console, else not.
-   */
-  bool _mDebug;
+  // none yet
 
 private:
-  // none yet
+  //! limits for the forward velocity of the robot [m/s]
+  cedar::aux::math::DoubleLimitsParameterPtr _mForwardVelocityLimits;
+  //! limits for the turning rate of the robot [rad/s]
+  cedar::aux::math::DoubleLimitsParameterPtr _mTurningRateLimits;
+
 }; // class cedar::dev::robot::Locomotion
 #endif // CEDAR_DEV_ROBOT_LOCOMOTION_H

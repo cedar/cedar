@@ -34,49 +34,35 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
-
+// CEDAR INCLUDES
 #include "cedar/devices/kteam/EPuckDrive.h"
 #include "cedar/devices/communication/SerialCommunication.h"
 #include "cedar/devices/kteam/gui/EPuckControlWidget.h"
 
 // SYSTEM INCLUDES
-
 #include <QApplication>
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
 
 int main(int argc, char **argv)
 {
   QApplication a(argc, argv);
 
-  //open the channel to the e-puck
-  cedar::dev::com::SerialCommunication *p_communication = new cedar::dev::com::SerialCommunication();
-  p_communication->readJson("../../tests/interactive/devices/ePuck/SerialCommunicationConfig.json");
+  // open the channel to the e-puck
+  cedar::dev::com::SerialCommunicationPtr communication(new cedar::dev::com::SerialCommunication());
+  communication->readJson("SerialCommunicationConfig.json");
 
-  //initialize e-puck-drive
-  cedar::dev::kteam::EPuckDrive *p_drive;
-  p_drive
-  = new cedar::dev::kteam::EPuckDrive(p_communication, "../../tests/interactive/devices/ePuck/EPuckDriveConfig.cfg");
+  // initialize e-puck-drive
+  cedar::dev::kteam::EPuckDrivePtr drive(new cedar::dev::kteam::EPuckDrive(communication));
 
-  //open the control-GUI
-  cedar::dev::kteam::gui::EPuckControlWidget *p_epuck_control;
-  p_epuck_control = new cedar::dev::kteam::gui::EPuckControlWidget(p_drive);
-  p_epuck_control->show();
+  // open the control-GUI
+  cedar::dev::kteam::gui::EPuckControlWidgetPtr epuck_control(new cedar::dev::kteam::gui::EPuckControlWidget(drive));
+  epuck_control->show();
 
   //start the program
-  a.exec();
+  QApplication application(argc, argv);
+  application.exec();
 
   //reset the e-puck
-  p_drive->reset();
-
-  delete p_drive;
-  delete p_communication;
-  delete p_epuck_control;
+  drive->reset();
 
   return 0;
 }

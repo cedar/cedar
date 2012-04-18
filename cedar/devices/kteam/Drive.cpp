@@ -22,44 +22,82 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KTeamDrive.cpp
+    File:        Drive.cpp
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2012 04 12
 
     Description: An object of this class represents the differential drive of a PWM-driven robot.
 
-    Credits:
+    Credits:     Original design by Andre Bartel (2011)
 
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/math/IntLimitsParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/math/constants.h"
 #include "cedar/devices/kteam/Drive.h"
+#include "cedar/devices/communication/SerialCommunication.h"
+#include "cedar/devices/exceptions.h"
 
 // SYSTEM INCLUDES
-#include <iostream>
+#include <vector>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+cedar::dev::kteam::Drive::Drive(cedar::dev::com::SerialCommunicationPtr communication)
+:
+cedar::dev::robot::DifferentialDrive(),
+mSerialCommunication(communication),
+_mNumberOfPulsesPerRevolution(new cedar::aux::DoubleParameter(this, "number of pulses per revolution", 0.1, 0.0, 1.0)),
+_mEncoderLimits(new cedar::aux::math::IntLimitsParameter(this, "encoder limits", -32768, 0, 0, 32767))
+{
+  mDistancePerPulse = 2.0 * cedar::aux::math::pi * getWheelRadius() / getNumberOfPulsesPerRevolution();
+
+#ifdef DEBUG
+  // send a dummy-message
+  getSerialCommunication()->lock();
+  getSerialCommunication()->send("A");
+  std::string answer = getSerialCommunication()->receive();
+  getSerialCommunication()->unlock();
+
+  // 'a,' or 'z,' expected, else init failed
+  if (answer.size() >= 2 && (answer[0] == 'a' || answer[0] == 'z') && answer[1] == ',')
+  {
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "EPuckDrive: Initialization successful (Answer: '" + answer + "')",
+      "cedar::dev::kteam::EPuckDrive::init()",
+      "EPuckDrive successfully initialized"
+    );
+  }
+  else
+  {
+    CEDAR_THROW
+    (
+      cedar::dev::SerialCommunicationException,
+      "Initialization of serial communication failed."
+    );
+  }
+#endif
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-double cedar::dev::kteam::Drive::getPulsesPerRevolution() const
+
+double cedar::dev::kteam::Drive::getNumberOfPulsesPerRevolution() const
 {
-  return _mPulsesPerRevolution;
+  return _mNumberOfPulsesPerRevolution->getValue();
 }
 
-int cedar::dev::kteam::Drive::getMaximalEncoderValue() const
+cedar::aux::math::IntLimitsParameterPtr cedar::dev::kteam::Drive::getEncoderLimits() const
 {
-  return _mMaximalEncoderValue;
-}
-
-int cedar::dev::kteam::Drive::getMinimalEncoderValue() const
-{
-  return _mMinimalEncoderValue;
+  return _mEncoderLimits;
 }
 
 double cedar::dev::kteam::Drive::getDistancePerPulse() const
@@ -67,33 +105,162 @@ double cedar::dev::kteam::Drive::getDistancePerPulse() const
   return mDistancePerPulse;
 }
 
-int cedar::dev::kteam::Drive::getMaximalNumberPulsesPerSecond() const
+char cedar::dev::kteam::Drive::getCommandCharacterSetSpeed() const
 {
-  return _mMaximalNumberPulsesPerSecond;
+  return 'D';
 }
 
-int cedar::dev::kteam::Drive::resetEncoder()
+char cedar::dev::kteam::Drive::getCommandCharacterSetEncoder() const
 {
-  int s = setEncoder(0,0);
-  if (s == 0 && _mDebug) // setting encoder failed
-  {
-    std::cout << "KTeamDrive: Error Resetting Encoder\n";
-  }
-  return s;
+  return 'P';
 }
 
-int cedar::dev::kteam::Drive::reset()
+char cedar::dev::kteam::Drive::getCommandCharacterGetEncoder() const
 {
-  int s = setWheelSpeed(0,0); // = 1 if setting wheel speed successful, else 0
-  s = s * resetEncoder(); // = 1 if setting both wheel speed and resetting encoder successful, else 0
-  if (s == 0 && _mDebug) // setting wheel speed or resetting encoder failed
-  {
-    std::cout << "KTeamDrive: Error Resetting Robot\n";
-  }
-  else if (_mDebug)
-  {
-    std::cout << "KTeamDrive: Resetting Robot Successful\n";
-  }
+  return 'Q';
+}
 
-  return s;
+char cedar::dev::kteam::Drive::getCommandCharacterGetAcceleration() const
+{
+  return 'A';
+}
+
+cedar::dev::com::SerialCommunicationPtr cedar::dev::kteam::Drive::getSerialCommunication() const
+{
+  return mSerialCommunication;
+}
+
+void cedar::dev::kteam::Drive::sendMovementCommand()
+{
+  // the speed has be thresholded based on the maximum possible number
+  // of pulses per second (this is hardware-specific).
+  // first: convert speed from m/s into Pulses/s ...
+  std::vector<int> wheel_speed_pulses(2);
+  wheel_speed_pulses[0] = cedar::aux::math::round(this->getWheelSpeed()[0] / mDistancePerPulse);
+  wheel_speed_pulses[1] = cedar::aux::math::round(this->getWheelSpeed()[1] / mDistancePerPulse);
+
+  // construct the command string "D,x,y"
+  // where x is the speed of the left wheel (in pulses/s)
+  // and y is the speed of the right wheel (in pulses/s)
+  std::ostringstream command;
+  command << getCommandCharacterSetSpeed() << "," << wheel_speed_pulses[0] << "," << wheel_speed_pulses[1];
+
+  getSerialCommunication()->lock();
+  // send the command via the serial connection
+  getSerialCommunication()->send(command.str());
+  // wait for an answer
+  std::string answer = getSerialCommunication()->receive();
+  getSerialCommunication()->unlock();
+
+  checkAnswer(answer, getCommandCharacterSetSpeed());
+}
+
+std::vector<int> cedar::dev::kteam::Drive::getEncoders() const
+{
+  // the left and right encoder value will be saved in this vector
+  std::vector<int> encoders(2);
+
+  // send the command to receive the values of the encoders
+  getSerialCommunication()->lock();
+  getSerialCommunication()->send(cedar::aux::toString(getCommandCharacterGetEncoder()));
+  std::string answer = getSerialCommunication()->receive();
+  getSerialCommunication()->unlock();
+
+  // check whether the answer begins with the correct character
+  checkAnswer(answer, getCommandCharacterGetEncoder());
+
+  std::istringstream answer_stream;
+  answer_stream.str(answer);
+
+  // skip the answer characters (e.g., 'q,') at the beginning
+  answer_stream.ignore(2);
+  checkStream(answer_stream);
+
+  // read the left encoder value
+  answer_stream >> encoders[0];
+  checkStream(answer_stream);
+
+  // skip the colon separating the encoder values
+  answer_stream.ignore(1);
+  checkStream(answer_stream);
+
+  // read the right encoder value
+  answer_stream >> encoders[1];
+  checkStream(answer_stream);
+
+  // print a debug message that everything worked
+  cedar::aux::LogSingleton::getInstance()->debugMessage
+  (
+    "Successfully received encoders",
+    "cedar::dev::kteam::Drive",
+    "Received encoders"
+  );
+
+  return encoders;
+}
+
+void cedar::dev::kteam::Drive::setEncoders(const std::vector<int>& encoders)
+{
+  // create a command string which will set the encoder values
+  std::ostringstream command;
+  command << getCommandCharacterSetEncoder() << "," << encoders[0] << "," << encoders[1];
+  // send the command string
+  getSerialCommunication()->lock();
+  getSerialCommunication()->send(command.str());
+  // receive an answer
+  std::string answer = getSerialCommunication()->receive();
+  getSerialCommunication()->unlock();
+
+  // check whether the answer begins with the correct character
+  checkAnswer(answer, getCommandCharacterSetEncoder());
+
+  // print a debug message that everything worked
+  cedar::aux::LogSingleton::getInstance()->debugMessage
+  (
+    "Successfully set encoders",
+    "cedar::dev::kteam::Drive",
+    "Set encoders"
+  );
+}
+
+void cedar::dev::kteam::Drive::reset()
+{
+  // stop the robot
+  stop();
+
+  // reset the encoder values of the robot to zero
+  std::vector<int> encoders(2);
+  encoders[0] = 0;
+  encoders[1] = 0;
+  setEncoders(encoders);
+}
+
+void cedar::dev::kteam::Drive::checkAnswer(const std::string& answer, char commandCharacter) const
+{
+  // determine the correct answer for the given command
+  char correct_answer = getSerialCommunication()->determineCorrectAnswer(commandCharacter);
+
+  // if the answer is incorrect ...
+  if (answer.empty() || answer[0] != correct_answer)
+  {
+    // ... throw an exception
+    std::string exception_message = "Unexpected answer during serial communication: " + answer;
+    CEDAR_THROW
+    (
+      cedar::dev::SerialCommunicationException,
+      exception_message
+    );
+  }
+}
+
+void cedar::dev::kteam::Drive::checkStream(const std::istringstream& answerStream) const
+{
+  if (answerStream.fail() || answerStream.eof())
+  {
+    CEDAR_THROW
+    (
+      cedar::dev::SerialCommunicationException,
+      "Error while parsing answer received from robot. Answer ends unexpectately."
+    );
+  }
 }

@@ -57,7 +57,7 @@ public:
 
   //!@brief Constructs the model of the K-Team robot.
   //!@param peDrive Pointer to the drive of the robot the position shall be calculated of.
-  DriveModel(cedar::dev::kteam::Drive *peDrive);
+  DriveModel(cedar::dev::kteam::DrivePtr drive);
 
   //!@brief Destructs the model of the K-Team robot.
   virtual ~DriveModel();
@@ -66,35 +66,22 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-  /*!@brief Initializes the model.
-   *@param peDrive Pointer to the drive of the robot the position shall be calculated of.
-   *@return 1 if initialization was successful, else 0.
-   */
-  int init(cedar::dev::kteam::Drive *peDrive);
-
-  /*!@brief Get-function of the initialization-status.
-   * @return true if model is initialized, else false.
-   */
-  bool isInitialized() const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-
   /*!@brief Calculates the current position and orientation of the robot based on its current encoder-values.
-   *@param LeftEncoder The current encoder-value of the left wheel.
-   *@param RightEncoder The current encoder-value of the right wheel.
+   * @param[in] encoders the encoder values of the left and right wheel
    */
-   void calculatePositionAndOrientation(int leftEncoder, int rightEncoder);
+   void calculatePositionAndOrientation(const std::vector<int>& encoders);
 
   /*!@brief Updates the current position.
    *
@@ -102,35 +89,19 @@ private:
    */
   void update();
 
-  /*!@brief This function implements the calculation of the distance the robot has moved since the last update.
-   *@param newLeftEncoder The current encoder-value of the left wheel.
-   *@param oldLeftEncoder The last encoder-value of the left wheel.
-   *@param newRightEncoder The current encoder-value of the right wheel.
-   *@param oldRightEncoder The last encoder-value of the right wheel.
-   *@return The distance the robot has moved [in m].
+  /*!@brief Calculates the distance the robot has moved since the last update.
+   * @param oldEncoders the encoder values of both wheels at time step t-1
+   * @param newEncoders the encoder values of both wheels at time step t
+   * @return the distance the robot has moved [m]
    */
-  double calculateDifferencePosition
-         (
-           int newLeftEncoder,
-           int oldLeftEncoder,
-           int newRightEncoder,
-           int oldRightEncoder
-         ) const;
+  double calculateDifferencePosition(const std::vector<int>& oldEncoders, const std::vector<int>& newEncoders) const;
 
-  /*!@brief This function implements the calculation of the angle the robot has turned since the last update.
-   *@param newLeftEncoder The current encoder-value of the left wheel.
-   *@param oldLeftEncoder The last encoder-value of the left wheel.
-   *@param newRightEncoder The current encoder-value of the right wheel.
-   *@param oldRightEncoder The last encoder-value of the right wheel.
-   *@return The angle the robot has turned [in rad].
+  /*!@brief Calculates the angle the robot has turned since the last update.
+   * @param oldEncoders the encoder values of both wheels at time step t-1
+   * @param newEncoders the encoder values of both wheels at time step t
+   * @return the angle the robot has turned [rad]
    */
-  double calculateDifferenceOrientation
-         (
-           int newLeftEncoder,
-           int oldLeftEncoder,
-           int newRightEncoder,
-           int oldRightEncoder
-         ) const;
+  double calculateDifferenceOrientation(const std::vector<int>& oldEncoders, const std::vector<int>& newEncoders) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -139,16 +110,10 @@ protected:
   // none yet
 
 private:
-  //!@brief The initialization-status
-  bool mInitialized;
+  //! drive of the robot
+  cedar::dev::kteam::DrivePtr mDrive;
 
-  /*!@brief Pointer to the robot the position is calculated of.
-   */
-  cedar::dev::kteam::Drive* mpeDrive;
-
-  /*!@brief Stores the last encoder-values (needed to calculate the distance the robot has moved).
-   */
-  cv::Mat mOldEncoder;
+  //! the last encoder values (needed to calculate the distance the robot has moved)
+  std::vector<int> mOldEncoders;
 }; // class cedar::dev::kteam::KTeamDriveModel
 #endif // CEDAR_DEV_KTEAM_DRIVE_MODEL_H
-
