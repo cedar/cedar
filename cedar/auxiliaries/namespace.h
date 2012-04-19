@@ -60,7 +60,9 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(UserData);
     //!@endcond
 
-    template<class T> class Singleton;
+    template <class T> class Singleton;
+
+    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(IntrusivePtrBase);
 
     //!@todo This class may be obsolete once the ConfigurationInterface is removed.
     template <typename T> class IntervalData;
@@ -246,9 +248,5 @@ namespace cedar
     };
   }
 }
-
-// Functions for boost intrusive pointer.
-extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_add_ref(cedar::aux::Parameter *pObject);
-extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_release(cedar::aux::Parameter *pObject);
 
 #endif // CEDAR_AUX_NAMESPACE_H
