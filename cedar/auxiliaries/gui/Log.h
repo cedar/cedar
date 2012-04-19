@@ -62,7 +62,7 @@ private:
   class LogInterface : public cedar::aux::LogInterface
   {
     public:
-      LogInterface(Log *pLog)
+      LogInterface(Log* pLog)
       :
       mpLog(pLog)
       {
@@ -79,7 +79,7 @@ private:
       }
 
     private:
-      Log *mpLog;
+      Log* mpLog;
   };
 
   CEDAR_GENERATE_POINTER_TYPES(LogInterface);

@@ -164,7 +164,7 @@ void cedar::aux::gui::Log::postMessage
     p_title_item = new QTableWidgetItem(QIcon(icon), title);
   }
 
-  QLabel *p_message_item = new QLabel(message);
+  QLabel* p_message_item = new QLabel(message);
   p_message_item->setToolTip("<p>" + message + "</p>");
 
   p_title_item->setFlags(item_flags);

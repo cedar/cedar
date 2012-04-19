@@ -151,7 +151,7 @@ _mInputNoiseGain
     this,
     "inputNoiseGain",
     0.1,
-    cedar::aux::DoubleParameter::LimitType::positive()
+    cedar::aux::DoubleParameter::LimitType::positiveZero()
   )
 ),
 _mSigmoid
