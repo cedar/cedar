@@ -193,7 +193,10 @@ void cedar::proc::sources::GaussInput::updateDimensionality()
 {
   int new_dimensionality = static_cast<int>(_mDimensionality->getValue());
   _mSigmas->resize(new_dimensionality, _mSigmas->getDefaultValue());
+  _mSigmas->setDefaultSize(new_dimensionality);
   _mCenters->resize(new_dimensionality, _mCenters->getDefaultValue());
+  _mCenters->setDefaultSize(new_dimensionality);
   _mSizes->resize(new_dimensionality, _mSizes->getDefaultValue());
+  _mSizes->setDefaultSize(new_dimensionality);
   this->onTrigger();
 }
