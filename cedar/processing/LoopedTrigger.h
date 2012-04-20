@@ -100,6 +100,10 @@ public slots:
    */
   void loopTimeChanged();
 
+  /*!@brief Slot that reacts to a change in the idle time parameter.
+   */
+  void idleTimeChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -139,6 +143,9 @@ private:
 
   //!@brief The loop time.
   cedar::aux::DoubleParameterPtr mLoopTime;
+
+  //!@brief The idle time.
+  cedar::aux::DoubleParameterPtr mIdleTime;
 
   //!@brief Whether the looped trigger waits for all its listeners to finish their processing.
   cedar::aux::BoolParameterPtr mWait;
