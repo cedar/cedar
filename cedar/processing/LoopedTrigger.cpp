@@ -100,12 +100,24 @@ mLoopType(new cedar::aux::EnumParameter(
                                        )
          ),
 //!@todo Make a TimeParameter and use it here instead.
-mLoopTime(new cedar::aux::DoubleParameter(this, "LoopTime", 1.0, 1.0, 1000000.0)),
+mLoopTime(new cedar::aux::DoubleParameter(this, "LoopTime", 10.0, 1.0, 1000000.0)),
+mIdleTime
+(
+  new cedar::aux::DoubleParameter
+  (
+    this,
+    "idle time",
+    1.0,
+    cedar::aux::DoubleParameter::LimitType::positiveZero()
+  )
+),
 mWait(new cedar::aux::BoolParameter(this, "wait", true))
 {
-
   QObject::connect(this->mLoopType.get(), SIGNAL(valueChanged()), this, SLOT(loopModeChanged()));
   QObject::connect(this->mLoopTime.get(), SIGNAL(valueChanged()), this, SLOT(loopTimeChanged()));
+  QObject::connect(this->mIdleTime.get(), SIGNAL(valueChanged()), this, SLOT(idleTimeChanged()));
+
+  this->loopModeChanged();
 }
 
 cedar::proc::LoopedTrigger::~LoopedTrigger()
@@ -128,12 +140,14 @@ void cedar::proc::LoopedTrigger::loopModeChanged()
     default:
     case cedar::proc::LoopMode::FIXED_ADAPTIVE:
       this->useFixedStepSize(true);
+      this->mIdleTime->setConstant(true);
       break;
 
     case cedar::proc::LoopMode::REALTIME:
       this->mLoopTime->setConstant(true);
       this->setSimulatedTime();
       this->setStepSize(0.0);
+      this->mIdleTime->setConstant(false);
       break;
   }
 }
@@ -141,6 +155,11 @@ void cedar::proc::LoopedTrigger::loopModeChanged()
 void cedar::proc::LoopedTrigger::loopTimeChanged()
 {
   this->setStepSize(this->mLoopTime->getValue());
+}
+
+void cedar::proc::LoopedTrigger::idleTimeChanged()
+{
+  this->setIdleTime(this->mIdleTime->getValue());
 }
 
 void cedar::proc::LoopedTrigger::removeListener(cedar::proc::TriggerablePtr triggerable)
