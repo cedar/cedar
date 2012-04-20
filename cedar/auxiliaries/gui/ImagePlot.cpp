@@ -106,6 +106,11 @@ cedar::aux::gui::ImagePlot::~ImagePlot()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
 {
+  if (!this->isVisible())
+  {
+    return;
+  }
+
   if (this->mDataType == DATA_TYPE_UNKNOWN)
   {
     return;
