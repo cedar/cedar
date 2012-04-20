@@ -57,6 +57,7 @@ namespace cedar
     {
       //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_PROC_CLASS(GaussInput);
+      CEDAR_DECLARE_PROC_CLASS(Camera);
       //!@endcond
     }
   }

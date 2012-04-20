@@ -57,6 +57,7 @@ cedar_add_library(cedarproc
   sources/GaussInput.h
   steps/StaticGain.h
   sources/NetReader.h
+  sources/Camera.h
   steps/Projection.h
   steps/Resize.h
   steps/NetWriter.h

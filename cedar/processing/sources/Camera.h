@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        IdeApplication.h
+    File:        Camera.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 07
+    Maintainer:  Georg Hartinger
+    Email:       georg.hartinger@ini.ruhr-uni-bochum.d
+    Date:        2012 04 20
 
     Description:
 
@@ -38,76 +34,61 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_IDE_APPLICATION_H
-#define CEDAR_PROC_GUI_IDE_APPLICATION_H
+#ifndef CEDAR_PROC_SOURCES_CAMERA_H
+#define CEDAR_PROC_SOURCES_CAMERA_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/sources/namespace.h"
+#include "cedar/processing/Step.h"
+#include "cedar/devices/sensors/visual/CameraGrabber.h"
+#include "cedar/auxiliaries/ImageData.h"
 
 // SYSTEM INCLUDES
-#include <QApplication>
-
-#ifdef _MSC_VER
-#include <Windows.h>
-#endif // _MSC_VER
 
 
-/*!@brief The application for the processingIde.
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::proc::gui::IdeApplication : public QApplication
+class cedar::proc::sources::Camera : public cedar::proc::Step
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  IdeApplication(int& argc, char** argv);
+  Camera();
 
-  //!@brief Destructor.
-  ~IdeApplication();
-
+  //!@brief Destructor
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Executes the main loop.
-   */
-  int exec();
-
-  /*!@brief Handles notifications.
-   */
-  bool notify(QObject* pReceiver, QEvent* pEvent);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-signals:
-  /*!@brief Signal that is sent when cedar::proc::gui::Ide::notify catches an otherwise unhandled exception.
-   */
-  void exception(const QString& message);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Handler for SEGV and other signals.
-   */
-  static void signalHandler(int signal);
+  void compute(const cedar::proc::Arguments&);
 
-  static void cleanupAfterCrash();
-
-#ifdef _MSC_VER
-  static LONG WINAPI vcCrashHandler(LPEXCEPTION_POINTERS);
-#endif
+  void onStart();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -115,10 +96,20 @@ private:
 protected:
   // none yet
 private:
-  //! The main window.
-  cedar::proc::gui::Ide* mpIde;
+  cedar::aux::ImageDataPtr mCameraImage;
 
-}; // class cedar::proc::gui::IdeApplication
+  cedar::dev::sensors::visual::CameraGrabberPtr mGrabber;
 
-#endif // CEDAR_PROC_GUI_IDE_APPLICATION_H
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  // none yet
+
+}; // class cedar::proc::sources::Camera
+
+#endif // CEDAR_PROC_SOURCES_CAMERA_H
 

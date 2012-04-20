@@ -113,11 +113,11 @@ void cedar::dev::sensors::visual::GrabberInterface::interruptSignalHandler(int)
 //--------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::GrabberInterface::emergencyCleanup()
 {
-  cedar::aux::LogSingleton::getInstance()->message
-                                           (
-                                             "Emergency Cleanup",
-                                             "cedar::dev::sensors::visual::GrabberInterface::emergencyCleanup()"
-                                           );
+//  cedar::aux::LogSingleton::getInstance()->message
+//                                           (
+//                                             "Emergency Cleanup",
+//                                             "cedar::dev::sensors::visual::GrabberInterface::emergencyCleanup()"
+//                                           );
 
   for (std::vector<GrabberInterface*>::iterator it = mInstances.begin(); it != mInstances.end(); ++it)
   {
