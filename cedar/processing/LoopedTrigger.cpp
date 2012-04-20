@@ -131,7 +131,6 @@ cedar::proc::LoopedTrigger::~LoopedTrigger()
 
 void cedar::proc::LoopedTrigger::loopModeChanged()
 {
-  this->mLoopTime->setConstant(false);
   this->useFixedStepSize(false);
   switch (this->mLoopType->getValue())
   {
@@ -140,13 +139,14 @@ void cedar::proc::LoopedTrigger::loopModeChanged()
     default:
     case cedar::proc::LoopMode::FIXED_ADAPTIVE:
       this->useFixedStepSize(true);
+      this->mLoopTime->setConstant(false);
       this->mIdleTime->setConstant(true);
       break;
 
     case cedar::proc::LoopMode::REALTIME:
-      this->mLoopTime->setConstant(true);
       this->setSimulatedTime();
       this->setStepSize(0.0);
+      this->mLoopTime->setConstant(true);
       this->mIdleTime->setConstant(false);
       break;
   }
