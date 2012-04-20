@@ -347,14 +347,13 @@ void cedar::dev::sensors::visual::GrabberInterface::setFps(double fps)
                                              );
 
 
-  }
-
   cedar::aux::LogSingleton::getInstance()->message
                                            (
                                              ConfigurationInterface::getName()
                                                + ": Switch to " + boost::lexical_cast<std::string>(fps) + " fps",
                                              "cedar::dev::sensors::visual::GrabberInterface::setFps()"
                                            );
+  }
 
   //cycle time in ms: 1000ms/frames_per_second
   double milliseconds = 1000. / fps;
@@ -414,7 +413,8 @@ void cedar::dev::sensors::visual::GrabberInterface::startGrabber()
   LoopedThread::start();
   cedar::aux::LogSingleton::getInstance()->message
                                            (
-                                             ConfigurationInterface::getName() + ": Grabbing started",
+                                             ConfigurationInterface::getName() + ": Grabbing started with "
+                                               + boost::lexical_cast<std::string>(getFps()) + " FPS.",
                                              "cedar::dev::sensors::visual::GrabberInterface::startGrabber()"
                                            );
 }

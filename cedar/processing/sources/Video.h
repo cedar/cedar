@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,60 +22,51 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraSetting.h
+    File:        Video.h
 
     Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.rub.de
-    Date:        2011 08 01
+    Email:       georg.hartinger@ini.ruhr-uni-bochum.d
+    Date:        2012 04 20
 
-    Description:  Header for CameraProperty enum-type class
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTING_H
-#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTING_H
+#ifndef CEDAR_PROC_SOURCES_VIDEO_H
+#define CEDAR_PROC_SOURCES_VIDEO_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/EnumType.h"
-#include "cedar/devices/sensors/visual/namespace.h"
+#include "cedar/processing/sources/namespace.h"
+#include "cedar/processing/Step.h"
+#include "cedar/devices/sensors/visual/VideoGrabber.h"
+#include "cedar/auxiliaries/ImageData.h"
 
 // SYSTEM INCLUDES
-#include <opencv2/highgui/highgui_c.h>
-
-//--------------------------------------------------------------------------------------------------------------------
-//(re)defines of our new introduced properties in OpenCV:
-//delete this, if the patched OpenCV is available
-#ifndef CV_CAP_PROP_ISO_SPEED
-  #define CV_CAP_PROP_ISO_SPEED 30
-#endif
 
 
-/*!@brief Enum class for camera settings.
+/*!@todo describe.
  *
- * Use this type for the CameraGrabber::setCameraSetting() and CameraGrabber::getCameraSetting() method
- *
- * @remarks
- *  This constants are direct mapped from opencv2/highgui/highui_c.h
- *
+ * @todo describe more.
  */
-class cedar::dev::sensors::visual::CameraSetting
+class cedar::proc::sources::Video : public cedar::proc::Step
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
-  // typedefs
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-//!@cond SKIPPED_DOCUMENTATION
-public:
-  typedef cedar::aux::EnumId Id;
-public:
-  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
+  Video();
 
   //!@brief Destructor
 
@@ -83,10 +74,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  static void construct();
-
-  static const cedar::aux::EnumBase& type();
-  static const cedar::dev::sensors::visual::CameraSetting::TypePtr& typePtr();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -98,39 +86,31 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraSetting> mType;
-  //!@endcond
+  void compute(const cedar::proc::Arguments&);
+
+  void onStart();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-
-  /*! @brief Set the framerate through the CameraGrabber::setCameraSetting() method
-   *
-   *  This constants are the available settings for the used camera
-   *
-   *  If you use a firewire camera, this settings can only be applied on startup, i.e. before the first picture
-   *  is grabbed with the CameraGrabber::grab() method.
-   */
-  static const Id SETTING_FPS = CV_CAP_PROP_FPS; // 5;
-  /// @see SETTING_FPS
-  static const Id SETTING_FRAME_WIDTH = CV_CAP_PROP_FRAME_WIDTH; // 3;
-  /// @see SETTING_FPS
-  static const Id SETTING_FRAME_HEIGHT = CV_CAP_PROP_FRAME_HEIGHT; // 4;
-  /// @see SETTING_FPS
-  static const Id SETTING_MODE = CV_CAP_PROP_MODE; // 9;
-  /// @see SETTING_FPS
-  static const Id SETTING_ISO_SPEED = CV_CAP_PROP_ISO_SPEED; // 30
-
-
 protected:
   // none yet
 private:
+  cedar::aux::ImageDataPtr mImage;
+
+  cedar::dev::sensors::visual::VideoGrabberPtr mGrabber;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
   // none yet
 
+private:
+  // none yet
 
-}; // cedar::dev::sensors::visual::CameraSetting
+}; // class cedar::proc::sources::Video
 
-#endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTING_H
+#endif // CEDAR_PROC_SOURCES_VIDEO_H
+
 
