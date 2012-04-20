@@ -41,6 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/IdeApplication.h"
 #include "cedar/processing/Manager.h"
+#include "cedar/devices/sensors/visual/CameraGrabber.h"
 #include "cedar/dynamics/namespace.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -95,19 +96,28 @@ void cedar::proc::gui::IdeApplication::signalHandler(int signal_id)
       signal_name = "SIGABRT";
       break;
 
+    case SIGINT:
+      signal_name = "SIGINT";
+      break;
+
     default:
       signal_name = "(unknown signal id)";
   }
 
-  std::ofstream stream;
-  std::string file_path;
-  cedar::aux::System::openCrashFile(stream, file_path);
-  stream << "Application received signal " << signal_name << std::endl;
-  cedar::aux::StackTrace trace;
-  stream << trace << std::endl;
+  if (signal_id != SIGINT)
+  {
+    std::ofstream stream;
+    std::string file_path;
+    cedar::aux::System::openCrashFile(stream, file_path);
+    stream << "Application received signal " << signal_name << std::endl;
+    cedar::aux::StackTrace trace;
+    stream << trace << std::endl;
 
-  std::cout << "Application received signal " << signal_name << std::endl;
-  std::cout << "A stack trace has been written to " << file_path << std::endl;
+    std::cout << "Application received signal " << signal_name << std::endl;
+    std::cout << "A stack trace has been written to " << file_path << std::endl;
+  }
+
+  cedar::proc::gui::IdeApplication::cleanupAfterCrash();
 
   // reset the abort signal to avoid infinite recursion
   signal(SIGABRT, SIG_DFL);
@@ -145,6 +155,9 @@ LONG cedar::proc::gui::IdeApplication::vcCrashHandler(LPEXCEPTION_POINTERS excep
   stream << trace << std::endl;
 
   std::cout << "A stack trace has been written to " << file_path << std::endl;
+
+  cedar::proc::gui::IdeApplication::cleanupAfterCrash();
+
   LONG retval = EXCEPTION_CONTINUE_SEARCH;
   return retval;
 }
@@ -157,6 +170,7 @@ int cedar::proc::gui::IdeApplication::exec()
 #else
   signal(SIGSEGV, &cedar::proc::gui::IdeApplication::signalHandler);
   signal(SIGABRT, &cedar::proc::gui::IdeApplication::signalHandler);
+  signal(SIGINT, &cedar::proc::gui::IdeApplication::signalHandler);
 #endif // _MSC_VER
 
   this->mpIde->show();
@@ -166,6 +180,11 @@ int cedar::proc::gui::IdeApplication::exec()
   return ret;
 }
 
+void cedar::proc::gui::IdeApplication::cleanupAfterCrash()
+{
+  cedar::dev::sensors::visual::GrabberInterface::emergencyCleanup();
+  QApplication::exit(-1);
+}
 
 bool cedar::proc::gui::IdeApplication::notify(QObject* pReceiver, QEvent* pEvent)
 {
