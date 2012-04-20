@@ -379,19 +379,17 @@ void cedar::proc::Connectable::declareData(DataRole::Id role, const std::string&
   // finally, insert a new data slot with the given parameters
   if (role == cedar::proc::DataRole::INPUT)
   {
-    slot_ptr = cedar::proc::DataSlotPtr(new cedar::proc::ExternalData(role, name, this, mandatory));
+    cedar::proc::ExternalDataPtr ext_slot_ptr(new cedar::proc::ExternalData(role, name, this, mandatory));
     mSlotConnection
-      = boost::shared_dynamic_cast<cedar::proc::ExternalData>
-        (
-          slot_ptr
-        )->connectToExternalDataChanged
-           (
-             boost::bind(&cedar::proc::Connectable::checkMandatoryConnections, this)
-           );
+      = ext_slot_ptr->connectToExternalDataChanged
+                      (
+                        boost::bind(&cedar::proc::Connectable::checkMandatoryConnections, this)
+                      );
+    slot_ptr = ext_slot_ptr;
   }
   else
   {
-    slot_ptr = cedar::proc::DataSlotPtr(new cedar::proc::ExternalData(role, name, this, mandatory));
+    slot_ptr = cedar::proc::DataSlotPtr(new cedar::proc::OwnedData(role, name, this, mandatory));
   }
   iter->second[name] = slot_ptr;
 
