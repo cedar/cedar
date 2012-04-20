@@ -44,6 +44,28 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
+int testMinMax(int cvMatType)
+{
+  int errors = 0;
+
+  cv::Mat identity = cv::Mat::eye(3, 3, cvMatType);
+
+  double min_val, max_val;
+  min_val = cedar::aux::math::min(identity);
+  max_val = cedar::aux::math::max(identity);
+  if (min_val != 0.0)
+  {
+    std::cout << "error in min(const cv::Mat" << cvMatType << ")" << std::endl;
+    errors++;
+  }
+  if (max_val != 1.0)
+  {
+    std::cout << "error in max(const cv::Mat" << cvMatType << ")" << std::endl;
+    errors++;
+  }
+
+  return errors;
+}
 
 int main()
 {
@@ -53,24 +75,10 @@ int main()
   int test_number = 0;
 
   // test stuff
-  std::cout << "test no" << test_number++ << std::endl;
-  cv::Mat identity = cv::Mat::eye(3, 3, CV_64FC1);
-  std::cout << "this should be the 3x3 identity matrix:" << std::endl;
-  cedar::aux::math::write(identity);
+  errors += testMinMax(CV_8U);
+  errors += testMinMax(CV_32F);
+  errors += testMinMax(CV_64F);
 
-  double min_val, max_val;
-  min_val = cedar::aux::math::min(identity);
-  max_val = cedar::aux::math::max(identity);
-  if (min_val != 0.0)
-  {
-    std::cout << "error in min(const cv::Mat)" << std::endl;
-    errors++;
-  }
-  if (max_val != 1.0)
-   {
-     std::cout << "error in max(const cv::Mat)" << std::endl;
-     errors++;
-   }
   std::cout << "test no" << test_number++ << std::endl;
   if (cedar::aux::math::normalizeAngle(5.9) <= -cedar::aux::math::pi
       || cedar::aux::math::normalizeAngle(5.9) > cedar::aux::math::pi)
