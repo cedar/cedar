@@ -45,7 +45,7 @@ int main(int , char **)
   {
     picture_grabber = new cedar::dev::sensors::visual::PictureGrabber( CONFIG_FILE_NAME_0 , FILE_NAME_0 );
   }
-  catch (cedar::aux::exc::InitializationException &e)
+  catch (cedar::aux::InitializationException &e)
   {
     //after an InitializationExeception the net_grabber class isn't initialized correctly
     //and can't be used
@@ -120,7 +120,7 @@ int main(int , char **)
       std::cout << "\nTry to enforce an exception:\n";
       std::cout << "SnapshotName_2: " << picture_grabber->getSnapshotName(2) <<std::endl;
     }
-    catch (cedar::aux::exc::ExceptionBase& e)
+    catch (cedar::aux::ExceptionBase& e)
     {
       //std::cout << "Exception: " <<e.what() << std::endl; //until now: buggy cedar implementation
       //all grabber exceptions (look at cedar/devices/sensors/visual/exceptions/namespace.h)

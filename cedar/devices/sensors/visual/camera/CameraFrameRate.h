@@ -43,10 +43,12 @@
 
 // SYSTEM INCLUDES
 
-/*!@brief Enum class for firewire camera fps setting mapped from dc1394/video.h
+/*!@brief Enum class for firewire camera fps setting
  *
- * Use this type for the CameraGrabber::setCameraInitFps() and getCameraInitFps() method.
+ * Use this type for the CameraGrabber::setCameraFps() and CameraGrabber::getCameraFps() method.
  *
+ * @remarks
+ * From OpenCV documentation: <br>
  * This enumeration is used for non-Format_7 modes. The framerate can be lower than expected if the
  * exposure time is longer than the requested frame period. Framerate can be controlled in a number of
  * other ways: framerate feature, external trigger, software trigger, shutter throttling and packet size
@@ -91,20 +93,45 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraFrameRate> mType;
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+  /*! @brief Allow OpenCV backend to set the framerate of the attached camera
+   *
+   * You can set the framerate through the the CameraGrabber::setCameraFps() method
+   */
   static const Id FRAMERATE_NOT_SET = UINT_MAX-2;
-  static const Id FRAMERATE_1_875 = 2;
-  static const Id FRAMERATE_3_75 = 4;
-  static const Id FRAMERATE_7_5 = 8;
+
+  /*! @brief Set the framerate to 2 fps with the CameraGrabber::setCameraFps() method
+   *
+   * For firewire-cameras the framerate will be set to 1.875 fps
+   */
+  static const Id FRAMERATE_2 = 2;
+
+  /*! @brief Set the framerate to 4 fps
+   *
+   * For firewire-cameras the framerate will be set to 3.75 fps
+   */
+  static const Id FRAMERATE_4 = 4;
+
+  /*! @brief Set the framerate to 8 fps
+   *
+   * For firewire-cameras the framerate will be set to 7.5 fps
+   */
+  static const Id FRAMERATE_8 = 8;
+  /// @brief Set the framerate to 15 fps
   static const Id FRAMERATE_15 = 15;
+  /// @brief Set the framerate to 30 fps
   static const Id FRAMERATE_30 = 30;
+  /// @brief Set the framerate to 60 fps
   static const Id FRAMERATE_60 = 60;
+  /// @brief Set the framerate to 120 fps
   static const Id FRAMERATE_120 = 120;
+  /// @brief Set the framerate to 240 fps
   static const Id FRAMERATE_240 = 240;
 
 
@@ -113,18 +140,6 @@ protected:
 private:
   // none yet
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
-//!@endcond
 }; // cedar::dev::sensors::visual::CameraFrameRate
 
 #endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_FRAMERATE_H

@@ -49,7 +49,14 @@ cedar::dev::sensors::visual::TestGrabber::TestGrabber(std::string configFileName
 :
 cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
-  std::cout<<"[TestGrabber::TestGrabber] Create a single channel grabber\n";
+  cedar::aux::LogSingleton::getInstance()->debugMessage
+                                          (
+                                           ConfigurationInterface::getName() + ": Create a single channel grabber",
+                                            "cedar::dev::sensors::visual::CameraGrabber::TestGrabber()"
+                                          );
+
+  //debug information logging
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
 
   //read initialization values from configuration file
   readInit(1,"TestGrabber");
@@ -73,7 +80,14 @@ cedar::dev::sensors::visual::TestGrabber::TestGrabber
 :
 cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
-  std::cout<<"[TestGrabber::TestGrabber] Create a stereo channel grabber\n";
+  //debug information logging
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+
+  cedar::aux::LogSingleton::getInstance()->debugMessage
+                                          (
+                                           ConfigurationInterface::getName() + ": Create a stereo channel grabber",
+                                            "cedar::dev::sensors::visual::CameraGrabber::TestGrabber()"
+                                          );
 
   //read initialization values from configuration file
   readInit(2,"StereoTestGrabber");
@@ -96,8 +110,16 @@ cedar::dev::sensors::visual::TestGrabber::~TestGrabber()
   //do memory de-allocation in the destructor
   //all stuff in the mChannels vector is cleared by the shared pointer
 
-  //some debug-output
-  std::cout<<"[TestGrabber::~TestGrabber] GrabberName: " << getName() << std::endl;
+  cedar::aux::LogSingleton::getInstance()->debugMessage
+                                          (
+                                           ConfigurationInterface::getName() + ": destructor",
+                                            "cedar::dev::sensors::visual::CameraGrabber::~TestGrabber()"
+                                          );
+
+
+  //debug logging
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -113,14 +135,17 @@ bool cedar::dev::sensors::visual::TestGrabber::onInit()
   //these pictures
 
   //-------------------------------------------------
-  std::cout << "[TestGrabber::onInit] Initialize Grabber with " << mNumCams << " channels ...\n";
-
+  std::stringstream init_message;
+  init_message << ": Initialize test grabber with " << mNumCams << " channels ..." << std::endl;
   for (unsigned int i = 0; i < mNumCams; ++i)
   {
-    std::cout << "Channel " << i << ": " << getChannel(i)->mSourceFileName << "\n";
+    init_message << "Channel " << i << ": capture from Source: " << getChannel(i)->mSourceFileName << std::endl;
   }
-  std::cout << std::flush;
-
+  cedar::aux::LogSingleton::getInstance()->systemInfo
+                                           (
+                                             ConfigurationInterface::getName() + init_message.str(),
+                                             "cedar::dev::sensors::visual::TestGrabber::onInit()"
+                                           );
 
   //-------------------------------------------------
   //load pictures one by one
@@ -136,11 +161,14 @@ bool cedar::dev::sensors::visual::TestGrabber::onInit()
 
 
   // all grabbers successfully initialized
-  std::cout << "[TestGrabber::onInit] Initialize... finished" << std::endl;
-
+  cedar::aux::LogSingleton::getInstance()->debugMessage
+                                          (
+                                           ConfigurationInterface::getName() + ": Initialization finished",
+                                            "cedar::dev::sensors::visual::CameraGrabber::onInit()"
+                                          );
   return true;
 
-  //test the initialize exception
+  //to test the initialize exception
   //return false;
 }
 
@@ -149,8 +177,11 @@ void cedar::dev::sensors::visual::TestGrabber::onCleanUp()
 {
   //do the cleanup of used hardware in this method
   //on an exception or a CTRL-C only onCleanUp will be invoked (no destructor)
-
-  std::cout << "[TestGrabber::onCleanUp] GrabberName: " << getName() << std::endl;
+  cedar::aux::LogSingleton::getInstance()->debugMessage
+                                          (
+                                           ConfigurationInterface::getName() + ": Cleaning up",
+                                            "cedar::dev::sensors::visual::CameraGrabber::onCleanUp()"
+                                          );
 }
 
 //----------------------------------------------------------------------------------------------------

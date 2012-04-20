@@ -35,9 +35,12 @@
 
 ======================================================================================================================*/
 
+// MAKE FIREWIRE OPTIONAL
+#include "cedar/configuration.h"
+#ifdef CEDAR_USE_LIB_DC1394
+
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/grabbertools/LibDcCameraBase.h"
-
 
 // PROJECT INCLUDES
 
@@ -82,3 +85,6 @@ int main(int, char *argv[])
 
   return 0;
 }
+
+#endif //CEDAR_USE_LIB_DC1394
+

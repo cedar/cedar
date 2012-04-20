@@ -50,20 +50,23 @@
 cedar::aux::exc::NetMissingRessourceException::NetMissingRessourceException()
 {
   // Sets the type name.
-  this->mType = "YARP missing ressource";
+  //@todo: GH commented on merge
+  //this->mType = "YARP missing ressource";
 }
 
 //! Constructor
 cedar::aux::exc::NetUnexpectedDataException::NetUnexpectedDataException()
 {
   // Sets the type name.
-  this->mType = "YARP unexpected data";
+  //@todo: GH commented on merge
+  //this->mType = "YARP unexpected data";
 }
 
 //! Constructor
 cedar::aux::exc::NetWaitingForWriterException::NetWaitingForWriterException()
 {
   // Sets the type name.
-  this->mType = "YARP cannot connect ports; waiting for writer";
+  //@todo: GH commented on merge
+  //this->mType = "YARP cannot connect ports; waiting for writer";
 }
 

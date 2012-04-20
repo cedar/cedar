@@ -40,7 +40,7 @@
 #include "cedar/devices/sensors/visual/camera/CameraProperty.h"
 #include "cedar/devices/sensors/visual/camera/CameraVideoMode.h"
 #include "cedar/devices/sensors/visual/camera/CameraFrameRate.h"
-#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
 
 // SYSTEM INCLUDES
 #include <boost/lexical_cast.hpp> //for reading values from the configfile
@@ -60,35 +60,36 @@ cedar::aux::ConfigurationInterface(configFileName),
 mCamSettings(camSettings),
 mCamPropertyValues(camPropertyValues)
 {
-  #ifdef DEBUG_CAMERAGRABBER
-    std::cout << "[CameraConfig::CameraState] channel "<< channel << " Config-file: " << configFileName << std::endl;
-  #endif
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+  cedar::aux::LogSingleton::getInstance()->debugMessage
+                                           (
+                                             ConfigurationInterface::getName() + ":"
+                                               + " Channel " + boost::lexical_cast<std::string>(channel)
+                                               + " Config-file: " + configFileName,
+                                             "cedar::dev::sensors::visual::CameraConfig::CameraConfig()"
+                                           );
+  mChannel = channel;
+  mChannelPrefix = "ch"+boost::lexical_cast<std::string>(channel)+"_";
 
-    mChannel = channel;
-    mChannelPrefix = "ch"+boost::lexical_cast<std::string>(channel)+"_";
+  bool result = declareParameter();
+  ConfigurationInterface::readOrDefaultConfiguration();
 
-    bool result = declareParameter();
-    ConfigurationInterface::readOrDefaultConfiguration();
+  if (not result )
+  {
+    std::string err = ConfigurationInterface::getName() + ": Channel "
+                      + boost::lexical_cast<std::string>(channel)
+                      + " - Critical error in constructor";
 
-    if (not result )
-    {
-      std::string err = "[CameraCapabilities::CameraCapabilities] channel "
-                        + boost::lexical_cast<std::string>(channel)
-                        + " - Critical error in constructor";
+    //throwing an exception in a shared-pointer managed class is catched by shared-pointer
+    cedar::aux::LogSingleton::getInstance()->error(err,"cedar::dev::sensors::visual::CameraConfig::CameraConfig()");
 
-      //throwing an exception in a shared-pointer managed class is catched by shared-pointer
-      std::cout << err << std::endl;
-
-      //todo: throw exception
-      //CEDAR_THROW(cedar::aux::exc::InitializationException,err);
-    }
+    CEDAR_THROW(cedar::aux::InitializationException,err);
+  }
 }
 
 cedar::dev::sensors::visual::CameraConfig::~CameraConfig()
 {
-  #ifdef DEBUG_CAMERAGRABBER
-    std::cout << "[CameraConfig::~CameraState] channel "<< mChannel << " Destroy class" << std::endl;
-  #endif
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -97,10 +98,13 @@ cedar::dev::sensors::visual::CameraConfig::~CameraConfig()
 
 bool cedar::dev::sensors::visual::CameraConfig::saveConfiguration()
 {
-  #ifdef DEBUG_CAMERAGRABBER
-    std::cout << "[CameraConfig::writeConfiguration] channel "<< mChannel << std::endl;
-  #endif
-
+  cedar::aux::LogSingleton::getInstance()->debugMessage
+                                           (
+                                             ConfigurationInterface::getName() 
+                                               + ": channel " + boost::lexical_cast<std::string>(mChannel),
+                                             "cedar::dev::sensors::visual::CameraConfig::saveConfiguration()"
+                                           );
+   
   ConfigurationInterface::writeConfiguration();
   return true;
 }

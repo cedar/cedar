@@ -35,17 +35,47 @@ s
 =============================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/processing/source/NetReader.h"
+#include "cedar/processing/sources/NetReader.h"
 #include "cedar/auxiliaries/net/exceptions/NetException.h"
 
 // PROJECT INCLUDES
 #include "cedar/processing/DataSlot.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
 #include <vector>
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr input_declaration
+    (
+      new ElementDeclarationTemplate<cedar::proc::steps::NetReaderSource>
+      (
+        "Utilities",
+        "cedar.processing.steps.NetReader"
+      )
+    );
+    input_declaration->setIconPath(":/steps/net_reader.svg");
+    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(input_declaration);
+
+    return true;
+  }
+
+  bool declared = declare();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

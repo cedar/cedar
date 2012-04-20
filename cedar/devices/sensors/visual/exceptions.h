@@ -39,55 +39,16 @@
 #define CEDAR_DEV_SENSORS_VISUAL_EXCEPTIONS_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
-
-
-//------------------------------------------------------------------------
-// namespace for exceptions
-//------------------------------------------------------------------------
-namespace cedar
-{
-  namespace aux
-  {
-    //! @brief Namespace for all exception classes.
-    namespace exc
-    {
-
-      //! @brief An exception for errors on recording
-      class GrabberRecordingException;
-
-      //! @brief An exception for errors on saving a snapshot
-      class GrabberSnapshotException;
-
-      //! @brief An exception for errors on grabbing
-      class GrabberGrabException;
-    }
-  }
-}
-
-
-
-//--------------------------------------------------------------------------------------------------------------------
-// exceptions
-//--------------------------------------------------------------------------------------------------------------------
-
+#include "cedar/auxiliaries/ExceptionBase.h"
+#include "cedar/devices/sensors/visual/namespace.h"
 
 //--------------------------------------------------------------------------------------------------------------------
 /*!@brief Exception for errors while saving a snapshots
  *
  *    This exception would be thrown when an error occurs while writing a snapshot to disk
  */
-class cedar::aux::exc::GrabberSnapshotException
-:
-public cedar::aux::exc::ExceptionBase
+class cedar::dev::sensors::visual::GrabberSnapshotException : public cedar::aux::ExceptionBase
 {
-public:
-  //!@brief The standard constructor.
-  GrabberSnapshotException(void)
-  {
-    // Set the type name.
-    this->mType = "GrabberSnapshotException";
-  }
 };
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -96,17 +57,8 @@ public:
  *
  *    This exception would be thrown when an error occurs during recording.
  */
-class cedar::aux::exc::GrabberRecordingException
-:
-public cedar::aux::exc::ExceptionBase
+class cedar::dev::sensors::visual::GrabberRecordingException : public cedar::aux::ExceptionBase
 {
-public:
-  //!@brief The standard constructor.
-  GrabberRecordingException(void)
-  {
-    // Set the type name.
-    this->mType = "GrabberRecordingException";
-  }
 };
 
 
@@ -119,17 +71,8 @@ public:
  *    This is a critical exception. The grabber-cleanup is performed right before this exception is thrown.<br>
  *    In this case, it is not possible to work any longer with this grabber.
  */
-class cedar::aux::exc::GrabberGrabException
-:
-public cedar::aux::exc::ExceptionBase
+class cedar::dev::sensors::visual::GrabberGrabException : public cedar::aux::ExceptionBase
 {
-public:
-  //!@brief The standard constructor.
-  GrabberGrabException(void)
-  {
-    // Set the type name.
-    this->mType = "GrabberGrabException";
-  }
 };
 
 

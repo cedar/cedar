@@ -46,9 +46,9 @@ cedar::aux::EnumType<cedar::dev::sensors::visual::CameraFrameRate>
 //!@cond SKIPPED_DOCUMENTATION
 #ifndef MSVC
 const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_NOT_SET;
-const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_1_875;
-const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_3_75;
-const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_7_5;
+const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_2;
+const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_4;
+const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_8;
 const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_15;
 const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_30;
 const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_60;
@@ -70,18 +70,18 @@ void cedar::dev::sensors::visual::CameraFrameRate::construct()
                                     ));
 
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_1_875,
+                                      cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_2,
                                       "FRAMERATE_1_875",
                                       "Grab with 1.875 frames per second"
                                     ));
 
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_3_75,
+                                      cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_4,
                                       "FRAMERATE_3_75",
                                       "Grab with 3.75 frames per second"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_7_5,
+                                      cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_8,
                                       "FRAMERATE_7_5",
                                       "Grab with 7.5 frames per second"
                                     ));

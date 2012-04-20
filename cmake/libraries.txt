@@ -204,10 +204,16 @@ else(LIB_DC1394)
 endif(LIB_DC1394)
 
 # YARP
-find_package(YARP REQUIRED)
-link_libraries(${YARP_LIBRARIES})
-include_directories(${YARP_INCLUDE_DIRS})
-set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${YARP_LIBRARIES})
+find_package(YARP)
+if(YARP_FOUND)
+	link_libraries(${YARP_LIBRARIES})
+	include_directories(${YARP_INCLUDE_DIRS})
+	message("-- Looking for YARP packages - found")
+	set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${YARP_LIBRARIES})
+	set(CEDAR_USE_YARP ON)
+else(YARP_FOUND)
+	message("-- Looking for YARP packages - not found")
+endif(YARP_FOUND)
 
 
 ##

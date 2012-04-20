@@ -45,7 +45,7 @@ cedar::aux::EnumType<cedar::dev::sensors::visual::CameraSetting>
 
 //!@cond SKIPPED_DOCUMENTATION
 #ifndef MSVC
-  const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_FRAME_WIDTH ;
+  const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_FRAME_WIDTH;
   const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_FRAME_HEIGHT;
   const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_FPS;
   const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_MODE;

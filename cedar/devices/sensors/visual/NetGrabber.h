@@ -33,11 +33,12 @@
     Credits:
 
 ======================================================================================================================*/
-
-
 #ifndef CEDAR_DEV_SENSORS_VISUAL_NET_GRABBER_H
 #define CEDAR_DEV_SENSORS_VISUAL_NET_GRABBER_H
 
+// MAKE YARP OPTIONAL
+#include "cedar/configuration.h"
+#ifdef CEDAR_USE_YARP
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/GrabberInterface.h"
@@ -45,6 +46,8 @@
 
 // SYSTEM INCLUDES
 
+
+#define SHOW_INIT_INFORMATION_NETGRABBER
 
 /*! @class cedar::dev::sensors::visual::NetGrabber
  *	@brief This grabber grabs images from a yarp-server located somewhere in the network
@@ -83,7 +86,7 @@ public cedar::dev::sensors::visual::GrabberInterface
     MatNetReaderPtr mMatNetReader;
   };
 
-  typedef boost::shared_ptr<NetChannel> NetChannelPtr;
+  CEDAR_GENERATE_POINTER_TYPES(NetChannel);
 
   //!@endcond
 
@@ -161,20 +164,15 @@ private:
   ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class NetChannelPtr
   inline NetChannelPtr getChannel(unsigned int channel)
   {
-    //!@todo: change to asserted_cast
-    //return cedar::aux::asserted_cast<NetChannelPtr>(mChannels.at(channel))
     return boost::static_pointer_cast<NetChannel>
            (
              cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
            );
   }
 
-  //!@todo: after merging change to ConstCameraChannelPtr
   ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
-  inline boost::shared_ptr<const NetChannel> getChannel(unsigned int channel) const
+  inline ConstNetChannelPtr getChannel(unsigned int channel) const
   {
-    //!@todo: change to asserted_cast
-    //return cedar::aux::asserted_cast<NetChannelPtr>(mChannels.at(channel))
     return boost::static_pointer_cast<const NetChannel>
            (
              cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
@@ -185,9 +183,6 @@ private:
   //parameters
   //--------------------------------------------------------------------------------------------------------------------
 
-public:
-  //none yet (hopefully never!)
-
 protected:
   //none yet
 
@@ -196,4 +191,5 @@ private:
   
 }; //class cedar::dev::sensors::visual::NetGrabber
 
-#endif
+#endif //CEDAR_USE_YARP
+#endif //CEDAR_DEV_SENSORS_VISUAL_NET_GRABBER_H

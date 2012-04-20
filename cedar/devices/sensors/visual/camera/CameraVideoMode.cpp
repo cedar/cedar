@@ -58,6 +58,7 @@ const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visu
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_8 ;
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_9 ;
 
+#ifdef CEDAR_USE_LIB_DC1394
 //firewire modes by name
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_160x120_YUV444  ;
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_320x240_YUV422  ;
@@ -91,7 +92,9 @@ const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visu
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_5 ;
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_6 ;
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_7 ;
+#endif //CEDAR_USE_LIB_DC1394
 #endif // MSVC
+
 //!@endcond
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -156,6 +159,7 @@ void cedar::dev::sensors::visual::CameraVideoMode::construct()
                                       "Tenth available mode"
                                     ));
 
+#ifdef CEDAR_USE_LIB_DC1394
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_160x120_YUV444,
                                       "MODE_FW_160x120_YUV444",
@@ -319,7 +323,7 @@ void cedar::dev::sensors::visual::CameraVideoMode::construct()
                                       "MODE_FW_FORMAT7_7"
                                     ));
 
-
+#endif // CEDAR_USE_LIB_DC1394
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods

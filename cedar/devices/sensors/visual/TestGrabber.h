@@ -39,31 +39,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/GrabberInterface.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
-
-
-//definition of the namespace for the testgrabber
-namespace cedar
-{
-  namespace dev
-  {
-    namespace sensors
-      {
-      namespace visual
-      {
-        class TestGrabber;
-        //!@brief smart pointer for the TestGrabber class
-        typedef boost::shared_ptr<TestGrabber> TestGrabberPtr;
-      }
-    }
-  }
-}
-
-
-
-
 
 /*! @brief A simple Grabber class for testing the Grabber interface
  *
@@ -99,6 +78,7 @@ public cedar::dev::sensors::visual::GrabberInterface
   };
 
   typedef boost::shared_ptr<TestChannel> TestChannelPtr;
+  typedef boost::shared_ptr<const TestChannel> ConstTestChannelPtr;
 
   //!@endcond
 
@@ -166,24 +146,19 @@ private:
   ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
   inline TestChannelPtr getChannel(unsigned int channel)
   {
-    //!@todo: change to asserted_cast
-    //return cedar::aux::asserted_cast<TestChannelPtr>(mChannels.at(channel))
     return boost::static_pointer_cast<TestChannel>
            (
              cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
            );
   }
 
-  //!@todo: after merging change to ConstCameraChannelPtr
   ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
-  inline boost::shared_ptr<const TestChannel> getChannel(unsigned int channel) const
+  inline ConstTestChannelPtr getChannel(unsigned int channel) const
   {
-    //!@todo: change to asserted_cast
-    //return cedar::aux::asserted_cast<TestChannelPtr>(mChannels.at(channel))
     return boost::static_pointer_cast<const TestChannel>
-           (
-             cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
-           );
+       (
+         cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+       );
   }
 
   //--------------------------------------------------------------------------------------------------------------------

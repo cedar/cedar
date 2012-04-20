@@ -38,6 +38,9 @@
 #define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_ISO_SPEED_H
 
 // CEDAR INCLUDES
+#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
+
+#ifdef CEDAR_USE_LIB_DC1394
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/devices/sensors/visual/namespace.h"
 
@@ -87,18 +90,33 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraIsoSpeed> mType;
-
+  //!@endcond
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+  /*! @brief Allow OpenCV backend to set the ISO-speed of the firewire bus.
+   *
+   *  Set the ISO-speed manually with the CameraGrabber::setCameraIsoSpeed() method. <br>
+   *
+   *  @remarks
+   *  As every setting, this can only be done before the first frame was grabbed.
+   */
+
   static const Id ISO_NOT_SET = UINT_MAX-2;
+
+  /// @brief Set the ISO-speed to 100
   static const Id ISO_100 = 100;
+  /// @see ISO_100
   static const Id ISO_200 = 200;
+  /// @see ISO_100
   static const Id ISO_400 = 400;
+  /// @see ISO_100
   static const Id ISO_800 = 800;
+  /// @see ISO_100
   static const Id ISO_1600 = 1600;
+  /// @see ISO_100
   static const Id ISO_3200 = 3200;
 
     
@@ -107,20 +125,8 @@ protected:
 private:
   // none yet
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
-//!@endcond
-
 }; // cedar::dev::sensors::visual::CameraIsoSpeed
 
+#endif // CEDAR_USE_LIB_DC1394
 #endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_ISO_SPEED_H
 

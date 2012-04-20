@@ -43,7 +43,7 @@
 // PROJECT INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/NumericParameter.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/net/NetWriter.h"
 
 // SYSTEM INCLUDES
@@ -106,10 +106,11 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief MatrixData representing the input. Storing it like this saves time during computation.
-  cedar::aux::MatDataPtr mInput;
+  cedar::aux::ConstMatDataPtr mInput;
 
 private:
   //!@brief the writer object (RAII)
+
   cedar::aux::net::NetWriter< cedar::aux::MatData::DataType > *mpWriter;
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -40,8 +40,9 @@
 
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/exceptions/namespace.h"
-#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
+//@todo: GH commented on merge
+//#include "cedar/auxiliaries/exceptions/namespace.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
 
 namespace cedar
 {

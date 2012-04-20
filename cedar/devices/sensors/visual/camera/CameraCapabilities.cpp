@@ -47,9 +47,12 @@ cedar::dev::sensors::visual::CameraCapabilities::CameraCapabilities(const std::s
 :
 cedar::aux::ConfigurationInterface(configFileName)
 {
-  #ifdef DEBUG_CAMERAGRABBER
-    std::cout << "[CameraCapabilities::CameraCapabilities] Config-file: " << configFileName << std::endl;
-  #endif
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+  cedar::aux::LogSingleton::getInstance()->debugMessage
+                                         (
+                                           ConfigurationInterface::getName() + ": Config-file: " + configFileName,
+                                           "cedar::dev::sensors::visual::CameraCapabilities::CameraCapabilities()"
+                                         );
 
   //for all known properties create a capability structure and store it
   for (unsigned int i=0; i<CameraProperty::type().list().size(); i++)
@@ -62,12 +65,16 @@ cedar::aux::ConfigurationInterface(configFileName)
   if (not declareParameters())
   {
     // throwing an exception prevents main-grabber class to clean up => catch this exception
-    std::string err = "[CameraCapabilities::CameraCapabilities] - Critical error in constructor";
+    std::string info = "[CameraCapabilities::CameraCapabilities] ERROR at parameter declaration";
+    cedar::aux::LogSingleton::getInstance()->error
+                                             (
+                                               ConfigurationInterface::getName() + ": " + info,
+                                               "cedar::dev::sensors::visual::CameraCapabilities::CameraCapabilities()"
+                                             );
     CEDAR_THROW
     (
-      std::cout << err << std::endl;
-      cedar::aux::exc::InitializationException,
-      err
+      cedar::aux::InitializationException,
+      info
     );
   }
   readOrDefaultConfiguration();
@@ -89,9 +96,7 @@ cedar::aux::ConfigurationInterface(configFileName)
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::sensors::visual::CameraCapabilities::~CameraCapabilities()
 {
-  #ifdef DEBUG_CAMERAGRABBER
-    std::cout << "[CameraCapabilities::~CameraCapabilities] Destroy class" << std::endl;
-  #endif
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -159,7 +164,7 @@ cedar::dev::sensors::visual::CameraCapabilities::CameraPropertyCapability&
   if (mCamProperties.at(prop).propId != propId)
   {
     //if not found, this is a critical error
-    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,
+    CEDAR_THROW(cedar::aux::IndexOutOfRangeException,
                 "[CameraCapabilities::getCapabilities] ERROR: Property not found!");
   }
   return mCamProperties.at(prop);

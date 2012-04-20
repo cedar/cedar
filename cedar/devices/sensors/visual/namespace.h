@@ -40,7 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/lib.h"
-#include "cedar/devices/robot/CMakeDefines.h"  // MAKE FIREWIRE OPTIONAL
+#include "cedar/configuration.h"   // MAKE FIREWIRE and YARP OPTIONAL
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -62,6 +62,10 @@ namespace cedar
       namespace visual
       {
 
+        //-----------------------------------------------------------------------------------------------
+        // grabber classes
+        //-----------------------------------------------------------------------------------------------
+
         //!@cond SKIPPED_DOCUMENTATION
 
         //common interface class
@@ -69,34 +73,58 @@ namespace cedar
         
         //grabber
         CEDAR_DECLARE_DEV_CLASS(VideoGrabber);
-        CEDAR_DECLARE_DEV_CLASS(NetGrabber);
         CEDAR_DECLARE_DEV_CLASS(PictureGrabber);
         CEDAR_DECLARE_DEV_CLASS(CameraGrabber);
+        CEDAR_DECLARE_DEV_CLASS(TestGrabber);
+
+        #ifdef CEDAR_USE_YARP
+        CEDAR_DECLARE_DEV_CLASS(NetGrabber);
+        #endif //#ifdef CEDAR_USE_YARP
+
         
         //enum classes
-        CEDAR_DECLARE_DEV_CLASS(CameraIsoSpeed);
         CEDAR_DECLARE_DEV_CLASS(CameraFrameRate);
         CEDAR_DECLARE_DEV_CLASS(CameraProperty);
         CEDAR_DECLARE_DEV_CLASS(CameraVideoMode);
         CEDAR_DECLARE_DEV_CLASS(CameraSetting);
-        
+        #ifdef CEDAR_USE_LIB_DC1394
+        CEDAR_DECLARE_DEV_CLASS(CameraIsoSpeed);
+        #endif
         //misc helper classes
         CEDAR_DECLARE_DEV_CLASS(CameraStateAndConfig);
         CEDAR_DECLARE_DEV_CLASS(CameraCapabilities);
         CEDAR_DECLARE_DEV_CLASS(CameraConfig);
         
+        //firewire related class of the grabbertools
+        #ifdef CEDAR_USE_LIB_DC1394
+        CEDAR_DECLARE_CLASS(LibDcCameraBase);
+        #endif
+
+        //-----------------------------------------------------------------------------------------------
+        // grabber types
+        //-----------------------------------------------------------------------------------------------
+
         ///! map property enum id to the value of the property
         typedef std::map<unsigned int, double> CameraPropertyValues;
 
         ///! a pair of property enum id and his value
         typedef std::pair<unsigned int, double> CameraPropertyValuesPair;
 
-        //firewire related classes of the grabbertools
-        #ifdef CEDAR_USE_LIB_DC1394
-          CEDAR_DECLARE_CLASS(LibDcCameraBase);
-        #endif
-
         //!@endcond
+
+        //-----------------------------------------------------------------------------------------------
+        // exceptions
+        //-----------------------------------------------------------------------------------------------
+
+        //! @brief An exception for errors on recording
+        class GrabberRecordingException;
+
+        //! @brief An exception for errors on saving a snapshot
+        class GrabberSnapshotException;
+
+        //! @brief An exception for errors on grabbing
+        class GrabberGrabException;
+
       }
     }
   }
