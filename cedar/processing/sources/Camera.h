@@ -112,4 +112,3 @@ private:
 }; // class cedar::proc::sources::Camera
 
 #endif // CEDAR_PROC_SOURCES_CAMERA_H
-
