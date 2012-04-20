@@ -37,7 +37,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/PictureGrabber.h"
-#include "cedar/auxiliaries/exceptions/IndexOutOfRangeException.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
 
@@ -56,6 +56,7 @@ cedar::dev::sensors::visual::PictureGrabber::PictureGrabber(
 :
 cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
   readInit(1,"PictureGrabber");
 
   //change/overwrite parameters with constructor values
@@ -73,6 +74,7 @@ cedar::dev::sensors::visual::PictureGrabber::PictureGrabber(
 :
 cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
   readInit(2,"PictureGrabber");
   getChannel(0)->mSourceFileName = pictureFileName0;
   getChannel(1)->mSourceFileName = pictureFileName1;
@@ -83,9 +85,7 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
 cedar::dev::sensors::visual::PictureGrabber::~PictureGrabber()
 {
   doCleanUp();
-  #ifdef DEBUG_PICTUREGRABBER
-    std::cout<<"[PictureGrabber::Destructor]"<< std::endl;
-  #endif
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -104,14 +104,17 @@ void cedar::dev::sensors::visual::PictureGrabber::onAddChannel()
 bool cedar::dev::sensors::visual::PictureGrabber::onInit()
 {
   //local and/or stored parameters are already initialized
-  #ifdef SHOW_INIT_INFORMATION_PICTUREGRABBER
-    std::cout << "PictureGrabber: Initialize Grabber with " << mNumCams << " pictures ..." << std::endl;
-    for (unsigned int i = 0; i < mNumCams; ++i)
-    {
-      std::cout << "Channel " << i << ": capture from Picture: " << getChannel(i)->mSourceFileName << "\n";
-    }
-    std::cout << std::flush;
-  #endif
+  std::stringstream init_message;
+  init_message << ": Initialize picture grabber with " << mNumCams << " pictures ..." << std::endl;
+  for (unsigned int i = 0; i < mNumCams; ++i)
+  {
+    init_message << "\tChannel " << i << ": capture from Picture: " << getChannel(i)->mSourceFileName << std::endl;
+  }
+  cedar::aux::LogSingleton::getInstance()->systemInfo
+                                           (
+                                             ConfigurationInterface::getName() + init_message.str(),
+                                             "cedar::dev::sensors::visual::PictureGrabber::onInit()"
+                                           );
 
   //for every channel, read from image-file
   for (unsigned int channel = 0; channel < mNumCams; ++channel)
@@ -124,17 +127,17 @@ bool cedar::dev::sensors::visual::PictureGrabber::onInit()
     }
     else
     {
-      std::cout << "[PictureGrabber::onInit] ERROR: Grabbing failed\n"
-                << "\tChannel " << channel << ": \"" << getChannel(channel)->mSourceFileName << "\"."
-                << std::endl;
+      cedar::aux::LogSingleton::getInstance()->error
+                                               (
+                                                ConfigurationInterface::getName() + ": Grabbing failed on Channel "
+                                                  + boost::lexical_cast<std::string>(channel) + " from \""
+                                                  + getChannel(channel)->mSourceFileName + "\"",
+                                                "cedar::dev::sensors::visual::PictureGrabber::onInit()"
+                                               );
       return false; //throws initialization exception
     }
   }
   //all grabbers successfully initialized
-
-  #ifdef DEBUG_PICTUREGRABBER
-    std::cout << "[PictureGrabber::onInit] finished" << std::endl;
-  # endif
 
   return true;
 }
@@ -150,7 +153,7 @@ const std::string& cedar::dev::sensors::visual::PictureGrabber::onGetSourceInfo(
 {
   if (channel >= mNumCams)
   {
-    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"PictureGrabber::onGetSourceInfo");
+    CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"PictureGrabber::onGetSourceInfo");
   }
   return getChannel(channel)->mSourceFileName;
 }
@@ -171,7 +174,7 @@ void cedar::dev::sensors::visual::PictureGrabber::setSourceFile(unsigned int cha
 {
   if (channel >= mNumCams)
   {
-    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"PictureGrabber::setPictureFileName");
+    CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"PictureGrabber::setPictureFileName");
   }
 
   getChannel(channel)->mSourceFileName = fileName;
@@ -183,6 +186,6 @@ void cedar::dev::sensors::visual::PictureGrabber::setSourceFile(unsigned int cha
 
   if (getChannel(channel)->mImageMat.empty())
   {
-    CEDAR_THROW(cedar::aux::exc::InitializationException,"PictureGrabber: Error on reading from file \""+fileName+"\"");
+    CEDAR_THROW(cedar::aux::InitializationException,"PictureGrabber: Error on reading from file \""+fileName+"\"");
   }
 }

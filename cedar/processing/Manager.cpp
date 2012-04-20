@@ -46,8 +46,6 @@
 #include "cedar/processing/MultiTrigger.h"
 #include "cedar/processing/PluginProxy.h"
 #include "cedar/processing/PluginDeclaration.h"
-#include "cedar/processing/source/NetReader.h"
-#include "cedar/processing/steps/NetWriter.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/exceptions.h"
@@ -65,12 +63,6 @@ cedar::proc::Manager cedar::proc::Manager::mManager;
 
 cedar::proc::Manager::Manager()
 {
-  this->steps().declareClass(net_reader_decl);
-
-  StepDeclarationPtr net_writer_decl(new
-    StepDeclarationT<cedar::proc::steps::NetWriterSink>("cedar.processing.steps.NetWriter", "Utilities"));
-  net_writer_decl->setIconPath(":/steps/net_writer.svg");
-  this->steps().declareClass(net_writer_decl);
 }
 
 cedar::proc::Manager::~Manager()

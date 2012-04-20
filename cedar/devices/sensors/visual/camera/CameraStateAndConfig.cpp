@@ -54,13 +54,16 @@ cedar::dev::sensors::visual::CameraStateAndConfig::CameraStateAndConfig
   const std::string capabilitiesFileName
 )
 {
-  #ifdef DEBUG_CAMERAGRABBER
-    std::cout << "[CameraStateAndConfig::CameraConfiguration] channel "<< channel
-              << " Config-file: " << configurationFileName << std::endl;
-    std::cout << "[CameraStateAndConfig::CameraConfiguration] channel "<< channel
-              << " Capability-file: " << capabilitiesFileName << std::endl;
-  #endif
-
+  cedar::aux::LogSingleton::getInstance()->allocating(this);  
+  std::stringstream debug_info;
+  debug_info << ": Channel "<< channel << " Config-file: " << configurationFileName << std::endl
+             << " Channel "<< channel << " Capability-file: " << capabilitiesFileName << std::endl;
+                               
+  cedar::aux::LogSingleton::getInstance()->debugMessage
+                                           (
+                                             "CameraStateAndConfig" + debug_info.str(),
+                                             "cedar::dev::sensors::visual::CameraStateAndConfig::CameraStateAndConfig()"
+                                           );
   mVideoCapture = videoCapture;
   mConfigurationFileName = configurationFileName;
   mCapabilitiesFileName = capabilitiesFileName;
@@ -103,7 +106,7 @@ cedar::dev::sensors::visual::CameraStateAndConfig::CameraStateAndConfig
   {
     CEDAR_THROW
     (
-      cedar::aux::exc::InitializationException,
+      cedar::aux::InitializationException,
       "[CameraStateAndConfig::CameraStateAndConfig] - Critical error in constructor"
     );
   }
@@ -114,9 +117,7 @@ cedar::dev::sensors::visual::CameraStateAndConfig::CameraStateAndConfig
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::sensors::visual::CameraStateAndConfig::~CameraStateAndConfig()
 {
-  #ifdef DEBUG_CAMERAGRABBER
-    std::cout << "[CameraStateAndConfig::~CameraStateAndConfig] channel "<< mChannel << " Destroy class" << std::endl;
-  #endif
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -127,20 +128,18 @@ cedar::dev::sensors::visual::CameraStateAndConfig::~CameraStateAndConfig()
 //--------------------------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::CameraStateAndConfig::saveConfiguration()
 {
-  #ifdef DEBUG_CAMERAGRABBER
-    std::cout<<"[CameraStateAndConfig::writeConfiguration] channel " << mChannel <<  std::endl;
-  #endif
+  cedar::aux::LogSingleton::getInstance()->debugMessage
+                                           (
+                                             "CameraStateAndConfig: channel " 
+                                               + boost::lexical_cast<std::string>(mChannel),
+                                             "cedar::dev::sensors::visual::CameraStateAndConfig::saveConfiguration()"
+                                           );
 
   bool result = true;
   //Camera Capabilities shouldn't be written
 
   //Save values from the camera
   result = mpCamConfig->saveConfiguration() && result;
-
-  #ifdef DEBUG_CAMERAGRABBER
-    std::cout<<"[CameraStateAndConfig::writeConfiguration] channel "<< mChannel << " result: "
-             << std::boolalpha << result << std::noboolalpha << std::endl;
-  #endif
 
   return result;
 }
@@ -151,12 +150,10 @@ bool cedar::dev::sensors::visual::CameraStateAndConfig::setProperty(CameraProper
 {
   int wanted_value = boost::math::iround(value);
 
-  #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-    std::string prop_name = CameraProperty::type().get(propId).name();
-    std::stringstream class_info;
-    class_info << "[CameraStateAndConfig::setProperty] Channel "<< mChannel
-               << ": Property \"" << prop_name << "\" ";
-  #endif
+
+  std::string prop_name = CameraProperty::type().get(propId).name();
+  std::stringstream info;
+  info << "Channel " << mChannel << ": Property \"" << prop_name << "\" ";
 
   // for cv::VideoCapture.get() we need as an unsigned int
   int prop_id = static_cast<unsigned int>(propId);
@@ -165,10 +162,12 @@ bool cedar::dev::sensors::visual::CameraStateAndConfig::setProperty(CameraProper
   //check if undefined properties
   if ( propId == cedar::aux::Enum::UNDEFINED)
   {
-    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << class_info << "unknown property (ID: "<< prop_id << ")" << std::endl;
-    #endif
-
+    info << "unknown (ID: "<< prop_id << ")";
+    cedar::aux::LogSingleton::getInstance()->warning
+                                             (
+                                               "CameraStateAndConfig: " + info.str(),
+                                               "cedar::dev::sensors::visual::CameraStateAndConfig::setProperty()"
+                                             );
     return false;
   }
 
@@ -176,14 +175,19 @@ bool cedar::dev::sensors::visual::CameraStateAndConfig::setProperty(CameraProper
   //check if property is supported from the cam
   if (!isSupported(propId))
   {
-    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
+    mCamPropertyValues[propId] = CAMERA_PROPERTY_NOT_SUPPORTED;
+
+    //at initialization time, all properties will be initialized with NOT_SUPPORTED, 
+    //this is not a warning
     if (!mInitialization)
     {
-      std::cout << class_info << "unsupported!" << std::endl;
+      info << "unsupported (ID: "<< prop_id << ")";
+      cedar::aux::LogSingleton::getInstance()->warning
+                                               (
+                                                 "CameraStateAndConfig: " + info.str(),
+                                                 "cedar::dev::sensors::visual::CameraStateAndConfig::setProperty()"
+                                               );
     }
-    #endif
-
-    mCamPropertyValues[propId] = CAMERA_PROPERTY_NOT_SUPPORTED;
     return false;
   }
 
@@ -200,20 +204,26 @@ bool cedar::dev::sensors::visual::CameraStateAndConfig::setProperty(CameraProper
       }
       else
       {
-        #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-        std::cout << class_info << "couldn't set to mode \"AUTO\""  << std::endl;
-        #endif
+        info << "couldn't set to mode \"AUTO\" (ID: "<< prop_id << ")";
+        cedar::aux::LogSingleton::getInstance()->warning
+                                                 (
+                                                   "CameraStateAndConfig: " + info.str(),
+                                                   "cedar::dev::sensors::visual::CameraStateAndConfig::setProperty()"
+                                                 );
         return false;
       }
     }
     else
     {
-      #ifdef ENABLE_GRABBER_WARNING_OUTPUT
       if (! mInitialization)
       {
-        std::cout << class_info << "\" doesn't support mode \"AUTO\""  << std::endl;
+        info << "doesn't support mode \"AUTO\"";
+        cedar::aux::LogSingleton::getInstance()->warning
+                                                 (
+                                                   "CameraStateAndConfig: " + info.str(),
+                                                   "cedar::dev::sensors::visual::CameraStateAndConfig::setProperty()"
+                                                 );        
       }
-      #endif
       return false;
     }
   }
@@ -228,20 +238,26 @@ bool cedar::dev::sensors::visual::CameraStateAndConfig::setProperty(CameraProper
       }
       else
       {
-        #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-        std::cout << class_info << "couldn't switch to \"OFF\""  << std::endl;
-        #endif
+        info << "couldn't set to \"OFF\"";
+        cedar::aux::LogSingleton::getInstance()->warning
+                                                 (
+                                                   "CameraStateAndConfig: " + info.str(),
+                                                   "cedar::dev::sensors::visual::CameraStateAndConfig::setProperty()"
+                                                 );        
         return false;
       }
     }
     else
     {
-      #ifdef ENABLE_GRABBER_WARNING_OUTPUT
       if (!mInitialization)
       {
-        std::cout << class_info << "\" doesn't support mode \"ON/OFF\""  << std::endl;
+        info << "doesn't support mode \"ON/OFF\"";
+        cedar::aux::LogSingleton::getInstance()->warning
+                                                 (
+                                                   "CameraStateAndConfig: " + info.str(),
+                                                   "cedar::dev::sensors::visual::CameraStateAndConfig::setProperty()"
+                                                 );  
       }
-      #endif
       return false;
     }
   }
@@ -256,20 +272,26 @@ bool cedar::dev::sensors::visual::CameraStateAndConfig::setProperty(CameraProper
       }
       else
       {
-        #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-        std::cout << class_info << "couldn't set to mode \"OnePushAuto\""  << std::endl;
-        #endif
+        info << "couldn't set to mode \"OnePushAuto\"";
+        cedar::aux::LogSingleton::getInstance()->warning
+                                                 (
+                                                   "CameraStateAndConfig: " + info.str(),
+                                                   "cedar::dev::sensors::visual::CameraStateAndConfig::setProperty()"
+                                                 );  
         return false;
       }
     }
     else
     {
-      #ifdef ENABLE_GRABBER_WARNING_OUTPUT
       if (!mInitialization)
       {
-        std::cout << class_info << "\" doesn't support mode \"ONE-PUSH-AUTO\""  << std::endl;
+        info << "doesn't support mode \"OnePushAuto\"";
+        cedar::aux::LogSingleton::getInstance()->warning
+                                                 (
+                                                   "CameraStateAndConfig: " + info.str(),
+                                                   "cedar::dev::sensors::visual::CameraStateAndConfig::setProperty()"
+                                                 );  
       }
-      #endif
       return false;
     }
   }
@@ -278,9 +300,12 @@ bool cedar::dev::sensors::visual::CameraStateAndConfig::setProperty(CameraProper
     //manual setting of property value
     if (! (isManualCapable(propId) || isAbsoluteCapable(propId) )  )
     {
-      #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << class_info << "is not able to set values manually"  << std::endl;
-      #endif
+      info << "is not able to set values manually";
+      cedar::aux::LogSingleton::getInstance()->warning
+                                               (
+                                                 "CameraStateAndConfig: " + info.str(),
+                                                 "cedar::dev::sensors::visual::CameraStateAndConfig::setProperty()"
+                                               );  
       return false;
     }
 
@@ -288,15 +313,16 @@ bool cedar::dev::sensors::visual::CameraStateAndConfig::setProperty(CameraProper
     int max_value = getMaxValue(propId);
     int min_value = getMinValue(propId);
 
-    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      if ( (wanted_value > max_value) || (wanted_value < min_value))
-      {
-          std::cout << class_info
-                    << "has a range of [" << min_value << ","<< max_value << "]" << std::endl;
-          std::cout << "[CameraStateAndConfig::setProperty] Your value of "<< value
-                    << " exceeds this boundaries" << std::endl;
-      }
-    #endif
+    if ( (wanted_value > max_value) || (wanted_value < min_value))
+    {
+      info << "has a range of [" << min_value << ","<< max_value << "]. "
+           << "Your value of "<< value << " exceeds this boundaries!";
+      cedar::aux::LogSingleton::getInstance()->warning
+                                               (
+                                                 "CameraStateAndConfig: " + info.str(),
+                                                 "cedar::dev::sensors::visual::CameraStateAndConfig::setProperty()"
+                                               );  
+    }
 
     if (value > max_value)
     {
@@ -307,13 +333,12 @@ bool cedar::dev::sensors::visual::CameraStateAndConfig::setProperty(CameraProper
       wanted_value = min_value;
     }
 
-    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      if (wanted_value != boost::math::iround(value))
-      {
-        std::cout << "[CameraStateAndConfig::setProperty] set " << prop_name << " to " << wanted_value << std::endl;
-      }
-    #endif
-
+    if (wanted_value != boost::math::iround(value))
+    {
+      //Firewire only supports integer as property values
+      //Other backends may be different
+      //std::cout << "[CameraStateAndConfig::setProperty] set " << prop_name << " to " << wanted_value << std::endl;
+    }
 
     //check if already set
     int old_value = boost::math::iround(getProperty(propId));
@@ -340,11 +365,13 @@ bool cedar::dev::sensors::visual::CameraStateAndConfig::setProperty(CameraProper
     }
 
     // an error occurred
-    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[CameraStateAndConfig::setProperty] Couldn't set Property "
-                << prop_name
-                << " to " << value << ". " << std::endl;
-    #endif
+    info << "couldn't be set! An unexpected error occured! New property value: "
+         << new_value << " (wanted value: " << wanted_value << ")";
+    cedar::aux::LogSingleton::getInstance()->error
+                                             (
+                                               "CameraStateAndConfig: " + info.str(),
+                                               "cedar::dev::sensors::visual::CameraStateAndConfig::setProperty()"
+                                             );  
 
     //sync with local storage
     mCamPropertyValues[propId] = getProperty(propId);
@@ -358,13 +385,12 @@ double cedar::dev::sensors::visual::CameraStateAndConfig::getProperty(CameraProp
 {
   if (propId == cedar::aux::Enum::UNDEFINED)
   {
-    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[CameraStateAndConfig::getProperty] Undefined property \""
-                << CameraProperty::type().get(propId).name()
-                << "\" (ID: "
-                << boost::lexical_cast<int>(propId)
-                << ")" << std::endl;
-    #endif
+    cedar::aux::LogSingleton::getInstance()->warning
+                                             (
+                                               "CameraStateAndConfig: Undefined property (ID: "
+                                                 + boost::lexical_cast<std::string>(propId) + ")",
+                                               "cedar::dev::sensors::visual::CameraStateAndConfig::getProperty()"
+                                             ); 
     return static_cast<double>(CAMERA_PROPERTY_NOT_SUPPORTED);
   }
 
@@ -375,19 +401,20 @@ double cedar::dev::sensors::visual::CameraStateAndConfig::getProperty(CameraProp
 //--------------------------------------------------------------------------------------------------------------------
 double cedar::dev::sensors::visual::CameraStateAndConfig::getPropertyValue(CameraProperty::Id propId)
 {
-  #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-    std::string prop_name = CameraProperty::type().get(propId).name();
-  #endif
+
+  std::string prop_name = CameraProperty::type().get(propId).name();
 
   // for cv::VideoCapture.get() we need as an unsigned int
   int prop_id = static_cast<unsigned int>(propId);
 
   if (propId == cedar::aux::Enum::UNDEFINED)
   {
-    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[CameraStateAndConfig::getPropertyValue] Undefined property \""
-                << prop_name << "\" (ID: "<< prop_id << ")" << std::endl;
-    #endif
+    cedar::aux::LogSingleton::getInstance()->warning
+                                             (
+                                               "CameraStateAndConfig: Undefined property (ID: "
+                                                 + boost::lexical_cast<std::string>(propId) + ")",
+                                               "cedar::dev::sensors::visual::CameraStateAndConfig::getPropertyValue()"
+                                             ); 
     return false;
   }
 
@@ -397,10 +424,12 @@ double cedar::dev::sensors::visual::CameraStateAndConfig::getPropertyValue(Camer
   }
   else
   {
-    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[CameraStateAndConfig::getPropertyValue] Unsupported property \""
-                << prop_name << "\" (ID: "<< prop_id << ")" << std::endl;
-    #endif
+    cedar::aux::LogSingleton::getInstance()->warning
+                                             (
+                                               "CameraStateAndConfig: Unsupported property (ID: "
+                                                 + boost::lexical_cast<std::string>(propId) + ")",
+                                               "cedar::dev::sensors::visual::CameraStateAndConfig::getPropertyValue()"
+                                             );  
     return static_cast<double>(CAMERA_PROPERTY_NOT_SUPPORTED);
   }
 }
@@ -427,9 +456,12 @@ double cedar::dev::sensors::visual::CameraStateAndConfig::getCamProperty(unsigne
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::CameraStateAndConfig::setAllParametersToCam()
 {
-  #ifdef DEBUG_CAMERAGRABBER
-    std::cout << "[CameraState::setAllParametersToCam] channel " << mChannel << std::endl;
-  #endif
+  cedar::aux::LogSingleton::getInstance()->debugMessage
+                                           (
+                                             "CameraStateAndConfig: Channel "
+                                               + boost::lexical_cast<std::string>(mChannel) + ")",
+                                             "cedar::dev::sensors::visual::CameraStateAndConfig::getPropertyValue()"
+                                           ); 
 
   CameraVideoMode::Id id_mode = CameraVideoMode::type().get(mCamSettings.mode).id();
   if (id_mode == cedar::aux::Enum::UNDEFINED)

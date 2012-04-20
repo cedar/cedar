@@ -44,7 +44,7 @@
 // PROJECT INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/NumericParameter.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/net/NetReader.h"
 
 // SYSTEM INCLUDES

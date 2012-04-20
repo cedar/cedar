@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/CameraGrabber.h"
 #include "cedar/devices/sensors/visual/camera/CameraConfig.h"
+#include "cedar/auxiliaries/Log.h"
 
 
 // SYSTEM INCLUDES

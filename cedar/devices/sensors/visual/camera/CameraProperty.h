@@ -78,12 +78,11 @@
 
 //--------------------------------------------------------------------------------------------------------------------
 /*!@brief Enum class for camera properties direct mapped from opencv2/highgui/highui_c.h
- * (also in dc1394/control.h)
  *
  * \remarks
  *    Use this type for the CameraGrabber::setCameraProperty() and getCameraProperty() method
  * \par
- *    Until now, only properties supported by the opencv backend are implemented
+ *    Until now, only properties supported by the OpenCV backend are implemented
  *
  */
 class cedar::dev::sensors::visual::CameraProperty
@@ -125,45 +124,52 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraProperty> mType;
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  static const Id PROP_BRIGHTNESS    = CV_CAP_PROP_BRIGHTNESS; // = 10
-  static const Id PROP_SATURATION    = CV_CAP_PROP_SATURATION; // = 12;
-  static const Id PROP_HUE           = CV_CAP_PROP_HUE; //13;
-  static const Id PROP_GAIN          = CV_CAP_PROP_GAIN; //14;
-  static const Id PROP_EXPOSURE      = CV_CAP_PROP_EXPOSURE; //15;
+  /*! @brief Set the brightness through the CameraGrabber::setCameraProperty() method
+   *
+   *  @remarks Not all of this properties are supported on the different camera models
+   */
+  static const Id PROP_BRIGHTNESS = CV_CAP_PROP_BRIGHTNESS; // = 10
+  /// @see PROP_BRIGHTNESS
+  static const Id PROP_SATURATION = CV_CAP_PROP_SATURATION; // = 12;
+  /// @see PROP_BRIGHTNESS
+  static const Id PROP_HUE = CV_CAP_PROP_HUE; //13;
+  /// @see PROP_BRIGHTNESS
+  static const Id PROP_GAIN = CV_CAP_PROP_GAIN; //14;
+  /// @see PROP_BRIGHTNESS
+  static const Id PROP_EXPOSURE = CV_CAP_PROP_EXPOSURE; //15;
+  /// @see PROP_BRIGHTNESS
   static const Id PROP_WHITE_BALANCE_BLUE_U = CV_CAP_PROP_WHITE_BALANCE_BLUE_U; //17;
-  static const Id PROP_SHARPNESS     = CV_CAP_PROP_SHARPNESS; //20;
+  /// @see PROP_BRIGHTNESS
+  static const Id PROP_SHARPNESS = CV_CAP_PROP_SHARPNESS; //20;
+  /// @see PROP_BRIGHTNESS
   static const Id PROP_AUTO_EXPOSURE = CV_CAP_PROP_AUTO_EXPOSURE; //21
-  static const Id PROP_GAMMA         = CV_CAP_PROP_GAMMA; //22;
-  static const Id PROP_TEMPERATURE   = CV_CAP_PROP_TEMPERATURE; // 23;
-  static const Id PROP_TRIGGER       = CV_CAP_PROP_TRIGGER; // 24;
+  /// @see PROP_BRIGHTNESS
+  static const Id PROP_GAMMA = CV_CAP_PROP_GAMMA; //22;
+  /// @see PROP_BRIGHTNESS
+  static const Id PROP_TEMPERATURE = CV_CAP_PROP_TEMPERATURE; // 23;
+  /// @see PROP_BRIGHTNESS
+  static const Id PROP_TRIGGER = CV_CAP_PROP_TRIGGER; // 24;
+  /// @see PROP_BRIGHTNESS
   static const Id PROP_TRIGGER_DELAY = CV_CAP_PROP_TRIGGER_DELAY; // 25;
+  /// @see PROP_BRIGHTNESS
   static const Id PROP_WHITE_BALANCE_RED_V = CV_CAP_PROP_WHITE_BALANCE_RED_V; // 26;
-  static const Id PROP_ZOOM          = CV_CAP_PROP_ZOOM; // 27;
-  static const Id PROP_FOCUS         = CV_CAP_PROP_FOCUS; // 28;
+  /// @see PROP_BRIGHTNESS
+  static const Id PROP_ZOOM = CV_CAP_PROP_ZOOM; // 27;
+  /// @see PROP_BRIGHTNESS
+  static const Id PROP_FOCUS = CV_CAP_PROP_FOCUS; // 28;
 
 protected:
   // none yet
 private:
   // none yet
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
-//!@endcond
 }; // cedar::dev::sensors::visual::CameraProperty
 
 #endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_PROPERTY_H

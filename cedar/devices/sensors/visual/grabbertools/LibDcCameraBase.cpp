@@ -35,10 +35,11 @@
 
 ======================================================================================================================*/
 
-// CEDAR INCLUDES
-#include "cedar/devices/robot/CMakeDefines.h"   // MAKE FIREWIRE OPTIONAL
-
+// MAKE FIREWIRE OPTIONAL
+#include "cedar/configuration.h"
 #ifdef CEDAR_USE_LIB_DC1394
+
+// CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/grabbertools/LibDcCameraBase.h"
 
 // SYSTEM INCLUDES

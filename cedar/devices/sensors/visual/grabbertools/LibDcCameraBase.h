@@ -38,7 +38,7 @@
 #define CEDAR_DEV_SENSORS_VISUAL_LIBDCCAMERABASE_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/robot/CMakeDefines.h"  // MAKE FIREWIRE OPTIONAL
+#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
 
 #ifdef CEDAR_USE_LIB_DC1394
 //#pragma message "compiling with DC1394 support"

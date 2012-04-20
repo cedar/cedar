@@ -36,7 +36,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/camera/CameraIsoSpeed.h"
+#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
 
+#ifdef CEDAR_USE_LIB_DC1394
 // SYSTEM INCLUDES
 
 
@@ -114,3 +116,4 @@ const cedar::dev::sensors::visual::CameraIsoSpeed::TypePtr& cedar::dev::sensors:
 {
   return cedar::dev::sensors::visual::CameraIsoSpeed::mType.type();
 }
+#endif // CEDAR_USE_LIB_DC1394

@@ -71,7 +71,7 @@ public cedar::dev::sensors::visual::GrabberInterface
     std::string mSourceFileName;
   };
 
-  typedef boost::shared_ptr<PictureChannel> PictureChannelPtr;
+  CEDAR_GENERATE_POINTER_TYPES(PictureChannel);
 
   //!@endcond
 
@@ -135,23 +135,18 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
+  /// @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
   inline PictureChannelPtr getChannel(unsigned int channel)
   {
-    //!@todo: change to asserted_cast
-    //return cedar::aux::asserted_cast<PictureChannelPtr>(mChannels.at(channel))
     return boost::static_pointer_cast<PictureChannel>
            (
              cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
            );
   }
 
-  //!@todo: after merging change to ConstCameraChannelPtr
-  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
-  inline boost::shared_ptr<const PictureChannel> getChannel(unsigned int channel) const
+  /// @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
+  inline ConstPictureChannelPtr getChannel(unsigned int channel) const
   {
-    //!@todo: change to asserted_cast
-    //return cedar::aux::asserted_cast<PictureChannelPtr>(mChannels.at(channel))
     return boost::static_pointer_cast<const PictureChannel>
            (
              cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
@@ -170,12 +165,9 @@ protected:
 private:
 
 
-
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
 
 private:

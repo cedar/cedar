@@ -79,7 +79,7 @@ int main(int , char **)
                            FINISH_INITIALIZATION
                          );
   }
-  catch (cedar::aux::exc::InitializationException &e)
+  catch (cedar::aux::InitializationException &e)
   {
     //after an InitializationExeception the video_grabber class isn't initialized correctly
     //and can't be used

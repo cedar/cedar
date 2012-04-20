@@ -39,12 +39,41 @@
 
 // PROJECT INCLUDES
 #include "cedar/processing/DataSlot.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
 #include <vector>
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr input_declaration
+    (
+      new ElementDeclarationTemplate<cedar::proc::steps::NetWriterSink>
+      (
+        "Utilities",
+        "cedar.processing.steps.NetWriter"
+      )
+    );
+    input_declaration->setIconPath(":/steps/net_writer.svg");
+    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(input_declaration);
+
+    return true;
+  }
+
+  bool declared = declare();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -145,7 +174,7 @@ void cedar::proc::steps::NetWriterSink::inputConnectionChanged(const std::string
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
   // Assign the input to the member. This saves us from casting in every computation step.
-  this->mInput = boost::shared_dynamic_cast<cedar::aux::MatData>(this->getInput(inputName));
+  this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
   // This should always work since other types should not be accepted.
   CEDAR_DEBUG_ASSERT(this->mInput);
 

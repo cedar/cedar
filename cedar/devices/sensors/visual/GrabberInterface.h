@@ -39,12 +39,11 @@
 #define CEDAR_DEV_SENSORS_VISUAL_GRABBER_INTERFACE_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/defines.h"
 #include "cedar/devices/sensors/visual/namespace.h"
 #include "cedar/devices/sensors/visual/exceptions.h"
 #include "cedar/auxiliaries/LoopedThread.h"
-#include "cedar/auxiliaries/exceptions/InitializationException.h"
-#include "cedar/auxiliaries/exceptions/IndexOutOfRangeException.h"
+#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>

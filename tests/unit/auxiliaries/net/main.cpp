@@ -85,7 +85,7 @@ int main()
       mat_errors++;
     }
   }
-  catch (cedar::aux::exc::ExceptionBase &E)
+  catch (cedar::aux::ExceptionBase &E)
   {
     log_file << E.exceptionInfo() << std::endl;
     return 1;
@@ -190,7 +190,7 @@ int main()
     }
 
   } // end try
-  catch (cedar::aux::exc::ExceptionBase &E)
+  catch (cedar::aux::ExceptionBase &E)
   {
     log_file << E.exceptionInfo() << std::endl;
     return 1;

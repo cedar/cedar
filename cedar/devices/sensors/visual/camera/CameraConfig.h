@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/ConfigurationInterface.h"
 #include "cedar/devices/sensors/visual/namespace.h"
+#include "cedar/auxiliaries/Log.h"
 
 
 // SYSTEM INCLUDES
