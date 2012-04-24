@@ -43,6 +43,7 @@
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
+#include <QStandardItemModel>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -96,14 +97,30 @@ void cedar::aux::gui::EnumParameter::parameterPointerChanged()
     {
       select_index = static_cast<int>(i);
     }
-    this->mpEdit->addItem(enum_val.prettyString().c_str(), QVariant(QString(enum_val.name().c_str())));
+    QVariant data(QString(enum_val.name().c_str()));
+    this->mpEdit->addItem(enum_val.prettyString().c_str(), data);
+    int item_index = this->mpEdit->findData(data);
+    QStandardItemModel* model = qobject_cast<QStandardItemModel*>(this->mpEdit->model());
+
+    CEDAR_DEBUG_ASSERT(model != NULL);
+
+    QModelIndex index = model->index(item_index, this->mpEdit->modelColumn(), this->mpEdit->rootModelIndex());
+    QStandardItem* p_item = model->itemFromIndex(index);
+    CEDAR_DEBUG_ASSERT(p_item != NULL);
+    p_item->setEnabled(parameter->isEnabled(enum_val));
   }
   if(select_index != -1)
   {
     this->mpEdit->setCurrentIndex(select_index);
   }
 
-  QObject::connect(this->mpEdit, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(currentIndexChanged(const QString&)));
+  QObject::connect
+  (
+    this->mpEdit,
+    SIGNAL(currentIndexChanged(const QString&)),
+    this,
+    SLOT(currentIndexChanged(const QString&))
+  );
 }
 
 void cedar::aux::gui::EnumParameter::currentIndexChanged(const QString&)
