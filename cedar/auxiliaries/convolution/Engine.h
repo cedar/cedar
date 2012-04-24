@@ -91,7 +91,7 @@ public:
     const cv::Mat& matrix,
     const cv::Mat& kernel,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    cedar::aux::conv::BorderType::Id mode = cedar::aux::conv::Mode::Same,
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same,
     const std::vector<int>& anchor = std::vector<int>()
   ) const = 0;
 
@@ -102,7 +102,7 @@ public:
     const cv::Mat& matrix,
     cedar::aux::kernel::ConstKernelPtr kernel,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    cedar::aux::conv::BorderType::Id mode = cedar::aux::conv::Mode::Same
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
   ) const = 0;
 
 
@@ -116,7 +116,7 @@ public:
     const cv::Mat& matrix,
     cedar::aux::kernel::ConstSeparablePtr kernel,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    cedar::aux::conv::BorderType::Id mode = cedar::aux::conv::Mode::Same
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
   ) const;
 
   /*!@brief Convolves a matrix with a kernel list.
@@ -126,7 +126,7 @@ public:
     const cv::Mat& matrix,
     const cedar::aux::conv::KernelList& kernel,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    cedar::aux::conv::BorderType::Id mode = cedar::aux::conv::Mode::Same
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
   ) const = 0;
 
   //!@brief Method for accessing the kernel list.
@@ -140,6 +140,27 @@ public:
   {
     return this->mKernelList;
   }
+
+  //!@brief Checks if a matrix is capable of a certain type of convolution.
+  virtual bool checkCapability
+  (
+    size_t matrixDim,
+    size_t kernelDim,
+    cedar::aux::conv::BorderType::Id borderType,
+    cedar::aux::conv::Mode::Id mode
+  ) const;
+
+  //!@brief Checks if a matrix is capable of a certain type of convolution.
+  virtual bool checkBorderTypeCapability
+  (
+    cedar::aux::conv::BorderType::Id borderType
+  ) const;
+
+  //!@brief Checks if a matrix is capable of a certain type of convolution.
+  virtual bool checkModeCapability
+  (
+    cedar::aux::conv::Mode::Id mode
+  ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

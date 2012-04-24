@@ -158,5 +158,26 @@ void cedar::aux::conv::Convolution::selectedEngineChanged()
                                boost::bind(&cedar::aux::conv::Convolution::slotKernelRemoved, this, _1)
                              );
 
+  this->updateEngineCapabilities();
+
   this->updateCombinedKernel();
+}
+
+void cedar::aux::conv::Convolution::updateEngineCapabilities()
+{
+  this->_mMode->enableAll();
+  const std::vector<cedar::aux::Enum>& modes = cedar::aux::conv::Mode::type().list();
+  for (size_t i = 0; i < modes.size(); ++i)
+  {
+    const cedar::aux::Enum& enum_value = modes.at(i);
+    this->_mMode->setEnabled(enum_value, this->getEngine()->checkModeCapability(enum_value));
+  }
+
+  this->_mBorderType->enableAll();
+  const std::vector<cedar::aux::Enum>& border_types = cedar::aux::conv::BorderType::type().list();
+  for (size_t i = 0; i < border_types.size(); ++i)
+  {
+    const cedar::aux::Enum& enum_value = border_types.at(i);
+    this->_mBorderType->setEnabled(enum_value, this->getEngine()->checkBorderTypeCapability(enum_value));
+  }
 }

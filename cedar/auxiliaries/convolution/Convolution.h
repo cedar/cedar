@@ -272,6 +272,10 @@ private:
    */
   void slotKernelRemoved(size_t);
 
+  /*!@brief Updates the engine capabilities.
+   */
+  void updateEngineCapabilities();
+
 private slots:
   //!@brief Reacts to a change of the convolution engine.
   void selectedEngineChanged();
