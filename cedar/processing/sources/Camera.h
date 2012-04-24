@@ -96,7 +96,7 @@ private:
 protected:
   // none yet
 private:
-  cedar::aux::ImageDataPtr mCameraImage;
+  cedar::aux::ImageDataPtr mImage;
 
   cedar::dev::sensors::visual::CameraGrabberPtr mGrabber;
 

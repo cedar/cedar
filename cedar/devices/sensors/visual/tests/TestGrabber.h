@@ -26,9 +26,9 @@
 
     Maintainer:  Georg.Hartinger
     Email:       georg.hartinger@ini.rub.de
-    Date:        2011 08 01
+    Date:        2012 04 23
 
-    Description: Header for the @em @em cedar::dev::sensors::visual::TestGrabber class.
+    Description: Header for the @em @em cedar::dev::sensors::visual::OglGrabber class.
 
     Credits:
 
@@ -39,7 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/GrabberInterface.h"
-#include "cedar/auxiliaries/casts.h"
+//#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -63,7 +63,7 @@ public cedar::dev::sensors::visual::GrabberInterface
 
   //!@cond SKIPPED_DOCUMENTATION
 
-  /*! @struct PictureChannel
+  /*! @struct TestChannel
    *  @brief Additional data of a grabbing channel
    *  @remarks For grabber developers<br>
    *    You don't have to create an extended channel structure, until you need more channel data.
