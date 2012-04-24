@@ -1,0 +1,76 @@
+#=======================================================================================================================
+#
+#   Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+# 
+#   This file is part of cedar.
+#
+#   cedar is free software: you can redistribute it and/or modify it under
+#   the terms of the GNU Lesser General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+#   WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+#   License for more details.
+#
+#   You should have received a copy of the GNU Lesser General Public License
+#   along with cedar. If not, see <http://www.gnu.org/licenses/>.
+#
+#=======================================================================================================================
+#
+#   Institute:   Ruhr-Universitaet Bochum
+#                Institut fuer Neuroinformatik
+#
+#   File:        changelog.txt
+#
+#   Maintainer:  all cedar developers
+#   Email:       cedar@ini.rub.de
+#   Date:        2012 01 12
+#
+#   Description: Cedar changelog
+#
+#   Credits:
+#
+#=======================================================================================================================
+
+== current version ==
+
+- cedar::aux
+  - fixed a critical bug in LoopedThread::singleStep, which used microseconds instead of milliseconds for step()
+  - cedar::aux::Configurable now inherits from boost::noncopyable, explicitly stating that you should never use
+    the copy constructor. Instead, you should use the functions Configurable::copyTo and Configurable::copyFrom.
+  - the cedar::aux::Base class was removed
+  - The old ConfigurationInterface is being phased out now. For this purpose, a transitional interface has been
+    developed that should mostly work with the old code. If you run into trouble, add the following line to your
+    cedar configuration file:
+    set (CEDAR_LIBCONFIG_LEGACY_MODE      1           CACHE BOOL "Use libconfig legacy mode.")
+    If you set this flag to 0, libconfig++ is no longer needed as a dependency! Some unit tests may fail, though.
+  - There is now a generalized structure for convolution. This structure wraps opencv and, optionally, fftw convolution!
+    For more, see the documentation for the cedar::aux::conv::Convolution class.
+
+- cedar::proc
+  - added directional arrows for graphical connections in processingIde
+  - when loading a plugin, the PluginProxy now also looks for a plugin description file. This file may contain some
+    information about your plugin in case you don't want to hardcode it, e.g., it can contain icon paths for processing
+    steps. See documentation of cedar::proc::PluginDeclaration for details.
+    
+- processingIde
+  - The IDE now remembers whether or not snap to grid is active.
+  - Implemented zooming in the IDE; apart from the controls that are directly visible, scrolling is also possible with
+    the mouse wheel (hold down ctrl)
+  - The property pane now indicates when parameters have been changed since the last save. 
+  - more verbose tooltip for data slots
+  - the tab order in the property pane is now working correctly
+
+- build system
+  - files in the resource folder are now moved to ${CEDAR_INSTALL_PREFIX}/share/resources. Use the
+    cedar::aux::System::locateResource function to locate them.
+
+== Version 0.5.1 ==
+- cedar::proc::steps
+  - fixed compilation bug of cedar::proc::steps::GaussInput on Windows platforms
+
+== Version 0.5 ==
+
+first release!
