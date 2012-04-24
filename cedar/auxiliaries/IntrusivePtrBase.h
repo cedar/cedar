@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LoopedTrigger.h
+    File:        IntrusivePtrBase.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 06
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 04 19
 
     Description:
 
@@ -38,71 +34,56 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_LOOPED_TRIGGER_H
-#define CEDAR_PROC_LOOPED_TRIGGER_H
+#ifndef CEDAR_AUX_INTRUSIVE_PTR_BASE_H
+#define CEDAR_AUX_INTRUSIVE_PTR_BASE_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
-#include "cedar/processing/Trigger.h"
-#include "cedar/auxiliaries/LoopedThread.h"
+#include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
-#include <vector>
-#include <QObject>
+#include <boost/intrusive_ptr.hpp>
+#include <boost/detail/atomic_count.hpp>
 
-/*!@brief A Trigger that sends trigger events in a constant loop.
- *
- *        This class is a translation of the cedar::aux::LoopedThread concept into the processing framework.
+// forward declaration of intrusive pointer functions
+extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_add_ref(cedar::aux::IntrusivePtrBase const *);
+extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_release(cedar::aux::IntrusivePtrBase const *);
+
+/*!@brief A base class for any classes that make use of boost::intrusive_ptr.
  */
-class cedar::proc::LoopedTrigger : public cedar::aux::LoopedThread,
-                                   public cedar::proc::Trigger
+class cedar::aux::IntrusivePtrBase
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  LoopedTrigger(double stepSize = 1.0);
+  IntrusivePtrBase();
 
-  //!@brief Destructor
-  virtual ~LoopedTrigger();
+  virtual ~IntrusivePtrBase();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Step method implemented from the superclass.
+  /*!@brief Function that increases the reference counter of the object.
+   *
+   *        Required for boost::intrusive_ptr.
    */
-  void step(double time);
+  friend void ::intrusive_ptr_add_ref(cedar::aux::IntrusivePtrBase const *pObject);
 
-  /*!@brief Starts the trigger loop.
-   * @todo Make the start/stop methods in LoopedThread virtual and overload them in LoopedTrigger instead?
+  /*!@brief Function that decreases the reference counter of the object and deletes it if the counter goes to zero.
+   *
+   *        Required for boost::intrusive_ptr
    */
-  void startTrigger();
-
-  /*!@brief Stops the trigger loop.
-   */
-  void stopTrigger();
-
-
-public slots:
-  /*!@brief Slot that reacts to a change in the loop mode parameter.
-   */
-  void loopModeChanged();
-
-  /*!@brief Slot that reacts to a change in the loop time parameter.
-   */
-  void loopTimeChanged();
-
-  /*!@brief Slot that reacts to a change in the idle time parameter.
-   */
-  void idleTimeChanged();
+  friend void ::intrusive_ptr_release(cedar::aux::IntrusivePtrBase const *pObject);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -114,42 +95,16 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Removes the triggerable from the list of listeners of this trigger.
-   */
-  void removeListener(cedar::proc::TriggerablePtr triggerable);
-
-  /*!@brief Adds the triggerable to the listeners of this of this trigger.
-   */
-  void addListener(cedar::proc::TriggerablePtr triggerable);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
 private:
-  // none yet
+  //! Reference counter for boost intrusive pointer.
+  mutable boost::detail::atomic_count mReferenceCount;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
+}; // class cedar::aux::IntrusivePtrBase
 
-private:
-  //!@brief The loop mode.
-  cedar::aux::EnumParameterPtr mLoopType;
+#endif // CEDAR_AUX_INTRUSIVE_PTR_BASE_H
 
-  //!@brief The loop time.
-  cedar::aux::DoubleParameterPtr mLoopTime;
-
-  //!@brief The idle time.
-  cedar::aux::DoubleParameterPtr mIdleTime;
-
-  //!@brief Whether the looped trigger waits for all its listeners to finish their processing.
-  cedar::aux::BoolParameterPtr mWait;
-
-}; // class cedar::proc::LoopedTrigger
-
-#endif // CEDAR_PROC_LOOPED_TRIGGER_H

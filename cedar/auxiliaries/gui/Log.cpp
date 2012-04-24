@@ -44,6 +44,7 @@
 
 // SYSTEM INCLUDES
 #include <QHeaderView>
+#include <QLabel>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -63,6 +64,14 @@ QTabWidget(pParent)
   this->addPane(cedar::aux::LOG_LEVEL_DEBUG, "debug", ":/cedar/auxiliaries/gui/debug.svg");
   this->addPane(cedar::aux::LOG_LEVEL_MEM_DEBUG, "memory", ":/cedar/auxiliaries/gui/memory.svg");
 #endif // DEBUG
+
+  QObject::connect
+  (
+    this,
+    SIGNAL(messageReceived(int, QString, QString)),
+    this,
+    SLOT(printMessage(int, QString, QString))
+  );
 }
 
 cedar::aux::gui::Log::~Log()
@@ -136,9 +145,9 @@ QTableWidget* cedar::aux::gui::Log::addPane(const std::string& title, const std:
 void cedar::aux::gui::Log::postMessage
 (
   QTableWidget* pTable,
-  const std::string& message,
-  const std::string& title,
-  const std::string& icon
+  const QString& message,
+  const QString& title,
+  const QString& icon
 )
 {
   Qt::ItemFlags item_flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
@@ -146,24 +155,23 @@ void cedar::aux::gui::Log::postMessage
   pTable->insertRow(row);
 
   QTableWidgetItem *p_title_item = NULL;
-  if (icon.empty())
+  if (icon.isEmpty())
   {
-    p_title_item = new QTableWidgetItem(QString::fromStdString(title));
+    p_title_item = new QTableWidgetItem(title);
   }
   else
   {
-    p_title_item = new QTableWidgetItem(QIcon(QString::fromStdString(icon)), QString::fromStdString(title));
+    p_title_item = new QTableWidgetItem(QIcon(icon), title);
   }
 
-  QString q_message = QString::fromStdString(message);
-  QTableWidgetItem *p_message_item = new QTableWidgetItem(q_message);
-  p_message_item->setToolTip("<p>" + q_message + "</p>");
+  QLabel* p_message_item = new QLabel(message);
+  p_message_item->setToolTip("<p>" + message + "</p>");
 
   p_title_item->setFlags(item_flags);
-  p_message_item->setFlags(item_flags);
 
   pTable->setItem(row, 0, p_title_item);
-  pTable->setItem(row, 1, p_message_item);
+  pTable->setCellWidget(row, 1, p_message_item);
+  pTable->resizeRowToContents(row);
 }
 
 void cedar::aux::gui::Log::message
@@ -173,9 +181,15 @@ void cedar::aux::gui::Log::message
        const std::string& title
      )
 {
+  emit messageReceived(static_cast<int>(level), QString::fromStdString(title), QString::fromStdString(message));
+}
+
+void cedar::aux::gui::Log::printMessage(int type, QString title, QString message)
+{
+  cedar::aux::LOG_LEVEL level = static_cast<cedar::aux::LOG_LEVEL>(type);
   QTableWidget* p_level_pane = NULL;
 
-  std::string icon;
+  QString icon;
 
   std::map<cedar::aux::LOG_LEVEL, QTableWidget*>::iterator iter = this->mpPanes.find(level);
   if (iter != this->mpPanes.end())
@@ -183,7 +197,7 @@ void cedar::aux::gui::Log::message
     p_level_pane = iter->second;
     CEDAR_DEBUG_ASSERT(mIcons.find(level) != mIcons.end());
 
-    icon = mIcons[level];
+    icon = QString::fromStdString(mIcons[level]);
   }
 
   switch (level)

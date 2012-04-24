@@ -145,11 +145,17 @@ bool cedar::aux::gui::MatrixPlot1D::canAppend(cedar::aux::ConstDataPtr data) con
   {
     return false;
   }
+  const cv::Mat& matrix = mat_data->getData();
+
+  if (cedar::aux::math::getDimensionalityOf(matrix) != 1)
+  {
+    return false;
+  }
 
   if
   (
     this->mPlotSeriesVector.size() == 0
-    || cedar::aux::math::get1DMatrixSize(mat_data->getData()) != this->mPlotSeriesVector.at(0)->mXValues.size())
+    || cedar::aux::math::get1DMatrixSize(matrix) != this->mPlotSeriesVector.at(0)->mXValues.size())
   {
     return false;
   }

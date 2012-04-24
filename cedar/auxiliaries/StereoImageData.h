@@ -22,87 +22,112 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LoopedTrigger.h
+    File:        StereoImageData.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 06
+    Maintainer:  Irina Popova,
 
-    Description:
+    Email:       irina.popova@ini.ruhr-uni-bochum.de,
+
+    Date:        2012 04 02
+
+    Description: Header for the cedar::aux::StereoImageData.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_LOOPED_TRIGGER_H
-#define CEDAR_PROC_LOOPED_TRIGGER_H
+#ifndef CEDAR_AUX_STEREO_IMAGE_DATA_H
+#define CEDAR_AUX_STEREO_IMAGE_DATA_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
-#include "cedar/processing/Trigger.h"
-#include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Data.h"
 
 // SYSTEM INCLUDES
-#include <vector>
-#include <QObject>
+//#include <QReadWriteLock>
 
-/*!@brief A Trigger that sends trigger events in a constant loop.
+/*!@brief A class to use stereo images.
  *
- *        This class is a translation of the cedar::aux::LoopedThread concept into the processing framework.
+ * @todo More detailed description of the class.
+ *
+ * @remarks
+ *
  */
-class cedar::proc::LoopedTrigger : public cedar::aux::LoopedThread,
-                                   public cedar::proc::Trigger
+
+class cedar::aux::StereoImageData : public cedar::aux::Data
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  LoopedTrigger(double stepSize = 1.0);
+  StereoImageData()
+  {
+  }
+
+  //!@brief This constructor initializes the internal data to a left und right images.
+  StereoImageData(const cv::Mat& image_left, const cv::Mat& image_right)
+  {
+    this->mLeftImage = image_left;
+    this->mRightImage = image_right;
+  }
 
   //!@brief Destructor
-  virtual ~LoopedTrigger();
+  virtual ~StereoImageData()
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Step method implemented from the superclass.
-   */
-  void step(double time);
 
-  /*!@brief Starts the trigger loop.
-   * @todo Make the start/stop methods in LoopedThread virtual and overload them in LoopedTrigger instead?
-   */
-  void startTrigger();
+  //!@brief returns the left image.
+  cv::Mat& getLeftImage()
+  {
+    return this->mLeftImage;
+  }
 
-  /*!@brief Stops the trigger loop.
-   */
-  void stopTrigger();
+  //!@brief returns the right image.
+  cv::Mat& getRightImage()
+  {
+    return this->mRightImage;
+  }
 
+  //!@brief returns the left image as a constant.
+  inline const cv::Mat& getLeftImage() const
+  {
+    return this->mLeftImage;
+  }
 
-public slots:
-  /*!@brief Slot that reacts to a change in the loop mode parameter.
-   */
-  void loopModeChanged();
+  //!@brief returns the right image as a constant.
+  const cv::Mat& getRightImage() const
+  {
+    return this->mRightImage;
+  }
 
-  /*!@brief Slot that reacts to a change in the loop time parameter.
-   */
-  void loopTimeChanged();
+  //!@brief sets the internal data to the given data.
+  void setImages(const cv::Mat& image_left, const cv::Mat& image_right)
+  {
+    this->mLeftImage = image_left;
+    this->mRightImage = image_right;
+  }
 
-  /*!@brief Slot that reacts to a change in the idle time parameter.
-   */
-  void idleTimeChanged();
+  //!@brief sets the left image to the given data.
+  void setLeftImage(const cv::Mat& image_left)
+  {
+    this->mLeftImage = image_left;
+  }
+
+  //!@brief sets the right image to the given data.
+  void setRightImage(const cv::Mat& image_right)
+  {
+    this->mRightImage = image_right;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -114,42 +139,18 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Removes the triggerable from the list of listeners of this trigger.
-   */
-  void removeListener(cedar::proc::TriggerablePtr triggerable);
-
-  /*!@brief Adds the triggerable to the listeners of this of this trigger.
-   */
-  void addListener(cedar::proc::TriggerablePtr triggerable);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-
+  //!@brief the internal data
+  cv::Mat mLeftImage;
+  cv::Mat mRightImage;
 private:
   // none yet
+}; // class cedar::aux::StereoImageData
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
+#endif // CEDAR_AUX_STEREO_IMAGE_DATA_H
 
-private:
-  //!@brief The loop mode.
-  cedar::aux::EnumParameterPtr mLoopType;
-
-  //!@brief The loop time.
-  cedar::aux::DoubleParameterPtr mLoopTime;
-
-  //!@brief The idle time.
-  cedar::aux::DoubleParameterPtr mIdleTime;
-
-  //!@brief Whether the looped trigger waits for all its listeners to finish their processing.
-  cedar::aux::BoolParameterPtr mWait;
-
-}; // class cedar::proc::LoopedTrigger
-
-#endif // CEDAR_PROC_LOOPED_TRIGGER_H
