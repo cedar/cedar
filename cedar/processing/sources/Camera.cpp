@@ -78,9 +78,9 @@ namespace
 cedar::proc::sources::Camera::Camera()
 :
 cedar::proc::Step(false, true),
-mCameraImage(new cedar::aux::ImageData(cv::Mat::zeros(1, 1, CV_32F)))
+mImage(new cedar::aux::ImageData(cv::Mat::zeros(1, 1, CV_32F)))
 {
-  this->declareOutput("camera image", mCameraImage);
+  this->declareOutput("camera image", mImage);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -101,5 +101,5 @@ void cedar::proc::sources::Camera::onStart()
 void cedar::proc::sources::Camera::compute(const cedar::proc::Arguments&)
 {
   this->mGrabber->grab();
-  this->mCameraImage->setData(this->mGrabber->getImage());
+  this->mImage->setData(this->mGrabber->getImage());
 }
