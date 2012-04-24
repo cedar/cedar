@@ -1244,8 +1244,10 @@ INCLUDE_FILE_PATTERNS  =
 # undefined via #undef or recursively expanded use the := operator 
 # instead of the = operator.
 
-PREDEFINED             = 
-
+PREDEFINED             = CEDAR_USE_FFTW \
+                         CEDAR_USE_AMTEC \
+                         CEDAR_USE_KUKA_LWR
+                         
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 
 # The macro definition that is found in the sources will be used. 

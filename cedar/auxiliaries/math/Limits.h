@@ -66,8 +66,8 @@ struct cedar::aux::math::Limits
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   //!@brief The standard constructor
+  //!@todo Shouldn't this set some values?
   Limits()
-      //!@todo Shouldn't this set some values?
   {
   };
 
