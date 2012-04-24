@@ -70,6 +70,55 @@ cedar::aux::conv::OpenCV::OpenCV()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::aux::conv::OpenCV::checkCapability
+     (
+       size_t matrixDim,
+       size_t kernelDim,
+       cedar::aux::conv::BorderType::Id borderType,
+       cedar::aux::conv::Mode::Id mode
+     )
+     const
+{
+  if (matrixDim > 2 || kernelDim > 2)
+  {
+    return false;
+  }
+
+  if (!this->checkBorderTypeCapability(borderType) || !this->checkModeCapability(mode))
+  {
+    return false;
+  }
+
+  return true;
+}
+
+bool cedar::aux::conv::OpenCV::checkBorderTypeCapability
+     (
+       cedar::aux::conv::BorderType::Id borderType
+     ) const
+{
+  switch (borderType)
+  {
+    case cedar::aux::conv::BorderType::Cyclic:
+    case cedar::aux::conv::BorderType::Reflect:
+    case cedar::aux::conv::BorderType::Replicate:
+    case cedar::aux::conv::BorderType::Zero:
+      return true;
+
+    default:
+      return false;
+  }
+}
+
+bool cedar::aux::conv::OpenCV::checkModeCapability
+     (
+       cedar::aux::conv::Mode::Id mode
+     ) const
+{
+  // currently, only the full same is supported
+  return mode == cedar::aux::conv::Mode::Same;
+}
+
 int cedar::aux::conv::OpenCV::translateBorderType(cedar::aux::conv::BorderType::Id borderType) const
 {
   switch (borderType)
@@ -448,7 +497,6 @@ void cedar::aux::conv::OpenCV::updateKernelType(size_t index)
   {
     this->mKernelTypes.resize(index + 1, KERNEL_TYPE_UNKNOWN);
   }
-
 
   cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList().getKernel(index);
   if (boost::dynamic_pointer_cast<const cedar::aux::kernel::Separable>(kernel))

@@ -60,3 +60,33 @@ cv::Mat cedar::aux::conv::Engine::convolve
   // default implementation: call the normal convolve method
   return this->convolve(matrix, cedar::aux::kernel::ConstKernelPtr(kernel), borderType, mode);
 }
+
+bool cedar::aux::conv::Engine::checkCapability
+     (
+       size_t /* matrixDim */,
+       size_t /* kernelDim */,
+       cedar::aux::conv::BorderType::Id /* borderType */,
+       cedar::aux::conv::BorderType::Id /* mode */
+     )
+     const
+{
+  return true;
+}
+
+//!@brief Checks if a matrix is capable of a certain type of convolution.
+bool cedar::aux::conv::Engine::checkBorderTypeCapability
+     (
+       cedar::aux::conv::BorderType::Id /* borderType */
+     ) const
+{
+  return true;
+}
+
+//!@brief Checks if a matrix is capable of a certain type of convolution.
+bool cedar::aux::conv::Engine::checkModeCapability
+     (
+       cedar::aux::conv::Mode::Id /* mode */
+     ) const
+{
+  return true;
+}

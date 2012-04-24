@@ -85,7 +85,7 @@ public:
   (
     const cv::Mat& matrix,
     cedar::aux::conv::BorderType::Id borderType,
-    cedar::aux::conv::BorderType::Id mode
+    cedar::aux::conv::Mode::Id mode
   ) const;
 
   cv::Mat convolve
@@ -93,7 +93,7 @@ public:
     const cv::Mat& matrix,
     const cv::Mat& kernel,
     cedar::aux::conv::BorderType::Id borderType,
-    cedar::aux::conv::BorderType::Id mode,
+    cedar::aux::conv::Mode::Id mode,
     const std::vector<int>& anchor
   ) const;
 
@@ -102,7 +102,7 @@ public:
     const cv::Mat& matrix,
     cedar::aux::kernel::ConstKernelPtr kernel,
     cedar::aux::conv::BorderType::Id borderType,
-    cedar::aux::conv::BorderType::Id mode
+    cedar::aux::conv::Mode::Id mode
   ) const;
 
   cv::Mat convolve
@@ -110,7 +110,7 @@ public:
     const cv::Mat& matrix,
     const cedar::aux::conv::KernelList& kernel,
     cedar::aux::conv::BorderType::Id borderType,
-    cedar::aux::conv::BorderType::Id mode
+    cedar::aux::conv::Mode::Id mode
   ) const;
 
   cv::Mat convolve
@@ -118,7 +118,25 @@ public:
     const cv::Mat& matrix,
     cedar::aux::kernel::ConstSeparablePtr kernel,
     cedar::aux::conv::BorderType::Id borderType,
-    cedar::aux::conv::BorderType::Id mode
+    cedar::aux::conv::Mode::Id mode
+  ) const;
+
+  bool checkCapability
+  (
+    size_t matrixDim,
+    size_t kernelDim,
+    cedar::aux::conv::BorderType::Id borderType,
+    cedar::aux::conv::Mode::Id mode
+  ) const;
+
+  bool checkBorderTypeCapability
+  (
+    cedar::aux::conv::BorderType::Id borderType
+  ) const;
+
+  bool checkModeCapability
+  (
+    cedar::aux::conv::Mode::Id mode
   ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
