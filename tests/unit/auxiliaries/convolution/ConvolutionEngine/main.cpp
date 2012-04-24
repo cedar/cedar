@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/convolution/OpenCV.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
 #include "cedar/auxiliaries/kernel/Separable.h"
+#include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/utilities.h"
 
@@ -275,10 +276,28 @@ int test_matxmat_convolution
       cedar::aux::conv::BorderType::Id borderType
     )
 {
+  // display the operation
+  std::cout << op1 << std::endl << " * " << std::endl << op2 << std::endl << " = " << std::endl;
+  // check if the engine is capable of this operation
+  if
+  (
+    !engine->checkCapability
+    (
+      cedar::aux::math::getDimensionalityOf(op1),
+      cedar::aux::math::getDimensionalityOf(op2),
+      borderType
+    )
+  )
+  {
+    std::cout << "Skipping: Engine is not capable of this operation." << std::endl;
+    return 0;
+  }
+
+  // if so, do it
   cv::Mat res = engine->convolve(op1, op2, borderType);
   cv::Mat expected = conv(op1, op2, borderType);
 
-  std::cout << op1 << std::endl << " * " << std::endl << op2 << std::endl << " = " << std::endl << res << std::endl;
+  std::cout << res << std::endl;
   std::cout << " ?= " << std::endl << expected << std::endl;
 
   if (!mat_eq(res, expected))
@@ -299,9 +318,26 @@ int testMatrixKernelOperation
     )
 {
   cv::Mat kernel_mat = kernel->getKernel();
+  std::cout << mat << std::endl << "*" << std::endl << kernel_mat << std::endl << " = " << std::endl;
+
+  // check if the engine is capable of this operation
+  if
+  (
+    !engine->checkCapability
+    (
+      cedar::aux::math::getDimensionalityOf(mat),
+      kernel->getDimensionality(),
+      borderType
+    )
+  )
+  {
+    std::cout << "Skipping: Engine is not capable of this operation." << std::endl;
+    return 0;
+  }
+
   cv::Mat expected = conv(mat, kernel_mat, borderType);
-  std::cout << mat << std::endl << "*" << std::endl << kernel_mat << std::endl << " = "
-            << std::endl << expected << std::endl;
+
+  std::cout << expected << std::endl;
 
   cv::Mat result = engine->convolve(mat, kernel, borderType);
   if (!mat_eq(expected, result))

@@ -147,7 +147,7 @@ public:
     size_t matrixDim,
     size_t kernelDim,
     cedar::aux::conv::BorderType::Id borderType,
-    cedar::aux::conv::Mode::Id mode
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
   ) const;
 
   //!@brief Checks if a matrix is capable of a certain type of convolution.
