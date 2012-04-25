@@ -42,7 +42,7 @@
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
 #include "cedar/auxiliaries/net/detail/transport/AbstractNetReader.h"
-#include "cedar/auxiliaries/net/exceptions/NetException.h"
+#include "cedar/auxiliaries/net/exceptions.h"
 
 // PROJECT INCLUDES
 #include <yarp/os/BufferedPort.h>
@@ -142,7 +142,7 @@ public:
     }
     else // you never know ...
     {
-      CEDAR_THROW( cedar::aux::exc::NetUnexpectedDataException,
+      CEDAR_THROW( cedar::aux::net::NetUnexpectedDataException,
                    "YARP: unexpectedly read NULL from port" );
       return 0;
     }

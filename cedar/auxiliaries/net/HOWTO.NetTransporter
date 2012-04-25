@@ -8,7 +8,7 @@ I want to write data over the network:
 #include <auxiliaries/net/Writer.h>
 
   cv::Mat mat= ...; // we will send this matrix over the network
-  Writer<cv::Mat> writer("mychannel"); // this is our writer class
+  cedar::aux::net::Writer<cv::Mat> writer("mychannel"); // this is our writer class
 
   // ...
 
@@ -18,10 +18,10 @@ I want to write data over the network:
 I want to read the same data from the network:
 ----------------------------------------------
 
-#include <auxiliaries/net/NetBlockingReader.h>
+#include <auxiliaries/net/Reader.h>
   
   cv::Mat mat;
-  Reader<cv::Mat> reader("mychannel");
+  cedar::aux::net::Reader<cv::Mat> reader("mychannel");
 
   mat= reader.read();
 
@@ -102,7 +102,7 @@ Question: What about exceptions:
 The readers may throw the following exceptions which you may want to
 catch and react to in your code:
 
-#include <auxiliaries/net/exceptions/NetException.h>
+#include <auxiliaries/net/exceptions.h>
 
   NetUnexpectedDataException: Will be thrown when there was no data
       on the channel (for the non-blocking Reader)
@@ -125,20 +125,17 @@ A COMPLETE EXAMPLE:
 ===================
 
 #include <auxiliaries/net/Writer.h>
-#include <auxiliaries/net/NetBlockingReader.h>
-#include <auxiliaries/net/exceptions/NetException.h>
-
-using namespace cedar::aux::net;
-using namespace cedar::aux::exc;
+#include <auxiliaries/net/BlockingReader.h>
+#include <auxiliaries/net/exceptions.h>
 
   // ...
 
   // instantiate reader class
   try 
   {
-    Reader<cv::Mat> reader("mychannel");
+    cedar::aux::net::Reader<cv::Mat> reader("mychannel");
   }
-  catch (NetMissingRessourceException &E)
+  catch (cedar::aux::net::NetMissingRessourceException &E)
   {
     // somehow YARP doesnt work ... :( typically fatal.
     exit(1);
@@ -153,20 +150,20 @@ using namespace cedar::aux::exc;
     {
       mat= reader.read(); // note: we don't use a blocking reader
     }
-    catch (NetWaitingForWriterException &E) 
+    catch (cedar::aux::net::NetWaitingForWriterException &E) 
     {
       // wait for remote writer to be initialized ...
       sleep(2); // 2 seconds
       continue;
     }
-    catch (NetUnexpectedDataException &E)
+    catch (cedar::aux::net::NetUnexpectedDataException &E)
     {
       // invalid or corrupted data, ignore
       // OR no new valid data yet
       
       break; // mat is unuseable, mark it as such somehow in your code
     }
-    catch (NetMissingRessourceException &E)
+    catch (cedar::aux::net::NetMissingRessourceException &E)
     {
       // somehow YARP doesnt work ... :( typically fatal.
       exit(1);

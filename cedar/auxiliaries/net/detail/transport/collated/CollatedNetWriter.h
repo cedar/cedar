@@ -48,7 +48,7 @@
 #include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetBase.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/MatrixTypeWrapper.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/YARPCollatedPortable.h"
-#include "cedar/auxiliaries/net/exceptions/NetException.h"
+#include "cedar/auxiliaries/net/exceptions.h"
 #include "cedar/auxiliaries/net/detail/transport/AbstractNetWriter.h"
 
 // PROJECT INCLUDES
@@ -127,7 +127,7 @@ public:
     // verify matrix size (or generate the header for further checks)
     if (!checkCollatedDataForWrite(t, mElementWrapper.prepare().header() ) )
     {
-      CEDAR_THROW( cedar::aux::exc::NetUnexpectedDataException,
+      CEDAR_THROW( cedar::aux::net::NetUnexpectedDataException,
                    "matrix has wrong size - you wrote matrices of "
                    "different size/type before!" );
       return;

@@ -36,14 +36,14 @@ s
 
 // LOCAL INCLUDES
 #include "cedar/processing/sources/NetReader.h"
-#include "cedar/auxiliaries/net/exceptions/NetException.h"
+#include "cedar/auxiliaries/net/exceptions.h"
 
 // PROJECT INCLUDES
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/assert.h"
-#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/net/exceptions.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -107,17 +107,17 @@ void cedar::proc::steps::NetReaderSource::onStart()
       mpReader= new cedar::aux::net::Reader< cedar::aux::MatData::DataType >("DEMOCHANNEL");
       // TODO: make channel configurable
     }
-    catch ( cedar::aux::exc::NetWaitingForWriterException &E )
+    catch ( cedar::aux::net::NetWaitingForWriterException &e )
     {
       // the writer hasnt declared the channel yet ... abort, better luck
       // on the next compute()
       return;
     }
-    catch ( cedar::aux::exc::NetMissingRessourceException &E )
+    catch ( cedar::aux::net::NetMissingRessourceException &e )
     {
       // somehow YARP doesnt work ... :( typically fatal.
       // TODO: what to do?
-      throw( E ); // lets try this ...
+      throw( e ); // lets try this ...
     }
   }
 }
@@ -139,13 +139,13 @@ void cedar::proc::steps::NetReaderSource::compute(const cedar::proc::Arguments&)
   {
     this->mOutput->setData( mpReader->read() );
   }
-  catch( cedar::aux::exc::NetWaitingForWriterException &E )
+  catch( cedar::aux::net::NetWaitingForWriterException &e )
   {
     // no writer instantiated yet? ignore
     // CHANGE NOTHING
     return;
   }
-  catch ( cedar::aux::exc::NetUnexpectedDataException &E )
+  catch ( cedar::aux::net::NetUnexpectedDataException &e )
   {
     // communication problem? ignore
     // CHANGE NOTHING
