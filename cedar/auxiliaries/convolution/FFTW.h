@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        FastConvolution.h
+    File:        FFTW.h
 
     Maintainer:  Stephan Zibner
     Email:       stephan.zibner@ini.rub.de
@@ -34,17 +34,16 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_CONV_FAST_CONVOLUTION_H
-#define CEDAR_AUX_CONV_FAST_CONVOLUTION_H
+#ifndef CEDAR_AUX_CONV_FFTW_H
+#define CEDAR_AUX_CONV_FFTW_H
 
-// CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 #ifdef CEDAR_USE_FFTW
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/namespace.h"
-#include "cedar/auxiliaries/convolution/Convolution.h"
+#include "cedar/auxiliaries/convolution/Engine.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -54,7 +53,7 @@
  *
  * @todo describe more.
  */
-class cedar::aux::conv::FastConvolution : public cedar::aux::conv::Convolution
+class cedar::aux::conv::FFTW : public cedar::aux::conv::Engine
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -72,13 +71,61 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none
+  cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
+  ) const;
+
+  cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    const cv::Mat& kernel,
+    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same,
+    const std::vector<int>& anchor = std::vector<int>()
+  ) const;
+
+  cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    cedar::aux::kernel::ConstKernelPtr kernel,
+    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
+  ) const;
+
+  cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    const cedar::aux::conv::KernelList& kernel,
+    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
+  ) const;
+
+  bool checkCapability
+  (
+    size_t matrixDim,
+    size_t kernelDim,
+    cedar::aux::conv::BorderType::Id borderType,
+    cedar::aux::conv::Mode::Id mode
+  ) const;
+
+  bool checkBorderTypeCapability
+  (
+    cedar::aux::conv::BorderType::Id borderType
+  ) const;
+
+  bool checkModeCapability
+  (
+    cedar::aux::conv::Mode::Id mode
+  ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  cv::Mat convolve(const cv::Mat& matrix, const cv::Mat& kernel) const;
+  cv::Mat convolveInternal(const cv::Mat& matrix, const cv::Mat& kernel, cedar::aux::conv::BorderType::Id borderType) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -94,7 +141,7 @@ protected:
 private:
   // none yet
 
-}; // cedar::aux::conv::Convolution
+}; // cedar::aux::conv::FFTW
 
-#endif // CEDAR_USE_FFTW
-#endif // CEDAR_AUX_CONV_FAST_CONVOLUTION_H
+#endif // CEDAR_FFTW
+#endif // CEDAR_AUX_CONV_FFTW_H

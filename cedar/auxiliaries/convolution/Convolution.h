@@ -209,18 +209,6 @@ public:
     return this->convolve(matrix, kernelList);
   }
 
-  //!@brief Method for accessing the kernel list.
-  inline cedar::aux::conv::KernelList& getKernelList()
-  {
-    return this->getEngine()->getKernelList();
-  }
-
-  //!@brief Constant variant of the method for accessing the kernel list.
-  inline const cedar::aux::conv::KernelList& getKernelList() const
-  {
-    return this->getEngine()->getKernelList();
-  }
-
   //!@brief Returns the convolution engine.
   inline cedar::aux::conv::ConstEnginePtr getEngine() const
   {
@@ -243,6 +231,18 @@ public:
   inline cedar::aux::MatDataPtr getCombinedKernel()
   {
     return this->mCombinedKernel;
+  }
+
+  //!@brief Method for accessing the kernel list.
+  inline cedar::aux::conv::KernelListPtr getKernelList()
+  {
+    return this->mKernelList;
+  }
+
+  //!@brief Constant variant of the method for accessing the kernel list.
+  inline cedar::aux::conv::ConstKernelListPtr getKernelList() const
+  {
+    return this->mKernelList;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -323,6 +323,9 @@ private:
    *  @see cedar::aux::conv::Mode
    */
   cedar::aux::EnumParameterPtr _mMode;
+
+  //! The list of kernel with which to convolve.
+  cedar::aux::conv::KernelListPtr mKernelList;
 
   //! The engine used for convolutions performed with this object.
   cedar::aux::conv::EngineParameterPtr _mEngine;

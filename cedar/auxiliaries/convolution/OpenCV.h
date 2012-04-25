@@ -139,6 +139,9 @@ public:
     cedar::aux::conv::Mode::Id mode
   ) const;
 
+  //!@brief method for setting the kernel list
+  void setKernelList(cedar::aux::conv::KernelListPtr kernelList);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

@@ -104,6 +104,9 @@ public:
     return this->mKernelRemovedSignal.connect(slot);
   }
 
+  //!@todo store the result of this function in a member and only update on demand
+  cv::Mat getCombinedKernel() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
