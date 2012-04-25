@@ -41,7 +41,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/NetGrabber.h"
-#include "cedar/auxiliaries/net/NetReader.h"
+#include "cedar/auxiliaries/net/Reader.h"
 #include "cedar/auxiliaries/net/exceptions/NetException.h"
 #include "cedar/auxiliaries/exceptions.h"
 
@@ -153,7 +153,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
 
   //-------------------------------------------------
   //open capture one by one
-  //cedar::aux::net::NetReader<cv::Mat> *YarpReader = NULL;
+  //cedar::aux::net::Reader<cv::Mat> *YarpReader = NULL;
   MatNetReaderPtr yarp_reader;
 
   //loop until connection established or an error occurs
@@ -180,7 +180,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
         #endif
 
         //establish connection
-        yarp_reader = MatNetReaderPtr(new cedar::aux::net::NetReader<cv::Mat>(getChannel(channel)->mChannelName));
+        yarp_reader = MatNetReaderPtr(new cedar::aux::net::Reader<cv::Mat>(getChannel(channel)->mChannelName));
 
         #ifdef SHOW_INIT_INFORMATION_NETGRABBER
           std::cout << "ok" << std::endl;

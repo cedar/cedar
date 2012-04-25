@@ -45,7 +45,7 @@
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/MatData.h"
-#include "cedar/auxiliaries/net/NetReader.h"
+#include "cedar/auxiliaries/net/Reader.h"
 
 // SYSTEM INCLUDES
 
@@ -100,7 +100,7 @@ protected:
   cedar::aux::MatDataPtr mOutput;
 private:
   //!@brief the reader object (RAII)
-  cedar::aux::net::NetReader< cedar::aux::MatData::DataType > *mpReader;
+  cedar::aux::net::Reader< cedar::aux::MatData::DataType > *mpReader;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

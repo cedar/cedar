@@ -100,7 +100,7 @@ void cedar::proc::steps::NetWriterSink::onStart()
   {
     try 
     {
-      mpWriter= new cedar::aux::net::NetWriter< cedar::aux::MatData::DataType >("DEMOCHANNEL");
+      mpWriter= new cedar::aux::net::Writer< cedar::aux::MatData::DataType >("DEMOCHANNEL");
       // TODO: make channel configurable
     }
     catch ( cedar::aux::exc::NetMissingRessourceException &E )

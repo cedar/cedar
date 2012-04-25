@@ -5,10 +5,10 @@ SIMPLE USE CASES:
 I want to write data over the network:
 --------------------------------------
 
-#include <auxiliaries/net/NetWriter.h>
+#include <auxiliaries/net/Writer.h>
 
   cv::Mat mat= ...; // we will send this matrix over the network
-  NetWriter<cv::Mat> writer("mychannel"); // this is our writer class
+  Writer<cv::Mat> writer("mychannel"); // this is our writer class
 
   // ...
 
@@ -21,7 +21,7 @@ I want to read the same data from the network:
 #include <auxiliaries/net/NetBlockingReader.h>
   
   cv::Mat mat;
-  NetReader<cv::Mat> reader("mychannel");
+  Reader<cv::Mat> reader("mychannel");
 
   mat= reader.read();
 
@@ -39,7 +39,7 @@ FAQ:
 Question: What datatypesupport are supported?
 ---------------------------------------
 
-As you can see the NetReaders and NetWriters are template classes. They
+As you can see the Readers and Writers are template classes. They
 can only be used with variable types for which support has been programmed
 in. These are at the moment:
 
@@ -52,7 +52,7 @@ in. These are at the moment:
 Question: How does the transport work?
 --------------------------------------
 
-The NetWriter/Readers use the YARP library internally, but are designed
+The Writer/Readers use the YARP library internally, but are designed
 to transparently wrap around YARP, so you don't need to worry about YARP.
 
 Note, that if you will need an additional 'yarp server' started. It is
@@ -67,7 +67,7 @@ This is a intentional trade-off.
 Question: When does my data leave the machine/arrive?
 -----------------------------------------------------
 
-The NetWriter and NetReader are internally buffered, which means that
+The Writer and Reader are internally buffered, which means that
 the read() and write() functions may(!) return before the data has actually
 left the machine or may be buffered until you call read() to get the data.
 
@@ -78,9 +78,9 @@ hold the newest arrived data.
 Question: The 'channel's I define are not the ones I see YARP using
 -------------------------------------------------------------------
 You have to pass a 'channel'-name-string to the constructors of the
-NetWriter/Reader. These are also called 'ports's in YARP nomenclature.
+Writer/Reader. These are also called 'ports's in YARP nomenclature.
 
-The NetWriter/Reader classes internally rename your 'channels', adding
+The Writer/Reader classes internally rename your 'channels', adding
 prefixes and suffixes to administer the different dispersed readers that
 listen to a YARP port.
 
@@ -91,7 +91,7 @@ Question: What different types of readers are there:
 ----------------------------------------------------
 The NetBlockingReader ... class blocks the execution of your code until
                       input arrives over its channel, while the ...
-    NetReader         ... class (NetReader.h) does not block, 
+    Reader         ... class (Reader.h) does not block, 
                       but will throw an
                       NetUnexpectedDataException when there is no
                       data available. See below.
@@ -105,7 +105,7 @@ catch and react to in your code:
 #include <auxiliaries/net/exceptions/NetException.h>
 
   NetUnexpectedDataException: Will be thrown when there was no data
-      on the channel (for the non-blocking NetReader)
+      on the channel (for the non-blocking Reader)
       OR some transmission error occurred. It signals you that the
       return value of read() is unuseable.
       You will want to catch this to write robust code.
@@ -124,7 +124,7 @@ Both reader and writer will throw:
 A COMPLETE EXAMPLE:
 ===================
 
-#include <auxiliaries/net/NetWriter.h>
+#include <auxiliaries/net/Writer.h>
 #include <auxiliaries/net/NetBlockingReader.h>
 #include <auxiliaries/net/exceptions/NetException.h>
 
@@ -136,7 +136,7 @@ using namespace cedar::aux::exc;
   // instantiate reader class
   try 
   {
-    NetReader<cv::Mat> reader("mychannel");
+    Reader<cv::Mat> reader("mychannel");
   }
   catch (NetMissingRessourceException &E)
   {

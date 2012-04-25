@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NetReader.h
+    File:        BlockingReader.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Thu 18 Aug 2011 11:38:01 AM CEST
+    Date:        Thu 18 Aug 2011 11:39:23 AM CEST
 
-    Description:
+    Description: the blocking version of the Reader
 
     Credits:
 
 =============================================================================*/
 
-#ifndef CEDAR_NETREADER_H
-#define CEDAR_NETREADER_H
+#ifndef CEDAR_NETBLOCKINGREADER_H
+#define CEDAR_NETBLOCKINGREADER_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
@@ -44,25 +44,22 @@
 #include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatHelper.h"
 
 // PROJECT INCLUDES
-#include <opencv2/opencv.hpp>
 
 // SYSTEM INCLUDES
-
 
 
 namespace cedar {
   namespace aux {
     namespace net {
 
-
   //---------------------------------------------------------------------------
   // the unspecialized template class cannot be instantiated
   //---------------------------------------------------------------------------
 
-/*!@brief Provides means to transport transparently (ie it is easy to use) a datatype over the net (non-blocking version)
+/*!@brief Provides means to transport transparently (ie it is easy to use) a datatype over the net (blocking version)
  * 
  * The class will assist you in receiving a datatype that you sent over
- * the network (or locally) using the NetWriter.
+ * the network (or locally) using the Writer.
  *
  * This class is a template, so you need to initialize it with the
  * datatype you want to receive as a template argument. 
@@ -70,20 +67,20 @@ namespace cedar {
  *
  * Short example:
  * @code
- *   NetReader<cv::Mat> myReader("mychannel");
+ *   BlockingReader<cv::Mat> myReader("mychannel");
  *   cv::Mat mat;
- *   mat= myReader.read(); // this will not block and will throw
- *                         // an exception if no data was waiting, see below
+ *   mat= myReader.read(); // this will block
  * @endcode
  *
  * Please also refer to the <a href='../../cedar/auxiliaries/net/HOWTO'>HOWTO</a> for full examples.
  *
  * See also the constructor and the read() function.
  *
- * @attention This reader does not block but will throw the exception
- * cedar::aux::exc::NetUnexpectedDataException if no data was waiting
- * in the network buffer. This allows you to decide if you want to
- * abort or re-use older data in such a case. See the HOWTO for this.
+ * @attention This version of the Reader is blocking, which means that the
+ * read() operation will only return when there actually was
+ * valid transmission received. For the non-blocking version, see Reader.
+ * If data was already waiting (see below) the read() will not block and
+ * return immediately.
  *
  * This class follows the RAII paradigm: ressource acquisition is instantiation.
  * It therefore is not copyable!
@@ -91,17 +88,17 @@ namespace cedar {
  * The incoming data is buffered in the background between reads, but the
  * buffer will only always contain one element - the newest one.
  *
- * Valid instantiations are: NetReader<char>, NetReader<unsigned char>, NetReader<short>,
- * NetReader<unsigned short>, NetReader<int>, NetReader<unsigned int>, NetReader<long>,
- * NetReader<unsigned long>, NetReader<float>, NetReader<double>, NetReader<bool>,
- * NetReader<cv::Mat>, NetReader< cv::Mat_<float>  
- * @see: NetBlockingReader, NetWriter
+ * Valid instantiations are: BlockingReader<char>, NetBlockingReader<unsigned char>, NetBlockingReader<short>,
+ * BlockingReader<unsigned short>, NetBlockingReader<int>, NetBlockingReader<unsigned int>, NetBlockingReader<long>,
+ * BlockingReader<unsigned long>, NetBlockingReader<float>, NetBlockingReader<double>, NetBlockingReader<bool>,
+ * BlockingReader<cv::Mat>, NetBlockingReader< cv::Mat_<float>  
+ * @see: Reader, Writer
  */
 template <typename T>
-class NetReader
+class BlockingReader
 {
    //!@brief The standard constructor will not load. Do not call it.
-   NetReader()
+   BlockingReader()
    {
      // this template cannot be instantiated if there is not a
      // valid specialization
@@ -115,15 +112,13 @@ class NetReader
    *       The channels should be the same for reading and writing,
    *       but unique in your local network (ie task/application specific)
    */
-   NetReader(std::string mychannel); // just declaration for doxygen
+   BlockingReader(std::string mychannel); // just declaration for doxygen
 
    /*! @brief read() the datatype T from the network
     *
-    * Note that in the NetReader the read() operation will not(!) block
-    * when no data was waiting in the network buffer, which means that
-    * your program will not suffer from additional delays.
-    * In that case read() will throw a cedar::aux::exc::NetUnexpectedDataException that you can catch and react to
-    * accordingly.
+    * Note that in the BlockingReader the read() operation *will* block,
+    * which means it will only return, when it has received valid
+    * data over the network.
     *
     * @return returns an instance of the specified datatype T, which you
     *         sent over the network.
@@ -137,14 +132,14 @@ class NetReader
   // template specialization for char 
   //---------------------------------------------------------------------------
 
-//!@brief Char specialization, see NetReader for details.
+//!@brief Char specialization, see BlockingReader for details.
 template <>
-class NetReader<char> : public cedar::aux::net::detail::SimpleNetReader<char, false>
+class BlockingReader<char> : public cedar::aux::net::detail::SimpleNetReader<char, true>
 { 
 public:
-  //!@brief use this constructor. See NetReader::NetReader for details.
-  explicit NetReader(const std::string &s) 
-                           : cedar::aux::net::detail::SimpleNetReader<char, false>(s)
+  //!@brief use this constructor. See BlockingReader::NetBlockingReader for details.
+  explicit BlockingReader(const std::string &s) 
+                           : cedar::aux::net::detail::SimpleNetReader<char, true>(s)
   {
   }
 };
@@ -153,14 +148,14 @@ public:
   // template specialization for unsigned char 
   //---------------------------------------------------------------------------
 
-//!@brief unsigned char specialization, see NetReader for details.
+//!@brief unsigned char specialization, see BlockingReader for details.
 template <>
-class NetReader<unsigned char> : public cedar::aux::net::detail::SimpleNetReader<unsigned char, false>
+class BlockingReader<unsigned char> : public cedar::aux::net::detail::SimpleNetReader<unsigned char, true>
 { 
 public:
-  //!@brief use this constructor. See NetReader for details.
-  explicit NetReader(const std::string &s) 
-                           : cedar::aux::net::detail::SimpleNetReader<unsigned char, false>(s)
+  //!@brief use this constructor. See BlockingReader for details.
+  explicit BlockingReader(const std::string &s) 
+                           : cedar::aux::net::detail::SimpleNetReader<unsigned char, true>(s)
   {
   }
 };
@@ -169,14 +164,14 @@ public:
   // template specialization for short
   //---------------------------------------------------------------------------
 
-//!@brief short specialization, see NetReader for details.
+//!@brief short specialization, see BlockingReader for details.
 template <>
-class NetReader<short> : public cedar::aux::net::detail::SimpleNetReader<short, false>
+class BlockingReader<short> : public cedar::aux::net::detail::SimpleNetReader<short, true>
 { 
 public:
-  //!@brief use this constructor. See NetReader for details.
-  explicit NetReader(const std::string &s) 
-                           : cedar::aux::net::detail::SimpleNetReader<short, false>(s)
+  //!@brief use this constructor. See BlockingReader for details.
+  explicit BlockingReader(const std::string &s) 
+                           : cedar::aux::net::detail::SimpleNetReader<short, true>(s)
   {
   }
 };
@@ -185,14 +180,14 @@ public:
   // template specialization for unsigned short
   //---------------------------------------------------------------------------
 
-//!@brief unsigned short specialization, see NetReader for details.
+//!@brief unsigned short specialization, see BlockingReader for details.
 template <>
-class NetReader<unsigned short> : public cedar::aux::net::detail::SimpleNetReader<unsigned short, false>
+class BlockingReader<unsigned short> : public cedar::aux::net::detail::SimpleNetReader<unsigned short, true>
 { 
 public:
-  //!@brief use this constructor. See NetReader for details.
-  explicit NetReader(const std::string &s) 
-                           : cedar::aux::net::detail::SimpleNetReader<unsigned short, false>(s)
+  //!@brief use this constructor. See BlockingReader for details.
+  explicit BlockingReader(const std::string &s) 
+                           : cedar::aux::net::detail::SimpleNetReader<unsigned short, true>(s)
   {
   }
 };
@@ -201,14 +196,14 @@ public:
   // template specialization for int
   //---------------------------------------------------------------------------
 
-//!@brief int specialization, see NetReader for details.
+//!@brief int specialization, see BlockingReader for details.
 template <>
-class NetReader<int> : public cedar::aux::net::detail::SimpleNetReader<int, false>
+class BlockingReader<int> : public cedar::aux::net::detail::SimpleNetReader<int, true>
 { 
 public:
-  //!@brief use this constructor. See NetReader for details.
-  explicit NetReader(const std::string &s) 
-                           : cedar::aux::net::detail::SimpleNetReader<int, false>(s)
+  //!@brief use this constructor. See BlockingReader for details.
+  explicit BlockingReader(const std::string &s) 
+                           : cedar::aux::net::detail::SimpleNetReader<int, true>(s)
   {
   }
 };
@@ -217,14 +212,14 @@ public:
   // template specialization for unsigned int
   //---------------------------------------------------------------------------
 
-//!@brief unsigned int specialization, see NetReader for details.
+//!@brief unsigned int specialization, see BlockingReader for details.
 template <>
-class NetReader<unsigned int> : public cedar::aux::net::detail::SimpleNetReader<unsigned int, false>
+class BlockingReader<unsigned int> : public cedar::aux::net::detail::SimpleNetReader<unsigned int, true>
 { 
 public:
-  //!@brief use this constructor. See NetReader for details.
-  explicit NetReader(const std::string &s) 
-                           : cedar::aux::net::detail::SimpleNetReader<unsigned int, false>(s)
+  //!@brief use this constructor. See BlockingReader for details.
+  explicit BlockingReader(const std::string &s) 
+                           : cedar::aux::net::detail::SimpleNetReader<unsigned int, true>(s)
   {
   }
 };
@@ -233,14 +228,14 @@ public:
   // template specialization for long
   //---------------------------------------------------------------------------
 
-//!@brief long specialization, see NetReader for details.
+//!@brief long specialization, see BlockingReader for details.
 template <>
-class NetReader<long> : public cedar::aux::net::detail::SimpleNetReader<long, false>
+class BlockingReader<long> : public cedar::aux::net::detail::SimpleNetReader<long, true>
 { 
 public:
-  //!@brief use this constructor. See NetReader for details.
-  explicit NetReader(const std::string &s) 
-                           : cedar::aux::net::detail::SimpleNetReader<long, false>(s)
+  //!@brief use this constructor. See BlockingReader for details.
+  explicit BlockingReader(const std::string &s) 
+                           : cedar::aux::net::detail::SimpleNetReader<long, true>(s)
   {
   }
 };
@@ -249,14 +244,14 @@ public:
   // template specialization for unsigned long
   //---------------------------------------------------------------------------
 
-//!@brief unsigned long specialization, see NetReader for details.
+//!@brief unsigned long specialization, see BlockingReader for details.
 template <>
-class NetReader<unsigned long> : public cedar::aux::net::detail::SimpleNetReader<unsigned long, false>
+class BlockingReader<unsigned long> : public cedar::aux::net::detail::SimpleNetReader<unsigned long, true>
 { 
 public:
-  //!@brief use this constructor. See NetReader for details.
-  explicit NetReader(const std::string &s) 
-                           : cedar::aux::net::detail::SimpleNetReader<unsigned long, false>(s)
+  //!@brief use this constructor. See BlockingReader for details.
+  explicit BlockingReader(const std::string &s) 
+                           : cedar::aux::net::detail::SimpleNetReader<unsigned long, true>(s)
   {
   }
 };
@@ -265,14 +260,14 @@ public:
   // template specialization for bool
   //---------------------------------------------------------------------------
 
-//!@brief bool specialization, see NetReader for details.
+//!@brief bool specialization, see BlockingReader for details.
 template <>
-class NetReader<bool> : public cedar::aux::net::detail::SimpleNetReader<bool, false>
+class BlockingReader<bool> : public cedar::aux::net::detail::SimpleNetReader<bool, true>
 { 
 public:
-  //!@brief use this constructor. See NetReader for details.
-  explicit NetReader(const std::string &s) 
-                           : cedar::aux::net::detail::SimpleNetReader<bool, false>(s)
+  //!@brief use this constructor. See BlockingReader for details.
+  explicit BlockingReader(const std::string &s) 
+                           : cedar::aux::net::detail::SimpleNetReader<bool, true>(s)
   {
   }
 };
@@ -281,14 +276,14 @@ public:
   // template specialization for float
   //---------------------------------------------------------------------------
 
-//!@brief float specialization, see NetReader for details.
+//!@brief float specialization, see BlockingReader for details.
 template <>
-class NetReader<float> : public cedar::aux::net::detail::SimpleNetReader<float, false>
+class BlockingReader<float> : public cedar::aux::net::detail::SimpleNetReader<float, true>
 { 
 public:
-  //!@brief use this constructor. See NetReader for details.
-  explicit NetReader(const std::string &s) 
-                       : cedar::aux::net::detail::SimpleNetReader<float, false>(s)
+  //!@brief use this constructor. See BlockingReader for details.
+  explicit BlockingReader(const std::string &s) 
+                       : cedar::aux::net::detail::SimpleNetReader<float, true>(s)
   {
   }
 };
@@ -297,14 +292,14 @@ public:
   // template specialization for double
   //---------------------------------------------------------------------------
 
-//!@brief double specialization, see NetReader for details.
+//!@brief double specialization, see BlockingReader for details.
 template <>
-class NetReader<double> : public cedar::aux::net::detail::SimpleNetReader<double, false>
+class BlockingReader<double> : public cedar::aux::net::detail::SimpleNetReader<double, true>
 { 
 public:
-  //!@brief use this constructor. See NetReader for details.
-  explicit NetReader(const std::string &s) 
-                       : cedar::aux::net::detail::SimpleNetReader<double, false>(s)
+  //!@brief use this constructor. See BlockingReader for details.
+  explicit BlockingReader(const std::string &s) 
+                       : cedar::aux::net::detail::SimpleNetReader<double, true>(s)
   {
   }
 };
@@ -313,16 +308,16 @@ public:
   // template specialization for cv::Mat
   //---------------------------------------------------------------------------
 
-//!@brief cv::Mat specialization, see NetReader for details.
+//!@brief cv::Mat specialization, see BlockingReader for details.
 template <>
-class NetReader<cv::Mat> : public cedar::aux::net::detail::cvMatHelper<cv::Mat>,
-                                   public cedar::aux::net::detail::CollatedNetReader<cv::Mat, false> 
+class BlockingReader<cv::Mat> : public cedar::aux::net::detail::cvMatHelper<cv::Mat>,
+                                   public cedar::aux::net::detail::CollatedNetReader<cv::Mat, true> 
 {
 public:
-  //!@brief use this constructor. See NetReader for details.
-  explicit NetReader(const std::string &myPortName) 
+  //!@brief use this constructor. See BlockingReader for details.
+  explicit BlockingReader(const std::string &myPortName) 
                          : cedar::aux::net::detail::cvMatHelper<cv::Mat>(), 
-                           cedar::aux::net::detail::CollatedNetReader<cv::Mat, false>(myPortName)
+                           cedar::aux::net::detail::CollatedNetReader<cv::Mat, true>(myPortName)
   {
   }
 };
@@ -331,17 +326,17 @@ public:
   // template specialization for cv::Mat_<float>
   //---------------------------------------------------------------------------
 
-//!@brief cv::Mat_<float> specialization, see NetReader for details.
+//!@brief cv::Mat_<float> specialization, see BlockingReader for details.
 template <>
-class NetReader< cv::Mat_<float> > 
+class BlockingReader< cv::Mat_<float> > 
                          : public cedar::aux::net::detail::cvMatHelper< cv::Mat_<float> >,
-                           public cedar::aux::net::detail::CollatedNetReader< cv::Mat_<float> , false> 
+                           public cedar::aux::net::detail::CollatedNetReader< cv::Mat_<float> , true> 
 {
 public:
-  //!@brief use this constructor. See NetReader for details.
-  explicit NetReader(const std::string &myPortName) 
+  //!@brief use this constructor. See BlockingReader for details.
+  explicit BlockingReader(const std::string &myPortName) 
                          : cedar::aux::net::detail::cvMatHelper< cv::Mat_<float> >(), 
-                           cedar::aux::net::detail::CollatedNetReader< cv::Mat_<float> , false>(myPortName)
+                           cedar::aux::net::detail::CollatedNetReader< cv::Mat_<float> , true>(myPortName)
   {
   }
 };
@@ -349,4 +344,3 @@ public:
 } } } // end namespaces
 
 #endif
-

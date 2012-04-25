@@ -60,7 +60,7 @@ namespace cedar {
 
 /*!@brief implements reading (RIAA over network) simple variable types
  *
- * use in NetReader
+ * use in Reader
  */
 template <typename T, bool BLOCK= false>
 class SimpleNetReader : public AbstractNetReader<T>
