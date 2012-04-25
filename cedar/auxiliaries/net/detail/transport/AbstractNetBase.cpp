@@ -37,6 +37,10 @@
 
 =============================================================================*/
 
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_YARP
+
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/transport/AbstractNetBase.h"
 #include "cedar/auxiliaries/net/exceptions.h"
@@ -286,4 +290,6 @@ bool AbstractNetBase::connectTo(const std::string &writerPort)
 }
 
 } } } } // end namespaces
+
+#endif // CEDAR_USE_YARP
 

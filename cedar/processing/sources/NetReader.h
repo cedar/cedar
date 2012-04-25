@@ -37,6 +37,9 @@
 #ifndef CEDAR_NETREADERSTEP_H
 #define CEDAR_NETREADERSTEP_H
 
+#include "cedar/configuration.h"
+#ifdef CEDAR_USE_YARP
+
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/processing/steps/namespace.h"
@@ -110,6 +113,8 @@ protected:
 private:
 
 }; // class cedar::proc::steps::NetReaderSource
+
+#endif
 
 #endif // CEDAR_PROC_STEPS_STATIC_GAIN_H
 

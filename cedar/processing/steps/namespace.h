@@ -37,6 +37,8 @@
 #ifndef CEDAR_PROC_STEPS_NAMESPACE_H
 #define CEDAR_PROC_STEPS_NAMESPACE_H
 
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
 #include "cedar/processing/lib.h"
 
@@ -55,6 +57,11 @@ namespace cedar
       CEDAR_DECLARE_PROC_CLASS(StaticGain);
       CEDAR_DECLARE_PROC_CLASS(Projection);
       CEDAR_DECLARE_PROC_CLASS(Resize);
+
+#ifdef CEDAR_USE_YARP
+      // ...
+#endif
+
       //!@endcond
     }
   }

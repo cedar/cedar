@@ -40,6 +40,17 @@
 #ifndef CEDAR_ABSTRACTNETBASE_H
 #define CEDAR_ABSTRACTNETBASE_H
 
+#include "cedar/configuration.h"
+
+#ifndef CEDAR_USE_YARP
+// YARP was not compiled in!
+// this may help to understand the error:
+#error "YARP not compiled in but used in net::Writer/Reader/BlockingReader"
+#else
+// ... the rest of the file is if YARP was compiled in ...
+
+
+
 // Use this to disable the code to start a local process for a yarp nameserver:
 // This lead to more problems than it is worth.
 // Just use a dedicated YARP nameserver for your local network.
@@ -171,5 +182,6 @@ inline bool AbstractNetBase::isConnected()
 
 } } } } // end namespaces
 
+#endif // CEDAR_USE_YARP
 #endif // CEDAR_XXX_XXX_H
 

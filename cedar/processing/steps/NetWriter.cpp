@@ -34,6 +34,9 @@
 
 =============================================================================*/
 
+#include "cedar/configuration.h"
+#ifdef CEDAR_USE_YARP
+
 // LOCAL INCLUDES
 #include "cedar/processing/steps/NetWriter.h"
 
@@ -183,3 +186,4 @@ void cedar::proc::steps::NetWriterSink::inputConnectionChanged(const std::string
   this->onTrigger();
 }
 
+#endif // CEDAR_USE_YARP

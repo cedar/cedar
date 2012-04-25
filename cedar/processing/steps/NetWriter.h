@@ -37,6 +37,9 @@
 #ifndef CEDAR_NETWRITERSINK_H
 #define CEDAR_NETWRITERSINK_H
 
+#include "cedar/configuration.h"
+#ifdef CEDAR_USE_YARP
+
 // LOCAL INCLUDES
 #include "cedar/processing/steps/namespace.h"
 
@@ -122,5 +125,6 @@ private:
 
 }; // class cedar::proc::steps::NetWriterSink
 
-#endif // CEDAR_PROC_STEPS_STATIC_GAIN_H
+#endif // CEDAR_USE_YARP
 
+#endif // CEDAR_PROC_STEPS_STATIC_GAIN_H
