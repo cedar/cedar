@@ -111,7 +111,7 @@ public:
 
   //!@brief The get-function of the C-Flag.
   //!@return The Country-Flag.
-  int getCFlag() const;
+  int getCountryFlag() const;
 
   //!@brief The get-function of the current Baud Rate.
   //!@return The Baud Rate used by the Serial Port (in Bit/s).
@@ -211,9 +211,9 @@ private:
   cedar::aux::StringParameterPtr _mEndOfCommandString;
 
   /*!@brief The country flag.
-   * C-Flag is an identifier of the user's country. Set CFlag to 0 if in Germany (Default) or 1 if in USA.
+   * C-Flag is an identifier of the user's country. Set CountryFlag to 0 if in Germany (Default) or 1 if in USA.
    */
-  cedar::aux::IntParameterPtr _mCFlag;
+  cedar::aux::IntParameterPtr _mCountryFlag;
 
   /*!@brief The Baudrate which shall be used by the serial port (in Bit/s).
    *        Set it to 15 for 38400 Bit/s or to 4098 for 115200 Bit/s (Default).

@@ -84,6 +84,8 @@ void cedar::dev::kteam::gui::EPuckControlWidget::timerEvent(QTimerEvent * /* eve
   // get new values
   std::vector<double> wheel_speed = mDrive->getWheelSpeed();
   std::vector<int> encoders = mDrive->getEncoders();
+  //std::vector<double> wheel_speed(2, 0.0);
+  //std::vector<int> encoders(2, 0);
 
   // display new values
   valueLeftWheelSpeed->display(wheel_speed[0]);

@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KTeamDriveModelTest.cpp
+    File:        main.cpp
 
     Maintainer:  Andre Bartel
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
@@ -51,6 +51,8 @@
 
 int main(int argc, char **argv)
 {
+  QApplication application(argc, argv);
+
   // create scene
   cedar::aux::gl::ScenePtr scene(new cedar::aux::gl::Scene);
   scene->setSceneLimit(1);
@@ -64,11 +66,11 @@ int main(int argc, char **argv)
 
   //open the channel to the robot
   cedar::dev::com::SerialCommunicationPtr communication(new cedar::dev::com::SerialCommunication());
-  communication->readJson("SerialCommunicationConfig.json");
+  communication->readJson("../SerialCommunicationConfig.json");
 
   //initialize the e-puck
   cedar::dev::kteam::EPuckDrivePtr drive(new cedar::dev::kteam::EPuckDrive(communication));
-  drive->readJson("EPuckDriveConfig.json");
+  drive->readJson("../EPuckDriveConfig.json");
 
   //initialize the model of the e-puck
   cedar::dev::kteam::DriveModelPtr kteam_model(new cedar::dev::kteam::DriveModel(drive));
@@ -88,7 +90,6 @@ int main(int argc, char **argv)
   kteam_model->setRotation(cedar::aux::math::pi / 2.0);
 
   //start the program
-  QApplication application(argc, argv);
   application.exec();
 
   return 0;

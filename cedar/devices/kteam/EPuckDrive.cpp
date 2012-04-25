@@ -73,27 +73,27 @@ std::vector<int> cedar::dev::kteam::EPuckDrive::getAcceleration()
 
   // skip 'a,' at the beginning of the answer
   answer_stream.ignore(2);
-  checkStream(answer_stream);
+  checkStream(answer_stream, false);
 
   // read the acceleration along the x-axis
   answer_stream >> acceleration[0];
-  checkStream(answer_stream);
+  checkStream(answer_stream, false);
 
   // skip the colon
   answer_stream.ignore(1);
-  checkStream(answer_stream);
+  checkStream(answer_stream, false);
 
   // read the acceleration along the y-axis
   answer_stream >> acceleration[1];
-  checkStream(answer_stream);
+  checkStream(answer_stream, false);
 
   // skip the colon
   answer_stream.ignore(1);
-  checkStream(answer_stream);
+  checkStream(answer_stream, false);
 
   // read the acceleration along the z-axis
   answer_stream >> acceleration[2];
-  checkStream(answer_stream);
+  checkStream(answer_stream, true);
 
   // print a debug message that everything worked
   cedar::aux::LogSingleton::getInstance()->debugMessage
@@ -106,3 +106,10 @@ std::vector<int> cedar::dev::kteam::EPuckDrive::getAcceleration()
   return acceleration;
 }
 
+void cedar::dev::kteam::EPuckDrive::readConfiguration(const cedar::aux::ConfigurationNode& node)
+{
+  // read the configuration
+  this->Configurable::readConfiguration(node);
+  // update the member mDistancePerPulse
+  this->updateDistancePerPulse();
+}
