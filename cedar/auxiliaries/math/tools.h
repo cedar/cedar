@@ -93,7 +93,7 @@ namespace cedar
       }
 
       //!@brief a helper function to determine the real dimensionality of a cv::Mat (matrix.dims works only for 2+ dims)
-      inline unsigned int getDimensionalityOf(cv::Mat matrix)
+      inline unsigned int getDimensionalityOf(const cv::Mat& matrix)
       {
         if (matrix.rows == 1 && matrix.cols == 1)
         {

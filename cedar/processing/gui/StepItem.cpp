@@ -39,7 +39,6 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
@@ -51,16 +50,23 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/gui/DataPlotter.h"
+#include "cedar/auxiliaries/gui/PlotManager.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.h"
+#include "cedar/auxiliaries/TypeHierarchyMap.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
 #include <QPainter>
+#include <QLabel>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
 #include <QGraphicsDropShadowEffect>
+#include <QLayout>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -249,10 +255,10 @@ void cedar::proc::gui::StepItem::addDataItems()
     try
     {
       qreal count = 0;
-      cedar::proc::Step::SlotMap& slotmap = this->mStep->getDataSlots(*enum_it);
-      for (cedar::proc::Step::SlotMap::iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
+      cedar::proc::Step::SlotList& slotmap = this->mStep->getOrderedDataSlots(*enum_it);
+      for (cedar::proc::Step::SlotList::iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
-        cedar::proc::DataSlotPtr slot = iter->second;
+        cedar::proc::DataSlotPtr slot = *iter;
         cedar::proc::gui::DataSlotItem *p_item = new cedar::proc::gui::DataSlotItem(this, slot);
         p_item->setPos(origin + count * direction * (data_size + padding) );
         mSlotMap[slot->getRole()][slot->getName()] = p_item;
@@ -308,10 +314,136 @@ cedar::proc::gui::StepItem::DataSlotNameMap& cedar::proc::gui::StepItem::getSlot
   return role_map->second;
 }
 
+void cedar::proc::gui::StepItem::addRoleSeparator(const cedar::aux::Enum& e, QMenu* pMenu)
+{
+  std::string label = e.prettyString() + "s";
+  pMenu->addSeparator();
+  QAction *p_label_action = pMenu->addAction(QString::fromStdString(label));
+  QFont font = p_label_action->font();
+  font.setBold(true);
+  p_label_action->setFont(font);
+  pMenu->addSeparator();
+  p_label_action->setEnabled(false);
+}
+
+void cedar::proc::gui::StepItem::fillPlots
+     (
+       QMenu* pMenu,
+       std::map<QAction*, std::pair<cedar::aux::gui::PlotDeclarationPtr, cedar::aux::Enum> >& declMap
+     )
+{
+  /*typedef cedar::aux::gui::PlotDeclarationManager::Node PlotNode;
+  typedef cedar::aux::gui::PlotDeclarationManager::ConstNodePtr ConstPlotNodePtr;*/
+
+  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
+      enum_it != cedar::proc::DataRole::type().list().end();
+      ++enum_it)
+  {
+    try
+    {
+      const cedar::aux::Enum& e = *enum_it;
+      this->addRoleSeparator(e, pMenu);
+
+      const cedar::proc::Step::SlotList& slotmap = this->mStep->getOrderedDataSlots(e.id());
+      for
+      (
+        cedar::proc::Step::SlotList::const_iterator slot_iter = slotmap.begin();
+        slot_iter != slotmap.end();
+        ++slot_iter
+      )
+      {
+        cedar::proc::DataSlotPtr slot = *slot_iter;
+        QMenu *p_menu = pMenu->addMenu(slot->getText().c_str());
+        cedar::aux::DataPtr data = slot->getData();
+        if (!data)
+        {
+          p_menu->setTitle("[unconnected] " + p_menu->title());
+          p_menu->setEnabled(false);
+        }
+        else
+        {
+          std::set<cedar::aux::gui::PlotDeclarationPtr> plots;
+          cedar::aux::gui::PlotManagerSingleton::getInstance()->getPlotClassesFor(data, plots);
+
+          if (plots.empty())
+          {
+            QAction *p_action = p_menu->addAction("no plots available");
+            p_action->setDisabled(true);
+          }
+          else
+          {
+            for
+            (
+              std::set<cedar::aux::gui::PlotDeclarationPtr>::iterator iter = plots.begin();
+              iter != plots.end();
+              ++iter
+            )
+            {
+              cedar::aux::gui::PlotDeclarationPtr declaration = *iter;
+              QAction *p_action = p_menu->addAction(QString::fromStdString(declaration->getPlotClass()));
+              p_action->setData(QString::fromStdString(slot->getName()));
+              declMap[p_action] = std::make_pair(declaration, e);
+
+              if (declaration == cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(data))
+              {
+                QFont font = p_action->font();
+                font.setBold(true);
+                p_action->setFont(font);
+              }
+            }
+          }
+        }
+      }
+    }
+    catch (const cedar::proc::InvalidRoleException& e)
+    {
+      // that's ok, a step may not have any data in a certain role.
+    }
+  }
+}
+void cedar::proc::gui::StepItem::showPlot
+(
+  const QPoint& position,
+  cedar::aux::gui::PlotInterface* pPlot,
+  cedar::proc::DataSlotPtr slot,
+  std::string title
+)
+{
+  //!@todo It would be better if setting the title would be part of the actual widget
+  if (title.empty())
+  {
+    title = slot->getText();
+    title += " (" + this->mStep->getName();
+    title += "." + slot->getName() + ")";
+  }
+
+  QDockWidget *p_dock = new QDockWidget(QString::fromStdString(title), mpMainWindow);
+  p_dock->setFloating(true);
+  p_dock->layout()->setContentsMargins(0, 0, 0, 0);
+
+  QRect geometry = p_dock->geometry();
+  geometry.setTopLeft(position);
+  geometry.setSize(QSize(200, 200));
+  p_dock->setGeometry(geometry);
+
+  p_dock->setWidget(pPlot);
+  p_dock->show();
+}
+
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
   QMenu menu;
   QMenu *p_data = menu.addMenu("data");
+
+  menu.addSeparator();
+
+  QAction *p_plot_all = menu.addAction("plot all");
+  QMenu *p_advanced_plotting = menu.addMenu("advanced plotting");
+
+  menu.addSeparator();
+
+  std::map<QAction*, std::pair<cedar::aux::gui::PlotDeclarationPtr, cedar::aux::Enum> > advanced_plot_map;
+  this->fillPlots(p_advanced_plotting, advanced_plot_map);
 
   QMenu *p_actions_menu = menu.addMenu("actions");
   menu.addSeparator();
@@ -331,7 +463,6 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
 
   QAction *p_delete_action = menu.addAction("delete");
 
-
   // Actions for data plotting -----------------------------------------------------------------------------------------
   std::map<QAction*, cedar::aux::Enum> action_type_map;
   bool has_data = false;
@@ -343,20 +474,15 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     try
     {
       const cedar::aux::Enum& e = *enum_it;
-      const cedar::proc::Step::SlotMap& slotmap = this->mStep->getDataSlots(e.id());
-      std::string label = e.prettyString() + "s";
-      p_data->addSeparator();
-      QAction *p_label_action = p_data->addAction(label.c_str());
-      QFont font = p_label_action->font();
-      font.setBold(true);
-      p_label_action->setFont(font);
-      p_data->addSeparator();
-      p_label_action->setEnabled(false);
-      for (cedar::proc::Step::SlotMap::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
+      this->addRoleSeparator(e, p_data);
+
+      const cedar::proc::Step::SlotList& slotmap = this->mStep->getOrderedDataSlots(e.id());
+      for (cedar::proc::Step::SlotList::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
-        QAction *p_action = p_data->addAction(iter->second->getText().c_str());
-        p_action->setData(QString(iter->first.c_str()));
-        if (iter->second->getData().get() == NULL)
+        cedar::proc::DataSlotPtr slot = *iter;
+        QAction *p_action = p_data->addAction(slot->getText().c_str());
+        p_action->setData(QString::fromStdString(slot->getName()));
+        if (slot->getData().get() == NULL)
         {
           p_action->setText("[unconnected] " + p_action->text());
           p_action->setEnabled(false);
@@ -387,29 +513,137 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   {
     std::string data_name = a->data().toString().toStdString();
     const cedar::aux::Enum& e = action_type_map[a];
+
     cedar::aux::DataPtr p_data = this->mStep->getData(e, data_name);
-
-    //!@todo It would be better if setting the title would be part of the actual widget
-    std::string title = this->mStep->getSlot(e, data_name)->getText();
-    title += " (" + this->mStep->getName();
-    title += "." + data_name + ")";
-
-    cedar::aux::gui::DataPlotter *p_plotter = new cedar::aux::gui::DataPlotter(title, mpMainWindow);
-    p_plotter->plot(p_data);
-    p_plotter->show();
+    cedar::proc::DataSlotPtr slot = this->mStep->getSlot(e, data_name);
+    cedar::aux::gui::DataPlotter *p_plotter = new cedar::aux::gui::DataPlotter();
+    p_plotter->plot(p_data, slot->getText());
+    this->showPlot(event->screenPos(), p_plotter, slot);
+  }
+  // plot all data slots
+  else if (a == p_plot_all)
+  {
+    this->plotAll(event->screenPos());
   }
   // execute an action
   else if (a->parentWidget() == p_actions_menu)
   {
     std::string action = a->text().toStdString();
     this->mStep->callAction(action);
+  }
+  // advanced plots
+  else if (advanced_plot_map.find(a) != advanced_plot_map.end())
+  {
+    cedar::aux::gui::PlotDeclarationPtr declaration = advanced_plot_map.find(a)->second.first;
+    const cedar::aux::Enum& e = advanced_plot_map.find(a)->second.second;
 
+    std::string data_name = a->data().toString().toStdString();
+
+    cedar::aux::DataPtr p_data = this->mStep->getData(e, data_name);
+    cedar::proc::DataSlotPtr slot = this->mStep->getSlot(e, data_name);
+    cedar::aux::gui::PlotInterface *p_plotter = declaration->createPlot();
+    p_plotter->plot(p_data, slot->getText());
+    this->showPlot(event->screenPos(), p_plotter, slot);
   }
   // delete the step
   else if (a == p_delete_action)
   {
     //!@todo
   }
+}
+
+void cedar::proc::gui::StepItem::plotAll(const QPoint& position)
+{
+  int grid_spacing = 2;
+  int columns = 2;
+
+  // initialize dock
+  QDockWidget *p_dock = new QDockWidget(QString::fromStdString(this->getStep()->getName()), this->mpMainWindow);
+  p_dock->setFloating(true);
+  p_dock->setContentsMargins(0, 0, 0, 0);
+
+  // initialize widget & layout
+  QWidget *p_widget = new QWidget();
+  p_widget->setContentsMargins(0, 0, 0, 0);
+  p_dock->setWidget(p_widget);
+  QGridLayout *p_layout = new QGridLayout();
+  p_layout->setContentsMargins(grid_spacing, grid_spacing, grid_spacing, grid_spacing);
+  p_layout->setSpacing(grid_spacing);
+  p_widget->setLayout(p_layout);
+
+  // iterate over all data slots
+  int count = 0;
+  QLabel *p_last_label = NULL;
+  bool is_multiplot = false;
+  cedar::aux::gui::DataPlotter *p_plotter = NULL;
+  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
+       enum_it != cedar::proc::DataRole::type().list().end();
+       ++enum_it)
+  {
+    const cedar::aux::Enum& e = *enum_it;
+
+    try
+    {
+      const cedar::proc::Step::SlotMap& slotmap = this->mStep->getDataSlots(e.id());
+      for (cedar::proc::Step::SlotMap::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
+      {
+        cedar::proc::DataSlotPtr slot = iter->second;
+        cedar::aux::DataPtr data = slot->getData();
+        const std::string& title = slot->getText();
+
+        // skip slots that aren't set
+        if (data)
+        {
+          int column = count % columns;
+          int row = 2 * (count / columns);
+
+          if (p_plotter == NULL || !p_plotter->canAppend(data))
+          {
+            // label
+            p_last_label = new QLabel(QString::fromStdString(slot->getText()));
+            p_layout->addWidget(p_last_label, row, column);
+            p_layout->setRowStretch(row, 0);
+
+            // plotter
+            p_plotter = new cedar::aux::gui::DataPlotter();
+            p_plotter->plot(data, title);
+            p_layout->addWidget(p_plotter, row + 1, column);
+            p_layout->setRowStretch(row + 1, 1);
+
+            count += 1;
+          }
+          else
+          {
+            p_plotter->append(data, title);
+            p_last_label->setText("");
+            is_multiplot = true;
+          }
+        }
+      }
+    }
+    catch (const cedar::proc::InvalidRoleException& e)
+    {
+      // that's ok, a step may not have any data in a certain role.
+    }
+  }
+
+  // if there is only one plot and it is a multiplot, we need no label
+  if (count == 1 && is_multiplot)
+  {
+    delete p_last_label;
+  }
+
+  // adapt size of plot widget/layout
+  int base_size = 200;
+  p_dock->setGeometry
+  (
+    QRect
+    (
+      position,
+      QSize(base_size * p_layout->columnCount(), base_size * p_layout->rowCount() / 2)
+    )
+  );
+  p_dock->show();
 }
 
 void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)

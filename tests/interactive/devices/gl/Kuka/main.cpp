@@ -35,7 +35,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/SimulatedKinematicChain.h"
-#include "cedar/devices/robot/KinematicChainModel.h"
 #include "cedar/devices/robot/gl/KukaArm.h"
 #include "cedar/devices/robot/gui/KinematicChainWidget.h"
 #include "cedar/auxiliaries/System.h"
@@ -51,46 +50,23 @@
 
 int main(int argc, char **argv)
 {
-  std::string configuration_file = cedar::aux::System::locateResource("configs/kuka_lwr4.conf");
-  std::string polygon_file_path = "";
-  // help requested?
-  if ((argc == 2) && (std::string(argv[1]) == "-h"))
-  { // Check the value of argc. If not enough parameters have been passed, inform user and exit.
-    std::cout << "Usage is -c <config file> -p <path to polygon data>" << std::endl;
-    return 0;
-  }
-  // parse arguments
-  for (int i = 1; i < argc; i++)
-  {
-    if (i+1 != argc) // check that we haven't finished parsing already
-    {
-      if (std::string(argv[i]) == "-c")
-      {
-        configuration_file = std::string(argv[i+1]);
-      }
-    }
-  }
-
-
-
-
+  std::string configuration_file_old = cedar::aux::System::locateResource("configs/kuka_lwr4.conf");
+  std::string configuration_file = cedar::aux::System::locateResource("configs/kuka_lwr4.json");
 
   QApplication a(argc, argv);
 
   // create simulated kinematic chains
-  cedar::dev::robot::KinematicChainPtr p_kuka_arm(new cedar::dev::robot::SimulatedKinematicChain(configuration_file));
-
-  // create models calculation of the transformation
-  cedar::dev::robot::KinematicChainModelPtr p_kuka_arm_model
+  cedar::dev::robot::KinematicChainPtr p_kuka_arm
   (
-    new cedar::dev::robot::KinematicChainModel(p_kuka_arm)
+    new cedar::dev::robot::SimulatedKinematicChain(configuration_file_old)
   );
+  p_kuka_arm->readJson(configuration_file);
 
   // create gl visualization objects
-  cedar::aux::gl::RigidBodyVisualizationPtr p_arm_visualization;
+  cedar::aux::gl::ObjectVisualizationPtr p_arm_visualization;
   cedar::dev::robot::gl::KinematicChainPtr p_kuka_arm_visualization
   (
-    new cedar::dev::robot::gl::KukaArm(p_kuka_arm_model)
+    new cedar::dev::robot::gl::KukaArm(p_kuka_arm)
   );
   p_arm_visualization = p_kuka_arm_visualization;
 
@@ -98,7 +74,7 @@ int main(int argc, char **argv)
   cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene());
   p_scene->setSceneLimit(2);
   p_scene->drawFloor(true);
-  p_scene->addRigidBodyVisualization(p_arm_visualization);
+  p_scene->addObjectVisualization(p_arm_visualization);
   cedar::aux::gui::Viewer viewer(p_scene);
   viewer.show();
   viewer.setSceneRadius(p_scene->getSceneLimit());
@@ -110,8 +86,8 @@ int main(int argc, char **argv)
   // show and start everything
   p_scene_widget->show();
   widget_arm.show();
-  p_kuka_arm_model->startTimer(50.0);
-  viewer.startTimer(50);
+  viewer.startTimer(20);
+  p_kuka_arm->startTimer(20);
   a.exec();
 
   return 0;

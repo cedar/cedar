@@ -60,7 +60,9 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(UserData);
     //!@endcond
 
-    template<class T> class Singleton;
+    template <class T> class Singleton;
+
+    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(IntrusivePtrBase);
 
     //!@todo This class may be obsolete once the ConfigurationInterface is removed.
     template <typename T> class IntervalData;
@@ -72,8 +74,9 @@ namespace cedar
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(LogFile);
     CEDAR_DECLARE_AUX_CLASS(MatrixIterator);
-    CEDAR_DECLARE_AUX_CLASS(RigidBody);
-    CEDAR_DECLARE_DEPRECATED(typedef RigidBody Object);
+    CEDAR_DECLARE_AUX_CLASS(LocalCoordinateFrame);
+    CEDAR_DECLARE_DEPRECATED(typedef LocalCoordinateFrame Object);
+    CEDAR_DECLARE_DEPRECATED(typedef LocalCoordinateFrame RigidBody);
     CEDAR_DECLARE_AUX_CLASS(System);
     //!@endcond
 
@@ -113,6 +116,8 @@ namespace cedar
     template <typename T> class ObjectParameterTemplate;
     //!@brief a template class for lists of objects of arbitrary type
     template <typename T> class ObjectListParameterTemplate;
+    //!@brief a template class for maps of objects of arbitrary type
+    template <typename T> class ObjectMapParameterTemplate;
     //!@brief A concretization of NumericParameter for double values.
     typedef NumericParameter<double> DoubleParameter;
     //!@brief A concretization of NumericParameter for unsigned int values.
@@ -133,6 +138,10 @@ namespace cedar
     typedef NumericVectorParameter<unsigned int> UIntVectorParameter;
     //!@brief A concretization of NumericVectorParameter for unsigned int values.
     typedef NumericVectorParameter<int> IntVectorParameter;
+
+    //!@brief A class for associating data with types and mapping the type hierarchy as well.
+    template <typename DataType, typename RootType> class TypeHierarchyMap;
+
     // all intrusive smart pointers
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolParameter);
@@ -172,21 +181,24 @@ namespace cedar
     //!@brief a templated version of cedar::aux::Data
     template <typename T> class DataTemplate;
 
-    //!@brief A concretization of DataTemplate for simple matrices (cv::Mat).
-    typedef DataTemplate<cv::Mat> MatData;
-
     //!@brief A concretization of DataTemplate for simple points (cv::Point).
     typedef DataTemplate<cv::Point> CvPointData;
 
     //!@brief A concretization of DataTemplate for double values.
     typedef DataTemplate<double> DoubleData;
 
+    //!@brief A concretization of DataTemplate for a set of simple matrices (std::vector<cv::Mat>).
+    typedef DataTemplate<std::vector<cv::Mat> > ImageSetData;
+
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_GENERATE_POINTER_TYPES(MatData);
+    CEDAR_DECLARE_AUX_CLASS(MatData);
     CEDAR_GENERATE_POINTER_TYPES(CvPointData);
     CEDAR_GENERATE_POINTER_TYPES(DoubleData);
+    CEDAR_GENERATE_POINTER_TYPES(ImageSetData);
     CEDAR_DECLARE_AUX_CLASS(ImageData);
+    CEDAR_DECLARE_AUX_CLASS(StereoImageData);
     /* exceptions */
+    CEDAR_DECLARE_AUX_CLASS(ConversionFailedException);
     CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
     CEDAR_DECLARE_AUX_CLASS(FileNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(BadConnectionException);
@@ -213,10 +225,8 @@ namespace cedar
     
     // Log related classes --------------------------------------------------------------------------------------------
     CEDAR_DECLARE_AUX_CLASS(Log);
-    typedef cedar::aux::Singleton<cedar::aux::Log> LogSingleton;
     
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_GENERATE_POINTER_TYPES(LogSingleton);
     CEDAR_DECLARE_AUX_CLASS(LogInterface);
     CEDAR_DECLARE_AUX_CLASS(LogFilter);
     CEDAR_DECLARE_AUX_CLASS(ConsoleLog);
@@ -241,9 +251,5 @@ namespace cedar
     };
   }
 }
-
-// Functions for boost intrusive pointer.
-extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_add_ref(cedar::aux::Parameter *pObject);
-extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_release(cedar::aux::Parameter *pObject);
 
 #endif // CEDAR_AUX_NAMESPACE_H

@@ -34,15 +34,12 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
-
+// CEDAR INCLUDES
 #include "cedar/devices/robot/gui/KinematicChainWidget.h"
 #include "cedar/devices/amtec/KinematicChain.h"
+#include "cedar/auxiliaries/System.h"
 
 // SYSTEM INCLUDES
-
 #include <iostream>
 #include <QApplication>
 
@@ -53,7 +50,21 @@
 int main(int argc, char *argv[]) {
   try
   {
-    cedar::dev::robot::KinematicChainPtr p_kinematic_chain(new cedar::dev::amtec::KinematicChain("../../../tests/interactive/devices/gui/AmtecKinematicChain/cora_arm.conf"));
+    std::string configuration_file_old = cedar::aux::System::locateResource("configs/cora_arm.conf");
+    std::string configuration_file = cedar::aux::System::locateResource("configs/cora_arm.json");
+    cedar::dev::amtec::KinematicChainPtr p_kinematic_chain
+    (
+      new cedar::dev::amtec::KinematicChain(configuration_file_old)
+    );
+    p_kinematic_chain->readJson(configuration_file);
+
+    if(!p_kinematic_chain->initDevice())
+    {
+      std::cout << "Error initializing the Amtec module!" << std::endl;
+      CEDAR_THROW(cedar::aux::InitializationException, "Error initializing the Amtec module!");
+    }
+
+
     //p_kinematic_chain->useCurrentHardwareValues(true);
     QApplication app(argc, argv);
     cedar::dev::robot::gui::KinematicChainWidget widget(p_kinematic_chain);

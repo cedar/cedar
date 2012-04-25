@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/KernelList.h"
+#include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
 

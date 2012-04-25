@@ -153,9 +153,9 @@ void cedar::aux::LoopedThread::run(void)
       }
     }
   }
-  else // if(step_size == 0)
+  else // step_size.total_microseconds() != 0
   {
-    // regular mode with time slots
+    // regular mode with fixed time
 
     // initialization
     mLastTimeStepStart = boost::posix_time::microsec_clock::universal_time();
@@ -181,7 +181,7 @@ void cedar::aux::LoopedThread::run(void)
       // calculate number of time steps taken
       double steps_taken
         = static_cast<double>(step_duration.total_microseconds()) / static_cast<double>(step_size.total_microseconds());
-      unsigned int full_steps_taken = static_cast<unsigned int>( steps_taken + 0.5 );
+      unsigned int full_steps_taken = static_cast<unsigned int>(steps_taken + 0.5);
 
       #if defined DEBUG && defined SHOW_TIMING_HELPERS
       // print warning if time steps have been skipped
@@ -223,7 +223,7 @@ void cedar::aux::LoopedThread::run(void)
         }
 
       }
-      else // if(mUseFixedStepSize)
+      else
       {
         // update statistics
         updateStatistics(steps_taken);

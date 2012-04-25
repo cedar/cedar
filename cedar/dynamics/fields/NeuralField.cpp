@@ -88,39 +88,96 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dyn::NeuralField::NeuralField()
 :
-mActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
-mSigmoidalActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
-mLateralInteraction(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
-mInputNoise(new cedar::aux::MatData(cv::Mat::zeros(10,10,CV_32F))),
-mNeuralNoise(new cedar::aux::MatData(cv::Mat::zeros(10,10,CV_32F))),
-mRestingLevel(new cedar::aux::DoubleParameter(this, "restingLevel", -5.0, -100, 0)),
-mTau(new cedar::aux::DoubleParameter(this, "tau", 100.0, 1.0, 10000.0)),
-mGlobalInhibition(new cedar::aux::DoubleParameter(this, "globalInhibition", -0.01, -100.0, 100.0)),
+mActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(50, 50, CV_32F))),
+mSigmoidalActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(50, 50, CV_32F))),
+mLateralInteraction(new cedar::dyn::SpaceCode(cv::Mat::zeros(50, 50, CV_32F))),
+mInputSum(new cedar::dyn::SpaceCode(cv::Mat::zeros(50, 50, CV_32F))),
+mInputNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
+mNeuralNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
+mRestingLevel
+(
+  new cedar::aux::DoubleParameter
+  (
+    this,
+    "restingLevel",
+    -5.0,
+    cedar::aux::DoubleParameter::LimitType::negativeZero()
+  )
+),
+mTau
+(
+  new cedar::aux::DoubleParameter
+  (
+    this,
+    "tau",
+    100.0,
+    cedar::aux::DoubleParameter::LimitType::positive()
+  )
+),
+mGlobalInhibition
+(
+  new cedar::aux::DoubleParameter
+  (
+    this,
+    "globalInhibition",
+    -0.01,
+    cedar::aux::DoubleParameter::LimitType::negativeZero()
+  )
+),
 // parameters
-_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 2, 0, 1000)),
-_mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000)),
-_mInputNoiseGain(new cedar::aux::DoubleParameter(this, "inputNoiseGain", 0.1, 0.0, 1000.0)),
+_mDimensionality
+(
+  new cedar::aux::UIntParameter
+  (
+    this,
+    "dimensionality",
+    2,
+    cedar::aux::UIntParameter::LimitType::positiveZero(1000)
+  )
+),
+_mSizes
+(
+  new cedar::aux::UIntVectorParameter
+  (
+    this,
+    "sizes",
+    2,
+    10,
+    cedar::aux::UIntParameter::LimitType::positive(1000)
+  )
+),
+_mInputNoiseGain
+(
+  new cedar::aux::DoubleParameter
+  (
+    this,
+    "inputNoiseGain",
+    0.1,
+    cedar::aux::DoubleParameter::LimitType::positiveZero()
+  )
+),
 _mSigmoid
 (
   new cedar::dyn::NeuralField::SigmoidParameter
   (
     this,
     "sigmoid",
-    cedar::aux::math::SigmoidPtr(new cedar::aux::math::AbsSigmoid(0.0, 10.0))
+    cedar::aux::math::SigmoidPtr(new cedar::aux::math::AbsSigmoid(0.0, 100.0))
   )
 ),
 _mLateralKernelConvolution(new cedar::aux::conv::Convolution()),
 _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 {
   //!@todo This call should not be necessary, rather, the vector should do that in its own.
-  _mSizes->makeDefault();
 
   //default is two modes/kernels for lateral interaction
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
+  
   this->declareBuffer("activation", mActivation);
   this->declareBuffer("lateralInteraction", mLateralInteraction);
   this->declareBuffer("lateralKernel", this->_mLateralKernelConvolution->getCombinedKernel());
   this->declareBuffer("neuralNoiseKernel", this->_mNoiseCorrelationKernelConvolution->getCombinedKernel());
+  this->declareBuffer("input sum", mInputSum);
 
   this->declareOutput("sigmoid(activation)", mSigmoidalActivation);
 
@@ -338,12 +395,12 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
 void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 {
   // get all members needed for the Euler step
-  cedar::proc::ExternalDataPtr input_slot = this->getInputSlot("input");
   cv::Mat& u = this->mActivation->getData();
   cv::Mat& sigmoid_u = this->mSigmoidalActivation->getData();
   cv::Mat& lateral_interaction = this->mLateralInteraction->getData();
   cv::Mat& input_noise = this->mInputNoise->getData();
   cv::Mat& neural_noise = this->mNeuralNoise->getData();
+  cv::Mat& input_sum = this->mInputSum->getData();
   const double& h = mRestingLevel->getValue();
   const double& tau = mTau->getValue();
   const double& global_inhibition = mGlobalInhibition->getValue();
@@ -399,34 +456,15 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 #endif
   */
 
+  this->updateInputSum();
+
   CEDAR_ASSERT(u.size == sigmoid_u.size);
   CEDAR_ASSERT(u.size == lateral_interaction.size);
+  CEDAR_ASSERT(u.size == input_sum.size);
 
   // the field equation
-  cv::Mat d_u = -u + h + lateral_interaction + global_inhibition * cv::sum(sigmoid_u)[0];
-  // add all inputs to d_u
-  for (size_t i = 0; i < input_slot->getDataCount(); ++i)
-  {
-    cedar::aux::DataPtr input = input_slot->getData(i);
-    if (input)
-    {
-      cv::Mat& input_mat = input->getData<cv::Mat>();
+  cv::Mat d_u = -u + h + lateral_interaction + global_inhibition * cv::sum(sigmoid_u)[0] + input_sum;
 
-      if (!cedar::aux::math::matrixSizesEqual(input_mat, d_u))
-      {
-        CEDAR_THROW_EXCEPTION(cedar::aux::MatrixMismatchException(input_mat, d_u));
-      }
-
-      if (this->getDimensionality() == 1)
-      {
-        d_u += cedar::aux::math::canonicalRowVector(input_mat);
-      }
-      else
-      {
-        d_u += input_mat;
-      }
-    }
-  }
   /* add input noise, but use the squared time only for Euler integration (divide by sqrt(time) here, because
    * the next line multiplies by time anyway)
    */
@@ -436,6 +474,35 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 
   // integrate one time step
   u += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau) * d_u;
+}
+
+void cedar::dyn::NeuralField::updateInputSum()
+{
+  cedar::proc::ExternalDataPtr input_slot = this->getInputSlot("input");
+  cv::Mat& input_sum = this->mInputSum->getData();
+
+  input_sum = cv::Scalar(0);
+
+  // add all inputs to d_u
+  for (size_t i = 0; i < input_slot->getDataCount(); ++i)
+  {
+    cedar::aux::DataPtr input = input_slot->getData(i);
+    if (input)
+    {
+      cv::Mat& input_mat = input->getData<cv::Mat>();
+
+      CEDAR_DEBUG_ASSERT(cedar::aux::math::matrixSizesEqual(input_mat, input_sum))
+
+      if (this->getDimensionality() == 1)
+      {
+        input_sum += cedar::aux::math::canonicalRowVector(input_mat);
+      }
+      else
+      {
+        input_sum += input_mat;
+      }
+    }
+  }
 }
 
 bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) const
@@ -512,6 +579,7 @@ void cedar::dyn::NeuralField::updateMatrices()
     this->mLateralInteraction->getData() = cv::Mat(1, 1, CV_32F, cv::Scalar(0));
     this->mInputNoise->getData() = cv::Mat(1, 1, CV_32F, cv::Scalar(0));
     this->mNeuralNoise->getData() = cv::Mat(1, 1, CV_32F, cv::Scalar(0));
+    this->mInputSum->setData(cv::Mat(1, 1, CV_32F, cv::Scalar(0)));
   }
   else if (dimensionality == 1)
   {
@@ -520,6 +588,7 @@ void cedar::dyn::NeuralField::updateMatrices()
     this->mLateralInteraction->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0));
     this->mInputNoise->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0));
     this->mNeuralNoise->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0));
+    this->mInputSum->setData(cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0)));
   }
   else
   {
@@ -528,6 +597,7 @@ void cedar::dyn::NeuralField::updateMatrices()
     this->mLateralInteraction->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
     this->mInputNoise->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
     this->mNeuralNoise->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
+    this->mInputSum->setData(cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0)));
   }
   this->unlockAll();
   if (dimensionality > 0) // only adapt kernel in non-0D case

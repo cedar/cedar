@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
 #include <iostream>

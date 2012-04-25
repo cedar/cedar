@@ -56,13 +56,13 @@
 
 cedar::aux::EnumType<cedar::proc::steps::Resize::Interpolation> cedar::proc::steps::Resize::Interpolation::mType;
 
-#ifndef MSVC
+#ifndef _MSC_VER
 const cedar::proc::steps::Resize::Interpolation::Id cedar::proc::steps::Resize::Interpolation::LINEAR;
 const cedar::proc::steps::Resize::Interpolation::Id cedar::proc::steps::Resize::Interpolation::NEAREST;
 const cedar::proc::steps::Resize::Interpolation::Id cedar::proc::steps::Resize::Interpolation::AREA;
 const cedar::proc::steps::Resize::Interpolation::Id cedar::proc::steps::Resize::Interpolation::CUBIC;
 const cedar::proc::steps::Resize::Interpolation::Id cedar::proc::steps::Resize::Interpolation::LANCZOS4;
-#endif // MSVC
+#endif // _MSC_VER
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class

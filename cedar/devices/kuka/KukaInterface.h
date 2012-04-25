@@ -37,8 +37,9 @@
 #ifndef CEDAR_DEV_KUKA_KUKA_INTERFACE_H
 #define CEDAR_DEV_KUKA_KUKA_INTERFACE_H
 
-// MAKE FRI OPTIONAL
-#include "cedar/devices/robot/CMakeDefines.h"
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 #ifdef CEDAR_USE_KUKA_LWR
 
 // CEDAR INCLUDES
@@ -78,7 +79,7 @@ public:
    *
    * @return    state
    */
-  bool isMovable();
+  bool isMovable() const;
 
   /*! @brief returns angle for a specified joint
    *
@@ -117,26 +118,26 @@ public:
    * Commands can only be send if the state is FRI_STATE_CMD, which represents the command mode
    * @return current state of the interface
    */
-  FRI_STATE getFriState();
+  FRI_STATE getFriState() const;
   /*! @brief returns the quality of the connection.
    *
    * this can range from FRI_QUALITY_UNACCEPTABLE to FRI_QUALITY_PERFECT
    * if the Quality is worse (means: less) than FRI_QUALITY_GOOD, command mode switches to monitor mode automatically
    * @return current Quality of the connection
    */
-  FRI_QUALITY getFriQuality();
+  FRI_QUALITY getFriQuality() const;
   /*! @brief returns sample time of the FRI
 
    * The sample time is set on the FRI server. Each interval with the length of the sample time, data will be exchanged
    * @return FRI sample time
    */
-  float getSampleTime();
+  float getSampleTime() const;
   /*! @brief check if the robot is powered
    *
    * this especially means the dead man switch is in the right position and the robot is in command mode
    * @return true, if power is on
    */
-  bool isPowerOn();
+  bool isPowerOn() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

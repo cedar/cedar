@@ -44,35 +44,20 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Torus::Torus(cedar::aux::RigidBodyPtr pRigidBody)
+cedar::aux::gl::Torus::Torus
+(
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
+  double radius,
+  double thickness,
+  double colorR,
+  double colorG,
+  double colorB
+)
 :
-cedar::aux::gl::RigidBodyVisualization(pRigidBody)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame, "Torus", colorR, colorG, colorB),
+mRadius(radius),
+mThickness(thickness)
 {
-  mRadius = 3;
-  mThickness = .5;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
-  mRigidBodyType = "Torus";
-}
-
-cedar::aux::gl::Torus::Torus(
-                              cedar::aux::RigidBodyPtr pRigidBody,
-                              double radius,
-                              double thickness,
-                              double R,
-                              double G,
-                              double B
-                            )
-:
-cedar::aux::gl::RigidBodyVisualization(pRigidBody)
-{
-  mRadius = radius;
-  mThickness = thickness;
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-  mRigidBodyType = "Torus";
 }
 
 //----------------------------------------------------------------------------------------------------------------------

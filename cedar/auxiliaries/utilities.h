@@ -46,7 +46,7 @@
 #include <boost/shared_ptr.hpp>
 #include <typeinfo>
 
-#ifdef MSVC
+#ifdef _MSC_VER
   #define NOMINMAX // don't add min and max macros!
   #include <Windows.h>
 #endif
@@ -142,7 +142,7 @@ namespace cedar
           this->mSymbolOffset = offset;
         }
 
-#ifdef GCC
+#ifdef __GNUG__
         /*!@brief Sets the raw string.
          *
          *        This function parses the raw string from gcc's backtrace capabilities into the relevant information.
@@ -181,11 +181,11 @@ namespace cedar
          *        StackEntries.
          */
         StackTrace();
-#ifdef MSVC
+#ifdef _MSC_VER
         /*!@brief Generates a stack trace for a specific context.
          */
         StackTrace(CONTEXT* context);
-#endif // MSVC
+#endif // _MSC_VER
 
         /*!@brief Returns the number of entries in the stack trace.
          */
@@ -210,11 +210,11 @@ namespace cedar
          */
         std::vector<cedar::aux::StackEntry> mStackTrace;
 
-#ifdef MSVC
+#ifdef _MSC_VER
         /*!@brief Initializes the stack trace from the given context.
          */
         void init(CONTEXT* context);
-#endif // MSVC
+#endif // _MSC_VER
     };
 
     /*!@brief Returns the stack entry at the given index.

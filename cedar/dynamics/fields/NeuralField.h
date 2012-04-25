@@ -49,7 +49,9 @@
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/math/Sigmoid.h"
 #include "cedar/auxiliaries/kernel/namespace.h"
+#include "cedar/auxiliaries/kernel/Kernel.h"
 #include "cedar/auxiliaries/ObjectParameterTemplate.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 #include "cedar/auxiliaries/namespace.h"
@@ -170,6 +172,12 @@ private:
     return this->_mDimensionality->getValue();
   }
 
+  /*!@brief   Recalculates the sum of all inputs.
+   *
+   * @remarks This method assumes that all data is locked.
+   */
+  void updateInputSum();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -182,6 +190,9 @@ protected:
 
   //!@brief this SpaceCode matrix contains the current lateral interactions of the NeuralField, i.e. convolution result
   cedar::dyn::SpaceCodePtr mLateralInteraction;
+
+  //!@brief this SpaceCode matrix contains the current lateral interactions of the NeuralField, i.e. convolution result
+  cedar::dyn::SpaceCodePtr mInputSum;
 
   //!@brief this MatData contains the input noise
   cedar::aux::MatDataPtr mInputNoise;

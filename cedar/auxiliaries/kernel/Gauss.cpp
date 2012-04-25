@@ -248,7 +248,9 @@ void cedar::aux::kernel::Gauss::updateDimensionality()
   }
 
   _mSigmas->resize(new_size);
+  _mSigmas->setDefaultSize(new_size);
   _mShifts->resize(new_size);
+  _mShifts->setDefaultSize(new_size);
   this->mCenters.resize(new_size);
   this->mSizes.resize(new_size);
   mpReadWriteLockOutput->unlock();

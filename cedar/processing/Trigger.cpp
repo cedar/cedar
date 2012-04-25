@@ -118,7 +118,6 @@ void cedar::proc::Trigger::wait()
   }
 }
 
-
 void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 {
   for (size_t i = 0; i < this->mListeners.size(); ++i)
@@ -126,6 +125,7 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
     // If the arguments can be set, trigger the step.
     //!@todo For dynamics, this can mean that some step times are discarded rather than accumulated.
     //!@todo cedar::proc::Step::setNextArguments should take a const pointer.
+    //!@todo Make a cache for each entry in the listener list to avoid the dynamic cast here/avoid it otherwise
     if (cedar::proc::StepPtr step = boost::shared_dynamic_cast<cedar::proc::Step>(this->mListeners.at(i)))
     {
       if (step->setNextArguments(arguments))

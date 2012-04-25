@@ -121,15 +121,6 @@ protected:
 private:
   // none yet
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::ObjectListParameter
 
 #endif // CEDAR_AUX_OBJECT_LIST_PARAMETER_H

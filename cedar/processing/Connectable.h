@@ -46,6 +46,7 @@
 
 // SYSTEM INCLUDES
 #include <boost/signals2/connection.hpp>
+#include <vector>
 
 /*!@brief   An interface for classes that have data slots that can be connected.
  *
@@ -60,6 +61,9 @@ class cedar::proc::Connectable : public cedar::proc::Element
 public:
   //! Map of data slot names to the corresponding cedar::proc::DataSlot objects.
   typedef std::map<std::string, cedar::proc::DataSlotPtr> SlotMap;
+
+  //! Map of data slot names to the corresponding cedar::proc::DataSlot objects.
+  typedef std::vector<cedar::proc::DataSlotPtr> SlotList;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -89,6 +93,12 @@ public:
 
   //!@brief Returns a constant reference to the map of data slots for a given role.
   const cedar::proc::Connectable::SlotMap& getDataSlots(DataRole::Id role) const;
+
+  //!@brief Returns the map of data slots for a given role.
+  cedar::proc::Connectable::SlotList& getOrderedDataSlots(DataRole::Id role);
+
+  //!@brief Returns a constant reference to the map of data slots for a given role.
+  const cedar::proc::Connectable::SlotList& getOrderedDataSlots(DataRole::Id role) const;
 
   /*!@brief Returns the input slot corresponding to the given name.
    * @see   cedar::proc::Step::getSlot
@@ -279,6 +289,9 @@ private:
 
   //!@brief a map of slot maps, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
   std::map<DataRole::Id, SlotMap> mDataConnections;
+
+  //!@brief a map of slot lists, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
+  std::map<DataRole::Id, SlotList> mDataConnectionsOrder;
 
   //!@brief flag that states if all mandatory connections (i.e. inputs) are set
   bool mMandatoryConnectionsAreSet;

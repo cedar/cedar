@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/logFilter/All.h"
+#include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
 
@@ -121,7 +122,7 @@ public:
     this->log(cedar::aux::LOG_LEVEL_ERROR, message, source, title);
   }
   
-  inline void debug(const std::string& message, const std::string& source, const std::string& title = "")
+  inline void debugMessage(const std::string& message, const std::string& source, const std::string& title = "")
   {
     this->debugLog(cedar::aux::LOG_LEVEL_DEBUG, message, source, title);
   }
@@ -138,6 +139,10 @@ public:
     cedar::aux::LogFilterPtr filter = cedar::aux::LogFilterPtr(new cedar::aux::logFilter::All())
   );
   
+  /*!@brief Removes all occurrences of the logger in the message passing chain.
+   */
+  void removeLogger(cedar::aux::LogInterfacePtr logger);
+
 
   /*!@brief Sends a standard message about an object's allocation.
    */
@@ -187,6 +192,25 @@ private:
   
   cedar::aux::LogInterfacePtr mDefaultLogger;
 };
+
+namespace cedar
+{
+  namespace aux
+  {
+#ifdef MSVC
+#ifdef CEDAR_LIB_EXPORTS_AUX
+    // dllexport
+    template class __declspec(dllexport) cedar::aux::Singleton<cedar::aux::Log>;
+#else // CEDAR_LIB_EXPORTS_AUX
+    // dllimport
+    extern template class __declspec(dllimport) cedar::aux::Singleton<cedar::aux::Log>;
+#endif // CEDAR_LIB_EXPORTS_AUX
+#endif // MSVC
+
+    //!@brief The singleton instance of the kernel factory manager.
+    typedef cedar::aux::Singleton<cedar::aux::Log> LogSingleton;
+  }
+}
 
 #endif // CEDAR_AUX_LOG_H
 

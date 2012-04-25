@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DoubleParameter.cpp
+    File:        UIntParameter.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/gui/UIntParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
@@ -103,7 +104,17 @@ void cedar::aux::gui::UIntParameter::propertiesChanged()
 {
   cedar::aux::UIntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(this->getParameter());
   this->mpSpinbox->setMinimum(parameter->getMinimum());
-  this->mpSpinbox->setMaximum(parameter->getMaximum());
+  int maximum = static_cast<int>(parameter->getMaximum());
+  if (maximum < 0)
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Qt cannot display the value range given for parameter " + parameter->getName() + ". Defaulting to max int.",
+      "cedar::aux::gui::UIntParameter::propertiesChanged()"
+    );
+    maximum = std::numeric_limits<int>::max();
+  }
+  this->mpSpinbox->setMaximum(maximum);
   this->mpSpinbox->setDisabled(parameter->isConstant());
 }
 
