@@ -59,7 +59,7 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(Mode);
 
       // convolution engines
-      CEDAR_DECLARE_AUX_CLASS(FastConvolution);
+      CEDAR_DECLARE_AUX_CLASS(FFTW);
       CEDAR_DECLARE_AUX_CLASS(OpenCV);
       //!@endcond
 

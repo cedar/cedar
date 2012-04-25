@@ -40,6 +40,7 @@
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/convolution/Engine.h"
 #include "cedar/auxiliaries/convolution/OpenCV.h"
+#include "cedar/auxiliaries/convolution/FFTW.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
 #include "cedar/auxiliaries/kernel/Separable.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -82,7 +83,7 @@ CEDAR_GENERATE_POINTER_TYPES(DemoKernel);
 class DemoKernel0D : public cedar::aux::kernel::Kernel
 {
   public:
-    DemoKernel0D(double amplitude)
+    DemoKernel0D(double amplitude) : cedar::aux::kernel::Kernel(0)
     {
       this->mKernel->setData(cv::Mat::ones(1, 1, CV_32F) * amplitude);
     }
@@ -319,7 +320,6 @@ int testMatrixKernelOperation
 {
   cv::Mat kernel_mat = kernel->getKernel();
   std::cout << mat << std::endl << "*" << std::endl << kernel_mat << std::endl << " = " << std::endl;
-
   // check if the engine is capable of this operation
   if
   (
@@ -550,6 +550,9 @@ int main()
 
   cedar::aux::conv::OpenCVPtr open_cv (new cedar::aux::conv::OpenCV());
   errors += testEngine(open_cv);
+
+  cedar::aux::conv::FFTWPtr fftw (new cedar::aux::conv::FFTW());
+  errors += testEngine(fftw);
 
   return errors;
 }

@@ -60,3 +60,8 @@ cv::Mat cedar::aux::conv::Engine::convolve
   // default implementation: call the normal convolve method
   return this->convolve(matrix, cedar::aux::kernel::ConstKernelPtr(kernel), borderType, mode);
 }
+
+void cedar::aux::conv::Engine::setKernelList(cedar::aux::conv::KernelListPtr kernelList)
+{
+  this->mKernelList = kernelList;
+}
