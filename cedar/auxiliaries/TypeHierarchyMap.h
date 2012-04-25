@@ -89,6 +89,8 @@ public:
       {
       }
 
+      virtual std::string getTypeString() const = 0;
+
       const_children_iterator childrenBegin() const
       {
         return this->mChildren.begin();
@@ -570,6 +572,11 @@ private:
       {
       }
 
+      std::string getTypeString() const
+      {
+        return cedar::aux::typeToString<T>();
+      }
+
       bool matchesExact(ConstRootTypePtr instance) const
       {
         return typeid(*instance) == typeid(T);
@@ -643,7 +650,12 @@ public:
 
   const DataType& getClosest(ConstRootTypePtr instance) const
   {
-    return this->mRootNode->getClosest(instance)->getData();
+    return this->getClosestNode(instance)->getData();
+  }
+
+  ConstNodePtr getClosestNode(ConstRootTypePtr instance) const
+  {
+    return this->mRootNode->getClosest(instance);
   }
 
   size_t size() const
