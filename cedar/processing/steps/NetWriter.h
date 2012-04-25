@@ -44,7 +44,7 @@
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/MatData.h"
-#include "cedar/auxiliaries/net/NetWriter.h"
+#include "cedar/auxiliaries/net/Writer.h"
 
 // SYSTEM INCLUDES
 
@@ -111,7 +111,7 @@ protected:
 private:
   //!@brief the writer object (RAII)
 
-  cedar::aux::net::NetWriter< cedar::aux::MatData::DataType > *mpWriter;
+  cedar::aux::net::Writer< cedar::aux::MatData::DataType > *mpWriter;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

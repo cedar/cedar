@@ -34,9 +34,9 @@
  ---------------------------------------------------------------------------------------------------------------------*/
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/NetBlockingReader.h"
-#include "cedar/auxiliaries/net/NetReader.h"
-#include "cedar/auxiliaries/net/NetWriter.h"
+#include "cedar/auxiliaries/net/BlockingReader.h"
+#include "cedar/auxiliaries/net/Reader.h"
+#include "cedar/auxiliaries/net/Writer.h"
 #include "cedar/auxiliaries/net/exceptions/NetException.h"
 
 // PROJECT INCLUDES
@@ -74,8 +74,8 @@ int main()
     float fl;
 
 #define MYSIMPLEPORT "CEDAR-UNIT-TEST-SIMPLE"
-    NetWriter<float> myFloatWriter(MYSIMPLEPORT);
-    NetBlockingReader<float> myFloatReader(MYSIMPLEPORT);
+    Writer<float> myFloatWriter(MYSIMPLEPORT);
+    BlockingReader<float> myFloatReader(MYSIMPLEPORT);
 
     fl= 42.42;
     myFloatWriter.write(fl);
@@ -140,13 +140,13 @@ int main()
   try
   {
     // writing ...
-    NetWriter<cv::Mat> myMatWriter(MYPORT);
-    NetWriter<cv::Mat> myMatWriter8(MYPORT"8");
+    Writer<cv::Mat> myMatWriter(MYPORT);
+    Writer<cv::Mat> myMatWriter8(MYPORT"8");
 
     // ... reading
-    NetBlockingReader<cv::Mat> myMatReader2(MYPORT);
-    NetBlockingReader<cv::Mat> myMatReader3(MYPORT);
-    NetBlockingReader<cv::Mat> myMatReader8(MYPORT"8");
+    BlockingReader<cv::Mat> myMatReader2(MYPORT);
+    BlockingReader<cv::Mat> myMatReader3(MYPORT);
+    BlockingReader<cv::Mat> myMatReader8(MYPORT"8");
 
     myMatWriter.write(mat);
     mat2= myMatReader2.read();
@@ -217,8 +217,8 @@ int main()
     floatMat_ mat4, mat5;
   
     mat_errors= 0;
-    NetWriter< cv::Mat_<float> > myMatWriter2_1(MYPORT"_");
-    NetBlockingReader< cv::Mat_<float> > myMatReader2_1(MYPORT"_");
+    Writer< cv::Mat_<float> > myMatWriter2_1(MYPORT"_");
+    BlockingReader< cv::Mat_<float> > myMatReader2_1(MYPORT"_");
 
     mat4= floatMat_(2,2);
 

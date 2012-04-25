@@ -42,7 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/GrabberInterface.h"
-#include "cedar/auxiliaries/net/NetReader.h"
+#include "cedar/auxiliaries/net/Reader.h"
 
 // SYSTEM INCLUDES
 
@@ -69,7 +69,7 @@ public cedar::dev::sensors::visual::GrabberInterface
   //!@cond SKIPPED_DOCUMENTATION
 
   //todo:typedef to NetReader
-  typedef boost::shared_ptr<cedar::aux::net::NetReader<cv::Mat> > MatNetReaderPtr;
+  typedef boost::shared_ptr<cedar::aux::net::Reader<cv::Mat> > MatNetReaderPtr;
 
 
   /*! @struct PictureChannel

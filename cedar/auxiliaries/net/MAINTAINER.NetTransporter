@@ -1,7 +1,7 @@
 You should look at the NetTransporter HOWTO before reading this.
 
 This file is supposed to help cedar programmers to maintain and add 
-functionality to the NetTransporter (NetWrite, NetReader, etc.) framework.
+functionality to the NetTransporter (NetWrite, Reader, etc.) framework.
 
 Directories:
 ============
@@ -23,7 +23,7 @@ Directories:
 
   net/detail/datatypesupport   holds everything you need to edit, if you
                             want to add a new supported datatype to
-                            the NetReaders/NetWriters, etc.
+                            the Readers/Writers, etc.
                             Note: These changes will mostly be
                                   specialization templates.
 
@@ -65,7 +65,7 @@ At the moment, the framework internally is separated into two parts:
 What to do, if I want to add another transferable data type:
 ============================================================
 
-Edit the NetReader.h, NetWriter.h, etc files to add templates specializations
+Edit the Reader.h, Writer.h, etc files to add templates specializations
 with the type you want to transfer.
 Choose the (internal) inherit you use, based on the data type you want
 to transfer:

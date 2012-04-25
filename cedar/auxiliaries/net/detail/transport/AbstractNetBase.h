@@ -65,7 +65,7 @@ namespace cedar {
     namespace net {
       namespace detail {
 
-/*!@brief Shared functionality between AbstractWriter and Reader
+/*!@brief Shared functionality between AbstractNetWriter and Reader
  *
  * Basic inherit with shared functionality that Writer and Reader
  * will use (e.g. establishing connection with the network).

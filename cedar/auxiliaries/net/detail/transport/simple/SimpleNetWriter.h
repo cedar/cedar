@@ -63,7 +63,7 @@ namespace cedar {
 
 /*!@brief implements writing (RIAA over network) simple variable types
  *
- * use in NetWriter
+ * use in Writer
  */
 template <typename T>
 class SimpleNetWriter : public AbstractNetWriter<T>

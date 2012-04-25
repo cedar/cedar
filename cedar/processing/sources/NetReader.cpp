@@ -104,7 +104,7 @@ void cedar::proc::steps::NetReaderSource::onStart()
   {
     try 
     {
-      mpReader= new cedar::aux::net::NetReader< cedar::aux::MatData::DataType >("DEMOCHANNEL");
+      mpReader= new cedar::aux::net::Reader< cedar::aux::MatData::DataType >("DEMOCHANNEL");
       // TODO: make channel configurable
     }
     catch ( cedar::aux::exc::NetWaitingForWriterException &E )
