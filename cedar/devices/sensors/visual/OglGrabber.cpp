@@ -45,7 +45,7 @@
 
 //----------------------------------------------------------------------------------------------------
 // Constructor for a single-channel grabber
-cedar::dev::sensors::visual::OglGrabber::OglGrabber(std::string configFileName, std::string channelName)
+cedar::dev::sensors::visual::OglGrabber::OglGrabber(std::string configFileName, QGLWidget* oglWidget)
 :
 cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
@@ -62,7 +62,7 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
   readInit(1,"OglGrabber");
 
   //overwrite parameters from configfiles with values from constuctor
-  getChannel(0)->mSourceFileName = channelName;
+  getChannel(0)->mpOglWidget = oglWidget;
 
   //now apply the whole configuration
   applyInit();
@@ -74,8 +74,8 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
 cedar::dev::sensors::visual::OglGrabber::OglGrabber
 (
   std::string configFileName,
-  std::string channelName0,
-  std::string channelName1
+  QGLWidget* oglWidget0,
+  QGLWidget* oglWidget1
 )
 :
 cedar::dev::sensors::visual::GrabberInterface(configFileName)
@@ -93,8 +93,8 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
   readInit(2,"StereoOglGrabber");
 
   //overwrite parameters from configfiles with values from constuctor
-  getChannel(0)->mSourceFileName = channelName0;
-  getChannel(1)->mSourceFileName = channelName1;
+  getChannel(0)->mpOglWidget = oglWidget0;
+  getChannel(1)->mpOglWidget = oglWidget1;
 
   //now apply the whole configuration
   applyInit();
@@ -139,7 +139,8 @@ bool cedar::dev::sensors::visual::OglGrabber::onInit()
   init_message << ": Initialize test grabber with " << mNumCams << " channels ..." << std::endl;
   for (unsigned int i = 0; i < mNumCams; ++i)
   {
-    init_message << "Channel " << i << ": capture from Source: " << getChannel(i)->mSourceFileName << std::endl;
+    init_message << "Channel " << i <<std::endl;
+        //<< ": capture from Source: " << getChannel(i)->mpOglWidget->WindowTitle() << std::endl;
   }
   cedar::aux::LogSingleton::getInstance()->systemInfo
                                            (
@@ -188,7 +189,8 @@ void cedar::dev::sensors::visual::OglGrabber::onCleanUp()
 void cedar::dev::sensors::visual::OglGrabber::onAddChannel()
 {
   //create the channel structure for one channel
-  TestChannelPtr channel(new TestChannel);
+  OglChannelPtr channel(new OglChannel);
+  channel->mpOglWidget = NULL;
   mChannels.push_back(channel);
 }
 
@@ -212,7 +214,9 @@ const std::string& cedar::dev::sensors::visual::OglGrabber::onGetSourceInfo(unsi
 
   //give some information about the used source like channelname, filename, devicename
   //or something like that
-  return getChannel(channel)->mSourceFileName;
+
+  //return getChannel(channel)->mSourceFileName;
+  return "QT::OGLWidget on Channel " + boost::lexical_cast<std::string>(channel);
 }
 
 //----------------------------------------------------------------------------------------------------

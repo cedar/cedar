@@ -568,7 +568,19 @@ void cedar::dev::sensors::visual::CameraStateAndConfig::setAllParametersToCam()
 bool cedar::dev::sensors::visual::CameraStateAndConfig::setSetting(CameraSetting::Id settingId, double value)
 {
   unsigned int prop_id = static_cast<unsigned int>(settingId);
-  return setCamProperty(prop_id,value);
+  bool result = setCamProperty(prop_id,value);
+  unsigned int ivalue = static_cast<unsigned int>(value);
+
+  switch (settingId)
+  {
+    case CameraSetting::SETTING_FPS :
+      mCamSettings.fps = CameraFrameRate::type().get(ivalue).name();
+    case CameraSetting::SETTING_ISO_SPEED :
+      mCamSettings.iso_speed = CameraIsoSpeed::type().get(ivalue).name();
+    case CameraSetting::SETTING_MODE :
+      mCamSettings.mode = CameraVideoMode::type().get(ivalue).name();
+  }
+  return result;
 }
 
 //--------------------------------------------------------------------------------------------------------------------

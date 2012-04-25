@@ -139,11 +139,18 @@ int main(int argc, char *argv[])
   std::cout << "\n\nSupported framerates (depend on video mode):" << std::endl;
   for (int mode=0; mode<num_modes; mode++)
   {
+    std::string video_mode_str = fw_interface.DC1394VideoModeToString(cam_video_modes.modes[mode]);
     std::cout << "\n - Video mode "
               << cam_video_modes.modes[mode]
               <<" : "
-              << fw_interface.DC1394VideoModeToString(cam_video_modes.modes[mode])
+              << video_mode_str
               << std::endl;
+
+    //no framerates on FORMAT7 modes
+    if (cam_video_modes.modes[mode] >= DC1394_VIDEO_MODE_FORMAT7_0)
+    {
+      continue;
+    }
 
     dc1394framerates_t mode_framerates = fw_interface.getCamFramerates(cam_video_modes.modes[mode]);
     int num_framerates = mode_framerates.num;

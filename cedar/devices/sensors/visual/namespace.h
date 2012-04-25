@@ -76,6 +76,7 @@ namespace cedar
         CEDAR_DECLARE_DEV_CLASS(PictureGrabber);
         CEDAR_DECLARE_DEV_CLASS(CameraGrabber);
         CEDAR_DECLARE_DEV_CLASS(TestGrabber);
+        CEDAR_DECLARE_DEV_CLASS(OglGrabber);
 
         #ifdef CEDAR_USE_YARP
         CEDAR_DECLARE_DEV_CLASS(NetGrabber);
