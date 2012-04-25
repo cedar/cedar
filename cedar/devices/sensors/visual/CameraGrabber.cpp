@@ -887,7 +887,7 @@ double cedar::dev::sensors::visual::CameraGrabber::getCameraSetting( unsigned in
   unsigned int setting_id = static_cast<unsigned int>(settingId);
 
   //check if undefined settings
-  if ( (settingId == cedar::aux::Enum::UNDEFINED) )
+  if (settingId == cedar::aux::Enum::UNDEFINED)
   {
       std::string info = ": Channel " + boost::lexical_cast<std::string>(channel)
                           + ": Undefined or unsupported settings \""

@@ -74,12 +74,12 @@ public cedar::dev::sensors::visual::GrabberInterface
   :
   cedar::dev::sensors::visual::GrabberInterface::GrabberChannel
   {
-    //! @brief The filenames
-    std::string mSourceFileName;
+    //! @brief The QT OpenGL widget
+    QGLWidget* mpOglWidget ;
   };
 
-  typedef boost::shared_ptr<TestChannel> TestChannelPtr;
-  typedef boost::shared_ptr<const TestChannel> ConstTestChannelPtr;
+  typedef boost::shared_ptr<OglChannel> OglChannelPtr;
+  typedef boost::shared_ptr<const OglChannel> ConstOglChannelPtr;
 
   //!@endcond
 
@@ -95,14 +95,14 @@ public:
    *  @param configFileName Filename for a file, where the configuration parameters should be stored
    *  @param channelName  Channel to grab from
    */
-  OglGrabber(std::string configFileName, std::string channelName);
+  OglGrabber(std::string configFileName, QGLWidget *oglWidget);
 
   /*! @brief The constructor for a stereo grabber.
    *  @param configFileName Filename for a file, where the configuration parameters should be stored
    *  @param channelName0  Channel one to grab from
    *  @param channelName1  Channel two to grab from
    */
-  OglGrabber(std::string configFileName, std::string channelName0, std::string channelName1);
+  OglGrabber(std::string configFileName, QGLWidget *oglWidget0, QGLWidget *oglWidget1);
 
   //!@brief Destructor
   ~OglGrabber();
@@ -145,18 +145,18 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
-  inline TestChannelPtr getChannel(unsigned int channel)
+  inline OglChannelPtr getChannel(unsigned int channel)
   {
-    return boost::static_pointer_cast<TestChannel>
+    return boost::static_pointer_cast<OglChannel>
            (
              cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
            );
   }
 
   ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
-  inline ConstTestChannelPtr getChannel(unsigned int channel) const
+  inline ConstOglChannelPtr getChannel(unsigned int channel) const
   {
-    return boost::static_pointer_cast<const TestChannel>
+    return boost::static_pointer_cast<const OglChannel>
        (
          cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
        );
@@ -165,8 +165,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:

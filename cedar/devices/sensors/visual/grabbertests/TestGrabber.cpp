@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/TestGrabber.h"
+#include "cedar/devices/sensors/visual/grabbertests/TestGrabber.h"
 
 // SYSTEM INCLUDES
 
