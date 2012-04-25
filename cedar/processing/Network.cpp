@@ -352,7 +352,7 @@ void cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode& root)
   {
     cedar::aux::LogSingleton::getInstance()->warning
     (
-      "Could not recognizing format: format or meta node missing. Defaulting to current version.",
+      "Could not recognize network format: format or meta node missing. Defaulting to current version.",
       "network reading",
       "cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode&)"
     );
@@ -363,7 +363,7 @@ void cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode& root)
     default:
       cedar::aux::LogSingleton::getInstance()->warning
       (
-        "Could not recognizing format: Unknown format version "
+        "Could not recognize format: Unknown format version "
            + cedar::aux::toString(format_version)
            + ". Defaulting to current version.",
         "network reading",
