@@ -33,6 +33,11 @@
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_YARP
+
+
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/BlockingReader.h"
 #include "cedar/auxiliaries/net/Reader.h"
@@ -273,4 +278,6 @@ std::cout << "done" << std::endl;
 
   return errors;
 }
+
+#endif // CEDAR_USE_YARP
 

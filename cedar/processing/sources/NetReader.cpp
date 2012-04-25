@@ -34,6 +34,9 @@ s
 
 =============================================================================*/
 
+#include "cedar/configuration.h"
+#ifdef CEDAR_USE_YARP
+
 // LOCAL INCLUDES
 #include "cedar/processing/sources/NetReader.h"
 #include "cedar/auxiliaries/net/exceptions.h"
@@ -154,4 +157,5 @@ void cedar::proc::steps::NetReaderSource::compute(const cedar::proc::Arguments&)
 
 }
 
+#endif
 

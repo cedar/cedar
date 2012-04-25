@@ -35,6 +35,9 @@
 
 =============================================================================*/
 
+#include "cedar/configuration.h"
+#ifdef CEDAR_USE_YARP
+
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatHelper.h"
 
@@ -187,4 +190,5 @@ template struct cedar::aux::net::detail::cvMatHelper< cv::Mat_<float> >;
 
 
 } } } } // end namespaces
+#endif
 
