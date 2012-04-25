@@ -93,8 +93,15 @@ cedar::aux::gui::PlotDeclarationPtr cedar::aux::gui::PlotManager::getDefaultDecl
 {
   //!@todo Add a configurable option that specifies a default
 
+  cedar::aux::gui::PlotDeclarationManager::ConstNodePtr closest_node
+    = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->getClosestNode(data);
+
+  // if this assertion fails, there was no node for the given data in the plot manager
+  CEDAR_DEBUG_ASSERT(closest_node);
+
   // check if a default is defined for the given type
-  std::string data_type = cedar::aux::objectTypeToString(data);
+  std::string data_type;
+  data_type = closest_node->getTypeString();
   cedar::aux::gui::PlotManager::normalizeTypeName(data_type);
   std::map<std::string, std::string>::const_iterator iter = this->mDefaultPlots.find(data_type);
   if (iter != this->mDefaultPlots.end())
@@ -118,8 +125,7 @@ cedar::aux::gui::PlotDeclarationPtr cedar::aux::gui::PlotManager::getDefaultDecl
   }
 
   // automatically determine a default plot (the first one in the vector)
-  const std::vector<cedar::aux::gui::PlotDeclarationPtr>& decls
-    = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->getClosest(data);
+  const std::vector<cedar::aux::gui::PlotDeclarationPtr>& decls = closest_node->getData();
 
   return decls.at(0);
 }

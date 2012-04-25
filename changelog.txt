@@ -87,13 +87,14 @@
   - more verbose tooltip for data slots
   - there is now a settings dialog; more settings will be added later.
   - the tab order in the property pane is now working correctly
-  
+
 - build system
-  - You now no longer need to specify CEDAR_BUILD_DIR in your cedar.conf.
   - Projects depending on cedar no longer need to define __LINUX__ etc.; this is now done automatically by the build
     system. 
   - files in the resource folder are now moved to ${CEDAR_INSTALL_PREFIX}/share/resources. Use the
     cedar::aux::System::locateResource function to locate them.
+  - It is no longer necessary to specify CEDAR_BUILD_DIR in the cedar.conf file. Instead, if the variable is not
+    specified, the directory in which you call cmake is automatically selected.
 
 == Version 0.5.1 ==
 - cedar::proc::steps
