@@ -113,8 +113,12 @@ protected:
 
   /*!@brief Checks whether the stream is still valid.
    * @param[in] answerStream string stream to be checked
+   * @param[in] atEndOfStream denotes whether the stream is believed to be at the end
    */
-  void checkStream(const std::istringstream& answerStream) const;
+  void checkStream(const std::istringstream& answerStream, bool atEndOfStream) const;
+
+  //!@brief Updates the member mDistancePerPulse according to the wheel radius and number of pulses per revolution.
+  void updateDistancePerPulse();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

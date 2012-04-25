@@ -56,7 +56,7 @@ mSerialCommunication(communication),
 _mNumberOfPulsesPerRevolution(new cedar::aux::DoubleParameter(this, "number of pulses per revolution", 0.1, 0.0, 1.0)),
 _mEncoderLimits(new cedar::aux::math::IntLimitsParameter(this, "encoder limits", -32768, 0, 0, 32767))
 {
-  mDistancePerPulse = 2.0 * cedar::aux::math::pi * getWheelRadius() / getNumberOfPulsesPerRevolution();
+  updateDistancePerPulse();
 
 #ifdef DEBUG
   // send a dummy-message
@@ -70,9 +70,9 @@ _mEncoderLimits(new cedar::aux::math::IntLimitsParameter(this, "encoder limits",
   {
     cedar::aux::LogSingleton::getInstance()->debugMessage
     (
-      "EPuckDrive: Initialization successful (Answer: '" + answer + "')",
-      "cedar::dev::kteam::EPuckDrive::init()",
-      "EPuckDrive successfully initialized"
+      "Drive: Initialization successful (Answer: '" + answer + "')",
+      "cedar::dev::kteam::Drive::initialize()",
+      "Drive successfully initialized"
     );
   }
   else
@@ -89,6 +89,11 @@ _mEncoderLimits(new cedar::aux::math::IntLimitsParameter(this, "encoder limits",
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dev::kteam::Drive::updateDistancePerPulse()
+{
+  mDistancePerPulse = 2.0 * cedar::aux::math::pi * getWheelRadius() / getNumberOfPulsesPerRevolution();
+}
 
 double cedar::dev::kteam::Drive::getNumberOfPulsesPerRevolution() const
 {
@@ -135,7 +140,7 @@ void cedar::dev::kteam::Drive::sendMovementCommand()
   // the speed has be thresholded based on the maximum possible number
   // of pulses per second (this is hardware-specific).
   // first: convert speed from m/s into Pulses/s ...
-  std::vector<int> wheel_speed_pulses(2);
+  std::vector<int> wheel_speed_pulses(2, 0);
   wheel_speed_pulses[0] = cedar::aux::math::round(this->getWheelSpeed()[0] / mDistancePerPulse);
   wheel_speed_pulses[1] = cedar::aux::math::round(this->getWheelSpeed()[1] / mDistancePerPulse);
 
@@ -174,19 +179,19 @@ std::vector<int> cedar::dev::kteam::Drive::getEncoders() const
 
   // skip the answer characters (e.g., 'q,') at the beginning
   answer_stream.ignore(2);
-  checkStream(answer_stream);
+  checkStream(answer_stream, false);
 
   // read the left encoder value
   answer_stream >> encoders[0];
-  checkStream(answer_stream);
+  checkStream(answer_stream, false);
 
   // skip the colon separating the encoder values
   answer_stream.ignore(1);
-  checkStream(answer_stream);
+  checkStream(answer_stream, false);
 
   // read the right encoder value
   answer_stream >> encoders[1];
-  checkStream(answer_stream);
+  checkStream(answer_stream, true);
 
   // print a debug message that everything worked
   cedar::aux::LogSingleton::getInstance()->debugMessage
@@ -253,14 +258,23 @@ void cedar::dev::kteam::Drive::checkAnswer(const std::string& answer, char comma
   }
 }
 
-void cedar::dev::kteam::Drive::checkStream(const std::istringstream& answerStream) const
+void cedar::dev::kteam::Drive::checkStream(const std::istringstream& answerStream, bool atEndOfStream) const
 {
-  if (answerStream.fail() || answerStream.eof())
+  if (answerStream.fail() || (!atEndOfStream && answerStream.eof()))
   {
+    if (answerStream.fail())
+    {
+      std::cout << "answer stream failed" << std::endl;
+    }
+    if (answerStream.eof())
+    {
+      std::cout << "answer stream eof" << std::endl;
+    }
+
     CEDAR_THROW
     (
       cedar::dev::SerialCommunicationException,
-      "Error while parsing answer received from robot. Answer ends unexpectately."
+      "Error while parsing answer received from robot. Unexpected structure of answer. (Answer: " + answerStream.str() + "\")"
     );
   }
 }

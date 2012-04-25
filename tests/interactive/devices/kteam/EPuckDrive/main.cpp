@@ -44,24 +44,24 @@
 
 int main(int argc, char **argv)
 {
-  QApplication a(argc, argv);
+  QApplication application(argc, argv);
 
-  // open the channel to the e-puck
+  // open the channel to the epuck
   cedar::dev::com::SerialCommunicationPtr communication(new cedar::dev::com::SerialCommunication());
-  communication->readJson("SerialCommunicationConfig.json");
+  communication->readJson("../SerialCommunicationConfig.json");
 
-  // initialize e-puck-drive
+  // initialize epuck-drive
   cedar::dev::kteam::EPuckDrivePtr drive(new cedar::dev::kteam::EPuckDrive(communication));
+  drive->readJson("../EPuckDriveConfig.json");
 
   // open the control-GUI
   cedar::dev::kteam::gui::EPuckControlWidgetPtr epuck_control(new cedar::dev::kteam::gui::EPuckControlWidget(drive));
   epuck_control->show();
 
   //start the program
-  QApplication application(argc, argv);
   application.exec();
 
-  //reset the e-puck
+  //reset the epuck
   drive->reset();
 
   return 0;

@@ -24,9 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Oliver Lomp
-#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-#   Date:        2012 02 22
+#   Maintainer:  Mathis Richter
+#   Email:       mathis.richter@ini.rub.de
+#   Date:        2012 04 25
 #
 #   Description:
 #
@@ -34,5 +34,4 @@
 #
 #=======================================================================================================================
 
-cedar_add_interactive_test("EPuckDrive" EPuckDriveTest.cpp)
-cedar_add_interactive_test("KTeamDriveModel" KTeamDriveModelTest.cpp)
+cedar_add_interactive_test("EPuckDrive" main.cpp)

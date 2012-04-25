@@ -65,17 +65,17 @@
 cedar::dev::com::SerialCommunication::SerialCommunication()
 :
 mInitialized(false),
-_mDevicePath(new cedar::aux::StringParameter(this, "DevicePath", "/dev/rfcomm0")),
-_mEndOfCommandString(new cedar::aux::StringParameter(this, "EndOfCommandString", "\\r\\n")),
-_mCFlag(new cedar::aux::IntParameter(this, "CFlag", 0, 0, 1)),
-_mBaudrate(new cedar::aux::UIntParameter(this, "BaudRate", 4098, 0, 1000000)),
-_mTimeOut(new cedar::aux::UIntParameter(this, "TimeOut", 250000, 0, 1000000)),
-_mLatency(new cedar::aux::UIntParameter(this, "Latency", 10000, 0, 1000000))
+_mDevicePath(new cedar::aux::StringParameter(this, "device path", "/dev/rfcomm0")),
+_mEndOfCommandString(new cedar::aux::StringParameter(this, "end of command string", "\\r\\n")),
+_mCountryFlag(new cedar::aux::IntParameter(this, "country flag", 0, 0, 1)),
+_mBaudrate(new cedar::aux::UIntParameter(this, "baud rate", 4098, 0, 1000000)),
+_mTimeOut(new cedar::aux::UIntParameter(this, "time out", 250000, 0, 1000000)),
+_mLatency(new cedar::aux::UIntParameter(this, "latency", 10000, 0, 1000000))
 {
   // currently, parameters for this class cannot be changed online.
   _mDevicePath->setConstant(true);
   _mEndOfCommandString->setConstant(true);
-  _mCFlag->setConstant(true);
+  _mCountryFlag->setConstant(true);
   _mBaudrate->setConstant(true);
   _mTimeOut->setConstant(true);
   _mLatency->setConstant(true);
@@ -119,9 +119,9 @@ char cedar::dev::com::SerialCommunication::determineCorrectAnswer(char commandCh
   return std::use_facet< std::ctype<char> >(locale).tolower(commandCharacter);
 }
 
-int cedar::dev::com::SerialCommunication::getCFlag() const
+int cedar::dev::com::SerialCommunication::getCountryFlag() const
 {
-  return _mCFlag->getValue();
+  return _mCountryFlag->getValue();
 }
 
 unsigned int cedar::dev::com::SerialCommunication::getBaudrate() const
@@ -199,7 +199,7 @@ void cedar::dev::com::SerialCommunication::initialize()
   mTerminal.c_lflag = 0;
 
   // set bps rate, hardware flow control, and 8n2 (8 bit, no parity, 2 stop bit)
-  switch (_mCFlag->getValue())
+  switch (_mCountryFlag->getValue())
   {
     case 0:
     {
@@ -213,7 +213,11 @@ void cedar::dev::com::SerialCommunication::initialize()
     }
     default:
     {
-      CEDAR_THROW(cedar::dev::SerialCommunicationException, "Wrong CFlag (set CFlag to 0 for Germany or 1 for USA.)");
+      CEDAR_THROW
+      (
+        cedar::dev::SerialCommunicationException,
+        "Wrong country flag (set flag to 0 for Germany or 1 for USA.)"
+      );
     }
   }
 
@@ -336,12 +340,12 @@ void cedar::dev::com::SerialCommunication::send(const std::string& command)
   std::ostringstream message;
   message << "Successfully sent data ("
           << status
-          << " Bytes written to '"
+          << " bytes written to '"
           << getDevicePath()
-          << "')\n"
-          << "Sending time: "
+          << "'), "
+          << "sending time: "
           << timer.elapsed()
-          << " ms\n";
+          << " ms";
 
   cedar::aux::LogSingleton::getInstance()->debugMessage
   (
@@ -379,7 +383,7 @@ std::string cedar::dev::com::SerialCommunication::receive()
   // status-information
   int status = 0;
   // number of bytes read
-  int read_bytes = -1;
+  int read_bytes = 0;
 
   fd_set read_fds;
   struct timeval tv;
@@ -387,7 +391,7 @@ std::string cedar::dev::com::SerialCommunication::receive()
   FD_ZERO(&read_fds);
   FD_SET(mFileDescriptor, &read_fds);
 
-  while (read_bytes < 0); // end-of-command string not found
+  do
   {
     tv.tv_sec = 0;
     tv.tv_usec = _mTimeOut->getValue();
@@ -436,6 +440,7 @@ std::string cedar::dev::com::SerialCommunication::receive()
     //search for end-of-command string, read_bytes = -1 if it is not found
     read_bytes = ans.str().find(mTranslatedEndOfCommandString);
   }
+  while (read_bytes < 0); // end-of-command string not found
 
   // write received string to desired location
   answer = ans.str();
