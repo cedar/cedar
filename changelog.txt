@@ -59,6 +59,8 @@
     also have a new constructor that takes a math::Limits object which is the new, recommended way of setting the
     limits. The same is true for NumericVectorParameters.
   - Added Data classes for stereo images and image sets.
+  - There is now a generalized structure for convolution. This structure wraps opencv and, optionally, fftw convolution!
+    For more, see the documentation for the cedar::aux::conv::Convolution class.
 
 - cedar::proc
   - added directional arrows for graphical connections in processingIde

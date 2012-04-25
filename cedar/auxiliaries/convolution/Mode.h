@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        EnumParameter.h
+    File:        Mode.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 28
+    Date:        2012 03 19
 
     Description:
 
@@ -34,77 +34,54 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_ENUM_PARAMETER_H
-#define CEDAR_AUX_ENUM_PARAMETER_H
+#ifndef CEDAR_AUX_CONV_MODE_H
+#define CEDAR_AUX_CONV_MODE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/convolution/namespace.h"
 #include "cedar/auxiliaries/EnumBase.h"
 
 // SYSTEM INCLUDES
-#include <set>
 
-/*!@brief A parameter storing an enum value.
+
+/*!@brief Enum describing the convolution mode.
  *
- * More detailed description of the class coming soon.
+ *        This parameter describes the mode of the convolution. It has two values:
+ *        <ul>
+ *          <li>@em Full: The result is the full convolution, i.e., nothing is cut away.</li>
+ *          <li>@em Same: The result of the convolution has the same size as the input matrix.</li>
+ *        </ul>
  */
-class cedar::aux::EnumParameter : public cedar::aux::Parameter
+class cedar::aux::conv::Mode
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //! The enum id
+  typedef cedar::aux::EnumId Id;
+
+  //! Pointer type to the enum base object of this class.
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  EnumParameter(cedar::aux::Configurable *pOwner,
-                const std::string& name,
-                boost::shared_ptr<cedar::aux::EnumBase> enumBase);
-
-  //!@brief The standard constructor, with an additional default value.
-  EnumParameter(cedar::aux::Configurable *pOwner,
-                const std::string& name,
-                boost::shared_ptr<cedar::aux::EnumBase> enumBase,
-                cedar::aux::EnumId defaultValue);
+  // none
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief read from a configuration node
-  void readFromNode(const cedar::aux::ConfigurationNode& root);
+  //! Initialization of the enum values.
+  static void construct();
 
-  //!@brief write to a configuration node
-  void writeToNode(cedar::aux::ConfigurationNode& root) const;
+  //! Returns a reference to the base enum object.
+  static const cedar::aux::EnumBase& type();
 
-  //!@brief set enum value to default
-  void makeDefault();
-
-  //!@brief return the enum value
-  cedar::aux::Enum getValue() const;
-
-  //!@brief set enum value to a specified id
-  void set(const std::string& enumId);
-
-  //!@brief get the enum from which this parameter represents an entry
-  const cedar::aux::EnumBase& getEnumDeclaration()
-  {
-    return *(this->mEnumDeclaration);
-  }
-
-  //! Disables the given option.
-  void disable(cedar::aux::EnumId value);
-
-  //! Enables the given option.
-  void enable(cedar::aux::EnumId value);
-
-  //! Enables or disables the given option
-  void setEnabled(cedar::aux::EnumId value, bool enabled);
-
-  //! Enables all values.
-  void enableAll();
-
-  //! Tests if the given value is enabled.
-  bool isEnabled(cedar::aux::EnumId value) const;
+  //! Returns a pointer to the base enum object.
+  static const cedar::aux::conv::Mode::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -121,20 +98,23 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  //! The output image has the same size as the input.
+  static const Id Same = 0;
+
+  //! The output image is large enough so that no values have to be discarded.
+  static const Id Full = 1;
+
+  //! Only use the results where no border handling was necessary.
+  static const Id Valid = 2;
+
 protected:
   // none yet
 private:
-  //!@brief the enum value of this parameter
-  cedar::aux::EnumId mValue;
+  //! The type object for this enum class.
+  static cedar::aux::EnumType<cedar::aux::conv::Mode> mType;
 
-  //!@brief the default value of this parameter
-  cedar::aux::EnumId mDefault;
+}; // class cedar::aux::conv::Mode
 
-  //!@brief a pointer to the enum used by this parameter
-  boost::shared_ptr<cedar::aux::EnumBase> mEnumDeclaration;
+#endif // CEDAR_AUX_CONV_MODE_H
 
-  //!@brief Set of all the disabled enum values.
-  std::set<cedar::aux::EnumId> mDisabledValues;
-}; // class cedar::aux::VectorParameter
-
-#endif // CEDAR_AUX_ENUM_PARAMETER_H

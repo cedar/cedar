@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/IntVectorParameter.h"
 #include "cedar/processing/namespace.h"
 
 // SYSTEM INCLUDES
@@ -75,12 +76,11 @@ class cedar::aux::kernel::Kernel : public QObject, public cedar::aux::Configurab
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  Kernel();
   /*!@brief Constructor with some parameters.
    * @param dimensionality the dimensionality of a kernel
    */
-  Kernel(unsigned int dimensionality);
+  Kernel(unsigned int dimensionality = 2);
+
   //!@brief Destructor
   virtual ~Kernel();
   //--------------------------------------------------------------------------------------------------------------------
@@ -98,11 +98,9 @@ public:
    * @return the kernel matrix
    */
   virtual const cv::Mat& getKernel() const;
+
   //!@brief get the internal DataPtr
   const cedar::aux::DataPtr getKernelRaw() const;
-
-  //!@brief Calculates the convolution of the kernel and the matrix.
-  virtual cv::Mat convolveWith(const cv::Mat& mat) const;
 
   /*!@brief get access to the write lock when in an asynchronous mode
    * @return pointer to the QReadWriteLock
@@ -123,6 +121,36 @@ public:
    */
   void hideDimensionality(bool hide);
 
+  /*!@brief Locks the kernel for reading.
+   */
+  inline void lockForRead() const
+  {
+    this->mpReadWriteLockOutput->lockForRead();
+  }
+
+  /*!@brief Locks the kernel for reading.
+   */
+  inline void lockForWrite() const
+  {
+    this->mpReadWriteLockOutput->lockForWrite();
+  }
+
+  /*!@brief Unlocks the kernel.
+   */
+  inline void unlock() const
+  {
+    this->mpReadWriteLockOutput->unlock();
+  }
+
+  /*!@brief Returns the kernel's shift.
+   */
+  inline const std::vector<int>& getAnchor() const
+  {
+    return this->_mAnchor->getValue();
+  }
+
+  virtual unsigned int getSize(size_t dimension) const;
+
 public slots:
   //!@todo merge update kernel and calculate, if calculate can be set to public and pure virtual works with Qt..
   void updateKernel();
@@ -142,8 +170,10 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  // none yet
+private slots:
+  //!@brief Reacts to a change in the dimensionality of the kernel.
+  void dimensionalityChanged();
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -152,7 +182,7 @@ protected:
   //!@brief matrix containing the kernel
   cedar::aux::MatDataPtr mKernel;
   //!@brief read and write lock to protect the kernel when calculating its values
-  QReadWriteLock *mpReadWriteLockOutput;
+  mutable QReadWriteLock *mpReadWriteLockOutput;
 private:
   // none yet
 
@@ -165,6 +195,9 @@ protected:
   //!@todo put this to a separate kernel implementation
   // a file from which the kernel matrix can be loaded
   //cedar::aux::StringParameterPtr _mKernelMatrixFile;
+
+  //!@brief Anchor of the kernel, relative to the center.
+  cedar::aux::IntVectorParameterPtr _mAnchor;
 
 private:
   // none yet

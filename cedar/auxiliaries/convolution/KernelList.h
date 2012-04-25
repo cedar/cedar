@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        EnumParameter.h
+    File:        KernelList.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 28
+    Date:        2012 03 13
 
     Description:
 
@@ -34,77 +34,81 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_ENUM_PARAMETER_H
-#define CEDAR_AUX_ENUM_PARAMETER_H
+#ifndef CEDAR_AUX_CONV_KERNEL_LIST_H
+#define CEDAR_AUX_CONV_KERNEL_LIST_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/Parameter.h"
-#include "cedar/auxiliaries/EnumBase.h"
+#include "cedar/auxiliaries/convolution/namespace.h"
+#include "cedar/auxiliaries/kernel/namespace.h"
 
 // SYSTEM INCLUDES
-#include <set>
+#include <boost/signals2.hpp>
+#include <vector>
 
-/*!@brief A parameter storing an enum value.
- *
- * More detailed description of the class coming soon.
+/*!@brief This is a structure for storing a list of kernels.
  */
-class cedar::aux::EnumParameter : public cedar::aux::Parameter
+class cedar::aux::conv::KernelList
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+  // none yet
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  EnumParameter(cedar::aux::Configurable *pOwner,
-                const std::string& name,
-                boost::shared_ptr<cedar::aux::EnumBase> enumBase);
+  void append(cedar::aux::kernel::KernelPtr kernel);
 
-  //!@brief The standard constructor, with an additional default value.
-  EnumParameter(cedar::aux::Configurable *pOwner,
-                const std::string& name,
-                boost::shared_ptr<cedar::aux::EnumBase> enumBase,
-                cedar::aux::EnumId defaultValue);
+  void remove(size_t index);
+
+  inline void setKernel(size_t index, cedar::aux::kernel::KernelPtr kernel)
+  {
+    this->mKernels.at(index) = kernel;
+
+    this->mKernelChangedSignal(index);
+  }
+
+  inline void resize(size_t size)
+  {
+    this->mKernels.resize(size);
+  }
+
+  inline cedar::aux::kernel::ConstKernelPtr getKernel(size_t i) const
+  {
+    return this->mKernels.at(i);
+  }
+
+  inline size_t size() const
+  {
+    return this->mKernels.size();
+  }
+
+  inline void clear()
+  {
+    this->mKernels.clear();
+  }
+
+  inline boost::signals2::connection connectToKernelAddedSignal(boost::function<void (size_t)> slot)
+  {
+    return this->mKernelAddedSignal.connect(slot);
+  }
+
+  inline boost::signals2::connection connectToKernelChangedSignal(boost::function<void (size_t)> slot)
+  {
+    return this->mKernelChangedSignal.connect(slot);
+  }
+
+  inline boost::signals2::connection connectToKernelRemovedSignal(boost::function<void (size_t)> slot)
+  {
+    return this->mKernelRemovedSignal.connect(slot);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief read from a configuration node
-  void readFromNode(const cedar::aux::ConfigurationNode& root);
-
-  //!@brief write to a configuration node
-  void writeToNode(cedar::aux::ConfigurationNode& root) const;
-
-  //!@brief set enum value to default
-  void makeDefault();
-
-  //!@brief return the enum value
-  cedar::aux::Enum getValue() const;
-
-  //!@brief set enum value to a specified id
-  void set(const std::string& enumId);
-
-  //!@brief get the enum from which this parameter represents an entry
-  const cedar::aux::EnumBase& getEnumDeclaration()
-  {
-    return *(this->mEnumDeclaration);
-  }
-
-  //! Disables the given option.
-  void disable(cedar::aux::EnumId value);
-
-  //! Enables the given option.
-  void enable(cedar::aux::EnumId value);
-
-  //! Enables or disables the given option
-  void setEnabled(cedar::aux::EnumId value, bool enabled);
-
-  //! Enables all values.
-  void enableAll();
-
-  //! Tests if the given value is enabled.
-  bool isEnabled(cedar::aux::EnumId value) const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -124,17 +128,25 @@ private:
 protected:
   // none yet
 private:
-  //!@brief the enum value of this parameter
-  cedar::aux::EnumId mValue;
+  //! A vector of all the kernels in this list.
+  std::vector<cedar::aux::kernel::KernelPtr> mKernels;
 
-  //!@brief the default value of this parameter
-  cedar::aux::EnumId mDefault;
+  boost::signals2::signal<void (size_t)> mKernelAddedSignal;
 
-  //!@brief a pointer to the enum used by this parameter
-  boost::shared_ptr<cedar::aux::EnumBase> mEnumDeclaration;
+  boost::signals2::signal<void (size_t)> mKernelChangedSignal;
 
-  //!@brief Set of all the disabled enum values.
-  std::set<cedar::aux::EnumId> mDisabledValues;
-}; // class cedar::aux::VectorParameter
+  boost::signals2::signal<void (size_t)> mKernelRemovedSignal;
 
-#endif // CEDAR_AUX_ENUM_PARAMETER_H
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  // none yet
+
+}; // class cedar::aux::conv::KernelList
+
+#endif // CEDAR_AUX_CONV_KERNEL_LIST_H
+

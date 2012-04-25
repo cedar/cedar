@@ -83,6 +83,15 @@ namespace cedar
       //!@brief a templated round function
       template <typename T> T round(T val);
 
+      /*!@brief   Limits a number to be in the range [lower, upper].
+       *
+       * @returns max(lower, min(value, upper))
+       */
+      template <typename T> inline T saturate(const T& value, const T& lower, const T& upper)
+      {
+        return std::max(lower, std::min(value, upper));
+      }
+
       //!@brief a helper function to determine the real dimensionality of a cv::Mat (matrix.dims works only for 2+ dims)
       inline unsigned int getDimensionalityOf(const cv::Mat& matrix)
       {
@@ -213,7 +222,7 @@ namespace cedar
        * @deprecated This method is deprecated. It will be replaced by cedar::aux::conv::Convolution in the long run.
        * @todo       Remove this function.
        */
-      cv::Mat convolve(const cv::Mat& matrix, const cv::Mat& kernel);
+      CEDAR_DECLARE_DEPRECATED(cv::Mat convolve(const cv::Mat& matrix, const cv::Mat& kernel));
 
       /*!\brief Same functionality as cvReduce for 2D->1D.
        *

@@ -36,6 +36,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/Convolution.h"
+#include "cedar/auxiliaries/convolution/BorderType.h"
+#include "cedar/auxiliaries/convolution/Mode.h"
+#include "cedar/auxiliaries/convolution/OpenCV.h"
+#include "cedar/auxiliaries/kernel/Kernel.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 
@@ -43,10 +48,136 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::aux::conv::Convolution::Convolution()
+:
+mCombinedKernel(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
+_mBorderType
+(
+  new cedar::aux::EnumParameter
+  (
+    this,
+    "borderType",
+    cedar::aux::conv::BorderType::typePtr(),
+    cedar::aux::conv::BorderType::Zero
+  )
+),
+_mMode
+(
+  new cedar::aux::EnumParameter
+  (
+    this,
+    "mode",
+    cedar::aux::conv::Mode::typePtr(),
+    cedar::aux::conv::Mode::Same
+  )
+),
+_mEngine
+(
+  new cedar::aux::conv::EngineParameter(this, "engine", cedar::aux::conv::EnginePtr(new cedar::aux::conv::OpenCV()))
+)
+{
+  this->selectedEngineChanged();
+
+  QObject::connect(this->_mEngine.get(), SIGNAL(valueChanged()), this, SLOT(selectedEngineChanged()));
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-cv::Mat cedar::aux::conv::Convolution::operator()(const cv::Mat& matrix, const cv::Mat& kernel) const
+
+void cedar::aux::conv::Convolution::slotKernelAdded(size_t index)
 {
-  return this->convolve(matrix, kernel);
+  cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList().getKernel(index);
+  QObject::connect(kernel.get(), SIGNAL(kernelUpdated()), this, SLOT(updateCombinedKernel()));
+  this->updateCombinedKernel();
+}
+
+void cedar::aux::conv::Convolution::slotKernelChanged(size_t)
+{
+  this->updateCombinedKernel();
+}
+
+void cedar::aux::conv::Convolution::slotKernelRemoved(size_t)
+{
+  this->updateCombinedKernel();
+  //!@todo disconnect kernelUpdated slot!
+}
+
+void cedar::aux::conv::Convolution::updateCombinedKernel()
+{
+  //!@todo make that this works for more than one/two dimensional kernels
+  cv::Mat new_combined_kernel = cv::Mat::zeros(1, 1, CV_32F);
+
+  for (size_t i = 0; i < this->getKernelList().size(); ++i)
+  {
+    cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList().getKernel(i);
+    kernel->lockForRead();
+    cv::Mat kernel_mat = kernel->getKernel();
+    kernel->unlock();
+
+    if (kernel_mat.rows > new_combined_kernel.rows || kernel_mat.cols > new_combined_kernel.cols)
+    {
+      int dw = std::max(0, (kernel_mat.cols - new_combined_kernel.cols + 1)/2);
+      int dh = std::max(0, (kernel_mat.rows - new_combined_kernel.rows + 1)/2);
+      cv::copyMakeBorder(new_combined_kernel, new_combined_kernel, dh, dh, dw, dw, cv::BORDER_CONSTANT, cv::Scalar(0));
+    }
+    int row_lower = (new_combined_kernel.rows - kernel_mat.rows)/2;
+    int row_upper = row_lower + kernel_mat.rows;
+    int col_lower = (new_combined_kernel.cols - kernel_mat.cols)/2;
+    int col_upper = col_lower + kernel_mat.cols;
+    cv::Range row_range(row_lower, row_upper);
+    cv::Range col_range(col_lower, col_upper);
+
+    new_combined_kernel(row_range, col_range) += kernel_mat;
+  }
+
+  this->mCombinedKernel->lockForWrite();
+  this->mCombinedKernel->setData(new_combined_kernel);
+  this->mCombinedKernel->unlock();
+}
+
+void cedar::aux::conv::Convolution::selectedEngineChanged()
+{
+  mKernelAddedConnection.disconnect();
+  mKernelChangedConnection.disconnect();
+  mKernelRemovedConnection.disconnect();
+
+  // connect to the new kernel list.
+  mKernelAddedConnection = this->getKernelList().connectToKernelAddedSignal
+                           (
+                             boost::bind(&cedar::aux::conv::Convolution::slotKernelAdded, this, _1)
+                           );
+
+  mKernelChangedConnection = this->getKernelList().connectToKernelChangedSignal
+                             (
+                               boost::bind(&cedar::aux::conv::Convolution::slotKernelChanged, this, _1)
+                             );
+
+  mKernelRemovedConnection = this->getKernelList().connectToKernelRemovedSignal
+                             (
+                               boost::bind(&cedar::aux::conv::Convolution::slotKernelRemoved, this, _1)
+                             );
+
+  this->updateEngineCapabilities();
+
+  this->updateCombinedKernel();
+}
+
+void cedar::aux::conv::Convolution::updateEngineCapabilities()
+{
+  this->_mMode->enableAll();
+  const std::vector<cedar::aux::Enum>& modes = cedar::aux::conv::Mode::type().list();
+  for (size_t i = 0; i < modes.size(); ++i)
+  {
+    const cedar::aux::Enum& enum_value = modes.at(i);
+    this->_mMode->setEnabled(enum_value, this->getEngine()->checkModeCapability(enum_value));
+  }
+
+  this->_mBorderType->enableAll();
+  const std::vector<cedar::aux::Enum>& border_types = cedar::aux::conv::BorderType::type().list();
+  for (size_t i = 0; i < border_types.size(); ++i)
+  {
+    const cedar::aux::Enum& enum_value = border_types.at(i);
+    this->_mBorderType->setEnabled(enum_value, this->getEngine()->checkBorderTypeCapability(enum_value));
+  }
 }

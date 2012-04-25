@@ -136,6 +136,8 @@ namespace cedar
     typedef NumericVectorParameter<double> DoubleVectorParameter;
     //!@brief A concretization of NumericVectorParameter for unsigned int values.
     typedef NumericVectorParameter<unsigned int> UIntVectorParameter;
+    //!@brief A concretization of NumericVectorParameter for unsigned int values.
+    typedef NumericVectorParameter<int> IntVectorParameter;
 
     //!@brief A class for associating data with types and mapping the type hierarchy as well.
     template <typename DataType, typename RootType> class TypeHierarchyMap;
@@ -147,6 +149,7 @@ namespace cedar
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleVectorParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntVectorParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringVectorParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntParameter);

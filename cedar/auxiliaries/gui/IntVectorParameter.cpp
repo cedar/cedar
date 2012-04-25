@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        EnumParameter.cpp
+    File:        IntVectorParameter.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 28
+    Date:        2012 03 12
 
     Description:
 
@@ -35,15 +35,14 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/EnumParameter.h"
-#include "cedar/auxiliaries/EnumParameter.h"
-#include "cedar/defines.h"
+#include "cedar/auxiliaries/gui/IntVectorParameter.h"
+#include "cedar/auxiliaries/IntVectorParameter.h"
+#include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
-#include <QHBoxLayout>
-#include <QStandardItemModel>
+#include <QVBoxLayout>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -53,8 +52,8 @@ namespace
 {
   bool registered = cedar::aux::gui::ParameterFactorySingleton::getInstance()->add
       <
-        cedar::aux::EnumParameter,
-        cedar::aux::gui::EnumParameter
+        cedar::aux::IntVectorParameter,
+        cedar::aux::gui::IntVectorParameter
       >();
 }
 
@@ -62,74 +61,79 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gui::EnumParameter::EnumParameter(QWidget *pParent)
+cedar::aux::gui::IntVectorParameter::IntVectorParameter(QWidget *pParent)
 :
 cedar::aux::gui::Parameter(pParent)
 {
-  this->setLayout(new QHBoxLayout());
-  this->mpEdit = new QComboBox();
+  this->setLayout(new QVBoxLayout());
   this->layout()->setContentsMargins(0, 0, 0, 0);
-  this->layout()->addWidget(this->mpEdit);
-
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
-}
-
-//!@brief Destructor
-cedar::aux::gui::EnumParameter::~EnumParameter()
-{
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gui::EnumParameter::parameterPointerChanged()
+
+void cedar::aux::gui::IntVectorParameter::parameterPointerChanged()
 {
-  cedar::aux::EnumParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::EnumParameter>(this->getParameter());
+  cedar::aux::IntVectorParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::aux::IntVectorParameter>(this->getParameter());
 
-  this->mpEdit->clear();
-  int select_index = -1;
-  for (size_t i = 0; i < parameter->getEnumDeclaration().list().size(); ++i)
-  {
-    const cedar::aux::Enum& enum_val = parameter->getEnumDeclaration().list().at(i);
-    if (enum_val == parameter->getValue())
-    {
-      select_index = static_cast<int>(i);
-    }
-    QVariant data(QString(enum_val.name().c_str()));
-    this->mpEdit->addItem(enum_val.prettyString().c_str(), data);
-    int item_index = this->mpEdit->findData(data);
-    QStandardItemModel* model = qobject_cast<QStandardItemModel*>(this->mpEdit->model());
-
-    CEDAR_DEBUG_ASSERT(model != NULL);
-
-    QModelIndex index = model->index(item_index, this->mpEdit->modelColumn(), this->mpEdit->rootModelIndex());
-    QStandardItem* p_item = model->itemFromIndex(index);
-    CEDAR_DEBUG_ASSERT(p_item != NULL);
-    p_item->setEnabled(parameter->isEnabled(enum_val));
-  }
-  if(select_index != -1)
-  {
-    this->mpEdit->setCurrentIndex(select_index);
-  }
-
-  QObject::connect
-  (
-    this->mpEdit,
-    SIGNAL(currentIndexChanged(const QString&)),
-    this,
-    SLOT(currentIndexChanged(const QString&))
-  );
+  QObject::connect(parameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertyChanged()));
+  this->propertyChanged();
 }
 
-void cedar::aux::gui::EnumParameter::currentIndexChanged(const QString&)
+void cedar::aux::gui::IntVectorParameter::propertyChanged()
 {
-  if (this->mpEdit->currentIndex() != -1)
+  cedar::aux::IntVectorParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::aux::IntVectorParameter>(this->getParameter());
+  //!@todo Don't throw away old spinboxes, reuse them instead
+  // Create the appropriate amount of spinboxes
+  if (this->mSpinboxes.size() != parameter->size())
   {
-    cedar::aux::EnumParameterPtr parameter;
-    parameter = boost::dynamic_pointer_cast<cedar::aux::EnumParameter>(this->getParameter());
-    QString value = this->mpEdit->itemData(this->mpEdit->currentIndex(), Qt::UserRole).toString();
-    parameter->set(value.toStdString());
+    for (size_t i = 0; i < this->mSpinboxes.size(); ++i)
+    {
+      delete this->mSpinboxes.at(i);
+    }
+    this->mSpinboxes.clear();
+
+    for (size_t i = 0; i < parameter->size(); ++i)
+    {
+      QSpinBox *p_widget = new QSpinBox();
+      this->mSpinboxes.push_back(p_widget);
+      this->layout()->addWidget(p_widget);
+      p_widget->setMinimumHeight(20);
+
+      // the limits have to be set here already so the value is set properly.
+      this->mSpinboxes.at(i)->setMinimum(parameter->getMinimum());
+      this->mSpinboxes.at(i)->setMaximum(parameter->getMaximum());
+      p_widget->setValue(parameter->at(i));
+      QObject::connect(p_widget, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
+    }
+
+    emit heightChanged();
   }
+
+  // Update the spinboxes' properties
+  for (size_t i = 0; i < this->mSpinboxes.size(); ++i)
+  {
+    this->mSpinboxes.at(i)->setMinimum(parameter->getMinimum());
+    this->mSpinboxes.at(i)->setMaximum(parameter->getMaximum());
+    this->mSpinboxes.at(i)->setEnabled(!parameter->isConstant());
+  }
+}
+
+void cedar::aux::gui::IntVectorParameter::valueChanged(int)
+{
+  cedar::aux::IntVectorParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::aux::IntVectorParameter>(this->getParameter());
+  std::vector<int> values = parameter->getValue();
+  CEDAR_DEBUG_ASSERT(this->mSpinboxes.size() == values.size());
+  for (size_t i = 0; i < values.size(); ++i)
+  {
+    values.at(i) = this->mSpinboxes.at(i)->value();
+  }
+
+  parameter->set(values);
 }

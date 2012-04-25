@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,47 +22,41 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        ConvolutionEngine.cpp
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2011 07 14
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 03 15
 
-    Description: Namespace file for cedar::aux::kernel.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_KERNEL_NAMESPACE_H
-#define CEDAR_AUX_KERNEL_NAMESPACE_H
-
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/defines.h"
+#include "cedar/auxiliaries/convolution/Engine.h"
+#include "cedar/auxiliaries/kernel/Separable.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
 
-namespace cedar
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+cv::Mat cedar::aux::conv::Engine::convolve
+        (
+          const cv::Mat& matrix,
+          cedar::aux::kernel::ConstSeparablePtr kernel,
+          cedar::aux::conv::BorderType::Id borderType,
+          cedar::aux::conv::BorderType::Id mode
+        )
+        const
 {
-  /*!@brief Namespace for all aux classes. */
-  namespace aux
-  {
-  /*!@brief Namespace for all kernel classes. */
-    namespace kernel
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_AUX_CLASS(Box);
-      CEDAR_DECLARE_AUX_CLASS(Kernel);
-      CEDAR_DECLARE_AUX_CLASS(Separable);
-      CEDAR_DECLARE_AUX_CLASS(Gauss);
-      //!@endcond
-
-      //!@brief The factory manager for kernel classes.
-      typedef cedar::aux::FactoryManager<cedar::aux::kernel::KernelPtr> FactoryManager;
-    }
-  }
+  // default implementation: call the normal convolve method
+  return this->convolve(matrix, cedar::aux::kernel::ConstKernelPtr(kernel), borderType, mode);
 }
-
-#endif // CEDAR_AUX_KERNEL_NAMESPACE_H

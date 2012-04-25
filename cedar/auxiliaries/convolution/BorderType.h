@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        EnumParameter.h
+    File:        BorderType.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 28
+    Date:        2012 03 14
 
     Description:
 
@@ -34,77 +34,51 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_ENUM_PARAMETER_H
-#define CEDAR_AUX_ENUM_PARAMETER_H
+#ifndef CEDAR_AUX_CONV_BORDER_TYPE_H
+#define CEDAR_AUX_CONV_BORDER_TYPE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/convolution/namespace.h"
 #include "cedar/auxiliaries/EnumBase.h"
 
 // SYSTEM INCLUDES
-#include <set>
 
-/*!@brief A parameter storing an enum value.
- *
- * More detailed description of the class coming soon.
+
+/*!@brief An enum class for the different kinds of border handling in convolution methods.
  */
-class cedar::aux::EnumParameter : public cedar::aux::Parameter
+class cedar::aux::conv::BorderType
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //! The type of the enum values.
+  typedef cedar::aux::EnumId Id;
+
+  //! The pointer type of the enum base object.
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  EnumParameter(cedar::aux::Configurable *pOwner,
-                const std::string& name,
-                boost::shared_ptr<cedar::aux::EnumBase> enumBase);
-
-  //!@brief The standard constructor, with an additional default value.
-  EnumParameter(cedar::aux::Configurable *pOwner,
-                const std::string& name,
-                boost::shared_ptr<cedar::aux::EnumBase> enumBase,
-                cedar::aux::EnumId defaultValue);
+  // none
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief read from a configuration node
-  void readFromNode(const cedar::aux::ConfigurationNode& root);
+  /*!@brief Initializes the enum values.
+   */
+  static void construct();
 
-  //!@brief write to a configuration node
-  void writeToNode(cedar::aux::ConfigurationNode& root) const;
+  /*!@brief Returns a reference to the enum base object.
+   */
+  static const cedar::aux::EnumBase& type();
 
-  //!@brief set enum value to default
-  void makeDefault();
-
-  //!@brief return the enum value
-  cedar::aux::Enum getValue() const;
-
-  //!@brief set enum value to a specified id
-  void set(const std::string& enumId);
-
-  //!@brief get the enum from which this parameter represents an entry
-  const cedar::aux::EnumBase& getEnumDeclaration()
-  {
-    return *(this->mEnumDeclaration);
-  }
-
-  //! Disables the given option.
-  void disable(cedar::aux::EnumId value);
-
-  //! Enables the given option.
-  void enable(cedar::aux::EnumId value);
-
-  //! Enables or disables the given option
-  void setEnabled(cedar::aux::EnumId value, bool enabled);
-
-  //! Enables all values.
-  void enableAll();
-
-  //! Tests if the given value is enabled.
-  bool isEnabled(cedar::aux::EnumId value) const;
+  /*!@brief Returns a pointer to the enum base object.
+   */
+  static const cedar::aux::conv::BorderType::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -121,20 +95,27 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  //! Borders are considered cyclic.
+  static const Id Cyclic = 0;
+
+  //! Values at the borders are considered zero.
+  static const Id Zero = 1;
+
+  //! The values at the borders are the same as those of the closest point in the image.
+  static const Id Replicate = 2;
+
+  //! Borders are mirror-images of the actual image.
+  static const Id Reflect = 3;
+
 protected:
   // none yet
+
 private:
-  //!@brief the enum value of this parameter
-  cedar::aux::EnumId mValue;
+  //! The enum object.
+  static cedar::aux::EnumType<cedar::aux::conv::BorderType> mType;
 
-  //!@brief the default value of this parameter
-  cedar::aux::EnumId mDefault;
+}; // class cedar::aux::conv::BorderType
 
-  //!@brief a pointer to the enum used by this parameter
-  boost::shared_ptr<cedar::aux::EnumBase> mEnumDeclaration;
+#endif // CEDAR_AUX_CONV_BORDER_TYPE_H
 
-  //!@brief Set of all the disabled enum values.
-  std::set<cedar::aux::EnumId> mDisabledValues;
-}; // class cedar::aux::VectorParameter
-
-#endif // CEDAR_AUX_ENUM_PARAMETER_H

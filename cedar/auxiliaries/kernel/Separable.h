@@ -49,6 +49,8 @@
  */
 class cedar::aux::kernel::Separable : public cedar::aux::kernel::Kernel
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
@@ -73,8 +75,19 @@ public:
    */
   virtual const cv::Mat& getKernelPart(unsigned int dimension) const;
 
-  //!@brief convolve this kernel with another matrix
-  cv::Mat convolveWith(const cv::Mat& mat) const;
+  inline size_t kernelPartCount() const
+  {
+    return this->mKernelParts.size();
+  }
+
+  void calculate()
+  {
+    this->calculateParts();
+
+    this->updateKernelMatrix();
+  }
+
+  unsigned int getSize(size_t dimension) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -82,11 +95,16 @@ public:
 protected:
   //!@brief set one kernel part of the specified dimension to the given matrix
   void setKernelPart(unsigned int dimension, const cv::Mat& mat);
+
+  void updateKernelMatrix();
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  virtual void calculateParts() = 0;
+
+private slots:
+  void dimensionalityChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
