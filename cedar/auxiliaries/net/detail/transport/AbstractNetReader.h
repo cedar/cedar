@@ -47,7 +47,7 @@
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
 #include "cedar/auxiliaries/net/detail/transport/AbstractNetBase.h"
-#include "cedar/auxiliaries/net/exceptions/NetException.h"
+#include "cedar/auxiliaries/net/exceptions.h"
 
 // PROJECT INCLUDES
 #include <boost/lexical_cast.hpp>
@@ -117,7 +117,7 @@ public:
                                          true ) // param: true == quiet
            )
     {
-      CEDAR_THROW( cedar::aux::exc::NetWaitingForWriterException,
+      CEDAR_THROW( cedar::aux::net::NetWaitingForWriterException,
                    "YARP: no writer yet (at intantiation point of reader)" );
     }
   }

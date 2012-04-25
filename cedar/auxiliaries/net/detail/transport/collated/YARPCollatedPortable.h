@@ -47,7 +47,7 @@
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/MatrixTypeWrapper.h"
-#include "cedar/auxiliaries/net/exceptions/NetException.h"
+#include "cedar/auxiliaries/net/exceptions.h"
 
 // SYSTEM INCLUDES
 #include <boost/utility.hpp>
@@ -151,7 +151,7 @@ public:
 
       if (mpVals == NULL)
       {
-        CEDAR_THROW( cedar::aux::exc::NetUnexpectedDataException,
+        CEDAR_THROW( cedar::aux::net::NetUnexpectedDataException,
                      "out of memory - cannot alloc transfered data" );
         return false;
       }

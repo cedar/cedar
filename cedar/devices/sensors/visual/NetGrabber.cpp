@@ -42,7 +42,7 @@
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/NetGrabber.h"
 #include "cedar/auxiliaries/net/Reader.h"
-#include "cedar/auxiliaries/net/exceptions/NetException.h"
+#include "cedar/auxiliaries/net/exceptions.h"
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES

@@ -42,7 +42,7 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/assert.h"
-#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/net/exceptions.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -103,11 +103,11 @@ void cedar::proc::steps::NetWriterSink::onStart()
       mpWriter= new cedar::aux::net::Writer< cedar::aux::MatData::DataType >("DEMOCHANNEL");
       // TODO: make channel configurable
     }
-    catch ( cedar::aux::exc::NetMissingRessourceException &E )
+    catch ( cedar::aux::net::NetMissingRessourceException &e )
     {
       // somehow YARP doesnt work ... :( typically fatal.
       // TODO: what to do?
-      throw( E ); // lets try this ...
+      throw( e ); // lets try this ...
     }
   }
 }
@@ -130,11 +130,11 @@ void cedar::proc::steps::NetWriterSink::compute(const cedar::proc::Arguments&)
   {
     mpWriter->write( mInput->getData() );
   }
-  catch ( cedar::aux::exc::NetMissingRessourceException &E )
+  catch ( cedar::aux::net::NetMissingRessourceException &e )
   {
     // somehow YARP doesnt work ... :( typically fatal.
     // TODO: what to do?
-    throw( E ); // lets try this ...
+    throw( e ); // lets try this ...
   }
 }
 

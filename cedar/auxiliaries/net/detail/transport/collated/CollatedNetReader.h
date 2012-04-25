@@ -49,7 +49,7 @@
 #include "cedar/auxiliaries/net/detail/transport/AbstractNetReader.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/MatrixTypeWrapper.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/YARPCollatedPortable.h"
-#include "cedar/auxiliaries/net/exceptions/NetException.h"
+#include "cedar/auxiliaries/net/exceptions.h"
 
 // PROJECT INCLUDES
 #include <yarp/os/PortReaderBuffer.h>
@@ -156,7 +156,7 @@ public:
       {
         // do something
         // user may catch this and choose to retry later on ...
-        CEDAR_THROW( cedar::aux::exc::NetWaitingForWriterException,
+        CEDAR_THROW( cedar::aux::net::NetWaitingForWriterException,
                      "YARP: cannot connect reader port; waiting for "
                      "writer" );
       }
@@ -166,7 +166,7 @@ public:
  
     if ( p_net_portable == NULL )
     {
-      CEDAR_THROW( cedar::aux::exc::NetUnexpectedDataException,
+      CEDAR_THROW( cedar::aux::net::NetUnexpectedDataException,
                    "YARP: unexpectedly read NULL from port" );
     }
     else
@@ -192,7 +192,7 @@ public:
 #if 1
       if (!checkCollatedDataForRead( p_net_portable->header() ) )
       {
-        CEDAR_THROW( cedar::aux::exc::NetUnexpectedDataException,
+        CEDAR_THROW( cedar::aux::net::NetUnexpectedDataException,
                      "matrix has wrong size - you wrote matrices of "
                      "different size/type before!" );
       }

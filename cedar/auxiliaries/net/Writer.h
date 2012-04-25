@@ -38,6 +38,8 @@
 #define CEDAR_NETWRITER_H
 
 // LOCAL INCLUDES
+#include "cedar/auxiliaries/net/namespace.h"
+#include "cedar/auxiliaries/net/exceptions.h"
 #include "cedar/auxiliaries/net/detail/namespace.h"
 #include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetWriter.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetWriter.h"

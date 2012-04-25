@@ -39,7 +39,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/transport/AbstractNetBase.h"
-#include "cedar/auxiliaries/net/exceptions/NetException.h"
+#include "cedar/auxiliaries/net/exceptions.h"
 
 // PROJECT INCLUDES
 #include <yarp/conf/version.h>
@@ -206,7 +206,7 @@ bool AbstractNetBase::checkNameServer()
 
     if (!startNameServer())  
     {
-      CEDAR_THROW( cedar::aux::exc::NetMissingRessourceException,
+      CEDAR_THROW( cedar::aux::net::NetMissingRessourceException,
                    "YARP: no yarp name server found and cannot auto "
                           "start one" );
     }
@@ -228,7 +228,7 @@ void AbstractNetBase::lateConstruct()
 
   if (!open()) // open with the virtual function open() 
   {            // implemented in a derived class
-      CEDAR_THROW( cedar::aux::exc::NetMissingRessourceException,
+      CEDAR_THROW( cedar::aux::net::NetMissingRessourceException,
                    "YARP could not open the port" );
   
   }

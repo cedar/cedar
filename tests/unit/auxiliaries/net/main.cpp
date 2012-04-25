@@ -37,7 +37,7 @@
 #include "cedar/auxiliaries/net/BlockingReader.h"
 #include "cedar/auxiliaries/net/Reader.h"
 #include "cedar/auxiliaries/net/Writer.h"
-#include "cedar/auxiliaries/net/exceptions/NetException.h"
+#include "cedar/auxiliaries/net/exceptions.h"
 
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/LogFile.h"
@@ -241,17 +241,17 @@ int main()
       log_file << "ERROR with cv::Mat_ test" << std::endl;
     }
   }
-  catch (cedar::aux::exc::NetWaitingForWriterException &E)
+  catch (cedar::aux::net::NetWaitingForWriterException &e)
   {
     log_file << "ERROR writer not initialized yet, should wait" << std::endl;
     return 1;
   }
-  catch (cedar::aux::exc::NetMissingRessourceException &E)
+  catch (cedar::aux::net::NetMissingRessourceException &e)
   {
     log_file << "ERROR YARP NAME SERVER NOT RUNNING" << std::endl;
     return 1;
   }
-  catch (cedar::aux::exc::NetUnexpectedDataException &E)
+  catch (cedar::aux::net::NetUnexpectedDataException &e)
   {
     log_file << "ERROR YARP unexpected data" << std::endl;
     return 1;
