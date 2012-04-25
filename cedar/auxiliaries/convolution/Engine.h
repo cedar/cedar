@@ -148,19 +148,19 @@ public:
     size_t kernelDim,
     cedar::aux::conv::BorderType::Id borderType,
     cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
-  ) const;
+  ) const = 0;
 
   //!@brief Checks if a matrix is capable of a certain type of convolution.
   virtual bool checkBorderTypeCapability
   (
     cedar::aux::conv::BorderType::Id borderType
-  ) const;
+  ) const = 0;
 
   //!@brief Checks if a matrix is capable of a certain type of convolution.
   virtual bool checkModeCapability
   (
     cedar::aux::conv::Mode::Id mode
-  ) const;
+  ) const = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
