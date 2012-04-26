@@ -28,7 +28,7 @@
     Email:       mathis.richter@ini.rub.de
     Date:        2010 11 11
 
-    Description: Header for the @em cedar::aux::math::Limits struct.
+    Description: Header for the @em cedar::aux::math::Limits class.
 
     Credits:
 
@@ -40,23 +40,41 @@
 #define NOMINMAX // to avoid Windows issues
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
+#include <boost/numeric/conversion/bounds.hpp>
+#include <limits>
+#include <iostream>
 
 
 /*!@brief Structure representing the limits of an interval.
  */
 template <typename T>
-struct cedar::aux::math::Limits
+class cedar::aux::math::Limits
 {
+public:
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend std::ostream& operator<<(std::ostream& stream, const cedar::aux::math::Limits<T>& limits)
+  {
+    stream << "[" << limits.getLower() << ", " << limits.getUpper() << "]";
+    return stream;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  //!@brief The standard constructor
-  Limits() {};
+  //@brief Default constructor
+  Limits()
+  :
+  mLowerLimit(0),
+  mUpperLimit(1)
+  {
+  }
+
   //!@brief Constructor that takes a minimum and maximum value
   Limits(const T& newLowerLimit, const T& newUpperLimit)
   :
@@ -73,21 +91,87 @@ struct cedar::aux::math::Limits
   mUpperLimit(otherLimits.mUpperLimit)
   {
   }
-
+  
   //--------------------------------------------------------------------------------------------------------------------
   // methods
   //--------------------------------------------------------------------------------------------------------------------
-
+public:
   /*!@brief Checks whether a given value is within the limits.
-   * @param[in] value the value to be checked
+   * @param[in] number the value to be checked
    */
-  bool isInLimits(const T& value) const
+  inline bool includes(const T& number)
   {
-    if (value < mLowerLimit || value > mUpperLimit)
+    return number >= this->getLower() && number <= this->getUpper();
+  }
+
+  //!@brief Returns the lower bound of the limits.
+  inline const T& getLower() const
+  {
+    return this->mLowerLimit;
+  }
+
+  //!@brief Sets the lower bound of the limits.
+  inline void setLower(const T& value)
+  {
+    this->mLowerLimit = value;
+  }
+
+  //!@brief Returns the lower bound of the limits.
+  inline const T& getUpper() const
+  {
+    return this->mUpperLimit;
+  }
+
+  //!@brief Sets the upper bound of the limits.
+  inline void setUpper(const T& value)
+  {
+    this->mUpperLimit = value;
+  }
+
+  //!@brief Constructs a limits object that covers only the positive interval (including 0).
+  static Limits positiveZero(const T& upper = boost::numeric::bounds<T>::highest())
+  {
+    return Limits(0, upper);
+  }
+
+  //!@brief Constructs a limits object that covers only the positive interval, excluding 0.
+  static Limits positive(const T& upper = boost::numeric::bounds<T>::highest())
+  {
+    // because smallest == 0 for integers, we have to differentiate here
+    if (std::numeric_limits<T>::is_integer)
     {
-      return false;
+      return Limits(1, upper);
     }
-    return true;
+    else
+    {
+      return Limits(boost::numeric::bounds<T>::smallest(), upper);
+    }
+  }
+
+  //!@brief Constructs a limits object that covers only the negative interval (including 0).
+  static Limits negativeZero(const T& lower = boost::numeric::bounds<T>::lowest())
+  {
+    return Limits(lower, 0);
+  }
+
+  //!@brief Constructs a limits object that covers only the negative interval, excluding 0.
+  static Limits negative(const T& lower = boost::numeric::bounds<T>::lowest())
+  {
+    // because smallest == 0 for integers, we have to differentiate here
+    if (std::numeric_limits<T>::is_integer)
+    {
+      return Limits(lower, -1);
+    }
+    else
+    {
+      return Limits(lower, -boost::numeric::bounds<T>::smallest());
+    }
+  }
+
+  //!@brief Returns a limits object that covers the full range of values.
+  static Limits full()
+  {
+    return Limits(boost::numeric::bounds<T>::lowest(), boost::numeric::bounds<T>::highest());
   }
 
   /*!@brief Tresholds a value if it is outside of the limits.
@@ -145,6 +229,9 @@ struct cedar::aux::math::Limits
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+private:
   //! minimum limit
   T mLowerLimit;
   //! maximum limit

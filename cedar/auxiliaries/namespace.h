@@ -60,7 +60,9 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(UserData);
     //!@endcond
 
-    template<class T> class Singleton;
+    template <class T> class Singleton;
+
+    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(IntrusivePtrBase);
 
     //!@todo This class may be obsolete once the ConfigurationInterface is removed.
     template <typename T> class IntervalData;
@@ -182,11 +184,16 @@ namespace cedar
     //!@brief A concretization of DataTemplate for double values.
     typedef DataTemplate<double> DoubleData;
 
+    //!@brief A concretization of DataTemplate for a set of simple matrices (std::vector<cv::Mat>).
+    typedef DataTemplate<std::vector<cv::Mat> > ImageSetData;
+
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(MatData);
     CEDAR_GENERATE_POINTER_TYPES(CvPointData);
     CEDAR_GENERATE_POINTER_TYPES(DoubleData);
+    CEDAR_GENERATE_POINTER_TYPES(ImageSetData);
     CEDAR_DECLARE_AUX_CLASS(ImageData);
+    CEDAR_DECLARE_AUX_CLASS(StereoImageData);
     /* exceptions */
     CEDAR_DECLARE_AUX_CLASS(ConversionFailedException);
     CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
@@ -241,9 +248,5 @@ namespace cedar
     };
   }
 }
-
-// Functions for boost intrusive pointer.
-extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_add_ref(cedar::aux::Parameter *pObject);
-extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_release(cedar::aux::Parameter *pObject);
 
 #endif // CEDAR_AUX_NAMESPACE_H

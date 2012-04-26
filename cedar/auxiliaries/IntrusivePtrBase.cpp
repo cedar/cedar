@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Log.cpp
+    File:        IntrusivePtrBase.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 02 14
+    Date:        2012 04 19
 
     Description:
 
@@ -34,11 +34,11 @@
 
 ======================================================================================================================*/
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/Log.h"
-#include "cedar/auxiliaries/LogFilter.h"
-#include "cedar/auxiliaries/LogInterface.h"
-#include "cedar/auxiliaries/ConsoleLog.h"
+#include "cedar/auxiliaries/IntrusivePtrBase.h"
 
 // SYSTEM INCLUDES
 
@@ -46,13 +46,13 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::Log::Log()
+cedar::aux::IntrusivePtrBase::IntrusivePtrBase()
 :
-mDefaultLogger(new cedar::aux::ConsoleLog())
+mReferenceCount(0)
 {
 }
 
-cedar::aux::Log::~Log()
+cedar::aux::IntrusivePtrBase::~IntrusivePtrBase()
 {
 }
 
@@ -60,60 +60,21 @@ cedar::aux::Log::~Log()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::Log::clearLoggers()
+void intrusive_ptr_add_ref(cedar::aux::IntrusivePtrBase const *pObject)
 {
-  this->mHandlers.clear();
+  CEDAR_DEBUG_ASSERT(pObject->mReferenceCount >= 0);
+  ++(pObject->mReferenceCount);
 }
 
-void cedar::aux::Log::addLogger(cedar::aux::LogInterfacePtr logger, cedar::aux::LogFilterPtr filter)
+void intrusive_ptr_release(cedar::aux::IntrusivePtrBase const *pObject)
 {
-  LogHandler handler;
-  handler.mpFilter = filter;
-  handler.mpLogger = logger;
-  this->mHandlers.push_back(handler);
-}
+  CEDAR_DEBUG_ASSERT(pObject->mReferenceCount >= 0);
 
-void cedar::aux::Log::removeLogger(cedar::aux::LogInterfacePtr logger)
-{
-  for (std::vector<LogHandler>::iterator i = this->mHandlers.begin(); i != this->mHandlers.end();)
+  --(pObject->mReferenceCount);
+
+  if (pObject->mReferenceCount == 0)
   {
-    const LogHandler& handler = *i;
-
-    if (handler.mpLogger == logger)
-    {
-      i = this->mHandlers.erase(i);
-    }
-    else
-    {
-      ++i;
-    }
+    // call Base's destructor
+    delete pObject;
   }
 }
-
-void cedar::aux::Log::log(cedar::aux::LOG_LEVEL level, const std::string& message, const std::string& source, const std::string& title)
-{
-  bool was_accepted = false;
-  // see if any of the filters match
-  for (size_t i = 0; i < this->mHandlers.size(); ++i)
-  {
-    LogHandler& handler = this->mHandlers.at(i);
-    if (handler.mpFilter->acceptsMessage(level, message, source, title))
-    {
-      // if the filter matches, send the message to the corresponding logger.
-      handler.mpLogger->message(level, message, title);
-      was_accepted = true;
-      
-      if (handler.mpFilter->removesMessages())
-      {
-        return;
-      }
-    }
-  }
-
-  // if none of the filters matched, use the default logger
-  if (!was_accepted)
-  {
-    this->mDefaultLogger->message(level, message, title);
-  }
-}
-

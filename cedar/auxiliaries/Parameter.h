@@ -42,8 +42,8 @@
 #define CEDAR_PROC_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/lib.h"
 #include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/IntrusivePtrBase.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -53,9 +53,9 @@
  *
  *        This is the base class for all parameters that can be registered in the cedar::aux::Configurable class.
  *
- * @see @ref ParametersConcept for a description of the parameters concept.
+ * @see   @ref ParametersConcept for a description of the parameters concept.
  */
-class cedar::aux::Parameter : public QObject
+class cedar::aux::Parameter : public QObject, public cedar::aux::IntrusivePtrBase
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -66,9 +66,6 @@ class cedar::aux::Parameter : public QObject
   // friends
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::aux::Configurable;
-
-  friend void ::intrusive_ptr_add_ref(cedar::aux::Parameter *pObject);
-  friend void ::intrusive_ptr_release(cedar::aux::Parameter *pObject);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -178,9 +175,7 @@ private:
 
   //! Flag that indicates whether this parameter was changed since the last file reading.
   bool mChanged;
-
-  //! Reference counter for boost intrusive pointer.
-  unsigned int mReferenceCount;
 }; // class cedar::aux::Parameter
+
 
 #endif // CEDAR_PROC_PARAMETER_H

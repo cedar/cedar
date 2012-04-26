@@ -46,10 +46,19 @@
     cedar configuration file:
     set (CEDAR_LIBCONFIG_LEGACY_MODE      1           CACHE BOOL "Use libconfig legacy mode.")
     If you set this flag to 0, libconfig++ is no longer needed as a dependency! Some unit tests may fail, though.
-  - merged AbstractFactory and AbstractFactoryDerived with Factory and FactoryDerived (including some changes to the interfaces)
+  - merged AbstractFactory and AbstractFactoryDerived with Factory and FactoryDerived (including some changes to the
+    interfaces)
   - introduced new FactoryManager class
   - gl::Object has been renamed to gl::RigidBody
-  - There are some new Parameter types: ObjectListParameter and ObjectParameter. They allow dynamically selecting the type of one or more objects. For example, these allow to dynamically select the type of the Sigmoid as well as the combination of kernels in the neural field.
+  - There are some new Parameter types: ObjectListParameter and ObjectParameter. They allow dynamically selecting the
+    type of one or more objects. For example, these allow to dynamically select the type of the Sigmoid as well as the
+    combination of kernels in the neural field.
+  - There is a new method for writing log messages. See the Logging tutorial in the documentation or cedar::aux::Log.
+  - There is a new widget for displaying log messages: cedar::aux::gui::Log.
+  - NumericParameters (DoubleParameter, IntParameter, UIntParameter) no longer need minimum and maximum values. They
+    also have a new constructor that takes a math::Limits object which is the new, recommended way of setting the
+    limits. The same is true for NumericVectorParameters.
+  - Added Data classes for stereo images and image sets.
 
 - cedar::proc
   - added directional arrows for graphical connections in processingIde

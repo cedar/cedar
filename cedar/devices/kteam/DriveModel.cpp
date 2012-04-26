@@ -80,8 +80,8 @@ void cedar::dev::kteam::DriveModel::update()
   calculatePositionAndOrientation(encoders);
 
   // reset encoders if reaching maximal/minimal encoder value
-  int maximum_encoder = mDrive->getEncoderLimits()->getValue().mUpperLimit;
-  int minimum_encoder = mDrive->getEncoderLimits()->getValue().mLowerLimit;
+  int maximum_encoder = mDrive->getEncoderLimits()->getValue().getUpper();
+  int minimum_encoder = mDrive->getEncoderLimits()->getValue().getLower();
   if (encoders[0] > 0.9 * maximum_encoder
      || encoders[1] > 0.9 * maximum_encoder
      || encoders[0] < 0.9 * minimum_encoder

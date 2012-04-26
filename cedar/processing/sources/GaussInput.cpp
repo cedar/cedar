@@ -87,17 +87,12 @@ cedar::proc::sources::GaussInput::GaussInput()
 :
 cedar::proc::Step(),
 mOutput(new cedar::aux::MatData(cv::Mat())),
-_mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0, -10000.0, 10000.0)),
-_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000)),
+_mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0)),
+_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 2, 1, 1000)),
 _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigma", 2, 3.0, 0.01, 1000.0)),
 _mCenters(new cedar::aux::DoubleVectorParameter(this, "centers", 2, 3.0, -10000.0, 10000.0)),
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000.0))
 {
-  _mDimensionality->setValue(2);
-//  _mDimensionality->setConstant(true);
-  _mSigmas->makeDefault();
-  _mCenters->makeDefault();
-  _mSizes->makeDefault();
   this->declareOutput("Gauss input");
   this->setOutput("Gauss input", mOutput);
   QObject::connect(_mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
@@ -198,7 +193,10 @@ void cedar::proc::sources::GaussInput::updateDimensionality()
 {
   int new_dimensionality = static_cast<int>(_mDimensionality->getValue());
   _mSigmas->resize(new_dimensionality, _mSigmas->getDefaultValue());
+  _mSigmas->setDefaultSize(new_dimensionality);
   _mCenters->resize(new_dimensionality, _mCenters->getDefaultValue());
+  _mCenters->setDefaultSize(new_dimensionality);
   _mSizes->resize(new_dimensionality, _mSizes->getDefaultValue());
+  _mSizes->setDefaultSize(new_dimensionality);
   this->onTrigger();
 }
