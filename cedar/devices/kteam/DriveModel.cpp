@@ -46,7 +46,7 @@ cedar::dev::kteam::DriveModel::DriveModel(cedar::dev::kteam::DrivePtr drive)
 :
 mDrive(drive)
 {
-  // Initialization of members
+  // initialization of members
   mOldEncoders.resize(2);
   mOldEncoders[0] = 0;
   mOldEncoders[1] = 0;

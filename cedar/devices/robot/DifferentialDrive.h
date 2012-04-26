@@ -28,7 +28,7 @@
     Email:       mathis.richter@ini.rub.de
     Date:        2012 04 12
 
-    Description: An object of this class represents the differential drive of a robot.
+    Description: The differential drive component of a mobile robot.
 
     Credits:     Original design by Andre Bartel (2011)
 
@@ -43,10 +43,10 @@
 // SYSTEM INCLUDES
 #include <vector>
 
-/*!@brief An object of this class represents the differential drive of a robot.
+/*!@brief The differential drive component of a mobile robot.
  *
  * This is an abstract class with functions and attributes common to differential drives. Robots with differential
- * drives are e.g. the mobile robots by K-Team.
+ * drives are, for instance, the mobile robots by K-Team.
  */
 class cedar::dev::robot::DifferentialDrive
 :

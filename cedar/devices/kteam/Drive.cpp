@@ -28,7 +28,7 @@
     Email:       mathis.richter@ini.rub.de
     Date:        2012 04 12
 
-    Description: An object of this class represents the differential drive of a PWM-driven robot.
+    Description: The differential drive of a PWM-driven robot.
 
     Credits:     Original design by Andre Bartel (2011)
 
@@ -262,15 +262,6 @@ void cedar::dev::kteam::Drive::checkStream(const std::istringstream& answerStrea
 {
   if (answerStream.fail() || (!atEndOfStream && answerStream.eof()))
   {
-    if (answerStream.fail())
-    {
-      std::cout << "answer stream failed" << std::endl;
-    }
-    if (answerStream.eof())
-    {
-      std::cout << "answer stream eof" << std::endl;
-    }
-
     CEDAR_THROW
     (
       cedar::dev::SerialCommunicationException,
