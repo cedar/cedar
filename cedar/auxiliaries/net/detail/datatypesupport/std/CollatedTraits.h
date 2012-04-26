@@ -22,52 +22,52 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        BasicNetHeader.h
+    File:        CollatedTraits.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 02:32:04 PM CEST
+    Date:        Wed 20 Jul 2011 04:43:49 PM CEST
 
-    Description: this doesnt do much. Even before we think about 
-                 what a matrix header contains, we want to have some
-                 primitive way to check for corruption.
+    Description: CollatedTraits in the std::-namespace specialization
 
     Credits:
 
 =============================================================================*/
 
-#ifndef CEDAR_COLLATEDNETHEADER_H
-#define CEDAR_COLLATEDNETHEADER_H
+#ifndef CEDAR_COLLATEDTRAITS_STD_H
+#define CEDAR_COLLATEDTRAITS_STD_H
 
 // LOCAL INCLUDES
+// traits specializations:
 #include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/transport/collated/header/BasicNetHeader.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
 
-
 namespace cedar {
   namespace aux {
     namespace net {
       namespace detail {
+        template<> struct CollatedTraits<std::string>;
+      }
+    }
+  }
+}
 
-/*!@brief net portable struct that will hold the header (of a matrix)
- *
- * This will be inherited and extended for for example a header for
- * cv-matrizes.
- *
- * These structures are small by default, i.e. dont hold accessor
- * functions. For accessing the data, 
- * see the static class MatrixNetHeaderAccessor
- */
-struct BasicNetHeader
+
+//////////////// OPENCV SPECIALIZATION of our traits class
+
+//!@brief CollatedTraits implementation for std::string
+template<>
+struct cedar::aux::net::detail::CollatedTraits<std::string>
 {
-  unsigned int mMagicNumber;
-  size_t       mDataSize; // this is highly-architecture dependant!
+  typedef std::string                                    DataType;
+  typedef cedar::aux::net::detail::BasicNetHeader        HeaderType;
 };
 
-} } } } // end namespaces
-      
+
 #endif
+

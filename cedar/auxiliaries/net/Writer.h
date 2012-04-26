@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetWriter.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetWriter.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/std/StringHelper.h"
 
 // PROJECT INCLUDES
 #include <boost/static_assert.hpp>
@@ -88,7 +89,7 @@ namespace cedar {
  * Valid instantiations are: Writer<char>, Writer<unsigned char>, Writer<short>,
  * Writer<unsigned short>, Writer<int>, Writer<unsigned int>, Writer<long>,
  * Writer<unsigned long>, Writer<float>, Writer<double>, Writer<bool>,
- * Writer<cv::Mat>, Writer< cv::Mat_<float>  
+ * Writer<cv::Mat>, Writer< cv::Mat_<float>, Writer< std::string >
  * @see: Reader, NetBlockingReader
  */
 template <typename T>
@@ -291,6 +292,23 @@ public:
   //!@brief use this constructor. See Writer for details.
   explicit Writer(const std::string &s) 
                        : cedar::aux::net::detail::SimpleNetWriter<double>(s)
+  {
+  }
+};
+
+  //---------------------------------------------------------------------------
+  // template specialization for std::string
+  //---------------------------------------------------------------------------
+
+//!@brief bool specialization, see Writer for details.
+template <>
+class Writer<std::string> : public cedar::aux::net::detail::StringHelper<std::string>,
+                            public cedar::aux::net::detail::CollatedNetWriter<std::string>
+{ 
+public:
+  //!@brief use this constructor. See Writer for details.
+  explicit Writer(const std::string &s) 
+                           : cedar::aux::net::detail::CollatedNetWriter<std::string>(s)
   {
   }
 };

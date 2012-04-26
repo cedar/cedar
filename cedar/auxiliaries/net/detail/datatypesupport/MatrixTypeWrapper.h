@@ -127,6 +127,13 @@ public:
     return NULL;
   }
 
+  void* contentAll() const
+  {
+    BOOST_STATIC_ASSERT(sizeof(T) == 0); 
+    // this will not compile, need to specialize
+    return NULL;
+  }
+
   void writeToMemory(char *p_vals)
   {
     defaultWriteToMemory(p_vals);
@@ -173,6 +180,27 @@ private:
               element_size );
     } 
   }
+
+  void fixedReadFromMemory(const char *p_vals)
+  {
+    size_t data_size;
+
+    data_size = getDataSize();
+    memcpy( contentAll(),
+            p_vals,
+            data_size );
+  }
+
+  void fixedWriteToMemory(char *p_vals)
+  {
+    size_t data_size;
+
+    data_size = getDataSize();
+    memcpy( p_vals,
+            contentAll(),
+            data_size );
+
+  }
 };
 
 
@@ -181,5 +209,6 @@ private:
 
 // Spezialisierungen: ...
 #include "cedar/auxiliaries/net/detail/datatypesupport/opencv/MatrixTypeWrapper.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/std/MatrixTypeWrapper.h"
 
 #endif
