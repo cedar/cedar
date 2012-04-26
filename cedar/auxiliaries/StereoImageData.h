@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,108 +22,62 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NumericParameter.h
+    File:        StereoImageData.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 06
+    Maintainer:  Irina Popova,
 
-    Description:
+    Email:       irina.popova@ini.ruhr-uni-bochum.de,
+
+    Date:        2012 04 02
+
+    Description: Header for the cedar::aux::StereoImageData.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_NUMERIC_PARAMETER_H
-#define CEDAR_AUX_NUMERIC_PARAMETER_H
+#ifndef CEDAR_AUX_STEREO_IMAGE_DATA_H
+#define CEDAR_AUX_STEREO_IMAGE_DATA_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/ParameterTemplate.h"
-#include "cedar/auxiliaries/math/Limits.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Data.h"
 
 // SYSTEM INCLUDES
-#include <boost/numeric/conversion/bounds.hpp>
+//#include <QReadWriteLock>
 
-
-/*!@brief A base class template for numeric parameters.
+/*!@brief A class to use stereo images.
+ *
+ * @todo More detailed description of the class.
+ *
+ * @remarks
+ *
  */
-template <typename T>
-class cedar::aux::NumericParameter : public cedar::aux::ParameterTemplate<T>
+
+class cedar::aux::StereoImageData : public cedar::aux::Data
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  typedef cedar::aux::math::Limits<T> LimitType;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief The constructor.
-   */
-  NumericParameter
-  (
-    cedar::aux::Configurable *pOwner,
-    const std::string& name,
-    const T& defaultValue,
-    const T& minimum,
-    const T& maximum
-  )
-  :
-  cedar::aux::ParameterTemplate<T>(pOwner, name, defaultValue),
-  mLimits(minimum, maximum)
+  //!@brief The standard constructor.
+  StereoImageData()
   {
   }
 
-  /*!@brief The constructor, with default minimum and maximum.
-   */
-  NumericParameter
-  (
-    cedar::aux::Configurable *pOwner,
-    const std::string& name,
-    const T& defaultValue,
-    const LimitType& limits = LimitType::full()
-  )
-  :
-  cedar::aux::ParameterTemplate<T>(pOwner, name, defaultValue),
-  mLimits(limits)
+  //!@brief This constructor initializes the internal data to a left und right images.
+  StereoImageData(const cv::Mat& image_left, const cv::Mat& image_right)
   {
-  }
-
-  //!@brief The constructor.
-  NumericParameter
-  (
-    cedar::aux::Configurable *pOwner,
-    const std::string& name,
-    const T& minimum,
-    const T& maximum
-  )
-  :
-  cedar::aux::ParameterTemplate<T>(pOwner, name),
-  mLimits(minimum, maximum)
-  {
-  }
-
-  //!@brief The constructor.
-  NumericParameter
-  (
-    cedar::aux::Configurable *pOwner,
-    const std::string& name,
-    const LimitType& limits = LimitType::full()
-  )
-  :
-  cedar::aux::ParameterTemplate<T>(pOwner, name),
-  mLimits(limits)
-  {
+    this->mLeftImage = image_left;
+    this->mRightImage = image_right;
   }
 
   //!@brief Destructor
-  ~NumericParameter()
+  virtual ~StereoImageData()
   {
   }
 
@@ -131,32 +85,48 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief get the minimum value of this parameter
-  const T& getMinimum() const
+
+  //!@brief returns the left image.
+  cv::Mat& getLeftImage()
   {
-    return this->mLimits.getLower();
+    return this->mLeftImage;
   }
 
-  //!@brief set the minimum value of this parameter
-  void setMinimum(const T& value)
+  //!@brief returns the right image.
+  cv::Mat& getRightImage()
   {
-    this->mLimits.setLower(value);
-
-    this->emitPropertyChangedSignal();
+    return this->mRightImage;
   }
 
-  //!@brief get the maximum value of this parameter
-  const T& getMaximum() const
+  //!@brief returns the left image as a constant.
+  inline const cv::Mat& getLeftImage() const
   {
-    return this->mLimits.getUpper();
+    return this->mLeftImage;
   }
 
-  //!@brief set the maximum value of this parameter
-  void setMaximum(const T& value)
+  //!@brief returns the right image as a constant.
+  const cv::Mat& getRightImage() const
   {
-    this->mLimits.setUpper(value);
+    return this->mRightImage;
+  }
 
-    this->emitPropertyChangedSignal();
+  //!@brief sets the internal data to the given data.
+  void setImages(const cv::Mat& image_left, const cv::Mat& image_right)
+  {
+    this->mLeftImage = image_left;
+    this->mRightImage = image_right;
+  }
+
+  //!@brief sets the left image to the given data.
+  void setLeftImage(const cv::Mat& image_left)
+  {
+    this->mLeftImage = image_left;
+  }
+
+  //!@brief sets the right image to the given data.
+  void setRightImage(const cv::Mat& image_right)
+  {
+    this->mRightImage = image_right;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -175,11 +145,12 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief the internal data
+  cv::Mat mLeftImage;
+  cv::Mat mRightImage;
 private:
-  //!@brief The limits for this parameter.
-  LimitType mLimits;
+  // none yet
+}; // class cedar::aux::StereoImageData
 
-}; // class cedar::aux::NumericParameter
+#endif // CEDAR_AUX_STEREO_IMAGE_DATA_H
 
-#endif // CEDAR_AUX_NUMERIC_PARAMETER_H

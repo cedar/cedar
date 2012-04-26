@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NumericParameter.h
+    File:        IntrusivePtrBase.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 06
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 04 19
 
     Description:
 
@@ -38,126 +34,56 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_NUMERIC_PARAMETER_H
-#define CEDAR_AUX_NUMERIC_PARAMETER_H
+#ifndef CEDAR_AUX_INTRUSIVE_PTR_BASE_H
+#define CEDAR_AUX_INTRUSIVE_PTR_BASE_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/ParameterTemplate.h"
-#include "cedar/auxiliaries/math/Limits.h"
+#include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
-#include <boost/numeric/conversion/bounds.hpp>
+#include <boost/intrusive_ptr.hpp>
+#include <boost/detail/atomic_count.hpp>
 
+// forward declaration of intrusive pointer functions
+extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_add_ref(cedar::aux::IntrusivePtrBase const *);
+extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_release(cedar::aux::IntrusivePtrBase const *);
 
-/*!@brief A base class template for numeric parameters.
+/*!@brief A base class for any classes that make use of boost::intrusive_ptr.
  */
-template <typename T>
-class cedar::aux::NumericParameter : public cedar::aux::ParameterTemplate<T>
+class cedar::aux::IntrusivePtrBase
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  typedef cedar::aux::math::Limits<T> LimitType;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief The constructor.
-   */
-  NumericParameter
-  (
-    cedar::aux::Configurable *pOwner,
-    const std::string& name,
-    const T& defaultValue,
-    const T& minimum,
-    const T& maximum
-  )
-  :
-  cedar::aux::ParameterTemplate<T>(pOwner, name, defaultValue),
-  mLimits(minimum, maximum)
-  {
-  }
+  //!@brief The standard constructor.
+  IntrusivePtrBase();
 
-  /*!@brief The constructor, with default minimum and maximum.
-   */
-  NumericParameter
-  (
-    cedar::aux::Configurable *pOwner,
-    const std::string& name,
-    const T& defaultValue,
-    const LimitType& limits = LimitType::full()
-  )
-  :
-  cedar::aux::ParameterTemplate<T>(pOwner, name, defaultValue),
-  mLimits(limits)
-  {
-  }
-
-  //!@brief The constructor.
-  NumericParameter
-  (
-    cedar::aux::Configurable *pOwner,
-    const std::string& name,
-    const T& minimum,
-    const T& maximum
-  )
-  :
-  cedar::aux::ParameterTemplate<T>(pOwner, name),
-  mLimits(minimum, maximum)
-  {
-  }
-
-  //!@brief The constructor.
-  NumericParameter
-  (
-    cedar::aux::Configurable *pOwner,
-    const std::string& name,
-    const LimitType& limits = LimitType::full()
-  )
-  :
-  cedar::aux::ParameterTemplate<T>(pOwner, name),
-  mLimits(limits)
-  {
-  }
-
-  //!@brief Destructor
-  ~NumericParameter()
-  {
-  }
+  virtual ~IntrusivePtrBase();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief get the minimum value of this parameter
-  const T& getMinimum() const
-  {
-    return this->mLimits.getLower();
-  }
+  /*!@brief Function that increases the reference counter of the object.
+   *
+   *        Required for boost::intrusive_ptr.
+   */
+  friend void ::intrusive_ptr_add_ref(cedar::aux::IntrusivePtrBase const *pObject);
 
-  //!@brief set the minimum value of this parameter
-  void setMinimum(const T& value)
-  {
-    this->mLimits.setLower(value);
-
-    this->emitPropertyChangedSignal();
-  }
-
-  //!@brief get the maximum value of this parameter
-  const T& getMaximum() const
-  {
-    return this->mLimits.getUpper();
-  }
-
-  //!@brief set the maximum value of this parameter
-  void setMaximum(const T& value)
-  {
-    this->mLimits.setUpper(value);
-
-    this->emitPropertyChangedSignal();
-  }
+  /*!@brief Function that decreases the reference counter of the object and deletes it if the counter goes to zero.
+   *
+   *        Required for boost::intrusive_ptr
+   */
+  friend void ::intrusive_ptr_release(cedar::aux::IntrusivePtrBase const *pObject);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -174,12 +100,11 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
 private:
-  //!@brief The limits for this parameter.
-  LimitType mLimits;
+  //! Reference counter for boost intrusive pointer.
+  mutable boost::detail::atomic_count mReferenceCount;
 
-}; // class cedar::aux::NumericParameter
+}; // class cedar::aux::IntrusivePtrBase
 
-#endif // CEDAR_AUX_NUMERIC_PARAMETER_H
+#endif // CEDAR_AUX_INTRUSIVE_PTR_BASE_H
+

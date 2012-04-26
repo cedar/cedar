@@ -118,10 +118,10 @@ public:
   void readFromNode(const cedar::aux::ConfigurationNode& root)
   {
     cedar::aux::ConfigurationNode lower_limit_child = root.get_child("lower limit");
-    mLimits.mLowerLimit = lower_limit_child.get_value<T>();
+    mLimits.setLower(lower_limit_child.get_value<T>());
 
     cedar::aux::ConfigurationNode upper_limit_child = root.get_child("upper limit");
-    mLimits.mUpperLimit = upper_limit_child.get_value<T>();
+    mLimits.setUpper(upper_limit_child.get_value<T>());
   }
 
   /*!@brief Write the current limits into a configuration tree.
@@ -133,11 +133,11 @@ public:
     cedar::aux::ConfigurationNode limits_node;
 
     cedar::aux::ConfigurationNode lower_limit_node;
-    lower_limit_node.put_value(mLimits.mLowerLimit);
+    lower_limit_node.put_value(mLimits.getLower());
     limits_node.push_back(cedar::aux::ConfigurationNode::value_type("lower limit", lower_limit_node));
 
     cedar::aux::ConfigurationNode upper_limit_node;
-    upper_limit_node.put_value(mLimits.mUpperLimit);
+    upper_limit_node.put_value(mLimits.getUpper());
     limits_node.push_back(cedar::aux::ConfigurationNode::value_type("upper limit", upper_limit_node));
 
     root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), limits_node));
@@ -165,25 +165,25 @@ public:
 
   void setLowerLimit(const T& value)
   {
-    mLimits.mLowerLimit = value;
+    mLimits.setLower(value);
     this->emitPropertyChangedSignal();
   }
 
   void setUpperLimit(const T& value)
   {
     // todo: check whether the new upper limit is inside the provided extrema
-    mLimits.mUpperLimit = value;
+    mLimits.setUpper(value);
     this->emitPropertyChangedSignal();
   }
 
   const T& getLowerLimit() const
   {
-    return mLimits.mLowerLimit;
+    return mLimits.getLower();
   }
 
   const T& getUpperLimit() const
   {
-    return mLimits.mUpperLimit;
+    return mLimits.getUpper();
   }
 
   //!@brief get the minimum value of the lower limit

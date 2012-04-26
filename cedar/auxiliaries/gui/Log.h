@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NumericParameter.h
+    File:        Log.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 06
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 04 13
 
     Description:
 
@@ -38,138 +34,107 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_NUMERIC_PARAMETER_H
-#define CEDAR_AUX_NUMERIC_PARAMETER_H
+#ifndef CEDAR_AUX_GUI_LOG_H
+#define CEDAR_AUX_GUI_LOG_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/ParameterTemplate.h"
-#include "cedar/auxiliaries/math/Limits.h"
+#include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/LogInterface.h"
 
 // SYSTEM INCLUDES
-#include <boost/numeric/conversion/bounds.hpp>
+#include <QTabWidget>
+#include <QTableWidget>
 
 
-/*!@brief A base class template for numeric parameters.
+/*!@brief A default log widget.
  */
-template <typename T>
-class cedar::aux::NumericParameter : public cedar::aux::ParameterTemplate<T>
+class cedar::aux::gui::Log : public QTabWidget
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  typedef cedar::aux::math::Limits<T> LimitType;
+private:
+  class LogInterface : public cedar::aux::LogInterface
+  {
+    public:
+      LogInterface(Log* pLog)
+      :
+      mpLog(pLog)
+      {
+      }
+
+      void message
+      (
+        cedar::aux::LOG_LEVEL level,
+        const std::string& message,
+        const std::string& title
+      )
+      {
+        this->mpLog->message(level, message, title);
+      }
+
+    private:
+      Log* mpLog;
+  };
+
+  CEDAR_GENERATE_POINTER_TYPES(LogInterface);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief The constructor.
-   */
-  NumericParameter
-  (
-    cedar::aux::Configurable *pOwner,
-    const std::string& name,
-    const T& defaultValue,
-    const T& minimum,
-    const T& maximum
-  )
-  :
-  cedar::aux::ParameterTemplate<T>(pOwner, name, defaultValue),
-  mLimits(minimum, maximum)
-  {
-  }
-
-  /*!@brief The constructor, with default minimum and maximum.
-   */
-  NumericParameter
-  (
-    cedar::aux::Configurable *pOwner,
-    const std::string& name,
-    const T& defaultValue,
-    const LimitType& limits = LimitType::full()
-  )
-  :
-  cedar::aux::ParameterTemplate<T>(pOwner, name, defaultValue),
-  mLimits(limits)
-  {
-  }
-
-  //!@brief The constructor.
-  NumericParameter
-  (
-    cedar::aux::Configurable *pOwner,
-    const std::string& name,
-    const T& minimum,
-    const T& maximum
-  )
-  :
-  cedar::aux::ParameterTemplate<T>(pOwner, name),
-  mLimits(minimum, maximum)
-  {
-  }
-
-  //!@brief The constructor.
-  NumericParameter
-  (
-    cedar::aux::Configurable *pOwner,
-    const std::string& name,
-    const LimitType& limits = LimitType::full()
-  )
-  :
-  cedar::aux::ParameterTemplate<T>(pOwner, name),
-  mLimits(limits)
-  {
-  }
+  //!@brief The standard constructor.
+  Log(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  ~NumericParameter()
-  {
-  }
+  ~Log();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief get the minimum value of this parameter
-  const T& getMinimum() const
-  {
-    return this->mLimits.getLower();
-  }
+  void message
+  (
+    cedar::aux::LOG_LEVEL level,
+    const std::string& message,
+    const std::string& title
+  );
 
-  //!@brief set the minimum value of this parameter
-  void setMinimum(const T& value)
-  {
-    this->mLimits.setLower(value);
+  void installHandlers(bool removeMessages = true);
 
-    this->emitPropertyChangedSignal();
-  }
-
-  //!@brief get the maximum value of this parameter
-  const T& getMaximum() const
-  {
-    return this->mLimits.getUpper();
-  }
-
-  //!@brief set the maximum value of this parameter
-  void setMaximum(const T& value)
-  {
-    this->mLimits.setUpper(value);
-
-    this->emitPropertyChangedSignal();
-  }
+  void uninstallHandlers();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+signals:
+  void messageReceived(int type, QString title, QString message);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void addPane(cedar::aux::LOG_LEVEL level, const std::string& title, const std::string& icon = "");
+
+  QTableWidget* addPane(const std::string& title, const std::string& icon = "");
+
+  void postMessage
+  (
+    QTableWidget* pTable,
+    const QString& message,
+    const QString& title,
+    const QString& icon = ""
+  );
+
+private slots:
+  void printMessage(int type, QString title, QString message);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -177,9 +142,23 @@ private:
 protected:
   // none yet
 private:
-  //!@brief The limits for this parameter.
-  LimitType mLimits;
+  QTableWidget* mpDefaultPane;
 
-}; // class cedar::aux::NumericParameter
+  LogInterfacePtr mLogger;
 
-#endif // CEDAR_AUX_NUMERIC_PARAMETER_H
+  std::map<cedar::aux::LOG_LEVEL, QTableWidget*> mpPanes;
+  std::map<cedar::aux::LOG_LEVEL, std::string> mIcons;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  // none yet
+
+}; // class cedar::aux::gui::Log
+
+#endif // CEDAR_AUX_GUI_LOG_H
+
