@@ -28,7 +28,7 @@
     Email:       mathis.richter@ini.rub.de
     Date:        2012 04 12
 
-    Description: An object of this class represents the differential drive of a PWM-driven robot.
+    Description: The differential drive of a pulse-width-modulation (PWM) driven robot.
 
     Credits:     Original design by Andre Bartel (2011)
 
@@ -47,10 +47,10 @@
 // SYSTEM INCLUDES
 #include <vector>
 
-/*!@brief An object of this class represents the differential drive of a PWM-driven robot.
+/*!@brief The differential drive of a pulse-width-modulation (PWM) driven robot.
  *
  * This is an abstract class with functions and attributes common to differential drive robots with
- * Pulse-Width-Modulation-driven wheels. These are e.g. the mobile robots E-Puck, Khepera and Koala.
+ * pulse-width-modulation driven wheels. These are, for instance, the mobile robots E-Puck, Khepera and Koala.
  */
 class cedar::dev::kteam::Drive : public cedar::dev::robot::DifferentialDrive
 {
@@ -151,4 +151,5 @@ private:
   //! limits for the encoder value
   cedar::aux::math::IntLimitsParameterPtr _mEncoderLimits;
 }; // class cedar::dev::kteam::Drive
+
 #endif // CEDAR_DEV_ROBOT_KTEAM_DRIVE_H

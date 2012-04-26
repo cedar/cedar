@@ -22,15 +22,15 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KTeamDriveModel.h
+    File:        DriveModel.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2012 04 26
 
-    Description: An object of this class represents the kinematics model of a differential drive robot with encoders.
+    Description: The kinematics model of a differential drive robot with encoders.
 
-    Credits:
+    Credits:     Original design by Andre Bartel (2011).
 
 ======================================================================================================================*/
 
@@ -43,10 +43,10 @@
 
 // SYSTEM INCLUDES
 
-/*!@brief An object of this class represents the kinematics model of a differential drive robot with encoders.
+/*!@brief The kinematics model of a differential drive robot with encoders.
  *
- * The class calculates position and orientation of the robot in a coordinate-system based on the robot's encoders
- * (odometry).
+ * This class calculates (i.e., estimates) the position and orientation of a robot
+ * based on the robot's encoders (odometry).
  */
 class cedar::dev::kteam::DriveModel : public cedar::dev::robot::Odometry
 {
@@ -55,11 +55,11 @@ class cedar::dev::kteam::DriveModel : public cedar::dev::robot::Odometry
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  //!@brief Constructs the model of the K-Team robot.
-  //!@param peDrive Pointer to the drive of the robot the position shall be calculated of.
+  //!@brief Constructor
+  //!@param[in] drive drive component of the robot we are modeling
   DriveModel(cedar::dev::kteam::DrivePtr drive);
 
-  //!@brief Destructs the model of the K-Team robot.
+  //!@brief Destructor
   virtual ~DriveModel();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -90,15 +90,15 @@ private:
   void update();
 
   /*!@brief Calculates the distance the robot has moved since the last update.
-   * @param oldEncoders the encoder values of both wheels at time step t-1
-   * @param newEncoders the encoder values of both wheels at time step t
+   * @param[in] oldEncoders the encoder values of both wheels at time step t-1
+   * @param[in] newEncoders the encoder values of both wheels at time step t
    * @return the distance the robot has moved [m]
    */
   double calculateDifferencePosition(const std::vector<int>& oldEncoders, const std::vector<int>& newEncoders) const;
 
   /*!@brief Calculates the angle the robot has turned since the last update.
-   * @param oldEncoders the encoder values of both wheels at time step t-1
-   * @param newEncoders the encoder values of both wheels at time step t
+   * @param[in] oldEncoders the encoder values of both wheels at time step t-1
+   * @param[in] newEncoders the encoder values of both wheels at time step t
    * @return the angle the robot has turned [rad]
    */
   double calculateDifferenceOrientation(const std::vector<int>& oldEncoders, const std::vector<int>& newEncoders) const;
@@ -110,10 +110,11 @@ protected:
   // none yet
 
 private:
-  //! drive of the robot
+  //! drive component of the robot
   cedar::dev::kteam::DrivePtr mDrive;
 
   //! the last encoder values (needed to calculate the distance the robot has moved)
   std::vector<int> mOldEncoders;
-}; // class cedar::dev::kteam::KTeamDriveModel
+}; // class cedar::dev::kteam::DriveModel
+
 #endif // CEDAR_DEV_KTEAM_DRIVE_MODEL_H
