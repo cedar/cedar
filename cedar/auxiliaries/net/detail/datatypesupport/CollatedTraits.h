@@ -75,6 +75,7 @@ struct CollatedTraits
 
 // specializations (these will compile):
 #include "cedar/auxiliaries/net/detail/datatypesupport/opencv/CollatedTraits.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/std/CollatedTraits.h"
 
 
 #endif

@@ -46,6 +46,7 @@ in. These are at the moment:
   - int, char, short, long (all also unsigned), float, double, bool
   - cv::Mat
   - cv::Mat_<float> 
+  - std::string
   - ... more to be added at your request ...
 
 

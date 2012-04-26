@@ -22,30 +22,31 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        BasicNetHeader.h
+    File:        MatrixTypeWrapper.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 02:32:04 PM CEST
+    Date:        Wed 20 Jul 2011 05:08:06 PM CEST
 
-    Description: this doesnt do much. Even before we think about 
-                 what a matrix header contains, we want to have some
-                 primitive way to check for corruption.
+    Description: std-namespace specialization for MatrixTypeWrapper.
 
     Credits:
 
 =============================================================================*/
 
-#ifndef CEDAR_COLLATEDNETHEADER_H
-#define CEDAR_COLLATEDNETHEADER_H
+#ifndef CEDAR_COLLATEDTYPE_STD_H
+#define CEDAR_COLLATEDTYPE_STD_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/net/detail/datatypesupport/CollatedTraits.h"
 
 // SYSTEM INCLUDES
 
+
+
+
+/////////////////// SPECIALIZATIONS of MatrixTypeWrapper
 
 
 namespace cedar {
@@ -53,21 +54,42 @@ namespace cedar {
     namespace net {
       namespace detail {
 
-/*!@brief net portable struct that will hold the header (of a matrix)
- *
- * This will be inherited and extended for for example a header for
- * cv-matrizes.
- *
- * These structures are small by default, i.e. dont hold accessor
- * functions. For accessing the data, 
- * see the static class MatrixNetHeaderAccessor
- */
-struct BasicNetHeader
+
+
+/////// cv::Mat
+
+
+template <>
+inline std::string MatrixTypeWrapper<std::string>::lateInitDataFromHeader()
 {
-  unsigned int mMagicNumber;
-  size_t       mDataSize; // this is highly-architecture dependant!
-};
+  return std::string();
+}
+
+template <>
+inline unsigned int MatrixTypeWrapper<std::string>::getDataSize() const
+{
+  return mHeader.mDataSize;
+}
+
+
+template <>
+inline void MatrixTypeWrapper<std::string>::writeToMemory(char *p_vals)
+{
+  fixedWriteToMemory(p_vals);
+}
+
+template <>
+inline void MatrixTypeWrapper<std::string>::readFromMemory(const char *p_vals)
+{
+  mData = std::string(p_vals);
+}
+
+template <>
+inline void* MatrixTypeWrapper<std::string>::contentAll() const
+{
+  return (void*) mData.c_str();
+}
 
 } } } } // end namespaces
-      
+
 #endif
