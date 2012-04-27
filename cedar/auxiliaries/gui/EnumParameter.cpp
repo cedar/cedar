@@ -90,10 +90,16 @@ void cedar::aux::gui::EnumParameter::parameterPointerChanged()
 
   this->mpEdit->clear();
   int select_index = -1;
+  int first_enabled = -1;
   for (size_t i = 0; i < parameter->getEnumDeclaration().list().size(); ++i)
   {
     const cedar::aux::Enum& enum_val = parameter->getEnumDeclaration().list().at(i);
-    if (enum_val == parameter->getValue())
+    bool enabled = parameter->isEnabled(enum_val);
+    if (first_enabled == -1 && enabled)
+    {
+      first_enabled = static_cast<int>(i);
+    }
+    if (enum_val == parameter->getValue() && enabled)
     {
       select_index = static_cast<int>(i);
     }
@@ -107,11 +113,16 @@ void cedar::aux::gui::EnumParameter::parameterPointerChanged()
     QModelIndex index = model->index(item_index, this->mpEdit->modelColumn(), this->mpEdit->rootModelIndex());
     QStandardItem* p_item = model->itemFromIndex(index);
     CEDAR_DEBUG_ASSERT(p_item != NULL);
-    p_item->setEnabled(parameter->isEnabled(enum_val));
+    p_item->setEnabled(enabled);
   }
-  if(select_index != -1)
+  if (select_index != -1)
   {
     this->mpEdit->setCurrentIndex(select_index);
+  }
+  else // may set the index to -1 or first enabled option
+  {
+    this->mpEdit->setCurrentIndex(first_enabled);
+    this->currentIndexChanged(this->mpEdit->currentText());
   }
 
   QObject::connect
