@@ -248,7 +248,7 @@ cv::Mat cedar::aux::conv::FFTW::padKernel(const cv::Mat& matrix, const cv::Mat& 
   for (size_t dim = 0; dim < cedar::aux::math::getDimensionalityOf(matrix); ++dim)
   {
     int kernel_center = kernel.size[dim]/2;
-    regions.at(0).push_back(cv::Range(0, kernel_center + 1)); // lower limit
+    regions.at(0).push_back(cv::Range(0, kernel_center + (kernel.size[dim] % 2))); // lower limit
     if (dim >= cedar::aux::math::getDimensionalityOf(kernel)) // fix for strange kernels (kind of a ridge padding)
     {
       regions.at(1).push_back(cv::Range(matrix.size[dim] - 1, matrix.size[dim])); // upper limit
