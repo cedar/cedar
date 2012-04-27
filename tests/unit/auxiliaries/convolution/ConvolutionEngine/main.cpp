@@ -67,7 +67,7 @@ cv::Mat numbers_2d;
 class DemoKernel : public cedar::aux::kernel::Kernel
 {
   public:
-    DemoKernel(const cv::Mat& matrix)
+    DemoKernel(const cv::Mat& matrix) : cedar::aux::kernel::Kernel(cedar::aux::math::getDimensionalityOf(matrix))
     {
       this->mKernel->setData(matrix);
     }

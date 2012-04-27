@@ -183,9 +183,13 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
   fftw_complex *result_fourier = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * transformed_elements);
   fftw_complex *kernel_fourier = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * transformed_elements);
   // transform sigmoid U to frequency domain (fft)
-  fftw_plan matrix_plan_forward = fftw_plan_dft_r2c(cedar::aux::math::getDimensionalityOf(matrix_64), matrix_64.size, const_cast<double*>(matrix_64.ptr<double>()), matrix_fourier, FFTW_FORWARD + FFTW_PATIENT);
-  fftw_plan kernel_plan_forward = fftw_plan_dft_r2c(cedar::aux::math::getDimensionalityOf(padded_kernel), padded_kernel.size, const_cast<double*>(padded_kernel.ptr<double>()), kernel_fourier, FFTW_FORWARD + FFTW_PATIENT);
-  fftw_plan matrix_plan_backward =  fftw_plan_dft_c2r(cedar::aux::math::getDimensionalityOf(matrix_64), matrix_64.size, result_fourier, const_cast<double*>(output.ptr<double>()), FFTW_BACKWARD + FFTW_PATIENT);
+  fftw_plan matrix_plan_forward = fftw_plan_dft_r2c(cedar::aux::math::getDimensionalityOf(matrix_64), matrix_64.size, const_cast<double*>(matrix_64.clone().ptr<double>()), matrix_fourier, FFTW_FORWARD + FFTW_ESTIMATE);
+  fftw_plan kernel_plan_forward = fftw_plan_dft_r2c(cedar::aux::math::getDimensionalityOf(padded_kernel), padded_kernel.size, const_cast<double*>(padded_kernel.clone().ptr<double>()), kernel_fourier, FFTW_FORWARD + FFTW_ESTIMATE);
+  fftw_plan matrix_plan_backward =  fftw_plan_dft_c2r(cedar::aux::math::getDimensionalityOf(matrix_64), matrix_64.size, result_fourier, const_cast<double*>(output.clone().ptr<double>()), FFTW_BACKWARD + FFTW_ESTIMATE);
+
+  matrix_plan_forward = fftw_plan_dft_r2c(cedar::aux::math::getDimensionalityOf(matrix_64), matrix_64.size, const_cast<double*>(matrix_64.ptr<double>()), matrix_fourier, FFTW_FORWARD + FFTW_ESTIMATE);
+  kernel_plan_forward = fftw_plan_dft_r2c(cedar::aux::math::getDimensionalityOf(padded_kernel), padded_kernel.size, const_cast<double*>(padded_kernel.ptr<double>()), kernel_fourier, FFTW_FORWARD + FFTW_ESTIMATE);
+  matrix_plan_backward =  fftw_plan_dft_c2r(cedar::aux::math::getDimensionalityOf(matrix_64), matrix_64.size, result_fourier, const_cast<double*>(output.ptr<double>()), FFTW_BACKWARD + FFTW_ESTIMATE);
   fftw_execute(matrix_plan_forward);
   fftw_execute(kernel_plan_forward);
 
