@@ -91,7 +91,8 @@ _mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0)),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 2, 1, 1000)),
 _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigma", 2, 3.0, 0.01, 1000.0)),
 _mCenters(new cedar::aux::DoubleVectorParameter(this, "centers", 2, 3.0, -10000.0, 10000.0)),
-_mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000.0))
+_mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000.0)),
+_mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
 {
   this->declareOutput("Gauss input");
   this->setOutput("Gauss input", mOutput);
@@ -100,6 +101,7 @@ _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000.0))
   QObject::connect(_mCenters.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
+  QObject::connect(_mIsCyclic.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   this->updateMatrix();
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -117,10 +119,37 @@ void cedar::proc::sources::GaussInput::compute(const cedar::proc::Arguments&)
   {
     kernel_parts.at(dim) = cv::Mat(static_cast<int>(sizes_uint.at(dim)), 1, CV_32F);
     CEDAR_DEBUG_ASSERT(sigmas.at(dim) > 0.0);
-    for (int row = 0; row < kernel_parts.at(dim).rows; ++row)
+
+    //!@todo may want to move this outside of (for dim) block, since all dims are cyclic
+    if (_mIsCyclic->getValue()) // is this a cyclic kernel? (only check once)
     {
-      kernel_parts.at(dim).at<float>(row, 0)
-          = cedar::aux::math::gauss(static_cast<int>(row) - _mCenters->at(dim), sigmas.at(dim));
+      for (int row = 0; row < kernel_parts.at(dim).rows; ++row)
+      {
+        int index = row - _mCenters->at(dim);
+        int current_size = static_cast<int>(sizes_uint.at(dim));
+        /* if the kernel is shifted away from the center of the matrix, make sure to take as many values from a
+         * cyclic kernel as the kernel center is shifted away from the matrix center
+         */
+        int shift = _mCenters->at(dim) - current_size / 2;
+        if (shift > 0 && row - shift < 0) // kernel center is to the right of matrix center and index is in cyclic range
+        {
+          index += current_size - 1;
+        }
+        if (shift < 0 && row - shift >= current_size) // kernel center is to the left of matrix center, cyclic index
+        {
+          index -= current_size - 1;
+        }
+        kernel_parts.at(dim).at<float>(row, 0)
+              = cedar::aux::math::gauss(index, sigmas.at(dim));
+      }
+    }
+    else // nothing special to do here
+    {
+      for (int row = 0; row < kernel_parts.at(dim).rows; ++row)
+      {
+        kernel_parts.at(dim).at<float>(row, 0)
+              = cedar::aux::math::gauss(static_cast<int>(row) - _mCenters->at(dim), sigmas.at(dim));
+      }
     }
   }
   kernel_parts.at(0) *= _mAmplitude->getValue();
