@@ -62,9 +62,13 @@ private:
   typedef typename cedar::aux::Singleton<cedar::aux::FactoryManager<ValueTypePtr> > FactorySingleton;
 
 public:
+  //!@brief iterator for map data structure
   typedef typename std::map<std::string, ValueTypePtr>::iterator iterator;
+  //!@brief iterator for map data structure (const)
   typedef typename std::map<std::string, ValueTypePtr>::const_iterator const_iterator;
+  //!@brief reverse iterator for map data structure
   typedef typename std::map<std::string, ValueTypePtr>::reverse_iterator reverse_iterator;
+  //!@brief reverse iterator for map data structure (const)
   typedef typename std::map<std::string, ValueTypePtr>::const_reverse_iterator const_reverse_iterator;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -144,22 +148,25 @@ public:
     this->mObjectMap = this->mDefaults;
   }
 
-  //!@brief return the size of the vector
+  //!@brief return the size of the map
   size_t size() const
   {
     return mObjectMap.size();
   }
 
+  //!@brief return the max size of the map
   size_t max_size() const
   {
     return mObjectMap.max_size();
   }
 
+  //!@brief returns whether the map is empty
   bool empty() const
   {
     return mObjectMap.empty();
   }
 
+  //!@brief access an object in the map through a given key
   ValueTypePtr& operator[](const std::string& key)
   {
     return mObjectMap[key];
@@ -188,51 +195,61 @@ public:
     this->mObjectMap.clear();
   }
 
+  //!@brief find an object through a given key
   iterator find(const std::string& key)
   {
     return mObjectMap.find(key);
   }
 
+  //!@brief find an object through a given key (const)
   const_iterator find(const std::string& key) const
   {
     return mObjectMap.find(key);
   }
 
+  //!@brief returns an iterator to the first element of the map
   iterator begin()
   {
     return mObjectMap.begin();
   }
 
+  //!@brief returns an iterator to the first element of the map (const)
   const_iterator begin() const
   {
     return mObjectMap.begin();
   }
 
+  //!@brief returns a reverse iterator to the beginning of the data structure
   reverse_iterator rbegin()
   {
     return mObjectMap.rbegin();
   }
 
+  //!@brief returns a reverse iterator to the beginning of the data structure (const)
   const_reverse_iterator rbegin() const
   {
     return mObjectMap.rbegin();
   }
 
+  //!@brief returns an iterator to the end of the map
   iterator end()
   {
     return mObjectMap.end();
   }
 
+  //!@brief returns an iterator to the end of the map (const)
   const_iterator end() const
   {
     return mObjectMap.end();
   }
 
+  //!@brief returns a reverse iterator to the end
   reverse_iterator rend()
   {
     return mObjectMap.rend();
   }
 
+  //!@brief returns a reverse iterator (const) to the end
   const_reverse_iterator rend() const
   {
     return mObjectMap.rend();

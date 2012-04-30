@@ -72,6 +72,7 @@ public:
     this->doAppend(data, title);
   }
 
+  //!@brief check if given data can be appended to a plot
   virtual bool canAppend(cedar::aux::ConstDataPtr data) const = 0;
 
   //--------------------------------------------------------------------------------------------------------------------

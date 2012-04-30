@@ -78,6 +78,7 @@ private:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief register a new type at the factory manager
   template <class TypePtr>
   bool registerType(std::string specifiedTypeName = "")
   {
@@ -103,6 +104,7 @@ public:
     return true;
   }
 
+  //!@brief allocate a new object of the given type
   BaseTypePtr allocate(const std::string& typeName)
   {
     typename std::map<std::string, FactoryTypePtr>::const_iterator iter = mRegisteredFactories.find(typeName);
@@ -116,6 +118,7 @@ public:
     return iter->second->allocate();
   }
 
+  //!@brief look up the type id of an object
   const std::string& getTypeId(BaseTypePtr object)
   {
     std::string generated_type_name = cedar::aux::objectTypeToString(object);
@@ -135,6 +138,7 @@ public:
     return iter->second;
   }
 
+  //!@brief list all types registered at the factory manager
   void listTypes(std::vector<std::string>& types) const
   {
     for

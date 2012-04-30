@@ -57,8 +57,11 @@ class cedar::aux::ObjectListParameterTemplate : public cedar::aux::ObjectListPar
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+  //!@brief a shared pointer of a BaseType object
   typedef typename boost::shared_ptr<BaseType> BaseTypePtr;
+  //!@brief a const shared pointer of a BaseType object
   typedef typename boost::shared_ptr<const BaseType> ConstBaseTypePtr;
+  //!@brief a singleton factory manager for base types
   typedef typename cedar::aux::Singleton<cedar::aux::FactoryManager<BaseTypePtr> > FactorySingleton;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -168,12 +171,14 @@ public:
     return this->at(index);
   }
 
+  //!@brief allocate and add an object at the end
   void pushBack(const std::string& typeId)
   {
     BaseTypePtr object = FactorySingleton::getInstance()->allocate(typeId);
     this->pushBack(object);
   }
 
+  //!@brief add an object at the end
   void pushBack(BaseTypePtr object)
   {
     //!@todo Check that the object is registered with the factory
@@ -183,6 +188,7 @@ public:
     this->emitChangedSignal();
   }
 
+  //!@brief remove an object at the given index
   void removeObject(size_t index)
   {
     // check the index for correctness
@@ -200,11 +206,13 @@ public:
     this->emitChangedSignal();
   }
 
+  //!@brief list all types that are registered at the factory manager
   void listTypes(std::vector<std::string>& types) const
   {
     FactorySingleton::getInstance()->listTypes(types);
   }
 
+  //!@brief returns the type id of an object
   const std::string& getTypeOfObject(cedar::aux::ConfigurablePtr object) const
   {
     BaseTypePtr base_ptr = boost::dynamic_pointer_cast<BaseType>(object);

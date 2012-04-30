@@ -47,7 +47,7 @@
 /*!@brief This is an implementation of the factory pattern that returns a new object of DerivedType as a BaseType
  *        pointer.
  *
- * @param DerivedType      Type of the object being allocated.
+ * @param DerivedTypePtr      Type of the object being allocated.
  * @param BaseTypePtr  The smart pointer base type. This can be used to decide whether you want to use shared_ptr,
  *                         intrusive_ptr or others.
  */

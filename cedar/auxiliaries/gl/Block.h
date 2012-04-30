@@ -60,7 +60,7 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief constructor. 
-   * @param pRigidBody pointer to the aux::RigidBody being visualized
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    * @param length extension of the block in x-direction of the object coordinate frame
    * @param width extension of the block in y-direction of the object coordinate frame
    * @param height extension of the block in z-direction of the object coordinate frame

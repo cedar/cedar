@@ -98,6 +98,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief log a message with a given log level
   void message
   (
     cedar::aux::LOG_LEVEL level,
@@ -114,6 +115,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 signals:
+  //!@brief signals reception of a signal
   void messageReceived(int type, QString title, QString message);
 
   //--------------------------------------------------------------------------------------------------------------------
