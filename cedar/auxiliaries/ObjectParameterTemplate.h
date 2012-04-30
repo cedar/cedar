@@ -28,7 +28,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
     Date:        2012 03 09
 
-    Description: Parameter for a dynamically allocatable, configurable object. Ha!
+    Description: Templated parameter for a dynamically allocatable, configurable object.
 
     Credits:
 
@@ -57,9 +57,13 @@ class cedar::aux::ObjectParameterTemplate : public cedar::aux::ObjectParameter
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief a shared pointer of a BaseType object
   typedef boost::shared_ptr<BaseType> BaseTypePtr;
+  //!@brief a const shared pointer of a BaseType object
   typedef boost::shared_ptr<const BaseType> ConstBaseTypePtr;
+  //!@brief a factory manager for base types
   typedef cedar::aux::FactoryManager<BaseTypePtr> FactoryManager;
+  //!@brief a singleton factory manager
   typedef cedar::aux::Singleton<FactoryManager> FactoryManagerSingleton;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -122,6 +126,7 @@ public:
     }
   }
 
+  //!@brief sets the object
   void setValue(BaseTypePtr object)
   {
     this->mObject = object;
@@ -129,32 +134,38 @@ public:
     this->emitChangedSignal();
   }
 
+  //!@brief returns the stored object (const)
   ConstBaseTypePtr getValue() const
   {
     return this->mObject;
   }
 
+  //!@brief returns the stored object
   BaseTypePtr getValue()
   {
     return this->mObject;
   }
 
+  //!@brief list all types that are registered at the factory manager
   void listTypes(std::vector<std::string>& types) const
   {
     FactoryManagerSingleton::getInstance()->listTypes(types);
   }
 
+  //!@brief returns the stored object as ConfigurablePtr
   cedar::aux::ConfigurablePtr getConfigurable()
   {
     return this->mObject;
   }
 
+  //!@brief sets a type at this parameter (allocating an object of this type in the process)
   void setType(const std::string& type)
   {
     BaseTypePtr object = FactoryManagerSingleton::getInstance()->allocate(type);
     this->setValue(object);
   }
 
+  //!@brief returns the type id for the represented object
   const std::string& getTypeId() const
   {
     return FactoryManagerSingleton::getInstance()->getTypeId(mObject);

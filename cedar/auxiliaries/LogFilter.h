@@ -70,11 +70,13 @@ public:
     const std::string& title
   ) const = 0;
   
+  //!@brief set whether a filter removes messages after accepting them, not passing them to other subsequent filters
   void setRemovesMessages(bool remove)
   {
     this->mRemovesMessages = remove;
   }
-  
+
+  //!@brief get whether a filter removes messages after accepting them, not passing them to other subsequent filters
   bool removesMessages() const
   {
     return this->mRemovesMessages;

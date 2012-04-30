@@ -86,6 +86,10 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor.
    * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
+   * @param objectType the type of the object
+   * @param colorR red value of RGB
+   * @param colorG green value of RGB
+   * @param colorB blue value of RGB
    */
   ObjectVisualization
   (
@@ -188,10 +192,11 @@ protected:
   /*!@brief loads index data from file into a vertex array
    * @param dataFileName specifies the file where the vertex data are stored
    * @param numberOfFaces specifies how many faces are in the file (3 indices for each face)
-   * @param vertices array where the data is stored into
+   * @param indices array where the data is stored into
    */
   void loadIndexData(const QString& dataFileName, unsigned int numberOfFaces, GLushort* indices);
 
+  //!@brief draw an element
   void drawElement
   (
     const GLuint vertexVboId,
@@ -199,7 +204,8 @@ protected:
     unsigned int numberOfFaces
   );
 
-  //todo: this should be done with a struct for material
+  //!@brief set a material specified by an int value
+  //!@todo: this should be done with a struct for material
   void setMaterial(int material);
 
   //--------------------------------------------------------------------------------------------------------------------

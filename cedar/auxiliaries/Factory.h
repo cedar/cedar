@@ -47,7 +47,7 @@
  *
  * BaseType must offer at least a constructor accepting an argument of type const cedar::aux::Arguments&.
  *
- * @param BaseType Type being returned by the allocate functions.
+ * @param BaseTypePtr Type being returned by the allocate functions.
  *
  */
 template <typename BaseTypePtr>

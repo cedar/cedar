@@ -58,11 +58,10 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(LoopedThread);
     CEDAR_DECLARE_AUX_CLASS(ConfigurationInterface);
     CEDAR_DECLARE_AUX_CLASS(UserData);
+    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(IntrusivePtrBase);
     //!@endcond
 
     template <class T> class Singleton;
-
-    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(IntrusivePtrBase);
 
     //!@todo This class may be obsolete once the ConfigurationInterface is removed.
     template <typename T> class IntervalData;
@@ -221,9 +220,9 @@ namespace cedar
     //!@endcond
     
     // Log related classes --------------------------------------------------------------------------------------------
-    CEDAR_DECLARE_AUX_CLASS(Log);
     
     //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_DECLARE_AUX_CLASS(Log);
     CEDAR_DECLARE_AUX_CLASS(LogInterface);
     CEDAR_DECLARE_AUX_CLASS(LogFilter);
     CEDAR_DECLARE_AUX_CLASS(ConsoleLog);
