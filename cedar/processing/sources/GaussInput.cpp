@@ -133,11 +133,11 @@ void cedar::proc::sources::GaussInput::compute(const cedar::proc::Arguments&)
         int shift = _mCenters->at(dim) - current_size / 2;
         if (shift > 0 && row - shift < 0) // kernel center is to the right of matrix center and index is in cyclic range
         {
-          index += current_size - 1;
+          index += current_size;
         }
         if (shift < 0 && row - shift >= current_size) // kernel center is to the left of matrix center, cyclic index
         {
-          index -= current_size - 1;
+          index -= current_size;
         }
         kernel_parts.at(dim).at<float>(row, 0)
               = cedar::aux::math::gauss(index, sigmas.at(dim));
