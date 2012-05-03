@@ -246,11 +246,8 @@ public:
 
 
       /*!@brief Prints the node and all its children to the stream.
-       *
        * @param indentation The indentation for everything that is printed.
-       *
        * @param visited     Set of all nodes already printed.
-       *
        * @param stream      The stream to which to write.
        */
       void print
