@@ -66,6 +66,8 @@
     information about your plugin in case you don't want to hardcode it, e.g., it can contain icon paths for processing
     steps. See documentation of cedar::proc::PluginDeclaration for details.
   - Overhauled the plotting system.
+  - Some outputs and parameters have been renamed. If your architectures fail to load, check that the connections use
+    the correct names.
 
 - cedar::dyn
   - NeuralField now supports changing the sigmoid type and changing the number and type of kernel modes

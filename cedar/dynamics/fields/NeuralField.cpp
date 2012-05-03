@@ -98,7 +98,7 @@ mRestingLevel
   new cedar::aux::DoubleParameter
   (
     this,
-    "restingLevel",
+    "resting level",
     -5.0,
     cedar::aux::DoubleParameter::LimitType::negativeZero()
   )
@@ -108,7 +108,7 @@ mTau
   new cedar::aux::DoubleParameter
   (
     this,
-    "tau",
+    "time scale",
     100.0,
     cedar::aux::DoubleParameter::LimitType::positive()
   )
@@ -118,7 +118,7 @@ mGlobalInhibition
   new cedar::aux::DoubleParameter
   (
     this,
-    "globalInhibition",
+    "global inhibition",
     -0.01,
     cedar::aux::DoubleParameter::LimitType::negativeZero()
   )
@@ -150,7 +150,7 @@ _mInputNoiseGain
   new cedar::aux::DoubleParameter
   (
     this,
-    "inputNoiseGain",
+    "input noise gain",
     0.1,
     cedar::aux::DoubleParameter::LimitType::positiveZero()
   )
@@ -169,10 +169,10 @@ _mSigmoid
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
 
   this->declareBuffer("activation", mActivation);
-  this->declareBuffer("lateralInteraction", mLateralInteraction);
+  this->declareBuffer("lateral interaction", mLateralInteraction);
   this->declareBuffer("input sum", mInputSum);
 
-  this->declareOutput("sigmoid(activation)", mSigmoidalActivation);
+  this->declareOutput("sigmoided activation", mSigmoidalActivation);
 
   this->declareInputCollection("input");
 
@@ -201,7 +201,7 @@ _mSigmoid
                 new KernelListParameter
                 (
                   this,
-                  "lateralKernels",
+                  "lateral kernels",
                   kernel_defaults
                 )
               );
@@ -216,7 +216,7 @@ _mSigmoid
                                                                                         5.0,
                                                                                         2
                                                                                       ));
-  this->addConfigurableChild("noiseCorrelationKernel", mNoiseCorrelationKernel);
+  this->addConfigurableChild("noise correlation kernel", mNoiseCorrelationKernel);
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
   // now check the dimensionality and sizes of all matrices
@@ -466,6 +466,7 @@ void cedar::dyn::NeuralField::updateInputSum()
     cedar::aux::DataPtr input = input_slot->getData(i);
     if (input)
     {
+      //!@todo This is probably slow -- store the type of each input and static_cast instead.
       cv::Mat& input_mat = input->getData<cv::Mat>();
 
       CEDAR_DEBUG_ASSERT(cedar::aux::math::matrixSizesEqual(input_mat, input_sum))
