@@ -48,8 +48,8 @@
  *        pointer.
  *
  * @param DerivedTypePtr      Type of the object being allocated.
- * @param BaseTypePtr  The smart pointer base type. This can be used to decide whether you want to use shared_ptr,
- *                         intrusive_ptr or others.
+ * @param BaseTypePtr         The smart pointer base type. This can be used to decide whether you want to use
+ *                            shared_ptr, intrusive_ptr or others.
  */
 template <typename BaseTypePtr, typename DerivedTypePtr>
 class cedar::aux::FactoryDerived : public cedar::aux::Factory<BaseTypePtr>
@@ -58,6 +58,7 @@ class cedar::aux::FactoryDerived : public cedar::aux::Factory<BaseTypePtr>
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! The type created by this factory.
   typedef typename DerivedTypePtr::element_type DerivedType;
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

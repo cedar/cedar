@@ -106,8 +106,15 @@ public:
     const std::string& title
   );
 
+  /*!@brief Installs the handlers that redirect log messages to this widget.
+   *
+   *        Before calling this method, the log will not display anything. Also, remember to uninstall them when the
+   *        log's parent is destroyed!
+   */
   void installHandlers(bool removeMessages = true);
 
+  /*!@brief Removes the handlers that redirect log messages to this widget.
+   */
   void uninstallHandlers();
 
   //--------------------------------------------------------------------------------------------------------------------
