@@ -159,7 +159,7 @@
     </widget>
    </item>
    <item row="4" column="0" colspan="2">
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="mpLocalCoordinateFrameGroupBox">
      <property name="title">
       <string/>
      </property>
@@ -167,7 +167,7 @@
     </widget>
    </item>
    <item row="2" column="0" colspan="2">
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="mpObjectVisualizationGroupBox">
      <property name="title">
       <string/>
      </property>
