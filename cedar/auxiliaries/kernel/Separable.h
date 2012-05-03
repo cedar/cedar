@@ -75,6 +75,7 @@ public:
    */
   virtual const cv::Mat& getKernelPart(unsigned int dimension) const;
 
+  //!@brief returns the amount of kernel parts, from which the kernel is assembled
   inline size_t kernelPartCount() const
   {
     return this->mKernelParts.size();
@@ -87,6 +88,7 @@ public:
     this->updateKernelMatrix();
   }
 
+  //!@brief returns the size for a given dimension
   unsigned int getSize(size_t dimension) const;
 
   //--------------------------------------------------------------------------------------------------------------------
