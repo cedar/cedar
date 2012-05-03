@@ -109,10 +109,14 @@ int main(int argc, char **argv)
   p_second_arm->setJointVelocity(1, -.45);
   p_second_arm->setJointVelocity(2, -.15);
   p_second_arm->setJointVelocity(3, .25);
+  p_second_arm->setJointVelocity(0, .1);
+  p_second_arm->setJointVelocity(1, .1);
+  p_second_arm->setJointVelocity(2, .1);
+  p_second_arm->setJointVelocity(3, .1);
 
   p_test_arm->start();
-  p_second_arm->start();
   p_test_arm->startTimer(20);
+  p_second_arm->start();
   p_second_arm->startTimer(20);
   viewer.startTimer(20);
   a.exec();
