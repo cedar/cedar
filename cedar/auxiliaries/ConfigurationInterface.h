@@ -75,6 +75,7 @@
 #define __libconfig_hpp
 #endif // __libconfig_hpp
 
+//!@cond SKIPPED_DOCUMENTATION
 namespace libconfig
 {
   struct Setting
@@ -157,6 +158,7 @@ namespace cedar
     }
   }
 }
+//!@endcond
 
 /*!@brief Interface for classes with configuration parameters.
  *

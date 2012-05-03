@@ -215,7 +215,7 @@
             "target": "new NeuralField.input"
         },
         {
-            "source": "new NeuralField.sigmoid(activation)",
+            "source": "new NeuralField.sigmoided activation",
             "target": "new Projection.input"
         }
     ],

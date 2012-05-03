@@ -74,11 +74,15 @@ class cedar::dyn::NeuralField : public cedar::dyn::Dynamics
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief a parameter for kernel objects
   typedef cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel> KernelListParameter;
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(KernelListParameter);
-
+  //!@brief a parameter for sigmoid objects
   typedef cedar::aux::ObjectParameterTemplate<cedar::aux::math::Sigmoid> SigmoidParameter;
+
+  //!@cond SKIPPED_DOCUMENTATION
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(KernelListParameter);
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(SigmoidParameter);
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -96,11 +100,13 @@ public:
   void onStart();
   void onStop();
 
+  //!@brief convenience function to access the output
   inline cedar::dyn::ConstSpaceCodePtr getFieldOutput() const
   {
     return this->mSigmoidalActivation;
   }
 
+  //!@brief convenience function to access the field activation
   inline cedar::dyn::ConstSpaceCodePtr getFieldActivation() const
   {
     return this->mActivation;

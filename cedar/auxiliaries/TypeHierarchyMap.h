@@ -45,12 +45,36 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <set>
 #include <queue>
+#include <iostream>
 
-/*!@todo describe.
+/*!@brief   A structure capable of representing parts of the inheritance sturcture between types.
  *
- * @todo describe more.
-
- * @remarks RootType must provide a default constructor.
+ *          Given a root type, different class types that inherit from it are ordered into a graph structure. This graph
+ *          is built in a way that represents the inheritance structure between two types: if class B inherits from
+ *          class A, then B will be below A in the graph, either as its direct child, or if there are multiple classes
+ *          in between that are known to the structure, as one of the grandchildren.
+ *
+ *          In addition to the representation of the hierarchy, each node in the graph is also capable of holding data
+ *          of the type DataType.
+ *
+ *          As an example, the primary reason for developing this structure was to enable flexible plotting of data.
+ *          Consider MatData and ImageData: ImageData inherits MatData. Thus, any plot capable of plotting MatData is
+ *          automatically also capable of plotting ImageData. Therefore, we can create a type hierarchy with
+ *          cedar::aux::Data as RootType and, e.g., use a string to identify the plot type. We can then insert the pair
+ *          &gt;ImageData, "ImagePlot"&lt;, which thus becomes a direct child of the root node. Next, we can insert the
+ *          pair &gt;MatData, "MatPlot"&lt;. The corresponding node is then inserted between the image node and the root
+ *          node. Thus, if we want to know which plots are available for ImageData, we can find the corresponding node
+ *          using tree.find&gt;ImageData&lt; which will return the resulting node, whose parents, in turn, can be
+ *          traversed to find the list ["ImagePlot", "MatPlot"].
+ *
+ * @remark  RootType must provide a default constructor.
+ *
+ * @remark  This structure has certain limitations: it uses dynamic casts to determine inheritance. This means that
+ *          there can, in principle, be an unlimited number of classes between two nodes that are connected by an edge
+ *          in the graph. This also means that the following two situations cannot be distinguished: let B inherit A,
+ *          C inherit B. Using dynamic casts, it is impossible to tell whether C inherits A directly as well as via B.
+ *          Thus, information in this structure is never complete, but should always be correct (telling you at least,
+ *          that B is a base of C, as well as A -- via B).
  */
 template <typename RootType, typename DataType>
 class cedar::aux::TypeHierarchyMap
@@ -59,29 +83,54 @@ class cedar::aux::TypeHierarchyMap
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@cond SKIPPED_DOCUMENTATION
   CEDAR_GENERATE_POINTER_TYPES(RootType);
+  //!@endcond
 
-  // forward declaration of child classes
 public:
+  // forward declaration of node class.
   class Node;
+
+  //!@cond SKIPPED_DOCUMENTATION
   CEDAR_GENERATE_POINTER_TYPES(Node);
+  //!@endcond
 
 private:
+  // Forward-declaration of the node template.
   template <typename T> class NodeTemplate;
 
 public:
+  /*!@brief   A node in the type hierarchy.
+   *
+   *          This node holds a piece of data and represents a specific type inside the hierarchy.
+   *
+   * @remarks Each node holds a probe instance which is used to perform dynamic casts for testing inheritance.
+   */
   class Node : public boost::enable_shared_from_this<Node>
   {
     private:
+      //! Set of children of the node, i.e., the classes that (presumably) directly inherit it.
       typedef std::set<NodePtr> Children;
+
+      //! Set of the parents of the node, i.e., the (presumed) direct bases classes of this class.
       typedef std::set<NodeWeakPtr> Parents;
+
     public:
+      //! Constant iterator over the children.
       typedef typename Children::const_iterator const_children_iterator;
+
+      //! Constant iterator over the parents.
       typedef typename Parents::const_iterator const_parents_iterator;
+
+      //! Iterator over the children.
       typedef typename Children::iterator children_iterator;
+
+      //! Iterator over the parents.
       typedef typename Parents::iterator parents_iterator;
 
     public:
+      /*!@brief Constructor that receives a probe instantce and the data to be held by this node.
+       */
       Node(RootTypePtr probeInstance, const DataType& data = DataType())
       :
       mProbeInstance(probeInstance),
@@ -89,46 +138,68 @@ public:
       {
       }
 
+      //!@brief Returns the string version of the type held by this node.
       virtual std::string getTypeString() const = 0;
 
+      //!@brief Returns a constant iterator to the beginning of the list of children.
       const_children_iterator childrenBegin() const
       {
         return this->mChildren.begin();
       }
 
+      //!@brief Returns a constant iterator to the end of the list of children.
       const_children_iterator childrenEnd() const
       {
         return this->mChildren.end();
       }
 
+      //!@brief Returns a constant iterator to the beginning of the list of parents.
       const_parents_iterator parentsBegin() const
       {
         return this->mParents.begin();
       }
 
+      //!@brief Returns a constant iterator to the end of the list of parents.
       const_parents_iterator parentsEnd() const
       {
         return this->mParents.end();
       }
 
+      //!@brief Sets the data held by the node.
       void setData(const DataType& data)
       {
         this->mData = data;
       }
 
+      //!@brief Returns the data held by the node.
       const DataType& getData() const
       {
         return this->mData;
       }
 
+      //!@brief Returns the data held by the node.
       DataType& getData()
       {
         return this->mData;
       }
 
+      /*!@brief   Inserts a new type into the sub-graph below this node, setting the given data.
+       *
+       * @tparam  T The type to add.
+       *
+       * @param   probeInstance The probe instance to use.
+       *
+       * @param   data The data to be inserted into the newly created node.
+       *
+       * @param   correspondingNode If a node was already added along the way, it is passed via this parameter. All
+       *                            subsequent nodes matching this type in any way attach to/detach from this node.
+       *
+       * @remarks This should usually be called via the TypeHierarchyMap containing this node.
+       */
       template <class T>
       NodePtr insert(ConstRootTypePtr probeInstance, const DataType& data, NodePtr correspondingNode = NodePtr())
       {
+        // if the
         if (this->matchesExact(probeInstance))
         {
           this->mData = data;
@@ -155,7 +226,6 @@ public:
           }
         }
 
-
         if (!is_child)
         {
           // insert new node for the instance.
@@ -175,19 +245,25 @@ public:
       }
 
 
+      /*!@brief Prints the node and all its children to the stream.
+       * @param indentation The indentation for everything that is printed.
+       * @param visited     Set of all nodes already printed.
+       * @param stream      The stream to which to write.
+       */
       void print
       (
         const std::string& indentation = "",
-        std::set<ConstNodePtr> visited = std::set<ConstNodePtr>()
+        std::set<ConstNodePtr> visited = std::set<ConstNodePtr>(),
+        std::ostream& stream = std::cout
       ) const
       {
         if (visited.find(this->shared_from_this()) != visited.end())
         {
-          std::cout << indentation << " LOOP!" << std::endl;
+          stream << indentation << " LOOP!" << std::endl;
           return;
         }
 
-        std::cout << indentation << cedar::aux::objectTypeToString(this->mProbeInstance)
+        stream << indentation << cedar::aux::objectTypeToString(this->mProbeInstance)
                   << " <" << this << ">" << std::endl;
         visited.insert(this->shared_from_this());
 
@@ -222,6 +298,8 @@ public:
         }
       }
 
+      /*!@brief Finds the node corresponding to instance's type.
+       */
       ConstNodePtr find(ConstRootTypePtr instance) const
       {
         if (this->matchesExact(instance))
@@ -250,6 +328,8 @@ public:
         return ConstNodePtr();
       }
 
+      /*!@brief Tests whether the given node is a parent of this node.
+       */
       bool isParent(ConstNodePtr node) const
       {
         NodeWeakPtr weaky(boost::const_pointer_cast<Node>(node));
@@ -322,6 +402,8 @@ public:
         return deepest_node;
       }
 
+      /*!@brief Tests whether the given node is an ancestor of this node.
+       */
       bool isAncestor(ConstNodePtr node) const
       {
         // either the node is a direct parent of this node ...
@@ -346,18 +428,30 @@ public:
         }
       }
 
+      /*!@brief Tests, whether the type of instance mathes the type of this node exactly.
+       */
       virtual bool matchesExact(ConstRootTypePtr instance) const = 0;
 
-      // true if instance can be dynamic_cast to the type of the node
+      /*!@brief   Tests, whether the type of instance derives from the type of this node.
+       *
+       * @remarks True if instance can be dynamic_cast to the type of this node.
+       */
       virtual bool matchesDerived(ConstRootTypePtr instance) const = 0;
 
-      // true if the type of the node can be dynamic_cast to the given type
+      /*!@brief   Tests, whether the type of this node derives from the given type.
+       *
+       * @tparam  The class of which the test is done for.
+       *
+       * @returns true if the type of the node can be dynamic_cast to the given type
+       */
       template <class T>
       bool derivesFrom() const
       {
         return boost::dynamic_pointer_cast<const T>(this->mProbeInstance);
       }
 
+      /*!@brief Counts all nodes connected to this node (directly and transitively).
+       */
       size_t countConnected() const
       {
         std::set<ConstNodePtr> nodes;
@@ -365,12 +459,16 @@ public:
         return nodes.size();
       }
 
+      /*!@brief Returns the number of direct children of this node.
+       */
       size_t childrenSize() const
       {
         return this->mChildren.size();
       }
 
     private:
+      /*!@brief Connects all related classes to this node that are connected to the given node.
+       */
       void connectAllDerived(NodePtr node)
       {
         std::set<NodePtr> nodes;
@@ -401,6 +499,8 @@ public:
         }
       }
 
+      /*!@brief Lists all nodes connected to this node.
+       */
       void listAllConnectedNodes(std::set<NodePtr>& nodes)
       {
         std::queue<NodePtr> to_explore;
@@ -433,6 +533,8 @@ public:
         }
       }
 
+      /*!@brief Lists all nodes connected to this node.
+       */
       void listAllConnectedNodes(std::set<ConstNodePtr>& nodes) const
       {
         std::queue<ConstNodePtr> to_explore;
@@ -465,6 +567,8 @@ public:
         }
       }
 
+      /*!@brief Inserts a class that is a superclass of this node.
+       */
       template <class T>
       NodePtr insertSuperClass(const DataType& data, NodePtr insertedNode)
       {
@@ -503,6 +607,8 @@ public:
         return insertedNode;
       }
 
+      /*!@brief Adds a parent to this node.
+       */
       void addParent(NodePtr parent)
       {
         if (parent.get() == this)
@@ -517,6 +623,8 @@ public:
         }
       }
 
+      /*!@brief Adds a child to this node.
+       */
       void addChild(NodePtr child)
       {
         if (child.get() == this)
@@ -531,6 +639,8 @@ public:
         }
       }
 
+      /*!@brief Removes one of this node's parents.
+       */
       void removeParent(NodePtr node)
       {
         parents_iterator iter = this->mParents.find(node);
@@ -541,6 +651,8 @@ public:
         }
       }
 
+      /*!@brief Removes one of this node's children.
+       */
       void removeChild(NodePtr node)
       {
         children_iterator iter = this->mChildren.find(node);
@@ -552,36 +664,52 @@ public:
       }
 
     private:
+      //! The probe instance used for making dynamic casts.
       RootTypePtr mProbeInstance;
 
+      //! The data held by this node.
       DataType mData;
 
+      //! The children of this node.
       Children mChildren;
 
+      //! The parents of this node.
       Parents mParents;
   };
 
 private:
+  /*!@brief  Node that represents a class of the given type.
+   *
+   * @tparam T Type held by this node.
+   */
   template <typename T>
   class NodeTemplate : public Node
   {
     public:
+      /*!@brief The default constructor.
+       */
       NodeTemplate(const DataType& data = DataType())
       :
       Node(RootTypePtr(new T()), data)
       {
       }
 
+      /*!@brief Returns a string representation of the type that this node represents.
+       */
       std::string getTypeString() const
       {
         return cedar::aux::typeToString<T>();
       }
 
+      /*!@brief Checks whether the type of the given instance is exactly the one represented by this node.
+       */
       bool matchesExact(ConstRootTypePtr instance) const
       {
         return typeid(*instance) == typeid(T);
       }
 
+      /*!@brief Checks whether the type of instance inherits the type represented by this node.
+       */
       bool matchesDerived(ConstRootTypePtr instance) const
       {
         return boost::dynamic_pointer_cast<const T>(instance);
@@ -599,12 +727,15 @@ public:
   {
   }
 
-  //!@brief Destructor
-
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief  Inserts a type into the hierarchy with the given data.
+   *
+   * @tparam T The type to insert.
+   * @param  data Data to be associated with the type.
+   */
   template <typename T>
   void insert(const DataType& data)
   {
@@ -648,21 +779,30 @@ public:
     this->mRootNode->findBases(instance, bases);
   }
 
+  /*!@brief Returns the type in the hierarchy that represents the type of instance most closely.
+   */
   const DataType& getClosest(ConstRootTypePtr instance) const
   {
     return this->getClosestNode(instance)->getData();
   }
 
+  /*!@brief Returns the node corresponding to the type in the hierarchy that represents the type of instance most
+   *        closely.
+   */
   ConstNodePtr getClosestNode(ConstRootTypePtr instance) const
   {
     return this->mRootNode->getClosest(instance);
   }
 
+  /*!@brief Returns the number of nodes currently stored in the hierarchy.
+   */
   size_t size() const
   {
     return this->mRootNode->countConnected();
   }
 
+  /*!@brief Retrieves the node corresponding to the given type.
+   */
   template <class T>
   ConstNodePtr find() const
   {
@@ -670,6 +810,8 @@ public:
     return this->find(instance);
   }
 
+  /*!@brief Retrieves the node corresponding to the given type.
+   */
   template <class T>
   NodePtr find()
   {
@@ -677,11 +819,15 @@ public:
     return this->find(instance);
   }
 
+  /*!@brief Sets the data of the root node.
+   */
   void setRootData(const DataType& data)
   {
     this->mRootNode->setData(data);
   }
 
+  /*!@brief Returns the root node.
+   */
   ConstNodePtr getRootNode() const
   {
     return this->mRootNode;
@@ -705,6 +851,7 @@ private:
 protected:
   // none yet
 private:
+  //! The root node of the hierarchy. This node represents RootType.
   NodePtr mRootNode;
 
 }; // class cedar::aux::TypeHierarchyMap

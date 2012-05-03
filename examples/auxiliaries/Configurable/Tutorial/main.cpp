@@ -43,6 +43,7 @@
 #include <QApplication>
 #include <iostream>
 
+//!@cond SKIPPED_DOCUMENTATION
 class MyConfigurableClass : public cedar::aux::Configurable
 {
   private:
@@ -83,7 +84,6 @@ class MyConfigurableClass : public cedar::aux::Configurable
 
 // first, we generate the pointer types for our class; this saves us some typing
 CEDAR_GENERATE_POINTER_TYPES(MyConfigurableClass); // include cedar/defines.h for this
-
 
 class A : public cedar::aux::Configurable
 {
@@ -150,7 +150,7 @@ class GroupDemo : public cedar::aux::Configurable
 };
 
 CEDAR_GENERATE_POINTER_TYPES(GroupDemo);
-
+//!@endcond
 
 int main(int argc, char** argv)
 {

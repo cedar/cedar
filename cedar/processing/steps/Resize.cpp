@@ -100,7 +100,7 @@ cedar::proc::steps::Resize::Resize()
 // outputs
 mOutput(new cedar::aux::MatData(cv::Mat())),
 // parameters
-_mOutputSize(new cedar::aux::UIntVectorParameter(this, "outputSize", 1, 10, 1, 1000000)),
+_mOutputSize(new cedar::aux::UIntVectorParameter(this, "output size", 1, 10, 1, 1000000)),
 _mInterpolationType(new cedar::aux::EnumParameter(this,
                                                   "interpolation",
                                                   cedar::proc::steps::Resize::Interpolation::typePtr(),

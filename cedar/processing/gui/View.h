@@ -117,6 +117,7 @@ protected:
   void mouseMoveEvent(QMouseEvent *pEvent);
 
 signals:
+  //!@brief reacts to a change in zoom level
   void zoomLevelChanged(double newZoomLevel);
 
   //--------------------------------------------------------------------------------------------------------------------

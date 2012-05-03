@@ -75,7 +75,7 @@ public:
   /*!@brief Constructor with configuration
    *
    *@param localCoordinateFrame pointer to the LocalCoordinateFrame being controlled by the widget
-   *@param configFileName path of a configuration file
+   *@param configurationFileName path of a configuration file
    *@param parent parent parameter of QWidget
    */
   LocalCoordinateFrameWidget

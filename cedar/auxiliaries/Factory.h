@@ -45,10 +45,9 @@
 
 /*!@brief Factory for dynamically allocating objects of the type BaseType.
  *
- * BaseType must offer at least a constructor accepting an argument of type const cedar::aux::Arguments&.
+ *        BaseType must offer at least a constructor accepting an argument of type const cedar::aux::Arguments&.
  *
- * @param BaseType Type being returned by the allocate functions.
- *
+ * @param BaseTypePtr Type being returned by the allocate functions.
  */
 template <typename BaseTypePtr>
 class cedar::aux::Factory
@@ -57,6 +56,7 @@ class cedar::aux::Factory
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! The base type created by the factory.
   typedef typename BaseTypePtr::element_type BaseType;
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
