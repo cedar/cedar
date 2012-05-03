@@ -59,8 +59,6 @@
  * allow you to control velocities or accelerations directly, you can start the
  * the KinematicChain as a thread to handle velocities and accelerations
  * "manually".
- *
- * @todo This no longer needs to inherit from Configurable once LoopedThread does.
  */
 class cedar::dev::robot::KinematicChain
 :
@@ -69,6 +67,8 @@ public cedar::aux::LoopedThread
 #ifdef CEDAR_LIBCONFIG_LEGACY_MODE
 ,public cedar::aux::Configurable // only needs to inherit virtually in case of non-legacy config interface
 #endif // CEDAR_LIBCONFIG_LEGACY_MODE
+public cedar::aux::LoopedThread,
+public cedar::aux::NamedConfigurable
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------
