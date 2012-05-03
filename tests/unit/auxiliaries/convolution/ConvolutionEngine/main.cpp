@@ -36,8 +36,6 @@
 
 
 // LOCAL INCLUDES
-
-// PROJECT INCLUDES
 #include "cedar/auxiliaries/convolution/Engine.h"
 #include "cedar/auxiliaries/convolution/OpenCV.h"
 #include "cedar/auxiliaries/convolution/FFTW.h"
@@ -46,6 +44,7 @@
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/utilities.h"
+#include "cedar/configuration.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -551,8 +550,10 @@ int main()
   cedar::aux::conv::OpenCVPtr open_cv (new cedar::aux::conv::OpenCV());
   errors += testEngine(open_cv);
 
+#ifdef CEDAR_USE_FFTW
   cedar::aux::conv::FFTWPtr fftw (new cedar::aux::conv::FFTW());
   errors += testEngine(fftw);
+#endif // CEDAR_USE_FFTW
 
   return errors;
 }
