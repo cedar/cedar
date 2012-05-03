@@ -189,6 +189,8 @@ public:
        *
        * @param   probeInstance The probe instance to use.
        *
+       * @param   data The data to be inserted into the newly created node.
+       *
        * @param   correspondingNode If a node was already added along the way, it is passed via this parameter. All
        *                            subsequent nodes matching this type in any way attach to/detach from this node.
        *
@@ -248,12 +250,14 @@ public:
        * @param indentation The indentation for everything that is printed.
        *
        * @param visited     Set of all nodes already printed.
+       *
+       * @param stream      The stream to which to write.
        */
       void print
       (
         const std::string& indentation = "",
         std::set<ConstNodePtr> visited = std::set<ConstNodePtr>(),
-        std::ostream& stream
+        std::ostream& stream = std::cout
       ) const
       {
         if (visited.find(this->shared_from_this()) != visited.end())

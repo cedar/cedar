@@ -64,10 +64,13 @@ private:
 public:
   //!@brief iterator for map data structure
   typedef typename std::map<std::string, ValueTypePtr>::iterator iterator;
+
   //!@brief iterator for map data structure (const)
   typedef typename std::map<std::string, ValueTypePtr>::const_iterator const_iterator;
+
   //!@brief reverse iterator for map data structure
   typedef typename std::map<std::string, ValueTypePtr>::reverse_iterator reverse_iterator;
+
   //!@brief reverse iterator for map data structure (const)
   typedef typename std::map<std::string, ValueTypePtr>::const_reverse_iterator const_reverse_iterator;
 
@@ -82,6 +85,12 @@ public:
   {
   }
 
+  /*!@brief Constructor.
+   *
+   * @param pOwner   The configurable that owns this parameter.
+   * @param name     The name of this parameter.
+   * @param defaults The map used as default value.
+   */
   ObjectMapParameterTemplate
   (
     cedar::aux::Configurable *pOwner,
@@ -265,6 +274,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /*!@brief Sets the changed flag of the parameter and all the objects stored in it.
+   */
   void setChangedFlag(bool changed)
   {
     // set the changed flag for the objects managed by the parameter

@@ -258,21 +258,47 @@ protected:
                       BLACK
                     };
 
+  //! Static member for no specularity.
   static const float mNoSpecular[3];
-  static const float mSegment_Ambient[3];
-  static const float mSegment_Diffuse[3];
-  static const float mSegment_Specular[3];
-  static const float mSegment_Shininess[1];
-  static const float mChrome_Ambient[3];
-  static const float mChrome_Diffuse[3];
-  static const float mChrome_Specular[3];
-  static const float mChrome_Shininess[1];
-  static const float mBlack_Ambient[3];
-  static const float mBlack_Diffuse[3];
-  static const float mBlack_Specular[3];
-  static const float mBlack_Shininess[1];
-private:
 
+  //! Static member for ambient color of segments.
+  static const float mSegment_Ambient[3];
+
+  //! Static member for diffuse color of segments.
+  static const float mSegment_Diffuse[3];
+
+  //! Static member for specilar color of segments.
+  static const float mSegment_Specular[3];
+
+  //! Static member for the shininess factor of segments.
+  static const float mSegment_Shininess[1];
+
+  //! Static member for the ambient color of chrome parts.
+  static const float mChrome_Ambient[3];
+
+  //! Static member for the ambient color of chrome parts.
+  static const float mChrome_Diffuse[3];
+
+  //! Static member for the specular color of chrome parts.
+  static const float mChrome_Specular[3];
+
+  //! Static member for the shininess factor of chrome parts.
+  static const float mChrome_Shininess[1];
+
+  //! Static member for the ambient color of black parts.
+  static const float mBlack_Ambient[3];
+
+  //! Static member for the diffuse color of black parts.
+  static const float mBlack_Diffuse[3];
+
+  //! Static member for the specular color of black parts.
+  static const float mBlack_Specular[3];
+
+  //! Static member for the shininess factor of black parts.
+  static const float mBlack_Shininess[1];
+
+private:
+  // none yet
 };
 
 #endif  // CEDAR_AUX_GL_OBJECT_VISUALIZATION_H

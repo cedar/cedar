@@ -49,9 +49,9 @@
 
 /*!@brief A parameter that reads a list of configurable objects from a file.
  *
- * @todo describe more.
+ * @todo Should BaseType include the pointer type?
  */
-template <class BaseType> //!@todo Should BaseType include the pointer type?
+template <class BaseType>
 class cedar::aux::ObjectListParameterTemplate : public cedar::aux::ObjectListParameter
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -59,8 +59,10 @@ class cedar::aux::ObjectListParameterTemplate : public cedar::aux::ObjectListPar
   //--------------------------------------------------------------------------------------------------------------------
   //!@brief a shared pointer of a BaseType object
   typedef typename boost::shared_ptr<BaseType> BaseTypePtr;
+
   //!@brief a const shared pointer of a BaseType object
   typedef typename boost::shared_ptr<const BaseType> ConstBaseTypePtr;
+
   //!@brief a singleton factory manager for base types
   typedef typename cedar::aux::Singleton<cedar::aux::FactoryManager<BaseTypePtr> > FactorySingleton;
 
@@ -75,6 +77,12 @@ public:
   {
   }
 
+  /*!@brief Constructor.
+   *
+   * @param pOwner   The configurable that owns this parameter.
+   * @param name     The name of this parameter.
+   * @param defaults The list used as default value.
+   */
   ObjectListParameterTemplate
   (
     cedar::aux::Configurable *pOwner,
@@ -241,6 +249,8 @@ private:
     return this->mObjectList.at(index);
   }
 
+  /*!@brief Sets the changed flag of the parameter and all the objects stored in it.
+   */
   void setChangedFlag(bool changed)
   {
     // set the changed flag for the objects managed by the parameter
