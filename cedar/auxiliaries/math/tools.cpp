@@ -208,6 +208,7 @@ void cedar::aux::math::write(cv::Mat matrix)
   std::cout << "\n";
 }
 
+//!@cond SKIPPED_DOCUMENTATION
 cv::Mat cedar::aux::math::convolve(const cv::Mat& matrix, const cv::Mat& kernel)
 {
   cv::Mat result;
@@ -227,6 +228,7 @@ cv::Mat cedar::aux::math::convolve(const cv::Mat& matrix, const cv::Mat& kernel)
 
   return result;
 }
+//!@endcond
 
 template <typename T>
 void cedar::aux::math::reduceCvMat3D(const cv::Mat& source, cv::Mat& destination, int dimensionToReduce, int reductionOperator)
