@@ -54,6 +54,7 @@
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -67,6 +68,10 @@
 cedar::proc::gui::Ide::Ide()
 {
   this->setupUi(this);
+
+  // first, setup the log to receive messages
+  this->mpLog->installHandlers(true);
+
   this->loadDefaultPlugins();
   this->resetStepList();
 
@@ -151,6 +156,7 @@ cedar::proc::gui::Ide::Ide()
 
 cedar::proc::gui::Ide::~Ide()
 {
+  this->mpLog->uninstallHandlers();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -447,12 +453,12 @@ void cedar::proc::gui::Ide::error(const QString& message)
 
 void cedar::proc::gui::Ide::message(const QString& message)
 {
-  this->mpLog->append(message + "\n");
+  cedar::aux::LogSingleton::getInstance()->message(message.toStdString(), "cedar::proc::gui::Ide::message");
 }
 
 void cedar::proc::gui::Ide::logError(const std::string& message)
 {
-  this->mpLog->append("<font color=\"red\"><b>" + QString::fromStdString(message) + "</b></font>\n");
+  cedar::aux::LogSingleton::getInstance()->error(message, "cedar::proc::gui::Ide::logError");
 }
 
 

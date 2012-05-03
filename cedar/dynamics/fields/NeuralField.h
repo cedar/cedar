@@ -73,11 +73,15 @@ class cedar::dyn::NeuralField : public cedar::dyn::Dynamics
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief a parameter for kernel objects
   typedef cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel> KernelListParameter;
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(KernelListParameter);
-
+  //!@brief a parameter for sigmoid objects
   typedef cedar::aux::ObjectParameterTemplate<cedar::aux::math::Sigmoid> SigmoidParameter;
+
+  //!@cond SKIPPED_DOCUMENTATION
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(KernelListParameter);
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(SigmoidParameter);
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -95,11 +99,13 @@ public:
   void onStart();
   void onStop();
 
+  //!@brief convenience function to access the output
   inline cedar::dyn::ConstSpaceCodePtr getFieldOutput() const
   {
     return this->mSigmoidalActivation;
   }
 
+  //!@brief convenience function to access the field activation
   inline cedar::dyn::ConstSpaceCodePtr getFieldActivation() const
   {
     return this->mActivation;
@@ -152,26 +158,44 @@ private:
     return this->_mDimensionality->getValue();
   }
 
+  /*!@brief   Recalculates the sum of all inputs.
+   *
+   * @remarks This method assumes that all data is locked.
+   */
+  void updateInputSum();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief this SpaceCode matrix contains the current field activity of the NeuralField
   cedar::dyn::SpaceCodePtr mActivation;
+
   //!@brief this SpaceCode matrix contains the current field activity, sent through the sigmoid function
   cedar::dyn::SpaceCodePtr mSigmoidalActivation;
+
   //!@brief this SpaceCode matrix contains the current lateral interactions of the NeuralField, i.e. convolution result
   cedar::dyn::SpaceCodePtr mLateralInteraction;
+
+  //!@brief this SpaceCode matrix contains the current lateral interactions of the NeuralField, i.e. convolution result
+  cedar::dyn::SpaceCodePtr mInputSum;
+
   //!@brief this MatData contains the input noise
   cedar::aux::MatDataPtr mInputNoise;
+
   //!@brief this MatData contains the neural noise
   cedar::aux::MatDataPtr mNeuralNoise;
+
   //!@brief the resting level of a field
   cedar::aux::DoubleParameterPtr mRestingLevel;
+
   //!@brief the relaxation rate of the field
-  cedar::aux::DoubleParameterPtr mTau; //!@todo deal with units, now: milliseconds
+  //!@todo deal with units; for now: milliseconds
+  cedar::aux::DoubleParameterPtr mTau;
+
   //!@brief the global inhibition of the field, which is not contained in the kernel
   cedar::aux::DoubleParameterPtr mGlobalInhibition;
+
   //!@brief the noise correlation kernel
   cedar::aux::kernel::GaussPtr mNoiseCorrelationKernel;
 private:

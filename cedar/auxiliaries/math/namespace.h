@@ -66,14 +66,17 @@ namespace cedar
 
       //!@brief a templated declaration for sigmoid function implementation
       template <class DerivedClass> class SigmoidDeclarationT;
-
+      //!@brief a template specialization for sigmoid factories
       typedef cedar::aux::Factory<SigmoidPtr> SigmoidFactory;
-      CEDAR_GENERATE_POINTER_TYPES(SigmoidFactory);
 
       template <class T> class LimitsParameter;
+      //!@brief a template specialization for double-based limits
       typedef LimitsParameter<double> DoubleLimitsParameter;
-      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleLimitsParameter);
 
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_GENERATE_POINTER_TYPES(SigmoidFactory);
+      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleLimitsParameter);
+      //!@endcond
     }
   }
 }

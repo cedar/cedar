@@ -37,8 +37,9 @@
 #ifndef CEDAR_DEV_KUKA_KUKA_INTERFACE_H
 #define CEDAR_DEV_KUKA_KUKA_INTERFACE_H
 
-// MAKE FRI OPTIONAL
-#include "cedar/devices/robot/CMakeDefines.h"
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 #ifdef CEDAR_USE_KUKA_LWR
 
 // CEDAR INCLUDES

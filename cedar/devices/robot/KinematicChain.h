@@ -44,7 +44,7 @@
 #include "cedar/devices/robot/namespace.h"
 #include "cedar/devices/robot/Component.h"
 #include "cedar/auxiliaries/LoopedThread.h"
-#include "cedar/auxiliaries/NamedConfigurable.h"
+#include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 
 // SYSTEM INCLUDES
@@ -63,6 +63,10 @@
 class cedar::dev::robot::KinematicChain
 :
 public cedar::dev::robot::Component,
+public cedar::aux::LoopedThread
+#ifdef CEDAR_LIBCONFIG_LEGACY_MODE
+,public cedar::aux::Configurable // only needs to inherit virtually in case of non-legacy config interface
+#endif // CEDAR_LIBCONFIG_LEGACY_MODE
 public cedar::aux::LoopedThread,
 public cedar::aux::NamedConfigurable
 {
@@ -97,9 +101,12 @@ public:
 public:
   //! smart pointer definition for the Joint struct
   typedef boost::shared_ptr<cedar::dev::robot::KinematicChain::Joint> JointPtr;
+  //!@brief a parameter for a list of joint objects
   typedef cedar::aux::ObjectListParameterTemplate<cedar::dev::robot::KinematicChain::Joint> JointListParameter;
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(JointListParameter);
 
+  //!@cond SKIPPED_DOCUMENTATION
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(JointListParameter);
+  //!@endcond
 
   //----------------------------------------------------------------------------
   // parameters

@@ -38,6 +38,7 @@
 #include "cedar/auxiliaries/NamedConfigurable.h"
 
 // SYSTEM INCLUDES
+#include <boost/filesystem.hpp>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -48,9 +49,8 @@ class TestClass : public cedar::aux::NamedConfigurable
 
 CEDAR_GENERATE_POINTER_TYPES(TestClass);
 
-int main()
+int testGetSetMethods()
 {
-  // the number of errors encountered in this test
   int errors = 0;
 
   TestClassPtr test_class(new TestClass());
@@ -58,19 +58,51 @@ int main()
   std::string name = test_class->getName();
   if (name != "test_name")
   {
-    std::cout << "Wrong name was set; ";
-    ++errors;
-  }
-  std::cout << "Read name \"" << name << "\"." << std::endl;
-
-  test_class->readJson("test.json");
-  if (name != "name_from_file")
-  {
     std::cout << "Wrong name was read; ";
     ++errors;
   }
   std::cout << "Read name \"" << name << "\"." << std::endl;
 
+  return errors;
+}
+
+int testIO()
+{
+  int errors = 0;
+  std::string test_name = "Test NamedConfigurable";
+
+  // write name to a file
+  {
+    TestClassPtr test_class(new TestClass());
+    test_class->setName(test_name);
+    test_class->writeJson("test.json");
+  }
+
+  // read name from file
+  {
+    TestClassPtr test_class(new TestClass());
+    test_class->readJson("test.json");
+
+    if (test_class->getName() != test_name)
+    {
+      std::cout << "Read the wrong name from file. Read: \"" << test_class->getName() << "\", expected: \""
+          << test_name << "\"" << std::endl;
+      ++errors;
+    }
+  }
+
+  boost::filesystem::remove("test.json");
+
+  return errors;
+}
+
+int main()
+{
+  // the number of errors encountered in this test
+  int errors = 0;
+
+  errors += testGetSetMethods();
+  errors += testIO();
 
   return errors;
 }

@@ -81,6 +81,7 @@ public:
   //!@brief plot data
   void plot(cedar::aux::DataPtr data, const std::string& title);
 
+  //!@brief check if given data can be added to a plot
   bool canAppend(cedar::aux::ConstDataPtr data) const;
 
 public slots:

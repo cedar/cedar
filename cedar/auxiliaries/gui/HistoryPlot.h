@@ -67,6 +67,10 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief plot data
+   * @param data plotted data
+   * @param title title of the plot window
+   */
   void plot(cedar::aux::DataPtr data, const std::string& title);
 
   //--------------------------------------------------------------------------------------------------------------------

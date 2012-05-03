@@ -87,6 +87,7 @@ public:
    *
    * @param data A pointer to the data to display. If this isn't a pointer to a cedar::aux::ImageData, the function
    *             throws.
+   * @param title title of the plot window
    */
   void plot(cedar::aux::DataPtr data, const std::string& title);
 

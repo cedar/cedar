@@ -67,6 +67,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief interface for all child logger classes
   virtual void message
   (
     cedar::aux::LOG_LEVEL level, 

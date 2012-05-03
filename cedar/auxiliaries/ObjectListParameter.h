@@ -84,13 +84,19 @@ public:
    */
   virtual void pushBack(const std::string& typeId) = 0;
 
+  /*!@brief Removes the object at the given index.
+   */
   virtual void removeObject(size_t index) = 0;
 
+  /*!@brief Connects to the object added signal.
+   */
   inline boost::signals2::connection connectToObjectAddedSignal(boost::function<void(int)> slot)
   {
     return this->mObjectAdded.connect(slot);
   }
 
+  /*!@brief Connects to the object removed signal.
+   */
   inline boost::signals2::connection connectToObjectRemovedSignal(boost::function<void(int)> slot)
   {
     return this->mObjectRemoved.connect(slot);

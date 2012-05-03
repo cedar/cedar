@@ -57,8 +57,7 @@ mpOwner(pOwner),
 mHasDefault(hasDefault),
 mConstant(false),
 mIsHidden(false),
-mChanged(false),
-mReferenceCount(0)
+mChanged(false)
 {
   CEDAR_ASSERT(this->mpOwner != NULL);
   this->setName(name);
@@ -74,20 +73,6 @@ cedar::aux::Parameter::~Parameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void intrusive_ptr_add_ref(cedar::aux::Parameter* pObject)
-{
-  pObject->mReferenceCount += 1;
-}
-
-void intrusive_ptr_release(cedar::aux::Parameter* pObject)
-{
-  pObject->mReferenceCount -= 1;
-
-  if (pObject->mReferenceCount == 0)
-  {
-    delete pObject;
-  }
-}
 
 void cedar::aux::Parameter::setChangedFlag(bool changed)
 {

@@ -49,13 +49,6 @@
 #include <boost/filesystem.hpp>
 
 
-// different test classes
-// reading from configuration file
-// writing to configuration file
-// "size" method
-// "at" method
-
-
 class TestClassOne : public cedar::aux::Configurable
 {
 public:

@@ -75,7 +75,7 @@ cedar::dyn::Preshape::Preshape()
 mActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 0, 1000)),
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000)),
-_mTimeScale(new cedar::aux::DoubleParameter(this, "timeScale", 0.1, 0.001, 10.0))
+_mTimeScale(new cedar::aux::DoubleParameter(this, "time scale", 0.1, 0.001, 10.0))
 {
   _mDimensionality->setValue(2);
   _mSizes->makeDefault();

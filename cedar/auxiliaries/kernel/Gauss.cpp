@@ -300,7 +300,9 @@ void cedar::aux::kernel::Gauss::updateDimensionality()
   mpReadWriteLockOutput->lockForWrite();
   unsigned int new_dimensionality = _mDimensionality->getValue();
   _mSigmas->resize(new_dimensionality, _mSigmas->getDefaultValue());
+  _mSigmas->setDefaultSize(new_dimensionality);
   _mShifts->resize(new_dimensionality, _mShifts->getDefaultValue());
+  _mShifts->setDefaultSize(new_dimensionality);
   mpReadWriteLockOutput->unlock();
   this->updateKernel();
 }

@@ -22,24 +22,24 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CMakeDefines.h.in
+    File:        ImageSetData.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2011 12 16
+    Maintainer:  Irina Popova
+    Email:       irina.popova@ini.ruhr-uni-bochum.de
+    Date:        2012 04 03
 
-    Description: File template the CMakeDefines.h files are generated from.
+    Description: This is a dummy header for the typedef ImageSetData
+                 (which is actually a cedar::aux::DataTemplate<std::vector<cv::Mat>>).
 
     Credits:
 
 ======================================================================================================================*/
 
-//!@todo Remove this file and set those variables in the CMake build system. 
+#ifndef CEDAR_AUX_IMAGE_SET_DATA_H
+#define CEDAR_AUX_IMAGE_SET_DATA_H
 
-// This file is used to make cmake variables available
-// in the c++ source files
-#ifndef CEDAR_DEVICES_CMAKE_DEFINES
-#define CEDAR_DEVICES_CMAKE_DEFINES
-#cmakedefine CEDAR_USE_AMTEC
-#cmakedefine CEDAR_USE_KUKA_LWR
-#endif
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/DataTemplate.h"
+
+#endif // CEDAR_AUX_IMAGE_SET_DATA_H

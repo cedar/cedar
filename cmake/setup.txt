@@ -70,6 +70,10 @@ set (CEDAR_INTERACTIVE_TEST_DIR "${CEDAR_TEST_DIR}/interactive")
 set (CEDAR_EXECUTABLES_DIR      "${CEDAR_HOME}/executables")
 # directory for examples
 set (CEDAR_EXAMPLES_DIR         "${CEDAR_HOME}/examples")
+# determine build directory, if not set
+if (NOT CEDAR_BUILD_DIR)
+  set (CEDAR_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR})
+endif()
 
 # default output directory for lib files
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CEDAR_LIB_DIR}")
@@ -102,32 +106,13 @@ include_directories(${CEDAR_HOME} ${CEDAR_TEST_DIR} ${CEDAR_BUILD_DIR})
 
 if (CMAKE_COMPILER_IS_GNUCC)
   add_definitions(-Wall -Wextra)
-  add_definitions(-DGNUCC -D__GNUCC__ -D__GCC__ -DGCC)
 elseif (MSVC)
   add_definitions(-W2)
-  add_definitions(-DMSVC)
 endif (CMAKE_COMPILER_IS_GNUCC)
 
 add_definitions(-D CEDAR_LOG_DIR=\\"${CEDAR_LOG_DIR}/\\")
 
-if (UNIX)
-  add_definitions(-DUNIX -D__UNIX__)
-  message("-- defined the UNIX constants.")
-endif (UNIX)
-
-if (APPLE)
-  add_definitions(-DAPPLE -D__APPLE__)
-  message("-- defined the APPLE constants.")
-endif (APPLE)
-
-if ("${CMAKE_SYSTEM}" MATCHES "Linux")
-  add_definitions(-DLINUX -D__LINUX__)
-  message("-- defined the LINUX constants.")
-endif ("${CMAKE_SYSTEM}" MATCHES "Linux")
-
-
 if (WIN32)
-  add_definitions(-DWINDOWS -D__WINDOWS__ -DWIN32 -D__WIN32__)
   set(CMAKE_DEBUG_POSTFIX "d") # TODO for linux too?
 endif (WIN32)
 

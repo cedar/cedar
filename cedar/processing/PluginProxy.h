@@ -43,7 +43,7 @@
 // SYSTEM INCLUDES
 #include <string>
 
-#ifdef WINDOWS
+#ifdef _WIN32
 #include <Windows.h>
 #endif
 
@@ -99,9 +99,9 @@ private:
   //!@brief Searches for the plugin description file.
   std::string findPluginDescription(const std::string& plugin_path) const;
 
-#ifdef WINDOWS
+#ifdef _WIN32
   std::string getLastError();
-#endif
+#endif // _WIN32
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -115,9 +115,9 @@ private:
   std::string mFileName;
 
   //! Handle to the dynamically loaded library.
-#ifdef UNIX
+#if defined __unix__ | defined __APPLE__
   void *mpLibHandle;
-#elif defined WINDOWS
+#elif defined _WIN32
   HMODULE mpLibHandle;
 #else
 #error Implement me for your os!

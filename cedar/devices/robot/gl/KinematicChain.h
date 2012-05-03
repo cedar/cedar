@@ -79,8 +79,6 @@ public:
   void setDisplayEndEffectorAcceleration(bool state);
 
   /*!@brief sets the joint radius to the new value
-   *
-   * @param value new radius
    */
   double getJointRadius();
 
