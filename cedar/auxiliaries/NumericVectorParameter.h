@@ -57,6 +57,7 @@ class cedar::aux::NumericVectorParameter : public cedar::aux::VectorParameter<T>
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief a templated limit
   typedef cedar::aux::math::Limits<T> LimitType;
 
   //--------------------------------------------------------------------------------------------------------------------

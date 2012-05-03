@@ -145,8 +145,9 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief the internal data
+  //!@brief the left image
   cv::Mat mLeftImage;
+  //!@brief the right image
   cv::Mat mRightImage;
 private:
   // none yet

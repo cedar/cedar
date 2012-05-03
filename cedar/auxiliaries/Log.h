@@ -85,10 +85,20 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   /*!@brief Sends a message through the current log system.
+   * @param level the level of a message (important for filtering messages at specific loggers)
+   * @param message the actual message
    * @param source The source of the message. Used for filtering out messages to certain loggers.
+   * @param title a title that may for exmaple be used as window title
    */
-  void log(cedar::aux::LOG_LEVEL level, const std::string& message, const std::string& source, const std::string& title = "");
+  void log
+       (
+         cedar::aux::LOG_LEVEL level,
+         const std::string& message,
+         const std::string& source,
+         const std::string& title = ""
+       );
   
+  //!@brief log a message only if building in debug mode
   inline void debugLog
   (
     cedar::aux::LOG_LEVEL CEDAR_DEBUG_ONLY(level),
@@ -102,26 +112,31 @@ public:
 #endif // DEBUG
   }
   
+  //!@brief log a message with log level system info
   inline void systemInfo(const std::string& message, const std::string& source, const std::string& title = "")
   {
     this->log(cedar::aux::LOG_LEVEL_SYSTEM_INFO, message, source, title);
   }
 
+  //!@brief log a message with log level message
   inline void message(const std::string& message, const std::string& source, const std::string& title = "")
   {
     this->log(cedar::aux::LOG_LEVEL_MESSAGE, message, source, title);
   }
   
+  //!@brief log a message with log level warning
   inline void warning(const std::string& message, const std::string& source, const std::string& title = "")
   {
     this->log(cedar::aux::LOG_LEVEL_WARNING, message, source, title);
   }
   
+  //!@brief log a message with log level error
   inline void error(const std::string& message, const std::string& source, const std::string& title = "")
   {
     this->log(cedar::aux::LOG_LEVEL_ERROR, message, source, title);
   }
   
+  //!@brief log a message with log level debug
   inline void debugMessage(const std::string& message, const std::string& source, const std::string& title = "")
   {
     this->debugLog(cedar::aux::LOG_LEVEL_DEBUG, message, source, title);

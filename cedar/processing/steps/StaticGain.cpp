@@ -81,7 +81,7 @@ cedar::proc::steps::StaticGain::StaticGain()
 // outputs
 mOutput(new cedar::aux::MatData(cv::Mat())),
 // parameters
-_mGainFactor(new cedar::aux::DoubleParameter(this, "gainFactor", 1.0, -10000.0, 10000.0))
+_mGainFactor(new cedar::aux::DoubleParameter(this, "gain factor", 1.0, -10000.0, 10000.0))
 {
   // declare all data
   this->declareInput("input");

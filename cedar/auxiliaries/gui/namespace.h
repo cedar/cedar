@@ -88,6 +88,7 @@ namespace cedar
        */
       typedef cedar::aux::TypeBasedFactory<cedar::aux::ParameterPtr, cedar::aux::gui::ParameterPtr> ParameterFactory;
 
+      //!@brief singleton specialization for the parameter factory
       typedef cedar::aux::Singleton<ParameterFactory> ParameterFactorySingleton;
 
       /* Plotting related classes */
@@ -108,7 +109,7 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(HistoryPlot0D);
       //!@endcond
 
-      // The manager for plot widgets
+      //!@brief The manager for plot widgets
       typedef
           cedar::aux::TypeHierarchyMap
           <
@@ -117,6 +118,7 @@ namespace cedar
           >
           PlotDeclarationManager;
 
+      //!@brief singleton specialization for the plot delcaration manager
       typedef cedar::aux::Singleton<PlotDeclarationManager> PlotDeclarationManagerSingleton;
     }
   }

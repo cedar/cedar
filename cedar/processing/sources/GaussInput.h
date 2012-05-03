@@ -117,6 +117,8 @@ protected:
   cedar::aux::DoubleVectorParameterPtr _mCenters;
   //!@brief the vector of sizes of matrix containing the Gauss function for each dimension
   cedar::aux::UIntVectorParameterPtr _mSizes;
+  //!@brief determines if the Gauss input is cyclic or not
+  cedar::aux::BoolParameterPtr _mIsCyclic;
 
 private:
 

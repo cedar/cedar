@@ -131,6 +131,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief set the changed flag to a given state
   virtual void setChangedFlag(bool changed);
 
 signals:

@@ -98,7 +98,7 @@ mRestingLevel
   new cedar::aux::DoubleParameter
   (
     this,
-    "restingLevel",
+    "resting level",
     -5.0,
     cedar::aux::DoubleParameter::LimitType::negativeZero()
   )
@@ -108,7 +108,7 @@ mTau
   new cedar::aux::DoubleParameter
   (
     this,
-    "tau",
+    "time scale",
     100.0,
     cedar::aux::DoubleParameter::LimitType::positive()
   )
@@ -118,7 +118,7 @@ mGlobalInhibition
   new cedar::aux::DoubleParameter
   (
     this,
-    "globalInhibition",
+    "global inhibition",
     -0.01,
     cedar::aux::DoubleParameter::LimitType::negativeZero()
   )
@@ -150,7 +150,7 @@ _mInputNoiseGain
   new cedar::aux::DoubleParameter
   (
     this,
-    "inputNoiseGain",
+    "input noise gain",
     0.1,
     cedar::aux::DoubleParameter::LimitType::positiveZero()
   )
@@ -173,12 +173,12 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   
   this->declareBuffer("activation", mActivation);
-  this->declareBuffer("lateralInteraction", mLateralInteraction);
+  this->declareBuffer("lateral interaction", mLateralInteraction);
   this->declareBuffer("lateralKernel", this->_mLateralKernelConvolution->getCombinedKernel());
   this->declareBuffer("neuralNoiseKernel", this->_mNoiseCorrelationKernelConvolution->getCombinedKernel());
   this->declareBuffer("input sum", mInputSum);
 
-  this->declareOutput("sigmoid(activation)", mSigmoidalActivation);
+  this->declareOutput("sigmoided activation", mSigmoidalActivation);
 
   this->declareInputCollection("input");
 
@@ -207,7 +207,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
                 new KernelListParameter
                 (
                   this,
-                  "lateralKernels",
+                  "lateral kernels",
                   kernel_defaults
                 )
               );
@@ -222,7 +222,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
                                                                                         5.0,
                                                                                         2
                                                                                       ));
-  this->addConfigurableChild("noiseCorrelationKernel", mNoiseCorrelationKernel);
+  this->addConfigurableChild("noise correlation kernel", mNoiseCorrelationKernel);
   _mNoiseCorrelationKernelConvolution->getKernelList()->append(mNoiseCorrelationKernel);
 
   this->addConfigurableChild("lateralKernelConvolution", _mLateralKernelConvolution);
@@ -488,6 +488,7 @@ void cedar::dyn::NeuralField::updateInputSum()
     cedar::aux::DataPtr input = input_slot->getData(i);
     if (input)
     {
+      //!@todo This is probably slow -- store the type of each input and static_cast instead.
       cv::Mat& input_mat = input->getData<cv::Mat>();
 
       CEDAR_DEBUG_ASSERT(cedar::aux::math::matrixSizesEqual(input_mat, input_sum))
