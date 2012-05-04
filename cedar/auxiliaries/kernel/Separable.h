@@ -59,10 +59,8 @@ class cedar::aux::kernel::Separable : public cedar::aux::kernel::Kernel
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  Separable();
   //!@brief Construct an instance of a separable kernel with some parameters.
-  Separable(unsigned int dimensionality);
+  Separable(unsigned int dimensionality = 2);
   //!@brief Destructor
   virtual ~Separable();
   //--------------------------------------------------------------------------------------------------------------------
@@ -80,12 +78,7 @@ public:
     return this->mKernelParts.size();
   }
 
-  void calculate()
-  {
-    this->calculateParts();
-
-    this->updateKernelMatrix();
-  }
+  void calculate();
 
   unsigned int getSize(size_t dimension) const;
 

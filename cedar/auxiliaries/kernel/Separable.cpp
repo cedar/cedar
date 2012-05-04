@@ -49,11 +49,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::aux::kernel::Separable::Separable()
-{
-  cedar::aux::LogSingleton::getInstance()->allocating(this);
-  QObject::connect(this->_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
-}
 
 cedar::aux::kernel::Separable::Separable(unsigned int dimensionality)
 :
@@ -73,6 +68,13 @@ cedar::aux::kernel::Separable::~Separable()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::kernel::Separable::calculate()
+{
+  this->calculateParts();
+
+  this->updateKernelMatrix();
+}
 
 unsigned int cedar::aux::kernel::Separable::getSize(size_t dimension) const
 {
@@ -111,7 +113,7 @@ void cedar::aux::kernel::Separable::updateKernelMatrix()
   {
     this->mpReadWriteLockOutput->lockForRead();
 
-    cv::Mat combined = this->mKernelParts.at(0);
+    cv::Mat combined = this->mKernelParts.at(0).clone();
 
     for (size_t i = 1; i < this->mKernelParts.size(); ++i)
     {
