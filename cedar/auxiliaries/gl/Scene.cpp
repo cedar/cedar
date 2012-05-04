@@ -56,6 +56,11 @@ cedar::aux::gl::Scene::~Scene()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+boost::signals2::connection cedar::aux::gl::Scene::connectToSceneChangedSignal(boost::function<void ()> slot)
+{
+  return mSceneChanged.connect(slot);
+}
+
 void cedar::aux::gl::Scene::drawFloor(bool state)
 {
   mIsDrawingFloor = state;
@@ -78,6 +83,7 @@ int cedar::aux::gl::Scene::addObjectVisualization(cedar::aux::gl::ObjectVisualiz
   {
     mViewers[i]->initGl(pObjectVisualization);
   }
+  mSceneChanged();
   return mObjectVisualizations.size() - 1;
 }
 
@@ -103,11 +109,13 @@ int cedar::aux::gl::Scene::removeViewer(cedar::aux::gui::Viewer* pViewer)
 void cedar::aux::gl::Scene::deleteObjectVisualization(int index)
 {
   mObjectVisualizations.removeAt(index);
+  mSceneChanged();
 }
 
 void cedar::aux::gl::Scene::clear()
 {
   mObjectVisualizations.clear();
+  mSceneChanged();
 }
 
 void cedar::aux::gl::Scene::draw()

@@ -76,6 +76,10 @@ public:
   // slots
   //--------------------------------------------------------------------------------------------------------------------
 public slots:
+  /*!@brief deletes the currently selected object from the scene
+   */
+  void deleteObject();
+
   /*!@brief sets the length of the current object
    * @param value    new length
    */
@@ -111,6 +115,9 @@ public:
   /*!@brief updates the parameters displayed in the widget */
   void updateWidget();
   
+  /*!@brief updates the object selection combo box */
+  void updateObjectSelectionComboBox();
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -135,6 +142,10 @@ private:
 
   //! checks whether the widget is currently being changed due to a switch in the selected object
   bool mSwitchingSelectedObject;
+
+  //! Connection to the displayed scene's changed signal.
+  boost::signals2::connection mSlotConnection;
+
 };
 
 #endif // CEDAR_AUX_GUI_SCENE_WIDGET_H

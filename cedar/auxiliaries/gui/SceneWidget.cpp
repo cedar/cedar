@@ -76,6 +76,11 @@ cedar::aux::gui::SceneWidget::~SceneWidget()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::gui::SceneWidget::deleteObject()
+{
+  mpScene->deleteObjectVisualization(mpComboBoxName->currentIndex());
+}
+
 void cedar::aux::gui::SceneWidget::setRadius(double value)
 {
   if(!mSwitchingSelectedObject)
@@ -282,8 +287,10 @@ void cedar::aux::gui::SceneWidget::updateWidget()
   mSwitchingSelectedObject = false;
 }
 
-void cedar::aux::gui::SceneWidget::init()
+void cedar::aux::gui::SceneWidget::updateObjectSelectionComboBox()
 {
+  mpComboBoxName->blockSignals(true);
+  mpComboBoxName->clear();
   // fill combo box with names of objects in the scene
   for (int i=0; i<mpScene->getNumberOfObjectVisualizations(); i++)
   {
@@ -292,6 +299,21 @@ void cedar::aux::gui::SceneWidget::init()
       QString(mpScene->getObjectVisualization(i)->getLocalCoordinateFrame()->getName().c_str())
     );
   }
+  mpComboBoxName->blockSignals(false);
+}
+
+void cedar::aux::gui::SceneWidget::init()
+{
+
+  updateObjectSelectionComboBox();
+//  // fill combo box with names of objects in the scene
+//  for (int i=0; i<mpScene->getNumberOfObjectVisualizations(); i++)
+//  {
+//    mpComboBoxName->addItem
+//    (
+//      QString(mpScene->getObjectVisualization(i)->getLocalCoordinateFrame()->getName().c_str())
+//    );
+//  }
   
   // initialize rigid body visualization widget
   mpObjectVisualizationWidget = new cedar::aux::gui::ObjectVisualizationWidget(mpScene->getObjectVisualization(0));
@@ -316,10 +338,17 @@ void cedar::aux::gui::SceneWidget::init()
   setWindowTitle(name);
   
   //connecting to slots
+  connect(mpDeleteObjectPushButton, SIGNAL(clicked()), this, SLOT(deleteObject()));
   connect(mpComboBoxName, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setActiveVisualization()));
   connect(mpDoubleSpinBoxRadius, SIGNAL(valueChanged(double)), this, SLOT(setRadius(double)));
   connect(mpDoubleSpinBoxThickness, SIGNAL(valueChanged(double)), this, SLOT(setThickness(double)));
   connect(mpDoubleSpinBoxLength, SIGNAL(valueChanged(double)), this, SLOT(setLength(double)));
   connect(mpDoubleSpinBoxWidth, SIGNAL(valueChanged(double)), this, SLOT(setWidth(double)));
   connect(mpDoubleSpinBoxHeight, SIGNAL(valueChanged(double)), this, SLOT(setHeight(double)));
+
+  mSlotConnection = mpScene->connectToSceneChangedSignal
+  (
+    boost::bind(&cedar::aux::gui::SceneWidget::updateObjectSelectionComboBox, this)
+  );
+
 }

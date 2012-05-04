@@ -147,6 +147,11 @@ int main(int argc, char **argv)
   );
   p_scene->addObjectVisualization(p_ellipse);
 
+
+  // create a widget to control the scene
+  cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));
+  p_scene_widget->show();
+
   // create a chessboard visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_chessboard_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
   p_chessboard_local_coordinate_frame->setName("chess board");
@@ -156,10 +161,6 @@ int main(int argc, char **argv)
     new cedar::aux::gl::Chessboard(p_chessboard_local_coordinate_frame, 3, 3, 0.2, 8, 8, 0, 0, 0)
   );
   p_scene->addObjectVisualization(p_chessboard);
-
-  // create a widget to control the scene
-  cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));
-  p_scene_widget->show();
 
   a.exec();
   return 0;

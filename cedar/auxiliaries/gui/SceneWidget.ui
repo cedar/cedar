@@ -37,7 +37,7 @@
        <widget class="QComboBox" name="mpComboBoxName"/>
       </item>
       <item row="3" column="0" colspan="7">
-       <widget class="QPushButton" name="mpPushButtonDeleteObject">
+       <widget class="QPushButton" name="mpDeleteObjectPushButton">
         <property name="text">
          <string>Delete Object</string>
         </property>
