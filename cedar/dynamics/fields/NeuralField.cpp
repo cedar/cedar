@@ -212,8 +212,6 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
                 )
               );
 
-  _mKernels->connectToObjectAddedSignal(boost::bind(&cedar::dyn::NeuralField::slotKernelAdded, this, _1));
-
   // setup noise correlation kernel
   mNoiseCorrelationKernel = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(
                                                                                         0.0,
@@ -428,32 +426,6 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   }
 
   lateral_interaction = lateral_convolution(sigmoid_u);
-
-  //!@todo remove when done.
-  /* OLD CODE --
-#ifdef FFTW
-  else if (this->_mDimensionality->getValue() < 8)
-  {
-    for (unsigned int i = 0; i < this->_mKernels->size(); i++)
-    {
-      //!@todo Should/does this not use the data->lock*
-      _mKernels->at(i)->getReadWriteLock()->lockForRead();
-      //cv::Mat convolution_buffer = this->mKernels.at(i)->convolveWith(sigmoid_u);
-      cedar::aux::conv::FastConvolution myConvolution;
-      cv::Mat sigmoid_64;
-      sigmoid_u.convertTo(sigmoid_64, CV_64F);
-      cv::Mat kernel_64;
-      this->_mKernels->at(i)->getKernel().convertTo(kernel_64, CV_64F);
-      cv::Mat convolution_buffer = myConvolution(sigmoid_64, kernel_64);
-      this->_mKernels.at(i)->getReadWriteLock()->unlock();
-      cv::Mat buffer_32;
-      convolution_buffer.convertTo(buffer_32, CV_32F);
-//      lateral_interaction += convolution_buffer;
-      lateral_interaction += buffer_32;
-    }
-  }
-#endif
-  */
 
   this->updateInputSum();
 
