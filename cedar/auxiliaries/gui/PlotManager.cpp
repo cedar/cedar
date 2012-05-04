@@ -93,17 +93,33 @@ cedar::aux::gui::PlotDeclarationPtr cedar::aux::gui::PlotManager::getDefaultDecl
 {
   //!@todo Add a configurable option that specifies a default
 
-  cedar::aux::gui::PlotDeclarationManager::ConstNodePtr closest_node
-    = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->getClosestNode(data);
-
-  // if this assertion fails, there was no node for the given data in the plot manager
-  CEDAR_DEBUG_ASSERT(closest_node);
 
   // check if a default is defined for the given type
   std::string data_type;
-  data_type = closest_node->getTypeString();
+
+  std::map<std::string, std::string>::const_iterator iter;
+
+  // first, try to find a default value for the direct type
+  // (defaults may be specified for types that aren't in the hierarchy)
+  data_type = cedar::aux::objectTypeToString(data);
   cedar::aux::gui::PlotManager::normalizeTypeName(data_type);
-  std::map<std::string, std::string>::const_iterator iter = this->mDefaultPlots.find(data_type);
+  iter = this->mDefaultPlots.find(data_type);
+
+  // if that wasn't found, try to find one for the closest type known in the plot hierarchy
+  cedar::aux::gui::PlotDeclarationManager::ConstNodePtr closest_node
+    = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->getClosestNode(data);
+
+  // if this assertion fails, there was no node for the given data in the plot manager; that shouldn't happen
+  CEDAR_DEBUG_ASSERT(closest_node);
+
+  if (iter == this->mDefaultPlots.end())
+  {
+    data_type = closest_node->getTypeString();
+    cedar::aux::gui::PlotManager::normalizeTypeName(data_type);
+    iter = this->mDefaultPlots.find(data_type);
+  }
+
+  // if one of the methods above yielded a result, use that
   if (iter != this->mDefaultPlots.end())
   {
     const std::string& default_plot_type = iter->second;
@@ -124,8 +140,7 @@ cedar::aux::gui::PlotDeclarationPtr cedar::aux::gui::PlotManager::getDefaultDecl
     }
   }
 
-  // automatically determine a default plot (the first one in the vector)
+  // otherwise, automatically determine a default plot (the first one in the vector)
   const std::vector<cedar::aux::gui::PlotDeclarationPtr>& decls = closest_node->getData();
-
   return decls.at(0);
 }
