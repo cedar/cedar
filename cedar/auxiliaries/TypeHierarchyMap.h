@@ -356,21 +356,19 @@ public:
           ConstNodePtr node = queue.front();
           queue.pop();
 
+
           if (node->matchesExact(instance))
           {
             return node;
           }
 
-          CEDAR_DEBUG_ASSERT(depth_map.find(this->shared_from_this()) != depth_map.end());
-          unsigned int depth = depth_map[this->shared_from_this()];
+          CEDAR_DEBUG_ASSERT(depth_map.find(node) != depth_map.end());
+          unsigned int depth = depth_map[node];
 
-          if (node->matchesDerived(instance))
+          if (node->matchesDerived(instance) && depth > deepest)
           {
-            if (depth > deepest)
-            {
-              deepest_node = node;
-              deepest = depth;
-            }
+            deepest_node = node;
+            deepest = depth;
           }
 
           for
@@ -390,7 +388,7 @@ public:
               new_depth = std::max(depth_iter->second, new_depth);
             }
 
-            depth_map[this->shared_from_this()] = new_depth;
+            depth_map[child_node] = new_depth;
           }
         }
 
