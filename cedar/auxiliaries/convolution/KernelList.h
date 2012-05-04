@@ -58,10 +58,13 @@ class cedar::aux::conv::KernelList
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief append a new kernel at the back of the list
   void append(cedar::aux::kernel::KernelPtr kernel);
 
+  //!@brief remove a kernel at a given index
   void remove(size_t index);
 
+  //!@brief insert a kernel at a given index
   inline void setKernel(size_t index, cedar::aux::kernel::KernelPtr kernel)
   {
     this->mKernels.at(index) = kernel;
@@ -69,36 +72,43 @@ public:
     this->mKernelChangedSignal(index);
   }
 
+  //!@brief resizes the list
   inline void resize(size_t size)
   {
     this->mKernels.resize(size);
   }
 
+  //!@brief access a kernel at given index
   inline cedar::aux::kernel::ConstKernelPtr getKernel(size_t i) const
   {
     return this->mKernels.at(i);
   }
 
+  //!@brief returns the size of kernels in this list
   inline size_t size() const
   {
     return this->mKernels.size();
   }
 
+  //!@brief removes all kernels from the list
   inline void clear()
   {
     this->mKernels.clear();
   }
 
+  //!@brief process adding a new kernel
   inline boost::signals2::connection connectToKernelAddedSignal(boost::function<void (size_t)> slot)
   {
     return this->mKernelAddedSignal.connect(slot);
   }
 
+  //!@brief process changes in a kernel
   inline boost::signals2::connection connectToKernelChangedSignal(boost::function<void (size_t)> slot)
   {
     return this->mKernelChangedSignal.connect(slot);
   }
 
+  //!@brief process removal of a kernel
   inline boost::signals2::connection connectToKernelRemovedSignal(boost::function<void (size_t)> slot)
   {
     return this->mKernelRemovedSignal.connect(slot);

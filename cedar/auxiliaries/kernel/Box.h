@@ -70,6 +70,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief convenience function for getting the amplitude of the kernel
   inline double getAmplitude() const
   {
     return this->_mAmplitude->getValue();

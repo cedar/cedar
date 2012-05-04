@@ -149,6 +149,7 @@ public:
     return this->_mAnchor->getValue();
   }
 
+  //!@brief returns the size of a given dimension
   virtual unsigned int getSize(size_t dimension) const;
 
 public slots:

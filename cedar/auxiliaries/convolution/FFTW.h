@@ -125,6 +125,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief the internal version of the convolve method, currently called by all interface methods
   cv::Mat convolveInternal(const cv::Mat& matrix, const cv::Mat& kernel, cedar::aux::conv::BorderType::Id borderType) const;
 
   //--------------------------------------------------------------------------------------------------------------------
