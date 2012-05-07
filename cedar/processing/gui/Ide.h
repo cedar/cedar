@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/ui_Ide.h"
 #include "cedar/processing/gui/namespace.h"
+#include "cedar/auxiliaries/LogInterface.h"
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
@@ -79,12 +80,6 @@ public:
   void keyPressEvent(QKeyEvent* pEvent);
 
 public slots:
-  /*!@brief Slot that is called whenever a different item is selected in the cedar::proc::gui::Scene.
-   *
-   * @todo This probably belongs somewhere else.
-   */
-  void sceneItemSelected();
-
   /*!@brief Slot that displays exceptions.
    */
   void exception(const QString& message);
@@ -145,6 +140,10 @@ public slots:
    */
   void showManagePluginsDialog();
 
+  /*!@brief Shows the settings dialog.
+   */
+  void showSettingsDialog();
+
   /*!@brief Toggles the snap to grid functionality.
    */
   void toggleGrid(bool toggled);
@@ -173,15 +172,24 @@ public slots:
    */
   void decreaseZoomLevel();
 
+  /*!@brief Returns the architecture view used by the ide.
+   */
+  cedar::proc::gui::View* getArchitectureView();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief Deletes the list of gragics items.
+
+  /*!@brief Deletes the list of graphics items.
    *
    * @todo This probably belongs somewhere else, e.g., cedar::proc::gui::Scene.
    */
   void deleteElements(QList<QGraphicsItem*>& items);
+
+  /*!@brief Delete a single graphics item.
+   */
+  void deleteElement(QGraphicsItem* pItem);
 
   /*!@brief Deletes the elements currently selected in the scene.
    *
@@ -218,6 +226,9 @@ private:
    */
   void logError(const std::string& message);
 
+  /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
+   */
+  static bool sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem);
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
