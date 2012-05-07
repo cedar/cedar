@@ -56,6 +56,13 @@ Germany
 
 You can also reach us by phone under +49 234 32-28967.
 
+Our website can be found here:
+http://cedar.ini.rub.de/
+
+Our repositories are hosted on bitbucket:
+https://bitbucket.org/cedar
+
+There, you can also find our issue-tracker (look under testing).
 
 #=======================================================================================================================
 # INSTALLING CEDAR
@@ -80,13 +87,13 @@ the oldest versions supported, unless noted otherwise.
 
 === Clone the cedar repository ===
 
-hg clone https://bitbucket.org/cedar/testing
+hg clone https://bitbucket.org/cedar/testing [your cedar directory]
 
 
 === Compilation ===
 
 1. Change into the cedar repository.
-   $ cd cedar
+   $ cd [your cedar directory]
 2. Create a copy of cedar.conf.example (in this folder) and name it 'cedar.conf'.
 3. Take a look at 'cedar.conf' make any changes for your individual system
    (e.g., installation prefix, external include paths, ...) with an editor of your
@@ -104,6 +111,7 @@ hg clone https://bitbucket.org/cedar/testing
 ]
 [Optional: Create the documentation (it will be generated in the folder 'build/doc'):
    $ make doc
+   Note, that this may generate some warnings that you can usually ignore safely.
 ]
 7a. For all Debian based Linux distributions: Create installation package and install it:
    $ make package
