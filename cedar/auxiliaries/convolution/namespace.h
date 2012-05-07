@@ -52,8 +52,31 @@ namespace cedar
     namespace conv
     {
       //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_AUX_CLASS(BorderType);
       CEDAR_DECLARE_AUX_CLASS(Convolution);
-      CEDAR_DECLARE_AUX_CLASS(FastConvolution);
+      CEDAR_DECLARE_AUX_CLASS(Engine);
+      CEDAR_DECLARE_AUX_CLASS(KernelList);
+      CEDAR_DECLARE_AUX_CLASS(Mode);
+
+      // convolution engines
+      CEDAR_DECLARE_AUX_CLASS(FFTW);
+      CEDAR_DECLARE_AUX_CLASS(OpenCV);
+      //!@endcond
+
+      /*!@brief The manager of all convolution classes.
+       */
+      typedef cedar::aux::FactoryManager<cedar::aux::conv::EnginePtr> EngineManager;
+
+      /*!@brief The manager of all convolution classes.
+       */
+      typedef cedar::aux::Singleton<EngineManager> EngineManagerSingleton;
+
+      /*!@brief A parameter for dynamically storing convolution engine objects.
+       */
+      typedef cedar::aux::ObjectParameterTemplate<cedar::aux::conv::Engine> EngineParameter;
+
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(EngineParameter);
       //!@endcond
     }
   }

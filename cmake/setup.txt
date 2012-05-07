@@ -60,8 +60,6 @@ endif(CEDAR_BUILD_DEBUG_VERSION)
 
 # set the directory for source code
 set (CEDAR_SOURCE_DIR           "${CEDAR_HOME}/cedar")
-# build directory
-set (CEDAR_BUILD_DIR            "${CMAKE_CURRENT_BINARY_DIR}")
 # directory for all tests
 set (CEDAR_TEST_DIR             "${CEDAR_HOME}/tests")
 # directory for all unit tests
@@ -72,6 +70,10 @@ set (CEDAR_INTERACTIVE_TEST_DIR "${CEDAR_TEST_DIR}/interactive")
 set (CEDAR_EXECUTABLES_DIR      "${CEDAR_HOME}/executables")
 # directory for examples
 set (CEDAR_EXAMPLES_DIR         "${CEDAR_HOME}/examples")
+# determine build directory, if not set
+if (NOT CEDAR_BUILD_DIR)
+  set (CEDAR_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR})
+endif()
 
 # default output directory for lib files
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CEDAR_LIB_DIR}")

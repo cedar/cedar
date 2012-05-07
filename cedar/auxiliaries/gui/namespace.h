@@ -70,11 +70,14 @@ namespace cedar
       class CEDAR_AUX_LIB_EXPORT EnumParameter;
       class CEDAR_AUX_LIB_EXPORT FileParameter;
       class CEDAR_AUX_LIB_EXPORT IntParameter;
+      class CEDAR_AUX_LIB_EXPORT IntVectorParameter;
       class CEDAR_AUX_LIB_EXPORT ObjectParameter;
       class CEDAR_AUX_LIB_EXPORT ObjectListParameter;
       class CEDAR_AUX_LIB_EXPORT StringParameter;
       class CEDAR_AUX_LIB_EXPORT UIntParameter;
       class CEDAR_AUX_LIB_EXPORT UIntVectorParameter;
+
+      class CEDAR_AUX_LIB_EXPORT Log;
 
       /* Exceptions */
       class InvalidPlotData;
@@ -85,6 +88,7 @@ namespace cedar
        */
       typedef cedar::aux::TypeBasedFactory<cedar::aux::ParameterPtr, cedar::aux::gui::ParameterPtr> ParameterFactory;
 
+      //!@brief singleton specialization for the parameter factory
       typedef cedar::aux::Singleton<ParameterFactory> ParameterFactorySingleton;
 
       /* Plotting related classes */
@@ -105,7 +109,7 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(HistoryPlot0D);
       //!@endcond
 
-      // The manager for plot widgets
+      //!@brief The manager for plot widgets
       typedef
           cedar::aux::TypeHierarchyMap
           <
@@ -114,6 +118,7 @@ namespace cedar
           >
           PlotDeclarationManager;
 
+      //!@brief singleton specialization for the plot delcaration manager
       typedef cedar::aux::Singleton<PlotDeclarationManager> PlotDeclarationManagerSingleton;
     }
   }

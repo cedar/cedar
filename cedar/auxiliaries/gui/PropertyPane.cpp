@@ -169,6 +169,9 @@ void cedar::aux::gui::PropertyPane::display(cedar::aux::ConfigurablePtr pConfigu
   this->mDisplayedConfigurable = pConfigurable;
 
   std::string label = this->getInstanceTypeId(pConfigurable);
+#ifdef DEBUG
+  label += " " + cedar::aux::toString(pConfigurable.get());
+#endif // DEBUG
   this->addLabelRow(label);
 
   this->append(pConfigurable->getParameters());

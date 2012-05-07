@@ -69,12 +69,16 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief produces a vector of suitable plt classes for given data
   void getPlotClassesFor(cedar::aux::ConstDataPtr data, std::set<cedar::aux::gui::PlotDeclarationPtr>& declarations);
 
+  //!@brief returns the default declaration for given data
   cedar::aux::gui::PlotDeclarationPtr getDefaultDeclarationFor(cedar::aux::ConstDataPtr data);
 
+  //!@brief declare a plot type
   void declare(cedar::aux::gui::PlotDeclarationPtr declaration);
 
+  //!@brief set default
   template <typename DataType, typename PlotterType>
   void setDefault()
   {
@@ -128,6 +132,9 @@ namespace cedar
   {
     namespace gui
     {
+      /*!@brief singleton specialization for the plot manager
+       * @todo can this be moved to namespace.h?
+       */
       typedef cedar::aux::Singleton<cedar::aux::gui::PlotManager> PlotManagerSingleton;
     }
   }
