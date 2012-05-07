@@ -49,7 +49,6 @@
 
 // SYSTEM INCLUDES
 
-
 /*!@brief User-Interface representation of a cedar::proc::DataSlot.
  *
  *        This class implements a cedar::proc::gui::GraphicsBase that is used to display a cedar::proc::DataSlot inside
@@ -70,7 +69,7 @@ public:
    * @param pParent The parent item to which the data slot belongs.
    * @param slot    The slot displayed by this item.
    */
-  DataSlotItem(cedar::proc::gui::StepItem *pParent, cedar::proc::DataSlotPtr slot);
+  DataSlotItem(cedar::proc::gui::GraphicsBase *pParent, cedar::proc::DataSlotPtr slot);
 
   //!@brief Destructor.
   ~DataSlotItem();
@@ -98,6 +97,10 @@ public:
   /*!@brief Returns a const pointer to the data slot displayed by this item.
    */
   cedar::proc::ConstDataSlotPtr getSlot() const;
+
+  /*!@brief Returns a pointer to the data slot displayed by this item.
+   */
+  cedar::proc::DataSlotPtr getSlot();
 
   /*!@brief Returns whether this slot can connect to somewhere else.
    *
@@ -131,11 +134,10 @@ protected:
   // none yet
 private:
   //! The step item that this slot belongs to.
-  cedar::proc::gui::StepItem *mpStep;
+  cedar::proc::gui::GraphicsBase *mpStep;
 
   //! The slot itself.
   cedar::proc::DataSlotPtr mSlot;
-
 }; // class DataSlotItem
 
 #endif // CEDAR_PROC_GUI_DATA_SLOT_ITEM_H

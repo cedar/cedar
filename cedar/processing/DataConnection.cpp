@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/OwnedData.h"
+#include "cedar/processing/PromotedExternalData.h"
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/Connectable.h"
@@ -65,7 +66,16 @@ cedar::proc::DataConnection::~DataConnection()
   if (source_shared && target_shared)
   {
     // remove the source data from target
-    target_shared->getParentPtr()->freeInput(target_shared->getName(), source_shared->getData());
+    cedar::proc::DataSlotPtr real_target = target_shared;
+    while
+    (
+      cedar::proc::PromotedExternalDataPtr promoted
+        = boost::shared_dynamic_cast<cedar::proc::PromotedExternalData>(real_target)
+    )
+    {
+      real_target = promoted->mDataSlot;
+    }
+    real_target->getParentPtr()->freeInput(real_target->getName(), source_shared->getData());
   }
 }
 //----------------------------------------------------------------------------------------------------------------------

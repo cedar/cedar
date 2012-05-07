@@ -15,6 +15,7 @@
     <file>steps/preshape.svg</file>
     <file>steps/projection.svg</file>
     <file>steps/noise.svg</file>
+    <file>network.svg</file>
     <file>toolbaricons/grid.svg</file>
   </qresource>
 </RCC>
