@@ -249,6 +249,8 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
     mElements.erase(it);
   }
   this->mElementRemovedSignal(element);
+  // process promoted slots that may have to be removed
+  this->processPromotedSlots();
 }
 
 void cedar::proc::Network::add(std::string className, std::string instanceName)
@@ -1184,7 +1186,17 @@ void cedar::proc::Network::demoteSlot(cedar::proc::DataRole::Id role, const std:
   std::string connectable;
   std::string child_slot_name;
   cedar::aux::splitFirst(name, ".", connectable, child_slot_name);
-  this->getElement<cedar::proc::Connectable>(connectable)->getSlot(role, child_slot_name)->demote();
+  try
+  {
+    this->getElement<cedar::proc::Connectable>(connectable)->getSlot(role, child_slot_name)->demote();
+  }
+  catch (cedar::aux::ExceptionBase& exc) // check that element does not exist in network
+  {
+    if (typeid(exc) != typeid(cedar::proc::InvalidNameException))
+    {
+      throw exc;
+    }
+  }
   this->mSlotChanged();
 }
 
@@ -1227,6 +1239,8 @@ boost::signals2::connection cedar::proc::Network::connectToElementRemovedSignal
 
 void cedar::proc::Network::processPromotedSlots()
 {
+  std::vector<cedar::aux::Enum> types_delete_later;
+  std::vector<std::string> slots_delete_later;
   for
   (
     cedar::aux::StringVectorParameter::const_iterator iter = _mPromotedSlots->begin();
@@ -1242,8 +1256,24 @@ void cedar::proc::Network::processPromotedSlots()
     try // is this already a slot of this network?
     {
       this->getSlot(cedar::proc::DataRole::type().getFromPrettyString(slot_role), slot_name);
+      std::string child;
+      std::string rest;
+      cedar::aux::splitFirst(slot_name, ".", child, rest);
+      try
+      {
+        this->getElement<cedar::proc::Element>(child);
+      }
+      catch (cedar::aux::ExceptionBase& exc) // remove promoted slot
+      {
+        if (typeid(exc) != typeid(cedar::proc::InvalidNameException))
+        {
+          throw exc;
+        }
+        types_delete_later.push_back(cedar::proc::DataRole::type().getFromPrettyString(slot_role));
+        slots_delete_later.push_back(slot_name);
+      }
     }
-    catch (cedar::aux::ExceptionBase& exc)
+    catch (cedar::aux::ExceptionBase& exc) // it's not, create a new promoted slot
     {
       if
       (
@@ -1267,6 +1297,10 @@ void cedar::proc::Network::processPromotedSlots()
         this->promoteSlot(step->getSlot(cedar::proc::DataRole::type().getFromPrettyString(slot_role), rest));
       }
     }
+  }
+  for (unsigned int i = 0; i < types_delete_later.size(); ++i)
+  {
+    this->demoteSlot(types_delete_later.at(i), slots_delete_later.at(i));
   }
 }
 
