@@ -396,7 +396,6 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
 
   std::list<cedar::proc::ElementPtr> elements;
   // sanity check - are all elements stored in the same network?
-  std::cout << "selected elements: " << selected.size() << std::endl;
   for (int i = 0; i < selected.size(); ++i)
   {
     if (cedar::proc::gui::Network *p_element = dynamic_cast<cedar::proc::gui::Network*>(selected.at(i)))
@@ -428,7 +427,6 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
       }
       else
       {
-        std::cout << "Added: " << p_element->getStep()->getName() << std::endl;
         elements.push_back(p_element->getStep());
       }
     }
