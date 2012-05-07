@@ -45,6 +45,7 @@
 // SYSTEM INCLUDES
 #include <QHeaderView>
 #include <QLabel>
+#include <QScrollBar>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -150,6 +151,9 @@ void cedar::aux::gui::Log::postMessage
   const QString& icon
 )
 {
+  QScrollBar* p_scroll_bar = pTable->verticalScrollBar();
+  bool scroll_down = (p_scroll_bar != 0 && p_scroll_bar->value() == p_scroll_bar->maximum());
+
   Qt::ItemFlags item_flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
   int row = pTable->rowCount();
   pTable->insertRow(row);
@@ -172,6 +176,13 @@ void cedar::aux::gui::Log::postMessage
   pTable->setItem(row, 0, p_title_item);
   pTable->setCellWidget(row, 1, p_message_item);
   pTable->resizeRowToContents(row);
+
+  if (scroll_down)
+  {
+    CEDAR_DEBUG_ASSERT(p_scroll_bar != NULL);
+
+    p_scroll_bar->setValue(p_scroll_bar->maximum());
+  }
 }
 
 void cedar::aux::gui::Log::message
