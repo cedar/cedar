@@ -49,6 +49,8 @@
  */
 class cedar::aux::kernel::Separable : public cedar::aux::kernel::Kernel
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
@@ -57,10 +59,8 @@ class cedar::aux::kernel::Separable : public cedar::aux::kernel::Kernel
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  Separable();
   //!@brief Construct an instance of a separable kernel with some parameters.
-  Separable(unsigned int dimensionality);
+  Separable(unsigned int dimensionality = 2);
   //!@brief Destructor
   virtual ~Separable();
   //--------------------------------------------------------------------------------------------------------------------
@@ -73,8 +73,16 @@ public:
    */
   virtual const cv::Mat& getKernelPart(unsigned int dimension) const;
 
-  //!@brief convolve this kernel with another matrix
-  cv::Mat convolveWith(const cv::Mat& mat) const;
+  //!@brief returns the amount of kernel parts, from which the kernel is assembled
+  inline size_t kernelPartCount() const
+  {
+    return this->mKernelParts.size();
+  }
+
+  void calculate();
+
+  //!@brief returns the size for a given dimension
+  unsigned int getSize(size_t dimension) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -82,11 +90,16 @@ public:
 protected:
   //!@brief set one kernel part of the specified dimension to the given matrix
   void setKernelPart(unsigned int dimension, const cv::Mat& mat);
+
+  void updateKernelMatrix();
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  virtual void calculateParts() = 0;
+
+private slots:
+  void dimensionalityChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

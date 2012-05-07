@@ -24,9 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Stephan Zibner
-#   Email:       stephan.zibner@ini.rub.de
-#   Date:        2011 11 28
+#   Maintainer:  Oliver Lomp
+#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+#   Date:        2012 03 16
 #
 #   Description:
 #
@@ -34,6 +34,4 @@
 #
 #=======================================================================================================================
 
-if(FFTW)
-  cedar_add_unit_test(Convolution main.cpp)
-endif(FFTW)
+cedar_add_unit_test(ConvolutionEngine main.cpp)

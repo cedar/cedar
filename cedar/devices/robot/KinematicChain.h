@@ -101,9 +101,12 @@ public:
 public:
   //! smart pointer definition for the Joint struct
   typedef boost::shared_ptr<cedar::dev::robot::KinematicChain::Joint> JointPtr;
+  //!@brief a parameter for a list of joint objects
   typedef cedar::aux::ObjectListParameterTemplate<cedar::dev::robot::KinematicChain::Joint> JointListParameter;
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(JointListParameter);
 
+  //!@cond SKIPPED_DOCUMENTATION
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(JointListParameter);
+  //!@endcond
 
   //----------------------------------------------------------------------------
   // parameters

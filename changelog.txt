@@ -53,10 +53,21 @@
     cedar configuration file:
     set (CEDAR_LIBCONFIG_LEGACY_MODE      1           CACHE BOOL "Use libconfig legacy mode.")
     If you set this flag to 0, libconfig++ is no longer needed as a dependency! Some unit tests may fail, though.
-  - merged AbstractFactory and AbstractFactoryDerived with Factory and FactoryDerived (including some changes to the interfaces)
+  - merged AbstractFactory and AbstractFactoryDerived with Factory and FactoryDerived (including some changes to the
+    interfaces)
   - introduced new FactoryManager class
   - gl::Object has been renamed to gl::RigidBody
-  - There are some new Parameter types: ObjectListParameter and ObjectParameter. They allow dynamically selecting the type of one or more objects. For example, these allow to dynamically select the type of the Sigmoid as well as the combination of kernels in the neural field.
+  - There are some new Parameter types: ObjectListParameter and ObjectParameter. They allow dynamically selecting the
+    type of one or more objects. For example, these allow to dynamically select the type of the Sigmoid as well as the
+    combination of kernels in the neural field.
+  - There is a new method for writing log messages. See the Logging tutorial in the documentation or cedar::aux::Log.
+  - There is a new widget for displaying log messages: cedar::aux::gui::Log.
+  - NumericParameters (DoubleParameter, IntParameter, UIntParameter) no longer need minimum and maximum values. They
+    also have a new constructor that takes a math::Limits object which is the new, recommended way of setting the
+    limits. The same is true for NumericVectorParameters.
+  - Added Data classes for stereo images and image sets.
+  - There is now a generalized structure for convolution. This structure wraps opencv and, optionally, fftw convolution!
+    For more, see the documentation for the cedar::aux::conv::Convolution class.
 
 - cedar::proc
   - added directional arrows for graphical connections in processingIde
@@ -66,6 +77,8 @@
   - Overhauled the plotting system.
   - added grouping functionality for processing
   - added promotion of data slots for networks
+  - Some outputs and parameters have been renamed. If your architectures fail to load, check that the connections use
+    the correct names.
 
 - cedar::dyn
   - NeuralField now supports changing the sigmoid type and changing the number and type of kernel modes
@@ -78,13 +91,14 @@
   - more verbose tooltip for data slots
   - there is now a settings dialog; more settings will be added later.
   - the tab order in the property pane is now working correctly
-  
+
 - build system
-  - You now no longer need to specify CEDAR_BUILD_DIR in your cedar.conf.
   - Projects depending on cedar no longer need to define __LINUX__ etc.; this is now done automatically by the build
     system. 
   - files in the resource folder are now moved to ${CEDAR_INSTALL_PREFIX}/share/resources. Use the
     cedar::aux::System::locateResource function to locate them.
+  - It is no longer necessary to specify CEDAR_BUILD_DIR in the cedar.conf file. Instead, if the variable is not
+    specified, the directory in which you call cmake is automatically selected.
 
 == Version 0.5.1 ==
 - cedar::proc::steps

@@ -241,11 +241,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QTextEdit" name="mpLog">
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
+      <widget class="cedar::aux::gui::Log" name="mpLog" native="true"/>
      </item>
     </layout>
    </widget>
@@ -469,6 +465,12 @@
    <class>cedar::proc::gui::ArchitectureToolBox</class>
    <extends>QWidget</extends>
    <header>cedar/processing/gui/ArchitectureToolBox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>cedar::aux::gui::Log</class>
+   <extends>QWidget</extends>
+   <header>cedar/auxiliaries/gui/Log.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

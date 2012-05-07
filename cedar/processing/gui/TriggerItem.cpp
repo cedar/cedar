@@ -53,10 +53,12 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
+#include <QApplication>
 #include <QPainter>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
@@ -242,16 +244,22 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
 
     if (a == p_start)
     {
+      /*!@todo Rather than reacting this way, the trigger should emit a signal when it is started/stopped which leads to
+       *       the color change
+       */
       p_looped_trigger->startTrigger();
-//      QGraphicsColorizeEffect *effect = new QGraphicsColorizeEffect();
-//      effect->setColor(QColor(0, 192, 0));
       this->setFillColor(mValidityColorValid);
     }
     else if (a == p_stop)
     {
+      this->setFillColor(mValidityColorWarning);
       p_looped_trigger->stopTrigger();
-//      QGraphicsColorizeEffect *effect = new QGraphicsColorizeEffect();
-//      effect->setColor(QColor(0, 0, 0));
+      while (p_looped_trigger->isRunning())
+      {
+        QApplication::processEvents();
+        cedar::aux::sleep(cedar::unit::Milliseconds(10));
+      }
+
       this->setFillColor(mDefaultFillColor);
     }
   }

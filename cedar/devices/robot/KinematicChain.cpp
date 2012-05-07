@@ -101,8 +101,8 @@ cedar::dev::robot::KinematicChain::~KinematicChain()
 //! constructor
 cedar::dev::robot::KinematicChain::Joint::Joint()
 :
-_mpPosition(new cedar::aux::DoubleVectorParameter(this, "position", -10, 10)),
-_mpAxis(new cedar::aux::DoubleVectorParameter(this, "axis", -1, 1)),
+_mpPosition(new cedar::aux::DoubleVectorParameter(this, "position", -10.0, 10.0)),
+_mpAxis(new cedar::aux::DoubleVectorParameter(this, "axis", -1.0, 1.0)),
 _mpAngleLimits(new cedar::aux::math::LimitsParameter<double>(this, "angle limits", -2*M_PI, 0.0, 0.0, 2*M_PI)),
 _mpVelocityLimits(new cedar::aux::math::LimitsParameter<double>(this, "velocity limits", -2*M_PI, 0.0, 0.0, 2*M_PI))
 {

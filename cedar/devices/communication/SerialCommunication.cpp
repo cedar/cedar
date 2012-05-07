@@ -75,7 +75,7 @@ _mOS(new cedar::aux::StringParameter(this, "OperatingSystem", "Linux"))
   mInitialized = false;
 }
 
-
+//!@cond SKIPPED_DOCUMENTATION
 cedar::dev::com::SerialCommunication::SerialCommunication(const std::string& config_file)
 :
 mOldConfigMode(true),
@@ -106,6 +106,7 @@ _mOS(new cedar::aux::StringParameter(this, "OperatingSystem", "Linux"))
   // this has to be called manually because the virtual function readConfiguration is not called
 //  this->init();
 }
+//!@endcond
 
 cedar::dev::com::SerialCommunication::~SerialCommunication()
 {

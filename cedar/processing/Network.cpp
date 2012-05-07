@@ -667,7 +667,8 @@ void cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode& root)
   {
     cedar::aux::LogSingleton::getInstance()->warning
     (
-      "Could not recognize file format. Defaulting to current file format version.",
+      "Could not recognize network format: format or meta node missing. Defaulting to current version.",
+      "network reading",
       "cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode&)"
     );
   }
@@ -681,7 +682,10 @@ void cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode& root)
     default:
       cedar::aux::LogSingleton::getInstance()->warning
       (
-        "Unknown format version " + cedar::aux::toString(format_version) + ". Defaulting to the current version.",
+        "Could not recognize format: Unknown format version "
+           + cedar::aux::toString(format_version)
+           + ". Defaulting to current version.",
+        "network reading",
         "cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode&)"
       );
     case 1:
@@ -702,9 +706,13 @@ void cedar::proc::Network::readFromV1(const cedar::aux::ConfigurationNode& root)
   catch (const boost::property_tree::ptree_bad_path&)
   {
     // no steps declared -- this is ok.
-#if defined DEBUG || defined DEBUG_FILE_READING
-    std::cout << "No steps present while reading configuration." << std::endl;
-#endif // defined DEBUG || defined DEBUG_FILE_READING
+#ifdef DEBUG_FILE_READING
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "No steps present while reading configuration.",
+      "cedar::proc::Network::readFromV1(const cedar::aux::ConfigurationNode&)"
+    );
+#endif // DEBUG_FILE_READING
   }
 
   try
@@ -715,9 +723,13 @@ void cedar::proc::Network::readFromV1(const cedar::aux::ConfigurationNode& root)
   catch (const boost::property_tree::ptree_bad_path&)
   {
     // no networks declared -- this is ok.
-#if defined DEBUG || defined DEBUG_FILE_READING
-    std::cout << "No networks present while reading configuration." << std::endl;
-#endif // defined DEBUG || defined DEBUG_FILE_READING
+#ifdef DEBUG_FILE_READING
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "No networks present while reading configuration.",
+      "cedar::proc::Network::readFromV1(const cedar::aux::ConfigurationNode&)"
+    );
+#endif // DEBUG_FILE_READING
   }
   // post-process networks (load promoted slots)
   for (ElementMap::iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
@@ -736,9 +748,13 @@ void cedar::proc::Network::readFromV1(const cedar::aux::ConfigurationNode& root)
   catch (const boost::property_tree::ptree_bad_path&)
   {
     // no connections declared -- this is ok.
-#if defined DEBUG || defined DEBUG_FILE_READING
-    std::cout << "No data connections present while reading configuration." << std::endl;
-#endif // defined DEBUG || defined DEBUG_FILE_READING
+#ifdef DEBUG_FILE_READING
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "No data connections present while reading configuration.",
+      "cedar::proc::Network::readFromV1(const cedar::aux::ConfigurationNode&)"
+    );
+#endif // DEBUG_FILE_READING
   }
 
   try
@@ -749,7 +765,11 @@ void cedar::proc::Network::readFromV1(const cedar::aux::ConfigurationNode& root)
   catch (const boost::property_tree::ptree_bad_path&)
   {
 #if defined DEBUG || defined DEBUG_FILE_READING
-    std::cout << "No triggers present while reading configuration." << std::endl;
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "No triggers present while reading configuration.",
+      "cedar::proc::Network::readFromV1(const cedar::aux::ConfigurationNode&)"
+    );
 #endif // defined DEBUG || defined DEBUG_FILE_READING
   }
 }

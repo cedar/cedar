@@ -84,7 +84,7 @@ public:
   void setTranslation(double x, double y);
 
   /*!@brief The set-function of the robot's orientation.
-   *@param orientation Orientation of the robot [in rad].
+   *@param angle Orientation of the robot [in rad].
    */
   void setRotation(double angle);
 

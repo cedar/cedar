@@ -280,6 +280,13 @@ namespace cedar
       return result;
     }
 
+    /*!@brief a regular expressions based replace inside a string
+     * @param input the input string
+     * @param regex a regular expression (syntax can be found in boost doc)
+     * @param replaceText the text that replaces all matching parts of the input
+     *
+     * based on http://www.boost.org/doc/libs/1_49_0/libs/regex/doc/html/boost_regex/ref/regex_replace.html
+     */
     inline std::string regexReplace(const std::string& input, const std::string& regex, const std::string& replaceText)
     {
       // based on http://www.boost.org/doc/libs/1_49_0/libs/regex/doc/html/boost_regex/ref/regex_replace.html

@@ -71,6 +71,7 @@ public:
    *        This is the main method that is called whenever a data plotter is requested to plot a different data.
    *
    * @param data The data to display.
+   * @param title the title of the plot window
    *
    * @todo Should data be const?
    */
