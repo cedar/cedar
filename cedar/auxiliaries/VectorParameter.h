@@ -232,7 +232,7 @@ public:
   }
 
   //!@brief resize the vector to a new size and initialize new entries to the given value
-  void resize(size_t size, const T& value = T())
+  void resize(size_t size, const T& value)
   {
     if (size == this->size())
       return;
@@ -240,6 +240,12 @@ public:
     this->mValues.resize(size, value);
 
     this->emitPropertyChangedSignal();
+  }
+
+  //!@brief Resize the vector to a new size and initialize new entries to the default value set for this parameter.
+  void resize(size_t size)
+  {
+    this->resize(size, this->mDefaultValue);
   }
 
   //!@brief get an item of this vector specified by an index
