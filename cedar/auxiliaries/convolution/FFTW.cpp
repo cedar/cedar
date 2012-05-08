@@ -67,7 +67,7 @@ cv::Mat cedar::aux::conv::FFTW::convolve
 (
   const cv::Mat& matrix,
   cedar::aux::conv::BorderType::Id borderType,
-  cedar::aux::conv::Mode::Id mode
+  cedar::aux::conv::Mode::Id /* mode */
 ) const
 {
   return this->convolveInternal(matrix, this->getKernelList()->getCombinedKernel(), borderType);
@@ -78,8 +78,8 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   const cv::Mat& matrix,
   const cv::Mat& kernel,
   cedar::aux::conv::BorderType::Id borderType,
-  cedar::aux::conv::Mode::Id mode,
-  const std::vector<int>& anchor
+  cedar::aux::conv::Mode::Id /* mode */,
+  const std::vector<int>& /* anchor */
 ) const
 {
   return this->convolveInternal(matrix, kernel, borderType);
@@ -90,7 +90,7 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   const cv::Mat& matrix,
   cedar::aux::kernel::ConstKernelPtr kernel,
   cedar::aux::conv::BorderType::Id borderType,
-  cedar::aux::conv::Mode::Id mode
+  cedar::aux::conv::Mode::Id /* mode */
 ) const
 {
   return this->convolveInternal(matrix, kernel->getKernel(), borderType);
@@ -101,7 +101,7 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   const cv::Mat& matrix,
   const cedar::aux::conv::KernelList& kernel,
   cedar::aux::conv::BorderType::Id borderType,
-  cedar::aux::conv::Mode::Id mode
+  cedar::aux::conv::Mode::Id /* mode */
 ) const
 {
   return this->convolveInternal(matrix, kernel.getCombinedKernel(), borderType);
