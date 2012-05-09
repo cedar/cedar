@@ -122,6 +122,8 @@ void cedar::proc::Step::callReset()
 
   // unlock everything
   cedar::aux::unlock(locks);
+
+  this->getFinishedTrigger()->trigger();
 }
 
 void cedar::proc::Step::reset()
