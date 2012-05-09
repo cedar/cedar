@@ -74,6 +74,13 @@ namespace cedar
       CEDAR_AUX_LIB_EXPORT double max(const cv::Mat matrix);
       //! returns the value of the global minimum of a matrix
       CEDAR_AUX_LIB_EXPORT double min(const cv::Mat matrix);
+
+      //! Returns the index of the global maximum of a matrix.
+      CEDAR_AUX_LIB_EXPORT unsigned int maxIndex1D(const cv::Mat matrix);
+
+      //! Returns the index of the global minimum of a matrix.
+      CEDAR_AUX_LIB_EXPORT unsigned int minIndex1D(const cv::Mat matrix);
+
       //! writes the matrix into the shell properly organized by columns and rows
       //!\todo move write(cv::Mat) to aux::utilities
       //!\todo rework (template for copy & paste code)

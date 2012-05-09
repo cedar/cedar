@@ -57,12 +57,49 @@ double cedar::aux::math::normalizeAngle(double value)
   return value;
 }
 
+unsigned int cedar::aux::math::maxIndex1D(const cv::Mat matrix)
+{
+  cv::Point max_index;
+  cv::minMaxLoc(matrix, NULL, NULL, NULL, &max_index);
+
+  CEDAR_DEBUG_ASSERT(cedar::aux::math::getDimensionalityOf(matrix) <= 1);
+
+  if (matrix.rows == 1)
+  {
+    return static_cast<unsigned int>(max_index.x);
+  }
+  else
+  {
+    CEDAR_DEBUG_ASSERT(matrix.cols == 1);
+    return static_cast<unsigned int>(max_index.y);
+  }
+}
+
 double cedar::aux::math::max(const cv::Mat matrix)
 {
   double max;
-  cv::minMaxLoc(matrix, 0 , &max);
+  cv::minMaxLoc(matrix, 0, &max);
   return max;
 }
+
+unsigned int cedar::aux::math::minIndex1D(const cv::Mat matrix)
+{
+  cv::Point min_index;
+  cv::minMaxLoc(matrix, NULL, NULL, &min_index, NULL);
+
+  CEDAR_DEBUG_ASSERT(cedar::aux::math::getDimensionalityOf(matrix) <= 1);
+
+  if (matrix.rows == 1)
+  {
+    return static_cast<unsigned int>(min_index.x);
+  }
+  else
+  {
+    CEDAR_DEBUG_ASSERT(matrix.cols == 1);
+    return static_cast<unsigned int>(min_index.y);
+  }
+}
+
 
 double cedar::aux::math::min(const cv::Mat matrix)
 {
