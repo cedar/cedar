@@ -135,7 +135,7 @@ protected:
   bool onInit();
   void onCleanUp();
   bool onDeclareParameters();
-  const std::string& onGetSourceInfo(unsigned int channel) const;
+  void onUpdateSourceInfo(unsigned int channel);
   bool onGrab();
   void onAddChannel();
 

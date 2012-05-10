@@ -73,8 +73,8 @@ public cedar::dev::sensors::visual::GrabberInterface
    */
   struct CameraId
   {
-    unsigned int busId;  ///! The bus id
-    unsigned int guid;   ///! The unique id of the device
+    unsigned int busId;  /// The bus id
+    unsigned int guid;   /// The unique id of the device
   };
 
 
@@ -87,9 +87,6 @@ public cedar::dev::sensors::visual::GrabberInterface
   {
     /// Unique channel id
     CameraId mCamId;
-
-    /// The channel information
-    std::string mChannelInfo;
 
     /// Camera interface
     cv::VideoCapture mVideoCapture;
@@ -348,7 +345,40 @@ public:
    */
   std::vector<std::string> getAllSettings(unsigned int channel);
 
+  /*! @brief Set a property direct in the cv::VideoCapture class
+   *
+   *    Use this method only for properties which are not (yet) supported by cedar CameraProperty()
+   *    or CameraSetting() class. But be aware, that there is no check if the wanted property is supported
+   *    by the used backend
+   *
+   *   @remarks
+   *      Use this only for above mentioned reasons, because there is no value-checking and the
+   *      internal values which are cached from the CameraGrabber class isn't updated!
+   *
+   *  @param channel This is the index of the source you want to set the parameter value.
+   *  @param propId The OpenCV constants for cv::VideoCapture.set() method
+   *  @param value The new value
+   *  @return Boolean value, that indicates the exit-state of cv::VideoCapture.set()
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+   *  @see  setCameraMode, setCameraFps, setCameraIsoSpeed, CameraSetting, setCameraProperty
+   *
+   *
+   */
+  bool setRawProperty(unsigned int channel, unsigned int propId, double value);
 
+  /*! @brief Get a property directly form the cv::VideoCapture
+   *
+   *    Use this method only for properties which are not (yet) supported by cedar CameraProperty()
+   *    or CameraSetting() class. But be aware, that there is no check if the wanted property is supported
+   *    by the used backend
+   *
+   *  @param channel This is the index of the source you want to set the parameter value.
+   *  @param propId The OpenCV constants for cv::VideoCapture.set() method
+   *  @return Value, that indicates the exit-state of cv::VideoCapture.set()
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+   *  @see  getCameraMode, getCameraFps, getCameraIsoSpeed, CameraSetting, getCameraProperty
+   */
+  double getRawProperty(unsigned int channel, unsigned int propId);
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -363,7 +393,7 @@ protected:
   bool onGrab();
 
   bool onDeclareParameters();
-  const std::string& onGetSourceInfo(unsigned int channel) const;
+  void onUpdateSourceInfo(unsigned int channel);
 
   ///! @brief Sync all Parameters from cameras with the local buffer
   bool onWriteConfiguration();
@@ -382,9 +412,6 @@ private:
 
   /// @brief Sets the channel-id which depends on the isGuid-flag (only used in constructor)
   void setChannelId(unsigned int channel, unsigned int id, bool isGuid);
-
-  /// @brief Sets the channel-info which depends on the created cv::VideoCapture (only used in constructor)
-  void setChannelInfo(unsigned int channel);
 
   /*! This string identifies, that the default-filename (containing grabber-guid) should be used
    * If the entry in the configuration file is different, then that file will be used

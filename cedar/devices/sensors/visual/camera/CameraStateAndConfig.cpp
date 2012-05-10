@@ -197,7 +197,7 @@ bool cedar::dev::sensors::visual::CameraStateAndConfig::setProperty(CameraProper
   {
     if (isAutoCapable(propId))
     {
-      if (setCamProperty(prop_id, static_cast<double>(CAMERA_PROPERTY_MODE_AUTO)))
+      if (setRawProperty(prop_id, static_cast<double>(CAMERA_PROPERTY_MODE_AUTO)))
       {
         mCamPropertyValues[propId] = CAMERA_PROPERTY_MODE_AUTO;
         return true;
@@ -231,7 +231,7 @@ bool cedar::dev::sensors::visual::CameraStateAndConfig::setProperty(CameraProper
   {
     if (isOnOffCapable(propId))
     {
-      if (setCamProperty(prop_id, static_cast<double>(CAMERA_PROPERTY_MODE_OFF)))
+      if (setRawProperty(prop_id, static_cast<double>(CAMERA_PROPERTY_MODE_OFF)))
       {
         mCamPropertyValues[propId] = CAMERA_PROPERTY_MODE_OFF;
         return true;
@@ -265,7 +265,7 @@ bool cedar::dev::sensors::visual::CameraStateAndConfig::setProperty(CameraProper
   {
     if (isOnePushCapable(propId))
     {
-      if (setCamProperty(prop_id, static_cast<double>(CAMERA_PROPERTY_MODE_ONE_PUSH_AUTO)))
+      if (setRawProperty(prop_id, static_cast<double>(CAMERA_PROPERTY_MODE_ONE_PUSH_AUTO)))
       {
         mCamPropertyValues[propId] = CAMERA_PROPERTY_MODE_ONE_PUSH_AUTO;
         return true;
@@ -350,7 +350,7 @@ bool cedar::dev::sensors::visual::CameraStateAndConfig::setProperty(CameraProper
     //not set, set it
     int new_value = 0;
     //if (mVideoCaptures.at(channel).set(propId, static_cast<double>(wanted_value))) asdf
-    if (setCamProperty(prop_id,value) )
+    if (setRawProperty(prop_id,value) )
     {
       //and check if successful
       new_value = boost::math::iround(getPropertyValue(propId));
@@ -420,7 +420,7 @@ double cedar::dev::sensors::visual::CameraStateAndConfig::getPropertyValue(Camer
 
   if (isSupported(propId))
   {
-    return getCamProperty(prop_id);
+    return getRawProperty(prop_id);
   }
   else
   {
@@ -435,7 +435,7 @@ double cedar::dev::sensors::visual::CameraStateAndConfig::getPropertyValue(Camer
 }
 
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::CameraStateAndConfig::setCamProperty(unsigned int propId, double value)
+bool cedar::dev::sensors::visual::CameraStateAndConfig::setRawProperty(unsigned int propId, double value)
 {
   bool result;
   mpVideoCaptureLock->lockForWrite();
@@ -445,7 +445,7 @@ bool cedar::dev::sensors::visual::CameraStateAndConfig::setCamProperty(unsigned 
 }
 
 //----------------------------------------------------------------------------------------------------
-double cedar::dev::sensors::visual::CameraStateAndConfig::getCamProperty(unsigned int propId)
+double cedar::dev::sensors::visual::CameraStateAndConfig::getRawProperty(unsigned int propId)
 {
   double result;
   mpVideoCaptureLock->lockForWrite();
@@ -471,7 +471,7 @@ void cedar::dev::sensors::visual::CameraStateAndConfig::setAllParametersToCam()
   //only set it if a mode is given. Otherwise use the default auto-mode from OpenCv
   if (id_mode != CameraVideoMode::MODE_NOT_SET)
   {
-    setCamProperty(static_cast<unsigned int> (CameraSetting::SETTING_MODE), static_cast<unsigned int> (id_mode));
+    setRawProperty(static_cast<unsigned int> (CameraSetting::SETTING_MODE), static_cast<unsigned int> (id_mode));
   }
 
   CameraFrameRate::Id id_fps = CameraFrameRate::type().get(mCamSettings.fps).id();
@@ -505,7 +505,7 @@ void cedar::dev::sensors::visual::CameraStateAndConfig::setAllParametersToCam()
 
   if (id_fps != CameraFrameRate::FRAMERATE_NOT_SET)
   {
-    setCamProperty(static_cast<unsigned int> (CameraSetting::SETTING_FPS), static_cast<unsigned int> (id_fps));
+    setRawProperty(static_cast<unsigned int> (CameraSetting::SETTING_FPS), static_cast<unsigned int> (id_fps));
   }
 
   CameraIsoSpeed::Id id_iso = CameraIsoSpeed::type().get(mCamSettings.iso_speed).id();
@@ -540,7 +540,7 @@ void cedar::dev::sensors::visual::CameraStateAndConfig::setAllParametersToCam()
 
   if (id_iso != CameraIsoSpeed::ISO_NOT_SET)
   {
-    setCamProperty(static_cast<unsigned int> (CameraSetting::SETTING_ISO_SPEED), static_cast<unsigned int> (id_iso));
+    setRawProperty(static_cast<unsigned int> (CameraSetting::SETTING_ISO_SPEED), static_cast<unsigned int> (id_iso));
   }
 
   //properties for each channel
@@ -557,7 +557,7 @@ void cedar::dev::sensors::visual::CameraStateAndConfig::setAllParametersToCam()
       //with recheck in case something wrong in the config-file
       setProperty(prop_id, prop_val);
       //without recheck
-      //setCamProperty(prop_id,prop_val);
+      //setRawProperty(prop_id,prop_val);
     }
   }
   //values set in camera, but there they aren't taken by the camera
@@ -568,7 +568,7 @@ void cedar::dev::sensors::visual::CameraStateAndConfig::setAllParametersToCam()
 bool cedar::dev::sensors::visual::CameraStateAndConfig::setSetting(CameraSetting::Id settingId, double value)
 {
   unsigned int prop_id = static_cast<unsigned int>(settingId);
-  bool result = setCamProperty(prop_id,value);
+  bool result = setRawProperty(prop_id,value);
   unsigned int ivalue = static_cast<unsigned int>(value);
 
   switch (settingId)
@@ -595,9 +595,9 @@ double cedar::dev::sensors::visual::CameraStateAndConfig::getSetting(CameraSetti
   case CameraSetting::SETTING_MODE :
     return static_cast<double>(CameraVideoMode::type().get(mCamSettings.mode).id());
   case CameraSetting::SETTING_FRAME_HEIGHT :
-    return getCamProperty(CameraSetting::SETTING_FRAME_HEIGHT);
+    return getRawProperty(CameraSetting::SETTING_FRAME_HEIGHT);
   case CameraSetting::SETTING_FRAME_WIDTH :
-    return getCamProperty(CameraSetting::SETTING_FRAME_WIDTH);
+    return getRawProperty(CameraSetting::SETTING_FRAME_WIDTH);
   default :
     return CAMERA_PROPERTY_NOT_SUPPORTED;
   }

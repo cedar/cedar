@@ -114,10 +114,22 @@ public:
    *  @remarks
    *	Supported image-types depend on operating system and installed libs. <br>
    *	For details look at the OpenCV-documentation (Section "imread").
-   *  @param channel which should be changed (default is 0).
+   *  @param channel which should be changed.
    *  @param fileName of the new picture.
+   *  @throws IndexOutOfRangeException If channel is't fit
+   *  @throws InitializationException If the grabber couldn't grab from the file
    */
   void setSourceFile(unsigned int channel, const std::string& fileName);
+
+  /*! @brief Set a new picture to grab from
+   *   This is for a single channel grabber or for channel 0 on a stereor grabber
+   *  @param fileName of the new picture.
+   *  @throws IndexOutOfRangeException If channel is't fit
+   *  @throws InitializationException If the grabber couldn't grab from the file
+   *  @see setSourceFile(unsigned int, const std::string&)
+   */
+
+  void setSourceFile(const std::string& fileName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -128,7 +140,7 @@ protected:
   bool onInit();
   bool onGrab();
   bool onDeclareParameters();
-  const std::string& onGetSourceInfo(unsigned int channel) const;
+  void onUpdateSourceInfo(unsigned int channel);
   void onAddChannel();
 
   //--------------------------------------------------------------------------------------------------------------------

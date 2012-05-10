@@ -45,14 +45,12 @@
 #include <opencv2/opencv.hpp>
 #include <QGLWidget>
 
-/*! @brief A simple Grabber class for testing the Grabber interface
+/*! @brief A grabber to grab from a QGLWidget
  *
- *  This grabber class is used to test the grabber interface. It
- *  creates a Grabber with a TestParam (default-value 123) and FPS set to 15
- *
- *  @remarks For grabber developers<br>
- *    This class can also be used as a template to create other classes derived from GrabberInstance
- *
+ *  Be aware, that the grabbing have to be done in the gui-thread.
+ *  The grabbing will fail, if you start the grabberthread to grab in the background.
+ *  You have to grab in your main gui-thread with the grab() memberfunction of the class.
+ *  The getImage() member could be also invoked in threads running in the background
  */
 class cedar::dev::sensors::visual::OglGrabber
 :
@@ -64,11 +62,8 @@ public cedar::dev::sensors::visual::GrabberInterface
 
   //!@cond SKIPPED_DOCUMENTATION
 
-  /*! @struct PictureChannel
-   *  @brief Additional data of a grabbing channel
-   *  @remarks For grabber developers<br>
-   *    You don't have to create an extended channel structure, until you need more channel data.
-   *    But when, then you have to implement the onAddChannel() member function as well
+  /*! @struct OglChannel
+   *  @brief Additional data of a grabbing channel to grab from a QGLWidget
    */
   struct OglChannel
   :
@@ -112,20 +107,11 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  /*! @brief Read the counter and reset it to zero
-   *  @remarks The counter counts the framerate (i.e. the call of the grab() method) of LoopedThread.
-   */
-  unsigned int getCounter();
 
-  /*! @brief Simple get-function for the test parameter
+  /*! @brief Set a new Widget to grab from
    *
    */
-  int getTestParam();
-
-  /*! @brief Simple set-function for the test parameter
-   *
-   */
-  void setTestParam(int mTest);
+  void setWidget(unsigned int channel, QGLWidget *oglWidget);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -134,11 +120,11 @@ protected:
 
   //derived from GrabberInterface
   bool onInit();
-  void onCleanUp();
   bool onDeclareParameters();
-  const std::string& onGetSourceInfo(unsigned int channel) const;
-  bool onGrab();
+  void onCleanUp();
+  void onUpdateSourceInfo(unsigned int channel);
   void onAddChannel();
+  bool onGrab();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -168,18 +154,12 @@ private:
 protected:
   // none yet
 private:
+  // none yet
 
-  //!@brief The counter
-  unsigned int mCounter;
-
-  //!@brief The test parameter
-  int _mTest;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 

@@ -81,9 +81,6 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
   //now apply the values, also invoke the onInit() member function
   applyInit();
 
-  //and read the info from cv::VideoCapture
-  setChannelInfo(0);
-
   std::stringstream debug_info;
   debug_info << ": cam0: guid " << getChannel(0)->mCamId.guid << " busid: " << getChannel(0)->mCamId.busId;
   cedar::aux::LogSingleton::getInstance()->debugMessage
@@ -128,10 +125,6 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
   //now apply the values, also invoke the onInit() member function
   applyInit();
 
-  //add channel info
-  setChannelInfo(0);
-  setChannelInfo(1);
-
   std::stringstream debug_info;
   debug_info << "Create" << std::endl
              << "\tcam0: guid " << getChannel(0)->mCamId.guid << " busid: " << getChannel(0)->mCamId.busId << std::endl
@@ -170,12 +163,6 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
 
   readInit(numChannels,"CameraGrabber");
   applyInit();
-
-  //add channel info
-  for (unsigned int channel = 0; channel < mNumCams; channel++)
-  {
-    setChannelInfo(channel);
-  }
 
   std::stringstream debug_info;
   debug_info << ": ";
@@ -228,19 +215,6 @@ void cedar::dev::sensors::visual::CameraGrabber::onAddChannel()
   //default constructor is invoked for the rest:
   //channelInfo, videoCapture, videoCaptureLock, camStateAndConfig, camCapabilitiesFileName
   mChannels.push_back(channel);
-}
-
-//----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::CameraGrabber::setChannelInfo(unsigned int channel)
-{
-  //add channel info
-  std::stringstream s;
-  s << "Camera channel 0"
-    << ": DeviceID: " << getChannel(channel)->mCamId.busId
-    << ", GUID: " << getChannel(channel)->mCamId.guid
-    << " (0x"<<std::hex<<getChannel(channel)->mCamId.guid<<")"<<std::dec
-    << ", Mode: " << CameraVideoMode::type().get(this->getCameraMode(0)).name();
-  getChannel(channel)->mChannelInfo = s.str();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -667,10 +641,16 @@ bool cedar::dev::sensors::visual::CameraGrabber::onGrab()
 
 
 //----------------------------------------------------------------------------------------------------
-const std::string& cedar::dev::sensors::visual::CameraGrabber::onGetSourceInfo(unsigned int channel) const
+void cedar::dev::sensors::visual::CameraGrabber::onUpdateSourceInfo(unsigned int channel)
 {
-  //value of channel is already checked by getSourceInfo
-  return getChannel(channel)->mChannelInfo;
+  //value of channel is already checked by GraberInterface::getSourceInfo()
+  std::stringstream s;
+  s << "Camera channel 0"
+    << ": DeviceID: " << getChannel(channel)->mCamId.busId
+    << ", GUID: " << getChannel(channel)->mCamId.guid
+    << " (0x"<<std::hex<<getChannel(channel)->mCamId.guid<<")"<<std::dec
+    << ", Mode: " << CameraVideoMode::type().get(this->getCameraMode(0)).name();
+  getChannel(channel)->mChannelInfo = s.str();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -872,7 +852,6 @@ bool cedar::dev::sensors::visual::CameraGrabber::setCameraSetting
   }
 
   bool result = getChannel(channel)->mCamStateAndConfig->setSetting(setting_id, value);
-  setChannelInfo(channel);
   return result;
 }
 
@@ -967,3 +946,23 @@ cv::Size cedar::dev::sensors::visual::CameraGrabber::getCameraFrameSize( unsigne
 }
 
 
+//----------------------------------------------------------------------------------------------------
+bool cedar::dev::sensors::visual::CameraGrabber::setRawProperty(unsigned int channel, unsigned int propId, double value)
+{
+  if (channel >= mNumCams)
+  {
+    CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"cedar::dev::sensors::visual::CameraGrabber::setRawProperty");
+  }
+  return getChannel(channel)->mCamStateAndConfig->setRawProperty(propId, value);
+}
+
+
+//----------------------------------------------------------------------------------------------------
+double cedar::dev::sensors::visual::CameraGrabber::getRawProperty(unsigned int channel, unsigned int propId)
+{
+  if (channel >= mNumCams)
+  {
+    CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"cedar::dev::sensors::visual::CameraGrabber::getRawProperty");
+  }
+  return getChannel(channel)->mCamStateAndConfig->getRawProperty(propId);
+}

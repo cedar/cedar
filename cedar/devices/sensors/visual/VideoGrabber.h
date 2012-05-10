@@ -108,14 +108,17 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
  /*! @brief Turn looping on or off (i.e., restart on end) */
-  void setLoop(bool loop = true);
+  void setLooped(bool loop = true);
+
+  //! @brief Check if looping is on or off
+  bool getLooped();
 
   /*! @brief Set the factor for grabbing speed
    *
    *   The speed stored in the AVI-File will be multiplied with this factor.<br>
    *		Effective FPS should be SpeedFactor*AVI-Speed<br>
    *  @remarks
-   *		The grabber thread have to be restarted to take setLoop effect.<br>
+   *		The grabber thread have to be restarted to take setLooped effect.<br>
    *		This is done internally (by calling setFPS), but keep that in mind.
    *  @see
    *		setFPS
@@ -203,11 +206,13 @@ protected:
    *
    *      The shortest file determine the end.<br>
    *      In case of looping through the files, the shortest file define the restart moment
+   *      The image matrix in getImage() could be empty also if the return value is true.
+   *      This happens if looped is false and all frames grabbed from the file, i.e. it is over.
    */
   bool onGrab();
 
   bool onDeclareParameters();
-  const std::string& onGetSourceInfo(unsigned int channel) const;
+  void onUpdateSourceInfo(unsigned int channel);
   void onCleanUp();
   void onAddChannel();
 
@@ -226,7 +231,7 @@ protected:
   
   /*! @brief Indicates if looping is on
    */
-  bool _mLoop;
+  bool _mLooped;
 
   /*! @brief Factor for grabbing speed
    *  @remarks the speed stored in the AVI-File will be multiplied with this factor

@@ -84,6 +84,7 @@ const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visu
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1280x960_MONO16 ;
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1600x1200_MONO16;
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_EXIF ;
+/*
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_0 ;
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_1 ;
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_2 ;
@@ -92,6 +93,7 @@ const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visu
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_5 ;
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_6 ;
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_7 ;
+*/
 #endif //CEDAR_USE_LIB_DC1394
 #endif // MSVC
 
@@ -282,6 +284,7 @@ void cedar::dev::sensors::visual::CameraVideoMode::construct()
                                       "MODE_FW_EXIF",
                                       "MODE_FW_EXIF"
                                     ));
+  /*
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_0,
                                       "MODE_FW_FORMAT7_0",
@@ -322,7 +325,7 @@ void cedar::dev::sensors::visual::CameraVideoMode::construct()
                                       "MODE_FW_FORMAT7_7",
                                       "MODE_FW_FORMAT7_7"
                                     ));
-
+*/
 #endif // CEDAR_USE_LIB_DC1394
 }
 //----------------------------------------------------------------------------------------------------------------------

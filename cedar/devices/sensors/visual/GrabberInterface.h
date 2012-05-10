@@ -122,6 +122,9 @@ protected:
 
     ///! for recordings
     cv::VideoWriter mVideoWriter;
+
+    /// The channel information
+    std::string mChannelInfo;
   };
 
   typedef boost::shared_ptr<GrabberChannel> GrabberChannelPtr;
@@ -215,7 +218,7 @@ public:
      *       In the mono case you do not need to supply this value. Default is 0.<br>
      *       In the stereo case it may be 0 or 1.
      */
-    virtual std::string getSourceInfo(unsigned int channel=0) const;
+    std::string& getSourceInfo(unsigned int channel=0);
 
     //------------------------------------------------------------------------
     //Thread related methods
@@ -621,7 +624,7 @@ protected:
      *       This is the only pure virtual member. It have to be implemented in derived class
      *       to supply correct informations
      */
-    virtual const std::string& onGetSourceInfo(unsigned int channel=0) const=0;
+    virtual void onUpdateSourceInfo(unsigned int channel=0) = 0;
 
 
     /*! @brief Create and initialize the channel-structure for only one channel

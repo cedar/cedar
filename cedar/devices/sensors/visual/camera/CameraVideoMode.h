@@ -191,6 +191,8 @@ public:
   static const Id MODE_FW_1600x1200_MONO16 = DC1394_VIDEO_MODE_1600x1200_MONO16;
   /// @see MODE_FW_160x120_YUV444
   static const Id MODE_FW_EXIF = DC1394_VIDEO_MODE_EXIF;
+
+  /* Format7 isn't supported from OpenCV firewire backend
   /// @see MODE_FW_160x120_YUV444
   static const Id MODE_FW_FORMAT7_0 = DC1394_VIDEO_MODE_FORMAT7_0;
   /// @see MODE_FW_160x120_YUV444
@@ -207,6 +209,7 @@ public:
   static const Id MODE_FW_FORMAT7_6 = DC1394_VIDEO_MODE_FORMAT7_6;
   /// @see MODE_FW_160x120_YUV444
   static const Id MODE_FW_FORMAT7_7 = DC1394_VIDEO_MODE_FORMAT7_7;
+  */
 #endif // CEDAR_USE_LIB_DC1394
 
 protected:

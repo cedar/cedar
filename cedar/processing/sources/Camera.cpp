@@ -78,28 +78,107 @@ namespace
 cedar::proc::sources::Camera::Camera()
 :
 cedar::proc::Step(false, true),
-mImage(new cedar::aux::ImageData(cv::Mat::zeros(1, 1, CV_32F)))
+mImage(new cedar::aux::ImageData(cv::Mat::zeros(1, 1, CV_32F))),
+mDeBayer(new cedar::aux::BoolParameter(this, "deBayer", true)),
+mBusId(new cedar::aux::UIntParameter(this, "busId", 0, 0, 999)),
+_mConfigurationFileName(new cedar::aux::FileParameter(this, "config",cedar::aux::FileParameter::READ,""))
 {
-  this->declareOutput("camera image", mImage);
+
+  //default file values
+  _mConfigurationFileName->setValue("./cameragrabber.cfg");
+  mGrabber.reset();
+
+
+  this->declareOutput("camera", mImage);
+  QObject::connect(_mConfigurationFileName.get(), SIGNAL(valueChanged()), this, SLOT(setConfigurationFileName()));
+  QObject::connect(mDeBayer.get(), SIGNAL(valueChanged()), this, SLOT(setDeBayer()));
+  QObject::connect(mBusId.get(), SIGNAL(valueChanged()), this, SLOT(setBusId()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+//----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Camera::onStart()
 {
   if (!mGrabber)
   {
-    mGrabber = cedar::dev::sensors::visual::CameraGrabberPtr
-               (
-                  new cedar::dev::sensors::visual::CameraGrabber("grabber.cfg", 1)
-               );
+    createGrabber();
   }
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+void cedar::proc::sources::Camera::setDeBayer()
+{
+
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+void cedar::proc::sources::Camera::setBusId()
+{
+  //recreate grabber if needed
+  if (mGrabber)
+  {
+    createGrabber();
+  }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+void cedar::proc::sources::Camera::setConfigurationFileName()
+{
+
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Camera::compute(const cedar::proc::Arguments&)
 {
-  this->mGrabber->grab();
-  this->mImage->setData(this->mGrabber->getImage());
+  if (mGrabber)
+  {
+    this->mGrabber->grab();
+
+    cv::Mat frame;
+
+    //check if conversion from bayer-pattern to cv::Mat BGR format is needed
+    if(this->mDeBayer->getValue())
+    {
+      cv::cvtColor(this->mGrabber->getImage(),frame,CV_BayerGR2BGR);
+    }
+    else
+    {
+      frame = this->mGrabber->getImage();
+    }
+    this->mImage->setData(frame.clone());
+  }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+void cedar::proc::sources::Camera::createGrabber()
+{
+
+  // destroy the old grabber (if any), in order to save the configuration
+  if (mGrabber)
+  {
+    const std::string message1 = "Old grabber deleted";
+    cedar::aux::LogSingleton::getInstance()->debugMessage(message1,"cedar::proc::sources::Camera::createGrabber()");
+  }
+  mGrabber.reset();
+
+  const std::string conf_file = this->_mConfigurationFileName->getPath();
+  const unsigned int bus_id = this->mBusId->getValue();
+
+  // create a new one
+  cedar::dev::sensors::visual::CameraGrabberPtr grabber;
+  grabber = cedar::dev::sensors::visual::CameraGrabberPtr
+            (
+               new cedar::dev::sensors::visual::CameraGrabber(conf_file,bus_id,false,true)
+            );
+  const std::string message2= "New grabber created";
+  cedar::aux::LogSingleton::getInstance()->debugMessage(message2,"cedar::proc::sources::Video::createGrabber()");
+
+  // the new grabber created without exception, so we can use it
+  mGrabber = grabber;
+
+  //!@todo read debayer value from config-file
 }

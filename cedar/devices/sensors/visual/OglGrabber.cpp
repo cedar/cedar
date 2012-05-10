@@ -49,22 +49,16 @@ cedar::dev::sensors::visual::OglGrabber::OglGrabber(std::string configFileName, 
 :
 cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                          (
-                                           ConfigurationInterface::getName() + ": Create a single channel grabber",
-                                            "cedar::dev::sensors::visual::CameraGrabber::OglGrabber()"
-                                          );
-
-  //debug information logging
+  // debug information logging
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
-  //read initialization values from configuration file
+  // read initialization values from configuration file
   readInit(1,"OglGrabber");
 
-  //overwrite parameters from configfiles with values from constuctor
+  // set additional parameters from the constuctor
   getChannel(0)->mpOglWidget = oglWidget;
 
-  //now apply the whole configuration
+  // now apply the whole configuration
   applyInit();
 }
 
@@ -80,23 +74,17 @@ cedar::dev::sensors::visual::OglGrabber::OglGrabber
 :
 cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
-  //debug information logging
+  // debug information logging
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                          (
-                                           ConfigurationInterface::getName() + ": Create a stereo channel grabber",
-                                            "cedar::dev::sensors::visual::CameraGrabber::OglGrabber()"
-                                          );
-
-  //read initialization values from configuration file
+  // read initialization values from configuration file
   readInit(2,"StereoOglGrabber");
 
-  //overwrite parameters from configfiles with values from constuctor
+  // set additional parameters from the constuctor
   getChannel(0)->mpOglWidget = oglWidget0;
   getChannel(1)->mpOglWidget = oglWidget1;
 
-  //now apply the whole configuration
+  // now apply the whole configuration
   applyInit();
 }
 
@@ -104,20 +92,7 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
 // Destructor
 cedar::dev::sensors::visual::OglGrabber::~OglGrabber()
 {
-  //call of doCleanup, to do the necessarily cleanup in GrabberInterface
   doCleanUp();
-
-  //do memory de-allocation in the destructor
-  //all stuff in the mChannels vector is cleared by the shared pointer
-
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                          (
-                                           ConfigurationInterface::getName() + ": destructor",
-                                            "cedar::dev::sensors::visual::CameraGrabber::~OglGrabber()"
-                                          );
-
-
-  //debug logging
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
 }
@@ -129,37 +104,20 @@ cedar::dev::sensors::visual::OglGrabber::~OglGrabber()
 //----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::OglGrabber::onInit()
 {
-
-  //do the initialization of your Grabber in this method,
-  //grab the first pictures and initialize the mImageMatVector with
-  //these pictures
-
-  //-------------------------------------------------
   std::stringstream init_message;
-  init_message << ": Initialize test grabber with " << mNumCams << " channels ..." << std::endl;
+  init_message << ": Initialize grabber with " << mNumCams << " channels ..." << std::endl;
   for (unsigned int i = 0; i < mNumCams; ++i)
   {
     init_message << "Channel " << i <<std::endl;
         //<< ": capture from Source: " << getChannel(i)->mpOglWidget->WindowTitle() << std::endl;
   }
-  cedar::aux::LogSingleton::getInstance()->systemInfo
+  cedar::aux::LogSingleton::getInstance()->message
                                            (
                                              ConfigurationInterface::getName() + init_message.str(),
                                              "cedar::dev::sensors::visual::OglGrabber::onInit()"
                                            );
-
-  //-------------------------------------------------
-  //load pictures one by one
-  for(unsigned int channel=0; channel<mNumCams;++channel)
-  {
-    //there is no need to create new matrices, empty ones are
-    //already initialized within the channel structure
-    cv::Mat frame=cv::Mat();
-
-    //apply the new content to the channel image
-    getChannel(channel)->mImageMat = frame;
-  }
-
+  //Grab first frames
+  onGrab();
 
   // all grabbers successfully initialized
   cedar::aux::LogSingleton::getInstance()->debugMessage
@@ -168,27 +126,25 @@ bool cedar::dev::sensors::visual::OglGrabber::onInit()
                                             "cedar::dev::sensors::visual::CameraGrabber::onInit()"
                                           );
   return true;
-
-  //to test the initialize exception
-  //return false;
 }
 
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::OglGrabber::onCleanUp()
 {
-  //do the cleanup of used hardware in this method
-  //on an exception or a CTRL-C only onCleanUp will be invoked (no destructor)
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                          (
-                                           ConfigurationInterface::getName() + ": Cleaning up",
-                                            "cedar::dev::sensors::visual::CameraGrabber::onCleanUp()"
-                                          );
+  // do the cleanup of used hardware in this method
+  // on an exception or a CTRL-C only onCleanUp will be invoked (no destructor)
+
+  // delete all pointer-references to external widgets
+  for (unsigned int channel = 0; channel < mNumCams; ++channel)
+  {
+    getChannel(channel)->mpOglWidget = NULL;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::OglGrabber::onAddChannel()
 {
-  //create the channel structure for one channel
+  // create the channel structure for one channel
   OglChannelPtr channel(new OglChannel);
   channel->mpOglWidget = NULL;
   mChannels.push_back(channel);
@@ -197,65 +153,101 @@ void cedar::dev::sensors::visual::OglGrabber::onAddChannel()
 //----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::OglGrabber::onDeclareParameters()
 {
-  //declare and initialize parameters and members of your derived class here
-  mCounter = 0 ;
+  // declare and initialize parameters and members of your derived class here
+  // mCounter = 0 ;
 
-  //if your parameters should be stored in the configfile,
-  //the default-values will be set on new grabbers
-  return addParameter(&_mTest, "testparam", 123) == CONFIG_SUCCESS;
+  // if your parameters should be stored in the configfile,
+  // the default-values will be set on new grabbers
+  // return addParameter(&_mTest, "testparam", 123) == CONFIG_SUCCESS;
+  return true;
 }
 
 //----------------------------------------------------------------------------------------------------
-const std::string& cedar::dev::sensors::visual::OglGrabber::onGetSourceInfo(unsigned int channel) const
+void cedar::dev::sensors::visual::OglGrabber::onUpdateSourceInfo(unsigned int channel)
 {
-  //this is the only pure virtual method of the GrabberInterface class
-
-  //no range-check is needed, because this is done in the GrabberInterface::getSourceInfo method
-
-  //give some information about the used source like channelname, filename, devicename
-  //or something like that
-
-  //return getChannel(channel)->mSourceFileName;
-  return "QT::OGLWidget on Channel " + boost::lexical_cast<std::string>(channel);
+  //value of channel is already checked by GraberInterface::getSourceInfo()
+  getChannel(channel)->mChannelInfo = "QT::OGLWidget on Channel " + boost::lexical_cast<std::string>(channel);
 }
 
 //----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::OglGrabber::onGrab()
 {
-  //this is the main grabbing method.
-  //read a new picture from the source and set the picture in the mImageMatVector.at()
-
+  bool ogl_valid = true;
   for(unsigned int channel=0; channel<mNumCams;++channel)
-   {
-     //apply the new content to the channel image
-     //getChannel(channel)->mImageMat = <grab_new_content>;
-   }
+  {
+    if (getChannel(channel)->mpOglWidget != NULL)
+    {
+      QGLWidget* p_channel_widget = getChannel(channel)->mpOglWidget;
 
-  //here we just want to count how often onGrab is invoked, due to a fps-check
-  mCounter ++;
-  return true;
+      // grab framebuffer without alpha-channel. possible values
+      // GL_FRONT_LEFT, GL_FRONT_RIGHT, GL_BACK_LEFT, GL_BACK_RIGHT, GL_FRONT, GL_BACK, GL_LEFT, GL_RIGHT, GL_AUXi,
+      // where i is between 0 and the value of GL_AUX_BUFFERS minus 1.
+
+      glReadBuffer(GL_FRONT_RIGHT);
+      QImage qimage = p_channel_widget->grabFrameBuffer(false);
+
+      // QImage to cv::Mat
+      cv::Mat mat = cv::Mat(qimage.height(), qimage.width(), CV_8UC4,(uchar*)qimage.bits(), qimage.bytesPerLine());
+      cv::Mat mat2 = cv::Mat(mat.rows, mat.cols, CV_8UC3 );
+      int from_to[] = { 0,0, 1,1, 2,2 };
+      cv::mixChannels( &mat, 1, &mat2, 1, from_to, 3 );
+
+      //apply the new content to the channel image
+      getChannel(channel)->mImageMat = mat2.clone();
+    }
+    else
+    {
+      ogl_valid = false;
+    }
+
+    // if opengl context isn't valid, then an empty matrix will be return
+    if (!ogl_valid)
+    {
+      getChannel(channel)->mImageMat = cv::Mat();
+    }
+  }
+
+  return ogl_valid;
 }
 
-//----------------------------------------------------------------------------------------------------
-unsigned int cedar::dev::sensors::visual::OglGrabber::getCounter()
-{
-  //a simple get-method
-  unsigned int ct = mCounter;
-  mCounter = 0;
-  return ct;
-}
 
 //----------------------------------------------------------------------------------------------------
-int cedar::dev::sensors::visual::OglGrabber::getTestParam()
+void cedar::dev::sensors::visual::OglGrabber::setWidget(unsigned int channel, QGLWidget *oglWidget)
 {
-  //a simple get-method
-  return _mTest;
-}
+  if (channel >= mNumCams)
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::IndexOutOfRangeException,
+      "cedar::dev::sensors::visual::OglGrabber::setWidget"
+    );
+  }
+  if (oglWidget != NULL)
+  {
 
-//----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::OglGrabber::setTestParam(int mTest)
-{
-  //a simple set-method
-  _mTest=mTest;
+    bool restart_grabber = LoopedThread::isRunning();
+
+    // stop grabbing thread if running
+    if (restart_grabber)
+    {
+      this->stopGrabber();
+    }
+
+    // change source
+    getChannel(channel)->mpOglWidget = oglWidget;
+    cedar::aux::LogSingleton::getInstance()->message
+                                            (
+                                             ConfigurationInterface::getName() + ": New Widget applied",
+                                              "cedar::dev::sensors::visual::OglGrabber::setWidget"
+                                            );
+    if (restart_grabber)
+    {
+      this->startGrabber();
+    }
+    else
+    {
+      this->grab();
+    }
+  }
 }
 

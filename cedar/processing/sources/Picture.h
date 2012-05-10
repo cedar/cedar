@@ -45,14 +45,13 @@
 #include "cedar/processing/Step.h"
 #include "cedar/devices/sensors/visual/PictureGrabber.h"
 #include "cedar/auxiliaries/ImageData.h"
+#include "cedar/auxiliaries/FileParameter.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
- *
- * @todo describe more.
- */
+//!@brief A picture file source for the processingIde
+
 class cedar::proc::sources::Picture : public cedar::proc::Step
 {
   Q_OBJECT
@@ -76,6 +75,14 @@ public:
 public:
   // none yet
 
+public slots:
+
+  //!@brief A slot that is triggered if a new filename should be set
+  void setFileName();
+
+  //!@brief Sets a new configuration filename
+  void setConfigurationFileName();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -87,9 +94,10 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void compute(const cedar::proc::Arguments&);
-
   void onStart();
 
+  //create a new grabber instance
+  void createGrabber();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -107,7 +115,12 @@ protected:
   // none yet
 
 private:
-  // none yet
+
+  //!@brief the filename to grab from
+  cedar::aux::FileParameterPtr _mFileName;
+
+  //!@brief The configuration filename
+  cedar::aux::FileParameterPtr _mConfigurationFileName;
 
 }; // class cedar::proc::sources::Picture
 
