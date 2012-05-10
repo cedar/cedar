@@ -35,6 +35,8 @@
 #=======================================================================================================================
 
 
-cedar_add_unit_test(net
-  main.cpp
-)
+if (CEDAR_USE_YARP)
+  cedar_add_unit_test(net
+                      main.cpp
+                      )
+endif ()

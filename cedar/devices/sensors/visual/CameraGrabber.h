@@ -38,6 +38,10 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_GRABBER_H
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_GRABBER_H
 
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_LIB_DC1394
+
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/GrabberInterface.h"
 #include "cedar/devices/sensors/visual/camera/CameraIsoSpeed.h"
@@ -448,6 +452,8 @@ private:
   // none yet
 
 }; // class cedar::dev::sensors::visual::CameraGrabber
+
+#endif // CEDAR_USE_LIB_DC1394
 
 #endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_GRABBER_H
 

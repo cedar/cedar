@@ -41,7 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/IdeApplication.h"
 #include "cedar/processing/Manager.h"
-#include "cedar/devices/sensors/visual/CameraGrabber.h"
+#include "cedar/devices/sensors/visual/GrabberInterface.h"
 #include "cedar/dynamics/namespace.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/auxiliaries/utilities.h"

@@ -216,7 +216,12 @@ const std::string& cedar::dev::sensors::visual::OglGrabber::onGetSourceInfo(unsi
   //or something like that
 
   //return getChannel(channel)->mSourceFileName;
-  return "QT::OGLWidget on Channel " + boost::lexical_cast<std::string>(channel);
+
+  if (this->mSourceInfo.empty())
+  {
+    this->mSourceInfo = "QT::OGLWidget on Channel " + boost::lexical_cast<std::string>(channel);
+  }
+  return this->mSourceInfo;
 }
 
 //----------------------------------------------------------------------------------------------------

@@ -34,6 +34,10 @@
 
 ======================================================================================================================*/
 
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_LIB_DC1394
+
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/camera/CameraCapabilities.h"
 
@@ -224,3 +228,4 @@ bool cedar::dev::sensors::visual::CameraCapabilities::isAbsoluteCapable(CameraPr
   return getCapabilities(propId).is_absolute_capable;
 }
 
+#endif // CEDAR_USE_LIB_DC1394
