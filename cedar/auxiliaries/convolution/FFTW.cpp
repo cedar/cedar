@@ -111,7 +111,7 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
         (
           const cv::Mat& matrix,
           const cv::Mat& kernel,
-          cedar::aux::conv::BorderType::Id borderType
+          cedar::aux::conv::BorderType::Id /* borderType */
         ) const
 {
   if (cedar::aux::math::getDimensionalityOf(kernel) == 0)
