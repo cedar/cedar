@@ -84,6 +84,9 @@ the oldest versions supported, unless noted otherwise.
    * libconfig 1.4
    * Doxygen 
 
+optional dependencies:
+   * YARP 2.3.6 (for YARP features like network connectivity)
+   * libDC1394 (for firewire cameras)
 
 === Clone the cedar repository ===
 
