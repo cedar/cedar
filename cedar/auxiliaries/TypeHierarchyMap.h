@@ -356,7 +356,6 @@ public:
           ConstNodePtr node = queue.front();
           queue.pop();
 
-
           if (node->matchesExact(instance))
           {
             return node;

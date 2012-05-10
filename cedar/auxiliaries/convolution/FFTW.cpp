@@ -149,22 +149,6 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
     CEDAR_ASSERT(kernel.type() == CV_64F);
     kernel_64 = kernel;
   }
-  // border interpolate
-  if (borderType != cedar::aux::conv::BorderType::Cyclic)
-  {
-    cv::Mat padded_matrix;
-    cv::copyMakeBorder
-    (
-      matrix_64,
-      padded_matrix,
-      kernel_64.size[1]/2,
-      kernel_64.size[1]/2,
-      kernel_64.size[0]/2,
-      kernel_64.size[0]/2,
-      borderType
-    );
-    matrix_64 = padded_matrix;
-  }
 
   cv::Mat output = matrix_64.clone();
   output = 0.0;
@@ -185,22 +169,20 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
   // transform sigmoid U to frequency domain (fft)
   fftw_plan matrix_plan_forward = fftw_plan_dft_r2c(cedar::aux::math::getDimensionalityOf(matrix_64), matrix_64.size, const_cast<double*>(matrix_64.clone().ptr<double>()), matrix_fourier, FFTW_FORWARD + FFTW_ESTIMATE);
   fftw_plan kernel_plan_forward = fftw_plan_dft_r2c(cedar::aux::math::getDimensionalityOf(padded_kernel), padded_kernel.size, const_cast<double*>(padded_kernel.clone().ptr<double>()), kernel_fourier, FFTW_FORWARD + FFTW_ESTIMATE);
-  fftw_plan matrix_plan_backward =  fftw_plan_dft_c2r(cedar::aux::math::getDimensionalityOf(matrix_64), matrix_64.size, result_fourier, const_cast<double*>(output.clone().ptr<double>()), FFTW_BACKWARD + FFTW_ESTIMATE);
+  fftw_plan matrix_plan_backward = fftw_plan_dft_c2r(cedar::aux::math::getDimensionalityOf(matrix_64), matrix_64.size, result_fourier, const_cast<double*>(output.clone().ptr<double>()), FFTW_BACKWARD + FFTW_ESTIMATE);
 
   matrix_plan_forward = fftw_plan_dft_r2c(cedar::aux::math::getDimensionalityOf(matrix_64), matrix_64.size, const_cast<double*>(matrix_64.ptr<double>()), matrix_fourier, FFTW_FORWARD + FFTW_ESTIMATE);
   kernel_plan_forward = fftw_plan_dft_r2c(cedar::aux::math::getDimensionalityOf(padded_kernel), padded_kernel.size, const_cast<double*>(padded_kernel.ptr<double>()), kernel_fourier, FFTW_FORWARD + FFTW_ESTIMATE);
-  matrix_plan_backward =  fftw_plan_dft_c2r(cedar::aux::math::getDimensionalityOf(matrix_64), matrix_64.size, result_fourier, const_cast<double*>(output.ptr<double>()), FFTW_BACKWARD + FFTW_ESTIMATE);
+  matrix_plan_backward = fftw_plan_dft_c2r(cedar::aux::math::getDimensionalityOf(matrix_64), matrix_64.size, result_fourier, const_cast<double*>(output.ptr<double>()), FFTW_BACKWARD + FFTW_ESTIMATE);
   fftw_execute(matrix_plan_forward);
   fftw_execute(kernel_plan_forward);
 
   // this is the simplest indexing method compared to the other ones
-  for (unsigned int xyz = 0 ; xyz < transformed_elements; ++xyz)
+  for (unsigned int xyz = 0; xyz < transformed_elements; ++xyz)
   {
     // complex multiplication (lateral)
-//    result_fourier[xyz][0] = (matrix_fourier[xyz][0]*kernel_fourier[xyz][0]-matrix_fourier[xyz][1]*kernel_fourier[xyz][1]) / number_of_elements;
-//    result_fourier[xyz][1] = (matrix_fourier[xyz][1]*kernel_fourier[xyz][0]+matrix_fourier[xyz][0]*kernel_fourier[xyz][1]) / number_of_elements;
-    result_fourier[xyz][0] = (kernel_fourier[xyz][0]*matrix_fourier[xyz][0]-kernel_fourier[xyz][1]*matrix_fourier[xyz][1]) / number_of_elements;
-    result_fourier[xyz][1] = (kernel_fourier[xyz][1]*matrix_fourier[xyz][0]+kernel_fourier[xyz][0]*matrix_fourier[xyz][1]) / number_of_elements;
+    result_fourier[xyz][0] = (kernel_fourier[xyz][0] * matrix_fourier[xyz][0] - kernel_fourier[xyz][1] * matrix_fourier[xyz][1]) / number_of_elements;
+    result_fourier[xyz][1] = (kernel_fourier[xyz][1] * matrix_fourier[xyz][0] + kernel_fourier[xyz][0] * matrix_fourier[xyz][1]) / number_of_elements;
   }
 
   // transform interaction back to time domain (ifft)
@@ -209,14 +191,6 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
   fftw_free(matrix_fourier);
   fftw_free(result_fourier);
   fftw_free(kernel_fourier);
-
-  // border interpolate
-  if (borderType != cedar::aux::conv::BorderType::Cyclic)
-  {
-    int dh = kernel_64.size[1] / 2;
-    int dw = kernel_64.size[0] / 2;
-    output = output(cv::Range(dh, dh + matrix.rows), cv::Range(dw, dw + matrix.cols));
-  }
 
   if (matrix.type() == CV_32F)
   {

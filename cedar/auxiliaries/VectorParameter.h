@@ -235,7 +235,9 @@ public:
   void resize(size_t size, const T& value)
   {
     if (size == this->size())
+    {
       return;
+    }
 
     this->mValues.resize(size, value);
 
