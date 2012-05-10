@@ -37,6 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/kernel/Separable.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/MatrixIterator.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/Log.h"
@@ -128,6 +129,28 @@ void cedar::aux::kernel::Separable::updateKernelMatrix()
   }
   else
   {
-    //!@todo Implement for more than two dimensions
+    CEDAR_ASSERT(this->getDimensionality() > 2);
+    std::vector<int> sizes;
+    for (unsigned int dim = 0; dim < this->getDimensionality(); ++dim)
+    {
+      sizes.push_back(static_cast<int>(this->getSize(dim)));
+    }
+    cv::Mat kernel(this->getDimensionality(), &sizes.front(), CV_32F);
+    cedar::aux::MatrixIterator iter(kernel);
+    do
+    {
+      float value = 0.0;
+      const std::vector<int>& position = iter.getCurrentIndexVector();
+      for (unsigned int dim = 0; dim < this->getDimensionality(); ++dim)
+      {
+        value *= cedar::aux::math::getMatrixEntry<float>(this->getKernelPart(dim), position.at(dim));
+      }
+      cedar::aux::math::assignMatrixEntry(kernel, position, value);
+    }
+    while (iter.increment());
+
+    this->mKernel->lockForWrite();
+    this->mKernel->setData(kernel);
+    this->mKernel->unlock();
   }
 }

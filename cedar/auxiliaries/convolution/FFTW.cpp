@@ -211,7 +211,17 @@ cv::Mat cedar::aux::conv::FFTW::padKernel(const cv::Mat& matrix, const cv::Mat& 
    * 121 => 100 anchor moves to 0,0
    * 010    001
    */
-
+  std::cout << "pad: " << std::endl;
+  for (unsigned int i = 0; i < cedar::aux::math::getDimensionalityOf(matrix); ++i)
+  {
+    std::cout << matrix.size[i] << " ";
+  }
+  std::cout << std::endl;
+  for (unsigned int i = 0; i < cedar::aux::math::getDimensionalityOf(kernel); ++i)
+  {
+    std::cout << kernel.size[i] << " ";
+  }
+  std::cout << std::endl;
   cv::Mat output = matrix.clone();
   output = 0.0;
   std::vector<cv::Range> region;
