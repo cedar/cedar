@@ -64,6 +64,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief logs a message to a terminal
   void message(cedar::aux::LOG_LEVEL level, const std::string& message, const std::string& title);
 
   //--------------------------------------------------------------------------------------------------------------------

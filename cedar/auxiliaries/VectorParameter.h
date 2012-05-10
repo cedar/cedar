@@ -77,6 +77,7 @@ public:
   cedar::aux::Parameter(pOwner, name, false)
   {
   }
+
   //!@brief Constructor with default container.
   VectorParameter(cedar::aux::Configurable *pOwner, const std::string& name, const std::vector<T>& defaults)
   :
@@ -86,6 +87,7 @@ public:
   {
     this->makeDefault();
   }
+
   //!@brief Constructor with default size and value.
   VectorParameter(cedar::aux::Configurable *pOwner, const std::string& name, size_t size, T defaultValue)
   :
@@ -114,6 +116,7 @@ public:
       this->mValues.push_back(iter->second.get_value<T>());
     }
   }
+
   //!@brief store the vector values in a configuration tree
   void writeToNode(cedar::aux::ConfigurationNode& root) const
   {
@@ -229,14 +232,22 @@ public:
   }
 
   //!@brief resize the vector to a new size and initialize new entries to the given value
-  void resize(size_t size, const T& value = T())
+  void resize(size_t size, const T& value)
   {
     if (size == this->size())
+    {
       return;
+    }
 
     this->mValues.resize(size, value);
 
     this->emitPropertyChangedSignal();
+  }
+
+  //!@brief Resize the vector to a new size and initialize new entries to the default value set for this parameter.
+  void resize(size_t size)
+  {
+    this->resize(size, this->mDefaultValue);
   }
 
   //!@brief get an item of this vector specified by an index
@@ -274,21 +285,29 @@ public:
     //!@todo emit a porperty changed signal here as well, as the new vector may have a different size
   }
 
+  //!@brief Set the default value.
+  void setDefault(size_t size, const T& value)
+  {
+    this->setDefaultSize(size);
+    this->mDefaultValue = value;
+  }
+
+  //!@brief Set the default value.
+  void setDefaultSize(size_t size)
+  {
+    this->mSize = size;
+  }
+
   //!@brief set vector to default
   void makeDefault()
   {
     if (mSize == 0)
     {
-
       this->mValues = mDefaults;
     }
     else
     {
-      mValues.clear();
-      for (size_t i = 0; i < mSize; i++)
-      {
-        mValues.push_back(mDefaultValue);
-      }
+      mValues.assign(this->mSize, this->mDefaultValue);
     }
   }
 

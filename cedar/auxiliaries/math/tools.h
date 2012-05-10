@@ -74,6 +74,13 @@ namespace cedar
       CEDAR_AUX_LIB_EXPORT double max(const cv::Mat matrix);
       //! returns the value of the global minimum of a matrix
       CEDAR_AUX_LIB_EXPORT double min(const cv::Mat matrix);
+
+      //! Returns the index of the global maximum of a matrix.
+      CEDAR_AUX_LIB_EXPORT unsigned int maxIndex1D(const cv::Mat matrix);
+
+      //! Returns the index of the global minimum of a matrix.
+      CEDAR_AUX_LIB_EXPORT unsigned int minIndex1D(const cv::Mat matrix);
+
       //! writes the matrix into the shell properly organized by columns and rows
       //!\todo move write(cv::Mat) to aux::utilities
       //!\todo rework (template for copy & paste code)
@@ -83,8 +90,17 @@ namespace cedar
       //!@brief a templated round function
       template <typename T> T round(T val);
 
+      /*!@brief   Limits a number to be in the range [lower, upper].
+       *
+       * @returns max(lower, min(value, upper))
+       */
+      template <typename T> inline T saturate(const T& value, const T& lower, const T& upper)
+      {
+        return std::max(lower, std::min(value, upper));
+      }
+
       //!@brief a helper function to determine the real dimensionality of a cv::Mat (matrix.dims works only for 2+ dims)
-      inline unsigned int getDimensionalityOf(cv::Mat matrix)
+      inline unsigned int getDimensionalityOf(const cv::Mat& matrix)
       {
         if (matrix.rows == 1 && matrix.cols == 1)
         {
@@ -213,7 +229,7 @@ namespace cedar
        * @deprecated This method is deprecated. It will be replaced by cedar::aux::conv::Convolution in the long run.
        * @todo       Remove this function.
        */
-      cv::Mat convolve(const cv::Mat& matrix, const cv::Mat& kernel);
+      CEDAR_DECLARE_DEPRECATED(cv::Mat convolve(const cv::Mat& matrix, const cv::Mat& kernel));
 
       /*!\brief Same functionality as cvReduce for 2D->1D.
        *

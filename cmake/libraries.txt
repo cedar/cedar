@@ -167,7 +167,7 @@ find_package(OpenGL)
 set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OPENGL_LIBRARY})
 
 # FFTW
-option(CEDAR_USE_FFTW "Include fast Fourier transform convolution using FFTW." OFF)
+option(CEDAR_USE_FFTW "Include fast Fourier transform convolution using FFTW." ON)
 if(CEDAR_USE_FFTW)
   message("-- Searching for FFTW...")
   find_library(FFTW fftw3 fftw3_threads)

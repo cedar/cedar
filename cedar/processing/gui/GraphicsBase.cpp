@@ -140,11 +140,13 @@ void cedar::proc::gui::GraphicsBase::setWidth(qreal width)
 void cedar::proc::gui::GraphicsBase::setOutlineColor(const QColor& color)
 {
   this->mOutlineColor = color;
+  this->update();
 }
 
 void cedar::proc::gui::GraphicsBase::setFillColor(const QColor& color)
 {
   this->mFillColor = color;
+  this->update();
 }
 
 void cedar::proc::gui::GraphicsBase::highlightConnectionTarget(cedar::proc::gui::GraphicsBase *pConnectionSource)

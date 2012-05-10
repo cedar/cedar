@@ -255,10 +255,10 @@ void cedar::proc::gui::StepItem::addDataItems()
     try
     {
       qreal count = 0;
-      cedar::proc::Step::SlotMap& slotmap = this->mStep->getDataSlots(*enum_it);
-      for (cedar::proc::Step::SlotMap::iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
+      cedar::proc::Step::SlotList& slotmap = this->mStep->getOrderedDataSlots(*enum_it);
+      for (cedar::proc::Step::SlotList::iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
-        cedar::proc::DataSlotPtr slot = iter->second;
+        cedar::proc::DataSlotPtr slot = *iter;
         cedar::proc::gui::DataSlotItem *p_item = new cedar::proc::gui::DataSlotItem(this, slot);
         p_item->setPos(origin + count * direction * (data_size + padding) );
         mSlotMap[slot->getRole()][slot->getName()] = p_item;
@@ -344,11 +344,17 @@ void cedar::proc::gui::StepItem::fillPlots
       const cedar::aux::Enum& e = *enum_it;
       this->addRoleSeparator(e, pMenu);
 
-      const cedar::proc::Step::SlotMap& slotmap = this->mStep->getDataSlots(e.id());
-      for (cedar::proc::Step::SlotMap::const_iterator slot_iter = slotmap.begin(); slot_iter != slotmap.end(); ++slot_iter)
+      const cedar::proc::Step::SlotList& slotmap = this->mStep->getOrderedDataSlots(e.id());
+      for
+      (
+        cedar::proc::Step::SlotList::const_iterator slot_iter = slotmap.begin();
+        slot_iter != slotmap.end();
+        ++slot_iter
+      )
       {
-        QMenu *p_menu = pMenu->addMenu(slot_iter->second->getText().c_str());
-        cedar::aux::DataPtr data = slot_iter->second->getData();
+        cedar::proc::DataSlotPtr slot = *slot_iter;
+        QMenu *p_menu = pMenu->addMenu(slot->getText().c_str());
+        cedar::aux::DataPtr data = slot->getData();
         if (!data)
         {
           p_menu->setTitle("[unconnected] " + p_menu->title());
@@ -375,7 +381,7 @@ void cedar::proc::gui::StepItem::fillPlots
             {
               cedar::aux::gui::PlotDeclarationPtr declaration = *iter;
               QAction *p_action = p_menu->addAction(QString::fromStdString(declaration->getPlotClass()));
-              p_action->setData(QString::fromStdString(slot_iter->first));
+              p_action->setData(QString::fromStdString(slot->getName()));
               declMap[p_action] = std::make_pair(declaration, e);
 
               if (declaration == cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(data))
@@ -470,12 +476,13 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
       const cedar::aux::Enum& e = *enum_it;
       this->addRoleSeparator(e, p_data);
 
-      const cedar::proc::Step::SlotMap& slotmap = this->mStep->getDataSlots(e.id());
-      for (cedar::proc::Step::SlotMap::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
+      const cedar::proc::Step::SlotList& slotmap = this->mStep->getOrderedDataSlots(e.id());
+      for (cedar::proc::Step::SlotList::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
-        QAction *p_action = p_data->addAction(iter->second->getText().c_str());
-        p_action->setData(QString(iter->first.c_str()));
-        if (iter->second->getData().get() == NULL)
+        cedar::proc::DataSlotPtr slot = *iter;
+        QAction *p_action = p_data->addAction(slot->getText().c_str());
+        p_action->setData(QString::fromStdString(slot->getName()));
+        if (slot->getData().get() == NULL)
         {
           p_action->setText("[unconnected] " + p_action->text());
           p_action->setEnabled(false);
