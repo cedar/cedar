@@ -68,7 +68,6 @@ void cedar::aux::conv::KernelList::remove(size_t index)
 
 cv::Mat cedar::aux::conv::KernelList::getCombinedKernel() const
 {
-  //!@todo make that this works for more than one/two dimensional kernels
   cv::Mat new_combined_kernel;
   if (this->size() > 0 && this->getKernel(0)->getDimensionality() < 3)
   {

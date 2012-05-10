@@ -62,7 +62,6 @@ namespace
         "cedar.processing.sources.Video"
       )
     );
-//    input_decl->setIconPath(":/steps/gauss_input.svg");
     cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
 
     return true;
