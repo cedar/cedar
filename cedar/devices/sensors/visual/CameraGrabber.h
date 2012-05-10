@@ -133,12 +133,7 @@ public:
    *    the interface or use the CV_CAP_xxx constants in /usr/local/include/opencv2/highgui/highgui_c.h for a
    *    base unit (like CV_CAP_FIREWIRE, CV_CAP_ANY)
    */
-  CameraGrabber(
-                 const std::string& configFileName,
-                 unsigned int camera,
-                 bool isGuid,
-                 bool finishInitialization = true
-               );
+  CameraGrabber(const std::string& configFileName, unsigned int camera, bool isGuid, bool finishInitialization = true);
 
 
   /*! @brief Constructor for a stereo camera grabber
@@ -151,13 +146,14 @@ public:
    *  @see cedar::dev::sensors::visual::CameraGrabber::CameraGrabber(const std::string&, unsigned int, bool, bool)
    *       for details about the used framework
    */
-  CameraGrabber(
-                 const std::string& configFileName,
-                 unsigned int camera0,
-                 unsigned int camera1,
-                 bool isGuid,
-                 bool finishInitialization = true
-               );
+  CameraGrabber
+  (
+    const std::string& configFileName,
+    unsigned int camera0,
+    unsigned int camera1,
+    bool isGuid,
+    bool finishInitialization = true
+  );
 
 
   /*! @brief Constructor for a camera grabber. The complete configuration will be read from configuration file.<br>
@@ -449,10 +445,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-
-public:
-  // none yet (hopefully never!)
-
 protected:
   // none yet
 
