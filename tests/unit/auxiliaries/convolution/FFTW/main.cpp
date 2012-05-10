@@ -84,7 +84,7 @@ int main()
   cv::Mat result_5D = fftw->convolve(matrix_5D, kernel_5D, cedar::aux::conv::BorderType::Cyclic);
 
   // unit test kernel padding
-  std::cout << "test no " << test_number++ << ": test kernel padding" << std::endl;
+  std::cout << "test no " << test_number++ << ": test kernel padding 1D" << std::endl;
   cv::Mat matrix_pad = cv::Mat::ones(6, 1, CV_64F);
   cv::Mat kernel_pad = cv::Mat::ones(3, 1, CV_64F);
   kernel_pad.at<double>(1,0) = 2.0;
@@ -162,6 +162,20 @@ int main()
     errors++;
     std::cout << "error in padding for even 1D kernel and odd size" << std::endl;
   }
+
+  std::cout << "test no " << test_number++ << ": test kernel padding 2D" << std::endl;
+
+  std::cout << "test no " << test_number++ << ": test kernel padding 3D" << std::endl;
+  int sizes[3];
+  int sizes_kernel[3];
+  for (unsigned int i = 0; i < 3; ++i)
+  {
+    sizes[i] = 30;
+    sizes_kernel[i] = 15;
+  }
+  matrix_pad = cv::Mat(3, sizes, CV_32F);
+  kernel_pad = cv::Mat(3, sizes_kernel, CV_32F);
+  padded = fftw->padKernel(matrix_pad, kernel_pad);
 
   std::cout << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)

@@ -35,6 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/convolution/KernelList.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
 #include "cedar/auxiliaries/assert.h"
@@ -68,28 +69,64 @@ void cedar::aux::conv::KernelList::remove(size_t index)
 cv::Mat cedar::aux::conv::KernelList::getCombinedKernel() const
 {
   //!@todo make that this works for more than one/two dimensional kernels
-  cv::Mat new_combined_kernel = cv::Mat::zeros(1, 1, CV_32F);
-
-  for (size_t i = 0; i < this->size(); ++i)
+  cv::Mat new_combined_kernel;
+  if (this->size() > 0 && this->getKernel(0)->getDimensionality() < 3)
   {
-    cedar::aux::kernel::ConstKernelPtr kernel = this->getKernel(i);
-    kernel->lockForRead();
-    cv::Mat kernel_mat = kernel->getKernel();
-    kernel->unlock();
-    if (kernel_mat.rows > new_combined_kernel.rows || kernel_mat.cols > new_combined_kernel.cols)
-    {
-      int dw = std::max(0, (kernel_mat.cols - new_combined_kernel.cols + 1)/2);
-      int dh = std::max(0, (kernel_mat.rows - new_combined_kernel.rows + 1)/2);
-      cv::copyMakeBorder(new_combined_kernel, new_combined_kernel, dh, dh, dw, dw, cv::BORDER_CONSTANT, cv::Scalar(0));
-    }
-    int row_lower = (new_combined_kernel.rows - kernel_mat.rows)/2;
-    int row_upper = row_lower + kernel_mat.rows;
-    int col_lower = (new_combined_kernel.cols - kernel_mat.cols)/2;
-    int col_upper = col_lower + kernel_mat.cols;
-    cv::Range row_range(row_lower, row_upper);
-    cv::Range col_range(col_lower, col_upper);
+    new_combined_kernel = cv::Mat::zeros(1, 1, CV_32F);
 
-    new_combined_kernel(row_range, col_range) += kernel_mat;
+    for (size_t i = 0; i < this->size(); ++i)
+    {
+      cedar::aux::kernel::ConstKernelPtr kernel = this->getKernel(i);
+      kernel->lockForRead();
+      cv::Mat kernel_mat = kernel->getKernel();
+      kernel->unlock();
+      if (kernel_mat.rows > new_combined_kernel.rows || kernel_mat.cols > new_combined_kernel.cols)
+      {
+        int dw = std::max(0, (kernel_mat.cols - new_combined_kernel.cols + 1)/2);
+        int dh = std::max(0, (kernel_mat.rows - new_combined_kernel.rows + 1)/2);
+        cv::copyMakeBorder(new_combined_kernel, new_combined_kernel, dh, dh, dw, dw, cv::BORDER_CONSTANT, cv::Scalar(0));
+      }
+      int row_lower = (new_combined_kernel.rows - kernel_mat.rows)/2;
+      int row_upper = row_lower + kernel_mat.rows;
+      int col_lower = (new_combined_kernel.cols - kernel_mat.cols)/2;
+      int col_upper = col_lower + kernel_mat.cols;
+      cv::Range row_range(row_lower, row_upper);
+      cv::Range col_range(col_lower, col_upper);
+
+      new_combined_kernel(row_range, col_range) += kernel_mat;
+    }
   }
+  else if (this->size() > 0 && this->getKernel(0)->getDimensionality() > 2)
+  {
+    std::vector<int> sizes;
+    sizes.resize(this->getKernel(0)->getDimensionality());
+    for (size_t dim = 0; dim < this->getKernel(0)->getDimensionality(); ++dim)
+    {
+      sizes.at(dim) = 0;
+    }
+    for (size_t i = 0; i < this->size(); ++i)
+    {
+      for (size_t dim = 0; dim < this->getKernel(i)->getDimensionality(); ++dim)
+      {
+        if (static_cast<unsigned int>(sizes.at(dim)) < this->getKernel(i)->getSize(dim))
+        {
+          sizes.at(dim) = this->getKernel(i)->getSize(dim);
+        }
+      }
+    }
+    new_combined_kernel = cv::Mat(this->getKernel(0)->getDimensionality(), &sizes.front(), CV_32F);
+    for (size_t i = 0; i < this->size(); ++i)
+    {
+      // determine ROI
+      std::vector<cv::Range> ranges;
+      for (size_t dim = 0; dim < this->getKernel(i)->getDimensionality(); ++dim)
+      {
+        int diff = new_combined_kernel.size[dim] - this->getKernel(i)->getSize(dim);
+        ranges.push_back(cv::Range(0 + diff / 2, new_combined_kernel.size[dim] - (diff + 1) / 2));
+      }
+      new_combined_kernel(&ranges.front()) += this->getKernel(i)->getKernel();
+    }
+  }
+
   return new_combined_kernel;
 }
