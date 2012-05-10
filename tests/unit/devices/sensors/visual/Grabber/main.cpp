@@ -35,11 +35,11 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/LogFile.h"
 #include "cedar/devices/sensors/visual/grabbertests/TestGrabber.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
+#include <boost/filesystem.hpp>
 
 /*!
  *  \file This file implements a test case for the GrabberInterface class
@@ -53,12 +53,6 @@ int main(int , char **)
   const std::string CHANNEL_0_NAME = "CHANNEL_0_NAME";
   const std::string GRABBER_NAME = "TestGrabber";
   const std::string CONFIG_FILE_NAME = "grabber.config";
-  const std::string LOGFILE = "UnitTestGrabber.log";
-
-  //create logfile
-  cedar::aux::LogFile log_file(LOGFILE);
-  log_file.addTimeStamp();
-  log_file << std::endl;
 
   // the number of errors encountered in this test
   int errors = 0;
@@ -75,7 +69,7 @@ int main(int , char **)
                                                             );
 
   //-----------------------------------------------------------
-  log_file << "test no " << test_number++ <<": setName() and getName()" << std::endl;
+  std::cout << "test no " << test_number++ <<": setName() and getName()" << std::endl;
   try
   {
     std::string name = "NewTestGrabber";
@@ -84,12 +78,12 @@ int main(int , char **)
   }
   catch(...)
   {
-    log_file << "error" << std::endl;
+    std::cout << "error" << std::endl;
     errors++;
   }
 
   //-----------------------------------------------------------
-  log_file << "test no " << test_number++ <<": setFps() and getFps()" << std::endl;
+  std::cout << "test no " << test_number++ <<": setFps() and getFps()" << std::endl;
 
   try
   {
@@ -101,44 +95,44 @@ int main(int , char **)
   }
   catch (...)
   {
-    log_file << "error" << std::endl;
+    std::cout << "error" << std::endl;
     errors++;
   }
 
   //-----------------------------------------------------------
-  log_file << "test no " << test_number++ <<": getFpsMeasured()" << std::endl;
+  std::cout << "test no " << test_number++ <<": getFpsMeasured()" << std::endl;
   try
   {
     grabber_1->getFpsMeasured();
   }
   catch (...)
   {
-    log_file << "error" <<std::endl;
+    std::cout << "error" <<std::endl;
     errors++;
   }
 
   //-----------------------------------------------------------
   //test default parameters
-  log_file << "test no " << test_number++ <<": default-parameter" << std::endl;
+  std::cout << "test no " << test_number++ <<": default-parameter" << std::endl;
   if (grabber_1->getTestParam() != 123)
   {
-    log_file << "error" << std::endl;
+    std::cout << "error" << std::endl;
     errors++;
   }
 
   //-----------------------------------------------------------
   //test number of channels
-  log_file << "test no " << test_number++ <<": getNumCams" << std::endl;
+  std::cout << "test no " << test_number++ <<": getNumCams" << std::endl;
 
   if (grabber_1->getNumCams() != 1 )
   {
-    log_file << "error" << std::endl;
+    std::cout << "error" << std::endl;
     errors++;
   }
 
 
   //-----------------------------------------------------------
-  log_file << "test no " << test_number++ <<": setRecordName() and getRecordName()" << std::endl;
+  std::cout << "test no " << test_number++ <<": setRecordName() and getRecordName()" << std::endl;
   try
   {
     std::string name,result;
@@ -173,25 +167,25 @@ int main(int , char **)
   }
   catch (...)
   {
-    log_file << "error" << std::endl;
+    std::cout << "error" << std::endl;
     errors++;
   }
 
   //-----------------------------------------------------------
-  log_file << "test no " << test_number++ <<": isRecording()" << std::endl;
+  std::cout << "test no " << test_number++ <<": isRecording()" << std::endl;
   try
   {
     grabber_1->isRecording();
   }
   catch (...)
   {
-    log_file << "error" <<std::endl;
+    std::cout << "error" <<std::endl;
     errors++;
   }
 
 
   //-----------------------------------------------------------
-  log_file << "test no " << test_number++ <<": setSnapshotName() and getSnapshotName()" << std::endl;
+  std::cout << "test no " << test_number++ <<": setSnapshotName() and getSnapshotName()" << std::endl;
   try
   {
     std::string name, result, expected;
@@ -228,13 +222,13 @@ int main(int , char **)
   }
   catch (...)
   {
-    log_file << "error" << std::endl;
+    std::cout << "error" << std::endl;
     errors++;
   }
 
   //-----------------------------------------------------------
   //readWriteLockPointer
-  log_file << "test no " << test_number++ <<": getReadWriteLockPointer()" << std::endl;
+  std::cout << "test no " << test_number++ <<": getReadWriteLockPointer()" << std::endl;
   try
   {
     QReadWriteLock *result = grabber_1->getReadWriteLockPointer();
@@ -242,13 +236,13 @@ int main(int , char **)
   }
   catch (...)
   {
-    log_file << "error" << std::endl;
+    std::cout << "error" << std::endl;
     errors++;
   }
 
   //-----------------------------------------------------------
   //test the rest of the get-methods
-  log_file << "test no " << test_number++ <<": getSize() and getSourceInfo()" << std::endl;
+  std::cout << "test no " << test_number++ <<": getSize() and getSourceInfo()" << std::endl;
   try
   {
 
@@ -269,31 +263,32 @@ int main(int , char **)
   }
   catch (...)
   {
-    log_file << "error" << std::endl;
+    std::cout << "error" << std::endl;
     errors++;
   }
 
   //-----------------------------------------------------------
-  log_file << "test no " << test_number++ <<": getReadWriteLockPointer()" << std::endl;
+  std::cout << "test no " << test_number++ <<": getReadWriteLockPointer()" << std::endl;
   try
   {
     grabber_1->getReadWriteLockPointer();
   }
   catch (...)
   {
-    log_file << "error" <<std::endl;
+    std::cout << "error" <<std::endl;
     errors++;
   }
 
   //-----------------------------------------------------------
   //check errors
-  log_file << "test finished, there were " << errors << " errors" << std::endl;
+  std::cout << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
   {
     errors = 255;
   }
 
-  return errors;
+  boost::filesystem::remove(CONFIG_FILE_NAME);
 
+  return errors;
 }
 
