@@ -44,6 +44,58 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
+int testMinMax(int cvMatType)
+{
+  int errors = 0;
+
+  cv::Mat identity = cv::Mat::eye(3, 3, cvMatType);
+
+  double min_val, max_val;
+  min_val = cedar::aux::math::min(identity);
+  max_val = cedar::aux::math::max(identity);
+  if (min_val != 0.0)
+  {
+    std::cout << "error in min(const cv::Mat" << cvMatType << ")" << std::endl;
+    errors++;
+  }
+  if (max_val != 1.0)
+  {
+    std::cout << "error in max(const cv::Mat" << cvMatType << ")" << std::endl;
+    errors++;
+  }
+
+  return errors;
+}
+
+int test1dMinMaxIndices()
+{
+  int errors = 0;
+  int min_index = 2;
+  int max_index = 4;
+
+  cv::Mat matrix = cv::Mat::ones(5, 1, CV_32F);
+
+  matrix.at<float>(min_index) = 0;
+  matrix.at<float>(max_index) = 2;
+
+  int read_min_index = static_cast<int>(cedar::aux::math::minIndex1D(matrix));
+  if (read_min_index != min_index)
+  {
+    std::cout << "Error: got the wrong min index. Got: " << read_min_index << ", expected: " << min_index
+        << ". Matrix is: " << matrix << std::endl;
+    ++errors;
+  }
+
+  int read_max_index = static_cast<int>(cedar::aux::math::maxIndex1D(matrix));
+  if (read_max_index != max_index)
+  {
+    std::cout << "Error: got the wrong max index. Got: " << read_max_index << ", expected: " << max_index
+        << ". Matrix is: " << matrix << std::endl;
+    ++errors;
+  }
+
+  return errors;
+}
 
 int main()
 {
@@ -53,24 +105,10 @@ int main()
   int test_number = 0;
 
   // test stuff
-  std::cout << "test no" << test_number++ << std::endl;
-  cv::Mat identity = cv::Mat::eye(3, 3, CV_64FC1);
-  std::cout << "this should be the 3x3 identity matrix:" << std::endl;
-  cedar::aux::math::write(identity);
+  errors += testMinMax(CV_8U);
+  errors += testMinMax(CV_32F);
+  errors += testMinMax(CV_64F);
 
-  double min_val, max_val;
-  min_val = cedar::aux::math::min(identity);
-  max_val = cedar::aux::math::max(identity);
-  if (min_val != 0.0)
-  {
-    std::cout << "error in min(const cv::Mat)" << std::endl;
-    errors++;
-  }
-  if (max_val != 1.0)
-   {
-     std::cout << "error in max(const cv::Mat)" << std::endl;
-     errors++;
-   }
   std::cout << "test no" << test_number++ << std::endl;
   if (cedar::aux::math::normalizeAngle(5.9) <= -cedar::aux::math::pi
       || cedar::aux::math::normalizeAngle(5.9) > cedar::aux::math::pi)
@@ -96,27 +134,30 @@ int main()
   if (dim != 0)
   {
     std::cout << "error in getDimensionalityOf(cv::Mat), expected dimensionality 0, got " << dim << std::endl;
+    ++errors;
   }
   cv::Mat matrix_1D(11, 1, CV_32F);
   dim = cedar::aux::math::getDimensionalityOf(matrix_1D);
-  if (dim != 0)
+  if (dim != 1)
   {
     std::cout << "error in getDimensionalityOf(cv::Mat), expected dimensionality 1, got " << dim << std::endl;
+    ++errors;
   }
   dim = cedar::aux::math::getDimensionalityOf(matrix_1D.t());
-  if (dim != 0)
+  if (dim != 1)
   {
     std::cout << "error in getDimensionalityOf(cv::Mat), expected dimensionality 1, got " << dim << std::endl;
+    ++errors;
   }
   cv::Mat matrix_2D(11, 30, CV_32F);
   dim = cedar::aux::math::getDimensionalityOf(matrix_2D);
-  if (dim != 0)
+  if (dim != 2)
   {
     std::cout << "error in getDimensionalityOf(cv::Mat), expected dimensionality 2, got " << dim << std::endl;
+    ++errors;
   }
 
-  // test round
-
+  errors += test1dMinMaxIndices();
 
   std::cout << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)

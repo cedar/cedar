@@ -58,6 +58,9 @@
   - NumericParameters (DoubleParameter, IntParameter, UIntParameter) no longer need minimum and maximum values. They
     also have a new constructor that takes a math::Limits object which is the new, recommended way of setting the
     limits. The same is true for NumericVectorParameters.
+  - Added Data classes for stereo images and image sets.
+  - There is now a generalized structure for convolution. This structure wraps opencv and, optionally, fftw convolution!
+    For more, see the documentation for the cedar::aux::conv::Convolution class.
 
 - cedar::proc
   - added directional arrows for graphical connections in processingIde
@@ -65,6 +68,8 @@
     information about your plugin in case you don't want to hardcode it, e.g., it can contain icon paths for processing
     steps. See documentation of cedar::proc::PluginDeclaration for details.
   - Overhauled the plotting system.
+  - Some outputs and parameters have been renamed. If your architectures fail to load, check that the connections use
+    the correct names.
 
 - cedar::dyn
   - NeuralField now supports changing the sigmoid type and changing the number and type of kernel modes
@@ -80,6 +85,8 @@
 - build system
   - files in the resource folder are now moved to ${CEDAR_INSTALL_PREFIX}/share/resources. Use the
     cedar::aux::System::locateResource function to locate them.
+  - It is no longer necessary to specify CEDAR_BUILD_DIR in the cedar.conf file. Instead, if the variable is not
+    specified, the directory in which you call cmake is automatically selected.
 
 == Version 0.5.1 ==
 - cedar::proc::steps

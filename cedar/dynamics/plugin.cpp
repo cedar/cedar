@@ -53,9 +53,3 @@ void pluginDeclaration(cedar::proc::PluginDeclarationPtr)
   //!@todo Switch this to the new logging mechanism
   std::cout << "cedardyn is no longer a plugin. Please don't include it any more!" << std::endl;
 }
-
-void cedar::dyn::getPluginDesciption(cedar::proc::PluginDeclarationPtr)
-{
-  //!@todo Switch this to the new logging mechanism
-  std::cout << "cedardyn is no longer a plugin. Please don't include it any more!" << std::endl;
-}

@@ -68,6 +68,42 @@ mEnumDeclaration(enumBase)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::EnumParameter::disable(cedar::aux::EnumId value)
+{
+  this->mDisabledValues.insert(value);
+}
+
+void cedar::aux::EnumParameter::enable(cedar::aux::EnumId value)
+{
+  std::set<cedar::aux::EnumId>::iterator iter = this->mDisabledValues.find(value);
+  if (iter != this->mDisabledValues.end())
+  {
+    this->mDisabledValues.erase(iter);
+  }
+}
+
+void cedar::aux::EnumParameter::setEnabled(cedar::aux::EnumId value, bool enabled)
+{
+  if (enabled)
+  {
+    this->enable(value);
+  }
+  else
+  {
+    this->disable(value);
+  }
+}
+
+void cedar::aux::EnumParameter::enableAll()
+{
+  this->mDisabledValues.clear();
+}
+
+bool cedar::aux::EnumParameter::isEnabled(cedar::aux::EnumId value) const
+{
+  return this->mDisabledValues.find(value) == this->mDisabledValues.end();
+}
+
 cedar::aux::Enum cedar::aux::EnumParameter::getValue() const
 {
   return mEnumDeclaration->get(this->mValue);

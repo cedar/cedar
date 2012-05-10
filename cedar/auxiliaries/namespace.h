@@ -58,9 +58,10 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(LoopedThread);
     CEDAR_DECLARE_AUX_CLASS(ConfigurationInterface);
     CEDAR_DECLARE_AUX_CLASS(UserData);
+    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(IntrusivePtrBase);
     //!@endcond
 
-    template<class T> class Singleton;
+    template <class T> class Singleton;
 
     //!@todo This class may be obsolete once the ConfigurationInterface is removed.
     template <typename T> class IntervalData;
@@ -134,6 +135,8 @@ namespace cedar
     typedef NumericVectorParameter<double> DoubleVectorParameter;
     //!@brief A concretization of NumericVectorParameter for unsigned int values.
     typedef NumericVectorParameter<unsigned int> UIntVectorParameter;
+    //!@brief A concretization of NumericVectorParameter for unsigned int values.
+    typedef NumericVectorParameter<int> IntVectorParameter;
 
     //!@brief A class for associating data with types and mapping the type hierarchy as well.
     template <typename DataType, typename RootType> class TypeHierarchyMap;
@@ -145,6 +148,7 @@ namespace cedar
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleVectorParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntVectorParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringVectorParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntParameter);
@@ -182,11 +186,16 @@ namespace cedar
     //!@brief A concretization of DataTemplate for double values.
     typedef DataTemplate<double> DoubleData;
 
+    //!@brief A concretization of DataTemplate for a set of simple matrices (std::vector<cv::Mat>).
+    typedef DataTemplate<std::vector<cv::Mat> > ImageSetData;
+
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(MatData);
     CEDAR_GENERATE_POINTER_TYPES(CvPointData);
     CEDAR_GENERATE_POINTER_TYPES(DoubleData);
+    CEDAR_GENERATE_POINTER_TYPES(ImageSetData);
     CEDAR_DECLARE_AUX_CLASS(ImageData);
+    CEDAR_DECLARE_AUX_CLASS(StereoImageData);
     /* exceptions */
     CEDAR_DECLARE_AUX_CLASS(ConversionFailedException);
     CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
@@ -214,9 +223,9 @@ namespace cedar
     //!@endcond
     
     // Log related classes --------------------------------------------------------------------------------------------
-    CEDAR_DECLARE_AUX_CLASS(Log);
     
     //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_DECLARE_AUX_CLASS(Log);
     CEDAR_DECLARE_AUX_CLASS(LogInterface);
     CEDAR_DECLARE_AUX_CLASS(LogFilter);
     CEDAR_DECLARE_AUX_CLASS(ConsoleLog);
@@ -241,9 +250,5 @@ namespace cedar
     };
   }
 }
-
-// Functions for boost intrusive pointer.
-extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_add_ref(cedar::aux::Parameter *pObject);
-extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_release(cedar::aux::Parameter *pObject);
 
 #endif // CEDAR_AUX_NAMESPACE_H

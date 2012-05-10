@@ -56,6 +56,7 @@ struct cedar::aux::math::Limits
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
+  //!@brief formatted output of a Limit to a stream
   friend std::ostream& operator<<(std::ostream& stream, const cedar::aux::math::Limits<T>& limits)
   {
     stream << "[" << limits.getLower() << ", " << limits.getUpper() << "]";
@@ -66,8 +67,8 @@ struct cedar::aux::math::Limits
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   //!@brief The standard constructor
+  //!@todo Shouldn't this set some values?
   Limits()
-      //!@todo Shouldn't this set some values?
   {
   };
 
@@ -88,6 +89,8 @@ struct cedar::aux::math::Limits
   {
   }
 
+  //!@brief checks whether a number is included in an integral specified by Limits
+  //!@return returns true if number is in the interval, returns false otherwise
   inline bool includes(const T& number)
   {
     return number >= this->getLower() && number <= this->getUpper();

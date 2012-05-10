@@ -75,7 +75,7 @@ public:
 
   /*!@brief Displays the parameters for a given configurable.
    *
-   * @param reset Whether or not the resetContents() function should be called.
+   * @param pConfigurable the given configurable.
    */
   void display(cedar::aux::ConfigurablePtr pConfigurable);
 
