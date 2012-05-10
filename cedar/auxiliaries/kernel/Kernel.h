@@ -183,7 +183,7 @@ protected:
   //!@brief matrix containing the kernel
   cedar::aux::MatDataPtr mKernel;
   //!@brief read and write lock to protect the kernel when calculating its values
-  mutable QReadWriteLock *mpReadWriteLockOutput;
+  mutable QReadWriteLock* mpReadWriteLockOutput;
 private:
   // none yet
 
