@@ -175,6 +175,10 @@ private:
   //!@brief The test parameter
   int _mTest;
 
+  //! The source info of the gl grabber.
+  //! @todo Is this the proper way of doing this?
+  mutable std::string mSourceInfo;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------

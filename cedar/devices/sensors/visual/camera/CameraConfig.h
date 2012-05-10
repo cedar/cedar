@@ -37,11 +37,14 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_CONFIG_H
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_CONFIG_H
 
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_LIB_DC1394
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/ConfigurationInterface.h"
 #include "cedar/devices/sensors/visual/namespace.h"
 #include "cedar/auxiliaries/Log.h"
-
 
 // SYSTEM INCLUDES
 
@@ -170,6 +173,8 @@ private:
 
 
 }; // cedar::dev::sensors::visual::CameraConfig
+
+#endif // CEDAR_USE_LIB_DC1394
 
 #endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_CONFIG_H
 

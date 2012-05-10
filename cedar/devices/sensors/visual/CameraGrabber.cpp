@@ -34,6 +34,10 @@
 
 ======================================================================================================================*/
 
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_LIB_DC1394
+
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/CameraGrabber.h"
 #include "cedar/auxiliaries/exceptions.h"
@@ -966,4 +970,4 @@ cv::Size cedar::dev::sensors::visual::CameraGrabber::getCameraFrameSize( unsigne
   return size;
 }
 
-
+#endif // CEDAR_USE_LIB_DC1394

@@ -37,6 +37,8 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
+#ifdef CEDAR_USE_LIB_DC1394
+
 // CEDAR INCLUDES
 #include "cedar/processing/sources/Camera.h"
 #include "cedar/processing/ElementDeclaration.h"
@@ -103,3 +105,5 @@ void cedar::proc::sources::Camera::compute(const cedar::proc::Arguments&)
   this->mGrabber->grab();
   this->mImage->setData(this->mGrabber->getImage());
 }
+
+#endif // CEDAR_USE_LIB_DC1394
