@@ -168,18 +168,6 @@ private:
   //!@brief read scene from a node
   void readScene(cedar::aux::ConfigurationNode& root);
 
-  //!@brief Add all steps contained in this network to a scene.
-  void addStepsToScene();
-
-  //!@brief Add all triggers contained in this network to a scene.
-  void addTriggersToScene();
-
-  //!@brief Add all networks contained in this network to a scene.
-  void addNetworksToScene();
-
-  //!@brief Add all connections contained in this network to a scene.
-  void addConnections();
-
   //!@brief Reacts to elements being added in the underlying network.
   void elementAdded(cedar::proc::Network* network, cedar::proc::ElementPtr pElement);
 
