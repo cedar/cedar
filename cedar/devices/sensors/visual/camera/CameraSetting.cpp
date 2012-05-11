@@ -34,6 +34,9 @@
 
 ======================================================================================================================*/
 
+#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
+#ifdef CEDAR_USE_LIB_DC1394
+
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/camera/CameraSetting.h"
 
@@ -49,7 +52,9 @@ cedar::aux::EnumType<cedar::dev::sensors::visual::CameraSetting>
   const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_FRAME_HEIGHT;
   const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_FPS;
   const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_MODE;
+#ifdef CEDAR_USE_LIB_DC1394
   const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_ISO_SPEED;
+#endif
 #endif // MSVC
 //!@endcond
 
@@ -79,11 +84,13 @@ void cedar::dev::sensors::visual::CameraSetting::construct()
                                       "SETTING_MODE",
                                       "The grabbing mode (i.e. size and color coding)"
                                     ));
+#ifdef CEDAR_USE_LIB_DC1394
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraSetting::SETTING_ISO_SPEED,
                                       "SETTING_ISO_SPEED",
                                       "Set the speed of the IEEE1394/firewire bus"
                                     ));
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -99,3 +106,4 @@ const cedar::dev::sensors::visual::CameraSetting::TypePtr& cedar::dev::sensors::
 {
   return cedar::dev::sensors::visual::CameraSetting::mType.type();
 }
+#endif // CEDAR_USE_LIB_DC1394

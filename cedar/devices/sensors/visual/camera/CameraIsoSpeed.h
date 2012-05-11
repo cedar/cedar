@@ -39,8 +39,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
-
 #ifdef CEDAR_USE_LIB_DC1394
+
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/devices/sensors/visual/namespace.h"
 

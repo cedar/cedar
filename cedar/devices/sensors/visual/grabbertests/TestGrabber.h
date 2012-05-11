@@ -28,7 +28,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 04 23
 
-    Description: Header for the @em @em cedar::dev::sensors::visual::OglGrabber class.
+    Description: Header for the @em @em cedar::dev::sensors::visual::TestGrabber class.
 
     Credits:
 

@@ -37,6 +37,9 @@
 #ifndef CEDAR_PROC_SOURCES_CAMERA_H
 #define CEDAR_PROC_SOURCES_CAMERA_H
 
+#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
+#ifdef CEDAR_USE_LIB_DC1394
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
@@ -136,4 +139,5 @@ private:
 
 }; // class cedar::proc::sources::Camera
 
+#endif // CEDAR_USE_LIB_DC1394
 #endif // CEDAR_PROC_SOURCES_CAMERA_H

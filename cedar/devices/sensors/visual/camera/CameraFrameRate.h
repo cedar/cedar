@@ -37,6 +37,9 @@
 #ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_FRAMERATE_H
 #define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_FRAMERATE_H
 
+#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
+#ifdef CEDAR_USE_LIB_DC1394
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/devices/sensors/visual/namespace.h"
@@ -141,6 +144,8 @@ private:
   // none yet
 
 }; // cedar::dev::sensors::visual::CameraFrameRate
+
+#endif // CEDAR_USE_LIB_DC1394
 
 #endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_FRAMERATE_H
 
