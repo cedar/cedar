@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 05:10:21 PM CEST
+    Date:        Wed 20 Jul 2011
 
     Description: Helper class for openCV matrices. Implements some checks 
                  we need to conform to the InterfaceCollatedData 
@@ -35,8 +35,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_CVMATHELPER_H
-#define CEDAR_CVMATHELPER_H
+#ifndef CEDAR_CVMAT_HELPER_H
+#define CEDAR_CVMAT_HELPER_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"

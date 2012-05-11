@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Tue 19 Jul 2011 05:10:54 PM CEST
+    Date:        Tue 19 Jul 2011 
 
     Description: To transport a primitive type (int, short, etc.) we
                  rely on yarp::os::BinPortable.
@@ -36,8 +36,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_SIMPLENETREADER_H
-#define CEDAR_SIMPLENETREADER_H
+#ifndef CEDAR_SIMPLE_NET_READER_H
+#define CEDAR_SIMPLE_NET_READER_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"

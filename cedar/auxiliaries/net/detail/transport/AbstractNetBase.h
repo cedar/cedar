@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Mon 18 Jul 2011 05:58:54 PM CEST
+    Date:        Mon 18 Jul 2011
 
     Description: Shared code between the AbstractNetReader and -Writer.
                  Also, note that this class is not template-based, but
@@ -37,8 +37,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_ABSTRACTNETBASE_H
-#define CEDAR_ABSTRACTNETBASE_H
+#ifndef CEDAR_ABSTRACT_NET_BASE_H
+#define CEDAR_ABSTRACT_NET_BASE_H
 
 #include "cedar/configuration.h"
 
@@ -93,7 +93,9 @@ class AbstractNetBase : virtual protected InterfaceOpenable,
   // members
   //---------------------------------------------------------------------------
 protected:
-  yarp::os::Network mNetwork;
+  yarp::os::Network mNetwork; // not static and not a singleton(!)
+                              // (because that doesnt work with YARP)
+                              // this is the YARP-documented way to use Network
 
 private:
   std::string mFullPortName; 

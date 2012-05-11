@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Tue 19 Jul 2011 04:46:11 PM CEST
+    Date:        Tue 19 Jul 2011
 
     Description: Part of the functionality a Reader class should have.
                  What is missing is the datatype (simple/primitiv vs
@@ -41,8 +41,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_ABSTRACTNETREADER_H
-#define CEDAR_ABSTRACTNETREADER_H
+#ifndef CEDAR_ABSTRACT_NET_READER_H
+#define CEDAR_ABSTRACT_NET_READER_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"

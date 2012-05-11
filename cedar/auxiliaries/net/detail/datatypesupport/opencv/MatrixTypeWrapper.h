@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 05:08:06 PM CEST
+    Date:        Wed 20 Jul 2011
 
     Description: openCV specialization for MatrixTypeWrapper.
                  This tells us how to acces an openCV-type
@@ -35,8 +35,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_COLLATEDTYPE_OPENCV_H
-#define CEDAR_COLLATEDTYPE_OPENCV_H
+#ifndef CEDAR_COLLATED_TYPE_OPENCV_H
+#define CEDAR_COLLATED_TYPE_OPENCV_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"

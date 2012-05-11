@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 05:08:06 PM CEST
+    Date:        Wed 20 Jul 2011
 
     Description: std-namespace specialization for MatrixTypeWrapper.
 
@@ -34,8 +34,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_COLLATEDTYPE_STD_H
-#define CEDAR_COLLATEDTYPE_STD_H
+#ifndef CEDAR_COLLATED_TYPE_STD_H
+#define CEDAR_COLLATED_TYPE_STD_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"

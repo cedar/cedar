@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Thu 18 Aug 2011 11:38:01 AM CEST
+    Date:        Thu 18 Aug 2011 
 
     Description:
 
@@ -34,8 +34,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_NETREADER_H
-#define CEDAR_NETREADER_H
+#ifndef CEDAR_NET_READER_H
+#define CEDAR_NET_READER_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/namespace.h"
@@ -74,7 +74,7 @@ namespace cedar {
  *
  * Short example:
  * @code
- *   Reader<cv::Mat> myReader("mychannel");
+ *   Reader<cv::Mat> myReader("userchannel");
  *   cv::Mat mat;
  *   mat= myReader.read(); // this will not block and will throw
  *                         // an exception if no data was waiting, see below
@@ -111,15 +111,16 @@ class Reader
      // valid specialization
 
      // this will be triggered if this type is instantiated
+     // and not before (due to dependency on T in the statement)
      BOOST_STATIC_ASSERT(sizeof(T) == 0); 
    }
 
    /*! @brief Use this constructor
-   * @param mychannel is the channel (or YARP port) you want to use.
+   * @param userchannel is the channel (or YARP port) you want to use.
    *       The channels should be the same for reading and writing,
    *       but unique in your local network (ie task/application specific)
    */
-   Reader(std::string mychannel); // just declaration for doxygen
+   Reader(std::string userchannel); // just declaration for doxygen
 
    /*! @brief read() the datatype T from the network
     *

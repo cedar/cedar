@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Tue 19 Jul 2011 05:07:37 PM CEST
+    Date:        Tue 19 Jul 2011
 
     Description: Make sure that the Collated/Simple-type classes 
                  basically behave the same way.
@@ -38,8 +38,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_INTERFACEOPENABLE_H
-#define CEDAR_INTERFACEOPENABLE_H
+#ifndef CEDAR_INTERFACE_OPENABLE_H
+#define CEDAR_INTERFACE_OPENABLE_H
 
 // LOCAL INCLUDES
 #include "../../namespace.h"

@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Sun 06 Nov 2011 11:44:14 PM CET
+    Date:        Sun 06 Nov 2011
 
     Description:
 
@@ -85,7 +85,7 @@ cedar::proc::sinks::NetWriter::NetWriter()
 :
 // outputs
 mInput(new cedar::aux::MatData(cv::Mat())),
-mpWriter(NULL)
+mWriter()
 // parameter
 {
   // declare all data
@@ -99,11 +99,11 @@ mpWriter(NULL)
 void cedar::proc::sinks::NetWriter::onStart()
 {
   // instantiate the reader, if not yet done
-  if (mpWriter == NULL)
+  if (!mWriter)
   {
     try 
     {
-      mpWriter= new cedar::aux::net::Writer< cedar::aux::MatData::DataType >("DEMOCHANNEL");
+      mWriter= boost::shared_ptr< cedar::aux::net::Writer< cedar::aux::MatData::DataType > >(new cedar::aux::net::Writer< cedar::aux::MatData::DataType >("DEMOCHANNEL"));
       // TODO: make channel configurable
     }
     catch ( cedar::aux::net::NetMissingRessourceException &e )
@@ -117,23 +117,21 @@ void cedar::proc::sinks::NetWriter::onStart()
 
 void cedar::proc::sinks::NetWriter::onStop()
 {
-  if (mpWriter != NULL)
-    delete mpWriter;
-  mpWriter= NULL;
+  mWriter.reset();
 }
 
 
 void cedar::proc::sinks::NetWriter::compute(const cedar::proc::Arguments&)
 {
-  if (mpWriter == NULL)
+  if (!mWriter)
     return;
 
   // write it over the channel
   try
   {
-    mpWriter->write( mInput->getData() );
+    mWriter->write( mInput->getData() );
   }
-  catch ( cedar::aux::net::NetMissingRessourceException &e )
+  catch (cedar::aux::net::NetMissingRessourceException& e)
   {
     // somehow YARP doesnt work ... :( typically fatal.
     // TODO: what to do?

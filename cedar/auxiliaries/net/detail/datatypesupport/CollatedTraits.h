@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 04:30:14 PM CEST
+    Date:        Wed 20 Jul 2011
 
     Description: traits class for the transferable data type.
                  Specialize this.
@@ -35,8 +35,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_COLLATEDTRAITS_H
-#define CEDAR_COLLATEDTRAITS_H
+#ifndef CEDAR_COLLATED_TRAITS_H
+#define CEDAR_COLLATED_TRAITS_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
