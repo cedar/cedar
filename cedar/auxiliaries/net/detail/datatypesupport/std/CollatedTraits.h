@@ -51,7 +51,9 @@ namespace cedar {
   namespace aux {
     namespace net {
       namespace detail {
+        //!@cond SKIPPED_DOCUMENTATION
         template<> struct CollatedTraits<std::string>;
+        //!@endcond
       }
     }
   }
@@ -60,7 +62,9 @@ namespace cedar {
 
 //////////////// OPENCV SPECIALIZATION of our traits class
 
-//!@brief CollatedTraits implementation for std::string
+//!@cond SKIPPED_DOCUMENTATION
+
+// CollatedTraits implementation for std::string
 template<>
 struct cedar::aux::net::detail::CollatedTraits<std::string>
 {
@@ -68,6 +72,7 @@ struct cedar::aux::net::detail::CollatedTraits<std::string>
   typedef cedar::aux::net::detail::BasicNetHeader        HeaderType;
 };
 
+//!@endcond
 
 #endif
 

@@ -60,7 +60,7 @@ namespace cedar {
   }
 }
 
-/*!@brief    */
+/*!@brief a step which reads a matrix over the network (needs YARP) */
 class cedar::proc::steps::NetReaderSource : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------

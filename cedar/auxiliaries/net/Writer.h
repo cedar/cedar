@@ -139,6 +139,7 @@ public:
   //---------------------------------------------------------------------------
   // template specialization for unsigned char 
   //---------------------------------------------------------------------------
+//!@cond SKIPPED_DOCUMENTATION
 
 //!@brief unsigned char specialization, see Writer for details.
 template <>
@@ -350,6 +351,8 @@ public:
   }
 };
 
+
+//!@endcond
 
 } } } // end namespaces
 

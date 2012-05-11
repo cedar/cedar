@@ -58,6 +58,7 @@ namespace cedar {
     namespace net {
       namespace detail {
 
+//!@cond SKIPPED_DOCUMENTATION
 /*!@brief implements reading (RIAA over network) simple variable types
  *
  * use in Reader
@@ -149,6 +150,7 @@ public:
   }
 
 };
+//!@endcond
 
 } } } } // end namespaces
 

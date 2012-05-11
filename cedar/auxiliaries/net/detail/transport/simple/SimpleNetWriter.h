@@ -61,6 +61,7 @@ namespace cedar {
       namespace detail {
 
 
+//!@cond SKIPPED_DOCUMENTATION
 /*!@brief implements writing (RIAA over network) simple variable types
  *
  * use in Writer
@@ -145,6 +146,7 @@ public:
   }
 
 };
+//!@endcond
 
 } } } } // end namespaces
 

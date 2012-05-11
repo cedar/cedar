@@ -54,6 +54,7 @@ namespace cedar {
     namespace net {
       namespace detail {
 
+//!@cond SKIPPED_DOCUMENTATION
 /*!@brief internal Interface 
  *
  * Implemented by AbstractNetWriter and Reader
@@ -69,6 +70,7 @@ protected:
   virtual std::string getFullPortName() = 0;
 };
 
+//!@endcond
 } } } } // end namespace
 
 #endif

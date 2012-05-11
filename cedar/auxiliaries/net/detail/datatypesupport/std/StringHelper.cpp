@@ -57,6 +57,7 @@ namespace cedar {
   namespace aux {
     namespace net {
       namespace detail {
+//!@cond SKIPPED_DOCUMENTATION
 
 // save local copy of the header inforsion. (will be compared later on with
 // user input)
@@ -166,6 +167,7 @@ template <typename CVT> StringHelper<CVT>::~StringHelper()
 template struct cedar::aux::net::detail::StringHelper<std::string>;
 
 
+//!@endcond
 } } } } // end namespaces
 #endif
 

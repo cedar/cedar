@@ -53,6 +53,7 @@ namespace cedar {
     namespace net {
       namespace detail {
 
+//!@cond SKIPPED_DOCUMENTATION
 /*!@brief net portable struct that will hold the header (of a matrix)
  *
  * This will be inherited and extended for for example a header for
@@ -67,6 +68,7 @@ struct BasicNetHeader
   unsigned int mMagicNumber;
   size_t       mDataSize; // this is highly-architecture dependant!
 };
+//!@endcond
 
 } } } } // end namespaces
       

@@ -65,6 +65,7 @@ namespace cedar {
       namespace detail {
 
 
+//!@cond SKIPPED_DOCUMENTATION
 /*!@brief implements reading (RIAA) of a complex data type (header + matrix)
  *
  * 'collated types' are types where a header-information and data-field
@@ -202,6 +203,7 @@ public:
     }
   }
 };
+//!@endcond
 
 } } } }  // end namespaces
 

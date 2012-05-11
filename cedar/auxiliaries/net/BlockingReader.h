@@ -135,6 +135,7 @@ class BlockingReader
   //---------------------------------------------------------------------------
   // template specialization for char 
   //---------------------------------------------------------------------------
+//!@cond SKIPPED_DOCUMENTATION
 
 //!@brief Char specialization, see BlockingReader for details.
 template <>
@@ -362,6 +363,7 @@ public:
   }
 };
 
+//!@endcond
 } } } // end namespaces
 
 #endif

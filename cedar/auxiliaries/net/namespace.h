@@ -57,7 +57,7 @@ namespace cedar
   namespace aux
   {
 
-    /*!@brief Namespace for all aux classes. */
+    /*!@brief Namespace for all network communication related classes. */
     namespace net
     {
       template <typename T>

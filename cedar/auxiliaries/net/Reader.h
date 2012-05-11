@@ -140,6 +140,8 @@ class Reader
   //---------------------------------------------------------------------------
   // template specialization for char 
   //---------------------------------------------------------------------------
+//!@cond SKIPPED_DOCUMENTATION
+
 
 //!@brief Char specialization, see Reader for details.
 template <>
@@ -367,6 +369,7 @@ public:
   }
 };
 
+//!@endcond
 } } } // end namespaces
 
 #endif

@@ -59,7 +59,7 @@ namespace cedar {
   }
 }
 
-/*!@brief   This  */
+/*!@brief A step which sends matrices over the network (needs YARP)  */
 class cedar::proc::steps::NetWriterSink : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------

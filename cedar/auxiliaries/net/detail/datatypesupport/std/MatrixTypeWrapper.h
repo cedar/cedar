@@ -54,6 +54,7 @@ namespace cedar {
     namespace net {
       namespace detail {
 
+//!@cond SKIPPED_DOCUMENTATION
 
 
 /////// cv::Mat
@@ -90,6 +91,7 @@ inline void* MatrixTypeWrapper<std::string>::contentAll() const
   return (void*) mData.c_str();
 }
 
+//!@endcond
 } } } } // end namespaces
 
 #endif

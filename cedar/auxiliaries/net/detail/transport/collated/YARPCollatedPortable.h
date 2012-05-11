@@ -59,6 +59,7 @@ namespace cedar {
   namespace aux {
     namespace net {
       namespace detail {
+//!@cond SKIPPED_DOCUMENTATION
 
 
 /*!@brief Wrapper around the transported matrix type. handles sending/receiving
@@ -222,6 +223,6 @@ public:
 
 } } } } // end namespaces
 
-
+//!@endcond
 #endif
 

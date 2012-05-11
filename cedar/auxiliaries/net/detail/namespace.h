@@ -37,12 +37,54 @@
 #ifndef CEDAR_NAMESPACE_H
 #define CEDAR_NAMESPACE_H
 
+#include "cedar/configuration.h"
 #include "cedar/auxiliaries/namespace.h"
 
 namespace cedar {
   namespace aux {
     namespace net {
       namespace detail {
+        //!@cond SKIPPED_DOCUMENTATION
+        CEDAR_DECLARE_AUX_CLASS(AbstractNetBase);
+
+        template <typename T>
+        class AbstractNetReader;
+        template <typename T>
+        class AbstractNetWriter;
+
+        template <typename T, bool BLOCK>
+        class SimpleNetReader;
+        template <typename T>
+        class SimpleNetWriter;
+         
+        CEDAR_DECLARE_AUX_CLASS(InterfaceOpenable);
+
+        struct CEDAR_AUX_LIB_EXPORT BasicNetHeader;
+        struct CEDAR_AUX_LIB_EXPORT MatrixNetHeader;
+
+        template <typename T> 
+        class CollatedNetBase;
+        template <typename T, bool BLOCK>
+        class CollatedNetReader;
+        template <typename T>
+        class CollatedNetWriter;
+        template<class T>
+        class YARPCollatedPortable;
+
+        template<typename T> 
+        class InterfaceCollatedData;
+
+        template<class T>
+        struct CollatedTraits;
+
+        template <typename T>
+        struct MatrixTypeWrapper;
+
+        template <typename CVT>
+        class cvMatHelper;
+        template <typename CVT>
+        class StringHelper;
+        //!@endcond
       }
     }
   }

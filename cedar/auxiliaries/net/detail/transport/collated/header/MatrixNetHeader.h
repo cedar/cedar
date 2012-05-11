@@ -52,6 +52,7 @@ namespace cedar {
     namespace net {
       namespace detail {
 
+//!@cond SKIPPED_DOCUMENTATION
 /*!@brief extend the header struct to matrix data (cols, rows)
  *
  */
@@ -62,6 +63,7 @@ public:
   /*unsigned*/ int mColumns; // cv::Mat uses signed ints for this
   unsigned int mElementSize;
 };
+//!@endcond
 
 } } } }  // end namespaces
 

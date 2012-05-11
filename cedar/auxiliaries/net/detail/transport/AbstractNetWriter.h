@@ -59,6 +59,7 @@ namespace cedar {
     namespace net {
       namespace detail {
 
+//!@cond SKIPPED_DOCUMENTATION
 /*!@brief Abstract Writer. function write() is virtual, handles basic connection
  *
  * Abstract Writer functionality (write datatype over network, RIIA)
@@ -120,6 +121,7 @@ public:
   //!@brief virtual write() needs to be implemented in child
   virtual void write(const T &t) = 0;
 };
+//!@endcond
 
 } } } }  // end namespaces
 

@@ -76,6 +76,7 @@ namespace cedar {
     namespace net {
       namespace detail {
 
+//!@cond SKIPPED_DOCUMENTATION
 /*!@brief Shared functionality between AbstractNetWriter and Reader
  *
  * Basic inherit with shared functionality that Writer and Reader
@@ -180,6 +181,7 @@ inline bool AbstractNetBase::isConnected()
   return mIsConnected;
 }
 
+//!@endcond  
 } } } } // end namespaces
 
 #endif // CEDAR_USE_YARP

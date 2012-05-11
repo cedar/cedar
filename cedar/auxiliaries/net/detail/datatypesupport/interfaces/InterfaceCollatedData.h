@@ -52,9 +52,10 @@ namespace cedar {
   namespace aux {
     namespace net {
       namespace detail {
+//!@cond SKIPPED_DOCUMENTATION
 
 
-/*!@brief Abstract interface of matrix-like data
+/* Abstract interface of matrix-like data
  *
  * we hold typedef-info for the traits-type, data and header-type
  */
@@ -72,7 +73,7 @@ protected:
   virtual bool checkCollatedDataForRead(const HeaderType &header) = 0;
 };
 
-
+//!@endcond
 } } } } // end namespace
 
 #endif

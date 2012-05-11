@@ -64,12 +64,14 @@ namespace cedar {
   namespace aux {
     namespace net {
       namespace detail {
+//!@cond SKIPPED_DOCUMENTATION
 
 // constants:
 const std::string AbstractNetBase::PORT_PREFIX("/CEDAR"); // static
 const std::string AbstractNetBase::PORT_DELIMINATOR("/"); // static  
 const std::string AbstractNetBase::PORT_SUFFIX_OUT("out"); // static
 const std::string AbstractNetBase::PORT_SUFFIX_IN("in"); // static
+
 
 // static variables:
 // none
@@ -290,6 +292,8 @@ bool AbstractNetBase::connectTo(const std::string &writerPort)
 }
 
 } } } } // end namespaces
+
+//!@endcond
 
 #endif // CEDAR_USE_YARP
 

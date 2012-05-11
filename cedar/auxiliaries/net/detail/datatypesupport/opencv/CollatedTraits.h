@@ -51,10 +51,12 @@ namespace cedar {
   namespace aux {
     namespace net {
       namespace detail {
+        //!@cond SKIPPED_DOCUMENTATION
         template<> struct CollatedTraits<cv::Mat>;
         template<> struct CollatedTraits< cv::Mat_<float> >;
         template <typename CVT> class cvMatHelper;
         class cvMatNetHeader; // forward declaration
+        //!@endcond
       }
     }
   }
@@ -63,7 +65,9 @@ namespace cedar {
 
 //////////////// OPENCV SPECIALIZATION of our traits class
 
-//!@brief CollatedTraits implementation for cv::Mat
+//!@cond SKIPPED_DOCUMENTATION
+
+// CollatedTraits implementation for cv::Mat
 template<>
 struct cedar::aux::net::detail::CollatedTraits<cv::Mat>
 {
@@ -72,7 +76,7 @@ struct cedar::aux::net::detail::CollatedTraits<cv::Mat>
   typedef cedar::aux::net::detail::cvMatNetHeader        HeaderType;
 };
 
-//!@brief CollatedTraits implementation for cv::Mat_<float> 
+// CollatedTraits implementation for cv::Mat_<float> 
 template<>
 struct cedar::aux::net::detail::CollatedTraits< cv::Mat_<float> >
 {
@@ -81,5 +85,6 @@ struct cedar::aux::net::detail::CollatedTraits< cv::Mat_<float> >
   typedef cedar::aux::net::detail::cvMatNetHeader                 HeaderType;
 };
 
+//!@endcond
 #endif
 

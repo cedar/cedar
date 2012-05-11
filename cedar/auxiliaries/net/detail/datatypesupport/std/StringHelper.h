@@ -54,6 +54,7 @@ namespace cedar {
   namespace aux {
     namespace net {
       namespace detail {
+//!@cond SKIPPED_DOCUMENTATION
 
 //!@brief a helper class which implements InterfacCollatedData for opencv types
 template <typename CVT>
@@ -95,6 +96,7 @@ public:
   virtual ~StringHelper();
 };
 
+//!@endcond
 } } } } // end namespaces
 
 #endif

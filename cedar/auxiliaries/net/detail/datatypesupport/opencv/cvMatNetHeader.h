@@ -54,6 +54,7 @@ namespace cedar {
   namespace aux {
     namespace net {
       namespace detail {
+//!@cond SKIPPED_DOCUMENTATION
 
 /*!@brief packed header with matrix info for network transfer
  *
@@ -65,6 +66,7 @@ public:
   /*unsigned*/ int mCVMatType; // note: cv::Mat::cvMatType is signed
 };
 
+//!@endcond
 } } } } // end namespaces
 
 #endif

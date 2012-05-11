@@ -63,6 +63,7 @@ namespace cedar {
     namespace net {
       namespace detail {
 
+//!@cond SKIPPED_DOCUMENTATION
 /*!@brief Abstract Reader. function read() is virtual, handles basic connection
  *
  * Abstract Reader functionality (read datatype over network, RIIA)
@@ -181,6 +182,8 @@ public:
 
 template <class T>
 int AbstractNetReader<T>::mReaderCounter; // static variable initialization
+
+//!@endcond
 
 } } } } // end namespaces
 

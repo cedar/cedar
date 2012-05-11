@@ -58,6 +58,7 @@ namespace cedar {
     namespace net {
       namespace detail {
 
+//!@cond SKIPPED_DOCUMENTATION
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
@@ -110,6 +111,7 @@ public:
 
 
 };
+//!@endcond
 
 } } } }  // end namespaces
 

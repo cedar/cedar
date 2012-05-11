@@ -66,6 +66,7 @@ namespace cedar {
       namespace detail {
 
 
+//!@cond SKIPPED_DOCUMENTATION
 /*!@brief implementation of matrix-over-network writer
  *
  * @see CollatedNetReader
@@ -139,6 +140,7 @@ public:
   }
 
 };
+//!@endcond
 
 } } } } // end namespaces
 

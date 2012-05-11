@@ -57,7 +57,7 @@ namespace cedar {
   namespace aux {
     namespace net {
       namespace detail {
-
+//!@cond SKIPPED_DOCUMENTATION
 
 /*!@brief templated wrapper of the to be transported data type. SPECIALIZE!
  *
@@ -203,7 +203,7 @@ private:
   }
 };
 
-
+//!@endcond
 } } } } // end namespaces
 
 

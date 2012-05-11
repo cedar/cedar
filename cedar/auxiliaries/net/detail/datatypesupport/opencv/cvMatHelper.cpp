@@ -59,6 +59,7 @@ namespace cedar {
   namespace aux {
     namespace net {
       namespace detail {
+//!@cond SKIPPED_DOCUMENTATION
 
 // save local copy of the header information. (will be compared later on with
 // user input)
@@ -188,7 +189,7 @@ template <typename CVT> cvMatHelper<CVT>::~cvMatHelper()
 template struct cedar::aux::net::detail::cvMatHelper<cv::Mat>;
 template struct cedar::aux::net::detail::cvMatHelper< cv::Mat_<float> >;
 
-
+//!@endcond
 } } } } // end namespaces
 #endif
 

@@ -58,6 +58,7 @@ namespace cedar {
   namespace aux {
     namespace net {
       namespace detail {
+//!@cond SKIPPED_DOCUMENTATION
 
 
 
@@ -146,6 +147,7 @@ inline unsigned int MatrixTypeWrapper< cv::Mat_<float> >::getElementCount() cons
 }
 
 
+//!@endcond
 } } } } // end namespaces
 
 #endif

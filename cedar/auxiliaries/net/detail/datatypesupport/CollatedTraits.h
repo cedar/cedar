@@ -52,6 +52,7 @@ namespace cedar {
   namespace aux {
     namespace net {
       namespace detail {
+//!@cond SKIPPED_DOCUMENTATION
 
 
 /*!@brief traits struct for a 'collated data type' i.e. a matrix type
@@ -70,7 +71,7 @@ struct CollatedTraits
   }
 };
 
-
+//!@endcond
 } } } } // end namespaces 
 
 // specializations (these will compile):
