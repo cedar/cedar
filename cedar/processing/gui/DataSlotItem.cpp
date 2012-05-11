@@ -238,7 +238,6 @@ void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuE
   {
     p_demote_action->setEnabled(true);
   }
-  QAction *p_debug_action = menu.addAction("debug");
   QAction *a = menu.exec(event->screenPos());
 
   if (a == NULL)
@@ -254,15 +253,6 @@ void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuE
     // Demote in the underlying non-gui. This automatically sends a signal, which removes the GUI representation.
     cedar::proc::Network* network = static_cast<cedar::proc::Network*>(this->mSlot->getParentPtr());
     network->demoteSlot(this->mSlot->getRole(), this->mSlot->getName());
-  }
-  if (a == p_debug_action)
-  {
-    std::cout << this->mSlot->getParent() << " " <<  this->mSlot->getName() << std::endl;
-    std::cout << this->mSlot->getParentPtr()->getNetwork()->getName() << std::endl;
-    if (cedar::proc::ExternalDataPtr ext_data = boost::shared_dynamic_cast<cedar::proc::ExternalData>(mSlot))
-    {
-      std::cout << ext_data->isCollection() << std::endl;
-    }
   }
 }
 

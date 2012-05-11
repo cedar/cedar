@@ -378,10 +378,6 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
              ++node_iter)
         {
           error_message += " " + node_iter->first;
-          if (node_iter->first == parameter->getName())
-          {
-            std::cout << "this is identical" << std::endl;
-          }
         }
         error_message += ". Boost message: ";
         error_message += e.what();

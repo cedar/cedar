@@ -589,8 +589,8 @@ void cedar::proc::gui::Ide::loadFile(QString file)
     this->exception(message);
   }
   this->mpActionSave->setEnabled(true);
-  //@todo remove
-//  this->resetTo(network);
+
+  this->mNetwork = network;
 
   cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(file.toStdString());
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
