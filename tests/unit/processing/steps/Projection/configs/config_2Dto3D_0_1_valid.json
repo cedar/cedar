@@ -207,8 +207,7 @@
             "wait": "true",
             "listeners":
             [
-                "new NeuralField",
-                "new NeuralField 1"
+                "new NeuralField"
             ]
         }
     },
