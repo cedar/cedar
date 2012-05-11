@@ -65,7 +65,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::sinks::NetWriter>
       (
-        "Utilities",
+        "Sinks",
         "cedar.processing.sinks.NetWriter"
       )
     );

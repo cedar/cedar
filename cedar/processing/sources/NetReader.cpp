@@ -67,7 +67,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::sources::NetReader>
       (
-        "Utilities",
+        "Sources",
         "cedar.processing.sources.NetReader"
       )
     );
