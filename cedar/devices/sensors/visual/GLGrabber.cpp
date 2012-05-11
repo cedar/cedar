@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        OglGrabber.cpp
+    File:        GLGrabber.cpp
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/OglGrabber.h"
+#include "cedar/devices/sensors/visual/GLGrabber.h"
 
 // SYSTEM INCLUDES
 
@@ -45,7 +45,7 @@
 
 //----------------------------------------------------------------------------------------------------
 // Constructor for a single-channel grabber
-cedar::dev::sensors::visual::OglGrabber::OglGrabber(std::string configFileName, QGLWidget* oglWidget)
+cedar::dev::sensors::visual::GLGrabber::GLGrabber(std::string configFileName, QGLWidget* oglWidget)
 :
 cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
@@ -65,7 +65,7 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
 
 //----------------------------------------------------------------------------------------------------
 // Constructor for a stereo grabber
-cedar::dev::sensors::visual::OglGrabber::OglGrabber
+cedar::dev::sensors::visual::GLGrabber::GLGrabber
 (
   std::string configFileName,
   QGLWidget* oglWidget0,
@@ -90,7 +90,7 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
 
 //----------------------------------------------------------------------------------------------------
 // Destructor
-cedar::dev::sensors::visual::OglGrabber::~OglGrabber()
+cedar::dev::sensors::visual::GLGrabber::~GLGrabber()
 {
   doCleanUp();
   cedar::aux::LogSingleton::getInstance()->freeing(this);
@@ -102,7 +102,7 @@ cedar::dev::sensors::visual::OglGrabber::~OglGrabber()
 //----------------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::OglGrabber::onInit()
+bool cedar::dev::sensors::visual::GLGrabber::onInit()
 {
   std::stringstream init_message;
   init_message << ": Initialize grabber with " << mNumCams << " channels ..." << std::endl;
@@ -129,7 +129,7 @@ bool cedar::dev::sensors::visual::OglGrabber::onInit()
 }
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::OglGrabber::onCleanUp()
+void cedar::dev::sensors::visual::GLGrabber::onCleanUp()
 {
   // do the cleanup of used hardware in this method
   // on an exception or a CTRL-C only onCleanUp will be invoked (no destructor)
@@ -142,7 +142,7 @@ void cedar::dev::sensors::visual::OglGrabber::onCleanUp()
 }
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::OglGrabber::onAddChannel()
+void cedar::dev::sensors::visual::GLGrabber::onAddChannel()
 {
   // create the channel structure for one channel
   OglChannelPtr channel(new OglChannel);
@@ -151,7 +151,7 @@ void cedar::dev::sensors::visual::OglGrabber::onAddChannel()
 }
 
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::OglGrabber::onDeclareParameters()
+bool cedar::dev::sensors::visual::GLGrabber::onDeclareParameters()
 {
   // declare and initialize parameters and members of your derived class here
   // mCounter = 0 ;
@@ -163,14 +163,14 @@ bool cedar::dev::sensors::visual::OglGrabber::onDeclareParameters()
 }
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::OglGrabber::onUpdateSourceInfo(unsigned int channel)
+void cedar::dev::sensors::visual::GLGrabber::onUpdateSourceInfo(unsigned int channel)
 {
   //value of channel is already checked by GraberInterface::getSourceInfo()
   getChannel(channel)->mChannelInfo = "QT::OGLWidget on Channel " + boost::lexical_cast<std::string>(channel);
 }
 
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::OglGrabber::onGrab()
+bool cedar::dev::sensors::visual::GLGrabber::onGrab()
 {
   bool ogl_valid = true;
   for(unsigned int channel=0; channel<mNumCams;++channel)
@@ -212,7 +212,7 @@ bool cedar::dev::sensors::visual::OglGrabber::onGrab()
 
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::OglGrabber::setWidget(unsigned int channel, QGLWidget *oglWidget)
+void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGLWidget *oglWidget)
 {
   if (channel >= mNumCams)
   {

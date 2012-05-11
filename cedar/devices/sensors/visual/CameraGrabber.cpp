@@ -34,6 +34,9 @@
 
 ======================================================================================================================*/
 
+#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
+#ifdef CEDAR_USE_LIB_DC1394
+
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/CameraGrabber.h"
 #include "cedar/auxiliaries/exceptions.h"
@@ -915,6 +918,7 @@ cedar::dev::sensors::visual::CameraFrameRate::Id
          );
 }
 
+#ifdef CEDAR_USE_LIB_DC1394
 //----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::CameraGrabber::setCameraIsoSpeed(unsigned int channel,CameraIsoSpeed::Id isoSpeedId)
 {
@@ -935,7 +939,7 @@ cedar::dev::sensors::visual::CameraIsoSpeed::Id
            getCameraSetting(channel, cedar::dev::sensors::visual::CameraSetting::SETTING_ISO_SPEED)
          );
 }
-
+#endif
 //----------------------------------------------------------------------------------------------------
 cv::Size cedar::dev::sensors::visual::CameraGrabber::getCameraFrameSize( unsigned int channel)
 {
@@ -966,3 +970,5 @@ double cedar::dev::sensors::visual::CameraGrabber::getRawProperty(unsigned int c
   }
   return getChannel(channel)->mCamStateAndConfig->getRawProperty(propId);
 }
+
+#endif // CEDAR_USE_LIB_DC1394

@@ -37,10 +37,12 @@
 #ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_VIDEO_MODE_H
 #define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_VIDEO_MODE_H
 
+#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
+#ifdef CEDAR_USE_LIB_DC1394
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/devices/sensors/visual/namespace.h"
-#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
 
 // SYSTEM INCLUDES
 #ifdef CEDAR_USE_LIB_DC1394
@@ -219,5 +221,6 @@ private:
 
 }; // cedar::dev::sensors::visual::CameraVideoMode
 
+#endif // CEDAR_USE_LIB_DC1394
 #endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_VIDEO_MODE_H
 

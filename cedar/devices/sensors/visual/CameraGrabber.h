@@ -38,7 +38,10 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_GRABBER_H
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_GRABBER_H
 
-// LOCAL INCLUDES
+#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
+#ifdef CEDAR_USE_LIB_DC1394
+
+// CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/GrabberInterface.h"
 #include "cedar/devices/sensors/visual/camera/CameraIsoSpeed.h"
 #include "cedar/devices/sensors/visual/camera/CameraProperty.h"
@@ -48,8 +51,6 @@
 #include "cedar/devices/sensors/visual/camera/CameraCapabilities.h"
 #include "cedar/devices/sensors/visual/camera/CameraStateAndConfig.h"
 #include "cedar/devices/sensors/visual/camera/CameraConfig.h"
-
-// CEDAR INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -294,6 +295,8 @@ public:
    */
   CameraFrameRate::Id getCameraFps(unsigned int channel);
 
+#ifdef CEDAR_USE_LIB_DC1394
+
   /*! @brief Set the ISO-speed of the IEEE1394/firewire bus.
    *
    *   This can only be done, if the first frame wasn't already grabbed
@@ -311,6 +314,8 @@ public:
    *  @param channel This is the index of the source you want to set the parameter value.
    */
   CameraIsoSpeed::Id getCameraIsoSpeed(unsigned int channel);
+
+#endif
 
   /*! @brief Gets the GUID of the camera
    *  @param channel This is the index of the source channel
@@ -468,6 +473,7 @@ private:
 
 }; // class cedar::dev::sensors::visual::CameraGrabber
 
+#endif // CEDAR_USE_LIB_DC1394
 #endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_GRABBER_H
 
 

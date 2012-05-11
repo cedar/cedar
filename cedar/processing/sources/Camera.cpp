@@ -34,6 +34,9 @@
 
 ======================================================================================================================*/
 
+#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
+#ifdef CEDAR_USE_LIB_DC1394
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
@@ -182,3 +185,5 @@ void cedar::proc::sources::Camera::createGrabber()
 
   //!@todo read debayer value from config-file
 }
+
+#endif // CEDAR_USE_LIB_DC1394

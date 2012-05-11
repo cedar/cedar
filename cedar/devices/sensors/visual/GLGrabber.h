@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        OglGrabber.h
+    File:        GLGrabber.h
 
     Maintainer:  Georg.Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
-    Description: Header for the @em @em cedar::dev::sensors::visual::OglGrabber class.
+    Description: Header for the @em @em cedar::dev::sensors::visual::GLGrabber class.
 
     Credits:
 
@@ -52,7 +52,7 @@
  *  You have to grab in your main gui-thread with the grab() memberfunction of the class.
  *  The getImage() member could be also invoked in threads running in the background
  */
-class cedar::dev::sensors::visual::OglGrabber
+class cedar::dev::sensors::visual::GLGrabber
 :
 public cedar::dev::sensors::visual::GrabberInterface
 {
@@ -90,17 +90,17 @@ public:
    *  @param configFileName Filename for a file, where the configuration parameters should be stored
    *  @param channelName  Channel to grab from
    */
-  OglGrabber(std::string configFileName, QGLWidget *oglWidget);
+  GLGrabber(std::string configFileName, QGLWidget *oglWidget);
 
   /*! @brief The constructor for a stereo grabber.
    *  @param configFileName Filename for a file, where the configuration parameters should be stored
    *  @param channelName0  Channel one to grab from
    *  @param channelName1  Channel two to grab from
    */
-  OglGrabber(std::string configFileName, QGLWidget *oglWidget0, QGLWidget *oglWidget1);
+  GLGrabber(std::string configFileName, QGLWidget *oglWidget0, QGLWidget *oglWidget1);
 
   //!@brief Destructor
-  ~OglGrabber();
+  ~GLGrabber();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -166,6 +166,6 @@ protected:
 private:
   // none yet
 
-}; // class cedar::dev::sensors::visual::OglGrabber
+}; // class cedar::dev::sensors::visual::GLGrabber
 
 #endif //CEDAR_DEV_SENSORS_VISUAL_OGL_GRABBER_H

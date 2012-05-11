@@ -34,6 +34,9 @@
 
 ======================================================================================================================*/
 
+#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
+#ifdef CEDAR_USE_LIB_DC1394
+
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/camera/CameraProperty.h"
 
@@ -160,3 +163,5 @@ const cedar::dev::sensors::visual::CameraProperty::TypePtr& cedar::dev::sensors:
 {
   return cedar::dev::sensors::visual::CameraProperty::mType.type();
 }
+
+#endif // CEDAR_USE_LIB_DC1394
