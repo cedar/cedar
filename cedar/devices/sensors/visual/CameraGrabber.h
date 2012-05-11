@@ -38,11 +38,10 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_GRABBER_H
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_GRABBER_H
 
-#include "cedar/configuration.h"
-
+#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
 #ifdef CEDAR_USE_LIB_DC1394
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/GrabberInterface.h"
 #include "cedar/devices/sensors/visual/camera/CameraIsoSpeed.h"
 #include "cedar/devices/sensors/visual/camera/CameraProperty.h"
@@ -52,8 +51,6 @@
 #include "cedar/devices/sensors/visual/camera/CameraCapabilities.h"
 #include "cedar/devices/sensors/visual/camera/CameraStateAndConfig.h"
 #include "cedar/devices/sensors/visual/camera/CameraConfig.h"
-
-// CEDAR INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -77,8 +74,8 @@ public cedar::dev::sensors::visual::GrabberInterface
    */
   struct CameraId
   {
-    unsigned int busId;  ///! The bus id
-    unsigned int guid;   ///! The unique id of the device
+    unsigned int busId;  /// The bus id
+    unsigned int guid;   /// The unique id of the device
   };
 
 
@@ -91,9 +88,6 @@ public cedar::dev::sensors::visual::GrabberInterface
   {
     /// Unique channel id
     CameraId mCamId;
-
-    /// The channel information
-    std::string mChannelInfo;
 
     /// Camera interface
     cv::VideoCapture mVideoCapture;
@@ -140,12 +134,7 @@ public:
    *    the interface or use the CV_CAP_xxx constants in /usr/local/include/opencv2/highgui/highgui_c.h for a
    *    base unit (like CV_CAP_FIREWIRE, CV_CAP_ANY)
    */
-  CameraGrabber(
-                 const std::string& configFileName,
-                 unsigned int camera,
-                 bool isGuid,
-                 bool finishInitialization = true
-               );
+  CameraGrabber(const std::string& configFileName, unsigned int camera, bool isGuid, bool finishInitialization = true);
 
 
   /*! @brief Constructor for a stereo camera grabber
@@ -158,13 +147,14 @@ public:
    *  @see cedar::dev::sensors::visual::CameraGrabber::CameraGrabber(const std::string&, unsigned int, bool, bool)
    *       for details about the used framework
    */
-  CameraGrabber(
-                 const std::string& configFileName,
-                 unsigned int camera0,
-                 unsigned int camera1,
-                 bool isGuid,
-                 bool finishInitialization = true
-               );
+  CameraGrabber
+  (
+    const std::string& configFileName,
+    unsigned int camera0,
+    unsigned int camera1,
+    bool isGuid,
+    bool finishInitialization = true
+  );
 
 
   /*! @brief Constructor for a camera grabber. The complete configuration will be read from configuration file.<br>
@@ -305,6 +295,8 @@ public:
    */
   CameraFrameRate::Id getCameraFps(unsigned int channel);
 
+#ifdef CEDAR_USE_LIB_DC1394
+
   /*! @brief Set the ISO-speed of the IEEE1394/firewire bus.
    *
    *   This can only be done, if the first frame wasn't already grabbed
@@ -322,6 +314,8 @@ public:
    *  @param channel This is the index of the source you want to set the parameter value.
    */
   CameraIsoSpeed::Id getCameraIsoSpeed(unsigned int channel);
+
+#endif
 
   /*! @brief Gets the GUID of the camera
    *  @param channel This is the index of the source channel
@@ -352,7 +346,40 @@ public:
    */
   std::vector<std::string> getAllSettings(unsigned int channel);
 
+  /*! @brief Set a property direct in the cv::VideoCapture class
+   *
+   *    Use this method only for properties which are not (yet) supported by cedar CameraProperty()
+   *    or CameraSetting() class. But be aware, that there is no check if the wanted property is supported
+   *    by the used backend
+   *
+   *   @remarks
+   *      Use this only for above mentioned reasons, because there is no value-checking and the
+   *      internal values which are cached from the CameraGrabber class isn't updated!
+   *
+   *  @param channel This is the index of the source you want to set the parameter value.
+   *  @param propId The OpenCV constants for cv::VideoCapture.set() method
+   *  @param value The new value
+   *  @return Boolean value, that indicates the exit-state of cv::VideoCapture.set()
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+   *  @see  setCameraMode, setCameraFps, setCameraIsoSpeed, CameraSetting, setCameraProperty
+   *
+   *
+   */
+  bool setRawProperty(unsigned int channel, unsigned int propId, double value);
 
+  /*! @brief Get a property directly form the cv::VideoCapture
+   *
+   *    Use this method only for properties which are not (yet) supported by cedar CameraProperty()
+   *    or CameraSetting() class. But be aware, that there is no check if the wanted property is supported
+   *    by the used backend
+   *
+   *  @param channel This is the index of the source you want to set the parameter value.
+   *  @param propId The OpenCV constants for cv::VideoCapture.set() method
+   *  @return Value, that indicates the exit-state of cv::VideoCapture.set()
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+   *  @see  getCameraMode, getCameraFps, getCameraIsoSpeed, CameraSetting, getCameraProperty
+   */
+  double getRawProperty(unsigned int channel, unsigned int propId);
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -367,7 +394,7 @@ protected:
   bool onGrab();
 
   bool onDeclareParameters();
-  const std::string& onGetSourceInfo(unsigned int channel) const;
+  void onUpdateSourceInfo(unsigned int channel);
 
   ///! @brief Sync all Parameters from cameras with the local buffer
   bool onWriteConfiguration();
@@ -386,9 +413,6 @@ private:
 
   /// @brief Sets the channel-id which depends on the isGuid-flag (only used in constructor)
   void setChannelId(unsigned int channel, unsigned int id, bool isGuid);
-
-  /// @brief Sets the channel-info which depends on the created cv::VideoCapture (only used in constructor)
-  void setChannelInfo(unsigned int channel);
 
   /*! This string identifies, that the default-filename (containing grabber-guid) should be used
    * If the entry in the configuration file is different, then that file will be used
@@ -426,10 +450,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-
-public:
-  // none yet (hopefully never!)
-
 protected:
   // none yet
 
@@ -454,7 +474,6 @@ private:
 }; // class cedar::dev::sensors::visual::CameraGrabber
 
 #endif // CEDAR_USE_LIB_DC1394
-
 #endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_GRABBER_H
 
 

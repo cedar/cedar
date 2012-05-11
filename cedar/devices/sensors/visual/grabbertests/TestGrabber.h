@@ -28,7 +28,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 04 23
 
-    Description: Header for the @em @em cedar::dev::sensors::visual::OglGrabber class.
+    Description: Header for the @em @em cedar::dev::sensors::visual::TestGrabber class.
 
     Credits:
 
@@ -135,7 +135,7 @@ protected:
   bool onInit();
   void onCleanUp();
   bool onDeclareParameters();
-  const std::string& onGetSourceInfo(unsigned int channel) const;
+  void onUpdateSourceInfo(unsigned int channel);
   bool onGrab();
   void onAddChannel();
 

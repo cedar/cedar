@@ -37,9 +37,14 @@
 #ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTING_H
 #define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTING_H
 
+#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
+#ifdef CEDAR_USE_LIB_DC1394
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/devices/sensors/visual/namespace.h"
+#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
+
 
 // SYSTEM INCLUDES
 #include <opencv2/highgui/highgui_c.h>
@@ -120,9 +125,11 @@ public:
   static const Id SETTING_FRAME_HEIGHT = CV_CAP_PROP_FRAME_HEIGHT; // 4;
   /// @see SETTING_FPS
   static const Id SETTING_MODE = CV_CAP_PROP_MODE; // 9;
+
+#ifdef CEDAR_USE_LIB_DC1394
   /// @see SETTING_FPS
   static const Id SETTING_ISO_SPEED = CV_CAP_PROP_ISO_SPEED; // 30
-
+#endif
 
 protected:
   // none yet
@@ -132,5 +139,6 @@ private:
 
 }; // cedar::dev::sensors::visual::CameraSetting
 
+#endif // CEDAR_USE_LIB_DC1394
 #endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTING_H
 

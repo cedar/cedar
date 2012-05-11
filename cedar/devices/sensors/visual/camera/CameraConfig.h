@@ -37,9 +37,9 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_CONFIG_H
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_CONFIG_H
 
-#include "cedar/configuration.h"
-
+#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
 #ifdef CEDAR_USE_LIB_DC1394
+
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/ConfigurationInterface.h"

@@ -166,7 +166,7 @@ int main(int , char **)
 
   //some options
   //loops through the avi
-  video_grabber->setLoop(true);
+  video_grabber->setLooped(true);
 
   //------------------------------------------------------------------
   //Create an OpenCV highgui window to show grabbed frames

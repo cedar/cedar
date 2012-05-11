@@ -74,9 +74,11 @@ namespace cedar
         //grabber
         CEDAR_DECLARE_DEV_CLASS(VideoGrabber);
         CEDAR_DECLARE_DEV_CLASS(PictureGrabber);
+        #ifdef CEDAR_USE_LIB_DC1394
         CEDAR_DECLARE_DEV_CLASS(CameraGrabber);
+        #endif
         CEDAR_DECLARE_DEV_CLASS(TestGrabber);
-        CEDAR_DECLARE_DEV_CLASS(OglGrabber);
+        CEDAR_DECLARE_DEV_CLASS(GLGrabber);
 
         #ifdef CEDAR_USE_YARP
         CEDAR_DECLARE_DEV_CLASS(NetGrabber);
@@ -84,17 +86,20 @@ namespace cedar
 
         
         //enum classes
+        #ifdef CEDAR_USE_LIB_DC1394
         CEDAR_DECLARE_DEV_CLASS(CameraFrameRate);
         CEDAR_DECLARE_DEV_CLASS(CameraProperty);
         CEDAR_DECLARE_DEV_CLASS(CameraVideoMode);
         CEDAR_DECLARE_DEV_CLASS(CameraSetting);
-        #ifdef CEDAR_USE_LIB_DC1394
         CEDAR_DECLARE_DEV_CLASS(CameraIsoSpeed);
         #endif
+
         //misc helper classes
+        #ifdef CEDAR_USE_LIB_DC1394
         CEDAR_DECLARE_DEV_CLASS(CameraStateAndConfig);
         CEDAR_DECLARE_DEV_CLASS(CameraCapabilities);
         CEDAR_DECLARE_DEV_CLASS(CameraConfig);
+        #endif
         
         //firewire related class of the grabbertools
         #ifdef CEDAR_USE_LIB_DC1394

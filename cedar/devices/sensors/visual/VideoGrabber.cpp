@@ -53,7 +53,10 @@ cedar::dev::sensors::visual::VideoGrabber::VideoGrabber(
                             const std::string& aviFileName
                           )
 :
-cedar::dev::sensors::visual::GrabberInterface(configFileName)
+cedar::dev::sensors::visual::GrabberInterface(configFileName),
+_mLooped(true),
+_mSpeedFactor(1),
+mFramesCount(0)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   readInit(1,"VideoGrabber");
@@ -71,7 +74,10 @@ cedar::dev::sensors::visual::VideoGrabber::VideoGrabber(
                             const std::string& aviFileName1
                           )
 :
-cedar::dev::sensors::visual::GrabberInterface(configFileName)
+cedar::dev::sensors::visual::GrabberInterface(configFileName),
+_mLooped(true),
+_mSpeedFactor(1),
+mFramesCount(0)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   readInit(2,"VideoGrabber");
@@ -85,7 +91,7 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
 //----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::VideoGrabber::onDeclareParameters()
 {
-  bool result1 = addParameter(&_mLoop, "loop", true) == CONFIG_SUCCESS;
+  bool result1 = addParameter(&_mLooped, "looped", true) == CONFIG_SUCCESS;
   bool result2 = addParameter(&_mSpeedFactor, "speedFactor", 1) == CONFIG_SUCCESS;
   return result1 && result2;
 }
@@ -214,21 +220,23 @@ bool cedar::dev::sensors::visual::VideoGrabber::onGrab()
     if (getChannel(channel)->mImageMat.empty())
     {
 
+      /*
       unsigned int pos_Abs = getChannel(0)->mVideoCapture.get(CV_CAP_PROP_POS_FRAMES);
-
       std::stringstream debug_message;
       debug_message << "[VideoGrabber::onGrab] Channel  :" << channel << " empty" << std::endl;
       debug_message << "[VideoGrabber::onGrab] Frame nr.:" << pos_Abs << std::endl;
       cedar::aux::LogSingleton::getInstance()->debugMessage
-                                                (
-                                                  ConfigurationInterface::getName() + ": " + debug_message.str(),
-                                                  "cedar::dev::sensors::visual::VideoGrabber::onGrab()"
-                                                );
+                                               (
+                                                 ConfigurationInterface::getName() + ": " + debug_message.str(),
+                                                 "cedar::dev::sensors::visual::VideoGrabber::onGrab()"
+                                               );
+      */
       //error or end of file?
-      if (getPositionAbsolute() == (mFramesCount-1))
+      if (getPositionAbsolute() == (mFramesCount))
+      //if (getPositionRelative() > 0.99)
       {
 
-        if (_mLoop)
+        if (_mLooped)
         {
           //rewind all channels and grab first frame
           setPositionAbsolute(0);
@@ -247,8 +255,9 @@ bool cedar::dev::sensors::visual::VideoGrabber::onGrab()
         }
         else
         {
-          //the last frame of the file remains in image buffer
-          result = false;
+          // loop is false and the last frame was already grabbed
+          // the last frame of the file doesn't remain in image buffer
+          result = true;
         }
       }
       else
@@ -262,13 +271,10 @@ bool cedar::dev::sensors::visual::VideoGrabber::onGrab()
 }
 
 //----------------------------------------------------------------------------------------------------
-const std::string& cedar::dev::sensors::visual::VideoGrabber::onGetSourceInfo(unsigned int channel) const
+void cedar::dev::sensors::visual::VideoGrabber::onUpdateSourceInfo(unsigned int channel)
 {
-  if (channel >= mNumCams)
-  {
-    CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"VideoGrabber::onGetSourceInfo");
-  }
-  return getChannel(channel)->mSourceFileName;
+  //value of channel is already checked by GraberInterface::getSourceInfo()
+  getChannel(channel)->mChannelInfo = getChannel(channel)->mSourceFileName;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -288,9 +294,24 @@ double cedar::dev::sensors::visual::VideoGrabber::getSpeedFactor() const
 }
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::VideoGrabber::setLoop(bool loop)
+void cedar::dev::sensors::visual::VideoGrabber::setLooped(bool loop)
 {
-  _mLoop = loop;
+  std::string message = "Set Loop ";
+  if (loop)
+  {
+    message = message + "ON";
+  }
+  else
+  {
+    message = message + "OFF";
+  }
+  cedar::aux::LogSingleton::getInstance()->debugMessage(message,"cedar::dev::sensors::visual::VideoGrabber::setLoop()");
+  _mLooped = loop;
+}
+//----------------------------------------------------------------------------------------------------
+bool cedar::dev::sensors::visual::VideoGrabber::getLooped()
+{
+  return _mLooped;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -355,11 +376,11 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionAbsolute(unsigned int
   //only check upper border
   if (newPositionAbs + 1 > mFramesCount)
   {
-    CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"VideoGrabber::setPositionRel");
+    CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"VideoGrabber::setPositionAbsolute");
   }
   std::stringstream debug_message;
-  debug_message << std::endl <<"\tCurrent position: " << getPositionAbsolute() << std::endl;
-  debug_message << "\tPosition set to frame: " << newPositionAbs << std::endl;
+  debug_message << std::endl <<"\tCurrent position: " << getPositionAbsolute() << std::endl
+                << "\tPosition set to frame: " << newPositionAbs << std::endl;
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                             (
                                               ConfigurationInterface::getName() + ": " + debug_message.str(),

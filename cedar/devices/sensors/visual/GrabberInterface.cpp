@@ -87,14 +87,13 @@ cedar::dev::sensors::visual::GrabberInterface::~GrabberInterface()
 
   if ((*it) == this)
   {
-    mInstances.erase(it);
-
     cedar::aux::LogSingleton::getInstance()->debugMessage
                                             (
                                               ConfigurationInterface::getName() + ": This grabber "
-                                                        + "deleted from list of all instances.",
+                                                        + "delete from list of all instances.",
                                               "cedar::dev::sensors::visual::GrabberInterface::~GrabberInterface()"
                                             );
+    mInstances.erase(it);
   }
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 }
@@ -497,13 +496,14 @@ QReadWriteLock* cedar::dev::sensors::visual::GrabberInterface::getReadWriteLockP
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-std::string cedar::dev::sensors::visual::GrabberInterface::getSourceInfo(unsigned int channel) const
+std::string& cedar::dev::sensors::visual::GrabberInterface::getSourceInfo(unsigned int channel)
 {
   if (channel >= mNumCams)
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"GrabberInterface::getSourceInfo");
   }
-  return onGetSourceInfo(channel);
+  onUpdateSourceInfo(channel);
+  return getChannel(channel)->mChannelInfo;
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -738,6 +738,10 @@ bool cedar::dev::sensors::visual::GrabberInterface::startRecording(double fps, i
 
   for (unsigned int channel = 0; channel < mNumCams; ++channel)
   {
+    //@Todo: check open and close function of cv::VideoWriter
+    //getChannel(channel)->mVideoWriter.open("video.avi", CV_FOURCC('M','P','4','2'), fps, getChannel(channel)->mImageMat.size());
+    //getChannel(channel)->mVideoWriter.close();
+
     cv::VideoWriter writer(getChannel(channel)->mRecordName,fourcc,fps,getChannel(channel)->mImageMat.size(),color);
 
     if (writer.isOpened())
