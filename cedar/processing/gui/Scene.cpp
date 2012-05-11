@@ -609,7 +609,6 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
                   = p_source->getSlot()->getParent() + std::string(".") + p_source->getSlot()->getName();
                 std::string target_name
                   = p_data_target->getSlot()->getParent() + std::string(".") + p_data_target->getSlot()->getName();
-                std::cout << "Source,Target: " << source_name << " " << target_name << std::endl;
                 //!@todo this code is really messy, think about restructuring the GUI
                 if
                 (
