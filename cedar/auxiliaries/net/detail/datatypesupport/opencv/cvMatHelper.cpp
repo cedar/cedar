@@ -43,6 +43,7 @@
 
 #include "cedar/auxiliaries/net/detail/datatypesupport/interfaces/InterfaceCollatedData.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatNetHeader.h"
+#include "cedar/auxiliaries/net/exceptions.h"
 
 // PROJECT INCLUDES
 #include <opencv2/opencv.hpp>
@@ -100,6 +101,14 @@ template <typename CVT> bool cvMatHelper<CVT>::checkCollatedDataForWrite(
   // first run: Initialize
   if (!mLocalHeader.mColumns || !mLocalHeader.mRows)
   {
+    // TODO: temporary fix
+    if (extheader.mRows < 0 
+        || extheader.mColumns < 0)
+    {
+      CEDAR_THROW( cedar::aux::net::NetUnhandledDataException,
+                   "n-dimensional (n>2) matrices currently unsupported" );
+    }
+
     // init the header data (from mat) that will be sent over the line
     initExternalHeader(mat, extheader); // get info from mat!
 
