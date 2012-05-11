@@ -97,20 +97,6 @@ AbstractNetBase::~AbstractNetBase()
 #ifdef DEBUG_NETT
   std::cout << "  ~AbstractNetBase [DESTRUCTOR]" << endl;
 #endif
-  
-#ifndef CEDAR_NETT_DISABLE_YARPSERVERPROC 
-  // we need to kill the child-process that runs an (automatically
-  // started) YARP name server.
-  // else processes, that wait() for all children of this program
-  // will never resume
-  if (mServerPID)
-  {
-    kill( mServerPID, SIGKILL );
-#ifdef DEBUG_NETT
-    std::cout << "  killed name server with pid " << mServerPID << endl;
-#endif  
-  }
-#endif
 }
 
 
@@ -121,102 +107,6 @@ std::string AbstractNetBase::getFullPortName()
 {
   return mFullPortName;
 }
-
-#ifndef CEDAR_NETT_DISABLE_YARPSERVERPROC 
-bool AbstractNetBase::startNameServer()
-{
-  pid_t pid;
-
-  pid= vfork(); // NEW PROCESS!
-
-  // (1) clean YARPs local "nameserver config file", which effectively
-  // serves as cache and just makes problems for us, when the nameserver
-  // changes. see (2)
-  yarp::os::impl::NameConfig nc;
-  nc.toFile(true); // clean configfile
- 
-  if ( pid < 0 )
-  {
-    // ERROR
-    return false;
-  }
-  else if (pid == 0)
-  {
-    // FORKED CHILD ...
-    // this will block!  
-    //if ( yarp::os::Network::runNameServer(0, 0) != 0 ) // needs YARP v2.3.6
-    //system("yarp server"); // starts command in a shell
-
-#ifdef DEBUG_NETT
-    std::cout << "  executing yarp server" << endl;
-#endif
-
-#if 1
-    // swallow the output of the following yarp server command
-    // (this redirect stdout of this process to /dev/null)
-    int fh;
-    ::fflush(stdout);
-    fh = ::open("/dev/null", O_WRONLY);
-    ::dup2(fh, 1);
-    ::close(fh);
-#endif
-
-    if (execlp("yarp", "yarp", "server", NULL) == -1)
-    {
-      // this works with all yarp versions
-      // this does not create a zombie process. better!
-
-#ifdef DEBUG_NETT
-      std::cout << "  could not start yarp server!" << endl;
-#endif
-
-    }
-    exit(EXIT_SUCCESS);
-  }
-  else
-  {
-    sleep(1); // ugly, but no better idea for now. we need to wait for the
-              // child process to start the name server.
-              // (fork doesnt guarantee the order of execution
-              //  between child and parent)
-              // it works okay, as we will only land here ONCE.
-
-    // (2) Yarp: this seems to be necessary so that we dont fail
-    //       the first time we look for the nameserver. see (1)
-    yarp::os::impl::NameClient& client = 
-               yarp::os::impl::NameClient::getNameClient();
-    client.updateAddress();
-
-    mServerPID= pid; // remember child PID, see Destructor
-    // PARENT ...
-    return yarp::os::NetworkBase::checkNetwork();
-  }
-
-}
-#endif
-
-#ifndef CEDAR_NETT_DISABLE_YARPSERVERPROC 
-bool AbstractNetBase::checkNameServer()
-{
-  // look for existing name server
-  bool found= true;
-
-  found= yarp::os::NetworkBase::checkNetwork();
-
-  if (!found)
-  {
-    // check if requested
-
-    if (!startNameServer())  
-    {
-      CEDAR_THROW( cedar::aux::net::NetMissingRessourceException,
-                   "YARP: no yarp name server found and cannot auto "
-                          "start one" );
-    }
-  }
-  return true;
-}
-#endif
 
 void AbstractNetBase::lateConstruct()
 {
