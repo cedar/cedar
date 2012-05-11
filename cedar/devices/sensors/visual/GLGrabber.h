@@ -65,16 +65,16 @@ public cedar::dev::sensors::visual::GrabberInterface
   /*! @struct OglChannel
    *  @brief Additional data of a grabbing channel to grab from a QGLWidget
    */
-  struct OglChannel
+  struct GLChannel
   :
   cedar::dev::sensors::visual::GrabberInterface::GrabberChannel
   {
     //! @brief The QT OpenGL widget
-    QGLWidget* mpOglWidget ;
+    QGLWidget* mpQGLWidget ;
   };
 
-  typedef boost::shared_ptr<OglChannel> OglChannelPtr;
-  typedef boost::shared_ptr<const OglChannel> ConstOglChannelPtr;
+  typedef boost::shared_ptr<GLChannel> GLChannelPtr;
+  typedef boost::shared_ptr<const GLChannel> ConstGLChannelPtr;
 
   //!@endcond
 
@@ -88,16 +88,16 @@ public cedar::dev::sensors::visual::GrabberInterface
 public:
   /*! @brief The constructor for a single channel grabber.
    *  @param configFileName Filename for a file, where the configuration parameters should be stored
-   *  @param channelName  Channel to grab from
+   *  @param qglWidget A pointer to a QGLWidget to grab from
    */
-  GLGrabber(std::string configFileName, QGLWidget *oglWidget);
+  GLGrabber(std::string configFileName, QGLWidget *qglWidget);
 
   /*! @brief The constructor for a stereo grabber.
    *  @param configFileName Filename for a file, where the configuration parameters should be stored
-   *  @param channelName0  Channel one to grab from
-   *  @param channelName1  Channel two to grab from
+   *  @param qglWidget0 A pointer to a QGLWidget to grab from for channel 0
+   *  @param qglWidget1 A pointer to a QGLWidget to grab from for channel 1
    */
-  GLGrabber(std::string configFileName, QGLWidget *oglWidget0, QGLWidget *oglWidget1);
+  GLGrabber(std::string configFileName, QGLWidget *qglWidget0, QGLWidget *qglWidget1);
 
   //!@brief Destructor
   ~GLGrabber();
@@ -111,7 +111,7 @@ public:
   /*! @brief Set a new Widget to grab from
    *
    */
-  void setWidget(unsigned int channel, QGLWidget *oglWidget);
+  void setWidget(unsigned int channel, QGLWidget *qglWidget);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -131,18 +131,18 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
-  inline OglChannelPtr getChannel(unsigned int channel)
+  inline GLChannelPtr getChannel(unsigned int channel)
   {
-    return boost::static_pointer_cast<OglChannel>
+    return boost::static_pointer_cast<GLChannel>
            (
              cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
            );
   }
 
   ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
-  inline ConstOglChannelPtr getChannel(unsigned int channel) const
+  inline ConstGLChannelPtr getChannel(unsigned int channel) const
   {
-    return boost::static_pointer_cast<const OglChannel>
+    return boost::static_pointer_cast<const GLChannel>
        (
          cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
        );

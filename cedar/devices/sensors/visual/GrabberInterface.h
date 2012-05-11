@@ -98,7 +98,9 @@ public boost::noncopyable
   // This extension will only be used, if there is no extension
   // in the new name parameter given to setSnapshotName() or setRecordName()
 public:
+  //!@brief The default extension for recording files. The extension determine the type of the file
   static const std::string mGrabberDefaultRecordExtension;
+  //!@brief The default extension for a snapshot. The extension determine the type of the file
   static const std::string mGrabberDefaultSnapshotExtension;
 
 protected:
@@ -127,7 +129,7 @@ protected:
     std::string mChannelInfo;
   };
 
-  typedef boost::shared_ptr<GrabberChannel> GrabberChannelPtr;
+  CEDAR_GENERATE_POINTER_TYPES(GrabberChannel);
 
   ///! @brief Typedef for a vector containing the instances of all used grabbers
   typedef std::vector<cedar::dev::sensors::visual::GrabberInterface*> GrabberInstancesVector;
@@ -155,19 +157,10 @@ protected:
 protected:
   /*! @brief The standard constructor.
    *  @remarks
-   *    The constructor is protected, because no instance of GrabberInterface should be instantiated
+   *    The constructor is protected, because no instance of GrabberInterface should be instantiated.
    *    Use a derived class instead.
    *  @param
    *    configFileName The filename where the configuration parameters should be stored in
-   *  @param
-   *    registerTerminationHandler Set this flag if the CTRL-C handler should be registerd via the "signal" function
-   *
-   *    // 1) a static member vector to store pointer to all instances of created grabbers
-   *    // 2) a static member function which handle the interrupt signal
-   *    // 3) some additional code in GrabberInterface.cpp to handle these issues
-   *    //------------------------------------------------------------------------
-   *
-   *
    */
   GrabberInterface(const std::string& configFileName);
 
@@ -190,9 +183,11 @@ public:
 
     /*! @brief This method register a signal handler for the signals SIGINT and SIGABRT
      *
-     *  A crash handler should be used, especially if a firewire camera grabber is instantiated
-     *  The internal handler catch the SIGINT and SIGABRT signal and calls the emergencyCleanup() method
-     *  If you implement your own handler, call the static emergencyCleanup in your method
+     *  A crash handler should be used, especially if a firewire camera grabber is instantiated.
+     *  The internal handler catch the SIGINT and SIGABRT signal and calls the emergencyCleanup() method.
+     *  If you implement your own handler, call the static member emergencyCleanup() in your method.
+     *
+     *  @see emergencyCleanup
      */
     static void installCrashHandler();
 

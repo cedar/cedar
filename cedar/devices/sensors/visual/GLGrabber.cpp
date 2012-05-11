@@ -45,7 +45,7 @@
 
 //----------------------------------------------------------------------------------------------------
 // Constructor for a single-channel grabber
-cedar::dev::sensors::visual::GLGrabber::GLGrabber(std::string configFileName, QGLWidget* oglWidget)
+cedar::dev::sensors::visual::GLGrabber::GLGrabber(std::string configFileName, QGLWidget* qglWidget)
 :
 cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
@@ -56,7 +56,7 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
   readInit(1,"OglGrabber");
 
   // set additional parameters from the constuctor
-  getChannel(0)->mpOglWidget = oglWidget;
+  getChannel(0)->mpQGLWidget = qglWidget;
 
   // now apply the whole configuration
   applyInit();
@@ -68,8 +68,8 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
 cedar::dev::sensors::visual::GLGrabber::GLGrabber
 (
   std::string configFileName,
-  QGLWidget* oglWidget0,
-  QGLWidget* oglWidget1
+  QGLWidget* qglWidget0,
+  QGLWidget* qglWidget1
 )
 :
 cedar::dev::sensors::visual::GrabberInterface(configFileName)
@@ -81,8 +81,8 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
   readInit(2,"StereoOglGrabber");
 
   // set additional parameters from the constuctor
-  getChannel(0)->mpOglWidget = oglWidget0;
-  getChannel(1)->mpOglWidget = oglWidget1;
+  getChannel(0)->mpQGLWidget = qglWidget0;
+  getChannel(1)->mpQGLWidget = qglWidget1;
 
   // now apply the whole configuration
   applyInit();
@@ -137,7 +137,7 @@ void cedar::dev::sensors::visual::GLGrabber::onCleanUp()
   // delete all pointer-references to external widgets
   for (unsigned int channel = 0; channel < mNumCams; ++channel)
   {
-    getChannel(channel)->mpOglWidget = NULL;
+    getChannel(channel)->mpQGLWidget = NULL;
   }
 }
 
@@ -145,8 +145,8 @@ void cedar::dev::sensors::visual::GLGrabber::onCleanUp()
 void cedar::dev::sensors::visual::GLGrabber::onAddChannel()
 {
   // create the channel structure for one channel
-  OglChannelPtr channel(new OglChannel);
-  channel->mpOglWidget = NULL;
+  GLChannelPtr channel(new GLChannel);
+  channel->mpQGLWidget = NULL;
   mChannels.push_back(channel);
 }
 
@@ -175,9 +175,9 @@ bool cedar::dev::sensors::visual::GLGrabber::onGrab()
   bool ogl_valid = true;
   for(unsigned int channel=0; channel<mNumCams;++channel)
   {
-    if (getChannel(channel)->mpOglWidget != NULL)
+    if (getChannel(channel)->mpQGLWidget != NULL)
     {
-      QGLWidget* p_channel_widget = getChannel(channel)->mpOglWidget;
+      QGLWidget* p_channel_widget = getChannel(channel)->mpQGLWidget;
 
       // grab framebuffer without alpha-channel. possible values
       // GL_FRONT_LEFT, GL_FRONT_RIGHT, GL_BACK_LEFT, GL_BACK_RIGHT, GL_FRONT, GL_BACK, GL_LEFT, GL_RIGHT, GL_AUXi,
@@ -212,7 +212,7 @@ bool cedar::dev::sensors::visual::GLGrabber::onGrab()
 
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGLWidget *oglWidget)
+void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGLWidget *qglWidget)
 {
   if (channel >= mNumCams)
   {
@@ -222,7 +222,7 @@ void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGL
       "cedar::dev::sensors::visual::OglGrabber::setWidget"
     );
   }
-  if (oglWidget != NULL)
+  if (qglWidget != NULL)
   {
 
     bool restart_grabber = LoopedThread::isRunning();
@@ -234,7 +234,7 @@ void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGL
     }
 
     // change source
-    getChannel(channel)->mpOglWidget = oglWidget;
+    getChannel(channel)->mpQGLWidget = qglWidget;
     cedar::aux::LogSingleton::getInstance()->message
                                             (
                                              ConfigurationInterface::getName() + ": New Widget applied",
