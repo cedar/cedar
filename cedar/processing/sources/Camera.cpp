@@ -65,7 +65,7 @@ namespace
         "cedar.processing.sources.Camera"
       )
     );
-    input_decl->setIconPath(":/steps/video_grabber.svg");
+//    input_decl->setIconPath(":/steps/video_grabber.svg");
     cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
 
     return true;
