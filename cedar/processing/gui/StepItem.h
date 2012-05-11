@@ -105,6 +105,10 @@ public:
 
   //!@brief returns one of the data slots associated with this step
   cedar::proc::gui::DataSlotItem* getSlotItem(cedar::proc::DataRole::Id role, const std::string& name);
+
+  //!@brief returns one of the data slots associated with this step
+  cedar::proc::gui::DataSlotItem const* getSlotItem(cedar::proc::DataRole::Id role, const std::string& name) const;
+
   //!@brief returns a map of all data slots of the same id
   cedar::proc::gui::StepItem::DataSlotNameMap& getSlotItems(cedar::proc::DataRole::Id role);
 
@@ -121,6 +125,14 @@ public:
 
   //!@brief helper function to remove all connections to other graphical elements
   void disconnect();
+
+  //!@brief Checks whether there is a gui connection between this step's output and the given input of the target.
+  bool hasGuiConnection
+  (
+    const std::string& fromSlot,
+    cedar::proc::gui::StepItem* pToItem,
+    const std::string& toSlot
+  ) const;
 
 public slots:
   //!@brief handles changes in the state of a step (e.g. from error to non-error state)

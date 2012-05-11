@@ -204,6 +204,12 @@ protected:
   //!@brief Declares an output slot and immediately sets the data pointer for that slot.
   void declareOutput(const std::string& name, cedar::aux::DataPtr data);
 
+  //!@brief Declares a new promoted slot.
+  void declarePromotedData(DataSlotPtr promotedSlot);
+
+  //!@brief Removes a promoted slot.
+  void removePromotedData(DataRole::Id role, const std::string& name);
+
   //!@brief Sets the data pointer for the buffer called name.
   void setBuffer(const std::string& name, cedar::aux::DataPtr data);
 
@@ -289,7 +295,7 @@ private:
 
   //!@brief a map of slot maps, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
   std::map<DataRole::Id, SlotMap> mDataConnections;
-
+public:
   //!@brief a map of slot lists, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
   std::map<DataRole::Id, SlotList> mDataConnectionsOrder;
 

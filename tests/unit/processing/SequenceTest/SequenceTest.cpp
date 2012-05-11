@@ -45,6 +45,7 @@
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Network.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -138,13 +139,14 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
   }
   std::cout << "threaded." << std::endl;
 
-  TriggerPtr sequence_trigger(new Trigger("sequence_trigger"));
+  std::cout << "Creating network ... " << std::endl;
+  cedar::proc::NetworkPtr network (new cedar::proc::Network());
 
+  TriggerPtr sequence_trigger(new Trigger("sequence_trigger"));
+  network->add(sequence_trigger);
   TriggerPtr prev_trigger = sequence_trigger;
   std::string desired_sequence = "";
 
-  std::cout << "Creating network ... " << std::endl;
-  cedar::proc::NetworkPtr network (new cedar::proc::Network());
   /*
    * Generate the sequence in the processing framework
    */
@@ -152,7 +154,8 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
   for (size_t i = 0; i < sequenceString.size(); ++i)
   {
     MultiTriggerPtr multi_trigger(new MultiTrigger());
-
+    multi_trigger->setName("multi_trigger" + cedar::aux::toString(i));
+    network->add(multi_trigger);
     std::string chr = "";
     chr += sequenceString.at(i);
     int no_steps = atoi(chr.c_str());
@@ -167,6 +170,8 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
     for (int no = 0; no < no_steps; ++no)
     {
       ComputableTestPtr step (new ComputableTest(i, sequence_buffer, lock, runInThread));
+      step->setName("computable " + cedar::aux::toString(i) + " " + cedar::aux::toString(no));
+      network->add(step);
       steps.push_back(step);
       network->connectTrigger(prev_trigger, step);
       network->connectTrigger(step->getFinishedTrigger(), multi_trigger);
@@ -180,7 +185,9 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
   }
 
   EndStopTestPtr stop_test(new EndStopTest());
+  stop_test->setName("end_stop_test");
   network->add(stop_test);
+
   network->connectTrigger(prev_trigger, stop_test);
 
   std::cout << "Triggering sequence " << sequenceString << "." << std::endl;
