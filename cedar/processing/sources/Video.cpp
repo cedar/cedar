@@ -63,6 +63,7 @@ namespace
         "cedar.processing.sources.Video"
       )
     );
+    declaration->setIconPath(":/steps/video_grabber.svg");
     cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
 
     return true;

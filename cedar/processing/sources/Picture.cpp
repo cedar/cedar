@@ -62,7 +62,7 @@ namespace
         "cedar.processing.sources.Picture"
       )
     );
-//    input_decl->setIconPath(":/steps/gauss_input.svg");
+    declaration->setIconPath(":/steps/picture_grabber.svg");
     cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
 
     return true;
