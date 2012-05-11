@@ -49,16 +49,21 @@
 
 /*!@brief A parameter that reads a list of configurable objects from a file.
  *
- * @todo describe more.
+ * @todo Should BaseType include the pointer type?
  */
-template <class BaseType> //!@todo Should BaseType include the pointer type?
+template <class BaseType>
 class cedar::aux::ObjectListParameterTemplate : public cedar::aux::ObjectListParameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+  //!@brief a shared pointer of a BaseType object
   typedef typename boost::shared_ptr<BaseType> BaseTypePtr;
+
+  //!@brief a const shared pointer of a BaseType object
   typedef typename boost::shared_ptr<const BaseType> ConstBaseTypePtr;
+
+  //!@brief a singleton factory manager for base types
   typedef typename cedar::aux::Singleton<cedar::aux::FactoryManager<BaseTypePtr> > FactorySingleton;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -72,6 +77,12 @@ public:
   {
   }
 
+  /*!@brief Constructor.
+   *
+   * @param pOwner   The configurable that owns this parameter.
+   * @param name     The name of this parameter.
+   * @param defaults The list used as default value.
+   */
   ObjectListParameterTemplate
   (
     cedar::aux::Configurable *pOwner,
@@ -168,12 +179,14 @@ public:
     return this->at(index);
   }
 
+  //!@brief allocate and add an object at the end
   void pushBack(const std::string& typeId)
   {
     BaseTypePtr object = FactorySingleton::getInstance()->allocate(typeId);
     this->pushBack(object);
   }
 
+  //!@brief add an object at the end
   void pushBack(BaseTypePtr object)
   {
     //!@todo Check that the object is registered with the factory
@@ -183,6 +196,7 @@ public:
     this->emitChangedSignal();
   }
 
+  //!@brief remove an object at the given index
   void removeObject(size_t index)
   {
     // check the index for correctness
@@ -200,11 +214,13 @@ public:
     this->emitChangedSignal();
   }
 
+  //!@brief list all types that are registered at the factory manager
   void listTypes(std::vector<std::string>& types) const
   {
     FactorySingleton::getInstance()->listTypes(types);
   }
 
+  //!@brief returns the type id of an object
   const std::string& getTypeOfObject(cedar::aux::ConfigurablePtr object) const
   {
     BaseTypePtr base_ptr = boost::dynamic_pointer_cast<BaseType>(object);
@@ -233,6 +249,8 @@ private:
     return this->mObjectList.at(index);
   }
 
+  /*!@brief Sets the changed flag of the parameter and all the objects stored in it.
+   */
   void setChangedFlag(bool changed)
   {
     // set the changed flag for the objects managed by the parameter

@@ -150,12 +150,14 @@ public:
     this->setUpperLimit(mUpperLimitDefault);
   }
 
+  //!@brief sets the lower limit and emits a signal
   void setLowerLimit(const T& value)
   {
     this->mLimits.mLowerLimit = value;
     this->emitPropertyChangedSignal();
   }
 
+  //!@brief sets the upper limit and emits a signal
   void setUpperLimit(const T& value)
   {
     // todo: check whether the new upper limit is inside the provided extrema
@@ -163,11 +165,13 @@ public:
     this->emitPropertyChangedSignal();
   }
 
+  //!@brief returns the lower limit
   const T& getLowerLimit() const
   {
     return this->mLimits.mLowerLimit;
   }
 
+  //!@brief returns the upper limit
   const T& getUpperLimit() const
   {
     return this->mLimits.mUpperLimit;

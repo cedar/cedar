@@ -274,6 +274,45 @@ int main()
     log_file << "OK (cv::Mat_)" << std::endl;
   }
 
+#if 1
+  // std::string test
+  try
+  {
+    std::string s = "hello world";
+
+#define MYSTRINGPORT "CEDAR-UNIT-TEST-STRING"
+    Writer<std::string> myStringWriter(MYSTRINGPORT);
+    BlockingReader<std::string> myStringReader(MYSTRINGPORT);
+
+    myStringWriter.write(s);
+
+    std::string t;
+    t = myStringReader.read();
+    if (t != s)
+    {
+      mat_errors++;
+      log_file << "ERROR with std::string (1)" << std::endl;
+    }
+
+    // test sending another string (with different size)
+    std::string s2 = "lalala";
+    myStringWriter.write(s2);
+    std::string t2;
+    t2 = myStringReader.read();
+
+    if (t2 != s2)
+    {
+      mat_errors++;
+      log_file << "ERROR with std::string (2)" << std::endl;
+    }
+
+  }
+  catch (cedar::aux::ExceptionBase &E)
+  {
+    log_file << E.exceptionInfo() << std::endl;
+    return 1;
+  }
+#endif
 std::cout << "done" << std::endl;
 
   return errors;

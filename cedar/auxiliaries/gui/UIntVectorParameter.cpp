@@ -44,10 +44,12 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
 #include <iostream>
+#include <limits.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 // associate aux::gui parameter with the aux parameter
@@ -89,6 +91,8 @@ void cedar::aux::gui::UIntVectorParameter::parameterPointerChanged()
   cedar::aux::UIntVectorParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::UIntVectorParameter>(this->getParameter());
 
+
+
   QObject::connect(parameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertyChanged()));
   this->propertyChanged();
 }
@@ -97,6 +101,21 @@ void cedar::aux::gui::UIntVectorParameter::propertyChanged()
 {
   cedar::aux::UIntVectorParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::UIntVectorParameter>(this->getParameter());
+
+  unsigned int minimum = parameter->getMinimum();
+  unsigned int maximum = parameter->getMaximum();
+
+  if (maximum > static_cast<unsigned int>(std::numeric_limits<int>::max()))
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Qt's spinboxes can only display up to the maximum of int. The maximum value specified for parameter \""
+      + parameter->getName() + "\" is higher than that.",
+      "cedar::aux::gui::UIntVectorParameter::propertyChanged()"
+    );
+    maximum = std::numeric_limits<int>::max();
+  }
+
   //!@todo Don't throw away old spinboxes, reuse them instead
   // Create the appropriate amount of spinboxes
   if (this->mSpinboxes.size() != parameter->size())
@@ -115,8 +134,8 @@ void cedar::aux::gui::UIntVectorParameter::propertyChanged()
       p_widget->setMinimumHeight(20);
 
       // the limits have to be set here already so the value is set properly.
-      this->mSpinboxes.at(i)->setMinimum(parameter->getMinimum());
-      this->mSpinboxes.at(i)->setMaximum(parameter->getMaximum());
+      p_widget->setMinimum(minimum);
+      p_widget->setMaximum(maximum);
       p_widget->setValue(parameter->at(i));
       QObject::connect(p_widget, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
     }
@@ -127,8 +146,8 @@ void cedar::aux::gui::UIntVectorParameter::propertyChanged()
   // Update the spinboxes' properties
   for (size_t i = 0; i < this->mSpinboxes.size(); ++i)
   {
-    this->mSpinboxes.at(i)->setMinimum(parameter->getMinimum());
-    this->mSpinboxes.at(i)->setMaximum(parameter->getMaximum());
+    this->mSpinboxes.at(i)->setMinimum(minimum);
+    this->mSpinboxes.at(i)->setMaximum(maximum);
     this->mSpinboxes.at(i)->setEnabled(!parameter->isConstant());
   }
 }

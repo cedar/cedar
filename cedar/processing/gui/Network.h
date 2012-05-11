@@ -43,28 +43,45 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/Network.h"
 
 // SYSTEM INCLUDES
-
+#include <QObject>
+#include <boost/signals2/signal.hpp>
+#include <boost/signals2/connection.hpp>
 
 /*!@brief The representation of a cedar::proc::Network in a cedar::proc::gui::Scene.
  *
- * @todo More descriptions.
+ *        This class takes care of loading cedar::proc::Networks in a manner that allows them to be added into
+ *        cedar::proc::gui::Scenes as either the root network or a subnetwork.
  */
-class cedar::proc::gui::Network
+class cedar::proc::gui::Network : public QObject, public cedar::proc::gui::GraphicsBase
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
+  //--------------------------------------------------------------------------------------------------------------------
+  // types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //!@brief mapping from data slot names to their graphical representation
+  typedef std::map<std::string, cedar::proc::gui::DataSlotItem*> DataSlotNameMap;
+  //!@brief mapping from data role id to a map of all data slots fitting this id
+  typedef std::map<cedar::proc::DataRole::Id, DataSlotNameMap> DataSlotMap;
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Network(QMainWindow *pMainWindow, cedar::proc::gui::Scene* pScene);
+  Network
+  (
+    QMainWindow *pMainWindow,
+    cedar::proc::gui::Scene* scene,
+    qreal width = 0,
+    qreal height = 0,
+    cedar::proc::NetworkPtr network = cedar::proc::NetworkPtr()
+  );
 
   //!@brief Destructor
   ~Network();
@@ -80,14 +97,60 @@ public:
   //!@brief read network from given file
   void read(const std::string& source);
 
-  //!@brief access the underlying cedar::proc::Network
+  /*!@brief access the underlying cedar::proc::Network
+   *
+   */
+  inline cedar::proc::NetworkPtr getNetwork()
+  {
+    return this->network();
+  }
+
+  /*!@brief access the underlying cedar::proc::Network
+   *
+   * @todo Deprecate this.
+   */
   cedar::proc::NetworkPtr network();
 
   //!@brief add all elements contained in this network to the scene
-  void addToScene();
+  void addElementsToScene();
 
   //!@brief get the current file, to which the network configuration can be saved
   const std::string& getFileName() const;
+
+  //!@brief Resizes the network to fit all its contents.
+  void fitToContents();
+
+  //!@brief Adds an element to the network.
+  void addElement(cedar::proc::gui::GraphicsBase *pElement);
+
+  //!@brief Adds a list of elements to the network efficiently.
+  void addElements(const std::list<QGraphicsItem*>& elements);
+
+  //!@brief Sets the scene containing this item.
+  void setScene(cedar::proc::gui::Scene* pScene);
+
+  //!@brief reads a configuration from a node
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
+  //!@brief saves a configuration to a node
+  void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
+
+  //!@todo dupliate function in Network and StepItem - move to generic parent class
+  cedar::proc::gui::DataSlotItem* getSlotItem(cedar::proc::DataRole::Id role, const std::string& name);
+
+  //!@brief returns a map of all data slots of the same id
+  cedar::proc::gui::Network::DataSlotNameMap& getSlotItems(cedar::proc::DataRole::Id role);
+
+  void disconnect();
+
+  QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value);
+
+  bool sceneEventFilter(QGraphicsItem *pWatched, QEvent *pEvent);
+
+  cedar::proc::gui::Scene* getScene()
+  {
+    return this->mpScene;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -101,15 +164,34 @@ protected:
 private:
 
   //!@brief write scene to a node
-  void writeScene(cedar::aux::ConfigurationNode& root);
+  void writeScene(cedar::aux::ConfigurationNode& root, cedar::aux::ConfigurationNode& scene);
   //!@brief read scene from a node
   void readScene(cedar::aux::ConfigurationNode& root);
 
-  //!@brief add all steps contained in this network to a scene
-  void addStepsToScene();
+  //!@brief Reacts to elements being added in the underlying network.
+  void elementAdded(cedar::proc::Network* network, cedar::proc::ElementPtr pElement);
 
-  //!@brief add all triggers contained in this network to a scene
-  void addTriggersToScene();
+  //!@brief Determines whether the network is the root network.
+  bool isRootNetwork();
+
+  void checkSlots();
+
+  void checkDataItems();
+
+  //!@brief Transforms the coordinates of a newly added child into the network's coordinate system.
+  void transformChildCoordinates(cedar::proc::gui::GraphicsBase* pItem);
+
+  void checkDataConnection(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target, bool added);
+
+  void checkTriggerConnection(cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool added);
+
+  void processStepAddedSignal(cedar::proc::ElementPtr);
+
+  void processStepRemovedSignal(cedar::proc::ConstElementPtr);
+
+private slots:
+  //!@brief Updates the label of the network.
+  void networkNameChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -119,18 +201,42 @@ protected:
 private:
   //!@brief represented network
   cedar::proc::NetworkPtr mNetwork;
+
   //!@brief a scene, which displays the elements contained in this network
   cedar::proc::gui::Scene* mpScene;
+
   //!@brief a filename from which to load a network configuration, or to which to save a configuration
   std::string mFileName;
+
   //!@brief a main window
   QMainWindow *mpMainWindow;
 
+  //!@brief a map of all data slots of the current step
+  DataSlotMap mSlotMap;
+
   //!@brief a vector of steps, which contains all steps that should be added to the scene after reading a configuration
   std::vector<cedar::proc::gui::StepItem*> mpStepsToAdd;
+
   //!@brief a vector of triggers, which contains all steps that should be added to the scene
   //        after reading a configuration
   std::vector<cedar::proc::gui::TriggerItem*> mpTriggersToAdd;
+
+  //!@brief a vector of steps, which contains all steps that should be added to the scene after reading a configuration
+  std::vector<cedar::proc::gui::Network*> mpNetworksToAdd;
+
+  //! Connection to Network's slot changed signal.
+  boost::signals2::connection mSlotConnection;
+  boost::signals2::connection mNewElementAddedConnection;
+  boost::signals2::connection mElementRemovedConnection;
+  boost::signals2::connection mTriggerConnectionChangedConnection;
+  boost::signals2::connection mDataConnectionChangedConnection;
+
+  //! Fit to contents-calls are temporarily disabled if this is set to true.
+  bool mHoldFitToContents;
+
+  //! Text item used for displaying the name of the network.
+  QGraphicsTextItem *mpNameDisplay;
+
 }; // class cedar::proc::gui::NetworkFile
 
 #endif // CEDAR_PROC_GUI_NETWORK_FILE_H

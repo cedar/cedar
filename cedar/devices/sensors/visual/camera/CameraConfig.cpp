@@ -34,6 +34,10 @@
 
 ======================================================================================================================*/
 
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_LIB_DC1394
+
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/camera/CameraConfig.h"
 #include "cedar/devices/sensors/visual/camera/CameraIsoSpeed.h"
@@ -157,4 +161,4 @@ bool cedar::dev::sensors::visual::CameraConfig::declareParameter()
   return result;
 }
 
-
+#endif // CEDAR_USE_LIB_DC1394

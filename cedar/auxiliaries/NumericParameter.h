@@ -58,6 +58,7 @@ class cedar::aux::NumericParameter : public cedar::aux::ParameterTemplate<T>
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Type of limits used by this parameter.
   typedef cedar::aux::math::Limits<T> LimitType;
 
   //--------------------------------------------------------------------------------------------------------------------

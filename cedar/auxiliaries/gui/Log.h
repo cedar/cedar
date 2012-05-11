@@ -62,7 +62,7 @@ private:
   class LogInterface : public cedar::aux::LogInterface
   {
     public:
-      LogInterface(Log *pLog)
+      LogInterface(Log* pLog)
       :
       mpLog(pLog)
       {
@@ -79,7 +79,7 @@ private:
       }
 
     private:
-      Log *mpLog;
+      Log* mpLog;
   };
 
   CEDAR_GENERATE_POINTER_TYPES(LogInterface);
@@ -98,6 +98,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief log a message with a given log level
   void message
   (
     cedar::aux::LOG_LEVEL level,
@@ -105,15 +106,24 @@ public:
     const std::string& title
   );
 
+  /*!@brief Installs the handlers that redirect log messages to this widget.
+   *
+   *        Before calling this method, the log will not display anything. Also, remember to uninstall them when the
+   *        log's parent is destroyed!
+   */
   void installHandlers(bool removeMessages = true);
 
+  /*!@brief Removes the handlers that redirect log messages to this widget.
+   */
   void uninstallHandlers();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+signals:
+  //!@brief signals reception of a signal
+  void messageReceived(int type, QString title, QString message);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -126,10 +136,14 @@ private:
   void postMessage
   (
     QTableWidget* pTable,
-    const std::string& message,
-    const std::string& title,
-    const std::string& icon = ""
+    const QString& message,
+    const QString& title,
+    const QString& icon = ""
   );
+
+private slots:
+  void printMessage(int type, QString title, QString message);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

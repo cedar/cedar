@@ -37,6 +37,10 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAPABILITIES_H
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAPABILITIES_H
 
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_LIB_DC1394
+
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/CameraGrabber.h"
 #include "cedar/auxiliaries/ConfigurationInterface.h"
@@ -192,6 +196,6 @@ private:
 
 }; // class cedar::dev::sensors::visual::CameraCapabilities
 
+#endif // CEDAR_USE_LIB_DC1394
+
 #endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAPABILITIES_H
-
-

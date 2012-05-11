@@ -65,6 +65,7 @@ namespace cedar {
 struct BasicNetHeader
 {
   unsigned int mMagicNumber;
+  size_t       mDataSize; // this is highly-architecture dependant!
 };
 
 } } } } // end namespaces

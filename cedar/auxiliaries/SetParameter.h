@@ -61,6 +61,7 @@ class cedar::aux::SetParameter : public cedar::aux::Parameter
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief a const iterator typedef
   typedef typename std::set<T>::const_iterator const_iterator;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -170,11 +171,13 @@ public:
     return this->mValues.size();
   }
 
+  //!@brief returns a const iterator to the first element of the set
   const_iterator begin() const
   {
     return this->mValues.begin();
   }
 
+  //!@brief returns a const iterator to the end of the set
   const_iterator end() const
   {
     return this->mValues.end();

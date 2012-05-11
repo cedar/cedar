@@ -44,6 +44,8 @@
 #include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetReader.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetReader.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/std/StringHelper.h"
 
 // PROJECT INCLUDES
 
@@ -90,10 +92,10 @@ namespace cedar {
  * The incoming data is buffered in the background between reads, but the
  * buffer will only always contain one element - the newest one.
  *
- * Valid instantiations are: BlockingReader<char>, NetBlockingReader<unsigned char>, NetBlockingReader<short>,
- * BlockingReader<unsigned short>, NetBlockingReader<int>, NetBlockingReader<unsigned int>, NetBlockingReader<long>,
- * BlockingReader<unsigned long>, NetBlockingReader<float>, NetBlockingReader<double>, NetBlockingReader<bool>,
- * BlockingReader<cv::Mat>, NetBlockingReader< cv::Mat_<float>  
+ * Valid instantiations are: BlockingReader<char>, BlockingReader<unsigned char>, BlockingReader<short>,
+ * BlockingReader<unsigned short>, BlockingReader<int>, BlockingReader<unsigned int>, BlockingReader<long>,
+ * BlockingReader<unsigned long>, BlockingReader<float>, BlockingReader<double>, BlockingReader<bool>,
+ * BlockingReader<cv::Mat>, BlockingReader< cv::Mat_<float>, BlockingReader< std::string >
  * @see: Reader, Writer
  */
 template <typename T>
@@ -139,7 +141,7 @@ template <>
 class BlockingReader<char> : public cedar::aux::net::detail::SimpleNetReader<char, true>
 { 
 public:
-  //!@brief use this constructor. See BlockingReader::NetBlockingReader for details.
+  //!@brief use this constructor. See BlockingReader::BlockingReader for details.
   explicit BlockingReader(const std::string &s) 
                            : cedar::aux::net::detail::SimpleNetReader<char, true>(s)
   {
@@ -286,6 +288,23 @@ public:
   //!@brief use this constructor. See BlockingReader for details.
   explicit BlockingReader(const std::string &s) 
                        : cedar::aux::net::detail::SimpleNetReader<float, true>(s)
+  {
+  }
+};
+
+  //---------------------------------------------------------------------------
+  // template specialization for std::string
+  //---------------------------------------------------------------------------
+
+//!@brief float specialization, see BlockingReader for details.
+template <>
+class BlockingReader<std::string> : public cedar::aux::net::detail::StringHelper<std::string>,
+                            public cedar::aux::net::detail::CollatedNetReader<std::string, true>
+{ 
+public:
+  //!@brief use this constructor. See BlockingReader for details.
+  explicit BlockingReader(const std::string &s) 
+                       : cedar::aux::net::detail::CollatedNetReader<std::string, true>(s)
   {
   }
 };
