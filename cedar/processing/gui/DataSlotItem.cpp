@@ -85,7 +85,7 @@ mSlot(slot)
   {
     if (ext_data->isCollection())
     {
-      this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_DIAMOND);
+      //this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_DIAMOND);
     }
 
     if (!ext_data->isMandatory())
@@ -283,11 +283,6 @@ void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOption
     if (ext_data->isCollection())
     {
       this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_DIAMOND);
-    }
-
-    if (!ext_data->isMandatory())
-    {
-      this->setOutlineColor(QColor(140, 140, 140));
     }
   }
   if (mSlot->isPromoted())

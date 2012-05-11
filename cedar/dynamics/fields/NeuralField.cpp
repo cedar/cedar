@@ -167,11 +167,6 @@ _mSigmoid
 _mLateralKernelConvolution(new cedar::aux::conv::Convolution()),
 _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 {
-  //!@todo This call should not be necessary, rather, the vector should do that in its own.
-
-  //default is two modes/kernels for lateral interaction
-  QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
-  
   this->declareBuffer("activation", mActivation);
   this->declareBuffer("lateral interaction", mLateralInteraction);
   this->declareBuffer("lateral kernel", this->_mLateralKernelConvolution->getCombinedKernel());
@@ -232,7 +227,6 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   this->_mKernels->connectToObjectRemovedSignal(boost::bind(&cedar::dyn::NeuralField::removeKernelFromConvolution, this, _1));
 
   this->transferKernelsToConvolution();
-
 
   // now check the dimensionality and sizes of all matrices
   this->updateMatrices();
