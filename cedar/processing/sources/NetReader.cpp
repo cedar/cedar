@@ -22,7 +22,7 @@ s
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NetReaderSource.cpp
+    File:        NetReader.cpp
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
@@ -65,10 +65,10 @@ namespace
 
     ElementDeclarationPtr input_declaration
     (
-      new ElementDeclarationTemplate<cedar::proc::steps::NetReaderSource>
+      new ElementDeclarationTemplate<cedar::proc::sources::NetReader>
       (
         "Utilities",
-        "cedar.processing.steps.NetReader"
+        "cedar.processing.sources.NetReader"
       )
     );
     input_declaration->setIconPath(":/steps/net_reader.svg");
@@ -83,7 +83,7 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::steps::NetReaderSource::NetReaderSource()
+cedar::proc::sources::NetReader::NetReader()
 :
 mOutput(new cedar::aux::MatData(cv::Mat())),
 // outputs
@@ -100,7 +100,7 @@ mpReader(NULL)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::steps::NetReaderSource::onStart()
+void cedar::proc::sources::NetReader::onStart()
 {
   // instantiate the reader, if not yet done
   if (mpReader == NULL)
@@ -125,14 +125,14 @@ void cedar::proc::steps::NetReaderSource::onStart()
   }
 }
 
-void cedar::proc::steps::NetReaderSource::onStop()
+void cedar::proc::sources::NetReader::onStop()
 {
   if (mpReader != NULL)
     delete mpReader;
   mpReader= NULL;
 }
 
-void cedar::proc::steps::NetReaderSource::compute(const cedar::proc::Arguments&)
+void cedar::proc::sources::NetReader::compute(const cedar::proc::Arguments&)
 {
   if (mpReader == NULL)
     return;
