@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/Settings.h"
@@ -121,11 +122,34 @@ cedar::proc::gui::StepItem::~StepItem()
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
   mStateChangedConnection.disconnect();
+
+  if (this->scene())
+  {
+    cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->removeStepItem(this);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::gui::StepItem::hasGuiConnection
+     (
+       const std::string& fromSlot,
+       cedar::proc::gui::StepItem* pToItem,
+       const std::string& toSlot
+     ) const
+{
+  CEDAR_DEBUG_ASSERT(pToItem != NULL);
+
+  cedar::proc::gui::DataSlotItem const* p_source_slot = this->getSlotItem(cedar::proc::DataRole::OUTPUT, fromSlot);
+  CEDAR_DEBUG_ASSERT(p_source_slot != NULL);
+
+  cedar::proc::gui::DataSlotItem const* p_target_slot = pToItem->getSlotItem(cedar::proc::DataRole::INPUT, toSlot);
+  CEDAR_DEBUG_ASSERT(p_target_slot != NULL);
+
+  return p_source_slot->hasGuiConnectionTo(p_target_slot);
+}
 
 void cedar::proc::gui::StepItem::stepStateChanged()
 {
@@ -164,6 +188,7 @@ void cedar::proc::gui::StepItem::redraw()
 
 void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 {
+  this->setElement(step);
   this->mStep = step;
   this->mClassId = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(this->mStep);
 
@@ -176,7 +201,6 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
   this->addDataItems();
   this->addTriggerItems();
 
-//  QObject::connect(step.get(), SIGNAL(stateChanged()), this, SLOT(stepStateChanged()));
   mStateChangedConnection = step->connectToStateChanged(boost::bind(&cedar::proc::gui::StepItem::stepStateChanged, this));
   QObject::connect(step.get(), SIGNAL(nameChanged()), this, SLOT(redraw()));
 }
@@ -273,11 +297,23 @@ void cedar::proc::gui::StepItem::addDataItems()
 }
 
 cedar::proc::gui::DataSlotItem* cedar::proc::gui::StepItem::getSlotItem
-                                                              (
-                                                                cedar::proc::DataRole::Id role, const std::string& name
-                                                              )
+                                (
+                                  cedar::proc::DataRole::Id role, const std::string& name
+                                )
 {
-  DataSlotMap::iterator role_map = this->mSlotMap.find(role);
+  return const_cast<cedar::proc::gui::DataSlotItem*>
+         (
+           static_cast<cedar::proc::gui::StepItem const*>(this)->getSlotItem(role, name)
+         );
+}
+
+cedar::proc::gui::DataSlotItem const* cedar::proc::gui::StepItem::getSlotItem
+                                      (
+                                        cedar::proc::DataRole::Id role,
+                                        const std::string& name
+                                      ) const
+{
+  DataSlotMap::const_iterator role_map = this->mSlotMap.find(role);
 
   if (role_map == this->mSlotMap.end())
   {
@@ -286,7 +322,7 @@ cedar::proc::gui::DataSlotItem* cedar::proc::gui::StepItem::getSlotItem
                                                    );
   }
 
-  DataSlotNameMap::iterator iter = role_map->second.find(name);
+  DataSlotNameMap::const_iterator iter = role_map->second.find(name);
   if (iter == role_map->second.end())
   {
     CEDAR_THROW(cedar::proc::InvalidNameException, "No slot item named \"" + name +
@@ -432,7 +468,18 @@ void cedar::proc::gui::StepItem::showPlot
 
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
+  cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+  CEDAR_DEBUG_ASSERT(p_scene);
+
   QMenu menu;
+
+  if (this->scene()->selectedItems().size() > 1)
+  {
+    p_scene->networkGroupingContextMenuEvent(menu);
+    menu.exec(event->screenPos());
+    return;
+  }
+
   QMenu *p_data = menu.addMenu("data");
 
   menu.addSeparator();
@@ -461,7 +508,11 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     }
   }
 
-  QAction *p_delete_action = menu.addAction("delete");
+  menu.addSeparator();
+  p_scene->networkGroupingContextMenuEvent(menu);
+
+  //!@todo Implement delete action.
+//  QAction *p_delete_action = menu.addAction("delete");
 
   // Actions for data plotting -----------------------------------------------------------------------------------------
   std::map<QAction*, cedar::aux::Enum> action_type_map;
@@ -546,10 +597,10 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     this->showPlot(event->screenPos(), p_plotter, slot);
   }
   // delete the step
-  else if (a == p_delete_action)
-  {
-    //!@todo
-  }
+//  else if (a == p_delete_action)
+//  {
+//    //!@todo
+//  }
 }
 
 void cedar::proc::gui::StepItem::plotAll(const QPoint& position)
@@ -670,25 +721,4 @@ cedar::proc::StepPtr cedar::proc::gui::StepItem::getStep()
 
 void cedar::proc::gui::StepItem::disconnect()
 {
-  // go through all DataSlots and remove connections
-  for (size_t i = 0; i < cedar::proc::DataRole::type().list().size(); ++i)
-  {
-    cedar::proc::DataRole::Id id = cedar::proc::DataRole::type().list().at(i);
-    if (id == cedar::aux::Enum::UNDEFINED)
-    {
-      continue;
-    }
-    cedar::proc::gui::StepItem::DataSlotNameMap& map = dynamic_cast<cedar::proc::gui::StepItem*>(this)->getSlotItems(id);
-    for (cedar::proc::gui::StepItem::DataSlotNameMap::iterator it = map.begin(); it != map.end(); ++it)
-    {
-      it->second->removeAllConnections();
-    }
-  }
-
-  // go through all triggers and remove their connections as well
-  for (size_t i = 0; i < this->mTriggers.size(); ++i)
-  {
-    cedar::proc::gui::TriggerItem* p_trigger = this->mTriggers.at(i);
-    p_trigger->removeAllConnections();
-  }
 }

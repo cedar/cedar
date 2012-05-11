@@ -36,14 +36,13 @@
 
 #TODO fix include of kuka/gui/FriStatusWidget if FRI is not installed
 cedar_add_library(cedardev
-  MOC_HEADERS
-  robot/gui/KinematicChainWidget.h
-  robot/gui/KinematicChainMonitorWidget.h
-  robot/gui/KinematicChainCommandWidget.h
-  kteam/gui/EPuckControlWidget.h
-  communication/gui/CommunicationWidget.h
-  kuka/gui/FriStatusWidget.h
-  LINK_LIBRARIES
-  cedaraux
-)
-
+                  MOC_HEADERS
+                  robot/gui/KinematicChainWidget.h
+                  robot/gui/KinematicChainMonitorWidget.h
+                  robot/gui/KinematicChainCommandWidget.h
+                  kteam/gui/EPuckControlWidget.h
+                  communication/gui/CommunicationWidget.h
+                  kuka/gui/FriStatusWidget.h
+                  LINK_LIBRARIES
+                  cedaraux
+                  )

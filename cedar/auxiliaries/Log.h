@@ -137,7 +137,7 @@ public:
   }
   
   //!@brief log a message with log level debug
-  inline void debugMessage(const std::string& message, const std::string& source, const std::string& title = "")
+  inline void debugMessage(const std::string& message, const std::string& source = "debug", const std::string& title = "")
   {
     this->debugLog(cedar::aux::LOG_LEVEL_DEBUG, message, source, title);
   }
