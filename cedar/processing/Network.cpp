@@ -87,15 +87,7 @@ cedar::proc::Network::~Network()
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
   // read out all elements and call this->remove for each element
-  std::vector<cedar::proc::ElementPtr> elements;
-  for (ElementMapIterator it = mElements.begin(); it != mElements.end(); ++it)
-  {
-    elements.push_back(it->second);
-  }
-  for (unsigned int i = 0; i < elements.size(); ++i)
-  {
-    this->remove(elements.at(i));
-  }
+  this->removeAll();
 
   mDataConnections.clear();
   mTriggerConnections.clear();
@@ -243,6 +235,12 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
       ++trigger_con;
     }
   }
+  // now, if the removed element is a network, delete all its children
+  if (cedar::proc::NetworkPtr network = this->getElement<cedar::proc::Network>(element->getName()))
+  {
+    network->removeAll();
+  }
+
   cedar::proc::Network::ElementMap::iterator it = mElements.find(element->getName());
   if (it != this->mElements.end())
   {
@@ -1327,4 +1325,18 @@ void cedar::proc::Network::processPromotedSlots()
 const cedar::proc::Network::DataConnectionVector& cedar::proc::Network::getDataConnections() const
 {
   return this->mDataConnections;
+}
+
+void cedar::proc::Network::removeAll()
+{
+  // read out all elements and call this->remove for each element
+  std::vector<cedar::proc::ElementPtr> elements;
+  for (ElementMapIterator it = mElements.begin(); it != mElements.end(); ++it)
+  {
+    elements.push_back(it->second);
+  }
+  for (unsigned int i = 0; i < elements.size(); ++i)
+  {
+    this->remove(elements.at(i));
+  }
 }

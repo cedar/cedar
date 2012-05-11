@@ -979,22 +979,31 @@ void cedar::proc::gui::Network::checkDataConnection
        cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target, bool added
      )
 {
-  cedar::proc::gui::DataSlotItem* source_slot
-    = dynamic_cast<cedar::proc::gui::StepItem*>
-      (
-        this->mpScene->getGraphicsItemFor
-        (
-          this->network()->getElement(source->getParent()).get()
-        )
-      )->getSlotItem(cedar::proc::DataRole::OUTPUT, source->getName());
-  cedar::proc::gui::DataSlotItem* target_slot
-    = dynamic_cast<cedar::proc::gui::StepItem*>
-      (
-        this->mpScene->getGraphicsItemFor
-        (
-          this->network()->getElement(target->getParent()).get()
-        )
-      )->getSlotItem(cedar::proc::DataRole::INPUT, target->getName());
+  cedar::proc::gui::DataSlotItem* source_slot = NULL;
+  cedar::proc::gui::GraphicsBase* p_base_source
+    = this->mpScene->getGraphicsItemFor(this->network()->getElement(source->getParent()).get());
+  if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_base_source))
+  {
+    source_slot = p_step_item->getSlotItem(cedar::proc::DataRole::OUTPUT, source->getName());
+  }
+  else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_base_source))
+  {
+    source_slot = p_network_item->getSlotItem(cedar::proc::DataRole::OUTPUT, source->getName());
+  }
+  CEDAR_ASSERT(source_slot);
+
+  cedar::proc::gui::DataSlotItem* target_slot = NULL;
+  cedar::proc::gui::GraphicsBase* p_base
+    = this->mpScene->getGraphicsItemFor(this->network()->getElement(target->getParent()).get());
+  if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_base))
+  {
+    target_slot = p_step_item->getSlotItem(cedar::proc::DataRole::INPUT, target->getName());
+  }
+  else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_base))
+  {
+    target_slot = p_network_item->getSlotItem(cedar::proc::DataRole::INPUT, target->getName());
+  }
+  CEDAR_ASSERT(target_slot);
 
   if (added)
   {
