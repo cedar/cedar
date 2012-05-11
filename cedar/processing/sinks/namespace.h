@@ -1,7 +1,7 @@
-/*======================================================================================================================
+/*=============================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -17,29 +17,27 @@
     You should have received a copy of the GNU Lesser General Public License
     along with cedar. If not, see <http://www.gnu.org/licenses/>.
 
-========================================================================================================================
+===============================================================================
 
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
     File:        namespace.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 19
+    Maintainer:  Jean-Stephane Jokeit
+    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
+    Date:        Fri 11 May 2012
 
-    Description: Namespace file for cedar::proc::source.
+    Description:
 
     Credits:
 
-======================================================================================================================*/
+=============================================================================*/
 
-#ifndef CEDAR_PROC_SOURCES_NAMESPACE_H
-#define CEDAR_PROC_SOURCES_NAMESPACE_H
+#ifndef CEDAR_PROC_SINKS_NAMESPACE_H
+#define CEDAR_PROC_SINKS_NAMESPACE_H
+
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/lib.h"
@@ -50,23 +48,18 @@
 
 namespace cedar
 {
-  /*!@brief Namespace for all processing classes. */
   namespace proc
   {
-    namespace sources
+    /*!@brief Namespace for processing sinks. */
+    namespace sinks
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(GaussInput);
-      CEDAR_DECLARE_PROC_CLASS(Camera);
-      CEDAR_DECLARE_PROC_CLASS(Picture);
-      CEDAR_DECLARE_PROC_CLASS(Video);
-
 #ifdef CEDAR_USE_YARP
-      CEDAR_DECLARE_PROC_CLASS(NetReader);
-#endif      
+      CEDAR_DECLARE_PROC_CLASS(NetWriter);
+#endif
       //!@endcond
     }
   }
 }
 
-#endif // CEDAR_PROC_SOURCES_NAMESPACE_H
+#endif // CEDAR_PROC_STEPS_NAMESPACE_H

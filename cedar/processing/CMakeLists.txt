@@ -39,7 +39,7 @@
 #=======================================================================================================================
 
 if(CEDAR_USE_YARP)
-  SET(yarp_moc_headers steps/NetWriter.h sources/NetReader.h)
+  SET(yarp_moc_headers sinks/NetWriter.h sources/NetReader.h)
 else()
   SET(yarp_moc_headers "")
 endif()

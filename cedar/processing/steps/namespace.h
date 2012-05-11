@@ -59,9 +59,8 @@ namespace cedar
       CEDAR_DECLARE_PROC_CLASS(Resize);
 
 #ifdef CEDAR_USE_YARP
-      // ...
+      CEDAR_DECLARE_PROC_CLASS(NetWriterSink);
 #endif
-
       //!@endcond
     }
   }

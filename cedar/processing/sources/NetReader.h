@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NetReaderSource.h
+    File:        NetReader.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
@@ -42,7 +42,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/processing/steps/namespace.h"
+#include "cedar/processing/sources/namespace.h"
 
 // PROJECT INCLUDES
 #include "cedar/processing/Step.h"
@@ -52,16 +52,8 @@
 
 // SYSTEM INCLUDES
 
-namespace cedar {
-  namespace proc {
-    namespace steps {
-      class NetReaderSource;
-    }
-  }
-}
-
 /*!@brief a step which reads a matrix over the network (needs YARP) */
-class cedar::proc::steps::NetReaderSource : public cedar::proc::Step
+class cedar::proc::sources::NetReader : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -72,7 +64,7 @@ class cedar::proc::steps::NetReaderSource : public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  NetReaderSource();
+  NetReader();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -112,7 +104,7 @@ protected:
 
 private:
 
-}; // class cedar::proc::steps::NetReaderSource
+}; // class cedar::proc::sources::NetReader
 
 #endif
 

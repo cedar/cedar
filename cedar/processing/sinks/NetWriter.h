@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NetWriterSink.h
+    File:        NetWriter.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
@@ -41,7 +41,7 @@
 #ifdef CEDAR_USE_YARP
 
 // LOCAL INCLUDES
-#include "cedar/processing/steps/namespace.h"
+#include "cedar/processing/sinks/namespace.h"
 
 // PROJECT INCLUDES
 #include "cedar/processing/Step.h"
@@ -51,16 +51,8 @@
 
 // SYSTEM INCLUDES
 
-namespace cedar {
-  namespace proc {
-    namespace steps {
-      class NetWriterSink;
-    }
-  }
-}
-
 /*!@brief A step which sends matrices over the network (needs YARP)  */
-class cedar::proc::steps::NetWriterSink : public cedar::proc::Step
+class cedar::proc::sinks::NetWriter : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -71,7 +63,7 @@ class cedar::proc::steps::NetWriterSink : public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  NetWriterSink();
+  NetWriter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -123,7 +115,7 @@ protected:
 
 private:
 
-}; // class cedar::proc::steps::NetWriterSink
+}; // class cedar::proc::sinks::NetWriter
 
 #endif // CEDAR_USE_YARP
 

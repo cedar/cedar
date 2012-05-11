@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NetWriterSink.cpp
+    File:        NetWriter.cpp
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
@@ -38,7 +38,7 @@
 #ifdef CEDAR_USE_YARP
 
 // LOCAL INCLUDES
-#include "cedar/processing/steps/NetWriter.h"
+#include "cedar/processing/sinks/NetWriter.h"
 
 // PROJECT INCLUDES
 #include "cedar/processing/DataSlot.h"
@@ -63,10 +63,10 @@ namespace
 
     ElementDeclarationPtr input_declaration
     (
-      new ElementDeclarationTemplate<cedar::proc::steps::NetWriterSink>
+      new ElementDeclarationTemplate<cedar::proc::sinks::NetWriter>
       (
         "Utilities",
-        "cedar.processing.steps.NetWriter"
+        "cedar.processing.sinks.NetWriter"
       )
     );
     input_declaration->setIconPath(":/steps/net_writer.svg");
@@ -81,7 +81,7 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::steps::NetWriterSink::NetWriterSink()
+cedar::proc::sinks::NetWriter::NetWriter()
 :
 // outputs
 mInput(new cedar::aux::MatData(cv::Mat())),
@@ -96,7 +96,7 @@ mpWriter(NULL)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::steps::NetWriterSink::onStart()
+void cedar::proc::sinks::NetWriter::onStart()
 {
   // instantiate the reader, if not yet done
   if (mpWriter == NULL)
@@ -115,7 +115,7 @@ void cedar::proc::steps::NetWriterSink::onStart()
   }
 }
 
-void cedar::proc::steps::NetWriterSink::onStop()
+void cedar::proc::sinks::NetWriter::onStop()
 {
   if (mpWriter != NULL)
     delete mpWriter;
@@ -123,7 +123,7 @@ void cedar::proc::steps::NetWriterSink::onStop()
 }
 
 
-void cedar::proc::steps::NetWriterSink::compute(const cedar::proc::Arguments&)
+void cedar::proc::sinks::NetWriter::compute(const cedar::proc::Arguments&)
 {
   if (mpWriter == NULL)
     return;
@@ -141,7 +141,7 @@ void cedar::proc::steps::NetWriterSink::compute(const cedar::proc::Arguments&)
   }
 }
 
-cedar::proc::DataSlot::VALIDITY cedar::proc::steps::NetWriterSink::determineInputValidity
+cedar::proc::DataSlot::VALIDITY cedar::proc::sinks::NetWriter::determineInputValidity
                                 (
                                   cedar::proc::ConstDataSlotPtr CEDAR_DEBUG_ONLY(slot),
                                   cedar::aux::DataPtr data
@@ -171,7 +171,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::NetWriterSink::determineInpu
   }
 }
 
-void cedar::proc::steps::NetWriterSink::inputConnectionChanged(const std::string& inputName)
+void cedar::proc::sinks::NetWriter::inputConnectionChanged(const std::string& inputName)
 {
   // Again, let's first make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(inputName == "input");
