@@ -87,6 +87,7 @@ the oldest versions supported, unless noted otherwise.
 optional dependencies:
    * YARP 2.3.6 (for YARP features like network connectivity)
    * libDC1394 (for firewire cameras)
+   * fftw-3.2.2 (for FFT-based convolutions)
 
 === Clone the cedar repository ===
 
