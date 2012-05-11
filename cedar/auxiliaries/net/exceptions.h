@@ -59,6 +59,13 @@ class cedar::aux::net::NetUnexpectedDataException : public cedar::aux::Exception
 {
 }; // class 
 
+/*!@brief exception for when the transmitted data is explicitly not handled
+ *
+ */
+class cedar::aux::net::NetUnhandledDataException : public cedar::aux::net::NetUnexpectedDataException
+{
+}; // class 
+
 /*!@brief exception for when the communication 'channel' was not (yet) set up
  *
  */

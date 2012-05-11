@@ -74,6 +74,7 @@ namespace cedar
       /* exceptions */
       CEDAR_DECLARE_AUX_CLASS(NetMissingRessourceException);
       CEDAR_DECLARE_AUX_CLASS(NetUnexpectedDataException);
+      CEDAR_DECLARE_AUX_CLASS(NetUnhandledDataException);
       CEDAR_DECLARE_AUX_CLASS(NetWaitingForWriterException);
       //!@endcond
 
