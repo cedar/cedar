@@ -37,6 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/PluginDeclaration.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/xml_parser.hpp>
@@ -71,7 +72,11 @@ void cedar::proc::PluginDeclaration::readDescription(const std::string& filePath
   if (descriptions.find("plugin") == descriptions.not_found())
   {
     // ok, if no root node is present, continue
-    std::cout << "Plugin description doesn't have the right root node (\"plugin\" node not found)." << std::endl;
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Plugin description file \"" + filePath +  "\"doesn't have the right root node (\"plugin\" node not found).",
+      "cedar::proc::PluginDeclaration::readDescription(const std::string&)"
+    );
     return;
   }
 
@@ -90,8 +95,12 @@ void cedar::proc::PluginDeclaration::readDescription(const std::string& filePath
     }
     else
     {
-      std::cout << "Warning: found an unhandled node type in cedar::proc::PluginDeclaration::readDescription for \""
-          << filePath << "\". Unhandled type is: \"" << type << "\"" << std::endl;
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Found an unhandled node type in cedar::proc::PluginDeclaration::readDescription for \""
+          + filePath + "\". Unhandled type is: \"" + type + "\"",
+        "cedar::proc::PluginDeclaration::readDescription(const std::string&)"
+      );
     }
   }
 }
@@ -111,8 +120,12 @@ void cedar::proc::PluginDeclaration::readDeclarations(const cedar::aux::Configur
     }
     else
     {
-      std::cout << "Warning: found an unhandled node type in cedar::proc::PluginDeclaration::readDeclarations"
-          << "Unhandled type is: \"" << type << "\"" << std::endl;
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Found an unhandled node type in cedar::proc::PluginDeclaration::readDeclarations Unhandled type is: \""
+          + type + "\"",
+        "cedar::proc::PluginDeclaration::readDeclarations(const cedar::aux::ConfigurationNode&)"
+      );
     }
   }
 }

@@ -98,6 +98,36 @@ namespace cedar
       {
         return std::max(lower, std::min(value, upper));
       }
+      
+      /*!@brief   Function that checks whether a matrix has the correct type.
+       *
+       * @returns True, if mat.type() corresponds to the given T (e.g., if mat.type() == CV_32F and T == float),
+       *          false otherwise.
+       */
+      template <typename T>
+      inline bool matrixTypeCheck(const cv::Mat&)
+      {
+        // this should not happen because the actual type-check is implemented in the template specializations.
+        CEDAR_THROW(cedar::aux::UnhandledTypeException, "The given matrix type check is not implemented.");
+      }
+
+      /*!@brief Template specialization for matrixTypeCheck with double/CV_64F.
+       *
+       */
+      template <>
+      inline bool matrixTypeCheck<double>(const cv::Mat& mat)
+      {
+        return mat.type() == CV_64F;
+      }
+
+      /*!@brief Template specialization for matrixTypeCheck with double/CV_64F.
+       *
+       */
+      template <>
+      inline bool matrixTypeCheck<float>(const cv::Mat& mat)
+      {
+        return mat.type() == CV_32F;
+      }
 
       //!@brief a helper function to determine the real dimensionality of a cv::Mat (matrix.dims works only for 2+ dims)
       inline unsigned int getDimensionalityOf(const cv::Mat& matrix)

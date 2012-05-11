@@ -41,7 +41,7 @@
 #include <iostream>
 
 // COLOR DEFINES
-#ifdef __linux
+#ifdef CEDAR_OS_LINUX
 #define COLOR_DARK_GRAY "1;30m"
 #define COLOR_LIGHT_GRAY "0;37m"
 #define COLOR_WHITE "1m"
@@ -54,7 +54,7 @@
 #define COLOR_LIGHT_RED "1;31m"
 #define COLOR(COLOR_CONSTANT) "\033[" COLOR_CONSTANT
 #define COLOR_CLEAR "\E[m"
-#endif // __linux
+#endif // CEDAR_OS_LINUX
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -79,26 +79,26 @@ void cedar::aux::ConsoleLog::message(cedar::aux::LOG_LEVEL level, const std::str
   {
     case cedar::aux::LOG_LEVEL_ERROR:
       std::cerr 
-#ifdef __linux
+#ifdef CEDAR_OS_LINUX
                 << COLOR(COLOR_RED)
-#endif // __linux
+#endif // CEDAR_OS_LINUX
                 << "error> " << formatted_message
-#ifdef __linux
+#ifdef CEDAR_OS_LINUX
                 << COLOR_CLEAR
-#endif // __linux
+#endif // CEDAR_OS_LINUX
                 << std::endl;
       break;
     
     case cedar::aux::LOG_LEVEL_WARNING:
       std::cout 
-#ifdef __linux
+#ifdef CEDAR_OS_LINUX
                 << COLOR(COLOR_BROWN)
-#endif // __linux
+#endif // CEDAR_OS_LINUX
                 << "warning> "
                 << formatted_message
-#ifdef __linux
+#ifdef CEDAR_OS_LINUX
                 << COLOR_CLEAR
-#endif // __linux
+#endif // CEDAR_OS_LINUX
                 << std::endl;
       break;
       
@@ -110,38 +110,38 @@ void cedar::aux::ConsoleLog::message(cedar::aux::LOG_LEVEL level, const std::str
       
     case cedar::aux::LOG_LEVEL_SYSTEM_INFO:
       std::cout 
-#ifdef __linux
+#ifdef CEDAR_OS_LINUX
                 << COLOR(COLOR_DARK_GRAY)
-#endif // __linux
+#endif // CEDAR_OS_LINUX
                 << "system info> "
                 << formatted_message
-#ifdef __linux
+#ifdef CEDAR_OS_LINUX
                 << COLOR_CLEAR
-#endif // __linux
+#endif // CEDAR_OS_LINUX
                 << std::endl;
       break;
       
     case cedar::aux::LOG_LEVEL_DEBUG:
       std::cout 
-#ifdef __linux
+#ifdef CEDAR_OS_LINUX
                 << COLOR(COLOR_BLUE)
-#endif // __linux
+#endif // CEDAR_OS_LINUX
                 << "debug> " << formatted_message
-#ifdef __linux
+#ifdef CEDAR_OS_LINUX
                 << COLOR_CLEAR
-#endif // __linux
+#endif // CEDAR_OS_LINUX
                 << std::endl;
       break;
       
     case cedar::aux::LOG_LEVEL_MEM_DEBUG:
       std::cout
-#ifdef __linux
+#ifdef CEDAR_OS_LINUX
                 << COLOR(COLOR_LIGHT_BLUE)
-#endif // __linux
+#endif // CEDAR_OS_LINUX
                 << "memdebug> " << formatted_message
-#ifdef __linux
+#ifdef CEDAR_OS_LINUX
                 << COLOR_CLEAR
-#endif // __linux
+#endif // CEDAR_OS_LINUX
                 << std::endl;
       break;
 
