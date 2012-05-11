@@ -40,6 +40,8 @@
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/OwnedData.h"
+#include "cedar/processing/PromotedExternalData.h"
+#include "cedar/processing/PromotedOwnedData.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/assert.h"
@@ -90,6 +92,39 @@ const cedar::proc::Connectable::SlotMap& cedar::proc::Connectable::getDataSlots(
   return iter->second;
 }
 
+cedar::proc::Connectable::SlotList& cedar::proc::Connectable::getOrderedDataSlots(DataRole::Id role)
+{
+  std::map<DataRole::Id, SlotList>::iterator iter = this->mDataConnectionsOrder.find(role);
+  if (iter == this->mDataConnectionsOrder.end())
+  {
+    CEDAR_THROW
+    (
+      cedar::proc::InvalidRoleException,
+      "Role "
+      + DataRole::type().get(role).name()
+      + " not found in cedar::proc::Connectable::getOrderedDataSlots(DataRole::Id)."
+    );
+  }
+  return iter->second;
+}
+
+
+const cedar::proc::Connectable::SlotList& cedar::proc::Connectable::getOrderedDataSlots(DataRole::Id role) const
+{
+  std::map<DataRole::Id, SlotList>::const_iterator iter = this->mDataConnectionsOrder.find(role);
+  if (iter == this->mDataConnectionsOrder.end())
+  {
+    CEDAR_THROW
+    (
+      cedar::proc::InvalidRoleException,
+      "Role "
+      + DataRole::type().get(role).name()
+      + " not found in cedar::proc::Connectable::getOrderedDataSlots(DataRole::Id)."
+    );
+  }
+  return iter->second;
+}
+
 /*! This is the default implementation of this function. The function, it does nothing!
  *  In your subclasses of cedar::proc::Connectable you may override this function to react to changes in the connected inputs
  *  of the Connectable. One common use for this method is to store a pointer to the new/changed data in the correct format,
@@ -112,7 +147,7 @@ void cedar::proc::Connectable::inputConnectionChanged(const std::string& /*input
 cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar::proc::DataSlotPtr slot)
 {
   // if the validty is indetermined (unknown), try to find it out
-  if (slot->getValidlity() == cedar::proc::DataSlot::VALIDITY_UNKNOWN)
+  if (slot->getValidity() == cedar::proc::DataSlot::VALIDITY_UNKNOWN)
   {
     // get the data object in the slot.
     cedar::aux::DataPtr data = slot->getData();
@@ -145,7 +180,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar
   }
 
   // return the validity stored in the slot
-  return slot->getValidlity();
+  return slot->getValidity();
 }
 
 /*! This is a convenience method that calls cedar::proc::Connectable::getInputValidity(cedar::proc::DataSlotPtr) with the slot
@@ -313,6 +348,17 @@ void cedar::proc::Connectable::declareData(DataRole::Id role, const std::string&
     CEDAR_DEBUG_ASSERT(iter != this->mDataConnections.end());
   }
 
+  // also, create a new slot list if necessary
+  std::map<DataRole::Id, SlotList>::iterator ordered_iter = this->mDataConnectionsOrder.find(role);
+  if (ordered_iter == this->mDataConnectionsOrder.end())
+  {
+    this->mDataConnectionsOrder[role] = SlotList();
+    ordered_iter = this->mDataConnectionsOrder.find(role);
+
+    CEDAR_DEBUG_ASSERT(ordered_iter != this->mDataConnectionsOrder.end());
+  }
+
+
   // check for duplicate entries in the slot map
   SlotMap::iterator map_iter = iter->second.find(name);
   if (map_iter != iter->second.end())
@@ -331,21 +377,25 @@ void cedar::proc::Connectable::declareData(DataRole::Id role, const std::string&
                                                    + "\" violates this rule.");
   }
 
+  cedar::proc::DataSlotPtr slot_ptr;
   // finally, insert a new data slot with the given parameters
   if (role == cedar::proc::DataRole::INPUT)
   {
-    iter->second[name] = cedar::proc::DataSlotPtr(new cedar::proc::ExternalData(role, name, this, mandatory));
+    cedar::proc::ExternalDataPtr ext_slot_ptr(new cedar::proc::ExternalData(role, name, this, mandatory));
     mSlotConnection
-      = boost::shared_dynamic_cast<cedar::proc::ExternalData>(
-                                                               iter->second[name]
-                                                             )->connectToExternalDataChanged(
-                                                 boost::bind(&cedar::proc::Connectable::checkMandatoryConnections, this)
-                                                                                            );
+      = ext_slot_ptr->connectToExternalDataChanged
+                      (
+                        boost::bind(&cedar::proc::Connectable::checkMandatoryConnections, this)
+                      );
+    slot_ptr = ext_slot_ptr;
   }
   else
   {
-    iter->second[name] = cedar::proc::DataSlotPtr(new cedar::proc::OwnedData(role, name, this, mandatory));
+    slot_ptr = cedar::proc::DataSlotPtr(new cedar::proc::OwnedData(role, name, this, mandatory));
   }
+  iter->second[name] = slot_ptr;
+
+  ordered_iter->second.push_back(slot_ptr);
 
   // since the data has (potentially) changed, re-check the inputs
   this->checkMandatoryConnections();
@@ -433,7 +483,11 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::getSlot(cedar::proc::DataRole
   return slot_iter->second;
 }
 
-cedar::proc::ConstDataSlotPtr cedar::proc::Connectable::getSlot(cedar::proc::DataRole::Id role, const std::string& name) const
+cedar::proc::ConstDataSlotPtr cedar::proc::Connectable::getSlot
+                              (
+                                cedar::proc::DataRole::Id role,
+                                const std::string& name
+                              ) const
 {
   std::map<DataRole::Id, SlotMap>::const_iterator slot_map_iter = this->mDataConnections.find(role);
   if (slot_map_iter == this->mDataConnections.end())
@@ -672,5 +726,64 @@ void cedar::proc::Connectable::parseDataNameNoRole
 
   // Split the string. Step name is everything before the dot, dataName everything after it.
   connectableName = instr.substr(0, dot_idx);
-  dataName = instr.substr(dot_idx+1, instr.length() - dot_idx - 1);
+  dataName = instr.substr(dot_idx + 1, instr.length() - dot_idx - 1);
+}
+
+void cedar::proc::Connectable::declarePromotedData(DataSlotPtr promotedSlot)
+{
+  // first, create a new slot map if necessary
+  std::map<DataRole::Id, SlotMap>::iterator iter = this->mDataConnections.find(promotedSlot->getRole());
+  if (iter == this->mDataConnections.end())
+  {
+    this->mDataConnections[promotedSlot->getRole()] = SlotMap();
+    iter = this->mDataConnections.find(promotedSlot->getRole());
+
+    CEDAR_DEBUG_ASSERT(iter != this->mDataConnections.end());
+  }
+  std::string dotted_name = promotedSlot->getParent() + "." + promotedSlot->getName();
+
+  // check for duplicate entries in the slot map
+  SlotMap::iterator map_iter = iter->second.find(dotted_name);
+  if (map_iter != iter->second.end())
+  {
+    CEDAR_THROW(cedar::proc::DuplicateNameException, "There is already a " +
+                 cedar::proc::DataRole::type().get(promotedSlot->getRole()).prettyString()
+                 + " data-declaration with the name " + dotted_name + ".");
+    return;
+  }
+
+  // finally, insert a new data slot with the given parameters
+  if (promotedSlot->getRole() == cedar::proc::DataRole::INPUT)
+  {
+    iter->second[dotted_name]
+      = cedar::proc::DataSlotPtr(new cedar::proc::PromotedExternalData(promotedSlot, this));
+    mSlotConnection
+      = boost::shared_dynamic_cast<cedar::proc::ExternalData>
+        (
+          iter->second[dotted_name]
+        )->connectToExternalDataChanged
+           (
+             boost::bind(&cedar::proc::Connectable::checkMandatoryConnections, this)
+           );
+  }
+  else
+  {
+    iter->second[dotted_name]
+      = cedar::proc::DataSlotPtr(new cedar::proc::PromotedOwnedData(promotedSlot, this));
+  }
+  promotedSlot->promote();
+  // since the data has (potentially) changed, re-check the inputs
+  this->checkMandatoryConnections();
+}
+
+void cedar::proc::Connectable::removePromotedData(DataRole::Id role, const std::string& name)
+{
+  std::map<DataRole::Id, SlotMap>::iterator iter = this->mDataConnections.find(role);
+  // check that a slot map was found
+  CEDAR_DEBUG_ASSERT(iter != this->mDataConnections.end());
+  // check for duplicate entries in the slot map
+  SlotMap::iterator map_iter = iter->second.find(name);
+  CEDAR_DEBUG_ASSERT(map_iter != iter->second.end());
+  map_iter->second->demote();
+  iter->second.erase(map_iter);
 }

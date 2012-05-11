@@ -55,10 +55,14 @@ int main(int, char**)
   std::cout << "test no" << test_number++ << std::endl;
   std::vector<double> sigmas;
   std::vector<double> shifts;
-  for (unsigned int dim = 1; dim <= 7; dim++)
+  for (unsigned int dim = 0; dim <= 7; dim++)
   {
-    sigmas.push_back(3.0);
-    shifts.push_back(0.0);
+    if (dim > 0)
+    {
+      sigmas.push_back(3.0);
+      shifts.push_back(0.0);
+    }
+    std::cout << "testing dimensionality " << dim << std::endl;
     cedar::aux::kernel::GaussPtr gaussian(new cedar::aux::kernel::Gauss(1.0, sigmas, shifts, 3, dim));
   }
 

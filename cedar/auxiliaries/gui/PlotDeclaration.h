@@ -74,8 +74,10 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief returns the plot class name
   virtual std::string getPlotClass() const = 0;
 
+  //!@brief allocates a new plot
   virtual cedar::aux::gui::PlotInterface* createPlot() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -127,7 +129,8 @@ public:
     return cedar::aux::typeToString<PlotType>();
   }
 
-  cedar::aux::gui::PlotInterface *createPlot()
+  //!@brief allocates a new plot of the template type
+  cedar::aux::gui::PlotInterface* createPlot()
   {
     return new PlotType();
   }

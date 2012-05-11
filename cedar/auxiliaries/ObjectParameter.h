@@ -28,7 +28,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
     Date:        2012 03 09
 
-    Description: Parameter for a dynamically allocatable, configurable object. Ha!
+    Description: Parameter for a dynamically allocatable, configurable object.
 
     Credits:
 
@@ -106,15 +106,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-private:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
 private:
   // none yet
 

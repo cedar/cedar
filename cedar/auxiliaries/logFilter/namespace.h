@@ -54,8 +54,10 @@ namespace cedar
     /*!@brief Namespace for all aux::logFilter classes. */
     namespace logFilter
     {
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_AUX_CLASS(All);
       CEDAR_DECLARE_AUX_CLASS(Type);
+      //!@endcond
     }
   }
 }

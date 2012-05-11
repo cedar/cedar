@@ -161,7 +161,7 @@ cedar::aux::DoubleParameter, cedar::aux::UIntParameter, cedar::aux::BoolParamete
 diagram for cedar::aux::Parameter to get a full overview.
 
 If those parameter types do not fit your needs, you can also implement your own ones, as explained
-@link ImplementingCustomParameterTypes in a later tutorial@endlink.
+@ref ImplementingCustomParameterTypes "in a later tutorial".
 
 
 @section ParameterGroupsAndChildren Intermediate Tutorial: Configurable Children and Parameter Groups

@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        FastConvolution.h
+    File:        Box.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2011 11 28
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 03 12
 
     Description:
 
@@ -34,67 +34,88 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_CONV_FAST_CONVOLUTION_H
-#define CEDAR_AUX_CONV_FAST_CONVOLUTION_H
-
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
-
-#ifdef CEDAR_USE_FFTW
+#ifndef CEDAR_AUX_KERNEL_BOX_H
+#define CEDAR_AUX_KERNEL_BOX_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/convolution/namespace.h"
-#include "cedar/auxiliaries/convolution/Convolution.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/kernel/namespace.h"
+#include "cedar/auxiliaries/kernel/Separable.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // SYSTEM INCLUDES
-#include <opencv2/opencv.hpp>
-#include <fftw3.h>
 
-/*!@brief Base class for convolution.
+
+/*!@brief Gauss kernel class.
  *
- * @todo describe more.
  */
-class cedar::aux::conv::FastConvolution : public cedar::aux::conv::Convolution
+class cedar::aux::kernel::Box : public cedar::aux::kernel::Separable
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
+  Box();
 
-  //!@brief Destructor
+  //!@brief The destructor.
+  ~Box();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none
+  //!@brief convenience function for getting the amplitude of the kernel
+  inline double getAmplitude() const
+  {
+    return this->_mAmplitude->getValue();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-  cv::Mat convolve(const cv::Mat& matrix, const cv::Mat& kernel) const;
+protected slots:
+  //!@brief update the dimensionality of the kernel matrices, triggered by a signal (e.g. a changed parameter value)
+  void updateDimensionality();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  cv::Mat padKernel(const cv::Mat& matrix, const cv::Mat& kernel) const;
+  /*!@brief Updates the box kernel's matrix.
+   */
+  void calculateParts();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 private:
   // none yet
 
-}; // cedar::aux::conv::Convolution
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  //!@brief The amplitude of the kernel.
+  cedar::aux::DoubleParameterPtr _mAmplitude;
 
-#endif // CEDAR_USE_FFTW
-#endif // CEDAR_AUX_CONV_FAST_CONVOLUTION_H
+  //!@brief The widths of the box kernel for each dimension.
+  cedar::aux::UIntVectorParameterPtr _mWidths;
+
+  //!@brief The shift of the box in each dimension.
+//  cedar::aux::IntVectorParameterPtr _mShifts;
+
+private:
+  // none yet
+
+}; // class cedar::aux::kernel::Box
+
+#endif // CEDAR_AUX_KERNEL_BOX_H

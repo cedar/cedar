@@ -56,13 +56,13 @@
 
 cedar::aux::EnumType<cedar::proc::steps::Resize::Interpolation> cedar::proc::steps::Resize::Interpolation::mType;
 
-#ifndef _MSC_VER
+#ifndef CEDAR_COMPILER_MSVC
 const cedar::proc::steps::Resize::Interpolation::Id cedar::proc::steps::Resize::Interpolation::LINEAR;
 const cedar::proc::steps::Resize::Interpolation::Id cedar::proc::steps::Resize::Interpolation::NEAREST;
 const cedar::proc::steps::Resize::Interpolation::Id cedar::proc::steps::Resize::Interpolation::AREA;
 const cedar::proc::steps::Resize::Interpolation::Id cedar::proc::steps::Resize::Interpolation::CUBIC;
 const cedar::proc::steps::Resize::Interpolation::Id cedar::proc::steps::Resize::Interpolation::LANCZOS4;
-#endif // _MSC_VER
+#endif // CEDAR_COMPILER_MSVC
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -100,7 +100,7 @@ cedar::proc::steps::Resize::Resize()
 // outputs
 mOutput(new cedar::aux::MatData(cv::Mat())),
 // parameters
-_mOutputSize(new cedar::aux::UIntVectorParameter(this, "outputSize", 1, 10, 1, 1000000)),
+_mOutputSize(new cedar::aux::UIntVectorParameter(this, "output size", 1, 10, 1, 1000000)),
 _mInterpolationType(new cedar::aux::EnumParameter(this,
                                                   "interpolation",
                                                   cedar::proc::steps::Resize::Interpolation::typePtr(),

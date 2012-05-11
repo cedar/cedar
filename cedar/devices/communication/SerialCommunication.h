@@ -47,14 +47,14 @@
 #include "cedar/auxiliaries/BoolParameter.h"
 
 // SYSTEM INCLUDES
-#ifndef _WIN32
+#ifndef CEDAR_OS_WINDOWS
   #include <termios.h>
   #include <errno.h>
   #include <fcntl.h>
 #else
   // some dummy types for windows.
   struct termios {};
-#endif // _WIN32
+#endif // CEDAR_OS_WINDOWS
 #include <QTime>
 
 /*!@brief This class provides a string-based communication with an external device using a Serial Port.
@@ -73,7 +73,6 @@ class cedar::dev::com::SerialCommunication : public Communication, public cedar:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Initiates a new communication with an external device per Serial Port.
-  //!@param config Location and name of the Configuration-File to be used.
   SerialCommunication();
 
   /*!@brief

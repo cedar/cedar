@@ -63,7 +63,9 @@ class cedar::aux::TypeBasedFactory
   // types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief type of the key
   typedef typename KeyBasePtr::element_type KeyBaseType;
+  //!@brief type of the value
   typedef typename ValueBasePtr::element_type ValueBaseType;
 
   //! Type for the factory.

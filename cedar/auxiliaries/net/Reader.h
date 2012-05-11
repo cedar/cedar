@@ -44,6 +44,8 @@
 #include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetReader.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetReader.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/std/StringHelper.h"
 
 // PROJECT INCLUDES
 #include <opencv2/opencv.hpp>
@@ -96,8 +98,8 @@ namespace cedar {
  * Valid instantiations are: Reader<char>, Reader<unsigned char>, Reader<short>,
  * Reader<unsigned short>, Reader<int>, Reader<unsigned int>, Reader<long>,
  * Reader<unsigned long>, Reader<float>, Reader<double>, Reader<bool>,
- * Reader<cv::Mat>, Reader< cv::Mat_<float>  
- * @see: NetBlockingReader, Writer
+ * Reader<cv::Mat>, Reader< cv::Mat_<float>, Reader< std::string >
+ * @see: BlockingReader, Writer
  */
 template <typename T>
 class Reader
@@ -307,6 +309,23 @@ public:
   //!@brief use this constructor. See Reader for details.
   explicit Reader(const std::string &s) 
                        : cedar::aux::net::detail::SimpleNetReader<double, false>(s)
+  {
+  }
+};
+
+  //---------------------------------------------------------------------------
+  // template specialization for std::string
+  //---------------------------------------------------------------------------
+
+//!@brief double specialization, see Reader for details.
+template <>
+class Reader<std::string> : public cedar::aux::net::detail::StringHelper<std::string>,
+                            public cedar::aux::net::detail::CollatedNetReader<std::string>
+{ 
+public:
+  //!@brief use this constructor. See Reader for details.
+  explicit Reader(const std::string &s) 
+                       : cedar::aux::net::detail::CollatedNetReader<std::string, false>(s)
   {
   }
 };

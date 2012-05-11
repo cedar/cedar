@@ -122,6 +122,8 @@ void cedar::proc::Step::callReset()
 
   // unlock everything
   cedar::aux::unlock(locks);
+
+  this->getFinishedTrigger()->trigger();
 }
 
 void cedar::proc::Step::reset()
@@ -191,10 +193,10 @@ const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const
  */
 void cedar::proc::Step::onNameChanged()
 {
-  if (this->mpRegisteredAt != NULL)
+  if (cedar::proc::ElementPtr parent_network = this->mRegisteredAt.lock())
   {
     // update the name
-    this->mpRegisteredAt->updateObjectName(this);
+    boost::shared_static_cast<cedar::proc::Network>(parent_network)->updateObjectName(this);
 
     // emit a signal to notify anyone interested in this
     emit nameChanged();
@@ -369,28 +371,31 @@ void cedar::proc::Step::run()
   // catch exceptions and translate them to the given state/message
   catch(const cedar::aux::ExceptionBase& e)
   {
-    cedar::aux::LogSingleton::getInstance()->warning
+    cedar::aux::LogSingleton::getInstance()->error
     (
       "An exception occurred in step \"" + this->getName() + "\": " + e.exceptionInfo(),
-      "cedar::proc::Step::run()"
+      "cedar::proc::Step::run()",
+      this->getName()
     );
     this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + e.exceptionInfo());
   }
   catch(const std::exception& e)
   {
-    cedar::aux::LogSingleton::getInstance()->warning
+    cedar::aux::LogSingleton::getInstance()->error
     (
       "An exception occurred in step \"" + this->getName() + "\": " + std::string(e.what()),
-      "cedar::proc::Step::run()"
+      "cedar::proc::Step::run()",
+      this->getName()
     );
     this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + std::string(e.what()));
   }
   catch(...)
   {
-    cedar::aux::LogSingleton::getInstance()->warning
+    cedar::aux::LogSingleton::getInstance()->error
     (
       "An exception of unknown type occurred in step \"" + this->getName() + "\".",
-      "cedar::proc::Step::run()"
+      "cedar::proc::Step::run()",
+      this->getName()
     );
     this->setState(cedar::proc::Step::STATE_EXCEPTION, "An unknown exception type occurred.");
   }

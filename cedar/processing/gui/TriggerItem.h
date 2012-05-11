@@ -96,6 +96,11 @@ public:
    */
   cedar::proc::TriggerPtr getTrigger();
 
+  /*!@brief returns the instance of Trigger
+   * @return the associated instance of Trigger
+   */
+  cedar::proc::ConstTriggerPtr getTrigger() const;
+
   //!@brief create the context menu for TriggerItem
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
@@ -108,6 +113,11 @@ public:
    * @param pTarget pointer to TriggerItem
    */
   void connectTo(cedar::proc::gui::TriggerItem *pTarget);
+
+  /*!@brief graphically connect to suiitable GraphicsItem
+   * @param pTarget pointer to GraphicsItem
+   */
+  void connectTo(cedar::proc::gui::GraphicsBase *pTarget);
 
   //!@brief read configuration from a node
   void readConfiguration(const cedar::aux::ConfigurationNode& node);

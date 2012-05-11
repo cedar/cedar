@@ -54,7 +54,26 @@ reusable architecture.
 @subsection ProcessingIntroduction_DataAndConnections Data and Connections
 
 The second important concept of the framework is Data. Each step can declare a set of inputs, outputs and buffers
-(buffers represent internal, temporary data that you might be interested in inspecting, e.g., by plotting it). 
+(buffers represent internal, temporary data that you might be interested in inspecting, e.g., by plotting it). Inputs
+and outputs are called slots of a step. Output slots can be connected to input slots, which in turn passes the data 
+produced by a step to the inputs of another step. Data is always of a specific type. This helps deciding how data can
+be plotted. The type also plays an important role in checking if the output slot of a step produces data that is
+compatible with an input slot of a connected step. The validity of such a connection is graphically represented by
+three colors: a red connection symbolizes an incompatibility of data. This may hint at a mismatch in dimensionality,
+size, or type. A green connection symbolizes the opposite situation: every relevant characteristic of the data matches
+between output slot and input slot. A yellow connection hints at a potential problem with a connection. In general,
+the receiving step can operate on the output data (e.g., a matrix of same dimensionality and size), but some
+assumptions are made to process the data, which may not be desirable. The following configuration is an example of a
+yellow warning: a cedar::proc::sources::GaussInput produces cedar::aux::MatData, which can be read off at its output slot. 
+cedar::aux::MatData is a data type, which just specifies the data structure (here: cv::Mat). A cedar::dyn::NeuralField 
+expects cedar::dyn::SpaceCode at its input slot. cedar::dyn::SpaceCode is another type of data, not only specifying the 
+data structure, but also the content of a data. Here, the matrix should contain neural activation in space code (i.e., 
+the spatial location of activity carries information). This is different from other data types (such as rate code that 
+puts emphasis on the level of activation as information content). A connection between cedar::proc::sources::GaussInput and 
+cedar::dyn::NeuralField is flagged yellow because cedar::dyn::NeuralField assumes that the cedar::aux::MatData it receives
+is carrying information through spatial location. The warning raises awareness to this assumption, which may be wrong
+in other scenarios. In future work, cedar will introduce conversion steps that can be put between non-matching outputs
+and inputs, making this assumption explicit.  
 
 
 

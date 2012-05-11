@@ -67,6 +67,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief drops all messages
   void message(cedar::aux::LOG_LEVEL, const std::string&, const std::string&)
   {
     // do nothing.
