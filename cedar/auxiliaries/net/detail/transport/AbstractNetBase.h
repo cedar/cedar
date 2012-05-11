@@ -50,12 +50,6 @@
 // ... the rest of the file is if YARP was compiled in ...
 
 
-
-// Use this to disable the code to start a local process for a yarp nameserver:
-// This lead to more problems than it is worth.
-// Just use a dedicated YARP nameserver for your local network.
-#define CEDAR_NETT_DISABLE_YARPSERVERPROC 
-
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
 #include "cedar/auxiliaries/net/detail/transport/interfaces/InterfaceOpenable.h"
@@ -101,10 +95,6 @@ private:
   std::string mFullPortName; 
     //the full (user-defines plus hardcoded suffixes) port name:
   bool   mIsConnected; // to speed up valid-network checks
-#ifndef CEDAR_NETT_DISABLE_YARPSERVERPROC 
-  pid_t  mServerPID;
-#endif  
-
 
 protected:
   // these constants will be added to the user-defined port name
@@ -168,12 +158,6 @@ protected:
   // private methods
   //---------------------------------------------------------------------------
 private:
-#ifndef CEDAR_NETT_DISABLE_YARPSERVERPROC 
-  //!@brief helper function to start an (external YARP) name server
-  bool startNameServer();
-  //!@brief helper function to check and start an (external YARP) name server 
-  bool checkNameServer();
-#endif  
 
 }; // class end
 
