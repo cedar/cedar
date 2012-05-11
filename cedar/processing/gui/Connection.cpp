@@ -42,6 +42,7 @@
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/auxiliaries/math/constants.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <QPainter>
@@ -63,7 +64,9 @@ mpSource(pSource),
 mpTarget(pTarget),
 mpArrow(0)
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->setFlags(this->flags() | QGraphicsItem::ItemStacksBehindParent | QGraphicsItem::ItemIsSelectable);
+  this->setParentItem(pSource);
   pSource->addConnection(this);
   pTarget->addConnection(this);
 
@@ -101,6 +104,7 @@ mpArrow(0)
 
 cedar::proc::gui::Connection::~Connection()
 {
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 }
 
 
@@ -144,28 +148,14 @@ void cedar::proc::gui::Connection::setValidity(cedar::proc::gui::ConnectValidity
 void cedar::proc::gui::Connection::update()
 {
   this->setZValue(-1.0);
-  QPainterPath path(this->mpSource->getConnectionAnchorInScene());
-  QPointF middle_point;
-  middle_point.setX
-  (
-    this->mpSource->getConnectionAnchorInScene().x()
-      + (this->mpTarget->getConnectionAnchorInScene().x()-this->mpSource->getConnectionAnchorInScene().x())/2.0
-  );
-  middle_point.setY
-  (
-    this->mpSource->getConnectionAnchorInScene().y()
-      + (this->mpTarget->getConnectionAnchorInScene().y()-this->mpSource->getConnectionAnchorInScene().y())/2.0
-  );
-  QPointF vector_src_tar;
-  vector_src_tar.setX
-  (
-    this->mpTarget->getConnectionAnchorInScene().x()-this->mpSource->getConnectionAnchorInScene().x()
-  );
-  vector_src_tar.setY
-  (
-    this->mpTarget->getConnectionAnchorInScene().y()-this->mpSource->getConnectionAnchorInScene().y()
-  );
-  path.lineTo(this->mpTarget->getConnectionAnchorInScene());
+
+  QPointF source = this->mpSource->getConnectionAnchorInScene() - this->mpSource->scenePos();
+  QPointF target = this->mpTarget->getConnectionAnchorInScene() - this->mpSource->scenePos();
+  QPointF middle_point = (target + source) / 2.0;
+  QPointF vector_src_tar = target - source;
+
+  QPainterPath path(source);
+  path.lineTo(target);
 
   this->setPath(path);
   if (mpArrow != 0)
