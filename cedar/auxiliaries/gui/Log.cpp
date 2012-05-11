@@ -152,7 +152,7 @@ void cedar::aux::gui::Log::postMessage
 )
 {
   QScrollBar* p_scroll_bar = pTable->verticalScrollBar();
-  bool scroll_down = (p_scroll_bar != 0 && p_scroll_bar->value() == p_scroll_bar->maximum());
+  bool scroll_down = (p_scroll_bar != NULL && p_scroll_bar->value() >= p_scroll_bar->maximum());
 
   Qt::ItemFlags item_flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
   int row = pTable->rowCount();
