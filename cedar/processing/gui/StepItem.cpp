@@ -721,25 +721,4 @@ cedar::proc::StepPtr cedar::proc::gui::StepItem::getStep()
 
 void cedar::proc::gui::StepItem::disconnect()
 {
-  // go through all DataSlots and remove connections
-//  for (size_t i = 0; i < cedar::proc::DataRole::type().list().size(); ++i)
-//  {
-//    cedar::proc::DataRole::Id id = cedar::proc::DataRole::type().list().at(i);
-//    if (id == cedar::aux::Enum::UNDEFINED)
-//    {
-//      continue;
-//    }
-//    cedar::proc::gui::StepItem::DataSlotNameMap& map = dynamic_cast<cedar::proc::gui::StepItem*>(this)->getSlotItems(id);
-//    for (cedar::proc::gui::StepItem::DataSlotNameMap::iterator it = map.begin(); it != map.end(); ++it)
-//    {
-//      it->second->removeAllConnections();
-//    }
-//  }
-//
-//  // go through all triggers and remove their connections as well
-//  for (size_t i = 0; i < this->mTriggers.size(); ++i)
-//  {
-//    cedar::proc::gui::TriggerItem* p_trigger = this->mTriggers.at(i);
-//    p_trigger->removeAllConnections();
-//  }
 }

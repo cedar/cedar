@@ -126,6 +126,8 @@ public:
    */
   void remove(cedar::proc::ConstElementPtr element);
 
+  void removeAll();
+
   /*!@brief Adds a new element with the type given by className and the name instanceName.
    *
    * @param className    Identifier of the type registered at cedar::proc::DeclarationRegistry.
