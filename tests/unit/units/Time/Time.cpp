@@ -159,8 +159,8 @@ int main(int /* argc */, char** /* argv */)
 
   {
     std::cout << "Testing t1 > t2 with seconds ... ";
-    cedar::unit::Seconds t1(1);
-    cedar::unit::Seconds t2(2);
+    cedar::unit::Seconds t1(2);
+    cedar::unit::Seconds t2(1);
     if (t1 > t2)
     {
       std::cout << "succeeded." << std::endl;
