@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Thu 18 Aug 2011 11:39:23 AM CEST
+    Date:        Thu 18 Aug 2011
 
     Description: the blocking version of the Reader
 
@@ -34,8 +34,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_NETBLOCKINGREADER_H
-#define CEDAR_NETBLOCKINGREADER_H
+#ifndef CEDAR_NET_BLOCKING_READER_H
+#define CEDAR_NET_BLOCKING_READER_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/namespace.h"
@@ -71,7 +71,7 @@ namespace cedar {
  *
  * Short example:
  * @code
- *   BlockingReader<cv::Mat> myReader("mychannel");
+ *   BlockingReader<cv::Mat> myReader("userchannel");
  *   cv::Mat mat;
  *   mat= myReader.read(); // this will block
  * @endcode
@@ -108,15 +108,16 @@ class BlockingReader
      // valid specialization
 
      // this will be triggered if this type is instantiated
+     // and not before (due to dependency on T in the statement)
      BOOST_STATIC_ASSERT(sizeof(T) == 0); 
    }
 
    /*! @brief Use this constructor
-   * @param mychannel is the channel (or YARP port) you want to use.
+   * @param userchannel is the channel (or YARP port) you want to use.
    *       The channels should be the same for reading and writing,
    *       but unique in your local network (ie task/application specific)
    */
-   BlockingReader(std::string mychannel); // just declaration for doxygen
+   BlockingReader(std::string userchannel); // just declaration for doxygen
 
    /*! @brief read() the datatype T from the network
     *

@@ -26,7 +26,7 @@ s
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Thu 03 Nov 2011 04:50:12 PM CET
+    Date:        Thu 03 Nov 2011
 
     Description:
 
@@ -87,7 +87,7 @@ cedar::proc::sources::NetReader::NetReader()
 :
 mOutput(new cedar::aux::MatData(cv::Mat())),
 // outputs
-mpReader(NULL)
+mReader()
 // parameters
 {
   // declare all data
@@ -103,11 +103,11 @@ mpReader(NULL)
 void cedar::proc::sources::NetReader::onStart()
 {
   // instantiate the reader, if not yet done
-  if (mpReader == NULL)
+  if (!mReader)
   {
     try 
     {
-      mpReader= new cedar::aux::net::Reader< cedar::aux::MatData::DataType >("DEMOCHANNEL");
+      mReader= boost::shared_ptr< cedar::aux::net::Reader< cedar::aux::MatData::DataType > >(new cedar::aux::net::Reader< cedar::aux::MatData::DataType >("DEMOCHANNEL"));
       // TODO: make channel configurable
     }
     catch ( cedar::aux::net::NetWaitingForWriterException &e )
@@ -127,28 +127,26 @@ void cedar::proc::sources::NetReader::onStart()
 
 void cedar::proc::sources::NetReader::onStop()
 {
-  if (mpReader != NULL)
-    delete mpReader;
-  mpReader= NULL;
+  mReader.reset();
 }
 
 void cedar::proc::sources::NetReader::compute(const cedar::proc::Arguments&)
 {
-  if (mpReader == NULL)
+  if (!mReader)
     return;
 
   // read from net and set data
   try
   {
-    this->mOutput->setData( mpReader->read() );
+    this->mOutput->setData( mReader->read() );
   }
-  catch( cedar::aux::net::NetWaitingForWriterException &e )
+  catch(cedar::aux::net::NetWaitingForWriterException& e)
   {
     // no writer instantiated yet? ignore
     // CHANGE NOTHING
     return;
   }
-  catch ( cedar::aux::net::NetUnexpectedDataException &e )
+  catch (cedar::aux::net::NetUnexpectedDataException& e)
   {
     // communication problem? ignore
     // CHANGE NOTHING

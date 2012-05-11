@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 04:41:29 PM CEST
+    Date:        Wed 20 Jul 2011
 
     Description: the transport part of the NetTransporter framework
                  needs this interface to be implemented
@@ -35,8 +35,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_INTERFACECOLLATEDDATA_H
-#define CEDAR_INTERFACECOLLATEDDATA_H
+#ifndef CEDAR_INTERFACE_COLLATEDDATA_H
+#define CEDAR_INTERFACE_COLLATEDDATA_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"

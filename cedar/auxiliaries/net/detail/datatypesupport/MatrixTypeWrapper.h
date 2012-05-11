@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 04:32:21 PM CEST
+    Date:        Wed 20 Jul 2011 
 
     Description: MatrixTypeWrapper provides template specializations to access
                  the transferred type (which will be a 'collated type'
@@ -38,8 +38,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_COLLATEDTYPE_H
-#define CEDAR_COLLATEDTYPE_H
+#ifndef CEDAR_COLLATED_TYPE_H
+#define CEDAR_COLLATED_TYPE_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"

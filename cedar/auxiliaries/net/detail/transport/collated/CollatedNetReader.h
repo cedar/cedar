@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Tue 19 Jul 2011 05:44:27 PM CEST
+    Date:        Tue 19 Jul 2011
 
     Description: Implementation for the user-accessible reading
                  of a matrix-like type. 
@@ -40,8 +40,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_COLLATEDNETREADER_H
-#define CEDAR_COLLATEDNETREADER_H
+#ifndef CEDAR_COLLATED_NET_READER_H
+#define CEDAR_COLLATED_NET_READER_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"

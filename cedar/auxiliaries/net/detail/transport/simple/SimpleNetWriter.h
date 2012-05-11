@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Tue 19 Jul 2011 05:36:10 PM CEST
+    Date:        Tue 19 Jul 2011
 
     Description: To transport a primitiv type (int, short, etc.) we
                  rely on yarp::os::BinPortable.
@@ -36,8 +36,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_SIMPLENETWRITER_H
-#define CEDAR_SIMPLENETWRITER_H
+#ifndef CEDAR_SIMPLE_NET_WRITER_H
+#define CEDAR_SIMPLE_NET_WRITER_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
@@ -51,9 +51,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
-
-using namespace std;
-using namespace yarp::os;
 
 namespace cedar {
   namespace aux {
@@ -73,7 +70,7 @@ class SimpleNetWriter : public AbstractNetWriter<T>
   // members
   //---------------------------------------------------------------------------
 private:
-  BufferedPort< BinPortable<T> > mBufferOut;
+  yarp::os::BufferedPort< yarp::os::BinPortable<T> > mBufferOut;
 
   //---------------------------------------------------------------------------
   // constructors and destructor
@@ -85,12 +82,12 @@ private:
   SimpleNetWriter &operator=(const SimpleNetWriter &S);
 
 public:
-  explicit SimpleNetWriter(const string &myPortName) 
+  explicit SimpleNetWriter(const std::string &myPortName) 
                                      : AbstractNetWriter<T>(myPortName),
                                        mBufferOut()
   {
 #ifdef DEBUG_NETT
-    cout << "  SimpleNetWriter [CONSTRUCTOR]" << endl;
+    std::cout << "  SimpleNetWriter [CONSTRUCTOR]" << endl;
 #endif
     AbstractNetWriter<T>::lateConstruct();
       // explanation: lateConstruct() needs to be called outside of
@@ -104,7 +101,7 @@ public:
   {
     AbstractNetWriter<T>::earlyDestruct();
 #ifdef DEBUG_NETT
-    cout << "  ~SimpleNetWriter [DESTRUCTOR]" << endl;
+    std::cout << "  ~SimpleNetWriter [DESTRUCTOR]" << endl;
 #endif
   }
 
@@ -139,7 +136,7 @@ public:
    */
   void write(const T &t) // may drop packets (non blocking)
   {
-    BinPortable<T> &r_bin_out= mBufferOut.prepare();
+    yarp::os::BinPortable<T> &r_bin_out= mBufferOut.prepare();
 
     r_bin_out.content()= t;
     mBufferOut.write();  

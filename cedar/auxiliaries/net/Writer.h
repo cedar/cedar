@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Thu 18 Aug 2011 11:38:32 AM CEST
+    Date:        Thu 18 Aug 2011 
 
     Description:
 
@@ -34,8 +34,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_NETWRITER_H
-#define CEDAR_NETWRITER_H
+#ifndef CEDAR_NET_WRITER_H
+#define CEDAR_NET_WRITER_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/namespace.h"
@@ -71,7 +71,7 @@ namespace cedar {
  *
  * Short example:
  * @code
- *   Writer<cv::Mat> myWriter("mychannel");
+ *   Writer<cv::Mat> myWriter("userchannel");
  *   cv::Mat mat= ...;
  *   myWriter.write(mat);
  * @endcode
@@ -102,15 +102,16 @@ class Writer
    // valid specialization
 
    // this will be triggered if this type is instantiated
+   // and not before (due to dependency on T in the statement)
    BOOST_STATIC_ASSERT(sizeof(T) == 0); 
   }
 
   /*! @brief Use this constructor
-   * @param mychannel is the channel (or YARP port) you want to use.
+   * @param userchannel is the channel (or YARP port) you want to use.
    *       The channels should be the same for reading and writing,
    *       but unique in your local network (ie task/application specific)
    */
-  Writer(std::string mychannel); // just declaration for doxygen
+  Writer(std::string userchannel); // just declaration for doxygen
 
   /*! @brief write the datatype T to the network
    *

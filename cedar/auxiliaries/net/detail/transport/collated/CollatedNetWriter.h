@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 04:15:50 PM CEST
+    Date:        Wed 20 Jul 2011
 
     Description: Implementation for the user-accessible writing 
                  of a matrix-like type. 
@@ -40,8 +40,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_COLLATEDNETWRITER_H
-#define CEDAR_COLLATEDNETWRITER_H
+#ifndef CEDAR_COLLATED_NET_WRITER_H
+#define CEDAR_COLLATED_NET_WRITER_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"

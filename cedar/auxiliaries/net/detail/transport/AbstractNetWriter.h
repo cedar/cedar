@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Tue 19 Jul 2011 03:15:20 PM CEST
+    Date:        Tue 19 Jul 2011
 
     Description: Part of the functionality a Writer class should have.
                  What is missing is the datatype (simple/primitiv vs
@@ -40,8 +40,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_ABSTRACTNETWRITER_H
-#define CEDAR_ABSTRACTNETWRITER_H
+#ifndef CEDAR_ABSTRACT_NET_WRITER_H
+#define CEDAR_ABSTRACT_NET_WRITER_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"

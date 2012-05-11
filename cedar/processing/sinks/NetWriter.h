@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Sun 06 Nov 2011 11:42:04 PM CET
+    Date:        Sun 06 Nov 2011
 
     Description:
 
@@ -34,8 +34,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_NETWRITERSINK_H
-#define CEDAR_NETWRITERSINK_H
+#ifndef CEDAR_NET_WRITER_SINK_H
+#define CEDAR_NET_WRITER_SINK_H
 
 #include "cedar/configuration.h"
 #ifdef CEDAR_USE_YARP
@@ -106,7 +106,7 @@ protected:
 private:
   //!@brief the writer object (RAII)
 
-  cedar::aux::net::Writer< cedar::aux::MatData::DataType > *mpWriter;
+  boost::shared_ptr< cedar::aux::net::Writer< cedar::aux::MatData::DataType > > mWriter;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

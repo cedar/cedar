@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 02:32:04 PM CEST
+    Date:        Wed 20 Jul 2011
 
     Description: this doesnt do much. Even before we think about 
                  what a matrix header contains, we want to have some
@@ -36,8 +36,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_COLLATEDNETHEADER_H
-#define CEDAR_COLLATEDNETHEADER_H
+#ifndef CEDAR_COLLATED_NET_HEADER_H
+#define CEDAR_COLLATED_NET_HEADER_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"

@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 05:13:06 PM CEST
+    Date:        Wed 20 Jul 2011
 
     Description: extend the MatrixNetHeader to hold information abaout
                  the matrix type.
@@ -37,8 +37,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_CVMATNETHEADER_H
-#define CEDAR_CVMATNETHEADER_H
+#ifndef CEDAR_CVMAT_NET_HEADER_H
+#define CEDAR_CVMAT_NET_HEADER_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"

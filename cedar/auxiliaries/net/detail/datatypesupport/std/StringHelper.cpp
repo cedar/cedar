@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 05:15:29 PM CEST
+    Date:        Fri 04 May 2012
 
     Description: Helper class for std::string
 

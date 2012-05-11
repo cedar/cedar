@@ -6,7 +6,7 @@ functionality to the NetTransporter (NetWrite, Reader, etc.) framework.
 Directories:
 ============
 
-  net/                      holds the user-accessable headers and
+  net/                      holds the user-accissable headers and
                             their .cpp files.
                             As you know, these are template specializations.
                             (see the HOWTO)

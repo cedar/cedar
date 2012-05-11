@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 02:49:00 PM CEST
+    Date:        Wed 20 Jul 2011 
 
     Description: This class is deeply intertwined with the way YARP
                  uses its yarp::os::BufferedReader/Writer classes.
@@ -41,8 +41,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_COLLATEDNETPORTABLE_H
-#define CEDAR_COLLATEDNETPORTABLE_H
+#ifndef CEDAR_COLLATED_NET_YARP_PORTABLE_H
+#define CEDAR_COLLATED_NET_YARP_PORTABLE_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
@@ -166,7 +166,7 @@ public:
     connection.expectBlock( (char*)mpVals,
                             data_size );
 
-    //////////// Nun haben wir den Daten-Teil ///////////
+    //////////// now we have the data-part ///////////
 
     if (mpVals == NULL) // paranoid
       return false;

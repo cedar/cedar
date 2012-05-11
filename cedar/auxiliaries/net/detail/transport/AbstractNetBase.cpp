@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Tue 19 Jul 2011 02:57:06 PM CEST
+    Date:        Tue 19 Jul 2011
 
     Description: Shared code between the AbstractNetReader and -Writer.
                  Also, note that this class is not template-based, but
@@ -57,9 +57,6 @@
 #include <signal.h>
 #include <stdio.h>
 
-using namespace std;
-using namespace yarp::os;
-
 namespace cedar {
   namespace aux {
     namespace net {
@@ -86,7 +83,7 @@ AbstractNetBase::AbstractNetBase(const std::string &myPortNameWithSuffix)
 {
 
 #ifdef DEBUG_NETT
-  cout << "  AbstractNetBase [CONSTRUCTOR]" << endl;
+  std::cout << "  AbstractNetBase [CONSTRUCTOR]" << endl;
 #else
   // if we are not in DEBUG-mode
   mNetwork.setVerbosity(-1); // tells YARP to inhibit messages
@@ -98,7 +95,7 @@ AbstractNetBase::AbstractNetBase(const std::string &myPortNameWithSuffix)
 AbstractNetBase::~AbstractNetBase()
 {
 #ifdef DEBUG_NETT
-  cout << "  ~AbstractNetBase [DESTRUCTOR]" << endl;
+  std::cout << "  ~AbstractNetBase [DESTRUCTOR]" << endl;
 #endif
   
 #ifndef CEDAR_NETT_DISABLE_YARPSERVERPROC 
@@ -110,7 +107,7 @@ AbstractNetBase::~AbstractNetBase()
   {
     kill( mServerPID, SIGKILL );
 #ifdef DEBUG_NETT
-    cout << "  killed name server with pid " << mServerPID << endl;
+    std::cout << "  killed name server with pid " << mServerPID << endl;
 #endif  
   }
 #endif
@@ -120,7 +117,7 @@ AbstractNetBase::~AbstractNetBase()
 //-----------------------------------------------------------------------------
 // methods
 //-----------------------------------------------------------------------------
-string AbstractNetBase::getFullPortName()
+std::string AbstractNetBase::getFullPortName()
 {
   return mFullPortName;
 }
@@ -151,7 +148,7 @@ bool AbstractNetBase::startNameServer()
     //system("yarp server"); // starts command in a shell
 
 #ifdef DEBUG_NETT
-    cout << "  executing yarp server" << endl;
+    std::cout << "  executing yarp server" << endl;
 #endif
 
 #if 1
@@ -170,7 +167,7 @@ bool AbstractNetBase::startNameServer()
       // this does not create a zombie process. better!
 
 #ifdef DEBUG_NETT
-      cout << "  could not start yarp server!" << endl;
+      std::cout << "  could not start yarp server!" << endl;
 #endif
 
     }
@@ -224,7 +221,7 @@ bool AbstractNetBase::checkNameServer()
 void AbstractNetBase::lateConstruct()
 {
 #ifdef DEBUG_NETT
-  cout << "  AbstractNetBase [lateConstruct()]" << endl;
+  std::cout << "  AbstractNetBase [lateConstruct()]" << endl;
 #endif
   // only call from the "non abstract" constructor class,
   // i.e. the final implementation class (derived fromt this class) 
@@ -243,7 +240,7 @@ void AbstractNetBase::lateConstruct()
 void AbstractNetBase::earlyDestruct()
 {
 #ifdef DEBUG_NETT
-  cout << "  AbstractNetBase [earlyDestruct]" << endl;
+  std::cout << "  AbstractNetBase [earlyDestruct]" << endl;
 #endif
   close(); // see lateConstruct()
            // dont use the returnvalue here and dont throw an exception
@@ -254,7 +251,7 @@ void AbstractNetBase::earlyDestruct()
 bool AbstractNetBase::connectTwo(const std::string &writerPort, const std::string &readerPort)
 {
 #ifdef DEBUG_NETT
-//  cout << "  AbstractNetBase [connectTwo]" << endl;
+//  std::cout << "  AbstractNetBase [connectTwo]" << endl;
 #endif
 
   if (mIsConnected)
@@ -274,7 +271,7 @@ bool AbstractNetBase::connectTwo(const std::string &writerPort, const std::strin
   }
 
 #ifdef DEBUG_NETT
-  cout << "  connection OK" << endl;
+  std::cout << "  connection OK" << endl;
 #endif
   mIsConnected= true;
   return true;
@@ -284,7 +281,7 @@ bool AbstractNetBase::connectTwo(const std::string &writerPort, const std::strin
 bool AbstractNetBase::connectTo(const std::string &writerPort)
 {
 #ifdef DEBUG_NETT
-  cout << "connect " <<  getFullPortName() << " to "  << writerPort  << endl;
+  std::cout << "connect " <<  getFullPortName() << " to "  << writerPort  << endl;
 #endif
   return connectTwo( writerPort,
                      getFullPortName() );

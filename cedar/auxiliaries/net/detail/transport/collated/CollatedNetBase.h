@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 02:43:13 PM CEST
+    Date:        Wed 20 Jul 2011
 
     Description: Shared code between the CollatedNetWriter and -Reader.
 
@@ -34,8 +34,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_COLLATEDNETBASE_H
-#define CEDAR_COLLATEDNETBASE_H
+#ifndef CEDAR_COLLATED_NET_BASE_H
+#define CEDAR_COLLATED_NET_BASE_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"

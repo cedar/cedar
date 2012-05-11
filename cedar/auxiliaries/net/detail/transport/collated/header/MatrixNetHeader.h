@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 02:37:21 PM CEST
+    Date:        Wed 20 Jul 2011
 
     Description: Header (part of the transported information that contains
                  the structure information of the data proper) for
@@ -36,8 +36,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_MATRIXNETHEADER_H
-#define CEDAR_MATRIXNETHEADER_H
+#ifndef CEDAR_MATRIX_NET_HEADER_H
+#define CEDAR_MATRIX_NET_HEADER_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"

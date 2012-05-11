@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 04:43:49 PM CEST
+    Date:        Wed 20 Jul 2011
 
     Description: CollatedTraits in the std::-namespace specialization
 
@@ -34,8 +34,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_COLLATEDTRAITS_STD_H
-#define CEDAR_COLLATEDTRAITS_STD_H
+#ifndef CEDAR_COLLATED_TRAITS_STD_H
+#define CEDAR_COLLATED_TRAITS_STD_H
 
 // LOCAL INCLUDES
 // traits specializations:

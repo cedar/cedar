@@ -26,7 +26,7 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Thu 03 Nov 2011 04:47:26 PM CET
+    Date:        Thu 03 Nov 2011
 
     Description:
 
@@ -34,8 +34,8 @@
 
 =============================================================================*/
 
-#ifndef CEDAR_NETREADERSTEP_H
-#define CEDAR_NETREADERSTEP_H
+#ifndef CEDAR_NET_READER_STEP_H
+#define CEDAR_NET_READER_STEP_H
 
 #include "cedar/configuration.h"
 #ifdef CEDAR_USE_YARP
@@ -95,7 +95,7 @@ protected:
   cedar::aux::MatDataPtr mOutput;
 private:
   //!@brief the reader object (RAII)
-  cedar::aux::net::Reader< cedar::aux::MatData::DataType > *mpReader;
+  boost::shared_ptr< cedar::aux::net::Reader< cedar::aux::MatData::DataType > > mReader;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
