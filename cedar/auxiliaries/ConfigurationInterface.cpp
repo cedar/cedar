@@ -498,11 +498,6 @@ int cedar::aux::ConfigurationInterface::handleTypeException(const cedar::aux::Co
 
 int cedar::aux::ConfigurationInterface::handleSettingNotFoundException(const cedar::aux::ConfigurationInterface::ParameterInfo&)
 {
-  //@todo
-  //GH:
-  //cerr << "> error in " << mConfigFileName << ": No '" << info.mName << "' setting in configuration file." << endl;
-  //setParameterToDefault(info);
-  //return CONFIG_MISSING_ITEM_ERROR;
   return CONFIG_SUCCESS;
 }
 
