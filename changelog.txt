@@ -45,9 +45,6 @@
     This function automatically decides which template version to call based on the matrix types.
   - Added a function cedar::aux::System::locateResource that helps with finding cedar resources (i.e., config files
     etc.) independent of the current working directory. See the documentation for details.
-  - Added a new Log class to cedar::aux. Using this is the new standard logging mechanism (over std::cout), as it can be
-    redirected at will, e.g., to the console (default) or some user interface. To access the log, use the corresponding
-    cedar::aux::LogSingleton::getInstance().
   - the cedar::aux::Base class was removed
   - The old ConfigurationInterface is being phased out now. For this purpose, a transitional interface has been
     developed that should mostly work with the old code. If you run into trouble, add the following line to your
@@ -61,7 +58,9 @@
   - There are some new Parameter types: ObjectListParameter and ObjectParameter. They allow dynamically selecting the
     type of one or more objects. For example, these allow to dynamically select the type of the Sigmoid as well as the
     combination of kernels in the neural field.
-  - There is a new method for writing log messages. See the Logging tutorial in the documentation or cedar::aux::Log.
+  - Added a new Log class to cedar::aux. Using this is the new standard logging mechanism (over std::cout), as it can be
+    redirected at will, e.g., to the console (default) or some user interface. To access the log, use the corresponding
+    cedar::aux::LogSingleton::getInstance(). See the Logging tutorial in the documentation or cedar::aux::Log.
   - There is a new widget for displaying log messages: cedar::aux::gui::Log.
   - NumericParameters (DoubleParameter, IntParameter, UIntParameter) no longer need minimum and maximum values. They
     also have a new constructor that takes a math::Limits object which is the new, recommended way of setting the
@@ -69,21 +68,24 @@
   - Added Data classes for stereo images and image sets.
   - There is now a generalized structure for convolution. This structure wraps opencv and, optionally, fftw convolution!
     For more, see the documentation for the cedar::aux::conv::Convolution class.
+  - The net namespace was added. This namespace contains wrappers around yarp's functionality and is available if cedar
+    is compiled with yarp.
+    
+- cedar::dev
+  - Added several classes for grabbing pictures, videos and cameras in cedar::dev::sensors::visual.
 
 - cedar::proc
   - added directional arrows for graphical connections in processingIde
   - when loading a plugin, the PluginProxy now also looks for a plugin description file. This file may contain some
     information about your plugin in case you don't want to hardcode it, e.g., it can contain icon paths for processing
     steps. See documentation of cedar::proc::PluginDeclaration for details.
-  - Overhauled the plotting system.
+  - Overhauled the plotting system. You can now select different types of plots for data in the processingIde where
+    available.
   - added grouping functionality for processing
   - added promotion of data slots for networks
   - Some outputs and parameters have been renamed. If your architectures fail to load, check that the connections use
     the correct names.
 
-- cedar::dyn
-  - NeuralField now supports changing the sigmoid type and changing the number and type of kernel modes
-    
 - processingIde
   - The IDE now remembers whether or not snap to grid is active.
   - Implemented zooming in the IDE; apart from the controls that are directly visible, scrolling is also possible with
@@ -93,6 +95,10 @@
   - there is now a settings dialog; more settings will be added later.
   - the tab order in the property pane is now working correctly
 
+- cedar::dyn
+  - NeuralField now supports changing the sigmoid type, the number and type of kernel modes as well as dynamic exchange
+    of the convolution method
+    
 - build system
   - Projects depending on cedar no longer need to define __LINUX__ etc.; this is now done automatically by the build
     system. 
