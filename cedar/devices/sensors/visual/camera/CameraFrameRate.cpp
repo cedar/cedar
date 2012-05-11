@@ -34,6 +34,9 @@
 
 ======================================================================================================================*/
 
+#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
+#ifdef CEDAR_USE_LIB_DC1394
+
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/camera/CameraFrameRate.h"
 
@@ -125,3 +128,4 @@ const cedar::dev::sensors::visual::CameraFrameRate::TypePtr& cedar::dev::sensors
 {
   return cedar::dev::sensors::visual::CameraFrameRate::mType.type();
 }
+#endif // CEDAR_USE_LIB_DC1394

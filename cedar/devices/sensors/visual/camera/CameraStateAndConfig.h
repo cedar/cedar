@@ -37,8 +37,7 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_STATE_AND_CONFIG_H
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_STATE_AND_CONFIG_H
 
-#include "cedar/configuration.h"
-
+#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
 #ifdef CEDAR_USE_LIB_DC1394
 
 // CEDAR INCLUDES
@@ -50,13 +49,13 @@
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
 
-/*! \class cedar::dev::sensors::visual::CameraStateAndConfig
- *  \brief This class manage the properties and capabilities of a camera.
+/*! @class cedar::dev::sensors::visual::CameraStateAndConfig
+ *  @brief This class manage the properties and capabilities of a camera.
  *
  *    With the methods of this class, the CameraGraber class can evaluate the available properties
  *    and their possible values.
  *
- *  \par
+ *  @par
  *    The main purpose of this class is to manage all the capabilities and properties of one used camera.
  *    There will be two classes created: <br>
  *    1. CameraCapabilities() <br>
@@ -84,15 +83,15 @@ class cedar::dev::sensors::visual::CameraStateAndConfig
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! \brief The standard constructor.
-   *  \param videoCapture The cv::VideoCapture object, which this configuration is assigned to
+  /*! @brief The standard constructor.
+   *  @param videoCapture The cv::VideoCapture object, which this configuration is assigned to
    *         This will be used, to read and set the values
-   *  \param pVideoCaptureLock The lock, for the concurrent access to the cv::VideoCapture object
+   *  @param pVideoCaptureLock The lock, for the concurrent access to the cv::VideoCapture object
    *         through grabbing and/or change settings
-   *  \param channel The number of the channel which this class is assigned to
-   *  \param configurationFileName The filename for the configuration file used to store camera properties in
+   *  @param channel The number of the channel which this class is assigned to
+   *  @param configurationFileName The filename for the configuration file used to store camera properties in
    *         This could be the same file, which the cameragrabber uses for configuration storage
-   *  \param capabilitiesFileName The filename of the capabilities. This file have to be adjusted for the used camera
+   *  @param capabilitiesFileName The filename of the capabilities. This file have to be adjusted for the used camera
    */
   CameraStateAndConfig(
                        cv::VideoCapture videoCapture,
@@ -110,15 +109,15 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  /*! \brief Set a property in the cv::VideoCapture class
+  /*! @brief Set a property in the cv::VideoCapture class
    *
    *    This method checks if given value is supported
    */
   bool setProperty(CameraProperty::Id propId, double value);
 
-  /*! \brief Set a property in the cv::VideoCapture class
-   *   \remarks This method checks if given value is supported
-   *   \return return value is either the value of the property or a one of the following constants
+  /*! @brief Set a property in the cv::VideoCapture class
+   *   @remarks This method checks if given value is supported
+   *   @return return value is either the value of the property or a one of the following constants
    *    CAMERA_PROPERTY_NOT_SUPPORTED,
    *    CAMERA_PROPERTY_MODE_AUTO,
    *    CAMERA_PROPERTY_MODE_OFF,
@@ -126,7 +125,7 @@ public:
    */
   double getProperty(CameraProperty::Id propId);
 
-  /*! \brief Get the real value of a Property which is set to auto.
+  /*! @brief Get the real value of a Property which is set to auto.
    *
    *    On all other properties it is the same as getProperty()
    */
@@ -139,59 +138,72 @@ public:
   ///! Get a Parameter in the cv::VideoCapture class
   double getSetting(CameraSetting::Id settingId);
 
-  /*! \brief Get the minimum possible value that can be set of the given property
-   *  \param propId The id of the property
+  /*! @brief Get the minimum possible value that can be set of the given property
+   *  @param propId The id of the property
    */
   int getMinValue(CameraProperty::Id propId);
 
-  /*! \brief Get the maximum possible value that can be set of the given property
-   *  \param propId The id of the property
+  /*! @brief Get the maximum possible value that can be set of the given property
+   *  @param propId The id of the property
    */
   int getMaxValue(CameraProperty::Id propId);
 
-  /*! \brief This method tells you, if the given property is supported by the used camera
-   *  \param propId The id of the  property
+  /*! @brief This method tells you, if the given property is supported by the used camera
+   *  @param propId The id of the  property
    */
   bool isSupported(CameraProperty::Id propId);
 
-  /*! \brief This method tells you, if the given property is readable by the used camera
-   *  \param propId The id of the  property
+  /*! @brief This method tells you, if the given property is readable by the used camera
+   *  @param propId The id of the  property
    */
   bool isReadable(CameraProperty::Id propId);
 
-  /*! \brief This method tells you, if the given property supports the OnePushAuto mode
+  /*! @brief This method tells you, if the given property supports the OnePushAuto mode
    *
    *  OnePushAuto is a special mode.<br>
    *     It is used as follows: Set a value to a property and then to OnePushAuto mode.
    *     The camera now will try to hold this value automatically.
-   *  \param propId The id of the  property
+   *  @param propId The id of the  property
    */
   bool isOnePushCapable(CameraProperty::Id propId);
 
-  /*! \brief This method tells you, if the given property could be turn off and on
-   *  \param propId The id of the  property
+  /*! @brief This method tells you, if the given property could be turn off and on
+   *  @param propId The id of the  property
    */
   bool isOnOffCapable(CameraProperty::Id propId);
 
-  /*! \brief This method tells you, if the given property can be set to auto-mode
-   *  \param propId The id of the  property
+  /*! @brief This method tells you, if the given property can be set to auto-mode
+   *  @param propId The id of the  property
    */
   bool isAutoCapable(CameraProperty::Id propId);
 
-  /*! \brief This method tells you, if the given property can be set manually
-   *  \param propId The id of the  property
+  /*! @brief This method tells you, if the given property can be set manually
+   *  @param propId The id of the  property
    */
   bool isManualCapable(CameraProperty::Id propId);
 
-  /*! \brief This method tells you, if the given property can be set to an absolute value
-   *  \param propId The id of the  property
+  /*! @brief This method tells you, if the given property can be set to an absolute value
+   *  @param propId The id of the  property
    */
   bool isAbsoluteCapable(CameraProperty::Id propId);
   
-  /*! \brief This method is called from the CameraGrabber when the configuration
+  /*! @brief This method is called from the CameraGrabber when the configuration
    *   should be saved
    */
   bool saveConfiguration();
+
+
+  /*! @brief Set a property in the cv::VideoCapture class
+   *
+   * Implements the cv::VideoCapture.set() method with respect to concurrent access
+   */
+  bool setRawProperty(unsigned int propId, double value);
+
+  /*! @brief Get a property form the cv::VideoCapture
+   *
+   * Implements the cv::VideoCapture.get() method with respect to concurrent access
+   */
+  double getRawProperty(unsigned int propId);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -203,15 +215,6 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*! Set a property in the cv::VideoCapture class
-   * implements the cv::VideoCapture.set() method with respect to concurrent access
-   */ 
-  bool setCamProperty(unsigned int propId, double value);
-
-  /*! Get a property form the cv::VideoCapture
-   * Implements the cv::VideoCapture.get() method with respect to concurrent access
-   */
-  double getCamProperty(unsigned int propId);
 
   /*! Read the channel properties from mCamPropertyValues and set it to the camera
    *  The Properties only set, if the property isn't set to auto or default
@@ -229,14 +232,14 @@ private:
 
   /// @cond SKIPPED_DOCUMENTATION
 
-  /*! \brief This is the struct, for the values of the camera settings
-   *  \remarks This is the local storage for the camera settings
+  /*! @brief This is the struct, for the values of the camera settings
+   *  @remarks This is the local storage for the camera settings
    *    and is only needed for ConfigurationInterface class
    */
   cedar::dev::sensors::visual::CameraConfig::CameraSettings mCamSettings;
 
-  /*! \brief This is the map, where all properties and their actual values stored in
-   *  \remarks This is used to map those settings like CAMERA_PROPERTY_MODE_AUTO
+  /*! @brief This is the map, where all properties and their actual values stored in
+   *  @remarks This is used to map those settings like CAMERA_PROPERTY_MODE_AUTO
    */
   cedar::dev::sensors::visual::CameraPropertyValues mCamPropertyValues;
 
@@ -283,6 +286,6 @@ private:
 
 }; // class cedar::dev::sensors::visual::CameraStateAndConfig
 
+#endif // CEDAR_USE_LIB_DC1394
 #endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_STATE_AND_CONFIG_H
 
-#endif // CEDAR_USE_LIB_DC1394

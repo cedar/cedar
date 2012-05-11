@@ -117,7 +117,18 @@ void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
   }
 
   cv::Mat& mat = this->mData->getData();
-  switch(mat.type())
+
+  this->mData->lockForRead();
+  if (mat.empty())
+  {
+    this->mpImageDisplay->setText("Matrix is empty.");
+    this->mData->unlock();
+    return;
+  }
+  int type = mat.type();
+  this->mData->unlock();
+
+  switch(type)
   {
     case CV_8UC1:
     {

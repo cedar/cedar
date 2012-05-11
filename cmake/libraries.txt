@@ -176,7 +176,7 @@ if(CEDAR_USE_FFTW)
     set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} fftw3 fftw3_threads)
   else(FFTW)
     message("   Optional library FFTW was not found on your system!")
-    set(FFTW OFF)
+    set(CEDAR_USE_FFTW OFF)
   endif(FFTW)
 endif(CEDAR_USE_FFTW)
 

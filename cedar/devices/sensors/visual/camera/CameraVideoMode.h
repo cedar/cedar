@@ -37,10 +37,12 @@
 #ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_VIDEO_MODE_H
 #define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_VIDEO_MODE_H
 
+#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
+#ifdef CEDAR_USE_LIB_DC1394
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/devices/sensors/visual/namespace.h"
-#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
 
 // SYSTEM INCLUDES
 #ifdef CEDAR_USE_LIB_DC1394
@@ -191,6 +193,8 @@ public:
   static const Id MODE_FW_1600x1200_MONO16 = DC1394_VIDEO_MODE_1600x1200_MONO16;
   /// @see MODE_FW_160x120_YUV444
   static const Id MODE_FW_EXIF = DC1394_VIDEO_MODE_EXIF;
+
+  /* Format7 isn't supported from OpenCV firewire backend
   /// @see MODE_FW_160x120_YUV444
   static const Id MODE_FW_FORMAT7_0 = DC1394_VIDEO_MODE_FORMAT7_0;
   /// @see MODE_FW_160x120_YUV444
@@ -207,6 +211,7 @@ public:
   static const Id MODE_FW_FORMAT7_6 = DC1394_VIDEO_MODE_FORMAT7_6;
   /// @see MODE_FW_160x120_YUV444
   static const Id MODE_FW_FORMAT7_7 = DC1394_VIDEO_MODE_FORMAT7_7;
+  */
 #endif // CEDAR_USE_LIB_DC1394
 
 protected:
@@ -216,5 +221,6 @@ private:
 
 }; // cedar::dev::sensors::visual::CameraVideoMode
 
+#endif // CEDAR_USE_LIB_DC1394
 #endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_VIDEO_MODE_H
 

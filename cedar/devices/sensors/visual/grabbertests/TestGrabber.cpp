@@ -204,7 +204,7 @@ bool cedar::dev::sensors::visual::TestGrabber::onDeclareParameters()
 }
 
 //----------------------------------------------------------------------------------------------------
-const std::string& cedar::dev::sensors::visual::TestGrabber::onGetSourceInfo(unsigned int channel) const
+void cedar::dev::sensors::visual::TestGrabber::onUpdateSourceInfo(unsigned int channel)
 {
   //this is the only pure virtual method of the GrabberInterface class
 
@@ -212,7 +212,7 @@ const std::string& cedar::dev::sensors::visual::TestGrabber::onGetSourceInfo(uns
 
   //give some information about the used source like channelname, filename, devicename
   //or something like that
-  return getChannel(channel)->mSourceFileName;
+  getChannel(channel)->mChannelInfo = getChannel(channel)->mSourceFileName;
 }
 
 //----------------------------------------------------------------------------------------------------

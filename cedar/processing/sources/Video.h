@@ -45,14 +45,16 @@
 #include "cedar/processing/Step.h"
 #include "cedar/devices/sensors/visual/VideoGrabber.h"
 #include "cedar/auxiliaries/ImageData.h"
+#include "cedar/auxiliaries/FileParameter.h"
+//#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/units/TimeUnit.h"
+
 
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
- *
- * @todo describe more.
- */
+//!@brief A video file  source for the processingIde
 class cedar::proc::sources::Video : public cedar::proc::Step
 {
   Q_OBJECT
@@ -76,6 +78,17 @@ public:
 public:
   // none yet
 
+public slots:
+
+  //!@brief a slot that is triggered if a new filename should be set
+  void setFileName();
+
+  //!@brief Set looping on or off
+  void setLoop();
+
+  //!@brief Sets a new configuration filename
+  void setConfigurationFileName();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -87,8 +100,11 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void compute(const cedar::proc::Arguments&);
-
   void onStart();
+  void reset();
+
+  //create a new grabber instance
+  void createGrabber();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -96,9 +112,19 @@ private:
 protected:
   // none yet
 private:
+  //!@brief the actually grabbed frame
   cedar::aux::ImageDataPtr mImage;
 
+  //!@brief the grabber
   cedar::dev::sensors::visual::VideoGrabberPtr mGrabber;
+
+  //!@brief the time in ms between two frames. Depends on the the framerate of the video
+  //!@todo: change to cedar::unit::Time
+  cedar::unit::Milliseconds mFrameDuration;
+
+  //!@brief the time elapsed since the last frame is displayed
+  //!@todo: change to cedar::unit::Time
+  cedar::unit::Milliseconds mTimeElapsed;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -106,8 +132,17 @@ private:
 protected:
   // none yet
 
+
 private:
-  // none yet
+  //!@brief the filename to grab from
+  cedar::aux::FileParameterPtr _mFileName;
+
+  //!@brief Looping through the video-file
+  cedar::aux::BoolParameterPtr _mLoop;
+
+  //!@brief The configuration filename
+  cedar::aux::FileParameterPtr _mConfigurationFileName;
+
 
 }; // class cedar::proc::sources::Video
 
