@@ -118,21 +118,25 @@ bool cedar::proc::gui::DataSlotItem::canConnect() const
   return this->mSlot->getRole() == cedar::proc::DataRole::OUTPUT;
 }
 
-cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo(GraphicsBase* pTarget) const
+cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo
+                                  (
+                                    cedar::proc::gui::GraphicsBase* pTarget
+                                  ) const
 {
   if (this->cedar::proc::gui::GraphicsBase::canConnectTo(pTarget) == cedar::proc::gui::CONNECT_NO)
   {
     return cedar::proc::gui::CONNECT_NO;
   }
 
-  cedar::proc::gui::DataSlotItem *p_target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(pTarget);
+  cedar::proc::gui::DataSlotItem *p_target_slot = dynamic_cast<cedar::proc::gui::DataSlotItem*>(pTarget);
+  cedar::proc::gui::GraphicsBase *p_target = p_target_slot->mpStep;
   // should only be able to connect to DataSlotItems
-  CEDAR_DEBUG_ASSERT(p_target != NULL);
+  CEDAR_DEBUG_ASSERT(p_target_slot != NULL);
 
   //!@todo This all seems a bit sketchy
   // either a slot is a collection ...
   cedar::proc::ConstExternalDataPtr target_slot
-                      = boost::shared_dynamic_cast<const cedar::proc::ExternalData>(p_target->getSlot());
+                      = boost::shared_dynamic_cast<const cedar::proc::ExternalData>(p_target_slot->getSlot());
   if (target_slot && target_slot->isCollection())
   {
     // ... then we cannot connect only if we are already connected ...
@@ -142,50 +146,52 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo(G
     }
   }
   // ... or, if it already has data, then it cannot have more.
-  else if (p_target->getSlot()->getData())
+  else if (p_target_slot->getSlot()->getData())
   {
     return cedar::proc::gui::CONNECT_NO;
   }
 
   // ... is this a promoted item?
-  if (p_target->getSlot()->isPromoted())
+  if (p_target_slot->getSlot()->isPromoted())
   {
     return cedar::proc::gui::CONNECT_NO;
   }
 
   // ... source and target are not in the same network
-  if (this->getSlot()->getParentPtr()->getNetwork() != p_target->getSlot()->getParentPtr()->getNetwork())
+  if (this->getSlot()->getParentPtr()->getNetwork() != p_target_slot->getSlot()->getParentPtr()->getNetwork())
   {
     return cedar::proc::gui::CONNECT_NO;
   }
 
   // a step cannot connect to itself
-  if (this->mpStep == p_target->mpStep)
+  if (this->mpStep == p_target_slot->mpStep)
   {
     return cedar::proc::gui::CONNECT_NO;
   }
 
   if (this->mSlot->getRole() == cedar::proc::DataRole::OUTPUT
-      && p_target->mSlot->getRole() == cedar::proc::DataRole::INPUT)
+      && p_target_slot->mSlot->getRole() == cedar::proc::DataRole::INPUT)
   {
-    cedar::proc::DataSlot::VALIDITY validity;
+    cedar::proc::DataSlot::VALIDITY validity = cedar::proc::DataSlot::VALIDITY_UNKNOWN;
     if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_target))
     {
-      validity = p_step_item->getStep()->determineInputValidity(p_target->mSlot, this->mSlot->getData());
+      validity = p_step_item->getStep()->determineInputValidity(p_target_slot->getSlot(), this->mSlot->getData());
     }
     else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_target))
     {
-      validity = p_network_item->network()->determineInputValidity(p_target->mSlot, this->mSlot->getData());
+      //!@todo The validity here must be checked correctly at the promoted slot rather than the network's pseudo-slot
+      validity = p_network_item->network()->determineInputValidity(p_target_slot->getSlot(), this->mSlot->getData());
     }
+
+    CEDAR_ASSERT(validity != cedar::proc::DataSlot::VALIDITY_UNKNOWN);
+
     switch (validity)
     {
       case cedar::proc::DataSlot::VALIDITY_ERROR:
         return cedar::proc::gui::CONNECT_ERROR;
-        break;
 
       case cedar::proc::DataSlot::VALIDITY_WARNING:
         return cedar::proc::gui::CONNECT_WARNING;
-        break;
 
       default:
         return cedar::proc::gui::CONNECT_YES;
