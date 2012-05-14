@@ -110,18 +110,17 @@ cedar::proc::Step::~Step()
 
 void cedar::proc::Step::callReset()
 {
-  // collect all locks that belong to this step
-  cedar::aux::LockSet locks;
-  this->getDataLocks(locks);
+  // first, reset the current state of the step (i.e., clear any exception etc. state)
+  this->resetState();
 
   // lock everything
-  cedar::aux::lock(locks);
+  this->lockAll();
 
   // reset the step
   this->reset();
 
   // unlock everything
-  cedar::aux::unlock(locks);
+  this->unlockAll();
 
   this->getFinishedTrigger()->trigger();
 }
