@@ -205,7 +205,23 @@ void cedar::proc::gui::DataSlotItem::connectTo(cedar::proc::gui::DataSlotItem *p
 {
   //!@todo check validity at non-gui layer
   cedar::proc::gui::Connection *p_connection = new cedar::proc::gui::Connection(this, pTarget);
-  p_connection->setValidity(cedar::proc::gui::CONNECT_YES);
+  cedar::proc::gui::ConnectValidity validity = cedar::proc::gui::CONNECT_ERROR;
+  switch (pTarget->getSlot()->getValidity())
+  {
+    case cedar::proc::DataSlot::VALIDITY_VALID:
+      validity = cedar::proc::gui::CONNECT_YES;
+      break;
+
+    case cedar::proc::DataSlot::VALIDITY_UNKNOWN: //!@todo VALIDITY_UNKNOWN should get its own color
+    case cedar::proc::DataSlot::VALIDITY_WARNING:
+      validity = cedar::proc::gui::CONNECT_WARNING;
+      break;
+
+    case cedar::proc::DataSlot::VALIDITY_ERROR:
+      validity = cedar::proc::gui::CONNECT_NO;
+      break;
+  }
+  p_connection->setValidity(validity);
   this->scene()->addItem(p_connection);
 }
 
