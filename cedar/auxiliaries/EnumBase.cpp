@@ -109,7 +109,7 @@ const cedar::aux::Enum& cedar::aux::EnumBase::get(const std::string& id) const
 const cedar::aux::Enum& cedar::aux::EnumBase::getFromPrettyString(const std::string& id) const
 {
   bool found = false;
-  cedar::aux::EnumId found_id;
+  cedar::aux::EnumId found_id = 0;
   for
   (
     std::map<cedar::aux::EnumId, cedar::aux::Enum>::const_iterator it = mEnumFromId.begin();
