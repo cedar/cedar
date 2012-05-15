@@ -35,8 +35,10 @@
 #=======================================================================================================================
 
 == current version ==
+- build system
+  - added a find script for FFTW that also searches for the include directory
 
-== Version 0.6 ==
+== Version 0.9 ==
 - cedar::aux
   - fixed a critical bug in LoopedThread::singleStep, which used microseconds instead of milliseconds for step()
   - cedar::aux::Configurable now inherits from boost::noncopyable, explicitly stating that you should never use
