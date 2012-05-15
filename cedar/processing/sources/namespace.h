@@ -41,6 +41,9 @@
 #ifndef CEDAR_PROC_SOURCES_NAMESPACE_H
 #define CEDAR_PROC_SOURCES_NAMESPACE_H
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
 #include "cedar/processing/lib.h"
 
@@ -57,7 +60,9 @@ namespace cedar
     {
       //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_PROC_CLASS(GaussInput);
+#ifdef CEDAR_USE_LIB_DC1394
       CEDAR_DECLARE_PROC_CLASS(Camera);
+#endif // CEDAR_USE_LIB_DC1394
       CEDAR_DECLARE_PROC_CLASS(Picture);
       CEDAR_DECLARE_PROC_CLASS(Video);
 
