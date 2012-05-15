@@ -54,6 +54,7 @@ cedar_add_library(cedarproc
   LINK_LIBRARIES
   cedaraux
   cedarunits
+  cedardev
   MOC_HEADERS
   gui/ArchitectureToolBox.h
   gui/ElementClassList.h
