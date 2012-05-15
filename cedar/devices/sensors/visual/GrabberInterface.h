@@ -52,10 +52,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
 
-#ifdef ENABLE_CTRL_C_HANDLER
-  #include <signal.h>               //CTRL-C handler
-#endif
-
 
 /*! @class cedar::dev::sensors::visual::GrabberInterface
  *  @brief This is the base class for all grabber.
@@ -516,7 +512,8 @@ protected:
      *          derived class between this two steps (i.e. readInit(...); YOUR_PARAMETER_CHANGE; applyInit() )
      *
      *  @par
-     *          If onInit() fails, onCleanUp() will be invoked in order to clean up alread initialized channels.<br><br>
+     *          If onInit() fails, onCleanUp() will be invoked in order to clean up already initialized channels.
+     *          <br><br>
      *          For an example look at VideoGrabber, NetGrabber or TestGrabber
      *  @see onInit, declareParameter, onCleanUp
      *
