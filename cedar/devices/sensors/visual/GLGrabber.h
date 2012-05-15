@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_OGL_GRABBER_H
-#define CEDAR_DEV_SENSORS_VISUAL_OGL_GRABBER_H
+#ifndef CEDAR_DEV_SENSORS_VISUAL_GL_GRABBER_H
+#define CEDAR_DEV_SENSORS_VISUAL_GL_GRABBER_H
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/GrabberInterface.h"
@@ -62,7 +62,7 @@ public cedar::dev::sensors::visual::GrabberInterface
 
   //!@cond SKIPPED_DOCUMENTATION
 
-  /*! @struct OglChannel
+  /*! @struct GlChannel
    *  @brief Additional data of a grabbing channel to grab from a QGLWidget
    */
   struct GLChannel
@@ -168,4 +168,4 @@ private:
 
 }; // class cedar::dev::sensors::visual::GLGrabber
 
-#endif //CEDAR_DEV_SENSORS_VISUAL_OGL_GRABBER_H
+#endif //CEDAR_DEV_SENSORS_VISUAL_GL_GRABBER_H

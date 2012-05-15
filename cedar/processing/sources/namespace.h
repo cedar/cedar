@@ -57,9 +57,12 @@ namespace cedar
     {
       //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_PROC_CLASS(GaussInput);
-      CEDAR_DECLARE_PROC_CLASS(Camera);
       CEDAR_DECLARE_PROC_CLASS(Picture);
       CEDAR_DECLARE_PROC_CLASS(Video);
+
+#ifdef CEDAR_USE_LIB_DC1394
+      CEDAR_DECLARE_PROC_CLASS(Camera);
+#endif
 
 #ifdef CEDAR_USE_YARP
       CEDAR_DECLARE_PROC_CLASS(NetReader);
