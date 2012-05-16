@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Sigmoid.h
+    File:        LinearSigmoid.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 05 16
 
     Description: Sigmoid functions
 
@@ -38,19 +34,18 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MATH_SIGMOID_H
-#define CEDAR_AUX_MATH_SIGMOID_H
+#ifndef CEDAR_AUX_MATH_LINEAR_SIGMOID_H
+#define CEDAR_AUX_MATH_LINEAR_SIGMOID_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
-#include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/math/Sigmoid.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief Basic interface for all sigmoid functions.
+/*!@brief Sigmoid function that is linear, i.e., multiplies the values with a scalar.
  */
-class cedar::aux::math::Sigmoid : public Configurable
+class cedar::aux::math::LinearSigmoid : public cedar::aux::math::Sigmoid
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -61,53 +56,21 @@ class cedar::aux::math::Sigmoid : public Configurable
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Sigmoid(double threshold = 0.0)
-  :
-  mThreshold(new DoubleParameter(this, "threshold", threshold, -1000.0, 1000.0))
-  {
-  }
-
-  //!@brief Destructor
-  virtual ~Sigmoid();
+  LinearSigmoid(double threshold = 0.0, double beta = 1.0);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief this function calculates the sigmoid function for a given double value.
-   * All inherited classes have to implement this function.
+  /*!@brief this function calculates the abs-based sigmoid function for a given double value.
    */
-  virtual double compute(double value) const = 0;
+  virtual double compute(double value) const;
 
-  /*!@brief this function calculates the sigmoid function for a given float value.
-   * Included for backward-compatibility
+  /*!@brief Returns the current beta value.
    */
-  virtual float compute(float value) const;
-
-  /*!@brief this function calculates the sigmoid function for an n-dimensional matrix.
-   *
-   * @todo write a non-templated function, which checks the type flag of cv::Mat and calls the correct templated compute
-   * function
-   *
-   * @todo Make a virtual version of this function that can be overloaded for faster sigmoid calculation.
-   */
-  template<typename T>
-  cv::Mat compute(const cv::Mat& values) const
+  inline double getBeta() const
   {
-    cv::Mat result = values.clone();
-    cv::MatConstIterator_<T> iter_src = values.begin<T>();
-    cv::MatIterator_<T> iter_dest = result.begin<T>();
-    for ( ; iter_src != values.end<T>(); ++iter_src, ++iter_dest)
-    {
-      *iter_dest = static_cast<T>(compute(static_cast<double>(*iter_src)));
-    }
-    return result;
-  }
-
-  //!@brief Returns the current threshold value.
-  inline double getThreshold() const
-  {
-    return this->mThreshold->getValue();
+    return this->_mBeta->getValue();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -128,34 +91,8 @@ private:
 protected:
   // none yet
 private:
-  //!@brief threshold of the sigmoid
-  cedar::aux::DoubleParameterPtr mThreshold;
+  //!@brief Scalar with which all values are multiplied.
+  cedar::aux::DoubleParameterPtr _mBeta;
 };
 
-#include "cedar/auxiliaries/FactoryManager.h"
-
-namespace cedar
-{
-  namespace aux
-  {
-    namespace math
-    {
-      //!@brief The manager of all sigmoind instances
-      typedef cedar::aux::FactoryManager<SigmoidPtr> SigmoidManager;
-
-#ifdef MSVC
-#ifdef CEDAR_LIB_EXPORTS_AUX
-      // dllexport
-      template class __declspec(dllexport) cedar::aux::Singleton<SigmoidManager>;
-#else // CEDAR_LIB_EXPORTS_AUX
-    // dllimport
-      extern template class __declspec(dllimport) cedar::aux::Singleton<SigmoidManager>;
-#endif // CEDAR_LIB_EXPORTS_AUX
-#endif // MSVC
-
-      //!@brief The singleton object of the SigmoidFactory.
-      typedef cedar::aux::Singleton<SigmoidManager> SigmoidManagerSingleton;
-    }
-  }
-}
-#endif  // CEDAR_AUX_MATH_SIGMOID_H
+#endif  // CEDAR_AUX_MATH_LINEAR_SIGMOID_H

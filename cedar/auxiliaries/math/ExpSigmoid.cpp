@@ -60,5 +60,5 @@ namespace
 
 double cedar::aux::math::ExpSigmoid::compute(double value) const
 {
-  return cedar::aux::math::sigmoidExp(value, mBeta->getValue(), mThreshold->getValue());
+  return cedar::aux::math::sigmoidExp(value, mBeta->getValue(), this->getThreshold());
 }

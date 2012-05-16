@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        AbsSigmoid.cpp
+    File:        LinearSigmoid.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 03 09
+    Date:        2012 05 16
 
     Description:
 
@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/AbsSigmoid.h"
+#include "cedar/auxiliaries/math/sigmoids/LinearSigmoid.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/Singleton.h"
 
@@ -48,18 +48,25 @@
 namespace
 {
   bool registered
-    = cedar::aux::math::SigmoidManagerSingleton::getInstance()->registerType<cedar::aux::math::AbsSigmoidPtr>();
+    = cedar::aux::math::SigmoidManagerSingleton::getInstance()->registerType<cedar::aux::math::LinearSigmoidPtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::aux::math::LinearSigmoid::LinearSigmoid(double threshold, double beta)
+:
+cedar::aux::math::Sigmoid(threshold),
+_mBeta(new cedar::aux::DoubleParameter(this, "beta", beta))
+{
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double cedar::aux::math::AbsSigmoid::compute(double value) const
+double cedar::aux::math::LinearSigmoid::compute(double value) const
 {
-  return cedar::aux::math::sigmoidAbs(value, mBeta->getValue(), this->getThreshold());
+  return this->getBeta() * value;
 }

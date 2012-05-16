@@ -60,5 +60,5 @@ namespace
 
 double cedar::aux::math::HeavisideSigmoid::compute(double value) const
 {
-  return cedar::aux::math::sigmoidHeaviside(value, mThreshold->getValue());
+  return cedar::aux::math::sigmoidHeaviside(value, this->getThreshold());
 }
