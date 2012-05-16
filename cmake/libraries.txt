@@ -70,10 +70,10 @@ endif (${CMAKE_BUILD_STATIC_LIBS})
 
 message("-- Searching for boost...")
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.40.0 COMPONENTS system date_time filesystem regex)
-set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Boost_LIBRARIES})
+find_package(Boost 1.41.0 COMPONENTS system date_time filesystem regex)
 
 if(Boost_FOUND)
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Boost_LIBRARIES})
   include_directories(${Boost_INCLUDE_DIRS})
   message("   boost was found in ${Boost_INCLUDE_DIRS}")
   #message("Found the following boost libraries: ${Boost_LIBRARIES}")
