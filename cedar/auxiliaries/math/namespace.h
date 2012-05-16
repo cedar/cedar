@@ -61,6 +61,8 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(AbsSigmoid);
       CEDAR_DECLARE_AUX_CLASS(ExpSigmoid);
       CEDAR_DECLARE_AUX_CLASS(HeavisideSigmoid);
+      CEDAR_DECLARE_AUX_CLASS(LinearSigmoid);
+      CEDAR_DECLARE_AUX_CLASS(SemiLinearSigmoid);
       CEDAR_DECLARE_AUX_CLASS(SigmoidDeclaration);
       //!@endcond
 
