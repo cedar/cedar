@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        AbsSigmoid.cpp
+    File:        HeavisideSigmoid.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/AbsSigmoid.h"
+#include "cedar/auxiliaries/math/sigmoids/HeavisideSigmoid.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/Singleton.h"
 
@@ -44,11 +44,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 // register class with the sigmoid factory manager
 //----------------------------------------------------------------------------------------------------------------------
-
 namespace
 {
   bool registered
-    = cedar::aux::math::SigmoidManagerSingleton::getInstance()->registerType<cedar::aux::math::AbsSigmoidPtr>();
+    = cedar::aux::math::SigmoidManagerSingleton::getInstance()->registerType<cedar::aux::math::HeavisideSigmoidPtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -59,7 +58,7 @@ namespace
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double cedar::aux::math::AbsSigmoid::compute(double value) const
+double cedar::aux::math::HeavisideSigmoid::compute(double value) const
 {
-  return cedar::aux::math::sigmoidAbs(value, mBeta->getValue(), this->getThreshold());
+  return cedar::aux::math::sigmoidHeaviside(value, this->getThreshold());
 }
