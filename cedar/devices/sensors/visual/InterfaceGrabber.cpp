@@ -48,7 +48,7 @@
 cedar::dev::sensors::visual::InterfaceGrabber::InterfaceGrabber
 (
   std::string configFileName,
-  cedar::dev::sensors::visual::GrabbableInterface* sourceInterfaceClass
+  cedar::dev::sensors::visual::Grabbable* sourceInterfaceClass
 )
 :
 cedar::dev::sensors::visual::Grabber(configFileName)
@@ -78,8 +78,8 @@ cedar::dev::sensors::visual::Grabber(configFileName)
 cedar::dev::sensors::visual::InterfaceGrabber::InterfaceGrabber
 (
   std::string configFileName,
-  cedar::dev::sensors::visual::GrabbableInterface* sourceInterfaceClass0,
-  cedar::dev::sensors::visual::GrabbableInterface* sourceInterfaceClass1
+  cedar::dev::sensors::visual::Grabbable* sourceInterfaceClass0,
+  cedar::dev::sensors::visual::Grabbable* sourceInterfaceClass1
 )
 :
 cedar::dev::sensors::visual::Grabber(configFileName)

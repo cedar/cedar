@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GrabbableInterface.h
+    File:        Grabbable.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
@@ -34,24 +34,26 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_GRABBABLE_INTERFACE_H
-#define CEDAR_DEV_SENSORS_VISUAL_GRABBABLE_INTERFACE_H
+#ifndef CEDAR_DEV_SENSORS_VISUAL_INTERFACE_H
+#define CEDAR_DEV_SENSORS_VISUAL_INTERFACE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/devices/sensors/visual/namespace.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
+#include <QReadWriteLock>
 
 
 /*!@brief An interface class to describe an interface to grab from any other class
  *
- * Implement this interface in your class, if the InterfaceGraber should grab from it
+ * Implement this interface in your class, if the InterfaceGrabber should grab from it
  *
  */
-class cedar::dev::sensors::visual::GrabbableInterface
+class cedar::dev::sensors::visual::Grabbable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -62,14 +64,14 @@ class cedar::dev::sensors::visual::GrabbableInterface
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief The standard constructor.
-  GrabbableInterface()
+  Grabbable()
   {
   };
 
 public:
 
   //!@brief Destructor
-  virtual ~GrabbableInterface()
+  virtual ~Grabbable()
   {
   };
 
@@ -83,8 +85,10 @@ public:
    */
   virtual cv::Mat grabImage(unsigned int channel) = 0;
 
-  //!@todo
-  // implement locking!! for the cv::Mat
+  /*!@brief Get the Lock for the image-mat
+   *
+   */
+  virtual QReadWriteLock* getReadWriteLockPointer() const = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -117,5 +121,5 @@ private:
 
 }; // class cedar::dev::sensors::visual::Grabbable
 
-#endif // CEDAR_DEV_SENSORS_VISUAL_GRABBABLE_INTERFACE_H
+#endif // CEDAR_DEV_SENSORS_VISUAL_GRABBABLE_H
 

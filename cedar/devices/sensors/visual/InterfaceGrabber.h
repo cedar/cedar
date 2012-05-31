@@ -75,7 +75,7 @@ public cedar::dev::sensors::visual::Grabber
   cedar::dev::sensors::visual::Grabber::GrabberChannel
   {
     //! @brief The class to grab from
-    cedar::dev::sensors::visual::GrabbableInterface* mpSourceInterfaceClass;
+    cedar::dev::sensors::visual::Grabbable* mpSourceInterfaceClass;
   };
 
   CEDAR_GENERATE_POINTER_TYPES(InterfaceChannel);
@@ -93,25 +93,25 @@ public:
   /*! @brief The constructor for a single channel grabber.
    *  @param configFileName Filename for a file, where the configuration parameters should be stored
    *  @param sourceInterfaceClass Class to grab from. Have to be a deriviative of the
-   *  cedar::dev::sensors::visual::GrabbableInterface class
+   *  cedar::dev::sensors::visual::Grabbable class
    */
   InterfaceGrabber
   (
     std::string configFileName,
-    cedar::dev::sensors::visual::GrabbableInterface* sourceInterfaceClass
+    cedar::dev::sensors::visual::Grabbable* sourceInterfaceClass
   );
 
   /*! @brief The constructor for a stereo grabber.
    *  @param configFileName Filename for a file, where the configuration parameters should be stored
    *  @param sourceInterfaceClass0 Class to grab from. Have to be a deriviative of the
-   *            cedar::dev::sensors::visual::GrabbableInterface class
+   *            cedar::dev::sensors::visual::Grabbable class
    *  @param sourceInterfaceClass1 Class to grab from. Have to be a deriviative of the
-   *            cedar::dev::sensors::visual::GrabbableInterface class   */
+   *            cedar::dev::sensors::visual::Grabbable class   */
   InterfaceGrabber
   (
     std::string configFileName,
-    cedar::dev::sensors::visual::GrabbableInterface* sourceInterfaceClass0,
-    cedar::dev::sensors::visual::GrabbableInterface* sourceInterfaceClass1
+    cedar::dev::sensors::visual::Grabbable* sourceInterfaceClass0,
+    cedar::dev::sensors::visual::Grabbable* sourceInterfaceClass1
   );
 
   //!@brief Destructor

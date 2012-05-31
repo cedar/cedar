@@ -63,6 +63,11 @@ namespace cedar
       {
 
         //-----------------------------------------------------------------------------------------------
+        // interface classes
+        //-----------------------------------------------------------------------------------------------
+        CEDAR_DECLARE_DEV_CLASS(Grabbable);
+
+        //-----------------------------------------------------------------------------------------------
         // grabber classes
         //-----------------------------------------------------------------------------------------------
 
@@ -76,7 +81,6 @@ namespace cedar
         CEDAR_DECLARE_DEV_CLASS(PictureGrabber);
         CEDAR_DECLARE_DEV_CLASS(TestGrabber);
         CEDAR_DECLARE_DEV_CLASS(GLGrabber);
-        CEDAR_DECLARE_DEV_CLASS(GrabbableInterface);
         CEDAR_DECLARE_DEV_CLASS(InterfaceGrabber);
 
 #ifdef CEDAR_USE_LIB_DC1394
