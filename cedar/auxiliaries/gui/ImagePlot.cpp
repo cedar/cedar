@@ -311,7 +311,7 @@ void cedar::aux::gui::ImagePlot::plot(cedar::aux::DataPtr data, const std::strin
   if (!this->mData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
-                "Cannot cast to cedar::aux::MatData in cedar::aux::gui::ImagePlot::display.");
+                "Cannot cast to cedar::aux::MatData in cedar::aux::gui::ImagePlot::plot.");
   }
 
   if (boost::dynamic_pointer_cast<cedar::aux::ImageData>(data))
