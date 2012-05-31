@@ -43,17 +43,16 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------------------------------
 // Constructor for a single-channel grabber
 cedar::dev::sensors::visual::GLGrabber::GLGrabber(std::string configFileName, QGLWidget* qglWidget)
 :
-cedar::dev::sensors::visual::GrabberInterface(configFileName)
+cedar::dev::sensors::visual::Grabber(configFileName)
 {
   // debug information logging
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
   // read initialization values from configuration file
-  readInit(1,"OglGrabber");
+  readInit(1,"GLGrabber");
 
   // set additional parameters from the constuctor
   getChannel(0)->mpQGLWidget = qglWidget;
@@ -63,7 +62,7 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
 }
 
 
-//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // Constructor for a stereo grabber
 cedar::dev::sensors::visual::GLGrabber::GLGrabber
 (
@@ -72,13 +71,13 @@ cedar::dev::sensors::visual::GLGrabber::GLGrabber
   QGLWidget* qglWidget1
 )
 :
-cedar::dev::sensors::visual::GrabberInterface(configFileName)
+cedar::dev::sensors::visual::Grabber(configFileName)
 {
   // debug information logging
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
   // read initialization values from configuration file
-  readInit(2,"StereoOglGrabber");
+  readInit(2,"StereoGLGrabber");
 
   // set additional parameters from the constuctor
   getChannel(0)->mpQGLWidget = qglWidget0;
@@ -88,28 +87,27 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
   applyInit();
 }
 
-//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // Destructor
 cedar::dev::sensors::visual::GLGrabber::~GLGrabber()
 {
   doCleanUp();
   cedar::aux::LogSingleton::getInstance()->freeing(this);
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::GLGrabber::onInit()
 {
   std::stringstream init_message;
   init_message << ": Initialize grabber with " << mNumCams << " channels ..." << std::endl;
   for (unsigned int i = 0; i < mNumCams; ++i)
   {
-    init_message << "Channel " << i <<std::endl;
-        //<< ": capture from Source: " << getChannel(i)->mpOglWidget->WindowTitle() << std::endl;
+    init_message << "Channel " << i
+                 << ": QT::OGLWidget class \"" << typeid(getChannel(i)->mpQGLWidget).name()
+                 << "\"" << std::endl;
   }
   cedar::aux::LogSingleton::getInstance()->message
                                            (
@@ -128,7 +126,7 @@ bool cedar::dev::sensors::visual::GLGrabber::onInit()
   return true;
 }
 
-//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::GLGrabber::onCleanUp()
 {
   // do the cleanup of used hardware in this method
@@ -141,7 +139,7 @@ void cedar::dev::sensors::visual::GLGrabber::onCleanUp()
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::GLGrabber::onAddChannel()
 {
   // create the channel structure for one channel
@@ -150,26 +148,23 @@ void cedar::dev::sensors::visual::GLGrabber::onAddChannel()
   mChannels.push_back(channel);
 }
 
-//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::GLGrabber::onDeclareParameters()
 {
-  // declare and initialize parameters and members of your derived class here
-  // mCounter = 0 ;
-
-  // if your parameters should be stored in the configfile,
-  // the default-values will be set on new grabbers
-  // return addParameter(&_mTest, "testparam", 123) == CONFIG_SUCCESS;
   return true;
 }
 
-//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::GLGrabber::onUpdateSourceInfo(unsigned int channel)
 {
   //value of channel is already checked by GraberInterface::getSourceInfo()
-  getChannel(channel)->mChannelInfo = "QT::OGLWidget on Channel " + boost::lexical_cast<std::string>(channel);
+  getChannel(channel)->mChannelInfo = "Channel " + boost::lexical_cast<std::string>(channel)
+                                      + ": QT::OGLWidget class \""
+                                      + typeid(getChannel(channel)->mpQGLWidget).name()
+                                      + "\"";
 }
 
-//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::GLGrabber::onGrab()
 {
   bool ogl_valid = true;
@@ -183,8 +178,12 @@ bool cedar::dev::sensors::visual::GLGrabber::onGrab()
       // GL_FRONT_LEFT, GL_FRONT_RIGHT, GL_BACK_LEFT, GL_BACK_RIGHT, GL_FRONT, GL_BACK, GL_LEFT, GL_RIGHT, GL_AUXi,
       // where i is between 0 and the value of GL_AUX_BUFFERS minus 1.
 
+      //activate this thread for painting
+      //problem: qgl-widget painting also have to be multithreaded, i.e also have to invoke makeCurrent(), doneCurrent()
+      //p_channel_widget->makeCurrent();
       glReadBuffer(GL_FRONT_RIGHT);
       QImage qimage = p_channel_widget->grabFrameBuffer(false);
+      //p_channel_widget->doneCurrent();
 
       // QImage to cv::Mat
       cv::Mat mat = cv::Mat(qimage.height(), qimage.width(), CV_8UC4,(uchar*)qimage.bits(), qimage.bytesPerLine());
@@ -197,21 +196,16 @@ bool cedar::dev::sensors::visual::GLGrabber::onGrab()
     }
     else
     {
+      // if opengl context isn't valid, then an empty matrix will be return
       ogl_valid = false;
-    }
-
-    // if opengl context isn't valid, then an empty matrix will be return
-    if (!ogl_valid)
-    {
       getChannel(channel)->mImageMat = cv::Mat();
     }
   }
-
   return ogl_valid;
 }
 
 
-//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGLWidget *qglWidget)
 {
   if (channel >= mNumCams)
@@ -219,7 +213,7 @@ void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGL
     CEDAR_THROW
     (
       cedar::aux::IndexOutOfRangeException,
-      "cedar::dev::sensors::visual::OglGrabber::setWidget"
+      "cedar::dev::sensors::visual::GLGrabber::setWidget"
     );
   }
   if (qglWidget != NULL)
@@ -238,15 +232,12 @@ void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGL
     cedar::aux::LogSingleton::getInstance()->message
                                             (
                                              ConfigurationInterface::getName() + ": New Widget applied",
-                                              "cedar::dev::sensors::visual::OglGrabber::setWidget"
+                                              "cedar::dev::sensors::visual::GLGrabber::setWidget"
                                             );
+    this->grab();
     if (restart_grabber)
     {
       this->startGrabber();
-    }
-    else
-    {
-      this->grab();
     }
   }
 }

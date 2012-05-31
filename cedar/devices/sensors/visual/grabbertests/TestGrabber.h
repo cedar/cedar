@@ -38,7 +38,7 @@
 #define CEDAR_DEV_SENSORS_VISUAL_TEST_GRABBER_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/GrabberInterface.h"
+#include "cedar/devices/sensors/visual/Grabber.h"
 //#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
@@ -55,7 +55,7 @@
  */
 class cedar::dev::sensors::visual::TestGrabber
 :
-public cedar::dev::sensors::visual::GrabberInterface
+public cedar::dev::sensors::visual::Grabber
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -71,14 +71,13 @@ public cedar::dev::sensors::visual::GrabberInterface
    */
   struct TestChannel
   :
-  cedar::dev::sensors::visual::GrabberInterface::GrabberChannel
+  cedar::dev::sensors::visual::Grabber::GrabberChannel
   {
     //! @brief The filenames
     std::string mSourceFileName;
   };
 
-  typedef boost::shared_ptr<TestChannel> TestChannelPtr;
-  typedef boost::shared_ptr<const TestChannel> ConstTestChannelPtr;
+  CEDAR_GENERATE_POINTER_TYPES(TestChannel);
 
   //!@endcond
 
@@ -131,7 +130,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  //derived from GrabberInterface
+  //derived from Grabber
   bool onInit();
   void onCleanUp();
   bool onDeclareParameters();
@@ -148,7 +147,7 @@ private:
   {
     return boost::static_pointer_cast<TestChannel>
            (
-             cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
            );
   }
 
@@ -157,15 +156,13 @@ private:
   {
     return boost::static_pointer_cast<const TestChannel>
        (
-         cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+         cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
        );
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:

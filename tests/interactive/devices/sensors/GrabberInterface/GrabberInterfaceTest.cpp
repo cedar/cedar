@@ -28,7 +28,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
-    Description: Interactive test of the GrabberInterface.
+    Description: Interactive test of the Grabber.
 
     Credits:
 

@@ -72,6 +72,7 @@ cedar_add_library(cedarproc
   steps/StaticGain.h
   sources/Picture.h
   sources/Video.h
+  sources/GrabberBase.h
   steps/Projection.h
   steps/Resize.h
   LoopedTrigger.h

@@ -22,42 +22,42 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Camera.h
+    File:        GrabberBase.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.ruhr-uni-bochum.d
-    Date:        2012 04 20
+    Date:        2012 05 23
 
-    Description:
+    Description: The header for the GrabberBase class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCES_CAMERA_H
-#define CEDAR_PROC_SOURCES_CAMERA_H
+#ifndef CEDAR_PROC_SOURCES_GRABBER_SOURCE_H
+#define CEDAR_PROC_SOURCES_GRABBER_SOURCE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-// MAKE FIREWIRE OPTIONAL
-#ifdef CEDAR_USE_LIB_DC1394
-
 // CEDAR INCLUDES
 #include "cedar/processing/sources/namespace.h"
-#include "cedar/processing/sources/GrabberBase.h"
-#include "cedar/devices/sensors/visual/CameraGrabber.h"
-
+#include "cedar/processing/Step.h"
+#include "cedar/devices/sensors/visual/Grabber.h"
+#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/ImageData.h"
 #include "cedar/auxiliaries/FileParameter.h"
-#include "cedar/auxiliaries/NumericParameter.h"
 
 // SYSTEM INCLUDES
 
-
-//!@brief A camera source for the processingIde
-class cedar::proc::sources::Camera
+/*!@brief The base class for all grabber sources for the processingIde
+ *
+ *    This class implements the common structure of all grabber sources
+ */
+class cedar::proc::sources::GrabberBase
 :
-public cedar::proc::sources::GrabberBase
+public cedar::proc::Step
 {
   Q_OBJECT
 
@@ -65,15 +65,17 @@ public cedar::proc::sources::GrabberBase
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-public:
+protected:
+  GrabberBase();
   //!@brief The standard constructor.
-  Camera();
 
+public:
   //!@brief Destructor
-//  virtual ~Camera(){};
+  virtual ~GrabberBase();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -82,53 +84,45 @@ public:
   // none yet
 
 public slots:
+  void setRecording();
+  void setSaveSnapshot();
+  //!@todo Enum RecordType (Encoding)
 
-  //!@brief Set the debayer function on or off
-  void setDeBayer();
+  //!@brief Sets a new configuration filename
+  void setConfigurationFileName();
 
-  /*!@brief Set the busId
-   *
-   * If this value is set on grabbing, the cameragrabber will be destroyed and with the new busId recreated
-   */
-  void setBusId();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+
+  //!@brief Invoke this function in the derived class
+  //  invokes onCreateGrabber() form derived class and updates information from grabber for the gui-parameter
+  void createGrabber();
+
+  //!@brief Create the grabber in the derived class
+  //  apply the new created Grabber to GrabberBase::mGrabber
+  virtual void onCreateGrabber() = 0;
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void compute(const cedar::proc::Arguments&);
-  void onStart();
-  void onCreateGrabber();
-
-  //!@brief Cast the base GrabberBasePtr to derived class CameraGrabberPtr
-  inline cedar::dev::sensors::visual::CameraGrabberPtr getGrabber()
-  {
-    return boost::static_pointer_cast<cedar::dev::sensors::visual::CameraGrabber>
-           (
-             this->cedar::proc::sources::GrabberBase::mGrabber
-           );
-  }
-
-  //!@brief Cast the base GrabberBasePtr to derived class CameraGrabberPtr
-  inline cedar::dev::sensors::visual::ConstCameraGrabberPtr getGrabber() const
-  {
-    return boost::static_pointer_cast<const cedar::dev::sensors::visual::CameraGrabber>
-           (
-            cedar::proc::sources::GrabberBase::mGrabber
-           );
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief The used Grabber stored in this pointer
+  cedar::dev::sensors::visual::GrabberPtr mGrabber;
+
+  //!@brief The grabbed Image
+  cedar::aux::ImageDataPtr mImage;
+
+
 private:
   // none yet
 
@@ -136,17 +130,22 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@cond SKIPPED_DOCUMENTATION
+  // the internal stored values of the properties
+  cedar::aux::BoolParameterPtr mRecording;
+  cedar::aux::StringParameterPtr mRecordName;
+  cedar::aux::BoolParameterPtr mSaveSnapshot;
+  cedar::aux::StringParameterPtr mSnapshotName;
+
+  //!@brief The configuration filename
+  cedar::aux::FileParameterPtr _mConfigurationFileName;
+  //!@todo Enum RecordType (Encoding)
+
+  //!@endcond
+private:
   // none yet
 
+}; //class cedar::proc::sources::GrabberBase
 
-private:
-  //!@ Bayer conversion from the camera image
-  cedar::aux::BoolParameterPtr mDeBayer;
+#endif // CEDAR_PROC_SOURCES_GRABBER_SOURCE_H
 
-  //!@ busid
-  cedar::aux::UIntParameterPtr mBusId;
-
-}; // class cedar::proc::sources::Camera
-
-#endif // CEDAR_USE_LIB_DC1394
-#endif // CEDAR_PROC_SOURCES_CAMERA_H
