@@ -61,6 +61,7 @@ cedar_add_library(cedaraux
   gui/MatrixPlot.h
   gui/MatrixPlot1D.h
   gui/MatrixPlot2D.h
+  gui/MatrixSlicePlot3D.h
   gui/PropertyPane.h
   gui/ImagePlot.h
   gui/StringParameter.h
