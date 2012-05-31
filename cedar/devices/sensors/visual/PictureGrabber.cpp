@@ -55,7 +55,7 @@ cedar::dev::sensors::visual::PictureGrabber::PictureGrabber
   const std::string& pictureFileName
 )
 :
-cedar::dev::sensors::visual::GrabberInterface(configFileName)
+cedar::dev::sensors::visual::Grabber(configFileName)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   readInit(1,"PictureGrabber");
@@ -74,7 +74,7 @@ cedar::dev::sensors::visual::PictureGrabber::PictureGrabber
   const std::string& pictureFileName1
 )
 :
-cedar::dev::sensors::visual::GrabberInterface(configFileName)
+cedar::dev::sensors::visual::Grabber(configFileName)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   readInit(2,"PictureGrabber");

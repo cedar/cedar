@@ -39,7 +39,7 @@
 #define CEDAR_DEV_SENSORS_VISUAL_PICTURE_GRABBER_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/GrabberInterface.h"
+#include "cedar/devices/sensors/visual/Grabber.h"
 
 // SYSTEM INCLUDES
 
@@ -52,7 +52,7 @@
  */
 class cedar::dev::sensors::visual::PictureGrabber
 :
-public cedar::dev::sensors::visual::GrabberInterface
+public cedar::dev::sensors::visual::Grabber
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -65,7 +65,7 @@ public cedar::dev::sensors::visual::GrabberInterface
    */
   struct PictureChannel
   :
-  cedar::dev::sensors::visual::GrabberInterface::GrabberChannel
+  cedar::dev::sensors::visual::Grabber::GrabberChannel
   {
     //! @brief The filenames
     std::string mSourceFileName;
@@ -136,7 +136,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  // inherited from GrabberInterface
+  // inherited from Grabber
   bool onInit();
   bool onGrab();
   bool onDeclareParameters();
@@ -152,7 +152,7 @@ private:
   {
     return boost::static_pointer_cast<PictureChannel>
            (
-             cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
            );
   }
 
@@ -161,7 +161,7 @@ private:
   {
     return boost::static_pointer_cast<const PictureChannel>
            (
-             cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
            );
   }
 

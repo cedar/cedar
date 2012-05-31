@@ -38,7 +38,7 @@
 #define CEDAR_DEV_SENSORS_VISUAL_VIDEO_GRABBER_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/GrabberInterface.h"
+#include "cedar/devices/sensors/visual/Grabber.h"
 
 // SYSTEM INCLUDES
 
@@ -51,7 +51,7 @@
  */
 class cedar::dev::sensors::visual::VideoGrabber
 :
-public cedar::dev::sensors::visual::GrabberInterface
+public cedar::dev::sensors::visual::Grabber
 {
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -65,7 +65,7 @@ public cedar::dev::sensors::visual::GrabberInterface
    */
   struct VideoChannel
   :
-  cedar::dev::sensors::visual::GrabberInterface::GrabberChannel
+  cedar::dev::sensors::visual::Grabber::GrabberChannel
   {
     //! Camera interface
     cv::VideoCapture mVideoCapture;
@@ -197,7 +197,7 @@ public:
 protected:
 
   //------------------------------------------------------------------------
-  //From GrabberInterface
+  //From Grabber
   //------------------------------------------------------------------------
 
   bool onInit();
@@ -256,7 +256,7 @@ private:
   {
     return boost::static_pointer_cast<VideoChannel>
            (
-             cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
            );
   }
 
@@ -267,7 +267,7 @@ private:
   {
     return boost::static_pointer_cast<const VideoChannel>
            (
-             cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
            );
   }
 

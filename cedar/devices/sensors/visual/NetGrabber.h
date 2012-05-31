@@ -41,7 +41,7 @@
 #ifdef CEDAR_USE_YARP
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/GrabberInterface.h"
+#include "cedar/devices/sensors/visual/Grabber.h"
 #include "cedar/auxiliaries/net/Reader.h"
 
 // SYSTEM INCLUDES
@@ -59,7 +59,7 @@
 
 class cedar::dev::sensors::visual::NetGrabber
 :
-public cedar::dev::sensors::visual::GrabberInterface
+public cedar::dev::sensors::visual::Grabber
 {
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -77,7 +77,7 @@ public cedar::dev::sensors::visual::GrabberInterface
    */
   struct NetChannel
   :
-  cedar::dev::sensors::visual::GrabberInterface::GrabberChannel
+  cedar::dev::sensors::visual::Grabber::GrabberChannel
   {
     //! The name of the used yarp channel
     std::string mChannelName;
@@ -131,7 +131,7 @@ public:
 protected:
 
   //------------------------------------------------------------------------
-  //From GrabberInterface
+  //From Grabber
   //------------------------------------------------------------------------
   bool onInit();
   bool onGrab();
@@ -166,7 +166,7 @@ private:
   {
     return boost::static_pointer_cast<NetChannel>
            (
-             cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
            );
   }
 
@@ -175,7 +175,7 @@ private:
   {
     return boost::static_pointer_cast<const NetChannel>
            (
-             cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
            );
   }
 
