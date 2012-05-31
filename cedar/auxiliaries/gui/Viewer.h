@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gl/namespace.h"
 #include "cedar/auxiliaries/gl/Scene.h"
+#include "cedar/devices/sensors/visual/Grabbable.h"
 
 // SYSTEM INCLUDES
 #include <QGLViewer/qglviewer.h>
@@ -54,7 +55,10 @@
  * @remarks To visualize an object, add it to an instance of cedar::aux::gl::Scene, then create a Viewer for this Scene
  *
  */
-class cedar::aux::gui::Viewer : public QGLViewer
+class cedar::aux::gui::Viewer
+:
+public QGLViewer//,
+//public cedar::dev::sensors::visual::Grabbable
 {
 private:
   Q_OBJECT
