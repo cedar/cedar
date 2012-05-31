@@ -139,7 +139,7 @@ void cedar::aux::kernel::Separable::updateKernelMatrix()
     cedar::aux::MatrixIterator iter(kernel);
     do
     {
-      float value = 0.0;
+      float value = 1.0;
       const std::vector<int>& position = iter.getCurrentIndexVector();
       for (unsigned int dim = 0; dim < this->getDimensionality(); ++dim)
       {

@@ -114,6 +114,7 @@ cv::Mat cedar::aux::conv::KernelList::getCombinedKernel() const
       }
     }
     new_combined_kernel = cv::Mat(this->getKernel(0)->getDimensionality(), &sizes.front(), CV_32F);
+    new_combined_kernel = 0.0;
     for (size_t i = 0; i < this->size(); ++i)
     {
       // determine ROI
@@ -126,6 +127,5 @@ cv::Mat cedar::aux::conv::KernelList::getCombinedKernel() const
       new_combined_kernel(&ranges.front()) += this->getKernel(i)->getKernel();
     }
   }
-
   return new_combined_kernel;
 }
