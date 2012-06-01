@@ -175,7 +175,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::timerEvent(QTimerEvent* /*pEvent*/)
 void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
 {
   unsigned int tiles = static_cast<unsigned int>(mat.size[2]);
-  if (mDesiredColumns <= 0 || mDesiredColumns > mat.size[2])
+  if (mDesiredColumns <= 0 || mDesiredColumns > tiles)
   {
     mDesiredColumns = std::ceil(std::max(1.0, std::sqrt(mat.size[2])));
   }
@@ -186,11 +186,13 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
   mSliceMatrixByteC3 = cv::Mat::zeros(rows * mat.size[0] + rows -1, columns * mat.size[1] + columns -1, CV_8UC3);
 
   // for each tile, copy content to right place
+  unsigned int max_rows = static_cast<unsigned int>(mat.size[0]);
+  unsigned int max_columns = static_cast<unsigned int>(mat.size[1]);
   for (unsigned int tile = 0; tile < tiles; ++tile)
   {
-    for (unsigned int row = 0; row < mat.size[0]; ++row)
+    for (unsigned int row = 0; row < max_rows; ++row)
     {
-      for (unsigned int column = 0; column < mat.size[1]; ++column)
+      for (unsigned int column = 0; column < max_columns; ++column)
       {
         std::vector<int> index;
         index.push_back(row);
@@ -271,7 +273,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::keyPressEvent(QKeyEvent* pEvent)
     case Qt::Key_Plus:
     {
       cv::Mat& mat = this->mData->getData();
-      if (mDesiredColumns < mat.size[2])
+      if (mDesiredColumns < static_cast<unsigned int>(mat.size[2]))
       {
         this->mDesiredColumns++;
       }
