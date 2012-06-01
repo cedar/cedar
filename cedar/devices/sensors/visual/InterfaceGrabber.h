@@ -76,6 +76,7 @@ public cedar::dev::sensors::visual::Grabber
   {
     //! @brief The class to grab from
     cedar::dev::sensors::visual::Grabbable* mpSourceInterfaceClass;
+    QReadWriteLock* mpGrabberLock;
   };
 
   CEDAR_GENERATE_POINTER_TYPES(InterfaceChannel);

@@ -46,7 +46,10 @@
 
 cedar::aux::gui::Viewer::Viewer(cedar::aux::gl::ScenePtr pScene)
 :
-mpScene(pScene)
+mpScene(pScene),
+mpGrabberLock(NULL),
+mGrabberBuffer(cv::Mat()),
+mGrabberConnected(false)
 {
   mpScene->addViewer(this);
 }
@@ -54,6 +57,10 @@ mpScene(pScene)
 cedar::aux::gui::Viewer::~Viewer()
 {
   mpScene->removeViewer(this);
+  if (mpGrabberLock)
+  {
+    delete mpGrabberLock;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -74,6 +81,11 @@ void cedar::aux::gui::Viewer::initGl(cedar::aux::gl::ObjectVisualizationPtr pVis
 void cedar::aux::gui::Viewer::draw()
 {
   mpScene->draw();
+
+  if (mGrabberConnected)
+  {
+    grabBuffer();
+  }
 }
 
 void cedar::aux::gui::Viewer::timerEvent(QTimerEvent*)
@@ -82,4 +94,54 @@ void cedar::aux::gui::Viewer::timerEvent(QTimerEvent*)
   {
     update();
   }
+}
+
+void cedar::aux::gui::Viewer::grabBuffer()
+{
+  // grab framebuffer without alpha-channel. possible values
+  // GL_FRONT_LEFT, GL_FRONT_RIGHT, GL_BACK_LEFT, GL_BACK_RIGHT, GL_FRONT, GL_BACK, GL_LEFT, GL_RIGHT, GL_AUXi,
+  // where i is between 0 and the value of GL_AUX_BUFFERS minus 1.
+
+  //activate this thread for painting
+  //problem: qgl-widget painting also have to be multithreaded, i.e also have to invoke makeCurrent(), doneCurrent()
+  //p_channel_widget->makeCurrent();
+  glReadBuffer(GL_FRONT_RIGHT);
+  QImage qimage = this->QGLWidget::grabFrameBuffer(false);
+  //p_channel_widget->doneCurrent();
+
+  // QImage to cv::Mat
+  cv::Mat mat = cv::Mat(qimage.height(), qimage.width(), CV_8UC4,(uchar*)qimage.bits(), qimage.bytesPerLine());
+  cv::Mat mat2 = cv::Mat(mat.rows, mat.cols, CV_8UC3 );
+  int from_to[] = { 0,0, 1,1, 2,2 };
+  cv::mixChannels( &mat, 1, &mat2, 1, from_to, 3 );
+
+  //apply the new content to the channel image
+  mpGrabberLock->lockForWrite();
+  mGrabberBuffer = mat2; //.clone()
+  mpGrabberLock->unlock();
+}
+
+
+cv::Mat cedar::aux::gui::Viewer::grabImage()
+{
+  return mGrabberBuffer;
+}
+
+
+QReadWriteLock* cedar::aux::gui::Viewer::connectGrabber()
+{
+  mpGrabberLock = new QReadWriteLock;
+  mGrabberConnected = true;
+  return mpGrabberLock;
+}
+
+
+void cedar::aux::gui::Viewer::disconnectGrabber()
+{
+  if (mpGrabberLock)
+  {
+    delete mpGrabberLock;
+    mpGrabberLock=NULL;
+  }
+  mGrabberConnected = false;
 }
