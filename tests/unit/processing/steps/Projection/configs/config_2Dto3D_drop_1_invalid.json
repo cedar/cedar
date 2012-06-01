@@ -138,9 +138,9 @@
                     "amplitude": "1",
                     "sigmas":
                     [
-                        "3",
-                        "3",
-                        "1.124950321843951e-316"
+                        "1",
+                        "1",
+                        "1"
                     ],
                     "shifts":
                     [
@@ -153,11 +153,11 @@
             },
             "lateral kernel convolution":
             {
-                "borderType": "Zero",
+                "borderType": "Cyclic",
                 "mode": "Same",
                 "engine":
                 {
-                    "type": "cedar.aux.conv.OpenCV"
+                    "type": "cedar.aux.conv.FFTW"
                 }
             },
             "noise correlation kernel":
@@ -215,7 +215,8 @@
             "wait": "true",
             "listeners":
             [
-                "new NeuralField"
+                "new NeuralField",
+                "new NeuralField 1"
             ]
         }
     },
@@ -243,40 +244,40 @@
             "step": "new GaussInput",
             "width": "160",
             "height": "50",
-            "positionX": "-928",
-            "positionY": "-336"
+            "positionX": "-920",
+            "positionY": "-328"
         },
         {
             "type": "trigger",
             "trigger": "new LoopedTrigger",
             "width": "30",
             "height": "30",
-            "positionX": "-408",
-            "positionY": "-496"
+            "positionX": "-400",
+            "positionY": "-488"
         },
         {
             "type": "step",
             "step": "new NeuralField",
             "width": "160",
             "height": "50",
-            "positionX": "-704",
-            "positionY": "-336"
+            "positionX": "-696",
+            "positionY": "-328"
         },
         {
             "type": "step",
             "step": "new NeuralField 1",
             "width": "160",
             "height": "50",
-            "positionX": "-272",
-            "positionY": "-336"
+            "positionX": "-264",
+            "positionY": "-328"
         },
         {
             "type": "step",
             "step": "new Projection",
             "width": "160",
             "height": "50",
-            "positionX": "-488",
-            "positionY": "-336"
+            "positionX": "-480",
+            "positionY": "-328"
         }
     ]
 }
