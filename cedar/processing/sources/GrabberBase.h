@@ -81,11 +81,11 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  void saveSnapshot();
 
 public slots:
   void setRecording();
-  void setSaveSnapshot();
+
   //!@todo Enum RecordType (Encoding)
 
   //!@brief Sets a new configuration filename
@@ -131,11 +131,11 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@cond SKIPPED_DOCUMENTATION
-  // the internal stored values of the properties
+  // the values of the properties
   cedar::aux::BoolParameterPtr mRecording;
-  cedar::aux::StringParameterPtr mRecordName;
-  cedar::aux::BoolParameterPtr mSaveSnapshot;
-  cedar::aux::StringParameterPtr mSnapshotName;
+  cedar::aux::FileParameterPtr mRecordName;
+  //cedar::aux::BoolParameterPtr mSaveSnapshot;
+  cedar::aux::FileParameterPtr mSnapshotName;
 
   //!@brief The configuration filename
   cedar::aux::FileParameterPtr _mConfigurationFileName;

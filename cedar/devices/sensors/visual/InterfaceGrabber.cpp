@@ -119,8 +119,6 @@ cedar::dev::sensors::visual::InterfaceGrabber::~InterfaceGrabber()
                                            ConfigurationInterface::getName() + ": destructor",
                                             "cedar::dev::sensors::visual::InterfaceGrabber::~InterfaceGrabber()"
                                           );
-
-
   //debug logging
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
@@ -133,12 +131,6 @@ cedar::dev::sensors::visual::InterfaceGrabber::~InterfaceGrabber()
 //----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::InterfaceGrabber::onInit()
 {
-
-  //do the initialization of your Grabber in this method,
-  //grab the first pictures and initialize the mImageMatVector with
-  //these pictures
-
-  //-------------------------------------------------
   std::stringstream init_message;
   init_message << ": Initialize test grabber with " << mNumCams << " channels ..." << std::endl;
   for (unsigned int i = 0; i < mNumCams; ++i)
@@ -156,12 +148,13 @@ bool cedar::dev::sensors::visual::InterfaceGrabber::onInit()
   //load pictures one by one
   for(unsigned int channel=0; channel<mNumCams;++channel)
   {
-    //there is no need to create new matrices, empty ones are
-    //already initialized within the channel structure
-    cv::Mat frame=cv::Mat();
+    getChannel(channel)->mpGrabberLock = getChannel(channel)->mpSourceInterfaceClass->connectGrabber();
 
     //apply the new content to the channel image
-    getChannel(channel)->mImageMat = frame;
+    getChannel(channel)->mpGrabberLock->lockForRead();
+    getChannel(channel)->mImageMat = getChannel(channel)->mpSourceInterfaceClass->grabImage().clone();
+    getChannel(channel)->mpGrabberLock->unlock();
+
   }
 
 
@@ -182,6 +175,7 @@ void cedar::dev::sensors::visual::InterfaceGrabber::onCleanUp()
 
   for(unsigned int channel=0; channel<mNumCams;++channel)
   {
+    getChannel(channel)->mpSourceInterfaceClass->disconnectGrabber();
     //remove the references to the external classes
     getChannel(channel)->mpSourceInterfaceClass = NULL;
   }
@@ -198,6 +192,8 @@ void cedar::dev::sensors::visual::InterfaceGrabber::onAddChannel()
 {
   //create the channel structure for one channel
   InterfaceChannelPtr channel(new InterfaceChannel);
+  channel->mpSourceInterfaceClass=NULL;
+  channel->mpGrabberLock=NULL;
   mChannels.push_back(channel);
 }
 
@@ -223,7 +219,9 @@ bool cedar::dev::sensors::visual::InterfaceGrabber::onGrab()
      //apply the new content to the channel image
      try
      {
-       getChannel(channel)->mImageMat = getChannel(channel)->mpSourceInterfaceClass->grabImage(channel);
+       getChannel(channel)->mpGrabberLock->lockForRead();
+       getChannel(channel)->mImageMat = getChannel(channel)->mpSourceInterfaceClass->grabImage().clone();
+       getChannel(channel)->mpGrabberLock->unlock();
      }
      catch(...)
      {

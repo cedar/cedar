@@ -83,12 +83,25 @@ public:
    *
    * @return The image in a cv::Mat structure
    */
-  virtual cv::Mat grabImage(unsigned int channel) = 0;
+  virtual cv::Mat grabImage() = 0;
 
-  /*!@brief Get the Lock for the image-mat
+
+  /*!@brief initialize the grabber specific parts in this method.
    *
+   * The grabber invokes this method in it's constructor.
+   * Have a look at the class cedar::aux::gui::Viewer for an implementation
+   *
+   * @return returns the lock for the image-mat.
    */
-  virtual QReadWriteLock* getReadWriteLockPointer() const = 0;
+  virtual QReadWriteLock* connectGrabber() = 0;
+
+
+  /*!@brief deinitialize the grabber specific parts in this method.
+   *
+   * The grabber invokes this method in it's destructor.
+   * Have a look at the class cedar::aux::gui::Viewer for an implementation
+   */
+  virtual void disconnectGrabber() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
