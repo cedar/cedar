@@ -78,7 +78,7 @@ the oldest versions supported, unless noted otherwise.
    * Boost 1.47
    * OpenCV 2.2
    * Qt 4.6.2
-   * qwt <= 5.2.1 (no newer versions)
+   * qwt 5.2.1
    * qwtplot3d 0.3
    * libqglviewer 2.3.6
    * libconfig 1.4

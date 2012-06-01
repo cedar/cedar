@@ -37,6 +37,7 @@
 == current version ==
 - cedar::aux
   - added a slice plot for 3D matrix data
+  - cedar now accepts both qwt versions 5.x and 6.x
 
 == Version 0.6 ==
 - cedar::aux
