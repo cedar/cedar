@@ -35,6 +35,7 @@ beneficial or even necessary.
 - @link ProcessingGuiTutorial Processing gui @endlink
 - @ref LoggingWithCedar
 - @ref ConfigurableAndParameters
+- @ref ProvidingCompatibility
 
 @section CodingStyle Coding Style
 cedar sticks to a strict @link CodingStyle coding style@endlink.

@@ -34,6 +34,9 @@
 
 ======================================================================================================================*/
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 #ifndef CEDAR_AUX_STRING_FUNCTIONS_H
 #define CEDAR_AUX_STRING_FUNCTIONS_H
 
@@ -61,6 +64,19 @@ namespace cedar
       std::ostringstream streamOut;
       streamOut << value;
       return streamOut.str();
+    }
+
+    /*!@brief Generates a string that contains a human-readable version number from a version made with the
+     *        CEDAR_MAKE_VERSION macro.
+     *
+     * @param version Integer generated with CEDAR_MAKE_VERSION.
+     */
+    inline std::string versionNumberToString(unsigned int version)
+    {
+      std::string res = cedar::aux::toString(CEDAR_GET_VERSION_MAJOR(version));
+      res += "." + cedar::aux::toString(CEDAR_GET_VERSION_MINOR(version));
+      res += "." + cedar::aux::toString(CEDAR_GET_VERSION_BUGFIX(version));
+      return res;
     }
 
     /*!@brief  Splits a string based on the given separator.
