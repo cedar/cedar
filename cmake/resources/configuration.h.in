@@ -41,6 +41,18 @@
 #ifndef CEDAR_CONFIGURATION_H
 #define CEDAR_CONFIGURATION_H
 
+// Cedar version information ===========================================================================================
+#define CEDAR_VERSION_MAJOR @CEDAR_VERSION_MAJOR@
+#define CEDAR_VERSION_MINOR @CEDAR_VERSION_MINOR@
+#define CEDAR_VERSION_BUGFIX @CEDAR_VERSION_BUGFIX@
+
+//!@todo Should this part be in defines.h?
+#define CEDAR_MAKE_VERSION(MAJOR, MINOR, BUGFIX) ((MAJOR << 16) + (MINOR << 8) + (BUGFIX))
+#define CEDAR_GET_VERSION_MAJOR(VERSION) (VERSION >> 16)
+#define CEDAR_GET_VERSION_MINOR(VERSION) ((VERSION >> 8) & 0xFF)
+#define CEDAR_GET_VERSION_BUGFIX(VERSION) (VERSION & 0xFF)
+#define CEDAR_VERSION CEDAR_MAKE_VERSION(CEDAR_VERSION_MAJOR, CEDAR_VERSION_MINOR, CEDAR_VERSION_BUGFIX)
+
 // Optional libraries ==================================================================================================
 #cmakedefine CEDAR_USE_FFTW
 #cmakedefine CEDAR_USE_LIB_DC1394
