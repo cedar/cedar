@@ -244,6 +244,8 @@ public:
   {
     return this->mKernelList;
   }
+signals:
+  void configurationChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

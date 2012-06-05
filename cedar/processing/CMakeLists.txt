@@ -71,6 +71,7 @@ cedar_add_library(cedarproc
   gui/View.h
   sources/GaussInput.h
   steps/StaticGain.h
+  steps/Convolution.h
   sources/Picture.h
   sources/Video.h
   steps/Projection.h
