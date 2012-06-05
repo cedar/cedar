@@ -22,37 +22,39 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GLGrabber.h
+    File:        InterfaceGrabber.h
 
     Maintainer:  Georg.Hartinger
     Email:       georg.hartinger@ini.rub.de
-    Date:        2011 08 01
+    Date:        2012 04 23
 
-    Description: Header for the @em @em cedar::dev::sensors::visual::GLGrabber class.
+    Description: Header for the @em @em cedar::dev::sensors::visual::InterfaceGrabber class.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_GL_GRABBER_H
-#define CEDAR_DEV_SENSORS_VISUAL_GL_GRABBER_H
+#ifndef CEDAR_DEV_SENSORS_VISUAL_INTERFACE_GRABBER_H
+#define CEDAR_DEV_SENSORS_VISUAL_INTERFACE_GRABBER_H
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/Grabber.h"
-#include "cedar/auxiliaries/casts.h"
+#include "cedar/devices/sensors/visual/Grabbable.h"
+
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
-#include <QGLWidget>
 
-/*! @brief A grabber to grab from a QGLWidget
+/*! @brief A simple Grabber class for testing the Grabber interface
  *
- *  Be aware, that the grabbing have to be done in the gui-thread.
- *  The grabbing will fail, if you start the grabberthread to grab in the background.
- *  You have to grab in your main gui-thread with the grab() memberfunction of the class.
- *  The getImage() member could be also invoked in threads running in the background
+ *  This grabber class is used to test the grabber interface. It
+ *  creates a Grabber with a TestParam (default-value 123) and FPS set to 15
+ *
+ *  @remarks For grabber developers<br>
+ *    This class can also be used as a template to create other classes derived from GrabberInstance
+ *
  */
-class cedar::dev::sensors::visual::GLGrabber
+class cedar::dev::sensors::visual::InterfaceGrabber
 :
 public cedar::dev::sensors::visual::Grabber
 {
@@ -62,18 +64,23 @@ public cedar::dev::sensors::visual::Grabber
 
   //!@cond SKIPPED_DOCUMENTATION
 
-  /*! @struct GLChannel
-   *  @brief Additional data of a grabbing channel to grab from a QGLWidget
+  /*! @struct TestChannel
+   *  @brief Additional data of a grabbing channel
+   *  @remarks For grabber developers<br>
+   *    You don't have to create an extended channel structure, until you need more channel data.
+   *    But when, then you have to implement the onAddChannel() member function as well
    */
-  struct GLChannel
+  struct InterfaceChannel
   :
   cedar::dev::sensors::visual::Grabber::GrabberChannel
   {
-    //! @brief The QT OpenGL widget
-    QGLWidget* mpQGLWidget ;
+    //! @brief The class to grab from
+    cedar::dev::sensors::visual::Grabbable* mpSourceInterfaceClass;
+    QReadWriteLock* mpGrabberLock;
   };
 
-  CEDAR_GENERATE_POINTER_TYPES(GLChannel);
+  CEDAR_GENERATE_POINTER_TYPES(InterfaceChannel);
+
   //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -86,30 +93,36 @@ public cedar::dev::sensors::visual::Grabber
 public:
   /*! @brief The constructor for a single channel grabber.
    *  @param configFileName Filename for a file, where the configuration parameters should be stored
-   *  @param qglWidget A pointer to a QGLWidget to grab from
+   *  @param sourceInterfaceClass Class to grab from. Have to be a deriviative of the
+   *  cedar::dev::sensors::visual::Grabbable class
    */
-  GLGrabber(std::string configFileName, QGLWidget *qglWidget);
+  InterfaceGrabber
+  (
+    std::string configFileName,
+    cedar::dev::sensors::visual::Grabbable* sourceInterfaceClass
+  );
 
   /*! @brief The constructor for a stereo grabber.
    *  @param configFileName Filename for a file, where the configuration parameters should be stored
-   *  @param qglWidget0 A pointer to a QGLWidget to grab from for channel 0
-   *  @param qglWidget1 A pointer to a QGLWidget to grab from for channel 1
-   */
-  GLGrabber(std::string configFileName, QGLWidget *qglWidget0, QGLWidget *qglWidget1);
+   *  @param sourceInterfaceClass0 Class to grab from. Have to be a deriviative of the
+   *            cedar::dev::sensors::visual::Grabbable class
+   *  @param sourceInterfaceClass1 Class to grab from. Have to be a deriviative of the
+   *            cedar::dev::sensors::visual::Grabbable class   */
+  InterfaceGrabber
+  (
+    std::string configFileName,
+    cedar::dev::sensors::visual::Grabbable* sourceInterfaceClass0,
+    cedar::dev::sensors::visual::Grabbable* sourceInterfaceClass1
+  );
 
   //!@brief Destructor
-  ~GLGrabber();
+  ~InterfaceGrabber();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-
-  /*! @brief Set a new Widget to grab from
-   *
-   */
-  void setWidget(unsigned int channel, QGLWidget *qglWidget);
+  //none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -118,29 +131,29 @@ protected:
 
   //derived from Grabber
   bool onInit();
-  bool onDeclareParameters();
   void onCleanUp();
+  bool onDeclareParameters();
   void onUpdateSourceInfo(unsigned int channel);
-  void onAddChannel();
   bool onGrab();
+  void onAddChannel();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
-  inline GLChannelPtr getChannel(unsigned int channel)
+  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class InterfaceChannelPtr
+  inline InterfaceChannelPtr getChannel(unsigned int channel)
   {
-    return boost::static_pointer_cast<GLChannel>
+    return boost::static_pointer_cast<InterfaceChannel>
            (
              cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
            );
   }
 
-  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
-  inline ConstGLChannelPtr getChannel(unsigned int channel) const
+  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class InterfaceChannellPtr
+  inline ConstInterfaceChannelPtr getChannel(unsigned int channel) const
   {
-    return boost::static_pointer_cast<const GLChannel>
+    return boost::static_pointer_cast<const InterfaceChannel>
        (
          cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
        );
@@ -158,12 +171,14 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::dev::sensors::visual::GLGrabber
+}; // class cedar::dev::sensors::visual::InterfaceGrabber
 
-#endif //CEDAR_DEV_SENSORS_VISUAL_GL_GRABBER_H
+#endif //CEDAR_DEV_SENSORS_VISUAL_INTERFACE_GRABBER_H

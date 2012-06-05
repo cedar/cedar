@@ -41,7 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/IdeApplication.h"
 #include "cedar/processing/Manager.h"
-#include "cedar/devices/sensors/visual/GrabberInterface.h"
+#include "cedar/devices/sensors/visual/Grabber.h"
 #include "cedar/dynamics/namespace.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -182,7 +182,7 @@ int cedar::proc::gui::IdeApplication::exec()
 
 void cedar::proc::gui::IdeApplication::cleanupAfterCrash()
 {
-  cedar::dev::sensors::visual::GrabberInterface::emergencyCleanup();
+  cedar::dev::sensors::visual::Grabber::emergencyCleanup();
   QApplication::exit(-1);
 }
 

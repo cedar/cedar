@@ -41,10 +41,12 @@
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gl/namespace.h"
 #include "cedar/auxiliaries/gl/Scene.h"
+#include "cedar/devices/sensors/visual/Grabbable.h"
 
 // SYSTEM INCLUDES
 #include <QGLViewer/qglviewer.h>
 #include <QList>
+#include <QReadWriteLock>
 
 /*!@brief A simple viewer for OpenGL drawing routines, based on QGLViewer
  *
@@ -54,7 +56,10 @@
  * @remarks To visualize an object, add it to an instance of cedar::aux::gl::Scene, then create a Viewer for this Scene
  *
  */
-class cedar::aux::gui::Viewer : public QGLViewer
+class cedar::aux::gui::Viewer
+:
+public QGLViewer,
+public cedar::dev::sensors::visual::Grabbable
 {
 private:
   Q_OBJECT
@@ -81,6 +86,45 @@ public:
 
   //!@brief call this function to initialize Gl resources for the passed visualization object
   void initGl(cedar::aux::gl::ObjectVisualizationPtr pVisualization);
+
+  // Grabbable Interface
+  /*!@brief Grab the Image in the class
+   *
+   * @remarks
+   *    This is a member of the grabbable interface
+   *
+   * @return The image in a cv::Mat structure
+   */
+  const cv::Mat& grabImage();
+
+
+  /*!@brief initialize the grabber specific parts in this method.
+   *
+   * The grabber invokes this method in it's constructor.
+   * Have a look at the class cedar::aux::gui::Viewer for an implementation.
+   * The QReadWriteLock is managed by this class, so don't delete it!
+   *
+   * @remarks
+   *    This is a member of the grabbable interface
+   *
+   * @return returns the lock for the image-mat, if there isn't already a grabber connected.
+   *         Otherwise it will return NULL
+   */
+  QReadWriteLock* registerGrabber();
+
+  /*!@brief deinitialize the grabber specific parts in this method.
+   *
+   * The grabber invokes this method in it's destructor.
+   * Have a look at the class cedar::aux::gui::Viewer for an implementation
+   *
+   * @param lock This is the lock which comes from the registerGrabber() method. This parameter is used to
+   *    check, if the assigned grabber invokes the deregisterGrabber() method
+   *
+   * @remarks
+   *    This is a member of the grabbable interface
+   */
+  void deregisterGrabber(QReadWriteLock* lock);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -92,5 +136,19 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
   cedar::aux::gl::ScenePtr const mpScene;
+
+  ///!@brief grab the GL context
+  void grabBuffer();
+
+  ///!@brief Read/write lock for the internal grabber buffer used for concurrent access
+  QReadWriteLock* mpGrabberLock;
+
+  ///!@brief the buffer for the grabber
+  cv::Mat mGrabberBuffer;
+
+  ///!@brief internal flag if grabber is connected
+  bool mGrabberConnected;
+
+  std::string mRegisteredGrabber;
 };
 #endif  // CEDAR_AUX_GUI_VIEWER_H

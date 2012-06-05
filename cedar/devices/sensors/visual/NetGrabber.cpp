@@ -60,7 +60,7 @@ cedar::dev::sensors::visual::NetGrabber::NetGrabber
   const std::string& yarpChannelName
 )
 :
-cedar::dev::sensors::visual::GrabberInterface(configFileName)
+cedar::dev::sensors::visual::Grabber(configFileName)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   readInit(1,"NetGrabber");
@@ -77,7 +77,7 @@ cedar::dev::sensors::visual::NetGrabber::NetGrabber
   const std::string& yarpChannelName1
 )
 :
-cedar::dev::sensors::visual::GrabberInterface(configFileName)
+cedar::dev::sensors::visual::Grabber(configFileName)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   readInit(2,"NetGrabber");
@@ -125,7 +125,7 @@ void cedar::dev::sensors::visual::NetGrabber::onCleanUp()
                                              "cedar::dev::sensors::visual::NetGrabber::onCleanUp()"
                                            );
   //close all captures
-  //mNetReaders.clear(); done in GrabberInterface
+  //mNetReaders.clear(); done in Grabber
 }
 
 //----------------------------------------------------------------------------------------------------

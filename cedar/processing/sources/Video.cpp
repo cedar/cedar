@@ -78,22 +78,21 @@ namespace
 
 cedar::proc::sources::Video::Video()
 :
-cedar::proc::Step(false, true),
-mImage(new cedar::aux::ImageData(cv::Mat::zeros(1, 1, CV_32F))),
+cedar::proc::sources::GrabberBase(),
 mFrameDuration(0.0),
 mTimeElapsed(0.0),
 _mFileName(new cedar::aux::FileParameter(this, "videofile",cedar::aux::FileParameter::READ,"")),
-_mLoop(new cedar::aux::BoolParameter(this, "loop", true)),
-_mConfigurationFileName(new cedar::aux::FileParameter(this, "config",cedar::aux::FileParameter::READ,""))
+_mLoop(new cedar::aux::BoolParameter(this, "loop", true))
 {
+  //default config-filename
+  GrabberBase::_mConfigurationFileName->setValue("./videograbber.cfg");
+
   //default-filenames
   _mFileName->setValue("./video.avi");
-  _mConfigurationFileName->setValue("./videograbber.cfg");
   mGrabber.reset();
 
   this->declareOutput("video", mImage);
   QObject::connect(_mFileName.get(), SIGNAL(valueChanged()), this, SLOT(setFileName()));
-  QObject::connect(_mConfigurationFileName.get(), SIGNAL(valueChanged()), this, SLOT(setConfigurationFileName()));
   QObject::connect(_mLoop.get(), SIGNAL(valueChanged()), this, SLOT(setLoop()));
 }
 
@@ -132,7 +131,7 @@ void cedar::proc::sources::Video::reset()
   // Rewind the video
   if (mGrabber)
   {
-    mGrabber->setPositionAbsolute(0);
+    this->getGrabber()->setPositionAbsolute(0);
   }
 }
 
@@ -192,31 +191,16 @@ void cedar::proc::sources::Video::setLoop()
 {
   if (mGrabber)
   {
-    this->mGrabber->setLooped(this->_mLoop->getValue());
+    this->getGrabber()->setLooped(this->_mLoop->getValue());
   }
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::sources::Video::setConfigurationFileName()
-{
-
-}
 
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::sources::Video::createGrabber()
+void cedar::proc::sources::Video::onCreateGrabber()
 {
   std::string filename = this->_mFileName->getPath();
 
-
-  // destroy the old grabber (if any), in order to save the configuration
-  if (mGrabber)
-  {
-    const std::string message1 = "Old grabber deleted";
-    cedar::aux::LogSingleton::getInstance()->debugMessage(message1,"cedar::proc::sources::Video::createGrabber()");
-  }
-  mGrabber.reset();
-
-  // create a new one
   cedar::dev::sensors::visual::VideoGrabberPtr grabber;
   grabber = cedar::dev::sensors::visual::VideoGrabberPtr
             (
@@ -226,13 +210,13 @@ void cedar::proc::sources::Video::createGrabber()
   cedar::aux::LogSingleton::getInstance()->debugMessage(message2,"cedar::proc::sources::Video::createGrabber()");
 
   // the new grabber created without exception, so we can use it
-  mGrabber = grabber;
+  GrabberBase::mGrabber = grabber;
 
   // calcualte the frameduration in ms
-  double fps = mGrabber->getSourceFps(0);
+  double fps = this->getGrabber()->getSourceFps(0);
   mFrameDuration = static_cast<cedar::unit::Milliseconds>(1000.0 / fps);
 
   // set the loop
-  this->mGrabber->setLooped(this->_mLoop->getValue());
+  this->getGrabber()->setLooped(this->_mLoop->getValue());
 
 }

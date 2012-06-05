@@ -53,7 +53,7 @@ cedar::dev::sensors::visual::VideoGrabber::VideoGrabber(
                             const std::string& aviFileName
                           )
 :
-cedar::dev::sensors::visual::GrabberInterface(configFileName),
+cedar::dev::sensors::visual::Grabber(configFileName),
 _mLooped(true),
 _mSpeedFactor(1),
 mFramesCount(0)
@@ -74,7 +74,7 @@ cedar::dev::sensors::visual::VideoGrabber::VideoGrabber(
                             const std::string& aviFileName1
                           )
 :
-cedar::dev::sensors::visual::GrabberInterface(configFileName),
+cedar::dev::sensors::visual::Grabber(configFileName),
 _mLooped(true),
 _mSpeedFactor(1),
 mFramesCount(0)
