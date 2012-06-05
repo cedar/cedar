@@ -10,6 +10,7 @@
     <file>steps/no_icon.svg</file>
     <file>steps/gauss_input.svg</file>
     <file>steps/static_gain.svg</file>
+    <file>steps/convolution.svg</file>
     <file>steps/net_reader.svg</file>
     <file>steps/resize.svg</file>
     <file>steps/net_writer.svg</file>

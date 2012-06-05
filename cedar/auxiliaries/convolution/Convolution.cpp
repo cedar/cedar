@@ -80,6 +80,9 @@ _mEngine
   this->selectedEngineChanged();
 
   QObject::connect(this->_mEngine.get(), SIGNAL(valueChanged()), this, SLOT(selectedEngineChanged()));
+  QObject::connect(this->_mEngine.get(), SIGNAL(valueChanged()), this, SIGNAL(configurationChanged()));
+  QObject::connect(this->_mMode.get(), SIGNAL(valueChanged()), this, SIGNAL(configurationChanged()));
+  QObject::connect(this->_mBorderType.get(), SIGNAL(valueChanged()), this, SIGNAL(configurationChanged()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
