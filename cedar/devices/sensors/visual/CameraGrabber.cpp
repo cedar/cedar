@@ -62,7 +62,7 @@ cedar::dev::sensors::visual::CameraGrabber::CameraGrabber
   bool finishInitialization
 )
 :
-cedar::dev::sensors::visual::GrabberInterface(configFileName)
+cedar::dev::sensors::visual::Grabber(configFileName)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   cedar::aux::LogSingleton::getInstance()->debugMessage
@@ -105,7 +105,7 @@ cedar::dev::sensors::visual::CameraGrabber::CameraGrabber
                  bool finishInitialization
                )
 :
-cedar::dev::sensors::visual::GrabberInterface(configFileName)
+cedar::dev::sensors::visual::Grabber(configFileName)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   cedar::aux::LogSingleton::getInstance()->debugMessage
@@ -149,7 +149,7 @@ cedar::dev::sensors::visual::CameraGrabber::CameraGrabber
                  unsigned int numChannels
                )
 :
-cedar::dev::sensors::visual::GrabberInterface(configFileName)
+cedar::dev::sensors::visual::Grabber(configFileName)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   cedar::aux::LogSingleton::getInstance()->debugMessage
@@ -299,7 +299,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::onInit()
 
     if (mCreateGrabberByGuid)
     {
-      init_message << "GUID: "<< getChannel(i)->mCamId.guid << std::endl;
+      init_message << "Camera-GUID: "<< getChannel(i)->mCamId.guid << std::endl;
     }
     else
     {
@@ -563,7 +563,7 @@ std::vector<std::string> cedar::dev::sensors::visual::CameraGrabber::getAllPrope
   }
 
 
-  //write out all properties directly read from cam
+  //write out all properties as set in our structure as well as the values directly read from cam
   std::vector<std::string> properties;
   properties.push_back("All properties of channel " + boost::lexical_cast<std::string>(channel) + ":");
 
@@ -576,7 +576,6 @@ std::vector<std::string> cedar::dev::sensors::visual::CameraGrabber::getAllPrope
     std::string prop_description = cedar::dev::sensors::visual::CameraProperty::type().get(prop_id).prettyString();
     double prop_value = getCameraProperty(channel,prop_id);
     double prop_raw_value = getCameraPropertyValue(channel,prop_id);
-
 
     std::stringstream prop_value_text;
     if (prop_value == CAMERA_PROPERTY_NOT_SUPPORTED)
@@ -665,8 +664,7 @@ void cedar::dev::sensors::visual::CameraGrabber::onCleanUp()
                                              "cedar::dev::sensors::visual::CameraGrabber::onCleanUp()"
                                            );
 
-  //close all captures
-  //mChannels.clear(); done in GrabberInterface
+  //close all captures mChannels.clear(); done in Grabber
 }
 
 //----------------------------------------------------------------------------------------------------

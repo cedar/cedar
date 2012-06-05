@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/sources/namespace.h"
+#include "cedar/processing/sources/GrabberBase.h"
 #include "cedar/processing/Step.h"
 #include "cedar/devices/sensors/visual/VideoGrabber.h"
 #include "cedar/auxiliaries/ImageData.h"
@@ -55,7 +56,9 @@
 
 
 //!@brief A video file  source for the processingIde
-class cedar::proc::sources::Video : public cedar::proc::Step
+class cedar::proc::sources::Video
+:
+public cedar::proc::sources::GrabberBase
 {
   Q_OBJECT
 
@@ -86,9 +89,6 @@ public slots:
   //!@brief Set looping on or off
   void setLoop();
 
-  //!@brief Sets a new configuration filename
-  void setConfigurationFileName();
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -104,7 +104,26 @@ private:
   void reset();
 
   //create a new grabber instance
-  void createGrabber();
+  void onCreateGrabber();
+
+
+  //!@brief Cast the base GrabberBasePtr to derived class VideoGrabberPtr
+  inline cedar::dev::sensors::visual::VideoGrabberPtr getGrabber()
+  {
+    return boost::static_pointer_cast<cedar::dev::sensors::visual::VideoGrabber>
+           (
+             this->cedar::proc::sources::GrabberBase::mGrabber
+           );
+  }
+
+  //!@brief Cast the base GrabberBasePtr to derived class VideoGrabberPtr
+  inline cedar::dev::sensors::visual::ConstVideoGrabberPtr getGrabber() const
+  {
+    return boost::static_pointer_cast<const cedar::dev::sensors::visual::VideoGrabber>
+           (
+            cedar::proc::sources::GrabberBase::mGrabber
+           );
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -112,11 +131,6 @@ private:
 protected:
   // none yet
 private:
-  //!@brief the actually grabbed frame
-  cedar::aux::ImageDataPtr mImage;
-
-  //!@brief the grabber
-  cedar::dev::sensors::visual::VideoGrabberPtr mGrabber;
 
   //!@brief the time in ms between two frames. Depends on the the framerate of the video
   //!@todo: change to cedar::unit::Time
@@ -140,8 +154,6 @@ private:
   //!@brief Looping through the video-file
   cedar::aux::BoolParameterPtr _mLoop;
 
-  //!@brief The configuration filename
-  cedar::aux::FileParameterPtr _mConfigurationFileName;
 
 
 }; // class cedar::proc::sources::Video

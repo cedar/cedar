@@ -22,45 +22,39 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Camera.h
+    File:        Grabbable.h
 
     Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.ruhr-uni-bochum.d
-    Date:        2012 04 20
+    Email:       georg.hartinger@ini.rub.de
+    Date:        2012 05 15
 
-    Description:
+    Description: Header for the grabbable interface class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCES_CAMERA_H
-#define CEDAR_PROC_SOURCES_CAMERA_H
+#ifndef CEDAR_DEV_SENSORS_VISUAL_INTERFACE_H
+#define CEDAR_DEV_SENSORS_VISUAL_INTERFACE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-// MAKE FIREWIRE OPTIONAL
-#ifdef CEDAR_USE_LIB_DC1394
-
 // CEDAR INCLUDES
-#include "cedar/processing/sources/namespace.h"
-#include "cedar/processing/sources/GrabberBase.h"
-#include "cedar/devices/sensors/visual/CameraGrabber.h"
-
-#include "cedar/auxiliaries/FileParameter.h"
-#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/devices/sensors/visual/namespace.h"
 
 // SYSTEM INCLUDES
+#include <opencv2/opencv.hpp>
+#include <QReadWriteLock>
 
 
-//!@brief A camera source for the processingIde
-class cedar::proc::sources::Camera
-:
-public cedar::proc::sources::GrabberBase
+/*!@brief An interface class to describe an interface to grab from any other class
+ *
+ * Implement this interface in your class, if the InterfaceGrabber should grab from it
+ *
+ */
+class cedar::dev::sensors::visual::Grabbable
 {
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -68,29 +62,52 @@ public cedar::proc::sources::GrabberBase
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-public:
+protected:
   //!@brief The standard constructor.
-  Camera();
+  Grabbable()
+  {
+  };
+
+public:
 
   //!@brief Destructor
-//  virtual ~Camera(){};
+  virtual ~Grabbable()
+  {
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
-
-public slots:
-
-  //!@brief Set the debayer function on or off
-  void setDeBayer();
-
-  /*!@brief Set the busId
+  /*!@brief Grab the Image in the class
    *
-   * If this value is set on grabbing, the cameragrabber will be destroyed and with the new busId recreated
+   * @return The image in a cv::Mat structure
    */
-  void setBusId();
+  virtual const cv::Mat& grabImage() = 0;
+
+
+  /*!@brief initialize the grabber specific parts in this method.
+   *
+   * The QReadWriteLock should be managed by the derived class.
+   * The grabber invokes this method in it's constructor.
+   * Have a look at the class cedar::aux::gui::Viewer for an implementation
+   *
+   * @return returns the lock for the image-mat, if there isn't already a grabber connected.
+   *         Otherwise it will return NULL
+   */
+  virtual QReadWriteLock* registerGrabber() = 0;
+
+
+  /*!@brief deinitialize the grabber specific parts in this method.
+   *
+   * The grabber invokes this method in it's destructor.
+   * Have a look at the class cedar::aux::gui::Viewer for an implementation
+   *
+   * @param lock This is the lock which comes from the registerGrabber() method. This parameter is used to
+   *    check, if the assigned grabber invokes the deregisterGrabber() method.
+   *    After invocation of this method, lock should be set to NULL!
+   */
+  virtual void deregisterGrabber(QReadWriteLock* lock) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -102,27 +119,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void compute(const cedar::proc::Arguments&);
-  void onStart();
-  void onCreateGrabber();
-
-  //!@brief Cast the base GrabberBasePtr to derived class CameraGrabberPtr
-  inline cedar::dev::sensors::visual::CameraGrabberPtr getGrabber()
-  {
-    return boost::static_pointer_cast<cedar::dev::sensors::visual::CameraGrabber>
-           (
-             this->cedar::proc::sources::GrabberBase::mGrabber
-           );
-  }
-
-  //!@brief Cast the base GrabberBasePtr to derived class CameraGrabberPtr
-  inline cedar::dev::sensors::visual::ConstCameraGrabberPtr getGrabber() const
-  {
-    return boost::static_pointer_cast<const cedar::dev::sensors::visual::CameraGrabber>
-           (
-            cedar::proc::sources::GrabberBase::mGrabber
-           );
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -138,15 +135,10 @@ private:
 protected:
   // none yet
 
-
 private:
-  //!@ Bayer conversion from the camera image
-  cedar::aux::BoolParameterPtr mDeBayer;
+  // none yet
 
-  //!@ busid
-  cedar::aux::UIntParameterPtr mBusId;
+}; // class cedar::dev::sensors::visual::Grabbable
 
-}; // class cedar::proc::sources::Camera
+#endif // CEDAR_DEV_SENSORS_VISUAL_GRABBABLE_H
 
-#endif // CEDAR_USE_LIB_DC1394
-#endif // CEDAR_PROC_SOURCES_CAMERA_H
