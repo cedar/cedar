@@ -95,30 +95,35 @@ public:
    *
    * @return The image in a cv::Mat structure
    */
-  virtual cv::Mat grabImage();
+  const cv::Mat& grabImage();
 
 
   /*!@brief initialize the grabber specific parts in this method.
    *
    * The grabber invokes this method in it's constructor.
-   * Have a look at the class cedar::aux::gui::Viewer for an implementation
+   * Have a look at the class cedar::aux::gui::Viewer for an implementation.
+   * The QReadWriteLock is managed by this class, so don't delete it!
    *
    * @remarks
    *    This is a member of the grabbable interface
    *
-   * @return returns the lock for the image-mat.
+   * @return returns the lock for the image-mat, if there isn't already a grabber connected.
+   *         Otherwise it will return NULL
    */
-  virtual QReadWriteLock* connectGrabber();
+  QReadWriteLock* registerGrabber();
 
   /*!@brief deinitialize the grabber specific parts in this method.
    *
    * The grabber invokes this method in it's destructor.
    * Have a look at the class cedar::aux::gui::Viewer for an implementation
-
+   *
+   * @param lock This is the lock which comes from the registerGrabber() method. This parameter is used to
+   *    check, if the assigned grabber invokes the deregisterGrabber() method
+   *
    * @remarks
    *    This is a member of the grabbable interface
    */
-  virtual void disconnectGrabber() = 0;
+  void deregisterGrabber(QReadWriteLock* lock);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -143,5 +148,7 @@ private:
 
   ///!@brief internal flag if grabber is connected
   bool mGrabberConnected;
+
+  std::string mRegisteredGrabber;
 };
 #endif  // CEDAR_AUX_GUI_VIEWER_H

@@ -53,14 +53,13 @@ cedar::dev::sensors::visual::InterfaceGrabber::InterfaceGrabber
 :
 cedar::dev::sensors::visual::Grabber(configFileName)
 {
-  cedar::aux::LogSingleton::getInstance()->debugMessage
+  //information logging
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+  cedar::aux::LogSingleton::getInstance()->message
                                           (
                                            ConfigurationInterface::getName() + ": Create a single channel grabber",
                                             "cedar::dev::sensors::visual::InterfaceGrabber::InterfaceGrabber()"
                                           );
-
-  //debug information logging
-  cedar::aux::LogSingleton::getInstance()->allocating(this);
 
   //read initialization values from configuration file
   readInit(1,"InterfaceGrabber");
@@ -70,6 +69,8 @@ cedar::dev::sensors::visual::Grabber(configFileName)
 
   //now apply the whole configuration
   applyInit();
+
+  std::cout << "InterfaceGrabber::InterfaceGrabber() finished" << std::endl;
 }
 
 
@@ -84,10 +85,10 @@ cedar::dev::sensors::visual::InterfaceGrabber::InterfaceGrabber
 :
 cedar::dev::sensors::visual::Grabber(configFileName)
 {
-  //debug information logging
+  // information logging
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
-  cedar::aux::LogSingleton::getInstance()->debugMessage
+  cedar::aux::LogSingleton::getInstance()->message
                                           (
                                            ConfigurationInterface::getName() + ": Create a stereo channel grabber",
                                             "cedar::dev::sensors::visual::InterfaceGrabber::InterfaceGrabber()"
@@ -114,11 +115,6 @@ cedar::dev::sensors::visual::InterfaceGrabber::~InterfaceGrabber()
   //do memory de-allocation in the destructor
   //all stuff in the mChannels vector is cleared by the shared pointer
 
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                          (
-                                           ConfigurationInterface::getName() + ": destructor",
-                                            "cedar::dev::sensors::visual::InterfaceGrabber::~InterfaceGrabber()"
-                                          );
   //debug logging
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
@@ -138,32 +134,28 @@ bool cedar::dev::sensors::visual::InterfaceGrabber::onInit()
     init_message << "Channel " << i << ": capture from Source: "
                  << typeid(getChannel(i)->mpSourceInterfaceClass).name() << std::endl;
   }
-  cedar::aux::LogSingleton::getInstance()->message
+  cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
                                              ConfigurationInterface::getName() + init_message.str(),
                                              "cedar::dev::sensors::visual::InterfaceGrabber::onInit()"
                                            );
 
-  //-------------------------------------------------
   //load pictures one by one
   for(unsigned int channel=0; channel<mNumCams;++channel)
   {
-    getChannel(channel)->mpGrabberLock = getChannel(channel)->mpSourceInterfaceClass->connectGrabber();
+    getChannel(channel)->mpGrabberLock = getChannel(channel)->mpSourceInterfaceClass->registerGrabber();
 
-    //apply the new content to the channel image
-    getChannel(channel)->mpGrabberLock->lockForRead();
-    getChannel(channel)->mImageMat = getChannel(channel)->mpSourceInterfaceClass->grabImage().clone();
-    getChannel(channel)->mpGrabberLock->unlock();
-
+    //check if successfully registered
+    if (! getChannel(channel)->mpGrabberLock)
+    {
+      return false;
+    }
   }
 
+  //grab first image
+  onGrab();
 
-  // all grabbers successfully initialized
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                          (
-                                           ConfigurationInterface::getName() + ": Initialization finished",
-                                            "cedar::dev::sensors::visual::InterfaceGrabber::onInit()"
-                                          );
+  //no exception until now
   return true;
 }
 
@@ -175,16 +167,12 @@ void cedar::dev::sensors::visual::InterfaceGrabber::onCleanUp()
 
   for(unsigned int channel=0; channel<mNumCams;++channel)
   {
-    getChannel(channel)->mpSourceInterfaceClass->disconnectGrabber();
+    getChannel(channel)->mpSourceInterfaceClass->deregisterGrabber(getChannel(channel)->mpGrabberLock);
     //remove the references to the external classes
     getChannel(channel)->mpSourceInterfaceClass = NULL;
+    getChannel(channel)->mpGrabberLock = NULL;
   }
 
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                          (
-                                           ConfigurationInterface::getName() + ": Cleaning up",
-                                            "cedar::dev::sensors::visual::InterfaceGrabber::onCleanUp()"
-                                          );
 }
 
 //----------------------------------------------------------------------------------------------------

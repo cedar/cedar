@@ -51,6 +51,12 @@ cedar::dev::sensors::visual::Grabber(configFileName)
   // debug information logging
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
+  cedar::aux::LogSingleton::getInstance()->message
+                                          (
+                                           ConfigurationInterface::getName() + ": Create a single channel GL-grabber",
+                                            "cedar::dev::sensors::visual::GLGrabber::GLGrabber()"
+                                          );
+
   // read initialization values from configuration file
   readInit(1,"GLGrabber");
 
@@ -75,6 +81,11 @@ cedar::dev::sensors::visual::Grabber(configFileName)
 {
   // debug information logging
   cedar::aux::LogSingleton::getInstance()->allocating(this);
+  cedar::aux::LogSingleton::getInstance()->message
+                                          (
+                                           ConfigurationInterface::getName() + ": Create a stereo channel GL-grabber",
+                                            "cedar::dev::sensors::visual::GLGrabber::GLGrabber()"
+                                          );
 
   // read initialization values from configuration file
   readInit(2,"StereoGLGrabber");
@@ -109,7 +120,7 @@ bool cedar::dev::sensors::visual::GLGrabber::onInit()
                  << ": QT::OGLWidget class \"" << typeid(getChannel(i)->mpQGLWidget).name()
                  << "\"" << std::endl;
   }
-  cedar::aux::LogSingleton::getInstance()->message
+  cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
                                              ConfigurationInterface::getName() + init_message.str(),
                                              "cedar::dev::sensors::visual::OglGrabber::onInit()"
@@ -117,12 +128,6 @@ bool cedar::dev::sensors::visual::GLGrabber::onInit()
   //Grab first frames
   onGrab();
 
-  // all grabbers successfully initialized
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                          (
-                                           ConfigurationInterface::getName() + ": Initialization finished",
-                                            "cedar::dev::sensors::visual::CameraGrabber::onInit()"
-                                          );
   return true;
 }
 

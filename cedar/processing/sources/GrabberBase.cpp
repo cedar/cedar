@@ -51,7 +51,7 @@ cedar::proc::sources::GrabberBase::GrabberBase()
 :
 cedar::proc::Step(false, true),
 mImage(new cedar::aux::ImageData(cv::Mat::zeros(1, 1, CV_32F))),
-mRecording(new cedar::aux::BoolParameter(this, "recording", false)),
+mRecording(new cedar::aux::BoolParameter(this, "record", false)),
 mRecordName(new cedar::aux::FileParameter(this, "recordName", cedar::aux::FileParameter::WRITE, "")),
 mSnapshotName(new cedar::aux::FileParameter(this, "snapshotName", cedar::aux::FileParameter::WRITE, "")),
 _mConfigurationFileName(new cedar::aux::FileParameter(this, "config",cedar::aux::FileParameter::READ,""))

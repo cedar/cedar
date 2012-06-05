@@ -49,7 +49,8 @@ cedar::aux::gui::Viewer::Viewer(cedar::aux::gl::ScenePtr pScene)
 mpScene(pScene),
 mpGrabberLock(NULL),
 mGrabberBuffer(cv::Mat()),
-mGrabberConnected(false)
+mGrabberConnected(false),
+mRegisteredGrabber("")
 {
   mpScene->addViewer(this);
 }
@@ -99,15 +100,10 @@ void cedar::aux::gui::Viewer::timerEvent(QTimerEvent*)
 void cedar::aux::gui::Viewer::grabBuffer()
 {
   // grab framebuffer without alpha-channel. possible values
-  // GL_FRONT_LEFT, GL_FRONT_RIGHT, GL_BACK_LEFT, GL_BACK_RIGHT, GL_FRONT, GL_BACK, GL_LEFT, GL_RIGHT, GL_AUXi,
-  // where i is between 0 and the value of GL_AUX_BUFFERS minus 1.
-
-  //activate this thread for painting
-  //problem: qgl-widget painting also have to be multithreaded, i.e also have to invoke makeCurrent(), doneCurrent()
-  //p_channel_widget->makeCurrent();
+  // GL_FRONT_LEFT, GL_FRONT_RIGHT, GL_BACK_LEFT, GL_BACK_RIGHT, GL_FRONT, GL_BACK, GL_LEFT, GL_RIGHT,
+  // GL_AUXi, where i is between 0 and the value of GL_AUX_BUFFERS minus 1.
   glReadBuffer(GL_FRONT_RIGHT);
   QImage qimage = this->QGLWidget::grabFrameBuffer(false);
-  //p_channel_widget->doneCurrent();
 
   // QImage to cv::Mat
   cv::Mat mat = cv::Mat(qimage.height(), qimage.width(), CV_8UC4,(uchar*)qimage.bits(), qimage.bytesPerLine());
@@ -122,26 +118,30 @@ void cedar::aux::gui::Viewer::grabBuffer()
 }
 
 
-cv::Mat cedar::aux::gui::Viewer::grabImage()
+const cv::Mat& cedar::aux::gui::Viewer::grabImage()
 {
   return mGrabberBuffer;
 }
 
-
-QReadWriteLock* cedar::aux::gui::Viewer::connectGrabber()
+QReadWriteLock* cedar::aux::gui::Viewer::registerGrabber()
 {
+  if (mGrabberConnected)
+  {
+    return NULL;
+  }
   mpGrabberLock = new QReadWriteLock;
   mGrabberConnected = true;
   return mpGrabberLock;
 }
 
-
-void cedar::aux::gui::Viewer::disconnectGrabber()
+void cedar::aux::gui::Viewer::deregisterGrabber(QReadWriteLock* lock)
 {
-  if (mpGrabberLock)
+  //only allow grabber with correct QReadWriteLock to disconnect
+  //i.e. use the pointer-address of the QReadWriteLock as unique id
+  if ( mpGrabberLock && (lock == mpGrabberLock) )
   {
     delete mpGrabberLock;
-    mpGrabberLock=NULL;
+    mpGrabberLock = NULL;
+    mGrabberConnected = false;
   }
-  mGrabberConnected = false;
 }
