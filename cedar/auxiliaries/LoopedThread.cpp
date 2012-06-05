@@ -44,19 +44,36 @@
 //------------------------------------------------------------------------------
 // constructors and destructor
 //------------------------------------------------------------------------------
-cedar::aux::LoopedThread::LoopedThread(double stepSize, double idleTime,const std::string& configFileName)
+cedar::aux::LoopedThread::LoopedThread
+(
+  double stepSize,
+  double idleTime
+#ifdef CEDAR_LIBCONFIG_LEGACY_MODE
+  ,const std::string& configFileName
+#endif // CEDAR_LIBCONFIG_LEGACY_MODE
+)
 :
+#ifdef CEDAR_LIBCONFIG_LEGACY_MODE
 cedar::aux::ConfigurationInterface(configFileName)
+#else
+_mStepSize(new cedar::aux::DoubleParameter(this, "step size", stepSize)),
+_mIdleTime(new cedar::aux::DoubleParameter(this, "idle time", idleTime)),
+_mSimulatedTime(new cedar::aux::DoubleParameter(this, "simulated time", 0.0)),
+_mUseFixedStepSize(new cedar::aux::BoolParameter(this, "use fixed step size", true))
+#endif // CEDAR_LIBCONFIG_LEGACY_MODE
 {
   mStop  = false;
   initStatistics();
 
   mStepSize = boost::posix_time::microseconds(static_cast<unsigned int>(1000 * stepSize + 0.5));
   mIdleTime = static_cast<unsigned int>(1000 * idleTime + 0.5);
+#ifdef CEDAR_LIBCONFIG_LEGACY_MODE
   mUseFixedStepSize = true;
+#endif // CEDAR_LIBCONFIG_LEGACY_MODE
   mSimulatedTime = boost::posix_time::microseconds(0);
 }
 
+#ifdef CEDAR_LIBCONFIG_LEGACY_MODE
 cedar::aux::LoopedThread::LoopedThread(const std::string& configFileName)
 :
 cedar::aux::ConfigurationInterface(configFileName)
@@ -74,6 +91,7 @@ cedar::aux::ConfigurationInterface(pConfigFileName)
   initStatistics();
   readParamsFromConfigFile();
 }
+#endif // CEDAR_LIBCONFIG_LEGACY_MODE
 
 cedar::aux::LoopedThread::~LoopedThread()
 {
@@ -124,7 +142,7 @@ void cedar::aux::LoopedThread::run(void)
 {
   // we do not want to change the step size while running
   boost::posix_time::time_duration step_size = mStepSize;
-  bool use_fixed_step_size = mUseFixedStepSize;
+  bool use_fixed_step_size = this->usesFixedStepSize();
   initStatistics();
 
   // which mode?
@@ -310,20 +328,14 @@ bool cedar::aux::LoopedThread::stopRequested()
 
 void cedar::aux::LoopedThread::readParamsFromConfigFile()
 {
-  _mStepSize = 100.0;
-  _mIdleTime = 0.001;
-  _mSimulatedTime = 0.0;
+  _mStepSize->setValue(100.0);
+  _mIdleTime->setValue(0.001);
+  _mSimulatedTime->setValue(0.0);
 
-  addParameter(&_mStepSize, "threadStepSize", 100.0);
-  addParameter(&_mIdleTime, "threadIdleTime", 0.001);
-  addParameter(&mUseFixedStepSize, "threadUseFixedStepSize", true);
-  addParameter(&_mSimulatedTime, "threadSimulatedTime", 0.0);
-
-  this->readOrDefaultConfiguration();
-
-  mStepSize = boost::posix_time::microseconds(static_cast<unsigned int>(1000 * _mStepSize + 0.5));
-  mIdleTime = static_cast<unsigned int>(1000 * _mIdleTime + 0.5);
-  mSimulatedTime = boost::posix_time::microseconds(static_cast<unsigned>(1000 * _mSimulatedTime + 0.5));
+  mStepSize = boost::posix_time::microseconds(static_cast<unsigned int>(1000 * this->getStepSizeParameter() + 0.5));
+  mIdleTime = static_cast<unsigned int>(1000 * this->getIdleTimeParameter() + 0.5);
+  mSimulatedTime
+    = boost::posix_time::microseconds(static_cast<unsigned>(1000 * this->getSimulatedTimeParameter() + 0.5));
 
   return;
 }
@@ -331,7 +343,7 @@ void cedar::aux::LoopedThread::readParamsFromConfigFile()
 void cedar::aux::LoopedThread::setStepSize(double stepSize)
 {
   mStepSize = boost::posix_time::microseconds(static_cast<unsigned int>(1000 * stepSize + 0.5));
-  _mStepSize = stepSize;
+  this->_mStepSize->setValue(stepSize);
 }
 
 void cedar::aux::LoopedThread::setIdleTime(double idleTime)
@@ -341,7 +353,7 @@ void cedar::aux::LoopedThread::setIdleTime(double idleTime)
 
 void cedar::aux::LoopedThread::useFixedStepSize(bool useFixedStepSize)
 {
-  mUseFixedStepSize = useFixedStepSize;
+  this->_mUseFixedStepSize->setValue(useFixedStepSize);
 }
 
 void cedar::aux::LoopedThread::setSimulatedTime(double simulatedTime)

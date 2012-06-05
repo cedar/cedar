@@ -34,12 +34,17 @@
 
 ======================================================================================================================*/
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 #ifndef CEDAR_AUX_LOOPED_THREAD_H
 #define CEDAR_AUX_LOOPED_THREAD_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -86,8 +91,11 @@
  * to fulfill real-time constraints.
  *
  * \todo fill in doxygen comments for all member variables
+ *
+ * \todo Revise the parameters of the looped thread
+ * \todo Use units instead of doubles
  */
-class cedar::aux::LoopedThread : public cedar::aux::ConfigurationInterface,
+class cedar::aux::LoopedThread : public cedar::aux::Configurable,
                                  public QThread
 {
   //----------------------------------------------------------------------------
@@ -110,33 +118,11 @@ public:
    * @param idleTime idle time (in milliseconds) used in fast running mode (i.e. stepSize = 0)
    * @param configFileName an optional configuration file for reading and writing thread configurations
    */
-  LoopedThread(double stepSize = 1.0, double idleTime = 0.001, const std::string& configFileName = "");
-
-  /*!@brief Constructor with configuration file parameter.
-   *
-   * This constructor creates a LoopedThread with parameters taken from a
-   * configuration file.
-   *
-   * In the configuration file the parameter names are the following:
-   *
-   * threadStepSize, threadIdleTime, threadUseFixedStepSize, threadSimulatedTime
-   *
-   * @param configFileName an optional configuration file for reading and writing thread configurations
-   */
-  LoopedThread(const std::string& configFileName);
-
-  /*!@brief Constructor with configuration file parameter.
-   *
-   * This constructor creates a LoopedThread with parameters taken from a
-   * configuration file.
-   *
-   * In the configuration file the parameter names are the following:
-   *
-   * threadStepSize, threadIdleTime, threadUseFixedStepSize, threadSimulatedTime
-   *
-   * @param pConfigFileName an optional configuration file for reading and writing thread configurations
-   */
-  LoopedThread(const char* pConfigFileName);
+  LoopedThread
+  (
+    double stepSize = 1.0,
+    double idleTime = 0.001
+  );
 
   //!@brief Destructor
   virtual ~LoopedThread();
@@ -251,9 +237,33 @@ protected:
   //----------------------------------------------------------------------------
 private:
   virtual void run(); // the thread does its work here!
+
   void initStatistics();
+
   inline void updateStatistics(double stepsTaken);
+
   void readParamsFromConfigFile();
+
+  inline double getStepSizeParameter() const
+  {
+    return this->_mStepSize->getValue();
+  }
+
+  inline double getIdleTimeParameter() const
+  {
+    return this->_mIdleTime->getValue();
+  }
+
+  inline double getSimulatedTimeParameter() const
+  {
+    return this->_mSimulatedTime->getValue();
+  }
+
+  inline bool usesFixedStepSize() const
+  {
+    return this->_mUseFixedStepSize->getValue();
+  }
+
 
   //----------------------------------------------------------------------------
   // members
@@ -261,16 +271,10 @@ private:
 protected:
   //!@brief desired length of a single step, in milliseconds
   boost::posix_time::time_duration mStepSize;
-  //! parameter version of mStepSize
-  double _mStepSize;
-  //! parameter version of mIdleTime
-  double _mIdleTime;
-  //! parameter version of mSimulatedTime
-  double _mSimulatedTime;
+
 private:
   bool mStop;
   unsigned int mIdleTime; //!< in microseconds
-  bool mUseFixedStepSize;
   boost::posix_time::time_duration mSimulatedTime;
   // gather some statistics
   unsigned long mNumberOfSteps;
@@ -279,6 +283,25 @@ private:
   // remeber time stamps of last step
   boost::posix_time::ptime mLastTimeStepStart;
   boost::posix_time::ptime mLastTimeStepEnd;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  //! parameter version of mStepSize
+  cedar::aux::DoubleParameterPtr _mStepSize;
+
+  //! parameter version of mIdleTime
+  cedar::aux::DoubleParameterPtr _mIdleTime;
+
+  //! parameter version of mSimulatedTime
+  cedar::aux::DoubleParameterPtr _mSimulatedTime;
+
+  //! Whether to use a fixed step size
+  cedar::aux::BoolParameterPtr _mUseFixedStepSize;
 
 }; // class cedar::aux::LoopedThread
 
