@@ -112,8 +112,8 @@ bool cedar::aux::conv::OpenCV::checkModeCapability
        cedar::aux::conv::Mode::Id mode
      ) const
 {
-  // currently, only the full same is supported
-  return mode == cedar::aux::conv::Mode::Same;
+  // currently, only full & same are supported
+  return mode == cedar::aux::conv::Mode::Same || mode == cedar::aux::conv::Mode::Full;
 }
 
 int cedar::aux::conv::OpenCV::translateBorderType(cedar::aux::conv::BorderType::Id borderType) const
@@ -182,6 +182,43 @@ void cedar::aux::conv::OpenCV::translateAnchor
   kernel->unlock();
 }
 
+cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
+        (
+          const cv::Mat& matrix,
+          cedar::aux::conv::BorderType::Id borderType
+        ) const
+{
+  int top = -1;
+  int bottom = -1;
+  int left = -1;
+  int right = -1;
+  if (matrix.rows % 2 == 1)
+  {
+    top = matrix.rows / 2;
+    bottom = matrix.rows / 2;
+  }
+  else
+  {
+    top = matrix.rows / 2;
+    bottom = matrix.rows / 2 - 1;
+  }
+
+  if (matrix.cols % 2 == 1)
+  {
+    left = matrix.cols / 2;
+    right = matrix.cols / 2;
+  }
+  else
+  {
+    left = matrix.cols / 2;
+    right = matrix.cols / 2 - 1;
+  }
+
+  cv::Mat full_matrix = cv::Mat::zeros(2 * matrix.rows - 1, 2 * matrix.cols - 1, CV_32F);
+  cv::copyMakeBorder(matrix, full_matrix, top, bottom, left, right, translateBorderType(borderType));
+
+  return full_matrix;
+}
 
 cv::Mat cedar::aux::conv::OpenCV::convolve
         (
@@ -192,13 +229,26 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
           const std::vector<int>& anchorVector
         ) const
 {
-  //!@todo Implement full mode!
-  CEDAR_ASSERT(mode == cedar::aux::conv::Mode::Same);
 
-  cv::Point anchor = cv::Point(-1, -1);
-  this->translateAnchor(anchor, anchorVector, kernel.size);
-  int border_type = this->translateBorderType(borderType);
-  return this->cvConvolve(matrix, kernel, border_type, anchor);
+  CEDAR_ASSERT(mode == cedar::aux::conv::Mode::Same || mode == cedar::aux::conv::Mode::Full);
+
+  if (mode == cedar::aux::conv::Mode::Same)
+  {
+    cv::Point anchor = cv::Point(-1, -1);
+    this->translateAnchor(anchor, anchorVector, kernel.size);
+    int border_type = this->translateBorderType(borderType);
+    return this->cvConvolve(matrix, kernel, border_type, anchor);
+  }
+
+  else //if (mode == cedar::aux::conv::Mode::Full)
+  {
+    cv::Mat matrix_full = createFullMatrix(matrix,borderType);
+    cv::Point anchor = cv::Point(-1, -1);
+    this->translateAnchor(anchor, anchorVector, kernel.size);
+    int border_type = this->translateBorderType(borderType);
+    return this->cvConvolve(matrix_full, kernel, border_type, anchor);
+  }
+
 }
 
 cv::Mat cedar::aux::conv::OpenCV::convolve
