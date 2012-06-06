@@ -67,6 +67,38 @@ cedar::proc::Connectable::~Connectable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+
+bool cedar::proc::Connectable::ownsDataOf(cedar::proc::ConstOwnedDataPtr slot) const
+{
+  // iterate over all buffers
+  std::map<DataRole::Id, SlotMap>::const_iterator map_iter = this->mDataConnections.find(cedar::proc::DataRole::BUFFER);
+  if (map_iter != this->mDataConnections.end())
+  {
+    for (SlotMap::const_iterator slot_iter = map_iter->second.begin(); slot_iter != map_iter->second.end(); ++slot_iter)
+    {
+      if (slot_iter->second->getData() == slot->getData())
+      {
+        return true;
+      }
+    }
+  }
+
+  // iterate over all outputs
+  map_iter = mDataConnections.find(cedar::proc::DataRole::OUTPUT);
+  if (map_iter != this->mDataConnections.end())
+  {
+    for (SlotMap::const_iterator slot_iter = map_iter->second.begin(); slot_iter != map_iter->second.end(); ++slot_iter)
+    {
+      if (slot_iter->second->getData() == slot->getData())
+      {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 cedar::proc::Connectable::SlotMap& cedar::proc::Connectable::getDataSlots(DataRole::Id role)
 {
   std::map<DataRole::Id, SlotMap>::iterator iter = this->mDataConnections.find(role);
@@ -535,14 +567,20 @@ cedar::proc::ConstDataSlotPtr cedar::proc::Connectable::getBufferSlot(const std:
   return this->getSlot(cedar::proc::DataRole::BUFFER, name);
 }
 
-cedar::proc::DataSlotPtr cedar::proc::Connectable::getOutputSlot(const std::string& name)
+cedar::proc::OwnedDataPtr cedar::proc::Connectable::getOutputSlot(const std::string& name)
 {
-  return this->getSlot(cedar::proc::DataRole::OUTPUT, name);
+  return cedar::aux::asserted_pointer_cast<cedar::proc::OwnedData>
+         (
+           this->getSlot(cedar::proc::DataRole::OUTPUT, name)
+         );
 }
 
-cedar::proc::ConstDataSlotPtr cedar::proc::Connectable::getOutputSlot(const std::string& name) const
+cedar::proc::ConstOwnedDataPtr cedar::proc::Connectable::getOutputSlot(const std::string& name) const
 {
-  return this->getSlot(cedar::proc::DataRole::OUTPUT, name);
+  return cedar::aux::asserted_pointer_cast<const cedar::proc::OwnedData>
+         (
+           this->getSlot(cedar::proc::DataRole::OUTPUT, name)
+         );
 }
 
 void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data)

@@ -41,6 +41,8 @@
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/Element.h"
 #include "cedar/processing/DataSlot.h"
+#include "cedar/processing/ExternalData.h"
+#include "cedar/processing/OwnedData.h"
 #include "cedar/processing/DataRole.h"
 #include "cedar/auxiliaries/threadingUtilities.h"
 
@@ -111,7 +113,7 @@ public:
 
   //!@brief Returns the output slot corresponding to the given name.
   //!@see cedar::proc::Step::getSlot
-  cedar::proc::DataSlotPtr getOutputSlot(const std::string& name);
+  cedar::proc::OwnedDataPtr getOutputSlot(const std::string& name);
 
   //!@brief Returns the slot corresponding to the specified role and name.
   cedar::proc::DataSlotPtr getSlot(DataRole::Id role, const std::string& name);
@@ -126,7 +128,7 @@ public:
 
   //!@brief Returns a const pointer to the output slot corresponding to the given name.
   //!@see cedar::proc::Step::getSlot
-  cedar::proc::ConstDataSlotPtr getOutputSlot(const std::string& name) const;
+  cedar::proc::ConstOwnedDataPtr getOutputSlot(const std::string& name) const;
 
   //!@brief Returns a const pointer to the slot corresponding to the given role and name.
   //!@see cedar::proc::Step::getSlot
@@ -166,6 +168,9 @@ public:
                                             cedar::proc::ConstDataSlotPtr slot,
                                             cedar::aux::DataPtr data
                                           ) const;
+
+  //!@brief Returns true, if this connectable already owns data in the target.
+  bool ownsDataOf(cedar::proc::ConstOwnedDataPtr slot) const;
 
   //!@brief Parses a data and Connectable name without specifying a role.
   static void parseDataNameNoRole
