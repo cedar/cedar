@@ -62,6 +62,8 @@ cv::Mat numbers_1d;
 // 3x3 matrix containing all numbers from 0 to 8
 cv::Mat numbers_2d;
 
+cv::Mat numbers_even_2d;
+
 
 class DemoKernel : public cedar::aux::kernel::Kernel
 {
@@ -256,7 +258,7 @@ cv::Mat conv
   }
   else if (mode == cedar::aux::conv::Mode::Full)
   {
-    cv::Mat result = cv::Mat::zeros(op1.rows, op1.cols, CV_32F);
+    cv::Mat result = cv::Mat::zeros(2*op1.rows-1, 2*op1.cols-1, CV_32F);
 
     //TODO implement full conv
 
@@ -271,7 +273,8 @@ cv::Mat conv
           for (int k_col = 0; k_col < op2.cols; ++k_col)
           {
             result.at<float>(row, col)
-              += border_interpolate(op1, row - k_row + offset_r, col - k_col + offset_c, borderType)
+//              += border_interpolate(op1, row - k_row + offset_r, col - k_col + offset_c, borderType)
+    += border_interpolate(op1, row - k_row, col - k_col, borderType)
                  * op2.at<float>(k_row, k_col);
           }
         }
@@ -329,7 +332,7 @@ int test_matxmat_convolution
     )
   )
   {
-    std::cout << "SKIPPED\n\tEngine is not capable of this operation." << std::endl;
+    std::cout << "SKIPPED --- Engine is not capable of this operation." << std::endl;
     return 0;
   }
 
@@ -373,16 +376,17 @@ int testMatrixKernelOperation
     (
       cedar::aux::math::getDimensionalityOf(mat),
       kernel->getDimensionality(),
-      borderType
+      borderType,
+      mode
     )
   )
   {
-    std::cout << "SKIPPED\n\tEngine is not capable of this operation." << std::endl;
+    std::cout << "SKIPPED --- Engine is not capable of this operation." << std::endl;
     return 0;
   }
 
   cv::Mat expected = conv(mat, kernel_mat, borderType, mode);
-  cv::Mat result = engine->convolve(mat, kernel, borderType);
+  cv::Mat result = engine->convolve(mat, kernel, borderType, mode);
 
   if (!mat_eq(expected, result))
   {
@@ -404,9 +408,11 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine, cedar::aux::k
 {
   int errors = 0;
 
-  {
-    std::cout << "Testing matrix * kernel";
+  std::cout << "-----------------------------------------------------------------------------" << std::endl;
+  std::cout << "                                          Testing matrix * kernel operations." << std::endl;
+  std::cout << "-----------------------------------------------------------------------------" << std::endl;
 
+  {
     std::cout << "(Cyclic 0D, Same) ... ";
     errors += testMatrixKernelOperation
               (
@@ -470,8 +476,6 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine, cedar::aux::k
   }
 
   {
-    std::cout << "Testing matrix * kernel";
-
     std::cout << "(Reflect 0D, Same) ... ";
     errors += testMatrixKernelOperation
               (
@@ -534,8 +538,6 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine, cedar::aux::k
   }
 
   {
-    std::cout << "Testing matrix * kernel";
-
     std::cout << "(Replicate 0D, Same) ... ";
     errors += testMatrixKernelOperation
               (
@@ -598,8 +600,6 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine, cedar::aux::k
   }
 
   {
-    std::cout << "Testing matrix * kernel";
-
     std::cout << "(Zero 0D, Same) ... ";
     errors += testMatrixKernelOperation
               (
@@ -668,7 +668,8 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine)
 {
   int errors = 0;
 
-  std::cout << "Testing matrix * kernel operations (non-separable, symmetric)" << std::endl;
+  std::cout << "-----------------------------------------------------------------------------" << std::endl;
+  std::cout << "                Testing matrix * kernel operations (non-separable, symmetric)" << std::endl;
   std::cout << "-----------------------------------------------------------------------------" << std::endl;
   {
     DemoKernel0DPtr demo_kernel_0d(new DemoKernel0D(2.0));
@@ -681,7 +682,8 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine)
     errors += testMatrixKernelOperations(engine, demo_kernel_2d);
   }
 
-  std::cout << "Testing matrix * kernel operations (non-separable, asymmetric)" << std::endl;
+  std::cout << "-----------------------------------------------------------------------------" << std::endl;
+  std::cout << "               Testing matrix * kernel operations (non-separable, asymmetric)" << std::endl;
   std::cout << "-----------------------------------------------------------------------------" << std::endl;
   {
     DemoKernelPtr demo_kernel_1d(new DemoKernel(numbers_1d));
@@ -691,7 +693,8 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine)
     errors += testMatrixKernelOperations(engine, demo_kernel_2d);
   }
 
-  std::cout << "Testing matrix * kernel operations (separable, symmetric)" << std::endl;
+  std::cout << "-----------------------------------------------------------------------------" << std::endl;
+  std::cout << "                    Testing matrix * kernel operations (separable, symmetric)" << std::endl;
   std::cout << "-----------------------------------------------------------------------------" << std::endl;
   {
     DemoSeparable0DPtr demo_kernel_0d(new DemoSeparable0D(2.0));
@@ -705,7 +708,8 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine)
     errors += testMatrixKernelOperations(engine, demo_kernel_2d);
   }
 
-  std::cout << "Testing matrix * kernel operations (separable, asymmetric)" << std::endl;
+  std::cout << "-----------------------------------------------------------------------------" << std::endl;
+  std::cout << "                   Testing matrix * kernel operations (separable, asymmetric)" << std::endl;
   std::cout << "-----------------------------------------------------------------------------" << std::endl;
   {
     DemoSeparable1DPtr demo_kernel_1d(new DemoSeparable1D(numbers_1d));
@@ -722,11 +726,10 @@ int testMatrixMatrixOperations(cedar::aux::conv::EnginePtr engine)
 {
   int errors = 0;
 
-  std::cout << "Testing matrix * matrix operations." << std::endl;
+  std::cout << "-----------------------------------------------------------------------------" << std::endl;
+  std::cout << "                                          Testing matrix * matrix operations." << std::endl;
   std::cout << "-----------------------------------------------------------------------------" << std::endl;
   {
-    std::cout << "Convolving two matrices:" << std::endl;
-
     cv::Mat op1, op2;
     op1 = cv::Mat::zeros(5, 1, CV_32F);
     op1.at<float>(3) = 1;
@@ -735,7 +738,7 @@ int testMatrixMatrixOperations(cedar::aux::conv::EnginePtr engine)
     op2.at<float>(1) = 1;
     op2.at<float>(2) = 0.5;
 
-    std::cout << " (Replicate, Same) ... ";
+    std::cout << "(Replicate, Same) ... ";
     errors += test_matxmat_convolution
               (
                 engine,
@@ -745,7 +748,7 @@ int testMatrixMatrixOperations(cedar::aux::conv::EnginePtr engine)
                 cedar::aux::conv::Mode::Same
               );
 
-    std::cout << " (Replicate, Full) ... ";
+    std::cout << "(Replicate, Full) ... ";
     errors += test_matxmat_convolution
               (
                 engine,
@@ -757,8 +760,6 @@ int testMatrixMatrixOperations(cedar::aux::conv::EnginePtr engine)
   }
 
   {
-
-
     cv::Mat op1, op2;
     op1 = cv::Mat::zeros(3, 3, CV_32F);
     op1.at<float>(0, 2) = 1;
@@ -767,7 +768,7 @@ int testMatrixMatrixOperations(cedar::aux::conv::EnginePtr engine)
     op2.at<float>(1, 2) = 0.5;
     op2.at<float>(0, 0) = 0.5;
 
-    std::cout << " (Reflect, Same) ... ";
+    std::cout << "(Reflect, Same) ... ";
     errors += test_matxmat_convolution
               (
                 engine,
@@ -777,7 +778,7 @@ int testMatrixMatrixOperations(cedar::aux::conv::EnginePtr engine)
                 cedar::aux::conv::Mode::Same
               );
 
-    std::cout << " (Reflect, Full) ... ";
+    std::cout << "(Reflect, Full) ... ";
     errors += test_matxmat_convolution
               (
                 engine,
@@ -789,8 +790,6 @@ int testMatrixMatrixOperations(cedar::aux::conv::EnginePtr engine)
   }
 
   {
-    std::cout << "Convolving two matrices:" << std::endl;
-
     std::cout << "(Zero, Same) ... ";
     errors += test_matxmat_convolution
               (
@@ -813,8 +812,6 @@ int testMatrixMatrixOperations(cedar::aux::conv::EnginePtr engine)
   }
 
   {
-    std::cout << "Convolving two matrices:";
-
     std::cout << "(Zero II, Same) ... ";
     errors += test_matxmat_convolution
               (
@@ -837,8 +834,6 @@ int testMatrixMatrixOperations(cedar::aux::conv::EnginePtr engine)
   }
 
   {
-    std::cout << "Convolving two matrices";
-
     std::cout << "(Cyclic 1D, Same) ... ";
     errors += test_matxmat_convolution
               (
@@ -861,8 +856,6 @@ int testMatrixMatrixOperations(cedar::aux::conv::EnginePtr engine)
   }
 
   {
-    std::cout << "Convolving two matrices";
-
     std::cout << "(Cyclic 2D, Same) ... ";
     errors += test_matxmat_convolution
               (
@@ -890,6 +883,7 @@ int testMatrixMatrixOperations(cedar::aux::conv::EnginePtr engine)
 
 int testEngine(cedar::aux::conv::EnginePtr engine)
 {
+  std::cout << "=============================================================================" << std::endl;
   std::cout << "Testing engine of type " << cedar::aux::objectTypeToString(engine) << std::endl;
   std::cout << "=============================================================================" << std::endl;
 
@@ -897,6 +891,86 @@ int testEngine(cedar::aux::conv::EnginePtr engine)
   errors += testMatrixMatrixOperations(engine);
   errors += testMatrixKernelOperations(engine);
   return errors;
+}
+
+void printMatrix(cv::Mat m, std::string name = "", int setW = 3)
+{
+  // if name is given print name
+  if(!name.empty())
+  {
+    std::cout << name << std::endl;
+  }
+  // print matrix
+  for(int y = 0; y < m.rows; y++)
+  {
+    for(int x = 0; x < m.cols; x++)
+    {
+      std::cout << " " << m.at<float>(y, x);
+//      std::cout << setw(setW) << m.at<float>(y, x);
+    }
+    std::cout << std::endl;
+  }
+}
+
+void testConv()
+{
+  numbers_2d = cv::Mat(5, 5, CV_32F);
+  numbers_2d.at<float>(0, 0) = 0;
+  numbers_2d.at<float>(0, 1) = 1;
+  numbers_2d.at<float>(0, 2) = 2;
+  numbers_2d.at<float>(0, 3) = 3;
+  numbers_2d.at<float>(0, 4) = 4;
+
+  numbers_2d.at<float>(1, 0) = 5;
+  numbers_2d.at<float>(1, 1) = 6;
+  numbers_2d.at<float>(1, 2) = 7;
+  numbers_2d.at<float>(1, 3) = 8;
+  numbers_2d.at<float>(1, 4) = 9;
+
+  numbers_2d.at<float>(2, 0) = 10;
+  numbers_2d.at<float>(2, 1) = 11;
+  numbers_2d.at<float>(2, 2) = 12;
+  numbers_2d.at<float>(2, 3) = 13;
+  numbers_2d.at<float>(2, 4) = 14;
+
+  numbers_2d.at<float>(3, 0) = 15;
+  numbers_2d.at<float>(3, 1) = 16;
+  numbers_2d.at<float>(3, 2) = 17;
+  numbers_2d.at<float>(3, 3) = 18;
+  numbers_2d.at<float>(3, 4) = 19;
+
+  numbers_2d.at<float>(4, 0) = 20;
+  numbers_2d.at<float>(4, 1) = 21;
+  numbers_2d.at<float>(4, 2) = 22;
+  numbers_2d.at<float>(4, 3) = 23;
+  numbers_2d.at<float>(4, 4) = 24;
+
+  cv::Mat expected = conv(numbers_2d, numbers_2d, cedar::aux::conv::BorderType::Zero, cedar::aux::conv::Mode::Full);
+  printMatrix(expected);
+
+  numbers_even_2d = cv::Mat(4, 4, CV_32F);
+  numbers_even_2d.at<float>(0, 0) = 0;
+  numbers_even_2d.at<float>(0, 1) = 1;
+  numbers_even_2d.at<float>(0, 2) = 2;
+  numbers_even_2d.at<float>(0, 3) = 3;
+
+  numbers_even_2d.at<float>(1, 0) = 4;
+  numbers_even_2d.at<float>(1, 1) = 5;
+  numbers_even_2d.at<float>(1, 2) = 6;
+  numbers_even_2d.at<float>(1, 3) = 7;
+
+  numbers_even_2d.at<float>(2, 0) = 8;
+  numbers_even_2d.at<float>(2, 1) = 9;
+  numbers_even_2d.at<float>(2, 2) = 10;
+  numbers_even_2d.at<float>(2, 3) = 11;
+
+  numbers_even_2d.at<float>(3, 0) = 12;
+  numbers_even_2d.at<float>(3, 1) = 13;
+  numbers_even_2d.at<float>(3, 2) = 14;
+  numbers_even_2d.at<float>(3, 3) = 15;
+
+  cv::Mat expected_even = conv(numbers_even_2d, numbers_even_2d, cedar::aux::conv::BorderType::Zero, cedar::aux::conv::Mode::Full);
+  printMatrix(expected_even);
 }
 
 int main()
@@ -912,6 +986,7 @@ int main()
   numbers_2d.at<float>(2, 0) = 6;
   numbers_2d.at<float>(2, 1) = 7;
   numbers_2d.at<float>(2, 2) = 8;
+
 
   numbers_1d = cv::Mat(3, 1, CV_32F);
   numbers_1d.at<float>(0) = 0;

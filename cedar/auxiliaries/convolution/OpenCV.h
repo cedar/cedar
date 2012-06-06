@@ -171,6 +171,8 @@ private:
     cedar::aux::kernel::ConstKernelPtr kernel
   ) const;
 
+  cv::Mat createFullMatrix(const cv::Mat& matrix, cedar::aux::conv::BorderType::Id borderType) const;
+
   cv::Mat cvConvolve
   (
     const cv::Mat& matrix,
