@@ -198,10 +198,17 @@
     <addaction name="mpActionSettings"/>
     <addaction name="separator"/>
    </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="mpActionAbout"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuPlugins"/>
    <addaction name="menuSimulation"/>
    <addaction name="mpMenuWindows"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QDockWidget" name="mpItemsWidget">
@@ -272,7 +279,7 @@
           <x>0</x>
           <y>0</y>
           <width>121</width>
-          <height>310</height>
+          <height>423</height>
          </rect>
         </property>
         <attribute name="label">
@@ -284,8 +291,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>121</width>
-          <height>310</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -447,6 +454,11 @@
   <action name="mpActionSettings">
    <property name="text">
     <string>Settings...</string>
+   </property>
+  </action>
+  <action name="mpActionAbout">
+   <property name="text">
+    <string>About...</string>
    </property>
   </action>
  </widget>
