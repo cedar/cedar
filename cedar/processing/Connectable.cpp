@@ -244,69 +244,6 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::determineInputValidity
   return cedar::proc::DataSlot::VALIDITY_VALID;
 }
 
-void cedar::proc::Connectable::getDataLocks(cedar::aux::LockSet& locks)
-{
-  for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.begin();
-       slot != this->mDataConnections.end();
-       ++slot)
-  {
-    this->getDataLocks(slot->first, locks);
-  }
-}
-
-/*!
- * @remarks The locks will be inserted into the set, the set is not cleared beforehand.
- */
-void cedar::proc::Connectable::getDataLocks(DataRole::Id role, cedar::aux::LockSet& locks)
-{
-  std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.find(role);
-  if (slot == this->mDataConnections.end())
-  {
-    // ok, no slots
-    return;
-  }
-
-  cedar::aux::LOCK_TYPE type;
-  switch (role)
-  {
-    case cedar::proc::DataRole::INPUT:
-      type = cedar::aux::LOCK_TYPE_READ;
-      break;
-
-    case cedar::proc::DataRole::OUTPUT:
-    case cedar::proc::DataRole::BUFFER:
-      type = cedar::aux::LOCK_TYPE_WRITE;
-      break;
-
-    default:
-      // should never happen unless a role is
-      CEDAR_THROW(cedar::proc::InvalidRoleException, "The given role is not implemented in cedar::proc::Connectable::getDataLocks.");
-  }
-
-
-  for (SlotMap::iterator iter = slot->second.begin(); iter != slot->second.end(); ++iter)
-  {
-    cedar::aux::DataPtr data = iter->second->getData();
-    if (data)
-    {
-      locks.insert(std::make_pair(&data->getLock(), type));
-    }
-  }
-}
-
-void cedar::proc::Connectable::lockAll()
-{
-  cedar::aux::LockSet locks;
-  this->getDataLocks(locks);
-  cedar::aux::lock(locks);
-}
-
-void cedar::proc::Connectable::unlockAll()
-{
-  cedar::aux::LockSet locks;
-  this->getDataLocks(locks);
-  cedar::aux::unlock(locks);
-}
 
 bool cedar::proc::Connectable::allInputsValid()
 {
@@ -598,8 +535,13 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
   }
 
   // inputs come from a different Connectable
-  if (role != cedar::proc::DataRole::INPUT)
+  if (role == cedar::proc::DataRole::INPUT)
   {
+    this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_READ);
+  }
+  else
+  {
+    this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_WRITE);
     data->setOwner(this);
   }
 #ifdef DEBUG_LOCKS
