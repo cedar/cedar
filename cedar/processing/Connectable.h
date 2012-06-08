@@ -300,7 +300,7 @@ private:
 
   //!@brief a map of slot maps, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
   std::map<DataRole::Id, SlotMap> mDataConnections;
-public:
+
   //!@brief a map of slot lists, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
   std::map<DataRole::Id, SlotList> mDataConnectionsOrder;
 
