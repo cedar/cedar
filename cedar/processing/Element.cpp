@@ -80,6 +80,9 @@ void cedar::proc::Element::setNetwork(cedar::proc::NetworkPtr network)
 {
   // set the parent registry
   this->mRegisteredAt = network;
+
+  // emit signal
+  this->mNetworkChanged();
 }
 
 cedar::proc::NetworkPtr cedar::proc::Element::getNetwork()
