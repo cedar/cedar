@@ -357,7 +357,11 @@ void cedar::proc::Step::run()
   this->mpArgumentsLock->unlock();
 
   //!@todo make the (un)locking optional?
+  // lock all data
   this->lockAll();
+
+  // lock all parameters
+  this->lockParameters(cedar::aux::LOCK_TYPE_READ);
 
   try
   {
@@ -396,6 +400,10 @@ void cedar::proc::Step::run()
     this->setState(cedar::proc::Step::STATE_EXCEPTION, "An unknown exception type occurred.");
   }
 
+  // unlock all parameters
+  this->unlockParameters();
+
+  // unlock all data
   this->unlockAll();
 
   // remove the argumens, as they have been processed.

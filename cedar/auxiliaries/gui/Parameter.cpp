@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ParameterBase.cpp
+    File:        Parameter.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
