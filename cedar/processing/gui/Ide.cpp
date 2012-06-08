@@ -163,6 +163,11 @@ cedar::proc::gui::Ide::Ide()
                    SIGNAL(triggered()),
                    this,
                    SLOT(showAboutDialog()));
+
+  QObject::connect(mpActionResetRootNetwork,
+                   SIGNAL(triggered()),
+                   this,
+                   SLOT(resetRootNetwork()));
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -173,6 +178,11 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::resetRootNetwork()
+{
+  this->mNetwork->getNetwork()->reset();
+}
 
 void cedar::proc::gui::Ide::showAboutDialog()
 {
