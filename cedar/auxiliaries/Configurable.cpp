@@ -53,12 +53,16 @@
 #include <sstream>
 #include <fstream> // only used for legacy configurable compatibility
 
+//!@todo Store parameter locks properly
+//!@todo Store parameter locks of children & subparameters properly
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::aux::Configurable::Configurable()
 {
+  this->connectToTreeChangedSignal(boost::bind(&cedar::aux::Configurable::updateLockSet, this));
 }
 
 
@@ -69,6 +73,37 @@ cedar::aux::Configurable::~Configurable()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::Configurable::lockParameters(cedar::aux::LOCK_TYPE lockType)
+{
+  cedar::aux::lock(this->mParameterLocks, lockType);
+}
+
+void cedar::aux::Configurable::unlockParameters()
+{
+  cedar::aux::unlock(this->mParameterLocks);
+}
+
+void cedar::aux::Configurable::updateLockSet()
+{
+  this->mParameterLocks.clear();
+
+  this->appendLocks(this->mParameterLocks);
+}
+
+void cedar::aux::Configurable::appendLocks(std::set<QReadWriteLock*>& locks)
+{
+  for (ParameterList::iterator iter = this->mParameterList.begin(); iter != this->mParameterList.end(); ++iter)
+  {
+    (*iter)->appendLocks(locks);
+  }
+
+  for (Children::iterator iter = this->mChildren.begin(); iter != this->mChildren.end(); ++iter)
+  {
+    iter->second->appendLocks(locks);
+  }
+}
+
 
 void cedar::aux::Configurable::configurationLoaded()
 {
@@ -261,6 +296,8 @@ void cedar::aux::Configurable::registerParameter(cedar::aux::ParameterPtr parame
   ParameterList::iterator last_iter = this->mParameterList.end();
   --last_iter;
   this->mParameterAssociations[name] = last_iter;
+
+  this->updateLockSet();
 }
 
 const cedar::aux::Configurable::ParameterList& cedar::aux::Configurable::getParameters() const
