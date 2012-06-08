@@ -190,6 +190,7 @@
     </property>
     <addaction name="mpThreadsStartAll"/>
     <addaction name="mpThreadsStopAll"/>
+    <addaction name="mpActionResetRootNetwork"/>
    </widget>
    <widget class="QMenu" name="mpMenuWindows">
     <property name="title">
@@ -337,6 +338,7 @@
    </attribute>
    <addaction name="mpActionShowHideGrid"/>
    <addaction name="mpActionSave"/>
+   <addaction name="mpActionResetRootNetwork"/>
   </widget>
   <action name="mpActionNew">
    <property name="text">
@@ -459,6 +461,21 @@
   <action name="mpActionAbout">
    <property name="text">
     <string>About...</string>
+   </property>
+  </action>
+  <action name="mpActionResetRootNetwork">
+   <property name="icon">
+    <iconset resource="icons/icons.qrc">
+     <normaloff>:/toolbaricons/reset.svg</normaloff>:/toolbaricons/reset.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Reset root network</string>
+   </property>
+   <property name="toolTip">
+    <string>Resets the root network of the current architecture.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
    </property>
   </action>
  </widget>
