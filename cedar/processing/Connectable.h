@@ -44,6 +44,7 @@
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/OwnedData.h"
 #include "cedar/processing/DataRole.h"
+#include "cedar/auxiliaries/Lockable.h"
 #include "cedar/auxiliaries/threadingUtilities.h"
 
 // SYSTEM INCLUDES
@@ -55,7 +56,8 @@
  * @remarks Do not inherit from this class directly, because this is a class that is used for managing the internals of
  *          the processing framework. In most circumstances, you probably want to inherit cedar::proc::Step.
  */
-class cedar::proc::Connectable : public cedar::proc::Element
+class cedar::proc::Connectable : public cedar::proc::Element,
+                                 public cedar::aux::Lockable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
@@ -226,29 +228,6 @@ protected:
 
   //!@brief Sets the data pointer of the output to zero.
   void freeOutput(const std::string& name);
-
-  /*!@brief Returns the set of data to be locked for this Connectable during the compute function (or any other processing).
-   */
-  void getDataLocks(cedar::aux::LockSet& locks);
-
-  /*!@brief Returns the set of data to be locked for the given role of this Connectable during the compute function
-   *        (or any other processing).
-   */
-  void getDataLocks(DataRole::Id role, cedar::aux::LockSet& locks);
-
-  /*!@brief   Locks all data of this Connectable.
-   *
-   *          Locking is done in a special order that prevents deadlocks, therefore you should always use this function to
-   *          lock the Connectable's data.
-   *
-   * @see     cedar::aux::lock for a description on the deadlock-free locking mechanism.
-   *
-   * @remarks Inputs are locked for reading, outputs and buffers for writing.
-   */
-  void lockAll();
-
-  //!@brief Unlocks all data of this Connectable.
-  void unlockAll();
 
   /*!@brief Checks all inputs for validity.
    *
