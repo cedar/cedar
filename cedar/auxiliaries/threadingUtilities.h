@@ -127,6 +127,36 @@ namespace cedar
         iter->first->unlock();
       }
     }
+
+    /*!@brief Alternative to the cedar::aux::lock(cedar::aux::LockSet&) method.
+     */
+    inline void lock(const std::set<QReadWriteLock*>& locks, cedar::aux::LOCK_TYPE type)
+    {
+      for (std::set<QReadWriteLock*>::const_iterator iter = locks.begin(); iter != locks.end(); ++iter)
+      {
+        // switch based on the lock type
+        switch (type)
+        {
+          case cedar::aux::LOCK_TYPE_READ:
+            (*iter)->lockForRead();
+            break;
+
+          case cedar::aux::LOCK_TYPE_WRITE:
+            (*iter)->lockForWrite();
+            break;
+        }
+      }
+    }
+
+    /*!@brief Alternative to the cedar::aux::unlock(cedar::aux::LockSet&) method.
+     */
+    inline void unlock(const std::set<QReadWriteLock*>& locks)
+    {
+      for (std::set<QReadWriteLock*>::const_iterator iter = locks.begin(); iter != locks.end(); ++iter)
+      {
+        (*iter)->unlock();
+      }
+    }
   }
 }
 

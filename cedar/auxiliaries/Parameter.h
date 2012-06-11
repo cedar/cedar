@@ -47,6 +47,8 @@
 
 // SYSTEM INCLUDES
 #include <QObject>
+#include <QReadWriteLock>
+#include <set>
 
 
 /*!@brief Base class for all parameters.
@@ -127,6 +129,27 @@ public:
   //!@param name New name of the object.
   void setName(const std::string& name);
 
+  //!@brief Returns the lock associated with this parameter.
+  inline QReadWriteLock* getLock()
+  {
+    return this->mpLock;
+  }
+
+  //!@brief Locks the parameter for writing.
+  void lockForWrite() const;
+
+  //!@brief Locks the parameter for writing.
+  void lockForRead() const;
+
+  //!@brief Unlocks the parameter.
+  void unlock() const;
+
+  //!@brief Appends all the locks needed to lock this parameter properly to the set.
+  virtual void appendLocks(std::set<QReadWriteLock*>& locks) const;
+
+  //!@brief Removes all the locks needed to lock this parameter properly from the set.
+  virtual void removeLocks(std::set<QReadWriteLock*>& locks) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -176,6 +199,10 @@ private:
 
   //! Flag that indicates whether this parameter was changed since the last file reading.
   bool mChanged;
+
+  //! Lock for the parameter.
+  mutable QReadWriteLock* mpLock;
+
 }; // class cedar::aux::Parameter
 
 

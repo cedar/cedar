@@ -357,10 +357,11 @@ void cedar::proc::Step::run()
   this->mpArgumentsLock->unlock();
 
   //!@todo make the (un)locking optional?
-  cedar::aux::LockSet locks;
-  this->getDataLocks(locks);
-  locks.insert(std::make_pair(arguments->getLock(), cedar::aux::LOCK_TYPE_READ));
-  cedar::aux::lock(locks);
+  // lock all data
+  this->lockAll();
+
+  // lock all parameters
+  this->lockParameters(cedar::aux::LOCK_TYPE_READ);
 
   try
   {
@@ -399,7 +400,11 @@ void cedar::proc::Step::run()
     this->setState(cedar::proc::Step::STATE_EXCEPTION, "An unknown exception type occurred.");
   }
 
-  cedar::aux::unlock(locks);
+  // unlock all parameters
+  this->unlockParameters();
+
+  // unlock all data
+  this->unlockAll();
 
   // remove the argumens, as they have been processed.
   this->getFinishedTrigger()->trigger();

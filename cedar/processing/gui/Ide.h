@@ -176,6 +176,14 @@ public slots:
    */
   cedar::proc::gui::View* getArchitectureView();
 
+  /*!@brief Displays the about dialog.
+   */
+  void showAboutDialog();
+
+  /*!@brief Resets the root network
+   */
+  void resetRootNetwork();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

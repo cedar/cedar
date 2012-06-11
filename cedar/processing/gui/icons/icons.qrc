@@ -1,6 +1,5 @@
 <RCC>
   <qresource prefix="/">
-    <file>toolbaricons/save.svg</file>
     <file>modeicons/select.svg</file>
     <file>modeicons/connect.svg</file>
     <file>modeicons/group.svg</file>
@@ -20,6 +19,8 @@
     <file>steps/video_grabber.svg</file>
     <file>steps/picture_grabber.svg</file>
     <file>network.svg</file>
+    <file>toolbaricons/save.svg</file>
     <file>toolbaricons/grid.svg</file>
+    <file>toolbaricons/reset.svg</file>
   </qresource>
 </RCC>
