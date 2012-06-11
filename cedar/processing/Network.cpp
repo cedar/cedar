@@ -1064,9 +1064,9 @@ void cedar::proc::Network::updateObjectName(cedar::proc::Element* object)
   // exchange the object in the map - put object at key (new name) and erase old entry
   // make a copy of the element pointer
   cedar::proc::ElementPtr element = old_iter->second;
-
+  std::string old_name = old_iter->first;
   // if new and old name are the same, do nothing
-  if (element->getName() == old_iter->first)
+  if (element->getName() == old_name)
   {
     return;
   }
@@ -1084,6 +1084,44 @@ void cedar::proc::Network::updateObjectName(cedar::proc::Element* object)
   mElements.erase(old_iter);
   // now we can reinsert the element (this invalidates the iterator)
   mElements[object->getName()] = element;
+
+  // check all promoted items
+  bool slots_changed = false;
+  for (unsigned int index = 0; index < _mPromotedSlots->size(); ++index)
+  {
+    std::string name;
+    std::string rest;
+    cedar::aux::splitFirst(_mPromotedSlots->at(index), ".", name, rest);
+    if (name == old_name)
+    {
+      std::string full_slot_name;
+      std::string type;
+      cedar::aux::splitLast(_mPromotedSlots->at(index), ".", full_slot_name, type);
+      std::string step_name;
+      std::string slot_name;
+      cedar::aux::splitLast(full_slot_name, ".", step_name, slot_name);
+      std::string new_slot_name = object->getName() + "." + slot_name;
+      if (type == "Input")
+      {
+        this->renameInput(full_slot_name, new_slot_name);
+      }
+      else if (type == "Output")
+      {
+        this->renameOutput(full_slot_name, new_slot_name);
+      }
+      else
+      {
+        CEDAR_ASSERT(false);
+      }
+      std::string updated_name = object->getName() + "." + rest;
+      _mPromotedSlots->set(index, updated_name);
+      slots_changed = true;
+    }
+  }
+  if (slots_changed)
+  {
+    this->mSlotChanged();
+  }
 }
 
 void cedar::proc::Network::getDataConnections(
