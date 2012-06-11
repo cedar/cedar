@@ -144,4 +144,8 @@ void cedar::aux::gui::Viewer::deregisterGrabber(QReadWriteLock* lock)
     mpGrabberLock = NULL;
     mGrabberConnected = false;
   }
+  else
+  {
+    //!@todo: think about an exception or switch to boolean return value
+  }
 }

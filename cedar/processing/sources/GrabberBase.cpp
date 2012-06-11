@@ -50,7 +50,7 @@
 cedar::proc::sources::GrabberBase::GrabberBase()
 :
 cedar::proc::Step(false, true),
-mImage(new cedar::aux::ImageData(cv::Mat::zeros(1, 1, CV_32F))),
+mImage(new cedar::aux::ImageData(cv::Mat::zeros(1, 1, CV_8UC3))),
 mRecording(new cedar::aux::BoolParameter(this, "record", false)),
 mRecordName(new cedar::aux::FileParameter(this, "recordName", cedar::aux::FileParameter::WRITE, "")),
 mSnapshotName(new cedar::aux::FileParameter(this, "snapshotName", cedar::aux::FileParameter::WRITE, "")),
@@ -84,10 +84,6 @@ void cedar::proc::sources::GrabberBase::setRecording()
     bool rec = this->mRecording->getValue();
     if (rec)
     {
-      //info = "Starting record from grabber";
-      //cedar::aux::LogSingleton::getInstance()->message(info,"cedar::proc::sources::GrabberSource::setRecording()");
-      //!@todo: change to right values read from config, parameter or what ever. Add changeable FourCC
-
       //set recordname
       std::string record_name = this->mRecordName->getPath();
       if (record_name != "")
@@ -101,8 +97,6 @@ void cedar::proc::sources::GrabberBase::setRecording()
     }
     else
     {
-      //info = "Stopping record from grabber";
-      //cedar::aux::LogSingleton::getInstance()->message(info,"cedar::proc::sources::GrabberSource::setRecording()");
       this->mGrabber->stopRecording();
       info = "Recording OFF";
     }
@@ -111,7 +105,7 @@ void cedar::proc::sources::GrabberBase::setRecording()
     // check if record is running
     if (rec && !(this->mGrabber->isRecording()))
     {
-      info = "Error while starting recording!";
+      info = "Error while start recording!";
       cedar::aux::LogSingleton::getInstance()->error(info,"cedar::proc::sources::GrabberSource::setRecording()");
     }
   }
@@ -120,8 +114,6 @@ void cedar::proc::sources::GrabberBase::setRecording()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::GrabberBase::saveSnapshot()
 {
-  //bool save_snapshot = this->mSaveSnapshot->getValue();
-
   if (mGrabber)
   {
     std::string snapshot_name = this->mSnapshotName->getPath();
@@ -148,7 +140,7 @@ void cedar::proc::sources::GrabberBase::createGrabber()
 
   if (mGrabber)
   {
-    //@!todo Values doesn't change after re-selection of the grabber
+    //@!todo Values in processingGUI doesn't change until re-selection of the grabber
     this->mSnapshotName->setValue(this->mGrabber->getSnapshotName());
     this->mRecordName->setValue(this->mGrabber->getRecordName());
   }
