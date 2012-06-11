@@ -767,3 +767,37 @@ void cedar::proc::Connectable::removePromotedData(DataRole::Id role, const std::
   map_iter->second->demote();
   iter->second.erase(map_iter);
 }
+
+void cedar::proc::Connectable::renameOutput(const std::string& oldName, const std::string& newName)
+{
+  if (oldName == newName)
+  {
+    return;
+  }
+  CEDAR_ASSERT(mDataConnections.find(DataRole::OUTPUT) != mDataConnections.end());
+  SlotMap::iterator elem = mDataConnections[DataRole::OUTPUT].find(oldName);
+  if (elem != mDataConnections[DataRole::OUTPUT].end())
+  {
+    cedar::proc::DataSlotPtr slot = elem->second;
+    mDataConnections[DataRole::OUTPUT].erase(elem);
+    mDataConnections[DataRole::OUTPUT][newName] = slot;
+    slot->setName(newName);
+  }
+}
+
+void cedar::proc::Connectable::renameInput(const std::string& oldName, const std::string& newName)
+{
+  if (oldName == newName)
+  {
+    return;
+  }
+  CEDAR_ASSERT(mDataConnections.find(DataRole::INPUT) != mDataConnections.end());
+  SlotMap::iterator elem = mDataConnections[DataRole::INPUT].find(oldName);
+  if (elem != mDataConnections[DataRole::INPUT].end())
+  {
+    cedar::proc::DataSlotPtr slot = elem->second;
+    mDataConnections[DataRole::INPUT].erase(elem);
+    mDataConnections[DataRole::INPUT][newName] = slot;
+    slot->setName(newName);
+  }
+}
