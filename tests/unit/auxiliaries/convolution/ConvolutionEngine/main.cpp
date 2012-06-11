@@ -48,6 +48,8 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
+#include <iostream>
+#include <iomanip>
 
 
 //!@todo Test each convolve method in the engine interface
@@ -158,6 +160,25 @@ class DemoSeparable2D : public cedar::aux::kernel::Separable
 
 CEDAR_GENERATE_POINTER_TYPES(DemoSeparable2D);
 
+void printMatrix(cv::Mat m, std::string name = "", int setW = 5)
+{
+  // if name is given print name
+  if(!name.empty())
+  {
+    std::cout << name << std::endl;
+  }
+  // print matrix
+  for(int x = 0; x < m.cols; x++)
+  {
+    for(int y = 0; y < m.rows; y++)
+    {
+//      std::cout << " " << m.at<float>(y, x);
+      std::cout << std::setw(setW) << m.at<float>(x, y);
+    }
+    std::cout << std::endl;
+  }
+}
+
 // this function makes sure that the modulus is always >= 0
 inline int pos_mod(int v1, int m)
 {
@@ -258,12 +279,8 @@ cv::Mat conv
   }
   else if (mode == cedar::aux::conv::Mode::Full)
   {
-    cv::Mat result = cv::Mat::zeros(2*op1.rows-1, 2*op1.cols-1, CV_32F);
+    cv::Mat result = cv::Mat::zeros(op1.rows + op2.rows - 1, op1.cols + op2.cols - 1, CV_32F);
 
-    //TODO implement full conv
-
-    int offset_r = op2.rows / 2;
-    int offset_c = op2.cols / 2;
     for (int row = 0; row < result.rows; ++row)
     {
       for (int col = 0; col < result.cols; ++col)
@@ -273,8 +290,7 @@ cv::Mat conv
           for (int k_col = 0; k_col < op2.cols; ++k_col)
           {
             result.at<float>(row, col)
-//              += border_interpolate(op1, row - k_row + offset_r, col - k_col + offset_c, borderType)
-    += border_interpolate(op1, row - k_row, col - k_col, borderType)
+              += border_interpolate(op1, row - k_row, col - k_col, borderType)
                  * op2.at<float>(k_row, k_col);
           }
         }
@@ -346,10 +362,18 @@ int test_matxmat_convolution
     std::cout << "ERROR." << std::endl;
 
     // display the operation
-    std::cout << op1 << std::endl << " * " << std::endl << op2 << std::endl << " = " << std::endl;
+    printMatrix(op1);
+    std::cout << " * " << std::endl;
+    printMatrix(op2);
+    std::cout << " = (engine result:)" << std::endl;
+    printMatrix(res);
+    std::cout << " ?= (expected result:)" << std::endl;
+    printMatrix(expected);
 
-    std::cout << res << std::endl;
-    std::cout << " ?= " << std::endl << expected << std::endl;
+//    // display the operation
+//    std::cout << op1 << std::endl << " * " << std::endl << op2 << std::endl << " = (engine result:)" << std::endl;
+//    std::cout << res << std::endl;
+//    std::cout << " ?= (expected result:)" << std::endl << expected << std::endl;
 
     return 1;
   }
@@ -393,10 +417,13 @@ int testMatrixKernelOperation
     std::cout << "ERROR:" << std::endl;
 
     // display the operation
-    std::cout << mat << std::endl << " * " << std::endl << kernel_mat << std::endl << " = " << std::endl;
-
-    std::cout << result << std::endl;
-    std::cout << " ?= " << std::endl << expected << std::endl;
+    printMatrix(mat);
+    std::cout << " * " << std::endl;
+    printMatrix(kernel_mat);
+    std::cout << " = (engine result:)" << std::endl;
+    printMatrix(result);
+    std::cout << " ?= (expected result:)" << std::endl;
+    printMatrix(expected);
 
     return 1;
   }
@@ -891,25 +918,6 @@ int testEngine(cedar::aux::conv::EnginePtr engine)
   errors += testMatrixMatrixOperations(engine);
   errors += testMatrixKernelOperations(engine);
   return errors;
-}
-
-void printMatrix(cv::Mat m, std::string name = "", int setW = 3)
-{
-  // if name is given print name
-  if(!name.empty())
-  {
-    std::cout << name << std::endl;
-  }
-  // print matrix
-  for(int y = 0; y < m.rows; y++)
-  {
-    for(int x = 0; x < m.cols; x++)
-    {
-      std::cout << " " << m.at<float>(y, x);
-//      std::cout << setw(setW) << m.at<float>(y, x);
-    }
-    std::cout << std::endl;
-  }
 }
 
 void testConv()
