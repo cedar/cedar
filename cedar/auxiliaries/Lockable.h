@@ -86,6 +86,9 @@ protected:
   //!@brief Add a lock to the set of locks of the lockable.
   void addLock(QReadWriteLock* pLock, cedar::aux::LOCK_TYPE lockType);
 
+  //!@brief Removes the given lock from the lock set.
+  void removeLock(QReadWriteLock* pLock, cedar::aux::LOCK_TYPE lockType);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------

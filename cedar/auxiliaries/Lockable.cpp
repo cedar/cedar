@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Lockable.h"
+#include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
 
@@ -68,4 +69,12 @@ void cedar::aux::Lockable::unlockAll()
 void cedar::aux::Lockable::addLock(QReadWriteLock* pLock, cedar::aux::LOCK_TYPE lockType)
 {
   cedar::aux::append(this->mLocks, pLock, lockType);
+}
+
+void cedar::aux::Lockable::removeLock(QReadWriteLock* pLock, cedar::aux::LOCK_TYPE lockType)
+{
+  cedar::aux::LockSet::iterator iter = this->mLocks.find(std::make_pair(pLock, lockType));
+
+  CEDAR_DEBUG_ASSERT(iter != this->mLocks.end());
+  this->mLocks.erase(iter);
 }

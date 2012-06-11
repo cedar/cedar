@@ -385,10 +385,28 @@ void cedar::proc::Connectable::declareOutput(const std::string& name, cedar::aux
   this->setOutput(name, data);
 }
 
+void cedar::proc::Connectable::removeLock(cedar::aux::DataPtr data, cedar::aux::LOCK_TYPE lockType)
+{
+  this->cedar::aux::Lockable::removeLock(&data->getLock(), lockType);
+}
+
+
 void cedar::proc::Connectable::declareInput(const std::string& name, bool mandatory)
 {
   this->declareData(DataRole::INPUT, name, mandatory);
+
+  this->getInputSlot(name)->connectToExternalDataRemoved
+  (
+    boost::bind
+    (
+      &cedar::proc::Connectable::removeLock,
+      this,
+      _1,
+      cedar::aux::LOCK_TYPE_READ
+    )
+  );
 }
+
 
 void cedar::proc::Connectable::declareInputCollection(const std::string& name)
 {

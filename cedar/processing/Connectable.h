@@ -264,6 +264,11 @@ private:
    * @returns list of failed mandatory connections
    */
   void checkMandatoryConnections();
+
+  /*!@brief Removed the lock from this cedar::aux::Lockable.
+   */
+  void removeLock(cedar::aux::DataPtr data, cedar::aux::LOCK_TYPE lockType);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

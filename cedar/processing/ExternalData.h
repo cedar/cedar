@@ -112,6 +112,8 @@ public:
   bool hasData(cedar::aux::ConstDataPtr data) const;
 
   /*!@brief   Removes the data pointer from the slot's collection.
+   *
+   * @todo    Should this (or some version of it) be in the cedar::proc::DataSlot class?
    */
   void removeData(cedar::aux::ConstDataPtr data0);
 
@@ -124,10 +126,16 @@ public:
    */
   bool isCollection() const;
 
-  /*!@brief register a function pointer with this function to react to any changes in external data
+  /*!@brief register a function pointer with this function to react to any changes in the list of external data in this
+   *        slot (i.e., data added, data removed.)
    */
   boost::signals2::connection connectToExternalDataChanged(boost::function<void ()> slot);
 
+  /*!@brief Register a function to react to the removal of external data in this slot.
+   *
+   *        The connected function receives the removed data as first argument.
+   */
+  boost::signals2::connection connectToExternalDataRemoved(boost::function<void (cedar::aux::DataPtr)> slot);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -167,6 +175,10 @@ private:
 
   //!@brief Whether this slot can have multiple data items.
   bool mIsCollection;
+
+  //!@brief A boost signal that is emitted when external data is removed from this slot's list.
+  boost::signals2::signal<void (cedar::aux::DataPtr)> mExternalDataRemoved;
+
 }; // class cedar::proc::ExternalData
 
 #endif // CEDAR_PROC_EXTERNAL_DATA_H
