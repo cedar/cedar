@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Element.cpp
+    File:        Lockable.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 11 17
+    Date:        2012 06 08
 
     Description:
 
@@ -34,9 +34,11 @@
 
 ======================================================================================================================*/
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
-#include "cedar/processing/Element.h"
-#include "cedar/processing/Network.h"
+#include "cedar/auxiliaries/Lockable.h"
 
 // SYSTEM INCLUDES
 
@@ -44,13 +46,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::Element::Element()
-:
-_mName(new cedar::aux::StringParameter(this, "name", "element"))
-{
-}
 
-cedar::proc::Element::~Element()
+cedar::aux::Lockable::~Lockable()
 {
 }
 
@@ -58,39 +55,17 @@ cedar::proc::Element::~Element()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::Element::setName(const std::string& name)
+void cedar::aux::Lockable::lockAll()
 {
-  this->_mName->setValue(name);
-
-  /*!@todo The following should actually be done, however, due to multiple inheritance from QObject in Step, this
-   *       wouldn't work with Qt.
-  if (this->mpRegisteredAt != NULL)
-  {
-    this->mpRegisteredAt->updateObjectName(this);
-  }
-  */
+  cedar::aux::lock(this->mLocks);
 }
 
-const std::string& cedar::proc::Element::getName() const
+void cedar::aux::Lockable::unlockAll()
 {
-  return this->_mName->getValue();
+  cedar::aux::unlock(this->mLocks);
 }
 
-void cedar::proc::Element::setNetwork(cedar::proc::NetworkPtr network)
+void cedar::aux::Lockable::addLock(QReadWriteLock* pLock, cedar::aux::LOCK_TYPE lockType)
 {
-  // set the parent registry
-  this->mRegisteredAt = network;
-
-  // emit signal
-  this->mNetworkChanged();
-}
-
-cedar::proc::NetworkPtr cedar::proc::Element::getNetwork()
-{
-  return this->mRegisteredAt.lock();
-}
-
-cedar::proc::ConstNetworkPtr cedar::proc::Element::getNetwork() const
-{
-  return this->mRegisteredAt.lock();
+  cedar::aux::append(this->mLocks, pLock, lockType);
 }

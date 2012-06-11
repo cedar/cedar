@@ -82,4 +82,5 @@ cedar_add_library(cedarproc
   ${yarp_moc_headers}
   RESOURCES
   gui/icons/icons.qrc
+  gui/images/images.qrc
   )

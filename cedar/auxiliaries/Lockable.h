@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Element.h
+    File:        Lockable.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 11 17
+    Date:        2012 06 08
 
     Description:
 
@@ -34,66 +34,57 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_ELEMENT_H
-#define CEDAR_PROC_ELEMENT_H
+#ifndef CEDAR_AUX_LOCKABLE_H
+#define CEDAR_AUX_LOCKABLE_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
-#include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/threadingUtilities.h"
 #include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/signals2.hpp>
+#include <QReadWriteLock>
 
-
-/*!@brief Base class for Elements in a processing architecture.
+/*!@brief Base class for strutures that can be locked in their entierety.
  *
- *        Each element is described by a name that uniquely identifies it within a processing module.
+ *        Locking is done in a special order that prevents deadlocks, therefore you should always use this function to
+ *        lock the Connectable's data.
+ *
+ *        This is intended as the base for classes that have multiple locks that must be locked in certain cases.
+ *
+ * @see   cedar::aux::lock for a description on the deadlock-free locking mechanism.
  */
-class cedar::proc::Element
-:
-virtual public cedar::aux::Configurable,
-public boost::enable_shared_from_this<cedar::proc::Element>
+class cedar::aux::Lockable
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  Element();
-
-  //!@brief The destructor.
-  virtual ~Element();
+  //!@brief Destructor
+  virtual ~Lockable();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Set the name of this element.
-  virtual void setName(const std::string& name);
+  //!@brief Locks all locks associated with this object.
+  void lockAll();
 
-  //!@brief Get the name of this element.
-  const std::string& getName() const;
-
-  //!@brief sets the network at which this element is registered
-  void setNetwork(cedar::proc::NetworkPtr network);
-
-  //!@brief get the network at which this element is registered
-  cedar::proc::NetworkPtr getNetwork();
-
-  //!@brief get the network at which this element is registered as const
-  cedar::proc::ConstNetworkPtr getNetwork() const;
+  //!@brief Unlocks all locks associated with this object.
+  void unlockAll();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  inline boost::signals2::connection connectToNetworkChanged(boost::function<void()> slot)
-  {
-    return this->mNetworkChanged.connect(slot);
-  }
+  //!@brief Add a lock to the set of locks of the lockable.
+  void addLock(QReadWriteLock* pLock, cedar::aux::LOCK_TYPE lockType);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -105,23 +96,12 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! the network this element is registered at
-  cedar::proc::NetworkWeakPtr mRegisteredAt;
-private:
-  //! Signal that is emitted whenever the element's network changes
-  boost::signals2::signal<void()> mNetworkChanged;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  //!@brief The name that uniquely identifies the element within its own module.
-  cedar::aux::StringParameterPtr _mName;
-
-private:
   // none yet
+private:
+  //! The set of locks that is (un)locked whenever the (un)lockAll method is called.
+  cedar::aux::LockSet mLocks;
 
-}; // class cedar::proc::Element
+}; // class cedar::aux::Lockable
 
-#endif // CEDAR_PROC_ELEMENT_H
+#endif // CEDAR_AUX_LOCKABLE_H
 

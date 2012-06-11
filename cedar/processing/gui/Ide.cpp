@@ -61,6 +61,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QDialogButtonBox>
 #include <boost/property_tree/detail/json_parser_error.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -156,6 +157,17 @@ cedar::proc::gui::Ide::Ide()
   fillRecentFilesList();
 
   this->zoomLevelSet(this->mpProcessingDrawer->getZoomLevel());
+
+
+  QObject::connect(mpActionAbout,
+                   SIGNAL(triggered()),
+                   this,
+                   SLOT(showAboutDialog()));
+
+  QObject::connect(mpActionResetRootNetwork,
+                   SIGNAL(triggered()),
+                   this,
+                   SLOT(resetRootNetwork()));
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -166,6 +178,43 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::resetRootNetwork()
+{
+  this->mNetwork->getNetwork()->reset();
+}
+
+void cedar::proc::gui::Ide::showAboutDialog()
+{
+  QDialog* p_dialog = new QDialog(this);
+  p_dialog->setModal(true);
+  QVBoxLayout* p_layout = new QVBoxLayout();
+  p_dialog->setLayout(p_layout);
+
+  QLabel* p_version_image = new QLabel();
+  p_layout->addWidget(p_version_image);
+  QImage version_image(":/cedar/processing/gui/images/current_version_image.svg");
+  p_version_image->setPixmap(QPixmap::fromImage(version_image));
+
+  QString about_text = "<center>This is cedar's processingIde<br />built with<br />cedar version <b>";
+  about_text += QString::fromStdString(cedar::aux::versionNumberToString(CEDAR_VERSION));
+  about_text += "</b>"
+#ifdef DEBUG
+      "<br />(debug build)"
+#endif // DEBUG
+      "</center>";
+  QLabel* p_label = new QLabel(about_text);
+  p_label->setTextFormat(Qt::RichText);
+  p_layout->addWidget(p_label);
+
+  QDialogButtonBox* p_buttons = new QDialogButtonBox(QDialogButtonBox::Ok);
+  p_buttons->setCenterButtons(true);
+  p_layout->addWidget(p_buttons);
+
+  QObject::connect(p_buttons, SIGNAL(accepted()), p_dialog, SLOT(accept()));
+
+  p_dialog->exec();
+}
 
 cedar::proc::gui::View* cedar::proc::gui::Ide::getArchitectureView()
 {
