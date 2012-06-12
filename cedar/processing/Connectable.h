@@ -267,7 +267,7 @@ private:
 
   /*!@brief Removed the lock from this cedar::aux::Lockable.
    */
-  void removeLock(cedar::aux::DataPtr data, cedar::aux::LOCK_TYPE lockType);
+  void removeLock(cedar::aux::ConstDataPtr data, cedar::aux::LOCK_TYPE lockType);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

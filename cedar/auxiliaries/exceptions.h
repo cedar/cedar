@@ -72,6 +72,12 @@ class cedar::aux::UnknownNameException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::UnknownNameException
 
+/*!@brief Exception that signals that something could not be found.
+ */
+class cedar::aux::NotFoundException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::NotFoundException
+
 /*!@brief Exception that occurs when a parameter is not found.
  */
 class cedar::aux::ParameterNotFoundException : public cedar::aux::ExceptionBase

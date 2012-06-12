@@ -135,7 +135,11 @@ public:
    *
    *        The connected function receives the removed data as first argument.
    */
-  boost::signals2::connection connectToExternalDataRemoved(boost::function<void (cedar::aux::DataPtr)> slot);
+  boost::signals2::connection connectToExternalDataRemoved(boost::function<void (cedar::aux::ConstDataPtr)> slot);
+
+  /*!@brief Clears all data from the slot.
+   */
+  void clear();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -177,7 +181,7 @@ private:
   bool mIsCollection;
 
   //!@brief A boost signal that is emitted when external data is removed from this slot's list.
-  boost::signals2::signal<void (cedar::aux::DataPtr)> mExternalDataRemoved;
+  boost::signals2::signal<void (cedar::aux::ConstDataPtr)> mExternalDataRemoved;
 
 }; // class cedar::proc::ExternalData
 
