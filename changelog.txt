@@ -39,10 +39,11 @@
   - added a slice plot for 3D matrix data
   - cedar now accepts both qwt versions 5.x and 6.x
 - build system
+  - added a find script for FFTW that also searches for the include directory
   - added defines for the current cedar version; this makes it possible to stay compatible to older versions, should
     this ever be needed. 
 
-== Version 0.6 ==
+== Version 0.9 ==
 - cedar::aux
   - fixed a critical bug in LoopedThread::singleStep, which used microseconds instead of milliseconds for step()
   - cedar::aux::Configurable now inherits from boost::noncopyable, explicitly stating that you should never use
