@@ -69,6 +69,11 @@ QReadWriteLock& cedar::aux::Data::getLock()
   return *this->mpLock;
 }
 
+QReadWriteLock& cedar::aux::Data::getLock() const
+{
+  return *this->mpLock;
+}
+
 cedar::aux::Configurable* cedar::aux::Data::getOwner() const
 {
   return this->mpeOwner;

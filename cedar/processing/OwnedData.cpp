@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/OwnedData.h"
+#include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
@@ -53,18 +54,27 @@ cedar::proc::OwnedData::OwnedData(
 :
 cedar::proc::DataSlot(role, name, pParent, isMandatory)
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
 }
 
 cedar::proc::OwnedData::~OwnedData()
 {
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::OwnedData::clear()
+{
+  std::cout << "Resetting data of " << this->getName() << std::endl;
+  this->mData.reset();
+}
+
 void cedar::proc::OwnedData::setData(cedar::aux::DataPtr data)
 {
+  CEDAR_DEBUG_ASSERT(data);
   // reset validity when the data changes.
   if (this->getRole() == cedar::proc::DataRole::INPUT)
   {

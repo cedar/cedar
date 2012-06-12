@@ -385,7 +385,7 @@ void cedar::proc::Connectable::declareOutput(const std::string& name, cedar::aux
   this->setOutput(name, data);
 }
 
-void cedar::proc::Connectable::removeLock(cedar::aux::DataPtr data, cedar::aux::LOCK_TYPE lockType)
+void cedar::proc::Connectable::removeLock(cedar::aux::ConstDataPtr data, cedar::aux::LOCK_TYPE lockType)
 {
   this->cedar::aux::Lockable::removeLock(&data->getLock(), lockType);
 }
@@ -603,7 +603,7 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& na
   if (map_iterator != iter->second.end())
   {
     cedar::proc::DataSlotPtr& slot = map_iterator->second;
-    slot->setData(cedar::aux::DataPtr());
+    slot->clear();
   }
   else
   {

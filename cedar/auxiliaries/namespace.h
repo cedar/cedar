@@ -198,19 +198,20 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(ImageData);
     CEDAR_DECLARE_AUX_CLASS(StereoImageData);
     /* exceptions */
-    CEDAR_DECLARE_AUX_CLASS(ConversionFailedException);
-    CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
-    CEDAR_DECLARE_AUX_CLASS(FileNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(BadConnectionException);
+    CEDAR_DECLARE_AUX_CLASS(ConversionFailedException);
     CEDAR_DECLARE_AUX_CLASS(DeadReferenceException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateIdException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateNameException);
+    CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
+    CEDAR_DECLARE_AUX_CLASS(FileNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(FailedAssertionException);
     CEDAR_DECLARE_AUX_CLASS(IndexOutOfRangeException);
     CEDAR_DECLARE_AUX_CLASS(InitializationException);
     CEDAR_DECLARE_AUX_CLASS(InvalidNameException);
     CEDAR_DECLARE_AUX_CLASS(MatrixMismatchException);
     CEDAR_DECLARE_AUX_CLASS(NoDefaultException);
+    CEDAR_DECLARE_AUX_CLASS(NotFoundException);
     CEDAR_DECLARE_AUX_CLASS(NullPointerException);
     CEDAR_DECLARE_AUX_CLASS(ParameterNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(RangeException);

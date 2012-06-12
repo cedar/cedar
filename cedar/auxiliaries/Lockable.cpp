@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Lockable.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
 
@@ -75,6 +76,9 @@ void cedar::aux::Lockable::removeLock(QReadWriteLock* pLock, cedar::aux::LOCK_TY
 {
   cedar::aux::LockSet::iterator iter = this->mLocks.find(std::make_pair(pLock, lockType));
 
-  CEDAR_DEBUG_ASSERT(iter != this->mLocks.end());
+  if(iter == this->mLocks.end())
+  {
+    CEDAR_THROW(cedar::aux::NotFoundException, "The given data object was not found in this lockable.");
+  }
   this->mLocks.erase(iter);
 }
