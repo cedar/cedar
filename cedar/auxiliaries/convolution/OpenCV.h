@@ -201,7 +201,6 @@ private:
                           cedar::aux::conv::BorderType::Id borderType
                           ) const;
 
-  cv::Mat resultCutOut(const cv::Mat& result, const cv::Mat& matrix, const cv::Mat& kernel) const;
   cv::Mat resultCutOut(
                       const cv::Mat& result,
                       unsigned int matrixRows,
@@ -209,6 +208,10 @@ private:
                       unsigned int kernelRows,
                       unsigned int kernelCols
                       ) const;
+
+  cv::Mat resultCutOut(const cv::Mat& result, const cv::Mat& matrix, const cv::Mat& kernel) const;
+
+  cv::Mat resultCutOut(const cv::Mat& result, const cv::Mat& matrix, const cedar::aux::kernel::ConstKernelPtr kernel) const;
 
   cv::Mat cvConvolve
   (
