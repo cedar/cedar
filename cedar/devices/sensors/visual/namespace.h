@@ -61,7 +61,6 @@ namespace cedar
       //! \brief Namespace for all visual sensors like cameras or camera-dummies (i.e. avi-file, picture)
       namespace visual
       {
-
         //-----------------------------------------------------------------------------------------------
         // interface classes
         //-----------------------------------------------------------------------------------------------

@@ -68,7 +68,6 @@ cedar::proc::OwnedData::~OwnedData()
 
 void cedar::proc::OwnedData::clear()
 {
-  std::cout << "Resetting data of " << this->getName() << std::endl;
   this->mData.reset();
 }
 

@@ -183,12 +183,10 @@ bool cedar::dev::sensors::visual::GLGrabber::onGrab()
       // GL_FRONT_LEFT, GL_FRONT_RIGHT, GL_BACK_LEFT, GL_BACK_RIGHT, GL_FRONT, GL_BACK, GL_LEFT, GL_RIGHT, GL_AUXi,
       // where i is between 0 and the value of GL_AUX_BUFFERS minus 1.
 
-      //activate this thread for painting
-      //problem: qgl-widget painting also have to be multithreaded, i.e also have to invoke makeCurrent(), doneCurrent()
-      //p_channel_widget->makeCurrent();
+      // activate this thread for painting
+      // problem: qgl-widget painting also have to be multithreaded, i.e also have to invoke makeCurrent(), doneCurrent()
       glReadBuffer(GL_FRONT_RIGHT);
       QImage qimage = p_channel_widget->grabFrameBuffer(false);
-      //p_channel_widget->doneCurrent();
 
       // QImage to cv::Mat
       cv::Mat mat = cv::Mat(qimage.height(), qimage.width(), CV_8UC4,(uchar*)qimage.bits(), qimage.bytesPerLine());
