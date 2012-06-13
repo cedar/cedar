@@ -207,11 +207,7 @@ cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
   int left = kernelCols - 1;
   int right = kernelCols - 1;
 
-  cv::Mat full_matrix = 0.0 * cv::Mat::zeros(
-                                            2 * kernelRows - 1 + matrix.rows + 2 * kernelRows - 1,
-                                            2 * kernelCols - 1 + matrix.cols + 2 * kernelCols - 1,
-                                            CV_32F
-                                            );
+  cv::Mat full_matrix;
   cv::copyMakeBorder(matrix, full_matrix, top, bottom, left, right, translateBorderType(borderType));
 
   return full_matrix;

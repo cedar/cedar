@@ -201,13 +201,14 @@ private:
                           cedar::aux::conv::BorderType::Id borderType
                           ) const;
 
-  cv::Mat resultCutOut(
-                      const cv::Mat& result,
-                      unsigned int matrixRows,
-                      unsigned int matrixCols,
-                      unsigned int kernelRows,
-                      unsigned int kernelCols
-                      ) const;
+  cv::Mat resultCutOut
+          (
+            const cv::Mat& result,
+            unsigned int matrixRows,
+            unsigned int matrixCols,
+            unsigned int kernelRows,
+            unsigned int kernelCols
+          ) const;
 
   cv::Mat resultCutOut(const cv::Mat& result, const cv::Mat& matrix, const cv::Mat& kernel) const;
 

@@ -63,7 +63,7 @@ namespace
       new ElementDeclarationTemplate<cedar::proc::steps::Convolution>
       (
         "Utilities",
-        "cedar.processing.Convolution"
+        "cedar.processing.steps.Convolution"
       )
     );
     convolution_decl->setIconPath(":/steps/convolution.svg");
@@ -101,10 +101,10 @@ mConvolution(new cedar::aux::conv::Convolution())
 
 void cedar::proc::steps::Convolution::compute(const cedar::proc::Arguments&)
 {
-  const cv::Mat& cv_kernel = mKernel->getData();
-  const cv::Mat& cv_matrix = mMatrix->getData();
+  const cv::Mat& kernel = mKernel->getData();
+  const cv::Mat& matrix = mMatrix->getData();
 
-  mOutput->setData(this->mConvolution->convolve(cv_matrix, cv_kernel));
+  mOutput->setData(this->mConvolution->convolve(matrix, kernel));
 }
 
 void cedar::proc::steps::Convolution::recompute()

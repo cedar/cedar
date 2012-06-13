@@ -62,15 +62,13 @@ cedar::dev::sensors::visual::Grabber(configFileName)
                                           );
 
   //read initialization values from configuration file
-  readInit(1,"InterfaceGrabber");
+  readInit(1, "InterfaceGrabber");
 
   //overwrite parameters from configfiles with values from constuctor
   getChannel(0)->mpSourceInterfaceClass = sourceInterfaceClass;
 
   //now apply the whole configuration
   applyInit();
-
-  std::cout << "InterfaceGrabber::InterfaceGrabber() finished" << std::endl;
 }
 
 

@@ -496,18 +496,6 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
       )
     )
   );
-  // target may be a nested Triggerable, recover!
-//  if (!p_target)
-//  {
-//    cedar::proc::PromotedExternalDataPtr promoted_slot
-//      = boost::shared_dynamic_cast<cedar::proc::PromotedExternalData>
-//        (
-//          this->getElement<cedar::proc::Connectable>(target_name)->getInputSlot(target_slot)
-//        );
-//    CEDAR_DEBUG_ASSERT(promoted_slot);
-//    std::string path = promoted_slot->getPromotionPath();
-//    p_target = this->getElement<cedar::proc::Triggerable>(path);
-//  }
   CEDAR_DEBUG_ASSERT(p_target);
   if (!p_target->isLooped())
   {

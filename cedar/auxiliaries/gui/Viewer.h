@@ -132,13 +132,13 @@ private:
   /*!@brief initialization */
   void init();
   
+  ///!@brief grab the GL context
+  void grabBuffer();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-  cedar::aux::gl::ScenePtr const mpScene;
-
-  ///!@brief grab the GL context
-  void grabBuffer();
+  cedar::aux::gl::ScenePtr mpScene;
 
   ///!@brief Read/write lock for the internal grabber buffer used for concurrent access
   QReadWriteLock* mpGrabberLock;
