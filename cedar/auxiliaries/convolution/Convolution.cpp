@@ -89,6 +89,13 @@ _mEngine
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::conv::Convolution::setAllowedModes(const std::set<cedar::aux::conv::Mode::Id>& modes)
+{
+  this->mAllowedModes = modes;
+
+  this->updateEngineCapabilities();
+}
+
 void cedar::aux::conv::Convolution::slotKernelAdded(size_t index)
 {
   cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList()->getKernel(index);
@@ -145,12 +152,24 @@ void cedar::aux::conv::Convolution::selectedEngineChanged()
 
 void cedar::aux::conv::Convolution::updateEngineCapabilities()
 {
-  this->_mMode->enableAll();
+  if (this->mAllowedModes.empty())
+  {
+    this->_mMode->enableAll();
+  }
+  else
+  {
+    this->_mMode->disableAll();
+  }
+
   const std::vector<cedar::aux::Enum>& modes = cedar::aux::conv::Mode::type().list();
   for (size_t i = 0; i < modes.size(); ++i)
   {
     const cedar::aux::Enum& enum_value = modes.at(i);
-    this->_mMode->setEnabled(enum_value, this->getEngine()->checkModeCapability(enum_value));
+
+    if (this->mAllowedModes.empty() || this->mAllowedModes.find(enum_value) != this->mAllowedModes.end())
+    {
+      this->_mMode->setEnabled(enum_value, this->getEngine()->checkModeCapability(enum_value));
+    }
   }
 
   this->_mBorderType->enableAll();

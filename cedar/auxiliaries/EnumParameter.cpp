@@ -99,6 +99,14 @@ void cedar::aux::EnumParameter::enableAll()
   this->mDisabledValues.clear();
 }
 
+void cedar::aux::EnumParameter::disableAll()
+{
+  for (size_t i = 0; i < this->mEnumDeclaration->list().size(); ++i)
+  {
+    this->disable(this->mEnumDeclaration->list().at(i));
+  }
+}
+
 bool cedar::aux::EnumParameter::isEnabled(cedar::aux::EnumId value) const
 {
   return this->mDisabledValues.find(value) == this->mDisabledValues.end();
@@ -106,7 +114,7 @@ bool cedar::aux::EnumParameter::isEnabled(cedar::aux::EnumId value) const
 
 cedar::aux::Enum cedar::aux::EnumParameter::getValue() const
 {
-  return mEnumDeclaration->get(this->mValue);
+  return this->mEnumDeclaration->get(this->mValue);
 }
 
 void cedar::aux::EnumParameter::set(const std::string& enumId)

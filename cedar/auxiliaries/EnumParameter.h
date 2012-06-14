@@ -103,6 +103,9 @@ public:
   //! Enables all values.
   void enableAll();
 
+  //! Disables all values.
+  void disableAll();
+
   //! Tests if the given value is enabled.
   bool isEnabled(cedar::aux::EnumId value) const;
 
