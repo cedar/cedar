@@ -49,10 +49,12 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/units/TimeUnit.h"
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
+#include <ctime>
 
 // MACROS
 // Enable to show information on locking/unlocking
@@ -71,6 +73,9 @@ Triggerable(isLooped),
 // initialize members
 mBusy(false),
 mpArgumentsLock(new QReadWriteLock()),
+mLastIterationTime(cedar::unit::Milliseconds(0)),
+mMovingAverageIterationTime(100), // average the last 100 iteration times
+mLastIterationTimeLock(new QReadWriteLock()),
 // initialize parameters
 _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
 {
@@ -98,10 +103,11 @@ cedar::proc::Step::~Step()
     );
   }
 
-  if (mpArgumentsLock != NULL)
-  {
-    delete mpArgumentsLock;
-  }
+  CEDAR_DEBUG_ASSERT(mpArgumentsLock != NULL);
+  delete mpArgumentsLock;
+
+  CEDAR_DEBUG_ASSERT(mLastIterationTimeLock != NULL);
+  delete mLastIterationTimeLock;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -158,7 +164,7 @@ void cedar::proc::Step::reset()
  */
 void cedar::proc::Step::registerFunction(const std::string& actionName, boost::function<void()> function)
 {
-  //!@todo Check for restrictions on the name, e.g., no spaces, ...
+  //!@todo Check for restrictions on the name, e.g., no dots, ...
   if (this->mActions.find(actionName) != this->mActions.end())
   {
     CEDAR_THROW(cedar::proc::InvalidNameException, "Duplicate action name: " + actionName);
@@ -311,10 +317,13 @@ void cedar::proc::Step::onTrigger(cedar::proc::TriggerPtr)
 void cedar::proc::Step::run()
 {
 #ifdef DEBUG_ARGUMENT_SETTING
-    cedar::aux::System::mCOutLock.lockForWrite();
-    std::cout << "Running step " << this->getName() << "." << std::endl;
-    cedar::aux::System::mCOutLock.unlock();
+  cedar::aux::System::mCOutLock.lockForWrite();
+  std::cout << "Running step " << this->getName() << "." << std::endl;
+  cedar::aux::System::mCOutLock.unlock();
 #endif // DEBUG_ARGUMENT_SETTING
+
+  // start measuring the execution time.
+  clock_t start = clock();
 
   this->mBusy = true;
 
@@ -406,9 +415,42 @@ void cedar::proc::Step::run()
   // unlock all data
   this->unlockAll();
 
+  // take time measurements
+  clock_t end = clock();
+  clock_t elapsed = end - start;
+  double elapsed_s = static_cast<double>(elapsed) / static_cast<double>(CLOCKS_PER_SEC);
+  this->setRunTimeMeasurement(cedar::unit::Seconds(elapsed_s));
+
   // remove the argumens, as they have been processed.
   this->getFinishedTrigger()->trigger();
   this->mBusy = false;
+}
+
+void cedar::proc::Step::setRunTimeMeasurement(const cedar::unit::Time& time)
+{
+  this->mLastIterationTimeLock->lockForWrite();
+  this->mLastIterationTime = cedar::unit::Seconds(time);
+  this->mMovingAverageIterationTime.append(this->mLastIterationTime);
+  this->mLastIterationTimeLock->unlock();
+}
+
+cedar::unit::Time cedar::proc::Step::getRunTimeMeasurement() const
+{
+  QReadLocker locker(this->mLastIterationTimeLock);
+  return this->mLastIterationTime;
+}
+
+cedar::unit::Time cedar::proc::Step::getRunTimeAverage() const
+{
+  QReadLocker locker(this->mLastIterationTimeLock);
+  if (this->mMovingAverageIterationTime.size() > 0)
+  {
+    return this->mMovingAverageIterationTime.getAverage();
+  }
+  else
+  {
+    return -1.0;
+  }
 }
 
 void cedar::proc::Step::setThreaded(bool isThreaded)

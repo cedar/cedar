@@ -177,6 +177,9 @@ private:
   //! Opens plots for all data in this step.
   void plotAll(const QPoint& position);
 
+  //! Updates the display of the step's run time measurements.
+  void timerEvent(QTimerEvent *pEvent);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -185,10 +188,15 @@ protected:
 private:
   //!@brief the represented step
   cedar::proc::StepPtr mStep;
+
   //!@brief a map of all data slots of the current step
   DataSlotMap mSlotMap;
+
   //!@brief a vector of all triggers of the current step
   std::vector<cedar::proc::gui::TriggerItem*> mTriggers;
+
+  //!@brief Identifier of the timer used for updating the run time measurements.
+  int mRunTimeMeasurementTimerId;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

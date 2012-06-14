@@ -60,6 +60,7 @@
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/units/TimeUnit.h"
 
 // SYSTEM INCLUDES
 #include <QPainter>
@@ -79,6 +80,7 @@ cedar::proc::gui::StepItem::StepItem(cedar::proc::StepPtr step, QMainWindow* pMa
 cedar::proc::gui::GraphicsBase(160, 50,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE),
+mRunTimeMeasurementTimerId(0),
 mpMainWindow(pMainWindow),
 mStepIcon(":/steps/no_icon.svg")
 {
@@ -94,6 +96,7 @@ cedar::proc::gui::StepItem::StepItem(QMainWindow* pMainWindow)
 cedar::proc::gui::GraphicsBase(160, 50,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE),
+mRunTimeMeasurementTimerId(0),
 mpMainWindow(pMainWindow),
 mStepIcon(":/steps/no_icon.svg")
 {
@@ -133,6 +136,16 @@ cedar::proc::gui::StepItem::~StepItem()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::StepItem::timerEvent(QTimerEvent * /* pEvent */)
+{
+  cedar::unit::Time last_time = this->mStep->getRunTimeMeasurement();
+  cedar::unit::Time average_time = this->mStep->getRunTimeAverage();
+  QString tool_tip = QString("Last iteration time: %1<br />Average iteration time: %2")
+      .arg(QString::fromStdString(cedar::aux::toString(cedar::unit::Milliseconds(last_time))))
+      .arg(QString::fromStdString(cedar::aux::toString(cedar::unit::Milliseconds(average_time))));
+  this->setToolTip(tool_tip);
+}
+
 bool cedar::proc::gui::StepItem::hasGuiConnection
      (
        const std::string& fromSlot,
@@ -159,8 +172,19 @@ void cedar::proc::gui::StepItem::stepStateChanged()
     case cedar::proc::Step::STATE_NOT_RUNNING:
       this->setOutlineColor(Qt::darkGray);
       this->setFillColor(QColor(235, 235, 235));
+
+      if (this->mRunTimeMeasurementTimerId != 0)
+      {
+        this->killTimer(this->mRunTimeMeasurementTimerId);
+        this->mRunTimeMeasurementTimerId = 0;
+      }
       break;
 
+    case cedar::proc::Step::STATE_RUNNING:
+      if (this->mRunTimeMeasurementTimerId == 0)
+      {
+        this->mRunTimeMeasurementTimerId = this->startTimer(1000); //!@todo Add option to change the frequency
+      }
     default:
       this->setOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor);
       this->setFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor);
