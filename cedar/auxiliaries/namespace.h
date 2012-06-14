@@ -64,6 +64,8 @@ namespace cedar
 
     template <class T> class Singleton;
 
+    template <typename T> class MovingAverage;
+
     //!@todo This class may be obsolete once the ConfigurationInterface is removed.
     template <typename T> class IntervalData;
     //!@brief smart pointer for IntervalData<double>
