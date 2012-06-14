@@ -215,10 +215,15 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
                                                                                         5.0,
                                                                                         2
                                                                                       ));
+  std::set<cedar::aux::conv::Mode::Id> allowed_convolution_modes;
+  allowed_convolution_modes.insert(cedar::aux::conv::Mode::Same);
+
   this->addConfigurableChild("noise correlation kernel", mNoiseCorrelationKernel);
-  _mNoiseCorrelationKernelConvolution->getKernelList()->append(mNoiseCorrelationKernel);
+  this->_mNoiseCorrelationKernelConvolution->getKernelList()->append(mNoiseCorrelationKernel);
+  this->_mNoiseCorrelationKernelConvolution->setAllowedModes(allowed_convolution_modes);
 
   this->addConfigurableChild("lateral kernel convolution", _mLateralKernelConvolution);
+  this->_mLateralKernelConvolution->setAllowedModes(allowed_convolution_modes);
 
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
