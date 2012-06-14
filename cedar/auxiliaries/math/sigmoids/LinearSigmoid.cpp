@@ -55,10 +55,9 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::math::LinearSigmoid::LinearSigmoid(double threshold, double beta)
+cedar::aux::math::LinearSigmoid::LinearSigmoid(double threshold)
 :
-cedar::aux::math::Sigmoid(threshold),
-_mBeta(new cedar::aux::DoubleParameter(this, "beta", beta))
+cedar::aux::math::Sigmoid(threshold)
 {
 }
 
@@ -68,5 +67,5 @@ _mBeta(new cedar::aux::DoubleParameter(this, "beta", beta))
 
 double cedar::aux::math::LinearSigmoid::compute(double value) const
 {
-  return this->getBeta() * value;
+  return value;
 }
