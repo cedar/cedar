@@ -127,8 +127,6 @@ void cedar::aux::gui::DoubleParameter::valueChanged(double value)
   cedar::aux::DoubleParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(this->getParameter());
 
-  parameter->lockForWrite();
-  parameter->setValue(value);
-  parameter->unlock();
+  parameter->setValue(value, true);
 }
 
