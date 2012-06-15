@@ -1,0 +1,36 @@
+/*!
+
+@page ReleasesConcept Release work flow
+
+This page is dedicated to our work flow and how it leads to releases.
+
+@section FeatureLifetime The lifetime of a new feature 
+
+Before a release, cedar passes through a number of repositories ensuring a gradual increase in stability. This schema
+is adapted from the release policy of the Debian Linux distribution. New features are first developed in private
+development branches until all interfaces have been decided on and the code of the new feature is ready for a peer review.
+It is then pushed into the repository
+<a href="http://www.bitbucket.org/cedar/unstable" title="cedar unstable">cedar unstable</a>. Here, it will be looked over
+by at least two other developers in the team to assure that the interfaces make sense, all code is properly documented,
+unit tests have been written, and the code adheres to the cedar coding style. Afterward, the new feature (and eventual
+fixes on its code) are pushed into the repository
+<a href="http://www.bitbucket.org/cedar/testing" title="cedar testing">cedar testing</a>. This repository will always
+contain the newest code. However, if you use it, be aware that its interfaces may still change before a new release.
+New features will remain in "cedar testing" until all features planned for the next version have been completed. We
+will then release a new version and push that version to the repository
+<a href="http://www.bitbucket.org/cedar/stable" title="cedar stable">cedar stable</a>.
+As we release whenever a set of certain new features is finished, the length of release cycles is not fixed and may vary
+considerably. 
+
+@section VersionNumbers Version numbers
+cedar uses a version number comprised of three numbers: "major.minor.bugfix"
+The version number of a new release is determined by the number m of milestones that will be completed with this release.
+The minor version number will then be increased by n. The major number is increased at will, whenever we feel cedar
+has progressed to "the next level". When we need to fix a critical bug in the stable branch, the bugfix number is increased
+by one.
+
+@section VersionNames Version names
+Each new stable release comes with a new alias. The first release (cedar 0.5) is called "moonchild". The next stable
+release will be called "purple piper". We challenge you to figure out where we get our inspiration for the naming scheme. 
+
+*/
