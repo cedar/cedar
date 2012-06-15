@@ -293,6 +293,9 @@ public:
     return this->mLastReadUINode;
   }
 
+  /*!@brief Remove all connections that connect up to a specified slot */
+  void removeAllConnectionsFromSlot(cedar::proc::ConstDataSlotPtr slot);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
