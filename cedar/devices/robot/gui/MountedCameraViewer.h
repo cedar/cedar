@@ -34,12 +34,15 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_GUI_MOUNTED_CAMERA_VIEWER_H
-#define CEDAR_DEV_ROBOT_GUI_MOUNTED_CAMERA_VIEWER_H
+#ifndef CEDAR_DEV_ROBOT_GL_MOUNTED_CAMERA_VIEWER_H
+#define CEDAR_DEV_ROBOT_GL_MOUNTED_CAMERA_VIEWER_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/Viewer.h"
+#include "cedar/auxiliaries/IntParameter.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/devices/robot/gui/namespace.h"
+#include "cedar/devices/robot/KinematicChain.h"
 
 // SYSTEM INCLUDES
 
@@ -48,7 +51,10 @@
  * ...
  *
  */
-class cedar::dev::robot::gui::MountedCameraViewer : public cedar::aux::gui::Viewer
+class cedar::dev::robot::gui::MountedCameraViewer
+:
+public cedar::aux::gui::Viewer,
+public cedar::aux::NamedConfigurable
 {
 private:
   Q_OBJECT
@@ -58,7 +64,7 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief the constructor */
-  MountedCameraViewer(cedar::aux::gl::ScenePtr pScene);
+  MountedCameraViewer(cedar::aux::gl::ScenePtr pScene, const cedar::dev::robot::KinematicChainPtr chain);
 
   /*!@brief the constructor */
   ~MountedCameraViewer();
@@ -68,21 +74,26 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   /*!@brief draws all objects in the scene */
-//  void draw();
+  void draw();
 
-  /*!@brief function being called automatically when a timer is up, usually in a loop */
-//  void timerEvent(QTimerEvent* pEvent);
+  /*!@brief read a configuration for all registered parameters from a cedar::aux::ConfigurationNode
+   *
+   * @param node json node providing the configuration
+   */
+  virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief initialization */
-  void init();
-  
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-//  cedar::aux::gl::ScenePtr const mpScene;
+  cedar::dev::robot::KinematicChainPtr mArm;
+  cedar::aux::LocalCoordinateFramePtr mCameraCoordinateFrame;
+  cedar::aux::IntParameterPtr mMountingJoint;
+  //! transformations to the camera frame (assuming reference configuration)
+  cv::Mat mReferenceCameraTransformation;
+  cv::Mat mTransformationTranspose;
 };
-#endif  // CEDAR_DEV_ROBOT_GUI_MOUNTED_CAMERA_VIEWER_H
+#endif  // CEDAR_DEV_ROBOT_GL_MOUNTED_CAMERA_VIEWER_H

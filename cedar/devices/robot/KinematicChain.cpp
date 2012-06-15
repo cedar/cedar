@@ -127,7 +127,6 @@ void cedar::dev::robot::KinematicChain::readConfiguration(const cedar::aux::Conf
 {
   cedar::aux::Configurable::readConfiguration(node);
   initializeFromJointList();
-
 }
 
 unsigned int cedar::dev::robot::KinematicChain::getNumberOfJoints() const
@@ -143,7 +142,6 @@ std::vector<double> cedar::dev::robot::KinematicChain::getJointAngles() const
   {
     dummy[i] = getJointAngle(i);
   }
-
   return dummy;
 }
 
@@ -465,7 +463,6 @@ void cedar::dev::robot::KinematicChain::setWorkingMode(ActionType actionType)
 
 void cedar::dev::robot::KinematicChain::init()
 {
-  // todo: add default values for these...
   this->addConfigurableChild("root coordinate frame", mpRootCoordinateFrame);
   this->addConfigurableChild("end-effector coordinate frame", mpEndEffectorCoordinateFrame);
 
@@ -886,6 +883,11 @@ cv::Mat cedar::dev::robot::KinematicChain::calculateEndEffectorPosition()
 cv::Mat cedar::dev::robot::KinematicChain::getRootTransformation()
 {
   return mpRootCoordinateFrame->getTransformation();
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::getProductOfExponentials(unsigned int jointIndex)
+{
+  return mProductsOfExponentials[jointIndex];
 }
 
 cv::Mat cedar::dev::robot::KinematicChain::getEndEffectorTransformation()

@@ -507,6 +507,12 @@ public:
    */
   cv::Mat getRootTransformation();
 
+  /*!@brief gives the product of exponentials up to the specified joint
+   *
+   * @return    product of exponentials, 4 \f$\times\f$ 4 matrix
+   */
+  cv::Mat getProductOfExponentials(unsigned int jointIndex);
+
   /*!@brief gives the transformation from base frame to the end-effector frame in the current configuration
    *
    * @return    rigid transformation matrix from world to end-effector frame, 4 \f$\times\f$ 4 matrix
