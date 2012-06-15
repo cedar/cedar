@@ -98,6 +98,7 @@ void cedar::aux::gui::IntVectorParameter::propertyChanged()
     }
     this->mSpinboxes.clear();
 
+    parameter->lockForRead();
     for (size_t i = 0; i < parameter->size(); ++i)
     {
       QSpinBox *p_widget = new QSpinBox();
@@ -111,17 +112,20 @@ void cedar::aux::gui::IntVectorParameter::propertyChanged()
       p_widget->setValue(parameter->at(i));
       QObject::connect(p_widget, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
     }
+    parameter->unlock();
 
     emit heightChanged();
   }
 
   // Update the spinboxes' properties
+  parameter->lockForRead();
   for (size_t i = 0; i < this->mSpinboxes.size(); ++i)
   {
     this->mSpinboxes.at(i)->setMinimum(parameter->getMinimum());
     this->mSpinboxes.at(i)->setMaximum(parameter->getMaximum());
     this->mSpinboxes.at(i)->setEnabled(!parameter->isConstant());
   }
+  parameter->unlock();
 }
 
 void cedar::aux::gui::IntVectorParameter::valueChanged(int)
@@ -135,5 +139,5 @@ void cedar::aux::gui::IntVectorParameter::valueChanged(int)
     values.at(i) = this->mSpinboxes.at(i)->value();
   }
 
-  parameter->set(values);
+  parameter->set(values, true);
 }
