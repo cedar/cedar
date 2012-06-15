@@ -116,6 +116,8 @@ void cedar::aux::kernel::Separable::updateKernelMatrix()
 
     cv::Mat combined = this->mKernelParts.at(0).clone();
 
+    CEDAR_DEBUG_ASSERT(this->mKernelParts.size() == this->getDimensionality());
+
     for (size_t i = 1; i < this->mKernelParts.size(); ++i)
     {
       combined = combined * this->mKernelParts.at(i).t();
