@@ -67,82 +67,85 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create simulated arm
-  cedar::dev::robot::KinematicChainPtr p_test_arm(new cedar::dev::robot::SimulatedKinematicChain
+  cedar::dev::robot::KinematicChainPtr test_arm(new cedar::dev::robot::SimulatedKinematicChain
   (
     "../../../../tests/interactive/devices/gl/MountedCameraViewer/test_arm.conf")
   );
-  p_test_arm->readJson("../../../../tests/interactive/devices/gl/MountedCameraViewer/test_arm.json");
+  test_arm->readJson("../../../../tests/interactive/devices/gl/MountedCameraViewer/test_arm.json");
 
   // create gl visualization objects
-  cedar::dev::robot::gl::KinematicChainPtr p_test_arm_visualization
+  cedar::dev::robot::gl::KinematicChainPtr test_arm_visualization
   (
-    new cedar::dev::robot::gl::KinematicChain(p_test_arm)
+    new cedar::dev::robot::gl::KinematicChain(test_arm)
   );
 
   // create scene and viewer to display the arm
-  cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene);
-  p_scene->setSceneLimit(2);
-  p_scene->drawFloor(true);
-  p_scene->addObjectVisualization(p_test_arm_visualization);
+  cedar::aux::gl::ScenePtr scene(new cedar::aux::gl::Scene);
+  scene->setSceneLimit(2);
+  scene->drawFloor(true);
+  scene->addObjectVisualization(test_arm_visualization);
 
   // create a prism visualization and add it to the scene
-  cedar::aux::LocalCoordinateFramePtr p_prism_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
-  p_prism_local_coordinate_frame->setName("prism");
-  p_prism_local_coordinate_frame->setTranslation(0, 0, .5);
-  cedar::aux::gl::ObjectVisualizationPtr p_prism
+  cedar::aux::LocalCoordinateFramePtr prism_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  prism_local_coordinate_frame->setName("prism");
+  prism_local_coordinate_frame->setTranslation(0.5, 0.5, .5);
+  cedar::aux::gl::ObjectVisualizationPtr prism
   (
-    new cedar::aux::gl::Prism(p_prism_local_coordinate_frame, .2, .1)
+    new cedar::aux::gl::Prism(prism_local_coordinate_frame, .2, .1)
   );
-  p_scene->addObjectVisualization(p_prism);
+  prism_local_coordinate_frame->rotate(0, M_PI/2);
+  scene->addObjectVisualization(prism);
 
   // create a torus visualization and add it to the scene
-  cedar::aux::LocalCoordinateFramePtr p_torus_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
-  p_torus_local_coordinate_frame->setName("torus");
-  p_torus_local_coordinate_frame->setTranslation( -.75, .3, .3 );
-  cedar::aux::gl::ObjectVisualizationPtr p_torus
+  cedar::aux::LocalCoordinateFramePtr torus_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  torus_local_coordinate_frame->setName("torus");
+  torus_local_coordinate_frame->setTranslation(.0, 1.5, .5);
+  cedar::aux::gl::ObjectVisualizationPtr torus
   (
-    new cedar::aux::gl::Torus(p_torus_local_coordinate_frame, .2, 0.03, 1, 0.5, 0)
+    new cedar::aux::gl::Torus(torus_local_coordinate_frame, .2, 0.03, 1, 0.5, 0)
   );
-  p_scene->addObjectVisualization(p_torus);
+  torus_local_coordinate_frame->rotate(0, M_PI/3);
+  scene->addObjectVisualization(torus);
 
   // create an ellipse visualization and add it to the scene
-  cedar::aux::LocalCoordinateFramePtr p_ellipse_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
-  p_ellipse_local_coordinate_frame->setName("ellipse");
-  p_ellipse_local_coordinate_frame->setTranslation(-.75, -.3, .3);
-  cedar::aux::gl::ObjectVisualizationPtr p_ellipse
+  cedar::aux::LocalCoordinateFramePtr ellipse_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  ellipse_local_coordinate_frame->setName("ellipse");
+  ellipse_local_coordinate_frame->setTranslation(.0, 1.8, .5);
+  cedar::aux::gl::ObjectVisualizationPtr ellipse
   (
-    new cedar::aux::gl::Ellipse(p_ellipse_local_coordinate_frame, .1, .2, 0.03, 1, 1, 0)
+    new cedar::aux::gl::Ellipse(ellipse_local_coordinate_frame, .1, .2, 0.03, 1, 1, 0)
   );
-  p_scene->addObjectVisualization(p_ellipse);
-
+  ellipse_local_coordinate_frame->rotate(0, M_PI/4);
+  scene->addObjectVisualization(ellipse);
 
   // create a simple viewer for the scene
-  cedar::aux::gui::Viewer viewer(p_scene);
+  cedar::aux::gui::Viewer viewer(scene);
   viewer.show();
-  viewer.setSceneRadius(p_scene->getSceneLimit());
+  viewer.setSceneRadius(scene->getSceneLimit());
 
   // create a mounted camera viewer
-  cedar::dev::robot::gui::MountedCameraViewer camera_viewer(p_scene);
+  cedar::dev::robot::gui::MountedCameraViewer camera_viewer(scene, test_arm);
+  camera_viewer.readJson("../../../../tests/interactive/devices/gl/MountedCameraViewer/test_camera.json");
   camera_viewer.show();
-  camera_viewer.setSceneRadius(p_scene->getSceneLimit());
+  camera_viewer.setSceneRadius(scene->getSceneLimit());
 
   // create widgets
-  cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));
-  p_scene_widget->show();
-  cedar::dev::robot::gui::KinematicChainWidget widget(p_test_arm);
+  cedar::aux::gui::SceneWidgetPtr scene_widget(new cedar::aux::gui::SceneWidget(scene));
+  scene_widget->show();
+  cedar::dev::robot::gui::KinematicChainWidget widget(test_arm);
   widget.getMonitorWidget()->setDecimals(10);
   widget.getCommandWidget()->setDecimals(10);
   widget.getCommandWidget()->setSingleStep(0.1);
   widget.show();
 
 
-  p_test_arm->startTimer(20);
+  test_arm->startTimer(20);
   viewer.startTimer(20);
   camera_viewer.startTimer(20);
   a.exec();
 
-  p_test_arm->stop();
-  p_test_arm->wait();
+  test_arm->stop();
+  test_arm->wait();
 
   return 0;
 }
