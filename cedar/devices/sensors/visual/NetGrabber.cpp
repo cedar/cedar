@@ -63,7 +63,7 @@ cedar::dev::sensors::visual::NetGrabber::NetGrabber
 cedar::dev::sensors::visual::Grabber(configFileName)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
-  readInit(1,"NetGrabber");
+  readInit(1);
   getChannel(0)->mChannelName = yarpChannelName;
   applyInit();
 }
@@ -80,7 +80,7 @@ cedar::dev::sensors::visual::NetGrabber::NetGrabber
 cedar::dev::sensors::visual::Grabber(configFileName)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
-  readInit(2,"NetGrabber");
+  readInit(2);
 
   //overwrite with settings from constructor
   getChannel(0)->mChannelName = yarpChannelName0;
@@ -263,8 +263,8 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
 
     cedar::aux::LogSingleton::getInstance()->debugMessage
                                              (
-                                              this->getName() + ": Try to grabb from channel "
-                                                + boost::lexical_cast<std::string>(channel),
+                                               this->getName() + ": Try to grabb from channel "
+                                                 + boost::lexical_cast<std::string>(channel),
                                                "cedar::dev::sensors::visual::NetGrabber::onInit()"
                                              );
     cv::Mat frame;
@@ -328,7 +328,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
   //all grabbers successfully initialized
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
-                                            this->getName() + ": Initializtion finished",
+                                             this->getName() + ": Initializtion finished",
                                              "cedar::dev::sensors::visual::NetGrabber::onInit()"
                                            );
 

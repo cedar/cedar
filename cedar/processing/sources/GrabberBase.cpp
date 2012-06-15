@@ -52,10 +52,13 @@ cedar::proc::sources::GrabberBase::GrabberBase()
 cedar::proc::Step(false, true),
 mImage(new cedar::aux::ImageData(cv::Mat::zeros(1, 1, CV_8UC3))),
 mRecording(new cedar::aux::BoolParameter(this, "record", false)),
-mRecordName(new cedar::aux::FileParameter(this, "record name", cedar::aux::FileParameter::WRITE, "./video.avi")),
-mSnapshotName(new cedar::aux::FileParameter(this, "snapshot name", cedar::aux::FileParameter::WRITE, "./picture.png")),
+mRecordName(new cedar::aux::FileParameter(this, "recordName", cedar::aux::FileParameter::WRITE, "")),
+mSnapshotName(new cedar::aux::FileParameter(this, "snapshotName", cedar::aux::FileParameter::WRITE, "")),
 _mConfigurationFileName(new cedar::aux::FileParameter(this, "config",cedar::aux::FileParameter::READ,""))
 {
+  mRecordName->setValue("./video.avi");
+  mSnapshotName->setValue("./picture.png");
+  mGrabber.reset();
   QObject::connect(mRecording.get(), SIGNAL(valueChanged()), this, SLOT(setRecording()));
   QObject::connect(_mConfigurationFileName.get(), SIGNAL(valueChanged()), this, SLOT(setConfigurationFileName()));
 
@@ -97,13 +100,13 @@ void cedar::proc::sources::GrabberBase::setRecording()
       this->mGrabber->stopRecording();
       info = "Recording OFF";
     }
-    cedar::aux::LogSingleton::getInstance()->message(info, "cedar::proc::sources::GrabberSource::setRecording()");
+    cedar::aux::LogSingleton::getInstance()->message(info,"cedar::proc::sources::GrabberSource::setRecording()");
 
     // check if record is running
     if (rec && !(this->mGrabber->isRecording()))
     {
       info = "Error while start recording!";
-      cedar::aux::LogSingleton::getInstance()->error(info, "cedar::proc::sources::GrabberSource::setRecording()");
+      cedar::aux::LogSingleton::getInstance()->error(info,"cedar::proc::sources::GrabberSource::setRecording()");
     }
   }
 }
@@ -128,7 +131,7 @@ void cedar::proc::sources::GrabberBase::createGrabber()
   // destroy the old grabber (if any), in order to save the configuration
   if (mGrabber)
   {
-    std::string message = "Old grabber deleted";
+    const std::string message = "Old grabber deleted";
     cedar::aux::LogSingleton::getInstance()->debugMessage(message,"cedar::proc::sources::GrabberBase::createGrabber()");
   }
   mGrabber.reset();

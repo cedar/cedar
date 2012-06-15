@@ -116,7 +116,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  // derived from Grabber
+  //derived from Grabber
   bool onInit();
   bool onDeclareParameters();
   void onCleanUp();
@@ -128,7 +128,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@ Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
+  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
   inline GLChannelPtr getChannel(unsigned int channel)
   {
     return boost::static_pointer_cast<GLChannel>
@@ -141,9 +141,15 @@ private:
   inline ConstGLChannelPtr getChannel(unsigned int channel) const
   {
     return boost::static_pointer_cast<const GLChannel>
-           (
-             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
-           );
+       (
+         cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
+       );
+  }
+
+  //!@brief The default name for the grabber
+  virtual inline std::string defaultGrabberName() const
+  {
+    return "GLGrabber";
   }
 
   //--------------------------------------------------------------------------------------------------------------------

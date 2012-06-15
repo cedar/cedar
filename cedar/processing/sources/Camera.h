@@ -72,6 +72,8 @@ public:
   //!@brief The standard constructor.
   Camera();
 
+  //!@brief Destructor
+//  virtual ~Camera(){};
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -135,6 +137,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 
 private:
   //!@ Bayer conversion from the camera image

@@ -67,7 +67,7 @@ cedar::dev::sensors::visual::Grabber(configFileName)
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
-                                             ConfigurationInterface::getName() + ": Single channel instance",
+                                             this->getName() + ": Single channel instance",
                                              "cedar::dev::sensors::visual::CameraGrabber::CameraGrabber()"
                                            );
 
@@ -75,7 +75,7 @@ cedar::dev::sensors::visual::Grabber(configFileName)
   mCreateGrabberByGuid = isGuid;
 
   //declareParameters and read it from configfile
-  readInit(1,"CameraGrabber");
+  readInit(1);
 
   //change/overwrite camera-ids with new parameters from constructor here
   mCreateGrabberByGuid = isGuid;
@@ -88,7 +88,7 @@ cedar::dev::sensors::visual::Grabber(configFileName)
   debug_info << ": cam0: guid " << getChannel(0)->mCamId.guid << " busid: " << getChannel(0)->mCamId.busId;
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
-                                             ConfigurationInterface::getName() + debug_info.str(),
+                                             this->getName() + debug_info.str(),
                                              "cedar::dev::sensors::visual::CameraGrabber::CameraGrabber()"
                                            );
   //cedar::aux::ConfigurationInterface::writeConfiguration();
@@ -110,7 +110,7 @@ cedar::dev::sensors::visual::Grabber(configFileName)
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
-                                             ConfigurationInterface::getName() + ": Stereo channel instance",
+                                             this->getName() + ": Stereo channel instance",
                                              "cedar::dev::sensors::visual::CameraGrabber::CameraGrabber()"
                                            );
 
@@ -119,7 +119,7 @@ cedar::dev::sensors::visual::Grabber(configFileName)
   mCreateGrabberByGuid = isGuid;
 
   //declareParameters and read it from configfile
-  readInit(2,"CameraGrabber");
+  readInit(2);
 
   //change/overwrite camera-ids with new parameters from constructor here
   setChannelId(0,camera0,isGuid);
@@ -135,7 +135,7 @@ cedar::dev::sensors::visual::Grabber(configFileName)
 
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
-                                             ConfigurationInterface::getName() + debug_info.str(),
+                                             this->getName() + debug_info.str(),
                                              "cedar::dev::sensors::visual::CameraGrabber::CameraGrabber()"
                                            );
   //cedar::aux::ConfigurationInterface::writeConfiguration();
@@ -154,7 +154,7 @@ cedar::dev::sensors::visual::Grabber(configFileName)
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
-                                             ConfigurationInterface::getName() + ": Created from config-file",
+                                             this->getName() + ": Created from config-file",
                                              "cedar::dev::sensors::visual::CameraGrabber::CameraGrabber()"
                                            );
 
@@ -164,7 +164,7 @@ cedar::dev::sensors::visual::Grabber(configFileName)
   //will be overwritten with values from configfile
   mCreateGrabberByGuid = false;
 
-  readInit(numChannels,"CameraGrabber");
+  readInit(numChannels);
   applyInit();
 
   std::stringstream debug_info;
@@ -177,7 +177,7 @@ cedar::dev::sensors::visual::Grabber(configFileName)
   }
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
-                                             ConfigurationInterface::getName() + debug_info.str(),
+                                             this->getName() + debug_info.str(),
                                              "cedar::dev::sensors::visual::CameraGrabber::CameraGrabber()"
                                            );
 
@@ -243,7 +243,8 @@ bool cedar::dev::sensors::visual::CameraGrabber::onDeclareParameters()
   bool result = true;
 
   bool byGuid = mCreateGrabberByGuid;
-  result = (addParameter(&mCreateGrabberByGuid, "createByGuid",byGuid) == CONFIG_SUCCESS) && result;
+  //@todo config:
+  //result = (addParameter(&mCreateGrabberByGuid, "createByGuid",byGuid) == CONFIG_SUCCESS) && result;
 
   for (unsigned int channel=0; channel<mNumCams; channel++)
   {
@@ -253,13 +254,16 @@ bool cedar::dev::sensors::visual::CameraGrabber::onDeclareParameters()
     //get default value from constructor-value. Value will be overwritten by configuration interface
     //so we store it
     CameraId cam_Id = getChannel(channel)->mCamId;
-    result = (addParameter(&getChannel(channel)->mCamId.guid,ch+"guid",cam_Id.guid)== CONFIG_SUCCESS) && result;
-    result = (addParameter(&getChannel(channel)->mCamId.busId,ch+"busId",cam_Id.busId) == CONFIG_SUCCESS) && result;
+    //@todo config:
+    //result = (addParameter(&getChannel(channel)->mCamId.guid,ch+"guid",cam_Id.guid)== CONFIG_SUCCESS) && result;
+    //@todo config:
+    //result = (addParameter(&getChannel(channel)->mCamId.busId,ch+"busId",cam_Id.busId) == CONFIG_SUCCESS) && result;
 
     std::string prop_name = ch+"cameraCapabilityFileName";
     std::string prop_default = useAutogeneratedFilenameString();
-    result = 
-      (addParameter(&getChannel(channel)->mCamCapabilitiesFileName,prop_name,prop_default) == CONFIG_SUCCESS) && result;
+    //@todo config:
+    //result =
+    //  (addParameter(&getChannel(channel)->mCamCapabilitiesFileName,prop_name,prop_default) == CONFIG_SUCCESS) && result;
   }
   return result;
 }
@@ -268,7 +272,8 @@ bool cedar::dev::sensors::visual::CameraGrabber::onDeclareParameters()
 bool cedar::dev::sensors::visual::CameraGrabber::onWriteConfiguration()
 {
   //write local resources (guid, busid and createByGuid
-  cedar::aux::ConfigurationInterface::writeConfiguration();
+  //@todo config:
+  //cedar::aux::ConfigurationInterface::writeConfiguration();
 
   //write properties of the cameras
   bool result = true;
@@ -286,7 +291,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::onInit()
 
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
-                                             ConfigurationInterface::getName() + ": onInit",
+                                             this->getName() + ": onInit",
                                              "cedar::dev::sensors::visual::CameraGrabber::onInit()"
                                            );
 
@@ -308,7 +313,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::onInit()
   }
   cedar::aux::LogSingleton::getInstance()->systemInfo
                                            (
-                                             ConfigurationInterface::getName() + init_message.str(),
+                                             this->getName() + init_message.str(),
                                              "cedar::dev::sensors::visual::CameraGrabber::onInit()"
                                            );
 
@@ -381,7 +386,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::onInit()
     {
       cedar::aux::LogSingleton::getInstance()->error
                                                (
-                                                 ConfigurationInterface::getName() + "At least ore camera not found!",
+                                                 this->getName() + "At least ore camera not found!",
                                                  "cedar::dev::sensors::visual::CameraGrabber::onInit()"
                                                );
       return false; //throws an initialization-exception
@@ -398,7 +403,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::onInit()
       {
         cedar::aux::LogSingleton::getInstance()->error
                                                  (
-                                                   ConfigurationInterface::getName()
+                                                   this->getName()
                                                      + ": Couldn't open camera (Channel "
                                                      + boost::lexical_cast<std::string>(channel) + ")",
                                                    "cedar::dev::sensors::visual::CameraGrabber::onInit()"
@@ -423,8 +428,9 @@ bool cedar::dev::sensors::visual::CameraGrabber::onInit()
     }
 
     //create and load the camera capabilities
-    std::string conf_file_name = 
-      ConfigurationInterface::getConfigFileName()+"_ch"+boost::lexical_cast<std::string>(channel);
+    //@todo config:
+    std::string conf_file_name = "default_cam_capabilities";
+    //conf_file_name = ConfigurationInterface::getConfigFileName()+"_ch"+boost::lexical_cast<std::string>(channel);
 
     //if capabilities filename match with definition for autogenerated filename, create filename
     std::string cap_file_name = getChannel(channel)->mCamCapabilitiesFileName;
@@ -479,7 +485,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::onInit()
       {
         cedar::aux::LogSingleton::getInstance()->error
                                          (
-                                           ConfigurationInterface::getName()
+                                           this->getName()
                                              + ": Couldn't retrieve frame from camera (Channel "
                                              + boost::lexical_cast<std::string>(channel) + ")",
                                            "cedar::dev::sensors::visual::CameraGrabber::onInit()"
@@ -497,7 +503,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::onInit()
   }
   cedar::aux::LogSingleton::getInstance()->systemInfo
                                            (
-                                             ConfigurationInterface::getName() + init_message.str(),
+                                             this->getName() + init_message.str(),
                                              "cedar::dev::sensors::visual::CameraGrabber::onInit()"
                                            );
   //all grabbers are now successfully initialized
@@ -660,7 +666,7 @@ void cedar::dev::sensors::visual::CameraGrabber::onCleanUp()
 {
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
-                                             ConfigurationInterface::getName() + ": onCleanUp",
+                                             this->getName() + ": onCleanUp",
                                              "cedar::dev::sensors::visual::CameraGrabber::onCleanUp()"
                                            );
 
@@ -715,7 +721,7 @@ double cedar::dev::sensors::visual::CameraGrabber::getCameraProperty(unsigned in
 
   cedar::aux::LogSingleton::getInstance()->warning
                                            (
-                                             ConfigurationInterface::getName() + ": Property " + prop + info,
+                                             this->getName() + ": Property " + prop + info,
                                              "cedar::dev::sensors::visual::CameraGrabber::getCameraProperty()"
                                            );
 
@@ -759,7 +765,7 @@ double cedar::dev::sensors::visual::CameraGrabber::getCameraPropertyValue
   std::string prop = CameraProperty::type().get(propId).name();
   cedar::aux::LogSingleton::getInstance()->warning
                                            (
-                                             ConfigurationInterface::getName() + ": Property " + prop + info,
+                                             this->getName() + ": Property " + prop + info,
                                              "cedar::dev::sensors::visual::CameraGrabber::getCameraPropertyValue()"
                                            );
   return CAMERA_PROPERTY_NOT_SUPPORTED;
@@ -783,7 +789,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::setCameraProperty
   std::string info = boost::lexical_cast<std::string>(boost::math::iround(value));
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
-                                             ConfigurationInterface::getName() + ": Try to set " + prop + " to " + info,
+                                             this->getName() + ": Try to set " + prop + " to " + info,
                                              "cedar::dev::sensors::visual::CameraGrabber::setCameraProperty()"
                                            );
 
@@ -829,7 +835,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::setCameraSetting
 
       cedar::aux::LogSingleton::getInstance()->message
                                                (
-                                                 ConfigurationInterface::getName() + info,
+                                                 this->getName() + info,
                                                  "cedar::dev::sensors::visual::CameraGrabber::setCameraSetting()"
                                                );
     return false;
@@ -846,7 +852,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::setCameraSetting
     */
     cedar::aux::LogSingleton::getInstance()->systemInfo
                                              (
-                                               ConfigurationInterface::getName() + info,
+                                               this->getName() + info,
                                                "cedar::dev::sensors::visual::CameraGrabber::setCameraSetting()"
                                              );
 
@@ -876,7 +882,7 @@ double cedar::dev::sensors::visual::CameraGrabber::getCameraSetting( unsigned in
 
       cedar::aux::LogSingleton::getInstance()->message
                                                (
-                                                 ConfigurationInterface::getName() + info,
+                                                 this->getName() + info,
                                                  "cedar::dev::sensors::visual::CameraGrabber::getCameraSetting()"
                                                );
     return -1;
