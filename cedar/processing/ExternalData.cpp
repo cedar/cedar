@@ -89,8 +89,15 @@ bool cedar::proc::ExternalData::hasData(cedar::aux::ConstDataPtr data) const
   return false;
 }
 
+void cedar::proc::ExternalData::clear()
+{
+  this->mData.clear();
+}
+
 void cedar::proc::ExternalData::removeData(cedar::aux::ConstDataPtr data)
 {
+  CEDAR_DEBUG_ASSERT(data);
+
   // Find the data entry.
   std::vector<cedar::aux::DataWeakPtr>::iterator iter;
   for (iter = this->mData.begin(); iter != this->mData.end(); ++iter)
@@ -107,6 +114,9 @@ void cedar::proc::ExternalData::removeData(cedar::aux::ConstDataPtr data)
 
   // Erase the data.
   this->mData.erase(iter);
+
+  this->mExternalDataRemoved(data);
+  this->mExternalDataChanged();
 }
 
 void cedar::proc::ExternalData::addData(cedar::aux::DataPtr data)
@@ -118,8 +128,7 @@ void cedar::proc::ExternalData::addData(cedar::aux::DataPtr data)
   {
     if (!this->mData.at(i).lock())
     {
-      this->mData.at(i) = data;
-      mExternalDataChanged();
+      this->setData(data, i);
       return;
     }
   }
@@ -152,6 +161,12 @@ void cedar::proc::ExternalData::setData(cedar::aux::DataPtr data, unsigned int i
   if (this->mData.size() <= index)
   {
     this->mData.resize(index + 1);
+  }
+
+  // if there is data at the given index, signal its removal
+  if (cedar::aux::DataPtr old_data = this->mData.at(index).lock())
+  {
+    this->mExternalDataRemoved(old_data);
   }
 
   this->mData.at(index) = data;
@@ -195,4 +210,12 @@ cedar::aux::ConstDataPtr cedar::proc::ExternalData::getData(unsigned int index) 
 boost::signals2::connection cedar::proc::ExternalData::connectToExternalDataChanged(boost::function<void ()> slot)
 {
   return mExternalDataChanged.connect(slot);
+}
+
+boost::signals2::connection cedar::proc::ExternalData::connectToExternalDataRemoved
+                            (
+                              boost::function<void (cedar::aux::ConstDataPtr)> slot
+                            )
+{
+  return this->mExternalDataRemoved.connect(slot);
 }

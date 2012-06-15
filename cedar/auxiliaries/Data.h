@@ -70,6 +70,9 @@ public:
   //!@brief Returns the lock associated with this data object.
   QReadWriteLock& getLock();
 
+  //!@brief Returns the lock associated with this data object.
+  QReadWriteLock& getLock() const;
+
   //!@brief Locks the data object for reading.
   inline void lockForRead() const
   {

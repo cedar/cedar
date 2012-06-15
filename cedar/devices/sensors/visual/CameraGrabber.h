@@ -42,7 +42,7 @@
 #ifdef CEDAR_USE_LIB_DC1394
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/GrabberInterface.h"
+#include "cedar/devices/sensors/visual/Grabber.h"
 #include "cedar/devices/sensors/visual/camera/CameraIsoSpeed.h"
 #include "cedar/devices/sensors/visual/camera/CameraProperty.h"
 #include "cedar/devices/sensors/visual/camera/CameraVideoMode.h"
@@ -61,7 +61,7 @@
  */
 class cedar::dev::sensors::visual::CameraGrabber
 :
-public cedar::dev::sensors::visual::GrabberInterface
+public cedar::dev::sensors::visual::Grabber
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -84,7 +84,7 @@ public cedar::dev::sensors::visual::GrabberInterface
    */
   struct CameraChannel
   :
-  cedar::dev::sensors::visual::GrabberInterface::GrabberChannel
+  cedar::dev::sensors::visual::Grabber::GrabberChannel
   {
     /// Unique channel id
     CameraId mCamId;
@@ -386,7 +386,7 @@ public:
 protected:
   
   //------------------------------------------------------------------------
-  //From GrabberInterface
+  // From Grabber
   //------------------------------------------------------------------------
 
   bool onInit();
@@ -425,7 +425,7 @@ private:
   /// @brief Default filename for the config-file of the camera capabilities
   inline std::string getCapabilitiesFilename(unsigned int guid)
   {
-    return "camera_"+boost::lexical_cast<std::string>(guid)+".capabilities";
+    return "camera_" + boost::lexical_cast<std::string>(guid) + ".capabilities";
   }
 
   /// @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class CameraChannelPtr
@@ -433,7 +433,7 @@ private:
   {
     return boost::static_pointer_cast<CameraChannel>
            (
-             cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
            );
   }
 
@@ -442,7 +442,7 @@ private:
   {
     return boost::static_pointer_cast<const CameraChannel>
            (
-             cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
            );
   }
 

@@ -56,7 +56,7 @@ class cedar::aux::math::LinearSigmoid : public cedar::aux::math::Sigmoid
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  LinearSigmoid(double threshold = 0.0, double beta = 1.0);
+  LinearSigmoid(double threshold = 0.0);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -65,13 +65,6 @@ public:
   /*!@brief this function calculates the abs-based sigmoid function for a given double value.
    */
   virtual double compute(double value) const;
-
-  /*!@brief Returns the current beta value.
-   */
-  inline double getBeta() const
-  {
-    return this->_mBeta->getValue();
-  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -91,8 +84,7 @@ private:
 protected:
   // none yet
 private:
-  //!@brief Scalar with which all values are multiplied.
-  cedar::aux::DoubleParameterPtr _mBeta;
+  // none yet
 };
 
 #endif  // CEDAR_AUX_MATH_LINEAR_SIGMOID_H

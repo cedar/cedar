@@ -28,7 +28,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
-    Description: Unit test for the behavior of the GrabberInterface (mono case)
+    Description: Unit test for the behavior of the Grabber (mono case)
 
     Credits:
 
@@ -42,7 +42,7 @@
 #include <boost/filesystem.hpp>
 
 /*!
- *  \file This file implements a test case for the GrabberInterface class
+ *  \file This file implements a test case for the Grabber class
  */
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -136,7 +136,7 @@ int main(int , char **)
   try
   {
     std::string name,result;
-    const std::string ext = cedar::dev::sensors::visual::GrabberInterface::mGrabberDefaultRecordExtension;
+    const std::string ext = cedar::dev::sensors::visual::Grabber::mGrabberDefaultRecordExtension;
 
     //set one w/o ext
     name="RecordNameNewName(0)";
@@ -189,7 +189,7 @@ int main(int , char **)
   try
   {
     std::string name, result, expected;
-    const std::string ext = cedar::dev::sensors::visual::GrabberInterface::mGrabberDefaultSnapshotExtension;
+    const std::string ext = cedar::dev::sensors::visual::Grabber::mGrabberDefaultSnapshotExtension;
 
     //set one w/o ext
     name="SnapshotNameNewName(0)";

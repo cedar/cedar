@@ -34,11 +34,11 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_OGL_GRABBER_H
-#define CEDAR_DEV_SENSORS_VISUAL_OGL_GRABBER_H
+#ifndef CEDAR_DEV_SENSORS_VISUAL_GL_GRABBER_H
+#define CEDAR_DEV_SENSORS_VISUAL_GL_GRABBER_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/GrabberInterface.h"
+#include "cedar/devices/sensors/visual/Grabber.h"
 #include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
@@ -54,7 +54,7 @@
  */
 class cedar::dev::sensors::visual::GLGrabber
 :
-public cedar::dev::sensors::visual::GrabberInterface
+public cedar::dev::sensors::visual::Grabber
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -62,20 +62,18 @@ public cedar::dev::sensors::visual::GrabberInterface
 
   //!@cond SKIPPED_DOCUMENTATION
 
-  /*! @struct OglChannel
+  /*! @struct GLChannel
    *  @brief Additional data of a grabbing channel to grab from a QGLWidget
    */
   struct GLChannel
   :
-  cedar::dev::sensors::visual::GrabberInterface::GrabberChannel
+  cedar::dev::sensors::visual::Grabber::GrabberChannel
   {
     //! @brief The QT OpenGL widget
     QGLWidget* mpQGLWidget ;
   };
 
-  typedef boost::shared_ptr<GLChannel> GLChannelPtr;
-  typedef boost::shared_ptr<const GLChannel> ConstGLChannelPtr;
-
+  CEDAR_GENERATE_POINTER_TYPES(GLChannel);
   //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -118,7 +116,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  //derived from GrabberInterface
+  // derived from Grabber
   bool onInit();
   bool onDeclareParameters();
   void onCleanUp();
@@ -130,12 +128,12 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
+  //!@ Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
   inline GLChannelPtr getChannel(unsigned int channel)
   {
     return boost::static_pointer_cast<GLChannel>
            (
-             cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
            );
   }
 
@@ -143,9 +141,9 @@ private:
   inline ConstGLChannelPtr getChannel(unsigned int channel) const
   {
     return boost::static_pointer_cast<const GLChannel>
-       (
-         cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
-       );
+           (
+             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
+           );
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -168,4 +166,4 @@ private:
 
 }; // class cedar::dev::sensors::visual::GLGrabber
 
-#endif //CEDAR_DEV_SENSORS_VISUAL_OGL_GRABBER_H
+#endif //CEDAR_DEV_SENSORS_VISUAL_GL_GRABBER_H

@@ -41,7 +41,9 @@
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/utilities.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 
@@ -53,6 +55,8 @@ cedar::proc::DataConnection::DataConnection(cedar::proc::DataSlotPtr source, ced
 mSource(source),
 mTarget(target)
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+
   CEDAR_DEBUG_ASSERT(boost::shared_dynamic_cast<cedar::proc::OwnedData>(source));
   // add the source data to target
   target->getParentPtr()->setInput(target->getName(), source->getData());
@@ -60,13 +64,16 @@ mTarget(target)
 
 cedar::proc::DataConnection::~DataConnection()
 {
-  cedar::proc::DataSlotPtr source_shared = mSource.lock();
-  cedar::proc::DataSlotPtr target_shared = mTarget.lock();
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
+
+  cedar::proc::DataSlotPtr source = mSource.lock();
+  cedar::proc::DataSlotPtr target = mTarget.lock();
+
   // first make a check if pointers are valid for source and target
-  if (source_shared && target_shared)
+  if (source && target)
   {
     // remove the source data from target
-    cedar::proc::DataSlotPtr real_target = target_shared;
+    cedar::proc::DataSlotPtr real_target = target;
     while
     (
       cedar::proc::PromotedExternalDataPtr promoted
@@ -75,7 +82,7 @@ cedar::proc::DataConnection::~DataConnection()
     {
       real_target = promoted->mDataSlot;
     }
-    real_target->getParentPtr()->freeInput(real_target->getName(), source_shared->getData());
+    real_target->getParentPtr()->freeInput(real_target->getName(), source->getData());
   }
 }
 //----------------------------------------------------------------------------------------------------------------------

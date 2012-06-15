@@ -42,17 +42,20 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/sources/namespace.h"
+#include "cedar/processing/sources/GrabberBase.h"
 #include "cedar/processing/Step.h"
 #include "cedar/devices/sensors/visual/PictureGrabber.h"
 #include "cedar/auxiliaries/ImageData.h"
-#include "cedar/auxiliaries/FileParameter.h"
+
 
 // SYSTEM INCLUDES
 
 
 //!@brief A picture file source for the processingIde
 
-class cedar::proc::sources::Picture : public cedar::proc::Step
+class cedar::proc::sources::Picture
+:
+public cedar::proc::sources::GrabberBase
 {
   Q_OBJECT
 
@@ -97,16 +100,36 @@ private:
   void onStart();
 
   //create a new grabber instance
-  void createGrabber();
+  void onCreateGrabber();
+
+
+  //!@brief Cast the base GrabberBasePtr to derived class PictureGrabberPtr
+  inline cedar::dev::sensors::visual::PictureGrabberPtr getGrabber()
+  {
+    return boost::static_pointer_cast<cedar::dev::sensors::visual::PictureGrabber>
+           (
+             this->cedar::proc::sources::GrabberBase::mGrabber
+           );
+  }
+
+  //!@brief Cast the base GrabberBasePtr to derived class PictureGrabberPtr
+  inline cedar::dev::sensors::visual::ConstPictureGrabberPtr getGrabber() const
+  {
+    return boost::static_pointer_cast<const cedar::dev::sensors::visual::PictureGrabber>
+           (
+            cedar::proc::sources::GrabberBase::mGrabber
+           );
+  }
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
 private:
-  cedar::aux::ImageDataPtr mImage;
+  // none yet
 
-  cedar::dev::sensors::visual::PictureGrabberPtr mGrabber;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -119,8 +142,7 @@ private:
   //!@brief the filename to grab from
   cedar::aux::FileParameterPtr _mFileName;
 
-  //!@brief The configuration filename
-  cedar::aux::FileParameterPtr _mConfigurationFileName;
+
 
 }; // class cedar::proc::sources::Picture
 

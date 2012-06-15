@@ -245,6 +245,12 @@ public:
     return this->mKernelList;
   }
 
+  //!@brief Sets the allowed modes for the convolution.
+  void setAllowedModes(const std::set<cedar::aux::conv::Mode::Id>& modes);
+
+signals:
+  void configurationChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -296,6 +302,9 @@ private:
    *  @todo Make a unit test for this.
    */
   cedar::aux::MatDataPtr mCombinedKernel;
+
+  //! When not empty, this set specifies the only allowed modes for the convolution
+  std::set<cedar::aux::conv::Mode::Id> mAllowedModes;
 
   //! Connection to the kernel added signal of the kernel list.
   boost::signals2::connection mKernelAddedConnection;

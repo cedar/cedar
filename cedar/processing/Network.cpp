@@ -454,16 +454,36 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
 {
   // parse element and slot name
   std::string source_name;
-  std::string source_slot;
+  std::string source_slot_name;
   std::string target_name;
-  std::string target_slot;
-  cedar::aux::splitFirst(source, ".", source_name, source_slot);
-  cedar::aux::splitFirst(target, ".", target_name, target_slot);
+  std::string target_slot_name;
+  cedar::aux::splitFirst(source, ".", source_name, source_slot_name);
+  cedar::aux::splitFirst(target, ".", target_name, target_slot_name);
   // check connection
   if (this->isConnected(source, target))
   {
     CEDAR_THROW(cedar::proc::DuplicateConnectionException, "This connection already exists!")
   }
+  std::string real_target_name;
+  std::string real_target_slot;
+  cedar::proc::Connectable::parseDataNameNoRole(target, real_target_name, real_target_slot);
+  cedar::proc::TriggerablePtr p_source = this->getElement<cedar::proc::Triggerable>(source_name);
+  cedar::proc::TriggerablePtr p_target = this->getElement<cedar::proc::Triggerable>(real_target_name);
+
+  cedar::proc::OwnedDataPtr source_slot
+    = this->getElement<cedar::proc::Connectable>(source_name)->getOutputSlot(source_slot_name);
+
+  cedar::proc::DataSlotPtr target_slot
+    = this->getElement<cedar::proc::Connectable>(target_name)->getInputSlot(target_slot_name);
+
+  cedar::proc::ConnectablePtr target_connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(p_target);
+  CEDAR_DEBUG_ASSERT(target_connectable);
+
+  if (target_connectable->ownsDataOf(source_slot))
+  {
+    CEDAR_THROW(cedar::proc::DeadlockException, "This connection would lead to a deadlock.");
+  }
+
   // create connection
   mDataConnections.push_back
   (
@@ -471,28 +491,11 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
     (
       new DataConnection
       (
-        this->getElement<cedar::proc::Connectable>(source_name)->getOutputSlot(source_slot),
-        this->getElement<cedar::proc::Connectable>(target_name)->getInputSlot(target_slot)
+        source_slot,
+        target_slot
       )
     )
   );
-  std::string real_target_name;
-  std::string real_target_slot;
-  cedar::proc::Connectable::parseDataNameNoRole(target, real_target_name, real_target_slot);
-  cedar::proc::TriggerablePtr p_source = this->getElement<cedar::proc::Triggerable>(source_name);
-  cedar::proc::TriggerablePtr p_target = this->getElement<cedar::proc::Triggerable>(real_target_name);
-  // target may be a nested Triggerable, recover!
-//  if (!p_target)
-//  {
-//    cedar::proc::PromotedExternalDataPtr promoted_slot
-//      = boost::shared_dynamic_cast<cedar::proc::PromotedExternalData>
-//        (
-//          this->getElement<cedar::proc::Connectable>(target_name)->getInputSlot(target_slot)
-//        );
-//    CEDAR_DEBUG_ASSERT(promoted_slot);
-//    std::string path = promoted_slot->getPromotionPath();
-//    p_target = this->getElement<cedar::proc::Triggerable>(path);
-//  }
   CEDAR_DEBUG_ASSERT(p_target);
   if (!p_target->isLooped())
   {
@@ -516,8 +519,8 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
   // inform any interested listeners of this new connection
   mDataConnectionChanged
   (
-    this->getElement<cedar::proc::Connectable>(source_name)->getOutputSlot(source_slot),
-    this->getElement<cedar::proc::Connectable>(target_name)->getInputSlot(target_slot),
+    this->getElement<cedar::proc::Connectable>(source_name)->getOutputSlot(source_slot_name),
+    this->getElement<cedar::proc::Connectable>(target_name)->getInputSlot(target_slot_name),
     true
   );
 }

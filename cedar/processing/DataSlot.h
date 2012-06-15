@@ -132,6 +132,9 @@ public:
   //!@brief set the current validity of this slot
   virtual void setValidity(VALIDITY validity);
 
+  //!@brief Removes all data from the slot.
+  virtual void clear() = 0;
+
   //!@brief checks if this Connectable is the parent of this DataSlotItem
   bool isParent(cedar::proc::ConstConnectablePtr parent) const;
 

@@ -76,6 +76,9 @@ namespace cedar
       //! a sigmoid that rises smoothly in an interval and is exactly zero resp. one outside that interval
       CEDAR_AUX_LIB_EXPORT double sigmoidInterval(const double value, const double t1, const double t2, const bool decreasing = false);
 
+      //! A sigmoid that is linear above a given threshold
+      CEDAR_AUX_LIB_EXPORT double sigmoidSemiLinear(double value, double threshold, double gain);
+
       //! an exponential-based sigmoid for a cv::Mat
       template<typename T>
       CEDAR_AUX_LIB_EXPORT cv::Mat sigmoid(const cv::Mat& mat, const double beta, const double threshold = 0);

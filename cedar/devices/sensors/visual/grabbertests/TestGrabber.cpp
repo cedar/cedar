@@ -47,12 +47,12 @@
 // Constructor for a single-channel grabber
 cedar::dev::sensors::visual::TestGrabber::TestGrabber(std::string configFileName, std::string channelName)
 :
-cedar::dev::sensors::visual::GrabberInterface(configFileName)
+cedar::dev::sensors::visual::Grabber(configFileName)
 {
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
                                            ConfigurationInterface::getName() + ": Create a single channel grabber",
-                                            "cedar::dev::sensors::visual::CameraGrabber::TestGrabber()"
+                                            "cedar::dev::sensors::visual::TestGrabber::TestGrabber()"
                                           );
 
   //debug information logging
@@ -78,7 +78,7 @@ cedar::dev::sensors::visual::TestGrabber::TestGrabber
   std::string channelName1
 )
 :
-cedar::dev::sensors::visual::GrabberInterface(configFileName)
+cedar::dev::sensors::visual::Grabber(configFileName)
 {
   //debug information logging
   cedar::aux::LogSingleton::getInstance()->allocating(this);
@@ -86,7 +86,7 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
                                            ConfigurationInterface::getName() + ": Create a stereo channel grabber",
-                                            "cedar::dev::sensors::visual::CameraGrabber::TestGrabber()"
+                                            "cedar::dev::sensors::visual::TestGrabber::TestGrabber()"
                                           );
 
   //read initialization values from configuration file
@@ -104,7 +104,7 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
 // Destructor
 cedar::dev::sensors::visual::TestGrabber::~TestGrabber()
 {
-  //call of doCleanup, to do the necessarily cleanup in GrabberInterface
+  //call of doCleanup, to do the necessarily cleanup in Grabber
   doCleanUp();
 
   //do memory de-allocation in the destructor
@@ -113,7 +113,7 @@ cedar::dev::sensors::visual::TestGrabber::~TestGrabber()
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
                                            ConfigurationInterface::getName() + ": destructor",
-                                            "cedar::dev::sensors::visual::CameraGrabber::~TestGrabber()"
+                                            "cedar::dev::sensors::visual::TestGrabber::~TestGrabber()"
                                           );
 
 
@@ -141,7 +141,7 @@ bool cedar::dev::sensors::visual::TestGrabber::onInit()
   {
     init_message << "Channel " << i << ": capture from Source: " << getChannel(i)->mSourceFileName << std::endl;
   }
-  cedar::aux::LogSingleton::getInstance()->systemInfo
+  cedar::aux::LogSingleton::getInstance()->message
                                            (
                                              ConfigurationInterface::getName() + init_message.str(),
                                              "cedar::dev::sensors::visual::TestGrabber::onInit()"
@@ -164,7 +164,7 @@ bool cedar::dev::sensors::visual::TestGrabber::onInit()
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
                                            ConfigurationInterface::getName() + ": Initialization finished",
-                                            "cedar::dev::sensors::visual::CameraGrabber::onInit()"
+                                            "cedar::dev::sensors::visual::TestGrabber::onInit()"
                                           );
   return true;
 
@@ -180,7 +180,7 @@ void cedar::dev::sensors::visual::TestGrabber::onCleanUp()
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
                                            ConfigurationInterface::getName() + ": Cleaning up",
-                                            "cedar::dev::sensors::visual::CameraGrabber::onCleanUp()"
+                                            "cedar::dev::sensors::visual::TestGrabber::onCleanUp()"
                                           );
 }
 
@@ -206,9 +206,9 @@ bool cedar::dev::sensors::visual::TestGrabber::onDeclareParameters()
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::TestGrabber::onUpdateSourceInfo(unsigned int channel)
 {
-  //this is the only pure virtual method of the GrabberInterface class
+  //this is the only pure virtual method of the Grabber class
 
-  //no range-check is needed, because this is done in the GrabberInterface::getSourceInfo method
+  //no range-check is needed, because this is done in the Grabber::getSourceInfo method
 
   //give some information about the used source like channelname, filename, devicename
   //or something like that

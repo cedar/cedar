@@ -34,11 +34,9 @@
 
 ======================================================================================================================*/
 
-#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
-#ifdef CEDAR_USE_LIB_DC1394
-
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
+#ifdef CEDAR_USE_LIB_DC1394
 
 // CEDAR INCLUDES
 #include "cedar/processing/sources/Camera.h"
@@ -80,20 +78,18 @@ namespace
 
 cedar::proc::sources::Camera::Camera()
 :
-cedar::proc::Step(false, true),
-mImage(new cedar::aux::ImageData(cv::Mat::zeros(1, 1, CV_32F))),
-mDeBayer(new cedar::aux::BoolParameter(this, "deBayer", true)),
-mBusId(new cedar::aux::UIntParameter(this, "busId", 0, 0, 999)),
-_mConfigurationFileName(new cedar::aux::FileParameter(this, "config",cedar::aux::FileParameter::READ,""))
+cedar::proc::sources::GrabberBase(),
+mDeBayer(new cedar::aux::BoolParameter(this, "deBayer", false)),
+mBusId(new cedar::aux::UIntParameter(this, "busId", 0, 0, 999))
 {
+  //default config-filename
+  GrabberBase::_mConfigurationFileName->setValue("./cameragrabber.cfg");
 
   //default file values
-  _mConfigurationFileName->setValue("./cameragrabber.cfg");
   mGrabber.reset();
 
 
   this->declareOutput("camera", mImage);
-  QObject::connect(_mConfigurationFileName.get(), SIGNAL(valueChanged()), this, SLOT(setConfigurationFileName()));
   QObject::connect(mDeBayer.get(), SIGNAL(valueChanged()), this, SLOT(setDeBayer()));
   QObject::connect(mBusId.get(), SIGNAL(valueChanged()), this, SLOT(setBusId()));
 }
@@ -107,7 +103,7 @@ void cedar::proc::sources::Camera::onStart()
 {
   if (!mGrabber)
   {
-    createGrabber();
+    GrabberBase::createGrabber();
   }
 }
 
@@ -124,19 +120,26 @@ void cedar::proc::sources::Camera::setBusId()
   //recreate grabber if needed
   if (mGrabber)
   {
-    createGrabber();
+    GrabberBase::createGrabber();
   }
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::sources::Camera::setConfigurationFileName()
-{
-
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Camera::compute(const cedar::proc::Arguments&)
 {
+  /* get the time-diff between two steps
+  try
+  {
+    const cedar::proc::StepTime& step_time = dynamic_cast<const cedar::proc::StepTime&>(arguments);
+    this->eulerStep(step_time.getStepTime());
+  }
+  catch (const std::bad_cast& e)
+  {
+    CEDAR_THROW(cedar::proc::InvalidArgumentsException, "Bad arguments passed to dynamics. Expected StepTime.");
+  }
+  */
+
   if (mGrabber)
   {
     this->mGrabber->grab();
@@ -157,17 +160,8 @@ void cedar::proc::sources::Camera::compute(const cedar::proc::Arguments&)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::sources::Camera::createGrabber()
+void cedar::proc::sources::Camera::onCreateGrabber()
 {
-
-  // destroy the old grabber (if any), in order to save the configuration
-  if (mGrabber)
-  {
-    const std::string message1 = "Old grabber deleted";
-    cedar::aux::LogSingleton::getInstance()->debugMessage(message1,"cedar::proc::sources::Camera::createGrabber()");
-  }
-  mGrabber.reset();
-
   const std::string conf_file = this->_mConfigurationFileName->getPath();
   const unsigned int bus_id = this->mBusId->getValue();
 
@@ -177,11 +171,11 @@ void cedar::proc::sources::Camera::createGrabber()
             (
                new cedar::dev::sensors::visual::CameraGrabber(conf_file,bus_id,false,true)
             );
-  const std::string message2= "New grabber created";
+  std::string message2 = "New grabber created";
   cedar::aux::LogSingleton::getInstance()->debugMessage(message2,"cedar::proc::sources::Video::createGrabber()");
 
   // the new grabber created without exception, so we can use it
-  mGrabber = grabber;
+  GrabberBase::mGrabber = grabber;
 
   //!@todo read debayer value from config-file
 }
