@@ -61,6 +61,9 @@ namespace cedar
       //! \brief Namespace for all visual sensors like cameras or camera-dummies (i.e. avi-file, picture)
       namespace visual
       {
+
+        //!@cond SKIPPED_DOCUMENTATION
+
         //-----------------------------------------------------------------------------------------------
         // interface classes
         //-----------------------------------------------------------------------------------------------
@@ -70,9 +73,7 @@ namespace cedar
         // grabber classes
         //-----------------------------------------------------------------------------------------------
 
-        //!@cond SKIPPED_DOCUMENTATION
-
-        //common interface class
+        //common base class for all grabbers
         CEDAR_DECLARE_DEV_CLASS(Grabber);
         
         //grabber

@@ -81,11 +81,15 @@ cedar::proc::sources::Video::Video()
 cedar::proc::sources::GrabberBase(),
 mFrameDuration(0.0),
 mTimeElapsed(0.0),
-_mFileName(new cedar::aux::FileParameter(this, "videofile",cedar::aux::FileParameter::READ,"./video.avi")),
+_mFileName(new cedar::aux::FileParameter(this, "videofile",cedar::aux::FileParameter::READ,"")),
 _mLoop(new cedar::aux::BoolParameter(this, "loop", true))
 {
-  // default config-filename
+  //default config-filename
   GrabberBase::_mConfigurationFileName->setValue("./videograbber.cfg");
+
+  //default-filenames
+  _mFileName->setValue("./video.avi");
+  mGrabber.reset();
 
   this->declareOutput("video", mImage);
   QObject::connect(_mFileName.get(), SIGNAL(valueChanged()), this, SLOT(setFileName()));
@@ -103,15 +107,17 @@ void cedar::proc::sources::Video::onStart()
   std::string filename = this->_mFileName->getPath();
 
   // check if videofile is there
-  if (filename == "")
+  if ( filename == "")
   {
-    std::string message = this->mGrabber->getName() + ": There is no file to grab from! Please set one!";
-    cedar::aux::LogSingleton::getInstance()->warning(message, "cedar::proc::sources::Video::onStart()");
+    std::string message = this->mGrabber->getName()+ ": There is no file to grab from! Please set one!";
+    cedar::aux::LogSingleton::getInstance()->warning(message,"cedar::proc::sources::Video::onStart()");
+    // std::cout << "[cedar::proc::sources::Video::onStart()]" << message << std::endl;
   }
 
   // if there is no grabber instance, create one
   else if (!mGrabber)
   {
+    // std::cout << "\n\n[cedar::proc::sources::Video::onStart()] try to create a new grabber" << std::endl;
     this->createGrabber();
   }
 
@@ -167,7 +173,7 @@ void cedar::proc::sources::Video::compute(const cedar::proc::Arguments &argument
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Video::setFileName()
 {
-  std::string message = "VideoGrabber: Set new filename to \"" + this->_mFileName->getPath()+"\"";
+  std::string message = "Set new filename to \"" + this->_mFileName->getPath()+"\"";
 
   // if already grabbing, a new grabber have to be created
   // because there is no possibility to change the filename

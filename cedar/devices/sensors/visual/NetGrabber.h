@@ -49,12 +49,14 @@
 
 #define SHOW_INIT_INFORMATION_NETGRABBER
 
-/*!@brief This grabber grabs images from a yarp-server located somewhere in the network
+/*! @class cedar::dev::sensors::visual::NetGrabber
+ *	@brief This grabber grabs images from a yarp-server located somewhere in the network
  *
  *   This functionality is implemented by using the
  *		cedar::aux::net::NetWriter and
  *		cedar::aux::net::NetReader classes.
  */
+
 class cedar::dev::sensors::visual::NetGrabber
 :
 public cedar::dev::sensors::visual::Grabber
@@ -70,8 +72,8 @@ public cedar::dev::sensors::visual::Grabber
   typedef boost::shared_ptr<cedar::aux::net::Reader<cv::Mat> > MatNetReaderPtr;
 
 
-  /*!@struct NetChannel
-   * @brief Additional data of a net grabbing channel
+  /*! @struct PictureChannel
+   *  @brief Additional data of a net grabbing channel
    */
   struct NetChannel
   :
@@ -89,13 +91,15 @@ public cedar::dev::sensors::visual::Grabber
   //!@endcond
 
 //--------------------------------------------------------------------------------------------------------------------
-// macros
+//macros
 //--------------------------------------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
+//constructors and destructor
 //--------------------------------------------------------------------------------------------------------------------
+
 public:
+
   /*! @brief Constructor for a single channel grabber
    *  @param configFileName	Filename for the configuration
    *  @param yarpChannelName Channel to grab from
@@ -121,13 +125,13 @@ public:
   //none yet
 
   //--------------------------------------------------------------------------------------------------------------------
-  // protected methods
+  //protected methods
   //--------------------------------------------------------------------------------------------------------------------
 
 protected:
 
   //------------------------------------------------------------------------
-  // From Grabber
+  //From Grabber
   //------------------------------------------------------------------------
   bool onInit();
   bool onGrab();
@@ -138,14 +142,14 @@ protected:
   void onAddChannel();
 
   //--------------------------------------------------------------------------------------------------------------------
-  // private methods
+  //private methods
   //--------------------------------------------------------------------------------------------------------------------
 
 private:
   //none yet
 
   //--------------------------------------------------------------------------------------------------------------------
-  // members
+  //members
   //--------------------------------------------------------------------------------------------------------------------
 
 public:
@@ -157,7 +161,7 @@ protected:
 
 private:
 
-  //! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class NetChannelPtr
+  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class NetChannelPtr
   inline NetChannelPtr getChannel(unsigned int channel)
   {
     return boost::static_pointer_cast<NetChannel>
@@ -166,7 +170,7 @@ private:
            );
   }
 
-  //! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
+  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
   inline ConstNetChannelPtr getChannel(unsigned int channel) const
   {
     return boost::static_pointer_cast<const NetChannel>
@@ -175,17 +179,23 @@ private:
            );
   }
 
+  //!@brief The default name for the grabber
+  virtual inline std::string defaultGrabberName() const
+  {
+    return "NetGrabber";
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
-  // parameters
+  //parameters
   //--------------------------------------------------------------------------------------------------------------------
 
 protected:
-  // none yet
+  //none yet
 
 private:
-  // none yet
+  //none yet
   
-}; // class cedar::dev::sensors::visual::NetGrabber
+}; //class cedar::dev::sensors::visual::NetGrabber
 
 #endif //CEDAR_USE_YARP
 #endif //CEDAR_DEV_SENSORS_VISUAL_NET_GRABBER_H

@@ -59,7 +59,7 @@ cedar::dev::sensors::visual::Grabber(configFileName)
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
   //read initialization values from configuration file
-  readInit(1,"TestGrabber");
+  readInit(1);
 
   //overwrite parameters from configfiles with values from constuctor
   getChannel(0)->mSourceFileName = channelName;
@@ -90,7 +90,7 @@ cedar::dev::sensors::visual::Grabber(configFileName)
                                           );
 
   //read initialization values from configuration file
-  readInit(2,"StereoTestGrabber");
+  readInit(2);
 
   //overwrite parameters from configfiles with values from constuctor
   getChannel(0)->mSourceFileName = channelName0;
@@ -200,7 +200,8 @@ bool cedar::dev::sensors::visual::TestGrabber::onDeclareParameters()
 
   //if your parameters should be stored in the configfile,
   //the default-values will be set on new grabbers
-  return addParameter(&_mTest, "testparam", 123) == CONFIG_SUCCESS;
+  //todo config add new parameter
+  //return addParameter(&_mTest, "testparam", 123) == CONFIG_SUCCESS;
 }
 
 //----------------------------------------------------------------------------------------------------

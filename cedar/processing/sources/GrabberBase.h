@@ -70,8 +70,8 @@ public cedar::proc::Step
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  GrabberBase();
   //!@brief The standard constructor.
+  GrabberBase();
 
 public:
   //!@brief Destructor
@@ -81,14 +81,16 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Save a Snapshot of the current picture
   void saveSnapshot();
 
 public slots:
+  //!@brief Slot for the recording-checkbox
   void setRecording();
 
   //!@todo Enum RecordType (Encoding)
 
-  //!@brief Sets a new configuration filename
+  //!@brief Slot to set a new configuration filename
   void setConfigurationFileName();
 
 

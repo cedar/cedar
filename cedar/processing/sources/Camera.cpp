@@ -171,7 +171,7 @@ void cedar::proc::sources::Camera::onCreateGrabber()
             (
                new cedar::dev::sensors::visual::CameraGrabber(conf_file,bus_id,false,true)
             );
-  std::string message2 = "New grabber created";
+  const std::string message2= "New grabber created";
   cedar::aux::LogSingleton::getInstance()->debugMessage(message2,"cedar::proc::sources::Video::createGrabber()");
 
   // the new grabber created without exception, so we can use it
