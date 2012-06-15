@@ -1,0 +1,128 @@
+#=======================================================================================================================
+#
+#   Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+# 
+#   This file is part of cedar.
+#
+#   cedar is free software: you can redistribute it and/or modify it under
+#   the terms of the GNU Lesser General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+#   WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+#   License for more details.
+#
+#   You should have received a copy of the GNU Lesser General Public License
+#   along with cedar. If not, see <http://www.gnu.org/licenses/>.
+#
+#=======================================================================================================================
+#
+#   Institute:   Ruhr-Universitaet Bochum
+#                Institut fuer Neuroinformatik
+#
+#   File:        changelog.txt
+#
+#   Maintainer:  all cedar developers
+#   Email:       cedar@ini.rub.de
+#   Date:        2012 01 12
+#
+#   Description: Cedar changelog
+#
+#   Credits:
+#
+#=======================================================================================================================
+
+== current version ==
+- general
+  - cedar now accepts both qwt versions 5.x and 6.x
+- cedar::aux
+  - added a slice plot for 3D matrix data
+  - implemented full mode for the opencv convolution engine
+- cedar::proc
+  - added a processing step for convolutions
+  - parameters are now locked in the compute method of processing steps
+- build system
+  - added a find script for FFTW that also searches for the include directory
+  - added defines for the current cedar version; this makes it possible to stay compatible to older versions, should
+    this ever be needed. 
+
+== Version 0.9 ==
+- cedar::aux
+  - fixed a critical bug in LoopedThread::singleStep, which used microseconds instead of milliseconds for step()
+  - cedar::aux::Configurable now inherits from boost::noncopyable, explicitly stating that you should never use
+    the copy constructor. Instead, you should use the functions Configurable::copyTo and Configurable::copyFrom.
+  - Templated functions in cedar::aux::math now have an "alias" version that can be called without a template parameter.
+    This function automatically decides which template version to call based on the matrix types.
+  - Added a function cedar::aux::System::locateResource that helps with finding cedar resources (i.e., config files
+    etc.) independent of the current working directory. See the documentation for details.
+  - the cedar::aux::Base class was removed
+  - The old ConfigurationInterface is being phased out now. For this purpose, a transitional interface has been
+    developed that should mostly work with the old code. If you run into trouble, add the following line to your
+    cedar configuration file:
+    set (CEDAR_LIBCONFIG_LEGACY_MODE      1           CACHE BOOL "Use libconfig legacy mode.")
+    If you set this flag to 0, libconfig++ is no longer needed as a dependency! Some unit tests may fail, though.
+  - merged AbstractFactory and AbstractFactoryDerived with Factory and FactoryDerived (including some changes to the
+    interfaces)
+  - introduced new FactoryManager class
+  - gl::Object has been renamed to gl::RigidBody
+  - There are some new Parameter types: ObjectListParameter and ObjectParameter. They allow dynamically selecting the
+    type of one or more objects. For example, these allow to dynamically select the type of the Sigmoid as well as the
+    combination of kernels in the neural field.
+  - Added a new Log class to cedar::aux. Using this is the new standard logging mechanism (over std::cout), as it can be
+    redirected at will, e.g., to the console (default) or some user interface. To access the log, use the corresponding
+    cedar::aux::LogSingleton::getInstance(). See the Logging tutorial in the documentation or cedar::aux::Log.
+  - There is a new widget for displaying log messages: cedar::aux::gui::Log.
+  - NumericParameters (DoubleParameter, IntParameter, UIntParameter) no longer need minimum and maximum values. They
+    also have a new constructor that takes a math::Limits object which is the new, recommended way of setting the
+    limits. The same is true for NumericVectorParameters.
+  - Added Data classes for stereo images and image sets.
+  - There is now a generalized structure for convolution. This structure wraps opencv and, optionally, fftw convolution!
+    For more, see the documentation for the cedar::aux::conv::Convolution class.
+  - The net namespace was added. This namespace contains wrappers around yarp's functionality and is available if cedar
+    is compiled with yarp.
+    
+- cedar::dev
+  - Added several classes for grabbing pictures, videos and cameras in cedar::dev::sensors::visual.
+
+- cedar::proc
+  - added directional arrows for graphical connections in processingIde
+  - when loading a plugin, the PluginProxy now also looks for a plugin description file. This file may contain some
+    information about your plugin in case you don't want to hardcode it, e.g., it can contain icon paths for processing
+    steps. See documentation of cedar::proc::PluginDeclaration for details.
+  - Overhauled the plotting system. You can now select different types of plots for data in the processingIde where
+    available.
+  - added grouping functionality for processing
+  - added promotion of data slots for networks
+  - Some outputs and parameters have been renamed. If your architectures fail to load, check that the connections use
+    the correct names.
+
+- processingIde
+  - The IDE now remembers whether or not snap to grid is active.
+  - Implemented zooming in the IDE; apart from the controls that are directly visible, scrolling is also possible with
+    the mouse wheel (hold down ctrl)
+  - The property pane now indicates when parameters have been changed since the last save. 
+  - more verbose tooltip for data slots
+  - there is now a settings dialog; more settings will be added later.
+  - the tab order in the property pane is now working correctly
+
+- cedar::dyn
+  - NeuralField now supports changing the sigmoid type, the number and type of kernel modes as well as dynamic exchange
+    of the convolution method
+    
+- build system
+  - Projects depending on cedar no longer need to define __LINUX__ etc.; this is now done automatically by the build
+    system. 
+  - files in the resource folder are now moved to ${CEDAR_INSTALL_PREFIX}/share/resources. Use the
+    cedar::aux::System::locateResource function to locate them.
+  - It is no longer necessary to specify CEDAR_BUILD_DIR in the cedar.conf file. Instead, if the variable is not
+    specified, the directory in which you call cmake is automatically selected.
+
+== Version 0.5.1 ==
+- cedar::proc::steps
+  - fixed compilation bug of cedar::proc::steps::GaussInput on Windows platforms
+
+== Version 0.5 ==
+
+first release!
