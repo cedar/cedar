@@ -45,7 +45,8 @@
 // CEDAR INCLUDES
 #include "cedar/devices/kuka/namespace.h"
 #include "cedar/devices/robot/KinematicChain.h"
-#include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "cedar/auxiliaries/IntParameter.h"
+#include "cedar/auxiliaries/StringParameter.h"
 
 // SYSTEM INCLUDES
 #include <fri/friremote.h>
@@ -66,7 +67,7 @@ public:
    *
    * @param configFileName    Name of the configuration file containing the parameters
    */
-  KukaInterface(const std::string& configFileName);
+  KukaInterface();
 
   /*!the Destructor*/
   virtual ~KukaInterface();
@@ -154,7 +155,7 @@ private:
    * This method is called from all constructors of the class.
    * @param commandMode establish command mode if true
    */
-  void init();
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
   /*!@brief every step is used to do communication between FRI and KUKA-RC
    *
    * if in velocity- or acceleration mode, every step will also change joint angles/velocity
@@ -196,9 +197,9 @@ protected:
   // none yet
 private:
   //!IP Address of the remote host
-  std::string _mRemoteHost;
+  cedar::aux::StringParameterPtr _mRemoteHost;
   //!local server port
-  int _mServerPort;
+  cedar::aux::IntParameterPtr _mServerPort;
 };
 #endif // CEDAR_USE_KUKA_FRI
 #endif /* CEDAR_DEV_ROBOT_KUKA_KUKA_INTERFACE_H */

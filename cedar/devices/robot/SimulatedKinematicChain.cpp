@@ -43,11 +43,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::robot::SimulatedKinematicChain::SimulatedKinematicChain(const std::string& configFileName)
-:
-KinematicChain(configFileName)
+cedar::dev::robot::SimulatedKinematicChain::SimulatedKinematicChain()
 {
-  init();
+  mJointAngles = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
 }
 
 cedar::dev::robot::SimulatedKinematicChain::~SimulatedKinematicChain()
@@ -78,7 +76,3 @@ void cedar::dev::robot::SimulatedKinematicChain::setJointAngle(unsigned int inde
   mJointAngles.at<double>(index, 0) = angle;
 }
 
-void cedar::dev::robot::SimulatedKinematicChain::init()
-{
-  mJointAngles = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
-}
