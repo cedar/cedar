@@ -162,6 +162,39 @@ const cedar::proc::Network::ElementMap& cedar::proc::Network::elements() const
   return this->mElements;
 }
 
+void cedar::proc::Network::removeAllConnectionsFromSlot(cedar::proc::ConstDataSlotPtr slot)
+{
+  for
+  (
+    cedar::proc::Network::DataConnectionVector::iterator data_con = mDataConnections.begin();
+    data_con != mDataConnections.end();
+    // empty
+  )
+  {
+    if ((*data_con)->getSource() == slot
+        || (*data_con)->getTarget() == slot)
+    {
+      mDataConnectionChanged
+      (
+        this->getElement<cedar::proc::Connectable>
+        (
+          (*data_con)->getSource()->getParent())->getOutputSlot((*data_con)->getSource()->getName()
+        ),
+        this->getElement<cedar::proc::Connectable>
+        (
+          (*data_con)->getTarget()->getParent())->getInputSlot((*data_con)->getTarget()->getName()
+        ),
+        false
+      );
+      data_con = this->removeDataConnection(data_con);
+    }
+    else
+    {
+      ++data_con;
+    }
+  }
+}
+
 void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
 {
   // first, delete all data connections to and from this Element
@@ -193,6 +226,50 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
       ++data_con;
     }
   }
+  // including the ones to promoted slots (this only works if the parent network is accessible)
+  if (cedar::proc::NetworkPtr parent = this->mRegisteredAt.lock())
+  {
+    std::vector<cedar::proc::DataRole::Id> data_roles;
+    data_roles.push_back(DataRole::INPUT);
+    data_roles.push_back(DataRole::OUTPUT);
+    // go through all slot types
+    for (unsigned int i = 0; i < data_roles.size(); ++i)
+    {
+      try
+      {
+        SlotMap& current_map = this->getDataSlots(data_roles.at(i));
+        for // go through all slots
+        (
+          SlotMap::iterator map = current_map.begin();
+          map != current_map.end();
+          ++map
+        )
+        {
+          if // check if this is promoted data
+          (
+            boost::shared_dynamic_cast<cedar::proc::PromotedExternalData>(map->second)
+            || boost::shared_dynamic_cast<cedar::proc::PromotedOwnedData>(map->second)
+          )
+          {
+            // if so, compare the name of the current element with the slot owner
+            std::string element_name;
+            std::string rest;
+            cedar::aux::splitFirst(map->first, ".", element_name, rest);
+            if (element->getName() == element_name) // this slot will be removed later, delete connections now
+            {
+              // remove all connections at parent network
+              parent->removeAllConnectionsFromSlot(map->second);
+            }
+          }
+        }
+      }
+      catch (cedar::proc::InvalidRoleException& exception)
+      {
+        continue;
+      }
+    }
+  }
+
   // then, delete all trigger connections to and from this Element
   for (
         cedar::proc::Network::TriggerConnectionVector::iterator trigger_con = mTriggerConnections.begin();

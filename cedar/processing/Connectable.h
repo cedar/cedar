@@ -282,7 +282,7 @@ private:
   boost::signals2::connection mSlotConnection;
 
   //!@brief a map of slot maps, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
-  std::map<DataRole::Id, SlotMap> mDataConnections;
+  std::map<DataRole::Id, SlotMap> mSlotMaps;
 
   //!@brief a map of slot lists, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
   std::map<DataRole::Id, SlotList> mDataConnectionsOrder;
