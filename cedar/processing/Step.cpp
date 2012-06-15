@@ -73,7 +73,7 @@ Triggerable(isLooped),
 // initialize members
 mBusy(false),
 mpArgumentsLock(new QReadWriteLock()),
-mLastIterationTime(cedar::unit::Milliseconds(0)),
+mLastIterationTime(cedar::unit::Milliseconds(-1.0)),
 mMovingAverageIterationTime(100), // average the last 100 iteration times
 mLastIterationTimeLock(new QReadWriteLock()),
 // initialize parameters
@@ -449,7 +449,7 @@ cedar::unit::Time cedar::proc::Step::getRunTimeAverage() const
   }
   else
   {
-    return -1.0;
+    return cedar::unit::Milliseconds(-1.0);
   }
 }
 

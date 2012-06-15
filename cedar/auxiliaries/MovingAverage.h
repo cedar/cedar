@@ -148,8 +148,6 @@ public:
    */
   ElementType getAverage() const
   {
-    CEDAR_ASSERT(this->size() != 0);
-
     return this->getSum() / this->size();
   }
 
@@ -157,7 +155,7 @@ public:
    */
   ElementType getSum() const
   {
-    CEDAR_ASSERT(this->size() != 0);
+    CEDAR_ASSERT(this->size() > 0);
 
     return this->mElementSum;
   }
