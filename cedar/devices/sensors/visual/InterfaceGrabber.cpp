@@ -57,7 +57,7 @@ cedar::dev::sensors::visual::Grabber(configFileName)
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   cedar::aux::LogSingleton::getInstance()->message
                                           (
-                                           ConfigurationInterface::getName() + ": Create a single channel grabber",
+                                           this->getName() + ": Create a single channel grabber",
                                             "cedar::dev::sensors::visual::InterfaceGrabber::InterfaceGrabber()"
                                           );
 
@@ -88,7 +88,7 @@ cedar::dev::sensors::visual::Grabber(configFileName)
 
   cedar::aux::LogSingleton::getInstance()->message
                                           (
-                                           ConfigurationInterface::getName() + ": Create a stereo channel grabber",
+                                           this->getName() + ": Create a stereo channel grabber",
                                             "cedar::dev::sensors::visual::InterfaceGrabber::InterfaceGrabber()"
                                           );
 
@@ -134,7 +134,7 @@ bool cedar::dev::sensors::visual::InterfaceGrabber::onInit()
   }
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
-                                             ConfigurationInterface::getName() + init_message.str(),
+                                             this->getName() + init_message.str(),
                                              "cedar::dev::sensors::visual::InterfaceGrabber::onInit()"
                                            );
 

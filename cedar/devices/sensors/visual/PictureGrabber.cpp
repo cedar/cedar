@@ -114,7 +114,7 @@ bool cedar::dev::sensors::visual::PictureGrabber::onInit()
   }
   cedar::aux::LogSingleton::getInstance()->systemInfo
                                            (
-                                             ConfigurationInterface::getName() + init_message.str(),
+                                             this->getName() + init_message.str(),
                                              "cedar::dev::sensors::visual::PictureGrabber::onInit()"
                                            );
 
@@ -131,7 +131,7 @@ bool cedar::dev::sensors::visual::PictureGrabber::onInit()
     {
       cedar::aux::LogSingleton::getInstance()->error
                                                (
-                                                ConfigurationInterface::getName() + ": Grabbing failed on Channel "
+                                                this->getName() + ": Grabbing failed on Channel "
                                                   + boost::lexical_cast<std::string>(channel) + " from \""
                                                   + getChannel(channel)->mSourceFileName + "\"",
                                                 "cedar::dev::sensors::visual::PictureGrabber::onInit()"

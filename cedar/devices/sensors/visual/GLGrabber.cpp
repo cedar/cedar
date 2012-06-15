@@ -53,7 +53,7 @@ cedar::dev::sensors::visual::Grabber(configFileName)
 
   cedar::aux::LogSingleton::getInstance()->message
                                           (
-                                           ConfigurationInterface::getName() + ": Create a single channel GL-grabber",
+                                           this->getName() + ": Create a single channel GL-grabber",
                                             "cedar::dev::sensors::visual::GLGrabber::GLGrabber()"
                                           );
 
@@ -83,7 +83,7 @@ cedar::dev::sensors::visual::Grabber(configFileName)
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   cedar::aux::LogSingleton::getInstance()->message
                                           (
-                                           ConfigurationInterface::getName() + ": Create a stereo channel GL-grabber",
+                                           this->getName() + ": Create a stereo channel GL-grabber",
                                             "cedar::dev::sensors::visual::GLGrabber::GLGrabber()"
                                           );
 
@@ -122,7 +122,7 @@ bool cedar::dev::sensors::visual::GLGrabber::onInit()
   }
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
-                                             ConfigurationInterface::getName() + init_message.str(),
+                                             this->getName() + init_message.str(),
                                              "cedar::dev::sensors::visual::OglGrabber::onInit()"
                                            );
   //Grab first frames
@@ -234,7 +234,7 @@ void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGL
     getChannel(channel)->mpQGLWidget = qglWidget;
     cedar::aux::LogSingleton::getInstance()->message
                                             (
-                                             ConfigurationInterface::getName() + ": New Widget applied",
+                                             this->getName() + ": New Widget applied",
                                               "cedar::dev::sensors::visual::GLGrabber::setWidget"
                                             );
     this->grab();

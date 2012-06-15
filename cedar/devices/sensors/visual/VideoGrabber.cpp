@@ -136,7 +136,7 @@ bool cedar::dev::sensors::visual::VideoGrabber::onInit()
   }
   cedar::aux::LogSingleton::getInstance()->systemInfo
                                            (
-                                             ConfigurationInterface::getName() + init_message.str(),
+                                             this->getName() + init_message.str(),
                                              "cedar::dev::sensors::visual::VideoGrabber::onInit()"
                                            );
 
@@ -158,7 +158,7 @@ bool cedar::dev::sensors::visual::VideoGrabber::onInit()
     {
       cedar::aux::LogSingleton::getInstance()->error
                                                (
-                                                ConfigurationInterface::getName() + ": Grabbing failed on Channel "
+                                                this->getName() + ": Grabbing failed on Channel "
                                                   + boost::lexical_cast<std::string>(channel) + " from \""
                                                   + getChannel(channel)->mSourceFileName + "\"",
                                                 "cedar::dev::sensors::visual::VideoGrabber::onInit()"
@@ -191,7 +191,7 @@ bool cedar::dev::sensors::visual::VideoGrabber::onInit()
     {
       cedar::aux::LogSingleton::getInstance()->error
                                                (
-                                                 ConfigurationInterface::getName()
+                                                 this->getName()
                                                   + ": Different framerates of channels 0 and 1",
                                                 "cedar::dev::sensors::visual::VideoGrabber::onInit()"
                                                );
@@ -246,7 +246,7 @@ bool cedar::dev::sensors::visual::VideoGrabber::onGrab()
           }
           cedar::aux::LogSingleton::getInstance()->debugMessage
                                                     (
-                                                      ConfigurationInterface::getName() + ": Video restarted",
+                                                      this->getName() + ": Video restarted",
                                                       "cedar::dev::sensors::visual::VideoGrabber::onGrab()"
                                                     );
 
@@ -346,7 +346,7 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionRelative(double newPo
   debug_message << "\tPosition set to frame: " << new_pos_abs << std::endl;
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                             (
-                                              ConfigurationInterface::getName() + ": " + debug_message.str(),
+                                              this->getName() + ": " + debug_message.str(),
                                               "cedar::dev::sensors::visual::VideoGrabber::setPositionRelative()"
                                             );
 
@@ -383,7 +383,7 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionAbsolute(unsigned int
                 << "\tPosition set to frame: " << newPositionAbs << std::endl;
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                             (
-                                              ConfigurationInterface::getName() + ": " + debug_message.str(),
+                                              this->getName() + ": " + debug_message.str(),
                                               "cedar::dev::sensors::visual::VideoGrabber::setPositionAbsolute()"
                                             );
 

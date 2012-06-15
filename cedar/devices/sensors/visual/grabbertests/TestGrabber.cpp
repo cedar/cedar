@@ -51,7 +51,7 @@ cedar::dev::sensors::visual::Grabber(configFileName)
 {
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
-                                           ConfigurationInterface::getName() + ": Create a single channel grabber",
+                                           this->getName() + ": Create a single channel grabber",
                                             "cedar::dev::sensors::visual::TestGrabber::TestGrabber()"
                                           );
 
@@ -85,7 +85,7 @@ cedar::dev::sensors::visual::Grabber(configFileName)
 
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
-                                           ConfigurationInterface::getName() + ": Create a stereo channel grabber",
+                                           this->getName() + ": Create a stereo channel grabber",
                                             "cedar::dev::sensors::visual::TestGrabber::TestGrabber()"
                                           );
 
@@ -112,7 +112,7 @@ cedar::dev::sensors::visual::TestGrabber::~TestGrabber()
 
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
-                                           ConfigurationInterface::getName() + ": destructor",
+                                           this->getName() + ": destructor",
                                             "cedar::dev::sensors::visual::TestGrabber::~TestGrabber()"
                                           );
 
@@ -143,7 +143,7 @@ bool cedar::dev::sensors::visual::TestGrabber::onInit()
   }
   cedar::aux::LogSingleton::getInstance()->message
                                            (
-                                             ConfigurationInterface::getName() + init_message.str(),
+                                             this->getName() + init_message.str(),
                                              "cedar::dev::sensors::visual::TestGrabber::onInit()"
                                            );
 
@@ -163,7 +163,7 @@ bool cedar::dev::sensors::visual::TestGrabber::onInit()
   // all grabbers successfully initialized
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
-                                           ConfigurationInterface::getName() + ": Initialization finished",
+                                           this->getName() + ": Initialization finished",
                                             "cedar::dev::sensors::visual::TestGrabber::onInit()"
                                           );
   return true;
@@ -179,7 +179,7 @@ void cedar::dev::sensors::visual::TestGrabber::onCleanUp()
   //on an exception or a CTRL-C only onCleanUp will be invoked (no destructor)
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
-                                           ConfigurationInterface::getName() + ": Cleaning up",
+                                           this->getName() + ": Cleaning up",
                                             "cedar::dev::sensors::visual::TestGrabber::onCleanUp()"
                                           );
 }
