@@ -681,17 +681,35 @@ void cedar::proc::gui::StepItem::plotAll(const QPoint& position)
 
             // plotter
             p_plotter = new cedar::aux::gui::DataPlotter();
-            p_plotter->plot(data, title);
-            p_layout->addWidget(p_plotter, row + 1, column);
-            p_layout->setRowStretch(row + 1, 1);
+            try
+            {
+              p_plotter->plot(data, title);
+              p_layout->addWidget(p_plotter, row + 1, column);
+              p_layout->setRowStretch(row + 1, 1);
 
-            count += 1;
+              count += 1;
+            }
+            catch (cedar::aux::UnknownTypeException& exc)
+            {
+              // clean up allocated data
+              delete p_plotter;
+              p_plotter = NULL;
+              delete p_last_label;
+              p_last_label = NULL;
+            }
           }
           else
           {
-            p_plotter->append(data, title);
-            p_last_label->setText("");
-            is_multiplot = true;
+            try
+            {
+              p_plotter->append(data, title);
+              p_last_label->setText("");
+              is_multiplot = true;
+            }
+            catch (cedar::aux::UnknownTypeException& exc)
+            {
+              // nothing to do here, just do not append the data
+            }
           }
         }
       }
