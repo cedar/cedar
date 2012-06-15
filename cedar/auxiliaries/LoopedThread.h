@@ -95,7 +95,7 @@
  * \todo Revise the parameters of the looped thread
  * \todo Use units instead of doubles
  */
-class cedar::aux::LoopedThread : public cedar::aux::Configurable,
+class cedar::aux::LoopedThread : virtual public cedar::aux::Configurable,
                                  public QThread
 {
   //----------------------------------------------------------------------------

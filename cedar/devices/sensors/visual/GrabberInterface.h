@@ -87,8 +87,7 @@
  */
 class cedar::dev::sensors::visual::GrabberInterface
 :
-public cedar::aux::LoopedThread,
-public boost::noncopyable
+public cedar::aux::LoopedThread
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constants

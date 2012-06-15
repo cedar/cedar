@@ -45,6 +45,7 @@
 #include "cedar/devices/robot/Component.h"
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 
 // SYSTEM INCLUDES
@@ -125,9 +126,11 @@ private:
   //----------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KinematicChain(const std::string& configFileName);
-  //!@brief constructor
-  KinematicChain(const std::string& configFileName, cedar::aux::LocalCoordinateFramePtr pEndEffector);
+  KinematicChain
+  (
+    cedar::aux::LocalCoordinateFramePtr pEndEffector
+      = cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame())
+  );
   //!@brief destructor
   virtual ~KinematicChain();
 

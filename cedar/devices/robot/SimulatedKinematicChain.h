@@ -55,7 +55,7 @@ class cedar::dev::robot::SimulatedKinematicChain : public cedar::dev::robot::Kin
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  SimulatedKinematicChain(const std::string& configFileName);
+  SimulatedKinematicChain();
   //!@brief destructor
   ~SimulatedKinematicChain();
   
@@ -87,7 +87,7 @@ public:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void init();
+  // none yet
   
   //--------------------------------------------------------------------------------------------------------------------
   // members

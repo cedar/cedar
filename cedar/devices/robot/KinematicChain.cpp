@@ -62,11 +62,9 @@ namespace
 //! constructor
 cedar::dev::robot::KinematicChain::KinematicChain
 (
-  const std::string& configFileName,
   cedar::aux::LocalCoordinateFramePtr pEndEffector
 )
 :
-LoopedThread(configFileName),
 mpJoints(new JointListParameter(this, "joints")),
 mpRootCoordinateFrame(new cedar::aux::LocalCoordinateFrame()),
 mpEndEffectorCoordinateFrame(pEndEffector)
@@ -76,17 +74,6 @@ mpEndEffectorCoordinateFrame(pEndEffector)
   init();
 }
 
-cedar::dev::robot::KinematicChain::KinematicChain(const std::string& configFileName)
-:
-LoopedThread(configFileName),
-mpJoints(new JointListParameter(this, "joints")),
-mpRootCoordinateFrame(new cedar::aux::LocalCoordinateFrame()),
-mpEndEffectorCoordinateFrame(new cedar::aux::LocalCoordinateFrame())
-{
-  setWorkingMode(ANGLE);
-  mUseCurrentHardwareValues = false;
-  init();
-}
 
 //! destructor
 cedar::dev::robot::KinematicChain::~KinematicChain()
