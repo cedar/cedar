@@ -24,9 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Mathis Richter
-#   Email:       mathis.richter@ini.rub.de
-#   Date:        2010 11 29
+#   Maintainer:  Hendrik Reimann
+#   Email:       hendrik.reimann@ini.rub.de
+#   Date:        2012 02 09
 #
 #   Description:
 #
@@ -34,17 +34,4 @@
 #
 #=======================================================================================================================
 
-#TODO fix include of kuka/gui/FriStatusWidget if FRI is not installed
-cedar_add_library(cedardev
-  MOC_HEADERS
-  robot/gui/KinematicChainWidget.h
-  robot/gui/KinematicChainMonitorWidget.h
-  robot/gui/KinematicChainCommandWidget.h
-  robot/gui/MountedCameraViewer.h
-  kteam/gui/EPuckControlWidget.h
-  communication/gui/CommunicationWidget.h
-  kuka/gui/FriStatusWidget.h
-  LINK_LIBRARIES
-  cedaraux
-)
-
+cedar_add_interactive_test("MountedCameraViewer" main.cpp)

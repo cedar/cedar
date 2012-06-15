@@ -117,7 +117,7 @@ int main(int argc, char **argv)
   );
   p_scene->addObjectVisualization(p_pyramid);
 
-  // create a torus visualization and add it to the scene
+  // create a prism visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_prism_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
   p_prism_local_coordinate_frame->setName("prism");
   p_prism_local_coordinate_frame->setTranslation(0, 0, 5);
@@ -137,7 +137,7 @@ int main(int argc, char **argv)
   );
   p_scene->addObjectVisualization(p_torus);
 
-  // create a torus visualization and add it to the scene
+  // create an ellipse visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_ellipse_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
   p_ellipse_local_coordinate_frame->setName("ellipse");
   p_ellipse_local_coordinate_frame->setTranslation(-7.5, -3, 3);
