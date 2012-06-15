@@ -196,7 +196,15 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
               );
 
   // setup noise correlation kernel
-  mNoiseCorrelationKernel = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(this->getDimensionality()));
+  mNoiseCorrelationKernel
+    = cedar::aux::kernel::GaussPtr
+      (
+        new cedar::aux::kernel::Gauss
+        (
+          this->getDimensionality(),
+          0.0 // default amplitude
+        )
+      );
   std::set<cedar::aux::conv::Mode::Id> allowed_convolution_modes;
   allowed_convolution_modes.insert(cedar::aux::conv::Mode::Same);
 
