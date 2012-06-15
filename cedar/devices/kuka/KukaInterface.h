@@ -67,7 +67,7 @@ public:
    *
    * @param configFileName    Name of the configuration file containing the parameters
    */
-  KukaInterface(const std::string& configFileName);
+  KukaInterface();
 
   /*!the Destructor*/
   virtual ~KukaInterface();

@@ -325,7 +325,7 @@ double cedar::dev::sensors::visual::GrabberInterface::getFpsMeasured() const
 //--------------------------------------------------------------------------------------------------------------------
 double cedar::dev::sensors::visual::GrabberInterface::getFps() const
 {
-  double fps = 1000. / LoopedThread::_mStepSize;
+  double fps = 1000. / LoopedThread::getStepSizeParameter();
   return fps;
 }
 

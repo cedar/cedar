@@ -49,9 +49,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::kuka::KukaInterface::KukaInterface(const std::string& configFileName)
+cedar::dev::kuka::KukaInterface::KukaInterface()
 :
-KinematicChain(configFileName),
 mCommandedJointPosition(LBR_MNJ),
 mMeasuredJointPosition(LBR_MNJ),
 _mRemoteHost(new cedar::aux::StringParameter(this, "remote host", "NULL")),
