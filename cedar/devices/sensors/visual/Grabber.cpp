@@ -90,7 +90,7 @@ cedar::dev::sensors::visual::Grabber::~Grabber()
   {
     cedar::aux::LogSingleton::getInstance()->debugMessage
                                             (
-                                              ConfigurationInterface::getName() + ": This grabber "
+                                              this->getName() + ": This grabber "
                                                 + "delete from list of all instances.",
                                               "cedar::dev::sensors::visual::GrabberInterface::~GrabberInterface()"
                                             );
@@ -150,7 +150,7 @@ void cedar::dev::sensors::visual::Grabber::doCleanUp()
 
     cedar::aux::LogSingleton::getInstance()->debugMessage
                                              (
-                                               ConfigurationInterface::getName() + ": cleanup",
+                                               this->getName() + ": cleanup",
                                                "cedar::dev::sensors::visual::GrabberInterface::doCleanUp()"
                                              );
 
@@ -287,7 +287,7 @@ bool cedar::dev::sensors::visual::Grabber::writeConfiguration()
   {
     cedar::aux::LogSingleton::getInstance()->error
                                              (
-                                              ConfigurationInterface::getName() + "Error while updating the parameters "
+                                              this->getName() + "Error while updating the parameters "
                                                 + "in the derived class. Configuration NOT saved!",
                                               "cedar::dev::sensors::visual::GrabberInterface::writeConfiguration()"
                                              );
@@ -299,7 +299,7 @@ bool cedar::dev::sensors::visual::Grabber::writeConfiguration()
 
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
-                                             ConfigurationInterface::getName() + ": Configuration saved",
+                                             this->getName() + ": Configuration saved",
                                              "cedar::dev::sensors::visual::GrabberInterface::writeConfiguration()"
                                            );
 
@@ -321,7 +321,7 @@ double cedar::dev::sensors::visual::Grabber::getFpsMeasured() const
 //--------------------------------------------------------------------------------------------------------------------
 double cedar::dev::sensors::visual::Grabber::getFps() const
 {
-  double fps = 1000. / LoopedThread::_mStepSize;
+  double fps = 1000. / LoopedThread::getStepSizeParameter();
   return fps;
 }
 
@@ -337,14 +337,14 @@ void cedar::dev::sensors::visual::Grabber::setFps(double fps)
 
     cedar::aux::LogSingleton::getInstance()->message
                                              (
-                                               ConfigurationInterface::getName() + ": Grabbing stopped",
+                                               this->getName() + ": Grabbing stopped",
                                                "cedar::dev::sensors::visual::GrabberInterface::setFps()"
                                              );
 
 
   cedar::aux::LogSingleton::getInstance()->message
                                            (
-                                             ConfigurationInterface::getName()
+                                             this->getName()
                                                + ": Switch to " + boost::lexical_cast<std::string>(fps) + " fps",
                                              "cedar::dev::sensors::visual::GrabberInterface::setFps()"
                                            );
@@ -361,7 +361,7 @@ void cedar::dev::sensors::visual::Grabber::setFps(double fps)
     startGrabber();
     cedar::aux::LogSingleton::getInstance()->message
                                              (
-                                               ConfigurationInterface::getName() + ": Grabbing started",
+                                               this->getName() + ": Grabbing started",
                                                "cedar::dev::sensors::visual::GrabberInterface::setFps()"
                                              );
   }
@@ -378,7 +378,7 @@ void cedar::dev::sensors::visual::Grabber::setFps(double fps)
   }
   cedar::aux::LogSingleton::getInstance()->message
                                            (
-                                             ConfigurationInterface::getName() + info,
+                                             this->getName() + info,
                                              "cedar::dev::sensors::visual::GrabberInterface::setFps()"
                                            );
 }
@@ -389,7 +389,7 @@ void cedar::dev::sensors::visual::Grabber::stopGrabber()
   LoopedThread::stop();
   cedar::aux::LogSingleton::getInstance()->message
                                            (
-                                             ConfigurationInterface::getName() + ": Grabbing stopped",
+                                             this->getName() + ": Grabbing stopped",
                                              "cedar::dev::sensors::visual::GrabberInterface::stopGrabber()"
                                            );
   mFpsMeasured = 0;
@@ -408,7 +408,7 @@ void cedar::dev::sensors::visual::Grabber::startGrabber()
   LoopedThread::start();
   cedar::aux::LogSingleton::getInstance()->message
                                            (
-                                             ConfigurationInterface::getName() + ": Grabbing started with "
+                                             this->getName() + ": Grabbing started with "
                                                + boost::lexical_cast<std::string>(getFps()) + " FPS.",
                                              "cedar::dev::sensors::visual::GrabberInterface::startGrabber()"
                                            );
@@ -438,7 +438,7 @@ void cedar::dev::sensors::visual::Grabber::grab()
     CEDAR_THROW
     ( 
       cedar::dev::sensors::visual::GrabberGrabException,
-      "[GrabberInterface::grab] Error in grabber \""+ _mName + "\" on grabbing: " + error_info
+      "[GrabberInterface::grab] Error in grabber \"" + this->getName() + "\" on grabbing: " + error_info
     );
   }
 
@@ -719,7 +719,7 @@ bool cedar::dev::sensors::visual::Grabber::startRecording(double fps, int fourcc
   {
     cedar::aux::LogSingleton::getInstance()->warning
                                              (
-                                               ConfigurationInterface::getName() + ": Grabber is already recording",
+                                               this->getName() + ": Grabber is already recording",
                                                "cedar::dev::sensors::visual::GrabberInterface::startRecording()"
                                              );
     return true;
@@ -747,7 +747,7 @@ bool cedar::dev::sensors::visual::Grabber::startRecording(double fps, int fourcc
 
       cedar::aux::LogSingleton::getInstance()->message
                                                (
-                                                 ConfigurationInterface::getName() + info,
+                                                 this->getName() + info,
                                                  "cedar::dev::sensors::visual::GrabberInterface::startRecording()"
                                                );
       recording_channels++;
@@ -769,7 +769,7 @@ bool cedar::dev::sensors::visual::Grabber::startRecording(double fps, int fourcc
   {
     cedar::aux::LogSingleton::getInstance()->message
                                              (
-                                               ConfigurationInterface::getName() + ": Grabbing started on recording",
+                                               this->getName() + ": Grabbing started on recording",
                                                "cedar::dev::sensors::visual::GrabberInterface::startRecording()"
                                              );
     mGrabberThreadStartedOnRecording = true;
@@ -790,7 +790,7 @@ void cedar::dev::sensors::visual::Grabber::stopRecording()
       mGrabberThreadStartedOnRecording = false;
       cedar::aux::LogSingleton::getInstance()->message
                                                (
-                                                 ConfigurationInterface::getName() + ": Grabbing stopped",
+                                                 this->getName() + ": Grabbing stopped",
                                                  "cedar::dev::sensors::visual::GrabberInterface::stopRecording()"
                                                );
     }

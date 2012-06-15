@@ -83,8 +83,7 @@
  */
 class cedar::dev::sensors::visual::Grabber
 :
-public cedar::aux::LoopedThread,
-public boost::noncopyable
+public cedar::aux::LoopedThread
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -474,6 +473,12 @@ public:
   std::string getChannelSaveFilenameAddition(int channel) const;
   //!@endcond
 
+  //!@brief Returns the name of the grabber instance.
+  inline std::string getName() const
+  {
+    return this->_mName->getName();
+  }
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -709,7 +714,7 @@ protected:
   static const int UPDATE_FPS_MEASURE_FRAME_COUNT = 5;
 
 private:
-  // none yet
+  cedar::aux::StringParameterPtr _mName;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constants

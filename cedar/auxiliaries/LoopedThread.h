@@ -230,7 +230,10 @@ public:
   // protected methods
   //----------------------------------------------------------------------------
 protected:
-  // none yet
+  inline double getStepSizeParameter() const
+  {
+    return this->_mStepSize->getValue();
+  }
 
   //----------------------------------------------------------------------------
   // private methods
@@ -243,11 +246,6 @@ private:
   inline void updateStatistics(double stepsTaken);
 
   void readParamsFromConfigFile();
-
-  inline double getStepSizeParameter() const
-  {
-    return this->_mStepSize->getValue();
-  }
 
   inline double getIdleTimeParameter() const
   {
