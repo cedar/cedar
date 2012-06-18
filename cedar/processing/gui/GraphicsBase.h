@@ -161,6 +161,7 @@ public:
 
   //!@brief set height of this GraphicsBase
   void setHeight(qreal height);
+
   //!@brief set width of this GraphicsBase
   void setWidth(qreal width);
 
@@ -297,6 +298,7 @@ protected:
 private:
   //!@brief width of the GraphicsBase
   cedar::aux::DoubleParameterPtr mWidth;
+
   //!@brief height of the GraphicsBase
   cedar::aux::DoubleParameterPtr mHeight;
 
