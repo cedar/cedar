@@ -70,8 +70,8 @@ namespace
     declaration->setIconPath(":/steps/switch.svg");
     declaration->setDescription("A step that calculates a mixture of two inputs based on a third one.<br />"
         "The step has the inputs \"input 1\", \"input 2\" and \"factor\". The output, \"mixture\" is calculated "
-        "as (gate factor) * (input 1) + (1 - gate factor) * (input 2). Thus, input one and two must be matrices, while "
-        "gate factor must be either DoubleData or zero-dimensional MatData.");
+        "as (factor) * (input 1) + (1 - factor) * (input 2). Thus, input one and two must be matrices, while "
+        "factor must be either DoubleData or zero-dimensional MatData.");
 
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(declaration);
 
@@ -96,7 +96,7 @@ mFactorDataType(FACTOR_TYPE_UNDETERMINED)
   this->declareInput("input 2");
   this->declareInput("factor");
 
-  this->declareOutput("output", mOutput);
+  this->declareOutput("mixture", mOutput);
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -110,7 +110,7 @@ void cedar::proc::steps::Switch::compute(const cedar::proc::Arguments&)
   const cv::Mat& input2 = this->mInput2->getData();
   cv::Mat& output = this->mOutput->getData();
 
-  // determine gate factor
+  // determine factor
   double gate_factor;
   switch (this->mFactorDataType)
   {
@@ -171,7 +171,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Switch::determineInputValidi
   else
   {
     // the slot should be one of the ones we have declared above
-    CEDAR_DEBUG_ASSERT(slot->getName() == "gate factor");
+    CEDAR_DEBUG_ASSERT(slot->getName() == "factor");
 
     if (cedar::aux::MatDataPtr mat_data = boost::shared_dynamic_cast<cedar::aux::MatData>(data))
     {
@@ -190,7 +190,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Switch::determineInputValidi
 
 void cedar::proc::steps::Switch::inputConnectionChanged(const std::string& inputName)
 {
-  if (inputName == "gate factor")
+  if (inputName == "factor")
   {
     this->mFactor = this->getInput(inputName);
     if (cedar::aux::MatDataPtr data = boost::shared_dynamic_cast<cedar::aux::MatData>(data))
