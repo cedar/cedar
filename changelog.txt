@@ -43,6 +43,8 @@
 - cedar::proc
   - added a processing step for convolutions
   - parameters are now locked in the compute method of processing steps
+  - as a very first attempt to reduce clutter in larger architectures, steps now have display modes that can accessed
+    and set via the right-click menu in the processingIde. 
 - build system
   - added a find script for FFTW that also searches for the include directory
   - added defines for the current cedar version; this makes it possible to stay compatible to older versions, should
