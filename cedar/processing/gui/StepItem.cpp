@@ -326,19 +326,30 @@ void cedar::proc::gui::StepItem::addDataItems()
 void cedar::proc::gui::StepItem::updateDataSlotPositions()
 {
   qreal padding = static_cast<qreal>(3);
+  qreal style_factor;
+
+  switch (this->mDisplayMode)
+  {
+    case cedar::proc::gui::StepItem::DisplayMode::ICON_ONLY:
+      style_factor = static_cast<qreal>(0.75);
+      break;
+
+    default:
+      style_factor = static_cast<qreal>(1);
+  }
   std::map<cedar::proc::DataRole::Id, QPointF> add_origins;
   std::map<cedar::proc::DataRole::Id, QPointF> add_directions;
   std::map<cedar::proc::DataRole::Id, qreal> data_slot_size;
 
-  data_slot_size[cedar::proc::DataRole::BUFFER] = mBaseDataSlotSize * static_cast<qreal>(0.75);
+  data_slot_size[cedar::proc::DataRole::BUFFER] = mBaseDataSlotSize * static_cast<qreal>(0.75) * style_factor;
   add_directions[cedar::proc::DataRole::BUFFER] = QPointF(1, 0);
   add_origins[cedar::proc::DataRole::BUFFER] = QPointF(0, -padding - data_slot_size[cedar::proc::DataRole::BUFFER]);
 
-  data_slot_size[cedar::proc::DataRole::INPUT] = mBaseDataSlotSize;
+  data_slot_size[cedar::proc::DataRole::INPUT] = mBaseDataSlotSize * style_factor;
   add_origins[cedar::proc::DataRole::INPUT] = QPointF(-padding - data_slot_size[cedar::proc::DataRole::INPUT], 0);
   add_directions[cedar::proc::DataRole::INPUT] = QPointF(0, 1);
 
-  data_slot_size[cedar::proc::DataRole::OUTPUT] = mBaseDataSlotSize;
+  data_slot_size[cedar::proc::DataRole::OUTPUT] = mBaseDataSlotSize * style_factor;
   add_origins[cedar::proc::DataRole::OUTPUT] = QPointF(this->width() + padding, 0);
   add_directions[cedar::proc::DataRole::OUTPUT] = QPointF(0, 1);
 
