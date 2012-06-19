@@ -49,7 +49,9 @@ cedar::dev::robot::DifferentialDrive::DifferentialDrive()
 _mWheelDistance(new cedar::aux::DoubleParameter(this, "wheel distance", 0)),
 _mWheelRadius(new cedar::aux::DoubleParameter(this, "wheel radius", 0))
 {
-
+  mWheelSpeed.resize(2);
+  mWheelSpeed[0] = 0;
+  mWheelSpeed[1] = 0;
 }
 
 cedar::dev::robot::DifferentialDrive::~DifferentialDrive()
