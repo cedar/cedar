@@ -48,6 +48,9 @@ cedar::dev::robot::Locomotion::Locomotion()
 :
 _mDebug(new cedar::aux::BoolParameter(this, "debug", false))
 {
+  mVelocity.resize(2);
+  mVelocity[0] = 0;
+  mVelocity[1] = 0;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -61,11 +64,13 @@ const std::vector<double>& cedar::dev::robot::Locomotion::getVelocity() const
 
 double cedar::dev::robot::Locomotion::getForwardVelocity() const
 {
+  CEDAR_DEBUG_ASSERT(this->mVelocity.size() > 0);
   return mVelocity[0];
 }
 
 double cedar::dev::robot::Locomotion::getTurningRate() const
 {
+  CEDAR_DEBUG_ASSERT(this->mVelocity.size() > 1);
   return mVelocity[1];
 }
 

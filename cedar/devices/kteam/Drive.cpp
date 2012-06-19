@@ -50,6 +50,7 @@ _mMaximalEncoderValue(new cedar::aux::IntParameter(this, "maximal encoder value"
 _mMinimalEncoderValue(new cedar::aux::IntParameter(this, "minimal encoder value", 0)),
 _mMaximalNumberPulsesPerSecond(new cedar::aux::IntParameter(this, "maximum number of pulses per second", 0))
 {
+  mDistancePerPulse = 0;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -38,6 +38,7 @@
 #include "cedar/devices/kteam/EPuckDrive.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 
@@ -82,13 +83,6 @@ int cedar::dev::kteam::EPuckDrive::init(cedar::dev::com::SerialCommunication *pe
   }
 
   // initialization of members
-  mVelocity.resize(2);
-  mVelocity[0] = 0;
-  mVelocity[1] = 0;
-  mWheelSpeed.resize(2);
-  mWheelSpeed[0] = 0;
-  mWheelSpeed[1] = 0;
-  mDistancePerPulse = 0;
   mpeCommunication = 0;
   std::string dummy_answer = ""; //answer for testing the communication
 
@@ -125,8 +119,7 @@ int cedar::dev::kteam::EPuckDrive::init(cedar::dev::com::SerialCommunication *pe
   {
     if (this->debug())
     {
-
-    std::cout << "EPuckDrive: Initialization failed\n";
+      std::cout << "EPuckDrive: Initialization failed\n";
     }
     return 0;
   }
@@ -136,15 +129,44 @@ void cedar::dev::kteam::EPuckDrive::readConfiguration(const cedar::aux::Configur
 {
   this->cedar::dev::kteam::Drive::readConfiguration(node);
 
-  if
-  (
-    this->getWheelDistance() <= 0
-    || this->getWheelRadius() <= 0
-    || this->getPulsesPerRevolution() <= 0
-    || this->getMaximalNumberPulsesPerSecond() <= 0
-  )
+  if (this->getWheelDistance() <= 0)
   {
-    std::cout << "EPuckDrive: Initialization failed (Invalid config-parameters (e.g. negative wheel radius))\n";
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Wheel distance (" + cedar::aux::toString(this->getWheelDistance()) + ") <= 0. EPuck initialization failed.",
+      "cedar::dev::kteam::EPuckDrive::readConfiguration"
+    );
+    return;
+  }
+
+  if (this->getWheelRadius() <= 0)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Wheel radius (" + cedar::aux::toString(this->getWheelRadius()) + ") <= 0. EPuck initialization failed.",
+      "cedar::dev::kteam::EPuckDrive::readConfiguration"
+    );
+    return;
+  }
+
+  if (this->getPulsesPerRevolution() <= 0)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Pulses Per Revolution (" + cedar::aux::toString(this->getPulsesPerRevolution()) + ") <= 0. EPuck initialization failed.",
+      "cedar::dev::kteam::EPuckDrive::readConfiguration"
+    );
+    return;
+  }
+
+
+  if (this->getMaximalNumberPulsesPerSecond() <= 0)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Maximal Number Pulses Per Second (" + cedar::aux::toString(this->getMaximalNumberPulsesPerSecond()) + ") <= 0. EPuck initialization failed.",
+      "cedar::dev::kteam::EPuckDrive::readConfiguration"
+    );
     return;
   }
 
