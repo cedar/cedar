@@ -202,6 +202,8 @@ bool cedar::dev::sensors::visual::TestGrabber::onDeclareParameters()
   //the default-values will be set on new grabbers
   //todo config add new parameter
   //return addParameter(&_mTest, "testparam", 123) == CONFIG_SUCCESS;
+
+  return false;
 }
 
 //----------------------------------------------------------------------------------------------------

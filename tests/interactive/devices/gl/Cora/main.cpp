@@ -50,23 +50,15 @@
 
 int main(int argc, char **argv)
 {
-  std::string arm_configuration_file_old = cedar::aux::System::locateResource("configs/cora_arm.conf");
-  std::string head_configuration_file_old = cedar::aux::System::locateResource("configs/cora_head.conf");
   std::string arm_configuration_file = cedar::aux::System::locateResource("configs/cora_arm.json");
   std::string head_configuration_file = cedar::aux::System::locateResource("configs/cora_head.json");
 
   QApplication a(argc, argv);
 
   // create simulated kinematic chains
-  cedar::dev::robot::KinematicChainPtr p_cora_arm
-  (
-    new cedar::dev::robot::SimulatedKinematicChain(arm_configuration_file_old)
-  );
+  cedar::dev::robot::KinematicChainPtr p_cora_arm(new cedar::dev::robot::SimulatedKinematicChain());
   p_cora_arm->readJson(arm_configuration_file);
-  cedar::dev::robot::KinematicChainPtr p_cora_head
-  (
-    new cedar::dev::robot::SimulatedKinematicChain(head_configuration_file_old)
-  );
+  cedar::dev::robot::KinematicChainPtr p_cora_head(new cedar::dev::robot::SimulatedKinematicChain());
   p_cora_head->readJson(head_configuration_file);
 
   // create gl visualization objects

@@ -52,7 +52,8 @@ int main()
   
   // create instance of test class
   std::cout << "reading kinematic chain from configuration file ..." << std::endl;
-  cedar::dev::robot::SimulatedKinematicChain test_arm("test.conf");
+  //!@todo This should be a pointer
+  cedar::dev::robot::SimulatedKinematicChain test_arm;
   test_arm.readJson("test_arm.json");
   
   //--------------------------------------------------------------------------------------------------------------------
