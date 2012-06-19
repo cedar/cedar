@@ -51,8 +51,9 @@ int main()
   int errors = 0;
   
   // create instance of test class
-  TestKinematicChain test_arm("test.conf");
-  TestKinematicChain acceleration_test_arm("acceleration_test_arm.conf");
+  //!@todo These should be pointers
+  TestKinematicChain test_arm;
+  TestKinematicChain acceleration_test_arm;
   // do I actually need the config file constructor?
   // - yes, for the LoopedThread stuff
   std::cout << "reading configuration from test_arm.json" << std::endl;

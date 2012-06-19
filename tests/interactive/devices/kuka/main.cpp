@@ -57,14 +57,13 @@ using cedar::dev::robot::KinematicChainPtr;
 int main(int argc, char **argv)
 {
   std::string mode = "0";
-  std::string configuration_file_old = cedar::aux::System::locateResource("configs/kuka_lwr4.conf");
   std::string configuration_file = cedar::aux::System::locateResource("configs/kuka_lwr4.json");
   QApplication a(argc, argv);
   FriStatusWidget* p_fri_status_widget = 0;
   cedar::dev::robot::gui::KinematicChainWidget* p_kinematic_chain_widget = 0;
 
   // create the hardware interface
-  KukaInterfacePtr p_arm(new cedar::dev::kuka::KukaInterface(configuration_file_old));
+  KukaInterfacePtr p_arm(new cedar::dev::kuka::KukaInterface());
   p_arm->readJson(configuration_file);
   p_fri_status_widget = new FriStatusWidget(p_arm);
   p_fri_status_widget->startTimer(100);

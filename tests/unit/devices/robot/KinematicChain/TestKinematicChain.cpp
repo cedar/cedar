@@ -46,9 +46,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 //! constructor
-TestKinematicChain::TestKinematicChain(const std::string& configFileName)
+TestKinematicChain::TestKinematicChain()
 :
-cedar::dev::robot::KinematicChain(configFileName)
+cedar::dev::robot::KinematicChain()
 {
   
 }

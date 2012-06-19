@@ -50,16 +50,12 @@
 
 int main(int argc, char **argv)
 {
-  std::string configuration_file_old = cedar::aux::System::locateResource("configs/kuka_lwr4.conf");
   std::string configuration_file = cedar::aux::System::locateResource("configs/kuka_lwr4.json");
 
   QApplication a(argc, argv);
 
   // create simulated kinematic chains
-  cedar::dev::robot::KinematicChainPtr p_kuka_arm
-  (
-    new cedar::dev::robot::SimulatedKinematicChain(configuration_file_old)
-  );
+  cedar::dev::robot::KinematicChainPtr p_kuka_arm(new cedar::dev::robot::SimulatedKinematicChain());
   p_kuka_arm->readJson(configuration_file);
 
   // create gl visualization objects

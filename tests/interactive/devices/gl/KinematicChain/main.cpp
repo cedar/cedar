@@ -54,10 +54,7 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create simulated arm
-  cedar::dev::robot::KinematicChainPtr p_test_arm(new cedar::dev::robot::SimulatedKinematicChain
-  (
-    "../../../../tests/interactive/devices/gl/KinematicChain/test_arm.conf")
-  );
+  cedar::dev::robot::KinematicChainPtr p_test_arm(new cedar::dev::robot::SimulatedKinematicChain());
   p_test_arm->readJson("../../../../tests/interactive/devices/gl/KinematicChain/test_arm.json");
 
   // create gl visualization objects
@@ -91,10 +88,7 @@ int main(int argc, char **argv)
 
 
   // create everything for a second arm that's connected to the end-effector of the first one
-  cedar::dev::robot::KinematicChainPtr p_second_arm(new cedar::dev::robot::SimulatedKinematicChain
-  (
-    "../../../../tests/interactive/devices/gl/KinematicChain/test_arm.conf")
-  );
+  cedar::dev::robot::KinematicChainPtr p_second_arm(new cedar::dev::robot::SimulatedKinematicChain());
   p_second_arm->readJson("../../../../tests/interactive/devices/gl/KinematicChain/test_arm.json");
 
   cedar::dev::robot::gl::KinematicChainPtr p_second_arm_visualization
