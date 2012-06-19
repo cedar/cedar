@@ -45,6 +45,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::dev::robot::DifferentialDrive::DifferentialDrive()
+:
+_mWheelDistance(new cedar::aux::DoubleParameter(this, "wheel distance", 0)),
+_mWheelRadius(new cedar::aux::DoubleParameter(this, "wheel radius", 0))
 {
 
 }
@@ -60,12 +63,12 @@ cedar::dev::robot::DifferentialDrive::~DifferentialDrive()
 
 double cedar::dev::robot::DifferentialDrive::getWheelDistance() const
 {
-  return _mWheelDistance;
+  return _mWheelDistance->getValue();
 }
 
 double cedar::dev::robot::DifferentialDrive::getWheelRadius() const
 {
-  return _mWheelRadius;
+  return _mWheelRadius->getValue();
 }
 
 const std::vector<double>& cedar::dev::robot::DifferentialDrive::getWheelSpeed() const
@@ -85,7 +88,7 @@ std::vector<double> cedar::dev::robot::DifferentialDrive::calculateVelocity
 
     //the calculation
     velocity[0] = (rightWheelSpeed + leftWheelSpeed) / 2;
-    velocity[1] = (rightWheelSpeed - leftWheelSpeed) / _mWheelDistance;
+    velocity[1] = (rightWheelSpeed - leftWheelSpeed) / this->getWheelDistance();
 
     return velocity;
 }
@@ -101,8 +104,8 @@ std::vector<double> cedar::dev::robot::DifferentialDrive::calculateWheelSpeed
   wheel_speed.resize(2);
 
   //the calculation
-  wheel_speed[0] = forwardVelocity - turningRate * _mWheelDistance / 2;
-  wheel_speed[1] = forwardVelocity + turningRate * _mWheelDistance / 2;
+  wheel_speed[0] = forwardVelocity - turningRate * this->getWheelDistance() / 2;
+  wheel_speed[1] = forwardVelocity + turningRate * this->getWheelDistance() / 2;
 
   return wheel_speed;
 }
@@ -115,7 +118,7 @@ int cedar::dev::robot::DifferentialDrive::setVelocity(double forwardVelocity, do
   //calculate and set the wheel speed
   wheel_speed = calculateWheelSpeed(forwardVelocity, turningRate);
   int s = setWheelSpeed(wheel_speed[0], wheel_speed[1]);
-  if (s == 0 && _mDebug) // setting wheel speed failed
+  if (s == 0 && this->debug()) // setting wheel speed failed
   {
     std::cout << "DifferentialDrive: Error Setting Velocity\n";
   }
@@ -131,7 +134,7 @@ int cedar::dev::robot::DifferentialDrive::setForwardVelocity(double forwardVeloc
   //calculate and set the wheel speed
   wheel_speed = calculateWheelSpeed(forwardVelocity, mVelocity[1]);
   int s = setWheelSpeed(wheel_speed[0], wheel_speed[1]);
-  if (s == 0 && _mDebug) //setting wheel speed failed
+  if (s == 0 && this->debug()) //setting wheel speed failed
   {
     std::cout << "DifferentialDrive: Error Setting Forward Velocity\n";
   }
@@ -147,7 +150,7 @@ int cedar::dev::robot::DifferentialDrive::setTurningRate(double turningRate)
   //calculate and set the wheel speed
   wheel_speed = calculateWheelSpeed(mVelocity[0], turningRate);
   int s = setWheelSpeed(wheel_speed[0], wheel_speed[1]);
-  if (s == 0 && _mDebug)  //setting wheel speed failed
+  if (s == 0 && this->debug())  //setting wheel speed failed
   {
     std::cout << "DifferentialDrive: Error Setting Turning Rate\n";
   }
