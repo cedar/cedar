@@ -39,7 +39,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/kteam/Drive.h"
-#include "cedar/auxiliaries/ConfigurationInterface.h"
 #include "cedar/devices/communication/SerialCommunication.h"
 
 // SYSTEM INCLUDES
@@ -51,9 +50,7 @@
  *object of the class SerialCommunication with the E-Puck's devicePath has to be set, otherwise the initialization will
  *fail. The data of the E-Puck is read from a configuration file.
  */
-class cedar::dev::kteam::EPuckDrive
-:
-public cedar::dev::kteam::Drive, public cedar::aux::ConfigurationInterface
+class cedar::dev::kteam::EPuckDrive : public cedar::dev::kteam::Drive
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -64,7 +61,7 @@ public:
    *@param peCommunication Pointer to the communication-device to be used (has to be initialized)
    *@param config Path and name of the config-file to be used.
    */
-  EPuckDrive(cedar::dev::com::SerialCommunication *peCommunication, const std::string& config);
+  EPuckDrive(cedar::dev::com::SerialCommunication *peCommunication);
 
   //!@brief Destructs the object.
   ~EPuckDrive();
@@ -125,6 +122,8 @@ private:
    *@return 1 if setting encoder values was successful and 0 otherwise.
    */
   int setEncoder(int leftEncoder, int rightEncoder);
+
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

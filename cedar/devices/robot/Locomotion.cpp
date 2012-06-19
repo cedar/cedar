@@ -44,6 +44,12 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::dev::robot::Locomotion::Locomotion()
+:
+_mDebug(new cedar::aux::BoolParameter(this, "debug", false))
+{
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -66,11 +72,11 @@ double cedar::dev::robot::Locomotion::getTurningRate() const
 int cedar::dev::robot::Locomotion::stop()
 {
   int s = setVelocity(0,0); //stop by setting both forward velocity and turning rate to 0
-  if (s == 0 && _mDebug) //setting velocity failed
+  if (s == 0 && this->debug()) //setting velocity failed
   {
     std::cout << "Locomotion: Error Stopping Robot\n";
   }
-  else if (_mDebug)
+  else if (this->debug())
   {
     std::cout << "Locomotion: Stopping Robot Successful\n";
   }

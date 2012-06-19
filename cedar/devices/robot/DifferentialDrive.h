@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/Locomotion.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -150,14 +151,14 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-  //!@brief The distance between the 2 wheels [in m].
-  double _mWheelDistance;
-
-  //!@brief The wheel's radius [in m].
-  double _mWheelRadius;
+  // none yet
 
 private:
-  // none yet
+  //!@brief The distance between the 2 wheels [in m].
+  cedar::aux::DoubleParameterPtr _mWheelDistance;
+
+  //!@brief The wheel's radius [in m].
+  cedar::aux::DoubleParameterPtr _mWheelRadius;
+
 }; // class cedar::dev::robot::mobile::DifferentialDrive
 #endif // CEDAR_DEV_ROBOT_MOBILE_DIFFERENTIAL_DRIVE_H

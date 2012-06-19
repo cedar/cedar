@@ -39,8 +39,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
-#include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "cedar/auxiliaries/Configurable.h"
 
 // SYSTEM INCLUDES
 #include <QGridLayout>
@@ -53,7 +54,7 @@
 class cedar::aux::gui::LocalCoordinateFrameWidget
 :
 public QWidget,
-public cedar::aux::ConfigurationInterface
+public cedar::aux::Configurable
 {
   //----------------------------------------------------------------------------
   // macros
@@ -71,19 +72,6 @@ public:
    *@param parent parent parameter of QWidget
    */
   LocalCoordinateFrameWidget(const cedar::aux::LocalCoordinateFramePtr localCoordinateFrame, QWidget* parent = 0);
-
-  /*!@brief Constructor with configuration
-   *
-   *@param localCoordinateFrame pointer to the LocalCoordinateFrame being controlled by the widget
-   *@param configurationFileName path of a configuration file
-   *@param parent parent parameter of QWidget
-   */
-  LocalCoordinateFrameWidget
-  (
-    const cedar::aux::LocalCoordinateFramePtr localCoordinateFrame,
-    const std::string& configurationFileName,
-    QWidget* parent = 0
-  );
 
   ~LocalCoordinateFrameWidget();
 
@@ -114,13 +102,21 @@ public:
 
 protected:
 
-  // none yet
+    // none yet
 
   //----------------------------------------------------------------------------
   // private methods
   //----------------------------------------------------------------------------
 
+private slots:
+  void decimalsChanged();
 private:
+
+  inline unsigned int getDecimals() const
+  {
+    return this->_mDecimals->getValue();
+  }
+
 
   void initWindow();
 
@@ -162,6 +158,12 @@ private:
   double mYMax;
   double mZMin;
   double mZMax;
+
+  //----------------------------------------------------------------------------
+  // parameters
+  //----------------------------------------------------------------------------
+private:
+  cedar::aux::UIntParameterPtr _mDecimals;
 };
 
 #endif /* CEDAR_AUX_GUI_LOCAL_COORDINATE_FRAME_WIDGET_H */
