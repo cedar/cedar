@@ -73,7 +73,7 @@ class cedar::dev::amtec::KinematicChain : public cedar::dev::robot::KinematicCha
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KinematicChain(const std::string& configFileName);
+  KinematicChain();
 
   //!@brief Destructor
   ~KinematicChain();
@@ -134,6 +134,12 @@ private:
   void setJointAngle(unsigned int index, double value);
   bool setJointVelocity(unsigned int index, double velocity);
 
+  //! Returns the amtec initialization string.
+  inline std::string getInitString()
+  {
+    return this->mInitString->getValue();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -141,10 +147,17 @@ protected:
   // none yet
 private:
   CDevice *mpDevice;
-  std::string mInitString;
   int mInit;
   std::vector<int> mModules;
   mutable QMutex mCanBusMutex;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  //! The amtec initialization string.
+  cedar::aux::StringParameterPtr mInitString;
+
 }; // class cedar::dev::amtec::KinematicChain
 #endif // CEDAR_USE_AMTEC
 #endif // CEDAR_DEV_ROBOT_AMTEC_KINEMATIC_CHAIN_H

@@ -242,7 +242,8 @@ bool cedar::dev::sensors::visual::CameraGrabber::onDeclareParameters()
 
   bool result = true;
 
-  bool byGuid = mCreateGrabberByGuid;
+  //!@todo Use this value.
+//  bool byGuid = mCreateGrabberByGuid;
   //@todo config:
   //result = (addParameter(&mCreateGrabberByGuid, "createByGuid",byGuid) == CONFIG_SUCCESS) && result;
 
