@@ -240,6 +240,12 @@ protected:
     this->mElement = element;
   }
 
+  //! Sets the snap-to-grid property of the element.
+  inline void setSnapToGrid(bool snap)
+  {
+    this->mSnapToGrid = snap;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -269,6 +275,7 @@ protected:
   //!@brief flag if the background should be drawn
   bool mDrawBackground;
 
+
 private:
   //!@brief the highlight mode
   cedar::proc::gui::GraphicsBase::HighlightMode mHighlightMode;
@@ -288,6 +295,9 @@ private:
   //!@brief The element associated with this graphics item
   //!@todo Should this be a weak ptr?
   cedar::proc::ElementPtr mElement;
+
+  //!@brief Whether the item snaps to the grid.
+  bool mSnapToGrid;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

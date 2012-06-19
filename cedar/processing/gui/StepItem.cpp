@@ -747,6 +747,7 @@ void cedar::proc::gui::StepItem::setDisplayMode(cedar::proc::gui::StepItem::Disp
   }
 
   this->updateDataSlotPositions();
+  this->updateConnections();
   this->update();
 }
 
