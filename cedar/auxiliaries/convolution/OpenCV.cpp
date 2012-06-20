@@ -231,52 +231,7 @@ cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
           cedar::aux::conv::BorderType::Id borderType
         ) const
 {
-//  // check for 0D-Kernels:
-//  if (kernel->getDimensionality() == 0)
-//  {
-//    // no border handling necessary
-//    return matrix;
-//  }
-//  else
-//  {
-//    // in other cases do border extension
-//    unsigned int kernel_rows = 0;
-//    unsigned int kernel_cols = 0;
-//
-//    unsigned int  kernel_dim = kernel->getDimensionality();
-//    if (kernel_dim == 1)
-//    {
-//      kernel_rows = kernel->getSize(0);
-//      kernel_cols = 0;
-//    }
-//    else if (kernel_dim == 2)
-//    {
-//      kernel_rows = kernel->getSize(0);
-//      kernel_cols = kernel->getSize(1);
-//    }
-//    else if (kernel_dim >= 3)
-//    {
-//      //TODO throw exception or implement
-//    }
-//
-//    return createFullMatrix(matrix, kernel_rows, kernel_cols, borderType);
-
-  if (kernel == NULL)
-  {
-  std::cout << "sdfkghlerwe4636" << std::endl;
-  }
-  std::cout << "kernel->getDimensionality " << kernel->getDimensionality() << std::endl;
-
-//  std::cout << "kernel->getSize(0) " << kernel->getSize(0) << std::endl;
-//  std::cout << "kernel->getSize(1) " << kernel->getSize(1) << std::endl;
-
-
-
-    cv::Mat kernel_rows_cols = getRowsCols(kernel);
-
-    std::cout << ".....rdg.......dsrwe4636" << std::endl;
-
-    std::cout << "kernel_rows_cols " << kernel_rows_cols << std::endl;
+    cv::Mat kernel_rows_cols = kernel->getRowsCols();
 
     return createFullMatrix
            (
@@ -285,7 +240,6 @@ cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
              static_cast<unsigned int>(kernel_rows_cols.at<float>(0,1)),
              borderType
            );
-//  }
 }
 
 cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
@@ -295,38 +249,15 @@ cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
           cedar::aux::conv::BorderType::Id borderType
         ) const
 {
-  //TODO what if kernels have different sizes?
+
+  if (!kernelList.checkForSameKernelSize())
+  {
+    CEDAR_THROW(cedar::aux::UnhandledValueException, "Full Convolution mode only supported if all kernels have same size");
+  }
+
   cedar::aux::kernel::ConstKernelPtr kernel = kernelList.getKernel(0);
 
-//  // check for 0D-Kernels:
-//  if (kernel->getDimensionality() == 0)
-//  {
-//    // no border handling necessary
-//    return matrix;
-//  }
-//  else
-//  {
-//    unsigned int kernel_rows = 0;
-//    unsigned int kernel_cols = 0;
-//
-//    unsigned int kernel_dim = kernel->getDimensionality();
-//    if (kernel_dim == 1)
-//    {
-//      kernel_rows = kernel->getSize(0);
-//      kernel_cols = 0;
-//    }
-//    else if (kernel_dim == 2)
-//    {
-//      kernel_rows = kernel->getSize(0);
-//      kernel_cols = kernel->getSize(1);
-//    }
-//    else if (kernel_dim >= 3)
-//    {
-//      //TODO throw exception or implement
-//    }
-//
-//    return createFullMatrix(matrix, kernel_rows, kernel_cols, borderType);
-    cv::Mat kernel_rows_cols = getRowsCols(kernel);
+    cv::Mat kernel_rows_cols = kernel->getRowsCols();
 
     return createFullMatrix
            (
@@ -335,7 +266,6 @@ cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
              static_cast<unsigned int>(kernel_rows_cols.at<float>(0,1)),
              borderType
            );
-//  }
 }
 
 cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
@@ -345,36 +275,7 @@ cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
           cedar::aux::conv::BorderType::Id borderType
         ) const
 {
-//  // check for 0D-Kernels:
-//  if (kernel->getDimensionality() == 0)
-//  {
-//    // no border handling necessary
-//    return matrix;
-//  }
-//  else
-//  {
-//    unsigned int kernel_rows = 0;
-//    unsigned int kernel_cols = 0;
-//
-//    unsigned int kernel_dim = kernel->getDimensionality();
-//    if (kernel_dim == 1)
-//    {
-//      kernel_rows = kernel->getSize(0);
-//      kernel_cols = 0;
-//    }
-//    else if (kernel_dim == 2)
-//    {
-//      kernel_rows = kernel->getSize(0);
-//      kernel_cols = kernel->getSize(1);
-//    }
-//    else if (kernel_dim >= 3)
-//    {
-//      //TODO throw exception or implement
-//    }
-//
-//    return createFullMatrix(matrix, kernel_rows, kernel_cols, borderType);
-
-    cv::Mat kernel_rows_cols = getRowsCols(kernel);
+    cv::Mat kernel_rows_cols = kernel->getRowsCols();
 
     return createFullMatrix
            (
@@ -383,7 +284,6 @@ cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
              static_cast<unsigned int>(kernel_rows_cols.at<float>(0,1)),
              borderType
            );
-//  }
 }
 
 cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
@@ -394,7 +294,7 @@ cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
 {
   cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList()->getKernel(0);
 
-  cv::Mat kernel_rows_cols = getRowsCols(kernel);
+  cv::Mat kernel_rows_cols = kernel->getRowsCols();
 
   return createFullMatrix
          (
@@ -405,48 +305,7 @@ cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
          );
 }
 
-cv::Mat cedar::aux::conv::OpenCV::getRowsCols(cedar::aux::kernel::ConstKernelPtr kernel) const
-{
-  cv::Mat rows_cols = cv::Mat::ones(1, 2, CV_32F);
-
-  // check for 0D-Kernels:
-  if (kernel->getDimensionality() == 0)
-  {
-    // no border handling necessary
-    std::cout << "DIM ZERO rows_cols " << std::endl << rows_cols << std::endl;
-    return rows_cols;
-  }
-  else
-  {
-    unsigned int kernel_dim = kernel->getDimensionality();
-
-    switch (kernel_dim)
-    {
-      case 0:
-        break;
-      case 1:
-        rows_cols.at<float>(0,0) = static_cast<float>(kernel->getSize(0));
-        rows_cols.at<float>(0,1) = 1.0;
-        break;
-      case 2:
-        rows_cols.at<float>(0,0) = static_cast<float>(kernel->getSize(0));
-        rows_cols.at<float>(0,1) = static_cast<float>(kernel->getSize(1));
-        break;
-      default:
-        CEDAR_THROW(
-                   cedar::aux::RangeException,
-                   "Kernel dimension and/or size not supported in 'full' convolution mode."
-                   );
-        break;
-    }
-
-    std::cout << "rows_cols " << std::endl << rows_cols << std::endl;
-    return rows_cols;
-  }
-}
-
-
-cv::Mat cedar::aux::conv::OpenCV::resultCutOut(
+cv::Mat cedar::aux::conv::OpenCV::cutOutResult(
                                               const cv::Mat& result,
                                               unsigned int matrixRows,
                                               unsigned int matrixCols,
@@ -476,16 +335,16 @@ cv::Mat cedar::aux::conv::OpenCV::resultCutOut(
   return cut_out;
 }
 
-cv::Mat cedar::aux::conv::OpenCV::resultCutOut(
+cv::Mat cedar::aux::conv::OpenCV::cutOutResult(
                                               const cv::Mat& result,
                                               const cv::Mat& matrix,
                                               const cv::Mat& kernel
                                               ) const
 {
-  return resultCutOut(result, matrix.rows, matrix.cols, kernel.rows, kernel.cols);
+  return cutOutResult(result, matrix.rows, matrix.cols, kernel.rows, kernel.cols);
 }
 
-cv::Mat cedar::aux::conv::OpenCV::resultCutOut(
+cv::Mat cedar::aux::conv::OpenCV::cutOutResult(
                                               const cv::Mat& result,
                                               const cv::Mat& matrix,
                                               const cedar::aux::kernel::ConstKernelPtr kernel
@@ -499,26 +358,16 @@ cv::Mat cedar::aux::conv::OpenCV::resultCutOut(
   }
   else
   {
-    unsigned int kernel_rows = 0;
-    unsigned int kernel_cols = 0;
+    cv::Mat kernel_rows_cols = kernel->getRowsCols();
 
-    unsigned int kernel_dim = kernel->getDimensionality();
-    if (kernel_dim == 1)
-    {
-      kernel_rows = kernel->getSize(0);
-      kernel_cols = 0;
-    }
-    else if (kernel_dim == 2)
-    {
-      kernel_rows = kernel->getSize(0);
-      kernel_cols = kernel->getSize(1);
-    }
-    else if (kernel_dim >= 3)
-    {
-      //TODO throw exception or implement
-    }
-
-    return resultCutOut(result, matrix.rows, matrix.cols, kernel_rows, kernel_cols);
+    return cutOutResult
+           (
+             result,
+             matrix.rows,
+             matrix.cols,
+             static_cast<unsigned int>(kernel_rows_cols.at<float>(0,0)),
+             static_cast<unsigned int>(kernel_rows_cols.at<float>(0,1))
+           );
   }
 }
 
@@ -545,14 +394,14 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
   else //if (mode == cedar::aux::conv::Mode::Full)
   {
     cv::Mat matrix_full = createFullMatrix(matrix, kernel, borderType);
-//    std::cout << "matrix_full\n" << matrix_full << std::endl;
+
     cv::Point anchor = cv::Point(-1, -1);
     this->translateAnchor(anchor, anchorVector, kernel.size);
 
     // border type dose not matter, because cut off
     cv::Mat result = this->cvConvolve(matrix_full, kernel, cv::BORDER_CONSTANT, anchor);
 
-    return resultCutOut(result, matrix, kernel);
+    return cutOutResult(result, matrix, kernel);
   }
 
 }
@@ -565,7 +414,6 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
           cedar::aux::conv::Mode::Id mode
         ) const
 {
-  //!@todo implement mode properly
   CEDAR_ASSERT(mode == cedar::aux::conv::Mode::Same || mode == cedar::aux::conv::Mode::Full);
 
   if (mode == cedar::aux::conv::Mode::Same)
@@ -584,7 +432,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
 
     // border type dose not matter, because cut off
     cv::Mat result = this->cvConvolve(matrix_full, kernel, cv::BORDER_CONSTANT, anchor);
-    return resultCutOut(result, matrix, kernel);
+    return cutOutResult(result, matrix, kernel);
   }
 }
 
@@ -598,7 +446,6 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
 {
   int border_type = this->translateBorderType(borderType);
 
-  //!@todo Implement mode
   CEDAR_ASSERT(mode == cedar::aux::conv::Mode::Same || mode == cedar::aux::conv::Mode::Full);
 
   if (mode == cedar::aux::conv::Mode::Same)
@@ -628,6 +475,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
       result += this->cvConvolve(matrix_full, kernel, border_type, anchor);
     }
 
+    //TODO why no cutOutResult here? maybe function not tested in unit test
     return result;
   }
 }
@@ -641,7 +489,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
         ) const
 {
   cv::Point anchor = cv::Point(-1, -1);
-  //!@todo Implement mode properly
+
   CEDAR_ASSERT(mode == cedar::aux::conv::Mode::Same || mode == cedar::aux::conv::Mode::Full);
 
   if (mode == cedar::aux::conv::Mode::Same)
@@ -790,7 +638,6 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
 {
   CEDAR_DEBUG_ASSERT(this->getKernelList()->size() == this->mKernelTypes.size());
 
-  //!@todo Mode handling
   CEDAR_ASSERT(mode == cedar::aux::conv::Mode::Same || mode == cedar::aux::conv::Mode::Full);
 
   int cv_border_type = this->translateBorderType(borderType);
@@ -850,62 +697,12 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
   }
   else // (mode == cedar::aux::conv::Mode::Full)
   {
-    bool same_size = checkForSameKernelSize();
+    bool same_size = this->getKernelList()->checkForSameKernelSize();
 
     if (same_size)
     {
       cv::Mat matrix_full = createFullMatrix(matrix, borderType);
-//      std::cout << std::endl << "****************matrix_full " << matrix_full << std::endl;
-//      cv::Mat result;
-//
-//      // do convolution with first kernel
-//      switch (this->mKernelTypes.at(0))
-//      {
-//        //--------------------------------------------------------------------------------------
-//        case KERNEL_TYPE_SEPARABLE:
-//        //--------------------------------------------------------------------------------------
-//        {
-//          cedar::aux::kernel::ConstSeparablePtr kernel
-//            = cedar::aux::asserted_pointer_cast<const cedar::aux::kernel::Separable>(this->getKernelList()->getKernel(0));
-//
-//          cv::Point anchor = cv::Point(-1, -1);
-//          this->translateAnchor(anchor, kernel);
-//
-//          result = this->cvConvolve(matrix_full, kernel, cv_border_type, anchor);
-//          break;
-//        }
-//
-//        //--------------------------------------------------------------------------------------
-//        case KERNEL_TYPE_FULL:
-//        //--------------------------------------------------------------------------------------
-//        {
-//          cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList()->getKernel(0);
-//
-//          cv::Point anchor = cv::Point(-1, -1);
-//          this->translateAnchor(anchor, kernel);
-//
-//          kernel->lockForRead();
-//          cv::Mat kernel_mat = kernel->getKernel();
-//          result = this->cvConvolve(matrix_full, kernel_mat, cv_border_type, anchor);
-//          kernel->unlock();
-//          break;
-//        }
-//
-//        //--------------------------------------------------------------------------------------
-//        case KERNEL_TYPE_UNKNOWN:
-//        //--------------------------------------------------------------------------------------
-//          CEDAR_THROW(cedar::aux::UnknownTypeException, "Unknown kernel type.");
-//          break;
-//
-//        default:
-//          CEDAR_THROW(cedar::aux::UnhandledValueException, "Unhandled kernel-type enum value.");
-//      }
-//
-//      std::cout << std::endl << "****************result " << result << std::endl;
-//
-//      result += convolved;
-
-      cv::Mat result = 0.0 * matrix_full; // TODO wrong size of result matrix size is matrix full - 2
+      cv::Mat result = 0.0 * matrix_full;
 
       // do convolution with all other kernels
       for (size_t i = 0; i < this->getKernelList()->size(); ++i)
@@ -956,55 +753,13 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
 
         result += convolved;
       }
-      return resultCutOut(result,matrix,this->getKernelList()->getKernel(0));
+      return cutOutResult(result,matrix,this->getKernelList()->getKernel(0));
     }
     else // kernels do not have same size
     {
       CEDAR_THROW(cedar::aux::UnhandledValueException, "Full Convolution mode only supported if all kernels have same size");
     }
   }
-}
-
-bool cedar::aux::conv::OpenCV::checkForSameKernelSize() const
-{
-  bool same_size = true;
-
-  // get dimensionality and sizes of first kernel in list
-  cedar::aux::kernel::ConstKernelPtr first_kernel = this->getKernelList()->getKernel(0);
-  size_t dim = first_kernel->getDimensionality();
-  unsigned int size[static_cast<unsigned int>(dim)];
-  for (size_t i = 0; i < dim; ++i)
-  {
-    size[i] = first_kernel->getSize(i);
-  }
-
-  // compare dimensionality and sizes of first kernel with each other kernel
-  size_t i = 1;
-  // check as long as sizes are equal
-  while (same_size && ( i + 1 <= this->getKernelList()->size()))
-  {
-    cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList()->getKernel(i);
-
-    // check dimensionality
-    if (kernel->getDimensionality() != dim)
-    {
-      same_size = false;
-    }
-    else
-    {
-      // if dimensionality is equal check sizes of each dimension
-      for (size_t d = 0; d < dim; ++d)
-      {
-        if (size[d] != kernel->getSize(d))
-        {
-          same_size = false;
-        }
-      }
-    }
-    ++i;
-  }
-
-  return same_size;
 }
 
 cv::Mat cedar::aux::conv::OpenCV::cvConvolve

@@ -369,11 +369,6 @@ int test_matxmat_convolution
     std::cout << " ?= (expected result:)" << std::endl;
     printMatrix(expected);
 
-//    // display the operation
-//    std::cout << op1 << std::endl << " * " << std::endl << op2 << std::endl << " = (engine result:)" << std::endl;
-//    std::cout << res << std::endl;
-//    std::cout << " ?= (expected result:)" << std::endl << expected << std::endl;
-
     return 1;
   }
 
@@ -389,7 +384,6 @@ int testMatrixKernelOperation
       cedar::aux::conv::Mode::Id mode
     )
 {
-  std::cout << std::endl << "----------------------------" << std::endl;
   cedar::aux::conv::KernelListPtr kernel_list = engine->getKernelList();
 
   // check if the engine is capable of this operation
@@ -409,31 +403,20 @@ int testMatrixKernelOperation
   }
 
   cv::Mat kernel_mat = kernel_list->getKernel(0)->getKernel();
-  std::cout << "\nkernel_mat " << 0 << std::endl << kernel_mat << std::endl;
   cv::Mat expected = conv(mat, kernel_mat, borderType, mode);
-  std::cout << "\nexpected " << 0 << std::endl << expected << std::endl;
+
   for (size_t i = 1; i < kernel_list->size(); ++i)
   {
     kernel_mat = kernel_list->getKernel(i)->getKernel();
-    std::cout << "\nkernel_mat " << i << std::endl << kernel_mat << std::endl;
     expected += conv(mat, kernel_mat, borderType, mode);
-    std::cout << "\nexpected " << i << std::endl << expected << std::endl;
   }
-
-  std::cout << "\ncombined kernel " << std::endl << kernel_list->getCombinedKernel() << std::endl;
-
-
-  std::cout << "kernel dim " << cedar::aux::math::getDimensionalityOf(kernel_list->getCombinedKernel())
-    << "(cv::mat " << kernel_mat.rows << ", " << kernel_mat.cols << ")" << std::endl;
-
-  std::cout << "expected dim cv::mat " << expected.rows << ", " << expected.cols << std::endl;
 
   cv::Mat result = engine->convolve(mat, borderType, mode);
 
   if (!mat_eq(expected, result))
   {
     std::cout << "ERROR:" << std::endl;
-
+    std::cout << "----------------------------" << std::endl;
     // display the operation
     printMatrix(mat);
     std::cout << " * " << std::endl;
@@ -1092,10 +1075,8 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine)
 
     errors += testMatrixKernelOperations(engine, kernel_list_0d);
     errors += testMatrixKernelOperations(engine, kernel_list_1d);
-//    errors += testMatrixKernelOperations(engine, kernel_list_2d);
+    errors += testMatrixKernelOperations(engine, kernel_list_2d);
   }
-
-
 
   return errors;
 }
@@ -1363,8 +1344,8 @@ int main()
   errors += testEngine(open_cv);
 
 #ifdef CEDAR_USE_FFTW
-//  cedar::aux::conv::FFTWPtr fftw (new cedar::aux::conv::FFTW());
-//  errors += testEngine(fftw);
+  cedar::aux::conv::FFTWPtr fftw (new cedar::aux::conv::FFTW());
+  errors += testEngine(fftw);
 #endif // CEDAR_USE_FFTW
 
   return errors;
