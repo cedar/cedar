@@ -298,6 +298,40 @@ cv::Mat conv
 
     return result;
   }
+  else if (mode == cedar::aux::conv::Mode::Valid)
+  {
+    if (op2.rows > op1.rows || op2.cols > op1.cols)
+    {
+      return cv::Mat::zeros(1,1,CV_32F);
+    }
+    else
+    {
+      cv::Mat result = cv::Mat::zeros(op1.rows - op2.rows + 1, op1.cols - op2.cols + 1, CV_32F);
+
+      cv::Mat op2_flipped;
+      cv::flip(op2, op2_flipped, -1);
+
+      for (int row = 0; row < result.rows; ++row)
+      {
+        for (int col = 0; col < result.cols; ++col)
+        {
+          for (int k_row = 0; k_row < op2_flipped.rows; ++k_row)
+          {
+            for (int k_col = 0; k_col < op2_flipped.cols; ++k_col)
+            {
+              result.at<float>(row, col)
+                += op1.at<float>(row + k_row, col + k_col)
+                   * op2_flipped.at<float>(k_row, k_col);
+//              result.at<float>(row, col)
+//                += border_interpolate(op1, row - k_row, col - k_col, borderType)
+//                   * op2.at<float>(k_row, k_col);
+            }
+          }
+        }
+      }
+      return result;
+    }
+  }
   else
   {
     std::cout << "ERROR!\n\tConvolution mode unknown!" << std::endl;
@@ -370,6 +404,19 @@ int test_matxmat_convolution
     printMatrix(expected);
 
     return 1;
+  }
+
+  if (mode == cedar::aux::conv::Mode::Valid)
+  {
+    std::cout << std::endl << "----------------------------" << std::endl;
+    printMatrix(op1);
+    std::cout << " * " << std::endl;
+    printMatrix(op2);
+    std::cout << " = (engine result:)" << std::endl;
+    printMatrix(res);
+    std::cout << " ?= (expected result:)" << std::endl;
+    printMatrix(expected);
+    std::cout << "----------------------------" << std::endl;
   }
 
   std::cout << "OK" << std::endl;
@@ -982,7 +1029,6 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine, cedar::aux::c
   return errors;
 }
 
-
 int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine)
 {
   int errors = 0;
@@ -1233,6 +1279,67 @@ int testMatrixMatrixOperations(cedar::aux::conv::EnginePtr engine)
                 cv::Mat::ones(3, 3, CV_32F),
                 cedar::aux::conv::BorderType::Cyclic,
                 cedar::aux::conv::Mode::Full
+              );
+  }
+
+  {
+    cv::Mat op1, op2;
+    op1 = cv::Mat::zeros(3, 3, CV_32F);
+    op1.at<float>(0, 2) = 1;
+    op1.at<float>(1, 2) = 1;
+    op2 = cv::Mat::zeros(3, 3, CV_32F);
+    op2.at<float>(1, 2) = 0.5;
+    op2.at<float>(0, 0) = 0.5;
+
+    std::cout << "(Valid 2D) ... ";
+    errors += test_matxmat_convolution
+              (
+                engine,
+                op1,
+                op2,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+  }
+
+  {
+    cv::Mat op1, op2;
+    op1 = cv::Mat::zeros(5, 1, CV_32F);
+    op1.at<float>(3) = 1;
+    op2 = cv::Mat::zeros(3, 1, CV_32F);
+    op2.at<float>(0) = 0.5;
+    op2.at<float>(1) = 1;
+    op2.at<float>(2) = 0.5;
+
+    std::cout << "(Valid 1D) ... ";
+    errors += test_matxmat_convolution
+              (
+                engine,
+                op1,
+                op2,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+  }
+
+  {
+    cv::Mat op1, op2;
+    op1 = cv::Mat::zeros(3, 3, CV_32F);
+    op1.at<float>(0, 2) = 1;
+    op1.at<float>(1, 2) = 1;
+    op2 = cv::Mat::zeros(3, 1, CV_32F);
+    op2.at<float>(0) = 0.5;
+    op2.at<float>(1) = 1;
+    op2.at<float>(2) = 0.5;
+
+    std::cout << "(Valid m2Dk1D) ... ";
+    errors += test_matxmat_convolution
+              (
+                engine,
+                op1,
+                op2,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
               );
   }
 
