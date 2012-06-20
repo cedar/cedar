@@ -201,6 +201,11 @@ private:
                           cedar::aux::conv::BorderType::Id borderType
                           ) const;
 
+  cv::Mat createFullMatrix(
+                          const cv::Mat& matrix,
+                          cedar::aux::conv::BorderType::Id borderType
+                          ) const;
+
   cv::Mat resultCutOut(
                       const cv::Mat& result,
                       unsigned int matrixRows,
@@ -212,6 +217,10 @@ private:
   cv::Mat resultCutOut(const cv::Mat& result, const cv::Mat& matrix, const cv::Mat& kernel) const;
 
   cv::Mat resultCutOut(const cv::Mat& result, const cv::Mat& matrix, const cedar::aux::kernel::ConstKernelPtr kernel) const;
+
+  bool checkForSameKernelSize() const;
+
+  cv::Mat getRowsCols(cedar::aux::kernel::ConstKernelPtr kernel) const;
 
   cv::Mat cvConvolve
   (
