@@ -40,6 +40,7 @@
 - cedar::aux
   - added a slice plot for 3D matrix data
   - implemented full mode for the opencv convolution engine
+  - removed the ConfigurationInterface (and the option to use CEDAR_LIBCONFIG_LEGACY_MODE)
 - cedar::proc
   - added a processing step for convolutions
   - parameters are now locked in the compute method of processing steps
@@ -47,6 +48,7 @@
   - added a find script for FFTW that also searches for the include directory
   - added defines for the current cedar version; this makes it possible to stay compatible to older versions, should
     this ever be needed. 
+  - removed dependency on libconfig
 
 == Version 0.9 ==
 - cedar::aux
