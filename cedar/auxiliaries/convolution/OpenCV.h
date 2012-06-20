@@ -218,6 +218,16 @@ private:
 
   cv::Mat cutOutResult(const cv::Mat& result, const cv::Mat& matrix, const cedar::aux::kernel::ConstKernelPtr kernel) const;
 
+  cv::Mat cutOutResult(
+                      const cv::Mat& result,
+                      unsigned int kernelRows,
+                      unsigned int kernelCols
+                      ) const;
+
+  cv::Mat cutOutResult(const cv::Mat& result, const cv::Mat& kernel) const;
+
+  cv::Mat cutOutResult(const cv::Mat& result, const cedar::aux::kernel::ConstKernelPtr kernel) const;
+
   cv::Mat cvConvolve
   (
     const cv::Mat& matrix,

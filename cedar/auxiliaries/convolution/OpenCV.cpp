@@ -113,8 +113,9 @@ bool cedar::aux::conv::OpenCV::checkModeCapability
        cedar::aux::conv::Mode::Id mode
      ) const
 {
-  // currently, only full & same are supported
-  return mode == cedar::aux::conv::Mode::Same || mode == cedar::aux::conv::Mode::Full;
+  return mode == cedar::aux::conv::Mode::Same
+      || mode == cedar::aux::conv::Mode::Full
+      || mode == cedar::aux::conv::Mode::Valid;
 }
 
 int cedar::aux::conv::OpenCV::translateBorderType(cedar::aux::conv::BorderType::Id borderType) const
@@ -371,6 +372,66 @@ cv::Mat cedar::aux::conv::OpenCV::cutOutResult(
   }
 }
 
+cv::Mat cedar::aux::conv::OpenCV::cutOutResult(
+                                              const cv::Mat& result,
+                                              unsigned int kernelRows,
+                                              unsigned int kernelCols
+                                              ) const
+{
+  // In the 0D and 1D case there is kernelRows and/or kernelCols 0 in some cases.
+  // This means that nothing has to be done, but for computational reasons kernel_SIZE_ has to be set to 1 to do so.
+  if (kernelRows == 0)
+  {
+    kernelRows = 1;
+  }
+
+  if (kernelCols == 0)
+  {
+    kernelCols = 1;
+  }
+
+  unsigned int cut_rows = result.rows - kernelRows + 1;
+  unsigned int cut_cols = result.cols - kernelCols + 1;
+  unsigned int offset_row = (result.rows - cut_rows) / 2;
+  unsigned int offset_col = (result.cols - cut_cols) / 2;
+
+  cv::Mat cut_out = result(cv::Range(offset_row, offset_row + cut_rows), cv::Range(offset_col, offset_col + cut_cols));
+
+  return cut_out;
+}
+
+cv::Mat cedar::aux::conv::OpenCV::cutOutResult(
+                                              const cv::Mat& result,
+                                              const cv::Mat& kernel
+                                              ) const
+{
+  return cutOutResult(result, kernel.rows, kernel.cols);
+}
+
+cv::Mat cedar::aux::conv::OpenCV::cutOutResult(
+                                              const cv::Mat& result,
+                                              const cedar::aux::kernel::ConstKernelPtr kernel
+                                              ) const
+{
+  // check for 0D-Kernels:
+  if (kernel->getDimensionality() == 0)
+  {
+    // no border handling necessary
+    return result;
+  }
+  else
+  {
+    cv::Mat kernel_rows_cols = kernel->getRowsCols();
+
+    return cutOutResult
+           (
+             result,
+             static_cast<unsigned int>(kernel_rows_cols.at<float>(0,0)),
+             static_cast<unsigned int>(kernel_rows_cols.at<float>(0,1))
+           );
+  }
+}
+
 cv::Mat cedar::aux::conv::OpenCV::convolve
         (
           const cv::Mat& matrix,
@@ -381,7 +442,12 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
         ) const
 {
 
-  CEDAR_ASSERT(mode == cedar::aux::conv::Mode::Same || mode == cedar::aux::conv::Mode::Full);
+  CEDAR_ASSERT
+  (
+    mode == cedar::aux::conv::Mode::Same
+    || mode == cedar::aux::conv::Mode::Full
+    || mode == cedar::aux::conv::Mode::Valid
+  );
 
   if (mode == cedar::aux::conv::Mode::Same)
   {
@@ -391,7 +457,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
     return this->cvConvolve(matrix, kernel, border_type, anchor);
   }
 
-  else //if (mode == cedar::aux::conv::Mode::Full)
+  else if (mode == cedar::aux::conv::Mode::Full)
   {
     cv::Mat matrix_full = createFullMatrix(matrix, kernel, borderType);
 
@@ -402,6 +468,16 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
     cv::Mat result = this->cvConvolve(matrix_full, kernel, cv::BORDER_CONSTANT, anchor);
 
     return cutOutResult(result, matrix, kernel);
+  }
+  else //if (mode == cedar::aux::conv::Mode::Valid)
+  {
+    cv::Point anchor = cv::Point(-1, -1);
+    this->translateAnchor(anchor, anchorVector, kernel.size);
+
+    // border type dose not matter, because cut off
+    cv::Mat result = this->cvConvolve(matrix, kernel, cv::BORDER_CONSTANT, anchor);
+
+    return cutOutResult(result, kernel);
   }
 
 }
