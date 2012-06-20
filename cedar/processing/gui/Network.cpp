@@ -422,7 +422,6 @@ const std::string& cedar::proc::gui::Network::getFileName() const
 
 void cedar::proc::gui::Network::addElementsToScene()
 {
-  //!@todo a lot of the code in these functions should probably be cleaned up and moved to the respective classes.
   if (!this->isRootNetwork())
   {
     this->fitToContents();
@@ -477,6 +476,7 @@ void cedar::proc::gui::Network::read(const std::string& source)
 
 void cedar::proc::gui::Network::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
+  std::cout << "cedar::proc::gui::Network::readConfiguration" << std::endl;
   this->cedar::proc::gui::GraphicsBase::readConfiguration(node);
 }
 
@@ -566,8 +566,11 @@ void cedar::proc::gui::Network::readScene(cedar::aux::ConfigurationNode& root)
     const std::string& type = iter->second.get<std::string>("type");
     if (type != "step" && type != "trigger" && type != "network")
     {
-      //!@todo properly warn the user about this in the UI rather than in the console.
-      std::cout << "Unknown ui item type: " << type << " in file " << this->mFileName << std::endl;
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Unknown ui item type: \"" + type + "\" in file \"" + this->mFileName + "\"",
+        "cedar::proc::gui::Network::readScene(cedar::aux::ConfigurationNode&)"
+      );
     }
   }
 }
@@ -816,50 +819,39 @@ void cedar::proc::gui::Network::processStepAddedSignal(cedar::proc::ElementPtr e
 {
   // store the type, which can be compared to entries in a configuration node
   std::string current_type;
+  cedar::proc::gui::GraphicsBase *p_scene_element = NULL;
   if (cedar::proc::StepPtr step = boost::shared_dynamic_cast<cedar::proc::Step>(element))
   {
     this->mpScene->addProcessingStep(step, QPointF(0, 0));
     current_type = "step";
+
+    p_scene_element = this->mpScene->getStepItemFor(step.get());
   }
   else if (cedar::proc::NetworkPtr network = boost::shared_dynamic_cast<cedar::proc::Network>(element))
   {
     this->mpScene->addNetwork(QPointF(0, 0), network);
     current_type = "network";
+    p_scene_element = this->mpScene->getNetworkFor(network.get());
   }
   else if (cedar::proc::TriggerPtr trigger = boost::shared_dynamic_cast<cedar::proc::Trigger>(element))
   {
     this->mpScene->addTrigger(trigger, QPointF(0, 0));
     current_type = "trigger";
+    p_scene_element = this->mpScene->getTriggerItemFor(trigger.get());
   }
+  CEDAR_ASSERT(p_scene_element != NULL);
+
   cedar::aux::ConfigurationNode& ui = this->network()->getLastReadUINode();
   for (cedar::aux::ConfigurationNode::iterator iter = ui.begin(); iter != ui.end(); ++iter)
   {
     const std::string& type = iter->second.get<std::string>("type");
     if (type == current_type)
     {
-      if (type == "step")
+      if (iter->second.get<std::string>(current_type) == element->getName())
       {
-        if (iter->second.get<std::string>("step") == element->getName())
-        {
-          this->mpScene->getStepItemFor
-          (
-            static_cast<cedar::proc::Step*>(element.get())
-          )->readConfiguration(iter->second);
-          ui.erase(iter);
-          return;
-        }
-      }
-      else if (type == "trigger")
-      {
-        if (iter->second.get<std::string>("trigger") == element->getName())
-        {
-          this->mpScene->getTriggerItemFor
-          (
-            static_cast<cedar::proc::Trigger*>(element.get())
-          )->readConfiguration(iter->second);
-          ui.erase(iter);
-          return;
-        }
+        p_scene_element->readConfiguration(iter->second);
+        ui.erase(iter);
+        return;
       }
     }
   }
