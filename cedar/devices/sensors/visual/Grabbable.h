@@ -69,7 +69,6 @@ protected:
   };
 
 public:
-
   //!@brief Destructor
   virtual ~Grabbable()
   {

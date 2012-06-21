@@ -43,7 +43,6 @@
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/casts.h"
-//#include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
 

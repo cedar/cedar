@@ -45,19 +45,7 @@
 
 // SYSTEM INCLUDES
 
-//TODO description
-/*!@brief   This is a static gain step that allows multiplying a matrix input with a factor.
- *
- *          This step implements the cedar::proc::Step interface and allows a user to easily multiply any matrix with a
- *          gain factor. This step is called a static gain step because the gain factor is determined by a parameter,
- *          rather than being an input that might change over time.
- *
- * @remarks This step declares the following interface:
- *          input - any matrix data
- *          output - the output, i.e., input multiplied by gainFactor
- *
- *          Parameters of the step are:
- *          gainFactor - the gain factor.
+/*!@todo Document this step
  */
 class cedar::proc::steps::Convolution : public cedar::proc::Step
 {
@@ -65,6 +53,7 @@ class cedar::proc::steps::Convolution : public cedar::proc::Step
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+  
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -90,12 +79,6 @@ public:
   {
     return this->mConvolution->getMode();
   }
-
-//  //!@brief Sets the current gain factor.
-//  inline void setBorderType(double gainFactor)
-//  {
-//    this->mConvolution->setValue(gainFactor);
-//  }
 
 public slots:
   //!@brief Triggers a computation of a step.
@@ -123,25 +106,28 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
+private:
   //!@brief The Data containing the input matrix
   cedar::aux::ConstMatDataPtr mMatrix;
+  
   //!@brief The Data containing the input kernel
   cedar::aux::ConstMatDataPtr mKernel;
+  
   //!@brief The data containing the result of the convolution.
   cedar::aux::MatDataPtr mOutput;
 
   //!@brief Containing convolution methods and parameter
   cedar::aux::conv::ConvolutionPtr mConvolution;
-private:
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief The factor by which the input is multiplied.
-
+  // none yet
 
 private:
+  // none yet
 
 }; // class cedar::proc::steps::Convolution
 

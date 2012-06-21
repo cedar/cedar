@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/math/sigmoids/SemiLinearSigmoid.h"
+#include "cedar/auxiliaries/math/sigmoids.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/Singleton.h"
 
@@ -68,12 +69,5 @@ _mBeta(new cedar::aux::DoubleParameter(this, "beta", beta))
 
 double cedar::aux::math::SemiLinearSigmoid::compute(double value) const
 {
-  if (value > this->getThreshold())
-  {
-    return this->getBeta() * value;
-  }
-  else
-  {
-    return 0;
-  }
+  return cedar::aux::math::sigmoidSemiLinear(value, this->getThreshold(), this->getBeta());
 }

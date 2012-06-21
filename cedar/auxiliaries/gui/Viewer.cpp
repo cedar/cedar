@@ -106,14 +106,14 @@ void cedar::aux::gui::Viewer::grabBuffer()
   QImage qimage = this->QGLWidget::grabFrameBuffer(false);
 
   // QImage to cv::Mat
-  cv::Mat mat = cv::Mat(qimage.height(), qimage.width(), CV_8UC4,(uchar*)qimage.bits(), qimage.bytesPerLine());
-  cv::Mat mat2 = cv::Mat(mat.rows, mat.cols, CV_8UC3 );
+  cv::Mat mat = cv::Mat(qimage.height(), qimage.width(), CV_8UC4, static_cast<uchar*>(qimage.bits()), qimage.bytesPerLine());
+  cv::Mat mat2 = cv::Mat(mat.rows, mat.cols, CV_8UC3);
   int from_to[] = { 0,0, 1,1, 2,2 };
-  cv::mixChannels( &mat, 1, &mat2, 1, from_to, 3 );
+  cv::mixChannels(&mat, 1, &mat2, 1, from_to, 3);
 
   //apply the new content to the channel image
   mpGrabberLock->lockForWrite();
-  mGrabberBuffer = mat2; //.clone()
+  mGrabberBuffer = mat2;
   mpGrabberLock->unlock();
 }
 
@@ -136,9 +136,9 @@ QReadWriteLock* cedar::aux::gui::Viewer::registerGrabber()
 
 void cedar::aux::gui::Viewer::deregisterGrabber(QReadWriteLock* lock)
 {
-  //only allow grabber with correct QReadWriteLock to disconnect
-  //i.e. use the pointer-address of the QReadWriteLock as unique id
-  if ( mpGrabberLock && (lock == mpGrabberLock) )
+  // only allow grabber with correct QReadWriteLock to disconnect
+  // i.e., use the pointer-address of the QReadWriteLock as unique id
+  if (mpGrabberLock && (lock == mpGrabberLock))
   {
     delete mpGrabberLock;
     mpGrabberLock = NULL;

@@ -244,7 +244,6 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::determineInputValidity
   return cedar::proc::DataSlot::VALIDITY_VALID;
 }
 
-
 bool cedar::proc::Connectable::allInputsValid()
 {
   // clear the list of invalid input names
@@ -390,7 +389,6 @@ void cedar::proc::Connectable::removeLock(cedar::aux::ConstDataPtr data, cedar::
   this->cedar::aux::Lockable::removeLock(&data->getLock(), lockType);
 }
 
-
 void cedar::proc::Connectable::declareInput(const std::string& name, bool mandatory)
 {
   this->declareData(DataRole::INPUT, name, mandatory);
@@ -406,7 +404,6 @@ void cedar::proc::Connectable::declareInput(const std::string& name, bool mandat
     )
   );
 }
-
 
 void cedar::proc::Connectable::declareInputCollection(const std::string& name)
 {

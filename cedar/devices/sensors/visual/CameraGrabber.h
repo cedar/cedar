@@ -386,7 +386,7 @@ public:
 protected:
   
   //------------------------------------------------------------------------
-  //From Grabber
+  // From Grabber
   //------------------------------------------------------------------------
 
   bool onInit();
@@ -425,7 +425,7 @@ private:
   /// @brief Default filename for the config-file of the camera capabilities
   inline std::string getCapabilitiesFilename(unsigned int guid)
   {
-    return "camera_"+boost::lexical_cast<std::string>(guid)+".capabilities";
+    return "camera_" + boost::lexical_cast<std::string>(guid) + ".capabilities";
   }
 
   /// @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class CameraChannelPtr

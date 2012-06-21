@@ -115,7 +115,7 @@ public:
    *
    * @todo    Should this (or some version of it) be in the cedar::proc::DataSlot class?
    */
-  void removeData(cedar::aux::ConstDataPtr data0);
+  void removeData(cedar::aux::ConstDataPtr data);
 
   /*!@brief   Sets whether or not this slot is a collection, i.e., accepts multiple data pointers.
    * @remarks This function throws unless the role of this slot is input.
