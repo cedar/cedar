@@ -175,8 +175,6 @@ private:
 
   //!@brief write scene to a node
   void writeScene(cedar::aux::ConfigurationNode& root, cedar::aux::ConfigurationNode& scene);
-  //!@brief read scene from a node
-  void readScene(cedar::aux::ConfigurationNode& root);
 
   //!@brief Reacts to elements being added in the underlying network.
   void elementAdded(cedar::proc::Network* network, cedar::proc::ElementPtr pElement);

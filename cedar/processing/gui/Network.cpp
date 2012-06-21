@@ -471,7 +471,6 @@ void cedar::proc::gui::Network::read(const std::string& source)
   read_json(source, root);
 
   this->mNetwork->readFrom(root);
-  this->readScene(root);
 }
 
 void cedar::proc::gui::Network::readConfiguration(const cedar::aux::ConfigurationNode& node)
@@ -544,33 +543,6 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, 
       cedar::aux::ConfigurationNode ui_node;
       p_network_item->writeScene(root, ui_node);
       network_node->second.add_child("ui", ui_node);
-    }
-  }
-}
-
-//!@todo remove this function
-void cedar::proc::gui::Network::readScene(cedar::aux::ConfigurationNode& root)
-{
-  this->mpStepsToAdd.clear();
-  this->mpTriggersToAdd.clear();
-  this->mpNetworksToAdd.clear();
-
-  if (root.find("ui") == root.not_found())
-  {
-    return;
-  }
-
-  cedar::aux::ConfigurationNode& ui = root.find("ui")->second;
-  for (cedar::aux::ConfigurationNode::iterator iter = ui.begin(); iter != ui.end(); ++iter)
-  {
-    const std::string& type = iter->second.get<std::string>("type");
-    if (type != "step" && type != "trigger" && type != "network")
-    {
-      cedar::aux::LogSingleton::getInstance()->warning
-      (
-        "Unknown ui item type: \"" + type + "\" in file \"" + this->mFileName + "\"",
-        "cedar::proc::gui::Network::readScene(cedar::aux::ConfigurationNode&)"
-      );
     }
   }
 }
