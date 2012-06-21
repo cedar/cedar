@@ -322,9 +322,6 @@ cv::Mat conv
               result.at<float>(row, col)
                 += op1.at<float>(row + k_row, col + k_col)
                    * op2_flipped.at<float>(k_row, k_col);
-//              result.at<float>(row, col)
-//                += border_interpolate(op1, row - k_row, col - k_col, borderType)
-//                   * op2.at<float>(k_row, k_col);
             }
           }
         }
@@ -472,7 +469,6 @@ int testMatrixKernelOperation
     printMatrix(result);
     std::cout << " ?= (expected result:)" << std::endl;
     printMatrix(expected);
-
     std::cout << "----------------------------" << std::endl;
 
     return 1;
@@ -1291,6 +1287,16 @@ int testMatrixMatrixOperations(cedar::aux::conv::EnginePtr engine)
     op2.at<float>(1, 2) = 0.5;
     op2.at<float>(0, 0) = 0.5;
 
+    std::cout << "(Valid 2D zero) ... ";
+    errors += test_matxmat_convolution
+              (
+                engine,
+                cv::Mat::zeros(3, 3, CV_32F),
+                cv::Mat::zeros(3, 3, CV_32F),
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
     std::cout << "(Valid 2D) ... ";
     errors += test_matxmat_convolution
               (
@@ -1300,6 +1306,28 @@ int testMatrixMatrixOperations(cedar::aux::conv::EnginePtr engine)
                 cedar::aux::conv::BorderType::Zero,
                 cedar::aux::conv::Mode::Valid
               );
+
+    std::cout << "(Valid 2D even) ... ";
+    errors += test_matxmat_convolution
+              (
+                engine,
+                cv::Mat::ones(4, 4, CV_32F),
+                numbers_2d,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 2D void) ... ";
+    errors += test_matxmat_convolution
+              (
+                engine,
+                op1,
+                cv::Mat::ones(4, 4, CV_32F),
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+
   }
 
   {
