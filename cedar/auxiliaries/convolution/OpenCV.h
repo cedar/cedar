@@ -108,7 +108,7 @@ public:
   cv::Mat convolve
   (
     const cv::Mat& matrix,
-    const cedar::aux::conv::KernelList& kernel,
+    cedar::aux::conv::ConstKernelListPtr kernelList,
     cedar::aux::conv::BorderType::Id borderType,
     cedar::aux::conv::Mode::Id mode
   ) const;
@@ -191,7 +191,7 @@ private:
 
   cv::Mat createFullMatrix(
                           const cv::Mat& matrix,
-                          const cedar::aux::conv::KernelList& kernelList,
+                          cedar::aux::conv::ConstKernelListPtr kernelList,
                           cedar::aux::conv::BorderType::Id borderType
                           ) const;
 
