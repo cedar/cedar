@@ -155,7 +155,7 @@ public:
   inline cv::Mat convolve
   (
     const cv::Mat& matrix,
-    const cedar::aux::conv::KernelList& kernelList
+    cedar::aux::conv::ConstKernelListPtr kernelList
   ) const
   {
     return this->getEngine()->convolve(matrix, kernelList, this->getBorderType(), this->getMode());
@@ -203,7 +203,7 @@ public:
   inline cv::Mat operator()
   (
     const cv::Mat& matrix,
-    const cedar::aux::conv::KernelList& kernelList
+    cedar::aux::conv::ConstKernelListPtr kernelList
   ) const
   {
     return this->convolve(matrix, kernelList);

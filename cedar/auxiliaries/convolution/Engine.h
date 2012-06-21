@@ -124,7 +124,7 @@ public:
   virtual cv::Mat convolve
   (
     const cv::Mat& matrix,
-    const cedar::aux::conv::KernelList& kernel,
+    cedar::aux::conv::ConstKernelListPtr kernelList,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
     cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
   ) const = 0;
