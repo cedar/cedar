@@ -68,7 +68,7 @@ class cedar::proc::LoopedTrigger : public cedar::aux::LoopedThread,
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  LoopedTrigger(double stepSize = 1.0);
+  LoopedTrigger(double stepSize = 1.0, const std::string& name = "");
 
   //!@brief Destructor
   virtual ~LoopedTrigger();
