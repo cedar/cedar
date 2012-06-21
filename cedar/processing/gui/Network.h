@@ -152,6 +152,16 @@ public:
     return this->mpScene;
   }
 
+  /*!@brief Sets the ui configuration for the element when it is added to the network.
+   */
+  inline void setNextElementUiConfiguration
+  (
+    cedar::proc::ElementPtr element, const cedar::aux::ConfigurationNode& uiDescription
+  )
+  {
+    this->mNextElementUiConfigurations[element.get()] = uiDescription;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -236,6 +246,9 @@ private:
 
   //! Text item used for displaying the name of the network.
   QGraphicsTextItem *mpNameDisplay;
+
+  //! Configuration of the next element that is added to the scene.
+  std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode> mNextElementUiConfigurations;
 
 }; // class cedar::proc::gui::NetworkFile
 
