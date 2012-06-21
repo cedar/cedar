@@ -77,6 +77,7 @@ mDrawBackground(true),
 mHighlightMode(HIGHLIGHTMODE_NONE),
 mOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor),
 mFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor),
+mSnapToGrid(true),
 mWidth
 (
   new cedar::aux::DoubleParameter
@@ -487,7 +488,13 @@ QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, c
     case QGraphicsItem::ItemPositionChange:
     {
       QPointF new_pos = value.toPointF();
-      if (this->scene() && cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->getSnapToGrid())
+
+      if
+      (
+        this->mSnapToGrid
+        && this->scene()
+        && cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->getSnapToGrid()
+      )
       {
         new_pos.rx() = cedar::aux::math::round(new_pos.x() / grid_size) * grid_size;
         new_pos.ry() = cedar::aux::math::round(new_pos.y() / grid_size) * grid_size;

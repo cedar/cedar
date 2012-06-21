@@ -225,6 +225,12 @@ macro(cedar_add_library)
   configure_file("${CEDAR_HOME}/cmake/resources/lib.h.in" ${libHOutputFile})
   set(headerFiles ${headerFiles} ${libHOutputFile})
 
+  # make sure the paths for all ui files exist
+  foreach(uiFile ${generatedUiHeaders})
+    get_filename_component(uiFilePath ${uiFile} PATH)
+    file(MAKE_DIRECTORY ${uiFilePath})
+  endforeach(uiFile ${generatedUiHeaders})
+  
   foreach(headerFile ${headerFiles})
     # get the path of the file
     get_filename_component(headerFilePath ${headerFile} PATH)

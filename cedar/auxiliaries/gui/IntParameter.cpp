@@ -89,7 +89,9 @@ void cedar::aux::gui::IntParameter::parameterPointerChanged()
 
   this->propertiesChanged();
 
+  parameter->lockForRead();
   this->mpSpinbox->setValue(parameter->getValue());
+  parameter->unlock();
   QObject::connect(this->mpSpinbox, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
 
   QObject::connect(parameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertiesChanged()));
@@ -98,13 +100,15 @@ void cedar::aux::gui::IntParameter::parameterPointerChanged()
 void cedar::aux::gui::IntParameter::propertiesChanged()
 {
   cedar::aux::IntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::IntParameter>(this->getParameter());
+  parameter->lockForRead();
   this->mpSpinbox->setMinimum(parameter->getMinimum());
   this->mpSpinbox->setMaximum(parameter->getMaximum());
   this->mpSpinbox->setDisabled(parameter->isConstant());
+  parameter->unlock();
 }
 
 void cedar::aux::gui::IntParameter::valueChanged(int value)
 {
   cedar::aux::IntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::IntParameter>(this->getParameter());
-  parameter->setValue(value);
+  parameter->setValue(value, true);
 }

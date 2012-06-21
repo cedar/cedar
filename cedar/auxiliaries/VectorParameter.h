@@ -278,9 +278,20 @@ public:
   }
 
   //!@brief set the internal vector to a given vector
-  void set(const std::vector<T>& values)
+  void set(const std::vector<T>& values, bool lock = false)
   {
+    if (lock)
+    {
+      this->lockForWrite();
+    }
+
     this->mValues = values;
+
+    if (lock)
+    {
+      this->unlock();
+    }
+
     this->emitChangedSignal();
     //!@todo emit a porperty changed signal here as well, as the new vector may have a different size
   }
