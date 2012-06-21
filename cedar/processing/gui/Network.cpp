@@ -841,6 +841,14 @@ void cedar::proc::gui::Network::processStepAddedSignal(cedar::proc::ElementPtr e
   }
   CEDAR_ASSERT(p_scene_element != NULL);
 
+  std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode>::iterator iter
+    = this->mNextElementUiConfigurations.find(p_scene_element->getElement().get());
+  if (iter != this->mNextElementUiConfigurations.end())
+  {
+    p_scene_element->readConfiguration(iter->second);
+    this->mNextElementUiConfigurations.erase(iter);
+  }
+
   cedar::aux::ConfigurationNode& ui = this->network()->getLastReadUINode();
   for (cedar::aux::ConfigurationNode::iterator iter = ui.begin(); iter != ui.end(); ++iter)
   {
