@@ -93,6 +93,9 @@ mSlot(slot)
       this->setOutlineColor(QColor(140, 140, 140));
     }
   }
+
+  // data slots never snap to the grid; they are attached to the parent.
+  this->setSnapToGrid(false);
 }
 
 cedar::proc::gui::DataSlotItem::~DataSlotItem()

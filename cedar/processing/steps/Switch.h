@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Gauss.h
+    File:        StaticGain.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2011 07 07
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 10 28
 
     Description:
 
@@ -34,125 +34,109 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_KERNEL_GAUSS_H
-#define CEDAR_AUX_KERNEL_GAUSS_H
+#ifndef CEDAR_PROC_STEPS_GATE_H
+#define CEDAR_PROC_STEPS_GATE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/kernel/namespace.h"
-#include "cedar/auxiliaries/kernel/Separable.h"
+#include "cedar/processing/steps/namespace.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Gauss kernel class.
+/*!@brief   This is a step that produces a switch between two inputs based on a third that gives the factor.
  *
+ * @remarks This step declares the following interface:
+ *          input 1 - any matrix data
+ *          input 2 - any matrix data
+ *          factor - a double/1x1 matrix input that determines the gating.
+ *
+ *          Parameters of the step are:
+ *          None.
  */
-class cedar::aux::kernel::Gauss : public cedar::aux::kernel::Separable
+class cedar::proc::steps::Switch : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  enum FACTOR_TYPE
+  {
+    FACTOR_IS_MATRIX,
+    FACTOR_IS_DOUBLE,
+    FACTOR_TYPE_UNDETERMINED
+  };
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Gauss
-  (
-    unsigned int dimensionality = 2,
-    double amplitude = 1.0,
-    double sigmas = 3.0,
-    double shifts = 0.0,
-    double limit = 5.0
-  );
+  Switch();
 
-  //!@brief Constructor to create an instance of Gauss directly from a set of parameters (without configuration file).
-  Gauss(
-         double amplitude,
-         std::vector<double> sigmas,
-         std::vector<double> shifts,
-         double limit,
-         unsigned int dimensionality
-       );
-  //!@brief Destructor
-  virtual ~Gauss();
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!\brief get the sigma of a given dimension
-  double getSigma(unsigned int dimension) const;
-
-  /*!\brief set the sigma of a chosen dimension and Gaussian
-   * \param dimension the dimension
-   * \param sigma the new \f$\sigma\f$
-   */
-  void setSigma(unsigned int dimension, double sigma);
-
-  //!@brief get the shift of the kernel for a given dimension
-  double getShift(unsigned int dimension) const;
-
-  //!@brief set the shift for a given dimension
-  void setShift(unsigned int dimension, double shift);
-
-  //!@brief get the amplitude of the kernel
-  double getAmplitude() const;
-
-  //!@brief set the amplitude of the kernel
-  void setAmplitude(double amplitude);
+  //!@brief Updates the output matrix.
+  void compute(const cedar::proc::Arguments& arguments);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
-protected slots:
-  //!@brief update the dimensionality of the kernel matrices, triggered by a signal (e.g. a changed parameter value)
-  void updateDimensionality();
+protected:
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
+
+  //!@brief Determines whether the data item can be connected to the slot.
+  cedar::proc::DataSlot::VALIDITY determineInputValidity
+                                  (
+                                    cedar::proc::ConstDataSlotPtr slot,
+                                    cedar::aux::DataPtr data
+                                  ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*! virtual function that in the derived classes actually does the job of initializing
-   * the kernel from file
-   * @todo deal with boost PropertyTree here
-   */
-  virtual void onInit();
-
-  /*!@brief virtual function to calculate the kernel matrix
-   */
-  void calculateParts();
-
-  //!@brief A function that heuristically determines width of the kernel in pixels.
-  unsigned int estimateWidth(unsigned int dim) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief vector of pixel sizes of the kernel matrices
-  std::vector<unsigned int> mSizes;
-  //!@brief matrix indices for kernel centers
-  std::vector<int> mCenters;
-private:
   // none yet
+
+private:
+  //!@brief The data containing the output.
+  cedar::aux::MatDataPtr mOutput;
+
+  //!@brief The data containing the first input.
+  cedar::aux::ConstMatDataPtr mInput1;
+
+  //!@brief The data containing the second input.
+  cedar::aux::ConstMatDataPtr mInput2;
+
+  //!@brief The data containing the gate factor.
+  cedar::aux::ConstDataPtr mFactor;
+
+  //! Type of the data at the gate. Used to speed up calculations.
+  FACTOR_TYPE mFactorDataType;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief amplitude of the kernel - after normalization of each dimension, this is applied to the first one
-  cedar::aux::DoubleParameterPtr _mAmplitude;
-  //!@brief sigmas of the Gauss function for each dimension
-  cedar::aux::DoubleVectorParameterPtr _mSigmas;
-  //!@brief shift of the Gauss function from the center for each dimension
-  cedar::aux::DoubleVectorParameterPtr _mShifts;
-  //!@brief scalar value, which is multiplied by the dimensions' sigmas to determine the pixel size
-  cedar::aux::DoubleParameterPtr _mLimit;
+  // none yet
+
 private:
   // none yet
 
-}; // class cedar::aux::kernel::Gauss
+}; // class cedar::proc::steps::Gate
 
-#endif // CEDAR_AUX_KERNEL_GAUSS_H
+#endif // CEDAR_PROC_STEPS_GATE_H

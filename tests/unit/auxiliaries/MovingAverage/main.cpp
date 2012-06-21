@@ -22,50 +22,70 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        main.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 10 28
+    Date:        2012 06 14
 
-    Description: Namespace file for cedar::proc::steps.
+    Description: 
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_NAMESPACE_H
-#define CEDAR_PROC_STEPS_NAMESPACE_H
 
-#include "cedar/configuration.h"
+// LOCAL INCLUDES
 
-// CEDAR INCLUDES
-#include "cedar/processing/lib.h"
+// PROJECT INCLUDES
+#include "cedar/auxiliaries/MovingAverage.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
+#include <iostream>
 
-
-namespace cedar
+int main()
 {
-  namespace proc
+  // the number of errors encountered in this test
+  int errors = 0;
+
+  cedar::aux::MovingAverage<double> average(2);
+  CEDAR_ASSERT(average.getMaximumNumberOfElements() == 2);
+
+  try
   {
-    /*!@brief Namespace for processing steps. */
-    namespace steps
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(Convolution);
-      CEDAR_DECLARE_PROC_CLASS(Projection);
-      CEDAR_DECLARE_PROC_CLASS(Resize);
-      CEDAR_DECLARE_PROC_CLASS(StaticGain);
-      CEDAR_DECLARE_PROC_CLASS(Switch);
+    average.getAverage();
 
-#ifdef CEDAR_USE_YARP
-      CEDAR_DECLARE_PROC_CLASS(NetWriterSink);
-#endif
-      //!@endcond
-    }
+    std::cout << "ERROR: did not throw on empty list!" << std::endl;
+    ++errors;
   }
-}
+  catch(...)
+  {
+    // ok, the above should throw
+  }
 
-#endif // CEDAR_PROC_STEPS_NAMESPACE_H
+  average.append(1);
+  std::cout << average << std::endl;
+  if (average.getAverage() != 1)
+  {
+    std::cout << "ERROR: wrong average, expected 1." << std::endl;
+    ++errors;
+  }
+
+  average.append(2);
+  std::cout << average << std::endl;
+  if (average.getAverage() != 1.5)
+  {
+    std::cout << "ERROR: wrong average, expected 1.5." << std::endl;
+    ++errors;
+  }
+
+  average.append(3);
+  std::cout << average << std::endl;
+  if (average.getAverage() != 2.5)
+  {
+    std::cout << "ERROR: wrong average, expected 2.5." << std::endl;
+    ++errors;
+  }
+
+  return errors;
+}

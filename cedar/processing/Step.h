@@ -46,14 +46,17 @@
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/Connectable.h"
+#include "cedar/auxiliaries/MovingAverage.h"
+#include "cedar/units/TimeUnit.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <QThread>
 #include <QReadWriteLock>
-#include <map>
-#include <set>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
+#include <map>
+#include <set>
 
 
 /*!@brief This class represents a processing step in the processing framework.
@@ -142,6 +145,14 @@ public:
     this->QThread::wait();
   }
 
+  /*!@brief Returns the last run time measured for this step.
+   */
+  cedar::unit::Time getRunTimeMeasurement() const;
+
+  /*!@brief Returns the average run time measured for this step.
+   */
+  cedar::unit::Time getRunTimeAverage() const;
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
@@ -191,6 +202,10 @@ private:
    */
   virtual void reset();
 
+  /*!@brief Sets the current execution time measurement.
+   */
+  void setRunTimeMeasurement(const cedar::unit::Time& time);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -212,6 +227,15 @@ private:
 
   //!@brief Map of all actions defined for this step.
   ActionMap mActions;
+
+  //!@brief The last iteration time of the step. Only meaningful if the step is running.
+  cedar::unit::Time mLastIterationTime;
+
+  //!@brief Moving average of the iteration time.
+  cedar::aux::MovingAverage<cedar::unit::Milliseconds> mMovingAverageIterationTime;
+
+  //!@brief Lock for the last iteration time.
+  mutable QReadWriteLock* mLastIterationTimeLock;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
