@@ -441,7 +441,6 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
           const std::vector<int>& anchorVector
         ) const
 {
-
   CEDAR_ASSERT
   (
     mode == cedar::aux::conv::Mode::Same
@@ -449,37 +448,47 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
     || mode == cedar::aux::conv::Mode::Valid
   );
 
-  if (mode == cedar::aux::conv::Mode::Same)
+  cv::Mat result;
+  switch(mode)
   {
-    cv::Point anchor = cv::Point(-1, -1);
-    this->translateAnchor(anchor, anchorVector, kernel.size);
-    int border_type = this->translateBorderType(borderType);
-    return this->cvConvolve(matrix, kernel, border_type, anchor);
+    case cedar::aux::conv::Mode::Same:
+      {
+        cv::Point anchor = cv::Point(-1, -1);
+        this->translateAnchor(anchor, anchorVector, kernel.size);
+        int border_type = this->translateBorderType(borderType);
+        result = this->cvConvolve(matrix, kernel, border_type, anchor);
+      }
+      break;
+
+    case cedar::aux::conv::Mode::Full:
+      {
+        cv::Mat matrix_full = createFullMatrix(matrix, kernel, borderType);
+        cv::Point anchor = cv::Point(-1, -1);
+        this->translateAnchor(anchor, anchorVector, kernel.size);
+        // border type dose not matter, because cut off
+        cv::Mat result_full = this->cvConvolve(matrix_full, kernel, cv::BORDER_CONSTANT, anchor);
+        result = cutOutResult(result_full, matrix, kernel);
+      }
+      break;
+    case cedar::aux::conv::Mode::Valid:
+      if (matrix.rows < kernel.rows || matrix.cols < kernel.cols)
+      {
+        result = cv::Mat::zeros(1,1,matrix.type());
+      }
+      else
+      {
+        cv::Point anchor = cv::Point(-1, -1);
+        this->translateAnchor(anchor, anchorVector, kernel.size);
+        // border type dose not matter, because cut off
+        cv::Mat result_full = this->cvConvolve(matrix, kernel, cv::BORDER_CONSTANT, anchor);
+        result = cutOutResult(result_full, kernel);
+      }
+      break;
+    default:
+      CEDAR_THROW(cedar::aux::BadConnectionException,"\"CEDAR_ASSERT\" failed before this exception.");
+      break;
   }
-
-  else if (mode == cedar::aux::conv::Mode::Full)
-  {
-    cv::Mat matrix_full = createFullMatrix(matrix, kernel, borderType);
-
-    cv::Point anchor = cv::Point(-1, -1);
-    this->translateAnchor(anchor, anchorVector, kernel.size);
-
-    // border type dose not matter, because cut off
-    cv::Mat result = this->cvConvolve(matrix_full, kernel, cv::BORDER_CONSTANT, anchor);
-
-    return cutOutResult(result, matrix, kernel);
-  }
-  else //if (mode == cedar::aux::conv::Mode::Valid)
-  {
-    cv::Point anchor = cv::Point(-1, -1);
-    this->translateAnchor(anchor, anchorVector, kernel.size);
-
-    // border type dose not matter, because cut off
-    cv::Mat result = this->cvConvolve(matrix, kernel, cv::BORDER_CONSTANT, anchor);
-
-    return cutOutResult(result, kernel);
-  }
-
+  return result;
 }
 
 cv::Mat cedar::aux::conv::OpenCV::convolve
