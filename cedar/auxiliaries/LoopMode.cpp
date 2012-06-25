@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LoopMode.cpp
+    File:        LoopMode.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 09 20
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2012 06 22
 
     Description:
 
@@ -35,39 +35,52 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/processing/LoopMode.h"
+#include "cedar/auxiliaries/LoopMode.h"
+#include "cedar/auxiliaries/EnumBase.h"
+#include "cedar/auxiliaries/EnumType.h"
 
 // SYSTEM INCLUDES
 
-cedar::aux::EnumType<cedar::proc::LoopMode> cedar::proc::LoopMode::mType("cedar::proc::LoopMode::");
+
+//----------------------------------------------------------------------------------------------------------------------
+// Static members
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::EnumType<cedar::aux::LoopMode> cedar::aux::LoopMode::mType("cedar::aux::LoopMode::");
 
 #ifndef CEDAR_COMPILER_MSVC
-const cedar::proc::LoopMode::Id cedar::proc::LoopMode::FIXED_ADAPTIVE;
-const cedar::proc::LoopMode::Id cedar::proc::LoopMode::FIXED;
-const cedar::proc::LoopMode::Id cedar::proc::LoopMode::REALTIME;
-#endif // CEDAR_COMPILER_MSVC
+const cedar::aux::LoopMode::Id cedar::aux::LoopMode::RealTime;
+const cedar::aux::LoopMode::Id cedar::aux::LoopMode::Fixed;
+const cedar::aux::LoopMode::Id cedar::aux::LoopMode::FixedAdaptive;
+const cedar::aux::LoopMode::Id cedar::aux::LoopMode::Simulated;
+#endif
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::LoopMode::construct()
-{
-  mType.type()->def(cedar::aux::Enum(cedar::proc::LoopMode::FIXED_ADAPTIVE, "FIXED_ADAPTIVE", "Fixed/Adaptive"));
-  mType.type()->def(cedar::aux::Enum(cedar::proc::LoopMode::FIXED, "FIXED", "Fixed"));
-  mType.type()->def(cedar::aux::Enum(cedar::proc::LoopMode::REALTIME, "REALTIME", "Real Time"));
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-const cedar::aux::EnumBase& cedar::proc::LoopMode::type()
+void cedar::aux::LoopMode::construct()
 {
-  return *cedar::proc::LoopMode::mType.type();
+  mType.type()->def(cedar::aux::Enum(cedar::aux::LoopMode::RealTime, "RealTime", "real-time"));
+  mType.type()->def(cedar::aux::Enum(cedar::aux::LoopMode::Fixed, "Fixed", "fixed time steps"));
+  mType.type()->def
+  (
+    cedar::aux::Enum(cedar::aux::LoopMode::FixedAdaptive, "FixedAdaptive", "fixed adaptive time steps")
+  );
+  mType.type()->def(cedar::aux::Enum(cedar::aux::LoopMode::Simulated, "Simulated", "simulated time"));
 }
 
-const cedar::proc::LoopMode::TypePtr& cedar::proc::LoopMode::typePtr()
+const cedar::aux::EnumBase& cedar::aux::LoopMode::type()
 {
-  return cedar::proc::LoopMode::mType.type();
+  return *cedar::aux::LoopMode::typePtr();
+}
+
+const cedar::aux::LoopMode::TypePtr& cedar::aux::LoopMode::typePtr()
+{
+  return cedar::aux::LoopMode::mType.type();
 }

@@ -63,8 +63,10 @@ public:
     std::cout << "current time (sec/usec): " << now.time_of_day().seconds()
               << " / " << now.time_of_day().total_microseconds() % 1000000
               << " (time in step(): " << time << ")" << std::endl;
-    if( mArtificialDelay )
-      usleep( rand() % (3*mStepSize.total_microseconds()) );
+    if ( mArtificialDelay )
+    {
+      usleep( rand() % (3 * static_cast<int>(this->getStepSize()) * 1000));
+    }
   }
 
   /*!@brief get info whether an artificial delay is added
