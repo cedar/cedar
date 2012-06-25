@@ -116,7 +116,6 @@ void cedar::dev::kuka::KukaInterface::readConfiguration(const cedar::aux::Config
   //set step size and idle time for the looped thread
   setStepSize(0);
   setIdleTime(0.01);
-  useFixedStepSize(false);
   //start the thread
   start();
 
