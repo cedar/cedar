@@ -377,6 +377,7 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
    */
   cedar::proc::NetworkPtr new_parent_network;
 
+  //!@todo Solve this better
   if (cedar::proc::gui::Network *p_element = dynamic_cast<cedar::proc::gui::Network*>(selected.at(0)))
   {
     new_parent_network = p_element->network()->getNetwork();
@@ -466,6 +467,18 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
       this->getGraphicsItemFor(new_parent_network.get())
     )->addElement(this->getGraphicsItemFor(network.get()));
   }
+
+  // remember all the old configurations of the ui representations
+  cedar::proc::gui::Network* p_new_network = this->getNetworkFor(network.get());
+  for (std::list<cedar::proc::ElementPtr>::iterator i = elements.begin(); i != elements.end(); ++i)
+  {
+    cedar::aux::ConfigurationNode ui_description;
+    cedar::proc::ElementPtr element = *i;
+    cedar::proc::gui::GraphicsBase* p_ui_element = this->getGraphicsItemFor(element.get());
+    p_ui_element->writeConfiguration(ui_description);
+    p_new_network->setNextElementUiConfiguration(element, ui_description);
+  }
+
   // move all elements to the network
   network->add(elements);
 }
@@ -892,9 +905,9 @@ void cedar::proc::gui::Scene::removeNetworkItem(cedar::proc::gui::Network* pNetw
 void cedar::proc::gui::Scene::addProcessingStep(cedar::proc::StepPtr step, QPointF position)
 {
   cedar::proc::gui::StepItem *p_drawer = new cedar::proc::gui::StepItem(step, this->mpMainWindow);
+  p_drawer->setPos(position);
   this->addStepItem(p_drawer);
 
-  p_drawer->setPos(position);
   this->update();
 }
 

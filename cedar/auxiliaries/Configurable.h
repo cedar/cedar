@@ -179,7 +179,7 @@ private:
   /*!@brief register a new parameter at this Configurable - throws an exception if parameter is already part of this
    * Configurable
    */
-  void registerParameter(cedar::aux::ParameterPtr parameter);
+  void registerParameter(cedar::aux::Parameter* parameter);
 
   //!@brief Transforms the old config format to one readable in the new interface.
   void oldFormatToNew(cedar::aux::ConfigurationNode& node);

@@ -123,5 +123,24 @@ int main()
   {
     // all well!
   }
+
+  {
+    std::cout << "Testing duplicate names ... ";
+
+    cedar::aux::ConfigurablePtr configurable(new cedar::aux::Configurable());
+    cedar::aux::DoubleParameterPtr dbl1(new cedar::aux::DoubleParameter(configurable.get(), "duplicate name"));
+    try
+    {
+      cedar::aux::DoubleParameterPtr dbl2(new cedar::aux::DoubleParameter(configurable.get(), "duplicate name"));
+      std::cout << "ERROR did not throw on duplicate name." << std::endl;
+      ++errors;
+    }
+    catch (cedar::aux::DuplicateNameException)
+    {
+      // exactly what should happen
+    }
+
+    std::cout << "done." << std::endl;
+  }
   return errors;
 }

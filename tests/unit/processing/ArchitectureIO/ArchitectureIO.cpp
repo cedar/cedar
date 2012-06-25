@@ -43,6 +43,7 @@
 #include "cedar/processing/Network.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/LoopedTrigger.h"
 
 /*!
  * This is a generic class for testing. When compute is called, its data is set from zero to one.
@@ -144,7 +145,7 @@ int main(int, char**)
   std::cout << "done." << std::endl;
 
   std::cout << "Creating trigger ... ";
-  cedar::proc::TriggerPtr trigger(new cedar::proc::Trigger("trigger"));
+  cedar::proc::LoopedTriggerPtr trigger(new cedar::proc::LoopedTrigger(10.0, "trigger"));
   network->add(trigger);
   std::cout << "done." << std::endl;
 
@@ -185,7 +186,7 @@ int main(int, char**)
   }
 
   std::cout << "Creating a second trigger ... ";
-  cedar::proc::TriggerPtr trigger_2(new cedar::proc::Trigger("trigger2"));
+  cedar::proc::LoopedTriggerPtr trigger_2(new cedar::proc::LoopedTrigger(10.0, "trigger2"));
   network->add(trigger_2);
 
   std::cout << "Connecting trigger to trigger2 ... ";
@@ -261,7 +262,7 @@ int main(int, char**)
   try
   {
     std::cout << "Looking for trigger ... ";
-    trigger = network->getElement<cedar::proc::Trigger>("trigger");
+    trigger = network->getElement<cedar::proc::LoopedTrigger>("trigger");
     CEDAR_ASSERT(trigger);
     std::cout << "found." << std::endl;
   }
