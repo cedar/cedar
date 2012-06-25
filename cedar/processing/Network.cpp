@@ -435,6 +435,7 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
       }
     }
   }
+
   // now add each element to the new network
   for (iterator it = elements.begin(); it != elements.end(); ++it)
   {
