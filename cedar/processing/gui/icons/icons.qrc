@@ -18,6 +18,7 @@
     <file>steps/preshape.svg</file>
     <file>steps/projection.svg</file>
     <file>steps/noise.svg</file>
+    <file>steps/sum.svg</file>
     <file>steps/video_grabber.svg</file>
     <file>steps/picture_grabber.svg</file>
     <file>network.svg</file>
