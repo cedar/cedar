@@ -215,11 +215,6 @@ public:
   // protected methods
   //----------------------------------------------------------------------------
 protected:
-  CEDAR_DECLARE_DEPRECATED(inline double getStepSizeParameter() const)
-  {
-    return this->getStepSize();
-  }
-
   inline double getStepSize() const
   {
     return this->_mStepSize->getValue();
