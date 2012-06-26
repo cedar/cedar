@@ -62,7 +62,7 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::Convolution>
       (
-        "Utilities",
+        "Math Utilities",
         "cedar.processing.steps.Convolution"
       )
     );
