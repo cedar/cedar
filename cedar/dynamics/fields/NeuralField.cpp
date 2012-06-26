@@ -48,7 +48,7 @@
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
-#include "cedar/auxiliaries/math/AbsSigmoid.h"
+#include "cedar/auxiliaries/math/sigmoids/AbsSigmoid.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
