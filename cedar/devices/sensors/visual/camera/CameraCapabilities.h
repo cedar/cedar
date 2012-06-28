@@ -72,7 +72,7 @@ public cedar::aux::ConfigurationInterface
   struct CameraPropertyCapability
   {
      cedar::dev::sensors::visual::CameraProperty::Id propId;
-     int max_value;
+     int max_value;  // @!todo set max/min in IntParameter for state-properties
      int min_value;
      bool is_supported;
      bool is_readable;

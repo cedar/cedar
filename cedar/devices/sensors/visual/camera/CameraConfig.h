@@ -72,7 +72,9 @@ public:
    */
   struct CameraSettings
   {
-    std::string fps;
+    //to cedar::aux::enum-parameter
+    //read: getValue() return enum-value
+    std::string fps; //change to _mFps
     std::string mode;
     std::string iso_speed;
     std::string capability_config_file_name;
