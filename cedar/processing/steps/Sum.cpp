@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Convolution.cpp
+    File:        StaticGain.cpp
 
-    Maintainer:  Ulja van Hengel
-    Email:       ulja@ini.ruhr-uni-bochum.de
-    Date:        2012 06 04
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 10 28
 
     Description:
 
@@ -35,18 +35,17 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/processing/steps/Convolution.h"
-#include "cedar/processing/DataSlot.h"
+#include "cedar/processing/steps/Sum.h"
+#include "cedar/processing/ExternalData.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
-#include "cedar/auxiliaries/convolution/Convolution.h"
-#include "cedar/processing/ExternalData.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
-#include <iostream>
-#include <vector>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -58,16 +57,16 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr convolution_decl
+    ElementDeclarationPtr declaration
     (
-      new ElementDeclarationTemplate<cedar::proc::steps::Convolution>
+      new ElementDeclarationTemplate<cedar::proc::steps::Sum>
       (
         "Math Utilities",
-        "cedar.processing.steps.Convolution"
+        "cedar.processing.steps.Sum"
       )
     );
-    convolution_decl->setIconPath(":/steps/convolution.svg");
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(convolution_decl);
+    declaration->setIconPath(":/steps/sum.svg");
+    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(declaration);
 
     return true;
   }
@@ -78,51 +77,59 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::steps::Convolution::Convolution()
+cedar::proc::steps::Sum::Sum()
 :
 // outputs
-mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
-// parameters
-mConvolution(new cedar::aux::conv::Convolution())
+mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))
 {
   // declare all data
-  this->declareInput("matrix", true);
-  this->declareInput("kernel", true);
+  this->declareInputCollection("terms");
+  this->declareOutput("sum", this->mOutput);
 
-  this->declareOutput("result", mOutput);
-
-  QObject::connect(this->mConvolution.get(), SIGNAL(configurationChanged()), this, SLOT(recompute()));
-
-  this->addConfigurableChild("convolution", this->mConvolution);
+  this->mInputs = this->getInputSlot("terms");
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::steps::Convolution::compute(const cedar::proc::Arguments&)
+void cedar::proc::steps::Sum::compute(const cedar::proc::Arguments&)
 {
-  const cv::Mat& kernel = mKernel->getData();
-  const cv::Mat& matrix = mMatrix->getData();
+  if (this->mInputs->getDataCount() == 0)
+  {
+    // no terms, result is all zeros.
+    this->mOutput->getData() *= 0;
+    return;
+  }
 
-  mOutput->setData(this->mConvolution->convolve(matrix, kernel));
+  cv::Mat sum = cedar::aux::asserted_pointer_cast<cedar::aux::MatData>(this->mInputs->getData(0))->getData().clone();
+  for (unsigned int data_id = 1; data_id < this->mInputs->getDataCount(); ++data_id)
+  {
+    sum += cedar::aux::asserted_pointer_cast<cedar::aux::MatData>(this->mInputs->getData(data_id))->getData();
+  }
+
+  this->mOutput->setData(sum);
 }
 
-void cedar::proc::steps::Convolution::recompute()
-{
-  this->onTrigger();
-}
-
-cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Convolution::determineInputValidity
+cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Sum::determineInputValidity
                                 (
                                   cedar::proc::ConstDataSlotPtr CEDAR_DEBUG_ONLY(slot),
                                   cedar::aux::DataPtr data
                                 ) const
 {
   // First, let's make sure that this is really the input in case anyone ever changes our interface.
-  CEDAR_DEBUG_ASSERT(slot->getName() == "matrix" || slot->getName() == "kernel");
+  CEDAR_DEBUG_ASSERT(slot->getName() == "terms")
 
-  if (boost::shared_dynamic_cast<cedar::aux::MatData>(data))
+  if (cedar::aux::MatDataPtr mat_data = boost::shared_dynamic_cast<cedar::aux::MatData>(data))
   {
+    if (this->mInputs->getDataCount() > 0)
+    {
+      const cv::Mat& first_mat
+        = cedar::aux::asserted_pointer_cast<cedar::aux::MatData>(this->mInputs->getData(0))->getData();
+      if (!cedar::aux::math::matrixSizesEqual(first_mat, mat_data->getData()))
+      {
+        return cedar::proc::DataSlot::VALIDITY_ERROR;
+      }
+    }
     // Mat data is accepted.
     return cedar::proc::DataSlot::VALIDITY_VALID;
   }
@@ -130,26 +137,5 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Convolution::determineInputV
   {
     // Everything else is rejected.
     return cedar::proc::DataSlot::VALIDITY_ERROR;
-  }
-}
-
-void cedar::proc::steps::Convolution::inputConnectionChanged(const std::string& inputName)
-{
-  // Again, let's first make sure that this is really the input in case anyone ever changes our interface.
-  CEDAR_DEBUG_ASSERT(inputName == "matrix" || inputName == "kernel");
-
-  if (inputName == "matrix")
-  {
-    // Assign the input to the member. This saves us from casting in every computation step.
-    this->mMatrix = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
-    // This should always work since other types should not be accepted.
-    CEDAR_DEBUG_ASSERT(this->mMatrix);
-  }
-  else if (inputName == "kernel")
-  {
-    // Assign the input to the member. This saves us from casting in every computation step.
-    this->mKernel = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
-    // This should always work since other types should not be accepted.
-    CEDAR_DEBUG_ASSERT(this->mKernel);
   }
 }
