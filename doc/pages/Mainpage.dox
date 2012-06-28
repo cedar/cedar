@@ -15,7 +15,7 @@ connect, keeping the effort of "how" to connect it very low.
 
 @section ProgrammingConcepts Programming concepts
 In the following pages you can find out about general programming concepts we used throughout the framework.
-- @link EnumConcept Threads and dynamics @endlink
+- @ref EnumConcept
 - @link InterProcessCommunicationConcept Inter-process communication using YARP @endlink
 - @link ParametersConcept Storing and loading parameters @endlink
 - @link ProcessingFrameworkConcept Processing framework @endlink
@@ -32,8 +32,10 @@ In these pages you can learn more about the structure and organization of cedar.
 We provide a number of tutorials for certain parts of cedar, for which some additional guidance may be
 beneficial or even necessary.
 - @link ProcessingFrameworkTutorial Processing framework @endlink
+- @link ProcessingGuiTutorial Processing gui @endlink
 - @ref LoggingWithCedar
 - @ref ConfigurableAndParameters
+- @ref ProvidingCompatibility
 
 @section CodingStyle Coding Style
 cedar sticks to a strict @link CodingStyle coding style@endlink.

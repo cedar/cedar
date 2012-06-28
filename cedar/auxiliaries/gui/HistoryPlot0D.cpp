@@ -150,6 +150,7 @@ void cedar::aux::gui::HistoryPlot0D::plot(cedar::aux::DataPtr data, const std::s
     }
     else
     {
+      data->unlock();
       CEDAR_THROW(cedar::aux::UnknownTypeException, "Unhandled matrix type in cedar::aux::gui::HistoryPlot0D::display.");
     }
   }
@@ -160,10 +161,25 @@ void cedar::aux::gui::HistoryPlot0D::plot(cedar::aux::DataPtr data, const std::s
   mpXValues.push_back(0);
   mpYValues.push_back(val);
 
-  this->mpCurve->setData(&this->mpXValues.at(0),
-                         &this->mpYValues.at(0),
-                         1);
-
+  // choose the right function depending on the qwt version
+  //!@todo write a macro that does this check (see MatrixPlot1D.cpp)
+#if (QWT_VERSION >> 16) == 5
+  this->mpCurve->setData
+  (
+    &this->mXArray.at(0),
+    &this->mYArray.at(0),
+    1
+  );
+#elif (QWT_VERSION >> 16) == 6
+  this->mpCurve->setRawSamples
+  (
+    &this->mXArray.at(0),
+    &this->mYArray.at(0),
+    1
+  );
+#else
+#error unsupported qwt version
+#endif
   this->mpCurve->attach(this->mpPlot);
 
   this->startTimer(30); //!@todo make the refresh time configurable.
@@ -213,6 +229,7 @@ void cedar::aux::gui::HistoryPlot0D::timerEvent(QTimerEvent* /* pEvent */)
     }
     else
     {
+      this->mData->unlock();
       CEDAR_THROW(cedar::aux::UnhandledTypeException, "Cannot handle the type of the matrix.");
     }
   }
@@ -242,8 +259,24 @@ void cedar::aux::gui::HistoryPlot0D::timerEvent(QTimerEvent* /* pEvent */)
     mYArray[i] = mpYValues[i];
   }
 
-  this->mpCurve->setData(&this->mXArray.at(0),
-                         &this->mYArray.at(0),
-                         static_cast<int>(this->mpXValues.size()));
+  // choose the right function depending on the qwt version
+  //!@todo write a macro that does this check (see MatrixPlot1D.cpp)
+#if (QWT_VERSION >> 16) == 5
+  this->mpCurve->setData
+  (
+    &this->mXArray.at(0),
+    &this->mYArray.at(0),
+    static_cast<int>(this->mpXValues.size())
+  );
+#elif (QWT_VERSION >> 16) == 6
+  this->mpCurve->setRawSamples
+  (
+    &this->mXArray.at(0),
+    &this->mYArray.at(0),
+    static_cast<int>(this->mpXValues.size())
+  );
+#else
+#error unsupported qwt version
+#endif
   this->mpPlot->replot();
 }

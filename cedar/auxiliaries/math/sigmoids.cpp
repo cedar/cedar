@@ -67,6 +67,18 @@ double cedar::aux::math::sigmoidHeaviside(const double x, const double threshold
   return 1.0;
 }
 
+double cedar::aux::math::sigmoidSemiLinear(double value, double threshold, double gain)
+{
+  if (value > threshold)
+  {
+    return gain * (value - threshold);
+  }
+  else
+  {
+    return 0.0;
+  }
+}
+
 template<typename T>
 cv::Mat cedar::aux::math::sigmoid(const cv::Mat& mat, const double beta, const double threshold)
 {

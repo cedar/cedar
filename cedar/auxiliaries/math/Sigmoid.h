@@ -88,6 +88,8 @@ public:
    *
    * @todo write a non-templated function, which checks the type flag of cv::Mat and calls the correct templated compute
    * function
+   *
+   * @todo Make a virtual version of this function that can be overloaded for faster sigmoid calculation.
    */
   template<typename T>
   cv::Mat compute(const cv::Mat& values) const
@@ -100,6 +102,12 @@ public:
       *iter_dest = static_cast<T>(compute(static_cast<double>(*iter_src)));
     }
     return result;
+  }
+
+  //!@brief Returns the current threshold value.
+  inline double getThreshold() const
+  {
+    return this->mThreshold->getValue();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -118,10 +126,10 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
+private:
   //!@brief threshold of the sigmoid
   cedar::aux::DoubleParameterPtr mThreshold;
-private:
-  // none yet
 };
 
 #include "cedar/auxiliaries/FactoryManager.h"

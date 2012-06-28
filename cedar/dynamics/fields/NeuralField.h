@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/dynamics/namespace.h"
 #include "cedar/dynamics/Dynamics.h"
+#include "cedar/auxiliaries/convolution/namespace.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
@@ -149,8 +150,27 @@ private:
   //!@brief Resets the field.
   void reset();
 
-  //!@brief Sets the dimensionality of the kernel.
-  void slotKernelAdded(size_t index);
+  /*!@brief Returns the convolution object currently selected.
+   */
+  inline cedar::aux::conv::ConvolutionPtr getConvolution()
+  {
+    return this->_mLateralKernelConvolution;
+  }
+
+  /*!@brief Updates the convolution object when a new kernel is added.
+   */
+  void slotKernelAdded(size_t kernelIndex);
+
+  /*!@brief Adds a kernel to the convolution object.
+   */
+  void addKernelToConvolution(cedar::aux::kernel::KernelPtr kernel);
+
+  /*!@brief Removes a kernel from the convolution object.
+   */
+  void removeKernelFromConvolution(size_t index);
+
+  //!@brief Makes the kernel list stored in the convolution equal to the one in the field.
+  void transferKernelsToConvolution();
 
   //!@brief Returns the dimensionality of the field.
   inline unsigned int getDimensionality() const
@@ -190,7 +210,7 @@ protected:
   cedar::aux::DoubleParameterPtr mRestingLevel;
 
   //!@brief the relaxation rate of the field
-  //!@todo deal with units; for now: milliseconds
+  //!@todo deal with units, now: milliseconds
   cedar::aux::DoubleParameterPtr mTau;
 
   //!@brief the global inhibition of the field, which is not contained in the kernel
@@ -198,6 +218,7 @@ protected:
 
   //!@brief the noise correlation kernel
   cedar::aux::kernel::GaussPtr mNoiseCorrelationKernel;
+
 private:
   // none yet
 
@@ -219,6 +240,13 @@ protected:
 
   //!@brief any sigmoid function
   SigmoidParameterPtr _mSigmoid;
+
+  //!@brief Parameter that determines the convolution engine used by the field.
+  cedar::aux::conv::ConvolutionPtr _mLateralKernelConvolution;
+
+  //!@brief Parameter that determines the convolution engine used by the field.
+  cedar::aux::conv::ConvolutionPtr _mNoiseCorrelationKernelConvolution;
+
 private:
   // none yet
 

@@ -87,10 +87,10 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::LoopedTrigger::LoopedTrigger(double stepSize)
+cedar::proc::LoopedTrigger::LoopedTrigger(double stepSize, const std::string& name)
 :
 cedar::aux::LoopedThread(stepSize),
-cedar::proc::Trigger("", true),
+cedar::proc::Trigger(name, true),
 //!@todo Should these parameters go into cedar::aux::LoopedThread?
 mLoopType(new cedar::aux::EnumParameter(
                                          this,

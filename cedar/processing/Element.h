@@ -44,13 +44,18 @@
 #include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/signals2.hpp>
 
 
 /*!@brief Base class for Elements in a processing architecture.
  *
  *        Each element is described by a name that uniquely identifies it within a processing module.
  */
-class cedar::proc::Element : virtual public cedar::aux::Configurable
+class cedar::proc::Element
+:
+virtual public cedar::aux::Configurable,
+public boost::enable_shared_from_this<cedar::proc::Element>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -73,13 +78,22 @@ public:
   const std::string& getName() const;
 
   //!@brief sets the network at which this element is registered
-  void setNetwork(cedar::proc::Network* pNetwork);
+  void setNetwork(cedar::proc::NetworkPtr network);
+
+  //!@brief get the network at which this element is registered
+  cedar::proc::NetworkPtr getNetwork();
+
+  //!@brief get the network at which this element is registered as const
+  cedar::proc::ConstNetworkPtr getNetwork() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  inline boost::signals2::connection connectToNetworkChanged(boost::function<void()> slot)
+  {
+    return this->mNetworkChanged.connect(slot);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -91,10 +105,11 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@todo make weak ptr
-  cedar::proc::Network* mpRegisteredAt;
+  //! the network this element is registered at
+  cedar::proc::NetworkWeakPtr mRegisteredAt;
 private:
-  // none yet
+  //! Signal that is emitted whenever the element's network changes
+  boost::signals2::signal<void()> mNetworkChanged;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

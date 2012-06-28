@@ -70,6 +70,7 @@ namespace cedar
       class CEDAR_AUX_LIB_EXPORT EnumParameter;
       class CEDAR_AUX_LIB_EXPORT FileParameter;
       class CEDAR_AUX_LIB_EXPORT IntParameter;
+      class CEDAR_AUX_LIB_EXPORT IntVectorParameter;
       class CEDAR_AUX_LIB_EXPORT ObjectParameter;
       class CEDAR_AUX_LIB_EXPORT ObjectListParameter;
       class CEDAR_AUX_LIB_EXPORT StringParameter;
@@ -102,6 +103,7 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(MatrixPlot);
       CEDAR_DECLARE_AUX_CLASS(MatrixPlot1D);
       CEDAR_DECLARE_AUX_CLASS(MatrixPlot2D);
+      CEDAR_DECLARE_AUX_CLASS(MatrixSlicePlot3D);
       CEDAR_DECLARE_AUX_CLASS(ImagePlot);
 
       CEDAR_DECLARE_AUX_CLASS(HistoryPlot);

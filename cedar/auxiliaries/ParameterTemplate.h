@@ -95,10 +95,24 @@ public:
     return this->mValue;
   }
 
-  //!@brief set the value of type T of this parameter
-  void setValue(const T& value)
+  /*!@brief set the value of type T of this parameter
+   *
+   * @param lock Whether the method should take care of properly locking the parameter.
+   */
+  void setValue(const T& value, bool lock = false)
   {
+    if (lock)
+    {
+      this->lockForWrite();
+    }
+
     this->mValue = value;
+
+    if (lock)
+    {
+      this->unlock();
+    }
+
     this->emitChangedSignal();
   }
 

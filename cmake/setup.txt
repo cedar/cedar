@@ -45,6 +45,11 @@
 # set the project name
 project(cedar)
 
+# set cedar version information
+set (CEDAR_VERSION_MAJOR 0)
+set (CEDAR_VERSION_MINOR 9)
+set (CEDAR_VERSION_BUGFIX 0) 
+
 # check whether this is an out-of-source build
 if( CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR AND NOT MSVC_IDE )
   message(FATAL_ERROR "In-source builds are not allowed. Please create a directory and run cmake from there, passing
@@ -96,7 +101,6 @@ endif (CEDAR_BUILD_STATIC_LIBS)
 
 # include the cedar library directory in the library search path
 link_directories(${CEDAR_LIB_DIR})
-message(STATUS ${CEDAR_BUILD_DIR})
 # add the cedar home directory to the ones that need to be included
 include_directories(${CEDAR_HOME} ${CEDAR_TEST_DIR} ${CEDAR_BUILD_DIR})
 

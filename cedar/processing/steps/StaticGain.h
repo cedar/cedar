@@ -79,6 +79,17 @@ public:
   //!@brief Updates the output matrix.
   void compute(const cedar::proc::Arguments& arguments);
 
+  //!@brief Returns the current gain factor.
+  inline double getGainFactor() const
+  {
+    return this->_mGainFactor->getValue();
+  }
+
+  //!@brief Sets the current gain factor.
+  inline void setGainFactor(double gainFactor)
+  {
+    this->_mGainFactor->setValue(gainFactor);
+  }
 
 public slots:
   //!@brief This slot is connected to the valueChanged() event of the gain value parameter.

@@ -118,8 +118,10 @@ void cedar::aux::gui::DoubleVectorParameter::propertyChanged()
       p_widget->setMinimumHeight(20);
 
       // The limits have to be set here already so that the value is set properly.
+      parameter->lockForRead();
       this->mSpinboxes.at(i)->setMinimum(parameter->getMinimum());
       this->mSpinboxes.at(i)->setMaximum(parameter->getMaximum());
+      parameter->unlock();
 
       p_widget->setValue(parameter->at(i));
       QObject::connect(p_widget, SIGNAL(valueChanged(double)), this, SLOT(valueChanged(double)));
@@ -129,11 +131,13 @@ void cedar::aux::gui::DoubleVectorParameter::propertyChanged()
   }
 
   // Update the spinboxes' properties
+  parameter->lockForRead();
   for (size_t i = 0; i < this->mSpinboxes.size(); ++i)
   {
     this->mSpinboxes.at(i)->setMinimum(parameter->getMinimum());
     this->mSpinboxes.at(i)->setMaximum(parameter->getMaximum());
   }
+  parameter->unlock();
 }
 
 void cedar::aux::gui::DoubleVectorParameter::valueChanged(double)
@@ -146,6 +150,6 @@ void cedar::aux::gui::DoubleVectorParameter::valueChanged(double)
   {
     values.at(i) = this->mSpinboxes.at(i)->value();
   }
-  parameter->set(values);
+  parameter->set(values, true);
 }
 

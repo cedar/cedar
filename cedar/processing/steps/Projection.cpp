@@ -58,12 +58,12 @@
 cedar::aux::EnumType<cedar::proc::steps::Projection::CompressionType>
   cedar::proc::steps::Projection::CompressionType::mType;
 
-#ifndef _MSC_VER
+#ifndef CEDAR_COMPILER_MSVC
 const cedar::proc::steps::Projection::CompressionType::Id cedar::proc::steps::Projection::CompressionType::SUM;
 const cedar::proc::steps::Projection::CompressionType::Id cedar::proc::steps::Projection::CompressionType::AVERAGE;
 const cedar::proc::steps::Projection::CompressionType::Id cedar::proc::steps::Projection::CompressionType::MAXIMUM;
 const cedar::proc::steps::Projection::CompressionType::Id cedar::proc::steps::Projection::CompressionType::MINIMUM;
-#endif
+#endif // CEDAR_COMPILER_MSVC
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class

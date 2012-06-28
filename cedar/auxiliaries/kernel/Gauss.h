@@ -59,7 +59,15 @@ class cedar::aux::kernel::Gauss : public cedar::aux::kernel::Separable
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Gauss();
+  Gauss
+  (
+    unsigned int dimensionality = 2,
+    double amplitude = 1.0,
+    double sigmas = 3.0,
+    double shifts = 0.0,
+    double limit = 5.0
+  );
+
   //!@brief Constructor to create an instance of Gauss directly from a set of parameters (without configuration file).
   Gauss(
          double amplitude,
@@ -74,12 +82,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! virtual function that in the derived classes actually does the job of initializing
-   * the kernel from file
-   */
-  //!@todo deal with boost PropertyTree here
-  virtual void onInit();
-
   //!\brief get the sigma of a given dimension
   double getSigma(unsigned int dimension) const;
 
@@ -101,16 +103,10 @@ public:
   //!@brief set the amplitude of the kernel
   void setAmplitude(double amplitude);
 
-  //!@brief get the pixel width of the kernel
-  unsigned int getWidth(unsigned int dim) const;
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected slots:
-  /*!@brief virtual function to calculate the kernel matrix
-   */
-  void calculate();
   //!@brief update the dimensionality of the kernel matrices, triggered by a signal (e.g. a changed parameter value)
   void updateDimensionality();
 
@@ -118,7 +114,18 @@ protected slots:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  /*! virtual function that in the derived classes actually does the job of initializing
+   * the kernel from file
+   * @todo deal with boost PropertyTree here
+   */
+  virtual void onInit();
+
+  /*!@brief virtual function to calculate the kernel matrix
+   */
+  void calculateParts();
+
+  //!@brief A function that heuristically determines width of the kernel in pixels.
+  unsigned int estimateWidth(unsigned int dim) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

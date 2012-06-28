@@ -41,8 +41,10 @@
 #include "cedar/processing/steps/Projection.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/Manager.h"
+#include "cedar/processing/StepTime.h"
 #include "cedar/auxiliaries/LogFile.h"
 #include "cedar/dynamics/namespace.h"
+#include "cedar/units/TimeUnit.h"
 
 // SYSTEM INCLUDES
 
@@ -72,7 +74,8 @@ void stepArchitecture(cedar::proc::NetworkPtr& network, unsigned int numberOfErr
   try
   {
     cedar::proc::LoopedTriggerPtr trigger = network->getElement<cedar::proc::LoopedTrigger>("new LoopedTrigger");
-    trigger->trigger();
+    cedar::proc::ArgumentsPtr arguments (new cedar::proc::StepTime(cedar::unit::Milliseconds(1.0)));
+    trigger->trigger(arguments);
   }
   catch (cedar::aux::ExceptionBase exception)
   {
@@ -89,6 +92,8 @@ void stepArchitecture(cedar::proc::NetworkPtr& network, unsigned int numberOfErr
  */
 void checkValidProjection(const std::string& configurationFile, unsigned int numberOfErrors)
 {
+  std::cout << "Checking file \"" << configurationFile << "\" (valid)" << std::endl;
+
   cedar::proc::NetworkPtr network(new cedar::proc::Network());
   network->readFile(configurationFile);
 
@@ -108,6 +113,7 @@ void checkValidProjection(const std::string& configurationFile, unsigned int num
  */
 void checkInvalidProjection(const std::string& configurationFile, unsigned int numberOfErrors)
 {
+  std::cout << "Checking file \"" << configurationFile << "\" (invalid)" << std::endl;
   cedar::proc::NetworkPtr network(new cedar::proc::Network());
   network->readFile(configurationFile);
 

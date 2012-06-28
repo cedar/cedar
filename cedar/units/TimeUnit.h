@@ -119,12 +119,29 @@ public:
     return this->mAmountInMicroSeconds < other.mAmountInMicroSeconds;
   }
 
+  /*!@brief Comparison operator.
+   */
+  template <unsigned int otherFactor, const char* otherSuffix>
+  bool operator>(const TimeUnit<otherFactor, otherSuffix>& comp) const
+  {
+    return this->mAmountInMicroSeconds > comp.mAmountInMicroSeconds;
+  }
+
   /*!@brief The addition operator.
    */
   template <unsigned int otherFactor, const char* otherSuffix>
   TimeUnit& operator+= (const TimeUnit<otherFactor, otherSuffix>& other)
   {
     this->mAmountInMicroSeconds += other.mAmountInMicroSeconds;
+    return *this;
+  }
+
+  /*!@brief The subtraction operator.
+   */
+  template <unsigned int otherFactor, const char* otherSuffix>
+  TimeUnit& operator-= (const TimeUnit<otherFactor, otherSuffix>& other)
+  {
+    this->mAmountInMicroSeconds -= other.mAmountInMicroSeconds;
     return *this;
   }
 

@@ -34,17 +34,20 @@
 #
 #=======================================================================================================================
 
-#TODO fix include of kuka/gui/FriStatusWidget if FRI is not installed
+if (CEDAR_USE_KUKA_LWR)
+  set(kuka_moc_files kuka/gui/FriStatusWidget.h)
+else(CEDAR_USE_KUKA_LWR)
+  set(kuka_moc_files "")
+endif(CEDAR_USE_KUKA_LWR)
 cedar_add_library(cedardev
-  MOC_HEADERS
-  robot/gui/KinematicChainWidget.h
-  robot/gui/KinematicChainMonitorWidget.h
-  robot/gui/KinematicChainCommandWidget.h
-  robot/gui/MountedCameraViewer.h
-  kteam/gui/EPuckControlWidget.h
-  communication/gui/CommunicationWidget.h
-  kuka/gui/FriStatusWidget.h
-  LINK_LIBRARIES
-  cedaraux
-)
-
+                  MOC_HEADERS
+                  robot/gui/KinematicChainWidget.h
+                  robot/gui/KinematicChainMonitorWidget.h
+                  robot/gui/KinematicChainCommandWidget.h
+                  robot/gui/MountedCameraViewer.h
+                  kteam/gui/EPuckControlWidget.h
+                  communication/gui/CommunicationWidget.h
+                  ${kuka_moc_files}
+                  LINK_LIBRARIES
+                  cedaraux
+                  )

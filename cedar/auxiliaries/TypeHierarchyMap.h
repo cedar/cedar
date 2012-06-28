@@ -246,11 +246,8 @@ public:
 
 
       /*!@brief Prints the node and all its children to the stream.
-       *
        * @param indentation The indentation for everything that is printed.
-       *
        * @param visited     Set of all nodes already printed.
-       *
        * @param stream      The stream to which to write.
        */
       void print
@@ -364,16 +361,13 @@ public:
             return node;
           }
 
-          CEDAR_DEBUG_ASSERT(depth_map.find(this->shared_from_this()) != depth_map.end());
-          unsigned int depth = depth_map[this->shared_from_this()];
+          CEDAR_DEBUG_ASSERT(depth_map.find(node) != depth_map.end());
+          unsigned int depth = depth_map[node];
 
-          if (node->matchesDerived(instance))
+          if (node->matchesDerived(instance) && depth > deepest)
           {
-            if (depth > deepest)
-            {
-              deepest_node = node;
-              deepest = depth;
-            }
+            deepest_node = node;
+            deepest = depth;
           }
 
           for
@@ -393,7 +387,7 @@ public:
               new_depth = std::max(depth_iter->second, new_depth);
             }
 
-            depth_map[this->shared_from_this()] = new_depth;
+            depth_map[child_node] = new_depth;
           }
         }
 

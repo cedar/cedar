@@ -106,13 +106,29 @@ cedar::aux::gui::ImagePlot::~ImagePlot()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
 {
+  if (!this->isVisible())
+  {
+    return;
+  }
+
   if (this->mDataType == DATA_TYPE_UNKNOWN)
   {
     return;
   }
 
   cv::Mat& mat = this->mData->getData();
-  switch(mat.type())
+
+  this->mData->lockForRead();
+  if (mat.empty())
+  {
+    this->mpImageDisplay->setText("Matrix is empty.");
+    this->mData->unlock();
+    return;
+  }
+  int type = mat.type();
+  this->mData->unlock();
+
+  switch(type)
   {
     case CV_8UC1:
     {
@@ -295,7 +311,7 @@ void cedar::aux::gui::ImagePlot::plot(cedar::aux::DataPtr data, const std::strin
   if (!this->mData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
-                "Cannot cast to cedar::aux::MatData in cedar::aux::gui::ImagePlot::display.");
+                "Cannot cast to cedar::aux::MatData in cedar::aux::gui::ImagePlot::plot.");
   }
 
   if (boost::dynamic_pointer_cast<cedar::aux::ImageData>(data))

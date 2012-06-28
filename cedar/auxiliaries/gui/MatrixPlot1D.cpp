@@ -197,8 +197,14 @@ void cedar::aux::gui::MatrixPlot1D::doAppend(cedar::aux::DataPtr data, const std
 
   this->buildArrays(plot_series, num);
 
+  //!@todo write a macro that does this check (see HistoryPlot0D.cpp)
+#if (QWT_VERSION >> 16) == 5
   plot_series->mpCurve->setData(&plot_series->mXValues.at(0), &plot_series->mYValues.at(0), num);
-
+#elif (QWT_VERSION >> 16) == 6
+  plot_series->mpCurve->setRawSamples(&plot_series->mXValues.at(0), &plot_series->mYValues.at(0), num);
+#else
+#error unsupported qwt version
+#endif
   plot_series->mpCurve->attach(this->mpPlot);
 
   mpLock->unlock();
@@ -359,10 +365,25 @@ void cedar::aux::gui::MatrixPlot1D::timerEvent(QTimerEvent * /* pEvent */)
       series->mYValues.at(i) = cedar::aux::math::getMatrixEntry<double>(mat, i);
     }
     series->mMatData->unlock();
-
-    series->mpCurve->setData(&series->mXValues.at(0),
-                             &series->mYValues.at(0),
-                             static_cast<int>(series->mXValues.size()));
+    // choose the right function depending on the qwt version
+    //!@todo write a macro that does this check (see HistoryPlot0D.cpp)
+#if (QWT_VERSION >> 16) == 5
+    series->mpCurve->setData
+    (
+      &series->mXValues.at(0),
+      &series->mYValues.at(0),
+      static_cast<int>(series->mXValues.size())
+    );
+#elif (QWT_VERSION >> 16) == 6
+    series->mpCurve->setRawSamples
+    (
+      &series->mXValues.at(0),
+      &series->mYValues.at(0),
+      static_cast<int>(series->mXValues.size())
+    );
+#else
+#error unsupported qwt version
+#endif
   }
 
   this->mpPlot->replot();

@@ -23,9 +23,7 @@ letters for new words (e.g. \b mpMyMemberPointer )
   - e.g. \b mpeMyExternalMemberPointerFromAConfigurationFile
 - local variables are all lower case, words and prefixes are separated with an underscore (e.g. \b p_local_pointer )
 - constants are all upper case, with additional prefix (e.g. \b M_MY_MEMBER_CONSTANT )
-- pointer style:
-  - if you declare a pointer, put the * adjacent to the pointer name (e.g. Example *mpMyExamplePointer; )
-  - put the * adjacent to the pointer type otherwise (e.g. Example* getExample())
+- pointer style: \b always put the * adjacent to the pointer type (e.g. Example* getExample())
 
 @section CodingStyleBraces Braces and Parentheses
 - place braces under and inline with keywords (see @ref CodingStyleWhiteSpace)
@@ -86,6 +84,7 @@ myFunctionCall(parameter1, parameter2, parameter3);
 - keep your interface clean - only declare methods as public, if a user needs them
 
 @section CodingStyleGeneral General Rules
+- never put more than one variable declaration in a single line (i.e., do not do something like int i, j, *p_u;)
 - make sure that there's a way of switching off all (debug) output that is send to std::cout - use at least \#ifdef 
 DEBUG *stuff* \#endif to encapsulate all output
 - use meaningful debug output, preferably with information about the object/class name and the method name that has
