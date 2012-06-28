@@ -74,7 +74,7 @@ endif(QT4_FOUND)
 link_libraries(opencv_highgui opencv_core)
 
 # Add include directories
-include_directories("${CEDAR_HOME}" "${CEDAR_HOME}/${CEDAR_BUILD_DIR}")
+include_directories("${CEDAR_HOME}" "${CEDAR_HOME}/${CEDAR_BUILD_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
 
 # Add link directories
 link_directories("${CEDAR_HOME}/${CEDAR_LIB_DIR}")
@@ -161,9 +161,17 @@ macro(cedar_project_add_target)
   list_files_to_compile(${directory})
   
   # Set moc files to be compiled
+  
+  # Set the output directory to something that prevents naming conflicts
+  set(old_binary_dir ${CMAKE_CURRENT_BINARY_DIR})
+  set(CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated_project_files)
+  include_directories(${CMAKE_CURRENT_BINARY_DIR})
+  
   qt4_add_resources(compiled_resource_paths ${project_resources})
   qt4_wrap_cpp(moc_headers ${moc_headers})
   qt4_wrap_ui(forms ${project_forms})
+  
+  set(CMAKE_CURRENT_BINARY_DIR ${old_binary_dir})
   
   set(files ${project_sources} ${moc_headers} ${forms} ${compiled_resource_paths})
   
