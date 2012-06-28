@@ -120,13 +120,11 @@ int main(int argc, char **argv)
 
   // create a simple viewer for the scene
   cedar::aux::gui::Viewer viewer(scene);
-  viewer.show();
   viewer.setSceneRadius(scene->getSceneLimit());
 
   // create a mounted camera viewer
   cedar::dev::robot::gui::MountedCameraViewer camera_viewer(scene, test_arm);
   camera_viewer.readJson("../../../../tests/interactive/devices/gl/MountedCameraViewer/test_camera.json");
-  camera_viewer.show();
   camera_viewer.setSceneRadius(scene->getSceneLimit());
 
   // create widgets
@@ -138,12 +136,15 @@ int main(int argc, char **argv)
   widget.getCommandWidget()->setSingleStep(0.1);
   widget.show();
 
-
+  // show widgets and start timers and threads
+  viewer.show();
+  camera_viewer.show();
   test_arm->startTimer(20);
   viewer.startTimer(20);
   camera_viewer.startTimer(20);
   a.exec();
 
+  // clean up
   test_arm->stop();
   test_arm->wait();
 

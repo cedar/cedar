@@ -76,6 +76,7 @@ public:
 protected:
   /*!@brief override to remove the mouse handling*/
   virtual void mousePressEvent(QMouseEvent* e);
+  /*!@brief override to remove the mouse handling*/
   virtual void wheelEvent(QWheelEvent* e);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -100,9 +101,14 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   cedar::dev::robot::KinematicChainPtr mArm;
   cedar::aux::LocalCoordinateFramePtr mCameraCoordinateFrame;
-  cedar::aux::IntParameterPtr mMountingJoint;
+  cedar::aux::IntParameterPtr _mMountingJoint;
+  cedar::aux::IntParameterPtr _mImageWidth;
+  cedar::aux::IntParameterPtr _mImageHeight;
+  cedar::aux::DoubleVectorParameterPtr _mCalibrationMatrix;
   //! transformations to the camera frame (assuming reference configuration)
   cv::Mat mReferenceCameraTransformation;
   cv::Mat mTransformationTranspose;
+  cv::Mat mCalibrationMatrix;
+  cv::Mat mProjection;
 };
 #endif  // CEDAR_DEV_ROBOT_GL_MOUNTED_CAMERA_VIEWER_H
