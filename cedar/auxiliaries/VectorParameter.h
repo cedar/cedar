@@ -232,14 +232,22 @@ public:
   }
 
   //!@brief resize the vector to a new size and initialize new entries to the given value
-  void resize(size_t size, const T& value = T())
+  void resize(size_t size, const T& value)
   {
     if (size == this->size())
+    {
       return;
+    }
 
     this->mValues.resize(size, value);
 
     this->emitPropertyChangedSignal();
+  }
+
+  //!@brief Resize the vector to a new size and initialize new entries to the default value set for this parameter.
+  void resize(size_t size)
+  {
+    this->resize(size, this->mDefaultValue);
   }
 
   //!@brief get an item of this vector specified by an index
@@ -270,9 +278,20 @@ public:
   }
 
   //!@brief set the internal vector to a given vector
-  void set(const std::vector<T>& values)
+  void set(const std::vector<T>& values, bool lock = false)
   {
+    if (lock)
+    {
+      this->lockForWrite();
+    }
+
     this->mValues = values;
+
+    if (lock)
+    {
+      this->unlock();
+    }
+
     this->emitChangedSignal();
     //!@todo emit a porperty changed signal here as well, as the new vector may have a different size
   }

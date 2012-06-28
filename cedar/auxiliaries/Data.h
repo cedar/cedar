@@ -70,20 +70,23 @@ public:
   //!@brief Returns the lock associated with this data object.
   QReadWriteLock& getLock();
 
+  //!@brief Returns the lock associated with this data object.
+  QReadWriteLock& getLock() const;
+
   //!@brief Locks the data object for reading.
-  inline void lockForRead()
+  inline void lockForRead() const
   {
     this->mpLock->lockForRead();
   }
 
   //!@brief Locks the data object for writing.
-  inline void lockForWrite()
+  inline void lockForWrite() const
   {
     this->mpLock->lockForWrite();
   }
 
   //!@brief Unlocks the data object.
-  inline void unlock()
+  inline void unlock() const
   {
     this->mpLock->unlock();
   }
@@ -138,7 +141,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief the lock for this data
-  QReadWriteLock *mpLock;
+  mutable QReadWriteLock *mpLock;
 
 private:
   //!@todo This should be a base*, however, right now Configurable can't be used with Base* because base has a (differently realized) name.

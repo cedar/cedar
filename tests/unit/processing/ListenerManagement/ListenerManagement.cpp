@@ -67,14 +67,19 @@ int main(int /* argc */, char** /* argv */)
 
   unsigned int errors = 0;
 
+  std::cout << "Creating network." << std::endl;
+  cedar::proc::NetworkPtr network (new cedar::proc::Network());
+
   std::cout << "Creating step." << std::endl;
   StepTestPtr step (new StepTest());
+  step->setName("step");
 
   std::cout << "Creating trigger." << std::endl;
   TriggerPtr trigger (new Trigger());
+  trigger->setName("trigger");
 
-  std::cout << "Creating network." << std::endl;
-  cedar::proc::NetworkPtr network (new cedar::proc::Network());
+  network->add(step);
+  network->add(trigger);
 
   std::cout << "Adding step." << std::endl;
   network->connectTrigger(trigger, step);
@@ -90,6 +95,8 @@ int main(int /* argc */, char** /* argv */)
   std::cout << "Adding a second step." << std::endl;
   std::cout << "Creating step 2." << std::endl;
   StepTestPtr step_2(new StepTest());
+  step_2->setName("step_2");
+  network->add(step_2);
   network->connectTrigger(trigger, step);
   network->connectTrigger(trigger, step_2);
 

@@ -57,22 +57,57 @@ mpOwner(pOwner),
 mHasDefault(hasDefault),
 mConstant(false),
 mIsHidden(false),
-mChanged(false)
+mChanged(false),
+mpLock(new QReadWriteLock())
 {
   CEDAR_ASSERT(this->mpOwner != NULL);
   this->setName(name);
 
-  this->mpOwner->registerParameter(cedar::aux::ParameterPtr(this));
+  this->mpOwner->registerParameter(this);
 }
 
 cedar::aux::Parameter::~Parameter()
 {
+  if (this->mpLock != NULL)
+  {
+    delete this->mpLock;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::Parameter::lockForWrite() const
+{
+  std::set<QReadWriteLock*> locks;
+  this->appendLocks(locks);
+  cedar::aux::lock(locks, cedar::aux::LOCK_TYPE_WRITE);
+}
+
+void cedar::aux::Parameter::lockForRead() const
+{
+  std::set<QReadWriteLock*> locks;
+  this->appendLocks(locks);
+  cedar::aux::lock(locks, cedar::aux::LOCK_TYPE_READ);
+}
+
+void cedar::aux::Parameter::unlock() const
+{
+  std::set<QReadWriteLock*> locks;
+  this->appendLocks(locks);
+  cedar::aux::unlock(locks);
+}
+
+void cedar::aux::Parameter::appendLocks(std::set<QReadWriteLock*>& locks) const
+{
+  locks.insert(this->mpLock);
+}
+
+void cedar::aux::Parameter::removeLocks(std::set<QReadWriteLock*>& locks) const
+{
+  locks.erase(locks.find(this->mpLock));
+}
 
 void cedar::aux::Parameter::setChangedFlag(bool changed)
 {

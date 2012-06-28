@@ -51,30 +51,32 @@
 //----------------------------------------------------------------------------------------------------------------------
 // register the trigger class
 //----------------------------------------------------------------------------------------------------------------------
-namespace
-{
-  bool declare()
-  {
-    using cedar::proc::ElementDeclarationPtr;
-    using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr multi_trigger_declaration
-    (
-      new ElementDeclarationTemplate<cedar::proc::MultiTrigger>
-      (
-        "Triggers",
-        "cedar.processing.MultiTrigger"
-      )
-    );
-    multi_trigger_declaration->setIconPath(":/triggers/multi_trigger.svg");
-
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(multi_trigger_declaration);
-
-    return true;
-  }
-
-  bool declared = declare();
-}
+// for now, we don't need to use the multi-trigger as it is not useful (and just leads to confusion)
+//namespace
+//{
+//  bool declare()
+//  {
+//    using cedar::proc::ElementDeclarationPtr;
+//    using cedar::proc::ElementDeclarationTemplate;
+//
+//    ElementDeclarationPtr multi_trigger_declaration
+//    (
+//      new ElementDeclarationTemplate<cedar::proc::MultiTrigger>
+//      (
+//        "Triggers",
+//        "cedar.processing.MultiTrigger"
+//      )
+//    );
+//    multi_trigger_declaration->setIconPath(":/triggers/multi_trigger.svg");
+//
+//    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(multi_trigger_declaration);
+//
+//    return true;
+//  }
+//
+//  bool declared = declare();
+//}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

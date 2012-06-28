@@ -72,19 +72,42 @@ public:
 public:
   //!@brief read from a configuration node
   void readFromNode(const cedar::aux::ConfigurationNode& root);
+
   //!@brief write to a configuration node
   void writeToNode(cedar::aux::ConfigurationNode& root) const;
+
   //!@brief set enum value to default
   void makeDefault();
+
   //!@brief return the enum value
   cedar::aux::Enum getValue() const;
+
   //!@brief set enum value to a specified id
   void set(const std::string& enumId);
+
   //!@brief get the enum from which this parameter represents an entry
   const cedar::aux::EnumBase& getEnumDeclaration()
   {
     return *(this->mEnumDeclaration);
   }
+
+  //! Disables the given option.
+  void disable(cedar::aux::EnumId value);
+
+  //! Enables the given option.
+  void enable(cedar::aux::EnumId value);
+
+  //! Enables or disables the given option
+  void setEnabled(cedar::aux::EnumId value, bool enabled);
+
+  //! Enables all values.
+  void enableAll();
+
+  //! Disables all values.
+  void disableAll();
+
+  //! Tests if the given value is enabled.
+  bool isEnabled(cedar::aux::EnumId value) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -106,10 +129,15 @@ protected:
 private:
   //!@brief the enum value of this parameter
   cedar::aux::EnumId mValue;
+
   //!@brief the default value of this parameter
   cedar::aux::EnumId mDefault;
+
   //!@brief a pointer to the enum used by this parameter
   boost::shared_ptr<cedar::aux::EnumBase> mEnumDeclaration;
+
+  //!@brief Set of all the disabled enum values.
+  std::set<cedar::aux::EnumId> mDisabledValues;
 }; // class cedar::aux::VectorParameter
 
 #endif // CEDAR_AUX_ENUM_PARAMETER_H

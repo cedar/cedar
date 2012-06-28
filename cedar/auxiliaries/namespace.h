@@ -55,6 +55,7 @@ namespace cedar
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Configurable);
     CEDAR_DECLARE_AUX_CLASS(NamedConfigurable);
+    CEDAR_DECLARE_AUX_CLASS(Lockable);
     CEDAR_DECLARE_AUX_CLASS(LoopedThread);
     CEDAR_DECLARE_AUX_CLASS(ConfigurationInterface);
     CEDAR_DECLARE_AUX_CLASS(UserData);
@@ -62,6 +63,8 @@ namespace cedar
     //!@endcond
 
     template <class T> class Singleton;
+
+    template <typename T> class MovingAverage;
 
     //!@todo This class may be obsolete once the ConfigurationInterface is removed.
     template <typename T> class IntervalData;
@@ -135,6 +138,8 @@ namespace cedar
     typedef NumericVectorParameter<double> DoubleVectorParameter;
     //!@brief A concretization of NumericVectorParameter for unsigned int values.
     typedef NumericVectorParameter<unsigned int> UIntVectorParameter;
+    //!@brief A concretization of NumericVectorParameter for unsigned int values.
+    typedef NumericVectorParameter<int> IntVectorParameter;
 
     //!@brief A class for associating data with types and mapping the type hierarchy as well.
     template <typename DataType, typename RootType> class TypeHierarchyMap;
@@ -146,6 +151,7 @@ namespace cedar
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleVectorParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntVectorParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringVectorParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntParameter);
@@ -194,19 +200,20 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(ImageData);
     CEDAR_DECLARE_AUX_CLASS(StereoImageData);
     /* exceptions */
-    CEDAR_DECLARE_AUX_CLASS(ConversionFailedException);
-    CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
-    CEDAR_DECLARE_AUX_CLASS(FileNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(BadConnectionException);
+    CEDAR_DECLARE_AUX_CLASS(ConversionFailedException);
     CEDAR_DECLARE_AUX_CLASS(DeadReferenceException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateIdException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateNameException);
+    CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
+    CEDAR_DECLARE_AUX_CLASS(FileNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(FailedAssertionException);
     CEDAR_DECLARE_AUX_CLASS(IndexOutOfRangeException);
     CEDAR_DECLARE_AUX_CLASS(InitializationException);
     CEDAR_DECLARE_AUX_CLASS(InvalidNameException);
     CEDAR_DECLARE_AUX_CLASS(MatrixMismatchException);
     CEDAR_DECLARE_AUX_CLASS(NoDefaultException);
+    CEDAR_DECLARE_AUX_CLASS(NotFoundException);
     CEDAR_DECLARE_AUX_CLASS(NullPointerException);
     CEDAR_DECLARE_AUX_CLASS(ParameterNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(RangeException);

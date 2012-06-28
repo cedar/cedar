@@ -59,6 +59,8 @@ class cedar::proc::DataSlot
   friend class cedar::proc::Connectable;
   friend class cedar::proc::DataConnection;
   friend class cedar::proc::Network;
+  friend class cedar::proc::PromotedExternalData;
+  friend class cedar::proc::PromotedOwnedData;
 
   //--------------------------------------------------------------------------------------------------------------------
   // types
@@ -121,29 +123,46 @@ public:
   //!@brief is this a mandatory connection? i.e. there must be at least one connection using this slot
   bool isMandatory() const;
 
+  //!@brief typo version of getValidity() const
+  CEDAR_DECLARE_DEPRECATED(VALIDITY getValidlity() const);
+
   //!@brief get the current validity of this slot
-  VALIDITY getValidlity() const;
+  virtual VALIDITY getValidity() const;
 
   //!@brief set the current validity of this slot
-  void setValidity(VALIDITY validity);
+  virtual void setValidity(VALIDITY validity);
+
+  //!@brief Removes all data from the slot.
+  virtual void clear() = 0;
 
   //!@brief checks if this Connectable is the parent of this DataSlotItem
   bool isParent(cedar::proc::ConstConnectablePtr parent) const;
+
+  void promote();
+
+  void demote();
+
+  bool isPromoted() const;
+
+  //!@brief get the pointer of this slot's parent
+  cedar::proc::Connectable* getParentPtr();
+
+  //!@brief get the const pointer of this slot's parent
+  const cedar::proc::Connectable* getParentPtr() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief set the internal DataPtr managed by this slot
+  virtual void setData(cedar::aux::DataPtr data) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief set the internal DataPtr managed by this slot
-  virtual void setData(cedar::aux::DataPtr data) = 0;
-  //!@brief get the pointer of this slot's parent
-  cedar::proc::Connectable* getParentPtr();
+  //!@brief Set the name of the data slot
+  void setName(const std::string& name);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -167,6 +186,9 @@ private:
 
   //! Role of the slot (input, output, ...)
   cedar::proc::DataRole::Id mRole;
+
+  //! Promoted flag
+  bool mIsPromoted;
 }; // class cedar::proc::DataSlot
 
 #endif // CEDAR_PROC_DATA_SLOT_H

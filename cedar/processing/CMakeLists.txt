@@ -38,10 +38,23 @@
 #
 #=======================================================================================================================
 
+if(CEDAR_USE_YARP)
+  SET(yarp_moc_headers sinks/NetWriter.h sources/NetReader.h)
+else()
+  SET(yarp_moc_headers "")
+endif()
+
+if(CEDAR_USE_LIB_DC1394)
+  SET(libdc_moc_headers sources/Camera.h)
+else()
+  SET(libdc_moc_headers "")
+endif()
+
 cedar_add_library(cedarproc
   LINK_LIBRARIES
   cedaraux
   cedarunits
+  cedardev
   MOC_HEADERS
   gui/ArchitectureToolBox.h
   gui/ElementClassList.h
@@ -51,15 +64,25 @@ cedar_add_library(cedarproc
   gui/PluginManagerDialog.h
   gui/ProjectionMappingParameter.h
   gui/Scene.h
+  gui/SettingsDialog.h
   gui/StepItem.h
+  gui/Network.h
   gui/ToolBox.h
   gui/View.h
   sources/GaussInput.h
   steps/StaticGain.h
+  steps/Convolution.h
+  sources/Picture.h
+  sources/Video.h
+  sources/GrabberBase.h
   steps/Projection.h
   steps/Resize.h
   LoopedTrigger.h
+  Network.h
   Step.h
+  ${libdc_moc_headers}
+  ${yarp_moc_headers}
   RESOURCES
   gui/icons/icons.qrc
+  gui/images/images.qrc
   )

@@ -105,3 +105,34 @@ const cedar::aux::Enum& cedar::aux::EnumBase::get(const std::string& id) const
     return this->mUndefined;
   }
 }
+
+const cedar::aux::Enum& cedar::aux::EnumBase::getFromPrettyString(const std::string& id) const
+{
+  bool found = false;
+  cedar::aux::EnumId found_id = 0;
+  for
+  (
+    std::map<cedar::aux::EnumId, cedar::aux::Enum>::const_iterator it = mEnumFromId.begin();
+    it != mEnumFromId.end();
+    ++it
+  )
+  {
+    if (it->second.prettyString() == id && found == false)
+    {
+      found_id = it->first;
+      found = true;
+    }
+    else if (it->second.prettyString() == id)
+    {
+      CEDAR_THROW(cedar::aux::DuplicateNameException, "This prettyString is ambiguous.");
+    }
+  }
+  if (found)
+  {
+    return mEnumFromId.find(found_id)->second;
+  }
+  else
+  {
+    return this->mUndefined;
+  }
+}

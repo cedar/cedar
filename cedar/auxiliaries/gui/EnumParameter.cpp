@@ -43,6 +43,7 @@
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
+#include <QStandardItemModel>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -89,21 +90,48 @@ void cedar::aux::gui::EnumParameter::parameterPointerChanged()
 
   this->mpEdit->clear();
   int select_index = -1;
+  int first_enabled = -1;
   for (size_t i = 0; i < parameter->getEnumDeclaration().list().size(); ++i)
   {
     const cedar::aux::Enum& enum_val = parameter->getEnumDeclaration().list().at(i);
-    if (enum_val == parameter->getValue())
+    bool enabled = parameter->isEnabled(enum_val);
+    if (first_enabled == -1 && enabled)
+    {
+      first_enabled = static_cast<int>(i);
+    }
+    if (enum_val == parameter->getValue() && enabled)
     {
       select_index = static_cast<int>(i);
     }
-    this->mpEdit->addItem(enum_val.prettyString().c_str(), QVariant(QString(enum_val.name().c_str())));
+    QVariant data(QString(enum_val.name().c_str()));
+    this->mpEdit->addItem(enum_val.prettyString().c_str(), data);
+    int item_index = this->mpEdit->findData(data);
+    QStandardItemModel* model = qobject_cast<QStandardItemModel*>(this->mpEdit->model());
+
+    CEDAR_DEBUG_ASSERT(model != NULL);
+
+    QModelIndex index = model->index(item_index, this->mpEdit->modelColumn(), this->mpEdit->rootModelIndex());
+    QStandardItem* p_item = model->itemFromIndex(index);
+    CEDAR_DEBUG_ASSERT(p_item != NULL);
+    p_item->setEnabled(enabled);
   }
-  if(select_index != -1)
+  if (select_index != -1)
   {
     this->mpEdit->setCurrentIndex(select_index);
   }
+  else // may set the index to -1 or first enabled option
+  {
+    this->mpEdit->setCurrentIndex(first_enabled);
+    this->currentIndexChanged(this->mpEdit->currentText());
+  }
 
-  QObject::connect(this->mpEdit, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(currentIndexChanged(const QString&)));
+  QObject::connect
+  (
+    this->mpEdit,
+    SIGNAL(currentIndexChanged(const QString&)),
+    this,
+    SLOT(currentIndexChanged(const QString&))
+  );
 }
 
 void cedar::aux::gui::EnumParameter::currentIndexChanged(const QString&)

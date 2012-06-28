@@ -34,6 +34,9 @@
 
 ======================================================================================================================*/
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 #ifndef CEDAR_AUX_STRING_FUNCTIONS_H
 #define CEDAR_AUX_STRING_FUNCTIONS_H
 
@@ -61,6 +64,19 @@ namespace cedar
       std::ostringstream streamOut;
       streamOut << value;
       return streamOut.str();
+    }
+
+    /*!@brief Generates a string that contains a human-readable version number from a version made with the
+     *        CEDAR_MAKE_VERSION macro.
+     *
+     * @param version Integer generated with CEDAR_MAKE_VERSION.
+     */
+    inline std::string versionNumberToString(unsigned int version)
+    {
+      std::string res = cedar::aux::toString(CEDAR_GET_VERSION_MAJOR(version));
+      res += "." + cedar::aux::toString(CEDAR_GET_VERSION_MINOR(version));
+      res += "." + cedar::aux::toString(CEDAR_GET_VERSION_BUGFIX(version));
+      return res;
     }
 
     /*!@brief  Splits a string based on the given separator.
@@ -92,6 +108,74 @@ namespace cedar
       }
       std::string chunk = str.substr(last_index, index - last_index);
       parts.push_back(chunk);
+    }
+
+    /*!@brief  Splits a string in two parts, up to the first occurrence of the separator.
+     *
+     *         For example, the string "This is an example" is split into the parts "This" and "is an example"] when
+     *         the separator " " is used.
+     *
+     * @param  str The string to split.
+     * @param  separator The separator.
+     * @param  first First part of the string.
+     * @param  rest Second part of the string - may contain separators.
+     *
+     * @remark If the separator is not found in \em str (e.g., if \em str is empty), the function will return the full
+     *         string in first and "" in rest.
+     */
+    inline void splitFirst
+                (
+                  const std::string& str,
+                  const std::string& separator,
+                  std::string& first,
+                  std::string& rest
+                )
+    {
+      size_t index = str.find(separator);
+      if (index != std::string::npos)
+      {
+        first = str.substr(0, index);
+        rest = str.substr(index + 1, std::string::npos);
+      }
+      else
+      {
+        first = str;
+        rest = "";
+      }
+    }
+
+    /*!@brief  Splits a string in two parts, up to the last occurrence of the separator.
+     *
+     *         For example, the string "This is an example" is split into the parts "This is an" and "example"] when
+     *         the separator " " is used.
+     *
+     * @param  str The string to split.
+     * @param  separator The separator.
+     * @param  rest First part of the string - may contain separators.
+     * @param  last Second part of the string.
+     *
+     * @remark If the separator is not found in \em str (e.g., if \em str is empty), the function will return the full
+     *         string in last and "" in rest.
+     */
+    inline void splitLast
+                (
+                  const std::string& str,
+                  const std::string& separator,
+                  std::string& rest,
+                  std::string& last
+                )
+    {
+      size_t index = str.rfind(separator);
+      if (index != std::string::npos)
+      {
+        rest = str.substr(0, index);
+        last = str.substr(index + 1, std::string::npos);
+      }
+      else
+      {
+        last = str;
+        rest = "";
+      }
     }
 
     /*!@brief  Joins an iterable list of strings together.

@@ -77,6 +77,8 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(OwnedData);
     CEDAR_DECLARE_PROC_CLASS(PluginProxy);
     CEDAR_DECLARE_PROC_CLASS(PluginDeclaration);
+    CEDAR_DECLARE_PROC_CLASS(PromotedExternalData);
+    CEDAR_DECLARE_PROC_CLASS(PromotedOwnedData);
     CEDAR_DECLARE_PROC_CLASS(Triggerable);
     CEDAR_DECLARE_PROC_CLASS(TriggerConnection);
     CEDAR_DECLARE_PROC_CLASS(ProjectionMapping);
@@ -97,6 +99,7 @@ namespace cedar
     //!@cond SKIPPED_DOCUMENTATION
     class CEDAR_PROC_LIB_EXPORT ConnectionMemberDeletedException;
     class CEDAR_PROC_LIB_EXPORT ConnectionNotFoundException;
+    class CEDAR_PROC_LIB_EXPORT DeadlockException;
     class CEDAR_PROC_LIB_EXPORT DuplicateConnectionException;
     class CEDAR_PROC_LIB_EXPORT DuplicateNameException;
     class CEDAR_PROC_LIB_EXPORT InvalidNameException;

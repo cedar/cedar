@@ -41,6 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/IdeApplication.h"
 #include "cedar/processing/Manager.h"
+#include "cedar/devices/sensors/visual/Grabber.h"
 #include "cedar/dynamics/namespace.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -49,13 +50,13 @@
 // SYSTEM INCLUDES
 #include <fstream>
 #include <cstdlib>
-#ifdef __GNUG__
+#ifdef CEDAR_COMPILER_GCC
   #include <csignal>
-#elif defined _MSC_VER
+#elif defined CEDAR_COMPILER_MSVC
   #include <signal.h>
 #else
   #error Please implement signal handling for your compiler.
-#endif // __GNUG__
+#endif // CEDAR_COMPILER_GCC
 
 #define CATCH_EXCEPTIONS_IN_GUI
 
@@ -95,26 +96,35 @@ void cedar::proc::gui::IdeApplication::signalHandler(int signal_id)
       signal_name = "SIGABRT";
       break;
 
+    case SIGINT:
+      signal_name = "SIGINT";
+      break;
+
     default:
       signal_name = "(unknown signal id)";
   }
 
-  std::ofstream stream;
-  std::string file_path;
-  cedar::aux::System::openCrashFile(stream, file_path);
-  stream << "Application received signal " << signal_name << std::endl;
-  cedar::aux::StackTrace trace;
-  stream << trace << std::endl;
+  if (signal_id != SIGINT)
+  {
+    std::ofstream stream;
+    std::string file_path;
+    cedar::aux::System::openCrashFile(stream, file_path);
+    stream << "Application received signal " << signal_name << std::endl;
+    cedar::aux::StackTrace trace;
+    stream << trace << std::endl;
 
-  std::cout << "Application received signal " << signal_name << std::endl;
-  std::cout << "A stack trace has been written to " << file_path << std::endl;
+    std::cout << "Application received signal " << signal_name << std::endl;
+    std::cout << "A stack trace has been written to " << file_path << std::endl;
+  }
+
+  cedar::proc::gui::IdeApplication::cleanupAfterCrash();
 
   // reset the abort signal to avoid infinite recursion
   signal(SIGABRT, SIG_DFL);
   abort();
 }
 
-#ifdef _MSC_VER
+#ifdef CEDAR_COMPILER_MSVC
 LONG cedar::proc::gui::IdeApplication::vcCrashHandler(LPEXCEPTION_POINTERS exceptions)
 {
   std::ofstream stream;
@@ -145,19 +155,23 @@ LONG cedar::proc::gui::IdeApplication::vcCrashHandler(LPEXCEPTION_POINTERS excep
   stream << trace << std::endl;
 
   std::cout << "A stack trace has been written to " << file_path << std::endl;
+
+  cedar::proc::gui::IdeApplication::cleanupAfterCrash();
+
   LONG retval = EXCEPTION_CONTINUE_SEARCH;
   return retval;
 }
-#endif // _MSC_VER
+#endif // CEDAR_COMPILER_MSVC
 
 int cedar::proc::gui::IdeApplication::exec()
 {
-#ifdef _MSC_VER
+#ifdef CEDAR_COMPILER_MSVC
   SetUnhandledExceptionFilter(&cedar::proc::gui::IdeApplication::vcCrashHandler);
 #else
   signal(SIGSEGV, &cedar::proc::gui::IdeApplication::signalHandler);
   signal(SIGABRT, &cedar::proc::gui::IdeApplication::signalHandler);
-#endif // _MSC_VER
+  signal(SIGINT, &cedar::proc::gui::IdeApplication::signalHandler);
+#endif // CEDAR_COMPILER_MSVC
 
   this->mpIde->show();
   int ret = this->QApplication::exec();
@@ -166,6 +180,11 @@ int cedar::proc::gui::IdeApplication::exec()
   return ret;
 }
 
+void cedar::proc::gui::IdeApplication::cleanupAfterCrash()
+{
+  cedar::dev::sensors::visual::Grabber::emergencyCleanup();
+  QApplication::exit(-1);
+}
 
 bool cedar::proc::gui::IdeApplication::notify(QObject* pReceiver, QEvent* pEvent)
 {

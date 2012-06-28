@@ -49,28 +49,34 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::aux::kernel::Kernel::Kernel()
-:
-mKernel(new cedar::aux::MatData()),
-_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000))
-{
-  cedar::aux::LogSingleton::getInstance()->allocating(this);
-
-  mpReadWriteLockOutput = new QReadWriteLock();
-  _mDimensionality->setConstant(true);
-}
 
 cedar::aux::kernel::Kernel::Kernel(unsigned int dimensionality)
 :
 cedar::aux::Configurable(),
 mKernel(new cedar::aux::MatData()),
-_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000))
+_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", dimensionality, 1, 1000))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
+
+  std::vector<int> anchor_defaults;
+  anchor_defaults.resize(dimensionality, 0);
+  _mAnchor = cedar::aux::IntVectorParameterPtr
+             (
+               new cedar::aux::IntVectorParameter
+               (
+                 this,
+                 "anchor",
+                 anchor_defaults,
+                 std::numeric_limits<int>::min(),
+                 std::numeric_limits<int>::max()
+               )
+             );
 
   mpReadWriteLockOutput = new QReadWriteLock();
   _mDimensionality->setValue(dimensionality);
   _mDimensionality->setConstant(true);
+
+  QObject::connect(this->_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
 }
 
 cedar::aux::kernel::Kernel::~Kernel()
@@ -87,9 +93,19 @@ cedar::aux::kernel::Kernel::~Kernel()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cv::Mat cedar::aux::kernel::Kernel::convolveWith(const cv::Mat& mat) const
+unsigned int cedar::aux::kernel::Kernel::getSize(size_t dimension) const
 {
-  return cedar::aux::math::convolve(mat, this->mKernel->getData());
+  CEDAR_ASSERT(dimension < this->getDimensionality());
+
+  // make sure that casting to unsigned doesn't have bad sideeffects
+  CEDAR_DEBUG_ASSERT(this->mKernel->getData().size[dimension] >= 0);
+
+  return static_cast<unsigned int>(this->mKernel->getData().size[dimension]);
+}
+
+void cedar::aux::kernel::Kernel::dimensionalityChanged()
+{
+  this->_mAnchor->resize(this->getDimensionality(), 0);
 }
 
 void cedar::aux::kernel::Kernel::hideDimensionality(bool hide)
@@ -126,4 +142,42 @@ void cedar::aux::kernel::Kernel::updateKernel()
 {
   this->calculate();
   emit kernelUpdated();
+}
+
+cv::Mat cedar::aux::kernel::Kernel::getRowsCols() const
+{
+  cv::Mat rows_cols = cv::Mat::ones(1, 2, CV_32F);
+
+  // check for 0D-Kernels:
+  if (this->getDimensionality() == 0)
+  {
+    // no border handling necessary
+    return rows_cols;
+  }
+  else
+  {
+    unsigned int kernel_dim = this->getDimensionality();
+
+    switch (kernel_dim)
+    {
+      case 0:
+        break;
+      case 1:
+        rows_cols.at<float>(0,0) = static_cast<float>(this->getSize(0));
+        rows_cols.at<float>(0,1) = 1.0;
+        break;
+      case 2:
+        rows_cols.at<float>(0,0) = static_cast<float>(this->getSize(0));
+        rows_cols.at<float>(0,1) = static_cast<float>(this->getSize(1));
+        break;
+      default:
+        CEDAR_THROW(
+                   cedar::aux::RangeException,
+                   "Kernel dimension and/or size not supported in 'full' convolution mode."
+                   );
+        break;
+    }
+
+    return rows_cols;
+  }
 }

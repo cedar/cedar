@@ -43,6 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/threadingUtilities.h"
 
 // SYSTEM INCLUDES
 #include <map>
@@ -127,8 +128,10 @@ public:
    * thrown
    */
   void addConfigurableChild(const std::string& name, cedar::aux::ConfigurablePtr child);
+
   //!@brief removes a child configuration from the configuration tree - if name is not found, an exception is thrown
   void removeConfigurableChild(const std::string& name);
+
   /*!@brief register a function pointer with this function to react to any changes in the tree structure (for example,
    * removing a child node)
    */
@@ -154,6 +157,14 @@ public:
    */
   cedar::aux::ConfigurablePtr getConfigurableChild(const std::string& path);
 
+  /*!@brief Locks all parameters of the configurable.
+   */
+  void lockParameters(cedar::aux::LOCK_TYPE lockType);
+
+  /*!@brief Unlocks all parameters of the configurable.
+   */
+  void unlockParameters();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -168,7 +179,7 @@ private:
   /*!@brief register a new parameter at this Configurable - throws an exception if parameter is already part of this
    * Configurable
    */
-  void registerParameter(cedar::aux::ParameterPtr parameter);
+  void registerParameter(cedar::aux::Parameter* parameter);
 
   //!@brief Transforms the old config format to one readable in the new interface.
   void oldFormatToNew(cedar::aux::ConfigurationNode& node);
@@ -178,6 +189,12 @@ private:
 
   //!@brief Sets all parameters to their default values.
   void defaultAll();
+
+  //!@brief Updates the lock set of the configurable.
+  void updateLockSet();
+
+  //!@brief Appends the locks of this configurable and its children to the set.
+  void appendLocks(std::set<QReadWriteLock*>& locks);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -197,10 +214,18 @@ protected:
 private:
   //!@brief list of parameters registered at this Configurable instance
   ParameterList mParameterList;
+
   //!@brief map of registered parameters, using the parameter name as key
   ParameterMap mParameterAssociations;
+
   //!@brief map of children of this Configurable instance
   Children mChildren;
+
+  /*!@brief   The lockable used for locking this configurable and all its parameters.
+   *
+   * @remarks In order to avoid multiple inheritance down the line, configurable has, rather than is, a lockable.
+   */
+  std::set<QReadWriteLock*> mParameterLocks;
 }; // class cedar::aux::Configurable
 
 #endif // CEDAR_AUX_CONFIGURABLE_H

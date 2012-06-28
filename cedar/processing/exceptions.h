@@ -51,6 +51,12 @@ class cedar::proc::InvalidNameException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::proc::InvalidNameException
 
+/*!@brief An exception that occurs when a deadlock may be caused by a user action.
+ */
+class cedar::proc::DeadlockException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::proc::DeadlockException
+
 /*!@brief An exception that occurs when an object is not found in a Registry.
  */
 class cedar::proc::InvalidObjectException : public cedar::aux::ExceptionBase

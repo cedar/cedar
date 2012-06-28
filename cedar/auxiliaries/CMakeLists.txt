@@ -61,14 +61,19 @@ cedar_add_library(cedaraux
   gui/MatrixPlot.h
   gui/MatrixPlot1D.h
   gui/MatrixPlot2D.h
+  gui/MatrixSlicePlot3D.h
   gui/PropertyPane.h
   gui/ImagePlot.h
   gui/StringParameter.h
   gui/UIntParameter.h
   gui/UIntVectorParameter.h
+  gui/IntVectorParameter.h
+  convolution/Convolution.h
   Parameter.h
+  kernel/Separable.h
   kernel/Kernel.h
   kernel/Gauss.h
+  kernel/Box.h
   RESOURCES
   gui/icons/message_icons.qrc
   LINK_LIBRARIES

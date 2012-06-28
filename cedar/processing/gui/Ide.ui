@@ -190,16 +190,26 @@
     </property>
     <addaction name="mpThreadsStartAll"/>
     <addaction name="mpThreadsStopAll"/>
+    <addaction name="mpActionResetRootNetwork"/>
    </widget>
    <widget class="QMenu" name="mpMenuWindows">
     <property name="title">
      <string>Windows</string>
     </property>
+    <addaction name="mpActionSettings"/>
+    <addaction name="separator"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="mpActionAbout"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuPlugins"/>
    <addaction name="menuSimulation"/>
    <addaction name="mpMenuWindows"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QDockWidget" name="mpItemsWidget">
@@ -270,7 +280,7 @@
           <x>0</x>
           <y>0</y>
           <width>121</width>
-          <height>310</height>
+          <height>423</height>
          </rect>
         </property>
         <attribute name="label">
@@ -282,8 +292,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>121</width>
-          <height>310</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -328,6 +338,7 @@
    </attribute>
    <addaction name="mpActionShowHideGrid"/>
    <addaction name="mpActionSave"/>
+   <addaction name="mpActionResetRootNetwork"/>
   </widget>
   <action name="mpActionNew">
    <property name="text">
@@ -440,6 +451,31 @@
   <action name="mpRecentFiles">
    <property name="text">
     <string>Recent files</string>
+   </property>
+  </action>
+  <action name="mpActionSettings">
+   <property name="text">
+    <string>Settings...</string>
+   </property>
+  </action>
+  <action name="mpActionAbout">
+   <property name="text">
+    <string>About...</string>
+   </property>
+  </action>
+  <action name="mpActionResetRootNetwork">
+   <property name="icon">
+    <iconset resource="icons/icons.qrc">
+     <normaloff>:/toolbaricons/reset.svg</normaloff>:/toolbaricons/reset.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Reset root network</string>
+   </property>
+   <property name="toolTip">
+    <string>Resets the root network of the current architecture.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
    </property>
   </action>
  </widget>
