@@ -673,15 +673,15 @@ protected:
     bool mRecord;
 
     /*! @brief  mNumCams should be used instead of mImageMatVector.size()
-     * @remarks
-     *          Initialization should be done in the constructor of the derived class.
+     *
+     *  Initialization should be done in the constructor of the derived class.
      */
     unsigned int mNumCams;
 
 
     /*! @brief Read/write lock
-     *  @remarks
-     *          Used for concurrent access to the mImageMatVector - matrices
+     *
+     *  Used for concurrent access to the mImageMatVector - matrices
      */
     QReadWriteLock* mpReadWriteLock;
     

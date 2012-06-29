@@ -38,11 +38,11 @@
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_CONFIG_H
 
 #include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
-#ifdef CEDAR_USE_LIB_DC1394
+//#ifdef CEDAR_USE_LIB_DC1394
 
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "cedar/auxiliaries/Configurable.h"
 #include "cedar/devices/sensors/visual/namespace.h"
 #include "cedar/auxiliaries/Log.h"
 
@@ -57,7 +57,7 @@
 
 class cedar::dev::sensors::visual::CameraConfig
 :
-public cedar::aux::ConfigurationInterface
+public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -77,7 +77,7 @@ public:
     std::string fps; //change to _mFps
     std::string mode;
     std::string iso_speed;
-    std::string capability_config_file_name;
+    //std::string capability_config_file_name;
   };
 
   //!@endcond
@@ -176,7 +176,7 @@ private:
 
 }; // cedar::dev::sensors::visual::CameraConfig
 
-#endif // CEDAR_USE_LIB_DC1394
+//#endif // CEDAR_USE_LIB_DC1394
 
 #endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_CONFIG_H
 
