@@ -59,15 +59,14 @@ cedar::dev::sensors::visual::CameraConfig::CameraConfig(
                             CameraPropertyValues &camPropertyValues
                           )
 :
-cedar::aux::ConfigurationInterface(configFileName),
+cedar::aux::Configurable(),
 mCamSettings(camSettings),
 mCamPropertyValues(camPropertyValues)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
-                                             ConfigurationInterface::getName() + ":"
-                                               + " Channel " + boost::lexical_cast<std::string>(channel)
+                                             " Channel " + boost::lexical_cast<std::string>(channel)
                                                + " Config-file: " + configFileName,
                                              "cedar::dev::sensors::visual::CameraConfig::CameraConfig()"
                                            );
@@ -75,11 +74,11 @@ mCamPropertyValues(camPropertyValues)
   mChannelPrefix = "ch"+boost::lexical_cast<std::string>(channel)+"_";
 
   bool result = declareParameter();
-  ConfigurationInterface::readOrDefaultConfiguration();
+//  ConfigurationInterface::readOrDefaultConfiguration();
 
   if (not result )
   {
-    std::string err = ConfigurationInterface::getName() + ": Channel "
+    std::string err = "Channel "
                       + boost::lexical_cast<std::string>(channel)
                       + " - Critical error in constructor";
 
@@ -103,12 +102,9 @@ bool cedar::dev::sensors::visual::CameraConfig::saveConfiguration()
 {
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
-                                             ConfigurationInterface::getName() 
-                                               + ": channel " + boost::lexical_cast<std::string>(mChannel),
+                                             "Channel "+boost::lexical_cast<std::string>(mChannel),
                                              "cedar::dev::sensors::visual::CameraConfig::saveConfiguration()"
                                            );
-   
-  ConfigurationInterface::writeConfiguration();
   return true;
 }
 
@@ -124,6 +120,12 @@ bool cedar::dev::sensors::visual::CameraConfig::declareParameter()
   // -------------------------------
   // settings
   // -------------------------------
+
+  //****************************************************************
+  //!@todo configswitch
+  //****************************************************************
+  // dynamically create parameters
+  /*
   param_value = CameraVideoMode::type().get(CameraVideoMode::MODE_NOT_SET).name();
   param_name = mChannelPrefix + "cam_mode";
   result = (addParameter(&mCamSettings.mode, param_name, param_value) == CONFIG_SUCCESS) && result;
@@ -137,7 +139,7 @@ bool cedar::dev::sensors::visual::CameraConfig::declareParameter()
   param_value = CameraIsoSpeed::type().get(CameraIsoSpeed::ISO_NOT_SET).name();
   param_name = mChannelPrefix + "cam_iso_speed";
   result = (addParameter(&mCamSettings.iso_speed, param_name, param_value) == CONFIG_SUCCESS) && result;
-
+*/
   // -------------------------------
   // properties
   // -------------------------------
@@ -149,7 +151,11 @@ bool cedar::dev::sensors::visual::CameraConfig::declareParameter()
     std::string param_name = mChannelPrefix + CameraProperty::type().get(param_id).name();
     double param_old_val = it->second;
 
-    result = (addParameter(param_adr, param_name, CAMERA_PROPERTY_MODE_AUTO) == CONFIG_SUCCESS) && result;
+    //****************************************************************
+    //!@todo configswitch
+    //****************************************************************
+    // dynamically create parameters
+   // result = (addParameter(param_adr, param_name, CAMERA_PROPERTY_MODE_AUTO) == CONFIG_SUCCESS) && result;
 
     //save status not supported in our map after configuration interface have modified it
     if (param_old_val == CAMERA_PROPERTY_NOT_SUPPORTED)

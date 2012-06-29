@@ -38,41 +38,38 @@
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/EnumParameter.h"
 
 // SYSTEM INCLUDES
 
 //------------------------------------------------------------------------------
 // constructors and destructor
 //------------------------------------------------------------------------------
-cedar::aux::LoopedThread::LoopedThread(double stepSize, double idleTime,const std::string& configFileName)
+cedar::aux::LoopedThread::LoopedThread
+(
+  double stepSize,
+  double idleTime,
+  double simulatedTime,
+  cedar::aux::EnumId mode
+
+)
 :
-cedar::aux::ConfigurationInterface(configFileName)
+_mStepSize(new cedar::aux::DoubleParameter(this, "step size", stepSize)),
+_mIdleTime(new cedar::aux::DoubleParameter(this, "idle time", idleTime)),
+_mSimulatedTime(new cedar::aux::DoubleParameter(this, "simulated time", simulatedTime)),
+_mLoopMode
+(
+  new cedar::aux::EnumParameter
+  (
+    this,
+    "loop mode",
+    cedar::aux::LoopMode::typePtr(),
+    mode
+  )
+)
 {
   mStop  = false;
   initStatistics();
-
-  mStepSize = boost::posix_time::microseconds(static_cast<unsigned int>(1000 * stepSize + 0.5));
-  mIdleTime = static_cast<unsigned int>(1000 * idleTime + 0.5);
-  mUseFixedStepSize = true;
-  mSimulatedTime = boost::posix_time::microseconds(0);
-}
-
-cedar::aux::LoopedThread::LoopedThread(const std::string& configFileName)
-:
-cedar::aux::ConfigurationInterface(configFileName)
-{
-  mStop = false;
-  initStatistics();
-  readParamsFromConfigFile();
-}
-
-cedar::aux::LoopedThread::LoopedThread(const char* pConfigFileName)
-:
-cedar::aux::ConfigurationInterface(pConfigFileName)
-{
-  mStop = false;
-  initStatistics();
-  readParamsFromConfigFile();
 }
 
 cedar::aux::LoopedThread::~LoopedThread()
@@ -99,7 +96,7 @@ void cedar::aux::LoopedThread::stop(unsigned int time, bool suppressWarning)
       );
     }
 
-    if (suppressWarning == false && mMaxStepsTaken > 1.01 && mSimulatedTime.total_microseconds() == 0)
+    if (suppressWarning == false && mMaxStepsTaken > 1.01 && _mSimulatedTime->getValue() <= 0.0)
     {
       std::string message = "The system was not fast enough to stay to scheduled thread timing. ";
       message += "Consider using a larger step size.\n";
@@ -123,120 +120,115 @@ void cedar::aux::LoopedThread::stop(unsigned int time, bool suppressWarning)
 void cedar::aux::LoopedThread::run(void)
 {
   // we do not want to change the step size while running
-  boost::posix_time::time_duration step_size = mStepSize;
-  bool use_fixed_step_size = mUseFixedStepSize;
+  boost::posix_time::time_duration step_size
+    = boost::posix_time::microseconds(static_cast<unsigned int>(1000 * this->getStepSize() + 0.5));//mStepSize;
   initStatistics();
 
   // which mode?
-  if (step_size.total_microseconds() == 0)
+  switch (_mLoopMode->getValue())
   {
-    // fast running mode
-
-    mLastTimeStepStart = boost::posix_time::microsec_clock::universal_time();
-    mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
-    boost::posix_time::time_duration time_difference;
-
-    while (!mStop)
+    case cedar::aux::LoopMode::RealTime:
     {
-      usleep(mIdleTime);
-      mLastTimeStepStart = mLastTimeStepEnd;
+      mLastTimeStepStart = boost::posix_time::microsec_clock::universal_time();
       mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
+      boost::posix_time::time_duration time_difference;
 
-      if(mSimulatedTime.total_microseconds() == 0)
+      while (!mStop)
       {
+        mLastTimeStepStart = mLastTimeStepEnd;
+        mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
+
         time_difference = mLastTimeStepEnd - mLastTimeStepStart;
-        step(time_difference.total_microseconds() * 0.001);
+        this->step(time_difference.total_microseconds() * 0.001);
+        usleep(static_cast<unsigned int>(1000 * _mIdleTime->getValue() + 0.5));
       }
-      else
-      {
-        step(mSimulatedTime.total_microseconds() * 0.001);
-      }
+      break;
     }
-  }
-  else // step_size.total_microseconds() != 0
-  {
-    // regular mode with fixed time
-
-    // initialization
-    mLastTimeStepStart = boost::posix_time::microsec_clock::universal_time();
-    mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
-    boost::posix_time::ptime scheduled_wakeup = mLastTimeStepEnd + step_size;
-    srand(boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds());
-
-    // some auxiliary variables
-    boost::posix_time::time_duration sleep_duration = boost::posix_time::microseconds(0);
-    boost::posix_time::time_duration step_duration = boost::posix_time::microseconds(0);
-
-    while (!mStop)
+    case cedar::aux::LoopMode::Simulated:
     {
-      // sleep until next wake up time
-      sleep_duration = scheduled_wakeup - boost::posix_time::microsec_clock::universal_time();
-      usleep(std::max<int>(0, sleep_duration.total_microseconds()));
-
-      // determine time since last run
-      mLastTimeStepStart = mLastTimeStepEnd;
-      mLastTimeStepEnd = scheduled_wakeup;
-      step_duration = mLastTimeStepEnd - mLastTimeStepStart;
-
-      // calculate number of time steps taken
-      double steps_taken
-        = static_cast<double>(step_duration.total_microseconds()) / static_cast<double>(step_size.total_microseconds());
-      unsigned int full_steps_taken = static_cast<unsigned int>(steps_taken + 0.5);
-
-      #if defined DEBUG && defined SHOW_TIMING_HELPERS
-      // print warning if time steps have been skipped
-      if (steps_taken > 1.01)
+      while (!mStop)
       {
-        cedar::aux::LogSingleton::getInstance()->debug
-        (
-          "Warning: " + cedar::aux::toString(steps_taken) + " time steps taken at once! "
-          "Your system might be too slow for an execution interval of "
-          + cedar::aux::toString(step_size.total_microseconds())
-          + " microseconds. Consider using a longer interval!",
-          "cedar::aux::LoopedThread::stop(unsigned int, bool)"
-        );
+        step(_mSimulatedTime->getValue());
+        usleep(static_cast<unsigned int>(1000 * _mIdleTime->getValue() + 0.5));
       }
-      #endif
+      break;
+    }
+    case cedar::aux::LoopMode::Fixed:
+    {
+      // initialization
+      mLastTimeStepStart = boost::posix_time::microsec_clock::universal_time();
+      mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
+      boost::posix_time::ptime scheduled_wakeup = mLastTimeStepEnd + step_size;
+      srand(boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds());
 
-      // here we have to distinguish between the different working modes of the
-      // thread. either we want to wake up on the next fixed time step or as
-      // soon as possible if we are already late.
-      if (use_fixed_step_size)
+      // some auxiliary variables
+      boost::posix_time::time_duration sleep_duration = boost::posix_time::microseconds(0);
+      boost::posix_time::time_duration step_duration = boost::posix_time::microseconds(0);
+
+      while (!mStop)
       {
+        // sleep until next wake up time
+        sleep_duration = scheduled_wakeup - boost::posix_time::microsec_clock::universal_time();
+        usleep(std::max<int>(0, sleep_duration.total_microseconds()));
+
+        // determine time since last run
+        mLastTimeStepStart = mLastTimeStepEnd;
+        mLastTimeStepEnd = scheduled_wakeup;
+        step_duration = mLastTimeStepEnd - mLastTimeStepStart;
+
+        // calculate number of time steps taken
+        double steps_taken
+          = static_cast<double>(step_duration.total_microseconds()) / static_cast<double>(step_size.total_microseconds());
+        unsigned int full_steps_taken = static_cast<unsigned int>(steps_taken + 0.5);
+
         // update statistics
         updateStatistics(full_steps_taken);
 
         // call step function
-        if (mSimulatedTime.total_microseconds() == 0)
-        {
-          step(full_steps_taken * step_size.total_microseconds() * 0.001);
-        }
-        else
-        {
-          step(mSimulatedTime.total_microseconds() * 0.001);
-        }
+        step(full_steps_taken * step_size.total_microseconds() * 0.001);
 
         // schedule the next wake up
         while (scheduled_wakeup < boost::posix_time::microsec_clock::universal_time())
         {
           scheduled_wakeup = scheduled_wakeup + step_size;
         }
+      } // while(!mStop)
 
-      }
-      else
+      break;
+    }
+    case cedar::aux::LoopMode::FixedAdaptive:
+    {
+      // initialization
+      mLastTimeStepStart = boost::posix_time::microsec_clock::universal_time();
+      mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
+      boost::posix_time::ptime scheduled_wakeup = mLastTimeStepEnd + step_size;
+      srand(boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds());
+
+      // some auxiliary variables
+      boost::posix_time::time_duration sleep_duration = boost::posix_time::microseconds(0);
+      boost::posix_time::time_duration step_duration = boost::posix_time::microseconds(0);
+
+      while (!mStop)
       {
+        // sleep until next wake up time
+        sleep_duration = scheduled_wakeup - boost::posix_time::microsec_clock::universal_time();
+        usleep(std::max<int>(0, sleep_duration.total_microseconds()));
+
+        // determine time since last run
+        mLastTimeStepStart = mLastTimeStepEnd;
+        mLastTimeStepEnd = scheduled_wakeup;
+        step_duration = mLastTimeStepEnd - mLastTimeStepStart;
+
+        // calculate number of time steps taken
+        double steps_taken
+          = static_cast<double>(step_duration.total_microseconds()) / static_cast<double>(step_size.total_microseconds());
+
         // update statistics
         updateStatistics(steps_taken);
 
         // call step function
-        if (mSimulatedTime.total_microseconds() == 0)
-        {
-          step(steps_taken * step_size.total_microseconds() * 0.001);
-        }
-        else
-        {
-          step(mSimulatedTime.total_microseconds() * 0.001);
-        }
+        step(steps_taken * step_size.total_microseconds() * 0.001);
+
 
         // schedule the next wake up
         scheduled_wakeup = std::max<boost::posix_time::ptime>
@@ -245,9 +237,136 @@ void cedar::aux::LoopedThread::run(void)
                              boost::posix_time::microsec_clock::universal_time()
                            );
 
-      } // if(mUseFixedStepSize)
+      } // while(!mStop)
 
-    } // while(!mStop)
+      break;
+    }
+    default:
+    {
+      // this should never happen - unrecognized enum case
+      CEDAR_ASSERT(false);
+    }
+  }
+  if (step_size.total_microseconds() == 0)
+  {
+//    // fast running mode
+//
+//    mLastTimeStepStart = boost::posix_time::microsec_clock::universal_time();
+//    mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
+//    boost::posix_time::time_duration time_difference;
+//
+//    while (!mStop)
+//    {
+//      usleep(static_cast<unsigned int>(1000 * _mIdleTime->getValue() + 0.5));
+//      mLastTimeStepStart = mLastTimeStepEnd;
+//      mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
+//
+//      if(mSimulatedTime.total_microseconds() == 0)
+//      {
+//        time_difference = mLastTimeStepEnd - mLastTimeStepStart;
+//        step(time_difference.total_microseconds() * 0.001);
+//      }
+//      else
+//      {
+//        step(mSimulatedTime.total_microseconds() * 0.001);
+//      }
+//    }
+  }
+  else // step_size.total_microseconds() != 0
+  {
+//    // regular mode with fixed time
+//
+//    // initialization
+//    mLastTimeStepStart = boost::posix_time::microsec_clock::universal_time();
+//    mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
+//    boost::posix_time::ptime scheduled_wakeup = mLastTimeStepEnd + step_size;
+//    srand(boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds());
+//
+//    // some auxiliary variables
+//    boost::posix_time::time_duration sleep_duration = boost::posix_time::microseconds(0);
+//    boost::posix_time::time_duration step_duration = boost::posix_time::microseconds(0);
+//
+//    while (!mStop)
+//    {
+//      // sleep until next wake up time
+//      sleep_duration = scheduled_wakeup - boost::posix_time::microsec_clock::universal_time();
+//      usleep(std::max<int>(0, sleep_duration.total_microseconds()));
+//
+//      // determine time since last run
+//      mLastTimeStepStart = mLastTimeStepEnd;
+//      mLastTimeStepEnd = scheduled_wakeup;
+//      step_duration = mLastTimeStepEnd - mLastTimeStepStart;
+//
+//      // calculate number of time steps taken
+//      double steps_taken
+//        = static_cast<double>(step_duration.total_microseconds()) / static_cast<double>(step_size.total_microseconds());
+//      unsigned int full_steps_taken = static_cast<unsigned int>(steps_taken + 0.5);
+//
+//      #if defined DEBUG && defined SHOW_TIMING_HELPERS
+//      // print warning if time steps have been skipped
+//      if (steps_taken > 1.01)
+//      {
+//        cedar::aux::LogSingleton::getInstance()->debug
+//        (
+//          "Warning: " + cedar::aux::toString(steps_taken) + " time steps taken at once! "
+//          "Your system might be too slow for an execution interval of "
+//          + cedar::aux::toString(step_size.total_microseconds())
+//          + " microseconds. Consider using a longer interval!",
+//          "cedar::aux::LoopedThread::stop(unsigned int, bool)"
+//        );
+//      }
+//      #endif
+//
+//      // here we have to distinguish between the different working modes of the
+//      // thread. either we want to wake up on the next fixed time step or as
+//      // soon as possible if we are already late.
+//      if (use_fixed_step_size)
+//      {
+//        // update statistics
+//        updateStatistics(full_steps_taken);
+//
+//        // call step function
+//        if (mSimulatedTime.total_microseconds() == 0)
+//        {
+//          step(full_steps_taken * step_size.total_microseconds() * 0.001);
+//        }
+//        else
+//        {
+//          step(mSimulatedTime.total_microseconds() * 0.001);
+//        }
+//
+//        // schedule the next wake up
+//        while (scheduled_wakeup < boost::posix_time::microsec_clock::universal_time())
+//        {
+//          scheduled_wakeup = scheduled_wakeup + step_size;
+//        }
+//
+//      }
+//      else
+//      {
+//        // update statistics
+//        updateStatistics(steps_taken);
+//
+//        // call step function
+//        if (mSimulatedTime.total_microseconds() == 0)
+//        {
+//          step(steps_taken * step_size.total_microseconds() * 0.001);
+//        }
+//        else
+//        {
+//          step(mSimulatedTime.total_microseconds() * 0.001);
+//        }
+//
+//        // schedule the next wake up
+//        scheduled_wakeup = std::max<boost::posix_time::ptime>
+//                           (
+//                             scheduled_wakeup + step_size,
+//                             boost::posix_time::microsec_clock::universal_time()
+//                           );
+//
+//      } // if(mUseFixedStepSize)
+//
+//    } // while(!mStop)
 
   } // if(step_size != 0)
 
@@ -287,13 +406,14 @@ void cedar::aux::LoopedThread::singleStep()
 {
   if (!this->isRunning())
   {
-    if (mSimulatedTime.total_microseconds() == 0)
+    //!@todo this distinction is not explicated
+    if (_mSimulatedTime->getValue() <= 0.0)
     {
-      step(mStepSize.total_microseconds() * 0.001);
+      step(_mStepSize->getValue());
     }
     else
     {
-      step(mSimulatedTime.total_microseconds() * 0.001);
+      step(_mSimulatedTime->getValue());
     }
   }
 }
@@ -308,45 +428,19 @@ bool cedar::aux::LoopedThread::stopRequested()
   return false;
 }
 
-void cedar::aux::LoopedThread::readParamsFromConfigFile()
-{
-  _mStepSize = 100.0;
-  _mIdleTime = 0.001;
-  _mSimulatedTime = 0.0;
-
-  addParameter(&_mStepSize, "threadStepSize", 100.0);
-  addParameter(&_mIdleTime, "threadIdleTime", 0.001);
-  addParameter(&mUseFixedStepSize, "threadUseFixedStepSize", true);
-  addParameter(&_mSimulatedTime, "threadSimulatedTime", 0.0);
-
-  this->readOrDefaultConfiguration();
-
-  mStepSize = boost::posix_time::microseconds(static_cast<unsigned int>(1000 * _mStepSize + 0.5));
-  mIdleTime = static_cast<unsigned int>(1000 * _mIdleTime + 0.5);
-  mSimulatedTime = boost::posix_time::microseconds(static_cast<unsigned>(1000 * _mSimulatedTime + 0.5));
-
-  return;
-}
-
 void cedar::aux::LoopedThread::setStepSize(double stepSize)
 {
-  mStepSize = boost::posix_time::microseconds(static_cast<unsigned int>(1000 * stepSize + 0.5));
-  _mStepSize = stepSize;
+  this->_mStepSize->setValue(stepSize);
 }
 
 void cedar::aux::LoopedThread::setIdleTime(double idleTime)
 {
-  mIdleTime = static_cast<unsigned int>(1000 * idleTime + 0.5);
-}
-
-void cedar::aux::LoopedThread::useFixedStepSize(bool useFixedStepSize)
-{
-  mUseFixedStepSize = useFixedStepSize;
+  _mIdleTime->setValue(idleTime);
 }
 
 void cedar::aux::LoopedThread::setSimulatedTime(double simulatedTime)
 {
-  mSimulatedTime = boost::posix_time::microseconds(static_cast<unsigned>(1000 * simulatedTime + 0.5));
+  _mSimulatedTime->setValue(simulatedTime);
 }
 
 boost::posix_time::ptime cedar::aux::LoopedThread::getLastTimeStepStart() const

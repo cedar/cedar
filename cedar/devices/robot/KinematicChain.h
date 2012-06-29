@@ -45,6 +45,7 @@
 #include "cedar/devices/robot/Component.h"
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 
 // SYSTEM INCLUDES
@@ -63,9 +64,6 @@
 class cedar::dev::robot::KinematicChain
 :
 public cedar::dev::robot::Component,
-//#ifdef CEDAR_LIBCONFIG_LEGACY_MODE
-//  public cedar::aux::Configurable, // only needs to inherit virtually in case of non-legacy config interface
-//#endif // CEDAR_LIBCONFIG_LEGACY_MODE
 public cedar::aux::LoopedThread,
 public cedar::aux::NamedConfigurable
 {
@@ -124,9 +122,11 @@ private:
   //----------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KinematicChain(const std::string& configFileName);
-  //!@brief constructor
-  KinematicChain(const std::string& configFileName, cedar::aux::LocalCoordinateFramePtr pEndEffector);
+  KinematicChain
+  (
+    cedar::aux::LocalCoordinateFramePtr pEndEffector
+      = cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame())
+  );
   //!@brief destructor
   virtual ~KinematicChain();
 

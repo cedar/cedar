@@ -51,16 +51,12 @@
 int main(int argc, char **argv)
 {
   // using kuka configuration as dummy
-  std::string configuration_file_old = cedar::aux::System::locateResource("configs/kuka_lwr4.conf");
   std::string configuration_file = cedar::aux::System::locateResource("configs/kuka_lwr4.json");
 
   QApplication a(argc, argv);
 
   // create dummy kinematic chain and model to represent the joint angles
-  cedar::dev::robot::KinematicChainPtr p_dummy_arm
-  (
-    new cedar::dev::robot::SimulatedKinematicChain(configuration_file_old)
-  );
+  cedar::dev::robot::KinematicChainPtr p_dummy_arm(new cedar::dev::robot::SimulatedKinematicChain());
   p_dummy_arm->readJson(configuration_file);
   p_dummy_arm->getRootCoordinateFrame()->setTransformation(cv::Mat::eye(4, 4, CV_64FC1));
 

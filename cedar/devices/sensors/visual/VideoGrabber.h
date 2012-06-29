@@ -39,6 +39,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/Grabber.h"
+#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/IntParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -197,7 +199,7 @@ public:
 protected:
 
   //------------------------------------------------------------------------
-  // From Grabber
+  //From Grabber
   //------------------------------------------------------------------------
 
   bool onInit();
@@ -225,17 +227,19 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
   
   /*! @brief Indicates if looping is on
    */
-  bool _mLooped;
+  //bool _mLooped;
 
   /*! @brief Factor for grabbing speed
    *  @remarks the speed stored in the AVI-File will be multiplied with this factor
    *    so effective FPS should be _mSpeedFactor*AVI-Speed
    */
-  double _mSpeedFactor;
+  //double _mSpeedFactor;
 
   /*! @brief Count of frames of the shortest file
    *
@@ -269,6 +273,12 @@ private:
            );
   }
 
+  //!@brief The default name for the grabber
+  virtual inline std::string defaultGrabberName() const
+  {
+    return "VideoGrabber";
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -276,6 +286,15 @@ protected:
   // none yet
 
 private:
+  //! @brief Indicates if looping is on
+  cedar::aux::BoolParameterPtr _mLooped;
+
+  /*! @brief Factor for grabbing speed
+   *  @remarks the speed stored in the AVI-File will be multiplied with this factor
+   *    so effective FPS should be _mSpeedFactor*AVI-Speed
+   */
+  cedar::aux::IntParameterPtr _mSpeedFactor;
+
   // none yet
 
 }; // class cedar::dev::sensors::visual::VideoGrabber

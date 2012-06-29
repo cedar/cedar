@@ -57,18 +57,20 @@ cedar::dev::sensors::visual::Grabber(configFileName)
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   cedar::aux::LogSingleton::getInstance()->message
                                           (
-                                           ConfigurationInterface::getName() + ": Create a single channel grabber",
+                                            this->getName() + ": Create a single channel grabber",
                                             "cedar::dev::sensors::visual::InterfaceGrabber::InterfaceGrabber()"
                                           );
 
   //read initialization values from configuration file
-  readInit(1, "InterfaceGrabber");
+  readInit(1);
 
   //overwrite parameters from configfiles with values from constuctor
   getChannel(0)->mpSourceInterfaceClass = sourceInterfaceClass;
 
   //now apply the whole configuration
   applyInit();
+
+  std::cout << "InterfaceGrabber::InterfaceGrabber() finished" << std::endl;
 }
 
 
@@ -88,12 +90,12 @@ cedar::dev::sensors::visual::Grabber(configFileName)
 
   cedar::aux::LogSingleton::getInstance()->message
                                           (
-                                           ConfigurationInterface::getName() + ": Create a stereo channel grabber",
+                                            this->getName() + ": Create a stereo channel grabber",
                                             "cedar::dev::sensors::visual::InterfaceGrabber::InterfaceGrabber()"
                                           );
 
   //read initialization values from configuration file
-  readInit(2,"StereoInterfaceGrabber");
+  readInit(2);
 
   //overwrite parameters from configfiles with values from constuctor
   getChannel(0)->mpSourceInterfaceClass = sourceInterfaceClass0;
@@ -134,7 +136,7 @@ bool cedar::dev::sensors::visual::InterfaceGrabber::onInit()
   }
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
-                                             ConfigurationInterface::getName() + init_message.str(),
+                                             this->getName() + init_message.str(),
                                              "cedar::dev::sensors::visual::InterfaceGrabber::onInit()"
                                            );
 
@@ -192,7 +194,8 @@ bool cedar::dev::sensors::visual::InterfaceGrabber::onDeclareParameters()
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::InterfaceGrabber::onUpdateSourceInfo(unsigned int channel)
 {
-  getChannel(channel)->mChannelInfo = this->getName() + "> Channel " + boost::lexical_cast<std::string>(channel) + ": "
+  getChannel(channel)->mChannelInfo = this->getName() + ": Channel "
+                                      + boost::lexical_cast<std::string>(channel) + ": "
                                       + typeid(getChannel(channel)->mpSourceInterfaceClass).name();
 }
 

@@ -51,7 +51,7 @@ cedar::dev::sensors::visual::Grabber(configFileName)
 {
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
-                                           ConfigurationInterface::getName() + ": Create a single channel grabber",
+                                           this->getName() + ": Create a single channel grabber",
                                             "cedar::dev::sensors::visual::TestGrabber::TestGrabber()"
                                           );
 
@@ -59,7 +59,7 @@ cedar::dev::sensors::visual::Grabber(configFileName)
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
   //read initialization values from configuration file
-  readInit(1,"TestGrabber");
+  readInit(1);
 
   //overwrite parameters from configfiles with values from constuctor
   getChannel(0)->mSourceFileName = channelName;
@@ -85,12 +85,12 @@ cedar::dev::sensors::visual::Grabber(configFileName)
 
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
-                                           ConfigurationInterface::getName() + ": Create a stereo channel grabber",
+                                           this->getName() + ": Create a stereo channel grabber",
                                             "cedar::dev::sensors::visual::TestGrabber::TestGrabber()"
                                           );
 
   //read initialization values from configuration file
-  readInit(2,"StereoTestGrabber");
+  readInit(2);
 
   //overwrite parameters from configfiles with values from constuctor
   getChannel(0)->mSourceFileName = channelName0;
@@ -112,7 +112,7 @@ cedar::dev::sensors::visual::TestGrabber::~TestGrabber()
 
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
-                                           ConfigurationInterface::getName() + ": destructor",
+                                           this->getName() + ": destructor",
                                             "cedar::dev::sensors::visual::TestGrabber::~TestGrabber()"
                                           );
 
@@ -143,7 +143,7 @@ bool cedar::dev::sensors::visual::TestGrabber::onInit()
   }
   cedar::aux::LogSingleton::getInstance()->message
                                            (
-                                             ConfigurationInterface::getName() + init_message.str(),
+                                             this->getName() + init_message.str(),
                                              "cedar::dev::sensors::visual::TestGrabber::onInit()"
                                            );
 
@@ -163,7 +163,7 @@ bool cedar::dev::sensors::visual::TestGrabber::onInit()
   // all grabbers successfully initialized
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
-                                           ConfigurationInterface::getName() + ": Initialization finished",
+                                           this->getName() + ": Initialization finished",
                                             "cedar::dev::sensors::visual::TestGrabber::onInit()"
                                           );
   return true;
@@ -179,7 +179,7 @@ void cedar::dev::sensors::visual::TestGrabber::onCleanUp()
   //on an exception or a CTRL-C only onCleanUp will be invoked (no destructor)
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
-                                           ConfigurationInterface::getName() + ": Cleaning up",
+                                           this->getName() + ": Cleaning up",
                                             "cedar::dev::sensors::visual::TestGrabber::onCleanUp()"
                                           );
 }
@@ -200,7 +200,10 @@ bool cedar::dev::sensors::visual::TestGrabber::onDeclareParameters()
 
   //if your parameters should be stored in the configfile,
   //the default-values will be set on new grabbers
-  return addParameter(&_mTest, "testparam", 123) == CONFIG_SUCCESS;
+  //todo config add new parameter
+  //return addParameter(&_mTest, "testparam", 123) == CONFIG_SUCCESS;
+
+  return false;
 }
 
 //----------------------------------------------------------------------------------------------------

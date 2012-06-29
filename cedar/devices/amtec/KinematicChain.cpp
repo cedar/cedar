@@ -63,13 +63,12 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::amtec::KinematicChain::KinematicChain(const std::string& configFileName)
+cedar::dev::amtec::KinematicChain::KinematicChain()
 :
-cedar::dev::robot::KinematicChain(configFileName)
+cedar::dev::robot::KinematicChain(),
+mInitString(new cedar::aux::StringParameter(this, "amtec init string", "ESD:0,450"))
 {
-  mpDevice = 0;
-  mInitString = "ESD:0,450";
-  readParamsFromConfigFile();
+  mpDevice = NULL;
 
   // todo: this cannot be called from the constructor any more, because the number of joints is not known yet
   // current solution is to make it initDevice() public and call it from the main program after readJson() was called
@@ -110,15 +109,16 @@ bool cedar::dev::amtec::KinematicChain::initDevice()
 
   if(!mpDevice)
   {
-    mpDevice = newDevice(mInitString.c_str());
+    mpDevice = newDevice(this->getInitString().c_str());
   }
 
   //
   // init device itself
   //
 
-  int ret_val = mpDevice->init(mInitString.c_str());
+  int ret_val = mpDevice->init(this->getInitString().c_str());
 
+  //!@todo Use the log interface instead of writing to cout.
   switch(ret_val)
   {
   case CLD_OK:
@@ -189,7 +189,7 @@ bool cedar::dev::amtec::KinematicChain::initDevice()
     }
 
     // set position limits
-    //todo: replace this with applyJointLimits oder something
+    //!@todo: replace this with applyJointLimits oder something
     mpDevice->setMinPos(mModules[i], getJoint(i)->_mpAngleLimits->getLowerLimit());
     mpDevice->setMaxPos(mModules[i], getJoint(i)->_mpAngleLimits->getUpperLimit());
 
@@ -358,18 +358,6 @@ bool cedar::dev::amtec::KinematicChain::calibrateModule(unsigned int module)
   }
 
   return true;
-}
-
-
-void cedar::dev::amtec::KinematicChain::readParamsFromConfigFile()
-{
-  if(addParameter(&mInitString, "amtecInitString", "ESD:0,450") != CONFIG_SUCCESS)
-  {
-    std::cout << "KinematicChain: Error reading 'amtecInitString' from config file!" << std::endl;
-  }
-
-  readOrDefaultConfiguration();
-  return;
 }
 
 

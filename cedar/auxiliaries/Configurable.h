@@ -61,7 +61,6 @@ class cedar::aux::Configurable : public boost::noncopyable
   // friends
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::aux::Parameter;
-  friend class cedar::aux::ConfigurationInterface;
 
   //--------------------------------------------------------------------------------------------------------------------
   // macros and types

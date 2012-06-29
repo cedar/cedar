@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,54 +22,63 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        UserData.h
+    File:        LoopMode.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.rub.de
-    Date:        2010 03 02
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2012 06 22
 
-    Description: Header for the @em cedar::aux::UserData class.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_USER_DATA_H
-#define CEDAR_AUX_USER_DATA_H
+#ifndef CEDAR_AUX_LOOP_MODE_H
+#define CEDAR_AUX_LOOP_MODE_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/EnumBase.h"
 
 // SYSTEM INCLUDES
-#include <string>
 
 
-/*!@brief This class is the base class for passing user data to the cedar::aux::ConfigurationInterface.
- *
- * If you want to pass your own data to the addParameter functions in the cedar::aux::ConfigurationInterface, make a
- * class that inherits from cedar::aux::UserData and stores all your values. Later, when you read the data, you can
- * \em dynamic_cast it back to your class and access the values.
+/*!@brief An enum class for the different modes of looping in LoopedThread.
  */
-class cedar::aux::UserData
+class cedar::aux::LoopMode
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  //! The type of the enum values.
+  typedef cedar::aux::EnumId Id;
+
+  //! The pointer type of the enum base object.
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief constructor
-  UserData();
-  //!@brief destructor
-  virtual ~UserData(void) = 0;
+  // none
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  /*!@brief Initializes the enum values.
+   */
+  static void construct();
+
+  /*!@brief Returns a reference to the enum base object.
+   */
+  static const cedar::aux::EnumBase& type();
+
+  /*!@brief Returns a pointer to the enum base object.
+   */
+  static const cedar::aux::LoopMode::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -86,10 +95,32 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  //! Thread runs as fast as possible, elapsed time is measured.
+  static const Id RealTime = 0;
+
+  /*! Thread calls step function in a fixed time step and waits for next iteration.
+   *  If step takes too long, steps are skipped accordingly.
+   */
+  static const Id Fixed = 1;
+
+  /*! Thread calls step function in a fixed time step and waits for next iteration.
+   * If step takes too long, the next iteration is executed as soon as possible.
+   */
+  static const Id FixedAdaptive = 2;
+
+  /*! Thread runs in arbitrary time but does not measure time. Instead, a fixed value is passed to the step function.
+   */
+  static const Id Simulated = 3;
+
 protected:
   // none yet
-private:
-  // none yet
-}; // class cedar::aux::UserData
 
-#endif // CEDAR_AUX_USER_DATA_H
+private:
+  //! The enum object.
+  static cedar::aux::EnumType<cedar::aux::LoopMode> mType;
+
+}; // class cedar::aux::conv::LoopMode
+
+#endif // CEDAR_AUX_LOOP_MODE_H
+

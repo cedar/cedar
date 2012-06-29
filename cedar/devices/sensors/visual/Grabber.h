@@ -33,10 +33,11 @@
     Credits:
 
 ======================================================================================================================*/
-
-
 #ifndef CEDAR_DEV_SENSORS_VISUAL_GRABBER_H
 #define CEDAR_DEV_SENSORS_VISUAL_GRABBER_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/namespace.h"
@@ -44,6 +45,7 @@
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/Log.h"
+#include <cedar/auxiliaries/NamedConfigurable.h>
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -83,8 +85,7 @@
  */
 class cedar::dev::sensors::visual::Grabber
 :
-public cedar::aux::LoopedThread,
-public boost::noncopyable
+public cedar::aux::LoopedThread
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -134,7 +135,7 @@ protected:
    *    The constructor is protected, because no instance of Grabber should be instantiated.
    *    Use a derived class instead.
    *  @param
-   *    configFileName The filename where the configuration parameters should be stored in
+   *    configFileName The filename where the configuration parameters should be stored in (only for looped thread)
    */
   Grabber(const std::string& configFileName);
 
@@ -147,6 +148,15 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
+  /*!@brief Set the name of the grabber
+   * @param name The new name of the grabber. If the string is empty, then a default value will be used
+   */
+  void setName(const std::string& name);
+
+  /*!@brief Get the name of the grabber
+   */
+  const std::string& getName() const;
 
   /*! @brief This method does an emergency cleanup of ALL instantiated grabbers
    *
@@ -190,7 +200,7 @@ public:
   std::string& getSourceInfo(unsigned int channel=0);
 
   //------------------------------------------------------------------------
-  //Thread related methods
+  // Thread related methods
   //------------------------------------------------------------------------
 
   /*! @brief Get the framerate which LoopedThread is set for grabbing
@@ -236,7 +246,7 @@ public:
 
 
   //------------------------------------------------------------------------
-  //Grabbing methods
+  // Grabbing methods
   //------------------------------------------------------------------------
 
   /*! @brief Get an Image in a cv::Mat structure
@@ -271,7 +281,7 @@ public:
 
 
   //------------------------------------------------------------------------
-  //Snapshot methods
+  // Snapshot methods
   //------------------------------------------------------------------------
 
   /*! @brief Set the snapshot filenames for all defined channels
@@ -367,7 +377,7 @@ public:
 
 
   //------------------------------------------------------------------------
-  //Record methods
+  // Record methods
   //------------------------------------------------------------------------
 
 
@@ -430,6 +440,9 @@ public:
    *  @param
    *      color Determins if recording is in color or black/white mode.
    *      Default value is true.
+   *  @param
+   *      startThread Determins if the grabberthread should be started on recording
+   *      Default value is true.
    *
    *  @remarks
    *      Always all cameras recording. To set the filename use setRecordName()<br>
@@ -460,19 +473,18 @@ public:
    */
   bool isRecording() const;
 
-  //!@cond SKIPPED_DOCUMENTATION
   /*! @brief Defines the additions to the filename.
    *
-   *   Will be used in a stereo-grabber if you use setSnapshotName("SnapshotFilename")
+   *   This method will be used in a stereo-grabber if you use setSnapshotName("SnapshotFilename")
    *   or setRecordName("RecordFilename") to set both filenames at once
    *
    *  @param channel
    *    This is the index of the source you want the snapshot from.
    *
-   *   @remarks default is "_ch[channel]", for example "_ch0" for channel 0
+   *  @remarks The extension is hardcoded to "_ch<channel>", for example "_ch0" for channel 0.
+   *
    */
   std::string getChannelSaveFilenameAddition(int channel) const;
-  //!@endcond
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -480,8 +492,14 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
+  //! @brief read the configuration from the config-file
+  //
+  //          Derived from cedar::aux::Configurable
+  //void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
   /*! @brief  This function initialize the grabber.
+   *
+   *  @param numCams The init-function need to know how many channels there are
    *
    *  @remarks For grabber developers <br>
    *          Have to be called in the constructor of the derived class. <br><br>
@@ -497,13 +515,8 @@ protected:
    *          <br><br>
    *          For an example look at VideoGrabber, NetGrabber or TestGrabber
    *  @see onInit, declareParameter, onCleanUp
-   *
-   *  @param numCams The init-function need to know how many channels there are
-   *  @param defaultGrabberName This name is used as a default name, which will
-   *         be stored in the configuration file. To change the name
-   *  @see cedar::aux::ConfigurationInterface::setName
    */
-  void readInit(unsigned int numCams,const std::string& defaultGrabberName);
+  void readInit(unsigned int numCams);
 
   /*! @brief This function applies the former read initialization and then it calls onInit of the derived class
    *   @see onInit()
@@ -528,7 +541,7 @@ protected:
   void doCleanUp();
 
   //------------------------------------------------------------------------
-  //For derived classes
+  // For derived classes
   //------------------------------------------------------------------------
 
 
@@ -640,6 +653,11 @@ private:
     return mChannels.at(channel);
   }
 
+  //!@brief Define a default name for the grabber
+  virtual inline std::string defaultGrabberName() const
+  {
+    return "";
+  }
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -655,15 +673,15 @@ protected:
     bool mRecord;
 
     /*! @brief  mNumCams should be used instead of mImageMatVector.size()
-     * @remarks
-     *          Initialization should be done in the constructor of the derived class.
+     *
+     *  Initialization should be done in the constructor of the derived class.
      */
     unsigned int mNumCams;
 
 
     /*! @brief Read/write lock
-     *  @remarks
-     *          Used for concurrent access to the mImageMatVector - matrices
+     *
+     *  Used for concurrent access to the mImageMatVector - matrices
      */
     QReadWriteLock* mpReadWriteLock;
     
@@ -698,18 +716,18 @@ private:
     ///! @brief Flag, if this is the first instance of a grabber (used for the ctrl-c handler)
     bool mFirstGrabberInstance;
 
-
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //------------------------------------------------------------------------
-  // Defines the how often getFpsMeasured() will be updated (in frames).
+  //!@brief Constant which defines how often getFpsMeasured() will be updated (in frames).
   // Default value is every 5 frames
   static const int UPDATE_FPS_MEASURE_FRAME_COUNT = 5;
 
 private:
-  // none yet
+  //!@brief The name of the grabber
+  cedar::aux::StringParameterPtr _mName;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constants

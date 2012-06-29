@@ -67,10 +67,7 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create simulated arm
-  cedar::dev::robot::KinematicChainPtr test_arm(new cedar::dev::robot::SimulatedKinematicChain
-  (
-    "../../../../tests/interactive/devices/gl/MountedCameraViewer/test_arm.conf")
-  );
+  cedar::dev::robot::KinematicChainPtr test_arm(new cedar::dev::robot::SimulatedKinematicChain());
   test_arm->readJson("../../../../tests/interactive/devices/gl/MountedCameraViewer/test_arm.json");
 
   // create gl visualization objects

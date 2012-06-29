@@ -49,15 +49,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::kuka::KukaInterface::KukaInterface(const std::string& configFileName)
+cedar::dev::kuka::KukaInterface::KukaInterface()
 :
-KinematicChain(configFileName),
 mCommandedJointPosition(LBR_MNJ),
-mMeasuredJointPosition(LBR_MNJ)
+mMeasuredJointPosition(LBR_MNJ),
+_mRemoteHost(new cedar::aux::StringParameter(this, "remote host", "NULL")),
+_mServerPort(new cedar::aux::IntParameter(this, "server port", 0))
 {
   mIsInit = false;
-  mpFriRemote = 0;
-  init();
+  mpFriRemote = NULL;
+//  init();
 }
 
 cedar::dev::kuka::KukaInterface::~KukaInterface()
@@ -82,31 +83,32 @@ cedar::dev::kuka::KukaInterface::~KukaInterface()
 //----------------------------------------------------------------------------------------------------------------------
 // public member functions
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::dev::kuka::KukaInterface::init()
+void cedar::dev::kuka::KukaInterface::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
+  this->cedar::aux::Configurable::readConfiguration(node);
   //The number of joints the KUKA LBR has
   //Load Parameters from the configuration file
   //ServerPort: 0 means, FRI will use the default Port
-  addParameter(&_mServerPort, "ServerPort", 0);
+//  addParameter(&_mServerPort, "ServerPort", 0);
   /*RemoteHost: if the string is "NULL", the friRemote instance will be created with NULL,
    * else it will interpret it as IP-Address
    */
-  addParameter(&_mRemoteHost, "RemoteHost", "NULL");
+//  addParameter(&_mRemoteHost, "RemoteHost", "NULL");
 
   //now read the configuration file
   //readOrDefaultConfiguration();
-  _mServerPort = 0;
-  _mRemoteHost = "NULL";
+//  _mServerPort = 0;
+//  _mRemoteHost = "NULL";
 
   //create a new Instance of the friRemote
-  if (_mRemoteHost != "NULL")
+  if (_mRemoteHost->getValue() != "NULL")
   {
     // friRemote cannot handle const char*
-    mpFriRemote = new friRemote(_mServerPort, const_cast<char*>(_mRemoteHost.c_str()));
+    mpFriRemote = new friRemote(_mServerPort->getValue(), const_cast<char*>(_mRemoteHost->getValue().c_str()));
   }
   else
   {
-    mpFriRemote = new friRemote(_mServerPort);
+    mpFriRemote = new friRemote(_mServerPort->getValue());
   }
   //copy default values from the FRI
   copyFromFRI();
@@ -114,7 +116,6 @@ void cedar::dev::kuka::KukaInterface::init()
   //set step size and idle time for the looped thread
   setStepSize(0);
   setIdleTime(0.01);
-  useFixedStepSize(false);
   //start the thread
   start();
 

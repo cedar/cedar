@@ -49,12 +49,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::sensors::visual::CameraCapabilities::CameraCapabilities(const std::string& configFileName)
 :
-cedar::aux::ConfigurationInterface(configFileName)
+cedar::aux::Configurable()
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                          (
-                                           ConfigurationInterface::getName() + ": Config-file: " + configFileName,
+                                           "Config-file: " + configFileName,
                                            "cedar::dev::sensors::visual::CameraCapabilities::CameraCapabilities()"
                                          );
 
@@ -66,13 +66,14 @@ cedar::aux::ConfigurationInterface(configFileName)
     mCamProperties.push_back(cap);
   }
 
+  /*
   if (not declareParameters())
   {
     // throwing an exception prevents main-grabber class to clean up => catch this exception
     std::string info = "[CameraCapabilities::CameraCapabilities] ERROR at parameter declaration";
     cedar::aux::LogSingleton::getInstance()->error
                                              (
-                                               ConfigurationInterface::getName() + ": " + info,
+                                              info,
                                                "cedar::dev::sensors::visual::CameraCapabilities::CameraCapabilities()"
                                              );
     CEDAR_THROW
@@ -81,7 +82,14 @@ cedar::aux::ConfigurationInterface(configFileName)
       info
     );
   }
-  readOrDefaultConfiguration();
+*/
+  //readOrDefaultConfiguration();
+
+  //****************************************************************
+  //!@todo configswitch
+  //****************************************************************
+  // dynamically create parameters
+
 
   //set properties which are not supported by cedar/opencv to false
   //i.e. ignore config-file values
@@ -121,6 +129,12 @@ bool cedar::dev::sensors::visual::CameraCapabilities::declareParameters()
     std::string prop_name = CameraProperty::type().get(id).name() + "_";
     std::string prop_cap;
 
+    //****************************************************************
+    //!@todo configswitch
+    //****************************************************************
+    // dynamically create parameters
+
+    /*
     //property capability one by one
     prop_cap = prop_name + "max_value";
     result = (addParameter(&mCamProperties.at(i).max_value, prop_cap, 255) == CONFIG_SUCCESS) && result;
@@ -148,6 +162,8 @@ bool cedar::dev::sensors::visual::CameraCapabilities::declareParameters()
 
     prop_cap = prop_name + "is_absolute_capable";
     result = (addParameter(&mCamProperties.at(i).is_absolute_capable, prop_cap, false) == CONFIG_SUCCESS) && result;
+
+    */
   }
   return result;
 }

@@ -51,14 +51,14 @@ cedar::dev::sensors::visual::Grabber(configFileName)
   // debug information logging
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
-  cedar::aux::LogSingleton::getInstance()->message
+  cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
-                                           ConfigurationInterface::getName() + ": Create a single channel GL-grabber",
+                                           this->getName() + ": Create a single channel GL-grabber",
                                             "cedar::dev::sensors::visual::GLGrabber::GLGrabber()"
                                           );
 
   // read initialization values from configuration file
-  readInit(1,"GLGrabber");
+  readInit(1);
 
   // set additional parameters from the constuctor
   getChannel(0)->mpQGLWidget = qglWidget;
@@ -81,14 +81,14 @@ cedar::dev::sensors::visual::Grabber(configFileName)
 {
   // debug information logging
   cedar::aux::LogSingleton::getInstance()->allocating(this);
-  cedar::aux::LogSingleton::getInstance()->message
+  cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
-                                           ConfigurationInterface::getName() + ": Create a stereo channel GL-grabber",
+                                           this->getName() + ": Create a stereo channel GL-grabber",
                                             "cedar::dev::sensors::visual::GLGrabber::GLGrabber()"
                                           );
 
   // read initialization values from configuration file
-  readInit(2,"StereoGLGrabber");
+  readInit(2);
 
   // set additional parameters from the constuctor
   getChannel(0)->mpQGLWidget = qglWidget0;
@@ -122,7 +122,7 @@ bool cedar::dev::sensors::visual::GLGrabber::onInit()
   }
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
-                                             ConfigurationInterface::getName() + init_message.str(),
+                                            this->getName() + init_message.str(),
                                              "cedar::dev::sensors::visual::OglGrabber::onInit()"
                                            );
   //Grab first frames
@@ -183,10 +183,12 @@ bool cedar::dev::sensors::visual::GLGrabber::onGrab()
       // GL_FRONT_LEFT, GL_FRONT_RIGHT, GL_BACK_LEFT, GL_BACK_RIGHT, GL_FRONT, GL_BACK, GL_LEFT, GL_RIGHT, GL_AUXi,
       // where i is between 0 and the value of GL_AUX_BUFFERS minus 1.
 
-      // activate this thread for painting
-      // problem: qgl-widget painting also have to be multithreaded, i.e also have to invoke makeCurrent(), doneCurrent()
+      //activate this thread for painting
+      //problem: qgl-widget painting also have to be multithreaded, i.e also have to invoke makeCurrent(), doneCurrent()
+      //p_channel_widget->makeCurrent();
       glReadBuffer(GL_FRONT_RIGHT);
       QImage qimage = p_channel_widget->grabFrameBuffer(false);
+      //p_channel_widget->doneCurrent();
 
       // QImage to cv::Mat
       cv::Mat mat = cv::Mat(qimage.height(), qimage.width(), CV_8UC4,(uchar*)qimage.bits(), qimage.bytesPerLine());
@@ -232,9 +234,9 @@ void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGL
 
     // change source
     getChannel(channel)->mpQGLWidget = qglWidget;
-    cedar::aux::LogSingleton::getInstance()->message
+    cedar::aux::LogSingleton::getInstance()->debugMessage
                                             (
-                                             ConfigurationInterface::getName() + ": New Widget applied",
+                                             this->getName() + ": New Widget applied",
                                               "cedar::dev::sensors::visual::GLGrabber::setWidget"
                                             );
     this->grab();

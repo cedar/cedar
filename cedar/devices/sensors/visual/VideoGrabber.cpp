@@ -54,12 +54,12 @@ cedar::dev::sensors::visual::VideoGrabber::VideoGrabber(
                           )
 :
 cedar::dev::sensors::visual::Grabber(configFileName),
-_mLooped(true),
-_mSpeedFactor(1),
-mFramesCount(0)
+mFramesCount(0),
+_mLooped(new cedar::aux::BoolParameter(this, "looped", false)),
+_mSpeedFactor(new cedar::aux::IntParameter(this, "speedFactor", 1))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
-  readInit(1,"VideoGrabber");
+  readInit(1);
 
   //overwrite configuration with constructor-values
   getChannel(0)->mSourceFileName = aviFileName;
@@ -75,12 +75,12 @@ cedar::dev::sensors::visual::VideoGrabber::VideoGrabber(
                           )
 :
 cedar::dev::sensors::visual::Grabber(configFileName),
-_mLooped(true),
-_mSpeedFactor(1),
-mFramesCount(0)
+mFramesCount(0),
+_mLooped(new cedar::aux::BoolParameter(this, "looped", false)),
+_mSpeedFactor(new cedar::aux::IntParameter(this, "speedFactor", 1))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
-  readInit(2,"VideoGrabber");
+  readInit(2);
 
   //overwrite configuration with constructor-values
   getChannel(0)->mSourceFileName = aviFileName0;
@@ -91,9 +91,10 @@ mFramesCount(0)
 //----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::VideoGrabber::onDeclareParameters()
 {
-  bool result1 = addParameter(&_mLooped, "looped", true) == CONFIG_SUCCESS;
-  bool result2 = addParameter(&_mSpeedFactor, "speedFactor", 1) == CONFIG_SUCCESS;
-  return result1 && result2;
+  //bool result1 = addParameter(&_mLooped, "looped", true) == CONFIG_SUCCESS;
+  //bool result2 = addParameter(&_mSpeedFactor, "speedFactor", 1) == CONFIG_SUCCESS;
+  //return result1 && result2;
+  return true;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -136,7 +137,7 @@ bool cedar::dev::sensors::visual::VideoGrabber::onInit()
   }
   cedar::aux::LogSingleton::getInstance()->systemInfo
                                            (
-                                             ConfigurationInterface::getName() + init_message.str(),
+                                             this->getName() + init_message.str(),
                                              "cedar::dev::sensors::visual::VideoGrabber::onInit()"
                                            );
 
@@ -158,7 +159,7 @@ bool cedar::dev::sensors::visual::VideoGrabber::onInit()
     {
       cedar::aux::LogSingleton::getInstance()->error
                                                (
-                                                ConfigurationInterface::getName() + ": Grabbing failed on Channel "
+                                                 this->getName() + ": Grabbing failed on Channel "
                                                   + boost::lexical_cast<std::string>(channel) + " from \""
                                                   + getChannel(channel)->mSourceFileName + "\"",
                                                 "cedar::dev::sensors::visual::VideoGrabber::onInit()"
@@ -191,9 +192,9 @@ bool cedar::dev::sensors::visual::VideoGrabber::onInit()
     {
       cedar::aux::LogSingleton::getInstance()->error
                                                (
-                                                 ConfigurationInterface::getName()
-                                                  + ": Different framerates of channels 0 and 1",
-                                                "cedar::dev::sensors::visual::VideoGrabber::onInit()"
+                                                 this->getName()
+                                                   + ": Different framerates of channels 0 and 1",
+                                                 "cedar::dev::sensors::visual::VideoGrabber::onInit()"
                                                );
       return false;  //throws an initialization-exception
     }
@@ -201,7 +202,7 @@ bool cedar::dev::sensors::visual::VideoGrabber::onInit()
 
   //----------------------------------------
   //set stepsize for LoopedThread
-  setFps(fps_ch0 * _mSpeedFactor);
+  setFps(fps_ch0 * _mSpeedFactor->getValue());
 
   return true;
 } //onInit()
@@ -227,7 +228,7 @@ bool cedar::dev::sensors::visual::VideoGrabber::onGrab()
       debug_message << "[VideoGrabber::onGrab] Frame nr.:" << pos_Abs << std::endl;
       cedar::aux::LogSingleton::getInstance()->debugMessage
                                                (
-                                                 ConfigurationInterface::getName() + ": " + debug_message.str(),
+                                                 this->getName() + ": " + debug_message.str(),
                                                  "cedar::dev::sensors::visual::VideoGrabber::onGrab()"
                                                );
       */
@@ -246,7 +247,7 @@ bool cedar::dev::sensors::visual::VideoGrabber::onGrab()
           }
           cedar::aux::LogSingleton::getInstance()->debugMessage
                                                     (
-                                                      ConfigurationInterface::getName() + ": Video restarted",
+                                                      this->getName() + ": Video restarted",
                                                       "cedar::dev::sensors::visual::VideoGrabber::onGrab()"
                                                     );
 
@@ -280,17 +281,17 @@ void cedar::dev::sensors::visual::VideoGrabber::onUpdateSourceInfo(unsigned int 
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::VideoGrabber::setSpeedFactor(double speedFactor)
 {
-  _mSpeedFactor = speedFactor;
+  _mSpeedFactor->setValue(speedFactor);
   double fps = getChannel(0)->mVideoCapture.get(CV_CAP_PROP_FPS);
 
   //set fps and restart the thread if running
-  setFps(fps * _mSpeedFactor);
+  setFps(fps * _mSpeedFactor->getValue());
 }
 
 //----------------------------------------------------------------------------------------------------
 double cedar::dev::sensors::visual::VideoGrabber::getSpeedFactor() const
 {
-  return _mSpeedFactor;
+  return _mSpeedFactor->getValue();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -306,7 +307,7 @@ void cedar::dev::sensors::visual::VideoGrabber::setLooped(bool loop)
     message = message + "OFF";
   }
   cedar::aux::LogSingleton::getInstance()->debugMessage(message,"cedar::dev::sensors::visual::VideoGrabber::setLoop()");
-  _mLooped = loop;
+  _mLooped->setValue(loop);
 }
 //----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::VideoGrabber::getLooped()
@@ -346,7 +347,7 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionRelative(double newPo
   debug_message << "\tPosition set to frame: " << new_pos_abs << std::endl;
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                             (
-                                              ConfigurationInterface::getName() + ": " + debug_message.str(),
+                                              this->getName() + ": " + debug_message.str(),
                                               "cedar::dev::sensors::visual::VideoGrabber::setPositionRelative()"
                                             );
 
@@ -383,7 +384,7 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionAbsolute(unsigned int
                 << "\tPosition set to frame: " << newPositionAbs << std::endl;
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                             (
-                                              ConfigurationInterface::getName() + ": " + debug_message.str(),
+                                              this->getName() + ": " + debug_message.str(),
                                               "cedar::dev::sensors::visual::VideoGrabber::setPositionAbsolute()"
                                             );
 

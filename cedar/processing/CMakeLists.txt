@@ -77,7 +77,6 @@ cedar_add_library(cedarproc
   sources/GrabberBase.h
   steps/Projection.h
   steps/Resize.h
-  LoopedTrigger.h
   Network.h
   Step.h
   ${libdc_moc_headers}
