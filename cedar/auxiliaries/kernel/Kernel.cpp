@@ -143,3 +143,41 @@ void cedar::aux::kernel::Kernel::updateKernel()
   this->calculate();
   emit kernelUpdated();
 }
+
+cv::Mat cedar::aux::kernel::Kernel::getRowsCols() const
+{
+  cv::Mat rows_cols = cv::Mat::ones(1, 2, CV_32F);
+
+  // check for 0D-Kernels:
+  if (this->getDimensionality() == 0)
+  {
+    // no border handling necessary
+    return rows_cols;
+  }
+  else
+  {
+    unsigned int kernel_dim = this->getDimensionality();
+
+    switch (kernel_dim)
+    {
+      case 0:
+        break;
+      case 1:
+        rows_cols.at<float>(0,0) = static_cast<float>(this->getSize(0));
+        rows_cols.at<float>(0,1) = 1.0;
+        break;
+      case 2:
+        rows_cols.at<float>(0,0) = static_cast<float>(this->getSize(0));
+        rows_cols.at<float>(0,1) = static_cast<float>(this->getSize(1));
+        break;
+      default:
+        CEDAR_THROW(
+                   cedar::aux::RangeException,
+                   "Kernel dimension and/or size not supported in 'full' convolution mode."
+                   );
+        break;
+    }
+
+    return rows_cols;
+  }
+}

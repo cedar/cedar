@@ -59,7 +59,15 @@ class cedar::aux::kernel::Gauss : public cedar::aux::kernel::Separable
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Gauss();
+  Gauss
+  (
+    unsigned int dimensionality = 2,
+    double amplitude = 1.0,
+    double sigmas = 3.0,
+    double shifts = 0.0,
+    double limit = 5.0
+  );
+
   //!@brief Constructor to create an instance of Gauss directly from a set of parameters (without configuration file).
   Gauss(
          double amplitude,
@@ -118,7 +126,6 @@ private:
 
   //!@brief A function that heuristically determines width of the kernel in pixels.
   unsigned int estimateWidth(unsigned int dim) const;
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

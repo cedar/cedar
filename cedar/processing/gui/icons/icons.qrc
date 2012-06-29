@@ -9,6 +9,7 @@
     <file>steps/no_icon.svg</file>
     <file>steps/gauss_input.svg</file>
     <file>steps/static_gain.svg</file>
+    <file>steps/switch.svg</file>
     <file>steps/convolution.svg</file>
     <file>steps/net_reader.svg</file>
     <file>steps/resize.svg</file>
@@ -17,6 +18,7 @@
     <file>steps/preshape.svg</file>
     <file>steps/projection.svg</file>
     <file>steps/noise.svg</file>
+    <file>steps/sum.svg</file>
     <file>steps/video_grabber.svg</file>
     <file>steps/picture_grabber.svg</file>
     <file>network.svg</file>

@@ -241,6 +241,9 @@ protected:
     return this->mMandatoryConnectionsAreSet;
   }
 
+  void renameOutput(const std::string& oldName, const std::string& newName);
+  void renameInput(const std::string& oldName, const std::string& newName);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -278,11 +281,11 @@ protected:
   //!@brief Vector with the names of all invalid input data.
   std::vector<std::string> mInvalidInputNames;
 private:
-  //!@brief a connection to a signal emitted by an external data slo
+  //!@brief a connection to a signal emitted by an external data slot
   boost::signals2::connection mSlotConnection;
 
   //!@brief a map of slot maps, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
-  std::map<DataRole::Id, SlotMap> mDataConnections;
+  std::map<DataRole::Id, SlotMap> mSlotMaps;
 
   //!@brief a map of slot lists, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
   std::map<DataRole::Id, SlotList> mDataConnectionsOrder;

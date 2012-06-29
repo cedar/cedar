@@ -154,3 +154,8 @@ bool cedar::proc::DataSlot::isPromoted() const
 {
   return this->mIsPromoted;
 }
+
+void cedar::proc::DataSlot::setName(const std::string& name)
+{
+  this->mName = name;
+}

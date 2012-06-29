@@ -43,6 +43,8 @@
 #include "cedar/auxiliaries/gui/Viewer.h"
 
 // SYSTEM INCLUDES
+#include <boost/signals2/signal.hpp>
+#include <boost/signals2/connection.hpp>
 #include <string>
 #include <QList>
 
@@ -68,6 +70,11 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief register a function pointer with this function to react to any changes in the scene (e.g. an object is
+   * added or deleted)
+   */
+  boost::signals2::connection connectToSceneChangedSignal(boost::function<void ()> slot);
+
   /*!@brief tells the scene whether a simple floor in the xy-plane should be drawn or not
    * @param state truth value of 'floor being drawn'
    */
@@ -140,6 +147,9 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+protected:
+  //!@brief a boost signal that is emitted if a change in the scene occurs
+  boost::signals2::signal<void ()> mSceneChanged;
 private:
   bool mIsDrawingFloor;
   double mSceneLimit;

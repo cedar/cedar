@@ -1,5 +1,5 @@
 {
-  "name" = "KUKA LWR4";
+  "name": "KUKA lwr4",
   "server port" = 0;
   "remote host" = "NULL";
   "step size" = "0.0";

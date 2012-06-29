@@ -84,10 +84,10 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::LoopedTrigger::LoopedTrigger(double stepSize)
+cedar::proc::LoopedTrigger::LoopedTrigger(double stepSize, const std::string& name)
 :
 cedar::aux::LoopedThread(stepSize),
-cedar::proc::Trigger("", true),
+cedar::proc::Trigger(name, true),
 //!@todo Make a TimeParameter and use it here instead.
 mWait(new cedar::aux::BoolParameter(this, "wait", true))
 {

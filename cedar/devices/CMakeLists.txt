@@ -44,6 +44,7 @@ cedar_add_library(cedardev
                   robot/gui/KinematicChainWidget.h
                   robot/gui/KinematicChainMonitorWidget.h
                   robot/gui/KinematicChainCommandWidget.h
+                  robot/gui/MountedCameraViewer.h
                   kteam/gui/EPuckControlWidget.h
                   communication/gui/CommunicationWidget.h
                   ${kuka_moc_files}

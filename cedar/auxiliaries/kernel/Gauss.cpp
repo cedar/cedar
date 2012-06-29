@@ -62,16 +62,23 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::aux::kernel::Gauss::Gauss()
+cedar::aux::kernel::Gauss::Gauss
+(
+  unsigned int dimensionality,
+  double amplitude,
+  double sigmas,
+  double shifts,
+  double limit
+)
 :
 cedar::aux::kernel::Separable(),
-_mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0, -10000.0, 10000.0)),
-_mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigmas", 2, 3.0, 0.01, 10000)),
-_mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", 2, 0.0, -10000.0, 10000)),
-_mLimit(new cedar::aux::DoubleParameter(this, "limit", 5.0, 0.01, 1000.0))
+_mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", amplitude, -10000.0, 10000.0)),
+_mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigmas", dimensionality, sigmas, 0.01, 10000)),
+_mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", dimensionality, shifts, -10000.0, 10000)),
+_mLimit(new cedar::aux::DoubleParameter(this, "limit", limit, 0.01, 1000.0))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
-  this->setDimensionality(_mSigmas->size());
+  this->setDimensionality(dimensionality);
   
   this->onInit();
 }
@@ -99,6 +106,7 @@ _mLimit(new cedar::aux::DoubleParameter(this, "limit", limit, 0.01, 1000.0))
   this->mSizes.resize(dimensionality);
   this->onInit();
 }
+
 
 cedar::aux::kernel::Gauss::~Gauss()
 {

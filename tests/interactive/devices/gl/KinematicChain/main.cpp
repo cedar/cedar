@@ -95,6 +95,7 @@ int main(int argc, char **argv)
   (
     new cedar::dev::robot::gl::KinematicChain(p_second_arm)
   );
+  p_second_arm_visualization->setDisplayBase(false);
   p_scene->addObjectVisualization(p_second_arm_visualization);
   p_test_arm->setEndEffector(p_second_arm->getRootCoordinateFrame());
   p_second_arm->setWorkingMode(cedar::dev::robot::KinematicChain::VELOCITY);
@@ -102,10 +103,14 @@ int main(int argc, char **argv)
   p_second_arm->setJointVelocity(1, -.45);
   p_second_arm->setJointVelocity(2, -.15);
   p_second_arm->setJointVelocity(3, .25);
+  p_second_arm->setJointVelocity(0, .1);
+  p_second_arm->setJointVelocity(1, .1);
+  p_second_arm->setJointVelocity(2, .1);
+  p_second_arm->setJointVelocity(3, .1);
 
   p_test_arm->start();
-  p_second_arm->start();
   p_test_arm->startTimer(20);
+  p_second_arm->start();
   p_second_arm->startTimer(20);
   viewer.startTimer(20);
   a.exec();

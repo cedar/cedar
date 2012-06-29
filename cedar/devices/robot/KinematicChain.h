@@ -44,7 +44,7 @@
 #include "cedar/devices/robot/namespace.h"
 #include "cedar/devices/robot/Component.h"
 #include "cedar/auxiliaries/LoopedThread.h"
-#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 
@@ -60,13 +60,12 @@
  * allow you to control velocities or accelerations directly, you can start the
  * the KinematicChain as a thread to handle velocities and accelerations
  * "manually".
- *
- * @todo This no longer needs to inherit from Configurable once LoopedThread does.
  */
 class cedar::dev::robot::KinematicChain
 :
 public cedar::dev::robot::Component,
-public cedar::aux::LoopedThread
+public cedar::aux::LoopedThread,
+public cedar::aux::NamedConfigurable
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------
@@ -508,6 +507,12 @@ public:
    */
   cv::Mat getRootTransformation();
 
+  /*!@brief gives the product of exponentials up to the specified joint
+   *
+   * @return    product of exponentials, 4 \f$\times\f$ 4 matrix
+   */
+  cv::Mat getProductOfExponentials(unsigned int jointIndex);
+
   /*!@brief gives the transformation from base frame to the end-effector frame in the current configuration
    *
    * @return    rigid transformation matrix from world to end-effector frame, 4 \f$\times\f$ 4 matrix
@@ -543,6 +548,8 @@ protected:
 private:
   void step(double time);
   void init();
+  void initializeFromJointList();
+
   void applyAngleLimits(cv::Mat& angles);
   void applyVelocityLimits(cv::Mat& velocities);
 
