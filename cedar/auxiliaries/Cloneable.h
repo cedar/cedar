@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Dimensions.h
+    File:        Cloneable.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 06 29
+    Date:        2012 07 02
 
     Description:
 
@@ -34,61 +34,49 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_ANNOTATION_DIMENSIONS_H
-#define CEDAR_AUX_ANNOTATION_DIMENSIONS_H
+#ifndef CEDAR_AUX_CLONEABLE_H
+#define CEDAR_AUX_CLONEABLE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/annotation/namespace.h"
-#include "cedar/auxiliaries/annotation/Annotation.h"
-#include "cedar/auxiliaries/Cloneable.h"
+#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 
-/*!@todo describe.
- *
- * @todo describe more.
+
+/*!@brief A class that implements the clone function based on a class's copy constructor.
  */
-class cedar::aux::annotation::Dimensions
-:
-public cedar::aux::annotation::Annotation,
-public cedar::aux::Cloneable<cedar::aux::annotation::Dimensions, cedar::aux::annotation::Annotation>
+template <class ClonedT, class ReturnedT>
+class cedar::aux::Cloneable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  struct Dimension
-  {
-    std::string mLabel;
-  };
+public:
+  typedef ClonedT ClonedType;
+  typedef ReturnedT ReturnedType;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  Dimensions(unsigned int numberOfDimensions);
-
-  Dimensions(const cedar::aux::annotation::Dimensions& copy);
+  //!@brief Destructor
+  virtual ~Cloneable()
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! Returns the label for the given dimension.
-  const std::string& getLabel(unsigned int dimension) const;
-
-  //! Sets the label of the given dimension.
-  void setLabel(unsigned int dimension, const std::string& label);
-
-  //! Returns the number of entries in the dimensions.
-  inline size_t getDimensionality() const
+  /*!@brief Clones the object using the copy constructor.
+   */
+  virtual boost::shared_ptr<ReturnedType> clone() const
   {
-    return this->mDimensions.size();
+    return boost::shared_ptr<ReturnedType>(new ClonedType(*cedar::aux::asserted_cast<const ClonedType*>(this)));
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -109,10 +97,18 @@ private:
 protected:
   // none yet
 private:
-  //! Labels corresponding to the dimensions
-  std::vector<Dimension> mDimensions;
+  // none yet
 
-}; // class cedar::aux::annotation::Dimensions
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-#endif // CEDAR_AUX_ANNOTATION_DIMENSIONS_H
+private:
+  // none yet
+
+}; // class cedar::aux::Cloneable
+
+#endif // CEDAR_AUX_CLONEABLE_H
 

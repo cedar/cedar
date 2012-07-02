@@ -66,6 +66,8 @@ namespace cedar
 
     template <typename T> class MovingAverage;
 
+    template <class ClonedT, class ReturnedT> class Cloneable;
+
     //!@todo This class may be obsolete once the ConfigurationInterface is removed.
     template <typename T> class IntervalData;
     //!@brief smart pointer for IntervalData<double>
