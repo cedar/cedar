@@ -44,10 +44,12 @@
 #include "cedar/auxiliaries/gui/MatrixPlot2D.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
+#include "cedar/auxiliaries/annotation/Dimensions.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
@@ -222,7 +224,50 @@ void cedar::aux::gui::MatrixPlot2D::timerEvent(QTimerEvent * /* pEvent */)
       return;
     }
     this->mpPlot->createDataset(this->mppArrayData, mDataRows, mDataCols);
+    this->applyLabels();
     this->mpPlot->updateGL();
+  }
+}
+
+
+void cedar::aux::gui::MatrixPlot2D::applyLabels()
+{
+  try
+  {
+    cedar::aux::annotation::DimensionsPtr dimensions
+      = this->mMatData->getAnnotation<cedar::aux::annotation::Dimensions>();
+
+    if (dimensions->getDimensionality() == 2)
+    {
+      QString label_x = QString::fromStdString(dimensions->getLabel(0));
+      QString label_y = QString::fromStdString(dimensions->getLabel(1));
+      std::cout << "labels: " << label_x.toStdString() << ", " << label_y.toStdString() << std::endl;
+      this->mpPlot->coordinates()->axes[Qwt3D::X1].setLabelString(label_x);
+      this->mpPlot->coordinates()->axes[Qwt3D::X2].setLabelString(label_x);
+      this->mpPlot->coordinates()->axes[Qwt3D::X3].setLabelString(label_x);
+      this->mpPlot->coordinates()->axes[Qwt3D::X4].setLabelString(label_x);
+      this->mpPlot->coordinates()->axes[Qwt3D::Y1].setLabelString(label_y);
+      this->mpPlot->coordinates()->axes[Qwt3D::Y2].setLabelString(label_y);
+      this->mpPlot->coordinates()->axes[Qwt3D::Y3].setLabelString(label_y);
+      this->mpPlot->coordinates()->axes[Qwt3D::Y4].setLabelString(label_y);
+    }
+    else
+    {
+      cedar::aux::LogSingleton::getInstance()->debugMessage
+      (
+        "Wrong number of entries in dimension annotations.",
+        "cedar::aux::gui::MatrixPlot2D::plot"
+      );
+    }
+  }
+  catch (cedar::aux::UnknownTypeException&)
+  {
+    // ok, no annotation found
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "No dimension annotation found.",
+      "cedar::aux::gui::MatrixPlot2D::plot"
+    );
   }
 }
 
