@@ -241,7 +241,6 @@ void cedar::aux::gui::MatrixPlot2D::applyLabels()
     {
       QString label_x = QString::fromStdString(dimensions->getLabel(0));
       QString label_y = QString::fromStdString(dimensions->getLabel(1));
-      std::cout << "labels: " << label_x.toStdString() << ", " << label_y.toStdString() << std::endl;
       this->mpPlot->coordinates()->axes[Qwt3D::X1].setLabelString(label_x);
       this->mpPlot->coordinates()->axes[Qwt3D::X2].setLabelString(label_x);
       this->mpPlot->coordinates()->axes[Qwt3D::X3].setLabelString(label_x);
@@ -263,11 +262,6 @@ void cedar::aux::gui::MatrixPlot2D::applyLabels()
   catch (cedar::aux::UnknownTypeException&)
   {
     // ok, no annotation found
-    cedar::aux::LogSingleton::getInstance()->debugMessage
-    (
-      "No dimension annotation found.",
-      "cedar::aux::gui::MatrixPlot2D::plot"
-    );
   }
 }
 
