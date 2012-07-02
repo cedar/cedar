@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_ANNOTATION_DIMENSIONS_H
-#define CEDAR_AUX_ANNOTATION_DIMENSIONS_H
+#ifndef CEDAR_AUX_ANNOTATION_COLOR_SPACE_H
+#define CEDAR_AUX_ANNOTATION_COLOR_SPACE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -51,44 +51,57 @@
  *
  * @todo describe more.
  */
-class cedar::aux::annotation::Dimensions
+class cedar::aux::annotation::ColorSpace
 :
 public cedar::aux::annotation::Annotation,
-public cedar::aux::Cloneable<cedar::aux::annotation::Dimensions, cedar::aux::annotation::Annotation>
+public cedar::aux::Cloneable<cedar::aux::annotation::ColorSpace, cedar::aux::annotation::Annotation>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  struct Dimension
+public:
+  //! Enum that indicates a channel's contents.
+  enum ChannelType
   {
-    std::string mLabel;
+    Red,
+    Green,
+    Blue,
+    Gray,
+    Hue,
+    Saturation,
+    Value,
+    Alpha,
+    Yellow,
+    ChromaticRed,
+    ChromaticBlue
   };
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  Dimensions(unsigned int numberOfDimensions);
+  //!@brief Constructor for a single channel.
+  ColorSpace(ChannelType channelType);
 
-  Dimensions(const cedar::aux::annotation::Dimensions& copy);
+  //!@brief Constructor for three channels.
+  ColorSpace(ChannelType channel1Type, ChannelType channel2Type, ChannelType channel3Type);
+
+  //!@brief Constructor for four channels.
+  ColorSpace(ChannelType channel1Type, ChannelType channel2Type, ChannelType channel3Type, ChannelType channel4Type);
+
+  //!@brief The copy constructor.
+  ColorSpace(const cedar::aux::annotation::ColorSpace& copy);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! Returns the label for the given dimension.
-  const std::string& getLabel(unsigned int dimension) const;
+  //! Returns the channel count.
+  unsigned int getNumberOfChannels() const;
 
-  //! Sets the label of the given dimension.
-  void setLabel(unsigned int dimension, const std::string& label);
-
-  //! Returns the number of entries in the dimensions.
-  inline size_t getDimensionality() const
-  {
-    return this->mDimensions.size();
-  }
+  //! Returns the type of the given channel.
+  cedar::aux::annotation::ColorSpace::ChannelType getChannelType(unsigned int channel) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -109,9 +122,9 @@ protected:
   // none yet
 private:
   //! Labels corresponding to the dimensions
-  std::vector<Dimension> mDimensions;
+  std::vector<ChannelType> mChannelTypes;
 
 }; // class cedar::aux::annotation::Dimensions
 
-#endif // CEDAR_AUX_ANNOTATION_DIMENSIONS_H
+#endif // CEDAR_AUX_ANNOTATION_IMAGE_H
 
