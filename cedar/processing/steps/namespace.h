@@ -54,6 +54,9 @@ namespace cedar
     namespace steps
     {
       //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_PROC_CLASS(TransformationDirection);
+      CEDAR_DECLARE_PROC_CLASS(TransformationType);
+      CEDAR_DECLARE_PROC_CLASS(CoordinateTransformation);
       CEDAR_DECLARE_PROC_CLASS(Convolution);
       CEDAR_DECLARE_PROC_CLASS(Projection);
       CEDAR_DECLARE_PROC_CLASS(Resize);
