@@ -56,6 +56,7 @@ namespace cedar
     {
       //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_AUX_CLASS(Annotation);
+      CEDAR_DECLARE_AUX_CLASS(ColorSpace);
       CEDAR_DECLARE_AUX_CLASS(Dimensions);
       //!@endcond
     }
