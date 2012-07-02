@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,16 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Data.cpp
+    File:        Annotation.cpp
 
-
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 17
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 06 29
 
     Description:
 
@@ -39,8 +34,11 @@
 
 ======================================================================================================================*/
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/annotation/Annotation.h"
 
 // SYSTEM INCLUDES
 
@@ -48,51 +46,24 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::Data::Data()
-:
-mpLock(new QReadWriteLock()),
-mpeOwner(NULL)
+cedar::aux::annotation::Annotation::Annotation()
 {
 }
 
-cedar::aux::Data::~Data()
+cedar::aux::annotation::Annotation::Annotation(const Annotation&)
 {
-  delete mpLock;
 }
+
+cedar::aux::annotation::Annotation::~Annotation()
+{
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::Data::setAnnotation(cedar::aux::annotation::AnnotationPtr annotation)
+cedar::aux::annotation::AnnotationPtr cedar::aux::annotation::Annotation::clone() const
 {
-  try
-  {
-    AnnotationIterator iter = this->findAnnotation(annotation);
-    *iter = annotation;
-  }
-  catch (cedar::aux::UnknownTypeException&)
-  {
-    this->mAnnotations.push_back(annotation);
-  }
-}
-
-QReadWriteLock& cedar::aux::Data::getLock()
-{
-  return *this->mpLock;
-}
-
-QReadWriteLock& cedar::aux::Data::getLock() const
-{
-  return *this->mpLock;
-}
-
-cedar::aux::Configurable* cedar::aux::Data::getOwner() const
-{
-  return this->mpeOwner;
-}
-
-void cedar::aux::Data::setOwner(cedar::aux::Configurable* step)
-{
-  this->mpeOwner = step;
+  return cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::Annotation(*this));
 }
