@@ -34,6 +34,7 @@
 
 ======================================================================================================================*/
 
+//TODO example architecture with description & interactive unit test
 
 // CEDAR INCLUDES
 #include "cedar/processing/steps/CoordinateTransformation.h"
@@ -47,6 +48,7 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
+#include <string.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 // ENUM: cedar::proc::steps::TransformationDirection
@@ -136,6 +138,13 @@ namespace
         "cedar.processing.steps.CoordinateTransformation"
       )
     );
+    coord_transform_decl->setDescription
+                          (
+                            "This processing step provides a coordinate transformation using a matrix-remapping "\
+                            "function.\n"\
+                            "You can select either transformation between Cartesian and polar coordinates or"\
+                            "Cartesian and log-polar coordinates. "
+                          );
     coord_transform_decl->setIconPath(":/steps/coordinate_transformation.svg");
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(coord_transform_decl);
 

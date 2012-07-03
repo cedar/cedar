@@ -66,6 +66,14 @@ namespace
         "cedar.processing.steps.Convolution"
       )
     );
+    convolution_decl->setDescription
+                      (
+                        "This processing step convolves a matrix with a kernel.\n"\
+                        "Convolution can be done with to different engines: OpenCV and FFTW. "\
+                        "The OpenCV engine provides Convolution with three modes: Full, same, and valid. "\
+                        "Also the border handling can be set as: Cyclic, zero-filled, mirrowed, and replicate. "\
+                        "The FFTW engine only provides cyclic border handling with mode same."
+                          );
     convolution_decl->setIconPath(":/steps/convolution.svg");
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(convolution_decl);
 
