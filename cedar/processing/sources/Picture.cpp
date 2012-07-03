@@ -41,6 +41,7 @@
 #include "cedar/processing/sources/Picture.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/auxiliaries/annotation/ColorSpace.h"
 
 // SYSTEM INCLUDES
 
@@ -111,6 +112,9 @@ void cedar::proc::sources::Picture::compute(const cedar::proc::Arguments&)
     // and set the filename
     this->mGrabber->grab();
     this->mImage->setData(this->mGrabber->getImage());
+
+    // update the annotation
+    this->annotateImage();
   }
 }
 

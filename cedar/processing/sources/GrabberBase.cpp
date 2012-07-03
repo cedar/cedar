@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/sources/GrabberBase.h"
+#include "cedar/auxiliaries/annotation/ColorSpace.h"
 
 
 // SYSTEM INCLUDES
@@ -50,7 +51,7 @@
 cedar::proc::sources::GrabberBase::GrabberBase()
 :
 cedar::proc::Step(false, true),
-mImage(new cedar::aux::ImageData(cv::Mat::zeros(1, 1, CV_8UC3))),
+mImage(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_8UC3))),
 mRecording(new cedar::aux::BoolParameter(this, "record", false)),
 mRecordName(new cedar::aux::FileParameter(this, "record name", cedar::aux::FileParameter::WRITE, "./video.avi")),
 mSnapshotName(new cedar::aux::FileParameter(this, "snapshot name", cedar::aux::FileParameter::WRITE, "./picture.png")),
@@ -70,6 +71,54 @@ cedar::proc::sources::GrabberBase::~GrabberBase()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::sources::GrabberBase::annotateImage()
+{
+  cedar::aux::annotation::ColorSpacePtr color_space;
+  switch (this->mImage->getData().channels())
+  {
+    case 4:
+      color_space = cedar::aux::annotation::ColorSpacePtr
+                    (
+                      new cedar::aux::annotation::ColorSpace
+                      (
+                        cedar::aux::annotation::ColorSpace::Red,
+                        cedar::aux::annotation::ColorSpace::Green,
+                        cedar::aux::annotation::ColorSpace::Blue,
+                        cedar::aux::annotation::ColorSpace::Alpha
+                      )
+                    );
+      break;
+
+    case 3:
+      color_space = cedar::aux::annotation::ColorSpacePtr
+                    (
+                      new cedar::aux::annotation::ColorSpace
+                      (
+                        cedar::aux::annotation::ColorSpace::Red,
+                        cedar::aux::annotation::ColorSpace::Green,
+                        cedar::aux::annotation::ColorSpace::Blue
+                      )
+                    );
+      break;
+
+    case 1:
+      color_space = cedar::aux::annotation::ColorSpacePtr
+                    (
+                      new cedar::aux::annotation::ColorSpace
+                      (
+                        cedar::aux::annotation::ColorSpace::Gray
+                      )
+                    );
+      break;
+
+    default:
+      // this should not happen.
+      CEDAR_ASSERT(false);
+  } // switch
+
+  this->mImage->setAnnotation(color_space);
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::GrabberBase::setRecording()

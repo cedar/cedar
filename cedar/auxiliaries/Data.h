@@ -147,6 +147,9 @@ public:
     return cedar::aux::asserted_pointer_cast<T>(*this->findAnnotation<T>());
   }
 
+  //! Copies all annotations from the given data pointer.
+  void copyAnnotationsFrom(cedar::aux::ConstDataPtr other);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

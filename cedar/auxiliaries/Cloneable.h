@@ -46,11 +46,36 @@
 
 // SYSTEM INCLUDES
 
+/*!@brief Base class for cloneables.
+ */
+template <class ReturnedT>
+class cedar::aux::CloneableBase
+{
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef ReturnedT ReturnedType;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // constructors and destructor
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  virtual ~CloneableBase()
+  {
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // public methods
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  virtual boost::shared_ptr<ReturnedType> clone() const = 0;
+};
 
 /*!@brief A class that implements the clone function based on a class's copy constructor.
  */
 template <class ClonedT, class ReturnedT>
-class cedar::aux::Cloneable
+class cedar::aux::Cloneable : public virtual cedar::aux::CloneableBase<ReturnedT>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -76,7 +101,7 @@ public:
    */
   virtual boost::shared_ptr<ReturnedType> clone() const
   {
-    return boost::shared_ptr<ReturnedType>(new ClonedType(*cedar::aux::asserted_cast<const ClonedType*>(this)));
+    return boost::shared_ptr<ReturnedType>(new ClonedType(*cedar::aux::asserted_cast<const ClonedT*>(this)));
   }
 
   //--------------------------------------------------------------------------------------------------------------------

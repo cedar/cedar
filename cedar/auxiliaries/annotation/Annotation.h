@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/annotation/namespace.h"
+#include "cedar/auxiliaries/Cloneable.h"
 
 // SYSTEM INCLUDES
 
@@ -50,7 +51,7 @@
  *
  * @todo describe more.
  */
-class cedar::aux::annotation::Annotation
+class cedar::aux::annotation::Annotation : public virtual cedar::aux::CloneableBase<cedar::aux::annotation::Annotation>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -73,9 +74,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief This method must be overwritten in all child classes
-   */
-  virtual cedar::aux::annotation::AnnotationPtr clone() const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
