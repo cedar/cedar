@@ -62,8 +62,3 @@ cedar::aux::annotation::Annotation::~Annotation()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-cedar::aux::annotation::AnnotationPtr cedar::aux::annotation::Annotation::clone() const
-{
-  return cedar::aux::annotation::AnnotationPtr(new cedar::aux::annotation::Annotation(*this));
-}

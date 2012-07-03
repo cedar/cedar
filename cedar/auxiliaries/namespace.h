@@ -66,6 +66,8 @@ namespace cedar
 
     template <typename T> class MovingAverage;
 
+    template <class ReturnedT> class CloneableBase;
+
     template <class ClonedT, class ReturnedT> class Cloneable;
 
     //!@todo This class may be obsolete once the ConfigurationInterface is removed.

@@ -41,6 +41,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
 
@@ -74,6 +75,15 @@ void cedar::aux::Data::setAnnotation(cedar::aux::annotation::AnnotationPtr annot
   catch (cedar::aux::UnknownTypeException&)
   {
     this->mAnnotations.push_back(annotation);
+  }
+}
+
+void cedar::aux::Data::copyAnnotationsFrom(cedar::aux::ConstDataPtr other)
+{
+  this->mAnnotations.resize(other->mAnnotations.size());
+  for (size_t i = 0; i < other->mAnnotations.size(); ++i)
+  {
+    this->mAnnotations[i] = other->mAnnotations[i]->clone();
   }
 }
 
