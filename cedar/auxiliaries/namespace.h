@@ -204,6 +204,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(ImageData);
     CEDAR_DECLARE_AUX_CLASS(StereoImageData);
     /* exceptions */
+    CEDAR_DECLARE_AUX_CLASS(AnnotationNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(BadConnectionException);
     CEDAR_DECLARE_AUX_CLASS(ConversionFailedException);
     CEDAR_DECLARE_AUX_CLASS(DeadReferenceException);

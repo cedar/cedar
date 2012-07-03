@@ -176,7 +176,7 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::DataPtr data, const std::stri
     p_plot->plot(this->mData, title);
     this->mpCurrentPlotWidget = p_plot;
   }
-  catch(cedar::aux::UnknownTypeException&)
+  catch(cedar::aux::AnnotationNotFoundException&)
   {
     // data is a matrix
     cv::Mat& mat = this->mData->getData();

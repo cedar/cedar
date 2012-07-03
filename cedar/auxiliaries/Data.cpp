@@ -72,7 +72,7 @@ void cedar::aux::Data::setAnnotation(cedar::aux::annotation::AnnotationPtr annot
     AnnotationIterator iter = this->findAnnotation(annotation);
     *iter = annotation;
   }
-  catch (cedar::aux::UnknownTypeException&)
+  catch (cedar::aux::AnnotationNotFoundException&)
   {
     this->mAnnotations.push_back(annotation);
   }
