@@ -78,6 +78,12 @@ class cedar::aux::NotFoundException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::NotFoundException
 
+/*!@brief Exception that signals that something could not be found.
+ */
+class cedar::aux::AnnotationNotFoundException : public cedar::aux::NotFoundException
+{
+}; // class cedar::aux::AnnotationNotFoundException
+
 /*!@brief Exception that occurs when a parameter is not found.
  */
 class cedar::aux::ParameterNotFoundException : public cedar::aux::ExceptionBase

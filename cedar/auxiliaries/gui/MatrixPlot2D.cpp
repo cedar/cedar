@@ -259,7 +259,7 @@ void cedar::aux::gui::MatrixPlot2D::applyLabels()
       );
     }
   }
-  catch (cedar::aux::UnknownTypeException&)
+  catch (cedar::aux::AnnotationNotFoundException&)
   {
     // ok, no annotation found
   }

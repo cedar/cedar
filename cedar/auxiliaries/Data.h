@@ -62,6 +62,7 @@ class cedar::aux::Data
 private:
   typedef std::vector<cedar::aux::annotation::AnnotationPtr> AnnotationList;
   typedef AnnotationList::iterator AnnotationIterator;
+  typedef AnnotationList::const_iterator AnnotationConstIterator;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -147,6 +148,16 @@ public:
     return cedar::aux::asserted_pointer_cast<T>(*this->findAnnotation<T>());
   }
 
+  /*! Returns an annotation of the given type as a constant pointer.
+   *
+   *  @throws A cedar::aux::UnknownTypeException if no matching annotation can be found.
+   */
+  template <typename T>
+  boost::shared_ptr<const T> getAnnotation() const
+  {
+    return cedar::aux::asserted_pointer_cast<const T>(*this->findAnnotation<T>());
+  }
+
   //! Copies all annotations from the given data pointer.
   void copyAnnotationsFrom(cedar::aux::ConstDataPtr other);
 
@@ -171,7 +182,21 @@ private:
       }
     }
 
-    CEDAR_THROW(cedar::aux::UnknownTypeException, "Could not find an annotation of the given type.");
+    CEDAR_THROW(cedar::aux::AnnotationNotFoundException, "Could not find an annotation of the given type.");
+  }
+
+  template <typename T>
+  AnnotationConstIterator findAnnotation() const
+  {
+    for (AnnotationConstIterator iter = this->mAnnotations.begin(); iter != this->mAnnotations.end(); ++iter)
+    {
+      if (typeid(**iter) == typeid(T))
+      {
+        return iter;
+      }
+    }
+
+    CEDAR_THROW(cedar::aux::AnnotationNotFoundException, "Could not find an annotation of the given type.");
   }
 
   AnnotationIterator findAnnotation(cedar::aux::annotation::AnnotationPtr annotation)
@@ -184,7 +209,7 @@ private:
       }
     }
 
-    CEDAR_THROW(cedar::aux::UnknownTypeException, "Could not find an annotation of the given type.");
+    CEDAR_THROW(cedar::aux::AnnotationNotFoundException, "Could not find an annotation of the given type.");
   }
 
   //--------------------------------------------------------------------------------------------------------------------
