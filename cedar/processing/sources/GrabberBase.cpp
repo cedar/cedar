@@ -82,9 +82,9 @@ void cedar::proc::sources::GrabberBase::annotateImage()
                     (
                       new cedar::aux::annotation::ColorSpace
                       (
-                        cedar::aux::annotation::ColorSpace::Red,
-                        cedar::aux::annotation::ColorSpace::Green,
                         cedar::aux::annotation::ColorSpace::Blue,
+                        cedar::aux::annotation::ColorSpace::Green,
+                        cedar::aux::annotation::ColorSpace::Red,
                         cedar::aux::annotation::ColorSpace::Alpha
                       )
                     );
@@ -95,9 +95,9 @@ void cedar::proc::sources::GrabberBase::annotateImage()
                     (
                       new cedar::aux::annotation::ColorSpace
                       (
-                        cedar::aux::annotation::ColorSpace::Red,
+                        cedar::aux::annotation::ColorSpace::Blue,
                         cedar::aux::annotation::ColorSpace::Green,
-                        cedar::aux::annotation::ColorSpace::Blue
+                        cedar::aux::annotation::ColorSpace::Red
                       )
                     );
       break;
