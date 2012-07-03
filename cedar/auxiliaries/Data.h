@@ -145,7 +145,7 @@ public:
   template <typename T>
   boost::shared_ptr<T> getAnnotation()
   {
-    return cedar::aux::asserted_pointer_cast<T>(*this->findAnnotation<T>());
+    return cedar::aux::asserted_pointer_cast<T>(this->mAnnotations[this->findAnnotation<T>()]);
   }
 
   /*! Returns an annotation of the given type as a constant pointer.
@@ -155,7 +155,7 @@ public:
   template <typename T>
   boost::shared_ptr<const T> getAnnotation() const
   {
-    return cedar::aux::asserted_pointer_cast<const T>(*this->findAnnotation<T>());
+    return cedar::aux::asserted_pointer_cast<const T>(this->mAnnotations[this->findAnnotation<T>()]);
   }
 
   //! Copies all annotations from the given data pointer.
@@ -172,40 +172,26 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   template <typename T>
-  AnnotationIterator findAnnotation()
+  size_t findAnnotation() const
   {
-    for (AnnotationIterator iter = this->mAnnotations.begin(); iter != this->mAnnotations.end(); ++iter)
+    for (size_t i = 0; i < this->mAnnotations.size(); ++i)
     {
-      if (typeid(**iter) == typeid(T))
+      if (typeid(*this->mAnnotations[i]) == typeid(T))
       {
-        return iter;
+        return i;
       }
     }
 
     CEDAR_THROW(cedar::aux::AnnotationNotFoundException, "Could not find an annotation of the given type.");
   }
 
-  template <typename T>
-  AnnotationConstIterator findAnnotation() const
+  size_t findAnnotation(cedar::aux::annotation::AnnotationPtr annotation) const
   {
-    for (AnnotationConstIterator iter = this->mAnnotations.begin(); iter != this->mAnnotations.end(); ++iter)
+    for (size_t i = 0; i < this->mAnnotations.size(); ++i)
     {
-      if (typeid(**iter) == typeid(T))
+      if (typeid(*this->mAnnotations[i]) == typeid(*annotation))
       {
-        return iter;
-      }
-    }
-
-    CEDAR_THROW(cedar::aux::AnnotationNotFoundException, "Could not find an annotation of the given type.");
-  }
-
-  AnnotationIterator findAnnotation(cedar::aux::annotation::AnnotationPtr annotation)
-  {
-    for (AnnotationIterator iter = this->mAnnotations.begin(); iter != this->mAnnotations.end(); ++iter)
-    {
-      if (typeid(*iter) == typeid(*annotation))
-      {
-        return iter;
+        return i;
       }
     }
 

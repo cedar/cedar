@@ -69,8 +69,8 @@ void cedar::aux::Data::setAnnotation(cedar::aux::annotation::AnnotationPtr annot
 {
   try
   {
-    AnnotationIterator iter = this->findAnnotation(annotation);
-    *iter = annotation;
+    size_t i = this->findAnnotation(annotation);
+    this->mAnnotations[i] = annotation;
   }
   catch (cedar::aux::AnnotationNotFoundException&)
   {

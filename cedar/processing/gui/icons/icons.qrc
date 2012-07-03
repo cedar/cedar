@@ -7,6 +7,7 @@
     <file>triggers/looped_trigger.svg</file>
     <file>triggers/multi_trigger.svg</file>
     <file>steps/no_icon.svg</file>
+    <file>steps/color_conversion.svg</file>
     <file>steps/gauss_input.svg</file>
     <file>steps/static_gain.svg</file>
     <file>steps/switch.svg</file>
