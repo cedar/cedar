@@ -99,7 +99,8 @@ _mTargetType
   (
     this,
     "target type",
-    cedar::proc::steps::ColorConversion::ColorSpace::typePtr()
+    cedar::proc::steps::ColorConversion::ColorSpace::typePtr(),
+    ColorSpace::HSV
   )
 )
 {
