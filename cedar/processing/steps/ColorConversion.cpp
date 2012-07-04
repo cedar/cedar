@@ -188,7 +188,6 @@ void cedar::proc::steps::ColorConversion::updateSourceImageColorSpace()
       )
       {
         this->mInputColorSpace = ColorSpace::BGR;
-        std::cout << "Source: BGR" << std::endl;
       }
       else if
       (
@@ -198,7 +197,6 @@ void cedar::proc::steps::ColorConversion::updateSourceImageColorSpace()
       )
       {
         this->mInputColorSpace = ColorSpace::HSV;
-        std::cout << "Source: HSV" << std::endl;
       }
       else
       {
