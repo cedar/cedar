@@ -15,7 +15,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="color_conversion.svg"
+   sodipodi:docname="channel_split.svg"
    inkscape:export-filename="/home/lompolbx/workspace/src/cedar.fieldFramework/cedar/processing/gui/icons/steps/no_icon.png"
    inkscape:export-xdpi="9"
    inkscape:export-ydpi="9">
@@ -28,7 +28,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
      inkscape:cx="111.58735"
-     inkscape:cy="122.56318"
+     inkscape:cy="124.58349"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -289,7 +289,7 @@
        x2="125.41126"
        y2="952.36222"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(-1034.5267,-652.36223)" />
+       gradientTransform="translate(-1052.3622,-652.36222)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient4164"
@@ -299,7 +299,7 @@
        x2="256.75323"
        y2="952.36224"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(-1052.3622,-652.36223)" />
+       gradientTransform="translate(-1052.3622,-652.36222)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient4172"
@@ -309,7 +309,7 @@
        x2="388.09524"
        y2="952.36222"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(-1070.1977,-652.36223)" />
+       gradientTransform="translate(-1052.3622,-652.36222)" />
   </defs>
   <metadata
      id="metadata7">
@@ -332,8 +332,8 @@
        id="g4987"
        style="stroke-width:18.75;stroke-miterlimit:4;stroke-dasharray:none" />
     <rect
-       y="51.071423"
-       x="-1015.1219"
+       y="51.07143"
+       x="-1001.1219"
        height="97.85714"
        width="98.506493"
        id="rect3725"
@@ -345,50 +345,71 @@
        width="98.506493"
        height="97.85714"
        x="-901.61548"
-       y="51.071423"
+       y="51.07143"
        transform="matrix(0,-1,1,0,0,0)" />
     <rect
-       y="51.071423"
-       x="-788.10901"
+       y="51.07143"
+       x="-802.10901"
        height="97.85714"
        width="98.506493"
        id="rect2849"
        style="fill:#150eff;fill-opacity:1;stroke:#000000;stroke-width:15.00000095;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        transform="matrix(0,-1,1,0,0,0)" />
+    <g
+       id="g2883">
+      <path
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:25;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter"
+         d="m 171.4375,839.875 a 12.50125,12.50125 0 1 0 0,25 l 36.15625,0 a 12.50125,12.50125 0 1 0 0,-25 l -36.15625,0 z"
+         id="path2894" />
+      <path
+         id="path2889"
+         d="m 236.43539,852.36222 -43.25,25 0,-50 43.25,25 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:0.2pt;marker-start:none" />
+    </g>
     <rect
-       style="fill:url(#linearGradient4148);fill-opacity:1;stroke:#000000;stroke-width:15.00000095;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-       id="rect2864"
+       transform="matrix(0,-1,1,0,0,0)"
+       style="fill:#ff0404;fill-opacity:1;stroke:#000000;stroke-width:15.00000095;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect2865"
        width="98.506493"
        height="97.85714"
-       x="-1015.1219"
-       y="251.07143"
-       transform="matrix(0,-1,1,0,0,0)" />
+       x="-1032.9575"
+       y="251.07143" />
     <rect
+       transform="matrix(0,-1,1,0,0,0)"
        y="251.07143"
        x="-901.61548"
        height="97.85714"
        width="98.506493"
-       id="rect2866"
-       style="fill:url(#linearGradient4170);fill-opacity:1;stroke:#000000;stroke-width:15.00000095;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-       transform="matrix(0,-1,1,0,0,0)" />
+       id="rect2867"
+       style="fill:#10ff41;fill-opacity:1;stroke:#000000;stroke-width:15.00000095;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
     <rect
-       style="fill:url(#linearGradient4178);fill-opacity:1;stroke:#000000;stroke-width:15.00000095;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-       id="rect2868"
+       transform="matrix(0,-1,1,0,0,0)"
+       style="fill:#150eff;fill-opacity:1;stroke:#000000;stroke-width:15.00000095;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect2869"
        width="98.506493"
        height="97.85714"
-       x="-788.10901"
-       y="251.07143"
-       transform="matrix(0,-1,1,0,0,0)" />
+       x="-770.2735"
+       y="251.07143" />
     <g
-       id="g2865"
-       transform="matrix(0,-1,1,0,-652.36223,1052.3622)">
+       id="g2875">
       <path
          style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:25;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter"
-         d="M 199.8125,811.125 A 12.50125,12.50125 0 0 0 187.5,823.78125 l 0,36.15625 a 12.50125,12.50125 0 1 0 25,0 l 0,-36.15625 A 12.50125,12.50125 0 0 0 199.8125,811.125 z"
-         id="path2894" />
+         d="m 207.90625,723.65625 a 12.50125,12.50125 0 0 0 -6.75,1.875 L 165,747.25 a 12.50332,12.50332 0 1 0 12.875,21.4375 l 36.15625,-21.75 a 12.50125,12.50125 0 0 0 -6.125,-23.28125 z"
+         id="path2871" />
       <path
-         id="path2871"
-         d="m 200,888.79761 -25,-43.25 50,0 -25,43.25 z"
+         id="path2881"
+         d="m 232.30941,721.3672 -24.18108,43.71313 -25.76706,-42.84925 49.94814,-0.86388 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:0.2pt;marker-start:none" />
+    </g>
+    <g
+       id="g2891">
+      <path
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:25;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter"
+         d="M 170.71875,938.15625 A 12.50125,12.50125 0 0 0 165,961.46875 l 36.15625,21.71875 a 12.50125,12.50125 0 1 0 12.875,-21.40625 l -36.15625,-21.75 a 12.50125,12.50125 0 0 0 -7.15625,-1.875 z"
+         id="path2873" />
+      <path
+         id="path2897"
+         d="m 232.30941,987.35242 -49.94814,-0.86388 25.76706,-42.84925 24.18108,43.71313 z"
          style="fill-rule:evenodd;stroke:#000000;stroke-width:0.2pt;marker-start:none" />
     </g>
   </g>

@@ -54,6 +54,7 @@ namespace cedar
     namespace steps
     {
       //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_PROC_CLASS(ChannelSplit);
       CEDAR_DECLARE_PROC_CLASS(Convolution);
       CEDAR_DECLARE_PROC_CLASS(ColorConversion);
       CEDAR_DECLARE_PROC_CLASS(Projection);
