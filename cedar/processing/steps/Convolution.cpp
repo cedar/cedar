@@ -144,6 +144,8 @@ void cedar::proc::steps::Convolution::inputConnectionChanged(const std::string& 
     this->mMatrix = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
     // This should always work since other types should not be accepted.
     CEDAR_DEBUG_ASSERT(this->mMatrix);
+
+    this->mOutput->copyAnnotationsFrom(this->mMatrix);
   }
   else if (inputName == "kernel")
   {
