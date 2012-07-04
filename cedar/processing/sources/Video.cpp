@@ -160,6 +160,8 @@ void cedar::proc::sources::Video::compute(const cedar::proc::Arguments &argument
         this->mImage->setData(frame.clone());
       }
       mTimeElapsed = 0.0;
+      //!@todo This should only happen once when the grabber is created/first frame is read.
+      this->annotateImage();
     }
   }
 }
