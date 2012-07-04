@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/PlotInterface.h"
+#include "cedar/auxiliaries/annotation/namespace.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -131,6 +132,9 @@ private:
 
   //! Data displayed by the plot.
   cedar::aux::MatDataPtr mData;
+
+  //! The color space annotation of the data (if present).
+  cedar::aux::annotation::ColorSpacePtr mDataColorSpace;
 
   //! Converted image.
   QImage mImage;
