@@ -148,6 +148,8 @@ void cedar::proc::steps::ChannelSplit::inputConnectionChanged(const std::string&
   this->mChannel3->setData(cv::Mat::zeros(2, 2, this->mInput->getData().type()));
   this->mChannel4->setData(cv::Mat::zeros(2, 2, this->mInput->getData().type()));
 
+  this->mChannels.resize(num_channels);
+
   int type = CV_MAKETYPE(this->mInput->getData().depth(), 1);
 
   // apply channel annotations and preallocate matrices
@@ -205,25 +207,18 @@ void cedar::proc::steps::ChannelSplit::compute(const cedar::proc::Arguments& /* 
 {
   const cv::Mat& input = this->mInput->getData();
 
-  //!@todo Store this vector as a member to make this faster
-  std::vector<cv::Mat> channels;
-  for (int i = 0; i < input.channels(); ++i)
-  {
-    channels.push_back(cv::Mat());
-  }
-
-  cv::split(input, channels);
+  cv::split(input, this->mChannels);
 
   switch (input.channels())
   {
     case 4:
-      this->mChannel4->setData(channels.at(3));
+      this->mChannel4->setData(this->mChannels.at(3));
     case 3:
-      this->mChannel3->setData(channels.at(2));
+      this->mChannel3->setData(this->mChannels.at(2));
     case 2:
-      this->mChannel2->setData(channels.at(1));
+      this->mChannel2->setData(this->mChannels.at(1));
     case 1:
     default:
-      this->mChannel1->setData(channels.at(0));
+      this->mChannel1->setData(this->mChannels.at(0));
   }
 }
