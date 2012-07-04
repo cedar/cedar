@@ -38,8 +38,12 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_PICTURE_GRABBER_H
 #define CEDAR_DEV_SENSORS_VISUAL_PICTURE_GRABBER_H
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/Grabber.h"
+#include "cedar/auxiliaries/FileParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -60,15 +64,25 @@ public cedar::dev::sensors::visual::Grabber
 
   //!@cond SKIPPED_DOCUMENTATION
 
+public:
+
   /*! @struct PictureChannel
    *  @brief Additional data of a picture grabbing channel
    */
   struct PictureChannel
   :
-  cedar::dev::sensors::visual::Grabber::GrabberChannel
+  cedar::dev::sensors::visual::Grabber::Channel
   {
-    //! @brief The filenames
-    std::string mSourceFileName;
+  public:
+    PictureChannel(const std::string& fileName = "./picture.jpg")
+    :
+    cedar::dev::sensors::visual::Grabber::Channel(),
+    _mSourceFileName(new cedar::aux::FileParameter(this, "fileName", cedar::aux::FileParameter::READ, fileName))
+    {
+    }
+
+    //! @brief The filename of the picture you want to grab from
+    cedar::aux::FileParameterPtr _mSourceFileName;
   };
 
   CEDAR_GENERATE_POINTER_TYPES(PictureChannel);
@@ -85,21 +99,25 @@ public cedar::dev::sensors::visual::Grabber
 public:
 
   /*! @brief  Constructor for a single-file grabber
-   *  @param configFileName	Filename for the configuration
+   *  @param grabberName  Name of the grabber
    *  @param pictureFileName	Filename to grab from
    */
-  PictureGrabber(const std::string& configFileName,const std::string& pictureFileName);
+  PictureGrabber
+  (
+    const std::string& grabberName = "PictureGrabber",
+    const std::string& pictureFileName = "./picture.jpg"
+  );
 
   /*! @brief Constructor for a stereo-file grabber
-   *  @param configFileName		Filename for the configuration
+   *  @param grabberName	Name of the grabber
    *  @param pictureFileName0	Filename to grab from for channel 0
    *  @param pictureFileName1	Filename to grab from for channel 1
    */
   PictureGrabber
   (
-    const std::string& configFileName,
-    const std::string& pictureFileName0,
-    const std::string& pictureFileName1
+    const std::string& grabberName = "StereoPictureGrabber",
+    const std::string& pictureFileName0 = "./picture.jpg",
+    const std::string& pictureFileName1 = "./picture_1.jpg"
   );
 
   /*! @brief Destructor */
@@ -139,11 +157,9 @@ protected:
   // inherited from Grabber
   bool onInit();
   bool onGrab();
-  bool onDeclareParameters();
   void onUpdateSourceInfo(unsigned int channel);
-  void onAddChannel();
 
-  // inherited from NamedConfiguration
+  // inherited from Configuration
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
 
@@ -152,27 +168,21 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   /// @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
-  inline PictureChannelPtr getChannel(unsigned int channel)
+  inline PictureChannelPtr getPictureChannel(unsigned int channel)
   {
     return boost::static_pointer_cast<PictureChannel>
            (
-             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
            );
   }
 
   /// @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
-  inline ConstPictureChannelPtr getChannel(unsigned int channel) const
+  inline ConstPictureChannelPtr getPictureChannel(unsigned int channel) const
   {
     return boost::static_pointer_cast<const PictureChannel>
            (
-             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
            );
-  }
-
-  //!@brief The default name for the grabber
-  virtual inline std::string defaultGrabberName() const
-  {
-    return "PictureGrabber";
   }
 
   //--------------------------------------------------------------------------------------------------------------------

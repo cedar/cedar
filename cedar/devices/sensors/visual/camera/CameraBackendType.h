@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,36 +22,33 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraIsoSpeed.h
+    File:        CameraBackendType.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
-    Date:        2011 08 01
+    Date:        2012 07 04
 
-    Description:  Header for CameraIsoSpeed enum-type class
+    Description:  Header for CameraBackendType enum-type class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_ISO_SPEED_H
-#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_ISO_SPEED_H
+#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERABACKENDTYPE_H
+#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERABACKENDTYPE_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
-#ifdef CEDAR_USE_LIB_DC1394
-
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/devices/sensors/visual/namespace.h"
 
 // SYSTEM INCLUDES
 
-
-/*!@brief Enum class for firewire ISO-speed
- *
- * Use this type for the CameraGrabber::setCameraInitIsoSpeed() and getCameraInitIsoSpeed() method
+/*!@brief Enum class to determine the used backend for the camera grabber
  */
-class cedar::dev::sensors::visual::CameraIsoSpeed
+class cedar::dev::sensors::visual::CameraBackendType
 {
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
@@ -73,12 +70,12 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public:  
+public:
   static void construct();
 
   static const cedar::aux::EnumBase& type();
-  static const cedar::dev::sensors::visual::CameraIsoSpeed::TypePtr& typePtr(); 
-  
+  static const cedar::dev::sensors::visual::CameraBackendType::TypePtr& typePtr();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -89,44 +86,45 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraIsoSpeed> mType;
+  static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraBackendType> mType;
   //!@endcond
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  /*! @brief Allow OpenCV backend to set the ISO-speed of the firewire bus.
+  /*! @brief Use the default value of the OpenCV::VideoCapture object
    *
-   *  Set the ISO-speed manually with the CameraGrabber::setCameraIsoSpeed() method.
-   *
-   *  @remarks
-   *  As every setting, this can only be done before the first frame was grabbed.
+   *  It is possible, that no all properties could be detected
    */
+  static const Id AUTO = 0;
 
-  static const Id ISO_NOT_SET = UINT_MAX-2;
+  /*! @brief Use only basic functionality of the cv::Capture object
+   */
+  static const Id CVCAPTURE = 1;
 
-  /// @brief Set the ISO-speed to 100
-  static const Id ISO_100 = 100;
-  /// @see ISO_100
-  static const Id ISO_200 = 200;
-  /// @see ISO_100
-  static const Id ISO_400 = 400;
-  /// @see ISO_100
-  static const Id ISO_800 = 800;
-  /// @see ISO_100
-  static const Id ISO_1600 = 1600;
-  /// @see ISO_100
-  static const Id ISO_3200 = 3200;
+#ifdef CEDAR_USE_LIB_DC1394
+  /*! @brief Use the DC1394 backend and settings
+   *
+   *   This is only possible if CEDAR is build with libdc support
+   */
+  static const Id DC1394 = 2;
+#endif
 
-    
+  /*! @brief Use the Video For Linux backend
+   */
+  static const Id VFL = 3;
+
+
+
 protected:
   // none yet
 private:
   // none yet
 
-}; // cedar::dev::sensors::visual::CameraIsoSpeed
+}; // cedar::dev::sensors::visual::CameraBackendType
 
-#endif // CEDAR_USE_LIB_DC1394
-#endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_ISO_SPEED_H
+
+#endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERABACKENDTYPE_H
 

@@ -38,8 +38,8 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_GRABBER_H
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_GRABBER_H
 
-#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
-#ifdef CEDAR_USE_LIB_DC1394
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/Grabber.h"
@@ -51,6 +51,7 @@
 #include "cedar/devices/sensors/visual/camera/CameraCapabilities.h"
 #include "cedar/devices/sensors/visual/camera/CameraStateAndConfig.h"
 #include "cedar/devices/sensors/visual/camera/CameraConfig.h"
+#include "cedar/devices/sensors/visual/camera/CameraBackendType.h"
 
 // SYSTEM INCLUDES
 
@@ -69,37 +70,60 @@ public cedar::dev::sensors::visual::Grabber
 
   //!@cond SKIPPED_DOCUMENTATION
 
-  /*! @struct CameraId
-   *  @brief Store the unique Id of a camera
-   */
-  struct CameraId
-  {
-    unsigned int busId;  /// The bus id
-    unsigned int guid;   /// The unique id of the device
-  };
 
-
+public:
   /*! @struct CameraChannel
    *  @brief Additional data of a camera channel
    */
   struct CameraChannel
   :
-  cedar::dev::sensors::visual::Grabber::GrabberChannel
+  cedar::dev::sensors::visual::Grabber::Channel
   {
-    /// Unique channel id
-    CameraId mCamId;
+  public:
+    CameraChannel
+    (
+      unsigned int GUID = 0,
+      unsigned int busId = 0,
+      cedar::dev::sensors::visual::CameraBackendType backendType = cedar::dev::sensors::visual::CameraBackendType::AUTO
+    )
+    :
+    cedar::dev::sensors::visual::Grabber::Channel(),
+    guid(GUID),
+    busId(busId),
+    _mBackendType(new cedar::aux::EnumParameter
+                  (
+                    this,
+                    "backend type",
+                    cedar::dev::sensors::visual::CameraBackendType::typePtr(),
+                    backendType
+                  )
+    ),
+    pmVideoCaptureLock(NULL)
+    {
+    }
 
-    /// Camera interface
-    cv::VideoCapture mVideoCapture;
+    /// Unique channel id (not supported on every backend)
+    unsigned int guid;
+
+    /// The id on the used bus
+    unsigned int busId;
+
+    /// The Backend to use
+    cedar::aux::EnumParameterPtr _mBackendType;
 
     /// The lock for the concurrent access to the cv::VideoCapture
     QReadWriteLock* pmVideoCaptureLock;
 
-    /// The manager of settings and properties
-    CameraStateAndConfigPtr mCamStateAndConfig;
+    CameraDevicePtr mpDevice;
 
-    /// Filename for the capabilities
-    std::string mCamCapabilitiesFileName; //delete
+    CameraStatePtr mpState;
+
+    CameraCapabilitiesPtr mpCapabilities;
+
+    CameraSettingsPtr mpSettings;
+
+    /// Camera interface
+    cv::VideoCapture mVideoCapture;
   };
 
   CEDAR_GENERATE_POINTER_TYPES(CameraChannel);
@@ -402,8 +426,6 @@ protected:
   ///! @brief Do the local clean up
   void onCleanUp();
 
-  ///! Create and initialize the channel-structure for ony channel (only used in constructor)
-  void onAddChannel();
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -429,28 +451,23 @@ private:
   }
 
   /// @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class CameraChannelPtr
-  inline CameraChannelPtr getChannel(unsigned int channel)
+  inline CameraChannelPtr getCameraChannel(unsigned int channel)
   {
     return boost::static_pointer_cast<CameraChannel>
            (
-             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
            );
   }
 
   /// @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class CameraChannelPtr
-  inline ConstCameraChannelPtr getChannel(unsigned int channel) const
+  inline ConstCameraChannelPtr getCameraChannel(unsigned int channel) const
   {
     return boost::static_pointer_cast<const CameraChannel>
            (
-             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
            );
   }
 
-  //!@brief The default name for the grabber
-  virtual inline std::string defaultGrabberName() const
-  {
-    return "CameraGrabber";
-  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -478,7 +495,6 @@ private:
 
 }; // class cedar::dev::sensors::visual::CameraGrabber
 
-#endif // CEDAR_USE_LIB_DC1394
 #endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_GRABBER_H
 
 

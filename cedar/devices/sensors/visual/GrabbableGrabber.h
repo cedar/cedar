@@ -22,20 +22,23 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        InterfaceGrabber.h
+    File:        GrabbableGrabber.h
 
     Maintainer:  Georg.Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 04 23
 
-    Description: Header for the @em @em cedar::dev::sensors::visual::InterfaceGrabber class.
+    Description: Header for the @em @em cedar::dev::sensors::visual::GrabbableGrabber class.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_INTERFACE_GRABBER_H
-#define CEDAR_DEV_SENSORS_VISUAL_INTERFACE_GRABBER_H
+#ifndef CEDAR_DEV_SENSORS_VISUAL_GRABBABLE_GRABBER_H
+#define CEDAR_DEV_SENSORS_VISUAL_GRABBABLE_GRABBER_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/Grabber.h"
@@ -54,7 +57,7 @@
  *    This class can also be used as a template to create other classes derived from GrabberInstance
  *
  */
-class cedar::dev::sensors::visual::InterfaceGrabber
+class cedar::dev::sensors::visual::GrabbableGrabber
 :
 public cedar::dev::sensors::visual::Grabber
 {
@@ -64,22 +67,32 @@ public cedar::dev::sensors::visual::Grabber
 
   //!@cond SKIPPED_DOCUMENTATION
 
+public:
+
   /*! @struct TestChannel
    *  @brief Additional data of a grabbing channel
    *  @remarks For grabber developers<br>
    *    You don't have to create an extended channel structure, until you need more channel data.
    *    But when, then you have to implement the onAddChannel() member function as well
    */
-  struct InterfaceChannel
+  struct GrabbableChannel
   :
-  cedar::dev::sensors::visual::Grabber::GrabberChannel
+  cedar::dev::sensors::visual::Grabber::Channel
   {
+  public:
+    GrabbableChannel(cedar::dev::sensors::visual::Grabbable* grabbable = NULL)
+    :
+    cedar::dev::sensors::visual::Grabber::Channel(),
+    mpSourceInterfaceClass(grabbable),
+    mpGrabberLock(NULL)
+    {
+    }
     //! @brief The class to grab from
     cedar::dev::sensors::visual::Grabbable* mpSourceInterfaceClass;
     QReadWriteLock* mpGrabberLock;
   };
 
-  CEDAR_GENERATE_POINTER_TYPES(InterfaceChannel);
+  CEDAR_GENERATE_POINTER_TYPES(GrabbableChannel);
 
   //!@endcond
 
@@ -91,32 +104,31 @@ public cedar::dev::sensors::visual::Grabber
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! @brief The constructor for a single channel grabber.
-   *  @param configFileName Filename for a file, where the configuration parameters should be stored
-   *  @param sourceInterfaceClass Class to grab from. Have to be a deriviative of the
-   *  cedar::dev::sensors::visual::Grabbable class
+
+  /*! @brief  Constructor for a single channel grabber
+   *  @param grabberName  Name of the grabber
+   *  @param grabbable Class that implements the grabbable interface to grab from
    */
-  InterfaceGrabber
+  GrabbableGrabber
   (
-    std::string configFileName,
-    cedar::dev::sensors::visual::Grabbable* sourceInterfaceClass
+    const std::string& grabberName = "GrabbableGrabber",
+    cedar::dev::sensors::visual::Grabbable *grabbable = NULL
   );
 
-  /*! @brief The constructor for a stereo grabber.
-   *  @param configFileName Filename for a file, where the configuration parameters should be stored
-   *  @param sourceInterfaceClass0 Class to grab from. Have to be a deriviative of the
-   *            cedar::dev::sensors::visual::Grabbable class
-   *  @param sourceInterfaceClass1 Class to grab from. Have to be a deriviative of the
-   *            cedar::dev::sensors::visual::Grabbable class   */
-  InterfaceGrabber
+  /*! @brief Constructor for a stereo channel grabber
+   *  @param grabberName  Name of the grabber
+   *  @param grabbable0 Class that implements the grabbable interface to grab from for channel 0
+   *  @param grabbable1 Class that implements the grabbable interface to grab from for channel 0
+   */
+  GrabbableGrabber
   (
-    std::string configFileName,
-    cedar::dev::sensors::visual::Grabbable* sourceInterfaceClass0,
-    cedar::dev::sensors::visual::Grabbable* sourceInterfaceClass1
+    const std::string& grabberName = "StereoGrabbableGrabber",
+    cedar::dev::sensors::visual::Grabbable *grabbable0 = NULL,
+    cedar::dev::sensors::visual::Grabbable *grabbable1 = NULL
   );
 
   //!@brief Destructor
-  ~InterfaceGrabber();
+  ~GrabbableGrabber();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -132,37 +144,30 @@ protected:
   //derived from Grabber
   bool onInit();
   void onCleanUp();
-  bool onDeclareParameters();
   void onUpdateSourceInfo(unsigned int channel);
   bool onGrab();
-  void onAddChannel();
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
   ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class InterfaceChannelPtr
-  inline InterfaceChannelPtr getChannel(unsigned int channel)
+  inline GrabbableChannelPtr getGrabbableChannel(unsigned int channel)
   {
-    return boost::static_pointer_cast<InterfaceChannel>
+    return boost::static_pointer_cast<GrabbableChannel>
            (
-             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
            );
   }
 
   ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class InterfaceChannellPtr
-  inline ConstInterfaceChannelPtr getChannel(unsigned int channel) const
+  inline ConstGrabbableChannelPtr getGrabbableChannel(unsigned int channel) const
   {
-    return boost::static_pointer_cast<const InterfaceChannel>
+    return boost::static_pointer_cast<const GrabbableChannel>
        (
-         cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
+         cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
        );
-  }
-
-  //!@brief The default name for the grabber
-  virtual inline std::string defaultGrabberName() const
-  {
-    return "InterfaceGrabber";
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -185,6 +190,6 @@ protected:
 private:
   // none yet
 
-}; // class cedar::dev::sensors::visual::InterfaceGrabber
+}; // class cedar::dev::sensors::visual::GrabbableGrabber
 
-#endif //CEDAR_DEV_SENSORS_VISUAL_INTERFACE_GRABBER_H
+#endif //CEDAR_DEV_SENSORS_VISUAL_GRABBABLE_GRABBER_H

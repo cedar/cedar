@@ -45,7 +45,10 @@
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/Log.h"
-#include <cedar/auxiliaries/NamedConfigurable.h>
+#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/FileParameter.h"
+#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -91,20 +94,37 @@ public cedar::aux::LoopedThread
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
-protected:
   //!@cond SKIPPED_DOCUMENTATION
 
+public:
+
   ///! @brief Structure to store all channel related stuff inside
-  struct GrabberChannel
+  struct Channel
+  :
+  public cedar::aux::Configurable
   {
+  public:
+    Channel()
+    :
+    _mSnapshotName(new cedar::aux::FileParameter(this,"snapshotName",cedar::aux::FileParameter::READ,"./snapshot.jpg")),
+    _mRecordName(new cedar::aux::FileParameter(this, "recordName",cedar::aux::FileParameter::READ,"./record.jpg")),
+    mChannelInfo("")
+    {
+      //init classes
+    };
+
+    virtual ~Channel()
+    {
+    }
+
     //! the picture frame
     cv::Mat mImageMat;
 
     //! Filename for snapshot
-    std::string mSnapshotName;
+    cedar::aux::FileParameterPtr _mSnapshotName;
 
     //! Filename for recording
-    std::string mRecordName;
+    cedar::aux::FileParameterPtr _mRecordName;
 
     ///! for recordings
     cv::VideoWriter mVideoWriter;
@@ -113,10 +133,17 @@ protected:
     std::string mChannelInfo;
   };
 
-  CEDAR_GENERATE_POINTER_TYPES(GrabberChannel);
+  CEDAR_GENERATE_POINTER_TYPES(Channel);
+
+  typedef cedar::aux::ObjectListParameterTemplate<Channel> ChannelParameter;
+  CEDAR_GENERATE_POINTER_TYPES(ChannelParameter);
 
   ///! @brief Typedef for a vector containing the instances of all used grabbers
   typedef std::vector<cedar::dev::sensors::visual::Grabber*> GrabberInstancesVector;
+  typedef cedar::aux::FactoryManager<cedar::dev::sensors::visual::Grabber::ChannelPtr> ChannelManager;
+
+public:
+  typedef cedar::aux::Singleton<cedar::dev::sensors::visual::Grabber::ChannelManager> ChannelManagerSingleton;
 
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -130,14 +157,24 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 
 protected:
-  /*! @brief The standard constructor.
+  /*! @brief The constructor for a single channel instance
+   *  @param grabberName The name of your grabber
+   *  @param ChannelPtr An already initialized channel structure of the derived grabber
    *  @remarks
    *    The constructor is protected, because no instance of Grabber should be instantiated.
    *    Use a derived class instead.
-   *  @param
-   *    configFileName The filename where the configuration parameters should be stored in (only for looped thread)
    */
-  Grabber(const std::string& configFileName);
+  Grabber(const std::string& grabberName, ChannelPtr defaultChannel);
+
+  /*! @brief The constructor for a single channel instance
+   *  @param grabberName The name of your grabber
+   *  @param ChannelPtr0 An already initialized channel structure of the derived grabber for channel 0
+   *  @param ChannelPtr1 An already initialized channel structure of the derived grabber for channel 1
+   *  @remarks
+   *    The constructor is protected, because no instance of Grabber should be instantiated.
+   *    Use a derived class instead.
+   */
+  Grabber(const std::string& grabberName, ChannelPtr defaultChannel0, ChannelPtr defaultChannel1);
 
 public:
 
@@ -150,7 +187,7 @@ public:
 public:
 
   /*!@brief Set the name of the grabber
-   * @param name The new name of the grabber. If the string is empty, then a default value will be used
+   * @param name The new name of the grabber. If the string is empty, then the old name wouldn't be changed
    */
   void setName(const std::string& name);
 
@@ -174,6 +211,18 @@ public:
    *  @see emergencyCleanup, doCleanUp
    */
   static void installCrashHandler();
+
+
+  /*! @brief This function applies the former read initialization (read via readJson)
+   *
+   *    If a grabber was already in grabbing mode, then a the old grabber will be deleted an a new one created
+   *    (with the changed parameters)
+   *
+   *    Call this method after readJson() to apply the new values.
+   *    It is possible to change values between readJson() and applyParameters() via the set-Methods
+   *    @see setRecordName(), @see setName(), @see CameraGrabber::setSettings()
+   */
+  void applyParameter();
 
 
   /*! @brief Get the number of currently used channels (sources).
@@ -361,20 +410,6 @@ public:
    */
   void saveSnapshotAllCams() const;
 
-  /*! @brief Write the actual used parameters to configuration
-   *
-   *    The configuration have to be saved manually with this function. There is no automatic saving for
-   *    example at the end of the program.
-   *
-   *  @return The integer return value of ConfigurationInterface::writeConfiguration() is casted to boolean
-   *
-   *  @remarks For grabber developers<br>
-   *    This method evokes onWriteConfiguration of the grabber. Implement in the derived class this function,
-   *    if there are any parameters have to be changed right before saving
-   *  @see onWriteConfiguration
-   */
-  bool writeConfiguration();
-
 
   //------------------------------------------------------------------------
   // Record methods
@@ -418,7 +453,7 @@ public:
    *      In the stereo case it may be 0 or 1.
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
-  const std::string& getRecordName(unsigned int channel=0) const;
+  const std::string getRecordName(unsigned int channel=0) const;
 
   /*! @brief Initialize and startGrabber recording
    *
@@ -497,32 +532,6 @@ protected:
   //          Derived from cedar::aux::Configurable
   //void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
-  /*! @brief  This function initialize the grabber.
-   *
-   *  @param numCams The init-function need to know how many channels there are
-   *
-   *  @remarks For grabber developers <br>
-   *          Have to be called in the constructor of the derived class. <br><br>
-   *          This is the first part of the initialization.
-   *          The initialization is a little bit tricky, but it restores and initializes all
-   *          local parameters from the configuration interface before Grabber::applyInit()
-   *          and onInit of the derived class will be invoked.<br><br>
-   *          On the other side, it is possible to change restored parameter in the constructor of a
-   *          derived class between this two steps (i.e. readInit(...); YOUR_PARAMETER_CHANGE; applyInit() )
-   *
-   *  @par
-   *          If onInit() fails, onCleanUp() will be invoked in order to clean up already initialized channels.
-   *          <br><br>
-   *          For an example look at VideoGrabber, NetGrabber or TestGrabber
-   *  @see onInit, declareParameter, onCleanUp
-   */
-  void readInit(unsigned int numCams);
-
-  /*! @brief This function applies the former read initialization and then it calls onInit of the derived class
-   *   @see onInit()
-   */
-  void applyInit();
-
   /*! @brief  Periodically call of grab()
    *
    *  For details have a look at cedar::aux::LoopedThread
@@ -555,7 +564,7 @@ protected:
    *      For examples, look at the classes VideoGrabber, CameraGrabber and PictureGrabber.
    */
 
-  virtual bool onInit();
+  virtual bool onCreateGrabber(unsigned int channel) = 0;
 
   /*! @brief  This method is invoked during destruction of the class.
    *
@@ -577,26 +586,6 @@ protected:
    *      This is where the grabbing takes place.
    */
   virtual bool onGrab();
-
-  /*! @brief  Declare parameters which should be saved in config-file
-   *
-   *		Should be overrided in derived class.<br>
-   *		Declare parameters for derived class in this method.<br>
-   *		Saved values are loaded at the beginning of Grabber.init()
-   *  @see doInit
-   */
-  virtual bool onDeclareParameters();
-
-  /*! @brief  In this method you can re-check or modify parameters
-   *
-   *    Should be overrided in derived class.<br>
-   *    Modify or actualize parameters declared in onDeclareParameters.<br>
-   *    This method only will be evoked right before the parameters are saved with
-   *    cedar::aux::ConfigurationInterface::writeConfiguration().<br>
-   *    Save your Parameters with Grabber::writeConfiguration()
-   *  @see onDeclareParameters, writeConfiguration
-   */
-  virtual bool onWriteConfiguration();
 
 
   /*! @brief Get information about the used device, i.e. the filename or the mount-point
@@ -627,6 +616,11 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
 
+  /*! @brief This function does internal variable initialization in grabber constructor
+   *  @param numChannels The number of channels you want to create
+   */
+  void init(std::vector<cedar::dev::sensors::visual::Grabber::ChannelPtr> grabberChannels);
+
 
   /*! @brief Callback function to respond to a captured CTRL-C event
    *
@@ -640,23 +634,17 @@ private:
   /*! Get the pointer to the channel structure of the specified channel
    *  @param channel The channel number of the wanted channel structure
    */
-  inline GrabberChannelPtr getChannel(unsigned int channel)
+  inline ChannelPtr getChannel(unsigned int channel)
   {
-    return mChannels.at(channel);
+    return _mChannels->at(channel);
   }
 
   /*! Get the const pointer to the channel structure of the specified channel
    *  @param channel The channel number of the wanted channel structure
    */
-  inline GrabberChannelPtr getChannel(unsigned int channel) const
+  inline ChannelPtr getChannel(unsigned int channel) const
   {
-    return mChannels.at(channel);
-  }
-
-  //!@brief Define a default name for the grabber
-  virtual inline std::string defaultGrabberName() const
-  {
-    return "";
+    return _mChannels->at(channel);
   }
 
 
@@ -664,10 +652,6 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-    ///! For every grabbing-channel one channel structure
-    std::vector<GrabberChannelPtr> mChannels;
-
 
     /*! @brief  Flag if recording is on     */
     bool mRecord;
@@ -691,7 +675,6 @@ protected:
     double mFpsMeasured;
     
 private:
-    
     ///! @brief Flag which indicates if the GrabberThread was started during startRecording
     bool mGrabberThreadStartedOnRecording;
 
@@ -724,6 +707,9 @@ protected:
   //!@brief Constant which defines how often getFpsMeasured() will be updated (in frames).
   // Default value is every 5 frames
   static const int UPDATE_FPS_MEASURE_FRAME_COUNT = 5;
+
+  ///! A vector which contains for every grabbing-channel one channel structure
+  ChannelParameterPtr _mChannels;
 
 private:
   //!@brief The name of the grabber
