@@ -93,6 +93,7 @@ const cedar::proc::steps::ColorConversion::ColorSpace::Id cedar::proc::steps::Co
 cedar::proc::steps::ColorConversion::ColorConversion()
 :
 mOutput(new cedar::aux::MatData(cv::Mat(2, 2, CV_32F))),
+mCvConversionConstant(-1),
 _mTargetType
 (
   new cedar::aux::EnumParameter
@@ -243,6 +244,9 @@ void cedar::proc::steps::ColorConversion::inputConnectionChanged(const std::stri
   this->mOutput->copyAnnotationsFrom(this->mInput);
   this->updateSourceImageColorSpace();
   this->updateTargetImageColorSpace();
+  this->updateCvConvertConstant();
+
+  this->onTrigger();
 }
 
 void cedar::proc::steps::ColorConversion::compute(const cedar::proc::Arguments& /* arguments */)
