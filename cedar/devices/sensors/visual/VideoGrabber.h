@@ -107,10 +107,10 @@ public:
    */
   VideoGrabber
   (
-    const std::string& grabberName = "PictureGrabber",
     const std::string& videoFileName = "./video.avi",
     bool looped = true,
-    bool speedFactor = 1
+    bool speedFactor = 1,
+    const std::string& grabberName = "PictureGrabber"
   );
 
   /*! @brief Constructor for a stereo-file grabber
@@ -120,11 +120,11 @@ public:
    */
   VideoGrabber
   (
-    const std::string& grabberName = "StereoPictureGrabber",
-    const std::string& videoFileName0 = "./video.avi",
-    const std::string& videoFileName1 = "./video_1.avi",
+    const std::string& videoFileName0,
+    const std::string& videoFileName1,
     bool looped = true,
-    bool speedFactor = 1
+    bool speedFactor = 1,
+    const std::string& grabberName = "StereoPictureGrabber"
   );
   //!@brief Destructor
   ~VideoGrabber();

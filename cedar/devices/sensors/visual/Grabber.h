@@ -609,7 +609,7 @@ protected:
    *  For grabber-developers:<br>
    *  Should be overrided in derived class, if more informations on a channel have to be stored
    */
-  virtual void onAddChannel();
+  //virtual void onAddChannel();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

@@ -59,11 +59,10 @@ class cedar::dev::sensors::visual::CameraSettings
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-protected:
+public:
   //!@brief The standard constructor.
   CameraSettings();
 
-public:
   //!@brief Destructor
   ~CameraSettings();
 

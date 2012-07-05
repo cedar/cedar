@@ -111,8 +111,8 @@ public:
    */
   GrabbableGrabber
   (
-    const std::string& grabberName = "GrabbableGrabber",
-    cedar::dev::sensors::visual::Grabbable *grabbable = NULL
+    cedar::dev::sensors::visual::Grabbable *grabbable = NULL,
+    const std::string& grabberName = "GrabbableGrabber"
   );
 
   /*! @brief Constructor for a stereo channel grabber
@@ -122,9 +122,9 @@ public:
    */
   GrabbableGrabber
   (
-    const std::string& grabberName = "StereoGrabbableGrabber",
-    cedar::dev::sensors::visual::Grabbable *grabbable0 = NULL,
-    cedar::dev::sensors::visual::Grabbable *grabbable1 = NULL
+    cedar::dev::sensors::visual::Grabbable *grabbable0,
+    cedar::dev::sensors::visual::Grabbable *grabbable1,
+    const std::string& grabberName = "StereoGrabbableGrabber"
   );
 
   //!@brief Destructor

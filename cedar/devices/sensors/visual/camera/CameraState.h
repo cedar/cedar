@@ -59,11 +59,11 @@ class cedar::dev::sensors::visual::CameraState
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-protected:
+public:
+
   //!@brief The standard constructor.
   CameraState();
 
-public:
   //!@brief Destructor
   ~CameraState();
 

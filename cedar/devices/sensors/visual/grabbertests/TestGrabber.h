@@ -108,8 +108,8 @@ public:
    */
   TestGrabber
   (
-    const std::string& grabberName = "TestGrabber",
-    const std::string& sourceFileName = "./default_parameter_value_for_code_instantiation"
+    const std::string& sourceFileName = "./default_parameter_value_for_code_instantiation",
+    const std::string& grabberName = "TestGrabber"
   );
 
   /*! @brief Constructor for a stereo channel grabber
@@ -119,9 +119,9 @@ public:
    */
   TestGrabber
   (
-    const std::string& grabberName = "StereoTestGrabber",
     const std::string& sourceFileName0 = "./default_parameter_value_for_code_instantiation_channel0",
-    const std::string& sourceFileName1 = "./default_parameter_value_for_code_instantiation_channel1"
+    const std::string& sourceFileName1 = "./default_parameter_value_for_code_instantiation_channel1",
+    const std::string& grabberName = "StereoTestGrabber"
   );
 
   //!@brief Destructor

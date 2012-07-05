@@ -104,8 +104,8 @@ public:
    */
   PictureGrabber
   (
-    const std::string& grabberName = "PictureGrabber",
-    const std::string& pictureFileName = "./picture.jpg"
+    const std::string& pictureFileName = "./picture.jpg",
+    const std::string& grabberName = "PictureGrabber"
   );
 
   /*! @brief Constructor for a stereo-file grabber
@@ -115,9 +115,9 @@ public:
    */
   PictureGrabber
   (
-    const std::string& grabberName = "StereoPictureGrabber",
-    const std::string& pictureFileName0 = "./picture.jpg",
-    const std::string& pictureFileName1 = "./picture_1.jpg"
+    const std::string& pictureFileName0,
+    const std::string& pictureFileName1,
+    const std::string& grabberName = "StereoPictureGrabber"
   );
 
   /*! @brief Destructor */

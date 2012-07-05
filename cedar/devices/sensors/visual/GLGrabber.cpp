@@ -59,8 +59,8 @@ namespace
 // Constructor for a single-channel grabber
 cedar::dev::sensors::visual::GLGrabber::GLGrabber
 (
-  const std::string& grabberName,
-  QGLWidget *qglWidget
+  QGLWidget *qglWidget,
+  const std::string& grabberName
 )
 :
 cedar::dev::sensors::visual::Grabber
@@ -80,9 +80,9 @@ cedar::dev::sensors::visual::Grabber
 // Constructor for a stereo grabber
 cedar::dev::sensors::visual::GLGrabber::GLGrabber
 (
-  const std::string& grabberName,
   QGLWidget *qglWidget0,
-  QGLWidget *qglWidget1
+  QGLWidget *qglWidget1,
+  const std::string& grabberName
 )
 :
 cedar::dev::sensors::visual::Grabber

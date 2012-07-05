@@ -117,8 +117,8 @@ public:
    */
   NetGrabber
   (
-    const std::string& grabberName = "NetGrabber",
-    const std::string& yarpChannelName = "grabberYarpChannel"
+    const std::string& yarpChannelName = "grabberYarpChannel",
+    const std::string& grabberName = "NetGrabber"
   );
 
   /*! @brief Constructor for a stereo channel grabber
@@ -128,9 +128,9 @@ public:
    */
   NetGrabber
   (
-    const std::string& grabberName = "StereoNetGrabber",
-    const std::string& yarpChannelName0 = "grabberYarpChannel",
-    const std::string& yarpChannelName1 = "grabberYarpChannel_1"
+    const std::string& yarpChannelName0,
+    const std::string& yarpChannelName1,
+    const std::string& grabberName = "StereoNetGrabber"
   );
 
   //!@brief Destructor

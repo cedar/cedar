@@ -63,8 +63,8 @@ namespace
 //Constructor for single-file grabber
 cedar::dev::sensors::visual::PictureGrabber::PictureGrabber
 (
-  const std::string& grabberName,
-  const std::string& pictureFileName
+  const std::string& pictureFileName,
+  const std::string& grabberName
 )
 :
 cedar::dev::sensors::visual::Grabber
@@ -83,9 +83,9 @@ cedar::dev::sensors::visual::Grabber
 //Constructor for stereo-file grabber
 cedar::dev::sensors::visual::PictureGrabber::PictureGrabber
 (
-  const std::string& grabberName,
   const std::string& pictureFileName0,
-  const std::string& pictureFileName1
+  const std::string& pictureFileName1,
+  const std::string& grabberName
 )
 :
 cedar::dev::sensors::visual::Grabber
@@ -142,7 +142,8 @@ bool cedar::dev::sensors::visual::PictureGrabber::onInit()
   init_message << "Initialize picture grabber with " << mNumCams << " channel(s) ..." << std::endl;
   for (unsigned int i = 0; i < mNumCams; ++i)
   {
-    init_message << "\tChannel " << i << ": capture from Picture: " << getPictureChannel(i)->_mSourceFileName->getValue() << std::endl;
+    init_message << "\tChannel " << i << ": capture from Picture: "
+                 << getPictureChannel(i)->_mSourceFileName->getPath() << std::endl;
   }
   cedar::aux::LogSingleton::getInstance()->message
                                            (

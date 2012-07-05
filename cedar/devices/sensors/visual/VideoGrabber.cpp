@@ -63,10 +63,10 @@ namespace
 //Constructor for single-file grabber
 cedar::dev::sensors::visual::VideoGrabber::VideoGrabber
 (
-  const std::string& grabberName,
   const std::string& videoFileName,
   bool looped,
-  bool speedFactor
+  bool speedFactor,
+  const std::string& grabberName
 )
 :
 cedar::dev::sensors::visual::Grabber
@@ -88,11 +88,11 @@ _mSpeedFactor(new cedar::aux::IntParameter(this, "speedFactor", speedFactor,1,20
 //Constructor for stereo-file grabber
 cedar::dev::sensors::visual::VideoGrabber::VideoGrabber
 (
-  const std::string& grabberName,
   const std::string& videoFileName0,
   const std::string& videoFileName1,
   bool looped,
-  bool speedFactor
+  bool speedFactor,
+  const std::string& grabberName
 )
 :
 cedar::dev::sensors::visual::Grabber

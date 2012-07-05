@@ -66,13 +66,20 @@ namespace
 //Constructor for single-file grabber
 cedar::dev::sensors::visual::CameraGrabber::CameraGrabber
 (
-  const std::string& configFileName,
-  unsigned int camera,
+  unsigned int cameraId,
   bool isGuid,
-  bool finishInitialization
+  cedar::dev::sensors::visual::CameraBackendType::Id backendType,
+  const std::string& grabberName
 )
 :
-cedar::dev::sensors::visual::Grabber(configFileName)
+cedar::dev::sensors::visual::Grabber
+(
+  grabberName,
+  cedar::dev::sensors::visual::CameraGrabber::CameraChannelPtr
+  (
+    new cedar::dev::sensors::visual::CameraGrabber::CameraChannel(cameraId, isGuid, backendType)
+  )
+)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   cedar::aux::LogSingleton::getInstance()->debugMessage
@@ -81,9 +88,9 @@ cedar::dev::sensors::visual::Grabber(configFileName)
                                              "cedar::dev::sensors::visual::CameraGrabber::CameraGrabber()"
                                            );
 
-  mFinishInitialization = finishInitialization;
   mCreateGrabberByGuid = isGuid;
 
+/*
   //declareParameters and read it from configfile
   //readInit(1);
 
@@ -102,20 +109,34 @@ cedar::dev::sensors::visual::Grabber(configFileName)
                                              "cedar::dev::sensors::visual::CameraGrabber::CameraGrabber()"
                                            );
   //cedar::aux::ConfigurationInterface::writeConfiguration();
+   *
+   */
 }
 
 //----------------------------------------------------------------------------------------------------
 //Constructor for stereo-file grabber
 cedar::dev::sensors::visual::CameraGrabber::CameraGrabber
-               (
-                 const std::string& configFileName,
-                 unsigned int camera0,
-                 unsigned int camera1,
-                 bool isGuid,
-                 bool finishInitialization
-               )
+(
+  unsigned int cameraId0,
+  unsigned int cameraId1,
+  bool isGuid,
+  cedar::dev::sensors::visual::CameraBackendType::Id backendType,
+  const std::string& grabberName
+)
 :
-cedar::dev::sensors::visual::Grabber(configFileName)
+cedar::dev::sensors::visual::Grabber
+(
+  grabberName,
+  cedar::dev::sensors::visual::CameraGrabber::CameraChannelPtr
+  (
+    new cedar::dev::sensors::visual::CameraGrabber::CameraChannel(cameraId0, isGuid, backendType)
+  ),
+  cedar::dev::sensors::visual::CameraGrabber::CameraChannelPtr
+  (
+    new cedar::dev::sensors::visual::CameraGrabber::CameraChannel(cameraId1, isGuid, backendType)
+  )
+)
+
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   cedar::aux::LogSingleton::getInstance()->debugMessage
@@ -124,7 +145,9 @@ cedar::dev::sensors::visual::Grabber(configFileName)
                                              "cedar::dev::sensors::visual::CameraGrabber::CameraGrabber()"
                                            );
 
+  mCreateGrabberByGuid = isGuid;
 
+/*
   mFinishInitialization = finishInitialization;
   mCreateGrabberByGuid = isGuid;
 
@@ -149,11 +172,13 @@ cedar::dev::sensors::visual::Grabber(configFileName)
                                              "cedar::dev::sensors::visual::CameraGrabber::CameraGrabber()"
                                            );
   //cedar::aux::ConfigurationInterface::writeConfiguration();
+   *
+   */
 }
 
 //----------------------------------------------------------------------------------------------------
 //constructor that reads configuration only from configuration file
-cedar::dev::sensors::visual::CameraGrabber::CameraGrabber
+/*cedar::dev::sensors::visual::CameraGrabber::CameraGrabber
                (
                  const std::string& configFileName,
                  unsigned int numChannels
@@ -193,6 +218,7 @@ cedar::dev::sensors::visual::Grabber(configFileName)
 
   //cedar::aux::ConfigurationInterface::writeConfiguration();
 }
+*/
 
 //----------------------------------------------------------------------------------------------------
 cedar::dev::sensors::visual::CameraGrabber::~CameraGrabber()
@@ -230,6 +256,7 @@ cedar::dev::sensors::visual::CameraGrabber::~CameraGrabber()
 //  mChannels.push_back(channel);
 //}
 
+/*
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::CameraGrabber::setChannelId(unsigned int channel, unsigned int id, bool isGuid)
 {
@@ -278,7 +305,8 @@ bool cedar::dev::sensors::visual::CameraGrabber::onDeclareParameters()
   }
   return result;
 }
-
+*/
+/*
 //----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::CameraGrabber::onWriteConfiguration()
 {
@@ -294,7 +322,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::onWriteConfiguration()
   }
   return result;
 }
-
+*/
 //----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::CameraGrabber::onInit()
 {
@@ -315,11 +343,11 @@ bool cedar::dev::sensors::visual::CameraGrabber::onInit()
 
     if (mCreateGrabberByGuid)
     {
-      init_message << "Camera-GUID: "<< getCameraChannel(i)->mCamId.guid << std::endl;
+      init_message << "Camera-GUID: "<< getCameraChannel(i)->mGuid << std::endl;
     }
     else
     {
-      init_message << "Bus-ID " << getCameraChannel(i)->mCamId.busId << std::endl;
+      init_message << "Bus-ID " << getCameraChannel(i)->mBusId << std::endl;
     }
   }
   cedar::aux::LogSingleton::getInstance()->systemInfo
@@ -364,11 +392,11 @@ bool cedar::dev::sensors::visual::CameraGrabber::onInit()
         //check if guid of camera is in our guid-vector
         for (unsigned int channel = 0; channel < mNumCams; ++channel)
         {
-          unsigned int test_guid = getCameraChannel(channel)->mCamId.guid;
+          unsigned int test_guid = getCameraChannel(channel)->mGuid;
           if (guid == test_guid )
           {
             //yes: store bus_id and videocapture
-            getCameraChannel(channel)->mCamId.busId = cam;
+            getCameraChannel(channel)->mBusId = cam;
             getCameraChannel(channel)->mVideoCapture = capture;
             found_cams++;
           }
@@ -409,7 +437,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::onInit()
     for (unsigned int channel = 0; channel < mNumCams; ++channel)
     {
       //open the camera
-      cv::VideoCapture capture(getCameraChannel(channel)->mCamId.busId);
+      cv::VideoCapture capture(getCameraChannel(channel)->mBusId);
       if (! capture.isOpened())
       {
         cedar::aux::LogSingleton::getInstance()->error
@@ -434,7 +462,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::onInit()
     //if grabber created by busId, guid is zero, so read it
     if (!mCreateGrabberByGuid)
     {
-      getCameraChannel(channel)->mCamId.guid =
+      getCameraChannel(channel)->mGuid =
         static_cast<unsigned int>(getCameraChannel(channel)->mVideoCapture.get(CV_CAP_PROP_GUID));
     }
 
@@ -444,8 +472,8 @@ bool cedar::dev::sensors::visual::CameraGrabber::onInit()
     //conf_file_name = ConfigurationInterface::getConfigFileName()+"_ch"+boost::lexical_cast<std::string>(channel);
 
     //if capabilities filename match with definition for autogenerated filename, create filename
-    std::string cap_file_name = getCameraChannel(channel)->mCamCapabilitiesFileName;
-    unsigned int guid = getCameraChannel(channel)->mCamId.guid;
+    std::string cap_file_name = "todo";//getCameraChannel(channel)->mCamCapabilitiesFileName;
+    unsigned int guid = getCameraChannel(channel)->mGuid;
 
     if (cap_file_name == useAutogeneratedFilenameString())
     {
@@ -467,7 +495,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::onInit()
     //create camera configuration
     try
     {
-      CameraStateAndConfigPtr cam_conf
+     /* CameraStateAndConfigPtr cam_conf
                               (
                                 new CameraStateAndConfig
                                     (
@@ -479,6 +507,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::onInit()
                                     )
                               );
       getCameraChannel(channel)->mCamStateAndConfig = cam_conf;
+      */
     }
     catch (...)
     {
@@ -510,7 +539,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::onInit()
   init_message << "Camera opened:" << std::endl;
   for (unsigned int i = 0; i < mNumCams; ++i)
   {
-    init_message << "Channel " << i << ": GUID: "<< getCameraChannel(i)->mCamId.guid << "\n";
+    init_message << "Channel " << i << ": GUID: "<< getCameraChannel(i)->mGuid << "\n";
   }
   cedar::aux::LogSingleton::getInstance()->systemInfo
                                            (
@@ -640,9 +669,9 @@ bool cedar::dev::sensors::visual::CameraGrabber::onGrab()
   //lock for concurrent access in the grabber-thread and in the get/set properties
   for (unsigned int channel = 0; channel < mNumCams; ++channel)
   {
-    getCameraChannel(channel)->pmVideoCaptureLock->lockForWrite();
+    getCameraChannel(channel)->mpVideoCaptureLock->lockForWrite();
     result = getCameraChannel(channel)->mVideoCapture.grab() && result;
-    getCameraChannel(channel)->pmVideoCaptureLock->unlock();
+    getCameraChannel(channel)->mpVideoCaptureLock->unlock();
   }
 
   //and then retrieve the frames
@@ -650,9 +679,9 @@ bool cedar::dev::sensors::visual::CameraGrabber::onGrab()
   {
     for (unsigned int channel = 0; channel < mNumCams; ++channel)
     {
-      getCameraChannel(channel)->pmVideoCaptureLock->lockForWrite();
+      getCameraChannel(channel)->mpVideoCaptureLock->lockForWrite();
       result = getCameraChannel(channel)->mVideoCapture.retrieve(getCameraChannel(channel)->mImageMat) && result;
-      getCameraChannel(channel)->pmVideoCaptureLock->unlock();
+      getCameraChannel(channel)->mpVideoCaptureLock->unlock();
     }
   }
   return result;
@@ -665,9 +694,9 @@ void cedar::dev::sensors::visual::CameraGrabber::onUpdateSourceInfo(unsigned int
   //value of channel is already checked by GraberInterface::getSourceInfo()
   std::stringstream s;
   s << "Camera channel 0"
-    << ": DeviceID: " << getCameraChannel(channel)->mCamId.busId
-    << ", GUID: " << getCameraChannel(channel)->mCamId.guid
-    << " (0x"<<std::hex<<getCameraChannel(channel)->mCamId.guid<<")"<<std::dec
+    << ": DeviceID: " << getCameraChannel(channel)->mBusId
+    << ", GUID: " << getCameraChannel(channel)->mGuid
+    << " (0x"<<std::hex<<getCameraChannel(channel)->mGuid<<")"<<std::dec
     << ", Mode: " << CameraVideoMode::type().get(this->getCameraMode(0)).name();
   getCameraChannel(channel)->mChannelInfo = s.str();
 }
@@ -695,7 +724,7 @@ unsigned int cedar::dev::sensors::visual::CameraGrabber::getCameraGuid(unsigned 
       "cedar::dev::sensors::visual::CameraGrabber::getCameraProperty"
     );
   }
-  return getCameraChannel(channel)->mCamId.guid;
+  return getCameraChannel(channel)->mGuid;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -712,6 +741,7 @@ double cedar::dev::sensors::visual::CameraGrabber::getCameraProperty(unsigned in
 
   std::string info="";
 
+  /*
   if (getCameraChannel(channel)->mCamStateAndConfig->isSupported(propId))
   {
     if (getCameraChannel(channel)->mCamStateAndConfig->isReadable(propId))
@@ -727,7 +757,7 @@ double cedar::dev::sensors::visual::CameraGrabber::getCameraProperty(unsigned in
   {
     info = " is not supported";
   }
-
+*/
   std::string prop = CameraProperty::type().get(propId).name();
 
   cedar::aux::LogSingleton::getInstance()->warning
@@ -756,7 +786,7 @@ double cedar::dev::sensors::visual::CameraGrabber::getCameraPropertyValue
   }
 
   std::string info="";
-
+/*
   if (getCameraChannel(channel)->mCamStateAndConfig->isSupported(propId))
   {
     if (getCameraChannel(channel)->mCamStateAndConfig->isReadable(propId))
@@ -772,7 +802,7 @@ double cedar::dev::sensors::visual::CameraGrabber::getCameraPropertyValue
   {
     info = " is not supported";
   }
-
+*/
   std::string prop = CameraProperty::type().get(propId).name();
   cedar::aux::LogSingleton::getInstance()->warning
                                            (
@@ -812,7 +842,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::setCameraProperty
       "cedar::dev::sensors::visual::CameraGrabber::setCameraProperty"
     );
   }
-  return getCameraChannel(channel)->mCamStateAndConfig->setProperty(propId, value);
+  //return getCameraChannel(channel)->mCamStateAndConfig->setProperty(propId, value);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -869,7 +899,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::setCameraSetting
 
   }
 
-  bool result = getCameraChannel(channel)->mCamStateAndConfig->setSetting(setting_id, value);
+  bool result = false; //getCameraChannel(channel)->mCamStateAndConfig->setSetting(setting_id, value);
   return result;
 }
 
@@ -898,7 +928,7 @@ double cedar::dev::sensors::visual::CameraGrabber::getCameraSetting( unsigned in
                                                );
     return -1;
   }
-  return getCameraChannel(channel)->mCamStateAndConfig->getSetting(setting_id);
+  return false; //getCameraChannel(channel)->mCamStateAndConfig->getSetting(setting_id);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -972,7 +1002,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::setRawProperty(unsigned int cha
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"cedar::dev::sensors::visual::CameraGrabber::setRawProperty");
   }
-  return getCameraChannel(channel)->mCamStateAndConfig->setRawProperty(propId, value);
+  return false; //getCameraChannel(channel)->mCamStateAndConfig->setRawProperty(propId, value);
 }
 
 
@@ -983,6 +1013,6 @@ double cedar::dev::sensors::visual::CameraGrabber::getRawProperty(unsigned int c
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"cedar::dev::sensors::visual::CameraGrabber::getRawProperty");
   }
-  return getCameraChannel(channel)->mCamStateAndConfig->getRawProperty(propId);
+  return 0.0; //getCameraChannel(channel)->mCamStateAndConfig->getRawProperty(propId);
 }
 
