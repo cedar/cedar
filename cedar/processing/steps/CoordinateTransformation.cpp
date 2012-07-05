@@ -504,6 +504,7 @@ void cedar::proc::steps::CoordinateTransformation::inputConnectionChanged(const 
   // This should always work since other types should not be accepted.
   CEDAR_DEBUG_ASSERT(this->mInput);
 
+  this->mOutput->copyAnnotationsFrom(this->mInput);
 }
 
 void cedar::proc::steps::CoordinateTransformation::changeNumberOfRows()

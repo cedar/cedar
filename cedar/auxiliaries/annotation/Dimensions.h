@@ -22,133 +22,96 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GrabberBase.h
+    File:        Dimensions.h
 
-    Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.ruhr-uni-bochum.d
-    Date:        2012 05 23
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 06 29
 
-    Description: The header for the GrabberBase class
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCES_GRABBER_SOURCE_H
-#define CEDAR_PROC_SOURCES_GRABBER_SOURCE_H
+#ifndef CEDAR_AUX_ANNOTATION_DIMENSIONS_H
+#define CEDAR_AUX_ANNOTATION_DIMENSIONS_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/namespace.h"
-#include "cedar/processing/Step.h"
-#include "cedar/devices/sensors/visual/Grabber.h"
-#include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/auxiliaries/MatData.h"
-#include "cedar/auxiliaries/FileParameter.h"
+#include "cedar/auxiliaries/annotation/namespace.h"
+#include "cedar/auxiliaries/annotation/Annotation.h"
+#include "cedar/auxiliaries/Cloneable.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief The base class for all grabber sources for the processingIde
+/*!@todo describe.
  *
- *    This class implements the common structure of all grabber sources
+ * @todo describe more.
  */
-class cedar::proc::sources::GrabberBase
+class cedar::aux::annotation::Dimensions
 :
-public cedar::proc::Step
+public cedar::aux::annotation::Annotation,
+public cedar::aux::Cloneable<cedar::aux::annotation::Dimensions, cedar::aux::annotation::Annotation>
 {
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-
+private:
+  struct Dimension
+  {
+    std::string mLabel;
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-  //!@brief The standard constructor.
-  GrabberBase();
-
 public:
-  //!@brief Destructor
-  virtual ~GrabberBase();
+  //!@brief The standard constructor.
+  Dimensions(unsigned int numberOfDimensions);
+
+  Dimensions(const cedar::aux::annotation::Dimensions& copy);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Save a Snapshot of the current picture
-  void saveSnapshot();
+  //! Returns the label for the given dimension.
+  const std::string& getLabel(unsigned int dimension) const;
 
-public slots:
-  //!@brief Slot for the recording-checkbox
-  void setRecording();
+  //! Sets the label of the given dimension.
+  void setLabel(unsigned int dimension, const std::string& label);
 
-  //!@todo Enum RecordType (Encoding)
-
-  //!@brief Slot to set a new configuration filename
-  void setConfigurationFileName();
-
+  //! Returns the number of entries in the dimensions.
+  inline size_t getDimensionality() const
+  {
+    return this->mDimensions.size();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-  //!@brief Invoke this function in the derived class
-  //  invokes onCreateGrabber() form derived class and updates information from grabber for the gui-parameter
-  void createGrabber();
-
-  //!@brief Create the grabber in the derived class
-  //  apply the new created Grabber to GrabberBase::mGrabber
-  virtual void onCreateGrabber() = 0;
-
-  //!@brief Applies an appropriate annotation to the current image.
-  void annotateImage();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief The used Grabber stored in this pointer
-  cedar::dev::sensors::visual::GrabberPtr mGrabber;
-
-  //!@brief The grabbed Image
-  cedar::aux::MatDataPtr mImage;
-
-
-private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  //!@cond SKIPPED_DOCUMENTATION
-  // the values of the properties
-  cedar::aux::BoolParameterPtr mRecording;
-  cedar::aux::FileParameterPtr mRecordName;
-  //cedar::aux::BoolParameterPtr mSaveSnapshot;
-  cedar::aux::FileParameterPtr mSnapshotName;
-
-  //!@brief The configuration filename
-  cedar::aux::FileParameterPtr _mConfigurationFileName;
-  //!@todo Enum RecordType (Encoding)
-
-  //!@endcond
 private:
-  // none yet
+  //! Labels corresponding to the dimensions
+  std::vector<Dimension> mDimensions;
 
-}; //class cedar::proc::sources::GrabberBase
+}; // class cedar::aux::annotation::Dimensions
 
-#endif // CEDAR_PROC_SOURCES_GRABBER_SOURCE_H
+#endif // CEDAR_AUX_ANNOTATION_DIMENSIONS_H
 

@@ -366,6 +366,9 @@ void cedar::proc::steps::Resize::inputConnectionChanged(const std::string& input
   // Adapt the dimensionality of the output size vector.
   this->_mOutputSize->resize(cedar::aux::math::getDimensionalityOf(input), 1);
 
+  // Also adapt the annotations of the input
+  this->mOutput->copyAnnotationsFrom(this->mInput);
+
   // Finally, this also requires a recomputation of the output.
   this->updateOutputMatrixSize();
 }

@@ -22,110 +22,105 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GrabberBase.h
+    File:        Cloneable.h
 
-    Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.ruhr-uni-bochum.d
-    Date:        2012 05 23
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 07 02
 
-    Description: The header for the GrabberBase class
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCES_GRABBER_SOURCE_H
-#define CEDAR_PROC_SOURCES_GRABBER_SOURCE_H
+#ifndef CEDAR_AUX_CLONEABLE_H
+#define CEDAR_AUX_CLONEABLE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/namespace.h"
-#include "cedar/processing/Step.h"
-#include "cedar/devices/sensors/visual/Grabber.h"
-#include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/auxiliaries/MatData.h"
-#include "cedar/auxiliaries/FileParameter.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief The base class for all grabber sources for the processingIde
- *
- *    This class implements the common structure of all grabber sources
+/*!@brief Base class for cloneables.
  */
-class cedar::proc::sources::GrabberBase
-:
-public cedar::proc::Step
+template <class ReturnedT>
+class cedar::aux::CloneableBase
 {
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-
+public:
+  typedef ReturnedT ReturnedType;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-  //!@brief The standard constructor.
-  GrabberBase();
-
 public:
-  //!@brief Destructor
-  virtual ~GrabberBase();
+  virtual ~CloneableBase()
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Save a Snapshot of the current picture
-  void saveSnapshot();
+  virtual boost::shared_ptr<ReturnedType> clone() const = 0;
+};
 
-public slots:
-  //!@brief Slot for the recording-checkbox
-  void setRecording();
+/*!@brief A class that implements the clone function based on a class's copy constructor.
+ */
+template <class ClonedT, class ReturnedT>
+class cedar::aux::Cloneable : public virtual cedar::aux::CloneableBase<ReturnedT>
+{
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef ClonedT ClonedType;
+  typedef ReturnedT ReturnedType;
 
-  //!@todo Enum RecordType (Encoding)
+  //--------------------------------------------------------------------------------------------------------------------
+  // constructors and destructor
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //!@brief Destructor
+  virtual ~Cloneable()
+  {
+  }
 
-  //!@brief Slot to set a new configuration filename
-  void setConfigurationFileName();
-
+  //--------------------------------------------------------------------------------------------------------------------
+  // public methods
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  /*!@brief Clones the object using the copy constructor.
+   */
+  virtual boost::shared_ptr<ReturnedType> clone() const
+  {
+    return boost::shared_ptr<ReturnedType>(new ClonedType(*cedar::aux::asserted_cast<const ClonedT*>(this)));
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-  //!@brief Invoke this function in the derived class
-  //  invokes onCreateGrabber() form derived class and updates information from grabber for the gui-parameter
-  void createGrabber();
-
-  //!@brief Create the grabber in the derived class
-  //  apply the new created Grabber to GrabberBase::mGrabber
-  virtual void onCreateGrabber() = 0;
-
-  //!@brief Applies an appropriate annotation to the current image.
-  void annotateImage();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief The used Grabber stored in this pointer
-  cedar::dev::sensors::visual::GrabberPtr mGrabber;
-
-  //!@brief The grabbed Image
-  cedar::aux::MatDataPtr mImage;
-
-
+  // none yet
 private:
   // none yet
 
@@ -133,22 +128,12 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@cond SKIPPED_DOCUMENTATION
-  // the values of the properties
-  cedar::aux::BoolParameterPtr mRecording;
-  cedar::aux::FileParameterPtr mRecordName;
-  //cedar::aux::BoolParameterPtr mSaveSnapshot;
-  cedar::aux::FileParameterPtr mSnapshotName;
+  // none yet
 
-  //!@brief The configuration filename
-  cedar::aux::FileParameterPtr _mConfigurationFileName;
-  //!@todo Enum RecordType (Encoding)
-
-  //!@endcond
 private:
   // none yet
 
-}; //class cedar::proc::sources::GrabberBase
+}; // class cedar::aux::Cloneable
 
-#endif // CEDAR_PROC_SOURCES_GRABBER_SOURCE_H
+#endif // CEDAR_AUX_CLONEABLE_H
 
