@@ -1,0 +1,30 @@
+<RCC>
+  <qresource prefix="/">
+    <file>modeicons/select.svg</file>
+    <file>modeicons/connect.svg</file>
+    <file>modeicons/group.svg</file>
+    <file>triggers/trigger.svg</file>
+    <file>triggers/looped_trigger.svg</file>
+    <file>triggers/multi_trigger.svg</file>
+    <file>steps/no_icon.svg</file>
+    <file>steps/gauss_input.svg</file>
+    <file>steps/static_gain.svg</file>
+    <file>steps/switch.svg</file>
+    <file>steps/convolution.svg</file>
+    <file>steps/coordinate_transformation.svg</file>
+    <file>steps/net_reader.svg</file>
+    <file>steps/resize.svg</file>
+    <file>steps/net_writer.svg</file>
+    <file>steps/field_temp.svg</file>
+    <file>steps/preshape.svg</file>
+    <file>steps/projection.svg</file>
+    <file>steps/noise.svg</file>
+    <file>steps/sum.svg</file>
+    <file>steps/video_grabber.svg</file>
+    <file>steps/picture_grabber.svg</file>
+    <file>network.svg</file>
+    <file>toolbaricons/save.svg</file>
+    <file>toolbaricons/grid.svg</file>
+    <file>toolbaricons/reset.svg</file>
+  </qresource>
+</RCC>
