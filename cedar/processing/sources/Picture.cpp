@@ -148,14 +148,14 @@ void cedar::proc::sources::Picture::onCreateGrabber()
 {
   //create grabber first to verify the correct creation, and then apply it
   cedar::dev::sensors::visual::PictureGrabberPtr grabber;
-  grabber = cedar::dev::sensors::visual::PictureGrabberPtr
-            (
-               new cedar::dev::sensors::visual::PictureGrabber
-                   (
-                     this->_mConfigurationFileName->getPath(),
-                     this->_mFileName->getPath()
-                   )
-            );
+//  grabber = cedar::dev::sensors::visual::PictureGrabberPtr
+//            (
+//               new cedar::dev::sensors::visual::PictureGrabber
+//                   (
+//                     this->_mConfigurationFileName->getPath(),
+//                     this->_mFileName->getPath()
+//                   )
+//            );
 
   //no exception here, so we could use it
   GrabberBase::mGrabber = grabber;

@@ -202,10 +202,10 @@ void cedar::proc::sources::Video::onCreateGrabber()
   std::string filename = this->_mFileName->getPath();
 
   cedar::dev::sensors::visual::VideoGrabberPtr grabber;
-  grabber = cedar::dev::sensors::visual::VideoGrabberPtr
-            (
-               new cedar::dev::sensors::visual::VideoGrabber(this->_mConfigurationFileName->getPath(),filename)
-            );
+//  grabber = cedar::dev::sensors::visual::VideoGrabberPtr
+//            (
+//               new cedar::dev::sensors::visual::VideoGrabber(this->_mConfigurationFileName->getPath(),filename)
+//            );
   const std::string message2= "New grabber created";
   cedar::aux::LogSingleton::getInstance()->debugMessage(message2,"cedar::proc::sources::Video::createGrabber()");
 

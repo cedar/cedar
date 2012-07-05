@@ -67,8 +67,8 @@ namespace
 //Constructor for single-channel grabber
 cedar::dev::sensors::visual::NetGrabber::NetGrabber
 (
-  const std::string& grabberName,
-  const std::string& yarpChannelName
+  const std::string& yarpChannelName,
+  const std::string& grabberName
 )
 :
 cedar::dev::sensors::visual::Grabber
@@ -88,9 +88,9 @@ cedar::dev::sensors::visual::Grabber
 //Constructor for stereo-channel grabber
 cedar::dev::sensors::visual::NetGrabber::NetGrabber
 (
-  const std::string& grabberName,
   const std::string& yarpChannelName0,
-  const std::string& yarpChannelName1
+  const std::string& yarpChannelName1,
+  const std::string& grabberName
 )
 :
 cedar::dev::sensors::visual::Grabber
