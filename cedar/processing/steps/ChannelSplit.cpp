@@ -116,7 +116,8 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::ChannelSplit::determineInput
     }
     catch (cedar::aux::AnnotationNotFoundException)
     {
-      // not valid data
+      // the data is mat data but not annotated; that's ok
+      return cedar::proc::DataSlot::VALIDITY_WARNING;
     }
   }
 
@@ -135,11 +136,18 @@ void cedar::proc::steps::ChannelSplit::inputConnectionChanged(const std::string&
   this->mChannel4->copyAnnotationsFrom(this->mInput);
 
   // split the channels
-  cedar::aux::annotation::ConstColorSpacePtr color_space
-    = this->mInput->getAnnotation<cedar::aux::annotation::ColorSpace>();
   unsigned int num_channels = static_cast<unsigned int>(this->mInput->getData().channels());
 
-  CEDAR_ASSERT(color_space->getNumberOfChannels() == num_channels);
+  cedar::aux::annotation::ConstColorSpacePtr color_space;
+  try
+  {
+    color_space = this->mInput->getAnnotation<cedar::aux::annotation::ColorSpace>();
+
+    CEDAR_ASSERT(color_space->getNumberOfChannels() == num_channels);
+  }
+  catch (cedar::aux::AnnotationNotFoundException)
+  {
+  }
 
 
   // reset channels
@@ -156,40 +164,52 @@ void cedar::proc::steps::ChannelSplit::inputConnectionChanged(const std::string&
   switch (num_channels)
   {
   case 4:
-    this->mChannel4->setAnnotation
-    (
-      cedar::aux::annotation::ColorSpacePtr(new cedar::aux::annotation::ColorSpace(color_space->getChannelType(3)))
-    );
+    if (color_space)
+    {
+      this->mChannel4->setAnnotation
+      (
+        cedar::aux::annotation::ColorSpacePtr(new cedar::aux::annotation::ColorSpace(color_space->getChannelType(3)))
+      );
+    }
     this->mChannel4->setData
     (
       cv::Mat::zeros(this->mInput->getData().rows, this->mInput->getData().cols, type)
     );
 
   case 3:
-    this->mChannel3->setAnnotation
-    (
-      cedar::aux::annotation::ColorSpacePtr(new cedar::aux::annotation::ColorSpace(color_space->getChannelType(2)))
-    );
+    if (color_space)
+    {
+      this->mChannel3->setAnnotation
+      (
+        cedar::aux::annotation::ColorSpacePtr(new cedar::aux::annotation::ColorSpace(color_space->getChannelType(2)))
+      );
+    }
     this->mChannel3->setData
     (
       cv::Mat::zeros(this->mInput->getData().rows, this->mInput->getData().cols, type)
     );
 
   case 2:
-    this->mChannel2->setAnnotation
-    (
-      cedar::aux::annotation::ColorSpacePtr(new cedar::aux::annotation::ColorSpace(color_space->getChannelType(1)))
-    );
+    if (color_space)
+    {
+      this->mChannel2->setAnnotation
+      (
+        cedar::aux::annotation::ColorSpacePtr(new cedar::aux::annotation::ColorSpace(color_space->getChannelType(1)))
+      );
+    }
     this->mChannel2->setData
     (
       cv::Mat::zeros(this->mInput->getData().rows, this->mInput->getData().cols, type)
     );
 
   case 1:
-    this->mChannel1->setAnnotation
-    (
-      cedar::aux::annotation::ColorSpacePtr(new cedar::aux::annotation::ColorSpace(color_space->getChannelType(0)))
-    );
+    if (color_space)
+    {
+      this->mChannel1->setAnnotation
+      (
+        cedar::aux::annotation::ColorSpacePtr(new cedar::aux::annotation::ColorSpace(color_space->getChannelType(0)))
+      );
+    }
     this->mChannel1->setData
     (
       cv::Mat::zeros(this->mInput->getData().rows, this->mInput->getData().cols, type)
