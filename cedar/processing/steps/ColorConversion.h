@@ -71,6 +71,7 @@ public:
 
       static void construct()
       {
+        mType.type()->def(cedar::aux::Enum(AUTO, "AUTO"));
         mType.type()->def(cedar::aux::Enum(BGR, "BGR"));
         mType.type()->def(cedar::aux::Enum(HSV, "HSV"));
       }
@@ -88,8 +89,9 @@ public:
       }
 
     public:
-      static const Id BGR = 0;
-      static const Id HSV = 1;
+      static const Id AUTO = 0;
+      static const Id BGR = 1;
+      static const Id HSV = 2;
 
     private:
       static cedar::aux::EnumType<ColorSpace> mType;
@@ -132,12 +134,12 @@ private:
   //!@brief Updates the output matrix.
   void compute(const cedar::proc::Arguments& arguments);
 
-  //!@brief Determines the color space of the source image
-  void updateSourceImageColorSpace();
-
 private slots:
   //!@brief Updates the constant passed to the cv::convert function.
   void updateCvConvertConstant();
+
+  //!@brief Determines the color space of the source image
+  void updateSourceImageColorSpace();
 
   //!@brief Updates the color space of the target image.
   void updateTargetImageColorSpace();
@@ -165,6 +167,10 @@ protected:
   // none yet
 
 private:
+  //! Type of the source image. Usually determined automatically.
+  cedar::aux::EnumParameterPtr _mSourceType;
+
+  //! Type of the target image.
   cedar::aux::EnumParameterPtr _mTargetType;
 
 }; // class cedar::proc::steps::ColorConversion
