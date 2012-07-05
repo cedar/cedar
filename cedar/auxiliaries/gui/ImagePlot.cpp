@@ -62,8 +62,6 @@ namespace
     boost::shared_ptr<DeclarationTypeM> declaration(new DeclarationTypeM());
     cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(declaration);
 
-    cedar::aux::gui::PlotManagerSingleton::getInstance()->setDefault<cedar::aux::ImageData, cedar::aux::gui::ImagePlot>();
-
     return true;
   }
 
@@ -367,21 +365,14 @@ void cedar::aux::gui::ImagePlot::plot(cedar::aux::DataPtr data, const std::strin
   }
 
   this->mDataColorSpace.reset();
-  if (boost::dynamic_pointer_cast<cedar::aux::ImageData>(data))
+  try
   {
+    this->mDataColorSpace = this->mData->getAnnotation<cedar::aux::annotation::ColorSpace>();
     mDataType = DATA_TYPE_IMAGE;
   }
-  else
+  catch (cedar::aux::AnnotationNotFoundException&)
   {
-    try
-    {
-      this->mDataColorSpace = this->mData->getAnnotation<cedar::aux::annotation::ColorSpace>();
-      mDataType = DATA_TYPE_IMAGE;
-    }
-    catch (cedar::aux::AnnotationNotFoundException&)
-    {
-      // ok, not an image
-    }
+    // ok, not an image
   }
 
   mpImageDisplay->setText("no image loaded");
