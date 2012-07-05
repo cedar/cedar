@@ -22,133 +22,158 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GrabberBase.h
+    File:        ColorConversion.h
 
-    Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.ruhr-uni-bochum.d
-    Date:        2012 05 23
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 07 03
 
-    Description: The header for the GrabberBase class
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCES_GRABBER_SOURCE_H
-#define CEDAR_PROC_SOURCES_GRABBER_SOURCE_H
+#ifndef CEDAR_PROC_STEPS_COLOR_CONVERSION_H
+#define CEDAR_PROC_STEPS_COLOR_CONVERSION_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/namespace.h"
+#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/Step.h"
-#include "cedar/devices/sensors/visual/Grabber.h"
-#include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/auxiliaries/MatData.h"
-#include "cedar/auxiliaries/FileParameter.h"
+#include "cedar/auxiliaries/annotation/namespace.h"
+#include "cedar/auxiliaries/EnumType.h"
+#include "cedar/auxiliaries/EnumParameter.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief The base class for all grabber sources for the processingIde
- *
- *    This class implements the common structure of all grabber sources
+
+/*!@brief A processing step that converts an image from one color space to another.
  */
-class cedar::proc::sources::GrabberBase
-:
-public cedar::proc::Step
+class cedar::proc::steps::ColorConversion : public cedar::proc::Step
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  //!@brief Enum class for color spaces.
+  class ColorSpace
+  {
+    public:
+      typedef cedar::aux::EnumId Id;
 
+      static void construct()
+      {
+        mType.type()->def(cedar::aux::Enum(AUTO, "AUTO"));
+        mType.type()->def(cedar::aux::Enum(BGR, "BGR"));
+        mType.type()->def(cedar::aux::Enum(HSV, "HSV"));
+      }
+
+      //! @returns A const reference to the base enum object.
+      static const cedar::aux::EnumBase& type()
+      {
+        return *(mType.type());
+      }
+
+      //! @returns A pointer to the base enum object.
+      static const cedar::proc::DataRole::TypePtr& typePtr()
+      {
+        return mType.type();
+      }
+
+    public:
+      static const Id AUTO = 0;
+      static const Id BGR = 1;
+      static const Id HSV = 2;
+
+    private:
+      static cedar::aux::EnumType<ColorSpace> mType;
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-  //!@brief The standard constructor.
-  GrabberBase();
-
 public:
-  //!@brief Destructor
-  virtual ~GrabberBase();
+  //!@brief The standard constructor.
+  ColorConversion();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Save a Snapshot of the current picture
-  void saveSnapshot();
-
-public slots:
-  //!@brief Slot for the recording-checkbox
-  void setRecording();
-
-  //!@todo Enum RecordType (Encoding)
-
-  //!@brief Slot to set a new configuration filename
-  void setConfigurationFileName();
-
+  inline ColorSpace::Id getTargetColorSpace() const
+  {
+    return this->_mTargetType->getValue();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-  //!@brief Invoke this function in the derived class
-  //  invokes onCreateGrabber() form derived class and updates information from grabber for the gui-parameter
-  void createGrabber();
-
-  //!@brief Create the grabber in the derived class
-  //  apply the new created Grabber to GrabberBase::mGrabber
-  virtual void onCreateGrabber() = 0;
-
-  //!@brief Applies an appropriate annotation to the current image.
-  void annotateImage();
+  //!@brief Determines whether the data item can be connected to the slot.
+  cedar::proc::DataSlot::VALIDITY determineInputValidity
+                                  (
+                                    cedar::proc::ConstDataSlotPtr slot,
+                                    cedar::aux::DataPtr data
+                                  ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
+
+  //!@brief Updates the output matrix.
+  void compute(const cedar::proc::Arguments& arguments);
+
+private slots:
+  //!@brief Updates the constant passed to the cv::convert function.
+  void updateCvConvertConstant();
+
+  //!@brief Determines the color space of the source image
+  void updateSourceImageColorSpace();
+
+  //!@brief Updates the color space of the target image.
+  void updateTargetImageColorSpace();
+
+  void recompute();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief The used Grabber stored in this pointer
-  cedar::dev::sensors::visual::GrabberPtr mGrabber;
-
-  //!@brief The grabbed Image
-  cedar::aux::MatDataPtr mImage;
-
-
-private:
   // none yet
+private:
+  cedar::aux::ConstMatDataPtr mInput;
+  cedar::aux::annotation::ConstColorSpacePtr mInputColorSpaceAnnotation;
+  ColorSpace::Id mInputColorSpace;
+
+  cedar::aux::MatDataPtr mOutput;
+
+  int mCvConversionConstant;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@cond SKIPPED_DOCUMENTATION
-  // the values of the properties
-  cedar::aux::BoolParameterPtr mRecording;
-  cedar::aux::FileParameterPtr mRecordName;
-  //cedar::aux::BoolParameterPtr mSaveSnapshot;
-  cedar::aux::FileParameterPtr mSnapshotName;
-
-  //!@brief The configuration filename
-  cedar::aux::FileParameterPtr _mConfigurationFileName;
-  //!@todo Enum RecordType (Encoding)
-
-  //!@endcond
-private:
   // none yet
 
-}; //class cedar::proc::sources::GrabberBase
+private:
+  //! Type of the source image. Usually determined automatically.
+  cedar::aux::EnumParameterPtr _mSourceType;
 
-#endif // CEDAR_PROC_SOURCES_GRABBER_SOURCE_H
+  //! Type of the target image.
+  cedar::aux::EnumParameterPtr _mTargetType;
+
+}; // class cedar::proc::steps::ColorConversion
+
+#endif // CEDAR_PROC_STEPS_COLOR_CONVERSION_H
 

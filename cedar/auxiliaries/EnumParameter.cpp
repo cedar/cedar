@@ -71,6 +71,17 @@ mEnumDeclaration(enumBase)
 void cedar::aux::EnumParameter::disable(cedar::aux::EnumId value)
 {
   this->mDisabledValues.insert(value);
+  if (this->mValue == value)
+  {
+    for (size_t i = 0; i < this->mEnumDeclaration->list().size(); ++i)
+    {
+      if (this->isEnabled(this->mEnumDeclaration->list().at(i)))
+      {
+        this->set(this->mEnumDeclaration->list().at(i).name());
+        break;
+      }
+    }
+  }
 }
 
 void cedar::aux::EnumParameter::enable(cedar::aux::EnumId value)

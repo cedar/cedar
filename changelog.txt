@@ -42,6 +42,8 @@
   - implemented full mode for the opencv convolution engine
   - removed the ConfigurationInterface (and the option to use CEDAR_LIBCONFIG_LEGACY_MODE)
   - FileParameters now can be set to have their path relative to the current working directory.
+  - A new annotation system has been introduced. Because of this, ImageData is now deprecated and should be switched to
+    MatData.
 - cedar::proc
   - added a processing step for convolutions
   - parameters are now locked in the compute method of processing steps
