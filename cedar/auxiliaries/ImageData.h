@@ -40,13 +40,14 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/annotation/ColorSpace.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
 /*!@brief This is a data class representing images.
  */
-class cedar::aux::ImageData : public cedar::aux::MatData
+CEDAR_DECLARE_DEPRECATED(class) cedar::aux::ImageData : public cedar::aux::MatData
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -57,6 +58,18 @@ public:
   :
   cedar::aux::MatData(value)
   {
+    this->setAnnotation
+    (
+      cedar::aux::annotation::ColorSpacePtr
+      (
+        new cedar::aux::annotation::ColorSpace
+        (
+          cedar::aux::annotation::ColorSpace::Blue,
+          cedar::aux::annotation::ColorSpace::Green,
+          cedar::aux::annotation::ColorSpace::Red
+        )
+      )
+    );
   }
 
   //--------------------------------------------------------------------------------------------------------------------
