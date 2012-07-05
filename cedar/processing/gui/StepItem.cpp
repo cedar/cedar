@@ -373,9 +373,12 @@ void cedar::proc::gui::StepItem::updateDataSlotPositions()
     try
     {
       qreal count = 0;
-      for (DataSlotNameMap::iterator iter = slot_item_map.begin(); iter != slot_item_map.end(); ++iter)
+      cedar::proc::Step::SlotList& slotmap = this->mStep->getOrderedDataSlots(role);
+      for (cedar::proc::Step::SlotList::iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
-        cedar::proc::gui::DataSlotItem *p_item = iter->second;
+        const std::string& slot_name = (*iter)->getName();
+        CEDAR_DEBUG_ASSERT(slot_item_map.find(slot_name) != slot_item_map.end());
+        cedar::proc::gui::DataSlotItem *p_item = slot_item_map[slot_name];
         p_item->setWidth(slot_size);
         p_item->setHeight(slot_size);
         p_item->setPos(origin + count * direction * (slot_size + padding));
