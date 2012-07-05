@@ -72,6 +72,7 @@ cedar_add_library(cedarproc
   sources/GaussInput.h
   steps/StaticGain.h
   steps/Convolution.h
+  steps/ColorConversion.h
   steps/CoordinateTransformation.h
   sources/Picture.h
   sources/Video.h

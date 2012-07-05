@@ -76,9 +76,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Updates the output matrix.
-  void compute(const cedar::proc::Arguments& arguments);
-
   //!@brief Returns the current gain factor.
   inline double getGainFactor() const
   {
@@ -113,6 +110,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief Updates the output matrix.
+  void compute(const cedar::proc::Arguments& arguments);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

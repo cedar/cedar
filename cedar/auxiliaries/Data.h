@@ -43,6 +43,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/annotation/Annotation.h"
+#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -53,6 +56,14 @@
  */
 class cedar::aux::Data
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef std::vector<cedar::aux::annotation::AnnotationPtr> AnnotationList;
+  typedef AnnotationList::iterator AnnotationIterator;
+  typedef AnnotationList::const_iterator AnnotationConstIterator;
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -124,6 +135,32 @@ public:
   //!@brief Sets the owner of the data object.
   void setOwner(cedar::aux::Configurable* step);
 
+  //! Sets an annotation. If there is already an annotation of the exact type of the given annotation, it is replaced.
+  void setAnnotation(cedar::aux::annotation::AnnotationPtr annotation);
+
+  /*! Returns an annotation of the given type.
+   *
+   *  @throws A cedar::aux::UnknownTypeException if no matching annotation can be found.
+   */
+  template <typename T>
+  boost::shared_ptr<T> getAnnotation()
+  {
+    return cedar::aux::asserted_pointer_cast<T>(this->mAnnotations[this->findAnnotation<T>()]);
+  }
+
+  /*! Returns an annotation of the given type as a constant pointer.
+   *
+   *  @throws A cedar::aux::UnknownTypeException if no matching annotation can be found.
+   */
+  template <typename T>
+  boost::shared_ptr<const T> getAnnotation() const
+  {
+    return cedar::aux::asserted_pointer_cast<const T>(this->mAnnotations[this->findAnnotation<T>()]);
+  }
+
+  //! Copies all annotations from the given data pointer.
+  void copyAnnotationsFrom(cedar::aux::ConstDataPtr other);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -134,7 +171,32 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  template <typename T>
+  size_t findAnnotation() const
+  {
+    for (size_t i = 0; i < this->mAnnotations.size(); ++i)
+    {
+      if (typeid(*this->mAnnotations[i]) == typeid(T))
+      {
+        return i;
+      }
+    }
+
+    CEDAR_THROW(cedar::aux::AnnotationNotFoundException, "Could not find an annotation of the given type.");
+  }
+
+  size_t findAnnotation(cedar::aux::annotation::AnnotationPtr annotation) const
+  {
+    for (size_t i = 0; i < this->mAnnotations.size(); ++i)
+    {
+      if (typeid(*this->mAnnotations[i]) == typeid(*annotation))
+      {
+        return i;
+      }
+    }
+
+    CEDAR_THROW(cedar::aux::AnnotationNotFoundException, "Could not find an annotation of the given type.");
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -146,6 +208,8 @@ protected:
 private:
   //!@todo This should be a base*, however, right now Configurable can't be used with Base* because base has a (differently realized) name.
   cedar::aux::Configurable* mpeOwner;
+
+  AnnotationList mAnnotations;
 }; // class cedar::aux::Data
 
 #endif // CEDAR_AUX_DATA_H

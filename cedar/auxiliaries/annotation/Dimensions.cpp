@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,16 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Data.cpp
+    File:        Dimensions.h
 
-
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 17
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 06 29
 
     Description:
 
@@ -39,9 +34,12 @@
 
 ======================================================================================================================*/
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/Data.h"
-#include "cedar/auxiliaries/utilities.h"
+#include "cedar/auxiliaries/annotation/Dimensions.h"
+#include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
 
@@ -49,60 +47,32 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::Data::Data()
-:
-mpLock(new QReadWriteLock()),
-mpeOwner(NULL)
+cedar::aux::annotation::Dimensions::Dimensions(unsigned int numberOfDimensions)
 {
+  this->mDimensions.resize(numberOfDimensions);
 }
 
-cedar::aux::Data::~Data()
+cedar::aux::annotation::Dimensions::Dimensions(const cedar::aux::annotation::Dimensions& copyFrom)
+:
+cedar::aux::annotation::Annotation(copyFrom)
 {
-  delete mpLock;
+  this->mDimensions.resize(copyFrom.getDimensionality());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::Data::setAnnotation(cedar::aux::annotation::AnnotationPtr annotation)
+void cedar::aux::annotation::Dimensions::setLabel(unsigned int dimension, const std::string& label)
 {
-  try
-  {
-    size_t i = this->findAnnotation(annotation);
-    this->mAnnotations[i] = annotation;
-  }
-  catch (cedar::aux::AnnotationNotFoundException&)
-  {
-    this->mAnnotations.push_back(annotation);
-  }
+  CEDAR_ASSERT(dimension < this->mDimensions.size());
+
+  this->mDimensions[dimension].mLabel = label;
 }
 
-void cedar::aux::Data::copyAnnotationsFrom(cedar::aux::ConstDataPtr other)
+const std::string& cedar::aux::annotation::Dimensions::getLabel(unsigned int dimension) const
 {
-  this->mAnnotations.resize(other->mAnnotations.size());
-  for (size_t i = 0; i < other->mAnnotations.size(); ++i)
-  {
-    this->mAnnotations[i] = other->mAnnotations[i]->clone();
-  }
-}
+  CEDAR_ASSERT(dimension < this->mDimensions.size());
 
-QReadWriteLock& cedar::aux::Data::getLock()
-{
-  return *this->mpLock;
-}
-
-QReadWriteLock& cedar::aux::Data::getLock() const
-{
-  return *this->mpLock;
-}
-
-cedar::aux::Configurable* cedar::aux::Data::getOwner() const
-{
-  return this->mpeOwner;
-}
-
-void cedar::aux::Data::setOwner(cedar::aux::Configurable* step)
-{
-  this->mpeOwner = step;
+  return this->mDimensions[dimension].mLabel;
 }
