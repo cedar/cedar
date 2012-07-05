@@ -94,6 +94,16 @@ cedar::proc::steps::ColorConversion::ColorConversion()
 :
 mOutput(new cedar::aux::MatData(cv::Mat(2, 2, CV_32F))),
 mCvConversionConstant(-1),
+_mSourceType
+(
+  new cedar::aux::EnumParameter
+  (
+    this,
+    "source type",
+    cedar::proc::steps::ColorConversion::ColorSpace::typePtr(),
+    ColorSpace::AUTO
+  )
+),
 _mTargetType
 (
   new cedar::aux::EnumParameter
@@ -105,12 +115,23 @@ _mTargetType
   )
 )
 {
+  // declare inputs
   this->declareInput("input image");
 
+  // declare outputs
   this->declareOutput("converted image", mOutput);
 
-  QObject::connect(this->_mTargetType.get(), SIGNAL(valueChanged()), this, SLOT(updateCvConvertConstant()));
+  // the target type cannot be determined automatically
+  _mTargetType->disable(ColorSpace::AUTO);
+
+  // connect signals from the changed source type
+  QObject::connect(this->_mSourceType.get(), SIGNAL(valueChanged()), this, SLOT(updateSourceImageColorSpace()));
+  QObject::connect(this->_mSourceType.get(), SIGNAL(valueChanged()), this, SLOT(updateCvConvertConstant()));
+  QObject::connect(this->_mSourceType.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
+
+  // connect signals from the changed target type
   QObject::connect(this->_mTargetType.get(), SIGNAL(valueChanged()), this, SLOT(updateTargetImageColorSpace()));
+  QObject::connect(this->_mTargetType.get(), SIGNAL(valueChanged()), this, SLOT(updateCvConvertConstant()));
   QObject::connect(this->_mTargetType.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
 }
 
@@ -129,15 +150,19 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::ColorConversion::determineIn
                                   cedar::aux::DataPtr data
                                 ) const
 {
-  try
+  if (cedar::aux::MatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::MatData>(data))
   {
-    data->getAnnotation<cedar::aux::annotation::ColorSpace>();
-    return cedar::proc::DataSlot::VALIDITY_VALID;
+    try
+    {
+      data->getAnnotation<cedar::aux::annotation::ColorSpace>();
+      return cedar::proc::DataSlot::VALIDITY_VALID;
+    }
+    catch (cedar::aux::AnnotationNotFoundException)
+    {
+      return cedar::proc::DataSlot::VALIDITY_WARNING;
+    }
   }
-  catch (cedar::aux::AnnotationNotFoundException)
-  {
-    return cedar::proc::DataSlot::VALIDITY_ERROR;
-  }
+  return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
 void cedar::proc::steps::ColorConversion::updateTargetImageColorSpace()
@@ -178,39 +203,65 @@ void cedar::proc::steps::ColorConversion::updateTargetImageColorSpace()
 
 void cedar::proc::steps::ColorConversion::updateSourceImageColorSpace()
 {
-  this->mInputColorSpaceAnnotation = this->mInput->getAnnotation<cedar::aux::annotation::ColorSpace>();
-  switch (this->mInputColorSpaceAnnotation->getNumberOfChannels())
+  this->_mSourceType->enableAll();
+
+  switch (this->_mSourceType->getValue())
   {
-    case 3:
-      if
-      (
-        this->mInputColorSpaceAnnotation->getChannelType(0) == cedar::aux::annotation::ColorSpace::Blue
-        && this->mInputColorSpaceAnnotation->getChannelType(1) == cedar::aux::annotation::ColorSpace::Green
-        && this->mInputColorSpaceAnnotation->getChannelType(2) == cedar::aux::annotation::ColorSpace::Red
-      )
+    case ColorSpace::AUTO:
+    {
+      try
       {
-        this->mInputColorSpace = ColorSpace::BGR;
+        this->mInputColorSpaceAnnotation = this->mInput->getAnnotation<cedar::aux::annotation::ColorSpace>();
+        switch (this->mInputColorSpaceAnnotation->getNumberOfChannels())
+        {
+          case 3:
+            if
+            (
+              this->mInputColorSpaceAnnotation->getChannelType(0) == cedar::aux::annotation::ColorSpace::Blue
+              && this->mInputColorSpaceAnnotation->getChannelType(1) == cedar::aux::annotation::ColorSpace::Green
+              && this->mInputColorSpaceAnnotation->getChannelType(2) == cedar::aux::annotation::ColorSpace::Red
+            )
+            {
+              this->mInputColorSpace = ColorSpace::BGR;
+            }
+            else if
+            (
+              this->mInputColorSpaceAnnotation->getChannelType(0) == cedar::aux::annotation::ColorSpace::Hue
+              && this->mInputColorSpaceAnnotation->getChannelType(1) == cedar::aux::annotation::ColorSpace::Saturation
+              && this->mInputColorSpaceAnnotation->getChannelType(2) == cedar::aux::annotation::ColorSpace::Value
+            )
+            {
+              this->mInputColorSpace = ColorSpace::HSV;
+            }
+            else
+            {
+              CEDAR_THROW(cedar::aux::UnhandledValueException, "The channel combination of the source image is not handled.");
+            }
+            break;
+
+          default:
+            CEDAR_THROW(cedar::aux::UnhandledValueException, "This step can currently only process three-channel images.");
+        }
       }
-      else if
-      (
-        this->mInputColorSpaceAnnotation->getChannelType(0) == cedar::aux::annotation::ColorSpace::Hue
-        && this->mInputColorSpaceAnnotation->getChannelType(1) == cedar::aux::annotation::ColorSpace::Saturation
-        && this->mInputColorSpaceAnnotation->getChannelType(2) == cedar::aux::annotation::ColorSpace::Value
-      )
+      catch (cedar::aux::AnnotationNotFoundException&)
       {
-        this->mInputColorSpace = ColorSpace::HSV;
+        this->mInputColorSpaceAnnotation.reset();
       }
-      else
-      {
-        CEDAR_THROW(cedar::aux::UnhandledValueException, "The channel combination of the source image is not handled.");
-      }
-      break;
+    } // case ColorSpace::AUTO
 
     default:
-      CEDAR_THROW(cedar::aux::UnhandledValueException, "This step can currently only process three-channel images.");
+    {
+      this->mInputColorSpace = this->_mSourceType->getValue();
+    } // default
+  }
+
+  if (!this->mInputColorSpaceAnnotation)
+  {
+    this->_mSourceType->disable(ColorSpace::AUTO);
   }
 
   this->_mTargetType->enableAll();
+  this->_mTargetType->disable(ColorSpace::AUTO);
   this->_mTargetType->disable(this->mInputColorSpace);
 }
 
