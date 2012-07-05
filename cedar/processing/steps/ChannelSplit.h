@@ -22,133 +22,106 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GrabberBase.h
+    File:        ChannelSplit.h
 
-    Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.ruhr-uni-bochum.d
-    Date:        2012 05 23
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 07 04
 
-    Description: The header for the GrabberBase class
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCES_GRABBER_SOURCE_H
-#define CEDAR_PROC_SOURCES_GRABBER_SOURCE_H
+#ifndef CEDAR_PROC_STEPS_CHANNEL_SPLIT_H
+#define CEDAR_PROC_STEPS_CHANNEL_SPLIT_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/namespace.h"
+#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/Step.h"
-#include "cedar/devices/sensors/visual/Grabber.h"
-#include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/auxiliaries/MatData.h"
-#include "cedar/auxiliaries/FileParameter.h"
+#include "cedar/auxiliaries/annotation/namespace.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief The base class for all grabber sources for the processingIde
- *
- *    This class implements the common structure of all grabber sources
+
+/*!@brief A processing step that converts an image from one color space to another.
  */
-class cedar::proc::sources::GrabberBase
-:
-public cedar::proc::Step
+class cedar::proc::steps::ChannelSplit : public cedar::proc::Step
 {
-  Q_OBJECT
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-
+public:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-  //!@brief The standard constructor.
-  GrabberBase();
-
 public:
-  //!@brief Destructor
-  virtual ~GrabberBase();
+  //!@brief The standard constructor.
+  ChannelSplit();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Save a Snapshot of the current picture
-  void saveSnapshot();
-
-public slots:
-  //!@brief Slot for the recording-checkbox
-  void setRecording();
-
-  //!@todo Enum RecordType (Encoding)
-
-  //!@brief Slot to set a new configuration filename
-  void setConfigurationFileName();
-
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-  //!@brief Invoke this function in the derived class
-  //  invokes onCreateGrabber() form derived class and updates information from grabber for the gui-parameter
-  void createGrabber();
-
-  //!@brief Create the grabber in the derived class
-  //  apply the new created Grabber to GrabberBase::mGrabber
-  virtual void onCreateGrabber() = 0;
-
-  //!@brief Applies an appropriate annotation to the current image.
-  void annotateImage();
+  //!@brief Determines whether the data item can be connected to the slot.
+  cedar::proc::DataSlot::VALIDITY determineInputValidity
+                                  (
+                                    cedar::proc::ConstDataSlotPtr slot,
+                                    cedar::aux::DataPtr data
+                                  ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
+
+  //!@brief Updates the output matrix.
+  void compute(const cedar::proc::Arguments& arguments);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief The used Grabber stored in this pointer
-  cedar::dev::sensors::visual::GrabberPtr mGrabber;
-
-  //!@brief The grabbed Image
-  cedar::aux::MatDataPtr mImage;
-
-
-private:
   // none yet
+private:
+  cedar::aux::ConstMatDataPtr mInput;
+  cedar::aux::annotation::ConstColorSpacePtr mInputColorSpaceAnnotation;
+
+  cedar::aux::MatDataPtr mChannel1;
+  cedar::aux::MatDataPtr mChannel2;
+  cedar::aux::MatDataPtr mChannel3;
+  cedar::aux::MatDataPtr mChannel4;
+
+  std::vector<cv::Mat> mChannels;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@cond SKIPPED_DOCUMENTATION
-  // the values of the properties
-  cedar::aux::BoolParameterPtr mRecording;
-  cedar::aux::FileParameterPtr mRecordName;
-  //cedar::aux::BoolParameterPtr mSaveSnapshot;
-  cedar::aux::FileParameterPtr mSnapshotName;
+  // none yet
 
-  //!@brief The configuration filename
-  cedar::aux::FileParameterPtr _mConfigurationFileName;
-  //!@todo Enum RecordType (Encoding)
-
-  //!@endcond
 private:
   // none yet
 
-}; //class cedar::proc::sources::GrabberBase
+}; // class cedar::proc::steps::ChannelSplit
 
-#endif // CEDAR_PROC_SOURCES_GRABBER_SOURCE_H
+#endif // CEDAR_PROC_STEPS_CHANNEL_SPLIT_H
 

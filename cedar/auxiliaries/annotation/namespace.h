@@ -26,52 +26,41 @@
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 10 28
+    Date:        2012 06 28
 
-    Description: Namespace file for cedar::proc::steps.
+    Description: Namespace file for cedar::aux::annotations.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_NAMESPACE_H
-#define CEDAR_PROC_STEPS_NAMESPACE_H
-
-#include "cedar/configuration.h"
+#ifndef CEDAR_AUX_ANNOTATIONS_NAMESPACE_H
+#define CEDAR_AUX_ANNOTATIONS_NAMESPACE_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/lib.h"
+#include "cedar/auxiliaries/lib.h"
+#include "cedar/defines.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <opencv2/opencv.hpp>
 
 
 namespace cedar
 {
-  namespace proc
+  /*!@brief Namespace for all aux classes. */
+  namespace aux
   {
-    /*!@brief Namespace for processing steps. */
-    namespace steps
+    namespace annotation
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(TransformationDirection);
-      CEDAR_DECLARE_PROC_CLASS(TransformationType);
-      CEDAR_DECLARE_PROC_CLASS(CoordinateTransformation);
-      CEDAR_DECLARE_PROC_CLASS(ChannelSplit);
-      CEDAR_DECLARE_PROC_CLASS(Convolution);
-      CEDAR_DECLARE_PROC_CLASS(ColorConversion);
-      CEDAR_DECLARE_PROC_CLASS(Projection);
-      CEDAR_DECLARE_PROC_CLASS(Resize);
-      CEDAR_DECLARE_PROC_CLASS(StaticGain);
-      CEDAR_DECLARE_PROC_CLASS(Sum);
-      CEDAR_DECLARE_PROC_CLASS(Switch);
-
-#ifdef CEDAR_USE_YARP
-      CEDAR_DECLARE_PROC_CLASS(NetWriterSink);
-#endif
+      CEDAR_DECLARE_AUX_CLASS(Annotation);
+      CEDAR_DECLARE_AUX_CLASS(ColorSpace);
+      CEDAR_DECLARE_AUX_CLASS(Dimensions);
       //!@endcond
     }
   }
 }
 
-#endif // CEDAR_PROC_STEPS_NAMESPACE_H
+#endif // CEDAR_AUX_ANNOTATIONS_NAMESPACE_H

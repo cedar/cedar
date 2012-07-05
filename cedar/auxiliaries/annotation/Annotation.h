@@ -22,133 +22,83 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GrabberBase.h
+    File:        Annotation.h
 
-    Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.ruhr-uni-bochum.d
-    Date:        2012 05 23
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 06 29
 
-    Description: The header for the GrabberBase class
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCES_GRABBER_SOURCE_H
-#define CEDAR_PROC_SOURCES_GRABBER_SOURCE_H
+#ifndef CEDAR_AUX_ANNOTATION_ANNOTATION_H
+#define CEDAR_AUX_ANNOTATION_ANNOTATION_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/namespace.h"
-#include "cedar/processing/Step.h"
-#include "cedar/devices/sensors/visual/Grabber.h"
-#include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/auxiliaries/MatData.h"
-#include "cedar/auxiliaries/FileParameter.h"
+#include "cedar/auxiliaries/annotation/namespace.h"
+#include "cedar/auxiliaries/Cloneable.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief The base class for all grabber sources for the processingIde
- *
- *    This class implements the common structure of all grabber sources
- */
-class cedar::proc::sources::GrabberBase
-:
-public cedar::proc::Step
-{
-  Q_OBJECT
 
+/*!@todo describe.
+ *
+ * @todo describe more.
+ */
+class cedar::aux::annotation::Annotation : public virtual cedar::aux::CloneableBase<cedar::aux::annotation::Annotation>
+{
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-  //!@brief The standard constructor.
-  GrabberBase();
-
 public:
+  //!@brief The standard constructor.
+  Annotation();
+
+  //!@brief The copy constructor.
+  Annotation(const Annotation& copyFrom);
+
   //!@brief Destructor
-  virtual ~GrabberBase();
+  virtual ~Annotation();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Save a Snapshot of the current picture
-  void saveSnapshot();
-
-public slots:
-  //!@brief Slot for the recording-checkbox
-  void setRecording();
-
-  //!@todo Enum RecordType (Encoding)
-
-  //!@brief Slot to set a new configuration filename
-  void setConfigurationFileName();
-
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-  //!@brief Invoke this function in the derived class
-  //  invokes onCreateGrabber() form derived class and updates information from grabber for the gui-parameter
-  void createGrabber();
-
-  //!@brief Create the grabber in the derived class
-  //  apply the new created Grabber to GrabberBase::mGrabber
-  virtual void onCreateGrabber() = 0;
-
-  //!@brief Applies an appropriate annotation to the current image.
-  void annotateImage();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief The used Grabber stored in this pointer
-  cedar::dev::sensors::visual::GrabberPtr mGrabber;
-
-  //!@brief The grabbed Image
-  cedar::aux::MatDataPtr mImage;
-
-
-private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  //!@cond SKIPPED_DOCUMENTATION
-  // the values of the properties
-  cedar::aux::BoolParameterPtr mRecording;
-  cedar::aux::FileParameterPtr mRecordName;
-  //cedar::aux::BoolParameterPtr mSaveSnapshot;
-  cedar::aux::FileParameterPtr mSnapshotName;
-
-  //!@brief The configuration filename
-  cedar::aux::FileParameterPtr _mConfigurationFileName;
-  //!@todo Enum RecordType (Encoding)
-
-  //!@endcond
 private:
-  // none yet
+  //! Vector of variable annotations that can be appended.
+  //!@todo Allow to access these quickly based on their type.
+  std::vector<cedar::aux::annotation::AnnotationPtr> mVariableAnnotations;
 
-}; //class cedar::proc::sources::GrabberBase
+}; // class cedar::aux::annotation::Annotation
 
-#endif // CEDAR_PROC_SOURCES_GRABBER_SOURCE_H
+#endif // CEDAR_AUX_ANNOTATION_ANNOTATION_H
 

@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/sources/GrabberBase.h"
+#include "cedar/auxiliaries/annotation/ColorSpace.h"
 
 
 // SYSTEM INCLUDES
@@ -47,15 +48,17 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+//!@todo The parameter names here should follow the default naming scheme
 cedar::proc::sources::GrabberBase::GrabberBase()
 :
 cedar::proc::Step(false, true),
-mImage(new cedar::aux::ImageData(cv::Mat::zeros(1, 1, CV_8UC3))),
+mImage(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_8UC3))),
 mRecording(new cedar::aux::BoolParameter(this, "record", false)),
 mRecordName(new cedar::aux::FileParameter(this, "recordName", cedar::aux::FileParameter::WRITE, "")),
 mSnapshotName(new cedar::aux::FileParameter(this, "snapshotName", cedar::aux::FileParameter::WRITE, "")),
 _mConfigurationFileName(new cedar::aux::FileParameter(this, "config",cedar::aux::FileParameter::READ,""))
 {
+	//!@todo These can be set using just the default parameter of the constructor.
   mRecordName->setValue("./video.avi");
   mSnapshotName->setValue("./picture.png");
   mGrabber.reset();
@@ -73,6 +76,54 @@ cedar::proc::sources::GrabberBase::~GrabberBase()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::sources::GrabberBase::annotateImage()
+{
+  cedar::aux::annotation::ColorSpacePtr color_space;
+  switch (this->mImage->getData().channels())
+  {
+    case 4:
+      color_space = cedar::aux::annotation::ColorSpacePtr
+                    (
+                      new cedar::aux::annotation::ColorSpace
+                      (
+                        cedar::aux::annotation::ColorSpace::Blue,
+                        cedar::aux::annotation::ColorSpace::Green,
+                        cedar::aux::annotation::ColorSpace::Red,
+                        cedar::aux::annotation::ColorSpace::Alpha
+                      )
+                    );
+      break;
+
+    case 3:
+      color_space = cedar::aux::annotation::ColorSpacePtr
+                    (
+                      new cedar::aux::annotation::ColorSpace
+                      (
+                        cedar::aux::annotation::ColorSpace::Blue,
+                        cedar::aux::annotation::ColorSpace::Green,
+                        cedar::aux::annotation::ColorSpace::Red
+                      )
+                    );
+      break;
+
+    case 1:
+      color_space = cedar::aux::annotation::ColorSpacePtr
+                    (
+                      new cedar::aux::annotation::ColorSpace
+                      (
+                        cedar::aux::annotation::ColorSpace::Gray
+                      )
+                    );
+      break;
+
+    default:
+      // this should not happen.
+      CEDAR_ASSERT(false);
+  } // switch
+
+  this->mImage->setAnnotation(color_space);
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::GrabberBase::setRecording()
@@ -100,13 +151,13 @@ void cedar::proc::sources::GrabberBase::setRecording()
       this->mGrabber->stopRecording();
       info = "Recording OFF";
     }
-    cedar::aux::LogSingleton::getInstance()->message(info,"cedar::proc::sources::GrabberSource::setRecording()");
+    cedar::aux::LogSingleton::getInstance()->message(info, "cedar::proc::sources::GrabberSource::setRecording()");
 
     // check if record is running
     if (rec && !(this->mGrabber->isRecording()))
     {
       info = "Error while start recording!";
-      cedar::aux::LogSingleton::getInstance()->error(info,"cedar::proc::sources::GrabberSource::setRecording()");
+      cedar::aux::LogSingleton::getInstance()->error(info, "cedar::proc::sources::GrabberSource::setRecording()");
     }
   }
 }
