@@ -87,7 +87,8 @@ public:
   :
   mpClassFactory(classFactory),
   mClassId(classId),
-  mCategory (category)
+  mCategory(category),
+  mIsDeprecated(false)
   {
   }
 
@@ -159,6 +160,26 @@ public:
    */
   virtual bool isObjectInstanceOf(BasePtr) = 0;
 
+  /*!@brief Marks the declared type as deprecated.
+   */
+  void deprecate(const std::string& description = "")
+  {
+    this->mIsDeprecated = true;
+    this->mDeprecationDescription = description;
+  }
+
+  //! Returns whether this step is deprecated.
+  bool isDeprecated() const
+  {
+    return this->mIsDeprecated;
+  }
+
+  //! Returns the deprecation description of the declaration.
+  const std::string& getDeprecationDescription() const
+  {
+    return this->mDeprecationDescription;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -188,6 +209,12 @@ protected:
 
   //! The category.
   std::string mCategory;
+
+  //! Whether or not the type declared with this object is deprecated.
+  bool mIsDeprecated;
+
+  //! Description of the deprecation.
+  std::string mDeprecationDescription;
 
 }; // class cedar::proc::DeclarationBase
 
