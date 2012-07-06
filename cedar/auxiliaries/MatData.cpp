@@ -67,21 +67,24 @@ std::string cedar::aux::MatData::getDescription() const
   else
   {
     unsigned int dim = cedar::aux::math::getDimensionalityOf(mat);
-    description += cedar::aux::toString(dim) + "-dimensional matrix<br />";
-    description += "size: ";
-    if (dim == 1)
+    description += cedar::aux::toString(dim) + "-dimensional matrix";
+    if (dim != 0)
     {
-      description += cedar::aux::toString(cedar::aux::math::get1DMatrixSize(mat));
-    }
-    else
-    {
-      for (unsigned int i = 0; i < dim; ++i)
+      description += "<br />size: ";
+      if (dim == 1)
       {
-        if (i > 0)
+        description += cedar::aux::toString(cedar::aux::math::get1DMatrixSize(mat));
+      }
+      else
+      {
+        for (unsigned int i = 0; i < dim; ++i)
         {
-          description += " x ";
+          if (i > 0)
+          {
+            description += " x ";
+          }
+          description += cedar::aux::toString(mat.size[i]);
         }
-        description += cedar::aux::toString(mat.size[i]);
       }
     }
     description += "<br />";
