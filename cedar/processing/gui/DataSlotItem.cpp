@@ -322,8 +322,6 @@ void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOption
 
 void cedar::proc::gui::DataSlotItem::generateTooltip()
 {
-  std::cout << "Generating tool tip now!" << std::endl;
-
   QString tool_tip;
   tool_tip += QString::fromStdString(cedar::proc::DataRole::type().get(this->mSlot->getRole()).prettyString());
   tool_tip += ": <b>" + QString::fromStdString(this->mSlot->getName()) + "</b>";
