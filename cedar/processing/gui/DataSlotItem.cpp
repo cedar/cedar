@@ -216,9 +216,12 @@ void cedar::proc::gui::DataSlotItem::connectTo(cedar::proc::gui::DataSlotItem *p
       validity = cedar::proc::gui::CONNECT_YES;
       break;
 
-    case cedar::proc::DataSlot::VALIDITY_UNKNOWN: //!@todo VALIDITY_UNKNOWN should get its own color
     case cedar::proc::DataSlot::VALIDITY_WARNING:
       validity = cedar::proc::gui::CONNECT_WARNING;
+      break;
+
+    case cedar::proc::DataSlot::VALIDITY_UNKNOWN:
+      validity = cedar::proc::gui::CONNECT_UNKNOWN;
       break;
 
     case cedar::proc::DataSlot::VALIDITY_ERROR:

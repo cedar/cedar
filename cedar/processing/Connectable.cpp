@@ -623,6 +623,8 @@ void cedar::proc::Connectable::setInput(const std::string& name, cedar::aux::Dat
 {
   this->setData(DataRole::INPUT, name, data);
   this->inputConnectionChanged(name);
+  // update the validity of the input
+  this->getInputValidity(name);
 }
 
 void cedar::proc::Connectable::setBuffer(const std::string& name, cedar::aux::DataPtr data)
