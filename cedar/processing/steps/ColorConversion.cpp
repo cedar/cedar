@@ -247,6 +247,8 @@ void cedar::proc::steps::ColorConversion::updateSourceImageColorSpace()
       {
         this->mInputColorSpaceAnnotation.reset();
       }
+
+      break;
     } // case ColorSpace::AUTO
 
     default:
