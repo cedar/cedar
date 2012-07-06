@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Dimensions.h
+    File:        Annotatable.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 06 29
+    Date:        2012 07 06
 
     Description:
 
@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_ANNOTATION_COLOR_SPACE_H
-#define CEDAR_AUX_ANNOTATION_COLOR_SPACE_H
+#ifndef CEDAR_AUX_ANNOTATION_ANNOTATABLE_H
+#define CEDAR_AUX_ANNOTATION_ANNOTATABLE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -43,65 +43,58 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/annotation/namespace.h"
 #include "cedar/auxiliaries/annotation/Annotation.h"
-#include "cedar/auxiliaries/Cloneable.h"
 
 // SYSTEM INCLUDES
 
-/*!@todo describe.
- *
- * @todo describe more.
+
+/*!@brief Base class for anything that can have annotations.
  */
-class cedar::aux::annotation::ColorSpace
-:
-public cedar::aux::annotation::Annotation,
-public cedar::aux::Cloneable<cedar::aux::annotation::ColorSpace, cedar::aux::annotation::Annotation>
+class cedar::aux::annotation::Annotatable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  //! Enum that indicates a channel's contents.
-  enum ChannelType
-  {
-    Red,
-    Green,
-    Blue,
-    Gray,
-    Hue,
-    Saturation,
-    Value,
-    Alpha,
-    Luminance,
-    ChromaticRed,
-    ChromaticBlue
-  };
-
+private:
+  typedef std::vector<cedar::aux::annotation::AnnotationPtr> AnnotationList;
+  typedef AnnotationList::iterator AnnotationIterator;
+  typedef AnnotationList::const_iterator AnnotationConstIterator;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Constructor for a single channel.
-  ColorSpace(ChannelType channelType);
-
-  //!@brief Constructor for three channels.
-  ColorSpace(ChannelType channel1Type, ChannelType channel2Type, ChannelType channel3Type);
-
-  //!@brief Constructor for four channels.
-  ColorSpace(ChannelType channel1Type, ChannelType channel2Type, ChannelType channel3Type, ChannelType channel4Type);
-
-  //!@brief The copy constructor.
-  ColorSpace(const cedar::aux::annotation::ColorSpace& copy);
+  //!@brief Destructor
+  virtual ~Annotatable();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! Returns the channel count.
-  unsigned int getNumberOfChannels() const;
+  //! Sets an annotation. If there is already an annotation of the exact type of the given annotation, it is replaced.
+  void setAnnotation(cedar::aux::annotation::AnnotationPtr annotation);
 
-  //! Returns the type of the given channel.
-  cedar::aux::annotation::ColorSpace::ChannelType getChannelType(unsigned int channel) const;
+  /*! Returns an annotation of the given type.
+   *
+   *  @throws A cedar::aux::UnknownTypeException if no matching annotation can be found.
+   */
+  template <typename T>
+  boost::shared_ptr<T> getAnnotation()
+  {
+    return cedar::aux::asserted_pointer_cast<T>(this->mAnnotations[this->findAnnotation<T>()]);
+  }
+
+  /*! Returns an annotation of the given type as a constant pointer.
+   *
+   *  @throws A cedar::aux::UnknownTypeException if no matching annotation can be found.
+   */
+  template <typename T>
+  boost::shared_ptr<const T> getAnnotation() const
+  {
+    return cedar::aux::asserted_pointer_cast<const T>(this->mAnnotations[this->findAnnotation<T>()]);
+  }
+
+  //! Copies all annotations from the given data pointer.
+  void copyAnnotationsFrom(cedar::aux::annotation::ConstAnnotatablePtr other);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -113,7 +106,34 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief Finds the index an annotation based on a type.
+  template <typename T>
+  size_t findAnnotation() const
+  {
+    for (size_t i = 0; i < this->mAnnotations.size(); ++i)
+    {
+      if (typeid(*this->mAnnotations[i]) == typeid(T))
+      {
+        return i;
+      }
+    }
+
+    CEDAR_THROW(cedar::aux::AnnotationNotFoundException, "Could not find an annotation of the given type.");
+  }
+
+  //!@brief Finds the index an annotation based on the type of a given object.
+  size_t findAnnotation(cedar::aux::annotation::AnnotationPtr annotation) const
+  {
+    for (size_t i = 0; i < this->mAnnotations.size(); ++i)
+    {
+      if (typeid(*this->mAnnotations[i]) == typeid(*annotation))
+      {
+        return i;
+      }
+    }
+
+    CEDAR_THROW(cedar::aux::AnnotationNotFoundException, "Could not find an annotation of the given type.");
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -121,10 +141,10 @@ private:
 protected:
   // none yet
 private:
-  //! Labels corresponding to the dimensions
-  std::vector<ChannelType> mChannelTypes;
+  //! List of annotations.
+  AnnotationList mAnnotations;
 
-}; // class cedar::aux::annotation::Dimensions
+}; // class cedar::aux::annotation::Annotatable
 
-#endif // CEDAR_AUX_ANNOTATION_IMAGE_H
+#endif // CEDAR_AUX_ANNOTATION_ANNOTATABLE_H
 
