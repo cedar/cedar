@@ -96,6 +96,7 @@ mSlot(slot)
 
   // data slots never snap to the grid; they are attached to the parent.
   this->setSnapToGrid(false);
+  this->setAcceptHoverEvents(true);
 }
 
 cedar::proc::gui::DataSlotItem::~DataSlotItem()
@@ -286,10 +287,15 @@ const std::string& cedar::proc::gui::DataSlotItem::getName() const
   return this->mSlot->getName();
 }
 
+void cedar::proc::gui::DataSlotItem::hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent)
+{
+  this->generateTooltip();
+
+  this->cedar::proc::gui::GraphicsBase::hoverEnterEvent(pEvent);
+}
+
 void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
 {
-  //todo: move this out of here and let it be called by a signal
-  this->generateTooltip();
   painter->save(); // save current painter settings
   //!@todo may call setBaseShape when receiving a signal, not every time paint() is called
   this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND);
@@ -313,6 +319,8 @@ void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOption
 
 void cedar::proc::gui::DataSlotItem::generateTooltip()
 {
+  std::cout << "Generating tool tip now!" << std::endl;
+
   QString tool_tip;
   tool_tip += QString::fromStdString(cedar::proc::DataRole::type().get(this->mSlot->getRole()).prettyString());
   tool_tip += ": <b>" + QString::fromStdString(this->mSlot->getName()) + "</b>";
