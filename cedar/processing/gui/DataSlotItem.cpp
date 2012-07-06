@@ -313,27 +313,14 @@ void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOption
 
 void cedar::proc::gui::DataSlotItem::generateTooltip()
 {
-  QString tool_tip("");
-  tool_tip += cedar::proc::DataRole::type().get(mSlot->getRole()).prettyString().c_str();
+  QString tool_tip;
+  tool_tip += cedar::proc::DataRole::type().get(this->mSlot->getRole()).prettyString().c_str();
   tool_tip += ": ";
-  tool_tip += mSlot->getName().c_str();
-  // mat info
-  if (cedar::aux::MatDataPtr mat_data = boost::shared_dynamic_cast<cedar::aux::MatData>(this->mSlot->getData()))
-  {
-    tool_tip += "<br />";
-    unsigned int dimensionality = cedar::aux::math::getDimensionalityOf(mat_data->getData());
-    tool_tip += QString("Dimensionality: %1").arg(dimensionality);
-    tool_tip += "<br />Sizes:";
-    for (unsigned int dim = 0; dim < dimensionality; ++dim)
-    {
-      tool_tip += QString(" %1").arg(mat_data->getData().size[dim]);
-    }
-  }
-  // type info
+  tool_tip += QString::fromStdString(this->mSlot->getName());
   if (this->mSlot->getData())
   {
-    QString unmangled_name = QString::fromStdString(cedar::aux::unmangleName(typeid(*(this->mSlot->getData().get()))));
-    tool_tip += QString("<br />") + Qt::escape(unmangled_name);
+    tool_tip += "<hr />";
+    tool_tip += QString::fromStdString(this->mSlot->getData()->getDescription());
   }
   this->setToolTip(tool_tip);
 }

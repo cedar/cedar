@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
@@ -90,6 +91,16 @@ cedar::aux::annotation::Annotation(copy)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::string cedar::aux::annotation::ColorSpace::getDescription() const
+{
+  std::string description = "Color space with " + cedar::aux::toString(this->getNumberOfChannels()) + " channels: ";
+  for (unsigned int i = 0; i < this->getNumberOfChannels(); ++i)
+  {
+    description += "<br />Channel " + cedar::aux::toString(i) + ": " + channelTypeToString(this->getChannelType(i));
+  }
+  return description;
+}
+
 unsigned int cedar::aux::annotation::ColorSpace::getNumberOfChannels() const
 {
   return this->mChannelTypes.size();
@@ -104,3 +115,30 @@ cedar::aux::annotation::ColorSpace::ChannelType cedar::aux::annotation::ColorSpa
 
   return this->mChannelTypes[channel];
 }
+
+const std::string& cedar::aux::annotation::ColorSpace::channelTypeToString
+                   (
+                     cedar::aux::annotation::ColorSpace::ChannelType type
+                   )
+{
+  static std::map<cedar::aux::annotation::ColorSpace::ChannelType, std::string> channel_type_strings;
+  if (channel_type_strings.empty())
+  {
+    channel_type_strings[Red] = "Red";
+    channel_type_strings[Green] = "Green";
+    channel_type_strings[Blue] = "Blue";
+    channel_type_strings[Gray] = "Gray";
+    channel_type_strings[Hue] = "Hue";
+    channel_type_strings[Saturation] = "Saturation";
+    channel_type_strings[Value] = "Value";
+    channel_type_strings[Alpha] = "Alpha";
+    channel_type_strings[Luminance] = "Luminance";
+    channel_type_strings[ChromaticRed] = "ChromaticRed";
+    channel_type_strings[ChromaticBlue] = "ChromaticBlue";
+  }
+
+  CEDAR_DEBUG_ASSERT(channel_type_strings.find(type) != channel_type_strings.end());
+
+  return channel_type_strings[type];
+}
+

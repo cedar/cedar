@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/annotation/Annotatable.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
 
@@ -75,4 +76,18 @@ void cedar::aux::annotation::Annotatable::copyAnnotationsFrom(cedar::aux::annota
   {
     this->mAnnotations[i] = other->mAnnotations[i]->clone();
   }
+}
+
+std::string cedar::aux::annotation::Annotatable::getDescription() const
+{
+  std::string description;
+  description += "Type: <b>" + cedar::aux::objectTypeToString(this) + "</b>";
+
+  for (size_t i = 0; i < this->mAnnotations.size(); ++i)
+  {
+    description += "<hr />";
+    description += this->mAnnotations[i]->getDescription();
+  }
+
+  return description;
 }

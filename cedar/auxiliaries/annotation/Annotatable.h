@@ -96,6 +96,12 @@ public:
   //! Copies all annotations from the given data pointer.
   void copyAnnotationsFrom(cedar::aux::annotation::ConstAnnotatablePtr other);
 
+  /*! @brief  Returns a description for the annotatable.
+   *
+   *          Built from the description of all the annotations in this object.
+   */
+  virtual std::string getDescription() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
