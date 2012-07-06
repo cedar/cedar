@@ -94,9 +94,7 @@ private:
 protected:
   // none yet
 private:
-  //! Vector of variable annotations that can be appended.
-  //!@todo Allow to access these quickly based on their type.
-  std::vector<cedar::aux::annotation::AnnotationPtr> mVariableAnnotations;
+  // none yet
 
 }; // class cedar::aux::annotation::Annotation
 
