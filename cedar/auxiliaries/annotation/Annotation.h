@@ -74,7 +74,12 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  /*!@brief   Implement this to return a description string for the given annotation.
+   *
+   * @remarks This string should contain HTML, e.g., for bold faced fonts and italics, as well as &lt;br /&gt; for line
+   *          breaks.
+   */
+  virtual std::string getDescription() const = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

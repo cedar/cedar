@@ -93,6 +93,9 @@ public:
   //!@brief The copy constructor.
   ColorSpace(const cedar::aux::annotation::ColorSpace& copy);
 
+  //!@brief Returns the channel type as a string.
+  static const std::string& channelTypeToString(cedar::aux::annotation::ColorSpace::ChannelType type);
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -102,6 +105,9 @@ public:
 
   //! Returns the type of the given channel.
   cedar::aux::annotation::ColorSpace::ChannelType getChannelType(unsigned int channel) const;
+
+  //! Generates the a description of the color space.
+  std::string getDescription() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

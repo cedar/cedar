@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Dimensions.h
+    File:        MatData.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 06 29
+    Date:        2012 07 06
 
     Description:
 
@@ -38,9 +38,9 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/annotation/Dimensions.h"
+#include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/stringFunctions.h"
-#include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
 
@@ -48,44 +48,48 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::annotation::Dimensions::Dimensions(unsigned int numberOfDimensions)
-{
-  this->mDimensions.resize(numberOfDimensions);
-}
-
-cedar::aux::annotation::Dimensions::Dimensions(const cedar::aux::annotation::Dimensions& copyFrom)
-:
-cedar::aux::annotation::Annotation(copyFrom)
-{
-  this->mDimensions.resize(copyFrom.getDimensionality());
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::annotation::Dimensions::setLabel(unsigned int dimension, const std::string& label)
-{
-  CEDAR_ASSERT(dimension < this->mDimensions.size());
-
-  this->mDimensions[dimension].mLabel = label;
-}
-
-const std::string& cedar::aux::annotation::Dimensions::getLabel(unsigned int dimension) const
-{
-  CEDAR_ASSERT(dimension < this->mDimensions.size());
-
-  return this->mDimensions[dimension].mLabel;
-}
-
-std::string cedar::aux::annotation::Dimensions::getDescription() const
+std::string cedar::aux::MatData::getDescription() const
 {
   std::string description;
+  description += Super::getDescription();
+  description += "<hr />";
 
-  for (size_t i = 0; i < this->mDimensions.size(); ++i)
+  this->lockForRead();
+  const cv::Mat& mat = this->getData();
+  if (mat.empty())
   {
-    description += "Dimension " + cedar::aux::toString(i) + ": " + this->mDimensions[i].mLabel;
+    description += "Empty matrix.";
   }
+  else
+  {
+    unsigned int dim = cedar::aux::math::getDimensionalityOf(mat);
+    description += cedar::aux::toString(dim) + "-dimensional matrix<br />";
+    description += "size: ";
+    if (dim == 1)
+    {
+      description += cedar::aux::toString(cedar::aux::math::get1DMatrixSize(mat));
+    }
+    else
+    {
+      for (unsigned int i = 0; i < dim; ++i)
+      {
+        if (i > 0)
+        {
+          description += " x ";
+        }
+        description += cedar::aux::toString(mat.size[i]);
+      }
+    }
+    description += "<br />";
+    description += "type: " + cedar::aux::math::matrixTypeToString(mat) + "<br />";
+    description += "channels: " + cedar::aux::toString(mat.channels());
+  }
+
+  this->unlock();
 
   return description;
 }
