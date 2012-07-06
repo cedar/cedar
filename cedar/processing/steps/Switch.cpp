@@ -68,10 +68,13 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/switch.svg");
-    declaration->setDescription("A step that calculates a mixture of two inputs based on a third one.<br />"
-        "The step has the inputs \"input 1\", \"input 2\" and \"factor\". The output, \"mixture\" is calculated "
-        "as (factor) * (input 1) + (1 - factor) * (input 2). Thus, input one and two must be matrices, while "
-        "factor must be either DoubleData or zero-dimensional MatData.");
+    declaration->setDescription
+    (
+      "A step that calculates a mixture of two inputs based on a third one.<br />"
+      "The step has the inputs \"input 1\", \"input 2\" and \"factor\". The output, \"mixture\" is calculated "
+      "as (factor) * (input 1) + (1 - factor) * (input 2). Thus, input one and two must be matrices, while "
+      "factor must be either DoubleData or zero-dimensional MatData."
+    );
 
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(declaration);
 

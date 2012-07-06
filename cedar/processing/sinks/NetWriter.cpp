@@ -70,6 +70,7 @@ namespace
       )
     );
     input_declaration->setIconPath(":/steps/net_writer.svg");
+    input_declaration->setDescription("Writes incoming matrices to a yarp port.");
     cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(input_declaration);
 
     return true;
