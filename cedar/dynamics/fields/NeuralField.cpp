@@ -73,6 +73,10 @@ namespace
       new cedar::proc::ElementDeclarationTemplate<cedar::dyn::NeuralField>("Fields", "cedar.dynamics.NeuralField")
     );
     field_decl->setIconPath(":/steps/field_temp.svg");
+    field_decl->setDescription
+    (
+      "An implementation of Amari's dynamic neural fields."
+    );
 
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(field_decl);
 
