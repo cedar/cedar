@@ -47,10 +47,11 @@
 #include "cedar/processing/MultiTrigger.h"
 #include "cedar/processing/Network.h"
 //!@todo Check if these includes are still necessary
-#include "cedar/processing/sources/GaussInput.h"
-#include "cedar/processing/steps/StaticGain.h"
-#include "cedar/processing/steps/Projection.h"
-#include "cedar/processing/steps/Resize.h"
+//#include "cedar/processing/sources/GaussInput.h"
+//#include "cedar/processing/steps/StaticGain.h"
+//#include "cedar/processing/steps/Projection.h"
+//#include "cedar/processing/steps/Resize.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 
@@ -140,6 +141,14 @@ cedar::proc::ElementPtr cedar::proc::DeclarationRegistry::allocateClass(const st
 
   if (iter != mDeclarations.end())
   {
+    if (iter->second->isDeprecated())
+    {
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Allocating deprecated class \"" + classId + "\".",
+        "cedar::proc::DeclarationRegistry::allocateClass(const std::string&)"
+      );
+    }
     return iter->second->getObjectFactory()->allocate();
   }
   // if this point is reached, no factory could be found for the given class id - throw
