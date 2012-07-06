@@ -60,8 +60,10 @@ class cedar::xxx::xxx
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
+  <class name>();
 
   //!@brief Destructor
+  virtual ~<class name>();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -98,7 +100,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::xxx
+}; // class cedar::xxx::xxx
 
 #endif // CEDAR_XXX_XXX_H
 
