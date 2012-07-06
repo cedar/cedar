@@ -90,6 +90,25 @@ struct cedar::aux::math::Limits
   {
   }
 
+  /*! @brief Returns the value if it is inside the limit; otherwise, if the value is lower, returns the limit's lower
+   *         bounds, otherwise it returns the upper limit.
+   */
+  inline const T& limit(const T& value) const
+  {
+    if (value < this->getLower())
+    {
+      return this->getLower();
+    }
+    else if (value > this->getUpper())
+    {
+      return this->getUpper();
+    }
+    else
+    {
+      return value;
+    }
+  }
+
   //! Returns the length of the interval, i.e., upper - lower.
   inline T getLength() const
   {

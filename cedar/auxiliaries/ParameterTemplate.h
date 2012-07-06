@@ -99,13 +99,14 @@ public:
    *
    * @param lock Whether the method should take care of properly locking the parameter.
    */
-  void setValue(const T& value, bool lock = false)
+  virtual void setValue(const T& value, bool lock = false)
   {
     if (lock)
     {
       this->lockForWrite();
     }
 
+    T old_value = this->mValue;
     this->mValue = value;
 
     if (lock)
@@ -113,7 +114,10 @@ public:
       this->unlock();
     }
 
-    this->emitChangedSignal();
+    if (old_value != this->mValue)
+    {
+      this->emitChangedSignal();
+    }
   }
 
   //!@brief store the current value of type T in a configuration tree
