@@ -314,9 +314,8 @@ void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOption
 void cedar::proc::gui::DataSlotItem::generateTooltip()
 {
   QString tool_tip;
-  tool_tip += cedar::proc::DataRole::type().get(this->mSlot->getRole()).prettyString().c_str();
-  tool_tip += ": ";
-  tool_tip += QString::fromStdString(this->mSlot->getName());
+  tool_tip += QString::fromStdString(cedar::proc::DataRole::type().get(this->mSlot->getRole()).prettyString());
+  tool_tip += ": <b>" + QString::fromStdString(this->mSlot->getName()) + "</b>";
   if (this->mSlot->getData())
   {
     tool_tip += "<hr />";
