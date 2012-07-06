@@ -203,6 +203,11 @@ void cedar::proc::steps::ColorConversion::updateTargetImageColorSpace()
 
 void cedar::proc::steps::ColorConversion::updateSourceImageColorSpace()
 {
+  if (!this->mInput)
+  {
+    return;
+  }
+
   this->_mSourceType->enableAll();
 
   switch (this->_mSourceType->getValue())
