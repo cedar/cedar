@@ -1,0 +1,20 @@
+{
+  "my first object list":
+  {
+    "TestClassOne":
+    {
+      "unsigned integer parameter": "0",
+      "double parameter": "0.0"
+    },
+    "TestClassTwo":
+    {
+      "unsigned integer parameter": "1",
+      "double parameter": "1.0"
+    },
+    "TestClassOne":
+    {
+      "unsigned integer parameter": "2",
+      "double parameter": "2.0"
+    }
+  }
+}
