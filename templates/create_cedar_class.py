@@ -142,5 +142,5 @@ for extension in extensions:
     with open(destination, "w") as out:
       out.write(contents)
     
-print "Done. Please remember to enter the class into the appropriate namespace!"
+print "Done. Please remember to enter the class into the appropriate namespace header and rerun cmake!"
 
