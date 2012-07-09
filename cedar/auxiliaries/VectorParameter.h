@@ -278,10 +278,16 @@ public:
       this->lockForWrite();
     }
 
+    bool changed = (this->mValues.size() != values.size());
+
     this->mValues.resize(values.size());
     for (size_t i = 0; i < values.size(); ++i)
     {
-      this->set(i, values[i]);
+      if (this->mValues[i] != values[i])
+      {
+        this->mValues[i] = values[i];
+        changed = true;
+      }
     }
 
     if (lock)
@@ -289,7 +295,10 @@ public:
       this->unlock();
     }
 
-    this->emitChangedSignal();
+    if (changed)
+    {
+      this->emitChangedSignal();
+    }
     //!@todo emit a porperty changed signal here as well, as the new vector may have a different size
   }
 
