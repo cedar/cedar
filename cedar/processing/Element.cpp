@@ -80,7 +80,7 @@ void cedar::proc::Element::validateName(const std::string& newName)
 {
   if (newName.find('.') != std::string::npos)
   {
-    CEDAR_THROW(cedar::aux::ValidationFailedException, "This name contains an unvalid character (\".\")");
+    CEDAR_THROW(cedar::aux::ValidationFailedException, "This name contains an invalid character (\".\")");
   }
 
   if (cedar::proc::ConstNetworkPtr network = this->getNetwork())
