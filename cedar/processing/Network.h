@@ -309,9 +309,17 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /*!@brief Reads the network from a configuration node and writes all exceptions into the given vector.
+   */
+  void readFrom
+  (
+    const cedar::aux::ConfigurationNode& root,
+    std::vector<std::string>& exceptions
+  );
+
   /*!@brief Reads the network from a configuration node using the first version of the format.
    */
-  void readFromV1(const cedar::aux::ConfigurationNode& root);
+  void readFromV1(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
 
   /*!@brief Writes the meta data to the configuration.
    */
@@ -319,7 +327,7 @@ private:
 
   /*!@brief Reads steps from the configuration node and adds them to the network.
    */
-  void readSteps(const cedar::aux::ConfigurationNode& root);
+  void readSteps(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
 
   /*!@brief Writes the steps in the network to the configuration node.
    */
@@ -327,7 +335,7 @@ private:
 
   /*!@brief Reads triggers from a configuration node and adds them to the network.
    */
-  void readTriggers(const cedar::aux::ConfigurationNode& root);
+  void readTriggers(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
 
   /*!@brief Writes the triggers in the network to the configuration node.
    */
@@ -335,7 +343,7 @@ private:
 
   /*!@brief Reads networks from a configuration node and adds them to the parent network.
    */
-  void readNetworks(const cedar::aux::ConfigurationNode& root);
+  void readNetworks(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
 
   /*!@brief Writes the child networks in the network to the configuration node.
    */
@@ -351,7 +359,7 @@ private:
 
   /*!@brief Reads data connections from a configuration node and adds them to the network.
    */
-  void readDataConnections(const cedar::aux::ConfigurationNode& root);
+  void readDataConnections(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
 
   /*!@brief Writes the data connections in the network to the configuration node.
    */
