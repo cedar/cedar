@@ -81,6 +81,10 @@ public:
   //!@brief set the current validity at the promoted slot
   void setValidity(VALIDITY validity);
 
+  void clear();
+
+  void removeData(cedar::aux::ConstDataPtr data);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

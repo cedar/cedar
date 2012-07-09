@@ -94,7 +94,7 @@ void cedar::proc::ExternalData::clear()
   while(!this->mData.empty())
   {
     cedar::aux::DataPtr data = this->mData.back().lock();
-    if(data)
+    if (data)
     {
       this->removeData(data);
     }
