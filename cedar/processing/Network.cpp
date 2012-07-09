@@ -117,7 +117,7 @@ boost::signals2::connection cedar::proc::Network::connectToElementAdded
 
 std::string cedar::proc::Network::getUniqueIdentifier(const std::string& identifier) const
 {
-  if (this->mElements.find(identifier) == this->mElements.end())
+  if (!this->nameExists(identifier))
   {
     return identifier;
   }
@@ -129,9 +129,14 @@ std::string cedar::proc::Network::getUniqueIdentifier(const std::string& identif
     result = identifier +  " " + cedar::aux::toString(count);
     ++count;
   }
-  while (this->mElements.find(result) != this->mElements.end());
+  while (this->nameExists(result));
 
   return result;
+}
+
+bool cedar::proc::Network::nameExists(const std::string& name) const
+{
+  return this->mElements.find(name) != this->mElements.end();
 }
 
 void cedar::proc::Network::listSubnetworks(std::set<cedar::proc::ConstNetworkPtr>& subnetworks) const
