@@ -618,6 +618,13 @@ void cedar::proc::gui::Ide::load()
 
 void cedar::proc::gui::Ide::loadFile(QString file)
 {
+  // print message
+  cedar::aux::LogSingleton::getInstance()->message
+                                           (
+                                             "Loading file: " + file.toStdString(),
+                                             "void cedar::proc::gui::Ide::loadFile(QString)"
+                                           );
+
   // reset scene
   this->mpProcessingDrawer->getScene()->reset();
   // create new root network
