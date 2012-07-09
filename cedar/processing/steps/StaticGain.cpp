@@ -65,6 +65,10 @@ namespace
       )
     );
     static_gain_decl->setIconPath(":/steps/static_gain.svg");
+    static_gain_decl->setDescription
+    (
+      "Multiplies a matrix with a scalar value that can be set as a parameter."
+    );
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(static_gain_decl);
 
     return true;

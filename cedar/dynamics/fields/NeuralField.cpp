@@ -48,7 +48,7 @@
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
-#include "cedar/auxiliaries/math/AbsSigmoid.h"
+#include "cedar/auxiliaries/math/sigmoids/AbsSigmoid.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -73,6 +73,10 @@ namespace
       new cedar::proc::ElementDeclarationTemplate<cedar::dyn::NeuralField>("Fields", "cedar.dynamics.NeuralField")
     );
     field_decl->setIconPath(":/steps/field_temp.svg");
+    field_decl->setDescription
+    (
+      "An implementation of Amari's dynamic neural fields."
+    );
 
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(field_decl);
 

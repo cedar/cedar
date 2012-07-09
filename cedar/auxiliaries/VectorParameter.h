@@ -256,13 +256,6 @@ public:
     return this->mValues.at(index);
   }
 
-  //!@brief set one entry of the vector to a new value
-  void set(size_t index, const T& value)
-  {
-    this->mValues.at(index) = value;
-    this->emitChangedSignal();
-  }
-
   //!@brief get the default vector
   const std::vector<T>& getDefaultValues() const
   {
@@ -285,7 +278,11 @@ public:
       this->lockForWrite();
     }
 
-    this->mValues = values;
+    this->mValues.resize(values.size());
+    for (size_t i = 0; i < values.size(); ++i)
+    {
+      this->set(i, values[i]);
+    }
 
     if (lock)
     {
@@ -294,6 +291,20 @@ public:
 
     this->emitChangedSignal();
     //!@todo emit a porperty changed signal here as well, as the new vector may have a different size
+  }
+
+  //!@brief set one entry of the vector to a new value
+  //!@todo This should be called setValue
+  virtual void set(size_t index, const T& value)
+  {
+    CEDAR_DEBUG_ASSERT(index < this->mValues.size());
+    T old_value = this->mValues[index];
+    this->mValues[index] = value;
+
+    if (value != old_value)
+    {
+      this->emitChangedSignal();
+    }
   }
 
   //!@brief Set the default value.

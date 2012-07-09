@@ -66,6 +66,10 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/color_conversion.svg");
+    declaration->setDescription
+    (
+      "Converts a matrix from one color space into another."
+    );
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(declaration);
 
     return true;
