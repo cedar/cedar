@@ -249,6 +249,12 @@ private:
   //!@brief converts transformation maps from CV_32F into (CV_16SC2, CV_16UC1)
   void convertMap();
 
+  //!@brief Annotates the current result matrix.
+  void applyAnnotations();
+
+private slots:
+  //! Reacts to a change in the transform direction.
+  void transformDirectionChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
