@@ -63,7 +63,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr input_decl
+    ElementDeclarationPtr declaration
     (
       new ElementDeclarationTemplate<cedar::proc::sources::GaussInput>
       (
@@ -71,9 +71,10 @@ namespace
         "cedar.processing.sources.GaussInput"
       )
     );
-    input_decl->setIconPath(":/steps/gauss_input.svg");
-    input_decl->setDescription("Generates a matrix that contains a sampled Gauss function.");
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(input_decl);
+    declaration->setIconPath(":/steps/gauss_input.svg");
+    declaration->setDescription("Generates a matrix that contains a sampled Gauss function.");
+    declaration->deprecatedName("cedar.processing.source.GaussInput");
+    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
 
     return true;
   }
