@@ -58,6 +58,11 @@ namespace
       new cedar::proc::ElementDeclarationTemplate<cedar::dyn::Preshape>("Fields", "cedar.dynamics.Preshape")
     );
     preshape_decl->setIconPath(":/steps/preshape.svg");
+    preshape_decl->setDescription
+    (
+      "A dynamical system that slowly accumulates activation at locations of strongly active input. The activation "
+      "decays slowly over time."
+    );
 
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(preshape_decl);
 

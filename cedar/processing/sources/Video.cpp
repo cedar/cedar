@@ -64,6 +64,10 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/video_grabber.svg");
+    declaration->setDescription
+    (
+      "Reads a video file and outputs the images. Supported formats depend on which ones are available via opencv."
+    );
     cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
 
     return true;

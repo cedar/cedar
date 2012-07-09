@@ -83,6 +83,10 @@ namespace
       )
     );
     resize_decl->setIconPath(":/steps/resize.svg");
+    resize_decl->setDescription
+    (
+      "Resizes a matrix by interpolating between the original values according to a method selected by the user."
+    );
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(resize_decl);
 
     return true;

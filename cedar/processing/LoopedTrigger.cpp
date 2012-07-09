@@ -71,6 +71,13 @@ namespace
       )
     );
     looped_trigger_declaration->setIconPath(":/triggers/looped_trigger.svg");
+    looped_trigger_declaration->setDescription
+    (
+      "A trigger that, when started, periodically sends out a trigger signal. Along this signal, a time is sent that "
+      "tells any attached steps by how much time they should advance their internal calculations.\n\n"
+      "This is useful, e.g., for iterating a dynamical system using the Euler method: the time sent with the trigger "
+      "signal can be used as the step time, and the approximation can be updated using it."
+    );
 
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(looped_trigger_declaration);
 

@@ -59,6 +59,7 @@ namespace
       new cedar::proc::ElementDeclarationTemplate<cedar::dyn::Noise>("Sources", "cedar.dynamics.Noise")
     );
     noise_decl->setIconPath(":/steps/noise.svg");
+    noise_decl->setDescription("A step that generates normally distributed random noise.");
 
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(noise_decl);
 

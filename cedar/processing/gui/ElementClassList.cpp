@@ -110,7 +110,7 @@ void cedar::proc::gui::ElementClassList::showList(const cedar::proc::Declaration
     class_description += "<div align=\"right\"><nobr><small><i>" + QString::fromStdString(class_id->getClassId()) + "</i></small></nobr></div>";
     if (!class_id->getDescription().empty())
     {
-      QString description = "<p>" + QString::fromStdString(class_id->getDescription()) + "</p>";
+      QString description = "<p>" + QString::fromStdString(class_id->getDescription()).replace("\n", "<br />") + "</p>";
       class_description += description;
     }
 

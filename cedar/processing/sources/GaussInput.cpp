@@ -72,6 +72,7 @@ namespace
       )
     );
     input_decl->setIconPath(":/steps/gauss_input.svg");
+    input_decl->setDescription("Generates a matrix that contains a sampled Gauss function.");
     cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(input_decl);
 
     return true;

@@ -84,6 +84,10 @@ namespace
       )
     );
     projection_decl->setIconPath(":/steps/projection.svg");
+    projection_decl->setDescription
+    (
+      "Projects N-Dimensional matrices onto M-Dimensions."
+    );
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(projection_decl);
 
     return true;
