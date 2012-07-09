@@ -180,6 +180,18 @@ public:
     return this->mDeprecationDescription;
   }
 
+  //! Adds a deprecated name to the declaration.
+  void deprecatedName(const std::string& oldName)
+  {
+    this->mDeprecatedNames.push_back(oldName);
+  }
+
+  //! Returns the deprecated names of this class.
+  const std::vector<std::string>& deprecatedNames() const
+  {
+    return this->mDeprecatedNames;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -215,6 +227,9 @@ protected:
 
   //! Description of the deprecation.
   std::string mDeprecationDescription;
+
+  //! A list of deprecated names for this class.
+  std::vector<std::string> mDeprecatedNames;
 
 }; // class cedar::proc::DeclarationBase
 
