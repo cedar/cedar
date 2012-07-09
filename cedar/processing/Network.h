@@ -263,6 +263,9 @@ public:
    */
   std::string getUniqueIdentifier(const std::string& identifier) const;
 
+  //!@brief Checks whether a name exists in the network.
+  bool nameExists(const std::string& name) const;
+
   /*!@brief Register a function pointer to react to an added element.
    */
   boost::signals2::connection connectToElementAdded

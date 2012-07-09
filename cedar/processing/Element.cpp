@@ -45,9 +45,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::Element::Element()
-:
-_mName(new cedar::aux::StringParameter(this, "name", "element"))
 {
+  _mName->setDefault("element");
+  _mName->setValidator(boost::bind(&cedar::proc::Element::validateName, this, _1));
 }
 
 cedar::proc::Element::~Element()
@@ -57,25 +57,6 @@ cedar::proc::Element::~Element()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-void cedar::proc::Element::setName(const std::string& name)
-{
-  this->_mName->setValue(name);
-
-  /*!@todo The following should actually be done, however, due to multiple inheritance from QObject in Step, this
-   *       wouldn't work with Qt.
-  if (this->mpRegisteredAt != NULL)
-  {
-    this->mpRegisteredAt->updateObjectName(this);
-  }
-  */
-}
-
-const std::string& cedar::proc::Element::getName() const
-{
-  return this->_mName->getValue();
-}
-
 void cedar::proc::Element::setNetwork(cedar::proc::NetworkPtr network)
 {
   // set the parent registry
@@ -93,4 +74,24 @@ cedar::proc::NetworkPtr cedar::proc::Element::getNetwork()
 cedar::proc::ConstNetworkPtr cedar::proc::Element::getNetwork() const
 {
   return this->mRegisteredAt.lock();
+}
+
+void cedar::proc::Element::validateName(const std::string& newName)
+{
+  if (newName.find('.') != std::string::npos)
+  {
+    CEDAR_THROW(cedar::aux::ValidationFailedException, "This name contains an unvalid character (\".\")");
+  }
+
+  if (cedar::proc::ConstNetworkPtr network = this->getNetwork())
+  {
+    if (network->nameExists(newName))
+    {
+      CEDAR_THROW
+      (
+        cedar::aux::ValidationFailedException,
+        "There is already an element of this name in this element's network."
+      );
+    }
+  }
 }

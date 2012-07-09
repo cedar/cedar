@@ -229,6 +229,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(UnknownNameException);
     CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
     CEDAR_DECLARE_AUX_CLASS(UnmanglingFailedException);
+    CEDAR_DECLARE_AUX_CLASS(ValidationFailedException);
     //!@endcond
     
     // Log related classes --------------------------------------------------------------------------------------------
