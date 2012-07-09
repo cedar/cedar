@@ -535,6 +535,7 @@ cedar::proc::ElementPtr cedar::proc::Network::getElement(const std::string& name
 
 void cedar::proc::Network::connectSlots(const std::string& source, const std::string& target)
 {
+  //!@todo Shouldn't large parts of this code be in DataConnection?
   // parse element and slot name
   std::string source_name;
   std::string source_slot_name;
