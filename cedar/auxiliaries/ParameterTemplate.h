@@ -47,6 +47,7 @@
 
 // SYSTEM INCLUDES
 #include <iostream>
+#include <boost/function.hpp>
 
 /*!@brief A generic template for parameters stored in a cedar::aux::Configurable.
  *
@@ -101,11 +102,14 @@ public:
    */
   virtual void setValue(const T& value, bool lock = false)
   {
+    if (mValidator)
+    {
+      mValidator(value);
+    }
     if (lock)
     {
       this->lockForWrite();
     }
-
     T old_value = this->mValue;
     this->mValue = value;
 
@@ -149,6 +153,17 @@ public:
     this->setValue(mDefault);
   }
 
+  //!@brief Set the default value.
+  void setDefault(const T& value)
+  {
+    this->mDefault = value;
+  }
+
+  void setValidator(boost::function<void(const T&)> validator)
+  {
+    mValidator = validator;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -172,6 +187,12 @@ private:
 
   //! The default value of the parameter. Ignored if mHasDefault is false.
   T mDefault;
+
+  /*! A validator function for setValue. Checks if a value fulfills all restrictions of this parameter.
+   * (e.g., if a string contains any invalid characters). Throws a ValidationFailedException
+   * if restrictions are violated.
+   */
+  boost::function<void(const T&)> mValidator;
 }; // class cedar::aux::ParameterTemplate
 
 #endif // CEDAR_PROC_PARAMETER_TEMPLATE_H

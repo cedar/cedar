@@ -199,4 +199,10 @@ class cedar::aux::ConversionFailedException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::UnhandledTypeException
 
+/*!@brief Exception that occurs when a parameter validation fails.
+ */
+class cedar::aux::ValidationFailedException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::ValidationFailedException
+
 #endif // CEDAR_AUX_EXCEPTIONS_H
