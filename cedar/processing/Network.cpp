@@ -1049,6 +1049,11 @@ void cedar::proc::Network::readTriggers
           exceptions.push_back(e.exceptionInfo());
         }
 
+        if (!triggerable)
+        {
+          continue; // target not found, cannot recover
+        }
+
         try
         {
           this->connectTrigger(trigger, triggerable);
