@@ -45,6 +45,7 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ExternalData.h" // getInputSlot() returns ExternalData
+#include "cedar/auxiliaries/annotation/Dimensions.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -206,7 +207,7 @@ _mMagnitudeBackward(new cedar::aux::DoubleParameter(this, "magnitudeBackward", 1
   // create maps
   this->createMap();
 
-  QObject::connect(this->_mTransformationDirection.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
+  QObject::connect(this->_mTransformationDirection.get(), SIGNAL(valueChanged()), this, SLOT(transformDirectionChanged()));
   QObject::connect(this->_mTransformationType.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
   QObject::connect(this->_mSamplesPerDegree.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
   QObject::connect(this->_mSamplesPerDistance.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
@@ -214,17 +215,48 @@ _mMagnitudeBackward(new cedar::aux::DoubleParameter(this, "magnitudeBackward", 1
   QObject::connect(this->_mNumberOfCols.get(), SIGNAL(valueChanged()), this, SLOT(changeNumberOfCols()));
   QObject::connect(this->_mMagnitudeForward.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
   QObject::connect(this->_mMagnitudeBackward.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
+
+  this->applyAnnotations();
 }
 
 cedar::proc::steps::CoordinateTransformation::~CoordinateTransformation()
 {
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::steps::CoordinateTransformation::applyAnnotations()
+{
+  cedar::aux::annotation::DimensionsPtr dims(new cedar::aux::annotation::Dimensions(2));
+  switch (this->_mTransformationDirection->getValue())
+  {
+    case TransformationDirection::Forward:
+      dims->setLabel(0, "angle");
+      dims->setLabel(1, "distance");
+      break;
+
+    case TransformationDirection::Backward:
+      dims->setLabel(0, "y");
+      dims->setLabel(1, "x");
+      break;
+
+    default:
+      // this should never happen, all enums should be handled above
+      CEDAR_ASSERT(false);
+  }
+  this->mOutput->setAnnotation(dims);
+}
+
+void cedar::proc::steps::CoordinateTransformation::transformDirectionChanged()
+{
+  // update the annotations
+  this->applyAnnotations();
+
+  // update computation
+  this->recompute();
+}
 
 // The arguments are unused here
 void cedar::proc::steps::CoordinateTransformation::compute(const cedar::proc::Arguments&)
@@ -505,6 +537,7 @@ void cedar::proc::steps::CoordinateTransformation::inputConnectionChanged(const 
   CEDAR_DEBUG_ASSERT(this->mInput);
 
   this->mOutput->copyAnnotationsFrom(this->mInput);
+  this->applyAnnotations();
 }
 
 void cedar::proc::steps::CoordinateTransformation::changeNumberOfRows()
