@@ -93,6 +93,10 @@ public:
   //!@brief removes all kernels from the list
   inline void clear()
   {
+    for (size_t i = 0; i < this->mKernels.size(); ++i)
+    {
+      this->mKernelRemovedSignal(i);
+    }
     this->mKernels.clear();
   }
 

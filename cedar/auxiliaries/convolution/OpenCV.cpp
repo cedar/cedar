@@ -1107,10 +1107,9 @@ void cedar::aux::conv::OpenCV::kernelRemoved(size_t index)
 
 void cedar::aux::conv::OpenCV::updateKernelType(size_t index)
 {
-  if (this->mKernelTypes.size() <= index)
-  {
-    this->mKernelTypes.resize(index + 1, KERNEL_TYPE_UNKNOWN);
-  }
+  this->mKernelTypes.resize(this->getKernelList()->size(), KERNEL_TYPE_UNKNOWN);
+
+  CEDAR_DEBUG_ASSERT(index < this->mKernelTypes.size());
 
   cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList()->getKernel(index);
   if (boost::dynamic_pointer_cast<const cedar::aux::kernel::Separable>(kernel))
@@ -1126,6 +1125,7 @@ void cedar::aux::conv::OpenCV::updateKernelType(size_t index)
 void cedar::aux::conv::OpenCV::setKernelList(cedar::aux::conv::KernelListPtr kernelList)
 {
   this->Engine::setKernelList(kernelList);
+  this->mKernelTypes.clear();
   for (size_t i = 0; i < this->getKernelList()->size(); ++i)
   {
     this->updateKernelType(i);
