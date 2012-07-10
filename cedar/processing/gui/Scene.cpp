@@ -222,23 +222,26 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
     default:
     case MODE_SELECT:
     {
-      QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
-      if (items.size() > 0)
+      if ((pMouseEvent->buttons() & Qt::LeftButton) > 0)
       {
-        // check if the start item is a connectable thing.
-        if ( (mpConnectionStart = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[0]))
-             && mpConnectionStart->canConnect())
+        QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
+        if (items.size() > 0)
         {
-          this->mMode = MODE_CONNECT;
-          mpeParentView->setMode(cedar::proc::gui::Scene::MODE_CONNECT);
-          this->connectModeProcessMousePress(pMouseEvent);
+          // check if the start item is a connectable thing.
+          if ( (mpConnectionStart = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[0]))
+               && mpConnectionStart->canConnect())
+          {
+            this->mMode = MODE_CONNECT;
+            mpeParentView->setMode(cedar::proc::gui::Scene::MODE_CONNECT);
+            this->connectModeProcessMousePress(pMouseEvent);
+          }
+          else
+          {
+            QGraphicsScene::mousePressEvent(pMouseEvent);
+          }
         }
-        else
-        {
-          QGraphicsScene::mousePressEvent(pMouseEvent);
-        }
+        break;
       }
-      break;
     }
 
     case MODE_CONNECT:
