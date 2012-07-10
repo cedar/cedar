@@ -214,11 +214,22 @@ void cedar::proc::steps::Switch::inputConnectionChanged(const std::string& input
     if (inputName == "input 1")
     {
       this->mInput1 = cedar::aux::asserted_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
-
     }
     else if (inputName == "input 2")
     {
       this->mInput2 = cedar::aux::asserted_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
+    }
+
+    if (this->mInput1 || this->mInput2)
+    {
+      if (this->mInput1)
+      {
+        this->mOutput->setData(0.0 * this->mInput1->getData());
+      }
+      else if (this->mInput2)
+      {
+        this->mOutput->setData(0.0 * this->mInput2->getData());
+      }
     }
   }
 }
