@@ -108,6 +108,8 @@ _mTargetType(new cedar::aux::EnumParameter(this, "target type", MatrixType::type
 {
   this->declareInput("matrix");
   this->declareOutput("converted matrix", mConverted);
+
+  QObject::connect(_mTargetType.get(), SIGNAL(valueChanged()), this, SLOT(targetTypeChanged()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -128,12 +130,14 @@ void cedar::proc::steps::MatrixTypeConverter::inputConnectionChanged(const std::
 {
   this->mMatrix = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(dataSlotName));
 
+  this->mConverted->copyAnnotationsFrom(this->mMatrix);
+
   this->onTrigger();
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::MatrixTypeConverter::determineInputValidity
                                 (
-                                  cedar::proc::ConstDataSlotPtr slot,
+                                  cedar::proc::ConstDataSlotPtr, // this step only has one slot
                                   cedar::aux::DataPtr data
                                 ) const
 {
