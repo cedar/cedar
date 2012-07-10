@@ -71,16 +71,9 @@ mEnumDeclaration(enumBase)
 void cedar::aux::EnumParameter::disable(cedar::aux::EnumId value)
 {
   this->mDisabledValues.insert(value);
-  if (this->mValue == value)
+  if (!this->isEnabled(this->mValue))
   {
-    for (size_t i = 0; i < this->mEnumDeclaration->list().size(); ++i)
-    {
-      if (this->isEnabled(this->mEnumDeclaration->list().at(i)))
-      {
-        this->setValue(this->mEnumDeclaration->list().at(i).name());
-        break;
-      }
-    }
+    this->selectFirstEnabled();
   }
 }
 
@@ -90,6 +83,24 @@ void cedar::aux::EnumParameter::enable(cedar::aux::EnumId value)
   if (iter != this->mDisabledValues.end())
   {
     this->mDisabledValues.erase(iter);
+  }
+
+  // if the current value is one of the disabled ones (this can happen, e.g., if all are disabled) select a new one
+  if (!this->isEnabled(this->mValue))
+  {
+    this->selectFirstEnabled();
+  }
+}
+
+void cedar::aux::EnumParameter::selectFirstEnabled()
+{
+  for (size_t i = 0; i < this->mEnumDeclaration->list().size(); ++i)
+  {
+    if (this->isEnabled(this->mEnumDeclaration->list().at(i)))
+    {
+      this->setValue(this->mEnumDeclaration->list().at(i).name());
+      break;
+    }
   }
 }
 
