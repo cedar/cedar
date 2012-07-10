@@ -77,7 +77,7 @@ void cedar::aux::EnumParameter::disable(cedar::aux::EnumId value)
     {
       if (this->isEnabled(this->mEnumDeclaration->list().at(i)))
       {
-        this->set(this->mEnumDeclaration->list().at(i).name());
+        this->setValue(this->mEnumDeclaration->list().at(i).name());
         break;
       }
     }
@@ -128,7 +128,13 @@ cedar::aux::Enum cedar::aux::EnumParameter::getValue() const
   return this->mEnumDeclaration->get(this->mValue);
 }
 
-void cedar::aux::EnumParameter::set(const std::string& enumId)
+void cedar::aux::EnumParameter::setValue(cedar::aux::EnumId enumId)
+{
+  this->mValue = enumId;
+  this->emitChangedSignal();
+}
+
+void cedar::aux::EnumParameter::setValue(const std::string& enumId)
 {
   this->mValue = this->mEnumDeclaration->get(enumId);
   this->emitChangedSignal();

@@ -83,7 +83,16 @@ public:
   cedar::aux::Enum getValue() const;
 
   //!@brief set enum value to a specified id
-  void set(const std::string& enumId);
+  void setValue(cedar::aux::EnumId enumId);
+
+  //!@brief set enum value to a specified id
+  void setValue(const std::string& enumId);
+
+  //!@brief set enum value to a specified id
+  CEDAR_DECLARE_DEPRECATED(void set(const std::string& enumId))
+  {
+    this->setValue(enumId);
+  }
 
   //!@brief get the enum from which this parameter represents an entry
   const cedar::aux::EnumBase& getEnumDeclaration()
