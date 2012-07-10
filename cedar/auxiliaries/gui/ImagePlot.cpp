@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/ImageData.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
@@ -168,14 +169,13 @@ void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
       break;
     }
 
-    case CV_32FC3:
-      this->mpImageDisplay->setText("Cannot display CV_32FC3 matrix.");
-      return;
-
     default:
-      QString text = QString("Unhandled matrix type %1.").arg(mat.type());
+    {
+      std::string matrix_type_name = cedar::aux::math::matrixTypeToString(mat);
+      QString text = "Cannot display matrix of type " + QString::fromStdString(matrix_type_name) + ".";
       this->mpImageDisplay->setText(text);
       return;
+    }
   }
 
   this->mpImageDisplay->setPixmap(QPixmap::fromImage(this->mImage));
