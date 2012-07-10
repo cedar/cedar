@@ -141,6 +141,6 @@ void cedar::aux::gui::EnumParameter::currentIndexChanged(const QString&)
     cedar::aux::EnumParameterPtr parameter;
     parameter = boost::dynamic_pointer_cast<cedar::aux::EnumParameter>(this->getParameter());
     QString value = this->mpEdit->itemData(this->mpEdit->currentIndex(), Qt::UserRole).toString();
-    parameter->set(value.toStdString());
+    parameter->setValue(value.toStdString());
   }
 }
