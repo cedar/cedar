@@ -74,6 +74,7 @@ cedar_add_library(cedarproc
   steps/Convolution.h
   steps/ColorConversion.h
   steps/CoordinateTransformation.h
+  steps/MatrixTypeConverter.h
   sources/Picture.h
   sources/Video.h
   sources/GrabberBase.h
