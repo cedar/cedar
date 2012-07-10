@@ -196,11 +196,11 @@ void cedar::proc::steps::Switch::inputConnectionChanged(const std::string& input
   if (inputName == "factor")
   {
     this->mFactor = this->getInput(inputName);
-    if (cedar::aux::MatDataPtr data = boost::shared_dynamic_cast<cedar::aux::MatData>(data))
+    if (boost::shared_dynamic_cast<const cedar::aux::MatData>(this->mFactor))
     {
       this->mFactorDataType = FACTOR_IS_MATRIX;
     }
-    else if (boost::shared_dynamic_cast<cedar::aux::DoubleData>(data))
+    else if (boost::shared_dynamic_cast<const cedar::aux::DoubleData>(this->mFactor))
     {
       this->mFactorDataType = FACTOR_IS_DOUBLE;
     }
@@ -219,7 +219,6 @@ void cedar::proc::steps::Switch::inputConnectionChanged(const std::string& input
     else if (inputName == "input 2")
     {
       this->mInput2 = cedar::aux::asserted_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
-
     }
   }
 }
