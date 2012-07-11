@@ -96,6 +96,15 @@ public:
   //!@brief Returns the channel type as a string.
   static const std::string& channelTypeToString(cedar::aux::annotation::ColorSpace::ChannelType type);
 
+  //! Returns an annotation with the channels BGR
+  static cedar::aux::annotation::ColorSpacePtr bgr();
+
+  //! Returns an annotation with the channels BGRA
+  static cedar::aux::annotation::ColorSpacePtr bgra();
+
+  //! Returns an annotation with one gray channel
+  static cedar::aux::annotation::ColorSpacePtr gray();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------

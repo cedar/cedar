@@ -83,38 +83,15 @@ void cedar::proc::sources::GrabberBase::annotateImage()
   switch (this->mImage->getData().channels())
   {
     case 4:
-      color_space = cedar::aux::annotation::ColorSpacePtr
-                    (
-                      new cedar::aux::annotation::ColorSpace
-                      (
-                        cedar::aux::annotation::ColorSpace::Blue,
-                        cedar::aux::annotation::ColorSpace::Green,
-                        cedar::aux::annotation::ColorSpace::Red,
-                        cedar::aux::annotation::ColorSpace::Alpha
-                      )
-                    );
+      color_space = cedar::aux::annotation::ColorSpace::bgra();
       break;
 
     case 3:
-      color_space = cedar::aux::annotation::ColorSpacePtr
-                    (
-                      new cedar::aux::annotation::ColorSpace
-                      (
-                        cedar::aux::annotation::ColorSpace::Blue,
-                        cedar::aux::annotation::ColorSpace::Green,
-                        cedar::aux::annotation::ColorSpace::Red
-                      )
-                    );
+      color_space = cedar::aux::annotation::ColorSpace::bgr();
       break;
 
     case 1:
-      color_space = cedar::aux::annotation::ColorSpacePtr
-                    (
-                      new cedar::aux::annotation::ColorSpace
-                      (
-                        cedar::aux::annotation::ColorSpace::Gray
-                      )
-                    );
+      color_space = cedar::aux::annotation::ColorSpace::gray();
       break;
 
     default:

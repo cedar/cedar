@@ -88,6 +88,45 @@ cedar::aux::annotation::Annotation(copy)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+// named constructors
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::annotation::ColorSpacePtr cedar::aux::annotation::ColorSpace::bgr()
+{
+  return cedar::aux::annotation::ColorSpacePtr
+         (
+           new cedar::aux::annotation::ColorSpace
+           (
+             cedar::aux::annotation::ColorSpace::Blue,
+             cedar::aux::annotation::ColorSpace::Green,
+             cedar::aux::annotation::ColorSpace::Red
+           )
+         );
+}
+
+cedar::aux::annotation::ColorSpacePtr cedar::aux::annotation::ColorSpace::bgra()
+{
+  return cedar::aux::annotation::ColorSpacePtr
+         (
+           new cedar::aux::annotation::ColorSpace
+           (
+             cedar::aux::annotation::ColorSpace::Blue,
+             cedar::aux::annotation::ColorSpace::Green,
+             cedar::aux::annotation::ColorSpace::Red,
+             cedar::aux::annotation::ColorSpace::Alpha
+           )
+         );
+}
+
+cedar::aux::annotation::ColorSpacePtr cedar::aux::annotation::ColorSpace::gray()
+{
+  return cedar::aux::annotation::ColorSpacePtr
+         (
+           new cedar::aux::annotation::ColorSpace(cedar::aux::annotation::ColorSpace::Gray)
+         );
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
