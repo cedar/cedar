@@ -41,6 +41,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "<namespace path>/namespace.h"
 
 // SYSTEM INCLUDES
 

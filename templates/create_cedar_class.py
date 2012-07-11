@@ -89,6 +89,7 @@ for namespace, alias in namespace_aliases.items():
   class_path = class_path.replace("::" + namespace, "::" + alias)
   
 class_path = class_path.replace("::", os.sep)
+namespace_path = class_path[:class_path.rfind(os.sep)]
 
 class_name = class_name_full.split("::")[-1]
 class_id_all_cap = class_name_full.replace("::", "_")
@@ -107,12 +108,13 @@ replacements["<first name> <last name>"] = users_name
 replacements["<email address>"] = users_mail
 replacements["<class name>"] = class_name
 replacements["<full class name>"] = class_name_full
+replacements["<namespace path>"] = namespace_path
   
 # Get user confirmation
 
 print "Creating class:", class_name_full, "aka", class_name
 print "at:", class_path + ".{" + ", ".join(extensions) + "}"
-#print "replacements:", replacements
+# print "replacements:", replacements
 choice = None
 while not choice in ('y', 'n'):
     choice = raw_input("Do you want to proceed? (y/n): ")
