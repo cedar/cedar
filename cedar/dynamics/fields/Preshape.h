@@ -71,7 +71,11 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief determine if a given Data is a valid input to the field
-  cedar::proc::DataSlot::VALIDITY determineInputValidity(cedar::proc::ConstDataSlotPtr, cedar::aux::DataPtr) const;
+  cedar::proc::DataSlot::VALIDITY determineInputValidity
+                                  (
+                                    cedar::proc::ConstDataSlotPtr,
+                                    cedar::aux::ConstDataPtr
+                                  ) const;
 
 public slots:
   //!@brief handle a change in dimensionality, which leads to creating new matrices
