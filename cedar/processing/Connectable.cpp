@@ -550,16 +550,6 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
     return;
   }
 
-  // inputs come from a different Connectable
-  if (role == cedar::proc::DataRole::INPUT)
-  {
-    this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_READ);
-  }
-  else
-  {
-    this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_WRITE);
-    data->setOwner(this);
-  }
 #ifdef DEBUG_LOCKS
   std::cout << "Data/lock: " << this->getName() << "." << name << "/" << (&data->getLock()) << std::endl;
 #endif // DEBUG_LOCKS
@@ -574,11 +564,22 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
     return;
   }
 
+  cedar::proc::DataSlotPtr slot = map_iterator->second;
+
+  // inputs come from a different Connectable
   if (role == cedar::proc::DataRole::INPUT)
   {
-    CEDAR_DEBUG_ASSERT(boost::shared_dynamic_cast<cedar::proc::ExternalData>(map_iterator->second));
+    this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_READ);
+    CEDAR_DEBUG_ASSERT(boost::shared_dynamic_cast<cedar::proc::ExternalData>(slot));
+    slot->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
   }
-  map_iterator->second->setData(data);
+  else
+  {
+    this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_WRITE);
+    data->setOwner(this);
+  }
+
+  slot->setData(data);
 
   this->checkMandatoryConnections();
 }
