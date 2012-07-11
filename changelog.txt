@@ -48,7 +48,9 @@
 - build system
   - added a find script for FFTW that also searches for the include directory
   - added defines for the current cedar version; this makes it possible to stay compatible to older versions, should
-    this ever be needed. 
+    this ever be needed.
+- cedar::dev
+  - added MountedCameraViewer, simulating cameras fixed on a kinematic chain in OpenGL
 
 == Version 0.9 ==
 - cedar::aux

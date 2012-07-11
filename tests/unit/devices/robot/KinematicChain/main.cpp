@@ -53,8 +53,6 @@ int main()
   // create instance of test class
   TestKinematicChain test_arm("test.conf");
   TestKinematicChain acceleration_test_arm("acceleration_test_arm.conf");
-  // do I actually need the config file constructor?
-  // - yes, for the LoopedThread stuff
   std::cout << "reading configuration from test_arm.json" << std::endl;
   test_arm.readJson("test_arm.json");
   acceleration_test_arm.readJson("acceleration_test_arm.json");
@@ -100,7 +98,7 @@ int main()
   if
   (
     !IsZero(endEffectorCoordinateFrame->getTranslationX() - (0.0))
-    || !IsZero(endEffectorCoordinateFrame->getTranslationY() - (0.0))
+    || !IsZero(endEffectorCoordinateFrame->getTranslationY() - (2.0))
     || !IsZero(endEffectorCoordinateFrame->getTranslationZ() - (8.0))
   )
   {
@@ -111,11 +109,11 @@ int main()
   cv::Mat eefRotation = endEffectorCoordinateFrame->getRotation();
   if
   (
-    !IsZero(eefRotation.at<double>(0, 0) - (0.0))
-    || !IsZero(eefRotation.at<double>(0, 1) - (-1.0))
+    !IsZero(eefRotation.at<double>(0, 0) - (1.0))
+    || !IsZero(eefRotation.at<double>(0, 1) - (0.0))
     || !IsZero(eefRotation.at<double>(0, 2) - (0.0))
-    || !IsZero(eefRotation.at<double>(1, 0) - (1.0))
-    || !IsZero(eefRotation.at<double>(1, 1) - (0.0))
+    || !IsZero(eefRotation.at<double>(1, 0) - (0.0))
+    || !IsZero(eefRotation.at<double>(1, 1) - (1.0))
     || !IsZero(eefRotation.at<double>(1, 2) - (0.0))
     || !IsZero(eefRotation.at<double>(2, 0) - (0.0))
     || !IsZero(eefRotation.at<double>(2, 1) - (0.0))
