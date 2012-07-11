@@ -651,7 +651,7 @@ void cedar::proc::Network::disconnectSlots(const std::string& source, const std:
   cedar::proc::ConnectablePtr source_connectable = this->getElement<cedar::proc::Connectable>(source_name);
   cedar::proc::ConnectablePtr target_connectable = this->getElement<cedar::proc::Connectable>(target_name);
 
-  cedar::proc::DataSlotPtr source_slot = source_connectable->getInputSlot(source_slot_name);
+  cedar::proc::DataSlotPtr source_slot = source_connectable->getOutputSlot(source_slot_name);
   cedar::proc::DataSlotPtr target_slot = target_connectable->getInputSlot(target_slot_name);
 
   this->disconnectSlots(source_slot, target_slot);
