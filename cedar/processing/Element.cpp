@@ -76,7 +76,7 @@ cedar::proc::ConstNetworkPtr cedar::proc::Element::getNetwork() const
   return this->mRegisteredAt.lock();
 }
 
-void cedar::proc::Element::validateName(const std::string& newName)
+void cedar::proc::Element::validateName(const std::string& newName) const
 {
   if (newName.find('.') != std::string::npos)
   {

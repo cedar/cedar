@@ -221,7 +221,7 @@ cedar::proc::TriggerPtr cedar::proc::Step::getTrigger(size_t index)
   return this->mTriggers.at(index);
 }
 
-void cedar::proc::Step::addTrigger(cedar::proc::TriggerPtr& trigger)
+void cedar::proc::Step::addTrigger(cedar::proc::TriggerPtr trigger)
 {
   this->mTriggers.push_back(trigger);
 }

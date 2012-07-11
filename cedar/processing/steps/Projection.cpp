@@ -495,11 +495,11 @@ void cedar::proc::steps::Projection::compressNDto0Dmax()
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Projection::determineInputValidity
                                 (
                                   cedar::proc::ConstDataSlotPtr CEDAR_DEBUG_ONLY(slot),
-                                  cedar::aux::DataPtr data
+                                  cedar::aux::ConstDataPtr data
                                 ) const
 {
   CEDAR_DEBUG_ASSERT(slot->getName() == "input")
-  if (boost::shared_dynamic_cast<cedar::aux::MatData>(data))
+  if (boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
   {
     return cedar::proc::DataSlot::VALIDITY_VALID;
   }

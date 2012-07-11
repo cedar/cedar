@@ -151,10 +151,10 @@ void cedar::proc::steps::ColorConversion::recompute()
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::ColorConversion::determineInputValidity
                                 (
                                   cedar::proc::ConstDataSlotPtr /* slot */,
-                                  cedar::aux::DataPtr data
+                                  cedar::aux::ConstDataPtr data
                                 ) const
 {
-  if (cedar::aux::MatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::MatData>(data))
+  if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
   {
     try
     {

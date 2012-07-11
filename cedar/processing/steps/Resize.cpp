@@ -336,13 +336,13 @@ void cedar::proc::steps::Resize::recompute()
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Resize::determineInputValidity
                                 (
                                   cedar::proc::ConstDataSlotPtr CEDAR_DEBUG_ONLY(slot),
-                                  cedar::aux::DataPtr data
+                                  cedar::aux::ConstDataPtr data
                                 ) const
 {
   // First, let's make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(slot->getName() == "input")
 
-  if (boost::shared_dynamic_cast<cedar::aux::MatData>(data))
+  if (boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
   {
     // Mat data is accepted.
     return cedar::proc::DataSlot::VALIDITY_VALID;
