@@ -158,6 +158,28 @@ cedar::proc::gui::StepItem::~StepItem()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::StepItem::slotAdded(cedar::proc::DataRole::Id role, const std::string& name)
+{
+  this->addDataItemFor(this->getStep()->getSlot(role, name));
+  this->updateDataSlotPositions();
+}
+
+void cedar::proc::gui::StepItem::slotRemoved(cedar::proc::DataRole::Id role, const std::string& name)
+{
+  cedar::proc::gui::DataSlotItem* p_item = NULL;
+
+  DataSlotMap::iterator iter = this->mSlotMap.find(role);
+  CEDAR_ASSERT(iter != this->mSlotMap.end());
+
+  DataSlotNameMap& name_map = iter->second;
+  DataSlotNameMap::iterator name_iter = name_map.find(name);
+
+  CEDAR_ASSERT(name_iter != name_map.end());
+  p_item = name_iter->second;
+  name_map.erase(name_iter);
+  delete p_item;
+}
+
 void cedar::proc::gui::StepItem::timerEvent(QTimerEvent * /* pEvent */)
 {
   cedar::unit::Time last_time = this->mStep->getRunTimeMeasurement();
@@ -249,6 +271,14 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 
   mStateChangedConnection = step->connectToStateChanged(boost::bind(&cedar::proc::gui::StepItem::stepStateChanged, this));
   QObject::connect(step.get(), SIGNAL(nameChanged()), this, SLOT(redraw()));
+
+  mSlotAddedConnection.disconnect();
+  mSlotRemovedConnection.disconnect();
+
+  mSlotAddedConnection
+    = step->connectToSlotAdded(boost::bind(&cedar::proc::gui::StepItem::slotAdded, this, _1, _2));
+  mSlotRemovedConnection
+    = step->connectToSlotRemoved(boost::bind(&cedar::proc::gui::StepItem::slotRemoved, this, _1, _2));
 }
 
 void cedar::proc::gui::StepItem::readConfiguration(const cedar::aux::ConfigurationNode& node)
@@ -309,9 +339,7 @@ void cedar::proc::gui::StepItem::addDataItems()
       cedar::proc::Step::SlotList& slotmap = this->mStep->getOrderedDataSlots(*enum_it);
       for (cedar::proc::Step::SlotList::iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
-        cedar::proc::DataSlotPtr slot = *iter;
-        cedar::proc::gui::DataSlotItem *p_item = new cedar::proc::gui::DataSlotItem(this, slot);
-        mSlotMap[slot->getRole()][slot->getName()] = p_item;
+        this->addDataItemFor(*iter);
       }
     }
     catch(const cedar::proc::InvalidRoleException&)
@@ -321,6 +349,12 @@ void cedar::proc::gui::StepItem::addDataItems()
   }
 
   this->updateDataSlotPositions();
+}
+
+void cedar::proc::gui::StepItem::addDataItemFor(cedar::proc::DataSlotPtr slot)
+{
+  cedar::proc::gui::DataSlotItem *p_item = new cedar::proc::gui::DataSlotItem(this, slot);
+  mSlotMap[slot->getRole()][slot->getName()] = p_item;
 }
 
 void cedar::proc::gui::StepItem::updateDataSlotPositions()

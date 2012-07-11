@@ -184,6 +184,9 @@ private:
    */
   void updateInputSum();
 
+private slots:
+  void activationAsOutputChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -232,6 +235,9 @@ protected:
   //!@brief the field sizes in each dimension
   cedar::aux::UIntVectorParameterPtr _mSizes;
 
+  //!@brief Parameter that lets the user decide whether the activation is an output.
+  cedar::aux::BoolParameterPtr _mOutputActivation;
+
   //!@brief input noise gain
   cedar::aux::DoubleParameterPtr _mInputNoiseGain;
 
@@ -246,6 +252,7 @@ protected:
 
   //!@brief Parameter that determines the convolution engine used by the field.
   cedar::aux::conv::ConvolutionPtr _mNoiseCorrelationKernelConvolution;
+
 
 private:
   // none yet

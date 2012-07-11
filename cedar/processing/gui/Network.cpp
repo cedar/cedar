@@ -680,7 +680,7 @@ void cedar::proc::gui::Network::disconnect()
 
 void cedar::proc::gui::Network::checkDataConnection
      (
-       cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target, bool added
+       cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target, bool added
      )
 {
   cedar::proc::gui::DataSlotItem* source_slot = NULL;

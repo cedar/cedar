@@ -216,12 +216,12 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
       (
         this->getElement<cedar::proc::Connectable>
         (
-          (*data_con)->getSource()->getParent())->getOutputSlot((*data_con)->getSource()->getName()
-        ),
+          (*data_con)->getSource()->getParent()
+        )->getOutputSlot((*data_con)->getSource()->getName() ),
         this->getElement<cedar::proc::Connectable>
         (
-          (*data_con)->getTarget()->getParent())->getInputSlot((*data_con)->getTarget()->getName()
-        ),
+          (*data_con)->getTarget()->getParent()
+        )->getInputSlot((*data_con)->getTarget()->getName()),
         false
       );
       data_con = this->removeDataConnection(data_con);
@@ -626,39 +626,58 @@ void cedar::proc::Network::connectTrigger(cedar::proc::TriggerPtr source, cedar:
   );
 }
 
+void cedar::proc::Network::disconnectOutputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot)
+{
+  std::vector<cedar::proc::DataConnectionPtr> connections;
+  this->getDataConnections(connectable, slot, connections);
+
+  for (size_t i = 0; i < connections.size(); ++i)
+  {
+    cedar::proc::DataConnectionPtr connection = connections[i];
+    this->disconnectSlots(connection->getSource(), connection->getTarget());
+  }
+}
+
 void cedar::proc::Network::disconnectSlots(const std::string& source, const std::string& target)
 {
   // parse element and slot name
   std::string source_name;
-  std::string source_slot;
+  std::string source_slot_name;
   std::string target_name;
-  std::string target_slot;
-  cedar::aux::splitFirst(source, ".", source_name, source_slot);
-  cedar::aux::splitFirst(target, ".", target_name, target_slot);
+  std::string target_slot_name;
+  cedar::aux::splitFirst(source, ".", source_name, source_slot_name);
+  cedar::aux::splitFirst(target, ".", target_name, target_slot_name);
+
+  cedar::proc::ConnectablePtr source_connectable = this->getElement<cedar::proc::Connectable>(source_name);
+  cedar::proc::ConnectablePtr target_connectable = this->getElement<cedar::proc::Connectable>(target_name);
+
+  cedar::proc::DataSlotPtr source_slot = source_connectable->getInputSlot(source_slot_name);
+  cedar::proc::DataSlotPtr target_slot = target_connectable->getInputSlot(target_slot_name);
+
+  this->disconnectSlots(source_slot, target_slot);
+}
+
+void cedar::proc::Network::disconnectSlots
+                           (
+                             cedar::proc::ConstDataSlotPtr sourceSlot,
+                             cedar::proc::ConstDataSlotPtr targetSlot
+                           )
+{
   for (DataConnectionVector::iterator it = mDataConnections.begin(); it != mDataConnections.end(); ++it)
   {
-    cedar::proc::ConnectablePtr target_connectable = this->getElement<cedar::proc::Connectable>(target_name);
-    if ((*it)->equals(
-                       this->getElement<cedar::proc::Connectable>(source_name)->getOutputSlot(source_slot),
-                       target_connectable->getInputSlot(target_slot)
-                     )
-       )
+    if ((*it)->equals(sourceSlot, targetSlot))
     {
       this->removeDataConnection(it);
       // inform any interested listeners of this new connection
-      mDataConnectionChanged
-      (
-        this->getElement<cedar::proc::Connectable>(source_name)->getOutputSlot(source_slot),
-        this->getElement<cedar::proc::Connectable>(target_name)->getInputSlot(target_slot),
-        false
-      );
+      mDataConnectionChanged(sourceSlot, targetSlot, false);
       return;
     }
   }
+
   CEDAR_THROW
   (
     cedar::proc::MissingConnectionException,
-    "The data connection between " + source  + " and " + target + " in network " + this->getName() + " does not exist!"
+    "The data connection between in network " + this->getName() + " does not exist!"
   );
 }
 
@@ -1498,7 +1517,7 @@ boost::signals2::connection cedar::proc::Network::connectToTriggerConnectionChan
 
 boost::signals2::connection cedar::proc::Network::connectToDataConnectionChanged
                             (
-                              boost::function<void (cedar::proc::DataSlotPtr, cedar::proc::DataSlotPtr, bool)> slot
+                              boost::function<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, bool)> slot
                             )
 {
   return mDataConnectionChanged.connect(slot);

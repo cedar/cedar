@@ -149,6 +149,7 @@ _mSizes
     cedar::aux::UIntParameter::LimitType::positive(1000)
   )
 ),
+_mOutputActivation(new cedar::aux::BoolParameter(this, "activation as output", false)),
 _mInputNoiseGain
 (
   new cedar::aux::DoubleParameter
@@ -222,6 +223,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
+  QObject::connect(_mOutputActivation.get(), SIGNAL(valueChanged()), this, SLOT(activationAsOutputChanged()));
 
   this->_mKernels->connectToObjectAddedSignal(boost::bind(&cedar::dyn::NeuralField::slotKernelAdded, this, _1));
   this->_mKernels->connectToObjectRemovedSignal(boost::bind(&cedar::dyn::NeuralField::removeKernelFromConvolution, this, _1));
@@ -235,6 +237,37 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dyn::NeuralField::activationAsOutputChanged()
+{
+  bool act_is_output = this->_mOutputActivation->getValue();
+  static std::string slot_name = "activation";
+
+  if (act_is_output)
+  {
+    if (this->hasBufferSlot(slot_name))
+    {
+      this->removeBufferSlot(slot_name);
+    }
+
+    if (!this->hasOutputSlot(slot_name))
+    {
+      this->declareOutput(slot_name, this->mActivation);
+    }
+  }
+  else
+  {
+    if (this->hasOutputSlot(slot_name))
+    {
+      this->removeOutputSlot(slot_name);
+    }
+
+    if (!this->hasBufferSlot(slot_name))
+    {
+      this->declareBuffer(slot_name, this->mActivation);
+    }
+  }
+}
 
 void cedar::dyn::NeuralField::slotKernelAdded(size_t kernelIndex)
 {

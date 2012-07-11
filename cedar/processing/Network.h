@@ -212,6 +212,19 @@ public:
    */
   void disconnectSlots(const std::string& source, const std::string& target);
 
+  /*!@brief Deletes the connection between the data slots.
+   *
+   * @param sourceSlot The source slot.
+   * @param targetSlot The target slot.
+   */
+  void disconnectSlots(cedar::proc::ConstDataSlotPtr sourceSlot, cedar::proc::ConstDataSlotPtr targetSlot);
+
+  /*!@brief Deletes all connections from a given data slot.
+   *
+   * @param slot Identifier of the data slot. This must be of the form "elementName.outputSlotName".
+   */
+  void disconnectOutputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot);
+
   /*!@brief Deletes the connection between source and target.
    */
   void disconnectTrigger(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target);
@@ -280,7 +293,7 @@ public:
 
   boost::signals2::connection connectToDataConnectionChanged
   (
-    boost::function<void (cedar::proc::DataSlotPtr, cedar::proc::DataSlotPtr, bool)> slot
+    boost::function<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, bool)> slot
   );
 
   boost::signals2::connection connectToNewElementAddedSignal(boost::function<void (cedar::proc::ElementPtr)> slot);
@@ -385,7 +398,7 @@ protected:
   //!@brief a boost signal that is emitted if a change in slot takes place
   boost::signals2::signal<void ()> mSlotChanged;
   boost::signals2::signal<void (cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool)> mTriggerConnectionChanged;
-  boost::signals2::signal<void (cedar::proc::DataSlotPtr, cedar::proc::DataSlotPtr, bool)> mDataConnectionChanged;
+  boost::signals2::signal<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, bool)> mDataConnectionChanged;
   boost::signals2::signal<void (cedar::proc::ElementPtr)> mNewElementAddedSignal;
   boost::signals2::signal<void (cedar::proc::ConstElementPtr)> mElementRemovedSignal;
 
