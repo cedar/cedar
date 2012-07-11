@@ -92,7 +92,7 @@ protected:
   cedar::proc::DataSlot::VALIDITY determineInputValidity
                                   (
                                     cedar::proc::ConstDataSlotPtr slot,
-                                    cedar::aux::DataPtr data
+                                    cedar::aux::ConstDataPtr data
                                   ) const;
   //!@brief Reacts to a change in the input connection.
   void inputConnectionChanged(const std::string& inputName);

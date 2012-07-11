@@ -135,7 +135,9 @@ public:
   //!@see cedar::proc::Step::getSlot
   cedar::proc::ConstDataSlotPtr getSlot(DataRole::Id role, const std::string& name) const;
 
-  //!@brief Provide data to an input slot. This means linking up another Connectable's output to the current Connectable.
+  /*!@brief Provide data to an input slot. This means linking up another Connectable's output
+   * to the current Connectable.
+   */
   void setInput(const std::string& name, cedar::aux::DataPtr data);
 
   //!@brief Removes a connection to another Connectable's output.
@@ -167,7 +169,7 @@ public:
   virtual cedar::proc::DataSlot::VALIDITY determineInputValidity
                                           (
                                             cedar::proc::ConstDataSlotPtr slot,
-                                            cedar::aux::DataPtr data
+                                            cedar::aux::ConstDataPtr data
                                           ) const;
 
   //!@brief Returns true, if this connectable already owns data in the target.
