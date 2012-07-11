@@ -111,10 +111,13 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
     }
   }
 
-  this->getNetwork()->disconnectOutputSlot
-                      (
-                        boost::static_pointer_cast<Connectable>(this->shared_from_this()), slot->getName()
-                      );
+  if (this->getNetwork())
+  {
+    this->getNetwork()->disconnectOutputSlot
+                        (
+                          boost::static_pointer_cast<Connectable>(this->shared_from_this()), slot->getName()
+                        );
+  }
 
   this->mSlotRemoved(role, name);
 }
