@@ -144,12 +144,12 @@ void cedar::proc::steps::Switch::compute(const cedar::proc::Arguments&)
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Switch::determineInputValidity
                                 (
                                   cedar::proc::ConstDataSlotPtr slot,
-                                  cedar::aux::DataPtr data
+                                  cedar::aux::ConstDataPtr data
                                 ) const
 {
   if (slot->getName() == "input 1" || slot->getName() == "input 2")
   {
-    if (cedar::aux::MatDataPtr mat_data = boost::shared_dynamic_cast<cedar::aux::MatData>(data))
+    if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
     {
       // check fitting sizes
       if (slot->getName() == "input 1" && this->mInput2)
@@ -176,14 +176,14 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Switch::determineInputValidi
     // the slot should be one of the ones we have declared above
     CEDAR_DEBUG_ASSERT(slot->getName() == "factor");
 
-    if (cedar::aux::MatDataPtr mat_data = boost::shared_dynamic_cast<cedar::aux::MatData>(data))
+    if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
     {
       if (cedar::aux::math::getDimensionalityOf(mat_data->getData()) == 0)
       {
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
-    else if (boost::shared_dynamic_cast<cedar::aux::DoubleData>(data))
+    else if (boost::shared_dynamic_cast<const cedar::aux::DoubleData>(data))
     {
       return cedar::proc::DataSlot::VALIDITY_VALID;
     }

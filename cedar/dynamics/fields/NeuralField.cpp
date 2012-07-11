@@ -350,12 +350,12 @@ void cedar::dyn::NeuralField::reset()
 cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
                                                          (
                                                            cedar::proc::ConstDataSlotPtr slot,
-                                                           cedar::aux::DataPtr data
+                                                           cedar::aux::ConstDataPtr data
                                                          ) const
 {
   if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "input")
   {
-    if (cedar::dyn::SpaceCodePtr input = boost::shared_dynamic_cast<cedar::dyn::SpaceCode>(data))
+    if (cedar::dyn::ConstSpaceCodePtr input = boost::shared_dynamic_cast<const cedar::dyn::SpaceCode>(data))
     {
       if (!this->isMatrixCompatibleInput(input->getData()))
       {
@@ -366,7 +366,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
-    else if (cedar::aux::MatDataPtr input = boost::shared_dynamic_cast<cedar::aux::MatData>(data))
+    else if (cedar::aux::ConstMatDataPtr input = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
     {
       if (!this->isMatrixCompatibleInput(input->getData()))
       {

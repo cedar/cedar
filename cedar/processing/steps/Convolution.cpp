@@ -123,13 +123,13 @@ void cedar::proc::steps::Convolution::recompute()
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Convolution::determineInputValidity
                                 (
                                   cedar::proc::ConstDataSlotPtr CEDAR_DEBUG_ONLY(slot),
-                                  cedar::aux::DataPtr data
+                                  cedar::aux::ConstDataPtr data
                                 ) const
 {
   // First, let's make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(slot->getName() == "matrix" || slot->getName() == "kernel");
 
-  if (boost::shared_dynamic_cast<cedar::aux::MatData>(data))
+  if (boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
   {
     // Mat data is accepted.
     return cedar::proc::DataSlot::VALIDITY_VALID;

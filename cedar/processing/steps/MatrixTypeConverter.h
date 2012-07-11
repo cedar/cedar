@@ -127,7 +127,7 @@ protected:
   cedar::proc::DataSlot::VALIDITY determineInputValidity
                                   (
                                     cedar::proc::ConstDataSlotPtr slot,
-                                    cedar::aux::DataPtr data
+                                    cedar::aux::ConstDataPtr data
                                   ) const;
 
   //--------------------------------------------------------------------------------------------------------------------

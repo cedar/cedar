@@ -238,7 +238,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(const
 cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::determineInputValidity
                                                    (
                                                      cedar::proc::ConstDataSlotPtr,
-                                                     cedar::aux::DataPtr
+                                                     cedar::aux::ConstDataPtr
                                                    )
                                                    const
 {

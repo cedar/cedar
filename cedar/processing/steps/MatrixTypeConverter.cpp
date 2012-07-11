@@ -138,10 +138,10 @@ void cedar::proc::steps::MatrixTypeConverter::inputConnectionChanged(const std::
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::MatrixTypeConverter::determineInputValidity
                                 (
                                   cedar::proc::ConstDataSlotPtr, // this step only has one slot
-                                  cedar::aux::DataPtr data
+                                  cedar::aux::ConstDataPtr data
                                 ) const
 {
-  if (boost::dynamic_pointer_cast<cedar::aux::MatData>(data))
+  if (boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
   {
     return cedar::proc::DataSlot::VALIDITY_VALID;
   }
