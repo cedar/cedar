@@ -42,7 +42,7 @@
 #define CEDAR_AUX_GUI_UINT_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/auxiliaries/gui/NumericParameter.h"
 #include "cedar/auxiliaries/gui/namespace.h"
 
 // SYSTEM INCLUDES
@@ -51,12 +51,18 @@
 
 /*!@brief Widget for representing and manipulating a cedar::aux::UIntParameter.
  */
-class cedar::aux::gui::UIntParameter : public cedar::aux::gui::Parameter
+class cedar::aux::gui::UIntParameter : public cedar::aux::gui::NumericParameter<unsigned int, QSpinBox>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef cedar::aux::gui::NumericParameter<unsigned int, QSpinBox> Base;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -72,16 +78,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-public slots:
-  //!@brief handles a change of the associated parameter
-  void parameterPointerChanged();
-
-  //!@brief handles a change in the parameter
-  void valueChanged(int value);
-
-  //!@brief Handles changes in the displayed parameter's properties.
-  void propertiesChanged();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -93,7 +90,12 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void parameterChanged();
+
+private slots:
+  /*!@brief Reacts to a change of the parameter's value.
+   */
+  void valueChanged(int value);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -101,9 +103,9 @@ private:
 protected:
   // none yet
 private:
-  //!@brief a spinbox for the represented parameter
-  QSpinBox *mpSpinbox;
+  // none yet
 
 }; // class cedar::aux::gui::UIntParameter
+
 
 #endif // CEDAR_AUX_GUI_UINT_PARAMETER_H

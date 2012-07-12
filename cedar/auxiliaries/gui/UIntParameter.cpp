@@ -62,6 +62,57 @@ namespace
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+// template specialization for QSpinBox
+//----------------------------------------------------------------------------------------------------------------------
+namespace cedar
+{
+  namespace aux
+  {
+    namespace gui
+    {
+      template<>
+      void NumericWidgetPolicy<unsigned int, QSpinBox>::setPrecision(QSpinBox*, int)
+      {
+        // integal precision is ignored
+      }
+    }
+  }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::gui::UIntParameter::UIntParameter(QWidget *pParent)
+:
+cedar::aux::gui::UIntParameter::Base(pParent)
+{
+}
+
+//!@brief Destructor
+cedar::aux::gui::UIntParameter::~UIntParameter()
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::UIntParameter::parameterChanged()
+{
+  this->Base::parameterChanged();
+  QObject::connect(this->mpWidget, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
+}
+
+
+void cedar::aux::gui::UIntParameter::valueChanged(int)
+{
+  this->widgetValueChanged();
+}
+
+
+/*
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -123,3 +174,4 @@ void cedar::aux::gui::UIntParameter::valueChanged(int value)
   cedar::aux::UIntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(this->getParameter());
   parameter->setValue(value);
 }
+*/
