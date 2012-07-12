@@ -50,4 +50,5 @@ cedar_add_library(cedardev
                   ${kuka_moc_files}
                   LINK_LIBRARIES
                   cedaraux
+		  dc1394
                   )
