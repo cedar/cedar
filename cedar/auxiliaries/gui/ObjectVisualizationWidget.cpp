@@ -37,7 +37,6 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/ObjectVisualizationWidget.h"
 #include "cedar/auxiliaries/exceptions.h"
-#include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>

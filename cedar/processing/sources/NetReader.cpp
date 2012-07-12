@@ -72,6 +72,7 @@ namespace
       )
     );
     input_declaration->setIconPath(":/steps/net_reader.svg");
+    input_declaration->setDescription("Reads a matrix from a yarp port.");
     cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(input_declaration);
 
     return true;

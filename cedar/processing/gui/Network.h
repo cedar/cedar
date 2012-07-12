@@ -152,6 +152,16 @@ public:
     return this->mpScene;
   }
 
+  /*!@brief Sets the ui configuration for the element when it is added to the network.
+   */
+  inline void setNextElementUiConfiguration
+  (
+    cedar::proc::ElementPtr element, const cedar::aux::ConfigurationNode& uiDescription
+  )
+  {
+    this->mNextElementUiConfigurations[element.get()] = uiDescription;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -165,8 +175,6 @@ private:
 
   //!@brief write scene to a node
   void writeScene(cedar::aux::ConfigurationNode& root, cedar::aux::ConfigurationNode& scene);
-  //!@brief read scene from a node
-  void readScene(cedar::aux::ConfigurationNode& root);
 
   //!@brief Reacts to elements being added in the underlying network.
   void elementAdded(cedar::proc::Network* network, cedar::proc::ElementPtr pElement);
@@ -181,7 +189,7 @@ private:
   //!@brief Transforms the coordinates of a newly added child into the network's coordinate system.
   void transformChildCoordinates(cedar::proc::gui::GraphicsBase* pItem);
 
-  void checkDataConnection(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target, bool added);
+  void checkDataConnection(cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target, bool added);
 
   void checkTriggerConnection(cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool added);
 
@@ -236,6 +244,9 @@ private:
 
   //! Text item used for displaying the name of the network.
   QGraphicsTextItem *mpNameDisplay;
+
+  //! Configuration of the next element that is added to the scene.
+  std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode> mNextElementUiConfigurations;
 
 }; // class cedar::proc::gui::NetworkFile
 

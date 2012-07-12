@@ -123,6 +123,11 @@ public:
    */
   void setThreaded(bool isThreaded);
 
+  /*!@brief States if a step is executed as its own thread, or if the run() function is called in the same thread as
+   *        the source of the trigger signal.
+   */
+  bool isThreaded() const;
+
   //!@brief Gets the amount of triggers stored in this step.
   size_t getTriggerCount() const;
 
@@ -170,7 +175,7 @@ protected:
    *        After calling this method, this step will be aware that this trigger belongs to it. Among other things, this
    *        means that the processingIde will be able to show this trigger and allow to connect it.
    */
-  void addTrigger(cedar::proc::TriggerPtr& trigger);
+  void addTrigger(cedar::proc::TriggerPtr trigger);
 
   //! @brief Method that registers a function of an object so that it can be used by the framework.
   void registerFunction(const std::string& actionName, boost::function<void()> function);
@@ -217,7 +222,7 @@ private:
   bool mBusy;
 
   //!@brief The lock used for protecting the computation arguments of the step.
-  QReadWriteLock *mpArgumentsLock;
+  QReadWriteLock* mpArgumentsLock;
 
   //!@brief The arguments for the next cedar::proc::Step::compute call.
   ArgumentsPtr mNextArguments;
@@ -236,6 +241,8 @@ private:
 
   //!@brief Lock for the last iteration time.
   mutable QReadWriteLock* mLastIterationTimeLock;
+
+  uint64 mRNGState;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

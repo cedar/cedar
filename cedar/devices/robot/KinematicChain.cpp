@@ -113,56 +113,11 @@ void cedar::dev::robot::KinematicChain::updateTransformations()
 void cedar::dev::robot::KinematicChain::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   cedar::aux::Configurable::readConfiguration(node);
-
-  // create state variables
-  mJointAngles = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
-  mJointVelocities = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
-  mJointAccelerations = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
-
-  // transform joint geometry into twist coordinates
-  cv::Mat xi;
-  cv::Mat T;
-  cv::Mat p;
-  cv::Mat omega = cv::Mat::zeros(3, 1, CV_64FC1);
-  for (unsigned int j=0; j<getNumberOfJoints(); j++)
-  {
-    // create and store twist
-    cedar::dev::robot::KinematicChain::JointPtr joint = getJoint(j);
-    p = cv::Mat::zeros(3, 1, CV_64FC1);
-    p.at<double>(0, 0) = joint->_mpPosition->at(0);
-    p.at<double>(1, 0) = joint->_mpPosition->at(1);
-    p.at<double>(2, 0) = joint->_mpPosition->at(2);
-    omega = cv::Mat::zeros(3, 1, CV_64FC1);
-    omega.at<double>(0, 0) = joint->_mpAxis->at(0);
-    omega.at<double>(1, 0) = joint->_mpAxis->at(1);
-    omega.at<double>(2, 0) = joint->_mpAxis->at(2);
-    xi = cedar::aux::math::twistCoordinates<double>(p, omega);
-    mReferenceJointTwists.push_back(xi.clone());
-
-    // create and store transformation matrix to joint coordinate frame
-    T = cv::Mat::eye(4, 4, CV_64FC1);
-    T.at<double>(0, 3) = joint->_mpPosition->at(0);
-    T.at<double>(1, 3) = joint->_mpPosition->at(1);
-    T.at<double>(2, 3) = joint->_mpPosition->at(2);
-    mReferenceJointTransformations.push_back(T.clone());
-
-    // create storage variables for intermediate results
-    mTwistExponentials.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
-    mProductsOfExponentials.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
-    mJointTransformations.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
-    mJointTwists.push_back(cv::Mat::zeros(6, 1, CV_64FC1));
-  }
-
-  // end-effector
-  mReferenceEndEffectorTransformation = getEndEffectorCoordinateFrame()->getTransformation();
-
-  // update storage variables
-  calculateTransformations();
+  initializeFromJointList();
 }
 
 unsigned int cedar::dev::robot::KinematicChain::getNumberOfJoints() const
 {
-//  return mpReferenceGeometry->getNumberOfJoints();
   return mpJoints->size();
 }
 
@@ -174,7 +129,6 @@ std::vector<double> cedar::dev::robot::KinematicChain::getJointAngles() const
   {
     dummy[i] = getJointAngle(i);
   }
-
   return dummy;
 }
 
@@ -496,71 +450,76 @@ void cedar::dev::robot::KinematicChain::setWorkingMode(ActionType actionType)
 
 void cedar::dev::robot::KinematicChain::init()
 {
-  // todo: integrate init() method of ReferenceGeometry
-
-  // todo: add default values for these...
   this->addConfigurableChild("root coordinate frame", mpRootCoordinateFrame);
   this->addConfigurableChild("end-effector coordinate frame", mpEndEffectorCoordinateFrame);
-//  this->addConfigurableChild("joints", mJoints);
 
-//  mJointAngles = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
-//  mJointVelocities = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
-//  mJointAccelerations = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
-
-//  cv::Mat xi;
-//  cv::Mat T;
-//  cv::Mat p;
-//  cv::Mat omega = cv::Mat::zeros(3, 1, CV_64FC1);
-//  omega.at<double>(0, 0) = 1;
-//  for (unsigned int j=0; j<getNumberOfJoints(); j++)
-//  {
-//    cedar::dev::robot::ReferenceGeometry::JointPtr joint = getReferenceGeometry()->getJoint(j);
-//    p = cv::Mat::zeros(3, 1, CV_64FC1);
-//    p.at<double>(0, 0) = joint->position[0];
-//    p.at<double>(1, 0) = joint->position[1];
-//    p.at<double>(2, 0) = joint->position[2];
-//    omega = cv::Mat::zeros(3, 1, CV_64FC1);
-//    omega.at<double>(0, 0) = joint->axis[0];
-//    omega.at<double>(1, 0) = joint->axis[1];
-//    omega.at<double>(2, 0) = joint->axis[2];
-//    xi = cedar::aux::math::twistCoordinates<double>(p, omega);
-//
-//    mReferenceJointTwists.push_back(xi.clone());
-//    T = cv::Mat::eye(4, 4, CV_64FC1);
-//    T.at<double>(0, 3) = joint->position[0];
-//    T.at<double>(1, 3) = joint->position[1];
-//    T.at<double>(2, 3) = joint->position[2];
-//    mReferenceJointTransformations.push_back(T.clone());
-//    mTwistExponentials.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
-//    mProductsOfExponentials.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
-//    mJointTransformations.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
-//    mJointTwists.push_back(cv::Mat::zeros(6, 1, CV_64FC1));
-//  }
-//
-//  // end effector
-//  mReferenceEndEffectorTransformation = cv::Mat::zeros(4, 4, CV_64FC1);
-//  cedar::dev::robot::ReferenceGeometry::EndEffectorPtr endEffector
-//    = getReferenceGeometry()->getEndEffector();
-//
-//  mReferenceEndEffectorTransformation.at<double>(0, 3) = endEffector->position[0];
-//  mReferenceEndEffectorTransformation.at<double>(1, 3) = endEffector->position[1];
-//  mReferenceEndEffectorTransformation.at<double>(2, 3) = endEffector->position[2];
-//
-//  mReferenceEndEffectorTransformation.at<double>(0, 0) = endEffector->orientation[0];
-//  mReferenceEndEffectorTransformation.at<double>(0, 1) = endEffector->orientation[1];
-//  mReferenceEndEffectorTransformation.at<double>(0, 2) = endEffector->orientation[2];
-//  mReferenceEndEffectorTransformation.at<double>(1, 0) = endEffector->orientation[3];
-//  mReferenceEndEffectorTransformation.at<double>(1, 1) = endEffector->orientation[4];
-//  mReferenceEndEffectorTransformation.at<double>(1, 2) = endEffector->orientation[5];
-//  mReferenceEndEffectorTransformation.at<double>(2, 0) = endEffector->orientation[6];
-//  mReferenceEndEffectorTransformation.at<double>(2, 1) = endEffector->orientation[7];
-//  mReferenceEndEffectorTransformation.at<double>(2, 2) = endEffector->orientation[8];
-//
-//  mReferenceEndEffectorTransformation.at<double>(3, 3) = 1.0;
-//
-//  updateTransformations();
+  cedar::dev::robot::KinematicChain::JointPtr default_joint(new cedar::dev::robot::KinematicChain::Joint);
+  default_joint->_mpPosition->pushBack(0);
+  default_joint->_mpPosition->pushBack(0);
+  default_joint->_mpPosition->pushBack(0);
+  default_joint->_mpAxis->pushBack(0);
+  default_joint->_mpAxis->pushBack(0);
+  default_joint->_mpAxis->pushBack(1);
+  default_joint->_mpAngleLimits->setLowerLimit(-2*M_PI);
+  default_joint->_mpAngleLimits->setUpperLimit(2*M_PI);
+  default_joint->_mpVelocityLimits->setLowerLimit(-2*M_PI);
+  default_joint->_mpVelocityLimits->setUpperLimit(2*M_PI);
+  this->mpJoints->pushBack(default_joint);
+  initializeFromJointList();
 }
 
+void cedar::dev::robot::KinematicChain::initializeFromJointList()
+{
+  // clear variables
+  mReferenceJointTwists.clear();
+  mReferenceJointTransformations.clear();
+  mTwistExponentials.clear();
+  mProductsOfExponentials.clear();
+  mJointTransformations.clear();
+  mJointTwists.clear();
+
+  // create state variables
+  mJointAngles = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+  mJointVelocities = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+  mJointAccelerations = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+
+  // transform joint geometry into twist coordinates
+  cv::Mat xi;
+  cv::Mat T;
+  cv::Mat p;
+  cv::Mat omega = cv::Mat::zeros(3, 1, CV_64FC1);
+  for (unsigned int j=0; j<getNumberOfJoints(); j++)
+  {
+    // create and store twist
+    cedar::dev::robot::KinematicChain::JointPtr joint = getJoint(j);
+    p = cv::Mat::zeros(3, 1, CV_64FC1);
+    p.at<double>(0, 0) = joint->_mpPosition->at(0);
+    p.at<double>(1, 0) = joint->_mpPosition->at(1);
+    p.at<double>(2, 0) = joint->_mpPosition->at(2);
+    omega = cv::Mat::zeros(3, 1, CV_64FC1);
+    omega.at<double>(0, 0) = joint->_mpAxis->at(0);
+    omega.at<double>(1, 0) = joint->_mpAxis->at(1);
+    omega.at<double>(2, 0) = joint->_mpAxis->at(2);
+    xi = cedar::aux::math::twistCoordinates<double>(p, omega);
+    mReferenceJointTwists.push_back(xi.clone());
+
+    // create and store transformation matrix to joint coordinate frame
+    T = cv::Mat::eye(4, 4, CV_64FC1);
+    T.at<double>(0, 3) = joint->_mpPosition->at(0);
+    T.at<double>(1, 3) = joint->_mpPosition->at(1);
+    T.at<double>(2, 3) = joint->_mpPosition->at(2);
+    mReferenceJointTransformations.push_back(T.clone());
+
+    // create storage variables for intermediate results
+    mTwistExponentials.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
+    mProductsOfExponentials.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
+    mJointTransformations.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
+    mJointTwists.push_back(cv::Mat::zeros(6, 1, CV_64FC1));
+  }
+
+  // end-effector
+  mReferenceEndEffectorTransformation = getEndEffectorCoordinateFrame()->getTransformation();
+}
 
 void cedar::dev::robot::KinematicChain::applyAngleLimits(cv::Mat& /*angles*/)
 {
@@ -911,6 +870,11 @@ cv::Mat cedar::dev::robot::KinematicChain::calculateEndEffectorPosition()
 cv::Mat cedar::dev::robot::KinematicChain::getRootTransformation()
 {
   return mpRootCoordinateFrame->getTransformation();
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::getProductOfExponentials(unsigned int jointIndex)
+{
+  return mProductsOfExponentials[jointIndex];
 }
 
 cv::Mat cedar::dev::robot::KinematicChain::getEndEffectorTransformation()

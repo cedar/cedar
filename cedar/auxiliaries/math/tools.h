@@ -129,6 +129,9 @@ namespace cedar
         return mat.type() == CV_32F;
       }
 
+      //!@brief Returns a string corresponding to the given matrix's type
+      std::string matrixTypeToString(const cv::Mat& matrix);
+
       //!@brief a helper function to determine the real dimensionality of a cv::Mat (matrix.dims works only for 2+ dims)
       inline unsigned int getDimensionalityOf(const cv::Mat& matrix)
       {

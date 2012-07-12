@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/LoopMode.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -116,12 +117,13 @@ public:
    *
    * @param stepSize time window for each step function in milliseconds
    * @param idleTime idle time (in milliseconds) used in fast running mode (i.e. stepSize = 0)
-   * @param configFileName an optional configuration file for reading and writing thread configurations
    */
   LoopedThread
   (
     double stepSize = 1.0,
-    double idleTime = 0.001
+    double idleTime = 0.01,
+    double simulatedTime = 1.0,
+    cedar::aux::EnumId mode = cedar::aux::LoopMode::Fixed
   );
 
   //!@brief Destructor
@@ -171,24 +173,7 @@ public:
    *
    * @param idleTime the new idle time in milliseconds
    */
-  void setIdleTime(double idleTime = 0.001);
-
-  /*!@brief Decide if a fixed step size is used in cases of delay.
-   *
-   * Depending on whether a fixed step size is used or not, LoopedThread
-   * behaves differently in cases where the system is not fast enough for the
-   * desired step size. If useFixedStepSize = true (default) and a scheduled
-   * execution of step() was missed, then a complete time step is skipped and
-   * LoopedThread tries to wake up for the next time step. By this, all time
-   * steps are executed on a predictable time. If useFixedStepSize = false and
-   * the scheduled execution of step() was missed, the next execution happens
-   * as soon as possible. Through this behavior a little time is saved but the
-   * executions of step() do not happen to predictable times any more.
-   *
-   * @param useFixedStepSize
-   */
-  void useFixedStepSize(bool useFixedStepSize = true);
-
+  void setIdleTime(double idleTime = 0.01);
 
   /*!@brief Sets a simulated time to be used in step().
    *
@@ -230,9 +215,19 @@ public:
   // protected methods
   //----------------------------------------------------------------------------
 protected:
-  inline double getStepSizeParameter() const
+  inline double getStepSize() const
   {
     return this->_mStepSize->getValue();
+  }
+
+  inline double getIdleTimeParameter() const
+  {
+    return this->_mIdleTime->getValue();
+  }
+
+  inline double getSimulatedTimeParameter() const
+  {
+    return this->_mSimulatedTime->getValue();
   }
 
   //----------------------------------------------------------------------------
@@ -245,35 +240,15 @@ private:
 
   inline void updateStatistics(double stepsTaken);
 
-  void readParamsFromConfigFile();
-
-  inline double getIdleTimeParameter() const
-  {
-    return this->_mIdleTime->getValue();
-  }
-
-  inline double getSimulatedTimeParameter() const
-  {
-    return this->_mSimulatedTime->getValue();
-  }
-
-  inline bool usesFixedStepSize() const
-  {
-    return this->_mUseFixedStepSize->getValue();
-  }
-
-
   //----------------------------------------------------------------------------
   // members
   //----------------------------------------------------------------------------
 protected:
-  //!@brief desired length of a single step, in milliseconds
-  boost::posix_time::time_duration mStepSize;
 
 private:
   bool mStop;
   unsigned int mIdleTime; //!< in microseconds
-  boost::posix_time::time_duration mSimulatedTime;
+//  boost::posix_time::time_duration mSimulatedTime;
   // gather some statistics
   unsigned long mNumberOfSteps;
   double mSumOfStepsTaken;
@@ -289,7 +264,7 @@ protected:
   // none yet
 
 private:
-  //! parameter version of mStepSize
+  //!@brief desired length of a single step, in milliseconds
   cedar::aux::DoubleParameterPtr _mStepSize;
 
   //! parameter version of mIdleTime
@@ -298,9 +273,8 @@ private:
   //! parameter version of mSimulatedTime
   cedar::aux::DoubleParameterPtr _mSimulatedTime;
 
-  //! Whether to use a fixed step size
-  cedar::aux::BoolParameterPtr _mUseFixedStepSize;
-
+  //! The loop mode of the trigger
+  cedar::aux::EnumParameterPtr _mLoopMode;
 }; // class cedar::aux::LoopedThread
 
 #endif // CEDAR_AUX_LOOPED_THREAD_H

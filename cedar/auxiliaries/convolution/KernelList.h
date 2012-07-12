@@ -93,6 +93,10 @@ public:
   //!@brief removes all kernels from the list
   inline void clear()
   {
+    for (size_t i = 0; i < this->mKernels.size(); ++i)
+    {
+      this->mKernelRemovedSignal(i);
+    }
     this->mKernels.clear();
   }
 
@@ -116,6 +120,9 @@ public:
 
   //!@todo store the result of this function in a member and only update on demand
   cv::Mat getCombinedKernel() const;
+
+  //!@brief returns true if all kernels in list have same dimensionality and size
+  bool checkForSameKernelSize() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

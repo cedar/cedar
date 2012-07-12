@@ -142,4 +142,28 @@ class cedar::proc::NoMappingException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::proc::NoMappingException
 
+/*!@brief An exception that is a collection of exception messages that occurred during loading of an architecture.
+ */
+class cedar::proc::ArchitectureLoadingException : public cedar::aux::ExceptionBase
+{
+public:
+  ArchitectureLoadingException(const std::vector<std::string>& exception_infos)
+  :
+  mExceptionInfos(exception_infos)
+  {
+  }
+
+  ~ArchitectureLoadingException() throw ()
+  {
+  }
+
+  const std::vector<std::string>& getMessages() const
+  {
+    return this->mExceptionInfos;
+  }
+
+private:
+  std::vector<std::string> mExceptionInfos;
+}; // class cedar::proc::ArchitectureLoadingException
+
 #endif // CEDAR_PROC_EXCEPTIONS_H

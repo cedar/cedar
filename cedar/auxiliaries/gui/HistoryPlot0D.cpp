@@ -150,6 +150,7 @@ void cedar::aux::gui::HistoryPlot0D::plot(cedar::aux::DataPtr data, const std::s
     }
     else
     {
+      data->unlock();
       CEDAR_THROW(cedar::aux::UnknownTypeException, "Unhandled matrix type in cedar::aux::gui::HistoryPlot0D::display.");
     }
   }
@@ -228,6 +229,7 @@ void cedar::aux::gui::HistoryPlot0D::timerEvent(QTimerEvent* /* pEvent */)
     }
     else
     {
+      this->mData->unlock();
       CEDAR_THROW(cedar::aux::UnhandledTypeException, "Cannot handle the type of the matrix.");
     }
   }

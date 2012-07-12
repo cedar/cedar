@@ -55,6 +55,7 @@
 // SYSTEM INCLUDES
 #include <iostream>
 #include <ctime>
+#include <opencv2/opencv.hpp>
 
 // MACROS
 // Enable to show information on locking/unlocking
@@ -77,6 +78,7 @@ mLastIterationTime(cedar::unit::Milliseconds(-1.0)),
 mMovingAverageIterationTime(100), // average the last 100 iteration times
 mLastIterationTimeLock(new QReadWriteLock()),
 // initialize parameters
+mRNGState(0),
 _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
@@ -219,7 +221,7 @@ cedar::proc::TriggerPtr cedar::proc::Step::getTrigger(size_t index)
   return this->mTriggers.at(index);
 }
 
-void cedar::proc::Step::addTrigger(cedar::proc::TriggerPtr& trigger)
+void cedar::proc::Step::addTrigger(cedar::proc::TriggerPtr trigger)
 {
   this->mTriggers.push_back(trigger);
 }
@@ -374,8 +376,21 @@ void cedar::proc::Step::run()
 
   try
   {
+    /* since the cv::RNG is initialized once for every thread, we have to store its state for subsequent calls
+     * to run() - otherwise, the sequence of generated random numbers will be identical for each execution of run()
+     */
+    if (this->isThreaded() && mRNGState != 0)
+    {
+      cv::RNG& my_rng = cv::theRNG();
+      my_rng.state = mRNGState;
+    }
     // call the compute function with the given arguments
     this->compute(*(arguments.get()));
+    if (this->isThreaded())
+    {
+      cv::RNG& my_rng = cv::theRNG();
+      mRNGState = my_rng.state;
+    }
   }
   // catch exceptions and translate them to the given state/message
   catch(const cedar::aux::ExceptionBase& e)
@@ -486,3 +501,7 @@ bool cedar::proc::Step::setNextArguments(cedar::proc::ArgumentsPtr arguments)
   return true;
 }
 
+bool cedar::proc::Step::isThreaded() const
+{
+  return this->_mRunInThread->getValue();
+}

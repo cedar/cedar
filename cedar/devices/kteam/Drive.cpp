@@ -43,23 +43,32 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+cedar::dev::kteam::Drive::Drive()
+:
+_mPulsesPerRevolution(new cedar::aux::DoubleParameter(this, "pulses per revolution", 0)),
+_mMaximalEncoderValue(new cedar::aux::IntParameter(this, "maximal encoder value", 0)),
+_mMinimalEncoderValue(new cedar::aux::IntParameter(this, "minimal encoder value", 0)),
+_mMaximalNumberPulsesPerSecond(new cedar::aux::IntParameter(this, "maximum number of pulses per second", 0))
+{
+  mDistancePerPulse = 0;
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 double cedar::dev::kteam::Drive::getPulsesPerRevolution() const
 {
-  return _mPulsesPerRevolution;
+  return _mPulsesPerRevolution->getValue();
 }
 
 int cedar::dev::kteam::Drive::getMaximalEncoderValue() const
 {
-  return _mMaximalEncoderValue;
+  return _mMaximalEncoderValue->getValue();
 }
 
 int cedar::dev::kteam::Drive::getMinimalEncoderValue() const
 {
-  return _mMinimalEncoderValue;
+  return _mMinimalEncoderValue->getValue();
 }
 
 double cedar::dev::kteam::Drive::getDistancePerPulse() const
@@ -69,13 +78,13 @@ double cedar::dev::kteam::Drive::getDistancePerPulse() const
 
 int cedar::dev::kteam::Drive::getMaximalNumberPulsesPerSecond() const
 {
-  return _mMaximalNumberPulsesPerSecond;
+  return _mMaximalNumberPulsesPerSecond->getValue();
 }
 
 int cedar::dev::kteam::Drive::resetEncoder()
 {
   int s = setEncoder(0,0);
-  if (s == 0 && _mDebug) // setting encoder failed
+  if (s == 0 && this->debug()) // setting encoder failed
   {
     std::cout << "KTeamDrive: Error Resetting Encoder\n";
   }
@@ -86,11 +95,11 @@ int cedar::dev::kteam::Drive::reset()
 {
   int s = setWheelSpeed(0,0); // = 1 if setting wheel speed successful, else 0
   s = s * resetEncoder(); // = 1 if setting both wheel speed and resetting encoder successful, else 0
-  if (s == 0 && _mDebug) // setting wheel speed or resetting encoder failed
+  if (s == 0 && this->debug()) // setting wheel speed or resetting encoder failed
   {
     std::cout << "KTeamDrive: Error Resetting Robot\n";
   }
-  else if (_mDebug)
+  else if (this->debug())
   {
     std::cout << "KTeamDrive: Resetting Robot Successful\n";
   }

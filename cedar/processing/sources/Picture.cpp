@@ -41,6 +41,7 @@
 #include "cedar/processing/sources/Picture.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/auxiliaries/annotation/ColorSpace.h"
 
 
 // SYSTEM INCLUDES
@@ -64,6 +65,11 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/picture_grabber.svg");
+    declaration->setDescription
+    (
+      "Reads an image from a file. What filetypes are supported depends on what your opencv "
+      "version supports."
+    );
     cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
 
     return true;
@@ -109,19 +115,22 @@ void cedar::proc::sources::Picture::compute(const cedar::proc::Arguments&)
     this->createGrabber();
   }
 
-  //if creation was successfully or the grabber was already there
+  // if creation was successfully or the grabber was already there
   if (mGrabber)
   {
     // and set the filename
     this->mGrabber->grab();
     this->mImage->setData(this->mGrabber->getImage());
+
+    // update the annotation
+    this->annotateImage();
   }
 }
 
 //----------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Picture::setFileName()
 {
-  //update grabber if already there
+  // update grabber if already there
   if (mGrabber)
   {
     std::string filename = this->_mFileName->getValue().path().toStdString();
@@ -131,8 +140,8 @@ void cedar::proc::sources::Picture::setFileName()
     cedar::aux::LogSingleton::getInstance()->debugMessage(message,"cedar::proc::sources::Picture::setFileName()");
   }
 
-  //if there isn't a grabber instance created, the filename is stored internally,
-  //onTrigger() will then create the new grabber and get the images
+  // if there isn't a grabber instance created, the filename is stored internally,
+  // onTrigger() will then create the new grabber and get the images
   this->onTrigger();
 }
 
@@ -146,7 +155,7 @@ void cedar::proc::sources::Picture::setConfigurationFileName()
 //----------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Picture::onCreateGrabber()
 {
-  //create grabber first to verify the correct creation, and then apply it
+  // create grabber first to verify the correct creation, and then apply it
   cedar::dev::sensors::visual::PictureGrabberPtr grabber;
   grabber = cedar::dev::sensors::visual::PictureGrabberPtr
             (
@@ -157,6 +166,6 @@ void cedar::proc::sources::Picture::onCreateGrabber()
                    )
             );
 
-  //no exception here, so we could use it
+  // no exception here, so we could use it
   GrabberBase::mGrabber = grabber;
 }

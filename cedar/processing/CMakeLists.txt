@@ -72,12 +72,14 @@ cedar_add_library(cedarproc
   sources/GaussInput.h
   steps/StaticGain.h
   steps/Convolution.h
+  steps/ColorConversion.h
+  steps/CoordinateTransformation.h
+  steps/MatrixTypeConverter.h
   sources/Picture.h
   sources/Video.h
   sources/GrabberBase.h
   steps/Projection.h
   steps/Resize.h
-  LoopedTrigger.h
   Network.h
   Step.h
   ${libdc_moc_headers}

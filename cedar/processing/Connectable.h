@@ -135,7 +135,9 @@ public:
   //!@see cedar::proc::Step::getSlot
   cedar::proc::ConstDataSlotPtr getSlot(DataRole::Id role, const std::string& name) const;
 
-  //!@brief Provide data to an input slot. This means linking up another Connectable's output to the current Connectable.
+  /*!@brief Provide data to an input slot. This means linking up another Connectable's output
+   * to the current Connectable.
+   */
   void setInput(const std::string& name, cedar::aux::DataPtr data);
 
   //!@brief Removes a connection to another Connectable's output.
@@ -167,7 +169,7 @@ public:
   virtual cedar::proc::DataSlot::VALIDITY determineInputValidity
                                           (
                                             cedar::proc::ConstDataSlotPtr slot,
-                                            cedar::aux::DataPtr data
+                                            cedar::aux::ConstDataPtr data
                                           ) const;
 
   //!@brief Returns true, if this connectable already owns data in the target.
@@ -210,6 +212,24 @@ protected:
   //!@brief Declares an output slot and immediately sets the data pointer for that slot.
   void declareOutput(const std::string& name, cedar::aux::DataPtr data);
 
+  //!@brief Removes an input slot.
+  inline void removeInputSlot(const std::string& name)
+  {
+    this->removeSlot(DataRole::INPUT, name);
+  }
+
+  //!@brief Removes a buffer slot.
+  inline void removeBufferSlot(const std::string& name)
+  {
+    this->removeSlot(DataRole::BUFFER, name);
+  }
+
+  //!@brief Removes an output slot.
+  inline void removeOutputSlot(const std::string& name)
+  {
+    this->removeSlot(DataRole::OUTPUT, name);
+  }
+
   //!@brief Declares a new promoted slot.
   void declarePromotedData(DataSlotPtr promotedSlot);
 
@@ -241,10 +261,34 @@ protected:
     return this->mMandatoryConnectionsAreSet;
   }
 
+  void renameOutput(const std::string& oldName, const std::string& newName);
+  void renameInput(const std::string& oldName, const std::string& newName);
+
+  inline bool hasInputSlot(const std::string& name)
+  {
+    return this->hasSlot(DataRole::INPUT, name);
+  }
+
+  inline bool hasBufferSlot(const std::string& name)
+  {
+    return this->hasSlot(DataRole::BUFFER, name);
+  }
+
+  inline bool hasOutputSlot(const std::string& name)
+  {
+    return this->hasSlot(DataRole::OUTPUT, name);
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief Removes a slot from the connectable.
+  void removeSlot(DataRole::Id role, const std::string& name);
+
+  //!@brief Checks if the connectable has a slot with the given role and name.
+  bool hasSlot(DataRole::Id role, const std::string& name) const;
+
   //!@brief Declares a new piece of data in the connectable.
   void declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
 
@@ -269,6 +313,36 @@ private:
   void removeLock(cedar::aux::ConstDataPtr data, cedar::aux::LOCK_TYPE lockType);
 
   //--------------------------------------------------------------------------------------------------------------------
+  // signals & connections
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  //!@brief a connection to a signal emitted by an external data slot
+  boost::signals2::connection mSlotConnection;
+
+  //! Signal that is emitted whenever a slot is added.
+  boost::signals2::signal<void (cedar::proc::DataRole::Id, const std::string&)> mSlotAdded;
+
+  //! Signal that is emitted whenever a slot is removed.
+  boost::signals2::signal<void (cedar::proc::DataRole::Id, const std::string&)> mSlotRemoved;
+
+public:
+  inline boost::signals2::connection connectToSlotAdded
+                                     (
+                                       boost::function<void (cedar::proc::DataRole::Id, const std::string&)> slot
+                                     )
+  {
+    return this->mSlotAdded.connect(slot);
+  }
+
+  inline boost::signals2::connection connectToSlotRemoved
+                                     (
+                                       boost::function<void (cedar::proc::DataRole::Id, const std::string&)> slot
+                                     )
+  {
+    return this->mSlotRemoved.connect(slot);
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
@@ -278,11 +352,8 @@ protected:
   //!@brief Vector with the names of all invalid input data.
   std::vector<std::string> mInvalidInputNames;
 private:
-  //!@brief a connection to a signal emitted by an external data slo
-  boost::signals2::connection mSlotConnection;
-
   //!@brief a map of slot maps, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
-  std::map<DataRole::Id, SlotMap> mDataConnections;
+  std::map<DataRole::Id, SlotMap> mSlotMaps;
 
   //!@brief a map of slot lists, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
   std::map<DataRole::Id, SlotList> mDataConnectionsOrder;

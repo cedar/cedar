@@ -161,6 +161,7 @@ public:
 
   //!@brief set height of this GraphicsBase
   void setHeight(qreal height);
+
   //!@brief set width of this GraphicsBase
   void setWidth(qreal width);
 
@@ -239,6 +240,12 @@ protected:
     this->mElement = element;
   }
 
+  //! Sets the snap-to-grid property of the element.
+  inline void setSnapToGrid(bool snap)
+  {
+    this->mSnapToGrid = snap;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -255,6 +262,8 @@ public:
   static const QColor mValidityColorWarning;
   //!@brief color for state "error"
   static const QColor mValidityColorError;
+  //!@brief color for state "unknown"
+  static const QColor mValidityColorUnknown;
   
   //!@brief color for outline
   static const QColor mDefaultOutlineColor;
@@ -267,6 +276,7 @@ public:
 protected:
   //!@brief flag if the background should be drawn
   bool mDrawBackground;
+
 
 private:
   //!@brief the highlight mode
@@ -288,6 +298,9 @@ private:
   //!@todo Should this be a weak ptr?
   cedar::proc::ElementPtr mElement;
 
+  //!@brief Whether the item snaps to the grid.
+  bool mSnapToGrid;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -297,6 +310,7 @@ protected:
 private:
   //!@brief width of the GraphicsBase
   cedar::aux::DoubleParameterPtr mWidth;
+
   //!@brief height of the GraphicsBase
   cedar::aux::DoubleParameterPtr mHeight;
 
