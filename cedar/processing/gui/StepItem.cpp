@@ -69,6 +69,7 @@
 #include <QMenu>
 #include <QGraphicsDropShadowEffect>
 #include <QLayout>
+#include <QResource>
 #include <iostream>
 
 
@@ -260,10 +261,19 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
   this->mStep = step;
   this->mClassId = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(this->mStep);
 
-  this->mStepIcon = QIcon(this->mClassId->getIconPath().c_str());
-  if (this->mStepIcon.isNull())
+  //!@todo This code is redundant with code in ElementClassList; unify
+  QResource ex_test(QString::fromStdString(this->mClassId->getIconPath()));
+  if (ex_test.isValid())
   {
-    this->mStepIcon = QIcon(":/steps/no_icon.svg");
+    this->mStepIcon = QIcon(QString::fromStdString(this->mClassId->getIconPath()));
+    if (this->mStepIcon.isNull())
+    {
+      this->mStepIcon = QIcon(":/steps/no_icon.svg");
+    }
+  }
+  else
+  {
+    this->mStepIcon = QIcon(":/steps/broken_icon.svg");
   }
 
   this->addDataItems();
