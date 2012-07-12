@@ -135,7 +135,7 @@ private:
   cv::Mat mSliceMatrix;
   cv::Mat mSliceMatrixByte;
   cv::Mat mSliceMatrixByteC3;
-
+  cv::Mat mSliceSize;
   bool mDataIsSet;
 
   //! desired columns of the slice plot
