@@ -34,6 +34,11 @@
 #
 #=======================================================================================================================
 
+== known issues ==
+  - cedardyn is not properly loaded on some OS when using processingIde. If you want to use its content, manually load
+    cedardyn using the plugin dialog. You then may want to go to the Manage.. dialog and mark this plugin to be loaded
+    on every start.
+
 == current version ==
 - general
   - cedar now accepts both qwt versions 5.x and 6.x
