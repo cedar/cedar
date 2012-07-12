@@ -42,7 +42,7 @@
 #define CEDAR_AUX_GUI_DOUBLE_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/auxiliaries/gui/NumericParameter.h"
 #include "cedar/auxiliaries/gui/namespace.h"
 
 // SYSTEM INCLUDES
@@ -51,12 +51,18 @@
 
 /*!@brief Widget for manipulating cedar::aux::DoubleParameters.
  */
-class cedar::aux::gui::DoubleParameter : public cedar::aux::gui::Parameter
+class cedar::aux::gui::DoubleParameter : public cedar::aux::gui::NumericParameter<double, QDoubleSpinBox>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef cedar::aux::gui::NumericParameter<double, QDoubleSpinBox> Base;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -72,19 +78,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-public slots:
-  /*!@brief Reacts to a change of the parameter pointer.
-   */
-  void parameterPointerChanged();
-
-  /*!@brief Reacts to a change of the parameter's value.
-   */
-  void valueChanged(double value);
-
-  /*!@brief Reacts to a change of the parameter's properties.
-   */
-  void propertyChanged();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -96,7 +90,12 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void applyProperties();
+  void parameterChanged();
+
+private slots:
+  /*!@brief Reacts to a change of the parameter's value.
+   */
+  void valueChanged(double value);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -104,8 +103,7 @@ private:
 protected:
   // none yet
 private:
-  //! QDoubleSpinBox used for displaying and manipulating the parameter's value.
-  QDoubleSpinBox *mpSpinbox;
+  // none yet
 
 }; // class cedar::aux::gui::DoubleParameter
 
