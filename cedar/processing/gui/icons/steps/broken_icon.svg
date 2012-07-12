@@ -15,7 +15,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="no_icon.svg"
+   sodipodi:docname="broken_icon.svg"
    inkscape:export-filename="/home/lompolbx/workspace/src/cedar.fieldFramework/cedar/processing/gui/icons/steps/no_icon.png"
    inkscape:export-xdpi="9"
    inkscape:export-ydpi="9">
@@ -241,10 +241,17 @@
      id="layer1"
      transform="translate(0,-652.3622)">
     <path
-       style="fill:#ffffff;stroke:#000000;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;fill-opacity:1"
-       d="M 68.21875 36.78125 L 68.21875 363.21875 L 331.78125 363.21875 L 331.78125 98.1875 L 270.375 36.78125 L 68.21875 36.78125 z "
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       d="m 68.21875,36.78125 0,131.75 c 16.797811,18.16719 35.41106,37.12019 37.84375,34.6875 l 46.46875,-46.46875 58.59375,58.59375 77.28125,-77.28125 43.375,43.40625 0,-83.28125 -61.40625,-61.40625 -202.15625,0 z"
        transform="translate(0,652.3622)"
-       id="rect2844" />
+       id="path3676"
+       sodipodi:nodetypes="cccccccccc" />
+    <path
+       style="fill:#ffffff;stroke:#000000;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;fill-opacity:1"
+       d="M 288.40625,178.0625 211.125,255.34375 152.53125,196.75 106.0625,243.21875 c -2.43269,2.43269 -21.045939,-16.52031 -37.84375,-34.6875 l 0,154.6875 263.5625,0 0,-141.75 -43.375,-43.40625 z"
+       transform="translate(0,652.3622)"
+       id="rect2844"
+       sodipodi:nodetypes="ccccccccc" />
     <path
        style="fill:none;stroke:#000000;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        d="M 263.5625 36.78125 L 263.5625 104.28125 L 331.78125 104.28125 L 331.78125 98.1875 L 270.375 36.78125 L 263.5625 36.78125 z "

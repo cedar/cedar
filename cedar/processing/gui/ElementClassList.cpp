@@ -44,6 +44,7 @@
 
 // SYSTEM INCLUDES
 #include <QApplication>
+#include <QResource>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -89,7 +90,15 @@ void cedar::proc::gui::ElementClassList::showList(const cedar::proc::Declaration
     QIcon icon;
     if (!class_id->getIconPath().empty())
     {
-      icon = QIcon(class_id->getIconPath().c_str());
+      QResource ex_test(QString::fromStdString(class_id->getIconPath()));
+      if (ex_test.isValid())
+      {
+        icon = QIcon(class_id->getIconPath().c_str());
+      }
+      else
+      {
+        icon = QIcon(":/steps/broken_icon.svg");
+      }
     }
     else
     {
