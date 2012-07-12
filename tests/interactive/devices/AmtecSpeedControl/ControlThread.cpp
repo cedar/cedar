@@ -48,10 +48,11 @@
 
 ControlThread::ControlThread(
                               const cedar::dev::robot::KinematicChainPtr kinematicChain,
-                              const std::string& configFileName
+                              double stepSize,
+                              double idleTime
                             )
 :
-cedar::aux::LoopedThread(100, 0.01, configFileName)
+cedar::aux::LoopedThread(stepSize, idleTime)
 {
   mpKinematicChain = kinematicChain;
   return;

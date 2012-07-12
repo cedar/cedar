@@ -46,7 +46,7 @@ cedar_add_library(cedardev
                   robot/gui/KinematicChainCommandWidget.h
                   kteam/gui/EPuckControlWidget.h
                   communication/gui/CommunicationWidget.h
-                  ${kuka_moc_files}
+#                  ${kuka_moc_files}
                   LINK_LIBRARIES
                   cedaraux
                   )
