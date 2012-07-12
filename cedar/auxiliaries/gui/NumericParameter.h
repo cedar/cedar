@@ -113,8 +113,6 @@ public:
     this->mpWidget = WidgetPolicy::create();
     this->layout()->setContentsMargins(0, 0, 0, 0);
     this->layout()->addWidget(this->mpWidget);
-    WidgetPolicy::setMinimum(this->mpWidget, -100.0);
-    WidgetPolicy::setMaximum(this->mpWidget, 100.0);
     WidgetPolicy::setPrecision(this->mpWidget, 4);
   }
 
