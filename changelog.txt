@@ -34,6 +34,11 @@
 #
 #=======================================================================================================================
 
+== known issues ==
+  - cedardyn is not properly loaded on some OS when using processingIde. If you want to use its content, manually load
+    cedardyn using the plugin dialog. You then may want to go to the Manage.. dialog and mark this plugin to be loaded
+    on every start.
+
 == current version ==
 - general
   - cedar now accepts both qwt versions 5.x and 6.x
@@ -44,6 +49,8 @@
   - FileParameters now can be set to have their path relative to the current working directory.
   - A new annotation system has been introduced. Because of this, ImageData is now deprecated and should be switched to
     MatData.
+- cedar::dev
+  - added MountedCameraViewer, simulating cameras fixed on a kinematic chain in OpenGL
 - cedar::proc
   - added a processing step for convolutions
   - parameters are now locked in the compute method of processing steps
@@ -64,7 +71,7 @@
 - build system
   - added a find script for FFTW that also searches for the include directory
   - added defines for the current cedar version; this makes it possible to stay compatible to older versions, should
-    this ever be needed. 
+    this ever be needed.
   - removed dependency on libconfig
 
 == Version 0.9 ==
