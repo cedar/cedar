@@ -168,12 +168,11 @@ void printMatrix(cv::Mat m, std::string name = "", int setW = 5)
     std::cout << name << std::endl;
   }
   // print matrix
-  for(int x = 0; x < m.cols; x++)
+  for(int r = 0; r < m.rows; ++r)
   {
-    for(int y = 0; y < m.rows; y++)
+    for(int c = 0; c < m.cols; ++c)
     {
-//      std::cout << " " << m.at<float>(y, x);
-      std::cout << std::setw(setW) << m.at<float>(x, y);
+      std::cout << std::setw(setW) << m.at<float>(r, c);
     }
     std::cout << std::endl;
   }
@@ -299,6 +298,37 @@ cv::Mat conv
 
     return result;
   }
+  else if (mode == cedar::aux::conv::Mode::Valid)
+  {
+    if (op2.rows > op1.rows || op2.cols > op1.cols)
+    {
+      return cv::Mat::zeros(1,1,CV_32F);
+    }
+    else
+    {
+      cv::Mat result = cv::Mat::zeros(op1.rows - op2.rows + 1, op1.cols - op2.cols + 1, CV_32F);
+
+      cv::Mat op2_flipped;
+      cv::flip(op2, op2_flipped, -1);
+
+      for (int row = 0; row < result.rows; ++row)
+      {
+        for (int col = 0; col < result.cols; ++col)
+        {
+          for (int k_row = 0; k_row < op2_flipped.rows; ++k_row)
+          {
+            for (int k_col = 0; k_col < op2_flipped.cols; ++k_col)
+            {
+              result.at<float>(row, col)
+                += op1.at<float>(row + k_row, col + k_col)
+                   * op2_flipped.at<float>(k_row, k_col);
+            }
+          }
+        }
+      }
+      return result;
+    }
+  }
   else
   {
     std::cout << "ERROR!\n\tConvolution mode unknown!" << std::endl;
@@ -370,10 +400,120 @@ int test_matxmat_convolution
     std::cout << " ?= (expected result:)" << std::endl;
     printMatrix(expected);
 
-//    // display the operation
-//    std::cout << op1 << std::endl << " * " << std::endl << op2 << std::endl << " = (engine result:)" << std::endl;
-//    std::cout << res << std::endl;
-//    std::cout << " ?= (expected result:)" << std::endl << expected << std::endl;
+    return 1;
+  }
+
+  std::cout << "OK" << std::endl;
+  return 0;
+}
+
+int testMatrixKernelOperation
+    (
+      cedar::aux::conv::EnginePtr engine,
+      const cv::Mat& mat,
+      cedar::aux::conv::BorderType::Id borderType,
+      cedar::aux::conv::Mode::Id mode
+    )
+{
+  cedar::aux::conv::KernelListPtr kernel_list = engine->getKernelList();
+
+  // check if the engine is capable of this operation
+  if
+  (
+    !engine->checkCapability
+    (
+      cedar::aux::math::getDimensionalityOf(mat),
+      cedar::aux::math::getDimensionalityOf(kernel_list->getCombinedKernel()),
+      borderType,
+      mode
+    )
+  )
+  {
+    std::cout << "SKIPPED --- Engine is not capable of this operation." << std::endl;
+    return 0;
+  }
+
+  cv::Mat kernel_mat = kernel_list->getKernel(0)->getKernel();
+  cv::Mat expected = conv(mat, kernel_mat, borderType, mode);
+
+  for (size_t i = 1; i < kernel_list->size(); ++i)
+  {
+    kernel_mat = kernel_list->getKernel(i)->getKernel();
+    expected += conv(mat, kernel_mat, borderType, mode);
+  }
+
+  cv::Mat result = engine->convolve(mat, borderType, mode);
+
+  if (!mat_eq(expected, result))
+  {
+    std::cout << "ERROR:" << std::endl;
+    std::cout << "----------------------------" << std::endl;
+    // display the operation
+    printMatrix(mat);
+    std::cout << " * " << std::endl;
+    printMatrix(kernel_list->getCombinedKernel());
+    std::cout << " = (engine result:)" << std::endl;
+    printMatrix(result);
+    std::cout << " ?= (expected result:)" << std::endl;
+    printMatrix(expected);
+    std::cout << "----------------------------" << std::endl;
+
+    return 1;
+  }
+
+  std::cout << "OK" << std::endl;
+  return 0;
+}
+
+int testMatrixKernelOperation
+    (
+      cedar::aux::conv::EnginePtr engine,
+      const cv::Mat& mat,
+      cedar::aux::conv::ConstKernelListPtr kernelList,
+      cedar::aux::conv::BorderType::Id borderType,
+      cedar::aux::conv::Mode::Id mode
+    )
+{
+  // check if the engine is capable of this operation
+  if
+  (
+    !engine->checkCapability
+    (
+      cedar::aux::math::getDimensionalityOf(mat),
+      cedar::aux::math::getDimensionalityOf(kernelList->getCombinedKernel()),
+      borderType,
+      mode
+    )
+  )
+  {
+    std::cout << "SKIPPED --- Engine is not capable of this operation." << std::endl;
+    return 0;
+  }
+
+  cv::Mat kernel_mat = kernelList->getKernel(0)->getKernel();
+  cv::Mat expected = conv(mat, kernel_mat, borderType, mode);
+
+  for (size_t i = 1; i < kernelList->size(); ++i)
+  {
+    kernel_mat = kernelList->getKernel(i)->getKernel();
+    expected += conv(mat, kernel_mat, borderType, mode);
+  }
+
+  cv::Mat result = engine->convolve(mat, kernelList, borderType, mode);
+
+  if (!mat_eq(expected, result))
+  {
+    std::cout << "ERROR:" << std::endl;
+    std::cout << "----------------------------" << std::endl;
+    // display the operation
+    printMatrix(mat);
+    std::cout << " * " << std::endl;
+    printMatrix(kernelList->getCombinedKernel());
+    std::cout << " = (engine result:)" << std::endl;
+    printMatrix(result);
+    std::cout << " ?= (expected result:)" << std::endl;
+    printMatrix(expected);
+    std::cout << "----------------------------" << std::endl;
 
     return 1;
   }
@@ -427,6 +567,56 @@ int testMatrixKernelOperation
 
     return 1;
   }
+
+  std::cout << "OK" << std::endl;
+  return 0;
+}
+
+int testMatrixSeparableOperation
+    (
+      cedar::aux::conv::EnginePtr engine,
+      const cv::Mat& mat,
+      cedar::aux::kernel::ConstSeparablePtr kernel,
+      cedar::aux::conv::BorderType::Id borderType,
+      cedar::aux::conv::Mode::Id mode
+    )
+{
+  cv::Mat kernel_mat = kernel->getKernel();
+  // check if the engine is capable of this operation
+  if
+  (
+    !engine->checkCapability
+    (
+      cedar::aux::math::getDimensionalityOf(mat),
+      kernel->getDimensionality(),
+      borderType,
+      mode
+    )
+  )
+  {
+    std::cout << "SKIPPED --- Engine is not capable of this operation." << std::endl;
+    return 0;
+  }
+
+  cv::Mat expected = conv(mat, kernel_mat, borderType, mode);
+  cv::Mat result = engine->convolve(mat, kernel, borderType, mode);
+
+  if (!mat_eq(expected, result))
+  {
+    std::cout << "ERROR:" << std::endl;
+
+    // display the operation
+    printMatrix(mat);
+    std::cout << " * " << std::endl;
+    printMatrix(kernel_mat);
+    std::cout << " = (engine result:)" << std::endl;
+    printMatrix(result);
+    std::cout << " ?= (expected result:)" << std::endl;
+    printMatrix(expected);
+
+    return 1;
+  }
+
   std::cout << "OK" << std::endl;
   return 0;
 }
@@ -688,6 +878,999 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine, cedar::aux::k
               );
   }
 
+  {
+    std::cout << "(Valid 2D zero) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                cv::Mat::zeros(3, 3, CV_32F),
+                kernel,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 2D) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_2d,
+                kernel,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 2D even) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                cv::Mat::ones(4, 4, CV_32F),
+                kernel,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 0D) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_0d,
+                kernel,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 1D) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_1d,
+                kernel,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 0D void) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                cv::Mat::ones(1, 1, CV_32F),
+                kernel,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+  }
+
+  return errors;
+}
+
+int testMatrixSeparableOperations(cedar::aux::conv::EnginePtr engine, cedar::aux::kernel::SeparablePtr kernel)
+{
+  int errors = 0;
+
+  std::cout << "-----------------------------------------------------------------------------" << std::endl;
+  std::cout << "                                          Testing matrix * kernel operations." << std::endl;
+  std::cout << "-----------------------------------------------------------------------------" << std::endl;
+
+  {
+    std::cout << "(Cyclic 0D, Same) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_0d,
+                kernel,
+                cedar::aux::conv::BorderType::Cyclic,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Cyclic 0D, Full) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_0d,
+                kernel,
+                cedar::aux::conv::BorderType::Cyclic,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Cyclic 1D, Same) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_1d,
+                kernel,
+                cedar::aux::conv::BorderType::Cyclic,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Cyclic 1D, Full) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_1d,
+                kernel,
+                cedar::aux::conv::BorderType::Cyclic,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Cyclic 2D, Same) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_2d,
+                kernel,
+                cedar::aux::conv::BorderType::Cyclic,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Cyclic 2D, Full) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_2d,
+                kernel,
+                cedar::aux::conv::BorderType::Cyclic,
+                cedar::aux::conv::Mode::Full
+              );
+
+  }
+
+  {
+    std::cout << "(Reflect 0D, Same) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_0d,
+                kernel,
+                cedar::aux::conv::BorderType::Reflect,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Reflect 0D, Full) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_0d,
+                kernel,
+                cedar::aux::conv::BorderType::Reflect,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Reflect 1D, Same) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_1d,
+                kernel,
+                cedar::aux::conv::BorderType::Reflect,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Reflect 1D, Full) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_1d,
+                kernel,
+                cedar::aux::conv::BorderType::Reflect,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Reflect 2D, Same) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_2d,
+                kernel,
+                cedar::aux::conv::BorderType::Reflect,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Reflect 2D, Full) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_2d,
+                kernel,
+                cedar::aux::conv::BorderType::Reflect,
+                cedar::aux::conv::Mode::Full
+              );
+  }
+
+  {
+    std::cout << "(Replicate 0D, Same) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_0d,
+                kernel,
+                cedar::aux::conv::BorderType::Replicate,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Replicate 0D, Full) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_0d,
+                kernel,
+                cedar::aux::conv::BorderType::Replicate,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Replicate 1D, Same) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_1d,
+                kernel,
+                cedar::aux::conv::BorderType::Replicate,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Replicate 1D, Full) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_1d,
+                kernel,
+                cedar::aux::conv::BorderType::Replicate,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Replicate 2D, Same) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_2d,
+                kernel,
+                cedar::aux::conv::BorderType::Replicate,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Replicate 2D, Full) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_2d,
+                kernel,
+                cedar::aux::conv::BorderType::Replicate,
+                cedar::aux::conv::Mode::Full
+              );
+  }
+
+  {
+    std::cout << "(Zero 0D, Same) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_0d,
+                kernel,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Zero 0D, Full) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_0d,
+                kernel,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Zero 1D, Same) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_1d,
+                kernel,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Zero 1D, Full) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_1d,
+                kernel,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Zero 2D, Same) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_2d,
+                kernel,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Zero 2D, Full) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_2d,
+                kernel,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Full
+              );
+  }
+
+  {
+    std::cout << "(Valid 2D zero) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                cv::Mat::zeros(3, 3, CV_32F),
+                kernel,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 2D) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_2d,
+                kernel,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 2D even) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                cv::Mat::ones(4, 4, CV_32F),
+                kernel,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 0D) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_0d,
+                kernel,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 1D) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                numbers_1d,
+                kernel,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 0D void) ... ";
+    errors += testMatrixSeparableOperation
+              (
+                engine,
+                cv::Mat::ones(1, 1, CV_32F),
+                kernel,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+  }
+
+  return errors;
+}
+
+int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine, cedar::aux::conv::KernelListPtr& kernelList)
+{
+  int errors = 0;
+
+  std::cout << "-----------------------------------------------------------------------------" << std::endl;
+  std::cout << "                 Testing matrix * kernel list operations. (passed on the fly)" << std::endl;
+  std::cout << "-----------------------------------------------------------------------------" << std::endl;
+
+  {
+    std::cout << "(Cyclic 0D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_0d,
+                kernelList,
+                cedar::aux::conv::BorderType::Cyclic,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Cyclic 0D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_0d,
+                kernelList,
+                cedar::aux::conv::BorderType::Cyclic,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Cyclic 1D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_1d,
+                kernelList,
+                cedar::aux::conv::BorderType::Cyclic,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Cyclic 1D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_1d,
+                kernelList,
+                cedar::aux::conv::BorderType::Cyclic,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Cyclic 2D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_2d,
+                kernelList,
+                cedar::aux::conv::BorderType::Cyclic,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Cyclic 2D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_2d,
+                kernelList,
+                cedar::aux::conv::BorderType::Cyclic,
+                cedar::aux::conv::Mode::Full
+              );
+
+  }
+
+  {
+    std::cout << "(Reflect 0D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_0d,
+                kernelList,
+                cedar::aux::conv::BorderType::Reflect,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Reflect 0D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_0d,
+                kernelList,
+                cedar::aux::conv::BorderType::Reflect,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Reflect 1D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_1d,
+                kernelList,
+                cedar::aux::conv::BorderType::Reflect,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Reflect 1D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_1d,
+                kernelList,
+                cedar::aux::conv::BorderType::Reflect,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Reflect 2D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_2d,
+                kernelList,
+                cedar::aux::conv::BorderType::Reflect,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Reflect 2D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_2d,
+                kernelList,
+                cedar::aux::conv::BorderType::Reflect,
+                cedar::aux::conv::Mode::Full
+              );
+  }
+
+  {
+    std::cout << "(Replicate 0D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_0d,
+                kernelList,
+                cedar::aux::conv::BorderType::Replicate,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Replicate 0D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_0d,
+                kernelList,
+                cedar::aux::conv::BorderType::Replicate,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Replicate 1D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_1d,
+                kernelList,
+                cedar::aux::conv::BorderType::Replicate,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Replicate 1D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_1d,
+                kernelList,
+                cedar::aux::conv::BorderType::Replicate,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Replicate 2D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_2d,
+                kernelList,
+                cedar::aux::conv::BorderType::Replicate,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Replicate 2D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_2d,
+                kernelList,
+                cedar::aux::conv::BorderType::Replicate,
+                cedar::aux::conv::Mode::Full
+              );
+  }
+
+  {
+    std::cout << "(Zero 0D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_0d,
+                kernelList,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Zero 0D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_0d,
+                kernelList,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Zero 1D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_1d,
+                kernelList,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Zero 1D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_1d,
+                kernelList,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Zero 2D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_2d,
+                kernelList,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Zero 2D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_2d,
+                kernelList,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Full
+              );
+  }
+
+  {
+    std::cout << "(Valid 2D zero) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                cv::Mat::zeros(3, 3, CV_32F),
+                kernelList,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 2D) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_2d,
+                kernelList,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 2D even) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                cv::Mat::ones(4, 4, CV_32F),
+                kernelList,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 0D) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_0d,
+                kernelList,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 1D) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_1d,
+                kernelList,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 0D void) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                cv::Mat::ones(1, 1, CV_32F),
+                kernelList,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+  }
+
+  std::cout << "-----------------------------------------------------------------------------" << std::endl;
+  std::cout << "                 Testing matrix * kernel list operations. (passed beforehand)" << std::endl;
+  std::cout << "-----------------------------------------------------------------------------" << std::endl;
+
+  engine->setKernelList(kernelList);
+
+  {
+    std::cout << "(Cyclic 0D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_0d,
+                cedar::aux::conv::BorderType::Cyclic,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Cyclic 0D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_0d,
+                cedar::aux::conv::BorderType::Cyclic,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Cyclic 1D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_1d,
+                cedar::aux::conv::BorderType::Cyclic,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Cyclic 1D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_1d,
+                cedar::aux::conv::BorderType::Cyclic,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Cyclic 2D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_2d,
+                cedar::aux::conv::BorderType::Cyclic,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Cyclic 2D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_2d,
+                cedar::aux::conv::BorderType::Cyclic,
+                cedar::aux::conv::Mode::Full
+              );
+
+  }
+
+  {
+    std::cout << "(Reflect 0D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_0d,
+                cedar::aux::conv::BorderType::Reflect,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Reflect 0D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_0d,
+                cedar::aux::conv::BorderType::Reflect,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Reflect 1D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_1d,
+                cedar::aux::conv::BorderType::Reflect,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Reflect 1D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_1d,
+                cedar::aux::conv::BorderType::Reflect,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Reflect 2D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_2d,
+                cedar::aux::conv::BorderType::Reflect,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Reflect 2D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_2d,
+                cedar::aux::conv::BorderType::Reflect,
+                cedar::aux::conv::Mode::Full
+              );
+  }
+
+  {
+    std::cout << "(Replicate 0D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_0d,
+                cedar::aux::conv::BorderType::Replicate,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Replicate 0D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_0d,
+                cedar::aux::conv::BorderType::Replicate,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Replicate 1D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_1d,
+                cedar::aux::conv::BorderType::Replicate,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Replicate 1D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_1d,
+                cedar::aux::conv::BorderType::Replicate,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Replicate 2D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_2d,
+                cedar::aux::conv::BorderType::Replicate,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Replicate 2D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_2d,
+                cedar::aux::conv::BorderType::Replicate,
+                cedar::aux::conv::Mode::Full
+              );
+  }
+
+  {
+    std::cout << "(Zero 0D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_0d,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Zero 0D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_0d,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Zero 1D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_1d,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Zero 1D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_1d,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Full
+              );
+
+    std::cout << "(Zero 2D, Same) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_2d,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Same
+              );
+
+    std::cout << "(Zero 2D, Full) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_2d,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Full
+              );
+  }
+
+  {
+    std::cout << "(Valid 2D zero) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                cv::Mat::zeros(3, 3, CV_32F),
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 2D) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_2d,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 2D even) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                cv::Mat::ones(4, 4, CV_32F),
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 0D) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_0d,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 1D) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                numbers_1d,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 0D void) ... ";
+    errors += testMatrixKernelOperation
+              (
+                engine,
+                cv::Mat::ones(1, 1, CV_32F),
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+  }
+
   return errors;
 }
 
@@ -725,14 +1908,14 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine)
   std::cout << "-----------------------------------------------------------------------------" << std::endl;
   {
     DemoSeparable0DPtr demo_kernel_0d(new DemoSeparable0D(2.0));
-    errors += testMatrixKernelOperations(engine, demo_kernel_0d);
+    errors += testMatrixSeparableOperations(engine, demo_kernel_0d);
 
     cv::Mat ones = cv::Mat::ones(3, 1, CV_32F);
     DemoSeparable1DPtr demo_kernel_1d(new DemoSeparable1D(ones));
-    errors += testMatrixKernelOperations(engine, demo_kernel_1d);
+    errors += testMatrixSeparableOperations(engine, demo_kernel_1d);
 
     DemoSeparable2DPtr demo_kernel_2d(new DemoSeparable2D(ones, ones));
-    errors += testMatrixKernelOperations(engine, demo_kernel_2d);
+    errors += testMatrixSeparableOperations(engine, demo_kernel_2d);
   }
 
   std::cout << "-----------------------------------------------------------------------------" << std::endl;
@@ -740,10 +1923,50 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine)
   std::cout << "-----------------------------------------------------------------------------" << std::endl;
   {
     DemoSeparable1DPtr demo_kernel_1d(new DemoSeparable1D(numbers_1d));
-    errors += testMatrixKernelOperations(engine, demo_kernel_1d);
+    errors += testMatrixSeparableOperations(engine, demo_kernel_1d);
 
     DemoSeparable2DPtr demo_kernel_2d(new DemoSeparable2D(numbers_1d, numbers_1d));
-    errors += testMatrixKernelOperations(engine, demo_kernel_2d);
+    errors += testMatrixSeparableOperations(engine, demo_kernel_2d);
+  }
+
+  std::cout << "-----------------------------------------------------------------------------" << std::endl;
+  std::cout << "                        Testing matrix * kernel operations (using KernelList)" << std::endl;
+  std::cout << "-----------------------------------------------------------------------------" << std::endl;
+  {
+    cv::Mat ones = cv::Mat::ones(3, 1, CV_32F);
+
+    DemoKernel0DPtr demo_kernel_0d(new DemoKernel0D(2.0));
+    DemoKernelPtr demo_kernel_1d_ones(new DemoKernel(cv::Mat::ones(3, 1, CV_32F)));
+    DemoKernelPtr demo_kernel_2d_ones(new DemoKernel(cv::Mat::ones(3, 3, CV_32F)));
+    DemoKernelPtr demo_kernel_1d(new DemoKernel(numbers_1d));
+    DemoKernelPtr demo_kernel_2d(new DemoKernel(numbers_2d));
+    DemoSeparable0DPtr demo_kernel_sep_0d(new DemoSeparable0D(2.0));
+    DemoSeparable1DPtr demo_kernel_sep_1d_ones(new DemoSeparable1D(ones));
+    DemoSeparable2DPtr demo_kernel_sep_2d_ones(new DemoSeparable2D(ones, ones));
+    DemoSeparable1DPtr demo_kernel_sep_1d(new DemoSeparable1D(numbers_1d));
+    DemoSeparable2DPtr demo_kernel_sep_2d(new DemoSeparable2D(numbers_1d, numbers_1d));
+
+
+    cedar::aux::conv::KernelListPtr kernel_list_0d(new cedar::aux::conv::KernelList());
+    cedar::aux::conv::KernelListPtr kernel_list_1d(new cedar::aux::conv::KernelList());
+    cedar::aux::conv::KernelListPtr kernel_list_2d(new cedar::aux::conv::KernelList());
+
+    kernel_list_0d->append(demo_kernel_0d);
+    kernel_list_0d->append(demo_kernel_sep_0d);
+
+    kernel_list_1d->append(demo_kernel_1d_ones);
+    kernel_list_1d->append(demo_kernel_1d);
+    kernel_list_1d->append(demo_kernel_sep_1d_ones);
+    kernel_list_1d->append(demo_kernel_sep_1d);
+
+    kernel_list_2d->append(demo_kernel_2d_ones);
+    kernel_list_2d->append(demo_kernel_2d);
+    kernel_list_2d->append(demo_kernel_sep_2d_ones);
+    kernel_list_2d->append(demo_kernel_sep_2d);
+
+    errors += testMatrixKernelOperations(engine, kernel_list_0d);
+    errors += testMatrixKernelOperations(engine, kernel_list_1d);
+    errors += testMatrixKernelOperations(engine, kernel_list_2d);
   }
 
   return errors;
@@ -901,6 +2124,99 @@ int testMatrixMatrixOperations(cedar::aux::conv::EnginePtr engine)
                 cv::Mat::ones(3, 3, CV_32F),
                 cedar::aux::conv::BorderType::Cyclic,
                 cedar::aux::conv::Mode::Full
+              );
+  }
+
+  {
+    cv::Mat op1, op2;
+    op1 = cv::Mat::zeros(3, 3, CV_32F);
+    op1.at<float>(0, 2) = 1;
+    op1.at<float>(1, 2) = 1;
+    op2 = cv::Mat::zeros(3, 3, CV_32F);
+    op2.at<float>(1, 2) = 0.5;
+    op2.at<float>(0, 0) = 0.5;
+
+    std::cout << "(Valid 2D zero) ... ";
+    errors += test_matxmat_convolution
+              (
+                engine,
+                cv::Mat::zeros(3, 3, CV_32F),
+                cv::Mat::zeros(3, 3, CV_32F),
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 2D) ... ";
+    errors += test_matxmat_convolution
+              (
+                engine,
+                op1,
+                op2,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 2D even) ... ";
+    errors += test_matxmat_convolution
+              (
+                engine,
+                cv::Mat::ones(4, 4, CV_32F),
+                numbers_2d,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+    std::cout << "(Valid 2D void) ... ";
+    errors += test_matxmat_convolution
+              (
+                engine,
+                op1,
+                cv::Mat::ones(4, 4, CV_32F),
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+
+
+  }
+
+  {
+    cv::Mat op1, op2;
+    op1 = cv::Mat::zeros(5, 1, CV_32F);
+    op1.at<float>(3) = 1;
+    op2 = cv::Mat::zeros(3, 1, CV_32F);
+    op2.at<float>(0) = 0.5;
+    op2.at<float>(1) = 1;
+    op2.at<float>(2) = 0.5;
+
+    std::cout << "(Valid 1D) ... ";
+    errors += test_matxmat_convolution
+              (
+                engine,
+                op1,
+                op2,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
+              );
+  }
+
+  {
+    cv::Mat op1, op2;
+    op1 = cv::Mat::zeros(3, 3, CV_32F);
+    op1.at<float>(0, 2) = 1;
+    op1.at<float>(1, 2) = 1;
+    op2 = cv::Mat::zeros(3, 1, CV_32F);
+    op2.at<float>(0) = 0.5;
+    op2.at<float>(1) = 1;
+    op2.at<float>(2) = 0.5;
+
+    std::cout << "(Valid m2Dk1D) ... ";
+    errors += test_matxmat_convolution
+              (
+                engine,
+                op1,
+                op2,
+                cedar::aux::conv::BorderType::Zero,
+                cedar::aux::conv::Mode::Valid
               );
   }
 

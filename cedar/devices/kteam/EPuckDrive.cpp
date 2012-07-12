@@ -38,6 +38,7 @@
 #include "cedar/devices/kteam/EPuckDrive.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 
@@ -46,11 +47,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::kteam::EPuckDrive::EPuckDrive
 (
-  cedar::dev::com::SerialCommunication *peCommunication,
-  const std::string& config
+  cedar::dev::com::SerialCommunication *peCommunication
 )
-:
-cedar::aux::ConfigurationInterface(config)
 {
   mInitialized = false;
   init(peCommunication);
@@ -68,7 +66,7 @@ int cedar::dev::kteam::EPuckDrive::init(cedar::dev::com::SerialCommunication *pe
 {
   if(mInitialized)
   {
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Initialization failed (Already initialized)\n";
     }
@@ -77,7 +75,7 @@ int cedar::dev::kteam::EPuckDrive::init(cedar::dev::com::SerialCommunication *pe
 
   if (!(peCommunication->isInitialized())) //Communication not initialized
   {
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Initialization failed (Given communication not initialized)\n";
     }
@@ -85,43 +83,19 @@ int cedar::dev::kteam::EPuckDrive::init(cedar::dev::com::SerialCommunication *pe
   }
 
   // initialization of members
-  mVelocity.resize(2);
-  mVelocity[0] = 0;
-  mVelocity[1] = 0;
-  mWheelSpeed.resize(2);
-  mWheelSpeed[0] = 0;
-  mWheelSpeed[1] = 0;
-  mDistancePerPulse = 0;
-  _mWheelDistance = 0;
-  _mWheelRadius = 0;
-  _mPulsesPerRevolution = 0;
-  _mMaximalEncoderValue = 0;
-  _mMinimalEncoderValue = 0;
-  _mMaximalNumberPulsesPerSecond = 0;
-  _mDebug = false;
   mpeCommunication = 0;
   std::string dummy_answer = ""; //answer for testing the communication
 
   // read config-parameters
-  addParameter(&_mWheelDistance, "WheelDistance", 0.053);
-  addParameter(&_mWheelRadius, "WheelRadius", 0.0205);
-  addParameter(&_mPulsesPerRevolution, "PulsesPerRevolution", 1000);
-  addParameter(&_mMaximalEncoderValue, "MaximumEncoderValue", 32767);
-  addParameter(&_mMinimalEncoderValue, "MinimalEncoderValue", -32768);
-  addParameter(&_mMaximalNumberPulsesPerSecond, "MaximumPulsesPerSecond", 1000);
-  addParameter(&_mDebug, "Debug", false);
-  this->readOrDefaultConfiguration();
-
-  // check if distances or number of pulses per revolution are negative
-  if (_mWheelDistance <= 0 || _mWheelRadius <= 0 || _mPulsesPerRevolution <= 0 || _mMaximalNumberPulsesPerSecond <= 0)
-  {
-    std::cout << "EPuckDrive: Initialization failed (Invalid config-parameters (e.g. negative wheel radius))\n";
-    return 0;
-  }
+  //!@todo Reintroduce this
+//  addParameter(&_mWheelDistance, "WheelDistance", 0.053);
+//  addParameter(&_mWheelRadius, "WheelRadius", 0.0205);
+//  addParameter(&_mPulsesPerRevolution, "PulsesPerRevolution", 1000);
+//  addParameter(&_mMaximalEncoderValue, "MaximumEncoderValue", 32767);
+//  addParameter(&_mMinimalEncoderValue, "MinimalEncoderValue", -32768);
+//  addParameter(&_mMaximalNumberPulsesPerSecond, "MaximumPulsesPerSecond", 1000);
 
   // calculate distance per pulse and maximal wheel speed
-  mDistancePerPulse = 2 * cedar::aux::math::pi * _mWheelRadius / _mPulsesPerRevolution;
-  mMaximalWheelSpeed = _mMaximalNumberPulsesPerSecond * mDistancePerPulse;
 
   mpeCommunication = peCommunication;
 
@@ -134,7 +108,7 @@ int cedar::dev::kteam::EPuckDrive::init(cedar::dev::com::SerialCommunication *pe
   // 'a,' or 'z,' expected, else init failed
   if ((dummy_answer[0] == 'a' || dummy_answer[0] == 'z') && dummy_answer[1] == ',')
   {
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Initialization successful (Answer: '" << dummy_answer << "')\n";
     }
@@ -143,13 +117,61 @@ int cedar::dev::kteam::EPuckDrive::init(cedar::dev::com::SerialCommunication *pe
   }
   else
   {
-    if (_mDebug)
+    if (this->debug())
     {
-
-    std::cout << "EPuckDrive: Initialization failed\n";
+      std::cout << "EPuckDrive: Initialization failed\n";
     }
     return 0;
   }
+}
+
+void cedar::dev::kteam::EPuckDrive::readConfiguration(const cedar::aux::ConfigurationNode& node)
+{
+  this->cedar::dev::kteam::Drive::readConfiguration(node);
+
+  if (this->getWheelDistance() <= 0)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Wheel distance (" + cedar::aux::toString(this->getWheelDistance()) + ") <= 0. EPuck initialization failed.",
+      "cedar::dev::kteam::EPuckDrive::readConfiguration"
+    );
+    return;
+  }
+
+  if (this->getWheelRadius() <= 0)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Wheel radius (" + cedar::aux::toString(this->getWheelRadius()) + ") <= 0. EPuck initialization failed.",
+      "cedar::dev::kteam::EPuckDrive::readConfiguration"
+    );
+    return;
+  }
+
+  if (this->getPulsesPerRevolution() <= 0)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Pulses Per Revolution (" + cedar::aux::toString(this->getPulsesPerRevolution()) + ") <= 0. EPuck initialization failed.",
+      "cedar::dev::kteam::EPuckDrive::readConfiguration"
+    );
+    return;
+  }
+
+
+  if (this->getMaximalNumberPulsesPerSecond() <= 0)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Maximal Number Pulses Per Second (" + cedar::aux::toString(this->getMaximalNumberPulsesPerSecond()) + ") <= 0. EPuck initialization failed.",
+      "cedar::dev::kteam::EPuckDrive::readConfiguration"
+    );
+    return;
+  }
+
+  mDistancePerPulse = 2 * cedar::aux::math::pi * this->getWheelRadius() / this->getPulsesPerRevolution();
+  mMaximalWheelSpeed = this->getMaximalNumberPulsesPerSecond() * mDistancePerPulse;
 }
 
 bool cedar::dev::kteam::EPuckDrive::isInitialized() const
@@ -161,7 +183,7 @@ int cedar::dev::kteam::EPuckDrive::getEncoder(int &leftEncoder, int &rightEncode
 {
   if (!mInitialized)
   {
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Error Getting Encoder (Drive not initialized)\n";
     }
@@ -179,7 +201,7 @@ int cedar::dev::kteam::EPuckDrive::getEncoder(int &leftEncoder, int &rightEncode
 
  if (s == 0) // communication failed
   {
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Error Getting Encoder (Communication Failed)\n";
     }
@@ -187,7 +209,7 @@ int cedar::dev::kteam::EPuckDrive::getEncoder(int &leftEncoder, int &rightEncode
   }
   else if (answer.find("q,") != 0) //unexpected answer of the robot, does not begin with 'q,'
   {
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Error Getting Encoder (Unexpected Answer: '" << answer << "')\n";
     }
@@ -199,7 +221,7 @@ int cedar::dev::kteam::EPuckDrive::getEncoder(int &leftEncoder, int &rightEncode
     answer_stream.ignore(2); //skip 'q,' at start
     if(answer_stream.fail() || answer_stream.eof())
     {
-      if (_mDebug)
+      if (this->debug())
       {
         std::cout << "EPuckDrive: Error Getting Encoder (Extracting encoder values failed)\n";
       }
@@ -208,7 +230,7 @@ int cedar::dev::kteam::EPuckDrive::getEncoder(int &leftEncoder, int &rightEncode
     answer_stream >> leftEncoder; //read in left encoder value
     if(answer_stream.fail() || answer_stream.eof())
     {
-      if (_mDebug)
+      if (this->debug())
       {
         std::cout << "EPuckDrive: Error Getting Encoder (Extracting encoder values failed)\n";
       }
@@ -217,7 +239,7 @@ int cedar::dev::kteam::EPuckDrive::getEncoder(int &leftEncoder, int &rightEncode
     answer_stream.ignore(1); //skip the colon
     if(answer_stream.fail() || answer_stream.eof())
     {
-      if (_mDebug)
+      if (this->debug())
       {
         std::cout << "EPuckDrive: Error Getting Encoder (Extracting encoder values failed)\n";
       }
@@ -226,14 +248,14 @@ int cedar::dev::kteam::EPuckDrive::getEncoder(int &leftEncoder, int &rightEncode
     answer_stream >> rightEncoder; //read in right encoder value
     if(answer_stream.fail() || !answer_stream.eof())
     {
-      if (_mDebug)
+      if (this->debug())
       {
         std::cout << "EPuckDrive: Error Getting Encoder (Extracting encoder values failed)\n";
       }
       return 0;
     }
 
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Getting Encoder Successful (Answer: '" << answer << "')\n";
     }
@@ -246,7 +268,7 @@ int cedar::dev::kteam::EPuckDrive::getAcceleration(int &xAcceleration, int &yAcc
 {
   if (!mInitialized)
   {
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Error Getting Acceleration (Drive Not Initialized)\n";
     }
@@ -263,7 +285,7 @@ int cedar::dev::kteam::EPuckDrive::getAcceleration(int &xAcceleration, int &yAcc
   mpeCommunication->unlock();
   if (s == 0) // communication failed
   {
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Error Getting Acceleration (Communication Failed)\n";
     }
@@ -271,7 +293,7 @@ int cedar::dev::kteam::EPuckDrive::getAcceleration(int &xAcceleration, int &yAcc
   }
   else if (answer.find("a,") != 0) //unexpected answer of the robot, does not begin with 'a,'
   {
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Error Getting Acceleration (Unexpected Answer: '" << answer << "')\n";
     }
@@ -283,7 +305,7 @@ int cedar::dev::kteam::EPuckDrive::getAcceleration(int &xAcceleration, int &yAcc
     answer_stream.ignore(2); //skip 'a,' at start
     if(answer_stream.fail() || answer_stream.eof())
     {
-      if (_mDebug)
+      if (this->debug())
       {
         std::cout << "EPuckDrive: Error Getting Acceleration (Extracting acceleration values failed)\n";
       }
@@ -292,7 +314,7 @@ int cedar::dev::kteam::EPuckDrive::getAcceleration(int &xAcceleration, int &yAcc
     answer_stream >> xAcceleration; //read in first acceleration value
     if(answer_stream.fail() || answer_stream.eof())
     {
-      if (_mDebug)
+      if (this->debug())
       {
         std::cout << "EPuckDrive: Error Getting Acceleration (Extracting acceleration values failed)\n";
       }
@@ -301,7 +323,7 @@ int cedar::dev::kteam::EPuckDrive::getAcceleration(int &xAcceleration, int &yAcc
     answer_stream.ignore(1); //skip the colon
     if(answer_stream.fail() || answer_stream.eof())
     {
-      if (_mDebug)
+      if (this->debug())
       {
         std::cout << "EPuckDrive: Error Getting Acceleration (Extracting acceleration values failed)\n";
       }
@@ -310,7 +332,7 @@ int cedar::dev::kteam::EPuckDrive::getAcceleration(int &xAcceleration, int &yAcc
     answer_stream >> yAcceleration; //read in second acceleration value
     if(answer_stream.fail() || answer_stream.eof())
     {
-      if (_mDebug)
+      if (this->debug())
       {
         std::cout << "EPuckDrive: Error Getting Acceleration (Extracting acceleration values failed)\n";
       }
@@ -319,7 +341,7 @@ int cedar::dev::kteam::EPuckDrive::getAcceleration(int &xAcceleration, int &yAcc
     answer_stream.ignore(1); //skip the colon
     if(answer_stream.fail() || answer_stream.eof())
     {
-      if (_mDebug)
+      if (this->debug())
       {
         std::cout << "EPuckDrive: Error Getting Acceleration (Extracting acceleration values failed)\n";
       }
@@ -328,14 +350,14 @@ int cedar::dev::kteam::EPuckDrive::getAcceleration(int &xAcceleration, int &yAcc
     answer_stream >> zAcceleration; //read in third acceleration value
     if(answer_stream.fail() || !answer_stream.eof())
     {
-      if (_mDebug)
+      if (this->debug())
       {
         std::cout << "EPuckDrive: Error Getting Acceleration (Extracting acceleration values failed)\n";
       }
       return 0;
     }
 
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Getting Acceleration Successful (Answer: '" << answer << "')\n";
     }
@@ -347,7 +369,7 @@ int cedar::dev::kteam::EPuckDrive::setWheelSpeed(double leftWheelSpeed, double r
 {
   if (!mInitialized)
   {
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Error Setting Wheel Speed (Drive not initialized)\n";
     }
@@ -360,37 +382,37 @@ int cedar::dev::kteam::EPuckDrive::setWheelSpeed(double leftWheelSpeed, double r
   rightWheelSpeed = cedar::aux::math::round (rightWheelSpeed / mDistancePerPulse);
 
   // check if the speed to set exceeds the maximum speed
-  if (leftWheelSpeed > _mMaximalNumberPulsesPerSecond)
+  if (leftWheelSpeed > this->getMaximalNumberPulsesPerSecond())
   {
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Warning Setting Wheel Speed (exceeds Maximum Wheel Speed)\n";
     }
-    leftWheelSpeed = _mMaximalNumberPulsesPerSecond;
+    leftWheelSpeed = this->getMaximalNumberPulsesPerSecond();
   }
-  if (rightWheelSpeed > _mMaximalNumberPulsesPerSecond)
+  if (rightWheelSpeed > this->getMaximalNumberPulsesPerSecond())
   {
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Warning Setting Wheel Speed (exceeds Maximum Wheel Speed)\n";
     }
-    rightWheelSpeed = _mMaximalNumberPulsesPerSecond;
+    rightWheelSpeed = this->getMaximalNumberPulsesPerSecond();
   }
-  if (leftWheelSpeed < - _mMaximalNumberPulsesPerSecond)
+  if (leftWheelSpeed < - this->getMaximalNumberPulsesPerSecond())
   {
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Warning Setting Wheel Speed (exceeds Maximum Wheel Speed)\n";
     }
-    leftWheelSpeed = - _mMaximalNumberPulsesPerSecond;
+    leftWheelSpeed = - this->getMaximalNumberPulsesPerSecond();
   }
-  if (rightWheelSpeed < - _mMaximalNumberPulsesPerSecond)
+  if (rightWheelSpeed < - this->getMaximalNumberPulsesPerSecond())
   {
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Warning Setting Wheel Speed (exceeds Maximum Wheel Speed)\n";
     }
-    rightWheelSpeed = - _mMaximalNumberPulsesPerSecond;
+    rightWheelSpeed = - this->getMaximalNumberPulsesPerSecond();
   }
 
   std::ostringstream command;
@@ -404,7 +426,7 @@ int cedar::dev::kteam::EPuckDrive::setWheelSpeed(double leftWheelSpeed, double r
   mpeCommunication->unlock();
   if (s == 0) // communication failed
   {
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Error Setting Wheel Speed (communication failed)\n";
     }
@@ -412,7 +434,7 @@ int cedar::dev::kteam::EPuckDrive::setWheelSpeed(double leftWheelSpeed, double r
   }
   else if (s != 1 || answer[0] !=  'd') //unexpected answer of the robot (not 'd')
   {
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Error Setting Wheel Speed (unexpected answer: '" << answer << "')\n";
     }
@@ -424,7 +446,7 @@ int cedar::dev::kteam::EPuckDrive::setWheelSpeed(double leftWheelSpeed, double r
     mWheelSpeed[0] = leftWheelSpeed * mDistancePerPulse;
     mWheelSpeed[1] = rightWheelSpeed * mDistancePerPulse;
     mVelocity = calculateVelocity(mWheelSpeed[0], mWheelSpeed[1]); //update forward velocity and turning rate
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Setting Wheel Speed Successful (Answer: '" << answer << "')\n";
     }
@@ -436,7 +458,7 @@ int cedar::dev::kteam::EPuckDrive::setEncoder(int leftEncoder, int rightEncoder)
 {
   if (!mInitialized)
   {
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Error Setting Encoder (Drive not initialized)\n";
     }
@@ -454,7 +476,7 @@ int cedar::dev::kteam::EPuckDrive::setEncoder(int leftEncoder, int rightEncoder)
   mpeCommunication->unlock();
   if (s == 0) // communication failed
   {
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Error Setting Encoder (communication failed)\n";
     }
@@ -462,7 +484,7 @@ int cedar::dev::kteam::EPuckDrive::setEncoder(int leftEncoder, int rightEncoder)
   }
   else if (s != 1 || answer[0] != 'p') // unexpected answer of the robot (not 'p')
   {
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Error Setting Encoder (unexpected answer: '" << answer << "')\n";
     }
@@ -470,7 +492,7 @@ int cedar::dev::kteam::EPuckDrive::setEncoder(int leftEncoder, int rightEncoder)
   }
   else
   {
-    if (_mDebug)
+    if (this->debug())
     {
       std::cout << "EPuckDrive: Setting Encoder Successful (Answer: '" << answer << "')\n";
     }

@@ -108,7 +108,7 @@ public:
   cv::Mat convolve
   (
     const cv::Mat& matrix,
-    const cedar::aux::conv::KernelList& kernel,
+    cedar::aux::conv::ConstKernelListPtr kernelList,
     cedar::aux::conv::BorderType::Id borderType,
     cedar::aux::conv::Mode::Id mode
   ) const;
@@ -191,7 +191,7 @@ private:
 
   cv::Mat createFullMatrix(
                           const cv::Mat& matrix,
-                          const cedar::aux::conv::KernelList& kernelList,
+                          cedar::aux::conv::ConstKernelListPtr kernelList,
                           cedar::aux::conv::BorderType::Id borderType
                           ) const;
 
@@ -201,18 +201,32 @@ private:
                           cedar::aux::conv::BorderType::Id borderType
                           ) const;
 
-  cv::Mat resultCutOut
-          (
-            const cv::Mat& result,
-            unsigned int matrixRows,
-            unsigned int matrixCols,
-            unsigned int kernelRows,
-            unsigned int kernelCols
-          ) const;
+  cv::Mat createFullMatrix(
+                          const cv::Mat& matrix,
+                          cedar::aux::conv::BorderType::Id borderType
+                          ) const;
 
-  cv::Mat resultCutOut(const cv::Mat& result, const cv::Mat& matrix, const cv::Mat& kernel) const;
+  cv::Mat cutOutResult(
+                      const cv::Mat& result,
+                      unsigned int matrixRows,
+                      unsigned int matrixCols,
+                      unsigned int kernelRows,
+                      unsigned int kernelCols
+                      ) const;
 
-  cv::Mat resultCutOut(const cv::Mat& result, const cv::Mat& matrix, const cedar::aux::kernel::ConstKernelPtr kernel) const;
+  cv::Mat cutOutResult(const cv::Mat& result, const cv::Mat& matrix, const cv::Mat& kernel) const;
+
+  cv::Mat cutOutResult(const cv::Mat& result, const cv::Mat& matrix, const cedar::aux::kernel::ConstKernelPtr kernel) const;
+
+  cv::Mat cutOutResult(
+                      const cv::Mat& result,
+                      unsigned int kernelRows,
+                      unsigned int kernelCols
+                      ) const;
+
+  cv::Mat cutOutResult(const cv::Mat& result, const cv::Mat& kernel) const;
+
+  cv::Mat cutOutResult(const cv::Mat& result, const cedar::aux::kernel::ConstKernelPtr kernel) const;
 
   cv::Mat cvConvolve
   (

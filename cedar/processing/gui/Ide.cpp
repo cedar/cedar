@@ -561,6 +561,7 @@ void cedar::proc::gui::Ide::stopThreads()
 
 void cedar::proc::gui::Ide::newFile()
 {
+  this->mpActionSave->setEnabled(false);
   this->resetTo(cedar::proc::gui::NetworkPtr(new cedar::proc::gui::Network(this, this->mpProcessingDrawer->getScene())));
 }
 
@@ -618,6 +619,13 @@ void cedar::proc::gui::Ide::load()
 
 void cedar::proc::gui::Ide::loadFile(QString file)
 {
+  // print message
+  cedar::aux::LogSingleton::getInstance()->message
+                                           (
+                                             "Loading file: " + file.toStdString(),
+                                             "void cedar::proc::gui::Ide::loadFile(QString)"
+                                           );
+
   // reset scene
   this->mpProcessingDrawer->getScene()->reset();
   // create new root network
@@ -628,6 +636,39 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   try
   {
     network->read(file.toStdString());
+  }
+  catch(const cedar::proc::ArchitectureLoadingException& e)
+  {
+    // Construct error dialog.
+    QString intro = "There were one or more errors while loading the specified file. Please review them below. <b>Note,"
+        " that this means that at least parts of your architecture have not been loaded correctly!</b>";
+    QDialog* p_dialog = new QDialog(this);
+    p_dialog->setWindowTitle("Errors while Loading Architecture");
+    p_dialog->setMinimumWidth(500);
+
+    QVBoxLayout *p_layout = new QVBoxLayout();
+    p_dialog->setLayout(p_layout);
+    QLabel* p_intro_label = new QLabel(intro);
+    p_intro_label->setWordWrap(true);
+    p_layout->addWidget(p_intro_label);
+
+    QListWidget* p_error_widget = new QListWidget();
+    p_layout->addWidget(p_error_widget);
+
+    for (size_t i = 0; i < e.getMessages().size(); ++i)
+    {
+      QString error = QString::fromStdString(e.getMessages()[i]);
+      p_error_widget->addItem(error);
+    }
+
+    // Create ok button
+    QDialogButtonBox* p_button_box = new QDialogButtonBox(QDialogButtonBox::Ok);
+    p_layout->addWidget(p_button_box);
+
+    QObject::connect(p_button_box, SIGNAL(accepted()), p_dialog, SLOT(accept()));
+
+    /* int r = */ p_dialog->exec();
+    delete p_dialog;
   }
   catch(const cedar::aux::ExceptionBase& e)
   {

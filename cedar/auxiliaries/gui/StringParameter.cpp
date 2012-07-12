@@ -46,6 +46,7 @@
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
+#include <QToolTip>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -95,8 +96,19 @@ void cedar::aux::gui::StringParameter::parameterPointerChanged()
 
 void cedar::aux::gui::StringParameter::textEdited(const QString& text)
 {
+  this->setStyleSheet("");
   cedar::aux::StringParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(this->getParameter());
-  parameter->setValue(text.toStdString());
+  try
+  {
+    parameter->setValue(text.toStdString());
+  }
+  catch (cedar::aux::ValidationFailedException& exc)
+  {
+    QPoint pos = this->mapToGlobal(QPoint(0, this->height()/2));
+
+    this->setStyleSheet("QLineEdit {background-color: red; }");
+    QToolTip::showText(pos, QString::fromStdString(exc.getMessage()), this);
+  }
 }
 

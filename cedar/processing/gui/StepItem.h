@@ -46,6 +46,7 @@
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/EnumType.h"
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
@@ -70,8 +71,42 @@ class cedar::proc::gui::StepItem : public QObject, public cedar::proc::gui::Grap
 public:
   //!@brief mapping from data slot names to their graphical representation
   typedef std::map<std::string, cedar::proc::gui::DataSlotItem*> DataSlotNameMap;
+
   //!@brief mapping from data role id to a map of all data slots fitting this id
   typedef std::map<cedar::proc::DataRole::Id, DataSlotNameMap> DataSlotMap;
+
+  //! Enum-class for the display mode of steps.
+  class DisplayMode
+  {
+    public:
+      typedef cedar::aux::EnumId Id;
+
+    public:
+      /*! @brief Construct method that fills the enum.
+       *  @see cedar::aux::EnumBase
+       */
+      static void construct()
+      {
+        mType.type()->def(cedar::aux::Enum(ICON_AND_TEXT, "ICON_AND_TEXT", "icon and text"));
+        mType.type()->def(cedar::aux::Enum(ICON_ONLY, "ICON_ONLY", "icon only"));
+      }
+
+      //! @returns A const reference to the base enum object.
+      static const cedar::aux::EnumBase& type()
+      {
+        return *mType.type();
+      }
+
+      //! Display icon and text
+      static const Id ICON_AND_TEXT = 0;
+
+      //! Display an icon only
+      static const Id ICON_ONLY = 1;
+
+    private:
+      //! The base enum object.
+      static cedar::aux::EnumType<cedar::proc::gui::StepItem::DisplayMode> mType;
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -163,7 +198,14 @@ private:
   void addRoleSeparator(const cedar::aux::Enum& e, QMenu* pMenu);
 
   //!@brief Fills the menu with available plots
-  void fillPlots(QMenu* pMenu, std::map<QAction*, std::pair<cedar::aux::gui::PlotDeclarationPtr, cedar::aux::Enum> >& declMap);
+  void fillPlots
+  (
+    QMenu* pMenu,
+    std::map<QAction*, std::pair<cedar::aux::gui::PlotDeclarationPtr, cedar::aux::Enum> >& declMap
+  );
+
+  //! Fills in the actions for the display style.
+  void fillDisplayStyleMenu(QMenu* pMenu);
 
   //!@brief Opens a new DockWidget to show the plot.
   void showPlot
@@ -179,6 +221,21 @@ private:
 
   //! Updates the display of the step's run time measurements.
   void timerEvent(QTimerEvent *pEvent);
+
+  //! Sets the current display mode.
+  void setDisplayMode(cedar::proc::gui::StepItem::DisplayMode::Id mode);
+
+  //! Updates the positions of the data slot items.
+  void updateDataSlotPositions();
+
+  void slotAdded(cedar::proc::DataRole::Id role, const std::string& name);
+
+  void slotRemoved(cedar::proc::DataRole::Id role, const std::string& name);
+
+  void addDataItemFor(cedar::proc::DataSlotPtr slot);
+
+private slots:
+  void displayStyleMenuTriggered(QAction* pAction);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -198,6 +255,21 @@ private:
   //!@brief Identifier of the timer used for updating the run time measurements.
   int mRunTimeMeasurementTimerId;
 
+  //! Size used for displaying the step icons.
+  static const int mIconSize;
+
+  //! The width of newly created steps.
+  static const qreal mDefaultWidth;
+
+  //! The height of newly created steps.
+  static const qreal mDefaultHeight;
+
+  //! The height of newly created steps.
+  static const qreal mBaseDataSlotSize;
+
+  boost::signals2::connection mSlotAddedConnection;
+  boost::signals2::connection mSlotRemovedConnection;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -206,12 +278,18 @@ protected:
 private:
   //!@brief the class id of the step
   cedar::proc::ElementDeclarationPtr mClassId;
+
   //!@brief the main window in which the current graphical representation is embedded
   QMainWindow* mpMainWindow;
+
   //!@brief the icon representing the contained step
   QIcon mStepIcon;
+
   //!@brief connection to state changed signal of step
   boost::signals2::connection mStateChangedConnection;
+
+  //!@brief The current display mode of the step.
+  cedar::proc::gui::StepItem::DisplayMode::Id mDisplayMode;
 
 }; // class StepItem
 

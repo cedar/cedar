@@ -37,12 +37,76 @@
 // CEDAR_INCLUDES
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/constants.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
 #include <math.h>
+
+
+std::string cedar::aux::math::matrixTypeToString(const cv::Mat& matrix)
+{
+  switch (matrix.type())
+  {
+    case CV_8U:
+      return "CV_8U";
+
+    case CV_8UC2:
+      return "CV_8UC2";
+
+    case CV_8UC3:
+      return "CV_8UC3";
+
+    case CV_8UC4:
+      return "CV_8UC4";
+
+
+    case CV_8S:
+      return "CV_8S";
+
+    case CV_8SC3:
+      return "CV_8SC3";
+
+
+    case CV_16U:
+      return "CV_16U";
+
+    case CV_16UC3:
+      return "CV_16UC3";
+
+    case CV_16S:
+      return "CV_16S";
+
+    case CV_16SC3:
+      return "CV_16SC3";
+
+
+    case CV_32S:
+      return "CV_32S";
+
+    case CV_32SC3:
+      return "CV_32SC3";
+
+    case CV_32F:
+      return "CV_32F";
+
+    case CV_32FC3:
+      return "CV_32FC3";
+
+
+    case CV_64F:
+      return "CV_64F";
+
+    case CV_64FC3:
+      return "CV_64FC3";
+
+
+    default:
+      return "Unknown type: " + cedar::aux::toString(matrix.type());
+  }
+}
 
 double cedar::aux::math::normalizeAngle(double value)
 {

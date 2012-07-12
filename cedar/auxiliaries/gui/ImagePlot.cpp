@@ -42,9 +42,11 @@
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h" // for the color map
 #include "cedar/auxiliaries/gui/PlotManager.h"
+#include "cedar/auxiliaries/annotation/ColorSpace.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/ImageData.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
@@ -60,8 +62,6 @@ namespace
     typedef cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::MatData, cedar::aux::gui::ImagePlot> DeclarationTypeM;
     boost::shared_ptr<DeclarationTypeM> declaration(new DeclarationTypeM());
     cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(declaration);
-
-    cedar::aux::gui::PlotManagerSingleton::getInstance()->setDefault<cedar::aux::ImageData, cedar::aux::gui::ImagePlot>();
 
     return true;
   }
@@ -169,14 +169,13 @@ void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
       break;
     }
 
-    case CV_32FC3:
-      this->mpImageDisplay->setText("Cannot display CV_32FC3 matrix.");
-      return;
-
     default:
-      QString text = QString("Unhandled matrix type %1.").arg(mat.type());
+    {
+      std::string matrix_type_name = cedar::aux::math::matrixTypeToString(mat);
+      QString text = "Cannot display matrix of type " + QString::fromStdString(matrix_type_name) + ".";
       this->mpImageDisplay->setText(text);
       return;
+    }
   }
 
   this->mpImageDisplay->setPixmap(QPixmap::fromImage(this->mImage));
@@ -186,6 +185,8 @@ void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
 //!@todo encapsulate lookup table functionality in own class
 cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) const
 {
+  CEDAR_DEBUG_ASSERT(in.channels() == 1);
+
   if (mLookupTableR.empty() || mLookupTableG.empty() || mLookupTableB.empty())
   {
     const size_t steps = 256;
@@ -238,13 +239,62 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
     default:
     case DATA_TYPE_IMAGE:
     {
-      cv::Mat converted;
-      std::vector<cv::Mat> merge_vec;
-      merge_vec.push_back(in);
-      merge_vec.push_back(in);
-      merge_vec.push_back(in);
-      cv::merge(merge_vec, converted);
-      return converted;
+      cedar::aux::annotation::ColorSpace::ChannelType type = cedar::aux::annotation::ColorSpace::Gray;
+
+      if (this->mDataColorSpace)
+      {
+        type = this->mDataColorSpace->getChannelType(0);
+      }
+
+      if (type == cedar::aux::annotation::ColorSpace::Hue)
+      {
+        cv::Mat ones = 0.0 * in + 255.0;
+        std::vector<cv::Mat> merge_vec;
+        merge_vec.push_back(in);
+        merge_vec.push_back(ones);
+        merge_vec.push_back(ones);
+        cv::Mat merged, converted;
+        cv::merge(merge_vec, merged);
+        cv::cvtColor(merged, converted, CV_HSV2BGR);
+        return converted;
+      }
+      else
+      {
+        std::vector<cv::Mat> merge_vec;
+        cv::Mat zeros = 0.0 * in;
+
+        switch (type)
+        {
+          case cedar::aux::annotation::ColorSpace::Red:
+            merge_vec.push_back(zeros);
+            merge_vec.push_back(zeros);
+            merge_vec.push_back(in);
+            break;
+
+          case cedar::aux::annotation::ColorSpace::Green:
+            merge_vec.push_back(zeros);
+            merge_vec.push_back(in);
+            merge_vec.push_back(zeros);
+            break;
+
+          case cedar::aux::annotation::ColorSpace::Blue:
+            merge_vec.push_back(in);
+            merge_vec.push_back(zeros);
+            merge_vec.push_back(zeros);
+            break;
+
+          default:
+          case cedar::aux::annotation::ColorSpace::Gray:
+            merge_vec.push_back(in);
+            merge_vec.push_back(in);
+            merge_vec.push_back(in);
+            break;
+        }
+
+        cv::Mat converted;
+        cv::merge(merge_vec, converted);
+        return converted;
+      }
     }
 
     case DATA_TYPE_MAT:
@@ -314,9 +364,15 @@ void cedar::aux::gui::ImagePlot::plot(cedar::aux::DataPtr data, const std::strin
                 "Cannot cast to cedar::aux::MatData in cedar::aux::gui::ImagePlot::plot.");
   }
 
-  if (boost::dynamic_pointer_cast<cedar::aux::ImageData>(data))
+  this->mDataColorSpace.reset();
+  try
   {
+    this->mDataColorSpace = this->mData->getAnnotation<cedar::aux::annotation::ColorSpace>();
     mDataType = DATA_TYPE_IMAGE;
+  }
+  catch (cedar::aux::AnnotationNotFoundException&)
+  {
+    // ok, not an image
   }
 
   mpImageDisplay->setText("no image loaded");

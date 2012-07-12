@@ -52,6 +52,7 @@ cedar::aux::gui::Parameter::Parameter(QWidget *pParent)
 :
 QWidget(pParent)
 {
+  QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterChanged()));
 }
 
 //!@brief Destructor
@@ -65,10 +66,21 @@ cedar::aux::gui::Parameter::~Parameter()
 void cedar::aux::gui::Parameter::setParameter(cedar::aux::ParameterPtr pParameter)
 {
   this->mParameter = pParameter;
+
+  QObject::connect(pParameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertiesChanged()));
+
   emit parameterPointerChanged();
 }
 
 cedar::aux::ParameterPtr cedar::aux::gui::Parameter::getParameter()
 {
   return this->mParameter;
+}
+
+void cedar::aux::gui::Parameter::parameterChanged()
+{
+}
+
+void cedar::aux::gui::Parameter::propertiesChanged()
+{
 }

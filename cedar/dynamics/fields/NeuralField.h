@@ -96,7 +96,11 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief determine if a given Data is a valid input to the field
-  cedar::proc::DataSlot::VALIDITY determineInputValidity(cedar::proc::ConstDataSlotPtr, cedar::aux::DataPtr) const;
+  cedar::proc::DataSlot::VALIDITY determineInputValidity
+                                  (
+                                    cedar::proc::ConstDataSlotPtr,
+                                    cedar::aux::ConstDataPtr
+                                  ) const;
   void onStart();
   void onStop();
 
@@ -184,6 +188,9 @@ private:
    */
   void updateInputSum();
 
+private slots:
+  void activationAsOutputChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -231,6 +238,9 @@ protected:
 
   //!@brief the field sizes in each dimension
   cedar::aux::UIntVectorParameterPtr _mSizes;
+
+  //!@brief Parameter that lets the user decide whether the activation is an output.
+  cedar::aux::BoolParameterPtr _mOutputActivation;
 
   //!@brief input noise gain
   cedar::aux::DoubleParameterPtr _mInputNoiseGain;

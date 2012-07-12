@@ -57,21 +57,31 @@ namespace
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+// template specialization for QSpinBox
+//----------------------------------------------------------------------------------------------------------------------
+namespace cedar
+{
+  namespace aux
+  {
+    namespace gui
+    {
+      template<>
+      void NumericWidgetPolicy<int, QSpinBox>::setPrecision(QSpinBox*, int)
+      {
+        // integal precision is ignored
+      }
+    }
+  }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::aux::gui::IntParameter::IntParameter(QWidget *pParent)
 :
-cedar::aux::gui::Parameter(pParent)
+cedar::aux::gui::IntParameter::Base(pParent)
 {
-  this->setLayout(new QHBoxLayout());
-  this->mpSpinbox = new QSpinBox();
-  this->layout()->setContentsMargins(0, 0, 0, 0);
-  this->layout()->addWidget(this->mpSpinbox);
-  this->mpSpinbox->setMinimum(0.0);
-  this->mpSpinbox->setMaximum(100.0);
-
-  QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
 }
 
 //!@brief Destructor
@@ -83,28 +93,14 @@ cedar::aux::gui::IntParameter::~IntParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gui::IntParameter::parameterPointerChanged()
+void cedar::aux::gui::IntParameter::parameterChanged()
 {
-  cedar::aux::IntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::IntParameter>(this->getParameter());
-
-  this->propertiesChanged();
-
-  this->mpSpinbox->setValue(parameter->getValue());
-  QObject::connect(this->mpSpinbox, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
-
-  QObject::connect(parameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertiesChanged()));
+  this->Base::parameterChanged();
+  QObject::connect(this->mpWidget, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
 }
 
-void cedar::aux::gui::IntParameter::propertiesChanged()
-{
-  cedar::aux::IntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::IntParameter>(this->getParameter());
-  this->mpSpinbox->setMinimum(parameter->getMinimum());
-  this->mpSpinbox->setMaximum(parameter->getMaximum());
-  this->mpSpinbox->setDisabled(parameter->isConstant());
-}
 
-void cedar::aux::gui::IntParameter::valueChanged(int value)
+void cedar::aux::gui::IntParameter::valueChanged(int)
 {
-  cedar::aux::IntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::IntParameter>(this->getParameter());
-  parameter->setValue(value);
+  this->widgetValueChanged();
 }

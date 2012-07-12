@@ -65,7 +65,6 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(ElementDeclaration);
     CEDAR_DECLARE_PROC_CLASS(ExternalData);
     CEDAR_DECLARE_PROC_CLASS(LoopArguments);
-    CEDAR_DECLARE_PROC_CLASS(LoopMode);
     CEDAR_DECLARE_PROC_CLASS(FrameworkSettings);
     CEDAR_DECLARE_PROC_CLASS(LoopedTrigger);
     CEDAR_DECLARE_PROC_CLASS(MultiTrigger);
@@ -97,6 +96,7 @@ namespace cedar
 
     /* Exceptions */
     //!@cond SKIPPED_DOCUMENTATION
+    class CEDAR_PROC_LIB_EXPORT ArchitectureLoadingException;
     class CEDAR_PROC_LIB_EXPORT ConnectionMemberDeletedException;
     class CEDAR_PROC_LIB_EXPORT ConnectionNotFoundException;
     class CEDAR_PROC_LIB_EXPORT DeadlockException;

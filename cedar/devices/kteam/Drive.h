@@ -40,6 +40,8 @@
 // CEDAR INCLUDES
 #include "cedar/devices/robot/DifferentialDrive.h"
 #include "cedar/devices/kteam/namespace.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/IntParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -54,6 +56,7 @@ class cedar::dev::kteam::Drive : public cedar::dev::robot::DifferentialDrive
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  Drive();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -134,19 +137,19 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Number of pulses per revolution of wheel.
-  double _mPulsesPerRevolution;
-
-  //!@brief The maximal encoder value.
-  int _mMaximalEncoderValue;
-
-  //!@brief The minimal encoder value.
-  int _mMinimalEncoderValue;
-
-  //!@brief The maximal possible number of pulses per second.
-  int _mMaximalNumberPulsesPerSecond;
+  // none yet
 
 private:
-  // none yet
+  //!@brief Number of pulses per revolution of wheel.
+  cedar::aux::DoubleParameterPtr _mPulsesPerRevolution;
+
+  //!@brief The maximal encoder value.
+  cedar::aux::IntParameterPtr _mMaximalEncoderValue;
+
+  //!@brief The minimal encoder value.
+  cedar::aux::IntParameterPtr _mMinimalEncoderValue;
+
+  //!@brief The maximal possible number of pulses per second.
+  cedar::aux::IntParameterPtr _mMaximalNumberPulsesPerSecond;
 }; // class cedar::dev::kteam::KTeamDrive
 #endif // CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H

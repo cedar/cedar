@@ -41,6 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/assert.h"
@@ -278,21 +279,26 @@ void cedar::aux::Configurable::writeJson(const std::string& filename) const
   boost::property_tree::write_json(filename, configuration);
 }
 
-void cedar::aux::Configurable::registerParameter(cedar::aux::ParameterPtr parameter)
+void cedar::aux::Configurable::registerParameter(cedar::aux::Parameter* parameter)
 {
   //!@todo Make a global function for checking names. This function might then also be used for step/data/... names.
   const std::string& name = parameter->getName();
   if (name.find(".") != std::string::npos)
   {
-    CEDAR_THROW(cedar::aux::InvalidNameException, "Parameter names cannot contain any dots ('.').");
+    CEDAR_THROW(cedar::aux::InvalidNameException, "\"" + name + "\" is an invalid name because it contains a '.'.");
   }
 
   if (this->mParameterAssociations.find(name) != this->mParameterAssociations.end())
   {
-    CEDAR_THROW(cedar::aux::DuplicateNameException, "Duplicate parameter name: \"" + name + "\"");
+    CEDAR_THROW
+    (
+      cedar::aux::DuplicateNameException,
+      "\"" + name + "\" is an invalid name because there is already a parameter of that name. "
+      "The parameter was dropped."
+    );
   }
 
-  this->mParameterList.push_back(parameter);
+  this->mParameterList.push_back(cedar::aux::ParameterPtr(parameter));
   ParameterList::iterator last_iter = this->mParameterList.end();
   --last_iter;
   this->mParameterAssociations[name] = last_iter;

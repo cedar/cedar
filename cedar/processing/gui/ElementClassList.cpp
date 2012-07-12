@@ -43,6 +43,8 @@
 #include "cedar/processing/ElementDeclaration.h"
 
 // SYSTEM INCLUDES
+#include <QApplication>
+#include <QResource>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -88,7 +90,15 @@ void cedar::proc::gui::ElementClassList::showList(const cedar::proc::Declaration
     QIcon icon;
     if (!class_id->getIconPath().empty())
     {
-      icon = QIcon(class_id->getIconPath().c_str());
+      QResource ex_test(QString::fromStdString(class_id->getIconPath()));
+      if (ex_test.isValid())
+      {
+        icon = QIcon(class_id->getIconPath().c_str());
+      }
+      else
+      {
+        icon = QIcon(":/steps/broken_icon.svg");
+      }
     }
     else
     {
@@ -98,12 +108,26 @@ void cedar::proc::gui::ElementClassList::showList(const cedar::proc::Declaration
 
     QString class_description;
     class_description += "<nobr>class <big><b>" + QString::fromStdString(class_id->getClassName()) + "</b></big></nobr>";
+
+    if (class_id->isDeprecated())
+    {
+      class_description += "<br /><div align=\"right\"><b>DEPRECATED</b></div>";
+      p_item->setBackground(QApplication::palette().brush(QPalette::Dark));
+    }
+
     class_description += "<hr />";
     class_description += "<div align=\"right\"><nobr><small><i>" + QString::fromStdString(class_id->getClassId()) + "</i></small></nobr></div>";
     if (!class_id->getDescription().empty())
     {
-      QString description = "<p>" + QString::fromStdString(class_id->getDescription()) + "</p>";
+      QString description = "<p>" + QString::fromStdString(class_id->getDescription()).replace("\n", "<br />") + "</p>";
       class_description += description;
+    }
+
+
+    if (class_id->isDeprecated() && !class_id->getDeprecationDescription().empty())
+    {
+      class_description += "<br /><b>This class is deprecated:</b> ";
+      class_description += QString::fromStdString(class_id->getDeprecationDescription());
     }
 
     p_item->setToolTip(class_description);

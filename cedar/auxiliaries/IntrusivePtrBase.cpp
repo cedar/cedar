@@ -68,7 +68,7 @@ void intrusive_ptr_add_ref(cedar::aux::IntrusivePtrBase const *pObject)
 
 void intrusive_ptr_release(cedar::aux::IntrusivePtrBase const *pObject)
 {
-  CEDAR_DEBUG_ASSERT(pObject->mReferenceCount >= 0);
+  CEDAR_DEBUG_ASSERT(pObject->mReferenceCount > 0);
 
   --(pObject->mReferenceCount);
 

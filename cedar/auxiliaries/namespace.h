@@ -57,7 +57,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(NamedConfigurable);
     CEDAR_DECLARE_AUX_CLASS(Lockable);
     CEDAR_DECLARE_AUX_CLASS(LoopedThread);
-    CEDAR_DECLARE_AUX_CLASS(ConfigurationInterface);
+    CEDAR_DECLARE_AUX_CLASS(LoopMode);
     CEDAR_DECLARE_AUX_CLASS(UserData);
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(IntrusivePtrBase);
     //!@endcond
@@ -65,6 +65,10 @@ namespace cedar
     template <class T> class Singleton;
 
     template <typename T> class MovingAverage;
+
+    template <class ReturnedT> class CloneableBase;
+
+    template <class ClonedT, class ReturnedT> class Cloneable;
 
     //!@todo This class may be obsolete once the ConfigurationInterface is removed.
     template <typename T> class IntervalData;
@@ -200,6 +204,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(ImageData);
     CEDAR_DECLARE_AUX_CLASS(StereoImageData);
     /* exceptions */
+    CEDAR_DECLARE_AUX_CLASS(AnnotationNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(BadConnectionException);
     CEDAR_DECLARE_AUX_CLASS(ConversionFailedException);
     CEDAR_DECLARE_AUX_CLASS(DeadReferenceException);
@@ -224,6 +229,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(UnknownNameException);
     CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
     CEDAR_DECLARE_AUX_CLASS(UnmanglingFailedException);
+    CEDAR_DECLARE_AUX_CLASS(ValidationFailedException);
     //!@endcond
     
     // Log related classes --------------------------------------------------------------------------------------------

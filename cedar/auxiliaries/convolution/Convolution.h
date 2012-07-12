@@ -155,7 +155,7 @@ public:
   inline cv::Mat convolve
   (
     const cv::Mat& matrix,
-    const cedar::aux::conv::KernelList& kernelList
+    cedar::aux::conv::ConstKernelListPtr kernelList
   ) const
   {
     return this->getEngine()->convolve(matrix, kernelList, this->getBorderType(), this->getMode());
@@ -203,7 +203,7 @@ public:
   inline cv::Mat operator()
   (
     const cv::Mat& matrix,
-    const cedar::aux::conv::KernelList& kernelList
+    cedar::aux::conv::ConstKernelListPtr kernelList
   ) const
   {
     return this->convolve(matrix, kernelList);
@@ -221,10 +221,22 @@ public:
     return this->_mBorderType->getValue();
   }
 
+  //! Sets the type of border handling.
+  inline void setBorderType(cedar::aux::conv::BorderType::Id borderType)
+  {
+    this->_mBorderType->setValue(borderType);
+  }
+
   //!@brief Returns the mode of the convolution.
   inline cedar::aux::conv::Mode::Id getMode() const
   {
     return this->_mMode->getValue();
+  }
+
+  //!@brief Sets the mode of the convolution.
+  inline void setMode(cedar::aux::conv::Mode::Id mode)
+  {
+    this->_mMode->setValue(mode);
   }
 
   //!@brief Returns a pointer to the combined kernel.

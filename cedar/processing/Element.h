@@ -39,7 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
-#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/namespace.h"
 
@@ -54,7 +54,7 @@
  */
 class cedar::proc::Element
 :
-virtual public cedar::aux::Configurable,
+virtual public cedar::aux::NamedConfigurable,
 public boost::enable_shared_from_this<cedar::proc::Element>
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -71,12 +71,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Set the name of this element.
-  virtual void setName(const std::string& name);
-
-  //!@brief Get the name of this element.
-  const std::string& getName() const;
-
   //!@brief sets the network at which this element is registered
   void setNetwork(cedar::proc::NetworkPtr network);
 
@@ -99,7 +93,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void validateName(const std::string& newName) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -115,8 +109,6 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief The name that uniquely identifies the element within its own module.
-  cedar::aux::StringParameterPtr _mName;
 
 private:
   // none yet

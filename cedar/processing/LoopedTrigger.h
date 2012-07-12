@@ -61,14 +61,13 @@ class cedar::proc::LoopedTrigger : public cedar::aux::LoopedThread,
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  LoopedTrigger(double stepSize = 1.0);
+  LoopedTrigger(double stepSize = 1.0, const std::string& name = "");
 
   //!@brief Destructor
   virtual ~LoopedTrigger();
@@ -89,20 +88,6 @@ public:
   /*!@brief Stops the trigger loop.
    */
   void stopTrigger();
-
-
-public slots:
-  /*!@brief Slot that reacts to a change in the loop mode parameter.
-   */
-  void loopModeChanged();
-
-  /*!@brief Slot that reacts to a change in the loop time parameter.
-   */
-  void loopTimeChanged();
-
-  /*!@brief Slot that reacts to a change in the idle time parameter.
-   */
-  void idleTimeChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -138,15 +123,6 @@ protected:
   // none yet
 
 private:
-  //!@brief The loop mode.
-  cedar::aux::EnumParameterPtr mLoopType;
-
-  //!@brief The loop time.
-  cedar::aux::DoubleParameterPtr mLoopTime;
-
-  //!@brief The idle time.
-  cedar::aux::DoubleParameterPtr mIdleTime;
-
   //!@brief Whether the looped trigger waits for all its listeners to finish their processing.
   cedar::aux::BoolParameterPtr mWait;
 

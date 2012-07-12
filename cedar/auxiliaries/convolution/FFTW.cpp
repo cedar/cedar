@@ -99,12 +99,12 @@ cv::Mat cedar::aux::conv::FFTW::convolve
 cv::Mat cedar::aux::conv::FFTW::convolve
 (
   const cv::Mat& matrix,
-  const cedar::aux::conv::KernelList& kernel,
+  cedar::aux::conv::ConstKernelListPtr kernelList,
   cedar::aux::conv::BorderType::Id borderType,
   cedar::aux::conv::Mode::Id /* mode */
 ) const
 {
-  return this->convolveInternal(matrix, kernel.getCombinedKernel(), borderType);
+  return this->convolveInternal(matrix, kernelList->getCombinedKernel(), borderType);
 }
 
 cv::Mat cedar::aux::conv::FFTW::convolveInternal

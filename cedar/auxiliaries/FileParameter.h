@@ -64,83 +64,54 @@ public:
     WRITE
   };
 
+  /*!@brief Sets the mode of the path, i.e., is the path treated as a relative or an absolute path?
+   */
+  enum PathMode
+  {
+    //! Paths are specified absolutely.
+    PATH_MODE_ABSOLUTE,
+
+    //! Paths are specified relative to the application's current working directory.
+    PATH_MODE_RELATIVE_TO_WORKING_DIR
+  };
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  FileParameter(cedar::aux::Configurable *pOwner, const std::string& name, Mode mode)
-  :
-  cedar::aux::Parameter(pOwner, name, false),
-  mMode(mode)
-  {
-  }
+  FileParameter(cedar::aux::Configurable *pOwner, const std::string& name, Mode mode);
 
   //!@brief A variant of the standard constructor, adding a default value
-  FileParameter(cedar::aux::Configurable *pOwner, const std::string& name, Mode mode, const std::string& defaultValue)
-  :
-  cedar::aux::Parameter(pOwner, name, true),
-  mValue(QString::fromStdString(defaultValue)),
-  mDefault(QString::fromStdString(defaultValue)),
-  mMode(mode)
-  {
-  }
-
-  //!@brief Destructor
-  ~FileParameter()
-  {
-  }
+  FileParameter(cedar::aux::Configurable *pOwner, const std::string& name, Mode mode, const std::string& defaultValue);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief reads a directory from a configuration node
-  void readFromNode(const cedar::aux::ConfigurationNode& node)
-  {
-    this->mValue.setPath(QString::fromStdString(node.get_value<std::string>()));
-  }
+  void readFromNode(const cedar::aux::ConfigurationNode& node);
 
   //!@brief stores a directory as string in a configuration node
-  void writeToNode(cedar::aux::ConfigurationNode& root) const
-  {
-    root.put(this->getName(), this->mValue.absolutePath().toStdString());
-  }
+  void writeToNode(cedar::aux::ConfigurationNode& root) const;
 
   //!@brief sets a new directory from string
-  void setValue(const std::string& value)
-  {
-    this->mValue.setPath(QString::fromStdString(value));
-    this->emitChangedSignal();
-  }
+  void setValue(const std::string& value);
 
   //!@brief sets a new directory from QDir
-  void setValue(const QDir& value)
-  {
-    this->mValue = value;
-    this->emitChangedSignal();
-  }
+  void setValue(const QDir& value);
 
   //!@brief sets directory to default value
-  void makeDefault()
-  {
-    this->setValue(this->mDefault);
-  }
+  void makeDefault();
 
   //!@brief get the directory
-  const QDir& getValue() const
-  {
-    return this->mValue;
-  }
+  const QDir& getValue() const;
 
   /*!@brief Returns the path stored in the parameter.
    *
    * @remarks This is an alias for calling getValue().path().toStdString(). See the documentation for QDir for details.
    */
-  std::string getPath()
-  {
-    return this->mValue.path().toStdString();
-  }
+  std::string getPath() const;
 
   CEDAR_DECLARE_DEPRECATED(void set(const std::string& value))
   {
@@ -157,10 +128,13 @@ public:
     return this->getValue();
   }
 
-  Mode getMode() const
-  {
-    return this->mMode;
-  }
+  /*!@brief Returns the mode of the file parameter.
+   */
+  cedar::aux::FileParameter::Mode getMode() const;
+
+  /*!@brief Sets the path mode.
+   */
+  void setPathMode(cedar::aux::FileParameter::PathMode mode);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -188,6 +162,10 @@ private:
 
   //!@brief Mode of the file
   Mode mMode;
+
+  //!@brief The path mode.
+  PathMode mPathMode;
+
 }; // class cedar::aux::DirectoryParameter
 
 #endif // CEDAR_AUX_FILE_PARAMETER_H

@@ -99,7 +99,7 @@ public cedar::dev::sensors::visual::Grabber
     CameraStateAndConfigPtr mCamStateAndConfig;
 
     /// Filename for the capabilities
-    std::string mCamCapabilitiesFileName;
+    std::string mCamCapabilitiesFileName; //delete
   };
 
   CEDAR_GENERATE_POINTER_TYPES(CameraChannel);

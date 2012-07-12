@@ -59,29 +59,31 @@
 //----------------------------------------------------------------------------------------------------------------------
 // register the trigger class
 //----------------------------------------------------------------------------------------------------------------------
-namespace
-{
-  bool declare()
-  {
-    using cedar::proc::ElementDeclarationPtr;
-    using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr trigger_declaration
-    (
-      new ElementDeclarationTemplate<cedar::proc::Trigger>
-      (
-        "Triggers",
-        "cedar.processing.Trigger"
-      )
-    );
-    trigger_declaration->setIconPath(":/triggers/trigger.svg");
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(trigger_declaration);
-
-    return true;
-  }
-
-  bool declared = declare();
-}
+// for now, we don't need to use the trigger as it is not useful (and just leads to confusion)
+//namespace
+//{
+//  bool declare()
+//  {
+//    using cedar::proc::ElementDeclarationPtr;
+//    using cedar::proc::ElementDeclarationTemplate;
+//
+//    ElementDeclarationPtr trigger_declaration
+//    (
+//      new ElementDeclarationTemplate<cedar::proc::Trigger>
+//      (
+//        "Triggers",
+//        "cedar.processing.Trigger"
+//      )
+//    );
+//    trigger_declaration->setIconPath(":/triggers/trigger.svg");
+//    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(trigger_declaration);
+//
+//    return true;
+//  }
+//
+//  bool declared = declare();
+//}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

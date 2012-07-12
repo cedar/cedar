@@ -41,7 +41,6 @@
 #include "cedar/devices/lib.h"
 #include "cedar/devices/robot/gui/namespace.h"
 #include "cedar/devices/robot/KinematicChain.h"
-#include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
 #include <QtCore/QTimer>
