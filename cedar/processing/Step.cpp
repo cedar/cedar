@@ -261,6 +261,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::TriggerPtr)
 
     this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING,
                    "Unconnected mandatory inputs prevent the step from running. These inputs are:" + errors);
+    return;
   } // this->mMandatoryConnectionsAreSet
 
   //!@todo Busy should be a lock object

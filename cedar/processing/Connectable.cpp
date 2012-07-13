@@ -357,7 +357,7 @@ void cedar::proc::Connectable::checkMandatoryConnections()
         iter != slot->second.end();
          ++iter)
     {
-      if (iter->second->isMandatory() && iter->second->getData().get() == NULL)
+      if (iter->second->isMandatory() && !iter->second->getData())
       {
         this->mMandatoryConnectionsAreSet = false;
         mMissingMandatoryConnections.push_back(

@@ -261,7 +261,7 @@ void cedar::proc::steps::CoordinateTransformation::transformDirectionChanged()
 // The arguments are unused here
 void cedar::proc::steps::CoordinateTransformation::compute(const cedar::proc::Arguments&)
 {
-  cv::Mat input = mInput->getData();
+  const cv::Mat& input = mInput->getData();
   unsigned int input_rows = input.rows;
   unsigned int input_cols = input.cols;
   if (mInputRows != input_rows || mInputCols != input_cols)
@@ -271,11 +271,11 @@ void cedar::proc::steps::CoordinateTransformation::compute(const cedar::proc::Ar
     createMap();
   }
 
-  cv::Mat output = mOutput->getData();
+  cv::Mat& output = mOutput->getData();
 
   cv::remap
   (
-    mInput->getData(),
+    input,
     output,
     this->mMapXConverted->getData(),
     this->mMapYConverted->getData(),
@@ -283,8 +283,6 @@ void cedar::proc::steps::CoordinateTransformation::compute(const cedar::proc::Ar
     cv::BORDER_TRANSPARENT,
     0
   );
-
-  this->mOutput->setData(output);
 }
 
 void cedar::proc::steps::CoordinateTransformation::recompute()
