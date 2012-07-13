@@ -194,8 +194,6 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
   cv::Mat slice;
   //sliceSize is used to set the size to 2d of the yet 3d slice after extracting it from the 3d data
   cv::Mat mSliceSize=cv::Mat(mat.size[0],mat.size[1],mat.type());
-  unsigned int max_rows = static_cast<unsigned int>(mat.size[0]);
-  unsigned int max_columns = static_cast<unsigned int>(mat.size[1]);
   unsigned int column=0;
   unsigned int row=0;
   for (unsigned int tile = 0; tile < tiles; tile++,column++)

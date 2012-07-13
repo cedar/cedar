@@ -314,5 +314,5 @@ void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::GraphicsBase *pT
    *       the "real" connections are already read via cedar::proc::Network, and then added to the ui afterwards using
    *       this function.
    */
-  this->scene()->addItem(new Connection(this, pTarget));
+  new Connection(this, pTarget);
 }
