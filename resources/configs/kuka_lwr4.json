@@ -1,11 +1,11 @@
 {
   "name": "KUKA lwr4",
-  "server port" = 0;
-  "remote host" = "NULL";
-  "step size" = "0.0";
-  "idle time" = "0.000";
-  "use fixed step size" = "false";
-  "simulated time" = "0.0";
+  "server port": "0",
+  "remote host": "NULL",
+  "step size": "0.0",
+  "idle time": "0.000",
+  "use fixed step size": "false",
+  "simulated time": "0.0",
   "root coordinate frame":
   {
     "initial translation":
