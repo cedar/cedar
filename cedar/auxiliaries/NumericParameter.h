@@ -146,6 +146,9 @@ public:
     this->mLimits.setLower(value);
 
     this->emitPropertyChangedSignal();
+
+    // updates the value if the limits restrict it
+    this->setValue(this->getValue());
   }
 
   //!@brief get the maximum value of this parameter
@@ -160,6 +163,9 @@ public:
     this->mLimits.setUpper(value);
 
     this->emitPropertyChangedSignal();
+
+    // updates the value if the limits restrict it
+    this->setValue(this->getValue());
   }
 
   /*!@brief set the value of type T of this parameter
