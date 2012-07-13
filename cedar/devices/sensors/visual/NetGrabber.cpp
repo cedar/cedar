@@ -151,11 +151,14 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
                                              "cedar::dev::sensors::visual::NetGrabber::onInit()"
                                            );
 
+  unsigned int num_cams = getNumCams();
   std::stringstream info;
-  info << "Initialize NetGrabber with " << mNumCams << " channels ..." << std::endl;
-  for (unsigned int i = 0; i < mNumCams; ++i)
+  info << "Initialize NetGrabber with " << num_cams << " channels ..." << std::endl;
+
+  for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
-    info << "Channel " << i << ": capture from YARP-hannel: "<<getNetChannel(i)->_mpYarpChannelName->getValue()<< "\n";
+    info << "Channel " << channel << ": capture from YARP-hannel: "
+         << getNetChannel(channel)->_mpYarpChannelName->getValue()<< "\n";
   }
 
   cedar::aux::LogSingleton::getInstance()->systemInfo
@@ -171,7 +174,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
   MatNetReaderPtr yarp_reader;
 
   //loop until connection established or an error occurs
-  for (unsigned int channel = 0; channel < mNumCams; ++channel)
+  for (unsigned int channel = 0; channel < num_cams; ++channel)
   {
     const std::string channel_name = getNetChannel(channel)->_mpYarpChannelName->getValue();
 
@@ -373,7 +376,8 @@ bool cedar::dev::sensors::visual::NetGrabber::onGrab()
   //unsigned int numCams = getNumCams();
   int result = true;
 
-  for (unsigned int channel = 0; channel < mNumCams; ++channel)
+  unsigned int num_cams = getNumCams();
+  for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
     //nonblocking version of netreader
 

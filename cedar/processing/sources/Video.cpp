@@ -85,7 +85,7 @@ _mFileName(new cedar::aux::FileParameter(this, "videofile",cedar::aux::FileParam
 _mLoop(new cedar::aux::BoolParameter(this, "loop", true))
 {
   //default config-filename
-  GrabberBase::_mConfigurationFileName->setValue("./videograbber.cfg");
+  //GrabberBase::_mConfigurationFileName->setValue("./videograbber.cfg");
 
   //default-filenames
   _mFileName->setValue("./video.avi");
@@ -118,7 +118,7 @@ void cedar::proc::sources::Video::onStart()
   else if (!mGrabber)
   {
     // std::cout << "\n\n[cedar::proc::sources::Video::onStart()] try to create a new grabber" << std::endl;
-    this->createGrabber();
+    //this->createGrabber();
   }
 
   // if grabber already grabbing, do nothing
@@ -179,7 +179,7 @@ void cedar::proc::sources::Video::setFileName()
   // because there is no possibility to change the filename
   if (mGrabber)
   {
-    this->createGrabber();
+    //this->createGrabber();
     message = this->mGrabber->getName() + ": " + message;
   }
   cedar::aux::LogSingleton::getInstance()->message(message,"cedar::proc::sources::Video::setFileName()");

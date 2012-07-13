@@ -197,13 +197,14 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
+
+  //! @brief The filename of the picture you want to grab from
+  //cedar::aux::FileParameterPtr _mSourceFileName;
 
 }; // class cedar::dev::sensors::visual::TestGrabber
 

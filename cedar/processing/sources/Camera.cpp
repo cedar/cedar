@@ -83,7 +83,7 @@ mDeBayer(new cedar::aux::BoolParameter(this, "deBayer", false)),
 mBusId(new cedar::aux::UIntParameter(this, "busId", 0, 0, 999))
 {
   //default config-filename
-  GrabberBase::_mConfigurationFileName->setValue("./cameragrabber.cfg");
+  //GrabberBase::_mConfigurationFileName->setValue("./cameragrabber.cfg");
 
   //default file values
   mGrabber.reset();
@@ -103,7 +103,7 @@ void cedar::proc::sources::Camera::onStart()
 {
   if (!mGrabber)
   {
-    GrabberBase::createGrabber();
+    //GrabberBase::createGrabber();
   }
 }
 
@@ -120,7 +120,7 @@ void cedar::proc::sources::Camera::setBusId()
   //recreate grabber if needed
   if (mGrabber)
   {
-    GrabberBase::createGrabber();
+   // GrabberBase::createGrabber();
   }
 }
 
@@ -162,7 +162,7 @@ void cedar::proc::sources::Camera::compute(const cedar::proc::Arguments&)
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Camera::onCreateGrabber()
 {
-  const std::string conf_file = this->_mConfigurationFileName->getPath();
+  //const std::string conf_file = this->_mConfigurationFileName->getPath();
   const unsigned int bus_id = this->mBusId->getValue();
 
   // create a new one
