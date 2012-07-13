@@ -105,6 +105,8 @@ namespace cedar
 #ifdef CEDAR_USE_LIB_DC1394
         CEDAR_DECLARE_DEV_CLASS(CameraDeviceDc1394);
 #endif
+        //enum classes
+        CEDAR_DECLARE_DEV_CLASS(RecordingFormat);
 
         //enum classes for camera
         CEDAR_DECLARE_DEV_CLASS(CameraFrameRate);

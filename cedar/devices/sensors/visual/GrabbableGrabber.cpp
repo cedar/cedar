@@ -124,12 +124,14 @@ cedar::dev::sensors::visual::GrabbableGrabber::~GrabbableGrabber()
 //----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::GrabbableGrabber::onInit()
 {
+  unsigned int num_cams = getNumCams();
   std::stringstream init_message;
-  init_message << ": Initialize test grabber with " << mNumCams << " channels ..." << std::endl;
-  for (unsigned int i = 0; i < mNumCams; ++i)
+  init_message << ": Initialize test grabber with " << num_cams << " channels ..." << std::endl;
+
+  for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
-    init_message << "Channel " << i << ": capture from Source: "
-                 << typeid(getGrabbableChannel(i)->mpSourceInterfaceClass).name() << std::endl;
+    init_message << "Channel " << channel << ": capture from Source: "
+                 << typeid(getGrabbableChannel(channel)->mpSourceInterfaceClass).name() << std::endl;
   }
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
@@ -138,7 +140,7 @@ bool cedar::dev::sensors::visual::GrabbableGrabber::onInit()
                                            );
 
   //load pictures one by one
-  for(unsigned int channel=0; channel<mNumCams;++channel)
+  for(unsigned int channel=0; channel < num_cams;++channel)
   {
     getGrabbableChannel(channel)->mpGrabberLock = getGrabbableChannel(channel)->mpSourceInterfaceClass->registerGrabber();
 
@@ -161,8 +163,8 @@ void cedar::dev::sensors::visual::GrabbableGrabber::onCleanUp()
 {
   //do the cleanup of used hardware in this method
   //on an exception or a CTRL-C only onCleanUp will be invoked (no destructor)
-
-  for(unsigned int channel=0; channel<mNumCams;++channel)
+  unsigned int num_cams = getNumCams();
+  for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
     getGrabbableChannel(channel)->mpSourceInterfaceClass->deregisterGrabber(getGrabbableChannel(channel)->mpGrabberLock);
     //remove the references to the external classes
@@ -194,7 +196,8 @@ void cedar::dev::sensors::visual::GrabbableGrabber::onUpdateSourceInfo(unsigned 
 bool cedar::dev::sensors::visual::GrabbableGrabber::onGrab()
 {
   bool result = true;
-  for(unsigned int channel=0; channel<mNumCams;++channel)
+  unsigned int num_cams = getNumCams();
+  for(unsigned int channel = 0; channel < num_cams; ++channel)
    {
      //apply the new content to the channel image
      try

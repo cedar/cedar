@@ -115,12 +115,14 @@ cedar::dev::sensors::visual::GLGrabber::~GLGrabber()
 
 bool cedar::dev::sensors::visual::GLGrabber::onInit()
 {
+  unsigned int num_cams = getNumCams();
   std::stringstream init_message;
-  init_message << ": Initialize grabber with " << mNumCams << " channels ..." << std::endl;
-  for (unsigned int i = 0; i < mNumCams; ++i)
+  init_message << ": Initialize grabber with " << getNumCams() << " channels ..." << std::endl;
+
+  for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
-    init_message << "Channel " << i
-                 << ": QT::OGLWidget class \"" << typeid(getGLChannel(i)->mpQGLWidget).name()
+    init_message << "Channel " << channel
+                 << ": QT::OGLWidget class \"" << typeid(getGLChannel(channel)->mpQGLWidget).name()
                  << "\"" << std::endl;
   }
   cedar::aux::LogSingleton::getInstance()->debugMessage
@@ -141,7 +143,8 @@ void cedar::dev::sensors::visual::GLGrabber::onCleanUp()
   // on an exception or a CTRL-C only onCleanUp will be invoked (no destructor)
 
   // delete all pointer-references to external widgets
-  for (unsigned int channel = 0; channel < mNumCams; ++channel)
+  unsigned int num_cams = getNumCams();
+  for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
     getGLChannel(channel)->mpQGLWidget = NULL;
   }
@@ -176,7 +179,8 @@ void cedar::dev::sensors::visual::GLGrabber::onUpdateSourceInfo(unsigned int cha
 bool cedar::dev::sensors::visual::GLGrabber::onGrab()
 {
   bool ogl_valid = true;
-  for(unsigned int channel=0; channel<mNumCams;++channel)
+  unsigned int num_cams = getNumCams();
+  for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
     if (getGLChannel(channel)->mpQGLWidget != NULL)
     {
@@ -216,7 +220,7 @@ bool cedar::dev::sensors::visual::GLGrabber::onGrab()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGLWidget *qglWidget)
 {
-  if (channel >= mNumCams)
+  if (channel >= getNumCams())
   {
     CEDAR_THROW
     (

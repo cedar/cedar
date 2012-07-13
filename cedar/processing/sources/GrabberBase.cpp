@@ -50,17 +50,18 @@
 cedar::proc::sources::GrabberBase::GrabberBase()
 :
 cedar::proc::Step(false, true),
-mImage(new cedar::aux::ImageData(cv::Mat::zeros(1, 1, CV_8UC3))),
-mRecording(new cedar::aux::BoolParameter(this, "record", false)),
-mRecordName(new cedar::aux::FileParameter(this, "recordName", cedar::aux::FileParameter::WRITE, "")),
-mSnapshotName(new cedar::aux::FileParameter(this, "snapshotName", cedar::aux::FileParameter::WRITE, "")),
-_mConfigurationFileName(new cedar::aux::FileParameter(this, "config",cedar::aux::FileParameter::READ,""))
+mImage(new cedar::aux::ImageData(cv::Mat::zeros(1, 1, CV_8UC3)))
+//mRecording(new cedar::aux::BoolParameter(this, "record", false)),
+//mRecordName(new cedar::aux::FileParameter(this, "recordName", cedar::aux::FileParameter::WRITE, "")),
+//mSnapshotName(new cedar::aux::FileParameter(this, "snapshotName", cedar::aux::FileParameter::WRITE, "")),
+//_mConfigurationFileName(new cedar::aux::FileParameter(this, "config",cedar::aux::FileParameter::READ,""))
 {
-  mRecordName->setValue("./video.avi");
-  mSnapshotName->setValue("./picture.png");
-  mGrabber.reset();
-  QObject::connect(mRecording.get(), SIGNAL(valueChanged()), this, SLOT(setRecording()));
-  QObject::connect(_mConfigurationFileName.get(), SIGNAL(valueChanged()), this, SLOT(setConfigurationFileName()));
+//  mRecordName->setValue("./video.avi");
+//  mSnapshotName->setValue("./picture.png");
+  this->getGrabber().reset();
+
+  //QObject::connect(mRecording.get(), SIGNAL(valueChanged()), this, SLOT(setRecording()));
+//  QObject::connect(_mConfigurationFileName.get(), SIGNAL(valueChanged()), this, SLOT(setConfigurationFileName()));
 
   //Snapshot as an action
   this->registerFunction("save snapshot", boost::bind(&cedar::proc::sources::GrabberBase::saveSnapshot, this));
@@ -75,82 +76,79 @@ cedar::proc::sources::GrabberBase::~GrabberBase()
 //----------------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::sources::GrabberBase::setRecording()
-{
-  if (mGrabber)
-  {
-    //check if already recording or not
-    std::string info;
-    bool rec = this->mRecording->getValue();
-    if (rec)
-    {
-      //set recordname
-      std::string record_name = this->mRecordName->getPath();
-      if (record_name != "")
-      {
-        this->mGrabber->setRecordName(record_name);
-      }
-
-      //record
-      this->mGrabber->startRecording(15,0,true,false);
-      info = "Recording ON";
-    }
-    else
-    {
-      this->mGrabber->stopRecording();
-      info = "Recording OFF";
-    }
-    cedar::aux::LogSingleton::getInstance()->message(info,"cedar::proc::sources::GrabberSource::setRecording()");
-
-    // check if record is running
-    if (rec && !(this->mGrabber->isRecording()))
-    {
-      info = "Error while start recording!";
-      cedar::aux::LogSingleton::getInstance()->error(info,"cedar::proc::sources::GrabberSource::setRecording()");
-    }
-  }
-}
+//void cedar::proc::sources::GrabberBase::setRecording()
+//{
+//  if (mGrabber)
+//  {
+//    //check if already recording or not
+//    std::string info;
+//    bool rec = this->mGrabber->isRecording();
+//    if (rec)
+//    {
+//      //set recordname
+//      std::string record_name = this->mRecordName->getPath();
+//      if (record_name != "")
+//      {
+//        this->mGrabber->setRecordName(record_name);
+//      }
+//
+//      //record
+//      this->mGrabber->startRecording(15,0,true,false);
+//      info = "Recording ON";
+//    }
+//    else
+//    {
+//      this->mGrabber->stopRecording();
+//      info = "Recording OFF";
+//    }
+//    cedar::aux::LogSingleton::getInstance()->message(info,"cedar::proc::sources::GrabberSource::setRecording()");
+//
+//    // check if record is running
+//    if (rec && !(this->mGrabber->isRecording()))
+//    {
+//      info = "Error while start recording!";
+//      cedar::aux::LogSingleton::getInstance()->error(info,"cedar::proc::sources::GrabberSource::setRecording()");
+//    }
+//  }
+//}
 
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::GrabberBase::saveSnapshot()
 {
-  if (mGrabber)
+  if (this->getGrabber())
   {
-    std::string snapshot_name = this->mSnapshotName->getPath();
-    if (snapshot_name != "")
-    {
-      this->mGrabber->setSnapshotName(snapshot_name);
-    }
-    this->mGrabber->saveSnapshotAllCams();
+//    std::string snapshot_name = this->mSnapshotName->getPath();
+//    if (snapshot_name != "")
+//    {
+//      this->mGrabber->setSnapshotName(snapshot_name);
+//    }
+    this->getGrabber()->saveSnapshotAllCams();
+  }
+  else
+  {
+    const std::string message = "Can't save a snapshot: no grabber instance";
+    cedar::aux::LogSingleton::getInstance()->warning(message,"cedar::proc::sources::GrabberBase::saveSnapshot()");
   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::sources::GrabberBase::createGrabber()
-{
-  // destroy the old grabber (if any), in order to save the configuration
-  if (mGrabber)
-  {
-    const std::string message = "Old grabber deleted";
-    cedar::aux::LogSingleton::getInstance()->debugMessage(message,"cedar::proc::sources::GrabberBase::createGrabber()");
-  }
-  mGrabber.reset();
+//void cedar::proc::sources::GrabberBase::createGrabber()
+//{
+//  // destroy the old grabber (if any), in order to save the configuration
+//  if (this->getGrabber())
+//  {
+//    const std::string message = "Old grabber deleted";
+//    cedar::aux::LogSingleton::getInstance()->debugMessage(message,"cedar::proc::sources::GrabberBase::createGrabber()");
+//  }
+//  this->getGrabber().reset();
+//
+//  //onCreateGrabber();
+//
+//  if (this->getGrabber())
+//  {
+//    //@!todo Values in processingGUI doesn't change until re-selection of the grabber
+//    //this->mSnapshotName->setValue(this->mGrabber->getSnapshotName());
+//    //this->mRecordName->setValue(this->mGrabber->getRecordName());
+//  }
+//}
 
-  onCreateGrabber();
-
-  if (mGrabber)
-  {
-    //@!todo Values in processingGUI doesn't change until re-selection of the grabber
-    this->mSnapshotName->setValue(this->mGrabber->getSnapshotName());
-    this->mRecordName->setValue(this->mGrabber->getRecordName());
-  }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::sources::GrabberBase::setConfigurationFileName()
-{
-  if (mGrabber)
-  {
-    //@!todo: ask user if grabber should be recreated, using new configfile
-  }
-}

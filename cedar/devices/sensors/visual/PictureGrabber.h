@@ -58,6 +58,18 @@ class cedar::dev::sensors::visual::PictureGrabber
 :
 public cedar::dev::sensors::visual::Grabber
 {
+  Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // slots
+  //--------------------------------------------------------------------------------------------------------------------
+
+  protected slots:
+
+  //!@brief A slot that is triggered if a new filename is set
+  void fileNameChanged();
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -155,18 +167,21 @@ public:
 protected:
 
   // inherited from Grabber
-  bool onInit();
+  //bool onInit();
   bool onGrab();
-  void onUpdateSourceInfo(unsigned int channel);
+  //void onUpdateSourceInfo(unsigned int channel);
+  bool onCreateGrabber();
+  void onCloseGrabber();
 
-  // inherited from Configuration
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+  /// @brief updates the channel informations
+  void setChannelInfo(unsigned int channel);
 
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+
   /// @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
   inline PictureChannelPtr getPictureChannel(unsigned int channel)
   {
@@ -184,6 +199,7 @@ private:
              cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
            );
   }
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

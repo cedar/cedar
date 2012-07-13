@@ -68,7 +68,8 @@ cedar::dev::sensors::visual::Grabber
   (
     new cedar::dev::sensors::visual::TestGrabber::TestChannel(sourceFileName)
   )
-)
+)//,
+//_mSourceFileName(new cedar::aux::FileParameter(this, "fileName", cedar::aux::FileParameter::READ, fileName))
 {
   //information logging
   cedar::aux::LogSingleton::getInstance()->allocating(this);
@@ -103,7 +104,8 @@ cedar::dev::sensors::visual::Grabber
   (
     new cedar::dev::sensors::visual::TestGrabber::TestChannel(sourceFileName1)
   )
-)
+)//,
+//_mSourceFileName(new cedar::aux::FileParameter(this, "fileName", cedar::aux::FileParameter::READ, fileName))
 {
   //debug information logging
   cedar::aux::LogSingleton::getInstance()->allocating(this);
@@ -151,11 +153,12 @@ bool cedar::dev::sensors::visual::TestGrabber::onInit()
 
   //-------------------------------------------------
   std::stringstream init_message;
-  init_message << ": Initialize test grabber with " << mNumCams << " channels ..." << std::endl;
-  for (unsigned int i = 0; i < mNumCams; ++i)
+  unsigned int num_cams = getNumCams();
+  init_message << ": Initialize test grabber with " << getNumCams() << " channels ..." << std::endl;
+  for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
-    init_message << "Channel " << i << ": capture from Source: "
-                 << getTestChannel(i)->_mpSourceFileName->getValue() << std::endl;
+    init_message << "Channel " << channel << ": capture from Source: "
+                 << getTestChannel(channel)->_mpSourceFileName->getValue() << std::endl;
   }
   cedar::aux::LogSingleton::getInstance()->message
                                            (
@@ -165,7 +168,7 @@ bool cedar::dev::sensors::visual::TestGrabber::onInit()
 
   //-------------------------------------------------
   //load pictures one by one
-  for(unsigned int channel=0; channel<mNumCams;++channel)
+  for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
     //there is no need to create new matrices, empty ones are
     //already initialized within the channel structure
@@ -227,7 +230,8 @@ bool cedar::dev::sensors::visual::TestGrabber::onGrab()
   //this is the main grabbing method.
   //read a new picture from the source and set the picture in the mImageMatVector.at()
 
-  for(unsigned int channel=0; channel<mNumCams;++channel)
+  unsigned int num_cams = getNumCams();
+  for(unsigned int channel = 0; channel < num_cams; ++channel)
    {
      //apply the new content to the channel image
      //getTestChannel(channel)->mImageMat = <grab_new_content>;
