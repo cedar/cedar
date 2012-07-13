@@ -68,6 +68,7 @@ void cedar::aux::gui::Parameter::setParameter(cedar::aux::ParameterPtr pParamete
   this->mParameter = pParameter;
 
   QObject::connect(pParameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertiesChanged()));
+  QObject::connect(pParameter.get(), SIGNAL(valueChanged()), this, SLOT(valueChanged()));
 
   emit parameterPointerChanged();
 }
@@ -82,5 +83,9 @@ void cedar::aux::gui::Parameter::parameterChanged()
 }
 
 void cedar::aux::gui::Parameter::propertiesChanged()
+{
+}
+
+void cedar::aux::gui::Parameter::valueChanged()
 {
 }
