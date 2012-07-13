@@ -229,7 +229,6 @@ void cedar::proc::gui::DataSlotItem::connectTo(cedar::proc::gui::DataSlotItem *p
       break;
   }
   p_connection->setValidity(validity);
-  this->scene()->addItem(p_connection);
 }
 
 void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)

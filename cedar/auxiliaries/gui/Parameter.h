@@ -114,6 +114,10 @@ private slots:
    */
   virtual void propertiesChanged();
 
+  /*! Slot that can be overridden when the value of the connected parameter changes.
+   */
+  virtual void valueChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
