@@ -124,11 +124,13 @@ public:
   {
     ValueParameterPtr parameter = cedar::aux::asserted_pointer_cast<ValueParameter>(this->getParameter());
 
+    // first, apply widget min/max values
+    this->propertiesChanged();
+
     parameter->lockForRead();
     WidgetPolicy::setValue(this->mpWidget, parameter->getValue());
     parameter->unlock();
 
-    this->propertiesChanged();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -156,11 +158,26 @@ private:
   {
     ValueParameterPtr parameter = cedar::aux::asserted_pointer_cast<ValueParameter>(this->getParameter());
 
+    bool blocked = this->mpWidget->blockSignals(true);
+
     parameter->lockForRead();
     this->mpWidget->setDisabled(parameter->isConstant());
     WidgetPolicy::setMinimum(this->mpWidget, parameter->getMinimum());
     WidgetPolicy::setMaximum(this->mpWidget, parameter->getMaximum());
     parameter->unlock();
+
+    this->mpWidget->blockSignals(blocked);
+  }
+
+  void valueChanged()
+  {
+    ValueParameterPtr parameter = cedar::aux::asserted_pointer_cast<ValueParameter>(this->getParameter());
+
+    bool blocked = this->mpWidget->blockSignals(true);
+    parameter->lockForRead();
+    this->mpWidget->setValue(parameter->getValue());
+    parameter->unlock();
+    this->mpWidget->blockSignals(blocked);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
