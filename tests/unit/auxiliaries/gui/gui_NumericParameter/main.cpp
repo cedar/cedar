@@ -40,8 +40,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/UIntParameter.h"
+#include "cedar/auxiliaries/gui/IntParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/IntParameter.h"
+#include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
@@ -50,61 +53,125 @@
 #include <string>
 #include <iostream>
 
-
-int main(int argc, char** argv)
+/*
+ * @param initialValue must lie within lower and upper limit
+ * @param secondValue must be within the parameter limits
+ * @param secondValue must be less than 10 and within the parameter limits
+ */
+template
+<
+  class ParameterType,
+  class WidgetType,
+  typename T
+>
+int test_parameter
+(
+  const T& lowerLimit,
+  const T& upperLimit,
+  const T& initialValue,
+  const T& firstValue,
+  const T& secondValue
+)
 {
-  QApplication app(argc, argv);
-
-  // the number of errors encountered in this test
   int errors = 0;
+  std::cout << "Testing " << cedar::aux::typeToString<ParameterType>()
+            << " with " << cedar::aux::typeToString<WidgetType>() << std::endl;
+
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ParameterType);
   cedar::aux::ConfigurablePtr test_cfg(new cedar::aux::Configurable());
 
-  cedar::aux::UIntParameterPtr uint_param(new cedar::aux::UIntParameter(test_cfg.get(), "test uint", 0, 0, 100));
-  cedar::aux::gui::UIntParameter* p_uint_widget = new cedar::aux::gui::UIntParameter();
-  p_uint_widget->setParameter(uint_param);
+  ParameterTypePtr param
+                   (
+                     new ParameterType
+                     (
+                       test_cfg.get(),
+                       "test uint",
+                       initialValue,
+                       lowerLimit, upperLimit
+                     )
+                   );
+  WidgetType* p_widget = new WidgetType();
+  p_widget->setParameter(param);
+
+  if (static_cast<T>(p_widget->mpWidget->value()) != initialValue)
+  {
+    std::cout << "ERROR: Widget didn't set its initial value properly. Value is: "
+              << p_widget->mpWidget->value() << std::endl;
+    ++errors;
+  }
 
   // test case: set value on parameter, check if the value is reflected in the gui
   std::cout << "Setting parameter value ..." << std::endl;
-  uint_param->setValue(5);
+  param->setValue(firstValue);
 
-//  while(QApplication::hasPendingEvents())
-//    QApplication::processEvents();
-
-  if (p_uint_widget->mpWidget->value() != 5)
+  if (static_cast<T>(p_widget->mpWidget->value()) != firstValue)
   {
     std::cout << "ERROR: Widget didn't update its value properly. Value is: "
-              << p_uint_widget->mpWidget->value() << std::endl;
+              << p_widget->mpWidget->value() << std::endl;
     ++errors;
   }
 
   // test case: set value on gui, check if the value is reflected in the parameter
   std::cout << "Setting widget value ..." << std::endl;
-  p_uint_widget->mpWidget->setValue(3);
-  if (uint_param->getValue() != 3)
+  p_widget->mpWidget->setValue(secondValue);
+  if (param->getValue() != secondValue)
   {
     std::cout << "ERROR: Widget didn't update parameter value properly. Value is: "
-              << uint_param->getValue() << std::endl;
+              << param->getValue() << std::endl;
     ++errors;
   }
 
   // test case: set value, set minimum to something that leads to a change of the value
   std::cout << "Setting value-changing parameter limits ..." << std::endl;
-  uint_param->setMinimum(10);
+  param->setMaximum(100);
 
-  if (p_uint_widget->mpWidget->minimum() != 10)
+  if (p_widget->mpWidget->maximum() != 100)
+  {
+    std::cout << "ERROR: Widget didn't update its maximum value properly. Maximum is: "
+              << p_widget->mpWidget->maximum() << std::endl;
+    ++errors;
+  }
+
+  param->setMinimum(10);
+
+  if (p_widget->mpWidget->minimum() != 10)
   {
     std::cout << "ERROR: Widget didn't update its minimum value properly. Minimum is: "
-              << p_uint_widget->mpWidget->minimum() << std::endl;
+              << p_widget->mpWidget->minimum() << std::endl;
     ++errors;
   }
 
-  if (uint_param->getValue() != 10)
+  if (param->getValue() != 10)
   {
-    std::cout << "ERROR: Widget didn't update its value properly. Value is: "
-              << uint_param->getValue() << std::endl;
+    std::cout << "ERROR: Widget didn't update parameter value properly. Value is: "
+              << param->getValue() << std::endl;
     ++errors;
   }
 
+  return errors;
+}
+
+int main(int argc, char** argv)
+{
+  // needs to be created because we deal with widgets here
+  QApplication app(argc, argv);
+
+  // the number of errors encountered in this test
+  int errors = 0;
+
+  errors += test_parameter
+      <
+        cedar::aux::UIntParameter,
+        cedar::aux::gui::UIntParameter,
+        unsigned int
+      >(0, 100, 2, 5, 3);
+
+  errors += test_parameter
+      <
+        cedar::aux::IntParameter,
+        cedar::aux::gui::IntParameter,
+        int
+      >(-100, 0, -2, -3, -4);
 
   std::cout << "Done. There were " << errors << " errors." << std::endl;
   return errors;
