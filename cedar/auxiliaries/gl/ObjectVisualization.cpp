@@ -53,11 +53,11 @@ const float cedar::aux::gl::ObjectVisualization::mSegment_Shininess[1] = {1.0f};
 const float cedar::aux::gl::ObjectVisualization::mChrome_Ambient[3] = {0.25f, 0.25f, 0.25f};
 const float cedar::aux::gl::ObjectVisualization::mChrome_Diffuse[3] = {0.4f, 0.4f, 0.4f};
 const float cedar::aux::gl::ObjectVisualization::mChrome_Specular[3] = {0.774597f, 0.774597f, 0.774597f};
-const float cedar::aux::gl::ObjectVisualization::mChrome_Shininess[1] = {0.6};
+const float cedar::aux::gl::ObjectVisualization::mChrome_Shininess[1] = {0.6f};
 const float cedar::aux::gl::ObjectVisualization::mBlack_Ambient[3] = {0.0f, 0.0f, 0.0f};
 const float cedar::aux::gl::ObjectVisualization::mBlack_Diffuse[3] = {0.01f, 0.01f, 0.01f};
-const float cedar::aux::gl::ObjectVisualization::mBlack_Specular[3] = {0.2f, 0.2, 0.2};
-const float cedar::aux::gl::ObjectVisualization::mBlack_Shininess[1] = {0.05};
+const float cedar::aux::gl::ObjectVisualization::mBlack_Specular[3] = {0.2f, 0.2f, 0.2f};
+const float cedar::aux::gl::ObjectVisualization::mBlack_Shininess[1] = {0.05f};
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -210,7 +210,7 @@ void cedar::aux::gl::ObjectVisualization::loadVertexData
   {
     QTextStream text_stream(&data);
     QString line;
-    float scale = 0.001; // mm -> m
+    float scale = 0.001f; // mm -> m
     for (unsigned int i=0; i<numberOfVertices; i++)
     {
       line = text_stream.readLine();
@@ -263,8 +263,11 @@ void cedar::aux::gl::ObjectVisualization::drawElement
 )
 {
   // bind the buffers
+  //!@todo Solve this for windows as well.
+#ifndef CEDAR_OS_WINDOWS
   glBindBuffer(GL_ARRAY_BUFFER, vertexVboId);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVboId);
+#endif // CEDAR_OS_WINDOWS
 
   // set the pointers
   glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(12));

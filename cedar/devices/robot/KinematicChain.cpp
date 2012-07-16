@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/math/LimitsParameter.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/auxiliaries/math/constants.h"
 
 // SYSTEM INCLUDES
 
@@ -90,8 +91,8 @@ cedar::dev::robot::KinematicChain::Joint::Joint()
 :
 _mpPosition(new cedar::aux::DoubleVectorParameter(this, "position", -10.0, 10.0)),
 _mpAxis(new cedar::aux::DoubleVectorParameter(this, "axis", -1.0, 1.0)),
-_mpAngleLimits(new cedar::aux::math::LimitsParameter<double>(this, "angle limits", -2*M_PI, 0.0, 0.0, 2*M_PI)),
-_mpVelocityLimits(new cedar::aux::math::LimitsParameter<double>(this, "velocity limits", -2*M_PI, 0.0, 0.0, 2*M_PI))
+_mpAngleLimits(new cedar::aux::math::LimitsParameter<double>(this, "angle limits", -2*cedar::aux::math::pi, 0.0, 0.0, 2*cedar::aux::math::pi)),
+_mpVelocityLimits(new cedar::aux::math::LimitsParameter<double>(this, "velocity limits", -2*cedar::aux::math::pi, 0.0, 0.0, 2*cedar::aux::math::pi))
 {
 
 }
@@ -460,10 +461,10 @@ void cedar::dev::robot::KinematicChain::init()
   default_joint->_mpAxis->pushBack(0);
   default_joint->_mpAxis->pushBack(0);
   default_joint->_mpAxis->pushBack(1);
-  default_joint->_mpAngleLimits->setLowerLimit(-2*M_PI);
-  default_joint->_mpAngleLimits->setUpperLimit(2*M_PI);
-  default_joint->_mpVelocityLimits->setLowerLimit(-2*M_PI);
-  default_joint->_mpVelocityLimits->setUpperLimit(2*M_PI);
+  default_joint->_mpAngleLimits->setLowerLimit(-2*cedar::aux::math::pi);
+  default_joint->_mpAngleLimits->setUpperLimit(2*cedar::aux::math::pi);
+  default_joint->_mpVelocityLimits->setLowerLimit(-2*cedar::aux::math::pi);
+  default_joint->_mpVelocityLimits->setUpperLimit(2*cedar::aux::math::pi);
   this->mpJoints->pushBack(default_joint);
   initializeFromJointList();
 }

@@ -77,7 +77,6 @@ class cedar::aux::gui::NumericWidgetPolicy
 
     static void setPrecision(WidgetT* pWidget, int precision)
     {
-      pWidget->setDecimals(precision);
     }
 
     static WidgetT* create(QWidget *pParent = NULL)

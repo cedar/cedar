@@ -47,6 +47,16 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
+// Windows specific undefinition of the max macro
+#ifdef CEDAR_OS_WINDOWS
+#  ifdef max
+#    undef max
+#  endif // def max
+#  ifdef min
+#    undef min
+#  endif // def min
+#endif // CEDAR_OS_WINDOWS
+
 /*
  *  this file has very generic math functions that do not fall under some other category
  *  more specific functions should be put in specialized files
