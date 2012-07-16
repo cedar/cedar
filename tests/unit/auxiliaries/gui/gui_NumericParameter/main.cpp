@@ -85,7 +85,7 @@ int test_parameter
                      new ParameterType
                      (
                        test_cfg.get(),
-                       "test uint",
+                       "test",
                        initialValue,
                        lowerLimit, upperLimit
                      )
@@ -145,6 +145,28 @@ int test_parameter
   {
     std::cout << "ERROR: Widget didn't update parameter value properly. Value is: "
               << param->getValue() << std::endl;
+    ++errors;
+  }
+
+  std::cout << "Testing full parameter range." << std::endl;
+
+  param = ParameterTypePtr
+          (
+            new ParameterType
+            (
+              test_cfg.get(),
+              "full range test",
+              initialValue
+            )
+          );
+
+  std::cout << "Changing widget parameter" << std::endl;
+  p_widget->setParameter(param);
+
+  if (static_cast<T>(p_widget->mpWidget->value()) != initialValue)
+  {
+    std::cout << "ERROR: Widget didn't set its value properly when using full parameter range. Value is: "
+              << p_widget->mpWidget->value() << std::endl;
     ++errors;
   }
 
