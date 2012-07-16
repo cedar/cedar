@@ -39,6 +39,6 @@
 
 // SYSTEM INCLUDES
 
-template struct cedar::aux::math::LimitsParameter<double>;
-template struct cedar::aux::math::LimitsParameter<int>;
-template struct cedar::aux::math::LimitsParameter<unsigned int>;
+template class cedar::aux::math::LimitsParameter<double>;
+template class cedar::aux::math::LimitsParameter<int>;
+template class cedar::aux::math::LimitsParameter<unsigned int>;

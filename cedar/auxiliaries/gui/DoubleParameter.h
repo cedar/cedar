@@ -48,6 +48,23 @@
 // SYSTEM INCLUDES
 #include <QDoubleSpinBox>
 
+//----------------------------------------------------------------------------------------------------------------------
+// template specialization for QSpinBox
+//----------------------------------------------------------------------------------------------------------------------
+namespace cedar
+{
+  namespace aux
+  {
+    namespace gui
+    {
+      template<>
+      inline void NumericWidgetPolicy<double, QDoubleSpinBox>::setPrecision(QDoubleSpinBox* pWidget, int precision)
+      {
+        pWidget->setDecimals(precision);
+      }
+    }
+  }
+}
 
 /*!@brief Widget for manipulating cedar::aux::DoubleParameters.
  */

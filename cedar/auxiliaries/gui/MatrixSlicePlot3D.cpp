@@ -177,7 +177,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
   unsigned int tiles = static_cast<unsigned int>(mat.size[2]);
   if (mDesiredColumns <= 0 || mDesiredColumns > tiles)
   {
-    mDesiredColumns = std::ceil(std::max(1.0, std::sqrt(mat.size[2])));
+    mDesiredColumns = std::ceil(std::max(1.0, std::sqrt(static_cast<double>(mat.size[2]))));
   }
   unsigned int columns = std::min(tiles, mDesiredColumns);
   unsigned int rows = std::ceil(tiles / static_cast<double>(columns));

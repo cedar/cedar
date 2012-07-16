@@ -137,8 +137,8 @@ bool cedar::aux::conv::KernelList::checkForSameKernelSize() const
   // get dimensionality and sizes of first kernel in list
   cedar::aux::kernel::ConstKernelPtr first_kernel = this->getKernel(0);
   size_t dim = first_kernel->getDimensionality();
-  unsigned int size[static_cast<unsigned int>(dim)];
-  for (size_t i = 0; i < dim; ++i)
+  std::vector<unsigned int> size(static_cast<size_t>(dim));
+  for (size_t i = 0; i < size.size(); ++i)
   {
     size[i] = first_kernel->getSize(i);
   }

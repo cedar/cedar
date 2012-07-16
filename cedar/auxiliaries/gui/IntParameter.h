@@ -44,6 +44,23 @@
 // SYSTEM INCLUDES
 #include <QSpinBox>
 
+//----------------------------------------------------------------------------------------------------------------------
+// template specialization for QSpinBox
+//----------------------------------------------------------------------------------------------------------------------
+namespace cedar
+{
+  namespace aux
+  {
+    namespace gui
+    {
+      template<>
+      inline void NumericWidgetPolicy<int, QSpinBox>::setPrecision(QSpinBox*, int)
+      {
+        // integal precision is ignored
+      }
+    }
+  }
+}
 
 /*!@brief Widget for representing and manipulating a cedar::aux::IntParameter.
  */
