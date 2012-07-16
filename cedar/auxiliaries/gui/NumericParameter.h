@@ -127,9 +127,10 @@ public:
     this->propertiesChanged();
 
     parameter->lockForRead();
-    WidgetPolicy::setValue(this->mpWidget, parameter->getValue());
+    ValueT value = parameter->getValue();
     parameter->unlock();
 
+    WidgetPolicy::setValue(this->mpWidget, value);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
