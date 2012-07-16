@@ -44,9 +44,11 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/NumericParameter.h"
 #include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <QSpinBox>
+#include <limits.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 // template specialization for QSpinBox
@@ -61,6 +63,38 @@ namespace cedar
       inline void NumericWidgetPolicy<unsigned int, QSpinBox>::setPrecision(QSpinBox*, int)
       {
         // integal precision is ignored
+      }
+
+      template<>
+      inline void NumericWidgetPolicy<unsigned int, QSpinBox>::setMinimum(QSpinBox* pWidget, const unsigned int& newValue)
+      {
+        unsigned int new_limit = newValue;
+        if (new_limit > static_cast<unsigned int>(std::numeric_limits<int>::max()))
+        {
+          cedar::aux::LogSingleton::getInstance()->warning
+          (
+            "Minimum for unsigned int parameter exceed qt's capabilities -- limiting to max int.",
+            "void cedar::aux::gui::NumericWidgetPolicy<unsigned int, QSpinBox>::setMinimum(WidgetT*, const ValueT&)"
+          );
+          new_limit = std::numeric_limits<int>::max();
+        }
+        pWidget->setMinimum(static_cast<int>(new_limit));
+      }
+
+      template<>
+      inline void NumericWidgetPolicy<unsigned int, QSpinBox>::setMaximum(QSpinBox* pWidget, const unsigned int& newValue)
+      {
+        unsigned int new_limit = newValue;
+        if (new_limit > static_cast<unsigned int>(std::numeric_limits<int>::max()))
+        {
+          cedar::aux::LogSingleton::getInstance()->warning
+          (
+            "Maximum for unsigned int parameter exceed qt's capabilities -- limiting to max int.",
+            "void cedar::aux::gui::NumericWidgetPolicy<unsigned int, QSpinBox>::setMinimum(WidgetT*, const ValueT&)"
+          );
+          new_limit = std::numeric_limits<int>::max();
+        }
+        pWidget->setMaximum(static_cast<int>(new_limit));
       }
     }
   }
