@@ -227,7 +227,8 @@ protected:
   cedar::aux::kernel::GaussPtr mNoiseCorrelationKernel;
 
 private:
-  // none yet
+  boost::signals2::connection mKernelAddedConnection;
+  boost::signals2::connection mKernelRemovedConnection;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

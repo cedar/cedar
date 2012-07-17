@@ -225,8 +225,13 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
   QObject::connect(_mOutputActivation.get(), SIGNAL(valueChanged()), this, SLOT(activationAsOutputChanged()));
 
-  this->_mKernels->connectToObjectAddedSignal(boost::bind(&cedar::dyn::NeuralField::slotKernelAdded, this, _1));
-  this->_mKernels->connectToObjectRemovedSignal(boost::bind(&cedar::dyn::NeuralField::removeKernelFromConvolution, this, _1));
+  mKernelAddedConnection
+    = this->_mKernels->connectToObjectAddedSignal(boost::bind(&cedar::dyn::NeuralField::slotKernelAdded, this, _1));
+  mKernelRemovedConnection
+    = this->_mKernels->connectToObjectRemovedSignal
+      (
+        boost::bind(&cedar::dyn::NeuralField::removeKernelFromConvolution, this, _1)
+      );
 
   this->transferKernelsToConvolution();
 
@@ -297,10 +302,22 @@ void cedar::dyn::NeuralField::removeKernelFromConvolution(size_t index)
 
 void cedar::dyn::NeuralField::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
+  // disconnect kernel slots (kernels first have to be loaded completely)
+  mKernelAddedConnection.disconnect();
+  mKernelRemovedConnection.disconnect();
+
   this->cedar::proc::Step::readConfiguration(node);
 
-  // transfer the kernels read by the object list parameter into the convolution structure
   this->transferKernelsToConvolution();
+
+  // reconnect slots
+  mKernelAddedConnection
+    = this->_mKernels->connectToObjectAddedSignal(boost::bind(&cedar::dyn::NeuralField::slotKernelAdded, this, _1));
+  mKernelRemovedConnection
+    = this->_mKernels->connectToObjectRemovedSignal
+      (
+        boost::bind(&cedar::dyn::NeuralField::removeKernelFromConvolution, this, _1)
+      );
 
   // legacy code for reading kernels with the old format
   cedar::aux::ConfigurationNode::const_assoc_iterator iter = node.find("numberOfKernels");
