@@ -83,10 +83,10 @@ public:
   cedar::aux::Enum getValue() const;
 
   //!@brief set enum value to a specified id
-  void setValue(cedar::aux::EnumId enumId);
+  void setValue(cedar::aux::EnumId enumId, bool lock = false);
 
   //!@brief set enum value to a specified id
-  void setValue(const std::string& enumId);
+  void setValue(const std::string& enumId, bool lock = false);
 
   //!@brief set enum value to a specified id
   CEDAR_DECLARE_DEPRECATED(void set(const std::string& enumId))

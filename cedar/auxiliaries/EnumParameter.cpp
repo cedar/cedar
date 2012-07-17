@@ -139,16 +139,23 @@ cedar::aux::Enum cedar::aux::EnumParameter::getValue() const
   return this->mEnumDeclaration->get(this->mValue);
 }
 
-void cedar::aux::EnumParameter::setValue(cedar::aux::EnumId enumId)
+void cedar::aux::EnumParameter::setValue(cedar::aux::EnumId enumId, bool lock)
 {
+  if (lock)
+  {
+    this->lockForRead();
+  }
   this->mValue = enumId;
+  if (lock)
+  {
+    this->unlock();
+  }
   this->emitChangedSignal();
 }
 
-void cedar::aux::EnumParameter::setValue(const std::string& enumId)
+void cedar::aux::EnumParameter::setValue(const std::string& enumId, bool lock)
 {
-  this->mValue = this->mEnumDeclaration->get(enumId);
-  this->emitChangedSignal();
+  this->setValue(this->mEnumDeclaration->get(enumId), lock);
 }
 
 void cedar::aux::EnumParameter::readFromNode(const cedar::aux::ConfigurationNode& root)
