@@ -84,29 +84,18 @@ public:
   //!@brief Save a Snapshot of the current picture
   void saveSnapshot();
 
-//public slots:
+public slots:
   //!@brief Slot for the recording-checkbox
-  //void setRecording();
+  void setRecording();
 
   //!@todo Enum RecordType (Encoding)
-
-  //!@brief Slot to set a new configuration filename
-  //void setConfigurationFileName();
 
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-  //!@brief Invoke this function in the derived class
-  //  invokes onCreateGrabber() form derived class and updates information from grabber for the gui-parameter
-  //void createGrabber();
-
-  //!@brief Create the grabber in the derived class
-  //  apply the new created Grabber to GrabberBase::mGrabber
-  //virtual void onCreateGrabber() = 0;
-
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -118,7 +107,7 @@ private:
   {
     return boost::static_pointer_cast<cedar::dev::sensors::visual::Grabber>
            (
-             this->cedar::proc::sources::GrabberBase::mGrabber
+             this->cedar::proc::sources::GrabberBase::mpGrabber
            );
   }
 
@@ -127,7 +116,7 @@ private:
   {
     return boost::static_pointer_cast<const cedar::dev::sensors::visual::Grabber>
            (
-             this->cedar::proc::sources::GrabberBase::mGrabber
+             this->cedar::proc::sources::GrabberBase::mpGrabber
            );
   }
 
@@ -136,7 +125,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief The used Grabber stored in this pointer
-  cedar::dev::sensors::visual::GrabberPtr mGrabber;
+  cedar::dev::sensors::visual::GrabberPtr mpGrabber;
 
   //!@brief The grabbed Image
   cedar::aux::ImageDataPtr mImage;
@@ -151,12 +140,9 @@ private:
 protected:
   //!@cond SKIPPED_DOCUMENTATION
   // the values of the properties
- // cedar::aux::FileParameterPtr mRecordName;
-  //cedar::aux::BoolParameterPtr mSaveSnapshot;
-  //cedar::aux::FileParameterPtr mSnapshotName;
+  cedar::aux::BoolParameterPtr mRecording;
 
   //!@brief The configuration filename
- // cedar::aux::FileParameterPtr _mConfigurationFileName;
   //!@todo Enum RecordType (Encoding)
 
   //!@endcond

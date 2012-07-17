@@ -23,7 +23,7 @@
 
 int main(int , char **)
 {
-
+/*
   const std::string FILE_NAME_0 = "/opt/matlab/R2010b/toolbox/images/imdemos/rhinos.avi";
   const std::string GRABBER_NAME_0 = "Video_Grabber_TestCase";
   const std::string CONFIG_FILE_NAME_0 = "video_grabber_testcase.config";
@@ -79,7 +79,7 @@ int main(int , char **)
    *  - speed is set on speedfactor*avi_file_speed
    *  - thread isn't running
    *  - grabber name is restored from configfile
-   */
+   * /
 
   //set the name to our custom name
   video_grabber->setName(GRABBER_NAME_0);
@@ -253,6 +253,6 @@ int main(int , char **)
   }
 
   std::cout << "finished\n";
-
+*/
   return 0;
 }

@@ -76,7 +76,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+
+public slots:
+  void updatePicture();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -96,7 +98,7 @@ private:
   {
     return boost::static_pointer_cast<cedar::dev::sensors::visual::PictureGrabber>
            (
-             this->cedar::proc::sources::Picture::mGrabber
+             this->cedar::proc::sources::Picture::mpGrabber
            );
   }
 
@@ -105,7 +107,7 @@ private:
   {
     return boost::static_pointer_cast<const cedar::dev::sensors::visual::PictureGrabber>
            (
-             this->cedar::proc::sources::Picture::mGrabber
+             this->cedar::proc::sources::Picture::mpGrabber
            );
   }
 

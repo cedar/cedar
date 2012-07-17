@@ -79,6 +79,9 @@ cedar::dev::sensors::visual::Grabber
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   QObject::connect (getPictureChannel(0)->_mSourceFileName.get(),SIGNAL(valueChanged()),this, SLOT(fileNameChanged()));
+
+  _mChannels->connectToObjectAddedSignal(boost::bind(&cedar::dev::sensors::visual::PictureGrabber::channelAdded,this,_1));
+
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -106,6 +109,8 @@ cedar::dev::sensors::visual::Grabber
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   QObject::connect (getPictureChannel(0)->_mSourceFileName.get(),SIGNAL(valueChanged()),this, SLOT(fileNameChanged()));
   QObject::connect (getPictureChannel(1)->_mSourceFileName.get(),SIGNAL(valueChanged()),this, SLOT(fileNameChanged()));
+
+  _mChannels->connectToObjectAddedSignal(boost::bind(&cedar::dev::sensors::visual::PictureGrabber::channelAdded,this,_1));
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -114,7 +119,6 @@ cedar::dev::sensors::visual::PictureGrabber::~PictureGrabber()
   doCleanUp();
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 }
-
 
 //--------------------------------------------------------------------------------------------------------------------
 // configurable interface
@@ -129,9 +133,17 @@ cedar::dev::sensors::visual::PictureGrabber::~PictureGrabber()
 //
 //}
 
-//----------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------
 // slots
-//----------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------
+void cedar::dev::sensors::visual::PictureGrabber::channelAdded(int index)
+{
+  QObject::connect(getPictureChannel(index)->_mSourceFileName.get(),SIGNAL(valueChanged()),this, SLOT(fileNameChanged()));
+}
+
+//----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()
 {
   //get sender
@@ -147,7 +159,7 @@ void cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()
     channel++;
   }
 
-  //if found
+  //if found, read new image for that channel
   if (p_sender == getPictureChannel(channel)->_mSourceFileName)
   {
     const std::string filename = getPictureChannel(channel)->_mSourceFileName->getPath();
@@ -159,13 +171,28 @@ void cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()
 
     if (getPictureChannel(channel)->mImageMat.empty())
     {
-      CEDAR_THROW(cedar::aux::InitializationException,"PictureGrabber: Error on reading from file \""+filename+"\"");
+      std::string message = this->getName() + ": Grabbing failed on Channel "
+                            + boost::lexical_cast<std::string>(channel) + " from \"" + filename + "\"" ;
+      cedar::aux::LogSingleton::getInstance()->error
+                                               (
+                                                 message,
+                                                 "cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()"
+                                               );
+      this->closeGrabber();
     }
     else
     {
+      cedar::aux::LogSingleton::getInstance()->debugMessage
+                                               (
+                                                 this->getName() + ": New file successfully read.",
+                                                 "cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()"
+                                               );
+      mCaptureDeviceCreated = true;
       setChannelInfo(channel);
+      emit pictureChanged();
     }
   }
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -173,11 +200,6 @@ void cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::PictureGrabber::onCloseGrabber()
 {
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                           (
-                                            this->getName() + ": Close picture grabbeer",
-                                             "cedar::dev::sensors::visual::PictureGrabber::onCloseGrabber()"
-                                           );
   //nothing to reset here
 }
 
@@ -189,12 +211,12 @@ bool cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()
 
   //show debug message
   std::stringstream init_message;
-  init_message << "Initialize picture grabber with " << getNumCams() << " channel(s) ..." << std::endl;
+  init_message << "Initialize picture grabber with " << getNumCams() << " channel(s) ...";
 
   for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
-    init_message << "\tChannel " << channel << ": capture from Picture: "
-                 << getPictureChannel(channel)->_mSourceFileName->getPath() << std::endl;
+    init_message << std::endl << "\tChannel " << channel << ": capture from Picture: "
+                 << getPictureChannel(channel)->_mSourceFileName->getPath();
   }
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
@@ -203,6 +225,8 @@ bool cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()
                                            );
 
   //for every channel, read from image-file
+  bool result = true;
+
   for (unsigned int channel = 0; channel < num_cams; ++channel)
   {
     cv::Mat frame = cv::imread(getPictureChannel(channel)->_mSourceFileName->getPath());
@@ -214,6 +238,7 @@ bool cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()
     }
     else
     {
+      result = false;
       cedar::aux::LogSingleton::getInstance()->error
                                                (
                                                   name + ": Grabbing failed on Channel "
@@ -221,21 +246,16 @@ bool cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()
                                                   + getPictureChannel(channel)->_mSourceFileName->getPath() + "\"",
                                                 "cedar::dev::sensors::visual::PictureGrabber::onInit()"
                                                );
-      return false; //throws initialization exception
     }
   }
-  //all grabbers successfully initialized
 
-  return true;
+  if (result)
+  {
+    emit pictureChanged();
+  }
+
+  return result;
 }
-
-
-//----------------------------------------------------------------------------------------------------
-//void cedar::dev::sensors::visual::PictureGrabber::onUpdateSourceInfo(unsigned int channel)
-//{
-//  //value of channel is already checked by Grabber::getSourceInfo()
-//  getPictureChannel(channel)->mChannelInfo = getPictureChannel(channel)->_mSourceFileName->getPath();
-//}
 
 //----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::PictureGrabber::onGrab()
@@ -253,6 +273,7 @@ bool cedar::dev::sensors::visual::PictureGrabber::onGrab()
 // picturegrabber
 //----------------------------------------------------------------------------------------------------------------------
 
+
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::PictureGrabber::setSourceFile(unsigned int channel, const std::string& fileName)
 {
@@ -261,6 +282,7 @@ void cedar::dev::sensors::visual::PictureGrabber::setSourceFile(unsigned int cha
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"PictureGrabber::setSourceFile");
   }
 
+  // signal onChanged() connected to fileNameChanged()
   getPictureChannel(channel)->_mSourceFileName->setValue(fileName);
 }
 
@@ -269,6 +291,18 @@ void cedar::dev::sensors::visual::PictureGrabber::setSourceFile(const std::strin
 {
   setSourceFile(0,fileName);
 }
+
+//----------------------------------------------------------------------------------------------------
+const std::string cedar::dev::sensors::visual::PictureGrabber::getSourceFile(unsigned int channel)
+{
+  if (channel >= getNumCams())
+  {
+    CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"PictureGrabber::setSourceFile");
+  }
+
+  return getPictureChannel(channel)->_mSourceFileName->getPath();
+}
+
 
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::PictureGrabber::setChannelInfo(unsigned int channel)

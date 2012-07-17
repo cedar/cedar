@@ -104,24 +104,24 @@ private:
   void reset();
 
   //create a new grabber instance
-  void onCreateGrabber();
+  //void onCreateGrabber();
 
 
   //!@brief Cast the base GrabberBasePtr to derived class VideoGrabberPtr
-  inline cedar::dev::sensors::visual::VideoGrabberPtr getGrabber()
+  inline cedar::dev::sensors::visual::VideoGrabberPtr getVideoGrabber()
   {
     return boost::static_pointer_cast<cedar::dev::sensors::visual::VideoGrabber>
            (
-             this->cedar::proc::sources::GrabberBase::mGrabber
+             this->cedar::proc::sources::GrabberBase::mpGrabber
            );
   }
 
   //!@brief Cast the base GrabberBasePtr to derived class VideoGrabberPtr
-  inline cedar::dev::sensors::visual::ConstVideoGrabberPtr getGrabber() const
+  inline cedar::dev::sensors::visual::ConstVideoGrabberPtr getVideoGrabber() const
   {
     return boost::static_pointer_cast<const cedar::dev::sensors::visual::VideoGrabber>
            (
-            cedar::proc::sources::GrabberBase::mGrabber
+            cedar::proc::sources::GrabberBase::mpGrabber
            );
   }
 

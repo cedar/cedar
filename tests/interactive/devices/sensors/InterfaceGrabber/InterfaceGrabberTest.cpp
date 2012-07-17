@@ -16,7 +16,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/InterfaceGrabber.h"
+#include "cedar/devices/sensors/visual/GrabbableGrabber.h"
 
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/SceneWidget.h"
@@ -32,7 +32,7 @@ int main(int argc, char **argv)
   // -------------------------------------------------------------------------------------------------------------------
   // Constants
   // -------------------------------------------------------------------------------------------------------------------
-
+/*
   // the name of the grabber
   // only used in the configuration file
   const std::string GRABBER_NAME = "Interface_Grabber_TestCase";
@@ -226,6 +226,6 @@ int main(int argc, char **argv)
   }
 
   std::cout << "finished\n";
-
+*/
   return 0;
 }

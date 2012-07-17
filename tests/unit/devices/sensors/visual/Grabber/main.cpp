@@ -50,6 +50,7 @@
 //--------------------------------------------------------------------------------------------------------------------
 int main(int , char **)
 {
+
   const std::string CHANNEL_0_NAME = "CHANNEL_0_NAME";
   const std::string GRABBER_NAME = "TestGrabber";
   const std::string CONFIG_FILE_NAME = "grabber.config";
@@ -59,7 +60,7 @@ int main(int , char **)
   // the current test number
   int test_number = 0;
 
-
+/*
   //------------------------------------------------------------------------------------------------------------------
   //create a test-grabber (only a dummy grabber for testing)
   cedar::dev::sensors::visual::TestGrabber *grabber_1 = new cedar::dev::sensors::visual::TestGrabber
@@ -288,7 +289,7 @@ int main(int , char **)
   }
 
   boost::filesystem::remove(CONFIG_FILE_NAME);
-
+*/
   return errors;
 }
 

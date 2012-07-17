@@ -106,14 +106,14 @@ public:
   //!@brief set this parameter to a value, read from a configuration node
   virtual void readFromNode(const cedar::aux::ConfigurationNode& node)
   {
-    this->mObjectList.clear();
+    this->clear();
     for (cedar::aux::ConfigurationNode::const_iterator iter = node.begin(); iter != node.end(); ++iter)
     {
       const std::string& object_type = iter->first;
       BaseTypePtr object = FactorySingleton::getInstance()->allocate(object_type);
 
+      this->pushBack(object);
       object->readConfiguration(iter->second);
-      this->mObjectList.push_back(object);
     }
   }
 
@@ -163,6 +163,8 @@ public:
   }
 
   /*!@brief Removes all objects from the list.
+   *
+   * @todo This should emit an objectRemovedSignal for each object in the list
    */
   void clear()
   {

@@ -42,7 +42,7 @@ using namespace cv;
 
 int main(int , char **)
 {
-
+/*
   const std::string FILE_NAME_0 = "/usr/local/src/OpenCV-2.2.0/samples/c/puzzle.png";
   const std::string FILE_NAME_1 = "/usr/local/src/OpenCV-2.2.0/samples/c/fruits.jpg";
 
@@ -102,7 +102,7 @@ int main(int , char **)
    *  Parameters loaded from configfile
    *  - thread isn't running
    *  - grabbername is restored from configfile
-   */
+   * /
 
     picture_grabber->setName(GRABBER_NAME_0);
 
@@ -241,6 +241,6 @@ int main(int , char **)
   }
 
   std::cout << "finished\n";
-
+*/
   return 0;
 }
