@@ -89,7 +89,10 @@ void cedar::aux::gui::BoolParameter::parameterPointerChanged()
 {
   cedar::aux::BoolParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::BoolParameter>(this->getParameter());
-  this->mpCheckBox->setChecked(parameter->getValue());
+  parameter->lockForRead();
+  bool checked = parameter->getValue();
+  parameter->unlock();
+  this->mpCheckBox->setChecked(checked);
   QObject::connect(this->mpCheckBox, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
 }
 
@@ -97,6 +100,6 @@ void cedar::aux::gui::BoolParameter::stateChanged(int state)
 {
   cedar::aux::BoolParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::BoolParameter>(this->getParameter());
-  parameter->setValue(state == Qt::Checked);
+  parameter->setValue(state == Qt::Checked, true);
 }
 

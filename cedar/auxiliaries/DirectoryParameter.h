@@ -93,16 +93,32 @@ public:
   }
 
   //!@brief sets a new directory from string
-  void setValue(const std::string& value)
+  void setValue(const std::string& value, bool lock = false)
   {
+    if (lock)
+    {
+      this->lockForWrite();
+    }
     this->mValue.setPath(QString::fromStdString(value));
+    if (lock)
+    {
+      this->unlock();
+    }
     this->emitChangedSignal();
   }
 
   //!@brief sets a new directory from QDir
-  void setValue(const QDir& value)
+  void setValue(const QDir& value, bool lock = false)
   {
+    if (lock)
+    {
+      this->lockForWrite();
+    }
     this->mValue = value;
+    if (lock)
+    {
+      this->unlock();
+    }
     this->emitChangedSignal();
   }
 
