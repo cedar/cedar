@@ -64,6 +64,10 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/video_grabber.svg");
+    declaration->setDescription
+    (
+      "Reads a video file and outputs the images. Supported formats depend on which ones are available via opencv."
+    );
     cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
 
     return true;
@@ -106,10 +110,10 @@ void cedar::proc::sources::Video::onStart()
   std::string filename = this->_mFileName->getPath();
 
   // check if videofile is there
-  if ( filename == "")
+  if (filename == "")
   {
     std::string message = this->getVideoGrabber()->getName()+ ": There is no file to grab from! Please set one!";
-    cedar::aux::LogSingleton::getInstance()->warning(message,"cedar::proc::sources::Video::onStart()");
+    cedar::aux::LogSingleton::getInstance()->warning(message, "cedar::proc::sources::Video::onStart()");
     // std::cout << "[cedar::proc::sources::Video::onStart()]" << message << std::endl;
   }
 
@@ -165,6 +169,8 @@ void cedar::proc::sources::Video::compute(const cedar::proc::Arguments &argument
         this->mImage->setData(frame.clone());
       }
       mTimeElapsed = 0.0;
+      //!@todo This should only happen once when the grabber is created/first frame is read.
+      this->annotateImage();
     }
   }
 }

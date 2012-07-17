@@ -177,36 +177,41 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
   unsigned int tiles = static_cast<unsigned int>(mat.size[2]);
   if (mDesiredColumns <= 0 || mDesiredColumns > tiles)
   {
-    mDesiredColumns = std::ceil(std::max(1.0, std::sqrt(mat.size[2])));
+    mDesiredColumns = std::ceil(std::max(1.0, std::sqrt(static_cast<double>(mat.size[2]))));
   }
   unsigned int columns = std::min(tiles, mDesiredColumns);
   unsigned int rows = std::ceil(tiles / static_cast<double>(columns));
-  mSliceMatrix = cv::Mat::zeros(rows * mat.size[0] + rows -1, columns * mat.size[1] + columns -1, mat.type());
+
+  mSliceMatrix = cv::Mat::ones(rows * mat.size[0] + rows -1, columns * mat.size[1] + columns -1, mat.type());
   mSliceMatrixByte = cv::Mat::zeros(rows * mat.size[0] + rows -1, columns * mat.size[1] + columns -1, CV_8UC1);
   mSliceMatrixByteC3 = cv::Mat::zeros(rows * mat.size[0] + rows -1, columns * mat.size[1] + columns -1, CV_8UC3);
 
   // for each tile, copy content to right place
-  unsigned int max_rows = static_cast<unsigned int>(mat.size[0]);
-  unsigned int max_columns = static_cast<unsigned int>(mat.size[1]);
-  for (unsigned int tile = 0; tile < tiles; ++tile)
+  // ranges is used to select the slice in the 3d-data
+  cv::Range ranges[3];
+  ranges[0] = cv::Range::all();
+  ranges[1] = cv::Range::all();
+  cv::Mat slice;
+  //sliceSize is used to set the size to 2d of the yet 3d slice after extracting it from the 3d data
+  cv::Mat mSliceSize=cv::Mat(mat.size[0],mat.size[1],mat.type());
+  unsigned int column=0;
+  unsigned int row=0;
+  for (unsigned int tile = 0; tile < tiles; tile++,column++)
   {
-    for (unsigned int row = 0; row < max_rows; ++row)
-    {
-      for (unsigned int column = 0; column < max_columns; ++column)
-      {
-        std::vector<int> index;
-        index.push_back(row);
-        index.push_back(column);
-        index.push_back(tile);
-        mSliceMatrix.at<float>
-        (
-          row + (mat.size[0] + 1) * (tile / columns),
-          column + (mat.size[1] + 1) * (tile % columns)
-        ) = mat.at<float>(&index[0]);
-      }
-    }
+	 if (column>=columns)
+	 {
+		 column=0;
+		 row = row+1;
+	 }
+	//selects the slice
+	ranges[2] = cv::Range( tile, tile+1 );
+	//deep copy of the slice
+	slice = mat(ranges).clone();
+	//set size from 3d to 2d
+	slice.copySize(mSliceSize);
+	//copy slice to the right tile in the larger matrix
+	slice.copyTo(mSliceMatrix(cv::Range(row*mat.size[0]+row,row+mat.size[0]*(row+1)),cv::Range(column*mat.size[1]+column,column+mat.size[1]* (column+1))));
   }
-
   double min, max;
   cv::minMaxLoc(mSliceMatrix, &min, &max);
   cv::Mat scaled = (mSliceMatrix - min) / (max - min) * 255.0;

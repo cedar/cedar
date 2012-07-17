@@ -262,6 +262,8 @@ public:
   static const QColor mValidityColorWarning;
   //!@brief color for state "error"
   static const QColor mValidityColorError;
+  //!@brief color for state "unknown"
+  static const QColor mValidityColorUnknown;
   
   //!@brief color for outline
   static const QColor mDefaultOutlineColor;

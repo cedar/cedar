@@ -62,7 +62,12 @@ public:
    *@param kinematicChain pointer to the chain
    *@param configFileName path to a configuration file
    */
-  ControlThread(const cedar::dev::robot::KinematicChainPtr kinematicChain, const std::string& configFileName);
+  ControlThread
+  (
+    const cedar::dev::robot::KinematicChainPtr kinematicChain,
+    double stepSize = 1.0,
+    double idleTime = 0.001
+  );
 
 //--------------------------------------------------------------------------------------------------------------------
 // public methods

@@ -99,7 +99,7 @@ void cedar::aux::gui::FileParameter::parameterPointerChanged()
   cedar::aux::FileParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::FileParameter>(this->getParameter());
   this->mpEdit->setReadOnly(false);
-  this->mpEdit->setText(parameter->getValue().absolutePath());
+  this->mpEdit->setText(QString::fromStdString(parameter->getPath()));
   this->mpEdit->setReadOnly(true);
 
   QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(parameterValueChanged()));
@@ -110,7 +110,7 @@ void cedar::aux::gui::FileParameter::parameterValueChanged()
   cedar::aux::FileParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::FileParameter>(this->getParameter());
   this->mpEdit->setReadOnly(false);
-  this->mpEdit->setText(parameter->getValue().absolutePath());
+  this->mpEdit->setText(QString::fromStdString(parameter->getPath()));
   this->mpEdit->setReadOnly(true);
 }
 

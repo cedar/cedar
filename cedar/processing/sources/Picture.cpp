@@ -41,6 +41,7 @@
 #include "cedar/processing/sources/Picture.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/auxiliaries/annotation/ColorSpace.h"
 
 
 // SYSTEM INCLUDES
@@ -64,6 +65,11 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/picture_grabber.svg");
+    declaration->setDescription
+    (
+      "Reads an image from a file. What filetypes are supported depends on what your opencv "
+      "version supports."
+    );
     cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
 
     return true;
@@ -135,6 +141,8 @@ void cedar::proc::sources::Picture::updatePicture()
                                              "cedar::dev::sensors::visual::Picture::updatePicture()"
                                            );
   onTrigger();
+  // update the annotation
+  this->annotateImage();
 }
 
 //----------------------------------------------------------------------------------------------------

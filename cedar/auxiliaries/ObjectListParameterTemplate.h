@@ -111,7 +111,6 @@ public:
     {
       const std::string& object_type = iter->first;
       BaseTypePtr object = FactorySingleton::getInstance()->allocate(object_type);
-
       this->pushBack(object);
       object->readConfiguration(iter->second);
     }

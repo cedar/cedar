@@ -44,6 +44,7 @@
 #include <QHBoxLayout>
 #include <iostream>
 
+
 //----------------------------------------------------------------------------------------------------------------------
 // associate aux::gui parameter with the aux parameter
 //----------------------------------------------------------------------------------------------------------------------
@@ -62,16 +63,8 @@ namespace
 
 cedar::aux::gui::IntParameter::IntParameter(QWidget *pParent)
 :
-cedar::aux::gui::Parameter(pParent)
+cedar::aux::gui::IntParameter::Base(pParent)
 {
-  this->setLayout(new QHBoxLayout());
-  this->mpSpinbox = new QSpinBox();
-  this->layout()->setContentsMargins(0, 0, 0, 0);
-  this->layout()->addWidget(this->mpSpinbox);
-  this->mpSpinbox->setMinimum(0.0);
-  this->mpSpinbox->setMaximum(100.0);
-
-  QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
 }
 
 //!@brief Destructor
@@ -83,32 +76,14 @@ cedar::aux::gui::IntParameter::~IntParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gui::IntParameter::parameterPointerChanged()
+void cedar::aux::gui::IntParameter::parameterChanged()
 {
-  cedar::aux::IntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::IntParameter>(this->getParameter());
-
-  this->propertiesChanged();
-
-  parameter->lockForRead();
-  this->mpSpinbox->setValue(parameter->getValue());
-  parameter->unlock();
-  QObject::connect(this->mpSpinbox, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
-
-  QObject::connect(parameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertiesChanged()));
+  this->Base::parameterChanged();
+  QObject::connect(this->mpWidget, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
 }
 
-void cedar::aux::gui::IntParameter::propertiesChanged()
-{
-  cedar::aux::IntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::IntParameter>(this->getParameter());
-  parameter->lockForRead();
-  this->mpSpinbox->setMinimum(parameter->getMinimum());
-  this->mpSpinbox->setMaximum(parameter->getMaximum());
-  this->mpSpinbox->setDisabled(parameter->isConstant());
-  parameter->unlock();
-}
 
-void cedar::aux::gui::IntParameter::valueChanged(int value)
+void cedar::aux::gui::IntParameter::valueChanged(int)
 {
-  cedar::aux::IntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::IntParameter>(this->getParameter());
-  parameter->setValue(value, true);
+  this->widgetValueChanged();
 }
