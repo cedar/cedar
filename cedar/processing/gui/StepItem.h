@@ -228,6 +228,12 @@ private:
   //! Updates the positions of the data slot items.
   void updateDataSlotPositions();
 
+  void slotAdded(cedar::proc::DataRole::Id role, const std::string& name);
+
+  void slotRemoved(cedar::proc::DataRole::Id role, const std::string& name);
+
+  void addDataItemFor(cedar::proc::DataSlotPtr slot);
+
 private slots:
   void displayStyleMenuTriggered(QAction* pAction);
 
@@ -260,6 +266,9 @@ private:
 
   //! The height of newly created steps.
   static const qreal mBaseDataSlotSize;
+
+  boost::signals2::connection mSlotAddedConnection;
+  boost::signals2::connection mSlotRemovedConnection;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

@@ -76,9 +76,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Updates the output matrix.
-  void compute(const cedar::proc::Arguments& arguments);
-
   //!@brief Returns the current gain factor.
   inline double getGainFactor() const
   {
@@ -106,13 +103,15 @@ protected:
   cedar::proc::DataSlot::VALIDITY determineInputValidity
                                   (
                                     cedar::proc::ConstDataSlotPtr slot,
-                                    cedar::aux::DataPtr data
+                                    cedar::aux::ConstDataPtr data
                                   ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief Updates the output matrix.
+  void compute(const cedar::proc::Arguments& arguments);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

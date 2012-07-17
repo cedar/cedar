@@ -95,10 +95,10 @@ private:
     return cedar::aux::asserted_pointer_cast<cedar::aux::ObjectParameter>(this->getParameter());
   }
 
+  QString prettyTypeId(const QString& typeId) const;
+
 private slots:
   void parameterPointerChanged();
-
-  void editClicked();
 
   void currentTypeChanged(int index);
 
@@ -110,9 +110,6 @@ protected:
 private:
   //! Combo box for selecting the type to add.
   QComboBox *mpTypeSelector;
-
-  //! Button for removing a child
-  QPushButton *mpEditButton;
 
 }; // class cedar::aux::gui::ObjectParameter
 

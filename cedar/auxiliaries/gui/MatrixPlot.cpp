@@ -44,8 +44,10 @@
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
 #include "cedar/auxiliaries/gui/MatrixPlot1D.h"
 #include "cedar/auxiliaries/gui/MatrixPlot2D.h"
+#include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
+#include "cedar/auxiliaries/annotation/ColorSpace.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -166,37 +168,46 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::DataPtr data, const std::stri
     this->mpCurrentPlotWidget = NULL;
   }
 
-  cv::Mat& mat = this->mData->getData();
-  unsigned int dims = cedar::aux::math::getDimensionalityOf(mat);
-
-  switch (dims)
+  try
   {
-    case 0:
-      this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData, title);
-      this->layout()->addWidget(this->mpCurrentPlotWidget);
-      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
-      break;
-    case 1:
-      this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot1D(this->mData, title);
-      this->layout()->addWidget(this->mpCurrentPlotWidget);
-      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
-      break;
-    case 2:
-      this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot2D(this->mData, title);
-      this->layout()->addWidget(this->mpCurrentPlotWidget);
-      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
-      break;
+    // data is an image
+    cedar::aux::annotation::ColorSpacePtr color_space = this->mData->getAnnotation<cedar::aux::annotation::ColorSpace>();
+    cedar::aux::gui::ImagePlot* p_plot = new cedar::aux::gui::ImagePlot();
+    p_plot->plot(this->mData, title);
+    this->mpCurrentPlotWidget = p_plot;
+  }
+  catch(cedar::aux::AnnotationNotFoundException&)
+  {
+    // data is a matrix
+    cv::Mat& mat = this->mData->getData();
+    unsigned int dims = cedar::aux::math::getDimensionalityOf(mat);
 
-    default:
+    switch (dims)
     {
-      std::string message = "The matrix plot widget can not handle a matrix with the given dimensionality (";
-      message += cedar::aux::toString(mat.dims);
-      message += "\nPress here to refresh the plot after you have changed the dimensionality.";
-      this->mpCurrentPlotWidget = new QPushButton(QString::fromStdString(message));
-      this->layout()->addWidget(this->mpCurrentPlotWidget);
-      connect(this->mpCurrentPlotWidget, SIGNAL(pressed()), this, SIGNAL(dataChanged()));
+      case 0:
+        this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData, title);
+        connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
+        break;
+      case 1:
+        this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot1D(this->mData, title);
+        connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
+        break;
+      case 2:
+        this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot2D(this->mData, title);
+        connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
+        break;
+
+      default:
+      {
+        std::string message = "The matrix plot widget can not handle a matrix with the given dimensionality (";
+        message += cedar::aux::toString(mat.dims);
+        message += "\nPress here to refresh the plot after you have changed the dimensionality.";
+        this->mpCurrentPlotWidget = new QPushButton(QString::fromStdString(message));
+        connect(this->mpCurrentPlotWidget, SIGNAL(pressed()), this, SIGNAL(dataChanged()));
+      }
     }
   }
+  this->layout()->addWidget(this->mpCurrentPlotWidget);
 }
 
 const Qwt3D::ColorVector& cedar::aux::gui::MatrixPlot::getStandardColorVector()

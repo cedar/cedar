@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/sources/GrabberBase.h"
+#include "cedar/auxiliaries/annotation/ColorSpace.h"
 
 
 // SYSTEM INCLUDES
@@ -47,12 +48,14 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+//!@todo The parameter names here should follow the default naming scheme
 cedar::proc::sources::GrabberBase::GrabberBase()
 :
 cedar::proc::Step(false, true),
-mImage(new cedar::aux::ImageData(cv::Mat::zeros(1, 1, CV_8UC3))),
+mImage(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_8UC3))),
 mRecording(new cedar::aux::BoolParameter(this, "record", false))
 {
+	//!@todo These can be set using just the default parameter of the constructor.
   //this->getGrabber().reset();
 
   QObject::connect(mRecording.get(), SIGNAL(valueChanged()), this, SLOT(setRecording()));
@@ -68,6 +71,31 @@ cedar::proc::sources::GrabberBase::~GrabberBase()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::sources::GrabberBase::annotateImage()
+{
+  cedar::aux::annotation::ColorSpacePtr color_space;
+  switch (this->mImage->getData().channels())
+  {
+    case 4:
+      color_space = cedar::aux::annotation::ColorSpace::bgra();
+      break;
+
+    case 3:
+      color_space = cedar::aux::annotation::ColorSpace::bgr();
+      break;
+
+    case 1:
+      color_space = cedar::aux::annotation::ColorSpace::gray();
+      break;
+
+    default:
+      // this should not happen.
+      CEDAR_ASSERT(false);
+  } // switch
+
+  this->mImage->setAnnotation(color_space);
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::GrabberBase::setRecording()

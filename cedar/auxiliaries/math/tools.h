@@ -47,6 +47,16 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
+// Windows specific undefinition of the max macro
+#ifdef CEDAR_OS_WINDOWS
+#  ifdef max
+#    undef max
+#  endif // def max
+#  ifdef min
+#    undef min
+#  endif // def min
+#endif // CEDAR_OS_WINDOWS
+
 /*
  *  this file has very generic math functions that do not fall under some other category
  *  more specific functions should be put in specialized files
@@ -128,6 +138,9 @@ namespace cedar
       {
         return mat.type() == CV_32F;
       }
+
+      //!@brief Returns a string corresponding to the given matrix's type
+      std::string matrixTypeToString(const cv::Mat& matrix);
 
       //!@brief a helper function to determine the real dimensionality of a cv::Mat (matrix.dims works only for 2+ dims)
       inline unsigned int getDimensionalityOf(const cv::Mat& matrix)

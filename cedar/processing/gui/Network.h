@@ -56,6 +56,8 @@
  *
  *        This class takes care of loading cedar::proc::Networks in a manner that allows them to be added into
  *        cedar::proc::gui::Scenes as either the root network or a subnetwork.
+ *
+ * @todo  It should probably be possible to use this class without a scene/main window.
  */
 class cedar::proc::gui::Network : public QObject, public cedar::proc::gui::GraphicsBase
 {
@@ -189,7 +191,7 @@ private:
   //!@brief Transforms the coordinates of a newly added child into the network's coordinate system.
   void transformChildCoordinates(cedar::proc::gui::GraphicsBase* pItem);
 
-  void checkDataConnection(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target, bool added);
+  void checkDataConnection(cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target, bool added);
 
   void checkTriggerConnection(cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool added);
 

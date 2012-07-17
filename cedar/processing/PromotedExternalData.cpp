@@ -38,6 +38,7 @@
 #include "cedar/processing/PromotedExternalData.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 
@@ -72,6 +73,11 @@ cedar::proc::PromotedExternalData::~PromotedExternalData()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::PromotedExternalData::clear()
+{
+  this->mDataSlot->clear();
+}
+
 void cedar::proc::PromotedExternalData::setData(cedar::aux::DataPtr data)
 {
   // reset validity when the data changes.
@@ -81,6 +87,11 @@ void cedar::proc::PromotedExternalData::setData(cedar::aux::DataPtr data)
   }
 
   this->mDataSlot->setData(data);
+}
+
+void cedar::proc::PromotedExternalData::removeData(cedar::aux::ConstDataPtr data)
+{
+  cedar::aux::asserted_pointer_cast<cedar::proc::ExternalData>(this->mDataSlot)->removeData(data);
 }
 
 cedar::aux::DataPtr cedar::proc::PromotedExternalData::getData()

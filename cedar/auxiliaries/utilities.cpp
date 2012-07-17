@@ -103,13 +103,14 @@ std::string cedar::aux::unmangleName(const char* mangledName)
 #endif // CEDAR_COMPILER_GCC
 }
 
+#define CEDAR_MACRO_CONTENTS_TO_CSTR(x) #x
 std::ostream& cedar::aux::operator<< (std::ostream& stream, const cedar::aux::StackTrace& trace)
 {
   stream << "Backtrace generated with ";
 #ifdef CEDAR_COMPILER_GCC
   stream << "CEDAR_COMPILER_GCC";
 #elif defined CEDAR_COMPILER_MSVC
-  stream << "CEDAR_COMPILER_MSVC " << #CEDAR_COMPILER_MSVC;
+  stream << "CEDAR_COMPILER_MSVC " << CEDAR_MACRO_CONTENTS_TO_CSTR(CEDAR_COMPILER_MSVC);
 #else
   stream << "unsupported compiler";
 #endif // CEDAR_COMPILER_GCC

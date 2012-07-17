@@ -64,6 +64,10 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/video_grabber.svg");
+    declaration->setDescription
+    (
+      "A source that reads images from a camera."
+    );
     cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
 
     return true;

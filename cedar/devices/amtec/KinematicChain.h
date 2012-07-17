@@ -42,6 +42,8 @@
 #ifdef CEDAR_USE_AMTEC
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/IntVectorParameter.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/devices/amtec/namespace.h"
 #include "cedar/devices/robot/KinematicChain.h"
 
@@ -137,7 +139,7 @@ private:
   //! Returns the amtec initialization string.
   inline std::string getInitString()
   {
-    return this->mInitString->getValue();
+    return this->_mInitString->getValue();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -146,9 +148,9 @@ private:
 protected:
   // none yet
 private:
-  CDevice *mpDevice;
+  CDevice* mpDevice;
   int mInit;
-  std::vector<int> mModules;
+//  std::vector<int> mModules;
   mutable QMutex mCanBusMutex;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -156,7 +158,9 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //! The amtec initialization string.
-  cedar::aux::StringParameterPtr mInitString;
+  cedar::aux::StringParameterPtr _mInitString;
+  //! The map of module identifiers
+  cedar::aux::IntVectorParameterPtr _mModuleMap;
 
 }; // class cedar::dev::amtec::KinematicChain
 #endif // CEDAR_USE_AMTEC

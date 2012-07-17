@@ -68,10 +68,13 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/switch.svg");
-    declaration->setDescription("A step that calculates a mixture of two inputs based on a third one.<br />"
-        "The step has the inputs \"input 1\", \"input 2\" and \"factor\". The output, \"mixture\" is calculated "
-        "as (factor) * (input 1) + (1 - factor) * (input 2). Thus, input one and two must be matrices, while "
-        "factor must be either DoubleData or zero-dimensional MatData.");
+    declaration->setDescription
+    (
+      "A step that calculates a mixture of two inputs based on a third one.<br />"
+      "The step has the inputs \"input 1\", \"input 2\" and \"factor\". The output, \"mixture\" is calculated "
+      "as (factor) * (input 1) + (1 - factor) * (input 2). Thus, input one and two must be matrices, while "
+      "factor must be either DoubleData or zero-dimensional MatData."
+    );
 
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(declaration);
 
@@ -141,12 +144,12 @@ void cedar::proc::steps::Switch::compute(const cedar::proc::Arguments&)
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Switch::determineInputValidity
                                 (
                                   cedar::proc::ConstDataSlotPtr slot,
-                                  cedar::aux::DataPtr data
+                                  cedar::aux::ConstDataPtr data
                                 ) const
 {
   if (slot->getName() == "input 1" || slot->getName() == "input 2")
   {
-    if (cedar::aux::MatDataPtr mat_data = boost::shared_dynamic_cast<cedar::aux::MatData>(data))
+    if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
     {
       // check fitting sizes
       if (slot->getName() == "input 1" && this->mInput2)
@@ -173,14 +176,14 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Switch::determineInputValidi
     // the slot should be one of the ones we have declared above
     CEDAR_DEBUG_ASSERT(slot->getName() == "factor");
 
-    if (cedar::aux::MatDataPtr mat_data = boost::shared_dynamic_cast<cedar::aux::MatData>(data))
+    if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
     {
       if (cedar::aux::math::getDimensionalityOf(mat_data->getData()) == 0)
       {
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
-    else if (boost::shared_dynamic_cast<cedar::aux::DoubleData>(data))
+    else if (boost::shared_dynamic_cast<const cedar::aux::DoubleData>(data))
     {
       return cedar::proc::DataSlot::VALIDITY_VALID;
     }
@@ -193,11 +196,11 @@ void cedar::proc::steps::Switch::inputConnectionChanged(const std::string& input
   if (inputName == "factor")
   {
     this->mFactor = this->getInput(inputName);
-    if (cedar::aux::MatDataPtr data = boost::shared_dynamic_cast<cedar::aux::MatData>(data))
+    if (boost::shared_dynamic_cast<const cedar::aux::MatData>(this->mFactor))
     {
       this->mFactorDataType = FACTOR_IS_MATRIX;
     }
-    else if (boost::shared_dynamic_cast<cedar::aux::DoubleData>(data))
+    else if (boost::shared_dynamic_cast<const cedar::aux::DoubleData>(this->mFactor))
     {
       this->mFactorDataType = FACTOR_IS_DOUBLE;
     }
@@ -211,12 +214,22 @@ void cedar::proc::steps::Switch::inputConnectionChanged(const std::string& input
     if (inputName == "input 1")
     {
       this->mInput1 = cedar::aux::asserted_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
-
     }
     else if (inputName == "input 2")
     {
       this->mInput2 = cedar::aux::asserted_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
+    }
 
+    if (this->mInput1 || this->mInput2)
+    {
+      if (this->mInput1)
+      {
+        this->mOutput->setData(0.0 * this->mInput1->getData());
+      }
+      else if (this->mInput2)
+      {
+        this->mOutput->setData(0.0 * this->mInput2->getData());
+      }
     }
   }
 }

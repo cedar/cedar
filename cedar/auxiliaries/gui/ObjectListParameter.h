@@ -101,14 +101,14 @@ private:
 
   void appendObjectToInstanceList(int index);
 
+  QString prettyTypeId(const QString& typeId) const;
+
 private slots:
   void parameterPointerChanged();
 
   void addClicked();
 
   void removeClicked();
-
-  void editClicked();
 
   void currentInstanceIndexChanged(int index);
 
@@ -129,9 +129,6 @@ private:
 
   //! Button for removing a child
   QPushButton *mpRemoveButton;
-
-  //! Button for removing a child
-  QPushButton *mpEditButton;
 
   //! Connection to the parameters instance added signal.
   boost::signals2::connection mObjectAddedConnection;

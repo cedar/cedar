@@ -59,6 +59,7 @@
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorValid(170, 218, 24);
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorWarning(255, 207, 40);
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorError(206, 0, 11);
+const QColor cedar::proc::gui::GraphicsBase::mValidityColorUnknown(206, 109, 11);
 
 const QColor cedar::proc::gui::GraphicsBase::mDefaultOutlineColor(Qt::black);
 const QColor cedar::proc::gui::GraphicsBase::mDefaultFillColor(Qt::white);
@@ -473,6 +474,9 @@ const QColor& cedar::proc::gui::GraphicsBase::getValidityColor(ConnectValidity v
 
     case cedar::proc::gui::CONNECT_WARNING:
       return mValidityColorWarning;
+
+    case cedar::proc::gui::CONNECT_UNKNOWN:
+      return mValidityColorUnknown;
 
     default:
       return mValidityColorError;

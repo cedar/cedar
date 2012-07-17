@@ -58,6 +58,11 @@ namespace
       new cedar::proc::ElementDeclarationTemplate<cedar::dyn::Preshape>("Fields", "cedar.dynamics.Preshape")
     );
     preshape_decl->setIconPath(":/steps/preshape.svg");
+    preshape_decl->setDescription
+    (
+      "A dynamical system that slowly accumulates activation at locations of strongly active input. The activation "
+      "decays slowly over time."
+    );
 
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(preshape_decl);
 
@@ -108,12 +113,12 @@ void cedar::dyn::Preshape::eulerStep(const cedar::unit::Time& time)
 cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
                                                          (
                                                            cedar::proc::ConstDataSlotPtr slot,
-                                                           cedar::aux::DataPtr data
+                                                           cedar::aux::ConstDataPtr data
                                                          ) const
 {
   if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "input")
   {
-    if (cedar::dyn::SpaceCodePtr input = boost::shared_dynamic_cast<cedar::dyn::SpaceCode>(data))
+    if (cedar::dyn::ConstSpaceCodePtr input = boost::shared_dynamic_cast<const cedar::dyn::SpaceCode>(data))
     {
       if (!this->isMatrixCompatibleInput(input->getData()))
       {
@@ -124,7 +129,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
-    else if (cedar::aux::MatDataPtr input = boost::shared_dynamic_cast<cedar::aux::MatData>(data))
+    else if (cedar::aux::ConstMatDataPtr input = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
     {
       if (!this->isMatrixCompatibleInput(input->getData()))
       {

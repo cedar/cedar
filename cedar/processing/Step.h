@@ -175,7 +175,7 @@ protected:
    *        After calling this method, this step will be aware that this trigger belongs to it. Among other things, this
    *        means that the processingIde will be able to show this trigger and allow to connect it.
    */
-  void addTrigger(cedar::proc::TriggerPtr& trigger);
+  void addTrigger(cedar::proc::TriggerPtr trigger);
 
   //! @brief Method that registers a function of an object so that it can be used by the framework.
   void registerFunction(const std::string& actionName, boost::function<void()> function);
@@ -222,7 +222,7 @@ private:
   bool mBusy;
 
   //!@brief The lock used for protecting the computation arguments of the step.
-  QReadWriteLock *mpArgumentsLock;
+  QReadWriteLock* mpArgumentsLock;
 
   //!@brief The arguments for the next cedar::proc::Step::compute call.
   ArgumentsPtr mNextArguments;

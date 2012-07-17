@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/MultiPlotInterface.h"
+#include "cedar/auxiliaries/math/namespace.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
@@ -129,6 +130,9 @@ public:
 
   bool canAppend(cedar::aux::ConstDataPtr data) const;
 
+  //!@brief Returns the limits of the x axis.
+  //!@todo Generalize this for n-dimensional matrix plots.
+  cedar::aux::math::Limits<double> getXLimits() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

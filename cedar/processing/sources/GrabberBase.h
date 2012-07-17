@@ -46,7 +46,7 @@
 #include "cedar/devices/sensors/visual/Grabber.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/auxiliaries/ImageData.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/FileParameter.h"
 
 // SYSTEM INCLUDES
@@ -95,8 +95,9 @@ public slots:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
 
+  //!@brief Applies an appropriate annotation to the current image.
+  void annotateImage();
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -128,7 +129,7 @@ protected:
   cedar::dev::sensors::visual::GrabberPtr mpGrabber;
 
   //!@brief The grabbed Image
-  cedar::aux::ImageDataPtr mImage;
+  cedar::aux::MatDataPtr mImage;
 
 
 private:

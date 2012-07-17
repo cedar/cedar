@@ -43,6 +43,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/annotation/Annotation.h"
+#include "cedar/auxiliaries/annotation/Annotatable.h"
+#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -51,7 +55,7 @@
  *
  *        The main task of this base interface is to provide a lock that is available for all derived data.
  */
-class cedar::aux::Data
+class cedar::aux::Data : public cedar::aux::annotation::Annotatable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -146,6 +150,7 @@ protected:
 private:
   //!@todo This should be a base*, however, right now Configurable can't be used with Base* because base has a (differently realized) name.
   cedar::aux::Configurable* mpeOwner;
+
 }; // class cedar::aux::Data
 
 #endif // CEDAR_AUX_DATA_H

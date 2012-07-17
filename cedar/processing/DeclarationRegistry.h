@@ -136,6 +136,9 @@ private:
   //! Member that stores the declarations.
   std::map<std::string, cedar::proc::ElementDeclarationPtr> mDeclarations;
 
+  //! Map of deprecated names to their current ones
+  std::map<std::string, std::string> mDeprecatedToCurrentNames;
+
   //! List of categories.
   CategoryList mCategories;
 

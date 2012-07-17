@@ -50,14 +50,13 @@
 int main(int /* argc */, char ** /* argv[] */)
 {
 //  std::string config_file("../../tests/interactive/devices/AmtecSpeedControl/cora_arm.conf");
-  std::string configuration_file_old = cedar::aux::System::locateResource("configs/cora_arm.conf");
   std::string configuration_file = cedar::aux::System::locateResource("configs/cora_arm.json");
 
   try
   {
     cedar::dev::amtec::KinematicChainPtr p_kinematic_chain
     (
-      new cedar::dev::amtec::KinematicChain(configuration_file_old)
+      new cedar::dev::amtec::KinematicChain()
     );
     p_kinematic_chain->readJson(configuration_file);
     if(!p_kinematic_chain->initDevice())
@@ -65,10 +64,11 @@ int main(int /* argc */, char ** /* argv[] */)
       std::cout << "Error initializing the Amtec module!" << std::endl;
       CEDAR_THROW(cedar::aux::InitializationException, "Error initializing the Amtec module!");
     }
-    ControlThread thread(p_kinematic_chain, configuration_file);
-    std::cout << "moving arm for 15s just by controling velocity..." << std::endl;
+//    ControlThread thread(p_kinematic_chain, configuration_file);
+    ControlThread thread(p_kinematic_chain, 100, 0.01);
+    std::cout << "moving arm for 5s just by controling velocity..." << std::endl;
     thread.start();
-    thread.wait(15000);
+    thread.wait(5000);
     thread.stop();
     thread.wait();
   }

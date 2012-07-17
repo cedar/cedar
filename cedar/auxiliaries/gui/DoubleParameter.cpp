@@ -66,17 +66,8 @@ namespace
 
 cedar::aux::gui::DoubleParameter::DoubleParameter(QWidget *pParent)
 :
-cedar::aux::gui::Parameter(pParent)
+cedar::aux::gui::DoubleParameter::Base(pParent)
 {
-  this->setLayout(new QHBoxLayout());
-  this->mpSpinbox = new QDoubleSpinBox();
-  this->layout()->setContentsMargins(0, 0, 0, 0);
-  this->layout()->addWidget(this->mpSpinbox);
-  this->mpSpinbox->setMinimum(-100.0);
-  this->mpSpinbox->setMaximum(+100.0);
-  this->mpSpinbox->setDecimals(4); //!@todo Make this an option in NumericParameter
-
-  QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
 }
 
 //!@brief Destructor
@@ -88,45 +79,15 @@ cedar::aux::gui::DoubleParameter::~DoubleParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gui::DoubleParameter::parameterPointerChanged()
+void cedar::aux::gui::DoubleParameter::parameterChanged()
 {
-  this->applyProperties();
-
-  cedar::aux::DoubleParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(this->getParameter());
-
-  // read current value
-  parameter->lockForRead();
-  this->mpSpinbox->setValue(parameter->getValue());
-  parameter->unlock();
-
-  // connect signals/slots
-  QObject::connect(this->mpSpinbox, SIGNAL(valueChanged(double)), this, SLOT(valueChanged(double)));
-  QObject::connect(parameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertyChanged()));
+  this->Base::parameterChanged();
+  QObject::connect(this->mpWidget, SIGNAL(valueChanged(double)), this, SLOT(valueChanged(double)));
 }
 
-void cedar::aux::gui::DoubleParameter::propertyChanged()
+
+void cedar::aux::gui::DoubleParameter::valueChanged(double)
 {
-  this->applyProperties();
-}
-
-void cedar::aux::gui::DoubleParameter::applyProperties()
-{
-  cedar::aux::DoubleParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(this->getParameter());
-
-  parameter->lockForRead();
-  this->mpSpinbox->setMinimum(parameter->getMinimum());
-  this->mpSpinbox->setMaximum(parameter->getMaximum());
-  this->mpSpinbox->setDisabled(parameter->isConstant());
-  parameter->unlock();
-}
-
-void cedar::aux::gui::DoubleParameter::valueChanged(double value)
-{
-  cedar::aux::DoubleParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(this->getParameter());
-
-  parameter->setValue(value, true);
+  this->widgetValueChanged();
 }
 
