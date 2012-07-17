@@ -86,7 +86,7 @@ mBusId(new cedar::aux::UIntParameter(this, "busId", 0, 0, 999))
   //GrabberBase::_mConfigurationFileName->setValue("./cameragrabber.cfg");
 
   //default file values
-  mGrabber.reset();
+  //mGrabber.reset();
 
 
   this->declareOutput("camera", mImage);
@@ -101,7 +101,7 @@ mBusId(new cedar::aux::UIntParameter(this, "busId", 0, 0, 999))
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Camera::onStart()
 {
-  if (!mGrabber)
+  if (!this->getCameraGrabber()->isCreated())
   {
     //GrabberBase::createGrabber();
   }
@@ -118,7 +118,7 @@ void cedar::proc::sources::Camera::setDeBayer()
 void cedar::proc::sources::Camera::setBusId()
 {
   //recreate grabber if needed
-  if (mGrabber)
+  if (this->getCameraGrabber()->isCreated())
   {
    // GrabberBase::createGrabber();
   }
@@ -140,44 +140,44 @@ void cedar::proc::sources::Camera::compute(const cedar::proc::Arguments&)
   }
   */
 
-  if (mGrabber)
+  if (this->getCameraGrabber()->isCreated())
   {
-    this->mGrabber->grab();
+    this->getCameraGrabber()->grab();
 
     cv::Mat frame;
 
     //check if conversion from bayer-pattern to cv::Mat BGR format is needed
     if(this->mDeBayer->getValue())
     {
-      cv::cvtColor(this->mGrabber->getImage(),frame,CV_BayerGR2BGR);
+      cv::cvtColor(this->getCameraGrabber()->getImage(),frame,CV_BayerGR2BGR);
     }
     else
     {
-      frame = this->mGrabber->getImage();
+      frame = this->getCameraGrabber()->getImage();
     }
     this->mImage->setData(frame.clone());
   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::sources::Camera::onCreateGrabber()
-{
-  //const std::string conf_file = this->_mConfigurationFileName->getPath();
-  const unsigned int bus_id = this->mBusId->getValue();
-
-  // create a new one
-  cedar::dev::sensors::visual::CameraGrabberPtr grabber;
-  //grabber = cedar::dev::sensors::visual::CameraGrabberPtr
-  //          (
-   //            new cedar::dev::sensors::visual::CameraGrabber(conf_file,bus_id,false,true)
-   //         );
-  const std::string message2= "New grabber created";
-  cedar::aux::LogSingleton::getInstance()->debugMessage(message2,"cedar::proc::sources::Video::createGrabber()");
-
-  // the new grabber created without exception, so we can use it
-  GrabberBase::mGrabber = grabber;
-
-  //!@todo read debayer value from config-file
-}
+//void cedar::proc::sources::Camera::onCreateGrabber()
+//{
+//  //const std::string conf_file = this->_mConfigurationFileName->getPath();
+//  const unsigned int bus_id = this->mBusId->getValue();
+//
+//  // create a new one
+//  cedar::dev::sensors::visual::CameraGrabberPtr grabber;
+//  //grabber = cedar::dev::sensors::visual::CameraGrabberPtr
+//  //          (
+//   //            new cedar::dev::sensors::visual::CameraGrabber(conf_file,bus_id,false,true)
+//   //         );
+//  const std::string message2= "New grabber created";
+//  cedar::aux::LogSingleton::getInstance()->debugMessage(message2,"cedar::proc::sources::Video::createGrabber()");
+//
+//  // the new grabber created without exception, so we can use it
+//  GrabberBase::mGrabber = grabber;
+//
+//  //!@todo read debayer value from config-file
+//}
 
 #endif // CEDAR_USE_LIB_DC1394

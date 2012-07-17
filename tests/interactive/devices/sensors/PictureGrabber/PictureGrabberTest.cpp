@@ -24,7 +24,7 @@
 
 int main(int , char **)
 {
-
+/*
   const std::string FILE_NAME_0 = "/usr/share/wallpapers/Vector_Sunset/contents/images/1024x768.jpg";
   const std::string FILE_NAME_1 = "/usr/share/wallpapers/Vector_Sunset/contents/images/1280x1024.jpg";
 
@@ -77,7 +77,7 @@ int main(int , char **)
    *  Parameters loaded from configfile
    *  - thread isn't running
    *  - grabbername is restored from configfile
-   */
+   * /
 
     picture_grabber->setName(GRABBER_NAME_0);
     std::cout << "\nGrab channel 0 from \"" << picture_grabber->getSourceInfo()<<"\"" << std::endl;
@@ -204,6 +204,6 @@ int main(int , char **)
   }
 
   std::cout << "finished\n";
-
+*/
   return 0;
 }

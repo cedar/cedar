@@ -109,7 +109,7 @@ public:
     Channel()
     :
     _mSnapshotName(new cedar::aux::FileParameter(this,"snapshotName",cedar::aux::FileParameter::READ,"./snapshot.jpg")),
-    _mRecordName(new cedar::aux::FileParameter(this, "recordName",cedar::aux::FileParameter::READ,"./record.jpg")),
+    _mRecordName(new cedar::aux::FileParameter(this, "recordName",cedar::aux::FileParameter::READ,"./record.avi")),
     mChannelInfo("")
     {
       //init classes
@@ -216,7 +216,22 @@ public:
    *    It is possible to change values between readJson() and applyParameters() via the set-Methods
    *    @see setRecordName(), @see setName(), @see CameraGrabber::setSettings()
    */
-  void applyParameter();
+  bool applyParameter();
+
+  /*!@brief This functin indicates, if the grabber is already in grabbing mode
+   *
+   * This is usefull, if you want to check if the automatically created grabbers from a config-file are fully
+   * functional, or if there was a problem during startup with the default parameters.
+   *
+   * At an instantiation, the grabber always will be created. If the capure-device also will be created depends on
+   * the default parameter. If there is no error, then the capture-device will be created and the grabber is fully
+   * functional.
+   *
+   * On an error, only the grabber is created, without the capture-device. It is possible to adjust the parameter
+   * and try to create the capture-device again with the applyParameter() method
+   */
+  bool isCreated();
+
 
   /*! @brief Resets the Grabber to initialization values, without opening the device
    *
@@ -658,11 +673,8 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-    /*! @brief  the number of channels
-     *
-     *  Initialization should be done in the constructor of the derived class.
-     */
-    //unsigned int mNumCams;
+    ///! @brief Flag which indicates if the capture devices of all channels are correctly created or not
+    bool mCaptureDeviceCreated;
 
 
     /*! @brief Read/write lock
@@ -676,6 +688,9 @@ protected:
      */
     double mFpsMeasured;
     
+    /*! @brief  Flag if recording is on     */
+    bool mRecording;
+
 private:
 
     ///! @brief Flag which indicates if the GrabberThread was started during startRecording
@@ -684,6 +699,7 @@ private:
     ///! @brief Flag which indicates if the CleanUp was already done (perhaps due to an error)
     bool mCleanUpAlreadyDone;
     
+
     ///! @brief Timestamp at startGrabber time to measure the real fps of grabbing
     boost::posix_time::ptime mFpsMeasureStart;
 
@@ -714,9 +730,6 @@ protected:
   ///! A vector which contains for every grabbing-channel one channel structure
   ChannelParameterPtr _mChannels;
 
-  /*! @brief  Flag if recording is on     */
-  //!@todo: olli: don't save this flag
-  cedar::aux::BoolParameterPtr _mRecording;
 
 private:
 

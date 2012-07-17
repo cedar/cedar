@@ -61,13 +61,20 @@ public cedar::dev::sensors::visual::Grabber
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
-  // slots
+  // slots and signals
   //--------------------------------------------------------------------------------------------------------------------
 
   protected slots:
 
   //!@brief A slot that is triggered if a new filename is set
   void fileNameChanged();
+
+
+  signals:
+
+  //!@brief This signal is emitted, when a new picture is available with the getImage() method.
+  void pictureChanged();
+
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -146,20 +153,25 @@ public:
    *	For details look at the OpenCV-documentation (Section "imread").
    *  @param channel which should be changed.
    *  @param fileName of the new picture.
-   *  @throws IndexOutOfRangeException If channel is't fit
+   *  @throws IndexOutOfRangeException If channel isn't fit
    *  @throws InitializationException If the grabber couldn't grab from the file
    */
   void setSourceFile(unsigned int channel, const std::string& fileName);
 
   /*! @brief Set a new picture to grab from
-   *   This is for a single channel grabber or for channel 0 on a stereor grabber
+   *   This is for a single channel grabber or for channel 0 on a stereo grabber
    *  @param fileName of the new picture.
-   *  @throws IndexOutOfRangeException If channel is't fit
+   *  @throws IndexOutOfRangeException If channel isn't fit
    *  @throws InitializationException If the grabber couldn't grab from the file
    *  @see setSourceFile(unsigned int, const std::string&)
    */
-
   void setSourceFile(const std::string& fileName);
+
+  /*! @brief Get the used file to grab from
+   *  @param channel The channel which filename should be read
+   *  @throws IndexOutOfRangeException If channel isn't fit
+   */
+  const std::string getSourceFile(unsigned int channel = 0);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -181,6 +193,10 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+
+  /*! @brief Boost slot method. Invoked if a channel is added as an ObjectListParameter as an object
+   */
+  void channelAdded(int index);
 
   /// @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
   inline PictureChannelPtr getPictureChannel(unsigned int channel)

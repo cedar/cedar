@@ -63,6 +63,7 @@ int main(int , char **)
   // the current test number
   int test_number = 0;
 
+/*
 
   //------------------------------------------------------------------------------------------------------------------
   //create a stereo-test-grabber (only a dummy grabber for testing)
@@ -341,7 +342,7 @@ int main(int , char **)
   }
 
   boost::filesystem::remove(CONFIG_FILE_NAME);
-
+*/
   return errors;
 
 }
