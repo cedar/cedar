@@ -111,7 +111,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief this SpaceCode matrix contains the current field activity of the NeuralField
-  cedar::dyn::SpaceCodePtr mActivation;
+  cedar::aux::MatDataPtr mActivation;
 private:
   // none yet
 

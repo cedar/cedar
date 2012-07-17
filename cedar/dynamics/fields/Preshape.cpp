@@ -36,7 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/dynamics/fields/Preshape.h"
-#include "cedar/dynamics/SpaceCode.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/assert.h"
@@ -77,7 +77,7 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dyn::Preshape::Preshape()
 :
-mActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
+mActivation(new cedar::aux::MatData(cv::Mat::zeros(10,10,CV_32F))),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 0, 1000)),
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000)),
 _mTimeScale(new cedar::aux::DoubleParameter(this, "time scale", 0.1, 0.001, 10.0))
@@ -118,7 +118,8 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
 {
   if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "input")
   {
-    if (cedar::dyn::ConstSpaceCodePtr input = boost::shared_dynamic_cast<const cedar::dyn::SpaceCode>(data))
+    //!@todo Reenable this once the annotations for space code are introduced.
+    /* if (cedar::dyn::ConstSpaceCodePtr input = boost::shared_dynamic_cast<const cedar::dyn::SpaceCode>(data))
     {
       if (!this->isMatrixCompatibleInput(input->getData()))
       {
@@ -129,7 +130,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
-    else if (cedar::aux::ConstMatDataPtr input = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+    else */ if (cedar::aux::ConstMatDataPtr input = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
     {
       if (!this->isMatrixCompatibleInput(input->getData()))
       {
@@ -137,7 +138,8 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
       }
       else
       {
-        return cedar::proc::DataSlot::VALIDITY_WARNING;
+        return cedar::proc::DataSlot::VALIDITY_VALID;
+        /* return cedar::proc::DataSlot::VALIDITY_WARNING; */ // see above todo entry
       }
     }
     return cedar::proc::DataSlot::VALIDITY_ERROR;
