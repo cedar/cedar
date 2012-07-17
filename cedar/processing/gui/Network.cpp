@@ -346,16 +346,16 @@ void cedar::proc::gui::Network::transformChildCoordinates(cedar::proc::gui::Grap
 
 void cedar::proc::gui::Network::elementAdded(cedar::proc::Network* pNetwork, cedar::proc::ElementPtr pElement)
 {
+  CEDAR_DEBUG_ASSERT(pNetwork == this->getNetwork().get());
+
   if (this->mpScene && !this->isRootNetwork())
   {
     cedar::proc::gui::GraphicsBase *p_element_item = this->mpScene->getGraphicsItemFor(pElement.get());
-    cedar::proc::gui::GraphicsBase *p_network_item = this->mpScene->getGraphicsItemFor(pNetwork);
     CEDAR_ASSERT(p_element_item != NULL);
-    CEDAR_ASSERT(p_network_item != NULL);
     if (p_element_item->parentItem() != this)
     {
       this->transformChildCoordinates(p_element_item);
-      p_element_item->setParentItem(p_network_item);
+      p_element_item->setParentItem(this);
       this->fitToContents();
     }
   }
