@@ -56,6 +56,8 @@
  *
  *        This class takes care of loading cedar::proc::Networks in a manner that allows them to be added into
  *        cedar::proc::gui::Scenes as either the root network or a subnetwork.
+ *
+ * @todo  It should probably be possible to use this class without a scene/main window.
  */
 class cedar::proc::gui::Network : public QObject, public cedar::proc::gui::GraphicsBase
 {
