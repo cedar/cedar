@@ -304,11 +304,22 @@ public:
 
   //!@brief set one entry of the vector to a new value
   //!@todo This should be called setValue
-  virtual void set(size_t index, const T& value)
+  virtual void set(size_t index, const T& value, bool lock = false)
   {
     CEDAR_DEBUG_ASSERT(index < this->mValues.size());
+
+    if (lock)
+    {
+      this->lockForWrite();
+    }
+
     T old_value = this->mValues[index];
     this->mValues[index] = value;
+
+    if (lock)
+    {
+      this->unlock();
+    }
 
     if (value != old_value)
     {
