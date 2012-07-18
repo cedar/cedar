@@ -64,6 +64,7 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(Parameter);
 
       class CEDAR_AUX_LIB_EXPORT BoolParameter;
+      class CEDAR_AUX_LIB_EXPORT BoolVectorParameter;
       class CEDAR_AUX_LIB_EXPORT DirectoryParameter;
       class CEDAR_AUX_LIB_EXPORT DoubleParameter;
       class CEDAR_AUX_LIB_EXPORT DoubleVectorParameter;
@@ -80,7 +81,10 @@ namespace cedar
       class CEDAR_AUX_LIB_EXPORT Log;
 
       template <typename ValueT, class WidgetT> class NumericWidgetPolicy;
-      template <typename ValueT, class WidgetType> class NumericParameter;
+      template <typename ValueT, class WidgetT> class NumericParameter;
+
+      template <typename ValueT, class WidgetT> class VectorParameterAbstraction;
+      template <typename ValueT, class WidgetT> class VectorParameter;
 
       /* Exceptions */
       class InvalidPlotData;
