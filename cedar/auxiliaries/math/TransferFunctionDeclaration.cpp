@@ -21,12 +21,12 @@
 
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
-
-    File:        LinearSigmoid.cpp
+                 
+    File:        TransferFunctionDeclaration.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 05 16
+    Date:        2012 03 25
 
     Description:
 
@@ -35,37 +35,18 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/sigmoids/LinearSigmoid.h"
-#include "cedar/auxiliaries/FactoryManager.h"
-#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/math/TransferFunctionDeclaration.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
-// register class with the sigmoid factory manager
-//----------------------------------------------------------------------------------------------------------------------
-
-namespace
-{
-  bool registered
-    = cedar::aux::math::TransferFunctionManagerSingleton::getInstance()->registerType<cedar::aux::math::LinearSigmoidPtr>();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
-cedar::aux::math::LinearSigmoid::LinearSigmoid(double threshold)
-:
-cedar::aux::math::Sigmoid(threshold)
+cedar::aux::math::TransferFunctionFactoryPtr cedar::aux::math::TransferFunctionDeclaration::getObjectFactory()
 {
+  return this->mpClassFactory;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-double cedar::aux::math::LinearSigmoid::compute(double value) const
-{
-  return value;
-}

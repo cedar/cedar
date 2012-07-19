@@ -63,20 +63,21 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(HeavisideSigmoid);
       CEDAR_DECLARE_AUX_CLASS(LinearSigmoid);
       CEDAR_DECLARE_AUX_CLASS(SemiLinearSigmoid);
-      CEDAR_DECLARE_AUX_CLASS(SigmoidDeclaration);
+      CEDAR_DECLARE_AUX_CLASS(TransferFunctionDeclaration);
+      CEDAR_DECLARE_AUX_CLASS(TransferFunction);
       //!@endcond
 
       //!@brief a templated declaration for sigmoid function implementation
-      template <class DerivedClass> class SigmoidDeclarationT;
+      template <class DerivedClass> class TransferFunctionDeclarationT;
       //!@brief a template specialization for sigmoid factories
-      typedef cedar::aux::Factory<SigmoidPtr> SigmoidFactory;
+      typedef cedar::aux::Factory<TransferFunctionPtr> TransferFunctionFactory;
 
       template <class T> class LimitsParameter;
       //!@brief a template specialization for double-based limits
       typedef LimitsParameter<double> DoubleLimitsParameter;
 
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_GENERATE_POINTER_TYPES(SigmoidFactory);
+      CEDAR_GENERATE_POINTER_TYPES(TransferFunctionFactory);
       CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleLimitsParameter);
       //!@endcond
     }
