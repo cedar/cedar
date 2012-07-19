@@ -98,7 +98,7 @@ public:
 
   /*! @brief Allow OpenCV backend to set the ISO-speed of the firewire bus.
    *
-   *  Set the ISO-speed manually with the CameraGrabber::setCameraIsoSpeed() method. <br>
+   *  Set the ISO-speed manually with the CameraGrabber::setCameraIsoSpeed() method.
    *
    *  @remarks
    *  As every setting, this can only be done before the first frame was grabbed.

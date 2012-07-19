@@ -37,14 +37,13 @@
 #ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTING_H
 #define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTING_H
 
-#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 #ifdef CEDAR_USE_LIB_DC1394
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/devices/sensors/visual/namespace.h"
-#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
-
 
 // SYSTEM INCLUDES
 #include <opencv2/highgui/highgui_c.h>
@@ -52,9 +51,9 @@
 //--------------------------------------------------------------------------------------------------------------------
 //(re)defines of our new introduced properties in OpenCV:
 //delete this, if the patched OpenCV is available
-#ifndef CV_CAP_PROP_ISO_SPEED
-  #define CV_CAP_PROP_ISO_SPEED 30
-#endif
+//#ifndef CV_CAP_PROP_ISO_SPEED
+//  #define CV_CAP_PROP_ISO_SPEED 30
+//#endif
 
 
 /*!@brief Enum class for camera settings.

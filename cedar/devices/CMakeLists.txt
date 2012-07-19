@@ -53,6 +53,7 @@ cedar_add_library(cedardev
                   robot/gui/MountedCameraViewer.h
                   kteam/gui/EPuckControlWidget.h
                   communication/gui/CommunicationWidget.h
+                  sensors/visual/PictureGrabber.h
                   ${kuka_moc_files}
                   LINK_LIBRARIES
                   cedaraux

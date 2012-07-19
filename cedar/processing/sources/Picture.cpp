@@ -84,17 +84,38 @@ namespace
 
 cedar::proc::sources::Picture::Picture()
 :
-cedar::proc::sources::GrabberBase(),
-_mFileName(new cedar::aux::FileParameter(this, "filename", cedar::aux::FileParameter::READ,""))
+cedar::proc::sources::GrabberBase()
 {
-  //default config-filename
-  GrabberBase::_mConfigurationFileName->setValue("./picturegrabber.cfg");
+  cedar::dev::sensors::visual::PictureGrabberPtr grabber;
+  grabber = cedar::dev::sensors::visual::PictureGrabberPtr
+            (
+               new cedar::dev::sensors::visual::PictureGrabber()
+            );
 
-  //default-filenames
-  _mFileName->setValue("./picture.png");
+  //no exception here, so we could use it
+  //GrabberBase::mGrabber = grabber;
+  this->mpGrabber = grabber;
 
+  this->addConfigurableChild("PictureGrabber", this->getPictureGrabber());
   this->declareOutput("Picture", mImage);
-  QObject::connect(_mFileName.get(), SIGNAL(valueChanged()), this, SLOT(setFileName()));
+
+  QObject::connect(this->getPictureGrabber().get(), SIGNAL(pictureChanged()), this, SLOT(updatePicture()));
+
+  if (this->getPictureGrabber()->applyParameter())
+  {
+    this->mImage->setData(this->getPictureGrabber()->getImage());
+  }
+  else
+  {
+    const std::string name = mpGrabber->getName();
+    std::stringstream init_message;
+    init_message << "Couldn't load image: "  << this->getPictureGrabber()->getSourceFile(0) << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+                                             (
+                                               name + ": " + init_message.str(),
+                                               "cedar::dev::sensors::visual::Picture::Picture()"
+                                             );
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -104,68 +125,35 @@ _mFileName(new cedar::aux::FileParameter(this, "filename", cedar::aux::FileParam
 //----------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Picture::onStart()
 {
+//  if (this->mGrabber->applyParameter())
+//  {
+//    // this->mGrabber->grab();
+//    this->mImage->setData(this->mGrabber->getImage());
+//  }
+}
+
+//----------------------------------------------------------------------------------------------------
+void cedar::proc::sources::Picture::updatePicture()
+{
+  cedar::aux::LogSingleton::getInstance()->debugMessage
+                                           (
+                                             this->getPictureGrabber()->getName() + ": Picture change detected.",
+                                             "cedar::dev::sensors::visual::Picture::updatePicture()"
+                                           );
+  onTrigger();
+  // update the annotation
+  this->annotateImage();
 }
 
 //----------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Picture::compute(const cedar::proc::Arguments&)
 {
-  if (!mGrabber)
+  if (getPictureGrabber()->isCreated())
   {
-    //no: create a new one
-    this->createGrabber();
-  }
-
-  // if creation was successfully or the grabber was already there
-  if (mGrabber)
-  {
-    // and set the filename
-    this->mGrabber->grab();
-    this->mImage->setData(this->mGrabber->getImage());
-
-    // update the annotation
-    this->annotateImage();
+    this->getPictureGrabber()->grab();
+    this->mImage->setData(this->getPictureGrabber()->getImage());
   }
 }
 
-//----------------------------------------------------------------------------------------------------
-void cedar::proc::sources::Picture::setFileName()
-{
-  // update grabber if already there
-  if (mGrabber)
-  {
-    std::string filename = this->_mFileName->getValue().path().toStdString();
-    this->getGrabber()->setSourceFile(filename);
-
-    std::string message = this->mGrabber->getName()+ ": Set new filename: " + filename;
-    cedar::aux::LogSingleton::getInstance()->debugMessage(message,"cedar::proc::sources::Picture::setFileName()");
-  }
-
-  // if there isn't a grabber instance created, the filename is stored internally,
-  // onTrigger() will then create the new grabber and get the images
-  this->onTrigger();
-}
 
 
-//----------------------------------------------------------------------------------------------------
-void cedar::proc::sources::Picture::setConfigurationFileName()
-{
-
-}
-
-//----------------------------------------------------------------------------------------------------
-void cedar::proc::sources::Picture::onCreateGrabber()
-{
-  // create grabber first to verify the correct creation, and then apply it
-  cedar::dev::sensors::visual::PictureGrabberPtr grabber;
-  grabber = cedar::dev::sensors::visual::PictureGrabberPtr
-            (
-               new cedar::dev::sensors::visual::PictureGrabber
-                   (
-                     this->_mConfigurationFileName->getPath(),
-                     this->_mFileName->getPath()
-                   )
-            );
-
-  // no exception here, so we could use it
-  GrabberBase::mGrabber = grabber;
-}

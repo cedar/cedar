@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,75 +22,80 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Camera.h
+    File:        RecordingFormat.h
 
     Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.ruhr-uni-bochum.d
-    Date:        2012 04 20
+    Email:       georg.hartinger@ini.rub.de
+    Date:        2012 07 04
 
-    Description:
+    Description:  Header for RecordingFormat enum-type class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCES_CAMERA_H
-#define CEDAR_PROC_SOURCES_CAMERA_H
+#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_RECORDINGFORMAT_H
+#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_RECORDINGFORMAT_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-// MAKE FIREWIRE OPTIONAL
-#ifdef CEDAR_USE_LIB_DC1394
-
 // CEDAR INCLUDES
-#include "cedar/processing/sources/namespace.h"
-#include "cedar/processing/sources/GrabberBase.h"
-#include "cedar/devices/sensors/visual/CameraGrabber.h"
-
-#include "cedar/auxiliaries/FileParameter.h"
-#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/EnumType.h"
+#include "cedar/devices/sensors/visual/namespace.h"
 
 // SYSTEM INCLUDES
+//#include <opencv2/opencv.hpp>
 
-
-//!@brief A camera source for the processingIde
-class cedar::proc::sources::Camera
-:
-public cedar::proc::sources::GrabberBase
+/*!@brief Enum class to determine the recording format
+ *
+ *    Maps the FOR-CC to a CEDAR Enum class. <br>
+ *
+ *     fourcc 4-character code of codec used for encoding of the recordings.<br>
+ *     Examples:<br>
+ *     CV_FOURCC('P','I','M,'1') is a MPEG-1 codec<br>
+ *     CV_FOURCC('M','J','P','G') is a motion-jpeg codec<br>
+ *     CV_FOURCC('M','P','4','2') is also a motion-jpeg codec<br>
+ *
+ *     For supported codecs, have a look at:<br>
+ *     /usr/local/src/OpenCV_{YOUR_VERSION}/modules/highgui/src/cap_ffmpeg_impl.hpp<br>
+ *     http://www.fourcc.org/codecs.php<br>
+ *
+ */
+class cedar::dev::sensors::visual::RecordingFormat
 {
-  Q_OBJECT
+  //--------------------------------------------------------------------------------------------------------------------
+  // typedefs
+  //--------------------------------------------------------------------------------------------------------------------
+//!@cond SKIPPED_DOCUMENTATION
+public:
+  typedef cedar::aux::EnumId Id;
+public:
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
+private:
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
+  // redefiniton of the CV_FOURCC inline function, because we need a static const value
+  #define CEDAR_FOURCC(c1,c2,c3,c4) (((c1) & 255) + (((c2) & 255) << 8) + (((c3) & 255) << 16) + (((c4) & 255) << 24))
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Camera();
 
   //!@brief Destructor
-//  virtual ~Camera(){};
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  static void construct();
 
-public slots:
-
-  //!@brief Set the debayer function on or off
-  void setDeBayer();
-
-  /*!@brief Set the busId
-   *
-   * If this value is set on grabbing, the cameragrabber will be destroyed and with the new busId recreated
-   */
-  void setBusId();
+  static const cedar::aux::EnumBase& type();
+  static const cedar::dev::sensors::visual::RecordingFormat::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -102,51 +107,42 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void compute(const cedar::proc::Arguments&);
-  void onStart();
-  //void onCreateGrabber();
-
-  //!@brief Cast the base GrabberBasePtr to derived class CameraGrabberPtr
-  inline cedar::dev::sensors::visual::CameraGrabberPtr getCameraGrabber()
-  {
-    return boost::static_pointer_cast<cedar::dev::sensors::visual::CameraGrabber>
-           (
-             this->cedar::proc::sources::GrabberBase::mpGrabber
-           );
-  }
-
-  //!@brief Cast the base GrabberBasePtr to derived class CameraGrabberPtr
-  inline cedar::dev::sensors::visual::ConstCameraGrabberPtr getCameraGrabber() const
-  {
-    return boost::static_pointer_cast<const cedar::dev::sensors::visual::CameraGrabber>
-           (
-            cedar::proc::sources::GrabberBase::mpGrabber
-           );
-  }
+  static cedar::aux::EnumType<cedar::dev::sensors::visual::RecordingFormat> mType;
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+
+  /// Record without any compression (i.e. RAW)
+  static const Id RECORD_RAW = 0;
+
+  /// Record in MP42 format
+  static const Id RECORD_MP42 = CEDAR_FOURCC('M','P','4','2'); // CV_FOURCC('M','P','4','2')
+
+  /// Record in MJPG
+  static const Id RECORD_MJPG = CEDAR_FOURCC('M','J','P','G');
+
+  /// Record in MPEG-2
+  static const Id RECORD_MPEG2 = CEDAR_FOURCC('m', 'p', 'g', '2');
+
+  /// Record in h264
+  static const Id RECORD_H264 = CEDAR_FOURCC('H', '2', '6', '4');
+
+  /// Record in h263
+  static const Id RECORD_H263 = CEDAR_FOURCC('H', '2', '6', '3');
+
+  /// Record in vp3
+  static const Id RECORD_VP3 = CEDAR_FOURCC('V', 'P', '3', '1');
+
 protected:
   // none yet
 private:
   // none yet
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
+}; // cedar::dev::sensors::visual::RecordingFormat
 
 
-private:
-  //!@ Bayer conversion from the camera image
-  cedar::aux::BoolParameterPtr mDeBayer;
+#endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_RECORDINGFORMAT_H
 
-  //!@ busid
-  cedar::aux::UIntParameterPtr mBusId;
-
-}; // class cedar::proc::sources::Camera
-
-#endif // CEDAR_USE_LIB_DC1394
-#endif // CEDAR_PROC_SOURCES_CAMERA_H

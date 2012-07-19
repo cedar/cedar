@@ -162,6 +162,8 @@ public:
   }
 
   /*!@brief Removes all objects from the list.
+   *
+   * @todo This should emit an objectRemovedSignal for each object in the list
    */
   void clear()
   {

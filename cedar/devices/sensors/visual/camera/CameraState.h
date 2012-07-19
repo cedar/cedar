@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,45 +22,36 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Camera.h
+    File:        CameraState.h
 
     Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.ruhr-uni-bochum.d
-    Date:        2012 04 20
+    Email:       georg.hartinger@ini.rub.de
+    Date:        2012 07 04
 
-    Description:
+    Description:  Header for the cedar::dev::sensors::visual::CameraState class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCES_CAMERA_H
-#define CEDAR_PROC_SOURCES_CAMERA_H
+#ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_STATE_H
+#define CEDAR_DEV_SENSORS_VISUAL_CAMERA_STATE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-// MAKE FIREWIRE OPTIONAL
-#ifdef CEDAR_USE_LIB_DC1394
-
 // CEDAR INCLUDES
-#include "cedar/processing/sources/namespace.h"
-#include "cedar/processing/sources/GrabberBase.h"
-#include "cedar/devices/sensors/visual/CameraGrabber.h"
-
-#include "cedar/auxiliaries/FileParameter.h"
-#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/devices/sensors/visual/namespace.h"
 
 // SYSTEM INCLUDES
 
 
-//!@brief A camera source for the processingIde
-class cedar::proc::sources::Camera
-:
-public cedar::proc::sources::GrabberBase
+/*!@brief Base class of the misc camera grabber backends.
+ *
+ * Implements the common features of a camera device
+ */
+class cedar::dev::sensors::visual::CameraState
 {
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -69,11 +60,12 @@ public cedar::proc::sources::GrabberBase
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
   //!@brief The standard constructor.
-  Camera();
+  CameraState();
 
   //!@brief Destructor
-//  virtual ~Camera(){};
+  ~CameraState();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -81,48 +73,17 @@ public:
 public:
   // none yet
 
-public slots:
-
-  //!@brief Set the debayer function on or off
-  void setDeBayer();
-
-  /*!@brief Set the busId
-   *
-   * If this value is set on grabbing, the cameragrabber will be destroyed and with the new busId recreated
-   */
-  void setBusId();
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void compute(const cedar::proc::Arguments&);
-  void onStart();
-  //void onCreateGrabber();
-
-  //!@brief Cast the base GrabberBasePtr to derived class CameraGrabberPtr
-  inline cedar::dev::sensors::visual::CameraGrabberPtr getCameraGrabber()
-  {
-    return boost::static_pointer_cast<cedar::dev::sensors::visual::CameraGrabber>
-           (
-             this->cedar::proc::sources::GrabberBase::mpGrabber
-           );
-  }
-
-  //!@brief Cast the base GrabberBasePtr to derived class CameraGrabberPtr
-  inline cedar::dev::sensors::visual::ConstCameraGrabberPtr getCameraGrabber() const
-  {
-    return boost::static_pointer_cast<const cedar::dev::sensors::visual::CameraGrabber>
-           (
-            cedar::proc::sources::GrabberBase::mpGrabber
-           );
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -138,15 +99,10 @@ private:
 protected:
   // none yet
 
-
 private:
-  //!@ Bayer conversion from the camera image
-  cedar::aux::BoolParameterPtr mDeBayer;
+  // none yet
 
-  //!@ busid
-  cedar::aux::UIntParameterPtr mBusId;
+}; // class cedar::dev::sensors::visual::CameraState
 
-}; // class cedar::proc::sources::Camera
+#endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_STATE_H
 
-#endif // CEDAR_USE_LIB_DC1394
-#endif // CEDAR_PROC_SOURCES_CAMERA_H
