@@ -132,6 +132,7 @@ int test_parameter(T initialValue, size_t initialSize, T firstValue)
     ++errors;
   }
 
+  std::cout << "Making parameter constant" << std::endl;
   parameter->setConstant(true);
   for (size_t i = 0; i < p_widget->mWidgets.size(); ++i)
   {
