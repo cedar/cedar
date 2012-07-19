@@ -79,14 +79,18 @@ public:
   {
     // empty as default implementation -- use template specialization to implement for specific classes
   }
+
+  static void applyProperties(WidgetT* pWidget, boost::intrusive_ptr<cedar::aux::VectorParameter<ValueT> > parameter)
+  {
+    pWidget->setDisabled(parameter->isConstant());
+  }
 };
 
-/*!@todo describe.
+/*!@brief A generic base class for gui representations of cedar::aux::VectorParameters.
  *
  * @todo describe more.
  *
  * @todo Use this class for the other vector parameters as well; introduce a numeric version of it
- * @todo Write a unit test for this class
  */
 template <typename ValueT, class WidgetT>
 class cedar::aux::gui::VectorParameter : public cedar::aux::gui::Parameter,
@@ -155,14 +159,33 @@ protected:
 private:
   void parameterChanged()
   {
-    QObject::connect(this->parameter().get(), SIGNAL(propertyChanged()), this, SLOT(propertiesChanged()));
-
     this->recreateWidgets();
   }
 
   void propertiesChanged()
   {
     this->recreateWidgets();
+  }
+
+  void valueChanged()
+  {
+    ParameterPtr parameter = this->parameter();
+
+    CEDAR_DEBUG_ASSERT(parameter->size() == this->mWidgets.size());
+
+    std::vector<ValueType> values;
+
+    parameter->lockForRead();
+    values.resize(this->mWidgets.size());
+    for (size_t i = 0; i < this->mWidgets.size(); ++i)
+    {
+      values[i] = parameter->at(i);
+    }
+    parameter->unlock();
+    for (size_t i = 0; i < values.size(); ++i)
+    {
+      WidgetAbstraction::setValue(this->mWidgets[i], values[i]);
+    }
   }
 
   void recreateWidgets()
@@ -186,6 +209,7 @@ private:
       this->layout()->addWidget(p_widget);
       WidgetAbstraction::setValue(p_widget, parameter->at(i));
       WidgetAbstraction::connectValueChange(this, p_widget);
+      WidgetAbstraction::applyProperties(p_widget, parameter);
     }
     parameter->unlock();
 
