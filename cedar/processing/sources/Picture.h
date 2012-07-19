@@ -71,7 +71,7 @@ public:
   Picture();
 
   //!@brief Destructor
-
+  ~Picture();
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void compute(const cedar::proc::Arguments&);
-  void onStart();
+  void reset();
 
   //!@brief Cast the base GrabberBasePtr to derived class PictureGrabberPtr
   inline cedar::dev::sensors::visual::PictureGrabberPtr getPictureGrabber()

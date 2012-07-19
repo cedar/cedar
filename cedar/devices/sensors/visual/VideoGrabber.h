@@ -59,6 +59,32 @@ class cedar::dev::sensors::visual::VideoGrabber
 :
 public cedar::dev::sensors::visual::Grabber
 {
+  Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // slots and signals
+  //--------------------------------------------------------------------------------------------------------------------
+
+  protected slots:
+
+  //!@brief A slot that is triggered if a new filename is set
+  void fileNameChanged();
+
+  //!@brief A slot that is triggered if the speedfactor is set
+  void speedFactorChanged();
+
+  signals:
+
+  //!@brief This signal is emitted, when a new videofile is successfully opened.
+  void doVideoChanged();
+
+  //!@brief This signal is emitted, when the speedFactor is changed.
+  void doSpeedFactorChanged();
+
+  private:
+  /*! @brief Boost slot method. Invoked if a channel is added as an ObjectListParameter as an object
+   */
+  void channelAdded(int index);
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -74,17 +100,17 @@ public:
   :
   cedar::dev::sensors::visual::Grabber::Channel
   {
-    VideoChannel(const std::string& fileName = "./video.avi")
+    VideoChannel(const std::string& fileName = "")
     :
     cedar::dev::sensors::visual::Grabber::Channel(),
-    _mSourceFileName(new cedar::aux::FileParameter(this, "fileName", cedar::aux::FileParameter::READ, fileName))
+    _mSourceFileName(new cedar::aux::FileParameter(this, "filename", cedar::aux::FileParameter::READ, fileName))
     {
     }
 
     //! Camera interface
     cv::VideoCapture mVideoCapture;
 
-    //! @brief The filename of the picture you want to grab from
+    //! @brief The filename of the video file you want to grab from
     cedar::aux::FileParameterPtr _mSourceFileName;
   };
 
@@ -107,10 +133,10 @@ public:
    */
   VideoGrabber
   (
-    const std::string& videoFileName = "./video.avi",
+    const std::string& videoFileName = "",
     bool looped = true,
     bool speedFactor = 1,
-    const std::string& grabberName = "PictureGrabber"
+    const std::string& grabberName = "VideoGrabber"
   );
 
   /*! @brief Constructor for a stereo-file grabber
@@ -124,7 +150,7 @@ public:
     const std::string& videoFileName1,
     bool looped = true,
     bool speedFactor = 1,
-    const std::string& grabberName = "StereoPictureGrabber"
+    const std::string& grabberName = "StereoVideoGrabber"
   );
   //!@brief Destructor
   ~VideoGrabber();
@@ -217,6 +243,13 @@ public:
    */
   double getSourceEncoding(unsigned int channel=0);
 
+  /*! @brief Get the used file to grab from
+   *  @param channel The channel which filename should be read
+   *  @throws IndexOutOfRangeException If channel isn't fit
+   */
+  const std::string getSourceFile(unsigned int channel = 0);
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -227,6 +260,8 @@ protected:
   //------------------------------------------------------------------------
 
   bool onInit();
+  bool onCreateGrabber();
+  void onCloseGrabber();
 
   /*! @brief Grab on all available files
    *
@@ -244,34 +279,12 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // members
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  
-  /*! @brief Indicates if looping is on
+  /*! @brief This function does internal variable initialization in  constructor
    */
-  //bool _mLooped;
+  void init();
 
-  /*! @brief Factor for grabbing speed
-   *  @remarks the speed stored in the AVI-File will be multiplied with this factor
-   *    so effective FPS should be _mSpeedFactor*AVI-Speed
-   */
-  //double _mSpeedFactor;
-
-  /*! @brief Count of frames of the shortest file
-   *
-   *		Used for scrolling in the avi-file
-   *  @see
-   *		setPositionRelative, getPositionRelative, setPositionAbsolute, setPositionRelative
-   */
-  unsigned int mFramesCount;
-
-private:
+  /// @brief Sets the channel informations
+  void setChannelInfo(unsigned int channel);
 
   /*! Cast the storage vector from base channel struct "GrabberChannelPtr" to
    *  derived class VideoChannelPtr
@@ -295,6 +308,22 @@ private:
            );
   }
 
+  //--------------------------------------------------------------------------------------------------------------------
+  // members
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  
+  /*! @brief Count of frames of the shortest file
+   *
+   *		Used for scrolling in the avi-file
+   *  @see
+   *		setPositionRelative, getPositionRelative, setPositionAbsolute, setPositionRelative
+   */
+  unsigned int mFramesCount;
+
+private:
+  // none yet
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -312,7 +341,6 @@ private:
    */
   cedar::aux::IntParameterPtr _mSpeedFactor;
 
-  // none yet
 
 }; // class cedar::dev::sensors::visual::VideoGrabber
 

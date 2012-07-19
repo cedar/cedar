@@ -77,11 +77,7 @@ cedar::dev::sensors::visual::Grabber
   )
 )
 {
-  cedar::aux::LogSingleton::getInstance()->allocating(this);
-  QObject::connect (getPictureChannel(0)->_mSourceFileName.get(),SIGNAL(valueChanged()),this, SLOT(fileNameChanged()));
-
-  _mChannels->connectToObjectAddedSignal(boost::bind(&cedar::dev::sensors::visual::PictureGrabber::channelAdded,this,_1));
-
+  init();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -106,13 +102,33 @@ cedar::dev::sensors::visual::Grabber
   )
 )
 {
-  cedar::aux::LogSingleton::getInstance()->allocating(this);
-  QObject::connect (getPictureChannel(0)->_mSourceFileName.get(),SIGNAL(valueChanged()),this, SLOT(fileNameChanged()));
-  QObject::connect (getPictureChannel(1)->_mSourceFileName.get(),SIGNAL(valueChanged()),this, SLOT(fileNameChanged()));
-
-  _mChannels->connectToObjectAddedSignal(boost::bind(&cedar::dev::sensors::visual::PictureGrabber::channelAdded,this,_1));
+  init();
 }
 
+//----------------------------------------------------------------------------------------------------
+void cedar::dev::sensors::visual::PictureGrabber::init()
+{
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+
+  //watch filename on every channel
+  for (unsigned int channel=0; channel<_mChannels->size(); ++channel)
+  {
+    QObject::connect
+             (
+               getPictureChannel(channel)->_mSourceFileName.get(),
+               SIGNAL(valueChanged()),
+               this,
+               SLOT(fileNameChanged())
+             );
+  }
+
+  //watch if channel added to ObjectParameterList
+  _mChannels->connectToObjectAddedSignal
+              (
+                boost::bind(&cedar::dev::sensors::visual::PictureGrabber::channelAdded,this,_1)
+              );
+
+}
 //----------------------------------------------------------------------------------------------------
 cedar::dev::sensors::visual::PictureGrabber::~PictureGrabber()
 {
@@ -140,7 +156,13 @@ cedar::dev::sensors::visual::PictureGrabber::~PictureGrabber()
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::PictureGrabber::channelAdded(int index)
 {
-  QObject::connect(getPictureChannel(index)->_mSourceFileName.get(),SIGNAL(valueChanged()),this, SLOT(fileNameChanged()));
+  QObject::connect
+           (
+             getPictureChannel(index)->_mSourceFileName.get(),
+             SIGNAL(valueChanged()),
+             this,
+             SLOT(fileNameChanged())
+           );
 }
 
 //----------------------------------------------------------------------------------------------------

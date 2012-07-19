@@ -81,7 +81,10 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Save a Snapshot of the current picture
+  /*!@brief Save a Snapshot of the current picture
+   *
+   * Implemented as an action in the grabber-step of processingGUI
+   */
   void saveSnapshot();
 
 public slots:
