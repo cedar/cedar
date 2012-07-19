@@ -24,9 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Mathis Richter
-#   Email:       mathis.richter@ini.rub.de
-#   Date:        2010 11 29
+#   Maintainer:  Oliver Lomp
+#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+#   Date:        2012 07 19
 #
 #   Description:
 #
@@ -34,49 +34,6 @@
 #
 #=======================================================================================================================
 
-cedar_add_library(cedaraux
-  MOC_HEADERS
-  LocalCoordinateFrame.h
-  gl/ObjectVisualization.h
-  gui/BaseWidget.h
-  gui/BoolParameter.h
-  gui/BoolVectorParameter.h
-  gui/DataPlotter.h
-  gui/DirectoryParameter.h
-  gui/DoubleParameter.h
-  gui/DoubleVectorParameter.h
-  gui/EnumParameter.h
-  gui/FileParameter.h
-  gui/IntParameter.h
-  gui/Log.h
-  gui/ObjectParameter.h
-  gui/ObjectListParameter.h
-  gui/Parameter.h
-  gui/LocalCoordinateFrameWidget.h
-  gui/ObjectVisualizationWidget.h
-  gui/PlotInterface.h
-  gui/Viewer.h
-  gui/SceneWidget.h
-  gui/HistoryPlot.h
-  gui/HistoryPlot0D.h
-  gui/MatrixPlot.h
-  gui/MatrixPlot1D.h
-  gui/MatrixPlot2D.h
-  gui/MatrixSlicePlot3D.h
-  gui/PropertyPane.h
-  gui/ImagePlot.h
-  gui/StringParameter.h
-  gui/UIntParameter.h
-  gui/UIntVectorParameter.h
-  gui/IntVectorParameter.h
-  convolution/Convolution.h
-  Parameter.h
-  kernel/Separable.h
-  kernel/Kernel.h
-  kernel/Gauss.h
-  kernel/Box.h
-  RESOURCES
-  gui/icons/message_icons.qrc
-  LINK_LIBRARIES
-  cedarunits
-)
+cedar_add_unit_test(PromotedConnections
+                    main.cpp
+                    )

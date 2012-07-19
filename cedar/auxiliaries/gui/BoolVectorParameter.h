@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SpaceCode.h
+    File:        BoolVectorParameter.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 06
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 07 18
 
     Description:
 
@@ -38,42 +34,92 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DYN_SPACE_CODE_H
-#define CEDAR_DYN_SPACE_CODE_H
+#ifndef CEDAR_AUX_GUI_BOOL_VECTOR_PARAMETER_H
+#define CEDAR_AUX_GUI_BOOL_VECTOR_PARAMETER_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/dynamics/namespace.h"
-#include "cedar/dynamics/MatActivation.h"
+#include "cedar/auxiliaries/gui/VectorParameter.h"
+#include "cedar/auxiliaries/gui/namespace.h"
 
 // SYSTEM INCLUDES
+#include <QCheckBox>
 
-/*!@brief A data type representing space code activation.
+namespace cedar
+{
+  namespace aux
+  {
+    namespace gui
+    {
+      template <>
+      inline bool cedar::aux::gui::VectorParameterAbstraction<bool, QCheckBox>::connectValueChange
+                  (
+                    cedar::aux::gui::Parameter* pParameter,
+                    QCheckBox* pWidget
+                  )
+      {
+        return QObject::connect(pWidget, SIGNAL(stateChanged(int)), pParameter, SLOT(widgetValueChanged(int)));
+      }
+
+
+      template<>
+      inline bool cedar::aux::gui::VectorParameterAbstraction<bool, QCheckBox>::getValue(QCheckBox* pWidget)
+      {
+        return pWidget->checkState() == Qt::Checked;
+      }
+
+      template<>
+      inline void cedar::aux::gui::VectorParameterAbstraction<bool, QCheckBox>::setValue
+                  (
+                    QCheckBox* pWidget,
+                    const bool& value
+                  )
+      {
+        if (value)
+        {
+          pWidget->setCheckState(Qt::Checked);
+        }
+        else
+        {
+          pWidget->setCheckState(Qt::Unchecked);
+        }
+      }
+
+    }
+  }
+}
+
+/*!@todo describe.
  *
- * @todo Explain the concept of space code.
+ * @todo describe more.
  */
-CEDAR_DECLARE_DEPRECATED(class) cedar::dyn::SpaceCode : public cedar::dyn::MatActivation
+class cedar::aux::gui::BoolVectorParameter : public cedar::aux::gui::VectorParameter<bool, QCheckBox>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef cedar::aux::gui::VectorParameter<bool, QCheckBox> Base;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  SpaceCode(const cv::Mat& value) : cedar::dyn::MatActivation(value)
-  {
-  }
-
-  //!@brief Destructor
-  virtual ~SpaceCode()
-  {
-  }
+  BoolVectorParameter(QWidget* pParent = NULL);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -84,8 +130,8 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  // none yet
+private slots:
+  void widgetValueChanged(int);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -94,6 +140,17 @@ protected:
   // none yet
 private:
   // none yet
-}; // class cedar::dyn::SpaceCode
 
-#endif // CEDAR_DYN_SPACE_CODE_H
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  // none yet
+
+}; // class cedar::aux::gui::BoolVectorParameter
+
+#endif // CEDAR_AUX_GUI_BOOL_VECTOR_PARAMETER_H
+

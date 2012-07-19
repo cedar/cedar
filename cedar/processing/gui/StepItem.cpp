@@ -148,6 +148,8 @@ cedar::proc::gui::StepItem::~StepItem()
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
   mStateChangedConnection.disconnect();
+  mSlotAddedConnection.disconnect();
+  mSlotRemovedConnection.disconnect();
 
   if (this->scene())
   {

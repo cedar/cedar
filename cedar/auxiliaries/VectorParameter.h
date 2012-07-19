@@ -49,6 +49,42 @@
 // SYSTEM INCLUDES
 #include <vector>
 
+namespace cedar
+{
+  namespace aux
+  {
+    template <typename T>
+    class StorageAbstraction
+    {
+      public:
+        const T& at(size_t index) const
+        {
+          CEDAR_DEBUG_ASSERT(index < this->mValues.size());
+          return this->mValues[index];
+        }
+
+      protected:
+        //!@brief Internal storage container.
+        std::vector<T> mValues;
+    };
+
+    template<>
+    class StorageAbstraction<bool>
+    {
+      public:
+        bool at(size_t index) const
+        {
+          CEDAR_DEBUG_ASSERT(index < this->mValues.size());
+          return this->mValues[index];
+        }
+
+      protected:
+        //!@brief Internal storage container.
+        std::vector<bool> mValues;
+    };
+  }
+}
+
 
 /*!@brief A parameter class for vectors of type T.
  *
@@ -56,7 +92,8 @@
  * time the content of the represented vector changes.
  */
 template <typename T>
-class cedar::aux::VectorParameter : public cedar::aux::Parameter
+class cedar::aux::VectorParameter : public cedar::aux::Parameter,
+                                    public cedar::aux::StorageAbstraction<T>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // typedef
@@ -250,12 +287,6 @@ public:
     this->resize(size, this->mDefaultValue);
   }
 
-  //!@brief get an item of this vector specified by an index
-  const T& at(size_t index) const
-  {
-    return this->mValues.at(index);
-  }
-
   //!@brief get the default vector
   const std::vector<T>& getDefaultValues() const
   {
@@ -304,11 +335,22 @@ public:
 
   //!@brief set one entry of the vector to a new value
   //!@todo This should be called setValue
-  virtual void set(size_t index, const T& value)
+  virtual void set(size_t index, const T& value, bool lock = false)
   {
     CEDAR_DEBUG_ASSERT(index < this->mValues.size());
+
+    if (lock)
+    {
+      this->lockForWrite();
+    }
+
     T old_value = this->mValues[index];
     this->mValues[index] = value;
+
+    if (lock)
+    {
+      this->unlock();
+    }
 
     if (value != old_value)
     {
@@ -338,7 +380,7 @@ public:
     }
     else
     {
-      mValues.assign(this->mSize, this->mDefaultValue);
+      this->mValues.assign(this->mSize, this->mDefaultValue);
     }
   }
 
@@ -360,12 +402,12 @@ private:
 protected:
   // none yet
 private:
-  //!@brief internal storage container of vector
-  std::vector<T> mValues;
   //!@brief a default vector
   std::vector<T> mDefaults;
+
   //!@brief a default size
   size_t mSize;
+
   //!@brief a default value, which is used together with size to create a default vector, or used for new entries
   T mDefaultValue;
 

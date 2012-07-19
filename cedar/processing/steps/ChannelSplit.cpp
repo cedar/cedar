@@ -131,7 +131,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::ChannelSplit::determineInput
 
 void cedar::proc::steps::ChannelSplit::inputConnectionChanged(const std::string& inputName)
 {
-  this->mInput = cedar::aux::asserted_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
+  this->mInput = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(this->getInput(inputName));
 
   // copy annotations
   this->mChannel1->copyAnnotationsFrom(this->mInput);

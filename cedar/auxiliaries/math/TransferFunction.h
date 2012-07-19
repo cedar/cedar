@@ -22,36 +22,30 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SpaceCode.h
+    File:        TransferFunction.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 06
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2012 07 19
 
-    Description:
+    Description: TransferFunction functions
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DYN_SPACE_CODE_H
-#define CEDAR_DYN_SPACE_CODE_H
+#ifndef CEDAR_AUX_MATH_TRANSFER_FUNCTION_H
+#define CEDAR_AUX_MATH_TRANSFER_FUNCTION_H
 
 // CEDAR INCLUDES
-#include "cedar/dynamics/namespace.h"
-#include "cedar/dynamics/MatActivation.h"
+#include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/Configurable.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief A data type representing space code activation.
- *
- * @todo Explain the concept of space code.
+/*!@brief Basic interface for all TransferFunction functions.
  */
-CEDAR_DECLARE_DEPRECATED(class) cedar::dyn::SpaceCode : public cedar::dyn::MatActivation
+class cedar::aux::math::TransferFunction : public Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -62,18 +56,48 @@ CEDAR_DECLARE_DEPRECATED(class) cedar::dyn::SpaceCode : public cedar::dyn::MatAc
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  SpaceCode(const cv::Mat& value) : cedar::dyn::MatActivation(value)
+  TransferFunction()
+  :
+  cedar::aux::Configurable()
   {
   }
 
   //!@brief Destructor
-  virtual ~SpaceCode()
-  {
-  }
+  virtual ~TransferFunction();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  /*!@brief this function calculates the TransferFunction function for a given double value.
+   * All inherited classes have to implement this function.
+   */
+  virtual double compute(double value) const = 0;
+
+  /*!@brief this function calculates the TransferFunction function for a given float value.
+   * Included for backward-compatibility
+   */
+  virtual float compute(float value) const;
+
+  /*!@brief this function calculates the TransferFunction function for an n-dimensional matrix.
+   *
+   * @todo write a non-templated function, which checks the type flag of cv::Mat and calls the correct templated compute
+   * function
+   *
+   * @todo Make a virtual version of this function that can be overloaded for faster TransferFunction calculation.
+   */
+  template<typename T>
+  cv::Mat compute(const cv::Mat& values) const
+  {
+    cv::Mat result = values.clone();
+    cv::MatConstIterator_<T> iter_src = values.begin<T>();
+    cv::MatIterator_<T> iter_dest = result.begin<T>();
+    for ( ; iter_src != values.end<T>(); ++iter_src, ++iter_dest)
+    {
+      *iter_dest = static_cast<T>(compute(static_cast<double>(*iter_src)));
+    }
+    return result;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -94,6 +118,32 @@ protected:
   // none yet
 private:
   // none yet
-}; // class cedar::dyn::SpaceCode
+};
 
-#endif // CEDAR_DYN_SPACE_CODE_H
+#include "cedar/auxiliaries/FactoryManager.h"
+
+namespace cedar
+{
+  namespace aux
+  {
+    namespace math
+    {
+      //!@brief The manager of all sigmoind instances
+      typedef cedar::aux::FactoryManager<TransferFunctionPtr> TransferFunctionManager;
+
+#ifdef MSVC
+#ifdef CEDAR_LIB_EXPORTS_AUX
+      // dllexport
+      template class __declspec(dllexport) cedar::aux::Singleton<TransferFunctionManager>;
+#else // CEDAR_LIB_EXPORTS_AUX
+    // dllimport
+      extern template class __declspec(dllimport) cedar::aux::Singleton<TransferFunctionManager>;
+#endif // CEDAR_LIB_EXPORTS_AUX
+#endif // MSVC
+
+      //!@brief The singleton object of the TransferFunctionFactory.
+      typedef cedar::aux::Singleton<TransferFunctionManager> TransferFunctionManagerSingleton;
+    }
+  }
+}
+#endif  // CEDAR_AUX_MATH_TRANSFER_FUNCTION_H

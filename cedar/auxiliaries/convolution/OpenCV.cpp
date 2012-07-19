@@ -117,28 +117,6 @@ bool cedar::aux::conv::OpenCV::checkModeCapability
       || mode == cedar::aux::conv::Mode::Valid;
 }
 
-int cedar::aux::conv::OpenCV::translateBorderType(cedar::aux::conv::BorderType::Id borderType) const
-{
-  switch (borderType)
-  {
-    case cedar::aux::conv::BorderType::Cyclic:
-      return cv::BORDER_WRAP;
-
-    case cedar::aux::conv::BorderType::Reflect:
-      return cv::BORDER_REFLECT;
-
-    case cedar::aux::conv::BorderType::Replicate:
-      return cv::BORDER_REPLICATE;
-
-    case cedar::aux::conv::BorderType::Zero:
-      //!@todo This actually makes the border -1 rather than 0!
-      return cv::BORDER_CONSTANT;
-
-    default:
-      return cv::BORDER_DEFAULT;
-  }
-}
-
 void cedar::aux::conv::OpenCV::translateAnchor
      (
        cv::Point& anchor,
@@ -209,7 +187,7 @@ cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
   int right = kernelCols - 1;
 
   cv::Mat full_matrix;
-  cv::copyMakeBorder(matrix, full_matrix, top, bottom, left, right, translateBorderType(borderType));
+  cv::copyMakeBorder(matrix, full_matrix, top, bottom, left, right, cedar::aux::conv::BorderType::toCvConstant(borderType));
 
   return full_matrix;
 }
@@ -454,7 +432,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
       {
         cv::Point anchor = cv::Point(-1, -1);
         this->translateAnchor(anchor, anchorVector, kernel.size);
-        int border_type = this->translateBorderType(borderType);
+        int border_type = cedar::aux::conv::BorderType::toCvConstant(borderType);
         result = this->cvConvolve(matrix, kernel, border_type, anchor);
       }
       break;
@@ -512,7 +490,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
       {
         cv::Point anchor = cv::Point(-1, -1);
         this->translateAnchor(anchor, kernel);
-        int border_type = this->translateBorderType(borderType);
+        int border_type = cedar::aux::conv::BorderType::toCvConstant(borderType);
         result = this->cvConvolve(matrix, kernel, border_type, anchor);
       }
       break;
@@ -559,7 +537,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
           cedar::aux::conv::Mode::Id mode
         ) const
 {
-  int border_type = this->translateBorderType(borderType);
+  int border_type = cedar::aux::conv::BorderType::toCvConstant(borderType);
 
   CEDAR_ASSERT
   (
@@ -673,7 +651,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
   {
     case cedar::aux::conv::Mode::Same:
       {
-        int border_type = this->translateBorderType(borderType);
+        int border_type = cedar::aux::conv::BorderType::toCvConstant(borderType);
 
         this->translateAnchor(anchor, kernel);
         return cvConvolve(matrix, kernel, border_type, anchor);
@@ -683,7 +661,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
       {
         cv::Mat matrix_full = createFullMatrix(matrix, kernel, borderType);
 
-        int border_type = this->translateBorderType(borderType);
+        int border_type = cedar::aux::conv::BorderType::toCvConstant(borderType);
 
         this->translateAnchor(anchor, kernel);
         cv::Mat result_full = cvConvolve(matrix_full, kernel, border_type, anchor);
@@ -699,7 +677,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
         }
         else
         {
-          int border_type = this->translateBorderType(borderType);
+          int border_type = cedar::aux::conv::BorderType::toCvConstant(borderType);
 
           this->translateAnchor(anchor, kernel);
           cv::Mat result_full = cvConvolve(matrix, kernel, border_type, anchor);
@@ -847,7 +825,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
     || mode == cedar::aux::conv::Mode::Valid
   );
 
-  int cv_border_type = this->translateBorderType(borderType);
+  int cv_border_type = cedar::aux::conv::BorderType::toCvConstant(borderType);
 
   switch(mode)
   {

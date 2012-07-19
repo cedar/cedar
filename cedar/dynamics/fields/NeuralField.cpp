@@ -40,7 +40,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/dynamics/fields/NeuralField.h"
-#include "cedar/dynamics/SpaceCode.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/DeclarationRegistry.h"
@@ -91,10 +90,10 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dyn::NeuralField::NeuralField()
 :
-mActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(50, 50, CV_32F))),
-mSigmoidalActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(50, 50, CV_32F))),
-mLateralInteraction(new cedar::dyn::SpaceCode(cv::Mat::zeros(50, 50, CV_32F))),
-mInputSum(new cedar::dyn::SpaceCode(cv::Mat::zeros(50, 50, CV_32F))),
+mActivation(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
+mSigmoidalActivation(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
+mLateralInteraction(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
+mInputSum(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mInputNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mNeuralNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mRestingLevel
@@ -406,7 +405,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
 {
   if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "input")
   {
-    if (cedar::dyn::ConstSpaceCodePtr input = boost::shared_dynamic_cast<const cedar::dyn::SpaceCode>(data))
+    if (cedar::aux::ConstMatDataPtr input = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
     {
       if (!this->isMatrixCompatibleInput(input->getData()))
       {
@@ -414,18 +413,9 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
       }
       else
       {
+        //!@todo Output warning if the input is not space code
+        /* return cedar::proc::DataSlot::VALIDITY_WARNING; */
         return cedar::proc::DataSlot::VALIDITY_VALID;
-      }
-    }
-    else if (cedar::aux::ConstMatDataPtr input = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
-    {
-      if (!this->isMatrixCompatibleInput(input->getData()))
-      {
-        return cedar::proc::DataSlot::VALIDITY_ERROR;
-      }
-      else
-      {
-        return cedar::proc::DataSlot::VALIDITY_WARNING;
       }
     }
     return cedar::proc::DataSlot::VALIDITY_ERROR;

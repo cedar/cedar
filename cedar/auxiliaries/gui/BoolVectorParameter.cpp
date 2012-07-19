@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LinearSigmoid.cpp
+    File:        BoolVectorParameter.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 05 16
+    Date:        2012 07 18
 
     Description:
 
@@ -34,30 +34,36 @@
 
 ======================================================================================================================*/
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/sigmoids/LinearSigmoid.h"
-#include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/auxiliaries/gui/BoolVectorParameter.h"
+#include "cedar/auxiliaries/BoolVectorParameter.h"
+#include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
-// register class with the sigmoid factory manager
+// associate aux::gui parameter with the aux parameter
 //----------------------------------------------------------------------------------------------------------------------
-
 namespace
 {
-  bool registered
-    = cedar::aux::math::TransferFunctionManagerSingleton::getInstance()->registerType<cedar::aux::math::LinearSigmoidPtr>();
+  bool registered = cedar::aux::gui::ParameterFactorySingleton::getInstance()->add
+      <
+        cedar::aux::BoolVectorParameter,
+        cedar::aux::gui::BoolVectorParameter
+      >();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::math::LinearSigmoid::LinearSigmoid(double threshold)
+cedar::aux::gui::BoolVectorParameter::BoolVectorParameter(QWidget* pParent)
 :
-cedar::aux::math::Sigmoid(threshold)
+cedar::aux::gui::BoolVectorParameter::Base(pParent)
 {
 }
 
@@ -65,7 +71,7 @@ cedar::aux::math::Sigmoid(threshold)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double cedar::aux::math::LinearSigmoid::compute(double value) const
+void cedar::aux::gui::BoolVectorParameter::widgetValueChanged(int)
 {
-  return value;
+  this->Base::widgetValueChanged(cedar::aux::asserted_cast<QCheckBox*>(QObject::sender()));
 }

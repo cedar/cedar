@@ -56,6 +56,7 @@ cedar::proc::gui::Settings cedar::proc::gui::Settings::mInstance;
 cedar::proc::gui::Settings::Settings()
 :
 cedar::aux::Configurable(),
+mWritingDisabled(false),
 mLog(new cedar::proc::gui::Settings::DockSettings()),
 mSteps(new cedar::proc::gui::Settings::DockSettings()),
 mTools(new cedar::proc::gui::Settings::DockSettings()),
@@ -303,15 +304,18 @@ void cedar::proc::gui::Settings::load()
 
 void cedar::proc::gui::Settings::save()
 {
-  std::string path = cedar::aux::System::getUserApplicationDataDirectory() + "/.cedar/processingGui";
-  try
+  if (!mWritingDisabled)
   {
-    this->writeJson(path);
-  }
-  catch (const boost::property_tree::json_parser::json_parser_error& e)
-  {
-    //!@todo proper signaling(?) of this message to the gui.
-    std::cout << "Error saving framework gui settings: " << e.what() << std::endl;
+    std::string path = cedar::aux::System::getUserApplicationDataDirectory() + "/.cedar/processingGui";
+    try
+    {
+      this->writeJson(path);
+    }
+    catch (const boost::property_tree::json_parser::json_parser_error& e)
+    {
+      //!@todo proper signaling(?) of this message to the gui.
+      std::cout << "Error saving framework gui settings: " << e.what() << std::endl;
+    }
   }
 }
 

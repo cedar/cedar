@@ -77,7 +77,7 @@ public:
   //!@brief a parameter for kernel objects
   typedef cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel> KernelListParameter;
   //!@brief a parameter for sigmoid objects
-  typedef cedar::aux::ObjectParameterTemplate<cedar::aux::math::Sigmoid> SigmoidParameter;
+  typedef cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction> SigmoidParameter;
 
   //!@cond SKIPPED_DOCUMENTATION
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(KernelListParameter);
@@ -105,13 +105,13 @@ public:
   void onStop();
 
   //!@brief convenience function to access the output
-  inline cedar::dyn::ConstSpaceCodePtr getFieldOutput() const
+  inline cedar::aux::ConstMatDataPtr getFieldOutput() const
   {
     return this->mSigmoidalActivation;
   }
 
   //!@brief convenience function to access the field activation
-  inline cedar::dyn::ConstSpaceCodePtr getFieldActivation() const
+  inline cedar::aux::ConstMatDataPtr getFieldActivation() const
   {
     return this->mActivation;
   }
@@ -196,16 +196,16 @@ private slots:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief this SpaceCode matrix contains the current field activity of the NeuralField
-  cedar::dyn::SpaceCodePtr mActivation;
+  cedar::aux::MatDataPtr mActivation;
 
   //!@brief this SpaceCode matrix contains the current field activity, sent through the sigmoid function
-  cedar::dyn::SpaceCodePtr mSigmoidalActivation;
+  cedar::aux::MatDataPtr mSigmoidalActivation;
 
   //!@brief this SpaceCode matrix contains the current lateral interactions of the NeuralField, i.e. convolution result
-  cedar::dyn::SpaceCodePtr mLateralInteraction;
+  cedar::aux::MatDataPtr mLateralInteraction;
 
   //!@brief this SpaceCode matrix contains the current lateral interactions of the NeuralField, i.e. convolution result
-  cedar::dyn::SpaceCodePtr mInputSum;
+  cedar::aux::MatDataPtr mInputSum;
 
   //!@brief this MatData contains the input noise
   cedar::aux::MatDataPtr mInputNoise;

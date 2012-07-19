@@ -270,12 +270,6 @@ private:
   boost::signals2::connection mSlotAddedConnection;
   boost::signals2::connection mSlotRemovedConnection;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-
-private:
   //!@brief the class id of the step
   cedar::proc::ElementDeclarationPtr mClassId;
 
@@ -290,6 +284,12 @@ private:
 
   //!@brief The current display mode of the step.
   cedar::proc::gui::StepItem::DisplayMode::Id mDisplayMode;
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+
+private:
 
 }; // class StepItem
 
