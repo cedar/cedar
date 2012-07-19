@@ -156,8 +156,6 @@ private:
 
   void updateKernelType(size_t index);
 
-  int translateBorderType(cedar::aux::conv::BorderType::Id borderType) const;
-
   void translateAnchor
   (
     cv::Point& anchor,

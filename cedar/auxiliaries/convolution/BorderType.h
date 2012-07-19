@@ -80,6 +80,30 @@ public:
    */
   static const cedar::aux::conv::BorderType::TypePtr& typePtr();
 
+  /*!@brief Returns the border type translated to one of the opencv constants.
+   */
+  inline static int toCvConstant(Id id)
+  {
+    switch (id)
+    {
+      case cedar::aux::conv::BorderType::Cyclic:
+        return cv::BORDER_WRAP;
+
+      case cedar::aux::conv::BorderType::Reflect:
+        return cv::BORDER_REFLECT;
+
+      case cedar::aux::conv::BorderType::Replicate:
+        return cv::BORDER_REPLICATE;
+
+      case cedar::aux::conv::BorderType::Zero:
+        //!@todo This may actually make the border -1 rather than 0, at least according to the documentation
+        return cv::BORDER_CONSTANT;
+
+      default:
+        return cv::BORDER_DEFAULT;
+    }
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
