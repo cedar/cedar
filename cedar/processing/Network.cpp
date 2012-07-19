@@ -380,42 +380,55 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
   std::vector<cedar::proc::DataSlotPtr> promoted_slots;
   std::vector<std::string> promoted_data_from;
   std::vector<std::string> promoted_data_to;
-  cedar::proc::NetworkPtr old_network = (*(elements.begin()))->getNetwork();
-  // remember all data connections between moved elements
+  cedar::proc::NetworkPtr old_network;// = (*(elements.begin()))->getNetwork();
   for
   (
-    cedar::proc::Network::DataConnectionVector::const_iterator it = old_network->getDataConnections().begin();
-    it != old_network->getDataConnections().end();
-    ++it
+    iterator it = elements.begin(); it != elements.end(); ++it
   )
   {
-    cedar::proc::ElementPtr source = old_network->getElement<cedar::proc::Element>((*it)->getSource()->getParent());
-    cedar::proc::ElementPtr target = old_network->getElement<cedar::proc::Element>((*it)->getTarget()->getParent());
-    iterator source_it = std::find(elements.begin(), elements.end(), source);
-    iterator target_it = std::find(elements.begin(), elements.end(), target);
-    if (source_it != elements.end() && target_it != elements.end())
+    if (old_network = (*(elements.begin()))->getNetwork())
     {
-      // this connection must be stored (note that connections are automatically deleted if elements are removed)
-      data_from.push_back((*it)->getSource()->getParent() + "." + (*it)->getSource()->getName());
-      data_to.push_back((*it)->getTarget()->getParent() + "." + (*it)->getTarget()->getName());
+      break;
     }
-    else if (source_it != elements.end())
+  }
+  // remember all data connections between moved elements
+  if (old_network)
+  {
+    for
+    (
+      cedar::proc::Network::DataConnectionVector::const_iterator it = old_network->getDataConnections().begin();
+      it != old_network->getDataConnections().end();
+      ++it
+    )
     {
-      promoted_slots.push_back
-      (
-        boost::shared_dynamic_cast<cedar::proc::Connectable>(source)->getOutputSlot((*it)->getSource()->getName())
-      );
-      promoted_data_from.push_back(this->getName() + "." + (*it)->getSource()->getParent() + "." + (*it)->getSource()->getName());
-      promoted_data_to.push_back((*it)->getTarget()->getParent() + "." + (*it)->getTarget()->getName());
-    }
-    else if (target_it != elements.end())
-    {
-      promoted_slots.push_back
-      (
-        boost::shared_dynamic_cast<cedar::proc::Connectable>(target)->getInputSlot((*it)->getTarget()->getName())
-      );
-      promoted_data_from.push_back((*it)->getSource()->getParent() + "." + (*it)->getSource()->getName());
-      promoted_data_to.push_back(this->getName() + "." + (*it)->getTarget()->getParent() + "." + (*it)->getTarget()->getName());
+      cedar::proc::ElementPtr source = old_network->getElement<cedar::proc::Element>((*it)->getSource()->getParent());
+      cedar::proc::ElementPtr target = old_network->getElement<cedar::proc::Element>((*it)->getTarget()->getParent());
+      iterator source_it = std::find(elements.begin(), elements.end(), source);
+      iterator target_it = std::find(elements.begin(), elements.end(), target);
+      if (source_it != elements.end() && target_it != elements.end())
+      {
+        // this connection must be stored (note that connections are automatically deleted if elements are removed)
+        data_from.push_back((*it)->getSource()->getParent() + "." + (*it)->getSource()->getName());
+        data_to.push_back((*it)->getTarget()->getParent() + "." + (*it)->getTarget()->getName());
+      }
+      else if (source_it != elements.end())
+      {
+        promoted_slots.push_back
+        (
+          boost::shared_dynamic_cast<cedar::proc::Connectable>(source)->getOutputSlot((*it)->getSource()->getName())
+        );
+        promoted_data_from.push_back(this->getName() + "." + (*it)->getSource()->getParent() + "." + (*it)->getSource()->getName());
+        promoted_data_to.push_back((*it)->getTarget()->getParent() + "." + (*it)->getTarget()->getName());
+      }
+      else if (target_it != elements.end())
+      {
+        promoted_slots.push_back
+        (
+          boost::shared_dynamic_cast<cedar::proc::Connectable>(target)->getInputSlot((*it)->getTarget()->getName())
+        );
+        promoted_data_from.push_back((*it)->getSource()->getParent() + "." + (*it)->getSource()->getName());
+        promoted_data_to.push_back(this->getName() + "." + (*it)->getTarget()->getParent() + "." + (*it)->getTarget()->getName());
+      }
     }
   }
   // remember all trigger connections between moved elements
