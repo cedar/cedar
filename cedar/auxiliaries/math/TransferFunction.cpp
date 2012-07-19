@@ -21,12 +21,12 @@
 
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
-                 
-    File:        SigmoidDeclaration.cpp
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 03 25
+    File:        TransferFunction.cpp
+
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2012 07 19
 
     Description:
 
@@ -35,18 +35,23 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/SigmoidDeclaration.h"
+#include "cedar/auxiliaries/math/TransferFunction.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::aux::math::SigmoidFactoryPtr cedar::aux::math::SigmoidDeclaration::getObjectFactory()
+
+cedar::aux::math::TransferFunction::~TransferFunction()
 {
-  return this->mpClassFactory;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+float cedar::aux::math::TransferFunction::compute(float value) const
+{
+  return static_cast<float>(compute(static_cast<double>(value)));
+}

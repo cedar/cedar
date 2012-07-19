@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SigmoidDeclarationT.h
+    File:        TransferFunctionDeclaration.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -38,8 +38,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MATH_SIGMOID_DECLARATION_H
-#define CEDAR_AUX_MATH_SIGMOID_DECLARATION_H
+#ifndef CEDAR_AUX_MATH_TRANSFER_FUNCTION_DECLARATION_H
+#define CEDAR_AUX_MATH_TRANSFER_FUNCTION_DECLARATION_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
@@ -49,10 +49,10 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief A SigmoidDeclaration contains the relation of a unique class id (as string) and the corresponding factory to
- *        create a sigmoid of this id. It is a concretization of DeclarationBase.
+/*!@brief A TransferFunctionDeclaration contains the relation of a unique class id (as string) and the corresponding
+ * factory to create a sigmoid of this id. It is a concretization of DeclarationBase.
  */
-class cedar::aux::math::SigmoidDeclaration
+class cedar::aux::math::TransferFunctionDeclaration
 {
 public:
 
@@ -60,11 +60,12 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   //!@brief constructor
-  SigmoidDeclaration(
-                      cedar::aux::math::SigmoidFactoryPtr classFactory,
-                      const std::string& classId,
-                      const std::string& category = "misc."
-                    )
+  TransferFunctionDeclaration
+  (
+    cedar::aux::math::TransferFunctionFactoryPtr classFactory,
+    const std::string& classId,
+    const std::string& category = "misc."
+  )
   :
   mpClassFactory(classFactory),
   mClassId(classId),
@@ -73,7 +74,7 @@ public:
   }
 
   //!@brief destructor
-  virtual ~SigmoidDeclaration()
+  virtual ~TransferFunctionDeclaration()
   {
   }
 
@@ -81,10 +82,10 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief get a factory for this declared sigmoid type
-  cedar::aux::math::SigmoidFactoryPtr getObjectFactory();
+  //!@brief get a factory for this declared transfer function type
+  cedar::aux::math::TransferFunctionFactoryPtr getObjectFactory();
 
-  //!@brief get the id of the declared sigmoid class
+  //!@brief get the id of the declared transfer function class
   const std::string& getClassId() const
   {
     return this->mClassId;
@@ -132,7 +133,7 @@ public:
    * @returns True, if the object passed as argument is an instance of the class represented by this declaration, false
    *          otherwise.
    */
-  virtual bool isObjectInstanceOf(cedar::aux::math::SigmoidPtr) = 0;
+  virtual bool isObjectInstanceOf(cedar::aux::math::TransferFunctionPtr) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -150,8 +151,8 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief pointer to a factory, which can allocate instances of ths declared class
-  cedar::aux::math::SigmoidFactoryPtr mpClassFactory;
+  //!@brief pointer to a factory, which can allocate instances of this declared class
+  cedar::aux::math::TransferFunctionFactoryPtr mpClassFactory;
   //!@brief a unique class id
   std::string mClassId;
   //!@brief a category
@@ -160,10 +161,10 @@ private:
   // none yet
 };
 
-/*!@brief Template for convenient declaration of sigmoid classes.
+/*!@brief Template for convenient declaration of transfer function classes.
  */
 template <class DerivedClass>
-class cedar::aux::math::SigmoidDeclarationT : public cedar::aux::math::SigmoidDeclaration
+class cedar::aux::math::TransferFunctionDeclarationT : public cedar::aux::math::TransferFunctionDeclaration
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -174,14 +175,14 @@ class cedar::aux::math::SigmoidDeclarationT : public cedar::aux::math::SigmoidDe
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  SigmoidDeclarationT(
-                    const std::string& classId,
-                    const std::string& category = "misc."
-                  )
+  TransferFunctionDeclarationT(const std::string& classId, const std::string& category = "misc.")
   :
-  SigmoidDeclaration
+  TransferFunctionDeclaration
   (
-    cedar::aux::math::SigmoidFactoryPtr(new cedar::aux::FactoryDerived<cedar::aux::math::SigmoidPtr, DerivedClass>()),
+    cedar::aux::math::TransferFunctionFactoryPtr
+    (
+      new cedar::aux::FactoryDerived<cedar::aux::math::TransferFunctionPtr, DerivedClass>()
+    ),
     classId,
     category
   )
@@ -189,15 +190,15 @@ public:
   }
 
   //!@brief Destructor
-  ~SigmoidDeclarationT()
+  ~TransferFunctionDeclarationT()
   {
   }
 
-  //!@brief check if a given ptr to a sigmoid is of this declaration's type
-  bool isObjectInstanceOf(cedar::aux::math::SigmoidPtr pointer)
+  //!@brief check if a given ptr to a transfer function is of this declaration's type
+  bool isObjectInstanceOf(cedar::aux::math::TransferFunctionPtr pointer)
   {
     return dynamic_cast<DerivedClass*>(pointer.get()) != NULL;
   }
-}; // class cedar::aux::math::SigmoidDeclarationT
+}; // class cedar::aux::math::TransferFunctionDeclarationT
 
-#endif // CEDAR_AUX_MATH_SIGMOID_DECLARATION_H
+#endif // CEDAR_AUX_MATH_TRANSFER_FUNCTION_DECLARATION_H
