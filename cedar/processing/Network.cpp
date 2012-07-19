@@ -548,10 +548,14 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
   {
     CEDAR_THROW(cedar::proc::DuplicateConnectionException, "This connection already exists!")
   }
+  std::string real_source_name;
+  std::string real_source_slot;
+  cedar::proc::Connectable::parseDataNameNoRole(source, real_source_name, real_source_slot);
+
   std::string real_target_name;
   std::string real_target_slot;
   cedar::proc::Connectable::parseDataNameNoRole(target, real_target_name, real_target_slot);
-  cedar::proc::TriggerablePtr p_source = this->getElement<cedar::proc::Triggerable>(source_name);
+  cedar::proc::TriggerablePtr p_source = this->getElement<cedar::proc::Triggerable>(real_source_name);
   cedar::proc::TriggerablePtr p_target = this->getElement<cedar::proc::Triggerable>(real_target_name);
 
   cedar::proc::OwnedDataPtr source_slot
@@ -585,10 +589,7 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
   {
     try
     {
-      this->connectTrigger(
-                            this->getElement<cedar::proc::Triggerable>(source_name)->getFinishedTrigger(),
-                            p_target
-                          );
+      this->connectTrigger(p_source->getFinishedTrigger(), p_target);
     }
     catch(const cedar::proc::DuplicateConnectionException&)
     {
@@ -1381,19 +1382,33 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
                                                        cedar::proc::Network::DataConnectionVector::iterator it
                                                      )
 {
-  const std::string& source_name = (*it)->getSource()->getParent();
+  //!@todo This code needs to be cleaned up, simplified and commented
+  std::string source_name = (*it)->getSource()->getParent();
   std::string target_name = (*it)->getTarget()->getParent();
-  std::string real_target_name = "";
+  std::string real_source_name = source_name;
+  if (cedar::proc::ConstPromotedExternalDataPtr ext = boost::shared_dynamic_cast<const cedar::proc::PromotedExternalData>((*it)->getSource()))
+  {
+    real_source_name = ext->getPromotionPath();
+  }
+  else if (cedar::proc::ConstPromotedOwnedDataPtr owned = boost::shared_dynamic_cast<const cedar::proc::PromotedOwnedData>((*it)->getSource()))
+  {
+    real_source_name = owned->getPromotionPath();
+  }
+
+  std::string real_target_name;
   if (cedar::proc::ConstPromotedExternalDataPtr ext = boost::shared_dynamic_cast<const cedar::proc::PromotedExternalData>((*it)->getTarget()))
   {
     real_target_name = ext->getPromotionPath();
   }
-  if (cedar::proc::ConstPromotedOwnedDataPtr owned = boost::shared_dynamic_cast<const cedar::proc::PromotedOwnedData>((*it)->getTarget()))
+  else if (cedar::proc::ConstPromotedOwnedDataPtr owned = boost::shared_dynamic_cast<const cedar::proc::PromotedOwnedData>((*it)->getTarget()))
   {
     real_target_name = owned->getPromotionPath();
   }
 
-  // if target is not looped, also delete the trigger connection
+  if (real_source_name != "") // the source is a nested element
+  {
+    source_name = real_source_name;
+  }
   if (real_target_name != "") // the target is a nested element
   {
     target_name = real_target_name;
@@ -1419,12 +1434,12 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
       }
     }
     // found no other connection, delete the TriggerConnection as well
-    if (real_target_name != "") // the target is a nested element
+    if (!real_target_name.empty()) // the target is a nested element
     {
       target_name = real_target_name;
     }
     this->disconnectTrigger(
-                             this->getElement<cedar::proc::Triggerable>(source_name)->getFinishedTrigger(),
+                             this->getElement<cedar::proc::Triggerable>(real_source_name)->getFinishedTrigger(),
                              this->getElement<cedar::proc::Triggerable>(target_name)
                            );
     triggerable_target->onTrigger();
