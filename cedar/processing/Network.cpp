@@ -548,10 +548,14 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
   {
     CEDAR_THROW(cedar::proc::DuplicateConnectionException, "This connection already exists!")
   }
+  std::string real_source_name;
+  std::string real_source_slot;
+  cedar::proc::Connectable::parseDataNameNoRole(source, real_source_name, real_source_slot);
+
   std::string real_target_name;
   std::string real_target_slot;
   cedar::proc::Connectable::parseDataNameNoRole(target, real_target_name, real_target_slot);
-  cedar::proc::TriggerablePtr p_source = this->getElement<cedar::proc::Triggerable>(source_name);
+  cedar::proc::TriggerablePtr p_source = this->getElement<cedar::proc::Triggerable>(real_source_name);
   cedar::proc::TriggerablePtr p_target = this->getElement<cedar::proc::Triggerable>(real_target_name);
 
   cedar::proc::OwnedDataPtr source_slot
@@ -585,10 +589,7 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
   {
     try
     {
-      this->connectTrigger(
-                            this->getElement<cedar::proc::Triggerable>(source_name)->getFinishedTrigger(),
-                            p_target
-                          );
+      this->connectTrigger(p_source->getFinishedTrigger(), p_target);
     }
     catch(const cedar::proc::DuplicateConnectionException&)
     {
