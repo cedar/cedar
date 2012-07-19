@@ -69,6 +69,24 @@ namespace cedar
       {
         return pWidget->checkState() == Qt::Checked;
       }
+
+      template<>
+      inline void cedar::aux::gui::VectorParameterAbstraction<bool, QCheckBox>::setValue
+                  (
+                    QCheckBox* pWidget,
+                    const bool& value
+                  )
+      {
+        if (value)
+        {
+          pWidget->setCheckState(Qt::Checked);
+        }
+        else
+        {
+          pWidget->setCheckState(Qt::Unchecked);
+        }
+      }
+
     }
   }
 }

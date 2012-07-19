@@ -74,6 +74,11 @@ public:
   {
     // empty as default implementation -- use template specialization to implement for specific classes
   }
+
+  static void setValue(WidgetT*, const ValueT&)
+  {
+    // empty as default implementation -- use template specialization to implement for specific classes
+  }
 };
 
 /*!@todo describe.
@@ -179,6 +184,7 @@ private:
     {
       WidgetType* p_widget = this->mWidgets[i] = WidgetAbstraction::create(i);
       this->layout()->addWidget(p_widget);
+      WidgetAbstraction::setValue(p_widget, parameter->at(i));
       WidgetAbstraction::connectValueChange(this, p_widget);
     }
     parameter->unlock();
