@@ -48,24 +48,24 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-//!@todo The parameter names here should follow the default naming scheme
 cedar::proc::sources::GrabberBase::GrabberBase()
 :
 cedar::proc::Step(false, true),
 mImage(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_8UC3))),
 mRecording(new cedar::aux::BoolParameter(this, "record", false))
 {
-	//!@todo These can be set using just the default parameter of the constructor.
-  //this->getGrabber().reset();
+	cedar::aux::LogSingleton::getInstance()->allocating(this);
 
-  QObject::connect(mRecording.get(), SIGNAL(valueChanged()), this, SLOT(setRecording()));
+  // Recording
+	QObject::connect(mRecording.get(), SIGNAL(valueChanged()), this, SLOT(setRecording()));
 
-  //Snapshot as an action
+  // Snapshot as an action
   this->registerFunction("save snapshot", boost::bind(&cedar::proc::sources::GrabberBase::saveSnapshot, this));
 }
 
 cedar::proc::sources::GrabberBase::~GrabberBase()
 {
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -145,11 +145,6 @@ void cedar::proc::sources::GrabberBase::saveSnapshot()
 {
   if (this->getGrabber()->isCreated())
   {
-//    std::string snapshot_name = this->mSnapshotName->getPath();
-//    if (snapshot_name != "")
-//    {
-//      this->mpGrabber->setSnapshotName(snapshot_name);
-//    }
     this->getGrabber()->saveSnapshotAllCams();
   }
   else

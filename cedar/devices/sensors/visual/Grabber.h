@@ -637,7 +637,7 @@ protected:
 private:
 
   /*! @brief This function does internal variable initialization in grabber constructor
-   *  @param numChannels The number of channels you want to create
+   *  @param grabberChannels A vector with all channels you want to initialize
    */
   void init(std::vector<cedar::dev::sensors::visual::Grabber::ChannelPtr> grabberChannels);
 

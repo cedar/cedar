@@ -75,7 +75,10 @@ public cedar::dev::sensors::visual::Grabber
   //!@brief This signal is emitted, when a new picture is available with the getImage() method.
   void pictureChanged();
 
-
+  private:
+  /*! @brief Boost slot method. Invoked if a channel is added as an ObjectListParameter as an object
+   */
+  void channelAdded(int index);
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -93,10 +96,10 @@ public:
   cedar::dev::sensors::visual::Grabber::Channel
   {
   public:
-    PictureChannel(const std::string& fileName = "./picture.jpg")
+    PictureChannel(const std::string& fileName = "")
     :
     cedar::dev::sensors::visual::Grabber::Channel(),
-    _mSourceFileName(new cedar::aux::FileParameter(this, "fileName", cedar::aux::FileParameter::READ, fileName))
+    _mSourceFileName(new cedar::aux::FileParameter(this, "filename", cedar::aux::FileParameter::READ, fileName))
     {
     }
 
@@ -123,7 +126,7 @@ public:
    */
   PictureGrabber
   (
-    const std::string& pictureFileName = "./picture.jpg",
+    const std::string& pictureFileName = "",
     const std::string& grabberName = "PictureGrabber"
   );
 
@@ -179,24 +182,21 @@ public:
 protected:
 
   // inherited from Grabber
-  //bool onInit();
   bool onGrab();
-  //void onUpdateSourceInfo(unsigned int channel);
   bool onCreateGrabber();
   void onCloseGrabber();
-
-  /// @brief updates the channel informations
-  void setChannelInfo(unsigned int channel);
 
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-
-  /*! @brief Boost slot method. Invoked if a channel is added as an ObjectListParameter as an object
+  /*! @brief This function does internal variable initialization in  constructor
    */
-  void channelAdded(int index);
+  void init();
+
+  /// @brief updates the channel informations
+  void setChannelInfo(unsigned int channel);
 
   /// @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
   inline PictureChannelPtr getPictureChannel(unsigned int channel)

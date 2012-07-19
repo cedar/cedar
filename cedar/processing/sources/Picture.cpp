@@ -86,6 +86,8 @@ cedar::proc::sources::Picture::Picture()
 :
 cedar::proc::sources::GrabberBase()
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+
   cedar::dev::sensors::visual::PictureGrabberPtr grabber;
   grabber = cedar::dev::sensors::visual::PictureGrabberPtr
             (
@@ -93,7 +95,6 @@ cedar::proc::sources::GrabberBase()
             );
 
   //no exception here, so we could use it
-  //GrabberBase::mGrabber = grabber;
   this->mpGrabber = grabber;
 
   this->addConfigurableChild("PictureGrabber", this->getPictureGrabber());
@@ -101,6 +102,23 @@ cedar::proc::sources::GrabberBase()
 
   QObject::connect(this->getPictureGrabber().get(), SIGNAL(pictureChanged()), this, SLOT(updatePicture()));
 
+  const std::string file_name = this->getPictureGrabber()->getSourceFile();
+  if ( ! (file_name == "." || file_name == "") )
+  {
+    this->reset();
+  }
+}
+
+cedar::proc::sources::Picture::~Picture()
+{
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+void cedar::proc::sources::Picture::reset()
+{
   if (this->getPictureGrabber()->applyParameter())
   {
     this->mImage->setData(this->getPictureGrabber()->getImage());
@@ -108,29 +126,16 @@ cedar::proc::sources::GrabberBase()
   else
   {
     const std::string name = mpGrabber->getName();
-    std::stringstream init_message;
-    init_message << "Couldn't load image: "  << this->getPictureGrabber()->getSourceFile(0) << std::endl;
+    std::stringstream error_message;
+    error_message << "Couldn't load image: "  << this->getPictureGrabber()->getSourceFile(0) << std::endl;
     cedar::aux::LogSingleton::getInstance()->error
                                              (
-                                               name + ": " + init_message.str(),
+                                               name + ": " + error_message.str(),
                                                "cedar::dev::sensors::visual::Picture::Picture()"
                                              );
   }
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------------------------------
-void cedar::proc::sources::Picture::onStart()
-{
-//  if (this->mGrabber->applyParameter())
-//  {
-//    // this->mGrabber->grab();
-//    this->mImage->setData(this->mGrabber->getImage());
-//  }
-}
 
 //----------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Picture::updatePicture()
