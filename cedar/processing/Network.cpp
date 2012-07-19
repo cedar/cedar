@@ -449,7 +449,14 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
 
   for (unsigned int i = 0; i < promoted_slots.size(); ++i)
   {
-    this->promoteSlot(promoted_slots.at(i));
+    try
+    {
+      this->promoteSlot(promoted_slots.at(i));
+    }
+    catch (const cedar::proc::DuplicateNameException& exc)
+    {
+      // nothing to to here, promoted slot already exists
+    }
   }
 
   // restore data connections
@@ -546,7 +553,7 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
   // check connection
   if (this->isConnected(source, target))
   {
-    CEDAR_THROW(cedar::proc::DuplicateConnectionException, "This connection already exists!")
+    CEDAR_THROW(cedar::proc::DuplicateConnectionException, "This connection already exists!");
   }
   std::string real_source_name;
   std::string real_source_slot;
