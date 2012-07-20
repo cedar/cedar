@@ -42,26 +42,101 @@
 #define CEDAR_AUX_GUI_UINT_VECTOR_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/auxiliaries/gui/NumericVectorParameter.h"
 #include "cedar/auxiliaries/gui/namespace.h"
 
 // SYSTEM INCLUDES
 #include <QSpinBox>
+#include <limits.h>
+
+//----------------------------------------------------------------------------------------------------------------------
+// template specializations
+//----------------------------------------------------------------------------------------------------------------------
+namespace cedar
+{
+  namespace aux
+  {
+    namespace gui
+    {
+      template <>
+      inline bool VectorParameterAbstraction<unsigned int, QSpinBox>::connectValueChange
+                  (
+                    cedar::aux::gui::Parameter* pParameter,
+                    QSpinBox* pWidget
+                  )
+      {
+        return QObject::connect(pWidget, SIGNAL(valueChanged(int)), pParameter, SLOT(widgetValueChanged(int)));
+      }
+
+
+      template<>
+      inline unsigned int VectorParameterAbstraction<unsigned int, QSpinBox>::getValue(QSpinBox* pWidget)
+      {
+        return pWidget->value();
+      }
+
+      template<>
+      inline void VectorParameterAbstraction<unsigned int, QSpinBox>::setValue
+                  (
+                    QSpinBox* pWidget,
+                    const unsigned int& value
+                  )
+      {
+        pWidget->setValue(value);
+      }
+
+      template<>
+      inline void NumericVectorParameterAbstraction<unsigned int, QSpinBox>::setMinimum
+                  (
+                    QSpinBox* pWidget,
+                    const unsigned int& limit
+                  )
+      {
+        unsigned int minimum = limit;
+        if (minimum > static_cast<unsigned int>(std::numeric_limits<int>::max()))
+        {
+          minimum = static_cast<unsigned int>(std::numeric_limits<int>::max());
+        }
+        pWidget->setMinimum(minimum);
+      }
+
+      template<>
+      inline void NumericVectorParameterAbstraction<unsigned int, QSpinBox>::setMaximum
+                  (
+                    QSpinBox* pWidget,
+                    const unsigned int& limit
+                  )
+      {
+        unsigned int maximum = limit;
+        if (maximum > static_cast<unsigned int>(std::numeric_limits<int>::max()))
+        {
+          maximum = static_cast<unsigned int>(std::numeric_limits<int>::max());
+        }
+        pWidget->setMaximum(maximum);
+      }
+    }
+  }
+}
 
 
 /*!@brief Widget for manipulating vectors of unsigned integer values.
- *
- * @todo This should be abstracted, probably in a template class:
- *       template <class ParameterType, class WidgetType> NumericVectorParameter,
- *       where, e.g., ParameterType = UIntVector and WidgetType = QSpinBox. Otherwise, a lot of code might get
- *       duplicated
  */
-class cedar::aux::gui::UIntVectorParameter : public cedar::aux::gui::Parameter
+class cedar::aux::gui::UIntVectorParameter : public cedar::aux::gui::NumericVectorParameter
+                                                    <
+                                                      unsigned int,
+                                                      QSpinBox
+                                                    >
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef cedar::aux::gui::NumericVectorParameter<unsigned int, QSpinBox> Base;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -70,23 +145,11 @@ public:
   //!@brief The standard constructor.
   UIntVectorParameter(QWidget *pParent = NULL);
 
-  //!@brief Destructor
-  virtual ~UIntVectorParameter();
-
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-public slots:
-  //!@brief handles a change of the associated parameters
-  void parameterPointerChanged();
-
-  //!@brief handles a change in the parameters
-  void valueChanged(int value);
-
-  //!@brief Handles changes in the displayed parameter's properties, e.g., a resizing of the vector.
-  void propertyChanged();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -97,24 +160,14 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  // none yet
+private slots:
+  void widgetValueChanged(int);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-private:
-  //!@brief a vector of spinboxes for displaying and changing the associated parameters
-  std::vector<QSpinBox*> mSpinboxes;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
 private:
   // none yet
 
