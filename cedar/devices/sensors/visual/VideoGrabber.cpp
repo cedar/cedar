@@ -66,13 +66,12 @@ cedar::dev::sensors::visual::VideoGrabber::VideoGrabber
 (
   const std::string& videoFileName,
   bool looped,
-  bool speedFactor,
-  const std::string& grabberName
+  bool speedFactor
 )
 :
 cedar::dev::sensors::visual::Grabber
 (
-  grabberName,
+  "VideoGrabber",
   cedar::dev::sensors::visual::VideoGrabber::VideoChannelPtr
   (
     new cedar::dev::sensors::visual::VideoGrabber::VideoChannel(videoFileName)
@@ -91,13 +90,12 @@ cedar::dev::sensors::visual::VideoGrabber::VideoGrabber
   const std::string& videoFileName0,
   const std::string& videoFileName1,
   bool looped,
-  bool speedFactor,
-  const std::string& grabberName
+  bool speedFactor
 )
 :
 cedar::dev::sensors::visual::Grabber
 (
-  grabberName,
+  "StereoVideoGrabber",
   cedar::dev::sensors::visual::VideoGrabber::VideoChannelPtr
   (
     new cedar::dev::sensors::visual::VideoGrabber::VideoChannel(videoFileName0)
@@ -169,6 +167,8 @@ void cedar::dev::sensors::visual::VideoGrabber::speedFactorChanged()
 {
   if (mCaptureDeviceCreated)
   {
+    std::cout << "VideoGrabber::speedFactorChanged" << std::endl;
+
     double fps = getVideoChannel(0)->mVideoCapture.get(CV_CAP_PROP_FPS);
     setFps(fps * _mSpeedFactor->getValue());
     emit doSpeedFactorChanged();
@@ -377,10 +377,10 @@ void cedar::dev::sensors::visual::VideoGrabber::setChannelInfo(unsigned int chan
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::VideoGrabber::setSpeedFactor(double speedFactor)
 {
-  if (_mSpeedFactor->getValue() == speedFactor)
-  {
+  //if (_mSpeedFactor->getValue() != speedFactor)
+  //{
     _mSpeedFactor->setValue(speedFactor);
-  }
+  //}
 }
 
 //----------------------------------------------------------------------------------------------------

@@ -52,30 +52,69 @@ int main(int , char **)
 {
 
   const std::string CHANNEL_0_NAME = "CHANNEL_0_NAME";
-  const std::string GRABBER_NAME = "TestGrabber";
+  const std::string GRABBER_NAME = "NewTestGrabber";
   const std::string CONFIG_FILE_NAME = "grabber.config";
+  const std::string GRABBER_PARAMETER_1 = "file1.png";
 
   // the number of errors encountered in this test
   int errors = 0;
   // the current test number
   int test_number = 0;
 
-/*
+
   //------------------------------------------------------------------------------------------------------------------
   //create a test-grabber (only a dummy grabber for testing)
-  cedar::dev::sensors::visual::TestGrabber *grabber_1 = new cedar::dev::sensors::visual::TestGrabber
+  cedar::dev::sensors::visual::TestGrabber *pGrabber = new cedar::dev::sensors::visual::TestGrabber
                                                             (
-                                                              CONFIG_FILE_NAME,
-                                                              CHANNEL_0_NAME
+                                                             GRABBER_PARAMETER_1
                                                             );
+
+
+  //-----------------------------------------------------------
+  // create configfile
+  std::cout << "test no " << test_number++ <<": writeJson()" << std::endl;
+  try
+  {
+    pGrabber->writeJson(CONFIG_FILE_NAME);
+  }
+  catch (...)
+  {
+    std::cout << "error" << std::endl;
+    errors++;
+  }
+
+  //-----------------------------------------------------------
+  // read from configfile
+  std::cout << "test no " << test_number++ <<": readJson()"  << std::endl;
+  try
+  {
+    pGrabber->readJson(CONFIG_FILE_NAME);
+  }
+  catch (...)
+  {
+    std::cout << "error" << std::endl;
+    errors++;
+  }
+
+  //-----------------------------------------------------------
+  std::cout << "test no " << test_number++ <<": applyParameter()" << std::endl;
+  try
+  {
+    pGrabber->applyParameter();
+  }
+  catch (...)
+  {
+    std::cout << "error" << std::endl;
+    errors++;
+  }
+
 
   //-----------------------------------------------------------
   std::cout << "test no " << test_number++ <<": setName() and getName()" << std::endl;
   try
   {
-    std::string name = "NewTestGrabber";
-    grabber_1->setName(name);
-    if (grabber_1->getName() != name ) {throw (-1);}
+    pGrabber->setName(GRABBER_NAME);
+    if (pGrabber->getName() != GRABBER_NAME ) {throw (-1);}
   }
   catch(...)
   {
@@ -85,11 +124,10 @@ int main(int , char **)
 
   //-----------------------------------------------------------
   std::cout << "test no " << test_number++ <<": setFps() and getFps()" << std::endl;
-
   try
   {
-    grabber_1->setFps(40);
-    if (grabber_1->getFps() != 40)
+    pGrabber->setFps(40);
+    if (pGrabber->getFps() != 40)
     {
       throw ( -1 );
     }
@@ -104,7 +142,7 @@ int main(int , char **)
   std::cout << "test no " << test_number++ <<": getFpsMeasured()" << std::endl;
   try
   {
-    grabber_1->getFpsMeasured();
+    pGrabber->getFpsMeasured();
   }
   catch (...)
   {
@@ -115,7 +153,8 @@ int main(int , char **)
   //-----------------------------------------------------------
   //test default parameters
   std::cout << "test no " << test_number++ <<": default-parameter" << std::endl;
-  if (grabber_1->getTestParam() != 123)
+  pGrabber->setTestParam(123);
+  if (pGrabber->getTestParam() != 123)
   {
     std::cout << "error" << std::endl;
     errors++;
@@ -125,7 +164,7 @@ int main(int , char **)
   //test number of channels
   std::cout << "test no " << test_number++ <<": getNumCams" << std::endl;
 
-  if (grabber_1->getNumCams() != 1 )
+  if (pGrabber->getNumCams() != 1 )
   {
     std::cout << "error" << std::endl;
     errors++;
@@ -141,30 +180,30 @@ int main(int , char **)
 
     //set one w/o ext
     name="RecordNameNewName(0)";
-    grabber_1->setRecordName(0,name);
-    result = grabber_1->getRecordName();
+    pGrabber->setRecordName(0,name);
+    result = pGrabber->getRecordName();
     if ( result != name+ext ) {throw (-1);}
-    result =  grabber_1->getRecordName(0);
+    result =  pGrabber->getRecordName(0);
     if ( result != name+ext ) {throw (-1);}
 
 
     //set one w/ ext
     name="RecordNameNewName(0).avi";
-    grabber_1->setRecordName(0,name);
-    result = grabber_1->getRecordName();
+    pGrabber->setRecordName(0,name);
+    result = pGrabber->getRecordName();
     if (result != name) {throw (-1);}
 
     //set all w/o ext
     name="RecordNameNewName_all";
-    grabber_1->setRecordName(name);
-    result = grabber_1->getRecordName();
+    pGrabber->setRecordName(name);
+    result = pGrabber->getRecordName();
     if (result != name+ext) {throw (-1);}
 
 
     //set all w/ ext
     name="RecordNameNewName_all.avi";
-    grabber_1->setRecordName(name);
-    if (grabber_1->getRecordName()!=name) {throw (-1);}
+    pGrabber->setRecordName(name);
+    if (pGrabber->getRecordName()!=name) {throw (-1);}
   }
   catch (...)
   {
@@ -176,7 +215,7 @@ int main(int , char **)
   std::cout << "test no " << test_number++ <<": isRecording()" << std::endl;
   try
   {
-    grabber_1->isRecording();
+    pGrabber->isRecording();
   }
   catch (...)
   {
@@ -194,31 +233,31 @@ int main(int , char **)
 
     //set one w/o ext
     name="SnapshotNameNewName(0)";
-    grabber_1->setSnapshotName(0,name);
-    result = grabber_1->getSnapshotName();
+    pGrabber->setSnapshotName(0,name);
+    result = pGrabber->getSnapshotName();
     expected = name+ext;
     if (result != expected ) {throw (-1);}
 
-    result = grabber_1->getSnapshotName(0);
+    result = pGrabber->getSnapshotName(0);
     expected = name+ext;
     if (result != expected ) {throw (-1);}
 
     //set one w/ ext
     name="SnapshotNameNewName(0).jpg";
-    grabber_1->setSnapshotName(0,name);
-    result = grabber_1->getSnapshotName();
+    pGrabber->setSnapshotName(0,name);
+    result = pGrabber->getSnapshotName();
     expected = name;
     if (result != expected ) {throw (-1);}
 
     //set all w/o ext
     name="SnapshotNameNewName_all";
-    grabber_1->setSnapshotName(name);
-    if (grabber_1->getSnapshotName()!=name+ext) {throw (-1);}
+    pGrabber->setSnapshotName(name);
+    if (pGrabber->getSnapshotName()!=name+ext) {throw (-1);}
 
     //set all w/ ext
     name="SnapshotNameNewName_all.jpg";
-    grabber_1->setSnapshotName(name);
-    if (grabber_1->getSnapshotName()!=name) {throw (-1);}
+    pGrabber->setSnapshotName(name);
+    if (pGrabber->getSnapshotName()!=name) {throw (-1);}
 
   }
   catch (...)
@@ -232,7 +271,7 @@ int main(int , char **)
   std::cout << "test no " << test_number++ <<": getReadWriteLockPointer()" << std::endl;
   try
   {
-    QReadWriteLock *result = grabber_1->getReadWriteLockPointer();
+    QReadWriteLock *result = pGrabber->getReadWriteLockPointer();
     if (result == NULL) { throw ( -1 ); }
   }
   catch (...)
@@ -242,25 +281,30 @@ int main(int , char **)
   }
 
   //-----------------------------------------------------------
-  //test the rest of the get-methods
-  std::cout << "test no " << test_number++ <<": getSize() and getSourceInfo()" << std::endl;
+  std::cout << "test no " << test_number++ <<": getSize()" << std::endl;
   try
   {
+    pGrabber->getSize();
+    pGrabber->getSize(0);
+  }
+  catch (...)
+  {
+    std::cout << "error" << std::endl;
+    errors++;
+  }
 
-    grabber_1->getSize();
-    grabber_1->getSize(0);
-
+  //-----------------------------------------------------------
+  std::cout << "test no " << test_number++ <<": getSourceInfo()" << std::endl;
+  try
+  {
     std::string result;
 
-    result = grabber_1->getSourceInfo();
+    result = pGrabber->getSourceInfo();
     if (result.empty()) { throw (-1); }
 
 
-    result = grabber_1->getSourceInfo(0);
+    result = pGrabber->getSourceInfo(0);
     if (result.empty()) { throw (-1); }
-
-    //throw (-1);
-
   }
   catch (...)
   {
@@ -272,7 +316,7 @@ int main(int , char **)
   std::cout << "test no " << test_number++ <<": getReadWriteLockPointer()" << std::endl;
   try
   {
-    grabber_1->getReadWriteLockPointer();
+    pGrabber->getReadWriteLockPointer();
   }
   catch (...)
   {
@@ -288,8 +332,9 @@ int main(int , char **)
     errors = 255;
   }
 
+  //delete configfile
   boost::filesystem::remove(CONFIG_FILE_NAME);
-*/
+
   return errors;
 }
 

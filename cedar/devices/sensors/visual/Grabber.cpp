@@ -539,7 +539,6 @@ std::string& cedar::dev::sensors::visual::Grabber::getSourceInfo(unsigned int ch
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"Grabber::getSourceInfo");
   }
-  //onUpdateSourceInfo(channel);
   return getChannel(channel)->mChannelInfo;
 }
 

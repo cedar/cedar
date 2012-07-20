@@ -135,8 +135,7 @@ public:
   (
     const std::string& videoFileName = "",
     bool looped = true,
-    bool speedFactor = 1,
-    const std::string& grabberName = "VideoGrabber"
+    bool speedFactor = 1
   );
 
   /*! @brief Constructor for a stereo-file grabber
@@ -149,8 +148,7 @@ public:
     const std::string& videoFileName0,
     const std::string& videoFileName1,
     bool looped = true,
-    bool speedFactor = 1,
-    const std::string& grabberName = "StereoVideoGrabber"
+    bool speedFactor = 1
   );
   //!@brief Destructor
   ~VideoGrabber();
