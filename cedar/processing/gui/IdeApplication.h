@@ -85,6 +85,7 @@ public:
    */
   bool notify(QObject* pReceiver, QEvent* pEvent);
 
+  //! returns the ide object
   inline cedar::proc::gui::Ide* getIde() const
   {
     return this->mpIde;

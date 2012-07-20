@@ -75,6 +75,7 @@ public:
   //!@brief set the current validity at the promoted slot
   void setValidity(VALIDITY validity);
 
+  //! get the full path of slot promotion as dot-concatenated string
   std::string getPromotionPath() const;
 
   //--------------------------------------------------------------------------------------------------------------------

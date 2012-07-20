@@ -147,16 +147,19 @@ class cedar::proc::NoMappingException : public cedar::aux::ExceptionBase
 class cedar::proc::ArchitectureLoadingException : public cedar::aux::ExceptionBase
 {
 public:
+  //! constructor
   ArchitectureLoadingException(const std::vector<std::string>& exception_infos)
   :
   mExceptionInfos(exception_infos)
   {
   }
 
+  //! destructor that ensure that no exception is thrown
   ~ArchitectureLoadingException() throw ()
   {
   }
 
+  //! get the messages of this exception
   const std::vector<std::string>& getMessages() const
   {
     return this->mExceptionInfos;

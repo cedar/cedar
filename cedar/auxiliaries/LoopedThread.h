@@ -117,6 +117,8 @@ public:
    *
    * @param stepSize time window for each step function in milliseconds
    * @param idleTime idle time (in milliseconds) used in fast running mode (i.e. stepSize = 0)
+   * @param simulatedTime a fixed time that is sent to all connected Triggerables regardless of real execution time
+   * @param mode the operational mode of this trigger
    */
   LoopedThread
   (
@@ -215,16 +217,19 @@ public:
   // protected methods
   //----------------------------------------------------------------------------
 protected:
+  //! get the duration of the fixed trigger step
   inline double getStepSize() const
   {
     return this->_mStepSize->getValue();
   }
 
+  //! get the idle time that is used in-between sending trigger signals
   inline double getIdleTimeParameter() const
   {
     return this->_mIdleTime->getValue();
   }
 
+  //! get the duration of the simulated time step
   inline double getSimulatedTimeParameter() const
   {
     return this->_mSimulatedTime->getValue();

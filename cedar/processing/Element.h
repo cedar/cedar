@@ -84,6 +84,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //! connects to network changed signal
   inline boost::signals2::connection connectToNetworkChanged(boost::function<void()> slot)
   {
     return this->mNetworkChanged.connect(slot);

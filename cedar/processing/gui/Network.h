@@ -145,10 +145,12 @@ public:
 
   void disconnect();
 
+  //! deals with changes to the network gui item
   QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value);
 
   bool sceneEventFilter(QGraphicsItem *pWatched, QEvent *pEvent);
 
+  //! get the scene in which this network is embedded
   cedar::proc::gui::Scene* getScene()
   {
     return this->mpScene;

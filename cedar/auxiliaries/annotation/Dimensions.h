@@ -72,6 +72,7 @@ public:
   //!@brief The standard constructor.
   Dimensions(unsigned int numberOfDimensions);
 
+  //! the copy constructor
   Dimensions(const cedar::aux::annotation::Dimensions& copy);
 
   //--------------------------------------------------------------------------------------------------------------------
