@@ -352,7 +352,7 @@ public:
       this->unlock();
     }
 
-    if (value != old_value)
+    if (this->mValues[index] != old_value)
     {
       this->emitChangedSignal();
     }

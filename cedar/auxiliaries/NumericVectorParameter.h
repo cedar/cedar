@@ -168,6 +168,14 @@ public:
   {
     this->mLimits.setLower(minimum);
 
+    for (size_t i = 0; i < this->size(); ++i)
+    {
+      if (this->mValues[i] < minimum)
+      {
+        this->mValues[i] = minimum;
+      }
+    }
+
     this->emitPropertyChangedSignal();
   }
 
@@ -181,6 +189,14 @@ public:
   void setMaximum(const T& maximum)
   {
     this->mLimits.setUpper(maximum);
+
+    for (size_t i = 0; i < this->size(); ++i)
+    {
+      if (this->mValues[i] > maximum)
+      {
+        this->mValues[i] = maximum;
+      }
+    }
 
     this->emitPropertyChangedSignal();
   }
