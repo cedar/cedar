@@ -201,10 +201,10 @@ protected:
   void declareInputCollection(const std::string& name);
 
   //!@brief Declares a buffer slot.
-  void declareBuffer(const std::string& name);
+  CEDAR_DECLARE_DEPRECATED(void declareBuffer(const std::string& name));
 
   //!@brief Declares an output slot.
-  void declareOutput(const std::string& name);
+  CEDAR_DECLARE_DEPRECATED(void declareOutput(const std::string& name));
 
   //!@brief Declares a buffer slot and immediately sets the data pointer for that slot.
   void declareBuffer(const std::string& name, cedar::aux::DataPtr data);
