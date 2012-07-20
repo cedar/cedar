@@ -261,19 +261,24 @@ protected:
     return this->mMandatoryConnectionsAreSet;
   }
 
+  //! renames the given output
   void renameOutput(const std::string& oldName, const std::string& newName);
+  //! renames the given input
   void renameInput(const std::string& oldName, const std::string& newName);
 
+  //! does this input slot exist?
   inline bool hasInputSlot(const std::string& name)
   {
     return this->hasSlot(DataRole::INPUT, name);
   }
 
+  //! does this buffer exist?
   inline bool hasBufferSlot(const std::string& name)
   {
     return this->hasSlot(DataRole::BUFFER, name);
   }
 
+  //! does this output slot exist?
   inline bool hasOutputSlot(const std::string& name)
   {
     return this->hasSlot(DataRole::OUTPUT, name);
@@ -326,6 +331,7 @@ private:
   boost::signals2::signal<void (cedar::proc::DataRole::Id, const std::string&)> mSlotRemoved;
 
 public:
+  //! connect to the slot added signal, which provides the data role and slot name
   inline boost::signals2::connection connectToSlotAdded
                                      (
                                        boost::function<void (cedar::proc::DataRole::Id, const std::string&)> slot
@@ -334,6 +340,7 @@ public:
     return this->mSlotAdded.connect(slot);
   }
 
+  //! connect to the slot removed signal, which provides the data role and slot name
   inline boost::signals2::connection connectToSlotRemoved
                                      (
                                        boost::function<void (cedar::proc::DataRole::Id, const std::string&)> slot

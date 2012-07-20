@@ -138,10 +138,13 @@ public:
   //!@brief checks if this Connectable is the parent of this DataSlotItem
   bool isParent(cedar::proc::ConstConnectablePtr parent) const;
 
+  //! promote this slot
   void promote();
 
+  //! demote this slot
   void demote();
 
+  //! states if this slot is promoted
   bool isPromoted() const;
 
   //!@brief get the pointer of this slot's parent

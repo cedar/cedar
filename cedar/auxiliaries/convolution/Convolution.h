@@ -261,6 +261,7 @@ public:
   void setAllowedModes(const std::set<cedar::aux::conv::Mode::Id>& modes);
 
 signals:
+  //! signals that the configuration has changed
   void configurationChanged();
 
   //--------------------------------------------------------------------------------------------------------------------

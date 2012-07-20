@@ -67,8 +67,10 @@ public:
   class ColorSpace
   {
     public:
+      //! the id of an enum entry
       typedef cedar::aux::EnumId Id;
 
+      //! constructs the enum for all ids
       static void construct()
       {
         mType.type()->def(cedar::aux::Enum(AUTO, "AUTO"));
@@ -89,8 +91,11 @@ public:
       }
 
     public:
+      //! flag for automatically determining the color space (using annotations)
       static const Id AUTO = 0;
+      //! flag for BGR color space (blue, green, red)
       static const Id BGR = 1;
+      //! flag for HSV color space (hue, saturation, value)
       static const Id HSV = 2;
 
     private:

@@ -74,6 +74,8 @@ namespace cedar
       /*!@brief A non-templated verion of cedar::aux::math::wedgeAxis<T>.
        *
        * @remarks Computationally, it is slightly more efficient to use the templated version.
+       * @param[in] rAxis operand, 3x1
+       * @param[out] rResult result of wedge operator on rAxis, 3x3
        */
       inline void wedgeAxis(const cv::Mat& rAxis, cv::Mat& rResult)
       {
@@ -106,6 +108,8 @@ namespace cedar
       /*!@brief A non-templated verion of cedar::aux::math::wedgeAxis<T>.
        *
        * @remarks Computationally, it is slightly more efficient to use the templated version.
+       * @param[in] rAxis operand, 3x1
+       * @return result of wedge operator on rAxis, 3x3
        */
       inline cv::Mat wedgeAxis(const cv::Mat& rAxis)
       {
@@ -134,6 +138,8 @@ namespace cedar
       /*!@brief A non-templated verion of cedar::aux::math::veeAxis<T>.
        *
        * @remarks Computationally, it is slightly more efficient to use the templated version.
+       * @param[in] rMatrix skew symmetric matrix, 3x3
+       * @param[out] rResult axis of the rotation represented by matrix, 3x1
        */
       inline void veeAxis(const cv::Mat& rMatrix, cv::Mat& rResult)
       {
@@ -166,6 +172,8 @@ namespace cedar
       /*!@brief A non-templated verion of cedar::aux::math::veeAxis<T>.
        *
        * @remarks Computationally, it is slightly more efficient to use the templated version.
+       * @param[in] rMatrix skew symmetric matrix, 3x3
+       * @return axis of the rotation represented by matrix, 3x1
        */
       inline cv::Mat veeAxis(const cv::Mat& rMatrix)
       {
@@ -194,6 +202,9 @@ namespace cedar
       /*!@brief A non-templated verion of cedar::aux::math::wedgeTwist<T>.
        *
        * @remarks Computationally, it is slightly more efficient to use the templated version.
+       * @param[in] rTwist twist coordinate vector, axis (row 4-6) must be
+       * normed, \f$(6 \times 1)\f$
+       * @param[out] rResult twist in matrix form, \f$(4 \times 4)\f$
        */
       inline void wedgeTwist(const cv::Mat& rTwist, cv::Mat& rResult)
       {
@@ -225,6 +236,8 @@ namespace cedar
       /*!@brief A non-templated verion of cedar::aux::math::veeAxis<T>.
        *
        * @remarks Computationally, it is slightly more efficient to use the templated version.
+       * @param rTwist    coordinate vector, use 6 rows, 1 column, axis (row 4-6) must be normed
+       * @return    twist in matrix form \f$(4 \times 4)\f$
        */
       inline cv::Mat wedgeTwist(const cv::Mat& rTwist)
       {
@@ -253,6 +266,9 @@ namespace cedar
       /*!@brief A non-templated verion of cedar::aux::math::veeTwist<T>.
        *
        * @remarks Computationally, it is slightly more efficient to use the templated version.
+       * @param[in] rMatrix twist in matrix form, \f$(4 \times 4)\f$, upper left
+       *   \f$3 \times 3\f$ is skew symmetric
+       * @param[out] rResult twist coordinate vector, \f$(6 \times 1)\f$
        */
       inline void veeTwist(const cv::Mat& rMatrix, cv::Mat& rResult)
       {
@@ -287,6 +303,9 @@ namespace cedar
       /*!@brief A non-templated verion of cedar::aux::math::veeTwist<T>.
        *
        * @remarks Computationally, it is slightly more efficient to use the templated version.
+       * @param[in] rMatrix twist in matrix form, \f$(4 \times 4)\f$, upper left
+       *   \f$3 \times 3\f$ is skew symmetric
+       * @return twist coordinate vector, \f$(6 \times 1)\f$
        */
       inline cv::Mat veeTwist(const cv::Mat& rMatrix)
       {
@@ -316,6 +335,9 @@ namespace cedar
       /*!@brief A non-templated verion of cedar::aux::math::expAxis<T>.
        *
        * @remarks Computationally, it is slightly more efficient to use the templated version.
+       * @param[in] rAxis normed axis of rotation, \f$3 \times 1\f$
+       * @param[in] theta angle of rotation
+       * @param[out] rResult rotation matrix, \f$3 \times 3\f$
        */
       inline void expAxis(const cv::Mat& rAxis, double theta, cv::Mat& rResult)
       {
@@ -350,6 +372,9 @@ namespace cedar
       /*!@brief A non-templated verion of cedar::aux::math::veeTwist<T>.
        *
        * @remarks Computationally, it is slightly more efficient to use the templated version.
+       * @param[in] rAxis normed axis of rotation, \f$3 \times 1\f$
+       * @param[in] theta angle of rotation
+       * @return rotation matrix, \f$3 \times 3\f$
        */
       inline cv::Mat expAxis(const cv::Mat& rMatrix, double theta)
       {
@@ -381,6 +406,11 @@ namespace cedar
       /*!@brief A non-templated verion of cedar::aux::math::logAxis<T>.
        *
        * @remarks Computationally, it is slightly more efficient to use the templated version.
+       * @param[in] rRotation rotation matrix, \f$3 \times 3\f$
+       * @param[out] rOmega axis of the rotation, \f$3 \times 1\f$
+       * @param[out] rTheta angle of rotation
+       * @param[in] optionalThetaChoice
+       *
        */
       inline void logAxis(const cv::Mat& rRotation, cv::Mat& rOmega, double& rTheta, bool optionalThetaChoice = false)
       {
@@ -481,6 +511,11 @@ namespace cedar
       /*!@brief A non-templated verion of cedar::aux::math::logTwist<T>.
        *
        * @remarks Computationally, it is slightly more efficient to use the templated version.
+       * @param[in] rTransformation    rigid transformation matrix,
+       *   \f$4 \times 4\f$
+       * @param[out] rXi twist matrix, \f$4 \times 4\f$
+       * @param[out] rTheta angle of rotation
+       * @param[in] optionalThetaChoice
        */
       inline void logTwist(const cv::Mat& rTransformation, cv::Mat& rXi, double& rTheta, bool optionalThetaChoice = false)
       {
