@@ -59,7 +59,6 @@ public:
 
   /*!@brief Constructs an object which represents the drive of an E-Puck robot.
    *@param peCommunication Pointer to the communication-device to be used (has to be initialized)
-   *@param config Path and name of the config-file to be used.
    */
   EPuckDrive(cedar::dev::com::SerialCommunication *peCommunication);
 

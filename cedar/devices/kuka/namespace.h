@@ -56,7 +56,7 @@ namespace cedar
     namespace kuka
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_DEV_CLASS(KukaInterface);
+      CEDAR_DECLARE_DEV_CLASS(KinematicChain);
       //!@endcond
     }
   }

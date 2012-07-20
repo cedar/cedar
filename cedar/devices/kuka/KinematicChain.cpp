@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KukaInterface.cpp
+    File:        KinematicChain.cpp
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.ruhr-uni-bochum.de
@@ -40,7 +40,7 @@
 #ifdef CEDAR_USE_KUKA_LWR
 
 // CEDAR INCLUDES
-#include "cedar/devices/kuka/KukaInterface.h"
+#include "cedar/devices/kuka/KinematicChain.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/math/LimitsParameter.h"
 
@@ -49,7 +49,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::kuka::KukaInterface::KukaInterface()
+cedar::dev::kuka::KinematicChain::KinematicChain()
 :
 mCommandedJointPosition(LBR_MNJ),
 mMeasuredJointPosition(LBR_MNJ),
@@ -61,19 +61,19 @@ _mServerPort(new cedar::aux::IntParameter(this, "server port", 0))
 //  init();
 }
 
-cedar::dev::kuka::KukaInterface::~KukaInterface()
+cedar::dev::kuka::KinematicChain::~KinematicChain()
 {
   if(mIsInit)
   {
-    //stop the looped Thread
+    // stop the looped Thread
     stop();
     wait();
-    //TODO The following line is not used at this point, the script "kukain.src" is not ready yet!
-    //If the script "kukain.src" is started on the KUKA-LBR, the first boolean value means "Stop the FRI"
-    //it won't throw an exception, because the index is 0 and therefore valid
+    // TODO The following line is not used at this point, the script "kukain.src" is not ready yet!
+    // If the script "kukain.src" is started on the KUKA-LBR, the first boolean value means "Stop the FRI"
+    // it won't throw an exception, because the index is 0 and therefore valid
     mpFriRemote->setToKRLBool(0, true);
     mpFriRemote->doDataExchange();
-    //Free Memory
+    // Free Memory
     if(mpFriRemote)
     {
       delete mpFriRemote;
@@ -83,24 +83,11 @@ cedar::dev::kuka::KukaInterface::~KukaInterface()
 //----------------------------------------------------------------------------------------------------------------------
 // public member functions
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::dev::kuka::KukaInterface::readConfiguration(const cedar::aux::ConfigurationNode& node)
+void cedar::dev::kuka::KinematicChain::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   this->cedar::aux::Configurable::readConfiguration(node);
-  //The number of joints the KUKA LBR has
-  //Load Parameters from the configuration file
-  //ServerPort: 0 means, FRI will use the default Port
-//  addParameter(&_mServerPort, "ServerPort", 0);
-  /*RemoteHost: if the string is "NULL", the friRemote instance will be created with NULL,
-   * else it will interpret it as IP-Address
-   */
-//  addParameter(&_mRemoteHost, "RemoteHost", "NULL");
 
-  //now read the configuration file
-  //readOrDefaultConfiguration();
-//  _mServerPort = 0;
-//  _mRemoteHost = "NULL";
-
-  //create a new Instance of the friRemote
+  // create a new Instance of the friRemote
   if (_mRemoteHost->getValue() != "NULL")
   {
     // friRemote cannot handle const char*
@@ -122,7 +109,7 @@ void cedar::dev::kuka::KukaInterface::readConfiguration(const cedar::aux::Config
   mIsInit = true;
 }
 
-bool cedar::dev::kuka::KukaInterface::isMovable() const
+bool cedar::dev::kuka::KinematicChain::isMovable() const
 {
   mLock.lockForRead();
   bool on = mPowerOn;
@@ -136,7 +123,7 @@ bool cedar::dev::kuka::KukaInterface::isMovable() const
   return false;
 }
 
-double cedar::dev::kuka::KukaInterface::getJointAngle(unsigned int index) const
+double cedar::dev::kuka::KinematicChain::getJointAngle(unsigned int index) const
 {
   double a = 0;
   try
@@ -156,7 +143,7 @@ double cedar::dev::kuka::KukaInterface::getJointAngle(unsigned int index) const
 }
 
 
-void cedar::dev::kuka::KukaInterface::setJointAngle(unsigned int index, double angle)
+void cedar::dev::kuka::KinematicChain::setJointAngle(unsigned int index, double angle)
 {
   try
   {
@@ -173,13 +160,13 @@ void cedar::dev::kuka::KukaInterface::setJointAngle(unsigned int index, double a
 }
 
 
-void cedar::dev::kuka::KukaInterface::setWorkingMode(cedar::dev::robot::KinematicChain::ActionType actionType)
+void cedar::dev::kuka::KinematicChain::setWorkingMode(cedar::dev::robot::KinematicChain::ActionType actionType)
 {
-  //Set the desired working mode
+  // Set the desired working mode
   KinematicChain::setWorkingMode(actionType);
-  //Reset the commanded position to the measured joint position
+  // Reset the commanded position to the measured joint position
   mCommandedJointPosition = mMeasuredJointPosition;
-  //restart the thread, since it was stopped by KinematicChain::setWorkingMode()
+  // restart the thread, since it was stopped by KinematicChain::setWorkingMode()
   this->start();
 }
 
@@ -187,7 +174,7 @@ void cedar::dev::kuka::KukaInterface::setWorkingMode(cedar::dev::robot::Kinemati
  * Overwritten start function of KinematicChain
  * the function inherited from KinematicChain does some things we do not want.
  */
-void cedar::dev::kuka::KukaInterface::start(Priority priority)
+void cedar::dev::kuka::KinematicChain::start(Priority priority)
 {
   if (isRunning())
   {
@@ -199,31 +186,31 @@ void cedar::dev::kuka::KukaInterface::start(Priority priority)
 //----------------------------------------------------------------------------------------------------------------------
 // private member functions
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::dev::kuka::KukaInterface::step(double)
+void cedar::dev::kuka::KinematicChain::step(double)
 {
-  //if the thread has not been initialized, do nothing
+  // if the thread has not been initialized, do nothing
   if (mIsInit)
   {
     mLock.lockForWrite();
-    //float array for copying joint position to fri
+    // float array for copying joint position to fri
     float commanded_joint[LBR_MNJ];
-    //initialize it with current measured position. This value will be overwritten in any case
-    //so this is just for safety
+    // initialize it with current measured position. This value will be overwritten in any case
+    // so this is just for safety
     for (unsigned i = 0; i < LBR_MNJ; i++)
     {
       commanded_joint[i] = mMeasuredJointPosition.at(i);
     }
-    //update joint angle and joint velocity if necessary (and only if in command mode)
-    //this will leave commanded_joint uninitialized, however, in this case it won't be used by doPositionControl()
+    // update joint angle and joint velocity if necessary (and only if in command mode)
+    // this will leave commanded_joint uninitialized, however, in this case it won't be used by doPositionControl()
     if (mpFriRemote->isPowerOn() && mpFriRemote->getState() == FRI_STATE_CMD)
     {
       switch (getWorkingMode())
       {
         case ACCELERATION:
-        //increase speed for all joints
+        // increase speed for all joints
         setJointVelocities(getJointVelocitiesMatrix() + getJointAccelerationsMatrix() * mpFriRemote->getSampleTime());
         case VELOCITY:
-          //change position for all joints
+          // change position for all joints
           for (unsigned i=0; i<LBR_MNJ; i++)
           {
             mCommandedJointPosition.at(i) += getJointVelocity(i) * mpFriRemote->getSampleTime();
@@ -231,32 +218,32 @@ void cedar::dev::kuka::KukaInterface::step(double)
         case ANGLE:
           for(unsigned i=0; i<LBR_MNJ; i++)
           {
-            //if the joint position exceeds the one in the reference geometry, reset the angle
+            // if the joint position exceeds the one in the reference geometry, reset the angle
             mCommandedJointPosition.at(i)
               = std::max<double>(mCommandedJointPosition.at(i), getJoint(i)->_mpAngleLimits->getLowerLimit());
             mCommandedJointPosition.at(i)
               = std::min<double>(mCommandedJointPosition.at(i), getJoint(i)->_mpAngleLimits->getUpperLimit());
-            //copy commanded joint position
+            // copy commanded joint position
             commanded_joint[i] = float(mCommandedJointPosition[i]);
           }
           break;
         default:
-          std::cerr << "Invalid working mode in KukaInterface::step(double). I'm afraid I can't do that." << std::endl;
+          std::cerr << "Invalid working mode in KinematicChain::step(double). I'm afraid I can't do that." << std::endl;
       }
     }
     mLock.unlock();
 
-    //now copy position data and do the data exchange
+    // now copy position data and do the data exchange
     mpFriRemote->doPositionControl(commanded_joint);
 
-    //lock and copy data back
+    // lock and copy data back
     mLock.lockForWrite();
     copyFromFRI();
     mLock.unlock();
   }
 }
 
-void cedar::dev::kuka::KukaInterface::copyFromFRI()
+void cedar::dev::kuka::KinematicChain::copyFromFRI()
 {
   mFriState = mpFriRemote->getState();
   mFriQuality = mpFriRemote->getQuality();
@@ -268,7 +255,7 @@ void cedar::dev::kuka::KukaInterface::copyFromFRI()
   {
     mMeasuredJointPosition[i] = double(pJointPos[i]);
   }
-  //if not in command mode or Power is not on, reset commanded position to measured position
+  // if not in command mode or Power is not on, reset commanded position to measured position
   if (mpFriRemote->getState() != FRI_STATE_CMD || !mpFriRemote->isPowerOn())
   {
     mCommandedJointPosition = mMeasuredJointPosition;
@@ -278,7 +265,7 @@ void cedar::dev::kuka::KukaInterface::copyFromFRI()
 // wrapped fri-functions
 //----------------------------------------------------------------------------------------------------------------------
 // todo: check whether the const works with the locks used here (and whether the locks are useful)
-FRI_STATE cedar::dev::kuka::KukaInterface::getFriState() const
+FRI_STATE cedar::dev::kuka::KinematicChain::getFriState() const
 {
   mLock.lockForRead();
   FRI_STATE s = mFriState;
@@ -286,7 +273,7 @@ FRI_STATE cedar::dev::kuka::KukaInterface::getFriState() const
   return s;
 }
 
-FRI_QUALITY cedar::dev::kuka::KukaInterface::getFriQuality() const
+FRI_QUALITY cedar::dev::kuka::KinematicChain::getFriQuality() const
 {
   mLock.lockForRead();
   FRI_QUALITY q = mFriQuality;
@@ -294,7 +281,7 @@ FRI_QUALITY cedar::dev::kuka::KukaInterface::getFriQuality() const
   return q;
 }
 
-float cedar::dev::kuka::KukaInterface::getSampleTime() const
+float cedar::dev::kuka::KinematicChain::getSampleTime() const
 {
   mLock.lockForRead();
   float t = mSampleTime;
@@ -302,7 +289,7 @@ float cedar::dev::kuka::KukaInterface::getSampleTime() const
   return t;
 }
 
-bool cedar::dev::kuka::KukaInterface::isPowerOn() const
+bool cedar::dev::kuka::KinematicChain::isPowerOn() const
 {
   mLock.lockForRead();
   bool on = mPowerOn;

@@ -13,33 +13,13 @@ in between should not be constrained by programming issues, but only be a questi
 tool aimed at facilitating the connection of modules to create robotic architectures. You can focus on "what" to
 connect, keeping the effort of "how" to connect it very low.
 
-@section ProgrammingConcepts Programming concepts
-In the following pages you can find out about general programming concepts we used throughout the framework.
-- @ref EnumConcept
-- @link InterProcessCommunicationConcept Inter-process communication using YARP @endlink
-- @link ParametersConcept Storing and loading parameters @endlink
-- @link ProcessingFrameworkConcept Processing framework @endlink
-- @link ThreadingConcept Threads and dynamics @endlink
-- @link UnitsConcept Physical units @endlink
-
-@section OrganizationalConcepts Organizational concepts
-In these pages you can learn more about the structure and organization of cedar.
-- @link FolderStructureConcept Folder structure @endlink
-- @link ReleasesConcept Release work flow @endlink
-- @link SoftwareTestingConcept Software testing @endlink
-
-@section Tutorials Tutorials
-We provide a number of tutorials for certain parts of cedar, for which some additional guidance may be
-beneficial or even necessary.
-- @ref ProjectsWithCedar
-- @link ProcessingFrameworkTutorial Processing framework @endlink
-- @link ProcessingGuiTutorial Processing gui @endlink
-- @ref LoggingWithCedar
-- @ref ConfigurableAndParameters
-- @ref ProvidingCompatibility
-
-@section CodingStyle Coding Style
-cedar sticks to a strict @link CodingStyle coding style@endlink.
+@section Guidelines Guidelines
+We have assembled documents that assist users of cedar to get productive with this framework. Please refer to the
+category that fits your profile the most:
+- If you just want to use cedar, have a look at our @link UsersGuide tutorials @endlink on how to use the processing 
+framework and add custom steps.
+- If you want to add new features to cedar or fix existing bugs, please take a look at the @link DevelopersGuide 
+developers' guide @endlink.
 
 @section Installation Installing cedar
 Please refer to the "readme.txt" file in the root of the repository to find instructions on how to install cedar.

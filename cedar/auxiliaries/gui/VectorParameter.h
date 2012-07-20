@@ -138,6 +138,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //! react to value change in one of the sub widgets
   virtual void widgetValueChanged(WidgetT* pWidget)
   {
     size_t index = this->mWidgets.size();

@@ -69,7 +69,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public slots:
+  //! accept changes made in the dialog
   void changesAccepted();
+  //! reject changes made in the dialog
   void changesRejected();
 
   //--------------------------------------------------------------------------------------------------------------------

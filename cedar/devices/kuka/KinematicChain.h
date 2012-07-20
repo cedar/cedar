@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KukaInterface.h
+    File:        KinematicChain.h
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.ruhr-uni-bochum.de
@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KUKA_KUKA_INTERFACE_H
-#define CEDAR_DEV_KUKA_KUKA_INTERFACE_H
+#ifndef CEDAR_DEV_KUKA_KINEMATIC_CHAIN_H
+#define CEDAR_DEV_KUKA_KINEMATIC_CHAIN_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -53,24 +53,22 @@
 #include <QReadWriteLock>
 
 
-/*!@brief cedar Interface for the KUKA LBR
-
+/*!@brief kinematic chain interface for the KUKA LBR
+ *
  * This class wraps the KUKA Fast Research Interface (FRI)
  */
-class cedar::dev::kuka::KukaInterface :  public cedar::dev::robot::KinematicChain
+class cedar::dev::kuka::KinematicChain :  public cedar::dev::robot::KinematicChain
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Constructor that takes the name of the configuration file to use with the object.
-   *
-   * @param configFileName    Name of the configuration file containing the parameters
+  /*!@brief Standard constructor
    */
-  KukaInterface();
+  KinematicChain();
 
-  /*!the Destructor*/
-  virtual ~KukaInterface();
+  /*!the destructor */
+  virtual ~KinematicChain();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -120,6 +118,7 @@ public:
    * @return current state of the interface
    */
   FRI_STATE getFriState() const;
+
   /*! @brief returns the quality of the connection.
    *
    * this can range from FRI_QUALITY_UNACCEPTABLE to FRI_QUALITY_PERFECT
@@ -127,12 +126,14 @@ public:
    * @return current Quality of the connection
    */
   FRI_QUALITY getFriQuality() const;
+
   /*! @brief returns sample time of the FRI
 
    * The sample time is set on the FRI server. Each interval with the length of the sample time, data will be exchanged
    * @return FRI sample time
    */
   float getSampleTime() const;
+
   /*! @brief check if the robot is powered
    *
    * this especially means the dead man switch is in the right position and the robot is in command mode
@@ -156,12 +157,14 @@ private:
    * @param commandMode establish command mode if true
    */
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
   /*!@brief every step is used to do communication between FRI and KUKA-RC
    *
    * if in velocity- or acceleration mode, every step will also change joint angles/velocity
    * @parameter time is not used
    */
   void step(double time);
+
   //!@brief copies data from the FRI to member variables for access from outside the loop thread
   void copyFromFRI();
 
@@ -171,23 +174,23 @@ private:
 protected:
   // none yet
 private:
-  //true, if the object has been initialized
+  //!@brief true, if the object has been initialized
   bool mIsInit;
-  //KUKA Vendor-Interface, wrapped by this class
-  friRemote *mpFriRemote;
-  //locker for read/write protection
+  //!@brief KUKA Vendor-Interface, wrapped by this class
+  friRemote* mpFriRemote;
+  //!@brief locker for read/write protection
   mutable QReadWriteLock mLock;
-  //last commanded joint position
+  //!@brief last commanded joint position
   std::vector<double> mCommandedJointPosition;
-  //last measured joint Position
+  //!@brief last measured joint Position
   std::vector<double> mMeasuredJointPosition;
-  //Copy of the FRI state
+  //!@brief Copy of the FRI state
   FRI_STATE mFriState;
-  //Copy of the current FRI quality
+  //!@brief Copy of the current FRI quality
   FRI_QUALITY mFriQuality;
-  //Sample Time of the FRI connection
+  //!@brief Sample Time of the FRI connection
   float mSampleTime;
-  //last known status if power is on on the KUKA RC
+  //!@brief last known status if power is on on the KUKA RC
   bool mPowerOn;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -202,4 +205,4 @@ private:
   cedar::aux::IntParameterPtr _mServerPort;
 };
 #endif // CEDAR_USE_KUKA_FRI
-#endif /* CEDAR_DEV_ROBOT_KUKA_KUKA_INTERFACE_H */
+#endif /* CEDAR_DEV_KUKA_KINEMATIC_CHAIN_H */

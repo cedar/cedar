@@ -116,6 +116,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //! creates a tool tip if the mouse cursor hovers over this object
   void hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
