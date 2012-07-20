@@ -84,8 +84,7 @@ _mStandardDeviation(new cedar::aux::DoubleParameter(this, "standard deviation", 
   _mSizes->makeDefault();
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
-  this->declareOutput("random");
-  this->setOutput("random", mRandomMatrix);
+  this->declareOutput("random", mRandomMatrix);
 
   // now check the dimensionality and sizes of all matrices
   this->updateMatrices();
