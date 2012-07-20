@@ -47,7 +47,7 @@ cedar::aux::EnumType<cedar::dev::sensors::visual::CameraVideoMode>
             cedar::dev::sensors::visual::CameraVideoMode::mType("cedar::dev::sensors::visual::CameraVideoMode::");
 
 //!@cond SKIPPED_DOCUMENTATION
-#ifndef MSVC
+#ifndef CEDAR_COMPILER_MSVC
 //supported video modes by number
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_NOT_SET;
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_0 ;
@@ -98,7 +98,7 @@ const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visu
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_7 ;
 */
 #endif //CEDAR_USE_LIB_DC1394
-#endif // MSVC
+#endif // CEDAR_COMPILER_MSVC
 
 //!@endcond
 
@@ -111,125 +111,125 @@ void cedar::dev::sensors::visual::CameraVideoMode::construct()
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_NOT_SET,
                                       "MODE_NOT_SET",
-                                      "The best available mode will be used"
+                                      "auto"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_0,
                                       "MODE_BY_NUM_0",
-                                      "First available mode"
+                                      "First available"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_1,
                                       "MODE_BY_NUM_1",
-                                      "Second available mode"
+                                      "Second available"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_2,
                                       "MODE_BY_NUM_2",
-                                      "Third available mode"
+                                      "Third available"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_3,
                                       "MODE_BY_NUM_3",
-                                      "Fourth available mode"
+                                      "Fourth available"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_4,
                                       "MODE_BY_NUM_4",
-                                      "Fifth available mode"
+                                      "Fifth available"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_5,
                                       "MODE_BY_NUM_5",
-                                      "Sixth available mode"
+                                      "Sixth available"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_6,
                                       "MODE_BY_NUM_6",
-                                      "Seventh available mode"
+                                      "Seventh available"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_7,
                                       "MODE_BY_NUM_7",
-                                      "Eighth available mode"
+                                      "Eighth available"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_8,
                                       "MODE_BY_NUM_8",
-                                      "Nineth available mode"
+                                      "Nineth available"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_9,
                                       "MODE_BY_NUM_9",
-                                      "Tenth available mode"
+                                      "Tenth available"
                                     ));
 
 #ifdef CEDAR_USE_LIB_DC1394
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_160x120_YUV444,
                                       "MODE_FW_160x120_YUV444",
-                                      "MODE_FW_160x120_YUV444"
+                                      "160x120_YUV444"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_320x240_YUV422,
                                       "MODE_FW_320x240_YUV422",
-                                      "MODE_FW_320x240_YUV422"
+                                      "320x240_YUV422"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_640x480_YUV411,
                                       "MODE_FW_640x480_YUV411",
-                                      "MODE_FW_640x480_YUV411"
+                                      "640x480_YUV411"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_640x480_YUV422,
                                       "MODE_FW_640x480_YUV422",
-                                      "MODE_FW_640x480_YUV422"
+                                      "640x480_YUV422"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_640x480_RGB8,
                                       "MODE_FW_640x480_RGB8",
-                                      "MODE_FW_640x480_RGB8"
+                                      "640x480_RGB8"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_640x480_MONO8,
                                       "MODE_FW_640x480_MONO8",
-                                      "MODE_FW_640x480_MONO8"
+                                      "640x480_MONO8"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_640x480_MONO16,
                                       "MODE_FW_640x480_MONO16",
-                                      "MODE_FW_640x480_MONO16"
+                                      "640x480_MONO16"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_800x600_YUV422,
                                       "MODE_FW_800x600_YUV422",
-                                      "MODE_FW_800x600_YUV422"
+                                      "800x600_YUV422"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_800x600_RGB8,
                                       "MODE_FW_800x600_RGB8",
-                                      "MODE_FW_800x600_RGB8"
+                                      "800x600_RGB8"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_800x600_MONO8,
                                       "MODE_FW_800x600_MONO8",
-                                      "MODE_FW_800x600_MONO8"
+                                      "800x600_MONO8"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1024x768_YUV422,
                                       "MODE_FW_1024x768_YUV422",
-                                      "MODE_FW_1024x768_YUV422"
+                                      "1024x768_YUV422"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1024x768_RGB8,
                                       "MODE_FW_1024x768_RGB8",
-                                      "MODE_FW_1024x768_RGB8"
+                                      "1024x768_RGB8"
                                     ));
 
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1024x768_MONO8,
                                       "MODE_FW_1024x768_MONO8",
-                                      "MODE_FW_1024x768_MONO8"
+                                      "1024x768_MONO8"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_800x600_MONO16,
@@ -239,53 +239,53 @@ void cedar::dev::sensors::visual::CameraVideoMode::construct()
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1024x768_MONO16,
                                       "MODE_FW_1024x768_MONO16",
-                                      "MODE_FW_1024x768_MONO16"
+                                      "1024x768_MONO16"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1280x960_YUV422,
                                       "MODE_FW_1280x960_YUV422",
-                                      "MODE_FW_1280x960_YUV422"
+                                      "1280x960_YUV422"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1280x960_RGB8,
                                       "MODE_FW_1280x960_RGB8",
-                                      "MODE_FW_1280x960_RGB8"
+                                      "1280x960_RGB8"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1280x960_MONO8,
                                       "MODE_FW_1280x960_MONO8",
-                                      "MODE_FW_1280x960_MONO8"
+                                      "1280x960_MONO8"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1600x1200_YUV422,
                                       "MODE_FW_1600x1200_YUV422",
-                                      "MODE_FW_1600x1200_YUV422"
+                                      "1600x1200_YUV422"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1600x1200_RGB8,
                                       "MODE_FW_1600x1200_RGB8",
-                                      "MODE_FW_1600x1200_RGB8"
+                                      "1600x1200_RGB8"
                                     ));
 
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1600x1200_MONO8,
                                       "MODE_FW_1600x1200_MONO8",
-                                      "MODE_FW_1600x1200_MONO8"
+                                      "1600x1200_MONO8"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1280x960_MONO16,
                                       "MODE_FW_1280x960_MONO16",
-                                      "MODE_FW_1280x960_MONO16"
+                                      "1280x960_MONO16"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1600x1200_MONO16,
                                       "MODE_FW_1600x1200_MONO16",
-                                      "MODE_FW_1600x1200_MONO16"
+                                      "1600x1200_MONO16"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_EXIF,
                                       "MODE_FW_EXIF",
-                                      "MODE_FW_EXIF"
+                                      "EXIF"
                                     ));
   /*
   mType.type()->def(cedar::aux::Enum(

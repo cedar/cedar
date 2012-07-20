@@ -38,8 +38,8 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_GRABBER_H
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_GRABBER_H
 
-#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
-#ifdef CEDAR_USE_LIB_DC1394
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/Grabber.h"
@@ -49,8 +49,17 @@
 #include "cedar/devices/sensors/visual/camera/CameraFrameRate.h"
 #include "cedar/devices/sensors/visual/camera/CameraSetting.h"
 #include "cedar/devices/sensors/visual/camera/CameraCapabilities.h"
-#include "cedar/devices/sensors/visual/camera/CameraStateAndConfig.h"
-#include "cedar/devices/sensors/visual/camera/CameraConfig.h"
+//#include "cedar/devices/sensors/visual/camera/CameraStateAndConfig.h"
+//#include "cedar/devices/sensors/visual/camera/CameraConfig.h"
+#include "cedar/devices/sensors/visual/camera/CameraSettings.h"
+#include "cedar/devices/sensors/visual/camera/CameraState.h"
+
+//backends
+#include "cedar/devices/sensors/visual/camera/CameraBackendType.h"
+#include "cedar/devices/sensors/visual/camera/backends/CameraDevice.h"
+#include "cedar/devices/sensors/visual/camera/backends/CameraDeviceVfl.h"
+#include "cedar/devices/sensors/visual/camera/backends/CameraDeviceDc1394.h"
+#include "cedar/devices/sensors/visual/camera/backends/CameraDeviceCvVideoCapture.h"
 
 // SYSTEM INCLUDES
 
@@ -69,43 +78,92 @@ public cedar::dev::sensors::visual::Grabber
 
   //!@cond SKIPPED_DOCUMENTATION
 
-  /*! @struct CameraId
-   *  @brief Store the unique Id of a camera
-   */
-  struct CameraId
-  {
-    unsigned int busId;  /// The bus id
-    unsigned int guid;   /// The unique id of the device
-  };
 
-
+public:
   /*! @struct CameraChannel
    *  @brief Additional data of a camera channel
    */
   struct CameraChannel
   :
-  cedar::dev::sensors::visual::Grabber::GrabberChannel
+  cedar::dev::sensors::visual::Grabber::Channel
   {
-    /// Unique channel id
-    CameraId mCamId;
+  public:
+    CameraChannel
+    (
+      unsigned int cameraId = 0,
+      bool byGuid = false,
+      cedar::dev::sensors::visual::CameraBackendType::Id backendType
+                                                           = cedar::dev::sensors::visual::CameraBackendType::AUTO
+    )
+    :
+    cedar::dev::sensors::visual::Grabber::Channel(),
+    mByGuid(byGuid),
+    _mBackendType(new cedar::aux::EnumParameter
+                  (
+                    this,
+                    "backend type",
+                    cedar::dev::sensors::visual::CameraBackendType::typePtr(),
+                    backendType
+                  )
+                 ),
+    mpVideoCaptureLock(NULL)
+    {
+      if (byGuid)
+      {
+        mBusId = 0;
+        mGuid = cameraId;
+      }
+      else
+      {
+        mBusId = cameraId;
+        mGuid = 0;
+      }
+    }
+
+    bool mByGuid;
+
+    /// The id on the used bus
+    unsigned int mBusId;
+
+    /// Unique channel id (not supported on every backend)
+    unsigned int mGuid;
+
+    /// The Backend to use
+    cedar::aux::EnumParameterPtr _mBackendType;
+
+    /// The lock for the concurrent access to the cv::VideoCapture
+    QReadWriteLock* mpVideoCaptureLock;
+
+    CameraStatePtr mpState;
+
+    CameraCapabilitiesPtr mpCapabilities;
+
+    CameraSettingsPtr mpSettings;
 
     /// Camera interface
     cv::VideoCapture mVideoCapture;
 
-    /// The lock for the concurrent access to the cv::VideoCapture
-    QReadWriteLock* pmVideoCaptureLock;
+    // Pointer to the camera device
+    CameraDevicePtr mpDevice;
 
-    /// The manager of settings and properties
-    CameraStateAndConfigPtr mCamStateAndConfig;
-
-    /// Filename for the capabilities
-    std::string mCamCapabilitiesFileName; //delete
   };
 
   CEDAR_GENERATE_POINTER_TYPES(CameraChannel);
 
 
   //!@endcond
+
+  /*
+  new CameraDeviceCvVideoCapture
+      (
+       mpCapabilities,
+       mpSettings,
+       mpState,
+       mVideoCapture,
+       mpVideoCaptureLock
+      )
+
+  */
 
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -134,26 +192,44 @@ public:
    *    the interface or use the CV_CAP_xxx constants in /usr/local/include/opencv2/highgui/highgui_c.h for a
    *    base unit (like CV_CAP_FIREWIRE, CV_CAP_ANY)
    */
-  CameraGrabber(const std::string& configFileName, unsigned int camera, bool isGuid, bool finishInitialization = true);
 
 
-  /*! @brief Constructor for a stereo camera grabber
-   *  @param configFileName Filename for the configuration
-   *  @param camera0 Device to grab from for channel 0. Look at OpenCV cv::VideoCapture documentation for details
-   *  @param camera1 Device to grab from for channel 1. Look at OpenCV cv::VideoCapture documentation for details
-   *  @param isGuid This flag have to be set, if the values in camera0 or camera1 are the guids of the cameras
-   *  @param finishInitialization Flag, if the initialization should be finished. Have a look at the CameraGrabber()
-   *          Constructor for details
-   *  @see cedar::dev::sensors::visual::CameraGrabber::CameraGrabber(const std::string&, unsigned int, bool, bool)
-   *       for details about the used framework
+
+  /*! @brief  Constructor for a single camera grabber
+   *  @param grabberName  Name of the grabber
+   *  @param backendType  The type of the backend you want to use.
+   *  @param cameraId  The identification of the camera. In case of a firewirecamera this could be the GUID of the
+   *                   wanted cam. In all other backends, this is the bus id
+   *  @param isGuid This flag is only available, when CEDAR is built with libdc/firewire support. If this flag is set
+   *                true, then the value in cameraId is treated as the unique GUID of the camera you want.
    */
   CameraGrabber
   (
-    const std::string& configFileName,
-    unsigned int camera0,
-    unsigned int camera1,
-    bool isGuid,
-    bool finishInitialization = true
+    unsigned int cameraId = 0,
+    bool isGuid = false,
+    cedar::dev::sensors::visual::CameraBackendType::Id backendType
+                                                         = cedar::dev::sensors::visual::CameraBackendType::AUTO,
+    const std::string& grabberName = "CameraGrabber"
+  );
+
+  /*! @brief  Constructor for a stereo camera grabber
+   *  @param grabberName  Name of the grabber
+   *  @param backendType  The type of the backend you want to use.
+   *  @param cameraId0  The identification of the camera on channel 0. In case of a firewire camera
+   *                  this could be the GUID of the wanted cam. In all other backends, this is the bus id.
+   *  @param cameraId1  The identification of the camera on channel 1. In case of a firewire camera
+   *                  this could be the GUID of the wanted cam. In all other backends, this is the bus id.
+   *  @param isGuid This flag is only available, when CEDAR is built with libdc/firewire support. If this flag is set
+   *                true, then the value in cameraId is treated as the unique GUID of the camera you want.
+   */
+  CameraGrabber
+  (
+    unsigned int cameraId0,
+    unsigned int cameraId1,
+    bool isGuid = false,
+    cedar::dev::sensors::visual::CameraBackendType::Id backendType
+                                                         = cedar::dev::sensors::visual::CameraBackendType::AUTO,
+    const std::string& grabberName = "StereoCameraGrabber"
   );
 
 
@@ -168,7 +244,7 @@ public:
    *        the default camera capabilities filename (build with guid or busId) will be used. It is possible,
    *        that this file isn't the right one for your camera.
    */
-  CameraGrabber(const std::string& configFileName, unsigned int numCameras);
+  //CameraGrabber(unsigned int numCameras);
 
 
   /*! @brief Destructor */
@@ -393,17 +469,15 @@ protected:
 
   bool onGrab();
 
-  bool onDeclareParameters();
+  //bool onDeclareParameters();
   void onUpdateSourceInfo(unsigned int channel);
 
   ///! @brief Sync all Parameters from cameras with the local buffer
-  bool onWriteConfiguration();
+  //bool onWriteConfiguration();
 
   ///! @brief Do the local clean up
   void onCleanUp();
 
-  ///! Create and initialize the channel-structure for ony channel (only used in constructor)
-  void onAddChannel();
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -412,7 +486,7 @@ protected:
 private:
 
   /// @brief Sets the channel-id which depends on the isGuid-flag (only used in constructor)
-  void setChannelId(unsigned int channel, unsigned int id, bool isGuid);
+  //void setChannelId(unsigned int channel, unsigned int id, bool isGuid);
 
   /*! This string identifies, that the default-filename (containing grabber-guid) should be used
    * If the entry in the configuration file is different, then that file will be used
@@ -429,28 +503,23 @@ private:
   }
 
   /// @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class CameraChannelPtr
-  inline CameraChannelPtr getChannel(unsigned int channel)
+  inline CameraChannelPtr getCameraChannel(unsigned int channel)
   {
     return boost::static_pointer_cast<CameraChannel>
            (
-             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
            );
   }
 
   /// @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class CameraChannelPtr
-  inline ConstCameraChannelPtr getChannel(unsigned int channel) const
+  inline ConstCameraChannelPtr getCameraChannel(unsigned int channel) const
   {
     return boost::static_pointer_cast<const CameraChannel>
            (
-             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
            );
   }
 
-  //!@brief The default name for the grabber
-  virtual inline std::string defaultGrabberName() const
-  {
-    return "CameraGrabber";
-  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -478,7 +547,6 @@ private:
 
 }; // class cedar::dev::sensors::visual::CameraGrabber
 
-#endif // CEDAR_USE_LIB_DC1394
 #endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_GRABBER_H
 
 

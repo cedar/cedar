@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,74 +22,59 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Video.h
+    File:        CameraBackendType.h
 
     Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.ruhr-uni-bochum.d
-    Date:        2012 04 20
+    Email:       georg.hartinger@ini.rub.de
+    Date:        2012 07 04
 
-    Description:
+    Description:  Header for CameraBackendType enum-type class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCES_VIDEO_H
-#define CEDAR_PROC_SOURCES_VIDEO_H
+#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERABACKENDTYPE_H
+#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERABACKENDTYPE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/namespace.h"
-#include "cedar/processing/sources/GrabberBase.h"
-#include "cedar/processing/Step.h"
-#include "cedar/devices/sensors/visual/VideoGrabber.h"
-#include "cedar/auxiliaries/ImageData.h"
-#include "cedar/auxiliaries/FileParameter.h"
-//#include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/units/TimeUnit.h"
-
+#include "cedar/auxiliaries/EnumType.h"
+#include "cedar/devices/sensors/visual/namespace.h"
 
 // SYSTEM INCLUDES
 
-
-//!@brief A video file  source for the processingIde
-class cedar::proc::sources::Video
-:
-public cedar::proc::sources::GrabberBase
+/*!@brief Enum class to determine the used backend for the camera grabber
+ */
+class cedar::dev::sensors::visual::CameraBackendType
 {
-  Q_OBJECT
-
-
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // typedefs
   //--------------------------------------------------------------------------------------------------------------------
+//!@cond SKIPPED_DOCUMENTATION
+public:
+  typedef cedar::aux::EnumId Id;
+public:
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Video();
 
   //!@brief Destructor
-  ~Video();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  static void construct();
 
-public slots:
-
-  //! This slot should be invoked, when the video in the VideoGrabber has changed.
-  void updateVideo();
-
-  //! This slot should be invoked, when the speed factor in the VideoGrabber has changed.
-  void updateSpeedFactor();
+  static const cedar::aux::EnumBase& type();
+  static const cedar::dev::sensors::visual::CameraBackendType::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -101,54 +86,45 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void compute(const cedar::proc::Arguments&);
-  void reset();
-
-  //!@brief Cast the base GrabberBasePtr to derived class VideoGrabberPtr
-  inline cedar::dev::sensors::visual::VideoGrabberPtr getVideoGrabber()
-  {
-    return boost::static_pointer_cast<cedar::dev::sensors::visual::VideoGrabber>
-           (
-             this->cedar::proc::sources::GrabberBase::mpGrabber
-           );
-  }
-
-  //!@brief Cast the base GrabberBasePtr to derived class VideoGrabberPtr
-  inline cedar::dev::sensors::visual::ConstVideoGrabberPtr getVideoGrabber() const
-  {
-    return boost::static_pointer_cast<const cedar::dev::sensors::visual::VideoGrabber>
-           (
-            cedar::proc::sources::GrabberBase::mpGrabber
-           );
-  }
+  static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraBackendType> mType;
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+
+  /*! @brief Use the default value of the OpenCV::VideoCapture object
+   *
+   *  It is possible, that no all properties could be detected
+   */
+  static const Id AUTO = 0;
+
+  /*! @brief Use only basic functionality of the cv::Capture object
+   */
+  static const Id CVCAPTURE = 1;
+
+#ifdef CEDAR_USE_LIB_DC1394
+  /*! @brief Use the DC1394 backend and settings
+   *
+   *   This is only possible if CEDAR is build with libdc support
+   */
+  static const Id DC1394 = 2;
+#endif
+
+  /*! @brief Use the Video For Linux backend
+   */
+  static const Id VFL = 3;
+
+
+
 protected:
   // none yet
 private:
-
-  //!@brief the time in ms between two frames. Depends on the the framerate of the video
-  //!@todo: change to cedar::unit::Time
-  cedar::unit::Milliseconds mFrameDuration;
-
-  //!@brief the time elapsed since the last frame is displayed
-  //!@todo: change to cedar::unit::Time
-  cedar::unit::Milliseconds mTimeElapsed;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
   // none yet
 
-private:
-  // none yet
+}; // cedar::dev::sensors::visual::CameraBackendType
 
 
-}; // class cedar::proc::sources::Video
-
-#endif // CEDAR_PROC_SOURCES_VIDEO_H
-
+#endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERABACKENDTYPE_H
 

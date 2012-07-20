@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,74 +22,60 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Video.h
+    File:        CameraDebayerPattern.h
 
     Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.ruhr-uni-bochum.d
-    Date:        2012 04 20
+    Email:       georg.hartinger@ini.rub.de
+    Date:        2012 07 04
 
-    Description:
+    Description:  Header for CameraDebayerPattern enum-type class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCES_VIDEO_H
-#define CEDAR_PROC_SOURCES_VIDEO_H
+#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERADEBAYERPATTERN_H
+#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERADEBAYERPATTERN_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/namespace.h"
-#include "cedar/processing/sources/GrabberBase.h"
-#include "cedar/processing/Step.h"
-#include "cedar/devices/sensors/visual/VideoGrabber.h"
-#include "cedar/auxiliaries/ImageData.h"
-#include "cedar/auxiliaries/FileParameter.h"
-//#include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/units/TimeUnit.h"
-
+#include "cedar/auxiliaries/EnumType.h"
+#include "cedar/devices/sensors/visual/namespace.h"
 
 // SYSTEM INCLUDES
 
-
-//!@brief A video file  source for the processingIde
-class cedar::proc::sources::Video
-:
-public cedar::proc::sources::GrabberBase
+/*!@brief Enum class to determine if a camera needs to be converted from a bayer-pattern to
+ *  the internal used BGR-format of cv::Mat
+ */
+class cedar::dev::sensors::visual::CameraDebayerPattern
 {
-  Q_OBJECT
-
-
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // typedefs
   //--------------------------------------------------------------------------------------------------------------------
+//!@cond SKIPPED_DOCUMENTATION
+public:
+  typedef cedar::aux::EnumId Id;
+public:
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Video();
 
   //!@brief Destructor
-  ~Video();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  static void construct();
 
-public slots:
-
-  //! This slot should be invoked, when the video in the VideoGrabber has changed.
-  void updateVideo();
-
-  //! This slot should be invoked, when the speed factor in the VideoGrabber has changed.
-  void updateSpeedFactor();
+  static const cedar::aux::EnumBase& type();
+  static const cedar::dev::sensors::visual::CameraDebayerPattern::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -101,54 +87,38 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void compute(const cedar::proc::Arguments&);
-  void reset();
-
-  //!@brief Cast the base GrabberBasePtr to derived class VideoGrabberPtr
-  inline cedar::dev::sensors::visual::VideoGrabberPtr getVideoGrabber()
-  {
-    return boost::static_pointer_cast<cedar::dev::sensors::visual::VideoGrabber>
-           (
-             this->cedar::proc::sources::GrabberBase::mpGrabber
-           );
-  }
-
-  //!@brief Cast the base GrabberBasePtr to derived class VideoGrabberPtr
-  inline cedar::dev::sensors::visual::ConstVideoGrabberPtr getVideoGrabber() const
-  {
-    return boost::static_pointer_cast<const cedar::dev::sensors::visual::VideoGrabber>
-           (
-            cedar::proc::sources::GrabberBase::mpGrabber
-           );
-  }
+  static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraDebayerPattern> mType;
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+
+
+  /// No conversion needed
+  static const Id NONE = 0;
+
+  /// Convert from blue-red to BGR
+  static const Id BG_TO_BGR = CV_BayerBG2BGR; // = 46
+
+  /// Convert from green-blue to BGR
+  static const Id GB_TO_BGR = CV_BayerGB2BGR; // = 47
+
+  /// Convert from red-green to BGR
+  static const Id RG_TO_BGR = CV_BayerRG2BGR; // = 48
+
+  /// Convert from green-red to BGR
+  static const Id GR_TO_BGR = CV_BayerGR2BGR; // = 49
+
+
 protected:
   // none yet
 private:
-
-  //!@brief the time in ms between two frames. Depends on the the framerate of the video
-  //!@todo: change to cedar::unit::Time
-  cedar::unit::Milliseconds mFrameDuration;
-
-  //!@brief the time elapsed since the last frame is displayed
-  //!@todo: change to cedar::unit::Time
-  cedar::unit::Milliseconds mTimeElapsed;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
   // none yet
 
-private:
-  // none yet
+}; // cedar::dev::sensors::visual::CameraDebayerPattern
 
 
-}; // class cedar::proc::sources::Video
-
-#endif // CEDAR_PROC_SOURCES_VIDEO_H
-
+#endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERADEBAYERPATTERN_H
 

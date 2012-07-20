@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,47 +22,39 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Video.h
+    File:        CameraDeviceCvVideoCaputre.h
 
     Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.ruhr-uni-bochum.d
-    Date:        2012 04 20
+    Email:       georg.hartinger@ini.rub.de
+    Date:        2012 07 04
 
-    Description:
+    Description:  Header for the cedar::dev::sensors::visual::CameraDeviceCvVideoCaputre class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCES_VIDEO_H
-#define CEDAR_PROC_SOURCES_VIDEO_H
+#ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_DEVICE_CVVIDEOCAPTURE_H
+#define CEDAR_DEV_SENSORS_VISUAL_CAMERA_DEVICE_CVVIDEOCAPTURE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/namespace.h"
-#include "cedar/processing/sources/GrabberBase.h"
-#include "cedar/processing/Step.h"
-#include "cedar/devices/sensors/visual/VideoGrabber.h"
-#include "cedar/auxiliaries/ImageData.h"
-#include "cedar/auxiliaries/FileParameter.h"
-//#include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/units/TimeUnit.h"
-
+#include "cedar/devices/sensors/visual/namespace.h"
+#include "cedar/devices/sensors/visual/camera/backends/CameraDevice.h"
 
 // SYSTEM INCLUDES
 
 
-//!@brief A video file  source for the processingIde
-class cedar::proc::sources::Video
+/*!@brief Base class of the misc camera grabber backends.
+ *
+ * Implements the common features of a camera device
+ */
+class cedar::dev::sensors::visual::CameraDeviceCvVideoCaputre
 :
-public cedar::proc::sources::GrabberBase
+cedar::dev::sensors::visual::CameraDevice::CameraDevice
 {
-  Q_OBJECT
-
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -72,24 +64,23 @@ public cedar::proc::sources::GrabberBase
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Video();
+  CameraDeviceCvVideoCaputre
+  (
+    cedar::dev::sensors::visual::CameraCapabilitiesPtr p_capabilities,
+    cedar::dev::sensors::visual::CameraSettingsPtr p_settings,
+    cedar::dev::sensors::visual::CameraStatePtr p_state,
+    cv::VideoCapture videoCapture,
+    QReadWriteLock* p_videoCaptureLock
+  );
 
   //!@brief Destructor
-  ~Video();
+  ~CameraDeviceCvVideoCaputre();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   // none yet
-
-public slots:
-
-  //! This slot should be invoked, when the video in the VideoGrabber has changed.
-  void updateVideo();
-
-  //! This slot should be invoked, when the speed factor in the VideoGrabber has changed.
-  void updateSpeedFactor();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -101,26 +92,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void compute(const cedar::proc::Arguments&);
-  void reset();
-
-  //!@brief Cast the base GrabberBasePtr to derived class VideoGrabberPtr
-  inline cedar::dev::sensors::visual::VideoGrabberPtr getVideoGrabber()
-  {
-    return boost::static_pointer_cast<cedar::dev::sensors::visual::VideoGrabber>
-           (
-             this->cedar::proc::sources::GrabberBase::mpGrabber
-           );
-  }
-
-  //!@brief Cast the base GrabberBasePtr to derived class VideoGrabberPtr
-  inline cedar::dev::sensors::visual::ConstVideoGrabberPtr getVideoGrabber() const
-  {
-    return boost::static_pointer_cast<const cedar::dev::sensors::visual::VideoGrabber>
-           (
-            cedar::proc::sources::GrabberBase::mpGrabber
-           );
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -128,14 +100,7 @@ private:
 protected:
   // none yet
 private:
-
-  //!@brief the time in ms between two frames. Depends on the the framerate of the video
-  //!@todo: change to cedar::unit::Time
-  cedar::unit::Milliseconds mFrameDuration;
-
-  //!@brief the time elapsed since the last frame is displayed
-  //!@todo: change to cedar::unit::Time
-  cedar::unit::Milliseconds mTimeElapsed;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -146,9 +111,7 @@ protected:
 private:
   // none yet
 
+}; // class cedar::dev::sensors::visual::CameraDeviceCvVideoCaputre
 
-}; // class cedar::proc::sources::Video
-
-#endif // CEDAR_PROC_SOURCES_VIDEO_H
-
+#endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_DEVICE_CVVIDEOCAPTURE_H
 

@@ -47,16 +47,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::sensors::visual::CameraCapabilities::CameraCapabilities(const std::string& configFileName)
+cedar::dev::sensors::visual::CameraCapabilities::CameraCapabilities()
 :
 cedar::aux::Configurable()
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                         (
-                                           "Config-file: " + configFileName,
-                                           "cedar::dev::sensors::visual::CameraCapabilities::CameraCapabilities()"
-                                         );
+  const std::string debug_message = "cedar::dev::sensors::visual::CameraCapabilities::CameraCapabilities()";
+  cedar::aux::LogSingleton::getInstance()->debugMessage(debug_message);
 
   //for all known properties create a capability structure and store it
   for (unsigned int i=0; i<CameraProperty::type().list().size(); i++)

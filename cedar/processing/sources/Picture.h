@@ -71,20 +71,14 @@ public:
   Picture();
 
   //!@brief Destructor
-
+  ~Picture();
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
 
 public slots:
-
-  //!@brief A slot that is triggered if a new filename should be set
-  void setFileName();
-
-  //!@brief Sets a new configuration filename
-  void setConfigurationFileName();
+  void updatePicture();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -97,27 +91,23 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void compute(const cedar::proc::Arguments&);
-  void onStart();
-
-  //create a new grabber instance
-  void onCreateGrabber();
-
+  void reset();
 
   //!@brief Cast the base GrabberBasePtr to derived class PictureGrabberPtr
-  inline cedar::dev::sensors::visual::PictureGrabberPtr getGrabber()
+  inline cedar::dev::sensors::visual::PictureGrabberPtr getPictureGrabber()
   {
     return boost::static_pointer_cast<cedar::dev::sensors::visual::PictureGrabber>
            (
-             this->cedar::proc::sources::GrabberBase::mGrabber
+             this->cedar::proc::sources::Picture::mpGrabber
            );
   }
 
   //!@brief Cast the base GrabberBasePtr to derived class PictureGrabberPtr
-  inline cedar::dev::sensors::visual::ConstPictureGrabberPtr getGrabber() const
+  inline cedar::dev::sensors::visual::ConstPictureGrabberPtr getPictureGrabber() const
   {
     return boost::static_pointer_cast<const cedar::dev::sensors::visual::PictureGrabber>
            (
-            cedar::proc::sources::GrabberBase::mGrabber
+             this->cedar::proc::sources::Picture::mpGrabber
            );
   }
 
@@ -138,11 +128,7 @@ protected:
   // none yet
 
 private:
-
-  //!@brief the filename to grab from
-  cedar::aux::FileParameterPtr _mFileName;
-
-
+  // none yet
 
 }; // class cedar::proc::sources::Picture
 
