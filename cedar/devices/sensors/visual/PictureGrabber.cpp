@@ -64,13 +64,12 @@ namespace
 //Constructor for single-file grabber
 cedar::dev::sensors::visual::PictureGrabber::PictureGrabber
 (
-  const std::string& pictureFileName,
-  const std::string& grabberName
+  const std::string& pictureFileName
 )
 :
 cedar::dev::sensors::visual::Grabber
 (
-  grabberName,
+  "PictureGraber",
   cedar::dev::sensors::visual::PictureGrabber::PictureChannelPtr
   (
     new cedar::dev::sensors::visual::PictureGrabber::PictureChannel(pictureFileName)
@@ -85,13 +84,12 @@ cedar::dev::sensors::visual::Grabber
 cedar::dev::sensors::visual::PictureGrabber::PictureGrabber
 (
   const std::string& pictureFileName0,
-  const std::string& pictureFileName1,
-  const std::string& grabberName
+  const std::string& pictureFileName1
 )
 :
 cedar::dev::sensors::visual::Grabber
 (
-  grabberName,
+  "StereoPictureGraber",
   cedar::dev::sensors::visual::PictureGrabber::PictureChannelPtr
   (
     new cedar::dev::sensors::visual::PictureGrabber::PictureChannel(pictureFileName0)

@@ -42,7 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/Grabber.h"
-#include "cedar/devices/sensors/visual/Grabbable.h"
+#include "cedar/auxiliaries/Grabbable.h"
 
 
 // SYSTEM INCLUDES
@@ -80,7 +80,7 @@ public:
   cedar::dev::sensors::visual::Grabber::Channel
   {
   public:
-    GrabbableChannel(cedar::dev::sensors::visual::Grabbable* grabbable = NULL)
+    GrabbableChannel(cedar::aux::Grabbable* grabbable = NULL)
     :
     cedar::dev::sensors::visual::Grabber::Channel(),
     mpSourceInterfaceClass(grabbable),
@@ -88,7 +88,7 @@ public:
     {
     }
     //! @brief The class to grab from
-    cedar::dev::sensors::visual::Grabbable* mpSourceInterfaceClass;
+    cedar::aux::Grabbable* mpSourceInterfaceClass;
     QReadWriteLock* mpGrabberLock;
   };
 
@@ -111,7 +111,7 @@ public:
    */
   GrabbableGrabber
   (
-    cedar::dev::sensors::visual::Grabbable *grabbable = NULL,
+    cedar::aux::Grabbable* grabbable = NULL,
     const std::string& grabberName = "GrabbableGrabber"
   );
 
@@ -122,8 +122,8 @@ public:
    */
   GrabbableGrabber
   (
-    cedar::dev::sensors::visual::Grabbable *grabbable0,
-    cedar::dev::sensors::visual::Grabbable *grabbable1,
+    cedar::aux::Grabbable* grabbable0,
+    cedar::aux::Grabbable* grabbable1,
     const std::string& grabberName = "StereoGrabbableGrabber"
   );
 

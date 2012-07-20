@@ -121,25 +121,21 @@ public:
 public:
 
   /*! @brief  Constructor for a single-file grabber
-   *  @param grabberName  Name of the grabber
    *  @param pictureFileName	Filename to grab from
    */
   PictureGrabber
   (
-    const std::string& pictureFileName = "",
-    const std::string& grabberName = "PictureGrabber"
+    const std::string& pictureFileName = ""
   );
 
   /*! @brief Constructor for a stereo-file grabber
-   *  @param grabberName	Name of the grabber
    *  @param pictureFileName0	Filename to grab from for channel 0
    *  @param pictureFileName1	Filename to grab from for channel 1
    */
   PictureGrabber
   (
     const std::string& pictureFileName0,
-    const std::string& pictureFileName1,
-    const std::string& grabberName = "StereoPictureGrabber"
+    const std::string& pictureFileName1
   );
 
   /*! @brief Destructor */

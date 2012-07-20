@@ -232,6 +232,10 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(ValidationFailedException);
     //!@endcond
     
+    //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_DECLARE_AUX_CLASS(Grabbable);
+    //!@endcond
+
     // Log related classes --------------------------------------------------------------------------------------------
     
     //!@cond SKIPPED_DOCUMENTATION

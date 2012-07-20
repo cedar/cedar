@@ -28,20 +28,20 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 05 15
 
-    Description: Header for the grabbable interface class
+    Description: The grabbable interface class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_INTERFACE_H
-#define CEDAR_DEV_SENSORS_VISUAL_INTERFACE_H
+#ifndef CEDAR_AUX_GRABBABLE_H
+#define CEDAR_AUX_GRABBABLE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/namespace.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -53,7 +53,7 @@
  * Implement this interface in your class, if the InterfaceGrabber should grab from it
  *
  */
-class cedar::dev::sensors::visual::Grabbable
+class cedar::aux::Grabbable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -138,7 +138,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::dev::sensors::visual::Grabbable
+}; // class cedar::aux::Grabbable
 
-#endif // CEDAR_DEV_SENSORS_VISUAL_GRABBABLE_H
+#endif // CEDAR_AUX_GRABBABLE_H
 

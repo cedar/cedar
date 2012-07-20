@@ -569,7 +569,7 @@ protected:
   //------------------------------------------------------------------------
 
 
-  /*! @brief Creates the channels, initializes them and read the first frames.
+  /*! @brief Create the channels, initializes them and read the first frames.
    */
   virtual bool onCreateGrabber() = 0;
 
