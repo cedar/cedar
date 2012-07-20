@@ -96,8 +96,7 @@ _mCenters(new cedar::aux::DoubleVectorParameter(this, "centers", 2, 3.0, -10000.
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000.0)),
 _mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
 {
-  this->declareOutput("Gauss input");
-  this->setOutput("Gauss input", mOutput);
+  this->declareOutput("Gauss input", mOutput);
   QObject::connect(_mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mSigmas.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mCenters.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
