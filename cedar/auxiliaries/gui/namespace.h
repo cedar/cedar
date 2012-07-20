@@ -84,10 +84,13 @@ namespace cedar
       template <typename ValueT, class WidgetT> class NumericParameter;
 
       template <typename ValueT, class WidgetT> class VectorParameterAbstraction;
-      template <typename ValueT, class WidgetT> class VectorParameter;
+      template <typename ValueT, class WidgetT, class Abstraction> class VectorParameter;
+
+      template <typename ValueT, class WidgetT> class NumericVectorParameterAbstraction;
+      template <typename ValueT, class WidgetT> class NumericVectorParameter;
 
       /* Exceptions */
-      class InvalidPlotData;
+      class CEDAR_AUX_LIB_EXPORT InvalidPlotData;
       //!@endcond
 
       /*! The factory for gui parameters.

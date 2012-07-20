@@ -43,20 +43,69 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/auxiliaries/gui/NumericVectorParameter.h"
 
 // SYSTEM INCLUDES
 #include <QDoubleSpinBox>
 
 
+//----------------------------------------------------------------------------------------------------------------------
+// template specializations
+//----------------------------------------------------------------------------------------------------------------------
+namespace cedar
+{
+  namespace aux
+  {
+    namespace gui
+    {
+      template <>
+      inline bool cedar::aux::gui::VectorParameterAbstraction<double, QDoubleSpinBox>::connectValueChange
+                  (
+                    cedar::aux::gui::Parameter* pParameter,
+                    QDoubleSpinBox* pWidget
+                  )
+      {
+        return QObject::connect(pWidget, SIGNAL(valueChanged(double)), pParameter, SLOT(widgetValueChanged(double)));
+      }
+
+
+      template<>
+      inline double cedar::aux::gui::VectorParameterAbstraction<double, QDoubleSpinBox>::getValue(QDoubleSpinBox* pWidget)
+      {
+        return pWidget->value();
+      }
+
+      template<>
+      inline void cedar::aux::gui::VectorParameterAbstraction<double, QDoubleSpinBox>::setValue
+                  (
+                    QDoubleSpinBox* pWidget,
+                    const double& value
+                  )
+      {
+        pWidget->setValue(value);
+      }
+    }
+  }
+}
+
 /*!@brief A widget for manipulating cedar::aux::DoubleVectorParameters.
  */
-class cedar::aux::gui::DoubleVectorParameter : public cedar::aux::gui::Parameter
+class cedar::aux::gui::DoubleVectorParameter : public cedar::aux::gui::NumericVectorParameter
+                                                      <
+                                                        double,
+                                                        QDoubleSpinBox
+                                                      >
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef cedar::aux::gui::NumericVectorParameter<double, QDoubleSpinBox> Base;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -65,26 +114,11 @@ public:
   //!@brief The standard constructor.
   DoubleVectorParameter(QWidget *pParent = NULL);
 
-  //!@brief Destructor
-  virtual ~DoubleVectorParameter();
-
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-public slots:
-  /*!@brief Slot that reacts to a change of the parameter pointer.
-   */
-  void parameterPointerChanged();
-
-  /*!@brief Slot that reacts to a change of the value the parameter.
-   */
-  void valueChanged(double value);
-
-  /*!@brief Handles changes in the displayed parameter's properties, e.g., a resizing of the vector.
-   */
-  void propertyChanged();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -95,8 +129,8 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  // none yet
+private slots:
+  void widgetValueChanged(double);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -104,8 +138,7 @@ private:
 protected:
   // none yet
 private:
-  //! Vector of the spinboxes used for displaying and manipulating the parameter values.
-  std::vector<QDoubleSpinBox*> mSpinboxes;
+  // none yet
 
 }; // class cedar::aux::gui::DoubleVectorParameter
 
