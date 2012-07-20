@@ -68,8 +68,10 @@ public:
   class MatrixType
   {
     public:
+      //! the id of an enum entry
       typedef cedar::aux::EnumId Id;
 
+      //! constructs the enum for all ids
       static void construct()
       {
         mType.type()->def(cedar::aux::Enum(Int8, "Int8"));
@@ -91,9 +93,13 @@ public:
       }
 
     public:
+      //! id for unsigned byte
       static const Id UInt8 = CV_8U;
+      //! id for signed byte
       static const Id Int8 = CV_8S;
+      //! id for floating point
       static const Id Float = CV_32F;
+      //! id for floating point, double precision
       static const Id Double = CV_64F;
 
     private:

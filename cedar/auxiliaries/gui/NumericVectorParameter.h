@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        IntVectorParameter.h
+    File:        NumericVectorParameter.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 03 12
+    Date:        2012 07 20
 
     Description:
 
@@ -34,81 +34,88 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_INT_VECTOR_PARAMETER_H
-#define CEDAR_AUX_GUI_INT_VECTOR_PARAMETER_H
+#ifndef CEDAR_AUX_GUI_NUMERIC_VECTOR_PARAMETER_H
+#define CEDAR_AUX_GUI_NUMERIC_VECTOR_PARAMETER_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/NumericVectorParameter.h"
+#include "cedar/auxiliaries/gui/VectorParameter.h"
 #include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/NumericVectorParameter.h"
 
 // SYSTEM INCLUDES
-#include <QSpinBox>
 
-
-//----------------------------------------------------------------------------------------------------------------------
-// template specializations
-//----------------------------------------------------------------------------------------------------------------------
-namespace cedar
+template <typename ValueT, class WidgetT>
+class cedar::aux::gui::NumericVectorParameterAbstraction
+:
+public cedar::aux::gui::VectorParameterAbstraction<ValueT, WidgetT>
 {
-  namespace aux
-  {
-    namespace gui
+  public:
+    static void applyProperties(WidgetT* pWidget, boost::intrusive_ptr<cedar::aux::VectorParameter<ValueT> > parameter)
     {
-      template <>
-      inline bool cedar::aux::gui::VectorParameterAbstraction<int, QSpinBox>::connectValueChange
-                  (
-                    cedar::aux::gui::Parameter* pParameter,
-                    QSpinBox* pWidget
-                  )
-      {
-        return QObject::connect(pWidget, SIGNAL(valueChanged(int)), pParameter, SLOT(widgetValueChanged(int)));
-      }
-
-
-      template<>
-      inline int cedar::aux::gui::VectorParameterAbstraction<int, QSpinBox>::getValue(QSpinBox* pWidget)
-      {
-        return pWidget->value();
-      }
-
-      template<>
-      inline void cedar::aux::gui::VectorParameterAbstraction<int, QSpinBox>::setValue
-                  (
-                    QSpinBox* pWidget,
-                    const int& value
-                  )
-      {
-        pWidget->setValue(value);
-      }
+      typedef cedar::aux::NumericVectorParameter<ValueT> NumericVector;
+      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(NumericVector);
+      NumericVectorPtr numeric_parameter = cedar::aux::asserted_pointer_cast<NumericVector>(parameter);
+      pWidget->setDisabled(parameter->isConstant());
+      bool signals_blocked = pWidget->blockSignals(true);
+      setMinimum(pWidget, numeric_parameter->getMinimum());
+      setMaximum(pWidget, numeric_parameter->getMaximum());
+      pWidget->blockSignals(signals_blocked);
     }
-  }
-}
 
-/*!@brief Widget for manipulating vectors of integer values.
+    static void setMinimum(WidgetT* pWidget, const ValueT& limit)
+    {
+      pWidget->setMinimum(limit);
+    }
+
+    static void setMaximum(WidgetT* pWidget, const ValueT& limit)
+    {
+      pWidget->setMaximum(limit);
+    }
+};
+
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::aux::gui::IntVectorParameter : public cedar::aux::gui::NumericVectorParameter
-                                                   <
-                                                     int,
-                                                     QSpinBox
-                                                   >
+template <typename ValueT, class WidgetT>
+class cedar::aux::gui::NumericVectorParameter : public cedar::aux::gui::VectorParameter
+                                                       <
+                                                         ValueT,
+                                                         WidgetT,
+                                                         cedar::aux::gui::NumericVectorParameterAbstraction
+                                                         <
+                                                           ValueT, WidgetT
+                                                         >
+                                                       >
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  typedef cedar::aux::gui::NumericVectorParameter<int, QSpinBox> Base;
+  typedef cedar::aux::gui::VectorParameter
+          <
+            ValueT,
+            WidgetT,
+            cedar::aux::gui::NumericVectorParameterAbstraction
+            <
+              ValueT, WidgetT
+            >
+          >
+          Base;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  IntVectorParameter(QWidget *pParent = NULL);
+  NumericVectorParameter(QWidget* pParent = NULL)
+  :
+  Base(pParent)
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -125,8 +132,8 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private slots:
-  void widgetValueChanged(int);
+private:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -136,6 +143,16 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::gui::IntVectorParameter
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-#endif // CEDAR_AUX_GUI_INT_VECTOR_PARAMETER_H
+private:
+  // none yet
+
+}; // class cedar::aux::gui::NumericVectorParameter
+
+#endif // CEDAR_AUX_GUI_NUMERIC_VECTOR_PARAMETER_H
+

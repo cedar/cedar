@@ -249,7 +249,7 @@ macro(cedar_add_library)
     endif (NOT isGenerated)
     
     # add the header file to the 'make install' target
-    install(FILES ${headerFile} DESTINATION ${CEDAR_HEADER_INSTALL_DIR}/${relativeHeaderFilePath})
+    install(FILES ${headerFile} DESTINATION "${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}/${relativeHeaderFilePath}")
   endforeach(headerFile ${headerFiles})
   
   # place source files into groups
@@ -274,6 +274,7 @@ macro(cedar_add_library)
   # add the library and link it to all relevant cedar and third party libraries
   set(CEDAR_LIBS ${CEDAR_LIBS} ${libraryName} CACHE INTERNAL "")
   add_library(${libraryName} ${CEDAR_LIB_TYPE} ${sourceFiles} ${headerFiles} ${recourceCompilerSrcs})
+  cedar_set_common_target_properties(${libraryName})
   
   if (MSVC)
     set(LIB_EXPORTS "CEDAR_LIB_EXPORTS_${CAP_LIB_NAME}")
@@ -291,7 +292,12 @@ macro(cedar_add_library)
   endif(WIN32)
 endmacro(cedar_add_library)
 
-
+macro(cedar_set_common_target_properties target)
+  set_target_properties(${target}
+                        PROPERTIES
+                        VERSION ${CEDAR_VERSION}
+                        )
+endmacro(cedar_set_common_target_properties)
 
 ################################################################################################################
 # macro for finding all source, header and other dependent files

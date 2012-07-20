@@ -256,5 +256,4 @@ endforeach(libPath)
 # write the current configuration values to the file
 set(CEDAR_CONFIGURATION_HEADER_OUTPUT "${CEDAR_BUILD_DIR}/cedar/configuration.h")
 configure_file("${CEDAR_HOME}/cmake/resources/configuration.h.in" "${CEDAR_CONFIGURATION_HEADER_OUTPUT}")
-install(FILES ${CEDAR_CONFIGURATION_HEADER_OUTPUT} DESTINATION ${CEDAR_HEADER_INSTALL_DIR}/)
 message("-- Current configuration was written to ${CEDAR_BUILD_DIR}/cedar/configuration.h")

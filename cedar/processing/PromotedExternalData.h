@@ -73,6 +73,7 @@ public:
 
   cedar::aux::ConstDataPtr getData() const;
 
+  //! get the full path of slot promotion as dot-concatenated string
   std::string getPromotionPath() const;
 
   //!@brief get the current validity of the promoted slot

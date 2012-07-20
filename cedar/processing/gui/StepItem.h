@@ -79,6 +79,7 @@ public:
   class DisplayMode
   {
     public:
+      //! the id of an enum entry
       typedef cedar::aux::EnumId Id;
 
     public:
