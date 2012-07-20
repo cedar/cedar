@@ -380,6 +380,8 @@ void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin)
 The declaration code should look familiar from @ref ProcessingTutorialFirstStepArchitectureFile. After recompiling, now,
 the plugin is ready for use!
 
+@remarks While not necessary, we recommend using @link ProjectsWithCedar cedar's project scripts@endlink for compiling
+         your plugin.
 
 
 @section ProcessingTutorialUsingTheProcessingIde Beginner's Tutorial: Using the processingIde

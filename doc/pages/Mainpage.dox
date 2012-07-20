@@ -31,6 +31,7 @@ In these pages you can learn more about the structure and organization of cedar.
 @section Tutorials Tutorials
 We provide a number of tutorials for certain parts of cedar, for which some additional guidance may be
 beneficial or even necessary.
+- @ref ProjectsWithCedar
 - @link ProcessingFrameworkTutorial Processing framework @endlink
 - @link ProcessingGuiTutorial Processing gui @endlink
 - @ref LoggingWithCedar
