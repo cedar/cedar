@@ -60,9 +60,19 @@ public cedar::aux::gui::VectorParameterAbstraction<ValueT, WidgetT>
       NumericVectorPtr numeric_parameter = cedar::aux::asserted_pointer_cast<NumericVector>(parameter);
       pWidget->setDisabled(parameter->isConstant());
       bool signals_blocked = pWidget->blockSignals(true);
-      pWidget->setMinimum(numeric_parameter->getMinimum());
-      pWidget->setMaximum(numeric_parameter->getMaximum());
+      setMinimum(pWidget, numeric_parameter->getMinimum());
+      setMaximum(pWidget, numeric_parameter->getMaximum());
       pWidget->blockSignals(signals_blocked);
+    }
+
+    static void setMinimum(WidgetT* pWidget, const ValueT& limit)
+    {
+      pWidget->setMinimum(limit);
+    }
+
+    static void setMaximum(WidgetT* pWidget, const ValueT& limit)
+    {
+      pWidget->setMaximum(limit);
     }
 };
 

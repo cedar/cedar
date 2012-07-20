@@ -41,6 +41,10 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
+#include "cedar/auxiliaries/gui/IntVectorParameter.h"
+#include "cedar/auxiliaries/IntVectorParameter.h"
+#include "cedar/auxiliaries/gui/UIntVectorParameter.h"
+#include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/exceptions.h"
@@ -149,7 +153,7 @@ int test_parameter(T initialValue, size_t initialSize, T firstValue, T min, T ma
 
   for (size_t i = 0; i < p_widget->mWidgets.size(); ++i)
   {
-    if (p_widget->mWidgets[i]->minimum() != min)
+    if (static_cast<T>(p_widget->mWidgets[i]->minimum()) != min)
     {
       std::cout << "Wrong min in widget " << i << "; is: " << p_widget->mWidgets[i]->minimum()
                 << ", should be: " << min << std::endl;
@@ -159,7 +163,7 @@ int test_parameter(T initialValue, size_t initialSize, T firstValue, T min, T ma
 
   for (size_t i = 0; i < p_widget->mWidgets.size(); ++i)
   {
-    if (p_widget->mWidgets[i]->maximum() != max)
+    if (static_cast<T>(p_widget->mWidgets[i]->maximum()) != max)
     {
       std::cout << "Wrong min in widget " << i << "; is: " << p_widget->mWidgets[i]->maximum()
                 << ", should be: " << max << std::endl;
@@ -191,6 +195,22 @@ int main(int argc, char** argv)
         cedar::aux::gui::DoubleVectorParameter,
         double
       >(1.0, 2, 2.0, -10.0, 10.0);
+
+
+  errors += test_parameter
+      <
+        cedar::aux::IntVectorParameter,
+        cedar::aux::gui::IntVectorParameter,
+        int
+      >(1, 2, 2, -10, 10);
+
+
+  errors += test_parameter
+      <
+        cedar::aux::UIntVectorParameter,
+        cedar::aux::gui::UIntVectorParameter,
+        unsigned int
+      >(1, 2, 2, 10, 15);
 
   std::cout << "Done. There were " << errors << " errors." << std::endl;
   return errors;
