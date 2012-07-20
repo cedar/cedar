@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        VectorParameterTemplate.h
+    File:        VectorParameter.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/VectorParameter.h"
+#include "cedar/auxiliaries/NumericVectorParameter.h"
 #include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
@@ -86,15 +87,21 @@ public:
   }
 };
 
+
 /*!@brief A generic base class for gui representations of cedar::aux::VectorParameters.
  *
  * @todo describe more.
  *
  * @todo Use this class for the other vector parameters as well; introduce a numeric version of it
  */
-template <typename ValueT, class WidgetT>
+template
+<
+  typename ValueT,
+  class WidgetT,
+  class Abstraction = cedar::aux::gui::VectorParameterAbstraction<ValueT, WidgetT>
+>
 class cedar::aux::gui::VectorParameter : public cedar::aux::gui::Parameter,
-                                         public cedar::aux::gui::VectorParameterAbstraction<ValueT, WidgetT>
+                                         public Abstraction
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -103,7 +110,7 @@ public:
   typedef ValueT ValueType;
   typedef WidgetT WidgetType;
   typedef cedar::aux::VectorParameter<ValueT> Parameter;
-  typedef cedar::aux::gui::VectorParameterAbstraction<ValueT, WidgetT> WidgetAbstraction;
+  typedef Abstraction WidgetAbstraction;
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(Parameter);
 
 
@@ -229,7 +236,7 @@ protected:
 private:
   std::vector<WidgetType*> mWidgets;
 
-}; // class cedar::aux::gui::VectorParameterTemplate
+}; // class cedar::aux::gui::VectorParameter
 
 #endif // CEDAR_AUX_GUI_VECTOR_PARAMETER_H
 
