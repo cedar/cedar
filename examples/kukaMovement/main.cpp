@@ -173,7 +173,7 @@ int main(int argc, char **argv)
   if (use_hardware)
   {
     // hardware interface
-    cedar::dev::kuka::KukaInterfacePtr lwr4(new cedar::dev::kuka::KukaInterface());
+    cedar::dev::kuka::KinematicChainPtr lwr4(new cedar::dev::kuka::KinematicChain());
     lwr4->readJson(configuration_file);
     arm = lwr4;
     // status widget

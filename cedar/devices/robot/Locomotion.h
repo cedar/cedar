@@ -112,6 +112,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
+  //! is debug output sent to the console?
   inline bool debug() const
   {
     return this->_mDebug->getValue();
