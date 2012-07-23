@@ -41,7 +41,6 @@
 
 // SYSTEM INCLUDES
 
-
 cedar::aux::EnumType<cedar::dev::sensors::visual::CameraFrameRate>
             cedar::dev::sensors::visual::CameraFrameRate::mType("cedar::dev::sensors::visual::CameraFramerate::");
 

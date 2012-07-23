@@ -38,7 +38,6 @@
 #define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_VIDEO_MODE_H
 
 #include "cedar/configuration.h"
-#ifdef CEDAR_USE_LIB_DC1394
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/EnumType.h"
@@ -221,6 +220,5 @@ private:
 
 }; // cedar::dev::sensors::visual::CameraVideoMode
 
-#endif // CEDAR_USE_LIB_DC1394
 #endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_VIDEO_MODE_H
 

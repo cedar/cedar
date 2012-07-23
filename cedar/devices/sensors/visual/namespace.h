@@ -79,10 +79,7 @@ namespace cedar
         CEDAR_DECLARE_DEV_CLASS(TestGrabber);
         CEDAR_DECLARE_DEV_CLASS(GLGrabber);
         CEDAR_DECLARE_DEV_CLASS(GrabbableGrabber);
-
-#ifdef CEDAR_USE_LIB_DC1394
         CEDAR_DECLARE_DEV_CLASS(CameraGrabber);
-#endif // CEDAR_USE_LIB_DC1394
 
 #ifdef CEDAR_USE_YARP
         CEDAR_DECLARE_DEV_CLASS(NetGrabber);
@@ -110,10 +107,7 @@ namespace cedar
         CEDAR_DECLARE_DEV_CLASS(CameraSetting);
         CEDAR_DECLARE_DEV_CLASS(CameraBackendType);
         CEDAR_DECLARE_DEV_CLASS(CameraDebayerPattern);
-
-#ifdef CEDAR_USE_LIB_DC1394
         CEDAR_DECLARE_DEV_CLASS(CameraIsoSpeed);
-#endif //CEDAR_USE_LIB_DC1394
 
 
        // CEDAR_DECLARE_DEV_CLASS(CameraStateAndConfig);

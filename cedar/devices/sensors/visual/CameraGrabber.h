@@ -53,6 +53,7 @@
 //#include "cedar/devices/sensors/visual/camera/CameraConfig.h"
 #include "cedar/devices/sensors/visual/camera/CameraSettings.h"
 #include "cedar/devices/sensors/visual/camera/CameraState.h"
+#include "cedar/devices/sensors/visual/namespace.h"
 
 //backends
 #include "cedar/devices/sensors/visual/camera/CameraBackendType.h"
@@ -255,7 +256,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
   /*!  @brief With this method, it is possible to get Information on any channel.
    *
    *   This method passes the arguments directly to the corresponding capture device
@@ -269,7 +269,7 @@ public:
    *          - CAMERA_PROPERTY_MODE_OFF
    *   @see CameraProperty
    */
-  double getCameraProperty( unsigned int channel, CameraProperty::Id propId);
+  double getCameraProperty(unsigned int channel, CameraProperty::Id propId);
 
   /*! @brief Get the real value of a Property which is set to auto.
    *
@@ -323,7 +323,7 @@ public:
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    *  @see  setCameraMode, setCameraFps, setCameraIsoSpeed, setCameraFrameSize, CameraSetting
    */
-  bool setCameraSetting(unsigned int channel, CameraSetting::Id settingId, double value);
+  bool setCameraSetting(unsigned int channel, cedar::dev::sensors::visual::CameraSettings::Id settingId, double value);
 
   /*! @brief Get values of the camera which have to be adjusted before the first image will be grabbed
    *
@@ -334,7 +334,7 @@ public:
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    *  @see  setCameraMode, setCameraFps, setCameraIsoSpeed, CameraSetting
    */
-  double getCameraSetting(unsigned int channel, CameraSetting::Id settingId);
+  double getCameraSetting(unsigned int channel, cedar::dev::sensors::visual::CameraSettings::Id settingId);
 
   /*! @brief Set the video mode of the camera.
    *
@@ -344,13 +344,13 @@ public:
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    * @see getCameraMode
    */
-  bool setCameraMode(unsigned int channel, CameraVideoMode::Id modeId);
+  bool setCameraMode(unsigned int channel, cedar::dev::sensors::visual::CameraVideoMode::Id modeId);
 
   /*! @brief Gets the actual mode.
    *  @param channel This is the index of the source you want to set the parameter value.
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
-  CameraVideoMode::Id getCameraMode(unsigned int channel);
+  cedar::dev::sensors::visual::CameraVideoMode::Id getCameraMode(unsigned int channel);
 
   /*! @brief Set the framerate of the camera.
    *

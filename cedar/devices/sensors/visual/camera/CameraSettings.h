@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/namespace.h"
+#include "cedar/auxiliaries/EnumType.h"
 
 // SYSTEM INCLUDES
 
@@ -53,8 +54,11 @@
 class cedar::dev::sensors::visual::CameraSettings
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // typedefs
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef cedar::aux::EnumId Id;
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

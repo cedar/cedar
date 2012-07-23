@@ -39,7 +39,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
-#ifdef CEDAR_USE_LIB_DC1394
 
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/devices/sensors/visual/namespace.h"
@@ -127,6 +126,5 @@ private:
 
 }; // cedar::dev::sensors::visual::CameraIsoSpeed
 
-#endif // CEDAR_USE_LIB_DC1394
 #endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_ISO_SPEED_H
 
