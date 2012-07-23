@@ -226,7 +226,7 @@ void cedar::proc::Step::addTrigger(cedar::proc::TriggerPtr trigger)
   this->mTriggers.push_back(trigger);
 }
 
-void cedar::proc::Step::onTrigger(cedar::proc::TriggerPtr)
+void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::TriggerPtr)
 {
 #ifdef DEBUG_RUNNING
   std::cout << "DEBUG_RUNNING> " << this->getName() << ".onTrigger()" << std::endl;
@@ -263,6 +263,19 @@ void cedar::proc::Step::onTrigger(cedar::proc::TriggerPtr)
                    "Unconnected mandatory inputs prevent the step from running. These inputs are:" + errors);
     return;
   } // this->mMandatoryConnectionsAreSet
+
+  if (!this->setNextArguments(args))
+  {
+    this->mpArgumentsLock->lockForWrite();
+    this->mNextArguments.reset();
+    this->mpArgumentsLock->unlock();
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Step \"" + this->getName() + " did not succeed in setting arguments, skipping onTrigger().",
+      "cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr, cedar::proc::TriggerPtr)"
+    );
+    return;
+  }
 
   //!@todo Busy should be a lock object
   if (!this->mBusy)
