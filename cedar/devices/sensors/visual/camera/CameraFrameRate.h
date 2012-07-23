@@ -39,7 +39,7 @@
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
-#ifdef CEDAR_USE_LIB_DC1394
+//!@todo Why does this need libdc?
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/EnumType.h"
@@ -66,7 +66,6 @@ class cedar::dev::sensors::visual::CameraFrameRate
 //!@cond SKIPPED_DOCUMENTATION
 public:
   typedef cedar::aux::EnumId Id;
-public:
   typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -145,8 +144,6 @@ private:
   // none yet
 
 }; // cedar::dev::sensors::visual::CameraFrameRate
-
-#endif // CEDAR_USE_LIB_DC1394
 
 #endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_FRAMERATE_H
 

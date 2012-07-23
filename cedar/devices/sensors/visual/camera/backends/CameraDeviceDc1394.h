@@ -46,6 +46,7 @@
 
 // SYSTEM INCLUDES
 
+#ifdef CEDAR_USE_LIB_DC1394
 
 /*!@brief Base class of the misc camera grabber backends.
  *
@@ -112,6 +113,8 @@ private:
   // none yet
 
 }; // class cedar::dev::sensors::visual::CameraDeviceDc1394
+
+#endif // defined CEDAR_USE_LIB_DC1394
 
 #endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_DEVICE_DC1394_H
 

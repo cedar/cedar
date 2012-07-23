@@ -586,14 +586,18 @@ std::vector<std::string> cedar::dev::sensors::visual::CameraGrabber::getAllSetti
 
   std::string mode = CameraVideoMode::type().get(getCameraSetting(channel,CameraSetting::SETTING_MODE )).name();
   std::string fps = CameraFrameRate::type().get(getCameraSetting(channel,CameraSetting::SETTING_FPS )).name();
+#ifdef CEDAR_USE_LIB_DC1394
   std::string iso = CameraIsoSpeed::type().get(getCameraSetting(channel,CameraSetting::SETTING_ISO_SPEED )).name();
+#endif // defined CEDAR_USE_LIB_DC1394
   unsigned int width = getCameraSetting(channel, CameraSetting::SETTING_FRAME_WIDTH);
   unsigned int height = getCameraSetting(channel, CameraSetting::SETTING_FRAME_HEIGHT);
   std::string size = boost::lexical_cast<std::string>(width) + " x "+ boost::lexical_cast<std::string>(height);
 
   settings.push_back("Camera video mode:\t" + mode);
   settings.push_back("Camera framerate:\t" + fps);
+#ifdef CEDAR_USE_LIB_DC1394
   settings.push_back("Camera ISO-speed:\t" + iso);
+#endif // defined CEDAR_USE_LIB_DC1394
   settings.push_back("Camera frame size:\t" + size);
 
   return settings;
