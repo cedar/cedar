@@ -570,22 +570,34 @@ cedar::proc::ConstDataSlotPtr cedar::proc::Connectable::getSlot
 
 cedar::proc::ExternalDataPtr cedar::proc::Connectable::getInputSlot(const std::string& name)
 {
-  return cedar::aux::asserted_pointer_cast<cedar::proc::ExternalData>(this->getSlot(cedar::proc::DataRole::INPUT, name));
+  return cedar::aux::asserted_pointer_cast<cedar::proc::ExternalData>
+         (
+           this->getSlot(cedar::proc::DataRole::INPUT, name)
+         );
 }
 
-cedar::proc::ConstDataSlotPtr cedar::proc::Connectable::getInputSlot(const std::string& name) const
+cedar::proc::ConstExternalDataPtr cedar::proc::Connectable::getInputSlot(const std::string& name) const
 {
-  return this->getSlot(cedar::proc::DataRole::INPUT, name);
+  return cedar::aux::asserted_pointer_cast<cedar::proc::ConstExternalData>
+         (
+           this->getSlot(cedar::proc::DataRole::INPUT, name)
+         );
 }
 
-cedar::proc::DataSlotPtr cedar::proc::Connectable::getBufferSlot(const std::string& name)
+cedar::proc::OwnedDataPtr cedar::proc::Connectable::getBufferSlot(const std::string& name)
 {
-  return this->getSlot(cedar::proc::DataRole::BUFFER, name);
+  return cedar::aux::asserted_pointer_cast<cedar::proc::OwnedData>
+         (
+           this->getSlot(cedar::proc::DataRole::BUFFER, name)
+         );
 }
 
-cedar::proc::ConstDataSlotPtr cedar::proc::Connectable::getBufferSlot(const std::string& name) const
+cedar::proc::ConstOwnedDataPtr cedar::proc::Connectable::getBufferSlot(const std::string& name) const
 {
-  return this->getSlot(cedar::proc::DataRole::BUFFER, name);
+  return cedar::aux::asserted_pointer_cast<cedar::proc::ConstOwnedData>
+         (
+           this->getSlot(cedar::proc::DataRole::BUFFER, name)
+         );
 }
 
 cedar::proc::OwnedDataPtr cedar::proc::Connectable::getOutputSlot(const std::string& name)
