@@ -113,9 +113,15 @@ public:
    *           cedar::proc::DataRole::VALIDITY). It also does nothing if the compute function has previously encountered
    *           an exception.
    */
-  void onTrigger(cedar::proc::TriggerPtr = cedar::proc::TriggerPtr());
+  void onTrigger
+       (
+         cedar::proc::ArgumentsPtr args = cedar::proc::ArgumentsPtr(),
+         cedar::proc::TriggerPtr = cedar::proc::TriggerPtr()
+       );
 
-  //!@brief Sets the arguments used by the next execution of the run function.
+  /*!@brief Sets the arguments used by the next execution of the run function.
+   *!@todo cedar::proc::Step::setNextArguments should take a const pointer.
+   */
   bool setNextArguments(cedar::proc::ArgumentsPtr arguments);
 
   /*!@brief Toggles if a step is executed as its own thread, or if the run() function is called in the same thread as
