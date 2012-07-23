@@ -215,9 +215,9 @@ private:
     {
       WidgetType* p_widget = this->mWidgets[i] = WidgetAbstraction::create(i);
       this->layout()->addWidget(p_widget);
+      WidgetAbstraction::applyProperties(p_widget, parameter);
       WidgetAbstraction::setValue(p_widget, parameter->at(i));
       WidgetAbstraction::connectValueChange(this, p_widget);
-      WidgetAbstraction::applyProperties(p_widget, parameter);
     }
     parameter->unlock();
 
