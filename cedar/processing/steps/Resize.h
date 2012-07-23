@@ -143,9 +143,6 @@ public slots:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Reacts to a change in the input connection.
-  void inputConnectionChanged(const std::string& inputName);
-
   //!@brief Determines whether the data item can be connected to the slot.
   cedar::proc::DataSlot::VALIDITY determineInputValidity
                                   (
@@ -157,6 +154,9 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
+
   /*!@brief   Returns a cv::Size that contains the correct sizes according to the step's parameters.
    *
    * @remarks Due to the nature of opencv's matrix size handling, this funciton only works for matrices with 2 or less

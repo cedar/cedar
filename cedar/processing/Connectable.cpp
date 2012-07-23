@@ -718,12 +718,12 @@ void cedar::proc::Connectable::setOutput(const std::string& name, cedar::aux::Da
   this->setData(DataRole::OUTPUT, name, data);
 }
 
-void cedar::proc::Connectable::freeInput(const std::string& name, cedar::aux::DataPtr data)
+void cedar::proc::Connectable::freeInput(const std::string& name, cedar::aux::ConstDataPtr data)
 {
   cedar::proc::ExternalDataPtr slot = this->getInputSlot(name);
   // the slot for name should always be found
   CEDAR_ASSERT(slot);
-
+  //!@todo this if should be moved to the slot
   if (slot->isCollection())
   {
     slot->removeData(data);
