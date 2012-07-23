@@ -85,7 +85,11 @@ public:
    *
    * @param    pSender The trigger that sent the trigger signal.
    */
-  virtual void onTrigger(cedar::proc::TriggerPtr pSender = cedar::proc::TriggerPtr()) = 0;
+  virtual void onTrigger
+               (
+                 cedar::proc::ArgumentsPtr args = cedar::proc::ArgumentsPtr(),
+                 cedar::proc::TriggerPtr pSender = cedar::proc::TriggerPtr()
+               ) = 0;
 
   /*!@brief   Sets this Triggerable's parent trigger. Triggerable's may only be triggerd by one trigger.
    *

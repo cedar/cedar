@@ -93,7 +93,7 @@ cedar::proc::MultiTrigger::~MultiTrigger()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::MultiTrigger::onTrigger(cedar::proc::TriggerPtr pSender)
+void cedar::proc::MultiTrigger::onTrigger(cedar::proc::ArgumentsPtr, cedar::proc::TriggerPtr pSender)
 {
   std::map<cedar::proc::TriggerPtr, bool>::iterator iter = this->mIncoming.find(pSender);
 
