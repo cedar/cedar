@@ -166,7 +166,7 @@ bool cedar::proc::Connectable::ownsDataOf(cedar::proc::ConstOwnedDataPtr slot) c
   return false;
 }
 
-cedar::proc::Connectable::SlotMap& cedar::proc::Connectable::getDataSlots(DataRole::Id role)
+cedar::proc::Connectable::SlotMap& cedar::proc::Connectable::getSlotMap(DataRole::Id role)
 {
   std::map<DataRole::Id, SlotMap>::iterator iter = this->mSlotMaps.find(role);
   if (iter == this->mSlotMaps.end())

@@ -600,10 +600,10 @@ void cedar::proc::gui::Network::checkDataItems()
     // now generate new entries for all slots that are not represented
     try
     {
-      cedar::proc::Step::SlotMap& slotmap = this->mNetwork->getDataSlots(*enum_it);
-      for (cedar::proc::Step::SlotMap::iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
+      const cedar::proc::Step::SlotMap& slotmap = this->mNetwork->getDataSlots(*enum_it);
+      for (cedar::proc::Step::SlotMap::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
-        cedar::proc::DataSlotPtr slot = iter->second;
+        cedar::proc::ConstDataSlotPtr slot = iter->second;
         // check that there is no graphical representation yet
         bool represented = false;
         for (DataSlotNameMap::iterator it = mSlotMap[*enum_it].begin(); it != mSlotMap[*enum_it].end(); ++it)
@@ -618,7 +618,9 @@ void cedar::proc::gui::Network::checkDataItems()
         {
           continue;
         }
-        cedar::proc::gui::DataSlotItem *p_item = new cedar::proc::gui::DataSlotItem(this, slot);
+        // get a non-const version of the data slot
+        cedar::proc::DataSlotPtr non_const_slot = this->mNetwork->getSlot(*enum_it, slot->getName());
+        cedar::proc::gui::DataSlotItem *p_item = new cedar::proc::gui::DataSlotItem(this, non_const_slot);
         p_item->setPos(origin + count * direction * (data_size + padding) );
         mSlotMap[slot->getRole()][slot->getName()] = p_item;
         count += static_cast<qreal>(1.0);

@@ -91,8 +91,7 @@ public:
   //!@brief Returns a specific output data pointer stored in this Connectable.
   cedar::aux::ConstDataPtr getOutput(const std::string& name) const;
 
-  //!@brief Returns the map of data slots for a given role.
-  cedar::proc::Connectable::SlotMap& getDataSlots(DataRole::Id role);
+public:
 
   //!@brief Returns a constant reference to the map of data slots for a given role.
   const cedar::proc::Connectable::SlotMap& getDataSlots(DataRole::Id role) const;
@@ -316,6 +315,9 @@ private:
   /*!@brief Removed the lock from this cedar::aux::Lockable.
    */
   void removeLock(cedar::aux::ConstDataPtr data, cedar::aux::LOCK_TYPE lockType);
+
+  //!@brief Returns the map of data slots for a given role (the non-const version of getDataSlots(DataRole::Id role)).
+  cedar::proc::Connectable::SlotMap& getSlotMap(DataRole::Id role);
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals & connections
