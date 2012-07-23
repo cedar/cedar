@@ -106,7 +106,7 @@ public:
 
   //!@brief Returns the buffer slot corresponding to the given name.
   //!@see cedar::proc::Step::getSlot
-  cedar::proc::DataSlotPtr getBufferSlot(const std::string& name);
+  cedar::proc::OwnedDataPtr getBufferSlot(const std::string& name);
 
   //!@brief Returns the output slot corresponding to the given name.
   //!@see cedar::proc::Step::getSlot
@@ -117,11 +117,11 @@ public:
 
   //!@brief Returns a const pointer to the input slot corresponding to the given name.
   //!@see cedar::proc::Step::getSlot
-  cedar::proc::ConstDataSlotPtr getInputSlot(const std::string& name) const;
+  cedar::proc::ConstExternalDataPtr getInputSlot(const std::string& name) const;
 
   //!@brief Returns a const pointer to the buffer slot corresponding to the given name.
   //!@see cedar::proc::Step::getSlot
-  cedar::proc::ConstDataSlotPtr getBufferSlot(const std::string& name) const;
+  cedar::proc::ConstOwnedDataPtr getBufferSlot(const std::string& name) const;
 
   //!@brief Returns a const pointer to the output slot corresponding to the given name.
   //!@see cedar::proc::Step::getSlot
