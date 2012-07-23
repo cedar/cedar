@@ -56,7 +56,7 @@ public:
   enum State
   {
     //! The state is undetermined.
-    STATE_NONE,
+    STATE_UNKNOWN,
     //! The Triggerable is not running.
     STATE_NOT_RUNNING,
     //! The Triggerable is currently running.
@@ -85,7 +85,11 @@ public:
    *
    * @param    pSender The trigger that sent the trigger signal.
    */
-  virtual void onTrigger(cedar::proc::TriggerPtr pSender = cedar::proc::TriggerPtr()) = 0;
+  virtual void onTrigger
+               (
+                 cedar::proc::ArgumentsPtr args = cedar::proc::ArgumentsPtr(),
+                 cedar::proc::TriggerPtr pSender = cedar::proc::TriggerPtr()
+               ) = 0;
 
   /*!@brief   Sets this Triggerable's parent trigger. Triggerable's may only be triggerd by one trigger.
    *
@@ -155,7 +159,7 @@ protected:
    */
   inline void resetState()
   {
-    this->setState(cedar::proc::Triggerable::STATE_NONE, "");
+    this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
   }
 
   //--------------------------------------------------------------------------------------------------------------------

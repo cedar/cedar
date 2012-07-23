@@ -91,14 +91,8 @@ public:
   //!@brief Returns a specific output data pointer stored in this Connectable.
   cedar::aux::ConstDataPtr getOutput(const std::string& name) const;
 
-  //!@brief Returns the map of data slots for a given role.
-  cedar::proc::Connectable::SlotMap& getDataSlots(DataRole::Id role);
-
   //!@brief Returns a constant reference to the map of data slots for a given role.
   const cedar::proc::Connectable::SlotMap& getDataSlots(DataRole::Id role) const;
-
-  //!@brief Returns the map of data slots for a given role.
-  cedar::proc::Connectable::SlotList& getOrderedDataSlots(DataRole::Id role);
 
   //!@brief Returns a constant reference to the map of data slots for a given role.
   const cedar::proc::Connectable::SlotList& getOrderedDataSlots(DataRole::Id role) const;
@@ -110,7 +104,7 @@ public:
 
   //!@brief Returns the buffer slot corresponding to the given name.
   //!@see cedar::proc::Step::getSlot
-  cedar::proc::DataSlotPtr getBufferSlot(const std::string& name);
+  cedar::proc::OwnedDataPtr getBufferSlot(const std::string& name);
 
   //!@brief Returns the output slot corresponding to the given name.
   //!@see cedar::proc::Step::getSlot
@@ -121,11 +115,11 @@ public:
 
   //!@brief Returns a const pointer to the input slot corresponding to the given name.
   //!@see cedar::proc::Step::getSlot
-  cedar::proc::ConstDataSlotPtr getInputSlot(const std::string& name) const;
+  cedar::proc::ConstExternalDataPtr getInputSlot(const std::string& name) const;
 
   //!@brief Returns a const pointer to the buffer slot corresponding to the given name.
   //!@see cedar::proc::Step::getSlot
-  cedar::proc::ConstDataSlotPtr getBufferSlot(const std::string& name) const;
+  cedar::proc::ConstOwnedDataPtr getBufferSlot(const std::string& name) const;
 
   //!@brief Returns a const pointer to the output slot corresponding to the given name.
   //!@see cedar::proc::Step::getSlot
@@ -141,23 +135,10 @@ public:
   void setInput(const std::string& name, cedar::aux::DataPtr data);
 
   //!@brief Removes a connection to another Connectable's output.
-  void freeInput(const std::string& name, cedar::aux::DataPtr data);
+  void freeInput(const std::string& name, cedar::aux::ConstDataPtr data);
 
   //!@brief Returns a specific data pointer stored in this Connectable.
   cedar::aux::DataPtr getData(DataRole::Id role, const std::string& name) const;
-
-  /*!@brief   Sets the isCollection member of the corresponding data slot to the given value.
-   *
-   *          A slot that is a collection can have multiple data items associated with it.
-   *
-   * @remarks This is only valid for inputs.
-   *
-   * @see     cedar::proc::DataSlot for details on collections.
-   */
-  void makeInputCollection(const std::string& name, bool isCollection = true);
-
-  //!@brief Method that is called whenever an input is connected to the Connectable.
-  virtual void inputConnectionChanged(const std::string& inputName);
 
   //!@brief Checks the validity of a slot.
   cedar::proc::DataSlot::VALIDITY getInputValidity(cedar::proc::DataSlotPtr slot);
@@ -284,6 +265,16 @@ protected:
     return this->hasSlot(DataRole::OUTPUT, name);
   }
 
+  /*!@brief   Sets the isCollection member of the corresponding data slot to the given value.
+   *
+   *          A slot that is a collection can have multiple data items associated with it.
+   *
+   * @remarks This is only valid for inputs.
+   *
+   * @see     cedar::proc::DataSlot for details on collections.
+   */
+  void makeInputCollection(const std::string& name, bool isCollection = true);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -317,6 +308,15 @@ private:
    */
   void removeLock(cedar::aux::ConstDataPtr data, cedar::aux::LOCK_TYPE lockType);
 
+  //!@brief Returns the map of data slots for a given role (the non-const version of getDataSlots(DataRole::Id role)).
+  cedar::proc::Connectable::SlotMap& getSlotMap(DataRole::Id role);
+
+
+  //!@brief Returns the map of data slots for a given role.
+  cedar::proc::Connectable::SlotList& getSlotList(DataRole::Id role);
+
+  //!@brief Method that is called whenever an input is connected to the Connectable.
+  virtual void inputConnectionChanged(const std::string& inputName);
   //--------------------------------------------------------------------------------------------------------------------
   // signals & connections
   //--------------------------------------------------------------------------------------------------------------------

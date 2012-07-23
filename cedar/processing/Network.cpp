@@ -242,18 +242,18 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
     {
       try
       {
-        SlotMap& current_map = this->getDataSlots(data_roles.at(i));
+        const SlotMap& current_map = this->getDataSlots(data_roles.at(i));
         for // go through all slots
         (
-          SlotMap::iterator map = current_map.begin();
+          SlotMap::const_iterator map = current_map.begin();
           map != current_map.end();
           ++map
         )
         {
           if // check if this is promoted data
           (
-            boost::shared_dynamic_cast<cedar::proc::PromotedExternalData>(map->second)
-            || boost::shared_dynamic_cast<cedar::proc::PromotedOwnedData>(map->second)
+            boost::shared_dynamic_cast<cedar::proc::ConstPromotedExternalData>(map->second)
+            || boost::shared_dynamic_cast<cedar::proc::ConstPromotedOwnedData>(map->second)
           )
           {
             // if so, compare the name of the current element with the slot owner

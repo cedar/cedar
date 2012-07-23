@@ -348,10 +348,11 @@ void cedar::proc::gui::StepItem::addDataItems()
 
     try
     {
-      cedar::proc::Step::SlotList& slotmap = this->mStep->getOrderedDataSlots(*enum_it);
-      for (cedar::proc::Step::SlotList::iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
+      const cedar::proc::Step::SlotList& slotmap = this->mStep->getOrderedDataSlots(*enum_it);
+      for (cedar::proc::Step::SlotList::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
-        this->addDataItemFor(*iter);
+        // use a non-const version of this slot
+        this->addDataItemFor(this->mStep->getSlot(*enum_it, (*iter)->getName()));
       }
     }
     catch(const cedar::proc::InvalidRoleException&)
@@ -419,8 +420,8 @@ void cedar::proc::gui::StepItem::updateDataSlotPositions()
     try
     {
       qreal count = 0;
-      cedar::proc::Step::SlotList& slotmap = this->mStep->getOrderedDataSlots(role);
-      for (cedar::proc::Step::SlotList::iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
+      const cedar::proc::Step::SlotList& slotmap = this->mStep->getOrderedDataSlots(role);
+      for (cedar::proc::Step::SlotList::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
         const std::string& slot_name = (*iter)->getName();
         CEDAR_DEBUG_ASSERT(slot_item_map.find(slot_name) != slot_item_map.end());
