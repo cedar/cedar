@@ -440,8 +440,8 @@ void cedar::proc::Connectable::declareData(DataRole::Id role, const std::string&
 
 void cedar::proc::Connectable::declareBuffer(const std::string& name, cedar::aux::DataPtr data)
 {
-  this->declareBuffer(name);
-  this->setBuffer(name, data);
+  this->declareData(cedar::proc::DataRole::BUFFER, name);
+  this->setData(cedar::proc::DataRole::BUFFER, name, data);
 }
 
 void cedar::proc::Connectable::declareOutput(const std::string& name, cedar::aux::DataPtr data)
@@ -449,8 +449,8 @@ void cedar::proc::Connectable::declareOutput(const std::string& name, cedar::aux
   // if you don't actually want to set data here, call a different function.
   CEDAR_ASSERT(data.get() != NULL);
 
-  this->declareOutput(name);
-  this->setOutput(name, data);
+  this->declareData(cedar::proc::DataRole::OUTPUT, name);
+  this->setData(cedar::proc::DataRole::OUTPUT, name, data);
 }
 
 void cedar::proc::Connectable::removeLock(cedar::aux::ConstDataPtr data, cedar::aux::LOCK_TYPE lockType)

@@ -44,6 +44,7 @@
 #include "cedar/devices/sensors/visual/CameraGrabber.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/devices/sensors/visual/namespace.h"
 
 // SYSTEM INCLUDES
 
@@ -92,7 +93,7 @@ public cedar::aux::Configurable
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  CameraCapabilities(const std::string& configFileName);
+  CameraCapabilities();
 
   //!@brief Destructor
   virtual ~CameraCapabilities();

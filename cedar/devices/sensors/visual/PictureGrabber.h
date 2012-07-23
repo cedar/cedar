@@ -38,8 +38,12 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_PICTURE_GRABBER_H
 #define CEDAR_DEV_SENSORS_VISUAL_PICTURE_GRABBER_H
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/Grabber.h"
+#include "cedar/auxiliaries/FileParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -54,21 +58,53 @@ class cedar::dev::sensors::visual::PictureGrabber
 :
 public cedar::dev::sensors::visual::Grabber
 {
+  Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // slots and signals
+  //--------------------------------------------------------------------------------------------------------------------
+
+  protected slots:
+
+  //!@brief A slot that is triggered if a new filename is set
+  void fileNameChanged();
+
+
+  signals:
+
+  //!@brief This signal is emitted, when a new picture is available with the getImage() method.
+  void pictureChanged();
+
+  private:
+  /*! @brief Boost slot method. Invoked if a channel is added as an ObjectListParameter as an object
+   */
+  void channelAdded(int index);
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
   //!@cond SKIPPED_DOCUMENTATION
 
+public:
+
   /*! @struct PictureChannel
    *  @brief Additional data of a picture grabbing channel
    */
   struct PictureChannel
   :
-  cedar::dev::sensors::visual::Grabber::GrabberChannel
+  cedar::dev::sensors::visual::Grabber::Channel
   {
-    //! @brief The filenames
-    std::string mSourceFileName;
+  public:
+    PictureChannel(const std::string& fileName = "")
+    :
+    cedar::dev::sensors::visual::Grabber::Channel(),
+    _mSourceFileName(new cedar::aux::FileParameter(this, "filename", cedar::aux::FileParameter::READ, fileName))
+    {
+    }
+
+    //! @brief The filename of the picture you want to grab from
+    cedar::aux::FileParameterPtr _mSourceFileName;
   };
 
   CEDAR_GENERATE_POINTER_TYPES(PictureChannel);
@@ -85,19 +121,19 @@ public cedar::dev::sensors::visual::Grabber
 public:
 
   /*! @brief  Constructor for a single-file grabber
-   *  @param configFileName	Filename for the configuration
    *  @param pictureFileName	Filename to grab from
    */
-  PictureGrabber(const std::string& configFileName,const std::string& pictureFileName);
+  PictureGrabber
+  (
+    const std::string& pictureFileName = ""
+  );
 
   /*! @brief Constructor for a stereo-file grabber
-   *  @param configFileName		Filename for the configuration
    *  @param pictureFileName0	Filename to grab from for channel 0
    *  @param pictureFileName1	Filename to grab from for channel 1
    */
   PictureGrabber
   (
-    const std::string& configFileName,
     const std::string& pictureFileName0,
     const std::string& pictureFileName1
   );
@@ -116,20 +152,25 @@ public:
    *	For details look at the OpenCV-documentation (Section "imread").
    *  @param channel which should be changed.
    *  @param fileName of the new picture.
-   *  @throws IndexOutOfRangeException If channel is't fit
+   *  @throws IndexOutOfRangeException If channel isn't fit
    *  @throws InitializationException If the grabber couldn't grab from the file
    */
   void setSourceFile(unsigned int channel, const std::string& fileName);
 
   /*! @brief Set a new picture to grab from
-   *   This is for a single channel grabber or for channel 0 on a stereor grabber
+   *   This is for a single channel grabber or for channel 0 on a stereo grabber
    *  @param fileName of the new picture.
-   *  @throws IndexOutOfRangeException If channel is't fit
+   *  @throws IndexOutOfRangeException If channel isn't fit
    *  @throws InitializationException If the grabber couldn't grab from the file
    *  @see setSourceFile(unsigned int, const std::string&)
    */
-
   void setSourceFile(const std::string& fileName);
+
+  /*! @brief Get the used file to grab from
+   *  @param channel The channel which filename should be read
+   *  @throws IndexOutOfRangeException If channel isn't fit
+   */
+  const std::string getSourceFile(unsigned int channel = 0);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -137,43 +178,40 @@ public:
 protected:
 
   // inherited from Grabber
-  bool onInit();
   bool onGrab();
-  bool onDeclareParameters();
-  void onUpdateSourceInfo(unsigned int channel);
-  void onAddChannel();
-
-  // inherited from NamedConfiguration
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+  bool onCreateGrabber();
+  void onCloseGrabber();
 
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /*! @brief This function does internal variable initialization in  constructor
+   */
+  void init();
+
+  /// @brief updates the channel informations
+  void setChannelInfo(unsigned int channel);
+
   /// @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
-  inline PictureChannelPtr getChannel(unsigned int channel)
+  inline PictureChannelPtr getPictureChannel(unsigned int channel)
   {
     return boost::static_pointer_cast<PictureChannel>
            (
-             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
            );
   }
 
   /// @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
-  inline ConstPictureChannelPtr getChannel(unsigned int channel) const
+  inline ConstPictureChannelPtr getPictureChannel(unsigned int channel) const
   {
     return boost::static_pointer_cast<const PictureChannel>
            (
-             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
            );
   }
 
-  //!@brief The default name for the grabber
-  virtual inline std::string defaultGrabberName() const
-  {
-    return "PictureGrabber";
-  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

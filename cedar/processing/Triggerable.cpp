@@ -137,7 +137,7 @@ void cedar::proc::Triggerable::onStop()
   // empty as a default implementation
 }
 
-cedar::proc::TriggerPtr& cedar::proc::Triggerable::getFinishedTrigger()
+cedar::proc::TriggerPtr cedar::proc::Triggerable::getFinishedTrigger()
 {
   if (!this->mFinished)
   {
