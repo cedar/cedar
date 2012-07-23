@@ -88,7 +88,7 @@ template
   class WidgetType,
   typename T
 >
-int test_parameter(T initialValue, size_t initialSize, T firstValue, T min, T max)
+int test_parameter(T initialValue, size_t initialSize, T firstValue, T min, T max, T min2, T max2, T val2)
 {
   int errors = 0;
   std::cout << "Testing " << cedar::aux::typeToString<ParameterType>()
@@ -147,6 +147,8 @@ int test_parameter(T initialValue, size_t initialSize, T firstValue, T min, T ma
     }
   }
 
+  //!@todo Check that changing the value is impossible while the parameter is const
+
   std::cout << "Changing min/max value of the parameter." << std::endl;
   parameter->setMinimum(min);
   parameter->setMaximum(max);
@@ -178,6 +180,24 @@ int test_parameter(T initialValue, size_t initialSize, T firstValue, T min, T ma
     ++errors;
   }
 
+  std::cout << "Setting min/max/val 2" << std::endl;
+  parameter->setConstant(false);
+  parameter->setMinimum(min2);
+  parameter->setMaximum(max2);
+  parameter->set(0, val2);
+
+  if (!testEquality<ParameterType, WidgetType>(parameter, p_widget))
+  {
+    ++errors;
+  }
+
+  std::cout << "Changing constness" << std::endl;
+  parameter->setConstant(true);
+  if (!testEquality<ParameterType, WidgetType>(parameter, p_widget))
+  {
+    ++errors;
+  }
+
   return errors;
 }
 
@@ -194,7 +214,7 @@ int main(int argc, char** argv)
         cedar::aux::DoubleVectorParameter,
         cedar::aux::gui::DoubleVectorParameter,
         double
-      >(1.0, 2, 2.0, -10.0, 10.0);
+      >(1.0, 2, 2.0, -10.0, 10.0, 1100.0, 1200.0, 1150.0);
 
 
   errors += test_parameter
@@ -202,7 +222,7 @@ int main(int argc, char** argv)
         cedar::aux::IntVectorParameter,
         cedar::aux::gui::IntVectorParameter,
         int
-      >(1, 2, 2, -10, 10);
+      >(1, 2, 2, -10, 10, 1000, 1200, 1100);
 
 
   errors += test_parameter
@@ -210,7 +230,7 @@ int main(int argc, char** argv)
         cedar::aux::UIntVectorParameter,
         cedar::aux::gui::UIntVectorParameter,
         unsigned int
-      >(1, 2, 2, 10, 15);
+      >(1, 2, 2, 10, 15, 1000, 1200, 1100);
 
   std::cout << "Done. There were " << errors << " errors." << std::endl;
   return errors;
