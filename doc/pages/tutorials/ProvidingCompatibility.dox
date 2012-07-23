@@ -1,0 +1,30 @@
+/*!
+
+@page ProvidingCompatibility Tutorial: Providing Compatibility to Older cedar Versions
+
+
+Although we aim to keep our interfaces as stable as possible and to introduce any necessary changes gently, we cannot
+guarantee that we will always be able to do so. Moreover, you may want to provide compatibility to older versions of
+cedar. Thus, we introduced some macros that specify the version of cedar you are linking to.
+
+The macro CEDAR_MAKE_VERSION(MAJOR, MINOR, BUGFIX) encodes a cedar version number. For example, you can call
+CEDAR_MAKE_VERSION(0, 9, 0) to encode version 0.9.0.
+
+The macro CEDAR_VERSION, defined in cedar/configuration.h (in the build directory) contains a numeric representation of
+the version (if you want to get this into a human-readable format, use cedar::aux::versionNumberToString).
+
+Because of the way the CEDAR_MAKE_VERSION macro is defined, versions are comparable: e.g., 0.9.0 is less than 0.10.0,
+0.1.0 is more than 0.0.1, 1.0.0 is less than 1.1.1 and so on. You can do this in preprocessor calls, e.g.,
+@code
+#if CEDAR_VERSION > CEDAR_MAKE_VERSION(0, 9, 0)
+  // do something that doesn't work with older versions
+#endif
+@endcode
+
+You can of course also use other operators.
+
+If you want to get a certain part of a version number, you can also use the macros
+CEDAR_GET_VERSION_MAJOR(CEDAR_VERSION), CEDAR_GET_VERSION_MINOR(CEDAR_VERSION) and
+CEDAR_GET_VERSION_BUGFIX(CEDAR_VERSION).
+
+*/
