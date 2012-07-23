@@ -191,7 +191,7 @@ const cedar::proc::Connectable::SlotMap& cedar::proc::Connectable::getDataSlots(
   return iter->second;
 }
 
-cedar::proc::Connectable::SlotList& cedar::proc::Connectable::getOrderedDataSlots(DataRole::Id role)
+cedar::proc::Connectable::SlotList& cedar::proc::Connectable::getSlotList(DataRole::Id role)
 {
   std::map<DataRole::Id, SlotList>::iterator iter = this->mDataConnectionsOrder.find(role);
   if (iter == this->mDataConnectionsOrder.end())

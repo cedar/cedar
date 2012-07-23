@@ -96,9 +96,6 @@ public:
   //!@brief Returns a constant reference to the map of data slots for a given role.
   const cedar::proc::Connectable::SlotMap& getDataSlots(DataRole::Id role) const;
 
-  //!@brief Returns the map of data slots for a given role.
-  cedar::proc::Connectable::SlotList& getOrderedDataSlots(DataRole::Id role);
-
   //!@brief Returns a constant reference to the map of data slots for a given role.
   const cedar::proc::Connectable::SlotList& getOrderedDataSlots(DataRole::Id role) const;
 
@@ -318,6 +315,10 @@ private:
 
   //!@brief Returns the map of data slots for a given role (the non-const version of getDataSlots(DataRole::Id role)).
   cedar::proc::Connectable::SlotMap& getSlotMap(DataRole::Id role);
+
+
+  //!@brief Returns the map of data slots for a given role.
+  cedar::proc::Connectable::SlotList& getSlotList(DataRole::Id role);
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals & connections
