@@ -56,7 +56,7 @@ public:
   enum State
   {
     //! The state is undetermined.
-    STATE_NONE,
+    STATE_UNKNOWN,
     //! The Triggerable is not running.
     STATE_NOT_RUNNING,
     //! The Triggerable is currently running.
@@ -155,7 +155,7 @@ protected:
    */
   inline void resetState()
   {
-    this->setState(cedar::proc::Triggerable::STATE_NONE, "");
+    this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
   }
 
   //--------------------------------------------------------------------------------------------------------------------
