@@ -47,7 +47,7 @@
 cedar::proc::Triggerable::Triggerable(bool isLooped)
 :
 mIsLooped(isLooped),
-mState(cedar::proc::Triggerable::STATE_NONE)
+mState(cedar::proc::Triggerable::STATE_UNKNOWN)
 {
 }
 
@@ -95,7 +95,7 @@ void cedar::proc::Triggerable::callOnStart()
 void cedar::proc::Triggerable::callOnStop()
 {
   this->onStop();
-  this->setState(cedar::proc::Triggerable::STATE_NONE, "");
+  this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
   if (mFinished)
   {
     for (size_t i = 0; i < this->mFinished->getListeners().size(); ++i)

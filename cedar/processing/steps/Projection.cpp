@@ -246,7 +246,7 @@ void cedar::proc::steps::Projection::reconfigure()
   if (this->_mDimensionMappings->getValue()->getValidity() == cedar::proc::ProjectionMapping::VALIDITY_ERROR)
   {
     this->setState(
-                    cedar::proc::Step::STATE_EXCEPTION,
+                    cedar::proc::Triggerable::STATE_EXCEPTION,
                     "The projection, as you have set it up, does not work in the given context.\
                     Please revise the mapping parameters."
                   );
@@ -254,7 +254,7 @@ void cedar::proc::steps::Projection::reconfigure()
   else
   {
     this->setState(
-                    cedar::proc::Step::STATE_NONE,
+                    cedar::proc::Triggerable::STATE_UNKNOWN,
                     "Projection mapping is set up correctly."
                   );
   }
