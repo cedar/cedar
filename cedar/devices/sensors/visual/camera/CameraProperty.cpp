@@ -35,7 +35,6 @@
 ======================================================================================================================*/
 
 #include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
-#ifdef CEDAR_USE_LIB_DC1394
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/camera/CameraProperty.h"
@@ -47,7 +46,7 @@ cedar::aux::EnumType<cedar::dev::sensors::visual::CameraProperty>
             cedar::dev::sensors::visual::CameraProperty::mType("cedar::dev::sensors::visual::CameraProperty::");
 
 //!@cond SKIPPED_DOCUMENTATION
-#ifndef MSVC
+#ifndef CEDAR_COMPILER_MSVC
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_BRIGHTNESS;
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_SATURATION;
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_HUE;
@@ -63,7 +62,7 @@ const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visua
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_WHITE_BALANCE_RED_V;
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_ZOOM;
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_FOCUS;
-#endif // MSVC
+#endif // CEDAR_COMPILER_MSVC
 //!@endcond
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -75,78 +74,79 @@ void cedar::dev::sensors::visual::CameraProperty::construct()
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_BRIGHTNESS,
                                       "PROP_BRIGHTNESS",
-                                      "Brightness"
+                                      "brightness"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_SATURATION,
                                       "PROP_SATURATION",
-                                      "Saturation"
+                                      "saturation"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_HUE,
                                       "PROP_HUE",
-                                      "Hue"
+                                      "hue"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_GAIN,
                                       "PROP_GAIN",
-                                      "Gain"
+                                      "gain"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_EXPOSURE,
                                       "PROP_EXPOSURE",
-                                      "Exposure (In case of a dc1394-camera, shutter is meant)"
+                                      "exposure shutter" // in case of firewire: shutter is meant
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_WHITE_BALANCE_BLUE_U,
                                       "PROP_WHITE_BALANCE_BLUE_U",
-                                      "White balance blue"
+                                      "white balance blue"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_SHARPNESS,
                                       "PROP_SHARPNESS",
-                                      "Sharpness"
+                                      "sharpness"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_AUTO_EXPOSURE,
                                       "PROP_AUTO_EXPOSURE",
-                                      "Exposure control done by camera, adjust reference level using this feature"
+                                      "exposure reference level"
+                                      //"exposure control done by camera, adjust reference level using this feature"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_GAMMA,
                                       "PROP_GAMMA",
-                                      "Gamma"
+                                      "gamma"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_TEMPERATURE,
                                       "PROP_TEMPERATURE",
-                                      "Temperature"
+                                      "temperature"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_TRIGGER,
                                       "PROP_TRIGGER",
-                                      "Trigger"
+                                      "trigger"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_TRIGGER_DELAY,
                                       "PROP_TRIGGER_DELAY",
-                                      "Trigger delay"
+                                      "trigger delay"
                                     ));
 
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_WHITE_BALANCE_RED_V,
                                       "PROP_WHITE_BALANCE_RED_V",
-                                      "White balance red"
+                                      "white balance red"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_ZOOM,
                                       "PROP_ZOOM",
-                                      "Zoom"
+                                      "zoom"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_FOCUS,
                                       "PROP_FOCUS",
-                                      "Focus"
+                                      "focus"
                                     ));
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -163,5 +163,3 @@ const cedar::dev::sensors::visual::CameraProperty::TypePtr& cedar::dev::sensors:
 {
   return cedar::dev::sensors::visual::CameraProperty::mType.type();
 }
-
-#endif // CEDAR_USE_LIB_DC1394

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,92 +22,59 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Grabbable.h
+    File:        CameraBackendType.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
-    Date:        2012 05 15
+    Date:        2012 07 04
 
-    Description: Header for the grabbable interface class
+    Description:  Header for CameraBackendType enum-type class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_INTERFACE_H
-#define CEDAR_DEV_SENSORS_VISUAL_INTERFACE_H
+#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERABACKENDTYPE_H
+#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERABACKENDTYPE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/EnumType.h"
 #include "cedar/devices/sensors/visual/namespace.h"
 
 // SYSTEM INCLUDES
-#include <opencv2/opencv.hpp>
-#include <QReadWriteLock>
 
-
-/*!@brief An interface class to describe an interface to grab from any other class
- *
- * Implement this interface in your class, if the InterfaceGrabber should grab from it
- *
+/*!@brief Enum class to determine the used backend for the camera grabber
  */
-class cedar::dev::sensors::visual::Grabbable
+class cedar::dev::sensors::visual::CameraBackendType
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // typedefs
   //--------------------------------------------------------------------------------------------------------------------
+//!@cond SKIPPED_DOCUMENTATION
+public:
+  typedef cedar::aux::EnumId Id;
+public:
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-  //!@brief The standard constructor.
-  Grabbable()
-  {
-  };
-
 public:
+  //!@brief The standard constructor.
 
   //!@brief Destructor
-  virtual ~Grabbable()
-  {
-  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Grab the Image in the class
-   *
-   * @return The image in a cv::Mat structure
-   */
-  virtual const cv::Mat& grabImage() = 0;
+  static void construct();
 
-
-  /*!@brief initialize the grabber specific parts in this method.
-   *
-   * The QReadWriteLock should be managed by the derived class.
-   * The grabber invokes this method in it's constructor.
-   * Have a look at the class cedar::aux::gui::Viewer for an implementation
-   *
-   * @return returns the lock for the image-mat, if there isn't already a grabber connected.
-   *         Otherwise it will return NULL
-   */
-  virtual QReadWriteLock* registerGrabber() = 0;
-
-
-  /*!@brief deinitialize the grabber specific parts in this method.
-   *
-   * The grabber invokes this method in it's destructor.
-   * Have a look at the class cedar::aux::gui::Viewer for an implementation
-   *
-   * @param lock This is the lock which comes from the registerGrabber() method. This parameter is used to
-   *    check, if the assigned grabber invokes the deregisterGrabber() method.
-   *    After invocation of this method, lock should be set to NULL!
-   */
-  virtual void deregisterGrabber(QReadWriteLock* lock) = 0;
+  static const cedar::aux::EnumBase& type();
+  static const cedar::dev::sensors::visual::CameraBackendType::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -119,26 +86,45 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraBackendType> mType;
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+
+  /*! @brief Use the default value of the OpenCV::VideoCapture object
+   *
+   *  It is possible, that no all properties could be detected
+   */
+  static const Id AUTO = 0;
+
+  /*! @brief Use only basic functionality of the cv::Capture object
+   */
+  static const Id CVCAPTURE = 1;
+
+#ifdef CEDAR_USE_LIB_DC1394
+  /*! @brief Use the DC1394 backend and settings
+   *
+   *   This is only possible if CEDAR is build with libdc support
+   */
+  static const Id DC1394 = 2;
+#endif
+
+  /*! @brief Use the Video For Linux backend
+   */
+  static const Id VFL = 3;
+
+
+
 protected:
   // none yet
 private:
   // none yet
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
+}; // cedar::dev::sensors::visual::CameraBackendType
 
-private:
-  // none yet
 
-}; // class cedar::dev::sensors::visual::Grabbable
-
-#endif // CEDAR_DEV_SENSORS_VISUAL_GRABBABLE_H
+#endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERABACKENDTYPE_H
 

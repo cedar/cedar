@@ -37,6 +37,9 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_GL_GRABBER_H
 #define CEDAR_DEV_SENSORS_VISUAL_GL_GRABBER_H
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/Grabber.h"
 #include "cedar/auxiliaries/casts.h"
@@ -60,17 +63,31 @@ public cedar::dev::sensors::visual::Grabber
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
+  //!@todo (olli) alternative to typedef
+  typedef boost::shared_ptr<QGLWidget> QGLWidgetPtr;
+
+
   //!@cond SKIPPED_DOCUMENTATION
+public:
 
   /*! @struct GLChannel
    *  @brief Additional data of a grabbing channel to grab from a QGLWidget
    */
   struct GLChannel
   :
-  cedar::dev::sensors::visual::Grabber::GrabberChannel
+  cedar::dev::sensors::visual::Grabber::Channel
   {
+  public:
+    GLChannel(QGLWidget* qglWidget=NULL)
+    :
+    cedar::dev::sensors::visual::Grabber::Channel(),
+    //mpQGLWidget(QGLWidgetPtr()) //empty QGLWidgetPtr
+    mpQGLWidget(qglWidget)
+    {
+    }
     //! @brief The QT OpenGL widget
     QGLWidget* mpQGLWidget ;
+    //cedar::dev::sensors::visual::GLGrabber::QGLWidgetPtr mpQGLWidget;
   };
 
   CEDAR_GENERATE_POINTER_TYPES(GLChannel);
@@ -84,18 +101,28 @@ public cedar::dev::sensors::visual::Grabber
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! @brief The constructor for a single channel grabber.
-   *  @param configFileName Filename for a file, where the configuration parameters should be stored
-   *  @param qglWidget A pointer to a QGLWidget to grab from
-   */
-  GLGrabber(std::string configFileName, QGLWidget *qglWidget);
 
-  /*! @brief The constructor for a stereo grabber.
-   *  @param configFileName Filename for a file, where the configuration parameters should be stored
-   *  @param qglWidget0 A pointer to a QGLWidget to grab from for channel 0
-   *  @param qglWidget1 A pointer to a QGLWidget to grab from for channel 1
+  /*! @brief  Constructor for a single channel grabber
+   *  @param grabberName  Name of the grabber
+   *  @param qglWidget Class derived from QGLWidget to grab from
    */
-  GLGrabber(std::string configFileName, QGLWidget *qglWidget0, QGLWidget *qglWidget1);
+  GLGrabber
+  (
+    QGLWidget *qglWidget = NULL,
+    const std::string& grabberName = "GLGrabber"
+  );
+
+  /*! @brief Constructor for a stereo channel grabber
+   *  @param grabberName  Name of the grabber
+   *  @param qglWidget0 Class derived from QGLWidget to grab from for channel 0
+   *  @param qglWidget1 Class derived from QGLWidget to grab from for channel 1
+   */
+  GLGrabber
+  (
+    QGLWidget *qglWidget0 = NULL,
+    QGLWidget *qglWidget1 = NULL,
+    const std::string& grabberName = "StereoGLGrabber"
+  );
 
   //!@brief Destructor
   ~GLGrabber();
@@ -121,7 +148,6 @@ protected:
   bool onDeclareParameters();
   void onCleanUp();
   void onUpdateSourceInfo(unsigned int channel);
-  void onAddChannel();
   bool onGrab();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -129,27 +155,21 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
-  inline GLChannelPtr getChannel(unsigned int channel)
+  inline GLChannelPtr getGLChannel(unsigned int channel)
   {
     return boost::static_pointer_cast<GLChannel>
            (
-             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
            );
   }
 
   ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
-  inline ConstGLChannelPtr getChannel(unsigned int channel) const
+  inline ConstGLChannelPtr getGLChannel(unsigned int channel) const
   {
     return boost::static_pointer_cast<const GLChannel>
        (
-         cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
+         cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
        );
-  }
-
-  //!@brief The default name for the grabber
-  virtual inline std::string defaultGrabberName() const
-  {
-    return "GLGrabber";
   }
 
   //--------------------------------------------------------------------------------------------------------------------

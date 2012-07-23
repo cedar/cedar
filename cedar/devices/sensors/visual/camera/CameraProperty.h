@@ -38,7 +38,6 @@
 #define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_PROPERTY_H
 
 #include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
-#ifdef CEDAR_USE_LIB_DC1394
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/EnumType.h"
@@ -96,7 +95,6 @@ class cedar::dev::sensors::visual::CameraProperty
 //!@cond SKIPPED_DOCUMENTATION
 public:
   typedef cedar::aux::EnumId Id;
-public:
   typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -175,6 +173,5 @@ private:
 
 }; // cedar::dev::sensors::visual::CameraProperty
 
-#endif // CEDAR_USE_LIB_DC1394
 #endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_PROPERTY_H
 

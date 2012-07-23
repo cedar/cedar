@@ -37,10 +37,14 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_VIDEO_GRABBER_H
 #define CEDAR_DEV_SENSORS_VISUAL_VIDEO_GRABBER_H
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/Grabber.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/IntParameter.h"
+#include "cedar/auxiliaries/FileParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -55,25 +59,59 @@ class cedar::dev::sensors::visual::VideoGrabber
 :
 public cedar::dev::sensors::visual::Grabber
 {
+  Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // slots and signals
+  //--------------------------------------------------------------------------------------------------------------------
+
+  protected slots:
+
+  //!@brief A slot that is triggered if a new filename is set
+  void fileNameChanged();
+
+  //!@brief A slot that is triggered if the speedfactor is set
+  void speedFactorChanged();
+
+  signals:
+
+  //!@brief This signal is emitted, when a new videofile is successfully opened.
+  void doVideoChanged();
+
+  //!@brief This signal is emitted, when the speedFactor is changed.
+  void doSpeedFactorChanged();
+
+  private:
+  /*! @brief Boost slot method. Invoked if a channel is added as an ObjectListParameter as an object
+   */
+  void channelAdded(int index);
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
   //!@cond SKIPPED_DOCUMENTATION
+public:
 
   /*! @struct VideoChannel
    *  @brief Additional data of a video channel
    */
   struct VideoChannel
   :
-  cedar::dev::sensors::visual::Grabber::GrabberChannel
+  cedar::dev::sensors::visual::Grabber::Channel
   {
+    VideoChannel(const std::string& fileName = "")
+    :
+    cedar::dev::sensors::visual::Grabber::Channel(),
+    _mSourceFileName(new cedar::aux::FileParameter(this, "filename", cedar::aux::FileParameter::READ, fileName))
+    {
+    }
+
     //! Camera interface
     cv::VideoCapture mVideoCapture;
 
-    //! Filename of video to grab from
-    std::string mSourceFileName;
+    //! @brief The filename of the video file you want to grab from
+    cedar::aux::FileParameterPtr _mSourceFileName;
   };
 
   CEDAR_GENERATE_POINTER_TYPES(VideoChannel);
@@ -89,19 +127,29 @@ public cedar::dev::sensors::visual::Grabber
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  /*!	@brief  Constructor for a single-file grabber
-   *	@param configFileName	Filename for the configuration
-   *  @param aviFileName		Filename to grab from
+  /*! @brief  Constructor for a single-file grabber
+   *  @param grabberName  Name of the grabber
+   *  @param videoFileName  Filename to grab from
    */
-  VideoGrabber(const std::string& configFileName,const std::string& aviFileName);
+  VideoGrabber
+  (
+    const std::string& videoFileName = "",
+    bool looped = true,
+    bool speedFactor = 1
+  );
 
-  /*!	@brief Constructor for a stereo-file grabber
-   *	@param configFileName	Filename for the configuration
-   *  @param aviFileName0	Filename to grab from for channel 0
-   *  @param aviFileName1	Filename to grab from for channel 1
+  /*! @brief Constructor for a stereo-file grabber
+   *  @param grabberName  Name of the grabber
+   *  @param videoFileName0 Filename to grab from for channel 0
+   *  @param videoFileName1 Filename to grab from for channel 1
    */
-  VideoGrabber(const std::string& configFileName, const std::string& aviFileName0, const std::string& aviFileName1);
-
+  VideoGrabber
+  (
+    const std::string& videoFileName0,
+    const std::string& videoFileName1,
+    bool looped = true,
+    bool speedFactor = 1
+  );
   //!@brief Destructor
   ~VideoGrabber();
 
@@ -193,6 +241,13 @@ public:
    */
   double getSourceEncoding(unsigned int channel=0);
 
+  /*! @brief Get the used file to grab from
+   *  @param channel The channel which filename should be read
+   *  @throws IndexOutOfRangeException If channel isn't fit
+   */
+  const std::string getSourceFile(unsigned int channel = 0);
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -203,6 +258,8 @@ protected:
   //------------------------------------------------------------------------
 
   bool onInit();
+  bool onCreateGrabber();
+  void onCloseGrabber();
 
   /*! @brief Grab on all available files
    *
@@ -213,34 +270,47 @@ protected:
    */
   bool onGrab();
 
-  bool onDeclareParameters();
   void onUpdateSourceInfo(unsigned int channel);
   void onCleanUp();
-  void onAddChannel();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  /*! @brief This function does internal variable initialization in  constructor
+   */
+  void init();
+
+  /// @brief Sets the channel informations
+  void setChannelInfo(unsigned int channel);
+
+  /*! Cast the storage vector from base channel struct "GrabberChannelPtr" to
+   *  derived class VideoChannelPtr
+   */
+  inline VideoChannelPtr getVideoChannel(unsigned int channel)
+  {
+    return boost::static_pointer_cast<VideoChannel>
+           (
+             cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
+           );
+  }
+
+  /*! Cast the storage vector from base channel struct "GrabberChannelPtr" to
+   *  derived class VideoChannellPtr
+   */
+  inline ConstVideoChannelPtr getVideoChannel(unsigned int channel) const
+  {
+    return boost::static_pointer_cast<const VideoChannel>
+           (
+             cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
+           );
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   
-  /*! @brief Indicates if looping is on
-   */
-  //bool _mLooped;
-
-  /*! @brief Factor for grabbing speed
-   *  @remarks the speed stored in the AVI-File will be multiplied with this factor
-   *    so effective FPS should be _mSpeedFactor*AVI-Speed
-   */
-  //double _mSpeedFactor;
-
   /*! @brief Count of frames of the shortest file
    *
    *		Used for scrolling in the avi-file
@@ -250,34 +320,8 @@ protected:
   unsigned int mFramesCount;
 
 private:
+  // none yet
 
-  /*! Cast the storage vector from base channel struct "GrabberChannelPtr" to
-   *  derived class VideoChannelPtr
-   */
-  inline VideoChannelPtr getChannel(unsigned int channel)
-  {
-    return boost::static_pointer_cast<VideoChannel>
-           (
-             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
-           );
-  }
-
-  /*! Cast the storage vector from base channel struct "GrabberChannelPtr" to
-   *  derived class VideoChannellPtr
-   */
-  inline ConstVideoChannelPtr getChannel(unsigned int channel) const
-  {
-    return boost::static_pointer_cast<const VideoChannel>
-           (
-             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
-           );
-  }
-
-  //!@brief The default name for the grabber
-  virtual inline std::string defaultGrabberName() const
-  {
-    return "VideoGrabber";
-  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -295,7 +339,6 @@ private:
    */
   cedar::aux::IntParameterPtr _mSpeedFactor;
 
-  // none yet
 
 }; // class cedar::dev::sensors::visual::VideoGrabber
 

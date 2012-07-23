@@ -107,7 +107,7 @@ namespace TEST_GRABBER
 //--------------------------------------------------------------------------------------------------------------------
 int main(int , char **)
 {
-
+/*
   const std::string  CHANNEL_0_NAME = "CHANNEL_0_NAME";
   const std::string  CHANNEL_1_NAME = "CHANNEL_1_NAME";
 
@@ -269,6 +269,7 @@ int main(int , char **)
   //grabber_4 is shared pointer
 
   std::cout << "Tests finished\n";
-
+*/
+  return 0;
 } //main
 
