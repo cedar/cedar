@@ -91,9 +91,6 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Reacts to a change in the input connection.
-  void inputConnectionChanged(const std::string& inputName);
-
   //!@brief Determines whether the data item can be connected to the slot.
   cedar::proc::DataSlot::VALIDITY determineInputValidity
                                   (
@@ -105,6 +102,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

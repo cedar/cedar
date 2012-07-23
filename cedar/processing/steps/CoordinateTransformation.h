@@ -224,13 +224,13 @@ public slots:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Checks if conected to new input.
-  void inputConnectionChanged(const std::string& inputName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief Checks if conected to new input.
+  void inputConnectionChanged(const std::string& inputName);
   //!@brief General function that has to be called if transformation maps have to be recomputed (type independent).
   void createMap();
 

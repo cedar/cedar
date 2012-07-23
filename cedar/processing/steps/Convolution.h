@@ -94,13 +94,13 @@ protected:
                                     cedar::proc::ConstDataSlotPtr slot,
                                     cedar::aux::ConstDataPtr data
                                   ) const;
-  //!@brief Reacts to a change in the input connection.
-  void inputConnectionChanged(const std::string& inputName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
