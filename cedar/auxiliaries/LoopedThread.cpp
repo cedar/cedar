@@ -157,8 +157,9 @@ void cedar::aux::LoopedThread::run(void)
     {
       // initialization
       mLastTimeStepStart = boost::posix_time::microsec_clock::universal_time();
-      mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
+      mLastTimeStepEnd = mLastTimeStepStart;
       boost::posix_time::ptime scheduled_wakeup = mLastTimeStepEnd + step_size;
+      //!@todo Should this really be here?
       srand(boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds());
 
       // some auxiliary variables
@@ -407,6 +408,7 @@ void cedar::aux::LoopedThread::singleStep()
   if (!this->isRunning())
   {
     //!@todo this distinction is not explicated
+    //!@todo use the loop mode parameter here!
     if (_mSimulatedTime->getValue() <= 0.0)
     {
       step(_mStepSize->getValue());
