@@ -193,24 +193,39 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
   ranges[1] = cv::Range::all();
   cv::Mat slice;
   //sliceSize is used to set the size to 2d of the yet 3d slice after extracting it from the 3d data
-  cv::Mat mSliceSize=cv::Mat(mat.size[0],mat.size[1],mat.type());
-  unsigned int column=0;
-  unsigned int row=0;
-  for (unsigned int tile = 0; tile < tiles; tile++,column++)
+  cv::Mat mSliceSize = cv::Mat(mat.size[0], mat.size[1], mat.type());
+  unsigned int column = 0;
+  unsigned int row = 0;
+  for (unsigned int tile = 0; tile < tiles; tile++, column++)
   {
-	 if (column>=columns)
-	 {
-		 column=0;
-		 row = row+1;
-	 }
-	//selects the slice
-	ranges[2] = cv::Range( tile, tile+1 );
-	//deep copy of the slice
-	slice = mat(ranges).clone();
-	//set size from 3d to 2d
-	slice.copySize(mSliceSize);
-	//copy slice to the right tile in the larger matrix
-	slice.copyTo(mSliceMatrix(cv::Range(row*mat.size[0]+row,row+mat.size[0]*(row+1)),cv::Range(column*mat.size[1]+column,column+mat.size[1]* (column+1))));
+   if (column >= columns)
+   {
+     column = 0;
+     row = row + 1;
+   }
+  //selects the slice
+  ranges[2] = cv::Range( tile, tile+1 );
+  //deep copy of the slice
+  slice = mat(ranges).clone();
+  //set size from 3d to 2d
+  slice.copySize(mSliceSize);
+  //copy slice to the right tile in the larger matrix
+  slice.copyTo
+        (
+          mSliceMatrix
+          (
+            cv::Range
+            (
+              row * mat.size[0] + row,
+              row + mat.size[0] * (row + 1)
+            ),
+            cv::Range
+            (
+              column * mat.size[1] + column,
+              column + mat.size[1] * (column + 1)
+            )
+          )
+        );
   }
   double min, max;
   cv::minMaxLoc(mSliceMatrix, &min, &max);
