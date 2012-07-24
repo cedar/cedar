@@ -104,8 +104,7 @@ protected:
 
 private:
   //!@brief the writer object (RAII)
-
-  boost::shared_ptr< cedar::aux::net::Writer< cedar::aux::MatData::DataType > > mWriter;
+  boost::shared_ptr<cedar::aux::net::Writer<cedar::aux::MatData::DataType> > mWriter;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

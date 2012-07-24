@@ -104,7 +104,7 @@ void cedar::proc::steps::Sum::compute(const cedar::proc::Arguments&)
     this->mOutput->getData() *= 0;
     return;
   }
-
+  //!@todo this may be slow, as it may allocate a matrix on each compute()
   cv::Mat sum = cedar::aux::asserted_pointer_cast<cedar::aux::MatData>(this->mInputs->getData(0))->getData().clone();
   for (unsigned int data_id = 1; data_id < this->mInputs->getDataCount(); ++data_id)
   {

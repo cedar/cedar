@@ -121,8 +121,6 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 {
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
-    // If the arguments can be set, trigger the step.
-    //!@todo For dynamics, this can mean that some step times are discarded rather than accumulated.
 #ifdef DEBUG_TRIGGERING
         std::cout << "Trigger " << this->getName() << " triggers " << this->mListeners.at(i)->getName() << std::endl;
 #endif // DEBUG_TRIGGERING

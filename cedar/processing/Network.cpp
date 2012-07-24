@@ -67,6 +67,37 @@
 //#define DEBUG_FILE_WRITING
 
 //----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr network_decl
+                          (
+                            new ElementDeclarationTemplate<cedar::proc::Network>
+                            (
+                              "Utilities",
+                              "cedar.processing.Network"
+                            )
+                          );
+    network_decl->setIconPath(":/network.svg");
+    network_decl->setDescription
+    (
+      "A grouping element for steps."
+    );
+    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(network_decl);
+
+    return true;
+  }
+
+  bool declared = declare();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
