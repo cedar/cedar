@@ -287,7 +287,7 @@ void cedar::proc::gui::Scene::networkGroupingContextMenuEvent(QMenu& menu)
   QObject::connect(p_add_to_new_network, SIGNAL(triggered()), this, SLOT(promoteElementToNewGroup()));
 
   QMenu *p_add_to_existing_network = menu.addMenu("move to existing network");
-  this->addNetworkNames(p_add_to_existing_network, this->mNetwork->network(), "");
+  this->addNetworkNames(p_add_to_existing_network, this->mNetwork->getNetwork(), "");
 }
 
 void cedar::proc::gui::Scene::addNetworkNames
@@ -299,7 +299,7 @@ void cedar::proc::gui::Scene::addNetworkNames
 {
   typedef std::set<cedar::proc::ConstNetworkPtr> Subnetworks;
   QMenu* submenu;
-  if (network == this->mNetwork->network())
+  if (network == this->mNetwork->getNetwork())
   {
     submenu = pMenu->addMenu("root network");
   }
@@ -335,12 +335,12 @@ void cedar::proc::gui::Scene::promoteElementToExistingGroup()
   cedar::proc::NetworkPtr target_network;
   if (target_network_name == "")
   {
-    target_network = this->mNetwork->network();
+    target_network = this->mNetwork->getNetwork();
   }
   else
   {
    target_network
-     = boost::shared_dynamic_cast<cedar::proc::Network>(this->mNetwork->network()->getElement(target_network_name));
+     = boost::shared_dynamic_cast<cedar::proc::Network>(this->mNetwork->getNetwork()->getElement(target_network_name));
   }
   CEDAR_ASSERT(target_network);
   cedar::proc::gui::Network *p_network
@@ -383,7 +383,7 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
   //!@todo Solve this better
   if (cedar::proc::gui::Network *p_element = dynamic_cast<cedar::proc::gui::Network*>(selected.at(0)))
   {
-    new_parent_network = p_element->network()->getNetwork();
+    new_parent_network = p_element->getNetwork()->getNetwork();
   }
   else if (cedar::proc::gui::StepItem *p_element = dynamic_cast<cedar::proc::gui::StepItem*>(selected.at(0)))
   {
@@ -404,7 +404,7 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
   {
     if (cedar::proc::gui::Network *p_element = dynamic_cast<cedar::proc::gui::Network*>(selected.at(i)))
     {
-      if (new_parent_network != p_element->network()->getNetwork())
+      if (new_parent_network != p_element->getNetwork()->getNetwork())
       {
         cedar::aux::LogSingleton::getInstance()->warning
         (
@@ -415,7 +415,7 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
       }
       else
       {
-        elements.push_back(p_element->network());
+        elements.push_back(p_element->getNetwork());
       }
     }
     else if (cedar::proc::gui::StepItem *p_element = dynamic_cast<cedar::proc::gui::StepItem*>(selected.at(i)))
@@ -455,10 +455,10 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
   CEDAR_DEBUG_ASSERT(new_parent_network);
   std::string name = new_parent_network->getUniqueIdentifier("new Network");
   network->setName(name);
-  if (new_parent_network == this->mNetwork->network())
+  if (new_parent_network == this->mNetwork->getNetwork())
   {
     // first add the network
-    mNetwork->network()->add(network);
+    mNetwork->getNetwork()->add(network);
     // signals created a new graphical representation, set its parent now
     mNetwork->addElement(this->getGraphicsItemFor(network.get()));
   }
@@ -500,7 +500,7 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
 
   if (a == p_reset)
   {
-    this->mNetwork->network()->reset();
+    this->mNetwork->getNetwork()->reset();
   }
   else if (a != NULL)
   {
@@ -772,8 +772,8 @@ cedar::proc::ElementPtr cedar::proc::gui::Scene::addElement(const std::string& c
     /*@todo check if this works in all cases since adding an item triggers a signal/slot chain,
      * which may not been processed completely
      */
-    CEDAR_DEBUG_ASSERT(mNetwork->network()->getElement<cedar::proc::Element>(adjusted_name).get());
-    this->getGraphicsItemFor(mNetwork->network()->getElement<cedar::proc::Element>(adjusted_name).get())->setPos(position);
+    CEDAR_DEBUG_ASSERT(mNetwork->getNetwork()->getElement<cedar::proc::Element>(adjusted_name).get());
+    this->getGraphicsItemFor(mNetwork->getNetwork()->getElement<cedar::proc::Element>(adjusted_name).get())->setPos(position);
 //    if (cedar::proc::StepPtr step = mNetwork->network()->getElement<cedar::proc::Step>(adjusted_name))
 //    {
 //      this->addProcessingStep(step, position);
@@ -818,7 +818,7 @@ cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::getGraphicsItemFor(cons
 
   if (iter == this->mElementMap.end())
   {
-    if (mNetwork->network().get() == element)
+    if (mNetwork->getNetwork().get() == element)
     {
       return mNetwork.get();
     }
@@ -889,20 +889,20 @@ void cedar::proc::gui::Scene::addNetworkItem(cedar::proc::gui::Network *pNetwork
   pNetwork->setScene(this);
 
   // we assume that network are only inserted once.
-  CEDAR_DEBUG_ASSERT(this->mNetworkMap.find(pNetwork->network().get()) == this->mNetworkMap.end());
-  this->mNetworkMap[pNetwork->network().get()] = pNetwork;
+  CEDAR_DEBUG_ASSERT(this->mNetworkMap.find(pNetwork->getNetwork().get()) == this->mNetworkMap.end());
+  this->mNetworkMap[pNetwork->getNetwork().get()] = pNetwork;
 
-  CEDAR_DEBUG_ASSERT(this->mElementMap.find(pNetwork->network().get()) == this->mElementMap.end());
-  this->mElementMap[pNetwork->network().get()] = pNetwork;
+  CEDAR_DEBUG_ASSERT(this->mElementMap.find(pNetwork->getNetwork().get()) == this->mElementMap.end());
+  this->mElementMap[pNetwork->getNetwork().get()] = pNetwork;
 }
 
 void cedar::proc::gui::Scene::removeNetworkItem(cedar::proc::gui::Network* pNetwork)
 {
   // we assume that steps are only inserted once.
-  CEDAR_DEBUG_ASSERT(this->mNetworkMap.find(pNetwork->network().get()) != this->mNetworkMap.end());
-  this->mNetworkMap.erase(mNetworkMap.find(pNetwork->network().get()));
-  CEDAR_DEBUG_ASSERT(this->mElementMap.find(pNetwork->network().get()) != this->mElementMap.end());
-  this->mElementMap.erase(mElementMap.find(pNetwork->network().get()));
+  CEDAR_DEBUG_ASSERT(this->mNetworkMap.find(pNetwork->getNetwork().get()) != this->mNetworkMap.end());
+  this->mNetworkMap.erase(mNetworkMap.find(pNetwork->getNetwork().get()));
+  CEDAR_DEBUG_ASSERT(this->mElementMap.find(pNetwork->getNetwork().get()) != this->mElementMap.end());
+  this->mElementMap.erase(mElementMap.find(pNetwork->getNetwork().get()));
 }
 
 void cedar::proc::gui::Scene::addProcessingStep(cedar::proc::StepPtr step, QPointF position)

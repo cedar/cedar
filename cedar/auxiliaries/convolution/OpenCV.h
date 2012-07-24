@@ -51,8 +51,6 @@
  * @todo Intelligent strategies should be useable here, e.g., when multiple kernels in a row are TYPE_FULL, they can be
  *       summed together etc.
  *
- * @todo Write a unit test for this class
- *
  * @todo This class should also be able to work with more matrices of more than two dimensions.
  *
  * @todo Right now, this computes correlation (it should flip the kernel)

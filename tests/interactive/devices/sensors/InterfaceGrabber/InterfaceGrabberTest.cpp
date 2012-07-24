@@ -27,7 +27,7 @@
 #include <QReadWriteLock>
 #include <boost/lexical_cast.hpp>
 
-int main(int argc, char **argv)
+int main(int, char**)
 {
   // -------------------------------------------------------------------------------------------------------------------
   // Constants

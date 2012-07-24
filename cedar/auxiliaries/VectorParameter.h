@@ -330,7 +330,7 @@ public:
     {
       this->emitChangedSignal();
     }
-    //!@todo emit a porperty changed signal here as well, as the new vector may have a different size
+    //!@todo emit a property changed signal here as well, as the new vector may have a different size
   }
 
   //!@brief set one entry of the vector to a new value

@@ -100,18 +100,15 @@ public:
   void read(const std::string& source);
 
   /*!@brief access the underlying cedar::proc::Network
-   *
    */
-  inline cedar::proc::NetworkPtr getNetwork()
-  {
-    return this->network();
-  }
+  cedar::proc::NetworkPtr getNetwork();
 
   /*!@brief access the underlying cedar::proc::Network
-   *
-   * @todo Deprecate this.
    */
-  cedar::proc::NetworkPtr network();
+  CEDAR_DECLARE_DEPRECATED(inline cedar::proc::NetworkPtr network())
+  {
+    return this->getNetwork();
+  }
 
   //!@brief add all elements contained in this network to the scene
   void addElementsToScene();

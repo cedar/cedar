@@ -49,7 +49,7 @@
 #include <opencv2/opencv.hpp>
 #include <fftw3.h>
 
-/*!@brief Base class for convolution.
+/*!@brief @todo describe
  *
  * @todo describe more.
  */

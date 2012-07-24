@@ -75,7 +75,6 @@ class ComputableTest : public cedar::proc::Step
 
     void compute(const cedar::proc::Arguments& /* arguments */)
     {
-      //! @todo log these times and calculate the overall test time to check performance.
       cedar::aux::usleep(rand() % 50000);
       meLock.lockForWrite();
       meSequenceBuffer.push_back(mSequenceId);

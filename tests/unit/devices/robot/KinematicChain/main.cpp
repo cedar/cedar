@@ -43,7 +43,7 @@
 #include "cedar/auxiliaries/math/constants.h"
 
 // SYSTEM INCLUDES
-
+CEDAR_GENERATE_POINTER_TYPES(TestKinematicChain);
 
 int main()
 {
@@ -51,19 +51,18 @@ int main()
   int errors = 0;
   
   // create instance of test class
-  //!@todo These should be pointers
-  TestKinematicChain test_arm;
-  TestKinematicChain acceleration_test_arm;
-  std::cout << "reading configuration from test_arm.json" << std::endl;
-  test_arm.readJson("test_arm.json");
-  acceleration_test_arm.readJson("acceleration_test_arm.json");
+  TestKinematicChainPtr test_arm(new TestKinematicChain());
+  TestKinematicChainPtr acceleration_test_arm(new TestKinematicChain());
+  std::cout << "reading configuration from test_arm->json" << std::endl;
+  test_arm->readJson("test_arm.json");
+  acceleration_test_arm->readJson("acceleration_test_arm.json");
   
   //--------------------------------------------------------------------------------------------------------------------
   // check configuration
   //--------------------------------------------------------------------------------------------------------------------
 
   std::cout << "checking the root coordinate frame..." << std::endl;
-  cedar::aux::LocalCoordinateFramePtr rootCoordinateFrame = test_arm.getRootCoordinateFrame();
+  cedar::aux::LocalCoordinateFramePtr rootCoordinateFrame = test_arm->getRootCoordinateFrame();
   if
   (
     !IsZero(rootCoordinateFrame->getTranslationX() - (2.0))
@@ -95,7 +94,7 @@ int main()
   }
 
   std::cout << "checking the end-effector coordinate frame..." << std::endl;
-  cedar::aux::LocalCoordinateFramePtr endEffectorCoordinateFrame = test_arm.getEndEffectorCoordinateFrame();
+  cedar::aux::LocalCoordinateFramePtr endEffectorCoordinateFrame = test_arm->getEndEffectorCoordinateFrame();
   if
   (
     !IsZero(endEffectorCoordinateFrame->getTranslationX() - (0.0))
@@ -127,7 +126,7 @@ int main()
   }
 
   std::cout << "checking the first joint ..." << std::endl;
-  cedar::dev::robot::KinematicChain::JointPtr joint = test_arm.getJoint(0);
+  cedar::dev::robot::KinematicChain::JointPtr joint = test_arm->getJoint(0);
   if
   (
     !IsZero(joint->_mpPosition->at(0) - (0.0))
@@ -181,42 +180,42 @@ int main()
   // simple service functions
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: getNumberOfJoints()" << std::endl;
-  if (!IsZero(test_arm.getNumberOfJoints() - 4))
+  if (test_arm->getNumberOfJoints() != 4)
   {
     errors++;
-    std::cout << "ERROR with getNumberOfJoints(), read: " << test_arm.getNumberOfJoints() << std::endl;
+    std::cout << "ERROR with getNumberOfJoints(), read: " << test_arm->getNumberOfJoints() << std::endl;
   }
   
   std::cout << "test: set/get joint angle/velocity functions" << std::endl;
-  test_arm.setJointAngle(2, -cedar::aux::math::pi*0.5);
-  test_arm.setJointAngle(3, cedar::aux::math::pi*0.5);
-  test_arm.setJointVelocity(1, 1);
-  test_arm.setJointVelocity(2, 1);
-  test_arm.updateTransformations();
+  test_arm->setJointAngle(2, -cedar::aux::math::pi*0.5);
+  test_arm->setJointAngle(3, cedar::aux::math::pi*0.5);
+  test_arm->setJointVelocity(1, 1);
+  test_arm->setJointVelocity(2, 1);
+  test_arm->updateTransformations();
   if
   (
-    !IsZero(test_arm.getJointAngle(0) - (0.0))
-    || !IsZero(test_arm.getJointAngle(1) - (0.0))
-    || !IsZero(test_arm.getJointAngle(2) - (-cedar::aux::math::pi*0.5))
-    || !IsZero(test_arm.getJointAngle(3) - (cedar::aux::math::pi*0.5))
-    || !IsZero(test_arm.getJointVelocity(1) - (1.0))
-    || !IsZero(test_arm.getJointVelocity(2) - (1.0))
+    !IsZero(test_arm->getJointAngle(0) - (0.0))
+    || !IsZero(test_arm->getJointAngle(1) - (0.0))
+    || !IsZero(test_arm->getJointAngle(2) - (-cedar::aux::math::pi*0.5))
+    || !IsZero(test_arm->getJointAngle(3) - (cedar::aux::math::pi*0.5))
+    || !IsZero(test_arm->getJointVelocity(1) - (1.0))
+    || !IsZero(test_arm->getJointVelocity(2) - (1.0))
   )
   {
     errors++;
     std::cout << "ERROR with set/get joint acceleration" << std::endl;
   }
-  acceleration_test_arm.setJointAngle(0, 0.1);
-  acceleration_test_arm.setJointAngle(1, 0.2);
-  acceleration_test_arm.setJointVelocity(0, 1.1);
-  acceleration_test_arm.setJointVelocity(1, 1.2);
-  acceleration_test_arm.setJointAcceleration(0, 2.1);
-  acceleration_test_arm.setJointAcceleration(1, 2.2);
-  acceleration_test_arm.updateTransformations();
+  acceleration_test_arm->setJointAngle(0, 0.1);
+  acceleration_test_arm->setJointAngle(1, 0.2);
+  acceleration_test_arm->setJointVelocity(0, 1.1);
+  acceleration_test_arm->setJointVelocity(1, 1.2);
+  acceleration_test_arm->setJointAcceleration(0, 2.1);
+  acceleration_test_arm->setJointAcceleration(1, 2.2);
+  acceleration_test_arm->updateTransformations();
   if
   (
-    !IsZero(acceleration_test_arm.getJointAcceleration(0) - (2.1))
-    || !IsZero(acceleration_test_arm.getJointAcceleration(1) - (2.2))
+    !IsZero(acceleration_test_arm->getJointAcceleration(0) - (2.1))
+    || !IsZero(acceleration_test_arm->getJointAcceleration(1) - (2.2))
   )
   {
     errors++;
@@ -227,8 +226,8 @@ int main()
   // transformations
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: transformations" << std::endl;
-  cv::Mat joint_transformation_1 = test_arm.getJointTransformation(1);
-  cv::Mat joint_transformation_3 = test_arm.getJointTransformation(3);
+  cv::Mat joint_transformation_1 = test_arm->getJointTransformation(1);
+  cv::Mat joint_transformation_3 = test_arm->getJointTransformation(3);
   if (
       // transformation to joint 1 frame
       !IsZero(joint_transformation_1.at<double>(0, 0) - 0)
@@ -282,8 +281,8 @@ int main()
   origin.at<double>( 3, 0 ) = 1;
   cv::Mat jacobian_1 = cv::Mat::zeros(3, 4, CV_64FC1);
   cv::Mat jacobian_3 = cv::Mat::zeros(3, 4, CV_64FC1);
-  test_arm.calculateCartesianJacobian(origin, 1, jacobian_1, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  test_arm.calculateCartesianJacobian(origin, 3, jacobian_3, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
+  test_arm->calculateCartesianJacobian(origin, 1, jacobian_1, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
+  test_arm->calculateCartesianJacobian(origin, 3, jacobian_3, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
   if (
       // Jacobian of joint 1
       !IsZero(jacobian_1.at<double>(0, 0) - 0)
@@ -303,7 +302,7 @@ int main()
         norm
         (
           jacobian_1
-          - test_arm.calculateCartesianJacobian(origin, 1, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES)
+          - test_arm->calculateCartesianJacobian(origin, 1, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES)
         )
       )
       // Jacobian of joint 3
@@ -324,7 +323,7 @@ int main()
         norm
         (
           jacobian_3
-          - test_arm.calculateCartesianJacobian(origin, 3, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES)
+          - test_arm->calculateCartesianJacobian(origin, 3, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES)
         )
       )
     )
@@ -334,7 +333,7 @@ int main()
   }
 
   std::cout << "test: calculateSpatialJacobian" << std::endl;
-  cv::Mat spatial_jacobian = test_arm.calculateSpatialJacobian(test_arm.getNumberOfJoints()-1);
+  cv::Mat spatial_jacobian = test_arm->calculateSpatialJacobian(test_arm->getNumberOfJoints()-1);
   if (
       !IsZero(spatial_jacobian.at<double>(0, 0) - 0)
       || !IsZero(spatial_jacobian.at<double>(1, 0) - 0)
@@ -377,10 +376,10 @@ int main()
   cv::Mat p = cv::Mat::zeros(4, 1, CV_64FC1);
   p.at<double>(2, 0) = 1.0;
   p.at<double>(3, 0) = 1.0;
-  cv::Mat v0 = test_arm.calculateVelocity(p, 0, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  cv::Mat v1 = test_arm.calculateVelocity(p, 1, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  cv::Mat v2 = test_arm.calculateVelocity(p, 2, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  cv::Mat v3 = test_arm.calculateVelocity(p, 3, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
+  cv::Mat v0 = test_arm->calculateVelocity(p, 0, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
+  cv::Mat v1 = test_arm->calculateVelocity(p, 1, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
+  cv::Mat v2 = test_arm->calculateVelocity(p, 2, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
+  cv::Mat v3 = test_arm->calculateVelocity(p, 3, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
   if (
       !IsZero(v0.at<double>(0, 0) - 0)
       || !IsZero(v0.at<double>(1, 0) - 0)
@@ -400,21 +399,12 @@ int main()
     std::cout << "ERROR with calculateVelocity()" << std::endl;
   }
 
-
-
-
-
-
-
-
-
-
   //--------------------------------------------------------------------------------------------------------------------
   // temporal derivative of spatial Jacobian
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateSpatialJacobianTemporalDerivative" << std::endl;
   cv::Mat spatial_jacobian_dot
-    = acceleration_test_arm.calculateSpatialJacobianTemporalDerivative(acceleration_test_arm.getNumberOfJoints()-1);
+    = acceleration_test_arm->calculateSpatialJacobianTemporalDerivative(acceleration_test_arm->getNumberOfJoints() - 1);
   if (
       !IsZero(spatial_jacobian_dot.at<double>(0, 0) - 0)
       || !IsZero(spatial_jacobian_dot.at<double>(1, 0) - 0)
@@ -438,17 +428,19 @@ int main()
   // acceleration
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateAcceleration" << std::endl;
-  cv::Mat a0 = acceleration_test_arm.calculateAcceleration(p, 0, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  cv::Mat a1 = acceleration_test_arm.calculateAcceleration(p, 1, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  double s0 = sin(acceleration_test_arm.getJointAngle(0));
-  double c0 = cos(acceleration_test_arm.getJointAngle(0));
-  double s01 = sin(acceleration_test_arm.getJointAngle(0) + acceleration_test_arm.getJointAngle(1));
-  double c01 = cos(acceleration_test_arm.getJointAngle(0) + acceleration_test_arm.getJointAngle(1));
-  double dot_theta_0 = acceleration_test_arm.getJointVelocity(0);
-  double dot_theta_1 = acceleration_test_arm.getJointVelocity(1);
+  cv::Mat a0
+    = acceleration_test_arm->calculateAcceleration(p, 0, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
+  cv::Mat a1
+    = acceleration_test_arm->calculateAcceleration(p, 1, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
+  double s0 = sin(acceleration_test_arm->getJointAngle(0));
+  double c0 = cos(acceleration_test_arm->getJointAngle(0));
+  double s01 = sin(acceleration_test_arm->getJointAngle(0) + acceleration_test_arm->getJointAngle(1));
+  double c01 = cos(acceleration_test_arm->getJointAngle(0) + acceleration_test_arm->getJointAngle(1));
+  double dot_theta_0 = acceleration_test_arm->getJointVelocity(0);
+  double dot_theta_1 = acceleration_test_arm->getJointVelocity(1);
   double dot_theta_01 = dot_theta_0 + dot_theta_1;
-  double ddot_theta_0 = acceleration_test_arm.getJointAcceleration(0);
-  double ddot_theta_1 = acceleration_test_arm.getJointAcceleration(1);
+  double ddot_theta_0 = acceleration_test_arm->getJointAcceleration(0);
+  double ddot_theta_1 = acceleration_test_arm->getJointAcceleration(1);
   double ddot_theta_01 = ddot_theta_0 + ddot_theta_1;
   double a0_1 = s0*dot_theta_0*dot_theta_0
                 - c0*ddot_theta_0;
@@ -479,11 +471,11 @@ int main()
   // temporal derivative of Cartesian Jacobian
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateCartesianJacobianTemporalDerivative" << std::endl;
-  cv::Mat tool = acceleration_test_arm.calculateEndEffectorPosition();
-  cv::Mat cartesian_jacobian_dot = acceleration_test_arm.calculateCartesianJacobianTemporalDerivative
+  cv::Mat tool = acceleration_test_arm->calculateEndEffectorPosition();
+  cv::Mat cartesian_jacobian_dot = acceleration_test_arm->calculateCartesianJacobianTemporalDerivative
   (
     tool,
-    acceleration_test_arm.getNumberOfJoints()-1,
+    acceleration_test_arm->getNumberOfJoints()-1,
     cedar::dev::robot::KinematicChain::WORLD_COORDINATES
   );
   if (
@@ -503,7 +495,7 @@ int main()
   // end-effector position
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateEndEffectorPosition" << std::endl;
-  cv::Mat end_effector_position = test_arm.calculateEndEffectorPosition();
+  cv::Mat end_effector_position = test_arm->calculateEndEffectorPosition();
   if (
       !IsZero(end_effector_position.at<double>(0, 0) - 0)
       || !IsZero(end_effector_position.at<double>(1, 0) - -2)
@@ -519,7 +511,7 @@ int main()
   // end-effector transformation
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateEndEffectorTransformation" << std::endl;
-  cv::Mat end_effector_transformation = test_arm.getEndEffectorTransformation();
+  cv::Mat end_effector_transformation = test_arm->getEndEffectorTransformation();
   if (
       !IsZero(end_effector_transformation.at<double>(0, 0) - 0)
       || !IsZero(end_effector_transformation.at<double>(0, 1) - -1)
@@ -547,7 +539,7 @@ int main()
   // end-effector jacobian
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateEndEffectorJacobian" << std::endl;
-  cv::Mat end_effector_jacobian = test_arm.calculateEndEffectorJacobian();
+  cv::Mat end_effector_jacobian = test_arm->calculateEndEffectorJacobian();
   if (
       !IsZero(end_effector_jacobian.at<double>(0, 0) - 0)
       || !IsZero(end_effector_jacobian.at<double>(1, 0) - 6)
@@ -571,7 +563,7 @@ int main()
   // end-effector velocity
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateEndEffectorVelocity" << std::endl;
-  cv::Mat v4 = test_arm.calculateEndEffectorVelocity();
+  cv::Mat v4 = test_arm->calculateEndEffectorVelocity();
   if (
       !IsZero(v4.at<double>(0, 0) - 0)
       || !IsZero(v4.at<double>(1, 0) - 6)
@@ -586,7 +578,7 @@ int main()
   // end-effector acceleration
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateEndEffectorAcceleration" << std::endl;
-  cv::Mat a2 = acceleration_test_arm.calculateEndEffectorAcceleration();
+  cv::Mat a2 = acceleration_test_arm->calculateEndEffectorAcceleration();
   if (
       !IsZero(a2.at<double>(0, 0) - 0)
       || !IsZero(a2.at<double>(1, 0) - a1_1)
@@ -596,13 +588,6 @@ int main()
     errors++;
     std::cout << "ERROR with calculateEndEffectorAcceleration()" << std::endl;
   }
-
-
-
-
-
-
-
 
   std::cout << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)

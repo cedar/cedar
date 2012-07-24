@@ -356,7 +356,7 @@ void cedar::proc::gui::Ide::showManagePluginsDialog()
 
 void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
 {
-  network->network()->setName("root");
+  network->getNetwork()->setName("root");
   this->mNetwork = network;
   this->mpProcessingDrawer->getScene()->setNetwork(network);
   this->mpProcessingDrawer->getScene()->reset();
@@ -509,7 +509,7 @@ void cedar::proc::gui::Ide::deleteElement(QGraphicsItem* pItem)
   {
     p_network_drawer->hide();
 //    p_network_drawer->removeAllConnections();
-    p_network_drawer->network()->getNetwork()->remove(p_network_drawer->network());
+    p_network_drawer->getNetwork()->getNetwork()->remove(p_network_drawer->getNetwork());
   }
   else
   {
@@ -630,7 +630,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   this->mpProcessingDrawer->getScene()->reset();
   // create new root network
   cedar::proc::gui::NetworkPtr network(new cedar::proc::gui::Network(this, this->mpProcessingDrawer->getScene()));
-  network->network()->setName("root");
+  network->getNetwork()->setName("root");
   this->mpProcessingDrawer->getScene()->setNetwork(network);
   // read network
   try

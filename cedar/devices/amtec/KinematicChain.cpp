@@ -43,6 +43,8 @@
 #include "cedar/devices/amtec/KinematicChain.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/math/LimitsParameter.h"
+#include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
 #ifdef CEDAR_OS_LINUX
@@ -125,17 +127,24 @@ bool cedar::dev::amtec::KinematicChain::initDevice()
 
   int ret_val = mpDevice->init(this->getInitString().c_str());
 
-  //!@todo Use the log interface instead of writing to cout.
   switch(ret_val)
   {
   case CLD_OK:
     break;
   case CLDERR_INITIALIZATIONERROR:
-    std::cout << "Amtec Device: Initialization error!" << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Amtec Device: Initialization error!",
+      "cedar::dev::amtec::KinematicChain::initDevice()"
+    );
     return false;
     break;
   default:
-    std::cout << "Amtec Device: Unknown initialization error!" << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Amtec Device: Unknown initialization error!",
+      "cedar::dev::amtec::KinematicChain::initDevice()"
+    );
     return false;
   }
 
@@ -147,28 +156,26 @@ bool cedar::dev::amtec::KinematicChain::initDevice()
 
   if(modules.size() <= 0)
   {
-    std::cout << "No Amtec modules found!" << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+        "No Amtec modules found!",
+      "cedar::dev::amtec::KinematicChain::initDevice()"
+    );
     return false;
   }
 
   if(modules.size() != getNumberOfJoints())
   {
-    std::cout << "Found " << modules.size() << " Amtec modules but "
-      << getNumberOfJoints()
-      << " are specified by configuration file!" << std::endl;
+    std::string message
+      = "Found " + cedar::aux::toString(modules.size()) + " Amtec modules but "
+        + cedar::aux::toString(getNumberOfJoints()) + " are specified by configuration file!";
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      message,
+      "cedar::dev::amtec::KinematicChain::initDevice()"
+    );
     return false;
   }
-
-  //
-  // read module map from config
-  //
-
-//  if(addParameter(&mModules, "amtecModuleMap", mModules) != CONFIG_SUCCESS)
-//  {
-//    std::cout << "KinematicChain: Error reading 'amtecModuleMap' from config file!" << std::endl;
-//  }
-//
-//  readOrDefaultConfiguration();
 
   // print module mapping to console
   std::cout << "Mapping of joints to modules:" << std::endl;

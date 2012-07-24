@@ -101,7 +101,7 @@ mHoldFitToContents(false)
   this->networkNameChanged();
 
   //!@todo This isn't really a great solution, we need a better one!
-  cedar::aux::ParameterPtr name_param = this->network()->getParameter("name");
+  cedar::aux::ParameterPtr name_param = this->getNetwork()->getParameter("name");
   QObject::connect(name_param.get(), SIGNAL(valueChanged()), this, SLOT(networkNameChanged()));
 
   mSlotConnection
@@ -182,7 +182,7 @@ cedar::proc::gui::Network::~Network()
 
 void cedar::proc::gui::Network::networkNameChanged()
 {
-  this->mpNameDisplay->setPlainText(QString::fromStdString(this->network()->getName()));
+  this->mpNameDisplay->setPlainText(QString::fromStdString(this->getNetwork()->getName()));
 
   this->fitToContents();
 }
@@ -378,7 +378,7 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
     }
     else if (cedar::proc::gui::Network* p_network = dynamic_cast<cedar::proc::gui::Network*>(*it))
     {
-      element = p_network->network();
+      element = p_network->getNetwork();
     }
     else
     {
@@ -391,7 +391,7 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
     elems.push_back(element);
   }
   this->mHoldFitToContents = true;
-  this->network()->add(elems);
+  this->getNetwork()->add(elems);
   // move elements
 //  for (const_iterator i = elements.begin(); i != elements.end(); ++i)
 //  {
@@ -436,7 +436,7 @@ void cedar::proc::gui::Network::setScene(cedar::proc::gui::Scene* pScene)
   this->mpScene = pScene;
 }
 
-cedar::proc::NetworkPtr cedar::proc::gui::Network::network()
+cedar::proc::NetworkPtr cedar::proc::gui::Network::getNetwork()
 {
   return this->mNetwork;
 }
@@ -687,7 +687,7 @@ void cedar::proc::gui::Network::checkDataConnection
 {
   cedar::proc::gui::DataSlotItem* source_slot = NULL;
   cedar::proc::gui::GraphicsBase* p_base_source
-    = this->mpScene->getGraphicsItemFor(this->network()->getElement(source->getParent()).get());
+    = this->mpScene->getGraphicsItemFor(this->getNetwork()->getElement(source->getParent()).get());
   if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_base_source))
   {
     source_slot = p_step_item->getSlotItem(cedar::proc::DataRole::OUTPUT, source->getName());
@@ -700,7 +700,7 @@ void cedar::proc::gui::Network::checkDataConnection
 
   cedar::proc::gui::DataSlotItem* target_slot = NULL;
   cedar::proc::gui::GraphicsBase* p_base
-    = this->mpScene->getGraphicsItemFor(this->network()->getElement(target->getParent()).get());
+    = this->mpScene->getGraphicsItemFor(this->getNetwork()->getElement(target->getParent()).get());
   if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_base))
   {
     target_slot = p_step_item->getSlotItem(cedar::proc::DataRole::INPUT, target->getName());
@@ -753,7 +753,7 @@ void cedar::proc::gui::Network::checkTriggerConnection
         (
           this->mpScene->getGraphicsItemFor
           (
-            this->network()->getElement(source->getName()).get()
+            this->getNetwork()->getElement(source->getName()).get()
           )
         );
   }
@@ -765,7 +765,7 @@ void cedar::proc::gui::Network::checkTriggerConnection
   cedar::proc::gui::GraphicsBase* target_element
     = this->mpScene->getGraphicsItemFor
       (
-        this->network()->getElement(boost::shared_dynamic_cast<cedar::proc::Element>(target)->getName()).get()
+        this->getNetwork()->getElement(boost::shared_dynamic_cast<cedar::proc::Element>(target)->getName()).get()
       );
   if (added)
   {
@@ -823,7 +823,7 @@ void cedar::proc::gui::Network::processStepAddedSignal(cedar::proc::ElementPtr e
     this->mNextElementUiConfigurations.erase(iter);
   }
 
-  cedar::aux::ConfigurationNode& ui = this->network()->getLastReadUINode();
+  cedar::aux::ConfigurationNode& ui = this->getNetwork()->getLastReadUINode();
   for (cedar::aux::ConfigurationNode::iterator iter = ui.begin(); iter != ui.end(); ++iter)
   {
     const std::string& type = iter->second.get<std::string>("type");

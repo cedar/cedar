@@ -49,8 +49,6 @@
 #include <QWidget>
 
 //!@brief A simple widget to monitor and change the state of a rigid body
-//!@todo I removed the CEDAR_DEV_LIB_EXPORT here, check if this still runs on Windows.
-//class CEDAR_DEV_LIB_EXPORT cedar::dev::robot::gui::LocalCoordinateFrameWidget
 class cedar::aux::gui::LocalCoordinateFrameWidget
 :
 public QWidget,

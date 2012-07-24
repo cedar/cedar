@@ -148,7 +148,7 @@ protected:
   mutable QReadWriteLock *mpLock;
 
 private:
-  //!@todo This should be a base*, however, right now Configurable can't be used with Base* because base has a (differently realized) name.
+  //!@todo This should be a DataOwner* (if that would exist as interface)
   cedar::aux::Configurable* mpeOwner;
 
 }; // class cedar::aux::Data

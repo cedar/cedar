@@ -62,7 +62,7 @@ int main(int , char **)
     return -1;
   }
   //------------------------------------------------------------------
-  /*After initialization of a net_grabber:
+  / * After initialization of a net_grabber:
    *
    * ALWAYS:
    *  - the first frame is already grabbed, so you can check the file using

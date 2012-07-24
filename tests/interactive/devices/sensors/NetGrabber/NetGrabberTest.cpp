@@ -60,7 +60,7 @@ int main(int , char **)
   }
 
   //------------------------------------------------------------------
-  /*After initialization of a NetGrabber:
+  / * After initialization of a NetGrabber:
    *
    * ALWAYS:
    *  - the Net is already grabbed, so you can check the file using

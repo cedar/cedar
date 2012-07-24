@@ -184,7 +184,7 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo
     else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_target))
     {
       //!@todo The validity here must be checked correctly at the promoted slot rather than the network's pseudo-slot
-      validity = p_network_item->network()->determineInputValidity(p_target_slot->getSlot(), this->mSlot->getData());
+      validity = p_network_item->getNetwork()->determineInputValidity(p_target_slot->getSlot(), this->mSlot->getData());
     }
 
     CEDAR_ASSERT(validity != cedar::proc::DataSlot::VALIDITY_UNKNOWN);
@@ -248,7 +248,7 @@ void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuE
   // no slot can be promoted to the root network
   if
   (
-    (this->mSlot->getParentPtr()->getNetwork() == p_scene->getRootNetwork()->network())
+    (this->mSlot->getParentPtr()->getNetwork() == p_scene->getRootNetwork()->getNetwork())
       || this->mSlot->isPromoted() || this->getNumberOfConnections() != 0
   )
   {

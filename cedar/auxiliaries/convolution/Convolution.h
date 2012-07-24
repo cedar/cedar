@@ -66,9 +66,6 @@
  *
  * @see     cedar::aux::conv::Engine, cedar::aux::conv::BorderType, cedar::aux::conv::Mode,
  *          cedar::aux::conv::KernelList, cedar::aux::conv
- *
- * @todo    Should the kernel list be stored within this object rather than each engine?
- *
  */
 class cedar::aux::conv::Convolution : public QObject, public cedar::aux::Configurable
 {

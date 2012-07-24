@@ -91,9 +91,6 @@
  * all step functions consecutively and also pass measured time to each step function
  * to fulfill real-time constraints.
  *
- * \todo fill in doxygen comments for all member variables
- *
- * \todo Revise the parameters of the looped thread
  * \todo Use units instead of doubles
  */
 class cedar::aux::LoopedThread : virtual public cedar::aux::Configurable,
@@ -251,15 +248,18 @@ private:
 protected:
 
 private:
+  //!@brief stop is requested
   bool mStop;
-  unsigned int mIdleTime; //!< in microseconds
-//  boost::posix_time::time_duration mSimulatedTime;
-  // gather some statistics
+
+  //!@brief total number of steps since start()
   unsigned long mNumberOfSteps;
+  //!@brief
   double mSumOfStepsTaken;
+  //!@brief
   double mMaxStepsTaken;
-  // remeber time stamps of last step
+  //!@brief remember time stamps of last step
   boost::posix_time::ptime mLastTimeStepStart;
+  //!@brief remember time stamps of last step
   boost::posix_time::ptime mLastTimeStepEnd;
 
   //--------------------------------------------------------------------------------------------------------------------

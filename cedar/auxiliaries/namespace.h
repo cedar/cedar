@@ -70,13 +70,6 @@ namespace cedar
 
     template <class ClonedT, class ReturnedT> class Cloneable;
 
-    //!@todo This class may be obsolete once the ConfigurationInterface is removed.
-    template <typename T> class IntervalData;
-    //!@brief smart pointer for IntervalData<double>
-    typedef boost::shared_ptr<IntervalData<double> > DoubleIntervalPtr;
-    //!@brief smart pointer for IntervalData<int>
-    typedef boost::shared_ptr<IntervalData<int> > IntIntervalPtr;
-
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(LogFile);
     CEDAR_DECLARE_AUX_CLASS(MatrixIterator);
