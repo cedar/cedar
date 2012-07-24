@@ -47,8 +47,8 @@
 cedar::aux::gl::Block::Block
 (
   cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
-	double length,
-	double width,
+  double length,
+  double width,
   double height,
   double colorR,
   double colorG,
