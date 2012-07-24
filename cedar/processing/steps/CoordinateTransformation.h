@@ -31,7 +31,6 @@
     Description: This Plugin provides coordinate transformation between Cartesian and polar coordinates and Cartesian
                  and log-polar coordinates.
                  User can set the sampling rate manually.
-                 //TODO fix error when angle-sampling rate is smaller than 1.
 
     Credits:
 
@@ -56,6 +55,8 @@
  *          <li>@em Forward: Direction in order of appearance of coordinate system names.</li>
  *          <li>@em Backward: Reversed direction.</li>
  *        </ul>
+ *
+ * @todo fix error when angle-sampling rate is smaller than 1.
  */
 class cedar::proc::steps::TransformationDirection
 {

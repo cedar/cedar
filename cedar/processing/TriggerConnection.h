@@ -46,7 +46,6 @@
 /*!@brief A connection from a cedar::proc::Trigger to a cedar::proc::Triggerable.
  *
  * @todo Describe this more.
- * @todo check if source is owned data
  */
 class cedar::proc::TriggerConnection
 {

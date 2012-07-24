@@ -194,9 +194,6 @@ private:
    *
    *        The arguments parameter is empty, unless the step is connected to a cedar::proc::LoopedTrigger, in which
    *        case arguments of the type cedar::proc::StepTime are passed.
-   *
-   * @todo  Shouldn't this method be private? It should never be called by the user, rather, they should use onTrigger()
-   *        (as that properly locks all the data).
    */
   virtual void compute(const cedar::proc::Arguments& arguments) = 0;
 
