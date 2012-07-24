@@ -317,7 +317,7 @@ public:
 
    *      With this method you can get the grabbed image.
    *  @param channel
-   *		  This is the index of the source you want the picture from.<br>
+   *      This is the index of the source you want the picture from.<br>
    *      In the mono case you do not need to supply this value. Default is 0.<br>
    *      In the stereo case it may be 0 or 1.
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
@@ -350,13 +350,13 @@ public:
 
   /*! @brief Set the snapshot filenames for all defined channels
    *
-   *		In the mono case, filename is used without changes<br>
-   *		In the stereo case, the filenames are constructed like<br>
-   *		snapshotName_wo_ext[ch:ChannelIndex:].snapshotName_ext<br>
-   *		For example: snapshot[0].jpg for the first channel by default
+   *    In the mono case, filename is used without changes<br>
+   *    In the stereo case, the filenames are constructed like<br>
+   *    snapshotName_wo_ext[ch:ChannelIndex:].snapshotName_ext<br>
+   *    For example: snapshot[0].jpg for the first channel by default
    *  @param snapshotName This is the filename for the snapshot with extension
    *  @see
-   *		getSnapshotName
+   *    getSnapshotName
    */
   void setSnapshotName(const std::string& snapshotName);
 
@@ -397,7 +397,7 @@ public:
   /*! @brief Get the current name of the snapshot file.
    *
    *  @param channel
-   *		This is the index of the source you want the snapshot from.<br>
+   *    This is the index of the source you want the snapshot from.<br>
    *      In the mono case you do not need to supply this value. Default is 0.<br>
    *      In the stereo case it may be 0 or 1.
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
@@ -433,14 +433,14 @@ public:
 
   /*! @brief Set the recording filenames for all defined channels
    *  @param
-   *		recordName This is the filename for the snapshot with extension
+   *    recordName This is the filename for the snapshot with extension
    *  @remarks
-   *		In the mono case, filename is used without changes<br>
-   *		In the stereo case, the filenames are constructed like<br>
-   *		recordName_wo_ext[ch:CameraIndex:].recordName_ext.<br>
-   *		For example: startRecording[ch0].avi for the first camera by default
+   *    In the mono case, filename is used without changes<br>
+   *    In the stereo case, the filenames are constructed like<br>
+   *    recordName_wo_ext[ch:CameraIndex:].recordName_ext.<br>
+   *    For example: startRecording[ch0].avi for the first camera by default
    *  @see
-   *		setRecordName, getRecordName
+   *    setRecordName, getRecordName
    *
    */
   void setRecordName(const std::string& recordName);
@@ -450,7 +450,7 @@ public:
    *    The file format is chosen by the ending of the filename, the file encoding depends on the
    *    parameter of startRecording().
    *  @param
-   *		channel This is the index of the source you want the picture from.<br>
+   *    channel This is the index of the source you want the picture from.<br>
    *      In the mono case you do not need to supply this value. Default is 0.<br>
    *      In the stereo case it may be 0 or 1.
    *  @param
@@ -512,9 +512,9 @@ public:
 
   /*! @brief Stop all recordings
    *  @remarks
-   *		All VideoWriter structures are released. There is no possibiltiy to append another recording.<br>
-   *		If recording will be restarted without changing the recording filenames, the old files will be
-   *		overwritten
+   *    All VideoWriter structures are released. There is no possibiltiy to append another recording.<br>
+   *    If recording will be restarted without changing the recording filenames, the old files will be
+   *    overwritten
    */
   void stopRecording();
 
@@ -610,12 +610,12 @@ protected:
 
   /*! @brief Get information about the used device, i.e. the filename or the mount-point
    *
-   *		You have to implement this method in the derived class. Set the informations
-   *		about the channels there. This is the only true virtual function of the Grabberinterface.
+   *    You have to implement this method in the derived class. Set the informations
+   *    about the channels there. This is the only true virtual function of the Grabberinterface.
    *   @param channel
-   *		This is the index of the source you want the name of the source from.<br>
-   *		In the mono case you do not need to supply this value. Default is 0.<br>
-   *		In the stereo case it may be 0 or 1.
+   *    This is the index of the source you want the name of the source from.<br>
+   *    In the mono case you do not need to supply this value. Default is 0.<br>
+   *    In the stereo case it may be 0 or 1.
    *
    *   @remarks For Grabber developers<br>
    *       This is the only pure virtual member. It have to be implemented in derived class

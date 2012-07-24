@@ -202,7 +202,7 @@ void cedar::dev::robot::gl::KinematicChain::drawEndEffector()
   mTransformationTranspose = mpKinematicChain->getEndEffectorTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
   
-	// draw the joint
+  // draw the joint
   glColor4d(mColorR, mColorG, mColorB, 0);
   cedar::aux::gl::drawSphere(mJointRadius, mResolution, mResolution, mIsDrawnAsWireFrame);
 }

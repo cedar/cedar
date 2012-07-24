@@ -39,5 +39,5 @@
 #=======================================================================================================================
 
 if(CEDAR_USE_LIB_DC1394)
-	cedar_add_executable(fwCamInfo)
+  cedar_add_executable(fwCamInfo)
 endif(CEDAR_USE_LIB_DC1394)

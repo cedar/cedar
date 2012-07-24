@@ -10,8 +10,8 @@ parameters, or function calls in the expected way. For instance, given a class s
 class Robot
 {
   public:
-  	Robot();
-  	Robot(const std::string& name);
+    Robot();
+    Robot(const std::string& name);
     void setName(const std::string& name);
     const std::string& getName() const;
   private:

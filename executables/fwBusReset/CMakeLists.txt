@@ -39,6 +39,6 @@
 #=======================================================================================================================
 
 if(CEDAR_USE_LIB_DC1394)
-#	message(STATUS "Program fwBusReset added")
-	cedar_add_executable(fwBusReset)
+#  message(STATUS "Program fwBusReset added")
+  cedar_add_executable(fwBusReset)
 endif(CEDAR_USE_LIB_DC1394)

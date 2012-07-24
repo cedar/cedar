@@ -217,40 +217,40 @@ img.right figure.right {float: right; margin: 0 0 2em 2em;}
 img.left, figure.left {float: left; margin: 0 0 2em 2em;}
 
 /* Body */
-	body {
-		background: #F5F4EF url('../images/bg.png');
-		color: #000305;
-		font-size: 87.5%; /* Base font size: 14px */
-		font-family: 'Trebuchet MS', Trebuchet, 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-		line-height: 1.429;
-		margin: 0;
-		padding: 0;
-		text-align: left;
-	}
+  body {
+    background: #F5F4EF url('../images/bg.png');
+    color: #000305;
+    font-size: 87.5%; /* Base font size: 14px */
+    font-family: 'Trebuchet MS', Trebuchet, 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    line-height: 1.429;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+  }
 
 /* Headings */
-h2 {font-size: 1.571em; color: #ff9600}	/* 22px */
-h3 {font-size: 1.429em; color: #ff9600}	/* 20px */
-h4 {font-size: 1.286em}	/* 18px */
-h5 {font-size: 1.143em}	/* 16px */
-h6 {font-size: 1em}	    /* 14px */
+h2 {font-size: 1.571em; color: #ff9600}  /* 22px */
+h3 {font-size: 1.429em; color: #ff9600}  /* 20px */
+h4 {font-size: 1.286em}  /* 18px */
+h5 {font-size: 1.143em}  /* 16px */
+h6 {font-size: 1em}      /* 14px */
 
 h2, h3, h4, h5, h6 {
-	font-weight: 400;
-	line-height: 1.1;
-	margin-bottom: .8em;
+  font-weight: 400;
+  line-height: 1.1;
+  margin-bottom: .8em;
 }
 
 /* Anchors */
 a {outline: 0;}
 a img {border: 0px; text-decoration: none;}
 a:link, a:visited {
-	color: #ff9600;
-	padding: 0;
-	text-decoration: none;
+  color: #ff9600;
+  padding: 0;
+  text-decoration: none;
 }
 a:hover, a:active {
-	text-decoration: underline;
+  text-decoration: underline;
 }
 
 strong, b {font-weight: bold;}
@@ -261,13 +261,13 @@ em, i {font-style: italic;}
 
 /* Lists */
 ul {
-	list-style: outside disc;
-	margin: 1em 0 1.5em 1.5em;
+  list-style: outside disc;
+  margin: 1em 0 1.5em 1.5em;
 }
 
 ol {
-	list-style: outside decimal;
-	margin: 1em 0 1.5em 1.5em;
+  list-style: outside decimal;
+  margin: 1em 0 1.5em 1.5em;
 }
 
 dl {margin: 0 0 1.5em 0;}
@@ -283,25 +283,25 @@ q {}
 /* Tables */
 table {margin: .5em auto 1.5em auto; width: 98%;}
 
-	/* Thead */
-	thead th {padding: .5em .4em; text-align: left;}
-	thead td {}
+  /* Thead */
+  thead th {padding: .5em .4em; text-align: left;}
+  thead td {}
 
-	/* Tbody */
-	tbody td {padding: .5em .4em;}
-	tbody th {}
+  /* Tbody */
+  tbody td {padding: .5em .4em;}
+  tbody th {}
 
-	tbody .alt td {}
-	tbody .alt th {}
+  tbody .alt td {}
+  tbody .alt th {}
 
-	/* Tfoot */
-	tfoot th {}
-	tfoot td {}
+  /* Tfoot */
+  tfoot th {}
+  tfoot td {}
 
 /* HTML5 tags */
 header, section, footer,
 aside, nav, article, figure {
-	display: block;
+  display: block;
 }
 
 
@@ -309,10 +309,10 @@ aside, nav, article, figure {
 
 
 /*
-	Header
+  Header
 *****************/
 #banner {
-	margin: 0 auto;
+  margin: 0 auto;
   padding: 2.5em 0 0 0;
   width = 100%;
   background: none;
@@ -323,17 +323,17 @@ aside, nav, article, figure {
 #banner h1 a:link, #banner h1 a:visited {
   font-size: 95%;
   font-family: 'Signika', sans-serif;
-	color: #000305;
-	display: block;
-	font-weight: bold;
-	margin: 0 0 .6em .2em;
-	text-decoration: none;
-	width: 427px;
+  color: #000305;
+  display: block;
+  font-weight: bold;
+  margin: 0 0 .6em .2em;
+  text-decoration: none;
+  width: 427px;
 }
 #banner h1 a:hover, #banner h1 a:active {
-	background: none;
-	color: #C74350;
-	text-shadow: none;
+  background: none;
+  color: #C74350;
+  text-shadow: none;
 }
 
 #banner h1 strong {font-size: 0.36em; font-weight: normal;}
@@ -342,18 +342,18 @@ aside, nav, article, figure {
 
 /* Main Nav */
 #banner nav {
-	background: #000305;
-	font-size: 1.143em;
-	height: 30px;
-	line-height: 20px;
-	margin: 0 auto;
-	padding: 0;
-	text-align: center;
-	width: 800px;
+  background: #000305;
+  font-size: 1.143em;
+  height: 30px;
+  line-height: 20px;
+  margin: 0 auto;
+  padding: 0;
+  text-align: center;
+  width: 800px;
 
-	border-radius: 5px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
 }
 
 #banner nav ul {list-style: none; margin: 0 auto; width: 800px;}
@@ -361,33 +361,33 @@ aside, nav, article, figure {
 
 #banner nav a:link, #banner nav a:visited {
   font-family: 'Signika', sans-serif;
-	color: #fff;
-	display: inline-block;
-	height: 20px;
-	padding: 5px 1.5em;
-	text-decoration: none;
+  color: #fff;
+  display: inline-block;
+  height: 20px;
+  padding: 5px 1.5em;
+  text-decoration: none;
 }
 #banner nav a:hover, #banner nav a:active,
 #banner nav .active a:link, #banner nav .active a:visited {
-/*	background: #C74451; */
-	background: #ff9600;
-	color: #000305;
-	text-shadow: none !important;
+/*  background: #C74451; */
+  background: #ff9600;
+  color: #000305;
+  text-shadow: none !important;
 }
 
 #banner nav li:first-child a {
-	border-top-left-radius: 5px;
-	-moz-border-radius-topleft: 5px;
-	-webkit-border-top-left-radius: 5px;
+  border-top-left-radius: 5px;
+  -moz-border-radius-topleft: 5px;
+  -webkit-border-top-left-radius: 5px;
 
-	border-bottom-left-radius: 5px;
-	-moz-border-radius-bottomleft: 5px;
-	-webkit-border-bottom-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  -moz-border-radius-bottomleft: 5px;
+  -webkit-border-bottom-left-radius: 5px;
 }
 
 
 /*
-	Body
+  Body
 *****************/
 .box {
   width = 100%;
@@ -395,16 +395,16 @@ aside, nav, article, figure {
   overflow: hidden;
   background: #fff;
   margin-top: 1em;
-	
-	border-radius: 10px;
-	-moz-border-radius: 10px;
-	-webkit-border-radius: 10px;
+  
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
 }
 
 
 
 /*
-	Featured
+  Featured
 *****************/
 #featured img {display: block; float: right; border: none; margin: 0;}
 
@@ -412,16 +412,16 @@ aside, nav, article, figure {
 #featured h3 {font-size: 1.429em; margin-top: 0; margin-bottom: .5em;}
 
 #featured h3 a:link, #featured h3 a:visited {color: #000305; text-decoration: none;}
-#featured h3 a:hover, #featured h3 a:active {color: #000305; background: #ff9600; text-shadow: 1px 1px 1px #333; border-radius: 3px; -moz-border-radius: 3px;	-webkit-border-radius: 3px; }
+#featured h3 a:hover, #featured h3 a:active {color: #000305; background: #ff9600; text-shadow: 1px 1px 1px #333; border-radius: 3px; -moz-border-radius: 3px;  -webkit-border-radius: 3px; }
 
 
 #about {
-	color: #000302;
-	font-size: 0.9em;
-	height: 30px;
-	line-height: 29px;
-	padding: 0 20px;
-	text-align: right;
+  color: #000302;
+  font-size: 0.9em;
+  height: 30px;
+  line-height: 29px;
+  padding: 0 20px;
+  text-align: right;
 }
 
 
@@ -439,36 +439,36 @@ aside, nav, article, figure {
 }
 
 #doxygen dt {
-	font-weight: bold;
+  font-weight: bold;
 }
 
 #doxygen div.multicol {
-	-moz-column-gap: 1em;
-	-webkit-column-gap: 1em;
-	-moz-column-count: 3;
-	-webkit-column-count: 3;
+  -moz-column-gap: 1em;
+  -webkit-column-gap: 1em;
+  -moz-column-count: 3;
+  -webkit-column-count: 3;
 }
 
 #doxygen p.startli, #doxygen p.startdd, #doxygen p.starttd {
-	margin-top: 2px;
+  margin-top: 2px;
 }
 
 #doxygen p.endli {
-	margin-bottom: 0px;
+  margin-bottom: 0px;
 }
 
 #doxygen p.enddd {
-	margin-bottom: 4px;
+  margin-bottom: 4px;
 }
 
 #doxygen p.endtd {
-	margin-bottom: 2px;
+  margin-bottom: 2px;
 }
 
 /* @end */
 
 #doxygen caption {
-	font-weight: bold;
+  font-weight: bold;
 }
 
 #doxygen span.legend {
@@ -482,47 +482,47 @@ aside, nav, article, figure {
 }
 /*
 #doxygen div.qindex, div.navtab{
-	background-color: #EBEFF6;
-	border: 1px solid #A3B4D7;
-	text-align: center;
-	margin: 2px;
-	padding: 2px;
+  background-color: #EBEFF6;
+  border: 1px solid #A3B4D7;
+  text-align: center;
+  margin: 2px;
+  padding: 2px;
 }
 */
 #doxygen div.qindex, div.navpath {
-	width: 100%;
-	line-height: 140%;
+  width: 100%;
+  line-height: 140%;
 }
 
 #doxygen div.navtab {
-	margin-right: 15px;
+  margin-right: 15px;
 }
 
 /* @group Link Styling */
 
 #doxygen a {
-	color: #ff9600;
-	font-weight: normal;
-	text-decoration: none;
+  color: #ff9600;
+  font-weight: normal;
+  text-decoration: none;
 }
 
 #doxygen .contents a:visited {
-	color: #ff9600;
+  color: #ff9600;
 }
 
 #doxygen a:hover {
-	text-decoration: underline;
+  text-decoration: underline;
 }
 
 #doxygen a.qindex {
-	font-weight: bold;
+  font-weight: bold;
 }
 /*
 #doxygen a.qindexHL {
-	font-weight: bold;
-	background-color: #9CAFD4;
-	color: #ffffff;
-	border: 1px double #869DCA;
+  font-weight: bold;
+  background-color: #9CAFD4;
+  color: #ffffff;
+  border: 1px double #869DCA;
 }
 */
 #doxygen .contents a.qindexHL:visited {
@@ -530,252 +530,252 @@ aside, nav, article, figure {
 }
 
 #doxygen a.el {
-	font-weight: normal;
+  font-weight: normal;
 }
 
 #doxygen a.elRef {
 }
 
 #doxygen a.code {
-	color: #ff9600;
+  color: #ff9600;
 }
 
 #doxygen a.codeRef {
-	color: #ff9600;
+  color: #ff9600;
 }
 
 /* @end */
 
 #doxygen dl.el {
-	margin-left: -1cm;
+  margin-left: -1cm;
 }
 
 #doxygen .fragment {
-	font-family: monospace, fixed;
-	font-size: 105%;
+  font-family: monospace, fixed;
+  font-size: 105%;
 }
 
 #doxygen pre.fragment {
-	border: 1px solid #dedede;
-	background-color: #fdfcfb;
-	padding: 4px 6px;
-	margin: 4px 8px 4px 2px;
-	overflow: auto;
-	word-wrap: break-word;
-	font-size:  9pt;
-	line-height: 125%;
+  border: 1px solid #dedede;
+  background-color: #fdfcfb;
+  padding: 4px 6px;
+  margin: 4px 8px 4px 2px;
+  overflow: auto;
+  word-wrap: break-word;
+  font-size:  9pt;
+  line-height: 125%;
 }
 
 #doxygen div.ah {
-	background-color: black;
-	font-weight: bold;
-	color: #ffffff;
-	margin-bottom: 3px;
-	margin-top: 3px;
-	padding: 0.2em;
-	border: solid thin #333;
-	border-radius: 0.5em;
-	-webkit-border-radius: .5em;
-	-moz-border-radius: .5em;
-	-webkit-box-shadow: 2px 2px 3px #999;
-	-moz-box-shadow: rgba(0, 0, 0, 0.15) 2px 2px 2px;
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#000305),color-stop(0.3, #444));
-	background-image: -moz-linear-gradient(center top, #eee 0%, #444 40%, #000305);
+  background-color: black;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 3px;
+  margin-top: 3px;
+  padding: 0.2em;
+  border: solid thin #333;
+  border-radius: 0.5em;
+  -webkit-border-radius: .5em;
+  -moz-border-radius: .5em;
+  -webkit-box-shadow: 2px 2px 3px #999;
+  -moz-box-shadow: rgba(0, 0, 0, 0.15) 2px 2px 2px;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#000305),color-stop(0.3, #444));
+  background-image: -moz-linear-gradient(center top, #eee 0%, #444 40%, #000305);
 }
 
 #doxygen div.groupHeader {
-	margin-left: 16px;
-	margin-top: 12px;
-	margin-bottom: 6px;
-	font-weight: bold;
+  margin-left: 16px;
+  margin-top: 12px;
+  margin-bottom: 6px;
+  font-weight: bold;
 }
 
 #doxygen div.groupText {
-	margin-left: 16px;
-	font-style: italic;
+  margin-left: 16px;
+  font-style: italic;
 }
 
 #doxygen body {
-	background: white;
-	color: black;
+  background: white;
+  color: black;
         margin: 0;
 }
 
 #doxygen div.contents {
-	margin-top: 10px;
-	margin-left: 10px;
-	margin-right: 10px;
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 #doxygen td.indexkey {
-	font-weight: bold;
-	border: 1px solid #e4e3de;
-	border-left: 0px;
+  font-weight: bold;
+  border: 1px solid #e4e3de;
+  border-left: 0px;
   border-right: 0px;
-	margin: 2px 0px 2px 0;
-	padding: 2px 10px;
+  margin: 2px 0px 2px 0;
+  padding: 2px 10px;
 }
 
 #doxygen td.indexvalue {
-	background: none;
-	border: 1px solid #e4e3de;
-	border-left: 0px;
-	border-right: 0px;
-	padding: 2px 10px;
-	margin: 2px 0px;
+  background: none;
+  border: 1px solid #e4e3de;
+  border-left: 0px;
+  border-right: 0px;
+  padding: 2px 10px;
+  margin: 2px 0px;
 }
 
 #doxygen tr.memlist {
-	background-color: #EEF1F7;
+  background-color: #EEF1F7;
 }
 
 #doxygen p.formulaDsp {
-	text-align: center;
+  text-align: center;
 }
 
 #doxygen img.formulaDsp {
-	
+  
 }
 
 #doxygen img.formulaInl {
-	vertical-align: middle;
+  vertical-align: middle;
 }
 
 #doxygen div.center {
-	text-align: center;
+  text-align: center;
         margin-top: 0px;
         margin-bottom: 0px;
         padding: 0px;
 }
 
 #doxygen div.center img {
-	border: 0px;
+  border: 0px;
 }
 
 #doxygen address.footer {
-	text-align: right;
-	padding-right: 12px;
+  text-align: right;
+  padding-right: 12px;
 }
 
 #doxygen img.footer {
-	border: 0px;
-	vertical-align: middle;
+  border: 0px;
+  vertical-align: middle;
 }
 
 /* @group Code Colorization */
 
 #doxygen span.keyword {
-	color: #008000
+  color: #008000
 }
 
 #doxygen span.keywordtype {
-	color: #604020
+  color: #604020
 }
 
 #doxygen span.keywordflow {
-	color: #e08000
+  color: #e08000
 }
 
 #doxygen span.comment {
-	color: #800000
+  color: #800000
 }
 
 #doxygen span.preprocessor {
-	color: #806020
+  color: #806020
 }
 
 #doxygen span.stringliteral {
-	color: #002080
+  color: #002080
 }
 
 #doxygen span.charliteral {
-	color: #008080
+  color: #008080
 }
 
 #doxygen span.vhdldigit { 
-	color: #ff00ff 
+  color: #ff00ff 
 }
 
 #doxygen span.vhdlchar { 
-	color: #000000 
+  color: #000000 
 }
 
 #doxygen span.vhdlkeyword { 
-	color: #700070 
+  color: #700070 
 }
 
 #doxygen span.vhdllogic { 
-	color: #ff0000 
+  color: #ff0000 
 }
 
 /* @end */
 
 /*
 .search {
-	color: #003399;
-	font-weight: bold;
+  color: #003399;
+  font-weight: bold;
 }
 
 form.search {
-	margin-bottom: 0px;
-	margin-top: 0px;
+  margin-bottom: 0px;
+  margin-top: 0px;
 }
 
 input.search {
-	font-size: 75%;
-	color: #000080;
-	font-weight: normal;
-	background-color: #e8eef2;
+  font-size: 75%;
+  color: #000080;
+  font-weight: normal;
+  background-color: #e8eef2;
 }
 */
 
 #doxygen td.tiny {
-	font-size: 75%;
+  font-size: 75%;
 }
 
 #doxygen .dirtab {
-	padding: 4px;
-	border-collapse: collapse;
-	border: 1px solid #A3B4D7;
+  padding: 4px;
+  border-collapse: collapse;
+  border: 1px solid #A3B4D7;
 }
 
 #doxygen th.dirtab {
-	background: #EBEFF6;
-	font-weight: bold;
+  background: #EBEFF6;
+  font-weight: bold;
 }
 
 #doxygen hr {
-	height: 0px;
-	border: none;
-	border-top: 1px solid #e4e3de;
+  height: 0px;
+  border: none;
+  border-top: 1px solid #e4e3de;
 }
 
 #doxygen hr.footer {
-	height: 1px;
+  height: 1px;
 }
 
 /* @group Member Descriptions */
 
 #doxygen table.memberdecls {
-	border-spacing: 0px;
-	padding: 0px;
+  border-spacing: 0px;
+  padding: 0px;
 }
 
 #doxygen .mdescLeft, #doxygen .mdescRight,
 #doxygen .memItemLeft, #doxygen .memItemRight,
 #doxygen .memTemplItemLeft, #doxygen .memTemplItemRight, #doxygen .memTemplParams {
-	border: none;
-	margin: 4px;
-	padding: 1px 0 0 8px;
+  border: none;
+  margin: 4px;
+  padding: 1px 0 0 8px;
 }
 
 #doxygen .mdescLeft, #doxygen .mdescRight {
-	padding: 0px 8px 4px 8px;
-	color: #555;
+  padding: 0px 8px 4px 8px;
+  color: #555;
 }
 
 #doxygen .memItemLeft, #doxygen .memItemRight, #doxygen .memTemplParams {
-	border-top: 1px solid #e4e3de;
+  border-top: 1px solid #e4e3de;
 }
 
 #doxygen .memItemLeft, #doxygen .memTemplItemLeft {
@@ -783,7 +783,7 @@ input.search {
 }
 
 #doxygen .memTemplParams {
-	color: #4665A2;
+  color: #4665A2;
         white-space: nowrap;
 }
 
@@ -794,24 +794,24 @@ input.search {
 /* Styles for detailed member documentation */
 
 #doxygen .memtemplate {
-	font-size: 80%;
-	color: #4665A2;
-	font-weight: normal;
-	margin-left: 3px;
+  font-size: 80%;
+  color: #4665A2;
+  font-weight: normal;
+  margin-left: 3px;
 }
 
 #doxygen .memnav {
-	background-color: #EBEFF6;
-	border: 1px solid #A3B4D7;
-	text-align: center;
-	margin: 2px;
-	margin-right: 15px;
-	padding: 2px;
+  background-color: #EBEFF6;
+  border: 1px solid #A3B4D7;
+  text-align: center;
+  margin: 2px;
+  margin-right: 15px;
+  padding: 2px;
 }
 
 #doxygen .memitem {
-	padding: 0;
-	margin-bottom: 10px;
+  padding: 0;
+  margin-bottom: 10px;
 }
 
 #doxygen .memname {
@@ -856,19 +856,19 @@ input.search {
 }
 
 #doxygen .paramkey {
-	text-align: right;
+  text-align: right;
 }
 
 #doxygen .paramtype {
-	white-space: nowrap;
+  white-space: nowrap;
 }
 
 #doxygen .paramname {
-	color: #602020;
-	white-space: nowrap;
+  color: #602020;
+  white-space: nowrap;
 }
 #doxygen .paramname em {
-	font-style: normal;
+  font-style: normal;
 }
 
 /* @end */
@@ -878,22 +878,22 @@ input.search {
 /* for the tree view */
 
 #doxygen .ftvtree {
-	font-family: sans-serif;
-	margin: 0px;
+  font-family: sans-serif;
+  margin: 0px;
 }
 
 /* these are for tree view when used as main index */
 
 #doxygen .directory {
-	font-size: 9pt;
-	font-weight: bold;
-	margin: 5px;
+  font-size: 9pt;
+  font-weight: bold;
+  margin: 5px;
 }
 
 #doxygen .directory h3 {
-	margin: 0px;
-	margin-top: 1em;
-	font-size: 11pt;
+  margin: 0px;
+  margin-top: 1em;
+  font-size: 11pt;
 }
 
 /*
@@ -905,62 +905,62 @@ proper pixel height of your image.
 
 /*
 .directory h3.swap {
-	height: 61px;
-	background-repeat: no-repeat;
-	background-image: url("yourimage.gif");
+  height: 61px;
+  background-repeat: no-repeat;
+  background-image: url("yourimage.gif");
 }
 .directory h3.swap span {
-	display: none;
+  display: none;
 }
 */
 
 #doxygen .directory > h3 {
-	margin-top: 0;
+  margin-top: 0;
 }
 
 #doxygen .directory p {
-	margin: 0px;
-	white-space: nowrap;
+  margin: 0px;
+  white-space: nowrap;
 }
 
 #doxygen .directory div {
-	display: none;
-	margin: 0px;
+  display: none;
+  margin: 0px;
 }
 
 #doxygen .directory img {
-	vertical-align: -30%;
+  vertical-align: -30%;
 }
 
 /* these are for tree view when not used as main index */
 
 #doxygen .directory-alt {
-	font-size: 100%;
-	font-weight: bold;
+  font-size: 100%;
+  font-weight: bold;
 }
 
 #doxygen .directory-alt h3 {
-	margin: 0px;
-	margin-top: 1em;
-	font-size: 11pt;
+  margin: 0px;
+  margin-top: 1em;
+  font-size: 11pt;
 }
 
 #doxygen .directory-alt > h3 {
-	margin-top: 0;
+  margin-top: 0;
 }
 
 #doxygen .directory-alt p {
-	margin: 0px;
-	white-space: nowrap;
+  margin: 0px;
+  white-space: nowrap;
 }
 
 #doxygen .directory-alt div {
-	display: none;
-	margin: 0px;
+  display: none;
+  margin: 0px;
 }
 
 #doxygen .directory-alt img {
-	vertical-align: -30%;
+  vertical-align: -30%;
 }
 
 /* @end */
@@ -970,66 +970,66 @@ proper pixel height of your image.
 }
 
 #doxygen address {
-	font-style: normal;
-	color: #2A3D61;
+  font-style: normal;
+  color: #2A3D61;
 }
 
 #doxygen table.doxtable {
-	border-collapse:collapse;
+  border-collapse:collapse;
 }
 
 #doxygen table.doxtable td, #doxygen table.doxtable th {
-	border: 1px solid #2D4068;
-	padding: 3px 7px 2px;
+  border: 1px solid #2D4068;
+  padding: 3px 7px 2px;
 }
 
 #doxygen table.doxtable th {
-	background-color: #374F7F;
-	color: #FFFFFF;
-	font-size: 110%;
-	padding-bottom: 4px;
-	padding-top: 5px;
-	text-align:left;
+  background-color: #374F7F;
+  color: #FFFFFF;
+  font-size: 110%;
+  padding-bottom: 4px;
+  padding-top: 5px;
+  text-align:left;
 }
 
 #doxygen .tabsearch {
-	top: 0px;
-	left: 10px;
-	height: 36px;
-	background-image: url('tab_b.png');
-	z-index: 101;
-	overflow: hidden;
-	font-size: 13px;
+  top: 0px;
+  left: 10px;
+  height: 36px;
+  background-image: url('tab_b.png');
+  z-index: 101;
+  overflow: hidden;
+  font-size: 13px;
 }
 
 #doxygen .navpath ul
 {
-	font-size: 11px;
-	height:30px;
-	line-height:30px;
-	color:#8AA0CC;
-	border:solid 1px #e4e3de;
-	overflow:hidden;
-	margin:0px;
-	padding:0px;
+  font-size: 11px;
+  height:30px;
+  line-height:30px;
+  color:#8AA0CC;
+  border:solid 1px #e4e3de;
+  overflow:hidden;
+  margin:0px;
+  padding:0px;
 }
 
 #doxygen .navpath li
 {
-	list-style-type:none;
-	float:left;
-	padding-left:10px;
-	padding-right: 15px;
-	background-position:right;
-	color: #000305;
+  list-style-type:none;
+  float:left;
+  padding-left:10px;
+  padding-right: 15px;
+  background-position:right;
+  color: #000305;
 }
 
 #doxygen .navpath a
 {
-	height:32px;
-	display:block;
-	text-decoration: none;
-	outline: none;
+  height:32px;
+  display:block;
+  text-decoration: none;
+  outline: none;
 }
 
 #doxygen .navpath a:hover
@@ -1039,16 +1039,16 @@ proper pixel height of your image.
 
 #doxygen div.summary
 {
-	float: right;
-	font-size: 8pt;
-	padding-right: 5px;
-	width: 50%;
-	text-align: right;
+  float: right;
+  font-size: 8pt;
+  padding-right: 5px;
+  width: 50%;
+  text-align: right;
 }       
 
 #doxygen div.summary a
 {
-	white-space: nowrap;
+  white-space: nowrap;
 }
 
 
