@@ -41,7 +41,8 @@
 #include <iostream>
 
 //!@brief threaded test class
-class MyTestThread : public cedar::aux::LoopedThread {
+class MyTestThread : public cedar::aux::LoopedThread
+{
 
 private:
 
@@ -89,9 +90,69 @@ public:
 
 };
 
+class CountingThread : public cedar::aux::LoopedThread
+{
+  public:
+    //!@brief constructor
+    CountingThread
+    (
+      double stepSize,
+      double idleTime,
+      double simulatedTime,
+      cedar::aux::LoopMode::Id mode
+    )
+    :
+    cedar::aux::LoopedThread(stepSize, idleTime, simulatedTime, mode),
+    mCounter(0)
+    {
+    }
+
+    void step(double /* time */)
+    {
+      ++mCounter;
+      usleep(100);
+    }
+
+
+    unsigned int mCounter;
+};
+
+
+int testConfiguration
+    (
+      double stepSize,
+      double idleTime,
+      double simulatedTime,
+      cedar::aux::LoopMode::Id mode
+    )
+{
+  int errors = 0;
+
+  CountingThread thread(stepSize, idleTime, simulatedTime, mode);
+
+  thread.start();
+  thread.wait(1000);
+  // the thread should at least run for two iterations
+  if (thread.mCounter < 2)
+  {
+    std::cout << "ERROR: the thread didn't iterate often enough." << std::endl;
+    ++errors;
+  }
+  thread.stop();
+  thread.wait(1000);
+  if (thread.isRunning())
+  {
+    std::cout << "ERROR: the thread didn't exit properly." << std::endl;
+    ++errors;
+  }
+
+  return errors;
+}
+
 
 int main()
 {
+  int errors = 0;
 
   double timeInterval = 100.0;  // milliseconds
   MyTestThread thread(timeInterval);
@@ -121,5 +182,9 @@ int main()
   std::cout << "Stopping thread ..." << std::endl;
   thread.stop();
 
-  return 0;
+  errors += testConfiguration(0.0, 0.01, 1, cedar::aux::LoopMode::Fixed);
+
+  std::cout << "Test finished, there were " << errors << " error(s)." << std::endl;
+
+  return errors;
 }
