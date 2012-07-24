@@ -117,7 +117,7 @@ void cedar::aux::LoopedThread::stop(unsigned int time, bool suppressWarning)
   return;
 }
 
-void cedar::aux::LoopedThread::run(void)
+void cedar::aux::LoopedThread::run()
 {
   // we do not want to change the step size while running
   boost::posix_time::time_duration step_size
@@ -155,10 +155,22 @@ void cedar::aux::LoopedThread::run(void)
     }
     case cedar::aux::LoopMode::Fixed:
     {
+      if (step_size.total_milliseconds() == 0)
+      {
+        //!@todo We may want to just prevent setting this value
+        cedar::aux::LogSingleton::getInstance()->warning
+        (
+          "Step size is zero in cedar::aux::LoopMode::Fixed, defaulting to one millisecond.",
+          "cedar::aux::LoopedThread::run()"
+        );
+        step_size = boost::posix_time::milliseconds(1);
+      }
+
       // initialization
       mLastTimeStepStart = boost::posix_time::microsec_clock::universal_time();
-      mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
+      mLastTimeStepEnd = mLastTimeStepStart;
       boost::posix_time::ptime scheduled_wakeup = mLastTimeStepEnd + step_size;
+      //!@todo Should this really be here?
       srand(boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds());
 
       // some auxiliary variables
