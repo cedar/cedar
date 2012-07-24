@@ -51,8 +51,8 @@
 /*! @class cedar::dev::sensors::visual::PictureGrabber
  *  @brief This grabber grabs images from a picture-file
  *  @remarks This functionality is implemented by using the OpenCV class
- *		cv::ImRead. See their documentation for details about
- *		supported image types.
+ *    cv::ImRead. See their documentation for details about
+ *    supported image types.
  */
 class cedar::dev::sensors::visual::PictureGrabber
 :
@@ -121,7 +121,7 @@ public:
 public:
 
   /*! @brief  Constructor for a single-file grabber
-   *  @param pictureFileName	Filename to grab from
+   *  @param pictureFileName  Filename to grab from
    */
   PictureGrabber
   (
@@ -129,8 +129,8 @@ public:
   );
 
   /*! @brief Constructor for a stereo-file grabber
-   *  @param pictureFileName0	Filename to grab from for channel 0
-   *  @param pictureFileName1	Filename to grab from for channel 1
+   *  @param pictureFileName0  Filename to grab from for channel 0
+   *  @param pictureFileName1  Filename to grab from for channel 1
    */
   PictureGrabber
   (
@@ -148,8 +148,8 @@ public:
 
   /*! @brief Set a new picture to grab from
    *  @remarks
-   *	Supported image-types depend on operating system and installed libs. <br>
-   *	For details look at the OpenCV-documentation (Section "imread").
+   *  Supported image-types depend on operating system and installed libs. <br>
+   *  For details look at the OpenCV-documentation (Section "imread").
    *  @param channel which should be changed.
    *  @param fileName of the new picture.
    *  @throws IndexOutOfRangeException If channel isn't fit

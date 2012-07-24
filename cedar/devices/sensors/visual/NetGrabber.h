@@ -50,11 +50,11 @@
 #define SHOW_INIT_INFORMATION_NETGRABBER
 
 /*! @class cedar::dev::sensors::visual::NetGrabber
- *	@brief This grabber grabs images from a yarp-server located somewhere in the network
+ *  @brief This grabber grabs images from a yarp-server located somewhere in the network
  *
  *   This functionality is implemented by using the
- *		cedar::aux::net::NetWriter and
- *		cedar::aux::net::NetReader classes.
+ *    cedar::aux::net::NetWriter and
+ *    cedar::aux::net::NetReader classes.
  */
 
 class cedar::dev::sensors::visual::NetGrabber

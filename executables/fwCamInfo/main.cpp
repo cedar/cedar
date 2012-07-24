@@ -166,6 +166,6 @@ int main(int argc, char *argv[])
   //cleanup
   fw_interface.closeCamera();
 
-	return 0;
+  return 0;
 }
 #endif //CEDAR_USE_LIB_DC1394

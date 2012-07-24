@@ -102,7 +102,7 @@ void cedar::aux::LocalCoordinateFrame::readConfiguration(const cedar::aux::Confi
   mTransformation.at<double>(1, 2) = _mInitialRotation->at(5);
   mTransformation.at<double>(2, 0) = _mInitialRotation->at(6);
   mTransformation.at<double>(2, 1) = _mInitialRotation->at(7);
-  mTransformation.at<double>(2, 2) = _mInitialRotation->at(8);	
+  mTransformation.at<double>(2, 2) = _mInitialRotation->at(8);
 }
 
 cv::Mat cedar::aux::LocalCoordinateFrame::getTranslation() const

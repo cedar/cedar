@@ -53,7 +53,7 @@
  *  @brief This grabber grabs images from video-files
  *
  *    This grabber will grab from all video-files known by OpenCV and/or ffmpeg
- *		Please look at their documentation for supported types (i.e. mpg, avi, ogg,...)
+ *    Please look at their documentation for supported types (i.e. mpg, avi, ogg,...)
  */
 class cedar::dev::sensors::visual::VideoGrabber
 :
@@ -166,19 +166,19 @@ public:
   /*! @brief Set the factor for grabbing speed
    *
    *   The speed stored in the AVI-File will be multiplied with this factor.<br>
-   *		Effective FPS should be SpeedFactor*AVI-Speed<br>
+   *    Effective FPS should be SpeedFactor*AVI-Speed<br>
    *  @remarks
-   *		The grabber thread have to be restarted to take setLooped effect.<br>
-   *		This is done internally (by calling setFPS), but keep that in mind.
+   *    The grabber thread have to be restarted to take setLooped effect.<br>
+   *    This is done internally (by calling setFPS), but keep that in mind.
    *  @see
-   *		setFPS
+   *    setFPS
    */
   void setSpeedFactor(double speedFactor);
 
   /*! @brief Get the factor for grabbing speed
    *
    *    The speed stored in the AVI-File will be multiplied with this factor
-   *		so effective FPS should be _mSpeedFactor*AVI-Speed
+   *    so effective FPS should be _mSpeedFactor*AVI-Speed
    */
   double getSpeedFactor() const;
 
@@ -209,8 +209,8 @@ public:
 
   /*! @brief Get the count of frames in the AVI
    *
-   *		In the case of a stereo grabber and different length,
-   *		the shortest avi-file determine the length
+   *    In the case of a stereo grabber and different length,
+   *    the shortest avi-file determine the length
    */
   unsigned int getFrameCount() const;
 
@@ -219,7 +219,7 @@ public:
    *  With this Method, it is possible to get Information on any channel.
    *  @param channel This is the index of the source you want parameter value.< br >
    *  @param propId This is any supported property - Id<br>
-   *	  If property-id is not supported or unknown, return value will be 0
+   *    If property-id is not supported or unknown, return value will be 0
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    *
    *  @remarks Look at the OpenCV documentation for VideoCapture::get() for details
@@ -313,9 +313,9 @@ protected:
   
   /*! @brief Count of frames of the shortest file
    *
-   *		Used for scrolling in the avi-file
+   *    Used for scrolling in the avi-file
    *  @see
-   *		setPositionRelative, getPositionRelative, setPositionAbsolute, setPositionRelative
+   *    setPositionRelative, getPositionRelative, setPositionAbsolute, setPositionRelative
    */
   unsigned int mFramesCount;
 
