@@ -38,9 +38,11 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_NAMESPACE_H
 #define CEDAR_DEV_SENSORS_VISUAL_NAMESPACE_H
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
 #include "cedar/devices/lib.h"
-#include "cedar/configuration.h"   // MAKE FIREWIRE and YARP OPTIONAL
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -61,18 +63,14 @@ namespace cedar
       //! \brief Namespace for all visual sensors like cameras or camera-dummies (i.e. avi-file, picture)
       namespace visual
       {
-        //-----------------------------------------------------------------------------------------------
-        // interface classes
-        //-----------------------------------------------------------------------------------------------
-        CEDAR_DECLARE_DEV_CLASS(Grabbable);
+
+        //!@cond SKIPPED_DOCUMENTATION
 
         //-----------------------------------------------------------------------------------------------
         // grabber classes
         //-----------------------------------------------------------------------------------------------
 
-        //!@cond SKIPPED_DOCUMENTATION
-
-        //common interface class
+        //common base class for all grabbers
         CEDAR_DECLARE_DEV_CLASS(Grabber);
         
         //grabber
@@ -80,35 +78,44 @@ namespace cedar
         CEDAR_DECLARE_DEV_CLASS(PictureGrabber);
         CEDAR_DECLARE_DEV_CLASS(TestGrabber);
         CEDAR_DECLARE_DEV_CLASS(GLGrabber);
-        CEDAR_DECLARE_DEV_CLASS(InterfaceGrabber);
-
-#ifdef CEDAR_USE_LIB_DC1394
+        CEDAR_DECLARE_DEV_CLASS(GrabbableGrabber);
         CEDAR_DECLARE_DEV_CLASS(CameraGrabber);
-#endif // CEDAR_USE_LIB_DC1394
 
 #ifdef CEDAR_USE_YARP
         CEDAR_DECLARE_DEV_CLASS(NetGrabber);
 #endif // CEDAR_USE_YARP
 
         //-----------------------------------------------------------------------------------------------
-        // helper classes
+        // camera grabber helper classes
         //-----------------------------------------------------------------------------------------------
-        
-        //enum classes for camera
+
+        //backend implementation
+        CEDAR_DECLARE_DEV_CLASS(CameraDevice);
+        CEDAR_DECLARE_DEV_CLASS(CameraDeviceVfl);
+        CEDAR_DECLARE_DEV_CLASS(CameraDeviceCvVideoCaputre);
+
 #ifdef CEDAR_USE_LIB_DC1394
+        CEDAR_DECLARE_DEV_CLASS(CameraDeviceDc1394);
+#endif
+        //enum classes
+        CEDAR_DECLARE_DEV_CLASS(RecordingFormat);
+
+        //enum classes for camera
         CEDAR_DECLARE_DEV_CLASS(CameraFrameRate);
         CEDAR_DECLARE_DEV_CLASS(CameraProperty);
         CEDAR_DECLARE_DEV_CLASS(CameraVideoMode);
         CEDAR_DECLARE_DEV_CLASS(CameraSetting);
+        CEDAR_DECLARE_DEV_CLASS(CameraBackendType);
+        CEDAR_DECLARE_DEV_CLASS(CameraDebayerPattern);
         CEDAR_DECLARE_DEV_CLASS(CameraIsoSpeed);
-#endif //CEDAR_USE_LIB_DC1394
+
+
+       // CEDAR_DECLARE_DEV_CLASS(CameraStateAndConfig);
+        CEDAR_DECLARE_DEV_CLASS(CameraState);
+        CEDAR_DECLARE_DEV_CLASS(CameraCapabilities);
+        CEDAR_DECLARE_DEV_CLASS(CameraSettings);
 
 #ifdef CEDAR_USE_LIB_DC1394
-        //misc helper classes for firewire
-        CEDAR_DECLARE_DEV_CLASS(CameraStateAndConfig);
-        CEDAR_DECLARE_DEV_CLASS(CameraCapabilities);
-        CEDAR_DECLARE_DEV_CLASS(CameraConfig);
-
         //firewire related base class for the grabbertools
         CEDAR_DECLARE_CLASS(LibDcCameraBase);
 #endif // CEDAR_USE_LIB_DC1394

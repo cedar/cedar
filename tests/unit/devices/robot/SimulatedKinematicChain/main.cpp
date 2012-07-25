@@ -52,22 +52,22 @@ int main()
   
   // create instance of test class
   std::cout << "reading kinematic chain from configuration file ..." << std::endl;
-  cedar::dev::robot::SimulatedKinematicChain test_arm("test.conf");
-  test_arm.readJson("test_arm.json");
+  cedar::dev::robot::SimulatedKinematicChainPtr test_arm(new cedar::dev::robot::SimulatedKinematicChain());
+  test_arm->readJson("test_arm.json");
   
   //--------------------------------------------------------------------------------------------------------------------
   // single angle
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: single angle functions" << std::endl;
-  test_arm.setJointAngle(0, 1);
-  test_arm.setJointAngle(1, 2.0);
-  test_arm.setJointAngle(2, cedar::aux::math::pi/2);
-  test_arm.setJointAngle(3, sqrt(2.0));
+  test_arm->setJointAngle(0, 1);
+  test_arm->setJointAngle(1, 2.0);
+  test_arm->setJointAngle(2, cedar::aux::math::pi/2);
+  test_arm->setJointAngle(3, sqrt(2.0));
   if (
-      !IsZero(test_arm.getJointAngle(0) - 1.0)
-      || !IsZero(test_arm.getJointAngle(1) - 2.0)
-      || !IsZero(test_arm.getJointAngle(2) - cedar::aux::math::pi/2.0)
-      || !IsZero(test_arm.getJointAngle(3) - sqrt(2.0))
+      !IsZero(test_arm->getJointAngle(0) - 1.0)
+      || !IsZero(test_arm->getJointAngle(1) - 2.0)
+      || !IsZero(test_arm->getJointAngle(2) - cedar::aux::math::pi/2.0)
+      || !IsZero(test_arm->getJointAngle(3) - sqrt(2.0))
       )
   {
     errors++;
@@ -83,12 +83,12 @@ int main()
   angle_vector.push_back(1.5);
   angle_vector.push_back(2.5);
   angle_vector.push_back(3.5);
-  test_arm.setJointAngles(angle_vector);
+  test_arm->setJointAngles(angle_vector);
   if (
-      !IsZero(test_arm.getJointAngles()[0] - 0.5)
-      || !IsZero(test_arm.getJointAngles()[1] - 1.5)
-      || !IsZero(test_arm.getJointAngles()[2] - 2.5)
-      || !IsZero(test_arm.getJointAngles()[3] - 3.5)
+      !IsZero(test_arm->getJointAngles()[0] - 0.5)
+      || !IsZero(test_arm->getJointAngles()[1] - 1.5)
+      || !IsZero(test_arm->getJointAngles()[2] - 2.5)
+      || !IsZero(test_arm->getJointAngles()[3] - 3.5)
       )
   {
     errors++;
@@ -104,12 +104,12 @@ int main()
   angle_matrix.at<double>(1, 0) = 0.2;
   angle_matrix.at<double>(2, 0) = 0.3;
   angle_matrix.at<double>(3, 0) = 0.4;
-  test_arm.setJointAngles(angle_matrix);
+  test_arm->setJointAngles(angle_matrix);
   if (
-      !IsZero(test_arm.getJointAnglesMatrix().at<double>(0, 0) - 0.1)
-      || !IsZero(test_arm.getJointAnglesMatrix().at<double>(1, 0) - 0.2)
-      || !IsZero(test_arm.getJointAnglesMatrix().at<double>(2, 0) - 0.3)
-      || !IsZero(test_arm.getJointAnglesMatrix().at<double>(3, 0) - 0.4)
+      !IsZero(test_arm->getJointAnglesMatrix().at<double>(0, 0) - 0.1)
+      || !IsZero(test_arm->getJointAnglesMatrix().at<double>(1, 0) - 0.2)
+      || !IsZero(test_arm->getJointAnglesMatrix().at<double>(2, 0) - 0.3)
+      || !IsZero(test_arm->getJointAnglesMatrix().at<double>(3, 0) - 0.4)
       )
   {
     errors++;

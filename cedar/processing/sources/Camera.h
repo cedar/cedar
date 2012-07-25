@@ -72,6 +72,8 @@ public:
   //!@brief The standard constructor.
   Camera();
 
+  //!@brief Destructor
+//  virtual ~Camera(){};
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -102,23 +104,23 @@ protected:
 private:
   void compute(const cedar::proc::Arguments&);
   void onStart();
-  void onCreateGrabber();
+  //void onCreateGrabber();
 
   //!@brief Cast the base GrabberBasePtr to derived class CameraGrabberPtr
-  inline cedar::dev::sensors::visual::CameraGrabberPtr getGrabber()
+  inline cedar::dev::sensors::visual::CameraGrabberPtr getCameraGrabber()
   {
     return boost::static_pointer_cast<cedar::dev::sensors::visual::CameraGrabber>
            (
-             this->cedar::proc::sources::GrabberBase::mGrabber
+             this->cedar::proc::sources::GrabberBase::mpGrabber
            );
   }
 
   //!@brief Cast the base GrabberBasePtr to derived class CameraGrabberPtr
-  inline cedar::dev::sensors::visual::ConstCameraGrabberPtr getGrabber() const
+  inline cedar::dev::sensors::visual::ConstCameraGrabberPtr getCameraGrabber() const
   {
     return boost::static_pointer_cast<const cedar::dev::sensors::visual::CameraGrabber>
            (
-            cedar::proc::sources::GrabberBase::mGrabber
+            cedar::proc::sources::GrabberBase::mpGrabber
            );
   }
 
@@ -135,6 +137,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 
 private:
   //!@ Bayer conversion from the camera image

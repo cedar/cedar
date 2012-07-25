@@ -34,12 +34,18 @@
 
 ======================================================================================================================*/
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 #ifndef CEDAR_AUX_LOOPED_THREAD_H
 #define CEDAR_AUX_LOOPED_THREAD_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/LoopMode.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -85,9 +91,9 @@
  * all step functions consecutively and also pass measured time to each step function
  * to fulfill real-time constraints.
  *
- * \todo fill in doxygen comments for all member variables
+ * \todo Use units instead of doubles
  */
-class cedar::aux::LoopedThread : public cedar::aux::ConfigurationInterface,
+class cedar::aux::LoopedThread : virtual public cedar::aux::Configurable,
                                  public QThread
 {
   //----------------------------------------------------------------------------
@@ -108,35 +114,16 @@ public:
    *
    * @param stepSize time window for each step function in milliseconds
    * @param idleTime idle time (in milliseconds) used in fast running mode (i.e. stepSize = 0)
-   * @param configFileName an optional configuration file for reading and writing thread configurations
+   * @param simulatedTime a fixed time that is sent to all connected Triggerables regardless of real execution time
+   * @param mode the operational mode of this trigger
    */
-  LoopedThread(double stepSize = 1.0, double idleTime = 0.001, const std::string& configFileName = "");
-
-  /*!@brief Constructor with configuration file parameter.
-   *
-   * This constructor creates a LoopedThread with parameters taken from a
-   * configuration file.
-   *
-   * In the configuration file the parameter names are the following:
-   *
-   * threadStepSize, threadIdleTime, threadUseFixedStepSize, threadSimulatedTime
-   *
-   * @param configFileName an optional configuration file for reading and writing thread configurations
-   */
-  LoopedThread(const std::string& configFileName);
-
-  /*!@brief Constructor with configuration file parameter.
-   *
-   * This constructor creates a LoopedThread with parameters taken from a
-   * configuration file.
-   *
-   * In the configuration file the parameter names are the following:
-   *
-   * threadStepSize, threadIdleTime, threadUseFixedStepSize, threadSimulatedTime
-   *
-   * @param pConfigFileName an optional configuration file for reading and writing thread configurations
-   */
-  LoopedThread(const char* pConfigFileName);
+  LoopedThread
+  (
+    double stepSize = 1.0,
+    double idleTime = 0.01,
+    double simulatedTime = 1.0,
+    cedar::aux::EnumId mode = cedar::aux::LoopMode::Fixed
+  );
 
   //!@brief Destructor
   virtual ~LoopedThread();
@@ -185,24 +172,7 @@ public:
    *
    * @param idleTime the new idle time in milliseconds
    */
-  void setIdleTime(double idleTime = 0.001);
-
-  /*!@brief Decide if a fixed step size is used in cases of delay.
-   *
-   * Depending on whether a fixed step size is used or not, LoopedThread
-   * behaves differently in cases where the system is not fast enough for the
-   * desired step size. If useFixedStepSize = true (default) and a scheduled
-   * execution of step() was missed, then a complete time step is skipped and
-   * LoopedThread tries to wake up for the next time step. By this, all time
-   * steps are executed on a predictable time. If useFixedStepSize = false and
-   * the scheduled execution of step() was missed, the next execution happens
-   * as soon as possible. Through this behavior a little time is saved but the
-   * executions of step() do not happen to predictable times any more.
-   *
-   * @param useFixedStepSize
-   */
-  void useFixedStepSize(bool useFixedStepSize = true);
-
+  void setIdleTime(double idleTime = 0.01);
 
   /*!@brief Sets a simulated time to be used in step().
    *
@@ -244,42 +214,72 @@ public:
   // protected methods
   //----------------------------------------------------------------------------
 protected:
-  // none yet
+  //! get the duration of the fixed trigger step
+  inline double getStepSize() const
+  {
+    return this->_mStepSize->getValue();
+  }
+
+  //! get the idle time that is used in-between sending trigger signals
+  inline double getIdleTimeParameter() const
+  {
+    return this->_mIdleTime->getValue();
+  }
+
+  //! get the duration of the simulated time step
+  inline double getSimulatedTimeParameter() const
+  {
+    return this->_mSimulatedTime->getValue();
+  }
 
   //----------------------------------------------------------------------------
   // private methods
   //----------------------------------------------------------------------------
 private:
   virtual void run(); // the thread does its work here!
+
   void initStatistics();
+
   inline void updateStatistics(double stepsTaken);
-  void readParamsFromConfigFile();
 
   //----------------------------------------------------------------------------
   // members
   //----------------------------------------------------------------------------
 protected:
-  //!@brief desired length of a single step, in milliseconds
-  boost::posix_time::time_duration mStepSize;
-  //! parameter version of mStepSize
-  double _mStepSize;
-  //! parameter version of mIdleTime
-  double _mIdleTime;
-  //! parameter version of mSimulatedTime
-  double _mSimulatedTime;
+
 private:
+  //!@brief stop is requested
   bool mStop;
-  unsigned int mIdleTime; //!< in microseconds
-  bool mUseFixedStepSize;
-  boost::posix_time::time_duration mSimulatedTime;
-  // gather some statistics
+
+  //!@brief total number of steps since start()
   unsigned long mNumberOfSteps;
+  //!@brief
   double mSumOfStepsTaken;
+  //!@brief
   double mMaxStepsTaken;
-  // remeber time stamps of last step
+  //!@brief remember time stamps of last step
   boost::posix_time::ptime mLastTimeStepStart;
+  //!@brief remember time stamps of last step
   boost::posix_time::ptime mLastTimeStepEnd;
 
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  //!@brief desired length of a single step, in milliseconds
+  cedar::aux::DoubleParameterPtr _mStepSize;
+
+  //! parameter version of mIdleTime
+  cedar::aux::DoubleParameterPtr _mIdleTime;
+
+  //! parameter version of mSimulatedTime
+  cedar::aux::DoubleParameterPtr _mSimulatedTime;
+
+  //! The loop mode of the trigger
+  cedar::aux::EnumParameterPtr _mLoopMode;
 }; // class cedar::aux::LoopedThread
 
 #endif // CEDAR_AUX_LOOPED_THREAD_H

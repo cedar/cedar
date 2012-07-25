@@ -91,7 +91,18 @@ bool cedar::proc::ExternalData::hasData(cedar::aux::ConstDataPtr data) const
 
 void cedar::proc::ExternalData::clear()
 {
-  this->mData.clear();
+  while(!this->mData.empty())
+  {
+    cedar::aux::DataPtr data = this->mData.back().lock();
+    if (data)
+    {
+      this->removeData(data);
+    }
+    else
+    {
+      this->mData.pop_back();
+    }
+  }
 }
 
 void cedar::proc::ExternalData::removeData(cedar::aux::ConstDataPtr data)

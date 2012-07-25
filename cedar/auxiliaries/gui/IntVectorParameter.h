@@ -38,26 +38,70 @@
 #define CEDAR_AUX_GUI_INT_VECTOR_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/auxiliaries/gui/NumericVectorParameter.h"
 #include "cedar/auxiliaries/gui/namespace.h"
 
 // SYSTEM INCLUDES
 #include <QSpinBox>
 
 
+//----------------------------------------------------------------------------------------------------------------------
+// template specializations
+//----------------------------------------------------------------------------------------------------------------------
+namespace cedar
+{
+  namespace aux
+  {
+    namespace gui
+    {
+      template <>
+      inline bool cedar::aux::gui::VectorParameterAbstraction<int, QSpinBox>::connectValueChange
+                  (
+                    cedar::aux::gui::Parameter* pParameter,
+                    QSpinBox* pWidget
+                  )
+      {
+        return QObject::connect(pWidget, SIGNAL(valueChanged(int)), pParameter, SLOT(widgetValueChanged(int)));
+      }
+
+
+      template<>
+      inline int cedar::aux::gui::VectorParameterAbstraction<int, QSpinBox>::getValue(QSpinBox* pWidget)
+      {
+        return pWidget->value();
+      }
+
+      template<>
+      inline void cedar::aux::gui::VectorParameterAbstraction<int, QSpinBox>::setValue
+                  (
+                    QSpinBox* pWidget,
+                    const int& value
+                  )
+      {
+        pWidget->setValue(value);
+      }
+    }
+  }
+}
+
 /*!@brief Widget for manipulating vectors of integer values.
- *
- * @todo This should be abstracted, probably in a template class:
- *       template <class ParameterType, class WidgetType> NumericVectorParameter,
- *       where, e.g., ParameterType = UIntVector and WidgetType = QSpinBox. Otherwise, a lot of code might get
- *       duplicated
  */
-class cedar::aux::gui::IntVectorParameter : public cedar::aux::gui::Parameter
+class cedar::aux::gui::IntVectorParameter : public cedar::aux::gui::NumericVectorParameter
+                                                   <
+                                                     int,
+                                                     QSpinBox
+                                                   >
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef cedar::aux::gui::NumericVectorParameter<int, QSpinBox> Base;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -70,16 +114,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-public slots:
-  //!@brief handles a change of the associated parameters
-  void parameterPointerChanged();
-
-  //!@brief handles a change in the parameters
-  void valueChanged(int value);
-
-  //!@brief Handles changes in the displayed parameter's properties, e.g., a resizing of the vector.
-  void propertyChanged();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -90,24 +125,14 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  // none yet
+private slots:
+  void widgetValueChanged(int);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-private:
-  //!@brief a vector of spinboxes for displaying and changing the associated parameters
-  std::vector<QSpinBox*> mSpinboxes;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
 private:
   // none yet
 

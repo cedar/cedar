@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
-#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -52,7 +52,7 @@
  *
  * rigid between world coordinate frame and object coordinate frame
  */
-class cedar::aux::LocalCoordinateFrame : public QObject, public cedar::aux::Configurable
+class cedar::aux::LocalCoordinateFrame : public QObject, public cedar::aux::NamedConfigurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -159,7 +159,7 @@ public slots:
   void setRotation(const std::vector<double>& rotation);
   /*!@brief rotates the object around one of the main axes of the object frame
    * @param axis    index of the axis to rotate around, between 0 and 2
-   * @param angle    value of angle that the object is rotated by
+   * @param angle    value of angle that the object is rotated by, in radians
    */
   void rotate(unsigned int axis, double angle);
 

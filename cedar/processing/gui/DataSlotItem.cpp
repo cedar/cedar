@@ -93,6 +93,10 @@ mSlot(slot)
       this->setOutlineColor(QColor(140, 140, 140));
     }
   }
+
+  // data slots never snap to the grid; they are attached to the parent.
+  this->setSnapToGrid(false);
+  this->setAcceptHoverEvents(true);
 }
 
 cedar::proc::gui::DataSlotItem::~DataSlotItem()
@@ -180,7 +184,7 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo
     else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_target))
     {
       //!@todo The validity here must be checked correctly at the promoted slot rather than the network's pseudo-slot
-      validity = p_network_item->network()->determineInputValidity(p_target_slot->getSlot(), this->mSlot->getData());
+      validity = p_network_item->getNetwork()->determineInputValidity(p_target_slot->getSlot(), this->mSlot->getData());
     }
 
     CEDAR_ASSERT(validity != cedar::proc::DataSlot::VALIDITY_UNKNOWN);
@@ -212,9 +216,12 @@ void cedar::proc::gui::DataSlotItem::connectTo(cedar::proc::gui::DataSlotItem *p
       validity = cedar::proc::gui::CONNECT_YES;
       break;
 
-    case cedar::proc::DataSlot::VALIDITY_UNKNOWN: //!@todo VALIDITY_UNKNOWN should get its own color
     case cedar::proc::DataSlot::VALIDITY_WARNING:
       validity = cedar::proc::gui::CONNECT_WARNING;
+      break;
+
+    case cedar::proc::DataSlot::VALIDITY_UNKNOWN:
+      validity = cedar::proc::gui::CONNECT_UNKNOWN;
       break;
 
     case cedar::proc::DataSlot::VALIDITY_ERROR:
@@ -222,7 +229,6 @@ void cedar::proc::gui::DataSlotItem::connectTo(cedar::proc::gui::DataSlotItem *p
       break;
   }
   p_connection->setValidity(validity);
-  this->scene()->addItem(p_connection);
 }
 
 void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
@@ -242,7 +248,7 @@ void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuE
   // no slot can be promoted to the root network
   if
   (
-    (this->mSlot->getParentPtr()->getNetwork() == p_scene->getRootNetwork()->network())
+    (this->mSlot->getParentPtr()->getNetwork() == p_scene->getRootNetwork()->getNetwork())
       || this->mSlot->isPromoted() || this->getNumberOfConnections() != 0
   )
   {
@@ -283,10 +289,15 @@ const std::string& cedar::proc::gui::DataSlotItem::getName() const
   return this->mSlot->getName();
 }
 
+void cedar::proc::gui::DataSlotItem::hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent)
+{
+  this->generateTooltip();
+
+  this->cedar::proc::gui::GraphicsBase::hoverEnterEvent(pEvent);
+}
+
 void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
 {
-  //todo: move this out of here and let it be called by a signal
-  this->generateTooltip();
   painter->save(); // save current painter settings
   //!@todo may call setBaseShape when receiving a signal, not every time paint() is called
   this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND);
@@ -310,27 +321,13 @@ void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOption
 
 void cedar::proc::gui::DataSlotItem::generateTooltip()
 {
-  QString tool_tip("");
-  tool_tip += cedar::proc::DataRole::type().get(mSlot->getRole()).prettyString().c_str();
-  tool_tip += ": ";
-  tool_tip += mSlot->getName().c_str();
-  // mat info
-  if (cedar::aux::MatDataPtr mat_data = boost::shared_dynamic_cast<cedar::aux::MatData>(this->mSlot->getData()))
-  {
-    tool_tip += "<br />";
-    unsigned int dimensionality = cedar::aux::math::getDimensionalityOf(mat_data->getData());
-    tool_tip += QString("Dimensionality: %1").arg(dimensionality);
-    tool_tip += "<br />Sizes:";
-    for (unsigned int dim = 0; dim < dimensionality; ++dim)
-    {
-      tool_tip += QString(" %1").arg(mat_data->getData().size[dim]);
-    }
-  }
-  // type info
+  QString tool_tip;
+  tool_tip += QString::fromStdString(cedar::proc::DataRole::type().get(this->mSlot->getRole()).prettyString());
+  tool_tip += ": <b>" + QString::fromStdString(this->mSlot->getName()) + "</b>";
   if (this->mSlot->getData())
   {
-    QString unmangled_name = QString::fromStdString(cedar::aux::unmangleName(typeid(*(this->mSlot->getData().get()))));
-    tool_tip += QString("<br />") + Qt::escape(unmangled_name);
+    tool_tip += "<hr />";
+    tool_tip += QString::fromStdString(this->mSlot->getData()->getDescription());
   }
   this->setToolTip(tool_tip);
 }

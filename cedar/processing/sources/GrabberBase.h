@@ -46,7 +46,7 @@
 #include "cedar/devices/sensors/visual/Grabber.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/auxiliaries/ImageData.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/FileParameter.h"
 
 // SYSTEM INCLUDES
@@ -70,8 +70,8 @@ public cedar::proc::Step
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  GrabberBase();
   //!@brief The standard constructor.
+  GrabberBase();
 
 public:
   //!@brief Destructor
@@ -81,15 +81,17 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Save a Snapshot of the current picture
+   *
+   * Implemented as an action in the grabber-step of processingGUI
+   */
   void saveSnapshot();
 
 public slots:
+  //!@brief Slot for the recording-checkbox
   void setRecording();
 
   //!@todo Enum RecordType (Encoding)
-
-  //!@brief Sets a new configuration filename
-  void setConfigurationFileName();
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -97,30 +99,40 @@ public slots:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  //!@brief Invoke this function in the derived class
-  //  invokes onCreateGrabber() form derived class and updates information from grabber for the gui-parameter
-  void createGrabber();
-
-  //!@brief Create the grabber in the derived class
-  //  apply the new created Grabber to GrabberBase::mGrabber
-  virtual void onCreateGrabber() = 0;
-
-
+  //!@brief Applies an appropriate annotation to the current image.
+  void annotateImage();
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+
+  //!@brief Cast the base GrabberBasePtr to derived class PictureGrabberPtr
+  inline cedar::dev::sensors::visual::GrabberPtr getGrabber()
+  {
+    return boost::static_pointer_cast<cedar::dev::sensors::visual::Grabber>
+           (
+             this->cedar::proc::sources::GrabberBase::mpGrabber
+           );
+  }
+
+  //!@brief Cast the base GrabberBasePtr to derived class PictureGrabberPtr
+  inline cedar::dev::sensors::visual::ConstGrabberPtr getGrabber() const
+  {
+    return boost::static_pointer_cast<const cedar::dev::sensors::visual::Grabber>
+           (
+             this->cedar::proc::sources::GrabberBase::mpGrabber
+           );
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief The used Grabber stored in this pointer
-  cedar::dev::sensors::visual::GrabberPtr mGrabber;
+  cedar::dev::sensors::visual::GrabberPtr mpGrabber;
 
   //!@brief The grabbed Image
-  cedar::aux::ImageDataPtr mImage;
+  cedar::aux::MatDataPtr mImage;
 
 
 private:
@@ -133,12 +145,8 @@ protected:
   //!@cond SKIPPED_DOCUMENTATION
   // the values of the properties
   cedar::aux::BoolParameterPtr mRecording;
-  cedar::aux::FileParameterPtr mRecordName;
-  //cedar::aux::BoolParameterPtr mSaveSnapshot;
-  cedar::aux::FileParameterPtr mSnapshotName;
 
   //!@brief The configuration filename
-  cedar::aux::FileParameterPtr _mConfigurationFileName;
   //!@todo Enum RecordType (Encoding)
 
   //!@endcond

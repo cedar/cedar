@@ -56,6 +56,8 @@
  *
  *        This class takes care of loading cedar::proc::Networks in a manner that allows them to be added into
  *        cedar::proc::gui::Scenes as either the root network or a subnetwork.
+ *
+ * @todo  It should probably be possible to use this class without a scene/main window.
  */
 class cedar::proc::gui::Network : public QObject, public cedar::proc::gui::GraphicsBase
 {
@@ -98,18 +100,15 @@ public:
   void read(const std::string& source);
 
   /*!@brief access the underlying cedar::proc::Network
-   *
    */
-  inline cedar::proc::NetworkPtr getNetwork()
-  {
-    return this->network();
-  }
+  cedar::proc::NetworkPtr getNetwork();
 
   /*!@brief access the underlying cedar::proc::Network
-   *
-   * @todo Deprecate this.
    */
-  cedar::proc::NetworkPtr network();
+  CEDAR_DECLARE_DEPRECATED(inline cedar::proc::NetworkPtr network())
+  {
+    return this->getNetwork();
+  }
 
   //!@brief add all elements contained in this network to the scene
   void addElementsToScene();
@@ -143,13 +142,25 @@ public:
 
   void disconnect();
 
+  //! deals with changes to the network gui item
   QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value);
 
   bool sceneEventFilter(QGraphicsItem *pWatched, QEvent *pEvent);
 
+  //! get the scene in which this network is embedded
   cedar::proc::gui::Scene* getScene()
   {
     return this->mpScene;
+  }
+
+  /*!@brief Sets the ui configuration for the element when it is added to the network.
+   */
+  inline void setNextElementUiConfiguration
+  (
+    cedar::proc::ElementPtr element, const cedar::aux::ConfigurationNode& uiDescription
+  )
+  {
+    this->mNextElementUiConfigurations[element.get()] = uiDescription;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -165,8 +176,6 @@ private:
 
   //!@brief write scene to a node
   void writeScene(cedar::aux::ConfigurationNode& root, cedar::aux::ConfigurationNode& scene);
-  //!@brief read scene from a node
-  void readScene(cedar::aux::ConfigurationNode& root);
 
   //!@brief Reacts to elements being added in the underlying network.
   void elementAdded(cedar::proc::Network* network, cedar::proc::ElementPtr pElement);
@@ -181,7 +190,7 @@ private:
   //!@brief Transforms the coordinates of a newly added child into the network's coordinate system.
   void transformChildCoordinates(cedar::proc::gui::GraphicsBase* pItem);
 
-  void checkDataConnection(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target, bool added);
+  void checkDataConnection(cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target, bool added);
 
   void checkTriggerConnection(cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool added);
 
@@ -236,6 +245,9 @@ private:
 
   //! Text item used for displaying the name of the network.
   QGraphicsTextItem *mpNameDisplay;
+
+  //! Configuration of the next element that is added to the scene.
+  std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode> mNextElementUiConfigurations;
 
 }; // class cedar::proc::gui::NetworkFile
 

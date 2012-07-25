@@ -84,6 +84,10 @@ namespace
       )
     );
     projection_decl->setIconPath(":/steps/projection.svg");
+    projection_decl->setDescription
+    (
+      "Projects N-Dimensional matrices onto M-Dimensions."
+    );
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(projection_decl);
 
     return true;
@@ -242,7 +246,7 @@ void cedar::proc::steps::Projection::reconfigure()
   if (this->_mDimensionMappings->getValue()->getValidity() == cedar::proc::ProjectionMapping::VALIDITY_ERROR)
   {
     this->setState(
-                    cedar::proc::Step::STATE_EXCEPTION,
+                    cedar::proc::Triggerable::STATE_EXCEPTION,
                     "The projection, as you have set it up, does not work in the given context.\
                     Please revise the mapping parameters."
                   );
@@ -250,7 +254,7 @@ void cedar::proc::steps::Projection::reconfigure()
   else
   {
     this->setState(
-                    cedar::proc::Step::STATE_NONE,
+                    cedar::proc::Triggerable::STATE_UNKNOWN,
                     "Projection mapping is set up correctly."
                   );
   }
@@ -491,11 +495,11 @@ void cedar::proc::steps::Projection::compressNDto0Dmax()
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Projection::determineInputValidity
                                 (
                                   cedar::proc::ConstDataSlotPtr CEDAR_DEBUG_ONLY(slot),
-                                  cedar::aux::DataPtr data
+                                  cedar::aux::ConstDataPtr data
                                 ) const
 {
   CEDAR_DEBUG_ASSERT(slot->getName() == "input")
-  if (boost::shared_dynamic_cast<cedar::aux::MatData>(data))
+  if (boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
   {
     return cedar::proc::DataSlot::VALIDITY_VALID;
   }

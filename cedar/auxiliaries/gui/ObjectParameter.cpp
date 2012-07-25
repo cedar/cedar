@@ -65,7 +65,6 @@ cedar::aux::gui::ObjectParameter::ObjectParameter()
 {
   int margins = 0;
   int spacing = 2;
-  int button_size = 20;
 
   QGridLayout *p_layout = new QGridLayout();
   p_layout->setContentsMargins(margins, margins, margins, margins);
@@ -76,14 +75,7 @@ cedar::aux::gui::ObjectParameter::ObjectParameter()
   mpTypeSelector->setToolTip("Select the type of the object.");
   p_layout->addWidget(mpTypeSelector, 0, 0);
 
-  mpEditButton = new QPushButton("...");
-  mpEditButton->setMaximumWidth(button_size);
-  mpEditButton->setEnabled(false);
-  mpEditButton->setToolTip("Opens a new window that lets you edit the parameters of the current object.");
-  p_layout->addWidget(mpEditButton, 0, 1);
-
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
-  QObject::connect(this->mpEditButton, SIGNAL(clicked()), this, SLOT(editClicked()));
 }
 
 cedar::aux::gui::ObjectParameter::~ObjectParameter()
@@ -93,6 +85,16 @@ cedar::aux::gui::ObjectParameter::~ObjectParameter()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+//!@todo This is redundant with the code in ObjectListParameter; unify that somehow!
+QString cedar::aux::gui::ObjectParameter::prettyTypeId(const QString& typeId) const
+{
+  QStringList parts = typeId.split('.');
+  QString class_id = parts.back();
+  parts.pop_back();
+  QString namespace_id = parts.join(".");
+  return class_id + " (" + namespace_id + ")";
+}
 
 void cedar::aux::gui::ObjectParameter::parameterPointerChanged()
 {
@@ -111,7 +113,9 @@ void cedar::aux::gui::ObjectParameter::parameterPointerChanged()
   int current_type = -1;
   for (size_t i = 0; i < types.size(); ++i)
   {
-    this->mpTypeSelector->addItem(QString::fromStdString(types.at(i)));
+    QString type_id = QString::fromStdString(types.at(i));
+    this->mpTypeSelector->addItem(this->prettyTypeId(type_id));
+    this->mpTypeSelector->setItemData(i, type_id);
     if (current_type == -1 && types.at(i) == parameter->getTypeId())
     {
       current_type = static_cast<int>(i);
@@ -119,33 +123,10 @@ void cedar::aux::gui::ObjectParameter::parameterPointerChanged()
   }
 
   this->mpTypeSelector->setCurrentIndex(current_type);
-  this->mpEditButton->setEnabled(current_type != -1);
 
   // reconnect the signal
   QObject::connect(this->mpTypeSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(currentTypeChanged(int)));
 
-}
-
-void cedar::aux::gui::ObjectParameter::editClicked()
-{
-  //!@todo Store the pointers to the dialogs/property panes hare and update them when an item is added/removed/...
-  //!@todo Find a way to make sure these dialogs close when the main window does.
-  cedar::aux::ConfigurablePtr configurable = this->getObjectParameter()->getConfigurable();
-  cedar::aux::gui::PropertyPane *p_display = new cedar::aux::gui::PropertyPane();
-  QDialog *p_dialog = new QDialog();
-  QVBoxLayout *p_layout = new QVBoxLayout();
-  p_layout->setContentsMargins(0, 0, 0, 0);
-  p_dialog->setLayout(p_layout);
-  p_layout->addWidget(p_display);
-
-  p_dialog->setWindowTitle(QString::fromStdString(this->getObjectParameter()->getName()));
-
-  p_dialog->show();
-  p_display->display(configurable);
-
-  // resize to fit contents
-  p_display->adjustSize();
-  p_dialog->adjustSize();
 }
 
 std::string cedar::aux::gui::ObjectParameter::getSelectedType() const
@@ -153,7 +134,7 @@ std::string cedar::aux::gui::ObjectParameter::getSelectedType() const
   int index = this->mpTypeSelector->currentIndex();
   if (index != -1)
   {
-    return this->mpTypeSelector->currentText().toStdString();
+    return this->mpTypeSelector->itemData(index).toString().toStdString();
   }
   else
   {
@@ -163,11 +144,9 @@ std::string cedar::aux::gui::ObjectParameter::getSelectedType() const
 
 void cedar::aux::gui::ObjectParameter::currentTypeChanged(int index)
 {
-  this->mpEditButton->setEnabled(index != -1);
-
   if (index != -1)
   {
-    std::string type = this->mpTypeSelector->currentText().toStdString();
+    std::string type = this->getSelectedType();
     this->getObjectParameter()->setType(type);
   }
 }

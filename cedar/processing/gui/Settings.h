@@ -155,6 +155,12 @@ public:
   //!@brief Set the snap to grid state.
   void snapToGrid(bool snap);
 
+  //! Disables writing.
+  void disableWriting(bool disable = true)
+  {
+    this->mWritingDisabled = disable;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -175,6 +181,9 @@ protected:
 private:
   //!@brief the singleton instance of gui::Settings
   static cedar::proc::gui::Settings mInstance;
+
+  //! Disables writing of the properties; this is useful for unit tests that shouldn't alter the configuration.
+  bool mWritingDisabled;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

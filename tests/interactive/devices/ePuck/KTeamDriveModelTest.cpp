@@ -77,8 +77,8 @@ int main(int argc, char **argv)
 
   //initialize the e-puck
   cedar::dev::kteam::EPuckDrive *pDrive;
-  pDrive = new cedar::dev::kteam::EPuckDrive(pCommunication,
-                                                     "../../tests/interactive/devices/ePuck/EPuckDriveConfig.cfg");
+  pDrive = new cedar::dev::kteam::EPuckDrive(pCommunication);
+  pDrive->readJson("../../tests/interactive/devices/ePuck/EPuckDrive.json");
   //initialize the model of the e-puck
   cedar::dev::kteam::DriveModelPtr p_kteam_model(new cedar::dev::kteam::DriveModel(pDrive));
   //add cylinder representing the robot

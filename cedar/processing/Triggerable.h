@@ -55,8 +55,8 @@ public:
   //! Enum that represents the current state of the Triggerable.
   enum State
   {
-    //! The state is indetermined.
-    STATE_NONE,
+    //! The state is undetermined.
+    STATE_UNKNOWN,
     //! The Triggerable is not running.
     STATE_NOT_RUNNING,
     //! The Triggerable is currently running.
@@ -68,9 +68,12 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Standard constructor
-  //!@param isLooped flag if this is a triggerable that is supposed to be executed in a loop
+  /*!@brief Standard constructor
+   *
+   * @param isLooped flag if this is a Triggerable that is supposed to be executed in a loop
+   */
   Triggerable(bool isLooped);
+
   //!@brief The destructor.
   virtual ~Triggerable();
 
@@ -82,7 +85,11 @@ public:
    *
    * @param    pSender The trigger that sent the trigger signal.
    */
-  virtual void onTrigger(cedar::proc::TriggerPtr pSender = cedar::proc::TriggerPtr()) = 0;
+  virtual void onTrigger
+               (
+                 cedar::proc::ArgumentsPtr args = cedar::proc::ArgumentsPtr(),
+                 cedar::proc::TriggerPtr pSender = cedar::proc::TriggerPtr()
+               ) = 0;
 
   /*!@brief   Sets this Triggerable's parent trigger. Triggerable's may only be triggerd by one trigger.
    *
@@ -121,10 +128,9 @@ public:
   const std::string& getStateAnnotation() const;
 
   //!@brief Returns the finished trigger singleton.
-  //!@brief use Singleton template class here
-  cedar::proc::TriggerPtr& getFinishedTrigger();
+  cedar::proc::TriggerPtr getFinishedTrigger();
 
-  //!@brief Returns this step's parent trigger. Steps may only be triggerd by one trigger.
+  //!@brief Returns this step's parent trigger. Steps may only be triggered by one trigger.
   cedar::proc::TriggerPtr getParentTrigger();
 
   //!@brief function that connects up a function to Triggerable's state changed signal
@@ -132,10 +138,6 @@ public:
 
   //!@brief Waits for the trigger signal to be finished.
   virtual void wait() = 0;
-
-//signals:
-//  //!@brief Signal that is emitted whenever the Triggerable's state is changed.
-//  void stateChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -157,7 +159,7 @@ protected:
    */
   inline void resetState()
   {
-    this->setState(cedar::proc::Triggerable::STATE_NONE, "");
+    this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -174,15 +176,16 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   //!@brief Whether the connect function should automatically connect the triggers as well.
   const bool mIsLooped;
+
   //!@brief If set, this is the trigger that triggers the step.
   cedar::proc::TriggerWeakPtr mParentTrigger;
+
   //!@brief current state of this step, taken from cedar::processing::Step::State
   State mState;
+
   //!@brief The annotation string for the current state.
   std::string mStateAnnotation;
 
@@ -191,8 +194,8 @@ protected:
 
 private:
   //!@brief the finished trigger singleton, which is triggered once the computation of this step is done
-  //!@brief use Singleton template class here
   cedar::proc::TriggerPtr mFinished;
+
 }; // class cedar::proc::Triggerable
 
 #endif // CEDAR_PROC_TRIGGERABLE_H

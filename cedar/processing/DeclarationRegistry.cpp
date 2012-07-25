@@ -46,11 +46,7 @@
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/MultiTrigger.h"
 #include "cedar/processing/Network.h"
-//!@todo Check if these includes are still necessary
-#include "cedar/processing/sources/GaussInput.h"
-#include "cedar/processing/steps/StaticGain.h"
-#include "cedar/processing/steps/Projection.h"
-#include "cedar/processing/steps/Resize.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 
@@ -60,17 +56,6 @@ using cedar::proc::ElementDeclarationTemplate;
 
 cedar::proc::DeclarationRegistry::DeclarationRegistry()
 {
-	//!@todo Move to Network.cpp
-  ElementDeclarationPtr network_decl(
-                                      new ElementDeclarationTemplate<cedar::proc::Network>
-                                      (
-                                        "Utilities",
-                                        "cedar.processing.Network"
-                                      )
-                                    );
-  network_decl->setIconPath(":/network.svg");
-  this->declareClass(network_decl);
-
 }
 
 void cedar::proc::DeclarationRegistry::declareClass(cedar::proc::ElementDeclarationPtr pDeclaration)
@@ -93,6 +78,21 @@ void cedar::proc::DeclarationRegistry::declareClass(cedar::proc::ElementDeclarat
     CEDAR_DEBUG_ASSERT(category_iter != this->mDeclarationsByCategory.end());
   }
   category_iter->second.push_back(pDeclaration);
+
+  // add deprecated names
+  for (size_t i = 0; i < pDeclaration->deprecatedNames().size(); ++i)
+  {
+    const std::string& deprecated_name = pDeclaration->deprecatedNames()[i];
+    if (this->mDeprecatedToCurrentNames.find(deprecated_name) != this->mDeprecatedToCurrentNames.end())
+    {
+      CEDAR_THROW
+      (
+        cedar::aux::DuplicateNameException,
+        "The deprecated name \"" + deprecated_name + "\" already exists."
+      );
+    }
+    this->mDeprecatedToCurrentNames[deprecated_name] = class_id;
+  }
 }
 
 const cedar::proc::DeclarationRegistry::CategoryList& cedar::proc::DeclarationRegistry::getCategories() const
@@ -138,8 +138,38 @@ cedar::proc::ElementPtr cedar::proc::DeclarationRegistry::allocateClass(const st
   std::map<std::string, cedar::proc::ElementDeclarationPtr>::const_iterator iter;
   iter = mDeclarations.find(classId);
 
+  // if the class id was not found, see if it is a deprecated name
+  if (iter == mDeclarations.end())
+  {
+    std::map<std::string, std::string>::const_iterator depr_iter = this->mDeprecatedToCurrentNames.find(classId);
+
+    if (depr_iter != this->mDeprecatedToCurrentNames.end())
+    {
+      const std::string& deprecated_name = depr_iter->first;
+      const std::string& proper_name = depr_iter->second;
+      iter = mDeclarations.find(proper_name);
+
+      if (iter != mDeclarations.end())
+      {
+        cedar::aux::LogSingleton::getInstance()->warning
+        (
+          "Using deprecated name \"" + deprecated_name + "\" to instantiate class \"" + proper_name + "\"",
+          "cedar::proc::DeclarationRegistry::allocateClass(const std::string&)"
+        );
+      }
+    }
+  }
+
   if (iter != mDeclarations.end())
   {
+    if (iter->second->isDeprecated())
+    {
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Allocating deprecated class \"" + classId + "\".",
+        "cedar::proc::DeclarationRegistry::allocateClass(const std::string&)"
+      );
+    }
     return iter->second->getObjectFactory()->allocate();
   }
   // if this point is reached, no factory could be found for the given class id - throw

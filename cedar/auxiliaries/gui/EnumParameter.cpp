@@ -91,6 +91,7 @@ void cedar::aux::gui::EnumParameter::parameterPointerChanged()
   this->mpEdit->clear();
   int select_index = -1;
   int first_enabled = -1;
+  parameter->lockForRead();
   for (size_t i = 0; i < parameter->getEnumDeclaration().list().size(); ++i)
   {
     const cedar::aux::Enum& enum_val = parameter->getEnumDeclaration().list().at(i);
@@ -115,6 +116,7 @@ void cedar::aux::gui::EnumParameter::parameterPointerChanged()
     CEDAR_DEBUG_ASSERT(p_item != NULL);
     p_item->setEnabled(enabled);
   }
+  parameter->unlock();
   if (select_index != -1)
   {
     this->mpEdit->setCurrentIndex(select_index);
@@ -141,6 +143,6 @@ void cedar::aux::gui::EnumParameter::currentIndexChanged(const QString&)
     cedar::aux::EnumParameterPtr parameter;
     parameter = boost::dynamic_pointer_cast<cedar::aux::EnumParameter>(this->getParameter());
     QString value = this->mpEdit->itemData(this->mpEdit->currentIndex(), Qt::UserRole).toString();
-    parameter->set(value.toStdString());
+    parameter->setValue(value.toStdString(), true);
   }
 }

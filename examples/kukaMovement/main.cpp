@@ -138,7 +138,6 @@ private:
 int main(int argc, char **argv)
 {
   std::string mode = "0";
-  std::string configuration_file_old = cedar::aux::System::locateResource("configs/kuka_lwr4.conf");
   std::string configuration_file = cedar::aux::System::locateResource("configs/kuka_lwr4.json");
   // help requested?
   if ((argc == 2) && (std::string(argv[1]) == "-h"))
@@ -174,7 +173,7 @@ int main(int argc, char **argv)
   if (use_hardware)
   {
     // hardware interface
-    cedar::dev::kuka::KukaInterfacePtr lwr4(new cedar::dev::kuka::KukaInterface(configuration_file_old));
+    cedar::dev::kuka::KinematicChainPtr lwr4(new cedar::dev::kuka::KinematicChain());
     lwr4->readJson(configuration_file);
     arm = lwr4;
     // status widget
@@ -185,7 +184,7 @@ int main(int argc, char **argv)
   else
   {
     // simulated arm
-    cedar::dev::robot::KinematicChainPtr sim(new cedar::dev::robot::SimulatedKinematicChain(configuration_file_old));
+    cedar::dev::robot::KinematicChainPtr sim(new cedar::dev::robot::SimulatedKinematicChain());
     sim->readJson(configuration_file);
     // set simulated arm to useful initial condition
     sim->setJointAngle(0, 0.1);

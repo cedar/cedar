@@ -41,15 +41,12 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/UIntVectorParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
-#include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
-#include <QVBoxLayout>
-#include <iostream>
-#include <limits.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 // associate aux::gui parameter with the aux parameter
@@ -69,15 +66,7 @@ namespace
 
 cedar::aux::gui::UIntVectorParameter::UIntVectorParameter(QWidget *pParent)
 :
-cedar::aux::gui::Parameter(pParent)
-{
-  this->setLayout(new QVBoxLayout());
-  this->layout()->setContentsMargins(0, 0, 0, 0);
-  QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
-}
-
-//!@brief Destructor
-cedar::aux::gui::UIntVectorParameter::~UIntVectorParameter()
+cedar::aux::gui::UIntVectorParameter::Base(pParent)
 {
 }
 
@@ -85,83 +74,8 @@ cedar::aux::gui::UIntVectorParameter::~UIntVectorParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-
-void cedar::aux::gui::UIntVectorParameter::parameterPointerChanged()
+void cedar::aux::gui::UIntVectorParameter::widgetValueChanged(int)
 {
-  cedar::aux::UIntVectorParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::UIntVectorParameter>(this->getParameter());
-
-
-
-  QObject::connect(parameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertyChanged()));
-  this->propertyChanged();
+  this->Base::widgetValueChanged(cedar::aux::asserted_cast<QSpinBox*>(QObject::sender()));
 }
 
-void cedar::aux::gui::UIntVectorParameter::propertyChanged()
-{
-  cedar::aux::UIntVectorParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::UIntVectorParameter>(this->getParameter());
-
-  unsigned int minimum = parameter->getMinimum();
-  unsigned int maximum = parameter->getMaximum();
-
-  if (maximum > static_cast<unsigned int>(std::numeric_limits<int>::max()))
-  {
-    cedar::aux::LogSingleton::getInstance()->warning
-    (
-      "Qt's spinboxes can only display up to the maximum of int. The maximum value specified for parameter \""
-      + parameter->getName() + "\" is higher than that.",
-      "cedar::aux::gui::UIntVectorParameter::propertyChanged()"
-    );
-    maximum = std::numeric_limits<int>::max();
-  }
-
-  //!@todo Don't throw away old spinboxes, reuse them instead
-  // Create the appropriate amount of spinboxes
-  if (this->mSpinboxes.size() != parameter->size())
-  {
-    for (size_t i = 0; i < this->mSpinboxes.size(); ++i)
-    {
-      delete this->mSpinboxes.at(i);
-    }
-    this->mSpinboxes.clear();
-
-    for (size_t i = 0; i < parameter->size(); ++i)
-    {
-      QSpinBox *p_widget = new QSpinBox();
-      this->mSpinboxes.push_back(p_widget);
-      this->layout()->addWidget(p_widget);
-      p_widget->setMinimumHeight(20);
-
-      // the limits have to be set here already so the value is set properly.
-      p_widget->setMinimum(minimum);
-      p_widget->setMaximum(maximum);
-      p_widget->setValue(parameter->at(i));
-      QObject::connect(p_widget, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
-    }
-
-    emit heightChanged();
-  }
-
-  // Update the spinboxes' properties
-  for (size_t i = 0; i < this->mSpinboxes.size(); ++i)
-  {
-    this->mSpinboxes.at(i)->setMinimum(minimum);
-    this->mSpinboxes.at(i)->setMaximum(maximum);
-    this->mSpinboxes.at(i)->setEnabled(!parameter->isConstant());
-  }
-}
-
-void cedar::aux::gui::UIntVectorParameter::valueChanged(int)
-{
-  cedar::aux::UIntVectorParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::UIntVectorParameter>(this->getParameter());
-  std::vector<unsigned int> values = parameter->getValue();
-  CEDAR_DEBUG_ASSERT(this->mSpinboxes.size() == values.size());
-  for (size_t i = 0; i < values.size(); ++i)
-  {
-    values.at(i) = this->mSpinboxes.at(i)->value();
-  }
-
-  parameter->set(values);
-}

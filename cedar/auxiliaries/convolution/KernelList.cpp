@@ -129,3 +129,45 @@ cv::Mat cedar::aux::conv::KernelList::getCombinedKernel() const
   }
   return new_combined_kernel;
 }
+
+bool cedar::aux::conv::KernelList::checkForSameKernelSize() const
+{
+  bool same_size = true;
+
+  // get dimensionality and sizes of first kernel in list
+  cedar::aux::kernel::ConstKernelPtr first_kernel = this->getKernel(0);
+  size_t dim = first_kernel->getDimensionality();
+  std::vector<unsigned int> size(static_cast<size_t>(dim));
+  for (size_t i = 0; i < size.size(); ++i)
+  {
+    size[i] = first_kernel->getSize(i);
+  }
+
+  // compare dimensionality and sizes of first kernel with each other kernel
+  size_t i = 1;
+  // check as long as sizes are equal
+  while (same_size && ( i + 1 <= this->size()))
+  {
+    cedar::aux::kernel::ConstKernelPtr kernel = this->getKernel(i);
+
+    // check dimensionality
+    if (kernel->getDimensionality() != dim)
+    {
+      same_size = false;
+    }
+    else
+    {
+      // if dimensionality is equal check sizes of each dimension
+      for (size_t d = 0; d < dim; ++d)
+      {
+        if (size[d] != kernel->getSize(d))
+        {
+          same_size = false;
+        }
+      }
+    }
+    ++i;
+  }
+
+  return same_size;
+}

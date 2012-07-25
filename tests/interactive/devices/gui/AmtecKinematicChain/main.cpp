@@ -50,11 +50,11 @@
 int main(int argc, char *argv[]) {
   try
   {
-    std::string configuration_file_old = cedar::aux::System::locateResource("configs/cora_arm.conf");
+//    std::string configuration_file_old = cedar::aux::System::locateResource("configs/cora_arm.conf");
     std::string configuration_file = cedar::aux::System::locateResource("configs/cora_arm.json");
     cedar::dev::amtec::KinematicChainPtr p_kinematic_chain
     (
-      new cedar::dev::amtec::KinematicChain(configuration_file_old)
+      new cedar::dev::amtec::KinematicChain()
     );
     p_kinematic_chain->readJson(configuration_file);
 

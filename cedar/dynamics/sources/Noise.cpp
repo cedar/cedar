@@ -59,6 +59,7 @@ namespace
       new cedar::proc::ElementDeclarationTemplate<cedar::dyn::Noise>("Sources", "cedar.dynamics.Noise")
     );
     noise_decl->setIconPath(":/steps/noise.svg");
+    noise_decl->setDescription("A step that generates normally distributed random noise.");
 
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(noise_decl);
 
@@ -83,8 +84,7 @@ _mStandardDeviation(new cedar::aux::DoubleParameter(this, "standard deviation", 
   _mSizes->makeDefault();
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
-  this->declareOutput("random");
-  this->setOutput("random", mRandomMatrix);
+  this->declareOutput("random", mRandomMatrix);
 
   // now check the dimensionality and sizes of all matrices
   this->updateMatrices();

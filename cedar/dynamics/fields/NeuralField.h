@@ -77,7 +77,7 @@ public:
   //!@brief a parameter for kernel objects
   typedef cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel> KernelListParameter;
   //!@brief a parameter for sigmoid objects
-  typedef cedar::aux::ObjectParameterTemplate<cedar::aux::math::Sigmoid> SigmoidParameter;
+  typedef cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction> SigmoidParameter;
 
   //!@cond SKIPPED_DOCUMENTATION
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(KernelListParameter);
@@ -96,18 +96,22 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief determine if a given Data is a valid input to the field
-  cedar::proc::DataSlot::VALIDITY determineInputValidity(cedar::proc::ConstDataSlotPtr, cedar::aux::DataPtr) const;
+  cedar::proc::DataSlot::VALIDITY determineInputValidity
+                                  (
+                                    cedar::proc::ConstDataSlotPtr,
+                                    cedar::aux::ConstDataPtr
+                                  ) const;
   void onStart();
   void onStop();
 
   //!@brief convenience function to access the output
-  inline cedar::dyn::ConstSpaceCodePtr getFieldOutput() const
+  inline cedar::aux::ConstMatDataPtr getFieldOutput() const
   {
     return this->mSigmoidalActivation;
   }
 
   //!@brief convenience function to access the field activation
-  inline cedar::dyn::ConstSpaceCodePtr getFieldActivation() const
+  inline cedar::aux::ConstMatDataPtr getFieldActivation() const
   {
     return this->mActivation;
   }
@@ -184,21 +188,24 @@ private:
    */
   void updateInputSum();
 
+private slots:
+  void activationAsOutputChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief this SpaceCode matrix contains the current field activity of the NeuralField
-  cedar::dyn::SpaceCodePtr mActivation;
+  cedar::aux::MatDataPtr mActivation;
 
   //!@brief this SpaceCode matrix contains the current field activity, sent through the sigmoid function
-  cedar::dyn::SpaceCodePtr mSigmoidalActivation;
+  cedar::aux::MatDataPtr mSigmoidalActivation;
 
   //!@brief this SpaceCode matrix contains the current lateral interactions of the NeuralField, i.e. convolution result
-  cedar::dyn::SpaceCodePtr mLateralInteraction;
+  cedar::aux::MatDataPtr mLateralInteraction;
 
   //!@brief this SpaceCode matrix contains the current lateral interactions of the NeuralField, i.e. convolution result
-  cedar::dyn::SpaceCodePtr mInputSum;
+  cedar::aux::MatDataPtr mInputSum;
 
   //!@brief this MatData contains the input noise
   cedar::aux::MatDataPtr mInputNoise;
@@ -220,7 +227,8 @@ protected:
   cedar::aux::kernel::GaussPtr mNoiseCorrelationKernel;
 
 private:
-  // none yet
+  boost::signals2::connection mKernelAddedConnection;
+  boost::signals2::connection mKernelRemovedConnection;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -231,6 +239,9 @@ protected:
 
   //!@brief the field sizes in each dimension
   cedar::aux::UIntVectorParameterPtr _mSizes;
+
+  //!@brief Parameter that lets the user decide whether the activation is an output.
+  cedar::aux::BoolParameterPtr _mOutputActivation;
 
   //!@brief input noise gain
   cedar::aux::DoubleParameterPtr _mInputNoiseGain;

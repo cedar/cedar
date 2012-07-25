@@ -91,6 +91,7 @@ protected:
   //!@brief set one kernel part of the specified dimension to the given matrix
   void setKernelPart(unsigned int dimension, const cv::Mat& mat);
 
+  //! update the resulting kernel matrix by fusing the separate dimensions
   void updateKernelMatrix();
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

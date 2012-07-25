@@ -47,7 +47,7 @@
 namespace
 {
   bool registered
-    = cedar::aux::math::SigmoidManagerSingleton::getInstance()->registerType<cedar::aux::math::HeavisideSigmoidPtr>();
+    = cedar::aux::math::TransferFunctionManagerSingleton::getInstance()->registerType<cedar::aux::math::HeavisideSigmoidPtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

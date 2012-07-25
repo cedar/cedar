@@ -89,9 +89,9 @@ void cedar::aux::math::veeAxis(const cv::Mat& rMatrix, cv::Mat& rResult)
   CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rMatrix));
   CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rResult));
 
-	rResult.at<T>(0, 0) = rMatrix.at<T>(2, 1);
-	rResult.at<T>(1, 0) = rMatrix.at<T>(0, 2);
-	rResult.at<T>(2, 0) = rMatrix.at<T>(1, 0);
+  rResult.at<T>(0, 0) = rMatrix.at<T>(2, 1);
+  rResult.at<T>(1, 0) = rMatrix.at<T>(0, 2);
+  rResult.at<T>(2, 0) = rMatrix.at<T>(1, 0);
 }
 
 template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::veeAxis<double>(const cv::Mat&, cv::Mat&);
@@ -157,14 +157,14 @@ void cedar::aux::math::veeTwist(const cv::Mat& rMatrix, cv::Mat& rResult)
   CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rMatrix));
   CEDAR_ASSERT(cedar::aux::math::matrixTypeCheck<T>(rResult));
 
-	// position
-	rResult.at<T>(0, 0) = rMatrix.at<T>(0, 3);
-	rResult.at<T>(1, 0) = rMatrix.at<T>(1, 3);
-	rResult.at<T>(2, 0) = rMatrix.at<T>(2, 3);
-	// axis
-	rResult.at<T>(3, 0) = rMatrix.at<T>(2, 1);
-	rResult.at<T>(4, 0) = rMatrix.at<T>(0, 2);
-	rResult.at<T>(5, 0) = rMatrix.at<T>(1, 0);
+  // position
+  rResult.at<T>(0, 0) = rMatrix.at<T>(0, 3);
+  rResult.at<T>(1, 0) = rMatrix.at<T>(1, 3);
+  rResult.at<T>(2, 0) = rMatrix.at<T>(2, 3);
+  // axis
+  rResult.at<T>(3, 0) = rMatrix.at<T>(2, 1);
+  rResult.at<T>(4, 0) = rMatrix.at<T>(0, 2);
+  rResult.at<T>(5, 0) = rMatrix.at<T>(1, 0);
 }
 
 template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::veeTwist<double>(const cv::Mat&, cv::Mat&);

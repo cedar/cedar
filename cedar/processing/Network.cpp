@@ -67,6 +67,37 @@
 //#define DEBUG_FILE_WRITING
 
 //----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr network_decl
+                          (
+                            new ElementDeclarationTemplate<cedar::proc::Network>
+                            (
+                              "Utilities",
+                              "cedar.processing.Network"
+                            )
+                          );
+    network_decl->setIconPath(":/network.svg");
+    network_decl->setDescription
+    (
+      "A grouping element for steps."
+    );
+    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(network_decl);
+
+    return true;
+  }
+
+  bool declared = declare();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -117,7 +148,7 @@ boost::signals2::connection cedar::proc::Network::connectToElementAdded
 
 std::string cedar::proc::Network::getUniqueIdentifier(const std::string& identifier) const
 {
-  if (this->mElements.find(identifier) == this->mElements.end())
+  if (!this->nameExists(identifier))
   {
     return identifier;
   }
@@ -129,9 +160,14 @@ std::string cedar::proc::Network::getUniqueIdentifier(const std::string& identif
     result = identifier +  " " + cedar::aux::toString(count);
     ++count;
   }
-  while (this->mElements.find(result) != this->mElements.end());
+  while (this->nameExists(result));
 
   return result;
+}
+
+bool cedar::proc::Network::nameExists(const std::string& name) const
+{
+  return this->mElements.find(name) != this->mElements.end();
 }
 
 void cedar::proc::Network::listSubnetworks(std::set<cedar::proc::ConstNetworkPtr>& subnetworks) const
@@ -162,17 +198,17 @@ const cedar::proc::Network::ElementMap& cedar::proc::Network::elements() const
   return this->mElements;
 }
 
-void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
+void cedar::proc::Network::removeAllConnectionsFromSlot(cedar::proc::ConstDataSlotPtr slot)
 {
-  // first, delete all data connections to and from this Element
-  for (
-        cedar::proc::Network::DataConnectionVector::iterator data_con = mDataConnections.begin();
-        data_con != mDataConnections.end();
-        // empty
-      )
+  for
+  (
+    cedar::proc::Network::DataConnectionVector::iterator data_con = mDataConnections.begin();
+    data_con != mDataConnections.end();
+    // empty
+  )
   {
-    if ((*data_con)->getSource()->isParent(boost::shared_dynamic_cast<const cedar::proc::Connectable>(element))
-        || (*data_con)->getTarget()->isParent(boost::shared_dynamic_cast<const cedar::proc::Connectable>(element)))
+    if ((*data_con)->getSource() == slot
+        || (*data_con)->getTarget() == slot)
     {
       mDataConnectionChanged
       (
@@ -193,6 +229,83 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
       ++data_con;
     }
   }
+}
+
+void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
+{
+  // first, delete all data connections to and from this Element
+  for (
+        cedar::proc::Network::DataConnectionVector::iterator data_con = mDataConnections.begin();
+        data_con != mDataConnections.end();
+        // empty
+      )
+  {
+    if ((*data_con)->getSource()->isParent(boost::shared_dynamic_cast<const cedar::proc::Connectable>(element))
+        || (*data_con)->getTarget()->isParent(boost::shared_dynamic_cast<const cedar::proc::Connectable>(element)))
+    {
+      mDataConnectionChanged
+      (
+        this->getElement<cedar::proc::Connectable>
+        (
+          (*data_con)->getSource()->getParent()
+        )->getOutputSlot((*data_con)->getSource()->getName() ),
+        this->getElement<cedar::proc::Connectable>
+        (
+          (*data_con)->getTarget()->getParent()
+        )->getInputSlot((*data_con)->getTarget()->getName()),
+        false
+      );
+      data_con = this->removeDataConnection(data_con);
+    }
+    else
+    {
+      ++data_con;
+    }
+  }
+  // including the ones to promoted slots (this only works if the parent network is accessible)
+  if (cedar::proc::NetworkPtr parent = this->mRegisteredAt.lock())
+  {
+    std::vector<cedar::proc::DataRole::Id> data_roles;
+    data_roles.push_back(DataRole::INPUT);
+    data_roles.push_back(DataRole::OUTPUT);
+    // go through all slot types
+    for (unsigned int i = 0; i < data_roles.size(); ++i)
+    {
+      try
+      {
+        const SlotMap& current_map = this->getDataSlots(data_roles.at(i));
+        for // go through all slots
+        (
+          SlotMap::const_iterator map = current_map.begin();
+          map != current_map.end();
+          ++map
+        )
+        {
+          if // check if this is promoted data
+          (
+            boost::shared_dynamic_cast<cedar::proc::ConstPromotedExternalData>(map->second)
+            || boost::shared_dynamic_cast<cedar::proc::ConstPromotedOwnedData>(map->second)
+          )
+          {
+            // if so, compare the name of the current element with the slot owner
+            std::string element_name;
+            std::string rest;
+            cedar::aux::splitFirst(map->first, ".", element_name, rest);
+            if (element->getName() == element_name) // this slot will be removed later, delete connections now
+            {
+              // remove all connections at parent network
+              parent->removeAllConnectionsFromSlot(map->second);
+            }
+          }
+        }
+      }
+      catch (cedar::proc::InvalidRoleException& exception)
+      {
+        continue;
+      }
+    }
+  }
+
   // then, delete all trigger connections to and from this Element
   for (
         cedar::proc::Network::TriggerConnectionVector::iterator trigger_con = mTriggerConnections.begin();
@@ -298,42 +411,55 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
   std::vector<cedar::proc::DataSlotPtr> promoted_slots;
   std::vector<std::string> promoted_data_from;
   std::vector<std::string> promoted_data_to;
-  cedar::proc::NetworkPtr old_network = (*(elements.begin()))->getNetwork();
-  // remember all data connections between moved elements
+  cedar::proc::NetworkPtr old_network;
   for
   (
-    cedar::proc::Network::DataConnectionVector::const_iterator it = old_network->getDataConnections().begin();
-    it != old_network->getDataConnections().end();
-    ++it
+    iterator it = elements.begin(); it != elements.end(); ++it
   )
   {
-    cedar::proc::ElementPtr source = old_network->getElement<cedar::proc::Element>((*it)->getSource()->getParent());
-    cedar::proc::ElementPtr target = old_network->getElement<cedar::proc::Element>((*it)->getTarget()->getParent());
-    iterator source_it = std::find(elements.begin(), elements.end(), source);
-    iterator target_it = std::find(elements.begin(), elements.end(), target);
-    if (source_it != elements.end() && target_it != elements.end())
+    if (old_network = (*(elements.begin()))->getNetwork())
     {
-      // this connection must be stored (note that connections are automatically deleted if elements are removed)
-      data_from.push_back((*it)->getSource()->getParent() + "." + (*it)->getSource()->getName());
-      data_to.push_back((*it)->getTarget()->getParent() + "." + (*it)->getTarget()->getName());
+      break;
     }
-    else if (source_it != elements.end())
+  }
+  // remember all data connections between moved elements
+  if (old_network)
+  {
+    for
+    (
+      cedar::proc::Network::DataConnectionVector::const_iterator it = old_network->getDataConnections().begin();
+      it != old_network->getDataConnections().end();
+      ++it
+    )
     {
-      promoted_slots.push_back
-      (
-        boost::shared_dynamic_cast<cedar::proc::Connectable>(source)->getOutputSlot((*it)->getSource()->getName())
-      );
-      promoted_data_from.push_back(this->getName() + "." + (*it)->getSource()->getParent() + "." + (*it)->getSource()->getName());
-      promoted_data_to.push_back((*it)->getTarget()->getParent() + "." + (*it)->getTarget()->getName());
-    }
-    else if (target_it != elements.end())
-    {
-      promoted_slots.push_back
-      (
-        boost::shared_dynamic_cast<cedar::proc::Connectable>(target)->getInputSlot((*it)->getTarget()->getName())
-      );
-      promoted_data_from.push_back((*it)->getSource()->getParent() + "." + (*it)->getSource()->getName());
-      promoted_data_to.push_back(this->getName() + "." + (*it)->getTarget()->getParent() + "." + (*it)->getTarget()->getName());
+      cedar::proc::ElementPtr source = old_network->getElement<cedar::proc::Element>((*it)->getSource()->getParent());
+      cedar::proc::ElementPtr target = old_network->getElement<cedar::proc::Element>((*it)->getTarget()->getParent());
+      iterator source_it = std::find(elements.begin(), elements.end(), source);
+      iterator target_it = std::find(elements.begin(), elements.end(), target);
+      if (source_it != elements.end() && target_it != elements.end())
+      {
+        // this connection must be stored (note that connections are automatically deleted if elements are removed)
+        data_from.push_back((*it)->getSource()->getParent() + "." + (*it)->getSource()->getName());
+        data_to.push_back((*it)->getTarget()->getParent() + "." + (*it)->getTarget()->getName());
+      }
+      else if (source_it != elements.end())
+      {
+        promoted_slots.push_back
+        (
+          boost::shared_dynamic_cast<cedar::proc::Connectable>(source)->getOutputSlot((*it)->getSource()->getName())
+        );
+        promoted_data_from.push_back(this->getName() + "." + (*it)->getSource()->getParent() + "." + (*it)->getSource()->getName());
+        promoted_data_to.push_back((*it)->getTarget()->getParent() + "." + (*it)->getTarget()->getName());
+      }
+      else if (target_it != elements.end())
+      {
+        promoted_slots.push_back
+        (
+          boost::shared_dynamic_cast<cedar::proc::Connectable>(target)->getInputSlot((*it)->getTarget()->getName())
+        );
+        promoted_data_from.push_back((*it)->getSource()->getParent() + "." + (*it)->getSource()->getName());
+        promoted_data_to.push_back(this->getName() + "." + (*it)->getTarget()->getParent() + "." + (*it)->getTarget()->getName());
+      }
     }
   }
   // remember all trigger connections between moved elements
@@ -358,6 +484,7 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
       }
     }
   }
+
   // now add each element to the new network
   for (iterator it = elements.begin(); it != elements.end(); ++it)
   {
@@ -366,7 +493,14 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
 
   for (unsigned int i = 0; i < promoted_slots.size(); ++i)
   {
-    this->promoteSlot(promoted_slots.at(i));
+    try
+    {
+      this->promoteSlot(promoted_slots.at(i));
+    }
+    catch (const cedar::proc::DuplicateNameException& exc)
+    {
+      // nothing to to here, promoted slot already exists
+    }
   }
 
   // restore data connections
@@ -452,6 +586,7 @@ cedar::proc::ElementPtr cedar::proc::Network::getElement(const std::string& name
 
 void cedar::proc::Network::connectSlots(const std::string& source, const std::string& target)
 {
+  //!@todo Shouldn't large parts of this code be in DataConnection?
   // parse element and slot name
   std::string source_name;
   std::string source_slot_name;
@@ -464,10 +599,14 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
   {
     CEDAR_THROW(cedar::proc::DuplicateConnectionException, "This connection already exists!")
   }
+  std::string real_source_name;
+  std::string real_source_slot;
+  cedar::proc::Connectable::parseDataNameNoRole(source, real_source_name, real_source_slot);
+
   std::string real_target_name;
   std::string real_target_slot;
   cedar::proc::Connectable::parseDataNameNoRole(target, real_target_name, real_target_slot);
-  cedar::proc::TriggerablePtr p_source = this->getElement<cedar::proc::Triggerable>(source_name);
+  cedar::proc::TriggerablePtr p_source = this->getElement<cedar::proc::Triggerable>(real_source_name);
   cedar::proc::TriggerablePtr p_target = this->getElement<cedar::proc::Triggerable>(real_target_name);
 
   cedar::proc::OwnedDataPtr source_slot
@@ -501,10 +640,7 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
   {
     try
     {
-      this->connectTrigger(
-                            this->getElement<cedar::proc::Triggerable>(source_name)->getFinishedTrigger(),
-                            p_target
-                          );
+      this->connectTrigger(p_source->getFinishedTrigger(), p_target);
     }
     catch(const cedar::proc::DuplicateConnectionException&)
     {
@@ -542,39 +678,58 @@ void cedar::proc::Network::connectTrigger(cedar::proc::TriggerPtr source, cedar:
   );
 }
 
+void cedar::proc::Network::disconnectOutputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot)
+{
+  std::vector<cedar::proc::DataConnectionPtr> connections;
+  this->getDataConnections(connectable, slot, connections);
+
+  for (size_t i = 0; i < connections.size(); ++i)
+  {
+    cedar::proc::DataConnectionPtr connection = connections[i];
+    this->disconnectSlots(connection->getSource(), connection->getTarget());
+  }
+}
+
 void cedar::proc::Network::disconnectSlots(const std::string& source, const std::string& target)
 {
   // parse element and slot name
   std::string source_name;
-  std::string source_slot;
+  std::string source_slot_name;
   std::string target_name;
-  std::string target_slot;
-  cedar::aux::splitFirst(source, ".", source_name, source_slot);
-  cedar::aux::splitFirst(target, ".", target_name, target_slot);
+  std::string target_slot_name;
+  cedar::aux::splitFirst(source, ".", source_name, source_slot_name);
+  cedar::aux::splitFirst(target, ".", target_name, target_slot_name);
+
+  cedar::proc::ConnectablePtr source_connectable = this->getElement<cedar::proc::Connectable>(source_name);
+  cedar::proc::ConnectablePtr target_connectable = this->getElement<cedar::proc::Connectable>(target_name);
+
+  cedar::proc::DataSlotPtr source_slot = source_connectable->getOutputSlot(source_slot_name);
+  cedar::proc::DataSlotPtr target_slot = target_connectable->getInputSlot(target_slot_name);
+
+  this->disconnectSlots(source_slot, target_slot);
+}
+
+void cedar::proc::Network::disconnectSlots
+                           (
+                             cedar::proc::ConstDataSlotPtr sourceSlot,
+                             cedar::proc::ConstDataSlotPtr targetSlot
+                           )
+{
   for (DataConnectionVector::iterator it = mDataConnections.begin(); it != mDataConnections.end(); ++it)
   {
-    cedar::proc::ConnectablePtr target_connectable = this->getElement<cedar::proc::Connectable>(target_name);
-    if ((*it)->equals(
-                       this->getElement<cedar::proc::Connectable>(source_name)->getOutputSlot(source_slot),
-                       target_connectable->getInputSlot(target_slot)
-                     )
-       )
+    if ((*it)->equals(sourceSlot, targetSlot))
     {
       this->removeDataConnection(it);
       // inform any interested listeners of this new connection
-      mDataConnectionChanged
-      (
-        this->getElement<cedar::proc::Connectable>(source_name)->getOutputSlot(source_slot),
-        this->getElement<cedar::proc::Connectable>(target_name)->getInputSlot(target_slot),
-        false
-      );
+      mDataConnectionChanged(sourceSlot, targetSlot, false);
       return;
     }
   }
+
   CEDAR_THROW
   (
     cedar::proc::MissingConnectionException,
-    "The data connection between " + source  + " and " + target + " in network " + this->getName() + " does not exist!"
+    "The data connection between in network " + this->getName() + " does not exist!"
   );
 }
 
@@ -658,6 +813,18 @@ void cedar::proc::Network::writeMetaData(cedar::aux::ConfigurationNode& meta)
 
 void cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode& root)
 {
+  std::vector<std::string> exceptions;
+  this->readFrom(root, exceptions);
+
+  if (!exceptions.empty())
+  {
+    cedar::proc::ArchitectureLoadingException exception(exceptions);
+    CEDAR_THROW_EXCEPTION(exception);
+  }
+}
+
+void cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions)
+{
   unsigned int format_version = 1; // default value is the current format
   try
   {
@@ -690,19 +857,23 @@ void cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode& root)
         "cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode&)"
       );
     case 1:
-      this->readFromV1(root);
+      this->readFromV1(root, exceptions);
       break;
   }
 }
 
-void cedar::proc::Network::readFromV1(const cedar::aux::ConfigurationNode& root)
+void cedar::proc::Network::readFromV1
+     (
+       const cedar::aux::ConfigurationNode& root,
+       std::vector<std::string>& exceptions
+     )
 {
   this->cedar::aux::Configurable::readConfiguration(root);
 
   try
   {
     const cedar::aux::ConfigurationNode& steps = root.get_child("steps");
-    this->readSteps(steps);
+    this->readSteps(steps, exceptions);
   }
   catch (const boost::property_tree::ptree_bad_path&)
   {
@@ -719,7 +890,7 @@ void cedar::proc::Network::readFromV1(const cedar::aux::ConfigurationNode& root)
   try
   {
     const cedar::aux::ConfigurationNode& networks = root.get_child("networks");
-    this->readNetworks(networks);
+    this->readNetworks(networks, exceptions);
   }
   catch (const boost::property_tree::ptree_bad_path&)
   {
@@ -744,7 +915,7 @@ void cedar::proc::Network::readFromV1(const cedar::aux::ConfigurationNode& root)
   try
   {
     const cedar::aux::ConfigurationNode& connections = root.get_child("connections");
-    this->readDataConnections(connections);
+    this->readDataConnections(connections, exceptions);
   }
   catch (const boost::property_tree::ptree_bad_path&)
   {
@@ -761,7 +932,7 @@ void cedar::proc::Network::readFromV1(const cedar::aux::ConfigurationNode& root)
   try
   {
     const cedar::aux::ConfigurationNode& triggers = root.get_child("triggers");
-    this->readTriggers(triggers);
+    this->readTriggers(triggers, exceptions);
   }
   catch (const boost::property_tree::ptree_bad_path&)
   {
@@ -793,7 +964,11 @@ void cedar::proc::Network::writeSteps(cedar::aux::ConfigurationNode& steps)
   }
 }
 
-void cedar::proc::Network::readSteps(const cedar::aux::ConfigurationNode& root)
+void cedar::proc::Network::readSteps
+     (
+       const cedar::aux::ConfigurationNode& root,
+       std::vector<std::string>& exceptions
+     )
 {
 #ifdef DEBUG_FILE_READING
   std::cout << "Reading steps." << std::endl;
@@ -810,10 +985,38 @@ void cedar::proc::Network::readSteps(const cedar::aux::ConfigurationNode& root)
     std::cout << "Reading step of type " << class_id << std::endl;
   #endif // DEBUG_FILE_READING
 
-    cedar::proc::ElementPtr step = cedar::proc::DeclarationRegistrySingleton::getInstance()->allocateClass(class_id);
-    step->readConfiguration(step_node);
-    this->add(step);
-    step->resetChangedStates(false);
+    cedar::proc::ElementPtr step;
+    try
+    {
+      step = cedar::proc::DeclarationRegistrySingleton::getInstance()->allocateClass(class_id);
+    }
+    catch (cedar::aux::ExceptionBase& e)
+    {
+      exceptions.push_back(e.exceptionInfo());
+    }
+
+    if (step)
+    {
+      try
+      {
+        step->readConfiguration(step_node);
+      }
+      catch (cedar::aux::ExceptionBase& e)
+      {
+        exceptions.push_back(e.exceptionInfo());
+      }
+
+      try
+      {
+        this->add(step);
+      }
+      catch (cedar::aux::ExceptionBase& e)
+      {
+        exceptions.push_back(e.exceptionInfo());
+      }
+
+      step->resetChangedStates(false);
+    }
   }
 }
 
@@ -835,7 +1038,11 @@ void cedar::proc::Network::writeTriggers(cedar::aux::ConfigurationNode& triggers
   }
 }
 
-void cedar::proc::Network::readTriggers(const cedar::aux::ConfigurationNode& root)
+void cedar::proc::Network::readTriggers
+     (
+       const cedar::aux::ConfigurationNode& root,
+       std::vector<std::string>& exceptions
+     )
 {
 #ifdef DEBUG_FILE_READING
   std::cout << "Reading triggers." << std::endl;
@@ -852,13 +1059,38 @@ void cedar::proc::Network::readTriggers(const cedar::aux::ConfigurationNode& roo
     std::cout << "Reading trigger of type " << class_id << std::endl;
 #endif // DEBUG_FILE_READING
 
-    cedar::proc::TriggerPtr trigger
-      = boost::shared_dynamic_cast<cedar::proc::Trigger>
-        (
-          cedar::proc::DeclarationRegistrySingleton::getInstance()->allocateClass(class_id)
-        );
-    trigger->readConfiguration(trigger_node);
-    this->add(trigger);
+    cedar::proc::TriggerPtr trigger;
+    try
+    {
+      trigger = boost::shared_dynamic_cast<cedar::proc::Trigger>
+                (
+                  cedar::proc::DeclarationRegistrySingleton::getInstance()->allocateClass(class_id)
+                );
+    }
+    catch (cedar::aux::ExceptionBase& e)
+    {
+      exceptions.push_back(e.exceptionInfo());
+      continue;
+    }
+
+    try
+    {
+      trigger->readConfiguration(trigger_node);
+    }
+    catch (cedar::aux::ExceptionBase& e)
+    {
+      exceptions.push_back(e.exceptionInfo());
+    }
+
+    try
+    {
+      this->add(trigger);
+    }
+    catch (cedar::aux::ExceptionBase& e)
+    {
+      exceptions.push_back(e.exceptionInfo());
+    }
+
     trigger->resetChangedStates(false);
   }
 
@@ -879,8 +1111,29 @@ void cedar::proc::Network::readTriggers(const cedar::aux::ConfigurationNode& roo
       {
         std::string listener_name = listener_iter->second.data();
 
-        cedar::proc::TriggerablePtr triggerable = this->getElement<Triggerable>(listener_name);
-        this->connectTrigger(trigger, triggerable);
+        cedar::proc::TriggerablePtr triggerable;
+        try
+        {
+          triggerable = this->getElement<Triggerable>(listener_name);
+        }
+        catch (cedar::aux::ExceptionBase& e)
+        {
+          exceptions.push_back(e.exceptionInfo());
+        }
+
+        if (!triggerable)
+        {
+          continue; // target not found, cannot recover
+        }
+
+        try
+        {
+          this->connectTrigger(trigger, triggerable);
+        }
+        catch (cedar::aux::ExceptionBase& e)
+        {
+          exceptions.push_back(e.exceptionInfo());
+        }
       }
     }
     catch (const boost::property_tree::ptree_bad_path&)
@@ -907,7 +1160,11 @@ void cedar::proc::Network::writeNetworks(cedar::aux::ConfigurationNode& networks
   }
 }
 
-void cedar::proc::Network::readNetworks(const cedar::aux::ConfigurationNode& root)
+void cedar::proc::Network::readNetworks
+     (
+       const cedar::aux::ConfigurationNode& root,
+       std::vector<std::string>& exceptions
+     )
 {
 #ifdef DEBUG_FILE_READING
   std::cout << "Reading networks." << std::endl;
@@ -924,14 +1181,41 @@ void cedar::proc::Network::readNetworks(const cedar::aux::ConfigurationNode& roo
     std::cout << "Reading network named " << network_name << std::endl;
 #endif // DEBUG_FILE_READING
 
-    cedar::proc::NetworkPtr network
-      = boost::shared_dynamic_cast<cedar::proc::Network>
-        (
-          cedar::proc::DeclarationRegistrySingleton::getInstance()->allocateClass("cedar.processing.Network")
-        );
-    network->setName(network_name);
-    this->add(network);
-    network->readFrom(network_node);
+    cedar::proc::NetworkPtr network;
+
+    try
+    {
+      network
+        = boost::shared_dynamic_cast<cedar::proc::Network>
+          (
+            cedar::proc::DeclarationRegistrySingleton::getInstance()->allocateClass("cedar.processing.Network")
+          );
+    }
+    catch (cedar::aux::ExceptionBase& e)
+    {
+      exceptions.push_back(e.exceptionInfo());
+      continue;
+    }
+
+    try
+    {
+      network->setName(network_name);
+    }
+    catch (cedar::aux::ExceptionBase& e)
+    {
+      exceptions.push_back(e.exceptionInfo());
+    }
+
+    try
+    {
+      this->add(network);
+    }
+    catch (cedar::aux::ExceptionBase& e)
+    {
+      exceptions.push_back(e.exceptionInfo());
+    }
+
+    network->readFrom(network_node, exceptions);
     // is this enough to recursively read in the network?
     network->resetChangedStates(false);
   }
@@ -972,7 +1256,11 @@ void cedar::proc::Network::writeDataConnections(cedar::aux::ConfigurationNode& r
   }
 }
 
-void cedar::proc::Network::readDataConnections(const cedar::aux::ConfigurationNode& root)
+void cedar::proc::Network::readDataConnections
+     (
+       const cedar::aux::ConfigurationNode& root,
+       std::vector<std::string>& exceptions
+     )
 {
 #ifdef DEBUG_FILE_READING
   std::cout << "Reading data connections." << std::endl;
@@ -982,7 +1270,14 @@ void cedar::proc::Network::readDataConnections(const cedar::aux::ConfigurationNo
       iter != root.end();
       ++iter)
   {
-    this->readDataConnection(iter->second);
+    try
+    {
+      this->readDataConnection(iter->second);
+    }
+    catch (cedar::aux::ExceptionBase& e)
+    {
+      exceptions.push_back(e.exceptionInfo());
+    }
   }
 }
 
@@ -1052,9 +1347,9 @@ void cedar::proc::Network::updateObjectName(cedar::proc::Element* object)
   // exchange the object in the map - put object at key (new name) and erase old entry
   // make a copy of the element pointer
   cedar::proc::ElementPtr element = old_iter->second;
-
+  std::string old_name = old_iter->first;
   // if new and old name are the same, do nothing
-  if (element->getName() == old_iter->first)
+  if (element->getName() == old_name)
   {
     return;
   }
@@ -1072,6 +1367,44 @@ void cedar::proc::Network::updateObjectName(cedar::proc::Element* object)
   mElements.erase(old_iter);
   // now we can reinsert the element (this invalidates the iterator)
   mElements[object->getName()] = element;
+
+  // check all promoted items
+  bool slots_changed = false;
+  for (unsigned int index = 0; index < _mPromotedSlots->size(); ++index)
+  {
+    std::string name;
+    std::string rest;
+    cedar::aux::splitFirst(_mPromotedSlots->at(index), ".", name, rest);
+    if (name == old_name)
+    {
+      std::string full_slot_name;
+      std::string type;
+      cedar::aux::splitLast(_mPromotedSlots->at(index), ".", full_slot_name, type);
+      std::string step_name;
+      std::string slot_name;
+      cedar::aux::splitLast(full_slot_name, ".", step_name, slot_name);
+      std::string new_slot_name = object->getName() + "." + slot_name;
+      if (type == "Input")
+      {
+        this->renameInput(full_slot_name, new_slot_name);
+      }
+      else if (type == "Output")
+      {
+        this->renameOutput(full_slot_name, new_slot_name);
+      }
+      else
+      {
+        CEDAR_ASSERT(false);
+      }
+      std::string updated_name = object->getName() + "." + rest;
+      _mPromotedSlots->set(index, updated_name);
+      slots_changed = true;
+    }
+  }
+  if (slots_changed)
+  {
+    this->mSlotChanged();
+  }
 }
 
 void cedar::proc::Network::getDataConnections(
@@ -1100,19 +1433,33 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
                                                        cedar::proc::Network::DataConnectionVector::iterator it
                                                      )
 {
-  const std::string& source_name = (*it)->getSource()->getParent();
+  //!@todo This code needs to be cleaned up, simplified and commented
+  std::string source_name = (*it)->getSource()->getParent();
   std::string target_name = (*it)->getTarget()->getParent();
-  std::string real_target_name = "";
+  std::string real_source_name = source_name;
+  if (cedar::proc::ConstPromotedExternalDataPtr ext = boost::shared_dynamic_cast<const cedar::proc::PromotedExternalData>((*it)->getSource()))
+  {
+    real_source_name = ext->getPromotionPath();
+  }
+  else if (cedar::proc::ConstPromotedOwnedDataPtr owned = boost::shared_dynamic_cast<const cedar::proc::PromotedOwnedData>((*it)->getSource()))
+  {
+    real_source_name = owned->getPromotionPath();
+  }
+
+  std::string real_target_name;
   if (cedar::proc::ConstPromotedExternalDataPtr ext = boost::shared_dynamic_cast<const cedar::proc::PromotedExternalData>((*it)->getTarget()))
   {
     real_target_name = ext->getPromotionPath();
   }
-  if (cedar::proc::ConstPromotedOwnedDataPtr owned = boost::shared_dynamic_cast<const cedar::proc::PromotedOwnedData>((*it)->getTarget()))
+  else if (cedar::proc::ConstPromotedOwnedDataPtr owned = boost::shared_dynamic_cast<const cedar::proc::PromotedOwnedData>((*it)->getTarget()))
   {
     real_target_name = owned->getPromotionPath();
   }
 
-  // if target is not looped, also delete the trigger connection
+  if (real_source_name != "") // the source is a nested element
+  {
+    source_name = real_source_name;
+  }
   if (real_target_name != "") // the target is a nested element
   {
     target_name = real_target_name;
@@ -1138,12 +1485,12 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
       }
     }
     // found no other connection, delete the TriggerConnection as well
-    if (real_target_name != "") // the target is a nested element
+    if (!real_target_name.empty()) // the target is a nested element
     {
       target_name = real_target_name;
     }
     this->disconnectTrigger(
-                             this->getElement<cedar::proc::Triggerable>(source_name)->getFinishedTrigger(),
+                             this->getElement<cedar::proc::Triggerable>(real_source_name)->getFinishedTrigger(),
                              this->getElement<cedar::proc::Triggerable>(target_name)
                            );
     triggerable_target->onTrigger();
@@ -1236,7 +1583,7 @@ boost::signals2::connection cedar::proc::Network::connectToTriggerConnectionChan
 
 boost::signals2::connection cedar::proc::Network::connectToDataConnectionChanged
                             (
-                              boost::function<void (cedar::proc::DataSlotPtr, cedar::proc::DataSlotPtr, bool)> slot
+                              boost::function<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, bool)> slot
                             )
 {
   return mDataConnectionChanged.connect(slot);

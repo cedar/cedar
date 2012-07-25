@@ -59,7 +59,21 @@ mTarget(target)
 
   CEDAR_DEBUG_ASSERT(boost::shared_dynamic_cast<cedar::proc::OwnedData>(source));
   // add the source data to target
-  target->getParentPtr()->setInput(target->getName(), source->getData());
+  //!@todo This code is redundant with the code below -- unify this
+  if (source && target)
+  {
+    // remove the source data from target
+    cedar::proc::DataSlotPtr real_target = target;
+    while
+    (
+      cedar::proc::PromotedExternalDataPtr promoted
+        = boost::shared_dynamic_cast<cedar::proc::PromotedExternalData>(real_target)
+    )
+    {
+      real_target = promoted->mDataSlot;
+    }
+    real_target->getParentPtr()->setInput(real_target->getName(), source->getData());
+  }
 }
 
 cedar::proc::DataConnection::~DataConnection()

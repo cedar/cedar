@@ -62,10 +62,18 @@ namespace
     (
       new ElementDeclarationTemplate<cedar::proc::steps::Convolution>
       (
-        "Utilities",
+        "Math Utilities",
         "cedar.processing.steps.Convolution"
       )
     );
+    convolution_decl->setDescription
+                      (
+                        "This processing step convolves a matrix with a kernel.\n"\
+                        "Convolution can be done with to different engines: OpenCV and FFTW. "\
+                        "The OpenCV engine provides Convolution with three modes: Full, same, and valid. "\
+                        "Also the border handling can be set as: Cyclic, zero-filled, mirrowed, and replicate. "\
+                        "The FFTW engine only provides cyclic border handling with mode same."
+                      );
     convolution_decl->setIconPath(":/steps/convolution.svg");
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(convolution_decl);
 
@@ -115,13 +123,13 @@ void cedar::proc::steps::Convolution::recompute()
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Convolution::determineInputValidity
                                 (
                                   cedar::proc::ConstDataSlotPtr CEDAR_DEBUG_ONLY(slot),
-                                  cedar::aux::DataPtr data
+                                  cedar::aux::ConstDataPtr data
                                 ) const
 {
   // First, let's make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(slot->getName() == "matrix" || slot->getName() == "kernel");
 
-  if (boost::shared_dynamic_cast<cedar::aux::MatData>(data))
+  if (boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
   {
     // Mat data is accepted.
     return cedar::proc::DataSlot::VALIDITY_VALID;
@@ -144,6 +152,8 @@ void cedar::proc::steps::Convolution::inputConnectionChanged(const std::string& 
     this->mMatrix = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
     // This should always work since other types should not be accepted.
     CEDAR_DEBUG_ASSERT(this->mMatrix);
+
+    this->mOutput->copyAnnotationsFrom(this->mMatrix);
   }
   else if (inputName == "kernel")
   {

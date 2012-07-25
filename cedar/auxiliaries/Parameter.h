@@ -38,8 +38,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_PARAMETER_H
-#define CEDAR_PROC_PARAMETER_H
+#ifndef CEDAR_AUX_PARAMETER_H
+#define CEDAR_AUX_PARAMETER_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
@@ -206,4 +206,4 @@ private:
 }; // class cedar::aux::Parameter
 
 
-#endif // CEDAR_PROC_PARAMETER_H
+#endif // CEDAR_AUX_PARAMETER_H

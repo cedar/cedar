@@ -51,8 +51,6 @@
  * @todo Intelligent strategies should be useable here, e.g., when multiple kernels in a row are TYPE_FULL, they can be
  *       summed together etc.
  *
- * @todo Write a unit test for this class
- *
  * @todo This class should also be able to work with more matrices of more than two dimensions.
  *
  * @todo Right now, this computes correlation (it should flip the kernel)
@@ -108,7 +106,7 @@ public:
   cv::Mat convolve
   (
     const cv::Mat& matrix,
-    const cedar::aux::conv::KernelList& kernel,
+    cedar::aux::conv::ConstKernelListPtr kernelList,
     cedar::aux::conv::BorderType::Id borderType,
     cedar::aux::conv::Mode::Id mode
   ) const;
@@ -156,8 +154,6 @@ private:
 
   void updateKernelType(size_t index);
 
-  int translateBorderType(cedar::aux::conv::BorderType::Id borderType) const;
-
   void translateAnchor
   (
     cv::Point& anchor,
@@ -191,7 +187,7 @@ private:
 
   cv::Mat createFullMatrix(
                           const cv::Mat& matrix,
-                          const cedar::aux::conv::KernelList& kernelList,
+                          cedar::aux::conv::ConstKernelListPtr kernelList,
                           cedar::aux::conv::BorderType::Id borderType
                           ) const;
 
@@ -201,18 +197,32 @@ private:
                           cedar::aux::conv::BorderType::Id borderType
                           ) const;
 
-  cv::Mat resultCutOut
-          (
-            const cv::Mat& result,
-            unsigned int matrixRows,
-            unsigned int matrixCols,
-            unsigned int kernelRows,
-            unsigned int kernelCols
-          ) const;
+  cv::Mat createFullMatrix(
+                          const cv::Mat& matrix,
+                          cedar::aux::conv::BorderType::Id borderType
+                          ) const;
 
-  cv::Mat resultCutOut(const cv::Mat& result, const cv::Mat& matrix, const cv::Mat& kernel) const;
+  cv::Mat cutOutResult(
+                      const cv::Mat& result,
+                      unsigned int matrixRows,
+                      unsigned int matrixCols,
+                      unsigned int kernelRows,
+                      unsigned int kernelCols
+                      ) const;
 
-  cv::Mat resultCutOut(const cv::Mat& result, const cv::Mat& matrix, const cedar::aux::kernel::ConstKernelPtr kernel) const;
+  cv::Mat cutOutResult(const cv::Mat& result, const cv::Mat& matrix, const cv::Mat& kernel) const;
+
+  cv::Mat cutOutResult(const cv::Mat& result, const cv::Mat& matrix, const cedar::aux::kernel::ConstKernelPtr kernel) const;
+
+  cv::Mat cutOutResult(
+                      const cv::Mat& result,
+                      unsigned int kernelRows,
+                      unsigned int kernelCols
+                      ) const;
+
+  cv::Mat cutOutResult(const cv::Mat& result, const cv::Mat& kernel) const;
+
+  cv::Mat cutOutResult(const cv::Mat& result, const cedar::aux::kernel::ConstKernelPtr kernel) const;
 
   cv::Mat cvConvolve
   (

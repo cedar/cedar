@@ -39,14 +39,24 @@ if (CEDAR_USE_KUKA_LWR)
 else(CEDAR_USE_KUKA_LWR)
   set(kuka_moc_files "")
 endif(CEDAR_USE_KUKA_LWR)
+
+set (linked_libs "")
+if (CEDAR_USE_LIB_DC1394)
+  set (linked_libs dc1394)
+endif(CEDAR_USE_LIB_DC1394)
+
 cedar_add_library(cedardev
                   MOC_HEADERS
                   robot/gui/KinematicChainWidget.h
                   robot/gui/KinematicChainMonitorWidget.h
                   robot/gui/KinematicChainCommandWidget.h
+                  robot/gui/MountedCameraViewer.h
                   kteam/gui/EPuckControlWidget.h
                   communication/gui/CommunicationWidget.h
+                  sensors/visual/VideoGrabber.h
+                  sensors/visual/PictureGrabber.h
                   ${kuka_moc_files}
                   LINK_LIBRARIES
                   cedaraux
+                  ${linked_libs}
                   )

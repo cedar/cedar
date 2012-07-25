@@ -59,29 +59,31 @@
 //----------------------------------------------------------------------------------------------------------------------
 // register the trigger class
 //----------------------------------------------------------------------------------------------------------------------
-namespace
-{
-  bool declare()
-  {
-    using cedar::proc::ElementDeclarationPtr;
-    using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr trigger_declaration
-    (
-      new ElementDeclarationTemplate<cedar::proc::Trigger>
-      (
-        "Triggers",
-        "cedar.processing.Trigger"
-      )
-    );
-    trigger_declaration->setIconPath(":/triggers/trigger.svg");
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(trigger_declaration);
-
-    return true;
-  }
-
-  bool declared = declare();
-}
+// for now, we don't need to use the trigger as it is not useful (and just leads to confusion)
+//namespace
+//{
+//  bool declare()
+//  {
+//    using cedar::proc::ElementDeclarationPtr;
+//    using cedar::proc::ElementDeclarationTemplate;
+//
+//    ElementDeclarationPtr trigger_declaration
+//    (
+//      new ElementDeclarationTemplate<cedar::proc::Trigger>
+//      (
+//        "Triggers",
+//        "cedar.processing.Trigger"
+//      )
+//    );
+//    trigger_declaration->setIconPath(":/triggers/trigger.svg");
+//    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(trigger_declaration);
+//
+//    return true;
+//  }
+//
+//  bool declared = declare();
+//}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -119,28 +121,18 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 {
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
-    // If the arguments can be set, trigger the step.
-    //!@todo For dynamics, this can mean that some step times are discarded rather than accumulated.
-    //!@todo cedar::proc::Step::setNextArguments should take a const pointer.
-    //!@todo Make a cache for each entry in the listener list to avoid the dynamic cast here/avoid it otherwise
-    if (cedar::proc::StepPtr step = boost::shared_dynamic_cast<cedar::proc::Step>(this->mListeners.at(i)))
-    {
-      if (step->setNextArguments(arguments))
-      {
 #ifdef DEBUG_TRIGGERING
         std::cout << "Trigger " << this->getName() << " triggers " << this->mListeners.at(i)->getName() << std::endl;
 #endif // DEBUG_TRIGGERING
-        this->mListeners.at(i)->onTrigger(boost::shared_static_cast<cedar::proc::Trigger>(this->shared_from_this()));
-      }
-    }
-    else
-    {
-      this->mListeners.at(i)->onTrigger(boost::shared_static_cast<cedar::proc::Trigger>(this->shared_from_this()));
-    }
+    this->mListeners.at(i)->onTrigger
+                            (
+                              arguments,
+                              boost::shared_static_cast<cedar::proc::Trigger>(this->shared_from_this())
+                            );
   }
 }
 
-void cedar::proc::Trigger::onTrigger(cedar::proc::TriggerPtr /* pSender */)
+void cedar::proc::Trigger::onTrigger(cedar::proc::ArgumentsPtr, cedar::proc::TriggerPtr)
 {
 }
 

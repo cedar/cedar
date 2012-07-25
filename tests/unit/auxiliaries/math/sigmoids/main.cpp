@@ -37,11 +37,11 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/math/sigmoids.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
-#include "cedar/auxiliaries/math/AbsSigmoid.h"
-#include "cedar/auxiliaries/math/ExpSigmoid.h"
-#include "cedar/auxiliaries/math/HeavisideSigmoid.h"
+#include "cedar/auxiliaries/math/sigmoids/AbsSigmoid.h"
+#include "cedar/auxiliaries/math/sigmoids/ExpSigmoid.h"
+#include "cedar/auxiliaries/math/sigmoids/HeavisideSigmoid.h"
 #include "cedar/auxiliaries/math/tools.h"
-#include "cedar/auxiliaries/math/SigmoidDeclaration.h"
+#include "cedar/auxiliaries/math/TransferFunctionDeclaration.h"
 
 // SYSTEM INCLUDES
 
@@ -109,11 +109,11 @@ int main()
   cedar::aux::math::write(sigmoid_my_values);
   cedar::aux::math::write(sigmoid_my_values_double);
 
-  cedar::aux::math::SigmoidDeclarationPtr sigmoid_declaration
+  cedar::aux::math::TransferFunctionDeclarationPtr sigmoid_declaration
   (
-    new cedar::aux::math::SigmoidDeclarationT<cedar::aux::math::AbsSigmoidPtr>("cedar.aux.math.AbsSigmoid")
+    new cedar::aux::math::TransferFunctionDeclarationT<cedar::aux::math::AbsSigmoidPtr>("cedar.aux.math.AbsSigmoid")
   );
-  cedar::aux::math::SigmoidPtr my_sigmoid = sigmoid_declaration->getObjectFactory()->allocate();
+  cedar::aux::math::TransferFunctionPtr my_sigmoid = sigmoid_declaration->getObjectFactory()->allocate();
   sigmoid_my_values = my_sigmoid->compute<float>(my_values);
   sigmoid_my_values_double = my_sigmoid->compute<double>(my_values_double);
   cedar::aux::math::write(sigmoid_my_values);

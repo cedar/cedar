@@ -48,7 +48,7 @@
 namespace
 {
   bool registered
-    = cedar::aux::math::SigmoidManagerSingleton::getInstance()->registerType<cedar::aux::math::LinearSigmoidPtr>();
+    = cedar::aux::math::TransferFunctionManagerSingleton::getInstance()->registerType<cedar::aux::math::LinearSigmoidPtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

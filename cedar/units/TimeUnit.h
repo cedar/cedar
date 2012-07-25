@@ -136,6 +136,15 @@ public:
     return *this;
   }
 
+  /*!@brief The subtraction operator.
+   */
+  template <unsigned int otherFactor, const char* otherSuffix>
+  TimeUnit& operator-= (const TimeUnit<otherFactor, otherSuffix>& other)
+  {
+    this->mAmountInMicroSeconds -= other.mAmountInMicroSeconds;
+    return *this;
+  }
+
   /*!@brief star operator for multiplying a TimeUnit with a scalar value on right side
    * @return result of multiplication
    */

@@ -146,12 +146,10 @@ protected:
   cedar::proc::DataSlot::VALIDITY determineInputValidity
                                 (
                                   cedar::proc::ConstDataSlotPtr slot,
-                                  cedar::aux::DataPtr data
+                                  cedar::aux::ConstDataPtr data
                                 ) const;
 
 protected slots:
-  //!@brief this slot is triggered whenever a new connection is connected as an input to the projection step
-  void inputConnectionChanged(const std::string& inputName);
   //!@brief this slot is triggered whenever the dimensionality of its output is changed by the user
   void outputDimensionalityChanged();
   //!@brief this slot is triggered whenever the size of any dimension of the output is changed by the user
@@ -163,6 +161,8 @@ protected slots:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief this function is triggered whenever a new connection is connected as an input to the projection step
+  void inputConnectionChanged(const std::string& inputName);
   //!@brief initializes or reconfigures the output matrix
   void initializeOutputMatrix();
 

@@ -91,16 +91,9 @@ cedar::aux::gui::ObjectListParameter::ObjectListParameter()
   mpRemoveButton->setToolTip("Remove the instance currently selected.");
   p_layout->addWidget(mpRemoveButton, 1, 1);
 
-  mpEditButton = new QPushButton("...");
-  mpEditButton->setToolTip("Open a new window to edit the parameters of the instance currently selected.");
-  mpEditButton->setMaximumWidth(button_size);
-  mpEditButton->setEnabled(false);
-  p_layout->addWidget(mpEditButton, 1, 2);
-
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
   QObject::connect(this->mpAddButton, SIGNAL(clicked()), this, SLOT(addClicked()));
   QObject::connect(this->mpRemoveButton, SIGNAL(clicked()), this, SLOT(removeClicked()));
-  QObject::connect(this->mpEditButton, SIGNAL(clicked()), this, SLOT(editClicked()));
   QObject::connect(this->mpInstanceSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(currentInstanceIndexChanged(int)));
 }
 
@@ -151,7 +144,9 @@ void cedar::aux::gui::ObjectListParameter::parameterPointerChanged()
 
   for (size_t i = 0; i < types.size(); ++i)
   {
-    this->mpTypeSelector->addItem(QString::fromStdString(types.at(i)));
+    QString type_id = QString::fromStdString(types.at(i));
+    this->mpTypeSelector->addItem(this->prettyTypeId(type_id));
+    this->mpTypeSelector->setItemData(i, type_id);
   }
 
   // Fill existing instances ------------------------------------------------------------------
@@ -160,6 +155,15 @@ void cedar::aux::gui::ObjectListParameter::parameterPointerChanged()
   {
     this->appendObjectToInstanceList(i);
   }
+}
+
+QString cedar::aux::gui::ObjectListParameter::prettyTypeId(const QString& typeId) const
+{
+  QStringList parts = typeId.split('.');
+  QString class_id = parts.back();
+  parts.pop_back();
+  QString namespace_id = parts.join(".");
+  return class_id + " (" + namespace_id + ")";
 }
 
 void cedar::aux::gui::ObjectListParameter::addClicked()
@@ -176,7 +180,8 @@ void cedar::aux::gui::ObjectListParameter::appendObjectToInstanceList(int index)
 {
   cedar::aux::ConfigurablePtr object = this->getObjectList()->configurableAt(index);
   const std::string& instance_type = this->getObjectList()->getTypeOfObject(object);
-  QString label = QString::fromStdString(instance_type);
+  int num = this->mpInstanceSelector->count();
+  QString label = QString("[%1] ").arg(num) + this->prettyTypeId(QString::fromStdString(instance_type));
   this->mpInstanceSelector->addItem(label);
 
   // The object's index should always correspond to the index in the combo box.
@@ -201,38 +206,12 @@ void cedar::aux::gui::ObjectListParameter::slotObjectRemoved(int index)
   this->mpInstanceSelector->removeItem(index);
 }
 
-void cedar::aux::gui::ObjectListParameter::editClicked()
-{
-  //!@todo Store the pointers to the dialogs/property panes hare and update them when an item is added/removed/...
-  //!@todo Find a way to make sure these dialogs close when the main window does.
-  cedar::aux::ConfigurablePtr configurable = this->getSelectedInstance();
-  cedar::aux::gui::PropertyPane *p_display = new cedar::aux::gui::PropertyPane();
-  QDialog *p_dialog = new QDialog();
-  QVBoxLayout *p_layout = new QVBoxLayout();
-  p_layout->setContentsMargins(0, 0, 0, 0);
-  p_dialog->setLayout(p_layout);
-  p_layout->addWidget(p_display);
-
-  QString title
-    = QString::fromStdString(this->getObjectList()->getName())
-      + QString("[%1]").arg(this->mpInstanceSelector->currentIndex());
-
-  p_dialog->setWindowTitle(title);
-
-  p_dialog->show();
-  p_display->display(configurable);
-
-  // resize to fit contents
-  p_display->adjustSize();
-  p_dialog->adjustSize();
-}
-
 std::string cedar::aux::gui::ObjectListParameter::getSelectedType() const
 {
   int index = this->mpTypeSelector->currentIndex();
   if (index != -1)
   {
-    return this->mpTypeSelector->currentText().toStdString();
+    return this->mpTypeSelector->itemData(index).toString().toStdString();
   }
   else
   {
@@ -258,5 +237,4 @@ void cedar::aux::gui::ObjectListParameter::currentInstanceIndexChanged(int index
 {
   bool enabled = (index != -1);
   mpRemoveButton->setEnabled(enabled);
-  mpEditButton->setEnabled(enabled);
 }

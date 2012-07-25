@@ -56,9 +56,11 @@ cedar::aux::gui::LocalCoordinateFrameWidget::LocalCoordinateFrameWidget
 )
 :
 QWidget(parent),
-mpLocalCoordinateFrame(localCoordinateFrame)
+mpLocalCoordinateFrame(localCoordinateFrame),
+// parameters
+_mDecimals(new cedar::aux::UIntParameter(this, "decimals", 2))
 {
-  mDecimals = 2;
+  //!@todo: make these configurable
   mRotationInterval = 10;
   mSingleTranslationStep = 0.1;
   mSingleRotationStep = 0.02;
@@ -70,46 +72,8 @@ mpLocalCoordinateFrame(localCoordinateFrame)
   mZMax = 10.0;
 
   initWindow();
-  return;
-}
 
-
-cedar::aux::gui::LocalCoordinateFrameWidget::LocalCoordinateFrameWidget
-(
-  const cedar::aux::LocalCoordinateFramePtr localCoordinateFrame,
-  const std::string& configurationFileName,
-  QWidget* parent
-)
-:
-QWidget(parent),
-cedar::aux::ConfigurationInterface(configurationFileName),
-mpLocalCoordinateFrame(localCoordinateFrame)
-{
-  // todo: make these configurable
-  mDecimals = 2;
-  mRotationInterval = 10;
-  mSingleTranslationStep = 0.1;
-  mSingleRotationStep = 0.02;
-  mXMin = -10.0;
-  mXMax = 10.0;
-  mYMin = -10.0;
-  mYMax = 10.0;
-  mZMin = -10.0;
-  mZMax = 10.0;
-
-  //
-  // read configuration file
-  //
-
-  if(addParameter(&mDecimals, "kinematicChainWidgetDecimals", 2) != CONFIG_SUCCESS)
-  {
-    std::cout << "LocalCoordinateFrameWidget: Error reading 'Decimals' from config file!" << std::endl;
-  }
-
-  readOrDefaultConfiguration();
-
-  initWindow();
-  return;
+  QObject::connect(this->_mDecimals.get(), SIGNAL(valueChanged()), this, SLOT(decimalsChanged()));
 }
 
 cedar::aux::gui::LocalCoordinateFrameWidget::~LocalCoordinateFrameWidget()
@@ -133,6 +97,13 @@ void cedar::aux::gui::LocalCoordinateFrameWidget::setLocalCoordinateFrame
 )
 {
   mpLocalCoordinateFrame = pLocalCoordinateFrame;
+}
+
+void cedar::aux::gui::LocalCoordinateFrameWidget::decimalsChanged()
+{
+  mpTranslationXSpinBox->setDecimals(static_cast<int>(this->getDecimals()));
+  mpTranslationYSpinBox->setDecimals(static_cast<int>(this->getDecimals()));
+  mpTranslationZSpinBox->setDecimals(static_cast<int>(this->getDecimals()));
 }
 
 void cedar::aux::gui::LocalCoordinateFrameWidget::initWindow()
@@ -166,7 +137,6 @@ void cedar::aux::gui::LocalCoordinateFrameWidget::initWindow()
   mpTranslationXSpinBox = new QDoubleSpinBox();
   mpTranslationXSpinBox->setRange(mXMin, mXMax);
   mpTranslationXSpinBox->setValue(mpLocalCoordinateFrame->getTranslationX());
-  mpTranslationXSpinBox->setDecimals(mDecimals);
   mpTranslationXSpinBox->setSingleStep(mSingleTranslationStep);
   connect(mpTranslationXSpinBox, SIGNAL(valueChanged(double)), this, SLOT(positionChanged(double)));
   mpGridLayout->addWidget(mpTranslationXSpinBox, 1, 1, 1, 2);
@@ -174,7 +144,6 @@ void cedar::aux::gui::LocalCoordinateFrameWidget::initWindow()
   mpTranslationYSpinBox = new QDoubleSpinBox();
   mpTranslationYSpinBox->setRange(mYMin, mYMax);
   mpTranslationYSpinBox->setValue(mpLocalCoordinateFrame->getTranslationY());
-  mpTranslationYSpinBox->setDecimals(mDecimals);
   mpTranslationYSpinBox->setSingleStep(mSingleTranslationStep);
   connect(mpTranslationYSpinBox, SIGNAL(valueChanged(double)), this, SLOT(positionChanged(double)));
   mpGridLayout->addWidget(mpTranslationYSpinBox, 1, 3, 1, 2);
@@ -182,7 +151,6 @@ void cedar::aux::gui::LocalCoordinateFrameWidget::initWindow()
   mpTranslationZSpinBox = new QDoubleSpinBox();
   mpTranslationZSpinBox->setRange(mZMin, mZMax);
   mpTranslationZSpinBox->setValue(mpLocalCoordinateFrame->getTranslationZ());
-  mpTranslationZSpinBox->setDecimals(mDecimals);
   mpTranslationZSpinBox->setSingleStep(mSingleTranslationStep);
   connect(mpTranslationZSpinBox, SIGNAL(valueChanged(double)), this, SLOT(positionChanged(double)));
   mpGridLayout->addWidget(mpTranslationZSpinBox, 1, 5, 1, 2);
@@ -281,7 +249,7 @@ void cedar::aux::gui::LocalCoordinateFrameWidget::update()
       {
         r = 0;
       }
-      p_label->setText(QString("%1").arg(r, 0, 'g', mDecimals, '0'));
+      p_label->setText(QString("%1").arg(r, 0, 'g', static_cast<int>(this->getDecimals()), '0'));
     }
   }
 

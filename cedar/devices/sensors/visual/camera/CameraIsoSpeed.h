@@ -39,7 +39,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
-#ifdef CEDAR_USE_LIB_DC1394
 
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/devices/sensors/visual/namespace.h"
@@ -98,7 +97,7 @@ public:
 
   /*! @brief Allow OpenCV backend to set the ISO-speed of the firewire bus.
    *
-   *  Set the ISO-speed manually with the CameraGrabber::setCameraIsoSpeed() method. <br>
+   *  Set the ISO-speed manually with the CameraGrabber::setCameraIsoSpeed() method.
    *
    *  @remarks
    *  As every setting, this can only be done before the first frame was grabbed.
@@ -127,6 +126,5 @@ private:
 
 }; // cedar::dev::sensors::visual::CameraIsoSpeed
 
-#endif // CEDAR_USE_LIB_DC1394
 #endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_ISO_SPEED_H
 

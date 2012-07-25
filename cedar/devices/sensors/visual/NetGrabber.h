@@ -36,7 +36,7 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_NET_GRABBER_H
 #define CEDAR_DEV_SENSORS_VISUAL_NET_GRABBER_H
 
-// MAKE YARP OPTIONAL
+// CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 #ifdef CEDAR_USE_YARP
 
@@ -49,12 +49,14 @@
 
 #define SHOW_INIT_INFORMATION_NETGRABBER
 
-/*!@brief This grabber grabs images from a yarp-server located somewhere in the network
+/*! @class cedar::dev::sensors::visual::NetGrabber
+ *  @brief This grabber grabs images from a yarp-server located somewhere in the network
  *
  *   This functionality is implemented by using the
- *		cedar::aux::net::NetWriter and
- *		cedar::aux::net::NetReader classes.
+ *    cedar::aux::net::NetWriter and
+ *    cedar::aux::net::NetReader classes.
  */
+
 class cedar::dev::sensors::visual::NetGrabber
 :
 public cedar::dev::sensors::visual::Grabber
@@ -66,22 +68,32 @@ public cedar::dev::sensors::visual::Grabber
 
   //!@cond SKIPPED_DOCUMENTATION
 
-  //todo:typedef to NetReader
+  typedef cedar::aux::net::Reader<cv::Mat> MatNetReader;
   typedef boost::shared_ptr<cedar::aux::net::Reader<cv::Mat> > MatNetReaderPtr;
 
+public:
 
-  /*!@struct NetChannel
-   * @brief Additional data of a net grabbing channel
+  /*! @struct PictureChannel
+   *  @brief Additional data of a net grabbing channel
    */
   struct NetChannel
   :
-  cedar::dev::sensors::visual::Grabber::GrabberChannel
+  cedar::dev::sensors::visual::Grabber::Channel
   {
+  public:
+    NetChannel(const std::string& yarpChannelName = "grabberYarpChannel")
+    :
+    cedar::dev::sensors::visual::Grabber::Channel(),
+    _mpYarpChannelName(new cedar::aux::StringParameter(this, "yarpChannel", yarpChannelName)),
+    mpMatNetReader(MatNetReaderPtr()) //empty MatNetReaderPtr
+    {
+    }
+
     //! The name of the used yarp channel
-    std::string mChannelName;
+    cedar::aux::StringParameterPtr _mpYarpChannelName;
 
     //! The Yarp Reader class instantiated for cv::Mat
-    MatNetReaderPtr mMatNetReader;
+    MatNetReaderPtr mpMatNetReader;
   };
 
   CEDAR_GENERATE_POINTER_TYPES(NetChannel);
@@ -89,26 +101,37 @@ public cedar::dev::sensors::visual::Grabber
   //!@endcond
 
 //--------------------------------------------------------------------------------------------------------------------
-// macros
+//macros
 //--------------------------------------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
+//constructors and destructor
 //--------------------------------------------------------------------------------------------------------------------
+
 public:
-  /*! @brief Constructor for a single channel grabber
-   *  @param configFileName	Filename for the configuration
-   *  @param yarpChannelName Channel to grab from
-   */
-  NetGrabber(const std::string& configFileName,const std::string& yarpChannelName);
 
+
+  /*! @brief  Constructor for a single channel grabber
+   *  @param grabberName  Name of the grabber
+   *  @param yarpChannelName  Filename to grab from
+   */
+  NetGrabber
+  (
+    const std::string& yarpChannelName = "grabberYarpChannel",
+    const std::string& grabberName = "NetGrabber"
+  );
 
   /*! @brief Constructor for a stereo channel grabber
-   *  @param configFileName	Filename for the configuration
-   *  @param yarpChannelName0	Name of a channel from the used yarp-server used for channel 0
-   *  @param yarpChannelName1	Another name of a channel from the used yarp-server used for channel 1
+   *  @param grabberName  Name of the grabber
+   *  @param yarpChannelName0 Filename to grab from for channel 0
+   *  @param yarpChannelName1 Filename to grab from for channel 1
    */
-  NetGrabber(const std::string& configFileName,const std::string& yarpChannelName0,const std::string& yarpChannelName1);
+  NetGrabber
+  (
+    const std::string& yarpChannelName0,
+    const std::string& yarpChannelName1,
+    const std::string& grabberName = "StereoNetGrabber"
+  );
 
   //!@brief Destructor
   ~NetGrabber();
@@ -121,31 +144,29 @@ public:
   //none yet
 
   //--------------------------------------------------------------------------------------------------------------------
-  // protected methods
+  //protected methods
   //--------------------------------------------------------------------------------------------------------------------
 
 protected:
 
   //------------------------------------------------------------------------
-  // From Grabber
+  //From Grabber
   //------------------------------------------------------------------------
   bool onInit();
   bool onGrab();
-  bool onDeclareParameters();
   void onUpdateSourceInfo(unsigned int channel);
 
   void onCleanUp();
-  void onAddChannel();
 
   //--------------------------------------------------------------------------------------------------------------------
-  // private methods
+  //private methods
   //--------------------------------------------------------------------------------------------------------------------
 
 private:
   //none yet
 
   //--------------------------------------------------------------------------------------------------------------------
-  // members
+  //members
   //--------------------------------------------------------------------------------------------------------------------
 
 public:
@@ -157,35 +178,36 @@ protected:
 
 private:
 
-  //! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class NetChannelPtr
-  inline NetChannelPtr getChannel(unsigned int channel)
+  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class NetChannelPtr
+  inline NetChannelPtr getNetChannel(unsigned int channel)
   {
     return boost::static_pointer_cast<NetChannel>
            (
-             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
            );
   }
 
-  //! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
-  inline ConstNetChannelPtr getChannel(unsigned int channel) const
+  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
+  inline ConstNetChannelPtr getNetChannel(unsigned int channel) const
   {
     return boost::static_pointer_cast<const NetChannel>
            (
-             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
            );
   }
 
+
   //--------------------------------------------------------------------------------------------------------------------
-  // parameters
+  //parameters
   //--------------------------------------------------------------------------------------------------------------------
 
 protected:
-  // none yet
+  //none yet
 
 private:
-  // none yet
+  //none yet
   
-}; // class cedar::dev::sensors::visual::NetGrabber
+}; //class cedar::dev::sensors::visual::NetGrabber
 
 #endif //CEDAR_USE_YARP
 #endif //CEDAR_DEV_SENSORS_VISUAL_NET_GRABBER_H
