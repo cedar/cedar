@@ -59,7 +59,7 @@ public:
   }
 
   void step(double time)
-	{
+  {
     boost::posix_time::ptime now = boost::posix_time::microsec_clock::universal_time();
     std::cout << "current time (sec/usec): " << now.time_of_day().seconds()
               << " / " << now.time_of_day().total_microseconds() % 1000000
