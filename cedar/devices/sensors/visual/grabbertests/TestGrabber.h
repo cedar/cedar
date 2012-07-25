@@ -37,9 +37,12 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_TEST_GRABBER_H
 #define CEDAR_DEV_SENSORS_VISUAL_TEST_GRABBER_H
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/Grabber.h"
-//#include "cedar/auxiliaries/casts.h"
+#include "cedar/auxiliaries/StringParameter.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -62,6 +65,7 @@ public cedar::dev::sensors::visual::Grabber
   //--------------------------------------------------------------------------------------------------------------------
 
   //!@cond SKIPPED_DOCUMENTATION
+public:
 
   /*! @struct TestChannel
    *  @brief Additional data of a grabbing channel
@@ -71,10 +75,18 @@ public cedar::dev::sensors::visual::Grabber
    */
   struct TestChannel
   :
-  cedar::dev::sensors::visual::Grabber::GrabberChannel
+  cedar::dev::sensors::visual::Grabber::Channel
   {
+  public:
+    TestChannel(const std::string& defaultFileName = "./default_parameter_value_for_processingGui_instantiation")
+    :
+    cedar::dev::sensors::visual::Grabber::Channel(),
+    _mpSourceFileName(new cedar::aux::StringParameter(this, "name_of_parameter", defaultFileName))
+    {
+    }
+
     //! @brief The filenames
-    std::string mSourceFileName;
+    cedar::aux::StringParameterPtr _mpSourceFileName;
   };
 
   CEDAR_GENERATE_POINTER_TYPES(TestChannel);
@@ -89,18 +101,26 @@ public cedar::dev::sensors::visual::Grabber
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! @brief The constructor for a single channel grabber.
-   *  @param configFileName Filename for a file, where the configuration parameters should be stored
-   *  @param channelName  Channel to grab from
-   */
-  TestGrabber(std::string configFileName, std::string channelName);
 
-  /*! @brief The constructor for a stereo grabber.
-   *  @param configFileName Filename for a file, where the configuration parameters should be stored
-   *  @param channelName0  Channel one to grab from
-   *  @param channelName1  Channel two to grab from
+  /*! @brief  Constructor for a single channel grabber
+   *  @param grabberName  Name of the grabber
+   *  @param sourceFileName Filename to grab from (here only for demonstration and testing)
    */
-  TestGrabber(std::string configFileName, std::string channelName0, std::string channelName1);
+  TestGrabber
+  (
+    const std::string& sourceFileName = "./default_parameter_value_for_code_instantiation"
+  );
+
+  /*! @brief Constructor for a stereo channel grabber
+   *  @param grabberName  Name of the grabber
+   *  @param sourceFileName0 Filename to grab from for channel 0 (here only for demonstration and testing)
+   *  @param sourceFileName1 Filename to grab from for channel 1 (here only for demonstration and testing)
+   */
+  TestGrabber
+  (
+    const std::string& sourceFileName0,
+    const std::string& sourceFileName1
+  );
 
   //!@brief Destructor
   ~TestGrabber();
@@ -131,34 +151,37 @@ public:
 protected:
 
   //derived from Grabber
-  bool onInit();
+  bool onCreateGrabber();
+  void onCloseGrabber();
   void onCleanUp();
-  bool onDeclareParameters();
-  void onUpdateSourceInfo(unsigned int channel);
   bool onGrab();
-  void onAddChannel();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+
+  /// @brief updates the channel informations
+  void setChannelInfo(unsigned int channel);
+
   ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
-  inline TestChannelPtr getChannel(unsigned int channel)
+  inline TestChannelPtr getTestChannel(unsigned int channel)
   {
     return boost::static_pointer_cast<TestChannel>
            (
-             cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
+             cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
            );
   }
 
   ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
-  inline ConstTestChannelPtr getChannel(unsigned int channel) const
+  inline ConstTestChannelPtr getTestChannel(unsigned int channel) const
   {
     return boost::static_pointer_cast<const TestChannel>
        (
-         cedar::dev::sensors::visual::Grabber::mChannels.at(channel)
+         cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
        );
   }
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -176,13 +199,14 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
+
+  //! @brief The filename of the picture you want to grab from
+  //cedar::aux::FileParameterPtr _mSourceFileName;
 
 }; // class cedar::dev::sensors::visual::TestGrabber
 

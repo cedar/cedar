@@ -66,9 +66,6 @@
  *
  * @see     cedar::aux::conv::Engine, cedar::aux::conv::BorderType, cedar::aux::conv::Mode,
  *          cedar::aux::conv::KernelList, cedar::aux::conv
- *
- * @todo    Should the kernel list be stored within this object rather than each engine?
- *
  */
 class cedar::aux::conv::Convolution : public QObject, public cedar::aux::Configurable
 {
@@ -155,7 +152,7 @@ public:
   inline cv::Mat convolve
   (
     const cv::Mat& matrix,
-    const cedar::aux::conv::KernelList& kernelList
+    cedar::aux::conv::ConstKernelListPtr kernelList
   ) const
   {
     return this->getEngine()->convolve(matrix, kernelList, this->getBorderType(), this->getMode());
@@ -203,7 +200,7 @@ public:
   inline cv::Mat operator()
   (
     const cv::Mat& matrix,
-    const cedar::aux::conv::KernelList& kernelList
+    cedar::aux::conv::ConstKernelListPtr kernelList
   ) const
   {
     return this->convolve(matrix, kernelList);
@@ -221,10 +218,22 @@ public:
     return this->_mBorderType->getValue();
   }
 
+  //! Sets the type of border handling.
+  inline void setBorderType(cedar::aux::conv::BorderType::Id borderType)
+  {
+    this->_mBorderType->setValue(borderType);
+  }
+
   //!@brief Returns the mode of the convolution.
   inline cedar::aux::conv::Mode::Id getMode() const
   {
     return this->_mMode->getValue();
+  }
+
+  //!@brief Sets the mode of the convolution.
+  inline void setMode(cedar::aux::conv::Mode::Id mode)
+  {
+    this->_mMode->setValue(mode);
   }
 
   //!@brief Returns a pointer to the combined kernel.
@@ -249,6 +258,7 @@ public:
   void setAllowedModes(const std::set<cedar::aux::conv::Mode::Id>& modes);
 
 signals:
+  //! signals that the configuration has changed
   void configurationChanged();
 
   //--------------------------------------------------------------------------------------------------------------------

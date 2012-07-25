@@ -82,7 +82,7 @@ public:
   void trigger(cedar::proc::ArgumentsPtr arguments = cedar::proc::ArgumentsPtr());
 
   //!@brief handles an incoming trigger signal if Trigger instance is listener
-  void onTrigger(cedar::proc::TriggerPtr pSender);
+  void onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::TriggerPtr pSender);
 
   //!@brief a boolean check, if a given step is a listener of this Trigger instance
   bool isListener(cedar::proc::TriggerablePtr step) const;

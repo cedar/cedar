@@ -24,7 +24,7 @@
 
 int main(int , char **)
 {
-
+/*
   const std::string  YARP_CHANNEL_0 = "Net_Grabber_TestCase_Channel_0";
   const std::string  YARP_CHANNEL_1 = "Net_Grabber_TestCase_Channel_1";
 
@@ -62,7 +62,7 @@ int main(int , char **)
     return -1;
   }
   //------------------------------------------------------------------
-  /*After initialization of a net_grabber:
+  / * After initialization of a net_grabber:
    *
    * ALWAYS:
    *  - the first frame is already grabbed, so you can check the file using
@@ -77,7 +77,7 @@ int main(int , char **)
    *  Parameters loaded from configfile
    *  - thread isn't running
    *  - grabbername is restored from configfile
-   */
+   * /
 
     net_grabber->setName(GRABBER_NAME_0);
 
@@ -226,6 +226,6 @@ int main(int , char **)
   }
 
   std::cout << "finished\n";
-
+*/
   return 0;
 }

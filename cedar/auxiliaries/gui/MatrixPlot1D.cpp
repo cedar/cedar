@@ -41,6 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/MatrixPlot1D.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
+#include "cedar/auxiliaries/math/Limits.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
@@ -48,6 +49,7 @@
 
 // SYSTEM INCLUDES
 #include <qwt/qwt_legend.h>
+#include <qwt/qwt_scale_div.h>
 #include <QContextMenuEvent>
 #include <QVBoxLayout>
 #include <QPalette>
@@ -93,6 +95,16 @@ cedar::aux::gui::MatrixPlot1D::~MatrixPlot1D()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::math::Limits<double> cedar::aux::gui::MatrixPlot1D::getXLimits() const
+{
+  cedar::aux::math::Limits<double> limits;
+
+  QwtScaleDiv* p_interval = this->mpPlot->axisScaleDiv(QwtPlot::xBottom);
+  limits.setLower(p_interval->lowerBound());
+  limits.setUpper(p_interval->upperBound());
+  return limits;
+}
 
 void cedar::aux::gui::MatrixPlot1D::applyStyle(size_t lineId, QwtPlotCurve *pCurve)
 {

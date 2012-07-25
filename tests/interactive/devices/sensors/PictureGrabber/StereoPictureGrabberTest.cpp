@@ -7,7 +7,7 @@
 
     Maintainer:  Georg.Hartinger
     Email:       georg.hartinger@ini.rub.de
-    Date:        2011 08 01
+    Date:        2012 07 20
 
     Description: Simple application to grab from a Picture (stereo-case)
 
@@ -15,61 +15,45 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/PictureGrabber.h"
-//#include <devices/sensors/visual/PictureGrabber.h>
-
-// PROJECT INCLUDES
-
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
 
-//--------------------------------------------------------------------------------------------------------------------
-//constants
-//--------------------------------------------------------------------------------------------------------------------
-
-
-
-//--------------------------------------------------------------------------------------------------------------------
-// main test program
-//--------------------------------------------------------------------------------------------------------------------
-
-
-using namespace cv;
-
-
 int main(int , char **)
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  //constants
+  //--------------------------------------------------------------------------------------------------------------------
 
-  const std::string FILE_NAME_0 = "/usr/local/src/OpenCV-2.2.0/samples/c/puzzle.png";
-  const std::string FILE_NAME_1 = "/usr/local/src/OpenCV-2.2.0/samples/c/fruits.jpg";
+  const std::string FILE_NAME_0 = "/usr/share/wallpapers/Vector_Sunset/contents/images/1024x768.jpg";
+  const std::string FILE_NAME_1 = "/usr/share/wallpapers/Vector_Sunset/contents/images/1280x1024.jpg";
 
-  const std::string GRABBER_NAME_0 = "Stereo_Picture_Grabber_TestCase";
-  const std::string CONFIG_FILE_NAME_0 = "stereo_picture_grabber_testcase.config";
-
+  const std::string GRABBER_NAME = "Stereo_Picture_Grabber_TestCase";
+  const std::string CONFIG_FILE_NAME = "stereo_picture_grabber_testcase.config";
 
   //title of highgui window
-  const std::string highgui_window_name_0 = "0 " + GRABBER_NAME_0 + ":" + FILE_NAME_0;
-  const std::string highgui_window_name_1 = "1 " + GRABBER_NAME_0 + ":" + FILE_NAME_1;
+  const std::string highgui_window_name_0 = FILE_NAME_0;
+  const std::string highgui_window_name_1 = FILE_NAME_1;
 
+  //--------------------------------------------------------------------------------------------------------------------
+  //main test
+  //--------------------------------------------------------------------------------------------------------------------
 
   std::cout << "\n\nInteractive test of the PictureGrabber class (stereo)\n";
   std::cout << "-----------------------------------------------------\n\n";
 
-
-
-  //------------------------------------------------------------------
+  //----------------------------------------------------------------------------------------
   //Create the grabber
+  //----------------------------------------------------------------------------------------
   std::cout << "Create a PictureGrabber:\n";
-  //------------------------------------------------------------------
-  //Create the grabber
-  std::cout << "Create a PictureGrabber:\n";
-  cedar::dev::sensors::visual::PictureGrabber *picture_grabber = NULL;
+  cedar::dev::sensors::visual::PictureGrabber* p_grabber = NULL;
   try
   {
-    picture_grabber = new cedar::dev::sensors::visual::PictureGrabber( CONFIG_FILE_NAME_0 , FILE_NAME_0, FILE_NAME_1 );
+    // create grabber with a filename
+    p_grabber = new cedar::dev::sensors::visual::PictureGrabber(FILE_NAME_0,FILE_NAME_1);
   }
   catch (cedar::aux::InitializationException &e)
   {
@@ -78,113 +62,96 @@ int main(int , char **)
     std::cout << "Error on creation of the NetGrabber class:\n"
               << e.exceptionInfo() << std::endl;
 
-    if (picture_grabber)
+    if (p_grabber)
     {
-      delete picture_grabber;
+      delete p_grabber;
     }
 
     return -1;
   }
 
-  //------------------------------------------------------------------
-  /*After initialization of a picture_grabber:
+  // activate crash-handler if there is any hardware-related stuff which has to be cleaned up
+  p_grabber->installCrashHandler();
+
+
+  //----------------------------------------------------------------------------------------
+  // load configuration. this step is optional.
+  //----------------------------------------------------------------------------------------
+  try
+  {
+    //p_grabber->readJson(CONFIG_FILE_NAME);
+  }
+  catch (...)
+  {
+    std::cout << "No configuration exists!" << std::endl;
+  }
+
+  // this step is essential. If you don't apply the default or loaded Parameter, the grabber will not work
+  // check if grabber is created successfully
+  if (! p_grabber->applyParameter())
+  {
+    // an error occured during initialization. Perhaps the file doesn't exist
+    if (p_grabber)
+    {
+      delete p_grabber;
+    }
+    return -1;
+  }
+
+  //----------------------------------------------------------------------------------------
+  // change settings and properties
+  //----------------------------------------------------------------------------------------
+
+  /*After initialization of a picture grabber:
    *
-   * ALWAYS:
-   *  - the first frame is already grabbed, so you can check the file using
-   *    getImage(), getSize(), getAviParam() or something else
+   *  The picture is already initialized and the first frame grabbed, so you can check the file using
+   *  getImage(), getSize() or something else
    *
-   * EITHER:
-   *  No or new configuration file:
-   *  - loopedThread isn't running (startGrabber auto-grabbing with startGrabber() )
-   *  - grabbername is set to default, i.e. picture_grabber
-   *
-   * OR:
-   *  Parameters loaded from configfile
-   *  - thread isn't running
-   *  - grabbername is restored from configfile
    */
 
-    picture_grabber->setName(GRABBER_NAME_0);
 
-    std::cout << "\nGrab from (0) " << picture_grabber->getSourceInfo(0)<< std::endl;
-    std::cout << "Grab from (1) " << picture_grabber->getSourceInfo(1)<< std::endl;
+  // Set the name of our grabber
+  p_grabber->setName(GRABBER_NAME);
 
-    //error, because it is only a stereo-grabber
-    //std::cout << "Grab from (3):" << picture_grabber->getSourceInfo(2);
+  std::cout << "\nGrab Channel 0 from: " << p_grabber->getSourceInfo(0)<< std::endl;
+  std::cout << "Grab Channel 1 from: " << p_grabber->getSourceInfo(1)<< std::endl;
 
-
-    std::cout << "\nSize of loaded Pictures:\n";
-    cv::Size ch0_size = picture_grabber->getSize(0);
-    cv::Size ch1_size = picture_grabber->getSize(1);
-    std::cout << "Channel 0: " << ch0_size.width <<" x " << ch0_size.height << std::endl;
-    std::cout << "Channel 1: " << ch1_size.width <<" x " << ch1_size.height << std::endl;
-
-
-    //check framerate of the grabber-thred (thread isn't started yet)
-    std::cout << "\nPictureGrabber thread FPS : " << picture_grabber->getFps() << std::endl;
-
-    //grabberthread don't have to be started. There is no new content to grab.
-
-    //Nevertheless you can create an avi file from your picture-grabbing
-    //In this case you have to startGrabber the thread
-    picture_grabber->setRecordName("RecordedPictureGrabber.avi");
-
-    //It is possible to create a snaptshot of the pics.
-    //In the case, you set another extenstion as in the source, the image will be converted
-
-    //Set Snapshotnames without channel-number (in mono-case: default value is 0)
-    //This is the same behavior as setRecordName()
-    //The type of the file (e.g. bitmap or jpg or something else) depend on extension
-    //look at the documentation of setSnapshotName for details
-    picture_grabber->setSnapshotName("snap.bmp");  // snap[ch0].bmp and snap[ch1].bmp
-    picture_grabber->setSnapshotName(0,"snap01.jpg"); // rename channel 0 to snap.jpg. Channel 1 isn't altered
-
-    //Check the constructed filenames
-    std::cout << "Check filenames of snapshots and recordings\n" << std::endl;
-
-    std::cout << "SnapshotName_0:\t" << picture_grabber->getSnapshotName(0) <<std::endl;
-    std::cout << "SnapshotName_1:\t" << picture_grabber->getSnapshotName(1) <<std::endl;
-    std::cout << "RecordName_0:\t" << picture_grabber->getRecordName(0) <<std::endl;
-    std::cout << "RecordName_1:\t" << picture_grabber->getRecordName(1) <<std::endl;
-
-    //enforcing an error and catch it
-    try
-    {
-      std::cout << "\nTry to enforce an exception:\n";
-      std::cout << "SnapshotName_2: " << picture_grabber->getSnapshotName(2) <<std::endl;
-    }
-    catch (cedar::aux::ExceptionBase& e)
-    {
-      //std::cout << "Exception: " <<e.what() << std::endl; //until now: buggy cedar implementation
-      //all grabber exceptions (look at cedar/devices/sensors/visual/exceptions/namespace.h)
-      //can be used without separate include-files
-      std::cout <<e.exceptionInfo()<<std::endl;
-    }
-
-    // Save a snapshot of the current images
-    //picture_grabber->saveSnapshotAllCams();
-
-    // Save a snapshot from channel 0 only
-    // Be aware, that existing files will be overwritten without any question
-    //picture_grabber->saveSnapshot(0);
+  // check filesize
+  std::cout << "\nSize of loaded Pictures:\n";
+  cv::Size ch0_size = p_grabber->getSize(0);
+  cv::Size ch1_size = p_grabber->getSize(1);
+  std::cout << "\tChannel 0: " << ch0_size.width <<" x " << ch0_size.height << std::endl;
+  std::cout << "\tChannel 1: " << ch1_size.width <<" x " << ch1_size.height << std::endl;
 
 
-  //------------------------------------------------------------------
+  // It is possible to create a snaptshot of the pics.
+  // In the case, you set another extenstion as in the source, the image will be converted
+  // The type of the file (e.g. bitmap or jpg or something else) depend on extension
+  // look at the documentation of setSnapshotName for details
+  p_grabber->setSnapshotName("snap.bmp");  // snap_ch0.bmp and snap_ch1.bmp
+  p_grabber->setSnapshotName(0,"snap01.jpg"); // rename channel 0 to snap.jpg. Channel 1 isn't altered
+
+  // Check the constructed filenames
+  std::cout << "\nCheck filenames of snapshots" << std::endl;
+  std::cout << "\tChannel0:" << p_grabber->getSnapshotName() <<std::endl;
+  std::cout << "\tChannel1:" << p_grabber->getSnapshotName(1) <<std::endl;
+
+  // Save a snapshot of the current images
+  // Be aware, that existing files will be overwritten without any question
+  //p_grabber->saveSnapshotAllCams();
+
+
+  //----------------------------------------------------------------------------------------
   //Create an OpenCV highgui window to show grabbed frames
+  //----------------------------------------------------------------------------------------
+
   std::cout << "\nShow pictures\n";
-  namedWindow(highgui_window_name_0,CV_WINDOW_KEEPRATIO);
-  namedWindow(highgui_window_name_1,CV_WINDOW_KEEPRATIO);
+  cv::namedWindow(highgui_window_name_0,CV_WINDOW_KEEPRATIO);
+  cv::namedWindow(highgui_window_name_1,CV_WINDOW_KEEPRATIO);
 
   //the first frame is already grabbed on initialization
-  cv::Mat frame0 = picture_grabber->getImage();
-  cv::Mat frame1 = picture_grabber->getImage(1);
-
-  //startGrabber recording
-  std::cout << "\nStart Recording\n";
-  picture_grabber->setFps(15);
-  picture_grabber->startGrabber();
-  picture_grabber->startRecording(15);
-
+  cv::Mat frame0 = p_grabber->getImage(0);
+  cv::Mat frame1 = p_grabber->getImage(1);
 
   //get frames for a while
   unsigned int counter=0;
@@ -195,49 +162,45 @@ int main(int , char **)
     imshow(highgui_window_name_1,frame1);
 
     //it is not necessary to do this, unless a new picture should be used
-    frame0 = picture_grabber->getImage();
-    frame1 = picture_grabber->getImage(1);
+    frame0 = p_grabber->getImage(0);
+    frame1 = p_grabber->getImage(1);
     counter++;
 
     //after one second, set new source-pictures
     if (counter == 10)
     {
       // Grab from another picture
-      // Be aware, when recording is on:
-      // The size of the video-frames wont't be changed.
-      // So, if the size of the new picture is different from the old one
-      // the new picture will be resized to the dimensions of the old
-      // regardless of the aspect ratio
-      picture_grabber->setSourceFile(0,FILE_NAME_1);
-      picture_grabber->setSourceFile(1,FILE_NAME_0);
+      p_grabber->setSourceFile(0,FILE_NAME_1);
     }
 
-    //exit after another second
-    if (counter == 20)
+    //exit after another two second
+    if (counter == 30)
     {
       break;
     }
 
     //wait 100ms (needed for highgui)
-    waitKey(100);
+    cv::waitKey(100);
   }
 
-  //------------------------------------------------------------------
+  //----------------------------------------------------------------------------------------
   //clean up
+  //----------------------------------------------------------------------------------------
 
-  destroyWindow(highgui_window_name_0);
-  destroyWindow(highgui_window_name_1);
+  // write configuration
+  // p_grabber->writeJson(CONFIG_FILE_NAME);
 
-  //stopGrabber grabbing-thread if running
+  cv::destroyWindow(highgui_window_name_0);
+  cv::destroyWindow(highgui_window_name_1);
+
+  //stop grabbing-thread if running
   //recording will also be stopped
-  if (picture_grabber->isRunning())
-  {
-   picture_grabber->stopGrabber();
-  }
+  p_grabber->stopGrabber();
+  p_grabber->wait();
 
-  if (picture_grabber)
+  if (p_grabber)
   {
-   delete picture_grabber;
+    delete p_grabber;
   }
 
   std::cout << "finished\n";

@@ -56,9 +56,18 @@ class cedar::aux::NumericVectorParameter : public cedar::aux::VectorParameter<T>
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  //! The superclass of this type
+  typedef cedar::aux::VectorParameter<T> Super;
 public:
   //!@brief a templated limit
   typedef cedar::aux::math::Limits<T> LimitType;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // using directives
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  using Super::set;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -159,6 +168,14 @@ public:
   {
     this->mLimits.setLower(minimum);
 
+    for (size_t i = 0; i < this->size(); ++i)
+    {
+      if (this->mValues[i] < minimum)
+      {
+        this->mValues[i] = minimum;
+      }
+    }
+
     this->emitPropertyChangedSignal();
   }
 
@@ -173,6 +190,14 @@ public:
   {
     this->mLimits.setUpper(maximum);
 
+    for (size_t i = 0; i < this->size(); ++i)
+    {
+      if (this->mValues[i] > maximum)
+      {
+        this->mValues[i] = maximum;
+      }
+    }
+
     this->emitPropertyChangedSignal();
   }
 
@@ -180,6 +205,11 @@ public:
   const T& getMaximum() const
   {
     return this->mLimits.getUpper();
+  }
+
+  void set(size_t index, const T& value, bool lock = false)
+  {
+    this->Super::set(index, this->mLimits.limit(value), lock);
   }
 
   //--------------------------------------------------------------------------------------------------------------------

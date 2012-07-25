@@ -28,7 +28,7 @@
     Email:       hendrik.reimann@ini.rub.de
     Date:        2010 10 21
 
-    Description: Namespace file for cedar::tests::unit::aux::ConfigurationInterface.
+    Description: Namespace file for cedar::tests::unit::aux::gl::TestVisualization.
 
     Credits:
 

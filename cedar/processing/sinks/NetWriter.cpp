@@ -37,15 +37,13 @@
 #include "cedar/configuration.h"
 #ifdef CEDAR_USE_YARP
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/sinks/NetWriter.h"
-
-// PROJECT INCLUDES
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
-#include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/net/exceptions.h"
+#include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -70,6 +68,7 @@ namespace
       )
     );
     input_declaration->setIconPath(":/steps/net_writer.svg");
+    input_declaration->setDescription("Writes incoming matrices to a yarp port.");
     cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(input_declaration);
 
     return true;
@@ -86,11 +85,9 @@ cedar::proc::sinks::NetWriter::NetWriter()
 // outputs
 mInput(new cedar::aux::MatData(cv::Mat())),
 mWriter()
-// parameter
 {
   // declare all data
   this->declareInput("input");
-
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -103,15 +100,20 @@ void cedar::proc::sinks::NetWriter::onStart()
   {
     try 
     {
-      mWriter= boost::shared_ptr< cedar::aux::net::Writer< cedar::aux::MatData::DataType > >(new cedar::aux::net::Writer< cedar::aux::MatData::DataType >("DEMOCHANNEL"));
+      mWriter
+        = boost::shared_ptr<cedar::aux::net::Writer<cedar::aux::MatData::DataType> >
+          (
+            new cedar::aux::net::Writer<cedar::aux::MatData::DataType>("DEMOCHANNEL")
+          );
       // TODO: make channel configurable
     }
-    catch ( cedar::aux::net::NetMissingRessourceException &e )
+    catch (cedar::aux::net::NetMissingRessourceException& e)
     {
       // somehow YARP doesnt work ... :( typically fatal.
-      // TODO: what to do?
-      throw( e ); // lets try this ...
+      // TODO: set state of step
+      throw (e); // lets try this ...
     }
+    // TODO: set state to OK
   }
 }
 
@@ -124,38 +126,40 @@ void cedar::proc::sinks::NetWriter::onStop()
 void cedar::proc::sinks::NetWriter::compute(const cedar::proc::Arguments&)
 {
   if (!mWriter)
+  {
     return;
+  }
 
   // write it over the channel
   try
   {
-    mWriter->write( mInput->getData() );
+    mWriter->write(mInput->getData());
   }
   catch (cedar::aux::net::NetMissingRessourceException& e)
   {
     // somehow YARP doesnt work ... :( typically fatal.
-    // TODO: what to do?
-    throw( e ); // lets try this ...
+    // TODO: set state of step
+    throw (e); // lets try this ...
   }
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::sinks::NetWriter::determineInputValidity
                                 (
                                   cedar::proc::ConstDataSlotPtr CEDAR_DEBUG_ONLY(slot),
-                                  cedar::aux::DataPtr data
+                                  cedar::aux::ConstDataPtr data
                                 ) const
 {
   // First, let's make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(slot->getName() == "input")
 
-  if (boost::shared_dynamic_cast<cedar::aux::MatData>(data))
+  if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
   {
-    cv::Mat &matref= boost::shared_dynamic_cast<cedar::aux::MatData>(data)->getData();
+    const cv::Mat& matref= mat_data->getData();
 
     if (matref.cols <= 0
         || matref.rows <= 0)
     {
-      // we dont support n-Dim at the moment
+      // we don't support n-Dim at the moment
       return cedar::proc::DataSlot::VALIDITY_ERROR;
     }
 
@@ -178,7 +182,6 @@ void cedar::proc::sinks::NetWriter::inputConnectionChanged(const std::string& in
   this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
   // This should always work since other types should not be accepted.
   CEDAR_DEBUG_ASSERT(this->mInput);
-
 
   // Finally, send data ...
   this->onTrigger();

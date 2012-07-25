@@ -41,14 +41,11 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
-#include "cedar/auxiliaries/Parameter.h"
-#include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
-#include <QVBoxLayout>
-#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // associate aux::gui parameter with the aux parameter
@@ -68,15 +65,7 @@ namespace
 
 cedar::aux::gui::DoubleVectorParameter::DoubleVectorParameter(QWidget *pParent)
 :
-cedar::aux::gui::Parameter(pParent)
-{
-  this->setLayout(new QVBoxLayout());
-  this->layout()->setContentsMargins(0, 0, 0, 0);
-  QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
-}
-
-//!@brief Destructor
-cedar::aux::gui::DoubleVectorParameter::~DoubleVectorParameter()
+cedar::aux::gui::DoubleVectorParameter::Base(pParent)
 {
 }
 
@@ -84,68 +73,8 @@ cedar::aux::gui::DoubleVectorParameter::~DoubleVectorParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-//!@todo A lot of this code is almost the same as cedar::aux::gui::UIntVectorParameter.
-
-void cedar::aux::gui::DoubleVectorParameter::parameterPointerChanged()
+void cedar::aux::gui::DoubleVectorParameter::widgetValueChanged(double)
 {
-  cedar::aux::DoubleVectorParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleVectorParameter>(this->getParameter());
-
-  QObject::connect(parameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertyChanged()));
-  this->propertyChanged();
-}
-
-void cedar::aux::gui::DoubleVectorParameter::propertyChanged()
-{
-  cedar::aux::DoubleVectorParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleVectorParameter>(this->getParameter());
-
-  //!@todo Don't throw away old spinboxes, reuse them instead
-  // Create the appropriate amount of spinboxes
-  if (this->mSpinboxes.size() != parameter->size())
-  {
-    for (size_t i = 0; i < this->mSpinboxes.size(); ++i)
-    {
-      delete this->mSpinboxes.at(i);
-    }
-    this->mSpinboxes.clear();
-
-    for (size_t i = 0; i < parameter->size(); ++i)
-    {
-      QDoubleSpinBox *p_widget = new QDoubleSpinBox();
-      this->mSpinboxes.push_back(p_widget);
-      this->layout()->addWidget(p_widget);
-      p_widget->setMinimumHeight(20);
-
-      // The limits have to be set here already so that the value is set properly.
-      this->mSpinboxes.at(i)->setMinimum(parameter->getMinimum());
-      this->mSpinboxes.at(i)->setMaximum(parameter->getMaximum());
-
-      p_widget->setValue(parameter->at(i));
-      QObject::connect(p_widget, SIGNAL(valueChanged(double)), this, SLOT(valueChanged(double)));
-    }
-
-    emit heightChanged();
-  }
-
-  // Update the spinboxes' properties
-  for (size_t i = 0; i < this->mSpinboxes.size(); ++i)
-  {
-    this->mSpinboxes.at(i)->setMinimum(parameter->getMinimum());
-    this->mSpinboxes.at(i)->setMaximum(parameter->getMaximum());
-  }
-}
-
-void cedar::aux::gui::DoubleVectorParameter::valueChanged(double)
-{
-  cedar::aux::DoubleVectorParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleVectorParameter>(this->getParameter());
-  std::vector<double> values = parameter->getValue();
-  CEDAR_DEBUG_ASSERT(this->mSpinboxes.size() == values.size());
-  for (size_t i = 0; i < values.size(); ++i)
-  {
-    values.at(i) = this->mSpinboxes.at(i)->value();
-  }
-  parameter->set(values);
+  this->Base::widgetValueChanged(cedar::aux::asserted_cast<QDoubleSpinBox*>(QObject::sender()));
 }
 

@@ -52,6 +52,7 @@ cedar::aux::gui::Parameter::Parameter(QWidget *pParent)
 :
 QWidget(pParent)
 {
+  QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterChanged()));
 }
 
 //!@brief Destructor
@@ -64,11 +65,33 @@ cedar::aux::gui::Parameter::~Parameter()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::aux::gui::Parameter::setParameter(cedar::aux::ParameterPtr pParameter)
 {
+  // disconnect old slots if a parameter was already set
+  if (this->mParameter)
+  {
+    QObject::disconnect(this->mParameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertiesChanged()));
+    QObject::disconnect(this->mParameter.get(), SIGNAL(valueChanged()), this, SLOT(valueChanged()));
+  }
   this->mParameter = pParameter;
+
+  QObject::connect(pParameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertiesChanged()));
+  QObject::connect(pParameter.get(), SIGNAL(valueChanged()), this, SLOT(valueChanged()));
+
   emit parameterPointerChanged();
 }
 
 cedar::aux::ParameterPtr cedar::aux::gui::Parameter::getParameter()
 {
   return this->mParameter;
+}
+
+void cedar::aux::gui::Parameter::parameterChanged()
+{
+}
+
+void cedar::aux::gui::Parameter::propertiesChanged()
+{
+}
+
+void cedar::aux::gui::Parameter::valueChanged()
+{
 }

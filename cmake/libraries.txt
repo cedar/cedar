@@ -103,26 +103,6 @@ elseif(OpenCV_FOUND)
 endif(OpenCV_FOUND)
 # message(STATUS "-- Found opencv libs ${OpenCV_LIBS}")
 
-# libconfig
-
-# check if legacy mode is enabled
-
-if (NOT DEFINED CEDAR_LIBCONFIG_LEGACY_MODE OR CEDAR_LIBCONFIG_LEGACY_MODE)
-    message("-- Searching for libconfig (LEGACY MODE)...")
-    set(CEDAR_LIBCONFIG_LEGACY_MODE ON)
-    
-    find_package(Libconfig REQUIRED)
-    if(Libconfig_FOUND)
-      message("   libconfig was found in ${Libconfig_INCLUDE_DIRS}")
-      set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Libconfig_LIBS})
-      include_directories(${Libconfig_INCLUDE_DIRS})
-    else(Libconfig_FOUND)
-      message(${CEDAR_LIB_ERROR_TYPE} "   Required library libconfig was not found on your system!
-      You can try to alter the default search paths in cedar.conf.")
-      set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} libconfig++)
-    endif(Libconfig_FOUND)
-endif()
-
 # libQGLViewer
 message("-- Searching for QGLViewer...")
 find_package(QGLViewer REQUIRED)
@@ -186,10 +166,10 @@ option(CEDAR_USE_KUKA_LWR "Include Kuka Fast Research Interface for LWR if possi
 
 find_library(KUKA_FRI FRI)
 if(KUKA_FRI)
-	message("-- Looking for Kuka Fast Research Interface - found")
-	set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} FRI)
+  message("-- Looking for Kuka Fast Research Interface - found")
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} FRI)
 else(KUKA_FRI)
-	message("-- Looking for Kuka Fast Research Interface - not found")
+  message("-- Looking for Kuka Fast Research Interface - not found")
     set(CEDAR_USE_KUKA_LWR OFF)
 endif(KUKA_FRI)
 
@@ -226,26 +206,26 @@ option(CEDAR_USE_AMTEC "Include Amtec related classes and examples if possible."
 message("-- Looking for Amtec drivers")
 find_library(AMTEC_LIBRARY_DEVICE amtecdevice)
 if(NOT AMTEC_LIBRARY_DEVICE)
-	message("   amtecdevice - not found")
+  message("   amtecdevice - not found")
 endif()
 
 find_library(AMTEC_LIBRARY_UTIL amtecutil)
 if(NOT AMTEC_LIBRARY_UTIL)
-	message("   amtecutil - not found")
+  message("   amtecutil - not found")
 endif()
 
 find_library(AMTEC_LIBRARY_NTCAN ntcan)
 if(NOT AMTEC_LIBRARY_NTCAN)
-	message("   ntcan - not found")
+  message("   ntcan - not found")
 endif()
 
 if(AMTEC_LIBRARY_DEVICE AND AMTEC_LIBRARY_UTIL AND AMTEC_LIBRARY_NTCAN)
   message("   Amtec drivers were found")
-	set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${AMTEC_LIBRARY_DEVICE} ${AMTEC_LIBRARY_UTIL} ${AMTEC_LIBRARY_NTCAN})
-	set(CEDAR_USE_AMTEC ON)
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${AMTEC_LIBRARY_DEVICE} ${AMTEC_LIBRARY_UTIL} ${AMTEC_LIBRARY_NTCAN})
+  set(CEDAR_USE_AMTEC ON)
 else(AMTEC_LIBRARY_DEVICE AND AMTEC_LIBRARY_UTIL AND AMTEC_LIBRARY_NTCAN)
-	message("   Excluding Amtec-dependent files.")
-	set(CEDAR_USE_AMTEC OFF)
+  message("   Excluding Amtec-dependent files.")
+  set(CEDAR_USE_AMTEC OFF)
 endif(AMTEC_LIBRARY_DEVICE AND AMTEC_LIBRARY_UTIL AND AMTEC_LIBRARY_NTCAN)
 
 
@@ -276,5 +256,4 @@ endforeach(libPath)
 # write the current configuration values to the file
 set(CEDAR_CONFIGURATION_HEADER_OUTPUT "${CEDAR_BUILD_DIR}/cedar/configuration.h")
 configure_file("${CEDAR_HOME}/cmake/resources/configuration.h.in" "${CEDAR_CONFIGURATION_HEADER_OUTPUT}")
-install(FILES ${CEDAR_CONFIGURATION_HEADER_OUTPUT} DESTINATION ${CEDAR_HEADER_INSTALL_DIR}/)
 message("-- Current configuration was written to ${CEDAR_BUILD_DIR}/cedar/configuration.h")

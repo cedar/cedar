@@ -40,64 +40,79 @@
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declared
+    = cedar::dev::sensors::visual::Grabber::ChannelManagerSingleton::getInstance()
+        ->registerType<cedar::dev::sensors::visual::TestGrabber::TestChannelPtr>();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------
 // Constructor for a single-channel grabber
-cedar::dev::sensors::visual::TestGrabber::TestGrabber(std::string configFileName, std::string channelName)
+cedar::dev::sensors::visual::TestGrabber::TestGrabber::TestGrabber
+(
+  const std::string& sourceFileName
+)
 :
-cedar::dev::sensors::visual::Grabber(configFileName)
+cedar::dev::sensors::visual::Grabber
+(
+  "TestGrabber",
+  cedar::dev::sensors::visual::TestGrabber::TestChannelPtr
+  (
+    new cedar::dev::sensors::visual::TestGrabber::TestChannel(sourceFileName)
+  )
+)//,
+//_mSourceFileName(new cedar::aux::FileParameter(this, "fileName", cedar::aux::FileParameter::READ, fileName))
 {
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                          (
-                                           ConfigurationInterface::getName() + ": Create a single channel grabber",
-                                            "cedar::dev::sensors::visual::TestGrabber::TestGrabber()"
-                                          );
-
-  //debug information logging
+  //information logging
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
-  //read initialization values from configuration file
-  readInit(1,"TestGrabber");
-
-  //overwrite parameters from configfiles with values from constuctor
-  getChannel(0)->mSourceFileName = channelName;
-
-  //now apply the whole configuration
-  applyInit();
+  cedar::aux::LogSingleton::getInstance()->debugMessage
+                                          (
+                                           this->getName() + ": Create a single channel grabber",
+                                            "cedar::dev::sensors::visual::TestGrabber::TestGrabber()"
+                                          );
 }
+
+
 
 
 //----------------------------------------------------------------------------------------------------
 // Constructor for a stereo grabber
-cedar::dev::sensors::visual::TestGrabber::TestGrabber
+cedar::dev::sensors::visual::TestGrabber::TestGrabber::TestGrabber
 (
-  std::string configFileName,
-  std::string channelName0,
-  std::string channelName1
+  const std::string& sourceFileName0,
+  const std::string& sourceFileName1
 )
 :
-cedar::dev::sensors::visual::Grabber(configFileName)
+cedar::dev::sensors::visual::Grabber
+(
+  "StereoTestGrabber",
+  cedar::dev::sensors::visual::TestGrabber::TestChannelPtr
+  (
+    new cedar::dev::sensors::visual::TestGrabber::TestChannel(sourceFileName0)
+  ),
+  cedar::dev::sensors::visual::TestGrabber::TestChannelPtr
+  (
+    new cedar::dev::sensors::visual::TestGrabber::TestChannel(sourceFileName1)
+  )
+)//,
+//_mSourceFileName(new cedar::aux::FileParameter(this, "fileName", cedar::aux::FileParameter::READ, fileName))
 {
   //debug information logging
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
-                                           ConfigurationInterface::getName() + ": Create a stereo channel grabber",
+                                           this->getName() + ": Create a stereo channel grabber",
                                             "cedar::dev::sensors::visual::TestGrabber::TestGrabber()"
                                           );
-
-  //read initialization values from configuration file
-  readInit(2,"StereoTestGrabber");
-
-  //overwrite parameters from configfiles with values from constuctor
-  getChannel(0)->mSourceFileName = channelName0;
-  getChannel(1)->mSourceFileName = channelName1;
-
-  //now apply the whole configuration
-  applyInit();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -112,7 +127,7 @@ cedar::dev::sensors::visual::TestGrabber::~TestGrabber()
 
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
-                                           ConfigurationInterface::getName() + ": destructor",
+                                           this->getName() + ": destructor",
                                             "cedar::dev::sensors::visual::TestGrabber::~TestGrabber()"
                                           );
 
@@ -127,49 +142,57 @@ cedar::dev::sensors::visual::TestGrabber::~TestGrabber()
 //----------------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::TestGrabber::onInit()
+bool cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()
 {
 
-  //do the initialization of your Grabber in this method,
-  //grab the first pictures and initialize the mImageMatVector with
-  //these pictures
+  // do the initialization of your Grabber in this method,
+  // grab the first pictures and initialize the mImageMatVector with
+  // these pictures
+
+  // if everything was fine, return true.
+  // if there where errors, return false. In this case, the base Grabber() class will envoke closeGrabber()
+  // so be sure, that onCloseGrabber() resets the Grabber to initialization state.
 
   //-------------------------------------------------
+  //init message
   std::stringstream init_message;
-  init_message << ": Initialize test grabber with " << mNumCams << " channels ..." << std::endl;
-  for (unsigned int i = 0; i < mNumCams; ++i)
+  unsigned int num_cams = getNumCams();
+  init_message << ": Initialize test grabber with " << getNumCams() << " channels ..." << std::endl;
+  for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
-    init_message << "Channel " << i << ": capture from Source: " << getChannel(i)->mSourceFileName << std::endl;
+    init_message << "Channel " << channel << ": capture from Source: "
+                 << getTestChannel(channel)->_mpSourceFileName->getValue() << std::endl;
   }
   cedar::aux::LogSingleton::getInstance()->message
                                            (
-                                             ConfigurationInterface::getName() + init_message.str(),
-                                             "cedar::dev::sensors::visual::TestGrabber::onInit()"
+                                             this->getName() + init_message.str(),
+                                             "cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()"
                                            );
 
   //-------------------------------------------------
   //load pictures one by one
-  for(unsigned int channel=0; channel<mNumCams;++channel)
+  for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
-    //there is no need to create new matrices, empty ones are
-    //already initialized within the channel structure
-    cv::Mat frame=cv::Mat();
+
+    //here we apply empty 1x1 matrizes to test the interface
+    cv::Mat frame=cv::Mat::zeros(1, 1, CV_8UC3);
 
     //apply the new content to the channel image
-    getChannel(channel)->mImageMat = frame;
+    getTestChannel(channel)->mImageMat = frame;
+
+    //don't forget to update the channel info
+    this->setChannelInfo(channel);
   }
 
 
   // all grabbers successfully initialized
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
-                                           ConfigurationInterface::getName() + ": Initialization finished",
-                                            "cedar::dev::sensors::visual::TestGrabber::onInit()"
+                                           this->getName() + ": Initialization finished",
+                                            "cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()"
                                           );
   return true;
 
-  //to test the initialize exception
-  //return false;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -179,40 +202,32 @@ void cedar::dev::sensors::visual::TestGrabber::onCleanUp()
   //on an exception or a CTRL-C only onCleanUp will be invoked (no destructor)
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
-                                           ConfigurationInterface::getName() + ": Cleaning up",
+                                           this->getName() + ": Cleaning up",
                                             "cedar::dev::sensors::visual::TestGrabber::onCleanUp()"
                                           );
 }
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::TestGrabber::onAddChannel()
+void cedar::dev::sensors::visual::TestGrabber::onCloseGrabber()
 {
-  //create the channel structure for one channel
-  TestChannelPtr channel(new TestChannel);
-  mChannels.push_back(channel);
+  //close all opened files here and reset the grabber to initialization state
+  //no files should be opened.
+  //after this method the createGrabber() can savely invoked.
+  //the image-matrices of the channels are already reseted in the base Grabber.closeGrabber() method
 }
 
-//----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::TestGrabber::onDeclareParameters()
-{
-  //declare and initialize parameters and members of your derived class here
-  mCounter = 0 ;
-
-  //if your parameters should be stored in the configfile,
-  //the default-values will be set on new grabbers
-  return addParameter(&_mTest, "testparam", 123) == CONFIG_SUCCESS;
-}
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::TestGrabber::onUpdateSourceInfo(unsigned int channel)
+void cedar::dev::sensors::visual::TestGrabber::setChannelInfo(unsigned int channel)
 {
-  //this is the only pure virtual method of the Grabber class
 
-  //no range-check is needed, because this is done in the Grabber::getSourceInfo method
+  //no range-check is needed, because this method is a private method
 
   //give some information about the used source like channelname, filename, devicename
   //or something like that
-  getChannel(channel)->mChannelInfo = getChannel(channel)->mSourceFileName;
+  getTestChannel(channel)->mChannelInfo = this->getName()
+                                          + " Channel " + boost::lexical_cast<std::string>(channel)
+                                          + " : "+ getTestChannel(channel)->_mpSourceFileName->getValue();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -221,10 +236,11 @@ bool cedar::dev::sensors::visual::TestGrabber::onGrab()
   //this is the main grabbing method.
   //read a new picture from the source and set the picture in the mImageMatVector.at()
 
-  for(unsigned int channel=0; channel<mNumCams;++channel)
+  unsigned int num_cams = getNumCams();
+  for(unsigned int channel = 0; channel < num_cams; ++channel)
    {
      //apply the new content to the channel image
-     //getChannel(channel)->mImageMat = <grab_new_content>;
+     //getTestChannel(channel)->mImageMat = grab_new_content();
    }
 
   //here we just want to count how often onGrab is invoked, due to a fps-check

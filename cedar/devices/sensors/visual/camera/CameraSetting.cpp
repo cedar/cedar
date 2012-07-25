@@ -35,7 +35,6 @@
 ======================================================================================================================*/
 
 #include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
-#ifdef CEDAR_USE_LIB_DC1394
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/camera/CameraSetting.h"
@@ -47,7 +46,7 @@ cedar::aux::EnumType<cedar::dev::sensors::visual::CameraSetting>
                      cedar::dev::sensors::visual::CameraSetting::mType("cedar::dev::sensors::visual::CameraSetting::");
 
 //!@cond SKIPPED_DOCUMENTATION
-#ifndef MSVC
+#ifndef CEDAR_COMPILER_MSVC
   const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_FRAME_WIDTH;
   const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_FRAME_HEIGHT;
   const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_FPS;
@@ -55,7 +54,7 @@ cedar::aux::EnumType<cedar::dev::sensors::visual::CameraSetting>
 #ifdef CEDAR_USE_LIB_DC1394
   const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_ISO_SPEED;
 #endif
-#endif // MSVC
+#endif // CEDAR_COMPILER_MSVC
 //!@endcond
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -67,28 +66,28 @@ void cedar::dev::sensors::visual::CameraSetting::construct()
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraSetting::SETTING_FRAME_WIDTH,
                                       "SETTING_FRAME_WIDTH",
-                                      "Width of grabbed frame"
+                                      "framewidth"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraSetting::SETTING_FRAME_HEIGHT,
                                       "SETTING_FRAME_HEIGHT",
-                                      "Height of grabbed frame"
+                                      "frameheight"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraSetting::SETTING_FPS,
                                       "SETTING_FPS",
-                                      "the framerate of the camera"
+                                      "fps"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraSetting::SETTING_MODE,
                                       "SETTING_MODE",
-                                      "The grabbing mode (i.e. size and color coding)"
+                                      "mode"
                                     ));
 #ifdef CEDAR_USE_LIB_DC1394
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraSetting::SETTING_ISO_SPEED,
                                       "SETTING_ISO_SPEED",
-                                      "Set the speed of the IEEE1394/firewire bus"
+                                      "ISO speed"
                                     ));
 #endif
 }
@@ -106,4 +105,3 @@ const cedar::dev::sensors::visual::CameraSetting::TypePtr& cedar::dev::sensors::
 {
   return cedar::dev::sensors::visual::CameraSetting::mType.type();
 }
-#endif // CEDAR_USE_LIB_DC1394

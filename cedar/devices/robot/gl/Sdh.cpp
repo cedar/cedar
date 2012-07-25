@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/gl/gl.h"
 #include "cedar/auxiliaries/gl/glu.h"
+#include "cedar/auxiliaries/math/constants.h"
 #include "cedar/devices/robot/gl/namespace.h"
 #include "cedar/devices/robot/gl/Sdh.h"
 #include "cedar/devices/robot/KinematicChain.h"
@@ -76,6 +77,8 @@ cedar::dev::robot::gl::Sdh::~Sdh()
 
 void cedar::dev::robot::gl::Sdh::initializeGl()
 {
+  //!@todo Implement this so that it works on windows
+#ifndef CEDAR_OS_WINDOWS
   // palm
   glGenBuffers(1, &mPalmVertexVboId);
   glBindBuffer(GL_ARRAY_BUFFER, mPalmVertexVboId);
@@ -138,7 +141,7 @@ void cedar::dev::robot::gl::Sdh::initializeGl()
   glGenBuffers(1, &mDistalSkinIndexVboId);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mDistalSkinIndexVboId);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, mDistalSkinFacesNumber*3 * sizeof(GLushort), mDistalSkinIndex, GL_STATIC_DRAW);
-
+#endif // ndef CEDAR_OS_WINDOWS
 }
 
 void cedar::dev::robot::gl::Sdh::draw()
@@ -172,7 +175,7 @@ void cedar::dev::robot::gl::Sdh::draw()
 
     // first finger root
     glTranslated(.019053, -0.033, .098);
-    glRotated(mpKinematicChain->getJointAngle(6)*180.0/M_PI, 0, 0, -1);
+    glRotated(mpKinematicChain->getJointAngle(6)*180.0/cedar::aux::math::pi, 0, 0, -1);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
@@ -189,7 +192,7 @@ void cedar::dev::robot::gl::Sdh::draw()
 
     // first finger proximal link
     glTranslated(.0, 0.0, .0175);
-    glRotated(mpKinematicChain->getJointAngle(0)*180.0/M_PI, 0, -1, 0);
+    glRotated(mpKinematicChain->getJointAngle(0)*180.0/cedar::aux::math::pi, 0, -1, 0);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
@@ -208,7 +211,7 @@ void cedar::dev::robot::gl::Sdh::draw()
 
     // first finger distal link
     glTranslated(0, 0, 0.104);
-    glRotated(mpKinematicChain->getJointAngle(1)*180.0/M_PI, 0, -1, 0);
+    glRotated(mpKinematicChain->getJointAngle(1)*180.0/cedar::aux::math::pi, 0, -1, 0);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
@@ -247,7 +250,7 @@ void cedar::dev::robot::gl::Sdh::draw()
 
     // second finger proximal link
     glTranslated(.0, 0.0, .0175);
-    glRotated(mpKinematicChain->getJointAngle(2)*180.0/M_PI, 0, -1, 0);
+    glRotated(mpKinematicChain->getJointAngle(2)*180.0/cedar::aux::math::pi, 0, -1, 0);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
@@ -266,7 +269,7 @@ void cedar::dev::robot::gl::Sdh::draw()
 
     // second finger distal link
     glTranslated(0, 0, 0.104);
-    glRotated(mpKinematicChain->getJointAngle(3)*180.0/M_PI, 0, -1, 0);
+    glRotated(mpKinematicChain->getJointAngle(3)*180.0/cedar::aux::math::pi, 0, -1, 0);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
@@ -286,7 +289,7 @@ void cedar::dev::robot::gl::Sdh::draw()
 
     // third finger root
     glTranslated(.019053, 0.033, .098);
-    glRotated(mpKinematicChain->getJointAngle(6)*180.0/M_PI, 0, 0, 1);
+    glRotated(mpKinematicChain->getJointAngle(6)*180.0/cedar::aux::math::pi, 0, 0, 1);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
@@ -303,7 +306,7 @@ void cedar::dev::robot::gl::Sdh::draw()
 
     // third finger proximal link
     glTranslated(.0, 0.0, .0175);
-    glRotated(mpKinematicChain->getJointAngle(4)*180.0/M_PI, 0, -1, 0);
+    glRotated(mpKinematicChain->getJointAngle(4)*180.0/cedar::aux::math::pi, 0, -1, 0);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
@@ -322,7 +325,7 @@ void cedar::dev::robot::gl::Sdh::draw()
 
     // first finger distal link
     glTranslated(0, 0, 0.104);
-    glRotated(mpKinematicChain->getJointAngle(5)*180.0/M_PI, 0, -1, 0);
+    glRotated(mpKinematicChain->getJointAngle(5)*180.0/cedar::aux::math::pi, 0, -1, 0);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);

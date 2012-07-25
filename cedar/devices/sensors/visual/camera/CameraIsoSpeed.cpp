@@ -48,7 +48,7 @@ cedar::aux::EnumType<cedar::dev::sensors::visual::CameraIsoSpeed>
             cedar::dev::sensors::visual::CameraIsoSpeed::mType("cedar::dev::sensors::visual::CameraIsoSpeed::");
             
 //!@cond SKIPPED_DOCUMENTATION
-#ifndef MSVC
+#ifndef CEDAR_COMPILER_MSVC
   const cedar::dev::sensors::visual::CameraIsoSpeed::Id cedar::dev::sensors::visual::CameraIsoSpeed::ISO_100;
   const cedar::dev::sensors::visual::CameraIsoSpeed::Id cedar::dev::sensors::visual::CameraIsoSpeed::ISO_200;
   const cedar::dev::sensors::visual::CameraIsoSpeed::Id cedar::dev::sensors::visual::CameraIsoSpeed::ISO_400;
@@ -56,7 +56,7 @@ cedar::aux::EnumType<cedar::dev::sensors::visual::CameraIsoSpeed>
   const cedar::dev::sensors::visual::CameraIsoSpeed::Id cedar::dev::sensors::visual::CameraIsoSpeed::ISO_1600;
   const cedar::dev::sensors::visual::CameraIsoSpeed::Id cedar::dev::sensors::visual::CameraIsoSpeed::ISO_3200;
   const cedar::dev::sensors::visual::CameraIsoSpeed::Id cedar::dev::sensors::visual::CameraIsoSpeed::ISO_NOT_SET;
-#endif // MSVC
+#endif // CEDAR_COMPILER_MSVC
 //!@endcond
 
 //----------------------------------------------------------------------------------------------------------------------

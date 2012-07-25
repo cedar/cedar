@@ -81,20 +81,19 @@ public slots:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Reacts to a change in the input connection.
-  void inputConnectionChanged(const std::string& inputName);
-
   //!@brief Determines whether the data item can be connected to the slot.
   cedar::proc::DataSlot::VALIDITY determineInputValidity
                                   (
                                     cedar::proc::ConstDataSlotPtr slot,
-                                    cedar::aux::DataPtr data
+                                    cedar::aux::ConstDataPtr data
                                   ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -105,8 +104,7 @@ protected:
 
 private:
   //!@brief the writer object (RAII)
-
-  boost::shared_ptr< cedar::aux::net::Writer< cedar::aux::MatData::DataType > > mWriter;
+  boost::shared_ptr<cedar::aux::net::Writer<cedar::aux::MatData::DataType> > mWriter;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

@@ -76,7 +76,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief process trigger event
-  void onTrigger(cedar::proc::TriggerPtr pSender);
+  void onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::TriggerPtr pSender);
 
   //!@brief if a trigger connects to the MultiTrigger, add it to the internal storage of sources
   void notifyConnected(cedar::proc::TriggerPtr trigger);

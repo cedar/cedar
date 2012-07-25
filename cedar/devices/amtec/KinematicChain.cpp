@@ -43,6 +43,8 @@
 #include "cedar/devices/amtec/KinematicChain.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/math/LimitsParameter.h"
+#include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
 #ifdef CEDAR_OS_LINUX
@@ -63,13 +65,19 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::amtec::KinematicChain::KinematicChain(const std::string& configFileName)
+cedar::dev::amtec::KinematicChain::KinematicChain()
 :
-cedar::dev::robot::KinematicChain(configFileName)
+cedar::dev::robot::KinematicChain(),
+_mInitString(new cedar::aux::StringParameter(this, "amtec init string", "ESD:1,1000")),
+_mModuleMap
+(
+  new cedar::aux::IntVectorParameter
+  (
+    this, "amtec module map", 1, 0, 0, std::numeric_limits<int>::max()
+  )
+)
 {
-  mpDevice = 0;
-  mInitString = "ESD:0,450";
-  readParamsFromConfigFile();
+  mpDevice = NULL;
 
   // todo: this cannot be called from the constructor any more, because the number of joints is not known yet
   // current solution is to make it initDevice() public and call it from the main program after readJson() was called
@@ -83,7 +91,7 @@ cedar::dev::robot::KinematicChain(configFileName)
 
 cedar::dev::amtec::KinematicChain::~KinematicChain()
 {
-  for(unsigned int i = 0; i < mModules.size(); ++i)
+  for(unsigned int i = 0; i < getNumberOfJoints(); ++i)
   {
     this->setJointVelocity(i, 0.0);
   }
@@ -110,78 +118,84 @@ bool cedar::dev::amtec::KinematicChain::initDevice()
 
   if(!mpDevice)
   {
-    mpDevice = newDevice(mInitString.c_str());
+    mpDevice = newDevice(this->getInitString().c_str());
   }
 
   //
   // init device itself
   //
 
-  int ret_val = mpDevice->init(mInitString.c_str());
+  int ret_val = mpDevice->init(this->getInitString().c_str());
 
   switch(ret_val)
   {
   case CLD_OK:
     break;
   case CLDERR_INITIALIZATIONERROR:
-    std::cout << "Amtec Device: Initialization error!" << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Amtec Device: Initialization error!",
+      "cedar::dev::amtec::KinematicChain::initDevice()"
+    );
     return false;
     break;
   default:
-    std::cout << "Amtec Device: Unknown initialization error!" << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Amtec Device: Unknown initialization error!",
+      "cedar::dev::amtec::KinematicChain::initDevice()"
+    );
     return false;
   }
 
   //
   // get default module map
   //
+  std::vector<int> modules;
+  mpDevice->getModuleIdMap(modules);
 
-  mpDevice->getModuleIdMap(mModules);
-
-  if(mModules.size() <= 0)
+  if(modules.size() <= 0)
   {
-    std::cout << "No Amtec modules found!" << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+        "No Amtec modules found!",
+      "cedar::dev::amtec::KinematicChain::initDevice()"
+    );
     return false;
   }
 
-  if(mModules.size() != getNumberOfJoints())
+  if(modules.size() != getNumberOfJoints())
   {
-    std::cout << "Found " << mModules.size() << " Amtec modules but "
-      << getNumberOfJoints()
-      << " are specified by reference geometry!" << std::endl;
+    std::string message
+      = "Found " + cedar::aux::toString(modules.size()) + " Amtec modules but "
+        + cedar::aux::toString(getNumberOfJoints()) + " are specified by configuration file!";
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      message,
+      "cedar::dev::amtec::KinematicChain::initDevice()"
+    );
     return false;
   }
-
-  //
-  // read module map from config
-  //
-
-  if(addParameter(&mModules, "amtecModuleMap", mModules) != CONFIG_SUCCESS)
-  {
-    std::cout << "KinematicChain: Error reading 'amtecModuleMap' from config file!" << std::endl;
-  }
-
-  readOrDefaultConfiguration();
 
   // print module mapping to console
   std::cout << "Mapping of joints to modules:" << std::endl;
-  std::cout << "amtecModuleMap = [ " << mModules[0];
-  for (unsigned int i = 1; i < mModules.size(); ++i)
+  std::cout << "amtec module map = [ " << _mModuleMap->at(0);
+  for (unsigned int i = 1; i < _mModuleMap->size(); ++i)
   {
-    std::cout << ", " << mModules[i];
+    std::cout << ", " << _mModuleMap->at(i);
   }
   std::cout << " ];" << std::endl;
 
   // calibrate and configure the modules
   mutex_locker.unlock();
 
-  for(unsigned int i = 0; i < mModules.size(); ++i)
+  for(unsigned int i = 0; i < _mModuleMap->size(); ++i)
   {
 
-    if(!isCalibrated(mModules[i]))
+    if(!isCalibrated(_mModuleMap->at(i)))
     {
 
-      if(!calibrateModule(mModules[i]))
+      if(!calibrateModule(_mModuleMap->at(i)))
       {
         return false;
       }
@@ -189,9 +203,9 @@ bool cedar::dev::amtec::KinematicChain::initDevice()
     }
 
     // set position limits
-    //todo: replace this with applyJointLimits oder something
-    mpDevice->setMinPos(mModules[i], getJoint(i)->_mpAngleLimits->getLowerLimit());
-    mpDevice->setMaxPos(mModules[i], getJoint(i)->_mpAngleLimits->getUpperLimit());
+    //!@todo: replace this with applyJointLimits oder something
+    mpDevice->setMinPos(_mModuleMap->at(i), getJoint(i)->_mpAngleLimits->getLowerLimit());
+    mpDevice->setMaxPos(_mModuleMap->at(i), getJoint(i)->_mpAngleLimits->getUpperLimit());
 
     // set velocity limits
     //float min_velocity = mpReferenceGeometry->getJoint(i)->velocityLimits.min;
@@ -212,14 +226,14 @@ double cedar::dev::amtec::KinematicChain::getJointAngle(unsigned int joint) cons
     return 0.0;
   }
 
-  if(joint >= mModules.size())
+  if(joint >= _mModuleMap->size())
   {
     std::cout << "Error: Trying to access the " << joint << ". module while only "
-      << mModules.size() << " were found." << std::endl;
+      << _mModuleMap->size() << " were found." << std::endl;
     return 0.0;
   }
 
-  int module = mModules[joint];
+  int module = _mModuleMap->at(joint);
   float position = 0.0f;
 
   mpDevice->getPos(module, &position);
@@ -238,14 +252,14 @@ double cedar::dev::amtec::KinematicChain::getJointVelocity(unsigned int joint) c
     return 0.0;
   }
 
-  if(joint >= mModules.size())
+  if(joint >= _mModuleMap->size())
   {
     std::cout << "Error: Trying to access the " << joint << ". module while only "
-      << mModules.size() << " were found." << std::endl;
+      << _mModuleMap->size() << " were found." << std::endl;
     return 0.0;
   }
 
-  int module = mModules[joint];
+  int module = _mModuleMap->at(joint);
   float velocity = 0.0f;
 
   mpDevice->getVel(module, &velocity);
@@ -264,14 +278,14 @@ void cedar::dev::amtec::KinematicChain::setJointAngle(unsigned int index, double
     return;
   }
 
-  if(index >= mModules.size())
+  if(index >= _mModuleMap->size())
   {
     std::cout << "Error: Trying to access the " << index << ". module while only "
-      << mModules.size() << " were found." << std::endl;
+      << _mModuleMap->size() << " were found." << std::endl;
     return;
   }
 
-  int module = mModules[index];
+  int module = _mModuleMap->at(index);
   mpDevice->moveRamp(module, value, getJoint(index)->_mpVelocityLimits->getUpperLimit(), M_2_PI);
 
   return;
@@ -288,17 +302,17 @@ bool cedar::dev::amtec::KinematicChain::setJointVelocity(unsigned int index, dou
     return true;
   }
 
-  if(index >= mModules.size())
+  if(index >= _mModuleMap->size())
   {
     std::cout << "Error: Trying to access the " << index << ". module while only "
-      << mModules.size() << " were found." << std::endl;
+      << _mModuleMap->size() << " were found." << std::endl;
     return true;
   }
 
   velocity = std::max<double>(velocity, getJoint(index)->_mpVelocityLimits->getLowerLimit());
   velocity = std::min<double>(velocity, getJoint(index)->_mpVelocityLimits->getUpperLimit());
 
-  int module = mModules[index];
+  int module = _mModuleMap->at(index);
   mpDevice->moveVel(module, velocity);
 
   return true;
@@ -361,18 +375,6 @@ bool cedar::dev::amtec::KinematicChain::calibrateModule(unsigned int module)
 }
 
 
-void cedar::dev::amtec::KinematicChain::readParamsFromConfigFile()
-{
-  if(addParameter(&mInitString, "amtecInitString", "ESD:0,450") != CONFIG_SUCCESS)
-  {
-    std::cout << "KinematicChain: Error reading 'amtecInitString' from config file!" << std::endl;
-  }
-
-  readOrDefaultConfiguration();
-  return;
-}
-
-
 bool cedar::dev::amtec::KinematicChain::isCalibrated(unsigned int module)
 {
   QMutexLocker mutex_locker(&mCanBusMutex);
@@ -411,15 +413,15 @@ float cedar::dev::amtec::KinematicChain::getMaxAcceleration(unsigned int index)
     return 0.0;
   }
 
-  if(index >= mModules.size())
+  if(index >= _mModuleMap->size())
   {
     std::cout << "Error: Trying to access the " << index << ". module while only "
-      << mModules.size() << " were found." << std::endl;
+      << _mModuleMap->size() << " were found." << std::endl;
     return 0.0;
   }
 
   float acc = 0.0;
-  mpDevice->getMaxAcc(mModules[index], &acc);
+  mpDevice->getMaxAcc(_mModuleMap->at(index), &acc);
 
   return acc;
 }
@@ -435,14 +437,14 @@ void cedar::dev::amtec::KinematicChain::setMaxAcceleration(unsigned int index, f
     return;
   }
 
-  if(index >= mModules.size())
+  if(index >= _mModuleMap->size())
   {
     std::cout << "Error: Trying to access the " << index << ". module while only "
-      << mModules.size() << " were found." << std::endl;
+      << _mModuleMap->size() << " were found." << std::endl;
     return;
   }
 
-  mpDevice->setMaxAcc(mModules[index], maxAcc);
+  mpDevice->setMaxAcc(_mModuleMap->at(index), maxAcc);
   return;
 }
 
@@ -456,14 +458,14 @@ void cedar::dev::amtec::KinematicChain::setJointAngle(unsigned int index, double
     return;
   }
 
-  if(index >= mModules.size())
+  if(index >= _mModuleMap->size())
   {
     std::cout << "Error: Trying to access the " << index << ". module while only "
-        << mModules.size() << " were found." << std::endl;
+        << _mModuleMap->size() << " were found." << std::endl;
     return;
   }
 
-  int module = mModules[index];
+  int module = _mModuleMap->at(index);
   mpDevice->moveStep(module, value, stepTime);
 }
 

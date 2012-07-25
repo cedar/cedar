@@ -46,14 +46,17 @@
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/Connectable.h"
+#include "cedar/auxiliaries/MovingAverage.h"
+#include "cedar/units/TimeUnit.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <QThread>
 #include <QReadWriteLock>
-#include <map>
-#include <set>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
+#include <map>
+#include <set>
 
 
 /*!@brief This class represents a processing step in the processing framework.
@@ -110,15 +113,26 @@ public:
    *           cedar::proc::DataRole::VALIDITY). It also does nothing if the compute function has previously encountered
    *           an exception.
    */
-  void onTrigger(cedar::proc::TriggerPtr = cedar::proc::TriggerPtr());
+  void onTrigger
+       (
+         cedar::proc::ArgumentsPtr args = cedar::proc::ArgumentsPtr(),
+         cedar::proc::TriggerPtr = cedar::proc::TriggerPtr()
+       );
 
-  //!@brief Sets the arguments used by the next execution of the run function.
+  /*!@brief Sets the arguments used by the next execution of the run function.
+   *!@todo cedar::proc::Step::setNextArguments should take a const pointer.
+   */
   bool setNextArguments(cedar::proc::ArgumentsPtr arguments);
 
   /*!@brief Toggles if a step is executed as its own thread, or if the run() function is called in the same thread as
    *        the source of the trigger signal.
    */
   void setThreaded(bool isThreaded);
+
+  /*!@brief States if a step is executed as its own thread, or if the run() function is called in the same thread as
+   *        the source of the trigger signal.
+   */
+  bool isThreaded() const;
 
   //!@brief Gets the amount of triggers stored in this step.
   size_t getTriggerCount() const;
@@ -142,6 +156,14 @@ public:
     this->QThread::wait();
   }
 
+  /*!@brief Returns the last run time measured for this step.
+   */
+  cedar::unit::Time getRunTimeMeasurement() const;
+
+  /*!@brief Returns the average run time measured for this step.
+   */
+  cedar::unit::Time getRunTimeAverage() const;
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
@@ -159,7 +181,7 @@ protected:
    *        After calling this method, this step will be aware that this trigger belongs to it. Among other things, this
    *        means that the processingIde will be able to show this trigger and allow to connect it.
    */
-  void addTrigger(cedar::proc::TriggerPtr& trigger);
+  void addTrigger(cedar::proc::TriggerPtr trigger);
 
   //! @brief Method that registers a function of an object so that it can be used by the framework.
   void registerFunction(const std::string& actionName, boost::function<void()> function);
@@ -172,9 +194,6 @@ private:
    *
    *        The arguments parameter is empty, unless the step is connected to a cedar::proc::LoopedTrigger, in which
    *        case arguments of the type cedar::proc::StepTime are passed.
-   *
-   * @todo  Shouldn't this method be private? It should never be called by the user, rather, they should use onTrigger()
-   *        (as that properly locks all the data).
    */
   virtual void compute(const cedar::proc::Arguments& arguments) = 0;
 
@@ -191,6 +210,10 @@ private:
    */
   virtual void reset();
 
+  /*!@brief Sets the current execution time measurement.
+   */
+  void setRunTimeMeasurement(const cedar::unit::Time& time);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -202,7 +225,7 @@ private:
   bool mBusy;
 
   //!@brief The lock used for protecting the computation arguments of the step.
-  QReadWriteLock *mpArgumentsLock;
+  QReadWriteLock* mpArgumentsLock;
 
   //!@brief The arguments for the next cedar::proc::Step::compute call.
   ArgumentsPtr mNextArguments;
@@ -212,6 +235,17 @@ private:
 
   //!@brief Map of all actions defined for this step.
   ActionMap mActions;
+
+  //!@brief The last iteration time of the step. Only meaningful if the step is running.
+  cedar::unit::Time mLastIterationTime;
+
+  //!@brief Moving average of the iteration time.
+  cedar::aux::MovingAverage<cedar::unit::Milliseconds> mMovingAverageIterationTime;
+
+  //!@brief Lock for the last iteration time.
+  mutable QReadWriteLock* mLastIterationTimeLock;
+
+  uint64 mRNGState;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

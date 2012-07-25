@@ -97,7 +97,7 @@ void checkValidProjection(const std::string& configurationFile, unsigned int num
   cedar::proc::NetworkPtr network(new cedar::proc::Network());
   network->readFile(configurationFile);
 
-  if (!checkProjectionState(network, cedar::proc::Triggerable::STATE_NONE))
+  if (!checkProjectionState(network, cedar::proc::Triggerable::STATE_UNKNOWN))
   {
     std::cout << "Projection is not in a valid state.\n";
     ++numberOfErrors;

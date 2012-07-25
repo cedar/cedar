@@ -60,8 +60,8 @@ int main(int argc, char **argv)
 
   //initialize e-puck-drive
   cedar::dev::kteam::EPuckDrive *p_drive;
-  p_drive
-  = new cedar::dev::kteam::EPuckDrive(p_communication, "../../tests/interactive/devices/ePuck/EPuckDriveConfig.cfg");
+  p_drive = new cedar::dev::kteam::EPuckDrive(p_communication);
+  p_drive->readJson("../../tests/interactive/devices/ePuck/EPuckDrive.json");
 
   //open the control-GUI
   cedar::dev::kteam::gui::EPuckControlWidget *p_epuck_control;

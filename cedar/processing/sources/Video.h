@@ -62,6 +62,7 @@ public cedar::proc::sources::GrabberBase
 {
   Q_OBJECT
 
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -74,6 +75,7 @@ public:
   Video();
 
   //!@brief Destructor
+  ~Video();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -83,11 +85,11 @@ public:
 
 public slots:
 
-  //!@brief a slot that is triggered if a new filename should be set
-  void setFileName();
+  //! This slot should be invoked, when the video in the VideoGrabber has changed.
+  void updateVideo();
 
-  //!@brief Set looping on or off
-  void setLoop();
+  //! This slot should be invoked, when the speed factor in the VideoGrabber has changed.
+  void updateSpeedFactor();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -100,28 +102,23 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void compute(const cedar::proc::Arguments&);
-  void onStart();
   void reset();
 
-  //create a new grabber instance
-  void onCreateGrabber();
-
-
   //!@brief Cast the base GrabberBasePtr to derived class VideoGrabberPtr
-  inline cedar::dev::sensors::visual::VideoGrabberPtr getGrabber()
+  inline cedar::dev::sensors::visual::VideoGrabberPtr getVideoGrabber()
   {
     return boost::static_pointer_cast<cedar::dev::sensors::visual::VideoGrabber>
            (
-             this->cedar::proc::sources::GrabberBase::mGrabber
+             this->cedar::proc::sources::GrabberBase::mpGrabber
            );
   }
 
   //!@brief Cast the base GrabberBasePtr to derived class VideoGrabberPtr
-  inline cedar::dev::sensors::visual::ConstVideoGrabberPtr getGrabber() const
+  inline cedar::dev::sensors::visual::ConstVideoGrabberPtr getVideoGrabber() const
   {
     return boost::static_pointer_cast<const cedar::dev::sensors::visual::VideoGrabber>
            (
-            cedar::proc::sources::GrabberBase::mGrabber
+            cedar::proc::sources::GrabberBase::mpGrabber
            );
   }
 
@@ -146,14 +143,8 @@ private:
 protected:
   // none yet
 
-
 private:
-  //!@brief the filename to grab from
-  cedar::aux::FileParameterPtr _mFileName;
-
-  //!@brief Looping through the video-file
-  cedar::aux::BoolParameterPtr _mLoop;
-
+  // none yet
 
 
 }; // class cedar::proc::sources::Video

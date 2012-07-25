@@ -63,7 +63,7 @@ mpLock(new QReadWriteLock())
   CEDAR_ASSERT(this->mpOwner != NULL);
   this->setName(name);
 
-  this->mpOwner->registerParameter(cedar::aux::ParameterPtr(this));
+  this->mpOwner->registerParameter(this);
 }
 
 cedar::aux::Parameter::~Parameter()

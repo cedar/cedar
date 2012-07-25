@@ -49,7 +49,7 @@
  *
  * This class is provided for convenience, because many classes derived from cedar::aux::Configurable use a name.
  */
-class cedar::aux::NamedConfigurable : public cedar::aux::Configurable
+class cedar::aux::NamedConfigurable : virtual public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // friends

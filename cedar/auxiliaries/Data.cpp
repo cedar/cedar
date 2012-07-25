@@ -41,6 +41,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
 

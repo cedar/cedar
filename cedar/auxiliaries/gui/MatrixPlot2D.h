@@ -130,12 +130,18 @@ protected:
 private:
   //!@brief initialize
   void init();
+
   //!@brief reset the perspective of the plot
   void resetPerspective(size_t perspectiveIndex = 0);
+
   //!@brief delete the allocated array data
   void deleteArrayData();
+
   //!@brief update the allocated array data
   void updateArrayData();
+
+  //!@brief Applies the labels from the data object to the plot.
+  void applyLabels();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

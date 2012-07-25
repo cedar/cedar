@@ -40,7 +40,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/dynamics/fields/NeuralField.h"
-#include "cedar/dynamics/SpaceCode.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/DeclarationRegistry.h"
@@ -48,7 +47,7 @@
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
-#include "cedar/auxiliaries/math/AbsSigmoid.h"
+#include "cedar/auxiliaries/math/sigmoids/AbsSigmoid.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -73,6 +72,10 @@ namespace
       new cedar::proc::ElementDeclarationTemplate<cedar::dyn::NeuralField>("Fields", "cedar.dynamics.NeuralField")
     );
     field_decl->setIconPath(":/steps/field_temp.svg");
+    field_decl->setDescription
+    (
+      "An implementation of Amari's dynamic neural fields."
+    );
 
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(field_decl);
 
@@ -87,10 +90,10 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dyn::NeuralField::NeuralField()
 :
-mActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(50, 50, CV_32F))),
-mSigmoidalActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(50, 50, CV_32F))),
-mLateralInteraction(new cedar::dyn::SpaceCode(cv::Mat::zeros(50, 50, CV_32F))),
-mInputSum(new cedar::dyn::SpaceCode(cv::Mat::zeros(50, 50, CV_32F))),
+mActivation(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
+mSigmoidalActivation(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
+mLateralInteraction(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
+mInputSum(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mInputNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mNeuralNoise(new cedar::aux::MatData(cv::Mat::zeros(50, 50, CV_32F))),
 mRestingLevel
@@ -145,6 +148,7 @@ _mSizes
     cedar::aux::UIntParameter::LimitType::positive(1000)
   )
 ),
+_mOutputActivation(new cedar::aux::BoolParameter(this, "activation as output", false)),
 _mInputNoiseGain
 (
   new cedar::aux::DoubleParameter
@@ -177,24 +181,12 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 
   this->declareInputCollection("input");
 
-  std::vector<double> sigmas;
-  std::vector<double> shifts;
-  sigmas.push_back(3.0);
-  shifts.push_back(0.0);
-  sigmas.push_back(3.0);
-  shifts.push_back(0.0);
-
   // setup default kernels
   std::vector<cedar::aux::kernel::KernelPtr> kernel_defaults;
   for (unsigned int i = 0; i < 1; i++)
   {
-    cedar::aux::kernel::GaussPtr kernel = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(
-                                                                                                      1.0,
-                                                                                                      sigmas,
-                                                                                                      shifts,
-                                                                                                      5.0,
-                                                                                                      2
-                                                                                                    ));
+    cedar::aux::kernel::GaussPtr kernel
+      = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(this->getDimensionality()));
     kernel_defaults.push_back(kernel);
   }
   _mKernels = KernelListParameterPtr
@@ -208,28 +200,37 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
               );
 
   // setup noise correlation kernel
-  mNoiseCorrelationKernel = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(
-                                                                                        0.0,
-                                                                                        sigmas,
-                                                                                        shifts,
-                                                                                        5.0,
-                                                                                        2
-                                                                                      ));
+  mNoiseCorrelationKernel
+    = cedar::aux::kernel::GaussPtr
+      (
+        new cedar::aux::kernel::Gauss
+        (
+          this->getDimensionality(),
+          0.0 // default amplitude
+        )
+      );
   std::set<cedar::aux::conv::Mode::Id> allowed_convolution_modes;
   allowed_convolution_modes.insert(cedar::aux::conv::Mode::Same);
 
   this->addConfigurableChild("noise correlation kernel", mNoiseCorrelationKernel);
   this->_mNoiseCorrelationKernelConvolution->getKernelList()->append(mNoiseCorrelationKernel);
-  this->_mNoiseCorrelationKernelConvolution->setAllowedModes(allowed_convolution_modes);
+  this->_mNoiseCorrelationKernelConvolution->setMode(cedar::aux::conv::Mode::Same);
+  this->_mNoiseCorrelationKernelConvolution->setBorderType(cedar::aux::conv::BorderType::Zero);
 
   this->addConfigurableChild("lateral kernel convolution", _mLateralKernelConvolution);
   this->_mLateralKernelConvolution->setAllowedModes(allowed_convolution_modes);
 
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
+  QObject::connect(_mOutputActivation.get(), SIGNAL(valueChanged()), this, SLOT(activationAsOutputChanged()));
 
-  this->_mKernels->connectToObjectAddedSignal(boost::bind(&cedar::dyn::NeuralField::slotKernelAdded, this, _1));
-  this->_mKernels->connectToObjectRemovedSignal(boost::bind(&cedar::dyn::NeuralField::removeKernelFromConvolution, this, _1));
+  mKernelAddedConnection
+    = this->_mKernels->connectToObjectAddedSignal(boost::bind(&cedar::dyn::NeuralField::slotKernelAdded, this, _1));
+  mKernelRemovedConnection
+    = this->_mKernels->connectToObjectRemovedSignal
+      (
+        boost::bind(&cedar::dyn::NeuralField::removeKernelFromConvolution, this, _1)
+      );
 
   this->transferKernelsToConvolution();
 
@@ -240,6 +241,37 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dyn::NeuralField::activationAsOutputChanged()
+{
+  bool act_is_output = this->_mOutputActivation->getValue();
+  static std::string slot_name = "activation";
+
+  if (act_is_output)
+  {
+    if (this->hasBufferSlot(slot_name))
+    {
+      this->removeBufferSlot(slot_name);
+    }
+
+    if (!this->hasOutputSlot(slot_name))
+    {
+      this->declareOutput(slot_name, this->mActivation);
+    }
+  }
+  else
+  {
+    if (this->hasOutputSlot(slot_name))
+    {
+      this->removeOutputSlot(slot_name);
+    }
+
+    if (!this->hasBufferSlot(slot_name))
+    {
+      this->declareBuffer(slot_name, this->mActivation);
+    }
+  }
+}
 
 void cedar::dyn::NeuralField::slotKernelAdded(size_t kernelIndex)
 {
@@ -269,10 +301,22 @@ void cedar::dyn::NeuralField::removeKernelFromConvolution(size_t index)
 
 void cedar::dyn::NeuralField::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
+  // disconnect kernel slots (kernels first have to be loaded completely)
+  mKernelAddedConnection.disconnect();
+  mKernelRemovedConnection.disconnect();
+
   this->cedar::proc::Step::readConfiguration(node);
 
-  // transfer the kernels read by the object list parameter into the convolution structure
   this->transferKernelsToConvolution();
+
+  // reconnect slots
+  mKernelAddedConnection
+    = this->_mKernels->connectToObjectAddedSignal(boost::bind(&cedar::dyn::NeuralField::slotKernelAdded, this, _1));
+  mKernelRemovedConnection
+    = this->_mKernels->connectToObjectRemovedSignal
+      (
+        boost::bind(&cedar::dyn::NeuralField::removeKernelFromConvolution, this, _1)
+      );
 
   // legacy code for reading kernels with the old format
   cedar::aux::ConfigurationNode::const_assoc_iterator iter = node.find("numberOfKernels");
@@ -356,12 +400,12 @@ void cedar::dyn::NeuralField::reset()
 cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
                                                          (
                                                            cedar::proc::ConstDataSlotPtr slot,
-                                                           cedar::aux::DataPtr data
+                                                           cedar::aux::ConstDataPtr data
                                                          ) const
 {
   if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "input")
   {
-    if (cedar::dyn::SpaceCodePtr input = boost::shared_dynamic_cast<cedar::dyn::SpaceCode>(data))
+    if (cedar::aux::ConstMatDataPtr input = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
     {
       if (!this->isMatrixCompatibleInput(input->getData()))
       {
@@ -369,18 +413,9 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
       }
       else
       {
+        //!@todo Output warning if the input is not space code
+        /* return cedar::proc::DataSlot::VALIDITY_WARNING; */
         return cedar::proc::DataSlot::VALIDITY_VALID;
-      }
-    }
-    else if (cedar::aux::MatDataPtr input = boost::shared_dynamic_cast<cedar::aux::MatData>(data))
-    {
-      if (!this->isMatrixCompatibleInput(input->getData()))
-      {
-        return cedar::proc::DataSlot::VALIDITY_ERROR;
-      }
-      else
-      {
-        return cedar::proc::DataSlot::VALIDITY_WARNING;
       }
     }
     return cedar::proc::DataSlot::VALIDITY_ERROR;

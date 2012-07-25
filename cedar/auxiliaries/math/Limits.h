@@ -41,6 +41,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
 #include <boost/numeric/conversion/bounds.hpp>
@@ -87,6 +88,33 @@ struct cedar::aux::math::Limits
   mLowerLimit(otherLimits.mLowerLimit),
   mUpperLimit(otherLimits.mUpperLimit)
   {
+  }
+
+  /*! @brief Returns the value if it is inside the limit; otherwise, if the value is lower, returns the limit's lower
+   *         bounds, otherwise it returns the upper limit.
+   */
+  inline const T& limit(const T& value) const
+  {
+    if (value < this->getLower())
+    {
+      return this->getLower();
+    }
+    else if (value > this->getUpper())
+    {
+      return this->getUpper();
+    }
+    else
+    {
+      return value;
+    }
+  }
+
+  //! Returns the length of the interval, i.e., upper - lower.
+  inline T getLength() const
+  {
+    CEDAR_DEBUG_ASSERT(this->getUpper() >= this->getLower());
+
+    return this->getUpper() - this->getLower();
   }
 
   //!@brief checks whether a number is included in an integral specified by Limits

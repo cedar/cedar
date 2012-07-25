@@ -65,6 +65,10 @@ namespace
       )
     );
     static_gain_decl->setIconPath(":/steps/static_gain.svg");
+    static_gain_decl->setDescription
+    (
+      "Multiplies a matrix with a scalar value that can be set as a parameter."
+    );
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(static_gain_decl);
 
     return true;
@@ -109,13 +113,13 @@ void cedar::proc::steps::StaticGain::gainChanged()
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::StaticGain::determineInputValidity
                                 (
                                   cedar::proc::ConstDataSlotPtr CEDAR_DEBUG_ONLY(slot),
-                                  cedar::aux::DataPtr data
+                                  cedar::aux::ConstDataPtr data
                                 ) const
 {
   // First, let's make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(slot->getName() == "input")
 
-  if (boost::shared_dynamic_cast<cedar::aux::MatData>(data))
+  if (boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
   {
     // Mat data is accepted.
     return cedar::proc::DataSlot::VALIDITY_VALID;
@@ -141,4 +145,6 @@ void cedar::proc::steps::StaticGain::inputConnectionChanged(const std::string& i
   const cv::Mat& input = this->mInput->getData();
   // Make a copy to create a matrix of the same type, dimensions, ...
   this->mOutput->setData(input.clone());
+
+  this->mOutput->copyAnnotationsFrom(this->mInput);
 }

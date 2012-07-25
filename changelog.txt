@@ -34,19 +34,48 @@
 #
 #=======================================================================================================================
 
+== known issues ==
+  - cedardyn is not properly loaded on some OS when using processingIde. If you want to use its content, manually load
+    cedardyn using the plugin dialog. You then may want to go to the Manage.. dialog and mark this plugin to be loaded
+    on every start.
+  - On windows, some of the GL drawing functionality for kinematic chains and related classes is not implemented.
+
 == current version ==
 - general
   - cedar now accepts both qwt versions 5.x and 6.x
 - cedar::aux
   - added a slice plot for 3D matrix data
   - implemented full mode for the opencv convolution engine
+  - removed the ConfigurationInterface (and the option to use CEDAR_LIBCONFIG_LEGACY_MODE)
+  - FileParameters now can be set to have their path relative to the current working directory.
+  - A new annotation system has been introduced. Because of this, ImageData is now deprecated and should be switched to
+    MatData.
+- cedar::dev
+  - added MountedCameraViewer, simulating cameras fixed on a kinematic chain in OpenGL
 - cedar::proc
   - added a processing step for convolutions
   - parameters are now locked in the compute method of processing steps
+  - as a very first attempt to reduce clutter in larger architectures, steps now have display modes that can accessed
+    and set via the right-click menu in the processingIde. 
+  - interface change for cedar::proc::Connectable (raising the level of const-correctness):
+    virtual cedar::proc::DataSlot::VALIDITY determineInputValidity
+                                            (
+                                              cedar::proc::ConstDataSlotPtr slot,
+                                              cedar::aux::DataPtr data  // not const
+                                            ) const;
+    is now
+    virtual cedar::proc::DataSlot::VALIDITY determineInputValidity
+                                            (
+                                              cedar::proc::ConstDataSlotPtr slot,
+                                              cedar::aux::ConstDataPtr data // introduced ConstDataPtr here
+                                            ) const;
+  - cedar::aux::math::Sigmoid now inherits from cedar::aux::math::TransferFunction, with TransferFunction being
+    a generalization of a sigmoid function (a mapping R -> R)
 - build system
   - added a find script for FFTW that also searches for the include directory
   - added defines for the current cedar version; this makes it possible to stay compatible to older versions, should
-    this ever be needed. 
+    this ever be needed.
+  - removed dependency on libconfig
 
 == Version 0.9 ==
 - cedar::aux

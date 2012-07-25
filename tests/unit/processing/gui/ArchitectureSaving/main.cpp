@@ -49,6 +49,7 @@
 #include "cedar/processing/gui/Network.h"
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/Network.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Step.h"
@@ -102,6 +103,8 @@ int main(int argc, char** argv)
   QApplication app(argc, argv);
 
   unsigned int errors = 0;
+
+  cedar::proc::gui::Settings::instance().disableWriting();
 
   cedar::proc::gui::Ide *p_ide = new cedar::proc::gui::Ide();
 

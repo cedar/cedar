@@ -48,10 +48,8 @@
 // SYSTEM INCLUDES
 
 /*!@brief A data type representing space code activation.
- *
- * @todo Explain the concept of space code.
  */
-class cedar::dyn::SpaceCode : public cedar::dyn::MatActivation
+CEDAR_DECLARE_DEPRECATED(class) cedar::dyn::SpaceCode : public cedar::dyn::MatActivation
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

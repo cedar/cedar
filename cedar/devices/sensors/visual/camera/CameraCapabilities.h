@@ -42,20 +42,19 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/CameraGrabber.h"
-#include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/devices/sensors/visual/namespace.h"
 
 // SYSTEM INCLUDES
 
 
 /*! \class cedar::dev::sensors::visual::CameraCapabilities
  *  \brief This class manages the capabilities of a camera
- *  \remarks It implements the configurationInterface private because
- *      the configuration should never be written
  */
 class cedar::dev::sensors::visual::CameraCapabilities
 :
-public cedar::aux::ConfigurationInterface
+public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -72,15 +71,15 @@ public cedar::aux::ConfigurationInterface
   struct CameraPropertyCapability
   {
      cedar::dev::sensors::visual::CameraProperty::Id propId;
-     int max_value;
+     int max_value;  // @!todo set max/min in IntParameter for state-properties
      int min_value;
      bool is_supported;
      bool is_readable;
-     bool is_one_push_capable;
+     bool is_one_push_capable;  //@!todo: reduce capabilties to some often used
      bool is_on_off_capable;
      bool is_auto_capable;
      bool is_manual_capable;
-     bool is_absolute_capable;
+     bool is_absolute_capable;  //del
   } ;
 
   //!@endcond
@@ -94,7 +93,7 @@ public cedar::aux::ConfigurationInterface
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  CameraCapabilities(const std::string& configFileName);
+  CameraCapabilities();
 
   //!@brief Destructor
   virtual ~CameraCapabilities();

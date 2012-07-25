@@ -53,7 +53,7 @@ class TestKinematicChain : public cedar::dev::robot::KinematicChain
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Constructor that gets a configuration file name.
-  TestKinematicChain(const std::string& configFileName);
+  TestKinematicChain();
 
   //!@brief Destructor
   virtual ~TestKinematicChain();
@@ -98,8 +98,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -108,8 +106,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   //! test member bool
 

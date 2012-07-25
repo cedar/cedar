@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
-#include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "cedar/auxiliaries/Configurable.h"
 
 // SYSTEM INCLUDES
 #include <QDoubleSpinBox>
@@ -54,8 +54,7 @@
 //class CEDAR_DEV_LIB_EXPORT cedar::dev::robot::gui::ObjectVisualizationWidget
 class cedar::aux::gui::ObjectVisualizationWidget
 :
-public QWidget,
-public cedar::aux::ConfigurationInterface
+public QWidget
 {
   //----------------------------------------------------------------------------
   // macros

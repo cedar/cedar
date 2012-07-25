@@ -40,6 +40,8 @@
 // CEDAR INCLUDES
 #include "cedar/devices/robot/namespace.h"
 #include "cedar/devices/robot/Component.h"
+#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -48,12 +50,14 @@
  * This is an abstract class with functions and attributes common to drives of mobile robots. Mobile robots are e.g
  * robots with differential drives or walking robots.
  */
-class cedar::dev::robot::Locomotion : public cedar::dev::robot::Component
+class cedar::dev::robot::Locomotion : public cedar::dev::robot::Component,
+                                      public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  Locomotion();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -108,7 +112,11 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  // none yet
+  //! is debug output sent to the console?
+  inline bool debug() const
+  {
+    return this->_mDebug->getValue();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -137,12 +145,12 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
+
+private:
   /*!@brief The Debug-Flag.
    *If true, error-messages and received strings from the robot are displayed on Console, else not.
    */
-  bool _mDebug;
-
-private:
-  // none yet
+  cedar::aux::BoolParameterPtr _mDebug;
 }; // class cedar::dev::robot::Locomotion
 #endif // CEDAR_DEV_ROBOT_LOCOMOTION_H

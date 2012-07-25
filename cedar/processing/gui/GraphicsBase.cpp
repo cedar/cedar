@@ -59,6 +59,7 @@
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorValid(170, 218, 24);
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorWarning(255, 207, 40);
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorError(206, 0, 11);
+const QColor cedar::proc::gui::GraphicsBase::mValidityColorUnknown(206, 109, 11);
 
 const QColor cedar::proc::gui::GraphicsBase::mDefaultOutlineColor(Qt::black);
 const QColor cedar::proc::gui::GraphicsBase::mDefaultFillColor(Qt::white);
@@ -77,6 +78,7 @@ mDrawBackground(true),
 mHighlightMode(HIGHLIGHTMODE_NONE),
 mOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor),
 mFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor),
+mSnapToGrid(true),
 mWidth
 (
   new cedar::aux::DoubleParameter
@@ -473,6 +475,9 @@ const QColor& cedar::proc::gui::GraphicsBase::getValidityColor(ConnectValidity v
     case cedar::proc::gui::CONNECT_WARNING:
       return mValidityColorWarning;
 
+    case cedar::proc::gui::CONNECT_UNKNOWN:
+      return mValidityColorUnknown;
+
     default:
       return mValidityColorError;
   }
@@ -487,7 +492,13 @@ QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, c
     case QGraphicsItem::ItemPositionChange:
     {
       QPointF new_pos = value.toPointF();
-      if (this->scene() && cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->getSnapToGrid())
+
+      if
+      (
+        this->mSnapToGrid
+        && this->scene()
+        && cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->getSnapToGrid()
+      )
       {
         new_pos.rx() = cedar::aux::math::round(new_pos.x() / grid_size) * grid_size;
         new_pos.ry() = cedar::aux::math::round(new_pos.y() / grid_size) * grid_size;

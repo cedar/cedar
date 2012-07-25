@@ -54,8 +54,7 @@ mActivation(new cedar::dyn::DoubleActivation(0.0)),
 mOutput(new cedar::dyn::DoubleActivation(0.0))
 {
   this->declareInput("input");
-  this->declareOutput("output");
-  this->setOutput("output", mOutput);
+  this->declareOutput("output", mOutput);
 }
 
 cedar::Neuron::~Neuron()

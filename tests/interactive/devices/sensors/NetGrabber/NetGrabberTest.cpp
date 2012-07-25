@@ -24,7 +24,7 @@
 
 int main(int , char **)
 {
-
+/*
   const std::string  YARP_CHANNEL_0 = "Net_Grabber_TestCase_Channel";
   const std::string  GRABBER_NAME_0 = "Net_Grabber_TestCase";
   const std::string  CONFIG_FILE_NAME_0 = "net_grabber_testcase.config";
@@ -60,7 +60,7 @@ int main(int , char **)
   }
 
   //------------------------------------------------------------------
-  /*After initialization of a NetGrabber:
+  / * After initialization of a NetGrabber:
    *
    * ALWAYS:
    *  - the Net is already grabbed, so you can check the file using
@@ -75,7 +75,7 @@ int main(int , char **)
    *  Parameters loaded from configfile
    *  - thread isn't running
    *  - grabbername is restored from configfile
-   */
+   * /
 
     net_grabber->setName(GRABBER_NAME_0);
     std::cout << "\nGrab channel 0 from \"" << net_grabber->getSourceInfo()<<"\"" << std::endl;
@@ -194,6 +194,6 @@ int main(int , char **)
   }
 
   std::cout << "finished\n";
-
+*/
   return 0;
 }

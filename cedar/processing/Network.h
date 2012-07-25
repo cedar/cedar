@@ -212,6 +212,19 @@ public:
    */
   void disconnectSlots(const std::string& source, const std::string& target);
 
+  /*!@brief Deletes the connection between the data slots.
+   *
+   * @param sourceSlot The source slot.
+   * @param targetSlot The target slot.
+   */
+  void disconnectSlots(cedar::proc::ConstDataSlotPtr sourceSlot, cedar::proc::ConstDataSlotPtr targetSlot);
+
+  /*!@brief Deletes all connections from a given data slot.
+   * @param connectable The slot's parent.
+   * @param slot Identifier of the data slot.
+   */
+  void disconnectOutputSlot(cedar::proc::ConnectablePtr connectable, const std::string& slot);
+
   /*!@brief Deletes the connection between source and target.
    */
   void disconnectTrigger(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target);
@@ -263,35 +276,48 @@ public:
    */
   std::string getUniqueIdentifier(const std::string& identifier) const;
 
+  //!@brief Checks whether a name exists in the network.
+  bool nameExists(const std::string& name) const;
+
   /*!@brief Register a function pointer to react to an added element.
    */
   boost::signals2::connection connectToElementAdded
   (
     boost::function<void (cedar::proc::Network*, cedar::proc::ElementPtr)> slot
   );
-  
+
+  //!@brief Register a function pointer to react to a changing trigger connection
   boost::signals2::connection connectToTriggerConnectionChanged
   (
     boost::function<void (cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool)> slot
   );
 
+  //!@brief Register a function pointer to react to a changing data connection
   boost::signals2::connection connectToDataConnectionChanged
   (
-    boost::function<void (cedar::proc::DataSlotPtr, cedar::proc::DataSlotPtr, bool)> slot
+    boost::function<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, bool)> slot
   );
 
+  //!@brief Register a function pointer to react to adding an element
   boost::signals2::connection connectToNewElementAddedSignal(boost::function<void (cedar::proc::ElementPtr)> slot);
 
+  //!@brief Register a function pointer to react to removing an element
   boost::signals2::connection connectToElementRemovedSignal(boost::function<void (cedar::proc::ConstElementPtr)> slot);
 
+  //!@brief Register a function pointer to react to changes in slots
   boost::signals2::connection connectToSlotChangedSignal(boost::function<void ()> slot);
 
+  //!@brief processes slot promotion
   void processPromotedSlots();
 
+  //!@brief returns the last ui node that was read
   cedar::aux::ConfigurationNode& getLastReadUINode()
   {
     return this->mLastReadUINode;
   }
+
+  /*!@brief Remove all connections that connect up to a specified slot */
+  void removeAllConnectionsFromSlot(cedar::proc::ConstDataSlotPtr slot);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -303,9 +329,17 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /*!@brief Reads the network from a configuration node and writes all exceptions into the given vector.
+   */
+  void readFrom
+  (
+    const cedar::aux::ConfigurationNode& root,
+    std::vector<std::string>& exceptions
+  );
+
   /*!@brief Reads the network from a configuration node using the first version of the format.
    */
-  void readFromV1(const cedar::aux::ConfigurationNode& root);
+  void readFromV1(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
 
   /*!@brief Writes the meta data to the configuration.
    */
@@ -313,7 +347,7 @@ private:
 
   /*!@brief Reads steps from the configuration node and adds them to the network.
    */
-  void readSteps(const cedar::aux::ConfigurationNode& root);
+  void readSteps(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
 
   /*!@brief Writes the steps in the network to the configuration node.
    */
@@ -321,7 +355,7 @@ private:
 
   /*!@brief Reads triggers from a configuration node and adds them to the network.
    */
-  void readTriggers(const cedar::aux::ConfigurationNode& root);
+  void readTriggers(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
 
   /*!@brief Writes the triggers in the network to the configuration node.
    */
@@ -329,7 +363,7 @@ private:
 
   /*!@brief Reads networks from a configuration node and adds them to the parent network.
    */
-  void readNetworks(const cedar::aux::ConfigurationNode& root);
+  void readNetworks(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
 
   /*!@brief Writes the child networks in the network to the configuration node.
    */
@@ -345,7 +379,7 @@ private:
 
   /*!@brief Reads data connections from a configuration node and adds them to the network.
    */
-  void readDataConnections(const cedar::aux::ConfigurationNode& root);
+  void readDataConnections(const cedar::aux::ConfigurationNode& root, std::vector<std::string>& exceptions);
 
   /*!@brief Writes the data connections in the network to the configuration node.
    */
@@ -370,12 +404,15 @@ private slots:
 protected:
   //!@brief a boost signal that is emitted if a change in slot takes place
   boost::signals2::signal<void ()> mSlotChanged;
+  //!@brief a boost signal that is emitted if a trigger connection changes (added/removed)
   boost::signals2::signal<void (cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool)> mTriggerConnectionChanged;
-  boost::signals2::signal<void (cedar::proc::DataSlotPtr, cedar::proc::DataSlotPtr, bool)> mDataConnectionChanged;
+  //!@brief a boost signal that is emitted if a data connection changes (added/removed)
+  boost::signals2::signal<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, bool)> mDataConnectionChanged;
+  //!@brief a boost signal that is emitted if an element is added to the network
   boost::signals2::signal<void (cedar::proc::ElementPtr)> mNewElementAddedSignal;
+  //!@brief a boost signal that is emitted if an element is removed from the network
   boost::signals2::signal<void (cedar::proc::ConstElementPtr)> mElementRemovedSignal;
 
-  cedar::aux::StringVectorParameterPtr _mPromotedSlots;
 private:
   //! Map associating element names to elements.
   ElementMap mElements;
@@ -387,6 +424,13 @@ private:
   TriggerConnectionVector mTriggerConnections;
 
   cedar::aux::ConfigurationNode mLastReadUINode;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  //!@brief a vector of all promoted slots
+  cedar::aux::StringVectorParameterPtr _mPromotedSlots;
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals

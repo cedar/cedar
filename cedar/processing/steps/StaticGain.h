@@ -76,9 +76,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Updates the output matrix.
-  void compute(const cedar::proc::Arguments& arguments);
-
   //!@brief Returns the current gain factor.
   inline double getGainFactor() const
   {
@@ -99,20 +96,22 @@ public slots:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Reacts to a change in the input connection.
-  void inputConnectionChanged(const std::string& inputName);
-
   //!@brief Determines whether the data item can be connected to the slot.
   cedar::proc::DataSlot::VALIDITY determineInputValidity
                                   (
                                     cedar::proc::ConstDataSlotPtr slot,
-                                    cedar::aux::DataPtr data
+                                    cedar::aux::ConstDataPtr data
                                   ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
+
+  //!@brief Updates the output matrix.
+  void compute(const cedar::proc::Arguments& arguments);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

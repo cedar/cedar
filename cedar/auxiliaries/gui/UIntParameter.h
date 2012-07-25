@@ -42,21 +42,78 @@
 #define CEDAR_AUX_GUI_UINT_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/auxiliaries/gui/NumericParameter.h"
 #include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <QSpinBox>
+#include <limits.h>
 
+//----------------------------------------------------------------------------------------------------------------------
+// template specialization for QSpinBox
+//----------------------------------------------------------------------------------------------------------------------
+namespace cedar
+{
+  namespace aux
+  {
+    namespace gui
+    {
+      template<>
+      inline void NumericWidgetPolicy<unsigned int, QSpinBox>::setPrecision(QSpinBox*, int)
+      {
+        // integal precision is ignored
+      }
+
+      template<>
+      inline void NumericWidgetPolicy<unsigned int, QSpinBox>::setMinimum(QSpinBox* pWidget, const unsigned int& newValue)
+      {
+        unsigned int new_limit = newValue;
+        if (new_limit > static_cast<unsigned int>(std::numeric_limits<int>::max()))
+        {
+          cedar::aux::LogSingleton::getInstance()->warning
+          (
+            "Minimum for unsigned int parameter exceed qt's capabilities -- limiting to max int.",
+            "void cedar::aux::gui::NumericWidgetPolicy<unsigned int, QSpinBox>::setMinimum(WidgetT*, const ValueT&)"
+          );
+          new_limit = std::numeric_limits<int>::max();
+        }
+        pWidget->setMinimum(static_cast<int>(new_limit));
+      }
+
+      template<>
+      inline void NumericWidgetPolicy<unsigned int, QSpinBox>::setMaximum(QSpinBox* pWidget, const unsigned int& newValue)
+      {
+        unsigned int new_limit = newValue;
+        if (new_limit > static_cast<unsigned int>(std::numeric_limits<int>::max()))
+        {
+          cedar::aux::LogSingleton::getInstance()->warning
+          (
+            "Maximum for unsigned int parameter exceed qt's capabilities -- limiting to max int.",
+            "void cedar::aux::gui::NumericWidgetPolicy<unsigned int, QSpinBox>::setMinimum(WidgetT*, const ValueT&)"
+          );
+          new_limit = std::numeric_limits<int>::max();
+        }
+        pWidget->setMaximum(static_cast<int>(new_limit));
+      }
+    }
+  }
+}
 
 /*!@brief Widget for representing and manipulating a cedar::aux::UIntParameter.
  */
-class cedar::aux::gui::UIntParameter : public cedar::aux::gui::Parameter
+class cedar::aux::gui::UIntParameter : public cedar::aux::gui::NumericParameter<unsigned int, QSpinBox>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef cedar::aux::gui::NumericParameter<unsigned int, QSpinBox> Base;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -72,16 +129,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-public slots:
-  //!@brief handles a change of the associated parameter
-  void parameterPointerChanged();
-
-  //!@brief handles a change in the parameter
-  void valueChanged(int value);
-
-  //!@brief Handles changes in the displayed parameter's properties.
-  void propertiesChanged();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -93,7 +141,12 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void parameterChanged();
+
+private slots:
+  /*!@brief Reacts to a change of the parameter's value.
+   */
+  void valueChanged(int value);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -101,9 +154,9 @@ private:
 protected:
   // none yet
 private:
-  //!@brief a spinbox for the represented parameter
-  QSpinBox *mpSpinbox;
+  // none yet
 
 }; // class cedar::aux::gui::UIntParameter
+
 
 #endif // CEDAR_AUX_GUI_UINT_PARAMETER_H

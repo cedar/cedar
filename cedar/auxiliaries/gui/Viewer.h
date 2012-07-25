@@ -41,7 +41,7 @@
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gl/namespace.h"
 #include "cedar/auxiliaries/gl/Scene.h"
-#include "cedar/devices/sensors/visual/Grabbable.h"
+#include "cedar/auxiliaries/Grabbable.h"
 
 // SYSTEM INCLUDES
 #include <QGLViewer/qglviewer.h>
@@ -59,7 +59,7 @@
 class cedar::aux::gui::Viewer
 :
 public QGLViewer,
-public cedar::dev::sensors::visual::Grabbable
+public cedar::aux::Grabbable
 {
 private:
   Q_OBJECT

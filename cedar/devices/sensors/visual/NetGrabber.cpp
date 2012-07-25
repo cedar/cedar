@@ -47,6 +47,17 @@
 
 // SYSTEM INCLUDES
 
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declared
+    = cedar::dev::sensors::visual::Grabber::ChannelManagerSingleton::getInstance()
+        ->registerType<cedar::dev::sensors::visual::NetGrabber::NetChannelPtr>();
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 //constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -56,36 +67,46 @@
 //Constructor for single-channel grabber
 cedar::dev::sensors::visual::NetGrabber::NetGrabber
 (
-  const std::string& configFileName,
-  const std::string& yarpChannelName
+  const std::string& yarpChannelName,
+  const std::string& grabberName
 )
 :
-cedar::dev::sensors::visual::Grabber(configFileName)
+cedar::dev::sensors::visual::Grabber
+(
+  grabberName,
+  cedar::dev::sensors::visual::NetGrabber::NetChannelPtr
+  (
+    new cedar::dev::sensors::visual::NetGrabber::NetChannel(yarpChannelName)
+  )
+)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
-  readInit(1,"NetGrabber");
-  getChannel(0)->mChannelName = yarpChannelName;
-  applyInit();
 }
+
 
 //----------------------------------------------------------------------------------------------------
 //Constructor for stereo-channel grabber
 cedar::dev::sensors::visual::NetGrabber::NetGrabber
 (
-  const std::string& configFileName,
   const std::string& yarpChannelName0,
-  const std::string& yarpChannelName1
+  const std::string& yarpChannelName1,
+  const std::string& grabberName
 )
 :
-cedar::dev::sensors::visual::Grabber(configFileName)
+cedar::dev::sensors::visual::Grabber
+(
+  grabberName,
+  cedar::dev::sensors::visual::NetGrabber::NetChannelPtr
+  (
+    new cedar::dev::sensors::visual::NetGrabber::NetChannel(yarpChannelName0)
+  ),
+  cedar::dev::sensors::visual::NetGrabber::NetChannelPtr
+  (
+    new cedar::dev::sensors::visual::NetGrabber::NetChannel(yarpChannelName1)
+  )
+)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
-  readInit(2,"NetGrabber");
-
-  //overwrite with settings from constructor
-  getChannel(0)->mChannelName = yarpChannelName0;
-  getChannel(1)->mChannelName = yarpChannelName1;
-  applyInit();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -108,20 +129,13 @@ cedar::dev::sensors::visual::NetGrabber::~NetGrabber()
 //methods
 //----------------------------------------------------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::NetGrabber::onAddChannel()
-{
-  //create the channel structure for one channel
-  NetChannelPtr channel(new NetChannel);
-  mChannels.push_back(channel);
-}
 
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::NetGrabber::onCleanUp()
 {
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
-                                             ConfigurationInterface::getName() + ": onCleanUp()",
+                                             this->getName() + ": onCleanUp()",
                                              "cedar::dev::sensors::visual::NetGrabber::onCleanUp()"
                                            );
   //close all captures
@@ -133,20 +147,23 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
 {
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
-                                             ConfigurationInterface::getName() + ": onInit()",
+                                             this->getName() + ": onInit()",
                                              "cedar::dev::sensors::visual::NetGrabber::onInit()"
                                            );
 
+  unsigned int num_cams = getNumCams();
   std::stringstream info;
-  info << "Initialize NetGrabber with " << mNumCams << " channels ..." << std::endl;
-  for (unsigned int i = 0; i < mNumCams; ++i)
+  info << "Initialize NetGrabber with " << num_cams << " channels ..." << std::endl;
+
+  for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
-    info << "Channel " << i << ": capture from YARP-hannel: " << getChannel(i)->mChannelName << "\n";
+    info << "Channel " << channel << ": capture from YARP-hannel: "
+         << getNetChannel(channel)->_mpYarpChannelName->getValue()<< "\n";
   }
 
   cedar::aux::LogSingleton::getInstance()->systemInfo
                                            (
-                                             ConfigurationInterface::getName() + ": " + info.str(),
+                                             this->getName() + ": " + info.str(),
                                              "cedar::dev::sensors::visual::NetGrabber::onInit()"
                                            );
 
@@ -157,13 +174,15 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
   MatNetReaderPtr yarp_reader;
 
   //loop until connection established or an error occurs
-  for (unsigned int channel = 0; channel < mNumCams; ++channel)
+  for (unsigned int channel = 0; channel < num_cams; ++channel)
   {
+    const std::string channel_name = getNetChannel(channel)->_mpYarpChannelName->getValue();
+
     cedar::aux::LogSingleton::getInstance()->systemInfo
                                              (
-                                               ConfigurationInterface::getName() + ": Create channel "
+                                               this->getName() + ": Create channel "
                                                  + boost::lexical_cast<std::string>(channel) + ": "
-                                                 + getChannel(channel)->mChannelName,
+                                                 + channel_name,
                                                "cedar::dev::sensors::visual::NetGrabber::onInit()"
                                              );
 
@@ -180,7 +199,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
         #endif
 
         //establish connection
-        yarp_reader = MatNetReaderPtr(new cedar::aux::net::Reader<cv::Mat>(getChannel(channel)->mChannelName));
+        yarp_reader = MatNetReaderPtr(new cedar::aux::net::Reader<cv::Mat>(channel_name));
 
         #ifdef SHOW_INIT_INFORMATION_NETGRABBER
           std::cout << "ok" << std::endl;
@@ -194,8 +213,8 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
       catch (cedar::aux::ExceptionBase &E)
       {
         std::stringstream error_msg;
-        error_msg << ConfigurationInterface::getName() << ": WARNING: waiting for yarp-writer failed" << std::endl
-                    << "\t\tChannel " << channel << ": "<< getChannel(channel)->mChannelName << std::endl
+        error_msg << this->getName() << ": WARNING: waiting for yarp-writer failed" << std::endl
+                    << "\t\tChannel " << channel << ": "<< channel_name << std::endl
                     << E.exceptionInfo();
         cedar::aux::LogSingleton::getInstance()->warning
                                                  (
@@ -205,8 +224,8 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
         if (++counter_get_writer > 10)
         {
           error_msg.clear();
-          error_msg << ConfigurationInterface::getName() << ": ERROR: Waiting for yarp-writer failed" << std::endl
-                    << "\tChannel " << channel << ": "<< getChannel(channel)->mChannelName << std::endl
+          error_msg << this->getName() << ": ERROR: Waiting for yarp-writer failed" << std::endl
+                    << "\tChannel " << channel << ": "<< channel_name << std::endl
                     << "\t" << E.exceptionInfo();
           cedar::aux::LogSingleton::getInstance()->error
                                                    (
@@ -228,8 +247,8 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
         //todo: throw weiter
         //std::stringstream error_msg;
         error_msg.clear();
-        error_msg << ConfigurationInterface::getName() << ": ERROR: Initialization failed" << std::endl
-                  << "\tChannel " << channel << ": "<< getChannel(channel)->mChannelName << std::endl
+        error_msg << this->getName() << ": ERROR: Initialization failed" << std::endl
+                  << "\tChannel " << channel << ": "<< channel_name << std::endl
                   << "\t" << E.exceptionInfo();
         cedar::aux::LogSingleton::getInstance()->error
                                                  (
@@ -244,9 +263,9 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
       {
         //std::stringstream error_msg;
         std::stringstream error_msg;
-        error_msg << ConfigurationInterface::getName() << ": ERROR: Unknown Error on initialization of yarp-writer"
+        error_msg << this->getName() << ": ERROR: Unknown Error on initialization of yarp-writer"
                   << std::endl
-                  << "\tChannel " << channel << ": "<< getChannel(channel)->mChannelName << std::endl;
+                  << "\tChannel " << channel << ": "<< channel_name << std::endl;
         cedar::aux::LogSingleton::getInstance()->error
                                                  (
                                                    error_msg.str(),
@@ -257,14 +276,14 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
 
     } while (!yarp_reader.get()); //check the raw pointer
 
-    getChannel(channel)->mMatNetReader = yarp_reader;
+    getNetChannel(channel)->mpMatNetReader = yarp_reader;
 
     //Channel i initialized, try to receive the first image
 
     cedar::aux::LogSingleton::getInstance()->debugMessage
                                              (
-                                              ConfigurationInterface::getName() + ": Try to grabb from channel "
-                                                + boost::lexical_cast<std::string>(channel),
+                                               this->getName() + ": Try to grabb from channel "
+                                                 + boost::lexical_cast<std::string>(channel),
                                                "cedar::dev::sensors::visual::NetGrabber::onInit()"
                                              );
     cv::Mat frame;
@@ -279,11 +298,11 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
         #ifdef SHOW_INIT_INFORMATION_NETGRABBER
           std::cout << "." << std::flush;
         #endif
-        frame = getChannel(channel)->mMatNetReader->read();
+        frame = getNetChannel(channel)->mpMatNetReader->read();
         #ifdef SHOW_INIT_INFORMATION_NETGRABBER
           std::cout << "ok" << std::endl;
         #endif
-        getChannel(channel)->mImageMat = frame;
+        getNetChannel(channel)->mImageMat = frame;
         reading_ok = true;
       }
       //@todo: GH commented on merge
@@ -293,8 +312,8 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
         if (++counter_get_image > 10)
         {
           std::stringstream error_msg;
-          error_msg << ConfigurationInterface::getName() << ": ERROR: Couldn't retrieve an image" << std::endl
-                      << "\t\tChannel " << channel << ": "<< getChannel(channel)->mChannelName << std::endl
+          error_msg << this->getName() << ": ERROR: Couldn't retrieve an image" << std::endl
+                      << "\t\tChannel " << channel << ": "<< channel_name << std::endl
                       << E.exceptionInfo();
           cedar::aux::LogSingleton::getInstance()->error
                                                    (
@@ -312,8 +331,8 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
       catch (...)
       {
         std::stringstream error_msg;
-        error_msg << ConfigurationInterface::getName() << ": ERROR: Couldn't retrieve an image" << std::endl
-                    << "\t\tChannel " << channel << ": "<< getChannel(channel)->mChannelName << std::endl;
+        error_msg << this->getName() << ": ERROR: Couldn't retrieve an image" << std::endl
+                    << "\t\tChannel " << channel << ": "<< channel_name << std::endl;
         cedar::aux::LogSingleton::getInstance()->error
                                                  (
                                                    error_msg.str(),
@@ -328,7 +347,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
   //all grabbers successfully initialized
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
-                                            ConfigurationInterface::getName() + ": Initializtion finished",
+                                             this->getName() + ": Initializtion finished",
                                              "cedar::dev::sensors::visual::NetGrabber::onInit()"
                                            );
 
@@ -341,19 +360,14 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
   return true;
 } //onInit()
 
-
-//----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::NetGrabber::onDeclareParameters()
-{
-  return true;
-}
-
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::NetGrabber::onUpdateSourceInfo(unsigned int channel)
 {
   //value of channel is already checked by GraberInterface::getSourceInfo()
   //TODO: perhaps it is possible to gather information of used yarp-server too
-  getChannel(channel)->mChannelInfo = getChannel(channel)->mChannelName;
+  std::string name = this->getName();
+  std::string channel_name = getNetChannel(channel)->_mpYarpChannelName->getValue();
+  getNetChannel(channel)->mChannelInfo = name + ": " + channel_name;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -362,14 +376,15 @@ bool cedar::dev::sensors::visual::NetGrabber::onGrab()
   //unsigned int numCams = getNumCams();
   int result = true;
 
-  for (unsigned int channel = 0; channel < mNumCams; ++channel)
+  unsigned int num_cams = getNumCams();
+  for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
     //nonblocking version of netreader
 
     //on exception leave programm, so we don't catch it here
     //try
     //{
-    getChannel(channel)->mImageMat = getChannel(channel)->mMatNetReader->read();
+    getNetChannel(channel)->mImageMat = getNetChannel(channel)->mpMatNetReader->read();
     /* }
      * catch (cedar::aux::NetUnexpectedDataException &E)
      * {
@@ -385,7 +400,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onGrab()
      * }
      */
 
-    if (getChannel(channel)->mImageMat.empty())
+    if (getNetChannel(channel)->mImageMat.empty())
     {
       result = false;
     }

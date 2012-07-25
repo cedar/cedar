@@ -40,6 +40,7 @@ cedar_add_library(cedaraux
   gl/ObjectVisualization.h
   gui/BaseWidget.h
   gui/BoolParameter.h
+  gui/BoolVectorParameter.h
   gui/DataPlotter.h
   gui/DirectoryParameter.h
   gui/DoubleParameter.h
