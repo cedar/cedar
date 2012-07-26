@@ -60,8 +60,6 @@
  *        use the connect functions of this network. This ensures proper management of storage and deletion of all the
  *        elements in the network.
  *
- * @todo Change the name of the class to Module?
- * @todo Add a slot which reacts to name changes of elements (update map of names to ptrs)
  * @todo Write a private eraseConnection function to avoid duplicated code in disconnectSlots and remove
  */
 class cedar::proc::Network : public QObject, public cedar::proc::Connectable

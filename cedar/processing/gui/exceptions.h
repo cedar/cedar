@@ -47,27 +47,6 @@
 
 // SYSTEM INCLUDES
 
-
-/*!@brief TODO
- */
-class cedar::proc::gui::InvalidStepNameException : public cedar::aux::ExceptionBase
-{
-public:
-  InvalidStepNameException()
-  {
-  }
-}; // class cedar::proc::InvalidStepNameException
-
-/*!@brief TODO
- */
-class cedar::proc::gui::InvalidTriggerNameException : public cedar::aux::ExceptionBase
-{
-public:
-  InvalidTriggerNameException()
-  {
-  }
-}; // class cedar::proc::InvalidTriggerNameException
-
 /*!@brief This exception is thrown whenever a mode is not known to cedar.
  */
 class cedar::proc::gui::InvalidModeException : public cedar::aux::ExceptionBase

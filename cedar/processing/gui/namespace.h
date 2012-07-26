@@ -79,8 +79,6 @@ namespace cedar
 
       /* Exceptions */
       class CEDAR_PROC_LIB_EXPORT InvalidModeException;
-      class CEDAR_PROC_LIB_EXPORT InvalidStepNameException;
-      class CEDAR_PROC_LIB_EXPORT InvalidTriggerNameException;
       //!@endcond
 
       /* enums */

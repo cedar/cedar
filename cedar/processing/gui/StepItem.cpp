@@ -655,9 +655,6 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   menu.addSeparator();
   p_scene->networkGroupingContextMenuEvent(menu);
 
-  //!@todo Implement delete action.
-//  QAction *p_delete_action = menu.addAction("delete");
-
   // Actions for data plotting -----------------------------------------------------------------------------------------
   std::map<QAction*, cedar::aux::Enum> action_type_map;
   bool has_data = false;
@@ -743,11 +740,6 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     p_plotter->plot(p_data, slot->getText());
     this->showPlot(event->screenPos(), p_plotter, slot);
   }
-  // delete the step
-//  else if (a == p_delete_action)
-//  {
-//    //!@todo
-//  }
 }
 
 void cedar::proc::gui::StepItem::fillDisplayStyleMenu(QMenu* pMenu)
