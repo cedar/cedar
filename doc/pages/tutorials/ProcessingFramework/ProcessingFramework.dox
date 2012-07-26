@@ -31,6 +31,7 @@ Intermediate tutorials introduce features that are optional but provide a more e
 such as input validation and others. Advanced tutorials cover features that are likely to only be needed in very few
 situations and require more advanced programming. Thus, the level of a tutorial doesn't reflect its difficulty, but
 rather it is a hint at what level of knowledge about the framework is expected from the reader.
+
   
 
 @section ProcessingTutorialFirstStep Beginner's Tutorial: One Small Step
@@ -38,6 +39,10 @@ rather it is a hint at what level of knowledge about the framework is expected f
 In this section, we will give a brief introduction on how to create a new processing step that adheres to the principles
 of the processing framework.
 
+@subsection ProcessingTutorialFirstStep_Setup Setup
+For this tutorial, we recommend using @link ProjectsWithCedar cedar's project scripts@endlink for compiling
+         your code. For the first tutorial, please add the necessary lines to compile an executable as described.
+         
 @subsection ProcessingTutorialFirstStep_Planning Planning
 
 The first thing to do when developing a new processing step (cedar::proc::Step) is to think about what the new step is
@@ -380,10 +385,6 @@ void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin)
 The declaration code should look familiar from @ref ProcessingTutorialFirstStepArchitectureFile. After recompiling, now,
 the plugin is ready for use!
 
-@remarks While not necessary, we recommend using @link ProjectsWithCedar cedar's project scripts@endlink for compiling
-         your plugin.
-
-
 @section ProcessingTutorialUsingTheProcessingIde Beginner's Tutorial: Using the processingIde
 
 In the folder @em cedar/bin, you can find an application called @em processingIde. If you run it, you can generate the
@@ -451,10 +452,10 @@ executed. This is done by overriding the method cedar::proc::Connectable::determ
 @code
 cedar::proc::DataSlot::VALIDITY SimpleSummation::determineInputValidity(
                                                                          cedar::proc::ConstDataSlotPtr,
-                                                                         cedar::aux::DataPtr data
+                                                                         cedar::aux::ConstDataPtr data
                                                                        ) const
 {
-  if (boost::shared_dynamic_cast<cedar::aux::MatData>(data))
+  if (boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data))
   {
     return cedar::proc::DataSlot::VALIDITY_VALID;
   }
