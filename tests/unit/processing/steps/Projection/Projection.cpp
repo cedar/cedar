@@ -162,11 +162,13 @@ int main()
   //===================================================================================================================
   // 1D to 3D
   //===================================================================================================================
+#ifdef CEDAR_USE_FFTW
   std::cout << "Checking 1D to 3D projections" << std::endl;
   checkValidProjection("configs/config_1Dto3D_0_valid.json", number_of_errors);
   checkValidProjection("configs/config_1Dto3D_1_valid.json", number_of_errors);
   checkValidProjection("configs/config_1Dto3D_2_valid.json", number_of_errors);
   checkInvalidProjection("configs/config_1Dto3D_drop_invalid.json", number_of_errors);
+#endif // CEDAR_USE_FFTW
 
   //===================================================================================================================
   // 2D to 0D
@@ -200,6 +202,8 @@ int main()
   checkInvalidProjection("configs/config_2Dto2D_drop_1_invalid.json", number_of_errors);
   checkInvalidProjection("configs/config_2Dto2D_drop_drop_invalid.json", number_of_errors);
 
+#ifdef CEDAR_USE_FFTW
+
   //===================================================================================================================
   // 2D to 3D
   //===================================================================================================================
@@ -227,6 +231,7 @@ int main()
   std::cout << "Checking 3D to 0D projections" << std::endl;
   checkValidProjection("configs/config_3Dto0D_valid.json", number_of_errors);
 
+
   //===================================================================================================================
   // 3D to 1D
   //===================================================================================================================
@@ -253,6 +258,7 @@ int main()
   std::cout << "Checking 3D to 3D projections" << std::endl;
   checkValidProjection("configs/config_3Dto3D_0_1_2_valid.json", number_of_errors);
   checkValidProjection("configs/config_3Dto3D_1_2_0_valid.json", number_of_errors);
+#endif // CEDAR_USE_FFTW
 
   std::cout << "Done. There were " << number_of_errors << " errors.\n";
 
