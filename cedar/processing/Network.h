@@ -124,6 +124,8 @@ public:
    */
   void remove(cedar::proc::ConstElementPtr element);
 
+  /*!@brief calls remove() for every element of the network
+   */
   void removeAll();
 
   /*!@brief Adds a new element with the type given by className and the name instanceName.
@@ -148,6 +150,8 @@ public:
    */
   void add(cedar::proc::ElementPtr element);
 
+  /*!@brief adds a list of elements and takes care of existing connections between those elements
+   */
   void add(std::list<cedar::proc::ElementPtr> elements);
 
   /*!@brief Returns the element with the given name as a pointer of the specified type.
@@ -239,6 +243,8 @@ public:
                            std::vector<cedar::proc::DataConnectionPtr>& connections
                          );
 
+  /*!@brief access the vector of data connections
+   */
   const cedar::proc::Network::DataConnectionVector& getDataConnections() const;
 
   /*!@brief Returns a const reference to the map of names to elements stored in the network.
@@ -256,11 +262,16 @@ public:
   /*!@brief Find the complete path of an element, if it exists in the tree structure
    * @returns returns the dot-separated path to the element, or empty string if element is not found in tree
    * @todo instead of returning an empty string, this function should throw an exception (catch it internally
-   * in recursive call) */
+   * in recursive call)
+   */
   std::string findPath(cedar::proc::ConstElementPtr findMe) const;
   
+  /*!@brief promote the given DataSlot to this network
+   */
   void promoteSlot(DataSlotPtr promotedSlot);
 
+  /*!@brief promote the given DataSlot of this network
+   */
   void demoteSlot(cedar::proc::DataRole::Id role, const std::string& name);
 
   /*!@brief This method lists all networks that are children of this network.
