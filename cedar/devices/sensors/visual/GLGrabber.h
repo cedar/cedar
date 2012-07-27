@@ -108,8 +108,8 @@ public:
    */
   GLGrabber
   (
-    QGLWidget *qglWidget = NULL,
-    const std::string& grabberName = "GLGrabber"
+    QGLWidget *qglWidget,
+    const std::string& grabberName
   );
 
   /*! @brief Constructor for a stereo channel grabber
@@ -119,9 +119,9 @@ public:
    */
   GLGrabber
   (
-    QGLWidget *qglWidget0 = NULL,
-    QGLWidget *qglWidget1 = NULL,
-    const std::string& grabberName = "StereoGLGrabber"
+    QGLWidget *qglWidget0,
+    QGLWidget *qglWidget1,
+    const std::string& grabberName
   );
 
   //!@brief Destructor

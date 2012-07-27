@@ -49,7 +49,7 @@
 
 
 //--------------------------------------------------------------------------------------------------------------------
-//(re)defines of our new introduced properties in OpenCV:
+//(re)defines of our newly introduced properties in OpenCV:
 //delete this, if the patched OpenCV is available
 #ifndef CV_CAP_PROP_ZOOM
   #define CV_CAP_PROP_ZOOM 27
@@ -137,32 +137,79 @@ public:
    *  @remarks Not all of this properties are supported on the different camera models
    */
   static const Id PROP_BRIGHTNESS = CV_CAP_PROP_BRIGHTNESS; // = 10
+
   /// @see PROP_BRIGHTNESS
   static const Id PROP_SATURATION = CV_CAP_PROP_SATURATION; // = 12;
+
   /// @see PROP_BRIGHTNESS
   static const Id PROP_HUE = CV_CAP_PROP_HUE; //13;
+
   /// @see PROP_BRIGHTNESS
   static const Id PROP_GAIN = CV_CAP_PROP_GAIN; //14;
+
   /// @see PROP_BRIGHTNESS
   static const Id PROP_EXPOSURE = CV_CAP_PROP_EXPOSURE; //15;
+
   /// @see PROP_BRIGHTNESS
+  //!@todo This is a solution for downward compatibility, but probably not the best one
+#ifdef CV_CAP_PROP_WHITE_BALANCE_BLUE_U
   static const Id PROP_WHITE_BALANCE_BLUE_U = CV_CAP_PROP_WHITE_BALANCE_BLUE_U; //17;
+#else
+  static const Id PROP_WHITE_BALANCE_BLUE_U = 17;
+#endif // CV_CAP_PROP_WHITE_BALANCE_BLUE_U
+
   /// @see PROP_BRIGHTNESS
+#ifdef CV_CAP_PROP_SHARPNESS
   static const Id PROP_SHARPNESS = CV_CAP_PROP_SHARPNESS; //20;
+#else
+  static const Id PROP_SHARPNESS = 20; //20;
+#endif // CV_CAP_PROP_SHARPNESS
+
   /// @see PROP_BRIGHTNESS
+#ifdef CV_CAP_PROP_AUTO_EXPOSURE
   static const Id PROP_AUTO_EXPOSURE = CV_CAP_PROP_AUTO_EXPOSURE; //21
+#else
+  static const Id PROP_AUTO_EXPOSURE = 21; //21
+#endif // CV_CAP_PROP_AUTO_EXPOSURE
+
   /// @see PROP_BRIGHTNESS
+#ifdef CV_CAP_PROP_GAMMA
   static const Id PROP_GAMMA = CV_CAP_PROP_GAMMA; //22;
+#else
+  static const Id PROP_GAMMA = 22;
+#endif // CV_CAP_PROP_GAMMA
+
   /// @see PROP_BRIGHTNESS
+#ifdef CV_CAP_PROP_TEMPERATURE
   static const Id PROP_TEMPERATURE = CV_CAP_PROP_TEMPERATURE; // 23;
+#else
+  static const Id PROP_TEMPERATURE = 23;
+#endif // CV_CAP_PROP_TEMPERATURE
+
   /// @see PROP_BRIGHTNESS
+#ifdef CV_CAP_PROP_TRIGGER
   static const Id PROP_TRIGGER = CV_CAP_PROP_TRIGGER; // 24;
+#else
+  static const Id PROP_TRIGGER = 24;
+#endif // CV_CAP_PROP_TRIGGER
+
   /// @see PROP_BRIGHTNESS
+#ifdef CV_CAP_PROP_TRIGGER_DELAY
   static const Id PROP_TRIGGER_DELAY = CV_CAP_PROP_TRIGGER_DELAY; // 25;
+#else
+  static const Id PROP_TRIGGER_DELAY = 25;
+#endif
+
   /// @see PROP_BRIGHTNESS
+#ifdef CV_CAP_PROP_WHITE_BALANCE_RED_V
   static const Id PROP_WHITE_BALANCE_RED_V = CV_CAP_PROP_WHITE_BALANCE_RED_V; // 26;
+#else
+  static const Id PROP_WHITE_BALANCE_RED_V = 26; // 26;
+#endif // CV_CAP_PROP_WHITE_BALANCE_RED_V
+
   /// @see PROP_BRIGHTNESS
   static const Id PROP_ZOOM = CV_CAP_PROP_ZOOM; // 27;
+
   /// @see PROP_BRIGHTNESS
   static const Id PROP_FOCUS = CV_CAP_PROP_FOCUS; // 28;
 

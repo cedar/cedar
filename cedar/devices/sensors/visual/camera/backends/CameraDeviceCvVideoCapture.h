@@ -53,7 +53,7 @@
  */
 class cedar::dev::sensors::visual::CameraDeviceCvVideoCaputre
 :
-cedar::dev::sensors::visual::CameraDevice::CameraDevice
+public cedar::dev::sensors::visual::CameraDevice
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
