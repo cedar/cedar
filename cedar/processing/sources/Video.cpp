@@ -173,6 +173,7 @@ void cedar::proc::sources::Video::compute(const cedar::proc::Arguments &argument
 void cedar::proc::sources::Video::updateVideo()
 {
   this->mImage->setData(this->getVideoGrabber()->getImage());
+  this->annotateImage();
   mFrameDuration = 1000/this->getVideoGrabber()->getFps();
   mTimeElapsed = 0.0;
   mRecording->setValue(this->getVideoGrabber()->isRecording());
