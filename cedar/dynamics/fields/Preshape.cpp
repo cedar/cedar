@@ -121,8 +121,8 @@ void cedar::dyn::Preshape::eulerStep(const cedar::unit::Time& time)
 
   // one possible preshape dynamic
   preshape +=
-	(
-	  cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau_build_up)
+  (
+    cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau_build_up)
       * (-1.0 * preshape + input_mat).mul(sigmoided_input)
     + cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau_decay)
       * (-1.0 * preshape.mul((1.0 - sigmoided_input)))
