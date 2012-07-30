@@ -131,19 +131,12 @@ namespace cedar
       //!@brief The manager of all sigmoind instances
       typedef cedar::aux::FactoryManager<TransferFunctionPtr> TransferFunctionManager;
 
-#ifdef MSVC
-#ifdef CEDAR_LIB_EXPORTS_AUX
-      // dllexport
-      template class __declspec(dllexport) cedar::aux::Singleton<TransferFunctionManager>;
-#else // CEDAR_LIB_EXPORTS_AUX
-    // dllimport
-      extern template class __declspec(dllimport) cedar::aux::Singleton<TransferFunctionManager>;
-#endif // CEDAR_LIB_EXPORTS_AUX
-#endif // MSVC
-
       //!@brief The singleton object of the TransferFunctionFactory.
       typedef cedar::aux::Singleton<TransferFunctionManager> TransferFunctionManagerSingleton;
+
+      CEDAR_INSTANTIATE_AUX_TEMPLATE(TransferFunctionManagerSingleton);
     }
   }
 }
+
 #endif  // CEDAR_AUX_MATH_TRANSFER_FUNCTION_H
