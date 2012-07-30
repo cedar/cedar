@@ -39,10 +39,12 @@
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/ExternalData.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/kernel/Kernel.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/convolution/Convolution.h"
-#include "cedar/processing/ExternalData.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -68,11 +70,13 @@ namespace
     );
     convolution_decl->setDescription
                       (
-                        "This processing step convolves a matrix with a kernel.\n"\
-                        "Convolution can be done with to different engines: OpenCV and FFTW. "\
-                        "The OpenCV engine provides Convolution with three modes: Full, same, and valid. "\
-                        "Also the border handling can be set as: Cyclic, zero-filled, mirrowed, and replicate. "\
-                        "The FFTW engine only provides cyclic border handling with mode same."
+                        "This processing step convolves a matrix with a kernel or kernel list.\n"
+                        "Convolution can be done with to different engines: OpenCV and FFTW. "
+                        "The OpenCV engine provides Convolution with three modes: Full, same, and valid. "
+                        "Also the border handling can be set as: Cyclic, zero-filled, mirrowed, and replicate. "
+                        "The FFTW engine only provides cyclic border handling with mode same.\n\n"
+                        "The step can either use an kernel matrix (input) to perform the convolution, or it can use "
+                        " a list of kernels set via parameters."
                       );
     convolution_decl->setIconPath(":/steps/convolution.svg");
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(convolution_decl);
@@ -90,18 +94,40 @@ cedar::proc::steps::Convolution::Convolution()
 :
 // outputs
 mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
+mConvolution(new cedar::aux::conv::Convolution()),
 // parameters
-mConvolution(new cedar::aux::conv::Convolution())
+_mKernels
+(
+  new cedar::proc::steps::Convolution::KernelListParameter
+  (
+    this,
+    "kernels",
+    std::vector<cedar::aux::kernel::KernelPtr>()
+  )
+)
 {
   // declare all data
   this->declareInput("matrix", true);
-  this->declareInput("kernel", true);
+  this->declareInput("kernel", false);
 
   this->declareOutput("result", mOutput);
 
   QObject::connect(this->mConvolution.get(), SIGNAL(configurationChanged()), this, SLOT(recompute()));
 
   this->addConfigurableChild("convolution", this->mConvolution);
+
+  mKernelAddedConnection
+    = this->_mKernels->connectToObjectAddedSignal
+      (
+        boost::bind(&cedar::proc::steps::Convolution::slotKernelAdded, this, _1)
+      );
+  mKernelRemovedConnection
+    = this->_mKernels->connectToObjectRemovedSignal
+      (
+        boost::bind(&cedar::proc::steps::Convolution::removeKernelFromConvolution, this, _1)
+      );
+
+  this->transferKernelsToConvolution();
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -109,10 +135,24 @@ mConvolution(new cedar::aux::conv::Convolution())
 
 void cedar::proc::steps::Convolution::compute(const cedar::proc::Arguments&)
 {
-  const cv::Mat& kernel = mKernel->getData();
   const cv::Mat& matrix = mMatrix->getData();
-
-  mOutput->setData(this->mConvolution->convolve(matrix, kernel));
+  if (mKernel)
+  {
+    const cv::Mat& kernel = mKernel->getData();
+    mOutput->setData(this->mConvolution->convolve(matrix, kernel));
+  }
+  else if (this->_mKernels->size() > 0)
+  {
+    if (this->_mKernels->at(0)->getDimensionality() != this->getDimensionality())
+    {
+      this->inputDimensionalityChanged();
+    }
+    mOutput->setData(this->mConvolution->convolve(matrix));
+  }
+  else
+  {
+    mOutput->setData(this->mMatrix->getData().clone());
+  }
 }
 
 void cedar::proc::steps::Convolution::recompute()
@@ -154,6 +194,8 @@ void cedar::proc::steps::Convolution::inputConnectionChanged(const std::string& 
     CEDAR_DEBUG_ASSERT(this->mMatrix);
 
     this->mOutput->copyAnnotationsFrom(this->mMatrix);
+
+    this->inputDimensionalityChanged();
   }
   else if (inputName == "kernel")
   {
@@ -162,4 +204,79 @@ void cedar::proc::steps::Convolution::inputConnectionChanged(const std::string& 
     // This should always work since other types should not be accepted.
     CEDAR_DEBUG_ASSERT(this->mKernel);
   }
+}
+
+void cedar::proc::steps::Convolution::inputDimensionalityChanged()
+{
+  for (size_t i = 0; i < this->_mKernels->size(); ++i)
+  {
+    this->_mKernels->at(i)->setDimensionality(this->getDimensionality());
+  }
+}
+
+void cedar::proc::steps::Convolution::readConfiguration(const cedar::aux::ConfigurationNode& node)
+{
+  // disconnect kernel slots (kernels first have to be loaded completely)
+  mKernelAddedConnection.disconnect();
+  mKernelRemovedConnection.disconnect();
+
+  this->cedar::proc::Step::readConfiguration(node);
+
+  this->transferKernelsToConvolution();
+
+  // reconnect slots
+  mKernelAddedConnection
+    = this->_mKernels->connectToObjectAddedSignal
+      (
+        boost::bind(&cedar::proc::steps::Convolution::slotKernelAdded, this, _1)
+      );
+  mKernelRemovedConnection
+    = this->_mKernels->connectToObjectRemovedSignal
+      (
+        boost::bind(&cedar::proc::steps::Convolution::removeKernelFromConvolution, this, _1)
+      );
+}
+
+
+void cedar::proc::steps::Convolution::slotKernelAdded(size_t kernelIndex)
+{
+  cedar::aux::kernel::KernelPtr kernel = this->_mKernels->at(kernelIndex);
+  this->addKernelToConvolution(kernel);
+
+  this->onTrigger();
+}
+
+void cedar::proc::steps::Convolution::transferKernelsToConvolution()
+{
+  this->getConvolution()->getKernelList()->clear();
+  for (size_t kernel = 0; kernel < this->_mKernels->size(); ++ kernel)
+  {
+    this->addKernelToConvolution(this->_mKernels->at(kernel));
+  }
+}
+
+unsigned int cedar::proc::steps::Convolution::getDimensionality() const
+{
+  if (this->mMatrix)
+  {
+    return cedar::aux::math::getDimensionalityOf(this->mMatrix->getData());
+  }
+  else
+  {
+    return 2;
+  }
+}
+
+
+void cedar::proc::steps::Convolution::addKernelToConvolution(cedar::aux::kernel::KernelPtr kernel)
+{
+  kernel->setDimensionality(this->getDimensionality());
+  this->getConvolution()->getKernelList()->append(kernel);
+}
+
+void cedar::proc::steps::Convolution::removeKernelFromConvolution(size_t index)
+{
+  this->getConvolution()->getKernelList()->remove(index);
+
+  this->onTrigger();
 }

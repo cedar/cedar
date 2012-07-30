@@ -42,10 +42,13 @@
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 
 // SYSTEM INCLUDES
 
-/*!@todo Document this step
+/*!@brief This step performs a convolution between an input and a kernel list or an explicitly specified kernel matrix.
+ *
+ * @todo A lot of the code for adding/removing kernels here is redundant with code in cedar::dyn::NeuralField
  */
 class cedar::proc::steps::Convolution : public cedar::proc::Step
 {
@@ -54,6 +57,17 @@ class cedar::proc::steps::Convolution : public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
   
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  //!@brief a parameter for kernel objects
+  typedef cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel> KernelListParameter;
+
+  //!@cond SKIPPED_DOCUMENTATION
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(KernelListParameter);
+  //!@endcond
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -95,12 +109,40 @@ protected:
                                     cedar::aux::ConstDataPtr data
                                   ) const;
 
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //!@brief Reacts to a change in the input connection.
   void inputConnectionChanged(const std::string& inputName);
+
+  /*!@brief Updates the convolution object when a new kernel is added.
+   */
+  void slotKernelAdded(size_t kernelIndex);
+
+  /*!@brief Adds a kernel to the convolution object.
+   */
+  void addKernelToConvolution(cedar::aux::kernel::KernelPtr kernel);
+
+  /*!@brief Removes a kernel from the convolution object.
+   */
+  void removeKernelFromConvolution(size_t index);
+
+  //!@brief Makes the kernel list stored in the convolution equal to the one in the field.
+  void transferKernelsToConvolution();
+
+  /*!@brief Returns the convolution object currently selected.
+   */
+  inline cedar::aux::conv::ConvolutionPtr getConvolution()
+  {
+    return this->mConvolution;
+  }
+
+  unsigned int getDimensionality() const;
+
+  void inputDimensionalityChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -120,6 +162,9 @@ private:
   //!@brief Containing convolution methods and parameter
   cedar::aux::conv::ConvolutionPtr mConvolution;
 
+  boost::signals2::connection mKernelAddedConnection;
+  boost::signals2::connection mKernelRemovedConnection;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -127,7 +172,7 @@ protected:
   // none yet
 
 private:
-  // none yet
+  KernelListParameterPtr _mKernels;
 
 }; // class cedar::proc::steps::Convolution
 
