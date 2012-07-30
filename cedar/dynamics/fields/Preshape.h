@@ -112,6 +112,7 @@ private:
 protected:
   //!@brief this SpaceCode matrix contains the current field activity of the NeuralField
   cedar::aux::MatDataPtr mActivation;
+
 private:
   // none yet
 
@@ -123,8 +124,10 @@ protected:
   cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
   //!@brief the field sizes in each dimension
   cedar::aux::UIntVectorParameterPtr _mSizes;
-  //!@brief time scale
-  cedar::aux::DoubleParameterPtr _mTimeScale;
+  //!@brief time scale build up
+  cedar::aux::DoubleParameterPtr _mTimeScaleBuildUp;
+  //!@brief time scale decay
+  cedar::aux::DoubleParameterPtr _mTimeScaleDecay;
 private:
   // none yet
 
