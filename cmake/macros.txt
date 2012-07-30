@@ -78,7 +78,7 @@ macro(cedar_add_unit_test)
   parse_arguments(unitTest "ARGUMENTS" "" ${ARGN})
   car(unitTestName ${unitTest_DEFAULT_ARGS})
   cdr(unitTestSources ${unitTest_DEFAULT_ARGS})
-  cedar_add_test(${unitTestName} ${unitTestSources} PREFIX "unitTest" DIRECTORY ${CEDAR_UNIT_TEST_DIR} ARGUMENTS unitTest_ARGUMENTS AUTOMATIC)
+  cedar_add_test(${unitTestName} ${unitTestSources} PREFIX "unitTest" DIRECTORY ${CEDAR_UNIT_TEST_DIR} ARGUMENTS ${unitTest_ARGUMENTS} AUTOMATIC)
 endmacro(cedar_add_unit_test)
 
 macro(cedar_add_interactive_test)
@@ -122,7 +122,19 @@ macro(cedar_add_test)
   #
   # add_test(<test identifier> <executable name> <arguments for the test>)
   if (test_AUTOMATIC)
-    add_test(${testName} ${CMAKE_COMMAND} -E chdir ${test_DIRECTORY}/${testSubdirectory}/${testName} ${CEDAR_EXE_DIR}/${test_PREFIX}/${testSubdirectory}/${testExecutableName} ${test_ARGUMENTS})
+    set(working_dir "${test_DIRECTORY}/${testSubdirectory}/${testName}")
+    if (CMAKE_MAJOR_VERSION GREATER 2 AND CMAKE_MINOR_VERSION GREATER 8 AND CMAKE_PATCH_VERSION GREATER 4)
+      add_test(NAME ${testName}
+               WORKING_DIRECTORY ${working_dir}
+               COMMAND ${testExecutableName} ${test_ARGUMENTS}
+              )
+    else()
+      # Workaround for the missing WORKING_DIRECTORY in versions below the one given above
+      if (WIN32)
+        message(WARNING "Unit tests might not work properly with this version of cmake. Please update to at least cmake version 2.8.4.")
+      endif(WIN32)
+      add_test(${testName} ${CMAKE_COMMAND} -E chdir ${test_DIRECTORY}/${testSubdirectory}/${testName} ${CEDAR_EXE_DIR}/${test_PREFIX}/${testSubdirectory}/${testExecutableName} ${test_ARGUMENTS})
+    endif()
   endif (test_AUTOMATIC)
   
   # link all cedar and third party libraries into the unit test executable
@@ -372,9 +384,9 @@ MACRO(PARSE_ARGUMENTS prefix arg_names option_names)
       SET(loption_names ${option_names})    
       LIST(FIND loption_names "${arg}" is_option)            
       IF (is_option GREATER -1)
-       SET(${prefix}_${arg} TRUE)
+        SET(${prefix}_${arg} TRUE)
       ELSE (is_option GREATER -1)
-       SET(current_arg_list ${current_arg_list} ${arg})
+        SET(current_arg_list ${current_arg_list} ${arg})
       ENDIF (is_option GREATER -1)
     ENDIF (is_arg_name GREATER -1)
   ENDFOREACH(arg)

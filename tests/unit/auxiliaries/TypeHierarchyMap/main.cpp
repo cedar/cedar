@@ -431,7 +431,7 @@ int main(int argc, char** argv)
 
     for (size_t test_num = 0; test_num < num_tests_nonfull; ++test_num)
     {
-      size_t rnd_index = random() % indices.size();
+      size_t rnd_index = rand() % indices.size();
       CEDAR_DEBUG_ASSERT(rnd_index < insert_orders.size());
       size_t test_index = indices.at(rnd_index);
       indices.erase(indices.begin() + rnd_index);

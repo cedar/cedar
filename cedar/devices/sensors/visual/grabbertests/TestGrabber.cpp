@@ -55,7 +55,7 @@ namespace
 
 //----------------------------------------------------------------------------------------------------
 // Constructor for a single-channel grabber
-cedar::dev::sensors::visual::TestGrabber::TestGrabber::TestGrabber
+cedar::dev::sensors::visual::TestGrabber::TestGrabber
 (
   const std::string& sourceFileName
 )
@@ -85,7 +85,7 @@ cedar::dev::sensors::visual::Grabber
 
 //----------------------------------------------------------------------------------------------------
 // Constructor for a stereo grabber
-cedar::dev::sensors::visual::TestGrabber::TestGrabber::TestGrabber
+cedar::dev::sensors::visual::TestGrabber::TestGrabber
 (
   const std::string& sourceFileName0,
   const std::string& sourceFileName1

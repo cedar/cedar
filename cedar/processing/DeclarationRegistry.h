@@ -153,15 +153,7 @@ namespace cedar
 {
   namespace proc
   {
-#ifdef MSVC
-#ifdef CEDAR_LIB_EXPORTS_PROC
-    // dllexport
-    template class __declspec(dllexport) cedar::aux::Singleton<cedar::proc::DeclarationRegistry>;
-#else // CEDAR_LIB_EXPORTS_PROC
-    // dllimport
-    extern template class __declspec(dllimport) cedar::aux::Singleton<cedar::proc::DeclarationRegistry>;
-#endif // CEDAR_LIB_EXPORTS_PROC
-#endif // MSVC
+    CEDAR_INSTANTIATE_PROC_TEMPLATE(cedar::aux::Singleton<cedar::proc::DeclarationRegistry>);
 
     //!@brief The singleton for the declaration registry.
     typedef cedar::aux::Singleton<cedar::proc::DeclarationRegistry> DeclarationRegistrySingleton;

@@ -36,7 +36,9 @@
 
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/grabbertests/TestGrabber.h"
+#include "cedar/units/TimeUnit.h"
 #include "cedar/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -73,7 +75,7 @@ namespace TEST_GRABBER
         ).total_milliseconds() < (FPS_TEST_DURATION_IN_SEC*1000)
       )
       {
-        usleep(200000);
+        cedar::aux::sleep(cedar::unit::Milliseconds(200));
         std::cout << "measured fps: "<< grabber.getFpsMeasured()<<std::endl;
        }
 
