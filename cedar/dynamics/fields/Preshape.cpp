@@ -40,6 +40,8 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/math/sigmoids.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 
@@ -80,16 +82,17 @@ cedar::dyn::Preshape::Preshape()
 mActivation(new cedar::aux::MatData(cv::Mat::zeros(10,10,CV_32F))),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 0, 1000)),
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000)),
-_mTimeScale(new cedar::aux::DoubleParameter(this, "time scale", 0.1, 0.001, 10.0))
+_mTimeScaleBuildUp(new cedar::aux::DoubleParameter(this, "time scale build up", 10.0, 0.001, 10000.0)),
+_mTimeScaleDecay(new cedar::aux::DoubleParameter(this, "time scale decay", 1000.0, 0.001, 10000.0))
 {
   _mDimensionality->setValue(2);
   _mSizes->makeDefault();
-  QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
   this->declareOutput("activation", mActivation);
 
   this->declareInput("input", true);
+  this->declareInput("peak detector", false);
 
   // now check the dimensionality and sizes of all matrices
   this->updateMatrices();
@@ -103,10 +106,27 @@ void cedar::dyn::Preshape::eulerStep(const cedar::unit::Time& time)
   cv::Mat& preshape = this->mActivation->getData();
   cedar::aux::ConstDataPtr input = this->getInput("input");
   const cv::Mat& input_mat = input->getData<cv::Mat>();
-  const double& time_scale = this->_mTimeScale->getValue();
+  const double& tau_build_up = this->_mTimeScaleBuildUp->getValue();
+  const double& tau_decay = this->_mTimeScaleDecay->getValue();
+  cv::Mat sigmoided_input = cedar::aux::math::sigmoidAbs<float>(input_mat, 1000.0, 0.5);
+  double peak = 1.0;
+  if
+  (
+    cedar::aux::ConstMatDataPtr peak_detector
+      = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(this->getInput("peak detector"))
+  )
+  {
+    peak = peak_detector->getData().at<float>(0, 0);
+  }
 
   // one possible preshape dynamic
-  preshape += cedar::unit::Milliseconds(time) / cedar::unit::Seconds(time_scale) * (-1.0 * preshape + input_mat);
+  preshape +=
+	(
+	  cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau_build_up)
+      * (-1.0 * preshape + input_mat).mul(sigmoided_input)
+    + cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau_decay)
+      * (-1.0 * preshape.mul((1.0 - sigmoided_input)))
+  ) * peak;
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
@@ -139,6 +159,21 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
       {
         return cedar::proc::DataSlot::VALIDITY_VALID;
         /* return cedar::proc::DataSlot::VALIDITY_WARNING; */ // see above todo entry
+      }
+    }
+    return cedar::proc::DataSlot::VALIDITY_ERROR;
+  }
+  else if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "peak detector")
+  {
+    if (cedar::aux::ConstMatDataPtr input = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+    {
+      if (cedar::aux::math::getDimensionalityOf(input->getData()) != 0)
+      {
+        return cedar::proc::DataSlot::VALIDITY_ERROR;
+      }
+      else
+      {
+        return cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
     return cedar::proc::DataSlot::VALIDITY_ERROR;
