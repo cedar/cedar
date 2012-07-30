@@ -216,18 +216,10 @@ namespace cedar
   {
     namespace kernel
     {
-#ifdef MSVC
-#ifdef CEDAR_LIB_EXPORTS_AUX
-      // dllexport
-      template class __declspec(dllexport) cedar::aux::Singleton<cedar::aux::kernel::FactoryManager>;
-#else // CEDAR_LIB_EXPORTS_AUX
-    // dllimport
-      extern template class __declspec(dllimport) cedar::aux::Singleton<cedar::aux::kernel::FactoryManager>;
-#endif // CEDAR_LIB_EXPORTS_AUX
-#endif // MSVC
-
       //!@brief The singleton instance of the kernel factory manager.
       typedef cedar::aux::Singleton<FactoryManager> FactoryManagerSingleton;
+
+      CEDAR_INSTANTIATE_AUX_TEMPLATE(FactoryManagerSingleton);
     }
   }
 }

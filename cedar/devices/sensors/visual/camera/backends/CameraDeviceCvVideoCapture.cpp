@@ -54,7 +54,7 @@ cedar::dev::sensors::visual::CameraDeviceCvVideoCaputre::CameraDeviceCvVideoCapu
   QReadWriteLock* p_videoCaptureLock
 )
 :
-cedar::dev::sensors::visual::CameraDevice::CameraDevice
+cedar::dev::sensors::visual::CameraDevice
 (
   p_capabilities,
   p_settings,

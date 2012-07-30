@@ -117,6 +117,7 @@ std::string cedar::aux::FileParameter::getPath() const
 {
   switch (this->mPathMode)
   {
+    default:
     case PATH_MODE_ABSOLUTE:
       return this->mValue.path().toStdString();
 
