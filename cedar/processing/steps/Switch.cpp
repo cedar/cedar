@@ -176,14 +176,14 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Switch::determineInputValidi
     // the slot should be one of the ones we have declared above
     CEDAR_DEBUG_ASSERT(slot->getName() == "factor");
 
-    if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+    if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data))
     {
       if (cedar::aux::math::getDimensionalityOf(mat_data->getData()) == 0)
       {
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
-    else if (boost::shared_dynamic_cast<const cedar::aux::DoubleData>(data))
+    else if (boost::shared_dynamic_cast<cedar::aux::ConstDoubleData>(data))
     {
       return cedar::proc::DataSlot::VALIDITY_VALID;
     }

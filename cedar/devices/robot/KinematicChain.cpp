@@ -100,7 +100,6 @@ _mpVelocityLimits(new cedar::aux::math::LimitsParameter<double>(this, "velocity 
 //------------------------------------------------------------------------------
 // methods
 //------------------------------------------------------------------------------
-
 void cedar::dev::robot::KinematicChain::timerEvent(QTimerEvent*)
 {
   updateTransformations();
@@ -133,7 +132,6 @@ std::vector<double> cedar::dev::robot::KinematicChain::getJointAngles() const
   return dummy;
 }
 
-
 cv::Mat cedar::dev::robot::KinematicChain::getJointAnglesMatrix() const
 {
   cv::Mat dummy = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
@@ -145,7 +143,6 @@ cv::Mat cedar::dev::robot::KinematicChain::getJointAnglesMatrix() const
 
   return dummy;
 }
-
 
 double cedar::dev::robot::KinematicChain::getJointVelocity(unsigned int index) const
 {
@@ -170,12 +167,10 @@ std::vector<double> cedar::dev::robot::KinematicChain::getJointVelocities() cons
   return dummy;
 }
 
-
 cv::Mat cedar::dev::robot::KinematicChain::getJointVelocitiesMatrix() const
 {
   return mJointVelocities.clone();
 }
-
 
 double cedar::dev::robot::KinematicChain::getJointAcceleration(unsigned int index) const
 {
@@ -186,7 +181,6 @@ double cedar::dev::robot::KinematicChain::getJointAcceleration(unsigned int inde
 
   return mJointAccelerations.at<double>(index, 0);
 }
-
 
 std::vector<double> cedar::dev::robot::KinematicChain::getJointAccelerations() const
 {
@@ -200,12 +194,10 @@ std::vector<double> cedar::dev::robot::KinematicChain::getJointAccelerations() c
   return dummy;
 }
 
-
 cv::Mat cedar::dev::robot::KinematicChain::getJointAccelerationsMatrix() const
 {
   return mJointAccelerations.clone();
 }
-
 
 cedar::dev::robot::KinematicChain::ActionType cedar::dev::robot::KinematicChain::getWorkingMode()
 {
@@ -233,7 +225,6 @@ void cedar::dev::robot::KinematicChain::setJointAngles(const std::vector<double>
   return;
 }
 
-
 void cedar::dev::robot::KinematicChain::setJointAngles(const cv::Mat& angles)
 {
   if (angles.size().height != (int)getNumberOfJoints() || angles.size().width != 1)
@@ -257,7 +248,6 @@ void cedar::dev::robot::KinematicChain::setJointAngles(const cv::Mat& angles)
   return;
 }
 
-
 bool cedar::dev::robot::KinematicChain::setJointVelocity(unsigned int index, double velocity)
 {
   if (index >= getNumberOfJoints())
@@ -273,7 +263,6 @@ bool cedar::dev::robot::KinematicChain::setJointVelocity(unsigned int index, dou
 
   return false;
 }
-
 
 bool cedar::dev::robot::KinematicChain::setJointVelocities(const std::vector<double>& velocities)
 {
@@ -296,7 +285,6 @@ bool cedar::dev::robot::KinematicChain::setJointVelocities(const std::vector<dou
 
   return hardware_velocity;
 }
-
 
 bool cedar::dev::robot::KinematicChain::setJointVelocities(const cv::Mat& velocities)
 {
@@ -321,7 +309,6 @@ bool cedar::dev::robot::KinematicChain::setJointVelocities(const cv::Mat& veloci
   return hardware_velocity;
 }
 
-
 bool cedar::dev::robot::KinematicChain::setJointAcceleration(unsigned int index, double acceleration)
 {
   if (index >= getNumberOfJoints())
@@ -333,7 +320,6 @@ bool cedar::dev::robot::KinematicChain::setJointAcceleration(unsigned int index,
   mJointAccelerations.at<double>(index,0) = acceleration;
   return false;
 }
-
 
 bool cedar::dev::robot::KinematicChain::setJointAccelerations(const std::vector<double>& accelerations)
 {
@@ -352,7 +338,6 @@ bool cedar::dev::robot::KinematicChain::setJointAccelerations(const std::vector<
   return false;
 }
 
-
 bool cedar::dev::robot::KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
 {
   if(accelerations.size().height != (int)getNumberOfJoints() || accelerations.size().width != 1)
@@ -366,7 +351,6 @@ bool cedar::dev::robot::KinematicChain::setJointAccelerations(const cv::Mat& acc
   mJointAccelerations = accelerations;
   return false;
 }
-
 
 void cedar::dev::robot::KinematicChain::step(double time)
 {
@@ -413,7 +397,6 @@ void cedar::dev::robot::KinematicChain::step(double time)
   return;
 }
 
-
 void cedar::dev::robot::KinematicChain::setWorkingMode(ActionType actionType)
 {
   stop();
@@ -447,7 +430,6 @@ void cedar::dev::robot::KinematicChain::setWorkingMode(ActionType actionType)
 
   return;
 }
-
 
 void cedar::dev::robot::KinematicChain::init()
 {

@@ -342,7 +342,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Resize::determineInputValidi
   // First, let's make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(slot->getName() == "input")
 
-  if (boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+  if (boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data))
   {
     // Mat data is accepted.
     return cedar::proc::DataSlot::VALIDITY_VALID;

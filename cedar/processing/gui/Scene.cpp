@@ -381,15 +381,15 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
   cedar::proc::NetworkPtr new_parent_network;
 
   //!@todo Solve this better
-  if (cedar::proc::gui::Network *p_element = dynamic_cast<cedar::proc::gui::Network*>(selected.at(0)))
+  if (cedar::proc::gui::Network* p_element = dynamic_cast<cedar::proc::gui::Network*>(selected.at(0)))
   {
     new_parent_network = p_element->getNetwork()->getNetwork();
   }
-  else if (cedar::proc::gui::StepItem *p_element = dynamic_cast<cedar::proc::gui::StepItem*>(selected.at(0)))
+  else if (cedar::proc::gui::StepItem* p_element = dynamic_cast<cedar::proc::gui::StepItem*>(selected.at(0)))
   {
     new_parent_network = p_element->getStep()->getNetwork();
   }
-  else if (cedar::proc::gui::TriggerItem *p_element = dynamic_cast<cedar::proc::gui::TriggerItem*>(selected.at(0)))
+  else if (cedar::proc::gui::TriggerItem* p_element = dynamic_cast<cedar::proc::gui::TriggerItem*>(selected.at(0)))
   {
     new_parent_network = p_element->getTrigger()->getNetwork();
   }
@@ -774,18 +774,6 @@ cedar::proc::ElementPtr cedar::proc::gui::Scene::addElement(const std::string& c
      */
     CEDAR_DEBUG_ASSERT(mNetwork->getNetwork()->getElement<cedar::proc::Element>(adjusted_name).get());
     this->getGraphicsItemFor(mNetwork->getNetwork()->getElement<cedar::proc::Element>(adjusted_name).get())->setPos(position);
-//    if (cedar::proc::StepPtr step = mNetwork->network()->getElement<cedar::proc::Step>(adjusted_name))
-//    {
-//      this->addProcessingStep(step, position);
-//    }
-//    else if (cedar::proc::TriggerPtr trigger = mNetwork->network()->getElement<cedar::proc::Trigger>(adjusted_name))
-//    {
-//      this->addTrigger(trigger, position);
-//    }
-//    else
-//    {
-//      CEDAR_THROW(cedar::proc::InvalidNameException, "name not known to network");
-//    }
   }
   catch(const cedar::aux::ExceptionBase& e)
   {

@@ -103,6 +103,7 @@ std::string cedar::aux::unmangleName(const char* mangledName)
 #endif // CEDAR_COMPILER_GCC
 }
 
+//!@todo Move this to the cedar/defines.h or anoher apropriate place.
 #define CEDAR_MACRO_CONTENTS_TO_CSTR(x) #x
 std::ostream& cedar::aux::operator<< (std::ostream& stream, const cedar::aux::StackTrace& trace)
 {

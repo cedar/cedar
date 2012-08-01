@@ -48,7 +48,6 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-
 //----------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------
@@ -69,7 +68,6 @@ cedar::aux::gui::ObjectVisualizationWidget::~ObjectVisualizationWidget()
 {
 
 }
-
 
 //------------------------------------------------------------------------------
 // methods

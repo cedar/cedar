@@ -47,10 +47,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::kteam::EPuckDrive::EPuckDrive
 (
-  cedar::dev::com::SerialCommunication *peCommunication
+  cedar::dev::com::SerialCommunication* peCommunication
 )
 {
   mInitialized = false;
+  // set the e-puck specific default values
+  _mWheelDistance->setDefault(0.053);
+  _mWheelDistance->makeDefault();
+  _mWheelRadius->setDefault(0.0205);
+  _mWheelRadius->makeDefault();
+  _mPulsesPerRevolution->setDefault(1000);
+  _mPulsesPerRevolution->makeDefault();
+  _mMaximalEncoderValue->setDefault(32767);
+  _mMaximalEncoderValue->makeDefault();
+  _mMinimalEncoderValue->setDefault(-32768);
+  _mMinimalEncoderValue->makeDefault();
+  _mMaximalNumberPulsesPerSecond->setDefault(1000);
+  _mMaximalNumberPulsesPerSecond->makeDefault();
   init(peCommunication);
 }
 
@@ -62,7 +75,7 @@ cedar::dev::kteam::EPuckDrive::~EPuckDrive()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-int cedar::dev::kteam::EPuckDrive::init(cedar::dev::com::SerialCommunication *peCommunication)
+int cedar::dev::kteam::EPuckDrive::init(cedar::dev::com::SerialCommunication* peCommunication)
 {
   if(mInitialized)
   {
@@ -86,17 +99,7 @@ int cedar::dev::kteam::EPuckDrive::init(cedar::dev::com::SerialCommunication *pe
   mpeCommunication = 0;
   std::string dummy_answer = ""; //answer for testing the communication
 
-  // read config-parameters
-  //!@todo Reintroduce this
-//  addParameter(&_mWheelDistance, "WheelDistance", 0.053);
-//  addParameter(&_mWheelRadius, "WheelRadius", 0.0205);
-//  addParameter(&_mPulsesPerRevolution, "PulsesPerRevolution", 1000);
-//  addParameter(&_mMaximalEncoderValue, "MaximumEncoderValue", 32767);
-//  addParameter(&_mMinimalEncoderValue, "MinimalEncoderValue", -32768);
-//  addParameter(&_mMaximalNumberPulsesPerSecond, "MaximumPulsesPerSecond", 1000);
-
   // calculate distance per pulse and maximal wheel speed
-
   mpeCommunication = peCommunication;
 
   // send a dummy-message

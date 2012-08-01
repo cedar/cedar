@@ -98,7 +98,6 @@ const cedar::proc::steps::MatrixTypeConverter::MatrixType::Id
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
 cedar::proc::steps::MatrixTypeConverter::MatrixTypeConverter()
 :
 // data

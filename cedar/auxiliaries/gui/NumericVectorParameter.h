@@ -142,16 +142,6 @@ protected:
   // none yet
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::gui::NumericVectorParameter
 
 #endif // CEDAR_AUX_GUI_NUMERIC_VECTOR_PARAMETER_H
