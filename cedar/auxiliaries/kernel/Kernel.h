@@ -153,6 +153,7 @@ public:
   virtual unsigned int getSize(size_t dimension) const;
 
   //!@brief returns a cv::Mat. (0,0) := number of rows, (0,1) := number of cols
+  //!@todo what is this function needed for???
   cv::Mat getRowsCols() const;
 
 public slots:

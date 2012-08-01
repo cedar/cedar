@@ -87,7 +87,6 @@ public:
   }
 };
 
-
 /*!@brief A generic base class for gui representations of cedar::aux::VectorParameters.
  *
  * @todo describe more.

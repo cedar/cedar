@@ -39,6 +39,8 @@
     cedardyn using the plugin dialog. You then may want to go to the Manage.. dialog and mark this plugin to be loaded
     on every start.
   - On windows, some of the GL drawing functionality for kinematic chains and related classes is not implemented.
+  - Grouping steps into networks is buggy. Please use with caution and report any errors you encounter.
+  - cedar::dev::sensors::visual::CameraGrabber is not working at the moment.
 
 == current version ==
 - general
