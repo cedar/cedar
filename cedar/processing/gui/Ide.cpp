@@ -70,6 +70,7 @@
 cedar::proc::gui::Ide::Ide()
 {
   this->setupUi(this);
+  
   // first, setup the log to receive messages
   this->mpLog->installHandlers(true);
 

@@ -41,6 +41,7 @@
   - On windows, some of the GL drawing functionality for kinematic chains and related classes is not implemented.
   - Grouping steps into networks is buggy. Please use with caution and report any errors you encounter.
   - cedar::dev::sensors::visual::CameraGrabber is not working at the moment.
+  - the net unit test fails from time to time (see issue #253 in testing)
 
 == current version ==
 - general

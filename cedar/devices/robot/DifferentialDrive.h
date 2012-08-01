@@ -151,14 +151,14 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-
-private:
   //!@brief The distance between the 2 wheels [in m].
   cedar::aux::DoubleParameterPtr _mWheelDistance;
 
   //!@brief The wheel's radius [in m].
   cedar::aux::DoubleParameterPtr _mWheelRadius;
+
+private:
+  // none yet
 
 }; // class cedar::dev::robot::mobile::DifferentialDrive
 #endif // CEDAR_DEV_ROBOT_MOBILE_DIFFERENTIAL_DRIVE_H
