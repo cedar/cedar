@@ -865,7 +865,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::setCameraSetting
 (
   unsigned int channel,
   CameraSetting::Id settingId,
-  double value
+  double //value
 )
 {
   if (channel >= getNumCams())
@@ -1005,7 +1005,12 @@ cv::Size cedar::dev::sensors::visual::CameraGrabber::getCameraFrameSize( unsigne
 
 
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::CameraGrabber::setRawProperty(unsigned int channel, unsigned int propId, double value)
+bool cedar::dev::sensors::visual::CameraGrabber::setRawProperty
+     (
+       unsigned int channel,
+       unsigned int /*propId*/,
+       double /*value*/
+     )
 {
   if (channel >= getNumCams())
   {
@@ -1016,7 +1021,11 @@ bool cedar::dev::sensors::visual::CameraGrabber::setRawProperty(unsigned int cha
 
 
 //----------------------------------------------------------------------------------------------------
-double cedar::dev::sensors::visual::CameraGrabber::getRawProperty(unsigned int channel, unsigned int propId)
+double cedar::dev::sensors::visual::CameraGrabber::getRawProperty
+       (
+         unsigned int channel,
+         unsigned int /*propId*/
+       )
 {
   if (channel >= getNumCams())
   {
