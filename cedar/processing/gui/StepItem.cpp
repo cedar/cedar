@@ -439,7 +439,6 @@ void cedar::proc::gui::StepItem::updateDataSlotPositions()
   }
 }
 
-
 cedar::proc::gui::DataSlotItem* cedar::proc::gui::StepItem::getSlotItem
                                 (
                                   cedar::proc::DataRole::Id role, const std::string& name

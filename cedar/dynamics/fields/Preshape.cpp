@@ -116,7 +116,7 @@ void cedar::dyn::Preshape::eulerStep(const cedar::unit::Time& time)
       = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(this->getInput("peak detector"))
   )
   {
-    peak = peak_detector->getData().at<float>(0, 0);
+    peak = cedar::aux::math::getMatrixEntry<double>(peak_detector->getData(), 0, 0);
   }
 
   // one possible preshape dynamic

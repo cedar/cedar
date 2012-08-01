@@ -55,7 +55,6 @@
 // ENUM: cedar::proc::steps::TransformationDirection
 //----------------------------------------------------------------------------------------------------------------------
 
-
 cedar::aux::EnumType<cedar::proc::steps::TransformationDirection> cedar::proc::steps::TransformationDirection::mType
                                                                   (
                                                                     "TransformationDirection::"
@@ -86,7 +85,6 @@ const cedar::proc::steps::TransformationDirection::TypePtr& cedar::proc::steps::
 //----------------------------------------------------------------------------------------------------------------------
 // ENUM: cedar::proc::steps::TransformationType
 //----------------------------------------------------------------------------------------------------------------------
-
 
 cedar::aux::EnumType<cedar::proc::steps::TransformationType> cedar::proc::steps::TransformationType::mType
                                                              (
@@ -119,7 +117,6 @@ const cedar::proc::steps::TransformationType::TypePtr& cedar::proc::steps::Trans
 {
   return cedar::proc::steps::TransformationType::mType.type();
 }
-
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -158,7 +155,6 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
 cedar::proc::steps::CoordinateTransformation::CoordinateTransformation()
 :
 mInput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
@@ -226,7 +222,6 @@ cedar::proc::steps::CoordinateTransformation::~CoordinateTransformation()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
 void cedar::proc::steps::CoordinateTransformation::applyAnnotations()
 {
   cedar::aux::annotation::DimensionsPtr dims(new cedar::aux::annotation::Dimensions(2));

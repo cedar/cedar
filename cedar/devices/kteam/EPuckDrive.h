@@ -60,7 +60,7 @@ public:
   /*!@brief Constructs an object which represents the drive of an E-Puck robot.
    *@param peCommunication Pointer to the communication-device to be used (has to be initialized)
    */
-  EPuckDrive(cedar::dev::com::SerialCommunication *peCommunication);
+  EPuckDrive(cedar::dev::com::SerialCommunication* peCommunication);
 
   //!@brief Destructs the object.
   ~EPuckDrive();
