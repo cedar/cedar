@@ -39,7 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/PlotInterface.h"
+#include "cedar/auxiliaries/gui/MultiPlotInterface.h"
 
 // SYSTEM INCLUDES
 #include <qwt/qwt_plot.h>
@@ -49,13 +49,51 @@
 /*!@brief A time-based plot for 0D values. Displays a history of this value from a certain point in the past up to now.
  *
  * More detailed description of the class.
+ *
+ * @todo Some of the code here is redundant with MatrixPlot1D.
  */
-class cedar::aux::gui::HistoryPlot0D : public cedar::aux::gui::PlotInterface
+class cedar::aux::gui::HistoryPlot0D : public cedar::aux::gui::MultiPlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+  struct CurveInfo
+  {
+    CurveInfo()
+    :
+    mCurve(NULL)
+    {
+    }
+
+    void setData(cedar::aux::DataPtr data);
+
+    double getDataValue() const;
+
+    //! The data of this curve, as generic data pointer
+    cedar::aux::DataPtr mData;
+
+    //! The data of this curve, as double data
+    cedar::aux::DoubleDataPtr mDoubleData;
+
+    //! The data of this curve, as matrix data
+    cedar::aux::MatDataPtr mMatData;
+
+    //! The qwt curve
+    QwtPlotCurve* mCurve;
+
+    //! y values of plot, stored as double-ended queue
+    std::deque<double> mYValues;
+
+    //! y values of plot, stored as vector (needed to pass this to qwt plot because deque is not stored linearly)
+    std::vector<double> mYArray;
+
+  };
+  CEDAR_GENERATE_POINTER_TYPES(CurveInfo);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -76,14 +114,18 @@ public:
 public:
   //!@brief display data
   void plot(cedar::aux::DataPtr data, const std::string& title);
+
   //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
+
+  bool canAppend(cedar::aux::ConstDataPtr data) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief create and handle the context menu
+  void contextMenuEvent(QContextMenuEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -92,20 +134,22 @@ private:
   //!@brief initialize the plot
   void init();
 
+  void doAppend(cedar::aux::DataPtr data, const std::string& title);
+
+  double getDataValue(size_t index);
+
+  void applyStyle(size_t lineId, QwtPlotCurve *pCurve);
+
+private slots:
+  void showLegend(bool show = true);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
 private:
-  //!@brief generic data pointer
-  cedar::aux::DataPtr mData;
-
-  //!@brief use this if data is of type DoubleData
-  cedar::aux::DoubleDataPtr mDoubleData;
-
-  //!@brief use this if data is of type MatData
-  cedar::aux::MatDataPtr mMatData;
+  std::vector<CurveInfoPtr> mCurves;
 
   //!@brief the current widget that holds the plot
   QWidget *mpCurrentPlotWidget;
@@ -113,23 +157,20 @@ private:
   //!@brief a plot
   QwtPlot *mpPlot;
 
-  //!@brief a curve inside the plot
-  QwtPlotCurve *mpCurve;
-
   //!@brief x values of plot, stored as double-ended queue
   std::deque<double> mpXValues;
 
-  //!@brief y values of plot, stored as double-ended queue
-  std::deque<double> mpYValues;
-
-  //!@brief x values of plot, stored as vector
+  //!@brief x values of plot, stored as vector (needed to pass this to qwt plot)
   std::vector<double> mXArray;
-
-  //!@brief y values of plot, stored as vector
-  std::vector<double> mYArray;
 
   //!@brief number of steps in the past, which are still plotted
   size_t mMaxHistorySize; //!@todo Make a parameter/configurable somehow.
+
+  //! A vector containing all the colors used for plot lines.
+  static std::vector<QColor> mLineColors;
+
+  //! A vector containing all the line stypes for the plot.
+  static std::vector<Qt::PenStyle> mLineStyles;
 
 }; // class cedar::aux::gui::HistoryPlot0D
 
