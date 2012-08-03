@@ -113,9 +113,9 @@ void cedar::aux::gui::PropertyPane::disconnect(cedar::aux::ConfigurablePtr pConf
     // disconnect everything between the parameter and this
     if (!QObject::disconnect(parameter.get(), 0, this, 0))
     {
-      cedar::aux::LogSingleton::getInstance()->warning
+      cedar::aux::LogSingleton::getInstance()->debugMessage
       (
-        "Could not disconnect the slots of the Property pane.",
+        "Could not disconnect the slots from parameter \"" + parameter->getName() + "\" to the property pane.",
         "cedar::proc::gui::PropertyPane::disconnect(cedar::aux::ConfigurablePtr)"
       );
     }
