@@ -194,8 +194,10 @@ private:
 
   void checkTriggerConnection(cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool added);
 
+  //!@todo why is this called StepAdded?
   void processStepAddedSignal(cedar::proc::ElementPtr);
 
+  //!@todo why is this called StepRemoved?
   void processStepRemovedSignal(cedar::proc::ConstElementPtr);
 
 private slots:

@@ -24,9 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Mathis Richter
-#   Email:       mathis.richter@ini.rub.de
-#   Date:        2010 11 29
+#   Maintainer:  Oliver Lomp
+#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+#   Date:        2012 08 02
 #
 #   Description:
 #
@@ -34,23 +34,6 @@
 #
 #=======================================================================================================================
 
-if (CEDAR_USE_KUKA_LWR)
-  set(kuka_moc_files kuka/gui/FriStatusWidget.h)
-else(CEDAR_USE_KUKA_LWR)
-  set(kuka_moc_files "")
-endif(CEDAR_USE_KUKA_LWR)
-
-cedar_add_library(cedardev
-                  MOC_HEADERS
-                  robot/gui/KinematicChainWidget.h
-                  robot/gui/KinematicChainMonitorWidget.h
-                  robot/gui/KinematicChainCommandWidget.h
-                  robot/gui/MountedCameraViewer.h
-                  kteam/gui/EPuckControlWidget.h
-                  communication/gui/CommunicationWidget.h
-                  sensors/visual/VideoGrabber.h
-                  sensors/visual/PictureGrabber.h
-                  ${kuka_moc_files}
-                  LINK_LIBRARIES
-                  cedaraux
-                  )
+cedar_add_unit_test(gui_ProcessingIde
+                    gui_ProcessingIde.cpp
+                    )

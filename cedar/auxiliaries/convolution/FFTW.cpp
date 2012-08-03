@@ -70,7 +70,14 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   cedar::aux::conv::Mode::Id /* mode */
 ) const
 {
-  return this->convolveInternal(matrix, this->getKernelList()->getCombinedKernel(), borderType);
+  if (this->getKernelList()->size() > 0)
+  {
+    return this->convolveInternal(matrix, this->getKernelList()->getCombinedKernel(), borderType);
+  }
+  else
+  {
+    return matrix.clone();
+  }
 }
 
 cv::Mat cedar::aux::conv::FFTW::convolve
@@ -104,7 +111,14 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   cedar::aux::conv::Mode::Id /* mode */
 ) const
 {
-  return this->convolveInternal(matrix, kernelList->getCombinedKernel(), borderType);
+  if (kernelList->size() > 0)
+  {
+    return this->convolveInternal(matrix, kernelList->getCombinedKernel(), borderType);
+  }
+  else
+  {
+    return matrix.clone();
+  }
 }
 
 cv::Mat cedar::aux::conv::FFTW::convolveInternal

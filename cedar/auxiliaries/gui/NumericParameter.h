@@ -137,7 +137,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*! Call this method whenver the value of the widget changes
+  /*! Call this method whenever the value of the widget changes
    *
    * @remarks This is a workaround for qt's inability to moc templated classes.
    */

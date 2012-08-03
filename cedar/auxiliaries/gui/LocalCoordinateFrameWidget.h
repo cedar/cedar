@@ -99,8 +99,7 @@ public:
   //----------------------------------------------------------------------------
 
 protected:
-
-    // none yet
+  // none yet
 
   //----------------------------------------------------------------------------
   // private methods
@@ -108,13 +107,12 @@ protected:
 
 private slots:
   void decimalsChanged();
+  
 private:
-
   inline unsigned int getDecimals() const
   {
     return this->_mDecimals->getValue();
   }
-
 
   void initWindow();
 

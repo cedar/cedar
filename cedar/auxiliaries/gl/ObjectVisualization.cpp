@@ -211,7 +211,7 @@ void cedar::aux::gl::ObjectVisualization::loadVertexData
     QTextStream text_stream(&data);
     QString line;
     float scale = 0.001f; // mm -> m
-    for (unsigned int i=0; i<numberOfVertices; i++)
+    for (unsigned int i = 0; i < numberOfVertices; i++)
     {
       line = text_stream.readLine();
       vertices[i].location[0] = line.section(" ", 0, 0).toFloat() * scale;

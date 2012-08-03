@@ -137,7 +137,7 @@ private:
   bool setJointVelocity(unsigned int index, double velocity);
 
   //! Returns the amtec initialization string.
-  inline std::string getInitString()
+  inline const std::string& getInitString()
   {
     return this->_mInitString->getValue();
   }
@@ -150,7 +150,6 @@ protected:
 private:
   CDevice* mpDevice;
   int mInit;
-//  std::vector<int> mModules;
   mutable QMutex mCanBusMutex;
 
   //--------------------------------------------------------------------------------------------------------------------

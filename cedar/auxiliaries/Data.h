@@ -45,8 +45,6 @@
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/annotation/Annotation.h"
 #include "cedar/auxiliaries/annotation/Annotatable.h"
-#include "cedar/auxiliaries/exceptions.h"
-#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>

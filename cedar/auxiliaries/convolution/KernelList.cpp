@@ -132,42 +132,32 @@ cv::Mat cedar::aux::conv::KernelList::getCombinedKernel() const
 
 bool cedar::aux::conv::KernelList::checkForSameKernelSize() const
 {
-  bool same_size = true;
-
-  // get dimensionality and sizes of first kernel in list
-  cedar::aux::kernel::ConstKernelPtr first_kernel = this->getKernel(0);
-  size_t dim = first_kernel->getDimensionality();
-  std::vector<unsigned int> size(static_cast<size_t>(dim));
-  for (size_t i = 0; i < size.size(); ++i)
+  if (this->size() == 0)  // nothing to to
   {
-    size[i] = first_kernel->getSize(i);
+    return false;
   }
 
+  // get first kernel in list
+  cedar::aux::kernel::ConstKernelPtr first_kernel = this->getKernel(0);
+
   // compare dimensionality and sizes of first kernel with each other kernel
-  size_t i = 1;
-  // check as long as sizes are equal
-  while (same_size && ( i + 1 <= this->size()))
+  for (size_t i = 1; i < this->size(); ++i)
   {
     cedar::aux::kernel::ConstKernelPtr kernel = this->getKernel(i);
 
     // check dimensionality
-    if (kernel->getDimensionality() != dim)
+    if (kernel->getDimensionality() != first_kernel->getDimensionality())
     {
-      same_size = false;
+      return false;
     }
-    else
+    // if dimensionality is equal check sizes of each dimension
+    for (size_t d = 0; d < first_kernel->getDimensionality(); ++d)
     {
-      // if dimensionality is equal check sizes of each dimension
-      for (size_t d = 0; d < dim; ++d)
+      if (first_kernel->getSize(d) != kernel->getSize(d))
       {
-        if (size[d] != kernel->getSize(d))
-        {
-          same_size = false;
-        }
+        return false;
       }
     }
-    ++i;
   }
-
-  return same_size;
+  return true;
 }

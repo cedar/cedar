@@ -137,9 +137,6 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-
-private:
   //!@brief Number of pulses per revolution of wheel.
   cedar::aux::DoubleParameterPtr _mPulsesPerRevolution;
 
@@ -151,5 +148,8 @@ private:
 
   //!@brief The maximal possible number of pulses per second.
   cedar::aux::IntParameterPtr _mMaximalNumberPulsesPerSecond;
+
+private:
+  // none yet
 }; // class cedar::dev::kteam::KTeamDrive
 #endif // CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H
