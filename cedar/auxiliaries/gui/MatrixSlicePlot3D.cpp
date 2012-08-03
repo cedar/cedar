@@ -186,13 +186,16 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
   mSliceMatrixByte = cv::Mat::zeros(rows * mat.size[0] + rows -1, columns * mat.size[1] + columns -1, CV_8UC1);
   mSliceMatrixByteC3 = cv::Mat::zeros(rows * mat.size[0] + rows -1, columns * mat.size[1] + columns -1, CV_8UC3);
 
+  // decide which plot code is used depending on the OpenCV version
+  // versions are defined since version 2.4, which supports the following code
+#if defined CV_MINOR_VERSION and defined CV_MAJOR_VERSION and CV_MAJOR_VERSION >= 2 and CV_MINOR_VERSION >= 4
   // for each tile, copy content to right place
   // ranges is used to select the slice in the 3d-data
   cv::Range ranges[3];
   ranges[0] = cv::Range::all();
   ranges[1] = cv::Range::all();
   cv::Mat slice;
-  //sliceSize is used to set the size to 2d of the yet 3d slice after extracting it from the 3d data
+  // sliceSize is used to set the size to 2d of the yet 3d slice after extracting it from the 3d data
   cv::Mat mSliceSize = cv::Mat(mat.size[0], mat.size[1], mat.type());
   unsigned int column = 0;
   unsigned int row = 0;
@@ -203,13 +206,13 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
       column = 0;
       row = row + 1;
     }
-    //selects the slice
+    // selects the slice
     ranges[2] = cv::Range(tile, tile+1);
-    //deep copy of the slice
+    // deep copy of the slice
     slice = mat(ranges).clone();
-    //set size from 3d to 2d
+    // set size from 3d to 2d
     slice.copySize(mSliceSize);
-    //copy slice to the right tile in the larger matrix
+    // copy slice to the right tile in the larger matrix
     slice.copyTo
           (
             mSliceMatrix
@@ -227,6 +230,29 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
             )
           );
   }
+#else
+  // for each tile, copy content to right place
+  unsigned int max_rows = static_cast<unsigned int>(mat.size[0]);
+  unsigned int max_columns = static_cast<unsigned int>(mat.size[1]);
+  for (unsigned int tile = 0; tile < tiles; ++tile)
+  {
+    for (unsigned int row = 0; row < max_rows; ++row)
+    {
+      for (unsigned int column = 0; column < max_columns; ++column)
+      {
+        std::vector<int> index;
+        index.push_back(row);
+        index.push_back(column);
+        index.push_back(tile);
+        mSliceMatrix.at<float>
+        (
+          row + (mat.size[0] + 1) * (tile / columns),
+          column + (mat.size[1] + 1) * (tile % columns)
+        ) = mat.at<float>(&index[0]);
+      }
+    }
+  }
+#endif // OpenCV version
   double min, max;
   cv::minMaxLoc(mSliceMatrix, &min, &max);
   cv::Mat scaled = (mSliceMatrix - min) / (max - min) * 255.0;
@@ -245,23 +271,6 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
     mSliceMatrixByteC3.step,
     QImage::Format_RGB888
   ).rgbSwapped();
-
-//  for (unsigned int tile = 0; tile < mat.size[2]; ++tile)
-//  {
-//    for (unsigned int row = 0; row < mat.size[0]; ++row)
-//    {
-//      for (unsigned int column = 0; column < mat.size[1]; ++column)
-//      {
-//        std::vector<int> index;
-//        index.push_back(row);
-//        index.push_back(column);
-//        index.push_back(tile);
-//        std::cout << mat.at<float>(&index.front()) << " ";
-//      }
-//      std::cout << std::endl;
-//    }
-//    std::cout << std::endl;
-//  }
 }
 
 void cedar::aux::gui::MatrixSlicePlot3D::resizeEvent(QResizeEvent* /*pEvent*/)
