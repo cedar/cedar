@@ -44,6 +44,8 @@
   - the net unit test fails from time to time (see issue #253 in testing)
 
 == current version ==
+
+== Version 0.9.1 ==
 - general
   - cedar now accepts both qwt versions 5.x and 6.x
 - cedar::aux
