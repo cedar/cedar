@@ -344,7 +344,11 @@ void cedar::proc::gui::Network::transformChildCoordinates(cedar::proc::gui::Grap
   pItem->setPos(this->mapFromItem(pItem, QPointF(0, 0)));
 }
 
-void cedar::proc::gui::Network::elementAdded(cedar::proc::Network* pNetwork, cedar::proc::ElementPtr pElement)
+void cedar::proc::gui::Network::elementAdded
+     (
+       cedar::proc::Network* CEDAR_DEBUG_ONLY(pNetwork),
+       cedar::proc::ElementPtr pElement
+     )
 {
   CEDAR_DEBUG_ASSERT(pNetwork == this->getNetwork().get());
 
