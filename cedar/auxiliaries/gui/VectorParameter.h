@@ -199,12 +199,14 @@ private:
   {
     ParameterPtr parameter = this->parameter();
 
-    //!@todo Don't discard old widgets, reuse them!
-    for (size_t i = 0; i < this->mWidgets.size(); ++i)
+    // Don't discard old widgets, reuse them!
+    if (this->mWidgets.size() > parameter->size())
     {
-      delete this->mWidgets[i];
+      for (size_t i = parameter->size(); i < this->mWidgets.size(); ++i)
+      {
+        delete this->mWidgets[i];
+      }
     }
-    this->mWidgets.clear();
 
     parameter->lockForRead();
     size_t num_widgets = parameter->size();
@@ -212,11 +214,14 @@ private:
 
     for (size_t i = 0; i < this->mWidgets.size(); ++i)
     {
-      WidgetType* p_widget = this->mWidgets[i] = WidgetAbstraction::create(i);
-      this->layout()->addWidget(p_widget);
-      WidgetAbstraction::applyProperties(p_widget, parameter);
-      WidgetAbstraction::setValue(p_widget, parameter->at(i));
-      WidgetAbstraction::connectValueChange(this, p_widget);
+      if (this->mWidgets[i] == NULL)
+      {
+        this->mWidgets[i] = WidgetAbstraction::create(i);
+        this->layout()->addWidget(this->mWidgets[i]);
+      }
+      WidgetAbstraction::applyProperties(this->mWidgets[i], parameter);
+      WidgetAbstraction::setValue(this->mWidgets[i], parameter->at(i));
+      WidgetAbstraction::connectValueChange(this, this->mWidgets[i]);
     }
     parameter->unlock();
 
