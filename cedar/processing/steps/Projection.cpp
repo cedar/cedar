@@ -499,7 +499,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Projection::determineInputVa
                                 ) const
 {
   CEDAR_DEBUG_ASSERT(slot->getName() == "input")
-  if (boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+  if (boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data))
   {
     return cedar::proc::DataSlot::VALIDITY_VALID;
   }

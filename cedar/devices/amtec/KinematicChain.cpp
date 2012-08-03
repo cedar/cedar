@@ -91,7 +91,7 @@ _mModuleMap
 
 cedar::dev::amtec::KinematicChain::~KinematicChain()
 {
-  for(unsigned int i = 0; i < getNumberOfJoints(); ++i)
+  for (unsigned int i = 0; i < getNumberOfJoints(); ++i)
   {
     this->setJointVelocity(i, 0.0);
   }
@@ -121,10 +121,7 @@ bool cedar::dev::amtec::KinematicChain::initDevice()
     mpDevice = newDevice(this->getInitString().c_str());
   }
 
-  //
   // init device itself
-  //
-
   int ret_val = mpDevice->init(this->getInitString().c_str());
 
   switch(ret_val)
@@ -148,9 +145,7 @@ bool cedar::dev::amtec::KinematicChain::initDevice()
     return false;
   }
 
-  //
   // get default module map
-  //
   std::vector<int> modules;
   mpDevice->getModuleIdMap(modules);
 

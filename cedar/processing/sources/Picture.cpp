@@ -119,6 +119,8 @@ cedar::proc::sources::Picture::~Picture()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Picture::reset()
 {
+  // we have to disconnect the slot here to avoid a deadlock
+  QObject::disconnect(this->getPictureGrabber().get(), SIGNAL(pictureChanged()), this, SLOT(updatePicture()));
   if (this->getPictureGrabber()->applyParameter())
   {
     this->mImage->setData(this->getPictureGrabber()->getImage());
@@ -134,6 +136,8 @@ void cedar::proc::sources::Picture::reset()
                                                "cedar::dev::sensors::visual::Picture::Picture()"
                                              );
   }
+  // reconnect the slot
+  QObject::connect(this->getPictureGrabber().get(), SIGNAL(pictureChanged()), this, SLOT(updatePicture()));
 }
 
 

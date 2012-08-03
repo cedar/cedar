@@ -34,11 +34,11 @@
 
 ======================================================================================================================*/
 
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
-
 #ifndef CEDAR_AUX_LOOPED_THREAD_H
 #define CEDAR_AUX_LOOPED_THREAD_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"

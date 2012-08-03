@@ -209,15 +209,14 @@ cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
           cedar::aux::conv::BorderType::Id borderType
         ) const
 {
-    cv::Mat kernel_rows_cols = kernel->getRowsCols();
-
-    return createFullMatrix
-           (
-             matrix,
-             static_cast<unsigned int>(kernel_rows_cols.at<float>(0,0)),
-             static_cast<unsigned int>(kernel_rows_cols.at<float>(0,1)),
-             borderType
-           );
+  const cv::Mat& kernel_mat = kernel->getKernel();
+  return createFullMatrix
+         (
+           matrix,
+           static_cast<unsigned int>(kernel_mat.rows),
+           static_cast<unsigned int>(kernel_mat.cols),
+           borderType
+         );
 }
 
 cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
@@ -235,15 +234,14 @@ cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
 
   cedar::aux::kernel::ConstKernelPtr kernel = kernelList->getKernel(0);
 
-    cv::Mat kernel_rows_cols = kernel->getRowsCols();
-
-    return createFullMatrix
-           (
-             matrix,
-             static_cast<unsigned int>(kernel_rows_cols.at<float>(0,0)),
-             static_cast<unsigned int>(kernel_rows_cols.at<float>(0,1)),
-             borderType
-           );
+  const cv::Mat& kernel_mat = kernel->getKernel();
+  return createFullMatrix
+         (
+           matrix,
+           static_cast<unsigned int>(kernel_mat.rows),
+           static_cast<unsigned int>(kernel_mat.cols),
+           borderType
+         );
 }
 
 cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
@@ -253,15 +251,14 @@ cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
           cedar::aux::conv::BorderType::Id borderType
         ) const
 {
-    cv::Mat kernel_rows_cols = kernel->getRowsCols();
-
-    return createFullMatrix
-           (
-             matrix,
-             static_cast<unsigned int>(kernel_rows_cols.at<float>(0,0)),
-             static_cast<unsigned int>(kernel_rows_cols.at<float>(0,1)),
-             borderType
-           );
+  const cv::Mat& kernel_mat = kernel->getKernel();
+  return createFullMatrix
+         (
+           matrix,
+           static_cast<unsigned int>(kernel_mat.rows),
+           static_cast<unsigned int>(kernel_mat.cols),
+           borderType
+         );
 }
 
 cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
@@ -272,13 +269,12 @@ cv::Mat cedar::aux::conv::OpenCV::createFullMatrix
 {
   cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList()->getKernel(0);
 
-  cv::Mat kernel_rows_cols = kernel->getRowsCols();
-
+  const cv::Mat& kernel_mat = kernel->getKernel();
   return createFullMatrix
          (
            matrix,
-           static_cast<unsigned int>(kernel_rows_cols.at<float>(0,0)),
-           static_cast<unsigned int>(kernel_rows_cols.at<float>(0,1)),
+           static_cast<unsigned int>(kernel_mat.rows),
+           static_cast<unsigned int>(kernel_mat.cols),
            borderType
          );
 }
@@ -336,15 +332,14 @@ cv::Mat cedar::aux::conv::OpenCV::cutOutResult(
   }
   else
   {
-    cv::Mat kernel_rows_cols = kernel->getRowsCols();
-
+    const cv::Mat& kernel_mat = kernel->getKernel();
     return cutOutResult
            (
              result,
              matrix.rows,
              matrix.cols,
-             static_cast<unsigned int>(kernel_rows_cols.at<float>(0,0)),
-             static_cast<unsigned int>(kernel_rows_cols.at<float>(0,1))
+             static_cast<unsigned int>(kernel_mat.rows),
+             static_cast<unsigned int>(kernel_mat.cols)
            );
   }
 }
@@ -398,13 +393,12 @@ cv::Mat cedar::aux::conv::OpenCV::cutOutResult(
   }
   else
   {
-    cv::Mat kernel_rows_cols = kernel->getRowsCols();
-
+    const cv::Mat& kernel_mat = kernel->getKernel();
     return cutOutResult
            (
              result,
-             static_cast<unsigned int>(kernel_rows_cols.at<float>(0,0)),
-             static_cast<unsigned int>(kernel_rows_cols.at<float>(0,1))
+             static_cast<unsigned int>(kernel_mat.rows),
+             static_cast<unsigned int>(kernel_mat.cols)
            );
   }
 }
@@ -507,8 +501,8 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
       break;
     case cedar::aux::conv::Mode::Valid:
       {
-        cv::Mat kernel_rows_cols = kernel->getRowsCols();
-        if (matrix.rows < kernel_rows_cols.at<float>(0,0) || matrix.cols < kernel_rows_cols.at<float>(0,1))
+        const cv::Mat& kernel_mat = kernel->getKernel();
+        if (matrix.rows < kernel_mat.rows || matrix.cols < kernel_mat.cols)
         {
           result = cv::Mat::zeros(1,1,matrix.type());
         }
@@ -594,8 +588,8 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
     {
       if (kernelList->checkForSameKernelSize())
       {
-        cv::Mat kernel_rows_cols = kernelList->getKernel(0)->getRowsCols();
-        if (matrix.rows < kernel_rows_cols.at<float>(0,0) || matrix.cols < kernel_rows_cols.at<float>(0,1))
+        const cv::Mat& kernel_mat = kernelList->getKernel(0)->getKernel();
+        if (matrix.rows < kernel_mat.rows || matrix.cols < kernel_mat.cols)
         {
           return cv::Mat::zeros(1,1,matrix.type());
         }
@@ -670,8 +664,9 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
       break;
     case cedar::aux::conv::Mode::Valid:
       {
-        cv::Mat kernel_rows_cols = kernel->getRowsCols();
-        if (matrix.rows < kernel_rows_cols.at<float>(0,0) || matrix.cols < kernel_rows_cols.at<float>(0,1))
+//        cv::Mat kernel_rows_cols = kernel->getRowsCols();
+        const cv::Mat& kernel_mat = kernel->getKernel();
+        if (matrix.rows < kernel_mat.rows || matrix.cols < kernel_mat.cols)
         {
           return cv::Mat::zeros(1,1,matrix.type());
         }
@@ -962,8 +957,8 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
       {
         if (this->getKernelList()->checkForSameKernelSize())
         {
-          cv::Mat kernel_rows_cols = this->getKernelList()->getKernel(0)->getRowsCols();
-          if (matrix.rows < kernel_rows_cols.at<float>(0,0) || matrix.cols < kernel_rows_cols.at<float>(0,1))
+          const cv::Mat& kernel_mat = this->getKernelList()->getKernel(0)->getKernel();
+          if (matrix.rows < kernel_mat.rows || matrix.cols < kernel_mat.cols)
           {
             return cv::Mat::zeros(1,1,matrix.type());
           }

@@ -549,7 +549,6 @@ private:
   void step(double time);
   void init();
   void initializeFromJointList();
-
   void applyAngleLimits(cv::Mat& angles);
   void applyVelocityLimits(cv::Mat& velocities);
 
