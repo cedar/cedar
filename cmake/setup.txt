@@ -48,7 +48,7 @@ project(cedar)
 # set cedar version information
 set (CEDAR_VERSION_MAJOR 0)
 set (CEDAR_VERSION_MINOR 9)
-set (CEDAR_VERSION_BUGFIX 0) 
+set (CEDAR_VERSION_BUGFIX 1) 
 
 # combined version
 set (CEDAR_VERSION "${CEDAR_VERSION_MAJOR}.${CEDAR_VERSION_MINOR}.${CEDAR_VERSION_BUGFIX}")
