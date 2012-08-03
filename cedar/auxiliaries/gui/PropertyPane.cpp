@@ -96,10 +96,10 @@ void cedar::aux::gui::PropertyPane::resetContents()
   if (configurable)
   {
     this->disconnect(configurable);
+    this->resetPointer();
+    this->mParameterWidgetRowIndex.clear();
+    this->mParameterRowIndex.clear();
   }
-  this->resetPointer();
-  this->mParameterWidgetRowIndex.clear();
-  this->mParameterRowIndex.clear();
 }
 
 void cedar::aux::gui::PropertyPane::disconnect(cedar::aux::ConfigurablePtr pConfigurable)
@@ -138,8 +138,6 @@ void cedar::aux::gui::PropertyPane::disconnect(cedar::aux::ConfigurablePtr pConf
         = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter)
     )
     {
-      QObject::connect(list_parameter.get(), SIGNAL(valueChanged()), this, SLOT(redraw()));
-
       for (size_t i = 0; i < list_parameter->size(); ++i)
       {
         cedar::aux::ConfigurablePtr configurable = list_parameter->configurableAt(i);
