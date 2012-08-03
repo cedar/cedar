@@ -280,6 +280,8 @@ void cedar::proc::gui::Ide::toggleGrid(bool triggered)
 void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
 {
   this->storeSettings();
+  //!@todo Without this, the gui_ProcessingIde crashes when exiting in certain circumstanges (see unit test gui_ProcessingIde)
+  this->mpPropertyTable->resetContents();
   pEvent->accept();
 }
 
