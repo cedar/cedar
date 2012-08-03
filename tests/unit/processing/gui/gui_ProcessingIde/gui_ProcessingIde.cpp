@@ -71,7 +71,6 @@ int main(int argc, char** argv)
 
   cedar::proc::gui::Ide* p_ide = new cedar::proc::gui::Ide();
   {
-//    p_ide->show();
     simulateEventLoop();
 
     cedar::proc::gui::View *p_view = p_ide->getArchitectureView();
@@ -88,7 +87,8 @@ int main(int argc, char** argv)
 
     cedar::proc::LoopedTriggerPtr looped_trigger
       = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(trigger_element);
-    cedar::proc::TriggerablePtr field_triggerable = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(field_element);
+    cedar::proc::TriggerablePtr field_triggerable
+      = boost::dynamic_pointer_cast<cedar::proc::Triggerable>(field_element);
     network->connectTrigger(looped_trigger, field_triggerable);
     simulateEventLoop();
 
@@ -105,6 +105,10 @@ int main(int argc, char** argv)
     looped_trigger->startTrigger();
     simulateEventLoop();
   }
+
+  std::cout << "Closing ide." << std::endl;
+  p_ide->close();
+  simulateEventLoop();
 
   std::cout << "Deleting ide." << std::endl;
   delete p_ide;
