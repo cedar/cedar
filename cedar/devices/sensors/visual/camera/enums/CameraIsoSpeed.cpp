@@ -39,7 +39,7 @@
 #ifdef CEDAR_USE_LIB_DC1394
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/camera/CameraIsoSpeed.h"
+#include "cedar/devices/sensors/visual/camera/enums/CameraIsoSpeed.h"
 
 // SYSTEM INCLUDES
 

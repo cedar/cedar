@@ -49,7 +49,7 @@
 #include "cedar/auxiliaries/FileParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
-#include "cedar/devices/sensors/visual/structures/RecordingFormat.h"
+#include "cedar/devices/sensors/visual/RecordingFormat.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -108,8 +108,8 @@ public:
   public:
     Channel()
     :
-    _mSnapshotName(new cedar::aux::FileParameter(this,"snapshotName",cedar::aux::FileParameter::READ,"./snapshot.jpg")),
-    _mRecordName(new cedar::aux::FileParameter(this, "recordName",cedar::aux::FileParameter::READ,"./record.avi")),
+    _mSnapshotName(new cedar::aux::FileParameter(this,"snapshotName",cedar::aux::FileParameter::WRITE,"./snapshot.jpg")),
+    _mRecordName(new cedar::aux::FileParameter(this, "recordName",cedar::aux::FileParameter::WRITE,"./record.avi")),
     mChannelInfo("")
     {
       //init classes

@@ -37,7 +37,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/camera/CameraFrameRate.h"
+#include "cedar/devices/sensors/visual/camera/enums/CameraFrameRate.h"
 
 // SYSTEM INCLUDES
 
@@ -46,15 +46,15 @@ cedar::aux::EnumType<cedar::dev::sensors::visual::CameraFrameRate>
 
 //!@cond SKIPPED_DOCUMENTATION
 #ifndef CEDAR_COMPILER_MSVC
-const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_NOT_SET;
-const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_2;
-const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_4;
-const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_8;
-const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_15;
-const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_30;
-const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_60;
-const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_120;
-const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_240;
+const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FPS_NOT_SET;
+const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FPS_2;
+const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FPS_4;
+const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FPS_8;
+const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FPS_15;
+const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FPS_30;
+const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FPS_60;
+const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FPS_120;
+const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FPS_240;
 #endif // CEDAR_COMPILER_MSVC
 //!@endcond
 
@@ -65,49 +65,49 @@ const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visu
 void cedar::dev::sensors::visual::CameraFrameRate::construct()
 {
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_NOT_SET,
+                                      cedar::dev::sensors::visual::CameraFrameRate::FPS_NOT_SET,
                                       "FRAMERATE_NOT_SET",
                                       "auto"
                                     ));
 
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_2,
+                                      cedar::dev::sensors::visual::CameraFrameRate::FPS_2,
                                       "FRAMERATE_1_875",
                                       "1.875 fps"
                                     ));
 
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_4,
+                                      cedar::dev::sensors::visual::CameraFrameRate::FPS_4,
                                       "FRAMERATE_3_75",
                                       "3.75 fps"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_8,
+                                      cedar::dev::sensors::visual::CameraFrameRate::FPS_8,
                                       "FRAMERATE_7_5",
                                       "7.5 fps"
                                      ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_15,
+                                      cedar::dev::sensors::visual::CameraFrameRate::FPS_15,
                                       "FRAMERATE_15",
                                       "15 fps"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_30,
+                                      cedar::dev::sensors::visual::CameraFrameRate::FPS_30,
                                       "FRAMERATE_30",
                                       "30 fps"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_60,
+                                      cedar::dev::sensors::visual::CameraFrameRate::FPS_60,
                                       "FRAMERATE_60",
                                       "60 fps"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_120,
+                                      cedar::dev::sensors::visual::CameraFrameRate::FPS_120,
                                       "FRAMERATE_120",
                                       "120 fps"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_240,
+                                      cedar::dev::sensors::visual::CameraFrameRate::FPS_240,
                                       "FRAMERATE_240",
                                       "240 fps"
                                     ));

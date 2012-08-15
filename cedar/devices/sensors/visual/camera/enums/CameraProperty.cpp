@@ -37,7 +37,7 @@
 #include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/camera/CameraProperty.h"
+#include "cedar/devices/sensors/visual/camera/enums/CameraProperty.h"
 
 // SYSTEM INCLUDES
 

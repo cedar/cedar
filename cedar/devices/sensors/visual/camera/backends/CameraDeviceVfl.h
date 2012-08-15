@@ -53,7 +53,7 @@
  */
 class cedar::dev::sensors::visual::CameraDeviceVfl
 :
-cedar::dev::sensors::visual::CameraDevice::CameraDevice
+public cedar::dev::sensors::visual::CameraDevice
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -66,11 +66,7 @@ public:
   //!@brief The standard constructor.
   CameraDeviceVfl
   (
-    cedar::dev::sensors::visual::CameraCapabilitiesPtr p_capabilities,
-    cedar::dev::sensors::visual::CameraSettingsPtr p_settings,
-    cedar::dev::sensors::visual::CameraStatePtr p_state,
-    cv::VideoCapture videoCapture,
-    QReadWriteLock* p_videoCaptureLock
+    cedar::dev::sensors::visual::CameraChannelPtr pCameraChannel
   );
 
   //!@brief Destructor
@@ -86,7 +82,10 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void fillCapabilities();
+  void applySettingsToCamera();
+  bool createCaptureDevice();
+  void applyStateToCamera();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

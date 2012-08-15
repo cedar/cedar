@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/structures/RecordingFormat.h"
+#include "cedar/devices/sensors/visual/RecordingFormat.h"
 
 // SYSTEM INCLUDES
 

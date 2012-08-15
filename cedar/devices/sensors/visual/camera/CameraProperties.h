@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,95 +22,111 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraCapabilities.h
+    File:        CameraProperties.h
 
-    Maintainer:  Georg.Hartinger
-    Email:       georg.hartinger@rub.de
-    Date:        2011 08 01
+    Maintainer:  Georg Hartinger
+    Email:       georg.hartinger@ini.rub.de
+    Date:        2012 07 04
 
-    Description: Header for the @em cedar::dev::sensors::visual::CameraCapabilities class.
+    Description:  Header for the cedar::dev::sensors::visual::CameraProperties class
 
     Credits:
- 
+
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAPABILITIES_H
-#define CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAPABILITIES_H
+#ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_PROPERTIES_H
+#define CEDAR_DEV_SENSORS_VISUAL_CAMERA_PROPERTIES_H
 
-#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
-#ifdef CEDAR_USE_LIB_DC1394
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/CameraGrabber.h"
-#include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/Log.h"
 #include "cedar/devices/sensors/visual/namespace.h"
+#include "cedar/devices/sensors/visual/camera/enums/CameraSetting.h"
+#include "cedar/devices/sensors/visual/camera/enums/CameraPropertyMode.h"
+#include "cedar/devices/sensors/visual/camera/enums/CameraProperty.h"
+#include "cedar/devices/sensors/visual/camera/CamProperty.h"
+#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/EnumType.h"
+#include "cedar/auxiliaries/Configurable.h"
+
 
 // SYSTEM INCLUDES
 
 
-/*! \class cedar::dev::sensors::visual::CameraCapabilities
- *  \brief This class manages the capabilities of a camera
+/*!@brief This class manages all properties and their capabilities of one camerachannel
+ *
+ * A property is a specific property from the cv::VideoCapture class
  */
-class cedar::dev::sensors::visual::CameraCapabilities
+class cedar::dev::sensors::visual::CameraProperties
 :
 public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // typedefs
   //--------------------------------------------------------------------------------------------------------------------
-
-  //!@cond SKIPPED_DOCUMENTATION
-
-  /*! \brief Stores the capability of a property
-   *
-   *    Every property have several capabilities and a defined range
-   *    where the values can be set.
-   *    This struct stores flags for all capabilities and the range of the values
-   */
-  struct CameraPropertyCapability
-  {
-     cedar::dev::sensors::visual::CameraProperty::Id propId;
-     int max_value;  // @!todo set max/min in IntParameter for state-properties
-     int min_value;
-     bool is_supported;
-     bool is_readable;
-     bool is_one_push_capable;  //@!todo: reduce capabilties to some often used
-     bool is_on_off_capable;
-     bool is_auto_capable;
-     bool is_manual_capable;
-     bool is_absolute_capable;  //del
-  } ;
-
-  //!@endcond
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef cedar::aux::EnumId Id;
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  CameraCapabilities();
+  CameraProperties();
 
   //!@brief Destructor
-  virtual ~CameraCapabilities();
+  ~CameraProperties();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  ///! set the value to the cv::VideoCapture object
+  bool setPropertyRawValue(unsigned int property_id,double value);
+
+  ///! get the value from the cv::VideoCapture object
+  double getPropertyRawValue(unsigned int property_id);
+
+  ///! set the value to the cv::VideoCapture object with respect to capabilities and settings
+//  bool setProperty(unsigned int property_id,double value);
+
+  ///! get the value from the cv::VideoCapture object with respect to capabilities and settings
+//  double getProperty(unsigned int property);
+
+
+//  cedar::dev::sensors::visual::CameraPropertiesSet& getProperties();
+
+
+  bool setSetting(cedar::dev::sensors::visual::CameraSetting::Id settingId, double value);
+
+  double getSetting(cedar::dev::sensors::visual::CameraSetting::Id settingId);
+
+
+  /// Get the mode of operation of the used parameter
+  cedar::dev::sensors::visual::CameraPropertyMode::Id getMode(cedar::dev::sensors::visual::CameraProperty::Id propId);
+
+  /// Set the mode of operation
+  void setMode
+  (
+    cedar::dev::sensors::visual::CameraProperty::Id propId,
+    cedar::dev::sensors::visual::CameraPropertyMode::Id mode
+  );
+
+  //get the shared-pointer to the parameter
+  //cedar::aux::DoubleParameterPtr getParameter();
+
 
   /*! \brief Get the minimum possible value that can be set of the given property
    *  \param propId The id of the property
    */
-  int getMinValue(CameraProperty::Id propId);
+  double getMinValue(CameraProperty::Id propId);
 
   /*! \brief Get the maximum possible value that can be set of the given property
    *  \param propId The id of the property
    */
-  int getMaxValue(CameraProperty::Id propId);
+  double getMaxValue(CameraProperty::Id propId);
 
   /*! \brief This method tells you, if the given property is supported by the used camera
    *  \param propId The id of the  property
@@ -129,7 +145,7 @@ public:
    *     The camera now will try to hold this value automatically.
    *  \param propId The id of the  property
    */
-  bool isOnePushCapable(CameraProperty::Id propId);
+  //bool isOnePushCapable(CameraProperty::Id propId);
 
   /*! \brief This method tells you, if the given property could be turn off and on
    *  \param propId The id of the  property
@@ -149,51 +165,42 @@ public:
   /*! \brief This method tells you, if the given property can be set to an absolute value
    *  \param propId The id of the  property
    */
-  bool isAbsoluteCapable(CameraProperty::Id propId);
-
+  //bool isAbsoluteCapable(CameraProperty::Id propId);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-  ///! Returns the capability struct of a given camera property
-  CameraPropertyCapability& getCapabilities(CameraProperty::Id propId);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //return CampProperty
+  //@exception std::out_of_range if the searched value doesn't exist
+  cedar::dev::sensors::visual::CamProperty& getPropertyPtr(CameraProperty::Id propId);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-
-  ///! Contains every property of the camera (the supported as well as the not supported ones)
-  std::vector<CameraPropertyCapability> mCamProperties;
-
-private:
   // none yet
+private:
+  //cedar::dev::sensors::visual::CameraPropertiesSet mProperties;
+  cedar::dev::sensors::visual::CameraPropertyMap mPropertiesList;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
-  ///! All properties and settings declared in this method for the ConfigurationInterface class
-  bool declareParameters();
+  // none yet
 
+}; // class cedar::dev::sensors::visual::CameraProperties
 
-}; // class cedar::dev::sensors::visual::CameraCapabilities
+#endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_PROPERTIES_H
 
-#endif // CEDAR_USE_LIB_DC1394
-
-#endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAPABILITIES_H
