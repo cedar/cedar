@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraDebayerPattern.cpp
+    File:        DeBayerFilter.cpp
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 07 04
 
-    Description: Implementation of the CameraDebayerPattern enum-type class
+    Description: Implementation of the DeBayerFilter enum-type class
 
     Credits:
 
@@ -38,21 +38,21 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/camera/CameraDebayerPattern.h"
+#include "cedar/devices/sensors/visual/camera/enums/DeBayerFilter.h"
 
 // SYSTEM INCLUDES
 
 
-cedar::aux::EnumType<cedar::dev::sensors::visual::CameraDebayerPattern>
-  cedar::dev::sensors::visual::CameraDebayerPattern::mType("cedar::dev::sensors::visual::CameraDebayerPattern::");
+cedar::aux::EnumType<cedar::dev::sensors::visual::DeBayerFilter>
+  cedar::dev::sensors::visual::DeBayerFilter::mType("cedar::dev::sensors::visual::DeBayerFilter::");
 
 //!@cond SKIPPED_DOCUMENTATION
 #ifndef CEDAR_COMPILER_MSVC
-const cedar::dev::sensors::visual::CameraDebayerPattern::Id cedar::dev::sensors::visual::CameraDebayerPattern::NONE;
-const cedar::dev::sensors::visual::CameraDebayerPattern::Id cedar::dev::sensors::visual::CameraDebayerPattern::BG_TO_BGR;
-const cedar::dev::sensors::visual::CameraDebayerPattern::Id cedar::dev::sensors::visual::CameraDebayerPattern::GB_TO_BGR;
-const cedar::dev::sensors::visual::CameraDebayerPattern::Id cedar::dev::sensors::visual::CameraDebayerPattern::RG_TO_BGR;
-const cedar::dev::sensors::visual::CameraDebayerPattern::Id cedar::dev::sensors::visual::CameraDebayerPattern::GR_TO_BGR;
+const cedar::dev::sensors::visual::DeBayerFilter::Id cedar::dev::sensors::visual::DeBayerFilter::NONE;
+const cedar::dev::sensors::visual::DeBayerFilter::Id cedar::dev::sensors::visual::DeBayerFilter::BG_TO_BGR;
+const cedar::dev::sensors::visual::DeBayerFilter::Id cedar::dev::sensors::visual::DeBayerFilter::GB_TO_BGR;
+const cedar::dev::sensors::visual::DeBayerFilter::Id cedar::dev::sensors::visual::DeBayerFilter::RG_TO_BGR;
+const cedar::dev::sensors::visual::DeBayerFilter::Id cedar::dev::sensors::visual::DeBayerFilter::GR_TO_BGR;
 #endif // CEDAR_COMPILER_MSVC
 //!@endcond
 
@@ -61,33 +61,32 @@ const cedar::dev::sensors::visual::CameraDebayerPattern::Id cedar::dev::sensors:
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::sensors::visual::CameraDebayerPattern::construct()
+void cedar::dev::sensors::visual::DeBayerFilter::construct()
 {
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraDebayerPattern::NONE,
+                                      cedar::dev::sensors::visual::DeBayerFilter::NONE,
                                       "NONE",
-                                      "auto"
+                                      "NONE"
                                     ));
-
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraDebayerPattern::BG_TO_BGR,
+                                      cedar::dev::sensors::visual::DeBayerFilter::BG_TO_BGR,
                                       "BG_TO_BGR",
-                                      "BG to BGR"
+                                      "Blue/Green to BGR"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraDebayerPattern::GB_TO_BGR,
+                                      cedar::dev::sensors::visual::DeBayerFilter::GB_TO_BGR,
                                       "GB_TO_BGR",
-                                      "GB to BGR"
+                                      "Green/Blue to BGR"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraDebayerPattern::RG_TO_BGR,
+                                      cedar::dev::sensors::visual::DeBayerFilter::RG_TO_BGR,
                                       "RG_TO_BGR",
-                                      "RG to BGR"
+                                      "Red/Green to BGR"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraDebayerPattern::GR_TO_BGR,
+                                      cedar::dev::sensors::visual::DeBayerFilter::GR_TO_BGR,
                                       "GR_TO_BGR",
-                                      "GR to BGR"
+                                      "Green/Red to BGR"
                                     ));
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -95,13 +94,13 @@ void cedar::dev::sensors::visual::CameraDebayerPattern::construct()
 //----------------------------------------------------------------------------------------------------------------------
 
 
-const cedar::aux::EnumBase& cedar::dev::sensors::visual::CameraDebayerPattern::type()
+const cedar::aux::EnumBase& cedar::dev::sensors::visual::DeBayerFilter::type()
 {
-  return *cedar::dev::sensors::visual::CameraDebayerPattern::mType.type();
+  return *cedar::dev::sensors::visual::DeBayerFilter::mType.type();
 }
 
-const cedar::dev::sensors::visual::CameraDebayerPattern::TypePtr& cedar::dev::sensors::visual::CameraDebayerPattern::typePtr()
+const cedar::dev::sensors::visual::DeBayerFilter::TypePtr& cedar::dev::sensors::visual::DeBayerFilter::typePtr()
 {
-  return cedar::dev::sensors::visual::CameraDebayerPattern::mType.type();
+  return cedar::dev::sensors::visual::DeBayerFilter::mType.type();
 }
 

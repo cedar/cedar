@@ -22,87 +22,103 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraState.h
+    File:        CameraPropertyMode.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
-    Date:        2012 07 04
+    Date:        2012 08 7
 
-    Description:  Header for the cedar::dev::sensors::visual::CameraState class
+    Description:  Header for CameraPropertyMode enum-type class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_STATE_H
-#define CEDAR_DEV_SENSORS_VISUAL_CAMERA_STATE_H
+#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_PROPERTYMODE_H
+#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_PROPERTYMODE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/EnumType.h"
 #include "cedar/devices/sensors/visual/namespace.h"
 
 // SYSTEM INCLUDES
+#include <opencv2/highgui/highgui_c.h>
 
-
-/*!@brief Base class of the misc camera grabber backends.
- *
- * Implements the common features of a camera device
- */
-class cedar::dev::sensors::visual::CameraState
+class cedar::dev::sensors::visual::CameraPropertyMode
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // typedefs
   //--------------------------------------------------------------------------------------------------------------------
+//!@cond SKIPPED_DOCUMENTATION
+public:
+  typedef cedar::aux::EnumId Id;
+public:
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
   //!@brief The standard constructor.
-  CameraState();
 
   //!@brief Destructor
-  ~CameraState();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  static void construct();
+
+  static const cedar::aux::EnumBase& type();
+  static const cedar::dev::sensors::visual::CameraPropertyMode::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraPropertyMode> mType;
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+
+  ///@brief Set the operational mode of a camera property. In this case, the backend deceide which mode to use
+  static const Id BACKEND_DEFAULT = 0;
+
+  ///@brief Set the operational mode of a camera property to auto. The property must be auto-capable
+  static const Id AUTO = 1;
+
+  ///@brief Set the operational mode of a camera property to manual settings. The property must be manual-capable
+  static const Id MANUAL = 2;
+
+  //firewire mode "one-push" and "on/off" are not supported from cedar right now
+#ifdef CEDAR_USE_LIB_DC1394
+  ///@brief Set the operational mode of a camera property to switch on or off. The property must be on/off-capable
+  //static const Id ON_OFF = 3;
+
+  //@brief Set the operational mode to one_push
+  //static const Id ONE_PUSH = 4;
+#endif
+
+
 protected:
   // none yet
 private:
   // none yet
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
 
-private:
-  // none yet
+}; // cedar::dev::sensors::visual::CameraPropertyMode
 
-}; // class cedar::dev::sensors::visual::CameraState
-
-#endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_STATE_H
+#endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_PROPERTYMODE_H
 

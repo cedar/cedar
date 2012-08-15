@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraDebayerPattern.h
+    File:        DeBayerFilter.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 07 04
 
-    Description:  Header for CameraDebayerPattern enum-type class
+    Description:  Header for DeBayerFilter enum-type class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERADEBAYERPATTERN_H
-#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERADEBAYERPATTERN_H
+#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_DEBAYERFILTER_H
+#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_DEBAYERFILTER_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -45,11 +45,17 @@
 #include "cedar/devices/sensors/visual/namespace.h"
 
 // SYSTEM INCLUDES
+//#include <opencv2/opencv.hpp>
 
-/*!@brief Enum class to determine if a camera needs to be converted from a bayer-pattern to
- *  the internal used BGR-format of cv::Mat
+/*!@brief Enum class to determine the applied bayer pattern (if needed)
+ *
+ *  For all available filters have a look at:
+ *    <OPENCV>/modules/imgproc/include/opencv2/imgproc/types_c.h
+ *
+ *  cv::Mat stores the images in BGR format, so only that filters mapped here
+ *
  */
-class cedar::dev::sensors::visual::CameraDebayerPattern
+class cedar::dev::sensors::visual::DeBayerFilter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
@@ -59,6 +65,8 @@ public:
   typedef cedar::aux::EnumId Id;
 public:
   typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+
+private:
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -75,7 +83,7 @@ public:
   static void construct();
 
   static const cedar::aux::EnumBase& type();
-  static const cedar::dev::sensors::visual::CameraDebayerPattern::TypePtr& typePtr();
+  static const cedar::dev::sensors::visual::DeBayerFilter::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -87,7 +95,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraDebayerPattern> mType;
+  static cedar::aux::EnumType<cedar::dev::sensors::visual::DeBayerFilter> mType;
   //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -95,30 +103,28 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-
-  /// No conversion needed
+  /// No bayer filter applied
   static const Id NONE = 0;
 
-  /// Convert from blue-red to BGR
-  static const Id BG_TO_BGR = CV_BayerBG2BGR; // = 46
+  /// Apply  bayer filter Blue-Green to BGR
+  static const Id BG_TO_BGR = CV_BayerBG2BGR; //= 46;
 
-  /// Convert from green-blue to BGR
-  static const Id GB_TO_BGR = CV_BayerGB2BGR; // = 47
+  /// Apply  bayer filter Green-Blue to BGR
+  static const Id GB_TO_BGR = CV_BayerGB2BGR; // = 47;
 
-  /// Convert from red-green to BGR
-  static const Id RG_TO_BGR = CV_BayerRG2BGR; // = 48
+  /// Apply  bayer filter Red-Green to BGR
+  static const Id RG_TO_BGR = CV_BayerRG2BGR; // = 48;
 
-  /// Convert from green-red to BGR
-  static const Id GR_TO_BGR = CV_BayerGR2BGR; // = 49
-
+  /// Apply  bayer filter Green-Red to BGR
+  static const Id GR_TO_BGR = CV_BayerGR2BGR; // = 49;
 
 protected:
   // none yet
 private:
   // none yet
 
-}; // cedar::dev::sensors::visual::CameraDebayerPattern
+}; // cedar::dev::sensors::visual::DeBayerFilter
 
 
-#endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERADEBAYERPATTERN_H
+#endif // EDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_DEBAYERFILTER_H
 

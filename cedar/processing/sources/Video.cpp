@@ -88,6 +88,7 @@ mTimeElapsed(0.0)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
+  // on creation, create also the videograbber. It doesn't matter if the file is valid.
   cedar::dev::sensors::visual::VideoGrabberPtr grabber;
   grabber = cedar::dev::sensors::visual::VideoGrabberPtr
             (

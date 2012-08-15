@@ -37,7 +37,7 @@
 #include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/camera/CameraSetting.h"
+#include "cedar/devices/sensors/visual/camera/enums/CameraSetting.h"
 
 // SYSTEM INCLUDES
 
@@ -47,12 +47,12 @@ cedar::aux::EnumType<cedar::dev::sensors::visual::CameraSetting>
 
 //!@cond SKIPPED_DOCUMENTATION
 #ifndef CEDAR_COMPILER_MSVC
-  const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_FRAME_WIDTH;
-  const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_FRAME_HEIGHT;
-  const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_FPS;
-  const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_MODE;
+  const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::FRAME_WIDTH;
+  const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::FRAME_HEIGHT;
+  const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::FPS;
+  const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::MODE;
 #ifdef CEDAR_USE_LIB_DC1394
-  const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_ISO_SPEED;
+  const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::ISO_SPEED;
 #endif
 #endif // CEDAR_COMPILER_MSVC
 //!@endcond
@@ -64,28 +64,28 @@ cedar::aux::EnumType<cedar::dev::sensors::visual::CameraSetting>
 void cedar::dev::sensors::visual::CameraSetting::construct()
 {
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraSetting::SETTING_FRAME_WIDTH,
+                                      cedar::dev::sensors::visual::CameraSetting::FRAME_WIDTH,
                                       "SETTING_FRAME_WIDTH",
                                       "framewidth"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraSetting::SETTING_FRAME_HEIGHT,
+                                      cedar::dev::sensors::visual::CameraSetting::FRAME_HEIGHT,
                                       "SETTING_FRAME_HEIGHT",
                                       "frameheight"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraSetting::SETTING_FPS,
+                                      cedar::dev::sensors::visual::CameraSetting::FPS,
                                       "SETTING_FPS",
                                       "fps"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraSetting::SETTING_MODE,
+                                      cedar::dev::sensors::visual::CameraSetting::MODE,
                                       "SETTING_MODE",
                                       "mode"
                                     ));
 #ifdef CEDAR_USE_LIB_DC1394
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraSetting::SETTING_ISO_SPEED,
+                                      cedar::dev::sensors::visual::CameraSetting::ISO_SPEED,
                                       "SETTING_ISO_SPEED",
                                       "ISO speed"
                                     ));

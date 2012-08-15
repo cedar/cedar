@@ -44,11 +44,11 @@ else()
   SET(yarp_moc_headers "")
 endif()
 
-if(CEDAR_USE_LIB_DC1394)
-  SET(libdc_moc_headers sources/Camera.h)
-else()
-  SET(libdc_moc_headers "")
-endif()
+#if(CEDAR_USE_LIB_DC1394)
+#  SET(libdc_moc_headers sources/Camera.h)
+#else()
+#  SET(libdc_moc_headers "")
+#endif()
 
 cedar_add_library(cedarproc
   LINK_LIBRARIES
@@ -78,6 +78,7 @@ cedar_add_library(cedarproc
   sources/Picture.h
   sources/Video.h
   sources/GrabberBase.h
+  sources/Camera.h
   steps/Projection.h
   steps/Resize.h
   Network.h

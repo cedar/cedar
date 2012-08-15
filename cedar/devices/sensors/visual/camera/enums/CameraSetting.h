@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraBackendType.h
+    File:        CameraSetting.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
-    Date:        2012 07 04
+    Date:        2011 08 01
 
-    Description:  Header for CameraBackendType enum-type class
+    Description:  Header for CameraProperty enum-type class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERABACKENDTYPE_H
-#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERABACKENDTYPE_H
+#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTING_H
+#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTING_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -45,10 +45,25 @@
 #include "cedar/devices/sensors/visual/namespace.h"
 
 // SYSTEM INCLUDES
+#include <opencv2/highgui/highgui_c.h>
 
-/*!@brief Enum class to determine the used backend for the camera grabber
+//--------------------------------------------------------------------------------------------------------------------
+//(re)defines of our new introduced properties in OpenCV:
+//delete this, if the patched OpenCV is available
+//#ifndef CV_CAP_PROP_ISO_SPEED
+//  #define CV_CAP_PROP_ISO_SPEED 30
+//#endif
+
+
+/*!@brief Enum class for camera settings.
+ *
+ * Use this type for the CameraGrabber::setCameraSetting() and CameraGrabber::getCameraSetting() method
+ *
+ * @remarks
+ *  This constants are direct mapped from opencv2/highgui/highui_c.h
+ *
  */
-class cedar::dev::sensors::visual::CameraBackendType
+class cedar::dev::sensors::visual::CameraSetting
 {
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
@@ -74,7 +89,7 @@ public:
   static void construct();
 
   static const cedar::aux::EnumBase& type();
-  static const cedar::dev::sensors::visual::CameraBackendType::TypePtr& typePtr();
+  static const cedar::dev::sensors::visual::CameraSetting::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -86,7 +101,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraBackendType> mType;
+  static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraSetting> mType;
   //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -94,37 +109,33 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  /*! @brief Use the default value of the OpenCV::VideoCapture object
+  /*! @brief Set the framerate through the CameraGrabber::setCameraSetting() method
    *
-   *  It is possible, that no all properties could be detected
+   *  This constants are the available settings for the used camera
+   *
+   *  If you use a firewire camera, this settings can only be applied on startup, i.e. before the first picture
+   *  is grabbed with the CameraGrabber::grab() method.
    */
-  static const Id AUTO = 0;
-
-  /*! @brief Use only basic functionality of the cv::Capture object
-   */
-  static const Id CVCAPTURE = 1;
+  static const Id FPS = CV_CAP_PROP_FPS; // 5;
+  /// @see SETTING_FPS
+  static const Id FRAME_WIDTH = CV_CAP_PROP_FRAME_WIDTH; // 3;
+  /// @see SETTING_FPS
+  static const Id FRAME_HEIGHT = CV_CAP_PROP_FRAME_HEIGHT; // 4;
+  /// @see SETTING_FPS
+  static const Id MODE = CV_CAP_PROP_MODE; // 9;
 
 #ifdef CEDAR_USE_LIB_DC1394
-  /*! @brief Use the DC1394 backend and settings
-   *
-   *   This is only possible if CEDAR is build with libdc support
-   */
-  static const Id DC1394 = 2;
+  /// @see SETTING_FPS
+  static const Id ISO_SPEED = CV_CAP_PROP_ISO_SPEED; // 30
 #endif
-
-  /*! @brief Use the Video For Linux backend
-   */
-  static const Id VFL = 3;
-
-
 
 protected:
   // none yet
 private:
   // none yet
 
-}; // cedar::dev::sensors::visual::CameraBackendType
 
+}; // cedar::dev::sensors::visual::CameraSetting
 
-#endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERABACKENDTYPE_H
+#endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTING_H
 

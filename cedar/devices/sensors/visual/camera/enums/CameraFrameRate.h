@@ -22,48 +22,43 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraSetting.h
+    File:        CameraFrameRate.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
-    Description:  Header for CameraProperty enum-type class
+    Description:  Header for CameraFrameRate enum-type class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTING_H
-#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTING_H
+#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_FRAMERATE_H
+#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_FRAMERATE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
+//!@todo Why does this need libdc?
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/devices/sensors/visual/namespace.h"
 
 // SYSTEM INCLUDES
-#include <opencv2/highgui/highgui_c.h>
 
-//--------------------------------------------------------------------------------------------------------------------
-//(re)defines of our new introduced properties in OpenCV:
-//delete this, if the patched OpenCV is available
-//#ifndef CV_CAP_PROP_ISO_SPEED
-//  #define CV_CAP_PROP_ISO_SPEED 30
-//#endif
-
-
-/*!@brief Enum class for camera settings.
+/*!@brief Enum class for firewire camera fps setting
  *
- * Use this type for the CameraGrabber::setCameraSetting() and CameraGrabber::getCameraSetting() method
+ * Use this type for the CameraGrabber::setCameraFps() and CameraGrabber::getCameraFps() method.
  *
  * @remarks
- *  This constants are direct mapped from opencv2/highgui/highui_c.h
- *
+ * From OpenCV documentation: <br>
+ * This enumeration is used for non-Format_7 modes. The framerate can be lower than expected if the
+ * exposure time is longer than the requested frame period. Framerate can be controlled in a number of
+ * other ways: framerate feature, external trigger, software trigger, shutter throttling and packet size
+ * (Format_7)
  */
-class cedar::dev::sensors::visual::CameraSetting
+class cedar::dev::sensors::visual::CameraFrameRate
 {
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
@@ -71,7 +66,6 @@ class cedar::dev::sensors::visual::CameraSetting
 //!@cond SKIPPED_DOCUMENTATION
 public:
   typedef cedar::aux::EnumId Id;
-public:
   typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -89,7 +83,7 @@ public:
   static void construct();
 
   static const cedar::aux::EnumBase& type();
-  static const cedar::dev::sensors::visual::CameraSetting::TypePtr& typePtr();
+  static const cedar::dev::sensors::visual::CameraFrameRate::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -101,7 +95,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraSetting> mType;
+  static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraFrameRate> mType;
   //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -109,33 +103,47 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  /*! @brief Set the framerate through the CameraGrabber::setCameraSetting() method
+  /*! @brief Allow OpenCV backend to set the framerate of the attached camera
    *
-   *  This constants are the available settings for the used camera
-   *
-   *  If you use a firewire camera, this settings can only be applied on startup, i.e. before the first picture
-   *  is grabbed with the CameraGrabber::grab() method.
+   * You can set the framerate through the the CameraGrabber::setCameraFps() method
    */
-  static const Id SETTING_FPS = CV_CAP_PROP_FPS; // 5;
-  /// @see SETTING_FPS
-  static const Id SETTING_FRAME_WIDTH = CV_CAP_PROP_FRAME_WIDTH; // 3;
-  /// @see SETTING_FPS
-  static const Id SETTING_FRAME_HEIGHT = CV_CAP_PROP_FRAME_HEIGHT; // 4;
-  /// @see SETTING_FPS
-  static const Id SETTING_MODE = CV_CAP_PROP_MODE; // 9;
+  static const Id FPS_NOT_SET = UINT_MAX-2;
 
-#ifdef CEDAR_USE_LIB_DC1394
-  /// @see SETTING_FPS
-  static const Id SETTING_ISO_SPEED = CV_CAP_PROP_ISO_SPEED; // 30
-#endif
+  /*! @brief Set the framerate to 2 fps with the CameraGrabber::setCameraFps() method
+   *
+   * For firewire-cameras the framerate will be set to 1.875 fps
+   */
+  static const Id FPS_2 = 2;
+
+  /*! @brief Set the framerate to 4 fps
+   *
+   * For firewire-cameras the framerate will be set to 3.75 fps
+   */
+  static const Id FPS_4 = 4;
+
+  /*! @brief Set the framerate to 8 fps
+   *
+   * For firewire-cameras the framerate will be set to 7.5 fps
+   */
+  static const Id FPS_8 = 8;
+  /// @brief Set the framerate to 15 fps
+  static const Id FPS_15 = 15;
+  /// @brief Set the framerate to 30 fps
+  static const Id FPS_30 = 30;
+  /// @brief Set the framerate to 60 fps
+  static const Id FPS_60 = 60;
+  /// @brief Set the framerate to 120 fps
+  static const Id FPS_120 = 120;
+  /// @brief Set the framerate to 240 fps
+  static const Id FPS_240 = 240;
+
 
 protected:
   // none yet
 private:
   // none yet
 
+}; // cedar::dev::sensors::visual::CameraFrameRate
 
-}; // cedar::dev::sensors::visual::CameraSetting
-
-#endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTING_H
+#endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_FRAMERATE_H
 

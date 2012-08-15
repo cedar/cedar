@@ -47,18 +47,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::sensors::visual::CameraDevice::CameraDevice
 (
-  cedar::dev::sensors::visual::CameraCapabilitiesPtr p_capabilities,
-  cedar::dev::sensors::visual::CameraSettingsPtr p_settings,
-  cedar::dev::sensors::visual::CameraStatePtr p_state,
-  cv::VideoCapture videoCapture,
-  QReadWriteLock* p_videoCaptureLock
+ cedar::dev::sensors::visual::CameraChannelPtr pCameraChannel
 )
 :
-mpCapabilities(p_capabilities),
-mpSettings(p_settings),
-mpState(p_state),
-mVideoCapture(videoCapture),
-mpVideoCaptureLock(p_videoCaptureLock)
+mpCameraChannel(pCameraChannel)
 {
 }
 
@@ -70,3 +62,32 @@ cedar::dev::sensors::visual::CameraDevice::~CameraDevice()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::dev::sensors::visual::CameraDevice::init()
+{
+  bool result = true;
+
+  // 1. lock
+  this->mpCameraChannel->mpVideoCaptureLock->lockForWrite();
+
+  // 2. close old videoCapture device
+  this->mpCameraChannel->mVideoCapture = cv::VideoCapture();
+
+  // 3  fill p_capabilities with the right values (depends on backend and camera)
+  this->fillCapabilities();
+
+  // 4. create cv::VideoCapture
+  result = this->createCaptureDevice();
+
+  // 4.1   apply settings from p_settings structure
+  this->applySettingsToCamera();
+
+  // 4.2   restore state of the device with the values in p_state
+  this->applyStateToCamera();
+
+  // 5. unlock
+  this->mpCameraChannel->mpVideoCaptureLock->unlock();
+
+  // 6. done
+  return result;
+}

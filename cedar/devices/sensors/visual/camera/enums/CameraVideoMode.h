@@ -115,25 +115,25 @@ public:
    * OpenCV firewire backend stores supported video modes in a list and
    * it is possible to change the mode through the indizes of this list
    */
-  static const Id MODE_BY_NUM_0 = 0;
-  /// @see MODE_BY_NUM_0
-  static const Id MODE_BY_NUM_1 = 1;
-  /// @see MODE_BY_NUM_0
-  static const Id MODE_BY_NUM_2 = 2;
-  /// @see MODE_BY_NUM_0
-  static const Id MODE_BY_NUM_3 = 3;
-  /// @see MODE_BY_NUM_0
-  static const Id MODE_BY_NUM_4 = 4;
-  /// @see MODE_BY_NUM_0
-  static const Id MODE_BY_NUM_5 = 5;
-  /// @see MODE_BY_NUM_0
-  static const Id MODE_BY_NUM_6 = 6;
-  /// @see MODE_BY_NUM_0
-  static const Id MODE_BY_NUM_7 = 7;
-  /// @see MODE_BY_NUM_0
-  static const Id MODE_BY_NUM_8 = 8;
-  /// @see MODE_BY_NUM_0
-  static const Id MODE_BY_NUM_9 = 9;
+  static const Id NUM_0 = 0;
+  /// @see NUM_0
+  static const Id NUM_1 = 1;
+  /// @see NUM_0
+  static const Id NUM_2 = 2;
+  /// @see NUM_0
+  static const Id NUM_3 = 3;
+  /// @see NUM_0
+  static const Id NUM_4 = 4;
+  /// @see NUM_0
+  static const Id NUM_5 = 5;
+  /// @see NUM_0
+  static const Id NUM_6 = 6;
+  /// @see NUM_0
+  static const Id NUM_7 = 7;
+  /// @see NUM_0
+  static const Id NUM_8 = 8;
+  /// @see NUM_0
+  static const Id NUM_9 = 9;
 
 
 #ifdef CEDAR_USE_LIB_DC1394
@@ -145,71 +145,71 @@ public:
    *   This constants are only available if you are using a firewire/IEEE1394 camera. The
    *   camera modes are directly mapped from libdc1394
    */
-  static const Id MODE_FW_160x120_YUV444 = DC1394_VIDEO_MODE_160x120_YUV444; //=64
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_320x240_YUV422 = DC1394_VIDEO_MODE_320x240_YUV422;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_640x480_YUV411 = DC1394_VIDEO_MODE_640x480_YUV411;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_640x480_YUV422 = DC1394_VIDEO_MODE_640x480_YUV422;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_640x480_RGB8 = DC1394_VIDEO_MODE_640x480_RGB8;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_640x480_MONO8 = DC1394_VIDEO_MODE_640x480_MONO8;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_640x480_MONO16 = DC1394_VIDEO_MODE_640x480_MONO16;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_800x600_YUV422 = DC1394_VIDEO_MODE_800x600_YUV422;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_800x600_RGB8 = DC1394_VIDEO_MODE_800x600_RGB8;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_800x600_MONO8 = DC1394_VIDEO_MODE_800x600_MONO8;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_1024x768_YUV422 = DC1394_VIDEO_MODE_1024x768_YUV422;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_1024x768_RGB8 = DC1394_VIDEO_MODE_1024x768_RGB8;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_1024x768_MONO8 = DC1394_VIDEO_MODE_1024x768_MONO8;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_800x600_MONO16 = DC1394_VIDEO_MODE_800x600_MONO16;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_1024x768_MONO16 = DC1394_VIDEO_MODE_1024x768_MONO16;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_1280x960_YUV422 = DC1394_VIDEO_MODE_1280x960_YUV422;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_1280x960_RGB8 = DC1394_VIDEO_MODE_1280x960_RGB8;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_1280x960_MONO8 = DC1394_VIDEO_MODE_1280x960_MONO8;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_1600x1200_YUV422 = DC1394_VIDEO_MODE_1600x1200_YUV422;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_1600x1200_RGB8 = DC1394_VIDEO_MODE_1600x1200_RGB8;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_1600x1200_MONO8 = DC1394_VIDEO_MODE_1600x1200_MONO8;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_1280x960_MONO16 = DC1394_VIDEO_MODE_1280x960_MONO16;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_1600x1200_MONO16 = DC1394_VIDEO_MODE_1600x1200_MONO16;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_EXIF = DC1394_VIDEO_MODE_EXIF;
+  static const Id FW_160x120_YUV444 = DC1394_VIDEO_MODE_160x120_YUV444; //=64
+  /// @see FW_160x120_YUV444
+  static const Id FW_320x240_YUV422 = DC1394_VIDEO_MODE_320x240_YUV422;
+  /// @see FW_160x120_YUV444
+  static const Id FW_640x480_YUV411 = DC1394_VIDEO_MODE_640x480_YUV411;
+  /// @see FW_160x120_YUV444
+  static const Id FW_640x480_YUV422 = DC1394_VIDEO_MODE_640x480_YUV422;
+  /// @see FW_160x120_YUV444
+  static const Id FW_640x480_RGB8 = DC1394_VIDEO_MODE_640x480_RGB8;
+  /// @see FW_160x120_YUV444
+  static const Id FW_640x480_MONO8 = DC1394_VIDEO_MODE_640x480_MONO8;
+  /// @see FW_160x120_YUV444
+  static const Id FW_640x480_MONO16 = DC1394_VIDEO_MODE_640x480_MONO16;
+  /// @see FW_160x120_YUV444
+  static const Id FW_800x600_YUV422 = DC1394_VIDEO_MODE_800x600_YUV422;
+  /// @see FW_160x120_YUV444
+  static const Id FW_800x600_RGB8 = DC1394_VIDEO_MODE_800x600_RGB8;
+  /// @see FW_160x120_YUV444
+  static const Id FW_800x600_MONO8 = DC1394_VIDEO_MODE_800x600_MONO8;
+  /// @see FW_160x120_YUV444
+  static const Id FW_1024x768_YUV422 = DC1394_VIDEO_MODE_1024x768_YUV422;
+  /// @see FW_160x120_YUV444
+  static const Id FW_1024x768_RGB8 = DC1394_VIDEO_MODE_1024x768_RGB8;
+  /// @see FW_160x120_YUV444
+  static const Id FW_1024x768_MONO8 = DC1394_VIDEO_MODE_1024x768_MONO8;
+  /// @see FW_160x120_YUV444
+  static const Id FW_800x600_MONO16 = DC1394_VIDEO_MODE_800x600_MONO16;
+  /// @see FW_160x120_YUV444
+  static const Id FW_1024x768_MONO16 = DC1394_VIDEO_MODE_1024x768_MONO16;
+  /// @see FW_160x120_YUV444
+  static const Id FW_1280x960_YUV422 = DC1394_VIDEO_MODE_1280x960_YUV422;
+  /// @see FW_160x120_YUV444
+  static const Id FW_1280x960_RGB8 = DC1394_VIDEO_MODE_1280x960_RGB8;
+  /// @see FW_160x120_YUV444
+  static const Id FW_1280x960_MONO8 = DC1394_VIDEO_MODE_1280x960_MONO8;
+  /// @see FW_160x120_YUV444
+  static const Id FW_1600x1200_YUV422 = DC1394_VIDEO_MODE_1600x1200_YUV422;
+  /// @see FW_160x120_YUV444
+  static const Id FW_1600x1200_RGB8 = DC1394_VIDEO_MODE_1600x1200_RGB8;
+  /// @see FW_160x120_YUV444
+  static const Id FW_1600x1200_MONO8 = DC1394_VIDEO_MODE_1600x1200_MONO8;
+  /// @see FW_160x120_YUV444
+  static const Id FW_1280x960_MONO16 = DC1394_VIDEO_MODE_1280x960_MONO16;
+  /// @see FW_160x120_YUV444
+  static const Id FW_1600x1200_MONO16 = DC1394_VIDEO_MODE_1600x1200_MONO16;
+  /// @see FW_160x120_YUV444
+  static const Id FW_EXIF = DC1394_VIDEO_MODE_EXIF;
 
   /* Format7 isn't supported from OpenCV firewire backend
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_FORMAT7_0 = DC1394_VIDEO_MODE_FORMAT7_0;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_FORMAT7_1 = DC1394_VIDEO_MODE_FORMAT7_1;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_FORMAT7_2 = DC1394_VIDEO_MODE_FORMAT7_2;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_FORMAT7_3 = DC1394_VIDEO_MODE_FORMAT7_3;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_FORMAT7_4 = DC1394_VIDEO_MODE_FORMAT7_4;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_FORMAT7_5 = DC1394_VIDEO_MODE_FORMAT7_5;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_FORMAT7_6 = DC1394_VIDEO_MODE_FORMAT7_6;
-  /// @see MODE_FW_160x120_YUV444
-  static const Id MODE_FW_FORMAT7_7 = DC1394_VIDEO_MODE_FORMAT7_7;
+  /// @see FW_160x120_YUV444
+  static const Id FW_FORMAT7_0 = DC1394_VIDEO_MODE_FORMAT7_0;
+  /// @see FW_160x120_YUV444
+  static const Id FW_FORMAT7_1 = DC1394_VIDEO_MODE_FORMAT7_1;
+  /// @see FW_160x120_YUV444
+  static const Id FW_FORMAT7_2 = DC1394_VIDEO_MODE_FORMAT7_2;
+  /// @see FW_160x120_YUV444
+  static const Id FW_FORMAT7_3 = DC1394_VIDEO_MODE_FORMAT7_3;
+  /// @see FW_160x120_YUV444
+  static const Id FW_FORMAT7_4 = DC1394_VIDEO_MODE_FORMAT7_4;
+  /// @see FW_160x120_YUV444
+  static const Id FW_FORMAT7_5 = DC1394_VIDEO_MODE_FORMAT7_5;
+  /// @see FW_160x120_YUV444
+  static const Id FW_FORMAT7_6 = DC1394_VIDEO_MODE_FORMAT7_6;
+  /// @see FW_160x120_YUV444
+  static const Id FW_FORMAT7_7 = DC1394_VIDEO_MODE_FORMAT7_7;
   */
 #endif // CEDAR_USE_LIB_DC1394
 

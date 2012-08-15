@@ -22,40 +22,35 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraBackendType.cpp
+    File:        CameraPropertyMode.cpp
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
-    Date:        2012 07 04
+    Date:        2011 08 01
 
-    Description: Implementation of the CameraBackendType enum-type class
+    Description: Implementation of the CameraPropertyMode enum-type class
 
     Credits:
 
 ======================================================================================================================*/
 
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
-
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/camera/CameraBackendType.h"
+#include "cedar/devices/sensors/visual/camera/enums/CameraPropertyMode.h"
 
 // SYSTEM INCLUDES
 
 
-cedar::aux::EnumType<cedar::dev::sensors::visual::CameraBackendType>
-            cedar::dev::sensors::visual::CameraBackendType::mType("cedar::dev::sensors::visual::CameraBackendType::");
+cedar::aux::EnumType<cedar::dev::sensors::visual::CameraPropertyMode>
+  cedar::dev::sensors::visual::CameraPropertyMode::mType("cedar::dev::sensors::visual::CameraPropertyMode::");
 
 //!@cond SKIPPED_DOCUMENTATION
 #ifndef CEDAR_COMPILER_MSVC
-const cedar::dev::sensors::visual::CameraBackendType::Id cedar::dev::sensors::visual::CameraBackendType::AUTO;
-const cedar::dev::sensors::visual::CameraBackendType::Id cedar::dev::sensors::visual::CameraBackendType::CVCAPTURE;
-
+  const cedar::dev::sensors::visual::CameraPropertyMode::Id cedar::dev::sensors::visual::CameraPropertyMode::BACKEND_DEFAULT;
+  const cedar::dev::sensors::visual::CameraPropertyMode::Id cedar::dev::sensors::visual::CameraPropertyMode::AUTO;
+  const cedar::dev::sensors::visual::CameraPropertyMode::Id cedar::dev::sensors::visual::CameraPropertyMode::MANUAL;
 #ifdef CEDAR_USE_LIB_DC1394
-const cedar::dev::sensors::visual::CameraBackendType::Id cedar::dev::sensors::visual::CameraBackendType::DC1394;
+  //const cedar::dev::sensors::visual::CameraPropertyMode::Id cedar::dev::sensors::visual::CameraPropertyMode::ON_OFF;
 #endif
-
-const cedar::dev::sensors::visual::CameraBackendType::Id cedar::dev::sensors::visual::CameraBackendType::VFL;
 #endif // CEDAR_COMPILER_MSVC
 //!@endcond
 
@@ -63,45 +58,42 @@ const cedar::dev::sensors::visual::CameraBackendType::Id cedar::dev::sensors::vi
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::sensors::visual::CameraBackendType::construct()
+void cedar::dev::sensors::visual::CameraPropertyMode::construct()
 {
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraBackendType::AUTO,
-                                      "BACKEND_AUTO",
-                                      "auto"
+                                      cedar::dev::sensors::visual::CameraPropertyMode::BACKEND_DEFAULT,
+                                      "BACKEND_DEFAULT",
+                                      "Backend"
                                     ));
-
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraBackendType::CVCAPTURE,
-                                      "CVCAPTURE",
-                                      "cv::VideoCapture"
+                                      cedar::dev::sensors::visual::CameraPropertyMode::AUTO,
+                                      "AUTO",
+                                      "Automatic"
+                                    ));
+  mType.type()->def(cedar::aux::Enum(
+                                      cedar::dev::sensors::visual::CameraPropertyMode::MANUAL,
+                                      "MANUAL",
+                                      "Manual"
                                     ));
 #ifdef CEDAR_USE_LIB_DC1394
-  mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraBackendType::DC1394,
-                                      "BACKEND_DC1394",
-                                      "DC1394 (firewire)"
-                                    ));
+//  mType.type()->def(cedar::aux::Enum(
+//                                      cedar::dev::sensors::visual::CameraPropertyMode::ON_OFF,
+//                                      "ON_OFF",
+//                                      "On/Off"
+//                                    ));
 #endif
-
-  mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraBackendType::VFL,
-                                      "VFL",
-                                      "VFL (video for linux)"
-                                    ));
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-
-const cedar::aux::EnumBase& cedar::dev::sensors::visual::CameraBackendType::type()
+const cedar::aux::EnumBase& cedar::dev::sensors::visual::CameraPropertyMode::type()
 {
-  return *cedar::dev::sensors::visual::CameraBackendType::mType.type();
+  return *cedar::dev::sensors::visual::CameraPropertyMode::mType.type();
 }
 
-const cedar::dev::sensors::visual::CameraBackendType::TypePtr& cedar::dev::sensors::visual::CameraBackendType::typePtr()
+const cedar::dev::sensors::visual::CameraPropertyMode::TypePtr& cedar::dev::sensors::visual::CameraPropertyMode::typePtr()
 {
-  return cedar::dev::sensors::visual::CameraBackendType::mType.type();
+  return cedar::dev::sensors::visual::CameraPropertyMode::mType.type();
 }
-
