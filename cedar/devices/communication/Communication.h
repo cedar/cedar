@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_COM_COMMUNICATION_H_
-#define CEDAR_DEV_COM_COMMUNICATION_H_
+#ifndef CEDAR_DEV_COM_COMMUNICATION_H
+#define CEDAR_DEV_COM_COMMUNICATION_H
 
 // CEDAR INCLUDES
 #include "cedar/devices/communication/namespace.h"
@@ -56,7 +56,6 @@ class cedar::dev::com::Communication
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
   //!@brief Initiates a new communication with an external device.
   Communication();
 
@@ -71,13 +70,13 @@ public:
    *@param command The string to be sent.
    *@return 1 if sending was successful and 0 in case of an error.
    */
-  virtual int send(const std::string& command) = 0;
+  virtual void send(const std::string& command) = 0;
 
   /*!@brief Receives a string from the device.
    *@param answer Variable the received string shall be stored in.
    *@return number of received bytes on success and 0 in case of an error.
    */
-  virtual int receive(std::string& answer) = 0;
+  virtual std::string receive() = 0;
 
   /*!@brief Locks the channel for reading or writing.
    *
@@ -112,4 +111,4 @@ protected:
 private:
   //none yet
 }; // class cedar::dev::com::Communication
-#endif // CEDAR_DEV_COM_COMMUNICATION_H_
+#endif // CEDAR_DEV_COM_COMMUNICATION_H

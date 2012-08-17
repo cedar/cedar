@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KTeamDriveModelTest.cpp
+    File:        main.cpp
 
     Maintainer:  Andre Bartel
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
@@ -34,75 +34,63 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
-
+// CEDAR INCLUDES
 #include "cedar/devices/kteam/EPuckDrive.h"
 #include "cedar/devices/kteam/DriveModel.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/SceneWidget.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gl/Cylinder.h"
+#include "cedar/auxiliaries/math/constants.h"
 #include "cedar/devices/kteam/gui/EPuckControlWidget.h"
+#include "cedar/devices/communication/SerialCommunication.h"
 
 // SYSTEM INCLUDES
-
 #include <QApplication>
 #include <math.h>
 
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
 int main(int argc, char **argv)
 {
-  QApplication a(argc, argv);
+  QApplication application(argc, argv);
 
   // create scene
-  cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene);
-  p_scene->setSceneLimit(1);
-  p_scene->drawFloor(false);
+  cedar::aux::gl::ScenePtr scene(new cedar::aux::gl::Scene);
+  scene->setSceneLimit(1);
+  scene->drawFloor(false);
 
   // create viewer
-  cedar::aux::gui::Viewer viewer(p_scene);
+  cedar::aux::gui::Viewer viewer(scene);
   viewer.show();
-  viewer.setSceneRadius(p_scene->getSceneLimit());
+  viewer.setSceneRadius(scene->getSceneLimit());
   viewer.startTimer(50);
 
   //open the channel to the robot
-  cedar::dev::com::SerialCommunication *pCommunication = new cedar::dev::com::SerialCommunication();
-  pCommunication->readJson("../../tests/interactive/devices/ePuck/SerialCommunicationConfig.json");
+  cedar::dev::com::SerialCommunicationPtr communication(new cedar::dev::com::SerialCommunication());
+  communication->readJson("../SerialCommunicationConfig.json");
 
   //initialize the e-puck
-  cedar::dev::kteam::EPuckDrive *pDrive;
-  pDrive = new cedar::dev::kteam::EPuckDrive(pCommunication);
-  pDrive->readJson("../../tests/interactive/devices/ePuck/EPuckDrive.json");
+  cedar::dev::kteam::EPuckDrivePtr drive(new cedar::dev::kteam::EPuckDrive(communication));
+  drive->readJson("../EPuckDriveConfig.json");
+
   //initialize the model of the e-puck
-  cedar::dev::kteam::DriveModelPtr p_kteam_model(new cedar::dev::kteam::DriveModel(pDrive));
+  cedar::dev::kteam::DriveModelPtr kteam_model(new cedar::dev::kteam::DriveModel(drive));
   //add cylinder representing the robot
-  cedar::aux::gl::ObjectVisualizationPtr p_cylinder(new cedar::aux::gl::Cylinder(p_kteam_model, 0.07, 0.05));
-  p_scene->addObjectVisualization(p_cylinder);
+  cedar::aux::gl::ObjectVisualizationPtr cylinder(new cedar::aux::gl::Cylinder(kteam_model, 0.07, 0.05));
+  scene->addObjectVisualization(cylinder);
 
   // create scene widget
-  cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));
-  p_scene_widget->show();
+  cedar::aux::gui::SceneWidgetPtr scene_widget(new cedar::aux::gui::SceneWidget(scene));
+  scene_widget->show();
 
   //open the control-GUI
-  cedar::dev::kteam::gui::EPuckControlWidget *p_epuck_control;
-  p_epuck_control = new cedar::dev::kteam::gui::EPuckControlWidget(pDrive);
-  p_epuck_control->show();
+  cedar::dev::kteam::gui::EPuckControlWidgetPtr epuck_control(new cedar::dev::kteam::gui::EPuckControlWidget(drive));
+  epuck_control->show();
 
   //change the robot's initial orientation
-  p_kteam_model->setRotation(M_PI / 2);
+  kteam_model->setRotation(cedar::aux::math::pi / 2.0);
 
   //start the program
-  a.exec();
-
-  delete pDrive;
-  delete pCommunication;
-  delete p_epuck_control;
+  application.exec();
 
   return 0;
 }

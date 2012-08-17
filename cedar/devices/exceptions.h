@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,39 +22,42 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        serialCommunicationTest.cpp
+    File:        exceptions.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Mathis Richter
 
-    Description: Interactive test-program for the SerialCommunication class.
+    Email:       mathis.richter@ini.rub.de
+
+    Date:        2012 04 11
+
+    Description: Header file for exceptions in the cedar::dev namespace.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_DEV_EXCEPTIONS_H
+#define CEDAR_DEV_EXCEPTIONS_H
+
 // CEDAR INCLUDES
-#include "cedar/devices/communication/SerialCommunication.h"
-#include "cedar/devices/communication/gui/CommunicationWidget.h"
+#include "cedar/devices/namespace.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
 
 // SYSTEM INCLUDES
-#include <QApplication>
 
-int main(int argc, char **argv)
+//!@brief Exception that occurs when a robot does not respond to commands.
+class cedar::dev::UnresponsiveRobotException : public cedar::aux::ExceptionBase
 {
-  //open the channel
-  cedar::dev::com::SerialCommunicationPtr communication(new cedar::dev::com::SerialCommunication());
-  communication->readJson("SerialCommunicationConfig.json");
+}; // class cedar::aux::UnresponsiveRobotException
 
-  // create the GUI
-  cedar::dev::com::gui::CommunicationWidgetPtr
-    communication_widget(new cedar::dev::com::gui::CommunicationWidget(communication));
-  communication_widget->show();
+//!@brief Exception that occurs when something goes wrong during serial communication with a robot.
+class cedar::dev::SerialCommunicationException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::dev::SerialCommunicationException
 
-  //start the program
-  QApplication application(argc, argv);
-  application.exec();
+//!@brief Exception that occurs when the operating system of the computer cannot be determined.
+class cedar::dev::UnknownOperatingSystemException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::dev::UnknownOperatingSystemException
 
-  return 0;
-}
+#endif // CEDAR_DEV_EXCEPTIONS_H
