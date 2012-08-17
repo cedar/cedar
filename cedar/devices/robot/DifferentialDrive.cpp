@@ -102,18 +102,16 @@ void cedar::dev::robot::DifferentialDrive::setForwardVelocityAndTurningRate
        double turningRate
      )
 {
-  std::cout << "desired forward velocity: " << forwardVelocity << std::endl;
   thresholdForwardVelocity(forwardVelocity);
   thresholdTurningRate(turningRate);
-  std::cout << "thresholded forward velocity: " << forwardVelocity << std::endl;
+
   double left_wheel_speed = 0;
   double right_wheel_speed = 0;
   convertToWheelSpeed(forwardVelocity, turningRate, left_wheel_speed, right_wheel_speed);
-  std::cout << "converted wheel speeds: " << left_wheel_speed << ", " << right_wheel_speed << std::endl;
   thresholdToHardwareLimits(left_wheel_speed, right_wheel_speed);
-  std::cout << "thresholded wheel speeds: " << left_wheel_speed << ", " << right_wheel_speed << std::endl;
   mWheelSpeed[0] = left_wheel_speed;
   mWheelSpeed[1] = right_wheel_speed;
+
   convertToForwardVelocityAndTurningRate(left_wheel_speed, right_wheel_speed, mForwardVelocity, mTurningRate);
   sendMovementCommand();
 }
