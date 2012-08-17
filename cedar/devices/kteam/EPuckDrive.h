@@ -24,31 +24,29 @@
 
     File:        EPuckDrive.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2012 04 17
 
-    Description: An object of this class represents the drive of the E-Puck, a differential drive mobile robot.
+    Description: The drive component of the mobile E-Puck robot.
 
-    Credits:
+    Credits:     Original design by Andre Bartel (2011)
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_MOBILE_EPUCK_DRIVE_H
-#define CEDAR_DEV_ROBOT_MOBILE_EPUCK_DRIVE_H
+#ifndef CEDAR_DEV_KTEAM_EPUCK_DRIVE_H
+#define CEDAR_DEV_KTEAM_EPUCK_DRIVE_H
 
 // CEDAR INCLUDES
 #include "cedar/devices/kteam/Drive.h"
-#include "cedar/devices/communication/SerialCommunication.h"
+#include "cedar/devices/communication/namespace.h"
 
 // SYSTEM INCLUDES
-#include <math.h>
 
-/*!@brief An object of this class represents the drive of the E-Puck, a differential drive mobile robot.
+/*!@brief The drive component of the mobile E-Puck robot.
  *
- *This class initiates the communication with the E-Puck and handles the string-based communication. An initialized
- *object of the class SerialCommunication with the E-Puck's devicePath has to be set, otherwise the initialization will
- *fail. The data of the E-Puck is read from a configuration file.
+ * The constructor expects an initialized serial communication object. After creation of the EPuckDrive
+ * object, all its parameters (e.g., wheel radius, hardware speed limits) are read from a configuration file.
  */
 class cedar::dev::kteam::EPuckDrive : public cedar::dev::kteam::Drive
 {
@@ -56,83 +54,37 @@ class cedar::dev::kteam::EPuckDrive : public cedar::dev::kteam::Drive
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-  /*!@brief Constructs an object which represents the drive of an E-Puck robot.
-   *@param peCommunication Pointer to the communication-device to be used (has to be initialized)
-   */
-  EPuckDrive(cedar::dev::com::SerialCommunication* peCommunication);
-
-  //!@brief Destructs the object.
-  ~EPuckDrive();
+  //!@brief Constructor
+  EPuckDrive(cedar::dev::com::SerialCommunicationPtr communication);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-  /*!@brief Initializes the E-Puck drive.
-   *@param peCommunication Pointer to the Serial Communication to use.
-   *@return 1 if initialization was successful, else 0.
-   */
-  int init(cedar::dev::com::SerialCommunication *peCommunication);
-
-  /*!@brief The get-function of the initialization status.
-   *@return true if EPuckDrive is initialized, else false.
-   */
-  bool isInitialized() const;
-
-  /*!@brief The get-function of the left and right encoder value.
-   *@param leftEncoder Variable the left encoder value shall be stored in.
-   *@param rightEncoder Variable the right encoder value shall be stored in.
-   *@return 1 if getting encoder values was successful and 0 otherwise.
-   */
-  int getEncoder(int &leftEncoder, int &rightEncoder);
-
-  /*!@brief The get-function of the current acceleration.
-   *@param xAcceleration Variable the acceleration in left-right-direction shall be stored in.
-   *@param yAcceleration Variable the acceleration in heading-direction shall be stored in.
-   *@param zAcceleration Variable the acceleration in up-down-direction shall be stored in.
-   *@return 1 if getting acceleration values was successful and 0 otherwise.
-   */
-  int getAcceleration(int &xAcceleration, int &yAcceleration, int &zAcceleration);
-
-  /*!@brief The set-function of the left and right wheel speed.
-   *@param leftWheelSpeed The wheel speed of the left wheel to be set [in m/s].
-   *@param rightWheelSpeed The wheel speed of the right wheel to be set [in m/s].
-   *@return 1 if setting wheel speeds was successful and 0 otherwise.
-   */
-  int setWheelSpeed(double leftWheelSpeed, double rightWheelSpeed);
+  //!@brief Returns the values of the acceleration sensor of the E-Puck robot.
+  std::vector<int> getAcceleration();
+  // documented in base class
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-
-  /*!@brief Sets both encoder values.
-   *@param leftEncoder The left encoder value to be set.
-   *@param rightEncoder The right encoder value to be set.
-   *@return 1 if setting encoder values was successful and 0 otherwise.
-   */
-  int setEncoder(int leftEncoder, int rightEncoder);
-
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-
 private:
-  //!@brief The initialization status of EPuckDrive
-  //!true if initialized, else false
-  bool mInitialized;
+  // none yet
 }; // class cedar::dev::kteam::EPuckDrive
-#endif // CEDAR_DEV_ROBOT_MOBILE_EPUCK_DRIVE_H
+
+#endif // CEDAR_DEV_KTEAM_EPUCK_DRIVE_H

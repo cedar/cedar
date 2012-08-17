@@ -71,9 +71,9 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Constructs the E-Puck-Control.
-  //!@param peDrive Pointer to the E-Puck that shall be controlled.
+  //!@param drive Pointer to the E-Puck that shall be controlled.
   //!@param parent Pointer to parent widget
-  EPuckControlWidget(cedar::dev::kteam::EPuckDrive *peDrive, QWidget *parent = 0);
+  EPuckControlWidget(cedar::dev::kteam::EPuckDrivePtr drive, QWidget *parent = 0);
 
   //!@brief Closes the control.
   virtual ~EPuckControlWidget();
@@ -124,6 +124,6 @@ protected:
 
 private:
   //!@brief Pointer to the controlled robot.
-  cedar::dev::kteam::EPuckDrive *mpeDrive;
+  cedar::dev::kteam::EPuckDrivePtr mDrive;
 }; // class cedar::dev::robot::mobile::gui::EPuckControlWidget
 #endif // CEDAR_DEV_KTEAM_GUI_EPUCK_CONTROL_WIDGET_H
