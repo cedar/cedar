@@ -58,4 +58,4 @@ set (CEDAR_DEPENDENCY_FFTW "/usr/include"                CACHE PATH "This is the
 set (CEDAR_DEPENDENCY_QWT "/usr/include/qwt-qt4"             CACHE PATH "This is the default path in which cedar tries to find qwt.")
 set (CEDAR_DEPENDENCY_QWTPLOT3D "/usr/local/include/qwtplot3d" CACHE PATH "This is the default path in which cedar tries to find qwtplot3d.")
 set (CEDAR_DEPENDENCY_QGLVIEWER "/usr/include/QGLViewer" CACHE PATH "This is the default path in which cedar tries to find QGLViewer.")
-set (CEDAR_DEPENDENCY_LIBRARIES "/usr/lib" "/usr/local/lib"    CACHE PATH "This is the default path in which cedar tries to find external libraries.")
+set (CEDAR_DEPENDENCY_LIBRARIES "/usr/local/lib"    CACHE PATH "This is the default path in which cedar tries to find external libraries.")
