@@ -10,9 +10,10 @@ find_path(QGLViewer_INCLUDE_DIRS
 )
 # find library in set of paths
 find_library(QGLViewer_LIBS
-  NAMES QGLViewer
+  NAMES qglviewer qglviewer-qt4 QGLViewer
   PATHS ${CEDAR_DEPENDENCY_LIBRARIES}
 )
+
 # now check if anything is missing
 if(QGLViewer_INCLUDE_DIRS AND QGLViewer_LIBS)
   set(QGLViewer_FOUND true)

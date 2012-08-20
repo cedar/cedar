@@ -48,8 +48,8 @@
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
-#include <qwt/qwt_legend.h>
-#include <qwt/qwt_scale_div.h>
+#include <qwt_legend.h>
+#include <qwt_scale_div.h>
 #include <QContextMenuEvent>
 #include <QVBoxLayout>
 #include <QPalette>

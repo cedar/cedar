@@ -10,7 +10,7 @@ find_path(qwt_INCLUDE_DIRS
 )
 # find library in set of paths
 find_library(qwt_LIBS
-  NAMES qwt
+  NAMES qwt qwt-qt4
   PATHS ${CEDAR_DEPENDENCY_LIBRARIES}
 )
 # now check if anything is missing

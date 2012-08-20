@@ -42,8 +42,8 @@
 #include "cedar/auxiliaries/gui/PlotInterface.h"
 
 // SYSTEM INCLUDES
-#include <qwt/qwt_plot.h>
-#include <qwt/qwt_plot_curve.h>
+#include <qwt_plot.h>
+#include <qwt_plot_curve.h>
 #include <deque>
 
 /*!@brief A time-based plot for 0D values. Displays a history of this value from a certain point in the past up to now.

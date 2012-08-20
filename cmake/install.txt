@@ -37,20 +37,39 @@
 ########################################################################################################################
 # install setup
 
+
+#------------------------
+# Header files
+#------------------------
+
 file(GLOB cedarHeaders "${CEDAR_SOURCE_DIR}/*.h")
 install(FILES ${cedarHeaders} DESTINATION "${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}")
-install(CODE "execute_process(COMMAND make doc)")
-install(DIRECTORY "${CEDAR_BUILD_DIR}/doc/html" DESTINATION "${CEDAR_DOC_INSTALL_DIR}-${CEDAR_VERSION}")
-install(DIRECTORY "${CEDAR_BUILD_DIR}/doc/latex" DESTINATION "${CEDAR_DOC_INSTALL_DIR}-${CEDAR_VERSION}")
-install(DIRECTORY "${CEDAR_HOME}/resources" DESTINATION "${CEDAR_RESOURCE_INSTALL_DIR}-${CEDAR_VERSION}")
 install(FILES ${CEDAR_CONFIGURATION_HEADER_OUTPUT} DESTINATION "${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}")
+# create links for the resource directory
+install(CODE "execute_process(COMMAND ln -fsT ${CMAKE_INSTALL_PREFIX}/${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION} ${CMAKE_INSTALL_PREFIX}/${CEDAR_HEADER_INSTALL_DIR})")
+
+#------------------------
+# Documentation
+#------------------------
+
+#install(CODE "execute_process(COMMAND make doc)")
+#install(DIRECTORY "${CEDAR_BUILD_DIR}/doc/html" DESTINATION "${CEDAR_DOC_INSTALL_DIR}-${CEDAR_VERSION}")
+#install(DIRECTORY "${CEDAR_BUILD_DIR}/doc/latex" DESTINATION "${CEDAR_DOC_INSTALL_DIR}-${CEDAR_VERSION}")
+
+#------------------------
+# Resources (e.g., icons)
+#------------------------
+
+install(DIRECTORY "${CEDAR_HOME}/resources" DESTINATION "${CEDAR_RESOURCE_INSTALL_DIR}-${CEDAR_VERSION}")
+# create links for the installed directories
+install(CODE "execute_process(COMMAND ln -fsT ${CMAKE_INSTALL_PREFIX}/${CEDAR_RESOURCE_INSTALL_DIR}-${CEDAR_VERSION} ${CMAKE_INSTALL_PREFIX}/${CEDAR_RESOURCE_INSTALL_DIR})")
+
+#------------------------
+# Executables
+#------------------------
+
 #todo install all executable files here automatically
 file(GLOB cedarExecutables "${CEDAR_EXE_DIR}/processingIde")
 install(FILES ${cedarExecutables} DESTINATION ${CEDAR_EXE_INSTALL_DIR})
 install(CODE "execute_process(COMMAND chmod 755 ${CMAKE_INSTALL_PREFIX}/${CEDAR_EXE_INSTALL_DIR}/processingIde)")
-install(CODE "execute_process(COMMAND chmod 755 ${CMAKE_INSTALL_PREFIX}/${CEDAR_EXE_INSTALL_DIR}/processingIde-${CEDAR_VERSION})")
-
-# make links for the installed directories
-install(CODE "execute_process(COMMAND ln -fsT ${CMAKE_INSTALL_PREFIX}${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION} ${CMAKE_INSTALL_PREFIX}${CEDAR_HEADER_INSTALL_DIR})")
-install(CODE "execute_process(COMMAND ln -fsT ${CMAKE_INSTALL_PREFIX}${CEDAR_RESOURCE_INSTALL_DIR}-${CEDAR_VERSION} ${CMAKE_INSTALL_PREFIX}${CEDAR_RESOURCE_INSTALL_DIR})")
 

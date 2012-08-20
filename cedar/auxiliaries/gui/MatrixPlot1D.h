@@ -49,9 +49,9 @@
 // SYSTEM INCLUDES
 #include <QWidget>
 #include <QReadWriteLock>
-#include <qwt/qwt_plot.h>
-#include <qwt/qwt_plot_curve.h>
-#include <qwt/qwt_plot_marker.h>
+#include <qwt_plot.h>
+#include <qwt_plot_curve.h>
+#include <qwt_plot_marker.h>
 #include <opencv2/opencv.hpp>
 
 /*!@brief Matrix plot that can display 1D matrices (i.e. vectors).
