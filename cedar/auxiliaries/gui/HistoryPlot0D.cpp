@@ -48,7 +48,7 @@
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
-#include <qwt/qwt_legend.h>
+#include <qwt_legend.h>
 #include <QVBoxLayout>
 #include <QContextMenuEvent>
 #include <QMenu>

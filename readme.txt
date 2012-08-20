@@ -93,7 +93,7 @@ We provide a Debian meta-package, which installs all dependencies you need
 to compile cedar under Ubuntu 12.04. The package can be downloaded from
 our bitbucket page.
 
-$ wget https://bitbucket.org/cedar/stable/downloads/cedar-dependencies.deb
+$ wget https://bitbucket.org/cedar/dependencies/downloads/cedar-dependencies.deb
 
 You will need a program like gdebi to install the package. If you do not have
 gdebi installed, get it now.
