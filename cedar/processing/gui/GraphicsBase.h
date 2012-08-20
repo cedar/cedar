@@ -277,7 +277,6 @@ protected:
   //!@brief flag if the background should be drawn
   bool mDrawBackground;
 
-
 private:
   //!@brief the highlight mode
   cedar::proc::gui::GraphicsBase::HighlightMode mHighlightMode;

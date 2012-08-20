@@ -144,10 +144,10 @@ public:
 protected:
   //!@brief check if all inputs are valid, e.g. have the right size and dimensionality
   cedar::proc::DataSlot::VALIDITY determineInputValidity
-                                (
-                                  cedar::proc::ConstDataSlotPtr slot,
-                                  cedar::aux::ConstDataPtr data
-                                ) const;
+                                  (
+                                    cedar::proc::ConstDataSlotPtr slot,
+                                    cedar::aux::ConstDataPtr data
+                                  ) const;
 
 protected slots:
   //!@brief this slot is triggered whenever the dimensionality of its output is changed by the user

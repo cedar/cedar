@@ -126,7 +126,6 @@ void cedar::aux::gui::ObjectParameter::parameterPointerChanged()
 
   // reconnect the signal
   QObject::connect(this->mpTypeSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(currentTypeChanged(int)));
-
 }
 
 std::string cedar::aux::gui::ObjectParameter::getSelectedType() const

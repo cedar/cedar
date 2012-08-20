@@ -62,7 +62,6 @@ public cedar::proc::sources::GrabberBase
 {
   Q_OBJECT
 
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -128,7 +127,6 @@ private:
 protected:
   // none yet
 private:
-
   //!@brief the time in ms between two frames. Depends on the the framerate of the video
   //!@todo: change to cedar::unit::Time
   cedar::unit::Milliseconds mFrameDuration;

@@ -154,7 +154,7 @@ private:
   //!@brief flag if plot grid should be displayed
   bool mShowGridLines;
   //!@biref the plot object
-  Qwt3D::GridPlot *mpPlot;
+  Qwt3D::GridPlot* mpPlot;
   //!@brief vector of possible perspectives
   std::vector<Perspective> mPerspectives;
   //!@brief row count of data

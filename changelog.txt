@@ -39,8 +39,13 @@
     cedardyn using the plugin dialog. You then may want to go to the Manage.. dialog and mark this plugin to be loaded
     on every start.
   - On windows, some of the GL drawing functionality for kinematic chains and related classes is not implemented.
+  - Grouping steps into networks is buggy. Please use with caution and report any errors you encounter.
+  - cedar::dev::sensors::visual::CameraGrabber is not working at the moment.
+  - the net unit test fails from time to time (see issue #253 in testing)
 
 == current version ==
+
+== Version 0.9.1 ==
 - general
   - cedar now accepts both qwt versions 5.x and 6.x
 - cedar::aux

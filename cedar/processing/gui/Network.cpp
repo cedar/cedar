@@ -344,7 +344,11 @@ void cedar::proc::gui::Network::transformChildCoordinates(cedar::proc::gui::Grap
   pItem->setPos(this->mapFromItem(pItem, QPointF(0, 0)));
 }
 
-void cedar::proc::gui::Network::elementAdded(cedar::proc::Network* pNetwork, cedar::proc::ElementPtr pElement)
+void cedar::proc::gui::Network::elementAdded
+     (
+       cedar::proc::Network* CEDAR_DEBUG_ONLY(pNetwork),
+       cedar::proc::ElementPtr pElement
+     )
 {
   CEDAR_DEBUG_ASSERT(pNetwork == this->getNetwork().get());
 
@@ -475,7 +479,6 @@ void cedar::proc::gui::Network::read(const std::string& source)
 
 void cedar::proc::gui::Network::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
-  std::cout << "cedar::proc::gui::Network::readConfiguration" << std::endl;
   this->cedar::proc::gui::GraphicsBase::readConfiguration(node);
 }
 
@@ -584,9 +587,6 @@ void cedar::proc::gui::Network::checkDataItems()
         mSlotMap[*enum_it].erase(current_iter);
       }
     }
-//    mSlotMap[*enum_it].clear();
-    // populate step item list
-//    mSlotMap[*enum_it] = DataSlotNameMap();
 
     const QPointF& origin = add_origins[*enum_it];
     const QPointF& direction = add_directions[*enum_it];
@@ -793,7 +793,7 @@ void cedar::proc::gui::Network::processStepAddedSignal(cedar::proc::ElementPtr e
 {
   // store the type, which can be compared to entries in a configuration node
   std::string current_type;
-  cedar::proc::gui::GraphicsBase *p_scene_element = NULL;
+  cedar::proc::gui::GraphicsBase* p_scene_element = NULL;
   if (cedar::proc::StepPtr step = boost::shared_dynamic_cast<cedar::proc::Step>(element))
   {
     this->mpScene->addProcessingStep(step, QPointF(0, 0));
