@@ -40,6 +40,9 @@ set (CEDAR_LIB_DIR        "${CEDAR_HOME}/lib"         CACHE PATH "Directory all 
 set (CEDAR_EXE_DIR        "${CEDAR_HOME}/bin"         CACHE PATH "Directory all cedar executables will be stored in.")
 set (CEDAR_LOG_DIR        "${CEDAR_HOME}/logs"        CACHE PATH "Default directory for all log files.")
 
+# set this if you want more info from the build system
+# set (CEDAR_VERBOSE_BUILD_SYSTEM On)
+
 # set (CEDAR_STOP_ON_MISSING_LIBRARIES      0           CACHE BOOL "Stop when libraries cannot be found by cmake?")
 set (CEDAR_BUILD_STATIC_LIBS              0           CACHE BOOL "Build all libraries statically (*.a)?")
 set (CEDAR_BUILD_DEBUG_VERSION            0           CACHE BOOL "Build with debug information?")
@@ -58,3 +61,4 @@ set (CEDAR_DEPENDENCY_QWT "/usr/local/include/qwt"             CACHE PATH "This 
 set (CEDAR_DEPENDENCY_QWTPLOT3D "/usr/local/include/qwtplot3d" CACHE PATH "This is the default path in which cedar tries to find qwtplot3d.")
 set (CEDAR_DEPENDENCY_QGLVIEWER "/usr/local/include/QGLViewer" CACHE PATH "This is the default path in which cedar tries to find QGLViewer.")
 set (CEDAR_DEPENDENCY_LIBRARIES "/usr/local/lib"               CACHE PATH "This is the default path in which cedar tries to find external libraries.")
+
