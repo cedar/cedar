@@ -72,7 +72,7 @@ There, you can also find our issue-tracker (look under testing).
 
 cedar comes with a bunch of dependencies on other libraries. Here is what you
 have to install before you can compile our library. The version numbers are
-the oldest versions supported, unless noted otherwise.
+the oldest versions supported.
 
    * CMake
    * Boost 1.47
@@ -81,17 +81,47 @@ the oldest versions supported, unless noted otherwise.
    * qwt 5.2.1
    * qwtplot3d 0.3
    * libqglviewer 2.3.6
-   * libconfig 1.4
-   * Doxygen 
 
 optional dependencies:
    * YARP 2.3.6 (for YARP features like network connectivity)
    * libDC1394 (for firewire cameras)
    * fftw-3.2.2 (for FFT-based convolutions)
+   * Doxygen (to generate HTML or LaTeX documentation)
+
+Ubuntu 12.04:
+We provide a Debian meta-package, which installs all dependencies you need
+to compile cedar under Ubuntu 12.04. The package can be downloaded from
+our bitbucket page.
+
+$ wget https://bitbucket.org/cedar/stable/downloads/cedar-dependencies.deb
+
+You will need a program like gdebi to install the package. If you do not have
+gdebi installed, get it now.
+
+$ sudo apt-get install gdebi
+
+Now you can install all of cedar's dependencies using gdebi.
+
+$ sudo gdebi cedar-dependencies.deb
+
+As part of the installation, the Debian package will also download, compile,
+and install a patched version of qwtplot3d (0.3), which sadly is no longer
+available anywhere else on the web.
+
 
 === Clone the cedar repository ===
 
-hg clone https://bitbucket.org/cedar/testing [your cedar directory]
+There are two ways to get the cedar sources. You can either use Mercurial, a distributed version control system (similar to Git). Install it through your package manager
+
+$ sudo apt-get install mercurial
+
+and then clone our official repository.
+
+$ hg clone https://bitbucket.org/cedar/stable [your cedar directory]
+
+If you do not want to use Mercurial, you can simply download a tarball containing the cedar sources from our bitbucket page (https://bitbucket.org/cedar/stable/downloads/).
+
+$ wget https://bitbucket.org/cedar/stable/get/tip.tar.bz2
 
 
 === Compilation ===
@@ -99,7 +129,7 @@ hg clone https://bitbucket.org/cedar/testing [your cedar directory]
 1. Change into the cedar repository.
    $ cd [your cedar directory]
 2. Create a copy of cedar.conf.example (in this folder) and name it 'cedar.conf'.
-3. Take a look at 'cedar.conf' make any changes for your individual system
+3. By default, 'cedar.conf' is set up to work on Ubuntu 12.04. Take a look at the file and make any changes for your individual system
    (e.g., installation prefix, external include paths, ...) with an editor of your
    choosing (e.g., vim).
    $ vim cedar.conf
@@ -113,15 +143,12 @@ hg clone https://bitbucket.org/cedar/testing [your cedar directory]
 [Optional: Run all unit tests to check whether everything works:
    $ make test
 ]
-[Optional: Create the documentation (it will be generated in the folder 'build/doc'):
+[Optional, only works when doxygen is installed: Create the documentation (it will be generated in the folder 'build/doc'):
    $ make doc
    Note, that this may generate some warnings that you can usually ignore safely.
 ]
-7a. For all Debian based Linux distributions: Create installation package and install it:
-   $ make package
-   $ sudo dpkg -i cedar-<version>-Linux.deb
-7b. Manual installation:
-   $ make install
+7a. Install cedar
+   $ sudo make install
 
 
 === Play around with the processing framework ===
