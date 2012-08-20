@@ -72,6 +72,9 @@ macro(cedar_add_executable)
   
   # change the runtime output directory back to the original value
   set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${originalRuntimeOutputDirectory})
+  
+  # finally, add this target to the list of executables that are going to be installed to CEDAR_EXE_INSTALL_DIR
+  install(TARGETS ${executableExecutableName} DESTINATION "${CMAKE_INSTALL_PREFIX}/${CEDAR_EXE_INSTALL_DIR}")
 endmacro(cedar_add_executable)
 
 macro(cedar_add_unit_test)
