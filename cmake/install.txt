@@ -52,9 +52,9 @@ install(CODE "execute_process(COMMAND ln -fsT ${CMAKE_INSTALL_PREFIX}/${CEDAR_HE
 # Documentation
 #------------------------
 
-#install(CODE "execute_process(COMMAND make doc)")
-#install(DIRECTORY "${CEDAR_BUILD_DIR}/doc/html" DESTINATION "${CEDAR_DOC_INSTALL_DIR}-${CEDAR_VERSION}")
-#install(DIRECTORY "${CEDAR_BUILD_DIR}/doc/latex" DESTINATION "${CEDAR_DOC_INSTALL_DIR}-${CEDAR_VERSION}")
+install(CODE "execute_process(COMMAND make doc)")
+install(DIRECTORY "${CEDAR_BUILD_DIR}/doc/html" DESTINATION "${CEDAR_DOC_INSTALL_DIR}-${CEDAR_VERSION}")
+install(DIRECTORY "${CEDAR_BUILD_DIR}/doc/latex" DESTINATION "${CEDAR_DOC_INSTALL_DIR}-${CEDAR_VERSION}")
 
 #------------------------
 # Resources (e.g., icons)
