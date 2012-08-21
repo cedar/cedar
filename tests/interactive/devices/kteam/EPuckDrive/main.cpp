@@ -35,6 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/System.h"
 #include "cedar/devices/kteam/EPuckDrive.h"
 #include "cedar/devices/communication/SerialCommunication.h"
 #include "cedar/devices/kteam/gui/EPuckControlWidget.h"
@@ -48,11 +49,13 @@ int main(int argc, char **argv)
 
   // open the channel to the epuck
   cedar::dev::com::SerialCommunicationPtr communication(new cedar::dev::com::SerialCommunication());
-  communication->readJson("../SerialCommunicationConfig.json");
+  std::string serial_communication_config = cedar::aux::System::locateResource("configs/serial_communication.json");
+  communication->readJson(serial_communication_config);
 
   // initialize epuck-drive
   cedar::dev::kteam::EPuckDrivePtr drive(new cedar::dev::kteam::EPuckDrive(communication));
-  drive->readJson("../EPuckDriveConfig.json");
+  std::string epuck_drive_config = cedar::aux::System::locateResource("configs/epuck_drive.json");
+  communication->readJson(epuck_drive_config);
 
   // open the control-GUI
   cedar::dev::kteam::gui::EPuckControlWidgetPtr epuck_control(new cedar::dev::kteam::gui::EPuckControlWidget(drive));

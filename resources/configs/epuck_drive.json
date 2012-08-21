@@ -9,12 +9,12 @@
   "wheel radius": "0.0205",
   "hardware speed limits":
   {
-    "lower limit": "0.0",
+    "lower limit": "-1.0",
     "upper limit": "1.0"
   },
   "forward velocity limits":
   {
-    "lower limit": "0.0",
+    "lower limit": "-1.0",
     "upper limit": "1.0"
   },
   "turning rate limits":
