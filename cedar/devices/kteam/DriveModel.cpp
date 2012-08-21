@@ -42,10 +42,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::kteam::DriveModel::DriveModel(cedar::dev::kteam::Drive *peDrive)
+cedar::dev::kteam::DriveModel::DriveModel(cedar::dev::kteam::DrivePtr drive)
+:
+mDrive(drive)
 {
-  mInitialized = false;
-  init(peDrive);
+  // initialization of members
+  mOldEncoders.resize(2);
+  mOldEncoders[0] = 0;
+  mOldEncoders[1] = 0;
+
+  // set starting-position
+  setTranslation(0, 0);
+  setRotation(0);
+  mDrive->reset();
+
+  // start update-timer and running-time
+  startTimer(1);
+
+  update();
 }
 
 cedar::dev::kteam::DriveModel::~DriveModel()
@@ -56,94 +70,44 @@ cedar::dev::kteam::DriveModel::~DriveModel()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-int cedar::dev::kteam::DriveModel::init(cedar::dev::kteam::Drive *peDrive)
-{
-  if(this->isInitialized())
-  {
-    if(mDebug)
-    {
-      std::cout << "KTeamDriveModel: Initialization failed (Already initialized)\n";
-    }
-    return 0;
-  }
-
-  // Initialization of members
-  mpeDrive = 0;
-  mOldEncoder = cv::Mat(2, 1, CV_64FC1);
-  mOldEncoder.at<double>(0, 0) = 0;
-  mOldEncoder.at<double>(1, 0) = 0;
-  mpeDrive = peDrive;
-  mDebug = false; //set true for debug-informations on console
-
-  // set starting-position
-  setTranslation(0, 0);
-  setRotation(0);
-  mpeDrive->resetEncoder();
-
-  // start update-timer and running-time
-  startTimer(1);
-
-  update();
-
-  if(mDebug)
-  {
-    std::cout << "KTeamDriveModel: Initialization successful\n";
-  }
-  return 1;
-}
-
-bool cedar::dev::kteam::DriveModel::isInitialized() const
-{
-  return this->mInitialized;
-}
 
 void cedar::dev::kteam::DriveModel::update()
 {
   // get new encoder-values
-  int left_encoder;
-  int right_encoder;
-  mpeDrive->getEncoder(left_encoder, right_encoder);
+  std::vector<int> encoders = mDrive->getEncoders();
 
   // calculate new position and orientation
-  calculatePositionAndOrientation(left_encoder, right_encoder);
-
-  // store encoder-values (needed for next update)
+  calculatePositionAndOrientation(encoders);
 
   // reset encoders if reaching maximal/minimal encoder value
-  int maximal_encoder = mpeDrive->getMaximalEncoderValue();
-  int minimal_encoder = mpeDrive->getMinimalEncoderValue();
-  if(left_encoder > 0.9 * maximal_encoder
-     || right_encoder > 0.9 * maximal_encoder
-     || left_encoder < 0.9 * minimal_encoder
-     || right_encoder < 0.9 * minimal_encoder
-     || left_encoder < 1.1 * minimal_encoder
-     || right_encoder < 1.1 * minimal_encoder)
+  int maximum_encoder = mDrive->getEncoderLimits()->getValue().getUpper();
+  int minimum_encoder = mDrive->getEncoderLimits()->getValue().getLower();
+  if (encoders[0] > 0.9 * maximum_encoder
+     || encoders[1] > 0.9 * maximum_encoder
+     || encoders[0] < 0.9 * minimum_encoder
+     || encoders[1] < 0.9 * minimum_encoder
+     || encoders[0] < 1.1 * minimum_encoder
+     || encoders[1] < 1.1 * minimum_encoder)
   {
-    mpeDrive->resetEncoder();
-    mOldEncoder.at<int>(0,0) = 0;
-    mOldEncoder.at<int>(1,0) = 0;
+    mDrive->reset();
+    mOldEncoders[0] = 0;
+    mOldEncoders[1] = 0;
   }
   else
   {
-    mOldEncoder.at<int>(0,0) = left_encoder;
-    mOldEncoder.at<int>(1,0) = right_encoder;
-  }
-
-  if(mDebug)
-  {
-    // output for importing into matlab
-    std::cout << getTranslationX() << " " << getTranslationY() << " " << getRotation() << "\n";
+    mOldEncoders[0] = encoders[0];
+    mOldEncoders[1] = encoders[1];
   }
 }
 
-void cedar::dev::kteam::DriveModel::calculatePositionAndOrientation(int leftEncoder, int rightEncoder)
+void cedar::dev::kteam::DriveModel::calculatePositionAndOrientation(const std::vector<int>& encoders)
 {
   // calculate the moved distance since last update
-  double ds = calculateDifferencePosition(leftEncoder, mOldEncoder.at<int>(0,0),
-                                          rightEncoder, mOldEncoder.at<int>(1,0));
+  double ds = calculateDifferencePosition(mOldEncoders, encoders);
+
   // calculate the angle rotated since last update
-  double dphi = calculateDifferenceOrientation(leftEncoder, mOldEncoder.at<int>(0,0),
-                                               rightEncoder, mOldEncoder.at<int>(1,0));
+  double dphi = calculateDifferenceOrientation(mOldEncoders, encoders);
+
   // calculate new position on x- and y-axis
   //todo: changed to use matrices instead of quaternions, check whether this still works (HR)
 //  double new_x_position = getTranslationX() + ds * getOrientationQuaternion(1);
@@ -164,24 +128,20 @@ void cedar::dev::kteam::DriveModel::calculatePositionAndOrientation(int leftEnco
 
 double cedar::dev::kteam::DriveModel::calculateDifferencePosition
        (
-         int newLeftEncoder,
-         int oldLeftEncoder,
-         int newRightEncoder,
-         int oldRightEncoder
+         const std::vector<int>& oldEncoders,
+         const std::vector<int>& newEncoders
        ) const
 {
-  return ((newRightEncoder - oldRightEncoder)
-          + (newLeftEncoder - oldLeftEncoder)) * mpeDrive->getDistancePerPulse() / 2;
+  return ((newEncoders[1] - oldEncoders[1]) + (newEncoders[0] - oldEncoders[0]))
+         * mDrive->getDistancePerPulse() / 2.0;
 }
 
 double cedar::dev::kteam::DriveModel::calculateDifferenceOrientation
        (
-         int newLeftEncoder,
-         int oldLeftEncoder,
-         int newRightEncoder,
-         int oldRightEncoder
+           const std::vector<int>& oldEncoders,
+           const std::vector<int>& newEncoders
        ) const
 {
-  return ((newRightEncoder - oldRightEncoder) - (newLeftEncoder - oldLeftEncoder))
-          * mpeDrive->getDistancePerPulse() / mpeDrive->getWheelDistance();
+  return ((newEncoders[1] - oldEncoders[1]) - (newEncoders[0] - oldEncoders[0]))
+         * mDrive->getDistancePerPulse() / mDrive->getWheelDistance();
 }

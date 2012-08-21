@@ -24,40 +24,34 @@
 
     File:        DifferentialDrive.cpp
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2012 04 12
 
     Description: An object of this class represents the differential drive of a robot.
 
-    Credits:
+    Credits:     Original design by Andre Bartel (2011)
 
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
+#include "cedar/auxiliaries/assert.h"
 #include "cedar/devices/robot/DifferentialDrive.h"
 
 // SYSTEM INCLUDES
-#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
 cedar::dev::robot::DifferentialDrive::DifferentialDrive()
 :
-_mWheelDistance(new cedar::aux::DoubleParameter(this, "wheel distance", 0)),
-_mWheelRadius(new cedar::aux::DoubleParameter(this, "wheel radius", 0))
-{
-  mWheelSpeed.resize(2);
-  mWheelSpeed[0] = 0;
-  mWheelSpeed[1] = 0;
-}
-
-cedar::dev::robot::DifferentialDrive::~DifferentialDrive()
-{
-
-}
+mWheelSpeed(2, 0),
+_mWheelDistance(new cedar::aux::DoubleParameter(this, "wheel distance", 0.1, 0.0, 1.0)),
+_mWheelRadius(new cedar::aux::DoubleParameter(this, "wheel radius", 0.01, 0.0, 1.0)),
+_mHardwareSpeedLimits(new cedar::aux::math::DoubleLimitsParameter(this, "hardware speed limits", 0.0, 0.2, 0.2, 2.0))
+{}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -73,94 +67,85 @@ double cedar::dev::robot::DifferentialDrive::getWheelRadius() const
   return _mWheelRadius->getValue();
 }
 
+cedar::aux::math::DoubleLimitsParameterPtr cedar::dev::robot::DifferentialDrive::getHardwareSpeedLimits() const
+{
+  return _mHardwareSpeedLimits;
+}
+
 const std::vector<double>& cedar::dev::robot::DifferentialDrive::getWheelSpeed() const
 {
   return mWheelSpeed;
 }
 
-std::vector<double> cedar::dev::robot::DifferentialDrive::calculateVelocity
-                    (
-                      double leftWheelSpeed,
-                      double rightWheelSpeed
-                    )
+void cedar::dev::robot::DifferentialDrive::setWheelSpeed(std::vector<double>& wheelSpeed)
 {
-    //construct the vector to return
-    std::vector<double> velocity;
-    velocity.resize(2);
+  double forward_velocity = 0;
+  double turning_rate = 0;
 
-    //the calculation
-    velocity[0] = (rightWheelSpeed + leftWheelSpeed) / 2;
-    velocity[1] = (rightWheelSpeed - leftWheelSpeed) / this->getWheelDistance();
-
-    return velocity;
+  convertToForwardVelocityAndTurningRate(wheelSpeed[0], wheelSpeed[1], forward_velocity, turning_rate);
+  setForwardVelocityAndTurningRate(forward_velocity, turning_rate);
 }
 
-std::vector<double> cedar::dev::robot::DifferentialDrive::calculateWheelSpeed
-                    (
-                      double forwardVelocity,
-                      double turningRate
-                    )
+void cedar::dev::robot::DifferentialDrive::setForwardVelocity(double forwardVelocity)
 {
-  //construct the vector to return
-  std::vector<double> wheel_speed;
-  wheel_speed.resize(2);
-
-  //the calculation
-  wheel_speed[0] = forwardVelocity - turningRate * this->getWheelDistance() / 2;
-  wheel_speed[1] = forwardVelocity + turningRate * this->getWheelDistance() / 2;
-
-  return wheel_speed;
+  setForwardVelocityAndTurningRate(forwardVelocity, getTurningRate());
 }
 
-int cedar::dev::robot::DifferentialDrive::setVelocity(double forwardVelocity, double turningRate)
+void cedar::dev::robot::DifferentialDrive::setTurningRate(double turningRate)
 {
-  std::vector<double> wheel_speed;
-  wheel_speed.resize(2);
-
-  //calculate and set the wheel speed
-  wheel_speed = calculateWheelSpeed(forwardVelocity, turningRate);
-  int s = setWheelSpeed(wheel_speed[0], wheel_speed[1]);
-  if (s == 0 && this->debug()) // setting wheel speed failed
-  {
-    std::cout << "DifferentialDrive: Error Setting Velocity\n";
-  }
-
-  return s;
+  setForwardVelocityAndTurningRate(getForwardVelocity(), turningRate);
 }
 
-int cedar::dev::robot::DifferentialDrive::setForwardVelocity(double forwardVelocity)
+void cedar::dev::robot::DifferentialDrive::setForwardVelocityAndTurningRate
+     (
+       double forwardVelocity,
+       double turningRate
+     )
 {
-  std::vector<double> wheel_speed;
-  wheel_speed.resize(2);
+  thresholdForwardVelocity(forwardVelocity);
+  thresholdTurningRate(turningRate);
 
-  //calculate and set the wheel speed
-  wheel_speed = calculateWheelSpeed(forwardVelocity, mVelocity[1]);
-  int s = setWheelSpeed(wheel_speed[0], wheel_speed[1]);
-  if (s == 0 && this->debug()) //setting wheel speed failed
-  {
-    std::cout << "DifferentialDrive: Error Setting Forward Velocity\n";
-  }
+  double left_wheel_speed = 0;
+  double right_wheel_speed = 0;
+  convertToWheelSpeed(forwardVelocity, turningRate, left_wheel_speed, right_wheel_speed);
+  thresholdToHardwareLimits(left_wheel_speed, right_wheel_speed);
+  mWheelSpeed[0] = left_wheel_speed;
+  mWheelSpeed[1] = right_wheel_speed;
 
-  return s;
+  convertToForwardVelocityAndTurningRate(left_wheel_speed, right_wheel_speed, mForwardVelocity, mTurningRate);
+  sendMovementCommand();
 }
 
-int cedar::dev::robot::DifferentialDrive::setTurningRate(double turningRate)
+void cedar::dev::robot::DifferentialDrive::thresholdToHardwareLimits
+     (
+       double& leftWheelSpeed,
+       double& rightWheelSpeed
+     )
 {
-  std::vector<double> wheel_speed;
-  wheel_speed.resize(2);
-
-  //calculate and set the wheel speed
-  wheel_speed = calculateWheelSpeed(mVelocity[0], turningRate);
-  int s = setWheelSpeed(wheel_speed[0], wheel_speed[1]);
-  if (s == 0 && this->debug())  //setting wheel speed failed
-  {
-    std::cout << "DifferentialDrive: Error Setting Turning Rate\n";
-  }
-
-  return s;
+  leftWheelSpeed = _mHardwareSpeedLimits->getValue().limit(leftWheelSpeed);
+  rightWheelSpeed = _mHardwareSpeedLimits->getValue().limit(rightWheelSpeed);
 }
 
-double cedar::dev::robot::DifferentialDrive::getMaximalWheelSpeed() const
+void cedar::dev::robot::DifferentialDrive::convertToWheelSpeed
+     (
+       double forwardVelocity,
+       double turningRate,
+       double& leftWheelSpeed,
+       double& rightWheelSpeed
+     ) const
 {
-  return mMaximalWheelSpeed;
+  leftWheelSpeed = forwardVelocity - turningRate * _mWheelDistance->getValue() / 2.0;
+  rightWheelSpeed = forwardVelocity + turningRate * _mWheelDistance->getValue() / 2.0;
+}
+
+void cedar::dev::robot::DifferentialDrive::convertToForwardVelocityAndTurningRate
+     (
+       double leftWheelSpeed,
+       double rightWheelSpeed,
+       double& forwardVelocity,
+       double& turningRate
+     ) const
+{
+  forwardVelocity = (rightWheelSpeed + leftWheelSpeed) / 2.0;
+  turningRate = (rightWheelSpeed - leftWheelSpeed) / _mWheelDistance->getValue();
 }
