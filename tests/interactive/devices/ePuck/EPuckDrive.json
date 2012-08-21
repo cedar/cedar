@@ -1,9 +1,0 @@
-{
-  "wheel distance": "0.053",
-  "wheel radius": "0.0205",
-  "pulses per revolution": "1000.0",
-  "maximum encoder value": "32767",
-  "minimal encoder value": "-32768",
-  "maximum number of pulses per second": "1000",
-  "debug": "false"
-}

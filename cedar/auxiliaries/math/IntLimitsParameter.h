@@ -22,39 +22,24 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        serialCommunicationTest.cpp
+    File:        DoubleLimitsParameter.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2012 04 13
 
-    Description: Interactive test-program for the SerialCommunication class.
+    Description: This is a dummy header for the typedef IntLimitsParameter (which is actually a
+                 cedar::aux::math::LimitsParameter<int>).
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_AUX_MATH_INT_LIMITS_PARAMETER_H
+#define CEDAR_AUX_MATH_INT_LIMITS_PARAMETER_H
+
 // CEDAR INCLUDES
-#include "cedar/devices/communication/SerialCommunication.h"
-#include "cedar/devices/communication/gui/CommunicationWidget.h"
+#include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/math/LimitsParameter.h"
 
-// SYSTEM INCLUDES
-#include <QApplication>
-
-int main(int argc, char **argv)
-{
-  //open the channel
-  cedar::dev::com::SerialCommunicationPtr communication(new cedar::dev::com::SerialCommunication());
-  communication->readJson("SerialCommunicationConfig.json");
-
-  // create the GUI
-  cedar::dev::com::gui::CommunicationWidgetPtr
-    communication_widget(new cedar::dev::com::gui::CommunicationWidget(communication));
-  communication_widget->show();
-
-  //start the program
-  QApplication application(argc, argv);
-  application.exec();
-
-  return 0;
-}
+#endif // CEDAR_AUX_MATH_INT_LIMITS_PARAMETER_H

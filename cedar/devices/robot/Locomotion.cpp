@@ -35,55 +35,60 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
+#include "cedar/auxiliaries/math/constants.h"
 #include "cedar/devices/robot/Locomotion.h"
 
 // SYSTEM INCLUDES
-#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
 cedar::dev::robot::Locomotion::Locomotion()
 :
-_mDebug(new cedar::aux::BoolParameter(this, "debug", false))
-{
-  mVelocity.resize(2);
-  mVelocity[0] = 0;
-  mVelocity[1] = 0;
-}
+_mForwardVelocityLimits
+(
+  new cedar::aux::math::DoubleLimitsParameter(this, "forward velocity limits", -2.0, 2.0, 2.0, 4.0)
+),
+_mTurningRateLimits
+(
+  new cedar::aux::math::DoubleLimitsParameter
+      (
+        this,
+        "turning rate limits",
+        -2.0 * cedar::aux::math::pi,
+        0.0,
+        0.0,
+        2.0 * cedar::aux::math::pi
+      )
+)
+{}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-const std::vector<double>& cedar::dev::robot::Locomotion::getVelocity() const
-{
-  return mVelocity;
-}
-
 double cedar::dev::robot::Locomotion::getForwardVelocity() const
 {
-  CEDAR_DEBUG_ASSERT(this->mVelocity.size() > 0);
-  return mVelocity[0];
+  return mForwardVelocity;
 }
 
 double cedar::dev::robot::Locomotion::getTurningRate() const
 {
-  CEDAR_DEBUG_ASSERT(this->mVelocity.size() > 1);
-  return mVelocity[1];
+  return mTurningRate;
 }
 
-int cedar::dev::robot::Locomotion::stop()
+void cedar::dev::robot::Locomotion::thresholdForwardVelocity(double& forwardVelocity) const
 {
-  int s = setVelocity(0,0); //stop by setting both forward velocity and turning rate to 0
-  if (s == 0 && this->debug()) //setting velocity failed
-  {
-    std::cout << "Locomotion: Error Stopping Robot\n";
-  }
-  else if (this->debug())
-  {
-    std::cout << "Locomotion: Stopping Robot Successful\n";
-  }
-  return s;
+  forwardVelocity = _mForwardVelocityLimits->getValue().limit(forwardVelocity);
+}
+
+void cedar::dev::robot::Locomotion::thresholdTurningRate(double& turningRate) const
+{
+  turningRate = _mTurningRateLimits->getValue().limit(turningRate);
+}
+
+void cedar::dev::robot::Locomotion::stop()
+{
+  setForwardVelocityAndTurningRate(0.0, 0.0);
 }
