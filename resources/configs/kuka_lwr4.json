@@ -2,8 +2,8 @@
   "name": "KUKA lwr4",
   "server port": "0",
   "remote host": "NULL",
-  "step size": "0.0",
-  "idle time": "0.000",
+  "step size": "20.0",
+  "idle time": "0.001",
   "use fixed step size": "false",
   "simulated time": "0.0",
   "root coordinate frame":
@@ -42,13 +42,13 @@
     {
       "angle limits":
       {
-        "lower limit": "-3.1415927",
-        "upper limit": "3.1415927"
+        "lower limit": "-2.97",
+        "upper limit": "2.97"
       },
       "velocity limits":
       {
-        "lower limit": "-5.0",
-        "upper limit": "5.0"
+        "lower limit": "-1.92",
+        "upper limit": "1.92"
       },
       "position":
       [
@@ -67,13 +67,13 @@
     {
       "angle limits":
       {
-        "lower limit": "-3.1415927",
-        "upper limit": "3.1415927"
+        "lower limit": "-2.09",
+        "upper limit": "2.09"
       },
       "velocity limits":
       {
-        "lower limit": "-5.0",
-        "upper limit": "5.0"
+        "lower limit": "-1.92",
+        "upper limit": "1.92"
       },
       "position":
       [
@@ -92,13 +92,13 @@
     {
       "angle limits":
       {
-        "lower limit": "-3.1415927",
-        "upper limit": "3.1415927"
+        "lower limit": "-2.97",
+        "upper limit": "2.97"
       },
       "velocity limits":
       {
-        "lower limit": "-5.0",
-        "upper limit": "5.0"
+        "lower limit": "-2.27",
+        "upper limit": "2.27"
       },
       "position":
       [
@@ -117,13 +117,13 @@
     {
       "angle limits":
       {
-        "lower limit": "-3.1415927",
-        "upper limit": "3.1415927"
+        "lower limit": "-2.09",
+        "upper limit": "2.09"
       },
       "velocity limits":
       {
-        "lower limit": "-5.0",
-        "upper limit": "5.0"
+        "lower limit": "-2.27",
+        "upper limit": "2.27"
       },
       "position":
       [
@@ -142,13 +142,13 @@
     {
       "angle limits":
       {
-        "lower limit": "-3.1415927",
-        "upper limit": "3.1415927"
+        "lower limit": "-2.96",
+        "upper limit": "2.97"
       },
       "velocity limits":
       {
-        "lower limit": "-5.0",
-        "upper limit": "5.0"
+        "lower limit": "-2.27",
+        "upper limit": "2.27"
       },
       "position":
       [
@@ -167,13 +167,13 @@
     {
       "angle limits":
       {
-        "lower limit": "-3.1415927",
-        "upper limit": "3.1415927"
+        "lower limit": "-2.09",
+        "upper limit": "2.09"
       },
       "velocity limits":
       {
-        "lower limit": "-5.0",
-        "upper limit": "5.0"
+        "lower limit": "-3.14159",
+        "upper limit": "3.14159"
       },
       "position":
       [
@@ -192,13 +192,13 @@
     {
       "angle limits":
       {
-        "lower limit": "-3.1415927",
-        "upper limit": "3.1415927"
+        "lower limit": "-2.97",
+        "upper limit": "2.97"
       },
       "velocity limits":
       {
-        "lower limit": "-5.0",
-        "upper limit": "5.0"
+        "lower limit": "-3.14159",
+        "upper limit": "3.14159"
       },
       "position":
       [
@@ -215,3 +215,4 @@
     }
   }
 }
+
