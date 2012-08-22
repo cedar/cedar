@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -22,95 +22,109 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraDevice.h
+    File:        DeBayerFilter.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 07 04
 
-    Description:  Header for the cedar::dev::sensors::visual::CameraDevice class
+    Description:  Header for DeBayerFilter enum-type class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_DEVICE_VFL_H
-#define CEDAR_DEV_SENSORS_VISUAL_CAMERA_DEVICE_VFL_H
+#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_DEBAYERFILTER_H
+#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_DEBAYERFILTER_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/EnumType.h"
 #include "cedar/devices/sensors/visual/namespace.h"
-#include "cedar/devices/sensors/visual/camera/backends/CameraDevice.h"
 
 // SYSTEM INCLUDES
+//#include <opencv2/opencv.hpp>
 
-
-/*!@brief Base class of the misc camera grabber backends.
+/*!@brief Enum class to determine the applied bayer pattern (if needed)
  *
- * Implements the common features of a camera device
+ *  For all available filters have a look at:
+ *    <OPENCV>/modules/imgproc/include/opencv2/imgproc/types_c.h
+ *
+ *  cv::Mat stores the images in BGR format, so only that filters mapped here
+ *
  */
-class cedar::dev::sensors::visual::CameraDeviceVfl
-:
-public cedar::dev::sensors::visual::CameraDevice
+class cedar::dev::sensors::visual::DeBayerFilter
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // typedefs
   //--------------------------------------------------------------------------------------------------------------------
+//!@cond SKIPPED_DOCUMENTATION
+public:
+  typedef cedar::aux::EnumId Id;
+public:
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+
+private:
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  CameraDeviceVfl
-  (
-    cedar::dev::sensors::visual::CameraChannelPtr pCameraChannel
-  );
 
   //!@brief Destructor
-  ~CameraDeviceVfl();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  static void construct();
+
+  static const cedar::aux::EnumBase& type();
+  static const cedar::dev::sensors::visual::DeBayerFilter::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void fillCapabilities();
-  void applySettingsToCamera();
-  bool createCaptureDevice();
-  void applyStateToCamera();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  static cedar::aux::EnumType<cedar::dev::sensors::visual::DeBayerFilter> mType;
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+
+  /// No bayer filter applied
+  static const Id NONE = 0;
+
+  /// Apply  bayer filter Blue-Green to BGR
+  static const Id BG_TO_BGR = CV_BayerBG2BGR; //= 46;
+
+  /// Apply  bayer filter Green-Blue to BGR
+  static const Id GB_TO_BGR = CV_BayerGB2BGR; // = 47;
+
+  /// Apply  bayer filter Red-Green to BGR
+  static const Id RG_TO_BGR = CV_BayerRG2BGR; // = 48;
+
+  /// Apply  bayer filter Green-Red to BGR
+  static const Id GR_TO_BGR = CV_BayerGR2BGR; // = 49;
+
 protected:
   // none yet
 private:
   // none yet
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
+}; // cedar::dev::sensors::visual::DeBayerFilter
 
-private:
-  // none yet
 
-}; // class cedar::dev::sensors::visual::CameraDeviceVfl
-
-#endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_DEVICE_VFL_H
+#endif // EDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_DEBAYERFILTER_H
 

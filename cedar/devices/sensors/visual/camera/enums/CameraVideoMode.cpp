@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -37,7 +37,7 @@
 #include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/camera/CameraVideoMode.h"
+#include "cedar/devices/sensors/visual/camera/enums/CameraVideoMode.h"
 
 // SYSTEM INCLUDES
 
@@ -49,52 +49,52 @@ cedar::aux::EnumType<cedar::dev::sensors::visual::CameraVideoMode>
 #ifndef CEDAR_COMPILER_MSVC
 //supported video modes by number
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_NOT_SET;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_0 ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_1 ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_2 ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_3 ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_4 ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_5 ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_6 ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_7 ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_8 ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_9 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::NUM_0 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::NUM_1 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::NUM_2 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::NUM_3 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::NUM_4 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::NUM_5 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::NUM_6 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::NUM_7 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::NUM_8 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::NUM_9 ;
 
 #ifdef CEDAR_USE_LIB_DC1394
 //firewire modes by name
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_160x120_YUV444  ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_320x240_YUV422  ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_640x480_YUV411  ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_640x480_YUV422  ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_640x480_RGB8    ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_640x480_MONO8   ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_640x480_MONO16  ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_800x600_YUV422  ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_800x600_RGB8    ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_800x600_MONO8   ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1024x768_YUV422 ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1024x768_RGB8   ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1024x768_MONO8  ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_800x600_MONO16  ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1024x768_MONO16 ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1280x960_YUV422 ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1280x960_RGB8   ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1280x960_MONO8  ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1600x1200_YUV422;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1600x1200_RGB8  ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1600x1200_MONO8 ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1280x960_MONO16 ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1600x1200_MONO16;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_EXIF ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_160x120_YUV444  ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_320x240_YUV422  ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_640x480_YUV411  ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_640x480_YUV422  ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_640x480_RGB8    ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_640x480_MONO8   ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_640x480_MONO16  ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_800x600_YUV422  ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_800x600_RGB8    ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_800x600_MONO8   ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_1024x768_YUV422 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_1024x768_RGB8   ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_1024x768_MONO8  ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_800x600_MONO16  ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_1024x768_MONO16 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_1280x960_YUV422 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_1280x960_RGB8   ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_1280x960_MONO8  ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_1600x1200_YUV422;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_1600x1200_RGB8  ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_1600x1200_MONO8 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_1280x960_MONO16 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_1600x1200_MONO16;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_EXIF ;
 /*
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_0 ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_1 ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_2 ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_3 ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_4 ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_5 ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_6 ;
-const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_7 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_FORMAT7_0 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_FORMAT7_1 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_FORMAT7_2 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_FORMAT7_3 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_FORMAT7_4 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_FORMAT7_5 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_FORMAT7_6 ;
+const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::FW_FORMAT7_7 ;
 */
 #endif //CEDAR_USE_LIB_DC1394
 #endif // CEDAR_COMPILER_MSVC
@@ -113,217 +113,217 @@ void cedar::dev::sensors::visual::CameraVideoMode::construct()
                                       "auto"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_0,
+                                      cedar::dev::sensors::visual::CameraVideoMode::NUM_0,
                                       "MODE_BY_NUM_0",
                                       "First available"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_1,
+                                      cedar::dev::sensors::visual::CameraVideoMode::NUM_1,
                                       "MODE_BY_NUM_1",
                                       "Second available"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_2,
+                                      cedar::dev::sensors::visual::CameraVideoMode::NUM_2,
                                       "MODE_BY_NUM_2",
                                       "Third available"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_3,
+                                      cedar::dev::sensors::visual::CameraVideoMode::NUM_3,
                                       "MODE_BY_NUM_3",
                                       "Fourth available"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_4,
+                                      cedar::dev::sensors::visual::CameraVideoMode::NUM_4,
                                       "MODE_BY_NUM_4",
                                       "Fifth available"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_5,
+                                      cedar::dev::sensors::visual::CameraVideoMode::NUM_5,
                                       "MODE_BY_NUM_5",
                                       "Sixth available"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_6,
+                                      cedar::dev::sensors::visual::CameraVideoMode::NUM_6,
                                       "MODE_BY_NUM_6",
                                       "Seventh available"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_7,
+                                      cedar::dev::sensors::visual::CameraVideoMode::NUM_7,
                                       "MODE_BY_NUM_7",
                                       "Eighth available"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_8,
+                                      cedar::dev::sensors::visual::CameraVideoMode::NUM_8,
                                       "MODE_BY_NUM_8",
                                       "Nineth available"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_9,
+                                      cedar::dev::sensors::visual::CameraVideoMode::NUM_9,
                                       "MODE_BY_NUM_9",
                                       "Tenth available"
                                     ));
 
 #ifdef CEDAR_USE_LIB_DC1394
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_160x120_YUV444,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_160x120_YUV444,
                                       "MODE_FW_160x120_YUV444",
                                       "160x120_YUV444"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_320x240_YUV422,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_320x240_YUV422,
                                       "MODE_FW_320x240_YUV422",
                                       "320x240_YUV422"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_640x480_YUV411,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_640x480_YUV411,
                                       "MODE_FW_640x480_YUV411",
                                       "640x480_YUV411"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_640x480_YUV422,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_640x480_YUV422,
                                       "MODE_FW_640x480_YUV422",
                                       "640x480_YUV422"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_640x480_RGB8,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_640x480_RGB8,
                                       "MODE_FW_640x480_RGB8",
                                       "640x480_RGB8"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_640x480_MONO8,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_640x480_MONO8,
                                       "MODE_FW_640x480_MONO8",
                                       "640x480_MONO8"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_640x480_MONO16,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_640x480_MONO16,
                                       "MODE_FW_640x480_MONO16",
                                       "640x480_MONO16"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_800x600_YUV422,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_800x600_YUV422,
                                       "MODE_FW_800x600_YUV422",
                                       "800x600_YUV422"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_800x600_RGB8,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_800x600_RGB8,
                                       "MODE_FW_800x600_RGB8",
                                       "800x600_RGB8"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_800x600_MONO8,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_800x600_MONO8,
                                       "MODE_FW_800x600_MONO8",
                                       "800x600_MONO8"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1024x768_YUV422,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_1024x768_YUV422,
                                       "MODE_FW_1024x768_YUV422",
                                       "1024x768_YUV422"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1024x768_RGB8,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_1024x768_RGB8,
                                       "MODE_FW_1024x768_RGB8",
                                       "1024x768_RGB8"
                                     ));
 
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1024x768_MONO8,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_1024x768_MONO8,
                                       "MODE_FW_1024x768_MONO8",
                                       "1024x768_MONO8"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_800x600_MONO16,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_800x600_MONO16,
                                       "MODE_FW_800x600_MONO16",
                                       "MODE_FW_800x600_MONO16"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1024x768_MONO16,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_1024x768_MONO16,
                                       "MODE_FW_1024x768_MONO16",
                                       "1024x768_MONO16"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1280x960_YUV422,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_1280x960_YUV422,
                                       "MODE_FW_1280x960_YUV422",
                                       "1280x960_YUV422"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1280x960_RGB8,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_1280x960_RGB8,
                                       "MODE_FW_1280x960_RGB8",
                                       "1280x960_RGB8"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1280x960_MONO8,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_1280x960_MONO8,
                                       "MODE_FW_1280x960_MONO8",
                                       "1280x960_MONO8"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1600x1200_YUV422,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_1600x1200_YUV422,
                                       "MODE_FW_1600x1200_YUV422",
                                       "1600x1200_YUV422"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1600x1200_RGB8,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_1600x1200_RGB8,
                                       "MODE_FW_1600x1200_RGB8",
                                       "1600x1200_RGB8"
                                     ));
 
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1600x1200_MONO8,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_1600x1200_MONO8,
                                       "MODE_FW_1600x1200_MONO8",
                                       "1600x1200_MONO8"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1280x960_MONO16,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_1280x960_MONO16,
                                       "MODE_FW_1280x960_MONO16",
                                       "1280x960_MONO16"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_1600x1200_MONO16,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_1600x1200_MONO16,
                                       "MODE_FW_1600x1200_MONO16",
                                       "1600x1200_MONO16"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_EXIF,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_EXIF,
                                       "MODE_FW_EXIF",
                                       "EXIF"
                                     ));
   /*
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_0,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_FORMAT7_0,
                                       "MODE_FW_FORMAT7_0",
                                       "MODE_FW_FORMAT7_0"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_1,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_FORMAT7_1,
                                       "MODE_FW_FORMAT7_1",
                                       "MODE_FW_FORMAT7_1"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_2,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_FORMAT7_2,
                                       "MODE_FW_FORMAT7_2",
                                       "MODE_FW_FORMAT7_2"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_3,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_FORMAT7_3,
                                       "MODE_FW_FORMAT7_3",
                                       "MODE_FW_FORMAT7_3"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_4,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_FORMAT7_4,
                                       "MODE_FW_FORMAT7_4",
                                       "MODE_FW_FORMAT7_4"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_5,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_FORMAT7_5,
                                       "MODE_FW_FORMAT7_5",
                                       "MODE_FW_FORMAT7_5"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_6,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_FORMAT7_6,
                                       "MODE_FW_FORMAT7_6",
                                       "MODE_FW_FORMAT7_6"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_7,
+                                      cedar::dev::sensors::visual::CameraVideoMode::FW_FORMAT7_7,
                                       "MODE_FW_FORMAT7_7",
                                       "MODE_FW_FORMAT7_7"
                                     ));

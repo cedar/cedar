@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,35 +22,48 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraIsoSpeed.h
+    File:        CameraSetting.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
-    Description:  Header for CameraIsoSpeed enum-type class
+    Description:  Header for CameraProperty enum-type class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_ISO_SPEED_H
-#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_ISO_SPEED_H
+#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTING_H
+#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTING_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
-
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/devices/sensors/visual/namespace.h"
 
 // SYSTEM INCLUDES
+#include <opencv2/highgui/highgui_c.h>
+
+//--------------------------------------------------------------------------------------------------------------------
+//(re)defines of our new introduced properties in OpenCV:
+//delete this, if the patched OpenCV is available
+//#ifndef CV_CAP_PROP_ISO_SPEED
+//  #define CV_CAP_PROP_ISO_SPEED 30
+//#endif
 
 
-/*!@brief Enum class for firewire ISO-speed
+/*!@brief Enum class for camera settings.
  *
- * Use this type for the CameraGrabber::setCameraInitIsoSpeed() and getCameraInitIsoSpeed() method
+ * Use this type for the CameraGrabber::setCameraSetting() and CameraGrabber::getCameraSetting() method
+ *
+ * @remarks
+ *  This constants are direct mapped from opencv2/highgui/highui_c.h
+ *
  */
-class cedar::dev::sensors::visual::CameraIsoSpeed
+class cedar::dev::sensors::visual::CameraSetting
 {
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
@@ -72,12 +85,12 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public:  
+public:
   static void construct();
 
   static const cedar::aux::EnumBase& type();
-  static const cedar::dev::sensors::visual::CameraIsoSpeed::TypePtr& typePtr(); 
-  
+  static const cedar::dev::sensors::visual::CameraSetting::TypePtr& typePtr();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -88,43 +101,41 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraIsoSpeed> mType;
+  static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraSetting> mType;
   //!@endcond
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  /*! @brief Allow OpenCV backend to set the ISO-speed of the firewire bus.
+  /*! @brief Set the framerate through the CameraGrabber::setCameraSetting() method
    *
-   *  Set the ISO-speed manually with the CameraGrabber::setCameraIsoSpeed() method.
+   *  This constants are the available settings for the used camera
    *
-   *  @remarks
-   *  As every setting, this can only be done before the first frame was grabbed.
+   *  If you use a firewire camera, this settings can only be applied on startup, i.e. before the first picture
+   *  is grabbed with the CameraGrabber::grab() method.
    */
+  static const Id FPS = CV_CAP_PROP_FPS; // 5;
+  /// @see SETTING_FPS
+  static const Id FRAME_WIDTH = CV_CAP_PROP_FRAME_WIDTH; // 3;
+  /// @see SETTING_FPS
+  static const Id FRAME_HEIGHT = CV_CAP_PROP_FRAME_HEIGHT; // 4;
+  /// @see SETTING_FPS
+  static const Id MODE = CV_CAP_PROP_MODE; // 9;
 
-  static const Id ISO_NOT_SET = UINT_MAX-2;
+#ifdef CEDAR_USE_LIB_DC1394
+  /// @see SETTING_FPS
+  static const Id ISO_SPEED = CV_CAP_PROP_ISO_SPEED; // 30
+#endif
 
-  /// @brief Set the ISO-speed to 100
-  static const Id ISO_100 = 100;
-  /// @see ISO_100
-  static const Id ISO_200 = 200;
-  /// @see ISO_100
-  static const Id ISO_400 = 400;
-  /// @see ISO_100
-  static const Id ISO_800 = 800;
-  /// @see ISO_100
-  static const Id ISO_1600 = 1600;
-  /// @see ISO_100
-  static const Id ISO_3200 = 3200;
-
-    
 protected:
   // none yet
 private:
   // none yet
 
-}; // cedar::dev::sensors::visual::CameraIsoSpeed
 
-#endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_ISO_SPEED_H
+}; // cedar::dev::sensors::visual::CameraSetting
+
+#endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTING_H
 

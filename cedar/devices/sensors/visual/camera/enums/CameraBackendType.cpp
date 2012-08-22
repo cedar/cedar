@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/camera/CameraBackendType.h"
+#include "cedar/devices/sensors/visual/camera/enums/CameraBackendType.h"
 
 // SYSTEM INCLUDES
 
@@ -53,7 +53,7 @@ const cedar::dev::sensors::visual::CameraBackendType::Id cedar::dev::sensors::vi
 
 #ifdef CEDAR_USE_LIB_DC1394
 const cedar::dev::sensors::visual::CameraBackendType::Id cedar::dev::sensors::visual::CameraBackendType::DC1394;
-#endif
+#endif //CEDAR_USE_LIB_DC1394
 
 const cedar::dev::sensors::visual::CameraBackendType::Id cedar::dev::sensors::visual::CameraBackendType::VFL;
 #endif // CEDAR_COMPILER_MSVC
@@ -67,27 +67,27 @@ void cedar::dev::sensors::visual::CameraBackendType::construct()
 {
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraBackendType::AUTO,
-                                      "BACKEND_AUTO",
+                                      "AUTO",
                                       "auto"
                                     ));
 
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraBackendType::CVCAPTURE,
                                       "CVCAPTURE",
-                                      "cv::VideoCapture"
+                                      "OpenCV (cv::VideoCapture)"
                                     ));
 #ifdef CEDAR_USE_LIB_DC1394
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraBackendType::DC1394,
-                                      "BACKEND_DC1394",
-                                      "DC1394 (firewire)"
+                                      "DC1394",
+                                      "DC1394 (libdc1394, Firewire)"
                                     ));
-#endif
+#endif //CEDAR_USE_LIB_DC1394
 
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraBackendType::VFL,
                                       "VFL",
-                                      "VFL (video for linux)"
+                                      "VfL (Video for Linux)"
                                     ));
 }
 //----------------------------------------------------------------------------------------------------------------------

@@ -88,6 +88,7 @@ mTimeElapsed(0.0)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
+  // on creation, create also the videograbber. It doesn't matter if the file is valid.
   cedar::dev::sensors::visual::VideoGrabberPtr grabber;
   grabber = cedar::dev::sensors::visual::VideoGrabberPtr
             (
@@ -173,7 +174,6 @@ void cedar::proc::sources::Video::compute(const cedar::proc::Arguments &argument
 void cedar::proc::sources::Video::updateVideo()
 {
   this->mImage->setData(this->getVideoGrabber()->getImage());
-  this->annotateImage();
   mFrameDuration = 1000/this->getVideoGrabber()->getFps();
   mTimeElapsed = 0.0;
   mRecording->setValue(this->getVideoGrabber()->isRecording());
