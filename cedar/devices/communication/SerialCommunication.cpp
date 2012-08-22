@@ -482,8 +482,13 @@ void cedar::dev::com::SerialCommunication::close()
 {
   int status = ::close(mFileDescriptor);
 
+  if (status != 0)
+  {
+    std::string exception_message = "Error closing port '" + getDevicePath() + "'";
+    CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message);
+  }
 #ifdef DEBUG
-  if (status == 0)
+  else
   {
     cedar::aux::LogSingleton::getInstance()->debugMessage
     (
@@ -492,16 +497,5 @@ void cedar::dev::com::SerialCommunication::close()
       "Serial communication closed"
     );
   }
-  else
-  {
-    std::string message = "Error closing port '" + getDevicePath() + "'\n";
-
-    cedar::aux::LogSingleton::getInstance()->error
-    (
-      message,
-      "cedar::dev::com::SerialCommunication",
-      "Error closing port"
-    );
-  }
-#endif // CEDAR_OS_WINDOWS
+#endif // DEBUG
 }

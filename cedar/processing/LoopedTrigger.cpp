@@ -46,7 +46,6 @@
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
-#include "cedar/auxiliaries/System.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES

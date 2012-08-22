@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        System.cpp
+    File:        systemFunctions.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
     Date:        2011 07 26
 
-    Description:
+    Description: Functions that depend on the operating system.
 
     Credits:
 
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/System.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/exceptions.h"
 
@@ -60,17 +60,10 @@
 #include "cedar/internals.h"
 #undef CEDAR_INTERNAL
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
-void cedar::aux::System::openCrashFile(std::ofstream& stream, std::string& crash_file)
+void cedar::aux::openCrashFile(std::ofstream& stream, std::string& crash_file)
 {
-  crash_file = cedar::aux::System::getUserHomeDirectory() + "/.cedar/crashes/";
+  crash_file = cedar::aux::getUserHomeDirectory() + "/.cedar/crashes/";
   boost::filesystem::create_directories(crash_file);
   const boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
   crash_file += "processingIde.";
@@ -79,7 +72,7 @@ void cedar::aux::System::openCrashFile(std::ofstream& stream, std::string& crash
   stream.open(crash_file.c_str());
 }
 
-std::string cedar::aux::System::getUserHomeDirectory()
+std::string cedar::aux::getUserHomeDirectory()
 {
 #ifdef CEDAR_OS_UNIX
   std::string homedir = getenv("HOME");
@@ -103,10 +96,10 @@ std::string cedar::aux::System::getUserHomeDirectory()
 #endif // CEDAR_OS_UNIX
 }
 
-std::string cedar::aux::System::getUserApplicationDataDirectory()
+std::string cedar::aux::getUserApplicationDataDirectory()
 {
 #ifdef CEDAR_OS_UNIX
-  return cedar::aux::System::getUserHomeDirectory();
+  return cedar::aux::getUserHomeDirectory();
 #elif defined CEDAR_OS_WINDOWS
   LPWSTR path = NULL;
   if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_CREATE, 0, &path)))
@@ -126,8 +119,9 @@ std::string cedar::aux::System::getUserApplicationDataDirectory()
 #endif // CEDAR_OS_WINDOWS
 }
 
-std::string cedar::aux::System::locateResource(const std::string& resourcePath)
+std::string cedar::aux::locateResource(const std::string& resourcePath)
 {
+  std::string function_name = "cedar::aux::locateResource";
   std::string in_home = CEDAR_HOME_DIRECTORY "/resources/" + resourcePath;
   std::string in_install = CEDAR_RESOURCE_INSTALL_DIR "/" + resourcePath;
   std::string cedar_resource_path;
@@ -139,7 +133,7 @@ std::string cedar::aux::System::locateResource(const std::string& resourcePath)
   
   if (boost::filesystem::exists(resourcePath))
   {
-    cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" locally.", "cedar::aux::System::locateResource");
+    cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" locally.", function_name);
     return resourcePath;
   }
   
@@ -149,25 +143,25 @@ std::string cedar::aux::System::locateResource(const std::string& resourcePath)
     static bool notified_about_this = false;
     if (!notified_about_this)
     {
-      cedar::aux::LogSingleton::getInstance()->systemInfo("Using CEDAR_RESOURCE_PATH for finding resources.", "cedar::aux::System::locateResource");
+      cedar::aux::LogSingleton::getInstance()->systemInfo("Using CEDAR_RESOURCE_PATH for finding resources.", function_name);
       notified_about_this = true;
     }
     std::string path = cedar_resource_path + "/" + resourcePath;
     if (boost::filesystem::exists(path))
     {
-      cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + path + "\".", "cedar::aux::System::locateResource");
+      cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + path + "\".", function_name);
       return path;
     }
   }
   
   if (boost::filesystem::exists(in_home))
   {
-    cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + in_home + "\".", "cedar::aux::System::locateResource");
+    cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + in_home + "\".", function_name);
     return in_home;
   }
   if (boost::filesystem::exists(in_install))
   {
-    cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + in_install + "\".", "cedar::aux::System::locateResource");
+    cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + in_install + "\".", function_name);
     return in_install;
   }
   

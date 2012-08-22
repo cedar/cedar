@@ -41,7 +41,7 @@
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/VectorParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/System.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
@@ -290,7 +290,7 @@ cedar::proc::gui::Settings& cedar::proc::gui::Settings::instance()
 
 void cedar::proc::gui::Settings::load()
 {
-  std::string path = cedar::aux::System::getUserApplicationDataDirectory() + "/.cedar/processingGui";
+  std::string path = cedar::aux::getUserApplicationDataDirectory() + "/.cedar/processingGui";
   try
   {
     this->readJson(path);
@@ -306,7 +306,7 @@ void cedar::proc::gui::Settings::save()
 {
   if (!mWritingDisabled)
   {
-    std::string path = cedar::aux::System::getUserApplicationDataDirectory() + "/.cedar/processingGui";
+    std::string path = cedar::aux::getUserApplicationDataDirectory() + "/.cedar/processingGui";
     try
     {
       this->writeJson(path);

@@ -28,14 +28,14 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
     Date:        2012 02 14
 
-    Description: Implements all unit tests for the @em cedar::aux::LogFile class.
+    Description: Implements all unit tests for the system functions in cedar::aux.
 
     Credits:
 
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/System.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 
 // PROJECT INCLUDES
 
@@ -44,6 +44,6 @@
 
 int main()
 {
-  std::cout << "Finding resource test: " << cedar::aux::System::locateResource("configs/test.txt") << std::endl;
+  std::cout << "Finding resource test: " << cedar::aux::locateResource("configs/cora_arm.json") << std::endl;
   return 0;
 }
