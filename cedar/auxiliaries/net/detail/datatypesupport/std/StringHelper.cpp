@@ -1,6 +1,6 @@
 /*=============================================================================
 
-    Copyright 2011 Institut fuer Neuroinforsik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinforsik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
