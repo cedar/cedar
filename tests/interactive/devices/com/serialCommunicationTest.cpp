@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/System.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/devices/communication/SerialCommunication.h"
 #include "cedar/devices/communication/gui/CommunicationWidget.h"
 
@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 {
   //open the channel
   cedar::dev::com::SerialCommunicationPtr communication(new cedar::dev::com::SerialCommunication());
-  std::string serial_communication_config = cedar::aux::System::locateResource("configs/serial_communication.json");
+  std::string serial_communication_config = cedar::aux::locateResource("configs/serial_communication.json");
   communication->readJson(serial_communication_config);
 
   // create the GUI

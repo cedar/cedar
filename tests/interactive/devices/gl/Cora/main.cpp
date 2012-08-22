@@ -38,7 +38,7 @@
 #include "cedar/devices/robot/gl/CoraArm.h"
 #include "cedar/devices/robot/gl/CoraHead.h"
 #include "cedar/devices/robot/gui/KinematicChainWidget.h"
-#include "cedar/auxiliaries/System.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gui/SceneWidget.h"
@@ -50,8 +50,8 @@
 
 int main(int argc, char **argv)
 {
-  std::string arm_configuration_file = cedar::aux::System::locateResource("configs/cora_arm.json");
-  std::string head_configuration_file = cedar::aux::System::locateResource("configs/cora_head.json");
+  std::string arm_configuration_file = cedar::aux::locateResource("configs/cora_arm.json");
+  std::string head_configuration_file = cedar::aux::locateResource("configs/cora_head.json");
 
   QApplication a(argc, argv);
 

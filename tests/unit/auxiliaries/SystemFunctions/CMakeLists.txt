@@ -35,4 +35,4 @@
 #=======================================================================================================================
 
 
-cedar_add_unit_test(System main.cpp)
+cedar_add_unit_test(SystemFunctions main.cpp)

@@ -45,7 +45,7 @@
 #include "cedar/dynamics/namespace.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/auxiliaries/utilities.h"
-#include "cedar/auxiliaries/System.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 
 // SYSTEM INCLUDES
 #include <fstream>
@@ -108,7 +108,7 @@ void cedar::proc::gui::IdeApplication::signalHandler(int signal_id)
   {
     std::ofstream stream;
     std::string file_path;
-    cedar::aux::System::openCrashFile(stream, file_path);
+    cedar::aux::openCrashFile(stream, file_path);
     stream << "Application received signal " << signal_name << std::endl;
     cedar::aux::StackTrace trace;
     stream << trace << std::endl;
@@ -129,7 +129,7 @@ LONG cedar::proc::gui::IdeApplication::vcCrashHandler(LPEXCEPTION_POINTERS excep
 {
   std::ofstream stream;
   std::string file_path;
-  cedar::aux::System::openCrashFile(stream, file_path);
+  cedar::aux::openCrashFile(stream, file_path);
   stream << "Application crash reason: ";
   
   switch(exceptions->ExceptionRecord->ExceptionCode)

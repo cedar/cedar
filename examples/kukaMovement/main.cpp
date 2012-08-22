@@ -47,7 +47,7 @@
 #include "cedar/auxiliaries/gui/SceneWidget.h"
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/gl/Sphere.h"
-#include "cedar/auxiliaries/System.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -138,7 +138,7 @@ private:
 int main(int argc, char **argv)
 {
   std::string mode = "0";
-  std::string configuration_file = cedar::aux::System::locateResource("configs/kuka_lwr4.json");
+  std::string configuration_file = cedar::aux::locateResource("configs/kuka_lwr4.json");
   // help requested?
   if ((argc == 2) && (std::string(argv[1]) == "-h"))
   { // Check the value of argc. If not enough parameters have been passed, inform user and exit.
