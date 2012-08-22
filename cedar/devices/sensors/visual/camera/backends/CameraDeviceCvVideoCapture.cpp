@@ -45,38 +45,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::sensors::visual::CameraDeviceCvVideoCaputre::CameraDeviceCvVideoCaputre
+cedar::dev::sensors::visual::CameraDeviceCvVideoCapture::CameraDeviceCvVideoCapture
 (
-  cedar::dev::sensors::visual::CameraCapabilitiesPtr p_capabilities,
-  cedar::dev::sensors::visual::CameraSettingsPtr p_settings,
-  cedar::dev::sensors::visual::CameraStatePtr p_state,
-  cv::VideoCapture videoCapture,
-  QReadWriteLock* p_videoCaptureLock
+  cedar::dev::sensors::visual::CameraChannelPtr pCameraChannel
 )
 :
-cedar::dev::sensors::visual::CameraDevice
-(
-  p_capabilities,
-  p_settings,
-  p_state,
-  videoCapture,
-  p_videoCaptureLock
-)
+cedar::dev::sensors::visual::CameraDevice::CameraDevice(pCameraChannel)
 {
-  //!@todo Implement the basic features with cvVideoCapture backend:
-  //
-  // 1. lock
-  // 2. if capture already there, delete it
-  // 3  fill p_capabilities with the right values (depends on backend and camera)
-  // 4. create cv::Videocapture
-  // 4.1   apply settings from p_settings structure
-  // 4.2   restore state of the device with the values in p_state
-
-  // 5. done
 }
 
 
-cedar::dev::sensors::visual::CameraDeviceCvVideoCaputre::~CameraDeviceCvVideoCaputre()
+cedar::dev::sensors::visual::CameraDeviceCvVideoCapture::~CameraDeviceCvVideoCapture()
 {
 }
 
@@ -84,3 +63,101 @@ cedar::dev::sensors::visual::CameraDeviceCvVideoCaputre::~CameraDeviceCvVideoCap
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+//void cedar::dev::sensors::visual::CameraDeviceCvVideoCapture::createPropertyAndSetting()
+//{
+//}
+
+
+//first step
+void cedar::dev::sensors::visual::CameraDeviceCvVideoCapture::fillCapabilities()
+{
+//  cedar::dev::sensors::visual::CameraPropertiesSet& properties = mpCameraChannel->mpProperties->getProperties();
+//  properties.get().clear();
+//
+//  //create structure with supported properties and their values
+//  int num_properties = cedar::dev::sensors::visual::CameraProperty::type().list().size();
+//  for (int i=0; i<num_properties; i++)
+//  {
+//    cedar::dev::sensors::visual::CameraProperty::Id prop_id
+//      = cedar::dev::sensors::visual::CameraProperty::type().list().at(i).id();
+//
+//    std::string prop_name = cedar::dev::sensors::visual::CameraProperty::type().list().at(i).prettyString();
+//
+//    //@todo: get min/max values from device !!!
+//
+//    cedar::dev::sensors::visual::CamPropertyPtr p_prop(new cedar::dev::sensors::visual::CamProperty
+//                                                         (
+//                                                           prop_id,
+//                                                           prop_name,
+//                                                           0.f,
+//                                                           1024.f,
+//                                                           128.f,
+//                                                           true,
+//                                                           true,
+//                                                           false,
+//                                                           true
+//                                                         )
+//                                                      );
+//    properties.insert(p_prop);
+//  }
+
+  /*
+  cedar::dev::sensors::visual::CameraSettingsSet& settings = mpSettings->getSettings();
+  settings.get().clear();
+
+
+  //create structure with settings and their values
+  int num_settings = cedar::dev::sensors::visual::CameraSetting::type().list().size();
+  for (int i=0; i<num_settings; i++)
+  {
+    cedar::dev::sensors::visual::CameraSetting::Id setting_id
+      = cedar::dev::sensors::visual::CameraSetting::type().list().at(i).id();
+
+    std::string setting_name = cedar::dev::sensors::visual::CameraSetting::type().list().at(i).prettyString();
+
+    //@todo: get min/max values from device !!!
+
+    cedar::dev::sensors::visual::CamSettingPtr p_prop(new cedar::dev::sensors::visual::CamSetting
+                                                         (
+                                                           setting_id,
+                                                           setting_name
+                                                         )
+                                                      );
+    settings.insert(p_prop);
+  }
+  */
+
+}
+
+//2. step
+bool cedar::dev::sensors::visual::CameraDeviceCvVideoCapture::createCaptureDevice()
+{
+  //
+
+  std::cout << "Create camera with cv::VideoCapture Backend\n"
+      << "BusId:" << mpCameraChannel->_mpBusId->getValue() << "\n"
+      << "Guid:" << mpCameraChannel->_mpGuid->getValue() << "\n"
+      << "ByGuid:" << mpCameraChannel->_mpByGuid->getValue() << "\n"
+      << std::endl;
+
+  cv::VideoCapture capture(mpCameraChannel->_mpBusId->getValue());
+  if(capture.isOpened())
+  {
+    mpCameraChannel->mVideoCapture = capture;
+    return true;
+  }
+  return false;
+}
+
+//3. step
+void cedar::dev::sensors::visual::CameraDeviceCvVideoCapture::applySettingsToCamera()
+{
+
+}
+
+//4. step
+void cedar::dev::sensors::visual::CameraDeviceCvVideoCapture::applyStateToCamera()
+{
+
+}

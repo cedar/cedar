@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraDeviceCvVideoCaputre.h
+    File:        CameraDeviceCvVideoCapture.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 07 04
 
-    Description:  Header for the cedar::dev::sensors::visual::CameraDeviceCvVideoCaputre class
+    Description:  Header for the cedar::dev::sensors::visual::CameraDeviceCvVideoCapture class
 
     Credits:
 
@@ -51,7 +51,7 @@
  *
  * Implements the common features of a camera device
  */
-class cedar::dev::sensors::visual::CameraDeviceCvVideoCaputre
+class cedar::dev::sensors::visual::CameraDeviceCvVideoCapture
 :
 public cedar::dev::sensors::visual::CameraDevice
 {
@@ -64,17 +64,13 @@ public cedar::dev::sensors::visual::CameraDevice
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  CameraDeviceCvVideoCaputre
+  CameraDeviceCvVideoCapture
   (
-    cedar::dev::sensors::visual::CameraCapabilitiesPtr p_capabilities,
-    cedar::dev::sensors::visual::CameraSettingsPtr p_settings,
-    cedar::dev::sensors::visual::CameraStatePtr p_state,
-    cv::VideoCapture videoCapture,
-    QReadWriteLock* p_videoCaptureLock
+   cedar::dev::sensors::visual::CameraChannelPtr pCameraChannel
   );
 
   //!@brief Destructor
-  ~CameraDeviceCvVideoCaputre();
+  ~CameraDeviceCvVideoCapture();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -86,7 +82,10 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void fillCapabilities();
+  void applySettingsToCamera();
+  bool createCaptureDevice();
+  void applyStateToCamera();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -111,7 +110,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::dev::sensors::visual::CameraDeviceCvVideoCaputre
+}; // class cedar::dev::sensors::visual::CameraDeviceCvVideoCapture
 
 #endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_DEVICE_CVVIDEOCAPTURE_H
 

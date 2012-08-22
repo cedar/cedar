@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -37,7 +37,7 @@
 #include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/camera/CameraProperty.h"
+#include "cedar/devices/sensors/visual/camera/enums/CameraProperty.h"
 
 // SYSTEM INCLUDES
 

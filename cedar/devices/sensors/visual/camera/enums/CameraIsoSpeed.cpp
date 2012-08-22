@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -39,7 +39,7 @@
 #ifdef CEDAR_USE_LIB_DC1394
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/camera/CameraIsoSpeed.h"
+#include "cedar/devices/sensors/visual/camera/enums/CameraIsoSpeed.h"
 
 // SYSTEM INCLUDES
 

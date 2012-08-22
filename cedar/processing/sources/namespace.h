@@ -64,8 +64,9 @@ namespace cedar
       CEDAR_DECLARE_PROC_CLASS(Picture);
       CEDAR_DECLARE_PROC_CLASS(Video);
 
-#ifdef CEDAR_USE_LIB_DC1394
       CEDAR_DECLARE_PROC_CLASS(Camera);
+
+#ifdef CEDAR_USE_LIB_DC1394
 #endif
 
 #ifdef CEDAR_USE_YARP

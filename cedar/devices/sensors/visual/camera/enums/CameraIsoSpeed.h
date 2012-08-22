@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,95 +22,109 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraDevice.h
+    File:        CameraIsoSpeed.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
-    Date:        2012 07 04
+    Date:        2011 08 01
 
-    Description:  Header for the cedar::dev::sensors::visual::CameraDevice class
+    Description:  Header for CameraIsoSpeed enum-type class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_DEVICE_VFL_H
-#define CEDAR_DEV_SENSORS_VISUAL_CAMERA_DEVICE_VFL_H
-
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
+#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_ISO_SPEED_H
+#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_ISO_SPEED_H
 
 // CEDAR INCLUDES
+#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
+
+#include "cedar/auxiliaries/EnumType.h"
 #include "cedar/devices/sensors/visual/namespace.h"
-#include "cedar/devices/sensors/visual/camera/backends/CameraDevice.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Base class of the misc camera grabber backends.
+/*!@brief Enum class for firewire ISO-speed
  *
- * Implements the common features of a camera device
+ * Use this type for the CameraGrabber::setCameraInitIsoSpeed() and getCameraInitIsoSpeed() method
  */
-class cedar::dev::sensors::visual::CameraDeviceVfl
-:
-public cedar::dev::sensors::visual::CameraDevice
+class cedar::dev::sensors::visual::CameraIsoSpeed
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // typedefs
   //--------------------------------------------------------------------------------------------------------------------
+//!@cond SKIPPED_DOCUMENTATION
+public:
+  typedef cedar::aux::EnumId Id;
+public:
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  CameraDeviceVfl
-  (
-    cedar::dev::sensors::visual::CameraChannelPtr pCameraChannel
-  );
 
   //!@brief Destructor
-  ~CameraDeviceVfl();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet
+public:  
+  static void construct();
 
+  static const cedar::aux::EnumBase& type();
+  static const cedar::dev::sensors::visual::CameraIsoSpeed::TypePtr& typePtr(); 
+  
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void fillCapabilities();
-  void applySettingsToCamera();
-  bool createCaptureDevice();
-  void applyStateToCamera();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
-
+  static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraIsoSpeed> mType;
+  //!@endcond
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+
+  /*! @brief Allow OpenCV backend to set the ISO-speed of the firewire bus.
+   *
+   *  Set the ISO-speed manually with the CameraGrabber::setCameraIsoSpeed() method.
+   *
+   *  @remarks
+   *  As every setting, this can only be done before the first frame was grabbed.
+   */
+
+  static const Id ISO_NOT_SET = UINT_MAX-2;
+
+  /// @brief Set the ISO-speed to 100
+  static const Id ISO_100 = 100;
+  /// @see ISO_100
+  static const Id ISO_200 = 200;
+  /// @see ISO_100
+  static const Id ISO_400 = 400;
+  /// @see ISO_100
+  static const Id ISO_800 = 800;
+  /// @see ISO_100
+  static const Id ISO_1600 = 1600;
+  /// @see ISO_100
+  static const Id ISO_3200 = 3200;
+
+    
 protected:
   // none yet
 private:
   // none yet
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
+}; // cedar::dev::sensors::visual::CameraIsoSpeed
 
-private:
-  // none yet
-
-}; // class cedar::dev::sensors::visual::CameraDeviceVfl
-
-#endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_DEVICE_VFL_H
+#endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_ISO_SPEED_H
 
