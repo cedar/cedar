@@ -110,6 +110,7 @@ namespace cedar
         CEDAR_DECLARE_DEV_CLASS(CameraSetting);
         CEDAR_DECLARE_DEV_CLASS(CameraBackendType);
         CEDAR_DECLARE_DEV_CLASS(CameraIsoSpeed);
+        CEDAR_DECLARE_DEV_CLASS(CameraDebayerPattern);
 
         // properties
 
@@ -124,6 +125,8 @@ namespace cedar
 
         // all settings from one channel
         CEDAR_DECLARE_DEV_CLASS(CameraSettings);
+        CEDAR_DECLARE_DEV_CLASS(CameraCapabilities);
+        CEDAR_DECLARE_DEV_CLASS(CameraState);
 
 
         // camera settings

@@ -813,7 +813,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::setRawProperty(unsigned int cha
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"cedar::dev::sensors::visual::CameraGrabber::setRawProperty");
   }
-  getCameraChannel(channel)->mpProperties->setPropertyRawValue(propId, value);
+  return getCameraChannel(channel)->mpProperties->setPropertyRawValue(propId, value);
   //return false;
 }
 
@@ -825,6 +825,6 @@ double cedar::dev::sensors::visual::CameraGrabber::getRawProperty(unsigned int c
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"cedar::dev::sensors::visual::CameraGrabber::getRawProperty");
   }
-  getCameraChannel(channel)->mpProperties->getPropertyRawValue(propId);
+  return getCameraChannel(channel)->mpProperties->getPropertyRawValue(propId);
 }
 
