@@ -150,6 +150,13 @@ public:
     this->setUpperLimit(mUpperLimitDefault);
   }
 
+  //!@brief Sets the default limits of the parameter.
+  void setDefaults(const T& defaultLower, const T& defaultUpper)
+  {
+    this->mLowerLimitDefault = defaultLower;
+    this->mUpperLimitDefault = defaultUpper;
+  }
+
   //!@brief get the current value of type T of this parameter
   const cedar::aux::math::Limits<T>& getValue() const
   {
