@@ -153,9 +153,6 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-
-private:
   //! distance between the wheels [in m]
   cedar::aux::DoubleParameterPtr _mWheelDistance;
   //! radius of the wheel [in m]
