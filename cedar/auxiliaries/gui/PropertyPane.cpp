@@ -252,18 +252,31 @@ void cedar::aux::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterPtr para
     this->indicateChange(p_label, parameter->isChanged());
 
 
-    cedar::aux::gui::Parameter *p_widget
-      = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter)->allocateRaw();
-    p_widget->setParent(this);
-    p_widget->setParameter(parameter);
-    p_widget->setEnabled(!parameter->isConstant());
-    this->setCellWidget(row, 1, p_widget);
-    this->resizeRowToContents(row);
+    try
+    {
+      cedar::aux::gui::Parameter *p_widget
+        = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter)->allocateRaw();
+      p_widget->setParent(this);
+      p_widget->setParameter(parameter);
+      p_widget->setEnabled(!parameter->isConstant());
+      this->setCellWidget(row, 1, p_widget);
+      this->resizeRowToContents(row);
 
-    this->mParameterWidgetRowIndex[p_widget] = row;
-    this->mParameterRowIndex[parameter.get()] = row;
-    QObject::connect(p_widget, SIGNAL(heightChanged()), this, SLOT(rowSizeChanged()));
-    QObject::connect(parameter.get(), SIGNAL(changedFlagChanged()), this, SLOT(parameterChangeFlagChanged()));
+      this->mParameterWidgetRowIndex[p_widget] = row;
+      this->mParameterRowIndex[parameter.get()] = row;
+      QObject::connect(p_widget, SIGNAL(heightChanged()), this, SLOT(rowSizeChanged()));
+      QObject::connect(parameter.get(), SIGNAL(changedFlagChanged()), this, SLOT(parameterChangeFlagChanged()));
+    }
+    catch (cedar::aux::UnknownTypeException& e)
+    {
+      QLabel* p_no_widget_label = new QLabel("(No widget for type)");
+      p_no_widget_label->setToolTip(QString::fromStdString(e.exceptionInfo()));
+      p_no_widget_label->setAlignment(Qt::AlignCenter);
+      p_no_widget_label->setAutoFillBackground(true);
+      p_no_widget_label->setStyleSheet("background-color: rgb(255, 200, 137)");
+      this->setCellWidget(row, 1, p_no_widget_label);
+      this->resizeRowToContents(row);
+    }
 
     // check if parameter is an object parameter
     if
