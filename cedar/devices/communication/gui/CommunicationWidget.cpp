@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -35,6 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/devices/communication/Communication.h"
 #include "cedar/devices/communication/gui/CommunicationWidget.h"
 
 // SYSTEM INCLUDES
@@ -42,9 +43,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::com::gui::CommunicationWidget::CommunicationWidget(cedar::dev::com::Communication *peCommunication)
+cedar::dev::com::gui::CommunicationWidget::CommunicationWidget(cedar::dev::com::CommunicationPtr communication)
 {
-  mpeCommunication = peCommunication;
+  mCommunication = communication;
   setupUi(this);
   connect(pushButtonSend, SIGNAL(pressed()), this, SLOT(send()));
 }
@@ -59,11 +60,10 @@ cedar::dev::com::gui::CommunicationWidget::~CommunicationWidget()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::com::gui::CommunicationWidget::send()
 {
-  mpeCommunication->lock();
-  mpeCommunication->send(boxCommand->text().toStdString()); //send the text typed into boxCommand
-  std::string answer;
+  mCommunication->lock();
+  mCommunication->send(boxCommand->text().toStdString()); //send the text typed into boxCommand
+  std::string answer = mCommunication->receive();
+  mCommunication->unlock();
   QString q_answer;
-  mpeCommunication->receive(answer);
-  mpeCommunication->unlock();
   boxAnswer->setText(q_answer.fromStdString(answer)); //type received string into boxAnswer
 }

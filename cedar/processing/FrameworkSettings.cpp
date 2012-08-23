@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -38,7 +38,7 @@
 #include "cedar/processing/FrameworkSettings.h"
 #include "cedar/auxiliaries/SetParameter.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
-#include "cedar/auxiliaries/System.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/processing/exceptions.h"
 
 // SYSTEM INCLUDES
@@ -72,7 +72,7 @@ cedar::aux::Configurable()
                          (
                            plugin_group.get(),
                            "workspace",
-                            cedar::aux::System::getUserHomeDirectory() + "/src/"
+                            cedar::aux::getUserHomeDirectory() + "/src/"
                          )
                      );
 
@@ -110,7 +110,7 @@ cedar::proc::FrameworkSettings::~FrameworkSettings()
   {
     //!\todo pass a log message to somewhere
     std::cout << "error saving framework settings, please check file permissions in "
-              << cedar::aux::System::getUserApplicationDataDirectory() << "/.cedar" << std::endl;
+              << cedar::aux::getUserApplicationDataDirectory() << "/.cedar" << std::endl;
   }
 }
 
@@ -160,7 +160,7 @@ std::string cedar::proc::FrameworkSettings::getPluginWorkspace() const
 
 void cedar::proc::FrameworkSettings::load()
 {
-  std::string path = cedar::aux::System::getUserApplicationDataDirectory() + "/.cedar/processingFramework";
+  std::string path = cedar::aux::getUserApplicationDataDirectory() + "/.cedar/processingFramework";
   try
   {
     this->readJson(path);
@@ -173,7 +173,7 @@ void cedar::proc::FrameworkSettings::load()
 
 void cedar::proc::FrameworkSettings::save()
 {
-  std::string path = cedar::aux::System::getUserApplicationDataDirectory() + "/.cedar/processingFramework";
+  std::string path = cedar::aux::getUserApplicationDataDirectory() + "/.cedar/processingFramework";
   try
   {
     this->writeJson(path);

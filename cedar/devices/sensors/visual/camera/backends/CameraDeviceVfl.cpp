@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -48,32 +48,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::sensors::visual::CameraDeviceVfl::CameraDeviceVfl
 (
-  cedar::dev::sensors::visual::CameraCapabilitiesPtr p_capabilities,
-  cedar::dev::sensors::visual::CameraSettingsPtr p_settings,
-  cedar::dev::sensors::visual::CameraStatePtr p_state,
-  cv::VideoCapture videoCapture,
-  QReadWriteLock* p_videoCaptureLock
+ cedar::dev::sensors::visual::CameraChannelPtr pCameraChannel
 )
 :
-cedar::dev::sensors::visual::CameraDevice
-(
-  p_capabilities,
-  p_settings,
-  p_state,
-  videoCapture,
-  p_videoCaptureLock
-)
+cedar::dev::sensors::visual::CameraDevice::CameraDevice(pCameraChannel)
 {
-  //!@todo Implement the video for linux backend:
-  //
-  // 1. lock
-  // 2. if capture already there, delete it
-  // 3  fill p_capabilities with the right values (depends on backend and camera)
-  // 4. create cv::Videocapture
-  // 4.1   apply settings from p_settings structure
-  // 4.2   restore state of the device with the values in p_state
-
-  // 5. done
 }
 
 
@@ -85,3 +64,23 @@ cedar::dev::sensors::visual::CameraDeviceVfl::~CameraDeviceVfl()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dev::sensors::visual::CameraDeviceVfl::fillCapabilities()
+{
+
+}
+
+bool cedar::dev::sensors::visual::CameraDeviceVfl::createCaptureDevice()
+{
+
+}
+
+void cedar::dev::sensors::visual::CameraDeviceVfl::applySettingsToCamera()
+{
+
+}
+
+void cedar::dev::sensors::visual::CameraDeviceVfl::applyStateToCamera()
+{
+
+}

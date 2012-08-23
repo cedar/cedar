@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -167,8 +167,6 @@ void cedar::dev::sensors::visual::VideoGrabber::speedFactorChanged()
 {
   if (mCaptureDeviceCreated)
   {
-    std::cout << "VideoGrabber::speedFactorChanged" << std::endl;
-
     double fps = getVideoChannel(0)->mVideoCapture.get(CV_CAP_PROP_FPS);
     setFps(fps * _mSpeedFactor->getValue());
     emit doSpeedFactorChanged();
@@ -178,7 +176,7 @@ void cedar::dev::sensors::visual::VideoGrabber::speedFactorChanged()
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::VideoGrabber::fileNameChanged()
 {
-  // reset all channels
+  // set all channels to their parameters
   if (Grabber::applyParameter())
   {
     emit doVideoChanged();

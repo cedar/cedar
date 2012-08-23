@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -28,7 +28,7 @@
     Email:       mathis.richter@ini.rub.de
     Date:        2010 11 11
 
-    Description: Header for the @em cedar::aux::math::Limits struct.
+    Description: Header for the @em cedar::aux::math::Limits class.
 
     Credits:
 
@@ -42,6 +42,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <boost/numeric/conversion/bounds.hpp>
@@ -52,8 +53,9 @@
 /*!@brief Structure representing the limits of an interval.
  */
 template <typename T>
-struct cedar::aux::math::Limits
+class cedar::aux::math::Limits
 {
+public:
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
@@ -67,11 +69,13 @@ struct cedar::aux::math::Limits
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  //!@brief The standard constructor
-  //!@todo Shouldn't this set some values?
+  //!@brief Default constructor
   Limits()
+  :
+  mLowerLimit(0),
+  mUpperLimit(1)
   {
-  };
+  }
 
   //!@brief Constructor that takes a minimum and maximum value
   Limits(const T& newLowerLimit, const T& newUpperLimit)
@@ -89,26 +93,11 @@ struct cedar::aux::math::Limits
   mUpperLimit(otherLimits.mUpperLimit)
   {
   }
-
-  /*! @brief Returns the value if it is inside the limit; otherwise, if the value is lower, returns the limit's lower
-   *         bounds, otherwise it returns the upper limit.
-   */
-  inline const T& limit(const T& value) const
-  {
-    if (value < this->getLower())
-    {
-      return this->getLower();
-    }
-    else if (value > this->getUpper())
-    {
-      return this->getUpper();
-    }
-    else
-    {
-      return value;
-    }
-  }
-
+  
+  //--------------------------------------------------------------------------------------------------------------------
+  // methods
+  //--------------------------------------------------------------------------------------------------------------------
+public:
   //! Returns the length of the interval, i.e., upper - lower.
   inline T getLength() const
   {
@@ -117,8 +106,9 @@ struct cedar::aux::math::Limits
     return this->getUpper() - this->getLower();
   }
 
-  //!@brief checks whether a number is included in an integral specified by Limits
-  //!@return returns true if number is in the interval, returns false otherwise
+  /*!@brief Checks whether a given value is within the limits.
+   * @param[in] number the value to be checked
+   */
   inline bool includes(const T& number)
   {
     return number >= this->getLower() && number <= this->getUpper();
@@ -194,14 +184,73 @@ struct cedar::aux::math::Limits
     return Limits(boost::numeric::bounds<T>::lowest(), boost::numeric::bounds<T>::highest());
   }
 
+
+  /*!@brief Tresholds a value if it is outside of the limits.
+   * If the value is below the lower limit, the method will set the value to the lower limit.
+   * If the value is above the upper limit, the method will set the value to the upper limit.
+   * If the value is within the limits, the method will not change the value.
+   * @param[in,out] value the value to be thresholded
+   */
+  inline const T& limit(const T& value, bool warnOnThresholding = true) const
+  {
+    if (value < getLower())
+    {
+      if (warnOnThresholding)
+      {
+        cedar::aux::LogSingleton::getInstance()->warning
+        (
+          "Thresholding a value to the lower limit.",
+          "cedar::aux::math::Limits",
+          "Tresholding"
+        );
+      }
+
+      return getLower();
+    }
+    else if (value > getUpper())
+    {
+      if (warnOnThresholding)
+      {
+        cedar::aux::LogSingleton::getInstance()->warning
+        (
+          "Thresholding a value to the upper limit.",
+          "cedar::aux::math::Limits",
+          "Tresholding"
+        );
+      }
+
+      return getUpper();
+    }
+
+    return value;
+  }
+
+  /*!@brief Tresholds a vector of values against the limits.
+   * @param[in,out] values the vector of values to be thresholded
+   */
+  inline void limit(std::vector<T>& values, bool warnOnThresholding = true) const
+  {
+    for
+    (
+      typename std::vector<T>::iterator it = values.begin();
+      it != values.end();
+      ++it
+    )
+    {
+      *it = this->limit(*it, warnOnThresholding);
+    }
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+private:
   //! minimum limit
   T mLowerLimit;
   //! maximum limit
   T mUpperLimit;
 }; // class cedar::aux::math::Limits
-
 
 #endif // CEDAR_AUX_MATH_LIMITS_H

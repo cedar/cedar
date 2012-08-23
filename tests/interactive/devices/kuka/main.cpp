@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -42,7 +42,7 @@
 #include "cedar/devices/robot/gl/KinematicChain.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
-#include "cedar/auxiliaries/System.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -54,7 +54,7 @@ using cedar::dev::kuka::gui::FriStatusWidget;
 int main(int argc, char **argv)
 {
   std::string mode = "0";
-  std::string configuration_file = cedar::aux::System::locateResource("configs/kuka_lwr4.json");
+  std::string configuration_file = cedar::aux::locateResource("configs/kuka_lwr4.json");
   QApplication a(argc, argv);
   FriStatusWidget* p_fri_status_widget = 0;
   cedar::dev::robot::gui::KinematicChainWidget* p_kinematic_chain_widget = 0;

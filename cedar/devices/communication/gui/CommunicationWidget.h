@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -38,7 +38,7 @@
 #define CEDAR_DEV_COM_GUI_COMMUNICATION_WIDGET_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/communication/Communication.h"
+#include "cedar/devices/communication/namespace.h"
 #include "cedar/devices/communication/gui/ui_CommunicationWidget.h"
 #include "cedar/devices/communication/gui/namespace.h"
 #include "cedar/auxiliaries/gui/BaseWidget.h"
@@ -65,7 +65,7 @@ private:
 public:
   //!@brief Constructs the GUI.
   //!@param peCommunication Pointer to the communication-class to be tested.
-  CommunicationWidget(cedar::dev::com::Communication *peCommunication);
+  CommunicationWidget(cedar::dev::com::CommunicationPtr communication);
 
   //!@brief Destructs the GUI.
   virtual ~CommunicationWidget();
@@ -100,7 +100,7 @@ protected:
 
 private:
   // pointer to the Communication-class.
-  cedar::dev::com::Communication *mpeCommunication;
+  cedar::dev::com::CommunicationPtr mCommunication;
 }; // class cedar::dev::com::gui::CommunicationWidget
 #endif // CEDAR_DEV_COM_GUI_COMMUNICATION_WIDGET_H
 

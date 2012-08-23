@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -42,6 +42,12 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/namespace.h"
+#include "cedar/auxiliaries/SetParameter.h"
+#include "cedar/devices/sensors/visual/camera/CameraProperties.h"
+#include "cedar/devices/sensors/visual/camera/CameraSettings.h"
+#include "cedar/devices/sensors/visual/camera/CameraChannel.h"  //circular includes !!
+
+
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -58,6 +64,7 @@ class cedar::dev::sensors::visual::CameraDevice
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -65,11 +72,12 @@ protected:
   //!@brief The standard constructor.
   CameraDevice
   (
-    cedar::dev::sensors::visual::CameraCapabilitiesPtr p_capabilities,
-    cedar::dev::sensors::visual::CameraSettingsPtr p_settings,
-    cedar::dev::sensors::visual::CameraStatePtr p_state,
-    cv::VideoCapture videoCapture,
-    QReadWriteLock* p_videoCaptureLock
+//    cedar::dev::sensors::visual::CameraSettingsPtr pSettings,
+//    cedar::dev::sensors::visual::CameraPropertiesPtr pProperties,
+//    cv::VideoCapture videoCapture,
+//    QReadWriteLock* p_videoCaptureLock
+//   cedar::dev::sensors::visual::CameraGrabber::CameraChannelPtr pCameraChannel
+   cedar::dev::sensors::visual::CameraChannelPtr pCameraChannel
   );
 
 public:
@@ -80,17 +88,28 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  bool init();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  cedar::dev::sensors::visual::CameraCapabilitiesPtr mpCapabilities;
-  cedar::dev::sensors::visual::CameraSettingsPtr mpSettings;
-  cedar::dev::sensors::visual::CameraStatePtr mpState;
-  cv::VideoCapture mVideoCapture;
-  QReadWriteLock* mpVideoCaptureLock;
+
+  //cv::VideoCapture mVideoCapture;
+  //QReadWriteLock* mpVideoCaptureLock;
+
+  //cedar::dev::sensors::visual::CameraSettingsPtr mpCamSettings;
+  //cedar::dev::sensors::visual::CameraPropertiesPtr mpCamProperties;
+
+//  cedar::dev::sensors::visual::CameraGrabber::CameraChannelPtr mpCameraChannel;
+  cedar::dev::sensors::visual::CameraChannelPtr mpCameraChannel;
+
+  virtual void fillCapabilities() = 0;
+  virtual bool createCaptureDevice() = 0;
+  virtual void applySettingsToCamera() = 0;
+  virtual void applyStateToCamera() = 0;
+
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -117,5 +136,37 @@ private:
 
 }; // class cedar::dev::sensors::visual::CameraDevice
 
+/*
+// The typedefs for the manager of the CameraDevices
+#include "cedar/auxiliaries/FactoryManager.h"
+
+namespace cedar
+{
+  namespace dev
+  {
+    namespace sensors
+    {
+      namespace visual
+      {
+        //!@brief The manager of all sigmoind instances
+        typedef cedar::aux::FactoryManager<CameraDevicePtr> CameraDeviceManager;
+
+#ifdef MSVC
+#ifdef CEDAR_LIB_EXPORTS_DEV
+        // dllexport
+        template class __declspec(dllexport) cedar::aux::Singleton<CameraDeviceManager>;
+#else // CEDAR_LIB_EXPORTS_DEV
+      // dllimport
+        extern template class __declspec(dllimport) cedar::aux::Singleton<CameraDeviceManager>;
+#endif // CEDAR_LIB_EXPORTS_DEV
+#endif // MSVC
+
+        //!@brief The singleton object of the TransferFunctionFactory.
+        typedef cedar::aux::Singleton<CameraDeviceManager> CameraDeviceManagerSingleton;
+      }
+    }
+  }
+}
+*/
 #endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_DEVICE_H
 

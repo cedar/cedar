@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -37,7 +37,7 @@
 #include "cedar/devices/robot/SimulatedKinematicChain.h"
 #include "cedar/devices/robot/gl/Sdh.h"
 #include "cedar/devices/robot/gui/KinematicChainWidget.h"
-#include "cedar/auxiliaries/System.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gui/SceneWidget.h"
@@ -51,7 +51,7 @@
 int main(int argc, char **argv)
 {
   // using kuka configuration as dummy
-  std::string configuration_file = cedar::aux::System::locateResource("configs/kuka_lwr4.json");
+  std::string configuration_file = cedar::aux::locateResource("configs/kuka_lwr4.json");
 
   QApplication a(argc, argv);
 

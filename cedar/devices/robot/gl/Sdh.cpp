@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -39,7 +39,7 @@
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/System.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/gl/gl.h"
 #include "cedar/auxiliaries/gl/glu.h"
@@ -364,58 +364,58 @@ void cedar::dev::robot::gl::Sdh::loadData()
 {
   // palm
   QString palm_vertex_data_file_name
-    = QString(cedar::aux::System::locateResource("meshes/sdh/palm_vertex.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/sdh/palm_vertex.txt").c_str());
   loadVertexData(palm_vertex_data_file_name, mPalmVertexNumber, mPalmVertex);
   QString palm_index_data_file_name
-    = QString(cedar::aux::System::locateResource("meshes/sdh/palm_index.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/sdh/palm_index.txt").c_str());
   loadIndexData(palm_index_data_file_name, mPalmFacesNumber, mPalmIndex);
 
   // root
   QString root_vertex_data_file_name
-    = QString(cedar::aux::System::locateResource("meshes/sdh/root_vertex.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/sdh/root_vertex.txt").c_str());
   loadVertexData(root_vertex_data_file_name, mRootVertexNumber, mRootVertex);
   QString root_index_data_file_name
-    = QString(cedar::aux::System::locateResource("meshes/sdh/root_index.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/sdh/root_index.txt").c_str());
   loadIndexData(root_index_data_file_name, mRootFacesNumber, mRootIndex);
 
   // knuckle
   QString knuckle_vertex_data_file_name
-    = QString(cedar::aux::System::locateResource("meshes/sdh/knuckle_vertex.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/sdh/knuckle_vertex.txt").c_str());
   loadVertexData(knuckle_vertex_data_file_name, mKnuckleVertexNumber, mKnuckleVertex);
   QString knuckle_index_data_file_name
-    = QString(cedar::aux::System::locateResource("meshes/sdh/knuckle_index.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/sdh/knuckle_index.txt").c_str());
   loadIndexData(knuckle_index_data_file_name, mKnuckleFacesNumber, mKnuckleIndex);
 
   // proximal link
   QString proximal_link_vertex_data_file_name
-    = QString(cedar::aux::System::locateResource("meshes/sdh/proximal_link_vertex.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/sdh/proximal_link_vertex.txt").c_str());
   loadVertexData(proximal_link_vertex_data_file_name, mProximalLinkVertexNumber, mProximalLinkVertex);
   QString proximal_link_index_data_file_name
-    = QString(cedar::aux::System::locateResource("meshes/sdh/proximal_link_index.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/sdh/proximal_link_index.txt").c_str());
   loadIndexData(proximal_link_index_data_file_name, mProximalLinkFacesNumber, mProximalLinkIndex);
 
   // proximal skin
   QString proximal_skin_vertex_data_file_name
-    = QString(cedar::aux::System::locateResource("meshes/sdh/proximal_skin_vertex.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/sdh/proximal_skin_vertex.txt").c_str());
   loadVertexData(proximal_skin_vertex_data_file_name, mProximalSkinVertexNumber, mProximalSkinVertex);
   QString proximal_skin_index_data_file_name
-    = QString(cedar::aux::System::locateResource("meshes/sdh/proximal_skin_index.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/sdh/proximal_skin_index.txt").c_str());
   loadIndexData(proximal_skin_index_data_file_name, mProximalSkinFacesNumber, mProximalSkinIndex);
 
   // distal link
   QString distal_link_vertex_data_file_name
-    = QString(cedar::aux::System::locateResource("meshes/sdh/distal_link_vertex.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/sdh/distal_link_vertex.txt").c_str());
   loadVertexData(distal_link_vertex_data_file_name, mDistalLinkVertexNumber, mDistalLinkVertex);
   QString distal_link_index_data_file_name
-    = QString(cedar::aux::System::locateResource("meshes/sdh/distal_link_index.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/sdh/distal_link_index.txt").c_str());
   loadIndexData(distal_link_index_data_file_name, mDistalLinkFacesNumber, mDistalLinkIndex);
 
   // distal skin
   QString distal_skin_vertex_data_file_name
-    = QString(cedar::aux::System::locateResource("meshes/sdh/distal_skin_vertex.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/sdh/distal_skin_vertex.txt").c_str());
   loadVertexData(distal_skin_vertex_data_file_name, mDistalSkinVertexNumber, mDistalSkinVertex);
   QString distal_skin_index_data_file_name
-    = QString(cedar::aux::System::locateResource("meshes/sdh/distal_skin_index.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/sdh/distal_skin_index.txt").c_str());
   loadIndexData(distal_skin_index_data_file_name, mDistalSkinFacesNumber, mDistalSkinIndex);
 
 }

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -34,39 +34,29 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
-
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/devices/communication/SerialCommunication.h"
 #include "cedar/devices/communication/gui/CommunicationWidget.h"
 
 // SYSTEM INCLUDES
-
 #include <QApplication>
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
 
 int main(int argc, char **argv)
 {
   //open the channel
-  cedar::dev::com::SerialCommunication *p_com = new cedar::dev::com::SerialCommunication();
-  p_com->readJson("../../tests/interactive/devices/com/SerialCommunicationConfig.json");
-
-  QApplication a(argc, argv);
+  cedar::dev::com::SerialCommunicationPtr communication(new cedar::dev::com::SerialCommunication());
+  std::string serial_communication_config = cedar::aux::locateResource("configs/serial_communication.json");
+  communication->readJson(serial_communication_config);
 
   // create the GUI
-  cedar::dev::com::gui::CommunicationWidget *communication_widget;
-  communication_widget = new cedar::dev::com::gui::CommunicationWidget(p_com);
+  cedar::dev::com::gui::CommunicationWidgetPtr
+    communication_widget(new cedar::dev::com::gui::CommunicationWidget(communication));
   communication_widget->show();
 
   //start the program
-  a.exec();
-
-  delete p_com;
-  delete communication_widget;
+  QApplication application(argc, argv);
+  application.exec();
 
   return 0;
 }

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -49,7 +49,6 @@
 
 int main(int /* argc */, char ** /* argv[] */)
 {
-//  std::string config_file("../../tests/interactive/devices/AmtecSpeedControl/cora_arm.conf");
   std::string configuration_file = cedar::aux::System::locateResource("configs/cora_arm.json");
 
   try

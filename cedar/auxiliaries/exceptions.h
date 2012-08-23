@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -32,7 +32,7 @@
                  stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 06 17
 
-    Description: Header file for exceptions in the cedar::aux::comp namespace.
+    Description: Header file for exceptions in the cedar::aux namespace.
 
     Credits:
 

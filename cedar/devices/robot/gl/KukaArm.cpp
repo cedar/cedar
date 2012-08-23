@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -37,7 +37,7 @@
 #define NOMINMAX // to avoid Windows issues
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/System.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/gl/gl.h"
 #include "cedar/auxiliaries/gl/glu.h"
@@ -377,74 +377,74 @@ void cedar::dev::robot::gl::KukaArm::loadData()
 {
   // base segment
   QString base_segment_vertex_data_file_name
-    = QString(cedar::aux::System::locateResource("meshes/kuka_lwr/base_segment_vertex.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/kuka_lwr/base_segment_vertex.txt").c_str());
   loadVertexData(base_segment_vertex_data_file_name, mBaseSegmentVertexNumber, mBaseSegmentVertex);
   QString base_segment_index_data_file_name
-    = QString(cedar::aux::System::locateResource("meshes/kuka_lwr/base_segment_index.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/kuka_lwr/base_segment_index.txt").c_str());
   loadIndexData(base_segment_index_data_file_name, mBaseSegmentFacesNumber, mBaseSegmentIndex);
 
   // base ring
   QString base_ring_vertex_data_file_name
-    = QString(cedar::aux::System::locateResource("meshes/kuka_lwr/base_ring_vertex.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/kuka_lwr/base_ring_vertex.txt").c_str());
   loadVertexData(base_ring_vertex_data_file_name, mBaseRingVertexNumber, mBaseRingVertex);
   QString base_ring_index_data_file_name
-  = QString(cedar::aux::System::locateResource("meshes/kuka_lwr/base_ring_index.txt").c_str());
+  = QString(cedar::aux::locateResource("meshes/kuka_lwr/base_ring_index.txt").c_str());
   loadIndexData(base_ring_index_data_file_name, mBaseRingFacesNumber, mBaseRingIndex);
 
   // forward segment
   QString forward_segment_vertex_data_file_name
-  = QString(cedar::aux::System::locateResource("meshes/kuka_lwr/forward_segment_vertex.txt").c_str());
+  = QString(cedar::aux::locateResource("meshes/kuka_lwr/forward_segment_vertex.txt").c_str());
   loadVertexData(forward_segment_vertex_data_file_name, mForwardSegmentVertexNumber, mForwardSegmentVertex);
   QString forward_segment_index_data_file_name
-  = QString(cedar::aux::System::locateResource("meshes/kuka_lwr/forward_segment_index.txt").c_str());
+  = QString(cedar::aux::locateResource("meshes/kuka_lwr/forward_segment_index.txt").c_str());
   loadIndexData(forward_segment_index_data_file_name, mForwardSegmentFacesNumber, mForwardSegmentIndex);
 
   // forward ring
   QString forward_ring_vertex_data_file_name
-  = QString(cedar::aux::System::locateResource("meshes/kuka_lwr/forward_ring_vertex.txt").c_str());
+  = QString(cedar::aux::locateResource("meshes/kuka_lwr/forward_ring_vertex.txt").c_str());
   loadVertexData(forward_ring_vertex_data_file_name, mForwardRingVertexNumber, mForwardRingVertex);
   QString forward_ring_index_data_file_name
-  = QString(cedar::aux::System::locateResource("meshes/kuka_lwr/forward_ring_index.txt").c_str());
+  = QString(cedar::aux::locateResource("meshes/kuka_lwr/forward_ring_index.txt").c_str());
   loadIndexData(forward_ring_index_data_file_name, mForwardRingFacesNumber, mForwardRingIndex);
 
   // inverse segment
   QString inverse_segment_vertex_data_file_name
-  = QString(cedar::aux::System::locateResource("meshes/kuka_lwr/inverse_segment_vertex.txt").c_str());
+  = QString(cedar::aux::locateResource("meshes/kuka_lwr/inverse_segment_vertex.txt").c_str());
   loadVertexData(inverse_segment_vertex_data_file_name, mInverseSegmentVertexNumber, mInverseSegmentVertex);
   QString inverse_segment_index_data_file_name
-  = QString(cedar::aux::System::locateResource("meshes/kuka_lwr/inverse_segment_index.txt").c_str());
+  = QString(cedar::aux::locateResource("meshes/kuka_lwr/inverse_segment_index.txt").c_str());
   loadIndexData(inverse_segment_index_data_file_name, mInverseSegmentFacesNumber, mInverseSegmentIndex);
 
   // inverse ring
   QString inverse_ring_vertex_data_file_name
-  = QString(cedar::aux::System::locateResource("meshes/kuka_lwr/inverse_ring_vertex.txt").c_str());
+  = QString(cedar::aux::locateResource("meshes/kuka_lwr/inverse_ring_vertex.txt").c_str());
   loadVertexData(inverse_ring_vertex_data_file_name, mInverseRingVertexNumber, mInverseRingVertex);
   QString inverse_ring_index_data_file_name
-  = QString(cedar::aux::System::locateResource("meshes/kuka_lwr/inverse_ring_index.txt").c_str());
+  = QString(cedar::aux::locateResource("meshes/kuka_lwr/inverse_ring_index.txt").c_str());
   loadIndexData(inverse_ring_index_data_file_name, mInverseRingFacesNumber, mInverseRingIndex);
 
   // wrist segment
   QString wrist_segment_vertex_data_file_name
-  = QString(cedar::aux::System::locateResource("meshes/kuka_lwr/wrist_segment_vertex.txt").c_str());
+  = QString(cedar::aux::locateResource("meshes/kuka_lwr/wrist_segment_vertex.txt").c_str());
   loadVertexData(wrist_segment_vertex_data_file_name, mWristSegmentVertexNumber, mWristSegmentVertex);
   QString wrist_segment_index_data_file_name
-  = QString(cedar::aux::System::locateResource("meshes/kuka_lwr/wrist_segment_index.txt").c_str());
+  = QString(cedar::aux::locateResource("meshes/kuka_lwr/wrist_segment_index.txt").c_str());
   loadIndexData(wrist_segment_index_data_file_name, mWristSegmentFacesNumber, mWristSegmentIndex);
 
   // wrist sphere
   QString wrist_sphere_vertex_data_file_name
-  = QString(cedar::aux::System::locateResource("meshes/kuka_lwr/wrist_sphere_vertex.txt").c_str());
+  = QString(cedar::aux::locateResource("meshes/kuka_lwr/wrist_sphere_vertex.txt").c_str());
   loadVertexData(wrist_sphere_vertex_data_file_name, mWristSphereVertexNumber, mWristSphereVertex);
   QString wrist_sphere_index_data_file_name
-  = QString(cedar::aux::System::locateResource("meshes/kuka_lwr/wrist_sphere_index.txt").c_str());
+  = QString(cedar::aux::locateResource("meshes/kuka_lwr/wrist_sphere_index.txt").c_str());
   loadIndexData(wrist_sphere_index_data_file_name, mWristSphereFacesNumber, mWristSphereIndex);
 
   // wrist ring
   QString wrist_ring_vertex_data_file_name
-  = QString(cedar::aux::System::locateResource("meshes/kuka_lwr/wrist_ring_vertex.txt").c_str());
+  = QString(cedar::aux::locateResource("meshes/kuka_lwr/wrist_ring_vertex.txt").c_str());
   loadVertexData(wrist_ring_vertex_data_file_name, mWristRingVertexNumber, mWristRingVertex);
   QString wrist_ring_index_data_file_name
-  = QString(cedar::aux::System::locateResource("meshes/kuka_lwr/wrist_ring_index.txt").c_str());
+  = QString(cedar::aux::locateResource("meshes/kuka_lwr/wrist_ring_index.txt").c_str());
   loadIndexData(wrist_ring_index_data_file_name, mWristRingFacesNumber, mWristRingIndex);
 
 

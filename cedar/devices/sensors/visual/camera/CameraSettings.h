@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -33,7 +33,7 @@
     Credits:
 
 ======================================================================================================================*/
-
+//newfile
 #ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTINGS_H
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTINGS_H
 
@@ -42,7 +42,14 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/namespace.h"
+#include "cedar/devices/sensors/visual/camera/enums/CameraSetting.h"
 #include "cedar/auxiliaries/EnumType.h"
+#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/Configurable.h"
+
+#include "cedar/devices/sensors/visual/camera/enums/CameraBackendType.h"
+
 
 // SYSTEM INCLUDES
 
@@ -52,29 +59,29 @@
  * Implements the common features of a camera device
  */
 class cedar::dev::sensors::visual::CameraSettings
+:
+public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  typedef cedar::aux::EnumId Id;
-  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  CameraSettings();
+  /// The standard constructor.
+  CameraSettings(cedar::dev::sensors::visual::CameraBackendType::Id backendType);
 
-  //!@brief Destructor
+  /// Destructor
   ~CameraSettings();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+//  cedar::dev::sensors::visual::CameraSettingsSet& getSettings();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -86,7 +93,11 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  /// Set a Parameter in the cv::VideoCapture class
+  bool setSetting(CameraSetting::Id settingId, double value);
+
+  /// Get a Parameter in the cv::VideoCapture class
+  double getSetting(CameraSetting::Id settingId);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -94,13 +105,32 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+//  cedar::dev::sensors::visual::CameraSettingsSet mSettings;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+  
+  /// frame width
+  cedar::aux::UIntParameterPtr mpWidth;
+
+  /// frame height
+  cedar::aux::UIntParameterPtr mpHeight;
+
+  /// framesize as mode
+  cedar::aux::EnumParameterPtr _mpGrabMode;
+
+  /// framerate of grabbing
+  cedar::aux::EnumParameterPtr _mpFPS;
+  
+  
+#ifdef CEDAR_USE_LIB_DC1394
+  /// the iso-speed of the firewire bus
+  cedar::aux::EnumParameterPtr _mpIsoSpeed;
+#endif
+
 
 private:
   // none yet

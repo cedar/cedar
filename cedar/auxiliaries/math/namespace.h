@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -55,7 +55,7 @@ namespace cedar
     namespace math
     {
       //!@brief a templated class for representing limits (i.e. an interval) of some type
-      template <typename T> struct Limits;
+      template <typename T> class Limits;
 
       //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_AUX_CLASS(Sigmoid);
@@ -76,10 +76,13 @@ namespace cedar
       template <class T> class LimitsParameter;
       //!@brief a template specialization for double-based limits
       typedef LimitsParameter<double> DoubleLimitsParameter;
+      //!@brief a template specialization for int-based limits
+      typedef LimitsParameter<int> IntLimitsParameter;
 
       //!@cond SKIPPED_DOCUMENTATION
       CEDAR_GENERATE_POINTER_TYPES(TransferFunctionFactory);
       CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleLimitsParameter);
+      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntLimitsParameter);
       //!@endcond
     }
   }

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -36,7 +36,7 @@
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
-#ifdef CEDAR_USE_LIB_DC1394
+
 
 // CEDAR INCLUDES
 #include "cedar/processing/sources/Camera.h"
@@ -82,20 +82,36 @@ namespace
 
 cedar::proc::sources::Camera::Camera()
 :
-cedar::proc::sources::GrabberBase(),
-mDeBayer(new cedar::aux::BoolParameter(this, "deBayer", false)),
-mBusId(new cedar::aux::UIntParameter(this, "busId", 0, 0, 999))
+cedar::proc::sources::GrabberBase()
 {
-  //default config-filename
-  //GrabberBase::_mConfigurationFileName->setValue("./cameragrabber.cfg");
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
 
-  //default file values
-  //mGrabber.reset();
+  // on creation, create also the cameragrabber. It doesn't matter if the file is valid.
+  cedar::dev::sensors::visual::CameraGrabberPtr grabber;
+  grabber = cedar::dev::sensors::visual::CameraGrabberPtr
+            (
+               new cedar::dev::sensors::visual::CameraGrabber()
+            );
 
+  //no exception here, so we could use it
+  this->mpGrabber = grabber;
 
+  this->addConfigurableChild("CameraGrabber", this->getCameraGrabber());
   this->declareOutput("camera", mImage);
-  QObject::connect(mDeBayer.get(), SIGNAL(valueChanged()), this, SLOT(setDeBayer()));
-  QObject::connect(mBusId.get(), SIGNAL(valueChanged()), this, SLOT(setBusId()));
+
+  //this->reset();
+
+  //QObject::connect(mDeBayer.get(), SIGNAL(valueChanged()), this, SLOT(setDeBayer()));
+  //QObject::connect(mBusId.get(), SIGNAL(valueChanged()), this, SLOT(setBusId()));
+
+  // applyParameter as an action
+  this->registerFunction("apply parameter", boost::bind(&cedar::proc::sources::Camera::applyParameter, this));
+
+}
+
+cedar::proc::sources::Camera::~Camera()
+{
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -107,32 +123,38 @@ void cedar::proc::sources::Camera::onStart()
 {
   if (!this->getCameraGrabber()->isCreated())
   {
-    //GrabberBase::createGrabber();
+
   }
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::sources::Camera::setDeBayer()
+void cedar::proc::sources::Camera::applyParameter()
 {
-
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::sources::Camera::setBusId()
-{
-  //recreate grabber if needed
-  if (this->getCameraGrabber()->isCreated())
+  if (this->getCameraGrabber()->applyParameter())
   {
-   // GrabberBase::createGrabber();
+    for (int i = 0; i < 5; ++i)
+    {
+      usleep(500);
+      this->onTrigger();
+      this->annotateImage();
+    }
   }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+                                             (
+                                               this->getCameraGrabber()->getName() + ": ERROR on applying parameter",
+                                               "void cedar::proc::sources::Camera::applyParameter()"
+                                             );
+  }
+
+
 }
-
-
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Camera::compute(const cedar::proc::Arguments&)
 {
-  /* get the time-diff between two steps
+  // get the time-diff between two steps
+  /*
   try
   {
     const cedar::proc::StepTime& step_time = dynamic_cast<const cedar::proc::StepTime&>(arguments);
@@ -142,46 +164,11 @@ void cedar::proc::sources::Camera::compute(const cedar::proc::Arguments&)
   {
     CEDAR_THROW(cedar::proc::InvalidArgumentsException, "Bad arguments passed to dynamics. Expected StepTime.");
   }
-  */
-
+ */
   if (this->getCameraGrabber()->isCreated())
   {
     this->getCameraGrabber()->grab();
-
-    cv::Mat frame;
-
-    //check if conversion from bayer-pattern to cv::Mat BGR format is needed
-    if(this->mDeBayer->getValue())
-    {
-      cv::cvtColor(this->getCameraGrabber()->getImage(),frame,CV_BayerGR2BGR);
-    }
-    else
-    {
-      frame = this->getCameraGrabber()->getImage();
-    }
-    this->mImage->setData(frame.clone());
+    this->mImage->setData(this->getCameraGrabber()->getImage().clone());
   }
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-//void cedar::proc::sources::Camera::onCreateGrabber()
-//{
-//  //const std::string conf_file = this->_mConfigurationFileName->getPath();
-//  const unsigned int bus_id = this->mBusId->getValue();
-//
-//  // create a new one
-//  cedar::dev::sensors::visual::CameraGrabberPtr grabber;
-//  //grabber = cedar::dev::sensors::visual::CameraGrabberPtr
-//  //          (
-//   //            new cedar::dev::sensors::visual::CameraGrabber(conf_file,bus_id,false,true)
-//   //         );
-//  const std::string message2= "New grabber created";
-//  cedar::aux::LogSingleton::getInstance()->debugMessage(message2,"cedar::proc::sources::Video::createGrabber()");
-//
-//  // the new grabber created without exception, so we can use it
-//  GrabberBase::mGrabber = grabber;
-//
-//  //!@todo read debayer value from config-file
-//}
-
-#endif // CEDAR_USE_LIB_DC1394

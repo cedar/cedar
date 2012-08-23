@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -40,9 +40,6 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-// MAKE FIREWIRE OPTIONAL
-#ifdef CEDAR_USE_LIB_DC1394
-
 // CEDAR INCLUDES
 #include "cedar/processing/sources/namespace.h"
 #include "cedar/processing/sources/GrabberBase.h"
@@ -73,7 +70,7 @@ public:
   Camera();
 
   //!@brief Destructor
-//  virtual ~Camera(){};
+  ~Camera();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -81,16 +78,18 @@ public:
 public:
   // none yet
 
-public slots:
+//public slots:
+//
+//  //!@brief Set the debayer function on or off
+//  void setDeBayer();
+//
+//  /*!@brief Set the busId
+//   *
+//   * If this value is set on grabbing, the cameragrabber will be destroyed and with the new busId recreated
+//   */
+//  void setBusId();
 
-  //!@brief Set the debayer function on or off
-  void setDeBayer();
-
-  /*!@brief Set the busId
-   *
-   * If this value is set on grabbing, the cameragrabber will be destroyed and with the new busId recreated
-   */
-  void setBusId();
+  void applyParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -148,5 +147,4 @@ private:
 
 }; // class cedar::proc::sources::Camera
 
-#endif // CEDAR_USE_LIB_DC1394
 #endif // CEDAR_PROC_SOURCES_CAMERA_H

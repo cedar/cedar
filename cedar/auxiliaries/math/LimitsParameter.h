@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -118,10 +118,10 @@ public:
   void readFromNode(const cedar::aux::ConfigurationNode& root)
   {
     cedar::aux::ConfigurationNode lower_limit_child = root.get_child("lower limit");
-    mLimits.mLowerLimit = lower_limit_child.get_value<T>();
+    mLimits.setLower(lower_limit_child.get_value<T>());
 
     cedar::aux::ConfigurationNode upper_limit_child = root.get_child("upper limit");
-    mLimits.mUpperLimit = upper_limit_child.get_value<T>();
+    mLimits.setUpper(upper_limit_child.get_value<T>());
   }
 
   /*!@brief Write the current limits into a configuration tree.
@@ -133,14 +133,14 @@ public:
     cedar::aux::ConfigurationNode limits_node;
 
     cedar::aux::ConfigurationNode lower_limit_node;
-    lower_limit_node.put_value(mLimits.mLowerLimit);
+    lower_limit_node.put_value(mLimits.getLower());
     limits_node.push_back(cedar::aux::ConfigurationNode::value_type("lower limit", lower_limit_node));
 
     cedar::aux::ConfigurationNode upper_limit_node;
-    upper_limit_node.put_value(mLimits.mUpperLimit);
+    upper_limit_node.put_value(mLimits.getUpper());
     limits_node.push_back(cedar::aux::ConfigurationNode::value_type("upper limit", upper_limit_node));
 
-    root.push_back(cedar::aux::ConfigurationNode::value_type(getName(), limits_node));
+    root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), limits_node));
   }
 
   //!@brief set value to default
@@ -150,10 +150,23 @@ public:
     this->setUpperLimit(mUpperLimitDefault);
   }
 
+  //!@brief get the current value of type T of this parameter
+  const cedar::aux::math::Limits<T>& getValue() const
+  {
+    return this->mLimits;
+  }
+
+  //!@brief set the value of type T of this parameter
+  void setValue(const cedar::aux::math::Limits<T>& value)
+  {
+    this->mLimits = value;
+    this->emitChangedSignal();
+  }
+
   //!@brief sets the lower limit and emits a signal
   void setLowerLimit(const T& value)
   {
-    this->mLimits.mLowerLimit = value;
+    this->mLimits.setLower(value);
     this->emitPropertyChangedSignal();
   }
 
@@ -161,20 +174,20 @@ public:
   void setUpperLimit(const T& value)
   {
     // todo: check whether the new upper limit is inside the provided extrema
-    this->mLimits.mUpperLimit = value;
+    this->mLimits.setUpper(value);
     this->emitPropertyChangedSignal();
   }
 
   //!@brief returns the lower limit
   const T& getLowerLimit() const
   {
-    return this->mLimits.mLowerLimit;
+    return this->mLimits.getLower();
   }
 
   //!@brief returns the upper limit
   const T& getUpperLimit() const
   {
-    return this->mLimits.mUpperLimit;
+    return this->mLimits.getUpper();
   }
 
   //!@brief get the minimum value of the lower limit
@@ -263,6 +276,7 @@ private:
   //!@brief The maximum value of the upper limit
   T mUpperLimitMaximum;
 
+  //! holds the minimum and maximum limits
   cedar::aux::math::Limits<T> mLimits;
 
 }; // class cedar::aux::math::LimitsParameter
