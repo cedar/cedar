@@ -194,6 +194,7 @@ void cedar::proc::steps::Convolution::inputConnectionChanged(const std::string& 
     CEDAR_DEBUG_ASSERT(this->mMatrix);
 
     this->mOutput->copyAnnotationsFrom(this->mMatrix);
+    this->mOutput->setData(this->mMatrix->getData().clone());
 
     this->inputDimensionalityChanged();
   }
