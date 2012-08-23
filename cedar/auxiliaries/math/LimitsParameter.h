@@ -80,6 +80,7 @@ public:
   mUpperLimitMinimum(defaultUpperLimitMinimum),
   mUpperLimitMaximum(defaultUpperLimitMaximum)
   {
+    this->makeDefault();
   }
 
   //!@brief the constructor
