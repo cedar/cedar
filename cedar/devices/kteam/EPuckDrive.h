@@ -63,8 +63,6 @@ public:
 public:
   //!@brief Returns the values of the acceleration sensor of the E-Puck robot.
   std::vector<int> getAcceleration();
-  // documented in base class
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

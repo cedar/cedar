@@ -53,11 +53,9 @@ cedar::dev::kteam::Drive::Drive(cedar::dev::com::SerialCommunicationPtr communic
 :
 cedar::dev::robot::DifferentialDrive(),
 mSerialCommunication(communication),
-_mNumberOfPulsesPerRevolution(new cedar::aux::DoubleParameter(this, "number of pulses per revolution", 0.1, 0.0, 1.0)),
+_mNumberOfPulsesPerRevolution(new cedar::aux::DoubleParameter(this, "number of pulses per revolution", 0.1)),
 _mEncoderLimits(new cedar::aux::math::IntLimitsParameter(this, "encoder limits", -32768, 0, 0, 32767))
 {
-  updateDistancePerPulse();
-
 #ifdef DEBUG
   // send a dummy-message
   getSerialCommunication()->lock();
@@ -90,9 +88,9 @@ _mEncoderLimits(new cedar::aux::math::IntLimitsParameter(this, "encoder limits",
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::kteam::Drive::updateDistancePerPulse()
+double cedar::dev::kteam::Drive::getDistancePerPulse() const
 {
-  mDistancePerPulse = 2.0 * cedar::aux::math::pi * getWheelRadius() / getNumberOfPulsesPerRevolution();
+  return 2.0 * cedar::aux::math::pi * getWheelRadius() / getNumberOfPulsesPerRevolution();
 }
 
 double cedar::dev::kteam::Drive::getNumberOfPulsesPerRevolution() const
@@ -103,11 +101,6 @@ double cedar::dev::kteam::Drive::getNumberOfPulsesPerRevolution() const
 cedar::aux::math::IntLimitsParameterPtr cedar::dev::kteam::Drive::getEncoderLimits() const
 {
   return _mEncoderLimits;
-}
-
-double cedar::dev::kteam::Drive::getDistancePerPulse() const
-{
-  return mDistancePerPulse;
 }
 
 char cedar::dev::kteam::Drive::getCommandCharacterSetSpeed() const
@@ -141,8 +134,8 @@ void cedar::dev::kteam::Drive::sendMovementCommand()
   // of pulses per second (this is hardware-specific).
   // first: convert speed from m/s into Pulses/s ...
   std::vector<int> wheel_speed_pulses(2, 0);
-  wheel_speed_pulses[0] = cedar::aux::math::round(this->getWheelSpeed()[0] / mDistancePerPulse);
-  wheel_speed_pulses[1] = cedar::aux::math::round(this->getWheelSpeed()[1] / mDistancePerPulse);
+  wheel_speed_pulses[0] = cedar::aux::math::round(this->getWheelSpeed()[0] / this->getDistancePerPulse());
+  wheel_speed_pulses[1] = cedar::aux::math::round(this->getWheelSpeed()[1] / this->getDistancePerPulse());
 
   // construct the command string "D,x,y"
   // where x is the speed of the left wheel (in pulses/s)

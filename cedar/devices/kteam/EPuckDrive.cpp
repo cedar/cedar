@@ -55,6 +55,8 @@ cedar::dev::kteam::Drive(communication)
   _mNumberOfPulsesPerRevolution->makeDefault();
   _mEncoderLimits->setDefaults(-32768, 32767);
   _mEncoderLimits->makeDefault();
+  _mHardwareSpeedLimits->setDefaults(-2000, 2000);
+  _mHardwareSpeedLimits->makeDefault();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -112,12 +114,4 @@ std::vector<int> cedar::dev::kteam::EPuckDrive::getAcceleration()
   );
 
   return acceleration;
-}
-
-void cedar::dev::kteam::EPuckDrive::readConfiguration(const cedar::aux::ConfigurationNode& node)
-{
-  // read the configuration
-  this->Configurable::readConfiguration(node);
-  // update the member mDistancePerPulse
-  this->updateDistancePerPulse();
 }
