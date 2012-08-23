@@ -143,9 +143,6 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-
-private:
   //! number of pulses per revolution of wheel
   cedar::aux::DoubleParameterPtr _mNumberOfPulsesPerRevolution;
   //! limits for the encoder value

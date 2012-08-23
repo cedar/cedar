@@ -47,6 +47,14 @@ cedar::dev::kteam::EPuckDrive::EPuckDrive(cedar::dev::com::SerialCommunicationPt
 :
 cedar::dev::kteam::Drive(communication)
 {
+  _mWheelDistance->setDefault(0.053);
+  _mWheelDistance->makeDefault();
+  _mWheelRadius->setDefault(0.0205);
+  _mWheelRadius->makeDefault();
+  _mNumberOfPulsesPerRevolution->setDefault(1000);
+  _mNumberOfPulsesPerRevolution->makeDefault();
+  _mEncoderLimits->setDefaults(-32768, 32767);
+  _mEncoderLimits->makeDefault();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
