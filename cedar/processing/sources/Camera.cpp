@@ -63,7 +63,7 @@ namespace
         "cedar.processing.sources.Camera"
       )
     );
-    declaration->setIconPath(":/steps/video_grabber.svg");
+    declaration->setIconPath(":/steps/camera_grabber.svg");
     declaration->setDescription
     (
       "A source that reads images from a camera."
