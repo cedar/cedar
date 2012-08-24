@@ -48,7 +48,7 @@ cedar::dev::robot::Locomotion::Locomotion()
 :
 _mForwardVelocityLimits
 (
-  new cedar::aux::math::DoubleLimitsParameter(this, "forward velocity limits", -2.0, 2.0, 2.0, 4.0)
+  new cedar::aux::math::DoubleLimitsParameter(this, "forward velocity limits", -2.0, 2.0, -4.0, 4.0, -4.0, 4.0)
 ),
 _mTurningRateLimits
 (
@@ -57,9 +57,11 @@ _mTurningRateLimits
         this,
         "turning rate limits",
         -2.0 * cedar::aux::math::pi,
-        0.0,
-        0.0,
-        2.0 * cedar::aux::math::pi
+        2.0 * cedar::aux::math::pi,
+        -20.0 * cedar::aux::math::pi,
+        20.0 * cedar::aux::math::pi,
+        -20.0 * cedar::aux::math::pi,
+        20.0 * cedar::aux::math::pi
       )
 )
 {}
