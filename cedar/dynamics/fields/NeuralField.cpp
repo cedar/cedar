@@ -69,7 +69,7 @@ namespace
 
     ElementDeclarationPtr field_decl
     (
-      new cedar::proc::ElementDeclarationTemplate<cedar::dyn::NeuralField>("Fields", "cedar.dynamics.NeuralField")
+      new cedar::proc::ElementDeclarationTemplate<cedar::dyn::NeuralField>("DFT", "cedar.dynamics.NeuralField")
     );
     field_decl->setIconPath(":/steps/field_temp.svg");
     field_decl->setDescription

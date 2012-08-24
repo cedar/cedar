@@ -68,6 +68,8 @@ namespace cedar
     CEDAR_DECLARE_DYN_CLASS(MatActivation);
     CEDAR_DECLARE_DYN_CLASS(Preshape);
     CEDAR_DECLARE_DYN_CLASS(Noise);
+    CEDAR_DECLARE_DYN_CLASS(RateToSpaceCode);
+    CEDAR_DECLARE_DYN_CLASS(SpaceToRateCode);
     //!@endcond
 
     //!@brief A function for loading the declarations of the dynamics namespace as plugin.

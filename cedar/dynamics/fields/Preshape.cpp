@@ -57,7 +57,7 @@ namespace
 
     ElementDeclarationPtr preshape_decl
     (
-      new cedar::proc::ElementDeclarationTemplate<cedar::dyn::Preshape>("Fields", "cedar.dynamics.Preshape")
+      new cedar::proc::ElementDeclarationTemplate<cedar::dyn::Preshape>("DFT", "cedar.dynamics.Preshape")
     );
     preshape_decl->setIconPath(":/steps/preshape.svg");
     preshape_decl->setDescription
