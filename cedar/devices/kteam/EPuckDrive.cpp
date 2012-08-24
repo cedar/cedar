@@ -69,10 +69,10 @@ std::vector<int> cedar::dev::kteam::EPuckDrive::getAcceleration()
   std::vector<int> acceleration(3);
 
   // send a command string to the robot to receive the current acceleration values
-  getSerialCommunication()->lock();
-  getSerialCommunication()->send(cedar::aux::toString(getCommandCharacterGetAcceleration()));
-  std::string answer = getSerialCommunication()->receive();
-  getSerialCommunication()->unlock();
+  std::string answer = getSerialCommunication()->sendAndReceiveLocked
+                       (
+                         cedar::aux::toString(getCommandCharacterGetAcceleration())
+                       );
 
   // check whether the first character of the answer is correct
   checkAnswer(answer, getCommandCharacterGetAcceleration());

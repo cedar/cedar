@@ -64,6 +64,7 @@
 
 cedar::dev::com::SerialCommunication::SerialCommunication()
 :
+mFileDescriptor(0),
 mInitialized(false),
 _mDevicePath(new cedar::aux::StringParameter(this, "device path", "/dev/rfcomm0")),
 _mEndOfCommandString(new cedar::aux::StringParameter(this, "end of command string", "\\r\\n")),
@@ -72,13 +73,6 @@ _mBaudrate(new cedar::aux::UIntParameter(this, "baud rate", 4098, 0, 1000000)),
 _mTimeOut(new cedar::aux::UIntParameter(this, "time out", 250000, 0, 1000000)),
 _mLatency(new cedar::aux::UIntParameter(this, "latency", 10000, 0, 1000000))
 {
-  // currently, parameters for this class cannot be changed online.
-  _mDevicePath->setConstant(true);
-  _mEndOfCommandString->setConstant(true);
-  _mCountryFlag->setConstant(true);
-  _mBaudrate->setConstant(true);
-  _mTimeOut->setConstant(true);
-  _mLatency->setConstant(true);
 }
 
 cedar::dev::com::SerialCommunication::~SerialCommunication()
@@ -151,16 +145,20 @@ void cedar::dev::com::SerialCommunication::checkIfInitialized() const
 {
   if (!mInitialized)
   {
-    CEDAR_THROW(cedar::aux::InitializationException, "Error sending data - port not initialized");
+    CEDAR_THROW(cedar::aux::InitializationException, "Port not initialized");
+  }
+}
+
+void cedar::dev::com::SerialCommunication::checkIfOpen() const
+{
+  if (this->mFileDescriptor == 0)
+  {
+    CEDAR_THROW(cedar::aux::InitializationException, "Serial port not opened.");
   }
 }
 
 void cedar::dev::com::SerialCommunication::initialize()
 {
-#ifdef _CEDAR_OS_WINDOWS32
-#warning "cedar::dev::com::SerialCommunication::initialize() not implemented for Windows.";
-#else
-
   if (mInitialized)
   {
     cedar::aux::LogSingleton::getInstance()->warning
@@ -176,136 +174,14 @@ void cedar::dev::com::SerialCommunication::initialize()
   // set the string signaling the end of a command
   setEndOfCommandString(_mEndOfCommandString->getValue());
 
-  // initialize communication on Linux
-#if defined CEDAR_OS_LINUX
-  mFileDescriptor = open(getDevicePath().c_str(), O_RDWR | O_NOCTTY);
-
-  if (mFileDescriptor == -1)
-  {
-    std::string exception_message = "Error opening serial port " + getDevicePath() + " on Linux";
-    CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message);
-  }
-
-  // save current modem settings
-  tcgetattr(mFileDescriptor, &mTerminal);
-
-  // ignore bytes with parity errors and make terminal raw and dumb
-  mTerminal.c_iflag = IGNPAR | IGNBRK;
-
-  // raw output
-  mTerminal.c_oflag = 0;
-
-  // do not echo characters
-  mTerminal.c_lflag = 0;
-
-  // set bps rate, hardware flow control, and 8n2 (8 bit, no parity, 2 stop bit)
-  switch (_mCountryFlag->getValue())
-  {
-    case 0:
-    {
-      mTerminal.c_cflag = CLOCAL | CREAD | CSTOPB | CS8;
-      break;
-    }
-    case 1:
-    {
-      mTerminal.c_cflag = CLOCAL | CREAD | CS8;
-      break;
-    }
-    default:
-    {
-      CEDAR_THROW
-      (
-        cedar::dev::SerialCommunicationException,
-        "Wrong country flag (set flag to 0 for Germany or 1 for USA.)"
-      );
-    }
-  }
-
-  //@todo what is going on here?
-  cfsetospeed(&mTerminal, _mBaudrate->getValue());
-  cfsetispeed(&mTerminal, _mBaudrate->getValue());
-  mTerminal.c_cc[VMIN] = 0;
-  mTerminal.c_cc[VTIME] = 0;
-  tcsetattr(mFileDescriptor, TCSANOW, &mTerminal);
-
-
-  // initialize communication on Mac
-#elif defined CEDAR_OS_APPLE
-  mFileDescriptor = open(getDevicePath().c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
-
-  if (mFileDescriptor < 0)
-  {
-    CEDAR_THROW(cedar::dev::SerialCommunicationException, "Error opening serial port " + getDevicePath() + " on Mac");
-  }
-
-  if (fcntl(mFileDescriptor, F_SETFL, 0) < 0)
-  {
-    std::ostringstream exception_message;
-    exception_message << "Error clearing O_NDELAY"
-                      << getDevicePath()
-                      << " - "
-                      << strerror(errno)
-                      << "("
-                      << errno
-                      << ")";
-    CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message.str());
-  }
-
-  // get the current options and save them for later reset
-  if (tcgetattr(mFileDescriptor, &mOriginalTTYAttrs) < 0)
-  {
-    std::ostringstream exception_message;
-    exception_message << "Error getting tty attribues"
-                      << getDevicePath()
-                      << " - "
-                      << strerror(errno)
-                      << "("
-                      << errno
-                      << ")";
-    CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message.c_str());
-  }
-
-  // set raw input; timeout: 1 s
-  // these options are documented in the man page for termios
-  mTerminal = mOriginalTTYAttrs;
-  mTerminal.c_cflag |= (CLOCAL | CREAD);
-  mTerminal.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
-  mTerminal.c_oflag &= ~OPOST;
-  mTerminal.c_cc[VMIN] = 0;
-  mTimeoutTalk = 30;
-  mTerminal.c_cc[VTIME] = 0; // mTimeoutTalk;
-  mTerminal.c_ispeed = _mBaudrate->getValue();
-  mTerminal.c_ospeed = _mBaudrate->getValue();
-  clear_my(mTerminal.c_cflag, CSIZE|PARENB); // control modes
-  set(mTerminal.c_cflag, CS8 | CSTOPB);
-
-  // set the options
-  if (tcsetattr(mFileDescriptor, TCSANOW, &mTerminal) < 0)
-  {
-    std::ostringstream exception_message;
-    exception_message << "Error getting tty attribues"
-                      << getDevicePath()
-                      << " - "
-                      << strerror(errno)
-                      << "("
-                      << errno
-                      << ")";
-    CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message.c_str());
-  }
-#else
-  CEDAR_THROW(cedar::dev::UnknownOperatingSystemException, "Error opening serial port - unknown operating system.");
-#endif
-
-  tcflush(mFileDescriptor, TCIOFLUSH);
   mInitialized = true;
+}
 
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-  (
-    "Successfully opened port" + getDevicePath(),
-    "cedar::dev::com::SerialCommunication",
-    "Serial communication initialized"
-  );
-#endif
+std::string cedar::dev::com::SerialCommunication::sendAndReceiveLocked(const std::string& command)
+{
+  QWriteLocker locker(&this->mLock);
+  this->send(command);
+  return this->receive();
 }
 
 void cedar::dev::com::SerialCommunication::send(const std::string& command)
@@ -315,6 +191,7 @@ void cedar::dev::com::SerialCommunication::send(const std::string& command)
 #else
 
   checkIfInitialized();
+  checkIfOpen();
 
 #ifdef DEBUG
   QTime timer;
@@ -336,28 +213,9 @@ void cedar::dev::com::SerialCommunication::send(const std::string& command)
     CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message);
   }
 
-#ifdef DEBUG
-  std::ostringstream message;
-  message << "Successfully sent data ("
-          << status
-          << " bytes written to '"
-          << getDevicePath()
-          << "'), "
-          << "sending time: "
-          << timer.elapsed()
-          << " ms";
-
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-  (
-    message.str(),
-    "cedar::dev::com::SerialCommunication",
-    "Successfully sent data"
-  );
-#endif
-
   // delay the following operations
   cedar::aux::usleep(_mLatency->getValue());
-#endif
+#endif // CEDAR_OS_WINDOWS
 }
 
 std::string cedar::dev::com::SerialCommunication::receive()
@@ -370,6 +228,7 @@ std::string cedar::dev::com::SerialCommunication::receive()
 #else
 
   checkIfInitialized();
+  checkIfOpen();
 
 #ifdef DEBUG
   QTime timer;
@@ -447,24 +306,6 @@ std::string cedar::dev::com::SerialCommunication::receive()
   // delete end-of-command string
   answer.resize(read_bytes);
 
-#ifdef DEBUG
-  std::ostringstream message;
-  message << "Successfully received data ("
-          << read_bytes
-          << " Byte(s) read from '"
-          << getDevicePath()
-          << "')\n"
-          << "Receiving time: "
-          << timer.elapsed()
-          << " ms\n";
-
-  cedar::aux::LogSingleton::getInstance()->message
-  (
-    message.str(),
-    "cedar::dev::com::SerialCommunication",
-    "Successfully received data"
-  );
-#endif
 #endif
 
   return answer;
@@ -478,6 +319,161 @@ void cedar::dev::com::SerialCommunication::setEndOfCommandString(const std::stri
   _mEndOfCommandString->setValue(eocString);
 }
 
+void cedar::dev::com::SerialCommunication::open()
+{
+  //!@todo There is a lot of duplicate code here for mac and linux -- make this less redundant
+  if (!this->isInitialized())
+  {
+    this->initialize();
+  }
+
+  if (this->mFileDescriptor > 0)
+  {
+    return;
+  }
+
+  // Parameters cannot be changed while the device is open
+  _mDevicePath->setConstant(true);
+  _mEndOfCommandString->setConstant(true);
+  _mCountryFlag->setConstant(true);
+  _mBaudrate->setConstant(true);
+  _mTimeOut->setConstant(true);
+  _mLatency->setConstant(true);
+
+#ifdef CEDAR_OS_WINDOWS
+#warning "cedar::dev::com::SerialCommunication::initialize() not implemented for Windows.";
+#else
+  // initialize communication on Linux
+#if defined CEDAR_OS_LINUX
+  mFileDescriptor = ::open(getDevicePath().c_str(), O_RDWR | O_NOCTTY);
+
+  if (mFileDescriptor == -1)
+  {
+    std::string exception_message = "Error opening serial port " + getDevicePath() + " on Linux";
+    CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message);
+  }
+
+  // save current modem settings
+  tcgetattr(mFileDescriptor, &mTerminal);
+
+  // ignore bytes with parity errors and make terminal raw and dumb
+  mTerminal.c_iflag = IGNPAR | IGNBRK;
+
+  // raw output
+  mTerminal.c_oflag = 0;
+
+  // do not echo characters
+  mTerminal.c_lflag = 0;
+
+  // set bps rate, hardware flow control, and 8n2 (8 bit, no parity, 2 stop bit)
+  switch (_mCountryFlag->getValue())
+  {
+    case 0:
+    {
+      mTerminal.c_cflag = CLOCAL | CREAD | CSTOPB | CS8;
+      break;
+    }
+    case 1:
+    {
+      mTerminal.c_cflag = CLOCAL | CREAD | CS8;
+      break;
+    }
+    default:
+    {
+      CEDAR_THROW
+      (
+        cedar::dev::SerialCommunicationException,
+        "Wrong country flag (set flag to 0 for Germany or 1 for USA.)"
+      );
+    }
+  }
+
+  //@todo what is going on here?
+  cfsetospeed(&mTerminal, _mBaudrate->getValue());
+  cfsetispeed(&mTerminal, _mBaudrate->getValue());
+  mTerminal.c_cc[VMIN] = 0;
+  mTerminal.c_cc[VTIME] = 0;
+  tcsetattr(mFileDescriptor, TCSANOW, &mTerminal);
+
+
+  // initialize communication on Mac
+#elif defined CEDAR_OS_APPLE
+  mFileDescriptor = ::open(getDevicePath().c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
+
+  if (mFileDescriptor < 0)
+  {
+    CEDAR_THROW(cedar::dev::SerialCommunicationException, "Error opening serial port " + getDevicePath() + " on Mac");
+  }
+
+  if (fcntl(mFileDescriptor, F_SETFL, 0) < 0)
+  {
+    std::ostringstream exception_message;
+    exception_message << "Error clearing O_NDELAY"
+                      << getDevicePath()
+                      << " - "
+                      << strerror(errno)
+                      << "("
+                      << errno
+                      << ")";
+    CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message.str());
+  }
+
+  // get the current options and save them for later reset
+  if (tcgetattr(mFileDescriptor, &mOriginalTTYAttrs) < 0)
+  {
+    std::ostringstream exception_message;
+    exception_message << "Error getting tty attribues"
+                      << getDevicePath()
+                      << " - "
+                      << strerror(errno)
+                      << "("
+                      << errno
+                      << ")";
+    CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message.c_str());
+  }
+
+  // set raw input; timeout: 1 s
+  // these options are documented in the man page for termios
+  mTerminal = mOriginalTTYAttrs;
+  mTerminal.c_cflag |= (CLOCAL | CREAD);
+  mTerminal.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+  mTerminal.c_oflag &= ~OPOST;
+  mTerminal.c_cc[VMIN] = 0;
+  mTimeoutTalk = 30;
+  mTerminal.c_cc[VTIME] = 0; // mTimeoutTalk;
+  mTerminal.c_ispeed = _mBaudrate->getValue();
+  mTerminal.c_ospeed = _mBaudrate->getValue();
+  clear_my(mTerminal.c_cflag, CSIZE|PARENB); // control modes
+  set(mTerminal.c_cflag, CS8 | CSTOPB);
+
+  // set the options
+  if (tcsetattr(mFileDescriptor, TCSANOW, &mTerminal) < 0)
+  {
+    std::ostringstream exception_message;
+    exception_message << "Error getting tty attribues"
+                      << getDevicePath()
+                      << " - "
+                      << strerror(errno)
+                      << "("
+                      << errno
+                      << ")";
+    CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message.c_str());
+  }
+#else
+  CEDAR_THROW(cedar::dev::UnknownOperatingSystemException, "Error opening serial port - unknown operating system.");
+#endif
+
+  tcflush(mFileDescriptor, TCIOFLUSH);
+
+  cedar::aux::LogSingleton::getInstance()->debugMessage
+  (
+    "Successfully opened port" + getDevicePath(),
+    "cedar::dev::com::SerialCommunication",
+    "Serial communication initialized"
+  );
+#endif
+}
+
 void cedar::dev::com::SerialCommunication::close()
 {
   int status = ::close(mFileDescriptor);
@@ -487,15 +483,20 @@ void cedar::dev::com::SerialCommunication::close()
     std::string exception_message = "Error closing port '" + getDevicePath() + "'";
     CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message);
   }
-#ifdef DEBUG
-  else
-  {
-    cedar::aux::LogSingleton::getInstance()->debugMessage
-    (
-      "Closing Port",
-      "cedar::dev::com::SerialCommunication",
-      "Serial communication closed"
-    );
-  }
-#endif // DEBUG
+
+  mFileDescriptor = 0;
+  cedar::aux::LogSingleton::getInstance()->debugMessage
+  (
+    "Closing Port",
+    "cedar::dev::com::SerialCommunication",
+    "Serial communication closed"
+  );
+
+  // Parameters cannot be changed while the device is open
+  _mDevicePath->setConstant(false);
+  _mEndOfCommandString->setConstant(false);
+  _mCountryFlag->setConstant(false);
+  _mBaudrate->setConstant(false);
+  _mTimeOut->setConstant(false);
+  _mLatency->setConstant(false);
 }

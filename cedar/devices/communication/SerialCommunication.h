@@ -82,6 +82,12 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Opens the channel.
+  void open();
+
+  //!@brief  Closes the channel.
+  void close();
+
 
   //!@brief The get-function of the initialization-status.
   //!@return true if initialized, else false
@@ -142,19 +148,18 @@ public:
    */
   void setEndOfCommandString(const std::string& eocString);
 
+  /*!@brief Sends a string and locks the channel properly.
+   */
+  std::string sendAndReceiveLocked(const std::string& command);
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief  Closes the channel.
-  void close();
-
   //!@brief Initializes the communication and opens the channel.
   //!@return 1 if initialization was successful, else 0.
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
@@ -164,6 +169,9 @@ private:
 
   //!@brief Checks whether the serial connection has been initialized. Throws an exception if not.
   void checkIfInitialized() const;
+
+  //!@brief Checks whether the serial connection has been opened. Throws an exception if not.
+  void checkIfOpen() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
