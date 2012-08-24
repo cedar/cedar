@@ -47,6 +47,16 @@ cedar::dev::kteam::EPuckDrive::EPuckDrive(cedar::dev::com::SerialCommunicationPt
 :
 cedar::dev::kteam::Drive(communication)
 {
+  _mWheelDistance->setDefault(0.053);
+  _mWheelDistance->makeDefault();
+  _mWheelRadius->setDefault(0.0205);
+  _mWheelRadius->makeDefault();
+  _mNumberOfPulsesPerRevolution->setDefault(1000);
+  _mNumberOfPulsesPerRevolution->makeDefault();
+  _mEncoderLimits->setDefaults(-32768, 32767);
+  _mEncoderLimits->makeDefault();
+  _mHardwareSpeedLimits->setDefaults(-2000, 2000);
+  _mHardwareSpeedLimits->makeDefault();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -104,12 +114,4 @@ std::vector<int> cedar::dev::kteam::EPuckDrive::getAcceleration()
   );
 
   return acceleration;
-}
-
-void cedar::dev::kteam::EPuckDrive::readConfiguration(const cedar::aux::ConfigurationNode& node)
-{
-  // read the configuration
-  this->Configurable::readConfiguration(node);
-  // update the member mDistancePerPulse
-  this->updateDistancePerPulse();
 }

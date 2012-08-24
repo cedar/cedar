@@ -117,9 +117,6 @@ protected:
    */
   void checkStream(const std::istringstream& answerStream, bool atEndOfStream) const;
 
-  //!@brief Updates the member mDistancePerPulse according to the wheel radius and number of pulses per revolution.
-  void updateDistancePerPulse();
-
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -134,8 +131,6 @@ protected:
   cedar::dev::com::SerialCommunicationPtr getSerialCommunication() const;
 
 private:
-  //! distance the wheel moves each pulse [in m]
-  double mDistancePerPulse;
   //! serial communication channel
   cedar::dev::com::SerialCommunicationPtr mSerialCommunication;
 
@@ -143,9 +138,6 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-
-private:
   //! number of pulses per revolution of wheel
   cedar::aux::DoubleParameterPtr _mNumberOfPulsesPerRevolution;
   //! limits for the encoder value
