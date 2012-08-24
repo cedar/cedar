@@ -51,11 +51,12 @@ int main(int argc, char **argv)
   cedar::dev::com::SerialCommunicationPtr communication(new cedar::dev::com::SerialCommunication());
   std::string serial_communication_config = cedar::aux::locateResource("configs/serial_communication.json");
   communication->readJson(serial_communication_config);
+  communication->open();
 
   // initialize epuck-drive
   cedar::dev::kteam::EPuckDrivePtr drive(new cedar::dev::kteam::EPuckDrive(communication));
   std::string epuck_drive_config = cedar::aux::locateResource("configs/epuck_drive.json");
-  communication->readJson(epuck_drive_config);
+  drive->readJson(epuck_drive_config);
 
   // open the control-GUI
   cedar::dev::kteam::gui::EPuckControlWidgetPtr epuck_control(new cedar::dev::kteam::gui::EPuckControlWidget(drive));
