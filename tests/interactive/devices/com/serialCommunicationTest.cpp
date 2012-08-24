@@ -48,6 +48,7 @@ int main(int argc, char **argv)
   cedar::dev::com::SerialCommunicationPtr communication(new cedar::dev::com::SerialCommunication());
   std::string serial_communication_config = cedar::aux::locateResource("configs/serial_communication.json");
   communication->readJson(serial_communication_config);
+  communication->open();
 
   // create the GUI
   cedar::dev::com::gui::CommunicationWidgetPtr

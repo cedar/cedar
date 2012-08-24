@@ -58,10 +58,7 @@ _mEncoderLimits(new cedar::aux::math::IntLimitsParameter(this, "encoder limits",
 {
 #ifdef DEBUG
   // send a dummy-message
-  getSerialCommunication()->lock();
-  getSerialCommunication()->send("A");
-  std::string answer = getSerialCommunication()->receive();
-  getSerialCommunication()->unlock();
+  std::string answer = getSerialCommunication()->sendAndReceiveLocked("A");
 
   // 'a,' or 'z,' expected, else init failed
   if (answer.size() >= 2 && (answer[0] == 'a' || answer[0] == 'z') && answer[1] == ',')
@@ -143,12 +140,9 @@ void cedar::dev::kteam::Drive::sendMovementCommand()
   std::ostringstream command;
   command << getCommandCharacterSetSpeed() << "," << wheel_speed_pulses[0] << "," << wheel_speed_pulses[1];
 
-  getSerialCommunication()->lock();
-  // send the command via the serial connection
-  getSerialCommunication()->send(command.str());
+
   // wait for an answer
-  std::string answer = getSerialCommunication()->receive();
-  getSerialCommunication()->unlock();
+  std::string answer = getSerialCommunication()->sendAndReceiveLocked(command.str());
 
   checkAnswer(answer, getCommandCharacterSetSpeed());
 }
@@ -159,10 +153,8 @@ std::vector<int> cedar::dev::kteam::Drive::getEncoders() const
   std::vector<int> encoders(2);
 
   // send the command to receive the values of the encoders
-  getSerialCommunication()->lock();
-  getSerialCommunication()->send(cedar::aux::toString(getCommandCharacterGetEncoder()));
-  std::string answer = getSerialCommunication()->receive();
-  getSerialCommunication()->unlock();
+  std::string answer
+    = getSerialCommunication()->sendAndReceiveLocked(cedar::aux::toString(getCommandCharacterGetEncoder()));
 
   // check whether the answer begins with the correct character
   checkAnswer(answer, getCommandCharacterGetEncoder());
@@ -202,12 +194,7 @@ void cedar::dev::kteam::Drive::setEncoders(const std::vector<int>& encoders)
   // create a command string which will set the encoder values
   std::ostringstream command;
   command << getCommandCharacterSetEncoder() << "," << encoders[0] << "," << encoders[1];
-  // send the command string
-  getSerialCommunication()->lock();
-  getSerialCommunication()->send(command.str());
-  // receive an answer
-  std::string answer = getSerialCommunication()->receive();
-  getSerialCommunication()->unlock();
+  std::string answer = getSerialCommunication()->sendAndReceiveLocked(command.str());
 
   // check whether the answer begins with the correct character
   checkAnswer(answer, getCommandCharacterSetEncoder());
