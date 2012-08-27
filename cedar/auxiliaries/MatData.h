@@ -80,6 +80,12 @@ public:
 public:
   std::string getDescription() const;
 
+  /*!@brief Returns the dimensionality of the matrix stored in this data.
+   *
+   * @remarks Calls cedar::aux::math::getDimensionalityOf(this->getData()) to determine the dimensionality.
+   */
+  unsigned int getDimensionality() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
