@@ -51,7 +51,7 @@
 cedar::proc::sources::GrabberBase::GrabberBase()
 :
 cedar::proc::Step(false, true),
-mImage(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_8UC3))),
+mImage(new cedar::aux::MatData(cv::Mat::zeros(3, 4, CV_8UC3))),
 mRecording(new cedar::aux::BoolParameter(this, "record", false))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
@@ -61,6 +61,8 @@ mRecording(new cedar::aux::BoolParameter(this, "record", false))
 
   // Snapshot as an action
   this->registerFunction("save snapshot", boost::bind(&cedar::proc::sources::GrabberBase::saveSnapshot, this));
+
+  this->annotateImage();
 }
 
 cedar::proc::sources::GrabberBase::~GrabberBase()
