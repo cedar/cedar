@@ -39,7 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/dynamics/namespace.h"
-#include "cedar/processing/Step.h"
+#include "cedar/dynamics/Dynamics.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 
@@ -48,7 +48,7 @@
 
 /*!@brief
  */
-class cedar::dyn::SpaceToRateCode : public cedar::proc::Step
+class cedar::dyn::SpaceToRateCode : public cedar::dyn::Dynamics
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -99,6 +99,7 @@ public:
   {
     this->_mTau->setValue(tau);
   }
+
 public slots:
   //!@brief This slot is connected to the valueChanged() event of the limit parameters.
   void limitsChanged();
@@ -122,7 +123,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //!@brief Updates the output matrix.
-  void compute(const cedar::proc::Arguments& arguments);
+  void eulerStep(const cedar::unit::Time& time);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
