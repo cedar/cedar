@@ -78,11 +78,14 @@ namespace cedar
       typedef LimitsParameter<double> DoubleLimitsParameter;
       //!@brief a template specialization for int-based limits
       typedef LimitsParameter<int> IntLimitsParameter;
+      //!@brief a template specialization for unsigned int-based limits
+      typedef LimitsParameter<unsigned int> UIntLimitsParameter;
 
       //!@cond SKIPPED_DOCUMENTATION
       CEDAR_GENERATE_POINTER_TYPES(TransferFunctionFactory);
       CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleLimitsParameter);
       CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntLimitsParameter);
+      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntLimitsParameter);
       //!@endcond
     }
   }

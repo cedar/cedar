@@ -67,12 +67,12 @@ int main(int argc, char **argv)
 
   //open the channel to the robot
   cedar::dev::com::SerialCommunicationPtr communication(new cedar::dev::com::SerialCommunication());
-  std::string serial_communication_config = cedar::aux::locateResource("configs/serial_communication.json");
+  std::string serial_communication_config = cedar::aux::locateResource("configs/epuck_serial_communication.json");
   communication->readJson(serial_communication_config);
 
   //initialize the e-puck
   cedar::dev::kteam::EPuckDrivePtr drive(new cedar::dev::kteam::EPuckDrive(communication));
-  std::string epuck_drive_config = cedar::aux::locateResource("configs/epuck_drive.json");
+  std::string epuck_drive_config = cedar::aux::locateResource("configs/epuck.json");
   communication->readJson(epuck_drive_config);
 
   //initialize the model of the e-puck

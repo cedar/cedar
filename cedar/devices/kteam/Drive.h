@@ -101,9 +101,6 @@ protected:
   //!@brief Returns the character used to get the encoders of the robot.
   virtual char getCommandCharacterGetEncoder() const;
 
-  //!@brief Returns the character used to get the acceleration of the robot.
-  virtual char getCommandCharacterGetAcceleration() const;
-
   /*!@brief Checks whether the answer begins with the correct first character.
    * The method throws an exception when the answer is not correct.
    * @param[in] answer the answer to check

@@ -35,6 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/devices/exceptions.h"
 #include "cedar/devices/kteam/EPuckDrive.h"
 #include "cedar/devices/communication/SerialCommunication.h"
 
@@ -47,6 +48,32 @@ cedar::dev::kteam::EPuckDrive::EPuckDrive(cedar::dev::com::SerialCommunicationPt
 :
 cedar::dev::kteam::Drive(communication)
 {
+  // send a dummy-message
+  getSerialCommunication()->lock();
+  getSerialCommunication()->send("A");
+  std::string answer = getSerialCommunication()->receive();
+  getSerialCommunication()->unlock();
+
+  // 'a,' or 'z,' expected, else init failed
+  if (answer.size() < 2 || (answer[0] != 'a' && answer[0] != 'z') || answer[1] != ',')
+  {
+    CEDAR_THROW
+    (
+      cedar::dev::SerialCommunicationException,
+      "Initialization of serial communication failed."
+    );
+  }
+#ifdef DEBUG
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Drive: Initialization successful (Answer: '" + answer + "')",
+      "cedar::dev::kteam::Drive::initialize()",
+      "Drive successfully initialized"
+    );
+  }
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -104,6 +131,11 @@ std::vector<int> cedar::dev::kteam::EPuckDrive::getAcceleration()
   );
 
   return acceleration;
+}
+
+char cedar::dev::kteam::EPuckDrive::getCommandCharacterGetAcceleration() const
+{
+  return 'A';
 }
 
 void cedar::dev::kteam::EPuckDrive::readConfiguration(const cedar::aux::ConfigurationNode& node)

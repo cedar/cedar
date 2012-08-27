@@ -57,33 +57,6 @@ _mNumberOfPulsesPerRevolution(new cedar::aux::DoubleParameter(this, "number of p
 _mEncoderLimits(new cedar::aux::math::IntLimitsParameter(this, "encoder limits", -32768, 0, 0, 32767))
 {
   updateDistancePerPulse();
-
-#ifdef DEBUG
-  // send a dummy-message
-  getSerialCommunication()->lock();
-  getSerialCommunication()->send("A");
-  std::string answer = getSerialCommunication()->receive();
-  getSerialCommunication()->unlock();
-
-  // 'a,' or 'z,' expected, else init failed
-  if (answer.size() >= 2 && (answer[0] == 'a' || answer[0] == 'z') && answer[1] == ',')
-  {
-    cedar::aux::LogSingleton::getInstance()->debugMessage
-    (
-      "Drive: Initialization successful (Answer: '" + answer + "')",
-      "cedar::dev::kteam::Drive::initialize()",
-      "Drive successfully initialized"
-    );
-  }
-  else
-  {
-    CEDAR_THROW
-    (
-      cedar::dev::SerialCommunicationException,
-      "Initialization of serial communication failed."
-    );
-  }
-#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -123,11 +96,6 @@ char cedar::dev::kteam::Drive::getCommandCharacterSetEncoder() const
 char cedar::dev::kteam::Drive::getCommandCharacterGetEncoder() const
 {
   return 'Q';
-}
-
-char cedar::dev::kteam::Drive::getCommandCharacterGetAcceleration() const
-{
-  return 'A';
 }
 
 cedar::dev::com::SerialCommunicationPtr cedar::dev::kteam::Drive::getSerialCommunication() const

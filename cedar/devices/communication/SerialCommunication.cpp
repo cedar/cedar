@@ -301,7 +301,7 @@ void cedar::dev::com::SerialCommunication::initialize()
 
   cedar::aux::LogSingleton::getInstance()->debugMessage
   (
-    "Successfully opened port" + getDevicePath(),
+    "Successfully opened port " + getDevicePath(),
     "cedar::dev::com::SerialCommunication",
     "Serial communication initialized"
   );
