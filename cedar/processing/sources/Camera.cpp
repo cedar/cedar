@@ -123,7 +123,6 @@ void cedar::proc::sources::Camera::onStart()
 {
   if (!this->getCameraGrabber()->isCreated())
   {
-
   }
 }
 
@@ -168,6 +167,8 @@ void cedar::proc::sources::Camera::compute(const cedar::proc::Arguments&)
   if (this->getCameraGrabber()->isCreated())
   {
     this->getCameraGrabber()->grab();
+    //!@todo Don't constantly reannotate here!
+    this->annotateImage();
     this->mImage->setData(this->getCameraGrabber()->getImage().clone());
   }
 }

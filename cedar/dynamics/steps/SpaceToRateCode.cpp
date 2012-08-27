@@ -101,18 +101,20 @@ _mTau(new cedar::aux::DoubleParameter(this, "tau", 10.0, cedar::aux::DoubleParam
   QObject::connect(_mLowerLimit.get(), SIGNAL(valueChanged()), this, SLOT(limitsChanged()));
   QObject::connect(_mUpperLimit.get(), SIGNAL(valueChanged()), this, SLOT(limitsChanged()));
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dyn::SpaceToRateCode::compute(const cedar::proc::Arguments&)
+void cedar::dyn::SpaceToRateCode::eulerStep(const cedar::unit::Time& time)
 {
   // the result is simply input * gain.
   double slope = cv::sum(this->mInput->getData()).val[0];
   double offset = cv::sum(this->mInput->getData().mul(mRamp)).val[0];
 
   this->mOutput->getData().at<float>(0,0)
-    += (-1.0 * slope * this->mOutput->getData().at<float>(0,0) + offset) / this->getTau();
+    += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(this->getTau())
+         * (-1.0 * slope * this->mOutput->getData().at<float>(0,0) + offset);
 }
 
 void cedar::dyn::SpaceToRateCode::limitsChanged()
@@ -120,7 +122,6 @@ void cedar::dyn::SpaceToRateCode::limitsChanged()
   if (this->mInput)
   {
     mRamp = cedar::aux::math::ramp(CV_32F, this->mInput->getData().rows, this->getLowerLimit(), this->getUpperLimit());
-    this->onTrigger();
   }
 }
 
@@ -133,16 +134,17 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::SpaceToRateCode::determineInputValid
   // First, let's make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(slot->getName() == "input")
 
-  if (boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+  if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
   {
-    // Mat data is accepted.
-    return cedar::proc::DataSlot::VALIDITY_VALID;
+    if (mat_data->getDimensionality() == 1)
+    {
+      // Mat data is accepted.
+      return cedar::proc::DataSlot::VALIDITY_VALID;
+    }
   }
-  else
-  {
-    // Everything else is rejected.
-    return cedar::proc::DataSlot::VALIDITY_ERROR;
-  }
+
+  // Everything else is rejected.
+  return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
 void cedar::dyn::SpaceToRateCode::inputConnectionChanged(const std::string& inputName)
