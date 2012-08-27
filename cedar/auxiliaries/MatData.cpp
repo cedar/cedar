@@ -96,3 +96,8 @@ std::string cedar::aux::MatData::getDescription() const
 
   return description;
 }
+
+unsigned int cedar::aux::MatData::getDimensionality() const
+{
+  return cedar::aux::math::getDimensionalityOf(this->mData);
+}
