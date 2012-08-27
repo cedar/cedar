@@ -82,8 +82,14 @@ cedar::dyn::Preshape::Preshape()
 mActivation(new cedar::aux::MatData(cv::Mat::zeros(10,10,CV_32F))),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 0, 1000)),
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000)),
-_mTimeScaleBuildUp(new cedar::aux::DoubleParameter(this, "time scale build up", 10.0, 0.001, 10000.0)),
-_mTimeScaleDecay(new cedar::aux::DoubleParameter(this, "time scale decay", 1000.0, 0.001, 10000.0))
+_mTimeScaleBuildUp
+(
+  new cedar::aux::DoubleParameter(this, "time scale build up", 10.0, cedar::aux::DoubleParameter::LimitType::positive())
+),
+_mTimeScaleDecay
+(
+  new cedar::aux::DoubleParameter(this, "time scale decay", 1000.0, cedar::aux::DoubleParameter::LimitType::positive())
+)
 {
   _mDimensionality->setValue(2);
   _mSizes->makeDefault();
@@ -96,6 +102,8 @@ _mTimeScaleDecay(new cedar::aux::DoubleParameter(this, "time scale decay", 1000.
 
   // now check the dimensionality and sizes of all matrices
   this->updateMatrices();
+
+  this->registerFunction("reset memory", boost::bind(&cedar::dyn::Preshape::resetMemory, this));
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -219,6 +227,11 @@ void cedar::dyn::Preshape::dimensionalityChanged()
 void cedar::dyn::Preshape::dimensionSizeChanged()
 {
   this->updateMatrices();
+}
+
+void cedar::dyn::Preshape::resetMemory()
+{
+  mActivation->getData() = 0.0;
 }
 
 void cedar::dyn::Preshape::updateMatrices()

@@ -106,6 +106,8 @@ private:
   //!@brief check if input fits to field in dimension and size
   bool isMatrixCompatibleInput(const cv::Mat& matrix) const;
 
+  void resetMemory();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
