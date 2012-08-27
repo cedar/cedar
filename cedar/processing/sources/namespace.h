@@ -59,6 +59,7 @@ namespace cedar
     namespace sources
     {
       //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_PROC_CLASS(Boost);
       CEDAR_DECLARE_PROC_CLASS(GrabberBase);
       CEDAR_DECLARE_PROC_CLASS(GaussInput);
       CEDAR_DECLARE_PROC_CLASS(Picture);

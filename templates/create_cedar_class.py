@@ -96,9 +96,13 @@ parser.add_option("-c", "--header-only", dest="header_only",
 # Deal with the arguments
 header_only = options.header_only
 
-if len(args) != 1:
+if len(args) > 1:
     print "Too many arguments (", args, "). Stopping."
-    sys.exit()
+    sys.exit(-1)
+elif len(args) == 0:
+    print "Not enough arguments."
+    parser.print_usage()
+    sys.exit(-1)
 
 class_name_full = args[0]
 

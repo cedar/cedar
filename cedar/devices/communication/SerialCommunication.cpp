@@ -429,7 +429,7 @@ void cedar::dev::com::SerialCommunication::open()
                       << "("
                       << errno
                       << ")";
-    CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message.c_str());
+    CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message.str());
   }
 
   // set raw input; timeout: 1 s
@@ -457,7 +457,7 @@ void cedar::dev::com::SerialCommunication::open()
                       << "("
                       << errno
                       << ")";
-    CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message.c_str());
+    CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message.str());
   }
 #else
   CEDAR_THROW(cedar::dev::UnknownOperatingSystemException, "Error opening serial port - unknown operating system.");

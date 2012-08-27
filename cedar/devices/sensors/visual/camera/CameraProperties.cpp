@@ -159,7 +159,7 @@ cedar::dev::sensors::visual::CamProperty& cedar::dev::sensors::visual::CameraPro
   CameraProperty::Id propId
 )
 {
-  return mPropertiesList.at(static_cast<unsigned int>(propId));
+  return mPropertiesList.find(static_cast<unsigned int>(propId))->second;
 
   //create empty CamProperty
   //cedar::dev::sensors::visual::CamPropertyPtr val(new cedar::dev::sensors::visual::CamProperty());

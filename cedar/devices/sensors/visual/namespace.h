@@ -148,6 +148,7 @@ namespace cedar
         //typedef std::map<unsigned int, double> CameraPropertyValues;
 
         //! map of a property-id to his class
+        //!@todo Should this not map from CameraProperty::Id / Enum::Id?
         typedef std::map<unsigned int, cedar::dev::sensors::visual::CamProperty> CameraPropertyMap;
 
         ///! a pair of property enum id and his value
