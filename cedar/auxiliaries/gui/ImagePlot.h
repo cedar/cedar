@@ -70,6 +70,19 @@ private:
     DATA_TYPE_UNKNOWN
   };
 
+  //! Widget used for displaying the image.
+  class ImageDisplay : public QLabel
+  {
+    public:
+      ImageDisplay(const QString& text);
+
+    protected:
+      void mousePressEvent(QMouseEvent * pEvent);
+
+    public:
+      cedar::aux::MatDataPtr mData;
+  };
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -128,7 +141,7 @@ protected:
   // none yet
 private:
   //! Label used for displaying the image.
-  QLabel *mpImageDisplay;
+  cedar::aux::gui::ImagePlot::ImageDisplay *mpImageDisplay;
 
   //! Data displayed by the plot.
   cedar::aux::MatDataPtr mData;
