@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatrixPlot.h
+    File:        MatDataPlot.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 14
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 08 28
 
     Description:
 
@@ -38,48 +34,45 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_MATRIX_PLOT_H
-#define CEDAR_AUX_GUI_MATRIX_PLOT_H
+#ifndef CEDAR_AUX_GUI_MAT_DATA_PLOT_H
+#define CEDAR_AUX_GUI_MAT_DATA_PLOT_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/MultiPlotInterface.h"
 
 // SYSTEM INCLUDES
-#include <QWidget>
-#include <QReadWriteLock>
-#include <opencv2/opencv.hpp>
-#include <qwtplot3d/qwt3d_types.h>
 
-/*!@brief Base class for plots that can display matrices.
+
+/*!@brief A generic plot for cedar::aux::MatData.
  *
- * @todo Write more detailed description of the class here.
+ *        This plot automatically selects the proper plot for matrix data based on its annotation and other factors.
  */
-class cedar::aux::gui::MatrixPlot : public cedar::aux::gui::MultiPlotInterface
+class cedar::aux::gui::MatDataPlot : public cedar::aux::gui::MultiPlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  MatrixPlot(QWidget *pParent = NULL);
+  MatDataPlot(QWidget *pParent = NULL);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief display a MatData
+  //!@brief Display a MatData.
   void plot(cedar::aux::DataPtr data, const std::string& title);
 
+  //!@brief Check if the given data can be appended to the plot.
   bool canAppend(cedar::aux::ConstDataPtr data) const;
-
-  //!@brief return vector of standard colors
-  static const Qwt3D::ColorVector& getStandardColorVector();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -105,9 +98,7 @@ private:
   //!@brief the plot widget
   QWidget *mpCurrentPlotWidget;
 
-  //!@brief vector filled with standard colors
-  static Qwt3D::ColorVector mStandardColorVector;
+}; // class cedar::aux::gui::MatDataPlot
 
-}; // class cedar::aux::gui::MatrixPlot
+#endif // CEDAR_AUX_GUI_MAT_DATA_PLOT_H
 
-#endif // CEDAR_AUX_GUI_MATRIX_PLOT_H
