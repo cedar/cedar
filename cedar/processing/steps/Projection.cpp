@@ -330,16 +330,17 @@ void cedar::proc::steps::Projection::expandMDtoND()
   cedar::aux::MatrixIterator output_iterator(mOutput->getData());
 
   // iterate through all elements of the output matrix
+  std::vector<int> input_index;
+  input_index.resize(input_dimensionality);
   do
   {
     // get index pointing to the current element in the output matrix
-    const std::vector<int> output_index = output_iterator.getCurrentIndexVector();
+    const std::vector<int>& output_index = output_iterator.getCurrentIndexVector();
 
     // compute the corresponding index in the input matrix
-    std::vector<int> input_index;
     for (unsigned int i = 0; i < _mDimensionMappings->getValue()->getNumberOfMappings(); ++i)
     {
-      input_index.push_back(output_index.at(_mDimensionMappings->getValue()->lookUp(i)));
+      input_index[i] = output_index.at(_mDimensionMappings->getValue()->lookUp(i));
     }
 
     // if the input dimensionality is 1 ...
