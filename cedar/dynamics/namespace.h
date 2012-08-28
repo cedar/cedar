@@ -68,6 +68,7 @@ namespace cedar
     CEDAR_DECLARE_DYN_CLASS(MatActivation);
     CEDAR_DECLARE_DYN_CLASS(Preshape);
     CEDAR_DECLARE_DYN_CLASS(Noise);
+    CEDAR_DECLARE_DYN_CLASS(RateMatrixToSpaceCode);
     CEDAR_DECLARE_DYN_CLASS(RateToSpaceCode);
     CEDAR_DECLARE_DYN_CLASS(SpaceToRateCode);
     //!@endcond
