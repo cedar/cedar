@@ -64,6 +64,8 @@ namespace
 {
   bool declare()
   {
+    using cedar::proc::DataRole;
+    using cedar::proc::ElementDeclaration;
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
@@ -77,6 +79,14 @@ namespace
       "An implementation of Amari's dynamic neural fields."
     );
 
+    // define field plot
+    ElementDeclaration::DataList field_plot_data;
+    field_plot_data.push_back(std::make_pair(DataRole::BUFFER, "input sum"));
+    field_plot_data.push_back(std::make_pair(DataRole::BUFFER, "activation"));
+    field_plot_data.push_back(std::make_pair(DataRole::OUTPUT, "sigmoided activation"));
+    field_decl->definePlot("field plot", field_plot_data);
+
+    // add declaration to the registry
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(field_decl);
 
     return true;
