@@ -44,11 +44,13 @@
 // CEDAR INCLUDES
 #include "cedar/processing/DeclarationBase.h"
 #include "cedar/processing/namespace.h"
+#include "cedar/processing/DataRole.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/FactoryDerived.h"
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief A StepDeclaration contains the relation of a unique class id (as string) and the corresponding factory to
@@ -63,6 +65,8 @@ class cedar::proc::ElementDeclaration : public cedar::proc::DeclarationBase
                                                >
 {
 public:
+  typedef std::vector<std::pair<cedar::proc::DataRole::Id, std::string> > DataList;
+  typedef std::vector<std::pair<std::string, DataList> > PlotDefinitionList;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -92,7 +96,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
   //!@brief set path to icon included in the graphical representation of this element
   void setIconPath(const std::string& path)
   {
@@ -132,6 +135,24 @@ public:
     }
   }
 
+  /*!@brief Defines a new plot for this type of element
+   *
+   * @param plotName    Name of the plot, displayed in the UI.
+   * @param dataToPlot  List of data slots to plot.
+   *
+   * @todo  This should also be read from the plugin xml file.
+   */
+  void definePlot(const std::string& plotName, const DataList& slotsToPlot)
+  {
+    this->mPlots.push_back(std::make_pair(plotName, slotsToPlot));
+  }
+
+  //!@brief Returns the defined plots for this declaration.
+  const PlotDefinitionList& definedPlots() const
+  {
+    return this->mPlots;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -155,6 +176,9 @@ private:
 
   //!@brief The description of the class.
   std::string mDescription;
+
+  //!@brief Declarations of plots.
+  PlotDefinitionList mPlots;
 };
 
 

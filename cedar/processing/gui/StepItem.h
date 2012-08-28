@@ -205,6 +205,9 @@ private:
     std::map<QAction*, std::pair<cedar::aux::gui::PlotDeclarationPtr, cedar::aux::Enum> >& declMap
   );
 
+  //!@brief Fills the defined plots into the given menu.
+  void fillDefinedPlots(QMenu* pMenu, const QPoint& plotPosition);
+
   //! Fills in the actions for the display style.
   void fillDisplayStyleMenu(QMenu* pMenu);
 
@@ -218,7 +221,12 @@ private:
   );
 
   //! Opens plots for all data in this step.
-  void plotAll(const QPoint& position);
+  void multiplot
+  (
+    const QPoint& position,
+    std::vector<std::pair<cedar::proc::DataRole::Id, std::string> > data
+      = std::vector<std::pair<cedar::proc::DataRole::Id, std::string> >()
+  );
 
   //! Updates the display of the step's run time measurements.
   void timerEvent(QTimerEvent *pEvent);
@@ -237,6 +245,8 @@ private:
 
 private slots:
   void displayStyleMenuTriggered(QAction* pAction);
+
+  void openDefinedPlotAction(QAction* pAction);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -45,7 +45,11 @@
 
 == current version ==
 - cedar::aux
-  - The image plot, when clicked, now shows the value of the pixel under the cursor. 
+  - The image plot, when clicked, now shows the value of the pixel under the cursor.
+  
+- cedar::proc
+  - You can now define plots in ElementDeclarations. Plots, in this case, are a list of data that is to be plotted
+    together.
 
 == Version 0.9.1 ==
 - general
