@@ -115,6 +115,7 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(MatrixPlot2D);
       CEDAR_DECLARE_AUX_CLASS(MatrixSlicePlot3D);
       CEDAR_DECLARE_AUX_CLASS(ImagePlot);
+      CEDAR_DECLARE_AUX_CLASS(MatDataPlot);
 
       CEDAR_DECLARE_AUX_CLASS(HistoryPlot);
       CEDAR_DECLARE_AUX_CLASS(HistoryPlot0D);

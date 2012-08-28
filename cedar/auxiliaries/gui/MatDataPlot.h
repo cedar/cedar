@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ImagePlot.h
+    File:        MatDataPlot.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 22
+    Date:        2012 08 28
 
     Description:
 
@@ -34,105 +34,57 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_IMAGE_PLOT_H
-#define CEDAR_AUX_GUI_IMAGE_PLOT_H
+#ifndef CEDAR_AUX_GUI_MAT_DATA_PLOT_H
+#define CEDAR_AUX_GUI_MAT_DATA_PLOT_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/PlotInterface.h"
-#include "cedar/auxiliaries/annotation/namespace.h"
+#include "cedar/auxiliaries/gui/MultiPlotInterface.h"
 
 // SYSTEM INCLUDES
-#include <QLabel>
-#include <QReadWriteLock>
-#include <opencv2/opencv.hpp>
-#include <qwtplot3d/qwt3d_types.h>
 
 
-/*!@brief A plot for images.
+/*!@brief A generic plot for cedar::aux::MatData.
+ *
+ *        This plot automatically selects the proper plot for matrix data based on its annotation and other factors.
  */
-class cedar::aux::gui::ImagePlot : public cedar::aux::gui::PlotInterface
+class cedar::aux::gui::MatDataPlot : public cedar::aux::gui::MultiPlotInterface
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  //! Enum for quickly accessing the type of the data displayed by the viewer.
-  enum DataType
-  {
-    DATA_TYPE_IMAGE,
-    DATA_TYPE_MAT,
-    DATA_TYPE_UNKNOWN
-  };
-
-  //! Widget used for displaying the image.
-  class ImageDisplay : public QLabel
-  {
-    public:
-      ImageDisplay(const QString& text);
-
-    protected:
-      void mousePressEvent(QMouseEvent * pEvent);
-
-    public:
-      cedar::aux::MatDataPtr mData;
-  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ImagePlot(QWidget *pParent = NULL);
-
-  //!@brief Destructor.
-  ~ImagePlot();
+  MatDataPlot(QWidget *pParent = NULL);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Displays the data.
-   *
-   * @param data A pointer to the data to display. If this isn't a pointer to a cedar::aux::ImageData, the function
-   *             throws.
-   * @param title title of the plot window
-   */
+  //!@brief Display a MatData.
   void plot(cedar::aux::DataPtr data, const std::string& title);
 
-  /*!@brief Updates the plot periodically.
-   */
-  void timerEvent(QTimerEvent *pEvent);
+  //!@brief Check if the given data can be appended to the plot.
+  bool canAppend(cedar::aux::ConstDataPtr data) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief Reacts to a resize of the plot.
-   */
-  void resizeEvent(QResizeEvent *event);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Resizes the pixmap used to display the image data.
-   */
-  void resizePixmap();
-
-  /*!@brief Converts a one-channel input matrix to a three-channel matrix that contains the one-channel matrix in all
-   *        channels.
-   */
-  cv::Mat threeChannelGrayscale(const cv::Mat& in) const;
-
-  /*!@brief Creates the image based on the matrix.
-   */
-  void imageFromMat(const cv::Mat& mat);
+  void doAppend(cedar::aux::DataPtr data, const std::string& title);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -140,27 +92,13 @@ private:
 protected:
   // none yet
 private:
-  //! Label used for displaying the image.
-  cedar::aux::gui::ImagePlot::ImageDisplay *mpImageDisplay;
-
-  //! Data displayed by the plot.
+  //!@brief the displayed MatData
   cedar::aux::MatDataPtr mData;
 
-  //! The color space annotation of the data (if present).
-  cedar::aux::annotation::ColorSpacePtr mDataColorSpace;
+  //!@brief the plot widget
+  QWidget *mpCurrentPlotWidget;
 
-  //! Converted image.
-  QImage mImage;
+}; // class cedar::aux::gui::MatDataPlot
 
-  //! Id of the timer used for updating the plot.
-  int mTimerId;
+#endif // CEDAR_AUX_GUI_MAT_DATA_PLOT_H
 
-  //! Type of the data.
-  DataType mDataType;
-
-  static std::vector<char> mLookupTableR;
-  static std::vector<char> mLookupTableG;
-  static std::vector<char> mLookupTableB;
-
-}; // class cedar::aux::gui::ImagePlot
-#endif // CEDAR_AUX_GUI_IMAGE_PLOT_H

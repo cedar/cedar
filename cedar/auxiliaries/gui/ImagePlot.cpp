@@ -50,6 +50,8 @@
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
+#include <QToolTip>
+#include <QMouseEvent>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -91,10 +93,16 @@ mDataType(DATA_TYPE_UNKNOWN)
   this->setLayout(p_layout);
   this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
-  mpImageDisplay = new QLabel("no image loaded");
+  mpImageDisplay = new cedar::aux::gui::ImagePlot::ImageDisplay("no image loaded");
   p_layout->addWidget(mpImageDisplay);
-  mpImageDisplay->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-  mpImageDisplay->setWordWrap(true);
+}
+
+cedar::aux::gui::ImagePlot::ImageDisplay::ImageDisplay(const QString& text)
+:
+QLabel(text)
+{
+  this->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  this->setWordWrap(true);
 }
 
 cedar::aux::gui::ImagePlot::~ImagePlot()
@@ -104,6 +112,81 @@ cedar::aux::gui::ImagePlot::~ImagePlot()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::ImagePlot::ImageDisplay::mousePressEvent(QMouseEvent * pEvent)
+{
+  //!@todo Use the channel annotation for values from three channel images
+  if (!this->pixmap() || !this->mData)
+    return;
+
+  const cv::Mat& matrix = this->mData->getData();
+
+  if (matrix.empty())
+  {
+    return;
+  }
+
+  int label_x = pEvent->x();
+  int label_y = pEvent->y();
+  int image_x = label_x - (this->width() - this->pixmap()->width()) / 2;
+  int image_y = label_y - (this->height() - this->pixmap()->height()) / 2;
+
+  double rel_x = static_cast<double>(image_x) / static_cast<double>(this->pixmap()->width());
+  double rel_y = static_cast<double>(image_y) / static_cast<double>(this->pixmap()->height());
+  int x = static_cast<int>(rel_x * static_cast<double>(matrix.cols));
+  int y = static_cast<int>(rel_y * static_cast<double>(matrix.rows));
+
+  if (x < 0 || y < 0 || x >= matrix.cols || y >= matrix.rows)
+  {
+    return;
+  }
+
+  QString info_text;
+  info_text += QString("x, y = %1, %2").arg(x).arg(y);
+
+  info_text += "<br />value: ";
+  switch (matrix.channels())
+  {
+    case 1:
+      info_text += QString("%1").arg(cedar::aux::math::getMatrixEntry<double>(matrix, y, x));
+      break;
+
+    case 3:
+      switch(matrix.depth())
+      {
+        case CV_8U:
+        {
+          const cv::Vec3b& value = matrix.at<cv::Vec3b>(y, x);
+          info_text += QString("%1, %2, %3").arg(static_cast<int>(value[0]))
+                                            .arg(static_cast<int>(value[1]))
+                                            .arg(static_cast<int>(value[2]));
+          break;
+        }
+
+        case CV_8S:
+        {
+          const cv::Vec3s& value = matrix.at<cv::Vec3s>(y, x);
+          info_text += QString("%1, %2, %3").arg(static_cast<int>(value[0]))
+                                            .arg(static_cast<int>(value[1]))
+                                            .arg(static_cast<int>(value[2]));
+          break;
+        }
+
+        default:
+          QToolTip::showText(pEvent->globalPos(), QString("Matrix depth (%1) not handled.").arg(matrix.depth()));
+          return;
+      }
+      break;
+
+    default:
+      // should never happen, all cases should be handled above
+      QToolTip::showText(pEvent->globalPos(), QString("Matrix channel count (%1) not handled.").arg(matrix.channels()));
+      return;
+  }
+
+  QToolTip::showText(pEvent->globalPos(), info_text);
+}
+
 void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
 {
   if (!this->isVisible())
@@ -358,6 +441,7 @@ void cedar::aux::gui::ImagePlot::plot(cedar::aux::DataPtr data, const std::strin
   mDataType = DATA_TYPE_MAT;
 
   this->mData = boost::dynamic_pointer_cast<cedar::aux::MatData>(data);
+  this->mpImageDisplay->mData = this->mData;
   if (!this->mData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,

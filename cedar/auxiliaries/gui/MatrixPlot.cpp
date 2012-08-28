@@ -44,10 +44,9 @@
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
 #include "cedar/auxiliaries/gui/MatrixPlot1D.h"
 #include "cedar/auxiliaries/gui/MatrixPlot2D.h"
-#include "cedar/auxiliaries/gui/ImagePlot.h"
+#include "cedar/auxiliaries/gui/MatrixSlicePlot3D.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
-#include "cedar/auxiliaries/annotation/ColorSpace.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -74,7 +73,6 @@ namespace
 
     boost::shared_ptr<DeclarationType> declaration(new DeclarationType());
     cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(declaration);
-    cedar::aux::gui::PlotManagerSingleton::getInstance()->setDefault<MatData, MatrixPlot>();
     return true;
   }
 
@@ -95,21 +93,11 @@ cedar::aux::gui::MatrixPlot::MatrixPlot(QWidget *pParent)
 cedar::aux::gui::MultiPlotInterface(pParent),
 mpCurrentPlotWidget(NULL)
 {
-
   QVBoxLayout *p_layout = new QVBoxLayout();
   this->setLayout(p_layout);
 
   this->setContentsMargins(0, 0, 0, 0);
   p_layout->setContentsMargins(0, 0, 0, 0);
-
-  if (pParent != NULL)
-  {
-    mWindowTitle = pParent->windowTitle();
-  }
-}
-
-cedar::aux::gui::MatrixPlot::~MatrixPlot()
-{
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -155,56 +143,49 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::DataPtr data, const std::stri
                 "Cannot cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot::display.");
   }
 
-  //!@todo this is buggy: appends a string to the parent's window title over and over again
-//  if (QWidget *p_parent = dynamic_cast<QWidget*>(this->parent()))
-//  {
-//    QString add = QString(" [%1 x %2]").arg(this->mData->getData().rows).arg(this->mData->getData().cols);
-//    p_parent->setWindowTitle(mWindowTitle + add);
-//  }
-
   if (this->mpCurrentPlotWidget)
   {
     delete this->mpCurrentPlotWidget;
     this->mpCurrentPlotWidget = NULL;
   }
 
-  try
-  {
-    // data is an image
-    cedar::aux::annotation::ColorSpacePtr color_space = this->mData->getAnnotation<cedar::aux::annotation::ColorSpace>();
-    cedar::aux::gui::ImagePlot* p_plot = new cedar::aux::gui::ImagePlot();
-    p_plot->plot(this->mData, title);
-    this->mpCurrentPlotWidget = p_plot;
-  }
-  catch(cedar::aux::AnnotationNotFoundException&)
-  {
-    // data is a matrix
-    cv::Mat& mat = this->mData->getData();
-    unsigned int dims = cedar::aux::math::getDimensionalityOf(mat);
+  cv::Mat& mat = this->mData->getData();
+  unsigned int dims = cedar::aux::math::getDimensionalityOf(mat);
 
-    switch (dims)
+  switch (dims)
+  {
+    case 0:
+      this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData, title);
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
+      break;
+
+    case 1:
+      this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot1D(this->mData, title);
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
+      break;
+
+    case 2:
+      this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot2D(this->mData, title);
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
+      break;
+
+    case 3:
     {
-      case 0:
-        this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData, title);
-        connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
-        break;
-      case 1:
-        this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot1D(this->mData, title);
-        connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
-        break;
-      case 2:
-        this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot2D(this->mData, title);
-        connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
-        break;
+      //!@todo This should work the same as in the other cases, i.e., passing the data & title to the constructor.
+      cedar::aux::gui::MatrixSlicePlot3D* p_plot = new cedar::aux::gui::MatrixSlicePlot3D();
+      this->mpCurrentPlotWidget = p_plot;
+      p_plot->plot(this->mData, title);
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
+      break;
+    }
 
-      default:
-      {
-        std::string message = "The matrix plot widget can not handle a matrix with the given dimensionality (";
-        message += cedar::aux::toString(mat.dims);
-        message += "\nPress here to refresh the plot after you have changed the dimensionality.";
-        this->mpCurrentPlotWidget = new QPushButton(QString::fromStdString(message));
-        connect(this->mpCurrentPlotWidget, SIGNAL(pressed()), this, SIGNAL(dataChanged()));
-      }
+    default:
+    {
+      std::string message = "The matrix plot widget can not handle a matrix with the given dimensionality (";
+      message += cedar::aux::toString(mat.dims);
+      message += "\nPress here to refresh the plot after you have changed the dimensionality.";
+      this->mpCurrentPlotWidget = new QPushButton(QString::fromStdString(message));
+      connect(this->mpCurrentPlotWidget, SIGNAL(pressed()), this, SIGNAL(dataChanged()));
     }
   }
   this->layout()->addWidget(this->mpCurrentPlotWidget);

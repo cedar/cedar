@@ -69,9 +69,6 @@ public:
   //!@brief The standard constructor.
   MatrixPlot(QWidget *pParent = NULL);
 
-  //!@brief Destructor
-  ~MatrixPlot();
-
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -104,12 +101,13 @@ protected:
 private:
   //!@brief the displayed MatData
   cedar::aux::MatDataPtr mData;
+
   //!@brief the plot widget
   QWidget *mpCurrentPlotWidget;
-  //!@brief window title
-  QString mWindowTitle;
+
   //!@brief vector filled with standard colors
   static Qwt3D::ColorVector mStandardColorVector;
+
 }; // class cedar::aux::gui::MatrixPlot
 
 #endif // CEDAR_AUX_GUI_MATRIX_PLOT_H
