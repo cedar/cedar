@@ -891,6 +891,12 @@ void cedar::proc::gui::StepItem::plotAll(const QPoint& position)
     delete p_last_label;
   }
 
+  // make all columns have the same stretch factor
+  for (int column = 0; column < p_layout->columnCount(); ++column)
+  {
+    p_layout->setColumnStretch(column, 1);
+  }
+
   // adapt size of plot widget/layout
   int base_size = 200;
   p_dock->setGeometry
