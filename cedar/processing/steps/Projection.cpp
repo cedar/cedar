@@ -332,6 +332,13 @@ void cedar::proc::steps::Projection::expandMDtoND()
   // iterate through all elements of the output matrix
   std::vector<int> input_index;
   input_index.resize(input_dimensionality);
+  // if the input dimensionality is 1 ...
+  if (input_dimensionality == 1)
+  {
+    // ... we still need to have an index tuple because of OpenCV limitations
+    input_index.push_back(0);
+  }
+
   do
   {
     // get index pointing to the current element in the output matrix
@@ -341,13 +348,6 @@ void cedar::proc::steps::Projection::expandMDtoND()
     for (unsigned int i = 0; i < _mDimensionMappings->getValue()->getNumberOfMappings(); ++i)
     {
       input_index[i] = output_index.at(_mDimensionMappings->getValue()->lookUp(i));
-    }
-
-    // if the input dimensionality is 1 ...
-    if (input_dimensionality == 1)
-    {
-      // ... we still need to have an index tuple because of OpenCV limitations
-      input_index.push_back(0);
     }
 
     // copy the activation value in the input matrix to the corresponding output matrix
