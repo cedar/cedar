@@ -44,6 +44,8 @@
   - the net unit test fails from time to time (see issue #253 in testing)
 
 == current version ==
+- cedar::aux
+  - The image plot, when clicked, now shows the value of the pixel under the cursor. 
 
 == Version 0.9.1 ==
 - general
