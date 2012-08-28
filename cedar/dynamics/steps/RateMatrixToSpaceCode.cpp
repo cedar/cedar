@@ -261,4 +261,5 @@ void cedar::dyn::RateMatrixToSpaceCode::outputSizesChanged()
     sizes_signed.push_back(this->getNumberOfBins());
     cv::Mat new_matrix(static_cast<int>(mDimensionality), &(sizes_signed.front()), CV_32F);
     this->mOutput->setData(new_matrix);
-  }}
+  }
+}
