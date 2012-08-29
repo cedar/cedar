@@ -77,6 +77,11 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief Returns the character used to set the encoders of the robot.
+  virtual std::string getCommandSetEncoder() const;
+  //!@brief Returns the character used to get the encoders of the robot.
+  virtual std::string getCommandGetEncoder() const;
+
   virtual std::string getCommandSetGripperPosition() const;
   virtual std::string getCommandGetGripperPosition() const;
   virtual std::string getCommandSetArmPosition() const;

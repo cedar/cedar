@@ -105,16 +105,6 @@ public:
   //!@return The End-Of-Command-String.
   const std::string& getEndOfCommandString() const;
 
-  /*!@brief Determines the expected answer for a command starting with the given character.
-   *
-   * Command strings always begin with an upper-case character (e.g., 'D').
-   * The correct answer to every command will begin with the lower-case version
-   * of that character (e.g., 'd').
-   *
-   * @param[in] commandString the command prefix
-   */
-  std::string determineCorrectAnswer(std::string commandString) const;
-
   //!@brief The get-function of the C-Flag.
   //!@return The Country-Flag.
   int getCountryFlag() const;
