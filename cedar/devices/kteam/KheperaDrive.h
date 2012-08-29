@@ -22,60 +22,81 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        EPuckDrive.h
+    File:        KheperaDrive.h
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
     Date:        2012 04 17
 
-    Description: The drive component of the mobile E-Puck robot.
+    Description: The drive component of the mobile Khepera robot.
 
-    Credits:     Original design by Andre Bartel (2011)
+    Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KTEAM_EPUCK_DRIVE_H
-#define CEDAR_DEV_KTEAM_EPUCK_DRIVE_H
+#ifndef CEDAR_DEV_KTEAM_KHEPERA_DRIVE_H
+#define CEDAR_DEV_KTEAM_KHEPERA_DRIVE_H
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/devices/kteam/Drive.h"
 #include "cedar/devices/communication/namespace.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief The drive component of the mobile E-Puck robot.
+/*!@brief The drive component of the mobile Khepera robot.
  *
- * The constructor expects an initialized serial communication object. After creation of the EPuckDrive
+ * The constructor expects an initialized serial communication object. After creation of the KheperaDrive
  * object, all its parameters (e.g., wheel radius, hardware speed limits) are read from a configuration file.
  */
-class cedar::dev::kteam::EPuckDrive : public cedar::dev::kteam::Drive
+class cedar::dev::kteam::KheperaDrive : public cedar::dev::kteam::Drive
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Constructor
-  EPuckDrive(cedar::dev::com::SerialCommunicationPtr communication);
+  KheperaDrive(cedar::dev::com::SerialCommunicationPtr communication);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Returns the values of the acceleration sensor of the E-Puck robot.
-  std::vector<int> getAcceleration();
+  void openGripper();
+  void closeGripper();
+  void setArmPosition(unsigned int position);
+  unsigned int getArmPosition();
+  unsigned int getGripperPosition();
+  unsigned int getGripperOpticalSensor();
+  unsigned int getGripperResistivity();
+  void setLEDState(unsigned int ledId, bool state);
+  std::vector<unsigned int> getProximitySensors();
+  std::vector<unsigned int> getAmbientSensors();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Returns the character used to get the acceleration of the robot.
-  virtual std::string getCommandGetAcceleration() const;
+  //!@brief Returns the character used to set the encoders of the robot.
+  virtual std::string getCommandSetEncoder() const;
+  //!@brief Returns the character used to get the encoders of the robot.
+  virtual std::string getCommandGetEncoder() const;
+
+  virtual std::string getCommandSetGripperPosition() const;
+  virtual std::string getCommandGetGripperPosition() const;
+  virtual std::string getCommandSetArmPosition() const;
+  virtual std::string getCommandGetArmPosition() const;
+  virtual std::string getCommandGetGripperOpticalSensor() const;
+  virtual std::string getCommandGetGripperResistivity() const;
+  virtual std::string getCommandSetLEDState() const;
+  virtual std::string getCommandGetProximitySensors() const;
+  virtual std::string getCommandGetAmbientSensors() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void setGripperPosition(bool open);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -84,6 +105,16 @@ protected:
   // none yet
 private:
   // none yet
-}; // class cedar::dev::kteam::EPuckDrive
 
-#endif // CEDAR_DEV_KTEAM_EPUCK_DRIVE_H
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  //! limits for the arm position
+  cedar::aux::math::UIntLimitsParameterPtr _mArmPositionLimits;
+}; // class cedar::dev::kteam::KheperaDrive
+
+#endif // CEDAR_DEV_KTEAM_KHEPERA_DRIVE_H

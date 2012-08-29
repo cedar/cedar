@@ -58,6 +58,8 @@
 #define clear_my(var, mask)    var &= (~(mask))
 #define set(var, mask)      var |= (mask)
 
+#define DEBUG_VERBOSE
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -105,12 +107,6 @@ const std::string& cedar::dev::com::SerialCommunication::getDevicePath() const
 const std::string& cedar::dev::com::SerialCommunication::getEndOfCommandString() const
 {
   return _mEndOfCommandString->getValue();
-}
-
-char cedar::dev::com::SerialCommunication::determineCorrectAnswer(char commandCharacter) const
-{
-  std::locale locale;
-  return std::use_facet< std::ctype<char> >(locale).tolower(commandCharacter);
 }
 
 int cedar::dev::com::SerialCommunication::getCountryFlag() const
@@ -213,6 +209,28 @@ void cedar::dev::com::SerialCommunication::send(const std::string& command)
     CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message);
   }
 
+#ifdef DEBUG_VERBOSE
+  std::ostringstream message;
+  message << "Successfully sent command '"
+          << command
+          << "'"
+          << "("
+          << status
+          << " bytes written to '"
+          << getDevicePath()
+          << "'), "
+          << "sending time: "
+          << timer.elapsed()
+          << " ms";
+
+  cedar::aux::LogSingleton::getInstance()->debugMessage
+  (
+    message.str(),
+    "cedar::dev::com::SerialCommunication",
+    "Successfully sent data"
+  );
+#endif
+
   // delay the following operations
   cedar::aux::usleep(_mLatency->getValue());
 #endif // CEDAR_OS_WINDOWS
@@ -306,6 +324,24 @@ std::string cedar::dev::com::SerialCommunication::receive()
   // delete end-of-command string
   answer.resize(read_bytes);
 
+#ifdef DEBUG_VERBOSE
+  std::ostringstream message;
+  message << "Successfully received data ("
+          << read_bytes
+          << " Byte(s) read from '"
+          << getDevicePath()
+          << "')\n"
+          << "Receiving time: "
+          << timer.elapsed()
+          << " ms\n";
+
+  cedar::aux::LogSingleton::getInstance()->message
+  (
+    message.str(),
+    "cedar::dev::com::SerialCommunication",
+    "Successfully received data"
+  );
+#endif
 #endif
 
   return answer;
