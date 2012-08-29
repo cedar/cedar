@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        EPuckControlWidget.cpp
+    File:        DriveControlWidget.cpp
 
     Maintainer:  Andre Bartel
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
@@ -35,16 +35,16 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/devices/kteam/gui/EPuckControlWidget.h"
+#include "cedar/devices/kteam/gui/DriveControlWidget.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::kteam::gui::EPuckControlWidget::EPuckControlWidget(cedar::dev::kteam::EPuckDrivePtr drive, QWidget *parent)
+cedar::dev::kteam::gui::DriveControlWidget::DriveControlWidget(cedar::dev::kteam::DrivePtr drive, QWidget *parent)
 :
-cedar::aux::gui::BaseWidget("EPuckControlWidget", parent),
+cedar::aux::gui::BaseWidget("DriveControlWidget", parent),
 mDrive(drive)
 {
   setupUi(this);
@@ -56,7 +56,7 @@ mDrive(drive)
   startTimer(100); //timer for updating display
 }
 
-cedar::dev::kteam::gui::EPuckControlWidget::~EPuckControlWidget()
+cedar::dev::kteam::gui::DriveControlWidget::~DriveControlWidget()
 {
 
 }
@@ -64,28 +64,26 @@ cedar::dev::kteam::gui::EPuckControlWidget::~EPuckControlWidget()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::dev::kteam::gui::EPuckControlWidget::drive()
+void cedar::dev::kteam::gui::DriveControlWidget::drive()
 {
   mDrive->setForwardVelocityAndTurningRate(spinBoxForwardVelocity->value(), spinBoxTurningRate->value());
 }
 
-void cedar::dev::kteam::gui::EPuckControlWidget::stop()
+void cedar::dev::kteam::gui::DriveControlWidget::stop()
 {
   mDrive->stop();
 }
 
-void cedar::dev::kteam::gui::EPuckControlWidget::reset()
+void cedar::dev::kteam::gui::DriveControlWidget::reset()
 {
   mDrive->reset();
 }
 
-void cedar::dev::kteam::gui::EPuckControlWidget::timerEvent(QTimerEvent * /* event */)
+void cedar::dev::kteam::gui::DriveControlWidget::timerEvent(QTimerEvent * /* event */)
 {
   // get new values
   std::vector<double> wheel_speed = mDrive->getWheelSpeed();
   std::vector<int> encoders = mDrive->getEncoders();
-  //std::vector<double> wheel_speed(2, 0.0);
-  //std::vector<int> encoders(2, 0);
 
   // display new values
   valueLeftWheelSpeed->display(wheel_speed[0]);

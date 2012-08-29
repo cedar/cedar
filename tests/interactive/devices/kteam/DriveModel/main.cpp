@@ -43,7 +43,7 @@
 #include "cedar/auxiliaries/gl/Cylinder.h"
 #include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/math/constants.h"
-#include "cedar/devices/kteam/gui/EPuckControlWidget.h"
+#include "cedar/devices/kteam/gui/DriveControlWidget.h"
 #include "cedar/devices/communication/SerialCommunication.h"
 
 // SYSTEM INCLUDES
@@ -67,13 +67,13 @@ int main(int argc, char **argv)
 
   //open the channel to the robot
   cedar::dev::com::SerialCommunicationPtr communication(new cedar::dev::com::SerialCommunication());
-  std::string serial_communication_config = cedar::aux::locateResource("configs/serial_communication.json");
+  std::string serial_communication_config = cedar::aux::locateResource("configs/epuck_serial_communication.json");
   communication->readJson(serial_communication_config);
   communication->open();
 
   //initialize the e-puck
   cedar::dev::kteam::EPuckDrivePtr drive(new cedar::dev::kteam::EPuckDrive(communication));
-  std::string epuck_drive_config = cedar::aux::locateResource("configs/epuck_drive.json");
+  std::string epuck_drive_config = cedar::aux::locateResource("configs/epuck.json");
   drive->readJson(epuck_drive_config);
 
   //initialize the model of the e-puck
@@ -87,8 +87,8 @@ int main(int argc, char **argv)
   scene_widget->show();
 
   //open the control-GUI
-  cedar::dev::kteam::gui::EPuckControlWidgetPtr epuck_control(new cedar::dev::kteam::gui::EPuckControlWidget(drive));
-  epuck_control->show();
+  cedar::dev::kteam::gui::DriveControlWidgetPtr drive_control(new cedar::dev::kteam::gui::DriveControlWidget(drive));
+  drive_control->show();
 
   //change the robot's initial orientation
   kteam_model->setRotation(cedar::aux::math::pi / 2.0);

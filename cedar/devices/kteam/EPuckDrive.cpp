@@ -35,6 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/devices/exceptions.h"
 #include "cedar/devices/kteam/EPuckDrive.h"
 #include "cedar/devices/communication/SerialCommunication.h"
 
@@ -57,6 +58,30 @@ cedar::dev::kteam::Drive(communication)
   _mEncoderLimits->makeDefault();
   _mHardwareSpeedLimits->setDefaults(-2000, 2000);
   _mHardwareSpeedLimits->makeDefault();
+
+  // send a dummy-message
+  std::string answer = getSerialCommunication()->sendAndReceiveLocked("A");
+
+  // 'a,' or 'z,' expected, else init failed
+  if (answer.size() < 2 || (answer[0] != 'a' && answer[0] != 'z') || answer[1] != ',')
+  {
+    CEDAR_THROW
+    (
+      cedar::dev::SerialCommunicationException,
+      "Initialization of serial communication failed."
+    );
+  }
+#ifdef DEBUG
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Drive: Initialization successful (Answer: '" + answer + "')",
+      "cedar::dev::kteam::Drive::initialize()",
+      "Drive successfully initialized"
+    );
+  }
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -71,11 +96,11 @@ std::vector<int> cedar::dev::kteam::EPuckDrive::getAcceleration()
   // send a command string to the robot to receive the current acceleration values
   std::string answer = getSerialCommunication()->sendAndReceiveLocked
                        (
-                         cedar::aux::toString(getCommandCharacterGetAcceleration())
+                         cedar::aux::toString(getCommandGetAcceleration())
                        );
 
   // check whether the first character of the answer is correct
-  checkAnswer(answer, getCommandCharacterGetAcceleration());
+  checkAnswer(answer, getCommandGetAcceleration());
 
   // create a string stream on the received answer
   std::istringstream answer_stream;
@@ -114,4 +139,9 @@ std::vector<int> cedar::dev::kteam::EPuckDrive::getAcceleration()
   );
 
   return acceleration;
+}
+
+std::string cedar::dev::kteam::EPuckDrive::getCommandGetAcceleration() const
+{
+  return "A";
 }

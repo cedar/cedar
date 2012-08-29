@@ -111,9 +111,9 @@ public:
    * The correct answer to every command will begin with the lower-case version
    * of that character (e.g., 'd').
    *
-   * @param[in] commandCharacter the first character of a command
+   * @param[in] commandString the command prefix
    */
-  char determineCorrectAnswer(char commandCharacter) const;
+  std::string determineCorrectAnswer(std::string commandString) const;
 
   //!@brief The get-function of the C-Flag.
   //!@return The Country-Flag.

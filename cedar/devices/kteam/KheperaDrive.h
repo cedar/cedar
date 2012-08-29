@@ -22,108 +22,94 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        EPuckControlWidget.h
+    File:        KheperaDrive.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2012 04 17
 
-    Description: Graphical User Interface for controlling the E-Puck.
+    Description: The drive component of the mobile Khepera robot.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KTEAM_GUI_EPUCK_CONTROL_WIDGET_H
-#define CEDAR_DEV_KTEAM_GUI_EPUCK_CONTROL_WIDGET_H
+#ifndef CEDAR_DEV_KTEAM_KHEPERA_DRIVE_H
+#define CEDAR_DEV_KTEAM_KHEPERA_DRIVE_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/kteam/EPuckDrive.h"
-#include "cedar/devices/kteam/gui/ui_EPuckControlWidget.h"
-#include "cedar/devices/kteam/gui/namespace.h"
-#include "cedar/auxiliaries/gui/BaseWidget.h"
+#include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/devices/kteam/Drive.h"
+#include "cedar/devices/communication/namespace.h"
 
 // SYSTEM INCLUDES
-#include <Qt>
 
-/*!@brief Graphical User Interface for controlling the E-Puck.
+/*!@brief The drive component of the mobile Khepera robot.
  *
- * Type the desired forward velocity and turning rate into the boxes. The wheel speed of the 2 differential-drive-wheels
- * is displayed as well as the encoder-values. The E-Puck starts driving with the specified velocity or changes its
- * velocity after pressing the 'Set Velocity'-button. Stop the E-Puck with 'Stop' and reset speed and encoder-values
- * with 'Reset'.
+ * The constructor expects an initialized serial communication object. After creation of the KheperaDrive
+ * object, all its parameters (e.g., wheel radius, hardware speed limits) are read from a configuration file.
  */
-class cedar::dev::kteam::gui::EPuckControlWidget
-:
-public cedar::aux::gui::BaseWidget, private Ui_EPuckControlWidget
+class cedar::dev::kteam::KheperaDrive : public cedar::dev::kteam::Drive
 {
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
-private:
-
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Constructs the E-Puck-Control.
-  //!@param drive Pointer to the E-Puck that shall be controlled.
-  //!@param parent Pointer to parent widget
-  EPuckControlWidget(cedar::dev::kteam::EPuckDrivePtr drive, QWidget *parent = 0);
-
-  //!@brief Closes the control.
-  virtual ~EPuckControlWidget();
+  //!@brief Constructor
+  KheperaDrive(cedar::dev::com::SerialCommunicationPtr communication);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public slots:
-
-  /*!@brief Sets the velocity of the robot.
-   */
-  void drive();
-
-  /*!@brief Stops the robot.
-   */
-  void stop();
-
-  /*!@brief Stops the robot and resets the encoder-values.
-   */
-  void reset();
+public:
+  void openGripper();
+  void closeGripper();
+  void setArmPosition(unsigned int position);
+  unsigned int getArmPosition();
+  unsigned int getGripperPosition();
+  unsigned int getGripperOpticalSensor();
+  unsigned int getGripperResistivity();
+  void setLEDState(unsigned int ledId, bool state);
+  std::vector<unsigned int> getProximitySensors();
+  std::vector<unsigned int> getAmbientSensors();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-  // none yet
+  virtual std::string getCommandSetGripperPosition() const;
+  virtual std::string getCommandGetGripperPosition() const;
+  virtual std::string getCommandSetArmPosition() const;
+  virtual std::string getCommandGetArmPosition() const;
+  virtual std::string getCommandGetGripperOpticalSensor() const;
+  virtual std::string getCommandGetGripperResistivity() const;
+  virtual std::string getCommandSetLEDState() const;
+  virtual std::string getCommandGetProximitySensors() const;
+  virtual std::string getCommandGetAmbientSensors() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-
-  /*!@brief The timer-event.
-   * @param event Pointer to event
-   */
-  void timerEvent(QTimerEvent *event);
-
-  /*!@brief Updates the displayed wheel-speeds and encoder-values and is called by timerEvent.
-   */
-  void update();
+  void setGripperPosition(bool open);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+private:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
 private:
-  //!@brief Pointer to the controlled robot.
-  cedar::dev::kteam::EPuckDrivePtr mDrive;
-}; // class cedar::dev::robot::mobile::gui::EPuckControlWidget
-#endif // CEDAR_DEV_KTEAM_GUI_EPUCK_CONTROL_WIDGET_H
+  //! limits for the arm position
+  cedar::aux::math::UIntLimitsParameterPtr _mArmPositionLimits;
+}; // class cedar::dev::kteam::KheperaDrive
+
+#endif // CEDAR_DEV_KTEAM_KHEPERA_DRIVE_H

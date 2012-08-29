@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        EPuckDriveTest.cpp
+    File:        KheperaDriveTest.cpp
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2012 08 27
 
-    Description: Interactive test-program for the EPuckDrive class.
+    Description: Interactive test for the KheperaDrive class.
 
     Credits:
 
@@ -36,7 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/systemFunctions.h"
-#include "cedar/devices/kteam/EPuckDrive.h"
+#include "cedar/devices/kteam/KheperaDrive.h"
 #include "cedar/devices/communication/SerialCommunication.h"
 #include "cedar/devices/kteam/gui/DriveControlWidget.h"
 
@@ -49,24 +49,30 @@ int main(int argc, char **argv)
 
   // open the channel to the epuck
   cedar::dev::com::SerialCommunicationPtr communication(new cedar::dev::com::SerialCommunication());
-  std::string serial_communication_config = cedar::aux::locateResource("configs/epuck_serial_communication.json");
+  std::string serial_communication_config = cedar::aux::locateResource("configs/khepera_serial_communication.json");
   communication->readJson(serial_communication_config);
   communication->open();
 
   // initialize epuck-drive
-  cedar::dev::kteam::EPuckDrivePtr drive(new cedar::dev::kteam::EPuckDrive(communication));
-  std::string epuck_drive_config = cedar::aux::locateResource("configs/epuck.json");
+  cedar::dev::kteam::KheperaDrivePtr drive(new cedar::dev::kteam::KheperaDrive(communication));
+  std::string epuck_drive_config = cedar::aux::locateResource("configs/khepera.json");
   drive->readJson(epuck_drive_config);
 
   // open the control-GUI
   cedar::dev::kteam::gui::DriveControlWidgetPtr drive_control(new cedar::dev::kteam::gui::DriveControlWidget(drive));
   drive_control->show();
 
+  // close and open the gripper
+  drive->closeGripper();
+  sleep(5);
+  drive->openGripper();
+  sleep(5);
+
   //start the program
   application.exec();
 
   //reset the epuck
-  drive->reset();
+  //drive->reset();
 
   return 0;
 }

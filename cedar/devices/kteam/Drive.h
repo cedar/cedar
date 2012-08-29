@@ -93,23 +93,20 @@ protected:
   virtual void sendMovementCommand();
 
   //!@brief Returns the character used to start a command which sets the robots speed.
-  virtual char getCommandCharacterSetSpeed() const;
+  virtual std::string getCommandSetSpeed() const;
 
   //!@brief Returns the character used to set the encoders of the robot.
-  virtual char getCommandCharacterSetEncoder() const;
+  virtual std::string getCommandSetEncoder() const;
 
   //!@brief Returns the character used to get the encoders of the robot.
-  virtual char getCommandCharacterGetEncoder() const;
-
-  //!@brief Returns the character used to get the acceleration of the robot.
-  virtual char getCommandCharacterGetAcceleration() const;
+  virtual std::string getCommandGetEncoder() const;
 
   /*!@brief Checks whether the answer begins with the correct first character.
    * The method throws an exception when the answer is not correct.
    * @param[in] answer the answer to check
-   * @param[in] commandCharacter the command character producing the received answer
+   * @param[in] command the command string producing the received answer
    */
-  void checkAnswer(const std::string& answer, char commandCharacter) const;
+  void checkAnswer(const std::string& answer, const std::string& command) const;
 
   /*!@brief Checks whether the stream is still valid.
    * @param[in] answerStream string stream to be checked

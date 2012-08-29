@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DoubleLimitsParameter.h
+    File:        IntLimitsParameter.h
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
