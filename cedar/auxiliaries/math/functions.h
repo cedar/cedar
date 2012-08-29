@@ -69,6 +69,17 @@ namespace cedar
       {
         return static_cast<float>(static_cast<int>(val + 0.5));
       }
+
+      //!@brief fills a matrix with a Gaussian
+      cv::Mat gaussMatrix
+              (
+                unsigned int dimensionality,
+                const std::vector<unsigned int>& matrixSizes,
+                double amplitude,
+                const std::vector<double>& sigmas,
+                const std::vector<double>& centers,
+                bool cyclic
+              );
     }
   }
 }

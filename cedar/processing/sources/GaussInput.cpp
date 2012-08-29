@@ -111,107 +111,18 @@ _mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
 
 void cedar::proc::sources::GaussInput::compute(const cedar::proc::Arguments&)
 {
-  std::vector<cv::Mat> kernel_parts;
-  const unsigned int& dimensionality = _mDimensionality->getValue();
-  const std::vector<double>& sigmas = _mSigmas->getValue();
-  const std::vector<unsigned int>& sizes_uint = _mSizes->getValue();
-  kernel_parts.resize(dimensionality);
-  for (size_t dim = 0; dim < dimensionality; ++dim)
-  {
-    kernel_parts.at(dim) = cv::Mat(static_cast<int>(sizes_uint.at(dim)), 1, CV_32F);
-    CEDAR_DEBUG_ASSERT(sigmas.at(dim) > 0.0);
-
-    //!@todo may want to move this outside of (for dim) block, since all dims are cyclic
-    if (_mIsCyclic->getValue()) // is this a cyclic kernel? (only check once)
-    {
-      for (int row = 0; row < kernel_parts.at(dim).rows; ++row)
-      {
-        int index = row - _mCenters->at(dim);
-        int current_size = static_cast<int>(sizes_uint.at(dim));
-        /* if the kernel is shifted away from the center of the matrix, make sure to take as many values from a
-         * cyclic kernel as the kernel center is shifted away from the matrix center
-         */
-        int shift = _mCenters->at(dim) - current_size / 2;
-        if (shift > 0 && row - shift < 0) // kernel center is to the right of matrix center and index is in cyclic range
-        {
-          index += current_size;
-        }
-        if (shift < 0 && row - shift >= current_size) // kernel center is to the left of matrix center, cyclic index
-        {
-          index -= current_size;
-        }
-        kernel_parts.at(dim).at<float>(row, 0)
-              = cedar::aux::math::gauss(index, sigmas.at(dim));
-      }
-    }
-    else // nothing special to do here
-    {
-      for (int row = 0; row < kernel_parts.at(dim).rows; ++row)
-      {
-        kernel_parts.at(dim).at<float>(row, 0)
-              = cedar::aux::math::gauss(static_cast<int>(row) - _mCenters->at(dim), sigmas.at(dim));
-      }
-    }
-  }
-  kernel_parts.at(0) *= _mAmplitude->getValue();
-  // assemble the input
-  std::vector<int> sizes(static_cast<size_t>(dimensionality));
-  for (unsigned int i = 0; i < dimensionality; i++)
-  {
-    sizes[i] = sizes_uint.at(i);
-  }
-  if (dimensionality == 1)
-  {
-    mOutput->getData() = cv::Mat(static_cast<int>(sizes.at(0)), 1, CV_32F);
-  }
-  else
-  {
-    mOutput->getData() = cv::Mat(static_cast<int>(dimensionality), &sizes.at(0), CV_32F);
-  }
-  cv::Mat& kernel = mOutput->getData();
-  // now fill up the big kernel matrix
-  std::vector<int> position(static_cast<size_t>(dimensionality));
-  unsigned int max_index = 1;
-  double max_index_d = 1.0;
-  for (unsigned int dim = 0; dim < dimensionality; dim++)
-  {
-    position[dim] = 0;
-    max_index_d *= sizes[dim];
-    if (max_index_d > std::numeric_limits<unsigned int>::max()/100.0)
-    {
-      CEDAR_THROW(cedar::aux::RangeException, "cannot handle inputs of this size");
-    }
-  }
-  max_index = static_cast<unsigned int>(max_index_d);
-  for (unsigned int i = 0; i < max_index; i++)
-  {
-    float value = 1.0;
-    for (unsigned int dim = 0; dim < dimensionality; dim++)
-    {
-      value *= kernel_parts.at(dim).at<float>(position.at(dim), 0);
-    }
-    if (dimensionality == 1)
-    {
-      kernel.at<float>(position[0], 0) = value;
-    }
-    else
-    {
-      kernel.at<float>(&position.at(0)) = value;
-    }
-    // increment index
-    position[0]++;
-    for (unsigned int dim = 0; dim < dimensionality; dim++)
-    {
-      if (position[dim] >= static_cast<int>(sizes[dim]))
-      {
-        position[dim] = 0;
-        if (dim+1 < dimensionality)
-        {
-          position[dim+1]++;
-        }
-      }
-    }
-  }
+  this->mOutput->setData
+                 (
+                   cedar::aux::math::gaussMatrix
+                   (
+                     _mDimensionality->getValue(),
+                     _mSizes->getValue(),
+                     _mAmplitude->getValue(),
+                     _mSigmas->getValue(),
+                     _mCenters->getValue(),
+                     _mIsCyclic->getValue()
+                   )
+                 );
 }
 
 void cedar::proc::sources::GaussInput::updateMatrix()

@@ -80,6 +80,7 @@ public:
   mUpperLimitMinimum(defaultUpperLimitMinimum),
   mUpperLimitMaximum(defaultUpperLimitMaximum)
   {
+    this->makeDefault();
   }
 
   //!@brief the constructor
@@ -148,6 +149,13 @@ public:
   {
     this->setLowerLimit(mLowerLimitDefault);
     this->setUpperLimit(mUpperLimitDefault);
+  }
+
+  //!@brief Sets the default limits of the parameter.
+  void setDefaults(const T& defaultLower, const T& defaultUpper)
+  {
+    this->mLowerLimitDefault = defaultLower;
+    this->mUpperLimitDefault = defaultUpper;
   }
 
   //!@brief get the current value of type T of this parameter

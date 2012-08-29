@@ -93,29 +93,26 @@ protected:
   virtual void sendMovementCommand();
 
   //!@brief Returns the character used to start a command which sets the robots speed.
-  virtual char getCommandCharacterSetSpeed() const;
+  virtual std::string getCommandSetSpeed() const;
 
   //!@brief Returns the character used to set the encoders of the robot.
-  virtual char getCommandCharacterSetEncoder() const;
+  virtual std::string getCommandSetEncoder() const;
 
   //!@brief Returns the character used to get the encoders of the robot.
-  virtual char getCommandCharacterGetEncoder() const;
+  virtual std::string getCommandGetEncoder() const;
 
   /*!@brief Checks whether the answer begins with the correct first character.
    * The method throws an exception when the answer is not correct.
    * @param[in] answer the answer to check
-   * @param[in] commandCharacter the command character producing the received answer
+   * @param[in] command the command string producing the received answer
    */
-  void checkAnswer(const std::string& answer, char commandCharacter) const;
+  void checkAnswer(const std::string& answer, const std::string& command) const;
 
   /*!@brief Checks whether the stream is still valid.
    * @param[in] answerStream string stream to be checked
    * @param[in] atEndOfStream denotes whether the stream is believed to be at the end
    */
   void checkStream(const std::istringstream& answerStream, bool atEndOfStream) const;
-
-  //!@brief Updates the member mDistancePerPulse according to the wheel radius and number of pulses per revolution.
-  void updateDistancePerPulse();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -131,8 +128,6 @@ protected:
   cedar::dev::com::SerialCommunicationPtr getSerialCommunication() const;
 
 private:
-  //! distance the wheel moves each pulse [in m]
-  double mDistancePerPulse;
   //! serial communication channel
   cedar::dev::com::SerialCommunicationPtr mSerialCommunication;
 
@@ -140,9 +135,6 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-
-private:
   //! number of pulses per revolution of wheel
   cedar::aux::DoubleParameterPtr _mNumberOfPulsesPerRevolution;
   //! limits for the encoder value

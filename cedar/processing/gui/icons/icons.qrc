@@ -6,8 +6,10 @@
     <file>triggers/trigger.svg</file>
     <file>triggers/looped_trigger.svg</file>
     <file>triggers/multi_trigger.svg</file>
+    <file>steps/boost.svg</file>
     <file>steps/no_icon.svg</file>
     <file>steps/broken_icon.svg</file>
+    <file>steps/camera_grabber.svg</file>
     <file>steps/channel_split.svg</file>
     <file>steps/color_conversion.svg</file>
     <file>steps/convolution.svg</file>
@@ -15,6 +17,8 @@
     <file>steps/field_temp.svg</file>
     <file>steps/flip.svg</file>
     <file>steps/gauss_input.svg</file>
+    <file>steps/rate_to_space_code.svg</file>
+    <file>steps/space_to_rate_code.svg</file>
     <file>steps/static_gain.svg</file>
     <file>steps/switch.svg</file>
     <file>steps/matrix_type_conversion.svg</file>

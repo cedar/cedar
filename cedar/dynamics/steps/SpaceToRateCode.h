@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -22,108 +22,131 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        EPuckControlWidget.h
+    File:        SpaceToRateCode.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2012 07 09
 
-    Description: Graphical User Interface for controlling the E-Puck.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KTEAM_GUI_EPUCK_CONTROL_WIDGET_H
-#define CEDAR_DEV_KTEAM_GUI_EPUCK_CONTROL_WIDGET_H
+#ifndef CEDAR_DYN_SPACE_TO_RATE_CODE_H
+#define CEDAR_DYN_SPACE_TO_RATE_CODE_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/kteam/EPuckDrive.h"
-#include "cedar/devices/kteam/gui/ui_EPuckControlWidget.h"
-#include "cedar/devices/kteam/gui/namespace.h"
-#include "cedar/auxiliaries/gui/BaseWidget.h"
+#include "cedar/dynamics/namespace.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // SYSTEM INCLUDES
-#include <Qt>
 
-/*!@brief Graphical User Interface for controlling the E-Puck.
- *
- * Type the desired forward velocity and turning rate into the boxes. The wheel speed of the 2 differential-drive-wheels
- * is displayed as well as the encoder-values. The E-Puck starts driving with the specified velocity or changes its
- * velocity after pressing the 'Set Velocity'-button. Stop the E-Puck with 'Stop' and reset speed and encoder-values
- * with 'Reset'.
+
+/*!@brief
  */
-class cedar::dev::kteam::gui::EPuckControlWidget
-:
-public cedar::aux::gui::BaseWidget, private Ui_EPuckControlWidget
+class cedar::dyn::SpaceToRateCode : public cedar::proc::Step
 {
-
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-
-private:
-
   Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Constructs the E-Puck-Control.
-  //!@param drive Pointer to the E-Puck that shall be controlled.
-  //!@param parent Pointer to parent widget
-  EPuckControlWidget(cedar::dev::kteam::EPuckDrivePtr drive, QWidget *parent = 0);
-
-  //!@brief Closes the control.
-  virtual ~EPuckControlWidget();
+  //!@brief The standard constructor.
+  SpaceToRateCode();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  //!@brief
+  inline double getLowerLimit() const
+  {
+    return this->_mLowerLimit->getValue();
+  }
+
+  //!@brief
+  inline void setLowerLimit(double lowerLimit)
+  {
+    this->_mLowerLimit->setValue(lowerLimit);
+  }
+
+  //!@brief
+  inline double getUpperLimit() const
+  {
+    return this->_mUpperLimit->getValue();
+  }
+
+  //!@brief
+  inline void setUpperLimit(double upperLimit)
+  {
+    this->_mUpperLimit->setValue(upperLimit);
+  }
+
+  inline double getTau() const
+  {
+    return this->_mTau->getValue();
+  }
+
+  //!@brief
+  inline void setTau(double tau)
+  {
+    this->_mTau->setValue(tau);
+  }
 public slots:
-
-  /*!@brief Sets the velocity of the robot.
-   */
-  void drive();
-
-  /*!@brief Stops the robot.
-   */
-  void stop();
-
-  /*!@brief Stops the robot and resets the encoder-values.
-   */
-  void reset();
+  //!@brief This slot is connected to the valueChanged() event of the limit parameters.
+  void limitsChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
 
-  // none yet
+  //!@brief Determines whether the data item can be connected to the slot.
+  cedar::proc::DataSlot::VALIDITY determineInputValidity
+                                  (
+                                    cedar::proc::ConstDataSlotPtr slot,
+                                    cedar::aux::ConstDataPtr data
+                                  ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-
-  /*!@brief The timer-event.
-   * @param event Pointer to event
-   */
-  void timerEvent(QTimerEvent *event);
-
-  /*!@brief Updates the displayed wheel-speeds and encoder-values and is called by timerEvent.
-   */
-  void update();
+  //!@brief Updates the output matrix.
+  void compute(const cedar::proc::Arguments& arguments);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief MatrixData representing the input. Storing it like this saves time during computation.
+  cedar::aux::ConstMatDataPtr mInput;
+
+  //!@brief The data containing the output.
+  cedar::aux::MatDataPtr mOutput;
+private:
+  cv::Mat mRamp;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  //!@brief
+  cedar::aux::DoubleParameterPtr _mLowerLimit;
+  cedar::aux::DoubleParameterPtr _mUpperLimit;
+  cedar::aux::DoubleParameterPtr _mTau;
 
 private:
-  //!@brief Pointer to the controlled robot.
-  cedar::dev::kteam::EPuckDrivePtr mDrive;
-}; // class cedar::dev::robot::mobile::gui::EPuckControlWidget
-#endif // CEDAR_DEV_KTEAM_GUI_EPUCK_CONTROL_WIDGET_H
+
+}; // class cedar::dyn::SpaceToRateCode
+
+#endif // CEDAR_DYN_SPACE_TO_RATE_CODE_H

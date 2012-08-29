@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -107,35 +107,35 @@ public:
    *
    * You can set the framerate through the the CameraGrabber::setCameraFps() method
    */
-  static const Id FRAMERATE_NOT_SET = UINT_MAX-2;
+  static const Id FPS_NOT_SET = UINT_MAX-2;
 
   /*! @brief Set the framerate to 2 fps with the CameraGrabber::setCameraFps() method
    *
    * For firewire-cameras the framerate will be set to 1.875 fps
    */
-  static const Id FRAMERATE_2 = 2;
+  static const Id FPS_2 = 2;
 
   /*! @brief Set the framerate to 4 fps
    *
    * For firewire-cameras the framerate will be set to 3.75 fps
    */
-  static const Id FRAMERATE_4 = 4;
+  static const Id FPS_4 = 4;
 
   /*! @brief Set the framerate to 8 fps
    *
    * For firewire-cameras the framerate will be set to 7.5 fps
    */
-  static const Id FRAMERATE_8 = 8;
+  static const Id FPS_8 = 8;
   /// @brief Set the framerate to 15 fps
-  static const Id FRAMERATE_15 = 15;
+  static const Id FPS_15 = 15;
   /// @brief Set the framerate to 30 fps
-  static const Id FRAMERATE_30 = 30;
+  static const Id FPS_30 = 30;
   /// @brief Set the framerate to 60 fps
-  static const Id FRAMERATE_60 = 60;
+  static const Id FPS_60 = 60;
   /// @brief Set the framerate to 120 fps
-  static const Id FRAMERATE_120 = 120;
+  static const Id FPS_120 = 120;
   /// @brief Set the framerate to 240 fps
-  static const Id FRAMERATE_240 = 240;
+  static const Id FPS_240 = 240;
 
 
 protected:

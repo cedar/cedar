@@ -43,10 +43,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/lib.h"
+#include "cedar/auxiliaries/SetParameter.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
-#include <map>
+//#include <map>
 
 
 
@@ -89,31 +90,50 @@ namespace cedar
         // camera grabber helper classes
         //-----------------------------------------------------------------------------------------------
 
-        //backend implementation
+        // backend implementation
         CEDAR_DECLARE_DEV_CLASS(CameraDevice);
         CEDAR_DECLARE_DEV_CLASS(CameraDeviceVfl);
-        CEDAR_DECLARE_DEV_CLASS(CameraDeviceCvVideoCaputre);
+        CEDAR_DECLARE_DEV_CLASS(CameraDeviceCvVideoCapture);
 
 #ifdef CEDAR_USE_LIB_DC1394
         CEDAR_DECLARE_DEV_CLASS(CameraDeviceDc1394);
 #endif
-        //enum classes
+        // enum classes
         CEDAR_DECLARE_DEV_CLASS(RecordingFormat);
 
-        //enum classes for camera
+        // enum classes for camera
+        CEDAR_DECLARE_DEV_CLASS(CameraBackendType);
+        CEDAR_DECLARE_DEV_CLASS(DeBayerFilter);
         CEDAR_DECLARE_DEV_CLASS(CameraFrameRate);
         CEDAR_DECLARE_DEV_CLASS(CameraProperty);
         CEDAR_DECLARE_DEV_CLASS(CameraVideoMode);
         CEDAR_DECLARE_DEV_CLASS(CameraSetting);
         CEDAR_DECLARE_DEV_CLASS(CameraBackendType);
-        CEDAR_DECLARE_DEV_CLASS(CameraDebayerPattern);
         CEDAR_DECLARE_DEV_CLASS(CameraIsoSpeed);
+        CEDAR_DECLARE_DEV_CLASS(CameraDebayerPattern);
 
+        // properties
 
-       // CEDAR_DECLARE_DEV_CLASS(CameraStateAndConfig);
-        CEDAR_DECLARE_DEV_CLASS(CameraState);
-        CEDAR_DECLARE_DEV_CLASS(CameraCapabilities);
+        // all properties from one channel
+        CEDAR_DECLARE_DEV_CLASS(CameraProperties);
+
+        // one property with name, enum-parameter for mode and double-parameter for value
+        CEDAR_DECLARE_DEV_CLASS(CamProperty);
+        CEDAR_DECLARE_DEV_CLASS(CameraPropertyMode);
+
+        // settings
+
+        // all settings from one channel
         CEDAR_DECLARE_DEV_CLASS(CameraSettings);
+        CEDAR_DECLARE_DEV_CLASS(CameraCapabilities);
+        CEDAR_DECLARE_DEV_CLASS(CameraState);
+
+
+        // camera settings
+        CEDAR_DECLARE_DEV_CLASS(CamSetting);
+
+        struct CameraChannel;
+        CEDAR_GENERATE_POINTER_TYPES(CameraChannel);
 
 #ifdef CEDAR_USE_LIB_DC1394
         //firewire related base class for the grabbertools
@@ -125,24 +145,33 @@ namespace cedar
         //-----------------------------------------------------------------------------------------------
 
         ///! map property enum id to the value of the property
-        typedef std::map<unsigned int, double> CameraPropertyValues;
+        //typedef std::map<unsigned int, double> CameraPropertyValues;
+
+        //! map of a property-id to his class
+        //!@todo Should this not map from CameraProperty::Id / Enum::Id?
+        typedef std::map<unsigned int, cedar::dev::sensors::visual::CamProperty> CameraPropertyMap;
 
         ///! a pair of property enum id and his value
-        typedef std::pair<unsigned int, double> CameraPropertyValuesPair;
+        // typedef std::pair<unsigned int, double> CameraPropertyValuesPair;
 
+        typedef cedar::aux::SetParameter<cedar::dev::sensors::visual::CamPropertyPtr> CameraPropertiesSet;
+        CEDAR_GENERATE_POINTER_TYPES(CameraPropertiesSet);
+
+        typedef cedar::aux::SetParameter<cedar::dev::sensors::visual::CamSettingPtr> CameraSettingsSet;
+        CEDAR_GENERATE_POINTER_TYPES(CameraSettingsSet);
         //!@endcond
 
         //-----------------------------------------------------------------------------------------------
         // exceptions
         //-----------------------------------------------------------------------------------------------
 
-        //! @brief An exception for errors on recording
+        //!@brief An exception for errors on recording
         class GrabberRecordingException;
 
-        //! @brief An exception for errors on saving a snapshot
+        //!@brief An exception for errors on saving a snapshot
         class GrabberSnapshotException;
 
-        //! @brief An exception for errors on grabbing
+        //!@brief An exception for errors on grabbing
         class GrabberGrabException;
 
       }

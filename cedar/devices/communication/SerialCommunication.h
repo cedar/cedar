@@ -82,6 +82,12 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Opens the channel.
+  void open();
+
+  //!@brief  Closes the channel.
+  void close();
+
 
   //!@brief The get-function of the initialization-status.
   //!@return true if initialized, else false
@@ -105,9 +111,9 @@ public:
    * The correct answer to every command will begin with the lower-case version
    * of that character (e.g., 'd').
    *
-   * @param[in] commandCharacter the first character of a command
+   * @param[in] commandString the command prefix
    */
-  char determineCorrectAnswer(char commandCharacter) const;
+  std::string determineCorrectAnswer(std::string commandString) const;
 
   //!@brief The get-function of the C-Flag.
   //!@return The Country-Flag.
@@ -142,19 +148,18 @@ public:
    */
   void setEndOfCommandString(const std::string& eocString);
 
+  /*!@brief Sends a string and locks the channel properly.
+   */
+  std::string sendAndReceiveLocked(const std::string& command);
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief  Closes the channel.
-  void close();
-
   //!@brief Initializes the communication and opens the channel.
   //!@return 1 if initialization was successful, else 0.
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
@@ -164,6 +169,9 @@ private:
 
   //!@brief Checks whether the serial connection has been initialized. Throws an exception if not.
   void checkIfInitialized() const;
+
+  //!@brief Checks whether the serial connection has been opened. Throws an exception if not.
+  void checkIfOpen() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -66,6 +66,12 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Opens the channel.
+  virtual void open() = 0;
+
+  //!@brief Closes the channel.
+  virtual void close() = 0;
+
   /*!@brief Sends a string to the device.
    *@param command The string to be sent.
    *@return 1 if sending was successful and 0 in case of an error.
@@ -92,8 +98,6 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Closes the channel.
-  virtual void close() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

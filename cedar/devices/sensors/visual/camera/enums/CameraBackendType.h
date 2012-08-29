@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        RecordingFormat.h
+    File:        CameraBackendType.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 07 04
 
-    Description:  Header for RecordingFormat enum-type class
+    Description:  Header for CameraBackendType enum-type class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_RECORDINGFORMAT_H
-#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_RECORDINGFORMAT_H
+#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERABACKENDTYPE_H
+#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERABACKENDTYPE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -45,24 +45,10 @@
 #include "cedar/devices/sensors/visual/namespace.h"
 
 // SYSTEM INCLUDES
-//#include <opencv2/opencv.hpp>
 
-/*!@brief Enum class to determine the recording format
- *
- *    Maps the FOR-CC to a CEDAR Enum class. <br>
- *
- *     fourcc 4-character code of codec used for encoding of the recordings.<br>
- *     Examples:<br>
- *     CV_FOURCC('P','I','M,'1') is a MPEG-1 codec<br>
- *     CV_FOURCC('M','J','P','G') is a motion-jpeg codec<br>
- *     CV_FOURCC('M','P','4','2') is also a motion-jpeg codec<br>
- *
- *     For supported codecs, have a look at:<br>
- *     /usr/local/src/OpenCV_{YOUR_VERSION}/modules/highgui/src/cap_ffmpeg_impl.hpp<br>
- *     http://www.fourcc.org/codecs.php<br>
- *
+/*!@brief Enum class to determine the used backend for the camera grabber
  */
-class cedar::dev::sensors::visual::RecordingFormat
+class cedar::dev::sensors::visual::CameraBackendType
 {
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
@@ -72,13 +58,6 @@ public:
   typedef cedar::aux::EnumId Id;
 public:
   typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
-
-private:
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-  // redefiniton of the CV_FOURCC inline function, because we need a static const value
-  #define CEDAR_FOURCC(c1,c2,c3,c4) (((c1) & 255) + (((c2) & 255) << 8) + (((c3) & 255) << 16) + (((c4) & 255) << 24))
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -95,7 +74,7 @@ public:
   static void construct();
 
   static const cedar::aux::EnumBase& type();
-  static const cedar::dev::sensors::visual::RecordingFormat::TypePtr& typePtr();
+  static const cedar::dev::sensors::visual::CameraBackendType::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -107,7 +86,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  static cedar::aux::EnumType<cedar::dev::sensors::visual::RecordingFormat> mType;
+  static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraBackendType> mType;
   //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -115,34 +94,37 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  /// Record without any compression (i.e. RAW)
-  static const Id RECORD_RAW = 0;
+  /*! @brief Use the default value of the OpenCV::VideoCapture object
+   *
+   *  It is possible, that no all properties could be detected
+   */
+  static const Id AUTO = 0;
 
-  /// Record in MP42 format
-  static const Id RECORD_MP42 = CEDAR_FOURCC('M','P','4','2'); // CV_FOURCC('M','P','4','2')
+  /*! @brief Use only basic functionality of the cv::Capture object
+   */
+  static const Id CVCAPTURE = 1;
 
-  /// Record in MJPG
-  static const Id RECORD_MJPG = CEDAR_FOURCC('M','J','P','G');
+#ifdef CEDAR_USE_LIB_DC1394
+  /*! @brief Use the DC1394 backend and settings
+   *
+   *   This is only possible if CEDAR is build with libdc support
+   */
+  static const Id DC1394 = 2;
+#endif //CEDAR_USE_LIB_DC1394
 
-  /// Record in MPEG-2
-  static const Id RECORD_MPEG2 = CEDAR_FOURCC('m', 'p', 'g', '2');
+  /*! @brief Use the Video For Linux backend
+   */
+  static const Id VFL = 3;
 
-  /// Record in h264
-  static const Id RECORD_H264 = CEDAR_FOURCC('H', '2', '6', '4');
 
-  /// Record in h263
-  static const Id RECORD_H263 = CEDAR_FOURCC('H', '2', '6', '3');
-
-  /// Record in vp3
-  static const Id RECORD_VP3 = CEDAR_FOURCC('V', 'P', '3', '1');
 
 protected:
   // none yet
 private:
   // none yet
 
-}; // cedar::dev::sensors::visual::RecordingFormat
+}; // cedar::dev::sensors::visual::CameraBackendType
 
 
-#endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_RECORDINGFORMAT_H
+#endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERABACKENDTYPE_H
 

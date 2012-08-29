@@ -69,7 +69,7 @@ namespace
 
     ElementDeclarationPtr field_decl
     (
-      new cedar::proc::ElementDeclarationTemplate<cedar::dyn::NeuralField>("Fields", "cedar.dynamics.NeuralField")
+      new cedar::proc::ElementDeclarationTemplate<cedar::dyn::NeuralField>("DFT", "cedar.dynamics.NeuralField")
     );
     field_decl->setIconPath(":/steps/field_temp.svg");
     field_decl->setDescription
@@ -497,15 +497,23 @@ void cedar::dyn::NeuralField::updateInputSum()
       //!@todo This is probably slow -- store the type of each input and static_cast instead.
       cv::Mat& input_mat = input->getData<cv::Mat>();
 
-      CEDAR_DEBUG_ASSERT(cedar::aux::math::matrixSizesEqual(input_mat, input_sum))
-
-      if (this->getDimensionality() == 1)
+      unsigned int input_dim = cedar::aux::math::getDimensionalityOf(input_mat);
+      if (input_dim == 0)
       {
-        input_sum += cedar::aux::math::canonicalRowVector(input_mat);
+        input_sum += cedar::aux::math::getMatrixEntry<double>(input_mat, 0, 0);
       }
       else
       {
-        input_sum += input_mat;
+        CEDAR_DEBUG_ASSERT(cedar::aux::math::matrixSizesEqual(input_mat, input_sum))
+
+        if (this->getDimensionality() == 1)
+        {
+          input_sum += cedar::aux::math::canonicalRowVector(input_mat);
+        }
+        else
+        {
+          input_sum += input_mat;
+        }
       }
     }
   }
@@ -513,37 +521,13 @@ void cedar::dyn::NeuralField::updateInputSum()
 
 bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) const
 {
-  // special cases due to opencv's strange handling of 1d-matrices
-  if(matrix.dims == 2 && matrix.rows == 1 && matrix.cols == 1)
-  {
-    // if this field is set to more dimensions than the input (in this case 1), they are not compatible
-    if (this->getDimensionality() != 0)
-      return false;
-  }
-  else if(matrix.dims == 2 && (matrix.rows == 1 || matrix.cols == 1))
-  {
-    // if this field is set to more dimensions than the input (in this case 1), they are not compatible
-    if (this->getDimensionality() != 1)
-      return false;
-
-    CEDAR_DEBUG_ASSERT(this->_mSizes->getValue().size() == 1);
-
-    // if the dimensions are both 1, rows or cols must be the same as the field size
-    if (static_cast<int>(this->_mSizes->at(0)) != matrix.rows
-        && static_cast<int>(this->_mSizes->at(0)) != matrix.cols)
-      return false;
-  }
-  else
-  {
-    if (static_cast<int>(this->getDimensionality()) != matrix.dims)
-      return false;
-    for (unsigned int dim = 0; dim < this->_mSizes->getValue().size(); ++dim)
-    {
-      if (matrix.size[static_cast<int>(dim)] != static_cast<int>(this->_mSizes->at(dim)))
-        return false;
-    }
-  }
-  return true;
+  unsigned int matrix_dim = cedar::aux::math::getDimensionalityOf(matrix);
+  return matrix_dim == 0
+         ||
+         (
+           this->getDimensionality() == matrix_dim
+           && cedar::aux::math::matrixSizesEqual(matrix, this->getFieldActivation()->getData())
+         );
 }
 
 void cedar::dyn::NeuralField::dimensionalityChanged()

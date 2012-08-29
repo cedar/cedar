@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -48,10 +48,11 @@
 #include <opencv2/highgui/highgui_c.h>
 
 //--------------------------------------------------------------------------------------------------------------------
-// (re)defines of our new introduced properties in OpenCV:
-#ifndef CV_CAP_PROP_ISO_SPEED
-  #define CV_CAP_PROP_ISO_SPEED 30
-#endif
+//(re)defines of our new introduced properties in OpenCV:
+//delete this, if the patched OpenCV is available
+//#ifndef CV_CAP_PROP_ISO_SPEED
+//  #define CV_CAP_PROP_ISO_SPEED 30
+//#endif
 
 
 /*!@brief Enum class for camera settings.
@@ -115,17 +116,17 @@ public:
    *  If you use a firewire camera, this settings can only be applied on startup, i.e. before the first picture
    *  is grabbed with the CameraGrabber::grab() method.
    */
-  static const Id SETTING_FPS = CV_CAP_PROP_FPS; // 5;
+  static const Id FPS = CV_CAP_PROP_FPS; // 5;
   /// @see SETTING_FPS
-  static const Id SETTING_FRAME_WIDTH = CV_CAP_PROP_FRAME_WIDTH; // 3;
+  static const Id FRAME_WIDTH = CV_CAP_PROP_FRAME_WIDTH; // 3;
   /// @see SETTING_FPS
-  static const Id SETTING_FRAME_HEIGHT = CV_CAP_PROP_FRAME_HEIGHT; // 4;
+  static const Id FRAME_HEIGHT = CV_CAP_PROP_FRAME_HEIGHT; // 4;
   /// @see SETTING_FPS
-  static const Id SETTING_MODE = CV_CAP_PROP_MODE; // 9;
+  static const Id MODE = CV_CAP_PROP_MODE; // 9;
 
 #ifdef CEDAR_USE_LIB_DC1394
   /// @see SETTING_FPS
-  static const Id SETTING_ISO_SPEED = CV_CAP_PROP_ISO_SPEED; // 30
+  static const Id ISO_SPEED = CV_CAP_PROP_ISO_SPEED; // 30
 #endif
 
 protected:

@@ -48,11 +48,19 @@ cedar::dev::kteam::EPuckDrive::EPuckDrive(cedar::dev::com::SerialCommunicationPt
 :
 cedar::dev::kteam::Drive(communication)
 {
+  _mWheelDistance->setDefault(0.053);
+  _mWheelDistance->makeDefault();
+  _mWheelRadius->setDefault(0.0205);
+  _mWheelRadius->makeDefault();
+  _mNumberOfPulsesPerRevolution->setDefault(1000);
+  _mNumberOfPulsesPerRevolution->makeDefault();
+  _mEncoderLimits->setDefaults(-32768, 32767);
+  _mEncoderLimits->makeDefault();
+  _mHardwareSpeedLimits->setDefaults(-2000, 2000);
+  _mHardwareSpeedLimits->makeDefault();
+
   // send a dummy-message
-  getSerialCommunication()->lock();
-  getSerialCommunication()->send("A");
-  std::string answer = getSerialCommunication()->receive();
-  getSerialCommunication()->unlock();
+  std::string answer = getSerialCommunication()->sendAndReceiveLocked("A");
 
   // 'a,' or 'z,' expected, else init failed
   if (answer.size() < 2 || (answer[0] != 'a' && answer[0] != 'z') || answer[1] != ',')
@@ -86,13 +94,13 @@ std::vector<int> cedar::dev::kteam::EPuckDrive::getAcceleration()
   std::vector<int> acceleration(3);
 
   // send a command string to the robot to receive the current acceleration values
-  getSerialCommunication()->lock();
-  getSerialCommunication()->send(cedar::aux::toString(getCommandCharacterGetAcceleration()));
-  std::string answer = getSerialCommunication()->receive();
-  getSerialCommunication()->unlock();
+  std::string answer = getSerialCommunication()->sendAndReceiveLocked
+                       (
+                         cedar::aux::toString(getCommandGetAcceleration())
+                       );
 
   // check whether the first character of the answer is correct
-  checkAnswer(answer, getCommandCharacterGetAcceleration());
+  checkAnswer(answer, getCommandGetAcceleration());
 
   // create a string stream on the received answer
   std::istringstream answer_stream;
@@ -133,15 +141,7 @@ std::vector<int> cedar::dev::kteam::EPuckDrive::getAcceleration()
   return acceleration;
 }
 
-char cedar::dev::kteam::EPuckDrive::getCommandCharacterGetAcceleration() const
+std::string cedar::dev::kteam::EPuckDrive::getCommandGetAcceleration() const
 {
-  return 'A';
-}
-
-void cedar::dev::kteam::EPuckDrive::readConfiguration(const cedar::aux::ConfigurationNode& node)
-{
-  // read the configuration
-  this->Configurable::readConfiguration(node);
-  // update the member mDistancePerPulse
-  this->updateDistancePerPulse();
+  return "A";
 }

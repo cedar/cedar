@@ -38,39 +38,41 @@
 #include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/devices/kteam/KheperaDrive.h"
 #include "cedar/devices/communication/SerialCommunication.h"
-#include "cedar/devices/kteam/gui/EPuckControlWidget.h"
+#include "cedar/devices/kteam/gui/DriveControlWidget.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
 
 int main(int argc, char **argv)
 {
-  //QApplication application(argc, argv);
+  QApplication application(argc, argv);
 
   // open the channel to the epuck
   cedar::dev::com::SerialCommunicationPtr communication(new cedar::dev::com::SerialCommunication());
   std::string serial_communication_config = cedar::aux::locateResource("configs/khepera_serial_communication.json");
   communication->readJson(serial_communication_config);
+  communication->open();
 
   // initialize epuck-drive
   cedar::dev::kteam::KheperaDrivePtr drive(new cedar::dev::kteam::KheperaDrive(communication));
   std::string epuck_drive_config = cedar::aux::locateResource("configs/khepera.json");
-  communication->readJson(epuck_drive_config);
+  drive->readJson(epuck_drive_config);
 
   // open the control-GUI
-  //cedar::dev::kteam::gui::EPuckControlWidgetPtr epuck_control(new cedar::dev::kteam::gui::EPuckControlWidget(drive));
-  //epuck_control->show();
+  cedar::dev::kteam::gui::DriveControlWidgetPtr drive_control(new cedar::dev::kteam::gui::DriveControlWidget(drive));
+  drive_control->show();
 
+  // close and open the gripper
   drive->closeGripper();
-
   sleep(5);
   drive->openGripper();
+  sleep(5);
 
   //start the program
-  //application.exec();
+  application.exec();
 
   //reset the epuck
-  drive->reset();
+  //drive->reset();
 
   return 0;
 }

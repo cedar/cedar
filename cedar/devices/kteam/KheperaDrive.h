@@ -62,9 +62,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // documented in base class
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
   void openGripper();
   void closeGripper();
   void setArmPosition(unsigned int position);
@@ -80,15 +77,15 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  virtual char getCommandCharacterSetGripperPosition() const;
-  virtual std::string getCommandCharacterGetGripperPosition() const;
-  virtual char getCommandCharacterSetArmPosition() const;
-  virtual std::string getCommandCharacterGetArmPosition() const;
-  virtual char getCommandCharacterGetGripperOpticalSensor() const;
-  virtual char getCommandCharacterGetGripperResistivity() const;
-  virtual char getCommandCharacterSetLEDState() const;
-  virtual char getCommandCharacterGetProximitySensors() const;
-  virtual char getCommandCharacterGetAmbientSensors() const;
+  virtual std::string getCommandSetGripperPosition() const;
+  virtual std::string getCommandGetGripperPosition() const;
+  virtual std::string getCommandSetArmPosition() const;
+  virtual std::string getCommandGetArmPosition() const;
+  virtual std::string getCommandGetGripperOpticalSensor() const;
+  virtual std::string getCommandGetGripperResistivity() const;
+  virtual std::string getCommandSetLEDState() const;
+  virtual std::string getCommandGetProximitySensors() const;
+  virtual std::string getCommandGetAmbientSensors() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

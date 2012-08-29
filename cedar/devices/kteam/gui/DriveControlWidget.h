@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,109 +22,106 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraIsoSpeed.h
+    File:        DriveControlWidget.h
 
-    Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.rub.de
-    Date:        2011 08 01
+    Maintainer:  Andre Bartel
+    Email:       andre.bartel@ini.ruhr-uni-bochum.de
+    Date:        2011 03 19
 
-    Description:  Header for CameraIsoSpeed enum-type class
+    Description: Graphical User Interface for controlling the KTeam robots.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_ISO_SPEED_H
-#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_ISO_SPEED_H
+#ifndef CEDAR_DEV_KTEAM_GUI_DRIVE_CONTROL_WIDGET_H
+#define CEDAR_DEV_KTEAM_GUI_DRIVE_CONTROL_WIDGET_H
 
 // CEDAR INCLUDES
-#include "cedar/configuration.h"   // MAKE FIREWIRE OPTIONAL
-
-#include "cedar/auxiliaries/EnumType.h"
-#include "cedar/devices/sensors/visual/namespace.h"
+#include "cedar/devices/kteam/EPuckDrive.h"
+#include "cedar/devices/kteam/gui/ui_DriveControlWidget.h"
+#include "cedar/devices/kteam/gui/namespace.h"
+#include "cedar/auxiliaries/gui/BaseWidget.h"
 
 // SYSTEM INCLUDES
+#include <Qt>
 
-
-/*!@brief Enum class for firewire ISO-speed
+/*!@brief Graphical User Interface for controlling the E-Puck.
  *
- * Use this type for the CameraGrabber::setCameraInitIsoSpeed() and getCameraInitIsoSpeed() method
+ * Type the desired forward velocity and turning rate into the boxes. The wheel speed of the 2 differential-drive-wheels
+ * is displayed as well as the encoder-values. The E-Puck starts driving with the specified velocity or changes its
+ * velocity after pressing the 'Set Velocity'-button. Stop the E-Puck with 'Stop' and reset speed and encoder-values
+ * with 'Reset'.
  */
-class cedar::dev::sensors::visual::CameraIsoSpeed
+class cedar::dev::kteam::gui::DriveControlWidget
+:
+public cedar::aux::gui::BaseWidget, private Ui_DriveControlWidget
 {
+
   //--------------------------------------------------------------------------------------------------------------------
-  // typedefs
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-//!@cond SKIPPED_DOCUMENTATION
-public:
-  typedef cedar::aux::EnumId Id;
-public:
-  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+private:
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
+  //!@brief Constructs the drive control widget.
+  //!@param drive Pointer to the drive that shall be controlled.
+  //!@param parent Pointer to parent widget
+  DriveControlWidget(cedar::dev::kteam::DrivePtr drive, QWidget *parent = 0);
 
-  //!@brief Destructor
+  //!@brief Closes the control.
+  virtual ~DriveControlWidget();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public:  
-  static void construct();
+public slots:
 
-  static const cedar::aux::EnumBase& type();
-  static const cedar::dev::sensors::visual::CameraIsoSpeed::TypePtr& typePtr(); 
-  
+  /*!@brief Sets the velocity of the robot.
+   */
+  void drive();
+
+  /*!@brief Stops the robot.
+   */
+  void stop();
+
+  /*!@brief Stops the robot and resets the encoder-values.
+   */
+  void reset();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraIsoSpeed> mType;
-  //!@endcond
+
+  /*!@brief The timer-event.
+   * @param event Pointer to event
+   */
+  void timerEvent(QTimerEvent *event);
+
+  /*!@brief Updates the displayed wheel-speeds and encoder-values and is called by timerEvent.
+   */
+  void update();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-
-  /*! @brief Allow OpenCV backend to set the ISO-speed of the firewire bus.
-   *
-   *  Set the ISO-speed manually with the CameraGrabber::setCameraIsoSpeed() method.
-   *
-   *  @remarks
-   *  As every setting, this can only be done before the first frame was grabbed.
-   */
-
-  static const Id ISO_NOT_SET = UINT_MAX-2;
-
-  /// @brief Set the ISO-speed to 100
-  static const Id ISO_100 = 100;
-  /// @see ISO_100
-  static const Id ISO_200 = 200;
-  /// @see ISO_100
-  static const Id ISO_400 = 400;
-  /// @see ISO_100
-  static const Id ISO_800 = 800;
-  /// @see ISO_100
-  static const Id ISO_1600 = 1600;
-  /// @see ISO_100
-  static const Id ISO_3200 = 3200;
-
-    
 protected:
   // none yet
+
 private:
-  // none yet
-
-}; // cedar::dev::sensors::visual::CameraIsoSpeed
-
-#endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_ISO_SPEED_H
-
+  //!@brief Pointer to the controlled robot.
+  cedar::dev::kteam::DrivePtr mDrive;
+}; // class cedar::dev::robot::kteam::gui::DriveControlWidget
+#endif // CEDAR_DEV_KTEAM_GUI_DRIVE_CONTROL_WIDGET_H
