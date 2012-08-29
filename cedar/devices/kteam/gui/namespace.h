@@ -28,7 +28,7 @@
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: Namespace file for cedar::dev::robot::mobile::gui.
+    Description: Namespace file for cedar::dev::robot::kteam::gui.
 
     Credits:
 
@@ -53,7 +53,7 @@ namespace cedar
       namespace gui
       {
         //!@cond SKIPPED_DOCUMENTATION
-        CEDAR_DECLARE_DEV_CLASS(EPuckControlWidget);
+        CEDAR_DECLARE_DEV_CLASS(DriveControlWidget);
         //!@endcond
       }
     }
