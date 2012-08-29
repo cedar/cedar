@@ -58,7 +58,7 @@
 #define clear_my(var, mask)    var &= (~(mask))
 #define set(var, mask)      var |= (mask)
 
-#define DEBUG_VERBOSE
+//#define DEBUG_VERBOSE
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
