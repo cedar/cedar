@@ -191,15 +191,18 @@ void cedar::dev::kteam::Drive::reset()
   setEncoders(encoders);
 }
 
+
+std::string cedar::dev::kteam::Drive::determineCorrectAnswer(std::string commandString) const
+{
+  std::transform(commandString.begin(), commandString.end(), commandString.begin(), ::tolower);
+  return commandString;
+}
+
+
 void cedar::dev::kteam::Drive::checkAnswer(const std::string& answer, const std::string& command) const
 {
   // determine the correct answer for the given command
-  std::cout << "answer: " << answer << std::endl;
-  std::cout << "command: " << command << std::endl;
-  std::string correct_answer = getSerialCommunication()->determineCorrectAnswer(command);
-  std::cout << "correct answer: " << correct_answer << std::endl;
-  std::cout << "correct?: " << answer.compare(0, command.size(), correct_answer, 0, command.size()) << std::endl;
-  std::cout << std::endl;
+  std::string correct_answer = this->determineCorrectAnswer(command);
 
   // if the answer is incorrect ...
   if (answer.empty() || answer.compare(0, command.size(), correct_answer, 0, command.size()) != 0)

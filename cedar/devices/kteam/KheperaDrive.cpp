@@ -367,6 +367,15 @@ std::vector<unsigned int> cedar::dev::kteam::KheperaDrive::getAmbientSensors()
   return ambient_values;
 }
 
+std::string cedar::dev::kteam::KheperaDrive::getCommandSetEncoder() const
+{
+  return "G";
+}
+
+std::string cedar::dev::kteam::KheperaDrive::getCommandGetEncoder() const
+{
+  return "H";
+}
 
 std::string cedar::dev::kteam::KheperaDrive::getCommandSetGripperPosition() const
 {

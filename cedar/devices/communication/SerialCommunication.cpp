@@ -109,12 +109,6 @@ const std::string& cedar::dev::com::SerialCommunication::getEndOfCommandString()
   return _mEndOfCommandString->getValue();
 }
 
-std::string cedar::dev::com::SerialCommunication::determineCorrectAnswer(std::string commandString) const
-{
-  std::transform(commandString.begin(), commandString.end(), commandString.begin(), ::tolower);
-  return commandString;
-}
-
 int cedar::dev::com::SerialCommunication::getCountryFlag() const
 {
   return _mCountryFlag->getValue();

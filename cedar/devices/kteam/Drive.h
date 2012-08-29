@@ -101,6 +101,17 @@ protected:
   //!@brief Returns the character used to get the encoders of the robot.
   virtual std::string getCommandGetEncoder() const;
 
+  /*!@brief Determines the expected answer for a command with a given command string prefix.
+   *
+   * Command strings always begin with an upper-case character (e.g., 'D').
+   * The correct answer to every command will begin with the lower-case version
+   * of that character (e.g., 'd').
+   *
+   * @param[in] commandString the command prefix
+   * @note The method makes a copy of the given string to not alter it.
+   */
+  std::string determineCorrectAnswer(std::string commandString) const;
+
   /*!@brief Checks whether the answer begins with the correct first character.
    * The method throws an exception when the answer is not correct.
    * @param[in] answer the answer to check
