@@ -86,10 +86,14 @@ cedar::aux::gui::PropertyPane::~PropertyPane()
 
 void cedar::aux::gui::PropertyPane::resetContents()
 {
-  if (mSlotConnection.connected())
+  for (size_t i = 0; i < this->mSlotConnections.size(); i++)
   {
-    mSlotConnection.disconnect();
+    if (this->mSlotConnections[i].connected())
+    {
+      this->mSlotConnections[i].disconnect();
+    }
   }
+  this->mSlotConnections.clear();
 
   // disconnect all signals from the configurable
   cedar::aux::ConfigurablePtr configurable = this->mDisplayedConfigurable.lock();
@@ -171,16 +175,30 @@ void cedar::aux::gui::PropertyPane::display(cedar::aux::ConfigurablePtr pConfigu
   label += " " + cedar::aux::toString(pConfigurable.get());
 #endif // DEBUG
   this->addLabelRow(label);
+  this->append("", pConfigurable);
+}
 
-  this->append(pConfigurable->getParameters());
-  mSlotConnection
-    = pConfigurable->connectToTreeChangedSignal(boost::bind(&cedar::aux::gui::PropertyPane::redraw, this));
-  for (cedar::aux::Configurable::Children::const_iterator iter = pConfigurable->configurableChildren().begin();
-       iter != pConfigurable->configurableChildren().end();
+void cedar::aux::gui::PropertyPane::append(const std::string& title, cedar::aux::ConfigurablePtr configurable)
+{
+  if (!title.empty())
+  {
+    this->addHeadingRow(title);
+  }
+
+  // append the direct parameters of the configurable
+  this->append(configurable->getParameters());
+
+  mSlotConnections.push_back
+  (
+    configurable->connectToTreeChangedSignal(boost::bind(&cedar::aux::gui::PropertyPane::redraw, this))
+  );
+
+  // append all children as well
+  for (cedar::aux::Configurable::Children::const_iterator iter = configurable->configurableChildren().begin();
+       iter != configurable->configurableChildren().end();
        ++iter)
   {
-    this->addHeadingRow(iter->first);
-    this->append(iter->second->getParameters());
+    this->append(iter->first, iter->second);
   }
 }
 

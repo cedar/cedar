@@ -118,6 +118,10 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /*!@breif Appends a configurable to the property pane.
+   */
+  void append(const std::string& title, cedar::aux::ConfigurablePtr configurable);
+
   /*!@brief Appends the representation for a parameter to the table.
    */
   void append(cedar::aux::Configurable::ParameterList& parameters);
@@ -166,7 +170,7 @@ private:
   std::map<cedar::aux::Parameter*, int> mParameterRowIndex;
 
   //! Connection to the configurable's tree changed signal.
-  boost::signals2::connection mSlotConnection;
+  std::vector<boost::signals2::connection> mSlotConnections;
 
 }; // class cedar::aux::gui::PropertyPane
 
