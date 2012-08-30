@@ -255,7 +255,7 @@ void cedar::dev::sensors::visual::Grabber::init
   mFpsMeasured = 0;
   mCaptureDeviceCreated = false;
   mRecording = false;
-
+//  mStartUp = true;
 
   //insert this instance to our instance-vector (used for emergency-cleanup)
   mInstances.push_back(this);

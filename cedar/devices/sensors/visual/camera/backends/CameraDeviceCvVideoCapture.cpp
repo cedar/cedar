@@ -47,10 +47,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::sensors::visual::CameraDeviceCvVideoCapture::CameraDeviceCvVideoCapture
 (
+  cedar::dev::sensors::visual::CameraGrabber* pCameraGrabber,
   cedar::dev::sensors::visual::CameraChannelPtr pCameraChannel
 )
 :
-cedar::dev::sensors::visual::CameraDevice::CameraDevice(pCameraChannel)
+cedar::dev::sensors::visual::CameraDevice::CameraDevice(pCameraGrabber,pCameraChannel)
 {
 }
 
@@ -70,63 +71,18 @@ cedar::dev::sensors::visual::CameraDeviceCvVideoCapture::~CameraDeviceCvVideoCap
 
 
 //first step
-void cedar::dev::sensors::visual::CameraDeviceCvVideoCapture::fillCapabilities()
+void cedar::dev::sensors::visual::CameraDeviceCvVideoCapture::setProperties()
 {
-//  cedar::dev::sensors::visual::CameraPropertiesSet& properties = mpCameraChannel->mpProperties->getProperties();
-//  properties.get().clear();
-//
-//  //create structure with supported properties and their values
-//  int num_properties = cedar::dev::sensors::visual::CameraProperty::type().list().size();
-//  for (int i=0; i<num_properties; i++)
-//  {
-//    cedar::dev::sensors::visual::CameraProperty::Id prop_id
-//      = cedar::dev::sensors::visual::CameraProperty::type().list().at(i).id();
-//
-//    std::string prop_name = cedar::dev::sensors::visual::CameraProperty::type().list().at(i).prettyString();
-//
-//    //@todo: get min/max values from device !!!
-//
-//    cedar::dev::sensors::visual::CamPropertyPtr p_prop(new cedar::dev::sensors::visual::CamProperty
-//                                                         (
-//                                                           prop_id,
-//                                                           prop_name,
-//                                                           0.f,
-//                                                           1024.f,
-//                                                           128.f,
-//                                                           true,
-//                                                           true,
-//                                                           false,
-//                                                           true
-//                                                         )
-//                                                      );
-//    properties.insert(p_prop);
-//  }
 
-  /*
-  cedar::dev::sensors::visual::CameraSettingsSet& settings = mpSettings->getSettings();
-  settings.get().clear();
+  //nothing to do here, only standard values needed
+  //which are already set in CameraProperties class
+
+  //disable all firewire related stuff (if firewire is available)
+
+  // in properties
 
 
-  //create structure with settings and their values
-  int num_settings = cedar::dev::sensors::visual::CameraSetting::type().list().size();
-  for (int i=0; i<num_settings; i++)
-  {
-    cedar::dev::sensors::visual::CameraSetting::Id setting_id
-      = cedar::dev::sensors::visual::CameraSetting::type().list().at(i).id();
-
-    std::string setting_name = cedar::dev::sensors::visual::CameraSetting::type().list().at(i).prettyString();
-
-    //@todo: get min/max values from device !!!
-
-    cedar::dev::sensors::visual::CamSettingPtr p_prop(new cedar::dev::sensors::visual::CamSetting
-                                                         (
-                                                           setting_id,
-                                                           setting_name
-                                                         )
-                                                      );
-    settings.insert(p_prop);
-  }
-  */
+  // in settings
 
 }
 
@@ -136,12 +92,12 @@ bool cedar::dev::sensors::visual::CameraDeviceCvVideoCapture::createCaptureDevic
   //
 
   std::cout << "Create camera with cv::VideoCapture Backend\n"
-      << "BusId:" << mpCameraChannel->_mpBusId->getValue() << "\n"
-      << "Guid:" << mpCameraChannel->_mpGuid->getValue() << "\n"
-      << "ByGuid:" << mpCameraChannel->_mpByGuid->getValue() << "\n"
+      << "BusId:" << mpCameraChannel->mpSettings->getBusId() << "\n"
+      << "Guid:" << mpCameraChannel->mpSettings->getGuid() << "\n"
+      << "ByGuid:" << mpCameraChannel->mpSettings->getByGuid() << "\n"
       << std::endl;
 
-  cv::VideoCapture capture(mpCameraChannel->_mpBusId->getValue());
+  cv::VideoCapture capture(mpCameraChannel->mpSettings->getBusId());
   if(capture.isOpened())
   {
     mpCameraChannel->mVideoCapture = capture;

@@ -52,9 +52,59 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::sensors::visual::CameraProperties::CameraProperties()
+cedar::dev::sensors::visual::CameraProperties::CameraProperties(cedar::aux::Configurable *pOwner)
+:
+cedar::aux::Configurable()
 {
+  // create new node for properties in the configuration
+  cedar::aux::ConfigurablePtr properties(new cedar::aux::Configurable());
+  pOwner->addConfigurableChild("properties", properties);
 
+  mpPropertiesList = cedar::dev::sensors::visual::CameraProperties::CamPropertiesMapPtr
+                     (
+                       new cedar::dev::sensors::visual::CameraProperties::CamPropertiesMap
+                     );
+
+  // Add all properties to the properties-list
+  int num_properties = cedar::dev::sensors::visual::CameraProperty::type().list().size();
+  for (int i=0; i<num_properties; i++)
+  {
+    cedar::dev::sensors::visual::CameraProperty::Id prop_id
+      = cedar::dev::sensors::visual::CameraProperty::type().list().at(i).id();
+
+    // ignore unsupported features
+    bool is_supported = true;
+    bool is_readable = true;
+
+    if (    (prop_id == cedar::dev::sensors::visual::CameraProperty::PROP_TRIGGER)
+         || (prop_id == cedar::dev::sensors::visual::CameraProperty::PROP_TRIGGER_DELAY)
+       )
+    {
+      is_supported = false;
+      is_readable = false;
+    }
+
+    //get name of property and create it with default value
+    std::string prop_name = cedar::dev::sensors::visual::CameraProperty::type().list().at(i).prettyString();
+
+    cedar::dev::sensors::visual::CamPropertyPtr p_prop(new cedar::dev::sensors::visual::CamProperty
+                                                         (
+                                                           prop_id,
+                                                           prop_name,
+                                                           (double) INT_MIN,
+                                                           (double) INT_MAX,
+                                                           128.f,
+                                                           is_supported,
+                                                           is_readable,
+                                                           false,
+                                                           true
+                                                         )
+                                                      );
+
+    mpPropertiesList->insert(std::pair<unsigned int, CamPropertyPtr>(prop_id,p_prop));
+    properties->addConfigurableChild(prop_name, p_prop);
+
+  }
 }
 
 cedar::dev::sensors::visual::CameraProperties::~CameraProperties()
@@ -65,10 +115,20 @@ cedar::dev::sensors::visual::CameraProperties::~CameraProperties()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-//cedar::dev::sensors::visual::CameraPropertiesSet& cedar::dev::sensors::visual::CameraProperties::getProperties()
+//cedar::dev::sensors::visual::CameraPropertyMap& cedar::dev::sensors::visual::CameraProperties::getPropertiesList()
 //{
-//  return mProperties;
+//  return mPropertiesList;
 //}
+
+//void cedar::dev::sensors::visual::CameraProperties::setPropertiesList
+//( 
+  //cedar::dev::sensors::visual::CameraPropertyMap propertiesList
+//)
+//{
+  //mPropertiesList.clear();
+  //mPropertiesList = propertiesList;
+//}
+
 
 //bool cedar::dev::sensors::visual::CameraProperties::setProperty(unsigned int property_id,double value)
 //{
@@ -91,50 +151,6 @@ cedar::dev::sensors::visual::CameraProperties::~CameraProperties()
 
 
 
-//--------------------------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::CameraProperties::setSetting(cedar::dev::sensors::visual::CameraSetting::Id settingId, double value)
-{
-
-  //have to be switched over to signal handler !!!
-
-  unsigned int prop_id = static_cast<unsigned int>(settingId);
-  bool result = this->setPropertyRawValue(prop_id,value);
-  unsigned int ivalue = static_cast<unsigned int>(value);
-
-//  switch (settingId)
-//  {
-//    case cedar::dev::sensors::visual::CameraSetting::FPS :
-//      //mCamSettings.fps = cedar::dev::sensors::visual::CameraFrameRate::type().get(ivalue).name();
-//    case cedar::dev::sensors::visual::CameraSetting::ISO_SPEED :
-//      //mCamSettings.iso_speed = cedar::dev::sensors::visual::CameraIsoSpeed::type().get(ivalue).name();
-//    case cedar::dev::sensors::visual::CameraSetting::MODE :
-//      //mCamSettings.mode = cedar::dev::sensors::visual::CameraVideoMode::type().get(ivalue).name();
-//  }
-//  return result;
-  return false;
-}
-
-//--------------------------------------------------------------------------------------------------------------------
-double cedar::dev::sensors::visual::CameraProperties::getSetting(CameraSetting::Id settingId)
-{
-//  switch (settingId)
-//  {
-//  case cedar::dev::sensors::visual::CameraSetting::FPS :
-//    return static_cast<double>(CameraFrameRate::type().get(mCamSettings.fps).id());
-//  case cedar::dev::sensors::visual::CameraSetting::ISO_SPEED :
-//    return static_cast<double>(CameraIsoSpeed::type().get(mCamSettings.iso_speed).id());
-//  case cedar::dev::sensors::visual::CameraSetting::MODE :
-//    return static_cast<double>(CameraVideoMode::type().get(mCamSettings.mode).id());
-//  case cedar::dev::sensors::visual::CameraSetting::FRAME_HEIGHT :
-//    return getRawProperty(CameraSetting::FRAME_HEIGHT);
-//  case cedar::dev::sensors::visual::CameraSetting::FRAME_WIDTH :
-//    return getRawProperty(CameraSetting::FRAME_WIDTH);
-//  default :
-//    return CAMERA_PROPERTY_NOT_SUPPORTED;
-//  }
-  return 0.0f;
-}
-
 
 bool cedar::dev::sensors::visual::CameraProperties::setPropertyRawValue(unsigned int property_id,double value)
 {
@@ -154,12 +170,12 @@ double cedar::dev::sensors::visual::CameraProperties::getPropertyRawValue(unsign
 }
 
 
-cedar::dev::sensors::visual::CamProperty& cedar::dev::sensors::visual::CameraProperties::getPropertyPtr
+cedar::dev::sensors::visual::CamPropertyPtr cedar::dev::sensors::visual::CameraProperties::getPropertyPtr
 (
   CameraProperty::Id propId
 )
 {
-  return mPropertiesList.find(static_cast<unsigned int>(propId))->second;
+  //return mPropertiesList.find(static_cast<unsigned int>(propId))->second;
 
   //create empty CamProperty
   //cedar::dev::sensors::visual::CamPropertyPtr val(new cedar::dev::sensors::visual::CamProperty());
@@ -204,10 +220,12 @@ bool cedar::dev::sensors::visual::CameraProperties::isReadable(CameraProperty::I
 
 }
 
+/*
 bool cedar::dev::sensors::visual::CameraProperties::isOnOffCapable(CameraProperty::Id propId)
 {
 
 }
+*/
 
 bool cedar::dev::sensors::visual::CameraProperties::isAutoCapable(CameraProperty::Id propId)
 {

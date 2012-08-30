@@ -57,18 +57,24 @@
 #include "cedar/devices/sensors/visual/namespace.h"
 
 //backends
-#include "cedar/devices/sensors/visual/camera/enums/CameraBackendType.h"
+#include "cedar/devices/sensors/visual/camera/backends/CameraBackendType.h"
 #include "cedar/devices/sensors/visual/camera/backends/CameraDevice.h"
-#include "cedar/devices/sensors/visual/camera/backends/CameraDeviceVfl.h"
-#include "cedar/devices/sensors/visual/camera/backends/CameraDeviceDc1394.h"
 #include "cedar/devices/sensors/visual/camera/backends/CameraDeviceCvVideoCapture.h"
+
+#ifdef CEDAR_USE_VIDEO_FOR_LINUX
+#include "cedar/devices/sensors/visual/camera/backends/CameraDeviceVfl.h"
+#endif //CEDAR_USE_VIDEO_FOR_LINUX
+
+#ifdef CEDAR_USE_LIB_DC1394
+#include "cedar/devices/sensors/visual/camera/backends/CameraDeviceDc1394.h"
+#endif // CEDAR_USE_LIB_DC1394
 
 // SYSTEM INCLUDES
 
 
 /*! @class cedar::dev::sensors::visual::CameraGrabber
- *  @brief This grabber grabs images from a camera. This functionality is implemented by
- *   using the OpenCV class cv::VideoCapture
+ *  @brief This grabber grabs images from a camera. The functionality is implemented by
+ *   using the OpenCV class cv::VideoCapture, but with different hardware backends
  */
 class cedar::dev::sensors::visual::CameraGrabber
 :
@@ -79,6 +85,8 @@ public cedar::dev::sensors::visual::Grabber
   //--------------------------------------------------------------------------------------------------------------------
 
   //!@cond SKIPPED_DOCUMENTATION
+  
+  //!@endcond
 
 
 public:
@@ -108,7 +116,8 @@ public:
 
   protected slots:
 
-  //!@brief A slot that is triggered if a new camera is set
+  //!@brief A slot that must be triggered if a camera-settings has changed. In that case,
+  // a new camera-device will be created
   void cameraChanged();
 
 
@@ -120,7 +129,7 @@ public:
   private:
   /*! @brief Boost slot method. Invoked if a channel is added as an ObjectListParameter as an object
    */
-  void channelAdded(int index);
+  void channelAdded(int);  // int index
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -416,17 +425,8 @@ protected:
   //------------------------------------------------------------------------
   //From Grabber
   //------------------------------------------------------------------------
-
-//  bool onInit();
-
   bool onGrab();
-
-  ///! @brief Sync all Parameters from cameras with the local buffer
-  //bool onWriteConfiguration();
-
-  ///! @brief Do the local clean up
   void onCleanUp();
-
   bool onCreateGrabber();
   void onCloseGrabber();
 
@@ -436,9 +436,12 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*! @brief This function does internal variable initialization in  constructor
-   */
+  /// This function does internal variable initialization for the constructors
   void init();
+
+  /*! @brief This function connects the used signals
+   */
+  void connectSignals();
 
   /// @brief updates the channel informations
   void setChannelInfo(unsigned int channel);
