@@ -45,7 +45,7 @@
 #include "cedar/devices/sensors/visual/namespace.h"
 
 // SYSTEM INCLUDES
-#include <opencv2/highgui/highgui_c.h>
+//#include <opencv2/highgui/highgui_c.h>
 
 class cedar::dev::sensors::visual::CameraPropertyMode
 {
@@ -102,7 +102,7 @@ public:
   ///@brief Set the operational mode of a camera property to manual settings. The property must be manual-capable
   static const Id MANUAL = 2;
 
-  //firewire mode "one-push" and "on/off" are not supported from cedar right now
+  //firewire mode "one-push" and "on/off" are not supported from cedar until now
 #ifdef CEDAR_USE_LIB_DC1394
   ///@brief Set the operational mode of a camera property to switch on or off. The property must be on/off-capable
   //static const Id ON_OFF = 3;

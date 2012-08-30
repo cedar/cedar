@@ -49,6 +49,7 @@
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/ObjectMapParameterTemplate.h"
 
 
 // SYSTEM INCLUDES
@@ -65,16 +66,19 @@ public cedar::aux::Configurable
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
+
+  //typedef cedar::aux::ObjectMapParameterTemplate<CamProperty> CamPropertiesMap;
+  typedef std::map<unsigned int, CamPropertyPtr> CamPropertiesMap;
+  CEDAR_GENERATE_POINTER_TYPES(CamPropertiesMap);
+
 public:
-  typedef cedar::aux::EnumId Id;
-  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  CameraProperties();
+  CameraProperties(cedar::aux::Configurable *pOwner);
 
   //!@brief Destructor
   ~CameraProperties();
@@ -96,13 +100,8 @@ public:
 //  double getProperty(unsigned int property);
 
 
-//  cedar::dev::sensors::visual::CameraPropertiesSet& getProperties();
-
-
-  bool setSetting(cedar::dev::sensors::visual::CameraSetting::Id settingId, double value);
-
-  double getSetting(cedar::dev::sensors::visual::CameraSetting::Id settingId);
-
+//  cedar::dev::sensors::visual::CameraPropertiesMap& getPropertiesList();
+  //void setPropertiesList(cedar::dev::sensors::visual::CameraPropertyMap propertiesList);
 
   /// Get the mode of operation of the used parameter
   cedar::dev::sensors::visual::CameraPropertyMode::Id getMode(cedar::dev::sensors::visual::CameraProperty::Id propId);
@@ -150,7 +149,7 @@ public:
   /*! \brief This method tells you, if the given property could be turn off and on
    *  \param propId The id of the  property
    */
-  bool isOnOffCapable(CameraProperty::Id propId);
+  //bool isOnOffCapable(CameraProperty::Id propId);
 
   /*! \brief This method tells you, if the given property can be set to auto-mode
    *  \param propId The id of the  property
@@ -177,9 +176,9 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //return CampProperty
+  //return CamProperty
   //@exception std::out_of_range if the searched value doesn't exist
-  cedar::dev::sensors::visual::CamProperty& getPropertyPtr(CameraProperty::Id propId);
+  cedar::dev::sensors::visual::CamPropertyPtr getPropertyPtr(CameraProperty::Id propId);
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -189,7 +188,9 @@ protected:
   // none yet
 private:
   //cedar::dev::sensors::visual::CameraPropertiesSet mProperties;
-  cedar::dev::sensors::visual::CameraPropertyMap mPropertiesList;
+  //cedar::dev::sensors::visual::CameraPropertyMap mPropertiesList;
+//  cedar::aux::ObjectMapParameterTemplate<CamProperty> mPropertiesList;
+  CamPropertiesMapPtr mpPropertiesList;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

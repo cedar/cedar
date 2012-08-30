@@ -49,17 +49,12 @@
 
 
 //--------------------------------------------------------------------------------------------------------------------
-//(re)defines of our new introduced properties in OpenCV:
-//delete this, if the patched OpenCV is available
-#ifndef CV_CAP_PROP_ZOOM
-  #define CV_CAP_PROP_ZOOM 27
-#endif
-#ifndef CV_CAP_PROP_FOCUS
-  #define CV_CAP_PROP_FOCUS 28
-#endif
-#ifndef CV_CAP_PROP_GUID
-  #define CV_CAP_PROP_GUID 29
-#endif
+// (re)defines of our new introduced properties in OpenCV:
+// for compatibility with OpenCV prior 2.4.0
+//@todo: check OpenCV version with ifdef
+#define CV_CAP_PROP_ZOOM 27
+#define CV_CAP_PROP_FOCUS 28
+#define CV_CAP_PROP_GUID 29
 
 //mappings from OpenCV constants
 //return value, if a property is not supported from the actual device

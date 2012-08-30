@@ -59,6 +59,7 @@ cedar::dev::sensors::visual::CamProperty::CamProperty
   //bool onOffCapable
 )
 :
+cedar::aux::Configurable(),
 mId(id),
 mName(name),
 mSupported(supported),
