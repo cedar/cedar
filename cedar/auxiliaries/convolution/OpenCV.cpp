@@ -738,8 +738,18 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
     case 1:
     {
       CEDAR_DEBUG_ASSERT(kernel->kernelPartCount() == 1);
-      const cv::Mat& kernel_mat = kernel->getKernelPart(0);
-      convolved = this->cvConvolve(matrix, kernel_mat, cvBorderType, anchor);
+      cv::Mat kernel_mat = kernel->getKernelPart(0);
+      if (matrix.rows == 1 && kernel_mat.rows != 1)
+      {
+        kernel_mat = kernel_mat.t();
+      }
+      if (matrix.cols == 1 && kernel_mat.cols != 1)
+      {
+        kernel_mat = kernel_mat.t();
+      }
+      cv::Mat flipped;
+      cv::flip(kernel_mat, flipped, -1);
+      convolved = this->cvConvolve(matrix, flipped, cvBorderType, anchor);
       break;
     }
 
