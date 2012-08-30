@@ -47,9 +47,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::sensors::visual::CameraDevice::CameraDevice
 (
- cedar::dev::sensors::visual::CameraChannelPtr pCameraChannel
+  cedar::dev::sensors::visual::CameraGrabber* cameraGrabber,
+  cedar::dev::sensors::visual::CameraChannelPtr pCameraChannel
 )
 :
+mpCameraGrabber(cameraGrabber),
 mpCameraChannel(pCameraChannel)
 {
 }
@@ -74,7 +76,7 @@ bool cedar::dev::sensors::visual::CameraDevice::init()
   this->mpCameraChannel->mVideoCapture = cv::VideoCapture();
 
   // 3  fill p_capabilities with the right values (depends on backend and camera)
-  this->fillCapabilities();
+  this->setProperties();
 
   // 4. create cv::VideoCapture
   result = this->createCaptureDevice();

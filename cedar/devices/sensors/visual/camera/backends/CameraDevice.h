@@ -45,7 +45,7 @@
 #include "cedar/auxiliaries/SetParameter.h"
 #include "cedar/devices/sensors/visual/camera/CameraProperties.h"
 #include "cedar/devices/sensors/visual/camera/CameraSettings.h"
-#include "cedar/devices/sensors/visual/camera/CameraChannel.h"  //circular includes !!
+#include "cedar/devices/sensors/visual/camera/CameraChannel.h"  //circular includes if this struct is in CameraGrabber
 
 
 
@@ -77,6 +77,7 @@ protected:
 //    cv::VideoCapture videoCapture,
 //    QReadWriteLock* p_videoCaptureLock
 //   cedar::dev::sensors::visual::CameraGrabber::CameraChannelPtr pCameraChannel
+   cedar::dev::sensors::visual::CameraGrabber* pCameraGrabber,
    cedar::dev::sensors::visual::CameraChannelPtr pCameraChannel
   );
 
@@ -102,9 +103,8 @@ protected:
   //cedar::dev::sensors::visual::CameraPropertiesPtr mpCamProperties;
 
 //  cedar::dev::sensors::visual::CameraGrabber::CameraChannelPtr mpCameraChannel;
-  cedar::dev::sensors::visual::CameraChannelPtr mpCameraChannel;
 
-  virtual void fillCapabilities() = 0;
+  virtual void setProperties() = 0;
   virtual bool createCaptureDevice() = 0;
   virtual void applySettingsToCamera() = 0;
   virtual void applyStateToCamera() = 0;
@@ -121,7 +121,9 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  cedar::dev::sensors::visual::CameraGrabber* mpCameraGrabber;
+  cedar::dev::sensors::visual::CameraChannelPtr mpCameraChannel;
+
 private:
   // none yet
 

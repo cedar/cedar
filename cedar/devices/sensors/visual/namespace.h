@@ -92,8 +92,11 @@ namespace cedar
 
         // backend implementation
         CEDAR_DECLARE_DEV_CLASS(CameraDevice);
-        CEDAR_DECLARE_DEV_CLASS(CameraDeviceVfl);
         CEDAR_DECLARE_DEV_CLASS(CameraDeviceCvVideoCapture);
+
+#ifdef CEDAR_USE_VIDEO_FOR_LINUX
+        CEDAR_DECLARE_DEV_CLASS(CameraDeviceVfl);
+#endif //CEDAR_USE_VIDEO_FOR_LINUX
 
 #ifdef CEDAR_USE_LIB_DC1394
         CEDAR_DECLARE_DEV_CLASS(CameraDeviceDc1394);
@@ -148,16 +151,18 @@ namespace cedar
         //typedef std::map<unsigned int, double> CameraPropertyValues;
 
         //! map of a property-id to his class
-        typedef std::map<unsigned int, cedar::dev::sensors::visual::CamProperty> CameraPropertyMap;
+        
+        //switch to ObjectMapParameterTemplate
+        typedef std::map<unsigned int, cedar::dev::sensors::visual::CamPropertyPtr> CameraPropertyMap;
 
         ///! a pair of property enum id and his value
         // typedef std::pair<unsigned int, double> CameraPropertyValuesPair;
 
-        typedef cedar::aux::SetParameter<cedar::dev::sensors::visual::CamPropertyPtr> CameraPropertiesSet;
-        CEDAR_GENERATE_POINTER_TYPES(CameraPropertiesSet);
+        //typedef cedar::aux::SetParameter<cedar::dev::sensors::visual::CamPropertyPtr> CameraPropertiesSet;
+        //CEDAR_GENERATE_POINTER_TYPES(CameraPropertiesSet);
 
-        typedef cedar::aux::SetParameter<cedar::dev::sensors::visual::CamSettingPtr> CameraSettingsSet;
-        CEDAR_GENERATE_POINTER_TYPES(CameraSettingsSet);
+        //typedef cedar::aux::SetParameter<cedar::dev::sensors::visual::CamSettingPtr> CameraSettingsSet;
+        //CEDAR_GENERATE_POINTER_TYPES(CameraSettingsSet);
         //!@endcond
 
         //-----------------------------------------------------------------------------------------------

@@ -75,8 +75,8 @@ public:
   (
    cedar::dev::sensors::visual::CameraProperty::Id id = 0,
    std::string name = "property",
-   double minValue = 0.f,
-   double maxValue = 255.f,
+   double minValue = (double) INT_MIN,
+   double maxValue = (double) INT_MAX,
    double defaultValue = 128,
    bool supported = true,
    bool readable = true,
