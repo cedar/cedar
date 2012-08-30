@@ -45,7 +45,10 @@
 #include "cedar/devices/sensors/visual/camera/enums/CameraSetting.h"
 
 #include "cedar/devices/sensors/visual/camera/backends/CameraDeviceCvVideoCapture.h"
+
+#ifdef CEDAR_USE_VIDEO_FOR_LINUX
 #include "cedar/devices/sensors/visual/camera/backends/CameraDeviceVfl.h"
+#endif // CEDAR_USE_VIDEO_FOR_LINUX
 
 #ifdef CEDAR_USE_LIB_DC1394
 #include "cedar/devices/sensors/visual/camera/backends/CameraDeviceDc1394.h"
@@ -130,45 +133,30 @@ cedar::dev::sensors::visual::Grabber
 void cedar::dev::sensors::visual::CameraGrabber::init()
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
-
-  for (unsigned int channel=0; channel<_mChannels->size(); ++channel)
-  {
-    QObject::connect
-             (
-               getCameraChannel(channel)->_mpBusId.get(),
-               SIGNAL(valueChanged()),
-               this,
-               SLOT(cameraChanged())
-             );
-    QObject::connect
-             (
-               getCameraChannel(channel)->_mpGuid.get(),
-               SIGNAL(valueChanged()),
-               this,
-               SLOT(cameraChanged())
-             );
-    QObject::connect
-             (
-               getCameraChannel(channel)->_mpBackendType.get(),
-               SIGNAL(valueChanged()),
-               this,
-               SLOT(cameraChanged())
-             );
-//    QObject::connect
-//             (
-//               getCameraChannel(channel)->_mpDebayerFilter.get(),
-//               SIGNAL(valueChanged()),
-//               this,
-//               SLOT(cameraChanged())
-//             );
-  }
-
+  this->connectSignals();
   //watch if channel added to ObjectParameterList
   _mChannels->connectToObjectAddedSignal
               (
                 boost::bind(&cedar::dev::sensors::visual::CameraGrabber::channelAdded,this,_1)
               );
+}
 
+
+//----------------------------------------------------------------------------------------------------
+void cedar::dev::sensors::visual::CameraGrabber::connectSignals()
+{
+  for (unsigned int channel=0; channel<_mChannels->size(); ++channel)
+  {
+    QObject::connect
+             (
+               getCameraChannel(channel)->_mpBackendType.get(),
+               SIGNAL(valueChanged()),
+               this,
+               SLOT(settingsChanged())
+             );
+
+    //getCameraChannel(channel)->mpSettings->connectSignals(this);
+  }
 }
 
 
@@ -184,54 +172,82 @@ cedar::dev::sensors::visual::CameraGrabber::~CameraGrabber()
 //--------------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::CameraGrabber::channelAdded(int index)
+void cedar::dev::sensors::visual::CameraGrabber::channelAdded(int) // int index
 {
-  QObject::connect
-           (
-             getCameraChannel(index)->_mpBusId.get(),
-             SIGNAL(valueChanged()),
-             this,
-             SLOT(cameraChanged())
-           );
-  QObject::connect
-           (
-             getCameraChannel(index)->_mpGuid.get(),
-             SIGNAL(valueChanged()),
-             this,
-             SLOT(cameraChanged())
-           );
-  QObject::connect
-           (
-             getCameraChannel(index)->_mpBackendType.get(),
-             SIGNAL(valueChanged()),
-             this,
-             SLOT(cameraChanged())
-           );
+  this->connectSignals();
 }
 
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::CameraGrabber::cameraChanged()
 {
-  // deceide if setting
+
+  cedar::aux::LogSingleton::getInstance()->debugMessage
+                                           (
+                                             this->getName() + ": cameraChanged signal",
+                                             "cedar::dev::sensors::visual::CameraGrabber::cameraChanged()"
+                                           );
 
 // get sender
   cedar::aux::ParameterPtr p_sender
     = cedar::aux::ParameterPtr(cedar::aux::asserted_cast<cedar::aux::Parameter * >(QObject::sender()));
 
   //search for the changed channel
-  unsigned int num_channels = getNumCams();
-  unsigned int channel = 0;
+//  unsigned int num_channels = getNumCams();
+//  unsigned int channel = 0;
+//
+//  //check if byGuid is set
+//  while( (channel < num_channels) && (p_sender != getCameraChannel(channel)->_mpByGuid.get()))
+//  {
+//    channel++;
+//  }
+//
+//  CEDAR_DEBUG_ASSERT(channel < num_channels);
 
-  while
-  (
-    (channel < num_channels)
-    && (p_sender != getCameraChannel(channel)->_mpBusId.get())
-    && (p_sender != getCameraChannel(channel)->_mpGuid.get())
-    && (p_sender != getCameraChannel(channel)->_mpBackendType.get())
-  )
-  {
-    channel++;
-  }
+//  // if byGuid is changed, adjust visibility of BusId/GUID
+//  if (p_sender == getCameraChannel(channel)->_mpByGuid.get())
+//  {
+//    cedar::aux::LogSingleton::getInstance()->debugMessage
+//                                             (
+//                                               this->getName() + ": byGUID changed",
+//                                               "cedar::dev::sensors::visual::CameraGrabber::cameraChanged()"
+//                                             );
+//    if (getCameraChannel(channel)->_mpGuid->getValue())
+//    {
+//      getCameraChannel(channel)->_mpBusId->setHidden(false);
+//      getCameraChannel(channel)->_mpGuid->setHidden(true);
+//    }
+//    else
+//    {
+//      getCameraChannel(channel)->_mpBusId->setHidden(true);
+//      getCameraChannel(channel)->_mpGuid->setHidden(false);
+//    }
+//
+//  }
+
+// search for sender:
+//  unsigned int channel = 0;
+//
+//  while
+//  (
+//    (channel < num_channels)
+//
+//    //signals from grabber
+//    && (p_sender != getCameraChannel(channel)->_mpByGuid())
+//    && (p_sender != getCameraChannel(channel)->_mpBusId.get())
+//    && (p_sender != getCameraChannel(channel)->_mpGuid.get())
+//    && (p_sender != getCameraChannel(channel)->_mpBackendType.get())
+//
+//    //signals from settings
+//    && (p_sender != getCameraChannel(channel)->mpSettings->mpWidth.get())
+//    && (p_sender != getCameraChannel(channel)->mpSettings->mpHeight.get())
+//    && (p_sender != getCameraChannel(channel)->mpSettings->_mpGrabMode.get())
+//#ifdef CEDAR_USE_LIB_DC1394
+//    && (p_sender != getCameraChannel(channel)->mpSettings->_mpIsoSpeed.get())
+//#endif
+//  )
+//  {
+//    channel++;
+//  }
 //
 //  //if found, create new content
 //  if ((p_sender == getCameraChannel(channel)->_mpBusId->get()) || (p_sender == getCameraChannel(channel)->_mpGuid->get()))
@@ -239,11 +255,13 @@ void cedar::dev::sensors::visual::CameraGrabber::cameraChanged()
 //    this->applyParameter();
 //  }
 
-  if (this->getCameraChannel(channel))   
+  // only apply parameters directly, if the camera is already in use.
+  // which is set by a loopedTrigger or by the applyParameter-action
+  if (mCaptureDeviceCreated)
   {
-    ;
+    // delete and recreate all channels
+    this->applyParameter();
   }
-  this->applyParameter();
 
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -278,13 +296,13 @@ bool cedar::dev::sensors::visual::CameraGrabber::onCreateGrabber()
   {
     init_message << "Channel " << channel << ": capture from ";
 
-    if (getCameraChannel(channel)->_mpByGuid->getValue())
+    if (getCameraChannel(channel)->mpSettings->getByGuid())
     {
-      init_message << "Camera-GUID: "<< getCameraChannel(channel)->_mpGuid->getValue() << std::endl;
+      init_message << "Camera-GUID: "<< getCameraChannel(channel)->mpSettings->getGuid() << std::endl;
     }
     else
     {
-      init_message << "Bus-ID " << getCameraChannel(channel)->_mpBusId->getValue() << std::endl;
+      init_message << "Bus-ID " << getCameraChannel(channel)->mpSettings->getBusId() << std::endl;
     }
   }
   cedar::aux::LogSingleton::getInstance()->debugMessage
@@ -311,6 +329,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::onCreateGrabber()
                                                              (
                                                                new cedar::dev::sensors::visual::CameraDeviceDc1394
                                                                    (
+                                                                     this,
                                                                      getCameraChannel(channel)
                                                                    )
                                                              );
@@ -319,15 +338,21 @@ bool cedar::dev::sensors::visual::CameraGrabber::onCreateGrabber()
         }
 #endif
 
+#ifdef CEDAR_USE_VIDEO_FOR_LINUX
+        case cedar::dev::sensors::visual::CameraBackendType::VFL :
+#endif // CEDAR_USE_VIDEO_FOR_LINUX
+
         case cedar::dev::sensors::visual::CameraBackendType::AUTO :
         case cedar::dev::sensors::visual::CameraBackendType::CVCAPTURE :
-        case cedar::dev::sensors::visual::CameraBackendType::VFL :
+
+
         default:
         {
           cedar::dev::sensors::visual::CameraDeviceCvVideoCapturePtr cv_device
                                                                      (
                                                                        new cedar::dev::sensors::visual::CameraDeviceCvVideoCapture
                                                                        (
+                                                                        this,
                                                                         getCameraChannel(channel)
                                                                        )
                                                                      );
@@ -341,7 +366,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::onCreateGrabber()
       }
       all_devices_created = all_devices_created && device_created;
     } // for every channel
-
+    //todo::don't touch mCaptureDeviceCreated!!
     mCaptureDeviceCreated = all_devices_created;
   }
   catch (...)
@@ -453,6 +478,8 @@ bool cedar::dev::sensors::visual::CameraGrabber::onGrab()
      cedar::dev::sensors::visual::DeBayerFilter::Id debayer_fiter;
      debayer_fiter = this->getCameraChannel(channel)->_mpDebayerFilter->getValue();
 
+     std::cout << "DEBAYER: " << debayer_fiter << std::endl;
+
      if (debayer_fiter != cedar::dev::sensors::visual::DeBayerFilter::NONE)
      {
        cv::cvtColor(getCameraChannel(channel)->mImageMat,getCameraChannel(channel)->mImageMat,debayer_fiter);
@@ -494,9 +521,9 @@ void cedar::dev::sensors::visual::CameraGrabber::setChannelInfo(unsigned int cha
 {
   std::stringstream s;
   s << "Camera channel 0"
-    << ": DeviceID: " << getCameraChannel(channel)->_mpBusId->getValue()
-    << ", GUID: " << getCameraChannel(channel)->_mpGuid->getValue()
-    << " (0x"<<std::hex<<getCameraChannel(channel)->_mpGuid->getValue()<<")"<<std::dec
+    << ": DeviceID: " << getCameraChannel(channel)->mpSettings->getBusId()
+    << ", GUID: " << getCameraChannel(channel)->mpSettings->getGuid()
+    << " (0x"<<std::hex<<getCameraChannel(channel)->mpSettings->getGuid()<<")"<<std::dec
     << ", Mode: " << CameraVideoMode::type().get(this->getCameraMode(0)).name();
   getCameraChannel(channel)->mChannelInfo = s.str();
 }
@@ -524,7 +551,7 @@ unsigned int cedar::dev::sensors::visual::CameraGrabber::getCameraGuid(unsigned 
       "cedar::dev::sensors::visual::CameraGrabber::getCameraProperty"
     );
   }
-  return getCameraChannel(channel)->_mpGuid->getValue();
+  return getCameraChannel(channel)->mpSettings->getGuid();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -813,7 +840,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::setRawProperty(unsigned int cha
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"cedar::dev::sensors::visual::CameraGrabber::setRawProperty");
   }
-  return getCameraChannel(channel)->mpProperties->setPropertyRawValue(propId, value);
+  return getCameraChannel(channel)->setRawProperty(propId, value);
   //return false;
 }
 
@@ -825,6 +852,6 @@ double cedar::dev::sensors::visual::CameraGrabber::getRawProperty(unsigned int c
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"cedar::dev::sensors::visual::CameraGrabber::getRawProperty");
   }
-  return getCameraChannel(channel)->mpProperties->getPropertyRawValue(propId);
+  return getCameraChannel(channel)->getRawProperty(propId);
 }
 

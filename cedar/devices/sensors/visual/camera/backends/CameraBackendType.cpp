@@ -38,7 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/camera/enums/CameraBackendType.h"
+#include "cedar/devices/sensors/visual/camera/backends/CameraBackendType.h"
 
 // SYSTEM INCLUDES
 
@@ -55,7 +55,11 @@ const cedar::dev::sensors::visual::CameraBackendType::Id cedar::dev::sensors::vi
 const cedar::dev::sensors::visual::CameraBackendType::Id cedar::dev::sensors::visual::CameraBackendType::DC1394;
 #endif //CEDAR_USE_LIB_DC1394
 
+#ifdef CEDAR_USE_VIDEO_FOR_LINUX
 const cedar::dev::sensors::visual::CameraBackendType::Id cedar::dev::sensors::visual::CameraBackendType::VFL;
+#endif // CEDAR_USE_VIDEO_FOR_LINUX
+
+
 #endif // CEDAR_COMPILER_MSVC
 //!@endcond
 
@@ -84,11 +88,14 @@ void cedar::dev::sensors::visual::CameraBackendType::construct()
                                     ));
 #endif //CEDAR_USE_LIB_DC1394
 
+#ifdef CEDAR_USE_VIDEO_FOR_LINUX
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraBackendType::VFL,
                                       "VFL",
                                       "VfL (Video for Linux)"
                                     ));
+#endif // CEDAR_USE_VIDEO_FOR_LINUX
+
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods

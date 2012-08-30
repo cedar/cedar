@@ -42,16 +42,17 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/namespace.h"
-#include "cedar/devices/sensors/visual/camera/enums/CameraSetting.h"
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
 
-#include "cedar/devices/sensors/visual/camera/enums/CameraBackendType.h"
-
+#include "cedar/devices/sensors/visual/camera/backends/CameraBackendType.h"
+#include "cedar/devices/sensors/visual/camera/enums/CameraSetting.h"
 
 // SYSTEM INCLUDES
+#include <QObject>
 
 
 /*!@brief Base class of the misc camera grabber backends.
@@ -60,19 +61,37 @@
  */
 class cedar::dev::sensors::visual::CameraSettings
 :
+public QObject,
 public cedar::aux::Configurable
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
-public:
+
+protected slots:
+
+//!@brief A slot that is triggered if a setting has changed
+  void settingChanged();
+
+
+signals:
+
+//!@brief This signal is emitted, when a setting has changed.
+  void settingsChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   /// The standard constructor.
-  CameraSettings(cedar::dev::sensors::visual::CameraBackendType::Id backendType);
+  CameraSettings
+  (
+    unsigned int cameraId = 0,
+    bool byGuid = false,
+    cedar::dev::sensors::visual::CameraBackendType::Id backendType = cedar::dev::sensors::visual::CameraBackendType::AUTO
+  );
 
   /// Destructor
   ~CameraSettings();
@@ -81,7 +100,24 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-//  cedar::dev::sensors::visual::CameraSettingsSet& getSettings();
+
+  /* Call this signal after creation of this class to connect the used signals
+   *
+   * For all settings, a new grabbing-device have to be created.
+   * All signals are connected to CameraGrabber::cameraChanged() slot
+   */
+//  void connectSignals(cedar::dev::sensors::visual::CameraGrabber* pCameraGrabber);
+  
+  //bool setSetting(cedar::dev::sensors::visual::CameraSetting::Id settingId, double value);
+  //double getSetting(cedar::dev::sensors::visual::CameraSetting::Id settingId);
+
+  unsigned int getBusId();
+  unsigned int getGuid();
+
+  bool getByGuid();
+
+  void setParametersFromBackend(cedar::dev::sensors::visual::CameraBackendType::Id backendType);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -93,11 +129,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /// Set a Parameter in the cv::VideoCapture class
-  bool setSetting(CameraSetting::Id settingId, double value);
+  // none yet
 
-  /// Get a Parameter in the cv::VideoCapture class
-  double getSetting(CameraSetting::Id settingId);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -105,13 +138,23 @@ private:
 protected:
   // none yet
 private:
-//  cedar::dev::sensors::visual::CameraSettingsSet mSettings;
+  cedar::dev::sensors::visual::CameraBackendType::Id mBackendType;
+  unsigned int mCameraId;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
+  /// create with guid or with bus id
+  cedar::aux::BoolParameterPtr _mpByGuid;
+
+  /// The id on the used bus
+  cedar::aux::UIntParameterPtr _mpBusId;
+
+  /// Unique channel id (not supported on every backend)
+  cedar::aux::UIntParameterPtr _mpGuid;
   
   /// frame width
   cedar::aux::UIntParameterPtr mpWidth;

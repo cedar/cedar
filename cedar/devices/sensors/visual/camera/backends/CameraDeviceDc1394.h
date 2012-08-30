@@ -40,13 +40,15 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
+#ifdef CEDAR_USE_LIB_DC1394
+
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/namespace.h"
 #include "cedar/devices/sensors/visual/camera/backends/CameraDevice.h"
 
 // SYSTEM INCLUDES
 
-#ifdef CEDAR_USE_LIB_DC1394
+
 
 /*!@brief Base class of the misc camera grabber backends.
  *
@@ -67,6 +69,7 @@ public:
   //!@brief The standard constructor.
   CameraDeviceDc1394
   (
+    cedar::dev::sensors::visual::CameraGrabber* pCameraGrabber,
     cedar::dev::sensors::visual::CameraChannelPtr pCameraChannel
   );
 
@@ -83,7 +86,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void fillCapabilities();
+  void setProperties();
   void applySettingsToCamera();
   bool createCaptureDevice();
   void applyStateToCamera();

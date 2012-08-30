@@ -44,7 +44,7 @@
 #include "cedar/devices/sensors/visual/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/Parameter.h"
-#include "cedar/devices/sensors/visual/camera/enums/CameraBackendType.h"
+#include "cedar/devices/sensors/visual/camera/backends/CameraBackendType.h"
 #include "cedar/devices/sensors/visual/camera/enums/DeBayerFilter.h"
 #include "cedar/devices/sensors/visual/Grabber.h"
 
@@ -74,9 +74,6 @@
     )
     :
     cedar::dev::sensors::visual::Grabber::Channel(),
-    _mpByGuid(new cedar::aux::BoolParameter(this,"by GUID",false)),
-    _mpBusId(new cedar::aux::UIntParameter(this,"bus ID",0,0,255)),
-    _mpGuid(new cedar::aux::UIntParameter(this,"GUID",0)),
     _mpBackendType(new cedar::aux::EnumParameter
                   (
                     this,
@@ -94,35 +91,34 @@
                            )
                          ),
     mpVideoCaptureLock(new QReadWriteLock())
-    //mProperties(cedar::dev::sensors::visual::CameraPropertiesSet())
+    //mpSettings(new cedar::dev::sensors::visual::CameraSettings(pCameraGrabber,backendType)),
     {
-      if (byGuid)
-      {
-        _mpBusId->setValue(0);
-        _mpBusId->setHidden(true);
-        _mpGuid->setValue(cameraId);
-      }
-      else
-      {
-        _mpBusId->setValue(cameraId);
-        _mpGuid->setValue(0);
-        _mpGuid->setHidden(true);
-      }
+
+
+
+      // create settings
+      mpSettings = cedar::dev::sensors::visual::CameraSettingsPtr
+                   (
+                     new cedar::dev::sensors::visual::CameraSettings(cameraId,byGuid,backendType)
+                   );
+
+      //add settings as configurable child
+      this->addConfigurableChild("settings", mpSettings);
+
+      // create properties
+      mpProperties = cedar::dev::sensors::visual::CameraPropertiesPtr
+                   (
+                     new cedar::dev::sensors::visual::CameraProperties(this)
+                   );
+
+      // connect slots of channel properties
+
     }
 
     ~CameraChannel()
     {
       delete mpVideoCaptureLock;
     }
-
-    /// create with guid or with bus id
-    cedar::aux::BoolParameterPtr _mpByGuid;
-
-    /// The id on the used bus
-    cedar::aux::UIntParameterPtr _mpBusId;
-
-    /// Unique channel id (not supported on every backend)
-    cedar::aux::UIntParameterPtr _mpGuid;
 
     /// The Backend to use
     cedar::aux::EnumParameterPtr _mpBackendType;
@@ -141,19 +137,52 @@
     // contains all properties
     cedar::dev::sensors::visual::CameraPropertiesPtr mpProperties;
 
-
     /// Camera interface
     cv::VideoCapture mVideoCapture;
 
     // Pointer to the camera device
     //CameraDevicePtr mpDevice;
 
+    bool setRawProperty(unsigned int propId, double value)
+    {
+      bool result;
+      mpVideoCaptureLock->lockForWrite();
+      result = mVideoCapture.set(propId, value);
+      mpVideoCaptureLock->unlock();
+
+      //check if set
+      if (result)
+      {
+        if (this->getRawProperty(propId) == value)
+        {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    /*! @brief Get a property directly form the cv::VideoCapture
+     *
+     *  @param propId The OpenCV constants for cv::VideoCapture.set() method
+     *  @return Value, that indicates the exit-state of cv::VideoCapture.set()
+     *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+     *  @see  getCameraMode, getCameraFps, getCameraIsoSpeed, CameraSetting, getCameraProperty
+     */
+    double getRawProperty(unsigned int propId)
+    {
+      double result;
+      mpVideoCaptureLock->lockForWrite();
+      result = mVideoCapture.get(propId);
+      mpVideoCaptureLock->unlock();
+      return result;
+    }
+
   };
 
   //CEDAR_GENERATE_POINTER_TYPES(CameraChannel);
 
 
-  //!@endcond
+
 
 
 
