@@ -225,6 +225,13 @@ private:
     }
     parameter->unlock();
 
+    // apply the proper tab order to all widgets
+    for (size_t i = 1; i < this->mWidgets.size(); ++i)
+    {
+      // tell qt that widgets[i-1] precedes widgets[i]
+      QWidget::setTabOrder(this->mWidgets[i - 1], this->mWidgets[i]);
+    }
+
     emit heightChanged();
   }
 
