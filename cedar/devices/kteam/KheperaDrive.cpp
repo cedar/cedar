@@ -59,6 +59,8 @@ _mArmPositionLimits(new cedar::aux::math::UIntLimitsParameter(this, "arm positio
   _mEncoderLimits->makeDefault();
   _mHardwareSpeedLimits->setDefaults(-2000, 2000);
   _mHardwareSpeedLimits->makeDefault();
+  _mArmPositionLimits->setDefaults(190, 249);
+  _mArmPositionLimits->makeDefault();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
