@@ -119,7 +119,8 @@ void cedar::dev::kteam::DriveModel::calculatePositionAndOrientation(const std::v
   double new_x_position = getTranslationX() + ds * getTransformation().at<double>(0, 1);
   double new_y_position = getTranslationY() + ds * getTransformation().at<double>(1, 1);
   // get old orientation and calculate new orientation
-  double new_orientation = getRotation() + dphi;
+  // don't need that at the moment (SZ)
+  //double new_orientation = getRotation() + dphi;
 
   // update both position and orientation
   setTranslation(new_x_position, new_y_position);
