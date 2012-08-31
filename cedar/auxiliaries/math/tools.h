@@ -221,11 +221,15 @@ namespace cedar
       template <typename T>
       inline T getMatrixEntry(const cv::Mat& matrix, int index)
       {
-        CEDAR_ASSERT(matrix.type() == CV_32F || matrix.type() == CV_64F);
+        CEDAR_ASSERT(matrix.type() == CV_8UC1 || matrix.type() == CV_32F || matrix.type() == CV_64F);
         CEDAR_ASSERT(cedar::aux::math::getDimensionalityOf(matrix) <= 1);
 
         switch (matrix.type())
         {
+          case CV_8UC1:
+            return static_cast<T>(matrix.at<unsigned char>(index));
+            break;
+
           case CV_32F:
             return static_cast<T>(matrix.at<float>(index));
             break;
