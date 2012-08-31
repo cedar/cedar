@@ -53,11 +53,11 @@ mDrive(drive)
 
   // set starting-position
   setTranslation(0, 0);
-  setRotation(0);
+  //setRotation(0);
   mDrive->reset();
 
   // start update-timer and running-time
-  startTimer(1);
+  //startTimer(1);
 
   update();
 }
@@ -123,7 +123,8 @@ void cedar::dev::kteam::DriveModel::calculatePositionAndOrientation(const std::v
 
   // update both position and orientation
   setTranslation(new_x_position, new_y_position);
-  setRotation(new_orientation);
+  rotate(2, dphi);
+//  setRotation(new_orientation);
 }
 
 double cedar::dev::kteam::DriveModel::calculateDifferencePosition
