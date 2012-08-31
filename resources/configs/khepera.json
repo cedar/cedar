@@ -21,5 +21,10 @@
   {
     "lower limit": "-3.141",
     "upper limit": "3.141"
+  },
+  "arm position limits":
+  {
+    "lower limit": "190",
+    "upper limit": "249"
   }
 }

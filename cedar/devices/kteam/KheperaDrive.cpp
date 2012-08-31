@@ -48,8 +48,17 @@ cedar::dev::kteam::KheperaDrive::KheperaDrive(cedar::dev::com::SerialCommunicati
 :
 cedar::dev::kteam::Drive(communication),
 _mArmPositionLimits(new cedar::aux::math::UIntLimitsParameter(this, "arm position limits", 0, 255, 0, 255))
-
 {
+  _mWheelDistance->setDefault(0.053);
+  _mWheelDistance->makeDefault();
+  _mWheelRadius->setDefault(0.0205);
+  _mWheelRadius->makeDefault();
+  _mNumberOfPulsesPerRevolution->setDefault(1000);
+  _mNumberOfPulsesPerRevolution->makeDefault();
+  _mEncoderLimits->setDefaults(-32768, 32767);
+  _mEncoderLimits->makeDefault();
+  _mHardwareSpeedLimits->setDefaults(-2000, 2000);
+  _mHardwareSpeedLimits->makeDefault();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -83,14 +92,6 @@ void cedar::dev::kteam::KheperaDrive::setGripperPosition(bool position)
 
   // check whether the answer begins with the correct character
   checkAnswer(answer, getCommandSetGripperPosition());
-
-  // print a debug message that everything worked
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-  (
-    "Successfully set gripper position",
-    "cedar::dev::kteam::KheperaDrive",
-    "Set gripper position"
-  );
 }
 
 void cedar::dev::kteam::KheperaDrive::setArmPosition(unsigned int position)
@@ -106,14 +107,6 @@ void cedar::dev::kteam::KheperaDrive::setArmPosition(unsigned int position)
 
   // check whether the answer begins with the correct character
   checkAnswer(answer, getCommandSetArmPosition());
-
-  // print a debug message that everything worked
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-  (
-    "Successfully set arm position",
-    "cedar::dev::kteam::KheperaDrive",
-    "Set arm position"
-  );
 }
 
 unsigned int cedar::dev::kteam::KheperaDrive::getArmPosition()

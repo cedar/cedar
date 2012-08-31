@@ -75,6 +75,8 @@ _mBaudrate(new cedar::aux::UIntParameter(this, "baud rate", 4098, 0, 1000000)),
 _mTimeOut(new cedar::aux::UIntParameter(this, "time out", 250000, 0, 1000000)),
 _mLatency(new cedar::aux::UIntParameter(this, "latency", 10000, 0, 1000000))
 {
+  QObject::connect(_mEndOfCommandString.get(), SIGNAL(valueChanged()),
+                   this, SLOT(updateTranslatedEndOfCommandString()));
 }
 
 cedar::dev::com::SerialCommunication::~SerialCommunication()
@@ -210,6 +212,7 @@ void cedar::dev::com::SerialCommunication::send(const std::string& command)
   }
 
 #ifdef DEBUG_VERBOSE
+  /*
   std::ostringstream message;
   message << "Successfully sent command '"
           << command
@@ -229,6 +232,7 @@ void cedar::dev::com::SerialCommunication::send(const std::string& command)
     "cedar::dev::com::SerialCommunication",
     "Successfully sent data"
   );
+  */
 #endif
 
   // delay the following operations
@@ -325,6 +329,7 @@ std::string cedar::dev::com::SerialCommunication::receive()
   answer.resize(read_bytes);
 
 #ifdef DEBUG_VERBOSE
+  /*
   std::ostringstream message;
   message << "Successfully received data ("
           << read_bytes
@@ -341,6 +346,7 @@ std::string cedar::dev::com::SerialCommunication::receive()
     "cedar::dev::com::SerialCommunication",
     "Successfully received data"
   );
+  */
 #endif
 #endif
 
@@ -352,7 +358,11 @@ void cedar::dev::com::SerialCommunication::setEndOfCommandString(const std::stri
   mTranslatedEndOfCommandString = eocString;
   mTranslatedEndOfCommandString = cedar::aux::replace(mTranslatedEndOfCommandString, "\\r", "\r");
   mTranslatedEndOfCommandString = cedar::aux::replace(mTranslatedEndOfCommandString, "\\n", "\n");
-  _mEndOfCommandString->setValue(eocString);
+}
+
+void cedar::dev::com::SerialCommunication::updateTranslatedEndOfCommandString()
+{
+  this->setEndOfCommandString(_mEndOfCommandString->getValue());
 }
 
 void cedar::dev::com::SerialCommunication::open()

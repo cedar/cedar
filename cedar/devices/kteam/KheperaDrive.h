@@ -65,6 +65,7 @@ public:
   void openGripper();
   void closeGripper();
   void setArmPosition(unsigned int position);
+  void setGripperPosition(bool open);
   unsigned int getArmPosition();
   unsigned int getGripperPosition();
   unsigned int getGripperOpticalSensor();
@@ -96,7 +97,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void setGripperPosition(bool open);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

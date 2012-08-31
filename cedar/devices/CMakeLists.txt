@@ -52,6 +52,7 @@ cedar_add_library(cedardev
                   robot/gui/KinematicChainCommandWidget.h
                   robot/gui/MountedCameraViewer.h
                   kteam/gui/DriveControlWidget.h
+                  communication/SerialCommunication.h
                   communication/gui/CommunicationWidget.h
                   sensors/visual/VideoGrabber.h
                   sensors/visual/PictureGrabber.h

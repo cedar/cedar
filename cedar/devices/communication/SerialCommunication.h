@@ -47,6 +47,7 @@
 #include "cedar/auxiliaries/BoolParameter.h"
 
 // SYSTEM INCLUDES
+#include <QObject>
 #ifdef CEDAR_OS_WINDOWS
   // some dummy types for windows.
   struct termios {};
@@ -65,8 +66,10 @@
  * The parameters of the communication must be read from a configuration file using the
  * cedar::aux::Configurable::readJson method right after constructing of the object.
  */
-class cedar::dev::com::SerialCommunication : public Communication, public cedar::aux::NamedConfigurable
+class cedar::dev::com::SerialCommunication : public QObject, public Communication, public cedar::aux::NamedConfigurable
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -162,6 +165,9 @@ private:
 
   //!@brief Checks whether the serial connection has been opened. Throws an exception if not.
   void checkIfOpen() const;
+
+private slots:
+  void updateTranslatedEndOfCommandString();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
