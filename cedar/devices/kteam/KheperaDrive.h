@@ -72,6 +72,7 @@ public:
   void setLEDState(unsigned int ledId, bool state);
   std::vector<unsigned int> getProximitySensors();
   std::vector<unsigned int> getAmbientSensors();
+  void setGripperPosition(bool open);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -96,7 +97,6 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void setGripperPosition(bool open);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

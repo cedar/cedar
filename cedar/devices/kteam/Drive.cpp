@@ -149,14 +149,6 @@ std::vector<int> cedar::dev::kteam::Drive::getEncoders() const
   answer_stream >> encoders[1];
   checkStream(answer_stream, true);
 
-  // print a debug message that everything worked
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-  (
-    "Successfully received encoders",
-    "cedar::dev::kteam::Drive",
-    "Received encoders"
-  );
-
   return encoders;
 }
 
@@ -169,14 +161,6 @@ void cedar::dev::kteam::Drive::setEncoders(const std::vector<int>& encoders)
 
   // check whether the answer begins with the correct character
   checkAnswer(answer, getCommandSetEncoder());
-
-  // print a debug message that everything worked
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-  (
-    "Successfully set encoders",
-    "cedar::dev::kteam::Drive",
-    "Set encoders"
-  );
 }
 
 void cedar::dev::kteam::Drive::reset()
