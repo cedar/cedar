@@ -124,6 +124,13 @@ _mInterpolationType(new cedar::aux::EnumParameter(this,
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::steps::Resize::readConfiguration(const cedar::aux::ConfigurationNode& node)
+{
+  cedar::proc::Step::readConfiguration(node);
+
+  this->updateOutputMatrixSize();
+}
+
 void cedar::proc::steps::Resize::compute(const cedar::proc::Arguments&)
 {
   const cv::Mat& input = this->mInput->getData();
