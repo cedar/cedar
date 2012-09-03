@@ -196,7 +196,7 @@ void cedar::dyn::RateMatrixToSpaceCode::interpolate()
 
 cedar::proc::DataSlot::VALIDITY cedar::dyn::RateMatrixToSpaceCode::determineInputValidity
                                 (
-                                  cedar::proc::ConstDataSlotPtr CEDAR_DEBUG_ONLY(slot),
+                                  cedar::proc::ConstDataSlotPtr slot,
                                   cedar::aux::ConstDataPtr data
                                 ) const
 {
