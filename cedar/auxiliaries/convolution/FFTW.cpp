@@ -205,7 +205,9 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
   fftw_free(matrix_fourier);
   fftw_free(result_fourier);
   fftw_free(kernel_fourier);
-
+  fftw_destroy_plan(matrix_plan_forward);
+  fftw_destroy_plan(kernel_plan_forward);
+  fftw_destroy_plan(matrix_plan_backward);
   if (matrix.type() == CV_32F)
   {
     cv::Mat output_32;

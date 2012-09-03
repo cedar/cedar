@@ -63,7 +63,7 @@ double cedar::dev::robot::Odometry::getRotation()
   //calculates the orientation from the quaternion stored in LocalCoordinateFrame.h.
   //todo: changed to use matrices instead of quaternions, check whether this still works (HR)
   // this assumes the heading direction of the vehicle is the x-axis of the local coordinate system
-  return atan2(getTransformation().at<double>(1, 1) , getTransformation().at<double>(0, 1));
+  return atan2(getTransformation().at<double>(1, 0) , getTransformation().at<double>(0, 0));
   //  return atan2(getOrientationQuaternion(2) , getOrientationQuaternion(1));
 }
 

@@ -58,7 +58,7 @@
 #define clear_my(var, mask)    var &= (~(mask))
 #define set(var, mask)      var |= (mask)
 
-#define DEBUG_VERBOSE
+#undef DEBUG_VERBOSE
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -212,7 +212,6 @@ void cedar::dev::com::SerialCommunication::send(const std::string& command)
   }
 
 #ifdef DEBUG_VERBOSE
-  /*
   std::ostringstream message;
   message << "Successfully sent command '"
           << command
@@ -232,7 +231,6 @@ void cedar::dev::com::SerialCommunication::send(const std::string& command)
     "cedar::dev::com::SerialCommunication",
     "Successfully sent data"
   );
-  */
 #endif
 
   // delay the following operations
@@ -329,7 +327,6 @@ std::string cedar::dev::com::SerialCommunication::receive()
   answer.resize(read_bytes);
 
 #ifdef DEBUG_VERBOSE
-  /*
   std::ostringstream message;
   message << "Successfully received data ("
           << read_bytes
@@ -346,7 +343,6 @@ std::string cedar::dev::com::SerialCommunication::receive()
     "cedar::dev::com::SerialCommunication",
     "Successfully received data"
   );
-  */
 #endif
 #endif
 

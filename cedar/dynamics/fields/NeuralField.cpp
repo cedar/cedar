@@ -531,6 +531,11 @@ void cedar::dyn::NeuralField::updateInputSum()
 
 bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) const
 {
+  if (matrix.type() != CV_32F)
+  {
+    return false;
+  }
+
   unsigned int matrix_dim = cedar::aux::math::getDimensionalityOf(matrix);
   return matrix_dim == 0
          ||
