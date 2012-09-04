@@ -197,7 +197,7 @@ namespace cedar
       template <typename T>
       inline void assignMatrixEntry(cv::Mat& matrix, int index, T value)
       {
-        CEDAR_ASSERT(matrix.type() == CV_32F || matrix.type() == CV_64F);
+        CEDAR_ASSERT(matrix.type() == CV_32F || matrix.type() == CV_64F || matrix.type() == CV_8U );
         CEDAR_ASSERT(cedar::aux::math::getDimensionalityOf(matrix) <= 1);
 
         switch (matrix.type())
@@ -208,6 +208,10 @@ namespace cedar
 
           case CV_64F:
             matrix.at<double>(index) = static_cast<double>(value);
+            break;
+
+          case CV_8U:
+            matrix.at<unsigned int>(index) = static_cast<unsigned int>(value);
             break;
 
           default:

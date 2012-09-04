@@ -121,7 +121,7 @@ unsigned int cedar::dev::kteam::KheperaDrive::getArmPosition()
     = getSerialCommunication()->sendAndReceiveLocked(getCommandGetArmPosition());
 
   // check whether the first character of the answer is correct
-  checkAnswer(answer, getCommandGetArmPosition());
+  checkAnswer(answer, getCommandGetArmPosition(), getAnswerGetGripperPosition());
 
   // create a string stream on the received answer
   std::istringstream answer_stream;
@@ -135,6 +135,7 @@ unsigned int cedar::dev::kteam::KheperaDrive::getArmPosition()
   answer_stream >> position;
   checkStream(answer_stream, true);
 
+#ifdef DEBUG_VERBOSE
   // print a debug message that everything worked
   cedar::aux::LogSingleton::getInstance()->debugMessage
   (
@@ -142,6 +143,7 @@ unsigned int cedar::dev::kteam::KheperaDrive::getArmPosition()
     "cedar::dev::kteam::KheperaDrive",
     "Read arm position"
   );
+#endif // DEBUG_VERBOSE
 
   return position;
 }
@@ -156,7 +158,7 @@ unsigned int cedar::dev::kteam::KheperaDrive::getGripperPosition()
     = getSerialCommunication()->sendAndReceiveLocked(getCommandGetGripperPosition());
 
   // check whether the first character of the answer is correct
-  checkAnswer(answer, getCommandGetGripperPosition());
+  checkAnswer(answer, getCommandGetGripperPosition(), getAnswerGetGripperPosition());
 
   // create a string stream on the received answer
   std::istringstream answer_stream;
@@ -170,6 +172,7 @@ unsigned int cedar::dev::kteam::KheperaDrive::getGripperPosition()
   answer_stream >> position;
   checkStream(answer_stream, true);
 
+#ifdef DEBUG_VERBOSE
   // print a debug message that everything worked
   cedar::aux::LogSingleton::getInstance()->debugMessage
   (
@@ -177,6 +180,7 @@ unsigned int cedar::dev::kteam::KheperaDrive::getGripperPosition()
     "cedar::dev::kteam::KheperaDrive",
     "Read gripper position"
   );
+#endif // DEBUG_VERBOSE
 
   return position;
 }
@@ -205,6 +209,7 @@ unsigned int cedar::dev::kteam::KheperaDrive::getGripperOpticalSensor()
   answer_stream >> sensor_value;
   checkStream(answer_stream, true);
 
+#ifdef DEBUG_VERBOSE
   // print a debug message that everything worked
   cedar::aux::LogSingleton::getInstance()->debugMessage
   (
@@ -212,6 +217,7 @@ unsigned int cedar::dev::kteam::KheperaDrive::getGripperOpticalSensor()
     "cedar::dev::kteam::KheperaDrive",
     "Read gripper optical sensor"
   );
+#endif // DEBUG_VERBOSE
 
   return sensor_value;
 }
@@ -240,6 +246,7 @@ unsigned int cedar::dev::kteam::KheperaDrive::getGripperResistivity()
   answer_stream >> resistivity;
   checkStream(answer_stream, true);
 
+#ifdef DEBUG_VERBOSE
   // print a debug message that everything worked
   cedar::aux::LogSingleton::getInstance()->debugMessage
   (
@@ -247,6 +254,7 @@ unsigned int cedar::dev::kteam::KheperaDrive::getGripperResistivity()
     "cedar::dev::kteam::KheperaDrive",
     "Read gripper resistivity"
   );
+#endif // DEBUG_VERBOSE
 
   return resistivity;
 }
@@ -263,6 +271,7 @@ void cedar::dev::kteam::KheperaDrive::setLEDState(unsigned int ledId, bool state
   // check whether the answer begins with the correct character
   checkAnswer(answer, getCommandSetLEDState());
 
+#ifdef DEBUG_VERBOSE
   // print a debug message that everything worked
   cedar::aux::LogSingleton::getInstance()->debugMessage
   (
@@ -270,6 +279,7 @@ void cedar::dev::kteam::KheperaDrive::setLEDState(unsigned int ledId, bool state
     "cedar::dev::kteam::KheperaDrive",
     "Set LED state"
   );
+#endif // DEBUG_VERBOSE
 }
 
 std::vector<unsigned int> cedar::dev::kteam::KheperaDrive::getProximitySensors()
@@ -306,6 +316,7 @@ std::vector<unsigned int> cedar::dev::kteam::KheperaDrive::getProximitySensors()
   answer_stream >> proximity_values[proximity_values.size()-1];
   checkStream(answer_stream, true);
 
+#ifdef DEBUG_VERBOSE
   // print a debug message that everything worked
   cedar::aux::LogSingleton::getInstance()->debugMessage
   (
@@ -313,6 +324,7 @@ std::vector<unsigned int> cedar::dev::kteam::KheperaDrive::getProximitySensors()
     "cedar::dev::kteam::KheperaDrive",
     "Received proximity values"
   );
+#endif // DEBUG_VERBOSE
 
   return proximity_values;
 }
@@ -351,6 +363,7 @@ std::vector<unsigned int> cedar::dev::kteam::KheperaDrive::getAmbientSensors()
   answer_stream >> ambient_values[ambient_values.size()-1];
   checkStream(answer_stream, true);
 
+#ifdef DEBUG_VERBOSE
   // print a debug message that everything worked
   cedar::aux::LogSingleton::getInstance()->debugMessage
   (
@@ -358,6 +371,7 @@ std::vector<unsigned int> cedar::dev::kteam::KheperaDrive::getAmbientSensors()
     "cedar::dev::kteam::KheperaDrive",
     "Received ambient values"
   );
+#endif // DEBUG_VERBOSE
 
   return ambient_values;
 }
@@ -382,6 +396,11 @@ std::string cedar::dev::kteam::KheperaDrive::getCommandGetGripperPosition() cons
   return "T,1,H,0";
 }
 
+std::string cedar::dev::kteam::KheperaDrive::getAnswerGetGripperPosition() const
+{
+  return "t,1,h";
+}
+
 std::string cedar::dev::kteam::KheperaDrive::getCommandSetArmPosition() const
 {
   return "T,1,E";
@@ -390,6 +409,11 @@ std::string cedar::dev::kteam::KheperaDrive::getCommandSetArmPosition() const
 std::string cedar::dev::kteam::KheperaDrive::getCommandGetArmPosition() const
 {
   return "T,1,H,1";
+}
+
+std::string cedar::dev::kteam::KheperaDrive::getAnswerGetArmPosition() const
+{
+  return "t,1,h";
 }
 
 std::string cedar::dev::kteam::KheperaDrive::getCommandGetGripperOpticalSensor() const
