@@ -175,21 +175,21 @@ void cedar::dev::kteam::Drive::reset()
   setEncoders(encoders);
 }
 
-
 std::string cedar::dev::kteam::Drive::determineCorrectAnswer(std::string commandString) const
 {
   std::transform(commandString.begin(), commandString.end(), commandString.begin(), ::tolower);
   return commandString;
 }
 
-
-void cedar::dev::kteam::Drive::checkAnswer(const std::string& answer, const std::string& command) const
+void cedar::dev::kteam::Drive::checkAnswer
+     (
+       const std::string& answer,
+       const std::string& command,
+       const std::string& expectedAnswer
+     ) const
 {
-  // determine the correct answer for the given command
-  std::string correct_answer = this->determineCorrectAnswer(command);
-
   // if the answer is incorrect ...
-  if (answer.empty() || answer.compare(0, command.size(), correct_answer, 0, command.size()) != 0)
+  if (answer.empty() || answer.compare(0, command.size(), expectedAnswer, 0, command.size()) != 0)
   {
     // ... throw an exception
     std::string exception_message = "Unexpected answer during serial communication: " + answer;
@@ -199,6 +199,13 @@ void cedar::dev::kteam::Drive::checkAnswer(const std::string& answer, const std:
       exception_message
     );
   }
+}
+
+void cedar::dev::kteam::Drive::checkAnswer(const std::string& answer, const std::string& command) const
+{
+  // determine the expected answer for the given command
+  std::string expected_answer = this->determineCorrectAnswer(command);
+  this->checkAnswer(answer, command, expected_answer);
 }
 
 void cedar::dev::kteam::Drive::checkStream(const std::istringstream& answerStream, bool atEndOfStream) const

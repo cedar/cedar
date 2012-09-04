@@ -119,6 +119,13 @@ protected:
    */
   void checkAnswer(const std::string& answer, const std::string& command) const;
 
+  void checkAnswer
+       (
+         const std::string& answer,
+         const std::string& command,
+         const std::string& expectedAnswer
+       ) const;
+
   /*!@brief Checks whether the stream is still valid.
    * @param[in] answerStream string stream to be checked
    * @param[in] atEndOfStream denotes whether the stream is believed to be at the end
