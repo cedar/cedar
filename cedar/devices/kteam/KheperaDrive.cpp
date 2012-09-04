@@ -121,14 +121,14 @@ unsigned int cedar::dev::kteam::KheperaDrive::getArmPosition()
     = getSerialCommunication()->sendAndReceiveLocked(getCommandGetArmPosition());
 
   // check whether the first character of the answer is correct
-  checkAnswer(answer, getCommandGetArmPosition(), getAnswerGetGripperPosition());
+  checkAnswer(answer, getCommandGetArmPosition(), getAnswerGetArmPosition());
 
   // create a string stream on the received answer
   std::istringstream answer_stream;
   answer_stream.str(answer);
 
   // skip 'a,' at the beginning of the answer
-  answer_stream.ignore(2);
+  answer_stream.ignore(getAnswerGetArmPosition().size() + 1);
   checkStream(answer_stream, false);
 
   // read the acceleration along the x-axis
@@ -165,7 +165,7 @@ unsigned int cedar::dev::kteam::KheperaDrive::getGripperPosition()
   answer_stream.str(answer);
 
   // skip 'a,' at the beginning of the answer
-  answer_stream.ignore(2);
+  answer_stream.ignore(getAnswerGetGripperPosition().size() + 1);
   checkStream(answer_stream, false);
 
   // read the acceleration along the x-axis
