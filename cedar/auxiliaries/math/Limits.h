@@ -49,6 +49,9 @@
 #include <limits>
 #include <iostream>
 
+// \todo find a more generic version of this
+#undef DEBUG_VERBOSE
+
 
 /*!@brief Structure representing the limits of an interval.
  */
@@ -191,11 +194,11 @@ public:
    * If the value is within the limits, the method will not change the value.
    * @param[in,out] value the value to be thresholded
    */
-  inline const T& limit(const T& value, bool warnOnThresholding = true) const
+  inline const T& limit(const T& value) const
   {
     if (value < getLower())
     {
-      if (warnOnThresholding)
+#ifdef DEBUG_VERBOSE
       {
         cedar::aux::LogSingleton::getInstance()->warning
         (
@@ -204,12 +207,13 @@ public:
           "Tresholding"
         );
       }
+#endif // DEBUG_VERBOSE
 
       return getLower();
     }
     else if (value > getUpper())
     {
-      if (warnOnThresholding)
+#ifdef DEBUG_VERBOSE
       {
         cedar::aux::LogSingleton::getInstance()->warning
         (
@@ -218,6 +222,7 @@ public:
           "Tresholding"
         );
       }
+#endif // DEBUG_VERBOSE
 
       return getUpper();
     }
@@ -228,7 +233,7 @@ public:
   /*!@brief Tresholds a vector of values against the limits.
    * @param[in,out] values the vector of values to be thresholded
    */
-  inline void limit(std::vector<T>& values, bool warnOnThresholding = true) const
+  inline void limit(std::vector<T>& values) const
   {
     for
     (
@@ -237,7 +242,7 @@ public:
       ++it
     )
     {
-      *it = this->limit(*it, warnOnThresholding);
+      *it = this->limit(*it);
     }
   }
 
