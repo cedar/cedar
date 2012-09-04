@@ -117,14 +117,7 @@ protected:
    * @param[in] answer the answer to check
    * @param[in] command the command string producing the received answer
    */
-  void checkAnswer(const std::string& answer, const std::string& command) const;
-
-  void checkAnswer
-       (
-         const std::string& answer,
-         const std::string& command,
-         const std::string& expectedAnswer
-       ) const;
+  void checkAnswer(const std::string& answer, const std::string& command, const std::string& expectedAnswer = "") const;
 
   /*!@brief Checks whether the stream is still valid.
    * @param[in] answerStream string stream to be checked
