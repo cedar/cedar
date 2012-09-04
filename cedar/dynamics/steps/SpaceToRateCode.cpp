@@ -117,6 +117,11 @@ void cedar::dyn::SpaceToRateCode::eulerStep(const cedar::unit::Time& time)
          * (-1.0 * slope * this->mOutput->getData().at<float>(0,0) + offset);
 }
 
+void cedar::dyn::SpaceToRateCode::reset()
+{
+  mOutput->getData() = cv::Scalar(0.0);
+}
+
 void cedar::dyn::SpaceToRateCode::limitsChanged()
 {
   if (this->mInput)
