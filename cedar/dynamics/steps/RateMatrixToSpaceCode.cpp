@@ -145,7 +145,20 @@ void cedar::dyn::RateMatrixToSpaceCode::compute(const cedar::proc::Arguments&)
 
 void cedar::dyn::RateMatrixToSpaceCode::limitsChanged()
 {
+  if (this->getLowerLimit() == this->getUpperLimit())
+  {
+    // print a message that the upper limit is being reset
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "The lower and upper limit of the RateMatrixToSpaceCode step are equal. The upper limit was now reset.",
+      "cedar::dyn::RateMatrixToSpaceCode",
+      "Reset upper limit"
+    );
+    this->setUpperLimit(this->getLowerLimit() + 0.1);
+  }
+
   mInterval = this->getUpperLimit() - this->getLowerLimit();
+
   if (this->mInput)
   {
     this->onTrigger();
