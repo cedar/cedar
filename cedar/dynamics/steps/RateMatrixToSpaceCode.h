@@ -100,14 +100,24 @@ private:
     return _mNumberOfBins->getValue();
   }
 
-  inline unsigned int getLowerLimit()
+  inline double getLowerLimit()
   {
     return _mLowerLimit->getValue();
   }
 
-  inline unsigned int getUpperLimit()
+  inline double getUpperLimit()
   {
     return _mUpperLimit->getValue();
+  }
+
+  inline void setLowerLimit(double limit)
+  {
+    _mLowerLimit->setValue(limit);
+  }
+
+  inline void setUpperLimit(double limit)
+  {
+    _mUpperLimit->setValue(limit);
   }
 
   inline int interpolateBin(double value)

@@ -85,8 +85,10 @@ protected:
 
   virtual std::string getCommandSetGripperPosition() const;
   virtual std::string getCommandGetGripperPosition() const;
+  virtual std::string getAnswerGetGripperPosition() const;
   virtual std::string getCommandSetArmPosition() const;
   virtual std::string getCommandGetArmPosition() const;
+  virtual std::string getAnswerGetArmPosition() const;
   virtual std::string getCommandGetGripperOpticalSensor() const;
   virtual std::string getCommandGetGripperResistivity() const;
   virtual std::string getCommandSetLEDState() const;

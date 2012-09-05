@@ -90,7 +90,7 @@ int main()
 
     // test whether a number beyond the lower limit will be thresholded
     int number = -5;
-    number = limits.limit(number, false);
+    number = limits.limit(number);
     if (number != limits.getLower())
     {
       std::cout << "ERROR: (int) a number beyond the lower limit is not thresholded to the lower limit." << std::endl;
@@ -99,7 +99,7 @@ int main()
 
     // test whether a number beyond the upper limit will be thresholded
     number = 5;
-    number = limits.limit(number, false);
+    number = limits.limit(number);
     if (number != limits.getUpper())
     {
       std::cout << "ERROR: (int) a number beyond the upper limit is not thresholded to the upper limit." << std::endl;
@@ -108,7 +108,7 @@ int main()
 
     // test whether a vector of numbers beyond the lower limit will be thresholded
     std::vector<int> numbers(3, -5);
-    limits.limit(numbers, false);
+    limits.limit(numbers);
     for (std::vector<int>::const_iterator number_it = numbers.begin(); number_it != numbers.end(); ++number_it)
     {
       if (*number_it != limits.getLower())
