@@ -212,6 +212,8 @@ void cedar::aux::gui::MatrixPlot2D::init()
   col.setColorVector(cedar::aux::gui::MatrixPlot::getStandardColorVector());
   this->mpPlot->setDataColor(col);
   this->mpPlot->updateGL();
+
+  mDataRows = mDataCols = 0;
 }
 
 void cedar::aux::gui::MatrixPlot2D::timerEvent(QTimerEvent * /* pEvent */)
