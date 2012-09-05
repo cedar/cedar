@@ -171,9 +171,10 @@ namespace cedar
       }
 
       //!@brief set a matrix entry to a given value without having to check if the matrix is of type double or float
-      inline void assignMatrixEntry(cv::Mat& matrix, std::vector<int> index, double value)
+      template <typename T>
+      inline void assignMatrixEntry(cv::Mat& matrix, std::vector<int> index, T value)
       {
-        CEDAR_ASSERT(matrix.type() == CV_32F || matrix.type() == CV_64F);
+        CEDAR_ASSERT(matrix.type() == CV_32F || matrix.type() == CV_64F || matrix.type() == CV_16UC1);
 
         switch (matrix.type())
         {
@@ -185,6 +186,9 @@ namespace cedar
             matrix.at<double>(&index.at(0)) = static_cast<double>(value);
             break;
 
+          case CV_16UC1:
+            matrix.at<unsigned int>(&index.at(0)) = static_cast<unsigned int>(value);
+            break;
           default:
             // this should never happen due to the assert above.
             CEDAR_ASSERT(false);
@@ -197,7 +201,7 @@ namespace cedar
       template <typename T>
       inline void assignMatrixEntry(cv::Mat& matrix, int index, T value)
       {
-        CEDAR_ASSERT(matrix.type() == CV_32F || matrix.type() == CV_64F);
+        CEDAR_ASSERT(matrix.type() == CV_32F || matrix.type() == CV_64F || matrix.type() == CV_16UC1 );
         CEDAR_ASSERT(cedar::aux::math::getDimensionalityOf(matrix) <= 1);
 
         switch (matrix.type())
@@ -208,6 +212,10 @@ namespace cedar
 
           case CV_64F:
             matrix.at<double>(index) = static_cast<double>(value);
+            break;
+
+          case CV_16UC1:
+            matrix.at<unsigned int>(index) = static_cast<unsigned int>(value);
             break;
 
           default:
@@ -221,13 +229,17 @@ namespace cedar
       template <typename T>
       inline T getMatrixEntry(const cv::Mat& matrix, int index)
       {
-        CEDAR_ASSERT(matrix.type() == CV_8UC1 || matrix.type() == CV_32F || matrix.type() == CV_64F);
+        CEDAR_ASSERT(matrix.type() == CV_8UC1 || matrix.type() == CV_16UC1 || matrix.type() == CV_32F || matrix.type() == CV_64F);
         CEDAR_ASSERT(cedar::aux::math::getDimensionalityOf(matrix) <= 1);
 
         switch (matrix.type())
         {
           case CV_8UC1:
             return static_cast<T>(matrix.at<unsigned char>(index));
+            break;
+
+          case CV_16UC1:
+            return static_cast<T>(matrix.at<unsigned int>(index));
             break;
 
           case CV_32F:
@@ -249,13 +261,17 @@ namespace cedar
       template <typename T>
       inline T getMatrixEntry(const cv::Mat& matrix, int row, int col)
       {
-        CEDAR_ASSERT(matrix.type() == CV_8U || matrix.type() == CV_32F || matrix.type() == CV_64F);
+        CEDAR_ASSERT(matrix.type() == CV_8U || matrix.type() == CV_16UC1 || matrix.type() == CV_32F || matrix.type() == CV_64F);
         CEDAR_ASSERT(cedar::aux::math::getDimensionalityOf(matrix) <= 2);
 
         switch (matrix.type())
         {
           case CV_8U:
             return static_cast<T>(matrix.at<unsigned char>(row, col));
+            break;
+
+          case CV_16UC1:
+            return static_cast<T>(matrix.at<unsigned int>(row, col));
             break;
 
           case CV_32F:
