@@ -102,9 +102,11 @@ cedar::proc::gui::GraphicsBase(cedar::proc::gui::StepItem::mDefaultWidth,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE),
 mRunTimeMeasurementTimerId(0),
 mpMainWindow(pMainWindow),
-mStepIcon(":/steps/no_icon.svg")
+mStepIcon(":/steps/no_icon.svg"),
+mDisplayMode(cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
+
 
   this->setStep(step);
   
@@ -119,7 +121,8 @@ cedar::proc::gui::GraphicsBase(cedar::proc::gui::StepItem::mDefaultWidth,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE),
 mRunTimeMeasurementTimerId(0),
 mpMainWindow(pMainWindow),
-mStepIcon(":/steps/no_icon.svg")
+mStepIcon(":/steps/no_icon.svg"),
+mDisplayMode(cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
@@ -128,8 +131,6 @@ mStepIcon(":/steps/no_icon.svg")
 
 void cedar::proc::gui::StepItem::construct()
 {
-  mDisplayMode = cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT;
-
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
                                );
