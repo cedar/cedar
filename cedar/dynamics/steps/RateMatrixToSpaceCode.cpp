@@ -171,6 +171,7 @@ void cedar::dyn::RateMatrixToSpaceCode::interpolate()
         index.at(2) = this->interpolateBin(input.at<float>(row, col));
         if (index.at(2) != -1)
         {
+          //!@todo This should probably use cedar::aux::math::getMatrixEntry
           output.at<float>(&(index.front())) = values.at<float>(row, col);
         }
       }
@@ -207,7 +208,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::RateMatrixToSpaceCode::determineInpu
     {
       // Mat data is accepted, but only 2D.
       unsigned int dimensionality = cedar::aux::math::getDimensionalityOf(mat_data->getData());
-      if (dimensionality == 2)
+      if (dimensionality == 2 && mat_data->getData().type() == CV_32F)
       {
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
@@ -219,7 +220,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::RateMatrixToSpaceCode::determineInpu
     {
       // Mat data is accepted, but only 2D.
       unsigned int dimensionality = cedar::aux::math::getDimensionalityOf(mat_data->getData());
-      if (dimensionality == 2)
+      if (dimensionality == 2 && mat_data->getData().type() == CV_32F)
       {
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
