@@ -38,7 +38,7 @@
 #include "ControlThread.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/System.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 
 // SYSTEM INCLUDES
 #include "cedar/devices/amtec/KinematicChain.h"
@@ -49,7 +49,7 @@
 
 int main(int /* argc */, char ** /* argv[] */)
 {
-  std::string configuration_file = cedar::aux::System::locateResource("configs/cora_arm.json");
+  std::string configuration_file = cedar::aux::locateResource("configs/cora_arm.json");
 
   try
   {

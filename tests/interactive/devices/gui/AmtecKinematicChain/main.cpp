@@ -37,7 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/devices/robot/gui/KinematicChainWidget.h"
 #include "cedar/devices/amtec/KinematicChain.h"
-#include "cedar/auxiliaries/System.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
   try
   {
 //    std::string configuration_file_old = cedar::aux::System::locateResource("configs/cora_arm.conf");
-    std::string configuration_file = cedar::aux::System::locateResource("configs/cora_arm.json");
+    std::string configuration_file = cedar::aux::locateResource("configs/cora_arm.json");
     cedar::dev::amtec::KinematicChainPtr p_kinematic_chain
     (
       new cedar::dev::amtec::KinematicChain()
