@@ -517,8 +517,11 @@ void cedar::proc::steps::Projection::inputConnectionChanged(const std::string& i
   this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
 
   unsigned int input_dimensionality = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
-
-  this->_mDimensionMappings->initialize(input_dimensionality);
+  
+  if (input_dimensionality != this->_mDimensionMappings->getValue()->getNumberOfMappings())
+  {
+    this->_mDimensionMappings->initialize(input_dimensionality);
+  }
 
   this->reconfigure();
 }
