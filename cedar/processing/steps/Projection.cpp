@@ -518,10 +518,7 @@ void cedar::proc::steps::Projection::inputConnectionChanged(const std::string& i
 
   unsigned int input_dimensionality = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
 
-  if (input_dimensionality != this->_mDimensionMappings->getValue()->getNumberOfMappings())
-  {
-    this->_mDimensionMappings->initialize(input_dimensionality);
-  }
+  this->_mDimensionMappings->initialize(input_dimensionality);
 
   this->reconfigure();
 }
