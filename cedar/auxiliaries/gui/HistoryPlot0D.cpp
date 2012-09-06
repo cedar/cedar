@@ -252,7 +252,7 @@ double cedar::aux::gui::HistoryPlot0D::getDataValue(size_t index)
   this->mCurves[index]->mData->lockForRead();
 
   // read out the double value
-  double val;
+  double val = 0.0;
   if (this->mCurves[index]->mDoubleData)
   {
     val = this->mCurves[index]->mDoubleData->getData();
