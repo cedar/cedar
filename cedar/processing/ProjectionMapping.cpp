@@ -39,6 +39,7 @@
 #include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/processing/ProjectionMapping.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
 #include <limits>
@@ -99,7 +100,16 @@ void cedar::proc::ProjectionMapping::updateValidity()
     }
     else
     {
-      if (mOutputDimensionality > 0 && ++(output_dimension_histogram[iter->second]) > 1)
+      if
+      (
+        mOutputDimensionality > 0
+        &&
+        (
+          iter->second >= output_dimension_histogram.size()
+          ||
+          ++(output_dimension_histogram[iter->second]) > 1
+        )
+      )
       {
         mValidity = cedar::proc::ProjectionMapping::VALIDITY_ERROR;
       }
