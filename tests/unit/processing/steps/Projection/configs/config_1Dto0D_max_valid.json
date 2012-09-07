@@ -157,7 +157,7 @@
             "threaded": "false",
             "dimension mapping":
             {
-                "0": "0"
+                "0": "4294967295"
             },
             "output dimensionality": "0",
             "output dimension sizes": "",
