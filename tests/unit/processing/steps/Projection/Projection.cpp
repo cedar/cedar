@@ -43,6 +43,8 @@
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/StepTime.h"
 #include "cedar/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/logFilter/Type.h"
+#include "cedar/auxiliaries/NullLogger.h"
 #include "cedar/dynamics/namespace.h"
 #include "cedar/units/TimeUnit.h"
 
@@ -69,7 +71,7 @@ bool checkProjectionState(cedar::proc::NetworkPtr& network, cedar::proc::Trigger
  * @param network the network that is to be stepped
  * @param numberOfErrors counter for the number of errors
  */
-void stepArchitecture(cedar::proc::NetworkPtr& network, unsigned int numberOfErrors)
+void stepArchitecture(cedar::proc::NetworkPtr& network, unsigned int& numberOfErrors)
 {
   try
   {
@@ -79,7 +81,7 @@ void stepArchitecture(cedar::proc::NetworkPtr& network, unsigned int numberOfErr
   }
   catch (cedar::aux::ExceptionBase exception)
   {
-    std::cout << "An exception was thrown when stepping the loaded architecture.\n";
+    std::cout << "ERROR: An exception was thrown when stepping the loaded architecture.\n";
     std::cout << exception.getMessage() << "\n";
     ++numberOfErrors;
   }
@@ -90,7 +92,7 @@ void stepArchitecture(cedar::proc::NetworkPtr& network, unsigned int numberOfErr
  * @param configurationFile name of the configuration file
  * @param numberOfErrors counter for the number of errors
  */
-void checkValidProjection(const std::string& configurationFile, unsigned int numberOfErrors)
+void checkValidProjection(const std::string& configurationFile, unsigned int& numberOfErrors)
 {
   std::cout << "Checking file \"" << configurationFile << "\" (valid)" << std::endl;
 
@@ -99,7 +101,7 @@ void checkValidProjection(const std::string& configurationFile, unsigned int num
 
   if (!checkProjectionState(network, cedar::proc::Triggerable::STATE_UNKNOWN))
   {
-    std::cout << "Projection is not in a valid state.\n";
+    std::cout << "ERROR: Projection is not in a valid state.\n";
     ++numberOfErrors;
   }
 
@@ -111,7 +113,7 @@ void checkValidProjection(const std::string& configurationFile, unsigned int num
  * @param configurationFile name of the configuration file
  * @param numberOfErrors counter for the number of errors
  */
-void checkInvalidProjection(const std::string& configurationFile, unsigned int numberOfErrors)
+void checkInvalidProjection(const std::string& configurationFile, unsigned int& numberOfErrors)
 {
   std::cout << "Checking file \"" << configurationFile << "\" (invalid)" << std::endl;
   cedar::proc::NetworkPtr network(new cedar::proc::Network());
@@ -119,7 +121,7 @@ void checkInvalidProjection(const std::string& configurationFile, unsigned int n
 
   if (!checkProjectionState(network, cedar::proc::Triggerable::STATE_EXCEPTION))
   {
-    std::cout << "Projection is not in an invalid state.\n";
+    std::cout << "ERROR: Projection is not in an invalid state.\n";
     ++numberOfErrors;
   }
 
@@ -128,6 +130,11 @@ void checkInvalidProjection(const std::string& configurationFile, unsigned int n
 
 int main()
 {
+  // Filter out mem-debug messages so the output reamins readable
+  cedar::aux::logFilter::TypePtr memdebug_filter(new cedar::aux::logFilter::Type(cedar::aux::LOG_LEVEL_MEM_DEBUG));
+  cedar::aux::LogInterfacePtr memdebug_logger(new cedar::aux::NullLogger());
+  cedar::aux::LogSingleton::getInstance()->addLogger(memdebug_logger, memdebug_filter);
+
   // count the number of errors
   unsigned int number_of_errors = 0;
 
