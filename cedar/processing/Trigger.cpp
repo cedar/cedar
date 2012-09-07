@@ -50,6 +50,8 @@
 #include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
+#include <QReadLocker>
+#include <QWriteLocker>
 #include <algorithm>
 
 // MACROS
@@ -102,6 +104,7 @@ cedar::proc::Trigger::~Trigger()
 {
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
+  QReadLocker lock(&mpListenersLock);
   this->mListeners.clear();
 }
 
@@ -111,6 +114,7 @@ cedar::proc::Trigger::~Trigger()
 
 void cedar::proc::Trigger::wait()
 {
+  QReadLocker lock(&mpListenersLock);
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
     this->mListeners.at(i)->wait();
@@ -119,6 +123,7 @@ void cedar::proc::Trigger::wait()
 
 void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 {
+  QReadLocker lock(&mpListenersLock);
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
 #ifdef DEBUG_TRIGGERING
@@ -138,6 +143,7 @@ void cedar::proc::Trigger::onTrigger(cedar::proc::ArgumentsPtr, cedar::proc::Tri
 
 void cedar::proc::Trigger::addListener(cedar::proc::TriggerablePtr step)
 {
+  QWriteLocker lock(&mpListenersLock);
   std::vector<cedar::proc::TriggerablePtr>::iterator iter;
   iter = this->find(step);
   if (iter == this->mListeners.end())
@@ -152,11 +158,13 @@ void cedar::proc::Trigger::addListener(cedar::proc::TriggerablePtr step)
 
 bool cedar::proc::Trigger::isListener(cedar::proc::TriggerablePtr step) const
 {
+  QReadLocker lock(&mpListenersLock);
   return this->find(step) != this->mListeners.end();
 }
 
 void cedar::proc::Trigger::removeListener(cedar::proc::TriggerablePtr step)
 {
+  QWriteLocker lock(&mpListenersLock);
   std::vector<cedar::proc::TriggerablePtr>::iterator iter;
   iter = this->find(step);
   if (iter != this->mListeners.end())
@@ -197,6 +205,7 @@ void cedar::proc::Trigger::writeConfiguration(cedar::aux::ConfigurationNode& nod
 {
   this->cedar::aux::Configurable::writeConfiguration(node);
 
+  QReadLocker lock(&mpListenersLock);
   cedar::aux::ConfigurationNode listeners;
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
