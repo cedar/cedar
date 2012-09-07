@@ -40,6 +40,8 @@
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
+#include <QReadLocker>
+#include <QWriteLocker>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -108,10 +110,12 @@ void cedar::proc::Triggerable::callOnStop()
 void cedar::proc::Triggerable::setState(cedar::proc::Triggerable::State newState, const std::string& annotation)
 {
   // Only act if the state actually changes.
+  QWriteLocker locker(&mStateLock);
   if (newState != this->mState || annotation != this->mStateAnnotation)
   {
     this->mState = newState;
     this->mStateAnnotation = annotation;
+    locker.unlock();
     mStateChanged();
 //    emit stateChanged();
   }
@@ -119,11 +123,13 @@ void cedar::proc::Triggerable::setState(cedar::proc::Triggerable::State newState
 
 cedar::proc::Triggerable::State cedar::proc::Triggerable::getState() const
 {
+  QReadLocker locker(&mStateLock);
   return this->mState;
 }
 
-const std::string& cedar::proc::Triggerable::getStateAnnotation() const
+std::string cedar::proc::Triggerable::getStateAnnotation() const
 {
+  QReadLocker locker(&mStateLock);
   return this->mStateAnnotation;
 }
 
