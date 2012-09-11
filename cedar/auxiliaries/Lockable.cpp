@@ -43,6 +43,8 @@
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
+#include <QReadLocker>
+#include <QWriteLocker>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -59,21 +61,25 @@ cedar::aux::Lockable::~Lockable()
 
 void cedar::aux::Lockable::lockAll()
 {
+  QReadLocker locker(&this->mLocksLock);
   cedar::aux::lock(this->mLocks);
 }
 
 void cedar::aux::Lockable::unlockAll()
 {
+  QReadLocker locker(&this->mLocksLock);
   cedar::aux::unlock(this->mLocks);
 }
 
 void cedar::aux::Lockable::addLock(QReadWriteLock* pLock, cedar::aux::LOCK_TYPE lockType)
 {
+  QWriteLocker locker(&this->mLocksLock);
   cedar::aux::append(this->mLocks, pLock, lockType);
 }
 
 void cedar::aux::Lockable::removeLock(QReadWriteLock* pLock, cedar::aux::LOCK_TYPE lockType)
 {
+  QWriteLocker locker(&this->mLocksLock);
   cedar::aux::LockSet::iterator iter = this->mLocks.find(std::make_pair(pLock, lockType));
 
   if(iter == this->mLocks.end())

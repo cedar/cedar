@@ -103,6 +103,9 @@ protected:
 private:
   //! The set of locks that is (un)locked whenever the (un)lockAll method is called.
   cedar::aux::LockSet mLocks;
+  
+  //! Lock used for locking the lock set.
+  mutable QReadWriteLock mLocksLock;
 
 }; // class cedar::aux::Lockable
 
