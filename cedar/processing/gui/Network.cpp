@@ -773,6 +773,7 @@ void cedar::proc::gui::Network::checkTriggerConnection
   }
   else
   {
+    //!@todo iterating over all elements is very slow, solve this more efficiently
     QList<QGraphicsItem*> items = this->mpScene->items();
     for (int i = 0; i < items.size(); ++i)
     {
@@ -783,6 +784,7 @@ void cedar::proc::gui::Network::checkTriggerConnection
           con->disconnect();
           this->mpScene->removeItem(con);
           delete con;
+          return;
         }
       }
     }
