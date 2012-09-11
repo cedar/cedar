@@ -47,6 +47,7 @@
 #include "cedar/processing/namespace.h"
 
 // SYSTEM INCLUDES
+#include <QReadWriteLock>
 #include <boost/enable_shared_from_this.hpp>
 #include <vector>
 
@@ -116,20 +117,24 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief Find a step in the list of listeners.
+  std::vector<cedar::proc::TriggerablePtr>::iterator find(cedar::proc::TriggerablePtr triggerable);
+
+  //!@brief Find a step in the list of listeners (const-version).
+  std::vector<cedar::proc::TriggerablePtr>::const_iterator find(cedar::proc::TriggerablePtr triggerable) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  //!@brief list of listeners
+  //! List of listeners.
   std::vector<cedar::proc::TriggerablePtr> mListeners;
+
+  //! Lock for the listeners list.
+  mutable QReadWriteLock mpListenersLock;
+
 private:
-  //!@brief find a step in the list of listeners
-  std::vector<cedar::proc::TriggerablePtr>::iterator find(cedar::proc::TriggerablePtr triggerable);
-  std::vector<cedar::proc::TriggerablePtr>::const_iterator find(cedar::proc::TriggerablePtr triggerable) const;
+  // none yet
 }; // class cedar::proc::Trigger
 
 #endif // CEDAR_PROC_TRIGGER_H

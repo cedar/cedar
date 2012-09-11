@@ -42,6 +42,7 @@
 
 // SYSTEM INCLUDES
 #include <QObject>
+#include <QReadWriteLock>
 #include <boost/signals2.hpp>
 
 /*!@brief Interface for all classes that can be triggered.
@@ -125,7 +126,7 @@ public:
 
   //!@brief Returns the annotation of the current state, e.g., the reasons for failing or the message of the last
   //        exception.
-  const std::string& getStateAnnotation() const;
+  std::string getStateAnnotation() const;
 
   //!@brief Returns the finished trigger singleton.
   cedar::proc::TriggerPtr getFinishedTrigger();
@@ -185,6 +186,9 @@ protected:
 
   //!@brief current state of this step, taken from cedar::processing::Step::State
   State mState;
+
+  //! Lock for the step state.
+  mutable QReadWriteLock mStateLock;
 
   //!@brief The annotation string for the current state.
   std::string mStateAnnotation;
