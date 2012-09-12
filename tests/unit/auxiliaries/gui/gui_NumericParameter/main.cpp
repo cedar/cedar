@@ -54,6 +54,7 @@ int main(int, char**)
 
 // SYSTEM INCLUDES
 #include <QApplication>
+#include <QLineEdit>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -63,6 +64,38 @@ int main(int, char**)
 #define protected public
 #include "cedar/auxiliaries/gui/UIntParameter.h"
 #include "cedar/auxiliaries/gui/IntParameter.h"
+#include "cedar/auxiliaries/gui/DoubleParameter.h"
+
+
+
+template <typename WidgetType>
+int testWidgetSpecifics(WidgetType*)
+{
+  // default implementation -- test nothing
+  return 0;
+}
+
+template <>
+int testWidgetSpecifics(QDoubleSpinBox* pWidget)
+{
+  int errors = 0;
+  std::cout << "Testing QDoubleSpinBox specifics ..." << std::endl;
+
+  pWidget->setDecimals(4);
+  pWidget->setValue(1.0);
+  pWidget->lineEdit()->setText("2.4");
+
+  // check that the widget doesn't interfere with typing by the user
+  if (pWidget->text() != "2.4")
+  {
+    std::cout << "Error: widget changed the text." << std::endl;
+    ++errors;
+  }
+
+  return errors;
+}
+
+
 
 /*
  * @param initialValue must lie within lower and upper limit
@@ -181,6 +214,8 @@ int test_parameter
     ++errors;
   }
 
+  errors += testWidgetSpecifics(p_widget->mpWidget);
+
   return errors;
 }
 
@@ -203,6 +238,13 @@ int main(int argc, char** argv)
       <
         cedar::aux::IntParameter,
         cedar::aux::gui::IntParameter,
+        int
+      >(-100, 0, -2, -3, -4);
+
+  errors += test_parameter
+      <
+        cedar::aux::DoubleParameter,
+        cedar::aux::gui::DoubleParameter,
         int
       >(-100, 0, -2, -3, -4);
 
