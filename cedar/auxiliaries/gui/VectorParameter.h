@@ -156,7 +156,10 @@ protected:
 
     CEDAR_DEBUG_ASSERT(this->mWidgets.size() == this->parameter()->size());
 
-    this->parameter()->set(index, WidgetAbstraction::getValue(this->mWidgets[index]), true);
+    if (WidgetAbstraction::getValue(this->mWidgets[index]) != this->parameter()->at(index))
+    {
+      this->parameter()->set(index, WidgetAbstraction::getValue(this->mWidgets[index]), true);
+    }
   }
 
 
@@ -191,7 +194,10 @@ private:
     parameter->unlock();
     for (size_t i = 0; i < values.size(); ++i)
     {
-      WidgetAbstraction::setValue(this->mWidgets[i], values[i]);
+      if (WidgetAbstraction::getValue(this->mWidgets[i]) != values[i])
+      {
+        WidgetAbstraction::setValue(this->mWidgets[i], values[i]);
+      }
     }
   }
 
