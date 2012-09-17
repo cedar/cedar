@@ -175,7 +175,10 @@ private:
 
     bool blocked = this->mpWidget->blockSignals(true);
     parameter->lockForRead();
-    this->mpWidget->setValue(parameter->getValue());
+    if (parameter->getValue() != getValue(this->mpWidget))
+    {
+      this->mpWidget->setValue(parameter->getValue());
+    }
     parameter->unlock();
     this->mpWidget->blockSignals(blocked);
   }
