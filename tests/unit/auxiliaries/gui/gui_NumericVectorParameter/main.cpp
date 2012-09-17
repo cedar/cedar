@@ -61,6 +61,7 @@ int main(int, char**)
 
 // SYSTEM INCLUDES
 #include <QApplication>
+#include <QLineEdit>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -90,6 +91,33 @@ bool testEquality(boost::intrusive_ptr<ParameterType> parameter, WidgetType* pWi
   }
 
   return equal;
+}
+
+template <typename WidgetType>
+int testWidgetSpecifics(WidgetType*)
+{
+  // default implementation -- test nothing
+  return 0;
+}
+
+template <>
+int testWidgetSpecifics(QDoubleSpinBox* pWidget)
+{
+  int errors = 0;
+  std::cout << "Testing QDoubleSpinBox specifics ..." << std::endl;
+
+  pWidget->setDecimals(4);
+  pWidget->setValue(1.0);
+  pWidget->lineEdit()->setText("2.4");
+
+  // check that the widget doesn't interfere with typing by the user
+  if (pWidget->text() != "2.4")
+  {
+    std::cout << "Error: widget changed the text." << std::endl;
+    ++errors;
+  }
+
+  return errors;
 }
 
 template
@@ -156,6 +184,9 @@ int test_parameter(T initialValue, size_t initialSize, T firstValue, T min, T ma
       ++errors;
     }
   }
+
+  CEDAR_ASSERT(!p_widget->mWidgets.empty());
+  errors += testWidgetSpecifics(p_widget->mWidgets[0]);
 
   //!@todo Check that changing the value is impossible while the parameter is const
 
