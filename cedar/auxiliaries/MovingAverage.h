@@ -160,6 +160,15 @@ public:
     return this->mElementSum;
   }
 
+  /*!@brief Returns the newest element in the buffer.
+   */
+  ElementType getNewest() const
+  {
+    CEDAR_ASSERT(this->size() > 0);
+
+    return this->mBuffer.back();
+  }
+
   /*!@brief Returns the element at the given index.
    */
   const T& at(size_t index) const

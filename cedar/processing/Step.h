@@ -164,6 +164,14 @@ public:
    */
   cedar::unit::Time getRunTimeAverage() const;
 
+  /*!@brief Returns the last lock time measured for this step.
+   */
+  cedar::unit::Time getLockTimeMeasurement() const;
+
+  /*!@brief Returns the average lock time measured for this step.
+   */
+  cedar::unit::Time getLockTimeAverage() const;
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
@@ -214,6 +222,10 @@ private:
    */
   void setRunTimeMeasurement(const cedar::unit::Time& time);
 
+  /*!@brief Sets the current execution time measurement.
+   */
+  void setLockTimeMeasurement(const cedar::unit::Time& time);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -236,14 +248,17 @@ private:
   //!@brief Map of all actions defined for this step.
   ActionMap mActions;
 
-  //!@brief The last iteration time of the step. Only meaningful if the step is running.
-  cedar::unit::Time mLastIterationTime;
-
   //!@brief Moving average of the iteration time.
   cedar::aux::MovingAverage<cedar::unit::Milliseconds> mMovingAverageIterationTime;
 
+  //!@brief Moving average of the iteration time.
+  cedar::aux::MovingAverage<cedar::unit::Milliseconds> mLockingTime;
+
   //!@brief Lock for the last iteration time.
-  mutable QReadWriteLock* mLastIterationTimeLock;
+  mutable QReadWriteLock mLastIterationTimeLock;
+
+  //!@brief Lock for the last iteration time.
+  mutable QReadWriteLock mLockTimeLock;
 
   uint64 mRNGState;
 
