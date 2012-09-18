@@ -98,24 +98,34 @@ int test1dMinMaxIndices()
   return errors;
 }
 
+//!@todo Write this for 2d, nd access functions as well
 template <typename MAT_T, typename INT_T, int CV_TYPE>
-int testAssignMatrixEntry()
+int testMatrixAccess1D()
 {
   int errors = 0;
 
   std::cout << "Testing assignMatrixEntry() function..." << std::endl;
 
   cv::Mat mat = cv::Mat::zeros(2, 1, CV_TYPE);
-  INT_T value = static_cast<INT_T>(-1);
-  cedar::aux::math::assignMatrixEntry(mat, 0, static_cast<MAT_T>(value));
-  cedar::aux::math::assignMatrixEntry(mat, 1, static_cast<MAT_T>(value));
+  // generate a binary 11111...
+  MAT_T value = static_cast<MAT_T>(static_cast<INT_T>(-1));
+  cedar::aux::math::assignMatrixEntry(mat, 0, value);
+  cedar::aux::math::assignMatrixEntry(mat, 1, value);
 
   for (int i = 0; i < mat.rows; ++i)
   {
     if (mat.at<MAT_T>(i) != value)
     {
-      std::cout << "Wrong value at index " << i
+      std::cout << "Wrong value written to index " << i
           << "; expected: " << value << ", got: " << mat.at<MAT_T>(i) << std::endl;
+      ++errors;
+    }
+
+    MAT_T read = cedar::aux::math::getMatrixEntry<MAT_T>(mat, i);
+    if (read != value)
+    {
+      std::cout << "Wrong value read at index " << i
+          << "; expected: " << value << ", got: " << read << std::endl;
       ++errors;
     }
   }
@@ -137,9 +147,9 @@ int main()
   errors += testMinMax(CV_32F);
   errors += testMinMax(CV_64F);
 
-  errors += testAssignMatrixEntry<uint16_t, uint16_t, CV_16U>();
-  errors += testAssignMatrixEntry<float, uint32_t, CV_32F>();
-  errors += testAssignMatrixEntry<double, uint64_t, CV_64F>();
+  errors += testMatrixAccess1D<uint16_t, uint16_t, CV_16U>();
+  errors += testMatrixAccess1D<float, uint32_t, CV_32F>();
+  errors += testMatrixAccess1D<double, uint64_t, CV_64F>();
 
   std::cout << "test no " << test_number++ << std::endl;
   if (cedar::aux::math::normalizeAngle(5.9) <= -cedar::aux::math::pi
