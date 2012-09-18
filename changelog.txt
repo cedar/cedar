@@ -50,6 +50,8 @@
 - cedar::proc
   - You can now define plots in ElementDeclarations. Plots, in this case, are a list of data that is to be plotted
     together.
+  - The resize step now orders its dimensions consistently in two-dimensional cases; unfortunately, this means that
+    all old architectures will need to flip their size order (used to be [width, height], is now [height, width]). 
 
 == Version 0.9.1 ==
 - general
