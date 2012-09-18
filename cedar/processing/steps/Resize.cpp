@@ -293,14 +293,14 @@ cv::Size cedar::proc::steps::Resize::getOutputSize() const
 {
   cv::Size size;
   CEDAR_ASSERT(this->_mOutputSize->size() <= 2);
-  size.width = this->_mOutputSize->at(0);
+  size.height = this->_mOutputSize->at(0);
   if (this->_mOutputSize->size() > 1)
   {
-    size.height = this->_mOutputSize->at(1);
+    size.width = this->_mOutputSize->at(1);
   }
   else
   {
-    size.height = 1;
+    size.width = 1;
   }
   return size;
 }
