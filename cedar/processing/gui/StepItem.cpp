@@ -186,11 +186,40 @@ void cedar::proc::gui::StepItem::slotRemoved(cedar::proc::DataRole::Id role, con
 
 void cedar::proc::gui::StepItem::timerEvent(QTimerEvent * /* pEvent */)
 {
-  cedar::unit::Time last_time = this->mStep->getRunTimeMeasurement();
-  cedar::unit::Time average_time = this->mStep->getRunTimeAverage();
-  QString tool_tip = QString("Last iteration time: %1<br />Average iteration time: %2")
-      .arg(QString::fromStdString(cedar::aux::toString(cedar::unit::Milliseconds(last_time))))
-      .arg(QString::fromStdString(cedar::aux::toString(cedar::unit::Milliseconds(average_time))));
+  cedar::unit::Milliseconds run_time(this->mStep->getRunTimeMeasurement());
+  cedar::unit::Milliseconds run_time_avg(this->mStep->getRunTimeAverage());
+  cedar::unit::Milliseconds lock_time(this->mStep->getLockTimeMeasurement());
+  cedar::unit::Milliseconds lock_time_avg(this->mStep->getLockTimeAverage());
+  QString tool_tip
+    = QString("<table>"
+              "  <tr>"
+              "    <th>Measurement:</th>"
+              "    <th>Last</th>"
+              "    <th>Average</th>"
+              "  </tr>"
+              "  <tr>"
+              "    <td>locking</td>"
+              "    <td>%3</td>"
+              "    <td>%4</td>"
+              "  </tr>"
+              "  <tr>"
+              "    <td>compute call</td>"
+              "    <td>%1</td>"
+              "    <td>%2</td>"
+              "  </tr>"
+              "  <tr>"
+              "    <td>sum</td>"
+              "    <td>%5</td>"
+              "    <td>%6</td>"
+              "  </tr>"
+              " </table>")
+      .arg(QString::fromStdString(cedar::aux::toString(run_time)))
+      .arg(QString::fromStdString(cedar::aux::toString(run_time_avg)))
+      .arg(QString::fromStdString(cedar::aux::toString(lock_time)))
+      .arg(QString::fromStdString(cedar::aux::toString(lock_time_avg)))
+      .arg(QString::fromStdString(cedar::aux::toString(run_time + lock_time)))
+      .arg(QString::fromStdString(cedar::aux::toString(run_time_avg + lock_time_avg)))
+      ;
   this->setToolTip(tool_tip);
 }
 

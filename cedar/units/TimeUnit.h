@@ -73,6 +73,18 @@ class cedar::unit::TimeUnit : public Time
     return stream;
   }
 
+  template <unsigned int T_other_factor, const char* T_other_suffix>
+  friend TimeUnit<T_factor, T_suffix> operator+
+  (
+    const TimeUnit<T_factor, T_suffix>& left,
+    const TimeUnit<T_other_factor, T_other_suffix>& right
+  )
+  {
+    TimeUnit<T_factor, T_suffix> res;
+    res.mAmountInMicroSeconds = left.mAmountInMicroSeconds + right.mAmountInMicroSeconds;
+    return res;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------

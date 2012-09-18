@@ -53,10 +53,18 @@ namespace cedar
 {
   namespace aux
   {
+    /*!@brief Class that abstracts methods for accessing vector storage.
+     *
+     *        Template specializations can override the way that elements in std::vectors are accessed. This is
+     *        necessary because std::vector<bool> behaves differently than vectors in general (at returns a copy instead
+     *        of a reference).
+     */
     template <typename T>
     class StorageAbstraction
     {
       public:
+        /*!@brief Returns the element at the given index.
+         */
         const T& at(size_t index) const
         {
           CEDAR_DEBUG_ASSERT(index < this->mValues.size());
@@ -68,10 +76,14 @@ namespace cedar
         std::vector<T> mValues;
     };
 
+    /*!@brief Specialization of the storage abstraction for a vector of bools.
+     */
     template<>
     class StorageAbstraction<bool>
     {
       public:
+        /*!@brief Returns the element at the given index.
+         */
         bool at(size_t index) const
         {
           CEDAR_DEBUG_ASSERT(index < this->mValues.size());
