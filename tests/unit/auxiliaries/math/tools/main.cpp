@@ -43,6 +43,7 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
+#include <stdint.h>
 
 int testMinMax(int cvMatType)
 {
@@ -97,6 +98,33 @@ int test1dMinMaxIndices()
   return errors;
 }
 
+template <typename MAT_T, typename INT_T, int CV_TYPE>
+int testAssignMatrixEntry()
+{
+  int errors = 0;
+
+  std::cout << "Testing assignMatrixEntry() function..." << std::endl;
+
+  cv::Mat mat = cv::Mat::zeros(2, 1, CV_TYPE);
+  INT_T value = static_cast<INT_T>(-1);
+  cedar::aux::math::assignMatrixEntry(mat, 0, static_cast<MAT_T>(value));
+  cedar::aux::math::assignMatrixEntry(mat, 1, static_cast<MAT_T>(value));
+
+  for (int i = 0; i < mat.rows; ++i)
+  {
+    if (mat.at<MAT_T>(i) != value)
+    {
+      std::cout << "Wrong value at index " << i
+          << "; expected: " << value << ", got: " << mat.at<MAT_T>(i) << std::endl;
+      ++errors;
+    }
+  }
+
+  std::cout << "              ... done." << std::endl;
+
+  return errors;
+}
+
 int main()
 {
   // the number of errors encountered in this test
@@ -109,7 +137,11 @@ int main()
   errors += testMinMax(CV_32F);
   errors += testMinMax(CV_64F);
 
-  std::cout << "test no" << test_number++ << std::endl;
+  errors += testAssignMatrixEntry<uint16_t, uint16_t, CV_16U>();
+  errors += testAssignMatrixEntry<float, uint32_t, CV_32F>();
+  errors += testAssignMatrixEntry<double, uint64_t, CV_64F>();
+
+  std::cout << "test no " << test_number++ << std::endl;
   if (cedar::aux::math::normalizeAngle(5.9) <= -cedar::aux::math::pi
       || cedar::aux::math::normalizeAngle(5.9) > cedar::aux::math::pi)
   {
@@ -159,7 +191,7 @@ int main()
 
   errors += test1dMinMaxIndices();
 
-  std::cout << "test finished, there were " << errors << " errors" << std::endl;
+  std::cout << "test finished with " << errors << " error(s)." << std::endl;
   if (errors > 255)
   {
     errors = 255;
