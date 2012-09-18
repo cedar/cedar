@@ -73,9 +73,8 @@ Triggerable(isLooped),
 // initialize members
 mBusy(false),
 mpArgumentsLock(new QReadWriteLock()),
-mLastIterationTime(cedar::unit::Milliseconds(-1.0)),
 mMovingAverageIterationTime(100), // average the last 100 iteration times
-mLastIterationTimeLock(new QReadWriteLock()),
+mLockingTime(100), // average the last 100 iteration times
 // initialize parameters
 mRNGState(0),
 _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
@@ -106,9 +105,6 @@ cedar::proc::Step::~Step()
 
   CEDAR_DEBUG_ASSERT(mpArgumentsLock != NULL);
   delete mpArgumentsLock;
-
-  CEDAR_DEBUG_ASSERT(mLastIterationTimeLock != NULL);
-  delete mLastIterationTimeLock;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -308,8 +304,6 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::T
 
 void cedar::proc::Step::run()
 {
-  // start measuring the execution time.
-  clock_t start = clock();
 
   this->mBusy = true;
 
@@ -333,12 +327,23 @@ void cedar::proc::Step::run()
   }
   this->mpArgumentsLock->unlock();
 
+  // start measuring the execution time.
+  clock_t lock_start = clock();
+
   //!@todo make the (un)locking optional?
   // lock all data
   this->lockAll();
 
   // lock all parameters
   this->lockParameters(cedar::aux::LOCK_TYPE_READ);
+
+  clock_t lock_end = clock();
+  clock_t lock_elapsed = lock_end - lock_start;
+  double lock_elapsed_s = static_cast<double>(lock_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
+  this->setLockTimeMeasurement(cedar::unit::Seconds(lock_elapsed_s));
+
+  // start measuring the execution time.
+  clock_t run_start = clock();
 
   try
   {
@@ -390,6 +395,10 @@ void cedar::proc::Step::run()
     this->setState(cedar::proc::Step::STATE_EXCEPTION, "An unknown exception type occurred.");
   }
 
+  clock_t run_end = clock();
+  clock_t run_elapsed = run_end - run_start;
+  double run_elapsed_s = static_cast<double>(run_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
+
   // unlock all parameters
   this->unlockParameters();
 
@@ -397,10 +406,7 @@ void cedar::proc::Step::run()
   this->unlockAll();
 
   // take time measurements
-  clock_t end = clock();
-  clock_t elapsed = end - start;
-  double elapsed_s = static_cast<double>(elapsed) / static_cast<double>(CLOCKS_PER_SEC);
-  this->setRunTimeMeasurement(cedar::unit::Seconds(elapsed_s));
+  this->setRunTimeMeasurement(cedar::unit::Seconds(run_elapsed_s));
 
   // remove the argumens, as they have been processed.
   this->getFinishedTrigger()->trigger();
@@ -409,24 +415,61 @@ void cedar::proc::Step::run()
 
 void cedar::proc::Step::setRunTimeMeasurement(const cedar::unit::Time& time)
 {
-  this->mLastIterationTimeLock->lockForWrite();
-  this->mLastIterationTime = cedar::unit::Seconds(time);
-  this->mMovingAverageIterationTime.append(this->mLastIterationTime);
-  this->mLastIterationTimeLock->unlock();
+  QWriteLocker locker(&this->mLastIterationTimeLock);
+  this->mMovingAverageIterationTime.append(cedar::unit::Seconds(time));
+}
+
+void cedar::proc::Step::setLockTimeMeasurement(const cedar::unit::Time& time)
+{
+  QWriteLocker locker(&this->mLockTimeLock);
+  this->mLockingTime.append(cedar::unit::Seconds(time));
 }
 
 cedar::unit::Time cedar::proc::Step::getRunTimeMeasurement() const
 {
-  QReadLocker locker(this->mLastIterationTimeLock);
-  return this->mLastIterationTime;
+  QReadLocker locker(&this->mLastIterationTimeLock);
+  if (this->mMovingAverageIterationTime.size() > 0)
+  {
+    return this->mMovingAverageIterationTime.getNewest();
+  }
+  else
+  {
+    return cedar::unit::Milliseconds(0.0);
+  }
+}
+
+cedar::unit::Time cedar::proc::Step::getLockTimeMeasurement() const
+{
+  QReadLocker locker(&this->mLockTimeLock);
+  if (this->mLockingTime.size() > 0)
+  {
+    return this->mLockingTime.getNewest();
+  }
+  else
+  {
+    return cedar::unit::Milliseconds(0.0);
+  }
 }
 
 cedar::unit::Time cedar::proc::Step::getRunTimeAverage() const
 {
-  QReadLocker locker(this->mLastIterationTimeLock);
+  QReadLocker locker(&this->mLastIterationTimeLock);
   if (this->mMovingAverageIterationTime.size() > 0)
   {
     return this->mMovingAverageIterationTime.getAverage();
+  }
+  else
+  {
+    return cedar::unit::Milliseconds(-1.0);
+  }
+}
+
+cedar::unit::Time cedar::proc::Step::getLockTimeAverage() const
+{
+  QReadLocker locker(&this->mLockTimeLock);
+  if (this->mLockingTime.size() > 0)
+  {
+    return this->mLockingTime.getAverage();
   }
   else
   {
