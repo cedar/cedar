@@ -46,6 +46,7 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
+#include <stdint.h>
 
 // Windows specific undefinition of the max macro
 #ifdef CEDAR_OS_WINDOWS
@@ -174,10 +175,24 @@ namespace cedar
       template <typename T>
       inline void assignMatrixEntry(cv::Mat& matrix, std::vector<int> index, T value)
       {
-        CEDAR_ASSERT(matrix.type() == CV_32F || matrix.type() == CV_64F || matrix.type() == CV_16UC1);
+        CEDAR_ASSERT
+        (
+          matrix.type() == CV_8U
+          || matrix.type() == CV_16U
+          || matrix.type() == CV_32F
+          || matrix.type() == CV_64F
+        );
 
         switch (matrix.type())
         {
+          case CV_8U:
+            matrix.at<uint8_t>(&index.at(0)) = static_cast<uint8_t>(value);
+            break;
+
+          case CV_16U:
+            matrix.at<uint16_t>(&index.at(0)) = static_cast<uint16_t>(value);
+            break;
+
           case CV_32F:
             matrix.at<float>(&index.at(0)) = static_cast<float>(value);
             break;
@@ -186,9 +201,6 @@ namespace cedar
             matrix.at<double>(&index.at(0)) = static_cast<double>(value);
             break;
 
-          case CV_16UC1:
-            matrix.at<unsigned int>(&index.at(0)) = static_cast<unsigned int>(value);
-            break;
           default:
             // this should never happen due to the assert above.
             CEDAR_ASSERT(false);
@@ -201,21 +213,31 @@ namespace cedar
       template <typename T>
       inline void assignMatrixEntry(cv::Mat& matrix, int index, T value)
       {
-        CEDAR_ASSERT(matrix.type() == CV_32F || matrix.type() == CV_64F || matrix.type() == CV_16UC1 );
+        CEDAR_ASSERT
+        (
+          matrix.type() == CV_8U
+          || matrix.type() == CV_16U
+          || matrix.type() == CV_32F
+          || matrix.type() == CV_64F
+        );
         CEDAR_ASSERT(cedar::aux::math::getDimensionalityOf(matrix) <= 1);
 
         switch (matrix.type())
         {
+          case CV_8U:
+            matrix.at<uint8_t>(index) = static_cast<uint8_t>(value);
+            break;
+
+          case CV_16U:
+            matrix.at<uint16_t>(index) = static_cast<uint16_t>(value);
+            break;
+
           case CV_32F:
             matrix.at<float>(index) = static_cast<float>(value);
             break;
 
           case CV_64F:
             matrix.at<double>(index) = static_cast<double>(value);
-            break;
-
-          case CV_16UC1:
-            matrix.at<unsigned int>(index) = static_cast<unsigned int>(value);
             break;
 
           default:
@@ -235,11 +257,11 @@ namespace cedar
         switch (matrix.type())
         {
           case CV_8UC1:
-            return static_cast<T>(matrix.at<unsigned char>(index));
+            return static_cast<T>(matrix.at<uint8_t>(index));
             break;
 
           case CV_16UC1:
-            return static_cast<T>(matrix.at<unsigned int>(index));
+            return static_cast<T>(matrix.at<uint16_t>(index));
             break;
 
           case CV_32F:
