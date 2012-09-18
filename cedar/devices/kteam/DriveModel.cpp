@@ -109,7 +109,7 @@ void cedar::dev::kteam::DriveModel::calculatePositionAndOrientation(const std::v
   double dphi = calculateDifferenceOrientation(mOldEncoders, encoders);
 
   // calculate new position on x- and y-axis
-  //todo: changed to use matrices instead of quaternions, check whether this still works (HR)
+  //!@todo: changed to use matrices instead of quaternions, check whether this still works (HR)
 //  double new_x_position = getTranslationX() + ds * getOrientationQuaternion(1);
 //  double new_y_position = getTranslationY() + ds * getOrientationQuaternion(2);
   // get old orientation and calculate new orientation

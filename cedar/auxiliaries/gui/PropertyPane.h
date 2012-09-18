@@ -118,7 +118,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@breif Appends a configurable to the property pane.
+  /*!@brief Appends a configurable to the property pane.
    */
   void append(const std::string& title, cedar::aux::ConfigurablePtr configurable);
 

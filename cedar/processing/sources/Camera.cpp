@@ -37,7 +37,6 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-
 // CEDAR INCLUDES
 #include "cedar/processing/sources/Camera.h"
 #include "cedar/processing/ElementDeclaration.h"

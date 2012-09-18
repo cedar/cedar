@@ -50,29 +50,6 @@
 #include <QVBoxLayout>
 
 //----------------------------------------------------------------------------------------------------------------------
-// type registration
-//----------------------------------------------------------------------------------------------------------------------
-
-// This plot is currently not registered -- it opens automatically in a matrix plot.
-//namespace
-//{
-//  bool registerPlot()
-//  {
-//    typedef cedar::aux::gui::PlotDeclarationTemplate
-//            <
-//              cedar::aux::MatData,
-//              cedar::aux::gui::MatrixSlicePlot3D
-//            > DeclarationTypeM;
-//    boost::shared_ptr<DeclarationTypeM> declaration(new DeclarationTypeM());
-//    cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(declaration);
-//
-//    return true;
-//  }
-//
-//  bool registered = registerPlot();
-//}
-
-//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::gui::MatrixSlicePlot3D::MatrixSlicePlot3D(QWidget* pParent)

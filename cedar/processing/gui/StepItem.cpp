@@ -107,7 +107,6 @@ mDisplayMode(cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
-
   this->setStep(step);
   
   this->construct();
@@ -944,12 +943,6 @@ void cedar::proc::gui::StepItem::multiplot
   QLabel *p_last_label = NULL;
   bool is_multiplot = false;
   cedar::aux::gui::DataPlotter *p_plotter = NULL;
-  /*for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
-       enum_it != cedar::proc::DataRole::type().list().end();
-       ++enum_it)
-  {
-    const cedar::aux::Enum& e = *enum_it;
-    */
 
   for (PlotList::const_iterator iter = data.begin(); iter != data.end(); ++iter)
   {
