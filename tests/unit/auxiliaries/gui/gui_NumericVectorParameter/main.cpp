@@ -135,7 +135,17 @@ int test_parameter(T initialValue, size_t initialSize, T firstValue, T min, T ma
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ParameterType);
   cedar::aux::ConfigurablePtr test_cfg(new cedar::aux::Configurable());
 
-  ParameterTypePtr parameter (new ParameterType(test_cfg.get(), "test", initialSize, initialValue));
+  ParameterTypePtr parameter
+                   (
+                     new ParameterType
+                         (
+                           test_cfg.get(),
+                           "test",
+                           initialSize,
+                           initialValue,
+                           ParameterType::LimitType::full()
+                         )
+                   );
 
   if (parameter->size() != initialSize)
   {
