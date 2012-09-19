@@ -63,6 +63,7 @@
 #include "cedar/units/TimeUnit.h"
 
 // SYSTEM INCLUDES
+#include <QPen>
 #include <QPainter>
 #include <QLabel>
 #include <QGraphicsSceneContextMenuEvent>
@@ -83,6 +84,8 @@ const int cedar::proc::gui::StepItem::mIconSize = 40;
 const qreal cedar::proc::gui::StepItem::mDefaultWidth = 160;
 const qreal cedar::proc::gui::StepItem::mDefaultHeight = 50;
 const qreal cedar::proc::gui::StepItem::mBaseDataSlotSize = 12.0;
+
+QIcon cedar::proc::gui::StepItem::mLoopedIcon(":/decorations/looped.svg");
 
 
 #ifndef CEDAR_COMPILER_MSVC
@@ -143,6 +146,33 @@ void cedar::proc::gui::StepItem::construct()
   }
 }
 
+
+cedar::proc::gui::StepItem::Decoration::Decoration
+(
+  cedar::proc::gui::StepItem* pStep,
+  const QIcon& icon,
+  const QString& description
+)
+:
+mIconSource(icon)
+{
+  this->mpRectangle = new QGraphicsRectItem(-1, -1, 10, 10, pStep);
+  this->mpIcon = new QGraphicsPixmapItem
+                 (
+                   mIconSource.pixmap(static_cast<int>(cedar::proc::gui::StepItem::mBaseDataSlotSize)),
+                   this->mpRectangle
+                 );
+  this->mpIcon->setToolTip(description);
+
+  QPen pen = this->mpRectangle->pen();
+  pen.setWidth(1);
+  pen.setColor(QColor(0, 0, 0));
+  QBrush bg(QColor(255, 255, 255));
+  this->mpRectangle->setPen(pen);
+  this->mpRectangle->setBrush(bg);
+}
+
+
 cedar::proc::gui::StepItem::~StepItem()
 {
   cedar::aux::LogSingleton::getInstance()->freeing(this);
@@ -161,10 +191,28 @@ cedar::proc::gui::StepItem::~StepItem()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::StepItem::Decoration::setPosition(const QPointF& pos)
+{
+  this->mpRectangle->setPos(pos);
+}
+
+void cedar::proc::gui::StepItem::Decoration::setSize(double sizeFactor)
+{
+  const qreal padding = 1;
+  const qreal size = static_cast<qreal>(0.7)
+                     * static_cast<qreal>(sizeFactor)
+                     * cedar::proc::gui::StepItem::mBaseDataSlotSize;
+  QRectF new_dims = this->mpRectangle->rect();
+  new_dims.setWidth(size + 2*padding);
+  new_dims.setHeight(size + 2*padding);
+  this->mpRectangle->setRect(new_dims);
+  this->mpIcon->setPixmap(mIconSource.pixmap(static_cast<int>(size)));
+}
+
 void cedar::proc::gui::StepItem::slotAdded(cedar::proc::DataRole::Id role, const std::string& name)
 {
   this->addDataItemFor(this->getStep()->getSlot(role, name));
-  this->updateDataSlotPositions();
+  this->updateAttachedItems();
 }
 
 void cedar::proc::gui::StepItem::slotRemoved(cedar::proc::DataRole::Id role, const std::string& name)
@@ -309,6 +357,7 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 
   this->addDataItems();
   this->addTriggerItems();
+  this->addDecorations();
 
   mStateChangedConnection = step->connectToStateChanged(boost::bind(&cedar::proc::gui::StepItem::stepStateChanged, this));
   QObject::connect(step.get(), SIGNAL(nameChanged()), this, SLOT(redraw()));
@@ -339,6 +388,57 @@ void cedar::proc::gui::StepItem::writeConfiguration(cedar::aux::ConfigurationNod
   root.put("step", this->mStep->getName());
   root.put("display style", cedar::proc::gui::StepItem::DisplayMode::type().get(this->mDisplayMode).name());
   this->cedar::proc::gui::GraphicsBase::writeConfiguration(root);
+}
+
+void cedar::proc::gui::StepItem::addDecorations()
+{
+  this->mDecorations.clear();
+
+  if (this->getStep() && this->getStep()->isLooped())
+  {
+    DecorationPtr decoration
+    (
+      new Decoration(this, mLoopedIcon, "This step is looped, i.e., it expects to be connected to a looped trigger.")
+    );
+
+    this->mDecorations.push_back(decoration);
+  }
+
+  this->updateDecorationPositions();
+}
+
+void cedar::proc::gui::StepItem::updateDecorationPositions()
+{
+  QPointF origin(this->width(), this->height());
+
+  switch (this->mDisplayMode)
+  {
+    case DisplayMode::ICON_ONLY:
+      origin.setX(origin.x() - 7.5);
+      break;
+
+    default:
+      origin.setX(origin.x() - 15.0);
+      origin.setY(origin.y() - 5.0);
+  }
+
+  QPointF offset_dir(-1, 0);
+  qreal distance = 10.0;
+  for (size_t i = 0; i < this->mDecorations.size(); ++i)
+  {
+    DecorationPtr decoration = this->mDecorations[i];
+    decoration->setPosition(origin + static_cast<qreal>(i) * distance * offset_dir);
+
+    switch (this->mDisplayMode)
+    {
+      case DisplayMode::ICON_ONLY:
+        decoration->setSize(0.7);
+        break;
+
+      default:
+        decoration->setSize(1.0);
+    }
+  }
 }
 
 void cedar::proc::gui::StepItem::addTriggerItems()
@@ -390,7 +490,7 @@ void cedar::proc::gui::StepItem::addDataItems()
     }
   }
 
-  this->updateDataSlotPositions();
+  this->updateAttachedItems();
 }
 
 void cedar::proc::gui::StepItem::addDataItemFor(cedar::proc::DataSlotPtr slot)
@@ -398,6 +498,13 @@ void cedar::proc::gui::StepItem::addDataItemFor(cedar::proc::DataSlotPtr slot)
   cedar::proc::gui::DataSlotItem *p_item = new cedar::proc::gui::DataSlotItem(this, slot);
   mSlotMap[slot->getRole()][slot->getName()] = p_item;
 }
+
+void cedar::proc::gui::StepItem::updateAttachedItems()
+{
+  this->updateDataSlotPositions();
+  this->updateDecorationPositions();
+}
+
 
 void cedar::proc::gui::StepItem::updateDataSlotPositions()
 {
@@ -884,7 +991,7 @@ void cedar::proc::gui::StepItem::setDisplayMode(cedar::proc::gui::StepItem::Disp
       break;
   }
 
-  this->updateDataSlotPositions();
+  this->updateAttachedItems();
   this->updateConnections();
   this->update();
 }
