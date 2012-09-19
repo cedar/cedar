@@ -69,7 +69,7 @@ public:
 
 public slots:
   //!@brief This slot is connected to the valueChanged() event of the limit parameters.
-  void limitsChanged();
+  void recompute();
   void outputSizesChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
