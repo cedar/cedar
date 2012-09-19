@@ -36,5 +36,6 @@
     <file>toolbaricons/save.svg</file>
     <file>toolbaricons/grid.svg</file>
     <file>toolbaricons/reset.svg</file>
+    <file>decorations/looped.svg</file>
   </qresource>
 </RCC>

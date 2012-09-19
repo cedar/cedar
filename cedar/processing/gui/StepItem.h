@@ -109,6 +109,32 @@ public:
       static cedar::aux::EnumType<cedar::proc::gui::StepItem::DisplayMode> mType;
   };
 
+private:
+  class Decoration
+  {
+    public:
+      Decoration(StepItem* pStep, const QIcon& icon, const QString& description);
+
+      ~Decoration()
+      {
+        delete mpIcon;
+        delete mpRectangle;
+      }
+
+      void setPosition(const QPointF& pos);
+
+      void setSize(double sizeFactor);
+
+    private:
+      QGraphicsPixmapItem* mpIcon;
+
+      QGraphicsRectItem* mpRectangle;
+
+      const QIcon& mIconSource;
+  };
+
+  CEDAR_GENERATE_POINTER_TYPES(Decoration);
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -193,6 +219,9 @@ private:
   //!@brief adds graphical representations for all triggers contained in the step
   void addTriggerItems();
 
+  //!@brief Adds the decorations to the step.
+  void addDecorations();
+
   //!@brief sets the represented step
   void setStep(cedar::proc::StepPtr step);
 
@@ -236,6 +265,12 @@ private:
 
   //! Updates the positions of the data slot items.
   void updateDataSlotPositions();
+
+  //! Updates the positions of the decoration items.
+  void updateDecorationPositions();
+
+  //! Updates the positions of all items attached to this one (decorations and data slots).
+  void updateAttachedItems();
 
   void slotAdded(cedar::proc::DataRole::Id role, const std::string& name);
 
@@ -295,6 +330,12 @@ private:
 
   //!@brief The current display mode of the step.
   cedar::proc::gui::StepItem::DisplayMode::Id mDisplayMode;
+
+  //! The decorations for this step.
+  std::vector<DecorationPtr> mDecorations;
+
+  //! Icon for indicating that a step is looped.
+  static QIcon mLoopedIcon;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
