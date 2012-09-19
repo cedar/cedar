@@ -49,8 +49,12 @@
 #include <strsafe.h>
 #endif // CEDAR_OS_UNIX
 
-//!@todo Make this switchable with configuration?
-#define BOOST_FILESYSTEM_VERSION 2 // we currently use boost's filesystem as version 2.
+#include <boost/version.hpp>
+#if (BOOST_VERSION / 100 % 1000 < 46) // there was an interface change in boost
+  #define BOOST_FILESYSTEM_VERSION 2
+#else
+  #define BOOST_FILESYSTEM_VERSION 3
+#endif
 #include <boost/filesystem.hpp>
 
 
@@ -82,7 +86,13 @@ cedar::proc::PluginProxy::~PluginProxy()
 std::string cedar::proc::PluginProxy::getPluginNameFromPath(const std::string& path)
 {
   boost::filesystem::path plugin_path(path);
-  std::string name = plugin_path.filename();
+  std::string name;
+#if (BOOST_VERSION / 100 % 1000 < 46) // there was an interface change in boost
+  name = plugin_path.filename();
+#else
+  name = plugin_path.filename().string();
+#endif
+
   if (name.substr(0, 3) == "lib")
   {
     name = name.substr(3);
