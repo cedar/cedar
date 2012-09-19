@@ -131,8 +131,11 @@ _mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
   this->declareOutput("output", mOutput);
   this->outputSizesChanged();
   // connect the parameter's change signal
-  QObject::connect(_mLowerLimits.get(), SIGNAL(valueChanged()), this, SLOT(limitsChanged()));
-  QObject::connect(_mUpperLimits.get(), SIGNAL(valueChanged()), this, SLOT(limitsChanged()));
+  QObject::connect(_mLowerLimits.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
+  QObject::connect(_mUpperLimits.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
+  QObject::connect(_mOutputSizes.get(), SIGNAL(valueChanged()), this, SLOT(outputSizesChanged()));
+  QObject::connect(_mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
+  QObject::connect(_mSigmas.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -156,7 +159,7 @@ void cedar::dyn::RateToSpaceCode::compute(const cedar::proc::Arguments&)
                  );
 }
 
-void cedar::dyn::RateToSpaceCode::limitsChanged()
+void cedar::dyn::RateToSpaceCode::recompute()
 {
   if (this->mInput)
   {
@@ -170,11 +173,12 @@ void cedar::dyn::RateToSpaceCode::interpolate()
   this->mInterpolatedCenters.resize(this->mDimensionality);
   for (unsigned int i = 0; i < this->mDimensionality; ++i)
   {
-    double real_value = std::max(this->_mLowerLimits->at(i), static_cast<double>(input.at<float>(i, 0)));
-    real_value = std::min (this->_mUpperLimits->at(i), real_value);
+//    double real_value = std::max(this->_mLowerLimits->at(i), static_cast<double>(input.at<float>(i, 0)));
+//    real_value = std::min (this->_mUpperLimits->at(i), real_value);
+    double real_value = static_cast<double>(input.at<float>(i, 0));
     double interval_length = this->_mUpperLimits->at(i) - this->_mLowerLimits->at(i);
     double interpolated_value = (real_value - this->_mLowerLimits->at(i)) / interval_length;
-    this->mInterpolatedCenters.at(i) = round(_mOutputSizes->at(i) * interpolated_value);
+    this->mInterpolatedCenters.at(i) = _mOutputSizes->at(i) * interpolated_value;
   }
 }
 
@@ -233,4 +237,5 @@ void cedar::dyn::RateToSpaceCode::outputSizesChanged()
   }
   cv::Mat new_matrix(static_cast<int>(mDimensionality), &(sizes_signed.front()), CV_32F);
   this->mOutput->setData(new_matrix);
+  this->recompute();
 }
