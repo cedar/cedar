@@ -208,8 +208,16 @@ void cedar::dev::robot::KinematicChain::setJointAngles(const std::vector<double>
 {
   if(angles.size() != getNumberOfJoints())
   {
-    std::cout << "Error: You provided an vector of angles with the wrong size ("
-      << angles.size() << " != " << getNumberOfJoints() << ")!" << std::endl;
+    //!@todo Should this throw an exception?
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "You provided a vector of angles with the wrong size (angles: "
+        + cedar::aux::toString(angles.size())
+        + " != no. of joints: "
+        + cedar::aux::toString(getNumberOfJoints())
+        + ")!",
+      "cedar::dev::robot::KinematicChain::setJointAngles(const std::vector<double>&)"
+    );
     return;
   }
 
@@ -229,15 +237,22 @@ void cedar::dev::robot::KinematicChain::setJointAngles(const cv::Mat& angles)
 {
   if (angles.size().height != (int)getNumberOfJoints() || angles.size().width != 1)
   {
-    std::cout << "Error: You provided an matrix of angles with the wrong size [("
-      << angles.size().height << "," << angles.size().width
-      << ") != (" << getNumberOfJoints() << ",1)]!" << std::endl;
+    //!@todo This should probably throw an exception.
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "You provided a vector of angles with the wrong size (angles: "
+        + cedar::aux::toString(angles.rows) + "x" + cedar::aux::toString(angles.cols)
+        + " != expected: "
+        + cedar::aux::toString(getNumberOfJoints())
+        + "x1)!",
+      "cedar::dev::robot::KinematicChain::setJointAngles(const cv::Mat&)"
+    );
     return;
   }
 
   for (unsigned i = 0; i < getNumberOfJoints(); i++)
   {
-    //TODO: use applyAngleLimits() ?
+    //!@todo: use applyAngleLimits() ?
     double angle = angles.at<double>(i,0);
     angle = std::max<double>(angle, getJoint(i)->_mpAngleLimits->getLowerLimit());
     angle = std::min<double>(angle, getJoint(i)->_mpAngleLimits->getUpperLimit());
@@ -252,10 +267,17 @@ bool cedar::dev::robot::KinematicChain::setJointVelocity(unsigned int index, dou
 {
   if (index >= getNumberOfJoints())
   {
-    std::cout << "Error: Trying to set velocity for joint " << index << "!" << std::endl;
+    //!@todo This should probably throw an exception.
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Index out of range when setting velocity for joint "
+        + cedar::aux::toString(index)
+        + "!",
+      "cedar::dev::robot::KinematicChain::setJointVelocity(unsigned int, double)"
+    );
     return false;
   }
-  //TODO use applyVelocityLimits()?
+  //!@todo use applyVelocityLimits()?
   velocity = std::max<double>(velocity, getJoint(index)->_mpVelocityLimits->getLowerLimit());
   velocity = std::min<double>(velocity, getJoint(index)->_mpVelocityLimits->getUpperLimit());
 
@@ -268,8 +290,16 @@ bool cedar::dev::robot::KinematicChain::setJointVelocities(const std::vector<dou
 {
   if (velocities.size() != getNumberOfJoints())
   {
-    std::cout << "Error: You provided an vector of velocities with the wrong size ("
-      << velocities.size() << " != " << getNumberOfJoints() << ")!" << std::endl;
+    //!@todo Should this throw an exception?
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "You provided a vector of velocities with the wrong size (provided: "
+        + cedar::aux::toString(velocities.size())
+        + " != expected: "
+        + cedar::aux::toString(getNumberOfJoints())
+        + ")!",
+      "cedar::dev::robot::KinematicChain::setJointVelocities(const std::vector<double>&)"
+    );
     return false;
   }
 
@@ -290,9 +320,16 @@ bool cedar::dev::robot::KinematicChain::setJointVelocities(const cv::Mat& veloci
 {
   if(velocities.size().height != (int)getNumberOfJoints() || velocities.size().width != 1)
   {
-    std::cout << "Error: You provided an matrix of velocities with the wrong size [("
-        << velocities.size().height << "," << velocities.size().width
-        << ") != (" << getNumberOfJoints() << ",1)]!" << std::endl;
+    //!@todo Should this throw an exception?
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "You provided a matrix of velocities with the wrong size (provided: "
+        + cedar::aux::toString(velocities.rows) + "x" + cedar::aux::toString(velocities.cols)
+        + " != expected: "
+        + cedar::aux::toString(getNumberOfJoints())
+        + "x1)!",
+      "cedar::dev::robot::KinematicChain::setJointVelocities(const cv::Mat&)"
+    );
     return false;
   }
 
@@ -313,7 +350,14 @@ bool cedar::dev::robot::KinematicChain::setJointAcceleration(unsigned int index,
 {
   if (index >= getNumberOfJoints())
   {
-    std::cout << "Error: Trying to set acceleration for joint " << index << "!" << std::endl;
+    //!@todo This should probably throw an exception.
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Index out of range when setting acceleration for joint "
+        + cedar::aux::toString(index)
+        + "!",
+      "cedar::dev::robot::KinematicChain::setJointAcceleration(unsigned int, double)"
+    );
     return false;
   }
 
@@ -325,8 +369,16 @@ bool cedar::dev::robot::KinematicChain::setJointAccelerations(const std::vector<
 {
   if(accelerations.size() != getNumberOfJoints())
   {
-    std::cout << "Error: You provided an matrix of accelerations with the wrong size ("
-      << accelerations.size() << " != " << getNumberOfJoints() << ")!" << std::endl;
+    //!@todo Should this throw an exception?
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "You provided a vector of accelerations with the wrong size (provided: "
+        + cedar::aux::toString(accelerations.size())
+        + " != expected: "
+        + cedar::aux::toString(getNumberOfJoints())
+        + ")!",
+      "cedar::dev::robot::KinematicChain::setJointAccelerations(const std::vector<double>&)"
+    );
     return false;
   }
 
@@ -342,9 +394,16 @@ bool cedar::dev::robot::KinematicChain::setJointAccelerations(const cv::Mat& acc
 {
   if(accelerations.size().height != (int)getNumberOfJoints() || accelerations.size().width != 1)
   {
-    std::cout << "Error: You provided an matrix of accelerations with the wrong size [("
-      << accelerations.size().height << "," << accelerations.size().width
-      << ") != (" << getNumberOfJoints() << ",1)]!" << std::endl;
+    //!@todo Should this throw an exception?
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "You provided a matrix of accelerations with the wrong size (provided: "
+        + cedar::aux::toString(accelerations.rows) + "x" + cedar::aux::toString(accelerations.cols)
+        + " != expected: "
+        + cedar::aux::toString(getNumberOfJoints())
+        + "x1)!",
+      "cedar::dev::robot::KinematicChain::setJointAccelerations(const cv::Mat&)"
+    );
     return false;
   }
 
@@ -390,8 +449,12 @@ void cedar::dev::robot::KinematicChain::step(double time)
       break;
 
     default:
-      std::cerr << "Oh oh, something went terribly wrong in cedar::dev::robot::KinematicChain::step(double)!"
-        << std::endl;
+      //!@todo Should this throw an exception?
+      cedar::aux::LogSingleton::getInstance()->error
+      (
+        "Oh oh, something went terribly wrong in cedar::dev::robot::KinematicChain::step(double)!",
+        "cedar::dev::robot::KinematicChain::step(double)"
+      );
   }
 
   return;
@@ -540,7 +603,12 @@ void cedar::dev::robot::KinematicChain::start(Priority priority)
   switch (mCurrentWorkingMode)
   {
   case ANGLE:
-    std::cout << "Error: KinematicChain refuses to work as a thread in ANGLE mode!" << std::endl;
+    //!@todo Should this throw an exception?
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "KinematicChain refuses to work as a thread in ANGLE mode!",
+      "cedar::dev::robot::KinematicChain::start(Priority)"
+    );
     return;
   case VELOCITY:
   case ACCELERATION:
