@@ -120,6 +120,7 @@ private:
     _mUpperLimit->setValue(limit);
   }
 
+  //!@todo generalize to a math utility function
   inline int interpolateBin(double value)
   {
     double interpolated = (value - this->getLowerLimit()) / mInterval;
