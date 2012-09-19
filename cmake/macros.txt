@@ -42,10 +42,18 @@
 ########################################################################################################################
 
 macro(cedar_add_executable)
+	cedar_add_target_executable(${ARGN})
+endmacro(cedar_add_executable)
+
+macro(cedar_add_example)
+	cedar_add_target_executable(${ARGN} NO_INSTALL)
+endmacro(cedar_add_example)
+
+macro(cedar_add_target_executable)
   # find all cpp source files in the current source folder and save them in a list
   file(GLOB sourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
-  parse_arguments(executable "PREFIX;MOC_HEADERS" "" ${ARGN})
+  parse_arguments(executable "PREFIX;MOC_HEADERS" "NO_INSTALL" ${ARGN})
   car(executableName ${executable_DEFAULT_ARGS})
 
   qt4_wrap_cpp(executableMocSources ${executable_MOC_HEADERS})
@@ -74,8 +82,10 @@ macro(cedar_add_executable)
   set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${originalRuntimeOutputDirectory})
   
   # finally, add this target to the list of executables that are going to be installed to CEDAR_EXE_INSTALL_DIR
-  install(TARGETS ${executableExecutableName} DESTINATION "${CMAKE_INSTALL_PREFIX}/${CEDAR_EXE_INSTALL_DIR}")
-endmacro(cedar_add_executable)
+  if (NOT executable_NO_INSTALL)
+  	install(TARGETS ${executableExecutableName} DESTINATION "${CMAKE_INSTALL_PREFIX}/${CEDAR_EXE_INSTALL_DIR}")
+  endif(NOT executable_NO_INSTALL)
+endmacro(cedar_add_target_executable)
 
 macro(cedar_add_unit_test)
   parse_arguments(unitTest "ARGUMENTS" "" ${ARGN})

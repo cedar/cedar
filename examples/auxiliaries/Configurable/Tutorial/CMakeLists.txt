@@ -34,4 +34,4 @@
 #
 #=======================================================================================================================
 
-cedar_add_executable(ConfigurableTutorial PREFIX "examples/")
+cedar_add_example(ConfigurableTutorial PREFIX "examples/")

@@ -35,5 +35,5 @@
 #=======================================================================================================================
 
 if(CEDAR_USE_KUKA_LWR)
-  cedar_add_executable(kukaMovement PREFIX "examples/")
+  cedar_add_example(kukaMovement PREFIX "examples/")
 endif(CEDAR_USE_KUKA_LWR)

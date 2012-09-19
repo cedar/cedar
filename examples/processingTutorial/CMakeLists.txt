@@ -38,4 +38,4 @@
 #
 #=======================================================================================================================
 
-cedar_add_executable(processingTutorial PREFIX "examples/")
+cedar_add_example(processingTutorial PREFIX "examples/")
