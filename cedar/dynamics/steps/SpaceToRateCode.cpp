@@ -90,7 +90,7 @@ mOutput(new cedar::aux::MatData(cv::Mat(1,1, CV_32F))),
 // parameters
 _mLowerLimit(new cedar::aux::DoubleParameter(this, "lowerLimit", 0.0, -10000.0, 10000.0)),
 _mUpperLimit(new cedar::aux::DoubleParameter(this, "upperLimit", 1.0, -10000.0, 10000.0)),
-_mTau(new cedar::aux::DoubleParameter(this, "tau", 10.0, cedar::aux::DoubleParameter::LimitType::positive()))
+_mTau(new cedar::aux::DoubleParameter(this, "tau", 100.0, cedar::aux::DoubleParameter::LimitType::positive()))
 {
   // declare all data
   this->declareInput("input");
@@ -141,7 +141,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::SpaceToRateCode::determineInputValid
 
   if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
   {
-    if (mat_data->getDimensionality() == 1)
+    if (mat_data->getDimensionality() == 1 && mat_data->getData().type() == CV_32F)
     {
       // Mat data is accepted.
       return cedar::proc::DataSlot::VALIDITY_VALID;
