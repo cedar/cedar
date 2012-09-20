@@ -93,7 +93,8 @@ public:
   virtual void setTurningRate(double turningRate);
 
   /*!@brief Sets the speed of the wheels based on the given forward velocity and turning rate.
-   * @param[in] turningRate The turning rate to be set [in rad/s].
+   * @param[in] forwardVelocity The forward velocity to be set [in m/s].
+   * @param[in] turningRate     The turning rate to be set [in rad/s].
    */
   virtual void setForwardVelocityAndTurningRate(double forwardVelocity, double turningRate);
 

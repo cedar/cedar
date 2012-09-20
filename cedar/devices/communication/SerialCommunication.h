@@ -75,7 +75,6 @@ class cedar::dev::com::SerialCommunication : public QObject, public Communicatio
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Initiates a new communication with an external device per Serial Port.
-  //!@param config Location and name of the Configuration-File to be used.
   SerialCommunication();
 
   //!@brief Ends the communication with the device and closes the channel.

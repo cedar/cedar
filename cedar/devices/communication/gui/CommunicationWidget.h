@@ -63,8 +63,9 @@ private:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Constructs the GUI.
-  //!@param peCommunication Pointer to the communication-class to be tested.
+  /*!@brief Constructs the GUI.
+   * @param communication Pointer to the communication-class to be tested.
+   */
   CommunicationWidget(cedar::dev::com::CommunicationPtr communication);
 
   //!@brief Destructs the GUI.

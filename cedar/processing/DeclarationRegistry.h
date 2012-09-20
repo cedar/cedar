@@ -153,7 +153,9 @@ namespace cedar
 {
   namespace proc
   {
+    //!@cond SKIPPED_DOCUMENTATION
     CEDAR_INSTANTIATE_PROC_TEMPLATE(cedar::aux::Singleton<cedar::proc::DeclarationRegistry>);
+    //!@endcond
 
     //!@brief The singleton for the declaration registry.
     typedef cedar::aux::Singleton<cedar::proc::DeclarationRegistry> DeclarationRegistrySingleton;
