@@ -49,12 +49,8 @@
 #include <dc1394/dc1394.h>
 
 
-/*! @file Main file for fwBusReset - a tool for firewire cameras
- *
- *  A short program to search the bus for the first available camera, then resets it and the bus itself
- *
+/*! A short program to search the bus for the first available camera, then resets it and the bus itself
  */
-
 int main(int, char *argv[])
 {
   std::cout << argv[0] << " resets the first camera on the firewire bus and the bus itself\n";

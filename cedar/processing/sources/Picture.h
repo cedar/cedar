@@ -78,6 +78,7 @@ public:
 public:
 
 public slots:
+  //!@brief a slot that takes care of updating the output picture
   void updatePicture();
 
   //--------------------------------------------------------------------------------------------------------------------

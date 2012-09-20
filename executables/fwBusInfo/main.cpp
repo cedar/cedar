@@ -49,12 +49,8 @@
 #include <dc1394/dc1394.h>
 #include <boost/lexical_cast.hpp>
 
-/*! @file main.cpp
- *
- * A short program to search and list all available cameras with their GUID's on the firewire bus
- *
+/*! A short program to search and list all available cameras with their GUID's on the firewire bus
  */
-
 int main(int, char *argv[])
 {
   std::cout << argv[0] << " is a program to list all available cameras on the firewire bus\n";
