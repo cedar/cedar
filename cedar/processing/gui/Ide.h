@@ -66,7 +66,7 @@ class cedar::proc::gui::Ide : public QMainWindow, public Ui_Ide
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Ide();
+  Ide(bool loadDefaultPlugins = true);
 
   //!@brief Destructor
   ~Ide();
