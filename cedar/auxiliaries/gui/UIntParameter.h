@@ -59,16 +59,15 @@ namespace cedar
   {
     namespace gui
     {
-      /*!@brief Template specialization of setPrecision for QSpinBoxes.
-       */
+      //!@cond SKIPPED_DOCUMENTATION
       template<>
       inline void NumericWidgetPolicy<unsigned int, QSpinBox>::setPrecision(QSpinBox*, int)
       {
         // integal precision is ignored
       }
+      //!@endcond
 
-      /*!@brief Template specialization of setMinimum for QSpinBoxes and unsigned int.
-       */
+      //!@cond SKIPPED_DOCUMENTATION
       template<>
       inline void NumericWidgetPolicy<unsigned int, QSpinBox>::setMinimum(QSpinBox* pWidget, const unsigned int& newValue)
       {
@@ -84,9 +83,9 @@ namespace cedar
         }
         pWidget->setMinimum(static_cast<int>(new_limit));
       }
+      //!@endcond
 
-      /*!@brief Template specialization of setMaximum for QSpinBoxes and unsigned int.
-       */
+      //!@cond SKIPPED_DOCUMENTATION
       template<>
       inline void NumericWidgetPolicy<unsigned int, QSpinBox>::setMaximum(QSpinBox* pWidget, const unsigned int& newValue)
       {
@@ -102,6 +101,7 @@ namespace cedar
         }
         pWidget->setMaximum(static_cast<int>(new_limit));
       }
+      //!@endcond
     }
   }
 }

@@ -135,7 +135,10 @@ public:
 
   //! The parameter for the type.
   typedef cedar::aux::NumericParameter<ValueType> ValueParameter;
+
+  //!@cond SKIPPED_DOCUMENTATION
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ValueParameter);
+  //!@endcond
 
   //! Policy used for interfacing with the widgets.
   typedef cedar::aux::gui::NumericWidgetPolicy<ValueT, WidgetType> WidgetPolicy;

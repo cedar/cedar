@@ -56,6 +56,7 @@ namespace cedar
   {
     namespace gui
     {
+      //!@cond SKIPPED_DOCUMENTATION
       template <>
       inline bool cedar::aux::gui::VectorParameterAbstraction<bool, QCheckBox>::connectValueChange
                   (
@@ -65,14 +66,17 @@ namespace cedar
       {
         return QObject::connect(pWidget, SIGNAL(stateChanged(int)), pParameter, SLOT(widgetValueChanged(int)));
       }
+      //!@endcond
 
-
+      //!@cond SKIPPED_DOCUMENTATION
       template<>
       inline bool cedar::aux::gui::VectorParameterAbstraction<bool, QCheckBox>::getValue(QCheckBox* pWidget)
       {
         return pWidget->checkState() == Qt::Checked;
       }
+      //!@endcond
 
+      //!@cond SKIPPED_DOCUMENTATION
       template<>
       inline void cedar::aux::gui::VectorParameterAbstraction<bool, QCheckBox>::setValue
                   (
@@ -89,6 +93,7 @@ namespace cedar
           pWidget->setCheckState(Qt::Unchecked);
         }
       }
+      //!@endcond
     }
   }
 }

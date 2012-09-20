@@ -58,6 +58,7 @@ namespace cedar
   {
     namespace gui
     {
+      //!@cond SKIPPED_DOCUMENTATION
       template <>
       inline bool VectorParameterAbstraction<unsigned int, QSpinBox>::connectValueChange
                   (
@@ -67,14 +68,17 @@ namespace cedar
       {
         return QObject::connect(pWidget, SIGNAL(valueChanged(int)), pParameter, SLOT(widgetValueChanged(int)));
       }
+      //!@endcond
 
-
+      //!@cond SKIPPED_DOCUMENTATION
       template<>
       inline unsigned int VectorParameterAbstraction<unsigned int, QSpinBox>::getValue(QSpinBox* pWidget)
       {
         return pWidget->value();
       }
+      //!@endcond
 
+      //!@cond SKIPPED_DOCUMENTATION
       template<>
       inline void VectorParameterAbstraction<unsigned int, QSpinBox>::setValue
                   (
@@ -84,7 +88,9 @@ namespace cedar
       {
         pWidget->setValue(value);
       }
+      //!@endcond
 
+      //!@cond SKIPPED_DOCUMENTATION
       template<>
       inline void NumericVectorParameterAbstraction<unsigned int, QSpinBox>::setMinimum
                   (
@@ -99,7 +105,9 @@ namespace cedar
         }
         pWidget->setMinimum(minimum);
       }
+      //!@endcond
 
+      //!@cond SKIPPED_DOCUMENTATION
       template<>
       inline void NumericVectorParameterAbstraction<unsigned int, QSpinBox>::setMaximum
                   (
@@ -114,6 +122,7 @@ namespace cedar
         }
         pWidget->setMaximum(maximum);
       }
+      //!@endcond
     }
   }
 }

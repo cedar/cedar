@@ -53,11 +53,13 @@ namespace cedar
   {
     namespace gui
     {
+      //!@cond SKIPPED_DOCUMENTATION
       template<>
       inline void NumericWidgetPolicy<int, QSpinBox>::setPrecision(QSpinBox*, int)
       {
         // integal precision is ignored
       }
+      //!@endcond
     }
   }
 }

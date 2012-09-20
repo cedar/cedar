@@ -216,7 +216,9 @@ namespace cedar
       //!@brief The singleton instance of the kernel factory manager.
       typedef cedar::aux::Singleton<FactoryManager> FactoryManagerSingleton;
 
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_INSTANTIATE_AUX_TEMPLATE(FactoryManagerSingleton);
+      //!@endcond
     }
   }
 }

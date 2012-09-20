@@ -630,7 +630,7 @@ namespace cedar
         }
       }
 
-      /*! @brief calculates the rigid from the given adjoint transformation
+      /*!@brief calculates the rigid from the given adjoint transformation
        * Convenience function giving the result as a return value. This is
        * slightly slower than the standard version.
        * @param[in] rAdjointTransformation adjoint transformation matrix,

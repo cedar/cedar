@@ -113,16 +113,19 @@ public:
    */
   std::string getPath() const;
 
+  //!@brief Old version of the setValue method.
   CEDAR_DECLARE_DEPRECATED(void set(const std::string& value))
   {
     this->setValue(value);
   }
 
+  //!@brief Old version of the setValue method.
   CEDAR_DECLARE_DEPRECATED(void set(const QDir& value))
   {
     this->setValue(value);
   }
 
+  //!@brief Old version of the getValue method.
   CEDAR_DECLARE_DEPRECATED(const QDir& get())
   {
     return this->getValue();

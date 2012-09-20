@@ -58,6 +58,7 @@ namespace cedar
   {
     namespace gui
     {
+      //!@cond SKIPPED_DOCUMENTATION
       template <>
       inline bool cedar::aux::gui::VectorParameterAbstraction<double, QDoubleSpinBox>::connectValueChange
                   (
@@ -67,14 +68,17 @@ namespace cedar
       {
         return QObject::connect(pWidget, SIGNAL(valueChanged(double)), pParameter, SLOT(widgetValueChanged(double)));
       }
+      //!@endcond
 
-
+      //!@cond SKIPPED_DOCUMENTATION
       template<>
       inline double cedar::aux::gui::VectorParameterAbstraction<double, QDoubleSpinBox>::getValue(QDoubleSpinBox* pWidget)
       {
         return pWidget->value();
       }
+      //!@endcond
 
+      //!@cond SKIPPED_DOCUMENTATION
       template<>
       inline void cedar::aux::gui::VectorParameterAbstraction<double, QDoubleSpinBox>::setValue
                   (
@@ -84,6 +88,7 @@ namespace cedar
       {
         pWidget->setValue(value);
       }
+      //!@endcond
     }
   }
 }

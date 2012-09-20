@@ -57,13 +57,13 @@ namespace cedar
   {
     namespace gui
     {
-      /*!@brief Template specialization of the setPrecision function for QDoubleSpinBox.
-       */
+      //!@cond SKIPPED_DOCUMENTATION
       template<>
       inline void NumericWidgetPolicy<double, QDoubleSpinBox>::setPrecision(QDoubleSpinBox* pWidget, int precision)
       {
         pWidget->setDecimals(precision);
       }
+      //!@endcond
     }
   }
 }

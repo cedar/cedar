@@ -54,6 +54,7 @@ namespace cedar
   {
     namespace gui
     {
+      //!@cond SKIPPED_DOCUMENTATION
       template <>
       inline bool cedar::aux::gui::VectorParameterAbstraction<int, QSpinBox>::connectValueChange
                   (
@@ -63,14 +64,18 @@ namespace cedar
       {
         return QObject::connect(pWidget, SIGNAL(valueChanged(int)), pParameter, SLOT(widgetValueChanged(int)));
       }
+      //!@endcond
 
 
+      //!@cond SKIPPED_DOCUMENTATION
       template<>
       inline int cedar::aux::gui::VectorParameterAbstraction<int, QSpinBox>::getValue(QSpinBox* pWidget)
       {
         return pWidget->value();
       }
+      //!@endcond
 
+      //!@cond SKIPPED_DOCUMENTATION
       template<>
       inline void cedar::aux::gui::VectorParameterAbstraction<int, QSpinBox>::setValue
                   (
@@ -80,6 +85,7 @@ namespace cedar
       {
         pWidget->setValue(value);
       }
+      //!@endcond
     }
   }
 }

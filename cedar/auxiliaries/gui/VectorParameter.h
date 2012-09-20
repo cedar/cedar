@@ -126,11 +126,21 @@ class cedar::aux::gui::VectorParameter : public cedar::aux::gui::Parameter,
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Type of value stored in the vector parameter.
   typedef ValueT ValueType;
+
+  //! Widget type used for displaying individual values.
   typedef WidgetT WidgetType;
+
+  //! Type of the parameter.
   typedef cedar::aux::VectorParameter<ValueT> Parameter;
+
+  //! Widget abstraction used.
   typedef Abstraction WidgetAbstraction;
+
+  //!@cond SKIPPED_DOCUMENTATION
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(Parameter);
+  //!@endcond
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -187,16 +197,19 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief Slot that is called whenever the parameter displayed by the the widget is changed.
   void parameterChanged()
   {
     this->recreateWidgets();
   }
 
+  //!@brief Slot that is called whenever the properties of the parameter displayed by the the widget is changed.
   void propertiesChanged()
   {
     this->recreateWidgets();
   }
 
+  //!@brief Slot that is called whenever the value of the parameter displayed by the the widget is changed.
   void valueChanged()
   {
     ParameterPtr parameter = this->parameter();
@@ -221,6 +234,7 @@ private:
     }
   }
 
+  //!@brief Recreates the widgets for the individual parameter entries.
   void recreateWidgets()
   {
     ParameterPtr parameter = this->parameter();
@@ -261,6 +275,7 @@ private:
     emit heightChanged();
   }
 
+  //!@brief Returns the parameter displayed by this widget as the proper type.
   inline ParameterPtr parameter()
   {
     return cedar::aux::asserted_pointer_cast<Parameter>(this->getParameter());
@@ -272,6 +287,7 @@ private:
 protected:
   // none yet
 private:
+  //! Vector of the widgets used for displaying the parameter entries.
   std::vector<WidgetType*> mWidgets;
 
 }; // class cedar::aux::gui::VectorParameter
