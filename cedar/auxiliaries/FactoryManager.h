@@ -47,9 +47,9 @@
 #include <map>
 
 
-/*!@todo describe.
+/*!@brief A manager of factories.
  *
- * @todo describe more.
+ * @tparam BaseTypePtr The type of pointer returned by the managed factories.
  */
 template <class BaseTypePtr>
 class cedar::aux::FactoryManager
@@ -71,8 +71,6 @@ private:
   FactoryManager()
   {
   }
-
-  //!@brief Destructor
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

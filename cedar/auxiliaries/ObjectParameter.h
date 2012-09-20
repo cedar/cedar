@@ -44,9 +44,7 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief A parameter that can store objects of dynamically determined type.
  *
  * @remarks The objects cannot themselves have a parameter with the name "type".
  */

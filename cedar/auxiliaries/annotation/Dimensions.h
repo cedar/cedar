@@ -47,9 +47,10 @@
 
 // SYSTEM INCLUDES
 
-/*!@todo describe.
+/*!@brief An annotation that provides labels and descriptions for dimensions.
  *
- * @todo describe more.
+ *        Exemplary usage of this annotation includes giving meaning to the dimensions of a matrix. For example, a
+ *        two-dimensional matrix might represent space in its rows and color in its columns.
  */
 class cedar::aux::annotation::Dimensions
 :

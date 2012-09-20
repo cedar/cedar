@@ -49,9 +49,7 @@
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief A slice-plot for 3D matrices.
  */
 class cedar::aux::gui::MatrixSlicePlot3D : public cedar::aux::gui::PlotInterface
 {

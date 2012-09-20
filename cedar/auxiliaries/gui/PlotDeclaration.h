@@ -47,9 +47,7 @@
 #include <boost/enable_shared_from_this.hpp>
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief A class used for declaring a plot to the plot manager.
  */
 class cedar::aux::gui::PlotDeclaration : public boost::enable_shared_from_this<cedar::aux::gui::PlotDeclaration>
 {
@@ -101,9 +99,7 @@ private:
   // none yet
 }; // class cedar::aux::gui::PlotDeclaration
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief A templated class used for declaring a plot to the plot manager, provided for convenience.
  */
 template <class DataType, class PlotType>
 class cedar::aux::gui::PlotDeclarationTemplate : public cedar::aux::gui::PlotDeclaration
@@ -116,14 +112,13 @@ class cedar::aux::gui::PlotDeclarationTemplate : public cedar::aux::gui::PlotDec
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-
-  //!@brief Destructor
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Returns the class of the plot as a string.
   std::string getPlotClass() const
   {
     return cedar::aux::typeToString<PlotType>();

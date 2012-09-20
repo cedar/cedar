@@ -98,9 +98,7 @@ namespace cedar
   }
 }
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief A widget for displaying parameters that contain vectors of bools.
  */
 class cedar::aux::gui::BoolVectorParameter : public cedar::aux::gui::VectorParameter<bool, QCheckBox>
 {
