@@ -69,7 +69,26 @@ cedar::proc::gui::IdeApplication::IdeApplication(int& argc, char** argv)
 QApplication(argc, argv),
 mpIde (NULL)
 {
-  this->mpIde = new cedar::proc::gui::Ide();
+  QStringList args = QCoreApplication::arguments();
+
+  if (args.contains("--help"))
+  {
+    std::cout << "Possible command line arguments:" << std::endl;
+    std::cout << std::endl;
+    std::cout << "--no-plugins\tStart without loading any plugins." << std::endl;
+    std::cout << "--help\tDisplay this help text." << std::endl;
+
+    ::exit(0);
+  }
+
+  bool no_plugins = args.contains("--no-plugins");
+
+  if (no_plugins)
+  {
+    std::cout << "-- Starting without plugins." << std::endl;
+  }
+
+  this->mpIde = new cedar::proc::gui::Ide(!no_plugins);
 
   QObject::connect(this, SIGNAL(exception(const QString&)), this->mpIde, SLOT(exception(const QString&)));
 }

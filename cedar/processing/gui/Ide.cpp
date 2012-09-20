@@ -67,14 +67,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::gui::Ide::Ide()
+cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins)
 {
   this->setupUi(this);
 
   // first, setup the log to receive messages
   this->mpLog->installHandlers(true);
 
-  this->loadDefaultPlugins();
+  if (loadDefaultPlugins)
+  {
+    this->loadDefaultPlugins();
+  }
   this->resetStepList();
 
   this->mpArchitectureToolBox->setView(this->mpProcessingDrawer);
