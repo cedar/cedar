@@ -75,11 +75,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief convenience function for accessing the strength of the boost
   inline double getStrength() const
   {
     return this->_mStrength->getValue();
   }
 
+  //!@brief convenience function for accessing the activity flag
   inline bool isActive() const
   {
     return this->_mActive->getValue();

@@ -70,6 +70,7 @@ public:
 public slots:
   //!@brief This slot is connected to the valueChanged() event of the limit parameters.
   void limitsChanged();
+  //!@brief This slot takes care of size changes.
   void outputSizesChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -151,9 +152,11 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief
+  //!@brief the lower limit of the mapped interval
   cedar::aux::DoubleParameterPtr _mLowerLimit;
+  //!@brief the upper limit of the mapped interval
   cedar::aux::DoubleParameterPtr _mUpperLimit;
+  //!@brief the number of bins representing the mapped interval
   cedar::aux::UIntParameterPtr _mNumberOfBins;
 
 private:

@@ -49,13 +49,6 @@
 #include <boost/lexical_cast.hpp>
 #include <fstream>
 
-
-/*! @file Main file for fwfwCameraSaveCapabilities - a tool for firewire cameras
- *
- *  A short program to search for all cameras on the firewire bus and save their capabilities to configuration files
- *
- */
-
 // ------------------------------------------------------------------------------------------------------------------
 // The filename where the capabilies of the cameras should be stored in
 // This file could be used as the capability file of this camera
@@ -130,6 +123,8 @@ namespace
 } //end anon namespace
 
 // ------------------------------------------------------------------------------------------------------------------
+/*! A short program to search for all cameras on the firewire bus and save their capabilities to configuration files
+  */
 int main(int , char**)
 {
 
