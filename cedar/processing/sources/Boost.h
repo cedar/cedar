@@ -49,9 +49,7 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief A uniform activation boost.
  */
 class cedar::proc::sources::Boost : public cedar::proc::Step
 {

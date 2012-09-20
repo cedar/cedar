@@ -49,9 +49,7 @@
 #include <opencv2/opencv.hpp>
 #include <fftw3.h>
 
-/*!@brief @todo describe
- *
- * @todo describe more.
+/*!@brief A convolution engine based on the FFTW library.
  */
 class cedar::aux::conv::FFTW : public cedar::aux::conv::Engine
 {
@@ -63,9 +61,7 @@ class cedar::aux::conv::FFTW : public cedar::aux::conv::Engine
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-
-  //!@brief Destructor
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

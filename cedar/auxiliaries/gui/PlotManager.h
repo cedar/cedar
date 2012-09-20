@@ -47,9 +47,7 @@
 // SYSTEM INCLUDES
 #include <set>
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief A manager for different types of plots
  */
 class cedar::aux::gui::PlotManager
 {
@@ -61,9 +59,7 @@ class cedar::aux::gui::PlotManager
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-
-  //!@brief Destructor
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

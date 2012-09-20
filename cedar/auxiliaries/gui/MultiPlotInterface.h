@@ -44,9 +44,7 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief An interface that indicates that a plot is capable of plotting more than one data object at a time.
  */
 class cedar::aux::gui::MultiPlotInterface : public cedar::aux::gui::PlotInterface
 {
@@ -65,6 +63,11 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Append the given data to the plot.
+   *
+   * @param data  The data to append.
+   * @param title The tilte (legend entry) of the data object.
+   */
   void append(cedar::aux::DataPtr data, const std::string& title)
   {
     //!@todo Move into cpp file
@@ -85,6 +88,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //! Actual implementation of the appending is deferred to the sub-classes.
   virtual void doAppend(cedar::aux::DataPtr data, const std::string& title) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------

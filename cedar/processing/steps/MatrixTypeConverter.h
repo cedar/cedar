@@ -50,9 +50,7 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief A processing step that converts a matrix to a specific type.
  */
 class cedar::proc::steps::MatrixTypeConverter : public cedar::proc::Step
 {

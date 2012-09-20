@@ -47,9 +47,14 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
+/*!@brief Base class for annotations.
  *
- * @todo describe more.
+ *        Annotations can be used to give meaning to objects that are cedar::aux::annotation::Annotatable. This adds the
+ *        possiblity to add semantic meaning at run-time, providing more flexibility than classes and inheritance.
+ *
+ *        Examples for the use of annotations include: matrix data can be annotated with a
+ *        cedar::aux::annotation::ColorSpace to indicate that it contains an image rather than a standard matrix. This
+ *        can then be interpreted, e.g., by the plotting system and let it know to automatically open an image plot.
  */
 class cedar::aux::annotation::Annotation : public virtual cedar::aux::CloneableBase<cedar::aux::annotation::Annotation>
 {

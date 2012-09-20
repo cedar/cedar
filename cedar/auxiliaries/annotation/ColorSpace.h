@@ -47,9 +47,10 @@
 
 // SYSTEM INCLUDES
 
-/*!@todo describe.
+/*!@brief An annotation that indicates a certain color space.
  *
- * @todo describe more.
+ *        The color space annotation has a number of channes, and each channel can have a specific meaning. For example,
+ *        channel one can be red, channel two green, and channel three blue to indicate an RGB color space.
  */
 class cedar::aux::annotation::ColorSpace
 :
