@@ -59,12 +59,16 @@ namespace cedar
   {
     namespace gui
     {
+      /*!@brief Template specialization of setPrecision for QSpinBoxes.
+       */
       template<>
       inline void NumericWidgetPolicy<unsigned int, QSpinBox>::setPrecision(QSpinBox*, int)
       {
         // integal precision is ignored
       }
 
+      /*!@brief Template specialization of setMinimum for QSpinBoxes and unsigned int.
+       */
       template<>
       inline void NumericWidgetPolicy<unsigned int, QSpinBox>::setMinimum(QSpinBox* pWidget, const unsigned int& newValue)
       {
@@ -81,6 +85,8 @@ namespace cedar
         pWidget->setMinimum(static_cast<int>(new_limit));
       }
 
+      /*!@brief Template specialization of setMaximum for QSpinBoxes and unsigned int.
+       */
       template<>
       inline void NumericWidgetPolicy<unsigned int, QSpinBox>::setMaximum(QSpinBox* pWidget, const unsigned int& newValue)
       {
@@ -113,6 +119,7 @@ class cedar::aux::gui::UIntParameter : public cedar::aux::gui::NumericParameter<
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //! Base class of this class.
   typedef cedar::aux::gui::NumericParameter<unsigned int, QSpinBox> Base;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -141,6 +148,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //! Method that is called when the parameter displayed by the widget changes.
   void parameterChanged();
 
 private slots:

@@ -48,9 +48,9 @@
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
 
-/*!@brief A templated version of cedar::aux::Data.
+/*!@brief   A templated version of cedar::aux::Data.
  *
- * @todo More detailed description of the class.
+ * @tparam  T Type stored in the data object.
  *
  * @remarks Usually, you should not include the header for this class directly. Rather, include the headers of its
  *          instantiations: e.g., for cedar::aux::MatData, include cedar/auxiliaries/MatData.h.
@@ -66,6 +66,7 @@ class cedar::aux::DataTemplate : public cedar::aux::Data
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! The type being stored in this data object.
   typedef T DataType;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -129,8 +130,10 @@ private:
 protected:
   //!@brief the internal data
   T mData;
+
 private:
   // none yet
+
 }; // class cedar::aux::DataTemplate
 
 #endif // CEDAR_AUX_DATA_TEMPLATE_H

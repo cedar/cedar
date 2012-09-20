@@ -49,8 +49,7 @@
 // SYSTEM INCLUDES
 
 
-/*! \class cedar::dev::sensors::visual::CameraCapabilities
- *  \brief This class manages the capabilities of a camera
+/*!@brief This class manages the capabilities of a camera
  */
 class cedar::dev::sensors::visual::CameraCapabilities
 :

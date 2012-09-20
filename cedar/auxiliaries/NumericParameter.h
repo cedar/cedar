@@ -58,7 +58,9 @@ class cedar::aux::NumericParameter : public cedar::aux::ParameterTemplate<T>
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //! The super class of this class.
   typedef cedar::aux::ParameterTemplate<T> Super;
+
 public:
   //! Type of limits used by this parameter.
   typedef cedar::aux::math::Limits<T> LimitType;
@@ -168,9 +170,10 @@ public:
     this->setValue(this->getValue());
   }
 
-  /*!@brief set the value of type T of this parameter
+  /*!@brief Set the value of type T of this parameter.
    *
-   * @param lock Whether the method should take care of properly locking the parameter.
+   * @param value The value to set.
+   * @param lock  Whether the method should take care of properly locking the parameter.
    */
   void setValue(const T& value, bool lock = false)
   {

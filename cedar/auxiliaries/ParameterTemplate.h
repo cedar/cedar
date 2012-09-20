@@ -49,10 +49,12 @@
 #include <iostream>
 #include <boost/function.hpp>
 
-/*!@brief A generic template for parameters stored in a cedar::aux::Configurable.
+/*!@brief  A generic template for parameters stored in a cedar::aux::Configurable.
  *
- *        This class stores the value of a parameter and offers access to the value via standard functions. All
- *        parameter implementations should inherit this as a base class.
+ *         This class stores the value of a parameter and offers access to the value via standard functions. All
+ *         parameter implementations should inherit this as a base class.
+ *
+ * @tparam T Type of the value stored as a parameter.
  */
 template <typename T>
 class cedar::aux::ParameterTemplate : public cedar::aux::Parameter
@@ -98,7 +100,8 @@ public:
 
   /*!@brief set the value of type T of this parameter
    *
-   * @param lock Whether the method should take care of properly locking the parameter.
+   * @param value The value to set.
+   * @param lock  Whether the method should take care of properly locking the parameter.
    */
   virtual void setValue(const T& value, bool lock = false)
   {
@@ -159,6 +162,12 @@ public:
     this->mDefault = value;
   }
 
+  /*!@brief Sets the validator function that is called before setting a new value.
+   *
+   *        This validator function should throw an exception when it detects an error in the new value.
+   *
+   * @param validator Validator function.
+   */
   void setValidator(boost::function<void(const T&)> validator)
   {
     mValidator = validator;

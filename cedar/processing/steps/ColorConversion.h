@@ -113,6 +113,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Returns the color space into which the input is transformed.
+   */
   inline ColorSpace::Id getTargetColorSpace() const
   {
     return this->_mTargetType->getValue();
@@ -149,6 +151,7 @@ private slots:
   //!@brief Updates the color space of the target image.
   void updateTargetImageColorSpace();
 
+  //!@brief Computes the output again.
   void recompute();
 
   //--------------------------------------------------------------------------------------------------------------------

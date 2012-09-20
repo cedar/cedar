@@ -55,12 +55,15 @@ class cedar::aux::CloneableBase
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! The type returned by the clone function.
   typedef ReturnedT ReturnedType;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Virtual base destructor.
+   */
   virtual ~CloneableBase()
   {
   }
@@ -69,10 +72,17 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Returns a clone of this object.
   virtual boost::shared_ptr<ReturnedType> clone() const = 0;
 };
 
-/*!@brief A class that implements the clone function based on a class's copy constructor.
+/*!@brief  A class that implements the clone function based on a class's copy constructor.
+ *
+ *         Any class that uses this interface can be cloned automatically. To use, simply inherit from this interface
+ *         with the appropriate template arguments.
+ *
+ * @tparam ClonedT   The type that is being cloned.
+ * @tparam ReturnedT The type that is returned; usually, the common base class in a hierarchy of cloneable objects.
  */
 template <class ClonedT, class ReturnedT>
 class cedar::aux::Cloneable : public virtual cedar::aux::CloneableBase<ReturnedT>
@@ -81,14 +91,17 @@ class cedar::aux::Cloneable : public virtual cedar::aux::CloneableBase<ReturnedT
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! The type of the object being cloned.
   typedef ClonedT ClonedType;
+
+  //! The type used to return the object.
   typedef ReturnedT ReturnedType;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Destructor
+  //!@brief Destructor.
   virtual ~Cloneable()
   {
   }
@@ -121,15 +134,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-private:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
 private:
   // none yet
 

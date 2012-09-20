@@ -65,6 +65,8 @@ class cedar::proc::steps::MatrixTypeConverter : public cedar::proc::Step
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Enum class for specifying a matrix type.
+   */
   class MatrixType
   {
     public:
@@ -117,6 +119,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Returns the type to which the matrix should be converted.
+   */
   inline MatrixType::Id getTargetType() const
   {
     return this->_mTargetType->getValue();
