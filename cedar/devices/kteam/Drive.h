@@ -82,14 +82,14 @@ public:
    */
   virtual void setEncoders(const std::vector<int>& encoders);
 
-  // documented in base class
+  //! @see Base class.
   virtual void reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // documented in base class
+  //! @see Base class.
   virtual void sendMovementCommand();
 
   //!@brief Returns the character used to start a command which sets the robots speed.
@@ -116,6 +116,7 @@ protected:
    * The method throws an exception when the answer is not correct.
    * @param[in] answer the answer to check
    * @param[in] command the command string producing the received answer
+   * @param[in] expectedAnswer The answer expected from the robot.
    */
   void checkAnswer(const std::string& answer, const std::string& command, const std::string& expectedAnswer = "") const;
 

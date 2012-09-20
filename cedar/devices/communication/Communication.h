@@ -78,9 +78,9 @@ public:
    */
   virtual void send(const std::string& command) = 0;
 
-  /*!@brief Receives a string from the device.
-   *@param answer Variable the received string shall be stored in.
-   *@return number of received bytes on success and 0 in case of an error.
+  /*!@brief  Receives a string from the device.
+   *
+   * @return The received string.
    */
   virtual std::string receive() = 0;
 
