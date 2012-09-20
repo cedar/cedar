@@ -49,12 +49,8 @@
 #include <boost/lexical_cast.hpp>
 
 
-/*! @file Main file for fwCamInfo - a tool for firewire cameras
- *
- *  A short program to display informations and capabilities of the properties of a given camera on the firewire bus
- *
+/*! A short program to display informations and capabilities of the properties of a given camera on the firewire bus
  */
-
 int main(int argc, char *argv[])
 {
 

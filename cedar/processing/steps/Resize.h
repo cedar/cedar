@@ -150,6 +150,9 @@ protected:
                                     cedar::aux::ConstDataPtr data
                                   ) const;
 
+  /*!@brief reads a configuration from a node
+   * @param node the said node
+   */
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
   //--------------------------------------------------------------------------------------------------------------------

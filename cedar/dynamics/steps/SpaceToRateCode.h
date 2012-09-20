@@ -65,36 +65,37 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief
+  //!@brief convenience function for accessing the lower limit
   inline double getLowerLimit() const
   {
     return this->_mLowerLimit->getValue();
   }
 
-  //!@brief
+  //!@brief convenience function for setting the lower limit
   inline void setLowerLimit(double lowerLimit)
   {
     this->_mLowerLimit->setValue(lowerLimit);
   }
 
-  //!@brief
+  //!@brief convenience function for accessing the upper limit
   inline double getUpperLimit() const
   {
     return this->_mUpperLimit->getValue();
   }
 
-  //!@brief
+  //!@brief convenience function for setting the upper limit
   inline void setUpperLimit(double upperLimit)
   {
     this->_mUpperLimit->setValue(upperLimit);
   }
 
+  //!@brief convenience function for accessing tau
   inline double getTau() const
   {
     return this->_mTau->getValue();
   }
 
-  //!@brief
+  //!@brief convenience function for setting tau
   inline void setTau(double tau)
   {
     this->_mTau->setValue(tau);
@@ -144,9 +145,11 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief
+  //!@brief the lower limit of the mapped interval
   cedar::aux::DoubleParameterPtr _mLowerLimit;
+  //!@brief the upper limit of the mapped interval
   cedar::aux::DoubleParameterPtr _mUpperLimit;
+  //!@brief the relaxation parameter of the dynamical system
   cedar::aux::DoubleParameterPtr _mTau;
 
 private:

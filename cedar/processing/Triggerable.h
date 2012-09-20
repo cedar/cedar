@@ -82,9 +82,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief    Handles an external trigger signal.
-   *
-   * @param    pSender The trigger that sent the trigger signal.
+  /*!@brief handles an external trigger signal.
+   * @param args arguments that should be passed to the Triggerable.
+   * @param pSender The trigger that sent the trigger signal.
    */
   virtual void onTrigger
                (
