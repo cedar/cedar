@@ -46,7 +46,7 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief
+/*!@brief A step that converts space code to rate code.
  */
 class cedar::dyn::SpaceToRateCode : public cedar::dyn::Dynamics
 {

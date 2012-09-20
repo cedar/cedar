@@ -100,10 +100,10 @@ public:
     return *(this->mEnumDeclaration);
   }
 
-  //! Disables the given option.
+  //!@brief Disables the given option.
   void disable(cedar::aux::EnumId value);
 
-  //! Enables the given option.
+  //!@brief Enables the given option.
   void enable(cedar::aux::EnumId value);
 
   //! Enables or disables the given option

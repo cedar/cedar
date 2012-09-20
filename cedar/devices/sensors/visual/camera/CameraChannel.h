@@ -33,7 +33,7 @@
     Credits:
 
 ======================================================================================================================*/
-//newfile
+
 #ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_CHANNEL_H
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_CHANNEL_H
 
@@ -50,13 +50,7 @@
 
 // SYSTEM INCLUDES
 
-
-/*!@brief Base class of the misc camera grabber backends.
- *
- * Implements the common features of a camera device
- */
-  /*! @struct CameraChannel
-   *  @brief Additional data of a camera channel
+  /*!@brief Additional data of a camera channel
    */
   struct cedar::dev::sensors::visual::CameraChannel
   :
@@ -130,8 +124,6 @@
     /// Camera needs to apply a bayer pattern filter
     cedar::aux::EnumParameterPtr _mpDebayerFilter;
 
-
-
     /// The lock for the concurrent access to the cv::VideoCapture
     QReadWriteLock* mpVideoCaptureLock;
 
@@ -140,7 +132,6 @@
 
     // contains all properties
     cedar::dev::sensors::visual::CameraPropertiesPtr mpProperties;
-
 
     /// Camera interface
     cv::VideoCapture mVideoCapture;
@@ -151,11 +142,6 @@
   };
 
   //CEDAR_GENERATE_POINTER_TYPES(CameraChannel);
-
-
-  //!@endcond
-
-
 
 #endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_CHANNEL_H
 

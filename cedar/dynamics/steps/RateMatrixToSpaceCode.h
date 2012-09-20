@@ -47,7 +47,7 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief
+/*!@brief A step that converts a 2-dimensional matrix of rate code values to a 3-dimensional matrix of space code.
  */
 class cedar::dyn::RateMatrixToSpaceCode : public cedar::proc::Step
 {

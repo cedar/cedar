@@ -47,12 +47,21 @@
 
 // SYSTEM INCLUDES
 
+/*!@brief Class that abstracts the interface of widgets used for numeric parameter vectors.
+ *
+ *        The behavior for different widget and value types can be overridden by template specialization.
+ */
 template <typename ValueT, class WidgetT>
 class cedar::aux::gui::NumericVectorParameterAbstraction
 :
 public cedar::aux::gui::VectorParameterAbstraction<ValueT, WidgetT>
 {
   public:
+    /*!@brief Applies properties of a given parameter to the given widget.
+     *
+     * @param pWidget   Widget to which to apply the parameters.
+     * @param parameter Parameter whose properties to apply.
+     */
     static void applyProperties(WidgetT* pWidget, boost::intrusive_ptr<cedar::aux::VectorParameter<ValueT> > parameter)
     {
       typedef cedar::aux::NumericVectorParameter<ValueT> NumericVector;
@@ -65,20 +74,28 @@ public cedar::aux::gui::VectorParameterAbstraction<ValueT, WidgetT>
       pWidget->blockSignals(signals_blocked);
     }
 
+    /*!@brief Sets the minimum allowed value in the widget.
+     *
+     * @param pWidget Widget for which to set the value.
+     * @param limit   The minimum value for the widget.
+     */
     static void setMinimum(WidgetT* pWidget, const ValueT& limit)
     {
       pWidget->setMinimum(limit);
     }
 
+    /*!@brief Sets the maximum allowed value in the widget.
+     *
+     * @param pWidget Widget for which to set the value.
+     * @param limit   The maximum value for the widget.
+     */
     static void setMaximum(WidgetT* pWidget, const ValueT& limit)
     {
       pWidget->setMaximum(limit);
     }
 };
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief Generic class for widgets that display numeric vector parameters.
  */
 template <typename ValueT, class WidgetT>
 class cedar::aux::gui::NumericVectorParameter : public cedar::aux::gui::VectorParameter

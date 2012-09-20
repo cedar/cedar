@@ -51,6 +51,10 @@
 #include <QVBoxLayout>
 #include <vector>
 
+/*!@brief A class that abstracts access to the widgets for a vector parameter.
+ *
+ *        Behavior in this class is overridden in template specializations.
+ */
 template <typename ValueT, class WidgetT>
 class cedar::aux::gui::VectorParameterAbstraction
 {
@@ -58,6 +62,11 @@ class cedar::aux::gui::VectorParameterAbstraction
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Creates a widget for the given index.
+   *
+   * @param index Index of the vector that the widget represents.
+   * @return The created widget.
+   */
   static WidgetT* create(unsigned int index)
   {
     WidgetT* p_widget = new WidgetT();
@@ -65,22 +74,35 @@ public:
     return p_widget;
   }
 
+  /*!@brief Connects the widget's value changed signal to the appropriate receiver.
+   *
+   * @return True if the connection was established correctly.
+   */
   static bool connectValueChange(cedar::aux::gui::Parameter* /* pParameter */, WidgetT* /* pWidget */)
   {
     // empty default implementation -- use template specialization to implement for specific classes
     return false;
   }
 
+  /*!@brief Returns the value of the given widget.
+   */
   static ValueT getValue(WidgetT*)
   {
     // empty as default implementation -- use template specialization to implement for specific classes
   }
 
+  /*!@brief Sets the given value in the given widget.
+   */
   static void setValue(WidgetT*, const ValueT&)
   {
     // empty as default implementation -- use template specialization to implement for specific classes
   }
 
+  /*!@brief Applies the parameter's properties (constancy etc.) to the widget.
+   *
+   * @param pWidget   Widget to which to apply the properties
+   * @param parameter Parameter whose properties are to be applied.
+   */
   static void applyProperties(WidgetT* pWidget, boost::intrusive_ptr<cedar::aux::VectorParameter<ValueT> > parameter)
   {
     pWidget->setDisabled(parameter->isConstant());
@@ -90,8 +112,6 @@ public:
 /*!@brief A generic base class for gui representations of cedar::aux::VectorParameters.
  *
  * @todo describe more.
- *
- * @todo Use this class for the other vector parameters as well; introduce a numeric version of it
  */
 template
 <

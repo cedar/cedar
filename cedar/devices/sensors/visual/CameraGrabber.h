@@ -78,9 +78,6 @@ public cedar::dev::sensors::visual::Grabber
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
-  //!@cond SKIPPED_DOCUMENTATION
-
-
 public:
 
 

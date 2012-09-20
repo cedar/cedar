@@ -51,34 +51,69 @@
 
 // policy for widgets
 
+/*!@brief Class that abstracts the interface for numeric widgets.
+ *
+ *        Where widgets differ from the default interface, it can be overridden via template specialization.
+ */
 template <typename ValueT, class WidgetT>
 class cedar::aux::gui::NumericWidgetPolicy
 {
   public:
+    /*!@brief Sets the value in the widget.
+     *
+     * @param pWidget  Widget whose value is to be set.
+     * @param newValue Value to set.
+     */
     static void setValue(WidgetT* pWidget, const ValueT& newValue)
     {
       pWidget->setValue(newValue);
     }
 
+    /*!@brief Gets the value from the widget.
+     *
+     * @param pWidget  Widget whose value to get.
+     */
     static ValueT getValue(WidgetT* pWidget)
     {
       return pWidget->value();
     }
 
+    /*!@brief Sets the minimal value allowed in the widget.
+     *
+     * @param pWidget  Widget whose minimum is to be set.
+     * @param newValue Minimum to be set.
+     */
     static void setMinimum(WidgetT* pWidget, const ValueT& newValue)
     {
       pWidget->setMinimum(newValue);
     }
 
+    /*!@brief Sets the maximal value allowed in the widget.
+     *
+     * @param pWidget  Widget whose maximum is to be set.
+     * @param newValue Maximum to be set.
+     */
     static void setMaximum(WidgetT* pWidget, const ValueT& newValue)
     {
       pWidget->setMaximum(newValue);
     }
 
+    /*!@brief Sets the precision of the value, i.e., the number of digits after the decimal point.
+     *
+     * @param pWidget   Widget for which the precision is to be set.
+     * @param precision New precision.
+     *
+     * @remarks This only affects widgets that display floating-point values.
+     */
     static void setPrecision(WidgetT* pWidget, int precision)
     {
     }
 
+    /*!@brief Creates a new widget of the given type.
+     *
+     * @param pParent The parent of the widget.
+     * @return The created widget.
+     */
     static WidgetT* create(QWidget *pParent = NULL)
     {
       return new WidgetT(pParent);
@@ -95,15 +130,21 @@ class cedar::aux::gui::NumericParameter : public cedar::aux::gui::Parameter,
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Type of the values stored in this widget.
   typedef ValueT ValueType;
+
+  //! The parameter for the type.
   typedef cedar::aux::NumericParameter<ValueType> ValueParameter;
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ValueParameter);
+
+  //! Policy used for interfacing with the widgets.
   typedef cedar::aux::gui::NumericWidgetPolicy<ValueT, WidgetType> WidgetPolicy;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief The constructor.
   NumericParameter(QWidget *pParent = NULL)
   :
   Parameter(pParent)
@@ -119,6 +160,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Reacts to a change of the parameter displayed by this widget.
   void parameterChanged()
   {
     ValueParameterPtr parameter = cedar::aux::asserted_pointer_cast<ValueParameter>(this->getParameter());
@@ -154,6 +196,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //! Reacts to a change in the properties of the parameter and applies them to the widget.
   void propertiesChanged()
   {
     ValueParameterPtr parameter = cedar::aux::asserted_pointer_cast<ValueParameter>(this->getParameter());
@@ -169,6 +212,7 @@ private:
     this->mpWidget->blockSignals(blocked);
   }
 
+  //! Reacts to a change in the value of the parameter and applies them to the widget.
   void valueChanged()
   {
     ValueParameterPtr parameter = cedar::aux::asserted_pointer_cast<ValueParameter>(this->getParameter());
@@ -187,6 +231,7 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //! Widget used for displaying the parameter.
   WidgetType* mpWidget;
 private:
   // none yet
