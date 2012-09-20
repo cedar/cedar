@@ -55,17 +55,18 @@
 
 /*!@brief A StepDeclaration contains the relation of a unique class id (as string) and the corresponding factory to
  * create a step of this id. It is a concretization of DeclarationBase.
- *
+ * @todo With the revised factory, passing the factory type is probably unnecessary
  */
 class cedar::proc::ElementDeclaration : public cedar::proc::DeclarationBase
                                                <
                                                  cedar::proc::Element,
-                                                 //!@todo With the revised factory, passing the factory type is probably unnecessary
                                                  cedar::aux::Factory<cedar::proc::ElementPtr>
                                                >
 {
 public:
+  //!@brief list that pairs a data role with the desired plot
   typedef std::vector<std::pair<cedar::proc::DataRole::Id, std::string> > DataList;
+  //!@brief list of plot definitions
   typedef std::vector<std::pair<std::string, DataList> > PlotDefinitionList;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -138,7 +139,7 @@ public:
   /*!@brief Defines a new plot for this type of element
    *
    * @param plotName    Name of the plot, displayed in the UI.
-   * @param dataToPlot  List of data slots to plot.
+   * @param slotsToPlot  List of data slots to plot.
    *
    * @todo  This should also be read from the plugin xml file.
    */

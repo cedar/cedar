@@ -70,6 +70,7 @@ public:
 public slots:
   //!@brief This slot is connected to the valueChanged() event of the limit parameters.
   void recompute();
+  //!@brief This slot takes care of size changes.
   void outputSizesChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -111,12 +112,17 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief
+  //!@brief the lower limits of the mapped interval for each rate-coded value
   cedar::aux::DoubleVectorParameterPtr _mLowerLimits;
+  //!@brief the upper limits of the mapped interval for each rate-coded value
   cedar::aux::DoubleVectorParameterPtr _mUpperLimits;
+  //!@brief the output sizes for each dimension representing the rate-coded values
   cedar::aux::UIntVectorParameterPtr _mOutputSizes;
+  //!@brief the amplitude of the Gaussian function
   cedar::aux::DoubleParameterPtr _mAmplitude;
+  //!@brief the sigmas of the Gaussian function
   cedar::aux::DoubleVectorParameterPtr _mSigmas;
+  //!@brief the flag determining the cyclic property of the Gaussian function
   cedar::aux::BoolParameterPtr _mIsCyclic;
 
 private:
