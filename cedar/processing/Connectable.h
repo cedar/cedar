@@ -275,6 +275,70 @@ protected:
    */
   void makeInputCollection(const std::string& name, bool isCollection = true);
 
+  //!@brief Locks all inputs.
+  inline void lockInputs() const
+  {
+    this->lockAll(this->getInputLockSet());
+  }
+
+  //!@brief Locks all buffers.
+  inline void lockBuffers() const
+  {
+    this->lockAll(this->getBufferLockSet());
+  }
+
+  //!@brief Locks all outputs.
+  inline void lockOutputs() const
+  {
+    this->lockAll(this->getOutputLockSet());
+  }
+
+  //!@brief Locks all inputs.
+  inline void unlockInputs() const
+  {
+    this->unlockAll(this->getInputLockSet());
+  }
+
+  //!@brief Locks all buffers.
+  inline void unlockBuffers() const
+  {
+    this->unlockAll(this->getBufferLockSet());
+  }
+
+  //!@brief Locks all outputs.
+  inline void unlockOutputs() const
+  {
+    this->unlockAll(this->getOutputLockSet());
+  }
+
+  //!@brief Returns the handle of the input lock set
+  inline LockSetHandle getInputLockSet() const
+  {
+    return this->getLockSetForRole(DataRole::INPUT);
+  }
+
+  //!@brief Returns the handle of the output lock set
+  inline LockSetHandle getBufferLockSet() const
+  {
+    return this->getLockSetForRole(DataRole::BUFFER);
+  }
+
+  //!@brief Returns the handle of the output lock set
+  inline LockSetHandle getOutputLockSet() const
+  {
+    return this->getLockSetForRole(DataRole::OUTPUT);
+  }
+
+  //!@brief Returns a handle for a lock set for a given role.
+  LockSetHandle getLockSetForRole(DataRole::Id role) const
+  {
+    std::map<DataRole::Id, LockSetHandle>::const_iterator iter = mRoleLockSetHandles.find(role);
+
+    CEDAR_DEBUG_ASSERT(iter != mRoleLockSetHandles.end());
+
+    return iter->second;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -367,6 +431,9 @@ private:
 
   //!@brief flag that states if all mandatory connections (i.e. inputs) are set
   bool mMandatoryConnectionsAreSet;
+
+  //!@brief Association between data roles and the corresponding lock set.
+  std::map<DataRole::Id, LockSetHandle> mRoleLockSetHandles;
 
 }; // class cedar::proc::Connectable
 
