@@ -123,6 +123,10 @@ public:
    */
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
+  /*!@brief Whether the activation is currently declared as output or buffer.
+   */
+  bool activationIsOutput() const;
+
 public slots:
   //!@brief handle a change in dimensionality, which leads to creating new matrices
   void dimensionalityChanged();
