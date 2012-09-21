@@ -69,9 +69,6 @@
  * Processing steps also have data slots that represent inputs, outputs and buffers (temporary data that can be
  * displayed in plots). Each data slot is assigned some data pointer, input slots get external data, buffer and output
  * slots must be assigned by the user, usually during the constructor.
- *
- *
- * @todo Cache the lock set used for locking the whole thread; this should give a slight speed boost to all steps.
  */
 class cedar::proc::Step : public QThread,
                           public cedar::proc::Connectable,
@@ -191,8 +188,66 @@ protected:
    */
   void addTrigger(cedar::proc::TriggerPtr trigger);
 
-  //! @brief Method that registers a function of an object so that it can be used by the framework.
+  /*!@brief Method that registers a function of an object so that it can be used by the framework.
+   *
+   * As an example, consider a class A that has a function void A::foo():
+   *
+   * @code
+   * class A : public cedar::proc::Step
+   * {
+   *   public:
+   *     void foo()
+   *     {
+   *       // ...
+   *     }
+   * }
+   * @endcode
+   *
+   * Then in A's constructor, call
+   *
+   * @code
+   * A:A()
+   * {
+   *   // ...
+   *   this->registerFunction("foo", boost::bind(&A::foo, this));
+   *   // ...
+   * }
+   * @endcode
+   *
+   */
   void registerFunction(const std::string& actionName, boost::function<void()> function);
+
+  /*!@brief Sets whether inputs and outputs are locked automatically.
+   *
+   *        By default, processing steps automatically lock all their data before calling user-supplied functionality.
+   *        This ensures thread safety, however, it may also mean that steps are locked for too long. For example, if a
+   *        step performs a very long operation in its compute function that is does not need to access the inputs or
+   *        outputs while it is running, the default behavior will lock them for the entire duration of the compute
+   *        function regardless. This can block other steps from performing calculations, thus reducing overall system
+   *        performance.
+   *
+   *        To alleviate this, steps can disable automatic locking/unlocking of inputs and outputs. The envisioned use
+   *        case for this is a compute function that looks as follows:
+   *
+   *        @code
+   * lock inputs
+   *   preprocess inputs
+   * unlock inputs
+   *
+   * do long computation
+   *
+   * lock outputs
+   *   write results from computation into outputs
+   * unlock outputs
+   *        @endcode
+   *
+   *        Buffer data will be locked in any case since it is not connected to other steps and thus cannot slow them
+   *        down.
+   *
+   *        @remarks This function is not thread safe and should only be called from the constructor as this is not
+   *                 behavior that is intended to be changed at runtime.
+   */
+  void setAutoLockInputsAndOutputs(bool autoLock);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
