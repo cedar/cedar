@@ -112,19 +112,56 @@ cedar::proc::Step::~Step()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Step::lock(cedar::aux::LOCK_TYPE parameterAccessType) const
+{
+  this->lockData();
+  this->lockParameters(parameterAccessType);
+}
+
+void cedar::proc::Step::unlock() const
+{
+  this->unlockParameters();
+  this->unlockData();
+}
+
+void cedar::proc::Step::lockData() const
+{
+  if (this->mAutoLockInputsAndOutputs)
+  {
+    this->lockAll();
+  }
+  else
+  {
+    this->lockBuffers();
+  }
+}
+
+void cedar::proc::Step::unlockData() const
+{
+  if (this->mAutoLockInputsAndOutputs)
+  {
+    // unlock all data
+    this->unlockAll();
+  }
+  else
+  {
+    this->unlockBuffers();
+  }
+}
+
 void cedar::proc::Step::callReset()
 {
   // first, reset the current state of the step (i.e., clear any exception etc. state)
   this->resetState();
 
   // lock everything
-  this->lockAll();
+  this->lock(cedar::aux::LOCK_TYPE_READ);
 
   // reset the step
   this->reset();
 
   // unlock everything
-  this->unlockAll();
+  this->unlock();
 
   this->getFinishedTrigger()->trigger();
 }
@@ -310,18 +347,8 @@ void cedar::proc::Step::run()
   // start measuring the execution time.
   clock_t lock_start = clock();
 
-  // lock all data
-  if (mAutoLockInputsAndOutputs)
-  {
-    this->lockAll();
-  }
-  else
-  {
-    this->lockBuffers();
-  }
-
-  // lock all parameters
-  this->lockParameters(cedar::aux::LOCK_TYPE_READ);
+  // lock the step
+  this->lock(cedar::aux::LOCK_TYPE_READ);
 
   clock_t lock_end = clock();
   clock_t lock_elapsed = lock_end - lock_start;
@@ -385,18 +412,8 @@ void cedar::proc::Step::run()
   clock_t run_elapsed = run_end - run_start;
   double run_elapsed_s = static_cast<double>(run_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
 
-  // unlock all parameters
-  this->unlockParameters();
-
-  if (mAutoLockInputsAndOutputs)
-  {
-    // unlock all data
-    this->unlockAll();
-  }
-  else
-  {
-    this->unlockBuffers();
-  }
+  // unlock the step
+  this->unlock();
 
   // take time measurements
   this->setRunTimeMeasurement(cedar::unit::Seconds(run_elapsed_s));
