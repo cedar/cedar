@@ -42,8 +42,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
-#include "cedar/auxiliaries/gui/MatrixPlot1D.h"
-#include "cedar/auxiliaries/gui/MatrixPlot2D.h"
+#include "cedar/auxiliaries/gui/LinePlot.h"
+#include "cedar/auxiliaries/gui/SurfacePlot.h"
 #include "cedar/auxiliaries/gui/MatrixSlicePlot3D.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
@@ -160,12 +160,12 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::DataPtr data, const std::stri
       break;
 
     case 1:
-      this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot1D(this->mData, title);
+      this->mpCurrentPlotWidget = new cedar::aux::gui::LinePlot(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
       break;
 
     case 2:
-      this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot2D(this->mData, title);
+      this->mpCurrentPlotWidget = new cedar::aux::gui::SurfacePlot(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
       break;
 

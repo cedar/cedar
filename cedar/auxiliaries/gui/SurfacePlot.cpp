@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatrixPlot2D.cpp
+    File:        SurfacePlot.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -41,7 +41,7 @@
 #define NOMINMAX // prevents MSVC conflicts
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/MatrixPlot2D.h"
+#include "cedar/auxiliaries/gui/SurfacePlot.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
 #include "cedar/auxiliaries/annotation/Dimensions.h"
@@ -60,14 +60,14 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gui::MatrixPlot2D::MatrixPlot2D(QWidget *pParent)
+cedar::aux::gui::SurfacePlot::SurfacePlot(QWidget *pParent)
 :
 cedar::aux::gui::PlotInterface(pParent)
 {
   this->init();
 }
 
-cedar::aux::gui::MatrixPlot2D::Perspective::Perspective(const std::string& name,
+cedar::aux::gui::SurfacePlot::Perspective::Perspective(const std::string& name,
                                                         double rotationX, double rotationY, double rotationZ,
                                                         double scaleX, double scaleY, double scaleZ,
                                                         double shiftX, double shiftY, double shiftZ,
@@ -87,7 +87,7 @@ mZoom(zoom)
   mShift[2]    = shiftZ;
 }
 
-cedar::aux::gui::MatrixPlot2D::MatrixPlot2D(cedar::aux::DataPtr matData, const std::string& title, QWidget *pParent)
+cedar::aux::gui::SurfacePlot::SurfacePlot(cedar::aux::DataPtr matData, const std::string& title, QWidget *pParent)
 :
 cedar::aux::gui::PlotInterface(pParent),
 mShowGridLines(false),
@@ -97,7 +97,7 @@ mppArrayData(NULL)
   this->plot(matData, title);
 }
 
-cedar::aux::gui::MatrixPlot2D::~MatrixPlot2D()
+cedar::aux::gui::SurfacePlot::~SurfacePlot()
 {
   this->deleteArrayData();
 }
@@ -106,7 +106,7 @@ cedar::aux::gui::MatrixPlot2D::~MatrixPlot2D()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gui::MatrixPlot2D::deleteArrayData()
+void cedar::aux::gui::SurfacePlot::deleteArrayData()
 {
   if (mppArrayData != NULL)
   {
@@ -118,7 +118,7 @@ void cedar::aux::gui::MatrixPlot2D::deleteArrayData()
   }
 }
 
-void cedar::aux::gui::MatrixPlot2D::updateArrayData()
+void cedar::aux::gui::SurfacePlot::updateArrayData()
 {
   cv::Mat data;
   this->mMatData->lockForRead();
@@ -157,7 +157,7 @@ void cedar::aux::gui::MatrixPlot2D::updateArrayData()
   }
 }
 
-void cedar::aux::gui::MatrixPlot2D::Perspective::applyTo(Qwt3D::Plot3D* pPlot)
+void cedar::aux::gui::SurfacePlot::Perspective::applyTo(Qwt3D::Plot3D* pPlot)
 {
   pPlot->setRotation(mRotation[0], mRotation[1], mRotation[2]);
   pPlot->setScale(mScale[0], mScale[1], mScale[2]);
@@ -165,20 +165,20 @@ void cedar::aux::gui::MatrixPlot2D::Perspective::applyTo(Qwt3D::Plot3D* pPlot)
   pPlot->setZoom(mZoom);
 }
 
-void cedar::aux::gui::MatrixPlot2D::plot(cedar::aux::DataPtr data, const std::string& /* title */)
+void cedar::aux::gui::SurfacePlot::plot(cedar::aux::DataPtr data, const std::string& /* title */)
 {
   this->mMatData = boost::shared_dynamic_cast<cedar::aux::MatData>(data);
 
   if (!this->mMatData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
-                "Could not cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot2D::plot.");
+                "Could not cast to cedar::aux::MatData in cedar::aux::gui::SurfacePlot::plot.");
   }
 
   this->startTimer(60); //!@todo make the refresh time configurable.
 }
 
-void cedar::aux::gui::MatrixPlot2D::init()
+void cedar::aux::gui::SurfacePlot::init()
 {
   this->mPerspectives.push_back(Perspective("default",
                                             90, 0, -90,
@@ -216,7 +216,7 @@ void cedar::aux::gui::MatrixPlot2D::init()
   mDataRows = mDataCols = 0;
 }
 
-void cedar::aux::gui::MatrixPlot2D::timerEvent(QTimerEvent * /* pEvent */)
+void cedar::aux::gui::SurfacePlot::timerEvent(QTimerEvent * /* pEvent */)
 {
   if (this->isVisible() && this->mMatData)
   {
@@ -232,7 +232,7 @@ void cedar::aux::gui::MatrixPlot2D::timerEvent(QTimerEvent * /* pEvent */)
 }
 
 
-void cedar::aux::gui::MatrixPlot2D::applyLabels()
+void cedar::aux::gui::SurfacePlot::applyLabels()
 {
   try
   {
@@ -257,7 +257,7 @@ void cedar::aux::gui::MatrixPlot2D::applyLabels()
       cedar::aux::LogSingleton::getInstance()->debugMessage
       (
         "Wrong number of entries in dimension annotations.",
-        "cedar::aux::gui::MatrixPlot2D::plot"
+        "cedar::aux::gui::SurfacePlot::plot"
       );
     }
   }
@@ -267,14 +267,14 @@ void cedar::aux::gui::MatrixPlot2D::applyLabels()
   }
 }
 
-void cedar::aux::gui::MatrixPlot2D::resetPerspective(size_t perspectiveIndex)
+void cedar::aux::gui::SurfacePlot::resetPerspective(size_t perspectiveIndex)
 {
   CEDAR_ASSERT(perspectiveIndex < this->mPerspectives.size());
   Perspective& perspective = this->mPerspectives.at(perspectiveIndex);
   perspective.applyTo(this->mpPlot);
 }
 
-void cedar::aux::gui::MatrixPlot2D::showGrid(bool show)
+void cedar::aux::gui::SurfacePlot::showGrid(bool show)
 {
   this->mShowGridLines = show;
   if (show)
@@ -289,7 +289,7 @@ void cedar::aux::gui::MatrixPlot2D::showGrid(bool show)
   }
 }
 
-void cedar::aux::gui::MatrixPlot2D::contextMenuEvent(QContextMenuEvent * pEvent)
+void cedar::aux::gui::SurfacePlot::contextMenuEvent(QContextMenuEvent * pEvent)
 {
   QMenu menu(this);
 
