@@ -113,7 +113,7 @@ int main(int, char**)
   {
     cedar::proc::NetworkPtr network(new cedar::proc::Network());
     cedar::proc::ElementPtr elem = declaration_registry->allocateClass(declaration->second->getClassId());
-    if (cedar::proc::StepPtr step = cedar::aux::asserted_pointer_cast<cedar::proc::Step>(elem))
+    if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(elem))
     {
       std::cout << "Testing class " << declaration->second->getClassId() << std::endl;
       network->readFile("processing_steps.json");
