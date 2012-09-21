@@ -181,6 +181,8 @@ _mSigmoid
 _mLateralKernelConvolution(new cedar::aux::conv::Convolution()),
 _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 {
+  this->setAutoLockInputsAndOutputs(false);
+
   this->declareBuffer("activation", mActivation);
   this->declareBuffer("lateral interaction", mLateralInteraction);
   this->declareBuffer("lateral kernel", this->_mLateralKernelConvolution->getCombinedKernel());
@@ -252,9 +254,14 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::dyn::NeuralField::activationIsOutput() const
+{
+  return this->_mOutputActivation->getValue();
+}
+
 void cedar::dyn::NeuralField::activationAsOutputChanged()
 {
-  bool act_is_output = this->_mOutputActivation->getValue();
+  bool act_is_output = this->activationIsOutput();
   static std::string slot_name = "activation";
 
   if (act_is_output)
@@ -400,11 +407,15 @@ void cedar::dyn::NeuralField::readConfiguration(const cedar::aux::ConfigurationN
 
 void cedar::dyn::NeuralField::reset()
 {
+  // these buffers are still locked automatically
   this->mActivation->getData() = mRestingLevel->getValue();
-  this->mSigmoidalActivation->getData() = cv::Scalar(0);
   this->mLateralInteraction->getData() = cv::Scalar(0);
   this->mInputNoise->getData() = cv::Scalar(0);
   this->mNeuralNoise->getData() = cv::Scalar(0);
+
+  this->lockOutputs();
+  this->mSigmoidalActivation->getData() = cv::Scalar(0);
+  this->unlockOutputs();
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
@@ -436,11 +447,10 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
 void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 {
   // get all members needed for the Euler step
-  cv::Mat& u = this->mActivation->getData();
-  cv::Mat& sigmoid_u = this->mSigmoidalActivation->getData();
   cv::Mat& lateral_interaction = this->mLateralInteraction->getData();
   cv::Mat& input_noise = this->mInputNoise->getData();
   cv::Mat& neural_noise = this->mNeuralNoise->getData();
+  cv::Mat& u = this->mActivation->getData();
   cv::Mat& input_sum = this->mInputSum->getData();
   const double& h = mRestingLevel->getValue();
   const double& tau = mTau->getValue();
@@ -449,6 +459,13 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   cedar::aux::conv::ConvolutionPtr convolution_ptr = this->getConvolution();
   cedar::aux::conv::Convolution& lateral_convolution = *convolution_ptr;
 
+  if (this->activationIsOutput())
+  {
+    this->mActivation->lockForRead();
+  }
+
+  QWriteLocker sigmoid_u_lock(&this->mSigmoidalActivation->getLock());
+  cv::Mat& sigmoid_u = this->mSigmoidalActivation->getData();
   // if the neural noise correlation kernel has an amplitude != 0, create new random values and convolve
   if (mNoiseCorrelationKernel->getAmplitude() != 0.0)
   {
@@ -468,7 +485,9 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
     // calculate output
     sigmoid_u = _mSigmoid->getValue()->compute<float>(u);
   }
+  sigmoid_u_lock.unlock();
 
+  QReadLocker sigmoid_u_readlock(&this->mSigmoidalActivation->getLock());
   lateral_interaction = lateral_convolution(sigmoid_u);
 
   this->updateInputSum();
@@ -487,8 +506,19 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   d_u += 1.0 / sqrt(cedar::unit::Milliseconds(time)/cedar::unit::Milliseconds(1.0))
          *_mInputNoiseGain->getValue() * input_noise;
 
+  if (this->activationIsOutput())
+  {
+    this->mActivation->unlock();
+    this->mActivation->lockForWrite();
+  }
+
   // integrate one time step
   u += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau) * d_u;
+
+  if (this->activationIsOutput())
+  {
+    this->mActivation->unlock();
+  }
 }
 
 void cedar::dyn::NeuralField::updateInputSum()
@@ -504,6 +534,7 @@ void cedar::dyn::NeuralField::updateInputSum()
     cedar::aux::DataPtr input = input_slot->getData(i);
     if (input)
     {
+      QReadLocker locker(&input->getLock());
       //!@todo This is probably slow -- store the type of each input and static_cast instead.
       cv::Mat& input_mat = input->getData<cv::Mat>();
 
