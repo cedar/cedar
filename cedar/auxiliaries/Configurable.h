@@ -158,11 +158,11 @@ public:
 
   /*!@brief Locks all parameters of the configurable.
    */
-  void lockParameters(cedar::aux::LOCK_TYPE lockType);
+  void lockParameters(cedar::aux::LOCK_TYPE lockType) const;
 
   /*!@brief Unlocks all parameters of the configurable.
    */
-  void unlockParameters();
+  void unlockParameters() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -224,7 +224,7 @@ private:
    *
    * @remarks In order to avoid multiple inheritance down the line, configurable has, rather than is, a lockable.
    */
-  std::set<QReadWriteLock*> mParameterLocks;
+  mutable std::set<QReadWriteLock*> mParameterLocks;
 }; // class cedar::aux::Configurable
 
 #endif // CEDAR_AUX_CONFIGURABLE_H

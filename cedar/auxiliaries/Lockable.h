@@ -46,6 +46,7 @@
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
+#include <set>
 
 /*!@brief Base class for strutures that can be locked in their entierety.
  *
@@ -61,11 +62,20 @@ class cedar::aux::Lockable
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  //! A handle to a lock set.
+  typedef unsigned int LockSetHandle;
+
+  //! Storage for locks in this class.
+  typedef std::multiset<std::pair<QReadWriteLock*, cedar::aux::LOCK_TYPE> > Locks;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief The constructor.
+  Lockable();
+
   //!@brief Destructor
   virtual ~Lockable();
 
@@ -74,20 +84,26 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Locks all locks associated with this object.
-  void lockAll();
+  void lockAll(LockSetHandle lockSet = 0) const;
 
   //!@brief Unlocks all locks associated with this object.
-  void unlockAll();
+  void unlockAll(LockSetHandle lockSet = 0) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief Add a lock to the set of locks of the lockable.
-  void addLock(QReadWriteLock* pLock, cedar::aux::LOCK_TYPE lockType);
+  void addLock(QReadWriteLock* pLock, cedar::aux::LOCK_TYPE lockType, LockSetHandle lockSet = 0);
 
   //!@brief Removes the given lock from the lock set.
-  void removeLock(QReadWriteLock* pLock, cedar::aux::LOCK_TYPE lockType);
+  void removeLock(QReadWriteLock* pLock, cedar::aux::LOCK_TYPE lockType, LockSetHandle lockSet = 0);
+
+  //!@brief Defines a lock set.
+  LockSetHandle defineLockSet(const std::string& lockSet);
+
+  //!@brief Retrieves the handle for a given lock set name.
+  LockSetHandle getLockSetHandle(const std::string& lockSet) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -101,11 +117,14 @@ private:
 protected:
   // none yet
 private:
-  //! The set of locks that is (un)locked whenever the (un)lockAll method is called.
-  cedar::aux::LockSet mLocks;
-  
   //! Lock used for locking the lock set.
   mutable QReadWriteLock mLocksLock;
+
+  //! Association between handles nad
+  std::map<std::string, unsigned int> mLockSetHandles;
+
+  //! Storage of the lock sets. mLockSets[0] contains all locks.
+  mutable std::vector<Locks> mLockSets;
 
 }; // class cedar::aux::Lockable
 

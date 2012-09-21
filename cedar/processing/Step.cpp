@@ -77,6 +77,7 @@ mMovingAverageIterationTime(100), // average the last 100 iteration times
 mLockingTime(100), // average the last 100 iteration times
 // initialize parameters
 mRNGState(0),
+mAutoLockInputsAndOutputs(true),
 _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
@@ -111,19 +112,56 @@ cedar::proc::Step::~Step()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Step::lock(cedar::aux::LOCK_TYPE parameterAccessType) const
+{
+  this->lockData();
+  this->lockParameters(parameterAccessType);
+}
+
+void cedar::proc::Step::unlock() const
+{
+  this->unlockParameters();
+  this->unlockData();
+}
+
+void cedar::proc::Step::lockData() const
+{
+  if (this->mAutoLockInputsAndOutputs)
+  {
+    this->lockAll();
+  }
+  else
+  {
+    this->lockBuffers();
+  }
+}
+
+void cedar::proc::Step::unlockData() const
+{
+  if (this->mAutoLockInputsAndOutputs)
+  {
+    // unlock all data
+    this->unlockAll();
+  }
+  else
+  {
+    this->unlockBuffers();
+  }
+}
+
 void cedar::proc::Step::callReset()
 {
   // first, reset the current state of the step (i.e., clear any exception etc. state)
   this->resetState();
 
   // lock everything
-  this->lockAll();
+  this->lock(cedar::aux::LOCK_TYPE_READ);
 
   // reset the step
   this->reset();
 
   // unlock everything
-  this->unlockAll();
+  this->unlock();
 
   this->getFinishedTrigger()->trigger();
 }
@@ -133,32 +171,11 @@ void cedar::proc::Step::reset()
   // empty as default implementation
 }
 
-/*!
- * As an example, consider a class A that has a function void A::foo():
- *
- * @code
- *  class A : public cedar::proc::Step
- *  {
- *    public:
- *      void foo()
- *      {
- *        // ...
- *      }
- *  }
- * @endcode
- *
- * Then in A's constructor, call
- *
- * @code
- *  A:A()
- *  {
- *    // ...
- *    this->registerFunction("foo", boost::bind(&A::foo, this));
- *    // ...
- *  }
- * @endcode
- *
- */
+void cedar::proc::Step::setAutoLockInputsAndOutputs(bool autoLock)
+{
+  this->mAutoLockInputsAndOutputs = autoLock;
+}
+
 void cedar::proc::Step::registerFunction(const std::string& actionName, boost::function<void()> function)
 {
   //!@todo Check for restrictions on the name, e.g., no dots, ...
@@ -330,12 +347,8 @@ void cedar::proc::Step::run()
   // start measuring the execution time.
   clock_t lock_start = clock();
 
-  //!@todo make the (un)locking optional?
-  // lock all data
-  this->lockAll();
-
-  // lock all parameters
-  this->lockParameters(cedar::aux::LOCK_TYPE_READ);
+  // lock the step
+  this->lock(cedar::aux::LOCK_TYPE_READ);
 
   clock_t lock_end = clock();
   clock_t lock_elapsed = lock_end - lock_start;
@@ -399,11 +412,8 @@ void cedar::proc::Step::run()
   clock_t run_elapsed = run_end - run_start;
   double run_elapsed_s = static_cast<double>(run_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
 
-  // unlock all parameters
-  this->unlockParameters();
-
-  // unlock all data
-  this->unlockAll();
+  // unlock the step
+  this->unlock();
 
   // take time measurements
   this->setRunTimeMeasurement(cedar::unit::Seconds(run_elapsed_s));

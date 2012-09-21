@@ -75,12 +75,12 @@ cedar::aux::Configurable::~Configurable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::Configurable::lockParameters(cedar::aux::LOCK_TYPE lockType)
+void cedar::aux::Configurable::lockParameters(cedar::aux::LOCK_TYPE lockType) const
 {
   cedar::aux::lock(this->mParameterLocks, lockType);
 }
 
-void cedar::aux::Configurable::unlockParameters()
+void cedar::aux::Configurable::unlockParameters() const
 {
   cedar::aux::unlock(this->mParameterLocks);
 }
