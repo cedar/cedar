@@ -281,10 +281,31 @@ private:
    */
   void setLockTimeMeasurement(const cedar::unit::Time& time);
 
+  /*!@brief Locks the data and parameters of the step.
+   */
+  void lock(cedar::aux::LOCK_TYPE parameterAccessType = cedar::aux::LOCK_TYPE_READ) const;
+
+  /*!@brief Unlocks the data and parameters of the step.
+   */
+  void unlock() const;
+
+  /*!@brief Locks the data of the step according to the current method.
+   *
+   * For a description of the method, see setAutoLockInputsAndOutputs(bool).
+   */
+  void lockData() const;
+
+  /*!@brief Locks the data of the step according to the current method.
+   *
+   * For a description of the method, see setAutoLockInputsAndOutputs(bool).
+   */
+  void unlockData() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
 private:
   //!@brief flag that states if step is still computing its latest output
