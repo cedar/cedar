@@ -416,7 +416,7 @@ void cedar::proc::Step::run()
   }
   else
   {
-    //!@todo Unlock buffers
+    this->unlockBuffers();
   }
 
   // take time measurements
