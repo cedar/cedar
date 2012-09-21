@@ -77,6 +77,7 @@ mMovingAverageIterationTime(100), // average the last 100 iteration times
 mLockingTime(100), // average the last 100 iteration times
 // initialize parameters
 mRNGState(0),
+mAutoLockInputsAndOutputs(true),
 _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
@@ -330,9 +331,15 @@ void cedar::proc::Step::run()
   // start measuring the execution time.
   clock_t lock_start = clock();
 
-  //!@todo make the (un)locking optional?
   // lock all data
-  this->lockAll();
+  if (mAutoLockInputsAndOutputs)
+  {
+    this->lockAll();
+  }
+  else
+  {
+    this->lockBuffers();
+  }
 
   // lock all parameters
   this->lockParameters(cedar::aux::LOCK_TYPE_READ);
@@ -402,8 +409,15 @@ void cedar::proc::Step::run()
   // unlock all parameters
   this->unlockParameters();
 
-  // unlock all data
-  this->unlockAll();
+  if (mAutoLockInputsAndOutputs)
+  {
+    // unlock all data
+    this->unlockAll();
+  }
+  else
+  {
+    //!@todo Unlock buffers
+  }
 
   // take time measurements
   this->setRunTimeMeasurement(cedar::unit::Seconds(run_elapsed_s));

@@ -60,7 +60,7 @@ class cedar::proc::DataRole
 public:
   //! The base type of enum ids of this class.
   typedef cedar::aux::EnumId Id;
-public:
+
   //! Typedef of the shared pointer of enum values belonging to this class.
   typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 

@@ -260,7 +260,11 @@ private:
   //!@brief Lock for the last iteration time.
   mutable QReadWriteLock mLockTimeLock;
 
+  //! The state of open-cv's RNG.
   uint64 mRNGState;
+
+  //! Whether the step should lock its inputs and outputs automatically.
+  bool mAutoLockInputsAndOutputs;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
