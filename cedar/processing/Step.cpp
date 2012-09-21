@@ -134,32 +134,11 @@ void cedar::proc::Step::reset()
   // empty as default implementation
 }
 
-/*!
- * As an example, consider a class A that has a function void A::foo():
- *
- * @code
- *  class A : public cedar::proc::Step
- *  {
- *    public:
- *      void foo()
- *      {
- *        // ...
- *      }
- *  }
- * @endcode
- *
- * Then in A's constructor, call
- *
- * @code
- *  A:A()
- *  {
- *    // ...
- *    this->registerFunction("foo", boost::bind(&A::foo, this));
- *    // ...
- *  }
- * @endcode
- *
- */
+void cedar::proc::Step::setAutoLockInputsAndOutputs(bool autoLock)
+{
+  this->mAutoLockInputsAndOutputs = autoLock;
+}
+
 void cedar::proc::Step::registerFunction(const std::string& actionName, boost::function<void()> function)
 {
   //!@todo Check for restrictions on the name, e.g., no dots, ...
