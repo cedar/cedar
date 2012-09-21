@@ -51,6 +51,12 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::aux::Lockable::Lockable()
+{
+  this->mLockSets.push_back(Locks());
+  this->mLockSetHandles["all"] = 0;
+}
+
 cedar::aux::Lockable::~Lockable()
 {
 }
@@ -59,32 +65,114 @@ cedar::aux::Lockable::~Lockable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::Lockable::lockAll()
+//!@brief Defines a lock set.
+cedar::aux::Lockable::LockSetHandle cedar::aux::Lockable::defineLockSet(const std::string& lockSet)
+{
+  QWriteLocker locker(&mLocksLock);
+
+  cedar::aux::Lockable::LockSetHandle new_handle = this->mLockSets.size();
+  this->mLockSets.push_back(Locks());
+  this->mLockSetHandles[lockSet] = new_handle;
+
+  return new_handle;
+}
+
+//!@brief Retrieves the handle for a given lock set name.
+cedar::aux::Lockable::LockSetHandle cedar::aux::Lockable::getLockSetHandle(const std::string& lockSet) const
+{
+  QReadLocker locker(&mLocksLock);
+
+  std::map<std::string, unsigned int>::const_iterator iter = this->mLockSetHandles.find(lockSet);
+  if (iter == this->mLockSetHandles.end())
+  {
+    CEDAR_THROW(cedar::aux::UnknownNameException, "Cannot find a lock set by the name \"" + lockSet + "\".");
+  }
+
+  return iter->second;
+}
+
+void cedar::aux::Lockable::lockAll(LockSetHandle lockSet) const
 {
   QReadLocker locker(&this->mLocksLock);
-  cedar::aux::lock(this->mLocks);
+
+  CEDAR_ASSERT(lockSet < this->mLockSets.size());
+
+  QReadWriteLock* p_last = NULL;
+  for (Locks::const_iterator iter = this->mLockSets[lockSet].begin(); iter != this->mLockSets[lockSet].end(); ++iter)
+  {
+    QReadWriteLock* p_lock = iter->first;
+
+    if (p_lock != p_last)
+    {
+      p_last = p_lock;
+
+      // switch based on the lock type
+      switch (iter->second)
+      {
+        case cedar::aux::LOCK_TYPE_READ:
+          p_lock->lockForRead();
+          break;
+
+        case cedar::aux::LOCK_TYPE_WRITE:
+          p_lock->lockForWrite();
+          break;
+      }
+    }
+  }
 }
 
-void cedar::aux::Lockable::unlockAll()
+void cedar::aux::Lockable::unlockAll(LockSetHandle lockSet) const
 {
   QReadLocker locker(&this->mLocksLock);
-  cedar::aux::unlock(this->mLocks);
+
+  CEDAR_ASSERT(lockSet < this->mLockSets.size());
+
+  QReadWriteLock* p_last = NULL;
+  for (Locks::const_iterator iter = this->mLockSets[lockSet].begin(); iter != this->mLockSets[lockSet].end(); ++iter)
+  {
+    QReadWriteLock* p_lock = iter->first;
+
+    if (p_lock != p_last)
+    {
+      p_last = p_lock;
+      p_lock->unlock();
+    }
+  }
 }
 
-void cedar::aux::Lockable::addLock(QReadWriteLock* pLock, cedar::aux::LOCK_TYPE lockType)
+void cedar::aux::Lockable::addLock(QReadWriteLock* pLock, cedar::aux::LOCK_TYPE lockType, LockSetHandle lockSet)
 {
   QWriteLocker locker(&this->mLocksLock);
-  cedar::aux::append(this->mLocks, pLock, lockType);
+
+  CEDAR_ASSERT(lockSet < this->mLockSets.size());
+
+  this->mLockSets[lockSet].insert(std::make_pair(pLock, lockType));
+
+  if (lockSet != 0)
+  {
+    locker.unlock();
+    this->addLock(pLock, lockType, 0);
+  }
 }
 
-void cedar::aux::Lockable::removeLock(QReadWriteLock* pLock, cedar::aux::LOCK_TYPE lockType)
+void cedar::aux::Lockable::removeLock(QReadWriteLock* pLock, cedar::aux::LOCK_TYPE lockType, LockSetHandle lockSet)
 {
   QWriteLocker locker(&this->mLocksLock);
-  cedar::aux::LockSet::iterator iter = this->mLocks.find(std::make_pair(pLock, lockType));
 
-  if(iter == this->mLocks.end())
+  CEDAR_ASSERT(lockSet < this->mLockSets.size());
+
+  cedar::aux::LockSet::iterator iter = this->mLockSets[lockSet].find(std::make_pair(pLock, lockType));
+
+  if(iter == this->mLockSets[lockSet].end())
   {
     CEDAR_THROW(cedar::aux::NotFoundException, "The given data object was not found in this lockable.");
   }
-  this->mLocks.erase(iter);
+  this->mLockSets[lockSet].erase(iter);
+
+  // remove the automatically added locks from the "all" set.
+  if (lockSet != 0)
+  {
+    locker.unlock();
+    this->removeLock(pLock, lockType, 0);
+  }
 }

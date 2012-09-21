@@ -58,6 +58,12 @@ cedar::proc::Connectable::Connectable()
 :
 mMandatoryConnectionsAreSet(true)
 {
+  for (size_t i = 0; i < cedar::proc::DataRole::type().list().size(); ++i)
+  {
+    const cedar::aux::Enum& e = cedar::proc::DataRole::type().list()[i];
+    LockSetHandle handle = this->defineLockSet(e.name());
+    mRoleLockSetHandles[e.id()] = handle;
+  }
 }
 
 cedar::proc::Connectable::~Connectable()
