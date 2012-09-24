@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/casts.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 
@@ -113,7 +114,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::ChannelSplit::determineInput
     {
       mat_data->getAnnotation<cedar::aux::annotation::ColorSpace>();
 
-      if (mat_data->getData().channels() <= 4)
+      if (mat_data->getData().channels() <= 4 && cedar::aux::math::getDimensionalityOf(mat_data->getData()) < 3)
       {
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
@@ -163,6 +164,11 @@ void cedar::proc::steps::ChannelSplit::inputConnectionChanged(const std::string&
   this->mChannels.resize(num_channels);
 
   int type = CV_MAKETYPE(this->mInput->getData().depth(), 1);
+
+  if (cedar::aux::math::getDimensionalityOf(this->mInput->getData()) > 2)
+  {
+    return;
+  }
 
   // apply channel annotations and preallocate matrices
   switch (num_channels)
