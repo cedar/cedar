@@ -231,6 +231,6 @@ protected:
 private:
   // none yet
 
-}; //class cedar::dev::sensors::visual::PictureGrabber
+}; // class cedar::dev::sensors::visual::PictureGrabber
 
-#endif //CEDAR_DEV_SENSORS_VISUAL_PICTURE_GRABBER_H
+#endif // CEDAR_DEV_SENSORS_VISUAL_PICTURE_GRABBER_H

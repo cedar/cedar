@@ -33,7 +33,7 @@
     Credits:
 
 ======================================================================================================================*/
-//newfile
+// newfile
 #ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTINGS_H
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTINGS_H
 
@@ -42,16 +42,20 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/namespace.h"
-#include "cedar/devices/sensors/visual/camera/enums/CameraSetting.h"
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
 
-#include "cedar/devices/sensors/visual/camera/enums/CameraBackendType.h"
-
+#include "cedar/devices/sensors/visual/camera/backends/CameraBackendType.h"
+#include "cedar/devices/sensors/visual/camera/enums/CameraSetting.h"
+#include "cedar/devices/sensors/visual/camera/enums/CameraVideoMode.h"
+#include "cedar/devices/sensors/visual/camera/enums/CameraFrameRate.h"
+#include "cedar/devices/sensors/visual/camera/enums/CameraIsoSpeed.h"
 
 // SYSTEM INCLUDES
+#include <QObject>
 
 
 /*!@brief Base class of the misc camera grabber backends.
@@ -60,19 +64,38 @@
  */
 class cedar::dev::sensors::visual::CameraSettings
 :
+public QObject,
 public cedar::aux::Configurable
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
-public:
+
+protected slots:
+
+//!@brief A slot that is triggered if a setting has changed
+  void settingChanged();
+
+
+signals:
+
+//!@brief This signal is emitted, when a setting has changed.
+// The CameraGrabber class have to create a new grabber with the new settings.
+  void settingsChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   /// The standard constructor.
-  CameraSettings(cedar::dev::sensors::visual::CameraBackendType::Id backendType);
+  CameraSettings
+  (
+    unsigned int cameraId = 0,
+    bool byGuid = false,
+    cedar::dev::sensors::visual::CameraBackendType::Id backendType = cedar::dev::sensors::visual::CameraBackendType::AUTO
+  );
 
   /// Destructor
   ~CameraSettings();
@@ -81,7 +104,28 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-//  cedar::dev::sensors::visual::CameraSettingsSet& getSettings();
+
+  // bool setSetting(cedar::dev::sensors::visual::CameraSetting::Id settingId, double value);
+  // double getSetting(cedar::dev::sensors::visual::CameraSetting::Id settingId);
+
+  unsigned int getCameraId();
+  bool getByGuid();
+
+  cedar::dev::sensors::visual::CameraVideoMode::Id getVideoMode();
+  cedar::dev::sensors::visual::CameraFrameRate::Id getFPS();
+
+#ifdef CEDAR_USE_LIB_DC1394
+  cedar::dev::sensors::visual::CameraIsoSpeed::Id getIsoSpeed();
+  void setIsoSpeed( cedar::dev::sensors::visual::CameraIsoSpeed::Id isoSpeed);
+#endif // CEDAR_USE_LIB_DC1394
+
+  void setCameraId(unsigned int CameraId, bool isGuid = false);
+
+  void setVideoMode(cedar::dev::sensors::visual::CameraVideoMode::Id videoMode);
+  void setFPS(cedar::dev::sensors::visual::CameraFrameRate::Id fps);
+
+  /// Change visible attributes to various parameters of the settings-part
+  void setBackendType(cedar::dev::sensors::visual::CameraBackendType::Id backendType);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -93,11 +137,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /// Set a Parameter in the cv::VideoCapture class
-  bool setSetting(CameraSetting::Id settingId, double value);
+  void hideFwVideoModes();
 
-  /// Get a Parameter in the cv::VideoCapture class
-  double getSetting(CameraSetting::Id settingId);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -105,19 +146,20 @@ private:
 protected:
   // none yet
 private:
-//  cedar::dev::sensors::visual::CameraSettingsSet mSettings;
+  cedar::dev::sensors::visual::CameraBackendType::Id mBackendType;
+  //unsigned int mCameraId;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-  
-  /// frame width
-  cedar::aux::UIntParameterPtr mpWidth;
 
-  /// frame height
-  cedar::aux::UIntParameterPtr mpHeight;
+  /// create with guid or with bus id
+  cedar::aux::BoolParameterPtr _mpByGuid;
+
+  /// Camera-ID. Either the Bus-ID or the GUID (depends on _mpByGuid)
+  cedar::aux::UIntParameterPtr _mpCameraId;
 
   /// framesize as mode
   cedar::aux::EnumParameterPtr _mpGrabMode;

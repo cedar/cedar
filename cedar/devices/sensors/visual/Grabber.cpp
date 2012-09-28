@@ -15,7 +15,7 @@
     License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
-    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+    along with cedar. If not, see <http:// www.gnu.org/licenses/>.
 
 ========================================================================================================================
 
@@ -44,14 +44,14 @@
 #include <signal.h>
 
 //----------------------------------------------------------------------------------------------------------------------
-//constants and static variables
+// constants and static variables
 //----------------------------------------------------------------------------------------------------------------------
 
 //!@todo check if needed
 const std::string cedar::dev::sensors::visual::Grabber::mGrabberDefaultRecordExtension =  ".avi";
 const std::string cedar::dev::sensors::visual::Grabber::mGrabberDefaultSnapshotExtension = ".jpg";
 
-//Initialize the static member vector containing all instances
+// Initialize the static member vector containing all instances
 cedar::dev::sensors::visual::Grabber::GrabberInstancesVector cedar::dev::sensors::visual::Grabber::mInstances;
 bool cedar::dev::sensors::visual::Grabber::mRegisterTerminationHandler;
 
@@ -68,7 +68,7 @@ namespace
 
 
 //----------------------------------------------------------------------------------------------------------------------
-//constructors and destructor
+// constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -79,7 +79,7 @@ cedar::aux::LoopedThread()
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->setName(grabberName);
 
-  //instantiate the default grabber with one channel with the right derived class
+  // instantiate the default grabber with one channel with the right derived class
   std::vector<cedar::dev::sensors::visual::Grabber::ChannelPtr> grabberchannels;
   grabberchannels.push_back(pChannel);
 
@@ -99,7 +99,7 @@ cedar::aux::LoopedThread()
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->setName(grabberName);
 
-  //instantiate the default grabber with two channels of the derived grabber
+  // instantiate the default grabber with two channels of the derived grabber
   std::vector<cedar::dev::sensors::visual::Grabber::ChannelPtr> grabberchannels;
   grabberchannels.push_back(pChannel0);
   grabberchannels.push_back(pChannel1);
@@ -111,7 +111,14 @@ cedar::aux::LoopedThread()
 //--------------------------------------------------------------------------------------------------------------------
 cedar::dev::sensors::visual::Grabber::~Grabber()
 {
-  //remove this grabber-instance from the InstancesVector
+  // freeing the readwrite-lock
+  if (mpReadWriteLock)
+  {
+    delete mpReadWriteLock;
+    mpReadWriteLock = NULL;
+  }
+
+  // remove this grabber-instance from the InstancesVector
   std::vector<Grabber *>::iterator it = mInstances.begin();
 
   while (((*it) != this) && (it != mInstances.end()))
@@ -134,10 +141,10 @@ cedar::dev::sensors::visual::Grabber::~Grabber()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-//methods for signal handling and cleanup
+// methods for signal handling and cleanup
 //----------------------------------------------------------------------------------------------------------------------
 
-//this function handles abnormal termination of the program (like the signals interrupt, abort or seg.fault)
+// this function handles abnormal termination of the program (like the signals interrupt, abort or seg.fault)
 void cedar::dev::sensors::visual::Grabber::interruptSignalHandler(int)
 {
   emergencyCleanup();
@@ -155,8 +162,8 @@ void cedar::dev::sensors::visual::Grabber::emergencyCleanup()
 
   for (std::vector<Grabber*>::iterator it = mInstances.begin(); it != mInstances.end(); ++it)
   {
-    //only cedar::dev::sensors::visual::Grabber::doCleanUp() and xxxGrabber::onCleanUp() methods invoked
-    //Note: no destructor involved here
+    // only cedar::dev::sensors::visual::Grabber::doCleanUp() and xxxGrabber::onCleanUp() methods invoked
+    // Note: no destructor involved here
     (*it)->doCleanUp();
   }
 }
@@ -190,33 +197,28 @@ void cedar::dev::sensors::visual::Grabber::doCleanUp()
 
     mCleanUpAlreadyDone = true;
 
-    //stopGrabber LoopedThread
+    // stopGrabber LoopedThread
     if (QThread::isRunning())
     {
       cedar::aux::LoopedThread::stop();
       this->wait();
     }
 
-    //stopGrabber Recording
+    // stopGrabber Recording
     stopRecording();
 
-    //do the cleanup in derived class
+    // do the cleanup in derived class
     onCleanUp();
 
-    unsigned int num_cams = getNumCams();
-    for (unsigned int channel = 0; channel < num_cams; channel++)
-    {
-      // call delete to each used pointer
-      // getChannel(channel)->cleanup();
-    }
+    mCaptureDeviceCreated = false;
 
+//    unsigned int num_cams = getNumCams();
+//    for (unsigned int channel = 0; channel < num_cams; channel++)
+//    {
+//      // call delete to each used pointer
+//      // getChannel(channel)->cleanup();
+//    }
 
-
-    if (mpReadWriteLock)
-    {
-      delete mpReadWriteLock;
-      mpReadWriteLock = NULL;
-    }
   }
 }
 
@@ -229,7 +231,7 @@ void cedar::dev::sensors::visual::Grabber::readConfiguration(const cedar::aux::C
 {
 cedar::aux::NamedConfigurable
 
-  //do readConfiguration for all childs. This is implemented in the base class
+  // do readConfiguration for all childs. This is implemented in the base class
   cedar::aux::NamedConfigurable::readConfiguration(node);
 
 }
@@ -245,7 +247,7 @@ void cedar::dev::sensors::visual::Grabber::init
   std::vector<cedar::dev::sensors::visual::Grabber::ChannelPtr> grabberChannels
 )
 {
-  //initialize local member
+  // initialize local member
   mpReadWriteLock = new QReadWriteLock();
   mGrabberThreadStartedOnRecording = false;
   mCleanUpAlreadyDone = false;
@@ -255,12 +257,12 @@ void cedar::dev::sensors::visual::Grabber::init
   mFpsMeasured = 0;
   mCaptureDeviceCreated = false;
   mRecording = false;
+//  mStartUp = true;
 
-
-  //insert this instance to our instance-vector (used for emergency-cleanup)
+  // insert this instance to our instance-vector (used for emergency-cleanup)
   mInstances.push_back(this);
 
-  //add the channels to the configurable interface
+  // add the channels to the configurable interface
   _mChannels = cedar::dev::sensors::visual::Grabber::ChannelParameterPtr
                (
                   new cedar::dev::sensors::visual::Grabber::ChannelParameter
@@ -287,15 +289,15 @@ bool cedar::dev::sensors::visual::Grabber::onGrab()
 //--------------------------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::Grabber::applyParameter()
 {
-  //check on first channel if there is already channel-information there.
-  //this is an indicator, that the channel is open and active
-  //if so, close all grabber
+  // check on first channel if there is already channel-information there.
+  // this is an indicator, that the channel is open and active
+  // if so, close all grabber
   if (mCaptureDeviceCreated)
   {
     this->closeGrabber();
   }
 
-  //create the channels in the derived classes
+  // create the channels in the derived classes
   if (this->onCreateGrabber())
   {
     mCaptureDeviceCreated = true;
@@ -323,22 +325,24 @@ bool cedar::dev::sensors::visual::Grabber::isCreated()
 //--------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::Grabber::closeGrabber()
 {
+  mCaptureDeviceCreated = false;
+
   if (this->isRunning())
   {
     this->stopGrabber();
   }
 
-  //close the grabber-things in the derived class
+  // close the grabber-things in the derived class
   this->onCloseGrabber();
 
-  //reset the common-things from all grabbers
+  // reset the common-things from all grabbers
   unsigned int num_cams = _mChannels->size();
   for (unsigned int channel=0; channel < num_cams; channel++)
   {
     this->getChannel(channel)->mChannelInfo="";
     this->getChannel(channel)->mImageMat = cv::Mat();
   }
-  mCaptureDeviceCreated = false;
+
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
                                              this->getName() + ": Close Capture channels",
@@ -382,11 +386,11 @@ void cedar::dev::sensors::visual::Grabber::setFps(double fps)
                                                "cedar::dev::sensors::visual::Grabber::setFps()"
                                              );
   }
-  //cycle time in ms: 1000ms/frames_per_second
+  // cycle time in ms: 1000ms/frames_per_second
   double milliseconds = 1000. / fps;
 
-  //LoopedThread::_mStepSize = milliseconds;  //set param for configuration file (bug in LoopedThread)
-  LoopedThread::setStepSize(milliseconds);        //change speed in thread
+  // LoopedThread::_mStepSize = milliseconds;  // set param for configuration file (bug in LoopedThread)
+  LoopedThread::setStepSize(milliseconds);        // change speed in thread
 
   if (wasRunning)
   {
@@ -449,27 +453,26 @@ void cedar::dev::sensors::visual::Grabber::grab()
   bool result = true;
   std::string error_info;
 
-  mpReadWriteLock->lockForWrite();        //Lock
+  mpReadWriteLock->lockForWrite();        // Lock
   try
   {
-    result = onGrab();                    //Grab
+    result = onGrab();                    // Grab
   }
   catch (std::exception& e)
   {
     error_info = e.what();
     result = false;
   }
-  mpReadWriteLock->unlock();              //Unlock
+  mpReadWriteLock->unlock();              // Unlock
 
   if (! result)
   {
-    cedar::aux::LogSingleton::getInstance()->error
+    cedar::aux::LogSingleton::getInstance()->warning
                                              (
-                                               this->getName() + ": Grabbed image is empty! The grabber instance will"
-                                               + "be cleaned up, so don't use this instance anymore!",
+                                               this->getName() + ": Grabbed image is empty!",
                                                "cedar::dev::sensors::visual::Grabber::grab()"
                                              );
-    doCleanUp();
+    this->closeGrabber();
     CEDAR_THROW
     (
       cedar::dev::sensors::visual::GrabberGrabException,
@@ -477,20 +480,20 @@ void cedar::dev::sensors::visual::Grabber::grab()
     );
   }
 
-  //grabbing ok, then
-  //calculate fps every 5 (default) grabbing frames
+  // grabbing ok, then
+  // calculate fps every 5 (default) grabbing frames
   if (! (++mFpsCounter %= UPDATE_FPS_MEASURE_FRAME_COUNT))
   {
     mFpsMeasureStop = boost::posix_time::microsec_clock::local_time();
 
-    //calculate real diff:
+    // calculate real diff:
     boost::posix_time::time_duration measure_duration = mFpsMeasureStop - mFpsMeasureStart;
     mFpsMeasured = double(UPDATE_FPS_MEASURE_FRAME_COUNT * 1000000. / measure_duration.total_microseconds());
 
     mFpsMeasureStart = boost::posix_time::microsec_clock::local_time();
   }
 
-  //check if recording is on
+  // check if recording is on
   if (mRecording)
   {
     unsigned int num_cams = getNumCams();
@@ -509,7 +512,7 @@ void cedar::dev::sensors::visual::Grabber::grab()
                                                    this->getName() + ": info ",
                                                    "cedar::dev::sensors::visual::Grabber::grab()"
                                                  );
-        doCleanUp();
+        this->closeGrabber();
         CEDAR_THROW(cedar::dev::sensors::visual::GrabberRecordingException,info.str());
       }
     }
@@ -550,23 +553,23 @@ void cedar::dev::sensors::visual::Grabber::setSnapshotName(const std::string& sn
     return;
   }
 
-  //initialize snapshot-names
+  // initialize snapshot-names
   std::string name = snapshotName;
   std::string ext  = "";
 
-  //check if extension in filename
+  // check if extension in filename
   std::size_t pos = name.rfind(".");
 
   if (pos != std::string::npos)
   {
-    //yes: extract it
+    // yes: extract it
     int cnt = pos;
     ext  = name.substr(pos);
     name = name.substr(0,cnt);
   }
   else
   {
-    //no: use default
+    // no: use default
     ext  = mGrabberDefaultSnapshotExtension;
     name = snapshotName;
   }
@@ -599,13 +602,13 @@ void cedar::dev::sensors::visual::Grabber::setSnapshotName
 
   if (snapshotName != "")
   {
-    //check if there is an extension
+    // check if there is an extension
     std::string name = snapshotName;
     std::size_t pos = name.rfind(".");
 
     if (pos == std::string::npos)
     {
-      //no: use default extension
+      // no: use default extension
       name.append(mGrabberDefaultSnapshotExtension);
     }
     getChannel(channel)->_mSnapshotName->setValue(name);
@@ -630,7 +633,7 @@ void cedar::dev::sensors::visual::Grabber::saveSnapshot(unsigned int channel) co
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"Grabber::saveSnapshot");
   }
 
-  //copy image to local buffer for slow imwrite-function and for error-checking
+  // copy image to local buffer for slow imwrite-function and for error-checking
   cv::Mat imgBuffer;
 
   if (!getChannel(channel)->mImageMat.empty())
@@ -687,27 +690,27 @@ void cedar::dev::sensors::visual::Grabber::setRecordName(const std::string& reco
     return;
   }
 
-  //initialize snapshot-names
+  // initialize snapshot-names
   std::string name = recordName;
   std::string ext  = "";
 
-  //check if extension in filename
+  // check if extension in filename
   std::size_t pos = name.rfind(".");
 
   if (pos != std::string::npos)
   {
-    //yes: extract it
+    // yes: extract it
     ext  = name.substr(pos);
     name = name.substr(0,pos);
   }
   else
   {
-    //no: use default
+    // no: use default
     ext  = mGrabberDefaultRecordExtension;
     name = recordName;
   }
 
-  //filename depends on no. of cams
+  // filename depends on no. of cams
   unsigned int num_cams = getNumCams();
   if (num_cams == 1)
   {
@@ -732,13 +735,13 @@ void cedar::dev::sensors::visual::Grabber::setRecordName(unsigned int channel, c
 
   if (recordName != "")
   {
-    //check if there is an extension
+    // check if there is an extension
     std::string name = recordName;
     std::size_t pos = name.rfind(".");
 
     if (pos == std::string::npos)
     {
-      //no: use default extension
+      // no: use default extension
       name.append(mGrabberDefaultRecordExtension);
     }
     getChannel(channel)->_mRecordName->setValue(name);
@@ -774,17 +777,17 @@ bool cedar::dev::sensors::visual::Grabber::startRecording
     return true;
   }
 
-  //set the record-flag
+  // set the record-flag
   mRecording = true;
   unsigned int recording_channels = 0;
 
-  //write the video-file with the actual grabbing-speed
-  //this is independent from the speed of the avi-file or the camera framerate
+  // write the video-file with the actual grabbing-speed
+  // this is independent from the speed of the avi-file or the camera framerate
 
   unsigned int num_cams = getNumCams();
   for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
-    //create writer
+    // create writer
     std::string record_name = getChannel(channel)->_mRecordName->getPath();
     cv::VideoWriter writer
                     (
@@ -797,7 +800,7 @@ bool cedar::dev::sensors::visual::Grabber::startRecording
 
     if (writer.isOpened())
     {
-      //save it in channel-struct
+      // save it in channel-struct
       getChannel(channel)->mVideoWriter = writer;
 
       std::string info = ": Channel " + boost::lexical_cast<std::string>(channel) + " recording to " + record_name;
@@ -821,7 +824,7 @@ bool cedar::dev::sensors::visual::Grabber::startRecording
       )
   }
 
-  //startGrabber the grabberthread if needed
+  // startGrabber the grabberthread if needed
   if (!QThread::isRunning() && startThread)
   {
     cedar::aux::LogSingleton::getInstance()->message
@@ -852,7 +855,7 @@ void cedar::dev::sensors::visual::Grabber::stopRecording()
                                                );
     }
 
-    //delete the videowriter
+    // delete the videowriter
     unsigned int num_cams = getNumCams();
     for(unsigned int channel = 0; channel < num_cams; ++channel)
     {
@@ -870,9 +873,9 @@ bool cedar::dev::sensors::visual::Grabber::isRecording() const
 //--------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::Grabber::step(double)
 {
-  //if something went wrong on grabbing,
-  //an exception is being thrown in the grab function
-  //right after a cleanup
+  // if something went wrong on grabbing,
+  // an exception is being thrown in the grab function
+  // right after a cleanup
   grab();
 }
 

@@ -56,12 +56,12 @@ namespace
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-//constructors and destructor
+// constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 
 //----------------------------------------------------------------------------------------------------
-//Constructor for single-file grabber
+// Constructor for single-file grabber
 cedar::dev::sensors::visual::PictureGrabber::PictureGrabber
 (
   const std::string& pictureFileName
@@ -80,7 +80,7 @@ cedar::dev::sensors::visual::Grabber
 }
 
 //----------------------------------------------------------------------------------------------------
-//Constructor for stereo-file grabber
+// Constructor for stereo-file grabber
 cedar::dev::sensors::visual::PictureGrabber::PictureGrabber
 (
   const std::string& pictureFileName0,
@@ -108,7 +108,7 @@ void cedar::dev::sensors::visual::PictureGrabber::init()
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
-  //watch filename on every channel
+  // watch filename on every channel
   for (unsigned int channel=0; channel<_mChannels->size(); ++channel)
   {
     QObject::connect
@@ -120,7 +120,7 @@ void cedar::dev::sensors::visual::PictureGrabber::init()
              );
   }
 
-  //watch if channel added to ObjectParameterList
+  // watch if channel added to ObjectParameterList
   _mChannels->connectToObjectAddedSignal
               (
                 boost::bind(&cedar::dev::sensors::visual::PictureGrabber::channelAdded,this,_1)
@@ -138,12 +138,12 @@ cedar::dev::sensors::visual::PictureGrabber::~PictureGrabber()
 // configurable interface
 //--------------------------------------------------------------------------------------------------------------------
 
-//void cedar::dev::sensors::visual::PictureGrabber::readConfiguration(const cedar::aux::ConfigurationNode& node)
+// void cedar::dev::sensors::visual::PictureGrabber::readConfiguration(const cedar::aux::ConfigurationNode& node)
 //{
-//  //do readConfiguration for all childs. This is implemented in the base class
+//  // do readConfiguration for all childs. This is implemented in the base class
 //  cedar::aux::Configurable::readConfiguration(node);
 //
-//  //initialize grabber:
+//  // initialize grabber:
 //
 //}
 
@@ -166,11 +166,11 @@ void cedar::dev::sensors::visual::PictureGrabber::channelAdded(int index)
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()
 {
-  //get sender
+  // get sender
   cedar::aux::FileParameterPtr p_sender
     = cedar::aux::FileParameterPtr(cedar::aux::asserted_cast<cedar::aux::FileParameter * >(QObject::sender()));
 
-  //search for the changed channel
+  // search for the changed channel
   unsigned int num_channels = getNumCams();
   unsigned int channel = 0;
 
@@ -179,12 +179,12 @@ void cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()
     channel++;
   }
 
-  //if found, read new image for that channel
+  // if found, read new image for that channel
   if (p_sender == getPictureChannel(channel)->_mSourceFileName)
   {
     const std::string filename = getPictureChannel(channel)->_mSourceFileName->getPath();
 
-    //lock image-matrix for writing
+    // lock image-matrix for writing
     mpReadWriteLock->lockForWrite();
     getPictureChannel(channel)->mImageMat = cv::imread(filename);
     mpReadWriteLock->unlock();
@@ -220,7 +220,7 @@ void cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::PictureGrabber::onCloseGrabber()
 {
-  //nothing to reset here
+  // nothing to reset here
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -229,7 +229,7 @@ bool cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()
   const std::string name = this->getName();
   unsigned int num_cams = getNumCams();
 
-  //show debug message
+  // show debug message
   std::stringstream init_message;
   init_message << "Initialize picture grabber with " << getNumCams() << " channel(s) ...";
 
@@ -244,7 +244,7 @@ bool cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()
                                              "cedar::dev::sensors::visual::PictureGrabber::onInit()"
                                            );
 
-  //for every channel, read from image-file
+  // for every channel, read from image-file
   bool result = true;
 
   for (unsigned int channel = 0; channel < num_cams; ++channel)

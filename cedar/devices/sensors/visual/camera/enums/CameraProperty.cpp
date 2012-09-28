@@ -57,8 +57,10 @@ const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visua
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_AUTO_EXPOSURE;
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_GAMMA;
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_TEMPERATURE;
+/* not supported from cedar
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_TRIGGER;
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_TRIGGER_DELAY;
+*/
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_WHITE_BALANCE_RED_V;
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_ZOOM;
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_FOCUS;
@@ -122,6 +124,7 @@ void cedar::dev::sensors::visual::CameraProperty::construct()
                                       "PROP_TEMPERATURE",
                                       "temperature"
                                     ));
+/* not supported from cedar
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_TRIGGER,
                                       "PROP_TRIGGER",
@@ -132,7 +135,7 @@ void cedar::dev::sensors::visual::CameraProperty::construct()
                                       "PROP_TRIGGER_DELAY",
                                       "trigger delay"
                                     ));
-
+*/
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_WHITE_BALANCE_RED_V,
                                       "PROP_WHITE_BALANCE_RED_V",

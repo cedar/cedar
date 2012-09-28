@@ -115,52 +115,52 @@ void cedar::dev::sensors::visual::CameraVideoMode::construct()
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::NUM_0,
                                       "MODE_BY_NUM_0",
-                                      "First available"
+                                      "mode #0"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::NUM_1,
                                       "MODE_BY_NUM_1",
-                                      "Second available"
+                                      "mode #1"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::NUM_2,
                                       "MODE_BY_NUM_2",
-                                      "Third available"
+                                      "mode #2"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::NUM_3,
                                       "MODE_BY_NUM_3",
-                                      "Fourth available"
+                                      "mode #3"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::NUM_4,
                                       "MODE_BY_NUM_4",
-                                      "Fifth available"
+                                      "mode #4"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::NUM_5,
                                       "MODE_BY_NUM_5",
-                                      "Sixth available"
+                                      "mode #5"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::NUM_6,
                                       "MODE_BY_NUM_6",
-                                      "Seventh available"
+                                      "mode #6"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::NUM_7,
                                       "MODE_BY_NUM_7",
-                                      "Eighth available"
+                                      "mode #7"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::NUM_8,
                                       "MODE_BY_NUM_8",
-                                      "Nineth available"
+                                      "mode #8"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraVideoMode::NUM_9,
                                       "MODE_BY_NUM_9",
-                                      "Tenth available"
+                                      "mode #9"
                                     ));
 
 #ifdef CEDAR_USE_LIB_DC1394
