@@ -33,7 +33,7 @@
     Credits:
 
 ======================================================================================================================*/
-//newfile
+// newfile
 #ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_CHANNEL_H
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_CHANNEL_H
 
@@ -49,140 +49,93 @@
 #include "cedar/devices/sensors/visual/Grabber.h"
 
 // SYSTEM INCLUDES
+#include <QReadWriteLock>
+#include <opencv2/opencv.hpp>
 
 
-/*!@brief Base class of the misc camera grabber backends.
- *
- * Implements the common features of a camera device
+/*! @struct CameraChannel
+ *  @brief Additional data of a camera channel
  */
-  /*! @struct CameraChannel
-   *  @brief Additional data of a camera channel
-   */
-  struct cedar::dev::sensors::visual::CameraChannel
+struct cedar::dev::sensors::visual::CameraChannel
+:
+cedar::dev::sensors::visual::Grabber::Channel
+{
+public:
+  CameraChannel
+  (
+    unsigned int cameraId = 0,
+    bool byGuid = false,
+    cedar::dev::sensors::visual::CameraBackendType::Id backendType
+      = cedar::dev::sensors::visual::CameraBackendType::AUTO,
+    cedar::dev::sensors::visual::DeBayerFilter::Id debayerFilter
+      = cedar::dev::sensors::visual::DeBayerFilter::NONE
+  )
   :
-  cedar::dev::sensors::visual::Grabber::Channel
+  cedar::dev::sensors::visual::Grabber::Channel(),
+  _mpBackendType(new cedar::aux::EnumParameter
+                (
+                  this,
+                  "backend type",
+                  cedar::dev::sensors::visual::CameraBackendType::typePtr(),
+                  backendType
+                )
+               ),
+  _mpDebayerFilter(new cedar::aux::EnumParameter
+                         (
+                           this,
+                           "decoding",
+                           cedar::dev::sensors::visual::DeBayerFilter::typePtr(),
+                           debayerFilter
+                         )
+                       ),
+  mpVideoCaptureLock(new QReadWriteLock())
   {
-  public:
-    CameraChannel
-    (
-      unsigned int cameraId = 0,
-      bool byGuid = false,
-      cedar::dev::sensors::visual::CameraBackendType::Id backendType
-        = cedar::dev::sensors::visual::CameraBackendType::AUTO,
-      cedar::dev::sensors::visual::DeBayerFilter::Id debayerFilter
-        = cedar::dev::sensors::visual::DeBayerFilter::NONE
-    )
-    :
-    cedar::dev::sensors::visual::Grabber::Channel(),
-    _mpBackendType(new cedar::aux::EnumParameter
-                  (
-                    this,
-                    "backend type",
-                    cedar::dev::sensors::visual::CameraBackendType::typePtr(),
-                    backendType
-                  )
-                 ),
-    _mpDebayerFilter(new cedar::aux::EnumParameter
-                           (
-                             this,
-                             "debayer",
-                             cedar::dev::sensors::visual::DeBayerFilter::typePtr(),
-                             debayerFilter
-                           )
-                         ),
-    mpVideoCaptureLock(new QReadWriteLock())
-    //mpSettings(new cedar::dev::sensors::visual::CameraSettings(pCameraGrabber,backendType)),
-    {
+    // create settings
+    mpSettings = cedar::dev::sensors::visual::CameraSettingsPtr
+                 (
+                   new cedar::dev::sensors::visual::CameraSettings(cameraId,byGuid,backendType)
+                 );
 
+    // add settings as configurable child
+    this->addConfigurableChild("settings", mpSettings);
 
+    // create properties
+    mpProperties = cedar::dev::sensors::visual::CameraPropertiesPtr
+                 (
+                   new cedar::dev::sensors::visual::CameraProperties(this,mVideoCapture,mpVideoCaptureLock)
+                 );
+  }
 
-      // create settings
-      mpSettings = cedar::dev::sensors::visual::CameraSettingsPtr
-                   (
-                     new cedar::dev::sensors::visual::CameraSettings(cameraId,byGuid,backendType)
-                   );
+  /// Destructor
+  ~CameraChannel()
+  {
+    delete mpVideoCaptureLock;
+  }
 
-      //add settings as configurable child
-      this->addConfigurableChild("settings", mpSettings);
+  /// The backend to use
+  cedar::aux::EnumParameterPtr _mpBackendType;
 
-      // create properties
-      mpProperties = cedar::dev::sensors::visual::CameraPropertiesPtr
-                   (
-                     new cedar::dev::sensors::visual::CameraProperties(this)
-                   );
+  /// Set the the camera bayer pattern filter (if any is needed)
+  cedar::aux::EnumParameterPtr _mpDebayerFilter;
 
-      // connect slots of channel properties
+  /*!@brief The lock for the concurrent access to the cv::VideoCapture.
+   *
+   *   Used in the CameraGrabber itself.
+   *   Do not mix up with the capture lock from the CameraGrabber, which will be used to lock the grabbed images
+   *   not the VideoCapture class
+   */
+  QReadWriteLock* mpVideoCaptureLock;
 
-    }
+  /// Class for all settings
+  cedar::dev::sensors::visual::CameraSettingsPtr mpSettings;
 
-    ~CameraChannel()
-    {
-      delete mpVideoCaptureLock;
-    }
+  /// Class for all properties
+  cedar::dev::sensors::visual::CameraPropertiesPtr mpProperties;
 
-    /// The Backend to use
-    cedar::aux::EnumParameterPtr _mpBackendType;
+  /// Camera interface
+  cv::VideoCapture mVideoCapture;
 
-    /// Camera needs to apply a bayer pattern filter
-    cedar::aux::EnumParameterPtr _mpDebayerFilter;
-
-
-
-    /// The lock for the concurrent access to the cv::VideoCapture
-    QReadWriteLock* mpVideoCaptureLock;
-
-    // contains all settings
-    cedar::dev::sensors::visual::CameraSettingsPtr mpSettings;
-
-    // contains all properties
-    cedar::dev::sensors::visual::CameraPropertiesPtr mpProperties;
-
-    /// Camera interface
-    cv::VideoCapture mVideoCapture;
-
-    // Pointer to the camera device
-    //CameraDevicePtr mpDevice;
-
-    bool setRawProperty(unsigned int propId, double value)
-    {
-      bool result;
-      mpVideoCaptureLock->lockForWrite();
-      result = mVideoCapture.set(propId, value);
-      mpVideoCaptureLock->unlock();
-
-      //check if set
-      if (result)
-      {
-        if (this->getRawProperty(propId) == value)
-        {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    /*! @brief Get a property directly form the cv::VideoCapture
-     *
-     *  @param propId The OpenCV constants for cv::VideoCapture.set() method
-     *  @return Value, that indicates the exit-state of cv::VideoCapture.set()
-     *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
-     *  @see  getCameraMode, getCameraFps, getCameraIsoSpeed, CameraSetting, getCameraProperty
-     */
-    double getRawProperty(unsigned int propId)
-    {
-      double result;
-      mpVideoCaptureLock->lockForWrite();
-      result = mVideoCapture.get(propId);
-      mpVideoCaptureLock->unlock();
-      return result;
-    }
-
-  };
-
-  //CEDAR_GENERATE_POINTER_TYPES(CameraChannel);
-
-
-
+};
 
 
 

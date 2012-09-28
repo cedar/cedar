@@ -15,7 +15,7 @@
     License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
-    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+    along with cedar. If not, see <http:// www.gnu.org/licenses/>.
 
 ========================================================================================================================
 
@@ -81,13 +81,13 @@ public:
     GLChannel(QGLWidget* qglWidget=NULL)
     :
     cedar::dev::sensors::visual::Grabber::Channel(),
-    //mpQGLWidget(QGLWidgetPtr()) //empty QGLWidgetPtr
+    // mpQGLWidget(QGLWidgetPtr()) // empty QGLWidgetPtr
     mpQGLWidget(qglWidget)
     {
     }
     //! @brief The QT OpenGL widget
     QGLWidget* mpQGLWidget ;
-    //cedar::dev::sensors::visual::GLGrabber::QGLWidgetPtr mpQGLWidget;
+    // cedar::dev::sensors::visual::GLGrabber::QGLWidgetPtr mpQGLWidget;
   };
 
   CEDAR_GENERATE_POINTER_TYPES(GLChannel);
@@ -143,7 +143,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  //derived from Grabber
+  // derived from Grabber
   bool onInit();
   bool onDeclareParameters();
   void onCleanUp();
@@ -192,4 +192,4 @@ private:
 
 }; // class cedar::dev::sensors::visual::GLGrabber
 
-#endif //CEDAR_DEV_SENSORS_VISUAL_GL_GRABBER_H
+#endif // CEDAR_DEV_SENSORS_VISUAL_GL_GRABBER_H

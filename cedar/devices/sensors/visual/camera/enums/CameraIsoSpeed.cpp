@@ -68,39 +68,39 @@ void cedar::dev::sensors::visual::CameraIsoSpeed::construct()
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraIsoSpeed::ISO_NOT_SET,
                                       "ISO_NOT_SET",
-                                      "Bus speed set to automatic"
+                                      "automatic"
                                     ));
 
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraIsoSpeed::ISO_100,
                                       "ISO_100",
-                                      "Bus speed 100 Mbit/s"
+                                      "100 Mbit/s"
                                     ));
                                     
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraIsoSpeed::ISO_200,
                                       "ISO_200",
-                                      "Bus speed 200 Mbit/s"
+                                      "200 Mbit/s"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraIsoSpeed::ISO_400,
                                       "ISO_400",
-                                      "Bus speed 400 Mbit/s"
+                                      "400 Mbit/s"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraIsoSpeed::ISO_800,
                                       "ISO_800",
-                                      "Bus speed 800 Mbit/s"
+                                      "800 Mbit/s"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraIsoSpeed::ISO_1600,
                                       "ISO_1600",
-                                      "Bus speed 1600 Mbit/s"
+                                      "1600 Mbit/s"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraIsoSpeed::ISO_3200,
                                       "ISO_3200",
-                                      "Bus speed 3200 Mbit/s"
+                                      "3200 Mbit/s"
                                     ));
 
 }

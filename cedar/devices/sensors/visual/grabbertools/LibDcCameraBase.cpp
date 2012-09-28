@@ -82,7 +82,7 @@ mError(DC1394_SUCCESS)
     }
     dc1394_free (mpFwContext);
     mpFwContext = NULL;
-    //throw ("Initialization Exception");
+    // throw ("Initialization Exception");
   }
 }
 
@@ -200,7 +200,7 @@ std::vector<std::string> cedar::dev::sensors::visual::LibDcCameraBase::getAllFea
 
   if (cam_features)
   {
-    //get features from cam
+    // get features from cam
     mError = dc1394_feature_get_all(mpCamera, cam_features);
 
     if (mError != DC1394_SUCCESS)
@@ -208,7 +208,7 @@ std::vector<std::string> cedar::dev::sensors::visual::LibDcCameraBase::getAllFea
       delete cam_features;
       EXCEPTION_THROW_ON_ERR
     }
-    //add them to our feature-vector
+    // add them to our feature-vector
     for (int i = 0 ; i < DC1394_FEATURE_NUM; i++)
     {
       features.push_back(dc1394_feature_get_string(cam_features->feature[i].id));
@@ -256,7 +256,7 @@ void cedar::dev::sensors::visual::LibDcCameraBase::printAllFeatures()
       return;
     }
     
-    //get a filehandle to console output
+    // get a filehandle to console output
     FILE *con = NULL;
     if  ( (con = fopen( "/dev/stdout" ,"w")) != NULL)
     {                                                    
@@ -413,8 +413,8 @@ std::string cedar::dev::sensors::visual::LibDcCameraBase::DC1394FeatureToCameraG
   dc1394feature_t feature
 ) const
 {
-  //CameraGrabber CameraProperty::Id have the same values like their OpenCv counterparts
-  //so we have to translate to DC1394 features
+  // CameraGrabber CameraProperty::Id have the same values like their OpenCv counterparts
+  // so we have to translate to DC1394 features
    
   std::string features[]=
   {

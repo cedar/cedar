@@ -321,8 +321,7 @@ void cedar::aux::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterPtr para
       {
         cedar::aux::ConfigurablePtr configurable = list_parameter->configurableAt(i);
         std::string label = list_parameter->getName() + "[" + cedar::aux::toString(i) + "]";
-        this->addLabelRow(label);
-        this->append(configurable->getParameters());
+        this->append(label, configurable);
       }
     }
   }

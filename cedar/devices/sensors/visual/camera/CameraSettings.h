@@ -33,7 +33,7 @@
     Credits:
 
 ======================================================================================================================*/
-//newfile
+// newfile
 #ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTINGS_H
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_SETTINGS_H
 
@@ -50,6 +50,9 @@
 
 #include "cedar/devices/sensors/visual/camera/backends/CameraBackendType.h"
 #include "cedar/devices/sensors/visual/camera/enums/CameraSetting.h"
+#include "cedar/devices/sensors/visual/camera/enums/CameraVideoMode.h"
+#include "cedar/devices/sensors/visual/camera/enums/CameraFrameRate.h"
+#include "cedar/devices/sensors/visual/camera/enums/CameraIsoSpeed.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -79,6 +82,7 @@ protected slots:
 signals:
 
 //!@brief This signal is emitted, when a setting has changed.
+// The CameraGrabber class have to create a new grabber with the new settings.
   void settingsChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -101,23 +105,27 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  /* Call this signal after creation of this class to connect the used signals
-   *
-   * For all settings, a new grabbing-device have to be created.
-   * All signals are connected to CameraGrabber::cameraChanged() slot
-   */
-//  void connectSignals(cedar::dev::sensors::visual::CameraGrabber* pCameraGrabber);
-  
-  //bool setSetting(cedar::dev::sensors::visual::CameraSetting::Id settingId, double value);
-  //double getSetting(cedar::dev::sensors::visual::CameraSetting::Id settingId);
+  // bool setSetting(cedar::dev::sensors::visual::CameraSetting::Id settingId, double value);
+  // double getSetting(cedar::dev::sensors::visual::CameraSetting::Id settingId);
 
-  unsigned int getBusId();
-  unsigned int getGuid();
-
+  unsigned int getCameraId();
   bool getByGuid();
 
-  void setParametersFromBackend(cedar::dev::sensors::visual::CameraBackendType::Id backendType);
+  cedar::dev::sensors::visual::CameraVideoMode::Id getVideoMode();
+  cedar::dev::sensors::visual::CameraFrameRate::Id getFPS();
 
+#ifdef CEDAR_USE_LIB_DC1394
+  cedar::dev::sensors::visual::CameraIsoSpeed::Id getIsoSpeed();
+  void setIsoSpeed( cedar::dev::sensors::visual::CameraIsoSpeed::Id isoSpeed);
+#endif // CEDAR_USE_LIB_DC1394
+
+  void setCameraId(unsigned int CameraId, bool isGuid = false);
+
+  void setVideoMode(cedar::dev::sensors::visual::CameraVideoMode::Id videoMode);
+  void setFPS(cedar::dev::sensors::visual::CameraFrameRate::Id fps);
+
+  /// Change visible attributes to various parameters of the settings-part
+  void setBackendType(cedar::dev::sensors::visual::CameraBackendType::Id backendType);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -129,7 +137,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void hideFwVideoModes();
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -139,7 +147,7 @@ protected:
   // none yet
 private:
   cedar::dev::sensors::visual::CameraBackendType::Id mBackendType;
-  unsigned int mCameraId;
+  //unsigned int mCameraId;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -150,17 +158,8 @@ protected:
   /// create with guid or with bus id
   cedar::aux::BoolParameterPtr _mpByGuid;
 
-  /// The id on the used bus
-  cedar::aux::UIntParameterPtr _mpBusId;
-
-  /// Unique channel id (not supported on every backend)
-  cedar::aux::UIntParameterPtr _mpGuid;
-  
-  /// frame width
-  cedar::aux::UIntParameterPtr mpWidth;
-
-  /// frame height
-  cedar::aux::UIntParameterPtr mpHeight;
+  /// Camera-ID. Either the Bus-ID or the GUID (depends on _mpByGuid)
+  cedar::aux::UIntParameterPtr _mpCameraId;
 
   /// framesize as mode
   cedar::aux::EnumParameterPtr _mpGrabMode;
