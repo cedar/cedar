@@ -66,7 +66,8 @@ public:
   //!@brief The standard constructor.
   CameraDeviceCvVideoCapture
   (
-   cedar::dev::sensors::visual::CameraChannelPtr pCameraChannel
+    cedar::dev::sensors::visual::CameraGrabber* pCameraGrabber,
+    cedar::dev::sensors::visual::CameraChannelPtr pCameraChannel
   );
 
   //!@brief Destructor
@@ -82,7 +83,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void fillCapabilities();
+  void setProperties();
   void applySettingsToCamera();
   bool createCaptureDevice();
   void applyStateToCamera();

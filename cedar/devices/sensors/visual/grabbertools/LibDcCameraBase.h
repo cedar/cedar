@@ -76,11 +76,11 @@ class cedar::dev::sensors::visual::LibDcCameraBase
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  //opens the firewire bus context and query the number of available cameras
+  // opens the firewire bus context and query the number of available cameras
   LibDcCameraBase();
   
   //!@brief Destructor
-  //close all firewire related handles
+  // close all firewire related handles
   ~LibDcCameraBase();
   
   //--------------------------------------------------------------------------------------------------------------------
@@ -100,7 +100,7 @@ public:
   void printAllFeatures();
   
  
-  //camera methods:
+  // camera methods:
 
   ///! Open a given camera. Methods like getCamFeatures rely on an opend camera.
   //   This is the first command if you want to get informations on a specific device
@@ -126,7 +126,7 @@ public:
   dc1394framerates_t getCamFramerates(dc1394video_mode_t mode);
 
  
-  //utility methods
+  // utility methods
     
   ///! Translate a DC1394-int-framerate to a string
   std::string DC1394FrameRateToString(dc1394framerate_t framerate) const;

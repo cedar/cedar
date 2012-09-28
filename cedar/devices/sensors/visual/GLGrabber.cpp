@@ -15,7 +15,7 @@
     License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
-    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+    along with cedar. If not, see <http:// www.gnu.org/licenses/>.
 
 ========================================================================================================================
 
@@ -130,7 +130,7 @@ bool cedar::dev::sensors::visual::GLGrabber::onInit()
                                             this->getName() + init_message.str(),
                                              "cedar::dev::sensors::visual::OglGrabber::onInit()"
                                            );
-  //Grab first frames
+  // Grab first frames
   onGrab();
 
   return true;
@@ -151,7 +151,7 @@ void cedar::dev::sensors::visual::GLGrabber::onCleanUp()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-//void cedar::dev::sensors::visual::GLGrabber::onAddChannel()
+// void cedar::dev::sensors::visual::GLGrabber::onAddChannel()
 //{
 //  // create the channel structure for one channel
 //  GLChannelPtr channel(new GLChannel);
@@ -168,7 +168,7 @@ bool cedar::dev::sensors::visual::GLGrabber::onDeclareParameters()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::GLGrabber::onUpdateSourceInfo(unsigned int channel)
 {
-  //value of channel is already checked by GraberInterface::getSourceInfo()
+  // value of channel is already checked by GraberInterface::getSourceInfo()
   getGLChannel(channel)->mChannelInfo = "Channel " + boost::lexical_cast<std::string>(channel)
                                       + ": QT::OGLWidget class \""
                                       + typeid(getGLChannel(channel)->mpQGLWidget).name()
@@ -190,12 +190,12 @@ bool cedar::dev::sensors::visual::GLGrabber::onGrab()
       // GL_FRONT_LEFT, GL_FRONT_RIGHT, GL_BACK_LEFT, GL_BACK_RIGHT, GL_FRONT, GL_BACK, GL_LEFT, GL_RIGHT, GL_AUXi,
       // where i is between 0 and the value of GL_AUX_BUFFERS minus 1.
 
-      //activate this thread for painting
-      //problem: qgl-widget painting also have to be multithreaded, i.e also have to invoke makeCurrent(), doneCurrent()
-      //p_channel_widget->makeCurrent();
+      // activate this thread for painting
+      // problem: qgl-widget painting also have to be multithreaded, i.e also have to invoke makeCurrent(), doneCurrent()
+      // p_channel_widget->makeCurrent();
       glReadBuffer(GL_FRONT_RIGHT);
       QImage qimage = p_channel_widget->grabFrameBuffer(false);
-      //p_channel_widget->doneCurrent();
+      // p_channel_widget->doneCurrent();
 
       // QImage to cv::Mat
       cv::Mat mat = cv::Mat(qimage.height(), qimage.width(), CV_8UC4,(uchar*)qimage.bits(), qimage.bytesPerLine());
@@ -203,7 +203,7 @@ bool cedar::dev::sensors::visual::GLGrabber::onGrab()
       int from_to[] = { 0,0, 1,1, 2,2 };
       cv::mixChannels( &mat, 1, &mat2, 1, from_to, 3 );
 
-      //apply the new content to the channel image
+      // apply the new content to the channel image
       getGLChannel(channel)->mImageMat = mat2.clone();
     }
     else

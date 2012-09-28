@@ -63,17 +63,17 @@ void cedar::dev::sensors::visual::CameraPropertyMode::construct()
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraPropertyMode::BACKEND_DEFAULT,
                                       "BACKEND_DEFAULT",
-                                      "Backend"
+                                      "default"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraPropertyMode::AUTO,
                                       "AUTO",
-                                      "Automatic"
+                                      "automatic"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraPropertyMode::MANUAL,
                                       "MANUAL",
-                                      "Manual"
+                                      "manual"
                                     ));
 #ifdef CEDAR_USE_LIB_DC1394
 //  mType.type()->def(cedar::aux::Enum(

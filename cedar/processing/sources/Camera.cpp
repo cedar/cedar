@@ -106,6 +106,9 @@ cedar::proc::sources::GrabberBase()
   // applyParameter as an action
   this->registerFunction("apply parameter", boost::bind(&cedar::proc::sources::Camera::applyParameter, this));
 
+  // update picture as an action
+  this->registerFunction("update frame", boost::bind(&cedar::proc::sources::Camera::updateFrame, this));
+
 }
 
 cedar::proc::sources::Camera::~Camera()
@@ -132,7 +135,7 @@ void cedar::proc::sources::Camera::applyParameter()
   {
     for (int i = 0; i < 5; ++i)
     {
-      usleep(500);
+      usleep(5000);
       this->onTrigger();
       this->annotateImage();
     }
@@ -145,9 +148,24 @@ void cedar::proc::sources::Camera::applyParameter()
                                                "void cedar::proc::sources::Camera::applyParameter()"
                                              );
   }
-
-
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+void cedar::proc::sources::Camera::updateFrame()
+{
+  if (this->getCameraGrabber()->isCreated())
+  {
+    for (int i = 0; i < 10; ++i)
+    {
+      usleep(50000);
+      this->onTrigger();
+      this->annotateImage();
+    }
+  }
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Camera::compute(const cedar::proc::Arguments&)
 {
@@ -167,7 +185,7 @@ void cedar::proc::sources::Camera::compute(const cedar::proc::Arguments&)
   {
     this->getCameraGrabber()->grab();
     //!@todo Don't constantly reannotate here!
-    this->annotateImage();
+    //this->annotateImage();
     this->mImage->setData(this->getCameraGrabber()->getImage().clone());
   }
 }

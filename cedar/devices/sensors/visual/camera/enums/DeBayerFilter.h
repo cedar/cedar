@@ -55,6 +55,8 @@
  *  cv::Mat stores the images in BGR format, so only that filters mapped here
  *
  */
+
+//! @todo: change class name to Decoding
 class cedar::dev::sensors::visual::DeBayerFilter
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -107,6 +109,7 @@ public:
   static const Id NONE = 0;
 
   /// Apply  bayer filter Blue-Green to BGR
+  /// @todo change constants to FROM_BG, FROM_GB...
   static const Id BG_TO_BGR = CV_BayerBG2BGR; //= 46;
 
   /// Apply  bayer filter Green-Blue to BGR

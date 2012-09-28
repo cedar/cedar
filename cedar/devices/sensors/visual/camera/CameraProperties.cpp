@@ -39,7 +39,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/camera/CameraProperties.h"
-
 #include "cedar/devices/sensors/visual/camera/enums/CameraIsoSpeed.h"
 #include "cedar/devices/sensors/visual/camera/enums/CameraProperty.h"
 #include "cedar/devices/sensors/visual/camera/enums/CameraVideoMode.h"
@@ -48,173 +47,312 @@
 #include "cedar/devices/sensors/visual/camera/enums/DeBayerFilter.h"
 
 // SYSTEM INCLUDES
+#include <boost/lexical_cast.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::sensors::visual::CameraProperties::CameraProperties()
+cedar::dev::sensors::visual::CameraProperties::CameraProperties
+(
+  cedar::aux::Configurable *pOwner,
+  cv::VideoCapture capture,
+  QReadWriteLock* lock
+)
+:
+cedar::aux::Configurable(),
+mVideoCapture(capture),
+mpVideoCaptureLock(lock)
 {
+  // create new node for properties in the configuration
+  cedar::aux::ConfigurablePtr properties(new cedar::aux::Configurable());
+  pOwner->addConfigurableChild("properties", properties);
 
+  mpPropertiesList = cedar::dev::sensors::visual::CameraProperties::CamPropertiesMapPtr
+                     (
+                       new cedar::dev::sensors::visual::CameraProperties::CamPropertiesMap
+                     );
+
+  // Add all properties to the properties-list
+  int num_properties = cedar::dev::sensors::visual::CameraProperty::type().list().size();
+  for (int i=0; i<num_properties; i++)
+  {
+    cedar::dev::sensors::visual::CameraProperty::Id prop_id
+      = cedar::dev::sensors::visual::CameraProperty::type().list().at(i).id();
+
+    // get name of property and create it with default value
+    std::string prop_name = cedar::dev::sensors::visual::CameraProperty::type().list().at(i).prettyString();
+
+    //create property with default parameter
+    cedar::dev::sensors::visual::CamPropertyPtr p_prop(new cedar::dev::sensors::visual::CamProperty(prop_id,prop_name));
+
+    //add to properties-list
+    mpPropertiesList->insert(std::pair<unsigned int, CamPropertyPtr>(prop_id,p_prop));
+    properties->addConfigurableChild(prop_name, p_prop);
+
+    QObject::connect(
+                      p_prop.get(),
+                      SIGNAL(propertyValueChanged(cedar::dev::sensors::visual::CameraProperty::Id,double)),
+                      this,
+                      SLOT(propertyValueChanged(cedar::dev::sensors::visual::CameraProperty::Id,double))
+                    );
+
+    QObject::connect(
+                      p_prop.get(),
+                      SIGNAL(propertyModeChanged(
+                                                  cedar::dev::sensors::visual::CameraProperty::Id,
+                                                  cedar::dev::sensors::visual::CameraPropertyMode::Id
+                                                )),
+                      this,
+                      SLOT(propertyModeChanged(
+                                                cedar::dev::sensors::visual::CameraProperty::Id,
+                                                cedar::dev::sensors::visual::CameraPropertyMode::Id
+                                              ))
+                    );
+  }
 }
 
 cedar::dev::sensors::visual::CameraProperties::~CameraProperties()
 {
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+// slots
+//----------------------------------------------------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------------------------------------------------
+void cedar::dev::sensors::visual::CameraProperties::propertyValueChanged
+(
+  cedar::dev::sensors::visual::CameraProperty::Id propertyId,
+  double newValue
+)
+{
+   std::cout << "[propertyValueChanged] prop :" << propertyId << " to " << newValue << std::endl;
+
+  // get the used CamProperty
+  cedar::dev::sensors::visual::CamPropertyPtr p_prop = (*mpPropertiesList)[propertyId];
+
+  // and the mode
+  cedar::dev::sensors::visual::CameraPropertyMode::Id prop_mode_id = p_prop->getMode();
+
+  //change the property value on the camera only if this property is mode manual
+  if (prop_mode_id == cedar::dev::sensors::visual::CameraPropertyMode::MANUAL)
+  {
+    setPropertyToCamera(propertyId,newValue);
+  }
+
+  // in modes BACKEND_DEFAULT and AUTO it is enough to update the values for displaying
+}
+
+//--------------------------------------------------------------------------------------------------------------------
+void cedar::dev::sensors::visual::CameraProperties::propertyModeChanged
+(
+  cedar::dev::sensors::visual::CameraProperty::Id propertyId,
+  cedar::dev::sensors::visual::CameraPropertyMode::Id newMode
+)
+{
+
+  std::cout << "[propertyModeChanged] prop :" << propertyId << " to " << newMode << std::endl;
+
+  // get the used CamProperty
+  cedar::dev::sensors::visual::CamPropertyPtr p_prop = (*mpPropertiesList)[propertyId];
+
+  // get values from the camera depends on mode
+  if (newMode == cedar::dev::sensors::visual::CameraPropertyMode::MANUAL)
+  {
+    double value = getPropertyFromCamera(propertyId);
+    p_prop->setValue(value);
+  }
+
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-//cedar::dev::sensors::visual::CameraPropertiesSet& cedar::dev::sensors::visual::CameraProperties::getProperties()
-//{
-//  return mProperties;
-//}
 
-//bool cedar::dev::sensors::visual::CameraProperties::setProperty(unsigned int property_id,double value)
-//{
-//  //set the value with respect to concurrent access
-//
-//  //get old value
-//  //set new value only if it is different
-//  //check if value is set to the right value
-//  //update setting-mode
-//  //update property-mode
-//  return false;
-//}
-//
-//double cedar::dev::sensors::visual::CameraProperties::getProperty(unsigned int property)
-//{
-//
-//}
-
-
-
-
+void cedar::dev::sensors::visual::CameraProperties::setVideoCaptureObject(cv::VideoCapture capture)
+{
+  mVideoCapture = capture;
+}
 
 //--------------------------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::CameraProperties::setSetting(cedar::dev::sensors::visual::CameraSetting::Id settingId, double value)
+bool cedar::dev::sensors::visual::CameraProperties::setProperty
+(
+  cedar::dev::sensors::visual::CameraProperty::Id propertyId,
+  double value
+)
 {
+  // check if new value is different from old
+  if ((*mpPropertiesList)[propertyId]->getValue() == value)
+  {
+    return true;
+  }
 
-  //have to be switched over to signal handler !!!
+  // set value
+  (*mpPropertiesList)[propertyId]->setValue(value);
 
-  unsigned int prop_id = static_cast<unsigned int>(settingId);
-  bool result = this->setPropertyRawValue(prop_id,value);
-  unsigned int ivalue = static_cast<unsigned int>(value);
+  // check if value is set to the right value
 
-//  switch (settingId)
-//  {
-//    case cedar::dev::sensors::visual::CameraSetting::FPS :
-//      //mCamSettings.fps = cedar::dev::sensors::visual::CameraFrameRate::type().get(ivalue).name();
-//    case cedar::dev::sensors::visual::CameraSetting::ISO_SPEED :
-//      //mCamSettings.iso_speed = cedar::dev::sensors::visual::CameraIsoSpeed::type().get(ivalue).name();
-//    case cedar::dev::sensors::visual::CameraSetting::MODE :
-//      //mCamSettings.mode = cedar::dev::sensors::visual::CameraVideoMode::type().get(ivalue).name();
-//  }
-//  return result;
+  if ((*mpPropertiesList)[propertyId]->getValue() == value)
+  {
+    return true;
+  }
   return false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-double cedar::dev::sensors::visual::CameraProperties::getSetting(CameraSetting::Id settingId)
-{
-//  switch (settingId)
-//  {
-//  case cedar::dev::sensors::visual::CameraSetting::FPS :
-//    return static_cast<double>(CameraFrameRate::type().get(mCamSettings.fps).id());
-//  case cedar::dev::sensors::visual::CameraSetting::ISO_SPEED :
-//    return static_cast<double>(CameraIsoSpeed::type().get(mCamSettings.iso_speed).id());
-//  case cedar::dev::sensors::visual::CameraSetting::MODE :
-//    return static_cast<double>(CameraVideoMode::type().get(mCamSettings.mode).id());
-//  case cedar::dev::sensors::visual::CameraSetting::FRAME_HEIGHT :
-//    return getRawProperty(CameraSetting::FRAME_HEIGHT);
-//  case cedar::dev::sensors::visual::CameraSetting::FRAME_WIDTH :
-//    return getRawProperty(CameraSetting::FRAME_WIDTH);
-//  default :
-//    return CAMERA_PROPERTY_NOT_SUPPORTED;
-//  }
-  return 0.0f;
-}
-
-
-bool cedar::dev::sensors::visual::CameraProperties::setPropertyRawValue(unsigned int property_id,double value)
-{
-  //lock videocapture
-
-  //set property
-
-  //unlock videocapture
-
-  return false;
-}
-
-
-double cedar::dev::sensors::visual::CameraProperties::getPropertyRawValue(unsigned int property_id)
-{
-  return 0.0f;
-}
-
-
-cedar::dev::sensors::visual::CamProperty& cedar::dev::sensors::visual::CameraProperties::getPropertyPtr
+bool cedar::dev::sensors::visual::CameraProperties::setPropertyMode
 (
-  CameraProperty::Id propId
-)
-{
-  return mPropertiesList.find(static_cast<unsigned int>(propId))->second;
-
-  //create empty CamProperty
-  //cedar::dev::sensors::visual::CamPropertyPtr val(new cedar::dev::sensors::visual::CamProperty());
-  //return val;
-}
-
-
-cedar::dev::sensors::visual::CameraPropertyMode::Id cedar::dev::sensors::visual::CameraProperties::getMode
-(
-  cedar::dev::sensors::visual::CameraProperty::Id propId
-)
-{
-
-}
-
-void cedar::dev::sensors::visual::CameraProperties::setMode
-(
-  cedar::dev::sensors::visual::CameraProperty::Id propId,
+  cedar::dev::sensors::visual::CameraProperty::Id propertyId,
   cedar::dev::sensors::visual::CameraPropertyMode::Id mode
 )
 {
-
+  cedar::dev::sensors::visual::CamPropertyPtr p_prop = (*mpPropertiesList)[propertyId];
+  p_prop->setMode(mode);
+  return (p_prop->getMode() == mode);
 }
 
-double cedar::dev::sensors::visual::CameraProperties::getMinValue(CameraProperty::Id propId)
+//--------------------------------------------------------------------------------------------------------------------
+cedar::dev::sensors::visual::CameraPropertyMode::Id cedar::dev::sensors::visual::CameraProperties::getPropertyMode
+(
+  cedar::dev::sensors::visual::CameraProperty::Id propertyId
+)
 {
+  // get the used CamProperty
+  cedar::dev::sensors::visual::CamPropertyPtr p_prop = (*mpPropertiesList)[propertyId];
 
+  return p_prop->getMode();
 }
 
-double cedar::dev::sensors::visual::CameraProperties::getMaxValue(CameraProperty::Id propId)
-{
 
+//--------------------------------------------------------------------------------------------------------------------
+double cedar::dev::sensors::visual::CameraProperties::getProperty
+(
+  cedar::dev::sensors::visual::CameraProperty::Id propertyId
+)
+{
+  cedar::dev::sensors::visual::CamPropertyPtr p_prop = (*mpPropertiesList)[propertyId];
+
+  // only return this value, if set to manual or if backend-default value
+  if (!(p_prop->isSupported()))
+  {
+    return CAMERA_PROPERTY_NOT_SUPPORTED;
+  }
+  if (p_prop->getMode() == cedar::dev::sensors::visual::CameraPropertyMode::AUTO)
+  {
+    return CAMERA_PROPERTY_MODE_AUTO;
+  }
+
+  if (p_prop->getMode() == cedar::dev::sensors::visual::CameraPropertyMode::BACKEND_DEFAULT)
+  {
+    return CAMERA_PROPERTY_MODE_DEFAULT;
+  }
+
+  return p_prop->getValue();
 }
 
-bool cedar::dev::sensors::visual::CameraProperties::isSupported(CameraProperty::Id propId)
-{
 
+//--------------------------------------------------------------------------------------------------------------------
+bool cedar::dev::sensors::visual::CameraProperties::setPropertyToCamera(unsigned int propertyId, double value)
+{
+  bool result = false;
+  mpVideoCaptureLock->lockForWrite();
+  if (mVideoCapture.isOpened())
+  {
+    //set only real values or CAMERA_PROPERTY_MODE_AUTO
+    if (    (value != CAMERA_PROPERTY_NOT_SUPPORTED)
+         || (value != CAMERA_PROPERTY_MODE_DEFAULT)
+       )
+    {
+      result = mVideoCapture.set(propertyId, value);
+    }
+  }
+  mpVideoCaptureLock->unlock();
+
+  // check if set
+  if (result)
+  {
+    if (this->getPropertyFromCamera(propertyId) == value)
+    {
+      return true;
+    }
+  }
+
+  std::string prop_name = cedar::dev::sensors::visual::CameraProperty::type().get(propertyId).prettyString();
+  cedar::aux::LogSingleton::getInstance()->warning
+                                           (
+                                             "property " + prop_name
+                                             + " couldn't set to " + boost::lexical_cast<std::string>(value),
+                                             "cedar::dev::sensors::visual::CameraProperties::setPropertyToCamera()"
+                                           );
+  return false;
 }
 
-bool cedar::dev::sensors::visual::CameraProperties::isReadable(CameraProperty::Id propId)
-{
 
+//--------------------------------------------------------------------------------------------------------------------
+double cedar::dev::sensors::visual::CameraProperties::getPropertyFromCamera(unsigned int propertyId)
+{
+  double result = -1;
+  mpVideoCaptureLock->lockForWrite();
+  if (mVideoCapture.isOpened())
+  {
+    result = mVideoCapture.get(propertyId);
+  }
+  mpVideoCaptureLock->unlock();
+  return result;
 }
 
-bool cedar::dev::sensors::visual::CameraProperties::isOnOffCapable(CameraProperty::Id propId)
+//--------------------------------------------------------------------------------------------------------------------
+cedar::dev::sensors::visual::CameraPropertyMode::Id cedar::dev::sensors::visual::CameraProperties::getMode
+(
+  cedar::dev::sensors::visual::CameraProperty::Id propertyId
+)
 {
-
+  return (*mpPropertiesList)[propertyId]->getMode();
 }
 
-bool cedar::dev::sensors::visual::CameraProperties::isAutoCapable(CameraProperty::Id propId)
-{
 
+//--------------------------------------------------------------------------------------------------------------------
+void cedar::dev::sensors::visual::CameraProperties::setMode
+(
+  cedar::dev::sensors::visual::CameraProperty::Id propertyId,
+  cedar::dev::sensors::visual::CameraPropertyMode::Id modeId
+)
+{
+  (*mpPropertiesList)[propertyId]->setMode(modeId);
 }
 
-bool cedar::dev::sensors::visual::CameraProperties::isManualCapable(CameraProperty::Id propId)
+//--------------------------------------------------------------------------------------------------------------------
+double cedar::dev::sensors::visual::CameraProperties::getMinValue(CameraProperty::Id propertyId)
 {
+  return (*mpPropertiesList)[propertyId]->getMinValue();
+}
 
+//--------------------------------------------------------------------------------------------------------------------
+double cedar::dev::sensors::visual::CameraProperties::getMaxValue(CameraProperty::Id propertyId)
+{
+  return (*mpPropertiesList)[propertyId]->getMaxValue();
+}
+
+//--------------------------------------------------------------------------------------------------------------------
+bool cedar::dev::sensors::visual::CameraProperties::isSupported(CameraProperty::Id propertyId)
+{
+  return (*mpPropertiesList)[propertyId]->isSupported();
+}
+
+//--------------------------------------------------------------------------------------------------------------------
+bool cedar::dev::sensors::visual::CameraProperties::isReadable(CameraProperty::Id propertyId)
+{
+  return (*mpPropertiesList)[propertyId]->isReadable();
+}
+
+//--------------------------------------------------------------------------------------------------------------------
+bool cedar::dev::sensors::visual::CameraProperties::isAutoCapable(CameraProperty::Id propertyId)
+{
+  return (*mpPropertiesList)[propertyId]->isAutoCapable();
+}
+
+//--------------------------------------------------------------------------------------------------------------------
+bool cedar::dev::sensors::visual::CameraProperties::isManualCapable(CameraProperty::Id propertyId)
+{
+  return (*mpPropertiesList)[propertyId]->isManualCapable();
 }
