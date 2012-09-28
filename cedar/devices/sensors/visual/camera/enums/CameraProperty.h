@@ -60,9 +60,12 @@
 //return value, if a property is not supported from the actual device
 #define CAMERA_PROPERTY_NOT_SUPPORTED -1
 
-//sets a feature to auto-mode. The propery have to be auto_capable.
+//sets a feature to auto-mode. The property have to be auto_capable.
 //Assigning a value to a feature, sets its mode to manual // =-2
 #define CAMERA_PROPERTY_MODE_AUTO CV_CAP_PROP_DC1394_MODE_AUTO
+
+// if a getProperty method returns this value, then the value of the property is determined by the backend
+#define CAMERA_PROPERTY_MODE_DEFAULT -3
 
 //if a feature is on/off capable, this value turns it off //=-4
 #define CAMERA_PROPERTY_MODE_OFF CV_CAP_PROP_DC1394_OFF
@@ -150,10 +153,12 @@ public:
   static const Id PROP_GAMMA = CV_CAP_PROP_GAMMA; //22;
   /// @see PROP_BRIGHTNESS
   static const Id PROP_TEMPERATURE = CV_CAP_PROP_TEMPERATURE; // 23;
+  /* until now: not supported by cedar
   /// @see PROP_BRIGHTNESS
   static const Id PROP_TRIGGER = CV_CAP_PROP_TRIGGER; // 24;
   /// @see PROP_BRIGHTNESS
   static const Id PROP_TRIGGER_DELAY = CV_CAP_PROP_TRIGGER_DELAY; // 25;
+  */
   /// @see PROP_BRIGHTNESS
   static const Id PROP_WHITE_BALANCE_RED_V = CV_CAP_PROP_WHITE_BALANCE_RED_V; // 26;
   /// @see PROP_BRIGHTNESS

@@ -69,27 +69,85 @@ bool cedar::dev::sensors::visual::CameraDevice::init()
 {
   bool result = true;
 
-  // 1. lock
+  // lock
   this->mpCameraChannel->mpVideoCaptureLock->lockForWrite();
 
-  // 2. close old videoCapture device
+  // close old videoCapture device
   this->mpCameraChannel->mVideoCapture = cv::VideoCapture();
+//  this->mpCameraChannel->mVideoCapture.release();
 
-  // 3  fill p_capabilities with the right values (depends on backend and camera)
+  // fill p_capabilities with the right values (depends on backend and camera)
   this->setProperties();
 
-  // 4. create cv::VideoCapture
+  // create cv::VideoCapture
   result = this->createCaptureDevice();
 
-  // 4.1   apply settings from p_settings structure
+  // pass the new created capture to the channel structure
+  mpCameraChannel->mpProperties->setVideoCaptureObject(mpCameraChannel->mVideoCapture);
+
+  // apply settings from p_settings structure
   this->applySettingsToCamera();
 
-  // 4.2   restore state of the device with the values in p_state
+  // restore state of the device with the values in p_state
   this->applyStateToCamera();
 
-  // 5. unlock
+  // unlock
   this->mpCameraChannel->mpVideoCaptureLock->unlock();
 
-  // 6. done
+  std::cout << "CameraDevice done" << std::endl;
+  return result;
+}
+
+
+bool cedar::dev::sensors::visual::CameraDevice::setPropertyToCamera(unsigned int propertyId, double value)
+{
+  // no lock needed, the cvVideoCapture object is globally locked
+  std::string prop_name = cedar::dev::sensors::visual::CameraProperty::type().get(propertyId).prettyString();
+  std::cout << "setPropertyToCamera "<< prop_name <<"( ID: " << propertyId << ") Value: " << value << std::endl;
+  bool result = false;
+  if (this->mpCameraChannel->mVideoCapture.isOpened())
+  {
+    //set only real values or CAMERA_PROPERTY_MODE_AUTO
+    if ( (value != CAMERA_PROPERTY_NOT_SUPPORTED) || (value != CAMERA_PROPERTY_MODE_DEFAULT) )
+    {
+      result = this->mpCameraChannel->mVideoCapture.set(propertyId, value);
+    }
+  }
+
+//  // check if set
+//  if (result)
+//  {
+//    if (this->getPropertyFromCamera(propertyId) == value)
+//    {
+//      return true;
+//    }
+//  }
+//
+//  std::string prop_name = cedar::dev::sensors::visual::CameraProperty::type().get(propertyId).prettyString();
+//  cedar::aux::LogSingleton::getInstance()->warning
+//                                           (
+//                                             "property " + prop_name
+//                                             + " couldn't set to " + boost::lexical_cast<std::string>(value),
+//                                             "cedar::dev::sensors::visual::CameraDevice::setPropertyToCamera()"
+//                                           );
+  return result;
+}
+
+double cedar::dev::sensors::visual::CameraDevice::getPropertyFromCamera(unsigned int propertyId)
+{
+  double result = CAMERA_PROPERTY_NOT_SUPPORTED;
+
+  if (this->mpCameraChannel->mVideoCapture.isOpened())
+  {
+    bool is_readable = this->mpCameraChannel->mpProperties->isReadable(propertyId);
+    if (is_readable)
+    {
+      result = this->mpCameraChannel->mVideoCapture.get(propertyId);
+    }
+    else
+    {
+      result = CAMERA_PROPERTY_NOT_SUPPORTED;
+    }
+  }
   return result;
 }

@@ -57,6 +57,8 @@ cedar_add_library(cedardev
                   sensors/visual/PictureGrabber.h
                   sensors/visual/CameraGrabber.h
                   sensors/visual/camera/CameraSettings.h
+                  sensors/visual/camera/CamProperty.h
+                  sensors/visual/camera/CameraProperties.h
                   ${kuka_moc_files}
                   LINK_LIBRARIES
                   cedaraux
