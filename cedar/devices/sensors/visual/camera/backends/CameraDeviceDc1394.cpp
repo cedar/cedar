@@ -50,21 +50,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::sensors::visual::CameraDeviceDc1394::CameraDeviceDc1394
 (
-//  cedar::dev::sensors::visual::CameraSettingsPtr pSettings,
-//  cedar::dev::sensors::visual::CameraPropertiesPtr pProperties,
-//  cv::VideoCapture videoCapture,
-//  QReadWriteLock* pVideoCaptureLock
+  cedar::dev::sensors::visual::CameraGrabber* pCameraGrabber,
   cedar::dev::sensors::visual::CameraChannelPtr pCameraChannel
 )
 :
-cedar::dev::sensors::visual::CameraDevice::CameraDevice(pCameraChannel)
-//cedar::dev::sensors::visual::CameraDevice::CameraDevice
-//(
-//  pSettings,
-//  pProperties,
-//  videoCapture,
-//  pVideoCaptureLock
-//)
+cedar::dev::sensors::visual::CameraDevice::CameraDevice(pCameraGrabber,pCameraChannel)
 {
   //!@todo Implement the firewire backend:
   //
@@ -279,14 +269,80 @@ cedar::dev::sensors::visual::CameraDeviceDc1394::~CameraDeviceDc1394()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::CameraDeviceDc1394::fillCapabilities()
+void cedar::dev::sensors::visual::CameraDeviceDc1394::setProperties()
 {
+//  int num_properties = cedar::dev::sensors::visual::CameraProperty::type().list().size();
+//  for (int i=0; i<num_properties; i++)
+//  {
+//    cedar::dev::sensors::visual::CameraProperty::Id prop_id
+//      = cedar::dev::sensors::visual::CameraProperty::type().list().at(i).id();
+//
+//
+//    // ignore unsupported features
+//    bool is_supported = true;
+//    bool is_readable = true;
+//
+//    if (    (prop_id == cedar::dev::sensors::visual::CameraProperty::PROP_TRIGGER)
+//         || (prop_id == cedar::dev::sensors::visual::CameraProperty::PROP_TRIGGER_DELAY)
+//       )
+//    {
+//      is_supported = false;
+//      is_readable = false;
+//    }
+//
+//    std::string prop_name = cedar::dev::sensors::visual::CameraProperty::type().list().at(i).prettyString();
+//
+//    //@todo: get min/max values from device !!!
+//
+//    mpCameraChannel->mpProperties->getPropertyClass(prop_name);
+
+    //adjust values with the right ones from the cam
+
+
+
+
+
+
+  //adjust values of the settings available
+
+  /*
+  cedar::dev::sensors::visual::CameraSettingsSet& settings = mpSettings->getSettings();
+  settings.get().clear();
+
+
+  //create structure with settings and their values
+  int num_settings = cedar::dev::sensors::visual::CameraSetting::type().list().size();
+  for (int i=0; i<num_settings; i++)
+  {
+    cedar::dev::sensors::visual::CameraSetting::Id setting_id
+      = cedar::dev::sensors::visual::CameraSetting::type().list().at(i).id();
+
+    std::string setting_name = cedar::dev::sensors::visual::CameraSetting::type().list().at(i).prettyString();
+
+    //@todo: get min/max values from device !!!
+
+    cedar::dev::sensors::visual::CamSettingPtr p_prop(new cedar::dev::sensors::visual::CamSetting
+                                                         (
+                                                           setting_id,
+                                                           setting_name
+                                                         )
+                                                      );
+    settings.insert(p_prop);
+  }
+  */
+
+
+
+
+
+//  }
+
 
 }
 
 bool cedar::dev::sensors::visual::CameraDeviceDc1394::createCaptureDevice()
 {
-
+  return false;
 }
 
 void cedar::dev::sensors::visual::CameraDeviceDc1394::applySettingsToCamera()

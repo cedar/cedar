@@ -15,7 +15,7 @@
     License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
-    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+    along with cedar. If not, see <http:// www.gnu.org/licenses/>.
 
 ========================================================================================================================
 
@@ -106,13 +106,13 @@ cedar::dev::sensors::visual::Grabber
 // Destructor
 cedar::dev::sensors::visual::GrabbableGrabber::~GrabbableGrabber()
 {
-  //call of doCleanup, to do the necessarily cleanup in Grabber
+  // call of doCleanup, to do the necessarily cleanup in Grabber
   doCleanUp();
 
-  //do memory de-allocation in the destructor
-  //all stuff in the mChannels vector is cleared by the shared pointer
+  // do memory de-allocation in the destructor
+  // all stuff in the mChannels vector is cleared by the shared pointer
 
-  //debug logging
+  // debug logging
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
 }
@@ -139,35 +139,35 @@ bool cedar::dev::sensors::visual::GrabbableGrabber::onInit()
                                              "cedar::dev::sensors::visual::GrabbableGrabber::onInit()"
                                            );
 
-  //load pictures one by one
+  // load pictures one by one
   for(unsigned int channel=0; channel < num_cams;++channel)
   {
     getGrabbableChannel(channel)->mpGrabberLock = getGrabbableChannel(channel)->mpSourceInterfaceClass->registerGrabber();
 
-    //check if successfully registered
+    // check if successfully registered
     if (! getGrabbableChannel(channel)->mpGrabberLock)
     {
       return false;
     }
   }
 
-  //grab first image
+  // grab first image
   onGrab();
 
-  //no exception until now
+  // no exception until now
   return true;
 }
 
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::GrabbableGrabber::onCleanUp()
 {
-  //do the cleanup of used hardware in this method
-  //on an exception or a CTRL-C only onCleanUp will be invoked (no destructor)
+  // do the cleanup of used hardware in this method
+  // on an exception or a CTRL-C only onCleanUp will be invoked (no destructor)
   unsigned int num_cams = getNumCams();
   for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
     getGrabbableChannel(channel)->mpSourceInterfaceClass->deregisterGrabber(getGrabbableChannel(channel)->mpGrabberLock);
-    //remove the references to the external classes
+    // remove the references to the external classes
     getGrabbableChannel(channel)->mpSourceInterfaceClass = NULL;
     getGrabbableChannel(channel)->mpGrabberLock = NULL;
   }
@@ -175,9 +175,9 @@ void cedar::dev::sensors::visual::GrabbableGrabber::onCleanUp()
 }
 
 //----------------------------------------------------------------------------------------------------
-//void cedar::dev::sensors::visual::GrabbableGrabber::onAddChannel()
+// void cedar::dev::sensors::visual::GrabbableGrabber::onAddChannel()
 //{
-//  //create the channel structure for one channel
+//  // create the channel structure for one channel
 //  InterfaceChannelPtr channel(new InterfaceChannel);
 //  channel->mpSourceInterfaceClass=NULL;
 //  channel->mpGrabberLock=NULL;
@@ -199,7 +199,7 @@ bool cedar::dev::sensors::visual::GrabbableGrabber::onGrab()
   unsigned int num_cams = getNumCams();
   for(unsigned int channel = 0; channel < num_cams; ++channel)
    {
-     //apply the new content to the channel image
+     // apply the new content to the channel image
      try
      {
        getGrabbableChannel(channel)->mpGrabberLock->lockForRead();

@@ -150,7 +150,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  //derived from Grabber
+  // derived from Grabber
   bool onCreateGrabber();
   void onCloseGrabber();
   void onCleanUp();
@@ -206,8 +206,8 @@ private:
   // none yet
 
   //! @brief The filename of the picture you want to grab from
-  //cedar::aux::FileParameterPtr _mSourceFileName;
+  // cedar::aux::FileParameterPtr _mSourceFileName;
 
 }; // class cedar::dev::sensors::visual::TestGrabber
 
-#endif //CEDAR_DEV_SENSORS_VISUAL_TEST_GRABBER_H
+#endif // CEDAR_DEV_SENSORS_VISUAL_TEST_GRABBER_H

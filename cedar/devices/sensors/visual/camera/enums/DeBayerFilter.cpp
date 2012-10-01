@@ -71,22 +71,22 @@ void cedar::dev::sensors::visual::DeBayerFilter::construct()
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::DeBayerFilter::BG_TO_BGR,
                                       "BG_TO_BGR",
-                                      "Blue/Green to BGR"
+                                      "from blue/green"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::DeBayerFilter::GB_TO_BGR,
                                       "GB_TO_BGR",
-                                      "Green/Blue to BGR"
+                                      "from green/blue"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::DeBayerFilter::RG_TO_BGR,
                                       "RG_TO_BGR",
-                                      "Red/Green to BGR"
+                                      "from red/green"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::DeBayerFilter::GR_TO_BGR,
                                       "GR_TO_BGR",
-                                      "Green/Red to BGR"
+                                      "from green/red"
                                     ));
 }
 //----------------------------------------------------------------------------------------------------------------------

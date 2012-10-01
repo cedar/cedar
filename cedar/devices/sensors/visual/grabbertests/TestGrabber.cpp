@@ -68,9 +68,9 @@ cedar::dev::sensors::visual::Grabber
     new cedar::dev::sensors::visual::TestGrabber::TestChannel(sourceFileName)
   )
 )//,
-//_mSourceFileName(new cedar::aux::FileParameter(this, "fileName", cedar::aux::FileParameter::READ, fileName))
+// _mSourceFileName(new cedar::aux::FileParameter(this, "fileName", cedar::aux::FileParameter::READ, fileName))
 {
-  //information logging
+  // information logging
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
   cedar::aux::LogSingleton::getInstance()->debugMessage
@@ -103,9 +103,9 @@ cedar::dev::sensors::visual::Grabber
     new cedar::dev::sensors::visual::TestGrabber::TestChannel(sourceFileName1)
   )
 )//,
-//_mSourceFileName(new cedar::aux::FileParameter(this, "fileName", cedar::aux::FileParameter::READ, fileName))
+// _mSourceFileName(new cedar::aux::FileParameter(this, "fileName", cedar::aux::FileParameter::READ, fileName))
 {
-  //debug information logging
+  // debug information logging
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
   cedar::aux::LogSingleton::getInstance()->debugMessage
@@ -119,11 +119,11 @@ cedar::dev::sensors::visual::Grabber
 // Destructor
 cedar::dev::sensors::visual::TestGrabber::~TestGrabber()
 {
-  //call of doCleanup, to do the necessarily cleanup in Grabber
+  // call of doCleanup, to do the necessarily cleanup in Grabber
   doCleanUp();
 
-  //do memory de-allocation in the destructor
-  //all stuff in the mChannels vector is cleared by the shared pointer
+  // do memory de-allocation in the destructor
+  // all stuff in the mChannels vector is cleared by the shared pointer
 
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
@@ -132,7 +132,7 @@ cedar::dev::sensors::visual::TestGrabber::~TestGrabber()
                                           );
 
 
-  //debug logging
+  // debug logging
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
 }
@@ -154,7 +154,7 @@ bool cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()
   // so be sure, that onCloseGrabber() resets the Grabber to initialization state.
 
   //-------------------------------------------------
-  //init message
+  // init message
   std::stringstream init_message;
   unsigned int num_cams = getNumCams();
   init_message << ": Initialize test grabber with " << getNumCams() << " channels ..." << std::endl;
@@ -170,17 +170,17 @@ bool cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()
                                            );
 
   //-------------------------------------------------
-  //load pictures one by one
+  // load pictures one by one
   for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
 
-    //here we apply empty 1x1 matrizes to test the interface
+    // here we apply empty 1x1 matrizes to test the interface
     cv::Mat frame=cv::Mat::zeros(1, 1, CV_8UC3);
 
-    //apply the new content to the channel image
+    // apply the new content to the channel image
     getTestChannel(channel)->mImageMat = frame;
 
-    //don't forget to update the channel info
+    // don't forget to update the channel info
     this->setChannelInfo(channel);
   }
 
@@ -198,8 +198,8 @@ bool cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::TestGrabber::onCleanUp()
 {
-  //do the cleanup of used hardware in this method
-  //on an exception or a CTRL-C only onCleanUp will be invoked (no destructor)
+  // do the cleanup of used hardware in this method
+  // on an exception or a CTRL-C only onCleanUp will be invoked (no destructor)
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
                                            this->getName() + ": Cleaning up",
@@ -210,10 +210,10 @@ void cedar::dev::sensors::visual::TestGrabber::onCleanUp()
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::TestGrabber::onCloseGrabber()
 {
-  //close all opened files here and reset the grabber to initialization state
-  //no files should be opened.
-  //after this method the createGrabber() can savely invoked.
-  //the image-matrices of the channels are already reseted in the base Grabber.closeGrabber() method
+  // close all opened files here and reset the grabber to initialization state
+  // no files should be opened.
+  // after this method the createGrabber() can savely invoked.
+  // the image-matrices of the channels are already reseted in the base Grabber.closeGrabber() method
 }
 
 
@@ -221,10 +221,10 @@ void cedar::dev::sensors::visual::TestGrabber::onCloseGrabber()
 void cedar::dev::sensors::visual::TestGrabber::setChannelInfo(unsigned int channel)
 {
 
-  //no range-check is needed, because this method is a private method
+  // no range-check is needed, because this method is a private method
 
-  //give some information about the used source like channelname, filename, devicename
-  //or something like that
+  // give some information about the used source like channelname, filename, devicename
+  // or something like that
   getTestChannel(channel)->mChannelInfo = this->getName()
                                           + " Channel " + boost::lexical_cast<std::string>(channel)
                                           + " : "+ getTestChannel(channel)->_mpSourceFileName->getValue();
@@ -233,17 +233,17 @@ void cedar::dev::sensors::visual::TestGrabber::setChannelInfo(unsigned int chann
 //----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::TestGrabber::onGrab()
 {
-  //this is the main grabbing method.
-  //read a new picture from the source and set the picture in the mImageMatVector.at()
+  // this is the main grabbing method.
+  // read a new picture from the source and set the picture in the mImageMatVector.at()
 
   unsigned int num_cams = getNumCams();
   for(unsigned int channel = 0; channel < num_cams; ++channel)
    {
-     //apply the new content to the channel image
-     //getTestChannel(channel)->mImageMat = grab_new_content();
+     // apply the new content to the channel image
+     // getTestChannel(channel)->mImageMat = grab_new_content();
    }
 
-  //here we just want to count how often onGrab is invoked, due to a fps-check
+  // here we just want to count how often onGrab is invoked, due to a fps-check
   mCounter ++;
   return true;
 }
@@ -251,7 +251,7 @@ bool cedar::dev::sensors::visual::TestGrabber::onGrab()
 //----------------------------------------------------------------------------------------------------
 unsigned int cedar::dev::sensors::visual::TestGrabber::getCounter()
 {
-  //a simple get-method
+  // a simple get-method
   unsigned int ct = mCounter;
   mCounter = 0;
   return ct;
@@ -260,14 +260,14 @@ unsigned int cedar::dev::sensors::visual::TestGrabber::getCounter()
 //----------------------------------------------------------------------------------------------------
 int cedar::dev::sensors::visual::TestGrabber::getTestParam()
 {
-  //a simple get-method
+  // a simple get-method
   return _mTest;
 }
 
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::TestGrabber::setTestParam(int mTest)
 {
-  //a simple set-method
+  // a simple set-method
   _mTest=mTest;
 }
 

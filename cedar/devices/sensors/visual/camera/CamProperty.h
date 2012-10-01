@@ -50,6 +50,7 @@
 #include "cedar/auxiliaries/EnumType.h"
 
 // SYSTEM INCLUDES
+#include <QObject>
 
 
 /*!@brief This class implements the capabilities of one property
@@ -58,11 +59,30 @@
  */
 class cedar::dev::sensors::visual::CamProperty
 :
+public QObject,
 public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+
+  Q_OBJECT
+
+  protected slots:
+  void propertyValueSlot();
+  void propertyModeSlot();
+
+signals:
+
+  //!@brief This signal is emitted, when the value of the property has changed.
+  void propertyValueChanged(cedar::dev::sensors::visual::CameraProperty::Id propertyId, double newValue);
+
+  //!@brief This signal is emitted, when the mode of the property has changed.
+  void propertyModeChanged
+  (
+    cedar::dev::sensors::visual::CameraProperty::Id propertyId,
+    cedar::dev::sensors::visual::CameraPropertyMode::Id newMode
+  );
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -75,8 +95,8 @@ public:
   (
    cedar::dev::sensors::visual::CameraProperty::Id id = 0,
    std::string name = "property",
-   double minValue = 0.f,
-   double maxValue = 255.f,
+   double minValue = (double) INT_MIN,
+   double maxValue = (double) INT_MAX,
    double defaultValue = 128,
    bool supported = true,
    bool readable = true,
@@ -96,21 +116,24 @@ public:
   /// Get the id of the actual Property
   cedar::dev::sensors::visual::CameraProperty::Id getId();
 
-  // Set the id
-  //void setId(cedar::dev::sensors::visual::CameraProperty::Id id);
 
   /// Get the mode of operation of the used parameter
   cedar::dev::sensors::visual::CameraPropertyMode::Id getMode();
 
   /// Set the mode of operation
-  void setMode(cedar::dev::sensors::visual::CameraPropertyMode::Id mode);
+  void setMode(cedar::dev::sensors::visual::CameraPropertyMode::Id modeId);
 
-  //get the shared-pointer to the parameter
-  //cedar::aux::DoubleParameterPtr getParameter();
+  // get the shared-pointer to the parameter
+  // cedar::aux::DoubleParameterPtr getParameter();
 
-  /*! \brief Get the minimum possible value that can be set of the given property
-   *  \param propId The id of the property
-   */
+  ///! Get the value of the property
+  double getValue();
+
+  ///! Set the value of the property
+  // @param value The new value to set
+  void setValue(double value);
+
+  ///! Get the minimum possible value of the property
   double getMinValue();
 
   /*! \brief Get the maximum possible value that can be set of the given property
@@ -138,7 +161,7 @@ public:
   // ACTUALLY NOT SUPPORTED BY CEDAR
   /*! \brief This method tells you, if the given property can be set to an absolute value
    */
-  //bool isAbsoluteCapable();
+  // bool isAbsoluteCapable();
 
   /*! \brief This method tells you, if the given property supports the OnePushAuto mode
    *
@@ -147,12 +170,14 @@ public:
    *     The camera now will try to hold this value automatically.
    *  \param propId The id of the  property
    */
-  //bool isOnePushCapable(CameraProperty::Id propId);
+  // bool isOnePushCapable(CameraProperty::Id propId);
 
   /*! \brief This method tells you, if the given property could be turn off and on
    */
-  //bool isOnOffCapable();
+  // bool isOnOffCapable();
 
+  /// Set the mode of operation internal to the backend
+  // void setModeToCam(cedar::dev::sensors::visual::CameraPropertyMode::Id modeId);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -177,7 +202,7 @@ private:
   bool mReadable;
   bool mAutoCapable;
   bool mManualCapable;
-  //bool mOnOffCapable;
+  // bool mOnOffCapable;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -194,7 +219,7 @@ private:
 
 }; // class cedar::dev::sensors::visual::CamProperty
 
-//typedef cedar::aux::SetParameter<cedar::dev::sensors::visual::Property> CameraPropertiesSet;
+// typedef cedar::aux::SetParameter<cedar::dev::sensors::visual::Property> CameraPropertiesSet;
 
 #endif // CEDAR_DEV_SENSORS_VISUAL_CAMPROPERTY_H
 
