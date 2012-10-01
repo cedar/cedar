@@ -120,7 +120,7 @@ private:
   //! Lock used for locking the lock set.
   mutable QReadWriteLock mLocksLock;
 
-  //! Association between handles nad
+  //! Association between handles and their names.
   std::map<std::string, unsigned int> mLockSetHandles;
 
   //! Storage of the lock sets. mLockSets[0] contains all locks.

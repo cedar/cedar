@@ -95,10 +95,13 @@ public:
     public:
       //! id for unsigned byte
       static const Id UInt8 = CV_8U;
+      
       //! id for signed byte
       static const Id Int8 = CV_8S;
+      
       //! id for floating point
       static const Id Float = CV_32F;
+      
       //! id for floating point, double precision
       static const Id Double = CV_64F;
 
