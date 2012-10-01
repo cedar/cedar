@@ -278,6 +278,8 @@ private:
 
   void addDataItemFor(cedar::proc::DataSlotPtr slot);
 
+  QDockWidget* createPlotDockWidget(const std::string& title) const;
+
 private slots:
   void displayStyleMenuTriggered(QAction* pAction);
 
