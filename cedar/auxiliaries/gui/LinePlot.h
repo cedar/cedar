@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatrixPlot.h
+    File:        LinePlot.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -38,27 +38,27 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_MATRIX_PLOT_2D_H
-#define CEDAR_AUX_GUI_MATRIX_PLOT_2D_H
+#ifndef CEDAR_AUX_GUI_LINE_PLOT_H
+#define CEDAR_AUX_GUI_LINE_PLOT_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/PlotInterface.h"
+#include "cedar/auxiliaries/gui/MultiPlotInterface.h"
+#include "cedar/auxiliaries/math/namespace.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
 #include <QReadWriteLock>
+#include <qwt_plot.h>
+#include <qwt_plot_curve.h>
+#include <qwt_plot_marker.h>
 #include <opencv2/opencv.hpp>
-#include <qwtplot3d/qwt3d_gridplot.h>
-#include <qwtplot3d/qwt3d_function.h>
-#include <qwtplot3d/qwt3d_plot3d.h>
-#include <qwtplot3d/qwt3d_io.h>
 
-/*!@brief Matrix plot that can display 2D matrices (i.e. vectors).
+/*!@brief Matrix plot that can display 1D matrices (i.e. vectors).
  *
  * @todo Write more detailed description of the class here.
  */
-class cedar::aux::gui::MatrixPlot2D : public PlotInterface
+class cedar::aux::gui::LinePlot : public cedar::aux::gui::MultiPlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -69,42 +69,44 @@ class cedar::aux::gui::MatrixPlot2D : public PlotInterface
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  class Perspective
+  struct PlotSeries
   {
-    public:
-      Perspective(const std::string& name = "perspective",
-                  double rotationX = 0, double rotationY = 0, double rotationZ = 0,
-                  double scaleX = 1, double scaleY = 1, double scaleZ = 1,
-                  double shiftX = 0, double shiftY = 0, double shiftZ = 0,
-                  double zoom = 1);
+    PlotSeries()
+    :
+    mpCurve(NULL)
+    {
+    }
 
-      void applyTo(Qwt3D::Plot3D* pPlot);
+    ~PlotSeries()
+    {
+    }
 
-      const std::string& getName() const
-      {
-        return this->mName;
-      }
-
-    private:
-      std::string mName;
-      double mRotation[3];
-      double mScale[3];
-      double mShift[3];
-      double mZoom;
+    //!@brief the displayed data
+    cedar::aux::MatDataPtr mMatData;
+    //!@brief a curve inside the plot
+    QwtPlotCurve *mpCurve;
+    //!@brief the x values of the plot
+    std::vector<double> mXValues;
+    //!@brief the y values of the plot
+    std::vector<double> mYValues;
   };
+
+  CEDAR_GENERATE_POINTER_TYPES(PlotSeries);
+
+  typedef std::vector<PlotSeriesPtr> PlotSeriesVector;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  MatrixPlot2D(QWidget *pParent = NULL);
+  LinePlot(QWidget *pParent = NULL);
 
   //!@brief Constructor expecting a DataPtr.
-  MatrixPlot2D(cedar::aux::DataPtr matData, const std::string& title, QWidget *pParent = NULL);
+  LinePlot(cedar::aux::DataPtr matData, const std::string& title, QWidget *pParent = NULL);
 
   //!@brief Destructor
-  ~MatrixPlot2D();
+  ~LinePlot();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -112,17 +114,32 @@ public:
 public:
   //!@brief display data
   void plot(cedar::aux::DataPtr matData, const std::string& title);
-  //!@brief show or hide the plot grid
-  void showGrid(bool show);
   //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
+
+  /*!
+   * @remarks This method is a temporary way to provide annotations, a more general one will be added soon.
+   */
+  void attachMarker(QwtPlotMarker *pMarker);
+
+  /*!@brief Detaches and deletes all markers added to this plot.
+   *
+   * @remarks This method is a temporary way to provide annotations, a more general one will be added soon.
+   */
+  void clearMarkers();
+
+  bool canAppend(cedar::aux::ConstDataPtr data) const;
+
+  //!@brief Returns the limits of the x axis.
+  //!@todo Generalize this for n-dimensional matrix plots.
+  cedar::aux::math::Limits<double> getXLimits() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief create and handle the context menu
-  void contextMenuEvent(QContextMenuEvent * pEvent);
+  void contextMenuEvent(QContextMenuEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -131,17 +148,16 @@ private:
   //!@brief initialize
   void init();
 
-  //!@brief reset the perspective of the plot
-  void resetPerspective(size_t perspectiveIndex = 0);
+  //!@brief (Re-)initializes the x and y value arrays.
+  void buildArrays(PlotSeriesPtr series, unsigned int new_size);
 
-  //!@brief delete the allocated array data
-  void deleteArrayData();
+  void doAppend(cedar::aux::DataPtr data, const std::string& title);
 
-  //!@brief update the allocated array data
-  void updateArrayData();
+  //!@brief Applies a plot style to a given curve.
+  static void applyStyle(size_t lineId, QwtPlotCurve *pCurve);
 
-  //!@brief Applies the labels from the data object to the plot.
-  void applyLabels();
+private slots:
+  void showLegend(bool show = true);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -149,20 +165,20 @@ private:
 protected:
   // none yet
 private:
-  //!@brief the displayed MatData
-  cedar::aux::MatDataPtr mMatData;
-  //!@brief flag if plot grid should be displayed
-  bool mShowGridLines;
-  //!@biref the plot object
-  Qwt3D::GridPlot* mpPlot;
-  //!@brief vector of possible perspectives
-  std::vector<Perspective> mPerspectives;
-  //!@brief row count of data
-  size_t mDataRows;
-  //!@brief column count of data
-  size_t mDataCols;
-  //!@brief 2D array data
-  Qwt3D::Triple** mppArrayData;
-}; // class cedar::aux::gui::MatrixPlot2D
+  //!@brief a plot
+  QwtPlot *mpPlot;
 
-#endif // CEDAR_AUX_GUI_MATRIX_PLOT_2D_H
+  PlotSeriesVector mPlotSeriesVector;
+
+  //! For locking the plot itself.
+  QReadWriteLock *mpLock;
+
+  //! A vector containing all the colors used for plot lines.
+  static std::vector<QColor> mLineColors;
+
+  //! A vector containing all the line stypes for the plot.
+  static std::vector<Qt::PenStyle> mLineStyles;
+
+}; // class cedar::aux::gui::LinePlot
+
+#endif // CEDAR_AUX_GUI_LINE_PLOT_H

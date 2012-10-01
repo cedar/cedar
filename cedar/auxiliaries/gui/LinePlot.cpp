@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatrixPlot2D.cpp
+    File:        LinePlot.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -39,7 +39,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/MatrixPlot1D.h"
+#include "cedar/auxiliaries/gui/LinePlot.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/math/Limits.h"
 #include "cedar/auxiliaries/MatData.h"
@@ -60,14 +60,14 @@
 // static members
 //----------------------------------------------------------------------------------------------------------------------
 
-std::vector<QColor> cedar::aux::gui::MatrixPlot1D::mLineColors;
-std::vector<Qt::PenStyle> cedar::aux::gui::MatrixPlot1D::mLineStyles;
+std::vector<QColor> cedar::aux::gui::LinePlot::mLineColors;
+std::vector<Qt::PenStyle> cedar::aux::gui::LinePlot::mLineStyles;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gui::MatrixPlot1D::MatrixPlot1D(QWidget *pParent)
+cedar::aux::gui::LinePlot::LinePlot(QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
 mpLock(new QReadWriteLock())
@@ -75,7 +75,7 @@ mpLock(new QReadWriteLock())
   this->init();
 }
 
-cedar::aux::gui::MatrixPlot1D::MatrixPlot1D(cedar::aux::DataPtr matData, const std::string& title, QWidget *pParent)
+cedar::aux::gui::LinePlot::LinePlot(cedar::aux::DataPtr matData, const std::string& title, QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
 mpLock(new QReadWriteLock())
@@ -84,7 +84,7 @@ mpLock(new QReadWriteLock())
   this->plot(matData, title);
 }
 
-cedar::aux::gui::MatrixPlot1D::~MatrixPlot1D()
+cedar::aux::gui::LinePlot::~LinePlot()
 {
   if (mpLock)
   {
@@ -96,7 +96,7 @@ cedar::aux::gui::MatrixPlot1D::~MatrixPlot1D()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::math::Limits<double> cedar::aux::gui::MatrixPlot1D::getXLimits() const
+cedar::aux::math::Limits<double> cedar::aux::gui::LinePlot::getXLimits() const
 {
   cedar::aux::math::Limits<double> limits;
 
@@ -106,7 +106,7 @@ cedar::aux::math::Limits<double> cedar::aux::gui::MatrixPlot1D::getXLimits() con
   return limits;
 }
 
-void cedar::aux::gui::MatrixPlot1D::applyStyle(size_t lineId, QwtPlotCurve *pCurve)
+void cedar::aux::gui::LinePlot::applyStyle(size_t lineId, QwtPlotCurve *pCurve)
 {
   // initialize vectors, if this has not happened, yet
   if (mLineColors.empty() || mLineStyles.empty())
@@ -150,7 +150,7 @@ void cedar::aux::gui::MatrixPlot1D::applyStyle(size_t lineId, QwtPlotCurve *pCur
   pCurve->setPen(pen);
 }
 
-bool cedar::aux::gui::MatrixPlot1D::canAppend(cedar::aux::ConstDataPtr data) const
+bool cedar::aux::gui::LinePlot::canAppend(cedar::aux::ConstDataPtr data) const
 {
   cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data);
   if (!mat_data)
@@ -175,7 +175,7 @@ bool cedar::aux::gui::MatrixPlot1D::canAppend(cedar::aux::ConstDataPtr data) con
   return true;
 }
 
-void cedar::aux::gui::MatrixPlot1D::doAppend(cedar::aux::DataPtr data, const std::string& title)
+void cedar::aux::gui::LinePlot::doAppend(cedar::aux::DataPtr data, const std::string& title)
 {
   PlotSeriesPtr plot_series(new PlotSeries());
 
@@ -190,7 +190,7 @@ void cedar::aux::gui::MatrixPlot1D::doAppend(cedar::aux::DataPtr data, const std
   if (!plot_series->mMatData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
-                "Could not cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot1D::plot.");
+                "Could not cast to cedar::aux::MatData in cedar::aux::gui::LinePlot::plot.");
   }
 
   plot_series->mpCurve = new QwtPlotCurve(title.c_str());
@@ -224,17 +224,17 @@ void cedar::aux::gui::MatrixPlot1D::doAppend(cedar::aux::DataPtr data, const std
   this->startTimer(30); //!@todo make the refresh time configurable.
 }
 
-void cedar::aux::gui::MatrixPlot1D::attachMarker(QwtPlotMarker *pMarker)
+void cedar::aux::gui::LinePlot::attachMarker(QwtPlotMarker *pMarker)
 {
   pMarker->attach(this->mpPlot);
 }
 
-void cedar::aux::gui::MatrixPlot1D::clearMarkers()
+void cedar::aux::gui::LinePlot::clearMarkers()
 {
   this->mpPlot->detachItems(QwtPlotMarker::Rtti_PlotMarker, true);
 }
 
-void cedar::aux::gui::MatrixPlot1D::plot(cedar::aux::DataPtr data, const std::string& title)
+void cedar::aux::gui::LinePlot::plot(cedar::aux::DataPtr data, const std::string& title)
 {
   mpLock->lockForWrite();
   mPlotSeriesVector.clear();
@@ -245,7 +245,7 @@ void cedar::aux::gui::MatrixPlot1D::plot(cedar::aux::DataPtr data, const std::st
   this->startTimer(30); //!@todo make the refresh time configurable.
 }
 
-void cedar::aux::gui::MatrixPlot1D::init()
+void cedar::aux::gui::LinePlot::init()
 {
   QPalette palette = this->palette();
   palette.setColor(QPalette::Window, Qt::white);
@@ -259,7 +259,7 @@ void cedar::aux::gui::MatrixPlot1D::init()
   this->layout()->addWidget(mpPlot);
 }
 
-void cedar::aux::gui::MatrixPlot1D::contextMenuEvent(QContextMenuEvent *pEvent)
+void cedar::aux::gui::LinePlot::contextMenuEvent(QContextMenuEvent *pEvent)
 {
   QMenu menu(this);
   QAction *p_antialiasing = menu.addAction("antialiasing");
@@ -294,7 +294,7 @@ void cedar::aux::gui::MatrixPlot1D::contextMenuEvent(QContextMenuEvent *pEvent)
   }
 }
 
-void cedar::aux::gui::MatrixPlot1D::showLegend(bool show)
+void cedar::aux::gui::LinePlot::showLegend(bool show)
 {
   if (show)
   {
@@ -320,7 +320,7 @@ void cedar::aux::gui::MatrixPlot1D::showLegend(bool show)
   }
 }
 
-void cedar::aux::gui::MatrixPlot1D::buildArrays(PlotSeriesPtr series, unsigned int new_size)
+void cedar::aux::gui::LinePlot::buildArrays(PlotSeriesPtr series, unsigned int new_size)
 {
   CEDAR_DEBUG_ASSERT(series->mXValues.size() == series->mYValues.size());
 
@@ -335,7 +335,7 @@ void cedar::aux::gui::MatrixPlot1D::buildArrays(PlotSeriesPtr series, unsigned i
   }
 }
 
-void cedar::aux::gui::MatrixPlot1D::timerEvent(QTimerEvent * /* pEvent */)
+void cedar::aux::gui::LinePlot::timerEvent(QTimerEvent * /* pEvent */)
 {
   if (!this->isVisible())
   {

@@ -60,8 +60,8 @@ cedar_add_library(cedaraux
   gui/HistoryPlot.h
   gui/HistoryPlot0D.h
   gui/MatrixPlot.h
-  gui/MatrixPlot1D.h
-  gui/MatrixPlot2D.h
+  gui/LinePlot.h
+  gui/SurfacePlot.h
   gui/MatrixSlicePlot3D.h
   gui/PropertyPane.h
   gui/ImagePlot.h

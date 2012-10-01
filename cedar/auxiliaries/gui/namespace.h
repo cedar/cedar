@@ -111,8 +111,8 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(MultiPlotInterface);
       CEDAR_DECLARE_AUX_CLASS(DataPlotter);
       CEDAR_DECLARE_AUX_CLASS(MatrixPlot);
-      CEDAR_DECLARE_AUX_CLASS(MatrixPlot1D);
-      CEDAR_DECLARE_AUX_CLASS(MatrixPlot2D);
+      CEDAR_DECLARE_AUX_CLASS(LinePlot);
+      CEDAR_DECLARE_AUX_CLASS(SurfacePlot);
       CEDAR_DECLARE_AUX_CLASS(MatrixSlicePlot3D);
       CEDAR_DECLARE_AUX_CLASS(ImagePlot);
       CEDAR_DECLARE_AUX_CLASS(MatDataPlot);
