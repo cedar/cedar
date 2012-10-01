@@ -655,13 +655,13 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
   // inputs come from a different Connectable
   if (role == cedar::proc::DataRole::INPUT)
   {
-    this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_READ);
+    this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_READ, this->getLockSetForRole(role));
     CEDAR_DEBUG_ASSERT(boost::shared_dynamic_cast<cedar::proc::ExternalData>(slot));
     slot->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
   }
   else
   {
-    this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_WRITE);
+    this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_WRITE, this->getLockSetForRole(role));
     data->setOwner(this);
   }
 
