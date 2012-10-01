@@ -53,6 +53,9 @@
   - The resize step now orders its dimensions consistently in two-dimensional cases; unfortunately, this means that
     all old architectures will need to flip their size order (used to be [width, height], is now [height, width]).
   - Plot widgets now no longer dock in the processingIde!
+  - Steps can now take care of locking their inputs and outputs manually by setting a flag. This may be useful if steps
+    lock data for a long time even though they are not accessing it, potentially preventing other steps in the
+    processing chain from running.
 
 == Version 0.9.1 ==
 - general
