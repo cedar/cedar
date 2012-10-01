@@ -87,7 +87,6 @@ const qreal cedar::proc::gui::StepItem::mBaseDataSlotSize = 12.0;
 
 QIcon cedar::proc::gui::StepItem::mLoopedIcon(":/decorations/looped.svg");
 
-
 #ifndef CEDAR_COMPILER_MSVC
 const cedar::proc::gui::StepItem::DisplayMode::Id cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT;
 const cedar::proc::gui::StepItem::DisplayMode::Id cedar::proc::gui::StepItem::DisplayMode::ICON_ONLY;
@@ -146,7 +145,6 @@ void cedar::proc::gui::StepItem::construct()
   }
 }
 
-
 cedar::proc::gui::StepItem::Decoration::Decoration
 (
   cedar::proc::gui::StepItem* pStep,
@@ -171,7 +169,6 @@ mIconSource(icon)
   this->mpRectangle->setPen(pen);
   this->mpRectangle->setBrush(bg);
 }
-
 
 cedar::proc::gui::StepItem::~StepItem()
 {

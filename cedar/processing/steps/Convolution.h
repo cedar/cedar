@@ -110,7 +110,7 @@ protected:
                                   ) const;
 
   /*!@brief reads a configuration from a node
-   * @param node the said node
+   * @param node Said node.
    */
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
