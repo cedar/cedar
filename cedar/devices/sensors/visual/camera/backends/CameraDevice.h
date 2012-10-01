@@ -45,9 +45,7 @@
 #include "cedar/auxiliaries/SetParameter.h"
 #include "cedar/devices/sensors/visual/camera/CameraProperties.h"
 #include "cedar/devices/sensors/visual/camera/CameraSettings.h"
-#include "cedar/devices/sensors/visual/camera/CameraChannel.h"  //circular includes !!
-
-
+#include "cedar/devices/sensors/visual/camera/CameraChannel.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -72,11 +70,7 @@ protected:
   //!@brief The standard constructor.
   CameraDevice
   (
-//    cedar::dev::sensors::visual::CameraSettingsPtr pSettings,
-//    cedar::dev::sensors::visual::CameraPropertiesPtr pProperties,
-//    cv::VideoCapture videoCapture,
-//    QReadWriteLock* p_videoCaptureLock
-//   cedar::dev::sensors::visual::CameraGrabber::CameraChannelPtr pCameraChannel
+   cedar::dev::sensors::visual::CameraGrabber* pCameraGrabber,
    cedar::dev::sensors::visual::CameraChannelPtr pCameraChannel
   );
 
@@ -95,21 +89,38 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  //cv::VideoCapture mVideoCapture;
-  //QReadWriteLock* mpVideoCaptureLock;
+  //! Set all properties to the camera
+  virtual void setProperties() = 0;
 
-  //cedar::dev::sensors::visual::CameraSettingsPtr mpCamSettings;
-  //cedar::dev::sensors::visual::CameraPropertiesPtr mpCamProperties;
-
-//  cedar::dev::sensors::visual::CameraGrabber::CameraChannelPtr mpCameraChannel;
-  cedar::dev::sensors::visual::CameraChannelPtr mpCameraChannel;
-
-  virtual void fillCapabilities() = 0;
+  //! Create a new Capture device
   virtual bool createCaptureDevice() = 0;
+
+  //! Apply all Settings to the Camera
   virtual void applySettingsToCamera() = 0;
+
+  //! Apply all Parameters to the Camera
   virtual void applyStateToCamera() = 0;
 
 
+  /*! @brief Set a property direct in the cv::VideoCapture class
+   *
+   *  @param propertyId The OpenCV constants for cv::VideoCapture.set() method
+   *  @param value The new value
+   *  @return Boolean value, that indicates if the value is properly set
+   */
+  bool setPropertyToCamera(unsigned int propertyId, double value);
+
+
+  /*! @brief Get a property directly form the cv::VideoCapture
+   *
+   *    Use this method only for properties which are not (yet) supported by cedar CameraProperty()
+   *    or CameraSetting() class. But be aware, that there is no check if the wanted property is supported
+   *    by the used backend
+   *
+   *  @param propertyId The OpenCV constants for cv::VideoCapture.set() method
+   *  @return Value, that indicates the exit-state of cv::VideoCapture.set()
+   */
+  double getPropertyFromCamera(unsigned int propertyId);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -121,7 +132,12 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //! The cameraGrabber of the used channel
+  cedar::dev::sensors::visual::CameraGrabber* mpCameraGrabber;
+
+  //! The channel structure
+  cedar::dev::sensors::visual::CameraChannelPtr mpCameraChannel;
+
 private:
   // none yet
 

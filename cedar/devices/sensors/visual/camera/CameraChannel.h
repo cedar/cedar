@@ -44,104 +44,100 @@
 #include "cedar/devices/sensors/visual/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/Parameter.h"
-#include "cedar/devices/sensors/visual/camera/enums/CameraBackendType.h"
+#include "cedar/devices/sensors/visual/camera/backends/CameraBackendType.h"
 #include "cedar/devices/sensors/visual/camera/enums/DeBayerFilter.h"
 #include "cedar/devices/sensors/visual/Grabber.h"
 
 // SYSTEM INCLUDES
+#include <QReadWriteLock>
+#include <opencv2/opencv.hpp>
 
-  /*!@brief Additional data of a camera channel
-   */
-  struct cedar::dev::sensors::visual::CameraChannel
+
+/*! @struct CameraChannel
+ *  @brief Additional data of a camera channel
+ */
+struct cedar::dev::sensors::visual::CameraChannel
+:
+cedar::dev::sensors::visual::Grabber::Channel
+{
+public:
+  CameraChannel
+  (
+    unsigned int cameraId = 0,
+    bool byGuid = false,
+    cedar::dev::sensors::visual::CameraBackendType::Id backendType
+      = cedar::dev::sensors::visual::CameraBackendType::AUTO,
+    cedar::dev::sensors::visual::DeBayerFilter::Id debayerFilter
+      = cedar::dev::sensors::visual::DeBayerFilter::NONE
+  )
   :
-  cedar::dev::sensors::visual::Grabber::Channel
+  cedar::dev::sensors::visual::Grabber::Channel(),
+  _mpBackendType(new cedar::aux::EnumParameter
+                (
+                  this,
+                  "backend type",
+                  cedar::dev::sensors::visual::CameraBackendType::typePtr(),
+                  backendType
+                )
+               ),
+  _mpDebayerFilter(new cedar::aux::EnumParameter
+                         (
+                           this,
+                           "decoding",
+                           cedar::dev::sensors::visual::DeBayerFilter::typePtr(),
+                           debayerFilter
+                         )
+                       ),
+  mpVideoCaptureLock(new QReadWriteLock())
   {
-  public:
-    CameraChannel
-    (
-      unsigned int cameraId = 0,
-      bool byGuid = false,
-      cedar::dev::sensors::visual::CameraBackendType::Id backendType
-        = cedar::dev::sensors::visual::CameraBackendType::AUTO,
-      cedar::dev::sensors::visual::DeBayerFilter::Id debayerFilter
-        = cedar::dev::sensors::visual::DeBayerFilter::NONE
-    )
-    :
-    cedar::dev::sensors::visual::Grabber::Channel(),
-    _mpByGuid(new cedar::aux::BoolParameter(this,"by GUID",false)),
-    _mpBusId(new cedar::aux::UIntParameter(this,"bus ID",0,0,255)),
-    _mpGuid(new cedar::aux::UIntParameter(this,"GUID",0)),
-    _mpBackendType(new cedar::aux::EnumParameter
-                  (
-                    this,
-                    "backend type",
-                    cedar::dev::sensors::visual::CameraBackendType::typePtr(),
-                    backendType
-                  )
-                 ),
-    _mpDebayerFilter(new cedar::aux::EnumParameter
-                           (
-                             this,
-                             "debayer",
-                             cedar::dev::sensors::visual::DeBayerFilter::typePtr(),
-                             debayerFilter
-                           )
-                         ),
-    mpVideoCaptureLock(new QReadWriteLock())
-    //mProperties(cedar::dev::sensors::visual::CameraPropertiesSet())
-    {
-      if (byGuid)
-      {
-        _mpBusId->setValue(0);
-        _mpBusId->setHidden(true);
-        _mpGuid->setValue(cameraId);
-      }
-      else
-      {
-        _mpBusId->setValue(cameraId);
-        _mpGuid->setValue(0);
-        _mpGuid->setHidden(true);
-      }
-    }
+    // create settings
+    mpSettings = cedar::dev::sensors::visual::CameraSettingsPtr
+                 (
+                   new cedar::dev::sensors::visual::CameraSettings(cameraId,byGuid,backendType)
+                 );
 
-    ~CameraChannel()
-    {
-      delete mpVideoCaptureLock;
-    }
+    // add settings as configurable child
+    this->addConfigurableChild("settings", mpSettings);
 
-    /// create with guid or with bus id
-    cedar::aux::BoolParameterPtr _mpByGuid;
+    // create properties
+    mpProperties = cedar::dev::sensors::visual::CameraPropertiesPtr
+                 (
+                   new cedar::dev::sensors::visual::CameraProperties(this,mVideoCapture,mpVideoCaptureLock)
+                 );
+  }
 
-    /// The id on the used bus
-    cedar::aux::UIntParameterPtr _mpBusId;
+  /// Destructor
+  ~CameraChannel()
+  {
+    delete mpVideoCaptureLock;
+  }
 
-    /// Unique channel id (not supported on every backend)
-    cedar::aux::UIntParameterPtr _mpGuid;
+  /// The backend to use
+  cedar::aux::EnumParameterPtr _mpBackendType;
 
-    /// The Backend to use
-    cedar::aux::EnumParameterPtr _mpBackendType;
+  /// Set the the camera bayer pattern filter (if any is needed)
+  cedar::aux::EnumParameterPtr _mpDebayerFilter;
 
-    /// Camera needs to apply a bayer pattern filter
-    cedar::aux::EnumParameterPtr _mpDebayerFilter;
+  /*!@brief The lock for the concurrent access to the cv::VideoCapture.
+   *
+   *   Used in the CameraGrabber itself.
+   *   Do not mix up with the capture lock from the CameraGrabber, which will be used to lock the grabbed images
+   *   not the VideoCapture class
+   */
+  QReadWriteLock* mpVideoCaptureLock;
 
-    /// The lock for the concurrent access to the cv::VideoCapture
-    QReadWriteLock* mpVideoCaptureLock;
+  /// Class for all settings
+  cedar::dev::sensors::visual::CameraSettingsPtr mpSettings;
 
-    // contains all settings
-    cedar::dev::sensors::visual::CameraSettingsPtr mpSettings;
+  /// Class for all properties
+  cedar::dev::sensors::visual::CameraPropertiesPtr mpProperties;
 
-    // contains all properties
-    cedar::dev::sensors::visual::CameraPropertiesPtr mpProperties;
+  /// Camera interface
+  cv::VideoCapture mVideoCapture;
 
-    /// Camera interface
-    cv::VideoCapture mVideoCapture;
+};
 
-    // Pointer to the camera device
-    //CameraDevicePtr mpDevice;
 
-  };
-
-  //CEDAR_GENERATE_POINTER_TYPES(CameraChannel);
 
 #endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_CHANNEL_H
 

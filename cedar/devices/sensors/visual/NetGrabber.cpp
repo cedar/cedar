@@ -59,12 +59,12 @@ namespace
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-//constructors and destructor
+// constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 
 //----------------------------------------------------------------------------------------------------
-//Constructor for single-channel grabber
+// Constructor for single-channel grabber
 cedar::dev::sensors::visual::NetGrabber::NetGrabber
 (
   const std::string& yarpChannelName,
@@ -85,7 +85,7 @@ cedar::dev::sensors::visual::Grabber
 
 
 //----------------------------------------------------------------------------------------------------
-//Constructor for stereo-channel grabber
+// Constructor for stereo-channel grabber
 cedar::dev::sensors::visual::NetGrabber::NetGrabber
 (
   const std::string& yarpChannelName0,
@@ -116,7 +116,7 @@ cedar::dev::sensors::visual::NetGrabber::~NetGrabber()
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
 
-  //done by smart-pointer in doCleanup
+  // done by smart-pointer in doCleanup
   /*for (unsigned int i = 0; i < mNumCams; ++i)
   {
     delete &mYarpChannels.at(i);
@@ -126,7 +126,7 @@ cedar::dev::sensors::visual::NetGrabber::~NetGrabber()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-//methods
+// methods
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -138,8 +138,8 @@ void cedar::dev::sensors::visual::NetGrabber::onCleanUp()
                                              this->getName() + ": onCleanUp()",
                                              "cedar::dev::sensors::visual::NetGrabber::onCleanUp()"
                                            );
-  //close all captures
-  //mNetReaders.clear(); done in Grabber
+  // close all captures
+  // mNetReaders.clear(); done in Grabber
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -169,11 +169,11 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
 
 
   //-------------------------------------------------
-  //open capture one by one
-  //cedar::aux::net::Reader<cv::Mat> *YarpReader = NULL;
+  // open capture one by one
+  // cedar::aux::net::Reader<cv::Mat> *YarpReader = NULL;
   MatNetReaderPtr yarp_reader;
 
-  //loop until connection established or an error occurs
+  // loop until connection established or an error occurs
   for (unsigned int channel = 0; channel < num_cams; ++channel)
   {
     const std::string channel_name = getNetChannel(channel)->_mpYarpChannelName->getValue();
@@ -186,7 +186,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
                                                "cedar::dev::sensors::visual::NetGrabber::onInit()"
                                              );
 
-    //try to connect for about 1 to 2 minutes per channel
+    // try to connect for about 1 to 2 minutes per channel
     int counter_get_writer = 0;
 
     do
@@ -198,7 +198,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
           std::cout << "." << std::flush;
         #endif
 
-        //establish connection
+        // establish connection
         yarp_reader = MatNetReaderPtr(new cedar::aux::net::Reader<cv::Mat>(channel_name));
 
         #ifdef SHOW_INIT_INFORMATION_NETGRABBER
@@ -207,9 +207,9 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
 
       }
 
-      //ERROR: No Yarp writer with appropriate channel name
+      // ERROR: No Yarp writer with appropriate channel name
       //@todo: GH commented on merge
-      //catch (cedar::aux::NetWaitingForWriterException &E)
+      // catch (cedar::aux::NetWaitingForWriterException &E)
       catch (cedar::aux::ExceptionBase &E)
       {
         std::stringstream error_msg;
@@ -232,7 +232,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
                                                      error_msg.str(),
                                                      "cedar::dev::sensors::visual::NetGrabber::onInit()"
                                                    );
-          return false;  //throws an initialization-exception
+          return false;  // throws an initialization-exception
         }
         else
         {
@@ -241,11 +241,11 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
       //@todo: GH commented on merge
       //}
 
-      //ERROR: Somehow YARP doesnt work ... :( typically fatal.
-      //catch (cedar::aux::ExceptionBase &E)
+      // ERROR: Somehow YARP doesnt work ... :( typically fatal.
+      // catch (cedar::aux::ExceptionBase &E)
       //{
-        //todo: throw weiter
-        //std::stringstream error_msg;
+        // todo: throw weiter
+        // std::stringstream error_msg;
         error_msg.clear();
         error_msg << this->getName() << ": ERROR: Initialization failed" << std::endl
                   << "\tChannel " << channel << ": "<< channel_name << std::endl
@@ -255,13 +255,13 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
                                                    error_msg.str(),
                                                    "cedar::dev::sensors::visual::NetGrabber::onInit()"
                                                  );
-        return false;  //throws an initialization-exception
+        return false;  // throws an initialization-exception
       }
 
-      //ERROR: Default
+      // ERROR: Default
       catch (...)
       {
-        //std::stringstream error_msg;
+        // std::stringstream error_msg;
         std::stringstream error_msg;
         error_msg << this->getName() << ": ERROR: Unknown Error on initialization of yarp-writer"
                   << std::endl
@@ -271,14 +271,14 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
                                                    error_msg.str(),
                                                    "cedar::dev::sensors::visual::NetGrabber::onInit()"
                                                  );
-        return false;  //throws an initialization-exception
+        return false;  // throws an initialization-exception
       }
 
-    } while (!yarp_reader.get()); //check the raw pointer
+    } while (!yarp_reader.get()); // check the raw pointer
 
     getNetChannel(channel)->mpMatNetReader = yarp_reader;
 
-    //Channel i initialized, try to receive the first image
+    // Channel i initialized, try to receive the first image
 
     cedar::aux::LogSingleton::getInstance()->debugMessage
                                              (
@@ -290,7 +290,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
     bool reading_ok = false;
     int counter_get_image = 0;
 
-    //loop until first image received
+    // loop until first image received
     do
     {
       try
@@ -306,7 +306,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
         reading_ok = true;
       }
       //@todo: GH commented on merge
-      //catch (cedar::aux::NetUnexpectedDataException &E)
+      // catch (cedar::aux::NetUnexpectedDataException &E)
       catch (cedar::aux::ExceptionBase &E)
       {
         if (++counter_get_image > 10)
@@ -320,7 +320,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
                                                      error_msg.str(),
                                                      "cedar::dev::sensors::visual::NetGrabber::onInit()"
                                                    );
-          return false;  //throws an initialization-exception
+          return false;  // throws an initialization-exception
         }
         else
         {
@@ -338,33 +338,33 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
                                                    error_msg.str(),
                                                    "cedar::dev::sensors::visual::NetGrabber::onInit()"
                                                  );
-        return false;  //throws an initialization-exception
+        return false;  // throws an initialization-exception
       }
 
     } while (!reading_ok);
   }
 
-  //all grabbers successfully initialized
+  // all grabbers successfully initialized
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
                                              this->getName() + ": Initializtion finished",
                                              "cedar::dev::sensors::visual::NetGrabber::onInit()"
                                            );
 
-  //TODO
-  //set fps
-  //until now, it is set to default value of loopedThread
-  //maybe read fps and check against default value from loopedthread
-  //to decide if it was load from config-file
+  // TODO
+  // set fps
+  // until now, it is set to default value of loopedThread
+  // maybe read fps and check against default value from loopedthread
+  // to decide if it was load from config-file
 
   return true;
-} //onInit()
+} // onInit()
 
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::NetGrabber::onUpdateSourceInfo(unsigned int channel)
 {
-  //value of channel is already checked by GraberInterface::getSourceInfo()
-  //TODO: perhaps it is possible to gather information of used yarp-server too
+  // value of channel is already checked by GraberInterface::getSourceInfo()
+  // TODO: perhaps it is possible to gather information of used yarp-server too
   std::string name = this->getName();
   std::string channel_name = getNetChannel(channel)->_mpYarpChannelName->getValue();
   getNetChannel(channel)->mChannelInfo = name + ": " + channel_name;
@@ -373,16 +373,16 @@ void cedar::dev::sensors::visual::NetGrabber::onUpdateSourceInfo(unsigned int ch
 //----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::NetGrabber::onGrab()
 {
-  //unsigned int numCams = getNumCams();
+  // unsigned int numCams = getNumCams();
   int result = true;
 
   unsigned int num_cams = getNumCams();
   for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
-    //nonblocking version of netreader
+    // nonblocking version of netreader
 
-    //on exception leave programm, so we don't catch it here
-    //try
+    // on exception leave programm, so we don't catch it here
+    // try
     //{
     getNetChannel(channel)->mImageMat = getNetChannel(channel)->mpMatNetReader->read();
     /* }
@@ -394,8 +394,8 @@ bool cedar::dev::sensors::visual::NetGrabber::onGrab()
      * //@TODO: Timeout for last matrix
      * //    how to detect the end of a stream??
      *
-     * //howto detect a false matrix
-     * //result = false;
+     * // howto detect a false matrix
+     * // result = false;
      *
      * }
      */
@@ -406,6 +406,6 @@ bool cedar::dev::sensors::visual::NetGrabber::onGrab()
     }
   }
   return result;
-} //onGrab()
+} // onGrab()
 
-#endif //CEDAR_USE_YARP
+#endif // CEDAR_USE_YARP

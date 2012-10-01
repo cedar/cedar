@@ -40,6 +40,8 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
+#ifdef CEDAR_USE_VIDEO_FOR_LINUX
+
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/namespace.h"
 #include "cedar/devices/sensors/visual/camera/backends/CameraDevice.h"
@@ -66,6 +68,7 @@ public:
   //!@brief The standard constructor.
   CameraDeviceVfl
   (
+    cedar::dev::sensors::visual::CameraGrabber* pCameraGrabber,
     cedar::dev::sensors::visual::CameraChannelPtr pCameraChannel
   );
 
@@ -82,7 +85,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void fillCapabilities();
+  void setProperties();
   void applySettingsToCamera();
   bool createCaptureDevice();
   void applyStateToCamera();
@@ -112,5 +115,7 @@ private:
 
 }; // class cedar::dev::sensors::visual::CameraDeviceVfl
 
+
+#endif // CEDAR_USE_VIDEO_FOR_LINUX
 #endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_DEVICE_VFL_H
 

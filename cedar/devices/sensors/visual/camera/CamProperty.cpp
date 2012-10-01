@@ -56,9 +56,10 @@ cedar::dev::sensors::visual::CamProperty::CamProperty
   bool readable,
   bool autoCapable,
   bool manualCapable
-  //bool onOffCapable
+  // bool onOffCapable
 )
 :
+cedar::aux::Configurable(),
 mId(id),
 mName(name),
 mSupported(supported),
@@ -68,7 +69,7 @@ mManualCapable(manualCapable),
 mpPropertyValue(new cedar::aux::DoubleParameter
                  (
                    this,
-                   "Value",
+                   "value",
                    defaultValue,
                    minValue,
                    maxValue
@@ -77,29 +78,79 @@ mpPropertyValue(new cedar::aux::DoubleParameter
 mpPropertyMode(new cedar::aux::EnumParameter
                 (
                   this,
-                  "Mode",
+                  "mode",
                   cedar::dev::sensors::visual::CameraPropertyMode::typePtr(),
                   cedar::dev::sensors::visual::CameraPropertyMode::BACKEND_DEFAULT
                 )
               )
 {
 
-  //todo add to configurable as subsection with name mName
+  QObject::connect(mpPropertyValue.get(),SIGNAL(valueChanged()),this,SLOT(propertyValueSlot()));
+  QObject::connect(mpPropertyMode.get(),SIGNAL(valueChanged()),this,SLOT(propertyModeSlot()));
 
-  // todo connect mpPropertyValue with signal for changing the value
+  // by default, all properties are in BACKEND_DEFAULT mode. It isn't allowed to change the value manually
+  mpPropertyValue->setConstant(true);
 
-  // todo allow only specific modes of operations for mpPropertyMode
-  // which depends on autoCapable, onOffCapable, readable, manualCapable
+  if (!mReadable)
+  {
+    // disable value (or set to const)
+    mpPropertyValue->setConstant(true);
+  }
+
+  if (!mSupported)
+  {
+    // disable value and mode
+    mpPropertyValue->setConstant(true);
+    mpPropertyMode->setConstant(true);
+  }
+
+  if (!mAutoCapable)
+  {
+    // disable mode::auto
+    mpPropertyMode->disable(cedar::dev::sensors::visual::CameraPropertyMode::AUTO);
+  }
+
+  if (!mManualCapable)
+  {
+    // disable mode::manual
+    mpPropertyMode->disable(cedar::dev::sensors::visual::CameraPropertyMode::MANUAL);
+  }
+
 }
-
-//todo write signal handlers for parameter value changed
-// and mModeId changed
-
 
 cedar::dev::sensors::visual::CamProperty::~CamProperty()
 {
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+// slots
+//----------------------------------------------------------------------------------------------------------------------
+void cedar::dev::sensors::visual::CamProperty::propertyValueSlot()
+{
+  emit propertyValueChanged(mId, mpPropertyValue->getValue());
+}
+
+void cedar::dev::sensors::visual::CamProperty::propertyModeSlot()
+{
+  cedar::dev::sensors::visual::CameraPropertyMode::Id new_mode_id = mpPropertyValue->getValue();
+
+  // if it is set to manual, it is not possible to get back to backend default, because this value is never stored.
+  // the grabber have to be reinitialized (i.e. destroyed and new created to do this)
+  if (new_mode_id == cedar::dev::sensors::visual::CameraPropertyMode::MANUAL)
+  {
+    std::cout << "propertyModeSlot MANUAL" << std::endl;
+    mpPropertyMode->disable(cedar::dev::sensors::visual::CameraPropertyMode::BACKEND_DEFAULT);
+    mpPropertyValue->setConstant(false);
+  }
+  else
+  {
+    // AUTO or BACKEND
+    std::cout << "propertyModeSlot MODE AUTO" << std::endl;
+    mpPropertyValue->setConstant(true);
+  }
+
+  emit propertyModeChanged(mId, mpPropertyMode->getValue());
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -111,31 +162,44 @@ cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::Cam
   return mId;
 }
 
-
-cedar::dev::sensors::visual::CameraPropertyMode::Id cedar::dev::sensors::visual::CamProperty::getMode()
+double cedar::dev::sensors::visual::CamProperty::getValue()
 {
-  //@todo: cast to Id ??
-  return mpPropertyMode->getValue();
+  return mpPropertyValue->getValue();
+}
+
+void cedar::dev::sensors::visual::CamProperty::setValue(double value)
+{
+    mpPropertyValue->setValue(value);
 }
 
 
-void cedar::dev::sensors::visual::CamProperty::setMode(cedar::dev::sensors::visual::CameraPropertyMode::Id mode)
+cedar::dev::sensors::visual::CameraPropertyMode::Id cedar::dev::sensors::visual::CamProperty::getMode()
 {
-  //@!todo setmode
+  return static_cast<cedar::dev::sensors::visual::CameraPropertyMode::Id>(mpPropertyMode->getValue());
+}
+
+void cedar::dev::sensors::visual::CamProperty::setMode(cedar::dev::sensors::visual::CameraPropertyMode::Id modeId)
+{
+  // ParameterPtr->setValue() refuses unavailable modes
+
+  // this method is called from commandline programs as well as from the gui (i.e. the mpPropertyMode control)
+  // check this to avoid an infinite loop on indirect invocation from the gui
+  if (mpPropertyMode->getValue() != modeId)
+  {
+    mpPropertyMode->setValue(modeId);
+  }
 }
 
 
 double cedar::dev::sensors::visual::CamProperty::getMinValue()
 {
-  //return mpPropertyValue->getLower();
-  return 0.0f;
+  return mpPropertyValue->getMinimum();
 }
 
 
 double cedar::dev::sensors::visual::CamProperty::getMaxValue()
 {
-  //return mpPropertyValue->getMaximum();
-  return 1024.0f;
+  return mpPropertyValue->getMaximum();
 }
 
 bool cedar::dev::sensors::visual::CamProperty::isSupported()

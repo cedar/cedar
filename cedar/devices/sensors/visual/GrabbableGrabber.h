@@ -134,14 +134,14 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //none yet
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  //derived from Grabber
+  // derived from Grabber
   bool onInit();
   void onCleanUp();
   void onUpdateSourceInfo(unsigned int channel);
@@ -190,4 +190,4 @@ private:
 
 }; // class cedar::dev::sensors::visual::GrabbableGrabber
 
-#endif //CEDAR_DEV_SENSORS_VISUAL_GRABBABLE_GRABBER_H
+#endif // CEDAR_DEV_SENSORS_VISUAL_GRABBABLE_GRABBER_H

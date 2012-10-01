@@ -108,8 +108,8 @@ public:
   public:
     Channel()
     :
-    _mSnapshotName(new cedar::aux::FileParameter(this,"snapshotName",cedar::aux::FileParameter::WRITE,"./snapshot.jpg")),
-    _mRecordName(new cedar::aux::FileParameter(this, "recordName",cedar::aux::FileParameter::WRITE,"./record.avi")),
+    _mSnapshotName(new cedar::aux::FileParameter(this,"snapshot file",cedar::aux::FileParameter::WRITE,"./snapshot.jpg")),
+    _mRecordName(new cedar::aux::FileParameter(this, "record file",cedar::aux::FileParameter::WRITE,"./record.avi")),
     mChannelInfo("")
     {
       //init classes
@@ -690,6 +690,9 @@ protected:
     
     /*! @brief  Flag if recording is on     */
     bool mRecording;
+
+//    /// Between Constructor and applyParameter(), this value is false, otherwise it will be true
+//    bool mStartUp;
 
 private:
 

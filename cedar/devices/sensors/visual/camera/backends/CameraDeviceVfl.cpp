@@ -37,6 +37,8 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
+#ifdef CEDAR_USE_VIDEO_FOR_LINUX
+
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/camera/backends/CameraDeviceVfl.h"
 
@@ -48,10 +50,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::sensors::visual::CameraDeviceVfl::CameraDeviceVfl
 (
- cedar::dev::sensors::visual::CameraChannelPtr pCameraChannel
+  cedar::dev::sensors::visual::CameraGrabber* pCameraGrabber,
+  cedar::dev::sensors::visual::CameraChannelPtr pCameraChannel
 )
 :
-cedar::dev::sensors::visual::CameraDevice::CameraDevice(pCameraChannel)
+cedar::dev::sensors::visual::CameraDevice::CameraDevice(pCameraGrabber,pCameraChannel)
 {
 }
 
@@ -65,7 +68,7 @@ cedar::dev::sensors::visual::CameraDeviceVfl::~CameraDeviceVfl()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::sensors::visual::CameraDeviceVfl::fillCapabilities()
+void cedar::dev::sensors::visual::CameraDeviceVfl::setProperties()
 {
 
 }
@@ -84,3 +87,5 @@ void cedar::dev::sensors::visual::CameraDeviceVfl::applyStateToCamera()
 {
 
 }
+
+#endif // CEDAR_USE_VIDEO_FOR_LINUX

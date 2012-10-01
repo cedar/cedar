@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -22,87 +22,111 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraState.h
+    File:        CameraBackendType.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 07 04
 
-    Description:  Header for the cedar::dev::sensors::visual::CameraState class
+    Description:  Header for CameraBackendType enum-type class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_STATE_H
-#define CEDAR_DEV_SENSORS_VISUAL_CAMERA_STATE_H
+#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERABACKENDTYPE_H
+#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERABACKENDTYPE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/EnumType.h"
 #include "cedar/devices/sensors/visual/namespace.h"
 
 // SYSTEM INCLUDES
 
-
-/*!@brief Base class of the misc camera grabber backends.
- *
- * Implements the common features of a camera device
+/*!@brief Enum class to determine the used backend for the camera grabber
  */
-class cedar::dev::sensors::visual::CameraState
+class cedar::dev::sensors::visual::CameraBackendType
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // typedefs
   //--------------------------------------------------------------------------------------------------------------------
+//!@cond SKIPPED_DOCUMENTATION
+public:
+  typedef cedar::aux::EnumId Id;
+public:
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
   //!@brief The standard constructor.
-  CameraState();
 
   //!@brief Destructor
-  ~CameraState();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  static void construct();
+
+  static const cedar::aux::EnumBase& type();
+  static const cedar::dev::sensors::visual::CameraBackendType::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraBackendType> mType;
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+
+  /*! @brief Use the default value of the OpenCV::VideoCapture object
+   *
+   *  It is possible, that no all properties could be detected
+   */
+  static const Id AUTO = 0;
+
+  /*! @brief Use only basic functionality of the cv::Capture object
+   */
+  static const Id CVCAPTURE = 1;
+
+#ifdef CEDAR_USE_LIB_DC1394
+  /*! @brief Use the DC1394 backend and settings
+   *
+   *   This is only possible if CEDAR is build with libdc support
+   */
+  static const Id DC1394 = 2;
+#endif //CEDAR_USE_LIB_DC1394
+
+#ifdef CEDAR_USE_VIDEO_FOR_LINUX
+  /*! @brief Use the Video For Linux backend
+   */
+  static const Id VFL = 3;
+#endif // CEDAR_USE_VIDEO_FOR_LINUX
+
+
+
 protected:
   // none yet
 private:
   // none yet
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
+}; // cedar::dev::sensors::visual::CameraBackendType
 
-private:
-  // none yet
 
-}; // class cedar::dev::sensors::visual::CameraState
-
-#endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_STATE_H
+#endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAMERABACKENDTYPE_H
 

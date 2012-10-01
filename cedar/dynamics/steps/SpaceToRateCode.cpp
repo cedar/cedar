@@ -162,5 +162,8 @@ void cedar::dyn::SpaceToRateCode::inputConnectionChanged(const std::string& inpu
   // This should always work since other types should not be accepted.
   CEDAR_DEBUG_ASSERT(this->mInput);
 
-  this->limitsChanged();
+  if (mInput->getDimensionality() == 1 && mInput->getData().type() == CV_32F)
+  {
+    this->limitsChanged();
+  }
 }
