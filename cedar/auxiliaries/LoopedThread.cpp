@@ -287,7 +287,11 @@ void cedar::aux::LoopedThread::updateStatistics(double stepsTaken)
 
   if (old_sum > mSumOfStepsTaken)
   {
-    std::cerr << "Warning: Value overflow in thread statistics. Statistics will be reseted." << std::endl;
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Value overflow in thread statistics. Statistics will be reset.",
+      "cedar::aux::LoopedThread::updateStatistics(double)"
+    );
     initStatistics();
   }
 

@@ -228,7 +228,11 @@ void cedar::dev::kuka::KinematicChain::step(double)
           }
           break;
         default:
-          std::cerr << "Invalid working mode in KinematicChain::step(double). I'm afraid I can't do that." << std::endl;
+          cedar::aux::LogSingleton::getInstance()->error
+          (
+            "Invalid working mode in KinematicChain::step(double) (I'm afraid I can't let you do that, dave.)",
+            "cedar::dev::kuka::KinematicChain::step(double)"
+          );
       }
     }
     mLock.unlock();
