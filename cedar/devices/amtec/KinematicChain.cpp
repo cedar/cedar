@@ -153,7 +153,7 @@ bool cedar::dev::amtec::KinematicChain::initDevice()
   {
     cedar::aux::LogSingleton::getInstance()->error
     (
-        "No Amtec modules found!",
+      "No Amtec modules found!",
       "cedar::dev::amtec::KinematicChain::initDevice()"
     );
     return false;
@@ -173,13 +173,15 @@ bool cedar::dev::amtec::KinematicChain::initDevice()
   }
 
   // print module mapping to console
-  std::cout << "Mapping of joints to modules:" << std::endl;
-  std::cout << "amtec module map = [ " << _mModuleMap->at(0);
+  std::string mapping_message = "Mapping of joints to modules: ";
+  mapping_message += cedar::aux::toString(_mModuleMap->at(0));
   for (unsigned int i = 1; i < _mModuleMap->size(); ++i)
   {
-    std::cout << ", " << _mModuleMap->at(i);
+    mapping_message += ", " + cedar::aux::toString(_mModuleMap->at(i));
   }
-  std::cout << " ];" << std::endl;
+  mapping_message += " ];";
+
+  cedar::aux::LogSingleton::getInstance()->message(mapping_message, "cedar::dev::amtec::KinematicChain::initDevice()");
 
   // calibrate and configure the modules
   mutex_locker.unlock();
@@ -215,16 +217,28 @@ double cedar::dev::amtec::KinematicChain::getJointAngle(unsigned int joint) cons
 {
   QMutexLocker mutex_locker(&mCanBusMutex);
 
+  //!@todo Write a getJoint(index) method to avoid this redundant code!
   if(!mpDevice)
   {
-    std::cout << "Error: No Amtec device!" << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "No Amtec device!",
+      "cedar::dev::amtec::KinematicChain::getJointAngle(unsigned int) const"
+    );
     return 0.0;
   }
 
   if(joint >= _mModuleMap->size())
   {
-    std::cout << "Error: Trying to access the " << joint << ". module while only "
-      << _mModuleMap->size() << " were found." << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Trying to access joint "
+        + cedar::aux::toString(joint)
+        + " while only"
+        + cedar::aux::toString(_mModuleMap->size())
+        + " were found.",
+      "cedar::dev::amtec::KinematicChain::getJointAngle(unsigned int) const"
+    );
     return 0.0;
   }
 
@@ -243,14 +257,25 @@ double cedar::dev::amtec::KinematicChain::getJointVelocity(unsigned int joint) c
 
   if(!mpDevice)
   {
-    std::cout << "Error: No Amtec device!" << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "No Amtec device!",
+      "cedar::dev::amtec::KinematicChain::getJointVelocity(unsigned int) const"
+    );
     return 0.0;
   }
 
   if(joint >= _mModuleMap->size())
   {
-    std::cout << "Error: Trying to access the " << joint << ". module while only "
-      << _mModuleMap->size() << " were found." << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Trying to access joint "
+        + cedar::aux::toString(joint)
+        + " while only"
+        + cedar::aux::toString(_mModuleMap->size())
+        + " were found.",
+      "cedar::dev::amtec::KinematicChain::getJointVelocity(unsigned int) const"
+    );
     return 0.0;
   }
 
@@ -269,14 +294,25 @@ void cedar::dev::amtec::KinematicChain::setJointAngle(unsigned int index, double
 
   if(!mpDevice)
   {
-    std::cout << "Error: No Amtec device!" << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "No Amtec device!",
+      "cedar::dev::amtec::KinematicChain::getJointVelocity(unsigned int) const"
+    );
     return;
   }
 
   if(index >= _mModuleMap->size())
   {
-    std::cout << "Error: Trying to access the " << index << ". module while only "
-      << _mModuleMap->size() << " were found." << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Trying to access joint "
+        + cedar::aux::toString(index)
+        + " while only"
+        + cedar::aux::toString(_mModuleMap->size())
+        + " were found.",
+      "cedar::dev::amtec::KinematicChain::getJointVelocity(unsigned int) const"
+    );
     return;
   }
 
@@ -293,14 +329,25 @@ bool cedar::dev::amtec::KinematicChain::setJointVelocity(unsigned int index, dou
 
   if(!mpDevice)
   {
-    std::cout << "Error: No Amtec device!" << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "No Amtec device!",
+      "cedar::dev::amtec::KinematicChain::setJointVelocity(unsigned int, double)"
+    );
     return true;
   }
 
   if(index >= _mModuleMap->size())
   {
-    std::cout << "Error: Trying to access the " << index << ". module while only "
-      << _mModuleMap->size() << " were found." << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Trying to access joint "
+        + cedar::aux::toString(index)
+        + " while only"
+        + cedar::aux::toString(_mModuleMap->size())
+        + " were found.",
+      "cedar::dev::amtec::KinematicChain::getJointVelocity(unsigned int) const"
+    );
     return true;
   }
 
@@ -318,9 +365,14 @@ bool cedar::dev::amtec::KinematicChain::calibrateModule(unsigned int module)
 {
   QMutexLocker mutex_locker(&mCanBusMutex);
 
+  //!@todo Use an assert here?
   if(!mpDevice)
   {
-    std::cout << "Trying to calibrate but no device initialized. This should never happen!" << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Trying to calibrate but no device initialized. This should never happen!",
+      "cedar::dev::amtec::KinematicChain::calibrateModule(unsigned int)"
+    );
     return false;
   }
 
@@ -329,7 +381,11 @@ bool cedar::dev::amtec::KinematicChain::calibrateModule(unsigned int module)
 
   if(ret_val != CLD_OK)
   {
-    std::cout << "Error halting Amtec module " << module << ": " << ret_val << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Error halting Amtec module " + cedar::aux::toString(module) + ": " + cedar::aux::toString(ret_val),
+      "cedar::dev::amtec::KinematicChain::calibrateModule(unsigned int)"
+    );
     return false;
   }
 
@@ -338,7 +394,11 @@ bool cedar::dev::amtec::KinematicChain::calibrateModule(unsigned int module)
 
   if(ret_val != CLD_OK)
   {
-    std::cout << "Error homing Amtec module " << module << ": " << ret_val << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Error homing Amtec module " + cedar::aux::toString(module) + ": " + cedar::aux::toString(ret_val),
+      "cedar::dev::amtec::KinematicChain::calibrateModule(unsigned int)"
+    );
     return false;
   }
 
@@ -351,7 +411,11 @@ bool cedar::dev::amtec::KinematicChain::calibrateModule(unsigned int module)
 
     if(ret_val != CLD_OK)
     {
-      std::cout << "Error homing Amtec module " << module << ": " << ret_val << std::endl;
+      cedar::aux::LogSingleton::getInstance()->error
+      (
+        "Error homing Amtec module " + cedar::aux::toString(module) + ": " + cedar::aux::toString(ret_val),
+        "cedar::dev::amtec::KinematicChain::calibrateModule(unsigned int)"
+      );
       return false;
     }
   }
@@ -362,7 +426,11 @@ bool cedar::dev::amtec::KinematicChain::calibrateModule(unsigned int module)
 
   if(ret_val != CLD_OK)
   {
-    std::cout << "Error resetting Amtec module " << module << ": " << ret_val << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Error resetting Amtec module " + cedar::aux::toString(module) + ": " + cedar::aux::toString(ret_val),
+      "cedar::dev::amtec::KinematicChain::calibrateModule(unsigned int)"
+    );
     return false;
   }
 
@@ -376,7 +444,11 @@ bool cedar::dev::amtec::KinematicChain::isCalibrated(unsigned int module)
 
   if(!mpDevice)
   {
-    std::cout << "Trying to read calibration state but no device initialized!" << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Trying to read calibration state but no device initialized!",
+      "cedar::dev::amtec::KinematicChain::isCalibrated(unsigned int)"
+    );
     return false;
   }
 
@@ -388,7 +460,15 @@ bool cedar::dev::amtec::KinematicChain::isCalibrated(unsigned int module)
 
   if(ret_val != CLD_OK)
   {
-    std::cout << "Error reading state of Amtec module " << module << ": " << ret_val << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Error reading state of Amtec module "
+        + cedar::aux::toString(module)
+        + ": "
+        + cedar::aux::toString(ret_val)
+        + ".",
+      "cedar::dev::amtec::KinematicChain::isCalibrated(unsigned int)"
+    );
     return false;
   }
 
@@ -404,14 +484,25 @@ float cedar::dev::amtec::KinematicChain::getMaxAcceleration(unsigned int index)
 
   if(!mpDevice)
   {
-    std::cout << "Trying to read max acceleration but no device initialized!" << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Trying to read max acceleration but no device initialized!",
+      "cedar::dev::amtec::KinematicChain::getMaxAcceleration(unsigned int)"
+    );
     return 0.0;
   }
 
   if(index >= _mModuleMap->size())
   {
-    std::cout << "Error: Trying to access the " << index << ". module while only "
-      << _mModuleMap->size() << " were found." << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Trying to access joint "
+        + cedar::aux::toString(index)
+        + " while only"
+        + cedar::aux::toString(_mModuleMap->size())
+        + " were found.",
+      "cedar::dev::amtec::KinematicChain::getMaxAcceleration(unsigned int)"
+    );
     return 0.0;
   }
 
@@ -428,14 +519,25 @@ void cedar::dev::amtec::KinematicChain::setMaxAcceleration(unsigned int index, f
 
   if(!mpDevice)
   {
-    std::cout << "Trying to set max acceleration but no device initialized!" << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Trying to set max acceleration but no device initialized!",
+      "cedar::dev::amtec::KinematicChain::setMaxAcceleration(unsigned int, float)"
+    );
     return;
   }
 
   if(index >= _mModuleMap->size())
   {
-    std::cout << "Error: Trying to access the " << index << ". module while only "
-      << _mModuleMap->size() << " were found." << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Trying to access joint "
+        + cedar::aux::toString(index)
+        + " while only"
+        + cedar::aux::toString(_mModuleMap->size())
+        + " were found.",
+      "cedar::dev::amtec::KinematicChain::getMaxAcceleration(unsigned int)"
+    );
     return;
   }
 
@@ -449,14 +551,25 @@ void cedar::dev::amtec::KinematicChain::setJointAngle(unsigned int index, double
 
   if(!mpDevice)
   {
-    std::cout << "Error: No Amtec device!" << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "No Amtec device!",
+      "cedar::dev::amtec::KinematicChain::setJointAngle(unsigned int, double, double)"
+    );
     return;
   }
 
   if(index >= _mModuleMap->size())
   {
-    std::cout << "Error: Trying to access the " << index << ". module while only "
-        << _mModuleMap->size() << " were found." << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Trying to access joint "
+        + cedar::aux::toString(index)
+        + " while only"
+        + cedar::aux::toString(_mModuleMap->size())
+        + " were found.",
+        "cedar::dev::amtec::KinematicChain::setJointAngle(unsigned int, double, double)"
+    );
     return;
   }
 
