@@ -143,7 +143,12 @@ void cedar::proc::PluginDeclaration::readElementDeclaration(const cedar::aux::Co
       return;
     }
   }
-  CEDAR_THROW(cedar::aux::InvalidNameException, "Could not find a class declaration for class \"" + class_id + "\".");
+
+  cedar::aux::LogSingleton::getInstance()->warning
+  (
+    "Could not find a class declaration for class \"" + class_id + "\".",
+    "cedar::proc::PluginDeclaration::readElementDeclaration(const cedar::aux::ConfigurationNode&)"
+  );
 }
 
 
