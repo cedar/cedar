@@ -73,12 +73,22 @@ endif(QT4_FOUND)
 # Look for opencv
 link_libraries(opencv_highgui opencv_core)
 
-# Add include directories
-include_directories("${CEDAR_HOME}" "${CEDAR_HOME}/${CEDAR_BUILD_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
+if(CEDAR_HOME)
+  message("-- Using local cedar version in ${CEDAR_HOME}")
+  # Add include directories
+  include_directories("${CEDAR_HOME}" "${CEDAR_HOME}/${CEDAR_BUILD_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
 
-# Add link directories
-link_directories("${CEDAR_HOME}/${CEDAR_LIB_DIR}")
+  # Add link directories
+  link_directories("${CEDAR_HOME}/${CEDAR_LIB_DIR}")
+  
+elseif(CEDAR_HOME_INSTALLED)
+  message("-- Using installed cedar version in ${CEDAR_HOME_INSTALLED}")
+  # Add include directories
+  include_directories("${CEDAR_HOME_INSTALLED}/include" "${CMAKE_CURRENT_BINARY_DIR}")
 
+  # Add link directories
+  link_directories("${CEDAR_HOME_INSTALLED}/lib")
+endif(CEDAR_HOME)
 
 ## Macros ########################
 

@@ -34,14 +34,17 @@
 #
 #=======================================================================================================================
 
-# The directory of the cedar version to use
+# You may choose to use either a local or an installed version of cedar
+# The directory of the local cedar version to use
 set(CEDAR_HOME "~/workspace/src/cedar.unstable")
+# The install directory of cedar (without subfolders such as include/ or lib/)
+#set(CEDAR_HOME_INSTALLED "/usr/local")
 
 # Activate to get more detailed cmake output
-# set(DEBUG_CEDAR_BUILD_SYSTEM On)
+#set(DEBUG_CEDAR_BUILD_SYSTEM On)
 
 # Specify the build type
 set(CMAKE_BUILD_TYPE debug)
 
 # Specify the build directory of cedar (defaults to "build" if not given)
-# set(CEDAR_BUILD_DIR build)
+#set(CEDAR_BUILD_DIR build)
