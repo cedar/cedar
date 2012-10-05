@@ -49,6 +49,46 @@
 #include <qwtplot3d/qwt3d_types.h>
 
 
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
+{
+  namespace aux
+  {
+    namespace gui
+    {
+      namespace detail
+      {
+        /* This is an internal class of ImagePlot that cannot be nested because Qt's moc doesn't support nested classes.
+         *
+         * Don't use it outside of the ImagePlot!
+         */
+        class ImagePlotWorker : public QObject
+        {
+          Q_OBJECT
+
+          public:
+            ImagePlotWorker(cedar::aux::gui::ImagePlot* pPlot)
+            :
+            mpPlot(pPlot)
+            {
+            }
+
+          public slots:
+            void convert();
+
+          signals:
+            void done();
+
+          public:
+            cedar::aux::gui::ImagePlot *mpPlot;
+        };
+        CEDAR_GENERATE_POINTER_TYPES(ImagePlotWorker);
+      }
+    }
+  }
+}
+//!@endcond
+
 /*!@brief A plot for images.
  */
 class cedar::aux::gui::ImagePlot : public cedar::aux::gui::PlotInterface
@@ -57,6 +97,11 @@ class cedar::aux::gui::ImagePlot : public cedar::aux::gui::PlotInterface
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::aux::gui::detail::ImagePlotWorker;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -109,6 +154,9 @@ public:
    */
   void timerEvent(QTimerEvent *pEvent);
 
+signals:
+  void convert();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -134,6 +182,9 @@ private:
    */
   void imageFromMat(const cv::Mat& mat);
 
+private slots:
+  void conversionDone();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -157,6 +208,12 @@ private:
 
   //! Type of the data.
   DataType mDataType;
+
+  //! Thread in which conversion of mat data to qwt triple is done.
+  QThread* mpWorkerThread;
+
+  //! Worker object.
+  cedar::aux::gui::detail::ImagePlotWorkerPtr mWorker;
 
   static std::vector<char> mLookupTableR;
   static std::vector<char> mLookupTableG;
