@@ -250,10 +250,15 @@ void cedar::dyn::RateMatrixToSpaceCode::inputConnectionChanged(const std::string
   {
     // Assign the input to the member. This saves us from casting in every computation step.
     this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
-    mDimensionality = cedar::aux::math::getDimensionalityOf(mInput->getData()) + 1;
+
+    if (!this->mInput)
+    {
+      return;
+    }
+
+    mDimensionality = mInput->getDimensionality() + 1;
 
     // This should always work since other types should not be accepted.
-    CEDAR_DEBUG_ASSERT(this->mInput);
     this->outputSizesChanged();
   }
 }

@@ -191,7 +191,10 @@ void cedar::proc::steps::Convolution::inputConnectionChanged(const std::string& 
     // Assign the input to the member. This saves us from casting in every computation step.
     this->mMatrix = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
     // This should always work since other types should not be accepted.
-    CEDAR_DEBUG_ASSERT(this->mMatrix);
+    if(!this->mMatrix)
+    {
+      return;
+    }
 
     this->mOutput->copyAnnotationsFrom(this->mMatrix);
     this->mOutput->setData(this->mMatrix->getData().clone());
@@ -202,8 +205,6 @@ void cedar::proc::steps::Convolution::inputConnectionChanged(const std::string& 
   {
     // Assign the input to the member. This saves us from casting in every computation step.
     this->mKernel = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
-    // This should always work since other types should not be accepted.
-    CEDAR_DEBUG_ASSERT(this->mKernel);
   }
 }
 

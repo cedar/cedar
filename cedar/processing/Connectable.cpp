@@ -738,6 +738,8 @@ void cedar::proc::Connectable::freeInput(const std::string& name, cedar::aux::Co
   {
     this->freeData(DataRole::INPUT, name);
   }
+
+  this->inputConnectionChanged(name);
 }
 
 void cedar::proc::Connectable::freeBuffer(const std::string& name)

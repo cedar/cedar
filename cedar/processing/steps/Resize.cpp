@@ -368,8 +368,11 @@ void cedar::proc::steps::Resize::inputConnectionChanged(const std::string& input
 
   // Assign the input to the member. This saves us from casting in every computation step.
   this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
-  // This should always work since other types should not be accepted.
-  CEDAR_DEBUG_ASSERT(this->mInput);
+
+  if( !this->mInput)
+  {
+    return;
+  }
 
   // Let's get a reference to the input matrix.
   const cv::Mat& input = this->mInput->getData();

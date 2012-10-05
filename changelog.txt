@@ -48,6 +48,8 @@
   - The image plot, when clicked, now shows the value of the pixel under the cursor.
   
 - cedar::proc
+  - IMPORTANT: when connections are removed, the inputConnectionChanged method is now called (as should always have been
+    the case); please test your steps accordingly and make sure you check whether the new data is not a null pointer!
   - You can now define plots in ElementDeclarations. Plots, in this case, are a list of data that is to be plotted
     together.
   - The resize step now orders its dimensions consistently in two-dimensional cases; unfortunately, this means that

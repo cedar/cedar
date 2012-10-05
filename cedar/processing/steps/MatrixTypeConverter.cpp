@@ -129,6 +129,11 @@ void cedar::proc::steps::MatrixTypeConverter::inputConnectionChanged(const std::
 {
   this->mMatrix = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(dataSlotName));
 
+  if (!this->mMatrix)
+  {
+    return;
+  }
+
   this->mConverted->copyAnnotationsFrom(this->mMatrix);
 
   this->onTrigger();
