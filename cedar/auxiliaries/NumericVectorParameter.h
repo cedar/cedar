@@ -130,21 +130,6 @@ public:
   }
 
   //!@brief The constructor.
-  CEDAR_DECLARE_DEPRECATED
-  (
-  NumericVectorParameter(
-                          cedar::aux::Configurable *pOwner,
-                          const std::string& name,
-                          const T& minimum,
-                          const T& maximum
-                        ))
-  :
-  cedar::aux::VectorParameter<T>(pOwner, name),
-  mLimits(minimum, maximum)
-  {
-  }
-
-  //!@brief The constructor.
   NumericVectorParameter(
                           cedar::aux::Configurable *pOwner,
                           const std::string& name,
