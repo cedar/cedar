@@ -22,6 +22,7 @@ This page contains the following sections:
   <li>@ref ProcessingTutorialDataValidation</li>
   <li>@ref ProcessingTutorialInputCollections</li>
   <li>@ref ProcessingTutorialOwnParameters</li>
+  <li>@ref ProcessingTutorialManualLocking</li>
   <li>@ref ProcessingTutorialSummary</li>
 </ol>
 
@@ -530,7 +531,52 @@ allocate new widgets for the newly set parameter.
 Finally, the new parameter widget must be associated with the parameter type.
 
 @todo There is currently no proper way to associate a parameter with the widget outside of cedar.
- 
+
+
+@section ProcessingTutorialManualLocking Advanced Tutorial: Locking your data manually
+
+By default, processing steps are automatically thread-safe, i.e., data and parameters are locked for reading and writing
+during any function calls by the processing framework. However, this may have a downside. Consider a processing step
+that has a very long-running compute method. Before calling it, the framework locks all inputs for reading and outputs
+for writing. Now, during the entire time the compute function is running, preceeding processing steps cannot lock their
+outputs for writing, because the long-running step holds a read lock on them.
+
+To counter this, we have introduced a method for disabling the automatic locking of inputs and outputs. In the above
+example, if the long-running step only accesses its inputs and outputs briefly, it can disable the automatic locking and
+only lock its data when it is actually accessed.
+
+To do so, a step has to call the following method in the constructor:
+@code
+your::Step::Step()
+{
+  // ...
+  this->setAutoLockInputsAndOutputs(false);
+  // ...
+}
+@endcode
+
+Note, that this only disables automatic locking of inputs and outputs. Parameters and buffers are still locked
+automatically (buffers are never passed to other steps, thus they cannot delay them.)
+
+Now, whenver you are accessing input or output data, you must lock it manually, e.g., by writing:
+@code
+  cedar::aux::ConstMatDataPtr input = ...
+  cedar::aux::MatDataPtr output = ...
+  
+  // ...
+  input->lockForRead();
+  // process input
+  input->unlock();
+  
+  
+  // do long computation
+  
+  
+  output->lockForWrite();
+  // write result to output
+  output->unlock();
+@endcode
+
 
 @section ProcessingTutorialSummary Summary
 
