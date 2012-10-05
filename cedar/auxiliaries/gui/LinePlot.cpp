@@ -91,6 +91,14 @@ cedar::aux::gui::LinePlot::~LinePlot()
   {
     delete mpLock;
   }
+
+  if (this->mpWorkerThread)
+  {
+    this->mpWorkerThread->quit();
+    this->mpWorkerThread->wait();
+    delete this->mpWorkerThread;
+    this->mpWorkerThread = NULL;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
