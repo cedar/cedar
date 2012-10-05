@@ -63,9 +63,9 @@ namespace cedar
     {
       namespace detail
       {
-        /* This is an internal class of LinePlot that cannot be nested because Qt's moc doesn't support nested classes.
+        /* This is an internal class of SurfacePlot that cannot be nested because Qt's moc doesn't support nested classes.
          *
-         * Don't use it outside of the LinePlot!
+         * Don't use it outside of the SurfacePlot!
          */
         class SurfacePlotWorker : public QObject
         {
@@ -83,7 +83,6 @@ namespace cedar
 
           signals:
             void done();
-            void dataChanged();
 
           public:
             cedar::aux::gui::SurfacePlot *mpPlot;
