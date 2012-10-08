@@ -48,7 +48,7 @@
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cv::Mat cedar::aux::conv::Engine::convolve
+cv::Mat cedar::aux::conv::Engine::convolveSeparable
         (
           const cv::Mat& matrix,
           cedar::aux::kernel::ConstSeparablePtr kernel,
