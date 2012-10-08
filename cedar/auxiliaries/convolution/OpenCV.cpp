@@ -631,7 +631,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
   }
 }
 
-cv::Mat cedar::aux::conv::OpenCV::convolve
+cv::Mat cedar::aux::conv::OpenCV::convolveSeparable
         (
           const cv::Mat& matrix,
           const cedar::aux::kernel::ConstSeparablePtr kernel,

@@ -111,7 +111,7 @@ public:
    * @remarks As a default, this method just calls the normal convolve function. Override this in order to implement
    *          faster convolution for separable kernels.
    */
-  virtual cv::Mat convolve
+  virtual cv::Mat convolveSeparable
   (
     const cv::Mat& matrix,
     cedar::aux::kernel::ConstSeparablePtr kernel,
