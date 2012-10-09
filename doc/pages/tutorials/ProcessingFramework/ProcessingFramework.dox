@@ -470,6 +470,9 @@ Note, that the slot parameter is not used here because the same conditions must 
 just a simple check, and a real-world summation step should probably also check that the matrix has a compatible size
 in this function, however, the principle still remains the same.
 
+@remarks The data pointer in this function can be a null-pointer when the connection is deleted. Always perform checks
+         for this circumstance!
+
 @remarks In the future, we plan to provide a system for at least partly automated checks, thus making the implementation
          of this function unnecessary in many cases. Of course, there will always be some checks that just have to be
          done manually.
