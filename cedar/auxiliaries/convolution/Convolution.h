@@ -134,13 +134,13 @@ public:
 
   /*!@brief Convolve with a separable kernel using the set convolution engine.
    */
-  inline cv::Mat convolve
+  inline cv::Mat convolveSeparable
   (
     const cv::Mat& matrix,
     cedar::aux::kernel::ConstSeparablePtr kernel
   ) const
   {
-    return this->getEngine()->convolve(matrix, kernel, this->getBorderType(), this->getMode());
+    return this->getEngine()->convolveSeparable(matrix, kernel, this->getBorderType(), this->getMode());
   }
 
   /*!@brief   Convolves a matrix with a kernel list.
@@ -193,7 +193,7 @@ public:
     cedar::aux::kernel::ConstSeparablePtr kernel
   ) const
   {
-    return this->convolve(matrix, kernel);
+    return this->convolveSeparable(matrix, kernel);
   }
 
   //!@brief The convolution functor for a matrix and a kernel list.
