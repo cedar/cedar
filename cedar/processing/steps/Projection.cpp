@@ -258,6 +258,17 @@ void cedar::proc::steps::Projection::reconfigure()
                     "Projection mapping is set up correctly."
                   );
   }
+
+  for (unsigned int input_dim = 0; input_dim < input_dimensionality; ++input_dim)
+  {
+    if (_mDimensionMappings->getValue()->isDropped(input_dim))
+    {
+      continue;
+    }
+    unsigned int output_dim = _mDimensionMappings->getValue()->lookUp(input_dim);
+    CEDAR_ASSERT(output_dim < output_dimensionality);
+    this->_mOutputDimensionSizes->set(output_dim, this->mInput->getData().size[input_dim]);
+  }
 }
 
 void cedar::proc::steps::Projection::initializeOutputMatrix()
