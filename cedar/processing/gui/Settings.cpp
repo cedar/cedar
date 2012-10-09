@@ -129,6 +129,15 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
           ""
         )
       );
+  this->mArchitectureExportDialogDirectory = cedar::aux::DirectoryParameterPtr
+      (
+        new cedar::aux::DirectoryParameter
+        (
+          recent_files.get(),
+          "lastArchitectureExportDialogDirectory",
+          ""
+        )
+      );
   this->mRecentArchitectureFiles = cedar::aux::StringVectorParameterPtr
       (
         new cedar::aux::StringVectorParameter
@@ -215,6 +224,11 @@ cedar::aux::StringVectorParameterPtr cedar::proc::gui::Settings::getArchitecture
 cedar::aux::DirectoryParameterPtr cedar::proc::gui::Settings::lastArchitectureLoadDialogDirectory()
 {
   return this->mArchitectureLoadDialogDirectory;
+}
+
+cedar::aux::DirectoryParameterPtr cedar::proc::gui::Settings::lastArchitectureExportDialogDirectory()
+{
+  return this->mArchitectureExportDialogDirectory;
 }
 
 cedar::aux::DirectoryParameterPtr cedar::proc::gui::Settings::lastPluginLoadDialogLocation()
