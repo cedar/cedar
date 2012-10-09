@@ -54,6 +54,7 @@
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
 #include <QMenu>
+#include <QThread>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -99,6 +100,14 @@ mppArrayData(NULL)
 
 cedar::aux::gui::SurfacePlot::~SurfacePlot()
 {
+  if (this->mpWorkerThread)
+  {
+    this->mpWorkerThread->quit();
+    this->mpWorkerThread->wait();
+    delete this->mpWorkerThread;
+    this->mpWorkerThread = NULL;
+  }
+
   this->deleteArrayData();
 }
 
@@ -214,20 +223,40 @@ void cedar::aux::gui::SurfacePlot::init()
   this->mpPlot->updateGL();
 
   mDataRows = mDataCols = 0;
+
+  this->mpWorkerThread = new QThread();
+  mWorker = cedar::aux::gui::detail::SurfacePlotWorkerPtr(new cedar::aux::gui::detail::SurfacePlotWorker(this));
+  mWorker->moveToThread(this->mpWorkerThread);
+  QObject::connect(this, SIGNAL(convert()), mWorker.get(), SLOT(convert()));
+  QObject::connect(mWorker.get(), SIGNAL(done()), this, SLOT(conversionDone()));
+
+  mpWorkerThread->start(QThread::LowPriority);
+}
+
+void cedar::aux::gui::detail::SurfacePlotWorker::convert()
+{
+  this->mpPlot->updateArrayData();
+
+  emit done();
+}
+
+void cedar::aux::gui::SurfacePlot::conversionDone()
+{
+  if(this->mppArrayData == NULL)
+  {
+    return;
+  }
+
+  this->mpPlot->createDataset(this->mppArrayData, mDataRows, mDataCols);
+  this->applyLabels();
+  this->mpPlot->updateGL();
 }
 
 void cedar::aux::gui::SurfacePlot::timerEvent(QTimerEvent * /* pEvent */)
 {
   if (this->isVisible() && this->mMatData)
   {
-    this->updateArrayData();
-    if(this->mppArrayData == NULL)
-    {
-      return;
-    }
-    this->mpPlot->createDataset(this->mppArrayData, mDataRows, mDataCols);
-    this->applyLabels();
-    this->mpPlot->updateGL();
+    emit convert();
   }
 }
 

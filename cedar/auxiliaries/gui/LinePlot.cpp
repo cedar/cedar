@@ -54,6 +54,7 @@
 #include <QVBoxLayout>
 #include <QPalette>
 #include <QMenu>
+#include <QThread>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -89,6 +90,14 @@ cedar::aux::gui::LinePlot::~LinePlot()
   if (mpLock)
   {
     delete mpLock;
+  }
+
+  if (this->mpWorkerThread)
+  {
+    this->mpWorkerThread->quit();
+    this->mpWorkerThread->wait();
+    delete this->mpWorkerThread;
+    this->mpWorkerThread = NULL;
   }
 }
 
@@ -207,7 +216,7 @@ void cedar::aux::gui::LinePlot::doAppend(cedar::aux::DataPtr data, const std::st
     return;
   }
 
-  this->buildArrays(plot_series, num);
+  plot_series->buildArrays(num);
 
   //!@todo write a macro that does this check (see HistoryPlot0D.cpp)
 #if (QWT_VERSION >> 16) == 5
@@ -257,6 +266,18 @@ void cedar::aux::gui::LinePlot::init()
 
   mpPlot = new QwtPlot(this);
   this->layout()->addWidget(mpPlot);
+
+  mpWorkerThread = new QThread();
+
+  mConversionWorker = cedar::aux::gui::detail::LinePlotWorkerPtr(new cedar::aux::gui::detail::LinePlotWorker(this));
+  mConversionWorker->moveToThread(mpWorkerThread);
+
+  //!@todo Add possibility to change priority
+  this->mpWorkerThread->start(QThread::LowPriority);
+
+  QObject::connect(mConversionWorker.get(), SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
+  QObject::connect(this, SIGNAL(convert()), mConversionWorker.get(), SLOT(convert()));
+  QObject::connect(mConversionWorker.get(), SIGNAL(done()), this, SLOT(conversionDone()));
 }
 
 void cedar::aux::gui::LinePlot::contextMenuEvent(QContextMenuEvent *pEvent)
@@ -320,38 +341,32 @@ void cedar::aux::gui::LinePlot::showLegend(bool show)
   }
 }
 
-void cedar::aux::gui::LinePlot::buildArrays(PlotSeriesPtr series, unsigned int new_size)
+void cedar::aux::gui::LinePlot::PlotSeries::buildArrays(unsigned int new_size)
 {
-  CEDAR_DEBUG_ASSERT(series->mXValues.size() == series->mYValues.size());
+  CEDAR_DEBUG_ASSERT(this->mXValues.size() == this->mYValues.size());
 
-  unsigned int old_size = series->mXValues.size();
+  unsigned int old_size = this->mXValues.size();
 
-  series->mXValues.resize(new_size);
-  series->mYValues.resize(new_size);
+  this->mXValues.resize(new_size);
+  this->mYValues.resize(new_size);
 
   for (unsigned int i = old_size; i < new_size; ++i)
   {
-    series->mXValues.at(i) = static_cast<double>(i);
+    this->mXValues.at(i) = static_cast<double>(i);
   }
 }
 
-void cedar::aux::gui::LinePlot::timerEvent(QTimerEvent * /* pEvent */)
+void cedar::aux::gui::detail::LinePlotWorker::convert()
 {
-  if (!this->isVisible())
+  QWriteLocker plot_locker(this->mpPlot->mpLock);
+  for (size_t i = 0; i < this->mpPlot->mPlotSeriesVector.size(); ++i)
   {
-    return;
-  }
+    cedar::aux::gui::LinePlot::PlotSeriesPtr series = this->mpPlot->mPlotSeriesVector.at(i);
 
-  this->mpLock->lockForRead();
-  for (size_t i = 0; i < this->mPlotSeriesVector.size(); ++i)
-  {
-    PlotSeriesPtr series = this->mPlotSeriesVector.at(i);
-
-    series->mMatData->lockForRead();
+    QReadLocker locker(&series->mMatData->getLock());
     const cv::Mat& mat = series->mMatData->getData();
     if (cedar::aux::math::getDimensionalityOf(mat) != 1) // plot is no longer capable of displaying the data
     {
-      series->mMatData->unlock();
       emit dataChanged();
       return;
     }
@@ -363,41 +378,62 @@ void cedar::aux::gui::LinePlot::timerEvent(QTimerEvent * /* pEvent */)
     // skip if the array is empty
     if (size == 0)
     {
-      series->mMatData->unlock();
       return;
     }
 
     if (series->mXValues.size() != size)
     {
-      this->buildArrays(series, size);
+      series->buildArrays(size);
     }
 
     for (size_t i = 0; i < series->mXValues.size(); ++i)
     {
       series->mYValues.at(i) = cedar::aux::math::getMatrixEntry<double>(mat, i);
     }
-    series->mMatData->unlock();
+  }
+
+  plot_locker.unlock();
+
+  emit done();
+}
+
+void cedar::aux::gui::LinePlot::conversionDone()
+{
+  QReadLocker locker(this->mpLock);
+  for (size_t i = 0; i < this->mPlotSeriesVector.size(); ++i)
+  {
+    PlotSeriesPtr series = this->mPlotSeriesVector.at(i);
+
     // choose the right function depending on the qwt version
     //!@todo write a macro that does this check (see HistoryPlot0D.cpp)
-#if (QWT_VERSION >> 16) == 5
-    series->mpCurve->setData
-    (
-      &series->mXValues.at(0),
-      &series->mYValues.at(0),
-      static_cast<int>(series->mXValues.size())
-    );
-#elif (QWT_VERSION >> 16) == 6
-    series->mpCurve->setRawSamples
-    (
-      &series->mXValues.at(0),
-      &series->mYValues.at(0),
-      static_cast<int>(series->mXValues.size())
-    );
-#else
-#error unsupported qwt version
-#endif
+    #if (QWT_VERSION >> 16) == 5
+      series->mpCurve->setData
+      (
+        &series->mXValues.at(0),
+        &series->mYValues.at(0),
+        static_cast<int>(series->mXValues.size())
+      );
+    #elif (QWT_VERSION >> 16) == 6
+      series->mpCurve->setRawSamples
+      (
+        &series->mXValues.at(0),
+        &series->mYValues.at(0),
+        static_cast<int>(series->mXValues.size())
+      );
+    #else
+    #error unsupported qwt version
+    #endif
   }
 
   this->mpPlot->replot();
-  mpLock->unlock();
+}
+
+void cedar::aux::gui::LinePlot::timerEvent(QTimerEvent * /* pEvent */)
+{
+  if (!this->isVisible())
+  {
+    return;
+  }
+
+  emit convert();
 }

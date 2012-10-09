@@ -46,6 +46,46 @@
 #include <qwt_plot_curve.h>
 #include <deque>
 
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
+{
+  namespace aux
+  {
+    namespace gui
+    {
+      namespace detail
+      {
+        /* This is an internal class of ImagePlot that cannot be nested because Qt's moc doesn't support nested classes.
+         *
+         * Don't use it outside of the ImagePlot!
+         */
+        class HistoryPlot0DWorker : public QObject
+        {
+          Q_OBJECT
+
+          public:
+            HistoryPlot0DWorker(cedar::aux::gui::HistoryPlot0D* pPlot)
+            :
+            mpPlot(pPlot)
+            {
+            }
+
+          public slots:
+            void convert();
+
+          signals:
+            void done();
+
+          public:
+            cedar::aux::gui::HistoryPlot0D *mpPlot;
+        };
+        CEDAR_GENERATE_POINTER_TYPES(HistoryPlot0DWorker);
+      }
+    }
+  }
+}
+//!@endcond
+
 /*!@brief A time-based plot for 0D values. Displays a history of this value from a certain point in the past up to now.
  *
  * More detailed description of the class.
@@ -58,6 +98,11 @@ class cedar::aux::gui::HistoryPlot0D : public cedar::aux::gui::MultiPlotInterfac
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::aux::gui::detail::HistoryPlot0DWorker;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -120,6 +165,9 @@ public:
 
   bool canAppend(cedar::aux::ConstDataPtr data) const;
 
+signals:
+  void convert();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -142,6 +190,7 @@ private:
 
 private slots:
   void showLegend(bool show = true);
+  void conversionDone();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -165,6 +214,12 @@ private:
 
   //!@brief number of steps in the past, which are still plotted
   size_t mMaxHistorySize; //!@todo Make a parameter/configurable somehow.
+
+  //! Thread in which conversion of mat data to qwt triple is done.
+  QThread* mpWorkerThread;
+
+  //! Worker object.
+  cedar::aux::gui::detail::HistoryPlot0DWorkerPtr mWorker;
 
   //! A vector containing all the colors used for plot lines.
   static std::vector<QColor> mLineColors;

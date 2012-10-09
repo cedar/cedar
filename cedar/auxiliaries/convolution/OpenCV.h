@@ -109,7 +109,7 @@ public:
     cedar::aux::conv::Mode::Id mode
   ) const;
 
-  cv::Mat convolve
+  cv::Mat convolveSeparable
   (
     const cv::Mat& matrix,
     cedar::aux::kernel::ConstSeparablePtr kernel,
