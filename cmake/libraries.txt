@@ -50,7 +50,7 @@ endif()
 
 # Qt
 message("-- Searching for Qt...")
-find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml REQUIRED)
+find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml QtSvg REQUIRED)
 if(QT4_FOUND)
   include(${QT_USE_FILE})
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${QT_LIBRARIES})

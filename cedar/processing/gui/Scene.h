@@ -243,6 +243,10 @@ public:
    */
   void setConfigurableWidget(cedar::aux::gui::PropertyPane *pConfigurableWidget);
 
+  /*!@brief Exports the scene to an svg file
+   */
+  void exportSvg(const QString& file);
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals
   //--------------------------------------------------------------------------------------------------------------------
