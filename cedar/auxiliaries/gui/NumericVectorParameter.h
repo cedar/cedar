@@ -62,12 +62,17 @@ public cedar::aux::gui::VectorParameterAbstraction<ValueT, WidgetT>
      * @param pWidget   Widget to which to apply the parameters.
      * @param parameter Parameter whose properties to apply.
      */
-    static void applyProperties(WidgetT* pWidget, boost::intrusive_ptr<cedar::aux::VectorParameter<ValueT> > parameter)
+    static void applyProperties
+                (
+                  WidgetT* pWidget,
+                  boost::intrusive_ptr<cedar::aux::VectorParameter<ValueT> > parameter,
+                  size_t index
+                )
     {
       typedef cedar::aux::NumericVectorParameter<ValueT> NumericVector;
       CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(NumericVector);
       NumericVectorPtr numeric_parameter = cedar::aux::asserted_pointer_cast<NumericVector>(parameter);
-      pWidget->setDisabled(parameter->isConstant());
+      pWidget->setDisabled(parameter->isConstantAt(index));
       bool signals_blocked = pWidget->blockSignals(true);
       setMinimum(pWidget, numeric_parameter->getMinimum());
       setMaximum(pWidget, numeric_parameter->getMaximum());
