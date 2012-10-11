@@ -195,9 +195,6 @@ void cedar::dev::kteam::Drive::checkAnswer
     expected_answer = this->determineCorrectAnswer(command);
   }
 
-  std::cout << "answer: " << answer << std::endl;
-  std::cout << "expected answer: " << expected_answer << std::endl;
-
   // if the answer is incorrect ...
   if (answer.empty() || answer.compare(0, expected_answer.size(), expected_answer, 0, expected_answer.size()) != 0)
   {

@@ -62,7 +62,9 @@
 #include <QGraphicsSceneDragDropEvent>
 #include <QMimeData>
 #include <QMenu>
+#include <QPainter>
 #include <QAction>
+#include <QSvgGenerator>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -91,6 +93,19 @@ cedar::proc::gui::Scene::~Scene()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Scene::exportSvg(const QString& file)
+{
+  QSvgGenerator generator;
+  generator.setFileName(file);
+  QRectF scene_rect = this->sceneRect();
+  generator.setSize(QSize(static_cast<int>(scene_rect.width()), static_cast<int>(scene_rect.height())));
+  generator.setViewBox(scene_rect);
+  QPainter painter;
+  painter.begin(&generator);
+  this->render(&painter);
+  painter.end();
+}
 
 void cedar::proc::gui::Scene::setConfigurableWidget(cedar::aux::gui::PropertyPane *pConfigurableWidget)
 {

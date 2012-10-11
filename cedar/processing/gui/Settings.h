@@ -137,6 +137,9 @@ public:
   //!@brief returns the last directory, from which an architecture was loaded
   cedar::aux::DirectoryParameterPtr lastArchitectureLoadDialogDirectory();
 
+  //!@brief returns the last directory, from which an architecture was loaded
+  cedar::aux::DirectoryParameterPtr lastArchitectureExportDialogDirectory();
+
   //!@brief appends an architecture configuration file to the history of files
   void appendArchitectureFileToHistory(const std::string& filePath);
 
@@ -214,6 +217,9 @@ private:
 
   //!@brief Directory, where the load dialog for architectures is supposed to open.
   cedar::aux::DirectoryParameterPtr mArchitectureLoadDialogDirectory;
+
+  //!@brief Directory, where the load dialog for architectures is supposed to open.
+  cedar::aux::DirectoryParameterPtr mArchitectureExportDialogDirectory;
 
   //!@brief History of architecture files recently loaded.
   cedar::aux::StringVectorParameterPtr mRecentArchitectureFiles;

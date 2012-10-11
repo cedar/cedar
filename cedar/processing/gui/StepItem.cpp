@@ -87,7 +87,6 @@ const qreal cedar::proc::gui::StepItem::mBaseDataSlotSize = 12.0;
 
 QIcon cedar::proc::gui::StepItem::mLoopedIcon(":/decorations/looped.svg");
 
-
 #ifndef CEDAR_COMPILER_MSVC
 const cedar::proc::gui::StepItem::DisplayMode::Id cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT;
 const cedar::proc::gui::StepItem::DisplayMode::Id cedar::proc::gui::StepItem::DisplayMode::ICON_ONLY;
@@ -146,7 +145,6 @@ void cedar::proc::gui::StepItem::construct()
   }
 }
 
-
 cedar::proc::gui::StepItem::Decoration::Decoration
 (
   cedar::proc::gui::StepItem* pStep,
@@ -171,7 +169,6 @@ mIconSource(icon)
   this->mpRectangle->setPen(pen);
   this->mpRectangle->setBrush(bg);
 }
-
 
 cedar::proc::gui::StepItem::~StepItem()
 {
@@ -732,9 +729,7 @@ void cedar::proc::gui::StepItem::showPlot
     title += "." + slot->getName() + ")";
   }
 
-  QDockWidget *p_dock = new QDockWidget(QString::fromStdString(title), mpMainWindow);
-  p_dock->setFloating(true);
-  p_dock->layout()->setContentsMargins(0, 0, 0, 0);
+  QDockWidget *p_dock = this->createPlotDockWidget(title);
 
   QRect geometry = p_dock->geometry();
   geometry.setTopLeft(position);
@@ -996,6 +991,16 @@ void cedar::proc::gui::StepItem::setDisplayMode(cedar::proc::gui::StepItem::Disp
   this->update();
 }
 
+QDockWidget* cedar::proc::gui::StepItem::createPlotDockWidget(const std::string& title) const
+{
+  QDockWidget *p_dock = new QDockWidget(QString::fromStdString(title), this->mpMainWindow);
+  p_dock->setFloating(true);
+  p_dock->setContentsMargins(0, 0, 0, 0);
+  p_dock->setAllowedAreas(Qt::NoDockWidgetArea);
+
+  return p_dock;
+}
+
 void cedar::proc::gui::StepItem::multiplot
      (
        const QPoint& position,
@@ -1032,9 +1037,7 @@ void cedar::proc::gui::StepItem::multiplot
   }
 
   // initialize dock
-  QDockWidget *p_dock = new QDockWidget(QString::fromStdString(this->getStep()->getName()), this->mpMainWindow);
-  p_dock->setFloating(true);
-  p_dock->setContentsMargins(0, 0, 0, 0);
+  QDockWidget *p_dock = createPlotDockWidget(this->getStep()->getName());
 
   // initialize widget & layout
   QWidget *p_widget = new QWidget();

@@ -63,6 +63,13 @@ cedar::aux::conv::OpenCV::OpenCV()
 {
 }
 
+cedar::aux::conv::OpenCV::~OpenCV()
+{
+  mKernelAddedConnection.disconnect();
+  mKernelChangedConnection.disconnect();
+  mKernelRemovedConnection.disconnect();
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -624,7 +631,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
   }
 }
 
-cv::Mat cedar::aux::conv::OpenCV::convolve
+cv::Mat cedar::aux::conv::OpenCV::convolveSeparable
         (
           const cv::Mat& matrix,
           const cedar::aux::kernel::ConstSeparablePtr kernel,
@@ -1101,13 +1108,28 @@ void cedar::aux::conv::OpenCV::updateKernelType(size_t index)
 
 void cedar::aux::conv::OpenCV::setKernelList(cedar::aux::conv::KernelListPtr kernelList)
 {
+  mKernelAddedConnection.disconnect();
+  mKernelChangedConnection.disconnect();
+  mKernelRemovedConnection.disconnect();
   this->Engine::setKernelList(kernelList);
   this->mKernelTypes.clear();
   for (size_t i = 0; i < this->getKernelList()->size(); ++i)
   {
     this->updateKernelType(i);
   }
-  this->getKernelList()->connectToKernelAddedSignal(boost::bind(&cedar::aux::conv::OpenCV::updateKernelType, this, _1));
-  this->getKernelList()->connectToKernelChangedSignal(boost::bind(&cedar::aux::conv::OpenCV::updateKernelType, this, _1));
-  this->getKernelList()->connectToKernelRemovedSignal(boost::bind(&cedar::aux::conv::OpenCV::kernelRemoved, this, _1));
+  mKernelAddedConnection
+    = this->getKernelList()->connectToKernelAddedSignal
+                             (
+                               boost::bind(&cedar::aux::conv::OpenCV::updateKernelType, this, _1)
+                             );
+  mKernelChangedConnection
+    = this->getKernelList()->connectToKernelChangedSignal
+                             (
+                               boost::bind(&cedar::aux::conv::OpenCV::updateKernelType, this, _1)
+                             );
+  mKernelRemovedConnection
+    = this->getKernelList()->connectToKernelRemovedSignal
+                             (
+                               boost::bind(&cedar::aux::conv::OpenCV::kernelRemoved, this, _1)
+                             );
 }

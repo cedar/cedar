@@ -184,6 +184,11 @@ public slots:
    */
   void resetRootNetwork();
 
+  /*!@brief Opens a dialog that lets the user export the current scene as an SVG
+   */
+  void exportSvg();
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

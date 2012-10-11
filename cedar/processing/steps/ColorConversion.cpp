@@ -96,7 +96,7 @@ const cedar::proc::steps::ColorConversion::ColorSpace::Id cedar::proc::steps::Co
 
 cedar::proc::steps::ColorConversion::ColorConversion()
 :
-mOutput(new cedar::aux::MatData(cv::Mat(2, 2, CV_32F))),
+mOutput(new cedar::aux::MatData(cv::Mat(2, 2, CV_32FC3))),
 mCvConversionConstant(-1),
 _mSourceType
 (
@@ -302,7 +302,16 @@ void cedar::proc::steps::ColorConversion::updateCvConvertConstant()
 
 void cedar::proc::steps::ColorConversion::inputConnectionChanged(const std::string& inputName)
 {
-  this->mInput = cedar::aux::asserted_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
+  cedar::aux::ConstDataPtr data = this->getInput(inputName);
+
+  if (!data)
+  {
+    this->mInput.reset();
+    return;
+  }
+
+  this->mInput = cedar::aux::asserted_pointer_cast<const cedar::aux::MatData>(data);
+
   this->mOutput->copyAnnotationsFrom(this->mInput);
   this->updateSourceImageColorSpace();
   this->updateTargetImageColorSpace();

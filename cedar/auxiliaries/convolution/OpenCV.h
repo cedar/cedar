@@ -72,6 +72,7 @@ private:
 public:
   OpenCV();
 
+  ~OpenCV();
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -108,7 +109,7 @@ public:
     cedar::aux::conv::Mode::Id mode
   ) const;
 
-  cv::Mat convolve
+  cv::Mat convolveSeparable
   (
     const cv::Mat& matrix,
     cedar::aux::kernel::ConstSeparablePtr kernel,
@@ -252,6 +253,15 @@ protected:
   // none yet
 private:
   std::vector<KernelType> mKernelTypes;
+
+  //! Connection to the kernel added signal of the kernel list.
+  boost::signals2::connection mKernelAddedConnection;
+
+  //! Connection to the kernel changed signal of the kernel list.
+  boost::signals2::connection mKernelChangedConnection;
+
+  //! Connection to the kernel removed signal of the kernel list.
+  boost::signals2::connection mKernelRemovedConnection;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

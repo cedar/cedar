@@ -50,6 +50,11 @@
 
 void pluginDeclaration(cedar::proc::PluginDeclarationPtr)
 {
-  //!@todo Switch this to the new logging mechanism
-  std::cout << "cedardyn is no longer a plugin. Please don't include it any more!" << std::endl;
+#ifndef CEDAR_OS_WINDOWS
+  cedar::aux::LogSingleton::getInstance()->warning
+  (
+    "cedardyn is no longer a plugin. Please don't include it any more!",
+    "void pluginDeclaration(cedar::proc::PluginDeclarationPtr)"
+  );
+#endif // CEDAR_OS_WINDOWS
 }

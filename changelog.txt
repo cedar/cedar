@@ -48,10 +48,17 @@
   - The image plot, when clicked, now shows the value of the pixel under the cursor.
   
 - cedar::proc
+  - IMPORTANT: when connections are removed, the inputConnectionChanged method is now called (as should always have been
+    the case); please test your steps accordingly and make sure you check whether the new data is not a null pointer!
   - You can now define plots in ElementDeclarations. Plots, in this case, are a list of data that is to be plotted
     together.
   - The resize step now orders its dimensions consistently in two-dimensional cases; unfortunately, this means that
-    all old architectures will need to flip their size order (used to be [width, height], is now [height, width]). 
+    all old architectures will need to flip their size order (used to be [width, height], is now [height, width]).
+  - Plot widgets now no longer dock in the processingIde!
+  - Steps can now take care of locking their inputs and outputs manually by setting a flag. This may be useful if steps
+    lock data for a long time even though they are not accessing it, potentially preventing other steps in the
+    processing chain from running.
+  - The processingIde can now export architectures into SVG files.
 
 == Version 0.9.1 ==
 - general
