@@ -160,9 +160,11 @@ public:
   void readFromNode(const cedar::aux::ConfigurationNode& root)
   {
     this->mValues.clear();
+    this->mSingleValueConst.clear();
     for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin(); iter != root.end(); ++iter)
     {
       this->mValues.push_back(iter->second.get_value<T>());
+      this->mSingleValueConst.push_back(false);
     }
   }
 
@@ -207,6 +209,9 @@ public:
   //!@brief erase an entry of this vector
   iterator erase(iterator iter)
   {
+    size_t index = std::distance(this->mValues.begin(), iter);
+    CEDAR_ASSERT(index < this->mSingleValueConst.size())
+    this->mSingleValueConst.erase(this->mSingleValueConst.begin() + index);
     iterator ret = this->mValues.erase(iter);
     this->emitChangedSignal();
     return ret;
@@ -271,6 +276,7 @@ public:
   void pushBack(const T& value)
   {
     this->mValues.push_back(value);
+    this->mSingleValueConst.push_back(false);
     this->emitChangedSignal();
   }
 
@@ -280,9 +286,14 @@ public:
     return this->mValues.size();
   }
 
-  //!@brief resize the vector to a new size and initialize new entries to the given value
-  void resize(size_t size, const T& value)
+  /*!@brief resize the vector to a new size and initialize new entries to the given value
+   * @param size the new size of the vector
+   * @param value the default value used to initialize new entries
+   * @param blockSignal suppress the emission of a propertyChanged signal
+   */
+  void resize(size_t size, const T& value, bool blockSignal = false)
   {
+    this->mSingleValueConst.resize(size, false);
     if (size == this->size())
     {
       return;
@@ -290,10 +301,15 @@ public:
 
     this->mValues.resize(size, value);
 
-    this->emitPropertyChangedSignal();
+    if (!blockSignal)
+    {
+      this->emitPropertyChangedSignal();
+    }
   }
 
-  //!@brief Resize the vector to a new size and initialize new entries to the default value set for this parameter.
+  /*!@brief Resize the vector to a new size and initialize new entries to the default value set for this parameter.
+   * @param size the new size of the vector
+   */
   void resize(size_t size)
   {
     this->resize(size, this->mDefaultValue);
@@ -323,7 +339,7 @@ public:
 
     bool changed = (this->mValues.size() != values.size());
 
-    this->mValues.resize(values.size());
+    this->resize(values.size(), this->mDefaultValue, true);
     for (size_t i = 0; i < values.size(); ++i)
     {
       if (this->mValues[i] != values[i])
@@ -394,6 +410,33 @@ public:
     {
       this->mValues.assign(this->mSize, this->mDefaultValue);
     }
+    this->mSingleValueConst.assign(this->mValues.size(), false);
+  }
+
+  //!@brief This function returns the constness of a single entry.
+  bool isConstantAt(size_t index) const
+  {
+    CEDAR_ASSERT(index < mSingleValueConst.size());
+    if (this->isConstant())
+    {
+      return true;
+    }
+    return mSingleValueConst[index];
+  }
+
+  //!@brief This function sets the constness of  a single entry.
+  void setConstantAt(size_t index, bool constness)
+  {
+    CEDAR_ASSERT(index < mSingleValueConst.size());
+    mSingleValueConst[index] = constness;
+    this->emitPropertyChangedSignal();
+  }
+
+  //!@brief This function resets the constness of all entries - and it sounds funny!
+  void unconstAll()
+  {
+    mSingleValueConst.assign(this->mSingleValueConst.size(), false);
+    this->emitPropertyChangedSignal();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -416,6 +459,9 @@ protected:
 private:
   //!@brief a default vector
   std::vector<T> mDefaults;
+
+  //!@brief a vector that tags single values as const (in contrast to setting the whole vector to const)
+  std::vector<bool> mSingleValueConst;
 
   //!@brief a default size
   size_t mSize;

@@ -52,6 +52,7 @@
 #include <QVBoxLayout>
 #include <QToolTip>
 #include <QMouseEvent>
+#include <QThread>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -95,6 +96,15 @@ mDataType(DATA_TYPE_UNKNOWN)
 
   mpImageDisplay = new cedar::aux::gui::ImagePlot::ImageDisplay("no image loaded");
   p_layout->addWidget(mpImageDisplay);
+
+  this->mpWorkerThread = new QThread();
+  mWorker = cedar::aux::gui::detail::ImagePlotWorkerPtr(new cedar::aux::gui::detail::ImagePlotWorker(this));
+  mWorker->moveToThread(this->mpWorkerThread);
+
+  QObject::connect(this, SIGNAL(convert()), mWorker.get(), SLOT(convert()));
+  QObject::connect(mWorker.get(), SIGNAL(done()), this, SLOT(conversionDone()));
+
+  this->mpWorkerThread->start(QThread::LowPriority);
 }
 
 cedar::aux::gui::ImagePlot::ImageDisplay::ImageDisplay(const QString& text)
@@ -107,6 +117,13 @@ QLabel(text)
 
 cedar::aux::gui::ImagePlot::~ImagePlot()
 {
+  if (this->mpWorkerThread)
+  {
+    this->mpWorkerThread->quit();
+    this->mpWorkerThread->wait();
+    delete this->mpWorkerThread;
+    this->mpWorkerThread = NULL;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -187,47 +204,37 @@ void cedar::aux::gui::ImagePlot::ImageDisplay::mousePressEvent(QMouseEvent * pEv
   QToolTip::showText(pEvent->globalPos(), info_text);
 }
 
-void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
+void cedar::aux::gui::detail::ImagePlotWorker::convert()
 {
-  if (!this->isVisible())
-  {
-    return;
-  }
+  cv::Mat& mat = this->mpPlot->mData->getData();
 
-  if (this->mDataType == DATA_TYPE_UNKNOWN)
-  {
-    return;
-  }
-
-  cv::Mat& mat = this->mData->getData();
-
-  this->mData->lockForRead();
+  this->mpPlot->mData->lockForRead();
   if (mat.empty())
   {
-    this->mpImageDisplay->setText("Matrix is empty.");
-    this->mData->unlock();
+    this->mpPlot->mpImageDisplay->setText("Matrix is empty.");
+    this->mpPlot->mData->unlock();
     return;
   }
   int type = mat.type();
-  this->mData->unlock();
+  this->mpPlot->mData->unlock();
 
   switch(type)
   {
     case CV_8UC1:
     {
-      this->mData->lockForRead();
-      cv::Mat converted = threeChannelGrayscale(mat);
-      this->mData->unlock();
+      this->mpPlot->mData->lockForRead();
+      cv::Mat converted = this->mpPlot->threeChannelGrayscale(mat);
+      this->mpPlot->mData->unlock();
       CEDAR_DEBUG_ASSERT(converted.type() == CV_8UC3);
-      this->imageFromMat(converted);
+      this->mpPlot->imageFromMat(converted);
       break;
     }
 
     case CV_8UC3:
     {
-      this->mData->lockForRead();
-      this->imageFromMat(mat);
-      this->mData->unlock();
+      this->mpPlot->mData->lockForRead();
+      this->mpPlot->imageFromMat(mat);
+      this->mpPlot->mData->unlock();
       break;
     }
 
@@ -238,17 +245,17 @@ void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
       // find min and max for scaling
       double min, max;
 
-      this->mData->lockForRead();
+      this->mpPlot->mData->lockForRead();
       cv::minMaxLoc(mat, &min, &max);
       cv::Mat scaled = (mat - min) / (max - min) * 255.0;
-      this->mData->unlock();
+      this->mpPlot->mData->unlock();
       cv::Mat mat_8u;
       scaled.convertTo(mat_8u, CV_8U);
 
       // convert grayscale to three-channel matrix
-      cv::Mat converted = threeChannelGrayscale(mat_8u);
+      cv::Mat converted = this->mpPlot->threeChannelGrayscale(mat_8u);
       CEDAR_DEBUG_ASSERT(converted.type() == CV_8UC3);
-      this->imageFromMat(converted);
+      this->mpPlot->imageFromMat(converted);
       break;
     }
 
@@ -256,13 +263,28 @@ void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
     {
       std::string matrix_type_name = cedar::aux::math::matrixTypeToString(mat);
       QString text = "Cannot display matrix of type " + QString::fromStdString(matrix_type_name) + ".";
-      this->mpImageDisplay->setText(text);
+      this->mpPlot->mpImageDisplay->setText(text);
       return;
     }
   }
 
+  emit done();
+}
+
+void cedar::aux::gui::ImagePlot::conversionDone()
+{
   this->mpImageDisplay->setPixmap(QPixmap::fromImage(this->mImage));
   this->resizePixmap();
+}
+
+void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
+{
+  if (!this->isVisible() || this->mDataType == DATA_TYPE_UNKNOWN)
+  {
+    return;
+  }
+
+  emit convert();
 }
 
 //!@todo encapsulate lookup table functionality in own class

@@ -193,14 +193,21 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Switch::determineInputValidi
 
 void cedar::proc::steps::Switch::inputConnectionChanged(const std::string& inputName)
 {
+  cedar::aux::ConstDataPtr data = this->getInput(inputName);
   if (inputName == "factor")
   {
-    this->mFactor = this->getInput(inputName);
-    if (boost::shared_dynamic_cast<const cedar::aux::MatData>(this->mFactor))
+    this->mFactor = data;
+
+    if (!this->mFactor)
+    {
+      return;
+    }
+
+    if (boost::shared_dynamic_cast<cedar::aux::ConstMatData>(this->mFactor))
     {
       this->mFactorDataType = FACTOR_IS_MATRIX;
     }
-    else if (boost::shared_dynamic_cast<const cedar::aux::DoubleData>(this->mFactor))
+    else if (boost::shared_dynamic_cast<cedar::aux::ConstDoubleData>(this->mFactor))
     {
       this->mFactorDataType = FACTOR_IS_DOUBLE;
     }
@@ -213,11 +220,25 @@ void cedar::proc::steps::Switch::inputConnectionChanged(const std::string& input
   {
     if (inputName == "input 1")
     {
-      this->mInput1 = cedar::aux::asserted_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
+      if (data)
+      {
+        this->mInput1 = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(data);
+      }
+      else
+      {
+        this->mInput1.reset();
+      }
     }
     else if (inputName == "input 2")
     {
-      this->mInput2 = cedar::aux::asserted_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
+      if (data)
+      {
+        this->mInput2 = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(data);
+      }
+      else
+      {
+        this->mInput2.reset();
+      }
     }
 
     if (this->mInput1 || this->mInput2)

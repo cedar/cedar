@@ -147,8 +147,10 @@ private:
 protected:
   //!@brief the lower limit of the mapped interval
   cedar::aux::DoubleParameterPtr _mLowerLimit;
+  
   //!@brief the upper limit of the mapped interval
   cedar::aux::DoubleParameterPtr _mUpperLimit;
+  
   //!@brief the relaxation parameter of the dynamical system
   cedar::aux::DoubleParameterPtr _mTau;
 

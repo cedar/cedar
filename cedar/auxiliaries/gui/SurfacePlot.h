@@ -54,6 +54,47 @@
 #include <qwtplot3d/qwt3d_plot3d.h>
 #include <qwtplot3d/qwt3d_io.h>
 
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
+{
+  namespace aux
+  {
+    namespace gui
+    {
+      namespace detail
+      {
+        /* This is an internal class of SurfacePlot that cannot be nested because Qt's moc doesn't support nested classes.
+         *
+         * Don't use it outside of the SurfacePlot!
+         */
+        class SurfacePlotWorker : public QObject
+        {
+          Q_OBJECT
+
+          public:
+            SurfacePlotWorker(cedar::aux::gui::SurfacePlot* pPlot)
+            :
+            mpPlot(pPlot)
+            {
+            }
+
+          public slots:
+            void convert();
+
+          signals:
+            void done();
+
+          public:
+            cedar::aux::gui::SurfacePlot *mpPlot;
+        };
+        CEDAR_GENERATE_POINTER_TYPES(SurfacePlotWorker);
+      }
+    }
+  }
+}
+//!@endcond
+
+
 /*!@brief Matrix plot that can display 2D matrices (i.e. vectors).
  *
  * @todo Write more detailed description of the class here.
@@ -64,6 +105,11 @@ class cedar::aux::gui::SurfacePlot : public PlotInterface
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::aux::gui::detail::SurfacePlotWorker;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -117,6 +163,9 @@ public:
   //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
 
+signals:
+  void convert();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -143,26 +192,41 @@ private:
   //!@brief Applies the labels from the data object to the plot.
   void applyLabels();
 
+private slots:
+  void conversionDone();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
 private:
-  //!@brief the displayed MatData
+  //! the displayed MatData
   cedar::aux::MatDataPtr mMatData;
-  //!@brief flag if plot grid should be displayed
+
+  //! flag if plot grid should be displayed
   bool mShowGridLines;
-  //!@biref the plot object
+
+  //! the plot object
   Qwt3D::GridPlot* mpPlot;
-  //!@brief vector of possible perspectives
+
+  //! vector of possible perspectives
   std::vector<Perspective> mPerspectives;
-  //!@brief row count of data
+
+  //! row count of data
   size_t mDataRows;
-  //!@brief column count of data
+
+  //! column count of data
   size_t mDataCols;
-  //!@brief 2D array data
+
+  //! 2D array data
   Qwt3D::Triple** mppArrayData;
+
+  //! Thread in which conversion of mat data to qwt triple is done.
+  QThread* mpWorkerThread;
+
+  //! Worker object.
+  cedar::aux::gui::detail::SurfacePlotWorkerPtr mWorker;
 }; // class cedar::aux::gui::SurfacePlot
 
 #endif // CEDAR_AUX_GUI_SURFACE_PLOT_H

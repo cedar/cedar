@@ -54,6 +54,49 @@
 #include <qwt_plot_marker.h>
 #include <opencv2/opencv.hpp>
 
+//!@cond SKIPPED_DOCUMENTATION
+namespace cedar
+{
+  namespace aux
+  {
+    namespace gui
+    {
+      namespace detail
+      {
+        /* This is an internal class of LinePlot that cannot be nested because Qt's moc doesn't support nested classes.
+         *
+         * Don't use it outside of the LinePlot!
+         */
+        class LinePlotWorker : public QObject
+        {
+          Q_OBJECT
+
+          public:
+            LinePlotWorker(cedar::aux::gui::LinePlot* pPlot)
+            :
+            mpPlot(pPlot)
+            {
+
+            }
+
+          public slots:
+            void convert();
+
+          signals:
+            void done();
+            void dataChanged();
+
+          public:
+            cedar::aux::gui::LinePlot *mpPlot;
+        };
+        CEDAR_GENERATE_POINTER_TYPES(LinePlotWorker);
+      }
+    }
+  }
+}
+//!@endcond
+
+
 /*!@brief Matrix plot that can display 1D matrices (i.e. vectors).
  *
  * @todo Write more detailed description of the class here.
@@ -64,6 +107,11 @@ class cedar::aux::gui::LinePlot : public cedar::aux::gui::MultiPlotInterface
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::aux::gui::detail::LinePlotWorker;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -80,6 +128,9 @@ private:
     ~PlotSeries()
     {
     }
+
+    //!@brief (Re-)initializes the x and y value arrays.
+    void buildArrays(unsigned int new_size);
 
     //!@brief the displayed data
     cedar::aux::MatDataPtr mMatData;
@@ -134,6 +185,9 @@ public:
   //!@todo Generalize this for n-dimensional matrix plots.
   cedar::aux::math::Limits<double> getXLimits() const;
 
+signals:
+  void convert();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -148,9 +202,6 @@ private:
   //!@brief initialize
   void init();
 
-  //!@brief (Re-)initializes the x and y value arrays.
-  void buildArrays(PlotSeriesPtr series, unsigned int new_size);
-
   void doAppend(cedar::aux::DataPtr data, const std::string& title);
 
   //!@brief Applies a plot style to a given curve.
@@ -158,6 +209,8 @@ private:
 
 private slots:
   void showLegend(bool show = true);
+
+  void conversionDone();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -178,6 +231,12 @@ private:
 
   //! A vector containing all the line stypes for the plot.
   static std::vector<Qt::PenStyle> mLineStyles;
+
+  //! Thread in which matrix data is converted to a qwt-ready format.
+  QThread* mpWorkerThread;
+
+  //! The worker that does actual converison.
+  cedar::aux::gui::detail::LinePlotWorkerPtr mConversionWorker;
 
 }; // class cedar::aux::gui::LinePlot
 

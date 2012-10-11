@@ -171,6 +171,11 @@ cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins)
                    SIGNAL(triggered()),
                    this,
                    SLOT(resetRootNetwork()));
+
+  QObject::connect(mpActionExportSVG,
+                   SIGNAL(triggered()),
+                   this,
+                   SLOT(exportSvg()));
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -181,6 +186,30 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::exportSvg()
+{
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureExportDialogDirectory();
+
+  QString file = QFileDialog::getSaveFileName(this, // parent
+                                              "Select where to export", // caption
+                                              last_dir->getValue().absolutePath(), // initial directory;
+                                              "svg (*.svg)" // filter(s), separated by ';;'
+                                              );
+
+  if (!file.isEmpty())
+  {
+    if (!file.endsWith(".svg"))
+    {
+      file += ".svg";
+    }
+
+    this->getArchitectureView()->getScene()->exportSvg(file);
+
+    QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
+    last_dir->setValue(path);
+  }
+}
 
 void cedar::proc::gui::Ide::resetRootNetwork()
 {

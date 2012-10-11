@@ -24,9 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Oliver Lomp
-#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-#   Date:        2012 06 27
+#   Maintainer:  Stephan Zibner
+#   Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+#   Date:        2012 10 04
 #
 #   Description:
 #
@@ -34,17 +34,6 @@
 #
 #=======================================================================================================================
 
-# You may choose to use either a local or an installed version of cedar
-# The directory of the local cedar version to use
-set(CEDAR_HOME "~/workspace/src/cedar.unstable")
-# The install directory of cedar (without subfolders such as include/ or lib/)
-#set(CEDAR_HOME_INSTALLED "/usr/local")
-
-# Activate to get more detailed cmake output
-#set(DEBUG_CEDAR_BUILD_SYSTEM On)
-
-# Specify the build type
-set(CMAKE_BUILD_TYPE debug)
-
-# Specify the build directory of cedar (defaults to "build" if not given)
-#set(CEDAR_BUILD_DIR build)
+cedar_add_unit_test(NeuralField
+                    main.cpp
+                   )
