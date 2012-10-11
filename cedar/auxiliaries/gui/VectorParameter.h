@@ -102,6 +102,7 @@ public:
    *
    * @param pWidget   Widget to which to apply the properties
    * @param parameter Parameter whose properties are to be applied.
+   * @param index The index of the underlying vector parameter entry
    */
   static void applyProperties
               (
