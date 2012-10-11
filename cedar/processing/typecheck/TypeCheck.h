@@ -59,6 +59,7 @@ class cedar::proc::typecheck::TypeCheck
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief The constructor.
   TypeCheck
   (
     cedar::proc::DataSlot::VALIDITY returnedOnOk = cedar::proc::DataSlot::VALIDITY_VALID,
@@ -72,13 +73,22 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Checks the validity of the given data for the given slot.
+   *
+   *        Override this function to implement your own validity check. Note, that this should either return
+   *        validityOk() or validityBad(), rather than the direct constants.
+   */
   virtual cedar::proc::DataSlot::VALIDITY check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr) const = 0;
 
+  /*!@brief The validity that is to be returned when the check succeeds.
+   */
   inline cedar::proc::DataSlot::VALIDITY validityOk() const
   {
     return this->mReturnedOnOk;
   }
 
+  /*!@brief The validity that is to be returned when the check fails.
+   */
   inline cedar::proc::DataSlot::VALIDITY validityBad() const
   {
     return this->mReturnedOnFail;
@@ -108,6 +118,7 @@ protected:
   // none yet
 private:
   cedar::proc::DataSlot::VALIDITY mReturnedOnOk;
+
   cedar::proc::DataSlot::VALIDITY mReturnedOnFail;
 
 }; // class cedar::proc::typecheck::TypeCheck
