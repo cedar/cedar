@@ -242,13 +242,24 @@ void cedar::proc::Connectable::inputConnectionChanged(const std::string& /*input
 {
 }
 
-/*!
- *  This function checks the current validity of a data slot. If the validity is already known, it is returned without
- *  rechecking it. If the current validity is cedar::proc::DataSlot::VALIDITY_UNKNOWN, the slot's validity is determined
- *  by calling the cedar::proc::Connectable::determineInputValidity method.
- *
- *  @param slot the slot that needs checking, specified via its smart pointer.
- */
+cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::checkInputValidity
+                                (
+                                  cedar::proc::ConstDataSlotPtr slot,
+                                  cedar::aux::ConstDataPtr data
+                                ) const
+{
+  if (slot->hasValidityCheck())
+  {
+    // get the validity from the validity check
+    return slot->checkValidityOf(data);
+  }
+  else
+  {
+    // get the validity from the user-implemented function
+    return this->determineInputValidity(slot, data);
+  }
+}
+
 cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar::proc::DataSlotPtr slot)
 {
   // if the validty is indetermined (unknown), try to find it out
@@ -275,21 +286,11 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar
     }
     else
     {
-      if (slot->hasValidityCheck())
-      {
-        // get the validity from the validity check
-        validity = slot->checkValidityOf(data);
-      }
-      else
-      {
-        // get the validity from the user-implemented function
-        validity = this->determineInputValidity(slot, data);
-      }
+      validity = this->checkInputValidity(slot, data);
     }
 
     // assign the validity to the slot
     slot->setValidity(validity);
-
   }
 
   // return the validity stored in the slot

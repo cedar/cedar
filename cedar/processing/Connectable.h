@@ -140,18 +140,29 @@ public:
   //!@brief Returns a specific data pointer stored in this Connectable.
   cedar::aux::DataPtr getData(DataRole::Id role, const std::string& name) const;
 
-  //!@brief Checks the validity of a slot.
+  /*! @brief Checks the validity of a slot.
+   *
+   *  This function checks the current validity of a data slot. If the validity is already known, it is returned without
+   *  rechecking it. If the current validity is cedar::proc::DataSlot::VALIDITY_UNKNOWN, the slot's validity is determined
+   *  by calling the cedar::proc::Connectable::determineInputValidity method.
+   *
+   *  @param slot the slot that needs checking, specified via its smart pointer.
+   */
   cedar::proc::DataSlot::VALIDITY getInputValidity(cedar::proc::DataSlotPtr slot);
 
   //!@brief Checks the validity of a slot.
   cedar::proc::DataSlot::VALIDITY getInputValidity(const std::string& slotName);
 
-  //!@brief Function that determines the validity of input data.
-  virtual cedar::proc::DataSlot::VALIDITY determineInputValidity
-                                          (
-                                            cedar::proc::ConstDataSlotPtr slot,
-                                            cedar::aux::ConstDataPtr data
-                                          ) const;
+  /*!@brief Function that checks the validity of input data.
+   *
+   * @remarks Internally, this function either calls the slot's associated type check or the determineInputValidity
+   *          function.
+   */
+  cedar::proc::DataSlot::VALIDITY checkInputValidity
+                                  (
+                                    cedar::proc::ConstDataSlotPtr slot,
+                                    cedar::aux::ConstDataPtr data
+                                  ) const;
 
   //!@brief Returns true, if this connectable already owns data in the target.
   bool ownsDataOf(cedar::proc::ConstOwnedDataPtr slot) const;
@@ -381,6 +392,14 @@ private:
 
   //!@brief Method that is called whenever an input is connected to the Connectable.
   virtual void inputConnectionChanged(const std::string& inputName);
+
+  //!@brief Function that determines the validity of input data.
+  virtual cedar::proc::DataSlot::VALIDITY determineInputValidity
+                                          (
+                                            cedar::proc::ConstDataSlotPtr slot,
+                                            cedar::aux::ConstDataPtr data
+                                          ) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals & connections
   //--------------------------------------------------------------------------------------------------------------------
