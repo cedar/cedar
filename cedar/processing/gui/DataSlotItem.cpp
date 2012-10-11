@@ -179,12 +179,12 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo
     cedar::proc::DataSlot::VALIDITY validity = cedar::proc::DataSlot::VALIDITY_UNKNOWN;
     if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_target))
     {
-      validity = p_step_item->getStep()->determineInputValidity(p_target_slot->getSlot(), this->mSlot->getData());
+      validity = p_step_item->getStep()->checkInputValidity(p_target_slot->getSlot(), this->mSlot->getData());
     }
     else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_target))
     {
       //!@todo The validity here must be checked correctly at the promoted slot rather than the network's pseudo-slot
-      validity = p_network_item->getNetwork()->determineInputValidity(p_target_slot->getSlot(), this->mSlot->getData());
+      validity = p_network_item->getNetwork()->checkInputValidity(p_target_slot->getSlot(), this->mSlot->getData());
     }
 
     CEDAR_ASSERT(validity != cedar::proc::DataSlot::VALIDITY_UNKNOWN);
