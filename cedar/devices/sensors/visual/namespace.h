@@ -80,91 +80,24 @@ namespace cedar
         CEDAR_DECLARE_DEV_CLASS(TestGrabber);
         CEDAR_DECLARE_DEV_CLASS(GLGrabber);
         CEDAR_DECLARE_DEV_CLASS(GrabbableGrabber);
-        CEDAR_DECLARE_DEV_CLASS(CameraGrabber);
 
 #ifdef CEDAR_USE_YARP
         CEDAR_DECLARE_DEV_CLASS(NetGrabber);
 #endif // CEDAR_USE_YARP
 
-        //-----------------------------------------------------------------------------------------------
-        // camera grabber helper classes
-        //-----------------------------------------------------------------------------------------------
-
-        // backend implementation
-        CEDAR_DECLARE_DEV_CLASS(CameraDevice);
-        CEDAR_DECLARE_DEV_CLASS(CameraDeviceCvVideoCapture);
-
-#ifdef CEDAR_USE_VIDEO_FOR_LINUX
-        CEDAR_DECLARE_DEV_CLASS(CameraDeviceVfl);
-#endif // CEDAR_USE_VIDEO_FOR_LINUX
-
-#ifdef CEDAR_USE_LIB_DC1394
-        CEDAR_DECLARE_DEV_CLASS(CameraDeviceDc1394);
-#endif
         // enum classes
         CEDAR_DECLARE_DEV_CLASS(RecordingFormat);
 
-        // enum classes for camera
-        CEDAR_DECLARE_DEV_CLASS(CameraBackendType);
-        CEDAR_DECLARE_DEV_CLASS(DeBayerFilter);
-        CEDAR_DECLARE_DEV_CLASS(CameraFrameRate);
-        CEDAR_DECLARE_DEV_CLASS(CameraProperty);
-        CEDAR_DECLARE_DEV_CLASS(CameraVideoMode);
-        CEDAR_DECLARE_DEV_CLASS(CameraSetting);
-        CEDAR_DECLARE_DEV_CLASS(CameraBackendType);
-        CEDAR_DECLARE_DEV_CLASS(CameraIsoSpeed);
-        CEDAR_DECLARE_DEV_CLASS(CameraDebayerPattern);
 
-        // properties
+        CEDAR_DECLARE_DEV_CLASS(GrabberChannel);
+        CEDAR_DECLARE_DEV_CLASS(PictureChannel);
+        CEDAR_DECLARE_DEV_CLASS(VideoChannel);
+        CEDAR_DECLARE_DEV_CLASS(NetChannel);
+        CEDAR_DECLARE_DEV_CLASS(GrabbableChannel);
+        CEDAR_DECLARE_DEV_CLASS(GLChannel);
 
-        // all properties from one channel
-        CEDAR_DECLARE_DEV_CLASS(CameraProperties);
-
-        // one property with name, enum-parameter for mode and double-parameter for value
-        CEDAR_DECLARE_DEV_CLASS(CamProperty);
-        CEDAR_DECLARE_DEV_CLASS(CameraPropertyMode);
-
-        // settings
-
-        // all settings from one channel
-        CEDAR_DECLARE_DEV_CLASS(CameraSettings);
-        CEDAR_DECLARE_DEV_CLASS(CameraCapabilities);
-        CEDAR_DECLARE_DEV_CLASS(CameraState);
-
-
-        // camera settings
-        CEDAR_DECLARE_DEV_CLASS(CamSetting);
-
-        struct CameraChannel;
-        CEDAR_GENERATE_POINTER_TYPES(CameraChannel);
-
-#ifdef CEDAR_USE_LIB_DC1394
-        // firewire related base class for the grabbertools
-        CEDAR_DECLARE_CLASS(LibDcCameraBase);
-#endif // CEDAR_USE_LIB_DC1394
-
-        //-----------------------------------------------------------------------------------------------
-        // grabber types
-        //-----------------------------------------------------------------------------------------------
-
-        ///! map property enum id to the value of the property
-        // typedef std::map<unsigned int, double> CameraPropertyValues;
-
-        //! map of a property-id to his class
-        //!@todo Should this not map from CameraProperty::Id / Enum::Id?
-        
-        // switch to ObjectMapParameterTemplate
-        typedef std::map<unsigned int, cedar::dev::sensors::visual::CamPropertyPtr> CameraPropertyMap;
-
-        ///! a pair of property enum id and his value
-        // typedef std::pair<unsigned int, double> CameraPropertyValuesPair;
-
-        // typedef cedar::aux::SetParameter<cedar::dev::sensors::visual::CamPropertyPtr> CameraPropertiesSet;
-        // CEDAR_GENERATE_POINTER_TYPES(CameraPropertiesSet);
-
-        // typedef cedar::aux::SetParameter<cedar::dev::sensors::visual::CamSettingPtr> CameraSettingsSet;
-        // CEDAR_GENERATE_POINTER_TYPES(CameraSettingsSet);
-        //!@endcond
+        typedef cedar::aux::ObjectListParameterTemplate<GrabberChannel> ChannelParameter;
+        CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ChannelParameter);
 
         //-----------------------------------------------------------------------------------------------
         // exceptions
@@ -178,7 +111,6 @@ namespace cedar
 
         //!@brief An exception for errors on grabbing
         class GrabberGrabException;
-
       }
     }
   }

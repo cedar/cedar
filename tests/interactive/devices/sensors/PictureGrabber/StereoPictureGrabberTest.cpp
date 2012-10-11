@@ -7,7 +7,7 @@
 
     Maintainer:  Georg.Hartinger
     Email:       georg.hartinger@ini.rub.de
-    Date:        2012 07 20
+    Date:        2011 08 01
 
     Description: Simple application to grab from a Picture (stereo-case)
 
@@ -17,12 +17,14 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/PictureGrabber.h"
+#include "cedar/auxiliaries/gui/ImagePlot.h"
+#include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
-#include <opencv2/opencv.hpp>
+#include <QtGui/QApplication>
 
 
-int main(int , char **)
+int main(int argc, char* argv[])
 {
   //--------------------------------------------------------------------------------------------------------------------
   //constants
@@ -34,9 +36,8 @@ int main(int , char **)
   const std::string GRABBER_NAME = "Stereo_Picture_Grabber_TestCase";
   const std::string CONFIG_FILE_NAME = "stereo_picture_grabber_testcase.config";
 
-  //title of highgui window
-  const std::string highgui_window_name_0 = FILE_NAME_0;
-  const std::string highgui_window_name_1 = FILE_NAME_1;
+  const std::string window_title0 = FILE_NAME_0;
+  const std::string window_title1 = FILE_NAME_1;
 
   //--------------------------------------------------------------------------------------------------------------------
   //main test
@@ -102,14 +103,6 @@ int main(int , char **)
   // change settings and properties
   //----------------------------------------------------------------------------------------
 
-  /*After initialization of a picture grabber:
-   *
-   *  The picture is already initialized and the first frame grabbed, so you can check the file using
-   *  getImage(), getSize() or something else
-   *
-   */
-
-
   // Set the name of our grabber
   p_grabber->setName(GRABBER_NAME);
 
@@ -142,56 +135,46 @@ int main(int , char **)
 
 
   //----------------------------------------------------------------------------------------
-  //Create an OpenCV highgui window to show grabbed frames
+  //Create a cedar::aux::gui ImagePlot widget to show grabbed frames
   //----------------------------------------------------------------------------------------
-
   std::cout << "\nShow pictures\n";
-  cv::namedWindow(highgui_window_name_0,CV_WINDOW_KEEPRATIO);
-  cv::namedWindow(highgui_window_name_1,CV_WINDOW_KEEPRATIO);
-
   //the first frame is already grabbed on initialization
-  cv::Mat frame0 = p_grabber->getImage(0);
+  cv::Mat frame0 = p_grabber->getImage();
   cv::Mat frame1 = p_grabber->getImage(1);
 
-  //get frames for a while
-  unsigned int counter=0;
+  QApplication app(argc, argv);
+  cedar::aux::gui::ImagePlotPtr p_plot0 = cedar::aux::gui::ImagePlotPtr(new cedar::aux::gui::ImagePlot());
+  cedar::aux::MatDataPtr p_data0 = cedar::aux::MatDataPtr(new cedar::aux::MatData(frame0));
+  p_plot0->plot(p_data0,window_title0);
+  p_plot0->show();
+  p_plot0->resize(frame0.cols,frame0.rows);
 
-  while (!frame0.empty())
+  cedar::aux::gui::ImagePlotPtr p_plot1 = cedar::aux::gui::ImagePlotPtr(new cedar::aux::gui::ImagePlot());
+  cedar::aux::MatDataPtr p_data1 = cedar::aux::MatDataPtr(new cedar::aux::MatData(frame1));
+  p_plot1->plot(p_data1,window_title1);
+  p_plot1->show();
+  p_plot1->resize(frame1.cols,frame1.rows);
+
+  while (QApplication::hasPendingEvents())
   {
-    imshow(highgui_window_name_0,frame0);
-    imshow(highgui_window_name_1,frame1);
+    QApplication::processEvents();
+  }
 
-    //it is not necessary to do this, unless a new picture should be used
-    frame0 = p_grabber->getImage(0);
-    frame1 = p_grabber->getImage(1);
-    counter++;
-
-    //after one second, set new source-pictures
-    if (counter == 10)
+  while (!frame0.empty() && !frame1.empty() && p_plot0->isVisible() && p_plot1->isVisible())
+  {
+    while (QApplication::hasPendingEvents())
     {
-      // Grab from another picture
-      p_grabber->setSourceFile(0,FILE_NAME_1);
+      QApplication::processEvents();
     }
 
-    //exit after another two second
-    if (counter == 30)
-    {
-      break;
-    }
+    //nothing else to do here. No new frames
 
-    //wait 100ms (needed for highgui)
-    cv::waitKey(100);
+    usleep(10000);
   }
 
   //----------------------------------------------------------------------------------------
   //clean up
   //----------------------------------------------------------------------------------------
-
-  // write configuration
-  // p_grabber->writeJson(CONFIG_FILE_NAME);
-
-  cv::destroyWindow(highgui_window_name_0);
-  cv::destroyWindow(highgui_window_name_1);
 
   //stop grabbing-thread if running
   //recording will also be stopped

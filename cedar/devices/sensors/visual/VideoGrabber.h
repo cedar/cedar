@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/Grabber.h"
+#include "cedar/devices/sensors/visual/VideoChannel.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/IntParameter.h"
 #include "cedar/auxiliaries/FileParameter.h"
@@ -90,33 +91,6 @@ public cedar::dev::sensors::visual::Grabber
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
-  //!@cond SKIPPED_DOCUMENTATION
-public:
-
-  /*! @struct VideoChannel
-   *  @brief Additional data of a video channel
-   */
-  struct VideoChannel
-  :
-  cedar::dev::sensors::visual::Grabber::Channel
-  {
-    VideoChannel(const std::string& fileName = "")
-    :
-    cedar::dev::sensors::visual::Grabber::Channel(),
-    _mSourceFileName(new cedar::aux::FileParameter(this, "filename", cedar::aux::FileParameter::READ, fileName))
-    {
-    }
-
-    //! Camera interface
-    cv::VideoCapture mVideoCapture;
-
-    //! @brief The filename of the video file you want to grab from
-    cedar::aux::FileParameterPtr _mSourceFileName;
-  };
-
-  CEDAR_GENERATE_POINTER_TYPES(VideoChannel);
-
-  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // macros

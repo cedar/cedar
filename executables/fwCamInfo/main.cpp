@@ -34,14 +34,13 @@
 
 ======================================================================================================================*/
 
-// MAKE FIREWIRE OPTIONAL
+// CEDAR CONFIGURATION
 #include "cedar/configuration.h"
+
 #ifdef CEDAR_USE_LIB_DC1394
 
-// LOCAL INCLUDES
-#include "cedar/devices/sensors/visual/grabbertools/LibDcCameraBase.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/devices/sensors/camera/backends/LibDcBase.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -81,7 +80,7 @@ int main(int argc, char *argv[])
   std::cout << "Informations on camera no. " << (int)camera_nr << "\n" <<  std::endl;
 
   //create firewire interface
-  cedar::dev::sensors::visual::LibDcCameraBase fw_interface;
+  cedar::dev::sensors::camera::LibDcBase fw_interface;
   
   if (fw_interface.getNumCams() < 1)
   {

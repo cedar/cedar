@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/Grabber.h"
+#include "cedar/devices/sensors/visual/NetChannel.h"
 #include "cedar/auxiliaries/net/Reader.h"
 
 // SYSTEM INCLUDES
@@ -66,39 +67,6 @@ public cedar::dev::sensors::visual::Grabber
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
-  //!@cond SKIPPED_DOCUMENTATION
-
-  typedef cedar::aux::net::Reader<cv::Mat> MatNetReader;
-  typedef boost::shared_ptr<cedar::aux::net::Reader<cv::Mat> > MatNetReaderPtr;
-
-public:
-
-  /*! @struct PictureChannel
-   *  @brief Additional data of a net grabbing channel
-   */
-  struct NetChannel
-  :
-  cedar::dev::sensors::visual::Grabber::Channel
-  {
-  public:
-    NetChannel(const std::string& yarpChannelName = "grabberYarpChannel")
-    :
-    cedar::dev::sensors::visual::Grabber::Channel(),
-    _mpYarpChannelName(new cedar::aux::StringParameter(this, "yarpChannel", yarpChannelName)),
-    mpMatNetReader(MatNetReaderPtr()) // empty MatNetReaderPtr
-    {
-    }
-
-    //! The name of the used yarp channel
-    cedar::aux::StringParameterPtr _mpYarpChannelName;
-
-    //! The Yarp Reader class instantiated for cv::Mat
-    MatNetReaderPtr mpMatNetReader;
-  };
-
-  CEDAR_GENERATE_POINTER_TYPES(NetChannel);
-
-  //!@endcond
 
 //--------------------------------------------------------------------------------------------------------------------
 // macros
