@@ -59,6 +59,8 @@
     lock data for a long time even though they are not accessing it, potentially preventing other steps in the
     processing chain from running.
   - The processingIde can now export architectures into SVG files.
+  - There is now a system to automatically perform input type checks in processing steps; this can replace writing of
+    the determineInputValidity function. See the documentation and processing tutorial for details.
 
 == Version 0.9.1 ==
 - general
