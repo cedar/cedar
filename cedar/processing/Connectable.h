@@ -173,13 +173,13 @@ protected:
    * @param mandatory If this is set to true, cedar::proc::Step::onTrigger will not run the compute function of the
    *                  Connectable unless the pointer to this slot (and all other mandatory slots) are non-zero.
    */
-  void declareInput(const std::string& name, bool mandatory = true);
+  cedar::proc::DataSlotPtr declareInput(const std::string& name, bool mandatory = true);
 
   /*!@brief Declares an input collection.
    *
    * @remarks This is equivalent to calling declareInput(name, false) and makeInputCollection(name).
    */
-  void declareInputCollection(const std::string& name);
+  cedar::proc::DataSlotPtr declareInputCollection(const std::string& name);
 
   //!@brief Declares a buffer slot.
   CEDAR_DECLARE_DEPRECATED(void declareBuffer(const std::string& name));
@@ -188,10 +188,10 @@ protected:
   CEDAR_DECLARE_DEPRECATED(void declareOutput(const std::string& name));
 
   //!@brief Declares a buffer slot and immediately sets the data pointer for that slot.
-  void declareBuffer(const std::string& name, cedar::aux::DataPtr data);
+  cedar::proc::DataSlotPtr declareBuffer(const std::string& name, cedar::aux::DataPtr data);
 
   //!@brief Declares an output slot and immediately sets the data pointer for that slot.
-  void declareOutput(const std::string& name, cedar::aux::DataPtr data);
+  cedar::proc::DataSlotPtr declareOutput(const std::string& name, cedar::aux::DataPtr data);
 
   //!@brief Removes an input slot.
   inline void removeInputSlot(const std::string& name)
@@ -350,7 +350,7 @@ private:
   bool hasSlot(DataRole::Id role, const std::string& name) const;
 
   //!@brief Declares a new piece of data in the connectable.
-  void declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
+  cedar::proc::DataSlotPtr declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
 
   /*!@brief Sets the data pointer for the slot of the given name and role.
    */

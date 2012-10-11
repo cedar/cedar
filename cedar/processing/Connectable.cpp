@@ -275,8 +275,16 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar
     }
     else
     {
-      // get the validity from the user-implemented function
-      validity = this->determineInputValidity(slot, data);
+      if (slot->hasValidityCheck())
+      {
+        // get the validity from the validity check
+        validity = slot->checkValidityOf(data);
+      }
+      else
+      {
+        // get the validity from the user-implemented function
+        validity = this->determineInputValidity(slot, data);
+      }
     }
 
     // assign the validity to the slot
@@ -377,7 +385,8 @@ void cedar::proc::Connectable::checkMandatoryConnections()
   }
 }
 
-void cedar::proc::Connectable::declareData(DataRole::Id role, const std::string& name, bool mandatory)
+cedar::proc::DataSlotPtr
+  cedar::proc::Connectable::declareData(DataRole::Id role, const std::string& name, bool mandatory)
 {
   // first, create a new slot map if necessary
   std::map<DataRole::Id, SlotMap>::iterator iter = this->mSlotMaps.find(role);
@@ -407,7 +416,6 @@ void cedar::proc::Connectable::declareData(DataRole::Id role, const std::string&
     CEDAR_THROW(cedar::proc::DuplicateNameException, "There is already a " +
                  cedar::proc::DataRole::type().get(role).prettyString()
                  + " data-declaration with the name " + name + ".");
-    return;
   }
 
   // check the name
@@ -442,21 +450,27 @@ void cedar::proc::Connectable::declareData(DataRole::Id role, const std::string&
   this->checkMandatoryConnections();
 
   this->mSlotAdded(role, name);
+
+  return slot_ptr;
 }
 
-void cedar::proc::Connectable::declareBuffer(const std::string& name, cedar::aux::DataPtr data)
+cedar::proc::DataSlotPtr cedar::proc::Connectable::declareBuffer(const std::string& name, cedar::aux::DataPtr data)
 {
-  this->declareData(cedar::proc::DataRole::BUFFER, name);
+  cedar::proc::DataSlotPtr slot = this->declareData(cedar::proc::DataRole::BUFFER, name);
   this->setData(cedar::proc::DataRole::BUFFER, name, data);
+
+  return slot;
 }
 
-void cedar::proc::Connectable::declareOutput(const std::string& name, cedar::aux::DataPtr data)
+cedar::proc::DataSlotPtr cedar::proc::Connectable::declareOutput(const std::string& name, cedar::aux::DataPtr data)
 {
   // if you don't actually want to set data here, call a different function.
   CEDAR_ASSERT(data.get() != NULL);
 
-  this->declareData(cedar::proc::DataRole::OUTPUT, name);
+  cedar::proc::DataSlotPtr slot = this->declareData(cedar::proc::DataRole::OUTPUT, name);
   this->setData(cedar::proc::DataRole::OUTPUT, name, data);
+
+  return slot;
 }
 
 void cedar::proc::Connectable::removeLock(cedar::aux::ConstDataPtr data, cedar::aux::LOCK_TYPE lockType)
@@ -464,9 +478,9 @@ void cedar::proc::Connectable::removeLock(cedar::aux::ConstDataPtr data, cedar::
   this->cedar::aux::Lockable::removeLock(&data->getLock(), lockType);
 }
 
-void cedar::proc::Connectable::declareInput(const std::string& name, bool mandatory)
+cedar::proc::DataSlotPtr cedar::proc::Connectable::declareInput(const std::string& name, bool mandatory)
 {
-  this->declareData(DataRole::INPUT, name, mandatory);
+  cedar::proc::DataSlotPtr slot = this->declareData(DataRole::INPUT, name, mandatory);
 
   this->getInputSlot(name)->connectToExternalDataRemoved
   (
@@ -478,12 +492,16 @@ void cedar::proc::Connectable::declareInput(const std::string& name, bool mandat
       cedar::aux::LOCK_TYPE_READ
     )
   );
+
+  return slot;
 }
 
-void cedar::proc::Connectable::declareInputCollection(const std::string& name)
+cedar::proc::DataSlotPtr cedar::proc::Connectable::declareInputCollection(const std::string& name)
 {
-  this->declareInput(name, false);
+  cedar::proc::DataSlotPtr slot = this->declareInput(name, false);
   this->makeInputCollection(name);
+
+  return slot;
 }
 
 

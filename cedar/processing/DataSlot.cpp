@@ -35,6 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/processing/typecheck/TypeCheck.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/Network.h"
@@ -70,15 +71,31 @@ cedar::proc::DataSlot::~DataSlot()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-/*!
- * @remarks Set to an empty string ("") to disable the text and use the name instead.
- */
+cedar::proc::DataSlot::TypeCheckFunction& cedar::proc::DataSlot::check()
+{
+  return this->mTypeCheck;
+}
+
+const cedar::proc::DataSlot::TypeCheckFunction& cedar::proc::DataSlot::getCheck() const
+{
+  return this->mTypeCheck;
+}
+
+bool cedar::proc::DataSlot::hasValidityCheck() const
+{
+  return !this->getCheck().empty();
+}
+
+cedar::proc::DataSlot::VALIDITY cedar::proc::DataSlot::checkValidityOf(cedar::aux::ConstDataPtr data) const
+{
+  return this->getCheck()(this->shared_from_this(), data);
+}
+
 void cedar::proc::DataSlot::setText(const std::string& text)
 {
   this->mText = text;
 }
 
-//!@brief Returns the text to display to the user.
 const std::string& cedar::proc::DataSlot::getText() const
 {
   if (this->mText.empty())
