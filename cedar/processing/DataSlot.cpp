@@ -39,6 +39,7 @@
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/Network.h"
+#include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
@@ -88,6 +89,11 @@ bool cedar::proc::DataSlot::hasValidityCheck() const
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::DataSlot::checkValidityOf(cedar::aux::ConstDataPtr data) const
 {
+  if (!this->hasValidityCheck())
+  {
+    CEDAR_THROW(cedar::proc::NoCheckException, "No check set for data slot \"" + this->getName() + "\".");
+  }
+
   return this->getCheck()(this->shared_from_this(), data);
 }
 
