@@ -168,7 +168,8 @@ public:
 
   /*!@brief Used for setting the type check for this object.
    *
-   * @todo Describe this in detail.
+   *        This method can be used to set the type check object for this slot by using the assignment operator, i.e.,
+   *        slot->check() = ...
    */
   TypeCheckFunction& check();
 
