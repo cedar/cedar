@@ -102,10 +102,16 @@ public:
    *
    * @param pWidget   Widget to which to apply the properties
    * @param parameter Parameter whose properties are to be applied.
+   * @param index The index of the underlying vector parameter entry
    */
-  static void applyProperties(WidgetT* pWidget, boost::intrusive_ptr<cedar::aux::VectorParameter<ValueT> > parameter)
+  static void applyProperties
+              (
+                WidgetT* pWidget,
+                boost::intrusive_ptr<cedar::aux::VectorParameter<ValueT> > parameter,
+                size_t index
+              )
   {
-    pWidget->setDisabled(parameter->isConstant());
+    pWidget->setDisabled(parameter->isConstantAt(index));
   }
 };
 
@@ -259,7 +265,7 @@ private:
         this->mWidgets[i] = WidgetAbstraction::create(i);
         this->layout()->addWidget(this->mWidgets[i]);
       }
-      WidgetAbstraction::applyProperties(this->mWidgets[i], parameter);
+      WidgetAbstraction::applyProperties(this->mWidgets[i], parameter, i);
       WidgetAbstraction::setValue(this->mWidgets[i], parameter->at(i));
       WidgetAbstraction::connectValueChange(this, this->mWidgets[i]);
     }

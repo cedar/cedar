@@ -52,7 +52,7 @@ namespace
 {
   bool declared
     = cedar::dev::sensors::visual::Grabber::ChannelManagerSingleton::getInstance()
-        ->registerType<cedar::dev::sensors::visual::PictureGrabber::PictureChannelPtr>();
+        ->registerType<cedar::dev::sensors::visual::PictureChannelPtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -70,9 +70,9 @@ cedar::dev::sensors::visual::PictureGrabber::PictureGrabber
 cedar::dev::sensors::visual::Grabber
 (
   "PictureGraber",
-  cedar::dev::sensors::visual::PictureGrabber::PictureChannelPtr
+  cedar::dev::sensors::visual::PictureChannelPtr
   (
-    new cedar::dev::sensors::visual::PictureGrabber::PictureChannel(pictureFileName)
+    new cedar::dev::sensors::visual::PictureChannel(pictureFileName)
   )
 )
 {
@@ -90,13 +90,13 @@ cedar::dev::sensors::visual::PictureGrabber::PictureGrabber
 cedar::dev::sensors::visual::Grabber
 (
   "StereoPictureGraber",
-  cedar::dev::sensors::visual::PictureGrabber::PictureChannelPtr
+  cedar::dev::sensors::visual::PictureChannelPtr
   (
-    new cedar::dev::sensors::visual::PictureGrabber::PictureChannel(pictureFileName0)
+    new cedar::dev::sensors::visual::PictureChannel(pictureFileName0)
   ),
-  cedar::dev::sensors::visual::PictureGrabber::PictureChannelPtr
+  cedar::dev::sensors::visual::PictureChannelPtr
   (
-    new cedar::dev::sensors::visual::PictureGrabber::PictureChannel(pictureFileName1)
+    new cedar::dev::sensors::visual::PictureChannel(pictureFileName1)
   )
 )
 {
@@ -186,10 +186,10 @@ void cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()
 
     // lock image-matrix for writing
     mpReadWriteLock->lockForWrite();
-    getPictureChannel(channel)->mImageMat = cv::imread(filename);
+    getImageMat(channel) = cv::imread(filename);
     mpReadWriteLock->unlock();
 
-    if (getPictureChannel(channel)->mImageMat.empty())
+    if (getImageMat(channel).empty())
     {
       std::string message = this->getName() + ": Grabbing failed on Channel "
                             + boost::lexical_cast<std::string>(channel) + " from \"" + filename + "\"" ;
@@ -253,7 +253,7 @@ bool cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()
 
     if (!frame.empty())
     {
-      getPictureChannel(channel)->mImageMat = frame;
+      getImageMat(channel) = frame;
       setChannelInfo(channel);
     }
     else
@@ -284,7 +284,7 @@ bool cedar::dev::sensors::visual::PictureGrabber::onGrab()
   unsigned int num_cams = getNumCams();
   for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
-    result = !(getPictureChannel(channel)->mImageMat.empty()) && result;
+    result = !(getImageMat(channel).empty()) && result;
   }
   return result;
 }
@@ -327,5 +327,5 @@ const std::string cedar::dev::sensors::visual::PictureGrabber::getSourceFile(uns
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::PictureGrabber::setChannelInfo(unsigned int channel)
 {
-  getPictureChannel(channel)->mChannelInfo = getPictureChannel(channel)->_mSourceFileName->getPath();
+  setChannelInfoString(channel,getPictureChannel(channel)->_mSourceFileName->getPath());
 }

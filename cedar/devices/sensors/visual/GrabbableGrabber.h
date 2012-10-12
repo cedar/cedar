@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/Grabber.h"
+#include "cedar/devices/sensors/visual/GrabbableChannel.h"
 #include "cedar/auxiliaries/Grabbable.h"
 
 
@@ -68,33 +69,6 @@ public cedar::dev::sensors::visual::Grabber
   //!@cond SKIPPED_DOCUMENTATION
 
 public:
-
-  /*! @struct TestChannel
-   *  @brief Additional data of a grabbing channel
-   *  @remarks For grabber developers<br>
-   *    You don't have to create an extended channel structure, until you need more channel data.
-   *    But when, then you have to implement the onAddChannel() member function as well
-   */
-  struct GrabbableChannel
-  :
-  cedar::dev::sensors::visual::Grabber::Channel
-  {
-  public:
-    GrabbableChannel(cedar::aux::Grabbable* grabbable = NULL)
-    :
-    cedar::dev::sensors::visual::Grabber::Channel(),
-    mpSourceInterfaceClass(grabbable),
-    mpGrabberLock(NULL)
-    {
-    }
-    //! @brief The class to grab from
-    cedar::aux::Grabbable* mpSourceInterfaceClass;
-    QReadWriteLock* mpGrabberLock;
-  };
-
-  CEDAR_GENERATE_POINTER_TYPES(GrabbableChannel);
-
-  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // macros

@@ -376,15 +376,15 @@ namespace cedar
        * @param[in] theta angle of rotation
        * @return rotation matrix, \f$3 \times 3\f$
        */
-      inline cv::Mat expAxis(const cv::Mat& rMatrix, double theta)
+      inline cv::Mat expAxis(const cv::Mat& rAxis, double theta)
       {
-        switch (rMatrix.type())
+        switch (rAxis.type())
         {
           case CV_32F:
-            return cedar::aux::math::expAxis<float>(rMatrix, theta);
+            return cedar::aux::math::expAxis<float>(rAxis, theta);
 
           case CV_64F:
-            return cedar::aux::math::expAxis<double>(rMatrix, theta);
+            return cedar::aux::math::expAxis<double>(rAxis, theta);
 
           default:
             CEDAR_THROW(cedar::aux::UnhandledTypeException, "This function can only be called with CV_32F or CV_64F matrices.");
@@ -409,21 +409,21 @@ namespace cedar
        * @param[in] rRotation rotation matrix, \f$3 \times 3\f$
        * @param[out] rOmega axis of the rotation, \f$3 \times 1\f$
        * @param[out] rTheta angle of rotation
-       * @param[in] optionalThetaChoice
-       *
+       * @param[in] negativeTheta set to TRUE to get negative theta and the
+       *   corresponding axis
        */
-      inline void logAxis(const cv::Mat& rRotation, cv::Mat& rOmega, double& rTheta, bool optionalThetaChoice = false)
+      inline void logAxis(const cv::Mat& rRotation, cv::Mat& rOmega, double& rTheta, bool negativeTheta = false)
       {
         CEDAR_DEBUG_ASSERT(rRotation.type() == rOmega.type());
 
         switch (rRotation.type())
         {
           case CV_32F:
-            cedar::aux::math::logAxis<float>(rRotation, rOmega, rTheta, optionalThetaChoice);
+            cedar::aux::math::logAxis<float>(rRotation, rOmega, rTheta, negativeTheta);
             break;
 
           case CV_64F:
-            cedar::aux::math::logAxis<double>(rRotation, rOmega, rTheta, optionalThetaChoice);
+            cedar::aux::math::logAxis<double>(rRotation, rOmega, rTheta, negativeTheta);
             break;
 
           default:
@@ -515,20 +515,21 @@ namespace cedar
        *   \f$4 \times 4\f$
        * @param[out] rXi twist matrix, \f$4 \times 4\f$
        * @param[out] rTheta angle of rotation
-       * @param[in] optionalThetaChoice
+       * @param[in] negativeTheta set to TRUE to get negative theta and the
+       *   corresponding axis
        */
-      inline void logTwist(const cv::Mat& rTransformation, cv::Mat& rXi, double& rTheta, bool optionalThetaChoice = false)
+      inline void logTwist(const cv::Mat& rTransformation, cv::Mat& rXi, double& rTheta, bool negativeTheta = false)
       {
         CEDAR_DEBUG_ASSERT(rTransformation.type() == rXi.type());
 
         switch (rXi.type())
         {
           case CV_32F:
-            cedar::aux::math::logTwist<float>(rTransformation, rXi, rTheta, optionalThetaChoice);
+            cedar::aux::math::logTwist<float>(rTransformation, rXi, rTheta, negativeTheta);
             break;
 
           case CV_64F:
-            cedar::aux::math::logTwist<double>(rTransformation, rXi, rTheta, optionalThetaChoice);
+            cedar::aux::math::logTwist<double>(rTransformation, rXi, rTheta, negativeTheta);
             break;
 
           default:
@@ -644,15 +645,15 @@ namespace cedar
        *
        * @remarks Computationally, it is slightly more efficient to use the templated version.
        */
-      inline cv::Mat adjointToRigidTransformation(const cv::Mat& rRigidTransformation)
+      inline cv::Mat adjointToRigidTransformation(const cv::Mat& rAdjointTransformation)
       {
-        switch (rRigidTransformation.type())
+        switch (rAdjointTransformation.type())
         {
           case CV_32F:
-            return cedar::aux::math::adjointToRigidTransformation<float>(rRigidTransformation);
+            return cedar::aux::math::adjointToRigidTransformation<float>(rAdjointTransformation);
 
           case CV_64F:
-            return cedar::aux::math::adjointToRigidTransformation<double>(rRigidTransformation);
+            return cedar::aux::math::adjointToRigidTransformation<double>(rAdjointTransformation);
 
           default:
             CEDAR_THROW(cedar::aux::UnhandledTypeException, "This function can only be called with CV_32F or CV_64F matrices.");

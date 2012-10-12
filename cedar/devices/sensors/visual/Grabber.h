@@ -50,6 +50,7 @@
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 #include "cedar/devices/sensors/visual/RecordingFormat.h"
+#include "cedar/devices/sensors/visual/GrabberChannel.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -96,59 +97,15 @@ public cedar::aux::LoopedThread
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
-  //!@cond SKIPPED_DOCUMENTATION
-
 public:
 
-  ///! @brief Structure to store all channel related stuff inside
-  struct Channel
-  :
-  public cedar::aux::Configurable
-  {
-  public:
-    Channel()
-    :
-    _mSnapshotName(new cedar::aux::FileParameter(this,"snapshot file",cedar::aux::FileParameter::WRITE,"./snapshot.jpg")),
-    _mRecordName(new cedar::aux::FileParameter(this, "record file",cedar::aux::FileParameter::WRITE,"./record.avi")),
-    mChannelInfo("")
-    {
-      //init classes
-    };
-
-    virtual ~Channel()
-    {
-    }
-
-    //! the picture frame
-    cv::Mat mImageMat;
-
-    //! Filename for snapshot
-    cedar::aux::FileParameterPtr _mSnapshotName;
-
-    //! Filename for recording
-    cedar::aux::FileParameterPtr _mRecordName;
-
-    ///! for recordings
-    cv::VideoWriter mVideoWriter;
-
-    /// The channel information
-    std::string mChannelInfo;
-  };
-
-  CEDAR_GENERATE_POINTER_TYPES(Channel);
-
-  typedef cedar::aux::ObjectListParameterTemplate<Channel> ChannelParameter;
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ChannelParameter);
-
-  ///! @brief Typedef for a vector containing the instances of all used grabbers
+  //! @brief Typedef for a vector containing the instances of all used grabbers
   typedef std::vector<cedar::dev::sensors::visual::Grabber*> GrabberInstancesVector;
-  typedef cedar::aux::FactoryManager<cedar::dev::sensors::visual::Grabber::ChannelPtr> ChannelManager;
 
-public:
+  //!@cond SKIPPED_DOCUMENTATION
+  typedef cedar::aux::FactoryManager<cedar::dev::sensors::visual::GrabberChannelPtr> ChannelManager;
   typedef cedar::aux::Singleton<cedar::dev::sensors::visual::Grabber::ChannelManager> ChannelManagerSingleton;
-
   //!@endcond
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -167,7 +124,7 @@ protected:
    *    The constructor is protected, because no instance of Grabber should be instantiated.
    *    Use a derived class instead.
    */
-  Grabber(const std::string& grabberName, ChannelPtr pChannel);
+  Grabber(const std::string& grabberName, GrabberChannelPtr pChannel);
 
   /*! @brief The constructor for a single channel instance
    *  @param grabberName The name of your grabber
@@ -177,7 +134,7 @@ protected:
    *    The constructor is protected, because no instance of Grabber should be instantiated.
    *    Use a derived class instead.
    */
-  Grabber(const std::string& grabberName, ChannelPtr pChannel0, ChannelPtr pChannel1);
+  Grabber(const std::string& grabberName, GrabberChannelPtr pChannel0, GrabberChannelPtr pChannel1);
 
 public:
 
@@ -608,28 +565,25 @@ protected:
   virtual bool onGrab();
 
 
-  /*! @brief Get information about the used device, i.e. the filename or the mount-point
+  //! Get the Pointer to the SnapshotName Element
+  //cedar::aux::FileParameterPtr getSnapshotNameParamter();
+
+  //! Get the Pointer to the RecordName Element
+  //cedar::aux::FileParameterPtr getRecordNameParamter();
+
+  /*!@brief Get the Image buffer
    *
-   *		You have to implement this method in the derived class. Set the informations
-   *		about the channels there. This is the only true virtual function of the Grabberinterface.
-   *   @param channel
-   *		This is the index of the source you want the name of the source from.<br>
-   *		In the mono case you do not need to supply this value. Default is 0.<br>
-   *		In the stereo case it may be 0 or 1.
+   *  Before this buffer can be read out or written in, it have to be locked with the mpReadWriteLock() lock!
    *
-   *   @remarks For Grabber developers<br>
-   *       This is the only pure virtual member. It have to be implemented in derived class
-   *       to supply correct informations
+   *  @param channel This is the index of the source you want to print the properties.
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
-  //virtual void onUpdateSourceInfo(unsigned int channel=0) = 0;
+  cv::Mat& getImageMat(unsigned int channel);
 
 
-  /*! @brief Create and initialize the channel-structure for only one channel
-   *
-   *  For grabber-developers:<br>
-   *  Should be overrided in derived class, if more informations on a channel have to be stored
-   */
-  //virtual void onAddChannel();
+  //cv::VideoWriter getVideoWriter();
+
+  void setChannelInfoString(unsigned int channel, std::string info);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -639,7 +593,7 @@ private:
   /*! @brief This function does internal variable initialization in grabber constructor
    *  @param grabberChannels A vector with all channels you want to initialize
    */
-  void init(std::vector<cedar::dev::sensors::visual::Grabber::ChannelPtr> grabberChannels);
+  void init(std::vector<cedar::dev::sensors::visual::GrabberChannelPtr> grabberChannels);
 
 
   /*! @brief Callback function to respond to a captured CTRL-C event
@@ -654,7 +608,7 @@ private:
   /*! Get the pointer to the channel structure of the specified channel
    *  @param channel The channel number of the wanted channel structure
    */
-  inline ChannelPtr getChannel(unsigned int channel)
+  inline GrabberChannelPtr getGrabberChannel(unsigned int channel)
   {
     return _mChannels->at(channel);
   }
@@ -662,7 +616,7 @@ private:
   /*! Get the const pointer to the channel structure of the specified channel
    *  @param channel The channel number of the wanted channel structure
    */
-  inline ChannelPtr getChannel(unsigned int channel) const
+  inline GrabberChannelPtr getGrabberChannel(unsigned int channel) const
   {
     return _mChannels->at(channel);
   }

@@ -15,27 +15,30 @@
 
 ======================================================================================================================*/
 
-// CEDAR INCLUDES
+// LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/PictureGrabber.h"
+#include "cedar/auxiliaries/gui/ImagePlot.h"
+#include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
+#include <QtGui/QApplication>
 #include <opencv2/opencv.hpp>
 
 
-int main(int , char **)
+int main(int argc, char* argv[])
 {
   //--------------------------------------------------------------------------------------------------------------------
   //constants
   //--------------------------------------------------------------------------------------------------------------------
 
   const std::string FILE_NAME_0 = "/usr/share/wallpapers/Vector_Sunset/contents/images/1024x768.jpg";
-  const std::string FILE_NAME_1 = "/usr/share/wallpapers/Vector_Sunset/contents/images/1280x1024.jpg";
+  const std::string FILE_NAME_1 = "/usr/share/wallpapers/Green_Concentration/contents/screenshot.png";
 
   const std::string GRABBER_NAME = "picture_grabber_TestCase";
   const std::string CONFIG_FILE_NAME = "picture_grabber_testcase.config";
 
   //title of highgui window
-  const std::string highgui_window_name_0 = FILE_NAME_0;
+  const std::string window_title = FILE_NAME_0;
 
   //--------------------------------------------------------------------------------------------------------------------
   //main test
@@ -85,7 +88,10 @@ int main(int , char **)
     std::cout << "No configuration exists!" << std::endl;
   }
 
-  // this step is essential. If you don't apply the default or loaded Parameter, the grabber will not work
+  //----------------------------------------------------------------------------------------
+  // apply configuration. this step is essential.
+  //----------------------------------------------------------------------------------------
+  // if you don't apply the default or loaded Parameter, the grabber will not work
   // check if grabber is created successfully
   if (! p_grabber->applyParameter())
   {
@@ -132,51 +138,66 @@ int main(int , char **)
 
 
   //----------------------------------------------------------------------------------------
-  //Create an OpenCV highgui window to show grabbed frames
+  //Create a cedar::aux::gui ImagePlot widget to show grabbed frames
   //----------------------------------------------------------------------------------------
 
-  std::cout << "\nShow pictures\n";
-  cv::namedWindow(highgui_window_name_0,CV_WINDOW_KEEPRATIO);
-
-  //the first frame is already grabbed on initialization
+  //the first frame is already grabbed on initialization, so get it
   cv::Mat frame0 = p_grabber->getImage();
 
-  //get frames for a while
-  unsigned int counter=0;
+  QApplication app(argc, argv);
+  cedar::aux::gui::ImagePlotPtr p_plot = cedar::aux::gui::ImagePlotPtr(new cedar::aux::gui::ImagePlot());
+  cedar::aux::MatDataPtr p_data = cedar::aux::MatDataPtr(new cedar::aux::MatData(frame0));
+  p_plot->plot(p_data,window_title);
+  p_plot->show();
+  p_plot->resize(frame0.cols,frame0.rows);
 
-  while (!frame0.empty())
+  while (QApplication::hasPendingEvents())
   {
-    imshow(highgui_window_name_0,frame0);
+    QApplication::processEvents();
+  }
 
-    //it is not necessary to do this, unless a new picture should be used
-    frame0 = p_grabber->getImage();
+  unsigned int counter = 0;
+  bool file2 = false;
+  while (!frame0.empty() && p_plot->isVisible())
+  {
+    while (QApplication::hasPendingEvents())
+    {
+      QApplication::processEvents();
+    }
+
     counter++;
 
     //after one second, set new source-pictures
-    if (counter == 10)
+    if (!(++counter %= 100))
     {
       // Grab from another picture
-      p_grabber->setSourceFile(0,FILE_NAME_1);
+      if (file2)
+      {
+        p_grabber->setSourceFile(0,FILE_NAME_0);
+        file2=false;
+      }
+      else
+      {
+        p_grabber->setSourceFile(0,FILE_NAME_1);
+        file2=true;
+      }
+      frame0 = p_grabber->getImage();
+      cedar::aux::MatDataPtr p_data = cedar::aux::MatDataPtr(new cedar::aux::MatData(frame0));
+      p_plot->plot(p_data,window_title);
+      p_plot->resize(frame0.cols,frame0.rows);
     }
 
-    //exit after another two second
-    if (counter == 30)
-    {
-      break;
-    }
-
-    //wait 100ms (needed for highgui)
-    cv::waitKey(100);
+    usleep(100000);
   }
+
+  //----------------------------------------------------------------------------------------
+  // save configuration. this step is optional.
+  //----------------------------------------------------------------------------------------
+  //p_grabber->writeJson(CONFIG_FILE_NAME);
 
   //----------------------------------------------------------------------------------------
   //clean up
   //----------------------------------------------------------------------------------------
-
-  // write configuration
-  // p_grabber->writeJson(CONFIG_FILE_NAME);
-
-  cv::destroyWindow(highgui_window_name_0);
 
   //stop grabbing-thread if running
   //recording will also be stopped
