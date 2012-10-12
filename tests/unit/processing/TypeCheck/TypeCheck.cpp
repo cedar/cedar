@@ -58,7 +58,7 @@ class TestStep : public cedar::proc::Step
     {
       slot1 = this->declareInput("input1");
 
-      slot1->check() = cedar::proc::typecheck::DerivedFrom<cedar::aux::MatData>();
+      slot1->setCheck(cedar::proc::typecheck::DerivedFrom<cedar::aux::MatData>());
     }
 
     cedar::proc::DataSlotPtr slot1;

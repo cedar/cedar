@@ -499,7 +499,7 @@ as follows:
     cedar::proc::DataSlotPtr operand1 = this->declareInput("operand1");
     
     // tell the slot what to expect
-    operand1->check() = cedar::proc::typecheck::DerivedFrom<cedar::aux::MatData>();
+    operand1->setCheck(cedar::proc::typecheck::DerivedFrom<cedar::aux::MatData>());
     // ...
   }
 @endcode

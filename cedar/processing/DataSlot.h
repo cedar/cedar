@@ -169,9 +169,9 @@ public:
   /*!@brief Used for setting the type check for this object.
    *
    *        This method can be used to set the type check object for this slot by using the assignment operator, i.e.,
-   *        slot->check() = ...
+   *        slot->setCheck(...)
    */
-  TypeCheckFunction& check();
+  void setCheck(const TypeCheckFunction& check);
 
   /*!@brief Checks whether this slot has a validity check associated with it.
    * @see   setCheck

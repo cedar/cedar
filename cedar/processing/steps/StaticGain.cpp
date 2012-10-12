@@ -92,7 +92,7 @@ _mGainFactor(new cedar::aux::DoubleParameter(this, "gain factor", 1.0, -10000.0,
   cedar::proc::DataSlotPtr input = this->declareInput("input");
   this->declareOutput("output", mOutput);
 
-  input->check() = cedar::proc::typecheck::DerivedFrom<cedar::aux::MatData>();
+  input->setCheck(cedar::proc::typecheck::DerivedFrom<cedar::aux::MatData>());
 
   // connect the parameter's change signal
   QObject::connect(_mGainFactor.get(), SIGNAL(valueChanged()), this, SLOT(gainChanged()));

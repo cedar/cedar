@@ -72,9 +72,9 @@ cedar::proc::DataSlot::~DataSlot()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::DataSlot::TypeCheckFunction& cedar::proc::DataSlot::check()
+void cedar::proc::DataSlot::setCheck(const TypeCheckFunction& check)
 {
-  return this->mTypeCheck;
+  this->mTypeCheck = check;
 }
 
 const cedar::proc::DataSlot::TypeCheckFunction& cedar::proc::DataSlot::getCheck() const
