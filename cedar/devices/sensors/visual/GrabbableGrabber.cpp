@@ -49,7 +49,7 @@ namespace
 {
   bool declared
     = cedar::dev::sensors::visual::Grabber::ChannelManagerSingleton::getInstance()
-        ->registerType<cedar::dev::sensors::visual::GrabbableGrabber::GrabbableChannelPtr>();
+        ->registerType<cedar::dev::sensors::visual::GrabbableChannelPtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -67,9 +67,9 @@ cedar::dev::sensors::visual::GrabbableGrabber::GrabbableGrabber
 cedar::dev::sensors::visual::Grabber
 (
   grabberName,
-  cedar::dev::sensors::visual::GrabbableGrabber::GrabbableChannelPtr
+  cedar::dev::sensors::visual::GrabbableChannelPtr
   (
-    new cedar::dev::sensors::visual::GrabbableGrabber::GrabbableChannel(grabbable)
+    new cedar::dev::sensors::visual::GrabbableChannel(grabbable)
   )
 )
 {
@@ -89,13 +89,13 @@ cedar::dev::sensors::visual::GrabbableGrabber::GrabbableGrabber
 cedar::dev::sensors::visual::Grabber
 (
   grabberName,
-  cedar::dev::sensors::visual::GrabbableGrabber::GrabbableChannelPtr
+  cedar::dev::sensors::visual::GrabbableChannelPtr
   (
-    new cedar::dev::sensors::visual::GrabbableGrabber::GrabbableChannel(grabbable0)
+    new cedar::dev::sensors::visual::GrabbableChannel(grabbable0)
   ),
-  cedar::dev::sensors::visual::GrabbableGrabber::GrabbableChannelPtr
+  cedar::dev::sensors::visual::GrabbableChannelPtr
   (
-    new cedar::dev::sensors::visual::GrabbableGrabber::GrabbableChannel(grabbable1)
+    new cedar::dev::sensors::visual::GrabbableChannel(grabbable1)
   )
 )
 {
@@ -187,9 +187,9 @@ void cedar::dev::sensors::visual::GrabbableGrabber::onCleanUp()
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::GrabbableGrabber::onUpdateSourceInfo(unsigned int channel)
 {
-  getGrabbableChannel(channel)->mChannelInfo = this->getName() + ": Channel "
+  setChannelInfoString(channel, this->getName() + ": Channel "
                                       + boost::lexical_cast<std::string>(channel) + ": "
-                                      + typeid(getGrabbableChannel(channel)->mpSourceInterfaceClass).name();
+                                      + typeid(getGrabbableChannel(channel)->mpSourceInterfaceClass).name());
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -203,7 +203,7 @@ bool cedar::dev::sensors::visual::GrabbableGrabber::onGrab()
      try
      {
        getGrabbableChannel(channel)->mpGrabberLock->lockForRead();
-       getGrabbableChannel(channel)->mImageMat = getGrabbableChannel(channel)->mpSourceInterfaceClass->grabImage().clone();
+       getImageMat(channel) = getGrabbableChannel(channel)->mpSourceInterfaceClass->grabImage().clone();
        getGrabbableChannel(channel)->mpGrabberLock->unlock();
      }
      catch(...)

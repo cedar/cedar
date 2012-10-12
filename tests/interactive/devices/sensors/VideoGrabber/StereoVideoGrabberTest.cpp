@@ -1,4 +1,4 @@
-/*======================================================================================================================
+/*========================================================================================================================
 
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
@@ -17,25 +17,29 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/VideoGrabber.h"
+#include "cedar/auxiliaries/gui/ImagePlot.h"
+#include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
+#include <QtGui/QApplication>
 
-int main(int, char**)
+
+int main(int argc, char* argv[])
 {
 
   //--------------------------------------------------------------------------------------------------------------------
   //constants
   //--------------------------------------------------------------------------------------------------------------------
 
-  const std::string FILE_NAME_0 = "/opt/matlab/R2011b/toolbox/images/imdemos/rhinos.avi";
-  const std::string FILE_NAME_1 = "/opt/matlab/R2011b/toolbox/images/imdemos/traffic.avi";
+  const std::string FILE_NAME_0 = "/home/ghartinger/Videos/rhinos.avi";
+  const std::string FILE_NAME_1 = "/home/ghartinger/Videos/traffic.avi";
 
   const std::string GRABBER_NAME = "stereo_p_grabber_testcase";
   const std::string CONFIG_FILE_NAME = "stereo_p_grabber_testcase.config";
 
   //title of highgui window
-  const std::string highgui_window_name_0 = FILE_NAME_0;
-  const std::string highgui_window_name_1 = FILE_NAME_1;
+  const std::string window_title0 = FILE_NAME_0;
+  const std::string window_title1 = FILE_NAME_1;
 
   //--------------------------------------------------------------------------------------------------------------------
   //main test
@@ -100,30 +104,48 @@ int main(int, char**)
   //----------------------------------------------------------------------------------------
   //Create an OpenCV highgui window to show grabbed frames
   //----------------------------------------------------------------------------------------
-  std::cout << "\nDisplay videos in highgui window\n";
-  cv::namedWindow(highgui_window_name_0,CV_WINDOW_KEEPRATIO);
-  cv::namedWindow(highgui_window_name_1,CV_WINDOW_KEEPRATIO);
 
   //the first frame is already grabbed on initialization
   cv::Mat frame0 = p_grabber->getImage();
   cv::Mat frame1 = p_grabber->getImage(1);
 
-  //start the grabbing-thread 2 times faster then normal
-  p_grabber->setSpeedFactor(2);
+  QApplication app(argc, argv);
+  cedar::aux::gui::ImagePlotPtr p_plot0 = cedar::aux::gui::ImagePlotPtr(new cedar::aux::gui::ImagePlot());
+  cedar::aux::MatDataPtr p_data0 = cedar::aux::MatDataPtr(new cedar::aux::MatData(frame0));
+  p_plot0->plot(p_data0,window_title0);
+  p_plot0->show();
+  p_plot0->resize(frame0.cols,frame0.rows);
+
+  cedar::aux::gui::ImagePlotPtr p_plot1 = cedar::aux::gui::ImagePlotPtr(new cedar::aux::gui::ImagePlot());
+  cedar::aux::MatDataPtr p_data1 = cedar::aux::MatDataPtr(new cedar::aux::MatData(frame1));
+  p_plot1->plot(p_data1,window_title1);
+  p_plot1->show();
+  p_plot1->resize(frame1.cols,frame1.rows);
+
+
+  while (QApplication::hasPendingEvents())
+  {
+    QApplication::processEvents();
+  }
+
+  //start the grabbing-thread. It is possible to set a speedfactor
+  p_grabber->setSpeedFactor(1);
 
 
   std::cout << "VideoGrabber thread FPS    : " << p_grabber->getFps() << std::endl;
   p_grabber->start();
 
   unsigned int counter_stat = 0;
-  unsigned int counter_end = 500;
 
   //get frames until avi is over
   //here: never because we have set loop to true
-  while (!frame0.empty())
+  while (!frame0.empty() && !frame1.empty() && p_plot0->isVisible() && p_plot1->isVisible())
   {
-    imshow(highgui_window_name_0,frame0);
-    imshow(highgui_window_name_1,frame1);
+    while (QApplication::hasPendingEvents())
+    {
+      QApplication::processEvents();
+    }
+
     frame0 = p_grabber->getImage(0);
     frame1 = p_grabber->getImage(1);
 
@@ -136,23 +158,18 @@ int main(int, char**)
                 << std::endl;
     }
 
-    //stop after 500 frames
-    if (--counter_end==0)
-    {
-      break;
-    }
-
-    //wait 10ms (needed for highgui)
-    //you can change this to 100 or 500, and see the difference
-    cv::waitKey(10);
+    usleep(1000);
   }
+
+  //----------------------------------------------------------------------------------------
+  // save configuration. this step is optional.
+  //----------------------------------------------------------------------------------------
+  //p_grabber->writeJson(CONFIG_FILE_NAME);
 
 
   //----------------------------------------------------------------------------------------
   //clean up
   //----------------------------------------------------------------------------------------
-  cv::destroyWindow(highgui_window_name_0);
-  cv::destroyWindow(highgui_window_name_1);
 
   //stop grabbing-thread if running
   //recording will also be stopped

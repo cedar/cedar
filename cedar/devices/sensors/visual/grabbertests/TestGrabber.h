@@ -75,12 +75,12 @@ public:
    */
   struct TestChannel
   :
-  cedar::dev::sensors::visual::Grabber::Channel
+  cedar::dev::sensors::visual::GrabberChannel
   {
   public:
     TestChannel(const std::string& defaultFileName = "./default_parameter_value_for_processingGui_instantiation")
     :
-    cedar::dev::sensors::visual::Grabber::Channel(),
+    cedar::dev::sensors::visual::GrabberChannel(),
     _mpSourceFileName(new cedar::aux::StringParameter(this, "name_of_parameter", defaultFileName))
     {
     }
