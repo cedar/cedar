@@ -163,7 +163,7 @@ void cedar::proc::steps::Flip::inputConnectionChanged(const std::string& inputNa
   if (cedar::aux::math::getDimensionalityOf(input) < 3)
   {
     // Make a copy to create a matrix of the same type, dimensions, ...
-    this->mOutput->setData(cv::Mat(input.cols, input.rows, input.type()));
+    this->mOutput->setData(cv::Mat(input.rows, input.cols, input.type()));
   }
   this->mOutput->copyAnnotationsFrom(this->mInput);
 }
