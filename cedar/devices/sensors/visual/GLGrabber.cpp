@@ -49,7 +49,7 @@ namespace
 {
   bool declared
     = cedar::dev::sensors::visual::Grabber::ChannelManagerSingleton::getInstance()
-        ->registerType<cedar::dev::sensors::visual::GLGrabber::GLChannelPtr>();
+        ->registerType<cedar::dev::sensors::visual::GLChannelPtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -66,9 +66,9 @@ cedar::dev::sensors::visual::GLGrabber::GLGrabber
 cedar::dev::sensors::visual::Grabber
 (
   grabberName,
-  cedar::dev::sensors::visual::GLGrabber::GLChannelPtr
+  cedar::dev::sensors::visual::GLChannelPtr
   (
-    new cedar::dev::sensors::visual::GLGrabber::GLChannel(qglWidget)
+    new cedar::dev::sensors::visual::GLChannel(qglWidget)
   )
 )
 {
@@ -88,13 +88,13 @@ cedar::dev::sensors::visual::GLGrabber::GLGrabber
 cedar::dev::sensors::visual::Grabber
 (
   grabberName,
-  cedar::dev::sensors::visual::GLGrabber::GLChannelPtr
+  cedar::dev::sensors::visual::GLChannelPtr
   (
-    new cedar::dev::sensors::visual::GLGrabber::GLChannel(qglWidget0)
+    new cedar::dev::sensors::visual::GLChannel(qglWidget0)
   ),
-  cedar::dev::sensors::visual::GLGrabber::GLChannelPtr
+  cedar::dev::sensors::visual::GLChannelPtr
   (
-    new cedar::dev::sensors::visual::GLGrabber::GLChannel(qglWidget1)
+    new cedar::dev::sensors::visual::GLChannel(qglWidget1)
   )
 )
 {
@@ -169,10 +169,10 @@ bool cedar::dev::sensors::visual::GLGrabber::onDeclareParameters()
 void cedar::dev::sensors::visual::GLGrabber::onUpdateSourceInfo(unsigned int channel)
 {
   // value of channel is already checked by GraberInterface::getSourceInfo()
-  getGLChannel(channel)->mChannelInfo = "Channel " + boost::lexical_cast<std::string>(channel)
+  setChannelInfoString(channel, "Channel " + boost::lexical_cast<std::string>(channel)
                                       + ": QT::OGLWidget class \""
                                       + typeid(getGLChannel(channel)->mpQGLWidget).name()
-                                      + "\"";
+                                      + "\"");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -204,13 +204,13 @@ bool cedar::dev::sensors::visual::GLGrabber::onGrab()
       cv::mixChannels( &mat, 1, &mat2, 1, from_to, 3 );
 
       // apply the new content to the channel image
-      getGLChannel(channel)->mImageMat = mat2.clone();
+      getImageMat(channel) = mat2.clone();
     }
     else
     {
       // if opengl context isn't valid, then an empty matrix will be return
       ogl_valid = false;
-      getGLChannel(channel)->mImageMat = cv::Mat();
+      getImageMat(channel) = cv::Mat();
     }
   }
   return ogl_valid;

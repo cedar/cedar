@@ -51,7 +51,7 @@ namespace
 {
   bool declared
     = cedar::dev::sensors::visual::Grabber::ChannelManagerSingleton::getInstance()
-        ->registerType<cedar::dev::sensors::visual::VideoGrabber::VideoChannelPtr>();
+        ->registerType<cedar::dev::sensors::visual::VideoChannelPtr>();
 }
 
 
@@ -72,9 +72,9 @@ cedar::dev::sensors::visual::VideoGrabber::VideoGrabber
 cedar::dev::sensors::visual::Grabber
 (
   "VideoGrabber",
-  cedar::dev::sensors::visual::VideoGrabber::VideoChannelPtr
+  cedar::dev::sensors::visual::VideoChannelPtr
   (
-    new cedar::dev::sensors::visual::VideoGrabber::VideoChannel(videoFileName)
+    new cedar::dev::sensors::visual::VideoChannel(videoFileName)
   )
 ),
 _mLooped(new cedar::aux::BoolParameter(this, "looped", looped)),
@@ -96,13 +96,13 @@ cedar::dev::sensors::visual::VideoGrabber::VideoGrabber
 cedar::dev::sensors::visual::Grabber
 (
   "StereoVideoGrabber",
-  cedar::dev::sensors::visual::VideoGrabber::VideoChannelPtr
+  cedar::dev::sensors::visual::VideoChannelPtr
   (
-    new cedar::dev::sensors::visual::VideoGrabber::VideoChannel(videoFileName0)
+    new cedar::dev::sensors::visual::VideoChannel(videoFileName0)
   ),
-  cedar::dev::sensors::visual::VideoGrabber::VideoChannelPtr
+  cedar::dev::sensors::visual::VideoChannelPtr
   (
-    new cedar::dev::sensors::visual::VideoGrabber::VideoChannel(videoFileName1)
+    new cedar::dev::sensors::visual::VideoChannel(videoFileName1)
   )
 ),
 _mLooped(new cedar::aux::BoolParameter(this, "looped", looped)),
@@ -231,7 +231,7 @@ bool cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
     if (capture.isOpened())
     {
       getVideoChannel(channel)->mVideoCapture = capture;
-      getVideoChannel(channel)->mVideoCapture >> getVideoChannel(channel)->mImageMat;
+      getVideoChannel(channel)->mVideoCapture >> getImageMat(channel);
       setChannelInfo(channel);
     }
     else
@@ -264,6 +264,12 @@ bool cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
   //----------------------------------------
   // check for equal FPS
   double fps_ch0 = getVideoChannel(0)->mVideoCapture.get(CV_CAP_PROP_FPS);
+
+  if (fps_ch0 < 1)
+  {
+    fps_ch0 = 1;
+  }
+
   if (num_cams > 1)
   {
     double fps_ch1 = getVideoChannel(1)->mVideoCapture.get(CV_CAP_PROP_FPS);
@@ -308,10 +314,10 @@ bool cedar::dev::sensors::visual::VideoGrabber::onGrab()
   unsigned int num_cams = getNumCams();
   for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
-    (getVideoChannel(channel)->mVideoCapture) >> getVideoChannel(channel)->mImageMat;
+    (getVideoChannel(channel)->mVideoCapture) >> getImageMat(channel);
 
     // check if the end of a channel is reached
-    if (getVideoChannel(channel)->mImageMat.empty())
+    if (getImageMat(channel).empty())
     {
 
       /*
@@ -336,7 +342,7 @@ bool cedar::dev::sensors::visual::VideoGrabber::onGrab()
           setPositionAbsolute(0);
           for (unsigned int i = 0; i < num_cams; ++i)
           {
-            (getVideoChannel(i)->mVideoCapture) >> getVideoChannel(i)->mImageMat;
+            (getVideoChannel(i)->mVideoCapture) >> getImageMat(i);
           }
           cedar::aux::LogSingleton::getInstance()->debugMessage
                                                     (
@@ -367,9 +373,8 @@ bool cedar::dev::sensors::visual::VideoGrabber::onGrab()
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::VideoGrabber::setChannelInfo(unsigned int channel)
 {
-  getVideoChannel(channel)->mChannelInfo = this->getName()
-                                           + " - channel " + boost::lexical_cast<std::string>(channel)
-                                           + ": " + getVideoChannel(channel)->_mSourceFileName->getPath();
+  setChannelInfoString(channel,this->getName() + " - channel " + boost::lexical_cast<std::string>(channel)
+                         + ": " + getVideoChannel(channel)->_mSourceFileName->getPath());
 }
 
 //----------------------------------------------------------------------------------------------------

@@ -164,7 +164,7 @@ int main(int argc, char** argv)
 
   cedar::proc::gui::Settings::instance().disableWriting();
 
-  cedar::proc::gui::Ide *p_ide = new cedar::proc::gui::Ide();
+  cedar::proc::gui::Ide *p_ide = new cedar::proc::gui::Ide(false);
 
   std::cout << "Testing architecture-1.json" << std::endl;
   errors += testArchitecture1(p_ide);

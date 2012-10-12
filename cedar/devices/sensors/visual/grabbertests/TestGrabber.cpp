@@ -178,7 +178,7 @@ bool cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()
     cv::Mat frame=cv::Mat::zeros(1, 1, CV_8UC3);
 
     // apply the new content to the channel image
-    getTestChannel(channel)->mImageMat = frame;
+    getImageMat(channel) = frame;
 
     // don't forget to update the channel info
     this->setChannelInfo(channel);
@@ -225,9 +225,8 @@ void cedar::dev::sensors::visual::TestGrabber::setChannelInfo(unsigned int chann
 
   // give some information about the used source like channelname, filename, devicename
   // or something like that
-  getTestChannel(channel)->mChannelInfo = this->getName()
-                                          + " Channel " + boost::lexical_cast<std::string>(channel)
-                                          + " : "+ getTestChannel(channel)->_mpSourceFileName->getValue();
+  setChannelInfoString(channel,this->getName() + " Channel " + boost::lexical_cast<std::string>(channel)
+                               + " : "+ getTestChannel(channel)->_mpSourceFileName->getValue());
 }
 
 //----------------------------------------------------------------------------------------------------

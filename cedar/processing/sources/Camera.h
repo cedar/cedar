@@ -43,7 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/sources/namespace.h"
 #include "cedar/processing/sources/GrabberBase.h"
-#include "cedar/devices/sensors/visual/CameraGrabber.h"
+#include "cedar/devices/sensors/camera/Grabber.h"
 
 #include "cedar/auxiliaries/FileParameter.h"
 #include "cedar/auxiliaries/NumericParameter.h"
@@ -109,18 +109,18 @@ private:
   //void onCreateGrabber();
 
   //!@brief Cast the base GrabberBasePtr to derived class CameraGrabberPtr
-  inline cedar::dev::sensors::visual::CameraGrabberPtr getCameraGrabber()
+  inline cedar::dev::sensors::camera::GrabberPtr getCameraGrabber()
   {
-    return boost::static_pointer_cast<cedar::dev::sensors::visual::CameraGrabber>
+    return boost::static_pointer_cast<cedar::dev::sensors::camera::Grabber>
            (
              this->cedar::proc::sources::GrabberBase::mpGrabber
            );
   }
 
   //!@brief Cast the base GrabberBasePtr to derived class CameraGrabberPtr
-  inline cedar::dev::sensors::visual::ConstCameraGrabberPtr getCameraGrabber() const
+  inline cedar::dev::sensors::camera::ConstGrabberPtr getCameraGrabber() const
   {
-    return boost::static_pointer_cast<const cedar::dev::sensors::visual::CameraGrabber>
+    return boost::static_pointer_cast<const cedar::dev::sensors::camera::Grabber>
            (
             cedar::proc::sources::GrabberBase::mpGrabber
            );
