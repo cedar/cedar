@@ -254,7 +254,7 @@ private:
   (
     const QPoint& position,
     std::vector<std::pair<cedar::proc::DataRole::Id, std::string> > data
-      = std::vector<std::pair<cedar::proc::DataRole::Id, std::string> >()
+      = (std::vector<std::pair<cedar::proc::DataRole::Id, std::string> >())
   );
 
   //! Updates the display of the step's run time measurements.
