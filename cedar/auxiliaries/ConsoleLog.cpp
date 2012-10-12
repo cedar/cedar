@@ -53,7 +53,7 @@
 #define COLOR_RED "0;31m"
 #define COLOR_LIGHT_RED "1;31m"
 #define COLOR(COLOR_CONSTANT) "\033[" COLOR_CONSTANT
-#define COLOR_CLEAR "\E[m"
+#define COLOR_CLEAR "\033[m"
 #endif // CEDAR_OS_LINUX
 
 //----------------------------------------------------------------------------------------------------------------------
