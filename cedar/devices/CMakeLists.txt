@@ -56,10 +56,10 @@ cedar_add_library(cedardev
                   communication/gui/CommunicationWidget.h
                   sensors/visual/VideoGrabber.h
                   sensors/visual/PictureGrabber.h
-                  sensors/visual/CameraGrabber.h
-                  sensors/visual/camera/CameraSettings.h
-                  sensors/visual/camera/CamProperty.h
-                  sensors/visual/camera/CameraProperties.h
+                  sensors/camera/Grabber.h
+                  sensors/camera/Channel.h
+                  sensors/camera/CamProperty.h
+                  sensors/camera/Properties.h
                   ${kuka_moc_files}
                   LINK_LIBRARIES
                   cedaraux

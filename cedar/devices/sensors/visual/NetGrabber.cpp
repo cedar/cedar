@@ -55,7 +55,7 @@ namespace
 {
   bool declared
     = cedar::dev::sensors::visual::Grabber::ChannelManagerSingleton::getInstance()
-        ->registerType<cedar::dev::sensors::visual::NetGrabber::NetChannelPtr>();
+        ->registerType<cedar::dev::sensors::visual::NetChannelPtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -74,9 +74,9 @@ cedar::dev::sensors::visual::NetGrabber::NetGrabber
 cedar::dev::sensors::visual::Grabber
 (
   grabberName,
-  cedar::dev::sensors::visual::NetGrabber::NetChannelPtr
+  cedar::dev::sensors::visual::NetChannelPtr
   (
-    new cedar::dev::sensors::visual::NetGrabber::NetChannel(yarpChannelName)
+    new cedar::dev::sensors::visual::NetChannel(yarpChannelName)
   )
 )
 {
@@ -96,13 +96,13 @@ cedar::dev::sensors::visual::NetGrabber::NetGrabber
 cedar::dev::sensors::visual::Grabber
 (
   grabberName,
-  cedar::dev::sensors::visual::NetGrabber::NetChannelPtr
+  cedar::dev::sensors::visual::NetChannelPtr
   (
-    new cedar::dev::sensors::visual::NetGrabber::NetChannel(yarpChannelName0)
+    new cedar::dev::sensors::visual::NetChannel(yarpChannelName0)
   ),
-  cedar::dev::sensors::visual::NetGrabber::NetChannelPtr
+  cedar::dev::sensors::visual::NetChannelPtr
   (
-    new cedar::dev::sensors::visual::NetGrabber::NetChannel(yarpChannelName1)
+    new cedar::dev::sensors::visual::NetChannel(yarpChannelName1)
   )
 )
 {
@@ -171,7 +171,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
   //-------------------------------------------------
   // open capture one by one
   // cedar::aux::net::Reader<cv::Mat> *YarpReader = NULL;
-  MatNetReaderPtr yarp_reader;
+  cedar::dev::sensors::visual::NetChannel::MatNetReaderPtr yarp_reader;
 
   // loop until connection established or an error occurs
   for (unsigned int channel = 0; channel < num_cams; ++channel)
@@ -199,7 +199,8 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
         #endif
 
         // establish connection
-        yarp_reader = MatNetReaderPtr(new cedar::aux::net::Reader<cv::Mat>(channel_name));
+        yarp_reader
+         = cedar::dev::sensors::visual::NetChannel::MatNetReaderPtr(new cedar::aux::net::Reader<cv::Mat>(channel_name));
 
         #ifdef SHOW_INIT_INFORMATION_NETGRABBER
           std::cout << "ok" << std::endl;
@@ -302,7 +303,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
         #ifdef SHOW_INIT_INFORMATION_NETGRABBER
           std::cout << "ok" << std::endl;
         #endif
-        getNetChannel(channel)->mImageMat = frame;
+        getImageMat(channel) = frame;
         reading_ok = true;
       }
       //@todo: GH commented on merge
@@ -367,7 +368,7 @@ void cedar::dev::sensors::visual::NetGrabber::onUpdateSourceInfo(unsigned int ch
   // TODO: perhaps it is possible to gather information of used yarp-server too
   std::string name = this->getName();
   std::string channel_name = getNetChannel(channel)->_mpYarpChannelName->getValue();
-  getNetChannel(channel)->mChannelInfo = name + ": " + channel_name;
+  setChannelInfoString(channel, name + ": " + channel_name);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -384,7 +385,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onGrab()
     // on exception leave programm, so we don't catch it here
     // try
     //{
-    getNetChannel(channel)->mImageMat = getNetChannel(channel)->mpMatNetReader->read();
+    getImageMat(channel) = getNetChannel(channel)->mpMatNetReader->read();
     /* }
      * catch (cedar::aux::NetUnexpectedDataException &E)
      * {
@@ -400,7 +401,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onGrab()
      * }
      */
 
-    if (getNetChannel(channel)->mImageMat.empty())
+    if (getImageMat(channel).empty())
     {
       result = false;
     }

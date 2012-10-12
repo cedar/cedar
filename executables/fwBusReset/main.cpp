@@ -35,14 +35,13 @@
 
 ======================================================================================================================*/
 
-// MAKE FIREWIRE OPTIONAL
+// CEDAR CONFIGURATION
 #include "cedar/configuration.h"
+
 #ifdef CEDAR_USE_LIB_DC1394
 
-// LOCAL INCLUDES
-#include "cedar/devices/sensors/visual/grabbertools/LibDcCameraBase.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/devices/sensors/camera/backends/LibDcBase.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -56,7 +55,7 @@ int main(int, char *argv[])
   std::cout << argv[0] << " resets the first camera on the firewire bus and the bus itself\n";
 
   //create firewire interface
-  cedar::dev::sensors::visual::LibDcCameraBase fw_interface;
+  cedar::dev::sensors::camera::LibDcBase fw_interface;
 
   if (fw_interface.getNumCams() < 1)
   {

@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/Grabber.h"
+#include "cedar/devices/sensors/visual/GLChannel.h"
 #include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
@@ -63,35 +64,6 @@ public cedar::dev::sensors::visual::Grabber
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
-  //!@todo (olli) alternative to typedef
-  typedef boost::shared_ptr<QGLWidget> QGLWidgetPtr;
-
-
-  //!@cond SKIPPED_DOCUMENTATION
-public:
-
-  /*! @struct GLChannel
-   *  @brief Additional data of a grabbing channel to grab from a QGLWidget
-   */
-  struct GLChannel
-  :
-  cedar::dev::sensors::visual::Grabber::Channel
-  {
-  public:
-    GLChannel(QGLWidget* qglWidget=NULL)
-    :
-    cedar::dev::sensors::visual::Grabber::Channel(),
-    // mpQGLWidget(QGLWidgetPtr()) // empty QGLWidgetPtr
-    mpQGLWidget(qglWidget)
-    {
-    }
-    //! @brief The QT OpenGL widget
-    QGLWidget* mpQGLWidget ;
-    // cedar::dev::sensors::visual::GLGrabber::QGLWidgetPtr mpQGLWidget;
-  };
-
-  CEDAR_GENERATE_POINTER_TYPES(GLChannel);
-  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // macros

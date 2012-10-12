@@ -43,6 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/Grabber.h"
+#include "cedar/devices/sensors/visual/PictureChannel.h"
 #include "cedar/auxiliaries/FileParameter.h"
 
 // SYSTEM INCLUDES
@@ -83,33 +84,6 @@ public cedar::dev::sensors::visual::Grabber
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-
-  //!@cond SKIPPED_DOCUMENTATION
-
-public:
-
-  /*! @struct PictureChannel
-   *  @brief Additional data of a picture grabbing channel
-   */
-  struct PictureChannel
-  :
-  cedar::dev::sensors::visual::Grabber::Channel
-  {
-  public:
-    PictureChannel(const std::string& fileName = "")
-    :
-    cedar::dev::sensors::visual::Grabber::Channel(),
-    _mSourceFileName(new cedar::aux::FileParameter(this, "filename", cedar::aux::FileParameter::READ, fileName))
-    {
-    }
-
-    //! @brief The filename of the picture you want to grab from
-    cedar::aux::FileParameterPtr _mSourceFileName;
-  };
-
-  CEDAR_GENERATE_POINTER_TYPES(PictureChannel);
-
-  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // macros

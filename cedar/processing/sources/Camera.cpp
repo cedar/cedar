@@ -85,11 +85,11 @@ cedar::proc::sources::GrabberBase()
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
-  // on creation, create also the cameragrabber. It doesn't matter if the file is valid.
-  cedar::dev::sensors::visual::CameraGrabberPtr grabber;
-  grabber = cedar::dev::sensors::visual::CameraGrabberPtr
+  // on creation, create also the cameragrabber.
+  cedar::dev::sensors::camera::GrabberPtr grabber;
+  grabber = cedar::dev::sensors::camera::GrabberPtr
             (
-               new cedar::dev::sensors::visual::CameraGrabber()
+               new cedar::dev::sensors::camera::Grabber()
             );
 
   //no exception here, so we could use it
