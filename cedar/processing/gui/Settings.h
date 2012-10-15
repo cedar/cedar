@@ -200,15 +200,19 @@ private:
 
   //!@brief the settings concerning the docking behavior for the log widget
   DockSettingsPtr mLog;
+
   //!@brief the settings concerning the docking behavior for the steps widget
   DockSettingsPtr mSteps;
+
   //!@brief the settings concerning the docking behavior for the tools widget
   DockSettingsPtr mTools;
+
   //!@brief the settings concerning the docking behavior for the property pane
   DockSettingsPtr mProperties;
   
   //!@brief list of bytes coming from Qt (sizes, ...)
   cedar::aux::StringParameterPtr mMainWindowGeometry;
+
   //!@brief list of bytes coming from Qt (minimized, maximized, ...)
   cedar::aux::StringParameterPtr mMainWindowState;
 

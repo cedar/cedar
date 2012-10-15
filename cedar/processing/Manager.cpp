@@ -48,6 +48,7 @@
 #include "cedar/processing/PluginDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/gui/Settings.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/defines.h"
@@ -76,6 +77,32 @@ cedar::proc::Manager::~Manager()
 cedar::proc::FrameworkSettings& cedar::proc::Manager::settings()
 {
   return this->mSettings;
+}
+
+void cedar::proc::Manager::loadDefaultPlugins()
+{
+  const std::set<std::string>& plugins = cedar::proc::gui::Settings::instance().pluginsToLoad();
+  for (std::set<std::string>::const_iterator iter = plugins.begin(); iter != plugins.end(); ++ iter)
+  {
+    try
+    {
+      cedar::proc::PluginProxyPtr plugin(new cedar::proc::PluginProxy(*iter));
+      cedar::proc::Manager::getInstance().load(plugin);
+      cedar::aux::LogSingleton::getInstance()->message
+      (
+        "Loaded default plugin \"" + (*iter) + "\"",
+        "void cedar::proc::Manager::loadDefaultPlugins()"
+      );
+    }
+    catch (const cedar::aux::ExceptionBase& e)
+    {
+      cedar::aux::LogSingleton::getInstance()->error
+      (
+        "Error while loading default plugin \"" + (*iter) + "\": " + e.exceptionInfo(),
+        "void cedar::proc::Manager::loadDefaultPlugins()"
+      );
+    }
+  }
 }
 
 void cedar::proc::Manager::load(cedar::proc::PluginProxyPtr plugin)
