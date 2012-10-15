@@ -348,5 +348,30 @@ int main()
     std::cout << "Doing nothing worked!" << std::endl;
   }
 
+
+  // ends with ---------------------------------------------------------------------------------------------------------
+  std::cout << "Testing endsWith()" << std::endl;
+  std::string astring = "Hello. I am a string.";
+
+  if (!cedar::aux::endsWith(astring, "string."))
+  {
+    std::cout << "Didn't find \"string.\" at the end." << std::endl;
+    ++errors;
+  }
+
+  if (!cedar::aux::endsWith(astring, "Hello. I am a string."))
+  {
+    std::cout << "Didn't find string itself at the end." << std::endl;
+    ++errors;
+  }
+
+  if (cedar::aux::endsWith(astring, "Hello. I am a much longer string."))
+  {
+    std::cout << "Accepted longer string." << std::endl;
+    ++errors;
+  }
+
+  std::cout << "Test finished with " << errors << " error(s)." << std::endl;
+
   return errors;
 }

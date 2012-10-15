@@ -220,6 +220,28 @@ namespace cedar
       return result;
     }
 
+    /*!@brief Function that checks whether a string ends with a given one.
+     *
+     * @returns True, if string ends with endsWith, false otherwise.
+     */
+    inline bool endsWith(const std::string& string, const std::string& endsWith)
+    {
+      if (string.length() < endsWith.length())
+      {
+        return false;
+      }
+
+      for (size_t i = 0; i < endsWith.size(); ++i)
+      {
+        if (string.at(string.length() - endsWith.length() + i) != endsWith.at(i))
+        {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
     /*!@brief Replaces all occurrences of needle in a given string with a specified replacement.
      *
      */
