@@ -76,6 +76,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  void setSourceFileName(const std::string& imagePath);
 
 public slots:
   //!@brief a slot that takes care of updating the output picture
