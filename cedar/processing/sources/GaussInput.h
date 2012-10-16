@@ -77,14 +77,16 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief refreshes the internal matrix containing the Gaussian input
-  void compute(const cedar::proc::Arguments& arguments);
+  //!@brief Sets the center of the Gauss in the given dimension.
+  void setCenter(unsigned int dimension, double center);
 
 public slots:
   //!@brief a slot that is triggered if any of the Gauss function parameters are changed
   void updateMatrix();
+
   //!@brief a slot to process changes in dimensionality, including reinitializing the buffers
   void updateDimensionality();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -94,6 +96,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief refreshes the internal matrix containing the Gaussian input
+  void compute(const cedar::proc::Arguments& arguments);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
