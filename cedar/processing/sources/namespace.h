@@ -53,9 +53,9 @@
 
 namespace cedar
 {
-  /*!@brief Namespace for all processing classes. */
   namespace proc
   {
+    /*!@brief Namespace for all sources in the processing framework. */
     namespace sources
     {
       //!@cond SKIPPED_DOCUMENTATION
