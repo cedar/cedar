@@ -147,7 +147,7 @@ public:
   SurfacePlot(QWidget *pParent = NULL);
 
   //!@brief Constructor expecting a DataPtr.
-  SurfacePlot(cedar::aux::DataPtr matData, const std::string& title, QWidget *pParent = NULL);
+  SurfacePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
 
   //!@brief Destructor
   ~SurfacePlot();
@@ -157,7 +157,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief display data
-  void plot(cedar::aux::DataPtr matData, const std::string& title);
+  void plot(cedar::aux::ConstDataPtr matData, const std::string& title);
   //!@brief show or hide the plot grid
   void showGrid(bool show);
   //!@brief handle timer events
@@ -202,7 +202,7 @@ protected:
   // none yet
 private:
   //! the displayed MatData
-  cedar::aux::MatDataPtr mMatData;
+  cedar::aux::ConstMatDataPtr mMatData;
 
   //! flag if plot grid should be displayed
   bool mShowGridLines;

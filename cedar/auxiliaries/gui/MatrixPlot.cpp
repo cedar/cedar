@@ -124,7 +124,7 @@ bool cedar::aux::gui::MatrixPlot::canAppend(cedar::aux::ConstDataPtr data) const
   }
 }
 
-void cedar::aux::gui::MatrixPlot::doAppend(cedar::aux::DataPtr data, const std::string& title)
+void cedar::aux::gui::MatrixPlot::doAppend(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   CEDAR_DEBUG_ASSERT(this->mpCurrentPlotWidget != NULL);
   cedar::aux::gui::MultiPlotInterface *p_multi_plot
@@ -134,9 +134,9 @@ void cedar::aux::gui::MatrixPlot::doAppend(cedar::aux::DataPtr data, const std::
   p_multi_plot->append(data, title);
 }
 
-void cedar::aux::gui::MatrixPlot::plot(cedar::aux::DataPtr data, const std::string& title)
+void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
-  this->mData= boost::shared_dynamic_cast<cedar::aux::MatData>(data);
+  this->mData= boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data);
   if (!this->mData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
@@ -149,7 +149,7 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::DataPtr data, const std::stri
     this->mpCurrentPlotWidget = NULL;
   }
 
-  cv::Mat& mat = this->mData->getData();
+  const cv::Mat& mat = this->mData->getData();
   unsigned int dims = cedar::aux::math::getDimensionalityOf(mat);
 
   switch (dims)

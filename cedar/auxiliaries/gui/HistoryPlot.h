@@ -71,7 +71,7 @@ public:
    * @param data plotted data
    * @param title title of the plot window
    */
-  void plot(cedar::aux::DataPtr data, const std::string& title);
+  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -91,7 +91,7 @@ private:
 protected:
   // none yet
 private:
-  cedar::aux::DataPtr mData;
+  cedar::aux::ConstDataPtr mData;
   QWidget *mpCurrentPlotWidget;
 }; // class cedar::aux::gui::HistoryPlot
 

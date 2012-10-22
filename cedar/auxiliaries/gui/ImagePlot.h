@@ -125,7 +125,7 @@ private:
       void mousePressEvent(QMouseEvent * pEvent);
 
     public:
-      cedar::aux::MatDataPtr mData;
+      cedar::aux::ConstMatDataPtr mData;
   };
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -148,7 +148,7 @@ public:
    *             throws.
    * @param title title of the plot window
    */
-  void plot(cedar::aux::DataPtr data, const std::string& title);
+  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
 
   /*!@brief Updates the plot periodically.
    */
@@ -195,10 +195,10 @@ private:
   cedar::aux::gui::ImagePlot::ImageDisplay *mpImageDisplay;
 
   //! Data displayed by the plot.
-  cedar::aux::MatDataPtr mData;
+  cedar::aux::ConstMatDataPtr mData;
 
   //! The color space annotation of the data (if present).
-  cedar::aux::annotation::ColorSpacePtr mDataColorSpace;
+  cedar::aux::annotation::ConstColorSpacePtr mDataColorSpace;
 
   //! Converted image.
   QImage mImage;

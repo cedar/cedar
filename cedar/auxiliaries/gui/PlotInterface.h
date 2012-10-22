@@ -75,7 +75,7 @@ public:
    *
    * @todo Should data be const?
    */
-  virtual void plot(cedar::aux::DataPtr data, const std::string& title) = 0;
+  virtual void plot(cedar::aux::ConstDataPtr data, const std::string& title) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

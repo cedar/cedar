@@ -111,7 +111,7 @@ bool cedar::aux::gui::MatDataPlot::canAppend(cedar::aux::ConstDataPtr data) cons
   }
 }
 
-void cedar::aux::gui::MatDataPlot::doAppend(cedar::aux::DataPtr data, const std::string& title)
+void cedar::aux::gui::MatDataPlot::doAppend(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   CEDAR_DEBUG_ASSERT(this->mpCurrentPlotWidget != NULL);
   cedar::aux::gui::MultiPlotInterface *p_multi_plot
@@ -121,9 +121,9 @@ void cedar::aux::gui::MatDataPlot::doAppend(cedar::aux::DataPtr data, const std:
   p_multi_plot->append(data, title);
 }
 
-void cedar::aux::gui::MatDataPlot::plot(cedar::aux::DataPtr data, const std::string& title)
+void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
-  this->mData= boost::shared_dynamic_cast<cedar::aux::MatData>(data);
+  this->mData= boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data);
   if (!this->mData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
@@ -139,7 +139,7 @@ void cedar::aux::gui::MatDataPlot::plot(cedar::aux::DataPtr data, const std::str
   try
   {
     // data should be plotted as an image
-    cedar::aux::annotation::ColorSpacePtr color_space = this->mData->getAnnotation<cedar::aux::annotation::ColorSpace>();
+    cedar::aux::annotation::ConstColorSpacePtr color_space = this->mData->getAnnotation<cedar::aux::annotation::ColorSpace>();
     cedar::aux::gui::ImagePlot* p_plot = new cedar::aux::gui::ImagePlot();
     p_plot->plot(this->mData, title);
     this->mpCurrentPlotWidget = p_plot;

@@ -88,7 +88,7 @@ mZoom(zoom)
   mShift[2]    = shiftZ;
 }
 
-cedar::aux::gui::SurfacePlot::SurfacePlot(cedar::aux::DataPtr matData, const std::string& title, QWidget *pParent)
+cedar::aux::gui::SurfacePlot::SurfacePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent)
 :
 cedar::aux::gui::PlotInterface(pParent),
 mShowGridLines(false),
@@ -174,9 +174,9 @@ void cedar::aux::gui::SurfacePlot::Perspective::applyTo(Qwt3D::Plot3D* pPlot)
   pPlot->setZoom(mZoom);
 }
 
-void cedar::aux::gui::SurfacePlot::plot(cedar::aux::DataPtr data, const std::string& /* title */)
+void cedar::aux::gui::SurfacePlot::plot(cedar::aux::ConstDataPtr data, const std::string& /* title */)
 {
-  this->mMatData = boost::shared_dynamic_cast<cedar::aux::MatData>(data);
+  this->mMatData = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data);
 
   if (!this->mMatData)
   {
@@ -265,7 +265,7 @@ void cedar::aux::gui::SurfacePlot::applyLabels()
 {
   try
   {
-    cedar::aux::annotation::DimensionsPtr dimensions
+    cedar::aux::annotation::ConstDimensionsPtr dimensions
       = this->mMatData->getAnnotation<cedar::aux::annotation::Dimensions>();
 
     if (dimensions->getDimensionality() == 2)

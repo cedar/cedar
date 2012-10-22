@@ -115,18 +115,18 @@ class cedar::aux::gui::HistoryPlot0D : public cedar::aux::gui::MultiPlotInterfac
     {
     }
 
-    void setData(cedar::aux::DataPtr data);
+    void setData(cedar::aux::ConstDataPtr data);
 
     double getDataValue() const;
 
     //! The data of this curve, as generic data pointer
-    cedar::aux::DataPtr mData;
+    cedar::aux::ConstDataPtr mData;
 
     //! The data of this curve, as double data
-    cedar::aux::DoubleDataPtr mDoubleData;
+    cedar::aux::ConstDoubleDataPtr mDoubleData;
 
     //! The data of this curve, as matrix data
-    cedar::aux::MatDataPtr mMatData;
+    cedar::aux::ConstMatDataPtr mMatData;
 
     //! The qwt curve
     QwtPlotCurve* mCurve;
@@ -148,7 +148,7 @@ public:
   HistoryPlot0D(QWidget *pParent = NULL);
 
   //!@brief Constructor that expects a DataPtr
-  HistoryPlot0D(cedar::aux::DataPtr matData, const std::string& title, QWidget *pParent = NULL);
+  HistoryPlot0D(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
 
   //!@brief Destructor
   ~HistoryPlot0D();
@@ -158,7 +158,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief display data
-  void plot(cedar::aux::DataPtr data, const std::string& title);
+  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
 
   //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
@@ -182,7 +182,7 @@ private:
   //!@brief initialize the plot
   void init();
 
-  void doAppend(cedar::aux::DataPtr data, const std::string& title);
+  void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
 
   double getDataValue(size_t index);
 

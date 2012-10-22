@@ -206,7 +206,7 @@ void cedar::aux::gui::ImagePlot::ImageDisplay::mousePressEvent(QMouseEvent * pEv
 
 void cedar::aux::gui::detail::ImagePlotWorker::convert()
 {
-  cv::Mat& mat = this->mpPlot->mData->getData();
+  const cv::Mat& mat = this->mpPlot->mData->getData();
 
   this->mpPlot->mData->lockForRead();
   if (mat.empty())
@@ -455,14 +455,14 @@ void cedar::aux::gui::ImagePlot::imageFromMat(const cv::Mat& mat)
   ).rgbSwapped();
 }
 
-void cedar::aux::gui::ImagePlot::plot(cedar::aux::DataPtr data, const std::string& /* title */)
+void cedar::aux::gui::ImagePlot::plot(cedar::aux::ConstDataPtr data, const std::string& /* title */)
 {
   if (mTimerId != 0)
     this->killTimer(mTimerId);
 
   mDataType = DATA_TYPE_MAT;
 
-  this->mData = boost::dynamic_pointer_cast<cedar::aux::MatData>(data);
+  this->mData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
   this->mpImageDisplay->mData = this->mData;
   if (!this->mData)
   {

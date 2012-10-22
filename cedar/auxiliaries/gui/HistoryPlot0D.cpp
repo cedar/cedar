@@ -83,7 +83,7 @@ mpCurrentPlotWidget(NULL)
   this->init();
 }
 
-cedar::aux::gui::HistoryPlot0D::HistoryPlot0D(cedar::aux::DataPtr data, const std::string& title, QWidget *pParent)
+cedar::aux::gui::HistoryPlot0D::HistoryPlot0D(cedar::aux::ConstDataPtr data, const std::string& title, QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
 mpCurrentPlotWidget(NULL)
@@ -253,7 +253,7 @@ void cedar::aux::gui::HistoryPlot0D::applyStyle(size_t lineId, QwtPlotCurve *pCu
   pCurve->setPen(pen);
 }
 
-void cedar::aux::gui::HistoryPlot0D::plot(cedar::aux::DataPtr data, const std::string& title)
+void cedar::aux::gui::HistoryPlot0D::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   this->mCurves.clear();
   this->doAppend(data, title);
@@ -291,11 +291,11 @@ double cedar::aux::gui::HistoryPlot0D::getDataValue(size_t index)
   return val;
 }
 
-void cedar::aux::gui::HistoryPlot0D::CurveInfo::setData(cedar::aux::DataPtr data)
+void cedar::aux::gui::HistoryPlot0D::CurveInfo::setData(cedar::aux::ConstDataPtr data)
 {
   this->mData = data;
-  this->mDoubleData = boost::shared_dynamic_cast<cedar::aux::DoubleData>(data);
-  this->mMatData = boost::shared_dynamic_cast<cedar::aux::MatData>(data);
+  this->mDoubleData = boost::shared_dynamic_cast<cedar::aux::ConstDoubleData>(data);
+  this->mMatData = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data);
 
   if (!this->mDoubleData && !this->mMatData)
   {
@@ -308,7 +308,7 @@ void cedar::aux::gui::HistoryPlot0D::CurveInfo::setData(cedar::aux::DataPtr data
   }
 }
 
-void cedar::aux::gui::HistoryPlot0D::doAppend(cedar::aux::DataPtr data, const std::string& title)
+void cedar::aux::gui::HistoryPlot0D::doAppend(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   CurveInfoPtr curve(new CurveInfo());
   this->mCurves.push_back(curve);

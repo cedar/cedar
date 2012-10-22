@@ -74,7 +74,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief display a MatData
-  void plot(cedar::aux::DataPtr data, const std::string& title);
+  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
 
   bool canAppend(cedar::aux::ConstDataPtr data) const;
 
@@ -91,7 +91,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void doAppend(cedar::aux::DataPtr data, const std::string& title);
+  void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -100,7 +100,7 @@ protected:
   // none yet
 private:
   //!@brief the displayed MatData
-  cedar::aux::MatDataPtr mData;
+  cedar::aux::ConstMatDataPtr mData;
 
   //!@brief the plot widget
   QWidget *mpCurrentPlotWidget;
