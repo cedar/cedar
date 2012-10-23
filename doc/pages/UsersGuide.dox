@@ -1,0 +1,31 @@
+/*!
+
+@page UsersGuide Users' Guide
+Welcome to cedar!
+
+@section Motivation Motivation
+
+@section Tutorials Tutorials
+We provide a number of tutorials for certain parts of cedar, for which some additional guidance may be
+beneficial or even necessary.
+@subsection BeginnersTutorials Beginners' Tutorials
+- @ref ProjectsWithCedar
+- @link ProcessingGuiTutorial Processing gui @endlink
+- @link ProcessingFrameworkTutorial Processing framework @endlink
+- @ref ConfigurableAndParameters
+@subsection AdvancedTutorials Advanced Tutorials
+- @ref LoggingWithCedar
+- @ref ProvidingCompatibility
+
+@section ProgrammingConcepts Programming concepts
+In the following pages you can find out about general programming concepts we used throughout the framework. If you are
+interested in implementation details, you may have a look at the following topics. 
+- @link ParametersConcept Storing and loading parameters @endlink
+- @link ProcessingFrameworkConcept Processing framework @endlink
+- @link ThreadingConcept Threads and dynamics @endlink
+- @link InterProcessCommunicationConcept Inter-process communication using YARP @endlink
+- @link UnitsConcept Physical units @endlink
+- @ref EnumConcept
+
+
+*/
