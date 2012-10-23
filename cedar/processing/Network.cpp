@@ -646,11 +646,9 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
     {
       // if the triggers are already connected, that's ok.
     }
-    // looped elements send trigger signals only when the architecture is running
-    if (!p_source || !p_source->isLooped())
-    {
-      p_target->onTrigger();
-    }
+
+    // trigger the connected target once, establishing a validity of the target
+    p_target->onTrigger();
   }
   // inform any interested listeners of this new connection
   mDataConnectionChanged
