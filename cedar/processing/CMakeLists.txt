@@ -71,6 +71,7 @@ cedar_add_library(cedarproc
   steps/MatrixTypeConverter.h
   steps/Flip.h
   sources/Boost.h
+  sources/Noise.h
   sources/Picture.h
   sources/Video.h
   sources/GrabberBase.h

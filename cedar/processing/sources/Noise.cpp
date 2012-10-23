@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/dynamics/sources/Noise.h"
+#include "cedar/processing/sources/Noise.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/MatData.h"
@@ -56,10 +56,14 @@ namespace
 
     ElementDeclarationPtr noise_decl
     (
-      new cedar::proc::ElementDeclarationTemplate<cedar::dyn::Noise>("Sources", "cedar.dynamics.Noise")
+      new cedar::proc::ElementDeclarationTemplate<cedar::proc::sources::Noise>
+          (
+            "Sources", "cedar.processing.sources.Noise"
+          )
     );
     noise_decl->setIconPath(":/steps/noise.svg");
     noise_decl->setDescription("A step that generates normally distributed random noise.");
+    noise_decl->deprecatedName("cedar.dynamics.Noise");
 
     cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(noise_decl);
 
@@ -72,7 +76,7 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dyn::Noise::Noise()
+cedar::proc::sources::Noise::Noise()
 :
 mRandomMatrix(new cedar::aux::MatData(cv::Mat::zeros(10,10,CV_32F))),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 0, 1000)),
@@ -92,7 +96,7 @@ _mStandardDeviation(new cedar::aux::DoubleParameter(this, "standard deviation", 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::dyn::Noise::eulerStep(const cedar::unit::Time&)
+void cedar::proc::sources::Noise::compute(const cedar::proc::Arguments&)
 {
   cv::Mat& random = this->mRandomMatrix->getData();
 
@@ -100,18 +104,18 @@ void cedar::dyn::Noise::eulerStep(const cedar::unit::Time&)
   cv::randn(random, cv::Scalar(_mMean->getValue()), cv::Scalar(_mStandardDeviation->getValue()));
 }
 
-void cedar::dyn::Noise::dimensionalityChanged()
+void cedar::proc::sources::Noise::dimensionalityChanged()
 {
   this->_mSizes->resize(_mDimensionality->getValue(), _mSizes->getDefaultValue());
   this->updateMatrices();
 }
 
-void cedar::dyn::Noise::dimensionSizeChanged()
+void cedar::proc::sources::Noise::dimensionSizeChanged()
 {
   this->updateMatrices();
 }
 
-void cedar::dyn::Noise::updateMatrices()
+void cedar::proc::sources::Noise::updateMatrices()
 {
   int dimensionality = static_cast<int>(_mDimensionality->getValue());
 
