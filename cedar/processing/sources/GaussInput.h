@@ -80,6 +80,9 @@ public:
   //!@brief Sets the center of the Gauss in the given dimension.
   void setCenter(unsigned int dimension, double center);
 
+  //!@brief Sets the amplitude of the Gauss input.
+  void setAmplitude(double amplitude);
+
 public slots:
   //!@brief a slot that is triggered if any of the Gauss function parameters are changed
   void updateMatrix();
