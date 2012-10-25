@@ -471,6 +471,7 @@ private:
 protected:
   // none yet
 
+
 private:
 
   /// Set if Initialization should be finished in constructor

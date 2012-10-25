@@ -69,13 +69,13 @@ public:
   //!@brief The standard constructor.
   DeviceDc1394
   (
-    cedar::dev::sensors::camera::Grabber* pCameraGrabber,
-    cedar::dev::sensors::camera::ChannelPtr pCameraChannel
+    cedar::dev::sensors::camera::Channel* pCameraChannel
   );
 
   //!@brief Destructor
   ~DeviceDc1394();
 
+  void initDevice();
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -91,17 +91,38 @@ protected:
   bool createCaptureDevice();
   void applyStateToCamera();
 
+  /*! @brief Opens the wanted camera with libDc methods
+   *
+   *  The wanted camera is determind from the camereaId of the channel (set in the constructor or in the gui)
+   *  @returns True, if camera was successfully opened, otherwise false
+   */
+  bool openLibDcCamera();
+
+  //! get all features from cam
+  void getFeaturesFromLibDc();
+
+  /*! get all framerates and enable them in the enum-class, disable all others
+   *  \param modeId The grabbing mode for the framerates (framerate selection depends on actual used grabbing mode)
+   */
+  void getFrameRatesFromLibDc(cedar::dev::sensors::camera::VideoMode::Id modeId);
+
+  //! get all available modes and enable them in the enum-class, disable all others
+  void getGrabModesFromLibDc();
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
   // none yet
 
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //! firewire interface for available settings and properties from camera
+  cedar::dev::sensors::camera::LibDcBasePtr mpLibDcInterface;
+
 private:
   // none yet
 

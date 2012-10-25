@@ -38,9 +38,15 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_EXCEPTIONS_H
 #define CEDAR_DEV_SENSORS_VISUAL_EXCEPTIONS_H
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/devices/sensors/camera/namespace.h"
+
+
+#ifdef CEDAR_USE_LIB_DC1394
 
 /*!@brief Exception on an error while initializing the LibDc class
  */
@@ -54,6 +60,7 @@ class cedar::dev::sensors::camera::LibDcException : public cedar::aux::Exception
 {
 };
 
+#endif // CEDAR_USE_LIB_DC1394
 
 
 

@@ -50,8 +50,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::sensors::camera::DeviceVfl::CameraDeviceVfl
 (
-  cedar::dev::sensors::camera::Grabber* pCameraGrabber,
-  cedar::dev::sensors::camera::ChannelPtr pCameraChannel
+  cedar::dev::sensors::camera::Channel* pCameraChannel
 )
 :
 cedar::dev::sensors::camera::Device::CameraDevice(pCameraGrabber,pCameraChannel)
