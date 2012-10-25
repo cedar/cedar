@@ -47,11 +47,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::sensors::camera::DeviceCvVideoCapture::DeviceCvVideoCapture
 (
-  cedar::dev::sensors::camera::Grabber* pCameraGrabber,
-  cedar::dev::sensors::camera::ChannelPtr pCameraChannel
+  cedar::dev::sensors::camera::Channel* pCameraChannel
 )
 :
-cedar::dev::sensors::camera::Device::Device(pCameraGrabber,pCameraChannel)
+cedar::dev::sensors::camera::Device::Device(pCameraChannel)
 {
 }
 

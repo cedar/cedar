@@ -122,11 +122,11 @@ cedar::dev::sensors::visual::GrabbableGrabber::~GrabbableGrabber()
 //----------------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::GrabbableGrabber::onInit()
+bool cedar::dev::sensors::visual::GrabbableGrabber::onCreateGrabber()
 {
   unsigned int num_cams = getNumCams();
   std::stringstream init_message;
-  init_message << ": Initialize test grabber with " << num_cams << " channels ..." << std::endl;
+  init_message << ": Initialize GrabbableGrabber with " << num_cams << " channels ..." << std::endl;
 
   for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
@@ -153,10 +153,14 @@ bool cedar::dev::sensors::visual::GrabbableGrabber::onInit()
 
   // grab first image
   onGrab();
-
-  // no exception until now
   return true;
 }
+
+void cedar::dev::sensors::visual::GrabbableGrabber::onCloseGrabber()
+{
+  this->onCleanUp();
+}
+
 
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::GrabbableGrabber::onCleanUp()
@@ -185,7 +189,7 @@ void cedar::dev::sensors::visual::GrabbableGrabber::onCleanUp()
 //}
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::GrabbableGrabber::onUpdateSourceInfo(unsigned int channel)
+void cedar::dev::sensors::visual::GrabbableGrabber::setChannelInfo(unsigned int channel)
 {
   setChannelInfoString(channel, this->getName() + ": Channel "
                                       + boost::lexical_cast<std::string>(channel) + ": "
