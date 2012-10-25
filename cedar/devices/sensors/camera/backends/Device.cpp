@@ -45,13 +45,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::sensors::camera::Device::Device
-(
-  cedar::dev::sensors::camera::Grabber* cameraGrabber,
-  cedar::dev::sensors::camera::ChannelPtr pCameraChannel
-)
+cedar::dev::sensors::camera::Device::Device(cedar::dev::sensors::camera::Channel* pCameraChannel)
 :
-mpCameraGrabber(cameraGrabber),
 mpCameraChannel(pCameraChannel)
 {
 }
@@ -64,6 +59,10 @@ cedar::dev::sensors::camera::Device::~Device()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+void cedar::dev::sensors::camera::Device::initDevice()
+{
+
+}
 
 bool cedar::dev::sensors::camera::Device::init()
 {

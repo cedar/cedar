@@ -121,11 +121,15 @@ namespace cedar
       // exceptions
       //-----------------------------------------------------------------------------------------------
 
+#ifdef CEDAR_USE_LIB_DC1394
+
       //!@brief An exception for errors on initialization of the LibDC class
       class LibDcInitException;
 
       //!@brief An exception for errors in the LibDc class
       class LibDcException;
+#endif //CEDAR_USE_LIB_DC1394
+
       }
     }
   }
