@@ -146,8 +146,19 @@ cedar::dev::sensors::visual::Grabber::~Grabber()
 //----------------------------------------------------------------------------------------------------------------------
 
 // this function handles abnormal termination of the program (like the signals interrupt, abort or seg.fault)
-void cedar::dev::sensors::visual::Grabber::interruptSignalHandler(int)
+void cedar::dev::sensors::visual::Grabber::interruptSignalHandler(int signal)
 {
+  std::string sig_name = "";
+  switch (signal)
+  {
+  case SIGINT: sig_name = "SIGINT"; break;
+  case SIGABRT: sig_name = "SIGABRT"; break;
+  case SIGSEGV: sig_name = "SIGSEGV"; break;
+  default:
+    sig_name = "UNKNOWN";
+    break;
+  }
+  std::cout << "Signal " << sig_name << " (" << signal << ") caught! Terminate program!" << std::endl;
   emergencyCleanup();
   std::exit(1);
 }
@@ -259,6 +270,7 @@ void cedar::dev::sensors::visual::Grabber::init
   mCaptureDeviceCreated = false;
   mRecording = false;
 //  mStartUp = true;
+  mIsGrabbing = false;
 
   // insert this instance to our instance-vector (used for emergency-cleanup)
   mInstances.push_back(this);
@@ -432,11 +444,13 @@ void cedar::dev::sensors::visual::Grabber::stopGrabber()
   {
     this->stopRecording();
   }
+  mIsGrabbing = false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::Grabber::startGrabber()
 {
+  mIsGrabbing = true;
   mFpsMeasured = 0;
   mFpsCounter = 0;
   mFpsMeasureStart = boost::posix_time::microsec_clock::local_time();
@@ -538,7 +552,7 @@ QReadWriteLock* cedar::dev::sensors::visual::Grabber::getReadWriteLockPointer() 
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-std::string& cedar::dev::sensors::visual::Grabber::getSourceInfo(unsigned int channel)
+std::string cedar::dev::sensors::visual::Grabber::getSourceInfo(unsigned int channel)
 {
   if (channel >= getNumCams())
   {
