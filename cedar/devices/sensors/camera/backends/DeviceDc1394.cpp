@@ -75,16 +75,16 @@ void cedar::dev::sensors::camera::DeviceDc1394::initDevice()
     return;
   }
 
-  std::cout << "DC1394: initDevice. Camera successfully opened through libdc" << std::endl;
+//  std::cout << "DC1394: initDevice. Camera successfully opened through libdc" << std::endl;
   //set available properties and their values
 
   getFeaturesFromLibDc();
   getGrabModesFromLibDc();
 
-  std::cout << "Set Grabmode to "
-    << cedar::dev::sensors::camera::VideoMode::type().get(mpCameraChannel->_mpGrabMode->getValue()).prettyString()
-    << std::endl;
-  getFrameRatesFromLibDc(mpCameraChannel->_mpGrabMode->getValue());
+//  std::cout << "Set Grabmode to "
+//    << cedar::dev::sensors::camera::VideoMode::type().get(mpCameraChannel->_mpGrabMode->getValue()).prettyString()
+//    << std::endl;
+  getFrameRatesFromLibDc(mpCameraChannel->_mpGrabMode->getValue()); //id?????
 
 
   //set first available mode
@@ -125,7 +125,7 @@ void cedar::dev::sensors::camera::DeviceDc1394::getGrabModesFromLibDc()
 {
   dc1394video_modes_t cam_video_modes = mpLibDcInterface->getCamVideoModes();
   int num_modes = cam_video_modes.num;
-  std::cout << "Camera Video Modes:" << std::endl;
+//  std::cout << "Camera Video Modes:" << std::endl;
   mpCameraChannel->_mpGrabMode->disableAll();
   for (int i=0; i<num_modes; i++)
   {
@@ -168,7 +168,18 @@ void cedar::dev::sensors::camera::DeviceDc1394::getFrameRatesFromLibDc
 //            << video_mode_str
 //            << std::endl;
 
-  dc1394framerates_t mode_framerates = mpLibDcInterface->getCamFramerates(cam_video_modes.modes[mode_id]);
+  int libdc_mode_index = -1;
+  for (unsigned int i = 0; i < cam_video_modes.num; ++i)
+  {
+    if (cam_video_modes.modes[i] == mode_id)
+    {
+      libdc_mode_index = i;
+      break;
+    }
+  }
+
+  CEDAR_ASSERT(libdc_mode_index != -1);
+  dc1394framerates_t mode_framerates = mpLibDcInterface->getCamFramerates(cam_video_modes.modes[libdc_mode_index]);
 
   // LibDc framerate id's are not identical to FrameRate::Id
   // search every FrameRate::Id in the LibDc structures, and set if available

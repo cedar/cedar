@@ -117,8 +117,6 @@ _mpIsoSpeed(new cedar::aux::EnumParameter
                  new cedar::dev::sensors::camera::Properties(this,mVideoCapture,mpVideoCaptureLock)
                );
 
-  this->setBackendType(backendType);
-
   QObject::connect(_mpByGuid.get(),SIGNAL(valueChanged()),this,SLOT(settingChanged()));
   QObject::connect(_mpCameraId.get(),SIGNAL(valueChanged()),this,SLOT(settingChanged()));
   QObject::connect(_mpGrabMode.get(),SIGNAL(valueChanged()),this,SLOT(settingChanged()));
@@ -146,10 +144,10 @@ void cedar::dev::sensors::camera::Channel::setBackendType
   cedar::dev::sensors::camera::BackendType::Id backendType
 )
 {
-  std::cout << "cedar::dev::sensors::camera::Channel::setBackendType ";
+ // std::cout << "cedar::dev::sensors::camera::Channel::setBackendType ";
   if (mBackendType != backendType)
   {
-    std::cout << "change to " << cedar::dev::sensors::camera::BackendType::type().get(backendType).prettyString() << std::endl;
+   // std::cout << "change to " << cedar::dev::sensors::camera::BackendType::type().get(backendType).prettyString() << std::endl;
 
     mBackendType = backendType;
 
@@ -212,7 +210,7 @@ void cedar::dev::sensors::camera::Channel::setBackendType
   } // end changed backend
   else
   {
-    std::cout << "nothing changed" << std::endl;
+    //std::cout << "nothing changed" << std::endl;
   }
 
 }

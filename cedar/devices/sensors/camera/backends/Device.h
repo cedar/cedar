@@ -133,7 +133,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //! The channel structure
-  cedar::dev::sensors::camera::ChannelPtr mpCameraChannel;
+  cedar::dev::sensors::camera::Channel* mpCameraChannel;
 
 private:
   // none yet
