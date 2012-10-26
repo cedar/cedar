@@ -158,7 +158,7 @@ void cedar::dev::sensors::camera::DeviceDc1394::getFrameRatesFromLibDc
 )
 {
   // LibDc constants for the grab-modes are identical to VideoMode::Id
-  unsigned int mode_id = static_cast<unsigned int>(modeId);
+  int mode_id = static_cast<int>(modeId);
   dc1394video_modes_t cam_video_modes = mpLibDcInterface->getCamVideoModes();
 
 //  std::string video_mode_str = mpLibDcInterface->DC1394VideoModeToString(cam_video_modes.modes[set_video_mode_id]);
