@@ -132,9 +132,13 @@ _mpIsoSpeed(new cedar::aux::EnumParameter
 
   /// Destructor
 cedar::dev::sensors::camera::Channel::~Channel()
+{
+  if (mpVideoCaptureLock)
   {
     delete mpVideoCaptureLock;
+    mpVideoCaptureLock = 0;
   }
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
