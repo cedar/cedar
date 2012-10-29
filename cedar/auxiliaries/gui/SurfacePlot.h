@@ -97,7 +97,8 @@ namespace cedar
 
 /*!@brief Matrix plot that can display 2D matrices (i.e. vectors).
  *
- * @todo Write more detailed description of the class here.
+ *        Matrices displayed by this plot are plotted as a three-dimensional surface, where the x- and y-coordinates are
+ *        assumed to be the indices of the 2d matrix while the z-coordinate is the value stored within the matrix.
  */
 class cedar::aux::gui::SurfacePlot : public PlotInterface
 {
