@@ -53,7 +53,17 @@
 
 /*!@brief Base class for plots that can display matrices.
  *
- * @todo Write more detailed description of the class here.
+ *        Based on the dimensionality of the data plotted, this class decides which type of plot to open. Currently,
+ *        these are:
+ *
+ *        HistoryPlot0D     for 0D matrices,
+ *
+ *        LinePlot          for 1D matrices,
+ *
+ *        SurfacePlot       for 2D matrices and
+ *
+ *        MatrixSlicePlot3D for 3D matrices.
+ *
  */
 class cedar::aux::gui::MatrixPlot : public cedar::aux::gui::MultiPlotInterface
 {

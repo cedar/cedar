@@ -49,9 +49,7 @@
 #include <QWidget>
 
 
-/*!@brief An abstract base widget for graphical representation of Parameter.
- *
- * @todo Write more detailed description of the class here.
+/*!@brief An abstract base widget for graphical representation of cedar::aux::Parameters.
  */
 class cedar::aux::gui::Parameter : public QWidget
 {
@@ -76,14 +74,17 @@ public:
 public:
   //!@brief set the parameter, which is graphically represented by this instance
   void setParameter(cedar::aux::ParameterPtr pParameter);
+
   //!@brief get the parameter, which is graphically represented by this instance
   cedar::aux::ParameterPtr getParameter();
 
 signals:
   //!@brief this signal is emitted whenever a new parameter is linked to this graphical representation
   void parameterPointerChanged();
-  //!@brief this signal is emitted if the height of the graphical representation changed due to size changes of
-  //        the represented parameter
+
+  /*!@brief this signal is emitted if the height of the graphical representation changed due to size changes of
+   *        the represented parameter
+   */
   void heightChanged();
 
   //--------------------------------------------------------------------------------------------------------------------

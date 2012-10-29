@@ -99,7 +99,8 @@ namespace cedar
 
 /*!@brief Matrix plot that can display 1D matrices (i.e. vectors).
  *
- * @todo Write more detailed description of the class here.
+ *        This plot is capable of displaying any matrix data with a dimensionality of one. It displays the data as a
+ *        line, assuming the indices of the matrix as the x axis.
  */
 class cedar::aux::gui::LinePlot : public cedar::aux::gui::MultiPlotInterface
 {

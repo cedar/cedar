@@ -50,7 +50,7 @@
 
 
 
-///! @brief Class to store all channel related stuff inside
+//! @brief Class to store all channel related stuff inside
 class cedar::dev::sensors::visual::GrabberChannel
 :
 virtual public cedar::aux::Configurable

@@ -46,10 +46,7 @@
 
 // SYSTEM INCLUDES
 
-/*!@brief
- *
- * ...
- *
+/*!@brief A widget for displaying a mounted camera.
  */
 class cedar::dev::robot::gui::MountedCameraViewer
 :
