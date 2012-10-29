@@ -34,14 +34,25 @@
 #
 #=======================================================================================================================
 
+== stable release ==
+
+Please keep in mind that "stable" refers to the state of our interfaces, i.e., doesn't mean the software is crash- or
+bug-free, but rather, that we'll try to not change any signatures of functions without deprecating them first.
+
+Currently, there are still a few classes and frameworks that are under development. Here's a list of interfaces that are
+likely to undergo major changes:
+- everything in devices
+- everything in units
+- the class CoordinateTransformation in processing::steps
+
+
 == known issues ==
-  - cedardyn is not properly loaded on some OS when using processingIde. If you want to use its content, manually load
+  - cedardyn is not properly loaded on some OSs when using processingIde. If you want to use its content, manually load
     cedardyn using the plugin dialog. You then may want to go to the Manage.. dialog and mark this plugin to be loaded
     on every start.
   - On windows, some of the GL drawing functionality for kinematic chains and related classes is not implemented.
   - Grouping steps into networks is buggy. Please use with caution and report any errors you encounter.
   - cedar::dev::sensors::visual::CameraGrabber is not working at the moment.
-  - the net unit test fails from time to time (see issue #253 in testing)
 
 == current version ==
 - cedar::aux
