@@ -87,7 +87,8 @@ cedar::aux::gui::ImagePlot::ImagePlot(QWidget *pParent)
 :
 cedar::aux::gui::PlotInterface(pParent),
 mTimerId(0),
-mDataType(DATA_TYPE_UNKNOWN)
+mDataType(DATA_TYPE_UNKNOWN),
+mConverting(false)
 {
   QVBoxLayout *p_layout = new QVBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
@@ -224,7 +225,7 @@ void cedar::aux::gui::detail::ImagePlotWorker::convert()
     case CV_8UC1:
     {
       this->mpPlot->mData->lockForRead();
-      cv::Mat converted = this->mpPlot->threeChannelGrayscale(mat);
+      cv::Mat converted = this->mpPlot->threeChannelGrayscale(this->mpPlot->mData->getData());
       this->mpPlot->mData->unlock();
       CEDAR_DEBUG_ASSERT(converted.type() == CV_8UC3);
       this->mpPlot->imageFromMat(converted);
@@ -234,7 +235,7 @@ void cedar::aux::gui::detail::ImagePlotWorker::convert()
     case CV_8UC3:
     {
       this->mpPlot->mData->lockForRead();
-      this->mpPlot->imageFromMat(mat);
+      this->mpPlot->imageFromMat(this->mpPlot->mData->getData());
       this->mpPlot->mData->unlock();
       break;
     }
@@ -277,15 +278,22 @@ void cedar::aux::gui::ImagePlot::conversionDone()
 {
   this->mpImageDisplay->setPixmap(QPixmap::fromImage(this->mImage));
   this->resizePixmap();
+  mConverting = false;
 }
 
 void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
 {
-  if (!this->isVisible() || this->mDataType == DATA_TYPE_UNKNOWN)
+  if
+  (
+    !this->isVisible() // plot widget is not visible -- no need to plot
+    || this->mDataType == DATA_TYPE_UNKNOWN // data type cannot be plotted
+    || mConverting // already converting -- skip this timer event
+  )
   {
     return;
   }
 
+  mConverting = true;
   emit convert();
 }
 
