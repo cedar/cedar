@@ -278,7 +278,7 @@ double cedar::aux::gui::HistoryPlot0D::getDataValue(size_t index)
   {
     cv::Mat matrix = this->mCurves[index]->mMatData->getData();
     //!@todo This check if the data still has the correct format should be somewhere else (probably)
-    if (cedar::aux::math::getDimensionalityOf(matrix) != 0) // plot is no longer capable of displaying the data
+    if (cedar::aux::math::getDimensionalityOf(matrix) != 0 || matrix.empty()) // plot is no longer capable of displaying the data
     {
       this->mCurves[index]->mData->unlock();
       emit dataChanged();
