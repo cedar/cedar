@@ -190,7 +190,13 @@ private:
 }; // class cedar::proc::steps::TransformationType
 
 
-/*!@brief This is a structure for storing a list of kernels.
+/*!@brief Performs a coordinate transformation on an input matrix.
+ *
+ * @remarks This step is still under development.
+ * @todo Develop this step.
+ *
+ * @todo Remove the second magnitude parameter
+ * @todo Make the magnitude parameter const when it does not apply (i.e., for Cart <-> Polar)
  */
 class cedar::proc::steps::CoordinateTransformation : public cedar::proc::Step
 {
@@ -204,6 +210,7 @@ class cedar::proc::steps::CoordinateTransformation : public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
 public:
   CoordinateTransformation();
+
   virtual ~CoordinateTransformation();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -211,13 +218,15 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief compute coordinate transformation
-    void compute(const cedar::proc::Arguments&);
+  void compute(const cedar::proc::Arguments&);
 
 public slots:
   //!@brief Triggers a computation of a step.
   void recompute();
+
   //!@brief Checks that number of rows is at least 1.
   void changeNumberOfRows();
+
   //!@brief Checks that number of columns is at least 1.
   void changeNumberOfCols();
 
@@ -232,6 +241,7 @@ protected:
 private:
   //!@brief Checks if conected to new input.
   void inputConnectionChanged(const std::string& inputName);
+
   //!@brief General function that has to be called if transformation maps have to be recomputed (type independent).
   void createMap();
 
@@ -275,14 +285,15 @@ private:
     //! Y coordinates for transformation
     cedar::aux::MatDataPtr mMapY;
 
-    //*! Transformation map X converted to CV_16SC for faster computation
+    //! Transformation map X converted to CV_16SC for faster computation
     cedar::aux::MatDataPtr mMapXConverted;
 
-    //*! Transformation map Y converted to CV_16SC for faster computation
+    //! Transformation map Y converted to CV_16SC for faster computation
     cedar::aux::MatDataPtr mMapYConverted;
 
     //! saves the number of rows of the input to check if input size has changed so maps have to be recomputed
     unsigned int mInputRows;
+
     //! saves the number of columns of the input to check if input size has changed so maps have to be recomputed
     unsigned int mInputCols;
 
@@ -295,21 +306,25 @@ protected:
 private:
     //! Defines between which two coordinate systems transformation is done
     cedar::aux::EnumParameterPtr _mTransformationType;
+
     //! Defines in which direction transformation is done
     cedar::aux::EnumParameterPtr _mTransformationDirection;
 
     //! Defines how many samples are done per degree. 0.5 samples per degree means a circle is sampled with 180 degree.
     cedar::aux::DoubleParameterPtr _mSamplesPerDegree;
+
     //! Defines how many samples are done per distance.
     cedar::aux::DoubleParameterPtr _mSamplesPerDistance;
 
     //! Defines the number of rows of the output matrix for the backward transformation
     cedar::aux::UIntParameterPtr _mNumberOfRows;
+
     //! Defines the number of columns of the output matrix for the backward transformation
     cedar::aux::UIntParameterPtr _mNumberOfCols;
 
     //! Defines the magnitude of the logarithmic scale for the forward log-polar-transformation
     cedar::aux::DoubleParameterPtr  _mMagnitudeForward;
+
     //! Defines the magnitude of the logarithmic scale for the backward log-polar-transformation
     cedar::aux::DoubleParameterPtr  _mMagnitudeBackward;
 }; // class cedar::proc::steps::CoordinateTransformation
