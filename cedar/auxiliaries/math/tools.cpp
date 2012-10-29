@@ -172,15 +172,6 @@ double cedar::aux::math::min(const cv::Mat matrix)
   return min;
 }
 
-template <typename T>
-T cedar::aux::math::round(T val)
-{
-  return std::floor(val + static_cast<T>(0.5));
-}
-
-template CEDAR_AUX_LIB_EXPORT float cedar::aux::math::round<float>(float val);
-template CEDAR_AUX_LIB_EXPORT double cedar::aux::math::round<double>(double val);
-
 void cedar::aux::math::write(cv::Mat matrix)
 {
   switch (matrix.type())
@@ -308,28 +299,6 @@ void cedar::aux::math::write(cv::Mat matrix)
   }
   std::cout << "\n";
 }
-
-//!@cond SKIPPED_DOCUMENTATION
-cv::Mat cedar::aux::math::convolve(const cv::Mat& matrix, const cv::Mat& kernel)
-{
-  cv::Mat result;
-
-  CEDAR_ASSERT(matrix.dims == kernel.dims);
-
-  switch (matrix.dims)
-  {
-    case 1:
-    case 2:
-      cv::filter2D(matrix, result, -1, kernel, cv::Point(-1, -1), 0.0, cv::BORDER_CONSTANT);
-      break;
-
-    default:
-      CEDAR_THROW(cedar::aux::UnhandledValueException, "Cannot convolve functions of the given dimensionality.");
-  }
-
-  return result;
-}
-//!@endcond
 
 template <typename T>
 void cedar::aux::math::reduceCvMat3D(const cv::Mat& source, cv::Mat& destination, int dimensionToReduce, int reductionOperator)
