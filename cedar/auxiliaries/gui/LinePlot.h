@@ -165,6 +165,7 @@ public:
 public:
   //!@brief display data
   void plot(cedar::aux::ConstDataPtr matData, const std::string& title);
+
   //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
 
@@ -186,6 +187,7 @@ public:
   cedar::aux::math::Limits<double> getXLimits() const;
 
 signals:
+  //!@brief Signals the worker thread to convert the data to the plot's internal format.
   void convert();
 
   //--------------------------------------------------------------------------------------------------------------------

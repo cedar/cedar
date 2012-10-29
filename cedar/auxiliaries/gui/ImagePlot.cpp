@@ -204,6 +204,7 @@ void cedar::aux::gui::ImagePlot::ImageDisplay::mousePressEvent(QMouseEvent * pEv
   QToolTip::showText(pEvent->globalPos(), info_text);
 }
 
+//!@cond SKIPPED_DOCUMENTATION
 void cedar::aux::gui::detail::ImagePlotWorker::convert()
 {
   const cv::Mat& mat = this->mpPlot->mData->getData();
@@ -270,6 +271,7 @@ void cedar::aux::gui::detail::ImagePlotWorker::convert()
 
   emit done();
 }
+//!@endcond
 
 void cedar::aux::gui::ImagePlot::conversionDone()
 {

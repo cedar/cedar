@@ -166,6 +166,7 @@ public:
   bool canAppend(cedar::aux::ConstDataPtr data) const;
 
 signals:
+  //!@brief Signals the worker thread to convert the data to the plot's internal format.
   void convert();
 
   //--------------------------------------------------------------------------------------------------------------------
