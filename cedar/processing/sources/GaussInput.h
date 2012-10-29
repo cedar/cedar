@@ -42,7 +42,6 @@
 #define CEDAR_PROC_SOURCES_GAUSS_INPUT_H
 
 // CEDAR INCLUDES
-#include "cedar/dynamics/namespace.h"
 #include "cedar/processing/sources/namespace.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/Step.h"

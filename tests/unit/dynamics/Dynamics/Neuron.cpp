@@ -37,6 +37,7 @@
 // LOCAL INCLUDES
 #include "Neuron.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/DoubleData.h"
 
 // PROJECT INCLUDES
 
@@ -50,8 +51,8 @@ cedar::Neuron::Neuron(double interactionWeight, double restingLevel)
 :
 mRestingLevel(new cedar::aux::DoubleParameter(this, "restingLevel", restingLevel, -100, 0)),
 mInteractionWeight(new cedar::aux::DoubleParameter(this, "interactionWeight", interactionWeight, -100, 100)),
-mActivation(new cedar::dyn::DoubleActivation(0.0)),
-mOutput(new cedar::dyn::DoubleActivation(0.0))
+mActivation(new cedar::aux::DoubleData(0.0)),
+mOutput(new cedar::aux::DoubleData(0.0))
 {
   this->declareInput("input");
   this->declareOutput("output", mOutput);
