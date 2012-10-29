@@ -50,6 +50,8 @@
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
+#include <QReadLocker>
+#include <QWriteLocker>
 #include <QToolTip>
 #include <QMouseEvent>
 #include <QThread>
@@ -276,7 +278,10 @@ void cedar::aux::gui::detail::ImagePlotWorker::convert()
 
 void cedar::aux::gui::ImagePlot::conversionDone()
 {
+  QReadLocker lock(&this->mImageLock);
   this->mpImageDisplay->setPixmap(QPixmap::fromImage(this->mImage));
+  lock.unlock();
+
   this->resizePixmap();
   mConverting = false;
 }
@@ -455,6 +460,7 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
 
 void cedar::aux::gui::ImagePlot::imageFromMat(const cv::Mat& mat)
 {
+  QWriteLocker lock(&this->mImageLock);
   this->mImage = QImage
   (
     mat.data,
@@ -508,6 +514,7 @@ void cedar::aux::gui::ImagePlot::resizeEvent(QResizeEvent * /*pEvent*/)
 
 void cedar::aux::gui::ImagePlot::resizePixmap()
 {
+  QReadLocker lock(&this->mImageLock);
   QSize scaled_size = this->mImage.size();
   scaled_size.scale(this->mpImageDisplay->size(), Qt::KeepAspectRatio);
   if ( (!this->mpImageDisplay->pixmap()

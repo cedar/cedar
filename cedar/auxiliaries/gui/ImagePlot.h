@@ -204,6 +204,9 @@ private:
   //! Converted image.
   QImage mImage;
 
+  //! Lock for mImage.
+  QReadWriteLock mImageLock;
+
   //! Id of the timer used for updating the plot.
   int mTimerId;
 
