@@ -202,11 +202,14 @@ void cedar::aux::gui::LinePlot::doAppend(cedar::aux::ConstDataPtr data, const st
                 "Could not cast to cedar::aux::MatData in cedar::aux::gui::LinePlot::plot.");
   }
 
+
   plot_series->mpCurve = new QwtPlotCurve(title.c_str());
   applyStyle(line_id, plot_series->mpCurve);
 
   data->lockForRead();
   const cv::Mat& mat = plot_series->mMatData->getData();
+
+  //!@todo This throws an exception when null data (or data of other dimensionality than 1) is passed.
   size_t num = cedar::aux::math::get1DMatrixSize(mat);
   data->unlock();
 
