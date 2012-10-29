@@ -1,0 +1,20 @@
+You should look at the NetTransporter HOWTO before reading this.
+
+
+Some important desing decisions:
+--------------------------------
+
+The data is only transmissible between same-compiler-same-architecture (ie big
+endian vs little endian). It is not universally exchangeable, as this
+would mean full serialization and transposing to another data format
+at a critical runtime-cost.
+
+A design aim was tranparency for the user. The user does not need to 
+concern himself with the mode of transport of the data (YARP).
+
+Detected runtime problems will be passed by using the C++ exception
+mechanism.
+
+We will go for low latency before correctness (for example we use stateless
+transport protocols), if not otherwise explicitly stated.
+
