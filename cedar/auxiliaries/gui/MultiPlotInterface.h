@@ -68,7 +68,7 @@ public:
    * @param data  The data to append.
    * @param title The tilte (legend entry) of the data object.
    */
-  void append(cedar::aux::DataPtr data, const std::string& title)
+  void append(cedar::aux::ConstDataPtr data, const std::string& title)
   {
     //!@todo Move into cpp file
     //!@todo Store data/title association?
@@ -89,7 +89,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //! Actual implementation of the appending is deferred to the sub-classes.
-  virtual void doAppend(cedar::aux::DataPtr data, const std::string& title) = 0;
+  virtual void doAppend(cedar::aux::ConstDataPtr data, const std::string& title) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

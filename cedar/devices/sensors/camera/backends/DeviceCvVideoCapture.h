@@ -64,11 +64,7 @@ public cedar::dev::sensors::camera::Device
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DeviceCvVideoCapture
-  (
-    cedar::dev::sensors::camera::Grabber* pCameraGrabber,
-    cedar::dev::sensors::camera::ChannelPtr pCameraChannel
-  );
+  DeviceCvVideoCapture(cedar::dev::sensors::camera::Channel* pCameraChannel);
 
   //!@brief Destructor
   ~DeviceCvVideoCapture();

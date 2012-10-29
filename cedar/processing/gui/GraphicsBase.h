@@ -53,9 +53,12 @@
 #include <QPen>
 
 
-/*!@brief Base class for graphical items in the Scene.
+/*!@brief Base class for graphical items in a processing scene.
  *
- * @todo Write more detailed description of the class here.
+ *        This class realizes a lot of the functionality related to drawing of processing steps, triggers etc. in a
+ *        cedar::proc::Scene. Because it is configurable, it also provides methods for storing and restoring the display
+ *        item from a configuration file.
+ *
  * @todo maybe rename this class to GraphicsItem
  */
 class cedar::proc::gui::GraphicsBase : public QGraphicsItem, public cedar::aux::Configurable

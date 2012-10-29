@@ -86,7 +86,7 @@ cedar::aux::gui::HistoryPlot::~HistoryPlot()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::aux::gui::HistoryPlot::plot(cedar::aux::DataPtr data, const std::string& title)
+void cedar::aux::gui::HistoryPlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   //!@todo implement for matrices and more dimensions
   if (this->mpCurrentPlotWidget)
@@ -95,7 +95,7 @@ void cedar::aux::gui::HistoryPlot::plot(cedar::aux::DataPtr data, const std::str
     this->mpCurrentPlotWidget = NULL;
   }
 
-  if (this->mData = boost::shared_dynamic_cast<cedar::aux::DoubleData>(data))
+  if (this->mData = boost::shared_dynamic_cast<cedar::aux::ConstDoubleData>(data))
   {
     this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData, title);
   }

@@ -34,7 +34,5 @@
 #
 #=======================================================================================================================
 
-if (CEDAR_USE_YARP)
-  cedar_add_interactive_test( "InterfaceGrabberTest" InterfaceGrabberTest.cpp )
-endif()
+cedar_add_example(CameraGrabberTutorial PREFIX "examples/grabber" )
 

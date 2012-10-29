@@ -52,7 +52,6 @@
 
 
 //!@brief A picture file source for the processingIde
-
 class cedar::proc::sources::Picture
 :
 public cedar::proc::sources::GrabberBase
@@ -76,6 +75,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Loads the given file into the picture source.
+  void setSourceFileName(const std::string& imagePath);
 
 public slots:
   //!@brief a slot that takes care of updating the output picture

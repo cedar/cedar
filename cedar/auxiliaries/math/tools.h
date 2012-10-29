@@ -99,7 +99,10 @@ namespace cedar
       CEDAR_AUX_LIB_EXPORT void write(cv::Mat matrix);
 
       //!@brief a templated round function
-      template <typename T> T round(T val);
+      template <typename T> inline T round(T val)
+      {
+        return std::floor(val + static_cast<T>(0.5));
+      }
 
       /*!@brief   Limits a number to be in the range [lower, upper].
        *
@@ -309,12 +312,6 @@ namespace cedar
             CEDAR_ASSERT(false);
         }
       }
-
-      /*!@brief      This function convolves a matrix with a given kernel and returns the resulting matrix.
-       * @deprecated This method is deprecated. It will be replaced by cedar::aux::conv::Convolution in the long run.
-       * @todo       Remove this function.
-       */
-      CEDAR_DECLARE_DEPRECATED(cv::Mat convolve(const cv::Mat& matrix, const cv::Mat& kernel));
 
       /*!\brief Same functionality as cvReduce for 2D->1D.
        *

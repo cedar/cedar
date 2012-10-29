@@ -94,6 +94,22 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
   cedar::proc::DataSlotPtr slot = slot_map_iter->second;
   slot_map.erase(slot_map_iter);
 
+  // remove the slot's data from the lock set (if any)
+  if (slot->getData())
+  {
+    cedar::aux::LOCK_TYPE lock_type;
+    switch (role)
+    {
+      case cedar::proc::DataRole::INPUT:
+        lock_type = cedar::aux::LOCK_TYPE_READ;
+        break;
+
+      default:
+        lock_type = cedar::aux::LOCK_TYPE_WRITE;
+    }
+    this->removeLock(slot->getData(), lock_type, this->getLockSetForRole(role));
+  }
+
   std::map<DataRole::Id, SlotList>::iterator list_iter;
   list_iter = this->mDataConnectionsOrder.find(role);
 
@@ -474,11 +490,6 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareOutput(const std::stri
   return slot;
 }
 
-void cedar::proc::Connectable::removeLock(cedar::aux::ConstDataPtr data, cedar::aux::LOCK_TYPE lockType)
-{
-  this->cedar::aux::Lockable::removeLock(&data->getLock(), lockType);
-}
-
 cedar::proc::DataSlotPtr cedar::proc::Connectable::declareInput(const std::string& name, bool mandatory)
 {
   cedar::proc::DataSlotPtr slot = this->declareData(DataRole::INPUT, name, mandatory);
@@ -490,7 +501,8 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareInput(const std::strin
       &cedar::proc::Connectable::removeLock,
       this,
       _1,
-      cedar::aux::LOCK_TYPE_READ
+      cedar::aux::LOCK_TYPE_READ,
+      this->getLockSetForRole(DataRole::INPUT)
     )
   );
 
@@ -639,6 +651,16 @@ cedar::proc::ConstOwnedDataPtr cedar::proc::Connectable::getOutputSlot(const std
          (
            this->getSlot(cedar::proc::DataRole::OUTPUT, name)
          );
+}
+
+void cedar::proc::Connectable::removeLock
+     (
+       cedar::aux::ConstDataPtr data,
+       cedar::aux::LOCK_TYPE lockType,
+       LockSetHandle lockSet
+     )
+{
+  this->cedar::aux::Lockable::removeLock(&data->getLock(), lockType, lockSet);
 }
 
 void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data)

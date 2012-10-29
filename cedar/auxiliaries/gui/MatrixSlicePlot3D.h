@@ -80,7 +80,7 @@ public:
    *             throws.
    * @param title title of the plot window
    */
-  void plot(cedar::aux::DataPtr data, const std::string& title);
+  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
 
   /*!@brief Updates the plot periodically.
    */
@@ -122,7 +122,7 @@ private:
   QLabel* mpImageDisplay;
 
   //! Data displayed by the plot.
-  cedar::aux::MatDataPtr mData;
+  cedar::aux::ConstMatDataPtr mData;
 
   //! Converted image.
   QImage mImage;

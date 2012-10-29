@@ -99,7 +99,8 @@ namespace cedar
 
 /*!@brief Matrix plot that can display 1D matrices (i.e. vectors).
  *
- * @todo Write more detailed description of the class here.
+ *        This plot is capable of displaying any matrix data with a dimensionality of one. It displays the data as a
+ *        line, assuming the indices of the matrix as the x axis.
  */
 class cedar::aux::gui::LinePlot : public cedar::aux::gui::MultiPlotInterface
 {
@@ -133,7 +134,7 @@ private:
     void buildArrays(unsigned int new_size);
 
     //!@brief the displayed data
-    cedar::aux::MatDataPtr mMatData;
+    cedar::aux::ConstMatDataPtr mMatData;
     //!@brief a curve inside the plot
     QwtPlotCurve *mpCurve;
     //!@brief the x values of the plot
@@ -154,7 +155,7 @@ public:
   LinePlot(QWidget *pParent = NULL);
 
   //!@brief Constructor expecting a DataPtr.
-  LinePlot(cedar::aux::DataPtr matData, const std::string& title, QWidget *pParent = NULL);
+  LinePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
 
   //!@brief Destructor
   ~LinePlot();
@@ -164,7 +165,8 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief display data
-  void plot(cedar::aux::DataPtr matData, const std::string& title);
+  void plot(cedar::aux::ConstDataPtr matData, const std::string& title);
+
   //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
 
@@ -186,6 +188,7 @@ public:
   cedar::aux::math::Limits<double> getXLimits() const;
 
 signals:
+  //!@brief Signals the worker thread to convert the data to the plot's internal format.
   void convert();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -202,7 +205,7 @@ private:
   //!@brief initialize
   void init();
 
-  void doAppend(cedar::aux::DataPtr data, const std::string& title);
+  void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
 
   //!@brief Applies a plot style to a given curve.
   static void applyStyle(size_t lineId, QwtPlotCurve *pCurve);

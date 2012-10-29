@@ -244,7 +244,7 @@ framework.
 The connect calls used for wiring things up stay the same and complete our main method:
 @code
   network->connectSlots("gauss1.Gauss input", "sum.operand1");
-  network->connectSlots("gauss1.Gauss input", "sum.operand2");
+  network->connectSlots("gauss2.Gauss input", "sum.operand2");
   
   return 0;
 }

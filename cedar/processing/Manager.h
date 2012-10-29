@@ -95,6 +95,9 @@ public:
   //!@brief Loads the declarations from a plugin declaration.
   void load(cedar::proc::PluginDeclarationPtr declaration);
 
+  //!@brief Loads the default plugins specified in cedar's configuration file.
+  void loadDefaultPlugins();
+
   //!@brief start all registered threads
   void startThreads();
 

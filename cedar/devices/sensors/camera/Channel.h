@@ -61,6 +61,7 @@
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
+#include <boost/enable_shared_from_this.hpp>
 
 
 /*! @struct Channel
@@ -70,7 +71,7 @@ class cedar::dev::sensors::camera::Channel
 :
 public QObject,
 public cedar::dev::sensors::visual::GrabberChannel
-
+//public boost::enable_shared_from_this<cedar::dev::sensors::camera::Channel>
 {
 
   Q_OBJECT
@@ -156,7 +157,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void hideFwVideoModes();
-
+  void createBackend();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -172,6 +173,12 @@ protected:
    *   not the VideoCapture class
    */
   QReadWriteLock* mpVideoCaptureLock;
+
+  /*! The istance of the used backend
+   *
+   *  Only used until all parameters applied and the grabbing cv::VideoCapture object is created
+   */
+  cedar::dev::sensors::camera::DevicePtr mpBackend;
 
 
 private:

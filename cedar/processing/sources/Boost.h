@@ -85,6 +85,12 @@ public:
     return this->_mActive->getValue();
   }
 
+  //!@brief Sets whether the boost is active.
+  inline void setActive(bool active)
+  {
+    this->_mActive->setValue(active);
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

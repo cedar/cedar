@@ -79,7 +79,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief plot data
-  void plot(cedar::aux::DataPtr data, const std::string& title);
+  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
 
   //!@brief check if given data can be added to a plot
   bool canAppend(cedar::aux::ConstDataPtr data) const;
@@ -98,7 +98,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void doAppend(cedar::aux::DataPtr data, const std::string& title);
+  void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -107,7 +107,7 @@ protected:
   // none yet
 private:
   //!@brief the displayed data
-  cedar::aux::DataPtr mData;
+  cedar::aux::ConstDataPtr mData;
 
   //!@brief The title of the data being displayed.
   std::string mTitle;

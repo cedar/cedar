@@ -218,7 +218,7 @@ public:
    *       In the mono case you do not need to supply this value. Default is 0.<br>
    *       In the stereo case it may be 0 or 1.
    */
-  std::string& getSourceInfo(unsigned int channel=0);
+  std::string getSourceInfo(unsigned int channel=0);
 
   //------------------------------------------------------------------------
   // Thread related methods
@@ -630,6 +630,8 @@ protected:
     ///! @brief Flag which indicates if the capture devices of all channels are correctly created or not
     bool mCaptureDeviceCreated;
 
+    //! Flag, that determins if grabbing is on either via the LoopedThread or via the LoopedTrigger from the gui
+    bool mIsGrabbing;
 
     /*! @brief Read/write lock
      *

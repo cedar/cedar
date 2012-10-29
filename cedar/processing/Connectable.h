@@ -381,7 +381,7 @@ private:
 
   /*!@brief Removed the lock from this cedar::aux::Lockable.
    */
-  void removeLock(cedar::aux::ConstDataPtr data, cedar::aux::LOCK_TYPE lockType);
+  void removeLock(cedar::aux::ConstDataPtr data, cedar::aux::LOCK_TYPE lockType, LockSetHandle lockSet);
 
   //!@brief Returns the map of data slots for a given role (the non-const version of getDataSlots(DataRole::Id role)).
   cedar::proc::Connectable::SlotMap& getSlotMap(DataRole::Id role);

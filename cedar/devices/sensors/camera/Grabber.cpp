@@ -15,7 +15,7 @@
     License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
-    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+    along with cedar. If not, see <http:// www.gnu.org/licenses/>.
 
 ========================================================================================================================
 
@@ -55,7 +55,7 @@
 
 // SYSTEM INCLUDES
 #include <boost/lexical_cast.hpp>
-#include <boost/math/special_functions/round.hpp> //rounding from double to int in cv::VideoCapture get and set methods
+#include <boost/math/special_functions/round.hpp> // rounding from double to int in cv::VideoCapture get and set methods
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -68,11 +68,11 @@ namespace
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-//constructors and destructor
+// constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------
-//Constructor for single-file grabber
+// Constructor for single-file grabber
 cedar::dev::sensors::camera::Grabber::Grabber
 (
   unsigned int cameraId,
@@ -94,7 +94,7 @@ cedar::dev::sensors::visual::Grabber
 }
 
 //----------------------------------------------------------------------------------------------------
-//Constructor for stereo-file grabber
+// Constructor for stereo-file grabber
 cedar::dev::sensors::camera::Grabber::Grabber
 (
   unsigned int cameraId0,
@@ -125,11 +125,18 @@ void cedar::dev::sensors::camera::Grabber::init()
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->connectSignals();
-  //watch if channel added to ObjectParameterList
+  // watch if channel added to ObjectParameterList
   _mChannels->connectToObjectAddedSignal
               (
                 boost::bind(&cedar::dev::sensors::camera::Grabber::channelAdded,this,_1)
               );
+
+  // enable/disable settings like byGuid or so
+  for (unsigned int channel=0; channel<_mChannels->size(); ++channel)
+  {
+    getCameraChannel(channel)->setBackendType(getCameraChannel(channel)->_mpBackendType->getValue());
+  }
+
 }
 
 
@@ -195,23 +202,25 @@ void cedar::dev::sensors::camera::Grabber::cameraChanged()
   }
   else
   {
-    //otherwise only update visible fields
+    // otherwise only update visible fields
     unsigned int num_cams = getNumCams();
     for (unsigned int channel = 0; channel < num_cams; ++channel)
     {
+//      std::cout << "set Backendtype to "
+//        << cedar::dev::sensors::camera::BackendType::type().get(getCameraChannel(channel)->_mpBackendType->getValue()).prettyString() << std::endl;
       getCameraChannel(channel)->setBackendType(getCameraChannel(channel)->_mpBackendType->getValue());
     }
   }
 
 }
 //----------------------------------------------------------------------------------------------------------------------
-//methods
+// methods
 //----------------------------------------------------------------------------------------------------------------------
 
 
 void cedar::dev::sensors::camera::Grabber::onCloseGrabber()
 {
-  //close all captures
+  // close all captures
   unsigned int num_cams = getNumCams();
   for (unsigned int channel = 0; channel < num_cams; ++channel)
   {
@@ -259,53 +268,17 @@ bool cedar::dev::sensors::camera::Grabber::onCreateGrabber()
     bool all_devices_created = true;
     for (unsigned int channel = 0; channel < num_cams; ++channel)
     {
-      bool device_created = true;
-
-      switch ( (getCameraChannel(channel)->_mpBackendType->getValue()).id() )
-      {
-
-#ifdef CEDAR_USE_LIB_DC1394
-        case cedar::dev::sensors::camera::BackendType::DC1394 :
-        {
-          cedar::dev::sensors::camera::DeviceDc1394Ptr dc1394_device
-                                                             (
-                                                               new cedar::dev::sensors::camera::DeviceDc1394
-                                                                   (
-                                                                     this,
-                                                                     getCameraChannel(channel)
-                                                                   )
-                                                             );
-          device_created = dc1394_device->init();
-          break;
-        }
-#endif
-
-#ifdef CEDAR_USE_VIDEO_FOR_LINUX
-        case cedar::dev::sensors::camera::BackendType::VFL :
-#endif // CEDAR_USE_VIDEO_FOR_LINUX
-
-        case cedar::dev::sensors::camera::BackendType::AUTO :
-        case cedar::dev::sensors::camera::BackendType::CVCAPTURE :
-
-
-        default:
-        {
-          cedar::dev::sensors::camera::DeviceCvVideoCapturePtr cv_device
-                                                                     (
-                                                                       new cedar::dev::sensors::camera::DeviceCvVideoCapture
-                                                                       (
-                                                                        this,
-                                                                        getCameraChannel(channel)
-                                                                       )
-                                                                     );
-          device_created = cv_device->init();
-        }
-      } // switch on backend
+      getCameraChannel(channel)->createBackend();
+      bool device_created = getCameraChannel(channel)->mpBackend->init();
 
       if (device_created)
       {
         setChannelInfo(channel);
       }
+
+      // Backend device not longer used. Channel::mVideoCapture does the job
+      getCameraChannel(channel)->mpBackend.reset();
+
       all_devices_created = all_devices_created && device_created;
     } // for every channel
 
@@ -417,7 +390,7 @@ std::vector<std::string> cedar::dev::sensors::camera::Grabber::getAllProperties(
   }
 
 
-  //write out all properties as set in our structure as well as the values directly read from cam
+  // write out all properties as set in our structure as well as the values directly read from cam
   std::vector<std::string> properties;
   properties.push_back("All properties of channel " + boost::lexical_cast<std::string>(channel) + ":");
 
@@ -459,14 +432,14 @@ bool cedar::dev::sensors::camera::Grabber::onGrab()
   int result = true;
   unsigned int num_cams = getNumCams();
 
-  //grab and retrieve
+  // grab and retrieve
    for(unsigned int channel = 0; channel < num_cams; ++channel)
    {
 
      getCameraChannel(channel)->mpVideoCaptureLock->lockForWrite();
      result = getCameraChannel(channel)->mVideoCapture.read(getImageMat(channel)) & result;
 
-     //check if conversion from bayer-pattern to cv::Mat BGR format is needed
+     // check if conversion from bayer-pattern to cv::Mat BGR format is needed
      cedar::dev::sensors::camera::Decoding::Id debayer_fiter;
      debayer_fiter = this->getCameraChannel(channel)->_mpDecodeFilter->getValue();
 
@@ -479,10 +452,10 @@ bool cedar::dev::sensors::camera::Grabber::onGrab()
 
    }
 
-  //OpenCV documentation:
-  //for better synchronizing between the cameras,
-  //first grab internally in camera
-  //lock for concurrent access in the grabber-thread and in the get/set properties
+  // OpenCV documentation:
+  // for better synchronizing between the cameras,
+  // first grab internally in camera
+  // lock for concurrent access in the grabber-thread and in the get/set properties
 
 //  for(unsigned int channel = 0; channel < num_cams; ++channel)
 //  {
@@ -491,7 +464,7 @@ bool cedar::dev::sensors::camera::Grabber::onGrab()
 //    getCameraChannel(channel)->mpVideoCaptureLock->unlock();
 //  }
 //
-//  //and then retrieve the frames
+//  // and then retrieve the frames
 //  if (result)
 //  {
 //    for(unsigned int channel = 0; channel < num_cams; ++channel)
@@ -522,7 +495,7 @@ void cedar::dev::sensors::camera::Grabber::setChannelInfo(unsigned int channel)
     ss << "Bus-ID: ";
   }
   ss << getCameraChannel(channel)->getCameraId()
-     << "; Mode: " << VideoMode::type().get(this->getCameraVideoMode(0)).prettyString();
+     << "; Mode: " << VideoMode::type().get(this->getCameraVideoMode(channel)).prettyString();
 
   setChannelInfoString(channel, ss.str());
 }
@@ -536,13 +509,13 @@ void cedar::dev::sensors::camera::Grabber::onCleanUp()
                                              "cedar::dev::sensors::camera::Grabber::onCleanUp()"
                                            );
 
-  //close all captures
+  // close all captures
   this->onCloseGrabber();
 //  unsigned int num_cams = getNumCams();
 //  for (unsigned int channel = 0; channel < num_cams; channel++)
 //  {
-//    //is done in the onClose() function
-//    //getCameraChannel(channel)->mVideoCapture.release();
+//    // is done in the onClose() function
+//    // getCameraChannel(channel)->mVideoCapture.release();
 //  }
 
 }

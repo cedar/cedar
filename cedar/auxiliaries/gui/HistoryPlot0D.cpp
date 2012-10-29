@@ -83,7 +83,7 @@ mpCurrentPlotWidget(NULL)
   this->init();
 }
 
-cedar::aux::gui::HistoryPlot0D::HistoryPlot0D(cedar::aux::DataPtr data, const std::string& title, QWidget *pParent)
+cedar::aux::gui::HistoryPlot0D::HistoryPlot0D(cedar::aux::ConstDataPtr data, const std::string& title, QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
 mpCurrentPlotWidget(NULL)
@@ -253,7 +253,7 @@ void cedar::aux::gui::HistoryPlot0D::applyStyle(size_t lineId, QwtPlotCurve *pCu
   pCurve->setPen(pen);
 }
 
-void cedar::aux::gui::HistoryPlot0D::plot(cedar::aux::DataPtr data, const std::string& title)
+void cedar::aux::gui::HistoryPlot0D::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   this->mCurves.clear();
   this->doAppend(data, title);
@@ -278,7 +278,7 @@ double cedar::aux::gui::HistoryPlot0D::getDataValue(size_t index)
   {
     cv::Mat matrix = this->mCurves[index]->mMatData->getData();
     //!@todo This check if the data still has the correct format should be somewhere else (probably)
-    if (cedar::aux::math::getDimensionalityOf(matrix) != 0) // plot is no longer capable of displaying the data
+    if (cedar::aux::math::getDimensionalityOf(matrix) != 0 || matrix.empty()) // plot is no longer capable of displaying the data
     {
       this->mCurves[index]->mData->unlock();
       emit dataChanged();
@@ -291,11 +291,11 @@ double cedar::aux::gui::HistoryPlot0D::getDataValue(size_t index)
   return val;
 }
 
-void cedar::aux::gui::HistoryPlot0D::CurveInfo::setData(cedar::aux::DataPtr data)
+void cedar::aux::gui::HistoryPlot0D::CurveInfo::setData(cedar::aux::ConstDataPtr data)
 {
   this->mData = data;
-  this->mDoubleData = boost::shared_dynamic_cast<cedar::aux::DoubleData>(data);
-  this->mMatData = boost::shared_dynamic_cast<cedar::aux::MatData>(data);
+  this->mDoubleData = boost::shared_dynamic_cast<cedar::aux::ConstDoubleData>(data);
+  this->mMatData = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data);
 
   if (!this->mDoubleData && !this->mMatData)
   {
@@ -308,7 +308,7 @@ void cedar::aux::gui::HistoryPlot0D::CurveInfo::setData(cedar::aux::DataPtr data
   }
 }
 
-void cedar::aux::gui::HistoryPlot0D::doAppend(cedar::aux::DataPtr data, const std::string& title)
+void cedar::aux::gui::HistoryPlot0D::doAppend(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   CurveInfoPtr curve(new CurveInfo());
   this->mCurves.push_back(curve);
@@ -324,6 +324,7 @@ void cedar::aux::gui::HistoryPlot0D::doAppend(cedar::aux::DataPtr data, const st
   curve->mYValues.assign(this->mpXValues.size(), val);
 }
 
+//!@cond SKIPPED_DOCUMENTATION
 void cedar::aux::gui::detail::HistoryPlot0DWorker::convert()
 {
   //!@todo: Use actual time measurements here
@@ -360,6 +361,7 @@ void cedar::aux::gui::detail::HistoryPlot0DWorker::convert()
 
   emit done();
 }
+//!@endcond
 
 void cedar::aux::gui::HistoryPlot0D::conversionDone()
 {

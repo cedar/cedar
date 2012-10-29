@@ -76,7 +76,7 @@ mpLock(new QReadWriteLock())
   this->init();
 }
 
-cedar::aux::gui::LinePlot::LinePlot(cedar::aux::DataPtr matData, const std::string& title, QWidget *pParent)
+cedar::aux::gui::LinePlot::LinePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
 mpLock(new QReadWriteLock())
@@ -184,7 +184,7 @@ bool cedar::aux::gui::LinePlot::canAppend(cedar::aux::ConstDataPtr data) const
   return true;
 }
 
-void cedar::aux::gui::LinePlot::doAppend(cedar::aux::DataPtr data, const std::string& title)
+void cedar::aux::gui::LinePlot::doAppend(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   PlotSeriesPtr plot_series(new PlotSeries());
 
@@ -193,7 +193,7 @@ void cedar::aux::gui::LinePlot::doAppend(cedar::aux::DataPtr data, const std::st
   mpLock->lockForWrite();
   mPlotSeriesVector.push_back(plot_series);
 
-  plot_series->mMatData = boost::shared_dynamic_cast<cedar::aux::MatData>(data);
+  plot_series->mMatData = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data);
 
 
   if (!plot_series->mMatData)
@@ -202,11 +202,14 @@ void cedar::aux::gui::LinePlot::doAppend(cedar::aux::DataPtr data, const std::st
                 "Could not cast to cedar::aux::MatData in cedar::aux::gui::LinePlot::plot.");
   }
 
+
   plot_series->mpCurve = new QwtPlotCurve(title.c_str());
   applyStyle(line_id, plot_series->mpCurve);
 
   data->lockForRead();
   const cv::Mat& mat = plot_series->mMatData->getData();
+
+  //!@todo This throws an exception when null data (or data of other dimensionality than 1) is passed.
   size_t num = cedar::aux::math::get1DMatrixSize(mat);
   data->unlock();
 
@@ -243,7 +246,7 @@ void cedar::aux::gui::LinePlot::clearMarkers()
   this->mpPlot->detachItems(QwtPlotMarker::Rtti_PlotMarker, true);
 }
 
-void cedar::aux::gui::LinePlot::plot(cedar::aux::DataPtr data, const std::string& title)
+void cedar::aux::gui::LinePlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   mpLock->lockForWrite();
   mPlotSeriesVector.clear();
@@ -356,6 +359,7 @@ void cedar::aux::gui::LinePlot::PlotSeries::buildArrays(unsigned int new_size)
   }
 }
 
+//!@cond SKIPPED_DOCUMENTATION
 void cedar::aux::gui::detail::LinePlotWorker::convert()
 {
   QWriteLocker plot_locker(this->mpPlot->mpLock);
@@ -396,6 +400,7 @@ void cedar::aux::gui::detail::LinePlotWorker::convert()
 
   emit done();
 }
+//!@endcond
 
 void cedar::aux::gui::LinePlot::conversionDone()
 {

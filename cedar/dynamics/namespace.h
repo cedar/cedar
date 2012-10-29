@@ -55,19 +55,10 @@ namespace cedar
   /*!@brief Namespace for all dyn classes. */
   namespace dyn
   {
-    //!@brief a template class tailored for use in all dynamics
-    template <typename T> class Activation;
-    //!@brief a specialization for double values
-    typedef Activation<double> DoubleActivation;
-
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_GENERATE_POINTER_TYPES(DoubleActivation);
     CEDAR_DECLARE_DYN_CLASS(Dynamics);
-    CEDAR_DECLARE_DYN_CLASS(SpaceCode);
     CEDAR_DECLARE_DYN_CLASS(NeuralField);
-    CEDAR_DECLARE_DYN_CLASS(MatActivation);
     CEDAR_DECLARE_DYN_CLASS(Preshape);
-    CEDAR_DECLARE_DYN_CLASS(Noise);
     CEDAR_DECLARE_DYN_CLASS(RateMatrixToSpaceCode);
     CEDAR_DECLARE_DYN_CLASS(RateToSpaceCode);
     CEDAR_DECLARE_DYN_CLASS(SpaceToRateCode);

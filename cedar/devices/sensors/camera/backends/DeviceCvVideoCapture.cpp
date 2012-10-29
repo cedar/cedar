@@ -47,11 +47,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::sensors::camera::DeviceCvVideoCapture::DeviceCvVideoCapture
 (
-  cedar::dev::sensors::camera::Grabber* pCameraGrabber,
-  cedar::dev::sensors::camera::ChannelPtr pCameraChannel
+  cedar::dev::sensors::camera::Channel* pCameraChannel
 )
 :
-cedar::dev::sensors::camera::Device::Device(pCameraGrabber,pCameraChannel)
+cedar::dev::sensors::camera::Device::Device(pCameraChannel)
 {
 }
 
@@ -92,7 +91,7 @@ bool cedar::dev::sensors::camera::DeviceCvVideoCapture::createCaptureDevice()
 // 2. step
 void cedar::dev::sensors::camera::DeviceCvVideoCapture::setProperties()
 {
-  std::cout << "get capabilities from camera" << std::endl;
+  //std::cout << "get capabilities from camera" << std::endl;
   int num_properties = cedar::dev::sensors::camera::Property::type().list().size();
   for (int i=0; i<num_properties; i++)
   {
@@ -120,7 +119,7 @@ void cedar::dev::sensors::camera::DeviceCvVideoCapture::applySettingsToCamera()
 {
   //only the video mode could be set in cv::Videocapture backend
 
-  std::cout << "applySettingsToCamera" << std::endl;
+  //std::cout << "applySettingsToCamera" << std::endl;
 
   //get the mode and check if it is set manually
   cedar::dev::sensors::camera::VideoMode::Id video_mode_id = mpCameraChannel->getVideoMode();
@@ -130,13 +129,13 @@ void cedar::dev::sensors::camera::DeviceCvVideoCapture::applySettingsToCamera()
     this->setPropertyToCamera(cedar::dev::sensors::camera::Setting::MODE,value);
   }
 
-  std::cout << "applySettingsToCamera finished" << std::endl;
+  //std::cout << "applySettingsToCamera finished" << std::endl;
 }
 
 // 4. step
 void cedar::dev::sensors::camera::DeviceCvVideoCapture::applyStateToCamera()
 {
-  std::cout << "applyStateToCamera" << std::endl;
+//  std::cout << "applyStateToCamera" << std::endl;
   int num_properties = cedar::dev::sensors::camera::Property::type().list().size();
   for (int i=0; i<num_properties; i++)
   {
@@ -168,5 +167,5 @@ void cedar::dev::sensors::camera::DeviceCvVideoCapture::applyStateToCamera()
       this->mpCameraChannel->mpProperties->setDefaultValue(prop_id,set_value);
     }
   }
-  std::cout << "applyStateToCamera finished" << std::endl;
+//  std::cout << "applyStateToCamera finished" << std::endl;
 }

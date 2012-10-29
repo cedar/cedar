@@ -44,7 +44,6 @@ cedar_add_library(cedardyn
                   MOC_HEADERS
                   fields/NeuralField.h
                   fields/Preshape.h
-                  sources/Noise.h
                   steps/RateMatrixToSpaceCode.h
                   steps/RateToSpaceCode.h
                   steps/SpaceToRateCode.h

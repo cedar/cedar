@@ -38,8 +38,8 @@
 #define CEDAR_DYN_NOISE_H
 
 // CEDAR INCLUDES
-#include "cedar/dynamics/namespace.h"
-#include "cedar/dynamics/Dynamics.h"
+#include "cedar/processing/sources/namespace.h"
+#include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
@@ -53,7 +53,7 @@
  * @todo More descriptions
  * @todo Does this take the sqrt(dt) problem into account? (may need to divide the output by dt/sqrt(dt))
  */
-class cedar::dyn::Noise : public cedar::dyn::Dynamics
+class cedar::proc::sources::Noise : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -83,14 +83,9 @@ public slots:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief compute the euler step
-   *
-   * This is the equation:
-   * \f[
-   *
-   * \f]
+  /*!@brief computes new random values
    */
-  void eulerStep(const cedar::unit::Time& time);
+  void compute(const cedar::proc::Arguments&);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -124,6 +119,6 @@ protected:
 private:
   // none yet
 
-}; // class cedar::dyn::Noise
+}; // class cedar::proc::Noise
 
 #endif // CEDAR_DYN_NOISE_H

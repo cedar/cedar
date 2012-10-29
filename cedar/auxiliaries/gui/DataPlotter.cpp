@@ -82,7 +82,7 @@ bool cedar::aux::gui::DataPlotter::canAppend(cedar::aux::ConstDataPtr data) cons
   return false;
 }
 
-void cedar::aux::gui::DataPlotter::doAppend(cedar::aux::DataPtr data, const std::string& title)
+void cedar::aux::gui::DataPlotter::doAppend(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   if (this->mpCurrentPlot == NULL)
   {
@@ -98,7 +98,7 @@ void cedar::aux::gui::DataPlotter::doAppend(cedar::aux::DataPtr data, const std:
   }
 }
 
-void cedar::aux::gui::DataPlotter::plot(cedar::aux::DataPtr data, const std::string& title)
+void cedar::aux::gui::DataPlotter::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   this->mData = data;
   this->mTitle = title;

@@ -97,7 +97,8 @@ namespace cedar
 
 /*!@brief Matrix plot that can display 2D matrices (i.e. vectors).
  *
- * @todo Write more detailed description of the class here.
+ *        Matrices displayed by this plot are plotted as a three-dimensional surface, where the x- and y-coordinates are
+ *        assumed to be the indices of the 2d matrix while the z-coordinate is the value stored within the matrix.
  */
 class cedar::aux::gui::SurfacePlot : public PlotInterface
 {
@@ -147,7 +148,7 @@ public:
   SurfacePlot(QWidget *pParent = NULL);
 
   //!@brief Constructor expecting a DataPtr.
-  SurfacePlot(cedar::aux::DataPtr matData, const std::string& title, QWidget *pParent = NULL);
+  SurfacePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
 
   //!@brief Destructor
   ~SurfacePlot();
@@ -157,13 +158,14 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief display data
-  void plot(cedar::aux::DataPtr matData, const std::string& title);
+  void plot(cedar::aux::ConstDataPtr matData, const std::string& title);
   //!@brief show or hide the plot grid
   void showGrid(bool show);
   //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
 
 signals:
+  //!@brief Signals the worker thread to convert the data to the plot's internal format.
   void convert();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -202,7 +204,7 @@ protected:
   // none yet
 private:
   //! the displayed MatData
-  cedar::aux::MatDataPtr mMatData;
+  cedar::aux::ConstMatDataPtr mMatData;
 
   //! flag if plot grid should be displayed
   bool mShowGridLines;

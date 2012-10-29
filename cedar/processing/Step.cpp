@@ -281,11 +281,13 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::T
     this->mpArgumentsLock->lockForWrite();
     this->mNextArguments.reset();
     this->mpArgumentsLock->unlock();
+    //!@todo This may happen a lot when running multiple looped triggers -- investigate
+    /*
     cedar::aux::LogSingleton::getInstance()->warning
     (
       "Step \"" + this->getName() + " did not succeed in setting arguments, skipping onTrigger().",
       "cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr, cedar::proc::TriggerPtr)"
-    );
+    );*/
     return;
   }
 

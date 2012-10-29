@@ -117,6 +117,11 @@ cedar::proc::sources::Picture::~Picture()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+void cedar::proc::sources::Picture::setSourceFileName(const std::string& imagePath)
+{
+  this->getPictureGrabber()->setSourceFile(imagePath);
+}
+
 void cedar::proc::sources::Picture::reset()
 {
   // we have to disconnect the slot here to avoid a deadlock

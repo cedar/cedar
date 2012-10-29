@@ -75,13 +75,13 @@ mDesiredColumns(0)
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::aux::gui::MatrixSlicePlot3D::plot(cedar::aux::DataPtr data, const std::string& /* title */)
+void cedar::aux::gui::MatrixSlicePlot3D::plot(cedar::aux::ConstDataPtr data, const std::string& /* title */)
 {
   if (mTimerId != 0)
     this->killTimer(mTimerId);
 
 
-  this->mData = boost::dynamic_pointer_cast<cedar::aux::MatData>(data);
+  this->mData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
   if (!this->mData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
@@ -117,7 +117,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::timerEvent(QTimerEvent* /*pEvent*/)
     return;
   }
 
-  cv::Mat& mat = this->mData->getData();
+  const cv::Mat& mat = this->mData->getData();
 
   this->mData->lockForRead();
   if (mat.empty())
@@ -280,7 +280,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::keyPressEvent(QKeyEvent* pEvent)
   {
     case Qt::Key_Plus:
     {
-      cv::Mat& mat = this->mData->getData();
+      const cv::Mat& mat = this->mData->getData();
       if (mDesiredColumns < static_cast<unsigned int>(mat.size[2]))
       {
         this->mDesiredColumns++;

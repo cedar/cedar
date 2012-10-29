@@ -50,6 +50,8 @@
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
+#include <QReadLocker>
+#include <QWriteLocker>
 #include <QToolTip>
 #include <QMouseEvent>
 #include <QThread>
@@ -87,7 +89,8 @@ cedar::aux::gui::ImagePlot::ImagePlot(QWidget *pParent)
 :
 cedar::aux::gui::PlotInterface(pParent),
 mTimerId(0),
-mDataType(DATA_TYPE_UNKNOWN)
+mDataType(DATA_TYPE_UNKNOWN),
+mConverting(false)
 {
   QVBoxLayout *p_layout = new QVBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
@@ -204,9 +207,10 @@ void cedar::aux::gui::ImagePlot::ImageDisplay::mousePressEvent(QMouseEvent * pEv
   QToolTip::showText(pEvent->globalPos(), info_text);
 }
 
+//!@cond SKIPPED_DOCUMENTATION
 void cedar::aux::gui::detail::ImagePlotWorker::convert()
 {
-  cv::Mat& mat = this->mpPlot->mData->getData();
+  const cv::Mat& mat = this->mpPlot->mData->getData();
 
   this->mpPlot->mData->lockForRead();
   if (mat.empty())
@@ -223,7 +227,7 @@ void cedar::aux::gui::detail::ImagePlotWorker::convert()
     case CV_8UC1:
     {
       this->mpPlot->mData->lockForRead();
-      cv::Mat converted = this->mpPlot->threeChannelGrayscale(mat);
+      cv::Mat converted = this->mpPlot->threeChannelGrayscale(this->mpPlot->mData->getData());
       this->mpPlot->mData->unlock();
       CEDAR_DEBUG_ASSERT(converted.type() == CV_8UC3);
       this->mpPlot->imageFromMat(converted);
@@ -233,7 +237,7 @@ void cedar::aux::gui::detail::ImagePlotWorker::convert()
     case CV_8UC3:
     {
       this->mpPlot->mData->lockForRead();
-      this->mpPlot->imageFromMat(mat);
+      this->mpPlot->imageFromMat(this->mpPlot->mData->getData());
       this->mpPlot->mData->unlock();
       break;
     }
@@ -270,20 +274,31 @@ void cedar::aux::gui::detail::ImagePlotWorker::convert()
 
   emit done();
 }
+//!@endcond
 
 void cedar::aux::gui::ImagePlot::conversionDone()
 {
+  QReadLocker lock(&this->mImageLock);
   this->mpImageDisplay->setPixmap(QPixmap::fromImage(this->mImage));
+  lock.unlock();
+
   this->resizePixmap();
+  mConverting = false;
 }
 
 void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
 {
-  if (!this->isVisible() || this->mDataType == DATA_TYPE_UNKNOWN)
+  if
+  (
+    !this->isVisible() // plot widget is not visible -- no need to plot
+    || this->mDataType == DATA_TYPE_UNKNOWN // data type cannot be plotted
+    || mConverting // already converting -- skip this timer event
+  )
   {
     return;
   }
 
+  mConverting = true;
   emit convert();
 }
 
@@ -445,6 +460,7 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
 
 void cedar::aux::gui::ImagePlot::imageFromMat(const cv::Mat& mat)
 {
+  QWriteLocker lock(&this->mImageLock);
   this->mImage = QImage
   (
     mat.data,
@@ -455,14 +471,14 @@ void cedar::aux::gui::ImagePlot::imageFromMat(const cv::Mat& mat)
   ).rgbSwapped();
 }
 
-void cedar::aux::gui::ImagePlot::plot(cedar::aux::DataPtr data, const std::string& /* title */)
+void cedar::aux::gui::ImagePlot::plot(cedar::aux::ConstDataPtr data, const std::string& /* title */)
 {
   if (mTimerId != 0)
     this->killTimer(mTimerId);
 
   mDataType = DATA_TYPE_MAT;
 
-  this->mData = boost::dynamic_pointer_cast<cedar::aux::MatData>(data);
+  this->mData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
   this->mpImageDisplay->mData = this->mData;
   if (!this->mData)
   {
@@ -498,6 +514,7 @@ void cedar::aux::gui::ImagePlot::resizeEvent(QResizeEvent * /*pEvent*/)
 
 void cedar::aux::gui::ImagePlot::resizePixmap()
 {
+  QReadLocker lock(&this->mImageLock);
   QSize scaled_size = this->mImage.size();
   scaled_size.scale(this->mpImageDisplay->size(), Qt::KeepAspectRatio);
   if ( (!this->mpImageDisplay->pixmap()

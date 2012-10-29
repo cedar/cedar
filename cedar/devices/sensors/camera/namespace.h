@@ -63,69 +63,75 @@ namespace cedar
       //! \brief Namespace for camera devices
       namespace camera
       {
+        //!@cond SKIPPED_DOCUMENTATION
+        CEDAR_DECLARE_DEV_CLASS(Grabber);
+        //-----------------------------------------------------------------------------------------------
+        // camera grabber helper classes
+        //-----------------------------------------------------------------------------------------------
 
-      CEDAR_DECLARE_DEV_CLASS(Grabber);
-      //-----------------------------------------------------------------------------------------------
-      // camera grabber helper classes
-      //-----------------------------------------------------------------------------------------------
+        // backend implementation
+        CEDAR_DECLARE_DEV_CLASS(Device);
+        CEDAR_DECLARE_DEV_CLASS(DeviceCvVideoCapture);
 
-      // backend implementation
-      CEDAR_DECLARE_DEV_CLASS(Device);
-      CEDAR_DECLARE_DEV_CLASS(DeviceCvVideoCapture);
+  #ifdef CEDAR_USE_VIDEO_FOR_LINUX
+        CEDAR_DECLARE_DEV_CLASS(CameraDeviceVfl);
+  #endif // CEDAR_USE_VIDEO_FOR_LINUX
 
-#ifdef CEDAR_USE_VIDEO_FOR_LINUX
-      CEDAR_DECLARE_DEV_CLASS(CameraDeviceVfl);
-#endif // CEDAR_USE_VIDEO_FOR_LINUX
+  #ifdef CEDAR_USE_LIB_DC1394
+        CEDAR_DECLARE_DEV_CLASS(DeviceDc1394);
+        CEDAR_DECLARE_DEV_CLASS(LibDcBase);
+  #endif
+
+        // enum classes for camera
+        CEDAR_DECLARE_DEV_CLASS(BackendType);
+        CEDAR_DECLARE_DEV_CLASS(Decoding);
+        CEDAR_DECLARE_DEV_CLASS(FrameRate);
+        CEDAR_DECLARE_DEV_CLASS(Property);
+        CEDAR_DECLARE_DEV_CLASS(VideoMode);
+        CEDAR_DECLARE_DEV_CLASS(Setting);
+        CEDAR_DECLARE_DEV_CLASS(BackendType);
+        CEDAR_DECLARE_DEV_CLASS(IsoSpeed);
+        CEDAR_DECLARE_DEV_CLASS(DebayerPattern);
+
+        // properties
+
+        // all properties from one channel
+        CEDAR_DECLARE_DEV_CLASS(Properties);
+
+        // one property with name, enum-parameter for mode and double-parameter for value
+        CEDAR_DECLARE_DEV_CLASS(CamProperty);
+        CEDAR_DECLARE_DEV_CLASS(PropertyMode);
+
+        // settings
+
+        // all settings from one channel
+        CEDAR_DECLARE_DEV_CLASS(Settings);
+        CEDAR_DECLARE_DEV_CLASS(Capabilities);
+        CEDAR_DECLARE_DEV_CLASS(State);
+
+        // camera settings
+        CEDAR_DECLARE_DEV_CLASS(CamSetting);
+
+        struct Channel;
+        CEDAR_GENERATE_POINTER_TYPES(Channel);
+
+        typedef std::map<unsigned int, cedar::dev::sensors::camera::CamPropertyPtr> PropertyMap;
+
+        //-----------------------------------------------------------------------------------------------
+        // exceptions
+        //-----------------------------------------------------------------------------------------------
 
 #ifdef CEDAR_USE_LIB_DC1394
-      CEDAR_DECLARE_DEV_CLASS(DeviceDc1394);
-      CEDAR_DECLARE_DEV_CLASS(LibDcBase);
-#endif
 
-      // enum classes for camera
-      CEDAR_DECLARE_DEV_CLASS(BackendType);
-      CEDAR_DECLARE_DEV_CLASS(Decoding);
-      CEDAR_DECLARE_DEV_CLASS(FrameRate);
-      CEDAR_DECLARE_DEV_CLASS(Property);
-      CEDAR_DECLARE_DEV_CLASS(VideoMode);
-      CEDAR_DECLARE_DEV_CLASS(Setting);
-      CEDAR_DECLARE_DEV_CLASS(BackendType);
-      CEDAR_DECLARE_DEV_CLASS(IsoSpeed);
-      CEDAR_DECLARE_DEV_CLASS(DebayerPattern);
+        //!@brief An exception for errors on initialization of the LibDC class
+        class LibDcInitException;
 
-      // properties
+        //!@brief An exception for errors in the LibDc class
+        class LibDcException;
+#endif //CEDAR_USE_LIB_DC1394
 
-      // all properties from one channel
-      CEDAR_DECLARE_DEV_CLASS(Properties);
+        //!@endcond
 
-      // one property with name, enum-parameter for mode and double-parameter for value
-      CEDAR_DECLARE_DEV_CLASS(CamProperty);
-      CEDAR_DECLARE_DEV_CLASS(PropertyMode);
-
-      // settings
-
-      // all settings from one channel
-      CEDAR_DECLARE_DEV_CLASS(Settings);
-      CEDAR_DECLARE_DEV_CLASS(Capabilities);
-      CEDAR_DECLARE_DEV_CLASS(State);
-
-      // camera settings
-      CEDAR_DECLARE_DEV_CLASS(CamSetting);
-
-      struct Channel;
-      CEDAR_GENERATE_POINTER_TYPES(Channel);
-
-      typedef std::map<unsigned int, cedar::dev::sensors::camera::CamPropertyPtr> PropertyMap;
-
-      //-----------------------------------------------------------------------------------------------
-      // exceptions
-      //-----------------------------------------------------------------------------------------------
-
-      //!@brief An exception for errors on initialization of the LibDC class
-      class LibDcInitException;
-
-      //!@brief An exception for errors in the LibDc class
-      class LibDcException;
       }
     }
   }

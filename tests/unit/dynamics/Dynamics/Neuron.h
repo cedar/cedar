@@ -39,7 +39,6 @@
 
 // LOCAL INCLUDES
 #include "cedar/dynamics/Dynamics.h"
-#include "cedar/dynamics/DoubleActivation.h"
 
 // PROJECT INCLUDES
 
@@ -94,8 +93,8 @@ protected:
 private:
   cedar::aux::DoubleParameterPtr mRestingLevel;
   cedar::aux::DoubleParameterPtr mInteractionWeight;
-  cedar::dyn::DoubleActivationPtr mActivation;
-  cedar::dyn::DoubleActivationPtr mOutput;
+  cedar::aux::DoubleDataPtr mActivation;
+  cedar::aux::DoubleDataPtr mOutput;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

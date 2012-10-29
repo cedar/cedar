@@ -343,28 +343,7 @@ void cedar::proc::gui::Ide::restoreSettings()
 
 void cedar::proc::gui::Ide::loadDefaultPlugins()
 {
-  const std::set<std::string>& plugins = cedar::proc::gui::Settings::instance().pluginsToLoad();
-  for (std::set<std::string>::const_iterator iter = plugins.begin(); iter != plugins.end(); ++ iter)
-  {
-    try
-    {
-      cedar::proc::PluginProxyPtr plugin(new cedar::proc::PluginProxy(*iter));
-      cedar::proc::Manager::getInstance().load(plugin);
-      QString message = "Loaded default plugin ";
-      message += iter->c_str();
-      message += ".";
-      this->message(message);
-    }
-    catch (const cedar::aux::ExceptionBase& e)
-    {
-      QString message = "Error loading default plugin ";
-      message += iter->c_str();
-      message += ": ";
-      message += e.exceptionInfo().c_str();
-
-      this->error(message);
-    }
-  }
+  cedar::proc::Manager::getInstance().loadDefaultPlugins();
 }
 
 void cedar::proc::gui::Ide::showLoadPluginDialog()

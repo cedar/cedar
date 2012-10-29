@@ -37,26 +37,27 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
+#ifdef CEDAR_USE_LIB_DC1394
+
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/camera/backends/DeviceDc1394.h"
 #include "cedar/devices/sensors/camera/backends/LibDcBase.h"
-
+#include "cedar/devices/sensors/camera/exceptions.h"
 
 // SYSTEM INCLUDES
 //#include <boost/lexical_cast.hpp>
 
-#ifdef CEDAR_USE_LIB_DC1394
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::sensors::camera::DeviceDc1394::DeviceDc1394
 (
-  cedar::dev::sensors::camera::Grabber* pCameraGrabber,
-  cedar::dev::sensors::camera::ChannelPtr pCameraChannel
+  cedar::dev::sensors::camera::Channel* pCameraChannel
 )
 :
-cedar::dev::sensors::camera::Device::Device(pCameraGrabber,pCameraChannel)
+cedar::dev::sensors::camera::Device::Device(pCameraChannel),
+mpLibDcInterface(new cedar::dev::sensors::camera::LibDcBase)
 {
 }
 
@@ -66,196 +67,32 @@ cedar::dev::sensors::camera::DeviceDc1394::~DeviceDc1394()
 }
 
 
-//  //if create by grabber id, search all cameras and get the device-nr on the bus
-//  if (getCameraChannel(0)->_mByGuid->getValue())
-//  {
-//    //all videocaptures already created, but not opened
-//
-//    // search for the right guid, so open it one by one
-//    unsigned int cam = 0;
-//    unsigned int found_cams=0;
-//    bool all_cams_found = false;
-//    bool no_more_cams = false;
-//
-//    //search all cams, i.e. all bus-ids
-//    cedar::aux::LogSingleton::getInstance()->debugMessage
-//                                            (
-//                                              "Searching for cameras on the bus...",
-//                                              "cedar::dev::sensors::camera::Grabber::onInit()"
-//                                            );
-//
-//    while (! (all_cams_found || no_more_cams))
-//    {
-//      //open one by one
-//      cv::VideoCapture capture(cam);
-//      if (capture.isOpened())
-//      {
-//        unsigned int guid = capture.get((int)CV_CAP_PROP_GUID);
-//
-//        cedar::aux::LogSingleton::getInstance()->debugMessage
-//                                                (
-//                                                  "\tFound at Bus-Id " + boost::lexical_cast<std::string>(cam)
-//                                                    + ": GUID " + boost::lexical_cast<std::string>(guid),
-//                                                  "cedar::dev::sensors::camera::Grabber::onInit()"
-//                                                );
-//
-//        //check if guid of camera is in our guid-vector
-//        for (unsigned int channel = 0; channel < num_cams; ++channel)
-//        {
-//          unsigned int test_guid = getCameraChannel(channel)->_mGuid->getValue();
-//          if (guid == test_guid )
-//          {
-//            //yes: store bus_id and videocapture
-//            getCameraChannel(channel)->_mBusId->setValue(cam);
-//            getCameraChannel(channel)->mVideoCapture = capture;
-//            found_cams++;
-//          }
-//        }
-//
-//        //check if all cams found
-//        if (found_cams == num_cams)
-//        {
-//          all_cams_found = true;
-//          cedar::aux::LogSingleton::getInstance()->debugMessage
-//                                                  (
-//                                                    "All needed cameras found. Stop searching.",
-//                                                    "cedar::dev::sensors::camera::Grabber::onInit()"
-//                                                  );
-//        }
-//      }
-//      else
-//      {
-//        //there are no more cams connected
-//        no_more_cams = true;
-//      }
-//      cam++;
-//    }
-//
-//    if (! all_cams_found)
-//    {
-//      cedar::aux::LogSingleton::getInstance()->error
-//                                               (
-//                                                 this->getName() + "At least ore camera not found!",
-//                                                 "cedar::dev::sensors::camera::Grabber::onInit()"
-//                                               );
-//      return false; //throws an initialization-exception
-//    }
-//  }
-//  else
-//  {
-//  // create by ongoing number
-//    for (unsigned int channel = 0; channel < num_cams; ++channel)
-//    {
-//      //open the camera
-//      cv::VideoCapture capture(getCameraChannel(channel)->_mBusId->getValue());
-//      if (! capture.isOpened())
-//      {
-//        cedar::aux::LogSingleton::getInstance()->error
-//                                                 (
-//                                                   this->getName()
-//                                                     + ": Couldn't open camera (Channel "
-//                                                     + boost::lexical_cast<std::string>(channel) + ")",
-//                                                   "cedar::dev::sensors::camera::Grabber::onInit()"
-//                                                 );
-//        return false; //throws an initialization-exception
-//      }
-//
-//      //store it in our vector
-//      getCameraChannel(channel)->mVideoCapture = capture;
-//    }
-//  }
-//
-//  //now initialize all videocaptures
-//  for (unsigned int channel = 0; channel < num_cams; ++channel)
-//   {
-//
-//    //if grabber created by busId, guid is zero, so read it
-//    if ( !getCameraChannel(0)->_mByGuid->getValue())
-//    {
-//      getCameraChannel(channel)
-//          ->_mGuid->setValue(static_cast<unsigned int>(getCameraChannel(channel)->mVideoCapture.get(CV_CAP_PROP_GUID)));
-//    }
-//
-//    //create and load the camera capabilities
-//    //@todo config:
-//    std::string conf_file_name = "default_cam_capabilities";
-//    //conf_file_name = ConfigurationInterface::getConfigFileName()+"_ch"+boost::lexical_cast<std::string>(channel);
-//
-//    //if capabilities filename match with definition for autogenerated filename, create filename
-//    std::string cap_file_name = "todo";//getCameraChannel(channel)->mCamCapabilitiesFileName;
-//    unsigned int guid = getCameraChannel(channel)->_mGuid->getValue();
-//
-//
-//    //create camera configuration
-//    try
-//    {
-//     /* CameraStateAndConfigPtr cam_conf
-//                              (
-//                                new CameraStateAndConfig
-//                                    (
-//                                      getCameraChannel(channel)->mVideoCapture,
-//                                      getCameraChannel(channel)->pmVideoCaptureLock,
-//                                      channel,
-//                                      conf_file_name,
-//                                      cap_file_name
-//                                    )
-//                              );
-//      getCameraChannel(channel)->mCamStateAndConfig = cam_conf;
-//      */
-//    }
-//    catch (...)
-//    {
-//      return false; //throws an initialization exception
-//    }
-//  }
-//
-//  //Check if initialization should be finished.
-//  for (unsigned int channel = 0; channel < num_cams; ++channel)
-//  {
-//    getCameraChannel(channel)->mVideoCapture >> getCameraChannel(channel)->mImageMat;
-//    if (getCameraChannel(channel)->mImageMat.empty())
-//    {
-//      cedar::aux::LogSingleton::getInstance()->error
-//                                       (
-//                                         this->getName()
-//                                           + ": Couldn't retrieve frame from camera (Channel "
-//                                           + boost::lexical_cast<std::string>(channel) + ")",
-//                                         "cedar::dev::sensors::camera::Grabber::onInit()"
-//                                       );
-//      return false; //throws an initialization-exception
-//    }
-//    setChannelInfo(channel);
-//  }
-//
-//  init_message.clear();
-//  init_message << "Camera opened:" << std::endl;
-//  for (unsigned int i = 0; i < num_cams; ++i)
-//  {
-//    init_message << "Channel " << i << ": GUID: "<< getCameraChannel(i)->_mGuid->getValue() << "\n";
-//  }
-//  cedar::aux::LogSingleton::getInstance()->systemInfo
-//                                           (
-//                                             this->getName() + init_message.str(),
-//                                             "cedar::dev::sensors::camera::Grabber::onInit()"
-//                                           );
-//  //all grabbers are now successfully initialized
-//
-//  //check for largest FPS
-//  double fps = getCameraChannel(0)->mVideoCapture.get(CV_CAP_PROP_FPS);
-//  for (unsigned int i = 1; i < getNumCams(); ++i)
-//  {
-//    double fps_test = getCameraChannel(i)->mVideoCapture.get(CV_CAP_PROP_FPS);
-//    if (fps_test > fps)
-//    {
-//      fps = fps_test;
-//    }
-//  }
-//
-//
-//  //set stepsize for LoopedThread
-//  setFps(fps);
-//
-//  mCaptureDeviceCreated = true;
+void cedar::dev::sensors::camera::DeviceDc1394::initDevice()
+{
+  if (!openLibDcCamera())
+  {
+    //CEDAR_THROW(cedar::dev::sensors::camera::LibDcInitException,"cedar::dev::sensors::camera::DeviceDc1394::initDevice()");
+    return;
+  }
+
+//  std::cout << "DC1394: initDevice. Camera successfully opened through libdc" << std::endl;
+  //set available properties and their values
+
+  getFeaturesFromLibDc();
+  getGrabModesFromLibDc();
+
+//  std::cout << "Set Grabmode to "
+//    << cedar::dev::sensors::camera::VideoMode::type().get(mpCameraChannel->_mpGrabMode->getValue()).prettyString()
+//    << std::endl;
+  getFrameRatesFromLibDc(mpCameraChannel->_mpGrabMode->getValue()); //id?????
+
+
+  //set first available mode
+//  unsigned int set_video_mode_id = 0;
+//  cedar::dev::sensors::camera::VideoMode::Id set_video_mode;
+//  set_video_mode = static_cast<cedar::dev::sensors::camera::VideoMode::Id>(cam_video_modes.modes[set_video_mode_id]);
+//  mpCameraChannel->_mpGrabMode->setValue(set_video_mode);
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -264,150 +101,88 @@ cedar::dev::sensors::camera::DeviceDc1394::~DeviceDc1394()
 //step 1
 bool cedar::dev::sensors::camera::DeviceDc1394::createCaptureDevice()
 {
-
-  unsigned int camera_id = mpCameraChannel->getCameraId();
-  unsigned int bus_id = 0;
-  uint64_t cam_guid = 0;
-
-  // ***************************************
-  // create firewire interface
-  // ***************************************
-  cedar::dev::sensors::camera::LibDcBasePtr p_fw_interface
-    = cedar::dev::sensors::camera::LibDcBasePtr(new cedar::dev::sensors::camera::LibDcBase);
-
-  // ***************************************
-  // get uid and guid from settings and camera
-  // ***************************************
-  if (this->mpCameraChannel->getByGuid())
+  if (mpLibDcInterface)
   {
-
-    //search all cams, i.e. all bus-ids
-    cedar::aux::LogSingleton::getInstance()->debugMessage
-                                            (
-                                              "Searching for camera with GUID "
-                                               + boost::lexical_cast<std::string>(camera_id) + " on the bus...",
-                                              "cedar::dev::sensors::camera::Grabber::onInit()"
-                                            );
-
-    unsigned int cams_on_bus = p_fw_interface->getNumCams();
-
-    if (cams_on_bus < 1)
-    {
-      cedar::aux::LogSingleton::getInstance()->error
-                                               (
-                                                 "No cameras on the firewire bus!",
-                                                 "cedar::dev::sensors::camera::Grabber::onInit()"
-                                               );
-      return false;
-    }
-
-    // ***************************************
-    // search for the right guid, so open it one by one
-    // ***************************************
-    bool cam_found = false;
-
-    for (unsigned int cam=0; cam < cams_on_bus; ++cam)
-    {
-      //only lower 32bit of guid
-      cam_guid = p_fw_interface->getCamGuid(cam);
-      unsigned int guid = (unsigned int)(cam_guid&0x00000000FFFFFFFF);
-
-      cedar::aux::LogSingleton::getInstance()->debugMessage
-                                              (
-                                                "Found: at Bus-Id " + boost::lexical_cast<std::string>(cam)
-                                                  + ": GUID " + boost::lexical_cast<std::string>(guid),
-                                                "cedar::dev::sensors::camera::Grabber::onInit()"
-                                              );
-      cam_found = (guid == camera_id);
-      if (cam_found)
-      {
-        bus_id = cam;
-        break;
-      }
-    }
-
-    //test if found
-    if (!cam_found)
-    {
-      cedar::aux::LogSingleton::getInstance()->error
-                                               (
-                                                 "No cameras with GUID "+boost::lexical_cast<std::string>(camera_id)
-                                                 +" not found on the firewire bus!",
-                                                 "cedar::dev::sensors::camera::Grabber::onInit()"
-                                               );
-      return false;
-    }
-
-    //found, the right camera is the camera with the index before
-    //std::cout << "Camera found at Bus-ID: " << bus_id << std::endl;
-
-  } //byGuid
-  else
-  {
-    //by bus-id from settings and guid from camera
-    bus_id = camera_id;
-    cam_guid = p_fw_interface->getCamGuid(camera_id);
+    // cleanup libdc
+    mpLibDcInterface->closeCamera();
+    mpLibDcInterface->cleanUp();
+    mpLibDcInterface.reset();
   }
 
+  //open camera with openCV backend
+  cv::VideoCapture capture(mpCameraChannel->getCameraId());
+  if(capture.isOpened())
+  {
+    mpCameraChannel->mVideoCapture = capture;
+    return true;
+  }
 
-  // ***************************************
-  // open camera with libdc to get the capabilities
-  // ***************************************
-  p_fw_interface->openCamera(cam_guid);
+  return false;
+}
 
-  // ***************************************
-  // get all available modes and enable them in the enum-class, disable all others
-  // ***************************************
 
-  dc1394video_modes_t cam_video_modes = p_fw_interface->getCamVideoModes();
+void cedar::dev::sensors::camera::DeviceDc1394::getGrabModesFromLibDc()
+{
+  dc1394video_modes_t cam_video_modes = mpLibDcInterface->getCamVideoModes();
   int num_modes = cam_video_modes.num;
 //  std::cout << "Camera Video Modes:" << std::endl;
-  //mpCameraChannel->_mpGrabMode->disableAll();
+  mpCameraChannel->_mpGrabMode->disableAll();
   for (int i=0; i<num_modes; i++)
   {
 //    std::cout << " - " << cam_video_modes.modes[i]
 //                       <<" : "
-//                       << p_fw_interface->DC1394VideoModeToString(cam_video_modes.modes[i])
+//                       << mpLibDcInterface->DC1394VideoModeToString(cam_video_modes.modes[i])
 //                       << " VideoMode::prettyString: "
 //                       << cedar::dev::sensors::camera::VideoMode::type().get(cam_video_modes.modes[i]).prettyString()
 //                       << std::endl;
 
+
+   // LibDc constants for the grabmodes are identical to VideoMode::Id
    cedar::dev::sensors::camera::VideoMode::Id mode_id
      = static_cast<cedar::dev::sensors::camera::VideoMode::Id>(cam_video_modes.modes[i]);
    if (mode_id <= cedar::dev::sensors::camera::VideoMode::FW_EXIF)
    {
      mpCameraChannel->_mpGrabMode->enable(mode_id);
-   }
-   else
-   {
-     mpCameraChannel->_mpGrabMode->disable(mode_id);
+//     std::cout << "enable " << cedar::dev::sensors::camera::VideoMode::type().get(cam_video_modes.modes[i]).prettyString() << std::endl;
    }
   }
 
-  //set first available mode
-  unsigned int set_video_mode_id = 0;
-  cedar::dev::sensors::camera::VideoMode::Id set_video_mode;
-  set_video_mode = static_cast<cedar::dev::sensors::camera::VideoMode::Id>(cam_video_modes.modes[set_video_mode_id]);
-  mpCameraChannel->_mpGrabMode->setValue(set_video_mode);
-
-
   //std::cout << "---modes finished---" << std::endl;
 
+}
 
-  // ***************************************
-  // get all framerates and enable them in the enum-class, disable all others
-  // ***************************************
 
-//  std::string video_mode_str = p_fw_interface->DC1394VideoModeToString(cam_video_modes.modes[set_video_mode_id]);
+void cedar::dev::sensors::camera::DeviceDc1394::getFrameRatesFromLibDc
+(
+  cedar::dev::sensors::camera::VideoMode::Id modeId
+)
+{
+  // LibDc constants for the grab-modes are identical to VideoMode::Id
+  int mode_id = static_cast<int>(modeId);
+  dc1394video_modes_t cam_video_modes = mpLibDcInterface->getCamVideoModes();
+
+//  std::string video_mode_str = mpLibDcInterface->DC1394VideoModeToString(cam_video_modes.modes[set_video_mode_id]);
 //  std::cout << "\n - Video mode "
 //            << cam_video_modes.modes[set_video_mode_id]
 //            <<" : "
 //            << video_mode_str
 //            << std::endl;
 
+  int libdc_mode_index = -1;
+  for (unsigned int i = 0; i < cam_video_modes.num; ++i)
+  {
+    if (cam_video_modes.modes[i] == mode_id)
+    {
+      libdc_mode_index = i;
+      break;
+    }
+  }
 
+  CEDAR_ASSERT(libdc_mode_index != -1);
+  dc1394framerates_t mode_framerates = mpLibDcInterface->getCamFramerates(cam_video_modes.modes[libdc_mode_index]);
 
-  dc1394framerates_t mode_framerates = p_fw_interface->getCamFramerates(cam_video_modes.modes[set_video_mode_id]);
+  // LibDc framerate id's are not identical to FrameRate::Id
+  // search every FrameRate::Id in the LibDc structures, and set if available
 
   int num_cedar_framerates = cedar::dev::sensors::camera::FrameRate::type().list().size();
   for (int rate = 0; rate < num_cedar_framerates; ++rate)
@@ -448,7 +223,7 @@ bool cedar::dev::sensors::camera::DeviceDc1394::createCaptureDevice()
     }
     else
     {
-//      std::string dc_name = p_fw_interface->DC1394FrameRateToString(mode_framerates.framerates[libdc_framerate_index]);
+//      std::string dc_name = mpLibDcInterface->DC1394FrameRateToString(mode_framerates.framerates[libdc_framerate_index]);
 //      std::string frame_name = cedar::dev::sensors::camera::FrameRate::type().get(rate_id).prettyString();
 //
 //      std::cout << "DC1394 ID " << (mode_framerates.framerates[libdc_framerate_index])
@@ -459,20 +234,103 @@ bool cedar::dev::sensors::camera::DeviceDc1394::createCaptureDevice()
 
 
   }
+}
+
+bool cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()
+{
+  unsigned int camera_id = mpCameraChannel->getCameraId();
+  unsigned int bus_id = 0;
+  uint64_t cam_guid = 0;
+
+  // get uid and guid from settings and camera
+  if (this->mpCameraChannel->getByGuid())
+  {
+
+    //search all cams, i.e. all bus-ids
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+                                            (
+                                              "Searching for camera with GUID "
+                                               + boost::lexical_cast<std::string>(camera_id) + " on the bus...",
+                                              "cedar::dev::sensors::camera::Grabber::onInit()"
+                                            );
+
+    unsigned int cams_on_bus = mpLibDcInterface->getNumCams();
+
+    if (cams_on_bus < 1)
+    {
+      cedar::aux::LogSingleton::getInstance()->error
+                                               (
+                                                 "No cameras on the firewire bus!",
+                                                 "cedar::dev::sensors::camera::Grabber::onInit()"
+                                               );
+      return false;
+    }
+
+    // search for the right guid, so open it one by one
+    bool cam_found = false;
+
+    for (unsigned int cam=0; cam < cams_on_bus; ++cam)
+    {
+      //only lower 32bit of guid
+      cam_guid = mpLibDcInterface->getCamGuid(cam);
+      unsigned int guid = (unsigned int)(cam_guid&0x00000000FFFFFFFF);
+
+      cedar::aux::LogSingleton::getInstance()->debugMessage
+                                              (
+                                                "Found: at Bus-Id " + boost::lexical_cast<std::string>(cam)
+                                                  + ": GUID " + boost::lexical_cast<std::string>(guid),
+                                                "cedar::dev::sensors::camera::Grabber::onInit()"
+                                              );
+      cam_found = (guid == camera_id);
+      if (cam_found)
+      {
+        bus_id = cam;
+        break;
+      }
+    }
+
+    //test if found
+    if (!cam_found)
+    {
+      cedar::aux::LogSingleton::getInstance()->error
+                                               (
+                                                 "No cameras with GUID "+boost::lexical_cast<std::string>(camera_id)
+                                                 +" not found on the firewire bus!",
+                                                 "cedar::dev::sensors::camera::Grabber::onInit()"
+                                               );
+      return false;
+    }
+
+    //found, the right camera is the camera with the index before
+    //std::cout << "Camera found at Bus-ID: " << bus_id << std::endl;
+
+  } //byGuid
+  else
+  {
+    //by bus-id from settings and guid from camera
+    bus_id = camera_id;
+    cam_guid = mpLibDcInterface->getCamGuid(camera_id);
+
+    unsigned int guid = (unsigned int)(cam_guid&0x00000000FFFFFFFF);
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+                                            (
+                                              "Open camera with bus Id " + boost::lexical_cast<std::string>(bus_id)
+                                                + ": GUID " + boost::lexical_cast<std::string>(guid),
+                                              "cedar::dev::sensors::camera::Grabber::onInit()"
+                                            );
+  }
 
 
-  // ***************************************
-  // get all iso-speeds and enable them in the enum-class, disable all others
-  // ***************************************
+  // open camera with libdc to get the capabilities
+  return mpLibDcInterface->openCamera(cam_guid);
+}
 
-  // todo: iso-speed
-  // not possible to get available iso-speeds. Just try to set one, and check if an error occured
-  // so all iso-speeds available for selection
-
+void cedar::dev::sensors::camera::DeviceDc1394::getFeaturesFromLibDc()
+{
   // ***************************************
   // get all features from cam
   // ***************************************
-  dc1394featureset_t cam_features = p_fw_interface->getCamFeatures();
+  dc1394featureset_t cam_features = mpLibDcInterface->getCamFeatures();
 
   //get all settings for all properties from camera
   int num_properties = cedar::dev::sensors::camera::Property::type().list().size();
@@ -528,7 +386,7 @@ bool cedar::dev::sensors::camera::DeviceDc1394::createCaptureDevice()
       //actual property found in supported list of properties from camera
 
 //      std::string feature_name
-//        = p_fw_interface->DC1394FeatureToCameraGrabberPropertyString(cam_features.feature[libdc_feature_index].id);
+//        = mpLibDcInterface->DC1394FeatureToCameraGrabberPropertyString(cam_features.feature[libdc_feature_index].id);
 //      std::string prop_name = cedar::dev::sensors::camera::Property::type().get(prop_id).prettyString();
 //
 //      std::cout << "DC1394_ID " << (cam_features.feature[libdc_feature_index].id) << " feature-name " << feature_name
@@ -594,34 +452,14 @@ bool cedar::dev::sensors::camera::DeviceDc1394::createCaptureDevice()
         // disable property
         p_prop->mSupported=false;
       }
-
-
     }
-
     p_prop->updateGuiElements();
     p_prop->doNotHandleEvents = false;
   }
 
-
-
-
-
-  //cleanup
-  p_fw_interface->closeCamera();
-  p_fw_interface->cleanUp();
-  p_fw_interface.reset();
-  cv::VideoCapture capture(camera_id);
-  if(capture.isOpened())
-  {
-    mpCameraChannel->mVideoCapture = capture;
-    return true;
-  }
-  return false;
-  //#include <QApplication>
-  //  qApp->desktop()->screen()->update;
 }
 
-//step 2
+
 void cedar::dev::sensors::camera::DeviceDc1394::setProperties()
 {
 //  int num_properties = cedar::dev::sensors::camera::Property::type().list().size();

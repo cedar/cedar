@@ -56,20 +56,6 @@ namespace cedar
         return exp(-pow(x, 2.0) / (2.0 * pow(sigma, 2.0)));
       }
 
-      /*!@brief Rounds a number to the closest integer.
-       */
-      inline double round(double val)
-      {
-        return static_cast<double>(static_cast<int>(val + 0.5));
-      }
-
-      /*!@brief Rounds a number to the closest integer.
-       */
-      inline float round(float val)
-      {
-        return static_cast<float>(static_cast<int>(val + 0.5));
-      }
-
       //!@brief fills a matrix with a Gaussian
       cv::Mat gaussMatrix
               (

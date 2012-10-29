@@ -109,6 +109,17 @@ _mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::sources::GaussInput::setCenter(unsigned int dimension, double center)
+{
+  CEDAR_ASSERT(dimension < this->_mCenters->size());
+  this->_mCenters->set(dimension, center);
+}
+
+void cedar::proc::sources::GaussInput::setAmplitude(double amplitude)
+{
+  this->_mAmplitude->setValue(amplitude);
+}
+
 void cedar::proc::sources::GaussInput::compute(const cedar::proc::Arguments&)
 {
   this->mOutput->setData

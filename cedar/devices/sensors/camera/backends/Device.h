@@ -67,11 +67,7 @@ class cedar::dev::sensors::camera::Device
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief The standard constructor.
-  Device
-  (
-   cedar::dev::sensors::camera::Grabber* pCameraGrabber,
-   cedar::dev::sensors::camera::ChannelPtr pCameraChannel
-  );
+  Device(cedar::dev::sensors::camera::Channel* pCameraChannel);
 
 public:
   //!@brief Destructor
@@ -81,6 +77,11 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
+  //! does the backend initialization
+  virtual void initDevice();
+
+
   bool init();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -131,11 +132,8 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! The cameraGrabber of the used channel
-  cedar::dev::sensors::camera::Grabber* mpCameraGrabber;
-
   //! The channel structure
-  cedar::dev::sensors::camera::ChannelPtr mpCameraChannel;
+  cedar::dev::sensors::camera::Channel* mpCameraChannel;
 
 private:
   // none yet

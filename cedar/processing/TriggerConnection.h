@@ -44,8 +44,6 @@
 
 
 /*!@brief A connection from a cedar::proc::Trigger to a cedar::proc::Triggerable.
- *
- * @todo Describe this more.
  */
 class cedar::proc::TriggerConnection
 {
