@@ -164,6 +164,7 @@ public:
   void timerEvent(QTimerEvent *pEvent);
 
 signals:
+  //!@brief Signals the worker thread to convert the data to the plot's internal format.
   void convert();
 
   //--------------------------------------------------------------------------------------------------------------------
