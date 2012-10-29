@@ -49,10 +49,9 @@
 
 //--------------------------------------------------------------------------------------------------------------------
 //(re)defines of our new introduced properties in OpenCV:
-//delete this, if the patched OpenCV is available
-//#ifndef CV_CAP_PROP_ISO_SPEED
-//  #define CV_CAP_PROP_ISO_SPEED 30
-//#endif
+#ifndef CV_CAP_PROP_ISO_SPEED
+  #define CV_CAP_PROP_ISO_SPEED 30
+#endif
 
 
 /*!@brief Enum class for camera settings.
