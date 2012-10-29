@@ -142,6 +142,12 @@ class cedar::proc::NoMappingException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::proc::NoMappingException
 
+/*!@brief An exception that is thrown by cedar::proc::DataSlot when a type check is requested that is not set.
+ */
+class cedar::proc::NoCheckException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::proc::NoCheckException
+
 /*!@brief An exception that is a collection of exception messages that occurred during loading of an architecture.
  */
 class cedar::proc::ArchitectureLoadingException : public cedar::aux::ExceptionBase

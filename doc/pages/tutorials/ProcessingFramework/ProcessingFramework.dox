@@ -20,6 +20,7 @@ This page contains the following sections:
   <li>@ref ProcessingTutorialUsingTheProcessingIde</li>
   <li>@ref ProcessingTutorialFirstStepDynamics</li>
   <li>@ref ProcessingTutorialDataValidation</li>
+  <li>@ref ProcessingTutorialDataValidationAutomation</li>
   <li>@ref ProcessingTutorialInputCollections</li>
   <li>@ref ProcessingTutorialOwnParameters</li>
   <li>@ref ProcessingTutorialManualLocking</li>
@@ -473,9 +474,38 @@ in this function, however, the principle still remains the same.
 @remarks The data pointer in this function can be a null-pointer when the connection is deleted. Always perform checks
          for this circumstance!
 
-@remarks In the future, we plan to provide a system for at least partly automated checks, thus making the implementation
-         of this function unnecessary in many cases. Of course, there will always be some checks that just have to be
-         done manually.
+
+@section ProcessingTutorialDataValidationAutomation Intermediate Tutorial: Data Validation II (The Automationing)
+
+We have recently introduced a new system that simplifies the type checking mechanisms and allows you to reuse type
+checking mechanisms. Every input slot can now have a type check associated with it that overrides the call to the
+determineInputValidity function. This check can, in principle, be any functor, i.e., any object that overloads
+operator(). The processing framework already has a few of these in the cedar::proc::typecheck namespace.
+
+Here's an example: say we write a step that can only deal with data that can be cast into cedar::aux::MatData (as in the
+example in @ref ProcessingTutorialDataValidation). With automatic type checking, we can express this in the constructor
+as follows:
+@code
+// ...
+#include <cedar/processing/typechek/DerivedFrom.h>
+// ...
+
+  SimpleSummation::SimpleSummation()
+  :
+  // ...
+  {
+    // ...
+    // store a pointer to the slot
+    cedar::proc::DataSlotPtr operand1 = this->declareInput("operand1");
+    
+    // tell the slot what to expect
+    operand1->setCheck(cedar::proc::typecheck::DerivedFrom<cedar::aux::MatData>());
+    // ...
+  }
+@endcode
+With this code in place, we no longer need to write long functions that do these checks! If the checks provided by cedar
+don't provide what you need, you have two options: either you use the old way of implementing the check in
+determineInputValidity, or you write your own type check class by deriving from cedar::proc::typecheck::TypeCheck. 
 
 
 @section ProcessingTutorialInputCollections Intermediate Tutorial: Input Collections
