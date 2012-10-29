@@ -52,6 +52,40 @@
 #include <string.h>
 
 //----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr coord_transform_decl
+    (
+      new ElementDeclarationTemplate<cedar::proc::steps::CoordinateTransformation>
+      (
+        "Math Utilities",
+        "cedar.processing.steps.CoordinateTransformation"
+      )
+    );
+    coord_transform_decl->setDescription
+                          (
+                            "This processing step provides a coordinate transformation using a matrix-remapping "\
+                            "function.\n"\
+                            "You can select either transformation between Cartesian and polar coordinates or"\
+                            "Cartesian and log-polar coordinates.\n\n<b>This class is still under development.</b>"
+                          );
+    coord_transform_decl->setIconPath(":/steps/coordinate_transformation.svg");
+    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(coord_transform_decl);
+
+    return true;
+  }
+
+  bool declared = declare();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 // ENUM: cedar::proc::steps::TransformationDirection
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -118,59 +152,26 @@ const cedar::proc::steps::TransformationType::TypePtr& cedar::proc::steps::Trans
   return cedar::proc::steps::TransformationType::mType.type();
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-// register the class
-//----------------------------------------------------------------------------------------------------------------------
-namespace
-{
-  bool declare()
-  {
-    using cedar::proc::ElementDeclarationPtr;
-    using cedar::proc::ElementDeclarationTemplate;
-
-    ElementDeclarationPtr coord_transform_decl
-    (
-      new ElementDeclarationTemplate<cedar::proc::steps::CoordinateTransformation>
-      (
-        "Math Utilities",
-        "cedar.processing.steps.CoordinateTransformation"
-      )
-    );
-    coord_transform_decl->setDescription
-                          (
-                            "This processing step provides a coordinate transformation using a matrix-remapping "\
-                            "function.\n"\
-                            "You can select either transformation between Cartesian and polar coordinates or"\
-                            "Cartesian and log-polar coordinates. "
-                          );
-    coord_transform_decl->setIconPath(":/steps/coordinate_transformation.svg");
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(coord_transform_decl);
-
-    return true;
-  }
-
-  bool declared = declare();
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::steps::CoordinateTransformation::CoordinateTransformation()
 :
-mInput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
-mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
+mInput(new cedar::aux::MatData(cv::Mat::zeros(2, 2, CV_32F))),
+mOutput(new cedar::aux::MatData(cv::Mat::zeros(2, 2, CV_32F))),
 mMapX(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
 mMapY(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
 mMapXConverted(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_16SC2))),
 mMapYConverted(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_16UC1))),
-mInputRows(1),
-mInputCols(1),
+mInputRows(mInput->getData().rows),
+mInputCols(mInput->getData().cols),
 _mTransformationType
 (
   new cedar::aux::EnumParameter
   (
     this,
-    "transformationType",
+    "transformation type",
     TransformationType::typePtr(),
     TransformationType::CartPolar
   )
@@ -180,25 +181,25 @@ _mTransformationDirection
   new cedar::aux::EnumParameter
   (
     this,
-    "transformationDirection",
+    "transformation direction",
     TransformationDirection::typePtr(),
     TransformationDirection::Forward
   )
 ),
-_mSamplesPerDegree(new cedar::aux::DoubleParameter(this, "samplesPerDegree", 1, 0.001, 100)),
-_mSamplesPerDistance(new cedar::aux::DoubleParameter(this, "samplesPerDistance", 1, 0.001, 100)),
-_mNumberOfRows(new cedar::aux::UIntParameter(this, "rowsSize", 10)),
-_mNumberOfCols(new cedar::aux::UIntParameter(this, "colsSize", 10)),
-_mMagnitudeForward(new cedar::aux::DoubleParameter(this, "magnitudeForward", 10, 0, 1000)),
-_mMagnitudeBackward(new cedar::aux::DoubleParameter(this, "magnitudeBackward", 10, 0, 1000))
+_mSamplesPerDegree(new cedar::aux::DoubleParameter(this, "samples per degree", 1, 0.001, 100)),
+_mSamplesPerDistance(new cedar::aux::DoubleParameter(this, "samples per distance", 1, 0.001, 100)),
+_mNumberOfRows(new cedar::aux::UIntParameter(this, "rows size", 10)),
+_mNumberOfCols(new cedar::aux::UIntParameter(this, "cols size", 10)),
+_mMagnitudeForward(new cedar::aux::DoubleParameter(this, "magnitude forward", 10, 0, 1000)),
+_mMagnitudeBackward(new cedar::aux::DoubleParameter(this, "magnitude backward", 10, 0, 1000))
 {
   // matrix in original coordinates that has to be transformed
   this->declareInput("input", true);
 
   // transformed matrix
   this->declareOutput("result", mOutput);
-  this->declareBuffer("mMapX", mMapX);
-  this->declareBuffer("mMapY", mMapY);
+  this->declareBuffer("map (X)", mMapX);
+  this->declareBuffer("map (Y)", mMapY);
 
   // create maps
   this->createMap();
@@ -257,8 +258,8 @@ void cedar::proc::steps::CoordinateTransformation::transformDirectionChanged()
 void cedar::proc::steps::CoordinateTransformation::compute(const cedar::proc::Arguments&)
 {
   const cv::Mat& input = mInput->getData();
-  unsigned int input_rows = input.rows;
-  unsigned int input_cols = input.cols;
+  unsigned int input_rows = static_cast<unsigned int>(input.rows);
+  unsigned int input_cols = static_cast<unsigned int>(input.cols);
   if (mInputRows != input_rows || mInputCols != input_cols)
   {
     mInputRows = input_rows;
@@ -304,6 +305,7 @@ void cedar::proc::steps::CoordinateTransformation::createMap()
           break;
       }
       break;
+
     case TransformationDirection::Backward:
       switch(_mTransformationType->getValue())
       {
@@ -318,6 +320,7 @@ void cedar::proc::steps::CoordinateTransformation::createMap()
           break;
       }
       break;
+
     default:
       CEDAR_THROW(cedar::aux::UnknownTypeException, "Selected coordinate transformation direction unknown.");
       break;
@@ -333,21 +336,23 @@ void cedar::proc::steps::CoordinateTransformation::createCartPolarMapForward()
   const unsigned int input_cols = this->mInput->getData().cols;
   const unsigned int input_type = this->mInput->getData().type();
 
-  const unsigned int input_center_rows = input_rows / 2.0;
-  const unsigned int input_center_cols = input_cols / 2.0;
+  const unsigned int input_center_rows = input_rows / 2;
+  const unsigned int input_center_cols = input_cols / 2;
 
-  const float distance = sqrt(pow(input_rows, 2.0) + pow(input_cols, 2.0));
+  const float distance = static_cast<float>(sqrt(pow(input_rows, 2.0) + pow(input_cols, 2.0)));
 
-  const float angular_step = 1 / this->_mSamplesPerDegree->getValue();
-  const float distance_step = 1 / this->_mSamplesPerDistance->getValue();
+  const float angular_step = 1.0f / static_cast<float>(this->_mSamplesPerDegree->getValue());
+  const float distance_step = 1.0f / static_cast<float>(this->_mSamplesPerDistance->getValue());
 
   unsigned int angular_size = static_cast<unsigned int>(360.0 * this->_mSamplesPerDegree->getValue());
   unsigned int distance_size = static_cast<unsigned int>(distance * this->_mSamplesPerDistance->getValue());
 
   // create forward map
-  cv::Mat forward_map_x, forward_map_y;
-  forward_map_x = cv::Mat(angular_size, distance_size, CV_32F);
-  forward_map_y = cv::Mat(angular_size, distance_size, CV_32F);
+  this->mMapX->setData(cv::Mat(angular_size, distance_size, CV_32F));
+  this->mMapY->setData(cv::Mat(angular_size, distance_size, CV_32F));
+
+  cv::Mat& forward_map_x = this->mMapX->getData();
+  cv::Mat& forward_map_y = this->mMapY->getData();
 
   for (unsigned int angle = 0; angle < angular_size; ++angle)
   {
@@ -355,12 +360,10 @@ void cedar::proc::steps::CoordinateTransformation::createCartPolarMapForward()
     {
       float x = input_center_cols + rho * distance_step * sin(angle * angular_step * cedar::aux::math::pi / 180.0);
       float y = input_center_rows + rho * distance_step * cos(angle * angular_step * cedar::aux::math::pi / 180.0);
-      forward_map_x.at<float> (angle, rho) = x;
-      forward_map_y.at<float> (angle, rho) = y;
+      forward_map_x.at<float>(angle, rho) = x;
+      forward_map_y.at<float>(angle, rho) = y;
     }
   }
-  this->mMapX->setData(forward_map_x);
-  this->mMapY->setData(forward_map_y);
 
   // convert maps to faster fixed point representation
   convertMap();
@@ -376,30 +379,31 @@ void cedar::proc::steps::CoordinateTransformation::createCartPolarMapBackward()
 
   const unsigned int input_type = this->mInput->getData().type();
 
-  const unsigned int map_rows = static_cast<unsigned int>(this->_mNumberOfRows->getValue());
-  const unsigned int map_cols = static_cast<unsigned int>(this->_mNumberOfCols->getValue());
+  const unsigned int map_rows = this->_mNumberOfRows->getValue();
+  const unsigned int map_cols = this->_mNumberOfCols->getValue();
 
   // create backward map
   cv::Mat backward_map_x, backward_map_y;
-  backward_map_x = cv::Mat::zeros(map_rows, map_cols, CV_32F);
-  backward_map_y = cv::Mat::zeros(map_rows, map_cols, CV_32F);
+  backward_map_x = cv::Mat(map_rows, map_cols, CV_32F);
+  backward_map_y = cv::Mat(map_rows, map_cols, CV_32F);
 
-  for (unsigned int r = 0; r < map_rows; ++r)
+  for (unsigned int row = 0; row < map_rows; ++row)
   {
-    for (unsigned int c = 0; c < map_cols; ++c)
+    for (unsigned int col = 0; col < map_cols; ++col)
     {
+      //!@todo Check if this is correct
       float angle = fmod
                     (
                       atan2
                       (
-                        static_cast<float>(map_cols) / 2.0 - static_cast<float>(c),
-                        static_cast<float>(map_rows) / 2.0 - static_cast<float>(r)
+                        static_cast<float>(map_cols) / 2.0 - static_cast<float>(col),
+                        static_cast<float>(map_rows) / 2.0 - static_cast<float>(row)
                       )
                       * 180.0 / cedar::aux::math::pi + 180.0, 360.0
                     );
-      float rho = sqrt(pow((c - map_cols / 2.0), 2.0) + pow((r - map_rows / 2.0), 2.0));
-      backward_map_x.at<float>(r, c) = rho * this->_mSamplesPerDistance->getValue();
-      backward_map_y.at<float>(r, c) = angle * this->_mSamplesPerDegree->getValue();
+      float rho = sqrt(pow((col - map_cols / 2.0), 2.0) + pow((row - map_rows / 2.0), 2.0));
+      backward_map_x.at<float>(row, col) = rho * static_cast<float>(this->_mSamplesPerDistance->getValue());
+      backward_map_y.at<float>(row, col) = angle * static_cast<float>(this->_mSamplesPerDegree->getValue());
     }
   }
   this->mMapX->setData(backward_map_x);
@@ -421,18 +425,18 @@ void cedar::proc::steps::CoordinateTransformation::createCartLogPolarMapForward(
   const unsigned int input_cols = this->mInput->getData().cols;
   const unsigned int input_type = this->mInput->getData().type();
 
-  const unsigned int input_center_rows = input_rows / 2.0;
-  const unsigned int input_center_cols = input_cols / 2.0;
+  const unsigned int input_center_rows = input_rows / 2;
+  const unsigned int input_center_cols = input_cols / 2;
 
   const float distance = sqrt(pow(input_rows, 2.0) + pow(input_cols, 2.0));
 
-  const float angular_step = 1 / this->_mSamplesPerDegree->getValue();
-  const float distance_step = 1 / this->_mSamplesPerDistance->getValue();
+  const float angular_step = 1.0f / static_cast<float>(this->_mSamplesPerDegree->getValue());
+  const float distance_step = 1.0f / static_cast<float>(this->_mSamplesPerDistance->getValue());
 
-  const unsigned int angular_size = static_cast<unsigned int>(360 * this->_mSamplesPerDegree->getValue());
+  const unsigned int angular_size = static_cast<unsigned int>(360.0 * this->_mSamplesPerDegree->getValue());
   const unsigned int distance_size = static_cast<unsigned int>(distance * this->_mSamplesPerDistance->getValue());
 
-  const double magnitude_forward = this->_mMagnitudeForward->getValue();
+  const float magnitude_forward = static_cast<float>(this->_mMagnitudeForward->getValue());
 
   // create forward map
   cv::Mat forward_map_x, forward_map_y;
@@ -475,8 +479,8 @@ void cedar::proc::steps::CoordinateTransformation::createCartLogPolarMapBackward
 
   // create backward map
   cv::Mat backward_map_x, backward_map_y;
-  backward_map_x = cv::Mat::zeros(map_rows, map_cols, CV_32F);
-  backward_map_y = cv::Mat::zeros(map_rows, map_cols, CV_32F);
+  backward_map_x = cv::Mat(map_rows, map_cols, CV_32F);
+  backward_map_y = cv::Mat(map_rows, map_cols, CV_32F);
 
   for (unsigned int r = 0; r < map_rows; ++r)
   {
@@ -525,7 +529,7 @@ void cedar::proc::steps::CoordinateTransformation::inputConnectionChanged(const 
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
   // Assign the input to the member. This saves us from casting in every computation step.
-  this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
+  this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
   // This should always work since other types should not be accepted.
   if (!this->mInput)
   {
@@ -538,6 +542,7 @@ void cedar::proc::steps::CoordinateTransformation::inputConnectionChanged(const 
 
 void cedar::proc::steps::CoordinateTransformation::changeNumberOfRows()
 {
+  //!@todo This constraint should be expressed as limits of the parameter.
   if (this->_mNumberOfRows->getValue() == 0)
   {
     this->_mNumberOfRows->setValue(1);
@@ -547,6 +552,7 @@ void cedar::proc::steps::CoordinateTransformation::changeNumberOfRows()
 
 void cedar::proc::steps::CoordinateTransformation::changeNumberOfCols()
 {
+  //!@todo This constraint should be expressed as limits of the parameter.
   if (this->_mNumberOfCols->getValue() == 0)
   {
     this->_mNumberOfCols->setValue(1);
