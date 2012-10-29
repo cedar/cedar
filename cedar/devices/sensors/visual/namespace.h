@@ -64,7 +64,6 @@ namespace cedar
       //! \brief Namespace for all visual sensors like cameras or camera-dummies (i.e. avi-file, picture)
       namespace visual
       {
-
         //!@cond SKIPPED_DOCUMENTATION
 
         //-----------------------------------------------------------------------------------------------
@@ -111,6 +110,8 @@ namespace cedar
 
         //!@brief An exception for errors on grabbing
         class GrabberGrabException;
+
+        //!@endcond
       }
     }
   }

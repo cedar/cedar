@@ -61,6 +61,7 @@ public cedar::aux::gui::VectorParameterAbstraction<ValueT, WidgetT>
      *
      * @param pWidget   Widget to which to apply the parameters.
      * @param parameter Parameter whose properties to apply.
+     * @param index     Index of the widget.
      */
     static void applyProperties
                 (
