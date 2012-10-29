@@ -359,6 +359,7 @@ void cedar::aux::gui::LinePlot::PlotSeries::buildArrays(unsigned int new_size)
   }
 }
 
+//!@cond SKIPPED_DOCUMENTATION
 void cedar::aux::gui::detail::LinePlotWorker::convert()
 {
   QWriteLocker plot_locker(this->mpPlot->mpLock);
@@ -399,6 +400,7 @@ void cedar::aux::gui::detail::LinePlotWorker::convert()
 
   emit done();
 }
+//!@endcond
 
 void cedar::aux::gui::LinePlot::conversionDone()
 {

@@ -324,6 +324,7 @@ void cedar::aux::gui::HistoryPlot0D::doAppend(cedar::aux::ConstDataPtr data, con
   curve->mYValues.assign(this->mpXValues.size(), val);
 }
 
+//!@cond SKIPPED_DOCUMENTATION
 void cedar::aux::gui::detail::HistoryPlot0DWorker::convert()
 {
   //!@todo: Use actual time measurements here
@@ -360,6 +361,7 @@ void cedar::aux::gui::detail::HistoryPlot0DWorker::convert()
 
   emit done();
 }
+//!@endcond
 
 void cedar::aux::gui::HistoryPlot0D::conversionDone()
 {

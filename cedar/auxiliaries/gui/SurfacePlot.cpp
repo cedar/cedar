@@ -233,12 +233,14 @@ void cedar::aux::gui::SurfacePlot::init()
   mpWorkerThread->start(QThread::LowPriority);
 }
 
+//!@cond SKIPPED_DOCUMENTATION
 void cedar::aux::gui::detail::SurfacePlotWorker::convert()
 {
   this->mpPlot->updateArrayData();
 
   emit done();
 }
+//!@endcond
 
 void cedar::aux::gui::SurfacePlot::conversionDone()
 {
