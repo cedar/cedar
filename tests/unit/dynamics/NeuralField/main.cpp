@@ -73,6 +73,7 @@ int main(int, char**)
   network->readFile("network.json");
   std::cout << "done." << std::endl;
 
+#ifdef CEDAR_USE_FFTW
   cedar::aux::ConfigurablePtr convolution
     = network->getElement<NeuralField>("Field")->getConfigurableChild("lateral kernel convolution");
   cedar::aux::ObjectParameterPtr engine
@@ -96,6 +97,7 @@ int main(int, char**)
 
   // stop the processing
   network->getElement<LoopedTrigger>("Main Trigger")->stop();
+#endif
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;
