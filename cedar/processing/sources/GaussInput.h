@@ -55,7 +55,8 @@
 
 /*!@brief Generates a matrix with a Gaussian.
  *
- * @todo More detailed description.
+ *        The output matrix will contain values of a Gauss function, sampled based on the indices of the matrix taken as
+ *        x,y,... coordinates.
  */
 class cedar::proc::sources::GaussInput : public cedar::proc::Step
 {

@@ -46,7 +46,10 @@
 
 /*!@brief An interface for classes that redirect log outputs to the console.
  *
- * @todo describe more.
+ *        This class represents cedar's default logger, i.e., if nothing else is set, all log messages will be printed
+ *        on the console.
+ *
+ *        Depending on the operating system, these messages will also appear in different colors.
  */
 class cedar::aux::ConsoleLog : public cedar::aux::LogInterface
 {

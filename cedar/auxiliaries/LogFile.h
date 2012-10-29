@@ -47,7 +47,7 @@
 
 /*!@brief A class for logging messages in a file.
  *
- * @todo more descriptions.
+ * @todo Port this to the new logging framework.
  */
 class cedar::aux::LogFile : public std::ofstream
 {

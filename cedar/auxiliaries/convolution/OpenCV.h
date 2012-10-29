@@ -46,9 +46,7 @@
 
 /*!@brief A convolution engine based on OpenCV's filter engine.
  *
- * @todo describe more.
- *
- * @todo Intelligent strategies should be useable here, e.g., when multiple kernels in a row are TYPE_FULL, they can be
+ * @todo Intelligent strategies should be usable here, e.g., when multiple kernels in a row are TYPE_FULL, they can be
  *       summed together etc.
  *
  * @todo This class should also be able to work with matrices of more than two dimensions.
