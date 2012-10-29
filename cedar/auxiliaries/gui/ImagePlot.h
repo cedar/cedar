@@ -216,6 +216,9 @@ private:
   //! Worker object.
   cedar::aux::gui::detail::ImagePlotWorkerPtr mWorker;
 
+  //! True if the plot is currently converting the data to the internal format. Used to skip overlapping timer events.
+  bool mConverting;
+
   static std::vector<char> mLookupTableR;
   static std::vector<char> mLookupTableG;
   static std::vector<char> mLookupTableB;
