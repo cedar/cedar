@@ -36,6 +36,8 @@
 
 #include "cedar/configuration.h"
 #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
+#include "cedar/auxiliaries/gui/LinePlot.h"
+#include "cedar/auxiliaries/gui/SurfacePlot.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/utilities.h"
 
@@ -77,6 +79,9 @@ int main(int argc, char** argv)
   int errors = 0;
 
   errors += testPlottingNullMatrix<cedar::aux::gui::HistoryPlot0D>();
+  //!@todo Fix this class for this test.
+//  errors += testPlottingNullMatrix<cedar::aux::gui::LinePlot>();
+  errors += testPlottingNullMatrix<cedar::aux::gui::SurfacePlot>();
 
   std::cout << "Done with " << errors << " error(s)." << std::endl;
   return errors;
