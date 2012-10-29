@@ -204,6 +204,9 @@ private:
   //! Converted image.
   QImage mImage;
 
+  //! Lock for mImage.
+  QReadWriteLock mImageLock;
+
   //! Id of the timer used for updating the plot.
   int mTimerId;
 
@@ -215,6 +218,9 @@ private:
 
   //! Worker object.
   cedar::aux::gui::detail::ImagePlotWorkerPtr mWorker;
+
+  //! True if the plot is currently converting the data to the internal format. Used to skip overlapping timer events.
+  bool mConverting;
 
   static std::vector<char> mLookupTableR;
   static std::vector<char> mLookupTableG;
