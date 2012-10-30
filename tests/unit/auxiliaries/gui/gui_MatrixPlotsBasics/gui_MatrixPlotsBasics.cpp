@@ -61,7 +61,9 @@ int testPlottingNullMatrix()
 
   p_plot->plot(null_mat, "null mat");
 
-  while (QApplication::hasPendingEvents())
+  // maximum amount of events to process (the plot sends timer events)
+  unsigned int i = 0;
+  while (QApplication::hasPendingEvents() && ++i < 1000)
   {
     QApplication::processEvents();
   }

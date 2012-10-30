@@ -46,6 +46,11 @@
 #include <time.h>
 #include <vector>
 
+bool checkTime(long expired_milliseconds, double expected_milliseconds)
+{
+  return fabs(static_cast<double>(expired_milliseconds) - expected_milliseconds) < 0.001 * expected_milliseconds;
+}
+
 int main(int, char**)
 {
   // the number of errors encountered in this test
@@ -66,7 +71,7 @@ int main(int, char**)
     boost::posix_time::ptime end = boost::posix_time::microsec_clock::universal_time();
 
     boost::posix_time::time_duration expired_time = end - start;
-    if (expired_time.total_milliseconds() < static_cast<long>(1000.0 * wait_times_seconds.at(i)))
+    if (!checkTime(expired_time.total_milliseconds(), 1000.0 * wait_times_seconds.at(i)))
     {
       std::cout << "Sleep didn't wait long enough; only " << expired_time.total_milliseconds() << " milliseconds have passed." << std::endl;
       errors++;
@@ -92,7 +97,7 @@ int main(int, char**)
     boost::posix_time::ptime end = boost::posix_time::microsec_clock::universal_time();
 
     boost::posix_time::time_duration expired_time = end - start;
-    if (expired_time.total_milliseconds() < static_cast<long>(wait_times_milliseconds.at(i)))
+    if (!checkTime(expired_time.total_milliseconds(), wait_times_milliseconds.at(i)))
     {
       std::cout << "Sleep didn't wait long enough; only " << expired_time.total_milliseconds() << " milliseconds have passed."
                << " (should have been " << wait_times_milliseconds.at(i) / 1000.0 << ")" << std::endl;

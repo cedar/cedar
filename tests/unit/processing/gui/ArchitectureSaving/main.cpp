@@ -61,7 +61,8 @@
 
 void simulateEventLoop()
 {
-  while (QApplication::hasPendingEvents())
+  unsigned int i = 0;
+  while (QApplication::hasPendingEvents() && ++i < 1000)
   {
     QApplication::processEvents();
   }
