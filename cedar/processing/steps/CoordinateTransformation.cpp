@@ -223,6 +223,24 @@ cedar::proc::steps::CoordinateTransformation::~CoordinateTransformation()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+cedar::proc::DataSlot::VALIDITY cedar::proc::steps::CoordinateTransformation::determineInputValidity
+                                (
+                                  cedar::proc::ConstDataSlotPtr,
+                                  cedar::aux::ConstDataPtr data
+                                ) const
+{
+  if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
+  {
+    if (mat_data->getDimensionality() == 2)
+    {
+      return cedar::proc::DataSlot::VALIDITY_VALID;
+    }
+  }
+
+  return cedar::proc::DataSlot::VALIDITY_ERROR;
+}
+
+
 void cedar::proc::steps::CoordinateTransformation::applyAnnotations()
 {
   cedar::aux::annotation::DimensionsPtr dims(new cedar::aux::annotation::Dimensions(2));
