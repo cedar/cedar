@@ -136,7 +136,8 @@ macro(cedar_add_test)
   # add_test(<test identifier> <executable name> <arguments for the test>)
   if (test_AUTOMATIC)
     set(working_dir "${test_DIRECTORY}/${testSubdirectory}/${testName}")
-    if (CMAKE_MAJOR_VERSION GREATER 2 AND CMAKE_MINOR_VERSION GREATER 8 AND CMAKE_PATCH_VERSION GREATER 4)
+    # we need at least version 2.8.4
+    if (${CMAKE_MAJOR_VERSION} GREATER 1 AND ${CMAKE_MINOR_VERSION} GREATER 7 AND ${CMAKE_PATCH_VERSION} GREATER 3)
       add_test(NAME ${testName}
                WORKING_DIRECTORY ${working_dir}
                COMMAND ${testExecutableName} ${test_ARGUMENTS}
