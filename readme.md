@@ -156,13 +156,12 @@ containing the cedar sources from our
 
         make test
 
-8. (optional) (only works when doxygen is installed) Create the documentation. It
-   will be generated in the folder `build/doc`:
+8. (optional) (only works when doxygen is installed) Create the documentation. It will be generated in the folder `build/doc`:
 
         make doc
 
-   Note that this may generate some warnings that you can usually ignore
-   safely.
+    Note that this may generate some warnings that you can usually ignore
+    safely.
 
 9. (optional) Install cedar
 
