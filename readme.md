@@ -47,26 +47,9 @@ The current release of cedar as well as documentation can be found on our [offic
 For now, Ubuntu Linux is the only supported operating system for cedar. The following manual for installing cedar is geared toward Ubuntu Linux and other Debian-based Linux distributions. That being said, we have successfully installed cedar on all major operating systems (other Linux distributions, MacOS, and Windows). In a lot of cases, the installation is not as easy and you will have to get creative here and there - but it is possible. Bear with us as we try to make cedar more platform independent.
 
 ## Install all dependencies
-cedar comes with a bunch of dependencies on other libraries. Here is what you
-have to install before you can compile our library. The version numbers are
-the oldest versions supported.
 
-* CMake
-* Boost 1.47
-* OpenCV 2.2
-* Qt 4.6.2
-* qwt 5.2.1
-* qwtplot3d 0.3
-* libqglviewer 2.3.6
+### Ubuntu 12.04 and 12.10
 
-optional dependencies:
-
-* YARP 2.3.6 (for YARP features like network connectivity)
-* libDC1394 (for firewire cameras)
-* fftw-3.2.2 (for FFT-based convolutions)
-* Doxygen (to generate HTML or LaTeX documentation)
-
-### Ubuntu 12.04 and 12.10:
 We provide a Debian meta-package, which installs all dependencies you need
 to compile cedar under Ubuntu 12.04 and 12.10. The package can be downloaded
 from our bitbucket page.
@@ -88,6 +71,33 @@ package you downloaded earlier.
 As part of the installation, the Debian package will download, compile,
 and install a patched version of qwtplot3d (0.3), which sadly is no longer
 available anywhere else on the web. We are working on removing this dependency from cedar but for now it is necessary for 3D plotting of data.
+
+### Other operating systems
+
+If the above Debian package does not work for your operating system,
+unfortunately you will have to install all dependencies manually. Here is what
+you have to install before you can compile cedar. The version numbers are the
+oldest versions supported.
+
+* CMake
+* Boost 1.47
+* OpenCV 2.2
+* Qt 4.6.2
+* qwt 5.2.1
+* qwtplot3d 0.3
+* libqglviewer 2.3.6
+
+optional dependencies:
+
+* YARP 2.3.6 (for network transparent inter-process communication)
+* libDC1394 (for firewire cameras)
+* fftw-3.2.2 (for computations convolutions based on the FFT)
+* Doxygen (to generate HTML or LaTeX documentation)
+
+We depend on a particular version of qwtplot3d, which we had to patch to
+fit our needs. You can get the
+[source code](https://bitbucket.org/cedar/dependencies/downloads/qwtplot3d-0.3.0-patched.tar.gz)
+of this library from our dependencies repository.
 
 ## Clone the cedar repository
 
