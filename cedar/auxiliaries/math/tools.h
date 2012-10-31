@@ -46,7 +46,20 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
-#include <stdint.h>
+
+//!@todo This should be its own header
+#ifdef CEDAR_COMPILER_MSVC
+  typedef __int8 int8_t;
+  typedef unsigned __int8 uint8_t;
+  typedef __int16 int16_t;
+  typedef unsigned __int16 uint16_t;
+  typedef __int32 int32_t;
+  typedef unsigned __int32 uint32_t;
+  typedef __int64 int64_t;
+  typedef unsigned __int64 uint64_t;
+#else
+  #include <stdint.h>
+#endif
 
 // Windows specific undefinition of the max macro
 #ifdef CEDAR_OS_WINDOWS

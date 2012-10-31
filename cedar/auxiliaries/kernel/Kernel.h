@@ -217,7 +217,7 @@ namespace cedar
       typedef cedar::aux::Singleton<FactoryManager> FactoryManagerSingleton;
 
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_INSTANTIATE_AUX_TEMPLATE(FactoryManagerSingleton);
+      CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<FactoryManager>);
       //!@endcond
     }
   }

@@ -161,13 +161,14 @@ void cedar::aux::Lockable::removeLock(QReadWriteLock* pLock, cedar::aux::LOCK_TY
 
   CEDAR_ASSERT(lockSet < this->mLockSets.size());
 
-  cedar::aux::LockSet::iterator iter = this->mLockSets[lockSet].find(std::make_pair(pLock, lockType));
+  Locks& lock_set = this->mLockSets[lockSet];
 
-  if(iter == this->mLockSets[lockSet].end())
+  Locks::iterator iter = lock_set.find(std::make_pair(pLock, lockType));
+  if(iter == lock_set.end())
   {
     CEDAR_THROW(cedar::aux::NotFoundException, "The given data object was not found in this lockable.");
   }
-  this->mLockSets[lockSet].erase(iter);
+  lock_set.erase(iter);
 
   // remove the automatically added locks from the "all" set.
   if (lockSet != 0)

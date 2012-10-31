@@ -19,6 +19,8 @@
 #include "cedar/devices/sensors/visual/VideoGrabber.h"
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
+
 
 // SYSTEM INCLUDES
 #include <QtGui/QApplication>
@@ -158,7 +160,7 @@ int main(int argc, char* argv[])
                 << std::endl;
     }
 
-    usleep(1000);
+    cedar::aux::sleep(cedar::unit::Milliseconds(1));
   }
 
   //----------------------------------------------------------------------------------------

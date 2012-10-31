@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/Locomotion.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // SYSTEM INCLUDES
 #include <vector>

@@ -46,10 +46,7 @@
 #include <QTime>
 #include <locale>
 
-#ifdef CEDAR_OS_WINDOWS
-  // some dummy types for windows.
-  struct termios {};
-#else
+#ifndef CEDAR_OS_WINDOWS
   #include <termios.h>
   #include <unistd.h>
 #endif // CEDAR_OS_WINDOWS
@@ -185,7 +182,7 @@ std::string cedar::dev::com::SerialCommunication::sendAndReceiveLocked(const std
 void cedar::dev::com::SerialCommunication::send(const std::string& command)
 {
 #ifdef CEDAR_OS_WINDOWS
-#warning "cedar::dev::com::SerialCommunication::send() not implemented for Windows.";
+#pragma message ("cedar::dev::com::SerialCommunication::send() not implemented for Windows.")
 #else
 
   checkIfInitialized();
@@ -244,7 +241,7 @@ std::string cedar::dev::com::SerialCommunication::receive()
   std::string answer;
 
 #ifdef CEDAR_OS_WINDOWS
-#warning "cedar::dev::com::SerialCommunication::receive() not implemented for Windows.";
+#pragma message ("cedar::dev::com::SerialCommunication::receive() not implemented for Windows.")
 #else
 
   checkIfInitialized();
@@ -383,7 +380,7 @@ void cedar::dev::com::SerialCommunication::open()
   _mLatency->setConstant(true);
 
 #ifdef CEDAR_OS_WINDOWS
-#warning "cedar::dev::com::SerialCommunication::initialize() not implemented for Windows.";
+#pragma message ("cedar::dev::com::SerialCommunication::initialize() not implemented for Windows.")
 #else
   // initialize communication on Linux
 #if defined CEDAR_OS_LINUX
@@ -518,6 +515,9 @@ void cedar::dev::com::SerialCommunication::open()
 
 void cedar::dev::com::SerialCommunication::close()
 {
+#ifdef CEDAR_OS_WINDOWS
+#pragma message ("cedar::dev::com::SerialCommunication::close() not implemented for Windows.")
+#else
   int status = ::close(mFileDescriptor);
 
   if (status != 0)
@@ -541,4 +541,5 @@ void cedar::dev::com::SerialCommunication::close()
   _mBaudrate->setConstant(false);
   _mTimeOut->setConstant(false);
   _mLatency->setConstant(false);
+#endif // CEDAR_OS_WINDOWS
 }

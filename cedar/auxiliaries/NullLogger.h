@@ -61,17 +61,14 @@ class cedar::aux::NullLogger : public cedar::aux::LogInterface
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet.
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief drops all messages
-  void message(cedar::aux::LOG_LEVEL, const std::string&, const std::string&)
-  {
-    // do nothing.
-  }
+  void message(cedar::aux::LOG_LEVEL, const std::string&, const std::string&);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

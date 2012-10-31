@@ -112,8 +112,7 @@ namespace cedar
         // camera settings
         CEDAR_DECLARE_DEV_CLASS(CamSetting);
 
-        struct Channel;
-        CEDAR_GENERATE_POINTER_TYPES(Channel);
+        CEDAR_DECLARE_DEV_CLASS(Channel);
 
         typedef std::map<unsigned int, cedar::dev::sensors::camera::CamPropertyPtr> PropertyMap;
 

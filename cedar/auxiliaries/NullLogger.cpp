@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,52 +22,36 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        functions.h
+    File:        NotLogger.cpp
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2011 07 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 10 31
 
-    Description: Math functions
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MATH_FUNCTIONS_H
-#define CEDAR_AUX_MATH_FUNCTIONS_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/NullLogger.h"
 
 // SYSTEM INCLUDES
-#include <math.h>
 
-namespace cedar
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::NullLogger::message(cedar::aux::LOG_LEVEL, const std::string&, const std::string&)
 {
-  namespace aux
-  {
-    namespace math
-    {
-    /*!@brief A simple one-dimensional Gauss function.
-     */
-      inline double gauss(double x, double sigma)
-      {
-        return exp(-pow(x, 2.0) / (2.0 * pow(sigma, 2.0)));
-      }
-
-      //!@brief fills a matrix with a Gaussian
-      CEDAR_AUX_LIB_EXPORT cv::Mat gaussMatrix
-                           (
-                             unsigned int dimensionality,
-                             const std::vector<unsigned int>& matrixSizes,
-                             double amplitude,
-                             const std::vector<double>& sigmas,
-                             const std::vector<double>& centers,
-                             bool cyclic
-                           );
-    }
-  }
+  // do nothing.
 }
-
-#endif  // CEDAR_AUX_MATH_FUNCTIONS_H
