@@ -68,19 +68,19 @@ We provide a Debian meta-package, which installs all dependencies you need
 to compile cedar under Ubuntu 12.04 and 12.10. The package can be downloaded
 from our bitbucket page.
 
-    $ wget https://bitbucket.org/cedar/dependencies/downloads/cedar-dependencies.deb
+    wget https://bitbucket.org/cedar/dependencies/downloads/cedar-dependencies.deb
 
 You will need a program like gdebi to install the package. gdebi is able to
 install local Debian packages while taking into consideration its dependencies
 - apt cannot do this at the moment. If you do not have gdebi installed, get it
 now.
 
-    $ sudo apt-get install gdebi
+    sudo apt-get install gdebi
 
 Now you can install all of cedar's dependencies using gdebi and the Debian
 package you downloaded earlier.
 
-    $ sudo gdebi cedar-dependencies.deb
+    sudo gdebi cedar-dependencies.deb
 
 As part of the installation, the Debian package will also download, compile,
 and install a patched version of qwtplot3d (0.3), which sadly is no longer
@@ -94,59 +94,68 @@ There are two ways to get the cedar sources.
 1. You can use Mercurial, a distributed version control system (similar to
 Git). Install it through your package manager
 
-        $ sudo apt-get install mercurial
+        sudo apt-get install mercurial
 
     and then clone our official repository.
 
-        $ hg clone https://bitbucket.org/cedar/stable [your cedar directory]
+        hg clone https://bitbucket.org/cedar/stable [your cedar directory]
 
 2. If you do not want to use Mercurial, you can simply download a tarball
-containing the cedar sources from our [https://bitbucket.org/cedar/stable/downloads/](bitbucket page).
+containing the cedar sources from our
+[bitbucket page](https://bitbucket.org/cedar/stable/downloads/)
 
-        $ wget https://bitbucket.org/cedar/stable/get/tip.tar.bz2
+        wget https://bitbucket.org/cedar/stable/get/tip.tar.gz
 
+    unpack it
+
+        tar xzf tip.tar.gz
+
+    and rename the resulting directory to something a bit cleaner than the
+    randomly generated name chosen by bitbucket
+
+        mv cedar-stable-[random letters] [your cedar directory]
 
 ## Compilation
 
-1. Change into the cedar repository.
+1. Change into the cedar directory.
 
-        $ cd [your cedar directory]
+        cd [your cedar directory]
 
 2. Create a copy of cedar.conf.example (in this folder) and name it
    'cedar.conf'.
 
-        $ cp cedar.conf.example cedar.conf
+        cp cedar.conf.example cedar.conf
 
-3. By default, 'cedar.conf' is set up to work on Ubuntu 12.04 and 12.10. If you
+3. By default, `cedar.conf` is set up to work on Ubuntu 12.04 and 12.10. If you
    are on a different system, take a look at the file and make any changes for
    your individual system (e.g., installation prefix, external include paths)
    with an editor of your choosing (e.g., vim).
 
-        $ vim cedar.conf
+        vim cedar.conf
 
 4. Create an out-of-source build folder and change into it:
 
-        $ mkdir build
-        $ cd build 
+        mkdir build
+        cd build 
 
 5. Call cmake to generate UNIX makefiles:
 
-        $ cmake ..
+        cmake ..
 
 6. Compile cedar. You can save some time by compiling in multiple threads in
    parallel. To split the compilation process into n threads, supply the
-   parameter '-j n' to the following command:
+   parameter `-j n` to the following command:
 
-        $ make
+        make
 
 7. (optional) Run all unit tests to check whether everything works:
 
-        $ make test
+        make test
 
 8. (optional) (only works when doxygen is installed) Create the documentation. It
-   will be generated in the folder 'build/doc':
+   will be generated in the folder `build/doc`:
 
-        $ make doc
+        make doc
 
    Note, that this may generate some warnings that you can usually ignore
    safely.
@@ -154,7 +163,7 @@ containing the cedar sources from our [https://bitbucket.org/cedar/stable/downlo
 
 7. (optional) Install cedar
 
-        $ sudo make install
+        sudo make install
 
 
 ## Play around with the processing framework
@@ -164,11 +173,11 @@ processing framework:
 
 1. Go into the binary folder of the cedar repository:
 
-        $ cd cedar/bin
+        cd cedar/bin
 
 2. Start the processing framework:
 
-        $ ./processingIde
+        ./processingIde
 
 3. Now, drag and drop elements from the top onto the working area and connect
    them up.
