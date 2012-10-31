@@ -164,7 +164,7 @@ containing the cedar sources from our
    Note that this may generate some warnings that you can usually ignore
    safely.
 
-7. (optional) Install cedar
+9. (optional) Install cedar
 
         sudo make install
 
