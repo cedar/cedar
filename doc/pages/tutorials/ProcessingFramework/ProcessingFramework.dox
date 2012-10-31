@@ -7,8 +7,9 @@
 @todo Most of the code on this page hasn't yet been tested directly; we need to make an examples folder and put it there.
 @todo There should also be an (advanced) tutorial on creating a custom data type (and visualizing it).
 
-This page offers several tutorials for using cedar's processing framework. A detailed description of the framework can
-be found at @ref ProcessingFrameworkConcept. 
+This page offers several tutorials for using cedar's processing framework. A detailed description of the framework and 
+its concepts can be found at @ref ProcessingFrameworkConcept. In the following tutorials, we assume that you are 
+familiar with these concepts. You can, of course, always look them up again during the tutorials.
 
 This page contains the following sections:
 
@@ -40,7 +41,7 @@ rather it is a hint at what level of knowledge about the framework is expected f
 In this section, we will give a brief introduction on how to create a new processing step that adheres to the principles
 of the processing framework.
 
-@subsection ProcessingTutorialFirstStep_Setup Setup
+@subsection ProcessingTutorialFirstStep_Setup Setting up and building your project
 For this tutorial, we recommend using @link ProjectsWithCedar cedar's project scripts@endlink for compiling
          your code. For the first tutorial, please add the necessary lines to compile an executable as described.
          
@@ -78,8 +79,7 @@ processing framework, this is expressed in the constructor:
 #include <cedar/auxiliaries/MatData.h> // this is the class MatData, used internally in this step
 
 SimpleSummation::SimpleSummation()
-:
-// mOutput is a member, its type is cedar::aux::MatDataPtr 
+: // <- the colon starts the member initialization list
 mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))
 {
   /* Declare both inputs; the "true" means that the inputs are mandatory, i.e.,
@@ -106,6 +106,7 @@ void SimpleSummation::compute(const cedar::proc::Arguments&)
 
   // Get a pointer to the first input.
   cedar::aux::ConstDataPtr op1 = this->getInputSlot("operand1")->getData();
+  
   /* Retreive its stored data and add it to the sum. 
      Note, that we assume that op1 can be cast to MatData!
      The call to the clone function is necessary to avoid writing into the input matrix.
@@ -240,7 +241,8 @@ from the example in @ref ProcessingTutorialRunningTheSimpleStep by
 Note that we don't need to declare the Gauss input here, as it is automatically declared as a standard within the
 framework.
 
-The connect calls used for wiring things up stay the same and complete our main method:
+The connect calls used for wiring things up stay the same and complete our main method. Here, source and target are 
+given by strings with the following syntax: [step name].[slot name]
 @code
   network->connectSlots("gauss1.Gauss input", "sum.operand1");
   network->connectSlots("gauss2.Gauss input", "sum.operand2");
@@ -451,10 +453,11 @@ not be aware of this assumption, they might connect a different kind of data, li
 processing framework offers functionality that allows us to automatically check the data before the compute function is
 executed. This is done by overriding the method cedar::proc::Connectable::determineInputValidity in our step:
 @code
-cedar::proc::DataSlot::VALIDITY SimpleSummation::determineInputValidity(
-                                                                         cedar::proc::ConstDataSlotPtr,
-                                                                         cedar::aux::ConstDataPtr data
-                                                                       ) const
+cedar::proc::DataSlot::VALIDITY SimpleSummation::determineInputValidity
+                                (
+                                  cedar::proc::ConstDataSlotPtr,
+                                  cedar::aux::ConstDataPtr data
+                                ) const
 {
   if (boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data))
   {

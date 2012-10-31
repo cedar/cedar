@@ -45,8 +45,7 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 SimpleSummation::SimpleSummation()
-:
-// mOutput is a member, its type is cedar::aux::MatDataPtr
+: // <- the colon starts the member initialization list
 mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))
 {
   /* Declare both inputs; the "true" means that the inputs are mandatory, i.e.,
@@ -68,6 +67,7 @@ void SimpleSummation::compute(const cedar::proc::Arguments&)
 
   // Get a pointer to the first input.
   cedar::aux::ConstDataPtr op1 = this->getInputSlot("operand1")->getData();
+
   /* Retreive its stored data and add it to the sum.
      Note, that we assume that op1 can be cast to MatData!
    */
