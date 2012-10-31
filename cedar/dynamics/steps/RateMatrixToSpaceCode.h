@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 
@@ -131,7 +132,7 @@ private:
     }
     else
     {
-      return static_cast<int>(round(interpolated * (this->getNumberOfBins() - 1)));
+      return static_cast<int>(cedar::aux::math::round(interpolated * (this->getNumberOfBins() - 1)));
     }
   }
 

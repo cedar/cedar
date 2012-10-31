@@ -68,12 +68,12 @@ cv::Mat cedar::aux::math::gaussMatrix
     {
       for (int row = 0; row < kernel_parts.at(dim).rows; ++row)
       {
-        int index = row - centers.at(dim);
+        int index = row - static_cast<int>(centers.at(dim));
         int current_size = static_cast<int>(matrixSizes.at(dim));
         /* if the kernel is shifted away from the center of the matrix, make sure to take as many values from a
          * cyclic kernel as the kernel center is shifted away from the matrix center
          */
-        int shift = centers.at(dim) - current_size / 2;
+        int shift = static_cast<int>(centers.at(dim)) - current_size / 2;
         if (shift > 0 && row - shift < 0) // kernel center is to the right of matrix center and index is in cyclic range
         {
           index += current_size;

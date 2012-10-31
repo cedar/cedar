@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
+#include "cedar/auxiliaries/kernel/Kernel.h"
 
 // SYSTEM INCLUDES
 

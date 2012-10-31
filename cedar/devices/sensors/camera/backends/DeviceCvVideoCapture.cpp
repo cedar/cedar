@@ -50,7 +50,7 @@ cedar::dev::sensors::camera::DeviceCvVideoCapture::DeviceCvVideoCapture
   cedar::dev::sensors::camera::Channel* pCameraChannel
 )
 :
-cedar::dev::sensors::camera::Device::Device(pCameraChannel)
+cedar::dev::sensors::camera::Device(pCameraChannel)
 {
 }
 
