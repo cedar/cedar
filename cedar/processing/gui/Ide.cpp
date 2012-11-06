@@ -67,12 +67,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins)
+cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui)
 {
   this->setupUi(this);
 
   // first, setup the log to receive messages
-  this->mpLog->installHandlers(true);
+  if (redirectLogToGui)
+  {
+    this->mpLog->installHandlers(true);
+  }
 
   if (loadDefaultPlugins)
   {

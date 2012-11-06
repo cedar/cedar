@@ -76,6 +76,8 @@ mpIde (NULL)
     std::cout << "Possible command line arguments:" << std::endl;
     std::cout << std::endl;
     std::cout << "--no-plugins\tStart without loading any plugins." << std::endl;
+    std::cout << "--no-log\tDon't redirect log messages to the UI. May help debugging if too many log messages cause"
+              << " the UI to lock up." << std::endl;
     std::cout << "--help\tDisplay this help text." << std::endl;
 
     ::exit(0);
@@ -88,7 +90,14 @@ mpIde (NULL)
     std::cout << "-- Starting without plugins." << std::endl;
   }
 
-  this->mpIde = new cedar::proc::gui::Ide(!no_plugins);
+  bool no_log_redirect = args.contains("--no-log");
+
+  if (no_log_redirect)
+  {
+    std::cout << "-- Log messages won't be redirected to the gui." << std::endl;
+  }
+
+  this->mpIde = new cedar::proc::gui::Ide(!no_plugins, !no_log_redirect);
 
   QObject::connect(this, SIGNAL(exception(const QString&)), this->mpIde, SLOT(exception(const QString&)));
 }
