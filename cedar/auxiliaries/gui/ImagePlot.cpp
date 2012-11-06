@@ -90,7 +90,8 @@ cedar::aux::gui::ImagePlot::ImagePlot(QWidget *pParent)
 cedar::aux::gui::PlotInterface(pParent),
 mTimerId(0),
 mDataType(DATA_TYPE_UNKNOWN),
-mConverting(false)
+mConverting(false),
+mSmoothScaling(true)
 {
   QVBoxLayout *p_layout = new QVBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
@@ -132,6 +133,11 @@ cedar::aux::gui::ImagePlot::~ImagePlot()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::ImagePlot::setSmoothScaling(bool smooth)
+{
+  this->mSmoothScaling = smooth;
+}
 
 void cedar::aux::gui::ImagePlot::ImageDisplay::mousePressEvent(QMouseEvent * pEvent)
 {
@@ -523,9 +529,19 @@ void cedar::aux::gui::ImagePlot::resizePixmap()
         && !this->mImage.isNull()
       )
   {
+    Qt::TransformationMode transformation_mode;
+    if (this->mSmoothScaling)
+    {
+      transformation_mode = Qt::SmoothTransformation;
+    }
+    else
+    {
+      transformation_mode = Qt::FastTransformation;
+    }
+
     QImage scaled_image = this->mImage.scaled(this->mpImageDisplay->size(),
                                               Qt::KeepAspectRatio,
-                                              Qt::SmoothTransformation);
+                                              transformation_mode);
     this->mpImageDisplay->setPixmap(QPixmap::fromImage(scaled_image));
   }
 }
