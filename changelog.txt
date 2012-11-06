@@ -57,6 +57,9 @@ likely to undergo major changes:
     there are some annoying bugs related to it.
 
 == current version ==
+- cedar::proc
+  - The processingIde can now be started with the "--no-log" option. This will redirect all log messages to the terminal
+    and can be very helpful when steps send too many log messages, leading to a lock-up of the user interface. 
 
 == Version 1.0.0 ==
 - cedar::aux
