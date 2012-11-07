@@ -71,11 +71,11 @@ double cedar::aux::math::sigmoidSemiLinear(double value, double threshold, doubl
 {
   if (value > threshold)
   {
-    return gain * (value - threshold);
+    return threshold + gain * (value - threshold);
   }
   else
   {
-    return 0.0;
+    return threshold;
   }
 }
 

@@ -61,6 +61,10 @@ likely to undergo major changes:
   - The processingIde can now be started with the "--no-log" option. This will redirect all log messages to the terminal
     and can be very helpful when steps send too many log messages, leading to a lock-up of the user interface. 
 
+== Version 1.0.1 ==
+- cedar::aux
+  - Fixed a bug in the SemiLinear transfer function; the threshold is now applied properly.
+
 == Version 1.0.0 ==
 - cedar::aux
   - The image plot, when clicked, now shows the value of the pixel under the cursor.
