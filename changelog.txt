@@ -58,6 +58,10 @@ likely to undergo major changes:
 
 == current version ==
 
+== Version 1.0.1 ==
+- cedar::aux
+  - Fixed a bug in the SemiLinear transfer function; the threshold is now applied properly.
+
 == Version 1.0.0 ==
 - cedar::aux
   - The image plot, when clicked, now shows the value of the pixel under the cursor.
