@@ -57,6 +57,8 @@ likely to undergo major changes:
     there are some annoying bugs related to it.
 
 == current version ==
+- cedar::proc
+  - Fixed an unitialized value in the color conversion step.
 
 == Version 1.0.1 ==
 - cedar::aux
