@@ -115,6 +115,11 @@ void cedar::proc::sources::GaussInput::setCenter(unsigned int dimension, double 
   this->_mCenters->set(dimension, center);
 }
 
+double cedar::proc::sources::GaussInput::getAmplitude() const
+{
+  return this->_mAmplitude->getValue();
+}
+
 void cedar::proc::sources::GaussInput::setAmplitude(double amplitude)
 {
   this->_mAmplitude->setValue(amplitude);

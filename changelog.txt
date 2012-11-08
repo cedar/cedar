@@ -62,6 +62,8 @@ likely to undergo major changes:
   
 - cedar::proc
   - Fixed an unitialized value in the color conversion step.
+  - The processingIde can now be started with the "--no-log" option. This will redirect all log messages to the terminal
+    and can be very helpful when steps send too many log messages, leading to a lock-up of the user interface. 
 
 == Version 1.0.1 ==
 - cedar::aux
