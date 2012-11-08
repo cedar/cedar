@@ -57,6 +57,9 @@ likely to undergo major changes:
     there are some annoying bugs related to it.
 
 == current version ==
+- cedar::aux
+  - Fixed some threading issues in the gui::ImagePlot.
+  
 - cedar::proc
   - Fixed an unitialized value in the color conversion step.
 
