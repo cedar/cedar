@@ -233,5 +233,7 @@ private:
   static std::vector<char> mLookupTableG;
   static std::vector<char> mLookupTableB;
 
+  static QReadWriteLock mLookupTableLock;
+
 }; // class cedar::aux::gui::ImagePlot
 #endif // CEDAR_AUX_GUI_IMAGE_PLOT_H
