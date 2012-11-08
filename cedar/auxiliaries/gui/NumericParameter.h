@@ -222,7 +222,7 @@ private:
 
     bool blocked = this->mpWidget->blockSignals(true);
     parameter->lockForRead();
-    if (parameter->getValue() != getValue(this->mpWidget))
+    if (parameter->getValue() != WidgetPolicy::getValue(this->mpWidget))
     {
       this->mpWidget->setValue(parameter->getValue());
     }

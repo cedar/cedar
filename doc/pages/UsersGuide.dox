@@ -17,7 +17,7 @@ beneficial or even necessary.
 - @ref LoggingWithCedar
 - @ref ProvidingCompatibility
 
-@section ProgrammingConcepts Programming concepts
+@section ProgrammingConcepts Programming Concepts
 In the following pages you can find out about general programming concepts we used throughout the framework. If you are
 interested in implementation details, you may have a look at the following topics. 
 - @link ParametersConcept Storing and loading parameters @endlink

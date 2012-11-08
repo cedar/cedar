@@ -53,8 +53,28 @@ likely to undergo major changes:
   - On windows, some of the GL drawing functionality for kinematic chains and related classes is not implemented.
   - Grouping steps into networks is buggy. Please use with caution and report any errors you encounter.
   - cedar::dev::sensors::visual::CameraGrabber is not working at the moment.
+  - network functionality in the processing framework has several issues; for now, we recommend not using it because
+    there are some annoying bugs related to it.
 
 == current version ==
+- cedar::proc
+  - The processingIde can now be started with the "--no-log" option. This will redirect all log messages to the terminal
+    and can be very helpful when steps send too many log messages, leading to a lock-up of the user interface. 
+  - There is now a system to automatically perform input type checks in processing steps; this can replace writing of
+    the determineInputValidity function. See the documentation and processing tutorial for details.
+
+== Version 1.0.2 ==
+- cedar::aux
+  - Fixed some threading issues in the gui::ImagePlot.
+  
+- cedar::proc
+  - Fixed an unitialized value in the color conversion step.
+
+== Version 1.0.1 ==
+- cedar::aux
+  - Fixed a bug in the SemiLinear transfer function; the threshold is now applied properly.
+
+== Version 1.0.0 ==
 - cedar::aux
   - The image plot, when clicked, now shows the value of the pixel under the cursor.
   
@@ -70,8 +90,6 @@ likely to undergo major changes:
     lock data for a long time even though they are not accessing it, potentially preventing other steps in the
     processing chain from running.
   - The processingIde can now export architectures into SVG files.
-  - There is now a system to automatically perform input type checks in processing steps; this can replace writing of
-    the determineInputValidity function. See the documentation and processing tutorial for details.
 
 == Version 0.9.1 ==
 - general

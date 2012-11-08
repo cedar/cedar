@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/systemFunctions.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/devices/kteam/KheperaDrive.h"
 #include "cedar/devices/communication/SerialCommunication.h"
 #include "cedar/devices/kteam/gui/DriveControlWidget.h"
@@ -64,9 +65,9 @@ int main(int argc, char **argv)
 
   // close and open the gripper
   drive->closeGripper();
-  sleep(5);
+  cedar::aux::sleep(cedar::unit::Seconds(5));
   drive->openGripper();
-  sleep(5);
+  cedar::aux::sleep(cedar::unit::Seconds(5));
 
   //start the program
   application.exec();

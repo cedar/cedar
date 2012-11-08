@@ -19,6 +19,7 @@
 #include "cedar/devices/sensors/camera/Grabber.h"
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 #include <QtGui/QApplication>
@@ -99,8 +100,10 @@ int main(int argc, char* argv[])
   // change settings or properties
   //----------------------------------------------------------------------------------------
 
+#ifdef CEDAR_USE_LIB_DC1394
   //only available for firewire cameras:
   p_grabber->setCameraIsoSpeed(0,cedar::dev::sensors::camera::IsoSpeed::ISO_200);
+#endif // CEDAR_USE_LIB_DC1394
 
   // you have to check if the framerate is supported by the used camera
   // on firewirecameras only suppertd framerates could be set
@@ -151,9 +154,11 @@ int main(int argc, char* argv[])
   cedar::dev::sensors::camera::FrameRate::Id fps = p_grabber->getCameraFps(0);
   std::cout << " (" << cedar::dev::sensors::camera::FrameRate::type().get(fps).name() << ")" << std::endl;
 
+#ifdef CEDAR_USE_LIB_DC1394
   std::cout << "\tCamera ISO-Speed :\t" << p_grabber->getCameraIsoSpeed(0);
   cedar::dev::sensors::camera::IsoSpeed::Id iso_speed = p_grabber->getCameraIsoSpeed(0);
   std::cout << " (" << cedar::dev::sensors::camera::IsoSpeed::type().get(iso_speed).name() << ")" << std::endl;
+#endif // CEDAR_USE_LIB_DC1394
 
   //read properties of camera
   std::cout << "\n\nChannel 0 properties:\n Negative values have special meaning and belongs to the mode.\n"
@@ -293,7 +298,7 @@ int main(int argc, char* argv[])
       std::cout << "Thread FPS: " << p_grabber->getFpsMeasured() << std::endl;
     }
 
-    usleep(1000);
+    cedar::aux::sleep(cedar::unit::Milliseconds(1));
   }
 
 

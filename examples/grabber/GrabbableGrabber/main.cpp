@@ -24,6 +24,7 @@
 #include "cedar/auxiliaries/gui/SceneWidget.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gl/Block.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -85,7 +86,7 @@ int main(int argc, char **argv)
   {
     QApplication::processEvents();
   }
-  usleep(10000);
+  cedar::aux::sleep(cedar::unit::Milliseconds(100));
 
   // -------------------------------------------------------------------------------------------------------------------
   // Create grabber, with viewer-class as parameter
@@ -155,7 +156,7 @@ int main(int argc, char **argv)
     {
       QApplication::processEvents();
     }
-    usleep (10000);
+    cedar::aux::sleep(cedar::unit::Milliseconds(10));
   }
 
 
@@ -232,7 +233,7 @@ int main(int argc, char **argv)
       // display real reached fps
       std::cout << "Thread FPS: " << p_grabber->getFpsMeasured() << std::endl;
     }
-    usleep(1000);
+    cedar::aux::sleep(cedar::unit::Milliseconds(1));
   }
 
   //----------------------------------------------------------------------------------------

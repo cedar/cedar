@@ -57,15 +57,15 @@ namespace cedar
       }
 
       //!@brief fills a matrix with a Gaussian
-      cv::Mat gaussMatrix
-              (
-                unsigned int dimensionality,
-                const std::vector<unsigned int>& matrixSizes,
-                double amplitude,
-                const std::vector<double>& sigmas,
-                const std::vector<double>& centers,
-                bool cyclic
-              );
+      CEDAR_AUX_LIB_EXPORT cv::Mat gaussMatrix
+                           (
+                             unsigned int dimensionality,
+                             const std::vector<unsigned int>& matrixSizes,
+                             double amplitude,
+                             const std::vector<double>& sigmas,
+                             const std::vector<double>& centers,
+                             bool cyclic
+                           );
     }
   }
 }

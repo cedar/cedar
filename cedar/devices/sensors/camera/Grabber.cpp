@@ -363,16 +363,16 @@ std::vector<std::string> cedar::dev::sensors::camera::Grabber::getAllSettings(un
   s = boost::lexical_cast<std::string>(size.width) + " x "+ boost::lexical_cast<std::string>(size.height);
   settings.push_back("camera framesize:\t" + s);
 
+#ifdef CEDAR_USE_LIB_DC1394
   if (getCameraChannel(channel)->_mpBackendType->getValue() == cedar::dev::sensors::camera::BackendType::DC1394)
   {
     s = cedar::dev::sensors::camera::FrameRate::type().get(p_channel->getFPS()).prettyString();
     settings.push_back("camera FPS mode:\t" + s);
 
-#ifdef CEDAR_USE_LIB_DC1394
     s = cedar::dev::sensors::camera::IsoSpeed::type().get(p_channel->getIsoSpeed()).prettyString();
     settings.push_back("camera ISO-speed mode:\t" + s);
-#endif // CEDAR_USE_LIB_DC1394
   }
+#endif // CEDAR_USE_LIB_DC1394
 
   return settings;
 }
@@ -429,6 +429,7 @@ std::vector<std::string> cedar::dev::sensors::camera::Grabber::getAllProperties(
 //----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::camera::Grabber::onGrab()
 {
+  //!@todo This should also be a bool
   int result = true;
   unsigned int num_cams = getNumCams();
 

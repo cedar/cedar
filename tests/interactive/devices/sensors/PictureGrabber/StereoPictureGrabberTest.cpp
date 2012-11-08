@@ -19,6 +19,7 @@
 #include "cedar/devices/sensors/visual/PictureGrabber.h"
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 #include <QtGui/QApplication>
@@ -169,7 +170,7 @@ int main(int argc, char* argv[])
 
     //nothing else to do here. No new frames
 
-    usleep(10000);
+    cedar::aux::sleep(cedar::unit::Microseconds(1));
   }
 
   //----------------------------------------------------------------------------------------

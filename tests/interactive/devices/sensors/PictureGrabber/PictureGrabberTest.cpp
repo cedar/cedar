@@ -19,6 +19,7 @@
 #include "cedar/devices/sensors/visual/PictureGrabber.h"
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 #include <QtGui/QApplication>
@@ -187,7 +188,7 @@ int main(int argc, char* argv[])
       p_plot->resize(frame0.cols,frame0.rows);
     }
 
-    usleep(100000);
+    cedar::aux::sleep(cedar::unit::Milliseconds(100));
   }
 
   //----------------------------------------------------------------------------------------

@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SimpleSummation.h
+    File:        NotLogger.cpp
 
-    Maintainer:  Tutorial Writer Person
-    Email:       cedar@ini.rub.de
-    Date:        2011 12 09
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 10 31
 
     Description:
 
@@ -34,49 +34,24 @@
 
 ======================================================================================================================*/
 
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
-#include "SimpleSummation.h"
-#include <cedar/processing/ExternalData.h> // getInputSlot() returns ExternalData
-#include <cedar/auxiliaries/MatData.h> // this is the class MatData, used internally in this step
+#include "cedar/auxiliaries/NullLogger.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-SimpleSummation::SimpleSummation()
-: // <- the colon starts the member initialization list
-mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))
-{
-  /* Declare both inputs; the "true" means that the inputs are mandatory, i.e.,
-     the step will not run unless both of the inputs are connected to data.
-   */
-  this->declareInput("operand1", true);
-  this->declareInput("operand2", true);
 
-  // Declare the output and set it to the output matrix defined above.
-  this->declareOutput("sum", mOutput);
-}
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void SimpleSummation::compute(const cedar::proc::Arguments&)
+
+void cedar::aux::NullLogger::message(cedar::aux::LOG_LEVEL, const std::string&, const std::string&)
 {
-  // Using data like this is more convenient.
-  cv::Mat& sum = mOutput->getData();
-
-  // Get a pointer to the first input.
-  cedar::aux::ConstDataPtr op1 = this->getInputSlot("operand1")->getData();
-
-  /* Retreive its stored data and add it to the sum.
-     Note, that we assume that op1 can be cast to MatData!
-   */
-  sum = op1->getData<cv::Mat>();
-
-  // Same as above for the second input.
-  cedar::aux::ConstDataPtr op2 = this->getInputSlot("operand2")->getData();
-  sum += op2->getData<cv::Mat>();
-
-  // In a console application, this lets us see that the computation is actually happening.
-  std::cout << "A sum was computed!" << std::endl;
+  // do nothing.
 }

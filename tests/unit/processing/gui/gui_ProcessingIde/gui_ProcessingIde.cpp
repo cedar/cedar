@@ -53,7 +53,8 @@
 void simulateEventLoop()
 {
   std::cout << "   Entering event loop ";
-  while (QApplication::hasPendingEvents())
+  unsigned int i = 0;
+  while (QApplication::hasPendingEvents() && ++i < 1000)
   {
     std::cout << ".";
     QApplication::processEvents();

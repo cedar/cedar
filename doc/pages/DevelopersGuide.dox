@@ -5,13 +5,13 @@ Welcome to cedar!
 
 @section Motivation Motivation
 
-@section OrganizationalConcepts Organizational concepts
+@section OrganizationalConcepts Organizational Concepts
 In these pages you can learn more about the structure and organization of cedar.
 - @link FolderStructureConcept Folder structure @endlink
 - @link ReleasesConcept Release work flow @endlink
 - @link SoftwareTestingConcept Software testing @endlink
 
-@section ProgrammingConcepts Programming concepts
+@section ProgrammingConcepts Programming Concepts
 In the following pages you can find out about general programming concepts we used throughout the framework.
 - @link ParametersConcept Storing and loading parameters @endlink
 - @link ProcessingFrameworkConcept Processing framework @endlink

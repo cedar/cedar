@@ -98,7 +98,9 @@ signals:
 
   friend class cedar::dev::sensors::camera::Device;
   friend class cedar::dev::sensors::camera::DeviceCvVideoCapture;
+#ifdef CEDAR_USE_LIB_DC1394
   friend class cedar::dev::sensors::camera::DeviceDc1394;
+#endif // CEDAR_USE_LIB_DC1394
 
 
 
