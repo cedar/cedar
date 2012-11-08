@@ -60,6 +60,8 @@ likely to undergo major changes:
 - cedar::proc
   - The processingIde can now be started with the "--no-log" option. This will redirect all log messages to the terminal
     and can be very helpful when steps send too many log messages, leading to a lock-up of the user interface. 
+  - There is now a system to automatically perform input type checks in processing steps; this can replace writing of
+    the determineInputValidity function. See the documentation and processing tutorial for details.
 
 == Version 1.0.2 ==
 - cedar::aux
