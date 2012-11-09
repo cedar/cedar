@@ -26,8 +26,8 @@
             "sizes":
             [
                 "10",
-                "10",
-                "10"
+                "30",
+                "20"
             ],
             "cyclic": "false"
         },
@@ -42,9 +42,10 @@
             "sizes":
             [
                 "10",
-                "10",
-                "10"
+                "30",
+                "20"
             ],
+            "activation as output": "false",
             "input noise gain": "0.1",
             "sigmoid":
             {
@@ -123,9 +124,10 @@
             "dimensionality": "2",
             "sizes":
             [
-                "10",
-                "10"
+                "20",
+                "30"
             ],
+            "activation as output": "false",
             "input noise gain": "0.1",
             "sigmoid":
             {
@@ -201,8 +203,8 @@
             "output dimensionality": "2",
             "output dimension sizes":
             [
-                "10",
-                "10"
+                "30",
+                "20"
             ],
             "compression type": "MAXIMUM"
         }
@@ -212,9 +214,10 @@
         "cedar.processing.LoopedTrigger":
         {
             "name": "new LoopedTrigger",
-            "LoopMode": "FIXED_ADAPTIVE",
-            "LoopTime": "1",
+            "step size": "1",
             "idle time": "1",
+            "simulated time": "1",
+            "loop mode": "Fixed",
             "wait": "true",
             "listeners":
             [
@@ -245,9 +248,10 @@
         {
             "type": "step",
             "step": "new GaussInput",
+            "display style": "ICON_AND_TEXT",
             "width": "160",
             "height": "50",
-            "positionX": "-928",
+            "positionX": "-929",
             "positionY": "-336"
         },
         {
@@ -261,6 +265,7 @@
         {
             "type": "step",
             "step": "new NeuralField",
+            "display style": "ICON_AND_TEXT",
             "width": "160",
             "height": "50",
             "positionX": "-704",
@@ -269,6 +274,7 @@
         {
             "type": "step",
             "step": "new NeuralField 1",
+            "display style": "ICON_AND_TEXT",
             "width": "160",
             "height": "50",
             "positionX": "-272",
@@ -277,6 +283,7 @@
         {
             "type": "step",
             "step": "new Projection",
+            "display style": "ICON_AND_TEXT",
             "width": "160",
             "height": "50",
             "positionX": "-480",
