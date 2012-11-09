@@ -141,7 +141,7 @@ void cedar::aux::gui::LinePlot::applyStyle(size_t lineId, QwtPlotCurve *pCurve)
 
   const size_t color_count = mLineColors.size();
   const size_t style_count = mLineStyles.size();
-  const size_t max_line_id = mLineStyles.size() * mLineStyles.size();
+  const size_t max_line_id = mLineColors.size() * mLineStyles.size();
 
   size_t line_id = lineId % max_line_id;
   size_t color_id = line_id % color_count;
@@ -363,9 +363,9 @@ void cedar::aux::gui::LinePlot::PlotSeries::buildArrays(unsigned int new_size)
 void cedar::aux::gui::detail::LinePlotWorker::convert()
 {
   QWriteLocker plot_locker(this->mpPlot->mpLock);
-  for (size_t i = 0; i < this->mpPlot->mPlotSeriesVector.size(); ++i)
+  for (size_t series_index = 0; series_index < this->mpPlot->mPlotSeriesVector.size(); ++series_index)
   {
-    cedar::aux::gui::LinePlot::PlotSeriesPtr series = this->mpPlot->mPlotSeriesVector.at(i);
+    cedar::aux::gui::LinePlot::PlotSeriesPtr series = this->mpPlot->mPlotSeriesVector.at(series_index);
 
     QReadLocker locker(&series->mMatData->getLock());
     const cv::Mat& mat = series->mMatData->getData();
@@ -390,9 +390,9 @@ void cedar::aux::gui::detail::LinePlotWorker::convert()
       series->buildArrays(size);
     }
 
-    for (size_t i = 0; i < series->mXValues.size(); ++i)
+    for (size_t x = 0; x < series->mXValues.size(); ++x)
     {
-      series->mYValues.at(i) = cedar::aux::math::getMatrixEntry<double>(mat, i);
+      series->mYValues.at(x) = cedar::aux::math::getMatrixEntry<double>(mat, x);
     }
   }
 
