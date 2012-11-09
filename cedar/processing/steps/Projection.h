@@ -184,6 +184,8 @@ private:
   void compressNDto0Dmean();
   //!@brief compresses 3D input to 2D output
   void compress3Dto2D();
+  //!@brief compresses 3D input to 2D output and swap the two remaining dimensions
+  void compress3Dto2DSwapped();
   //!@brief compresses 3D input to 1D output
   void compress3Dto1D();
   //!@brief compresses 2D input to 1D output

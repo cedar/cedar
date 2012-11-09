@@ -57,6 +57,9 @@ likely to undergo major changes:
     there are some annoying bugs related to it.
 
 == current version ==
+- cedar::proc
+  - Fixed a bug in the procection step that could lead to a crash when the destination dimensions of a 3d to a 2d matrix
+    were swapped.
 
 == Version 1.0.2 ==
 - cedar::aux
