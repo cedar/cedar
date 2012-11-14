@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KTeamDriveModel.cpp
+    File:        Odometry.cpp
 
     Maintainer:  Stephan Zibner
     Email:       stephan.zibner@ini.ruhr-uni-bochum.de
@@ -35,14 +35,14 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/devices/kteam/DriveModel.h"
+#include "cedar/devices/kteam/Odometry.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::kteam::DriveModel::DriveModel(cedar::dev::kteam::DrivePtr drive)
+cedar::dev::kteam::Odometry::Odometry(cedar::dev::kteam::DrivePtr drive)
 :
 mDrive(drive)
 {
@@ -62,7 +62,7 @@ mDrive(drive)
   update();
 }
 
-cedar::dev::kteam::DriveModel::~DriveModel()
+cedar::dev::kteam::Odometry::~Odometry()
 {
 
 }
@@ -71,7 +71,7 @@ cedar::dev::kteam::DriveModel::~DriveModel()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::kteam::DriveModel::update()
+void cedar::dev::kteam::Odometry::update()
 {
   // get new encoder-values
   std::vector<int> encoders = mDrive->getEncoders();
@@ -100,7 +100,7 @@ void cedar::dev::kteam::DriveModel::update()
   }
 }
 
-void cedar::dev::kteam::DriveModel::calculatePositionAndOrientation(const std::vector<int>& encoders)
+void cedar::dev::kteam::Odometry::calculatePositionAndOrientation(const std::vector<int>& encoders)
 {
   // calculate the moved distance since last update
   double ds = calculateDifferencePosition(mOldEncoders, encoders);
@@ -128,7 +128,7 @@ void cedar::dev::kteam::DriveModel::calculatePositionAndOrientation(const std::v
 //  setRotation(new_orientation);
 }
 
-double cedar::dev::kteam::DriveModel::calculateDifferencePosition
+double cedar::dev::kteam::Odometry::calculateDifferencePosition
        (
          const std::vector<int>& oldEncoders,
          const std::vector<int>& newEncoders
@@ -138,7 +138,7 @@ double cedar::dev::kteam::DriveModel::calculateDifferencePosition
          * mDrive->getDistancePerPulse() / 2.0;
 }
 
-double cedar::dev::kteam::DriveModel::calculateDifferenceOrientation
+double cedar::dev::kteam::Odometry::calculateDifferenceOrientation
        (
            const std::vector<int>& oldEncoders,
            const std::vector<int>& newEncoders

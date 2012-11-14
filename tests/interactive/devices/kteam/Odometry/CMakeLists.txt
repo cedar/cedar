@@ -34,4 +34,4 @@
 #
 #=======================================================================================================================
 
-cedar_add_interactive_test("DriveModel" main.cpp)
+cedar_add_interactive_test("Odometry" main.cpp)

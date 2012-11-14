@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DriveModel.h
+    File:        Odometry.h
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KTEAM_DRIVE_MODEL_H
-#define CEDAR_DEV_KTEAM_DRIVE_MODEL_H
+#ifndef CEDAR_DEV_KTEAM_ODOMETRY_H
+#define CEDAR_DEV_KTEAM_ODOMETRY_H
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/Odometry.h"
@@ -48,7 +48,7 @@
  * This class calculates (i.e., estimates) the position and orientation of a robot
  * based on the robot's encoders (odometry).
  */
-class cedar::dev::kteam::DriveModel : public cedar::dev::robot::Odometry
+class cedar::dev::kteam::Odometry : public cedar::dev::robot::Odometry
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -57,10 +57,10 @@ public:
 
   //!@brief Constructor
   //!@param[in] drive drive component of the robot we are modeling
-  DriveModel(cedar::dev::kteam::DrivePtr drive);
+  Odometry(cedar::dev::kteam::DrivePtr drive);
 
   //!@brief Destructor
-  virtual ~DriveModel();
+  virtual ~Odometry();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -115,6 +115,6 @@ private:
 
   //! the last encoder values (needed to calculate the distance the robot has moved)
   std::vector<int> mOldEncoders;
-}; // class cedar::dev::kteam::DriveModel
+}; // class cedar::dev::kteam::Odometry
 
-#endif // CEDAR_DEV_KTEAM_DRIVE_MODEL_H
+#endif // CEDAR_DEV_KTEAM_ODOMETRY_H

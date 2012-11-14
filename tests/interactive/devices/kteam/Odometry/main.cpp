@@ -28,7 +28,7 @@
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: Interactive test-program for the KTeamDriveModel class.
+    Description: Interactive test-program for the kteam::Odometry class.
 
     Credits:
 
@@ -36,7 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/kteam/EPuckDrive.h"
-#include "cedar/devices/kteam/DriveModel.h"
+#include "cedar/devices/kteam/Odometry.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/SceneWidget.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
@@ -77,7 +77,7 @@ int main(int argc, char **argv)
   drive->readJson(epuck_drive_config);
 
   //initialize the model of the e-puck
-  cedar::dev::kteam::DriveModelPtr kteam_model(new cedar::dev::kteam::DriveModel(drive));
+  cedar::dev::kteam::OdometryPtr kteam_model(new cedar::dev::kteam::Odometry(drive));
   //add cylinder representing the robot
   cedar::aux::gl::ObjectVisualizationPtr cylinder(new cedar::aux::gl::Cylinder(kteam_model, 0.07, 0.05));
   scene->addObjectVisualization(cylinder);
