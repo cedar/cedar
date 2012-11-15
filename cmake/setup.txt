@@ -133,5 +133,8 @@ else(buildTypeLower MATCHES debug)
   add_definitions(-DRELEASE)
 endif(buildTypeLower MATCHES debug)
 
+# extract name of the computer that cedar is being built on
+site_name(CEDAR_BUILT_ON_MACHINE)
+
 # configure the file exposing internal cmake variables to cedar
 configure_file("${CEDAR_HOME}/cmake/resources/internals.h.in" "${CMAKE_CURRENT_BINARY_DIR}/cedar/internals.h")
