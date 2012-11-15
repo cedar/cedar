@@ -578,7 +578,8 @@ private:
   mutable QReadWriteLock mVelocitiesLock;
   cv::Mat mJointAccelerations;
   mutable QReadWriteLock mAccelerationsLock;
-  ActionType mCurrentWorkingMode;
+  ActionType mWorkingMode;
+  mutable QReadWriteLock mWorkingModeLock;
 
   //! vector of all joints
   JointListParameterPtr mpJoints;
