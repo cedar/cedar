@@ -68,10 +68,10 @@ cedar::dev::robot::KinematicChain::KinematicChain
 :
 mpJoints(new JointListParameter(this, "joints")),
 mpRootCoordinateFrame(new cedar::aux::LocalCoordinateFrame()),
-mpEndEffectorCoordinateFrame(pEndEffector)
+mpEndEffectorCoordinateFrame(pEndEffector),
+mWorkingMode(ANGLE),
+mUseCurrentHardwareValues(false)
 {
-  setWorkingMode(ANGLE);
-  mUseCurrentHardwareValues = false;
   init();
 }
 
@@ -210,7 +210,9 @@ cv::Mat cedar::dev::robot::KinematicChain::getJointAccelerationsMatrix() const
 
 cedar::dev::robot::KinematicChain::ActionType cedar::dev::robot::KinematicChain::getWorkingMode()
 {
-  return mCurrentWorkingMode;
+  QReadLocker locker(&mWorkingModeLock);
+
+  return mWorkingMode;
 }
 
 void cedar::dev::robot::KinematicChain::setJointAngles(const std::vector<double>& angles)
@@ -432,7 +434,7 @@ bool cedar::dev::robot::KinematicChain::setJointAccelerations(const cv::Mat& acc
 void cedar::dev::robot::KinematicChain::step(double time)
 {
   // update the angle according to working mode
-  switch (mCurrentWorkingMode)
+  switch (getWorkingMode())
   {
     case ANGLE:
 
@@ -485,12 +487,12 @@ void cedar::dev::robot::KinematicChain::step(double time)
 
 void cedar::dev::robot::KinematicChain::setWorkingMode(ActionType actionType)
 {
-  stop(); // TODO: remove this line
+  QWriteLocker locker(&mWorkingModeLock);
 
   cv::Mat zeros = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
 
   // need to stop something?
-  switch (mCurrentWorkingMode)
+  switch (mWorkingMode)
   {
     case ACCELERATION:
     {
@@ -506,10 +508,10 @@ void cedar::dev::robot::KinematicChain::setWorkingMode(ActionType actionType)
       break;
   }
 
-  mCurrentWorkingMode = actionType;
+  mWorkingMode = actionType;
 
   // reset variables where necessary (HR: is that really necessary?)
-  switch (mCurrentWorkingMode)
+  switch (mWorkingMode)
   {
     case ACCELERATION:
     {
@@ -521,7 +523,6 @@ void cedar::dev::robot::KinematicChain::setWorkingMode(ActionType actionType)
       QWriteLocker locker(&mVelocitiesLock);
       mJointVelocities = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
     }
-      start(); // TODO: remove this line
     case ANGLE:
       break;
   }
@@ -644,7 +645,7 @@ void cedar::dev::robot::KinematicChain::start(Priority priority)
     return;
   }
 
-  switch (mCurrentWorkingMode)
+  switch (getWorkingMode())
   {
   case ANGLE:
     //!@todo Should this throw an exception?
