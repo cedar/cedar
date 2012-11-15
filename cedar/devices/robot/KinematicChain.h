@@ -110,7 +110,7 @@ public:
   //----------------------------------------------------------------------------
 public:
   //!@brief The different modes to operate the kinematic chain
-  enum ActionType { ANGLE, VELOCITY, ACCELERATION };
+  enum ActionType { ANGLE, VELOCITY, ACCELERATION, STOP };
 
 protected:
   // none yet
