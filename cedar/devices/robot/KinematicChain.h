@@ -567,14 +567,19 @@ private:
   // members
   //----------------------------------------------------------------------------
 protected:
-  //!@brief current state of the joint angles
+  //!@brief current state of the joint angles, see also mAnglesLock
   cv::Mat mJointAngles;
+  //!@brief the lock of the mJointAngles
+  mutable QReadWriteLock mAnglesLock;
 
 private:
   bool mUseCurrentHardwareValues;
   cv::Mat mJointVelocities;
+  mutable QReadWriteLock mVelocitiesLock;
   cv::Mat mJointAccelerations;
-  ActionType mCurrentWorkingMode;
+  mutable QReadWriteLock mAccelerationsLock;
+  ActionType mWorkingMode;
+  mutable QReadWriteLock mWorkingModeLock;
 
   //! vector of all joints
   JointListParameterPtr mpJoints;
