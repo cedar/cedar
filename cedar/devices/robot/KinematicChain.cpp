@@ -68,10 +68,10 @@ cedar::dev::robot::KinematicChain::KinematicChain
 :
 mpJoints(new JointListParameter(this, "joints")),
 mpRootCoordinateFrame(new cedar::aux::LocalCoordinateFrame()),
-mpEndEffectorCoordinateFrame(pEndEffector)
+mpEndEffectorCoordinateFrame(pEndEffector),
+mWorkingMode(ANGLE),
+mUseCurrentHardwareValues(false)
 {
-  setWorkingMode(ANGLE);
-  mUseCurrentHardwareValues = false;
   init();
 }
 
@@ -151,6 +151,7 @@ double cedar::dev::robot::KinematicChain::getJointVelocity(unsigned int index) c
     return 0.0;
   }
 
+  QReadLocker locker(&mVelocitiesLock);
   return mJointVelocities.at<double>(index, 0);
 }
 
@@ -158,6 +159,8 @@ double cedar::dev::robot::KinematicChain::getJointVelocity(unsigned int index) c
 std::vector<double> cedar::dev::robot::KinematicChain::getJointVelocities() const
 {
   std::vector<double> dummy(getNumberOfJoints());
+
+  QReadLocker locker(&mVelocitiesLock);
 
   for (unsigned int i = 0; i < getNumberOfJoints(); ++i)
   {
@@ -169,6 +172,8 @@ std::vector<double> cedar::dev::robot::KinematicChain::getJointVelocities() cons
 
 cv::Mat cedar::dev::robot::KinematicChain::getJointVelocitiesMatrix() const
 {
+  QReadLocker locker(&mVelocitiesLock);
+
   return mJointVelocities.clone();
 }
 
@@ -179,6 +184,7 @@ double cedar::dev::robot::KinematicChain::getJointAcceleration(unsigned int inde
     return 0.0;
   }
 
+  QReadLocker locker(&mAccelerationsLock);
   return mJointAccelerations.at<double>(index, 0);
 }
 
@@ -191,17 +197,22 @@ std::vector<double> cedar::dev::robot::KinematicChain::getJointAccelerations() c
     dummy[i] = mJointAccelerations.at<double>(i,0);
   }
 
+  QReadLocker locker(&mAccelerationsLock);
   return dummy;
 }
 
 cv::Mat cedar::dev::robot::KinematicChain::getJointAccelerationsMatrix() const
 {
+  QReadLocker locker(&mAccelerationsLock);
+
   return mJointAccelerations.clone();
 }
 
 cedar::dev::robot::KinematicChain::ActionType cedar::dev::robot::KinematicChain::getWorkingMode()
 {
-  return mCurrentWorkingMode;
+  QReadLocker locker(&mWorkingModeLock);
+
+  return mWorkingMode;
 }
 
 void cedar::dev::robot::KinematicChain::setJointAngles(const std::vector<double>& angles)
@@ -228,6 +239,7 @@ void cedar::dev::robot::KinematicChain::setJointAngles(const std::vector<double>
     angle = std::min<double>(angle, getJoint(i)->_mpAngleLimits->getUpperLimit());
 
     setJointAngle(i, angle);
+    // locking done in setJointAngle()
   }
 
   return;
@@ -258,6 +270,7 @@ void cedar::dev::robot::KinematicChain::setJointAngles(const cv::Mat& angles)
     angle = std::min<double>(angle, getJoint(i)->_mpAngleLimits->getUpperLimit());
 
     setJointAngle(i, angle);
+    // locking done in setJointAngle()
   }
 
   return;
@@ -281,6 +294,7 @@ bool cedar::dev::robot::KinematicChain::setJointVelocity(unsigned int index, dou
   velocity = std::max<double>(velocity, getJoint(index)->_mpVelocityLimits->getLowerLimit());
   velocity = std::min<double>(velocity, getJoint(index)->_mpVelocityLimits->getUpperLimit());
 
+  QWriteLocker locker(&mVelocitiesLock);
   mJointVelocities.at<double>(index,0) = velocity;
 
   return false;
@@ -307,6 +321,7 @@ bool cedar::dev::robot::KinematicChain::setJointVelocities(const std::vector<dou
 
   for(unsigned i = 0; i < getNumberOfJoints(); i++)
   {
+    // locking done in setJointVelocity()
     if(!setJointVelocity(i, velocities[i]))
     {
       hardware_velocity = false;
@@ -337,6 +352,7 @@ bool cedar::dev::robot::KinematicChain::setJointVelocities(const cv::Mat& veloci
 
   for (unsigned i = 0; i < getNumberOfJoints(); i++)
   {
+    // locking done in setJointVelocity()
     if (!setJointVelocity(i, velocities.at<double>(i, 0)))
     {
       hardware_velocity = false;
@@ -361,7 +377,9 @@ bool cedar::dev::robot::KinematicChain::setJointAcceleration(unsigned int index,
     return false;
   }
 
+  QWriteLocker locker(&mAccelerationsLock);
   mJointAccelerations.at<double>(index,0) = acceleration;
+
   return false;
 }
 
@@ -382,6 +400,7 @@ bool cedar::dev::robot::KinematicChain::setJointAccelerations(const std::vector<
     return false;
   }
 
+  QWriteLocker locker(&mAccelerationsLock);
   for(unsigned int i = 0; i < getNumberOfJoints(); ++i)
   {
     mJointAccelerations.at<double>(i,0) = accelerations[i];
@@ -407,15 +426,15 @@ bool cedar::dev::robot::KinematicChain::setJointAccelerations(const cv::Mat& acc
     return false;
   }
 
+  QWriteLocker locker(&mAccelerationsLock);
   mJointAccelerations = accelerations;
   return false;
 }
 
 void cedar::dev::robot::KinematicChain::step(double time)
 {
-
   // update the angle according to working mode
-  switch (mCurrentWorkingMode)
+  switch (getWorkingMode())
   {
     case ANGLE:
 
@@ -428,7 +447,10 @@ void cedar::dev::robot::KinematicChain::step(double time)
         mJointVelocities = getJointVelocitiesMatrix();
       }
 
-      mJointVelocities += getJointAccelerationsMatrix() * ( time / 1000.0 );
+      {
+        QWriteLocker locker(&mVelocitiesLock);
+        mJointVelocities += getJointAccelerationsMatrix() * ( time / 1000.0 );
+      }
       applyVelocityLimits(mJointVelocities);
 
       if(setJointVelocities(mJointVelocities))
@@ -443,7 +465,10 @@ void cedar::dev::robot::KinematicChain::step(double time)
         mJointAngles = getJointAnglesMatrix();
       }
 
-      mJointAngles += getJointVelocitiesMatrix() * ( time / 1000.0 );
+      {
+        QWriteLocker locker(&mAnglesLock);
+        mJointAngles += getJointVelocitiesMatrix() * ( time / 1000.0 );
+      }
       applyAngleLimits(mJointAngles);
       setJointAngles(mJointAngles);
       break;
@@ -462,31 +487,42 @@ void cedar::dev::robot::KinematicChain::step(double time)
 
 void cedar::dev::robot::KinematicChain::setWorkingMode(ActionType actionType)
 {
-  stop();
+  QWriteLocker locker(&mWorkingModeLock);
 
   cv::Mat zeros = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
 
   // need to stop something?
-  switch (mCurrentWorkingMode)
+  switch (mWorkingMode)
   {
     case ACCELERATION:
+    {
+      QWriteLocker locker(&mAccelerationsLock);
       setJointAccelerations(zeros);
+    }
     case VELOCITY:
+    {
+      QWriteLocker locker(&mVelocitiesLock);
       setJointVelocities(zeros);
+    }
     case ANGLE:
       break;
   }
 
-  mCurrentWorkingMode = actionType;
+  mWorkingMode = actionType;
 
   // reset variables where necessary (HR: is that really necessary?)
-  switch (mCurrentWorkingMode)
+  switch (mWorkingMode)
   {
     case ACCELERATION:
+    {
+      QWriteLocker locker(&mAccelerationsLock);
       mJointAccelerations = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+    }
     case VELOCITY:
+    {
+      QWriteLocker locker(&mVelocitiesLock);
       mJointVelocities = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
-      start();
+    }
     case ANGLE:
       break;
   }
@@ -525,9 +561,18 @@ void cedar::dev::robot::KinematicChain::initializeFromJointList()
   mJointTwists.clear();
 
   // create state variables
-  mJointAngles = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
-  mJointVelocities = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
-  mJointAccelerations = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+  {
+    QWriteLocker locker(&mAnglesLock);
+    mJointAngles = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+  }
+  {
+    QWriteLocker locker(&mVelocitiesLock);
+    mJointVelocities = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+  }
+  {
+    QWriteLocker locker(&mAccelerationsLock);
+    mJointAccelerations = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+  }
 
   // transform joint geometry into twist coordinates
   cv::Mat xi;
@@ -600,7 +645,7 @@ void cedar::dev::robot::KinematicChain::start(Priority priority)
     return;
   }
 
-  switch (mCurrentWorkingMode)
+  switch (getWorkingMode())
   {
   case ANGLE:
     //!@todo Should this throw an exception?
@@ -612,7 +657,13 @@ void cedar::dev::robot::KinematicChain::start(Priority priority)
     return;
   case VELOCITY:
   case ACCELERATION:
-    mJointAngles = getJointAnglesMatrix();
+    {
+      cv::Mat tmp = getJointAnglesMatrix();
+      
+      QWriteLocker locker(&mAnglesLock);
+      mJointAngles = tmp;
+    }
+
     QThread::start(priority);
     break;
   }

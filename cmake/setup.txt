@@ -113,6 +113,7 @@ include_directories(${CEDAR_HOME} ${CEDAR_TEST_DIR} ${CEDAR_BUILD_DIR})
 
 if (CMAKE_COMPILER_IS_GNUCC)
   add_definitions(-Wall -Wextra)
+  add_definitions(-std=gnu++0x)
 elseif (MSVC)
   add_definitions(-W2)
 endif (CMAKE_COMPILER_IS_GNUCC)

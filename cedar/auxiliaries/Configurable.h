@@ -48,6 +48,12 @@
 // SYSTEM INCLUDES
 #include <map>
 #include <list>
+#include <fstream> // for write_csv()
+#include <string>  // for write_csv()
+#include <ostream> // for write_csv()
+#include <iomanip> // for write_csv()
+#include <iostream> // for write_csv() debugging
+#include <boost/next_prior.hpp> // for write_csv()
 #include <boost/signals2/signal.hpp>
 #include <boost/signals2/connection.hpp>
 #include <boost/function.hpp>
@@ -113,6 +119,9 @@ public:
 
   //!@brief write a configuration to a cedar::aux::ConfigurationNode tree and store this tree in a json file
   void writeJson(const std::string& filename) const;
+
+  //!@brief write a configuration to a cedar::aux::ConfigurationNode tree and store this tree in a csv spreadsheet file
+  void writeCSV(const std::string& filename) const;
 
   //!@brief get a map of all children of the current Configurable
   const Children& configurableChildren() const;
@@ -194,6 +203,93 @@ private:
 
   //!@brief Appends the locks of this configurable and its children to the set.
   void appendLocks(std::set<QReadWriteLock*>& locks);
+
+  //!@brief make sure the directories exist 
+  std::string normalizeFilename(const std::string& filename) const;
+
+  //!@brief helper function to write a Ptree to .csv. internals start here. opens the stream
+  template<class Ptree>
+  void write_csv(const std::string &filename, const Ptree &pt) const
+  {
+    // heavily copied + simplified from boost
+    std::basic_ofstream<typename Ptree::key_type::value_type>
+    stream(filename.c_str());
+    if (!stream)
+    {
+      std::cerr << "cannot write file: " << filename << std::endl;
+    }
+    write_csv_internal(stream, pt, filename);
+  }
+
+
+  //!@brief helper function to write a Ptree to .csv. internal. check stream
+  template<class Ptree>
+  void write_csv_internal(std::basic_ostream<typename Ptree::key_type::value_type> &stream, 
+                            const Ptree &pt,
+                            const std::string &filename) const
+  {
+
+    write_csv_helper(stream, pt, 0);
+    stream << std::endl;
+    if (!stream.good())
+    {
+      std::cerr << "write error: " << filename << std::endl;
+    }
+  }
+
+  //!@brief helper function to write a Ptree to .csv. internal. write structure
+  template<class Ptree>
+  void write_csv_helper(std::basic_ostream<typename Ptree::key_type::value_type> &stream, 
+                        const Ptree &pt, int indent) const
+  {
+    typedef typename Ptree::key_type::value_type Ch;
+    typedef typename std::basic_string<Ch> Str;
+
+    // vectors of Parameters fully written into one row:
+    // one value per cell;
+    // every level 0 container element starts new row;
+    // all level >= 1 containers with non-values also start new row
+    // rows first cell is always the containers Parameter name;
+    //     A   B   C   D   E 
+    //    name 42  43  44  45
+
+    if (pt.empty() && indent > 0)
+    {      
+      // write value:
+      //<< std::setprecision(4) // set decimal precision for data. saves a lot of bytes ;)
+      stream << ( pt.template get_value<Str>() ); // << Ch(','); 
+        // TODO: add escaping special characters
+    }
+    else if (pt.count(Str()) == pt.size() && indent > 0)
+    {
+      // sub-array:
+      typename Ptree::const_iterator it = pt.begin();
+      for (; it != pt.end(); ++it)
+      {
+        // write-out one level lower:
+        write_csv_helper(stream, it->second, indent + 1);
+        if (boost::next(it) != pt.end())
+        {
+          // separator for cells (columns):
+          stream << Ch(',');
+        }
+      }
+    }
+    else
+    {
+      // iterate over first level:
+      typename Ptree::const_iterator it = pt.begin();
+      for (; it != pt.end(); ++it)
+      {
+        stream << Ch('\n'); // every entry on new line (row)
+        stream << (it->first) << Ch(','); // name in first cell of row
+
+        write_csv_helper(stream, it->second, indent + 1);
+      }
+
+      stream << Ch('\n'); // NL on last row
+    }
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
