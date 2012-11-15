@@ -66,11 +66,11 @@ cedar::dev::robot::KinematicChain::KinematicChain
   cedar::aux::LocalCoordinateFramePtr pEndEffector
 )
 :
+mUseCurrentHardwareValues(false),
+mWorkingMode(STOP),
 mpJoints(new JointListParameter(this, "joints")),
 mpRootCoordinateFrame(new cedar::aux::LocalCoordinateFrame()),
-mpEndEffectorCoordinateFrame(pEndEffector),
-mWorkingMode(ANGLE),
-mUseCurrentHardwareValues(false)
+mpEndEffectorCoordinateFrame(pEndEffector)
 {
   init();
 }
@@ -217,6 +217,9 @@ cedar::dev::robot::KinematicChain::ActionType cedar::dev::robot::KinematicChain:
 
 void cedar::dev::robot::KinematicChain::setJointAngles(const std::vector<double>& angles)
 {
+  // @todo: for security reasons setting angles should be only allowed
+  //        in STOP or ANGLE mode
+
   if(angles.size() != getNumberOfJoints())
   {
     //!@todo Should this throw an exception?
@@ -436,8 +439,10 @@ void cedar::dev::robot::KinematicChain::step(double time)
   // update the angle according to working mode
   switch (getWorkingMode())
   {
-    case ANGLE:
+    case STOP:
+      break;
 
+    case ANGLE:
       break;
 
     case ACCELERATION:
@@ -494,16 +499,18 @@ void cedar::dev::robot::KinematicChain::setWorkingMode(ActionType actionType)
   // need to stop something?
   switch (mWorkingMode)
   {
+    case STOP:
+      // fall-through
     case ACCELERATION:
-    {
-      QWriteLocker locker(&mAccelerationsLock);
-      setJointAccelerations(zeros);
-    }
+      {
+        setJointAccelerations(zeros);
+      }
+      // fall-through
     case VELOCITY:
-    {
-      QWriteLocker locker(&mVelocitiesLock);
-      setJointVelocities(zeros);
-    }
+      {
+        setJointVelocities(zeros);
+      }
+      // fall-through
     case ANGLE:
       break;
   }
@@ -514,16 +521,20 @@ void cedar::dev::robot::KinematicChain::setWorkingMode(ActionType actionType)
   switch (mWorkingMode)
   {
     case ACCELERATION:
-    {
-      QWriteLocker locker(&mAccelerationsLock);
-      mJointAccelerations = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
-    }
+      {
+        QWriteLocker locker(&mAccelerationsLock);
+        mJointAccelerations = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+      }
+      // fall-through
     case VELOCITY:
-    {
-      QWriteLocker locker(&mVelocitiesLock);
-      mJointVelocities = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
-    }
+      {
+        QWriteLocker locker(&mVelocitiesLock);
+        mJointVelocities = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+      }
+      // fall-through
     case ANGLE:
+      // fall-through
+    case STOP:
       break;
   }
 
@@ -647,6 +658,15 @@ void cedar::dev::robot::KinematicChain::start(Priority priority)
 
   switch (getWorkingMode())
   {
+  case STOP:
+    //!@todo Should this throw an exception?
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Error: KinematicChain is in working mode STOP!",
+      "cedar::dev::robot::KinematicChain::start(Priority)"
+    );
+    return;
+
   case ANGLE:
     //!@todo Should this throw an exception?
     cedar::aux::LogSingleton::getInstance()->error
