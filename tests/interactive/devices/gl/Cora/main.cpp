@@ -34,10 +34,10 @@
  -----------------------------------------------------------------------------*/
 
 // CEDAR INCLUDES
-#include "cedar/devices/robot/SimulatedKinematicChain.h"
-#include "cedar/devices/robot/gl/CoraArm.h"
-#include "cedar/devices/robot/gl/CoraHead.h"
-#include "cedar/devices/robot/gui/KinematicChainWidget.h"
+#include "cedar/devices/SimulatedKinematicChain.h"
+#include "cedar/devices/gl/CoraArm.h"
+#include "cedar/devices/gl/CoraHead.h"
+#include "cedar/devices/gui/KinematicChainWidget.h"
 #include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
@@ -56,14 +56,14 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create simulated kinematic chains
-  cedar::dev::robot::KinematicChainPtr p_cora_arm(new cedar::dev::robot::SimulatedKinematicChain());
+  cedar::dev::KinematicChainPtr p_cora_arm(new cedar::dev::SimulatedKinematicChain());
   p_cora_arm->readJson(arm_configuration_file);
-  cedar::dev::robot::KinematicChainPtr p_cora_head(new cedar::dev::robot::SimulatedKinematicChain());
+  cedar::dev::KinematicChainPtr p_cora_head(new cedar::dev::SimulatedKinematicChain());
   p_cora_head->readJson(head_configuration_file);
 
   // create gl visualization objects
-  cedar::dev::robot::gl::KinematicChainPtr p_cora_arm_visualization(new cedar::dev::robot::gl::CoraArm(p_cora_arm));
-  cedar::dev::robot::gl::KinematicChainPtr p_cora_head_visualization(new cedar::dev::robot::gl::CoraHead(p_cora_head));
+  cedar::dev::gl::KinematicChainPtr p_cora_arm_visualization(new cedar::dev::gl::CoraArm(p_cora_arm));
+  cedar::dev::gl::KinematicChainPtr p_cora_head_visualization(new cedar::dev::gl::CoraHead(p_cora_head));
 
   // create scene and viewer to display the arm
   cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene());
@@ -82,8 +82,8 @@ int main(int argc, char **argv)
 
   // create control widgets for the scene and the arm
   cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));
-  cedar::dev::robot::gui::KinematicChainWidget widget_arm(p_cora_arm);
-  cedar::dev::robot::gui::KinematicChainWidget widget_head(p_cora_head);
+  cedar::dev::gui::KinematicChainWidget widget_arm(p_cora_arm);
+  cedar::dev::gui::KinematicChainWidget widget_head(p_cora_head);
 
   p_scene_widget->show();
   widget_arm.show();

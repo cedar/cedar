@@ -34,13 +34,13 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_KTEAM_DRIVE_H
-#define CEDAR_DEV_ROBOT_KTEAM_DRIVE_H
+#ifndef CEDAR_DEV_KTEAM_DRIVE_H
+#define CEDAR_DEV_KTEAM_DRIVE_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/math/IntLimitsParameter.h"
-#include "cedar/devices/robot/DifferentialDrive.h"
+#include "cedar/devices/DifferentialDrive.h"
 #include "cedar/devices/kteam/namespace.h"
 #include "cedar/devices/communication/namespace.h"
 
@@ -52,7 +52,7 @@
  * This is an abstract class with functions and attributes common to differential drive robots with
  * pulse-width-modulation driven wheels. These are, for instance, the mobile robots E-Puck, Khepera and Koala.
  */
-class cedar::dev::kteam::Drive : public cedar::dev::robot::DifferentialDrive
+class cedar::dev::kteam::Drive : public cedar::dev::DifferentialDrive
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -153,4 +153,4 @@ protected:
   cedar::aux::math::IntLimitsParameterPtr _mEncoderLimits;
 }; // class cedar::dev::kteam::Drive
 
-#endif // CEDAR_DEV_ROBOT_KTEAM_DRIVE_H
+#endif // CEDAR_DEV_KTEAM_DRIVE_H

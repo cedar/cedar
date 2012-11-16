@@ -22,53 +22,63 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ControlThread.cpp
+    File:        TestRobot.cpp
 
-    Maintainer:  Bjoern Weghenkel
-    Email:       bjoern.weghenkel@ini.ruhr-uni-bochum.de
-    Date:        2011 05 10
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2010 11 08
 
-    Description: Example of speed control of an single joint.
+    Description: Implementation of the @em TestRobot class.
 
     Credits:
 
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-
-#include "ControlThread.h"
+#include "unit/devices/Robot/TestRobot.h"
+#include "unit/devices/Robot/TestComponent.h"
 
 // PROJECT INCLUDES
+#include "cedar/devices/Robot.h"
+#include "cedar/devices/Component.h"
 
 // SYSTEM INCLUDES
+#include <string>
+#include <set>
+#include <iostream>
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-ControlThread::ControlThread(
-                              const cedar::dev::KinematicChainPtr kinematicChain,
-                              double stepSize,
-                              double idleTime
-                            )
+//! constructor
+cedar::tests::unit::dev::Robot::TestRobot::TestRobot(void)
 :
-cedar::aux::LoopedThread(stepSize, idleTime)
+cedar::dev::Robot()
 {
-  mpKinematicChain = kinematicChain;
-  return;
+  _mSubComponentNames["TestComponent1"] = std::set<std::string>();
+  _mSubComponentNames["TestComponent2"] = std::set<std::string>();
 }
 
-
-void ControlThread::step(double)
+//! destructor
+cedar::tests::unit::dev::Robot::TestRobot::~TestRobot()
 {
-  double current_pos = mpKinematicChain->getJointAngle(JOINT);
-  double current_vel = mpKinematicChain->getJointVelocity(JOINT);
-
-  double rate_of_change = 1.0 * (TARGET - current_pos);
-  rate_of_change = std::min<double>(rate_of_change, current_vel + 0.4);
-
-  //todo: use a log instead of the std::cout
-  std::cout << "setting speed " << rate_of_change << std::endl;
-  mpKinematicChain->setJointVelocity(JOINT, rate_of_change);
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::dev::ComponentPtr
+  cedar::tests::unit::dev::Robot::TestRobot::createComponent(const std::string& rComponentName)
+{
+  cedar::dev::ComponentPtr test_component
+  (
+    new cedar::tests::unit::dev::Robot::TestComponent(rComponentName)
+  );
+
+  return test_component;
+}
+
 

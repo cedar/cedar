@@ -28,7 +28,7 @@
     Email:       hendrik.reimann@ini.rub.de
     Date:        2012 06 15
 
-    Description: Example for an @em cedar::dev::robot::gui::MountedCameraViewer
+    Description: Example for an @em cedar::dev::gui::MountedCameraViewer
 
     Credits:
 
@@ -38,7 +38,7 @@
 
 // PROJECT INCLUDES
 
-#include "cedar/devices/robot/gl/KinematicChain.h"
+#include "cedar/devices/gl/KinematicChain.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gl/Prism.h"
@@ -47,11 +47,11 @@
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/gui/SceneWidget.h"
-#include "cedar/devices/robot/gui/KinematicChainWidget.h"
-#include "cedar/devices/robot/gui/KinematicChainMonitorWidget.h"
-#include "cedar/devices/robot/gui/MountedCameraViewer.h"
-#include "cedar/devices/robot/SimulatedKinematicChain.h"
-#include "cedar/devices/robot/gui/MountedCameraViewer.h"
+#include "cedar/devices/gui/KinematicChainWidget.h"
+#include "cedar/devices/gui/KinematicChainMonitorWidget.h"
+#include "cedar/devices/gui/MountedCameraViewer.h"
+#include "cedar/devices/SimulatedKinematicChain.h"
+#include "cedar/devices/gui/MountedCameraViewer.h"
 
 // SYSTEM INCLUDES
 
@@ -67,13 +67,13 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create simulated arm
-  cedar::dev::robot::KinematicChainPtr test_arm(new cedar::dev::robot::SimulatedKinematicChain());
+  cedar::dev::KinematicChainPtr test_arm(new cedar::dev::SimulatedKinematicChain());
   test_arm->readJson("../../../../tests/interactive/devices/gl/MountedCameraViewer/test_arm.json");
 
   // create gl visualization objects
-  cedar::dev::robot::gl::KinematicChainPtr test_arm_visualization
+  cedar::dev::gl::KinematicChainPtr test_arm_visualization
   (
-    new cedar::dev::robot::gl::KinematicChain(test_arm)
+    new cedar::dev::gl::KinematicChain(test_arm)
   );
 
   // create scene and viewer to display the arm
@@ -120,14 +120,14 @@ int main(int argc, char **argv)
   viewer.setSceneRadius(scene->getSceneLimit());
 
   // create a mounted camera viewer
-  cedar::dev::robot::gui::MountedCameraViewer camera_viewer(scene, test_arm);
+  cedar::dev::gui::MountedCameraViewer camera_viewer(scene, test_arm);
   camera_viewer.readJson("../../../../tests/interactive/devices/gl/MountedCameraViewer/test_camera.json");
   camera_viewer.setSceneRadius(scene->getSceneLimit());
 
   // create widgets
   cedar::aux::gui::SceneWidgetPtr scene_widget(new cedar::aux::gui::SceneWidget(scene));
   scene_widget->show();
-  cedar::dev::robot::gui::KinematicChainWidget widget(test_arm);
+  cedar::dev::gui::KinematicChainWidget widget(test_arm);
   widget.getMonitorWidget()->setDecimals(10);
   widget.getCommandWidget()->setDecimals(10);
   widget.getCommandWidget()->setSingleStep(0.1);

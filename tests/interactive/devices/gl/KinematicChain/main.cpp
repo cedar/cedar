@@ -36,8 +36,8 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "cedar/devices/robot/SimulatedKinematicChain.h"
-#include "cedar/devices/robot/gl/KinematicChain.h"
+#include "cedar/devices/SimulatedKinematicChain.h"
+#include "cedar/devices/gl/KinematicChain.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
@@ -54,13 +54,13 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create simulated arm
-  cedar::dev::robot::KinematicChainPtr p_test_arm(new cedar::dev::robot::SimulatedKinematicChain());
+  cedar::dev::KinematicChainPtr p_test_arm(new cedar::dev::SimulatedKinematicChain());
   p_test_arm->readJson("../../../../tests/interactive/devices/gl/KinematicChain/test_arm.json");
 
   // create gl visualization objects
-  cedar::dev::robot::gl::KinematicChainPtr p_test_arm_visualization
+  cedar::dev::gl::KinematicChainPtr p_test_arm_visualization
   (
-    new cedar::dev::robot::gl::KinematicChain(p_test_arm)
+    new cedar::dev::gl::KinematicChain(p_test_arm)
   );
 //  cedar::aux::gl::ConePtr p_end_effector_visualization(new cedar::aux::gl::Cone (p_test_arm_model->getEndEffector(), .03, .1 ));
 
@@ -80,7 +80,7 @@ int main(int argc, char **argv)
   cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));
   p_scene_widget->show();
 
-  p_test_arm->setWorkingMode(cedar::dev::robot::KinematicChain::VELOCITY);
+  p_test_arm->setWorkingMode(cedar::dev::KinematicChain::VELOCITY);
   p_test_arm->setJointVelocity(0, 0.31);
   p_test_arm->setJointVelocity(1, -.045);
   p_test_arm->setJointVelocity(2, -.015);
@@ -88,17 +88,17 @@ int main(int argc, char **argv)
 
 
   // create everything for a second arm that's connected to the end-effector of the first one
-  cedar::dev::robot::KinematicChainPtr p_second_arm(new cedar::dev::robot::SimulatedKinematicChain());
+  cedar::dev::KinematicChainPtr p_second_arm(new cedar::dev::SimulatedKinematicChain());
   p_second_arm->readJson("../../../../tests/interactive/devices/gl/KinematicChain/test_arm.json");
 
-  cedar::dev::robot::gl::KinematicChainPtr p_second_arm_visualization
+  cedar::dev::gl::KinematicChainPtr p_second_arm_visualization
   (
-    new cedar::dev::robot::gl::KinematicChain(p_second_arm)
+    new cedar::dev::gl::KinematicChain(p_second_arm)
   );
   p_second_arm_visualization->setDisplayBase(false);
   p_scene->addObjectVisualization(p_second_arm_visualization);
   p_test_arm->setEndEffector(p_second_arm->getRootCoordinateFrame());
-  p_second_arm->setWorkingMode(cedar::dev::robot::KinematicChain::VELOCITY);
+  p_second_arm->setWorkingMode(cedar::dev::KinematicChain::VELOCITY);
   p_second_arm->setJointVelocity(0, 0.31);
   p_second_arm->setJointVelocity(1, -.45);
   p_second_arm->setJointVelocity(2, -.15);

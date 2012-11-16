@@ -24,97 +24,107 @@
 
     File:        Odometry.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2012 04 26
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 03 19
 
-    Description: The kinematics model of a differential drive robot with encoders.
+    Description: An object of this class represents the model of a mobile robot's kinematics.
 
-    Credits:     Original design by Andre Bartel (2011).
+    Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KTEAM_ODOMETRY_H
-#define CEDAR_DEV_KTEAM_ODOMETRY_H
+#ifndef CEDAR_DEV_ODOMETRY_H
+#define CEDAR_DEV_ODOMETRY_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/Odometry.h"
-#include "cedar/devices/kteam/Drive.h"
+#include "cedar/devices/namespace.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 
 // SYSTEM INCLUDES
+#include <opencv2/opencv.hpp>
+#include <QObject>
+#include <QTime>
 
-/*!@brief The kinematics model of a differential drive robot with encoders.
+/*!@brief An object of this class represents the model of a mobile robot's kinematics.
  *
- * This class calculates (i.e., estimates) the position and orientation of a robot
- * based on the robot's encoders (odometry).
+ * The class calculates position and orientation of the robot in a coordinate-system based on the robot's sensoric
+ * informations. Because this class has no access to the robot's sensors, it is an abstract class. The actual
+ * implementation is handled in its subclasses.
  */
-class cedar::dev::kteam::Odometry : public cedar::dev::Odometry
+//!@todo why inheriting from LocalCoordinateFrame here? HR: this mirrors how KinematicChainModel inherits from
+//! LocalCoordinateFrame - only these classes are sufficiently powerful and provide enough information to satisfy
+//! LocalCoordinateFrame requirements
+class cedar::dev::Odometry : public cedar::aux::LocalCoordinateFrame
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  //!@brief Constructor
-  //!@param[in] drive drive component of the robot we are modeling
-  Odometry(cedar::dev::kteam::DrivePtr drive);
-
-  //!@brief Destructor
-  virtual ~Odometry();
-
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+
+  /*!@brief The get-function of the robot's current position.
+   *@return Vector with position on x- (1st element) and y-axis (2nd element) [both in m]
+   */
+  cv::Mat getTranslation() const;
+
+  /*!@brief The get-function of the robot's current orientation.
+   *@return The current orientation [in rad].
+   */
+  double getRotation();
+
+  /*!@brief The set-function of the robot's position.
+   *@param x new translation of the robot coordinate system on the world x-axis [in m].
+   *@param y new translation of the robot coordinate system on the world y-axis [in m].
+   */
+  void setTranslation(double x, double y);
+
+  /*!@brief The set-function of the robot's orientation.
+   *@param angle Orientation of the robot [in rad].
+   */
+  void setRotation(double angle);
+
+  //!@brief Sets the Debug-flag
+  void setDebug(bool debug);
+
+  /*!@brief reset elapsed time.
+   */
+  void resetTime();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+
+  /*!@brief Updates the current position.
+   *
+   * This function is called by timerEvent(). Implement it in the sublass
+   * so that it updates the robot's position.
+   */
+  virtual void update() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Calculates the current position and orientation of the robot based on its current encoder-values.
-   * @param[in] encoders the encoder values of the left and right wheel
-   */
-   void calculatePositionAndOrientation(const std::vector<int>& encoders);
 
-  /*!@brief Updates the current position.
-   *
-   * This function is called by timerEvent() of MobileRobotModel. It calls calculatePositionAndOrientation().
+  /*!@brief The timerEvent.
    */
-  void update();
-
-  /*!@brief Calculates the distance the robot has moved since the last update.
-   * @param[in] oldEncoders the encoder values of both wheels at time step t-1
-   * @param[in] newEncoders the encoder values of both wheels at time step t
-   * @return the distance the robot has moved [m]
-   */
-  double calculateDifferencePosition(const std::vector<int>& oldEncoders, const std::vector<int>& newEncoders) const;
-
-  /*!@brief Calculates the angle the robot has turned since the last update.
-   * @param[in] oldEncoders the encoder values of both wheels at time step t-1
-   * @param[in] newEncoders the encoder values of both wheels at time step t
-   * @return the angle the robot has turned [rad]
-   */
-  double calculateDifferenceOrientation(const std::vector<int>& oldEncoders, const std::vector<int>& newEncoders) const;
+  void timerEvent(QTimerEvent *event);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief The debug-flag.
+  bool mDebug;
 
 private:
-  //! drive component of the robot
-  cedar::dev::kteam::DrivePtr mDrive;
+  // none yet
+}; // class cedar::dev::Odometry
+#endif // CEDAR_DEV_ODOMETRY_H
 
-  //! the last encoder values (needed to calculate the distance the robot has moved)
-  std::vector<int> mOldEncoders;
-}; // class cedar::dev::kteam::Odometry
-
-#endif // CEDAR_DEV_KTEAM_ODOMETRY_H

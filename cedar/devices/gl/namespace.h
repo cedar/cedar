@@ -22,44 +22,44 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KinematicChainWidget.cpp
+    File:        namespace.h
 
-    Maintainer:  Bjoern Weghenkel
-    Email:       bjoern.weghenkel@ini.rub.de
-    Date:        2011 01 06
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
+    Date:        2010 11 30
 
-    Description: Example for an @em cedar::dev::KinematicChainWidget.
+    Description: Namespace file for cedar::dev::gl.
 
     Credits:
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+#ifndef CEDAR_DEV_GL_NAMESPACE_H
+#define CEDAR_DEV_GL_NAMESPACE_H
 
-// PROJECT INCLUDES
-
-#include "cedar/devices/gui/KinematicChainWidget.h"
-#include "cedar/devices/gui/KinematicChainMonitorWidget.h"
-#include "cedar/devices/SimulatedKinematicChain.h"
+// CEDAR INCLUDES
+#include "cedar/devices/lib.h"
 
 // SYSTEM INCLUDES
+#include <boost/smart_ptr.hpp>
 
-#include <iostream>
-#include <QApplication>
-
-//------------------------------------------------------------------------------
-// methods
-//------------------------------------------------------------------------------
-
-int main(int argc, char *argv[])
+namespace cedar
 {
-  cedar::dev::KinematicChainPtr p_kinematic_chain(new cedar::dev::SimulatedKinematicChain());
-  p_kinematic_chain->readJson("../../../../tests/interactive/devices/gui/KinematicChainWidget/test_arm.json");
-  QApplication app(argc, argv);
-  cedar::dev::gui::KinematicChainWidget widget(p_kinematic_chain);
-  widget.getMonitorWidget()->setDecimals(10);
-  widget.getCommandWidget()->setDecimals(10);
-  widget.getCommandWidget()->setSingleStep(0.12345);
-  widget.show();
-  return app.exec();
+  namespace dev
+  {
+    //!@brief Namespace for widget classes.
+    namespace gl
+    {
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_DEV_CLASS(KinematicChain);
+      CEDAR_DECLARE_DEV_CLASS(AmtecChain);
+      CEDAR_DECLARE_DEV_CLASS(CoraArm);
+      CEDAR_DECLARE_DEV_CLASS(CoraHead);
+      CEDAR_DECLARE_DEV_CLASS(KukaArm);
+      CEDAR_DECLARE_DEV_CLASS(Sdh);
+      //!@endcond
+    }
+  }
 }
+
+#endif // CEDAR_DEV_GL_NAMESPACE_H
