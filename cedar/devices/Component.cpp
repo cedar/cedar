@@ -22,44 +22,28 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KinematicChainWidget.cpp
+    File:        Component.cpp
 
-    Maintainer:  Bjoern Weghenkel
-    Email:       bjoern.weghenkel@ini.rub.de
-    Date:        2011 01 06
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2010 11 08
 
-    Description: Example for an @em cedar::dev::KinematicChainWidget.
+    Description: Abstract component of a robot (e.g., a kinematic chain).
 
     Credits:
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
-
-#include "cedar/devices/gui/KinematicChainWidget.h"
-#include "cedar/devices/gui/KinematicChainMonitorWidget.h"
-#include "cedar/devices/SimulatedKinematicChain.h"
+// CEDAR INCLUDES
+#include "cedar/devices/Component.h"
+#include "cedar/devices/Robot.h"
 
 // SYSTEM INCLUDES
 
-#include <iostream>
-#include <QApplication>
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // methods
-//------------------------------------------------------------------------------
-
-int main(int argc, char *argv[])
-{
-  cedar::dev::KinematicChainPtr p_kinematic_chain(new cedar::dev::SimulatedKinematicChain());
-  p_kinematic_chain->readJson("../../../../tests/interactive/devices/gui/KinematicChainWidget/test_arm.json");
-  QApplication app(argc, argv);
-  cedar::dev::gui::KinematicChainWidget widget(p_kinematic_chain);
-  widget.getMonitorWidget()->setDecimals(10);
-  widget.getCommandWidget()->setDecimals(10);
-  widget.getCommandWidget()->setSingleStep(0.12345);
-  widget.show();
-  return app.exec();
-}
+//----------------------------------------------------------------------------------------------------------------------

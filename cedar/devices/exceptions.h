@@ -60,4 +60,10 @@ class cedar::dev::UnknownOperatingSystemException : public cedar::aux::Exception
 {
 }; // class cedar::dev::UnknownOperatingSystemException
 
+
+//!@brief Exception that occurs when a component that was requested from a robot is not available.
+class cedar::dev::ComponentNotAvailableException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::dev::UnknownOperatingSystemException
+
 #endif // CEDAR_DEV_EXCEPTIONS_H

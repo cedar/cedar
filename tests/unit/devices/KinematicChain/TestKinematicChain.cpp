@@ -22,44 +22,58 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KinematicChainWidget.cpp
+    File:        TestObject.cpp
 
-    Maintainer:  Bjoern Weghenkel
-    Email:       bjoern.weghenkel@ini.rub.de
-    Date:        2011 01 06
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
+    Date:        2012 02 15
 
-    Description: Example for an @em cedar::dev::KinematicChainWidget.
+    Description: Implementation of the @em cedar::tests::unit::dev::TestKinematicChain class.
 
     Credits:
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
 
-// PROJECT INCLUDES
-
-#include "cedar/devices/gui/KinematicChainWidget.h"
-#include "cedar/devices/gui/KinematicChainMonitorWidget.h"
-#include "cedar/devices/SimulatedKinematicChain.h"
+// CEDAR INCLUDES
+#include "tests/unit/devices/KinematicChain/TestKinematicChain.h"
 
 // SYSTEM INCLUDES
 
-#include <iostream>
-#include <QApplication>
 
-//------------------------------------------------------------------------------
-// methods
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
 
-int main(int argc, char *argv[])
+//! constructor
+TestKinematicChain::TestKinematicChain()
+:
+cedar::dev::KinematicChain()
 {
-  cedar::dev::KinematicChainPtr p_kinematic_chain(new cedar::dev::SimulatedKinematicChain());
-  p_kinematic_chain->readJson("../../../../tests/interactive/devices/gui/KinematicChainWidget/test_arm.json");
-  QApplication app(argc, argv);
-  cedar::dev::gui::KinematicChainWidget widget(p_kinematic_chain);
-  widget.getMonitorWidget()->setDecimals(10);
-  widget.getCommandWidget()->setDecimals(10);
-  widget.getCommandWidget()->setSingleStep(0.12345);
-  widget.show();
-  return app.exec();
+  
+}
+
+//! destructor
+TestKinematicChain::~TestKinematicChain()
+{
+
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+double TestKinematicChain::getJointAngle(unsigned int index) const
+{
+  return mJointAngles.at<double>(index, 0);
+}
+
+void TestKinematicChain::setJointAngle(unsigned int index, double angle)
+{
+  mJointAngles.at<double>(index, 0) = angle;
+}
+
+bool TestKinematicChain::isMovable() const
+{
+  return true;
 }

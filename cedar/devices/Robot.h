@@ -22,51 +22,61 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Odometry.h
+    File:        Robot.h
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
-    Date:        2012 04 26
+    Date:        2010 11 08
 
-    Description: The kinematics model of a differential drive robot with encoders.
+    Description: Manages all components of a robot and the communication with the hardware.
 
-    Credits:     Original design by Andre Bartel (2011).
+    Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KTEAM_ODOMETRY_H
-#define CEDAR_DEV_KTEAM_ODOMETRY_H
+#ifndef CEDAR_DEV_ROBOT_H
+#define CEDAR_DEV_ROBOT_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/Odometry.h"
-#include "cedar/devices/kteam/Drive.h"
+#include "cedar/devices/namespace.h"
 
 // SYSTEM INCLUDES
+#include <vector>
+#include <string>
+#include <set>
+#include <map>
 
-/*!@brief The kinematics model of a differential drive robot with encoders.
+/*!@brief Base class for robots.
  *
- * This class calculates (i.e., estimates) the position and orientation of a robot
- * based on the robot's encoders (odometry).
+ * @todo More detailed description of the class.
  */
-class cedar::dev::kteam::Odometry : public cedar::dev::Odometry
+class cedar::dev::Robot
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-  //!@brief Constructor
-  //!@param[in] drive drive component of the robot we are modeling
-  Odometry(cedar::dev::kteam::DrivePtr drive);
-
-  //!@brief Destructor
-  virtual ~Odometry();
+  //!@brief constructor
+  Robot();
+  //!@brief destructor
+  virtual ~Robot() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  /*! @brief Returns a pointer to the component with the name @em componentName.
+   *
+   * @return Pointer to the requested component.
+   * @param[in] rComponentName Name of the component that is to be returned.
+   */
+  ComponentPtr getComponent(const std::string& rComponentName);
+
+  /*! @brief Creates a specified component.
+   *
+   * Abstract factory class, which will be implemented by the concrete subclass.
+   */
+  virtual ComponentPtr createComponent(const std::string& rComponentName) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -78,43 +88,37 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Calculates the current position and orientation of the robot based on its current encoder-values.
-   * @param[in] encoders the encoder values of the left and right wheel
-   */
-   void calculatePositionAndOrientation(const std::vector<int>& encoders);
-
-  /*!@brief Updates the current position.
+  /*! @brief Checks if a component with the supplied @em rComponentName exists within the robot.
    *
-   * This function is called by timerEvent() of MobileRobotModel. It calls calculatePositionAndOrientation().
+   * @param[in] rComponentName Name of the subcomponent we need to check.
    */
-  void update();
+  bool isComponentAvailable(const std::string& rComponentName) const;
 
-  /*!@brief Calculates the distance the robot has moved since the last update.
-   * @param[in] oldEncoders the encoder values of both wheels at time step t-1
-   * @param[in] newEncoders the encoder values of both wheels at time step t
-   * @return the distance the robot has moved [m]
+  /*! @brief Checks if a subcomponent with the supplied @em rComponentName exists for a parent component
+   * with the name @em parentComponentName.
+   *
+   * @param[in] rComponentName Name of the subcomponent we need to check.
+   * @param[in] rParentComponentName Name of the component, that might be the parent of @em componentName.
    */
-  double calculateDifferencePosition(const std::vector<int>& oldEncoders, const std::vector<int>& newEncoders) const;
-
-  /*!@brief Calculates the angle the robot has turned since the last update.
-   * @param[in] oldEncoders the encoder values of both wheels at time step t-1
-   * @param[in] newEncoders the encoder values of both wheels at time step t
-   * @return the angle the robot has turned [rad]
-   */
-  double calculateDifferenceOrientation(const std::vector<int>& oldEncoders, const std::vector<int>& newEncoders) const;
+  bool isComponentAvailable(
+                             const std::string& rComponentName,
+                             const std::string& rParentComponentName
+                           ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //! map of pointers to all sub components
+  std::map<std::string, ComponentPtr> mComponents;
+
+  //! names of all components and their corresponding sub-components
+  std::map<std::string, std::set<std::string> > _mSubComponentNames;
+
+  //! Name of the robot.
+  std::string _mName;
 
 private:
-  //! drive component of the robot
-  cedar::dev::kteam::DrivePtr mDrive;
-
-  //! the last encoder values (needed to calculate the distance the robot has moved)
-  std::vector<int> mOldEncoders;
-}; // class cedar::dev::kteam::Odometry
-
-#endif // CEDAR_DEV_KTEAM_ODOMETRY_H
+  // none yet
+}; // class cedar::dev::Robot
+#endif // CEDAR_DEV_ROBOT_H

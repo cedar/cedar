@@ -22,51 +22,46 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Odometry.h
+    File:        Component.h
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
-    Date:        2012 04 26
+    Date:        2010 08 30
 
-    Description: The kinematics model of a differential drive robot with encoders.
+    Description: Abstract component of a robot (e.g., a kinematic chain).
 
-    Credits:     Original design by Andre Bartel (2011).
+    Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KTEAM_ODOMETRY_H
-#define CEDAR_DEV_KTEAM_ODOMETRY_H
+
+#ifndef CEDAR_DEV_COMPONENT_H
+#define CEDAR_DEV_COMPONENT_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/Odometry.h"
-#include "cedar/devices/kteam/Drive.h"
+#include "cedar/devices/namespace.h"
+#include "cedar/devices/communication/Communication.h"
 
 // SYSTEM INCLUDES
+#include <vector>
+#include <string>
+#include <set>
 
-/*!@brief The kinematics model of a differential drive robot with encoders.
+/*!@brief Base class for components of robots.
  *
- * This class calculates (i.e., estimates) the position and orientation of a robot
- * based on the robot's encoders (odometry).
+ * @todo More detailed description of the class.
  */
-class cedar::dev::kteam::Odometry : public cedar::dev::Odometry
+class cedar::dev::Component
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  //!@brief Constructor
-  //!@param[in] drive drive component of the robot we are modeling
-  Odometry(cedar::dev::kteam::DrivePtr drive);
-
-  //!@brief Destructor
-  virtual ~Odometry();
-
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -78,43 +73,29 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Calculates the current position and orientation of the robot based on its current encoder-values.
-   * @param[in] encoders the encoder values of the left and right wheel
-   */
-   void calculatePositionAndOrientation(const std::vector<int>& encoders);
-
-  /*!@brief Updates the current position.
-   *
-   * This function is called by timerEvent() of MobileRobotModel. It calls calculatePositionAndOrientation().
-   */
-  void update();
-
-  /*!@brief Calculates the distance the robot has moved since the last update.
-   * @param[in] oldEncoders the encoder values of both wheels at time step t-1
-   * @param[in] newEncoders the encoder values of both wheels at time step t
-   * @return the distance the robot has moved [m]
-   */
-  double calculateDifferencePosition(const std::vector<int>& oldEncoders, const std::vector<int>& newEncoders) const;
-
-  /*!@brief Calculates the angle the robot has turned since the last update.
-   * @param[in] oldEncoders the encoder values of both wheels at time step t-1
-   * @param[in] newEncoders the encoder values of both wheels at time step t
-   * @return the angle the robot has turned [rad]
-   */
-  double calculateDifferenceOrientation(const std::vector<int>& oldEncoders, const std::vector<int>& newEncoders) const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //! name of the category the component is in (in the configuration file)
+  std::string mCategoryName;
+  //! pointer to the robot the component belongs to
+  RobotPtr mpRobot;
+  //! pointer to the communication device
+  cedar::dev::com::Communication *mpeCommunication;
 
 private:
-  //! drive component of the robot
-  cedar::dev::kteam::DrivePtr mDrive;
+  // none yet
 
-  //! the last encoder values (needed to calculate the distance the robot has moved)
-  std::vector<int> mOldEncoders;
-}; // class cedar::dev::kteam::Odometry
-
-#endif // CEDAR_DEV_KTEAM_ODOMETRY_H
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  //! name of the parent component (if it exists)
+  std::string _mParentName;
+private:
+  // none yet
+}; // class cedar::dev::Component
+#endif // CEDAR_DEV_COMPONENT_H

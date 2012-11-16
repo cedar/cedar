@@ -160,7 +160,7 @@ void cedar::dev::kuka::KinematicChain::setJointAngle(unsigned int index, double 
 }
 
 
-void cedar::dev::kuka::KinematicChain::setWorkingMode(cedar::dev::robot::KinematicChain::ActionType actionType)
+void cedar::dev::kuka::KinematicChain::setWorkingMode(cedar::dev::KinematicChain::ActionType actionType)
 {
   // Set the desired working mode
   KinematicChain::setWorkingMode(actionType);
