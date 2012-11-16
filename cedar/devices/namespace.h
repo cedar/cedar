@@ -50,9 +50,18 @@ namespace cedar
   namespace dev
   {
     //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_DECLARE_DEV_CLASS(Robot);
+    CEDAR_DECLARE_DEV_CLASS(Component);
+    CEDAR_DECLARE_DEV_CLASS(Locomotion);
+    CEDAR_DECLARE_DEV_CLASS(DifferentialDrive);
+    CEDAR_DECLARE_DEV_CLASS(KinematicChain);
+    CEDAR_DECLARE_DEV_CLASS(Odometry);
+    CEDAR_DECLARE_DEV_CLASS(SimulatedKinematicChain);
+
     CEDAR_DECLARE_DEV_CLASS(UnresponsiveRobotException);
     CEDAR_DECLARE_DEV_CLASS(SerialCommunicationException);
     CEDAR_DECLARE_DEV_CLASS(UnknownOperatingSystemException);
+    CEDAR_DECLARE_DEV_CLASS(ComponentNotAvailableException);
     //!@endcond
   }
 }

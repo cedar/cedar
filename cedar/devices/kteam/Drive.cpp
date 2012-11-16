@@ -51,7 +51,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::kteam::Drive::Drive(cedar::dev::com::SerialCommunicationPtr communication)
 :
-cedar::dev::robot::DifferentialDrive(),
+cedar::dev::DifferentialDrive(),
 mSerialCommunication(communication),
 _mNumberOfPulsesPerRevolution(new cedar::aux::DoubleParameter(this, "number of pulses per revolution", 0.1)),
 _mEncoderLimits(new cedar::aux::math::IntLimitsParameter(this, "encoder limits", -32768, 0, 0, 32767))
