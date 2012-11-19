@@ -85,6 +85,13 @@ void cedar::aux::LoopedThread::stop(unsigned int time, bool suppressWarning)
   if (this->isRunning())
   {
     mStop = true;
+
+    // avoid dead-locking if called from the same thread:
+    if (QThread::currentThread() == this)
+    {
+      return;
+    }
+
     wait(time);
 
     if (this->isRunning())
