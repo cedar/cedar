@@ -285,13 +285,13 @@ void cedar::aux::Configurable::writeJson(const std::string& filename) const
   boost::property_tree::write_json(filename, configuration);
 }
 
-void cedar::aux::Configurable::writeCSV(const std::string& filename) const
+void cedar::aux::Configurable::writeCsv(const std::string& filename) const
 {
   std::string new_filename = normalizeFilename(filename);
 
   cedar::aux::ConfigurationNode configuration;
   this->writeConfiguration(configuration);
-  write_csv(new_filename, configuration);
+  writeCsvConfiguration(new_filename, configuration);
 }
 
 void cedar::aux::Configurable::registerParameter(cedar::aux::Parameter* parameter)
