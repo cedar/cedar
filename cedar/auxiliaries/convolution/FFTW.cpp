@@ -259,8 +259,10 @@ cv::Mat cedar::aux::conv::FFTW::padKernel(const cv::Mat& matrix, const cv::Mat& 
     {
       dim_0_fix = 1;
     }
-    cv::Range output_index[cedar::aux::math::getDimensionalityOf(matrix) + dim_0_fix];
-    cv::Range kernel_index[cedar::aux::math::getDimensionalityOf(matrix) + dim_0_fix];
+
+    std::vector<cv::Range> output_index(cedar::aux::math::getDimensionalityOf(matrix) + dim_0_fix);
+    std::vector<cv::Range> kernel_index(cedar::aux::math::getDimensionalityOf(matrix) + dim_0_fix);
+
     for (size_t dim = 0; dim < cedar::aux::math::getDimensionalityOf(matrix); ++dim)
     {
       if (part & (1 << dim))
@@ -281,7 +283,7 @@ cv::Mat cedar::aux::conv::FFTW::padKernel(const cv::Mat& matrix, const cv::Mat& 
     }
   // if 1.0 is missing, the temporary cv::Mat view onto output is replaced by kernel, instead of setting the values
   // at the specified region to the values of kernel (1.0 * kernel returns a cv::MatExpr, not cv::Mat...)
-    output(output_index) = 1.0 * kernel(kernel_index);
+    output(&(output_index.front())) = 1.0 * kernel(&(kernel_index.front()));
   }
   return output;
 }
