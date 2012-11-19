@@ -110,8 +110,20 @@ int testReading(const std::string& configFile)
   TestListTypePtr object_list_parameter(new TestListType(configurable_object.get(), "my first object list"));
   
   std::cout << "Reading file " << configFile << std::endl;
-  configurable_object->readJson(configFile);
-  
+  if (configFile.substr( configFile.length()-5,
+                           configFile.length() ) 
+      == ".json") 
+  {
+    configurable_object->readJson(configFile);
+  }
+  else if (configFile.substr( configFile.length()-4,
+                              configFile.length() )
+           == ".csv" )
+  {
+    // this does not exist yet: configurable_object->readCsv(configFile);
+    
+  }
+
   // The test file contains three objects.
   if (object_list_parameter->size() != 3)
   {
@@ -207,11 +219,14 @@ int testWriting()
   object_list_parameter->pushBack(object3);
 
   configurable_object->writeJson("tmp.json");
+  configurable_object->writeCsv("tmp.csv");
 
   // the structure above should write the same structure as tested previously.
   testReading("tmp.json");
+  // doesnt exist yet, see above: testReading("tmp.csv");
 
   boost::filesystem::remove("tmp.json");
+  boost::filesystem::remove("tmp.csv");
 
   return errors;
 }
