@@ -87,6 +87,7 @@ cedar::dyn::SpaceToRateCode::SpaceToRateCode()
 :
 // outputs
 mOutput(new cedar::aux::MatData(cv::Mat(1,1, CV_32F))),
+mFixPoint(new cedar::aux::MatData(cv::Mat(1,1, CV_32F))),
 // parameters
 _mLowerLimit(new cedar::aux::DoubleParameter(this, "lowerLimit", 0.0, -10000.0, 10000.0)),
 _mUpperLimit(new cedar::aux::DoubleParameter(this, "upperLimit", 1.0, -10000.0, 10000.0)),
@@ -95,6 +96,7 @@ _mTau(new cedar::aux::DoubleParameter(this, "tau", 100.0, cedar::aux::DoublePara
   // declare all data
   this->declareInput("input");
   this->declareOutput("output", mOutput);
+  this->declareBuffer("fix point", mFixPoint);
   this->mOutput->getData().at<float>(0,0) = 0.0;
   this->limitsChanged();
   // connect the parameter's change signal
@@ -111,10 +113,34 @@ void cedar::dyn::SpaceToRateCode::eulerStep(const cedar::unit::Time& time)
   // the result is simply input * gain.
   double slope = cv::sum(this->mInput->getData()).val[0];
   double offset = cv::sum(this->mInput->getData().mul(mRamp)).val[0];
+  double full_time = cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(1.0);
+  double tau = cedar::unit::Milliseconds(this->getTau()) / cedar::unit::Milliseconds(1.0);
 
-  this->mOutput->getData().at<float>(0,0)
-    += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(this->getTau())
-         * (-1.0 * slope * this->mOutput->getData().at<float>(0,0) + offset);
+  double local_time = full_time;
+  if (local_time / tau * slope >= 2) // stability criterion
+  {
+    local_time = tau / slope;
+  }
+
+  double h = local_time;
+  double steps = floor(full_time / h);
+  double h_rest = full_time - h * steps;
+  double v = 1.0 - h * slope / tau;
+  double v_rest = 1.0 - h_rest * slope / tau;
+  double x_0 = this->mOutput->getData().at<float>(0,0);
+  double v_pow_t_1 = pow(v, steps);
+
+  if (v != 1.0)
+  {
+    this->mOutput->getData().at<float>(0,0)
+      = v_rest * (v_pow_t_1 * x_0 + h * offset / tau * (1 - v_pow_t_1) / (1 - v)) + h_rest * offset / tau;
+  }
+  else
+  {
+    this->mOutput->getData().at<float>(0,0)
+      = v_rest * (v_pow_t_1 * x_0 + h * offset / tau * steps) + h_rest * offset / tau;
+  }
+  this->mFixPoint->getData().at<float>(0,0) = offset / slope;
 }
 
 void cedar::dyn::SpaceToRateCode::reset()
