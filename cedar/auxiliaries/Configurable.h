@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/threadingUtilities.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <map>
@@ -217,7 +218,11 @@ private:
     stream(filename.c_str());
     if (!stream)
     {
-      std::cerr << "cannot write file: " << filename << std::endl;
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "cannot write file: " + filename,
+        "cedar::aux::Configurable::writeCsv()"
+      );
     }
     writeCsvStream(stream, pt, filename, separator);
   }
@@ -235,7 +240,12 @@ private:
     stream << std::endl;
     if (!stream.good())
     {
-      std::cerr << "write error: " << filename << std::endl;
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "write error: " + filename,
+        "cedar::aux::Configurable::writeCsv()"
+      );
+
     }
   }
 
