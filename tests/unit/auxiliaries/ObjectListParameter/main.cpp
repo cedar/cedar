@@ -219,7 +219,7 @@ int testWriting()
   object_list_parameter->pushBack(object3);
 
   configurable_object->writeJson("tmp.json");
-  configurable_object->writeCsv("tmp.csv");
+  configurable_object->writeCsv("tmp.csv", ';');
 
   // the structure above should write the same structure as tested previously.
   testReading("tmp.json");
