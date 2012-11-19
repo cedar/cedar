@@ -154,6 +154,10 @@ public:
    */
   void timerEvent(QTimerEvent *pEvent);
 
+  /*!@brief Set the scaling mode of the plot.
+   */
+  void setSmoothScaling(bool smooth);
+
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
   void convert();
@@ -222,9 +226,14 @@ private:
   //! True if the plot is currently converting the data to the internal format. Used to skip overlapping timer events.
   bool mConverting;
 
+  //! Whether the matrix should be smoothed during scaling.
+  bool mSmoothScaling;
+
   static std::vector<char> mLookupTableR;
   static std::vector<char> mLookupTableG;
   static std::vector<char> mLookupTableB;
+
+  static QReadWriteLock mLookupTableLock;
 
 }; // class cedar::aux::gui::ImagePlot
 #endif // CEDAR_AUX_GUI_IMAGE_PLOT_H

@@ -44,6 +44,7 @@
 // SYSTEM INCLUDES
 #include <iostream>
 #include <math.h>
+#include <limits.h>
 
 
 std::string cedar::aux::math::matrixTypeToString(const cv::Mat& matrix)
@@ -301,273 +302,138 @@ void cedar::aux::math::write(cv::Mat matrix)
 }
 
 template <typename T>
-void cedar::aux::math::reduceCvMat3D(const cv::Mat& source, cv::Mat& destination, int dimensionToReduce, int reductionOperator)
+void cedar::aux::math::reduceCvMat3D
+                       (
+                         const cv::Mat& source,
+                         cv::Mat& destination,
+                         int dimensionToReduce,
+                         int reductionOperator,
+                         bool swapDimensions
+                       )
 {
-  int source_dimension_size_0 = source.size[0];
-  int source_dimension_size_1 = source.size[1];
-  int source_dimension_size_2 = source.size[2];
+  CEDAR_ASSERT(dimensionToReduce < 3);
+  CEDAR_DEBUG_ASSERT(source.dims == 3);
+  CEDAR_DEBUG_ASSERT(destination.dims == 2);
 
-  double sum;
-  double min;
-  double max;
+  size_t mapped_dimensions[2];
 
   switch (dimensionToReduce)
   {
     case 0:
-    {
-      switch (reductionOperator)
-      {
-        case (CV_REDUCE_SUM):
-        {
-          for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
-          {
-            for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
-            {
-              sum = 0;
-              for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
-              {
-                sum += source.at<T>(dim_0, dim_1, dim_2);
-              }
-              destination.at<T>(dim_1, dim_2) = sum;
-            }
-          }
-          break;
-        }
-        case (CV_REDUCE_AVG):
-        {
-          for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
-          {
-            for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
-            {
-              sum = 0;
-              for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
-              {
-                sum += source.at<T>(dim_0, dim_1, dim_2);
-              }
-              destination.at<T>(dim_1, dim_2) = sum/source_dimension_size_0;
-            }
-          }
-          break;
-        }
-        case (CV_REDUCE_MAX):
-        {
-          for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
-          {
-            for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
-            {
-              max = -10000;
-              for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
-              {
-                min = source.at<T>(dim_0, dim_1, dim_2);
-                if (min > max)
-                {
-                  max = min;
-                }
-              }
-              destination.at<T>(dim_1, dim_2) = max;
-            }
-          }
-          break;
-        }
-        case (CV_REDUCE_MIN):
-        {
-          for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
-          {
-            for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
-            {
-              min = 10000;
-              for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
-              {
-                max = source.at<T>(dim_0, dim_1, dim_2);
-                if(max < min)
-                {
-                  min = max;
-                }
-              }
-              destination.at<T>(dim_1, dim_2) = min;
-            }
-          }
-          break;
-        }
-        default:
-        {
-          break;
-        }
-      } // END switch reductionOperator
+      mapped_dimensions[0] = 1;
+      mapped_dimensions[1] = 2;
       break;
-    }
+
     case 1:
+      mapped_dimensions[0] = 0;
+      mapped_dimensions[1] = 2;
+      break;
+
+    case 2:
+      mapped_dimensions[0] = 0;
+      mapped_dimensions[1] = 1;
+      break;
+
+    default:
+      // should never happen -- dimensionsToReduce < 3
+      CEDAR_ASSERT(false);
+  }
+
+  if (swapDimensions)
+  {
+    size_t other = mapped_dimensions[0];
+    mapped_dimensions[0] = mapped_dimensions[1];
+    mapped_dimensions[1] = other;
+  }
+
+  int source_size[2] = {source.size[mapped_dimensions[0]], source.size[mapped_dimensions[1]]};
+
+  CEDAR_ASSERT(destination.rows == source_size[0]);
+  CEDAR_ASSERT(destination.cols == source_size[1]);
+
+  int dropped_size = source.size[dimensionToReduce];
+
+  T sum;
+  T min;
+  T max;
+
+  int src_index[3] = {0, 0, 0};
+  int& dim_dropped = src_index[static_cast<size_t>(dimensionToReduce)];
+  int& dim_1 = src_index[mapped_dimensions[0]];
+  int& dim_2 = src_index[mapped_dimensions[1]];
+
+  switch (reductionOperator)
+  {
+    case (CV_REDUCE_SUM):
     {
-      switch (reductionOperator)
+      for (dim_1 = 0; dim_1 < source_size[0]; ++dim_1)
       {
-        case (CV_REDUCE_SUM):
+        for (dim_2 = 0; dim_2 < source_size[1]; ++dim_2)
         {
-          for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
+          sum = 0;
+          for (dim_dropped = 0; dim_dropped < dropped_size; ++dim_dropped)
           {
-            for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
-            {
-              sum = 0;
-              for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
-              {
-                sum += source.at<T>(dim_0, dim_1, dim_2);
-              }
-              destination.at<T>(dim_0, dim_2) = sum;
-            }
+            sum += source.at<T>(src_index);
           }
-          break;
+          destination.at<T>(dim_1, dim_2) = sum;
         }
-        case (CV_REDUCE_AVG):
-        {
-          for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
-          {
-            for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
-            {
-              sum = 0;
-              for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
-              {
-                sum += source.at<T>(dim_0, dim_1, dim_2);
-              }
-              destination.at<T>(dim_0, dim_2) = sum/source_dimension_size_0;
-            }
-          }
-          break;
-        }
-        case (CV_REDUCE_MAX):
-        {
-          for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
-          {
-            for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
-            {
-              max = -10000;
-              for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
-              {
-                min = source.at<T>(dim_0, dim_1, dim_2);
-                if (min > max)
-                {
-                  max = min;
-                }
-              }
-              destination.at<T>(dim_0, dim_2) = max;
-            }
-          }
-          break;
-        }
-        case (CV_REDUCE_MIN):
-        {
-          for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
-          {
-            for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
-            {
-              min = 10000;
-              for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
-              {
-                max = source.at<T>(dim_0, dim_1, dim_2);
-                if (max < min)
-                {
-                  min = max;
-                }
-              }
-              destination.at<T>(dim_0, dim_2) = min;
-            }
-          }
-          break;
-        }
-        default:
-        {
-          break;
-        }
-      } // END switch reductionOperator
+      }
       break;
     }
-    case 2:
+    case (CV_REDUCE_AVG):
     {
-      switch (reductionOperator)
+      for (dim_1 = 0; dim_1 < source_size[0]; ++dim_1)
       {
-        case (CV_REDUCE_SUM):
+        for (dim_2 = 0; dim_2 < source_size[1]; ++dim_2)
         {
-          for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
+          sum = 0;
+          for (dim_dropped = 0; dim_dropped < dropped_size; ++dim_dropped)
           {
-            for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
-            {
-              sum = 0;
-              for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
-              {
-                sum += source.at<T>(dim_0 ,dim_1, dim_2);
-              }
-              destination.at<T>(dim_0, dim_1) = sum;
-            }
+            sum += source.at<T>(src_index);
           }
-          break;
+          destination.at<T>(dim_1, dim_2) = sum/dropped_size;
         }
-        case (CV_REDUCE_AVG):
+      }
+      break;
+    }
+    case (CV_REDUCE_MAX):
+    {
+      for (dim_1 = 0; dim_1 < source_size[0]; ++dim_1)
+      {
+        for (dim_2 = 0; dim_2 < source_size[1]; ++dim_2)
         {
-          for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
+          max = std::numeric_limits<int>::min();
+          for (dim_dropped = 0; dim_dropped < dropped_size; ++dim_dropped)
           {
-            for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
-            {
-              sum = 0;
-              for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
-              {
-                sum += source.at<T>(dim_0, dim_1, dim_2);
-              }
-              destination.at<T>(dim_0, dim_1) = sum/source_dimension_size_0;
-            }
+            max = std::max(max, source.at<T>(src_index));
           }
-          break;
+          destination.at<T>(dim_1, dim_2) = max;
         }
-        case (CV_REDUCE_MAX):
+      }
+      break;
+    }
+    case (CV_REDUCE_MIN):
+    {
+      for (dim_1 = 0; dim_1 < source_size[0]; ++dim_1)
+      {
+        for (dim_2 = 0; dim_2 < source_size[1]; ++dim_2)
         {
-          for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
+          min = std::numeric_limits<int>::max();
+          for (dim_dropped = 0; dim_dropped < dropped_size; ++dim_dropped)
           {
-            for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
-            {
-              max = -10000;
-              for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
-              {
-                min = source.at<T>(dim_0, dim_1, dim_2);
-                if (min > max)
-                {
-                  max = min;
-                }
-              }
-              destination.at<T>(dim_0, dim_1) = max;
-            }
+            min = std::min(min, source.at<T>(src_index));
           }
-          break;
+          destination.at<T>(dim_1, dim_2) = min;
         }
-        case (CV_REDUCE_MIN):
-        {
-          for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
-          {
-            for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
-            {
-              min = 10000;
-              for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
-              {
-                max = source.at<T>(dim_0, dim_1, dim_2);
-                if (max < min)
-                {
-                  min = max;
-                }
-              }
-              destination.at<T>(dim_0, dim_1) = min;
-            }
-          }
-          break;
-        }
-        default:
-        {
-          break;
-        }
-      } // END switch reductionOperator
+      }
       break;
     }
     default:
     {
       break;
     }
-  }
+  } // END switch reductionOperator
 }
 
-template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::reduceCvMat3D<float>(const cv::Mat& source, cv::Mat& dst, int dimensionToReduce, int reductionOperator);
-template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::reduceCvMat3D<double>(const cv::Mat& source, cv::Mat& dst, int dimensionToReduce, int reductionOperator);
+template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::reduceCvMat3D<float>(const cv::Mat& source, cv::Mat& dst, int dimensionToReduce, int reductionOperator, bool swapDimensions);
+template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::reduceCvMat3D<double>(const cv::Mat& source, cv::Mat& dst, int dimensionToReduce, int reductionOperator, bool swapDimensions);
