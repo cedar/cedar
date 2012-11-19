@@ -189,6 +189,9 @@ void cedar::aux::LoopedThread::run()
         // sleep until next wake up time
         sleep_duration = scheduled_wakeup - boost::posix_time::microsec_clock::universal_time();
         usleep(std::max<int>(0, sleep_duration.total_microseconds()));
+      
+        if (mStop) // a lot can happen in a few us
+          return;
 
         // determine time since last run
         mLastTimeStepStart = mLastTimeStepEnd;
@@ -206,6 +209,9 @@ void cedar::aux::LoopedThread::run()
 
         // call step function
         step(full_steps_taken * step_size.total_microseconds() * 0.001);
+
+        if (mStop) // a lot can happen in a step()
+          return;
 
         // schedule the next wake up
         while (scheduled_wakeup < boost::posix_time::microsec_clock::universal_time())
@@ -234,6 +240,9 @@ void cedar::aux::LoopedThread::run()
         sleep_duration = scheduled_wakeup - boost::posix_time::microsec_clock::universal_time();
         usleep(std::max<int>(0, sleep_duration.total_microseconds()));
 
+        if (mStop) // a lot can happen in a few us
+          return;
+
         // determine time since last run
         mLastTimeStepStart = mLastTimeStepEnd;
         mLastTimeStepEnd = scheduled_wakeup;
@@ -250,6 +259,8 @@ void cedar::aux::LoopedThread::run()
         // call step function
         step(steps_taken * step_size.total_microseconds() * 0.001);
 
+        if (mStop) // a lot can happen in a step()
+          return;
 
         // schedule the next wake up
         scheduled_wakeup = std::max<boost::posix_time::ptime>
