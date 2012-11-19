@@ -121,7 +121,7 @@ public:
   void writeJson(const std::string& filename) const;
 
   //!@brief write a configuration to a cedar::aux::ConfigurationNode tree and store this tree in a csv spreadsheet file
-  void writeCsv(const std::string& filename) const;
+  void writeCsv(const std::string& filename, const char separator = ',') const;
 
   //!@brief get a map of all children of the current Configurable
   const Children& configurableChildren() const;
@@ -209,7 +209,8 @@ private:
 
   //!@brief helper function to write a Ptree to .csv. internals start here. opens the stream
   template<class Ptree>
-  void writeCsvConfiguration(const std::string& filename, const Ptree& pt) const
+  void writeCsvConfiguration(const std::string& filename, const Ptree& pt, 
+                             const char separator) const
   {
     // heavily copied + simplified from boost
     std::basic_ofstream<typename Ptree::key_type::value_type>
@@ -218,7 +219,7 @@ private:
     {
       std::cerr << "cannot write file: " << filename << std::endl;
     }
-    writeCsvStream(stream, pt, filename);
+    writeCsvStream(stream, pt, filename, separator);
   }
 
 
@@ -226,10 +227,11 @@ private:
   template<class Ptree>
   void writeCsvStream(std::basic_ostream<typename Ptree::key_type::value_type>& stream, 
                             const Ptree& pt,
-                            const std::string& filename) const
+                            const std::string& filename,
+                            const char separator) const
   {
 
-    writeCsvItem(stream, pt, 0);
+    writeCsvItem(stream, pt, 0, separator);
     stream << std::endl;
     if (!stream.good())
     {
@@ -240,7 +242,8 @@ private:
   //!@brief helper function to write a Ptree to .csv. internal. write structure
   template<class Ptree>
   void writeCsvItem(std::basic_ostream<typename Ptree::key_type::value_type>& stream, 
-                        const Ptree& pt, int indent) const
+                        const Ptree& pt, int indent,
+                        const char separator) const
   {
     typedef typename Ptree::key_type::value_type Ch;
     typedef typename std::basic_string<Ch> Str;
@@ -257,7 +260,7 @@ private:
     {      
       // write value:
       //<< std::setprecision(4) // set decimal precision for data. saves a lot of bytes ;)
-      stream << ( pt.template get_value<Str>() ); // << Ch(','); 
+      stream << ( pt.template get_value<Str>() ); 
         // TODO: add escaping special characters
     }
     else if (pt.count(Str()) == pt.size() && indent > 0)
@@ -267,11 +270,11 @@ private:
       for (; it != pt.end(); ++it)
       {
         // write-out one level lower:
-        writeCsvItem(stream, it->second, indent + 1);
+        writeCsvItem(stream, it->second, indent + 1, separator);
         if (boost::next(it) != pt.end())
         {
           // separator for cells (columns):
-          stream << Ch(',');
+          stream << Ch(separator);
         }
       }
     }
@@ -282,9 +285,9 @@ private:
       for (; it != pt.end(); ++it)
       {
         stream << Ch('\n'); // every entry on new line (row)
-        stream << (it->first) << Ch(','); // name in first cell of row
+        stream << (it->first) << Ch(separator); // name in first cell of row
 
-        writeCsvItem(stream, it->second, indent + 1);
+        writeCsvItem(stream, it->second, indent + 1, separator);
       }
 
       stream << Ch('\n'); // NL on last row
