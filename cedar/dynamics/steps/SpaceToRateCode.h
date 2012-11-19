@@ -138,6 +138,7 @@ protected:
 
   //!@brief The data containing the output.
   cedar::aux::MatDataPtr mOutput;
+  cedar::aux::MatDataPtr mFixPoint;
 private:
   cv::Mat mRamp;
 
