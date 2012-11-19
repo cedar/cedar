@@ -559,6 +559,9 @@ void cedar::dev::robot::KinematicChain::init()
   default_joint->_mpVelocityLimits->setUpperLimit(2*cedar::aux::math::pi);
   this->mpJoints->pushBack(default_joint);
   initializeFromJointList();
+
+  mCurrentInitialConfiguration = "";
+  mInitialConfigurations[""] = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
 }
 
 void cedar::dev::robot::KinematicChain::initializeFromJointList()
@@ -1069,3 +1072,129 @@ const cedar::dev::robot::KinematicChain::JointPtr cedar::dev::robot::KinematicCh
 {
   return mpJoints->at(index);
 }
+
+
+
+void cedar::dev::robot::KinematicChain::setInitialConfigurations(std::map<std::string, cv::Mat> configs)
+{
+  QWriteLocker wlock(&mCurrentInitialConfigurationLock);
+
+  mInitialConfigurations.clear();
+  for( std::map< std::string, cv::Mat >::const_iterator it = configs.begin(); it != configs.end(); ++it)
+  {
+    mInitialConfigurations[ it->first ] = it->second.clone();
+    // it is important to clone the cv::Mats!
+  }
+
+  if (mCurrentInitialConfiguration.empty()
+      || mCurrentInitialConfiguration == "")
+  {
+    wlock.unlock();
+    // auto apply
+    applyInitialConfiguration( mInitialConfigurations.begin()->first );
+  }
+}
+
+
+bool cedar::dev::robot::KinematicChain::applyInitialConfiguration(std::string s)
+{
+  QReadLocker rlock(&mCurrentInitialConfigurationLock);
+  auto f = mInitialConfigurations.find(s);
+  if (f != mInitialConfigurations.end())
+  {
+    rlock.unlock();
+    QWriteLocker wlock(&mCurrentInitialConfigurationLock);
+
+    mCurrentInitialConfiguration = s;
+    // apply ...
+    // better to drive slowly to this configuration ...
+    if (0) // TODO: !isSimulated())
+    {
+      // TODO: setWorkingMode( RESETSAFE );
+    }
+    else
+    {
+      auto mode = getWorkingMode();
+
+      setWorkingMode( ANGLE );
+      setJointAngles( f->second );
+      setWorkingMode( mode );
+    }
+
+    return true;
+  }
+  return false;
+}
+
+
+bool cedar::dev::robot::KinematicChain::applyInitialConfiguration(unsigned int i)
+{
+  QReadLocker rlock(&mCurrentInitialConfigurationLock);
+
+  if (i >= mInitialConfigurations.size())
+    return false;
+
+  unsigned int j = 0;
+  for( std::map< std::string, cv::Mat >::const_iterator it = mInitialConfigurations.begin(); it != mInitialConfigurations.end(); it++ )
+  {
+    if (i == j)
+    {
+      rlock.unlock();
+      return applyInitialConfiguration(it->first);
+    }
+    j++;
+  }
+
+  return false; // should land here
+}
+
+unsigned int cedar::dev::robot::KinematicChain::getCurrentInitialConfigurationIndex()
+{
+  QReadLocker lock(&mCurrentInitialConfigurationLock);
+  unsigned int j;
+
+  for( std::map< std::string, cv::Mat >::const_iterator it = mInitialConfigurations.begin(); it != mInitialConfigurations.end(); it++ )
+  {
+    if (it->first == mCurrentInitialConfiguration)
+    {
+      return j;
+    }
+    j++;
+  }
+
+  return 0; // TODO: throw error?
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::getInitialConfiguration(std::string s)
+{
+  QReadLocker lock(&mCurrentInitialConfigurationLock);
+
+  return mInitialConfigurations[s];
+}
+
+std::vector<std::string> cedar::dev::robot::KinematicChain::getInitialConfigurationIndices()
+{
+  QReadLocker lock(&mCurrentInitialConfigurationLock);
+  std::vector<std::string> result;
+
+  for( std::map<std::string,cv::Mat>::const_iterator it = mInitialConfigurations.begin(); it != mInitialConfigurations.end(); ++it )
+  {
+    result.push_back( (*it).first );
+  }
+  return result;
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::getCurrentInitialConfiguration()
+{
+  QReadLocker lock(&mCurrentInitialConfigurationLock);
+
+  std::map< std::string, cv::Mat >::const_iterator found = mInitialConfigurations.find(mCurrentInitialConfiguration);
+  if (found == mInitialConfigurations.end())
+  {
+    // TODO ?
+    return cv::Mat();
+  }
+
+  return mInitialConfigurations[ mCurrentInitialConfiguration ];
+}
+
