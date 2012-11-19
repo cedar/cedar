@@ -108,39 +108,126 @@ _mTau(new cedar::aux::DoubleParameter(this, "tau", 100.0, cedar::aux::DoublePara
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+/*!
+ * @class cedar::dyn::SpaceToRateCode
+ *
+ * This step's update equation contains some mathematical reformulations that warrant explanation.
+ *
+ * Normally, the Euler step for this particular equation would be calculated according to
+ * \f[
+ *   x_{t + 1} = x_t + \frac{dt}{\tau} \cdot (-s x_t + o),
+ * \f]
+ * where \f$s\f$ and \f$o\f$ are values derived from the input, and \f$dt\f$ is the time step to be simulated.
+ *
+ * However, \f$s\f$ and \f$o\f$ can potentially become quite large, leading to instabilities in the numerical
+ * approximation of the solution. Thus, our approach to prevent these instabilities is to subdivide \f$dt\f$ into
+ * \f$T\f$ substeps, all of length \f$h\f$, except for the last one which is of length \f$h_r\f$, so that
+ * \f$dt = T \cdot h + h_r\f$.
+ *
+ * Given this, we could just calculate the substeps with the usual forward Euler approach. However, this would mean
+ * that the Euler step would have to be calculated \f$T + 1\f$ times, which could potentially be a time consuming
+ * operation.
+ *
+ * Instead, we can simplify this by recursively inserting the Euler approximation. First, we reformulate the
+ * approximation for the fixed substep \f$h\f$:
+ * \f{eqnarray*}{
+ *   x_{t + 1} &=& x_{t} + h \cdot \frac{1}{\tau} (-s x_{t} + o) \\
+ *             &=& x_{t} - \frac{h}{\tau} s x_{t} + \frac{h}{\tau} o \\
+ *             &=& \left( 1 - \frac{h}{\tau} s \right) x_{t} + \frac{h}{\tau} o.
+ * \f}
+ * Then, we recursively insert this equation into itself:
+ * \f{eqnarray*}{
+ *  x_{n + 1} &=& \left( 1 - \frac{h}{\tau} s \right) x_{t} + \frac{h}{\tau} o \\
+ *          &=& \left( 1 - \frac{h}{\tau} s \right) \left( \left( 1 - \frac{h}{\tau} s \right) x_{t - 1}
+ *              + \frac{h}{\tau} o \right) + \frac{h}{\tau} o \\
+ *          &=& \left( 1 - \frac{h}{\tau} s\right)^2 x_{t - 1} + \left( 1 - \frac{h}{\tau} s \right) \frac{h}{\tau} o
+ *              + \frac{h}{\tau} o \\
+ *          &=& \ldots \\
+ *          &=& \left( 1 - \frac{h}{\tau} s\right)^{m} x_{t - (m - 1)} + \sum\limits_{i = 0}^{m - 1}
+ *              \left( 1 - \frac{h}{\tau} s\right)^i \cdot \frac{h}{\tau} o \\
+ *          &=& \ldots \\
+ *          &=& \left( 1 - \frac{h}{\tau} s\right)^{t + 1} x_{0} + \sum\limits_{i = 0}^{t}
+ *              \left( 1 - \frac{h}{\tau} s\right)^i \cdot \frac{h}{\tau} o
+ * \f}
+ *
+ * The sum in this result can be simplified (see also
+ * <a href="http://de.wikipedia.org/wiki/Geometrische_Reihe#Herleitung_der_Formel_f.C3.BCr_die_Partialsummen">this proof
+ * on wikipedia</a>). Let \f$v = 1 - \frac{h}{\tau} s\f$. Then
+ * \f{eqnarray*}{
+ *   s_t &:=& \sum\limits_{i = 0}^{t} v^i \\
+ *       &=& 1 + v^1 + v^2 + \ldots + v^t \\
+ *   v \cdot s_t &=&  v + v^2 + v^3 + \ldots + v^{t+1} \\
+ *   \Rightarrow
+ *     s_t - v \cdot s_t &=& 1 - v^{t + 1} \\
+ *   \Leftrightarrow s_t (1 - v) &=& 1 - v^{t + 1} \\
+ *   \Leftrightarrow s_t &=& \frac{1 - v^{t + 1}}{1 - v}
+ * \f}
+ * This result only holds for \f$v \neq 1\f$, howerver, for \f$v = 1\f$, calculating the sum is trivial.
+ *
+ * Inserting this result into the approximation, we get
+ * \f{eqnarray*}{
+ * x_{t + 1} &=& v^{t + 1} x_{0} + \frac{h}{\tau} o \cdot \sum\limits_{i = 0}^{t} v^i\\
+ *    &=&
+ *      v^{t + 1} x_{0}
+ *      + \frac{h}{\tau} o \cdot \frac{1 - v^{t + 1}}{1 - v}
+ * \f}
+ *
+ * Combined, all these results can be used to arrive at the equation for the complete simulation of our time steps,
+ *  \f{eqnarray*}{
+ *    x_{T,r} &=& \left( 1 - \frac{h_r}{\tau} s \right) x_T + \frac{h_r}{\tau} o \\
+ *     &=& \left( 1 - \frac{h_r}{\tau} s \right)
+ *         \left(v^{T + 1} x_{0} + \frac{h}{\tau} o \cdot \frac{1 - v^{T + 1}}{1 - v} \right)
+ *         + \frac{h_r}{\tau} o
+ *  \f}
+ *
+ * From the above considerations, we can also derive that this approximation is stable iff
+ * \f[
+ *   \left| \left( 1 - \frac{h}{\tau} s\right) \right| < 1
+ * \f]
+ * (because otherwise, the sums do not converge). Because \f$h\f$ and \f$s\f$ are positive, this condition can be
+ * rewritten as
+ * \f[
+ *   \frac{h}{\tau} s < 2,
+ * \f]
+ * or
+ * \f[
+ *    h < \frac{2 \tau}{s}.
+ * \f]
+ */
 void cedar::dyn::SpaceToRateCode::eulerStep(const cedar::unit::Time& time)
 {
-  // the result is simply input * gain.
-  double slope = cv::sum(this->mInput->getData()).val[0];
-  double offset = cv::sum(this->mInput->getData().mul(mRamp)).val[0];
-  double full_time = cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(1.0);
+  // the result is simply input * gain; see explanation above for variable names
+  double s = cv::sum(this->mInput->getData()).val[0];
+  double o = cv::sum(this->mInput->getData().mul(mRamp)).val[0];
+  double dt = cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(1.0);
   double tau = cedar::unit::Milliseconds(this->getTau()) / cedar::unit::Milliseconds(1.0);
 
-  double local_time = full_time;
-  if (local_time / tau * slope >= 2) // stability criterion
+  double h = dt;
+  if (h / tau * s >= 2) // stability criterion
   {
-    local_time = tau / slope;
+    h = tau / s; // select a value that is very stable, i.e., is far from the point of instability
   }
 
-  double h = local_time;
-  double steps = floor(full_time / h);
-  double h_rest = full_time - h * steps;
-  double v = 1.0 - h * slope / tau;
-  double v_rest = 1.0 - h_rest * slope / tau;
+  // again, see above for the meaning of the variables
+  double T = floor(dt / h);
+  double h_r = dt - h * T;
+  double v = 1.0 - h * s / tau;
+  double v_rest = 1.0 - h_r * s / tau; // defined just like v, just with h_r instead of h
   double x_0 = this->mOutput->getData().at<float>(0,0);
-  double v_pow_t_1 = pow(v, steps);
+  double v_pow_T = pow(v, T);
 
+  double s_T;
   if (v != 1.0)
   {
-    this->mOutput->getData().at<float>(0,0)
-      = v_rest * (v_pow_t_1 * x_0 + h * offset / tau * (1 - v_pow_t_1) / (1 - v)) + h_rest * offset / tau;
+    s_T = (1 - v_pow_T) / (1 - v);
   }
   else
   {
-    this->mOutput->getData().at<float>(0,0)
-      = v_rest * (v_pow_t_1 * x_0 + h * offset / tau * steps) + h_rest * offset / tau;
+    s_T = T;
   }
-  this->mFixPoint->getData().at<float>(0,0) = offset / slope;
+  this->mOutput->getData().at<float>(0,0) = v_rest * (v_pow_T * x_0 + h * o / tau * s_T) + h_r * o / tau;
+
+  this->mFixPoint->getData().at<float>(0,0) = o / s;
 }
 
 void cedar::dyn::SpaceToRateCode::reset()

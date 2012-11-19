@@ -59,7 +59,9 @@ likely to undergo major changes:
 == current version ==
 - cedar::proc
   - The processingIde can now be started with the "--no-log" option. This will redirect all log messages to the terminal
-    and can be very helpful when steps send too many log messages, leading to a lock-up of the user interface. 
+    and can be very helpful when steps send too many log messages, leading to a lock-up of the user interface.
+- cedar::dyn
+  - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   
 
 == Version 1.0.3 ==
 - cedar::aux
