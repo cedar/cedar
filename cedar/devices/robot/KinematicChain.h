@@ -537,6 +537,37 @@ public:
    */
   cv::Mat calculateEndEffectorAcceleration();
 
+  /*!@brief get joints of a named initial configuration
+   *
+   * @return    joint values of the initial configuration
+   */
+  cv::Mat getInitialConfiguration(std::string name);
+
+  /*!@brief get the vector of all initial configuration names
+   *
+   * @return    vector of string: the names of initial configurations
+   */
+  std::vector<std::string> getInitialConfigurationIndices();
+
+  /*!@brief get index number of the current initial configuration
+   *
+   * @return   the index position in the vector of names 
+   */
+  unsigned int getCurrentInitialConfigurationIndex();
+
+  /*!@brief get joints of the current initial configuration
+   *
+   * @return    joint values of the initial configuration
+   */
+  cv::Mat getCurrentInitialConfiguration();
+
+  //!@brief set the named map of initial configurations
+  void setInitialConfigurations(std::map<std::string, cv::Mat> configs);
+  //!@brief apply the named initial configuration by name
+  bool applyInitialConfiguration(std::string s);
+  //!@brief apply the named initial configuration by index
+  bool applyInitialConfiguration(unsigned int i);
+
   //----------------------------------------------------------------------------
   // protected methods
   //----------------------------------------------------------------------------
@@ -605,5 +636,12 @@ private:
   std::vector<cv::Mat> mJointTransformations;
   //! twist coordinates for the transformations induced by rotating the joints in the curent configuration
   std::vector<cv::Mat> mJointTwists;
+
+  //!@brief map of the named initial configurations
+  std::map< std::string, cv::Mat > mInitialConfigurations;
+  //!@brief the current initial configuration name
+  std::string mCurrentInitialConfiguration;
+  //!@brief lock for the initial configuration datas
+  QReadWriteLock mCurrentInitialConfigurationLock;
 }; // class cedar::dev::robot::KinematicChain
 #endif // CEDAR_DEV_ROBOT_KINEMATIC_CHAIN_H
