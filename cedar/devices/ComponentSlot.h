@@ -77,7 +77,7 @@ public:
    *
    * @returns pointer to the component
    */
-  cedar::dev::ComponentPtr getComponent() const;
+  cedar::dev::ComponentPtr getComponent();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

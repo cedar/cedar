@@ -35,6 +35,8 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/ObjectMapParameterTemplate.h"
+#include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/devices/ComponentSlot.h"
 
 // SYSTEM INCLUDES
@@ -47,11 +49,12 @@
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-  cedar::dev::ComponentPtr cedar::dev::ComponentSlot::getComponent() const
+  cedar::dev::ComponentPtr cedar::dev::ComponentSlot::getComponent()
   {
     if (!mComponent)
     {
-      std::string component_type_id = _mComponentTypeIds[_mChannelType->getValue()];
+      std::string channel_type = _mChannelType->getValue();
+      std::string component_type_id = (*(*_mComponentTypeIds)[channel_type]);
       mComponent = FactorySingleton::getInstance()->allocate(component_type_id);
     }
 
