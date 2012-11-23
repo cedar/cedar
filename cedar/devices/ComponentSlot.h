@@ -22,57 +22,62 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TestRobot.h
+    File:        ComponentSlot.h
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
-    Date:        2010 11 08
+    Date:        2012 11 23
 
-    Description: Header for the @em TestRobot class.
+    Description: Slot for components of a robot (e.g., a kinematic chain).
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_TESTS_UNIT_DEV_ROBOT_TEST_ROBOT_H
-#define CEDAR_TESTS_UNIT_DEV_ROBOT_TEST_ROBOT_H
+#ifndef CEDAR_DEV_COMPONENT_SLOT_H
+#define CEDAR_DEV_COMPONENT_SLOT_H
 
-// LOCAL INCLUDES
-#include "unit/devices/Robot/namespace.h"
-
-// PROJECT INCLUDES
-#include "cedar/devices/Robot.h"
-#include "cedar/devices/Component.h"
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/devices/namespace.h"
 
 // SYSTEM INCLUDES
-#include <string>
 
-
-/*!@brief Abstract description of the class.
+/*!@brief Slot for a single robot component.
  *
- * More detailed description of the class.
+ * @todo More detailed description of the class.
  */
-class cedar::tests::unit::dev::Robot::TestRobot : public cedar::dev::Robot
+class cedar::dev::ComponentSlot
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
+  //!@brief a singleton factory manager for components
+  typedef cedar::aux::Singleton<cedar::aux::FactoryManager<cedar::dev::ComponentPtr> > FactorySingleton;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Constructor that gets a configuration file name.
-  TestRobot(void);
-
-  //!@brief Destructor
-  virtual ~TestRobot(void);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  /*!@brief Returns a pointer to the robot this component slot belongs to.
+   *
+   * @returns pointer to this slot's robot
+   */
+  inline cedar::dev::RobotPtr getRobot() const
+  {
+    return mRobot;
+  }
+
+  /*!@brief Returns the component currently docked to this component slot.
+   *
+   * @returns pointer to the component
+   */
+  cedar::dev::ComponentPtr getComponent() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -89,26 +94,28 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  virtual cedar::dev::ComponentPtr createComponent(const std::string& rComponentName);
-
 protected:
   // none yet
+
 private:
-  // none yet
+  //! robot the component slot belongs to
+  cedar::dev::RobotPtr mRobot;
+
+  //! component that is currently docked to this slot
+  cedar::dev::ComponentPtr mComponent;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
-
 private:
-  // none yet
+  //! name of the component slot
+  cedar::aux::StringParameterPtr _mName;
 
-}; // class cedar::tests::unit::aux::dev::Robot::TestRobot
+  cedar::aux::StringParameterPtr _mChannelType;
 
-#endif // CEDAR_TESTS_UNIT_DEV_ROBOT_ROBOT_TEST_ROBOT_H
-
+  //! mapping of channel types to class names of components
+  cedar::aux::StringMapParameterPtr _mComponentTypeIds;
+}; // class cedar::dev::ComponentSlot
+#endif // CEDAR_DEV_COMPONENT_SLOT_H

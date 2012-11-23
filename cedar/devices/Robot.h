@@ -26,9 +26,9 @@
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
-    Date:        2010 11 08
+    Date:        2012 11 23
 
-    Description: Manages all components of a robot and the communication with the hardware.
+    Description: Manages all components of a robot.
 
     Credits:
 
@@ -38,12 +38,12 @@
 #define CEDAR_DEV_ROBOT_H
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/namespace.h"
 #include "cedar/devices/namespace.h"
 
 // SYSTEM INCLUDES
 #include <vector>
 #include <string>
-#include <set>
 #include <map>
 
 /*!@brief Base class for robots.
@@ -52,6 +52,12 @@
  */
 class cedar::dev::Robot
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // types
+  //--------------------------------------------------------------------------------------------------------------------
+  typedef cedar::aux::ObjectMapParameterTemplate<cedar::dev::ComponentSlot> ComponentSlotParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ComponentSlotParameter);
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -65,18 +71,31 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! @brief Returns a pointer to the component with the name @em componentName.
+  /*! @brief Returns a pointer to the component docked to the component slot with the name @em componentSlotName.
    *
    * @return Pointer to the requested component.
-   * @param[in] rComponentName Name of the component that is to be returned.
+   * @param[in] componentSlotName name of the component slot, whose component is to be returned.
    */
-  ComponentPtr getComponent(const std::string& rComponentName);
+  ComponentPtr getComponent(const std::string& componentSlotName) const;
 
-  /*! @brief Creates a specified component.
+  /*! @brief Returns a vector containing all the available slot names of the robot.
    *
-   * Abstract factory class, which will be implemented by the concrete subclass.
+   * @return vector of available slot names
    */
-  virtual ComponentPtr createComponent(const std::string& rComponentName) = 0;
+  std::vector<std::string> getComponentSlotNames() const;
+
+  /*! @brief Returns the component slot with the name @em componentSlotName.
+   *
+   * @return component slot
+   * @param[in] componentSlotName name of the component slot that is to be returned
+   */
+  ComponentSlotPtr getComponentSlot(const std::string& componentSlotName) const;
+
+  /*! @brief Returns the name of the robot.
+   *
+   * @return Name of the robot.
+   */
+  const std::string& getName() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -88,37 +107,29 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*! @brief Checks if a component with the supplied @em rComponentName exists within the robot.
-   *
-   * @param[in] rComponentName Name of the subcomponent we need to check.
-   */
-  bool isComponentAvailable(const std::string& rComponentName) const;
-
-  /*! @brief Checks if a subcomponent with the supplied @em rComponentName exists for a parent component
-   * with the name @em parentComponentName.
-   *
-   * @param[in] rComponentName Name of the subcomponent we need to check.
-   * @param[in] rParentComponentName Name of the component, that might be the parent of @em componentName.
-   */
-  bool isComponentAvailable(
-                             const std::string& rComponentName,
-                             const std::string& rParentComponentName
-                           ) const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! map of pointers to all sub components
-  std::map<std::string, ComponentPtr> mComponents;
-
-  //! names of all components and their corresponding sub-components
-  std::map<std::string, std::set<std::string> > _mSubComponentNames;
-
-  //! Name of the robot.
-  std::string _mName;
+  // none yet
 
 private:
   // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  //! name of the robot
+  cedar::aux::StringParameterPtr _mName;
+
+  //! mapping of all slot names to their component slots
+  ComponentSlotParameterPtr _mComponentSlots;
+
 }; // class cedar::dev::Robot
 #endif // CEDAR_DEV_ROBOT_H

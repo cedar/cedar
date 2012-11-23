@@ -36,7 +36,6 @@
 
 
 // LOCAL INCLUDES
-#include "unit/devices/Robot/TestRobot.h"
 
 // PROJECT INCLUDES
 #include "cedar/devices/Robot.h"
@@ -48,8 +47,6 @@
 int main()
 {
   cedar::tests::unit::dev::Robot::TestRobot robot;
-  robot.getComponent("TestComponent1");
-  robot.getComponent("TestComponent2");
 
   return 0;
 }

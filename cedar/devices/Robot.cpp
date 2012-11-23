@@ -26,23 +26,26 @@
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
-    Date:        2010 11 08
+    Date:        2012 11 23
 
-    Description: Manages all components of a robot and the communication with the hardware.
+    Description: Manages all components of a robot.
 
     Credits:
 
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/devices/Robot.h"
-#include "cedar/devices/exceptions.h"
+#include "cedar/auxiliaries/ObjectMapParameterTemplate.h"
+#include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
+#include "cedar/devices/Robot.h"
+#include "cedar/devices/ComponentSlot.h"
+#include "cedar/devices/exceptions.h"
 
 // SYSTEM INCLUDES
+#include <cstdio>
 #include <map>
 #include <string>
-#include <set>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -62,71 +65,49 @@ cedar::dev::Robot::~Robot(void)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-/*! If the component has not been initialized yet, it will be created using the abstract @em createComponent method.
- *  For that reason, the method is not const.
- */
-cedar::dev::ComponentPtr cedar::dev::Robot::getComponent(const std::string& rComponentName)
+cedar::dev::ComponentPtr cedar::dev::Robot::getComponent(const std::string& componentSlotName) const
 {
-  // if the requested component is not available ..
-  if(!isComponentAvailable(rComponentName))
-  {
-    // .. throw an exception
-    CEDAR_THROW(cedar::dev::ComponentNotAvailableException,
-      "Component with name \"" + rComponentName + "\" does not exist in the robot \"" + _mName + "\".\n");
-  }
-
-  // if the component has not been initialized yet ..
-  if (mComponents[rComponentName].use_count() == 0)
-  {
-    // .. and add it to the map of all components.
-    mComponents[rComponentName] = createComponent(rComponentName);
-  }
-
-  return mComponents[rComponentName];
+  return (*_mComponentSlots)[componentSlotName]->getComponent();
 }
 
-bool cedar::dev::Robot::isComponentAvailable(const std::string& rComponentName) const
+std::vector<std::string> cedar::dev::Robot::getComponentSlotNames() const
 {
-  // search for the component name in the map
-  std::map<std::string, std::set<std::string> >::const_iterator component_names_it
-    = _mSubComponentNames.find(rComponentName);
+  std::vector<std::string> slot_names;
 
-  // return whether the component name was found
-  return component_names_it != _mSubComponentNames.end();
+  // for all elements in the _mComponentSlots map
+  for
+  (
+    std::map<std::string, cedar::dev::ComponentSlotPtr>::const_iterator map_entry
+      = _mComponentSlots->begin();
+    map_entry != _mComponentSlots->end();
+    ++map_entry
+  )
+  {
+    // copy the key of the map (i.e., the name of the slot) into the vector
+    slot_names.push_back(map_entry->first);
+  }
+
+  return slot_names;
 }
 
-bool cedar::dev::Robot::isComponentAvailable
-     (
-       const std::string& rComponentName,
-       const std::string& rParentComponentName
-     ) const
+cedar::dev::ComponentSlotPtr cedar::dev::Robot::getComponentSlot(const std::string& componentSlotName) const
 {
-  bool is_available = false;
+  std::map<std::string, cedar::dev::ComponentSlotPtr>::const_iterator slot_it
+    = _mComponentSlots->find(componentSlotName);
 
-  // search for the sub components of the parent component
-  std::map< std::string, std::set<std::string> >::const_iterator parent_component_it
-    = _mSubComponentNames.find(rParentComponentName);
-
-  // if the parent component was not found ..
-  if (parent_component_it == _mSubComponentNames.end())
+  if (slot_it == _mComponentSlots->end())
   {
-    // .. throw an exception.
-    CEDAR_THROW(cedar::dev::ComponentNotAvailableException,
-      "Parent component with name \"" + rParentComponentName + "\" does not exist in the robot.\n");
+    std::ostringstream exception_message;
+    exception_message << "The robot does not have a component slot with the name \""
+                      << componentSlotName
+                      << "\" .";
+    CEDAR_THROW(cedar::dev::ResourceNotAvailableException, exception_message.str());
   }
 
-  // get the names of all subcomponents of the parent component
-  std::set<std::string> sub_component_names = parent_component_it->second;
+  return slot_it->second;
+}
 
-  // search for the subcomponent
-  std::set<std::string>::const_iterator sub_component_name_it
-    = sub_component_names.find(rComponentName);
-
-  // check and save whether the component name was found
-  if (sub_component_name_it != sub_component_names.end())
-  {
-    is_available = true;
-  }
-
-  return is_available;
+const std::string& cedar::dev::Robot::getName() const
+{
+  return this->_mName->getValue();
 }
