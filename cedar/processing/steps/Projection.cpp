@@ -194,7 +194,29 @@ void cedar::proc::steps::Projection::reconfigure()
     // input and output dimensionality
     if (input_dimensionality == 3 && output_dimensionality == 2)
     {
-      mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto2D;
+      unsigned int mapped[2];
+      unsigned int map_index = 0;
+      for (unsigned int index = 0; index < input_dimensionality; ++index)
+      {
+        if (!_mDimensionMappings->getValue()->isDropped(index))
+        {
+          mapped[map_index] = _mDimensionMappings->getValue()->lookUp(index);
+          ++map_index;
+        }
+      }
+
+      CEDAR_DEBUG_ASSERT(mapped[0] != mapped[1]);
+
+      bool swapped = mapped[0] > mapped[1];
+
+      if (swapped)
+      {
+        mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto2DSwapped;
+      }
+      else
+      {
+        mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto2D;
+      }
     }
     else if (input_dimensionality == 3 && output_dimensionality == 1)
     {
@@ -388,7 +410,28 @@ void cedar::proc::steps::Projection::compress3Dto2D()
 {
   CEDAR_DEBUG_ASSERT(mIndicesToCompress.size() == 1);
 
-  cedar::aux::math::reduceCvMat3D<float>(mInput->getData(), mOutput->getData(), mIndicesToCompress.at(0), _mCompressionType->getValue());
+  cedar::aux::math::reduceCvMat3D<float>
+  (
+    mInput->getData(),
+    mOutput->getData(),
+    mIndicesToCompress.at(0),
+    _mCompressionType->getValue(),
+    false // don't flip
+  );
+}
+
+void cedar::proc::steps::Projection::compress3Dto2DSwapped()
+{
+  CEDAR_DEBUG_ASSERT(mIndicesToCompress.size() == 1);
+
+  cedar::aux::math::reduceCvMat3D<float>
+  (
+    mInput->getData(),
+    mOutput->getData(),
+    mIndicesToCompress.at(0),
+    _mCompressionType->getValue(),
+    true // don't flip
+  );
 }
 
 void cedar::proc::steps::Projection::compress3Dto1D()

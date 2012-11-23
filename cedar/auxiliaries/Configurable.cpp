@@ -262,8 +262,7 @@ void cedar::aux::Configurable::newFormatToOld(cedar::aux::ConfigurationNode& nod
   }
 }
 
-
-void cedar::aux::Configurable::writeJson(const std::string& filename) const
+std::string cedar::aux::Configurable::normalizeFilename(const std::string& filename) const
 {
   std::string dir = filename;
 
@@ -274,9 +273,25 @@ void cedar::aux::Configurable::writeJson(const std::string& filename) const
     boost::filesystem::create_directories(dir);
   }
 
+  return filename;
+}
+
+void cedar::aux::Configurable::writeJson(const std::string& filename) const
+{
+  std::string new_filename = normalizeFilename(filename);
+
   cedar::aux::ConfigurationNode configuration;
   this->writeConfiguration(configuration);
   boost::property_tree::write_json(filename, configuration);
+}
+
+void cedar::aux::Configurable::writeCsv(const std::string& filename, const char separator) const
+{
+  std::string new_filename = normalizeFilename(filename);
+
+  cedar::aux::ConfigurationNode configuration;
+  this->writeConfiguration(configuration);
+  writeCsvConfiguration(new_filename, configuration, separator);
 }
 
 void cedar::aux::Configurable::registerParameter(cedar::aux::Parameter* parameter)

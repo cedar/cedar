@@ -138,6 +138,9 @@ protected:
 
   //!@brief The data containing the output.
   cedar::aux::MatDataPtr mOutput;
+
+  //!@brief Contains the current fixed point (mainly used for visualization)
+  cedar::aux::MatDataPtr mFixPoint;
 private:
   cv::Mat mRamp;
 

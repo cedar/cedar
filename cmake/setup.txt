@@ -48,7 +48,7 @@ project(cedar)
 # set cedar version information
 set (CEDAR_VERSION_MAJOR 1)
 set (CEDAR_VERSION_MINOR 0)
-set (CEDAR_VERSION_BUGFIX 2) 
+set (CEDAR_VERSION_BUGFIX 3) 
 
 # combined version
 set (CEDAR_VERSION "${CEDAR_VERSION_MAJOR}.${CEDAR_VERSION_MINOR}.${CEDAR_VERSION_BUGFIX}")
@@ -113,6 +113,7 @@ include_directories(${CEDAR_HOME} ${CEDAR_TEST_DIR} ${CEDAR_BUILD_DIR})
 
 if (CMAKE_COMPILER_IS_GNUCC)
   add_definitions(-Wall -Wextra)
+  add_definitions(-std=gnu++0x)
 elseif (MSVC)
   add_definitions(-W2)
 endif (CMAKE_COMPILER_IS_GNUCC)
@@ -131,6 +132,9 @@ else(buildTypeLower MATCHES debug)
   message("-- Building in \"RELEASE\" mode.")
   add_definitions(-DRELEASE)
 endif(buildTypeLower MATCHES debug)
+
+# extract name of the computer that cedar is being built on
+site_name(CEDAR_BUILT_ON_MACHINE)
 
 # configure the file exposing internal cmake variables to cedar
 configure_file("${CEDAR_HOME}/cmake/resources/internals.h.in" "${CMAKE_CURRENT_BINARY_DIR}/cedar/internals.h")

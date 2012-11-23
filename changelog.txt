@@ -57,11 +57,28 @@ likely to undergo major changes:
     there are some annoying bugs related to it.
 
 == current version ==
+- all:
+  - enabled C++0x / C++11 compiler flag for GCC
+
+- cedar::dev
+  - KinematicChain instances now need to be started via ->start() by the implementor. They do not start threading on their own, anymore
+  
 - cedar::proc
   - The processingIde can now be started with the "--no-log" option. This will redirect all log messages to the terminal
-    and can be very helpful when steps send too many log messages, leading to a lock-up of the user interface. 
+    and can be very helpful when steps send too many log messages, leading to a lock-up of the user interface.
   - There is now a system to automatically perform input type checks in processing steps; this can replace writing of
     the determineInputValidity function. See the documentation and processing tutorial for details.
+
+- cedar::dyn
+  - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   
+
+== Version 1.0.3 ==
+- cedar::aux
+  - Fixed some minor bad code in the gui::LinePlot
+  
+- cedar::proc
+  - Fixed a bug in the procection step that could lead to a crash when the destination dimensions of a 3d to a 2d matrix
+    were swapped.
 
 == Version 1.0.2 ==
 - cedar::aux
