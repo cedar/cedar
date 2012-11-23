@@ -26,7 +26,7 @@
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
-    Date:        2010 08 30
+    Date:        2012 11 23
 
     Description: Abstract component of a robot (e.g., a kinematic chain).
 
@@ -40,12 +40,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/namespace.h"
-#include "cedar/devices/communication/Communication.h"
 
 // SYSTEM INCLUDES
-#include <vector>
-#include <string>
-#include <set>
 
 /*!@brief Base class for components of robots.
  *
@@ -62,6 +58,10 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  inline cedar::dev::ChannelPtr getChannel() const
+  {
+    return mChannel;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -79,22 +79,17 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! name of the category the component is in (in the configuration file)
-  std::string mCategoryName;
-  //! pointer to the robot the component belongs to
-  RobotPtr mpRobot;
-  //! pointer to the communication device
-  cedar::dev::com::Communication *mpeCommunication;
+  // none yet
 
 private:
-  // none yet
+  //! channel of communication
+  cedar::dev::ChannelPtr mChannel;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! name of the parent component (if it exists)
-  std::string _mParentName;
+  // none yet
 private:
   // none yet
 }; // class cedar::dev::Component

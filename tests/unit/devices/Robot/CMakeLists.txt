@@ -40,6 +40,4 @@ cedar_add_unit_test(Robot
   namespace.h
   TestComponent.cpp
   TestComponent.h
-  TestRobot.cpp
-  TestRobot.h
 )

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,80 +22,56 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Robot.h
+    File:        Channel.h
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
     Date:        2012 11 23
 
-    Description: Manages all components of a robot.
+    Description: Communication channel for a component or device (e.g., serial communication).
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_H
-#define CEDAR_DEV_ROBOT_H
+#ifndef CEDAR_DEV_CHANNEL_H
+#define CEDAR_DEV_CHANNEL_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 #include "cedar/devices/namespace.h"
 
 // SYSTEM INCLUDES
-#include <vector>
-#include <string>
-#include <map>
 
-/*!@brief Base class for robots.
+
+/*!@brief Communication channel for a component or device (e.g., serial communication).
  *
- * @todo More detailed description of the class.
+ * @todo describe more.
  */
-class cedar::dev::Robot
+class cedar::dev::Channel
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // types
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  typedef cedar::aux::ObjectMapParameterTemplate<cedar::dev::ComponentSlot> ComponentSlotParameter;
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ComponentSlotParameter);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief constructor
-  Robot();
-  //!@brief destructor
-  virtual ~Robot();
+  //!@brief The standard constructor.
+  Channel();
+
+  //!@brief Destructor
+  virtual ~Channel();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! @brief Returns a pointer to the component docked to the component slot with the name @em componentSlotName.
-   *
-   * @return Pointer to the requested component.
-   * @param[in] componentSlotName name of the component slot, whose component is to be returned.
-   */
-  ComponentPtr getComponent(const std::string& componentSlotName) const;
-
-  /*! @brief Returns a vector containing all the available slot names of the robot.
-   *
-   * @return vector of available slot names
-   */
-  std::vector<std::string> getComponentSlotNames() const;
-
-  /*! @brief Returns the component slot with the name @em componentSlotName.
-   *
-   * @return component slot
-   * @param[in] componentSlotName name of the component slot that is to be returned
-   */
-  ComponentSlotPtr getComponentSlot(const std::string& componentSlotName) const;
-
-  /*! @brief Returns the name of the robot.
-   *
-   * @return Name of the robot.
-   */
-  const std::string& getName() const;
+  virtual void open() = 0;
+  virtual void close() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -114,7 +90,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-
 private:
   // none yet
 
@@ -123,13 +98,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-
 private:
-  //! name of the robot
-  cedar::aux::StringParameterPtr _mName;
+  // none yet
 
-  //! mapping of all slot names to their component slots
-  ComponentSlotParameterPtr _mComponentSlots;
+}; // class cedar::dev::Channel
 
-}; // class cedar::dev::Robot
-#endif // CEDAR_DEV_ROBOT_H
+#endif // CEDAR_DEV_CHANNEL_H
+

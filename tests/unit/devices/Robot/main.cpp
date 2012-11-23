@@ -36,6 +36,7 @@
 
 
 // LOCAL INCLUDES
+#include "unit/devices/Robot/namespace.h"
 
 // PROJECT INCLUDES
 #include "cedar/devices/Robot.h"
@@ -46,7 +47,7 @@
 
 int main()
 {
-  cedar::tests::unit::dev::Robot::TestRobot robot;
+  cedar::dev::Robot robot;
 
   return 0;
 }
