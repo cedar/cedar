@@ -22,63 +22,38 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TestRobot.cpp
+    File:        ComponentSlot.cpp
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
-    Date:        2010 11 08
+    Date:        2012 11 23
 
-    Description: Implementation of the @em TestRobot class.
+    Description: Slot for components of a robot (e.g., a kinematic chain).
 
     Credits:
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-#include "unit/devices/Robot/TestRobot.h"
-#include "unit/devices/Robot/TestComponent.h"
-
-// PROJECT INCLUDES
-#include "cedar/devices/Robot.h"
-#include "cedar/devices/Component.h"
+// CEDAR INCLUDES
+#include "cedar/devices/ComponentSlot.h"
 
 // SYSTEM INCLUDES
-#include <string>
-#include <set>
-#include <iostream>
-
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-//! constructor
-cedar::tests::unit::dev::Robot::TestRobot::TestRobot(void)
-:
-cedar::dev::Robot()
-{
-  _mSubComponentNames["TestComponent1"] = std::set<std::string>();
-  _mSubComponentNames["TestComponent2"] = std::set<std::string>();
-}
-
-//! destructor
-cedar::tests::unit::dev::Robot::TestRobot::~TestRobot()
-{
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::ComponentPtr
-  cedar::tests::unit::dev::Robot::TestRobot::createComponent(const std::string& rComponentName)
-{
-  cedar::dev::ComponentPtr test_component
-  (
-    new cedar::tests::unit::dev::Robot::TestComponent(rComponentName)
-  );
+  cedar::dev::ComponentPtr cedar::dev::ComponentSlot::getComponent() const
+  {
+    if (!mComponent)
+    {
+      std::string component_type_id = _mComponentTypeIds[_mChannelType->getValue()];
+      mComponent = FactorySingleton::getInstance()->allocate(component_type_id);
+    }
 
-  return test_component;
-}
-
-
+    return mComponent;
+  }

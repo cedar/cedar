@@ -141,6 +141,7 @@ namespace cedar
     //!@brief A class for associating data with types and mapping the type hierarchy as well.
     template <typename DataType, typename RootType> class TypeHierarchyMap;
 
+
     // all intrusive smart pointers
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolParameter);
@@ -153,6 +154,9 @@ namespace cedar
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringVectorParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntVectorParameter);
+
+    typedef ObjectMapParameterTemplate<std::string> StringMapParameter;
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringMapParameter);
     //!@endcond
 
     //!@brief a parameter storing a valid directory
