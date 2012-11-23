@@ -326,20 +326,23 @@ namespace cedar
         }
       }
 
-      /*!\brief Same functionality as cvReduce for 2D->1D.
+      /*!@brief Same functionality as cvReduce for 2D->1D.
        *
-       * \param[in] source a 3D matrix source
-       * \param[out] destination a 2D matrix destination (must be same type as src)
-       * \param[in] dimensionToReduce along which dimension should be reduced?
-       * \param[in] reductionOperator reduction operator (again, same choices as cvReduce)
+       * @param[in] source a 3D matrix source
+       * @param[out] destination a 2D matrix destination (must be same type as src)
+       * @param[in] dimensionToReduce along which dimension should be reduced?
+       * @param[in] reductionOperator reduction operator (again, same choices as cvReduce)
+       * @param[in] switchDimensions whether to switch the other two dimensions
        *
+       * @todo The signature of this function should be revised - it should probably take a mapping.
        */
       template <typename T>
       void reduceCvMat3D(
                           const cv::Mat& source,
                           cv::Mat& destination,
                           int dimensionToReduce,
-                          int reductionOperator = CV_REDUCE_SUM
+                          int reductionOperator = CV_REDUCE_SUM,
+                          bool swapDimensions = false
                         );
 
       /*!@brief Creates a matrix containing a one-dimensional ramp.
