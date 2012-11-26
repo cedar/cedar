@@ -22,44 +22,37 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        Channel.cpp
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2012 11 23
 
-    Description: Namespace file for cedar::dev::kteam.
+    Description: Communication channel for a component or device (e.g., serial communication).
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KTEAM_NAMESPACE_H
-#define CEDAR_DEV_KTEAM_NAMESPACE_H
-
 // CEDAR INCLUDES
-#include "cedar/devices/lib.h"
+#include "cedar/devices/Channel.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
 
-namespace cedar
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+cedar::dev::Channel::Channel()
 {
-  namespace dev
-  {
-    /*! @brief Namespace for kteam implementations of MobileRobot. */
-    namespace kteam
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_DEV_CLASS(EPuckDrive);
-      CEDAR_DECLARE_DEV_CLASS(KheperaDrive);
-      CEDAR_DECLARE_DEV_CLASS(Drive);
-      CEDAR_DECLARE_DEV_CLASS(DriveSerial);
-      CEDAR_DECLARE_DEV_CLASS(SerialChannel);
-      CEDAR_DECLARE_DEV_CLASS(Odometry);
-      //!@endcond
-    }
-  }
+
 }
 
-#endif // CEDAR_DEV_KTEAM_NAMESPACE_H
+cedar::dev::Channel::~Channel()
+{
+
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+

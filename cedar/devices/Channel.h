@@ -44,6 +44,7 @@
 #include "cedar/devices/namespace.h"
 
 // SYSTEM INCLUDES
+#include <QReadWriteLock>
 
 
 /*!@brief Communication channel for a component or device (e.g., serial communication).
@@ -70,7 +71,10 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Opens the channel.
   virtual void open() = 0;
+
+  //!@brief Closes the channel.
   virtual void close() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -89,7 +93,8 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //! read/write lock for the channel
+  QReadWriteLock mLock;
 private:
   // none yet
 

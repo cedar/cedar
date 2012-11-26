@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,40 +22,43 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        Component.cpp
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2012 11 26
 
-    Description: Namespace file for cedar::dev::com.
+    Description: Abstract component of a robot (e.g., a kinematic chain).
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_COM_NAMESPACE_H
-#define CEDAR_DEV_COM_NAMESPACE_H
-
 // CEDAR INCLUDES
-#include "cedar/devices/lib.h"
+#include "cedar/devices/Component.h"
+#include "cedar/devices/Channel.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
 
-namespace cedar
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+// constructor
+cedar::dev::Component::Component()
+{}
+
+// constructor taking an externally created channel
+cedar::dev::Component::Component(cedar::dev::ChannelPtr channel)
+:
+mChannel(channel)
+{}
+
+cedar::dev::Component::~Component()
 {
-  namespace dev
-  {
-    /*! @brief Namespace for communication classes. */
-    namespace com
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_DEV_CLASS(Communication);
-      CEDAR_DECLARE_DEV_CLASS(SerialCommunication);
-      //!@endcond
-    }
-  }
 }
 
-#endif // CEDAR_DEV_COM_NAMESPACE_H
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+

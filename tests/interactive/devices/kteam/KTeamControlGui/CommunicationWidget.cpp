@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/devices/communication/Communication.h"
+#include "cedar/devices/SerialChannel.h"
 #include "cedar/devices/communication/gui/CommunicationWidget.h"
 
 // SYSTEM INCLUDES
@@ -43,9 +43,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::com::gui::CommunicationWidget::CommunicationWidget(cedar::dev::com::CommunicationPtr communication)
+cedar::dev::com::gui::CommunicationWidget::CommunicationWidget(cedar::dev::SerialChannelPtr channel)
 {
-  mCommunication = communication;
+  mChannel = channel;
   setupUi(this);
   connect(pushButtonSend, SIGNAL(pressed()), this, SLOT(send()));
 }
@@ -60,10 +60,10 @@ cedar::dev::com::gui::CommunicationWidget::~CommunicationWidget()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::com::gui::CommunicationWidget::send()
 {
-  mCommunication->lock();
-  mCommunication->send(boxCommand->text().toStdString()); //send the text typed into boxCommand
-  std::string answer = mCommunication->receive();
-  mCommunication->unlock();
+  mChannel->lock();
+  mChannel->send(boxCommand->text().toStdString()); //send the text typed into boxCommand
+  std::string answer = mChannel->receive();
+  mChannel->unlock();
   QString q_answer;
   boxAnswer->setText(q_answer.fromStdString(answer)); //type received string into boxAnswer
 }

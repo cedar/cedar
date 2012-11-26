@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SerialCommunication.cpp
+    File:        SerialChannel.cpp
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
@@ -38,7 +38,7 @@
 #include "cedar/devices/exceptions.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/Log.h"
-#include "cedar/devices/communication/SerialCommunication.h"
+#include "cedar/devices/SerialChannel.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
@@ -61,7 +61,7 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::com::SerialCommunication::SerialCommunication()
+cedar::dev::SerialChannel::SerialChannel()
 :
 mFileDescriptor(0),
 mInitialized(false),
@@ -76,7 +76,7 @@ _mLatency(new cedar::aux::UIntParameter(this, "latency", 10000, 0, 1000000))
                    this, SLOT(updateTranslatedEndOfCommandString()));
 }
 
-cedar::dev::com::SerialCommunication::~SerialCommunication()
+cedar::dev::SerialChannel::~SerialChannel()
 {
   if (mInitialized)
   {
@@ -88,47 +88,47 @@ cedar::dev::com::SerialCommunication::~SerialCommunication()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::dev::com::SerialCommunication::isInitialized() const
+bool cedar::dev::SerialChannel::isInitialized() const
 {
   return mInitialized;
 }
 
-int cedar::dev::com::SerialCommunication::getFileDescriptor() const
+int cedar::dev::SerialChannel::getFileDescriptor() const
 {
   return mFileDescriptor;
 }
 
-const std::string& cedar::dev::com::SerialCommunication::getDevicePath() const
+const std::string& cedar::dev::SerialChannel::getDevicePath() const
 {
   return _mDevicePath->getValue();
 }
 
-const std::string& cedar::dev::com::SerialCommunication::getEndOfCommandString() const
+const std::string& cedar::dev::SerialChannel::getEndOfCommandString() const
 {
   return _mEndOfCommandString->getValue();
 }
 
-int cedar::dev::com::SerialCommunication::getCountryFlag() const
+int cedar::dev::SerialChannel::getCountryFlag() const
 {
   return _mCountryFlag->getValue();
 }
 
-unsigned int cedar::dev::com::SerialCommunication::getBaudrate() const
+unsigned int cedar::dev::SerialChannel::getBaudrate() const
 {
   return _mBaudrate->getValue();
 }
 
-unsigned int cedar::dev::com::SerialCommunication::getTimeOut() const
+unsigned int cedar::dev::SerialChannel::getTimeOut() const
 {
   return _mTimeOut->getValue();
 }
 
-unsigned int cedar::dev::com::SerialCommunication::getLatency() const
+unsigned int cedar::dev::SerialChannel::getLatency() const
 {
   return _mLatency->getValue();
 }
 
-void cedar::dev::com::SerialCommunication::readConfiguration(const cedar::aux::ConfigurationNode& node)
+void cedar::dev::SerialChannel::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   // read the configuration
   this->Configurable::readConfiguration(node);
@@ -136,7 +136,7 @@ void cedar::dev::com::SerialCommunication::readConfiguration(const cedar::aux::C
   this->initialize();
 }
 
-void cedar::dev::com::SerialCommunication::checkIfInitialized() const
+void cedar::dev::SerialChannel::checkIfInitialized() const
 {
   if (!mInitialized)
   {
@@ -144,7 +144,7 @@ void cedar::dev::com::SerialCommunication::checkIfInitialized() const
   }
 }
 
-void cedar::dev::com::SerialCommunication::checkIfOpen() const
+void cedar::dev::SerialChannel::checkIfOpen() const
 {
   if (this->mFileDescriptor == 0)
   {
@@ -152,14 +152,14 @@ void cedar::dev::com::SerialCommunication::checkIfOpen() const
   }
 }
 
-void cedar::dev::com::SerialCommunication::initialize()
+void cedar::dev::SerialChannel::initialize()
 {
   if (mInitialized)
   {
     cedar::aux::LogSingleton::getInstance()->warning
     (
-      "Initialization failed (already initialized)",
-      "cedar::dev::com::SerialCommunication",
+      "Serial channel already initialized",
+      "cedar::dev::SerialChannel",
       "Initialization failed"
     );
 
@@ -172,17 +172,17 @@ void cedar::dev::com::SerialCommunication::initialize()
   mInitialized = true;
 }
 
-std::string cedar::dev::com::SerialCommunication::sendAndReceiveLocked(const std::string& command)
+std::string cedar::dev::SerialChannel::sendAndReceiveLocked(const std::string& command)
 {
-  QWriteLocker locker(&this->mLock);
+  QWriteLocker lock(&(this->mLock));
   this->send(command);
   return this->receive();
 }
 
-void cedar::dev::com::SerialCommunication::send(const std::string& command)
+void cedar::dev::SerialChannel::send(const std::string& command)
 {
 #ifdef CEDAR_OS_WINDOWS
-#pragma message ("cedar::dev::com::SerialCommunication::send() not implemented for Windows.")
+#pragma message ("cedar::dev::SerialChannel::send() not implemented for Windows.")
 #else
 
   checkIfInitialized();
@@ -225,7 +225,7 @@ void cedar::dev::com::SerialCommunication::send(const std::string& command)
   cedar::aux::LogSingleton::getInstance()->debugMessage
   (
     message.str(),
-    "cedar::dev::com::SerialCommunication",
+    "cedar::dev::SerialChannel",
     "Successfully sent data"
   );
 #endif
@@ -235,13 +235,13 @@ void cedar::dev::com::SerialCommunication::send(const std::string& command)
 #endif // CEDAR_OS_WINDOWS
 }
 
-std::string cedar::dev::com::SerialCommunication::receive()
+std::string cedar::dev::SerialChannel::receive()
 {
   // the answer received
   std::string answer;
 
 #ifdef CEDAR_OS_WINDOWS
-#pragma message ("cedar::dev::com::SerialCommunication::receive() not implemented for Windows.")
+#pragma message ("cedar::dev::SerialChannel::receive() not implemented for Windows.")
 #else
 
   checkIfInitialized();
@@ -337,7 +337,7 @@ std::string cedar::dev::com::SerialCommunication::receive()
   cedar::aux::LogSingleton::getInstance()->message
   (
     message.str(),
-    "cedar::dev::com::SerialCommunication",
+    "cedar::dev::SerialChannel",
     "Successfully received data"
   );
 #endif
@@ -346,19 +346,19 @@ std::string cedar::dev::com::SerialCommunication::receive()
   return answer;
 }
 
-void cedar::dev::com::SerialCommunication::setEndOfCommandString(const std::string& eocString)
+void cedar::dev::SerialChannel::setEndOfCommandString(const std::string& eocString)
 {
   mTranslatedEndOfCommandString = eocString;
   mTranslatedEndOfCommandString = cedar::aux::replace(mTranslatedEndOfCommandString, "\\r", "\r");
   mTranslatedEndOfCommandString = cedar::aux::replace(mTranslatedEndOfCommandString, "\\n", "\n");
 }
 
-void cedar::dev::com::SerialCommunication::updateTranslatedEndOfCommandString()
+void cedar::dev::SerialChannel::updateTranslatedEndOfCommandString()
 {
   this->setEndOfCommandString(_mEndOfCommandString->getValue());
 }
 
-void cedar::dev::com::SerialCommunication::open()
+void cedar::dev::SerialChannel::open()
 {
   //!@todo There is a lot of duplicate code here for mac and linux -- make this less redundant
   if (!this->isInitialized())
@@ -380,9 +380,9 @@ void cedar::dev::com::SerialCommunication::open()
   _mLatency->setConstant(true);
 
 #ifdef CEDAR_OS_WINDOWS
-#pragma message ("cedar::dev::com::SerialCommunication::initialize() not implemented for Windows.")
+#pragma message ("cedar::dev::SerialChannel::initialize() not implemented for Windows.")
 #else
-  // initialize communication on Linux
+  // initialize channel on Linux
 #if defined CEDAR_OS_LINUX
   mFileDescriptor = ::open(getDevicePath().c_str(), O_RDWR | O_NOCTTY);
 
@@ -435,7 +435,7 @@ void cedar::dev::com::SerialCommunication::open()
   tcsetattr(mFileDescriptor, TCSANOW, &mTerminal);
 
 
-  // initialize communication on Mac
+  // initialize channel on Mac
 #elif defined CEDAR_OS_APPLE
   mFileDescriptor = ::open(getDevicePath().c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
 
@@ -507,16 +507,16 @@ void cedar::dev::com::SerialCommunication::open()
   cedar::aux::LogSingleton::getInstance()->debugMessage
   (
     "Successfully opened port" + getDevicePath(),
-    "cedar::dev::com::SerialCommunication",
-    "Serial communication initialized"
+    "cedar::dev::SerialChannel",
+    "Serial channel initialized"
   );
 #endif
 }
 
-void cedar::dev::com::SerialCommunication::close()
+void cedar::dev::SerialChannel::close()
 {
 #ifdef CEDAR_OS_WINDOWS
-#pragma message ("cedar::dev::com::SerialCommunication::close() not implemented for Windows.")
+#pragma message ("cedar::dev::SerialChannel::close() not implemented for Windows.")
 #else
   int status = ::close(mFileDescriptor);
 
@@ -530,8 +530,8 @@ void cedar::dev::com::SerialCommunication::close()
   cedar::aux::LogSingleton::getInstance()->debugMessage
   (
     "Closing Port",
-    "cedar::dev::com::SerialCommunication",
-    "Serial communication closed"
+    "cedar::dev::SerialChannel",
+    "Serial channel closed"
   );
 
   // Parameters cannot be changed while the device is open

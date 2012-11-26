@@ -22,45 +22,40 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Communication.cpp
+    File:        namespace.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2012 11 26
 
-    Description: This class provides a string-based communication with an external device.
+    Description: Namespace file for cedar::dev::kteam::khepera.
 
-    Credits:     Marc Sons (Author of msTransport.cpp this class is a revised and cedar-compatible version of)
+    Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_DEV_KTEAM_KHEPERA_NAMESPACE_H
+#define CEDAR_DEV_KTEAM_KHEPERA_NAMESPACE_H
+
 // CEDAR INCLUDES
-#include "cedar/devices/communication/Communication.h"
+#include "cedar/devices/lib.h"
 
 // SYSTEM INCLUDES
+#include <boost/smart_ptr.hpp>
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-cedar::dev::com::Communication::Communication()
+namespace cedar
 {
+  namespace dev
+  {
+    namespace kteam
+    {
+      namespace khepera
+      {
+        //!@cond SKIPPED_DOCUMENTATION
 
+      //!@endcond
+    }
+  }
 }
 
-cedar::dev::com::Communication::~Communication()
-{
-
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-void cedar::dev::com::Communication::lock()
-{
-  mLock.lockForWrite();
-}
-
-void cedar::dev::com::Communication::unlock()
-{
-  mLock.unlock();
-}
+#endif // CEDAR_DEV_KTEAM_KHEPERA_NAMESPACE_H

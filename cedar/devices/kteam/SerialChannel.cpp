@@ -22,73 +22,60 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DriveControlWidget.cpp
+    File:        SerialChannel.cpp
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2012 11 26
 
-    Description: Graphical User Interface for controlling the E-Puck.
+    Description: Add description.
 
     Credits:
 
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/devices/kteam/Drive.h"
-#include "cedar/devices/kteam/gui/DriveControlWidget.h"
+#include "cedar/auxiliaries/Log.h"
+#include "cedar/devices/kteam/SerialChannel.h"
+#include "cedar/devices/SerialChannel.h"
+#include "cedar/devices/exceptions.h"
 
 // SYSTEM INCLUDES
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::kteam::gui::DriveControlWidget::DriveControlWidget(cedar::dev::kteam::DrivePtr drive, QWidget *parent)
-:
-cedar::aux::gui::BaseWidget("DriveControlWidget", parent),
-mDrive(drive)
-{
-  setupUi(this);
-  spinBoxForwardVelocity->setValue(mDrive->getForwardVelocity()); //initialize forwardVelocity
-  spinBoxTurningRate->setValue(mDrive->getTurningRate()); //initialize turningRate
-  connect(pushButtonStart, SIGNAL(pressed()), this, SLOT(drive()));
-  connect(pushButtonStop, SIGNAL(pressed()), this, SLOT(stop()));
-  connect(pushButtonReset, SIGNAL(pressed()), this, SLOT(reset()));
-  startTimer(100); //timer for updating display
-}
-
-cedar::dev::kteam::gui::DriveControlWidget::~DriveControlWidget()
-{
-
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::dev::kteam::gui::DriveControlWidget::drive()
-{
-  mDrive->setForwardVelocityAndTurningRate(spinBoxForwardVelocity->value(), spinBoxTurningRate->value());
-}
 
-void cedar::dev::kteam::gui::DriveControlWidget::stop()
+void cedar::dev::kteam::SerialChannel::initialize()
 {
-  mDrive->stop();
-}
+  cedar::dev::SerialChannel::initialize();
 
-void cedar::dev::kteam::gui::DriveControlWidget::reset()
-{
-  mDrive->reset();
-}
+  // send a dummy-message
+  std::string answer = this->sendAndReceiveLocked("D,0,0");
 
-void cedar::dev::kteam::gui::DriveControlWidget::timerEvent(QTimerEvent * /* event */)
-{
-  // get new values
-  std::vector<double> wheel_speed = mDrive->getWheelSpeed();
-  std::vector<int> encoders = mDrive->getEncoders();
-
-  // display new values
-  valueLeftWheelSpeed->display(wheel_speed[0]);
-  valueRightWheelSpeed->display(wheel_speed[1]);
-  valueLeftEncoder->display(encoders[0]);
-  valueRightEncoder->display(encoders[1]);
+  // 'd,' or 'z,' expected, else init failed
+  if (answer.size() < 2 || (answer[0] != 'd' && answer[0] != 'z') || answer[1] != ',')
+  {
+    CEDAR_THROW
+    (
+      cedar::dev::SerialCommunicationException,
+      "Initialization of serial communication failed."
+    );
+  }
+#ifdef DEBUG
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Drive: Initialization successful (Answer: '" + answer + "')",
+      "cedar::dev::kteam::epuck::Drive::initialize()",
+      "Drive successfully initialized"
+    );
+  }
+#endif
 }

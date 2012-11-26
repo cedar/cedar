@@ -22,54 +22,50 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        EPuckDrive.h
+    File:        SerialChannel.h
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
-    Date:        2012 04 17
+    Date:        2012 11 26
 
-    Description: The drive component of the mobile E-Puck robot.
+    Description: Add description.
 
-    Credits:     Original design by Andre Bartel (2011)
+    Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KTEAM_EPUCK_DRIVE_H
-#define CEDAR_DEV_KTEAM_EPUCK_DRIVE_H
+#ifndef CEDAR_DEV_KTEAM_SERIAL_CHANNEL_H
+#define CEDAR_DEV_KTEAM_SERIAL_CHANNEL_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/kteam/Drive.h"
-#include "cedar/devices/communication/namespace.h"
+#include "cedar/devices/kteam/namespace.h"
+#include "cedar/devices/SerialChannel.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief The drive component of the mobile E-Puck robot.
+
+/*!@brief Add description.
  *
- * The constructor expects an initialized serial communication object. After creation of the EPuckDrive
- * object, all its parameters (e.g., wheel radius, hardware speed limits) are read from a configuration file.
  */
-class cedar::dev::kteam::EPuckDrive : public cedar::dev::kteam::Drive
+class cedar::dev::kteam::SerialChannel : public cedar::dev::SerialChannel
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Constructor
-  EPuckDrive(cedar::dev::com::SerialCommunicationPtr communication);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Returns the values of the acceleration sensor of the E-Puck robot.
-  std::vector<int> getAcceleration();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Returns the character used to get the acceleration of the robot.
-  virtual std::string getCommandGetAcceleration() const;
+  virtual void initialize();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -82,8 +78,17 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 private:
   // none yet
-}; // class cedar::dev::kteam::EPuckDrive
 
-#endif // CEDAR_DEV_KTEAM_EPUCK_DRIVE_H
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  // none yet
+}; // class cedar::dev::kteam::SerialChannel
+#endif // CEDAR_DEV_KTEAM_SERIAL_CHANNEL_H

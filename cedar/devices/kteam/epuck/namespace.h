@@ -24,18 +24,18 @@
 
     File:        namespace.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2012 11 26
 
-    Description: Namespace file for cedar::dev::kteam.
+    Description: Namespace file for cedar::dev::kteam::epuck.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KTEAM_NAMESPACE_H
-#define CEDAR_DEV_KTEAM_NAMESPACE_H
+#ifndef CEDAR_DEV_KTEAM_EPUCK_NAMESPACE_H
+#define CEDAR_DEV_KTEAM_EPUCK_NAMESPACE_H
 
 // CEDAR INCLUDES
 #include "cedar/devices/lib.h"
@@ -47,19 +47,16 @@ namespace cedar
 {
   namespace dev
   {
-    /*! @brief Namespace for kteam implementations of MobileRobot. */
     namespace kteam
     {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_DEV_CLASS(EPuckDrive);
-      CEDAR_DECLARE_DEV_CLASS(KheperaDrive);
-      CEDAR_DECLARE_DEV_CLASS(Drive);
-      CEDAR_DECLARE_DEV_CLASS(DriveSerial);
-      CEDAR_DECLARE_DEV_CLASS(SerialChannel);
-      CEDAR_DECLARE_DEV_CLASS(Odometry);
+      namespace epuck
+      {
+        //!@cond SKIPPED_DOCUMENTATION
+
       //!@endcond
+      }
     }
   }
 }
 
-#endif // CEDAR_DEV_KTEAM_NAMESPACE_H
+#endif // CEDAR_DEV_KTEAM_EPUCK_NAMESPACE_H

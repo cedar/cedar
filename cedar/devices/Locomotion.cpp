@@ -44,8 +44,34 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+
+// constructor
 cedar::dev::Locomotion::Locomotion()
 :
+_mForwardVelocityLimits
+(
+  new cedar::aux::math::DoubleLimitsParameter(this, "forward velocity limits", -2.0, 2.0, -4.0, 4.0, -4.0, 4.0)
+),
+_mTurningRateLimits
+(
+  new cedar::aux::math::DoubleLimitsParameter
+      (
+        this,
+        "turning rate limits",
+        -2.0 * cedar::aux::math::pi,
+        2.0 * cedar::aux::math::pi,
+        -20.0 * cedar::aux::math::pi,
+        20.0 * cedar::aux::math::pi,
+        -20.0 * cedar::aux::math::pi,
+        20.0 * cedar::aux::math::pi
+      )
+)
+{}
+
+// constructor taking an externally created channel
+cedar::dev::Locomotion::Locomotion(cedar::dev::ChannelPtr channel)
+:
+cedar::dev::Component(channel),
 _mForwardVelocityLimits
 (
   new cedar::aux::math::DoubleLimitsParameter(this, "forward velocity limits", -2.0, 2.0, -4.0, 4.0, -4.0, 4.0)

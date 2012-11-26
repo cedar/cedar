@@ -22,70 +22,67 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CommunicationWidget.h
+    File:        DriveSerial.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2012 11 26
 
-    Description: Graphical User Interface for testing the class Communication.
+    Description: Add description.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_COM_GUI_COMMUNICATION_WIDGET_H
-#define CEDAR_DEV_COM_GUI_COMMUNICATION_WIDGET_H
+#ifndef CEDAR_DEV_KTEAM_DRIVE_SERIAL_H
+#define CEDAR_DEV_KTEAM_DRIVE_SERIAL_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/communication/namespace.h"
-#include "cedar/devices/communication/gui/ui_CommunicationWidget.h"
-#include "cedar/devices/communication/gui/namespace.h"
-#include "cedar/auxiliaries/gui/BaseWidget.h"
+#include "cedar/devices/kteam/Drive.h"
+#include "cedar/devices/namespace.h"
+#include "cedar/devices/kteam/namespace.h"
 
 // SYSTEM INCLUDES
-#include <Qt>
-#include <QString>
 
-/*!@brief Graphical User Interface for testing the class Communication.
- *
- * Type the string to be sent into 'command' and click 'send'. The answer of the device is then displayed in 'answer'.
+
+/*!@brief Add description.
  */
-class cedar::dev::com::gui::CommunicationWidget : public cedar::aux::gui::BaseWidget, private Ui_CommunicationWidget
+class cedar::dev::kteam::DriveSerial : public cedar::dev::kteam::Drive
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Constructs the GUI.
-   * @param communication Pointer to the communication-class to be tested.
-   */
-  CommunicationWidget(cedar::dev::com::CommunicationPtr communication);
+  //!@brief Constructor
+  DriveSerial();
 
-  //!@brief Destructs the GUI.
-  virtual ~CommunicationWidget();
+  //!@brief Constructor taking an externally created channel
+  DriveSerial(cedar::dev::kteam::SerialChannelPtr channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public slots:
-  /*!@brief Sends the string.
-   *
-   * This function calls 'send' of the linked communication class with the string typed into 'command' as parameter.
+public:
+  //!@brief Returns the current encoder value of the left and right wheel.
+  virtual std::vector<int> getEncoders() const;
+
+  /*!@brief Sets the encoder values of both wheels.
+   * @param[in] encoders encoder value for the left and right wheel
    */
-  void send();
+  virtual void setEncoders(const std::vector<int>& encoders);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  /*! Returns the channel but casts it into a SerialChannelPtr.
+   *
+   * @returns pointer to the serial channel
+   */
+  cedar::dev::kteam::SerialChannelPtr getSerialChannel() const;
+
+  //! @see Base class.
+  virtual void sendMovementCommand();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -98,10 +95,22 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+private:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  //! string representing the "set speed" command
+  cedar::aux::StringParameterPtr _mCommandSetSpeed;
+  //! string representing the "set encoder" command
+  cedar::aux::StringParameterPtr _mCommandSetEncoder;
+  //! string representing the "get encoder" command
+  cedar::aux::StringParameterPtr _mCommandGetEncoder;
 
 private:
-  // pointer to the Communication-class.
-  cedar::dev::com::CommunicationPtr mCommunication;
-}; // class cedar::dev::com::gui::CommunicationWidget
-#endif // CEDAR_DEV_COM_GUI_COMMUNICATION_WIDGET_H
+  // none yet
+}; // class cedar::dev::kteam::DriveSerial
 
+#endif // CEDAR_DEV_KTEAM_DRIVE_H
