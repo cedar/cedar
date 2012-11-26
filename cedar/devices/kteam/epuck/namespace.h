@@ -52,8 +52,8 @@ namespace cedar
       namespace epuck
       {
         //!@cond SKIPPED_DOCUMENTATION
-
-      //!@endcond
+        CEDAR_DECLARE_DEV_CLASS(AccelerationSensorSerial);
+        //!@endcond
       }
     }
   }

@@ -59,6 +59,7 @@ namespace cedar
     CEDAR_DECLARE_DEV_CLASS(DifferentialDrive);
     CEDAR_DECLARE_DEV_CLASS(KinematicChain);
     CEDAR_DECLARE_DEV_CLASS(Odometry);
+    CEDAR_DECLARE_DEV_CLASS(Sensor);
     CEDAR_DECLARE_DEV_CLASS(SimulatedKinematicChain);
 
     // exceptions
