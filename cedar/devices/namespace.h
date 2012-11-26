@@ -54,6 +54,7 @@ namespace cedar
     CEDAR_DECLARE_DEV_CLASS(ComponentSlot);
     CEDAR_DECLARE_DEV_CLASS(Component);
     CEDAR_DECLARE_DEV_CLASS(Channel);
+    CEDAR_DECLARE_DEV_CLASS(SerialChannel);
     CEDAR_DECLARE_DEV_CLASS(Locomotion);
     CEDAR_DECLARE_DEV_CLASS(DifferentialDrive);
     CEDAR_DECLARE_DEV_CLASS(KinematicChain);

@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SerialCommunication.h
+    File:        SerialChannel.h
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
@@ -34,12 +34,12 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_COM_SERIAL_COMMUNICATION_H_
-#define CEDAR_DEV_COM_SERIAL_COMMUNICATION_H_
+#ifndef CEDAR_DEV_SERIAL_CHANNEL_H
+#define CEDAR_DEV_SERIAL_CHANNEL_H
 //!@todo Serial communication needs implementation for windows.
 
 // CEDAR INCLUDES
-#include "cedar/devices/communication/Communication.h"
+#include "cedar/devices/Channel.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
@@ -61,12 +61,12 @@
  *
  * This includes opening and closing the Serial Port as well as sending and receiving strings. Examples for such
  * devices are mobile robots (E-Puck, Khepera). It is also possible to lock the channel to prevent read-/write-errors
- * if multiple threads are accessing the device (implemented in Communication.h).
+ * if multiple threads are accessing the device (implemented in Channel.h).
  *
  * The parameters of the communication must be read from a configuration file using the
  * cedar::aux::Configurable::readJson method right after constructing of the object.
  */
-class cedar::dev::com::SerialCommunication : public QObject, public Communication, public cedar::aux::NamedConfigurable
+class cedar::dev::SerialChannel : public QObject, public Channel, public cedar::aux::NamedConfigurable
 {
   Q_OBJECT
 
@@ -75,21 +75,20 @@ class cedar::dev::com::SerialCommunication : public QObject, public Communicatio
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Initiates a new communication with an external device per Serial Port.
-  SerialCommunication();
+  SerialChannel();
 
   //!@brief Ends the communication with the device and closes the channel.
-  ~SerialCommunication();
+  ~SerialChannel();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Opens the channel.
-  void open();
+  virtual void open();
 
   //!@brief  Closes the channel.
-  void close();
-
+  virtual void close();
 
   //!@brief The get-function of the initialization-status.
   //!@return true if initialized, else false
@@ -147,6 +146,8 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief Initializes the object.
+  void initialize();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -155,9 +156,6 @@ private:
   //!@brief Initializes the communication and opens the channel.
   //!@return 1 if initialization was successful, else 0.
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
-  //!@brief Initializes the object.
-  void initialize();
 
   //!@brief Checks whether the serial connection has been initialized. Throws an exception if not.
   void checkIfInitialized() const;
@@ -179,7 +177,7 @@ private:
   int mFileDescriptor;
 
   //!@brief Initialization status of the Serial Port.
-  // True if SerialCommunication has been initialized, else false.
+  // True if SerialChannel has been initialized, else false.
   bool mInitialized;
 
   //!@brief Terminal IO.
@@ -234,5 +232,5 @@ private:
    * Shouldn't be set too low to prevent reading-/writing-interference. Default is 10000 ms.
    */
   cedar::aux::UIntParameterPtr _mLatency;
-}; // class cedar::dev::com::SerialCommunication
-#endif // CEDAR_DEV_COM_SERIAL_COMMUNICATION_H_
+}; // class cedar::dev::SerialChannel
+#endif // CEDAR_DEV_SERIAL_CHANNEL_H

@@ -38,6 +38,7 @@
 #define CEDAR_DEV_DIFFERENTIAL_DRIVE_H
 
 // CEDAR INCLUDES
+#include "cedar/devices/namespace.h"
 #include "cedar/devices/Locomotion.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 
@@ -59,6 +60,9 @@ public cedar::dev::Locomotion
 public:
   //!@brief The constructor
   DifferentialDrive();
+
+  //!@brief Constructor taking an externally created channel
+  DifferentialDrive(cedar::dev::ChannelPtr channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

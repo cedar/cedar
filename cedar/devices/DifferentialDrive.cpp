@@ -38,6 +38,7 @@
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/devices/namespace.h"
 #include "cedar/devices/DifferentialDrive.h"
 
 // SYSTEM INCLUDES
@@ -47,6 +48,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::DifferentialDrive::DifferentialDrive()
 :
+mWheelSpeed(2, 0),
+_mWheelDistance(new cedar::aux::DoubleParameter(this, "wheel distance", 0.1, 0.0, 1.0)),
+_mWheelRadius(new cedar::aux::DoubleParameter(this, "wheel radius", 0.01, 0.0, 1.0)),
+_mHardwareSpeedLimits(new cedar::aux::math::DoubleLimitsParameter(this, "hardware speed limits", 0.0, 0.2, 0.2, 2.0))
+{}
+
+cedar::dev::DifferentialDrive::DifferentialDrive(cedar::dev::ChannelPtr channel)
+:
+cedar::dev::Locomotion(channel),
 mWheelSpeed(2, 0),
 _mWheelDistance(new cedar::aux::DoubleParameter(this, "wheel distance", 0.1, 0.0, 1.0)),
 _mWheelRadius(new cedar::aux::DoubleParameter(this, "wheel radius", 0.01, 0.0, 1.0)),

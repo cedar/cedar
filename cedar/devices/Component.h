@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/namespace.h"
+#include "cedar/devices/Channel.h"
 
 // SYSTEM INCLUDES
 
@@ -53,6 +54,14 @@ class cedar::dev::Component
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Constructor
+  Component();
+
+  //!@brief Constructor taking an externally created channel
+  Component(cedar::dev::ChannelPtr channel);
+
+  //!@brief Destructor
+  ~Component();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

@@ -47,13 +47,11 @@ endif(CEDAR_USE_LIB_DC1394)
 
 cedar_add_library(cedardev
                   MOC_HEADERS
+                  SerialChannel.h
                   gui/KinematicChainWidget.h
                   gui/KinematicChainMonitorWidget.h
                   gui/KinematicChainCommandWidget.h
                   gui/MountedCameraViewer.h
-                  kteam/gui/DriveControlWidget.h
-                  communication/SerialCommunication.h
-                  communication/gui/CommunicationWidget.h
                   sensors/visual/VideoGrabber.h
                   sensors/visual/PictureGrabber.h
                   sensors/camera/Grabber.h

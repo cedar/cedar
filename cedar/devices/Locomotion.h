@@ -58,7 +58,11 @@ class cedar::dev::Locomotion : public cedar::dev::Component,
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Constructor
   Locomotion();
+
+  //!@brief Constructor taking an externally created channel
+  Locomotion(cedar::dev::ChannelPtr channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

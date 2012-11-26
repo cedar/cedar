@@ -22,44 +22,39 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        serialChannelHelperFunctions.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Mathis Richter
 
-    Description: Namespace file for cedar::dev::kteam.
+    Email:       mathis.richter@ini.rub.de
+
+    Date:        2012 11 26
+
+    Description: Helper functions for the serial channel, specific to KTeam.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KTEAM_NAMESPACE_H
-#define CEDAR_DEV_KTEAM_NAMESPACE_H
+#ifndef CEDAR_DEV_KTEAM_SERIAL_CHANNEL_HELPER_FUNCTIONS_H
+#define CEDAR_DEV_KTEAM_SERIAL_CHANNEL_HELPER_FUNCTIONS_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/lib.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
 
-namespace cedar
-{
-  namespace dev
-  {
-    /*! @brief Namespace for kteam implementations of MobileRobot. */
-    namespace kteam
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_DEV_CLASS(EPuckDrive);
-      CEDAR_DECLARE_DEV_CLASS(KheperaDrive);
-      CEDAR_DECLARE_DEV_CLASS(Drive);
-      CEDAR_DECLARE_DEV_CLASS(DriveSerial);
-      CEDAR_DECLARE_DEV_CLASS(SerialChannel);
-      CEDAR_DECLARE_DEV_CLASS(Odometry);
-      //!@endcond
-    }
-  }
-}
 
-#endif // CEDAR_DEV_KTEAM_NAMESPACE_H
+//!@brief Checks whether the answer received over the serial connection is correct with respect to the command sent.
+void checkSerialCommunicationAnswer
+     (
+       const std::string& answer,
+       const std::string& command,
+       const std::string& expectedAnswer = ""
+     );
+
+//!@brief Checks whether a given stream is in the correct state.
+void checkStreamValidity(const std::istringstream& answerStream, bool atEndOfStream);
+
+#endif // CEDAR_DEV_KTEAM_SERIAL_CHANNEL_HELPER_FUNCTIONS_H
