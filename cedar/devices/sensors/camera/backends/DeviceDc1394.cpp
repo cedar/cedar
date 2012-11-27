@@ -273,7 +273,7 @@ bool cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()
     {
       //only lower 32bit of guid
       cam_guid = mpLibDcInterface->getCamGuid(cam);
-      unsigned int guid = (unsigned int)(cam_guid&0x00000000FFFFFFFF);
+      unsigned int guid = static_cast<unsigned int>(cam_guid&0x00000000FFFFFFFF);
 
       cedar::aux::LogSingleton::getInstance()->debugMessage
                                               (
@@ -311,7 +311,7 @@ bool cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()
     bus_id = camera_id;
     cam_guid = mpLibDcInterface->getCamGuid(camera_id);
 
-    unsigned int guid = (unsigned int)(cam_guid&0x00000000FFFFFFFF);
+    unsigned int guid = static_cast<unsigned int>(cam_guid&0x00000000FFFFFFFF);
     cedar::aux::LogSingleton::getInstance()->debugMessage
                                             (
                                               "Open camera with bus Id " + boost::lexical_cast<std::string>(bus_id)

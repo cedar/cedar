@@ -99,8 +99,8 @@ public:
   (
    cedar::dev::sensors::camera::Property::Id id = 0,
    std::string name = "property",
-   double minValue = (double) INT_MIN,
-   double maxValue = (double) INT_MAX,
+   double minValue = static_cast<double>(INT_MIN),
+   double maxValue = static_cast<double>(INT_MAX),
    double defaultValue = 128,
    bool supported = true,
    bool autoCapable = false,

@@ -146,7 +146,7 @@ int main(int argc, char* argv[])
   //----------------------------------------------------------------------------------------
 
   std::cout << "Default settings:" << std::endl;
-  std::cout << "\tCamera Mode :\t" << (int) p_grabber->getCameraVideoMode(0);
+  std::cout << "\tCamera Mode :\t" << static_cast<int>(p_grabber->getCameraVideoMode(0));
   cedar::dev::sensors::camera::VideoMode::Id mode = p_grabber->getCameraVideoMode(0);
   std::cout << " (" << cedar::dev::sensors::camera::VideoMode::type().get(mode).name() << ")" << std::endl;
 

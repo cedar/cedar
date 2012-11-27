@@ -198,7 +198,7 @@ bool cedar::dev::sensors::visual::GLGrabber::onGrab()
       // p_channel_widget->doneCurrent();
 
       // QImage to cv::Mat
-      cv::Mat mat = cv::Mat(qimage.height(), qimage.width(), CV_8UC4,(uchar*)qimage.bits(), qimage.bytesPerLine());
+      cv::Mat mat = cv::Mat(qimage.height(), qimage.width(), CV_8UC4, static_cast<uchar*>(qimage.bits()), qimage.bytesPerLine());
       cv::Mat mat2 = cv::Mat(mat.rows, mat.cols, CV_8UC3 );
       int from_to[] = { 0,0, 1,1, 2,2 };
       cv::mixChannels( &mat, 1, &mat2, 1, from_to, 3 );
