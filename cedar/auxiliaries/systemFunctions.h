@@ -74,6 +74,6 @@ namespace cedar
      */
     CEDAR_AUX_LIB_EXPORT void openCrashFile(std::ofstream& stream, std::string& fileName);
   }
-}; // namespace cedar::aux
+} // namespace cedar::aux
 
 #endif // CEDAR_AUX_SYSTEM_FUNCTIONS_H
