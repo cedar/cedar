@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Gripper.h
+    File:        GripperSerial.h
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KTEAM_KHEPERA_GRIPPER_H
-#define CEDAR_DEV_KTEAM_KHEPERA_GRIPPER_H
+#ifndef CEDAR_DEV_KTEAM_KHEPERA_GRIPPER_SERIAL_H
+#define CEDAR_DEV_KTEAM_KHEPERA_GRIPPER_SERIAL_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -44,7 +44,7 @@
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/devices/kteam/namespace.h"
 #include "cedar/devices/kteam/khepera/namespace.h"
-#include "cedar/devices/Component.h"
+#include "cedar/devices/kteam/khepera/Gripper.h"
 
 // SYSTEM INCLUDES
 
@@ -53,7 +53,7 @@
  *
  * @todo describe more.
  */
-class cedar::dev::kteam::khepera::Gripper : public cedar::dev::Component
+class cedar::dev::kteam::khepera::GripperSerial : public cedar::dev::kteam::khepera::Gripper
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -64,41 +64,35 @@ class cedar::dev::kteam::khepera::Gripper : public cedar::dev::Component
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Gripper();
+  GripperSerial();
 
   //!@brief The standard constructor.
-  Gripper(cedar::dev::ChannelPtr channel);
+  GripperSerial(cedar::dev::kteam::SerialChannelPtr channel);
 
   //!@brief Destructor
-  virtual ~Gripper();
+  virtual ~GripperSerial();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Opens the gripper.
-  void openGripper();
-
-  //!@brief Closes the gripper.
-  void closeGripper();
-
   //!@brief Sets the arm position.
-  virtual void setArmPosition(unsigned int position) = 0;
+  void setArmPosition(unsigned int position);
 
   //!@brief Sets the position of the gripper (i.e., opens or closes it).
-  virtual void setGripperPosition(bool open) = 0;
+  void setGripperPosition(bool open);
 
   //!@brief Returns the current arm position.
-  virtual unsigned int getArmPosition() = 0;
+  unsigned int getArmPosition();
 
   //!@brief Returns the gripper position.
-  virtual unsigned int getGripperPosition() = 0;
+  unsigned int getGripperPosition();
 
   //!@brief Returns the current measurement of the optical sensor in the Khepera's gripper.
-  virtual unsigned int getGripperOpticalSensor() = 0;
+  unsigned int getGripperOpticalSensor();
 
   //!@brief Returns the current measurement of the resistivity sensor in the Khepera's gripper.
-  virtual unsigned int getGripperResistivity() = 0;
+  unsigned int getGripperResistivity();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -110,7 +104,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void initialize();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -124,12 +118,30 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! limits for the arm position
-  cedar::aux::math::UIntLimitsParameterPtr _mArmPositionLimits;
+  // none yet
 
 private:
-  // none yet
-}; // class cedar::dev::kteam::khepera::Gripper
+  //! command used to set the encoders of the robot
+  cedar::aux::StringParameterPtr _mCommandSetEncoder;
+  //! command used to get the encoders of the robot
+  cedar::aux::StringParameterPtr _mCommandGetEncoder;
+  //! command used to set the gripper position
+  cedar::aux::StringParameterPtr _mCommandSetGripperPosition;
+  //! command used to get the gripper position
+  cedar::aux::StringParameterPtr _mCommandGetGripperPosition;
+  //! answer expected when getting the gripper position
+  cedar::aux::StringParameterPtr _mAnswerGetGripperPosition;
+  //! command used to set the arm position
+  cedar::aux::StringParameterPtr _mCommandSetArmPosition;
+  //! command used to get the arm position
+  cedar::aux::StringParameterPtr _mCommandGetArmPosition;
+  //! answer expected when getting the arm position
+  cedar::aux::StringParameterPtr _mAnswerGetArmPosition;
+  //! command used when getting the optical sensor of the gripper
+  cedar::aux::StringParameterPtr _mCommandGetGripperOpticalSensor;
+  //! command used when getting the resistance sensor of the gripper
+  cedar::aux::StringParameterPtr _mCommandGetGripperResistivity;
+}; // class cedar::dev::kteam::khepera::GripperSerial
 
-#endif // CEDAR_DEV_KTEAM_KHEPERA_GRIPPER_H
+#endif // CEDAR_DEV_KTEAM_KHEPERA_GRIPPER_SERIAL_H
 
