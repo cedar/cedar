@@ -28,7 +28,7 @@
     Email:       bjoern.weghenkel@ini.rub.de
     Date:        2011 01 06
 
-    Description: Example for an @em cedar::dev::robot::KinematicChainWidget.
+    Description: Example for an @em cedar::dev::KinematicChainWidget.
 
     Credits:
 
@@ -38,9 +38,9 @@
 
 // PROJECT INCLUDES
 
-#include "cedar/devices/robot/gui/KinematicChainWidget.h"
-#include "cedar/devices/robot/gui/KinematicChainMonitorWidget.h"
-#include "cedar/devices/robot/SimulatedKinematicChain.h"
+#include "cedar/devices/gui/KinematicChainWidget.h"
+#include "cedar/devices/gui/KinematicChainMonitorWidget.h"
+#include "cedar/devices/SimulatedKinematicChain.h"
 
 // SYSTEM INCLUDES
 
@@ -53,10 +53,10 @@
 
 int main(int argc, char *argv[])
 {
-  cedar::dev::robot::KinematicChainPtr p_kinematic_chain(new cedar::dev::robot::SimulatedKinematicChain());
+  cedar::dev::KinematicChainPtr p_kinematic_chain(new cedar::dev::SimulatedKinematicChain());
   p_kinematic_chain->readJson("../../../../tests/interactive/devices/gui/KinematicChainWidget/test_arm.json");
   QApplication app(argc, argv);
-  cedar::dev::robot::gui::KinematicChainWidget widget(p_kinematic_chain);
+  cedar::dev::gui::KinematicChainWidget widget(p_kinematic_chain);
   widget.getMonitorWidget()->setDecimals(10);
   widget.getCommandWidget()->setDecimals(10);
   widget.getCommandWidget()->setSingleStep(0.12345);

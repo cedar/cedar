@@ -35,6 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/devices/kteam/Drive.h"
 #include "cedar/devices/kteam/gui/DriveControlWidget.h"
 
 // SYSTEM INCLUDES

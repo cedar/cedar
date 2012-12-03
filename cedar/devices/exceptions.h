@@ -60,4 +60,9 @@ class cedar::dev::UnknownOperatingSystemException : public cedar::aux::Exception
 {
 }; // class cedar::dev::UnknownOperatingSystemException
 
+//!@brief Exception that occurs a resource (e.g., a component or channel) is not available.
+class cedar::dev::ResourceNotAvailableException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::dev::ComponentNotAvailableException
+
 #endif // CEDAR_DEV_EXCEPTIONS_H
