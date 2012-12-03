@@ -37,11 +37,20 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/casts.h"
 #include "cedar/devices/kteam/serialChannelHelperFunctions.h"
+#include "cedar/devices/kteam/SerialChannel.h"
 #include "cedar/devices/exceptions.h"
+#include "cedar/devices/Channel.h"
 
 // SYSTEM INCLUDES
 
+cedar::dev::kteam::SerialChannelPtr convertToSerialChannel(cedar::dev::ChannelPtr channel)
+{
+  cedar::dev::kteam::SerialChannelPtr serial_channel
+    = cedar::aux::asserted_pointer_cast<cedar::dev::kteam::SerialChannel>(channel);
+  return serial_channel;
+}
 
 void checkSerialCommunicationAnswer
      (

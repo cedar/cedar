@@ -76,7 +76,7 @@ void cedar::dev::kteam::DriveSerial::sendMovementCommand()
   command << _mCommandSetSpeed->getValue() << "," << wheel_speed_pulses[0] << "," << wheel_speed_pulses[1];
 
   // wait for an answer
-  std::string answer = getSerialChannel()->sendAndReceiveLocked(command.str());
+  std::string answer = convertToSerialChannel(getChannel())->sendAndReceiveLocked(command.str());
 
   checkSerialCommunicationAnswer(answer, _mCommandSetSpeed->getValue());
 }
@@ -88,7 +88,7 @@ std::vector<int> cedar::dev::kteam::DriveSerial::getEncoders() const
 
   // send the command to receive the values of the encoders
   std::string answer
-    = getSerialChannel()->sendAndReceiveLocked(_mCommandGetEncoder->getValue());
+    = convertToSerialChannel(getChannel())->sendAndReceiveLocked(_mCommandGetEncoder->getValue());
 
   // check whether the answer begins with the correct character
   checkSerialCommunicationAnswer(answer, _mCommandGetEncoder->getValue());
@@ -120,15 +120,8 @@ void cedar::dev::kteam::DriveSerial::setEncoders(const std::vector<int>& encoder
   // create a command string which will set the encoder values
   std::ostringstream command;
   command << _mCommandSetEncoder->getValue() << "," << encoders[0] << "," << encoders[1];
-  std::string answer = getSerialChannel()->sendAndReceiveLocked(command.str());
+  std::string answer = convertToSerialChannel(getChannel())->sendAndReceiveLocked(command.str());
 
   // check whether the answer begins with the correct character
   checkSerialCommunicationAnswer(answer, _mCommandSetEncoder->getValue());
-}
-
-cedar::dev::kteam::SerialChannelPtr cedar::dev::kteam::DriveSerial::getSerialChannel() const
-{
-  cedar::dev::kteam::SerialChannelPtr serial_channel
-    = cedar::aux::asserted_pointer_cast<cedar::dev::kteam::SerialChannel>(this->getChannel());
-  return serial_channel;
 }

@@ -38,6 +38,7 @@
 #define CEDAR_DEV_COMPONENT_SLOT_H
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/devices/namespace.h"
 
@@ -47,7 +48,7 @@
  *
  * @todo More detailed description of the class.
  */
-class cedar::dev::ComponentSlot
+class cedar::dev::ComponentSlot : public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types

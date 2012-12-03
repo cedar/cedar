@@ -40,7 +40,6 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
-#include "cedar/auxiliaries/Configurable.h"
 #include "cedar/devices/namespace.h"
 #include "cedar/devices/Component.h"
 
@@ -51,8 +50,7 @@
  * This is an abstract class with functions and attributes common to drives of mobile robots. Mobile robots are e.g
  * robots with differential drives or walking robots.
  */
-class cedar::dev::Locomotion : public cedar::dev::Component,
-                               public cedar::aux::Configurable
+class cedar::dev::Locomotion : public cedar::dev::Component
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
