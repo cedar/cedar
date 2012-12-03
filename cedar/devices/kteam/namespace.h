@@ -57,6 +57,7 @@ namespace cedar
       CEDAR_DECLARE_DEV_CLASS(DriveSerial);
       CEDAR_DECLARE_DEV_CLASS(SerialChannel);
       CEDAR_DECLARE_DEV_CLASS(Odometry);
+      CEDAR_DECLARE_DEV_CLASS(ProximitySensorSerial);
       //!@endcond
     }
   }
