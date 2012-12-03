@@ -92,12 +92,6 @@ public:
    */
   ComponentSlotPtr getComponentSlot(const std::string& componentSlotName) const;
 
-  /*! @brief Returns the name of the robot.
-   *
-   * @return Name of the robot.
-   */
-  const std::string& getName() const;
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

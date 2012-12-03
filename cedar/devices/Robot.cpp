@@ -106,8 +106,3 @@ cedar::dev::ComponentSlotPtr cedar::dev::Robot::getComponentSlot(const std::stri
 
   return slot_it->second;
 }
-
-const std::string& cedar::dev::Robot::getName() const
-{
-  return this->_mName->getValue();
-}
