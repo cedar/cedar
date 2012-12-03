@@ -65,8 +65,13 @@ class cedar::proc::gui::Ide : public QMainWindow, public Ui_Ide
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  Ide(bool loadDefaultPlugins = true);
+  /*!@brief The standard constructor.
+   *
+   * @param loadDefaultPlugins Loads all plugins set as default in the configuration.
+   * @param redirectLogToGui   Enables or disables redirection of log messages to the gui (can help when too many log
+   *                           messages lock up the user interface).
+   */
+  Ide(bool loadDefaultPlugins = true, bool redirectLogToGui = true);
 
   //!@brief Destructor
   ~Ide();
