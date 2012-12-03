@@ -42,9 +42,13 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
+#include "cedar/devices/namespace.h"
+#include "cedar/devices/kteam/namespace.h"
 
 // SYSTEM INCLUDES
 
+//!@brief Converts a given channel pointer to a kteam serial channel pointer.
+cedar::dev::kteam::SerialChannelPtr convertToSerialChannel(cedar::dev::ChannelPtr channel);
 
 //!@brief Checks whether the answer received over the serial connection is correct with respect to the command sent.
 void checkSerialCommunicationAnswer

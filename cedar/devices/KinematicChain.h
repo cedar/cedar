@@ -44,7 +44,6 @@
 #include "cedar/devices/namespace.h"
 #include "cedar/devices/Component.h"
 #include "cedar/auxiliaries/LoopedThread.h"
-#include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 
@@ -64,8 +63,7 @@
 class cedar::dev::KinematicChain
 :
 public cedar::dev::Component,
-public cedar::aux::LoopedThread,
-public cedar::aux::NamedConfigurable
+public cedar::aux::LoopedThread
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------

@@ -52,8 +52,9 @@ namespace cedar
       namespace khepera
       {
         //!@cond SKIPPED_DOCUMENTATION
-
-      //!@endcond
+        CEDAR_DECLARE_DEV_CLASS(Gripper);
+        //!@endcond
+      }
     }
   }
 }

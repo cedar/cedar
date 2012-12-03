@@ -75,12 +75,6 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*! Returns the channel but casts it into a SerialChannelPtr.
-   *
-   * @returns pointer to the serial channel
-   */
-  cedar::dev::kteam::SerialChannelPtr getSerialChannel() const;
-
   //! @see Base class.
   virtual void sendMovementCommand();
 

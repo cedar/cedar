@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,81 +22,83 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Robot.h
+    File:        Gripper.h
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
-    Date:        2012 11 23
+    Date:        2012 11 26
 
-    Description: Manages all components of a robot.
+    Description: Gripper that can be attached to the Khepera robot.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_H
-#define CEDAR_DEV_ROBOT_H
+#ifndef CEDAR_DEV_KTEAM_KHEPERA_GRIPPER_H
+#define CEDAR_DEV_KTEAM_KHEPERA_GRIPPER_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/NamedConfigurable.h"
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/devices/namespace.h"
+#include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/devices/kteam/namespace.h"
+#include "cedar/devices/kteam/khepera/namespace.h"
+#include "cedar/devices/Component.h"
 
 // SYSTEM INCLUDES
-#include <vector>
-#include <string>
-#include <map>
 
-/*!@brief Base class for robots.
+
+/*!@brief Gripper that can be attached to the Khepera robot.
  *
- * @todo More detailed description of the class.
+ * @todo describe more.
  */
-class cedar::dev::Robot : public cedar::aux::NamedConfigurable
+class cedar::dev::kteam::khepera::Gripper : public cedar::dev::Component
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // types
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  typedef cedar::aux::ObjectMapParameterTemplate<cedar::dev::ComponentSlot> ComponentSlotParameter;
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ComponentSlotParameter);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief constructor
-  Robot();
-  //!@brief destructor
-  virtual ~Robot();
+  //!@brief The standard constructor.
+  Gripper();
+
+  //!@brief The standard constructor.
+  Gripper(cedar::dev::kteam::SerialChannelPtr channel);
+
+  //!@brief Destructor
+  virtual ~Gripper();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! @brief Returns a pointer to the component docked to the component slot with the name @em componentSlotName.
-   *
-   * @return Pointer to the requested component.
-   * @param[in] componentSlotName name of the component slot, whose component is to be returned.
-   */
-  ComponentPtr getComponent(const std::string& componentSlotName) const;
+  //!@brief Opens the gripper.
+  void openGripper();
 
-  /*! @brief Returns a vector containing all the available slot names of the robot.
-   *
-   * @return vector of available slot names
-   */
-  std::vector<std::string> getComponentSlotNames() const;
+  //!@brief Closes the gripper.
+  void closeGripper();
 
-  /*! @brief Returns the component slot with the name @em componentSlotName.
-   *
-   * @return component slot
-   * @param[in] componentSlotName name of the component slot that is to be returned
-   */
-  ComponentSlotPtr getComponentSlot(const std::string& componentSlotName) const;
+  //!@brief Sets the arm position.
+  void setArmPosition(unsigned int position);
 
-  /*! @brief Returns the name of the robot.
-   *
-   * @return Name of the robot.
-   */
-  const std::string& getName() const;
+  //!@brief Sets the position of the gripper (i.e., opens or closes it).
+  void setGripperPosition(bool open);
+
+  //!@brief Returns the current arm position.
+  unsigned int getArmPosition();
+
+  //!@brief Returns the gripper position.
+  unsigned int getGripperPosition();
+
+  //!@brief Returns the current measurement of the optical sensor in the Khepera's gripper.
+  unsigned int getGripperOpticalSensor();
+
+  //!@brief Returns the current measurement of the resistivity sensor in the Khepera's gripper.
+  unsigned int getGripperResistivity();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -108,14 +110,13 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void initialize();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-
 private:
   // none yet
 
@@ -126,8 +127,29 @@ protected:
   // none yet
 
 private:
-  //! mapping of all slot names to their component slots
-  ComponentSlotParameterPtr _mComponentSlots;
+  //! limits for the arm position
+  cedar::aux::math::UIntLimitsParameterPtr _mArmPositionLimits;
+  //! command used to set the encoders of the robot
+  cedar::aux::StringParameterPtr _mCommandSetEncoder;
+  //! command used to get the encoders of the robot
+  cedar::aux::StringParameterPtr _mCommandGetEncoder;
+  //! command used to set the gripper position
+  cedar::aux::StringParameterPtr _mCommandSetGripperPosition;
+  //! command used to get the gripper position
+  cedar::aux::StringParameterPtr _mCommandGetGripperPosition;
+  //! answer expected when getting the gripper position
+  cedar::aux::StringParameterPtr _mAnswerGetGripperPosition;
+  //! command used to set the arm position
+  cedar::aux::StringParameterPtr _mCommandSetArmPosition;
+  //! command used to get the arm position
+  cedar::aux::StringParameterPtr _mCommandGetArmPosition;
+  //! answer expected when getting the arm position
+  cedar::aux::StringParameterPtr _mAnswerGetArmPosition;
+  //! command used when getting the optical sensor of the gripper
+  cedar::aux::StringParameterPtr _mCommandGetGripperOpticalSensor;
+  //! command used when getting the resistance sensor of the gripper
+  cedar::aux::StringParameterPtr _mCommandGetGripperResistivity;
+}; // class cedar::dev::kteam::khepera::Gripper
 
-}; // class cedar::dev::Robot
-#endif // CEDAR_DEV_ROBOT_H
+#endif // CEDAR_DEV_KTEAM_KHEPERA_GRIPPER_H
+

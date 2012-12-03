@@ -39,6 +39,7 @@
 #define CEDAR_DEV_COMPONENT_H
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/devices/namespace.h"
 #include "cedar/devices/Channel.h"
 
@@ -48,7 +49,7 @@
  *
  * @todo More detailed description of the class.
  */
-class cedar::dev::Component
+class cedar::dev::Component : public cedar::aux::NamedConfigurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -67,6 +68,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Returns the channel associated with the component.
   inline cedar::dev::ChannelPtr getChannel() const
   {
     return mChannel;
