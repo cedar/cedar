@@ -55,6 +55,8 @@ namespace cedar
       CEDAR_DECLARE_DEV_CLASS(KheperaDrive);
       CEDAR_DECLARE_DEV_CLASS(Drive);
       CEDAR_DECLARE_DEV_CLASS(DriveSerial);
+      CEDAR_DECLARE_DEV_CLASS(Led);
+      CEDAR_DECLARE_DEV_CLASS(LedSerial);
       CEDAR_DECLARE_DEV_CLASS(SerialChannel);
       CEDAR_DECLARE_DEV_CLASS(Odometry);
       CEDAR_DECLARE_DEV_CLASS(ProximitySensorSerial);
