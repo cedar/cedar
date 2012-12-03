@@ -53,6 +53,7 @@ namespace cedar
       {
         //!@cond SKIPPED_DOCUMENTATION
         CEDAR_DECLARE_DEV_CLASS(Gripper);
+        CEDAR_DECLARE_DEV_CLASS(GripperSerial);
         //!@endcond
       }
     }
