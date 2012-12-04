@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        AmbientLightSensorSerial.h
+    File:        InfraredSensorSerial.h
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
     Date:        2012 12 03
 
-    Description: Ambient light sensor, which communicates over a serial channel.
+    Description: Infrared sensor, which communicates over a serial channel.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KTEAM_AMBIENT_LIGHT_SENSOR_SERIAL_H
-#define CEDAR_DEV_KTEAM_AMBIENT_LIGHT_SENSOR_SERIAL_H
+#ifndef CEDAR_DEV_KTEAM_INFRARED_SENSOR_SERIAL_H
+#define CEDAR_DEV_KTEAM_INFRARED_SENSOR_SERIAL_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -49,11 +49,12 @@
 #include <cv.h>
 
 
-/*!@brief Ambient light sensor, which communicates over a serial channel.
+/*!@brief Infrared sensor, which communicates over a serial channel.
  *
- * @todo describe more.
+ * This class can provide either proximity or ambient light values, depending on the command string that
+ * is sent to the robot.
  */
-class cedar::dev::kteam::AmbientLightSensorSerial : public cedar::dev::Sensor
+class cedar::dev::kteam::InfraredSensorSerial : public cedar::dev::Sensor
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -64,13 +65,13 @@ class cedar::dev::kteam::AmbientLightSensorSerial : public cedar::dev::Sensor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  AmbientLightSensorSerial();
+  InfraredSensorSerial();
 
   //!@brief Constructor taking an externally created channel.
-  AmbientLightSensorSerial(cedar::dev::kteam::SerialChannelPtr channel);
+  InfraredSensorSerial(cedar::dev::kteam::SerialChannelPtr channel);
 
   //!@brief Destructor
-  virtual ~AmbientLightSensorSerial();
+  virtual ~InfraredSensorSerial();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -106,9 +107,9 @@ protected:
   // none yet
 
 private:
-  cedar::aux::StringParameterPtr _mCommandGetAmbientLight;
+  cedar::aux::StringParameterPtr _mCommandGetInfrared;
 
-}; // class cedar::dev::kteam::AmbientLightSensorSerial
+}; // class cedar::dev::kteam::InfraredSensorSerial
 
-#endif // CEDAR_DEV_KTEAM_AMBIENT_LIGHT_SENSOR_SERIAL_H
+#endif // CEDAR_DEV_KTEAM_INFRARED_SENSOR_SERIAL_H
 

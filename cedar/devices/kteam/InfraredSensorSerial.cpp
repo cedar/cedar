@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ProximitySensorSerial.cpp
+    File:        InfraredSensorSerial.cpp
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
     Date:        2012 12 03
 
-    Description: Proximity sensor, which communicates over a serial channel.
+    Description: Infrared sensor, which communicates over a serial channel.
 
     Credits:
 
@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/math/tools.h"
-#include "cedar/devices/kteam/ProximitySensorSerial.h"
+#include "cedar/devices/kteam/InfraredSensorSerial.h"
 #include "cedar/devices/kteam/SerialChannel.h"
 #include "cedar/devices/kteam/serialChannelHelperFunctions.h"
 
@@ -50,11 +50,11 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::kteam::ProximitySensorSerial::ProximitySensorSerial()
+cedar::dev::kteam::InfraredSensorSerial::InfraredSensorSerial()
 {
 }
 
-cedar::dev::kteam::ProximitySensorSerial::ProximitySensorSerial
+cedar::dev::kteam::InfraredSensorSerial::InfraredSensorSerial
 (
   cedar::dev::kteam::SerialChannelPtr channel
 )
@@ -63,7 +63,7 @@ cedar::dev::Sensor(cedar::aux::asserted_pointer_cast<cedar::dev::Channel>(channe
 {
 }
 
-cedar::dev::kteam::ProximitySensorSerial::~ProximitySensorSerial()
+cedar::dev::kteam::InfraredSensorSerial::~InfraredSensorSerial()
 {
 }
 
@@ -71,20 +71,20 @@ cedar::dev::kteam::ProximitySensorSerial::~ProximitySensorSerial()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cv::Mat cedar::dev::kteam::ProximitySensorSerial::getData()
+cv::Mat cedar::dev::kteam::InfraredSensorSerial::getData()
 {
   // the left and right encoder value will be saved in this vector
-  cv::Mat proximity_values = cv::Mat::zeros(1, 8, CV_32F);
+  cv::Mat infrared_values = cv::Mat::zeros(1, 8, CV_32F);
 
   // cast the channel into a serial channel
   cedar::dev::kteam::SerialChannelPtr serial_channel
     = convertToSerialChannel(getChannel());
 
   // send the command to receive the values of the encoders
-  std::string answer = serial_channel->sendAndReceiveLocked(_mCommandGetProximity->getValue());
+  std::string answer = serial_channel->sendAndReceiveLocked(_mCommandGetInfrared->getValue());
 
   // check whether the answer begins with the correct character
-  checkSerialCommunicationAnswer(answer, _mCommandGetProximity->getValue());
+  checkSerialCommunicationAnswer(answer, _mCommandGetInfrared->getValue());
 
   std::istringstream answer_stream;
   answer_stream.str(answer);
@@ -93,14 +93,14 @@ cv::Mat cedar::dev::kteam::ProximitySensorSerial::getData()
   answer_stream.ignore(2);
   checkStreamValidity(answer_stream, false);
 
-  for (unsigned int i = 0; i < static_cast<unsigned int>(proximity_values.size().height); ++i)
+  for (unsigned int i = 0; i < static_cast<unsigned int>(infrared_values.size().height); ++i)
   {
     // read the left encoder value
-    answer_stream >> proximity_values.at<float>(i);
+    answer_stream >> infrared_values.at<float>(i);
     checkStreamValidity(answer_stream, false);
 
     // skip the colon separating the encoder values
-    if (i < static_cast<unsigned int>(proximity_values.size().height) - 1)
+    if (i < static_cast<unsigned int>(infrared_values.size().height) - 1)
     {
       answer_stream.ignore(1);
       checkStreamValidity(answer_stream, false);
@@ -111,11 +111,11 @@ cv::Mat cedar::dev::kteam::ProximitySensorSerial::getData()
   // print a debug message that everything worked
   cedar::aux::LogSingleton::getInstance()->debugMessage
   (
-    "Successfully received proximity values",
-    "cedar::dev::kteam::ProximitySensorSerial",
-    "Received proximity values"
+    "Successfully received infrared values",
+    "cedar::dev::kteam::InfraredSensorSerial",
+    "Received infrared values"
   );
 #endif // DEBUG_VERBOSE
 
-  return proximity_values;
+  return infrared_values;
 }
