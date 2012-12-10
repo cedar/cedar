@@ -57,8 +57,7 @@ class cedar::dev::Robot : public cedar::aux::NamedConfigurable
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
-  typedef cedar::aux::ObjectMapParameterTemplate<cedar::dev::ComponentSlot> ComponentSlotParameter;
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ComponentSlotParameter);
+  typedef std::map<std::string, cedar::dev::ComponentSlotPtr> ComponentSlotParameter;
 
   typedef cedar::aux::ObjectMapParameterTemplate<cedar::dev::Channel, cedar::aux::allocationPolicies::OnDemand<cedar::dev::Channel> > ChannelParameter;
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ChannelParameter);
@@ -139,7 +138,7 @@ private:
   cedar::aux::ConfigurablePtr _mRobotDescription;
 
   //! mapping of all slot names to their component slots
-  ComponentSlotParameterPtr _mComponentSlots;
+  ComponentSlotParameter _mComponentSlots;
 
   //! mapping of all channel names to the channel
   ChannelParameterPtr _mChannels;
