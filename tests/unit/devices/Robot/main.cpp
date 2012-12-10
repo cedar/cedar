@@ -58,5 +58,12 @@ int main()
     std::cout << "Slot: " << (*slot_iter) << std::endl;
   }
 
+  std::vector<std::string> channel_list = robot->listChannels();
+
+  for (auto channel_iter = channel_list.begin(); channel_iter != channel_list.end(); ++channel_iter)
+  {
+    std::cout << "Channel: " << (*channel_iter) << std::endl;
+  }
+
   return 0;
 }
