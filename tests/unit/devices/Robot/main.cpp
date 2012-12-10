@@ -40,6 +40,7 @@
 
 // PROJECT INCLUDES
 #include "cedar/devices/Robot.h"
+#include "cedar/devices/ComponentSlot.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -48,14 +49,16 @@
 int main()
 {
   cedar::dev::RobotPtr robot(new cedar::dev::Robot());
-//  robot->setDescriptionPath("RobotDescription.json"); // optional
   robot->readJson("RobotConfiguration.json");
 
   std::vector<std::string> slot_list = robot->listComponentSlots();
 
   for (auto slot_iter = slot_list.begin(); slot_iter != slot_list.end(); ++slot_iter)
   {
-    std::cout << "Slot: " << (*slot_iter) << std::endl;
+    const std::string& slot_name = *slot_iter;
+    cedar::dev::ComponentSlotPtr slot = robot->getComponentSlot(slot_name);
+    std::cout << "Slot: " << slot_name << std::endl;
+    std::cout << slot << std::endl;
   }
 
   std::vector<std::string> channel_list = robot->listChannels();

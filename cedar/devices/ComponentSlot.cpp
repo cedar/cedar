@@ -38,6 +38,7 @@
 #include "cedar/auxiliaries/ObjectMapParameterTemplate.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/devices/ComponentSlot.h"
+#include "cedar/devices/Component.h"
 
 // SYSTEM INCLUDES
 
@@ -45,18 +46,53 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::dev::ComponentSlot::ComponentSlot(cedar::dev::RobotPtr robot)
+:
+mRobot(robot)
+{
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-  cedar::dev::ComponentPtr cedar::dev::ComponentSlot::getComponent()
-  {
-    if (!mComponent)
-    {
-      std::string channel_type = _mChannelType->getValue();
-      std::string component_type_id = (*(*_mComponentTypeIds)[channel_type]);
-      mComponent = FactorySingleton::getInstance()->allocate(component_type_id);
-    }
+void cedar::dev::ComponentSlot::readConfiguration(const cedar::aux::ConfigurationNode& node)
+{
+  cedar::aux::ConfigurationNode::const_assoc_iterator common = node.find("common component parameters");
 
-    return mComponent;
+  mCommonParameters = cedar::aux::ConfigurationNode();
+
+  if (common != node.not_found())
+  {
+    mCommonParameters = common->second;
   }
+
+  cedar::aux::ConfigurationNode::const_assoc_iterator available_slots = node.find("available components");
+  if (available_slots != node.not_found())
+  {
+    for (auto slot_iter = available_slots->second.begin(); slot_iter != available_slots->second.end(); ++slot_iter)
+    {
+      const std::string& type_str = slot_iter->first;
+      const cedar::aux::ConfigurationNode& conf = slot_iter->second;
+
+      //!@todo Actual exception
+      CEDAR_ASSERT(this->_mComponentConfigurations.find(type_str) == this->_mComponentConfigurations.end());
+
+      this->_mComponentConfigurations[type_str] = conf;
+    }
+  }
+
+  this->cedar::aux::Configurable::readConfiguration(node);
+}
+
+cedar::dev::ComponentPtr cedar::dev::ComponentSlot::getComponent()
+{
+  if (!mComponent)
+  {
+    std::string channel_type = _mChannelType->getValue();
+    std::string component_type_id = (*(*_mComponentTypeIds)[channel_type]);
+    mComponent = FactorySingleton::getInstance()->allocate(component_type_id);
+  }
+
+  return mComponent;
+}
