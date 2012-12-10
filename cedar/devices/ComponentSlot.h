@@ -51,15 +51,40 @@
 class cedar::dev::ComponentSlot : public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend std::ostream& operator<<(std::ostream& stream, const cedar::dev::ComponentSlot& slot)
+  {
+    stream << "available components:" << std::endl;
+    for (auto iter = slot._mComponentConfigurations.begin(); iter != slot._mComponentConfigurations.end(); ++iter)
+    {
+      stream << "  " << iter->first << std::endl;
+    }
+
+    return stream;
+  }
+
+  friend std::ostream& operator<<(std::ostream& stream, cedar::dev::ComponentSlotPtr slot)
+  {
+    stream << "Component slot @ " << slot.get() << std::endl;
+    stream << *slot;
+    return stream;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
   //!@brief a singleton factory manager for components
   typedef cedar::aux::Singleton<cedar::aux::FactoryManager<cedar::dev::ComponentPtr> > FactorySingleton;
 
+  typedef std::map<std::string, cedar::dev::ComponentPtr> Components;
+  typedef std::map<std::string, cedar::aux::ConfigurationNode> ComponentConfigurations;
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  ComponentSlot(cedar::dev::RobotPtr robot);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -79,6 +104,8 @@ public:
    * @returns pointer to the component
    */
   cedar::dev::ComponentPtr getComponent();
+
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -118,5 +145,12 @@ private:
 
   //! mapping of channel types to class names of components
   cedar::aux::StringMapParameterPtr _mComponentTypeIds;
+
+  Components _mComponents;
+
+  ComponentConfigurations _mComponentConfigurations;
+
+  cedar::aux::ConfigurationNode mCommonParameters;
+
 }; // class cedar::dev::ComponentSlot
 #endif // CEDAR_DEV_COMPONENT_SLOT_H
