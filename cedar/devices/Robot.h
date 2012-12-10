@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/NamedConfigurable.h"
+#include "cedar/auxiliaries/FileParameter.h"
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/devices/namespace.h"
 
@@ -59,12 +60,16 @@ class cedar::dev::Robot : public cedar::aux::NamedConfigurable
   typedef cedar::aux::ObjectMapParameterTemplate<cedar::dev::ComponentSlot> ComponentSlotParameter;
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ComponentSlotParameter);
 
+  typedef cedar::aux::ObjectMapParameterTemplate<cedar::dev::Channel, cedar::aux::allocationPolicies::OnDemand<cedar::dev::Channel> > ChannelParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ChannelParameter);
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
   Robot();
+
   //!@brief destructor
   virtual ~Robot();
 
@@ -92,6 +97,12 @@ public:
    */
   ComponentSlotPtr getComponentSlot(const std::string& componentSlotName) const;
 
+  //!@brief Read a configuration for all registered parameters from a cedar::aux::ConfigurationNode.
+  virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
+  //!@returns A list of all components of this robot.
+  std::vector<std::string> listComponentSlots() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -102,7 +113,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief Read a configuration for all registered parameters from a cedar::aux::ConfigurationNode.
+  virtual void readDescription(const cedar::aux::ConfigurationNode& node);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -120,8 +132,14 @@ protected:
   // none yet
 
 private:
+  //! Configurable object used for storing robot setup in a separate file.
+  cedar::aux::ConfigurablePtr _mRobotDescription;
+
   //! mapping of all slot names to their component slots
   ComponentSlotParameterPtr _mComponentSlots;
+
+  //! mapping of all channel names to the channel
+  ChannelParameterPtr _mChannels;
 
 }; // class cedar::dev::Robot
 #endif // CEDAR_DEV_ROBOT_H

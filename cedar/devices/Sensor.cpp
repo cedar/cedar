@@ -22,42 +22,42 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        serialCommunicationTest.cpp
+    File:        <filename>
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  <first name> <last name>
+    Email:       <email address>
+    Date:        <creation date YYYY MM DD>
 
-    Description: Interactive test-program for the SerialCommunication class.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/systemFunctions.h"
-#include "cedar/devices/communication/SerialCommunication.h"
-#include "cedar/devices/communication/gui/CommunicationWidget.h"
+#include "cedar/devices/Sensor.h"
 
 // SYSTEM INCLUDES
-#include <QApplication>
 
-int main(int argc, char **argv)
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::dev::Sensor::Sensor()
 {
-  //open the channel
-  cedar::dev::com::SerialCommunicationPtr communication(new cedar::dev::com::SerialCommunication());
-  std::string serial_communication_config = cedar::aux::locateResource("configs/serial_communication.json");
-  communication->readJson(serial_communication_config);
-  communication->open();
-
-  // create the GUI
-  cedar::dev::com::gui::CommunicationWidgetPtr
-    communication_widget(new cedar::dev::com::gui::CommunicationWidget(communication));
-  communication_widget->show();
-
-  //start the program
-  QApplication application(argc, argv);
-  application.exec();
-
-  return 0;
 }
+
+cedar::dev::Sensor::Sensor(cedar::dev::ChannelPtr channel)
+{
+}
+
+cedar::dev::Sensor::~Sensor()
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------

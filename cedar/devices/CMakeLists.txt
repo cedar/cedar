@@ -52,6 +52,7 @@ cedar_add_library(cedardev
                   gui/KinematicChainMonitorWidget.h
                   gui/KinematicChainCommandWidget.h
                   gui/MountedCameraViewer.h
+                  kteam/gui/DriveControlWidget.h
                   sensors/visual/VideoGrabber.h
                   sensors/visual/PictureGrabber.h
                   sensors/camera/Grabber.h

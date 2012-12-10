@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/namespace.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -51,7 +52,7 @@
  *
  * @todo describe more.
  */
-class cedar::dev::Channel
+class cedar::dev::Channel : public cedar::aux::NamedConfigurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types

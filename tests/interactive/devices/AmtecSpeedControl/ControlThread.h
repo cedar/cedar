@@ -40,7 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/LoopedThread.h"
-#include "cedar/devices/robot/KinematicChain.h"
+#include "cedar/devices/KinematicChain.h"
 
 // SYSTEM INCLUDES
 
