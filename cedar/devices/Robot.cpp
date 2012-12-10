@@ -84,6 +84,18 @@ std::vector<std::string> cedar::dev::Robot::listComponentSlots() const
   return slot_vector;
 }
 
+std::vector<std::string> cedar::dev::Robot::listChannels() const
+{
+  std::vector<std::string> channels;
+
+  for (auto channel_iter = _mChannels->begin(); channel_iter != _mChannels->end(); ++channel_iter)
+  {
+    channels.push_back(channel_iter->first);
+  }
+
+  return channels;
+}
+
 void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& node)
 {
   this->_mRobotDescription->readConfiguration(node);

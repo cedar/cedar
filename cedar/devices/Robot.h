@@ -103,6 +103,9 @@ public:
   //!@returns A list of all components of this robot.
   std::vector<std::string> listComponentSlots() const;
 
+  //!@returns A list of all channels of this robot.
+  std::vector<std::string> listChannels() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
