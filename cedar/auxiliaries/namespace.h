@@ -52,6 +52,12 @@ namespace cedar
   /*!@brief Namespace for all aux classes. */
   namespace aux
   {
+    namespace allocationPolicies
+    {
+      template <typename ValueType> class Instantly;
+      template <typename ValueType> class OnDemand;
+    }
+
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Configurable);
     CEDAR_DECLARE_AUX_CLASS(NamedConfigurable);
@@ -116,7 +122,7 @@ namespace cedar
     //!@brief a template class for lists of objects of arbitrary type
     template <typename T> class ObjectListParameterTemplate;
     //!@brief a template class for maps of objects of arbitrary type
-    template <typename T> class ObjectMapParameterTemplate;
+    template <typename T, class AllocationPolicy = allocationPolicies::Instantly<T> > class ObjectMapParameterTemplate;
     //!@brief A concretization of NumericParameter for double values.
     typedef NumericParameter<double> DoubleParameter;
     //!@brief A concretization of NumericParameter for unsigned int values.

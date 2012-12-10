@@ -47,7 +47,16 @@
 
 int main()
 {
-  cedar::dev::Robot robot;
+  cedar::dev::RobotPtr robot(new cedar::dev::Robot());
+//  robot->setDescriptionPath("RobotDescription.json"); // optional
+  robot->readJson("RobotConfiguration.json");
+
+  std::vector<std::string> slot_list = robot->listComponentSlots();
+
+  for (auto slot_iter = slot_list.begin(); slot_iter != slot_list.end(); ++slot_iter)
+  {
+    std::cout << "Slot: " << (*slot_iter) << std::endl;
+  }
 
   return 0;
 }

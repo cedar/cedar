@@ -66,7 +66,7 @@
  * The parameters of the communication must be read from a configuration file using the
  * cedar::aux::Configurable::readJson method right after constructing of the object.
  */
-class cedar::dev::SerialChannel : public QObject, public Channel, public cedar::aux::NamedConfigurable
+class cedar::dev::SerialChannel : public QObject, public Channel
 {
   Q_OBJECT
 

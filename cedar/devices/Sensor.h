@@ -61,7 +61,7 @@ public:
   Sensor(cedar::dev::ChannelPtr channel);
 
   //!@brief Destructor
-  ~Sensor();
+  virtual ~Sensor();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
