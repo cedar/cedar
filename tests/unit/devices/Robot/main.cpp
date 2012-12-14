@@ -41,6 +41,7 @@
 // PROJECT INCLUDES
 #include "cedar/devices/Robot.h"
 #include "cedar/devices/ComponentSlot.h"
+#include "unit/devices/Robot/TestComponent.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -48,8 +49,13 @@
 
 int main()
 {
+  int errors = 0;
+
+
   cedar::dev::RobotPtr robot(new cedar::dev::Robot());
   robot->readJson("RobotConfiguration.json");
+
+  robot->setChannel("channel 1");
 
   std::vector<std::string> slot_list = robot->listComponentSlots();
 
@@ -68,5 +74,30 @@ int main()
     std::cout << "Channel: " << (*channel_iter) << std::endl;
   }
 
-  return 0;
+  cedar::tests::unit::dev::Robot::TestComponentPtr component
+    = robot->getComponent<cedar::tests::unit::dev::Robot::TestComponent>("component 1");
+
+  if (!component)
+  {
+    std::cout << "Error: could not retrieve \"component 1\"" << std::endl;
+    ++errors;
+  }
+  else
+  {
+    if (component->_mParameter1->getValue() != 1)
+    {
+      std::cout << "Error: parameter 1 has the wrong value (should be 1, is "
+                << component->_mParameter1->getValue() << ")" << std::endl;
+      ++errors;
+    }
+
+    if (component->_mParameter2->getValue() != 2)
+    {
+      std::cout << "Error: parameter 2 has the wrong value (should be 2, is "
+                << component->_mParameter2->getValue() << ")" << std::endl;
+      ++errors;
+    }
+  }
+
+  return errors;
 }

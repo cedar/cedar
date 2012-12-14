@@ -44,6 +44,7 @@
 // PROJECT INCLUDES
 #include "cedar/devices/Robot.h"
 #include "cedar/devices/Component.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -63,8 +64,8 @@ class cedar::tests::unit::dev::Robot::TestComponent : public cedar::dev::Compone
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Constructor that gets a configuration file name.
-  TestComponent(const std::string& rTestParameter);
+  //!@brief Constructor.
+  TestComponent();
 
   //!@brief Destructor
   virtual ~TestComponent();
@@ -73,8 +74,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief returns test name
-  const std::string& getTestName() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -97,13 +96,13 @@ public:
 protected:
   // none yet
 private:
-  std::string mTestName;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet (hopefully never!)
+  cedar::aux::UIntParameterPtr _mParameter1;
+  cedar::aux::UIntParameterPtr _mParameter2;
 protected:
   // none yet
 private:

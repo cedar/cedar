@@ -38,6 +38,8 @@
 #ifndef CEDAR_TESTS_UNIT_DEV_ROBOT_NAMESPACE_H
 #define CEDAR_TESTS_UNIT_DEV_ROBOT_NAMESPACE_H
 
+#include "cedar/defines.h"
+
 namespace cedar
 {
   namespace tests
@@ -51,6 +53,7 @@ namespace cedar
         {
           class TestRobot;
           class TestComponent;
+          CEDAR_GENERATE_POINTER_TYPES(TestComponent);
         }
       }
     }

@@ -72,6 +72,15 @@ cedar::dev::Robot::~Robot()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::dev::Robot::setChannel(const std::string& channel)
+{
+  for (auto slot_iter = _mComponentSlots.begin(); slot_iter != _mComponentSlots.end(); ++slot_iter)
+  {
+    cedar::dev::ComponentSlotPtr slot = slot_iter->second;
+    slot->setChannel(channel);
+  }
+}
+
 std::vector<std::string> cedar::dev::Robot::listComponentSlots() const
 {
   std::vector<std::string> slot_vector;

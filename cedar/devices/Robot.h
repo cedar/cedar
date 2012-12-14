@@ -107,6 +107,16 @@ public:
   //!@returns A list of all channels of this robot.
   std::vector<std::string> listChannels() const;
 
+  //!@brief Sets the channel for all components in the robot.
+  void setChannel(const std::string& channel);
+
+  template <typename T>
+  inline boost::shared_ptr<T> getComponent(const std::string& slotName) const
+  {
+    cedar::dev::ComponentPtr component = this->getComponent(slotName);
+    return boost::dynamic_pointer_cast<T>(component);
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
