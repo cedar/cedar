@@ -117,6 +117,8 @@ namespace cedar
     template <typename T> class VectorParameter;
     //!@brief a template class for vector parameters (of numeric type)
     template <typename T> class NumericVectorParameter;
+    //!@brief a template class for map parameters (of primitive type)
+    template <typename T> class MapParameter;
     //!@brief a template class for storing objects that are allocated dynamically.
     template <typename T> class ObjectParameterTemplate;
     //!@brief a template class for lists of objects of arbitrary type
@@ -161,7 +163,7 @@ namespace cedar
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntVectorParameter);
 
-    typedef ObjectMapParameterTemplate<std::string> StringMapParameter;
+    typedef MapParameter<std::string> StringMapParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringMapParameter);
     //!@endcond
 

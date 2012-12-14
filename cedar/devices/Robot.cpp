@@ -96,6 +96,38 @@ std::vector<std::string> cedar::dev::Robot::listChannels() const
   return channels;
 }
 
+void cedar::dev::Robot::performConsistencyCheck() const
+{
+  // gather all channels from the component slots
+  std::set<std::string> slot_channels;
+
+  for (auto slot_iter = this->_mComponentSlots.begin(); slot_iter != this->_mComponentSlots.end(); ++slot_iter)
+  {
+    cedar::dev::ConstComponentSlotPtr slot = slot_iter->second;
+    std::vector<std::string> slot_channel_list = slot->listChannels();
+    slot_channels.insert(slot_channel_list.begin(), slot_channel_list.end());
+  }
+
+  // check if every slot specifies relationships for every channel
+  for (auto slot_iter = this->_mComponentSlots.begin(); slot_iter != this->_mComponentSlots.end(); ++slot_iter)
+  {
+    cedar::dev::ConstComponentSlotPtr slot = slot_iter->second;
+    const std::string& slot_name = slot_iter->first;
+    for (auto channel_it = slot_channels.begin(); channel_it != slot_channels.end(); ++channel_it)
+    {
+      const std::string& name = *channel_it;
+      if (!slot->hasChannel(name))
+      {
+        cedar::aux::LogSingleton::getInstance()->warning
+        (
+          "The slot \"" + slot_name + "\" has no mapping for channel \"" + name + "\".",
+          "void cedar::dev::Robot::performConsistencyCheck() const"
+        );
+      }
+    }
+  }
+}
+
 void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& node)
 {
   // read using default procedure (where possible)
@@ -127,6 +159,8 @@ void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& nod
       _mComponentSlots[slot_name] = slot;
     }
   }
+
+  this->performConsistencyCheck();
 }
 
 void cedar::dev::Robot::readConfiguration(const cedar::aux::ConfigurationNode& node)
