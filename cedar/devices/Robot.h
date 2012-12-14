@@ -120,6 +120,9 @@ private:
   //!@brief Read a configuration for all registered parameters from a cedar::aux::ConfigurationNode.
   virtual void readDescription(const cedar::aux::ConfigurationNode& node);
 
+  //!@brief Checks the robot description for consistency. Issues are written to the log as warnings and errors.
+  void performConsistencyCheck() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

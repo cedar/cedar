@@ -48,7 +48,8 @@
 
 cedar::dev::ComponentSlot::ComponentSlot(cedar::dev::RobotPtr robot)
 :
-mRobot(robot)
+mRobot(robot),
+_mComponentTypeIds(new cedar::aux::StringMapParameter(this, "channel to component mapping"))
 {
 }
 
@@ -90,6 +91,23 @@ std::ostream& cedar::dev::operator<<(std::ostream& stream, cedar::dev::Component
   return stream;
 }
 
+std::vector<std::string> cedar::dev::ComponentSlot::listChannels() const
+{
+  std::vector<std::string> list;
+  for (auto iter = this->_mComponentTypeIds->begin(); iter != this->_mComponentTypeIds->end(); ++iter)
+  {
+    list.push_back(iter->first);
+  }
+  return list;
+}
+
+bool cedar::dev::ComponentSlot::hasChannel(const std::string& name) const
+{
+  return this->_mComponentTypeIds->find(name) != this->_mComponentTypeIds->end();
+}
+
+
+
 void cedar::dev::ComponentSlot::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   cedar::aux::ConfigurationNode::const_assoc_iterator common = node.find("common component parameters");
@@ -124,7 +142,7 @@ cedar::dev::ComponentPtr cedar::dev::ComponentSlot::getComponent()
   if (!mComponent)
   {
     std::string channel_type = _mChannelType->getValue();
-    std::string component_type_id = (*(*_mComponentTypeIds)[channel_type]);
+    std::string component_type_id = _mComponentTypeIds->get(channel_type);
     mComponent = FactorySingleton::getInstance()->allocate(component_type_id);
   }
 

@@ -38,9 +38,10 @@
 #define CEDAR_DEV_COMPONENT_SLOT_H
 
 // CEDAR INCLUDES
+#include "cedar/devices/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/devices/namespace.h"
+#include "cedar/auxiliaries/MapParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -94,6 +95,12 @@ public:
   cedar::dev::ComponentPtr getComponent();
 
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
+  //!@brief Lists all channels in this component.
+  std::vector<std::string> listChannels() const;
+
+  //!@brief Checks if a channel of the given name exists.
+  bool hasChannel(const std::string& name) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
