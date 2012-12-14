@@ -44,6 +44,7 @@
 
 // SYSTEM INCLUDES
 
+
 /*!@brief Slot for a single robot component.
  *
  * @todo More detailed description of the class.
@@ -53,23 +54,11 @@ class cedar::dev::ComponentSlot : public cedar::aux::Configurable
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend std::ostream& operator<<(std::ostream& stream, const cedar::dev::ComponentSlot& slot)
-  {
-    stream << "available components:" << std::endl;
-    for (auto iter = slot._mComponentConfigurations.begin(); iter != slot._mComponentConfigurations.end(); ++iter)
-    {
-      stream << "  " << iter->first << std::endl;
-    }
+  friend std::ostream& operator<<(std::ostream& stream, const cedar::dev::ComponentSlot& slot);
 
-    return stream;
-  }
+  friend std::ostream& operator<<(std::ostream& stream, cedar::dev::ConstComponentSlotPtr slot);
 
-  friend std::ostream& operator<<(std::ostream& stream, cedar::dev::ComponentSlotPtr slot)
-  {
-    stream << "Component slot @ " << slot.get() << std::endl;
-    stream << *slot;
-    return stream;
-  }
+  friend std::ostream& operator<<(std::ostream& stream, cedar::dev::ComponentSlotPtr slot);
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -77,7 +66,6 @@ class cedar::dev::ComponentSlot : public cedar::aux::Configurable
   //!@brief a singleton factory manager for components
   typedef cedar::aux::Singleton<cedar::aux::FactoryManager<cedar::dev::ComponentPtr> > FactorySingleton;
 
-  typedef std::map<std::string, cedar::dev::ComponentPtr> Components;
   typedef std::map<std::string, cedar::aux::ConfigurationNode> ComponentConfigurations;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -145,8 +133,6 @@ private:
 
   //! mapping of channel types to class names of components
   cedar::aux::StringMapParameterPtr _mComponentTypeIds;
-
-  Components _mComponents;
 
   ComponentConfigurations _mComponentConfigurations;
 
