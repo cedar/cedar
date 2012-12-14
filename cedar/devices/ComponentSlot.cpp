@@ -56,6 +56,40 @@ mRobot(robot)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::ostream& cedar::dev::operator<<(std::ostream& stream, const cedar::dev::ComponentSlot& slot)
+{
+  stream << "available components:" << std::endl;
+  for (auto iter = slot._mComponentConfigurations.begin(); iter != slot._mComponentConfigurations.end(); ++iter)
+  {
+    const std::string& type_name = iter->first;
+    stream << "  " << type_name;
+    if (slot.mComponent)
+    {
+      stream << " (with component instance of type " << cedar::aux::objectTypeToString(slot.mComponent) << ")";
+    }
+    else
+    {
+      stream << " (currently holds no component instance)";
+    }
+    stream << std::endl;
+  }
+
+  return stream;
+}
+
+std::ostream& cedar::dev::operator<<(std::ostream& stream, cedar::dev::ConstComponentSlotPtr slot)
+{
+  stream << "Component slot @ " << slot.get() << std::endl;
+  stream << *slot;
+  return stream;
+}
+
+std::ostream& cedar::dev::operator<<(std::ostream& stream, cedar::dev::ComponentSlotPtr slot)
+{
+  stream << cedar::dev::ConstComponentSlotPtr(slot);
+  return stream;
+}
+
 void cedar::dev::ComponentSlot::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   cedar::aux::ConfigurationNode::const_assoc_iterator common = node.find("common component parameters");
