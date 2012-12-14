@@ -1,115 +1,21 @@
 {
   "component slots":
   {
-    "drive":
+    "component 1":
     {
-      "channel to component mapping":
-      {
-        "serial": "kteam drive serial",
-        "network": "kteam drive network"
-      },
       "available components":
       {
-        "cedar::dev::kteam::DriveSerial":
+        "channel 1":
         {
-          "channel": "epuck_serial",
-          "command set speed": "D",
-          "command set encoder": "P",
-          "command get encoder": "Q"
-        },
-        "cedar::dev::kteam::DriveNetwork":
-        {
-          "channel": "epuck_network",
-          "command set speed": "D",
-          "command set encoder": "P",
-          "command get encoder": "Q"
+          "cedar.tests.unit.dev.Robot.TestComponent":
+          {
+            "parameter 1": "1"
+          }
         }
       },
       "common component parameters":
       {
-        "forward velocity limits":
-        {
-          "lower limit": "-1.0",
-          "upper limit": "1.0"
-        },
-        "turning rate limits":
-        {
-          "lower limit": "-3.141",
-          "upper limit": "3.141"
-        },
-        "wheel distance": "0.053",
-        "wheel radius": "0.0205",
-        "hardware speed limits":
-        {
-          "lower limit": "-1.0",
-          "upper limit": "1.0"
-        },
-        "number of pulses per revolution": "1000",
-        "encoder limits":
-        {
-          "lower limit": "-32768",
-          "upper limit": "32767"
-        }
-      }
-    },
-    "proximity sensor":
-    {
-      "channel to component mapping":
-      {
-        "serial": "proximity sensor serial"
-      },
-      "available components":
-      {
-        "cedar::dev::kteam::InfraredSensorSerial":
-        {
-          "channel": "epuck_serial",
-          "command get infrared": "N"
-        }
-      }
-    },
-    "ambient light sensor":
-    {
-      "channel to component mapping":
-      {
-        "serial": "ambient light sensor serial"
-      },
-      "available components":
-      {
-        "cedar::dev::kteam::InfraredSensorSerial":
-        {
-          "channel": "epuck_serial",
-          "command get infrared": "O"
-        }
-      }
-    },
-    "acceleration sensor":
-    {
-      "channel to component mapping":
-      {
-        "serial": "acceleration sensor serial"
-      },
-      "available components":
-      {
-        "cedar::dev::kteam::epuck::AccelerationSensorSerial":
-        {
-          "channel": "epuck_serial",
-          "command get acceleration": "A"
-        }
-      }
-    },
-    "led":
-    {
-      "channel to component mapping":
-      {
-        "serial": "led serial"
-      },
-      "available components":
-      {
-        "cedar::dev::kteam::LedSerial":
-        {
-          "channel": "epuck_serial",
-          "command set state": "L"
-        }
+        "parameter 2": "2"
       }
     }
   },

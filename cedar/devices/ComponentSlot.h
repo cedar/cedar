@@ -102,6 +102,9 @@ public:
   //!@brief Checks if a channel of the given name exists.
   bool hasChannel(const std::string& name) const;
 
+  //!@brief Sets the channel for this component.
+  void setChannel(const std::string& channel);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -139,7 +142,7 @@ private:
   cedar::aux::StringParameterPtr _mChannelType;
 
   //! mapping of channel types to class names of components
-  cedar::aux::StringMapParameterPtr _mComponentTypeIds;
+  std::map<std::string, std::string> mComponentTypeIds;
 
   ComponentConfigurations _mComponentConfigurations;
 

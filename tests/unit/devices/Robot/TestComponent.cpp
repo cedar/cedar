@@ -45,16 +45,32 @@
 #include <string>
 #include <iostream>
 
+//----------------------------------------------------------------------------------------------------------------------
+// type registration
+//----------------------------------------------------------------------------------------------------------------------
+
+namespace
+{
+  bool registered()
+  {
+    cedar::dev::ComponentManagerSingleton::getInstance()->
+        registerType<cedar::tests::unit::dev::Robot::TestComponentPtr>();
+    return true;
+  }
+
+  bool registerFnCall = registered();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 //! constructor
-cedar::tests::unit::dev::Robot::TestComponent::TestComponent(const std::string& rTestName)
+cedar::tests::unit::dev::Robot::TestComponent::TestComponent()
 :
 cedar::dev::Component(),
-mTestName(rTestName)
+_mParameter1(new cedar::aux::UIntParameter(this, "parameter 1", 10)),
+_mParameter2(new cedar::aux::UIntParameter(this, "parameter 2", 10))
 {
 }
 
@@ -66,8 +82,3 @@ cedar::tests::unit::dev::Robot::TestComponent::~TestComponent()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-const std::string& cedar::tests::unit::dev::Robot::TestComponent::getTestName() const
-{
-  return mTestName;
-}
