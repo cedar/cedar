@@ -119,6 +119,8 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::commandJoints()
   case 2:
     mpKinematicChain->setJointAccelerations(command_vector);
     break;
+  case 3: // STOP
+    break;
   default:
     CEDAR_THROW(cedar::aux::UnhandledValueException, "This value is not handled here.");
   }
@@ -168,6 +170,7 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::update()
       mCommandBoxes[j]->setValue(mpKinematicChain->getJointAcceleration(j));
       mCommandBoxes[j]->blockSignals(false);
     }
+  case 3: // STOP
     break;
   default:
     CEDAR_THROW(cedar::aux::UnhandledValueException, "This is not a handled case.");
@@ -200,6 +203,8 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::initWindow()
   mpModeBox->addItem(QString("position"));
   mpModeBox->addItem(QString("velocity"));
   mpModeBox->addItem(QString("acceleration"));
+  mpModeBox->addItem(QString("stopped"));
+
   mpModeBox->setCurrentIndex(mpKinematicChain->getWorkingMode());
   mpGridLayout->addWidget(mpModeBox, 1, 0);
   connect(mpModeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(changeWorkingMode(int)));
