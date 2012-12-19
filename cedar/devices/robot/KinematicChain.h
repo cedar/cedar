@@ -111,6 +111,7 @@ public:
 public:
   //!@brief The different modes to operate the kinematic chain
   enum ActionType { ANGLE, VELOCITY, ACCELERATION, STOP };
+               // TODO: jokeit:  ANGLE --> unthreaded mode
 
 protected:
   // none yet
@@ -561,11 +562,19 @@ public:
    */
   cv::Mat getCurrentInitialConfiguration();
 
+  //!@brief add one initial configuration
+  void addInitialConfiguration(const std::string &name, const cv::Mat &config);
+  //!@brief delete one initial configuration
+  void deleteInitialConfiguration(const std::string &name);
   //!@brief set the named map of initial configurations
+  //
+  // prefer using @addInitialConfiguration
   void setInitialConfigurations(std::map<std::string, cv::Mat> configs);
-  //!@brief apply the named initial configuration by name
+  //!@brief set the currently valid initial configuration and apply it (i.e. move the manipulator to that configuration)
   bool applyInitialConfiguration(std::string s);
   //!@brief apply the named initial configuration by index
+  //
+  // Prefer using @applyInitialConfiguration(string) for accessing named configurations
   bool applyInitialConfiguration(unsigned int i);
 
   //----------------------------------------------------------------------------
@@ -593,6 +602,13 @@ private:
    */
   cv::Mat calculateTwistTemporalDerivative(unsigned int index);
 
+  //!@brief set the currently valid initial configuration, do not move the manipulator
+  // 
+  // See also @applyInitialConfiguration
+  bool setCurrentInitialConfiguration(const std::string &s);
+
+  //!@brief: test validity of initial configurations
+  void checkInitialConfigurations();
 
   //----------------------------------------------------------------------------
   // members
