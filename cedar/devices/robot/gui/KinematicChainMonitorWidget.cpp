@@ -119,7 +119,10 @@ void cedar::dev::robot::gui::KinematicChainMonitorWidget::initWindow()
   setLayout(mpGridLayout);
 
   // start a timer to update the interface
-  startTimer(mUpdateInterval);
+  if (!mTimerId)
+  {
+    mTimerId =  startTimer(mUpdateInterval);
+  }
 
   return;
 }

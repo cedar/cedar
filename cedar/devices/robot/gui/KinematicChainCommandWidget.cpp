@@ -181,6 +181,10 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::setKeepSendingState(in
 {
   if (state)
   {
+    if (mTimerId)
+    {
+      killTimer(mTimerId);
+    }
     mTimerId = startTimer(mUpdateInterval);
   }
   else
