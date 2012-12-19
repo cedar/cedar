@@ -79,12 +79,10 @@ void cedar::dev::robot::gui::KinematicChainWidget::init(cedar::dev::robot::Kinem
 
   QGridLayout* p_layout = new QGridLayout();
   QGroupBox* p_monitor_group = new QGroupBox();
-//  p_monitor_group->setTitle("Monitor");
   p_layout->addWidget(p_monitor_group, 0, 0);
   mpMonitorWidget = new cedar::dev::robot::gui::KinematicChainMonitorWidget(kinematicChain, this);
   p_layout->addWidget(mpMonitorWidget, 0, 0);
   QGroupBox* p_command_group = new QGroupBox();
-//  p_command_group->setTitle("Command");
   p_layout->addWidget(p_command_group, 0, 1);
   mpCommandWidget = new cedar::dev::robot::gui::KinematicChainCommandWidget(kinematicChain);
   p_layout->addWidget(mpCommandWidget, 0, 1);
