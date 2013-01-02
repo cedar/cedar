@@ -37,11 +37,13 @@
 #include "cedar/devices/robot/SimulatedKinematicChain.h"
 #include "cedar/devices/robot/gl/KukaArm.h"
 #include "cedar/devices/robot/gui/KinematicChainWidget.h"
+#include "cedar/devices/robot/gui/MountedCameraViewer.h"
 #include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gui/SceneWidget.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/auxiliaries/gl/Cylinder.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -52,6 +54,7 @@ int main(int argc, char **argv)
   std::string trunk_configuration_file = cedar::aux::locateResource("configs/caren_trunk.json");
   std::string arm_configuration_file = cedar::aux::locateResource("configs/kuka_lwr4.json");
   std::string head_configuration_file = cedar::aux::locateResource("configs/caren_head.json");
+  std::string camera_middle_configuration_file = cedar::aux::locateResource("configs/caren_camera_middle.json");
 
   QApplication a(argc, argv);
 
@@ -69,14 +72,14 @@ int main(int argc, char **argv)
   scene->setSceneLimit(2);
   scene->drawFloor(true);
   cedar::aux::gui::Viewer viewer(scene);
-  viewer.show();
   viewer.setSceneRadius(scene->getSceneLimit());
 
   // create visualization objects
   cedar::dev::robot::gl::KinematicChainPtr caren_trunk_visualization(new cedar::dev::robot::gl::KinematicChain(caren_trunk));
   cedar::dev::robot::gl::KinematicChainPtr caren_arm_visualization(new cedar::dev::robot::gl::KukaArm(caren_arm));
   cedar::dev::robot::gl::KinematicChainPtr caren_head_visualization(new cedar::dev::robot::gl::KinematicChain(caren_head));
-//  arm_visualization->setDisplayEndEffectorVelocity(false);
+
+  // add visualization objects to scene
   scene->addObjectVisualization(caren_trunk_visualization);
   scene->addObjectVisualization(caren_arm_visualization);
   scene->addObjectVisualization(caren_head_visualization);
@@ -87,21 +90,42 @@ int main(int argc, char **argv)
   cedar::dev::robot::gui::KinematicChainWidget arm_widget(caren_arm);
   cedar::dev::robot::gui::KinematicChainWidget head_widget(caren_head);
 
+  // create a cylinder visualization and add it to the scene
+  cedar::aux::LocalCoordinateFramePtr cylinder_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  cylinder_local_coordinate_frame->setName("cylinder");
+  cylinder_local_coordinate_frame->setTranslation(.3, .0, 1.0);
+  cedar::aux::gl::ObjectVisualizationPtr cylinder
+  (
+    new cedar::aux::gl::Cylinder(cylinder_local_coordinate_frame, .1, .2, 0, 0.8, 0)
+  );
+  scene->addObjectVisualization(cylinder);
+
+  // create a mounted camera viewer
+  cedar::dev::robot::gui::MountedCameraViewer camera_viewer(scene, caren_head);
+  camera_viewer.readJson(camera_middle_configuration_file);
+  camera_viewer.setSceneRadius(scene->getSceneLimit());
+
+  // show widgets
   scene_widget->show();
   trunk_widget.show();
   arm_widget.show();
   head_widget.show();
+  viewer.show();
+  camera_viewer.show();
 
   caren_trunk->startTimer(50.0);
   caren_arm->startTimer(50.0);
   caren_head->startTimer(50.0);
   viewer.startTimer(50);
+  camera_viewer.startTimer(50);
   a.exec();
 
   caren_trunk->stop();
   caren_arm->stop();
   caren_head->stop();
-  cedar::aux::sleep(cedar::unit::Seconds(1));
+  caren_trunk->wait();
+  caren_arm->wait();
+  caren_head->wait();
 
   return 0;
 }
