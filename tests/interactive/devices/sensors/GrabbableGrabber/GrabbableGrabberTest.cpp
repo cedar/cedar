@@ -152,7 +152,7 @@ int main(int argc, char **argv)
     {
       QApplication::processEvents();
     }
-    usleep (10000);
+    usleep (10);
   }
 
 

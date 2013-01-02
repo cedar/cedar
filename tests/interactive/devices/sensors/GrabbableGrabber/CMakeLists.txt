@@ -34,7 +34,5 @@
 #
 #=======================================================================================================================
 
-if (CEDAR_USE_YARP)
-  cedar_add_interactive_test( "GrabbableGrabberTest" GrabbableGrabberTest.cpp )
-endif()
+cedar_add_interactive_test( "GrabbableGrabberTest" GrabbableGrabberTest.cpp )
 
