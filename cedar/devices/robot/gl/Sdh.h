@@ -58,7 +58,10 @@ public:
   //!@brief constructor
   Sdh
   (
-    cedar::dev::robot::KinematicChainPtr pKinematicChain
+    cedar::dev::robot::KinematicChainPtr fingerOne,
+    cedar::dev::robot::KinematicChainPtr fingerTwo,
+    cedar::dev::robot::KinematicChainPtr fingerThree,
+    cedar::dev::robot::KinematicChainPtr palm
   );
   //!@brief destructor
   ~Sdh();
@@ -89,7 +92,10 @@ private:
 protected:
   // none yet
 private:
-  cedar::dev::robot::KinematicChainPtr mpKinematicChain;
+  cedar::dev::robot::KinematicChainPtr mpFingerOne;
+  cedar::dev::robot::KinematicChainPtr mpFingerTwo;
+  cedar::dev::robot::KinematicChainPtr mpFingerThree;
+  cedar::dev::robot::KinematicChainPtr mpPalm;
 
   // palm
   static const unsigned int mPalmVertexNumber = 7103;
