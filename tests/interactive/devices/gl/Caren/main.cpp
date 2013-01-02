@@ -36,6 +36,7 @@
 // CEDAR INCLUDES
 #include "cedar/devices/robot/SimulatedKinematicChain.h"
 #include "cedar/devices/robot/gl/KukaArm.h"
+#include "cedar/devices/robot/gl/Sdh.h"
 #include "cedar/devices/robot/gui/KinematicChainWidget.h"
 #include "cedar/devices/robot/gui/MountedCameraViewer.h"
 #include "cedar/auxiliaries/systemFunctions.h"
@@ -51,21 +52,37 @@
 
 int main(int argc, char **argv)
 {
+  QApplication a(argc, argv);
+
+  // find resources
   std::string trunk_configuration_file = cedar::aux::locateResource("configs/caren_trunk.json");
   std::string arm_configuration_file = cedar::aux::locateResource("configs/kuka_lwr4.json");
   std::string head_configuration_file = cedar::aux::locateResource("configs/caren_head.json");
   std::string camera_middle_configuration_file = cedar::aux::locateResource("configs/caren_camera_middle.json");
-
-  QApplication a(argc, argv);
+  std::string finger_one_configuration_file = cedar::aux::locateResource("configs/sdh_finger_one.json");
+  std::string finger_two_configuration_file = cedar::aux::locateResource("configs/sdh_finger_two.json");
+  std::string finger_three_configuration_file = cedar::aux::locateResource("configs/sdh_finger_three.json");
+  std::string palm_configuration_file = cedar::aux::locateResource("configs/sdh_palm.json");
 
   // create simulated kinematic chains
   cedar::dev::robot::KinematicChainPtr caren_trunk(new cedar::dev::robot::SimulatedKinematicChain());
   caren_trunk->readJson(trunk_configuration_file);
   cedar::dev::robot::KinematicChainPtr caren_arm(new cedar::dev::robot::SimulatedKinematicChain());
   caren_arm->readJson(arm_configuration_file);
-  caren_trunk->setEndEffector(caren_arm->getRootCoordinateFrame());
   cedar::dev::robot::KinematicChainPtr caren_head(new cedar::dev::robot::SimulatedKinematicChain());
   caren_head->readJson(head_configuration_file);
+  cedar::dev::robot::KinematicChainPtr finger_one(new cedar::dev::robot::SimulatedKinematicChain());
+  finger_one->readJson(finger_one_configuration_file);
+  cedar::dev::robot::KinematicChainPtr finger_two(new cedar::dev::robot::SimulatedKinematicChain());
+  finger_two->readJson(finger_two_configuration_file);
+  cedar::dev::robot::KinematicChainPtr finger_three(new cedar::dev::robot::SimulatedKinematicChain());
+  finger_three->readJson(finger_three_configuration_file);
+  cedar::dev::robot::KinematicChainPtr palm(new cedar::dev::robot::SimulatedKinematicChain());
+  palm->readJson(palm_configuration_file);
+
+  // link kinematic chains to each other
+  caren_trunk->setEndEffector(caren_arm->getRootCoordinateFrame());
+  caren_arm->setEndEffector(palm->getRootCoordinateFrame());
 
   // create scene and viewer to display the arm
   cedar::aux::gl::ScenePtr scene(new cedar::aux::gl::Scene());
@@ -78,17 +95,23 @@ int main(int argc, char **argv)
   cedar::dev::robot::gl::KinematicChainPtr caren_trunk_visualization(new cedar::dev::robot::gl::KinematicChain(caren_trunk));
   cedar::dev::robot::gl::KinematicChainPtr caren_arm_visualization(new cedar::dev::robot::gl::KukaArm(caren_arm));
   cedar::dev::robot::gl::KinematicChainPtr caren_head_visualization(new cedar::dev::robot::gl::KinematicChain(caren_head));
+  cedar::dev::robot::gl::SdhPtr hand_visualization(new cedar::dev::robot::gl::Sdh(finger_one, finger_two, finger_three, palm));
 
   // add visualization objects to scene
   scene->addObjectVisualization(caren_trunk_visualization);
   scene->addObjectVisualization(caren_arm_visualization);
   scene->addObjectVisualization(caren_head_visualization);
+  scene->addObjectVisualization(hand_visualization);
 
   // create control widgets for the scene and the arm
   cedar::aux::gui::SceneWidgetPtr scene_widget(new cedar::aux::gui::SceneWidget(scene));
-  cedar::dev::robot::gui::KinematicChainWidget trunk_widget(caren_trunk);
-  cedar::dev::robot::gui::KinematicChainWidget arm_widget(caren_arm);
-  cedar::dev::robot::gui::KinematicChainWidget head_widget(caren_head);
+  cedar::dev::robot::gui::KinematicChainWidget widget_trunk(caren_trunk);
+  cedar::dev::robot::gui::KinematicChainWidget widget_arm(caren_arm);
+  cedar::dev::robot::gui::KinematicChainWidget widget_head(caren_head);
+  cedar::dev::robot::gui::KinematicChainWidget widget_finger_one(finger_one);
+  cedar::dev::robot::gui::KinematicChainWidget widget_finger_two(finger_two);
+  cedar::dev::robot::gui::KinematicChainWidget widget_finger_three(finger_three);
+  cedar::dev::robot::gui::KinematicChainWidget widget_palm(palm);
 
   // create a cylinder visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr cylinder_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
@@ -107,9 +130,13 @@ int main(int argc, char **argv)
 
   // show widgets
   scene_widget->show();
-  trunk_widget.show();
-  arm_widget.show();
-  head_widget.show();
+  widget_trunk.show();
+  widget_arm.show();
+  widget_head.show();
+  widget_finger_one.show();
+  widget_finger_two.show();
+  widget_finger_three.show();
+  widget_palm.show();
   viewer.show();
   camera_viewer.show();
 
