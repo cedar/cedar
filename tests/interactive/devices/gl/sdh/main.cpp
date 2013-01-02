@@ -50,7 +50,7 @@
 
 int main(int argc, char **argv)
 {
-  // using kuka configuration as dummy
+  // find resources
   std::string finger_one_configuration_file = cedar::aux::locateResource("configs/sdh_finger_one.json");
   std::string finger_two_configuration_file = cedar::aux::locateResource("configs/sdh_finger_two.json");
   std::string finger_three_configuration_file = cedar::aux::locateResource("configs/sdh_finger_three.json");
@@ -67,7 +67,7 @@ int main(int argc, char **argv)
   finger_three->readJson(finger_three_configuration_file);
   cedar::dev::robot::KinematicChainPtr palm(new cedar::dev::robot::SimulatedKinematicChain());
   palm->readJson(palm_configuration_file);
-//  finger_one->getpalmCoordinateFrame()->setTransformation(cv::Mat::eye(4, 4, CV_64FC1));
+//  finger_one->getRootCoordinateFrame()->setTransformation(cv::Mat::eye(4, 4, CV_64FC1));
 
   // create gl visualization objects
   cedar::dev::robot::gl::SdhPtr hand_visualization
