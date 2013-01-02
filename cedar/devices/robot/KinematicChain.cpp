@@ -112,8 +112,9 @@ void cedar::dev::robot::KinematicChain::updateTransformations()
 
 void cedar::dev::robot::KinematicChain::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
-  cedar::aux::Configurable::readConfiguration(node);
+  cedar::aux::NamedConfigurable::readConfiguration(node);
   initializeFromJointList();
+  getRootCoordinateFrame()->setName(this->getName());
 }
 
 unsigned int cedar::dev::robot::KinematicChain::getNumberOfJoints() const
