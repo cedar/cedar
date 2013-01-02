@@ -52,14 +52,14 @@
 
 cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget
 (
-  cedar::dev::robot::KinematicChainPtr kinematicChain,
+  cedar::dev::robot::KinematicChainPtr kinematic_chain,
   QWidget *parent,
   Qt::WindowFlags
 )
 :
 QWidget(parent)
 {
-  init(kinematicChain);
+  init(kinematic_chain);
   return;
 }
 
@@ -73,18 +73,18 @@ cedar::dev::robot::gui::KinematicChainWidget::~KinematicChainWidget()
 // methods
 //------------------------------------------------------------------------------
 
-void cedar::dev::robot::gui::KinematicChainWidget::init(cedar::dev::robot::KinematicChainPtr kinematicChain)
+void cedar::dev::robot::gui::KinematicChainWidget::init(cedar::dev::robot::KinematicChainPtr kinematic_chain)
 {
-  setWindowTitle(QApplication::translate("KinematicChainWindow", "KinematicChain"));
+  setWindowTitle(QString(kinematic_chain->getName().c_str()));
 
   QGridLayout* p_layout = new QGridLayout();
   QGroupBox* p_monitor_group = new QGroupBox();
   p_layout->addWidget(p_monitor_group, 0, 0);
-  mpMonitorWidget = new cedar::dev::robot::gui::KinematicChainMonitorWidget(kinematicChain, this);
+  mpMonitorWidget = new cedar::dev::robot::gui::KinematicChainMonitorWidget(kinematic_chain, this);
   p_layout->addWidget(mpMonitorWidget, 0, 0);
   QGroupBox* p_command_group = new QGroupBox();
   p_layout->addWidget(p_command_group, 0, 1);
-  mpCommandWidget = new cedar::dev::robot::gui::KinematicChainCommandWidget(kinematicChain);
+  mpCommandWidget = new cedar::dev::robot::gui::KinematicChainCommandWidget(kinematic_chain);
   p_layout->addWidget(mpCommandWidget, 0, 1);
   this->setLayout(p_layout);
 
