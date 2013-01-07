@@ -33,6 +33,12 @@
     <file>steps/sum.svg</file>
     <file>steps/video_grabber.svg</file>
     <file>menus/properties.svg</file>
+    <file>menus/plot.svg</file>
+    <file>menus/plot_advanced.svg</file>
+    <file>menus/plot_all.svg</file>
+    <file>menus/data.svg</file>
+    <file>menus/actions.svg</file>
+    <file>menus/display_style.svg</file>
     <file>network.svg</file>
     <file>toolbaricons/save.svg</file>
     <file>toolbaricons/grid.svg</file>

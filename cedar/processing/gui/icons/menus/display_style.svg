@@ -15,7 +15,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.1 r9760"
-   sodipodi:docname="properties.svg"
+   sodipodi:docname="display_style.svg"
    inkscape:export-filename="/home/lompolbx/workspace/src/cedar.fieldFramework/cedar/processing/gui/icons/steps/no_icon.png"
    inkscape:export-xdpi="9"
    inkscape:export-ydpi="9">
@@ -26,9 +26,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="11.2"
-     inkscape:cx="-3.2417921"
-     inkscape:cy="7.9959335"
+     inkscape:zoom="22.4"
+     inkscape:cx="-2.550748"
+     inkscape:cy="10.91095"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -41,6 +41,14 @@
      inkscape:guide-bbox="true" />
   <defs
      id="defs4">
+    <inkscape:path-effect
+       is_visible="true"
+       id="path-effect4716"
+       effect="spiro" />
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect3042"
+       is_visible="true" />
     <linearGradient
        id="linearGradient3896">
       <stop
@@ -373,41 +381,22 @@
        x="2.34375"
        y="1024.7059" />
     <g
-       id="g3904"
-       transform="translate(0,0.44648055)"
-       style="stroke:#930000;stroke-opacity:1">
-      <path
-         transform="translate(0,1022.3622)"
-         d="M 22.148006,21.523006 12.62758,24.073996 5.6581452,17.104561 8.2091355,7.5841355 17.729561,5.0331452 24.698996,12.00258 z"
-         inkscape:randomized="0"
-         inkscape:rounded="0"
-         inkscape:flatsided="true"
-         sodipodi:arg2="1.3089969"
-         sodipodi:arg1="0.78539816"
-         sodipodi:r2="8.53578"
-         sodipodi:r1="9.8562698"
-         sodipodi:cy="14.553571"
-         sodipodi:cx="15.178571"
-         sodipodi:sides="6"
-         id="path3900"
-         style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#930000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-         sodipodi:type="star" />
-      <path
-         sodipodi:type="star"
-         style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#930000;stroke-width:4.47749424;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-         id="path3902"
-         sodipodi:sides="6"
-         sodipodi:cx="15.178571"
-         sodipodi:cy="14.553571"
-         sodipodi:r1="9.8562698"
-         sodipodi:r2="8.53578"
-         sodipodi:arg1="0.78539816"
-         sodipodi:arg2="1.3089969"
-         inkscape:flatsided="true"
-         inkscape:rounded="0"
-         inkscape:randomized="0"
-         d="M 22.148006,21.523006 12.62758,24.073996 5.6581452,17.104561 8.2091355,7.5841355 17.729561,5.0331452 24.698996,12.00258 z"
-         transform="matrix(0.4466784,0,0,0.4466784,8.3986311,1030.415)" />
+       id="g3044"
+       transform="translate(-0.11160707,1.2723128)">
+      <rect
+         y="1028.7908"
+         x="7.5446429"
+         height="11.383928"
+         width="15.133928"
+         id="rect3040"
+         style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#930000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <rect
+         style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#930000;stroke-width:1.99999988;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+         id="rect3042"
+         width="6.9642854"
+         height="3.1696427"
+         x="11.294643"
+         y="1040.2194" />
     </g>
   </g>
 </svg>

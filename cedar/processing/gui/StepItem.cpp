@@ -766,12 +766,18 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   }
 
   QMenu *p_data = menu.addMenu("data");
+  p_data->setIcon(QIcon(":/menus/data.svg"));
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
   QAction *p_plot_all = menu.addAction("plot all");
+  p_plot_all->setIcon(QIcon(":/menus/plot_all.svg"));
+
   QMenu *p_element_plots = menu.addMenu("defined plots");
+  p_element_plots->setIcon(QIcon(":/menus/plot.svg"));
+
   QMenu *p_advanced_plotting = menu.addMenu("advanced plotting");
+  p_advanced_plotting->setIcon(QIcon(":/menus/plot_advanced.svg"));
 
   this->fillDefinedPlots(p_element_plots, event->screenPos());
 
@@ -787,6 +793,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   this->fillPlots(p_advanced_plotting, advanced_plot_map);
 
   QMenu *p_actions_menu = menu.addMenu("actions");
+  p_actions_menu->setIcon(QIcon(":/menus/actions.svg"));
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
   const cedar::proc::Step::ActionMap& map = this->mStep->getActions();
@@ -960,6 +967,7 @@ void cedar::proc::gui::StepItem::openDefinedPlotAction(QAction* pAction)
 void cedar::proc::gui::StepItem::fillDisplayStyleMenu(QMenu* pMenu)
 {
   QMenu* p_sub_menu = pMenu->addMenu("display style");
+  p_sub_menu->setIcon(QIcon(":/menus/display_style.svg"));
 
   for (size_t i = 0; i < cedar::proc::gui::StepItem::DisplayMode::type().list().size(); ++i)
   {
