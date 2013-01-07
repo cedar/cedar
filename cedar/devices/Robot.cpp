@@ -72,6 +72,60 @@ cedar::dev::Robot::~Robot()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::ostream& cedar::dev::operator<<(std::ostream& stream, const cedar::dev::Robot& robot)
+{
+  stream << "===============================================" << std::endl;
+  stream << " Robot called \"" << robot.getName() << "\" @" << (&robot) << std::endl;
+  stream << "===============================================" << std::endl << std::endl;
+
+  std::vector<std::string> slot_list = robot.listComponentSlots();
+
+  for (auto slot_iter = slot_list.begin(); slot_iter != slot_list.end(); ++slot_iter)
+  {
+    const std::string& slot_name = *slot_iter;
+    cedar::dev::ComponentSlotPtr slot = robot.getComponentSlot(slot_name);
+    stream << "-----------------------------------------------" << std::endl;
+    stream << " Slot: " << slot_name << std::endl;
+    stream << "-----------------------------------------------" << std::endl << std::endl;
+    stream << slot << std::endl << std::endl;
+  }
+
+  std::vector<std::string> channel_list = robot.listChannels();
+
+  for (auto channel_iter = channel_list.begin(); channel_iter != channel_list.end(); ++channel_iter)
+  {
+    const std::string& channel_name = *channel_iter;
+    stream << "-----------------------------------------------" << std::endl;
+    stream << " Channel: " << channel_name << std::endl;
+    stream << "-----------------------------------------------" << std::endl << std::endl;
+
+    if (robot.hasChannelInstance(channel_name))
+    {
+      cedar::dev::ConstChannelPtr channel = robot.getChannel(channel_name);
+      stream << channel << std::endl;
+    }
+    else
+    {
+      stream << "  (not instantiated)";
+    }
+    stream << std::endl << std::endl;
+  }
+
+  return stream;
+}
+
+std::ostream& cedar::dev::operator<<(std::ostream& stream, cedar::dev::ConstRobotPtr robot)
+{
+  stream << *robot;
+  return stream;
+}
+
+std::ostream& cedar::dev::operator<<(std::ostream& stream, cedar::dev::RobotPtr robot)
+{
+  stream << cedar::dev::ConstRobotPtr(robot);
+  return stream;
+}
+
 void cedar::dev::Robot::setChannel(const std::string& channel)
 {
   for (auto slot_iter = _mComponentSlots.begin(); slot_iter != _mComponentSlots.end(); ++slot_iter)
@@ -80,6 +134,12 @@ void cedar::dev::Robot::setChannel(const std::string& channel)
     slot->setChannel(channel);
   }
 }
+
+cedar::dev::ConstChannelPtr cedar::dev::Robot::getChannel(const std::string& channel) const
+{
+  return this->_mChannels->get(channel);
+}
+
 
 std::vector<std::string> cedar::dev::Robot::listComponentSlots() const
 {
@@ -103,6 +163,11 @@ std::vector<std::string> cedar::dev::Robot::listChannels() const
   }
 
   return channels;
+}
+
+bool cedar::dev::Robot::hasChannelInstance(const std::string& channel) const
+{
+  return this->_mChannels->instanceCreated(channel);
 }
 
 void cedar::dev::Robot::performConsistencyCheck() const

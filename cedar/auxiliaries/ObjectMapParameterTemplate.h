@@ -174,6 +174,17 @@ namespace cedar
           return this->mObjectMap[key];
         }
 
+        /*!@returns True, if the given string is a key in this map and an instance has been created.
+         *
+         * @throws If the given key is not a known configuration key.
+         */
+        bool instanceCreated(const std::string& key) const
+        {
+          CEDAR_ASSERT(this->isConfigurationKey(key));
+
+          return this->mObjectMap.find(key) != this->mObjectMap.end();
+        }
+
       protected:
         void readObject(const std::string& key, const cedar::aux::ConfigurationNode& node)
         {
@@ -215,10 +226,16 @@ namespace cedar
           }
         }
 
+        //!@returns True, if the given key exists in the list of known configurations, false otherwise.
+        bool isConfigurationKey(const std::string& key) const
+        {
+          return mConfigurations.find(key) != mConfigurations.end();
+        }
+
         void allocateKey(const std::string& key) const
         {
           //!@todo make this a proper exception
-          CEDAR_ASSERT(mConfigurations.find(key) != mConfigurations.end());
+          CEDAR_ASSERT(this->isConfigurationKey(key));
 
           cedar::aux::ConfigurationNode node = this->mConfigurations.find(key)->second;
           this->mObjectMap[key] = this->allocate(node);
@@ -340,6 +357,13 @@ public:
   bool empty() const
   {
     return this->mObjectMap.empty();
+  }
+
+  /*!@brief Returns the given element.
+   */
+  typename AllocationPolicy::ValueTypePtr get(const std::string& key)
+  {
+    return (*this)[key];
   }
 
   /*!

@@ -56,3 +56,8 @@ cedar::dev::Channel::~Channel()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::ostream& operator<<(std::ostream& stream, const cedar::dev::Channel& channel)
+{
+  stream << "Channel @ " << (&channel) << std::endl;
+  return stream;
+}

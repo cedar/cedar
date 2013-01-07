@@ -57,22 +57,7 @@ int main()
 
   robot->setChannel("channel 1");
 
-  std::vector<std::string> slot_list = robot->listComponentSlots();
-
-  for (auto slot_iter = slot_list.begin(); slot_iter != slot_list.end(); ++slot_iter)
-  {
-    const std::string& slot_name = *slot_iter;
-    cedar::dev::ComponentSlotPtr slot = robot->getComponentSlot(slot_name);
-    std::cout << "Slot: " << slot_name << std::endl;
-    std::cout << slot << std::endl;
-  }
-
-  std::vector<std::string> channel_list = robot->listChannels();
-
-  for (auto channel_iter = channel_list.begin(); channel_iter != channel_list.end(); ++channel_iter)
-  {
-    std::cout << "Channel: " << (*channel_iter) << std::endl;
-  }
+  std::cout << robot << std::endl;
 
   cedar::tests::unit::dev::Robot::TestComponentPtr component
     = robot->getComponent<cedar::tests::unit::dev::Robot::TestComponent>("component 1");
