@@ -89,6 +89,9 @@ public:
   //!@brief Unlocks all locks associated with this object.
   void unlockAll(LockSetHandle lockSet = 0) const;
 
+  //!@brief Returns the number of locks.
+  size_t getLockCount() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
