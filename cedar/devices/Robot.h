@@ -57,6 +57,15 @@ class cedar::dev::Robot : public cedar::aux::NamedConfigurable,
                           public boost::enable_shared_from_this<cedar::dev::Robot>
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend std::ostream& operator<<(std::ostream& stream, const cedar::dev::Robot& robot);
+
+  friend std::ostream& operator<<(std::ostream& stream, cedar::dev::ConstRobotPtr robot);
+
+  friend std::ostream& operator<<(std::ostream& stream, cedar::dev::RobotPtr robot);
+
+  //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
   typedef std::map<std::string, cedar::dev::ComponentSlotPtr> ComponentSlotParameter;
@@ -109,6 +118,12 @@ public:
 
   //!@brief Sets the channel for all components in the robot.
   void setChannel(const std::string& channel);
+
+  //!@brief Sets the channel for all components in the robot.
+  cedar::dev::ConstChannelPtr getChannel(const std::string& channel) const;
+
+  //!@brief Tests whether an instance has been created for the given channel.
+  bool hasChannelInstance(const std::string& channel) const;
 
   template <typename T>
   inline boost::shared_ptr<T> getComponent(const std::string& slotName) const
