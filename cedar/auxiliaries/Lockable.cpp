@@ -65,6 +65,11 @@ cedar::aux::Lockable::~Lockable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+size_t cedar::aux::Lockable::getLockCount() const
+{
+  return this->mLockSets[this->getLockSetHandle("all")].size();
+}
+
 //!@brief Defines a lock set.
 cedar::aux::Lockable::LockSetHandle cedar::aux::Lockable::defineLockSet(const std::string& lockSet)
 {
