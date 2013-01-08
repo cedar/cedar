@@ -78,3 +78,6 @@ include(${CEDAR_CMAKE_DIR}/packaging.txt)
 # setup documentation
 include(${CEDAR_CMAKE_DIR}/doxygen.txt)
 
+# output configuration summary
+include(${CEDAR_CMAKE_DIR}/summary.txt)
+
