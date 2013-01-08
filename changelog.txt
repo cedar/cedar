@@ -60,6 +60,10 @@ likely to undergo major changes:
 - all:
   - enabled C++0x / C++11 compiler flag for GCC
 
+- cedar::aux
+  - DoubleData now inherits MatData. It therefore is also no longer just a typedef of a template, so make sure you
+    include the proper header (cedar/auxiliaries/DoubleData) in your code.
+
 - cedar::dev
   - KinematicChain instances now need to be started via ->start() by the implementor. They do not start threading on their own, anymore
 
