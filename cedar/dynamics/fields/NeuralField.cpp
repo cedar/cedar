@@ -225,6 +225,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   allowed_convolution_modes.insert(cedar::aux::conv::Mode::Same);
 
   this->addConfigurableChild("noise correlation kernel", mNoiseCorrelationKernel);
+  mNoiseCorrelationKernel->markAdvanced();
   this->_mNoiseCorrelationKernelConvolution->getKernelList()->append(mNoiseCorrelationKernel);
   this->_mNoiseCorrelationKernelConvolution->setMode(cedar::aux::conv::Mode::Same);
   this->_mNoiseCorrelationKernelConvolution->setBorderType(cedar::aux::conv::BorderType::Zero);

@@ -62,6 +62,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::aux::Configurable::Configurable()
+:
+mIsAdvanced(false)
 {
   this->connectToTreeChangedSignal(boost::bind(&cedar::aux::Configurable::updateLockSet, this));
 }
@@ -74,6 +76,33 @@ cedar::aux::Configurable::~Configurable()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+size_t cedar::aux::Configurable::countAdvanced() const
+{
+  size_t advanced_count = 0;
+  for (auto iter = mParameterList.begin(); iter != mParameterList.end(); ++iter)
+  {
+    cedar::aux::ConstParameterPtr parameter = *iter;
+    if (parameter->isAdvanced())
+    {
+      ++advanced_count;
+    }
+  }
+
+  for (auto iter = this->mChildren.begin(); iter != this->mChildren.end(); ++iter)
+  {
+    cedar::aux::ConfigurablePtr conf = iter->second;
+
+    if (conf->isAdvanced())
+    {
+      ++advanced_count;
+    }
+
+    advanced_count += conf->countAdvanced();
+  }
+
+  return advanced_count;
+}
 
 void cedar::aux::Configurable::lockParameters(cedar::aux::LOCK_TYPE lockType) const
 {

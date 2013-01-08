@@ -61,6 +61,8 @@
 #include <boost/noncopyable.hpp>
 
 /*!@brief An interface for classes that can store and load parameters from files.
+ *
+ * @todo Lock this class -- accessing the parameter list is currently not thread safe.
  */
 class cedar::aux::Configurable : public boost::noncopyable
 {
@@ -173,6 +175,29 @@ public:
   /*!@brief Unlocks all parameters of the configurable.
    */
   void unlockParameters() const;
+
+  //! Returns the number of advanced parameters & configurable children in this configurable.
+  size_t countAdvanced() const;
+
+  /*!@brief   Marks this configurable as advanced.
+   *
+   *          Advanced configurable are those that usually don't need to be changed. This is mainly used by user
+   *          interfaces to avoid cluttering lists with parameters that are rarely needed, or may need specific
+   *          knowledge to be set to proper values.
+   *
+   * @remarks Currently, this should not be changed at runtime; call this once, right after you add the parameter to a
+   *          configurable.
+   */
+  void markAdvanced(bool advanced = true)
+  {
+    this->mIsAdvanced = advanced;
+  }
+
+  //!@brief Returns whether this parameter is marked as advanced.
+  bool isAdvanced() const
+  {
+    return this->mIsAdvanced;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -328,6 +353,9 @@ private:
 
   //!@brief map of children of this Configurable instance
   Children mChildren;
+
+  //!@brief Whether this is an advanced configurable; usually only makes sense, when this is a child.
+  bool mIsAdvanced;
 
   /*!@brief   The lockable used for locking this configurable and all its parameters.
    *

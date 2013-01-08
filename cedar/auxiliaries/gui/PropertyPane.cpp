@@ -60,7 +60,8 @@
 
 cedar::aux::gui::PropertyPane::PropertyPane(QWidget *pParent)
 :
-QTableWidget(pParent)
+QTableWidget(pParent),
+mpShowAdvanced(NULL)
 {
   this->setSelectionMode(QAbstractItemView::NoSelection);
   this->setTabKeyNavigation(false);
@@ -70,10 +71,14 @@ QTableWidget(pParent)
   this->verticalHeader()->setVisible(false);
 
   this->setColumnCount(2);
-
   QStringList labels;
   labels << "Property" << "Value";
   this->setHorizontalHeaderLabels(labels);
+
+  // advanced button
+  mpShowAdvanced = new QCheckBox("show advanced");
+  QObject::connect(mpShowAdvanced, SIGNAL(toggled(bool)), this, SLOT(showAdvanced(bool)));
+  this->addWidgetRow(this->mpShowAdvanced);
 }
 
 cedar::aux::gui::PropertyPane::~PropertyPane()
@@ -83,6 +88,15 @@ cedar::aux::gui::PropertyPane::~PropertyPane()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::PropertyPane::showAdvanced(bool show)
+{
+  if (this->mpShowAdvanced != NULL)
+  {
+    this->mpShowAdvanced->setChecked(show);
+  }
+  this->redraw();
+}
 
 void cedar::aux::gui::PropertyPane::resetContents()
 {
@@ -113,6 +127,11 @@ void cedar::aux::gui::PropertyPane::disconnect(cedar::aux::ConfigurablePtr pConf
       ++iter)
   {
     cedar::aux::ParameterPtr parameter = *iter;
+
+    if (parameter->isAdvanced() && !this->showAdvanced())
+    {
+      continue;
+    }
 
     // disconnect everything between the parameter and this
     if (!QObject::disconnect(parameter.get(), 0, this, 0))
@@ -154,9 +173,13 @@ void cedar::aux::gui::PropertyPane::disconnect(cedar::aux::ConfigurablePtr pConf
        iter != pConfigurable->configurableChildren().end();
        ++iter)
   {
-    this->disconnect(iter->second);
-  }
+    cedar::aux::ConfigurablePtr configurable = iter->second;
 
+    if (!configurable->isAdvanced() || this->showAdvanced())
+    {
+      this->disconnect(configurable);
+    }
+  }
 }
 
 std::string cedar::aux::gui::PropertyPane::getInstanceTypeId(cedar::aux::ConfigurablePtr pConfigurable) const
@@ -175,6 +198,10 @@ void cedar::aux::gui::PropertyPane::display(cedar::aux::ConfigurablePtr pConfigu
   label += " " + cedar::aux::toString(pConfigurable.get());
 #endif // DEBUG
   this->addLabelRow(label);
+
+  QString adv_text = QString("show advanced (%1)").arg(pConfigurable->countAdvanced());
+  mpShowAdvanced->setText(adv_text);
+
   this->append("", pConfigurable);
 }
 
@@ -198,14 +225,18 @@ void cedar::aux::gui::PropertyPane::append(const std::string& title, cedar::aux:
        iter != configurable->configurableChildren().end();
        ++iter)
   {
-    this->append(iter->first, iter->second);
+    const std::string& label = iter->first;
+    cedar::aux::ConfigurablePtr configurable = iter->second;
+
+    if (!configurable->isAdvanced() || this->showAdvanced())
+    {
+      this->append(label, configurable);
+    }
   }
 }
 
 void cedar::aux::gui::PropertyPane::addHeadingRow(const std::string& label)
 {
-  int row = this->rowCount();
-  this->insertRow(row);
   QLabel *p_label = new QLabel();
 
   QFont font = p_label->font();
@@ -218,17 +249,22 @@ void cedar::aux::gui::PropertyPane::addHeadingRow(const std::string& label)
   p_label->setAutoFillBackground(true);
   p_label->setBackgroundRole(QPalette::Dark);
   p_label->setForegroundRole(QPalette::Light);
-  this->setCellWidget(row, 0, p_label);
-  this->setSpan(row, 0, 1, 2);
+
+  this->addWidgetRow(p_label);
 }
 
 void cedar::aux::gui::PropertyPane::addLabelRow(const std::string& label)
 {
-  int row = this->rowCount();
-  this->insertRow(row);
   QLabel *p_label = new QLabel();
   p_label->setText(label.c_str());
-  this->setCellWidget(row, 0, p_label);
+  this->addWidgetRow(p_label);
+}
+
+void cedar::aux::gui::PropertyPane::addWidgetRow(QWidget* pWidget)
+{
+  int row = this->rowCount();
+  this->insertRow(row);
+  this->setCellWidget(row, 0, pWidget);
   this->setSpan(row, 0, 1, 2);
 }
 
@@ -236,7 +272,11 @@ void cedar::aux::gui::PropertyPane::append(cedar::aux::Configurable::ParameterLi
 {
   for (cedar::aux::Configurable::ParameterList::iterator iter = parameters.begin(); iter != parameters.end(); ++iter)
   {
-    this->addPropertyRow(*iter);
+    cedar::aux::ParameterPtr parameter = *iter;
+    if (!parameter->isAdvanced() || this->showAdvanced())
+    {
+      this->addPropertyRow(parameter);
+    }
   }
 }
 
@@ -372,8 +412,8 @@ void cedar::aux::gui::PropertyPane::rowSizeChanged()
 void cedar::aux::gui::PropertyPane::resetPointer()
 {
   this->mDisplayedConfigurable.reset();
-  this->clearContents();
-  this->setRowCount(0);
+  mpShowAdvanced->setText("show advanced");
+  this->setRowCount(1);
 }
 
 void cedar::aux::gui::PropertyPane::redraw()
