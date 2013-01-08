@@ -82,6 +82,8 @@ _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
+  this->_mRunInThread->markAdvanced();
+
   // create the finished trigger singleton.
   this->getFinishedTrigger();
 
