@@ -35,8 +35,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/SimulatedKinematicChain.h"
-#include "cedar/devices/robot/gl/KukaArm.h"
-#include "cedar/devices/robot/gl/Sdh.h"
+#include "cedar/devices/robot/gl/Caren.h"
 #include "cedar/devices/robot/gui/KinematicChainWidget.h"
 #include "cedar/devices/robot/gui/MountedCameraViewer.h"
 #include "cedar/auxiliaries/systemFunctions.h"
@@ -92,16 +91,22 @@ int main(int argc, char **argv)
   viewer.setSceneRadius(scene->getSceneLimit());
 
   // create visualization objects
-  cedar::dev::robot::gl::KinematicChainPtr caren_trunk_visualization(new cedar::dev::robot::gl::KinematicChain(caren_trunk));
-  cedar::dev::robot::gl::KinematicChainPtr caren_arm_visualization(new cedar::dev::robot::gl::KukaArm(caren_arm));
-  cedar::dev::robot::gl::KinematicChainPtr caren_head_visualization(new cedar::dev::robot::gl::KinematicChain(caren_head));
-  cedar::dev::robot::gl::SdhPtr hand_visualization(new cedar::dev::robot::gl::Sdh(finger_one, finger_two, finger_three, palm));
+  cedar::dev::robot::gl::CarenPtr caren_visualization
+  (
+    new cedar::dev::robot::gl::Caren
+    (
+      caren_trunk,
+      caren_arm,
+      caren_head,
+      palm,
+      finger_one,
+      finger_two,
+      finger_three
+    )
+  );
 
   // add visualization objects to scene
-  scene->addObjectVisualization(caren_trunk_visualization);
-  scene->addObjectVisualization(caren_arm_visualization);
-  scene->addObjectVisualization(caren_head_visualization);
-  scene->addObjectVisualization(hand_visualization);
+  scene->addObjectVisualization(caren_visualization);
 
   // create control widgets for the scene and the arm
   cedar::aux::gui::SceneWidgetPtr scene_widget(new cedar::aux::gui::SceneWidget(scene));

@@ -73,12 +73,13 @@ public:
   //!@brief the visualization initializes resources in the current GL context
   virtual void initializeGl();
 
+  //!@brief draws the hand
+  void draw();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief draws the hand
-  void draw();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
