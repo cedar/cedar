@@ -128,15 +128,15 @@ bool cedar::dev::sensors::visual::GLGrabber::onCreateGrabber()
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
                                             this->getName() + init_message.str(),
-                                             "cedar::dev::sensors::visual::OglGrabber::onInit()"
+                                             "cedar::dev::sensors::visual::OglGrabber::onCreateGrabber()"
                                            );
   // Grab first frames
   onGrab();
-
   return true;
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::GLGrabber::onCloseGrabber()
 {
   this->onCleanUp();
@@ -221,9 +221,9 @@ void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGL
       "cedar::dev::sensors::visual::GLGrabber::setWidget"
     );
   }
+
   if (qglWidget != NULL)
   {
-
     bool restart_grabber = LoopedThread::isRunning();
 
     // stop grabbing thread if running

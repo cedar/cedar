@@ -227,13 +227,11 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  //------------------------------------------------------------------------
-  // From Grabber
-  //------------------------------------------------------------------------
-
-  bool onInit();
+  // inherited from Grabber
   bool onCreateGrabber();
   void onCloseGrabber();
+  void onUpdateSourceInfo(unsigned int channel);
+  void onCleanUp();
 
   /*! @brief Grab on all available files
    *
@@ -243,10 +241,6 @@ protected:
    *      This happens if looped is false and all frames grabbed from the file, i.e. it is over.
    */
   bool onGrab();
-
-  void onUpdateSourceInfo(unsigned int channel);
-  void onCleanUp();
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

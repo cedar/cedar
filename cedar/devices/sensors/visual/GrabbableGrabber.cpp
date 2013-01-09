@@ -136,7 +136,7 @@ bool cedar::dev::sensors::visual::GrabbableGrabber::onCreateGrabber()
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
                                              this->getName() + init_message.str(),
-                                             "cedar::dev::sensors::visual::GrabbableGrabber::onInit()"
+                                             "cedar::dev::sensors::visual::GrabbableGrabber::onCreateGrabber()"
                                            );
 
   // load pictures one by one

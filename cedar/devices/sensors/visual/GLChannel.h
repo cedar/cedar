@@ -66,7 +66,6 @@ public:
   GLChannel(QGLWidget* qglWidget=NULL)
   :
   cedar::dev::sensors::visual::GrabberChannel(),
-  // mpQGLWidget(QGLWidgetPtr()) // empty QGLWidgetPtr
   mpQGLWidget(qglWidget)
   {
   }

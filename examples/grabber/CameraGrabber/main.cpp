@@ -26,9 +26,29 @@
 #include <opencv2/opencv.hpp>
 #include <boost/lexical_cast.hpp>
 
-/* Program to test the CameraGrabber class
- *
- */
+// ---------------------------------------------------------------------------------------------------------------------
+// Local methods
+// ---------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  void processQtEvents()
+  {
+#ifdef CEDAR_OS_APPLE
+    unsigned int event_counter = 0;
+    while (QApplication::hasPendingEvents() && (++event_counter < 1000))
+#else
+    while (QApplication::hasPendingEvents())
+#endif
+    {
+      QApplication::processEvents();
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Example program
+// ---------------------------------------------------------------------------------------------------------------------
+
 int main(int argc, char* argv[])
 {
 
@@ -247,11 +267,8 @@ int main(int argc, char* argv[])
   p_plot->show();
   p_plot->resize(frame0.cols,frame0.rows);
 
-  while (QApplication::hasPendingEvents())
-  {
-    QApplication::processEvents();
-  }
-
+  //process events of the ImagePlot widget
+  processQtEvents();
 
   //start the grabber-thread for updating camera images with 30 fps
   p_grabber->setFps(30);
@@ -278,10 +295,8 @@ int main(int argc, char* argv[])
   //get frames for a while
   while (!frame0.empty() && p_plot->isVisible())
   {
-    while (QApplication::hasPendingEvents())
-    {
-      QApplication::processEvents();
-    }
+    //process events of the ImagePlot widget
+    processQtEvents();
 
     //get new images, this is independent from camera-thread
     //if camera-thread is faster than your processing, images will be skipped
