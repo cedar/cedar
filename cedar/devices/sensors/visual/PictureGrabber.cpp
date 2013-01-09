@@ -208,7 +208,7 @@ void cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()
                                                  "cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()"
                                                );
       mCaptureDeviceCreated = true;
-      setChannelInfo(channel);
+      onUpdateSourceInfo(channel);
       emit pictureChanged();
     }
   }
@@ -254,7 +254,6 @@ bool cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()
     if (!frame.empty())
     {
       getImageMat(channel) = frame;
-      setChannelInfo(channel);
     }
     else
     {
@@ -325,7 +324,7 @@ const std::string cedar::dev::sensors::visual::PictureGrabber::getSourceFile(uns
 
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::PictureGrabber::setChannelInfo(unsigned int channel)
+void cedar::dev::sensors::visual::PictureGrabber::onUpdateSourceInfo(unsigned int channel)
 {
   setChannelInfoString(channel,getPictureChannel(channel)->_mSourceFileName->getPath());
 }

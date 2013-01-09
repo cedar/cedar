@@ -271,11 +271,6 @@ bool cedar::dev::sensors::camera::Grabber::onCreateGrabber()
       getCameraChannel(channel)->createBackend();
       bool device_created = getCameraChannel(channel)->mpBackend->init();
 
-      if (device_created)
-      {
-        setChannelInfo(channel);
-      }
-
       // Backend device not longer used. Channel::mVideoCapture does the job
       getCameraChannel(channel)->mpBackend.reset();
 
@@ -481,7 +476,7 @@ bool cedar::dev::sensors::camera::Grabber::onGrab()
 
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::camera::Grabber::setChannelInfo(unsigned int channel)
+void cedar::dev::sensors::camera::Grabber::onUpdateSourceInfo(unsigned int channel)
 {
   std::stringstream ss;
 
