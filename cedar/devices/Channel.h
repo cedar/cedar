@@ -59,6 +59,10 @@ class cedar::dev::Channel : public cedar::aux::NamedConfigurable
   //--------------------------------------------------------------------------------------------------------------------
   friend std::ostream& operator<<(std::ostream& stream, const cedar::dev::Channel& channel);
 
+  friend std::ostream& operator<<(std::ostream& stream, cedar::dev::ConstChannelPtr channel);
+
+  friend std::ostream& operator<<(std::ostream& stream, cedar::dev::ChannelPtr channel);
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -113,6 +117,29 @@ private:
   // none yet
 
 }; // class cedar::dev::Channel
+
+
+// Code for the channel factory manager ================================================================================
+
+#include "cedar/auxiliaries/FactoryManager.h"
+
+
+namespace cedar
+{
+  namespace dev
+  {
+    //!@brief The manager of all sigmoind instances
+    typedef cedar::aux::FactoryManager<cedar::dev::ChannelPtr> ChannelManager;
+
+    //!@brief The singleton object of the TransferFunctionFactory.
+    typedef cedar::aux::Singleton<cedar::dev::ChannelManager> ChannelManagerSingleton;
+
+    //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_INSTANTIATE_DEV_TEMPLATE(cedar::aux::Singleton<cedar::dev::ChannelManager>);
+    //!@endcond
+  }
+}
+
 
 #endif // CEDAR_DEV_CHANNEL_H
 

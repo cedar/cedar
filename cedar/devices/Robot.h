@@ -68,10 +68,13 @@ class cedar::dev::Robot : public cedar::aux::NamedConfigurable,
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
+private:
   typedef std::map<std::string, cedar::dev::ComponentSlotPtr> ComponentSlotParameter;
 
   typedef cedar::aux::ObjectMapParameterTemplate<cedar::dev::Channel, cedar::aux::allocationPolicies::OnDemand<cedar::dev::Channel> > ChannelParameter;
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ChannelParameter);
+
+  typedef cedar::aux::NamedConfigurable Super;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -122,6 +125,9 @@ public:
   //!@brief Sets the channel for all components in the robot.
   cedar::dev::ConstChannelPtr getChannel(const std::string& channel) const;
 
+  //!@brief Sets the channel for all components in the robot.
+  cedar::dev::ChannelPtr getChannel(const std::string& channel);
+
   //!@brief Tests whether an instance has been created for the given channel.
   bool hasChannelInstance(const std::string& channel) const;
 
@@ -147,6 +153,9 @@ private:
 
   //!@brief Checks the robot description for consistency. Issues are written to the log as warnings and errors.
   void performConsistencyCheck() const;
+
+  //! Reads and instantiates the slots given in the configuration.
+  void readComponentSlotInstantiations(const cedar::aux::ConfigurationNode& node);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

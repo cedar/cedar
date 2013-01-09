@@ -39,6 +39,7 @@
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/devices/ComponentSlot.h"
 #include "cedar/devices/Component.h"
+#include "cedar/devices/Robot.h"
 
 // SYSTEM INCLUDES
 
@@ -48,7 +49,8 @@
 
 cedar::dev::ComponentSlot::ComponentSlot(cedar::dev::RobotPtr robot)
 :
-mRobot(robot)
+mRobot(robot),
+_mChannelType(new cedar::aux::StringParameter(this, "channel type", ""))
 {
 }
 
@@ -129,6 +131,8 @@ void cedar::dev::ComponentSlot::setChannel(const std::string& channel)
     const cedar::aux::ConfigurationNode& tree = conf_iter->second;
     configuration.insert(configuration.end(), tree.begin(), tree.end());
   }
+
+  this->mComponent->setChannel(this->mRobot->getChannel(channel));
 
   this->mComponent->readConfiguration(configuration);
 }
