@@ -115,7 +115,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  // derived from Grabber
+  // inherited from Grabber
   void onCleanUp();
   bool onGrab();
   bool onCreateGrabber();

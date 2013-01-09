@@ -9,7 +9,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 04 26
 
-    Description: Simple application to grab from a QGLWidget (mono-case)
+    Description: Simple example on how to grab from a QGLWidget
 
     Credits:
 
@@ -29,8 +29,28 @@
 #include <QReadWriteLock>
 #include <boost/lexical_cast.hpp>
 
-// cedar::aux::gui::Viewer ->(erbt von) QGLViewer ->(erbt von) QGLWidget
+// ---------------------------------------------------------------------------------------------------------------------
+// Local methods
+// ---------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  void processQtEvents()
+  {
+#ifdef CEDAR_OS_APPLE
+    unsigned int event_counter = 0;
+    while (QApplication::hasPendingEvents() && (++event_counter < 1000))
+#else
+    while (QApplication::hasPendingEvents())
+#endif
+    {
+      QApplication::processEvents();
+    }
+  }
+}
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Example program
+// ---------------------------------------------------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
   // -------------------------------------------------------------------------------------------------------------------
@@ -77,10 +97,7 @@ int main(int argc, char **argv)
   p_scene->addObjectVisualization(p_block);
   p_block_local_coordinate_frame->rotate(0, M_PI/2);
 
-  while (QApplication::hasPendingEvents())
-  {
-    QApplication::processEvents();
-  }
+  processQtEvents();
 
   // -------------------------------------------------------------------------------------------------------------------
   // Create the GLGrabber
@@ -107,10 +124,7 @@ int main(int argc, char **argv)
               << e.exceptionInfo() << std::endl;
 
     // connected with viewer, process pending events
-    while (QApplication::hasPendingEvents())
-    {
-      QApplication::processEvents();
-    }
+    processQtEvents();
 
     // delete p_grabber is done via the shared-pointer class
     return -1;
@@ -147,10 +161,7 @@ int main(int argc, char **argv)
   // allow to register the grabber in the viewer class and wait.
   for (int i = 0; i < 10; ++i)
   {
-    while (QApplication::hasPendingEvents())
-    {
-      QApplication::processEvents();
-    }
+    processQtEvents();
     cedar::aux::sleep(cedar::unit::Milliseconds(10));
   }
 
@@ -191,10 +202,7 @@ int main(int argc, char **argv)
   // allow the ImagePlot to create
   for (int i=0; i<10; i++)
   {
-    while (QApplication::hasPendingEvents())
-    {
-      QApplication::processEvents();
-    }
+    processQtEvents();
   }
 
   // The grabbing have to be done in the GUI-thread!!!
@@ -209,10 +217,7 @@ int main(int argc, char **argv)
   // get frames for a while
   while (!frame.empty() && p_plot->isVisible())
   {
-    while (QApplication::hasPendingEvents())
-    {
-      QApplication::processEvents();
-    }
+    processQtEvents();
 
     // grab in the GUI-thread
     p_grabber->grab();

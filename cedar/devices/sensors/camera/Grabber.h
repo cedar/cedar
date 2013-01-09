@@ -407,9 +407,7 @@ protected:
    */
   double getPropertyFromCamera(unsigned int channel, unsigned int propertyId);
 
-  //------------------------------------------------------------------------
-  // From Grabber
-  //------------------------------------------------------------------------
+  // inherited from Grabber
   bool onGrab();
   void onCleanUp();
   bool onCreateGrabber();

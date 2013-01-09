@@ -9,7 +9,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 04 26
 
-    Description: Simple application to grab from a class which implements the grabbable interface (mono-case)
+    Description: Simple application to grab from a class which implements the grabbable interface
 
     Credits:
 
@@ -32,9 +32,30 @@
 #include <opencv2/opencv.hpp>
 #include <boost/lexical_cast.hpp>
 
-/* This is a simple example of how to use the GrabbableGrabber
- * to grab from a class which implements the "cedar::aux::Grabbable" interface
- */
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Local methods
+// ---------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  void processQtEvents()
+  {
+#ifdef CEDAR_OS_APPLE
+    unsigned int event_counter = 0;
+    while (QApplication::hasPendingEvents() && (++event_counter < 1000))
+#else
+    while (QApplication::hasPendingEvents())
+#endif
+    {
+      QApplication::processEvents();
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Example program
+// ---------------------------------------------------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
   // -------------------------------------------------------------------------------------------------------------------
@@ -82,10 +103,7 @@ int main(int argc, char **argv)
   p_block_local_coordinate_frame->rotate(0, M_PI/2);
 
   // wait until viewer is finished with its creation
-  while (QApplication::hasPendingEvents())
-  {
-    QApplication::processEvents();
-  }
+  processQtEvents();
   cedar::aux::sleep(cedar::unit::Milliseconds(100));
 
   // -------------------------------------------------------------------------------------------------------------------
@@ -116,11 +134,7 @@ int main(int argc, char **argv)
   }
 
   // connected with viewer, process pending events
-  while (QApplication::hasPendingEvents())
-  {
-    QApplication::processEvents();
-  }
-
+  processQtEvents();
 
   // activate crash-handler if there is any hardware-related stuff which has to be cleaned up
   p_grabber->installCrashHandler();
@@ -152,10 +166,7 @@ int main(int argc, char **argv)
   // at least one redraw is needed to write the GL-Image in the grab-buffer from interface "Grabbable"
   for (int i = 0; i < 100; ++i)
   {
-    while (QApplication::hasPendingEvents())
-    {
-      QApplication::processEvents();
-    }
+    processQtEvents();
     cedar::aux::sleep(cedar::unit::Milliseconds(10));
   }
 
@@ -192,10 +203,7 @@ int main(int argc, char **argv)
   p_plot->resize(frame.cols,frame.rows);
 
   // allow the ImagePlot to create
-  while (QApplication::hasPendingEvents())
-  {
-    QApplication::processEvents();
-  }
+  processQtEvents();
 
   // start the grabber-thread for reading the GL images in the background
   std::cout << "Start grabbing in the background" << std::endl;
@@ -212,10 +220,7 @@ int main(int argc, char **argv)
   // get frames for a while
   while (!frame.empty() && p_plot->isVisible())
   {
-    while (QApplication::hasPendingEvents())
-    {
-      QApplication::processEvents();
-    }
+    processQtEvents();
 
     // read new images, from the grabber-buffer. This is independent from background-thread
     // the background thread gets the images from the gl-widget periodically
