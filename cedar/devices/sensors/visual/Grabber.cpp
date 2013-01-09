@@ -210,7 +210,7 @@ void cedar::dev::sensors::visual::Grabber::doCleanUp()
     mCleanUpAlreadyDone = true;
 
     // stopGrabber LoopedThread
-    if (QThread::isRunning())
+    if (isRunning())
     {
       cedar::aux::LoopedThread::stop();
       this->wait();
@@ -387,7 +387,7 @@ double cedar::dev::sensors::visual::Grabber::getFps() const
 //--------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::Grabber::setFps(double fps)
 {
-  bool wasRunning = QThread::isRunning();
+  bool wasRunning = isRunning();
 
   if (wasRunning)
   {
@@ -412,7 +412,7 @@ void cedar::dev::sensors::visual::Grabber::setFps(double fps)
   }
 
   std::string info;
-  if (QThread::isRunning())
+  if (isRunning())
   {
     info =  ": Thread running";
   }
@@ -841,7 +841,7 @@ bool cedar::dev::sensors::visual::Grabber::startRecording
   }
 
   // startGrabber the grabberthread if needed
-  if (!QThread::isRunning() && startThread)
+  if (!isRunning() && startThread)
   {
     cedar::aux::LogSingleton::getInstance()->message
                                              (

@@ -38,7 +38,6 @@
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
-#include "cedar/auxiliaries/EnumParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -54,6 +53,9 @@ cedar::aux::LoopedThread::LoopedThread
 
 )
 :
+mpThread(NULL),
+mDestructing(false),
+mpWorker(NULL),
 _mStepSize(new cedar::aux::DoubleParameter(this, "step size", stepSize)),
 _mIdleTime(new cedar::aux::DoubleParameter(this, "idle time", idleTime)),
 _mSimulatedTime(new cedar::aux::DoubleParameter(this, "simulated time", simulatedTime)),
@@ -68,257 +70,215 @@ _mLoopMode
   )
 )
 {
-  mStop  = false;
-  initStatistics();
 }
 
 cedar::aux::LoopedThread::~LoopedThread()
 {
+  mDestructing = true;  // do not execute a new this->start()
+
+  if (isRunning())
+  {
+    if (validWorker())
+    {
+      mpWorker->requestStop(); // set stopped state first, 
+                               // do not enter next loop() iteration
+    }
+
+    // if a thread is running, quit it
+    mpThread->disconnect(this); // dont execute finishedThread()
+    mpThread->quit();
+
+    // need to wait for the thread to quit, to make sure
+    // the worker doesnt call this->step()
+    if (QThread::currentThread() != mpThread)
+    {
+      // avoid dead-locking if called from the same thread:
+      mpThread->wait();
+    }
+    else
+    {
+      // the worker::step() lead to destruction of LoopedThread
+      // this is a problem
+      // TODO: emanate an error/warning
+    }
+  }
+
+  // free worker data
+  if (validWorker())
+  {
+    // delete after thread stopped
+    mpWorker->deleteLater();
+    mpWorker = NULL;
+  }
+
+  // free thread data
+  if (validThread())
+  {
+    mpThread->deleteLater();
+    mpThread = NULL;
+  }
 }
 
 //------------------------------------------------------------------------------
 // methods
 //------------------------------------------------------------------------------
 
+bool cedar::aux::LoopedThread::isRunning() const
+{
+  if (mpThread == NULL)
+    return false;
+
+  return mpThread->isRunning();
+}
+
+void cedar::aux::LoopedThread::start()
+{
+  if (mDestructing) // dont start the thread if we are in the destructor
+    return;
+
+  // EXPLANATION: This object (LoopedThread) is a wrapper.
+  //              users use it and may inherit it, modyfing its step() method.
+  //
+  //              We initialize a new thread (a QThread object) and
+  //              a worker object (a QObject with a custom loop() method).
+  //              The worker is then pushed into the QThreads' object thread.
+  //
+  //              The work is done in the workers loop() method.
+  //
+  //              Communication is done via the QT event loops (also of the
+  //              QThread object).
+
+  if (validWorker() != validThread())
+  {
+    // report an error/warning TODO 
+    return; // should not happen
+  }
+  else if (isRunning())
+  {
+    return; // already running, everything ok
+  }
+  else if (!validThread()) // ==> (!validThread && !validWorker())
+  {
+    // TODO: CEDAR_ASSERT( !validWorker() )
+
+    // we need a new worker object
+    mpWorker = new cedar::aux::LoopedThreadWorker(this);
+    // we need a new thread object
+    mpThread = new QThread;
+
+    mpWorker->moveToThread(mpThread);
+
+    // when the thread starts, start the loop() in the worker:
+    connect( mpThread, SIGNAL(started()), mpWorker, SLOT(loop()) );
+    // when the thread finishes (somebody called quit()), react to it:
+    connect( mpThread, SIGNAL(finished()), this, SLOT(finishedThread()) );
+  }
+  // else: thread and worker already exist, but are stopped
+
+  // start the thread 
+  mpThread->start();
+}
+
+void cedar::aux::LoopedThread::finishedThread()
+{
+  // we land here if the thread quitted (ended normally)
+
+  if (mDestructing)
+    return;
+
+  if (validThread())
+  {
+    mpThread->deleteLater();
+    mpThread = NULL; // allow me to restart a new thread/worker
+  }
+  if (validWorker())
+  {
+    mpWorker->requestStop();
+    mpWorker->deleteLater();
+    mpWorker = NULL; // allow me to restart a new thread/worker
+  }
+
+
+}
+
+bool cedar::aux::LoopedThread::validWorker() const
+{
+  if (mpWorker == NULL)
+    return false;
+  return true;
+}
+
+bool cedar::aux::LoopedThread::validThread() const
+{
+  if (mpThread == NULL)
+    return false;
+  return true;
+}
+
+
 void cedar::aux::LoopedThread::stop(unsigned int time, bool suppressWarning)
 {
-  if (this->isRunning())
+  if (mDestructing)
+    return;
+
+  stopStatistics(suppressWarning);
+
+  if (validWorker())
+    mpWorker->requestStop(); // change internal state, wont destroy the object
+
+  if (isRunning())
   {
-    mStop = true;
+    mpThread->quit(); // this really quits the thread
 
     // avoid dead-locking if called from the same thread:
-    if (QThread::currentThread() == this)
+    if (QThread::currentThread() != mpThread)
     {
-      return;
+      mpThread->wait(); // TODO: wait(time)
+        // synchronize with thread exit
     }
 
-    wait(time);
-
-    if (this->isRunning())
-    {
-      cedar::aux::LogSingleton::getInstance()->warning
-      (
-        "Thread is still running after call of stop()!",
-        "cedar::aux::LoopedThread::stop(unsigned int, bool)"
-      );
-    }
-
-    if (suppressWarning == false && mMaxStepsTaken > 1.01 && _mSimulatedTime->getValue() <= 0.0)
-    {
-      std::string message = "The system was not fast enough to stay to scheduled thread timing. ";
-      message += "Consider using a larger step size.\n";
-      message += "Execution stats:\n";
-      message += "  avg. time steps between execution: ";
-      message += cedar::aux::toString(mSumOfStepsTaken / static_cast<double>(mNumberOfSteps));
-      message += "\n";
-      message += "  max. time steps between execution: ";
-      message += cedar::aux::toString(mMaxStepsTaken);
-
-      cedar::aux::LogSingleton::getInstance()->warning
-      (
-        message,
-        "cedar::aux::LoopedThread::stop(unsigned int, bool)"
-      );
-    }
-  }
-  return;
-}
-
-void cedar::aux::LoopedThread::run()
-{
-  // we do not want to change the step size while running
-  boost::posix_time::time_duration step_size
-    = boost::posix_time::microseconds(static_cast<unsigned int>(1000 * this->getStepSize() + 0.5));//mStepSize;
-  initStatistics();
-
-  // which mode?
-  switch (_mLoopMode->getValue())
-  {
-    case cedar::aux::LoopMode::RealTime:
-    {
-      mLastTimeStepStart = boost::posix_time::microsec_clock::universal_time();
-      mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
-      boost::posix_time::time_duration time_difference;
-
-      while (!mStop)
-      {
-        mLastTimeStepStart = mLastTimeStepEnd;
-        mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
-
-        time_difference = mLastTimeStepEnd - mLastTimeStepStart;
-        this->step(time_difference.total_microseconds() * 0.001);
-        usleep(static_cast<unsigned int>(1000 * _mIdleTime->getValue() + 0.5));
-      }
-      break;
-    }
-    case cedar::aux::LoopMode::Simulated:
-    {
-      while (!mStop)
-      {
-        step(_mSimulatedTime->getValue());
-        usleep(static_cast<unsigned int>(1000 * _mIdleTime->getValue() + 0.5));
-      }
-      break;
-    }
-    case cedar::aux::LoopMode::Fixed:
-    {
-      if (step_size.total_milliseconds() == 0)
-      {
-        //!@todo We may want to just prevent setting this value
-        cedar::aux::LogSingleton::getInstance()->warning
-        (
-          "Step size is zero in cedar::aux::LoopMode::Fixed, defaulting to one millisecond.",
-          "cedar::aux::LoopedThread::run()"
-        );
-        step_size = boost::posix_time::milliseconds(1);
-      }
-
-      // initialization
-      mLastTimeStepStart = boost::posix_time::microsec_clock::universal_time();
-      mLastTimeStepEnd = mLastTimeStepStart;
-      boost::posix_time::ptime scheduled_wakeup = mLastTimeStepEnd + step_size;
-      //!@todo Should this really be here?
-      srand(boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds());
-
-      // some auxiliary variables
-      boost::posix_time::time_duration sleep_duration = boost::posix_time::microseconds(0);
-      boost::posix_time::time_duration step_duration = boost::posix_time::microseconds(0);
-
-      while (!mStop)
-      {
-        // sleep until next wake up time
-        sleep_duration = scheduled_wakeup - boost::posix_time::microsec_clock::universal_time();
-        usleep(std::max<int>(0, sleep_duration.total_microseconds()));
-      
-        if (mStop) // a lot can happen in a few us
-          break;
-
-        // determine time since last run
-        mLastTimeStepStart = mLastTimeStepEnd;
-        mLastTimeStepEnd = scheduled_wakeup;
-        step_duration = mLastTimeStepEnd - mLastTimeStepStart;
-
-        // calculate number of time steps taken
-        double steps_taken
-          = static_cast<double>(step_duration.total_microseconds())
-            / static_cast<double>(step_size.total_microseconds());
-        unsigned int full_steps_taken = static_cast<unsigned int>(steps_taken + 0.5);
-
-        // update statistics
-        updateStatistics(full_steps_taken);
-
-        // call step function
-        step(full_steps_taken * step_size.total_microseconds() * 0.001);
-
-        if (mStop) // a lot can happen in a step()
-          break;
-
-        // schedule the next wake up
-        while (scheduled_wakeup < boost::posix_time::microsec_clock::universal_time())
-        {
-          scheduled_wakeup = scheduled_wakeup + step_size;
-        }
-      } // while(!mStop)
-
-      break;
-    }
-    case cedar::aux::LoopMode::FixedAdaptive:
-    {
-      // initialization
-      mLastTimeStepStart = boost::posix_time::microsec_clock::universal_time();
-      mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
-      boost::posix_time::ptime scheduled_wakeup = mLastTimeStepEnd + step_size;
-      srand(boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds());
-
-      // some auxiliary variables
-      boost::posix_time::time_duration sleep_duration = boost::posix_time::microseconds(0);
-      boost::posix_time::time_duration step_duration = boost::posix_time::microseconds(0);
-
-      while (!mStop)
-      {
-        // sleep until next wake up time
-        sleep_duration = scheduled_wakeup - boost::posix_time::microsec_clock::universal_time();
-        usleep(std::max<int>(0, sleep_duration.total_microseconds()));
-
-        if (mStop) // a lot can happen in a few us
-          break;
-
-        // determine time since last run
-        mLastTimeStepStart = mLastTimeStepEnd;
-        mLastTimeStepEnd = scheduled_wakeup;
-        step_duration = mLastTimeStepEnd - mLastTimeStepStart;
-
-        // calculate number of time steps taken
-        double steps_taken
-          = static_cast<double>(step_duration.total_microseconds())
-            / static_cast<double>(step_size.total_microseconds());
-
-        // update statistics
-        updateStatistics(steps_taken);
-
-        // call step function
-        step(steps_taken * step_size.total_microseconds() * 0.001);
-
-        if (mStop) // a lot can happen in a step()
-          break;
-
-        // schedule the next wake up
-        scheduled_wakeup = std::max<boost::posix_time::ptime>
-                           (
-                             scheduled_wakeup + step_size,
-                             boost::posix_time::microsec_clock::universal_time()
-                           );
-
-      } // while(!mStop)
-
-      break;
-    }
-    default:
-    {
-      // this should never happen - unrecognized enum case
-      CEDAR_ASSERT(false);
-    }
   }
 
-  mStop = false;
-  return;
-}
-
-void cedar::aux::LoopedThread::initStatistics()
-{
-  mNumberOfSteps = 0;
-  mSumOfStepsTaken = 0.0;
-  mMaxStepsTaken = 0.0;
-}
-
-void cedar::aux::LoopedThread::updateStatistics(double stepsTaken)
-{
-
-  double old_sum = mSumOfStepsTaken;
-
-  mNumberOfSteps += 1.0;
-  mSumOfStepsTaken += stepsTaken;
-  if (stepsTaken > mMaxStepsTaken)
-  {
-    mMaxStepsTaken = stepsTaken;
-  }
-
-  if (old_sum > mSumOfStepsTaken)
+  if (this->isRunning())
   {
     cedar::aux::LogSingleton::getInstance()->warning
     (
-      "Value overflow in thread statistics. Statistics will be reset.",
-      "cedar::aux::LoopedThread::updateStatistics(double)"
+      "Thread is still running after call of stop()!",
+      "cedar::aux::LoopedThread::stop(unsigned int, bool)"
     );
-    initStatistics();
   }
-
-  return;
 }
+
+void cedar::aux::LoopedThread::stopStatistics(bool suppressWarning)
+{
+  if (!isRunning())
+    return;
+
+  unsigned long numberOfSteps = mpWorker->getNumberOfSteps();
+
+  if (suppressWarning == false && numberOfSteps > 1.01 && getSimulatedTimeParameter() <= 0.0)
+  {
+    std::string message = "The system was not fast enough to stay to scheduled thread timing. ";
+    message += "Consider using a larger step size.\n";
+    message += "Execution stats:\n";
+    message += "  avg. time steps between execution: ";
+    message += cedar::aux::toString(numberOfSteps / static_cast<double>(numberOfSteps));
+    message += "\n";
+    message += "  max. time steps between execution: ";
+    message += cedar::aux::toString(mpWorker->getMaxStepsTaken());
+
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      message,
+      "cedar::aux::LoopedThread::stop(unsigned int, bool)"
+    );
+  }
+}
+
 
 void cedar::aux::LoopedThread::singleStep()
 {
-  if (!this->isRunning())
+  if (!isRunning())
   {
     switch (_mLoopMode->getValue())
     {
@@ -343,9 +303,10 @@ void cedar::aux::LoopedThread::singleStep()
   }
 }
 
+// check if this method is needed, think of deprecating it
 bool cedar::aux::LoopedThread::stopRequested()
 {
-  if (this->isRunning() && mStop == true)
+  if (isRunning() && validWorker() && mpWorker->stopRequested())
   {
     return true;
   }
@@ -368,17 +329,3 @@ void cedar::aux::LoopedThread::setSimulatedTime(double simulatedTime)
   _mSimulatedTime->setValue(simulatedTime);
 }
 
-boost::posix_time::ptime cedar::aux::LoopedThread::getLastTimeStepStart() const
-{
-  return mLastTimeStepStart;
-}
-
-boost::posix_time::ptime cedar::aux::LoopedThread::getLastTimeStepEnd() const
-{
-  return mLastTimeStepEnd;
-}
-
-boost::posix_time::time_duration cedar::aux::LoopedThread::getLastTimeStepDuration() const
-{
-  return mLastTimeStepStart - mLastTimeStepEnd;
-}

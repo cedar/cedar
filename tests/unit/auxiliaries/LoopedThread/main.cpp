@@ -40,6 +40,8 @@
 #include <cstdlib>
 #include <iostream>
 
+#include <boost/lexical_cast.hpp>
+
 //!@brief threaded test class
 class MyTestThread : public cedar::aux::LoopedThread
 {
@@ -135,7 +137,9 @@ int testConfiguration
   // the thread should at least run for two iterations
   if (thread.mCounter < 2)
   {
-    std::cout << "ERROR: the thread didn't iterate often enough." << std::endl;
+    std::cout << "ERROR: the thread didn't iterate often enough, only " 
+              << boost::lexical_cast<std::string>(thread.mCounter) 
+              << " times." << std::endl;
     ++errors;
   }
   thread.stop();

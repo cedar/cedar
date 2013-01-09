@@ -45,7 +45,9 @@
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/LoopMode.h"
+#include "cedar/auxiliaries/LoopedThreadWorker.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -93,12 +95,16 @@
  *
  * \todo Use units instead of doubles
  */
-class cedar::aux::LoopedThread : virtual public cedar::aux::Configurable,
-                                 public QThread
+class cedar::aux::LoopedThread : public QObject,
+                                 virtual public cedar::aux::Configurable
 {
   //----------------------------------------------------------------------------
   // macros
   //----------------------------------------------------------------------------
+
+  Q_OBJECT
+   
+
   //----------------------------------------------------------------------------
   // constructors and destructor
   //----------------------------------------------------------------------------
@@ -149,6 +155,9 @@ public:
    */
   void stop(unsigned int timeout = 500, bool suppressWarning = false);
 
+  void start(); // TODO: manpage
+  bool isRunning() const; // TODO manpage
+
   /*!@brief Performs a single step with default step size (or simulated time).
    *
    * This has no effect if the thread is already running.
@@ -185,35 +194,20 @@ public:
    */
   void setSimulatedTime(double simulatedTime = 0.0);
 
-
-  /*!@brief Returns the last timesteps start time.
-   *
-   */
-  boost::posix_time::ptime getLastTimeStepStart() const;
-
-
-  /*!@brief Returns the last timesteps end time.
-   *
-   */
-  boost::posix_time::ptime getLastTimeStepEnd() const;
-
-
-  /*!@brief Returns the last timesteps duration.
-   *
-   */
-  boost::posix_time::time_duration getLastTimeStepDuration() const;
-
-
   /*!@brief Returns true if the thread is running but stop() was called.
    *
    */
   bool stopRequested();
 
+  inline void wait(int i = 0)
+  {
+    i = 42;
+    // TODO
+    // TODO: brauchen wir diese funktion ueberhaupt? wird bislang nur zum
+    // Pruefen auf Beenden des Threads verwendet, oder?
+  }
 
-  //----------------------------------------------------------------------------
-  // protected methods
-  //----------------------------------------------------------------------------
-protected:
+
   //! get the duration of the fixed trigger step
   inline double getStepSize() const
   {
@@ -232,15 +226,51 @@ protected:
     return this->_mSimulatedTime->getValue();
   }
 
+  //! get the loop mode
+  inline cedar::aux::Enum getLoopModeParameter() const
+  {
+    return this->_mLoopMode->getValue();
+  }
+
+#if 0
+// TODO: finish this
+  inline boost::posix_time::ptime getLastTimeStepStart() const
+  {
+    if (validWorker())
+      return mpWorker->getLastTimeStepStart();
+    return 0;
+  }
+
+  inline boost::posix_time::ptime getLastTimeStepEnd() const
+  {
+    if (validWorker())
+      return mpWorker->getLastTimeStepEnd();
+    return 0;
+  }
+
+  inline boost::posix_time::time_duration getLastTimeStepDuration() const
+  {
+    if (validWorker())
+      return mpWorker->getLastTimeStepDuration();
+    return 0;
+  }
+#endif  
+
+public slots:
+  void finishedThread();
+
+  //----------------------------------------------------------------------------
+  // protected methods
+  //----------------------------------------------------------------------------
+protected:
+
   //----------------------------------------------------------------------------
   // private methods
   //----------------------------------------------------------------------------
 private:
-  virtual void run(); // the thread does its work here!
-
-  void initStatistics();
-
-  inline void updateStatistics(double stepsTaken);
+  bool validWorker() const;
+  bool validThread() const;
+  void stopStatistics(bool suppressWarnings);
 
   //----------------------------------------------------------------------------
   // members
@@ -248,19 +278,6 @@ private:
 protected:
 
 private:
-  //!@brief stop is requested
-  bool mStop;
-
-  //!@brief total number of steps since start()
-  unsigned long mNumberOfSteps;
-  //!@brief
-  double mSumOfStepsTaken;
-  //!@brief
-  double mMaxStepsTaken;
-  //!@brief remember time stamps of last step
-  boost::posix_time::ptime mLastTimeStepStart;
-  //!@brief remember time stamps of last step
-  boost::posix_time::ptime mLastTimeStepEnd;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -269,6 +286,11 @@ protected:
   // none yet
 
 private:
+  QThread *mpThread;
+  bool    mDestructing;
+
+  cedar::aux::LoopedThreadWorker *mpWorker;
+
   //!@brief desired length of a single step, in milliseconds
   cedar::aux::DoubleParameterPtr _mStepSize;
 

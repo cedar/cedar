@@ -174,14 +174,15 @@ void cedar::dev::kuka::KinematicChain::setWorkingMode(cedar::dev::robot::Kinemat
  * Overwritten start function of KinematicChain
  * the function inherited from KinematicChain does some things we do not want.
  */
-void cedar::dev::kuka::KinematicChain::start(Priority priority)
+void cedar::dev::kuka::KinematicChain::start()
 {
   if (isRunning())
   {
     return;
   }
 
-  QThread::start(priority);
+  //QThread::start();
+  cedar::dev::robot::KinematicChain::start();
 }
 //----------------------------------------------------------------------------------------------------------------------
 // private member functions
