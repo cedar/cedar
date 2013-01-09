@@ -1,7 +1,7 @@
 {
   "component slots":
   {
-    "component 1":
+    "component slot 1":
     {
       "available components":
       {
@@ -21,22 +21,18 @@
   },
   "channels":
   {
-    "epuck_serial":
+    "channel 1":
     {
-      "cedar::dev::kteam::SerialChannel":
+      "cedar.tests.unit.dev.Robot.TestChannel":
       {
-        "end of command string": "\\r\\n",
-        "country flag": "0",
-        "time out": "250000",
-        "latency": "10000"
+        "info": "channel 1 info"
       }
     },
-    "epuck_network":
+    "channel 2":
     {
-      "cedar::dev::kteam::NetworkChannel":
+      "cedar.tests.unit.dev.Robot.TestChannel":
       {
-        "hostname": "epuck.ini.rub.de",
-        "port": "9559"
+        "info": "channel 2 info"
       }
     }
   }

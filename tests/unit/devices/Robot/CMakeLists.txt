@@ -38,6 +38,7 @@
 cedar_add_unit_test(Robot
   main.cpp
   namespace.h
+  TestChannel.cpp
   TestComponent.cpp
   TestComponent.h
 )

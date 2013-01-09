@@ -132,8 +132,13 @@ public:
 
     if (iter == mRegisteredFactories.end())
     {
+      std::vector<std::string> types;
+      listTypes(types);
+
+      std::string available_types = cedar::aux::join(types, ",");
+
       CEDAR_THROW(cedar::aux::UnknownTypeException,
-        "No factory is registered for the type name \"" + typeName + "\".");
+        "No factory is registered for the type name \"" + typeName + "\". Known types are: " + available_types);
     }
 
     return iter->second->allocate();

@@ -140,6 +140,10 @@ cedar::dev::ConstChannelPtr cedar::dev::Robot::getChannel(const std::string& cha
   return this->_mChannels->get(channel);
 }
 
+cedar::dev::ChannelPtr cedar::dev::Robot::getChannel(const std::string& channel)
+{
+  return this->_mChannels->get(channel);
+}
 
 std::vector<std::string> cedar::dev::Robot::listComponentSlots() const
 {
@@ -253,6 +257,40 @@ void cedar::dev::Robot::readConfiguration(const cedar::aux::ConfigurationNode& n
   cedar::aux::ConfigurationNode description;
   boost::property_tree::read_json(description_resource, description);
   this->readDescription(description);
+
+  this->Super::readConfiguration(node);
+
+  this->readComponentSlotInstantiations(node);
+}
+
+void cedar::dev::Robot::readComponentSlotInstantiations(const cedar::aux::ConfigurationNode& node)
+{
+  std::vector<std::string> component_slots = this->listComponentSlots();
+
+  auto component_slots_iter = node.find("component slots");
+  //!@todo Proper component_slots_node
+  CEDAR_ASSERT(component_slots_iter != node.not_found());
+  const cedar::aux::ConfigurationNode& component_slots_node = component_slots_iter->second;
+
+  // iterate over all slots; there should be an entry in the configuration for each of them.
+  for (auto iter = component_slots.begin(); iter != component_slots.end(); ++iter)
+  {
+    const std::string& slot_name = *iter;
+
+    auto slot_iter = component_slots_node.find(slot_name);
+    if (slot_iter == component_slots_node.not_found())
+    {
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Robot configuration is missing an entry for component slot \"" + slot_name + "\".",
+        "cedar::dev::Robot::readComponentSlotInstantiations(const cedar::aux::ConfigurationNode&)"
+      );
+      continue;
+    }
+    const std::string& channel_type = slot_iter->second.get<std::string>("channel type");
+
+    this->getComponentSlot(slot_name)->setChannel(channel_type);
+  }
 }
 
 cedar::dev::ComponentPtr cedar::dev::Robot::getComponent(const std::string& componentSlotName) const

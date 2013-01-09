@@ -22,31 +22,51 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Channel.cpp
+    File:        TestComponent.cpp
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
-    Date:        2012 11 23
+    Date:        2010 11 08
 
-    Description: Communication channel for a component or device (e.g., serial communication).
+    Description: Implementation of the @em TestComponent class.
 
     Credits:
 
 ======================================================================================================================*/
 
-// CEDAR INCLUDES
-#include "cedar/devices/Channel.h"
+
+// LOCAL INCLUDES
+#include "unit/devices/Robot/TestChannel.h"
 
 // SYSTEM INCLUDES
+#include <string>
+#include <iostream>
+
+//----------------------------------------------------------------------------------------------------------------------
+// type registration
+//----------------------------------------------------------------------------------------------------------------------
+
+namespace
+{
+  bool registered()
+  {
+    cedar::dev::ChannelManagerSingleton::getInstance()->
+        registerType<cedar::tests::unit::dev::Robot::TestChannelPtr>();
+    std::cout << "registr call for test channel!" << std::endl;
+    return true;
+  }
+
+  bool registerFnCall = registered();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::Channel::Channel()
-{
-}
 
-cedar::dev::Channel::~Channel()
+//! constructor
+cedar::tests::unit::dev::Robot::TestChannel::TestChannel()
+:
+_mInfo(new cedar::aux::StringParameter(this, "info", ""))
 {
 }
 
@@ -54,21 +74,10 @@ cedar::dev::Channel::~Channel()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-std::ostream& cedar::dev::operator<<(std::ostream& stream, const cedar::dev::Channel& channel)
+void cedar::tests::unit::dev::Robot::TestChannel::open()
 {
-  stream << "Channel @ " << (&channel) << " of type " << cedar::aux::objectTypeToString(&channel) << std::endl;
-  return stream;
 }
 
-std::ostream& cedar::dev::operator<<(std::ostream& stream, cedar::dev::ChannelPtr channel)
+void cedar::tests::unit::dev::Robot::TestChannel::close()
 {
-  stream << (*channel);
-  return stream;
 }
-
-std::ostream& cedar::dev::operator<<(std::ostream& stream, cedar::dev::ConstChannelPtr channel)
-{
-  stream << (*channel);
-  return stream;
-}
-

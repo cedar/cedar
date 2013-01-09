@@ -46,25 +46,20 @@
 // SYSTEM INCLUDES
 #include <string>
 
+const std::string component_slot_1_name = "component slot 1";
 
-int main()
+int testConfiguration(const std::string& configFileName)
 {
   int errors = 0;
-
-
   cedar::dev::RobotPtr robot(new cedar::dev::Robot());
-  robot->readJson("RobotConfiguration.json");
-
-  robot->setChannel("channel 1");
-
-  std::cout << robot << std::endl;
+  robot->readJson(configFileName);
 
   cedar::tests::unit::dev::Robot::TestComponentPtr component
-    = robot->getComponent<cedar::tests::unit::dev::Robot::TestComponent>("component 1");
+    = robot->getComponent<cedar::tests::unit::dev::Robot::TestComponent>(component_slot_1_name);
 
   if (!component)
   {
-    std::cout << "Error: could not retrieve \"component 1\"" << std::endl;
+    std::cout << "Error: could not retrieve \"" << component_slot_1_name << "\"" << std::endl;
     ++errors;
   }
   else
@@ -83,6 +78,21 @@ int main()
       ++errors;
     }
   }
+
+
+
+  std::cout << "Final robot:" << std::endl;
+  std::cout << robot << std::endl;
+
+  std::cout << "Configuration \"" << configFileName << "\" revealed " << errors << " error(s)." << std::endl;
+  return errors;
+}
+
+int main()
+{
+  int errors = 0;
+
+  errors += testConfiguration("RobotConfiguration_1.json");
 
   return errors;
 }

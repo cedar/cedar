@@ -74,6 +74,11 @@ public:
     return mChannel;
   }
 
+  inline void setChannel(cedar::dev::ChannelPtr channel)
+  {
+    this->mChannel = channel;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -122,7 +127,7 @@ namespace cedar
     typedef cedar::aux::Singleton<cedar::dev::ComponentManager> ComponentManagerSingleton;
 
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<cedar::dev::ComponentManager>);
+    CEDAR_INSTANTIATE_DEV_TEMPLATE(cedar::aux::Singleton<cedar::dev::ComponentManager>);
     //!@endcond
   }
 }

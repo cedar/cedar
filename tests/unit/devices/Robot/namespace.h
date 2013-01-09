@@ -54,6 +54,9 @@ namespace cedar
           class TestRobot;
           class TestComponent;
           CEDAR_GENERATE_POINTER_TYPES(TestComponent);
+
+          class TestChannel;
+          CEDAR_GENERATE_POINTER_TYPES(TestChannel);
         }
       }
     }
