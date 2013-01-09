@@ -291,8 +291,8 @@ int main(int argc, char* argv[])
     p_data->unlock();
     p_lock->unlock();
 
-    //every second
-    if (! (++counter %= 1000))
+    // state messages
+    if (! (++counter %= 200))
     {
       //display real reached fps
       std::cout << "Thread FPS: " << p_grabber->getFpsMeasured() << std::endl;

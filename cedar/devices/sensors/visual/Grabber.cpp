@@ -314,6 +314,10 @@ bool cedar::dev::sensors::visual::Grabber::applyParameter()
   if (this->onCreateGrabber())
   {
     mCaptureDeviceCreated = true;
+    for (unsigned int channel=0; channel<getNumCams();++channel)
+    {
+      onUpdateSourceInfo(channel);
+    }
   }
   else
   {

@@ -232,7 +232,6 @@ bool cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
     {
       getVideoChannel(channel)->mVideoCapture = capture;
       getVideoChannel(channel)->mVideoCapture >> getImageMat(channel);
-      setChannelInfo(channel);
     }
     else
     {
@@ -371,7 +370,7 @@ bool cedar::dev::sensors::visual::VideoGrabber::onGrab()
 }
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::VideoGrabber::setChannelInfo(unsigned int channel)
+void cedar::dev::sensors::visual::VideoGrabber::onUpdateSourceInfo(unsigned int channel)
 {
   setChannelInfoString(channel,this->getName() + " - channel " + boost::lexical_cast<std::string>(channel)
                          + ": " + getVideoChannel(channel)->_mSourceFileName->getPath());

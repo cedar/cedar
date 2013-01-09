@@ -28,7 +28,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 04 23
 
-    Description: Implementation of a Grabber to grab from OpenGL, i.e from a QGLWidget
+    Description: Implementation of a Grabber to grab from a QGLWidget
 
     Credits:
 
@@ -113,7 +113,7 @@ cedar::dev::sensors::visual::GLGrabber::~GLGrabber()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::dev::sensors::visual::GLGrabber::onInit()
+bool cedar::dev::sensors::visual::GLGrabber::onCreateGrabber()
 {
   unsigned int num_cams = getNumCams();
   std::stringstream init_message;
@@ -136,6 +136,13 @@ bool cedar::dev::sensors::visual::GLGrabber::onInit()
   return true;
 }
 
+
+void cedar::dev::sensors::visual::GLGrabber::onCloseGrabber()
+{
+  this->onCleanUp();
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::GLGrabber::onCleanUp()
 {
@@ -148,21 +155,6 @@ void cedar::dev::sensors::visual::GLGrabber::onCleanUp()
   {
     getGLChannel(channel)->mpQGLWidget = NULL;
   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// void cedar::dev::sensors::visual::GLGrabber::onAddChannel()
-//{
-//  // create the channel structure for one channel
-//  GLChannelPtr channel(new GLChannel);
-//  channel->mpQGLWidget = NULL;
-//  mChannels.push_back(channel);
-//}
-
-//----------------------------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::GLGrabber::onDeclareParameters()
-{
-  return true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -198,7 +190,8 @@ bool cedar::dev::sensors::visual::GLGrabber::onGrab()
       // p_channel_widget->doneCurrent();
 
       // QImage to cv::Mat
-      cv::Mat mat = cv::Mat(qimage.height(), qimage.width(), CV_8UC4, static_cast<uchar*>(qimage.bits()), qimage.bytesPerLine());
+      cv::Mat mat =
+         cv::Mat(qimage.height(), qimage.width(), CV_8UC4, static_cast<uchar*>(qimage.bits()), qimage.bytesPerLine());
       cv::Mat mat2 = cv::Mat(mat.rows, mat.cols, CV_8UC3 );
       int from_to[] = { 0,0, 1,1, 2,2 };
       cv::mixChannels( &mat, 1, &mat2, 1, from_to, 3 );
@@ -242,10 +235,10 @@ void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGL
     // change source
     getGLChannel(channel)->mpQGLWidget = qglWidget;
     cedar::aux::LogSingleton::getInstance()->debugMessage
-                                            (
-                                             this->getName() + ": New Widget applied",
-                                              "cedar::dev::sensors::visual::GLGrabber::setWidget"
-                                            );
+                                             (
+                                               this->getName() + ": New Widget applied",
+                                               "cedar::dev::sensors::visual::GLGrabber::setWidget"
+                                             );
     this->grab();
     if (restart_grabber)
     {

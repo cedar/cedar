@@ -123,7 +123,6 @@ protected:
   bool onInit();
   bool onGrab();
   void onUpdateSourceInfo(unsigned int channel);
-
   void onCleanUp();
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -414,6 +414,7 @@ protected:
   void onCleanUp();
   bool onCreateGrabber();
   void onCloseGrabber();
+  void onUpdateSourceInfo(unsigned int channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -425,9 +426,6 @@ private:
   /*! @brief This function connects the used signals
    */
   void connectSignals();
-
-  /// @brief updates the channel informations
-  void setChannelInfo(unsigned int channel);
 
   /// @brief Sets the channel-id which depends on the isGuid-flag (only used in constructor)
   // void setChannelId(unsigned int channel, unsigned int id, bool isGuid);
