@@ -155,14 +155,12 @@ protected:
   void onCloseGrabber();
   void onCleanUp();
   bool onGrab();
+  void onUpdateSourceInfo(unsigned int channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-
-  /// @brief updates the channel informations
-  void setChannelInfo(unsigned int channel);
 
   ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
   inline TestChannelPtr getTestChannel(unsigned int channel)

@@ -117,14 +117,12 @@ public:
 
 protected:
 
-  //------------------------------------------------------------------------
-  // From Grabber
-  //------------------------------------------------------------------------
-  bool onInit();
+  // inherited from Grabber
+  bool onCreateGrabber();
   bool onGrab();
   void onUpdateSourceInfo(unsigned int channel);
-
   void onCleanUp();
+  void onCloseGrabber();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

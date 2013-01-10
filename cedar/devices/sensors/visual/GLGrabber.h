@@ -81,7 +81,7 @@ public:
   GLGrabber
   (
     QGLWidget *qglWidget,
-    const std::string& grabberName
+    const std::string& grabberName = "GLGrabber"
   );
 
   /*! @brief Constructor for a stereo channel grabber
@@ -93,7 +93,7 @@ public:
   (
     QGLWidget *qglWidget0,
     QGLWidget *qglWidget1,
-    const std::string& grabberName
+    const std::string& grabberName = "StereoGLGrabber"
   );
 
   //!@brief Destructor
@@ -115,17 +115,18 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  // derived from Grabber
-  bool onInit();
-  bool onDeclareParameters();
+  // inherited from Grabber
   void onCleanUp();
-  void onUpdateSourceInfo(unsigned int channel);
   bool onGrab();
+  bool onCreateGrabber();
+  void onCloseGrabber();
+  void onUpdateSourceInfo(unsigned int channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+
   ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
   inline GLChannelPtr getGLChannel(unsigned int channel)
   {

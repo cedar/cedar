@@ -251,7 +251,7 @@ bool cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()
                                             (
                                               "Searching for camera with GUID "
                                                + boost::lexical_cast<std::string>(camera_id) + " on the bus...",
-                                              "cedar::dev::sensors::camera::Grabber::onInit()"
+                                              "cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()"
                                             );
 
     unsigned int cams_on_bus = mpLibDcInterface->getNumCams();
@@ -261,7 +261,7 @@ bool cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()
       cedar::aux::LogSingleton::getInstance()->error
                                                (
                                                  "No cameras on the firewire bus!",
-                                                 "cedar::dev::sensors::camera::Grabber::onInit()"
+                                                 "cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()"
                                                );
       return false;
     }
@@ -279,7 +279,7 @@ bool cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()
                                               (
                                                 "Found: at Bus-Id " + boost::lexical_cast<std::string>(cam)
                                                   + ": GUID " + boost::lexical_cast<std::string>(guid),
-                                                "cedar::dev::sensors::camera::Grabber::onInit()"
+                                                "cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()"
                                               );
       cam_found = (guid == camera_id);
       if (cam_found)
@@ -296,7 +296,7 @@ bool cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()
                                                (
                                                  "No cameras with GUID "+boost::lexical_cast<std::string>(camera_id)
                                                  +" not found on the firewire bus!",
-                                                 "cedar::dev::sensors::camera::Grabber::onInit()"
+                                                 "cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()"
                                                );
       return false;
     }
@@ -316,7 +316,7 @@ bool cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()
                                             (
                                               "Open camera with bus Id " + boost::lexical_cast<std::string>(bus_id)
                                                 + ": GUID " + boost::lexical_cast<std::string>(guid),
-                                              "cedar::dev::sensors::camera::Grabber::onInit()"
+                                              "cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()"
                                             );
   }
 

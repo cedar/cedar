@@ -112,21 +112,16 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  // derived from Grabber
- // bool onInit();
+  // inherited from Grabber
   void onCleanUp();
-  //void onUpdateSourceInfo(unsigned int channel);
   bool onGrab();
   bool onCreateGrabber();
   void onCloseGrabber();
-
+  void onUpdateSourceInfo(unsigned int channel);
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-
-  /// @brief updates the channel informations
-  void setChannelInfo(unsigned int channel);
 
   ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class InterfaceChannelPtr
   inline GrabbableChannelPtr getGrabbableChannel(unsigned int channel)

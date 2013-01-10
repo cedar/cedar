@@ -218,7 +218,7 @@ bool cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
                                              this->getName() + init_message.str(),
-                                             "cedar::dev::sensors::visual::VideoGrabber::onInit()"
+                                             "cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()"
                                            );
 
 
@@ -232,7 +232,6 @@ bool cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
     {
       getVideoChannel(channel)->mVideoCapture = capture;
       getVideoChannel(channel)->mVideoCapture >> getImageMat(channel);
-      setChannelInfo(channel);
     }
     else
     {
@@ -241,7 +240,7 @@ bool cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
                                                  this->getName() + ": Grabbing failed on Channel "
                                                   + boost::lexical_cast<std::string>(channel) + " from \""
                                                   + getVideoChannel(channel)->_mSourceFileName->getPath() + "\"",
-                                                "cedar::dev::sensors::visual::VideoGrabber::onInit()"
+                                                "cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()"
                                                );
       return false;
     }
@@ -279,7 +278,7 @@ bool cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
                                                (
                                                  this->getName()
                                                    + ": Different framerates of channels 0 and 1",
-                                                 "cedar::dev::sensors::visual::VideoGrabber::onInit()"
+                                                 "cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()"
                                                );
       return false;
     }
@@ -371,7 +370,7 @@ bool cedar::dev::sensors::visual::VideoGrabber::onGrab()
 }
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::VideoGrabber::setChannelInfo(unsigned int channel)
+void cedar::dev::sensors::visual::VideoGrabber::onUpdateSourceInfo(unsigned int channel)
 {
   setChannelInfoString(channel,this->getName() + " - channel " + boost::lexical_cast<std::string>(channel)
                          + ": " + getVideoChannel(channel)->_mSourceFileName->getPath());
@@ -380,10 +379,7 @@ void cedar::dev::sensors::visual::VideoGrabber::setChannelInfo(unsigned int chan
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::VideoGrabber::setSpeedFactor(double speedFactor)
 {
-  // if (_mSpeedFactor->getValue() != speedFactor)
-  //{
-    _mSpeedFactor->setValue(speedFactor);
-  //}
+   _mSpeedFactor->setValue(speedFactor);
 }
 
 //----------------------------------------------------------------------------------------------------
