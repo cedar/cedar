@@ -3,36 +3,31 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        InterfaceGrabberTest.cpp
+    File:        OglGrabberTest.cpp
 
     Maintainer:  Georg.Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 04 26
 
-    Description: Simple application to grab from a class which implements the grabbable interface
+    Description: Simple example on how to grab from a QGLWidget
 
     Credits:
 
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/GrabbableGrabber.h"
-#include "cedar/auxiliaries/Grabbable.h"
+#include "cedar/devices/sensors/visual/GLGrabber.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/SceneWidget.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gl/Block.h"
-#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
-#include <QtGui/QApplication>
-#include <opencv2/opencv.hpp>
 #include <boost/lexical_cast.hpp>
-
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Local methods
@@ -64,15 +59,15 @@ int main(int argc, char **argv)
 
   // the name of the grabber
   // only used in the configuration file
-  const std::string GRABBER_NAME = "Interface_Grabber_Test";
+  const std::string GRABBER_NAME = "GL_Grabber_Test";
 
   // the name for the configuration file (not needed for this test)
-  const std::string CONFIG_FILE_NAME = "interface_grabber_test.config";
+  const std::string CONFIG_FILE_NAME = "GL_grabber_testcase.config";
 
   // title of grabber window
   std::string window_title = "Grabber: " + GRABBER_NAME;
 
-  std::cout << "\n\nInteractive test of the InterfaceGrabber class\n";
+  std::cout << "\n\nInteractive test of the GLGrabber class\n";
   std::cout << "--------------------------------------------\n\n";
 
   // -------------------------------------------------------------------------------------------------------------------
@@ -102,42 +97,42 @@ int main(int argc, char **argv)
   p_scene->addObjectVisualization(p_block);
   p_block_local_coordinate_frame->rotate(0, M_PI/2);
 
-  // wait until viewer is finished with its creation
   processQtEvents();
-  cedar::aux::sleep(cedar::unit::Milliseconds(100));
 
   // -------------------------------------------------------------------------------------------------------------------
-  // Create grabber, with viewer-class as parameter
+  // Create the GLGrabber
   // -------------------------------------------------------------------------------------------------------------------
-  std::cout << "Create a CameraGrabber:\n";
-  cedar::dev::sensors::visual::GrabbableGrabberPtr p_grabber;
+
+  std::cout << "Create a GLGrabber:\n";
+  cedar::dev::sensors::visual::GLGrabberPtr p_grabber;
   try
   {
-    p_grabber = cedar::dev::sensors::visual::GrabbableGrabberPtr
+    p_grabber = cedar::dev::sensors::visual::GLGrabberPtr
                 (
-                  new cedar::dev::sensors::visual::GrabbableGrabber
+                  new cedar::dev::sensors::visual::GLGrabber
                       (
-                       static_cast<cedar::aux::Grabbable * >(&viewer),
+                       static_cast<QGLWidget *>(&viewer),
                        GRABBER_NAME // not necessary
                       )
                 );
   }
   catch (cedar::aux::InitializationException &e)
   {
-    // after an InitializationExeception the grabber class isn't initialized correctly
-    // and couldn't be used
-    std::cout << "Error on creation of the GrabbableGrabber class:\n"
+    //after an InitializationExeception the video_grabber class isn't initialized correctly
+    //and couldn't be used
+    std::cout << "Error on creation of the VideoGrabber class:\n"
               << e.exceptionInfo() << std::endl;
+
+    // connected with viewer, process pending events
+    processQtEvents();
 
     // delete p_grabber is done via the shared-pointer class
     return -1;
   }
 
-  // connected with viewer, process pending events
-  processQtEvents();
-
   // activate crash-handler if there is any hardware-related stuff which has to be cleaned up
   p_grabber->installCrashHandler();
+
 
   //----------------------------------------------------------------------------------------
   // load configuration. this step is optional.
@@ -151,6 +146,7 @@ int main(int argc, char **argv)
     std::cout << "No configuration exists!" << std::endl;
   }
 
+
   //----------------------------------------------------------------------------------------
   // apply configuration. this step is mandatory.
   //----------------------------------------------------------------------------------------
@@ -158,17 +154,18 @@ int main(int argc, char **argv)
   // check if grabber is created successfully
   if (! p_grabber->applyParameter())
   {
-    // an error occured during initialization. Perhaps the file doesn't exist
+    // an error occured during initialization.
     return -1;
   }
 
   // allow to register the grabber in the viewer class and wait.
-  // at least one redraw is needed to write the GL-Image in the grab-buffer from interface "Grabbable"
-  for (int i = 0; i < 100; ++i)
+  for (int i = 0; i < 10; ++i)
   {
     processQtEvents();
     cedar::aux::sleep(cedar::unit::Milliseconds(10));
   }
+
+  std::cout << "\nGrab channel 0 from \"" << p_grabber->getSourceInfo()<< "\"" << std::endl;
 
 
   //-------------------------------------------------------------------------------------------------------------------
@@ -203,16 +200,16 @@ int main(int argc, char **argv)
   p_plot->resize(frame.cols,frame.rows);
 
   // allow the ImagePlot to create
-  processQtEvents();
+  for (int i=0; i<10; i++)
+  {
+    processQtEvents();
+  }
 
-  // start the grabber-thread for reading the GL images in the background
-  std::cout << "Start grabbing in the background" << std::endl;
-  p_grabber->setFps(50);
-  p_grabber->startGrabber();
+  // The grabbing have to be done in the GUI-thread!!!
+  // If you start background-grabbing, a segmentation-fault occur!!
 
-  // start recording (if you like)
-  // std::cout << "\nStart Recording\n";
-  // p_grabber->startRecording(50);
+  // p_grabber->setFps(50);
+  // p_grabber->startGrabber();
 
   unsigned int counter=0;
   std::cout << "\nDisplay GL frames\n";
@@ -221,6 +218,9 @@ int main(int argc, char **argv)
   while (!frame.empty() && p_plot->isVisible())
   {
     processQtEvents();
+
+    // grab in the GUI-thread
+    p_grabber->grab();
 
     // read new images, from the grabber-buffer. This is independent from background-thread
     // the background thread gets the images from the gl-widget periodically
@@ -250,12 +250,6 @@ int main(int argc, char **argv)
   // clean up
   //----------------------------------------------------------------------------------------
 
-  // stopGrabber grabbing-thread if running
-  // recording will also be stopped
-  if (p_grabber->isRunning())
-  {
-    p_grabber->stopGrabber();
-  }
   std::cout << "finished\n";
 
   // p_grabber is deleted in the shared-pointer class
