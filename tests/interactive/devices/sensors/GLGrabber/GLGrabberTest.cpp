@@ -49,7 +49,7 @@ namespace
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Example program
+// Interactive test program
 // ---------------------------------------------------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
@@ -64,7 +64,7 @@ int main(int argc, char **argv)
   // the name for the configuration file (not needed for this test)
   const std::string CONFIG_FILE_NAME = "GL_grabber_testcase.config";
 
-  // title of grabber window
+  //title of plot window
   std::string window_title = "Grabber: " + GRABBER_NAME;
 
   std::cout << "\n\nInteractive test of the GLGrabber class\n";
@@ -205,8 +205,8 @@ int main(int argc, char **argv)
     processQtEvents();
   }
 
-  // The grabbing have to be done in the GUI-thread!!!
-  // If you start background-grabbing, a segmentation-fault occur!!
+  // The grabbing have to be done in the GUI-thread!
+  // If you start background-grabbing, a segmentation-fault occur!
 
   // p_grabber->setFps(50);
   // p_grabber->startGrabber();

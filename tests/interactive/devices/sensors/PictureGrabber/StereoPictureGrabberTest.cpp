@@ -24,7 +24,28 @@
 // SYSTEM INCLUDES
 #include <QtGui/QApplication>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Local methods
+// ---------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  void processQtEvents()
+  {
+#ifdef CEDAR_OS_APPLE
+    unsigned int event_counter = 0;
+    while (QApplication::hasPendingEvents() && (++event_counter < 1000))
+#else
+    while (QApplication::hasPendingEvents())
+#endif
+    {
+      QApplication::processEvents();
+    }
+  }
+}
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Interactive test program
+// ---------------------------------------------------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -156,17 +177,14 @@ int main(int argc, char* argv[])
   p_plot1->show();
   p_plot1->resize(frame1.cols,frame1.rows);
 
-  while (QApplication::hasPendingEvents())
-  {
-    QApplication::processEvents();
-  }
+  //process the events generated inside QT-Framework
+  processQtEvents();
+
 
   while (!frame0.empty() && !frame1.empty() && p_plot0->isVisible() && p_plot1->isVisible())
   {
-    while (QApplication::hasPendingEvents())
-    {
-      QApplication::processEvents();
-    }
+    //process the events generated inside QT-Framework
+    processQtEvents();
 
     //nothing else to do here. No new frames
 

@@ -3,13 +3,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        InterfaceGrabberTest.cpp
+    File:        GrabbableGrabberTest.cpp
 
     Maintainer:  Georg.Hartinger
     Email:       georg.hartinger@ini.rub.de
-    Date:        2012 04 26
+    Date:        2013 01 11
 
-    Description: Simple application to grab from a class which implements the grabbable interface (mono-case)
+    Description: Interactive test to grab from a class which implements the grabbable interface
 
     Credits:
 
@@ -24,6 +24,7 @@
 #include "cedar/auxiliaries/gui/SceneWidget.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gl/Block.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -31,6 +32,30 @@
 #include <opencv2/opencv.hpp>
 #include <boost/lexical_cast.hpp>
 
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Local methods
+// ---------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  void processQtEvents()
+  {
+#ifdef CEDAR_OS_APPLE
+    unsigned int event_counter = 0;
+    while (QApplication::hasPendingEvents() && (++event_counter < 1000))
+#else
+    while (QApplication::hasPendingEvents())
+#endif
+    {
+      QApplication::processEvents();
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Interactive test program
+// ---------------------------------------------------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
   // -------------------------------------------------------------------------------------------------------------------
@@ -39,12 +64,12 @@ int main(int argc, char **argv)
 
   // the name of the grabber
   // only used in the configuration file
-  const std::string GRABBER_NAME = "Interface_Grabber_Test";
+  const std::string GRABBER_NAME = "Grabbable_Grabber_Test";
 
   // the name for the configuration file (not needed for this test)
-  const std::string CONFIG_FILE_NAME = "interface_grabber_test.config";
+  const std::string CONFIG_FILE_NAME = "grabbable_grabber_test.config";
 
-  // title of grabber window
+  // title of plot window
   std::string window_title = "Grabber: " + GRABBER_NAME;
 
   std::cout << "\n\nInteractive test of the InterfaceGrabber class\n";
@@ -78,11 +103,8 @@ int main(int argc, char **argv)
   p_block_local_coordinate_frame->rotate(0, M_PI/2);
 
   // wait until viewer is finished with its creation
-  while (QApplication::hasPendingEvents())
-  {
-    QApplication::processEvents();
-  }
-  usleep(10000);
+  processQtEvents();
+  cedar::aux::sleep(cedar::unit::Milliseconds(100));
 
   // -------------------------------------------------------------------------------------------------------------------
   // Create grabber, with viewer-class as parameter
@@ -112,13 +134,9 @@ int main(int argc, char **argv)
   }
 
   // connected with viewer, process pending events
-  while (QApplication::hasPendingEvents())
-  {
-    QApplication::processEvents();
-  }
+  processQtEvents();
 
-
-  // activate crash-handler if there is any hardware-related stuff which has to be cleaned up
+  // activate crash-handler, because the handle in the Grabbable-Widget have to be set to zero.
   p_grabber->installCrashHandler();
 
   //----------------------------------------------------------------------------------------
@@ -148,11 +166,8 @@ int main(int argc, char **argv)
   // at least one redraw is needed to write the GL-Image in the grab-buffer from interface "Grabbable"
   for (int i = 0; i < 100; ++i)
   {
-    while (QApplication::hasPendingEvents())
-    {
-      QApplication::processEvents();
-    }
-    usleep (10000);
+    processQtEvents();
+    cedar::aux::sleep(cedar::unit::Milliseconds(10));
   }
 
 
@@ -188,10 +203,7 @@ int main(int argc, char **argv)
   p_plot->resize(frame.cols,frame.rows);
 
   // allow the ImagePlot to create
-  while (QApplication::hasPendingEvents())
-  {
-    QApplication::processEvents();
-  }
+  processQtEvents();
 
   // start the grabber-thread for reading the GL images in the background
   std::cout << "Start grabbing in the background" << std::endl;
@@ -208,10 +220,7 @@ int main(int argc, char **argv)
   // get frames for a while
   while (!frame.empty() && p_plot->isVisible())
   {
-    while (QApplication::hasPendingEvents())
-    {
-      QApplication::processEvents();
-    }
+    processQtEvents();
 
     // read new images, from the grabber-buffer. This is independent from background-thread
     // the background thread gets the images from the gl-widget periodically
@@ -223,13 +232,13 @@ int main(int argc, char **argv)
     p_data->unlock();
     p_lock->unlock();
 
-    // every second
-    if (! (++counter %= 1000))
+    // state messages
+    if (! (++counter %= 200))
     {
       // display real reached fps
       std::cout << "Thread FPS: " << p_grabber->getFpsMeasured() << std::endl;
     }
-    usleep(1000);
+    cedar::aux::sleep(cedar::unit::Milliseconds(1));
   }
 
   //----------------------------------------------------------------------------------------
