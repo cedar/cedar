@@ -209,7 +209,7 @@ int main(int , char **)
   delete grabber_1;
   grabber_1 = NULL;
 
-  usleep(1000);
+  cedar::aux::sleep(cedar::unit::Milliseconds(1));
   cedar::dev::sensors::visual::TestGrabber *grabber_2 = new cedar::dev::sensors::visual::TestGrabber
                                                             (
                                                               CHANNEL_0_NAME,
@@ -275,7 +275,7 @@ int main(int , char **)
 
 
   std::cout << "\n\nPress now CTRL-C\n";
-  sleep(3*FPS_TEST_DURATION_IN_SEC);
+  cedar::aux::sleep(cedar::unit::Seconds(static_cast<double>(3*FPS_TEST_DURATION_IN_SEC)));
 
   //no ctrl-c pressed
   std::cout << "\n\nWARNING: No CTRL-C catched - do normal cleanup\n";
