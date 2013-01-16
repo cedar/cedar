@@ -68,22 +68,22 @@ cv::Mat cedar::aux::math::gaussMatrix
     {
       for (int row = 0; row < kernel_parts.at(dim).rows; ++row)
       {
-        int index = row - static_cast<int>(centers.at(dim));
-        int current_size = static_cast<int>(matrixSizes.at(dim));
+        double position = row - static_cast<double>(centers.at(dim));
+        double current_size = static_cast<double>(matrixSizes.at(dim));
         /* if the kernel is shifted away from the center of the matrix, make sure to take as many values from a
          * cyclic kernel as the kernel center is shifted away from the matrix center
          */
-        int shift = static_cast<int>(centers.at(dim)) - current_size / 2;
+        double shift = static_cast<double>(centers.at(dim)) - current_size / 2.0;
         if (shift > 0 && row - shift < 0) // kernel center is to the right of matrix center and index is in cyclic range
         {
-          index += current_size;
+          position += current_size;
         }
         if (shift < 0 && row - shift >= current_size) // kernel center is to the left of matrix center, cyclic index
         {
-          index -= current_size;
+          position -= current_size;
         }
         kernel_parts.at(dim).at<float>(row, 0)
-              = cedar::aux::math::gauss(index, sigmas.at(dim));
+              = cedar::aux::math::gauss(position, sigmas.at(dim));
       }
     }
     else // nothing special to do here
@@ -91,7 +91,7 @@ cv::Mat cedar::aux::math::gaussMatrix
       for (int row = 0; row < kernel_parts.at(dim).rows; ++row)
       {
         kernel_parts.at(dim).at<float>(row, 0)
-              = cedar::aux::math::gauss(static_cast<int>(row) - centers.at(dim), sigmas.at(dim));
+              = cedar::aux::math::gauss(static_cast<double>(row) - centers.at(dim), sigmas.at(dim));
       }
     }
   }
