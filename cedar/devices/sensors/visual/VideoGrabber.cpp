@@ -319,28 +319,29 @@ bool cedar::dev::sensors::visual::VideoGrabber::onGrab()
     if (getImageMat(channel).empty())
     {
 
-      /*
+/*
       unsigned int pos_Abs = getVideoChannel(0)->mVideoCapture.get(CV_CAP_PROP_POS_FRAMES);
       std::stringstream debug_message;
       debug_message << "[VideoGrabber::onGrab] Channel  :" << channel << " empty" << std::endl;
       debug_message << "[VideoGrabber::onGrab] Frame nr.:" << pos_Abs << std::endl;
+      debug_message << "[VideoGrabber::onGrab] Framecount:" << mFramesCount << std::endl;
       cedar::aux::LogSingleton::getInstance()->debugMessage
                                                (
                                                  this->getName() + ": " + debug_message.str(),
                                                  "cedar::dev::sensors::visual::VideoGrabber::onGrab()"
                                                );
-      */
+*/
       // error or end of file?
-      if (getPositionAbsolute() == (mFramesCount))
+      if (getPositionAbsolute() >= (mFramesCount))
       // if (getPositionRelative() > 0.99)
       {
 
         if (_mLooped->getValue())
         {
           // rewind all channels and grab first frame
-          setPositionAbsolute(0);
           for (unsigned int i = 0; i < num_cams; ++i)
           {
+            (getVideoChannel(i)->mVideoCapture).set(CV_CAP_PROP_POS_FRAMES,0);
             (getVideoChannel(i)->mVideoCapture) >> getImageMat(i);
           }
           cedar::aux::LogSingleton::getInstance()->debugMessage
@@ -370,10 +371,10 @@ bool cedar::dev::sensors::visual::VideoGrabber::onGrab()
 }
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::VideoGrabber::onUpdateSourceInfo(unsigned int channel)
+std::string cedar::dev::sensors::visual::VideoGrabber::onUpdateSourceInfo(unsigned int channel)
 {
-  setChannelInfoString(channel,this->getName() + " - channel " + boost::lexical_cast<std::string>(channel)
-                         + ": " + getVideoChannel(channel)->_mSourceFileName->getPath());
+  return this->getName() + " - channel " + boost::lexical_cast<std::string>(channel)
+                         + ": " + getVideoChannel(channel)->_mSourceFileName->getPath();
 }
 
 //----------------------------------------------------------------------------------------------------

@@ -23,7 +23,7 @@
 
 // SYSTEM INCLUDES
 #include <QtGui/QApplication>
-
+#include <ios>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Local methods
@@ -78,6 +78,9 @@ int main(int argc, char* argv[])
   const std::string filename_channel0 = std::string(argv[1]);
   const std::string filename_channel1 = std::string(argv[2]);
   const std::string window_title = "StereoVideoGrabber: \""+ filename_channel0 + "\", \"" + filename_channel1+"\"";
+
+  std::cout.setf(std::ios::fixed,std::ios::floatfield);
+  std::cout.precision(3);
 
   std::cout << "\n\nInteractive test of the VideoGrabber class (stereo)\n";
   std::cout << "--------------------------------------------\n\n";
@@ -137,7 +140,7 @@ int main(int argc, char* argv[])
   //----------------------------------------------------------------------------------------
 
   //the first frame is already grabbed on initialization
-  //p_grabber->grab();
+  //p_grabber->grab() not needed
 
   //the first frame is now grabbed and could be read
   //always use the QReadWriteLock for locking the cv::Mat image object on access
@@ -167,6 +170,7 @@ int main(int argc, char* argv[])
   //----------------------------------------------------------------------------------------
   // Create a cedar::aux::gui ImagePlot widget to show grabbed frames
   //----------------------------------------------------------------------------------------
+  std::cout << "\nShow frames - close grabber window to exit" << std::endl;
 
   QApplication app(argc, argv);
   cedar::aux::gui::ImagePlotPtr p_plot = cedar::aux::gui::ImagePlotPtr(new cedar::aux::gui::ImagePlot());
@@ -184,8 +188,10 @@ int main(int argc, char* argv[])
 
   //start the grabbing-thread. It is possible to set a speedfactor
   p_grabber->setSpeedFactor(1);
+  p_grabber->setLooped(true);
 
-  std::cout << "VideoGrabber thread FPS    : " << p_grabber->getFps() << std::endl;
+  std::cout << "Video FPS              : " << p_grabber->getSourceFps() << std::endl;
+  std::cout << "VideoGrabber thread FPS: " << p_grabber->getFps() << std::endl;
   p_grabber->start();
 
   unsigned int counter_stat = 0;
@@ -210,7 +216,7 @@ int main(int argc, char* argv[])
     p_lock->unlock();
 
     //status
-    if (++counter_stat %= 200 )
+    if (!(++counter_stat %= 100) )
     {
       std::cout << "Measured FPS: " << p_grabber->getFpsMeasured()
                 << "\tPos_Rel: "<< p_grabber->getPositionRelative()
@@ -218,8 +224,9 @@ int main(int argc, char* argv[])
                 << std::endl;
     }
 
-    // watch the output. The video is much slower than 100 fps.
-    cedar::aux::sleep(cedar::unit::Microseconds(10));
+    // watch the output - everything should be fine.
+    //The video is much slower than 100 fps.
+    cedar::aux::sleep(cedar::unit::Milliseconds(10));
   }
 
   //----------------------------------------------------------------------------------------
@@ -236,7 +243,7 @@ int main(int argc, char* argv[])
   //recording will also be stopped
   if (p_grabber->isRunning())
   {
-    p_grabber->stop();
+    p_grabber->stopGrabber();
   }
 
   // p_grabber is deleted in the shared-pointer class

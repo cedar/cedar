@@ -28,6 +28,7 @@
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
 #include <boost/lexical_cast.hpp>
+#include <ios>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Local methods
@@ -66,6 +67,13 @@ int main(int argc, char **argv)
 
   //title of plot window
   std::string window_title = "Grabber: " + GRABBER_NAME;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  //main test
+  //--------------------------------------------------------------------------------------------------------------------
+
+  std::cout.setf(std::ios::fixed,std::ios::floatfield);
+  std::cout.precision(3);
 
   std::cout << "\n\nInteractive test of the GLGrabber class\n";
   std::cout << "--------------------------------------------\n\n";
