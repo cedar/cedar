@@ -28,6 +28,7 @@
 #include <QtGui/QApplication>
 #include <opencv2/opencv.hpp>
 #include <boost/lexical_cast.hpp>
+#include <ios>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Local methods
@@ -75,6 +76,11 @@ int main(int argc, char* argv[])
   //title of plot window
   std::string window_title = GRABBER_NAME + ": " + boost::lexical_cast<std::string>(CHANNEL_0_DEVICE);
 
+  //--------------------------------------------------------------------------------------------------------------------
+  //main test
+  //--------------------------------------------------------------------------------------------------------------------
+  std::cout.setf(std::ios::fixed,std::ios::floatfield);
+  std::cout.precision(3);
 
   std::cout << "\n\nInteractive test of the CameraGrabber class\n";
   std::cout << "-------------------------------------------\n\n";

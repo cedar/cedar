@@ -367,13 +367,13 @@ bool cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
 } // onCreateGrabber()
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::NetGrabber::onUpdateSourceInfo(unsigned int channel)
+std::string cedar::dev::sensors::visual::NetGrabber::onUpdateSourceInfo(unsigned int channel)
 {
   // value of channel is already checked by GraberInterface::getSourceInfo()
   // TODO: perhaps it is possible to gather information of used yarp-server too
   std::string name = this->getName();
   std::string channel_name = getNetChannel(channel)->_mpYarpChannelName->getValue();
-  setChannelInfoString(channel, name + ": " + channel_name);
+  return name + ": " + channel_name;
 }
 
 //----------------------------------------------------------------------------------------------------

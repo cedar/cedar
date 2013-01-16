@@ -120,7 +120,7 @@ protected:
   bool onGrab();
   bool onCreateGrabber();
   void onCloseGrabber();
-  void onUpdateSourceInfo(unsigned int channel);
+  std::string onUpdateSourceInfo(unsigned int channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

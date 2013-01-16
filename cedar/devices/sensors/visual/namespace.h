@@ -92,6 +92,10 @@ namespace cedar
         CEDAR_DECLARE_DEV_CLASS(NetChannel);
 #endif // CEDAR_USE_YARP
 
+        // grabber class only for unit-test
+        CEDAR_DECLARE_DEV_CLASS(TestGrabber);
+        CEDAR_DECLARE_DEV_CLASS(TestChannel);
+
         //-----------------------------------------------------------------------------------------------
         // enum classes
         //-----------------------------------------------------------------------------------------------
@@ -104,8 +108,6 @@ namespace cedar
         typedef cedar::aux::ObjectListParameterTemplate<GrabberChannel> ChannelParameter;
         CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ChannelParameter);
 
-        // grabber class only for unit-test
-        CEDAR_DECLARE_DEV_CLASS(TestGrabber);
 
 
         //-----------------------------------------------------------------------------------------------

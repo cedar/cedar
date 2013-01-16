@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,84 +22,60 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GrabbableGrabber.h
+    File:        GrabberChannel.h
 
-    Maintainer:  Georg.Hartinger
+    Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
-    Date:        2012 04 23
+    Date:        2012 09 28
 
-    Description: Header for the @em @em cedar::dev::sensors::visual::GrabbableGrabber class.
+    Description: Class GrabberChannel
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_GRABBABLE_GRABBER_H
-#define CEDAR_DEV_SENSORS_VISUAL_GRABBABLE_GRABBER_H
+#ifndef CEDAR_DEV_SENSORS_VISUAL_TEST_CHANNEL_H
+#define CEDAR_DEV_SENSORS_VISUAL_TEST_CHANNEL_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/Grabber.h"
-#include "cedar/devices/sensors/visual/GrabbableChannel.h"
-#include "cedar/auxiliaries/Grabbable.h"
-
+#include "cedar/devices/sensors/visual/namespace.h"
+#include "cedar/devices/sensors/visual/GrabberChannel.h"
+#include "cedar/auxiliaries/IntParameter.h"
 
 // SYSTEM INCLUDES
-#include <opencv2/opencv.hpp>
 
-/*! @brief A simple Grabber class for testing the Grabber interface
- *
- *  This grabber class is used to test the grabber interface. It
- *  creates a Grabber with a TestParam (default-value 123) and FPS set to 15
- *
- *  @remarks For grabber developers<br>
- *    This class can also be used as a template to create other classes derived from GrabberInstance
- *
- */
-class cedar::dev::sensors::visual::GrabbableGrabber
+
+
+//!@brief TestChannel contains additional data of a picture grabbing channel
+class cedar::dev::sensors::visual::TestChannel
 :
-public cedar::dev::sensors::visual::Grabber
+public cedar::dev::sensors::visual::GrabberChannel
 {
+  //!@brief friend class of TestGrabber for direct access to the members
+  friend class cedar::dev::sensors::visual::TestGrabber;
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
   //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-  /*! @brief  Constructor for a single channel grabber
-   *  @param grabberName  Name of the grabber
-   *  @param grabbable Class that implements the grabbable interface to grab from
-   */
-  GrabbableGrabber
-  (
-    cedar::aux::Grabbable* grabbable = NULL,
-    const std::string& grabberName = "GrabbableGrabber"
-  );
-
-  /*! @brief Constructor for a stereo channel grabber
-   *  @param grabberName  Name of the grabber
-   *  @param grabbable0 Class that implements the grabbable interface to grab from for channel 0
-   *  @param grabbable1 Class that implements the grabbable interface to grab from for channel 0
-   */
-  GrabbableGrabber
-  (
-    cedar::aux::Grabbable* grabbable0,
-    cedar::aux::Grabbable* grabbable1,
-    const std::string& grabberName = "StereoGrabbableGrabber"
-  );
+  //!@brief The standard constructor.
+  TestChannel(const std::string& fileName = "")
+  :
+  cedar::dev::sensors::visual::GrabberChannel(),
+  _mSourceFileName(new cedar::aux::FileParameter(this, "filename", cedar::aux::FileParameter::READ, fileName))
+  {
+  };
 
   //!@brief Destructor
-  ~GrabbableGrabber();
+  virtual ~TestChannel()
+  {
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -111,36 +87,13 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-  // inherited from Grabber
-  void onCleanUp();
-  bool onGrab();
-  bool onCreateGrabber();
-  void onCloseGrabber();
-  std::string onUpdateSourceInfo(unsigned int channel);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-
-  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class InterfaceChannelPtr
-  inline GrabbableChannelPtr getGrabbableChannel(unsigned int channel)
-  {
-    return boost::static_pointer_cast<GrabbableChannel>
-           (
-             cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
-           );
-  }
-
-  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class InterfaceChannellPtr
-  inline ConstGrabbableChannelPtr getGrabbableChannel(unsigned int channel) const
-  {
-    return boost::static_pointer_cast<const GrabbableChannel>
-       (
-         cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
-       );
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -150,16 +103,18 @@ protected:
 private:
   // none yet
 
-
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief The test parameter
+  cedar::aux::FileParameterPtr _mSourceFileName;
 
 private:
   // none yet
 
-}; // class cedar::dev::sensors::visual::GrabbableGrabber
+}; // class cedar::dev::sensors::visual::TestChannel
 
-#endif // CEDAR_DEV_SENSORS_VISUAL_GRABBABLE_GRABBER_H
+#endif // CEDAR_DEV_SENSORS_VISUAL_TEST_CHANNEL_H
+
+

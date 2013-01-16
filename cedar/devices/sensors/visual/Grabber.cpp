@@ -316,7 +316,8 @@ bool cedar::dev::sensors::visual::Grabber::applyParameter()
     mCaptureDeviceCreated = true;
     for (unsigned int channel = 0; channel < getNumCams(); ++channel)
     {
-      onUpdateSourceInfo(channel);
+      std::string channelinfo = onUpdateSourceInfo(channel);
+      setChannelInfoString(channel,channelinfo);
     }
   }
   else

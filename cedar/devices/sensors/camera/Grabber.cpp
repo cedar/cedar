@@ -476,7 +476,7 @@ bool cedar::dev::sensors::camera::Grabber::onGrab()
 
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::camera::Grabber::onUpdateSourceInfo(unsigned int channel)
+std::string cedar::dev::sensors::camera::Grabber::onUpdateSourceInfo(unsigned int channel)
 {
   std::stringstream ss;
 
@@ -493,7 +493,7 @@ void cedar::dev::sensors::camera::Grabber::onUpdateSourceInfo(unsigned int chann
   ss << getCameraChannel(channel)->getCameraId()
      << "; Mode: " << VideoMode::type().get(this->getCameraVideoMode(channel)).prettyString();
 
-  setChannelInfoString(channel, ss.str());
+  return ss.str();
 }
 
 //----------------------------------------------------------------------------------------------------
