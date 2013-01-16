@@ -379,7 +379,7 @@ void cedar::dev::sensors::visual::VideoGrabber::onUpdateSourceInfo(unsigned int 
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::VideoGrabber::setSpeedFactor(double speedFactor)
 {
-   _mSpeedFactor->setValue(speedFactor);
+  _mSpeedFactor->setValue(speedFactor);
 }
 
 //----------------------------------------------------------------------------------------------------

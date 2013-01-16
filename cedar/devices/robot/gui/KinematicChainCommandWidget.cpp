@@ -58,7 +58,8 @@ cedar::dev::robot::gui::KinematicChainCommandWidget::KinematicChainCommandWidget
 )
 :
 QWidget(parent, f),
-mpKinematicChain(kinematicChain)
+mpKinematicChain(kinematicChain),
+mTimerId(0)
 {
   initWindow();
 }
