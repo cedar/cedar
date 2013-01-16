@@ -50,9 +50,45 @@
 
 // (re)defines of our new introduced properties in OpenCV:
 // for compatibility with OpenCV prior 2.4.0
-#define CV_CAP_PROP_ZOOM 27
-#define CV_CAP_PROP_FOCUS 28
-#define CV_CAP_PROP_GUID 29
+#ifndef CV_CAP_PROP_ZOOM
+  #define CV_CAP_PROP_ZOOM 27
+#endif // CV_CAP_PROP_ZOOM
+
+#ifndef CV_CAP_PROP_FOCUS
+  #define CV_CAP_PROP_FOCUS 28
+#endif // CV_CAP_PROP_FOCUS
+
+#ifndef CV_CAP_PROP_GUID
+  #define CV_CAP_PROP_GUID 29
+#endif // CV_CAP_PROP_GUID
+
+#ifndef CV_CAP_PROP_TEMPERATURE
+  #define CV_CAP_PROP_TEMPERATURE 23
+#endif // CV_CAP_PROP_TEMPERATURE
+
+#ifndef CV_CAP_PROP_WHITE_BALANCE_RED_V
+  #define CV_CAP_PROP_WHITE_BALANCE_RED_V 26
+#endif // CV_CAP_PROP_WHITE_BALANCE_RED_V
+
+#ifndef CV_CAP_PROP_WHITE_BALANCE_BLUE_U
+  #define CV_CAP_PROP_WHITE_BALANCE_BLUE_U 17
+#endif // CV_CAP_PROP_WHITE_BALANCE_BLUE_U
+
+#ifndef CV_CAP_PROP_SHARPNESS
+  #define CV_CAP_PROP_SHARPNESS 20
+#endif // CV_CAP_PROP_SHARPNESS
+
+#ifndef CV_CAP_PROP_AUTO_EXPOSURE
+  #define CV_CAP_PROP_AUTO_EXPOSURE 21
+#endif // CV_CAP_PROP_AUTO_EXPOSURE
+
+#ifndef CV_CAP_PROP_GAMMA
+  #define CV_CAP_PROP_GAMMA 22
+#endif // CV_CAP_PROP_GAMMA
+
+#ifndef CV_CAP_PROP_DC1394_MODE_AUTO
+  #define CV_CAP_PROP_DC1394_MODE_AUTO 0
+#endif // CV_CAP_PROP_DC1394_MODE_AUTO
 
 //return value, if a property is not supported from the actual device
 //have to be larger than the highest value of the properties!
