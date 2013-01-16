@@ -572,7 +572,7 @@ protected:
    *
    *  @param channel The channel which should be updated
    */
-  virtual void onUpdateSourceInfo(unsigned int channel)=0;
+  virtual void onUpdateSourceInfo(unsigned int channel) = 0;
 
   //! Get the Pointer to the SnapshotName Element
   //cedar::aux::FileParameterPtr getSnapshotNameParamter();
@@ -589,7 +589,6 @@ protected:
    */
   cv::Mat& getImageMat(unsigned int channel);
 
-
   /*! @brief Updates the info string of the given channel
    *
    * Call this method in the derived class in the method onUpdateSourceInfo()
@@ -600,8 +599,6 @@ protected:
    */
   void setChannelInfoString(unsigned int channel, std::string info);
 
-
-
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -611,7 +608,6 @@ private:
    *  @param grabberChannels A vector with all channels you want to initialize
    */
   void init(std::vector<cedar::dev::sensors::visual::GrabberChannelPtr> grabberChannels);
-
 
   /*! @brief Callback function to respond to a captured CTRL-C event
    *

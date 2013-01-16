@@ -183,7 +183,6 @@ namespace cedar
     //!@brief A concretization of DataTemplate for simple points (cv::Point).
     typedef DataTemplate<cv::Point> CvPointData;
 
-
     //!@brief A concretization of DataTemplate for a set of simple matrices (std::vector<cv::Mat>).
     typedef DataTemplate<std::vector<cv::Mat> > ImageSetData;
 

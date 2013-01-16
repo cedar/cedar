@@ -50,12 +50,13 @@
 cedar::dev::robot::gui::KinematicChainMonitorWidget::KinematicChainMonitorWidget
 (
   cedar::dev::robot::KinematicChainPtr kinematicChain,
-  QWidget * parent,
+  QWidget* parent,
   Qt::WindowFlags f
 )
 :
 QWidget(parent, f),
-mpKinematicChain(kinematicChain)
+mpKinematicChain(kinematicChain),
+mTimerId(0)
 {
   mDecimals = 6;
 
