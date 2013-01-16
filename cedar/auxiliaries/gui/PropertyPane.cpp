@@ -189,7 +189,7 @@ std::string cedar::aux::gui::PropertyPane::getInstanceTypeId(cedar::aux::Configu
 
 void cedar::aux::gui::PropertyPane::display(cedar::aux::ConfigurablePtr pConfigurable)
 {
-  this->resetContents();
+  this->resetPointer();
 
   this->mDisplayedConfigurable = pConfigurable;
 

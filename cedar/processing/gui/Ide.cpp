@@ -377,6 +377,7 @@ void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
   this->mpProcessingDrawer->getScene()->setNetwork(network);
   this->mpProcessingDrawer->getScene()->reset();
   this->mNetwork->addElementsToScene();
+  this->mpPropertyTable->resetPointer();
 }
 
 void cedar::proc::gui::Ide::architectureToolFinished()
