@@ -230,7 +230,7 @@ protected:
   // inherited from Grabber
   bool onCreateGrabber();
   void onCloseGrabber();
-  void onUpdateSourceInfo(unsigned int channel);
+  std::string onUpdateSourceInfo(unsigned int channel);
   void onCleanUp();
 
   /*! @brief Grab on all available files

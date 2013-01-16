@@ -311,7 +311,7 @@ const std::string cedar::dev::sensors::visual::PictureGrabber::getSourceFile(uns
 
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::PictureGrabber::onUpdateSourceInfo(unsigned int channel)
+std::string cedar::dev::sensors::visual::PictureGrabber::onUpdateSourceInfo(unsigned int channel)
 {
-  setChannelInfoString(channel,getPictureChannel(channel)->_mSourceFileName->getPath());
+  return getPictureChannel(channel)->_mSourceFileName->getPath();
 }

@@ -22,6 +22,7 @@
 #include <QtGui/QApplication>
 #include <opencv2/opencv.hpp>
 #include <boost/lexical_cast.hpp>
+#include <ios>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Local methods
@@ -52,6 +53,9 @@ int main(int , char **)
   const std::string  GRABBER_NAME_0 = "Net_Grabber_TestCase";
   const std::string  CONFIG_FILE_NAME_0 = "net_grabber_testcase.config";
 
+
+  std::cout.setf(std::ios::fixed,std::ios::floatfield);
+  std::cout.precision(3);
 
   //title of highgui window
   std::string highgui_window_name_0 = GRABBER_NAME_0 + ": " + YARP_CHANNEL_0;
@@ -208,7 +212,7 @@ int main(int , char **)
   //recording will also be stopped
   if (net_grabber->isRunning())
   {
-    net_grabber->stop();
+    net_grabber->stopGrabber();
   }
 
   if (net_grabber)
