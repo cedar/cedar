@@ -41,6 +41,7 @@
 #include "cedar/devices/robot/KinematicChain.h"
 #include "tests/unit/devices/robot/KinematicChain/TestKinematicChain.h"
 #include "cedar/auxiliaries/math/constants.h"
+#include "cedar/auxiliaries/systemFunctions.h"
 
 // SYSTEM INCLUDES
 CEDAR_GENERATE_POINTER_TYPES(TestKinematicChain);
@@ -53,9 +54,12 @@ int main()
   // create instance of test class
   TestKinematicChainPtr test_arm(new TestKinematicChain());
   TestKinematicChainPtr acceleration_test_arm(new TestKinematicChain());
-  std::cout << "reading configuration from test_arm->json" << std::endl;
+  TestKinematicChainPtr complex_test_arm(new TestKinematicChain());
   test_arm->readJson("test_arm.json");
   acceleration_test_arm->readJson("acceleration_test_arm.json");
+  std::string complex_test_arm_configuration_file = cedar::aux::locateResource("configs/complex_test_arm.json");
+  complex_test_arm->readJson(complex_test_arm_configuration_file);
+
   
   //--------------------------------------------------------------------------------------------------------------------
   // check configuration
@@ -402,94 +406,95 @@ int main()
   //--------------------------------------------------------------------------------------------------------------------
   // temporal derivative of spatial Jacobian
   //--------------------------------------------------------------------------------------------------------------------
-  std::cout << "test: calculateSpatialJacobianTemporalDerivative" << std::endl;
-  cv::Mat spatial_jacobian_dot
-    = acceleration_test_arm->calculateSpatialJacobianTemporalDerivative(acceleration_test_arm->getNumberOfJoints() - 1);
-  if (
-      !IsZero(spatial_jacobian_dot.at<double>(0, 0) - 0)
-      || !IsZero(spatial_jacobian_dot.at<double>(1, 0) - 0)
-      || !IsZero(spatial_jacobian_dot.at<double>(2, 0) - 0)
-      || !IsZero(spatial_jacobian_dot.at<double>(3, 0) - 0)
-      || !IsZero(spatial_jacobian_dot.at<double>(4, 0) - 0)
-      || !IsZero(spatial_jacobian_dot.at<double>(5, 0) - 0)
-      || !IsZero(spatial_jacobian_dot.at<double>(0, 1) - 0)
-      || !IsZero(spatial_jacobian_dot.at<double>(1, 1) - -sin(0.1)*1.1)
-      || !IsZero(spatial_jacobian_dot.at<double>(2, 1) - cos(0.1)*1.1)
-      || !IsZero(spatial_jacobian_dot.at<double>(3, 1) - 0)
-      || !IsZero(spatial_jacobian_dot.at<double>(4, 1) - 0)
-      || !IsZero(spatial_jacobian_dot.at<double>(5, 1) - 0)
-     )
-  {
-    errors++;
-    std::cout << "ERROR with calculateSpatialJacobianTemporalDerivative()" << std::endl;
-  }
+//  std::cout << "test: calculateSpatialJacobianTemporalDerivative" << std::endl;
+  cv::Mat spatial_jacobian_dot;
+//  spatial_jacobian_dot =
+//    acceleration_test_arm->calculateSpatialJacobianTemporalDerivative(acceleration_test_arm->getNumberOfJoints() - 1);
+//  if (
+//      !IsZero(spatial_jacobian_dot.at<double>(0, 0) - 0)
+//      || !IsZero(spatial_jacobian_dot.at<double>(1, 0) - 0)
+//      || !IsZero(spatial_jacobian_dot.at<double>(2, 0) - 0)
+//      || !IsZero(spatial_jacobian_dot.at<double>(3, 0) - 0)
+//      || !IsZero(spatial_jacobian_dot.at<double>(4, 0) - 0)
+//      || !IsZero(spatial_jacobian_dot.at<double>(5, 0) - 0)
+//      || !IsZero(spatial_jacobian_dot.at<double>(0, 1) - 0)
+//      || !IsZero(spatial_jacobian_dot.at<double>(1, 1) - -sin(0.1)*1.1)
+//      || !IsZero(spatial_jacobian_dot.at<double>(2, 1) - cos(0.1)*1.1)
+//      || !IsZero(spatial_jacobian_dot.at<double>(3, 1) - 0)
+//      || !IsZero(spatial_jacobian_dot.at<double>(4, 1) - 0)
+//      || !IsZero(spatial_jacobian_dot.at<double>(5, 1) - 0)
+//     )
+//  {
+//    errors++;
+//    std::cout << "ERROR with calculateSpatialJacobianTemporalDerivative()" << std::endl;
+//  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // acceleration
   //--------------------------------------------------------------------------------------------------------------------
-  std::cout << "test: calculateAcceleration" << std::endl;
-  cv::Mat a0
-    = acceleration_test_arm->calculateAcceleration(p, 0, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  cv::Mat a1
-    = acceleration_test_arm->calculateAcceleration(p, 1, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  double s0 = sin(acceleration_test_arm->getJointAngle(0));
-  double c0 = cos(acceleration_test_arm->getJointAngle(0));
-  double s01 = sin(acceleration_test_arm->getJointAngle(0) + acceleration_test_arm->getJointAngle(1));
-  double c01 = cos(acceleration_test_arm->getJointAngle(0) + acceleration_test_arm->getJointAngle(1));
-  double dot_theta_0 = acceleration_test_arm->getJointVelocity(0);
-  double dot_theta_1 = acceleration_test_arm->getJointVelocity(1);
-  double dot_theta_01 = dot_theta_0 + dot_theta_1;
-  double ddot_theta_0 = acceleration_test_arm->getJointAcceleration(0);
-  double ddot_theta_1 = acceleration_test_arm->getJointAcceleration(1);
-  double ddot_theta_01 = ddot_theta_0 + ddot_theta_1;
-  double a0_1 = s0*dot_theta_0*dot_theta_0
-                - c0*ddot_theta_0;
-  double a0_2 = - c0*dot_theta_0*dot_theta_0
-                - s0*ddot_theta_0;
-  double a1_1 = s0*dot_theta_0*dot_theta_0
-                + s01*dot_theta_01*dot_theta_01
-                - c0*ddot_theta_0
-                - c01*ddot_theta_01;
-  double a1_2 = - c0*dot_theta_0*dot_theta_0
-                - c01*dot_theta_01*dot_theta_01
-                - s0*ddot_theta_0
-                - s01*ddot_theta_01;
-  if (
-      !IsZero(a0.at<double>(0, 0) - 0)
-      || !IsZero(a0.at<double>(1, 0) - a0_1)
-      || !IsZero(a0.at<double>(2, 0) - a0_2)
-      || !IsZero(a1.at<double>(0, 0) - 0)
-      || !IsZero(a1.at<double>(1, 0) - a1_1)
-      || !IsZero(a1.at<double>(2, 0) - a1_2)
-     )
-  {
-    errors++;
-    std::cout << "ERROR with calculateAcceleration()" << std::endl;
-  }
+//  std::cout << "test: calculateAcceleration" << std::endl;
+//  cv::Mat a0
+//    = acceleration_test_arm->calculateAcceleration(p, 0, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
+//  cv::Mat a1
+//    = acceleration_test_arm->calculateAcceleration(p, 1, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
+//  double s0 = sin(acceleration_test_arm->getJointAngle(0));
+//  double c0 = cos(acceleration_test_arm->getJointAngle(0));
+//  double s01 = sin(acceleration_test_arm->getJointAngle(0) + acceleration_test_arm->getJointAngle(1));
+//  double c01 = cos(acceleration_test_arm->getJointAngle(0) + acceleration_test_arm->getJointAngle(1));
+//  double dot_theta_0 = acceleration_test_arm->getJointVelocity(0);
+//  double dot_theta_1 = acceleration_test_arm->getJointVelocity(1);
+//  double dot_theta_01 = dot_theta_0 + dot_theta_1;
+//  double ddot_theta_0 = acceleration_test_arm->getJointAcceleration(0);
+//  double ddot_theta_1 = acceleration_test_arm->getJointAcceleration(1);
+//  double ddot_theta_01 = ddot_theta_0 + ddot_theta_1;
+//  double a0_1 = s0*dot_theta_0*dot_theta_0
+//                - c0*ddot_theta_0;
+//  double a0_2 = - c0*dot_theta_0*dot_theta_0
+//                - s0*ddot_theta_0;
+//  double a1_1 = s0*dot_theta_0*dot_theta_0
+//                + s01*dot_theta_01*dot_theta_01
+//                - c0*ddot_theta_0
+//                - c01*ddot_theta_01;
+//  double a1_2 = - c0*dot_theta_0*dot_theta_0
+//                - c01*dot_theta_01*dot_theta_01
+//                - s0*ddot_theta_0
+//                - s01*ddot_theta_01;
+//  if (
+//      !IsZero(a0.at<double>(0, 0) - 0)
+//      || !IsZero(a0.at<double>(1, 0) - a0_1)
+//      || !IsZero(a0.at<double>(2, 0) - a0_2)
+//      || !IsZero(a1.at<double>(0, 0) - 0)
+//      || !IsZero(a1.at<double>(1, 0) - a1_1)
+//      || !IsZero(a1.at<double>(2, 0) - a1_2)
+//     )
+//  {
+//    errors++;
+//    std::cout << "ERROR with calculateAcceleration()" << std::endl;
+//  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // temporal derivative of Cartesian Jacobian
   //--------------------------------------------------------------------------------------------------------------------
-  std::cout << "test: calculateCartesianJacobianTemporalDerivative" << std::endl;
-  cv::Mat tool = acceleration_test_arm->calculateEndEffectorPosition();
-  cv::Mat cartesian_jacobian_dot = acceleration_test_arm->calculateCartesianJacobianTemporalDerivative
-  (
-    tool,
-    acceleration_test_arm->getNumberOfJoints()-1,
-    cedar::dev::robot::KinematicChain::WORLD_COORDINATES
-  );
-  if (
-      !IsZero(cartesian_jacobian_dot.at<double>(0, 0) - 0)
-      || !IsZero(cartesian_jacobian_dot.at<double>(1, 0) - (s0*dot_theta_0 + s01*dot_theta_01))
-      || !IsZero(cartesian_jacobian_dot.at<double>(2, 0) - (-c0*dot_theta_0 - c01*dot_theta_01))
-      || !IsZero(cartesian_jacobian_dot.at<double>(0, 1) - 0)
-      || !IsZero(cartesian_jacobian_dot.at<double>(1, 1) - s01*dot_theta_01)
-      || !IsZero(cartesian_jacobian_dot.at<double>(2, 1) - -c01*dot_theta_01)
-     )
-  {
-    errors++;
-    std::cout << "ERROR with calculateCartesianJacobianTemporalDerivative()" << std::endl;
-  }
+//  std::cout << "test: calculateCartesianJacobianTemporalDerivative" << std::endl;
+//  cv::Mat tool = acceleration_test_arm->calculateEndEffectorPosition();
+//  cv::Mat cartesian_jacobian_dot = acceleration_test_arm->calculateCartesianJacobianTemporalDerivative
+//  (
+//    tool,
+//    acceleration_test_arm->getNumberOfJoints()-1,
+//    cedar::dev::robot::KinematicChain::WORLD_COORDINATES
+//  );
+//  if (
+//      !IsZero(cartesian_jacobian_dot.at<double>(0, 0) - 0)
+//      || !IsZero(cartesian_jacobian_dot.at<double>(1, 0) - (s0*dot_theta_0 + s01*dot_theta_01))
+//      || !IsZero(cartesian_jacobian_dot.at<double>(2, 0) - (-c0*dot_theta_0 - c01*dot_theta_01))
+//      || !IsZero(cartesian_jacobian_dot.at<double>(0, 1) - 0)
+//      || !IsZero(cartesian_jacobian_dot.at<double>(1, 1) - s01*dot_theta_01)
+//      || !IsZero(cartesian_jacobian_dot.at<double>(2, 1) - -c01*dot_theta_01)
+//     )
+//  {
+//    errors++;
+//    std::cout << "ERROR with calculateCartesianJacobianTemporalDerivative()" << std::endl;
+//  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // end-effector position
@@ -577,17 +582,95 @@ int main()
   //--------------------------------------------------------------------------------------------------------------------
   // end-effector acceleration
   //--------------------------------------------------------------------------------------------------------------------
-  std::cout << "test: calculateEndEffectorAcceleration" << std::endl;
-  cv::Mat a2 = acceleration_test_arm->calculateEndEffectorAcceleration();
-  if (
-      !IsZero(a2.at<double>(0, 0) - 0)
-      || !IsZero(a2.at<double>(1, 0) - a1_1)
-      || !IsZero(a2.at<double>(2, 0) - a1_2)
-     )
+//  std::cout << "test: calculateEndEffectorAcceleration" << std::endl;
+//  cv::Mat a2 = acceleration_test_arm->calculateEndEffectorAcceleration();
+//  if (
+//      !IsZero(a2.at<double>(0, 0) - 0)
+//      || !IsZero(a2.at<double>(1, 0) - a1_1)
+//      || !IsZero(a2.at<double>(2, 0) - a1_2)
+//     )
+//  {
+//    errors++;
+//    std::cout << "ERROR with calculateEndEffectorAcceleration()" << std::endl;
+//  }
+
+
+
+
+
+
+
+
+
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // temporal derivative of spatial Jacobian
+  //--------------------------------------------------------------------------------------------------------------------
+  std::cout << "test: calculateSpatialJacobianTemporalDerivative" << std::endl;
+//  complex_test_arm->setJointAngle(0, 0.23123);
+//  complex_test_arm->setJointAngle(1, 0.58234);
+//  complex_test_arm->setJointAngle(2, 0.62716);
+//  complex_test_arm->setJointAngle(3, 0.617321);
+//  complex_test_arm->setJointVelocity(0, 0.615414);
+//  complex_test_arm->setJointVelocity(1, 0.875416);
+//  complex_test_arm->setJointVelocity(2, 0.987231);
+//  complex_test_arm->setJointVelocity(3, 0.234654);
+//  complex_test_arm->setJointAcceleration(0, 0.876);
+//  complex_test_arm->setJointAcceleration(1, 0.154);
+//  complex_test_arm->setJointAcceleration(2, 0.892);
+//  complex_test_arm->setJointAcceleration(3, 0.354);
+  complex_test_arm->setJointAngle(0, M_PI/2);
+  complex_test_arm->setJointAngle(1, M_PI/2);
+  complex_test_arm->setJointAngle(2, 0.0);
+  complex_test_arm->setJointAngle(3, -M_PI/2);
+  complex_test_arm->setJointVelocity(0, 0.4);
+  complex_test_arm->setJointVelocity(1, 0.6);
+  complex_test_arm->setJointVelocity(2, 0.2);
+  complex_test_arm->setJointVelocity(3, 0.4);
+  complex_test_arm->setJointAcceleration(0, 3);
+  complex_test_arm->setJointAcceleration(1, 2);
+  complex_test_arm->setJointAcceleration(2, 1);
+  complex_test_arm->setJointAcceleration(3, 3);
+  complex_test_arm->updateTransformations();
+  spatial_jacobian
+    = complex_test_arm->calculateSpatialJacobian(complex_test_arm->getNumberOfJoints() - 1);
+  spatial_jacobian_dot
+    = complex_test_arm->calculateSpatialJacobianTemporalDerivative(complex_test_arm->getNumberOfJoints() - 1);
+  // approximate Jacobian with finite difference method
+  double delta_t = 0.000000001;
+  complex_test_arm->setJointAngles
+  (
+    complex_test_arm->getJointAnglesMatrix()
+    + delta_t*complex_test_arm->getJointVelocitiesMatrix()
+    + delta_t*delta_t*complex_test_arm->getJointAccelerationsMatrix()
+  );
+  complex_test_arm->setJointVelocities
+  (
+    complex_test_arm->getJointVelocitiesMatrix()
+    + delta_t*complex_test_arm->getJointAccelerationsMatrix()
+  );
+  complex_test_arm->updateTransformations();
+  cv::Mat spatial_jacobian_new
+    = complex_test_arm->calculateSpatialJacobian(complex_test_arm->getNumberOfJoints() - 1);
+  cv::Mat spatial_jacobian_dot_numeric = (spatial_jacobian_new - spatial_jacobian) * 1 / delta_t;
+
+  if (norm(spatial_jacobian_dot - spatial_jacobian_dot_numeric)/(spatial_jacobian_dot.cols*6) > 1e-07)
   {
     errors++;
-    std::cout << "ERROR with calculateEndEffectorAcceleration()" << std::endl;
+    std::cout << "ERROR with calculateSpatialJacobianTemporalDerivative(...)" << std::endl;
+    std::cout << "temporal derivative of spatial Jacobian, analytic" << std::endl;
+    cedar::aux::math::write(spatial_jacobian_dot);
+    std::cout << "temporal derivative of spatial Jacobian, numeric" << std::endl;
+    cedar::aux::math::write(spatial_jacobian_dot_numeric);
+    std::cout << "norm(spatial_jacobian_dot - spatial_jacobian_dot_numeric)/(spatial_jacobian_dot.cols*6) = "
+              << norm(spatial_jacobian_dot - spatial_jacobian_dot_numeric)/(spatial_jacobian_dot.cols*6) << std::endl;
   }
+
+
+
+//--------------------------------------------------------------------------------------------------------------------
+// end of test function
+//--------------------------------------------------------------------------------------------------------------------
 
   std::cout << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
