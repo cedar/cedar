@@ -63,7 +63,9 @@
 // static members
 //----------------------------------------------------------------------------------------------------------------------
 
+#ifdef CEDAR_OS_UNIX
 std::string cedar::proc::PluginProxy::mPluginBeingLoaded = "";
+#endif // CEDAR_OS_UNIX
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -180,6 +182,7 @@ std::string cedar::proc::PluginProxy::findPluginFile(const std::string& file) co
   return "";
 }
 
+#ifdef CEDAR_OS_UNIX
 void cedar::proc::PluginProxy::abortHandler(int)
 {
   std::cout
@@ -192,6 +195,7 @@ void cedar::proc::PluginProxy::abortHandler(int)
       << "try to recompile the affected plugins." << std::endl;
   exit(-2);
 }
+#endif // CEDAR_OS_UNIX
 
 void cedar::proc::PluginProxy::load(const std::string& file)
 {
