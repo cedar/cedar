@@ -47,7 +47,7 @@ namespace
   void showUsage(std::string programName)
   {
     std::cout << "\n\nInteractive test for the PictureGrabber class.\n\n"
-        << "Usage: \t" << programName << " <PictureFile> [<PictureFile2>]"
+        << "Usage: \t" << programName << " <PictureFile> [<PictureFile2>]\n"
         << std::endl;
   }
 }
@@ -188,7 +188,8 @@ int main(int argc, char* argv[])
   QApplication app(argc, argv);
   cedar::aux::gui::ImagePlotPtr p_plot = cedar::aux::gui::ImagePlotPtr(new cedar::aux::gui::ImagePlot());
   cedar::aux::MatDataPtr p_data = cedar::aux::MatDataPtr(new cedar::aux::MatData(frame0));
-  p_plot->plot(p_data,window_title);
+  p_plot->plot(p_data, window_title);
+  p_plot->setWindowTitle(QString::fromStdString(window_title));
   p_plot->show();
   p_plot->resize(frame0.cols,frame0.rows);
 
@@ -223,7 +224,7 @@ int main(int argc, char* argv[])
 
         frame0 = p_grabber->getImage();
         cedar::aux::MatDataPtr p_data = cedar::aux::MatDataPtr(new cedar::aux::MatData(frame0));
-        p_plot->plot(p_data,window_title);
+        p_plot->plot(p_data, window_title);
         p_plot->resize(frame0.cols,frame0.rows);
         std::cout << "Grab from \"" << p_grabber->getSourceInfo()<<"\"" << std::endl;
         cv::Size ch0_size = p_grabber->getSize(0);

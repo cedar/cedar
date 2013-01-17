@@ -294,7 +294,6 @@ bool cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::VideoGrabber::onCloseGrabber()
 {
-  this->stopRecording();
   unsigned int num_cams = getNumCams();
   for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
