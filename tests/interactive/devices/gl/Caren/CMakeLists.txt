@@ -24,9 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Georg Hartinger
-#   Email:       georg.hartinger@rub.de
-#   Date:        
+#   Maintainer:  Hendrik Reimann
+#   Email:       hendrik.reimann@ini.rub.de
+#   Date:        2012 12 20
 #
 #   Description:
 #
@@ -34,9 +34,4 @@
 #
 #=======================================================================================================================
 
-if (CEDAR_USE_YARP)
-  cedar_add_interactive_test( "NetGrabber" NetGrabberTest.cpp )
-  cedar_add_interactive_test( "StereoNetGrabber" StereoNetGrabberTest.cpp )
-  cedar_add_interactive_test( "NetTransmitter" NetTransmitter.cpp)
-endif()
-
+cedar_add_interactive_test("Caren" main.cpp)

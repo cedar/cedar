@@ -112,8 +112,9 @@ void cedar::dev::robot::KinematicChain::updateTransformations()
 
 void cedar::dev::robot::KinematicChain::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
-  cedar::aux::Configurable::readConfiguration(node);
+  cedar::aux::NamedConfigurable::readConfiguration(node);
   initializeFromJointList();
+  getRootCoordinateFrame()->setName(this->getName());
 }
 
 unsigned int cedar::dev::robot::KinematicChain::getNumberOfJoints() const
@@ -952,36 +953,117 @@ cv::Mat cedar::dev::robot::KinematicChain::calculateSpatialJacobianTemporalDeriv
   return J;
 }
 
-cv::Mat cedar::dev::robot::KinematicChain::calculateTwistTemporalDerivative(unsigned int j)
+cv::Mat cedar::dev::robot::KinematicChain::calculateTwistTemporalDerivative(unsigned int jointIndex)
 {
   // calculate transformation to (j-1)-th joint frame
   cv::Mat g = cv::Mat::zeros(4, 4, CV_64FC1);
   // g is a product of j-1 exponentials, so the temporal derivative is a sum with j-1 summands
-  for (unsigned int k = 0; k < j; k++)
+  for (unsigned int k = 0; k < jointIndex; k++)
   {
-    // for the k-th summand, we derive the k-th factor and leave the other ones
-    cv::Mat s_k = cv::Mat::eye(4, 4, CV_64FC1); // k-th summand
+    /*******************************************************************************************************************
+     * the k-th summand, deriving the factor with positive sign theta_k
+     ******************************************************************************************************************/
+    cv::Mat s_k = cv::Mat::eye(4, 4, CV_64FC1); // summand where the factor with the positive sign theta_k is derived
     // factors before the k-th
-    for (unsigned int i = 0; i < k; i++)
+    for (unsigned int j = 0; j < k; j++)
     {
-      // i-th factor stays the same for i < k
-      s_k = s_k * mTwistExponentials[i];
+      // j-th factor stays the same for j < k
+      s_k = s_k * mTwistExponentials[j];
+//      if((jointIndex == 2) && (k == 1))
+//      {
+//        std::cout << "joint index = " << jointIndex << ", k = " << k << std::endl;
+//        std::cout << "j = " << j << std::endl;
+//        std::cout << "s_k:" << std::endl;
+//        cedar::aux::math::write(s_k);
+//      }
+
     }
-    // the k-th factor of the k-th summand is derived by time
-    s_k = s_k * cedar::aux::math::wedgeTwist<double>(mReferenceJointTwists[k])
-              * mTwistExponentials[k]
-              * getJointVelocity(k);
+    // k-th factor is derived by time
+    s_k = s_k * cedar::aux::math::wedgeTwist<double>(mReferenceJointTwists[k]) * mTwistExponentials[k];
+
+//    if((jointIndex == 2) && (k == 1))
+//    {
+//      std::cout << "j = " << k << std::endl;
+//
+//      std::cout << "s_k:" << std::endl;
+//      cedar::aux::math::write(s_k);
+//      std::cout << "cedar::aux::math::wedgeTwist<double>(mReferenceJointTwists[k]):" << std::endl;
+//      cedar::aux::math::write(cedar::aux::math::wedgeTwist<double>(mReferenceJointTwists[k]));
+//      std::cout << "mTwistExponentials[k]:" << std::endl;
+//      cedar::aux::math::write(mTwistExponentials[k]);
+//    }
     // factors after the k-th
-    for (unsigned int i = k+1; i < j-1; i++)
+    for (unsigned int j = k+1; j < jointIndex; j++)
     {
-      // i-th factor stays the same for i > k
-      s_k = s_k * mTwistExponentials[i];
+      // j-th factor stays the same for j > k
+      s_k = s_k * mTwistExponentials[j];
+//      if((jointIndex == 2) && (k == 1))
+//      {
+//        std::cout << "j = " << j << std::endl;
+//        std::cout << "s_k:" << std::endl;
+//        cedar::aux::math::write(s_k);
+//      }
     }
+    s_k = s_k * cedar::aux::math::wedgeTwist<double>(mReferenceJointTwists[jointIndex])
+              * mProductsOfExponentials[jointIndex-1].inv();
+//    if((jointIndex == 2) && (k == 1))
+//    {
+//      std::cout << "final s_k:" << std::endl;
+//      cedar::aux::math::write(s_k);
+//    }
+    /*******************************************************************************************************************
+     * the (2*(j-1)-k)-th summand, deriving the factor with negative sign theta_k
+     ******************************************************************************************************************/
+    cv::Mat t_k; // summand where the factor with the negative sign theta_k is derived
+    t_k = mProductsOfExponentials[jointIndex-1]
+            * cedar::aux::math::wedgeTwist<double>(mReferenceJointTwists[jointIndex]);
+    // factors before the k-th
+    for (unsigned int j = jointIndex-1; j > k; j--)
+    {
+      // j-th factor stays the same for j > k
+      t_k = t_k * mTwistExponentials[j].inv();
+    }
+    // k-th factor is derived by time
+    t_k = t_k * cedar::aux::math::wedgeTwist<double>(mReferenceJointTwists[k]) * mTwistExponentials[k].inv();
+    // factors after the k-th
+    for (int j = k-1; j >= 0; j--)
+    {
+      // j-th factor stays the same for j < k
+      t_k = t_k * mTwistExponentials[j].inv();
+    }
+
+//    if((jointIndex == 2) && (k == 1))
+//    {
+//      std::cout << "final s_k:" << std::endl;
+//      cedar::aux::math::write(s_k);
+//      std::cout << "final t_k:" << std::endl;
+//      cedar::aux::math::write(t_k);
+//      std::cout << "g:" << std::endl;
+//      cedar::aux::math::write(g);
+//    }
     // add this summand to the sum
-    g = g + s_k;
+    g = g + getJointVelocity(k)*(s_k - t_k);
+
+//    std::cout << "joint index = " << jointIndex << ", summand " << k << std::endl;
+//    std::cout << "final s_k:" << std::endl;
+//    cedar::aux::math::write(s_k);
+//    std::cout << "final t_k:" << std::endl;
+//    cedar::aux::math::write(t_k);
+//    std::cout << "g:" << std::endl;
+//    cedar::aux::math::write(g);
   }
+
+//  std::cout << "twist exponentials:" << std::endl;
+//  for (unsigned int l = 0; l <= jointIndex; l++)
+//  {
+//    cedar::aux::math::write(mTwistExponentials[l]);
+//  }
+//  std::cout << "cedar::aux::math::veeTwist<double>(g):" << std::endl;
+//  cedar::aux::math::write(cedar::aux::math::veeTwist<double>(g));
+//  std::cout << "------------------------------------------------------" << std::endl;
+
   // adjoint of the calculated sum times the j-th twist is the derivative
-  return cedar::aux::math::rigidToAdjointTransformation<double>(g) * mReferenceJointTwists[j];
+  return cedar::aux::math::veeTwist<double>(g);
  }
 
 cv::Mat cedar::dev::robot::KinematicChain::calculateEndEffectorPosition()
