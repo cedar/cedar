@@ -70,7 +70,17 @@ public cedar::aux::Configurable
   Q_OBJECT
 
   protected slots:
+
+  /*!@brief This slot is used internally, to map propertyValueChanged signal from all handled Properties
+   *
+   *  The main purpuse is to raise the signal after a few checks "propertyValueChanged"
+   */
   void propertyValueSlot();
+
+  /*!@brief This slot is used internally, to map propertyModeChanged signal from all handled Properties
+   *
+   *  The main purpuse is to raise the signal "propertyModeChanged" after the calling property was determined
+   */
   void propertyModeSlot();
 
 signals:
@@ -116,14 +126,16 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  //enable the property, i.e. set constant
+  //! Enable the property, i.e. set constant
   void disable();
 
-  //disable the property
+  //! Disable the property
   void enable();
 
-  //! set the default value from backend initialization. This method is invoked from the createGrabber() method to set
-  //! the default backend value;
+  /*! Set the default value from backend initialization.
+   *
+   *  This method is invoked from the createGrabber() method to set the default backend value
+   */
   void setDefaultValue(double value);
 
   /// Get the id of the actual Property
@@ -133,29 +145,28 @@ public:
   /// Get the mode of operation of the used parameter
   cedar::dev::sensors::camera::PropertyMode::Id getMode();
 
-  /// Set the mode of operation
+  /*! @brief Set the mode of operation
+   *
+   * @param modeId The frame mode as enum parameter
+   */
   void setMode(cedar::dev::sensors::camera::PropertyMode::Id modeId);
-
-  // get the shared-pointer to the parameter
-  // cedar::aux::DoubleParameterPtr getParameter();
 
   ///! Get the value of the property
   double getValue();
 
-  ///! Set the value of the property
-  // @param value The new value to set
+  /*! @brief Set the value of the property
+   *  @param value The new value to set
+   */
   void setValue(double value);
 
   ///! Get the minimum possible value of the property
   double getMinValue();
 
   /*! \brief Get the maximum possible value that can be set of the given property
-   *  \param propId The id of the property
    */
   double getMaxValue();
 
   /*! \brief This method tells you, if the given property is supported by the used camera
-   *  \param propId The id of the  property
    */
   bool isSupported();
 
@@ -206,35 +217,44 @@ private:
 protected:
   // none yet
 private:
-  cedar::dev::sensors::camera::Property::Id mId;
-  std::string mName;
-  bool mSupported;
-  bool mAutoCapable;
-  bool mManualCapable;
-  // bool mOnOffCapable;
 
-  //! stores the default value from the camera initialization
+  /// The ID of the Property.
+  cedar::dev::sensors::camera::Property::Id mId;
+
+  /// The displayed name in the property pane of the processingIde
+  std::string mName;
+
+  /// A flag, if this property is supported by the used camera
+  bool mSupported;
+
+  /// A flag, to indicate if this property could be set to mode: auto
+  bool mAutoCapable;
+
+
+  /// A flag, to indicate if this property could be set to mode: manual
+  bool mManualCapable;
+
+  /// Stores the default value from the camera initialization
   double mDefaultValue;
 
-  //disable eventhandling for enum parameters during initialization and update
+  /// A Flag, to disable the event-handling for enum parameters during initialization and update
   bool doNotHandleEvents;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // the real value of the parameter from the camera
+
+  /// The real value of the parameter from the camera
   cedar::aux::DoubleParameterPtr mpPropertyValue;
 
-  // operational mode
+  /// The current set operational mode of the property
   cedar::aux::EnumParameterPtr mpPropertyMode;
 
 private:
   // none yet
 
 }; // class cedar::dev::sensors::visual::CamProperty
-
-// typedef cedar::aux::SetParameter<cedar::dev::sensors::visual::Property> CameraPropertiesSet;
 
 #endif // CEDAR_DEV_SENSORS_CAMERA_CAMPROPERTY_H
 

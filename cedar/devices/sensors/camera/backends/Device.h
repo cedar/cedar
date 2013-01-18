@@ -78,10 +78,15 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  //! does the backend initialization
+  //! Does the backend initialization
   virtual void initDevice();
 
-
+  /*! @brief Initialization of the class
+   *
+   *  This function have to be called after the class was created.
+   *
+   * @return True, if the cameras are successfully initialized, otherwise false.
+   */
   bool init();
 
   //--------------------------------------------------------------------------------------------------------------------

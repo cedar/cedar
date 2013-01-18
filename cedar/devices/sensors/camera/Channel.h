@@ -64,8 +64,8 @@
 #include <boost/enable_shared_from_this.hpp>
 
 
-/*! @struct Channel
- *  @brief Additional data of a camera channel
+/*! @brief Additional data of a camera channel
+ *
  */
 class cedar::dev::sensors::camera::Channel
 :
@@ -82,27 +82,28 @@ public cedar::dev::sensors::visual::GrabberChannel
 
 protected slots:
 
-//!@brief A slot that is triggered if a setting has changed
+  /*! @brief A slot that is triggered from the used parameters if a setting has changed
+   *
+   *  Internally, the settingsChanges() signal is emitted
+   */
   void settingChanged();
 
 
 signals:
 
-//!@brief This signal is emitted, when a setting has changed.
-// The CameraGrabber class have to create a new grabber with the new settings.
+  /*!@brief This signal is emitted, when a setting has changed.
+   *
+   * The CameraGrabber have to react on this signal, to recreate the backend with the new settings
+   */
   void settingsChanged();
 
-
-  //!@brief friend class of GLGrabber for direct access to the members
+  // friend classes of this channel for direct access to the members
   friend class cedar::dev::sensors::camera::Grabber;
-
   friend class cedar::dev::sensors::camera::Device;
   friend class cedar::dev::sensors::camera::DeviceCvVideoCapture;
 #ifdef CEDAR_USE_LIB_DC1394
   friend class cedar::dev::sensors::camera::DeviceDc1394;
 #endif // CEDAR_USE_LIB_DC1394
-
-
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -129,23 +130,75 @@ public:
   // bool setSetting(cedar::dev::sensors::camera::Setting::Id settingId, double value);
   // double getSetting(cedar::dev::sensors::camera::Setting::Id settingId);
 
+  /*! @brief Get the ID of the used Camera
+   *
+   * @return The id as unsigned int
+   */
   unsigned int getCameraId();
+
+  /// @brief Flag to indicate, if the grabber was created by using the GUID of the camera
   bool getByGuid();
 
+  /*! @brief Get the actual used video mode of the camera
+   *
+   * @return The used video mode as enum parameter
+   */
   cedar::dev::sensors::camera::VideoMode::Id getVideoMode();
+
+  /*! @brief Get the actual used framerate of the camera
+   *
+   * @return The used framerate as enum parameter
+   */
   cedar::dev::sensors::camera::FrameRate::Id getFPS();
 
 #ifdef CEDAR_USE_LIB_DC1394
+  /*! @brief Get the actual used ISO-speed of the Firewire-bus
+   *  @return The used ISO-speed as enum parameter
+   *  @remarks This method is only available, if cedar was built with firewire support
+   */
   cedar::dev::sensors::camera::IsoSpeed::Id getIsoSpeed();
+
+  /*! @brief Set the actual used ISO-speed of the Firewire-bus
+   *  @remarks This method is only available, if cedar was built with firewire support
+   */
   void setIsoSpeed( cedar::dev::sensors::camera::IsoSpeed::Id isoSpeed);
 #endif // CEDAR_USE_LIB_DC1394
 
+  /*! @brief Set the camera id.
+   * This will close the actual used camera, and the one with the given ID will be used
+   *
+   * @param CameraId The ID of the camera you want to use.
+   *    It depends on isGuid, if this value is used as unique Identifier or as the number on the bus.
+   * @param isGuid Flag that indicates, if CameraId is treated as bus-ID or as GUID
+   *
+   * @remarks
+   *    The GUID is only supported from the firewire (DC1394) backend
+   */
   void setCameraId(unsigned int CameraId, bool isGuid = false);
 
+  /*! @brief Set a new framemode.
+   *
+   *   The videomode determins the size of the grabbed images and the colorspace
+   *
+   * @param videoMode The wanted video mode as enum parameter id
+   */
   void setVideoMode(cedar::dev::sensors::camera::VideoMode::Id videoMode);
+
+  /*! @ brief Set a new grabbing framerate to the camera
+   *
+   *   It depends on the camera, if this function is supported.
+   *   Firewire cameras support different framerates out ot the box.
+   *
+   * @param fps The wanted framerate as enum parameter
+   */
   void setFPS(cedar::dev::sensors::camera::FrameRate::Id fps);
 
-  /// Change visible attributes to various parameters of the settings-part
+  /*! Set a new backendtype to the used channel.
+   *
+   * This will also change some visible attributes to various parameters in the processingIde
+   *
+   * @param backendType The wanted backend as enum parameter
+   */
   void setBackendType(cedar::dev::sensors::camera::BackendType::Id backendType);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -158,7 +211,11 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+
+  /// Method to all Videomodes related to DC1394 in the VideoMode enum parameter to disabled
   void hideFwVideoModes();
+
+  /// Method to create the wanted backend which depends on the Backend enum parameter
   void createBackend();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -184,6 +241,8 @@ protected:
 
 
 private:
+
+  /// The actual used backend for the camera
   cedar::dev::sensors::camera::BackendType::Id mBackendType;
   //unsigned int mCameraId;
 
@@ -198,39 +257,32 @@ protected:
   /// Set the the camera bayer pattern filter (if any is needed)
   cedar::aux::EnumParameterPtr _mpDecodeFilter;
 
-
-  /// Class for all settings
-//  cedar::dev::sensors::camera::SettingsPtr mpSettings;
-
   /// Class for all properties
   cedar::dev::sensors::camera::PropertiesPtr mpProperties;
 
 
-  /// create with guid or with bus id
+  /// Create with guid or with bus id
   cedar::aux::BoolParameterPtr _mpByGuid;
 
   /// Camera-ID. Either the Bus-ID or the GUID (depends on _mpByGuid)
   cedar::aux::UIntParameterPtr _mpCameraId;
 
-  /// framesize as mode
+  /// Framesize as mode
   cedar::aux::EnumParameterPtr _mpGrabMode;
 
-  /// framerate of grabbing
+  /// Framerate of grabbing
   cedar::aux::EnumParameterPtr _mpFPS;
 
 
 #ifdef CEDAR_USE_LIB_DC1394
-  /// the iso-speed of the firewire bus
+  /// The iso-speed of the firewire bus
   cedar::aux::EnumParameterPtr _mpIsoSpeed;
 #endif
-
-
 
 private:
   // none yet
 
 };
-
 
 #endif // CEDAR_DEV_SENSORS_CAMERA_CHANNEL_H
 

@@ -47,14 +47,23 @@
 // SYSTEM INCLUDES
 //#include <opencv2/highgui/highgui_c.h>
 
+/*! @brief The mode of a camera property
+ *
+ *  This class encapsulates the mode of a specific Property. The property itself could be set to auto or to manual.
+ *  By default, the backend sets the property-value to a default value. This state is mapped to the third possible
+ *  value: BackendDefault
+ *
+ */
 class cedar::dev::sensors::camera::PropertyMode
 {
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Typedef for the enum values
   typedef cedar::aux::EnumId Id;
 public:
+  //! Typedef for this enum as shared pointer
   typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -67,9 +76,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Construct
   static void construct();
 
+  //! Type
   static const cedar::aux::EnumBase& type();
+
+  //! Type Pointer
   static const cedar::dev::sensors::camera::PropertyMode::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -82,6 +95,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+
+  //! Storage
   static cedar::aux::EnumType<cedar::dev::sensors::camera::PropertyMode> mType;
 
   //--------------------------------------------------------------------------------------------------------------------
