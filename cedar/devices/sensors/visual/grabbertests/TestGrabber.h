@@ -73,7 +73,6 @@ public cedar::dev::sensors::visual::Grabber
 public:
 
   /*! @brief  Constructor for a single channel grabber
-   *  @param grabberName  Name of the grabber
    *  @param sourceFileName Filename to grab from (here only for demonstration and testing)
    */
   TestGrabber
@@ -82,7 +81,6 @@ public:
   );
 
   /*! @brief Constructor for a stereo channel grabber
-   *  @param grabberName  Name of the grabber
    *  @param sourceFileName0 Filename to grab from for channel 0 (here only for demonstration and testing)
    *  @param sourceFileName1 Filename to grab from for channel 1 (here only for demonstration and testing)
    */
