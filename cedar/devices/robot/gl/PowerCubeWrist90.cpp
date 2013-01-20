@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PowerCube110
+    File:        PowerCubeWrist90
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
     Date:        2010 12 14
 
-    Description: implementation for a class visualizing the PowerCube 110
+    Description: implementation for a class visualizing the PowerCubeWrist90
 
     Credits:
 
@@ -45,7 +45,7 @@
 #include "cedar/auxiliaries/gl/glu.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/devices/robot/gl/namespace.h"
-#include "cedar/devices/robot/gl/PowerCube110.h"
+#include "cedar/devices/robot/gl/PowerCubeWrist90.h"
 #include "cedar/devices/robot/KinematicChain.h"
 
 // SYSTEM INCLUDES
@@ -55,7 +55,7 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::robot::gl::PowerCube110::PowerCube110
+cedar::dev::robot::gl::PowerCubeWrist90::PowerCubeWrist90
 (
   cedar::dev::robot::KinematicChainPtr kinematicChain
 )
@@ -66,7 +66,7 @@ mpKinematicChain(kinematicChain)
   loadData();
 }
 
-cedar::dev::robot::gl::PowerCube110::~PowerCube110()
+cedar::dev::robot::gl::PowerCubeWrist90::~PowerCubeWrist90()
 {
 
 }
@@ -75,7 +75,7 @@ cedar::dev::robot::gl::PowerCube110::~PowerCube110()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::robot::gl::PowerCube110::initializeGl()
+void cedar::dev::robot::gl::PowerCubeWrist90::initializeGl()
 {
   //!@todo Implement this so that it works on windows
 #ifndef CEDAR_OS_WINDOWS
@@ -97,7 +97,25 @@ void cedar::dev::robot::gl::PowerCube110::initializeGl()
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mDistalLinkIndexVboId);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, mDistalLinkFacesNumber*3 * sizeof(GLushort), mDistalLinkIndex, GL_STATIC_DRAW);
 
-  // distal skin
+  // wrist link
+  glGenBuffers(1, &mWristLinkVertexVboId);
+  glBindBuffer(GL_ARRAY_BUFFER, mWristLinkVertexVboId);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mWristLinkVertexNumber, NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mWristLinkVertexNumber, mWristLinkVertex);
+  glGenBuffers(1, &mWristLinkIndexVboId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mWristLinkIndexVboId);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mWristLinkFacesNumber*3 * sizeof(GLushort), mWristLinkIndex, GL_STATIC_DRAW);
+
+  // box
+  glGenBuffers(1, &mBoxVertexVboId);
+  glBindBuffer(GL_ARRAY_BUFFER, mBoxVertexVboId);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mBoxVertexNumber, NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mBoxVertexNumber, mBoxVertex);
+  glGenBuffers(1, &mBoxIndexVboId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBoxIndexVboId);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mBoxFacesNumber*3 * sizeof(GLushort), mBoxIndex, GL_STATIC_DRAW);
+
+  // connector
   glGenBuffers(1, &mConnectorVertexVboId);
   glBindBuffer(GL_ARRAY_BUFFER, mConnectorVertexVboId);
   glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mConnectorVertexNumber, NULL, GL_STATIC_DRAW);
@@ -108,7 +126,7 @@ void cedar::dev::robot::gl::PowerCube110::initializeGl()
 #endif // ndef CEDAR_OS_WINDOWS
 }
 
-void cedar::dev::robot::gl::PowerCube110::draw()
+void cedar::dev::robot::gl::PowerCubeWrist90::draw()
 {
   setAxisLength(0);
   setResolution(20);
@@ -130,15 +148,18 @@ void cedar::dev::robot::gl::PowerCube110::draw()
     }
 
     // transform to make up for data file organization
-    glRotated(90, 1, 0, 0);
-    glTranslated(0, 0.1105, 0);
+//    glRotated(90, 1, 0, 0);
+//    glTranslated(0, 0.1105, 0);
 
     // draw
     setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     this->drawElement(mProximalLinkVertexVboId, mProximalLinkIndexVboId, mProximalLinkFacesNumber);
+    this->drawElement(mBoxVertexVboId, mBoxIndexVboId, mBoxFacesNumber);
     this->drawElement(mConnectorVertexVboId, mConnectorIndexVboId, mConnectorFacesNumber);
-    glRotated(mpKinematicChain->getJointAngle(0)*180.0/cedar::aux::math::pi, 0, 1, 0);
+    glRotated(mpKinematicChain->getJointAngle(0)*180.0/cedar::aux::math::pi, 1, 0, 0);
     this->drawElement(mDistalLinkVertexVboId, mDistalLinkIndexVboId, mDistalLinkFacesNumber);
+    glRotated(mpKinematicChain->getJointAngle(1)*180.0/cedar::aux::math::pi, 0, 1, 0);
+    this->drawElement(mWristLinkVertexVboId, mWristLinkIndexVboId, mWristLinkFacesNumber);
     setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
   }
 
@@ -156,30 +177,46 @@ void cedar::dev::robot::gl::PowerCube110::draw()
 
 
 
-void cedar::dev::robot::gl::PowerCube110::loadData()
+void cedar::dev::robot::gl::PowerCubeWrist90::loadData()
 {
   // proximal link
   QString proximal_link_vertex_data_file_name
-    = QString(cedar::aux::locateResource("meshes/PowerCube110/proximal_link_vertex.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/PowerCubeWrist90/proximal_link_vertex.txt").c_str());
   loadVertexData(proximal_link_vertex_data_file_name, mProximalLinkVertexNumber, mProximalLinkVertex);
   QString proximal_link_index_data_file_name
-    = QString(cedar::aux::locateResource("meshes/PowerCube110/proximal_link_index.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/PowerCubeWrist90/proximal_link_index.txt").c_str());
   loadIndexData(proximal_link_index_data_file_name, mProximalLinkFacesNumber, mProximalLinkIndex);
 
   // distal link
   QString distal_link_vertex_data_file_name
-    = QString(cedar::aux::locateResource("meshes/PowerCube110/distal_link_vertex.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/PowerCubeWrist90/distal_link_vertex.txt").c_str());
   loadVertexData(distal_link_vertex_data_file_name, mDistalLinkVertexNumber, mDistalLinkVertex);
   QString distal_link_index_data_file_name
-    = QString(cedar::aux::locateResource("meshes/PowerCube110/distal_link_index.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/PowerCubeWrist90/distal_link_index.txt").c_str());
   loadIndexData(distal_link_index_data_file_name, mDistalLinkFacesNumber, mDistalLinkIndex);
+
+  // wrist link
+  QString wrist_link_vertex_data_file_name
+    = QString(cedar::aux::locateResource("meshes/PowerCubeWrist90/wrist_link_vertex.txt").c_str());
+  loadVertexData(wrist_link_vertex_data_file_name, mWristLinkVertexNumber, mWristLinkVertex);
+  QString wrist_link_index_data_file_name
+    = QString(cedar::aux::locateResource("meshes/PowerCubeWrist90/wrist_link_index.txt").c_str());
+  loadIndexData(wrist_link_index_data_file_name, mWristLinkFacesNumber, mWristLinkIndex);
+
+  // box
+  QString box_vertex_data_file_name
+    = QString(cedar::aux::locateResource("meshes/PowerCubeWrist90/box_vertex.txt").c_str());
+  loadVertexData(box_vertex_data_file_name, mBoxVertexNumber, mBoxVertex);
+  QString box_index_data_file_name
+    = QString(cedar::aux::locateResource("meshes/PowerCubeWrist90/box_index.txt").c_str());
+  loadIndexData(box_index_data_file_name, mBoxFacesNumber, mBoxIndex);
 
   // connector
   QString connector_vertex_data_file_name
-    = QString(cedar::aux::locateResource("meshes/PowerCube110/connector_vertex.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/PowerCubeWrist90/connector_vertex.txt").c_str());
   loadVertexData(connector_vertex_data_file_name, mConnectorVertexNumber, mConnectorVertex);
   QString connector_index_data_file_name
-    = QString(cedar::aux::locateResource("meshes/PowerCube110/connector_index.txt").c_str());
+    = QString(cedar::aux::locateResource("meshes/PowerCubeWrist90/connector_index.txt").c_str());
   loadIndexData(connector_index_data_file_name, mConnectorFacesNumber, mConnectorIndex);
 
 }
