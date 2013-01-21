@@ -119,5 +119,17 @@ cedar_summary_lib_found("FRI" CEDAR_USE_KUKA_LWR)
 cedar_summary_lib_found("Amtec" CEDAR_USE_AMTEC)
 
 message("")
+
+cedar_summary_h2("Documentation")
+
+cedar_summary_lib_found("Doxygen" DOXYGEN_FOUND)
+
+message("")
+
+cedar_summary_h2("Installation prefix")
+
+message("  ${CMAKE_INSTALL_PREFIX}")
+
+message("")
 fill_line("=")
 message("")
