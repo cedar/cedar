@@ -75,6 +75,10 @@ likely to undergo major changes:
 - cedar::dyn
   - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   
 
+== Version 1.0.5 ==
+- Build system
+  - 'make install' can be used without having Doxygen installed
+
 == Version 1.0.4 ==
 - Build system
   - Moved the version information to a separate file (cmake/version.txt).

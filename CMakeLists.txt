@@ -72,14 +72,14 @@ include(${CEDAR_CMAKE_DIR}/testing.txt)
 # setup of executables
 include(${CEDAR_CMAKE_DIR}/executables.txt)
 
+# setup documentation
+include(${CEDAR_CMAKE_DIR}/doxygen.txt)
+
 # setup of files that are installed (additionally to the libraries)
 include(${CEDAR_CMAKE_DIR}/install.txt)
 
 # setup of packaging
 include(${CEDAR_CMAKE_DIR}/packaging.txt)
-
-# setup documentation
-include(${CEDAR_CMAKE_DIR}/doxygen.txt)
 
 # output configuration summary
 include(${CEDAR_CMAKE_DIR}/summary.txt)
