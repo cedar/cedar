@@ -160,7 +160,7 @@ private:
 
   /*!@brief Disconnects all relevant signals of the given parameters.
    */
-  void disconnect(cedar::aux::ConfigurablePtr pConfigurable);
+  void disconnect();
 
   //! Returns whether the pane should show advanced parameters.
   bool showAdvanced() const
