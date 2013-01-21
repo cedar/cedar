@@ -100,6 +100,20 @@ void cedar::aux::gui::PropertyPane::showAdvanced(bool show)
 
 void cedar::aux::gui::PropertyPane::resetContents()
 {
+  this->disconnect();
+
+  // disconnect all signals from the configurable
+  cedar::aux::ConfigurablePtr configurable = this->mDisplayedConfigurable.lock();
+  if (configurable)
+  {
+    this->resetPointer();
+    this->mParameterWidgetRowIndex.clear();
+    this->mParameterRowIndex.clear();
+  }
+}
+
+void cedar::aux::gui::PropertyPane::disconnect()
+{
   for (size_t i = 0; i < this->mSlotConnections.size(); i++)
   {
     if (this->mSlotConnections[i].connected())
@@ -109,75 +123,18 @@ void cedar::aux::gui::PropertyPane::resetContents()
   }
   this->mSlotConnections.clear();
 
-  // disconnect all signals from the configurable
-  cedar::aux::ConfigurablePtr configurable = this->mDisplayedConfigurable.lock();
-  if (configurable)
+  for (auto iter = this->mParameterRowIndex.begin(); iter != this->mParameterRowIndex.end(); ++iter)
   {
-    this->disconnect(configurable);
-    this->resetPointer();
-    this->mParameterWidgetRowIndex.clear();
-    this->mParameterRowIndex.clear();
-  }
-}
-
-void cedar::aux::gui::PropertyPane::disconnect(cedar::aux::ConfigurablePtr pConfigurable)
-{
-  for (cedar::aux::Configurable::ParameterList::iterator iter = pConfigurable->getParameters().begin();
-      iter != pConfigurable->getParameters().end();
-      ++iter)
-  {
-    cedar::aux::ParameterPtr parameter = *iter;
-
-    if (parameter->isAdvanced() && !this->showAdvanced())
-    {
-      continue;
-    }
+    cedar::aux::Parameter* parameter = iter->first;
 
     // disconnect everything between the parameter and this
-    if (!QObject::disconnect(parameter.get(), 0, this, 0))
+    if (!QObject::disconnect(parameter, 0, this, 0))
     {
       cedar::aux::LogSingleton::getInstance()->debugMessage
       (
         "Could not disconnect the slots from parameter \"" + parameter->getName() + "\" to the property pane.",
         "cedar::proc::gui::PropertyPane::disconnect(cedar::aux::ConfigurablePtr)"
       );
-    }
-
-    // check if parameter is an object parameter
-    if
-    (
-      cedar::aux::ObjectParameterPtr object_parameter
-        = boost::dynamic_pointer_cast<cedar::aux::ObjectParameter>(parameter)
-    )
-    {
-      cedar::aux::ConfigurablePtr configurable = object_parameter->getConfigurable();
-      this->disconnect(configurable);
-    }
-
-    // check if parameter is an object list parameter
-    if
-    (
-      cedar::aux::ObjectListParameterPtr list_parameter
-        = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter)
-    )
-    {
-      for (size_t i = 0; i < list_parameter->size(); ++i)
-      {
-        cedar::aux::ConfigurablePtr configurable = list_parameter->configurableAt(i);
-        this->disconnect(configurable);
-      }
-    }
-  }
-
-  for (cedar::aux::Configurable::Children::const_iterator iter = pConfigurable->configurableChildren().begin();
-       iter != pConfigurable->configurableChildren().end();
-       ++iter)
-  {
-    cedar::aux::ConfigurablePtr configurable = iter->second;
-
-    if (!configurable->isAdvanced() || this->showAdvanced())
-    {
-      this->disconnect(configurable);
     }
   }
 }
@@ -425,8 +382,11 @@ void cedar::aux::gui::PropertyPane::redraw()
   }
 
   cedar::aux::ConfigurablePtr displayed = this->mDisplayedConfigurable.lock();
-  this->resetContents();
-  this->display(displayed);
+  if (displayed)
+  {
+    this->resetContents();
+    this->display(displayed);
+  }
 
   if (QScrollBar *p_scroll_bar = this->verticalScrollBar())
   {
