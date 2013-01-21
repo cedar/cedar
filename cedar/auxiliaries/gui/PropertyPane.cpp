@@ -425,8 +425,11 @@ void cedar::aux::gui::PropertyPane::redraw()
   }
 
   cedar::aux::ConfigurablePtr displayed = this->mDisplayedConfigurable.lock();
-  this->resetContents();
-  this->display(displayed);
+  if (displayed)
+  {
+    this->resetContents();
+    this->display(displayed);
+  }
 
   if (QScrollBar *p_scroll_bar = this->verticalScrollBar())
   {
