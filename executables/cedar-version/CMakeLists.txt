@@ -24,9 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Georg Hartinger
-#   Email:       georg.hartinger@rub.de
-#   Date:        
+#   Maintainer:  Oliver Lomp
+#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+#   Date:        2012 11 15
 #
 #   Description:
 #
@@ -34,5 +34,4 @@
 #
 #=======================================================================================================================
 
-cedar_add_example(GrabbableGrabberTutorial PREFIX "examples/grabber" )
-
+cedar_add_executable(cedar-version)

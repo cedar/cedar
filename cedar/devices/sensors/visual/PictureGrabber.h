@@ -155,7 +155,7 @@ protected:
   bool onGrab();
   bool onCreateGrabber();
   void onCloseGrabber();
-
+  void onUpdateSourceInfo(unsigned int channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -164,9 +164,6 @@ private:
   /*! @brief This function does internal variable initialization in  constructor
    */
   void init();
-
-  /// @brief updates the channel informations
-  void setChannelInfo(unsigned int channel);
 
   /// @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
   inline PictureChannelPtr getPictureChannel(unsigned int channel)

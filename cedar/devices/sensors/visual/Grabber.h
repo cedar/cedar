@@ -565,6 +565,15 @@ protected:
   virtual bool onGrab();
 
 
+  /*! @brief Updates the channel informations
+   *
+   *  This method is used internally to update the channel info string. It will be called after the onCreate()-method
+   *  of the derived grabber-classes is invoked.
+   *
+   *  @param channel The channel which should be updated
+   */
+  virtual void onUpdateSourceInfo(unsigned int channel) = 0;
+
   //! Get the Pointer to the SnapshotName Element
   //cedar::aux::FileParameterPtr getSnapshotNameParamter();
 
@@ -580,9 +589,14 @@ protected:
    */
   cv::Mat& getImageMat(unsigned int channel);
 
-
-  //cv::VideoWriter getVideoWriter();
-
+  /*! @brief Updates the info string of the given channel
+   *
+   * Call this method in the derived class in the method onUpdateSourceInfo()
+   * to update the infos about the channel source
+   *
+   * @param channel The channel you want to update
+   * @param info The new info-string for that channel
+   */
   void setChannelInfoString(unsigned int channel, std::string info);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -594,7 +608,6 @@ private:
    *  @param grabberChannels A vector with all channels you want to initialize
    */
   void init(std::vector<cedar::dev::sensors::visual::GrabberChannelPtr> grabberChannels);
-
 
   /*! @brief Callback function to respond to a captured CTRL-C event
    *

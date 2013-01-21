@@ -130,6 +130,11 @@ cedar::dev::sensors::visual::NetGrabber::~NetGrabber()
 //----------------------------------------------------------------------------------------------------------------------
 
 
+void cedar::dev::sensors::visual::NetGrabber::onCloseGrabber()
+{
+  //todo implement the closing of the grabber in order to recreate it with a new channel
+}
+
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::NetGrabber::onCleanUp()
 {
@@ -143,12 +148,12 @@ void cedar::dev::sensors::visual::NetGrabber::onCleanUp()
 }
 
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::NetGrabber::onInit()
+bool cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
 {
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
-                                             this->getName() + ": onInit()",
-                                             "cedar::dev::sensors::visual::NetGrabber::onInit()"
+                                             this->getName() + ": onCreateGrabber()",
+                                             "cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()"
                                            );
 
   unsigned int num_cams = getNumCams();
@@ -164,7 +169,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
   cedar::aux::LogSingleton::getInstance()->systemInfo
                                            (
                                              this->getName() + ": " + info.str(),
-                                             "cedar::dev::sensors::visual::NetGrabber::onInit()"
+                                             "cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()"
                                            );
 
 
@@ -183,7 +188,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
                                                this->getName() + ": Create channel "
                                                  + boost::lexical_cast<std::string>(channel) + ": "
                                                  + channel_name,
-                                               "cedar::dev::sensors::visual::NetGrabber::onInit()"
+                                               "cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()"
                                              );
 
     // try to connect for about 1 to 2 minutes per channel
@@ -220,7 +225,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
         cedar::aux::LogSingleton::getInstance()->warning
                                                  (
                                                    error_msg.str(),
-                                                   "cedar::dev::sensors::visual::NetGrabber::onInit()"
+                                                   "cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()"
                                                  );
         if (++counter_get_writer > 10)
         {
@@ -231,7 +236,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
           cedar::aux::LogSingleton::getInstance()->error
                                                    (
                                                      error_msg.str(),
-                                                     "cedar::dev::sensors::visual::NetGrabber::onInit()"
+                                                     "cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()"
                                                    );
           return false;  // throws an initialization-exception
         }
@@ -254,7 +259,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
         cedar::aux::LogSingleton::getInstance()->error
                                                  (
                                                    error_msg.str(),
-                                                   "cedar::dev::sensors::visual::NetGrabber::onInit()"
+                                                   "cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()"
                                                  );
         return false;  // throws an initialization-exception
       }
@@ -270,7 +275,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
         cedar::aux::LogSingleton::getInstance()->error
                                                  (
                                                    error_msg.str(),
-                                                   "cedar::dev::sensors::visual::NetGrabber::onInit()"
+                                                   "cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()"
                                                  );
         return false;  // throws an initialization-exception
       }
@@ -285,7 +290,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
                                              (
                                                this->getName() + ": Try to grabb from channel "
                                                  + boost::lexical_cast<std::string>(channel),
-                                               "cedar::dev::sensors::visual::NetGrabber::onInit()"
+                                               "cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()"
                                              );
     cv::Mat frame;
     bool reading_ok = false;
@@ -319,7 +324,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
           cedar::aux::LogSingleton::getInstance()->error
                                                    (
                                                      error_msg.str(),
-                                                     "cedar::dev::sensors::visual::NetGrabber::onInit()"
+                                                     "cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()"
                                                    );
           return false;  // throws an initialization-exception
         }
@@ -337,7 +342,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
         cedar::aux::LogSingleton::getInstance()->error
                                                  (
                                                    error_msg.str(),
-                                                   "cedar::dev::sensors::visual::NetGrabber::onInit()"
+                                                   "cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()"
                                                  );
         return false;  // throws an initialization-exception
       }
@@ -349,7 +354,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
                                              this->getName() + ": Initializtion finished",
-                                             "cedar::dev::sensors::visual::NetGrabber::onInit()"
+                                             "cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()"
                                            );
 
   // TODO
@@ -359,7 +364,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
   // to decide if it was load from config-file
 
   return true;
-} // onInit()
+} // onCreateGrabber()
 
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::NetGrabber::onUpdateSourceInfo(unsigned int channel)

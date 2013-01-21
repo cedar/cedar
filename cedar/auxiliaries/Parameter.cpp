@@ -58,6 +58,7 @@ mHasDefault(hasDefault),
 mConstant(false),
 mIsHidden(false),
 mChanged(false),
+mAdvanced(false),
 mpLock(new QReadWriteLock())
 {
   CEDAR_ASSERT(this->mpOwner != NULL);

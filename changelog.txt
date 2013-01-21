@@ -57,6 +57,23 @@ likely to undergo major changes:
     there are some annoying bugs related to it.
 
 == current version ==
+- all:
+  - enabled C++0x / C++11 compiler flag for GCC
+
+- cedar::aux
+  - DoubleData now inherits MatData. It therefore is also no longer just a typedef of a template, so make sure you
+    include the proper header (cedar/auxiliaries/DoubleData) in your code.
+  - Parameters and Configurables can now be marked as advanced. Those that are, are not displayed to the user unless
+    they opt to have them displayed by checking a box in the property pane. 
+
+- cedar::dev
+  - KinematicChain instances now need to be started via ->start() by the implementor. They do not start threading on their own, anymore
+
+- cedar::proc
+  - The processingIde can now be started with the "--no-log" option. This will redirect all log messages to the terminal
+    and can be very helpful when steps send too many log messages, leading to a lock-up of the user interface.
+- cedar::dyn
+  - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   
 
 == Version 1.0.5 ==
 - Build system

@@ -227,13 +227,11 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  //------------------------------------------------------------------------
-  // From Grabber
-  //------------------------------------------------------------------------
-
-  bool onInit();
+  // inherited from Grabber
   bool onCreateGrabber();
   void onCloseGrabber();
+  void onUpdateSourceInfo(unsigned int channel);
+  void onCleanUp();
 
   /*! @brief Grab on all available files
    *
@@ -244,9 +242,6 @@ protected:
    */
   bool onGrab();
 
-  void onUpdateSourceInfo(unsigned int channel);
-  void onCleanUp();
-
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -255,8 +250,6 @@ private:
    */
   void init();
 
-  /// @brief Sets the channel informations
-  void setChannelInfo(unsigned int channel);
 
   /*! Cast the storage vector from base channel struct "GrabberChannelPtr" to
    *  derived class VideoChannelPtr

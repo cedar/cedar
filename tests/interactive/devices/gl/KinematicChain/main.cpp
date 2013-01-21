@@ -81,6 +81,7 @@ int main(int argc, char **argv)
   p_scene_widget->show();
 
   p_test_arm->setWorkingMode(cedar::dev::robot::KinematicChain::VELOCITY);
+  p_test_arm->start();
   p_test_arm->setJointVelocity(0, 0.31);
   p_test_arm->setJointVelocity(1, -.045);
   p_test_arm->setJointVelocity(2, -.015);

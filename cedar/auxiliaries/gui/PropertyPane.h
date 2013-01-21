@@ -44,6 +44,7 @@
 
 // SYSTEM INCLUDES
 #include <QTableWidget>
+#include <QCheckBox>
 #include <QLabel>
 #include <boost/signals2/connection.hpp>
 
@@ -106,6 +107,10 @@ public slots:
    */
   void parameterChangeFlagChanged();
 
+  /*!@brief Set whether advanced parameters should be shown.
+   */
+  void showAdvanced(bool show);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -134,6 +139,9 @@ private:
    */
   void addLabelRow(const std::string& label);
 
+  //! Adds a widget that takes up a whole row.
+  void addWidgetRow(QWidget* pWidget);
+
   /*!@brief Adds a row that displays a given parameter.
    */
   void addPropertyRow(cedar::aux::ParameterPtr parameter);
@@ -154,6 +162,12 @@ private:
    */
   void disconnect(cedar::aux::ConfigurablePtr pConfigurable);
 
+  //! Returns whether the pane should show advanced parameters.
+  bool showAdvanced() const
+  {
+    return this->mpShowAdvanced->isChecked();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -171,6 +185,9 @@ private:
 
   //! Connection to the configurable's tree changed signal.
   std::vector<boost::signals2::connection> mSlotConnections;
+
+  //! Checkbox that lets the user show advanced parameters.
+  QCheckBox* mpShowAdvanced;
 
 }; // class cedar::aux::gui::PropertyPane
 
