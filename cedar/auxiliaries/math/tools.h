@@ -48,7 +48,7 @@
 #include <opencv2/opencv.hpp>
 
 //!@todo This should be its own header
-#ifdef CEDAR_COMPILER_MSVC
+#if defined CEDAR_COMPILER_MSVC && _MSC_VER < 1600 // MSVC with a version greater than 1600 should come with the stdint header.
   typedef __int8 int8_t;
   typedef unsigned __int8 uint8_t;
   typedef __int16 int16_t;
