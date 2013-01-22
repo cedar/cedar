@@ -80,10 +80,6 @@ public:
    */
   void display(cedar::aux::ConfigurablePtr pConfigurable);
 
-  /*!@brief Resets the contents of the widget.
-   */
-  void resetContents();
-
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -91,9 +87,9 @@ public:
   // none yet
 
 public slots:
-  /*!@brief Resets the pointer to the configurable displayed in this widget.
+  /*!@brief Resets the contents of the widget.
    */
-  void resetPointer();
+  void resetContents();
 
   /*!@brief Recreates the widget.
    */
