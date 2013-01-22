@@ -107,12 +107,8 @@ void cedar::aux::gui::PropertyPane::resetContents()
   this->disconnect();
 
   // disconnect all signals from the configurable
-  cedar::aux::ConfigurablePtr configurable = this->mDisplayedConfigurable.lock();
-  if (configurable)
-  {
-    this->mParameterWidgetRowIndex.clear();
-    this->mParameterRowIndex.clear();
-  }
+  this->mParameterWidgetRowIndex.clear();
+  this->mParameterRowIndex.clear();
 }
 
 void cedar::aux::gui::PropertyPane::disconnect()
