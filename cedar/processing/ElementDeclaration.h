@@ -42,7 +42,6 @@
 #define CEDAR_PROC_ELEMENT_DECLARATION_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/DeclarationBase.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/DataRole.h"
 #include "cedar/auxiliaries/utilities.h"
