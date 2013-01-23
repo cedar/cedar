@@ -36,7 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/PluginProxy.h"
-#include "cedar/processing/PluginDeclaration.h"
+#include "cedar/auxiliaries/PluginDeclarationList.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/Log.h"
