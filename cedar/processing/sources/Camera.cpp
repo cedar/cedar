@@ -67,7 +67,8 @@ namespace
     (
       "A source that reads images from a camera."
     );
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }

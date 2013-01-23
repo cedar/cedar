@@ -46,6 +46,7 @@
 #include "cedar/processing/MultiTrigger.h"
 #include "cedar/processing/PluginProxy.h"
 #include "cedar/processing/PluginDeclaration.h"
+#include "cedar/auxiliaries/PluginDeclarationList.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/gui/Settings.h"
@@ -138,10 +139,7 @@ void cedar::proc::Manager::load(cedar::proc::PluginProxyPtr plugin)
 void cedar::proc::Manager::load(cedar::proc::PluginDeclarationPtr declaration)
 {
   // load steps
-  for (size_t i = 0; i < declaration->elementDeclarations().size(); ++i)
-  {
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration->elementDeclarations().at(i));
-  }
+  declaration->declareAll();
 }
 
 void cedar::proc::Manager::registerThread(cedar::aux::LoopedThreadPtr thread)

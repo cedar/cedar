@@ -70,7 +70,8 @@ namespace
     (
       "Flips a one- or two-dimensional matrix."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(flip_decl);
+
+    flip_decl->declare();
 
     return true;
   }

@@ -78,7 +78,7 @@ namespace
       "signal can be used as the step time, and the approximation can be updated using it."
     );
 
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(looped_trigger_declaration);
+    looped_trigger_declaration->declare();
 
     return true;
   }

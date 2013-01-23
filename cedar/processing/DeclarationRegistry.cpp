@@ -54,6 +54,7 @@
 using cedar::proc::ElementDeclarationPtr;
 using cedar::proc::ElementDeclarationTemplate;
 
+/*
 cedar::proc::DeclarationRegistry::DeclarationRegistry()
 {
 }
@@ -176,3 +177,4 @@ cedar::proc::ElementPtr cedar::proc::DeclarationRegistry::allocateClass(const st
   CEDAR_THROW(cedar::proc::InvalidNameException, "Cannot allocate object of class \""
                                                  + classId + "\": class unknown.")
 }
+*/

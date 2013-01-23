@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PluginDeclaration.cpp
+    File:        PluginDeclarationList.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 22
+    Date:        2013 01 18
 
     Description:
 
@@ -34,10 +34,14 @@
 
 ======================================================================================================================*/
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
-#include "cedar/processing/PluginDeclaration.h"
-#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/auxiliaries/PluginDeclarationList.h"
+#include "cedar/auxiliaries/PluginDeclaration.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/xml_parser.hpp>
@@ -45,20 +49,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-/*
-cedar::proc::PluginDeclaration::PluginDeclaration()
-{
-}
 
-cedar::proc::PluginDeclaration::PluginDeclaration(const std::string& className, const std::string& category)
-:
-mClassName(className),
-mCategory(category)
-{
-}
-
-
-cedar::proc::PluginDeclaration::~PluginDeclaration()
+cedar::aux::PluginDeclarationList::PluginDeclarationList()
 {
 }
 
@@ -66,12 +58,12 @@ cedar::proc::PluginDeclaration::~PluginDeclaration()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::PluginDeclaration::add(cedar::proc::ElementDeclarationPtr declaration)
+void cedar::aux::PluginDeclarationList::add(cedar::aux::PluginDeclarationPtr declaration)
 {
-  this->mElementDeclarations.push_back(declaration);
+  this->mDeclarations.push_back(declaration);
 }
 
-void cedar::proc::PluginDeclaration::readDescription(const std::string& filePath)
+void cedar::aux::PluginDeclarationList::readDescription(const std::string& filePath)
 {
   cedar::aux::ConfigurationNode descriptions;
   boost::property_tree::xml_parser::read_xml(filePath, descriptions);
@@ -112,7 +104,7 @@ void cedar::proc::PluginDeclaration::readDescription(const std::string& filePath
   }
 }
 
-void cedar::proc::PluginDeclaration::readDeclarations(const cedar::aux::ConfigurationNode& declarations)
+void cedar::aux::PluginDeclarationList::readDeclarations(const cedar::aux::ConfigurationNode& declarations)
 {
   for (cedar::aux::ConfigurationNode::const_iterator declaration_iter = declarations.begin();
       declaration_iter != declarations.end();
@@ -121,46 +113,60 @@ void cedar::proc::PluginDeclaration::readDeclarations(const cedar::aux::Configur
     const std::string& type = declaration_iter->first;
     const cedar::aux::ConfigurationNode& node = declaration_iter->second;
 
-    if (type == "element")
+    if (type == "element" || type == "plugin") //!@todo make the node type element deprecated
     {
-      this->readElementDeclaration(node);
+      this->readDeclaration(node);
     }
     else
     {
       cedar::aux::LogSingleton::getInstance()->warning
       (
-        "Found an unhandled node type in cedar::proc::PluginDeclaration::readDeclarations Unhandled type is: \""
+        "Found an unhandled node type in cedar::aux::PluginDeclarationList::readDeclarations. Unhandled type is: \""
           + type + "\"",
-        "cedar::proc::PluginDeclaration::readDeclarations(const cedar::aux::ConfigurationNode&)"
+        "cedar::aux::PluginDeclarationList::readDeclarations(const cedar::aux::ConfigurationNode&)"
       );
     }
   }
 }
 
-void cedar::proc::PluginDeclaration::readElementDeclaration(const cedar::aux::ConfigurationNode& declaration)
+void cedar::aux::PluginDeclarationList::readDeclaration(const cedar::aux::ConfigurationNode& declaration)
 {
   const cedar::aux::ConfigurationNode& xmlattr = declaration.get_child("<xmlattr>");
   const std::string& class_id = xmlattr.get_child("class").get_value<std::string>();
 
-  for (size_t i = 0; i < this->mElementDeclarations.size(); ++i)
+  try
   {
-    if (this->mElementDeclarations.at(i)->getClassId() == class_id)
+    this->findPluginDeclaration(class_id);
+  }
+  catch(const cedar::aux::UnknownNameException&)
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Could not find a class declaration for class \"" + class_id + "\".",
+      "cedar::aux::PluginDeclarationList::readDeclaration(const cedar::aux::ConfigurationNode&)"
+    );
+  }
+}
+
+cedar::aux::PluginDeclarationPtr
+  cedar::aux::PluginDeclarationList::findPluginDeclaration(const std::string& className) const
+{
+  for (size_t i = 0; i < this->mDeclarations.size(); ++i)
+  {
+    if (this->mDeclarations.at(i)->getClassName() == className)
     {
-      this->mElementDeclarations.at(i)->read(declaration);
-      return;
+      return this->mDeclarations.at(i);
     }
   }
 
-  cedar::aux::LogSingleton::getInstance()->warning
-  (
-    "Could not find a class declaration for class \"" + class_id + "\".",
-    "cedar::proc::PluginDeclaration::readElementDeclaration(const cedar::aux::ConfigurationNode&)"
-  );
+  CEDAR_THROW(cedar::aux::UnknownNameException, "Could not find declaration for class name.");
 }
 
-
-const cedar::proc::PluginDeclaration::ElementDeclarations& cedar::proc::PluginDeclaration::elementDeclarations() const
+void cedar::aux::PluginDeclarationList::declareAll() const
 {
-  return this->mElementDeclarations;
+  for (auto decl_iter = this->mDeclarations.begin(); decl_iter != this->mDeclarations.end(); ++decl_iter)
+  {
+    cedar::aux::PluginDeclarationPtr declaration = *decl_iter;
+    declaration->declare();
+  }
 }
-*/

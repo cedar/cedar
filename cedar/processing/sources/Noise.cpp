@@ -54,18 +54,18 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr noise_decl
+    ElementDeclarationPtr declaration
     (
       new cedar::proc::ElementDeclarationTemplate<cedar::proc::sources::Noise>
           (
             "Sources", "cedar.processing.sources.Noise"
           )
     );
-    noise_decl->setIconPath(":/steps/noise.svg");
-    noise_decl->setDescription("A step that generates normally distributed random noise.");
-    noise_decl->deprecatedName("cedar.dynamics.Noise");
+    declaration->setIconPath(":/steps/noise.svg");
+    declaration->setDescription("A step that generates normally distributed random noise.");
+    declaration->deprecatedName("cedar.dynamics.Noise");
 
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(noise_decl);
+    declaration->declare();
 
     return true;
   }

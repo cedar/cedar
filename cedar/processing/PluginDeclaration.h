@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/PluginDeclarationList.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -48,7 +49,7 @@
 // macros
 //--------------------------------------------------------------------------------------------------------------------
 
-//!@todo Should CEDAR_BEGIN_PLUGIN_DECLARATION be in cedar/defines.h?
+//!@todo This should be in a more appropriate place.
 # ifdef __cplusplus
 #   define CEDAR_BEGIN_PLUGIN_DECLARATION extern "C" {
 #   define CEDAR_END_PLUGIN_DECLARATION }
@@ -97,7 +98,7 @@
  * Note, that you should always use Qt's resource system to store icons and other resources in order to avoid confusion
  * about filepaths.
  */
-class cedar::proc::PluginDeclaration
+/*class cedar::proc::PluginDeclaration
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -111,7 +112,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  PluginDeclaration();
+  PluginDeclaration(const std::string& category, const std::string& className = std::string());
 
   //!@brief Destructor
   ~PluginDeclaration();
@@ -126,10 +127,10 @@ public:
   //!@brief access all ElementDeclarations
   const ElementDeclarations& elementDeclarations() const;
 
-  /*!@brief Reads parts of the plugin description from the given file.
+  / *!@brief Reads parts of the plugin description from the given file.
    *
    * @remarks This function should only be called after all declarations have been added.
-   */
+   * /
   void readDescription(const std::string& filePath);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -153,7 +154,12 @@ protected:
 private:
   //!@brief internal storage of all registered ElementDeclarations.
   ElementDeclarations mElementDeclarations;
+
+  std::string mClassName;
+
+  std::string mCategory;
 }; // class cedar::proc::PluginDeclaration
+*/
 
 #endif // CEDAR_PROC_PLUGIN_DECLARATION_H
 

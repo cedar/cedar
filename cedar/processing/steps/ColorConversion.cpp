@@ -70,7 +70,8 @@ namespace
     (
       "Converts a matrix from one color space into another."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }

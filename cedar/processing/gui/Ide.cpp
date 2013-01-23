@@ -389,10 +389,8 @@ void cedar::proc::gui::Ide::resetStepList()
 {
   using cedar::proc::Manager;
 
-  for (cedar::proc::DeclarationRegistry::CategoryList::const_iterator iter
-         = DeclarationRegistrySingleton::getInstance()->getCategories().begin();
-       iter != DeclarationRegistrySingleton::getInstance()->getCategories().end();
-       ++iter)
+  std::set<std::string> categories = ElementManagerSingleton::getInstance()->listCategories();
+  for (auto iter = categories.begin(); iter != categories.end(); ++iter)
   {
     const std::string& category_name = *iter;
     cedar::proc::gui::ElementClassList *p_tab;
@@ -406,9 +404,7 @@ void cedar::proc::gui::Ide::resetStepList()
     {
       p_tab = mElementClassListWidgets[category_name];
     }
-    p_tab->showList(
-                     DeclarationRegistrySingleton::getInstance()->getCategoryEntries(category_name)
-                   );
+    p_tab->showList(ElementManagerSingleton::getInstance()->getCategoryEntries(category_name));
   }
 }
 

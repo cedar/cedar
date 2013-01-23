@@ -43,6 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
+#include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/auxiliaries/gui/namespace.h"
@@ -321,7 +322,7 @@ private:
   boost::signals2::connection mSlotRemovedConnection;
 
   //!@brief the class id of the step
-  cedar::proc::ElementDeclarationPtr mClassId;
+  cedar::aux::ConstPluginDeclarationPtr mClassId;
 
   //!@brief the main window in which the current graphical representation is embedded
   QMainWindow* mpMainWindow;

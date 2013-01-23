@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ElementClassList.h
+    File:        PluginDeclarationList.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 11 23
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 01 18
 
     Description:
 
@@ -38,43 +34,66 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_H
-#define CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_H
+#ifndef CEDAR_AUX_PLUGIN_DECLARATION_LIST_H
+#define CEDAR_AUX_PLUGIN_DECLARATION_LIST_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
-#include <QListWidget>
 
-/*!@brief A widget showing a list of steps that can be dragged into the architecture area.
+
+/*!@todo describe.
  *
- * More detailed description of the class.
+ * @todo describe more.
  */
-class cedar::proc::gui::ElementClassList : public QListWidget
+class cedar::aux::PluginDeclarationList
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
+private:
+  typedef std::vector<cedar::aux::PluginDeclarationPtr> DeclarationList;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ElementClassList(QWidget *pParent = NULL);
-
-  //!@brief Destructor
-  ~ElementClassList();
+  PluginDeclarationList();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief for a given category, show all registered steps (their icon and name)
-  void showList(const cedar::proc::ElementManager::BasePluginList& entries);
+  //!@brief Add a PluginDeclaration to this list.
+  void add(cedar::aux::PluginDeclarationPtr declaration);
+
+  /*!@brief   Reads parts of the plugin description from the given xml file.
+   *
+   * @remarks This function should only be called after all declarations have been added.
+   */
+  void readDescription(const std::string& filePath);
+
+  /*!@brief Returns the PluginDeclaration corresponding to the given class name.
+   */
+  cedar::aux::PluginDeclarationPtr findPluginDeclaration(const std::string& className) const;
+
+  //! Declares all plugins in this list.
+  void declareAll() const;
+
+  size_t size() const
+  {
+    return this->mDeclarations.size();
+  }
+
+  cedar::aux::PluginDeclarationPtr at(size_t i) const
+  {
+    return this->mDeclarations.at(i);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -86,7 +105,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void readDeclarations(const cedar::aux::ConfigurationNode& declarations);
+  void readDeclaration(const cedar::aux::ConfigurationNode& declarations);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -94,8 +114,10 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  //! List of the element declarations stored in this plugin declaration.
+  DeclarationList mDeclarations;
 
-}; // class ElementClassList
+}; // class cedar::aux::PluginDeclarationList
 
-#endif // CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_H
+#endif // CEDAR_AUX_PLUGIN_DECLARATION_LIST_H
+

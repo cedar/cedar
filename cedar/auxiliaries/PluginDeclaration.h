@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PluginProxy.h
+    File:        PluginDeclaration.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 22
+    Date:        2013 01 18
 
     Description:
 
@@ -34,58 +34,99 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_PLUGIN_PROXY_H
-#define CEDAR_PROC_PLUGIN_PROXY_H
+#ifndef CEDAR_AUX_PLUGIN_DECLARATION_H
+#define CEDAR_AUX_PLUGIN_DECLARATION_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
-#include <string>
 
-#ifdef CEDAR_OS_WINDOWS
-#include <Windows.h>
-#endif // CEDAR_OS_WINDOWS
 
-/*!@brief A class that encapsulates the OS dependent functionality for dynamically loading libraries.
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::proc::PluginProxy
+class cedar::aux::PluginDeclaration
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  typedef void (*PluginInterfaceMethod)(cedar::aux::PluginDeclarationListPtr);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  PluginProxy();
-  //!@brief Some other constructor.
-  PluginProxy(const std::string& file);
+  PluginDeclaration();
+
+  //! Constructor that takes a class name.
+  PluginDeclaration(const std::string& className, const std::string& category);
 
   //!@brief Destructor
-  ~PluginProxy();
+  virtual ~PluginDeclaration();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief loaded a shared/dynamic library from a file path
-  void load(const std::string& file);
-
-  //!@brief get declaration of this proxy
-  cedar::aux::PluginDeclarationListPtr getDeclaration();
-
-  /*!@brief Returns the canonical name of a plugin based on its filepath
+  /*!@brief Declares this plugin with the appropriate manager.
    */
-  static std::string getPluginNameFromPath(const std::string& path);
+  virtual void declare() const = 0;
 
-#ifdef CEDAR_OS_UNIX
-  static void abortHandler(int signal);
-#endif // CEDAR_OS_UNIX
+  //! Returns the class name associated with this declaration.
+  virtual std::string getClassName() const = 0;
+
+  //! Returns the category of this declaration.
+  inline const std::string& getCategory() const
+  {
+    return this->mCategory;
+  }
+
+  /*!@brief Marks the declared type as deprecated.
+   */
+  void deprecate(const std::string& description = "")
+  {
+    this->mIsDeprecated = true;
+    this->mDeprecationDescription = description;
+  }
+
+  //! Returns whether this step is deprecated.
+  bool isDeprecated() const
+  {
+    return this->mIsDeprecated;
+  }
+
+  //! Returns the deprecation description of the declaration.
+  const std::string& getDeprecationDescription() const
+  {
+    return this->mDeprecationDescription;
+  }
+
+  //! Adds a deprecated name to the declaration.
+  void deprecatedName(const std::string& oldName)
+  {
+    this->mDeprecatedNames.push_back(oldName);
+  }
+
+  //! Returns the deprecated names of this class.
+  const std::vector<std::string>& deprecatedNames() const
+  {
+    return this->mDeprecatedNames;
+  }
+
+  /*!
+   * @brief Returns the class name without the preceding namespace.
+   */
+  std::string getClassNameWithoutNamespace() const;
+
+  /*!
+   * @brief Returns the namespace name without the class name.
+   */
+  std::string getNamespaceName() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -97,41 +138,57 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief search known directories for this plugin.
-  std::string findPluginFile(const std::string& file) const;
-
-  //!@brief Searches for the plugin description file.
-  std::string findPluginDescription(const std::string& plugin_path) const;
-
-#ifdef CEDAR_OS_WINDOWS
-  std::string getLastError();
-#endif // CEDAR_OS_WINDOWS
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //! Name of the class. Empty if an automatically generated name is to be used.
+  std::string mClassName;
+
 private:
-  //!@brief plugin declaration
-  cedar::aux::PluginDeclarationListPtr mDeclaration;
-  //!@brief file path to plugin
-  std::string mFileName;
+  //! Category for this declaration.
+  std::string mCategory;
 
-  //! Handle to the dynamically loaded library.
-#ifdef CEDAR_OS_UNIX
-  void *mpLibHandle;
+  //! Whether or not the type declared with this object is deprecated.
+  bool mIsDeprecated;
 
-  /*! The plugin that is currently being loaded -- used to report to the user if a SIGABRT was caught during plugin
-   *  loading
+  //! Description of the deprecation.
+  std::string mDeprecationDescription;
+
+  //! A list of deprecated names for this class.
+  std::vector<std::string> mDeprecatedNames;
+
+}; // class cedar::aux::PluginDeclaration
+
+
+/*!@todo describe.
+ *
+ * @todo describe more.
+ */
+template <class BaseTypePtr>
+class cedar::aux::PluginDeclarationBaseTemplate : public cedar::aux::PluginDeclaration
+{
+public:
+  //!@brief The standard constructor.
+  PluginDeclarationBaseTemplate()
+  {
+  }
+
+  //! Constructor that takes a class name.
+  PluginDeclarationBaseTemplate(const std::string& category, const std::string& className)
+  :
+  PluginDeclaration(className, category)
+  {
+  }
+
+  /*!@brief Checks if an Element is of the plugin class's type.
+   *
+   * @param pointer Instance that is checked
    */
-  static std::string mPluginBeingLoaded;
-#elif defined CEDAR_OS_WINDOWS
-  HMODULE mpLibHandle;
-#else
-#error Implement me for your os!
-#endif
-}; // class cedar::proc::PluginProxy
+  virtual bool isObjectInstanceOf(BaseTypePtr pointer) const = 0;
+};
 
-#endif // CEDAR_PROC_PLUGIN_PROXY_H
+#endif // CEDAR_AUX_PLUGIN_DECLARATION_H
 

@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PluginProxy.h
+    File:        PluginDeclarationTemplate.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 22
+    Date:        2013 01 18
 
     Description:
 
@@ -34,58 +34,92 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_PLUGIN_PROXY_H
-#define CEDAR_PROC_PLUGIN_PROXY_H
+#ifndef CEDAR_AUX_PLUGIN_DECLARATION_TEMPLATE_H
+#define CEDAR_AUX_PLUGIN_DECLARATION_TEMPLATE_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/PluginDeclaration.h"
+#include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/DeclarationManagerTemplate.h"
 
 // SYSTEM INCLUDES
-#include <string>
 
-#ifdef CEDAR_OS_WINDOWS
-#include <Windows.h>
-#endif // CEDAR_OS_WINDOWS
 
-/*!@brief A class that encapsulates the OS dependent functionality for dynamically loading libraries.
+/*!@todo describe.
+ *
+ * @tparam BaseClass The direct base class for this class. This class must either be or inherit
+ *         cedar::aux::PluginDeclarationBaseTemplate<BaseClassPtr>.
+ * @todo describe more.
  */
-class cedar::proc::PluginProxy
+template <class BaseClassPtr, class PluginClassPtr, class BaseClass = cedar::aux::PluginDeclarationBaseTemplate<BaseClassPtr> >
+class cedar::aux::PluginDeclarationTemplate
+:
+public BaseClass,
+public boost::enable_shared_from_this<cedar::aux::PluginDeclarationTemplate<BaseClassPtr, PluginClassPtr, BaseClass> >
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  typedef void (*PluginInterfaceMethod)(cedar::aux::PluginDeclarationListPtr);
+  typedef typename cedar::aux::Singleton<cedar::aux::FactoryManager<BaseClassPtr> > PluginFactoryManager;
+  typedef typename cedar::aux::Singleton<cedar::aux::DeclarationManagerTemplate<BaseClassPtr> > DeclarationManager;
+  typedef typename PluginClassPtr::element_type PluginClass;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  PluginProxy();
-  //!@brief Some other constructor.
-  PluginProxy(const std::string& file);
-
-  //!@brief Destructor
-  ~PluginProxy();
+  /*!@brief The constructor.
+   *
+   * @param category  Category of the declaration.
+   * @param className Class name to use. A name will automatically be generated when this is left empty.
+   *
+   * @remarks The className parameter is essentially a legacy parameter to provide downward-compatibility; it should
+   *          usually be left empty.
+   */
+  PluginDeclarationTemplate(const std::string& category, const std::string& className = std::string())
+  :
+  BaseClass(category, className)
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief loaded a shared/dynamic library from a file path
-  void load(const std::string& file);
-
-  //!@brief get declaration of this proxy
-  cedar::aux::PluginDeclarationListPtr getDeclaration();
-
-  /*!@brief Returns the canonical name of a plugin based on its filepath
+  /*!@brief Declares this plugin at the appropriate factory.
    */
-  static std::string getPluginNameFromPath(const std::string& path);
+  void declare() const
+  {
+    DeclarationManager::getInstance()->addDeclaration(this->shared_from_this());
+    this->onDeclare();
+  }
 
-#ifdef CEDAR_OS_UNIX
-  static void abortHandler(int signal);
-#endif // CEDAR_OS_UNIX
+  std::string getClassName() const
+  {
+    if (!this->mClassName.empty())
+    {
+      return this->mClassName;
+    }
+    else
+    {
+      return PluginFactoryManager::getInstance()->template generateTypeName<PluginClassPtr>();
+    }
+  }
+
+  /*!@brief Checks if an Element is of the plugin class's type.
+   *
+   * @param pointer Instance that is checked
+   */
+  bool isObjectInstanceOf(BaseClassPtr pointer) const
+  {
+    return boost::dynamic_pointer_cast<PluginClass>(pointer);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -97,15 +131,10 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief search known directories for this plugin.
-  std::string findPluginFile(const std::string& file) const;
-
-  //!@brief Searches for the plugin description file.
-  std::string findPluginDescription(const std::string& plugin_path) const;
-
-#ifdef CEDAR_OS_WINDOWS
-  std::string getLastError();
-#endif // CEDAR_OS_WINDOWS
+  virtual void onDeclare() const
+  {
+    PluginFactoryManager::getInstance()->template registerType<PluginClassPtr>(this->mClassName);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -113,25 +142,18 @@ private:
 protected:
   // none yet
 private:
-  //!@brief plugin declaration
-  cedar::aux::PluginDeclarationListPtr mDeclaration;
-  //!@brief file path to plugin
-  std::string mFileName;
+  // none yet
 
-  //! Handle to the dynamically loaded library.
-#ifdef CEDAR_OS_UNIX
-  void *mpLibHandle;
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-  /*! The plugin that is currently being loaded -- used to report to the user if a SIGABRT was caught during plugin
-   *  loading
-   */
-  static std::string mPluginBeingLoaded;
-#elif defined CEDAR_OS_WINDOWS
-  HMODULE mpLibHandle;
-#else
-#error Implement me for your os!
-#endif
-}; // class cedar::proc::PluginProxy
+private:
+  // none yet
 
-#endif // CEDAR_PROC_PLUGIN_PROXY_H
+}; // class cedar::aux::PluginDeclarationTemplate
+
+#endif // CEDAR_AUX_PLUGIN_DECLARATION_TEMPLATE_H
 

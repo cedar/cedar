@@ -71,7 +71,8 @@ namespace
     (
       "Splits a matrix with up to four channels into the according number of separate matrices."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }

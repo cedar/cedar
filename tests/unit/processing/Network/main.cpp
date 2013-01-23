@@ -95,7 +95,7 @@ int main(int /* argc */, char** /* argv */)
   std::cout << "done." << std::endl;
 
   std::cout << "Adding declaration to the registry ... ";
-  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(test_module_decl);
+  test_module_decl->declare();
   std::cout << "done." << std::endl;
 
   std::cout << "Reading Sample.json ... ";

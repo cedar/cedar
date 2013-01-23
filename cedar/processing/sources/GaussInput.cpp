@@ -74,7 +74,8 @@ namespace
     declaration->setIconPath(":/steps/gauss_input.svg");
     declaration->setDescription("Generates a matrix that contains a sampled Gauss function.");
     declaration->deprecatedName("cedar.processing.source.GaussInput");
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }

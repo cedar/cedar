@@ -109,7 +109,7 @@ int main(int, char**)
                                        new cedar::proc::ElementDeclarationTemplate<TestClass>("blubber","TestClass")
                                      );
   test_decl->setIconPath(":/steps/resize.svg");
-  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(test_decl);
+  test_decl->declare();
 
   cedar::proc::NetworkPtr root(new cedar::proc::Network());
   TestSourcePtr rootClass(new TestSource());

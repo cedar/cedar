@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Boost.cpp
+    File:        PluginDeclaration.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 08 27
+    Date:        2013 01 18
 
     Description:
 
@@ -38,75 +38,64 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/sources/Boost.h"
-#include "cedar/processing/ElementDeclaration.h"
-#include "cedar/processing/DeclarationRegistry.h"
-#include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/PluginDeclaration.h"
 
 // SYSTEM INCLUDES
-
-//----------------------------------------------------------------------------------------------------------------------
-// register the class
-//----------------------------------------------------------------------------------------------------------------------
-namespace
-{
-  bool declare()
-  {
-    using cedar::proc::ElementDeclarationPtr;
-    using cedar::proc::ElementDeclarationTemplate;
-
-    ElementDeclarationPtr declaration
-    (
-      new ElementDeclarationTemplate<cedar::proc::sources::Boost>
-      (
-        "Sources",
-        "cedar.processing.sources.Boost"
-      )
-    );
-    declaration->setIconPath(":/steps/boost.svg");
-    declaration->setDescription("Generates a 1x1 boost matrix. This can be input to, e.g., a field.");
-
-    declaration->declare();
-
-    return true;
-  }
-
-  bool declared = declare();
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::sources::Boost::Boost()
+cedar::aux::PluginDeclaration::PluginDeclaration()
 :
-mBoost(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
-_mStrength(new cedar::aux::DoubleParameter(this, "strength", 1.0)),
-_mActive(new cedar::aux::BoolParameter(this, "active", false))
+mIsDeprecated(false)
 {
-  this->declareOutput("boost", this->mBoost);
+}
 
-  QObject::connect(_mStrength.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
-  QObject::connect(_mActive.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));
+cedar::aux::PluginDeclaration::PluginDeclaration(const std::string& className, const std::string& category)
+:
+mClassName(className),
+mCategory(category),
+mIsDeprecated(false)
+{
+}
+
+cedar::aux::PluginDeclaration::~PluginDeclaration()
+{
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::sources::Boost::compute(const cedar::proc::Arguments&)
+/*!
+ * @brief Returns the class name without the preceding namespace.
+ */
+std::string cedar::aux::PluginDeclaration::getClassNameWithoutNamespace() const
 {
-  if (this->isActive())
+  std::size_t index = this->getClassName().rfind('.');
+  if (index != std::string::npos)
   {
-    this->mBoost->getData().at<float>(0, 0) = this->getStrength();
+    return this->getClassName().substr(index + 1);
   }
   else
   {
-    this->mBoost->getData().at<float>(0, 0) = 0.0;
+    return this->getClassName();
   }
 }
 
-void cedar::proc::sources::Boost::recompute()
+/*!
+ * @brief Returns the namespace name without the class name.
+ */
+std::string cedar::aux::PluginDeclaration::getNamespaceName() const
 {
-  this->onTrigger();
+  std::size_t index = this->getClassName().rfind('.');
+  if (index != std::string::npos)
+  {
+    return this->getClassName().substr(0, index);
+  }
+  else
+  {
+    return this->getClassName();
+  }
 }

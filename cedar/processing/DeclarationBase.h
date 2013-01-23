@@ -87,8 +87,7 @@ public:
   :
   mpClassFactory(classFactory),
   mClassId(classId),
-  mCategory(category),
-  mIsDeprecated(false)
+  mCategory(category)
   {
   }
 
@@ -160,38 +159,6 @@ public:
    */
   virtual bool isObjectInstanceOf(BasePtr) = 0;
 
-  /*!@brief Marks the declared type as deprecated.
-   */
-  void deprecate(const std::string& description = "")
-  {
-    this->mIsDeprecated = true;
-    this->mDeprecationDescription = description;
-  }
-
-  //! Returns whether this step is deprecated.
-  bool isDeprecated() const
-  {
-    return this->mIsDeprecated;
-  }
-
-  //! Returns the deprecation description of the declaration.
-  const std::string& getDeprecationDescription() const
-  {
-    return this->mDeprecationDescription;
-  }
-
-  //! Adds a deprecated name to the declaration.
-  void deprecatedName(const std::string& oldName)
-  {
-    this->mDeprecatedNames.push_back(oldName);
-  }
-
-  //! Returns the deprecated names of this class.
-  const std::vector<std::string>& deprecatedNames() const
-  {
-    return this->mDeprecatedNames;
-  }
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -221,15 +188,6 @@ protected:
 
   //! The category.
   std::string mCategory;
-
-  //! Whether or not the type declared with this object is deprecated.
-  bool mIsDeprecated;
-
-  //! Description of the deprecation.
-  std::string mDeprecationDescription;
-
-  //! A list of deprecated names for this class.
-  std::vector<std::string> mDeprecatedNames;
 
 }; // class cedar::proc::DeclarationBase
 

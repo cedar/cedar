@@ -336,13 +336,17 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 {
   this->setElement(step);
   this->mStep = step;
-  this->mClassId = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(this->mStep);
+  this->mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->mStep);
+  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(this->mClassId))
+  cedar::proc::ConstElementDeclarationPtr elem_decl
+    = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(this->mClassId);
+
 
   //!@todo This code is redundant with code in ElementClassList; unify
-  QResource ex_test(QString::fromStdString(this->mClassId->getIconPath()));
+  QResource ex_test(QString::fromStdString(elem_decl->getIconPath()));
   if (ex_test.isValid())
   {
-    this->mStepIcon = QIcon(QString::fromStdString(this->mClassId->getIconPath()));
+    this->mStepIcon = QIcon(QString::fromStdString(elem_decl->getIconPath()));
     if (this->mStepIcon.isNull())
     {
       this->mStepIcon = QIcon(":/steps/no_icon.svg");
@@ -902,17 +906,18 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
 void cedar::proc::gui::StepItem::fillDefinedPlots(QMenu* pMenu, const QPoint& plotPosition)
 {
   // get declaration of the element displayed by this item
-  cedar::proc::ElementDeclarationPtr decl
-    = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(this->mStep);
+  auto decl = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->mStep);
+  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(decl));
+  auto elem_decl = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(decl);
 
-  if (!decl)
+  if (!decl || !elem_decl)
   {
     pMenu->setDisabled(true);
     pMenu->setToolTip("No declaration was found for this element.");
     return;
   }
 
-  if (decl->definedPlots().empty())
+  if (elem_decl->definedPlots().empty())
   {
     pMenu->setDisabled(true);
     pMenu->setToolTip("No plots defined for this element.");
@@ -922,9 +927,9 @@ void cedar::proc::gui::StepItem::fillDefinedPlots(QMenu* pMenu, const QPoint& pl
   QObject::connect(pMenu, SIGNAL(triggered(QAction*)), this, SLOT(openDefinedPlotAction(QAction*)));
 
   // list all defined plots, if available
-  for (size_t i = 0; i < decl->definedPlots().size(); ++i)
+  for (size_t i = 0; i < elem_decl->definedPlots().size(); ++i)
   {
-    const std::string& plot_name = decl->definedPlots()[i].first;
+    const std::string& plot_name = elem_decl->definedPlots()[i].first;
     QAction* p_action = pMenu->addAction(QString::fromStdString(plot_name));
     p_action->setData(plotPosition);
   }
@@ -935,14 +940,15 @@ void cedar::proc::gui::StepItem::openDefinedPlotAction(QAction* pAction)
   std::string plot_name = pAction->text().toStdString();
 
   // get declaration of the element displayed by this item
-  cedar::proc::ElementDeclarationPtr decl
-    = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(this->mStep);
+  auto decl = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->mStep);
+  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(decl));
+  auto elem_decl = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(decl);
 
   // find the list of data to plot for this item
-  size_t list_index = decl->definedPlots().size();
-  for (size_t i = 0; i < decl->definedPlots().size(); ++i)
+  size_t list_index = elem_decl->definedPlots().size();
+  for (size_t i = 0; i < elem_decl->definedPlots().size(); ++i)
   {
-    const std::string& name = decl->definedPlots()[i].first;
+    const std::string& name = elem_decl->definedPlots()[i].first;
     if (plot_name == name)
     {
       list_index = i;
@@ -950,7 +956,7 @@ void cedar::proc::gui::StepItem::openDefinedPlotAction(QAction* pAction)
     }
   }
 
-  if (list_index >= decl->definedPlots().size())
+  if (list_index >= elem_decl->definedPlots().size())
   {
     cedar::aux::LogSingleton::getInstance()->error
     (
@@ -961,7 +967,7 @@ void cedar::proc::gui::StepItem::openDefinedPlotAction(QAction* pAction)
     return;
   }
 
-  this->multiplot(pAction->data().toPoint(), decl->definedPlots()[list_index].second);
+  this->multiplot(pAction->data().toPoint(), elem_decl->definedPlots()[list_index].second);
 }
 
 void cedar::proc::gui::StepItem::fillDisplayStyleMenu(QMenu* pMenu)
