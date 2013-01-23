@@ -87,7 +87,7 @@ public:
    *
    * @return True, if the cameras are successfully initialized, otherwise false.
    */
-  bool init();
+  bool createCaptureDevice();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -98,7 +98,7 @@ protected:
   virtual void setProperties() = 0;
 
   //! Create a new Capture device
-  virtual bool createCaptureDevice() = 0;
+  virtual bool createCaptureObject() = 0;
 
   //! Apply all Settings to the Camera
   virtual void applySettingsToCamera() = 0;

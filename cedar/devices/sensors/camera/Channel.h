@@ -233,7 +233,7 @@ protected:
    */
   QReadWriteLock* mpVideoCaptureLock;
 
-  /*! The istance of the used backend
+  /*! The instance of the used backend
    *
    *  Only used until all parameters applied and the grabbing cv::VideoCapture object is created
    */
@@ -244,7 +244,6 @@ private:
 
   /// The actual used backend for the camera
   cedar::dev::sensors::camera::BackendType::Id mBackendType;
-  //unsigned int mCameraId;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
