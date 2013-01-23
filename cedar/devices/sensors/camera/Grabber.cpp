@@ -433,6 +433,7 @@ bool cedar::dev::sensors::camera::Grabber::onGrab()
    {
 
      getCameraChannel(channel)->mpVideoCaptureLock->lockForWrite();
+     //!@todo Don't mix bool and int with an & here; the MSVC warns (rightfully) that this is unsafe.
      result = getCameraChannel(channel)->mVideoCapture.read(getImageMat(channel)) & result;
 
      // check if conversion from bayer-pattern to cv::Mat BGR format is needed
