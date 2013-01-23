@@ -64,7 +64,7 @@ void cedar::dev::sensors::camera::Device::initDevice()
 
 }
 
-bool cedar::dev::sensors::camera::Device::init()
+bool cedar::dev::sensors::camera::Device::createCaptureDevice()
 {
   bool result = true;
 
@@ -76,7 +76,7 @@ bool cedar::dev::sensors::camera::Device::init()
 //  this->mpCameraChannel->mVideoCapture.release();
 
   // create cv::VideoCapture
-  result = this->createCaptureDevice();
+  result = this->createCaptureObject();
 
   if (!result)
   {
