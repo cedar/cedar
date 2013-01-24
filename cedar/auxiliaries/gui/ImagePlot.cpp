@@ -41,7 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h" // for the color map
-#include "cedar/auxiliaries/gui/PlotManager.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
@@ -64,9 +64,9 @@ namespace
 {
   bool registerPlot()
   {
-    typedef cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::MatData, cedar::aux::gui::ImagePlot> DeclarationTypeM;
-    boost::shared_ptr<DeclarationTypeM> declaration(new DeclarationTypeM());
-    cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(declaration);
+    typedef cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::MatData, cedar::aux::gui::ImagePlot> DeclarationType;
+    boost::shared_ptr<DeclarationType> declaration(new DeclarationType());
+    declaration->declare();
 
     return true;
   }

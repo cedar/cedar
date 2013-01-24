@@ -646,7 +646,7 @@ void cedar::proc::gui::StepItem::addRoleSeparator(const cedar::aux::Enum& e, QMe
 void cedar::proc::gui::StepItem::fillPlots
      (
        QMenu* pMenu,
-       std::map<QAction*, std::pair<cedar::aux::gui::PlotDeclarationPtr, cedar::aux::Enum> >& declMap
+       std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
      )
 {
   /*typedef cedar::aux::gui::PlotDeclarationManager::Node PlotNode;
@@ -679,7 +679,7 @@ void cedar::proc::gui::StepItem::fillPlots
         }
         else
         {
-          std::set<cedar::aux::gui::PlotDeclarationPtr> plots;
+          std::set<cedar::aux::gui::ConstPlotDeclarationPtr> plots;
           cedar::aux::gui::PlotManagerSingleton::getInstance()->getPlotClassesFor(data, plots);
 
           if (plots.empty())
@@ -689,15 +689,10 @@ void cedar::proc::gui::StepItem::fillPlots
           }
           else
           {
-            for
-            (
-              std::set<cedar::aux::gui::PlotDeclarationPtr>::iterator iter = plots.begin();
-              iter != plots.end();
-              ++iter
-            )
+            for (auto iter = plots.begin(); iter != plots.end(); ++iter)
             {
-              cedar::aux::gui::PlotDeclarationPtr declaration = *iter;
-              QAction *p_action = p_menu->addAction(QString::fromStdString(declaration->getPlotClass()));
+              cedar::aux::gui::ConstPlotDeclarationPtr declaration = *iter;
+              QAction *p_action = p_menu->addAction(QString::fromStdString(declaration->getClassName()));
               p_action->setData(QString::fromStdString(slot->getName()));
               declMap[p_action] = std::make_pair(declaration, e);
 
@@ -793,7 +788,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
-  std::map<QAction*, std::pair<cedar::aux::gui::PlotDeclarationPtr, cedar::aux::Enum> > advanced_plot_map;
+  std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> > advanced_plot_map;
   this->fillPlots(p_advanced_plotting, advanced_plot_map);
 
   QMenu *p_actions_menu = menu.addMenu("actions");
@@ -890,7 +885,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   // advanced plots
   else if (advanced_plot_map.find(a) != advanced_plot_map.end())
   {
-    cedar::aux::gui::PlotDeclarationPtr declaration = advanced_plot_map.find(a)->second.first;
+    cedar::aux::gui::ConstPlotDeclarationPtr declaration = advanced_plot_map.find(a)->second.first;
     const cedar::aux::Enum& e = advanced_plot_map.find(a)->second.second;
 
     std::string data_name = a->data().toString().toStdString();
