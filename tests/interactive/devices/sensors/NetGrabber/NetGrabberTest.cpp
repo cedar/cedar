@@ -60,6 +60,15 @@ namespace
 // ---------------------------------------------------------------------------------------------------------------------
 // Interactive test program
 // ---------------------------------------------------------------------------------------------------------------------
+
+/*! @file Interactive test for the NetGrabber class
+ *
+ *    This grabber get his frames from a yarp-server with the given channelname
+ *  @remarks
+ *    To create a yarp-stream, you could use the program interactiveTest_NetTransmitter
+ *    In order to use this grabber, a YARP-server have to be up and running.
+ */
+
 int main(int argc, char* argv[])
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -174,11 +183,14 @@ int main(int argc, char* argv[])
   processQtEvents();
 
   //----------------------------------------------------------------------------------------
-  //start the grabber-thread for updating camera images with 30 fps
+  //start the grabber-thread for updating camera images
   //----------------------------------------------------------------------------------------
 
-  //start the grabbing-thread.
   p_grabber->startGrabber();
+
+  //----------------------------------------------------------------------------------------
+  // send frames and show them on screen until window will be closed
+  //----------------------------------------------------------------------------------------
 
   unsigned int counter_stat = 0;
 

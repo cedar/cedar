@@ -377,7 +377,7 @@ void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
   this->mpProcessingDrawer->getScene()->setNetwork(network);
   this->mpProcessingDrawer->getScene()->reset();
   this->mNetwork->addElementsToScene();
-  this->mpPropertyTable->resetPointer();
+  this->mpPropertyTable->resetContents();
 }
 
 void cedar::proc::gui::Ide::architectureToolFinished()
@@ -505,7 +505,7 @@ void cedar::proc::gui::Ide::deleteElement(QGraphicsItem* pItem)
   // delete step
   if (cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(pItem))
   {
-    this->mpPropertyTable->resetPointer();
+    this->mpPropertyTable->resetContents();
     p_drawer->hide();
     p_drawer->getStep()->getNetwork()->remove(p_drawer->getStep());
   }

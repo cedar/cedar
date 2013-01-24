@@ -78,11 +78,16 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  //! does the backend initialization
+  //! Does the backend initialization
   virtual void initDevice();
 
-
-  bool init();
+  /*! @brief Initialization of the class
+   *
+   *  This function have to be called after the class was created.
+   *
+   * @return True, if the cameras are successfully initialized, otherwise false.
+   */
+  bool createCaptureDevice();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -93,7 +98,7 @@ protected:
   virtual void setProperties() = 0;
 
   //! Create a new Capture device
-  virtual bool createCaptureDevice() = 0;
+  virtual bool createCaptureObject() = 0;
 
   //! Apply all Settings to the Camera
   virtual void applySettingsToCamera() = 0;
