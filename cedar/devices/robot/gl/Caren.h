@@ -106,8 +106,10 @@ private:
   cedar::dev::robot::KinematicChainPtr mFingerOne;
   cedar::dev::robot::KinematicChainPtr mFingerTwo;
   cedar::dev::robot::KinematicChainPtr mFingerThree;
+  cedar::dev::robot::gl::KinematicChainPtr mTrunkVisualization;
   cedar::dev::robot::gl::KinematicChainPtr mArmVisualization;
   cedar::dev::robot::gl::SdhPtr mHandVisualization;
+  cedar::dev::robot::gl::KinematicChainPtr mHeadVisualization;
 
 }; // class cedar::dev::robot::gl::Caren
 #endif // CEDAR_DEV_ROBOT_GL_CAREN_H

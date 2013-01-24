@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/devices/robot/gl/namespace.h"
 #include "cedar/devices/robot/KinematicChain.h"
-#include "cedar/auxiliaries/gl/ObjectVisualization.h"
+#include "cedar/devices/robot/gl/KinematicChain.h"
 #include "cedar/auxiliaries/gl/gl.h"
 
 // SYSTEM INCLUDES
@@ -49,7 +49,7 @@
 /*!@brief Visualization of the PowerCube 110
  * ...
  */
-class cedar::dev::robot::gl::PowerCube110 : public cedar::aux::gl::ObjectVisualization
+class cedar::dev::robot::gl::PowerCube110 : public cedar::dev::robot::gl::KinematicChain
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -70,13 +70,18 @@ public:
   //!@brief the visualization initializes resources in the current GL context
   virtual void initializeGl();
 
-  //!@brief draws the hand
-  void draw();
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief draws the base
+  void drawBase();
+
+  //!@brief draws the segment attached to the specified joint
+  void drawSegment(unsigned int index);
+
+  //!@brief draws the end-effector
+  void drawEndEffector();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -90,8 +95,6 @@ private:
 protected:
   // none yet
 private:
-  cedar::dev::robot::KinematicChainPtr mpKinematicChain;
-
   // proximal link
   static const unsigned int mProximalLinkVertexNumber = 4299;
   static const unsigned int mProximalLinkFacesNumber = 2580;

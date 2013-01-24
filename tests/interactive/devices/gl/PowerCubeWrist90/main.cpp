@@ -62,7 +62,7 @@ int main(int argc, char **argv)
   // create gl visualization objects
   cedar::dev::robot::gl::PowerCubeWrist90Ptr head_visualization
   (
-      new cedar::dev::robot::gl::PowerCubeWrist90(head)
+    new cedar::dev::robot::gl::PowerCubeWrist90(head)
   );
 
   // create scene and viewer to display the arm
@@ -82,6 +82,7 @@ int main(int argc, char **argv)
   scene_widget->show();
   widget_head.show();
   viewer.startTimer(50);
+  head->startTimer(20);
   a.exec();
 
   return 0;
