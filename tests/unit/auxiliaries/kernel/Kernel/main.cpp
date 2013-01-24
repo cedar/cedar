@@ -42,6 +42,7 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
+#include <boost/filesystem.hpp>
 
 int test_io()
 {
