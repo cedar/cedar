@@ -111,6 +111,20 @@ int main(int /* argc */, char** /* argv */)
   step_b->onTrigger();
   std::cout << "done." << std::endl;
 
+  std::cout << "Trying to access sub-element in a step (should not work)." << std::endl;
+  try
+  {
+    // if this works ...
+    network->getElement("stepB.foo");
+    // ... increase error count.
+    std::cout << "Somehow got past a call that was not supposed to work." << std::endl;
+    ++errors;
+  }
+  catch(cedar::aux::ExceptionBase&) // this should throw some cedar exception.
+  {
+    std::cout << "Properly threw something." << std::endl;
+  }
+
   // test nested networks
   std::cout << "Test nested network." << std::endl;
   cedar::proc::NetworkPtr network_parent(new cedar::proc::Network());
