@@ -232,7 +232,7 @@ private:
   void fillPlots
   (
     QMenu* pMenu,
-    std::map<QAction*, std::pair<cedar::aux::gui::PlotDeclarationPtr, cedar::aux::Enum> >& declMap
+    std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
   );
 
   //!@brief Fills the defined plots into the given menu.

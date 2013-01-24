@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/MatDataPlot.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
@@ -63,7 +64,7 @@ namespace
     typedef cedar::aux::gui::PlotDeclarationTemplate<MatData, MatDataPlot> DeclarationType;
 
     boost::shared_ptr<DeclarationType> declaration(new DeclarationType());
-    cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(declaration);
+    declaration->declare();
     cedar::aux::gui::PlotManagerSingleton::getInstance()->setDefault<MatData, MatDataPlot>();
     return true;
   }

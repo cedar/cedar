@@ -41,7 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/HistoryPlot.h"
 #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
-#include "cedar/auxiliaries/gui/PlotManager.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/DoubleData.h"
@@ -57,9 +57,12 @@ namespace
 {
   bool registerPlot()
   {
-    typedef cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::DoubleData, cedar::aux::gui::HistoryPlot> DeclarationType;
-    boost::shared_ptr<DeclarationType> decl(new DeclarationType());
-    cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(decl);
+    typedef
+      cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::DoubleData, cedar::aux::gui::HistoryPlot>
+      DeclarationType;
+
+    boost::shared_ptr<DeclarationType> declaration(new DeclarationType());
+    declaration->declare();
     return true;
   }
 
