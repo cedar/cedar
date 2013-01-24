@@ -70,7 +70,7 @@ cedar::dev::sensors::camera::DeviceCvVideoCapture::~DeviceCvVideoCapture()
 
 
 // 1. step
-bool cedar::dev::sensors::camera::DeviceCvVideoCapture::createCaptureDevice()
+bool cedar::dev::sensors::camera::DeviceCvVideoCapture::createCaptureObject()
 {
 
 //  std::cout << "Create camera with cv::VideoCapture Backend\n"

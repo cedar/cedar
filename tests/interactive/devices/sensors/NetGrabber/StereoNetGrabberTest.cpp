@@ -61,6 +61,17 @@ namespace
 // ---------------------------------------------------------------------------------------------------------------------
 // Interactive test program
 // ---------------------------------------------------------------------------------------------------------------------
+
+/*! @file Interactive test for the StereoNetGrabber class
+ *
+ *    This grabber get his frames from a yarp-server with the given channelnames
+ *
+ *  @remarks
+ *    To create a yarp-stream, you could use the program interactiveTest_NetTransmitter
+ *    For a stereo stream, just start it twice with different video files.
+ *    In order to use this grabber, a YARP-server have to be up and running.
+ */
+
 int main(int argc, char* argv[])
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -191,8 +202,18 @@ int main(int argc, char* argv[])
 
   //process the events generated inside QT-Framework
   processQtEvents();
-  unsigned int counter_stat = 0;
+
+  //----------------------------------------------------------------------------------------
+  //start the grabber-thread for updating images from video file
+  //----------------------------------------------------------------------------------------
+
   p_grabber->startGrabber();
+
+  //----------------------------------------------------------------------------------------
+  // send frames and show them on screen until window will be closed
+  //----------------------------------------------------------------------------------------
+
+  unsigned int counter_stat = 0;
 
   while (p_plot->isVisible())
   {

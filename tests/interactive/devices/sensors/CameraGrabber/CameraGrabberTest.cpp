@@ -53,8 +53,10 @@ namespace
 // Interactive test program
 // ---------------------------------------------------------------------------------------------------------------------
 
-// Use this, if you want to test with a firewire camera
+// Use this, if you want to test with a firewire camera (only possible, if cedar is compiled with dc1394 support)
+#ifdef CEDAR_USE_LIB_DC1394
 #define USE_FIREWIRE_BACKEND
+#endif
 
 int main(int argc, char* argv[])
 {
