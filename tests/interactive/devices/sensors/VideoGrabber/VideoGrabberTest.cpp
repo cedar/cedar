@@ -24,6 +24,7 @@
 
 // SYSTEM INCLUDES
 #include <QtGui/QApplication>
+#include <ios>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Local methods
@@ -46,7 +47,7 @@ namespace
   void showUsage(std::string programName)
   {
     std::cout << "\n\nInteractive test for the VideoGrabber class.\n\n"
-        << "Usage: \t" << programName << " <VideoFile>"
+        << "Usage: \t" << programName << " <VideoFile>\n"
         << std::endl;
   }
 
@@ -79,6 +80,8 @@ int main(int argc, char* argv[])
   const std::string filename_channel0 = std::string(argv[1]);
   const std::string window_title = "VideoGrabber: \""+ filename_channel0 + "\"";
 
+  std::cout.setf(std::ios::fixed,std::ios::floatfield);
+  std::cout.precision(3);
 
   std::cout << "\n\nInteractive test of the VideoGrabber class (mono)\n";
   std::cout << "--------------------------------------------\n\n";
@@ -159,6 +162,7 @@ int main(int argc, char* argv[])
   cedar::aux::gui::ImagePlotPtr p_plot = cedar::aux::gui::ImagePlotPtr(new cedar::aux::gui::ImagePlot());
   cedar::aux::MatDataPtr p_data = cedar::aux::MatDataPtr(new cedar::aux::MatData(frame0));
   p_plot->plot(p_data,window_title);
+  p_plot->setWindowTitle(QString::fromStdString(window_title));
   p_plot->show();
   p_plot->resize(frame0.cols,frame0.rows);
 
@@ -191,7 +195,7 @@ int main(int argc, char* argv[])
     p_lock->unlock();
 
     //status
-    if (++counter_stat %= 200 )
+    if (!(++counter_stat %= 100))
     {
       std::cout << "Measured FPS: " << p_grabber->getFpsMeasured()
                 << "\tPos_Rel: "<< p_grabber->getPositionRelative()
@@ -199,8 +203,10 @@ int main(int argc, char* argv[])
                 << std::endl;
     }
 
-    // watch the output. The video is much slower than 100 fps.
+    // watch the output - everything should be fine.
+    //The video is much slower than 100 fps.
     cedar::aux::sleep(cedar::unit::Milliseconds(10));
+
   }
 
   //----------------------------------------------------------------------------------------

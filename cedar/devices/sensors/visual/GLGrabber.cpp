@@ -158,13 +158,13 @@ void cedar::dev::sensors::visual::GLGrabber::onCleanUp()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::GLGrabber::onUpdateSourceInfo(unsigned int channel)
+std::string cedar::dev::sensors::visual::GLGrabber::onUpdateSourceInfo(unsigned int channel)
 {
   // value of channel is already checked by GraberInterface::getSourceInfo()
-  setChannelInfoString(channel, "Channel " + boost::lexical_cast<std::string>(channel)
+  return "Channel " + boost::lexical_cast<std::string>(channel)
                                       + ": QT::OGLWidget class \""
                                       + typeid(getGLChannel(channel)->mpQGLWidget).name()
-                                      + "\"");
+                                      + "\"";
 }
 
 //----------------------------------------------------------------------------------------------------------------------

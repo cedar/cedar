@@ -84,7 +84,7 @@
  *      Initialize in the constructor of a derived class the filenames or camera-device-names.
  *      At the end of the constructor, call doInit() with the number of channels you use and with a default name.
  *      At the beginning of the destructor, call doCleanUp() and do the cleanup in this function.
- *      To get an example look at the VideoGrabber or the TestGrabber-class. <br><br>
+ *      To get an example, have a look at the VideoGrabber or the TestGrabber-class. <br><br>
  *
  *
  */
@@ -572,7 +572,7 @@ protected:
    *
    *  @param channel The channel which should be updated
    */
-  virtual void onUpdateSourceInfo(unsigned int channel) = 0;
+  virtual std::string onUpdateSourceInfo(unsigned int channel) = 0;
 
   //! Get the Pointer to the SnapshotName Element
   //cedar::aux::FileParameterPtr getSnapshotNameParamter();

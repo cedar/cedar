@@ -63,7 +63,7 @@ cedar::aux::Configurable(),
 QObject(),
 cedar::dev::sensors::visual::GrabberChannel(),
 mpVideoCaptureLock(new QReadWriteLock()),
-mBackendType(-1),
+mBackendType(cedar::dev::sensors::camera::BackendType::CVCAPTURE), //will be set to auto
 _mpBackendType(new cedar::aux::EnumParameter
                 (
                   this,
@@ -95,7 +95,7 @@ _mpFPS(new cedar::aux::EnumParameter
              this,
              "camera fps",
              cedar::dev::sensors::camera::FrameRate::typePtr(),
-             cedar::dev::sensors::camera::FrameRate::FPS_15
+             cedar::dev::sensors::camera::FrameRate::FPS_NOT_SET //FPS_15
            )
        )
 #ifdef CEDAR_USE_LIB_DC1394
@@ -105,7 +105,7 @@ _mpIsoSpeed(new cedar::aux::EnumParameter
                   this,
                   "iso speed",
                   cedar::dev::sensors::camera::IsoSpeed::typePtr(),
-                  cedar::dev::sensors::camera::IsoSpeed::ISO_200
+                  cedar::dev::sensors::camera::IsoSpeed::ISO_NOT_SET //ISO_200
                 )
             )
 #endif
@@ -148,10 +148,10 @@ void cedar::dev::sensors::camera::Channel::setBackendType
   cedar::dev::sensors::camera::BackendType::Id backendType
 )
 {
- // std::cout << "cedar::dev::sensors::camera::Channel::setBackendType ";
+  //std::cout << "cedar::dev::sensors::camera::Channel::setBackendType ";
   if (mBackendType != backendType)
   {
-   // std::cout << "change to " << cedar::dev::sensors::camera::BackendType::type().get(backendType).prettyString() << std::endl;
+    //std::cout << "change to " << cedar::dev::sensors::camera::BackendType::type().get(backendType).prettyString() << std::endl;
 
     mBackendType = backendType;
 
@@ -165,20 +165,16 @@ void cedar::dev::sensors::camera::Channel::setBackendType
       case cedar::dev::sensors::camera::BackendType::DC1394:
       {
         _mpByGuid->setHidden(false);
-
-        // set visible of grab-mode to true
-        // disable unavailable grab-modes (depends on cam)
-        // disable unavailable fps (depends on mode)
-
         _mpIsoSpeed->setHidden(false);
-
-        // show all modes
-        // show only available modes
-        _mpGrabMode->enableAll();
-
-        // set visible of fps to false, fps is only used in a console-program or for firewire cameras
         _mpFPS->setHidden(false);
 
+
+        // set visibility of  all grab-modes to true
+        _mpGrabMode->enableAll();
+
+
+        // @todo: disable unavailable grab-modes (depends on cam)
+        // @todo: disable unavailable fps (depends on mode)
       }
       break;
   #endif
@@ -195,7 +191,7 @@ void cedar::dev::sensors::camera::Channel::setBackendType
         // ignore byGUID (default values)
         _mpByGuid->setHidden(true);
 
-        // set visible of fps to false, fps is only used in a console-program or for firewire cameras
+        // fps depends on the camera
         _mpFPS->setHidden(true);
 
 
@@ -205,17 +201,22 @@ void cedar::dev::sensors::camera::Channel::setBackendType
         _mpIsoSpeed->setHidden(true);
 
   #endif
-
-        // set visible of grab-mode to false
-
       }
 
     } // end switch
+
+    //set default values on backend-switching
+    _mpIsoSpeed->setValue(cedar::dev::sensors::camera::IsoSpeed::ISO_NOT_SET);
+    _mpFPS->setValue(cedar::dev::sensors::camera::FrameRate::FPS_NOT_SET);
+    _mpGrabMode->setValue(cedar::dev::sensors::camera::VideoMode::MODE_NOT_SET);
+
   } // end changed backend
   else
   {
     //std::cout << "nothing changed" << std::endl;
   }
+
+
 
 }
 

@@ -25,6 +25,7 @@
 #include <QtGui/QApplication>
 #include <opencv2/opencv.hpp>
 #include <boost/lexical_cast.hpp>
+#include <ios>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Local methods
@@ -72,6 +73,13 @@ int main(int argc, char* argv[])
   //title of plot window
   std::string window_title = "Cameras: " + boost::lexical_cast<std::string>(DEVICE_ID_CHANNEL0)
       + ", " + boost::lexical_cast<std::string>(DEVICE_ID_CHANNEL1);
+
+
+  //--------------------------------------------------------------------------------------------------------------------
+  //main test
+  //--------------------------------------------------------------------------------------------------------------------
+  std::cout.setf(std::ios::fixed,std::ios::floatfield);
+  std::cout.precision(3);
 
   std::cout << "\n\nInteractive test of the CameraGrabber class (stereo)\n";
   std::cout << "--------------------------------------------\n\n";
@@ -214,6 +222,7 @@ int main(int argc, char* argv[])
   cedar::aux::gui::ImagePlotPtr p_plot = cedar::aux::gui::ImagePlotPtr(new cedar::aux::gui::ImagePlot());
   cedar::aux::MatDataPtr p_data = cedar::aux::MatDataPtr(new cedar::aux::MatData(stereo_pic));
   p_plot->plot(p_data,window_title);
+  p_plot->setWindowTitle(QString::fromStdString(window_title));
   p_plot->show();
   p_plot->resize(stereo_pic.cols,stereo_pic.rows);
 

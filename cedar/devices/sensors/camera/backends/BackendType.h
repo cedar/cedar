@@ -54,8 +54,10 @@ class cedar::dev::sensors::camera::BackendType
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Typedef for the enum values
   typedef cedar::aux::EnumId Id;
 public:
+  //! Typedef for this enum as shared pointer
   typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -68,9 +70,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Construct
   static void construct();
 
+  //! Type
   static const cedar::aux::EnumBase& type();
+
+  //! Type Pointer
   static const cedar::dev::sensors::camera::BackendType::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------

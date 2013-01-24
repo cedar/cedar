@@ -179,11 +179,10 @@ void cedar::dev::sensors::visual::GrabbableGrabber::onCleanUp()
 }
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::GrabbableGrabber::onUpdateSourceInfo(unsigned int channel)
+std::string cedar::dev::sensors::visual::GrabbableGrabber::onUpdateSourceInfo(unsigned int channel)
 {
-  setChannelInfoString(channel, this->getName() + ": Channel "
-                                      + boost::lexical_cast<std::string>(channel) + ": "
-                                      + typeid(getGrabbableChannel(channel)->mpSourceInterfaceClass).name());
+  return this->getName() + ": Channel " + boost::lexical_cast<std::string>(channel) + ": "
+               + typeid(getGrabbableChannel(channel)->mpSourceInterfaceClass).name();
 }
 
 //----------------------------------------------------------------------------------------------------
