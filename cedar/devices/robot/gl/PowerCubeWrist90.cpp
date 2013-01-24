@@ -55,13 +55,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::robot::gl::PowerCubeWrist90::PowerCubeWrist90
-(
-  cedar::dev::robot::KinematicChainPtr kinematicChain
-)
+cedar::dev::robot::gl::PowerCubeWrist90::PowerCubeWrist90(cedar::dev::robot::KinematicChainPtr kinematicChain)
 :
-cedar::aux::gl::ObjectVisualization(kinematicChain->getRootCoordinateFrame()),
-mpKinematicChain(kinematicChain)
+cedar::dev::robot::gl::KinematicChain(kinematicChain)
 {
   loadData();
 }
@@ -126,56 +122,67 @@ void cedar::dev::robot::gl::PowerCubeWrist90::initializeGl()
 #endif // ndef CEDAR_OS_WINDOWS
 }
 
-void cedar::dev::robot::gl::PowerCubeWrist90::draw()
+void cedar::dev::robot::gl::PowerCubeWrist90::drawBase()
 {
-  setAxisLength(0);
-  setResolution(20);
-  setColor(.5, .5, .5);
-
   prepareDraw();
-  if (mIsVisible)
+  glRotated(-90.0, 1.0, 0.0, 0.0);
+  if (mIsDrawnAsWireFrame)
   {
-    cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
-
-    // save hand origin to stack
-    glPushMatrix();
-
-    // draw the base
-    if (isDrawingLocalCoordinateFrame())
-    {
-      cedar::aux::gl::drawAxes(0.05);
-      cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
-    }
-
-    // transform to make up for data file organization
-//    glRotated(90, 1, 0, 0);
-//    glTranslated(0, 0.1105, 0);
-
-    // draw
-    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
-    this->drawElement(mProximalLinkVertexVboId, mProximalLinkIndexVboId, mProximalLinkFacesNumber);
-    this->drawElement(mBoxVertexVboId, mBoxIndexVboId, mBoxFacesNumber);
-    this->drawElement(mConnectorVertexVboId, mConnectorIndexVboId, mConnectorFacesNumber);
-    glRotated(mpKinematicChain->getJointAngle(0)*180.0/cedar::aux::math::pi, 1, 0, 0);
-    this->drawElement(mDistalLinkVertexVboId, mDistalLinkIndexVboId, mDistalLinkFacesNumber);
-    glRotated(mpKinematicChain->getJointAngle(1)*180.0/cedar::aux::math::pi, 0, 1, 0);
-    this->drawElement(mWristLinkVertexVboId, mWristLinkIndexVboId, mWristLinkFacesNumber);
-    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   }
-
-
-
-
-
-
-
-
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-
+  else
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  }
+  setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
+  this->drawElement(mWristLinkVertexVboId, mWristLinkIndexVboId, mWristLinkFacesNumber);
 }
 
+void cedar::dev::robot::gl::PowerCubeWrist90::drawSegment(unsigned int index)
+{
+  // move to origin transformation and resave it to the stack
+  glPopMatrix();
+  glPushMatrix();
 
+  // move to object coordinates
+  mTransformationTranspose = mpKinematicChain->getJointTransformation(index).t();
+  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  glRotated(-90.0, 1.0, 0.0, 0.0);
+  glRotated(-90.0, 0.0, 1.0, 0.0);
+
+  if (isDrawingLocalCoordinateFrame())
+  {
+    cedar::aux::gl::drawAxes(0.2);
+  }
+  if (mIsDrawnAsWireFrame)
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  }
+  else
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  }
+  switch (index)
+  {
+  case 0:
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
+    this->drawElement(mDistalLinkVertexVboId, mDistalLinkIndexVboId, mDistalLinkFacesNumber);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
+    break;
+  case 1:
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
+    this->drawElement(mProximalLinkVertexVboId, mProximalLinkIndexVboId, mProximalLinkFacesNumber);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
+    break;
+
+  }
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
+void cedar::dev::robot::gl::PowerCubeWrist90::drawEndEffector()
+{
+
+}
 
 void cedar::dev::robot::gl::PowerCubeWrist90::loadData()
 {

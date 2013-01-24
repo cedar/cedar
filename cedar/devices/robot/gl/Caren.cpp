@@ -38,8 +38,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/gl/Caren.h"
+#include "cedar/devices/robot/gl/PowerCube110.h"
 #include "cedar/devices/robot/gl/KukaArm.h"
 #include "cedar/devices/robot/gl/Sdh.h"
+#include "cedar/devices/robot/gl/PowerCubeWrist90.h"
 #include "cedar/auxiliaries/gl/gl.h"
 #include "cedar/auxiliaries/gl/drawShapes.h"
 
@@ -68,8 +70,10 @@ mPalm(palm),
 mFingerOne(fingerOne),
 mFingerTwo(fingerTwo),
 mFingerThree(fingerThree),
+mTrunkVisualization(new cedar::dev::robot::gl::PowerCube110(trunk)),
 mArmVisualization(new cedar::dev::robot::gl::KukaArm(arm)),
-mHandVisualization(new cedar::dev::robot::gl::Sdh(fingerOne, fingerTwo, fingerThree, palm))
+mHandVisualization(new cedar::dev::robot::gl::Sdh(fingerOne, fingerTwo, fingerThree, palm)),
+mHeadVisualization(new cedar::dev::robot::gl::PowerCubeWrist90(head))
 {
 
 }
@@ -85,47 +89,51 @@ cedar::dev::robot::gl::Caren::~Caren()
 
 void cedar::dev::robot::gl::Caren::initializeGl()
 {
+  mTrunkVisualization->initializeGl();
   mArmVisualization->initializeGl();
   mHandVisualization->initializeGl();
+  mHeadVisualization->initializeGl();
 }
 
 void cedar::dev::robot::gl::Caren::draw()
 {
-//  drawBase();
+  drawBase();
+  mTrunkVisualization->draw();
   mArmVisualization->draw();
   mHandVisualization->draw();
+  mHeadVisualization->draw();
 }
 
 void cedar::dev::robot::gl::Caren::drawBase()
 {
-  // move to origin
-  glPopMatrix();
-  glPushMatrix();
-
-  // move to object coordinates
-  mTransformationTranspose = mTrunk->getRootTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
-
-//  setMaterial(CHROME);
-  glTranslated(-.090 - .025, 0, .010 + .070);
-  cedar::aux::gl::drawBlock(.050, .050, .140, mIsDrawnAsWireFrame); // this is the aluminum block
-//  setMaterial(DARK_BLUE_METAL);
-  glTranslated(-.025 - .010, 0, 0);
-  cedar::aux::gl::drawBlock(.020, .050, .140, mIsDrawnAsWireFrame); // this is the small blue block
-  glTranslated(-.010 - .025, 0, .1625);
-  cedar::aux::gl::drawBlock(.050, .050, .465, mIsDrawnAsWireFrame); // this is the tall pole
-//  setMaterial(CHROME);
-  glTranslated(0, 0, .2325 + .004);
-  cedar::aux::gl::drawBlock(.050, .050, .008, mIsDrawnAsWireFrame); // now comes the aluminum connector
-  glTranslated(0, 0, .004 + .013);
-  glRotated(45, 0, 0, 1);
-  cedar::aux::gl::drawBlock(.031, .031, .026, mIsDrawnAsWireFrame);
-  glRotated(-45, 0, 0, 1);
-  glTranslated(0, 0, .013 + .023);
-  cedar::aux::gl::drawBlock(.050, .050, .046, mIsDrawnAsWireFrame);
-  glTranslated(-.025 + .1175, 0, .023 + .005);
-  cedar::aux::gl::drawBlock(.235, .050, .010, mIsDrawnAsWireFrame); // this is the long horizontal piece
-//  setMaterial(NO_MATERIAL);
+//  // move to origin
+//  glPopMatrix();
+//  glPushMatrix();
+//
+//  // move to object coordinates
+//  mTransformationTranspose = mTrunk->getRootTransformation().t();
+//  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+//
+////  setMaterial(CHROME);
+//  glTranslated(-.090 - .025, 0, .010 + .070);
+//  cedar::aux::gl::drawBlock(.050, .050, .140, mIsDrawnAsWireFrame); // this is the aluminum block
+////  setMaterial(DARK_BLUE_METAL);
+//  glTranslated(-.025 - .010, 0, 0);
+//  cedar::aux::gl::drawBlock(.020, .050, .140, mIsDrawnAsWireFrame); // this is the small blue block
+//  glTranslated(-.010 - .025, 0, .1625);
+//  cedar::aux::gl::drawBlock(.050, .050, .465, mIsDrawnAsWireFrame); // this is the tall pole
+////  setMaterial(CHROME);
+//  glTranslated(0, 0, .2325 + .004);
+//  cedar::aux::gl::drawBlock(.050, .050, .008, mIsDrawnAsWireFrame); // now comes the aluminum connector
+//  glTranslated(0, 0, .004 + .013);
+//  glRotated(45, 0, 0, 1);
+//  cedar::aux::gl::drawBlock(.031, .031, .026, mIsDrawnAsWireFrame);
+//  glRotated(-45, 0, 0, 1);
+//  glTranslated(0, 0, .013 + .023);
+//  cedar::aux::gl::drawBlock(.050, .050, .046, mIsDrawnAsWireFrame);
+//  glTranslated(-.025 + .1175, 0, .023 + .005);
+//  cedar::aux::gl::drawBlock(.235, .050, .010, mIsDrawnAsWireFrame); // this is the long horizontal piece
+////  setMaterial(NO_MATERIAL);
 
 }
 

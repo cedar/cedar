@@ -62,8 +62,9 @@ int main(int argc, char **argv)
   // create gl visualization objects
   cedar::dev::robot::gl::PowerCube110Ptr trunk_visualization
   (
-      new cedar::dev::robot::gl::PowerCube110(trunk)
+    new cedar::dev::robot::gl::PowerCube110(trunk)
   );
+//  trunk->updateTransformations();
 
   // create scene and viewer to display the arm
   cedar::aux::gl::ScenePtr scene(new cedar::aux::gl::Scene());
@@ -82,6 +83,7 @@ int main(int argc, char **argv)
   scene_widget->show();
   widget_trunk.show();
   viewer.startTimer(50);
+  trunk->startTimer(20);
   a.exec();
 
   return 0;
