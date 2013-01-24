@@ -268,7 +268,9 @@ bool cedar::dev::sensors::camera::Grabber::onCreateGrabber()
     bool all_devices_created = true;
     for (unsigned int channel = 0; channel < num_cams; ++channel)
     {
-      getCameraChannel(channel)->createBackend();
+      //backend already created on initialization
+      //getCameraChannel(channel)->createBackend();
+
       bool device_created = getCameraChannel(channel)->mpBackend->createCaptureDevice();
 
       if (device_created)
