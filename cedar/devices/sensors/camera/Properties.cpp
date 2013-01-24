@@ -126,7 +126,8 @@ void cedar::dev::sensors::camera::Properties::propertyValueChanged
   double newValue
 )
 {
-  // std::cout << "[propertyValueChanged] prop :" << propertyId << " to " << newValue << std::endl;
+//  std::cout << __PRETTY_FUNCTION__ << std::endl;
+//  std::cout << "[propertyValueChanged] prop :" << propertyId << " to " << newValue << std::endl;
 
   // get the used CamProperty
   cedar::dev::sensors::camera::CamPropertyPtr p_prop = (*mpPropertiesList)[propertyId];
@@ -151,17 +152,26 @@ void cedar::dev::sensors::camera::Properties::propertyModeChanged
 )
 {
 
-  //std::cout << "[propertyModeChanged] prop :" << propertyId << " to " << newMode << std::endl;
+  // mode is automatically set in the backend, because of the use as enum-parameter
+
+  std::cout << "[propertyModeChanged] prop :" << propertyId << " to " << newMode << std::endl;
 
   // get the used CamProperty
   cedar::dev::sensors::camera::CamPropertyPtr p_prop = (*mpPropertiesList)[propertyId];
 
-  // get values from the camera depends on mode
-  if (newMode == cedar::dev::sensors::camera::PropertyMode::MANUAL)
-  {
-    double value = getPropertyFromCamera(propertyId);
-    p_prop->setValue(value);
-  }
+//  if (p_prop->getMode() != newMode)
+//  {
+//    // changed mode
+//    std::cout << "different from backend" << std::endl;
+//  }
+//  else
+//  {
+//    std::cout << "equal in backend" << std::endl;
+//  }
+
+  // get actual values from the camera
+  double value = getPropertyFromCamera(propertyId);
+  p_prop->setValue(value);
 
 }
 
@@ -264,23 +274,23 @@ double cedar::dev::sensors::camera::Properties::getProperty
 bool cedar::dev::sensors::camera::Properties::setPropertyToCamera(unsigned int propertyId, double value)
 {
   std::string prop_name = cedar::dev::sensors::camera::Property::type().get(propertyId).prettyString();
-/*  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                           (
-                                             "set property " + prop_name
-                                             + " to " + boost::lexical_cast<std::string>(value),
-                                             "cedar::dev::sensors::camera::Properties::setPropertyToCamera()"
-                                           );*/
 
   bool result = false;
   mpVideoCaptureLock->lockForWrite();
   if (mVideoCapture.isOpened())
   {
     //set only real values or CAMERA_PROPERTY_MODE_AUTO
-    if (    (value != CAMERA_PROPERTY_NOT_SUPPORTED)
-         || (value != CAMERA_PROPERTY_MODE_DEFAULT)
-       )
+    if ((value != CAMERA_PROPERTY_NOT_SUPPORTED) || (value != CAMERA_PROPERTY_MODE_DEFAULT))
     {
       result = mVideoCapture.set(propertyId, value);
+      //  cedar::aux::LogSingleton::getInstance()->debugMessage
+      //                                           (
+      //                                             "set property " + prop_name
+      //                                             + " to " + boost::lexical_cast<std::string>(value),
+      //                                             "cedar::dev::sensors::camera::Properties::setPropertyToCamera()"
+      //                                           );
+      std::cout << "Prooperties: set property " << prop_name  << " to " << boost::lexical_cast<std::string>(value)
+                << std::endl;
     }
   }
   mpVideoCaptureLock->unlock();
@@ -334,6 +344,8 @@ cedar::dev::sensors::camera::PropertyMode::Id cedar::dev::sensors::camera::Prope
   cedar::dev::sensors::camera::Property::Id propertyId
 )
 {
+//  std::cout << __PRETTY_FUNCTION__ << " from Property " << propertyId
+//            << ": mode " <<(*mpPropertiesList)[propertyId]->getMode()<< std::endl;
   return (*mpPropertiesList)[propertyId]->getMode();
 }
 

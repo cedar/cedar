@@ -126,7 +126,7 @@ public:
   /*! get the value from the cv::VideoCapture object with respect to capabilities and settings
    *
    * @param propertyId The Id of the property as cedar::dev::sensors::camera::Property::Id
-   * @return If the value is negative, then the mode of the property is either BACKEND_DEFAULT or AUTO
+   * @return The value of the property
    */
   double getProperty(cedar::dev::sensors::camera::Property::Id propertyId);
 

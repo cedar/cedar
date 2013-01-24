@@ -87,7 +87,7 @@
 #endif // CV_CAP_PROP_GAMMA
 
 #ifndef CV_CAP_PROP_DC1394_MODE_AUTO
-  #define CV_CAP_PROP_DC1394_MODE_AUTO 0
+  #define CV_CAP_PROP_DC1394_MODE_AUTO -2 // was 0
 #endif // CV_CAP_PROP_DC1394_MODE_AUTO
 
 // opencv 2.2 compatibility:
@@ -121,7 +121,7 @@
 
 //return value, if a property is not supported from the actual device
 //have to be larger than the highest value of the properties!
-#define CAMERA_PROPERTY_NOT_SUPPORTED 1000
+#define CAMERA_PROPERTY_NOT_SUPPORTED 100000
 
 //mappings from OpenCV constants
 
@@ -133,7 +133,7 @@
 #define CAMERA_PROPERTY_MODE_DEFAULT -3
 
 //if a feature is on/off capable, this value turns it off //=-4
-#define CAMERA_PROPERTY_MODE_OFF CV_CAP_PROP_DC1394_OFF
+//#define CAMERA_PROPERTY_MODE_OFF CV_CAP_PROP_DC1394_OFF
 
 //this sets a property to its one_push_auto mode. The feature have to be one_push_auto capable.
 //one_push_auto: set the property to the wanted value and then to one_push_auto.
