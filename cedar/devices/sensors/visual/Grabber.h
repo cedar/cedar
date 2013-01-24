@@ -589,6 +589,15 @@ protected:
    */
   cv::Mat& getImageMat(unsigned int channel);
 
+  /*! @brief Updates the info string of the given channel
+   *
+   * Call this method in the derived class in the method onUpdateSourceInfo()
+   * to update the infos about the channel source
+   *
+   * @param channel The channel you want to update
+   * @param info The new info-string for that channel
+   */
+  void setChannelInfoString(unsigned int channel, std::string info);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -625,15 +634,6 @@ private:
     return _mChannels->at(channel);
   }
 
-  /*! @brief Updates the info string of the given channel
-   *
-   * Call this method in the derived class in the method onUpdateSourceInfo()
-   * to update the infos about the channel source
-   *
-   * @param channel The channel you want to update
-   * @param info The new info-string for that channel
-   */
-  void setChannelInfoString(unsigned int channel, std::string info);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

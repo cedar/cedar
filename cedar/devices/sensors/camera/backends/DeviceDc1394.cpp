@@ -56,7 +56,7 @@ cedar::dev::sensors::camera::DeviceDc1394::DeviceDc1394
   cedar::dev::sensors::camera::Channel* pCameraChannel
 )
 :
-cedar::dev::sensors::camera::Device::Device(pCameraChannel),
+cedar::dev::sensors::camera::Device(pCameraChannel),
 mpLibDcInterface(new cedar::dev::sensors::camera::LibDcBase)
 {
 }
@@ -98,8 +98,23 @@ void cedar::dev::sensors::camera::DeviceDc1394::initDevice()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-//step 1
-bool cedar::dev::sensors::camera::DeviceDc1394::createCaptureDevice()
+
+/*
+void cedar::dev::sensors::camera::DeviceDc1394::updateSettings()
+{
+  //get framerates of newly set video mode
+
+
+  VideoMode::Id mode_from_gui = mpCameraChannel->_mpGrabMode->getValue();
+  if (! ((mode_from_gui == VideoMode::MODE_NOT_SET) || (mode_from_gui <= VideoMode::NUM_9)))
+  {
+    getFrameRatesFromLibDc(mpCameraChannel->_mpGrabMode->getValue());
+  }
+
+}
+*/
+
+bool cedar::dev::sensors::camera::DeviceDc1394::createCaptureObject()
 {
   if (mpLibDcInterface)
   {
@@ -327,12 +342,10 @@ bool cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()
 
 void cedar::dev::sensors::camera::DeviceDc1394::getFeaturesFromLibDc()
 {
-  // ***************************************
   // get all features from cam
-  // ***************************************
   dc1394featureset_t cam_features = mpLibDcInterface->getCamFeatures();
 
-  //get all settings for all properties from camera
+  //synchronize every feature (i.e. property) with the representing object
   int num_properties = cedar::dev::sensors::camera::Property::type().list().size();
   for (int prop = 0; prop < num_properties; ++prop)
   {
