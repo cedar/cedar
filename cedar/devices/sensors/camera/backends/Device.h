@@ -78,8 +78,14 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  //! Does the backend initialization
-  virtual void initDevice();
+  /*! In this method, properties and settings from the backend could be set
+   *
+   *  read the values probably with the help of external libraries in order to read
+   *  min/max values or supported features from the wanted device and set them in the channel structure.
+   *  This method is called before createCaptureDevice() is invoked.
+   *
+   */
+  virtual void init();
 
   /*! @brief Initialization of the class
    *
@@ -94,17 +100,18 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  //! Set all properties to the camera
-  virtual void setProperties() = 0;
-
   //! Create a new Capture device
   virtual bool createCaptureObject() = 0;
 
   //! Apply all Settings to the Camera
   virtual void applySettingsToCamera() = 0;
 
-  //! Apply all Parameters to the Camera
-  virtual void applyStateToCamera() = 0;
+  //! Apply all Parameters from the GUI to the Camera
+  void applyStateToCamera();
+
+
+  //! Test all properties from the device and enable/disable the properties of the channel
+  virtual void getAvailablePropertiesFromCamera(){};
 
 
   /*! @brief Set a property direct in the cv::VideoCapture class

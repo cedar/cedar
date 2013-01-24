@@ -80,7 +80,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //! does the backend initialization
-  void initDevice();
+  void init();
 
   //! update settings from gui
   //void updateSettings();
@@ -89,10 +89,10 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void setProperties();
+
+  // derived from class Device
   void applySettingsToCamera();
   bool createCaptureObject();
-  void applyStateToCamera();
 
   /*! @brief Opens the wanted camera with libDc methods
    *
