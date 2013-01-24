@@ -45,6 +45,8 @@
 
 cedar::dev::robot::SimulatedKinematicChain::SimulatedKinematicChain()
 {
+  QWriteLocker locker(&mAnglesLock);
+
   mJointAngles = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
 }
 
@@ -68,11 +70,15 @@ bool cedar::dev::robot::SimulatedKinematicChain::isMovable() const
 
 double cedar::dev::robot::SimulatedKinematicChain::getJointAngle(unsigned int index) const
 {
+  QReadLocker locker(&mAnglesLock);
+
   return mJointAngles.at<double>(index, 0);
 }
 
 void cedar::dev::robot::SimulatedKinematicChain::setJointAngle(unsigned int index, double angle)
 {
+  QWriteLocker locker(&mAnglesLock);
+
   mJointAngles.at<double>(index, 0) = angle;
 }
 

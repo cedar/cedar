@@ -19,9 +19,32 @@
 #include "cedar/devices/sensors/visual/NetGrabber.h"
 
 // SYSTEM INCLUDES
+#include <QtGui/QApplication>
 #include <opencv2/opencv.hpp>
+#include <boost/lexical_cast.hpp>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Local methods
+// ---------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  void processQtEvents()
+  {
+#ifdef CEDAR_OS_APPLE
+    unsigned int event_counter = 0;
+    while (QApplication::hasPendingEvents() && (++event_counter < 1000))
+#else
+    while (QApplication::hasPendingEvents())
+#endif
+    {
+      QApplication::processEvents();
+    }
+  }
+}
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Interactive test program
+// ---------------------------------------------------------------------------------------------------------------------
 int main(int , char **)
 {
 /*

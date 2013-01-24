@@ -80,3 +80,7 @@ include(${CEDAR_CMAKE_DIR}/install.txt)
 
 # setup of packaging
 include(${CEDAR_CMAKE_DIR}/packaging.txt)
+
+# output configuration summary
+include(${CEDAR_CMAKE_DIR}/summary.txt)
+

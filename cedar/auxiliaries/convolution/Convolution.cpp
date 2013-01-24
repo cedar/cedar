@@ -77,6 +77,7 @@ _mEngine
   new cedar::aux::conv::EngineParameter(this, "engine", cedar::aux::conv::EnginePtr(new cedar::aux::conv::OpenCV()))
 )
 {
+  this->_mEngine->markAdvanced();
   this->selectedEngineChanged();
 
   QObject::connect(this->_mEngine.get(), SIGNAL(valueChanged()), this, SLOT(selectedEngineChanged()));

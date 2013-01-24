@@ -179,9 +179,6 @@ bool cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()
 
     // apply the new content to the channel image
     getImageMat(channel) = frame;
-
-    // don't forget to update the channel info
-    this->setChannelInfo(channel);
   }
 
 
@@ -218,7 +215,7 @@ void cedar::dev::sensors::visual::TestGrabber::onCloseGrabber()
 
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::TestGrabber::setChannelInfo(unsigned int channel)
+void cedar::dev::sensors::visual::TestGrabber::onUpdateSourceInfo(unsigned int channel)
 {
 
   // no range-check is needed, because this method is a private method
