@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
+#include <boost/numeric/conversion/bounds.hpp>
 #include <qwt_legend.h>
 #include <qwt_scale_div.h>
 #include <QContextMenuEvent>
@@ -366,8 +367,8 @@ void cedar::aux::gui::LinePlot::setFixedYAxisScaling()
   cedar::aux::math::Limits<double> y_limits = this->getYLimits();
   auto p_lower = new QDoubleSpinBox();
   p_layout->addWidget(p_lower, 0, 1);
-  p_lower->setMinimum(std::numeric_limits<double>::lowest());
-  p_lower->setMaximum(std::numeric_limits<double>::max());
+  p_lower->setMinimum(boost::numeric::bounds<double>::lowest());
+  p_lower->setMaximum(boost::numeric::bounds<double>::highest());
   p_lower->setValue(y_limits.getLower());
 
   p_label = new QLabel("upper limit:");
@@ -375,8 +376,8 @@ void cedar::aux::gui::LinePlot::setFixedYAxisScaling()
 
   auto p_upper = new QDoubleSpinBox();
   p_layout->addWidget(p_upper, 1, 1);
-  p_upper->setMinimum(std::numeric_limits<double>::lowest());
-  p_upper->setMaximum(std::numeric_limits<double>::max());
+  p_upper->setMinimum(boost::numeric::bounds<double>::lowest());
+  p_upper->setMaximum(boost::numeric::bounds<double>::highest());
   p_upper->setValue(y_limits.getUpper());
 
   auto p_buttons = new QDialogButtonBox();
