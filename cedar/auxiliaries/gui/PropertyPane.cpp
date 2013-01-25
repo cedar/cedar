@@ -100,16 +100,15 @@ void cedar::aux::gui::PropertyPane::showAdvanced(bool show)
 
 void cedar::aux::gui::PropertyPane::resetContents()
 {
+  this->mDisplayedConfigurable.reset();
+  mpShowAdvanced->setText("show advanced");
+  this->setRowCount(1);
+
   this->disconnect();
 
   // disconnect all signals from the configurable
-  cedar::aux::ConfigurablePtr configurable = this->mDisplayedConfigurable.lock();
-  if (configurable)
-  {
-    this->resetPointer();
-    this->mParameterWidgetRowIndex.clear();
-    this->mParameterRowIndex.clear();
-  }
+  this->mParameterWidgetRowIndex.clear();
+  this->mParameterRowIndex.clear();
 }
 
 void cedar::aux::gui::PropertyPane::disconnect()
@@ -364,13 +363,6 @@ void cedar::aux::gui::PropertyPane::rowSizeChanged()
   QApplication::processEvents();
 
   this->resizeRowToContents(row);
-}
-
-void cedar::aux::gui::PropertyPane::resetPointer()
-{
-  this->mDisplayedConfigurable.reset();
-  mpShowAdvanced->setText("show advanced");
-  this->setRowCount(1);
 }
 
 void cedar::aux::gui::PropertyPane::redraw()

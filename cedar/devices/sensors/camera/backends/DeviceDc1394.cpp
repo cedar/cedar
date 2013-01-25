@@ -25,7 +25,7 @@
     File:        CameraDeviceDc1394.cpp
 
     Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.rub.de
+    Email:       georg.hartinger@rub.de
     Date:        2012 07 04
 
     Description:  Implementation for the cedar::dev::sensors::camera::DeviceDc1394 class
@@ -56,7 +56,7 @@ cedar::dev::sensors::camera::DeviceDc1394::DeviceDc1394
   cedar::dev::sensors::camera::Channel* pCameraChannel
 )
 :
-cedar::dev::sensors::camera::Device::Device(pCameraChannel),
+cedar::dev::sensors::camera::Device(pCameraChannel),
 mpLibDcInterface(new cedar::dev::sensors::camera::LibDcBase)
 {
 }
@@ -67,9 +67,11 @@ cedar::dev::sensors::camera::DeviceDc1394::~DeviceDc1394()
 }
 
 
-void cedar::dev::sensors::camera::DeviceDc1394::initDevice()
+void cedar::dev::sensors::camera::DeviceDc1394::init()
 {
-  if (!openLibDcCamera())
+//  std::cout << __PRETTY_FUNCTION__ << std::endl;
+
+  if (!this->openLibDcCamera())
   {
     //CEDAR_THROW(cedar::dev::sensors::camera::LibDcInitException,"cedar::dev::sensors::camera::DeviceDc1394::initDevice()");
     return;
@@ -78,13 +80,13 @@ void cedar::dev::sensors::camera::DeviceDc1394::initDevice()
 //  std::cout << "DC1394: initDevice. Camera successfully opened through libdc" << std::endl;
   //set available properties and their values
 
-  getFeaturesFromLibDc();
-  getGrabModesFromLibDc();
+  this->getFeaturesFromLibDc();
+  this->getGrabModesFromLibDc();
 
 //  std::cout << "Set Grabmode to "
 //    << cedar::dev::sensors::camera::VideoMode::type().get(mpCameraChannel->_mpGrabMode->getValue()).prettyString()
 //    << std::endl;
-  getFrameRatesFromLibDc(mpCameraChannel->_mpGrabMode->getValue()); //id?????
+  this->getFrameRatesFromLibDc(mpCameraChannel->_mpGrabMode->getValue()); //id?????
 
 
   //set first available mode
@@ -98,9 +100,26 @@ void cedar::dev::sensors::camera::DeviceDc1394::initDevice()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-//step 1
-bool cedar::dev::sensors::camera::DeviceDc1394::createCaptureDevice()
+
+/*
+void cedar::dev::sensors::camera::DeviceDc1394::updateSettings()
 {
+  //get framerates of newly set video mode
+
+
+  VideoMode::Id mode_from_gui = mpCameraChannel->_mpGrabMode->getValue();
+  if (! ((mode_from_gui == VideoMode::MODE_NOT_SET) || (mode_from_gui <= VideoMode::NUM_9)))
+  {
+    getFrameRatesFromLibDc(mpCameraChannel->_mpGrabMode->getValue());
+  }
+
+}
+*/
+
+bool cedar::dev::sensors::camera::DeviceDc1394::createCaptureObject()
+{
+//  std::cout << __PRETTY_FUNCTION__ << std::endl;
+
   if (mpLibDcInterface)
   {
     // cleanup libdc
@@ -123,6 +142,9 @@ bool cedar::dev::sensors::camera::DeviceDc1394::createCaptureDevice()
 
 void cedar::dev::sensors::camera::DeviceDc1394::getGrabModesFromLibDc()
 {
+
+//  std::cout << __PRETTY_FUNCTION__ << std::endl;
+
   dc1394video_modes_t cam_video_modes = mpLibDcInterface->getCamVideoModes();
   int num_modes = cam_video_modes.num;
 //  std::cout << "Camera Video Modes:" << std::endl;
@@ -157,6 +179,8 @@ void cedar::dev::sensors::camera::DeviceDc1394::getFrameRatesFromLibDc
   cedar::dev::sensors::camera::VideoMode::Id modeId
 )
 {
+//  std::cout << __PRETTY_FUNCTION__ << std::endl;
+
   // LibDc constants for the grab-modes are identical to VideoMode::Id
   int mode_id = static_cast<int>(modeId);
   dc1394video_modes_t cam_video_modes = mpLibDcInterface->getCamVideoModes();
@@ -327,12 +351,10 @@ bool cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()
 
 void cedar::dev::sensors::camera::DeviceDc1394::getFeaturesFromLibDc()
 {
-  // ***************************************
   // get all features from cam
-  // ***************************************
   dc1394featureset_t cam_features = mpLibDcInterface->getCamFeatures();
 
-  //get all settings for all properties from camera
+  //synchronize every feature (i.e. property) with the representing object
   int num_properties = cedar::dev::sensors::camera::Property::type().list().size();
   for (int prop = 0; prop < num_properties; ++prop)
   {
@@ -456,92 +478,12 @@ void cedar::dev::sensors::camera::DeviceDc1394::getFeaturesFromLibDc()
     p_prop->updateGuiElements();
     p_prop->doNotHandleEvents = false;
   }
-
 }
 
 
-void cedar::dev::sensors::camera::DeviceDc1394::setProperties()
-{
-//  int num_properties = cedar::dev::sensors::camera::Property::type().list().size();
-//  for (int i=0; i<num_properties; i++)
-//  {
-//    cedar::dev::sensors::camera::Property::Id prop_id
-//      = cedar::dev::sensors::camera::Property::type().list().at(i).id();
-//
-//
-//    // ignore unsupported features
-//    bool is_supported = true;
-//    bool is_readable = true;
-//
-//    if (    (prop_id == cedar::dev::sensors::camera::Property::PROP_TRIGGER)
-//         || (prop_id == cedar::dev::sensors::camera::Property::PROP_TRIGGER_DELAY)
-//       )
-//    {
-//      is_supported = false;
-//      is_readable = false;
-//    }
-//
-//    std::string prop_name = cedar::dev::sensors::camera::Property::type().list().at(i).prettyString();
-//
-//    //@todo: get min/max values from device !!!
-//
-//    mpCameraChannel->mpProperties->getPropertyClass(prop_name);
-
-    //adjust values with the right ones from the cam
-
-
-
-
-
-
-  //adjust values of the settings available
-
-  /*
-  cedar::dev::sensors::camera::SettingsSet& settings = mpSettings->getSettings();
-  settings.get().clear();
-
-
-  //create structure with settings and their values
-  int num_settings = cedar::dev::sensors::camera::Setting::type().list().size();
-  for (int i=0; i<num_settings; i++)
-  {
-    cedar::dev::sensors::camera::Setting::Id setting_id
-      = cedar::dev::sensors::camera::Setting::type().list().at(i).id();
-
-    std::string setting_name = cedar::dev::sensors::camera::Setting::type().list().at(i).prettyString();
-
-    //@todo: get min/max values from device !!!
-
-    cedar::dev::sensors::visual::CamSettingPtr p_prop(new cedar::dev::sensors::visual::CamSetting
-                                                         (
-                                                           setting_id,
-                                                           setting_name
-                                                         )
-                                                      );
-    settings.insert(p_prop);
-  }
-  */
-
-
-
-
-
-//  }
-
-
-}
-
-
-// step 3
 void cedar::dev::sensors::camera::DeviceDc1394::applySettingsToCamera()
 {
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
 
 }
-
-// step 4
-void cedar::dev::sensors::camera::DeviceDc1394::applyStateToCamera()
-{
-
-}
-
 #endif // CEDAR_USE_LIB_DC1394

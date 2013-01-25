@@ -72,7 +72,7 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------
-// Constructor for single-file grabber
+// Constructor for a single channel grabber
 cedar::dev::sensors::camera::Grabber::Grabber
 (
   unsigned int cameraId,
@@ -94,7 +94,7 @@ cedar::dev::sensors::visual::Grabber
 }
 
 //----------------------------------------------------------------------------------------------------
-// Constructor for stereo-file grabber
+// Constructor for stereo grabber
 cedar::dev::sensors::camera::Grabber::Grabber
 (
   unsigned int cameraId0,
@@ -268,14 +268,23 @@ bool cedar::dev::sensors::camera::Grabber::onCreateGrabber()
     bool all_devices_created = true;
     for (unsigned int channel = 0; channel < num_cams; ++channel)
     {
-      getCameraChannel(channel)->createBackend();
-      bool device_created = getCameraChannel(channel)->mpBackend->init();
+      //backend already created on initialization
+      //getCameraChannel(channel)->createBackend();
+
+      bool device_created = getCameraChannel(channel)->mpBackend->createCaptureDevice();
+
+      if (device_created)
+      {
+      	setChannelInfoString(channel,this->onUpdateSourceInfo(channel));
+      }
+      else
+      {
+        all_devices_created = false;
+      }
 
       // Backend device not longer used. Channel::mVideoCapture does the job
       getCameraChannel(channel)->mpBackend.reset();
-
-      all_devices_created = all_devices_created && device_created;
-    } // for every channel
+    }
 
     result = all_devices_created;
   }
@@ -424,8 +433,7 @@ std::vector<std::string> cedar::dev::sensors::camera::Grabber::getAllProperties(
 //----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::camera::Grabber::onGrab()
 {
-  //!@todo This should also be a bool
-  int result = true;
+  bool result = true;
   unsigned int num_cams = getNumCams();
 
   // grab and retrieve
@@ -433,7 +441,6 @@ bool cedar::dev::sensors::camera::Grabber::onGrab()
    {
 
      getCameraChannel(channel)->mpVideoCaptureLock->lockForWrite();
-     //!@todo Don't mix bool and int with an & here; the MSVC warns (rightfully) that this is unsafe.
      result = getCameraChannel(channel)->mVideoCapture.read(getImageMat(channel)) & result;
 
      // check if conversion from bayer-pattern to cv::Mat BGR format is needed
@@ -477,7 +484,7 @@ bool cedar::dev::sensors::camera::Grabber::onGrab()
 
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::camera::Grabber::onUpdateSourceInfo(unsigned int channel)
+std::string cedar::dev::sensors::camera::Grabber::onUpdateSourceInfo(unsigned int channel)
 {
   std::stringstream ss;
 
@@ -494,7 +501,7 @@ void cedar::dev::sensors::camera::Grabber::onUpdateSourceInfo(unsigned int chann
   ss << getCameraChannel(channel)->getCameraId()
      << "; Mode: " << VideoMode::type().get(this->getCameraVideoMode(channel)).prettyString();
 
-  setChannelInfoString(channel, ss.str());
+  return ss.str();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -508,13 +515,6 @@ void cedar::dev::sensors::camera::Grabber::onCleanUp()
 
   // close all captures
   this->onCloseGrabber();
-//  unsigned int num_cams = getNumCams();
-//  for (unsigned int channel = 0; channel < num_cams; channel++)
-//  {
-//    // is done in the onClose() function
-//    // getCameraChannel(channel)->mVideoCapture.release();
-//  }
-
 }
 
 //----------------------------------------------------------------------------------------------------

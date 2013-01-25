@@ -75,21 +75,24 @@ public:
   //!@brief Destructor
   ~DeviceDc1394();
 
-  void initDevice();
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  //! does the backend initialization
+  void init();
+
+  //! update settings from gui
+  //void updateSettings();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void setProperties();
+
+  // derived from class Device
   void applySettingsToCamera();
-  bool createCaptureDevice();
-  void applyStateToCamera();
+  bool createCaptureObject();
 
   /*! @brief Opens the wanted camera with libDc methods
    *

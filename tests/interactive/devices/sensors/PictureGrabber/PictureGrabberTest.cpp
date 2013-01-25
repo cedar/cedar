@@ -24,7 +24,7 @@
 // SYSTEM INCLUDES
 #include <QtGui/QApplication>
 #include <opencv2/opencv.hpp>
-
+#include <ios>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Local methods
@@ -47,7 +47,7 @@ namespace
   void showUsage(std::string programName)
   {
     std::cout << "\n\nInteractive test for the PictureGrabber class.\n\n"
-        << "Usage: \t" << programName << " <PictureFile> [<PictureFile2>]"
+        << "Usage: \t" << programName << " <PictureFile> [<PictureFile2>]\n"
         << std::endl;
   }
 }
@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
   //constants
   //--------------------------------------------------------------------------------------------------------------------
 
-  const std::string GRABBER_NAME = "picture_grabber_TestCase";
+  const std::string GRABBER_NAME = "picture_grabber_testcase";
   const std::string CONFIG_FILE_NAME = "picture_grabber_testcase.config";
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -81,12 +81,18 @@ int main(int argc, char* argv[])
 
   if (argc > 2)
   {
-    std::string filename_channel1 = std::string(argv[2]);
+    filename_channel1 = std::string(argv[2]);
     window_title = window_title + ", \""+ filename_channel1 + "\"";
   }
 
+  std::cout.setf(std::ios::fixed,std::ios::floatfield);
+  std::cout.precision(3);
+
   std::cout << "\n\nInteractive test of the PictureGrabber class (mono)\n";
   std::cout << "-----------------------------------------------------\n\n";
+  std::cout << window_title << std::endl;
+  std::cout << "file0: " << filename_channel0 << std::endl;
+  std::cout << "file1: " << filename_channel1 << std::endl;
 
   //----------------------------------------------------------------------------------------
   //Create the grabber
@@ -111,9 +117,6 @@ int main(int argc, char* argv[])
   }
 
   // install crash-handler not necessary. No hardware and no files for writing needed
-  cedar::dev::sensors::visual::Grabber::installCrashHandler();
-
-  // activate crash-handler if there is any hardware-related stuff which has to be cleaned up
   p_grabber->installCrashHandler();
 
 
@@ -146,11 +149,10 @@ int main(int argc, char* argv[])
 
   /*After initialization of a picture grabber:
    *
-   *  The picture is already initialized and the first frame grabbed, so you can check the file using
+   *  The picture is already initialized and the picture is grabbed, so you can check the file using
    *  getImage(), getSize() or something else
    *
    */
-
 
   // Set the name of our grabber
   p_grabber->setName(GRABBER_NAME);
@@ -177,6 +179,8 @@ int main(int argc, char* argv[])
   //----------------------------------------------------------------------------------------
   //Create a cedar::aux::gui ImagePlot widget to show grabbed frames
   //----------------------------------------------------------------------------------------
+  std::cout << "\nShow image - close grabber window to exit" << std::endl;
+
 
   //the first frame is already grabbed on initialization, so get it
   cv::Mat frame0 = p_grabber->getImage();
@@ -184,13 +188,13 @@ int main(int argc, char* argv[])
   QApplication app(argc, argv);
   cedar::aux::gui::ImagePlotPtr p_plot = cedar::aux::gui::ImagePlotPtr(new cedar::aux::gui::ImagePlot());
   cedar::aux::MatDataPtr p_data = cedar::aux::MatDataPtr(new cedar::aux::MatData(frame0));
-  p_plot->plot(p_data,window_title);
+  p_plot->plot(p_data, window_title);
+  p_plot->setWindowTitle(QString::fromStdString(window_title));
   p_plot->show();
   p_plot->resize(frame0.cols,frame0.rows);
 
   //process the events generated inside QT-Framework
   processQtEvents();
-
 
   unsigned int counter = 0;
   bool file2 = false;
@@ -199,33 +203,42 @@ int main(int argc, char* argv[])
     //process the events generated inside QT-Framework
     processQtEvents();
 
-    counter++;
-
-    //after one second, set new source-pictures
-    if (!(++counter %= 100))
+    //after two seconds, set new source-pictures
+    if (!(++counter %= 20))
     {
       if (filename_channel1 != "")
       {
         // Grab from another picture
         if (file2)
         {
+          std::cout << "\nSet file 0" << std::endl;
           p_grabber->setSourceFile(0,filename_channel0);
           file2=false;
         }
         else
         {
+          std::cout << "\nSet file 1" << std::endl;
           p_grabber->setSourceFile(0,filename_channel1);
           file2=true;
         }
+
         frame0 = p_grabber->getImage();
         cedar::aux::MatDataPtr p_data = cedar::aux::MatDataPtr(new cedar::aux::MatData(frame0));
-        p_plot->plot(p_data,window_title);
+        p_plot->plot(p_data, window_title);
         p_plot->resize(frame0.cols,frame0.rows);
+        std::cout << "Grab from \"" << p_grabber->getSourceInfo()<<"\"" << std::endl;
+        cv::Size ch0_size = p_grabber->getSize(0);
+        std::cout << "Size of loaded picture: " << ch0_size.width <<" x " << ch0_size.height << std::endl;
+      }
+      else
+      {
+        std::cout << "." << std::flush;
       }
     }
-
     cedar::aux::sleep(cedar::unit::Milliseconds(100));
   }
+
+  std::cout << std::endl;
 
   //----------------------------------------------------------------------------------------
   // save configuration. this step is optional.

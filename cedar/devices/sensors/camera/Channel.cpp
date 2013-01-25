@@ -63,7 +63,7 @@ cedar::aux::Configurable(),
 QObject(),
 cedar::dev::sensors::visual::GrabberChannel(),
 mpVideoCaptureLock(new QReadWriteLock()),
-mBackendType(-1),
+mBackendType(cedar::dev::sensors::camera::BackendType::CVCAPTURE), //will be set to auto
 _mpBackendType(new cedar::aux::EnumParameter
                 (
                   this,
@@ -95,7 +95,7 @@ _mpFPS(new cedar::aux::EnumParameter
              this,
              "camera fps",
              cedar::dev::sensors::camera::FrameRate::typePtr(),
-             cedar::dev::sensors::camera::FrameRate::FPS_15
+             cedar::dev::sensors::camera::FrameRate::FPS_NOT_SET //FPS_15
            )
        )
 #ifdef CEDAR_USE_LIB_DC1394
@@ -105,7 +105,7 @@ _mpIsoSpeed(new cedar::aux::EnumParameter
                   this,
                   "iso speed",
                   cedar::dev::sensors::camera::IsoSpeed::typePtr(),
-                  cedar::dev::sensors::camera::IsoSpeed::ISO_200
+                  cedar::dev::sensors::camera::IsoSpeed::ISO_NOT_SET //ISO_200
                 )
             )
 #endif
@@ -142,16 +142,16 @@ cedar::dev::sensors::camera::Channel::~Channel()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-//called from gui
+//invoked with signal from gui
 void cedar::dev::sensors::camera::Channel::setBackendType
 (
   cedar::dev::sensors::camera::BackendType::Id backendType
 )
 {
- // std::cout << "cedar::dev::sensors::camera::Channel::setBackendType ";
+  //std::cout << "cedar::dev::sensors::camera::Channel::setBackendType ";
   if (mBackendType != backendType)
   {
-   // std::cout << "change to " << cedar::dev::sensors::camera::BackendType::type().get(backendType).prettyString() << std::endl;
+    //std::cout << "change to " << cedar::dev::sensors::camera::BackendType::type().get(backendType).prettyString() << std::endl;
 
     mBackendType = backendType;
 
@@ -164,21 +164,17 @@ void cedar::dev::sensors::camera::Channel::setBackendType
   #ifdef CEDAR_USE_LIB_DC1394
       case cedar::dev::sensors::camera::BackendType::DC1394:
       {
+        // the visibility of available grab-modes and framerates is already set in createBackend()
+
+        // show firewire related properties
         _mpByGuid->setHidden(false);
-
-        // set visible of grab-mode to true
-        // disable unavailable grab-modes (depends on cam)
-        // disable unavailable fps (depends on mode)
-
         _mpIsoSpeed->setHidden(false);
-
-        // show all modes
-        // show only available modes
-        _mpGrabMode->enableAll();
-
-        // set visible of fps to false, fps is only used in a console-program or for firewire cameras
         _mpFPS->setHidden(false);
 
+        // additional: set "auto" available
+        _mpFPS->enable(cedar::dev::sensors::camera::FrameRate::FPS_NOT_SET);
+        _mpGrabMode->enable(cedar::dev::sensors::camera::VideoMode::MODE_NOT_SET);
+        _mpIsoSpeed->enable(cedar::dev::sensors::camera::IsoSpeed::ISO_NOT_SET);
       }
       break;
   #endif
@@ -191,32 +187,30 @@ void cedar::dev::sensors::camera::Channel::setBackendType
       case cedar::dev::sensors::camera::BackendType::CVCAPTURE:
       default:
       {
-
         // ignore byGUID (default values)
         _mpByGuid->setHidden(true);
 
-        // set visible of fps to false, fps is only used in a console-program or for firewire cameras
+        // fps depends on the camera
         _mpFPS->setHidden(true);
 
-
   #ifdef CEDAR_USE_LIB_DC1394
-        // disable all grab-modes with firewire (if they are here)
+        // disable all firewire related grab-modes (if they are here)
         hideFwVideoModes();
         _mpIsoSpeed->setHidden(true);
-
   #endif
-
-        // set visible of grab-mode to false
-
       }
+    } // switch
 
-    } // end switch
+    //set default values on backend-switching
+    _mpIsoSpeed->setValue(cedar::dev::sensors::camera::IsoSpeed::ISO_NOT_SET);
+    _mpFPS->setValue(cedar::dev::sensors::camera::FrameRate::FPS_NOT_SET);
+    _mpGrabMode->setValue(cedar::dev::sensors::camera::VideoMode::MODE_NOT_SET);
+
   } // end changed backend
   else
   {
     //std::cout << "nothing changed" << std::endl;
   }
-
 }
 
 
@@ -265,7 +259,6 @@ void cedar::dev::sensors::camera::Channel::setCameraId(unsigned int CameraId, bo
   {
     _mpByGuid->setValue(isGuid);
   }
-
 }
 
 
@@ -306,7 +299,7 @@ void cedar::dev::sensors::camera::Channel::setIsoSpeed(cedar::dev::sensors::came
 
 void cedar::dev::sensors::camera::Channel::hideFwVideoModes()
 {
-  // Add all properties to the properties-list
+  // loop through all properties of the properties-list
   int num_modes = cedar::dev::sensors::camera::VideoMode::type().list().size();
   for (int i=0; i<num_modes; i++)
   {
@@ -315,8 +308,7 @@ void cedar::dev::sensors::camera::Channel::hideFwVideoModes()
 
     if (prop_id > cedar::dev::sensors::camera::VideoMode::NUM_9)
     {
-      //  _mpGrabMode->disable(cedar::dev::sensors::camera::PropertyMode::AUTO);
-        _mpGrabMode->disable(prop_id);
+      _mpGrabMode->disable(prop_id);
     }
     _mpGrabMode->enable(cedar::dev::sensors::camera::VideoMode::MODE_NOT_SET);
   }
@@ -324,15 +316,15 @@ void cedar::dev::sensors::camera::Channel::hideFwVideoModes()
 
 void cedar::dev::sensors::camera::Channel::createBackend()
 {
+//  std::cout << __PRETTY_FUNCTION__ << std::endl;
+
   if (mpBackend)
   {
     mpBackend.reset();
   }
 
-  switch ( _mpBackendType->getValue().id() )
+  switch (_mpBackendType->getValue().id())
   {
-
-
 
   #ifdef CEDAR_USE_LIB_DC1394
     case cedar::dev::sensors::camera::BackendType::DC1394 :
@@ -341,7 +333,6 @@ void cedar::dev::sensors::camera::Channel::createBackend()
                                                    (
                                                      new cedar::dev::sensors::camera::DeviceDc1394
                                                          (
-//                                                           shared_from_this()
                                                            this
                                                          )
                                                    );
@@ -364,14 +355,11 @@ void cedar::dev::sensors::camera::Channel::createBackend()
                                                            (
                                                              new cedar::dev::sensors::camera::DeviceCvVideoCapture
                                                              (
-//                                                              shared_from_this()
                                                                this
                                                              )
                                                            );
       mpBackend = cv_device;
     }
-  } // switch on backend
-
-  mpBackend->initDevice();
-
+  } // switch
+  mpBackend->init();
 }
