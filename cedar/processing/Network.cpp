@@ -558,7 +558,15 @@ cedar::proc::ConstElementPtr cedar::proc::Network::getElement(const std::string&
   cedar::aux::splitFirst(name, ".", first, rest);
   if (first.length() != 0 && rest.length() != 0)
   {
-    return this->getElement<Network>(first)->getElement(rest);
+    cedar::proc::ConstElementPtr element = this->getElement(first);
+    cedar::proc::ConstNetworkPtr network = boost::dynamic_pointer_cast<cedar::proc::ConstNetwork>(element);
+
+    if (!network)
+    {
+      CEDAR_THROW(cedar::proc::InvalidNameException, "The given name does not specify a proper path in this network.");
+    }
+
+    return network->getElement(rest);
   }
   else
   {
