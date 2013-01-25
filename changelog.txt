@@ -75,6 +75,12 @@ likely to undergo major changes:
 - cedar::dyn
   - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   
 
+== Version 1.0.7
+- cedar::aux::gui
+  - fixed a bug in how matrix plots handle changing data dimensionality
+- cedar::proc
+  - fixed a potential crash in Network::getElement("path") 
+
 == Version 1.0.6 ==
 - General
   - added support for OpenCV 2.2
