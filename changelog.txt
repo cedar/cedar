@@ -65,7 +65,10 @@ likely to undergo major changes:
     include the proper header (cedar/auxiliaries/DoubleData) in your code.
   - Parameters and Configurables can now be marked as advanced. Those that are, are not displayed to the user unless
     they opt to have them displayed by checking a box in the property pane.
-  - gui::LinePlots now have an option in their context menu to set fixed limits for the y axis.
+  
+- cedar::aux::gui
+  - LinePlots now have an option in their context menu to set fixed limits for the y axis.
+  - There is now a history plot for 1D matrices.
 
 - cedar::dev
   - KinematicChain instances now need to be started via ->start() by the implementor. They do not start threading on their own, anymore
