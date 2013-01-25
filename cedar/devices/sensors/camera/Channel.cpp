@@ -202,7 +202,9 @@ void cedar::dev::sensors::camera::Channel::setBackendType
     } // switch
 
     //set default values on backend-switching
+#ifdef CEDAR_USE_LIB_DC1394
     _mpIsoSpeed->setValue(cedar::dev::sensors::camera::IsoSpeed::ISO_NOT_SET);
+#endif
     _mpFPS->setValue(cedar::dev::sensors::camera::FrameRate::FPS_NOT_SET);
     _mpGrabMode->setValue(cedar::dev::sensors::camera::VideoMode::MODE_NOT_SET);
 
