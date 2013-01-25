@@ -323,9 +323,13 @@ void cedar::aux::gui::LinePlot::contextMenuEvent(QContextMenuEvent *pEvent)
   menu.addSeparator();
   QMenu* p_y_scaling_menu = menu.addMenu("y axis scaling");
   QAction* p_y_scaling_auto = p_y_scaling_menu->addAction("automatic");
+  p_y_scaling_auto->setCheckable(true);
+  p_y_scaling_auto->setChecked(this->mpPlot->axisAutoScale(QwtPlot::yLeft));
   QObject::connect(p_y_scaling_auto, SIGNAL(triggered()), this, SLOT(setAutomaticYAxisScaling()));
 
   QAction* p_y_scaling_fixed = p_y_scaling_menu->addAction("fixed");
+  p_y_scaling_fixed->setCheckable(true);
+  p_y_scaling_fixed->setChecked(this->mpPlot->axisAutoScale(QwtPlot::yLeft) == false);
   QObject::connect(p_y_scaling_fixed, SIGNAL(triggered()), this, SLOT(setFixedYAxisScaling()));
 
   QAction *p_action = menu.exec(pEvent->globalPos());
