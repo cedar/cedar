@@ -39,8 +39,6 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/datatypesupport/std/StringHelper.h"
-
-#include "cedar/auxiliaries/net/detail/datatypesupport/interfaces/InterfaceCollatedData.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatNetHeader.h"
 
 // PROJECT INCLUDES

@@ -29,7 +29,6 @@
     Date:        Wed 20 Jul 2011
 
     Description: Helper class for openCV matrices. Implements some checks 
-                 we need to conform to the InterfaceCollatedData 
 
     Credits:
 
@@ -40,7 +39,6 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
-#include "cedar/auxiliaries/net/detail/datatypesupport/interfaces/InterfaceCollatedData.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/CollatedTraits.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatNetHeader.h"
 
@@ -58,9 +56,9 @@ namespace cedar {
       namespace detail {
 //!@cond SKIPPED_DOCUMENTATION
 
-//!@brief a helper class which implements InterfacCollatedData for opencv types
+//!@brief a helper class which implements some checks for opencv types
 template <typename CVT>
-class cvMatHelper  : virtual protected InterfaceCollatedData<CVT>
+class cvMatHelper
 {
 
   //---------------------------------------------------------------------------

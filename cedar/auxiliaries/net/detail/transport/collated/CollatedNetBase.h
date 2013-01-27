@@ -39,7 +39,6 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
-#include "cedar/auxiliaries/net/detail/datatypesupport/interfaces/InterfaceCollatedData.h"
 #include "cedar/auxiliaries/net/detail/transport/interfaces/InterfaceOpenable.h"
 
 #include "cedar/auxiliaries/net/detail/datatypesupport/CollatedTraits.h"
@@ -64,8 +63,7 @@ namespace cedar {
  * More detailed description of the class.
  */
 template <typename T> 
-class CollatedNetBase : virtual protected InterfaceOpenable,
-                        virtual protected InterfaceCollatedData<T>
+class CollatedNetBase : virtual protected InterfaceOpenable
 {
   //---------------------------------------------------------------------------
   // members
