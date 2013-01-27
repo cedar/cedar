@@ -161,7 +161,7 @@ void cedar::dev::sensors::camera::Channel::setBackendType
     switch (mBackendType)
     {
 
-  #ifdef CEDAR_USE_LIB_DC1394
+#ifdef CEDAR_USE_LIB_DC1394
       case cedar::dev::sensors::camera::BackendType::DC1394:
       {
         // the visibility of available grab-modes and framerates is already set in createBackend()
@@ -177,11 +177,11 @@ void cedar::dev::sensors::camera::Channel::setBackendType
         _mpIsoSpeed->enable(cedar::dev::sensors::camera::IsoSpeed::ISO_NOT_SET);
       }
       break;
-  #endif
+#endif
 
-  #ifdef CEDAR_USE_VIDEO_FOR_LINUX
+#ifdef CEDAR_USE_VIDEO_FOR_LINUX
       case cedar::dev::sensors::camera::BackendType::VFL:
-  #endif // CEDAR_USE_VIDEO_FOR_LINUX
+#endif // CEDAR_USE_VIDEO_FOR_LINUX
 
       case cedar::dev::sensors::camera::BackendType::AUTO:
       case cedar::dev::sensors::camera::BackendType::CVCAPTURE:
@@ -193,11 +193,11 @@ void cedar::dev::sensors::camera::Channel::setBackendType
         // fps depends on the camera
         _mpFPS->setHidden(true);
 
-  #ifdef CEDAR_USE_LIB_DC1394
+#ifdef CEDAR_USE_LIB_DC1394
         // disable all firewire related grab-modes (if they are here)
         hideFwVideoModes();
         _mpIsoSpeed->setHidden(true);
-  #endif
+#endif
       }
     } // switch
 
@@ -328,7 +328,7 @@ void cedar::dev::sensors::camera::Channel::createBackend()
   switch (_mpBackendType->getValue().id())
   {
 
-  #ifdef CEDAR_USE_LIB_DC1394
+#ifdef CEDAR_USE_LIB_DC1394
     case cedar::dev::sensors::camera::BackendType::DC1394 :
     {
       cedar::dev::sensors::camera::DeviceDc1394Ptr dc1394_device
@@ -341,11 +341,11 @@ void cedar::dev::sensors::camera::Channel::createBackend()
       mpBackend = dc1394_device;
       break;
     }
-  #endif
+#endif
 
-  #ifdef CEDAR_USE_VIDEO_FOR_LINUX
+#ifdef CEDAR_USE_VIDEO_FOR_LINUX
     case cedar::dev::sensors::camera::BackendType::VFL :
-  #endif // CEDAR_USE_VIDEO_FOR_LINUX
+#endif // CEDAR_USE_VIDEO_FOR_LINUX
 
     case cedar::dev::sensors::camera::BackendType::AUTO :
     case cedar::dev::sensors::camera::BackendType::CVCAPTURE :
