@@ -318,7 +318,7 @@ private:
   bool checkCollatedDataForWrite(const cedar::aux::net::detail::CollatedTraits<std::string>::DataType &data,
                                  cedar::aux::net::detail::CollatedTraits<std::string>::HeaderType &header)
   {
-    return StringHelper<std::string>::checkCollatedDataForWrite(data,header);
+    return cedar::aux::net::detail::StringHelper<std::string>::checkCollatedDataForWrite(data,header);
   }
 
 };
@@ -344,7 +344,7 @@ private:
   bool checkCollatedDataForWrite(const cedar::aux::net::detail::CollatedTraits<cv::Mat>::DataType &data,
                                  cedar::aux::net::detail::CollatedTraits<cv::Mat>::HeaderType &header)
   {
-    return cvMatHelper<cv::Mat>::checkCollatedDataForWrite(data,header);
+    return cedar::aux::net::detail::cvMatHelper<cv::Mat>::checkCollatedDataForWrite(data,header);
   }
 
 };
@@ -371,7 +371,7 @@ private:
   bool checkCollatedDataForWrite(const cedar::aux::net::detail::CollatedTraits<cv::Mat_<float> >::DataType &data,
                                  cedar::aux::net::detail::CollatedTraits<cv::Mat_<float> >::HeaderType &header)
   {
-    return cvMatHelper<cv::Mat_<float> >::checkCollatedDataForWrite(data,header);
+    return cedar::aux::net::detail::cvMatHelper<cv::Mat_<float> >::checkCollatedDataForWrite(data,header);
   }
 
 };
