@@ -93,6 +93,8 @@ private:
   CollatedNetReader(const CollatedNetReader &C); // not copyable
   CollatedNetReader &operator=(const CollatedNetReader &C); // not copyable
 
+  virtual bool checkCollatedDataForRead(const typename CollatedTraits<T>::HeaderType &header) = 0;
+
 public:
   //!@brief use this constructor
   explicit CollatedNetReader(const std::string &myPortName) 
