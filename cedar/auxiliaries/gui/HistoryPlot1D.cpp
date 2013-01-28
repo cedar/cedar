@@ -117,7 +117,8 @@ void cedar::aux::gui::HistoryPlot1D::resetHistory()
   {
     hist = hist.t();
   }
-  hist.copyTo(new_hist(cv::Range::all(), cv::Range(this->mMaxHistSize - 1, this->mMaxHistSize)));
+  cv::Mat slice = new_hist(cv::Range::all(), cv::Range(this->mMaxHistSize - 1, this->mMaxHistSize));
+  hist.copyTo(slice);
 
   QWriteLocker hlocker(&this->mHistory->getLock());
   this->mHistory->setData(new_hist);
@@ -169,9 +170,10 @@ void cedar::aux::gui::HistoryPlot1D::advanceHistory()
     start = 1;
   }
 
-
-  current_hist(cv::Range::all(), cv::Range(start, end)).copyTo(new_hist(cv::Range::all(), cv::Range(0, end - start)));
-  now.copyTo(new_hist(cv::Range::all(), cv::Range(new_hist.cols - 1, new_hist.cols)));
+  cv::Mat slice = new_hist(cv::Range::all(), cv::Range(0, end - start));
+  current_hist(cv::Range::all(), cv::Range(start, end)).copyTo(slice);
+  cv::Mat slice2 = new_hist(cv::Range::all(), cv::Range(new_hist.cols - 1, new_hist.cols));
+  now.copyTo(slice2);
 
   this->mHistory->setData(new_hist);
 }
