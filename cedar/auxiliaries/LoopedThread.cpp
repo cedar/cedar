@@ -74,6 +74,7 @@ _mLoopMode
 
 cedar::aux::LoopedThread::~LoopedThread()
 {
+	//!@todo This should be locked -- or something else is wrong here; this should probably not be a bool, but rather a mutex
   mDestructing = true;  // do not execute a new this->start()
 
   if (isRunning())
@@ -99,7 +100,7 @@ cedar::aux::LoopedThread::~LoopedThread()
     {
       // the worker::step() lead to destruction of LoopedThread
       // this is a problem
-      // TODO: emanate an error/warning
+      //!@todo: emanate an error/warning
     }
   }
 
@@ -153,7 +154,7 @@ void cedar::aux::LoopedThread::start()
     // report an error/warning TODO 
     return; // should not happen
   }
-  else if (isRunning())
+  else if (isRunning()) //!@todo Should output a warning/error
   {
     return; // already running, everything ok
   }
@@ -164,7 +165,7 @@ void cedar::aux::LoopedThread::start()
     // we need a new worker object
     mpWorker = new cedar::aux::LoopedThreadWorker(this);
     // we need a new thread object
-    mpThread = new QThread;
+    mpThread = new QThread();
 
     mpWorker->moveToThread(mpThread);
 
@@ -278,7 +279,7 @@ void cedar::aux::LoopedThread::stopStatistics(bool suppressWarning)
 
 void cedar::aux::LoopedThread::singleStep()
 {
-  if (!isRunning())
+  if (!this->isRunning())
   {
     switch (_mLoopMode->getValue())
     {
@@ -306,7 +307,7 @@ void cedar::aux::LoopedThread::singleStep()
 // check if this method is needed, think of deprecating it
 bool cedar::aux::LoopedThread::stopRequested()
 {
-  if (isRunning() && validWorker() && mpWorker->stopRequested())
+  if (this->isRunning() && this->validWorker() && mpWorker->stopRequested())
   {
     return true;
   }

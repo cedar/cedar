@@ -52,7 +52,7 @@ cedar::aux::LoopedThreadWorker::LoopedThreadWorker(cedar::aux::LoopedThread *wra
 
 cedar::aux::LoopedThreadWorker::~LoopedThreadWorker() 
 {
-  // note: dont delete mpWrapper here! it should delete us
+  // Note: do not delete mpWrapper here! it should delete us
 }
 
 void cedar::aux::LoopedThreadWorker::requestStop()
