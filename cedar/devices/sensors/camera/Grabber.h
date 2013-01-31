@@ -96,15 +96,17 @@ public:
 
   protected slots:
 
-  //!@brief A slot that must be triggered if a camera-settings has changed. In that case,
-  // a new camera-device will be created
-  void cameraChanged();
+  /*!@brief A slot that must be triggered if a camera-settings has changed. In that case,
+   * a new camera-device will be created. It is internally connected with the CameraChannel->settingsChanged signal.
+   */
+  void settingChanged();
 
 
-  // signals:
+  /*!@brief A slot that must be triggered if the backend has changed. It is internally connected with the
+   *      CameraChannel->Backend Enum-Parameter valueChanged() signal.
+   */
+  void backendChanged();
 
-  //!@brief This signal is emitted, when a new picture is available with the getImage() method.
- // void pictureChanged();
 
   private:
   /*! @brief Boost slot method. Invoked if a channel is added as an ObjectListParameter as an object

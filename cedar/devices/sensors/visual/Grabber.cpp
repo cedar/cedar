@@ -331,6 +331,7 @@ bool cedar::dev::sensors::visual::Grabber::applyParameter()
     this->closeGrabber();
   }
 
+//  std::cout << __PRETTY_FUNCTION__  << ": mCaptureDeviceCreated: " << std::boolalpha << mCaptureDeviceCreated << std::endl;
   return mCaptureDeviceCreated;
 }
 

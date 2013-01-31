@@ -69,7 +69,9 @@ cedar::dev::sensors::camera::DeviceDc1394::~DeviceDc1394()
 
 void cedar::dev::sensors::camera::DeviceDc1394::init()
 {
-//  std::cout << __PRETTY_FUNCTION__ << std::endl;
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+#endif
 
   if (!this->openLibDcCamera())
   {
@@ -116,9 +118,20 @@ void cedar::dev::sensors::camera::DeviceDc1394::updateSettings()
 }
 */
 
+void cedar::dev::sensors::camera::DeviceDc1394::updateFps()
+{
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+#endif
+  this->getFrameRatesFromLibDc(mpCameraChannel->_mpGrabMode->getValue());
+}
+
+
 bool cedar::dev::sensors::camera::DeviceDc1394::createCaptureObject()
 {
-//  std::cout << __PRETTY_FUNCTION__ << std::endl;
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+#endif
 
   if (mpLibDcInterface)
   {
@@ -128,7 +141,7 @@ bool cedar::dev::sensors::camera::DeviceDc1394::createCaptureObject()
     mpLibDcInterface.reset();
   }
 
-  //open camera with openCV backend
+  //open camera with OpenCv VideoCapture class
   cv::VideoCapture capture(mpCameraChannel->getCameraId());
   if(capture.isOpened())
   {
@@ -142,13 +155,24 @@ bool cedar::dev::sensors::camera::DeviceDc1394::createCaptureObject()
 
 void cedar::dev::sensors::camera::DeviceDc1394::getGrabModesFromLibDc()
 {
+  //only invoked at the creation of the backend
 
-//  std::cout << __PRETTY_FUNCTION__ << std::endl;
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+#endif
+
+  //save old state and restore at the end of this method
+  cedar::dev::sensors::camera::VideoMode::Id used_mode_id = mpCameraChannel->_mpGrabMode->getValue();
 
   dc1394video_modes_t cam_video_modes = mpLibDcInterface->getCamVideoModes();
-  int num_modes = cam_video_modes.num;
-//  std::cout << "Camera Video Modes:" << std::endl;
+
+  // disable event-handling from the grab-mode parameter
+  mpCameraChannel->_mpGrabMode->blockSignals(true);
   mpCameraChannel->_mpGrabMode->disableAll();
+  mpCameraChannel->_mpGrabMode->enable(cedar::dev::sensors::camera::VideoMode::MODE_NOT_SET);
+
+  int num_modes = cam_video_modes.num;
+  //  std::cout << "Camera Video Modes:" << std::endl;
   for (int i=0; i<num_modes; i++)
   {
 //    std::cout << " - " << cam_video_modes.modes[i]
@@ -169,8 +193,16 @@ void cedar::dev::sensors::camera::DeviceDc1394::getGrabModesFromLibDc()
    }
   }
 
-  //std::cout << "---modes finished---" << std::endl;
-
+  //restore previous used mode
+  if (mpCameraChannel->_mpGrabMode->isEnabled(used_mode_id))
+  {
+    mpCameraChannel->_mpGrabMode->enable(used_mode_id);
+  }
+  else
+  {
+    mpCameraChannel->_mpGrabMode->setValue(cedar::dev::sensors::camera::VideoMode::MODE_NOT_SET);
+  }
+  mpCameraChannel->_mpGrabMode->blockSignals(false);
 }
 
 
@@ -179,18 +211,32 @@ void cedar::dev::sensors::camera::DeviceDc1394::getFrameRatesFromLibDc
   cedar::dev::sensors::camera::VideoMode::Id modeId
 )
 {
-//  std::cout << __PRETTY_FUNCTION__ << std::endl;
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+  std::cout << "\tVideo mode: " << modeId << std::endl;
+#endif
+
+  // save old state for restoring at the end
+  cedar::dev::sensors::camera::FrameRate::Id used_fps = mpCameraChannel->_mpFPS->getValue();
+
+  if (modeId == cedar::dev::sensors::camera::VideoMode::MODE_NOT_SET)
+  {
+    mpCameraChannel->_mpFPS->enableAll();
+    return;
+  }
 
   // LibDc constants for the grab-modes are identical to VideoMode::Id
   int mode_id = static_cast<int>(modeId);
   dc1394video_modes_t cam_video_modes = mpLibDcInterface->getCamVideoModes();
 
-//  std::string video_mode_str = mpLibDcInterface->DC1394VideoModeToString(cam_video_modes.modes[set_video_mode_id]);
-//  std::cout << "\n - Video mode "
-//            << cam_video_modes.modes[set_video_mode_id]
+//#ifdef DEBUG_CAMERA_GRABBER
+//  std::string video_mode_str = mpLibDcInterface->DC1394VideoModeToString(cam_video_modes.modes[mode_id]);
+//  std::cout << "\tVideo mode (modeId " << mode_id << "): "
+//            << cam_video_modes.modes[mode_id]
 //            <<" : "
 //            << video_mode_str
 //            << std::endl;
+//#endif
 
   int libdc_mode_index = -1;
   for (unsigned int i = 0; i < cam_video_modes.num; ++i)
@@ -241,6 +287,7 @@ void cedar::dev::sensors::camera::DeviceDc1394::getFrameRatesFromLibDc
       }
     }
 
+    //mode available?
     if (libdc_framerate_index == -1)
     {
       mpCameraChannel->_mpFPS->disable(rate_id);
@@ -255,8 +302,19 @@ void cedar::dev::sensors::camera::DeviceDc1394::getFrameRatesFromLibDc
 //                << " FrameRate::Id " << rate_id << "; name "<< frame_name << std::endl;
        mpCameraChannel->_mpFPS->enable(rate_id);
     }
+  }
 
+  //always enable mode AUTO
+  mpCameraChannel->_mpFPS->enable(cedar::dev::sensors::camera::FrameRate::FPS_NOT_SET);
 
+  //restore previous used fps settings (if available)
+  if (mpCameraChannel->_mpFPS->isEnabled(used_fps))
+  {
+    mpCameraChannel->_mpFPS->setValue(used_fps);
+  }
+  else
+  {
+    mpCameraChannel->_mpFPS->setValue(cedar::dev::sensors::camera::FrameRate::FPS_NOT_SET);
   }
 }
 
@@ -483,7 +541,42 @@ void cedar::dev::sensors::camera::DeviceDc1394::getFeaturesFromLibDc()
 
 void cedar::dev::sensors::camera::DeviceDc1394::applySettingsToCamera()
 {
+#ifdef DEBUG_CAMERA_GRABBER
   std::cout << __PRETTY_FUNCTION__ << std::endl;
+#endif
+
+  //frame mode
+  cedar::dev::sensors::camera::VideoMode::Id video_mode_id = mpCameraChannel->getVideoMode();
+  if (video_mode_id != cedar::dev::sensors::camera::VideoMode::MODE_NOT_SET)
+  {
+#ifdef DEBUG_CAMERA_GRABBER
+    std::cout << "Set VideoMode" << std::endl;
+#endif
+    double value = static_cast<double>(video_mode_id);
+    this->setPropertyToCamera(cedar::dev::sensors::camera::Setting::MODE,value);
+  }
+
+  //framerate
+  cedar::dev::sensors::camera::FrameRate::Id framerate_id = mpCameraChannel->getFPS();
+  if (framerate_id != cedar::dev::sensors::camera::FrameRate::FPS_NOT_SET)
+  {
+#ifdef DEBUG_CAMERA_GRABBER
+    std::cout << "Set FrameRate" << std::endl;
+#endif
+    double value = static_cast<double>(framerate_id);
+    this->setPropertyToCamera(cedar::dev::sensors::camera::Setting::FPS,value);
+  }
+
+  //iso-speed
+  cedar::dev::sensors::camera::IsoSpeed::Id iso_speed_id = mpCameraChannel->getIsoSpeed();
+  if (iso_speed_id != cedar::dev::sensors::camera::IsoSpeed::ISO_NOT_SET)
+  {
+#ifdef DEBUG_CAMERA_GRABBER
+    std::cout << "Set IsoSpeed" << std::endl;
+#endif
+    double value = static_cast<double>(iso_speed_id);
+    this->setPropertyToCamera(cedar::dev::sensors::camera::Setting::ISO_SPEED,value);
+  }
 
 }
 #endif // CEDAR_USE_LIB_DC1394
