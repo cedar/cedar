@@ -139,6 +139,7 @@ public:
   //----------------------------------------------------------------------------
 public:
 
+	//!@todo This should be private -- loopedthreadworker should be a friend
   /*!@brief All calculations for each time step are put into step().
    *
    * @param time length of the time step to be calculated in milliseconds

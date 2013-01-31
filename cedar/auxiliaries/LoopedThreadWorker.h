@@ -57,7 +57,8 @@
 
 namespace cedar
 {
-  namespace aux {
+  namespace aux
+  {
     class LoopedThreadWorker; // doesnt need to be in namespace.h (internal)
   };
 };
