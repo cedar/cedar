@@ -117,13 +117,13 @@ _mpIsoSpeed(new cedar::aux::EnumParameter
                  new cedar::dev::sensors::camera::Properties(this,mVideoCapture,mpVideoCaptureLock)
                );
 
-  QObject::connect(_mpByGuid.get(),SIGNAL(valueChanged()),this,SLOT(settingChanged()));
-  QObject::connect(_mpCameraId.get(),SIGNAL(valueChanged()),this,SLOT(settingChanged()));
-  QObject::connect(_mpGrabMode.get(),SIGNAL(valueChanged()),this,SLOT(settingChanged()));
-  QObject::connect(_mpFPS.get(),SIGNAL(valueChanged()),this,SLOT(settingChanged()));
+  QObject::connect(_mpByGuid.get(),SIGNAL(valueChanged()),this,SLOT(deviceChanged()));
+  QObject::connect(_mpCameraId.get(),SIGNAL(valueChanged()),this,SLOT(deviceChanged()));
+  QObject::connect(_mpGrabMode.get(),SIGNAL(valueChanged()),this,SLOT(grabModeChanged()));
+  QObject::connect(_mpFPS.get(),SIGNAL(valueChanged()),this,SLOT(fpsChanged()));
 
 #ifdef CEDAR_USE_LIB_DC1394
-  QObject::connect(_mpIsoSpeed.get(),SIGNAL(valueChanged()),this,SLOT(settingChanged()));
+  QObject::connect(_mpIsoSpeed.get(),SIGNAL(valueChanged()),this,SLOT(isoSpeedChanged()));
 #endif
 
 }
@@ -142,17 +142,20 @@ cedar::dev::sensors::camera::Channel::~Channel()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-//invoked with signal from gui
+//invoked with signal from gui or internal through setValue of the ObjectParameter
 void cedar::dev::sensors::camera::Channel::setBackendType
 (
   cedar::dev::sensors::camera::BackendType::Id backendType
 )
 {
-  //std::cout << "cedar::dev::sensors::camera::Channel::setBackendType ";
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+#endif
   if (mBackendType != backendType)
   {
-    //std::cout << "change to " << cedar::dev::sensors::camera::BackendType::type().get(backendType).prettyString() << std::endl;
-
+#ifdef DEBUG_CAMERA_GRABBER
+    std::cout << "\tchange to " << cedar::dev::sensors::camera::BackendType::type().get(backendType).prettyString() << std::endl;
+#endif
     mBackendType = backendType;
 
     this->createBackend();
@@ -202,11 +205,19 @@ void cedar::dev::sensors::camera::Channel::setBackendType
     } // switch
 
     //set default values on backend-switching
+    //disable the change-signals to prevent double-processing
 #ifdef CEDAR_USE_LIB_DC1394
+    _mpIsoSpeed->blockSignals(true);
     _mpIsoSpeed->setValue(cedar::dev::sensors::camera::IsoSpeed::ISO_NOT_SET);
+    _mpIsoSpeed->blockSignals(false);
 #endif
+    _mpFPS->blockSignals(true);
     _mpFPS->setValue(cedar::dev::sensors::camera::FrameRate::FPS_NOT_SET);
+    _mpFPS->blockSignals(false);
+
+    _mpGrabMode->blockSignals(true);
     _mpGrabMode->setValue(cedar::dev::sensors::camera::VideoMode::MODE_NOT_SET);
+    _mpGrabMode->blockSignals(false);
 
   } // end changed backend
   else
@@ -216,7 +227,58 @@ void cedar::dev::sensors::camera::Channel::setBackendType
 }
 
 
-void cedar::dev::sensors::camera::Channel::settingChanged()
+void cedar::dev::sensors::camera::Channel::fpsChanged()
+{
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+#endif
+}
+
+
+void cedar::dev::sensors::camera::Channel::grabModeChanged()
+{
+  //invoked when user changes the grabmode as well as the backend turns entries on or off
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+#endif
+
+  if (mpBackend)
+  {
+#ifdef DEBUG_CAMERA_GRABBER
+    std::cout << "\tGrabber offline, update availabe fps for the new mode" << std::endl;
+#endif
+
+#ifdef CEDAR_USE_LIB_DC1394
+    if (_mpBackendType->getValue() == cedar::dev::sensors::camera::BackendType::DC1394)
+    {
+      cedar::dev::sensors::camera::DeviceDc1394Ptr p_backend;
+      p_backend = boost::static_pointer_cast<cedar::dev::sensors::camera::DeviceDc1394>(mpBackend);
+
+      //disable signals from fps:
+      _mpFPS->blockSignals(true);
+      p_backend->updateFps();
+      _mpFPS->blockSignals(false);
+    }
+#endif
+  }
+  else
+  {
+#ifdef DEBUG_CAMERA_GRABBER
+    std::cout << "Grabber online, create new grabbing-object" << std::endl;
+#endif
+  }
+}
+
+#ifdef CEDAR_USE_LIB_DC1394
+void cedar::dev::sensors::camera::Channel::isoSpeedChanged()
+{
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+#endif
+}
+#endif
+
+void cedar::dev::sensors::camera::Channel::deviceChanged()
 {
   // get sender and test if "byGUID" is changed
 /*  cedar::aux::ParameterPtr p_sender
@@ -226,8 +288,10 @@ void cedar::dev::sensors::camera::Channel::settingChanged()
   if (p_sender = _mpByGuid.get())
   {
   }*/
-
-  emit settingsChanged();
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+#endif
+  emit changeCamera();
 }
 
 unsigned int cedar::dev::sensors::camera::Channel::getCameraId()
@@ -318,8 +382,9 @@ void cedar::dev::sensors::camera::Channel::hideFwVideoModes()
 
 void cedar::dev::sensors::camera::Channel::createBackend()
 {
-//  std::cout << __PRETTY_FUNCTION__ << std::endl;
-
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+#endif
   if (mpBackend)
   {
     mpBackend.reset();

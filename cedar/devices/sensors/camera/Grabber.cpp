@@ -150,15 +150,16 @@ void cedar::dev::sensors::camera::Grabber::connectSignals()
                getCameraChannel(channel)->_mpBackendType.get(),
                SIGNAL(valueChanged()),
                this,
-               SLOT(cameraChanged())
+               //SLOT(cameraChanged())
+               SLOT(backendChanged())
              );
 
     QObject::connect
              (
                getCameraChannel(channel).get(),
-               SIGNAL(settingsChanged()),
+               SIGNAL(changeCamera()),
                this,
-               SLOT(cameraChanged())
+               SLOT(settingChanged())
              );
   }
 }
@@ -182,27 +183,29 @@ void cedar::dev::sensors::camera::Grabber::channelAdded(int) // int index
 }
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::camera::Grabber::cameraChanged()
+void cedar::dev::sensors::camera::Grabber::backendChanged()
 {
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+  // std::cout << __PRETTY_FUNCTION__ << " mCaptureDeviceCreated: "<<mCaptureDeviceCreated << std::endl;
+#endif
 
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                           (
-                                             this->getName() + ": cameraChanged signal",
-                                             "cedar::dev::sensors::camera::Grabber::cameraChanged()"
-                                           );
+  //create a new backend
 
-//  getCameraChannel(0)->setBackendType(getCameraChannel(0)->_mpBackendType->getValue());
-
-  // only apply parameters directly, if the camera is already in use.
-  // which is set by a loopedTrigger or by the applyParameter-action
   if (mCaptureDeviceCreated)
   {
     // delete and recreate all channels
+#ifdef DEBUG_CAMERA_GRABBER
+    std::cout << "\tdo applyParameter (i.e. recreate)" << std::endl;
+#endif
     this->applyParameter();
   }
   else
   {
     // otherwise only update visible fields
+#ifdef DEBUG_CAMERA_GRABBER
+    std::cout << "\tupdate visible fields " << std::endl;
+#endif
     unsigned int num_cams = getNumCams();
     for (unsigned int channel = 0; channel < num_cams; ++channel)
     {
@@ -211,6 +214,25 @@ void cedar::dev::sensors::camera::Grabber::cameraChanged()
       getCameraChannel(channel)->setBackendType(getCameraChannel(channel)->_mpBackendType->getValue());
     }
   }
+}
+
+//----------------------------------------------------------------------------------------------------
+void cedar::dev::sensors::camera::Grabber::settingChanged()
+{
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+#endif
+  // Settings have changed. If the capure-device is already created, then it have to be recreated.
+
+
+//  getCameraChannel(0)->setBackendType(getCameraChannel(0)->_mpBackendType->getValue());
+
+  // only apply parameters directly, if the camera is already in use.
+  // which is set by a loopedTrigger or by the applyParameter-action
+
+
+
+
 
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -231,9 +253,15 @@ void cedar::dev::sensors::camera::Grabber::onCloseGrabber()
 //----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::camera::Grabber::onCreateGrabber()
 {
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+  //std::cout << "mCaptureDeviceCreated" << std::boolalpha << " : " << mCaptureDeviceCreated << std::endl;
+#endif
+
   if (this->isCreated())
   {
     this->closeGrabber();
+    //std::cout << "old grabber closed" << std::endl;
   }
 
   bool result = false;
@@ -254,7 +282,7 @@ bool cedar::dev::sensors::camera::Grabber::onCreateGrabber()
     {
       init_message << "Bus-ID: ";
     }
-    init_message << getCameraChannel(channel)->getCameraId() << std::endl;
+    init_message << getCameraChannel(channel)->getCameraId();
   }
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
@@ -262,14 +290,24 @@ bool cedar::dev::sensors::camera::Grabber::onCreateGrabber()
                                              "cedar::dev::sensors::camera::Grabber::onCreateGrabber()"
                                            );
 
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << "\t"<< this->getName() + init_message.str() << std::endl;
+#endif
+
   // create capture device, which depends on the chosen backend
   try
   {
     bool all_devices_created = true;
     for (unsigned int channel = 0; channel < num_cams; ++channel)
     {
-      //backend already created on initialization
-      //getCameraChannel(channel)->createBackend();
+      //backend already created on initialization, but destroyed on onApplyParameter()/onCreateGrabber()
+      if (!getCameraChannel(channel)->mpBackend)
+      {
+       getCameraChannel(channel)->createBackend();
+#ifdef DEBUG_CAMERA_GRABBER
+       std::cout << "Backend recreated" << std::endl;
+#endif
+      }
 
       bool device_created = getCameraChannel(channel)->mpBackend->createCaptureDevice();
 
@@ -292,7 +330,6 @@ bool cedar::dev::sensors::camera::Grabber::onCreateGrabber()
   {
     result = false;
   }
-
   return result;
 }
 

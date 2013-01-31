@@ -85,6 +85,9 @@ public:
   //! update settings from gui
   //void updateSettings();
 
+  //!@brief Enable/disable framerates for the current selected frame mode
+  void updateFps();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -109,7 +112,7 @@ protected:
    */
   void getFrameRatesFromLibDc(cedar::dev::sensors::camera::VideoMode::Id modeId);
 
-  //! get all available modes and enable them in the enum-class, disable all others
+  //! get all available modes and enable them in the enum-class, disable all others and set mode to "AUTO"
   void getGrabModesFromLibDc();
 
   //--------------------------------------------------------------------------------------------------------------------

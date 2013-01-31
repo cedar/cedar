@@ -90,7 +90,9 @@ bool cedar::dev::sensors::camera::DeviceCvVideoCapture::createCaptureObject()
 
 void cedar::dev::sensors::camera::DeviceCvVideoCapture::getAvailablePropertiesFromCamera()
 {
+#ifdef DEBUG_CAMERA_GRABBER
   std::cout << __PRETTY_FUNCTION__ << std::endl;
+#endif
 
   int num_properties = cedar::dev::sensors::camera::Property::type().list().size();
   for (int i=0; i<num_properties; i++)

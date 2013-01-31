@@ -66,8 +66,9 @@ void cedar::dev::sensors::camera::Device::init()
 
 bool cedar::dev::sensors::camera::Device::createCaptureDevice()
 {
-//  std::cout << __PRETTY_FUNCTION__ << std::endl;
-
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+#endif
 
   bool result = true;
 
@@ -106,8 +107,9 @@ bool cedar::dev::sensors::camera::Device::createCaptureDevice()
 
 void cedar::dev::sensors::camera::Device::applyStateToCamera()
 {
-
-//  std::cout << __PRETTY_FUNCTION__ << std::endl;
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+#endif
 
   int num_properties = cedar::dev::sensors::camera::Property::type().list().size();
   for (int i=0; i<num_properties; i++)
@@ -147,7 +149,9 @@ bool cedar::dev::sensors::camera::Device::setPropertyToCamera(unsigned int prope
 {
   // no lock needed, the cvVideoCapture object is globally locked
   std::string prop_name = cedar::dev::sensors::camera::Property::type().get(propertyId).prettyString();
+#ifdef DEBUG_CAMERA_GRABBER
   std::cout << "setPropertyToCamera "<< prop_name <<"( ID: " << propertyId << ") Value: " << value << std::endl;
+#endif
   bool result = false;
   if (this->mpCameraChannel->mVideoCapture.isOpened())
   {
