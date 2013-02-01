@@ -53,6 +53,8 @@
 #include <string>
 #include <iostream>
 #include <QThread>
+#include <QMutex>
+#include <QReadWriteLock>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
 
@@ -154,16 +156,16 @@ public:
    * @param timeout the max. time to wait for the thread (in milliseconds).
    * @param suppressWarning by default a warning about occurring timing problems will be given
    */
-  void stop(unsigned int timeout = 500, bool suppressWarning = false);
+  void stop(unsigned int timeout = 500, bool suppressWarning = false); // TODO: say it is thread-safe and re-entry will abort with a warning TODO: say, it will block until the thread finishes, but maximally wait timeout 
 
-  void start(); // TODO: manpage
-  bool isRunning() const; // TODO manpage
+  void start(); // TODO: manpage TODO: say it is thread-safe and re-entry will abort with a warning
+  bool isRunning() const; // TODO manpage, TODO: say it is thread-safe
 
   /*!@brief Performs a single step with default step size (or simulated time).
    *
    * This has no effect if the thread is already running.
    */
-  void singleStep();
+  void singleStep(); // TODO: note, this function is not re-entrant
 
   /*!@brief Sets a new step size
    *
@@ -258,7 +260,7 @@ public:
 #endif  
 
 public slots:
-  void finishedThread();
+  void finishedThread(); // thread-safe
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -269,9 +271,10 @@ protected:
   // private methods
   //----------------------------------------------------------------------------
 private:
-  bool validWorker() const;
-  bool validThread() const;
-  void stopStatistics(bool suppressWarnings);
+  bool validWorker() const; // thread-UN-safe
+  bool validThread() const; // thread-UN-safe
+  void stopStatistics(bool suppressWarnings); // TODO: are the stats locked? // thread un-safe
+  bool isRunningUnlocked() const; // is NOT thread-safe
 
   //----------------------------------------------------------------------------
   // members
@@ -287,10 +290,12 @@ protected:
   // none yet
 
 private:
-  QThread *mpThread;
-  bool    mDestructing;
+  QThread* mpThread;
+  mutable bool mDestructing; 
+  mutable QMutex mDestructingMutex;
 
   cedar::aux::LoopedThreadWorker *mpWorker;
+  mutable QReadWriteLock mGeneralAccessLock;
 
   //!@brief desired length of a single step, in milliseconds
   cedar::aux::DoubleParameterPtr _mStepSize;

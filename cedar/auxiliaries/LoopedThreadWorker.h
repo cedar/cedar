@@ -106,7 +106,7 @@ class cedar::aux::LoopedThreadWorker : public QObject
     cedar::aux::LoopedThread *mpWrapper;
 
     //!@brief stop is requested
-    bool mStop;
+    volatile bool mStop; // volatile disables some optimizations, but doesn't add thread-safety
 
     //!@brief total number of steps since start()
     unsigned long mNumberOfSteps;
