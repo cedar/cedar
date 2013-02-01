@@ -44,18 +44,18 @@
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 
-cedar::aux::LoopedThreadWorker::LoopedThreadWorker(cedar::aux::LoopedThread *wrapper) 
+cedar::aux::detail::LoopedThreadWorker::LoopedThreadWorker(cedar::aux::LoopedThread *wrapper) 
 : mpWrapper(wrapper), mStop(false)
 {
   initStatistics();
 }
 
-cedar::aux::LoopedThreadWorker::~LoopedThreadWorker() 
+cedar::aux::detail::LoopedThreadWorker::~LoopedThreadWorker() 
 {
   // Note: do not delete mpWrapper here! it should delete us
 }
 
-void cedar::aux::LoopedThreadWorker::requestStop()
+void cedar::aux::detail::LoopedThreadWorker::requestStop()
 {
   // this will stop and exit the loop (not the thread - the thread is stopped
   // by the wrapper LoopedThread)
@@ -64,16 +64,17 @@ void cedar::aux::LoopedThreadWorker::requestStop()
   mStop = true;
 }
 
-bool cedar::aux::LoopedThreadWorker::stopRequested()
+bool cedar::aux::detail::LoopedThreadWorker::stopRequested()
 {
+  // TODO: locking
   return mStop;
 }
 
-void cedar::aux::LoopedThreadWorker::loop()
+void cedar::aux::detail::LoopedThreadWorker::work()
 {
-  // TODO: check whether wrapper (mpWrapper) still exists
+  // TODO: check whether wrapper (mpWrapper) still exists (paranoid)
 
-  mStop = false;
+  mStop = false; // TODO: locking
 
   // we do not want to change the step size while running
   boost::posix_time::time_duration step_size
@@ -89,7 +90,7 @@ void cedar::aux::LoopedThreadWorker::loop()
       mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
       boost::posix_time::time_duration time_difference;
 
-      while (!mStop)
+      while (!mStop) // TODO: locking // note: mStop ist volatile, which is good
       {
         mLastTimeStepStart = mLastTimeStepEnd;
         mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
@@ -102,7 +103,7 @@ void cedar::aux::LoopedThreadWorker::loop()
     }
     case cedar::aux::LoopMode::Simulated:
     {
-      while (!mStop)
+      while (!mStop) // TODO: locking // note: mStop is volatile, which is good
       {
         mpWrapper->step(mpWrapper->getSimulatedTimeParameter());
         usleep(static_cast<unsigned int>(1000 * mpWrapper->getIdleTimeParameter() + 0.5));
@@ -133,13 +134,13 @@ void cedar::aux::LoopedThreadWorker::loop()
       boost::posix_time::time_duration sleep_duration = boost::posix_time::microseconds(0);
       boost::posix_time::time_duration step_duration = boost::posix_time::microseconds(0);
 
-      while (!mStop)
+      while (!mStop) // TODO: locking // note: mStop is volatile, which is good
       {
         // sleep until next wake up time
         sleep_duration = scheduled_wakeup - boost::posix_time::microsec_clock::universal_time();
         usleep(std::max<int>(0, sleep_duration.total_microseconds()));
       
-        if (mStop) // a lot can happen in a few us
+        if (mStop) // a lot can happen in a few us // TODO: locking
           break;
 
         // determine time since last run
@@ -159,7 +160,7 @@ void cedar::aux::LoopedThreadWorker::loop()
         // call step function
         mpWrapper->step(full_steps_taken * step_size.total_microseconds() * 0.001);
 
-        if (mStop) // a lot can happen in a step()
+        if (mStop) // a lot can happen in a step() // TODO: locking
           break;
 
         // schedule the next wake up
@@ -167,7 +168,7 @@ void cedar::aux::LoopedThreadWorker::loop()
         {
           scheduled_wakeup = scheduled_wakeup + step_size;
         }
-      } // while(!mStop)
+      } // while(!mStop) 
 
       break;
     }
@@ -183,13 +184,13 @@ void cedar::aux::LoopedThreadWorker::loop()
       boost::posix_time::time_duration sleep_duration = boost::posix_time::microseconds(0);
       boost::posix_time::time_duration step_duration = boost::posix_time::microseconds(0);
 
-      while (!mStop)
+      while (!mStop) // TODO: locking // note: mStop ist volatile, which is good
       {
         // sleep until next wake up time
         sleep_duration = scheduled_wakeup - boost::posix_time::microsec_clock::universal_time();
         usleep(std::max<int>(0, sleep_duration.total_microseconds()));
 
-        if (mStop) // a lot can happen in a few us
+        if (mStop) // a lot can happen in a few us // TODO: locking
           break;
 
         // determine time since last run
@@ -208,7 +209,7 @@ void cedar::aux::LoopedThreadWorker::loop()
         // call step function
         mpWrapper->step(steps_taken * step_size.total_microseconds() * 0.001);
 
-        if (mStop) // a lot can happen in a step()
+        if (mStop) // a lot can happen in a step() // TODO: locking
           break;
 
         // schedule the next wake up
@@ -229,18 +230,18 @@ void cedar::aux::LoopedThreadWorker::loop()
     }
   }
 
-  mStop = false;
+  mStop = false; // TODO: locking
   return;
 }
 
-void cedar::aux::LoopedThreadWorker::initStatistics()
+void cedar::aux::detail::LoopedThreadWorker::initStatistics()
 {
   mNumberOfSteps = 0;
   mSumOfStepsTaken = 0.0;
   mMaxStepsTaken = 0.0;
 }
 
-void cedar::aux::LoopedThreadWorker::updateStatistics(double stepsTaken)
+void cedar::aux::detail::LoopedThreadWorker::updateStatistics(double stepsTaken)
 {
 
   double old_sum = mSumOfStepsTaken;
@@ -265,27 +266,27 @@ void cedar::aux::LoopedThreadWorker::updateStatistics(double stepsTaken)
   return;
 }
 
-boost::posix_time::ptime cedar::aux::LoopedThreadWorker::getLastTimeStepStart() const
+boost::posix_time::ptime cedar::aux::detail::LoopedThreadWorker::getLastTimeStepStart() const
 {
   return mLastTimeStepStart;
 }
 
-boost::posix_time::ptime cedar::aux::LoopedThreadWorker::getLastTimeStepEnd() const
+boost::posix_time::ptime cedar::aux::detail::LoopedThreadWorker::getLastTimeStepEnd() const
 {
   return mLastTimeStepEnd;
 }
 
-boost::posix_time::time_duration cedar::aux::LoopedThreadWorker::getLastTimeStepDuration() const
+boost::posix_time::time_duration cedar::aux::detail::LoopedThreadWorker::getLastTimeStepDuration() const
 {
   return mLastTimeStepStart - mLastTimeStepEnd;
 }
 
-unsigned long cedar::aux::LoopedThreadWorker::getNumberOfSteps()
+unsigned long cedar::aux::detail::LoopedThreadWorker::getNumberOfSteps()
 {
   return mNumberOfSteps;
 }
 
-double cedar::aux::LoopedThreadWorker::getMaxStepsTaken()
+double cedar::aux::detail::LoopedThreadWorker::getMaxStepsTaken()
 {
   return mMaxStepsTaken;
 }

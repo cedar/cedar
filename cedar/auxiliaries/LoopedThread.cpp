@@ -66,7 +66,7 @@ _mLoopMode
   new cedar::aux::EnumParameter
   (
     this,
-    "loop mode",
+    "loop mode", // ??? TODO do still need this here?
     cedar::aux::LoopMode::typePtr(),
     mode
   )
@@ -114,7 +114,6 @@ cedar::aux::LoopedThread::~LoopedThread()
   if (validWorker())
   {
     mpWorker->requestStop(); // set stopped state first, 
-                             // do not enter next loop() iteration
                              // note: this may not stop the thread in time,
                              // but will help to exit cleanly for some workers
     // note: mpWorker->requestStop() needs to be thread-safe
@@ -205,17 +204,17 @@ void cedar::aux::LoopedThread::start()
   //              users use it and may inherit it, modyfing its step() method.
   //
   //              We initialize a new thread (a QThread object) and
-  //              a worker object (a QObject with a custom loop() method).
+  //              a worker object (a QObject with a custom work() method).
   //              The worker is then pushed into the QThreads' object thread.
   //
-  //              The work is done in the workers loop() method.
+  //              The work is done in the workers work() method.
   //
   //              Communication is done via the QT event loops (also of the
   //              QThread object).
 
   if (validWorker() != validThread())
   {
-    // report an error/warning TODO 
+    // report an error/warning TODO   --> throw an error or CEDAR_ASSERT
     return; // should not happen
   }
   else if (isRunningUnlocked()) //!@todo Should output a warning/error
@@ -227,14 +226,14 @@ void cedar::aux::LoopedThread::start()
     // TODO: CEDAR_ASSERT( !validWorker() )
 
     // we need a new worker object
-    mpWorker = new cedar::aux::LoopedThreadWorker(this);
+    mpWorker = new cedar::aux::detail::LoopedThreadWorker(this);
     // we need a new thread object
     mpThread = new QThread();
 
     mpWorker->moveToThread(mpThread);
 
-    // when the thread starts, start the loop() in the worker:
-    connect( mpThread, SIGNAL(started()), mpWorker, SLOT(loop()) );
+    // when the thread starts, start the work() in the worker:
+    connect( mpThread, SIGNAL(started()), mpWorker, SLOT(work()) );
     // when the thread finishes (somebody called quit()), react to it:
     connect( mpThread, SIGNAL(finished()), this, SLOT(finishedThread()) );
   }
@@ -251,9 +250,7 @@ void cedar::aux::LoopedThread::finishedThread()
   QWriteLocker locker(&mGeneralAccessLock);
   // make sure we enter this function only once
 
-  // TODO: make sure everything is exception-free after this line!
-  
-  // we cannot test isRunning(), here per premise
+  // note, we cannot test isRunning(), here per premise
 
   if (mDestructing) // always test after locking, see start()
     return;
@@ -311,7 +308,7 @@ void cedar::aux::LoopedThread::stop(unsigned int time, bool suppressWarning)
     // avoid dead-locking if called from the same thread:
     if (QThread::currentThread() != mpThread)
     {
-      mpThread->wait(); // TODO: wait(time)
+      mpThread->wait(); // TODO: change back to ... wait(time)
         // synchronize with thread exit
     }
 
@@ -359,7 +356,7 @@ void cedar::aux::LoopedThread::stopStatistics(bool suppressWarning)
 }
 
 
-void cedar::aux::LoopedThread::singleStep()
+void cedar::aux::LoopedThread::singleStep() // TODO: needs to be virtual
 {
   if (!this->isRunning()) // use thread-safe variant  
   {

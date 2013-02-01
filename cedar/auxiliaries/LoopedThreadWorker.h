@@ -59,12 +59,15 @@ namespace cedar
 {
   namespace aux
   {
-    class LoopedThreadWorker; // doesnt need to be in namespace.h (internal)
+    namespace detail
+    {
+      class LoopedThreadWorker; // doesnt need to be in namespace.h (internal)
+    };
   };
 };
 
 
-class cedar::aux::LoopedThreadWorker : public QObject
+class cedar::aux::detail::LoopedThreadWorker : public QObject
 {
   Q_OBJECT
 
@@ -78,7 +81,7 @@ class cedar::aux::LoopedThreadWorker : public QObject
 
 
   public slots:
-    void loop();
+    void work();
 
   public:
     /*!@brief Returns the last timesteps start time.
