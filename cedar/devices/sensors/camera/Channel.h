@@ -113,7 +113,7 @@ signals:
    * then a new grabbing-object with the new settings will be created. Otherwise this signal
    * could be ignored.
    */
-  //void settingChanges();
+  void changeSetting();
 
 
   // friend classes of this channel for direct access to the members

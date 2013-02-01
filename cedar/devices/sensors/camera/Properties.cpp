@@ -295,7 +295,7 @@ bool cedar::dev::sensors::camera::Properties::setPropertyToCamera(unsigned int p
     if ((value != CAMERA_PROPERTY_NOT_SUPPORTED) || (value != CAMERA_PROPERTY_MODE_DEFAULT))
     {
       result = mVideoCapture.set(propertyId, value);
-#ifdef DEBUG_CAMERA_GRABBER
+#ifdef DEBUG_CAMERA_GRABBER1
       std::string prop_name = cedar::dev::sensors::camera::Property::type().get(propertyId).prettyString();
       //  cedar::aux::LogSingleton::getInstance()->debugMessage
       //                                           (
@@ -311,7 +311,7 @@ bool cedar::dev::sensors::camera::Properties::setPropertyToCamera(unsigned int p
 #endif
     }
   }
-#ifdef DEBUG_CAMERA_GRABBER
+#ifdef DEBUG_CAMERA_GRABBER1
   else
   {
     std::cout << "\tNothing to do (VideoCapture not opened)" << std::endl;
