@@ -59,6 +59,8 @@ void cedar::aux::LoopedThreadWorker::requestStop()
 {
   // this will stop and exit the loop (not the thread - the thread is stopped
   // by the wrapper LoopedThread)
+
+  // TODO: needs to be locked!
   mStop = true;
 }
 
