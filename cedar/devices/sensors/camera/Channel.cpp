@@ -226,14 +226,21 @@ void cedar::dev::sensors::camera::Channel::setBackendType
   }
 }
 
-
+//gh todo: delete method, same as deviceChanged
 void cedar::dev::sensors::camera::Channel::fpsChanged()
 {
 #ifdef DEBUG_CAMERA_GRABBER
   std::cout << __PRETTY_FUNCTION__ << std::endl;
 #endif
+  // only recreate when grabbing, otherwise nothing to do
+  if (!mpBackend)
+  {
+#ifdef DEBUG_CAMERA_GRABBER
+    std::cout << "\tGrabber online, create new grabbing-object" << std::endl;
+#endif
+    emit changeSetting();
+  }
 }
-
 
 void cedar::dev::sensors::camera::Channel::grabModeChanged()
 {
@@ -264,17 +271,27 @@ void cedar::dev::sensors::camera::Channel::grabModeChanged()
   else
   {
 #ifdef DEBUG_CAMERA_GRABBER
-    std::cout << "Grabber online, create new grabbing-object" << std::endl;
+    std::cout << "\tGrabber online, create new grabbing-object" << std::endl;
 #endif
+    emit changeSetting();
   }
 }
 
+//gh todo: delete method, same as deviceChanged
 #ifdef CEDAR_USE_LIB_DC1394
 void cedar::dev::sensors::camera::Channel::isoSpeedChanged()
 {
 #ifdef DEBUG_CAMERA_GRABBER
   std::cout << __PRETTY_FUNCTION__ << std::endl;
 #endif
+  // recreate grabber when grabbing, otherwise nothing to do
+  if (!mpBackend)
+  {
+#ifdef DEBUG_CAMERA_GRABBER
+    std::cout << "\tGrabber online, create new grabbing-object" << std::endl;
+#endif
+    emit changeSetting();
+  }
 }
 #endif
 
@@ -291,7 +308,11 @@ void cedar::dev::sensors::camera::Channel::deviceChanged()
 #ifdef DEBUG_CAMERA_GRABBER
   std::cout << __PRETTY_FUNCTION__ << std::endl;
 #endif
-  emit changeCamera();
+  // recreate grabber when grabbing, otherwise nothing to do
+  if (!mpBackend)
+  {
+    emit changeCamera();
+  }
 }
 
 unsigned int cedar::dev::sensors::camera::Channel::getCameraId()
@@ -385,6 +406,10 @@ void cedar::dev::sensors::camera::Channel::createBackend()
 #ifdef DEBUG_CAMERA_GRABBER
   std::cout << __PRETTY_FUNCTION__ << std::endl;
 #endif
+
+  //save old state and restore at the end of this method
+  cedar::dev::sensors::camera::VideoMode::Id used_mode_id = _mpGrabMode->getValue();
+
   if (mpBackend)
   {
     mpBackend.reset();
@@ -429,4 +454,14 @@ void cedar::dev::sensors::camera::Channel::createBackend()
     }
   } // switch
   mpBackend->init();
+
+  //restore previous used mode - if available;
+  if (_mpGrabMode->isEnabled(used_mode_id))
+  {
+    _mpGrabMode->setValue(used_mode_id);
+  }
+  else
+  {
+    _mpGrabMode->setValue(cedar::dev::sensors::camera::VideoMode::MODE_NOT_SET);
+  }
 }

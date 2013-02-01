@@ -330,8 +330,6 @@ bool cedar::dev::sensors::visual::Grabber::applyParameter()
                                              );
     this->closeGrabber();
   }
-
-//  std::cout << __PRETTY_FUNCTION__  << ": mCaptureDeviceCreated: " << std::boolalpha << mCaptureDeviceCreated << std::endl;
   return mCaptureDeviceCreated;
 }
 
@@ -451,6 +449,11 @@ void cedar::dev::sensors::visual::Grabber::stopGrabber()
     this->stopRecording();
   }
   mIsGrabbing = false;
+}
+
+void cedar::dev::sensors::visual::Grabber::setIsGrabbing(bool isGrabbing)
+{
+  mIsGrabbing = isGrabbing;
 }
 
 //--------------------------------------------------------------------------------------------------------------------

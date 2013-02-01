@@ -88,14 +88,7 @@ void cedar::dev::sensors::camera::DeviceDc1394::init()
 //  std::cout << "Set Grabmode to "
 //    << cedar::dev::sensors::camera::VideoMode::type().get(mpCameraChannel->_mpGrabMode->getValue()).prettyString()
 //    << std::endl;
-  this->getFrameRatesFromLibDc(mpCameraChannel->_mpGrabMode->getValue()); //id?????
-
-
-  //set first available mode
-//  unsigned int set_video_mode_id = 0;
-//  cedar::dev::sensors::camera::VideoMode::Id set_video_mode;
-//  set_video_mode = static_cast<cedar::dev::sensors::camera::VideoMode::Id>(cam_video_modes.modes[set_video_mode_id]);
-//  mpCameraChannel->_mpGrabMode->setValue(set_video_mode);
+  this->getFrameRatesFromLibDc(mpCameraChannel->_mpGrabMode->getValue());
 }
 
 
@@ -196,11 +189,17 @@ void cedar::dev::sensors::camera::DeviceDc1394::getGrabModesFromLibDc()
   //restore previous used mode
   if (mpCameraChannel->_mpGrabMode->isEnabled(used_mode_id))
   {
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << "\tRestore previous mode. ID: "<< used_mode_id << std::endl;
+#endif
     mpCameraChannel->_mpGrabMode->enable(used_mode_id);
   }
   else
   {
     mpCameraChannel->_mpGrabMode->setValue(cedar::dev::sensors::camera::VideoMode::MODE_NOT_SET);
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << "\tSet frame mode to auto." << std::endl;
+#endif
   }
   mpCameraChannel->_mpGrabMode->blockSignals(false);
 }

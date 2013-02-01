@@ -102,10 +102,20 @@ public:
   void settingChanged();
 
 
+  void cameraChanged();
+
   /*!@brief A slot that must be triggered if the backend has changed. It is internally connected with the
    *      CameraChannel->Backend Enum-Parameter valueChanged() signal.
    */
   void backendChanged();
+
+  signals:
+
+  /*!@brief This signal is raised, if the grabber will be recreated
+   *
+   *   This signal is used from the processingIde Camera step to annotate a new imagesize
+   */
+  void frameSizeChanged();
 
 
   private:
