@@ -156,7 +156,7 @@ public:
    * @param timeout the max. time to wait for the thread (in milliseconds).
    * @param suppressWarning by default a warning about occurring timing problems will be given
    */
-  void stop(unsigned int timeout = 500, bool suppressWarning = false); // TODO: say it is thread-safe and re-entry will abort with a warning TODO: say, it will block until the thread finishes, but maximally wait timeout 
+  void stop(unsigned int timeout = 500, bool suppressWarning = false); // TODO: say it is thread-safe and re-entry will abort with a warning
 
   void start(); // TODO: manpage TODO: say it is thread-safe and re-entry will abort with a warning
   bool isRunning() const; // TODO manpage, TODO: say it is thread-safe
@@ -165,7 +165,7 @@ public:
    *
    * This has no effect if the thread is already running.
    */
-  void singleStep(); // TODO: note, this function is not re-entrant
+  void singleStep(); // TODO: say this function is not re-entrant TODO: does this need to be thread-safe? TODO: needs to be virtual if step() is virtual! TODO: in kimenaticChain: you need to overwrite this
 
   /*!@brief Sets a new step size
    *
@@ -294,7 +294,7 @@ private:
   mutable bool mDestructing; 
   mutable QMutex mDestructingMutex;
 
-  cedar::aux::LoopedThreadWorker *mpWorker;
+  cedar::aux::detail::LoopedThreadWorker *mpWorker;
   mutable QReadWriteLock mGeneralAccessLock;
 
   //!@brief desired length of a single step, in milliseconds
