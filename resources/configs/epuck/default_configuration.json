@@ -1,6 +1,6 @@
 {
   "name": "default e-puck robot",
-  "description file": "epuck/configs/description.json",
+  "description file": "configs/epuck/description.json",
   "component slots":
   {
     "drive":
