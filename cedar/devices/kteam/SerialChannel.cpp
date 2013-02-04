@@ -42,6 +42,21 @@
 
 // SYSTEM INCLUDES
 
+//----------------------------------------------------------------------------------------------------------------------
+// type registration
+//----------------------------------------------------------------------------------------------------------------------
+
+namespace
+{
+  bool registered()
+  {
+    cedar::dev::ChannelManagerSingleton::getInstance()->
+        registerType<cedar::dev::kteam::SerialChannelPtr>();
+    return true;
+  }
+
+  bool registerFnCall = registered();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

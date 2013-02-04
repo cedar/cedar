@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/devices/kteam/EPuckDrive.h"
+#include "cedar/devices/kteam/DriveSerial.h"
 #include "cedar/devices/kteam/Odometry.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/SceneWidget.h"
@@ -44,7 +44,7 @@
 #include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/devices/kteam/gui/DriveControlWidget.h"
-#include "cedar/devices/communication/SerialCommunication.h"
+#include "cedar/devices/kteam/SerialChannel.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -66,13 +66,13 @@ int main(int argc, char **argv)
   viewer.startTimer(50);
 
   //open the channel to the robot
-  cedar::dev::com::SerialCommunicationPtr communication(new cedar::dev::com::SerialCommunication());
+  cedar::dev::kteam::SerialChannelPtr communication(new cedar::dev::kteam::SerialChannel());
   std::string serial_communication_config = cedar::aux::locateResource("configs/epuck_serial_communication.json");
   communication->readJson(serial_communication_config);
   communication->open();
 
   //initialize the e-puck
-  cedar::dev::kteam::EPuckDrivePtr drive(new cedar::dev::kteam::EPuckDrive(communication));
+  cedar::dev::kteam::DriveSerialPtr drive(new cedar::dev::kteam::DriveSerial(communication));
   std::string epuck_drive_config = cedar::aux::locateResource("configs/epuck.json");
   drive->readJson(epuck_drive_config);
 
