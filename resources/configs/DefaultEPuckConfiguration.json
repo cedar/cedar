@@ -1,6 +1,6 @@
 {
   "name": "default ePuck robot",
-  "description file": "EPuckDescription.json",
+  "description file": "configs/EPuckDescription.json",
   "component slots":
   {
     "drive":
@@ -22,6 +22,6 @@
     "led":
     {
       "channel type": "serial"
-    },
+    }
   }
 }
