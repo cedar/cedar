@@ -7,7 +7,7 @@
       {
         "serial":
         {
-          "cedar.devices.kteam.DriveSerial":
+          "cedar.dev.kteam.DriveSerial":
           {
             "command set speed": "D",
             "command set encoder": "P",
@@ -48,7 +48,7 @@
       {
         "serial":
         {
-          "cedar.devies.InfraredSensorSerial":
+          "cedar.dev.kteam.InfraredSensorSerial":
           {
             "command get infrared": "O"
           }
@@ -64,7 +64,7 @@
       {
         "serial":
         {
-          "cedar.devies.InfraredSensorSerial":
+          "cedar.dev.kteam.InfraredSensorSerial":
           {
             "command get infrared": "N"
           }
@@ -80,7 +80,7 @@
       {
         "serial":
         {
-          "cedar.devies.kteam.epuck.AccelerationSensorSerial":
+          "cedar.dev.kteam.epuck.AccelerationSensorSerial":
           {
             "command get acceleration": "A"
           }
@@ -96,7 +96,7 @@
       {
         "serial":
         {
-          "cedar.devies.kteam.LedSerial":
+          "cedar.dev.kteam.LedSerial":
           {
             "command set state": "L"
           }
@@ -111,7 +111,7 @@
   {
     "serial":
     {
-      "cedar.devices.kteam.SerialChannel":
+      "cedar.dev.kteam.SerialChannel":
       {
         "name": "serial communication",
         "device path": "/dev/rfcomm0",
