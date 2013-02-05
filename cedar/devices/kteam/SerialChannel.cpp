@@ -66,10 +66,8 @@ namespace
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::kteam::SerialChannel::initialize()
+void cedar::dev::kteam::SerialChannel::postOpenHook()
 {
-  cedar::dev::SerialChannel::initialize();
-
   // send a dummy-message
   std::string answer = this->sendAndReceiveLocked("D,0,0");
 

@@ -74,10 +74,10 @@ _mInfo(new cedar::aux::StringParameter(this, "info", ""))
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::tests::unit::dev::Robot::TestChannel::open()
+void cedar::tests::unit::dev::Robot::TestChannel::openHook()
 {
 }
 
-void cedar::tests::unit::dev::Robot::TestChannel::close()
+void cedar::tests::unit::dev::Robot::TestChannel::closeHook()
 {
 }

@@ -82,16 +82,32 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Opens the channel.
-  virtual void open() = 0;
+  void open();
 
   //!@brief Closes the channel.
-  virtual void close() = 0;
+  void close();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief Executed before the code in @em openHook.
+  virtual void preOpenHook(){};
+
+  //!@brief This method implements opening of the channel.
+  virtual void openHook() = 0;
+
+  //!@brief Executed after the code in @em openHook.
+  virtual void postOpenHook(){};
+
+  //!@brief Executed before the code in @em closeHook.
+  virtual void preCloseHook(){};
+
+  //!@brief This method implements closing of the channel.
+  virtual void closeHook() = 0;
+
+  //!@brief Executed after the code in @em closeHook.
+  virtual void postCloseHook(){};
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

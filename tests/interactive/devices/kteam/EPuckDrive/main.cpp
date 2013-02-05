@@ -54,6 +54,9 @@ int main(int argc, char **argv)
   cedar::dev::kteam::DrivePtr drive
     = robot->getComponent<cedar::dev::kteam::Drive>("drive");
 
+  cedar::dev::ChannelPtr channel = drive->getChannel();
+  channel->open();
+
   // open the control-GUI
   cedar::dev::kteam::gui::DriveControlWidgetPtr drive_control(new cedar::dev::kteam::gui::DriveControlWidget(drive));
   drive_control->show();

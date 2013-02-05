@@ -85,10 +85,10 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Opens the channel.
-  virtual void open();
+  virtual void openHook();
 
   //!@brief  Closes the channel.
-  virtual void close();
+  virtual void closeHook();
 
   //!@brief The get-function of the initialization-status.
   //!@return true if initialized, else false
@@ -146,8 +146,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Initializes the object.
-  void initialize();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -156,9 +155,6 @@ private:
   //!@brief Initializes the communication and opens the channel.
   //!@return 1 if initialization was successful, else 0.
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
-  //!@brief Checks whether the serial connection has been initialized. Throws an exception if not.
-  void checkIfInitialized() const;
 
   //!@brief Checks whether the serial connection has been opened. Throws an exception if not.
   void checkIfOpen() const;
@@ -175,10 +171,6 @@ protected:
 private:
   //!@brief File Descriptor of the communication.
   int mFileDescriptor;
-
-  //!@brief Initialization status of the Serial Port.
-  // True if SerialChannel has been initialized, else false.
-  bool mInitialized;
 
   //!@brief Terminal IO.
   struct termios mTerminal;
