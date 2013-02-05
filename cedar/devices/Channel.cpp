@@ -72,3 +72,16 @@ std::ostream& cedar::dev::operator<<(std::ostream& stream, cedar::dev::ConstChan
   return stream;
 }
 
+void cedar::dev::Channel::open()
+{
+  preOpenHook();
+  openHook();
+  postOpenHook();
+}
+
+void cedar::dev::Channel::close()
+{
+  preCloseHook();
+  closeHook();
+  postCloseHook();
+}

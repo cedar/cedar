@@ -64,7 +64,6 @@
 cedar::dev::SerialChannel::SerialChannel()
 :
 mFileDescriptor(0),
-mInitialized(false),
 _mDevicePath(new cedar::aux::StringParameter(this, "device path", "/dev/rfcomm0")),
 _mEndOfCommandString(new cedar::aux::StringParameter(this, "end of command string", "\\r\\n")),
 _mCountryFlag(new cedar::aux::IntParameter(this, "country flag", 0, 0, 1)),
@@ -78,20 +77,14 @@ _mLatency(new cedar::aux::UIntParameter(this, "latency", 10000, 0, 1000000))
 
 cedar::dev::SerialChannel::~SerialChannel()
 {
-  if (mInitialized)
-  {
-    close();
-  }
+  close();
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::dev::SerialChannel::isInitialized() const
-{
-  return mInitialized;
-}
 
 int cedar::dev::SerialChannel::getFileDescriptor() const
 {
@@ -132,16 +125,6 @@ void cedar::dev::SerialChannel::readConfiguration(const cedar::aux::Configuratio
 {
   // read the configuration
   this->Configurable::readConfiguration(node);
-  // initialize the communication channel
-  this->initialize();
-}
-
-void cedar::dev::SerialChannel::checkIfInitialized() const
-{
-  if (!mInitialized)
-  {
-    CEDAR_THROW(cedar::aux::InitializationException, "Port not initialized");
-  }
 }
 
 void cedar::dev::SerialChannel::checkIfOpen() const
@@ -150,26 +133,6 @@ void cedar::dev::SerialChannel::checkIfOpen() const
   {
     CEDAR_THROW(cedar::aux::InitializationException, "Serial port not opened.");
   }
-}
-
-void cedar::dev::SerialChannel::initialize()
-{
-  if (mInitialized)
-  {
-    cedar::aux::LogSingleton::getInstance()->warning
-    (
-      "Serial channel already initialized",
-      "cedar::dev::SerialChannel",
-      "Initialization failed"
-    );
-
-    return;
-  }
-
-  // set the string signaling the end of a command
-  setEndOfCommandString(_mEndOfCommandString->getValue());
-
-  mInitialized = true;
 }
 
 std::string cedar::dev::SerialChannel::sendAndReceiveLocked(const std::string& command)
@@ -185,7 +148,6 @@ void cedar::dev::SerialChannel::send(const std::string& command)
 #pragma message ("cedar::dev::SerialChannel::send() not implemented for Windows.")
 #else
 
-  checkIfInitialized();
   checkIfOpen();
 
 #ifdef DEBUG
@@ -244,7 +206,6 @@ std::string cedar::dev::SerialChannel::receive()
 #pragma message ("cedar::dev::SerialChannel::receive() not implemented for Windows.")
 #else
 
-  checkIfInitialized();
   checkIfOpen();
 
 #ifdef DEBUG
@@ -358,13 +319,12 @@ void cedar::dev::SerialChannel::updateTranslatedEndOfCommandString()
   this->setEndOfCommandString(_mEndOfCommandString->getValue());
 }
 
-void cedar::dev::SerialChannel::open()
+void cedar::dev::SerialChannel::openHook()
 {
   //!@todo There is a lot of duplicate code here for mac and linux -- make this less redundant
-  if (!this->isInitialized())
-  {
-    this->initialize();
-  }
+
+  //!@todo Do we still need this? Not sure why this is done here.
+  setEndOfCommandString(_mEndOfCommandString->getValue());
 
   if (this->mFileDescriptor > 0)
   {
@@ -380,9 +340,9 @@ void cedar::dev::SerialChannel::open()
   _mLatency->setConstant(true);
 
 #ifdef CEDAR_OS_WINDOWS
-#pragma message ("cedar::dev::SerialChannel::initialize() not implemented for Windows.")
+#pragma message ("cedar::dev::SerialChannel::open() not implemented for Windows.")
 #else
-  // initialize channel on Linux
+  // open channel on Linux
 #if defined CEDAR_OS_LINUX
   mFileDescriptor = ::open(getDevicePath().c_str(), O_RDWR | O_NOCTTY);
 
@@ -435,7 +395,7 @@ void cedar::dev::SerialChannel::open()
   tcsetattr(mFileDescriptor, TCSANOW, &mTerminal);
 
 
-  // initialize channel on Mac
+  // openialize channel on Mac
 #elif defined CEDAR_OS_APPLE
   mFileDescriptor = ::open(getDevicePath().c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
 
@@ -508,12 +468,12 @@ void cedar::dev::SerialChannel::open()
   (
     "Successfully opened port" + getDevicePath(),
     "cedar::dev::SerialChannel",
-    "Serial channel initialized"
+    "Serial channel opened"
   );
 #endif
 }
 
-void cedar::dev::SerialChannel::close()
+void cedar::dev::SerialChannel::closeHook()
 {
 #ifdef CEDAR_OS_WINDOWS
 #pragma message ("cedar::dev::SerialChannel::close() not implemented for Windows.")

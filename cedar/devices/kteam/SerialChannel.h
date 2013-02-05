@@ -65,7 +65,8 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  virtual void initialize();
+  //!@brief Initialization code which needs to be executed after the channel has been opened.
+  virtual void postOpenHook();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
