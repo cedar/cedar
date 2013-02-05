@@ -58,6 +58,23 @@ likely to undergo major changes:
 
 == current version ==
 
+== Version 1.0.7
+- cedar::aux::gui
+  - fixed a bug in how matrix plots handle changing data dimensionality
+- cedar::proc
+  - fixed a potential crash in Network::getElement("path") 
+
+== Version 1.0.6 ==
+- General
+  - added support for OpenCV 2.2
+  - fixed build on Windows
+- cedar::aux::conv
+  - fixed a memory leak in FFTW-based convolution
+
+== Version 1.0.5 ==
+- Build system
+  - 'make install' can be used without having Doxygen installed
+
 == Version 1.0.4 ==
 - Build system
   - Moved the version information to a separate file (cmake/version.txt).
