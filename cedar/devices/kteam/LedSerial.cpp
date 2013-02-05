@@ -65,6 +65,18 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::dev::kteam::LedSerial::LedSerial()
+:
+_mCommandSetState(new cedar::aux::StringParameter(this, "command set state", "L"))
+{
+}
+
+cedar::dev::kteam::LedSerial::LedSerial
+(
+  cedar::dev::kteam::SerialChannelPtr channel
+)
+:
+cedar::dev::Led(cedar::aux::asserted_pointer_cast<cedar::dev::Channel>(channel)),
+_mCommandSetState(new cedar::aux::StringParameter(this, "command set state", "L"))
 {
 }
 

@@ -36,8 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/casts.h"
-#include "cedar/auxiliaries/math/IntLimitsParameter.h"
-#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/devices/kteam/DriveSerial.h"
 #include "cedar/devices/kteam/SerialChannel.h"
 #include "cedar/devices/kteam/serialChannelHelperFunctions.h"
@@ -64,12 +63,19 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::kteam::DriveSerial::DriveSerial()
+:
+_mCommandSetSpeed(new cedar::aux::StringParameter(this, "command set speed", "D")),
+_mCommandSetEncoder(new cedar::aux::StringParameter(this, "command set encoder", "P")),
+_mCommandGetEncoder(new cedar::aux::StringParameter(this, "command get encoder", "Q"))
 {
 }
 
 cedar::dev::kteam::DriveSerial::DriveSerial(cedar::dev::kteam::SerialChannelPtr channel)
 :
-cedar::dev::kteam::Drive(cedar::aux::asserted_pointer_cast<cedar::dev::Channel>(channel))
+cedar::dev::kteam::Drive(cedar::aux::asserted_pointer_cast<cedar::dev::Channel>(channel)),
+_mCommandSetSpeed(new cedar::aux::StringParameter(this, "command set speed", "D")),
+_mCommandSetEncoder(new cedar::aux::StringParameter(this, "command set encoder", "P")),
+_mCommandGetEncoder(new cedar::aux::StringParameter(this, "command get encoder", "Q"))
 {
 }
 

@@ -64,6 +64,9 @@ public:
   //!@brief The standard constructor.
   LedSerial();
 
+  //!@brief Constructor taking a channel pointer.
+  LedSerial(cedar::dev::kteam::SerialChannelPtr channel);
+
   //!@brief Destructor
   virtual ~LedSerial();
 
