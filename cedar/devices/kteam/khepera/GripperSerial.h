@@ -121,10 +121,6 @@ protected:
   // none yet
 
 private:
-  //! command used to set the encoders of the robot
-  cedar::aux::StringParameterPtr _mCommandSetEncoder;
-  //! command used to get the encoders of the robot
-  cedar::aux::StringParameterPtr _mCommandGetEncoder;
   //! command used to set the gripper position
   cedar::aux::StringParameterPtr _mCommandSetGripperPosition;
   //! command used to get the gripper position
@@ -137,10 +133,10 @@ private:
   cedar::aux::StringParameterPtr _mCommandGetArmPosition;
   //! answer expected when getting the arm position
   cedar::aux::StringParameterPtr _mAnswerGetArmPosition;
-  //! command used when getting the optical sensor of the gripper
-  cedar::aux::StringParameterPtr _mCommandGetGripperOpticalSensor;
   //! command used when getting the resistance sensor of the gripper
   cedar::aux::StringParameterPtr _mCommandGetGripperResistivity;
+  //! command used when getting the optical sensor of the gripper
+  cedar::aux::StringParameterPtr _mCommandGetGripperOpticalSensor;
 }; // class cedar::dev::kteam::khepera::GripperSerial
 
 #endif // CEDAR_DEV_KTEAM_KHEPERA_GRIPPER_SERIAL_H

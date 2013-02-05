@@ -67,6 +67,8 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::dev::kteam::InfraredSensorSerial::InfraredSensorSerial()
+:
+_mCommandGetInfrared(new cedar::aux::StringParameter(this, "command get infrared", "N"))
 {
 }
 
@@ -75,7 +77,8 @@ cedar::dev::kteam::InfraredSensorSerial::InfraredSensorSerial
   cedar::dev::kteam::SerialChannelPtr channel
 )
 :
-cedar::dev::Sensor(cedar::aux::asserted_pointer_cast<cedar::dev::Channel>(channel))
+cedar::dev::Sensor(cedar::aux::asserted_pointer_cast<cedar::dev::Channel>(channel)),
+_mCommandGetInfrared(new cedar::aux::StringParameter(this, "command get infrared", "N"))
 {
 }
 
