@@ -157,9 +157,7 @@ void cedar::proc::sources::Camera::applyParameter()
   {
     for (int i = 0; i < 5; ++i)
     {
-      //todo:cedar::aux::usleep
-      //cedar::aux::sleep(cedar::unit::Milliseconds(30));
-      usleep(5000);
+      cedar::aux::sleep(cedar::unit::Milliseconds(5));
       this->onTrigger();
       this->annotateImage();
     }
