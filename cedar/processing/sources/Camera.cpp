@@ -41,6 +41,7 @@
 #include "cedar/processing/sources/Camera.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 
