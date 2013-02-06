@@ -28,7 +28,7 @@
     Email:       mathis.richter@ini.rub.de
     Date:        2012 11 26
 
-    Description: Add description.
+    Description: Channel to KTEAM serial devices.
 
     Credits:
 
@@ -44,7 +44,7 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Add description.
+/*!@brief Channel to KTEAM serial devices.
  *
  */
 class cedar::dev::kteam::SerialChannel : public cedar::dev::SerialChannel
@@ -65,7 +65,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Initialization code which needs to be executed after the channel has been opened.
+  //!@brief After opening the channel, the read buffer needs to be cleaned from the status message sent by the robot.
   virtual void postOpenHook();
 
   //--------------------------------------------------------------------------------------------------------------------

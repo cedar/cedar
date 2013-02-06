@@ -28,7 +28,7 @@
     Email:       mathis.richter@ini.rub.de
     Date:        2013 02 05
 
-    Description: Channel for serial communication, based on Boost ASIO.
+    Description: Channel to serial devices, based on Boost ASIO.
 
     Credits:     Based on the class TimeoutSerial, written by Terraneo Federico.
                  http://gitorious.org/serial-port/serial-port/trees/master/2_with_timeout
@@ -40,11 +40,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/Channel.h"
-#include "cedar/auxiliaries/NamedConfigurable.h"
-#include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/UIntParameter.h"
-#include "cedar/auxiliaries/IntParameter.h"
-#include "cedar/auxiliaries/BoolParameter.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -52,8 +47,7 @@
 #include <boost/asio.hpp>
 
 
-/*!@brief Document me.
- */
+//!@brief Channel to serial devies, based on Boost ASIO.
 class cedar::dev::SerialChannel : public QObject, public Channel
 {
   Q_OBJECT
@@ -96,13 +90,17 @@ public:
   //!@brief Returns the timeout in seconds.
   double getTimeout() const;
 
-  //!@brief Sends a string to the serial port.
+  /*!@brief Writes a string to the serial port.
+   * Always supply commands without the trailing command delimiter, as it is automatically added.
+   */
   void write(std::string command);
 
   //!@brief Reads a string from the serial port.
   std::string read();
 
-  //!@brief Sends a string and receives the answer. While doing so, the channel is locked.
+  /*!@brief Writes a string and reads the answer. While doing so, the channel is locked.
+   * Always supply commands without the trailing command delimiter, as it is automatically added.
+   */
   std::string writeAndReadLocked(const std::string& command);
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -114,17 +112,22 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief Initializes the communication and opens the channel.
-  //!@return 1 if initialization was successful, else 0.
+  //!@brief Reads parameters from a configuration node.
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
-  //!@brief Sets up the read.
+  //!@brief Sets up the reading process.
   void setupRead();
 
+  /*!@brief Handler that is called whenever a read operation was successful.
+   * In a successful read, the command delimiter is reached before the timeout expires.
+   */
   void readCompleted(const boost::system::error_code& error, const size_t bytesTransferred);
+
+  //!@brief Handler that is called whenever the timeout expires on read operations.
   void timeoutExpired(const boost::system::error_code& error);
 
 private slots:
+  //!@brief Constructs the actual command delimiter from an escaped version that the user inputs.
   void updateCommandDelimiter();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -134,7 +137,7 @@ protected:
   // none yet
 
 private:
-  //!@brief String that signals the end of commands.
+  //! string that signals the end of commands
   std::string mCommandDelimiter;
   //! IO service object
   boost::asio::io_service mIoService;
@@ -144,7 +147,7 @@ private:
   boost::asio::deadline_timer mTimer;
   //! buffer for received data
   boost::asio::streambuf mReadData;
-  //! number of received bytes (used within the callback for asynchronous reading)
+  //! number of received bytes
   size_t mBytesTransferred;
 
   //! possible results of receiving an answer
@@ -156,7 +159,7 @@ private:
     readTimeoutExpired
   };
 
-  //! used by read with timeout
+  //! current status of the read operation
   enum ReadResult mReadResult;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -176,12 +179,12 @@ private:
    */
   cedar::aux::StringParameterPtr _mEscapedCommandDelimiter;
 
-  /*!@brief The baud rate used for communicating with the serial port (in Bit/s).
+  /*!@brief The baud rate (Bit/s) used for communicating with the serial port.
    *        Default is 115200 Bit/s.
    */
   cedar::aux::UIntParameterPtr _mBaudRate;
 
-  /*!@brief Time in seconds until current read-/write-operation times out.
+  /*!@brief Time (s) until the current read or write operation times out.
    * Default is 0.25 s (250 ms).
    */
   cedar::aux::DoubleParameterPtr _mTimeout;

@@ -28,7 +28,7 @@
     Email:       mathis.richter@ini.rub.de
     Date:        2012 11 26
 
-    Description: Add description.
+    Description: Channel to KTEAM serial devices.
 
     Credits:
 
@@ -69,6 +69,7 @@ namespace
 void cedar::dev::kteam::SerialChannel::postOpenHook()
 {
   // send a dummy-message
+  //!@todo we may not have to send a dummy command here, maybe it is possible to clear the read buffer without it
   std::string answer = this->writeAndReadLocked("D,0,0");
 
   // 'd,' or 'z,' expected, else init failed
