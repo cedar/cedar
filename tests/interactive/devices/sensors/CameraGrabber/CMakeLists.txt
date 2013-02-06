@@ -34,8 +34,8 @@
 #
 #=======================================================================================================================
 
-if (CEDAR_USE_LIBDC1394)
-  cedar_add_interactive_test( "CameraGrabberTest" CameraGrabberTest.cpp )
-  cedar_add_interactive_test( "StereoCameraGrabberTest" StereoCameraGrabberTest.cpp )
+if (${CEDAR_USE_LIB_DC1394})
+  cedar_add_interactive_test( "CameraGrabber" CameraGrabberTest.cpp )
+  cedar_add_interactive_test( "StereoCameraGrabber" StereoCameraGrabberTest.cpp )
 endif()
 

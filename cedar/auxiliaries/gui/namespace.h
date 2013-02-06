@@ -114,11 +114,13 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(LinePlot);
       CEDAR_DECLARE_AUX_CLASS(SurfacePlot);
       CEDAR_DECLARE_AUX_CLASS(MatrixSlicePlot3D);
+      CEDAR_DECLARE_AUX_CLASS(MatrixVectorPlot);
       CEDAR_DECLARE_AUX_CLASS(ImagePlot);
       CEDAR_DECLARE_AUX_CLASS(MatDataPlot);
 
       CEDAR_DECLARE_AUX_CLASS(HistoryPlot);
       CEDAR_DECLARE_AUX_CLASS(HistoryPlot0D);
+      CEDAR_DECLARE_AUX_CLASS(HistoryPlot1D);
       //!@endcond
 
       //!@brief The manager for plot widgets

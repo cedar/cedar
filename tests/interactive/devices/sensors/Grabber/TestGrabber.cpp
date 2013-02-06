@@ -42,15 +42,14 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
-
+#include <ios>
 
 //--------------------------------------------------------------------------------------------------------------------
-//additional namespace to hide global functions
+// Local methods
 //--------------------------------------------------------------------------------------------------------------------
-//todo change namespace lowercase
-namespace TEST_GRABBER
+
+namespace
 {
-
     const int FPS_TEST_DURATION_IN_SEC = 1;
 
     //---------------------------------------------------------------
@@ -101,15 +100,18 @@ namespace TEST_GRABBER
         return false;
       }
     } // test_framrate
-} // namespace TEST_GRABBER
+}
 
 
-//--------------------------------------------------------------------------------------------------------------------
-// main test program
-//--------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// Interactive test program
+// ---------------------------------------------------------------------------------------------------------------------
 int main(int , char **)
 {
-/*
+  //--------------------------------------------------------------------------------------------------------------------
+  //constants
+  //--------------------------------------------------------------------------------------------------------------------
+
   const std::string  CHANNEL_0_NAME = "CHANNEL_0_NAME";
   const std::string  CHANNEL_1_NAME = "CHANNEL_1_NAME";
 
@@ -119,20 +121,33 @@ int main(int , char **)
   const std::string  GRABBER_NAME_2 = "TestGrabber_2";
   const std::string  CONFIG_FILE_NAME_2 = "grabber2.config";
 
+  //--------------------------------------------------------------------------------------------------------------------
+  //main test
+  //--------------------------------------------------------------------------------------------------------------------
+  std::cout.setf(std::ios::fixed,std::ios::floatfield);
+  std::cout.precision(3);
+
   std::cout << "\n\nInteractive test of GrabberInterface\n";
   std::cout << "------------------------------------\n\n";
   std::cout << "Create a TestGrabber:";
 
+  //--------------------------------------------------------------------------------------------------------------------
+  // 1. stereo grabber
+  //--------------------------------------------------------------------------------------------------------------------
   //create a stereo-grabber (only a dummy grabber for testing)
   cedar::dev::sensors::visual::TestGrabber *grabber_1 = new cedar::dev::sensors::visual::TestGrabber
                                                             (
-                                                              CONFIG_FILE_NAME_1,
                                                               CHANNEL_0_NAME,
                                                               CHANNEL_1_NAME
                                                             );
 
-  //todo installCrashHandler in other tests
   grabber_1->installCrashHandler();
+
+  if (! grabber_1->applyParameter())
+  {
+    // an error occured during initialization. Perhaps the file doesn't exist
+    return -1;
+  }
 
   grabber_1->setName(GRABBER_NAME_1);
   std::cout << "\nGrabber created with name \""<<grabber_1->getName()<<"\"\n";
@@ -151,24 +166,24 @@ int main(int , char **)
 
   std::cout << "\nSet Fps to \"40\" and start thread\n";
   grabber_1->setFps(40);
-  TEST_GRABBER::test_framrate(*grabber_1);
+  test_framrate(*grabber_1);
 
   std::cout << "\nSet Fps to \"100\" and start thread\n";
   grabber_1->setFps(100);
-  TEST_GRABBER::test_framrate(*grabber_1);
+  test_framrate(*grabber_1);
 
   std::cout << "\nSet Fps to \"200\" and start thread\n";
   grabber_1->setFps(200);
-  TEST_GRABBER::test_framrate(*grabber_1);
+  test_framrate(*grabber_1);
 
   std::cout << "\nSet Fps to \"500\" and start thread\n";
   grabber_1->setFps(500);
-  TEST_GRABBER::test_framrate(*grabber_1);
+  test_framrate(*grabber_1);
 
   std::cout << "\nEnforce an error and check the maximum available FPS\n";
   std::cout << "\nSet Fps to \"50000\" and start thread\n";
   grabber_1->setFps(50000);
-  TEST_GRABBER::test_framrate(*grabber_1);
+  test_framrate(*grabber_1);
 
 
   //-----------------------------------------------------------
@@ -190,27 +205,30 @@ int main(int , char **)
             <<"\tFPS to \"50\"\n"
             <<"Recreate the grabber\n";
 
+  grabber_1->writeJson(CONFIG_FILE_NAME_1);
   delete grabber_1;
   grabber_1 = NULL;
 
-  usleep(1000);
+  cedar::aux::sleep(cedar::unit::Milliseconds(1));
   cedar::dev::sensors::visual::TestGrabber *grabber_2 = new cedar::dev::sensors::visual::TestGrabber
                                                             (
-                                                              CONFIG_FILE_NAME_1,
                                                               CHANNEL_0_NAME,
                                                               CHANNEL_1_NAME
                                                              );
 
+  grabber_2->readJson(CONFIG_FILE_NAME_1);
+  grabber_2->applyParameter();
+
   std::cout << "A new grabber created:\n"
             << "\tGrabbername \""<< grabber_2->getName() << "\"\n"
             << "\tTestParam \"" << grabber_2->getTestParam() << "\"\n"
-            << "\tFps "<< grabber_2->getFps() << "\"\n";
+            << "\tFps \""<< grabber_2->getFps() << "\"\n";
 
   //restore default values
   grabber_2->setTestParam(grabber_1_testparam);
   grabber_2->setFps(grabber_1_fps);
   grabber_2->setName(grabber_1_name);
-  grabber_2->writeConfiguration();
+
 
   //-----------------------------------------------------------
   //Test CTRL-C handler
@@ -224,10 +242,10 @@ int main(int , char **)
   std::cout << "\n1.\n";
   cedar::dev::sensors::visual::TestGrabber *grabber_3 = new cedar::dev::sensors::visual::TestGrabber
                                                             (
-                                                              CONFIG_FILE_NAME_2,
                                                               CHANNEL_0_NAME,
                                                               CHANNEL_1_NAME
                                                             );
+  grabber_3->applyParameter();
   grabber_3->setName(GRABBER_NAME_2);
 
   std::cout << "-> A new grabber created with name \""<<grabber_3->getName()<<"\"\n";
@@ -246,17 +264,18 @@ int main(int , char **)
                                               (
                                                 new cedar::dev::sensors::visual::TestGrabber
                                                     (
-                                                      CONFIG_FILE_NAME_2,
                                                       CHANNEL_1_NAME
                                                     )
                                               );
+  grabber_4->applyParameter();
+
   std::cout << "-> A new grabber created with name \""<<grabber_4->getName()<<"\"\n";
   grabber_4->setName("shared_ptr grabber");
   std::cout << "-> Set name to \""<<grabber_4->getName()<<"\"\n";
 
 
   std::cout << "\n\nPress now CTRL-C\n";
-  sleep(3*TEST_GRABBER::FPS_TEST_DURATION_IN_SEC);
+  cedar::aux::sleep(cedar::unit::Seconds(static_cast<double>(3*FPS_TEST_DURATION_IN_SEC)));
 
   //no ctrl-c pressed
   std::cout << "\n\nWARNING: No CTRL-C catched - do normal cleanup\n";
@@ -271,7 +290,7 @@ int main(int , char **)
   //grabber_4 is shared pointer
 
   std::cout << "Tests finished\n";
-*/
+
   return 0;
 } //main
 

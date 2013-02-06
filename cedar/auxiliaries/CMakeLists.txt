@@ -63,6 +63,7 @@ cedar_add_library(cedaraux
   gui/LinePlot.h
   gui/SurfacePlot.h
   gui/MatrixSlicePlot3D.h
+  gui/MatrixVectorPlot.h
   gui/PropertyPane.h
   gui/ImagePlot.h
   gui/StringParameter.h

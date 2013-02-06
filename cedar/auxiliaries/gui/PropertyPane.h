@@ -44,6 +44,7 @@
 
 // SYSTEM INCLUDES
 #include <QTableWidget>
+#include <QCheckBox>
 #include <QLabel>
 #include <boost/signals2/connection.hpp>
 
@@ -79,10 +80,6 @@ public:
    */
   void display(cedar::aux::ConfigurablePtr pConfigurable);
 
-  /*!@brief Resets the contents of the widget.
-   */
-  void resetContents();
-
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -90,9 +87,9 @@ public:
   // none yet
 
 public slots:
-  /*!@brief Resets the pointer to the configurable displayed in this widget.
+  /*!@brief Resets the contents of the widget.
    */
-  void resetPointer();
+  void resetContents();
 
   /*!@brief Recreates the widget.
    */
@@ -105,6 +102,10 @@ public slots:
   /*!@brief Slot that reacts when one of the parameters displayed by this widget changes its changed flag.
    */
   void parameterChangeFlagChanged();
+
+  /*!@brief Set whether advanced parameters should be shown.
+   */
+  void showAdvanced(bool show);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -134,6 +135,9 @@ private:
    */
   void addLabelRow(const std::string& label);
 
+  //! Adds a widget that takes up a whole row.
+  void addWidgetRow(QWidget* pWidget);
+
   /*!@brief Adds a row that displays a given parameter.
    */
   void addPropertyRow(cedar::aux::ParameterPtr parameter);
@@ -152,7 +156,13 @@ private:
 
   /*!@brief Disconnects all relevant signals of the given parameters.
    */
-  void disconnect(cedar::aux::ConfigurablePtr pConfigurable);
+  void disconnect();
+
+  //! Returns whether the pane should show advanced parameters.
+  bool showAdvanced() const
+  {
+    return this->mpShowAdvanced->isChecked();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -171,6 +181,9 @@ private:
 
   //! Connection to the configurable's tree changed signal.
   std::vector<boost::signals2::connection> mSlotConnections;
+
+  //! Checkbox that lets the user show advanced parameters.
+  QCheckBox* mpShowAdvanced;
 
 }; // class cedar::aux::gui::PropertyPane
 
