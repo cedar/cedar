@@ -119,6 +119,19 @@ cedar::dev::sensors::camera::Properties::~Properties()
 // slots
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::dev::sensors::camera::Properties::blockSignals(bool block)
+{
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << ": " << block << std::endl;
+#endif
+  int num_properties = cedar::dev::sensors::camera::Property::type().list().size();
+  for (int i=0; i<num_properties; i++)
+  {
+    cedar::dev::sensors::camera::Property::Id prop_id = cedar::dev::sensors::camera::Property::type().list().at(i).id();
+    (*mpPropertiesList)[prop_id]->blockSignals(block);
+  }
+}
+
 //--------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::camera::Properties::propertyValueChanged
 (
@@ -420,7 +433,7 @@ bool cedar::dev::sensors::camera::Properties::isManualCapable(Property::Id prope
 
 //--------------------------------------------------------------------------------------------------------------------
 cedar::dev::sensors::camera::CamPropertyPtr
-  cedar::dev::sensors::camera::Properties::getPropertyClass(Property::Id propertyId)
+  cedar::dev::sensors::camera::Properties::getPropertyObject(Property::Id propertyId)
 {
   return (*mpPropertiesList)[propertyId];
 }

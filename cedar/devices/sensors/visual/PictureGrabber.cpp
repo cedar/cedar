@@ -194,7 +194,7 @@ void cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()
                                                  this->getName() + ": New file successfully read.",
                                                  "cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()"
                                                );
-      mCaptureDeviceCreated = true;
+      setIsCreated(true);
       onUpdateSourceInfo(channel);
       emit pictureChanged();
     }

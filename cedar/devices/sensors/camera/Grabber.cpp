@@ -206,7 +206,7 @@ void cedar::dev::sensors::camera::Grabber::backendChanged()
   }
 
   //if already created, apply used parameter
-  if (mCaptureDeviceCreated)
+  if (this->isCreated())
   {
     // delete and recreate all channels
 #ifdef DEBUG_CAMERA_GRABBER
@@ -279,7 +279,7 @@ bool cedar::dev::sensors::camera::Grabber::onCreateGrabber()
 {
 #ifdef DEBUG_CAMERA_GRABBER
   std::cout << __PRETTY_FUNCTION__ << std::endl;
-  //std::cout << "mCaptureDeviceCreated" << std::boolalpha << " : " << mCaptureDeviceCreated << std::endl;
+  //std::cout << "mCaptureDeviceCreated" << std::boolalpha << " : " << this->isCreated() << std::endl;
 #endif
 
   // number of channels
@@ -501,24 +501,24 @@ bool cedar::dev::sensors::camera::Grabber::onGrab()
   unsigned int num_cams = getNumCams();
 
   // grab and retrieve
-   for(unsigned int channel = 0; channel < num_cams; ++channel)
-   {
+  for(unsigned int channel = 0; channel < num_cams; ++channel)
+  {
 
-     getCameraChannel(channel)->mpVideoCaptureLock->lockForWrite();
-     result = getCameraChannel(channel)->mVideoCapture.read(getImageMat(channel)) & result;
+    getCameraChannel(channel)->mpVideoCaptureLock->lockForWrite();
+    result = getCameraChannel(channel)->mVideoCapture.read(getImageMat(channel)) & result;
 
-     // check if conversion from bayer-pattern to cv::Mat BGR format is needed
-     cedar::dev::sensors::camera::Decoding::Id debayer_fiter;
-     debayer_fiter = this->getCameraChannel(channel)->_mpDecodeFilter->getValue();
+    // check if conversion from bayer-pattern to cv::Mat BGR format is needed
+    cedar::dev::sensors::camera::Decoding::Id debayer_fiter;
+    debayer_fiter = this->getCameraChannel(channel)->_mpDecodeFilter->getValue();
 
-     if (debayer_fiter != cedar::dev::sensors::camera::Decoding::NONE)
-     {
-       cv::cvtColor(getImageMat(channel),getImageMat(channel),debayer_fiter);
-     }
+    if (debayer_fiter != cedar::dev::sensors::camera::Decoding::NONE)
+    {
+      cv::cvtColor(getImageMat(channel),getImageMat(channel),debayer_fiter);
+    }
 
-     getCameraChannel(channel)->mpVideoCaptureLock->unlock();
+    getCameraChannel(channel)->mpVideoCaptureLock->unlock();
 
-   }
+  }
 
   // OpenCV documentation:
   // for better synchronizing between the cameras,

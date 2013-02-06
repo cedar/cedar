@@ -165,7 +165,7 @@ void cedar::dev::sensors::visual::VideoGrabber::channelAdded(int index)
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::VideoGrabber::speedFactorChanged()
 {
-  if (mCaptureDeviceCreated)
+  if (isCreated())
   {
     double fps = getVideoChannel(0)->mVideoCapture.get(CV_CAP_PROP_FPS);
     setFps(fps * _mSpeedFactor->getValue());
