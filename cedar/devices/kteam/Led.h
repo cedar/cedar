@@ -43,6 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/devices/kteam/namespace.h"
 #include "cedar/devices/Component.h"
+#include "cedar/devices/namespace.h"
 
 // SYSTEM INCLUDES
 
@@ -62,10 +63,13 @@ class cedar::dev::kteam::Led : public cedar::dev::Component
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Led(){};
+  Led();
+
+  //!@brief Constructor taking an externally created channel.
+  Led(cedar::dev::ChannelPtr channel);
 
   //!@brief Destructor
-  virtual ~Led(){};
+  virtual ~Led();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

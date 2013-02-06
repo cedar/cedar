@@ -76,7 +76,7 @@ _mCommandSetArmPosition(new cedar::aux::StringParameter(this, "command set arm p
 _mCommandGetArmPosition(new cedar::aux::StringParameter(this, "command get arm position", "T,1,H,1")),
 _mAnswerGetArmPosition(new cedar::aux::StringParameter(this, "answer get arm position", "t,1,h")),
 _mCommandGetGripperResistivity(new cedar::aux::StringParameter(this, "command get gripper resistivity", "T,1,F")),
-_mCommandGetGripperOpticalSensorPosition
+_mCommandGetGripperOpticalSensor
 (
   new cedar::aux::StringParameter(this, "command get gripper optical sensor", "T,1,G")
 )
@@ -94,7 +94,7 @@ _mCommandSetArmPosition(new cedar::aux::StringParameter(this, "command set arm p
 _mCommandGetArmPosition(new cedar::aux::StringParameter(this, "command get arm position", "T,1,H,1")),
 _mAnswerGetArmPosition(new cedar::aux::StringParameter(this, "answer get arm position", "t,1,h")),
 _mCommandGetGripperResistivity(new cedar::aux::StringParameter(this, "command get gripper resistivity", "T,1,F")),
-_mCommandGetGripperOpticalSensorPosition
+_mCommandGetGripperOpticalSensor
 (
   new cedar::aux::StringParameter(this, "command get gripper optical sensor", "T,1,G")
 )
@@ -122,7 +122,7 @@ void cedar::dev::kteam::khepera::GripperSerial::setGripperPosition(bool position
   command << _mCommandSetGripperPosition->getValue() << "," << position_value;
   // send the command string
   std::string answer
-    = convertToSerialChannel(getChannel())->sendAndReceiveLocked(command.str());
+    = convertToSerialChannel(getChannel())->writeAndReadLocked(command.str());
 
   // check whether the answer begins with the correct character
   checkSerialCommunicationAnswer(answer, _mCommandSetGripperPosition->getValue());
@@ -137,7 +137,7 @@ void cedar::dev::kteam::khepera::GripperSerial::setArmPosition(unsigned int posi
   command << _mCommandSetArmPosition->getValue() << "," << position;
   // send the command string
   std::string answer
-    = convertToSerialChannel(getChannel())->sendAndReceiveLocked(command.str());
+    = convertToSerialChannel(getChannel())->writeAndReadLocked(command.str());
 
   // check whether the answer begins with the correct character
   checkSerialCommunicationAnswer(answer, _mCommandSetArmPosition->getValue());
@@ -150,7 +150,7 @@ unsigned int cedar::dev::kteam::khepera::GripperSerial::getArmPosition()
 
   // send a command string to the robot to receive the current acceleration values
   std::string answer
-    = convertToSerialChannel(getChannel())->sendAndReceiveLocked(_mCommandGetArmPosition->getValue());
+    = convertToSerialChannel(getChannel())->writeAndReadLocked(_mCommandGetArmPosition->getValue());
 
   // check whether the first character of the answer is correct
   checkSerialCommunicationAnswer(answer, _mCommandGetArmPosition->getValue(), _mAnswerGetArmPosition->getValue());
@@ -187,7 +187,7 @@ unsigned int cedar::dev::kteam::khepera::GripperSerial::getGripperPosition()
 
   // send a command string to the robot to receive the current acceleration values
   std::string answer
-    = convertToSerialChannel(getChannel())->sendAndReceiveLocked(_mCommandGetGripperPosition->getValue());
+    = convertToSerialChannel(getChannel())->writeAndReadLocked(_mCommandGetGripperPosition->getValue());
 
   // check whether the first character of the answer is correct
   checkSerialCommunicationAnswer(answer, _mCommandGetGripperPosition->getValue(), _mAnswerGetGripperPosition->getValue());
@@ -224,7 +224,7 @@ unsigned int cedar::dev::kteam::khepera::GripperSerial::getGripperOpticalSensor(
 
   // send a command string to the robot to receive the current acceleration values
   std::string answer
-    = convertToSerialChannel(getChannel())->sendAndReceiveLocked
+    = convertToSerialChannel(getChannel())->writeAndReadLocked
                                             (
                                               std::string(_mCommandGetGripperOpticalSensor->getValue())
                                             );
@@ -264,7 +264,7 @@ unsigned int cedar::dev::kteam::khepera::GripperSerial::getGripperResistivity()
 
   // send a command string to the robot to receive the current acceleration values
   std::string answer
-    = convertToSerialChannel(getChannel())->sendAndReceiveLocked(_mCommandGetGripperResistivity->getValue());
+    = convertToSerialChannel(getChannel())->writeAndReadLocked(_mCommandGetGripperResistivity->getValue());
 
   // check whether the first character of the answer is correct
   checkSerialCommunicationAnswer(answer, _mCommandGetGripperResistivity->getValue());

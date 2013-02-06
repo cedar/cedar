@@ -26,34 +26,29 @@
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
-    Date:        2012 04 13
+    Date:        2013 02 05
 
-    Description: This class provides a string-based communication with an external device using a Serial Port.
+    Description: Channel for serial communication, based on Boost ASIO.
 
-    Credits:     Andre Bartel, Marc Sons
+    Credits:     Based on the class TimeoutSerial, written by Terraneo Federico.
+                 http://gitorious.org/serial-port/serial-port/trees/master/2_with_timeout
 
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
 #include "cedar/devices/exceptions.h"
-#include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/devices/SerialChannel.h"
 #include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/StringParameter.h"
 
 // SYSTEM INCLUDES
-#include <cstdio>
-#include <QTime>
-#include <locale>
+#include <boost/utility.hpp>
+#include <boost/asio.hpp>
+#include <boost/bind.hpp>
 
-#ifndef CEDAR_OS_WINDOWS
-  #include <termios.h>
-  #include <unistd.h>
-#endif // CEDAR_OS_WINDOWS
-
-
-#define clear_my(var, mask)    var &= (~(mask))
-#define set(var, mask)      var |= (mask)
 
 #undef DEBUG_VERBOSE
 
@@ -63,22 +58,23 @@
 
 cedar::dev::SerialChannel::SerialChannel()
 :
-mFileDescriptor(0),
+mCommandDelimiter("\r\n"),
+mIoService(),
+mPort(mIoService),
+mTimer(mIoService),
 _mDevicePath(new cedar::aux::StringParameter(this, "device path", "/dev/rfcomm0")),
-_mEndOfCommandString(new cedar::aux::StringParameter(this, "end of command string", "\\r\\n")),
-_mCountryFlag(new cedar::aux::IntParameter(this, "country flag", 0, 0, 1)),
-_mBaudrate(new cedar::aux::UIntParameter(this, "baud rate", 4098, 0, 1000000)),
-_mTimeOut(new cedar::aux::UIntParameter(this, "time out", 250000, 0, 1000000)),
-_mLatency(new cedar::aux::UIntParameter(this, "latency", 10000, 0, 1000000))
+_mEscapedCommandDelimiter(new cedar::aux::StringParameter(this, "escaped command delimiter", "\\r\\n")),
+_mBaudRate(new cedar::aux::UIntParameter(this, "baud rate", 115200, 0, 8000000)),
+_mTimeout(new cedar::aux::DoubleParameter(this, "time out", 0.25, 0, 1000))
 {
-  QObject::connect(_mEndOfCommandString.get(), SIGNAL(valueChanged()),
-                   this, SLOT(updateTranslatedEndOfCommandString()));
+  QObject::connect(_mEscapedCommandDelimiter.get(), SIGNAL(valueChanged()),
+                   this, SLOT(updateCommandDelimiter()));
+
+  updateCommandDelimiter();
 }
 
 cedar::dev::SerialChannel::~SerialChannel()
 {
-  close();
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -86,9 +82,9 @@ cedar::dev::SerialChannel::~SerialChannel()
 //----------------------------------------------------------------------------------------------------------------------
 
 
-int cedar::dev::SerialChannel::getFileDescriptor() const
+void cedar::dev::SerialChannel::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
-  return mFileDescriptor;
+  this->Configurable::readConfiguration(node);
 }
 
 const std::string& cedar::dev::SerialChannel::getDevicePath() const
@@ -96,93 +92,41 @@ const std::string& cedar::dev::SerialChannel::getDevicePath() const
   return _mDevicePath->getValue();
 }
 
-const std::string& cedar::dev::SerialChannel::getEndOfCommandString() const
+const std::string& cedar::dev::SerialChannel::getCommandDelimiter() const
 {
-  return _mEndOfCommandString->getValue();
+  return _mEscapedCommandDelimiter->getValue();
 }
 
-int cedar::dev::SerialChannel::getCountryFlag() const
+unsigned int cedar::dev::SerialChannel::getBaudRate() const
 {
-  return _mCountryFlag->getValue();
+  return _mBaudRate->getValue();
 }
 
-unsigned int cedar::dev::SerialChannel::getBaudrate() const
+double cedar::dev::SerialChannel::getTimeout() const
 {
-  return _mBaudrate->getValue();
+  return _mTimeout->getValue();
 }
 
-unsigned int cedar::dev::SerialChannel::getTimeOut() const
-{
-  return _mTimeOut->getValue();
-}
-
-unsigned int cedar::dev::SerialChannel::getLatency() const
-{
-  return _mLatency->getValue();
-}
-
-void cedar::dev::SerialChannel::readConfiguration(const cedar::aux::ConfigurationNode& node)
-{
-  // read the configuration
-  this->Configurable::readConfiguration(node);
-}
-
-void cedar::dev::SerialChannel::checkIfOpen() const
-{
-  if (this->mFileDescriptor == 0)
-  {
-    CEDAR_THROW(cedar::aux::InitializationException, "Serial port not opened.");
-  }
-}
-
-std::string cedar::dev::SerialChannel::sendAndReceiveLocked(const std::string& command)
+std::string cedar::dev::SerialChannel::writeAndReadLocked(const std::string& command)
 {
   QWriteLocker lock(&(this->mLock));
-  this->send(command);
-  return this->receive();
+  this->write(command);
+  return this->read();
 }
 
-void cedar::dev::SerialChannel::send(const std::string& command)
+void cedar::dev::SerialChannel::write(std::string command)
 {
-#ifdef CEDAR_OS_WINDOWS
-#pragma message ("cedar::dev::SerialChannel::send() not implemented for Windows.")
-#else
-
-  checkIfOpen();
-
-#ifdef DEBUG
-  QTime timer;
-  timer.start();
-#endif
-
-  std::ostringstream stream;
-  // status information about the serial transmission
-  int status = 0;
-
-  stream << command << mTranslatedEndOfCommandString;
-  status = write(mFileDescriptor, stream.str().c_str(), stream.str().length());
-
-  if (status < 0)
-  {
-    tcflush(mFileDescriptor, TCOFLUSH);
-
-    std::string exception_message = "Error sending data (" + cedar::aux::toString(errno) + ")";
-    CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message);
-  }
+  command.append(mCommandDelimiter);
+  boost::asio::write(mPort, boost::asio::buffer(command.c_str(), command.size()));
 
 #ifdef DEBUG_VERBOSE
   std::ostringstream message;
   message << "Successfully sent command '"
           << command
           << "'"
-          << "("
-          << status
-          << " bytes written to '"
+          << " to serial port '"
           << getDevicePath()
-          << "'), "
-          << "sending time: "
-          << timer.elapsed()
-          << " ms";
+          << "'";
 
   cedar::aux::LogSingleton::getInstance()->debugMessage
   (
@@ -191,302 +135,201 @@ void cedar::dev::SerialChannel::send(const std::string& command)
     "Successfully sent data"
   );
 #endif
-
-  // delay the following operations
-  cedar::aux::usleep(_mLatency->getValue());
-#endif // CEDAR_OS_WINDOWS
 }
 
-std::string cedar::dev::SerialChannel::receive()
+void cedar::dev::SerialChannel::setupRead()
 {
-  // the answer received
-  std::string answer;
-
-#ifdef CEDAR_OS_WINDOWS
-#pragma message ("cedar::dev::SerialChannel::receive() not implemented for Windows.")
-#else
-
-  checkIfOpen();
-
-#ifdef DEBUG
-  QTime timer;
-  timer.start();
-#endif
-
-  // the last read char
-  char char_read;
-  // the complete string
-  std::ostringstream ans;
-  // status-information
-  int status = 0;
-  // number of bytes read
-  int read_bytes = 0;
-
-  fd_set read_fds;
-  struct timeval tv;
-
-  FD_ZERO(&read_fds);
-  FD_SET(mFileDescriptor, &read_fds);
-
-  do
-  {
-    tv.tv_sec = 0;
-    tv.tv_usec = _mTimeOut->getValue();
-    // check if the channel is ready
-    status = select(FD_SETSIZE, &read_fds, NULL, NULL, &tv);
-
-    // channel is ready
-    if (status > 0)
-    {
-      // read 1 byte
-      status = read(mFileDescriptor, &char_read, 1);
-
-      // reading successful
-      if (status > 0)
-      {
-        ans << char_read;
-      }
-      // reading failed
-      else
-      {
-        tcflush(mFileDescriptor, TCIFLUSH);
-
-        std::string exception_message = "Error sending data (" + cedar::aux::toString(errno) + ")";
-        CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message);
-      }
-    }
-    // select: time out
-    else if (status == 0)
-    {
-      tcflush(mFileDescriptor, TCIFLUSH);
-      CEDAR_THROW(cedar::dev::SerialCommunicationException, "Error: Time out while receiving data");
-    }
-    // select: error
-    else if (status < 0)
-    {
-      // error is not an interrupt
-      if (errno != EINTR)
-      {
-        tcflush(mFileDescriptor, TCIFLUSH);
-
-        std::string exception_message = "Error sending data (" + cedar::aux::toString(errno) + ")";
-        CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message);
-      }
-    }
-
-    //search for end-of-command string, read_bytes = -1 if it is not found
-    read_bytes = ans.str().find(mTranslatedEndOfCommandString);
-  }
-  while (read_bytes < 0); // end-of-command string not found
-
-  // write received string to desired location
-  answer = ans.str();
-  // delete end-of-command string
-  answer.resize(read_bytes);
-
-#ifdef DEBUG_VERBOSE
-  std::ostringstream message;
-  message << "Successfully received data ("
-          << read_bytes
-          << " Byte(s) read from '"
-          << getDevicePath()
-          << "')\n"
-          << "Receiving time: "
-          << timer.elapsed()
-          << " ms\n";
-
-  cedar::aux::LogSingleton::getInstance()->message
+  boost::asio::async_read_until
   (
-    message.str(),
-    "cedar::dev::SerialChannel",
-    "Successfully received data"
+    mPort,
+    mReadData,
+    mCommandDelimiter,
+    boost::bind
+    (
+      &cedar::dev::SerialChannel::readCompleted,
+      this,
+      boost::asio::placeholders::error,
+      boost::asio::placeholders::bytes_transferred
+    )
   );
-#endif
-#endif
-
-  return answer;
 }
 
-void cedar::dev::SerialChannel::setEndOfCommandString(const std::string& eocString)
+std::string cedar::dev::SerialChannel::read()
 {
-  mTranslatedEndOfCommandString = eocString;
-  mTranslatedEndOfCommandString = cedar::aux::replace(mTranslatedEndOfCommandString, "\\r", "\r");
-  mTranslatedEndOfCommandString = cedar::aux::replace(mTranslatedEndOfCommandString, "\\n", "\n");
+  mReadResult = readInProgress;
+  mBytesTransferred = 0;
+
+  setupRead();
+
+  mTimer.expires_from_now(boost::posix_time::time_duration(boost::posix_time::seconds(_mTimeout->getValue())));
+  mTimer.async_wait(boost::bind(&cedar::dev::SerialChannel::timeoutExpired, this, boost::asio::placeholders::error));
+
+  for (;;)
+  {
+    mIoService.run_one();
+
+    switch(mReadResult)
+    {
+      case readSuccess:
+      {
+        mTimer.cancel();
+        mBytesTransferred -= mCommandDelimiter.size();
+        std::istream input_stream(&mReadData);
+        // allocate a string for the answer
+        std::string answer(mBytesTransferred, '\0');
+        // fill the string from the buffer
+        input_stream.read(&answer[0], mBytesTransferred);
+        // remove the delimiter from the stream
+        input_stream.ignore(mCommandDelimiter.size());
+
+        #ifdef DEBUG_VERBOSE
+          std::ostringstream message;
+          message << "Successfully received data ("
+                  << mBytesTransferred
+                  << " Byte(s) read from '"
+                  << getDevicePath()
+                  << "')\n";
+
+          cedar::aux::LogSingleton::getInstance()->message
+          (
+            message.str(),
+            "cedar::dev::SerialChannel",
+            "Successfully received data"
+          );
+        #endif
+
+        return answer;
+      }
+      case readTimeoutExpired:
+      {
+        mPort.cancel();
+        CEDAR_THROW(cedar::dev::TimeoutException, "Timeout expired on receiving data on the serial channel.");
+      }
+      case readError:
+      {
+        mTimer.cancel();
+        mPort.cancel();
+
+        std::ostringstream message;
+        message << "Boost system error while receiving data on the serial channel. Error code: "
+                << boost::system::error_code();
+        CEDAR_THROW(cedar::dev::SerialCommunicationException, message.str());
+      }
+      case readInProgress:
+      {
+        // remain in the loop
+      }
+    }
+  }
 }
 
-void cedar::dev::SerialChannel::updateTranslatedEndOfCommandString()
+void cedar::dev::SerialChannel::readCompleted
+(
+  const boost::system::error_code& error,
+  const size_t bytesTransferred
+)
 {
-  this->setEndOfCommandString(_mEndOfCommandString->getValue());
-}
+  if (!error)
+  {
+    mReadResult = readSuccess;
+    this->mBytesTransferred = bytesTransferred;
 
-void cedar::dev::SerialChannel::openHook()
-{
-  //!@todo There is a lot of duplicate code here for mac and linux -- make this less redundant
+    return;
+  }
 
-  //!@todo Do we still need this? Not sure why this is done here.
-  setEndOfCommandString(_mEndOfCommandString->getValue());
+  // in case an asynchronous operation is canceled due to a timeout,
+  // each OS seems to have its own way to react
+  #if defined CEDAR_OS_WINDOWS
 
-  if (this->mFileDescriptor > 0)
+  // Windows spits out error 995
+  if (error.value() == 995)
   {
     return;
   }
 
-  // Parameters cannot be changed while the device is open
+  #elif defined CEDAR_OS_APPLE
+
+  // MacOS spits out error 45
+  if (error.value() == 45)
+  {
+    // Bug in OS X, it might be necessary to repeat the setup
+    // http://osdir.com/ml/lib.boost.asio.user/2008-08/msg00004.html
+    setupReceiver();
+
+    return;
+  }
+
+  #elif defined CEDAR_OS_LINUX
+
+  // Linux spits out error 125
+  if (error.value() == 125)
+  {
+    return;
+  }
+
+  #endif
+
+  mReadResult = readError;
+}
+
+void cedar::dev::SerialChannel::timeoutExpired(const boost::system::error_code& error)
+{
+  if (!error && mReadResult == readInProgress)
+  {
+    mReadResult = readTimeoutExpired;
+  }
+}
+
+void cedar::dev::SerialChannel::setCommandDelimiter(const std::string& commandDelimiter)
+{
+  mCommandDelimiter = commandDelimiter;
+  mCommandDelimiter = cedar::aux::replace(mCommandDelimiter, "\\r", "\r");
+  mCommandDelimiter = cedar::aux::replace(mCommandDelimiter, "\\n", "\n");
+}
+
+void cedar::dev::SerialChannel::updateCommandDelimiter()
+{
+  this->setCommandDelimiter(_mEscapedCommandDelimiter->getValue());
+}
+
+bool cedar::dev::SerialChannel::isOpen()
+{
+  return mPort.is_open();
+}
+
+void cedar::dev::SerialChannel::openHook()
+{
+  // the following parameters are not to be changed while the port is open
   _mDevicePath->setConstant(true);
-  _mEndOfCommandString->setConstant(true);
-  _mCountryFlag->setConstant(true);
-  _mBaudrate->setConstant(true);
-  _mTimeOut->setConstant(true);
-  _mLatency->setConstant(true);
+  _mEscapedCommandDelimiter->setConstant(true);
+  _mBaudRate->setConstant(true);
+  _mTimeout->setConstant(true);
 
-#ifdef CEDAR_OS_WINDOWS
-#pragma message ("cedar::dev::SerialChannel::open() not implemented for Windows.")
-#else
-  // open channel on Linux
-#if defined CEDAR_OS_LINUX
-  mFileDescriptor = ::open(getDevicePath().c_str(), O_RDWR | O_NOCTTY);
-
-  if (mFileDescriptor == -1)
+  if (this->isOpen())
   {
-    std::string exception_message = "Error opening serial port " + getDevicePath() + " on Linux";
-    CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message);
+    this->close();
   }
 
-  // save current modem settings
-  tcgetattr(mFileDescriptor, &mTerminal);
-
-  // ignore bytes with parity errors and make terminal raw and dumb
-  mTerminal.c_iflag = IGNPAR | IGNBRK;
-
-  // raw output
-  mTerminal.c_oflag = 0;
-
-  // do not echo characters
-  mTerminal.c_lflag = 0;
-
-  // set bps rate, hardware flow control, and 8n2 (8 bit, no parity, 2 stop bit)
-  switch (_mCountryFlag->getValue())
-  {
-    case 0:
-    {
-      mTerminal.c_cflag = CLOCAL | CREAD | CSTOPB | CS8;
-      break;
-    }
-    case 1:
-    {
-      mTerminal.c_cflag = CLOCAL | CREAD | CS8;
-      break;
-    }
-    default:
-    {
-      CEDAR_THROW
-      (
-        cedar::dev::SerialCommunicationException,
-        "Wrong country flag (set flag to 0 for Germany or 1 for USA.)"
-      );
-    }
-  }
-
-  //@todo what is going on here?
-  cfsetospeed(&mTerminal, _mBaudrate->getValue());
-  cfsetispeed(&mTerminal, _mBaudrate->getValue());
-  mTerminal.c_cc[VMIN] = 0;
-  mTerminal.c_cc[VTIME] = 0;
-  tcsetattr(mFileDescriptor, TCSANOW, &mTerminal);
-
-
-  // openialize channel on Mac
-#elif defined CEDAR_OS_APPLE
-  mFileDescriptor = ::open(getDevicePath().c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
-
-  if (mFileDescriptor < 0)
-  {
-    CEDAR_THROW(cedar::dev::SerialCommunicationException, "Error opening serial port " + getDevicePath() + " on Mac");
-  }
-
-  if (fcntl(mFileDescriptor, F_SETFL, 0) < 0)
-  {
-    std::ostringstream exception_message;
-    exception_message << "Error clearing O_NDELAY"
-                      << getDevicePath()
-                      << " - "
-                      << strerror(errno)
-                      << "("
-                      << errno
-                      << ")";
-    CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message.str());
-  }
-
-  // get the current options and save them for later reset
-  if (tcgetattr(mFileDescriptor, &mOriginalTTYAttrs) < 0)
-  {
-    std::ostringstream exception_message;
-    exception_message << "Error getting tty attribues"
-                      << getDevicePath()
-                      << " - "
-                      << strerror(errno)
-                      << "("
-                      << errno
-                      << ")";
-    CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message.str());
-  }
-
-  // set raw input; timeout: 1 s
-  // these options are documented in the man page for termios
-  mTerminal = mOriginalTTYAttrs;
-  mTerminal.c_cflag |= (CLOCAL | CREAD);
-  mTerminal.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
-  mTerminal.c_oflag &= ~OPOST;
-  mTerminal.c_cc[VMIN] = 0;
-  mTimeoutTalk = 30;
-  mTerminal.c_cc[VTIME] = 0; // mTimeoutTalk;
-  mTerminal.c_ispeed = _mBaudrate->getValue();
-  mTerminal.c_ospeed = _mBaudrate->getValue();
-  clear_my(mTerminal.c_cflag, CSIZE|PARENB); // control modes
-  set(mTerminal.c_cflag, CS8 | CSTOPB);
-
-  // set the options
-  if (tcsetattr(mFileDescriptor, TCSANOW, &mTerminal) < 0)
-  {
-    std::ostringstream exception_message;
-    exception_message << "Error getting tty attribues"
-                      << getDevicePath()
-                      << " - "
-                      << strerror(errno)
-                      << "("
-                      << errno
-                      << ")";
-    CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message.str());
-  }
-#else
-  CEDAR_THROW(cedar::dev::UnknownOperatingSystemException, "Error opening serial port - unknown operating system.");
-#endif
-
-  tcflush(mFileDescriptor, TCIOFLUSH);
+  mPort.open(_mDevicePath->getValue());
+  mPort.set_option(boost::asio::serial_port_base::baud_rate(_mBaudRate->getValue()));
 
   cedar::aux::LogSingleton::getInstance()->debugMessage
   (
-    "Successfully opened port" + getDevicePath(),
+    "Successfully opened port " + getDevicePath(),
     "cedar::dev::SerialChannel",
     "Serial channel opened"
   );
-#endif
 }
 
 void cedar::dev::SerialChannel::closeHook()
 {
-#ifdef CEDAR_OS_WINDOWS
-#pragma message ("cedar::dev::SerialChannel::close() not implemented for Windows.")
-#else
-  int status = ::close(mFileDescriptor);
-
-  if (status != 0)
+  if (!isOpen())
   {
-    std::string exception_message = "Error closing port '" + getDevicePath() + "'";
-    CEDAR_THROW(cedar::dev::SerialCommunicationException, exception_message);
+    return;
   }
 
-  mFileDescriptor = 0;
+  mPort.close();
+
   cedar::aux::LogSingleton::getInstance()->debugMessage
   (
     "Closing Port",
@@ -494,12 +337,9 @@ void cedar::dev::SerialChannel::closeHook()
     "Serial channel closed"
   );
 
-  // Parameters cannot be changed while the device is open
+  // parameters can now be changed again
   _mDevicePath->setConstant(false);
-  _mEndOfCommandString->setConstant(false);
-  _mCountryFlag->setConstant(false);
-  _mBaudrate->setConstant(false);
-  _mTimeOut->setConstant(false);
-  _mLatency->setConstant(false);
-#endif // CEDAR_OS_WINDOWS
+  _mEscapedCommandDelimiter->setConstant(false);
+  _mBaudRate->setConstant(false);
+  _mTimeout->setConstant(false);
 }

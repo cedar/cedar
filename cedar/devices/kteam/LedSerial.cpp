@@ -38,9 +38,12 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/devices/kteam/Led.h"
 #include "cedar/devices/kteam/LedSerial.h"
+#include "cedar/devices/Channel.h"
 #include "cedar/devices/kteam/SerialChannel.h"
 #include "cedar/devices/kteam/serialChannelHelperFunctions.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 
@@ -75,7 +78,7 @@ cedar::dev::kteam::LedSerial::LedSerial
   cedar::dev::kteam::SerialChannelPtr channel
 )
 :
-cedar::dev::Led(cedar::aux::asserted_pointer_cast<cedar::dev::Channel>(channel)),
+cedar::dev::kteam::Led(cedar::aux::asserted_pointer_cast<cedar::dev::Channel>(channel)),
 _mCommandSetState(new cedar::aux::StringParameter(this, "command set state", "L"))
 {
 }
@@ -95,7 +98,7 @@ void cedar::dev::kteam::LedSerial::setState(unsigned int ledId, bool state)
   command << _mCommandSetState->getValue() << "," << ledId << "," << state;
   // send the command string
   std::string answer
-    = convertToSerialChannel(getChannel())->sendAndReceiveLocked(command.str());
+    = convertToSerialChannel(getChannel())->writeAndReadLocked(command.str());
 
   // check whether the answer begins with the correct character
   checkSerialCommunicationAnswer(answer, _mCommandSetState->getValue());

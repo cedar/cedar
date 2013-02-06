@@ -115,11 +115,9 @@
       {
         "name": "serial channel",
         "device path": "/dev/ttyUSB0",
-        "baud rate": "15",
-        "end of command string": "\\r\\n",
-        "country flag": "0",
-        "time out": "250000",
-        "latency": "10000"
+        "baud rate": "38400",
+        "escaped command delimiter": "\\r\\n",
+        "time out": "0.25"
       }
     }
   }

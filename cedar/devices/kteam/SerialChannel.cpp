@@ -69,7 +69,7 @@ namespace
 void cedar::dev::kteam::SerialChannel::postOpenHook()
 {
   // send a dummy-message
-  std::string answer = this->sendAndReceiveLocked("D,0,0");
+  std::string answer = this->writeAndReadLocked("D,0,0");
 
   // 'd,' or 'z,' expected, else init failed
   if (answer.size() < 2 || (answer[0] != 'd' && answer[0] != 'z') || answer[1] != ',')

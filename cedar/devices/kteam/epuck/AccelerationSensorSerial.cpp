@@ -100,7 +100,7 @@ cv::Mat cedar::dev::kteam::epuck::AccelerationSensorSerial::getData()
     = cedar::aux::asserted_pointer_cast<cedar::dev::kteam::SerialChannel>(getChannel());
 
   // send a command string to the robot to receive the current acceleration values
-  std::string answer = serial_channel->sendAndReceiveLocked(_mCommandGetAcceleration->getValue());
+  std::string answer = serial_channel->writeAndReadLocked(_mCommandGetAcceleration->getValue());
 
   // check whether the first character of the answer is correct
   checkSerialCommunicationAnswer(answer, _mCommandGetAcceleration->getValue());

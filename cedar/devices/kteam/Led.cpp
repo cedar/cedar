@@ -22,54 +22,42 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        Led.cpp
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
-    Date:        2012 04 13
+    Date:        2013 02 05
 
-    Description: Namespace file for cedar::dev.
+    Description: A component that allows control of LEDs on KTeam robots.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_NAMESPACE_H
-#define CEDAR_DEV_NAMESPACE_H
-
 // CEDAR INCLUDES
-#include "cedar/devices/lib.h"
-#include "cedar/defines.h"
+#include "cedar/devices/kteam/Led.h"
+#include "cedar/devices/Component.h"
+#include "cedar/devices/Channel.h"
 
 // SYSTEM INCLUDES
 
-
-namespace cedar
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+cedar::dev::kteam::Led::Led()
 {
-  /*!@brief Namespace for all devices classes. */
-  namespace dev
-  {
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_DEV_CLASS(Robot);
-    CEDAR_DECLARE_DEV_CLASS(ComponentSlot);
-    CEDAR_DECLARE_DEV_CLASS(Component);
-    CEDAR_DECLARE_DEV_CLASS(Channel);
-    CEDAR_DECLARE_DEV_CLASS(SerialChannel);
-    CEDAR_DECLARE_DEV_CLASS(Locomotion);
-    CEDAR_DECLARE_DEV_CLASS(DifferentialDrive);
-    CEDAR_DECLARE_DEV_CLASS(KinematicChain);
-    CEDAR_DECLARE_DEV_CLASS(Odometry);
-    CEDAR_DECLARE_DEV_CLASS(Sensor);
-    CEDAR_DECLARE_DEV_CLASS(SimulatedKinematicChain);
-
-    // exceptions
-    CEDAR_DECLARE_DEV_CLASS(UnresponsiveRobotException);
-    CEDAR_DECLARE_DEV_CLASS(SerialCommunicationException);
-    CEDAR_DECLARE_DEV_CLASS(UnknownOperatingSystemException);
-    CEDAR_DECLARE_DEV_CLASS(ResourceNotAvailableException);
-    CEDAR_DECLARE_DEV_CLASS(TimeoutException);
-    //!@endcond
-  }
 }
 
-#endif // CEDAR_DEV_NAMESPACE_H
+cedar::dev::kteam::Led::Led(cedar::dev::ChannelPtr channel)
+:
+cedar::dev::Component(channel)
+{
+}
+
+cedar::dev::kteam::Led::~Led()
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
