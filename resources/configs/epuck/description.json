@@ -101,13 +101,11 @@
     {
       "cedar.dev.kteam.SerialChannel":
       {
-        "name": "serial communication",
+        "name": "serial channel",
         "device path": "/dev/rfcomm0",
-        "baud rate": "4098",
-        "end of command string": "\\r\\n",
-        "country flag": "0",
-        "time out": "250000",
-        "latency": "10000"
+        "baud rate": "115200",
+        "escaped command delimiter": "\\r\\n",
+        "time out": "5.25"
       }
     }
   }

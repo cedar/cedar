@@ -55,6 +55,11 @@ class cedar::dev::SerialCommunicationException : public cedar::aux::ExceptionBas
 {
 }; // class cedar::dev::SerialCommunicationException
 
+//!@brief Exception that occurs when a timeout expires.
+class cedar::dev::TimeoutException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::dev::TimeoutException
+
 //!@brief Exception that occurs when the operating system of the computer cannot be determined.
 class cedar::dev::UnknownOperatingSystemException : public cedar::aux::ExceptionBase
 {

@@ -26,17 +26,17 @@
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
-    Date:        2012 04 13
+    Date:        2013 02 05
 
-    Description: This class provides a string-based communication with an external device using a Serial Port.
+    Description: Channel for serial communication, based on Boost ASIO.
 
-    Credits:     Andre Bartel, Marc Sons
+    Credits:     Based on the class TimeoutSerial, written by Terraneo Federico.
+                 http://gitorious.org/serial-port/serial-port/trees/master/2_with_timeout
 
 ======================================================================================================================*/
 
 #ifndef CEDAR_DEV_SERIAL_CHANNEL_H
 #define CEDAR_DEV_SERIAL_CHANNEL_H
-//!@todo Serial communication needs implementation for windows.
 
 // CEDAR INCLUDES
 #include "cedar/devices/Channel.h"
@@ -48,23 +48,11 @@
 
 // SYSTEM INCLUDES
 #include <QObject>
-#ifdef CEDAR_OS_WINDOWS
-  // some dummy types for windows.
-  struct termios {};
-#else
-  #include <termios.h>
-  #include <errno.h>
-  #include <fcntl.h>
-#endif // CEDAR_OS_WINDOWS
+#include <boost/utility.hpp>
+#include <boost/asio.hpp>
 
-/*!@brief This class provides a string-based communication with an external device using a Serial Port.
- *
- * This includes opening and closing the Serial Port as well as sending and receiving strings. Examples for such
- * devices are mobile robots (E-Puck, Khepera). It is also possible to lock the channel to prevent read-/write-errors
- * if multiple threads are accessing the device (implemented in Channel.h).
- *
- * The parameters of the communication must be read from a configuration file using the
- * cedar::aux::Configurable::readJson method right after constructing of the object.
+
+/*!@brief Document me.
  */
 class cedar::dev::SerialChannel : public QObject, public Channel
 {
@@ -74,10 +62,10 @@ class cedar::dev::SerialChannel : public QObject, public Channel
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Initiates a new communication with an external device per Serial Port.
+  //!@brief The default constructor.
   SerialChannel();
 
-  //!@brief Ends the communication with the device and closes the channel.
+  //!@brief Destructor.
   ~SerialChannel();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -90,58 +78,32 @@ public:
   //!@brief  Closes the channel.
   virtual void closeHook();
 
-  //!@brief The get-function of the initialization-status.
-  //!@return true if initialized, else false
-  bool isInitialized() const;
+  //!@brief Checks whether the port is open.
+  bool isOpen();
 
-  //!@brief The get-function of the File Descriptor.
-  //!@return File Descriptor of the communication.
-  int getFileDescriptor() const;
-
-  //!@brief The get-function of the device's path.
-  //!@return Path of the Serial Port.
+  //!@brief Returns the device path and name of the serial port.
   const std::string& getDevicePath() const;
 
-  //!@brief The get-function of the End-of-Command-String.
-  //!@return The End-Of-Command-String.
-  const std::string& getEndOfCommandString() const;
+  //!@brief Returns the string that signals the end of commands.
+  const std::string& getCommandDelimiter() const;
 
-  //!@brief The get-function of the C-Flag.
-  //!@return The Country-Flag.
-  int getCountryFlag() const;
+  //!@brief Sets the string that signals the end of commands.
+  void setCommandDelimiter(const std::string& commandDelimiter);
 
-  //!@brief The get-function of the current Baud Rate.
-  //!@return The Baud Rate used by the Serial Port (in Bit/s).
-  unsigned int getBaudrate() const;
+  //!@brief Returns the baud rate (Bit/s) set for the serial port.
+  unsigned int getBaudRate() const;
 
-  //!@brief The get-function of the time-out value.
-  //!@return Time in microsecs until current read-/write-operation times out.
-  unsigned int getTimeOut() const;
+  //!@brief Returns the timeout in seconds.
+  double getTimeout() const;
 
-  //!@brief The get-function of the latency.
-  //!@return Delay of next operation after send (in microsecs).
-  unsigned int getLatency() const;
+  //!@brief Sends a string to the serial port.
+  void write(std::string command);
 
-  /*!@brief Sends a string to the device.
-   *@param command The string to be sent.
-   */
-  void send(const std::string& command);
+  //!@brief Reads a string from the serial port.
+  std::string read();
 
-  /*!@brief Receives a string from the device.
-   *@return returns the received string
-   */
-  std::string receive();
-
-  /*!@brief Specifies the new End-Of-Command-String.
-   *@param eocString New End-Of-Command-String.
-   *
-   *The End-Of-Command-String is also read from the configuration-file when the communication is initialized.
-   */
-  void setEndOfCommandString(const std::string& eocString);
-
-  /*!@brief Sends a string and locks the channel properly.
-   */
-  std::string sendAndReceiveLocked(const std::string& command);
+  //!@brief Sends a string and receives the answer. While doing so, the channel is locked.
+  std::string writeAndReadLocked(const std::string& command);
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -156,11 +118,14 @@ private:
   //!@return 1 if initialization was successful, else 0.
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
-  //!@brief Checks whether the serial connection has been opened. Throws an exception if not.
-  void checkIfOpen() const;
+  //!@brief Sets up the read.
+  void setupRead();
+
+  void readCompleted(const boost::system::error_code& error, const size_t bytesTransferred);
+  void timeoutExpired(const boost::system::error_code& error);
 
 private slots:
-  void updateTranslatedEndOfCommandString();
+  void updateCommandDelimiter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -169,22 +134,30 @@ protected:
   // none yet
 
 private:
-  //!@brief File Descriptor of the communication.
-  int mFileDescriptor;
+  //!@brief String that signals the end of commands.
+  std::string mCommandDelimiter;
+  //! IO service object
+  boost::asio::io_service mIoService;
+  //! serial port object
+  boost::asio::serial_port mPort;
+  //! timer for the timeout
+  boost::asio::deadline_timer mTimer;
+  //! buffer for received data
+  boost::asio::streambuf mReadData;
+  //! number of received bytes (used within the callback for asynchronous reading)
+  size_t mBytesTransferred;
 
-  //!@brief Terminal IO.
-  struct termios mTerminal;
+  //! possible results of receiving an answer
+  enum ReadResult
+  {
+    readInProgress,
+    readSuccess,
+    readError,
+    readTimeoutExpired
+  };
 
-  //!@brief Help variable for communication settings with OS X.
-  unsigned mTimeoutTalk;
-
-  //!@brief Help variable for communication settings with OS X.
-  struct termios mOriginalTTYAttrs;
-
-  /*!@brief Translated version of the end of command string, i.e., the user's input with "\r" and "\n" replaced by the
-   *        appropriate characters.
-   */
-  std::string mTranslatedEndOfCommandString;
+  //! used by read with timeout
+  enum ReadResult mReadResult;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -193,36 +166,25 @@ protected:
   // none yet
 
 private:
-  /*!@brief Path of the Serial Port.
+  /*!@brief Path and name of the serial port.
    * Default is "/dev/rfcomm0" (Bluetooth).
    */
   cedar::aux::StringParameterPtr _mDevicePath;
 
-  /*!@brief The End-Of-Command-String.
-   * Marks the end of the sent/received string. Default is "\r\n" (carriage return + line feed).
+  /*!@brief Marks the end of sent and received strings.
+   * Default is "\\r\\n" (escaped carriage return + escaped line feed).
    */
-  cedar::aux::StringParameterPtr _mEndOfCommandString;
+  cedar::aux::StringParameterPtr _mEscapedCommandDelimiter;
 
-  /*!@brief The country flag.
-   * C-Flag is an identifier of the user's country. Set CountryFlag to 0 if in Germany (Default) or 1 if in USA.
+  /*!@brief The baud rate used for communicating with the serial port (in Bit/s).
+   *        Default is 115200 Bit/s.
    */
-  cedar::aux::IntParameterPtr _mCountryFlag;
+  cedar::aux::UIntParameterPtr _mBaudRate;
 
-  /*!@brief The Baudrate which shall be used by the serial port (in Bit/s).
-   *        Set it to 15 for 38400 Bit/s or to 4098 for 115200 Bit/s (Default).
-   *
-   * @todo  This should be an enum of all possible values rather than an arbitrary integer.
+  /*!@brief Time in seconds until current read-/write-operation times out.
+   * Default is 0.25 s (250 ms).
    */
-  cedar::aux::UIntParameterPtr _mBaudrate;
+  cedar::aux::DoubleParameterPtr _mTimeout;
 
-  /*!@brief Time in microsecs until current read-/write-operation times out.
-   * The time out prevents deadlocks that occur if the device does not respond. Default is 250000 ms.
-   */
-  cedar::aux::UIntParameterPtr _mTimeOut;
-
-  /*!@brief Delay of next operation after send (in microsecs).
-   * Shouldn't be set too low to prevent reading-/writing-interference. Default is 10000 ms.
-   */
-  cedar::aux::UIntParameterPtr _mLatency;
 }; // class cedar::dev::SerialChannel
 #endif // CEDAR_DEV_SERIAL_CHANNEL_H

@@ -50,7 +50,7 @@ cedar::dev::Sensor::Sensor()
 {
 }
 
-cedar::dev::Sensor::Sensor(cedar::dev::ChannelPtr channel)
+cedar::dev::Sensor::Sensor(cedar::dev::ChannelPtr)
 {
 }
 

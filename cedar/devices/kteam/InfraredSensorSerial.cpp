@@ -100,7 +100,7 @@ cv::Mat cedar::dev::kteam::InfraredSensorSerial::getData()
     = convertToSerialChannel(getChannel());
 
   // send the command to receive the values of the encoders
-  std::string answer = serial_channel->sendAndReceiveLocked(_mCommandGetInfrared->getValue());
+  std::string answer = serial_channel->writeAndReadLocked(_mCommandGetInfrared->getValue());
 
   // check whether the answer begins with the correct character
   checkSerialCommunicationAnswer(answer, _mCommandGetInfrared->getValue());
