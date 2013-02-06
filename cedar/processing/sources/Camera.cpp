@@ -41,6 +41,7 @@
 #include "cedar/processing/sources/Camera.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 
@@ -157,9 +158,7 @@ void cedar::proc::sources::Camera::applyParameter()
   {
     for (int i = 0; i < 5; ++i)
     {
-      //todo:cedar::aux::usleep
-      //cedar::aux::sleep(cedar::unit::Milliseconds(30));
-      usleep(5000);
+      cedar::aux::sleep(cedar::unit::Milliseconds(5));
       this->onTrigger();
       this->annotateImage();
     }
