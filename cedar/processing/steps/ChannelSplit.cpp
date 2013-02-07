@@ -110,19 +110,23 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::ChannelSplit::determineInput
 {
   if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
   {
-    try
+    if
+    (
+      mat_data->getData().channels() > 1
+      && mat_data->getData().channels() <= 4
+      && cedar::aux::math::getDimensionalityOf(mat_data->getData()) < 3
+    )
     {
-      mat_data->getAnnotation<cedar::aux::annotation::ColorSpace>();
-
-      if (mat_data->getData().channels() <= 4 && cedar::aux::math::getDimensionalityOf(mat_data->getData()) < 3)
+      try
       {
+        mat_data->getAnnotation<cedar::aux::annotation::ColorSpace>();
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
-    }
-    catch (cedar::aux::AnnotationNotFoundException)
-    {
-      // the data is mat data but not annotated; that's ok
-      return cedar::proc::DataSlot::VALIDITY_WARNING;
+      catch (cedar::aux::AnnotationNotFoundException)
+      {
+        // the data is mat data but not annotated; that's ok
+        return cedar::proc::DataSlot::VALIDITY_WARNING;
+      }
     }
   }
 

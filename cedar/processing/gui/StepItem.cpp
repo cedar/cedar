@@ -45,6 +45,7 @@
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/exceptions.h"
+#include "cedar/processing/gui/PropertyPane.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/Step.h"
@@ -729,7 +730,7 @@ void cedar::proc::gui::StepItem::showPlot
     title += "." + slot->getName() + ")";
   }
 
-  QDockWidget *p_dock = this->createPlotDockWidget(title);
+  QDockWidget *p_dock = this->createDockWidget(title);
 
   QRect geometry = p_dock->geometry();
   geometry.setTopLeft(position);
@@ -740,8 +741,18 @@ void cedar::proc::gui::StepItem::showPlot
   p_dock->show();
 }
 
+void cedar::proc::gui::StepItem::openProperties()
+{
+  QDockWidget *p_widget = this->createDockWidget("Properties");
+  cedar::proc::gui::PropertyPane* props = new cedar::proc::gui::PropertyPane();
+  p_widget->setWidget(props);
+  props->display(this->getStep());
+  p_widget->show();
+}
+
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
+  //!@todo Would be nice to have icons for these actions
   cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
   CEDAR_DEBUG_ASSERT(p_scene);
 
@@ -755,22 +766,35 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   }
 
   QMenu *p_data = menu.addMenu("data");
+  p_data->setIcon(QIcon(":/menus/data.svg"));
 
-  menu.addSeparator();
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
   QAction *p_plot_all = menu.addAction("plot all");
-  QMenu *p_element_plots = menu.addMenu("defined plots");
-  QMenu *p_advanced_plotting = menu.addMenu("advanced plotting");
+  p_plot_all->setIcon(QIcon(":/menus/plot_all.svg"));
 
-  menu.addSeparator();
+  QMenu *p_element_plots = menu.addMenu("defined plots");
+  p_element_plots->setIcon(QIcon(":/menus/plot.svg"));
+
+  QMenu *p_advanced_plotting = menu.addMenu("advanced plotting");
+  p_advanced_plotting->setIcon(QIcon(":/menus/plot_advanced.svg"));
 
   this->fillDefinedPlots(p_element_plots, event->screenPos());
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+
+  QAction *p_properties = menu.addAction("open properties widget");
+  QObject::connect(p_properties, SIGNAL(triggered()), this, SLOT(openProperties()));
+  p_properties->setIcon(QIcon(":/menus/properties.svg"));
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
   std::map<QAction*, std::pair<cedar::aux::gui::PlotDeclarationPtr, cedar::aux::Enum> > advanced_plot_map;
   this->fillPlots(p_advanced_plotting, advanced_plot_map);
 
   QMenu *p_actions_menu = menu.addMenu("actions");
-  menu.addSeparator();
+  p_actions_menu->setIcon(QIcon(":/menus/actions.svg"));
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
   const cedar::proc::Step::ActionMap& map = this->mStep->getActions();
   if (map.empty())
@@ -785,7 +809,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     }
   }
 
-  menu.addSeparator();
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
   p_scene->networkGroupingContextMenuEvent(menu);
 
   // Actions for data plotting -----------------------------------------------------------------------------------------
@@ -828,7 +852,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     p_action->setEnabled(false);
   }
 
-  menu.addSeparator();
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
   this->fillDisplayStyleMenu(&menu);
 
   QAction *a = menu.exec(event->screenPos());
@@ -943,6 +967,7 @@ void cedar::proc::gui::StepItem::openDefinedPlotAction(QAction* pAction)
 void cedar::proc::gui::StepItem::fillDisplayStyleMenu(QMenu* pMenu)
 {
   QMenu* p_sub_menu = pMenu->addMenu("display style");
+  p_sub_menu->setIcon(QIcon(":/menus/display_style.svg"));
 
   for (size_t i = 0; i < cedar::proc::gui::StepItem::DisplayMode::type().list().size(); ++i)
   {
@@ -991,7 +1016,7 @@ void cedar::proc::gui::StepItem::setDisplayMode(cedar::proc::gui::StepItem::Disp
   this->update();
 }
 
-QDockWidget* cedar::proc::gui::StepItem::createPlotDockWidget(const std::string& title) const
+QDockWidget* cedar::proc::gui::StepItem::createDockWidget(const std::string& title) const
 {
   QDockWidget *p_dock = new QDockWidget(QString::fromStdString(title), this->mpMainWindow);
   p_dock->setFloating(true);
@@ -1037,7 +1062,7 @@ void cedar::proc::gui::StepItem::multiplot
   }
 
   // initialize dock
-  QDockWidget *p_dock = createPlotDockWidget(this->getStep()->getName());
+  QDockWidget *p_dock = createDockWidget(this->getStep()->getName());
 
   // initialize widget & layout
   QWidget *p_widget = new QWidget();

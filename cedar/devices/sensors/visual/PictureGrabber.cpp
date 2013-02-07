@@ -135,19 +135,6 @@ cedar::dev::sensors::visual::PictureGrabber::~PictureGrabber()
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-// configurable interface
-//--------------------------------------------------------------------------------------------------------------------
-
-// void cedar::dev::sensors::visual::PictureGrabber::readConfiguration(const cedar::aux::ConfigurationNode& node)
-//{
-//  // do readConfiguration for all childs. This is implemented in the base class
-//  cedar::aux::Configurable::readConfiguration(node);
-//
-//  // initialize grabber:
-//
-//}
-
-//--------------------------------------------------------------------------------------------------------------------
 // slots
 //--------------------------------------------------------------------------------------------------------------------
 
@@ -208,7 +195,7 @@ void cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()
                                                  "cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()"
                                                );
       mCaptureDeviceCreated = true;
-      setChannelInfo(channel);
+      onUpdateSourceInfo(channel);
       emit pictureChanged();
     }
   }
@@ -241,7 +228,7 @@ bool cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
                                              name + ": " + init_message.str(),
-                                             "cedar::dev::sensors::visual::PictureGrabber::onInit()"
+                                             "cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()"
                                            );
 
   // for every channel, read from image-file
@@ -254,7 +241,6 @@ bool cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()
     if (!frame.empty())
     {
       getImageMat(channel) = frame;
-      setChannelInfo(channel);
     }
     else
     {
@@ -264,7 +250,7 @@ bool cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()
                                                   name + ": Grabbing failed on Channel "
                                                   + boost::lexical_cast<std::string>(channel) + " from \""
                                                   + getPictureChannel(channel)->_mSourceFileName->getPath() + "\"",
-                                                "cedar::dev::sensors::visual::PictureGrabber::onInit()"
+                                                "cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()"
                                                );
     }
   }
@@ -325,7 +311,7 @@ const std::string cedar::dev::sensors::visual::PictureGrabber::getSourceFile(uns
 
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::PictureGrabber::setChannelInfo(unsigned int channel)
+std::string cedar::dev::sensors::visual::PictureGrabber::onUpdateSourceInfo(unsigned int channel)
 {
-  setChannelInfoString(channel,getPictureChannel(channel)->_mSourceFileName->getPath());
+  return getPictureChannel(channel)->_mSourceFileName->getPath();
 }

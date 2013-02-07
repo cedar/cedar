@@ -50,12 +50,13 @@
 cedar::dev::gui::KinematicChainMonitorWidget::KinematicChainMonitorWidget
 (
   cedar::dev::KinematicChainPtr kinematicChain,
-  QWidget * parent,
+  QWidget* parent,
   Qt::WindowFlags f
 )
 :
 QWidget(parent, f),
-mpKinematicChain(kinematicChain)
+mpKinematicChain(kinematicChain),
+mTimerId(0)
 {
   mDecimals = 6;
 
@@ -119,7 +120,10 @@ void cedar::dev::gui::KinematicChainMonitorWidget::initWindow()
   setLayout(mpGridLayout);
 
   // start a timer to update the interface
-  startTimer(mUpdateInterval);
+  if (!mTimerId)
+  {
+    mTimerId =  startTimer(mUpdateInterval);
+  }
 
   return;
 }

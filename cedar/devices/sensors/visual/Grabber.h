@@ -59,7 +59,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
 
-
 /*! @class cedar::dev::sensors::visual::Grabber
  *  @brief This is the base class for all grabber.
  *
@@ -84,7 +83,7 @@
  *      Initialize in the constructor of a derived class the filenames or camera-device-names.
  *      At the end of the constructor, call doInit() with the number of channels you use and with a default name.
  *      At the beginning of the destructor, call doCleanUp() and do the cleanup in this function.
- *      To get an example look at the VideoGrabber or the TestGrabber-class. <br><br>
+ *      To get an example, have a look at the VideoGrabber or the TestGrabber-class. <br><br>
  *
  *
  */
@@ -493,6 +492,11 @@ public:
    */
   std::string getChannelSaveFilenameAddition(int channel) const;
 
+  /*!@brief Set the internal used flag when the grabbing is switched on
+   *
+   * Internally used in the processing Step "Camera" when running with a looped trigger
+   */
+  void setIsGrabbing(bool isGrabbing);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -565,6 +569,15 @@ protected:
   virtual bool onGrab();
 
 
+  /*! @brief Updates the channel informations
+   *
+   *  This method is used internally to update the channel info string. It will be called after the onCreate()-method
+   *  of the derived grabber-classes is invoked.
+   *
+   *  @param channel The channel which should be updated
+   */
+  virtual std::string onUpdateSourceInfo(unsigned int channel) = 0;
+
   //! Get the Pointer to the SnapshotName Element
   //cedar::aux::FileParameterPtr getSnapshotNameParamter();
 
@@ -580,9 +593,14 @@ protected:
    */
   cv::Mat& getImageMat(unsigned int channel);
 
-
-  //cv::VideoWriter getVideoWriter();
-
+  /*! @brief Updates the info string of the given channel
+   *
+   * Call this method in the derived class in the method onUpdateSourceInfo()
+   * to update the infos about the channel source
+   *
+   * @param channel The channel you want to update
+   * @param info The new info-string for that channel
+   */
   void setChannelInfoString(unsigned int channel, std::string info);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -594,7 +612,6 @@ private:
    *  @param grabberChannels A vector with all channels you want to initialize
    */
   void init(std::vector<cedar::dev::sensors::visual::GrabberChannelPtr> grabberChannels);
-
 
   /*! @brief Callback function to respond to a captured CTRL-C event
    *
@@ -627,7 +644,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-    ///! @brief Flag which indicates if the capture devices of all channels are correctly created or not
+    //! @brief Flag which indicates if the capture devices of all channels are correctly created or not
     bool mCaptureDeviceCreated;
 
     //! Flag, that determins if grabbing is on either via the LoopedThread or via the LoopedTrigger from the gui
@@ -639,9 +656,7 @@ protected:
      */
     QReadWriteLock* mpReadWriteLock;
     
-    /*! @brief The actual measured fps of grabbing
-     *
-     */
+    //! @brief The actual measured fps of grabbing
     double mFpsMeasured;
     
     /*! @brief  Flag if recording is on     */

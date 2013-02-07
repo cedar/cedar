@@ -118,6 +118,11 @@ void cedar::aux::gui::MatrixSlicePlot3D::timerEvent(QTimerEvent* /*pEvent*/)
   }
 
   const cv::Mat& mat = this->mData->getData();
+  if (cedar::aux::math::getDimensionalityOf(mat) != 3) // plot is no longer capable of displaying the data
+  {
+    emit dataChanged();
+    return;
+  }
 
   this->mData->lockForRead();
   if (mat.empty())

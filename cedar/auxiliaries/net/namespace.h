@@ -80,6 +80,6 @@ namespace cedar
 
     }
   }
-}; // end namespaces
+} // end namespaces
 
 #endif // CEDAR_XXX_XXX_H

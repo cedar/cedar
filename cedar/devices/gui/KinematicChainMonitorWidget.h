@@ -128,6 +128,7 @@ private:
   cedar::dev::ConstKinematicChainPtr mpKinematicChain;
   QGridLayout* mpGridLayout;
   unsigned int mDecimals;
+  int mTimerId;
 };
 
 #endif /* CEDAR_DEV_GUI_KINEMATIC_CHAIN_MONITOR_WIDGET_H */

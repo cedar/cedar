@@ -71,9 +71,6 @@ namespace cedar {
         template<class T>
         class YARPCollatedPortable;
 
-        template<typename T> 
-        class InterfaceCollatedData;
-
         template<class T>
         struct CollatedTraits;
 

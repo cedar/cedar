@@ -41,6 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/HistoryPlot.h"
 #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
+#include "cedar/auxiliaries/gui/HistoryPlot1D.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/exceptions.h"
@@ -60,6 +61,11 @@ namespace
     typedef cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::DoubleData, cedar::aux::gui::HistoryPlot> DeclarationType;
     boost::shared_ptr<DeclarationType> decl(new DeclarationType());
     cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(decl);
+
+    typedef cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::MatData, cedar::aux::gui::HistoryPlot> DeclarationType2;
+    boost::shared_ptr<DeclarationType2> decl2(new DeclarationType2());
+    cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(decl2);
+
     return true;
   }
 
@@ -95,13 +101,32 @@ void cedar::aux::gui::HistoryPlot::plot(cedar::aux::ConstDataPtr data, const std
     this->mpCurrentPlotWidget = NULL;
   }
 
-  if (this->mData = boost::shared_dynamic_cast<cedar::aux::ConstDoubleData>(data))
+  this->mData = data;
+  if (boost::shared_dynamic_cast<cedar::aux::ConstDoubleData>(data))
   {
-    this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData, title);
+    this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D();
+  }
+  else if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data))
+  {
+    switch (mat_data->getDimensionality())
+    {
+      case 1:
+        this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot1D();
+        break;
+
+      default:
+        CEDAR_THROW
+        (
+          cedar::aux::gui::InvalidPlotData,
+          "Don't know how to plot MatData with the given dimensionality ("
+            + cedar::aux::toString(mat_data->getDimensionality()) + "."
+        );
+    }
   }
   else
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData, "Don't know how to plot this data.");
   }
+  this->mpCurrentPlotWidget->plot(this->mData, title);
   this->layout()->addWidget(this->mpCurrentPlotWidget);
 }

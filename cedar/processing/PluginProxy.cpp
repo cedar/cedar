@@ -40,6 +40,7 @@
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/configuration.h"
 
 // SYSTEM INCLUDES
 #ifdef CEDAR_OS_UNIX
@@ -56,7 +57,15 @@
   #define BOOST_FILESYSTEM_VERSION 3
 #endif
 #include <boost/filesystem.hpp>
+#include <signal.h>
 
+//----------------------------------------------------------------------------------------------------------------------
+// static members
+//----------------------------------------------------------------------------------------------------------------------
+
+#ifdef CEDAR_OS_UNIX
+std::string cedar::proc::PluginProxy::mPluginBeingLoaded = "";
+#endif // CEDAR_OS_UNIX
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -173,6 +182,21 @@ std::string cedar::proc::PluginProxy::findPluginFile(const std::string& file) co
   return "";
 }
 
+#ifdef CEDAR_OS_UNIX
+void cedar::proc::PluginProxy::abortHandler(int)
+{
+  std::cout
+      << "==================================================================" << std::endl
+      << "  Something went horribly, HORRIBLY wrong while loading a plugin" << std::endl
+      << "==================================================================" << std::endl;
+  std::cout << std::endl << "The offending plugin is located at " << mPluginBeingLoaded  << std::endl << std::endl;
+  std::cout << "This often happens when you update your cedar version but don't recompile your plugins. You can try to "
+      << "disable your plugins while starting the processingIde. Run processingIde --help for details. If this helps, "
+      << "try to recompile the affected plugins." << std::endl;
+  exit(-2);
+}
+#endif // CEDAR_OS_UNIX
+
 void cedar::proc::PluginProxy::load(const std::string& file)
 {
   this->mFileName = this->findPluginFile(file);
@@ -180,7 +204,16 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   // OS-Dependent code for loading the plugin.
   PluginInterfaceMethod p_interface = NULL;
 #ifdef CEDAR_OS_UNIX
-  this->mpLibHandle = dlopen(this->mFileName.c_str(), RTLD_NOW);
+
+  mPluginBeingLoaded = file;
+  void (*old_abrt_handle)(int);
+  old_abrt_handle = signal(SIGABRT, &cedar::proc::PluginProxy::abortHandler);
+
+  this->mpLibHandle = dlopen(this->mFileName.c_str(), RTLD_NOW | RTLD_GLOBAL);
+
+  signal(SIGABRT, old_abrt_handle);
+  mPluginBeingLoaded = "not set";
+
   if (!this->mpLibHandle)
   {
     std::string dl_err = dlerror();

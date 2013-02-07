@@ -86,7 +86,7 @@ public:
 protected:
   void setProperties();
   void applySettingsToCamera();
-  bool createCaptureDevice();
+  bool createCaptureObject();
   void applyStateToCamera();
 
   //--------------------------------------------------------------------------------------------------------------------
