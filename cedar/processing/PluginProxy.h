@@ -83,6 +83,10 @@ public:
    */
   static std::string getPluginNameFromPath(const std::string& path);
 
+#ifdef CEDAR_OS_UNIX
+  static void abortHandler(int signal);
+#endif // CEDAR_OS_UNIX
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -117,6 +121,11 @@ private:
   //! Handle to the dynamically loaded library.
 #ifdef CEDAR_OS_UNIX
   void *mpLibHandle;
+
+  /*! The plugin that is currently being loaded -- used to report to the user if a SIGABRT was caught during plugin
+   *  loading
+   */
+  static std::string mPluginBeingLoaded;
 #elif defined CEDAR_OS_WINDOWS
   HMODULE mpLibHandle;
 #else

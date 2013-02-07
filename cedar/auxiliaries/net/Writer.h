@@ -41,10 +41,10 @@
 #include "cedar/auxiliaries/net/namespace.h"
 #include "cedar/auxiliaries/net/exceptions.h"
 #include "cedar/auxiliaries/net/detail/namespace.h"
-#include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetWriter.h"
-#include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetWriter.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatHelper.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/std/StringHelper.h"
+#include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetWriter.h"
+#include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetWriter.h"
 
 // PROJECT INCLUDES
 #include <boost/static_assert.hpp>
@@ -313,6 +313,14 @@ public:
                            : cedar::aux::net::detail::CollatedNetWriter<std::string>(s)
   {
   }
+
+private:
+  bool checkCollatedDataForWrite(const cedar::aux::net::detail::CollatedTraits<std::string>::DataType &data,
+                                 cedar::aux::net::detail::CollatedTraits<std::string>::HeaderType &header)
+  {
+    return cedar::aux::net::detail::StringHelper<std::string>::checkCollatedDataForWrite(data,header);
+  }
+
 };
 
   //---------------------------------------------------------------------------
@@ -331,6 +339,14 @@ public:
                            cedar::aux::net::detail::CollatedNetWriter<cv::Mat>(myPortName)
   {
   }
+
+private:
+  bool checkCollatedDataForWrite(const cedar::aux::net::detail::CollatedTraits<cv::Mat>::DataType &data,
+                                 cedar::aux::net::detail::CollatedTraits<cv::Mat>::HeaderType &header)
+  {
+    return cedar::aux::net::detail::cvMatHelper<cv::Mat>::checkCollatedDataForWrite(data,header);
+  }
+
 };
 
   //---------------------------------------------------------------------------
@@ -350,6 +366,14 @@ public:
                            cedar::aux::net::detail::CollatedNetWriter< cv::Mat_<float> >(myPortName)
   {
   }
+
+private:
+  bool checkCollatedDataForWrite(const cedar::aux::net::detail::CollatedTraits<cv::Mat_<float> >::DataType &data,
+                                 cedar::aux::net::detail::CollatedTraits<cv::Mat_<float> >::HeaderType &header)
+  {
+    return cedar::aux::net::detail::cvMatHelper<cv::Mat_<float> >::checkCollatedDataForWrite(data,header);
+  }
+
 };
 
 

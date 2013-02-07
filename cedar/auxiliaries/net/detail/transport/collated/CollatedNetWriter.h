@@ -108,6 +108,9 @@ public:
 #endif
   }
 
+private:
+  virtual bool checkCollatedDataForWrite(const typename CollatedTraits<T>::DataType &data,
+                                         typename CollatedTraits<T>::HeaderType &header) = 0;
 
   //---------------------------------------------------------------------------
   // public methods

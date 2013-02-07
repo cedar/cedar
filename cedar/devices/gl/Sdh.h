@@ -58,7 +58,10 @@ public:
   //!@brief constructor
   Sdh
   (
-    cedar::dev::KinematicChainPtr pKinematicChain
+    cedar::dev::KinematicChainPtr fingerOne,
+    cedar::dev::KinematicChainPtr fingerTwo,
+    cedar::dev::KinematicChainPtr fingerThree,
+    cedar::dev::KinematicChainPtr palm
   );
   //!@brief destructor
   ~Sdh();
@@ -70,12 +73,13 @@ public:
   //!@brief the visualization initializes resources in the current GL context
   virtual void initializeGl();
 
+  //!@brief draws the hand
+  void draw();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief draws the hand
-  void draw();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -89,7 +93,10 @@ private:
 protected:
   // none yet
 private:
-  cedar::dev::KinematicChainPtr mpKinematicChain;
+  cedar::dev::KinematicChainPtr mpFingerOne;
+  cedar::dev::KinematicChainPtr mpFingerTwo;
+  cedar::dev::KinematicChainPtr mpFingerThree;
+  cedar::dev::KinematicChainPtr mpPalm;
 
   // palm
   static const unsigned int mPalmVertexNumber = 7103;

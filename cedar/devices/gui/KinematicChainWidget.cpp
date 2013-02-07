@@ -75,16 +75,14 @@ cedar::dev::gui::KinematicChainWidget::~KinematicChainWidget()
 
 void cedar::dev::gui::KinematicChainWidget::init(cedar::dev::KinematicChainPtr kinematicChain)
 {
-  setWindowTitle(QApplication::translate("KinematicChainWindow", "KinematicChain"));
+  setWindowTitle(QString(kinematicChain->getName().c_str()));
 
   QGridLayout* p_layout = new QGridLayout();
   QGroupBox* p_monitor_group = new QGroupBox();
-//  p_monitor_group->setTitle("Monitor");
   p_layout->addWidget(p_monitor_group, 0, 0);
   mpMonitorWidget = new cedar::dev::gui::KinematicChainMonitorWidget(kinematicChain, this);
   p_layout->addWidget(mpMonitorWidget, 0, 0);
   QGroupBox* p_command_group = new QGroupBox();
-//  p_command_group->setTitle("Command");
   p_layout->addWidget(p_command_group, 0, 1);
   mpCommandWidget = new cedar::dev::gui::KinematicChainCommandWidget(kinematicChain);
   p_layout->addWidget(mpCommandWidget, 0, 1);

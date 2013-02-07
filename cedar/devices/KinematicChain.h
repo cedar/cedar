@@ -44,6 +44,7 @@
 #include "cedar/devices/namespace.h"
 #include "cedar/devices/Component.h"
 #include "cedar/auxiliaries/LoopedThread.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 
@@ -63,7 +64,8 @@
 class cedar::dev::KinematicChain
 :
 public cedar::dev::Component,
-public cedar::aux::LoopedThread
+public cedar::aux::LoopedThread,
+public cedar::aux::NamedConfigurable
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------
@@ -555,10 +557,10 @@ private:
 
   /*!@brief gives the temporal derivative of a joint twist in the current configuration
    *
-   * @param index    index of the joint twist
-   * @return    derivative of the joint twist, 6 \f$\times\f$ 1 matrix
+   * @param jointIndex index of the joint twist
+   * @return derivative of the joint twist, 6 \f$\times\f$ 1 matrix
    */
-  cv::Mat calculateTwistTemporalDerivative(unsigned int index);
+  cv::Mat calculateTwistTemporalDerivative(unsigned int jointIndex);
 
 
   //----------------------------------------------------------------------------

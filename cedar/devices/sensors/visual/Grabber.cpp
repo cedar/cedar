@@ -314,6 +314,11 @@ bool cedar::dev::sensors::visual::Grabber::applyParameter()
   if (this->onCreateGrabber())
   {
     mCaptureDeviceCreated = true;
+    for (unsigned int channel = 0; channel < getNumCams(); ++channel)
+    {
+      std::string channelinfo = onUpdateSourceInfo(channel);
+      setChannelInfoString(channel,channelinfo);
+    }
   }
   else
   {
@@ -325,7 +330,6 @@ bool cedar::dev::sensors::visual::Grabber::applyParameter()
                                              );
     this->closeGrabber();
   }
-
   return mCaptureDeviceCreated;
 }
 
@@ -445,6 +449,11 @@ void cedar::dev::sensors::visual::Grabber::stopGrabber()
     this->stopRecording();
   }
   mIsGrabbing = false;
+}
+
+void cedar::dev::sensors::visual::Grabber::setIsGrabbing(bool isGrabbing)
+{
+  mIsGrabbing = isGrabbing;
 }
 
 //--------------------------------------------------------------------------------------------------------------------
