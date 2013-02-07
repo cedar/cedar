@@ -569,7 +569,7 @@ protected:
    *  @param channel The channel to grab from
    *
    */
-  virtual bool onGrab();
+  virtual bool onGrab(unsigned int channel);
 
 
   /*! @brief Updates the channel informations
@@ -681,6 +681,9 @@ private:
 
     //! @brief Used for concurrent access to the mIsGrabbing flag
     QReadWriteLock* mpLockIsGrabbing;
+
+    //! @brief Used for blocking other threads while grabber is created
+    QReadWriteLock* mpLockIsCreating;
 
     ///! @brief Flag which indicates if the GrabberThread was started during startRecording
     bool mGrabberThreadStartedOnRecording;
