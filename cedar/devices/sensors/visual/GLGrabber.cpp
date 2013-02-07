@@ -130,8 +130,6 @@ bool cedar::dev::sensors::visual::GLGrabber::onCreateGrabber()
                                             this->getName() + init_message.str(),
                                              "cedar::dev::sensors::visual::OglGrabber::onCreateGrabber()"
                                            );
-  // Grab first frames
-  onGrab();
   return true;
 }
 
@@ -168,43 +166,40 @@ std::string cedar::dev::sensors::visual::GLGrabber::onUpdateSourceInfo(unsigned 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::GLGrabber::onGrab()
+bool cedar::dev::sensors::visual::GLGrabber::onGrab(unsigned int channel)
 {
   bool ogl_valid = true;
-  unsigned int num_cams = getNumCams();
-  for(unsigned int channel = 0; channel < num_cams; ++channel)
+
+  if (getGLChannel(channel)->mpQGLWidget != NULL)
   {
-    if (getGLChannel(channel)->mpQGLWidget != NULL)
-    {
-      QGLWidget* p_channel_widget = getGLChannel(channel)->mpQGLWidget;
+    QGLWidget* p_channel_widget = getGLChannel(channel)->mpQGLWidget;
 
-      // grab framebuffer without alpha-channel. possible values
-      // GL_FRONT_LEFT, GL_FRONT_RIGHT, GL_BACK_LEFT, GL_BACK_RIGHT, GL_FRONT, GL_BACK, GL_LEFT, GL_RIGHT, GL_AUXi,
-      // where i is between 0 and the value of GL_AUX_BUFFERS minus 1.
+    // grab framebuffer without alpha-channel. possible values
+    // GL_FRONT_LEFT, GL_FRONT_RIGHT, GL_BACK_LEFT, GL_BACK_RIGHT, GL_FRONT, GL_BACK, GL_LEFT, GL_RIGHT, GL_AUXi,
+    // where i is between 0 and the value of GL_AUX_BUFFERS minus 1.
 
-      // activate this thread for painting
-      // problem: qgl-widget painting also have to be multithreaded, i.e also have to invoke makeCurrent(), doneCurrent()
-      // p_channel_widget->makeCurrent();
-      glReadBuffer(GL_FRONT_RIGHT);
-      QImage qimage = p_channel_widget->grabFrameBuffer(false);
-      // p_channel_widget->doneCurrent();
+    // activate this thread for painting
+    // problem: qgl-widget painting also have to be multithreaded, i.e also have to invoke makeCurrent(), doneCurrent()
+    // p_channel_widget->makeCurrent();
+    glReadBuffer(GL_FRONT_RIGHT);
+    QImage qimage = p_channel_widget->grabFrameBuffer(false);
+    // p_channel_widget->doneCurrent();
 
-      // QImage to cv::Mat
-      cv::Mat mat =
-         cv::Mat(qimage.height(), qimage.width(), CV_8UC4, static_cast<uchar*>(qimage.bits()), qimage.bytesPerLine());
-      cv::Mat mat2 = cv::Mat(mat.rows, mat.cols, CV_8UC3 );
-      int from_to[] = { 0,0, 1,1, 2,2 };
-      cv::mixChannels( &mat, 1, &mat2, 1, from_to, 3 );
+    // QImage to cv::Mat
+    cv::Mat mat =
+       cv::Mat(qimage.height(), qimage.width(), CV_8UC4, static_cast<uchar*>(qimage.bits()), qimage.bytesPerLine());
+    cv::Mat mat2 = cv::Mat(mat.rows, mat.cols, CV_8UC3 );
+    int from_to[] = { 0,0, 1,1, 2,2 };
+    cv::mixChannels( &mat, 1, &mat2, 1, from_to, 3 );
 
-      // apply the new content to the channel image
-      getImageMat(channel) = mat2.clone();
-    }
-    else
-    {
-      // if opengl context isn't valid, then an empty matrix will be return
-      ogl_valid = false;
-      getImageMat(channel) = cv::Mat();
-    }
+    // apply the new content to the channel image
+    getImageMat(channel) = mat2.clone();
+  }
+  else
+  {
+    // if opengl context isn't valid, then an empty matrix will be return
+    ogl_valid = false;
+    getImageMat(channel) = cv::Mat();
   }
   return ogl_valid;
 }

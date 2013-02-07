@@ -278,8 +278,7 @@ void cedar::dev::sensors::camera::Grabber::onCloseGrabber()
 bool cedar::dev::sensors::camera::Grabber::onCreateGrabber()
 {
 #ifdef DEBUG_CAMERA_GRABBER
-  std::cout << __PRETTY_FUNCTION__ << std::endl;
-  //std::cout << "mCaptureDeviceCreated" << std::boolalpha << " : " << this->isCreated() << std::endl;
+  std::cout << __PRETTY_FUNCTION__ << " start" << std::endl;
 #endif
 
   // number of channels
@@ -356,6 +355,10 @@ bool cedar::dev::sensors::camera::Grabber::onCreateGrabber()
   {
     result = false;
   }
+
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << " end" << std::endl;
+#endif
 
   return result;
 }
@@ -493,20 +496,22 @@ std::vector<std::string> cedar::dev::sensors::camera::Grabber::getAllProperties(
 }
 
 
-
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::camera::Grabber::onGrab()
+bool cedar::dev::sensors::camera::Grabber::onGrab(unsigned int channel)
 {
-  bool result = true;
-  unsigned int num_cams = getNumCams();
+  getCameraChannel(channel)->mpVideoCaptureLock->lockForWrite();
 
-  // grab and retrieve
-  for(unsigned int channel = 0; channel < num_cams; ++channel)
+  bool result = false;
+  result = getCameraChannel(channel)->mVideoCapture.read(getImageMat(channel));
+
+#ifdef DEBUG_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << " grab channel " << channel << "; result of read-function: "
+            << std::boolalpha << result
+            << " thread: " << QThread::currentThread() << std::endl;
+#endif
+
+  if (result)
   {
-
-    getCameraChannel(channel)->mpVideoCaptureLock->lockForWrite();
-    result = getCameraChannel(channel)->mVideoCapture.read(getImageMat(channel)) & result;
-
     // check if conversion from bayer-pattern to cv::Mat BGR format is needed
     cedar::dev::sensors::camera::Decoding::Id debayer_fiter;
     debayer_fiter = this->getCameraChannel(channel)->_mpDecodeFilter->getValue();
@@ -515,36 +520,11 @@ bool cedar::dev::sensors::camera::Grabber::onGrab()
     {
       cv::cvtColor(getImageMat(channel),getImageMat(channel),debayer_fiter);
     }
-
-    getCameraChannel(channel)->mpVideoCaptureLock->unlock();
-
   }
 
-  // OpenCV documentation:
-  // for better synchronizing between the cameras,
-  // first grab internally in camera
-  // lock for concurrent access in the grabber-thread and in the get/set properties
-
-//  for(unsigned int channel = 0; channel < num_cams; ++channel)
-//  {
-//    getCameraChannel(channel)->mpVideoCaptureLock->lockForWrite();
-//    result = getCameraChannel(channel)->mVideoCapture.grab() && result;
-//    getCameraChannel(channel)->mpVideoCaptureLock->unlock();
-//  }
-//
-//  // and then retrieve the frames
-//  if (result)
-//  {
-//    for(unsigned int channel = 0; channel < num_cams; ++channel)
-//    {
-//      getCameraChannel(channel)->mpVideoCaptureLock->lockForWrite();
-//      result = getCameraChannel(channel)->mVideoCapture.retrieve(getImageMat(channel)) && result;
-//      getCameraChannel(channel)->mpVideoCaptureLock->unlock();
-//    }
-//  }
+  getCameraChannel(channel)->mpVideoCaptureLock->unlock();
   return result;
 }
-
 
 
 //----------------------------------------------------------------------------------------------------
@@ -595,6 +575,7 @@ unsigned int cedar::dev::sensors::camera::Grabber::getCameraId(unsigned int chan
   return getCameraChannel(channel)->getCameraId();
 }
 
+//----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::camera::Grabber::isGuid(unsigned int channel)
 {
   if (channel >= getNumCams())
