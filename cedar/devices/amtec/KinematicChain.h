@@ -45,7 +45,7 @@
 #include "cedar/auxiliaries/IntVectorParameter.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/devices/amtec/namespace.h"
-#include "cedar/devices/robot/KinematicChain.h"
+#include "cedar/devices/KinematicChain.h"
 
 // SYSTEM INCLUDES
 
@@ -68,7 +68,7 @@
 
 /*!@brief KinematicChain implementation for Amtec modules
  */
-class cedar::dev::amtec::KinematicChain : public cedar::dev::robot::KinematicChain
+class cedar::dev::amtec::KinematicChain : public cedar::dev::KinematicChain
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

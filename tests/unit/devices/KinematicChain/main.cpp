@@ -468,21 +468,21 @@ int main()
   cv::Mat p1 = root_transformation * complex_test_arm->getJointTransformation(1) * p_local;
   cv::Mat p2 = root_transformation * complex_test_arm->getJointTransformation(2) * p_local;
   cv::Mat p3 = root_transformation * complex_test_arm->getJointTransformation(3) * p_local;
-  cv::Mat v0 = complex_test_arm->calculateVelocity(p_local, 0, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  cv::Mat v1 = complex_test_arm->calculateVelocity(p_local, 1, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  cv::Mat v2 = complex_test_arm->calculateVelocity(p_local, 2, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  cv::Mat v3 = complex_test_arm->calculateVelocity(p_local, 3, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  cv::Mat a0 = complex_test_arm->calculateAcceleration(p_local, 0, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  cv::Mat a1 = complex_test_arm->calculateAcceleration(p_local, 1, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  cv::Mat a2 = complex_test_arm->calculateAcceleration(p_local, 2, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  cv::Mat a3 = complex_test_arm->calculateAcceleration(p_local, 3, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
+  cv::Mat v0 = complex_test_arm->calculateVelocity(p_local, 0, cedar::dev::KinematicChain::LOCAL_COORDINATES);
+  cv::Mat v1 = complex_test_arm->calculateVelocity(p_local, 1, cedar::dev::KinematicChain::LOCAL_COORDINATES);
+  cv::Mat v2 = complex_test_arm->calculateVelocity(p_local, 2, cedar::dev::KinematicChain::LOCAL_COORDINATES);
+  cv::Mat v3 = complex_test_arm->calculateVelocity(p_local, 3, cedar::dev::KinematicChain::LOCAL_COORDINATES);
+  cv::Mat a0 = complex_test_arm->calculateAcceleration(p_local, 0, cedar::dev::KinematicChain::LOCAL_COORDINATES);
+  cv::Mat a1 = complex_test_arm->calculateAcceleration(p_local, 1, cedar::dev::KinematicChain::LOCAL_COORDINATES);
+  cv::Mat a2 = complex_test_arm->calculateAcceleration(p_local, 2, cedar::dev::KinematicChain::LOCAL_COORDINATES);
+  cv::Mat a3 = complex_test_arm->calculateAcceleration(p_local, 3, cedar::dev::KinematicChain::LOCAL_COORDINATES);
   spatial_jacobian
     = complex_test_arm->calculateSpatialJacobian(complex_test_arm->getNumberOfJoints() - 1);
   cv::Mat cartesian_jacobian = complex_test_arm->calculateCartesianJacobian
   (
     p_local,
     complex_test_arm->getNumberOfJoints()-1,
-    cedar::dev::robot::KinematicChain::LOCAL_COORDINATES
+    cedar::dev::KinematicChain::LOCAL_COORDINATES
   );
   cv::Mat p_eef = complex_test_arm->calculateEndEffectorPosition();
   cv::Mat v_eef = complex_test_arm->calculateEndEffectorVelocity();
@@ -495,7 +495,7 @@ int main()
   (
     p_local,
     complex_test_arm->getNumberOfJoints()-1,
-    cedar::dev::robot::KinematicChain::LOCAL_COORDINATES
+    cedar::dev::KinematicChain::LOCAL_COORDINATES
   );
 
   // make a small step for finite difference method
@@ -518,21 +518,21 @@ int main()
   cv::Mat p1_new = root_transformation * complex_test_arm->getJointTransformation(1) * p_local;
   cv::Mat p2_new = root_transformation * complex_test_arm->getJointTransformation(2) * p_local;
   cv::Mat p3_new = root_transformation * complex_test_arm->getJointTransformation(3) * p_local;
-  cv::Mat v0_new = complex_test_arm->calculateVelocity(p_local, 0, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  cv::Mat v1_new = complex_test_arm->calculateVelocity(p_local, 1, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  cv::Mat v2_new = complex_test_arm->calculateVelocity(p_local, 2, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  cv::Mat v3_new = complex_test_arm->calculateVelocity(p_local, 3, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  cv::Mat a0_new = complex_test_arm->calculateAcceleration(p_local, 0, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  cv::Mat a1_new = complex_test_arm->calculateAcceleration(p_local, 1, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  cv::Mat a2_new = complex_test_arm->calculateAcceleration(p_local, 2, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
-  cv::Mat a3_new = complex_test_arm->calculateAcceleration(p_local, 3, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
+  cv::Mat v0_new = complex_test_arm->calculateVelocity(p_local, 0, cedar::dev::KinematicChain::LOCAL_COORDINATES);
+  cv::Mat v1_new = complex_test_arm->calculateVelocity(p_local, 1, cedar::dev::KinematicChain::LOCAL_COORDINATES);
+  cv::Mat v2_new = complex_test_arm->calculateVelocity(p_local, 2, cedar::dev::KinematicChain::LOCAL_COORDINATES);
+  cv::Mat v3_new = complex_test_arm->calculateVelocity(p_local, 3, cedar::dev::KinematicChain::LOCAL_COORDINATES);
+  cv::Mat a0_new = complex_test_arm->calculateAcceleration(p_local, 0, cedar::dev::KinematicChain::LOCAL_COORDINATES);
+  cv::Mat a1_new = complex_test_arm->calculateAcceleration(p_local, 1, cedar::dev::KinematicChain::LOCAL_COORDINATES);
+  cv::Mat a2_new = complex_test_arm->calculateAcceleration(p_local, 2, cedar::dev::KinematicChain::LOCAL_COORDINATES);
+  cv::Mat a3_new = complex_test_arm->calculateAcceleration(p_local, 3, cedar::dev::KinematicChain::LOCAL_COORDINATES);
   cv::Mat spatial_jacobian_new
     = complex_test_arm->calculateSpatialJacobian(complex_test_arm->getNumberOfJoints() - 1);
   cv::Mat cartesian_jacobian_new = complex_test_arm->calculateCartesianJacobian
   (
     p_local,
     complex_test_arm->getNumberOfJoints()-1,
-    cedar::dev::robot::KinematicChain::LOCAL_COORDINATES
+    cedar::dev::KinematicChain::LOCAL_COORDINATES
   );
   cv::Mat p_eef_new = complex_test_arm->calculateEndEffectorPosition();
   cv::Mat v_eef_new = complex_test_arm->calculateEndEffectorVelocity();

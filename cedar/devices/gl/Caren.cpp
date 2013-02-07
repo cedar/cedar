@@ -37,9 +37,9 @@
 #define NOMINMAX // to avoid Windows issues
 
 // CEDAR INCLUDES
-#include "cedar/devices/robot/gl/Caren.h"
-#include "cedar/devices/robot/gl/KukaArm.h"
-#include "cedar/devices/robot/gl/Sdh.h"
+#include "cedar/devices/gl/Caren.h"
+#include "cedar/devices/gl/KukaArm.h"
+#include "cedar/devices/gl/Sdh.h"
 #include "cedar/auxiliaries/gl/gl.h"
 #include "cedar/auxiliaries/gl/drawShapes.h"
 
@@ -49,15 +49,15 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::robot::gl::Caren::Caren
+cedar::dev::gl::Caren::Caren
 (
-  cedar::dev::robot::KinematicChainPtr trunk,
-  cedar::dev::robot::KinematicChainPtr arm,
-  cedar::dev::robot::KinematicChainPtr head,
-  cedar::dev::robot::KinematicChainPtr palm,
-  cedar::dev::robot::KinematicChainPtr fingerOne,
-  cedar::dev::robot::KinematicChainPtr fingerTwo,
-  cedar::dev::robot::KinematicChainPtr fingerThree
+  cedar::dev::KinematicChainPtr trunk,
+  cedar::dev::KinematicChainPtr arm,
+  cedar::dev::KinematicChainPtr head,
+  cedar::dev::KinematicChainPtr palm,
+  cedar::dev::KinematicChainPtr fingerOne,
+  cedar::dev::KinematicChainPtr fingerTwo,
+  cedar::dev::KinematicChainPtr fingerThree
 )
 :
 cedar::aux::gl::ObjectVisualization(trunk->getRootCoordinateFrame()),
@@ -68,13 +68,13 @@ mPalm(palm),
 mFingerOne(fingerOne),
 mFingerTwo(fingerTwo),
 mFingerThree(fingerThree),
-mArmVisualization(new cedar::dev::robot::gl::KukaArm(arm)),
-mHandVisualization(new cedar::dev::robot::gl::Sdh(fingerOne, fingerTwo, fingerThree, palm))
+mArmVisualization(new cedar::dev::gl::KukaArm(arm)),
+mHandVisualization(new cedar::dev::gl::Sdh(fingerOne, fingerTwo, fingerThree, palm))
 {
 
 }
 
-cedar::dev::robot::gl::Caren::~Caren()
+cedar::dev::gl::Caren::~Caren()
 {
 
 }
@@ -83,20 +83,20 @@ cedar::dev::robot::gl::Caren::~Caren()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::robot::gl::Caren::initializeGl()
+void cedar::dev::gl::Caren::initializeGl()
 {
   mArmVisualization->initializeGl();
   mHandVisualization->initializeGl();
 }
 
-void cedar::dev::robot::gl::Caren::draw()
+void cedar::dev::gl::Caren::draw()
 {
 //  drawBase();
   mArmVisualization->draw();
   mHandVisualization->draw();
 }
 
-void cedar::dev::robot::gl::Caren::drawBase()
+void cedar::dev::gl::Caren::drawBase()
 {
   // move to origin
   glPopMatrix();
@@ -129,7 +129,7 @@ void cedar::dev::robot::gl::Caren::drawBase()
 
 }
 
-void cedar::dev::robot::gl::Caren::drawCamera()
+void cedar::dev::gl::Caren::drawCamera()
 {
 //  setMaterial(WHITE_PLASTIC);
 //  glRotated(90, 1, 0, 0);
