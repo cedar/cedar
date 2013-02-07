@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 
   // create simulated arm
   std::string finger_one_configuration_file = cedar::aux::locateResource("configs/test_arm.json");
-  cedar::dev::robot::KinematicChainPtr test_arm(new cedar::dev::SimulatedKinematicChain());
+  cedar::dev::KinematicChainPtr test_arm(new cedar::dev::SimulatedKinematicChain());
   test_arm->readJson(finger_one_configuration_file);
 
   // create gl visualization objects

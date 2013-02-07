@@ -64,8 +64,7 @@
 class cedar::dev::KinematicChain
 :
 public cedar::dev::Component,
-public cedar::aux::LoopedThread,
-public cedar::aux::NamedConfigurable
+public cedar::aux::LoopedThread
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------

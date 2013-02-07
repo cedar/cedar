@@ -953,7 +953,7 @@ cv::Mat cedar::dev::KinematicChain::calculateSpatialJacobianTemporalDerivative(u
   return J;
 }
 
-cv::Mat cedar::dev::KinematicChain::calculateTwistTemporalDerivative(unsigned int j)
+cv::Mat cedar::dev::KinematicChain::calculateTwistTemporalDerivative(unsigned int jointIndex)
 {
   // calculate transformation to (j-1)-th joint frame
   cv::Mat g = cv::Mat::zeros(4, 4, CV_64FC1);

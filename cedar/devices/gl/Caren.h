@@ -38,8 +38,8 @@
 #define CEDAR_DEV_ROBOT_GL_CAREN_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/robot/gl/namespace.h"
-#include "cedar/devices/robot/KinematicChain.h"
+#include "cedar/devices/gl/namespace.h"
+#include "cedar/devices/KinematicChain.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
 
 // SYSTEM INCLUDES
@@ -48,7 +48,7 @@
  *
  * This class provides a simple OpenGL visualization of Caren.
  */
-class cedar::dev::robot::gl::Caren : public cedar::aux::gl::ObjectVisualization
+class cedar::dev::gl::Caren : public cedar::aux::gl::ObjectVisualization
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -57,13 +57,13 @@ public:
   //!@brief constructor
   Caren
   (
-    cedar::dev::robot::KinematicChainPtr trunk,
-    cedar::dev::robot::KinematicChainPtr arm,
-    cedar::dev::robot::KinematicChainPtr head,
-    cedar::dev::robot::KinematicChainPtr palm,
-    cedar::dev::robot::KinematicChainPtr fingerOne,
-    cedar::dev::robot::KinematicChainPtr fingerTwo,
-    cedar::dev::robot::KinematicChainPtr fingerThree
+    cedar::dev::KinematicChainPtr trunk,
+    cedar::dev::KinematicChainPtr arm,
+    cedar::dev::KinematicChainPtr head,
+    cedar::dev::KinematicChainPtr palm,
+    cedar::dev::KinematicChainPtr fingerOne,
+    cedar::dev::KinematicChainPtr fingerTwo,
+    cedar::dev::KinematicChainPtr fingerThree
   );
   //!@brief destructor
   ~Caren();
@@ -99,16 +99,16 @@ public:
 protected:
   // none yet
 private:
-  cedar::dev::robot::KinematicChainPtr mTrunk;
-  cedar::dev::robot::KinematicChainPtr mArm;
-  cedar::dev::robot::KinematicChainPtr mHead;
-  cedar::dev::robot::KinematicChainPtr mPalm;
-  cedar::dev::robot::KinematicChainPtr mFingerOne;
-  cedar::dev::robot::KinematicChainPtr mFingerTwo;
-  cedar::dev::robot::KinematicChainPtr mFingerThree;
-  cedar::dev::robot::gl::KinematicChainPtr mArmVisualization;
-  cedar::dev::robot::gl::SdhPtr mHandVisualization;
+  cedar::dev::KinematicChainPtr mTrunk;
+  cedar::dev::KinematicChainPtr mArm;
+  cedar::dev::KinematicChainPtr mHead;
+  cedar::dev::KinematicChainPtr mPalm;
+  cedar::dev::KinematicChainPtr mFingerOne;
+  cedar::dev::KinematicChainPtr mFingerTwo;
+  cedar::dev::KinematicChainPtr mFingerThree;
+  cedar::dev::gl::KinematicChainPtr mArmVisualization;
+  cedar::dev::gl::SdhPtr mHandVisualization;
 
-}; // class cedar::dev::robot::gl::Caren
+}; // class cedar::dev::gl::Caren
 #endif // CEDAR_DEV_ROBOT_GL_CAREN_H
 
