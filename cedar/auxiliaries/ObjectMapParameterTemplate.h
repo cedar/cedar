@@ -256,17 +256,17 @@ namespace cedar
  *
  * @todo describe more.
  */
-template <class ValueType, class AllocationPolicy>
-class cedar::aux::ObjectMapParameterTemplate : public cedar::aux::Parameter, public AllocationPolicy
+template <class ValueType, class TAllocationPolicy = allocationPolicies::Instantly<ValueType> >
+class cedar::aux::ObjectMapParameterTemplate : public cedar::aux::Parameter, public TAllocationPolicy
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  typedef typename AllocationPolicy::iterator iterator;
-  typedef typename AllocationPolicy::const_iterator const_iterator;
-  typedef typename AllocationPolicy::reverse_iterator reverse_iterator;
-  typedef typename AllocationPolicy::const_reverse_iterator const_reverse_iterator;
+  typedef typename TAllocationPolicy::iterator iterator;
+  typedef typename TAllocationPolicy::const_iterator const_iterator;
+  typedef typename TAllocationPolicy::reverse_iterator reverse_iterator;
+  typedef typename TAllocationPolicy::const_reverse_iterator const_reverse_iterator;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -289,7 +289,7 @@ public:
   (
     cedar::aux::Configurable *pOwner,
     const std::string& name,
-    const std::map<std::string, typename AllocationPolicy::ValueTypePtr>& defaults
+    const std::map<std::string, typename TAllocationPolicy::ValueTypePtr>& defaults
   )
   :
   cedar::aux::Parameter(pOwner, name, true)
@@ -315,7 +315,7 @@ public:
 
       CEDAR_ASSERT(object_node.size() == 1);
 
-      AllocationPolicy::readObject(key, object_node);
+      TAllocationPolicy::readObject(key, object_node);
     }
   }
 
@@ -361,7 +361,7 @@ public:
 
   /*!@brief Returns the given element.
    */
-  typename AllocationPolicy::ValueTypePtr get(const std::string& key)
+  typename TAllocationPolicy::ValueTypePtr get(const std::string& key)
   {
     return (*this)[key];
   }
@@ -387,61 +387,61 @@ public:
   }
 
   //!@brief find an object through a given key
-  typename AllocationPolicy::iterator find(const std::string& key)
+  typename TAllocationPolicy::iterator find(const std::string& key)
   {
     return this->mObjectMap.find(key);
   }
 
   //!@brief find an object through a given key (const)
-  typename AllocationPolicy::const_iterator find(const std::string& key) const
+  typename TAllocationPolicy::const_iterator find(const std::string& key) const
   {
     return this->mObjectMap.find(key);
   }
 
   //!@brief returns an iterator to the first element of the map
-  typename AllocationPolicy::iterator begin()
+  typename TAllocationPolicy::iterator begin()
   {
     return this->storage().begin();
   }
 
   //!@brief returns an iterator to the first element of the map (const)
-  typename AllocationPolicy::const_iterator begin() const
+  typename TAllocationPolicy::const_iterator begin() const
   {
     return this->storage().begin();
   }
 
   //!@brief returns a reverse iterator to the beginning of the data structure
-  typename AllocationPolicy::reverse_iterator rbegin()
+  typename TAllocationPolicy::reverse_iterator rbegin()
   {
     return this->storage().rbegin();
   }
 
   //!@brief returns a reverse iterator to the beginning of the data structure (const)
-  typename AllocationPolicy::const_reverse_iterator rbegin() const
+  typename TAllocationPolicy::const_reverse_iterator rbegin() const
   {
     return this->storage().rbegin();
   }
 
   //!@brief returns an iterator to the end of the map
-  typename AllocationPolicy::iterator end()
+  typename TAllocationPolicy::iterator end()
   {
     return this->storage().end();
   }
 
   //!@brief returns an iterator to the end of the map (const)
-  typename AllocationPolicy::const_iterator end() const
+  typename TAllocationPolicy::const_iterator end() const
   {
     return this->storage().end();
   }
 
   //!@brief returns a reverse iterator to the end
-  typename AllocationPolicy::reverse_iterator rend()
+  typename TAllocationPolicy::reverse_iterator rend()
   {
     return this->storage().rend();
   }
 
   //!@brief returns a reverse iterator (const) to the end
-  typename AllocationPolicy::const_reverse_iterator rend() const
+  typename TAllocationPolicy::const_reverse_iterator rend() const
   {
     return this->mObjectMap.rend();
   }
@@ -461,7 +461,7 @@ private:
   void setChangedFlag(bool changed)
   {
     // set the changed flag for the objects managed by the parameter
-    typename std::map<std::string, typename AllocationPolicy::ValueTypePtr>::iterator map_it;
+    typename std::map<std::string, typename TAllocationPolicy::ValueTypePtr>::iterator map_it;
     for (map_it = this->mObjectMap.begin(); map_it != this->mObjectMap.end(); ++map_it)
     {
       map_it->second->resetChangedStates(changed);
@@ -479,7 +479,7 @@ protected:
   // none yet
 private:
   //! The default values.
-  std::map<std::string, typename AllocationPolicy::ValueTypePtr> mDefaults;
+  std::map<std::string, typename TAllocationPolicy::ValueTypePtr> mDefaults;
 
 }; // class cedar::aux::ObjectMapParameterTemplate
 

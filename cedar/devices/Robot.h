@@ -59,11 +59,11 @@ class cedar::dev::Robot : public cedar::aux::NamedConfigurable,
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend std::ostream& operator<<(std::ostream& stream, const cedar::dev::Robot& robot);
+  friend CEDAR_DEV_LIB_EXPORT std::ostream& operator<<(std::ostream& stream, const cedar::dev::Robot& robot);
 
-  friend std::ostream& operator<<(std::ostream& stream, cedar::dev::ConstRobotPtr robot);
+  friend CEDAR_DEV_LIB_EXPORT std::ostream& operator<<(std::ostream& stream, cedar::dev::ConstRobotPtr robot);
 
-  friend std::ostream& operator<<(std::ostream& stream, cedar::dev::RobotPtr robot);
+  friend CEDAR_DEV_LIB_EXPORT std::ostream& operator<<(std::ostream& stream, cedar::dev::RobotPtr robot);
 
   //--------------------------------------------------------------------------------------------------------------------
   // types
