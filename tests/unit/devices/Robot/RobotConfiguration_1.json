@@ -1,0 +1,11 @@
+{
+  "name": "concrete test robot",
+  "description file": "RobotDescription.json",
+  "component slots":
+  {
+    "component slot 1":
+    {
+      "channel type": "channel 1"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "default e-puck robot",
+  "description file": "configs/epuck/description.json",
+  "component slots":
+  {
+    "drive":
+    {
+      "channel type": "serial"
+    },
+    "ambient light sensor":
+    {
+      "channel type": "serial"
+    },
+    "proximity sensor":
+    {
+      "channel type": "serial"
+    },
+    "acceleration sensor":
+    {
+      "channel type": "serial"
+    },
+    "led":
+    {
+      "channel type": "serial"
+    }
+  }
+}
