@@ -64,6 +64,7 @@ void checkSerialCommunicationAnswer
   // if no expected answer is supplied, it is assumed that the expected answer is the command in lower case
   if (expected_answer.empty())
   {
+    expected_answer.resize(command.size());
     std::transform(command.begin(), command.end(), expected_answer.begin(), ::tolower);
   }
 
