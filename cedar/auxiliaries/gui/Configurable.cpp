@@ -39,12 +39,72 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/Configurable.h"
+#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/Parameter.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
+#include <QHeaderView>
+#include <QAbstractItemModel>
+#include <QStyledItemDelegate>
+#include <QList>
+#include <QLabel>
+
+//----------------------------------------------------------------------------------------------------------------------
+// delegate that tells the QTreeWidget what widget to open for editing parameters
+//----------------------------------------------------------------------------------------------------------------------
+
+class DataDelegate : public QStyledItemDelegate
+{
+  public:
+    DataDelegate(cedar::aux::ConfigurablePtr pConfigurable)
+    :
+    mpConfigurable(pConfigurable)
+    {
+    }
+
+    QWidget *createEditor
+             (
+               QWidget *pParent,
+               const QStyleOptionViewItem& /*option*/,
+               const QModelIndex &index
+             )
+             const
+    {
+      // Get the name of the parameter for which to return the edit widget.
+      std::string parameter_path = index.data(Qt::UserRole).toString().toStdString();
+
+      cedar::aux::ParameterPtr parameter = this->mpConfigurable->getParameter(parameter_path);
+
+      QWidget* p_ret = NULL;
+      try
+      {
+        cedar::aux::gui::Parameter *p_widget
+          = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter)->allocateRaw();
+        p_widget->setParameter(parameter);
+        p_ret = p_widget;
+      }
+      catch (cedar::aux::UnknownTypeException& e)
+      {
+        QLabel* p_no_widget_label = new QLabel("(No widget for type)");
+        p_no_widget_label->setToolTip(QString::fromStdString(e.exceptionInfo()));
+        p_no_widget_label->setAlignment(Qt::AlignCenter);
+        p_no_widget_label->setAutoFillBackground(true);
+        p_no_widget_label->setStyleSheet("background-color: rgb(255, 200, 137)");
+        p_ret = p_no_widget_label;
+      }
+
+      p_ret->setParent(pParent);
+
+      return p_ret;
+    }
+
+  private:
+    cedar::aux::ConfigurablePtr mpConfigurable;
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -61,7 +121,7 @@ cedar::aux::gui::Configurable::Configurable()
   p_layout->addWidget(mpPropertyTree, 1);
   p_layout->setContentsMargins(0, 0, 0, 0);
 
-  // setup columns
+  // setup header
   this->mpPropertyTree->setColumnCount(2);
   QStringList header_labels;
   header_labels << "Property" << "Value";
@@ -76,6 +136,8 @@ cedar::aux::gui::Configurable::Configurable()
 void cedar::aux::gui::Configurable::display(cedar::aux::ConfigurablePtr configurable)
 {
   this->clear();
+  
+  this->mpPropertyTree->setItemDelegateForColumn(1, new DataDelegate(configurable));
 
   std::string type_name = cedar::aux::objectTypeToString(configurable);
   QStringList text;
@@ -84,18 +146,17 @@ void cedar::aux::gui::Configurable::display(cedar::aux::ConfigurablePtr configur
   this->mpPropertyTree->addTopLevelItem(p_item);
   this->mpPropertyTree->setFirstItemColumnSpanned(p_item, true);
 
-  this->append(configurable, p_item);
+  this->append(configurable, p_item, std::string());
 }
 
-void cedar::aux::gui::Configurable::append(cedar::aux::ConfigurablePtr configurable, QTreeWidgetItem* pItem)
+void cedar::aux::gui::Configurable::append(cedar::aux::ConfigurablePtr configurable, QTreeWidgetItem* pItem, const std::string& pathSoFar)
 {
   auto parameters = configurable->getParameters();
   for (auto param_iter = parameters.begin(); param_iter != parameters.end(); ++param_iter)
   {
-    cedar::aux::ConstParameterPtr parameter = *param_iter;
-    QTreeWidgetItem* parameter_item = new QTreeWidgetItem();
-    parameter_item->setText(0, QString::fromStdString(parameter->getName()));
-    pItem->addChild(parameter_item);
+    cedar::aux::ParameterPtr parameter = *param_iter;
+
+    this->append(parameter, pItem, pathSoFar);
   }
 
   auto children = configurable->configurableChildren();
@@ -103,13 +164,43 @@ void cedar::aux::gui::Configurable::append(cedar::aux::ConfigurablePtr configura
   {
     const std::string& child_name = child_iter->first;
     cedar::aux::ConfigurablePtr child = child_iter->second;
+
+    std::string path = pathSoFar;
+    if (!path.empty())
+    {
+      path += ".";
+    }
+    path += child_name;
+
     QTreeWidgetItem* child_item = new QTreeWidgetItem();
     child_item->setText(0, QString::fromStdString(child_name));
     pItem->addChild(child_item);
-    this->append(child, child_item);
+    this->mpPropertyTree->setFirstItemColumnSpanned(child_item, true);
+    this->append(child, child_item, path);
   }
+}
+
+void cedar::aux::gui::Configurable::append(cedar::aux::ParameterPtr parameter, QTreeWidgetItem* pNode, const std::string& pathSoFar)
+{
+  std::string path = pathSoFar;
+  if (!pathSoFar.empty())
+  {
+    path += ".";
+  }
+  path += parameter->getName();
+
+  QTreeWidgetItem* parameter_item = new QTreeWidgetItem();
+  parameter_item->setText(0, QString::fromStdString(parameter->getName()));
+  parameter_item->setData(1, Qt::UserRole, QString::fromStdString(path));
+  pNode->addChild(parameter_item);
+  this->mpPropertyTree->openPersistentEditor(parameter_item, 1);
 }
 
 void cedar::aux::gui::Configurable::clear()
 {
+  QAbstractItemDelegate * p_delegate = this->mpPropertyTree->itemDelegateForColumn(1);
+  if (p_delegate != NULL)
+  {
+    delete p_delegate;
+  }
 }

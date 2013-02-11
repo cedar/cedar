@@ -47,7 +47,6 @@
 #include <QWidget>
 #include <QTreeWidget>
 
-
 /*!@brief A widget to display and manipulate the parameters of cedar::aux::Configurables.
  *
  * @remarks This widget is intended to replace the old cedar::aux/proc::PropertyPane in the long run.
@@ -92,7 +91,10 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //! Appends the given configurable to the tree widget item.
-  void append(cedar::aux::ConfigurablePtr configurable, QTreeWidgetItem* pItem);
+  void append(cedar::aux::ConfigurablePtr configurable, QTreeWidgetItem* pItem, const std::string& pathSoFar);
+
+  //! Appends the given parameter to the tree node.
+  void append(cedar::aux::ParameterPtr parameter, QTreeWidgetItem* pNode, const std::string& pathSoFar);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
