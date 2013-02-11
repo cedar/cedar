@@ -36,8 +36,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/kteam/Odometry.h"
+#include "cedar/auxiliaries/math/IntLimitsParameter.h"
 
 // SYSTEM INCLUDES
+#include <boost/units/systems/si/length.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -135,7 +137,7 @@ double cedar::dev::kteam::Odometry::calculateDifferencePosition
        ) const
 {
   return ((newEncoders[1] - oldEncoders[1]) + (newEncoders[0] - oldEncoders[0]))
-         * mDrive->getDistancePerPulse() / 2.0;
+         * (mDrive->getDistancePerPulse() / boost::units::si::meters) / 2.0;
 }
 
 double cedar::dev::kteam::Odometry::calculateDifferenceOrientation
@@ -144,6 +146,6 @@ double cedar::dev::kteam::Odometry::calculateDifferenceOrientation
            const std::vector<int>& newEncoders
        ) const
 {
-  return ((newEncoders[1] - oldEncoders[1]) - (newEncoders[0] - oldEncoders[0]))
+  return static_cast<double>((newEncoders[1] - oldEncoders[1]) - (newEncoders[0] - oldEncoders[0]))
          * mDrive->getDistancePerPulse() / mDrive->getWheelDistance();
 }

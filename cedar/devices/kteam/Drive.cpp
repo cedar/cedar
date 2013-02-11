@@ -45,6 +45,12 @@
 
 // SYSTEM INCLUDES
 #include <vector>
+#include <boost/units/cmath.hpp>
+#include <boost/units/systems/si/length.hpp>
+#include <boost/units/systems/si/velocity.hpp>
+
+using namespace boost::units;
+using namespace boost::units::si;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -68,7 +74,7 @@ _mEncoderLimits(new cedar::aux::math::IntLimitsParameter(this, "encoder limits",
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double cedar::dev::kteam::Drive::getDistancePerPulse() const
+quantity<length> cedar::dev::kteam::Drive::getDistancePerPulse() const
 {
   return 2.0 * cedar::aux::math::pi * getWheelRadius() / getNumberOfPulsesPerRevolution();
 }
@@ -95,18 +101,22 @@ void cedar::dev::kteam::Drive::reset()
   setEncoders(encoders);
 }
 
-std::vector<int> cedar::dev::kteam::Drive::convertWheelSpeedToPulses(const std::vector<double> wheelSpeed) const
+std::vector<quantity<frequency> > cedar::dev::kteam::Drive::convertWheelSpeedToPulses
+                 (
+                   const std::vector<quantity<velocity> >& wheelSpeed
+                 ) const
 {
   CEDAR_ASSERT(wheelSpeed.size() == 2);
 
   // the speed has be thresholded based on the maximum possible number
   // of pulses per second (this is hardware-specific).
   // first: convert speed from m/s into Pulses/s ...
-  std::vector<int> wheel_speed_pulses(wheelSpeed.size(), 0);
+  std::vector<quantity<frequency> > wheel_speed_pulses(wheelSpeed.size(), 0 * hertz);
 
   for (unsigned int i = 0; i < wheelSpeed.size(); ++i)
   {
-    wheel_speed_pulses[i] = cedar::aux::math::round(wheelSpeed[i] / this->getDistancePerPulse());
+    // compute the number of pulses per second and round the value to a natural number
+    wheel_speed_pulses[i] = boost::units::round(wheelSpeed[i] / this->getDistancePerPulse());
   }
 
   return wheel_speed_pulses;

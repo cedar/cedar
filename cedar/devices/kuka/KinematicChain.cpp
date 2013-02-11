@@ -40,6 +40,7 @@
 #ifdef CEDAR_USE_KUKA_LWR
 
 // CEDAR INCLUDES
+#include "cedar/devices/KinematicChain.h"
 #include "cedar/devices/kuka/KinematicChain.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/math/LimitsParameter.h"
@@ -163,7 +164,7 @@ void cedar::dev::kuka::KinematicChain::setJointAngle(unsigned int index, double 
 void cedar::dev::kuka::KinematicChain::setWorkingMode(cedar::dev::KinematicChain::ActionType actionType)
 {
   // Set the desired working mode
-  cedar::dev::robot::KinematicChain::setWorkingMode(actionType);
+  cedar::dev::KinematicChain::setWorkingMode(actionType);
   // Reset the commanded position to the measured joint position
   mCommandedJointPosition = mMeasuredJointPosition;
   // restart the thread, since it was stopped by KinematicChain::setWorkingMode()

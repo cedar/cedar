@@ -43,10 +43,12 @@
 #include "cedar/devices/kteam/namespace.h"
 #include "cedar/devices/DifferentialDrive.h"
 
-
-
 // SYSTEM INCLUDES
 #include <vector>
+#include <boost/units/quantity.hpp>
+#include <boost/units/systems/si/frequency.hpp>
+#include <boost/units/systems/si/velocity.hpp>
+#include <boost/units/systems/si/length.hpp>
 
 /*!@brief The differential drive of a pulse-width-modulation (PWM) driven robot.
  *
@@ -73,7 +75,7 @@ public:
   double getNumberOfPulsesPerRevolution() const;
 
   //!@brief Returns the distance a wheel moves for a single pulse [in m].
-  double getDistancePerPulse() const;
+  boost::units::quantity<boost::units::si::length> getDistancePerPulse() const;
 
   //!@brief Returns the limits for the encoder values.
   cedar::aux::math::IntLimitsParameterPtr getEncoderLimits() const;
@@ -93,7 +95,10 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  std::vector<int> convertWheelSpeedToPulses(const std::vector<double> wheelSpeed) const;
+  std::vector<boost::units::quantity<boost::units::si::frequency> > convertWheelSpeedToPulses
+                   (
+                     const std::vector<boost::units::quantity<boost::units::si::velocity> >& wheelSpeed
+                   ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
