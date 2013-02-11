@@ -43,6 +43,12 @@
 
 // SYSTEM INCLUDES
 #include <vector>
+#include <boost/units/quantity.hpp>
+#include <boost/units/systems/si/frequency.hpp>
+#include <boost/units/systems/si/velocity.hpp>
+
+using namespace boost::units;
+using namespace boost::units::si;
 
 //----------------------------------------------------------------------------------------------------------------------
 // type registration
@@ -88,13 +94,17 @@ void cedar::dev::kteam::DriveSerial::sendMovementCommand()
   // the speed has be thresholded based on the maximum possible number
   // of pulses per second (this is hardware-specific).
   // first: convert speed from m/s into Pulses/s ...
-  std::vector<int> wheel_speed_pulses = convertWheelSpeedToPulses(getWheelSpeed());
+  std::vector<quantity<frequency> > wheel_speed_pulses = convertWheelSpeedToPulses(getWheelSpeed());
 
   // construct the command string "D,x,y"
   // where x is the speed of the left wheel (in pulses/s)
   // and y is the speed of the right wheel (in pulses/s)
   std::ostringstream command;
-  command << _mCommandSetSpeed->getValue() << "," << wheel_speed_pulses[0] << "," << wheel_speed_pulses[1];
+  command << _mCommandSetSpeed->getValue()
+          << ","
+          << wheel_speed_pulses[0] / hertz
+          << ","
+          << wheel_speed_pulses[1] / hertz;
 
   // wait for an answer
   std::string answer = convertToSerialChannel(getChannel())->writeAndReadLocked(command.str());

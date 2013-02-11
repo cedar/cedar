@@ -41,9 +41,14 @@
 #include "cedar/devices/namespace.h"
 #include "cedar/devices/Locomotion.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
 
 // SYSTEM INCLUDES
 #include <vector>
+#include <boost/units/quantity.hpp>
+#include <boost/units/systems/si/velocity.hpp>
+#include <boost/units/systems/si/length.hpp>
+#include <boost/units/systems/si/angular_velocity.hpp>
 
 /*!@brief The differential drive component of a mobile robot.
  *
@@ -69,10 +74,10 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Returns the distance between the two wheels [in m].
-  double getWheelDistance() const;
+  boost::units::quantity<boost::units::si::length> getWheelDistance() const;
 
   //!@brief Returns the radius of the wheels [in m].
-  double getWheelRadius() const;
+  boost::units::quantity<boost::units::si::length> getWheelRadius() const;
 
   //!@brief Returns the speed limits dictated by the robotic hardware [in m/s].
   cedar::aux::math::DoubleLimitsParameterPtr getHardwareSpeedLimits() const;
@@ -80,30 +85,34 @@ public:
   /*!@brief Returns the current speed of the wheels [in m/s].
    * @return Vector holding the wheel speed of the left (1st element) and right wheel (2nd element) [both in m/s]
    */
-  const std::vector<double>& getWheelSpeed() const;
+  const std::vector<boost::units::quantity<boost::units::si::velocity> >& getWheelSpeed() const;
 
   /*!@brief Sets the speed of the left and right wheel.
    * @param[in] wheelSpeed The wheel speed of the left and right wheel to be set [in m/s].
    *
    * @todo Shouldn't the parameter be const?
    */
-  virtual void setWheelSpeed(std::vector<double>& wheelSpeed);
+  virtual void setWheelSpeed(std::vector<boost::units::quantity<boost::units::si::velocity> >& wheelSpeed);
 
   /*!@brief Sets the speed of the wheels based on the given forward velocity.
    * @param[in] forwardVelocity The forward velocity to be set [in m/s].
    */
-  virtual void setForwardVelocity(double forwardVelocity);
+  virtual void setForwardVelocity(boost::units::quantity<boost::units::si::velocity> forwardVelocity);
 
   /*!@brief Sets the speed of the wheels based on the given turning rate.
    * @param[in] turningRate The turning rate to be set [in rad/s].
    */
-  virtual void setTurningRate(double turningRate);
+  virtual void setTurningRate(boost::units::quantity<boost::units::si::angular_velocity> turningRate);
 
   /*!@brief Sets the speed of the wheels based on the given forward velocity and turning rate.
    * @param[in] forwardVelocity The forward velocity to be set [in m/s].
    * @param[in] turningRate     The turning rate to be set [in rad/s].
    */
-  virtual void setForwardVelocityAndTurningRate(double forwardVelocity, double turningRate);
+  virtual void setForwardVelocityAndTurningRate
+               (
+                 boost::units::quantity<boost::units::si::velocity> forwardVelocity,
+                 boost::units::quantity<boost::units::si::angular_velocity> turningRate
+               );
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -113,7 +122,11 @@ protected:
    * @param[in,out] leftWheelSpeed the speed of the left wheel [m/s]
    * @param[in,out] rightWheelSpeed the speed of the right wheel [m/s]
    */
-  void thresholdToHardwareLimits(double& leftWheelSpeed, double& rightWheelSpeed);
+  void thresholdToHardwareLimits
+       (
+         boost::units::quantity<boost::units::si::velocity>& leftWheelSpeed,
+         boost::units::quantity<boost::units::si::velocity>& rightWheelSpeed
+       );
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -127,10 +140,10 @@ private:
    */
   void convertToWheelSpeed
        (
-         double forwardVelocity,
-         double turningRate,
-         double& leftWheelSpeed,
-         double& rightWheelSpeed
+         boost::units::quantity<boost::units::si::velocity> forwardVelocity,
+         boost::units::quantity<boost::units::si::angular_velocity> turningRate,
+         boost::units::quantity<boost::units::si::velocity>& leftWheelSpeed,
+         boost::units::quantity<boost::units::si::velocity>& rightWheelSpeed
        ) const;
 
   /*!@brief Converts given wheel speeds into a forward velocity and turning rate.
@@ -141,10 +154,10 @@ private:
    */
   void convertToForwardVelocityAndTurningRate
        (
-         double leftWheelSpeed,
-         double rightWheelSpeed,
-         double& forwardVelocity,
-         double& turningRate
+         boost::units::quantity<boost::units::si::velocity> leftWheelSpeed,
+         boost::units::quantity<boost::units::si::velocity> rightWheelSpeed,
+         boost::units::quantity<boost::units::si::velocity>& forwardVelocity,
+         boost::units::quantity<boost::units::si::angular_velocity>& turningRate
        ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -155,7 +168,7 @@ protected:
 
 private:
   //! vector holding the current speed of the left (1st element) and right (2nd element) wheel [in m/s]
-  std::vector<double> mWheelSpeed;
+  std::vector<boost::units::quantity<boost::units::si::velocity> > mWheelSpeed;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
