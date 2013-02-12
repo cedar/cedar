@@ -38,10 +38,34 @@
 #include "cedar/devices/Odometry.h"
 
 // SYSTEM INCLUDES
+#include <opencv2/opencv.hpp>
+#include <boost/units/quantity.hpp>
+#include <boost/units/cmath.hpp>
+#include <boost/units/systems/si/length.hpp>
+#include <boost/units/systems/si/plane_angle.hpp>
+
+// namespaces for units
+using namespace boost::units;
+using namespace boost::units::si;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+cedar::dev::Odometry::Odometry()
+:
+mCoordinateFrame(cedar::aux::LocalCoordinateFramePtr(new cedar::aux::LocalCoordinateFrame()))
+{
+}
+
+cedar::dev::Odometry::Odometry(cedar::aux::LocalCoordinateFramePtr coordinateFrame)
+:
+mCoordinateFrame(coordinateFrame)
+{
+}
+
+cedar::dev::Odometry::~Odometry()
+{
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -50,36 +74,43 @@
 cv::Mat cedar::dev::Odometry::getTranslation() const
 {
   //construct the matrix to return
-  cv::Mat translation = cv::Mat(2, 1, CV_64FC1);
+  cv::Mat translation = cedar::dev::Odometry::LengthMatrix(2, 1);
 
   //store the x- and y-position in the new matrix (gets are from LocalCoordinateFrame.h)
-  translation.at<double>(0, 0) = getTranslationX();
-  translation.at<double>(1, 0) = getTranslationY();
+  translation.at<quantity<length> >(0, 0) = getCoordinateFrame()->getTranslationX() * meters;
+  translation.at<quantity<length> >(1, 0) = getCoordinateFrame()->getTranslationY() * meters;
+
   return translation;
 }
 
-double cedar::dev::Odometry::getRotation()
+quantity<plane_angle> cedar::dev::Odometry::getRotation()
 {
   //calculates the orientation from the quaternion stored in LocalCoordinateFrame.h.
   //todo: changed to use matrices instead of quaternions, check whether this still works (HR)
   // this assumes the heading direction of the vehicle is the x-axis of the local coordinate system
-  return atan2(getTransformation().at<double>(1, 0) , getTransformation().at<double>(0, 0));
+  return atan2
+         (
+           getCoordinateFrame()->getTransformation().at<double>(1, 0),
+           getCoordinateFrame()->getTransformation().at<double>(0, 0)
+         ) * radians;
   //  return atan2(getOrientationQuaternion(2) , getOrientationQuaternion(1));
 }
 
-void cedar::dev::Odometry::setTranslation(double x, double y)
+void cedar::dev::Odometry::setTranslation(const quantity<length>& x, const quantity<length>& y)
 {
-  LocalCoordinateFrame::setTranslation(x, y, 0); //sets x- and y-position only (z-position = 0)
+  //!todo
+  //sets x- and y-position only (z-position = 0)
+  getCoordinateFrame()->setTranslation(x/meters, y/meters, 0);
 }
 
-void cedar::dev::Odometry::setRotation(double angle)
+void cedar::dev::Odometry::setRotation(quantity<plane_angle> angle)
 {
   //construct a new matrix as parameter for setOrientationQuaternion
   cv::Mat rotation = cv::Mat(4, 1, CV_64FC1);
-  rotation.at<double>(0, 0) = 0; //orientation is a unit-quaternion
-  rotation.at<double>(1, 0) = cos(angle);
-  rotation.at<double>(2, 0) = sin(angle);
-  rotation.at<double>(3, 0) = 0; //no rotation in z-direction
+  rotation.at<double>(0, 0) = 0;                        //orientation is a unit-quaternion
+  rotation.at<double>(1, 0) = boost::units::cos(angle);
+  rotation.at<double>(2, 0) = boost::units::sin(angle);
+  rotation.at<double>(3, 0) = 0;                        //no rotation in z-direction
 
   //todo: fix this! (HR)
 //  setOrientationQuaternion(orientation_mat);
@@ -90,7 +121,7 @@ void cedar::dev::Odometry::timerEvent(QTimerEvent*)
   update();
 }
 
-void cedar::dev::Odometry::setDebug(bool debug)
+cedar::aux::LocalCoordinateFramePtr cedar::dev::Odometry::getCoordinateFrame() const
 {
-  mDebug = debug;
+  return mCoordinateFrame;
 }
