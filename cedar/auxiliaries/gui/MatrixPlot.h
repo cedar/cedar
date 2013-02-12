@@ -91,6 +91,9 @@ public:
   //!@brief return vector of standard colors
   static const Qwt3D::ColorVector& getStandardColorVector();
 
+public slots:
+  void processChangedData();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

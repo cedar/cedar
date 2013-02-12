@@ -44,7 +44,7 @@
 #include "cedar/auxiliaries/Grabbable.h"
 
 // SYSTEM INCLUDES
-#include <QGLViewer/qglviewer.h>
+#include <qglviewer.h>
 #include <QList>
 #include <QReadWriteLock>
 

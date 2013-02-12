@@ -100,8 +100,10 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! @brief The class to grab from
+  //! The object to grab from
   cedar::aux::Grabbable* mpSourceInterfaceClass;
+
+  //! The used lock
   QReadWriteLock* mpGrabberLock;
 
 private:

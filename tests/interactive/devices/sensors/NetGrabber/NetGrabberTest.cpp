@@ -17,11 +17,13 @@
 
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/NetGrabber.h"
+#include "cedar/auxiliaries/gui/ImagePlot.h"
+#include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
+
 
 // SYSTEM INCLUDES
 #include <QtGui/QApplication>
-#include <opencv2/opencv.hpp>
-#include <boost/lexical_cast.hpp>
 #include <ios>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -41,186 +43,199 @@ namespace
       QApplication::processEvents();
     }
   }
+
+  void showUsage(std::string programName)
+  {
+    std::cout << "\n\nInteractive test for the NetGrabber class.\n"
+        << "------------------------------------------\n\n"
+        << "This grabber get his frames from a yarp-server with the given channelname\n\n"
+        << "Usage: \t" << programName << " <YarpChannelName>\n"
+        << "\nRemarks: To create a yarp-stream, you could use the program \"interactiveTest_NetTransmitter\"\n"
+        << "         In order to use this grabber, a YARP-server have to be up and running.\n"
+        << std::endl;
+  }
+
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Interactive test program
 // ---------------------------------------------------------------------------------------------------------------------
-int main(int , char **)
-{
-/*
-  const std::string  YARP_CHANNEL_0 = "Net_Grabber_TestCase_Channel";
-  const std::string  GRABBER_NAME_0 = "Net_Grabber_TestCase";
-  const std::string  CONFIG_FILE_NAME_0 = "net_grabber_testcase.config";
 
+/*! @file Interactive test for the NetGrabber class
+ *
+ *    This grabber get his frames from a yarp-server with the given channelname
+ *  @remarks
+ *    To create a yarp-stream, you could use the program interactiveTest_NetTransmitter
+ *    In order to use this grabber, a YARP-server have to be up and running.
+ */
+
+int main(int argc, char* argv[])
+{
+  //--------------------------------------------------------------------------------------------------------------------
+  //constants
+  //--------------------------------------------------------------------------------------------------------------------
+
+  const std::string GRABBER_NAME = "NetGrabber_testcase";
+  const std::string CONFIG_FILE_NAME = "NetGrabber_testcase.config";
+
+  //--------------------------------------------------------------------------------------------------------------------
+  //main test
+  //--------------------------------------------------------------------------------------------------------------------
+
+  //get name of yarp-channel
+  if (argc < 2)
+  {
+    showUsage(argv[0]);
+    return -1;
+  }
+
+  const std::string channel_name = std::string(argv[1]);
+  const std::string window_title = "NetGrabber: \""+ channel_name + "\"";
 
   std::cout.setf(std::ios::fixed,std::ios::floatfield);
   std::cout.precision(3);
 
-  //title of highgui window
-  std::string highgui_window_name_0 = GRABBER_NAME_0 + ": " + YARP_CHANNEL_0;
-
-  std::cout << "\n\nInteractive test of the NetGrabber class (mono)\n";
+  std::cout << "\n\nInteractive test of the NetGrabber class\n";
   std::cout << "-----------------------------------------------------\n\n";
+  std::cout << "Channel 0: " << channel_name;
 
-  //------------------------------------------------------------------
+  //----------------------------------------------------------------------------------------
   //Create the grabber
+  //----------------------------------------------------------------------------------------
+
   std::cout << "Create a NetGrabber:\n";
-  cedar::dev::sensors::visual::NetGrabber *net_grabber=NULL;
+  cedar::dev::sensors::visual::NetGrabberPtr p_grabber;
   try
   {
-    net_grabber = new cedar::dev::sensors::visual::NetGrabber( CONFIG_FILE_NAME_0 , YARP_CHANNEL_0 );
+    p_grabber = cedar::dev::sensors::visual::NetGrabberPtr
+                (
+                  new cedar::dev::sensors::visual::NetGrabber(channel_name)
+                );
   }
   catch (cedar::aux::InitializationException &e)
   {
-    //after an InitializationExeception the net_grabber class isn't initialized correctly
+    //after an InitializationExeception the p_grabber class isn't initialized correctly
     //and can't be used
-    std::cout << "Error on creation of the NetGrabber class:\n"
+    std::cout << "Error on creation of the VideoGrabber class:\n"
               << e.exceptionInfo() << std::endl;
-
-    if (net_grabber)
-    {
-      delete net_grabber;
-    }
 
     return -1;
   }
 
-  //------------------------------------------------------------------
-  / * After initialization of a NetGrabber:
-   *
-   * ALWAYS:
-   *  - the Net is already grabbed, so you can check the file using
-   *    getImage(), getSize() or something else
-   *
-   * EITHER:
-   *  No or new configuration file:
-   *  - loopedThread isn't running (only needed for recording)
-   *  - grabbername is set to default, i.e. NetGrabber
-   *
-   * OR:
-   *  Parameters loaded from configfile
-   *  - thread isn't running
-   *  - grabbername is restored from configfile
-   * /
+  // install crash-handler to close the yarp-channel in case of program termination
+  cedar::dev::sensors::visual::Grabber::installCrashHandler();
 
-    net_grabber->setName(GRABBER_NAME_0);
-    std::cout << "\nGrab channel 0 from \"" << net_grabber->getSourceInfo()<<"\"" << std::endl;
-
-    //this raise an error, because it isn't a stereo-grabber
-    //std::cout << "Grab from (1):" << net_grabber->getSourceInfo(1);
-
-    std::cout << "\nSize of loaded Net:\n";
-    cv::Size ch0_size = net_grabber->getSize(0);
-    std::cout << "Channel 0: " << ch0_size.width <<" x " << ch0_size.height << std::endl;
-
-    //check framerate of the grabber-thread (thread isn't started yet)
-    std::cout << "\nNetGrabber thread FPS : " << net_grabber->getFps() << std::endl;
-
-
-    //Nevertheless you can create an avi file from your Net-grabbing
-    //In this case you have to start the thread
-    net_grabber->setRecordName("RecordedNetGrabber.avi");
-
-    //Set Snapshotnames without channel-number (in stereo-case: default value is 0)
-    //This is the same behavior as setRecordName()
-    //The type of the file (e.g. bitmap or jpg or something else) depend on extension
-    //look at the documentation of setSnapshotName for details
-    net_grabber->setSnapshotName("NetGrabber_Snapshot.jpg"); 
-    
-    //Check the constructed filenames
-    std::cout << "Check filenames of snapshots and recordings\n" << std::endl;
-
-    std::cout << "SnapshotName:\t" << net_grabber->getSnapshotName() <<std::endl;
-    std::cout << "RecordName:\t" << net_grabber->getRecordName() <<std::endl;
-
-    //enforcing an error and catch it
-    try
-    {
-      std::cout << "\nTry to enforce an exception:\n";
-      std::cout << "SnapshotName_2: " << net_grabber->getSnapshotName(2) <<std::endl;
-    }
-    catch (cedar::aux::ExceptionBase& e)
-    {
-      //std::cout << "Exception: " <<e.what() << std::endl; //until now: buggy cedar implementation
-      //all grabber exceptions (look at cedar/devices/sensors/visual/exceptions/namespace.h)
-      //can be used without separate include-files
-      std::cout <<e.exceptionInfo()<<std::endl;
-    }
-
-  //------------------------------------------------------------------
-  //Create an OpenCV highgui window to show grabbed frames
-  std::cout << "\nDisplay the grabbed pictures\n";
-  cv::namedWindow(highgui_window_name_0,CV_WINDOW_KEEPRATIO);
-
-  QReadWriteLock * pReadWriteLock;
-  pReadWriteLock = net_grabber->getReadWriteLockPointer();
-
-  //get images with respect to grabbing-thread
-  pReadWriteLock->lockForRead();
-  cv::Mat frame = net_grabber->getImage();
-  pReadWriteLock->unlock();
-
-  //start recording
-  net_grabber->setFps(15);
-  std::cout << "\nStart Recording\n";
-
-  //startRecording starts the grabbing-thread if not running
-  //the speed of the grabbingthread is independent of the speed writing to
-  //the avi-file. The video will only be shorter or longer.
-  net_grabber->startRecording(15);
-
-  //get frames for a while
-  unsigned int counter=0;
-
-  while (!frame.empty())
+  //----------------------------------------------------------------------------------------
+  // load configuration. this step is optional.
+  //----------------------------------------------------------------------------------------
+  try
   {
-    cv::imshow(highgui_window_name_0,frame);
-
-    pReadWriteLock->lockForRead();
-    cv::Mat frame = net_grabber->getImage();
-    pReadWriteLock->unlock();
-
-
-    counter++;
-
-    //after one second, show some stats
-    if (counter == 100)
-    {
-      std::cout << "Actual framerate of grabbing: " << net_grabber->getFpsMeasured() << std::endl;
-      // Save a snapshot from channel 0 only
-      // Be aware, that existing files will be overwritten without any question
-      //net_grabber->saveSnapshot(0);
-    }
-
-    //exit after another second
-    if (counter == 200)
-    {
-      break;
-    }
-
-    //wait 10ms (needed for highgui)
-    cv::waitKey(10);
+    //p_grabber->readJson(CONFIG_FILE_NAME);
+  }
+  catch (...)
+  {
+    std::cout << "No configuration exists!" << std::endl;
   }
 
-  //------------------------------------------------------------------
-  //clean up
+  //----------------------------------------------------------------------------------------
+  // apply configuration. this step is mandatory.
+  //----------------------------------------------------------------------------------------
+  // if you don't apply the default or loaded Parameter, the grabber will not work
+  // check if grabber is created successfully
+  if (! p_grabber->applyParameter())
+  {
+    // an error occured during initialization. Perhaps the file doesn't exist
+    return -1;
+  }
 
-  cv::destroyWindow(highgui_window_name_0);
+  //----------------------------------------------------------------------------------------
+  // grab first frame
+  //----------------------------------------------------------------------------------------
+
+  //the first frame is already grabbed on initialization
+  //p_grabber->grab();
+
+  //the first frame is now grabbed and could be read
+  //always use the QReadWriteLock for locking the cv::Mat image object on access
+  QReadWriteLock* p_lock = p_grabber->getReadWriteLockPointer();
+
+  //the local image buffer
+  cv::Mat frame0;
+
+  //get the picture from the grabber
+  p_lock->lockForRead();
+  frame0 = p_grabber->getImage();
+  p_lock->unlock();
+
+  //----------------------------------------------------------------------------------------
+  // Create a cedar::aux::gui ImagePlot widget to show grabbed frames
+  //----------------------------------------------------------------------------------------
+
+  QApplication app(argc, argv);
+  cedar::aux::gui::ImagePlotPtr p_plot = cedar::aux::gui::ImagePlotPtr(new cedar::aux::gui::ImagePlot());
+  cedar::aux::MatDataPtr p_data = cedar::aux::MatDataPtr(new cedar::aux::MatData(frame0));
+  p_plot->plot(p_data,window_title);
+  p_plot->setWindowTitle(QString::fromStdString(window_title));
+  p_plot->show();
+  p_plot->resize(frame0.cols,frame0.rows);
+
+  //process the events generated inside QT-Framework
+  processQtEvents();
+
+  //----------------------------------------------------------------------------------------
+  //start the grabber-thread for updating camera images
+  //----------------------------------------------------------------------------------------
+
+  p_grabber->startGrabber();
+
+  //----------------------------------------------------------------------------------------
+  // send frames and show them on screen until window will be closed
+  //----------------------------------------------------------------------------------------
+
+  unsigned int counter_stat = 0;
+
+  //get frames until avi is over, but here: never because we have set loop to true
+  //close window to finish test
+  while (!frame0.empty() && p_plot->isVisible())
+  {
+    //process the events generated inside QT-Framework
+    processQtEvents();
+
+    p_lock->lockForRead();
+    p_data->lockForWrite();
+    frame0 = p_grabber->getImage();
+    p_data->unlock();
+    p_lock->unlock();
+
+    //status
+    if (!(++counter_stat %= 100))
+    {
+      std::cout << "Measured FPS: " << p_grabber->getFpsMeasured() << std::endl;
+    }
+
+    // watch the output - everything should be fine.
+    //The video is much slower than 100 fps.
+    cedar::aux::sleep(cedar::unit::Milliseconds(10));
+
+  }
+
+  //----------------------------------------------------------------------------------------
+  // save configuration. this step is optional.
+  //----------------------------------------------------------------------------------------
+  //p_grabber->writeJson(CONFIG_FILE_NAME);
+
+
+  //----------------------------------------------------------------------------------------
+  //clean up
+  //----------------------------------------------------------------------------------------
 
   //stop grabbing-thread if running
   //recording will also be stopped
-  if (net_grabber->isRunning())
-  {
-    net_grabber->stopGrabber();
-  }
+  p_grabber->stopGrabber();
 
-  if (net_grabber)
-  {
-    delete net_grabber;
-  }
-
+  //delete p_grabber is done via the shared-pointer class
   std::cout << "finished\n";
-*/
+
   return 0;
 }
+

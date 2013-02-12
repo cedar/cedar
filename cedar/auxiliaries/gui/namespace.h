@@ -122,6 +122,7 @@ namespace cedar
 
       CEDAR_DECLARE_AUX_CLASS(HistoryPlot);
       CEDAR_DECLARE_AUX_CLASS(HistoryPlot0D);
+      CEDAR_DECLARE_AUX_CLASS(HistoryPlot1D);
       //!@endcond
 
       //!@brief The manager for plot widgets
