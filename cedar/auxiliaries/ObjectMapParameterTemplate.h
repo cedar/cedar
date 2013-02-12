@@ -256,7 +256,7 @@ namespace cedar
  *
  * @todo describe more.
  */
-template <class ValueType, class TAllocationPolicy = allocationPolicies::Instantly<ValueType> >
+template <class ValueType, class TAllocationPolicy = cedar::aux::allocationPolicies::Instantly<ValueType> >
 class cedar::aux::ObjectMapParameterTemplate : public cedar::aux::Parameter, public TAllocationPolicy
 {
   //--------------------------------------------------------------------------------------------------------------------
