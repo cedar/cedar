@@ -45,10 +45,12 @@
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/devices/kteam/gui/DriveControlWidget.h"
 #include "cedar/devices/kteam/SerialChannel.h"
+#include "cedar/devices/Robot.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
 #include <math.h>
+#include <boost/units/systems/si/plane_angle.hpp>
 
 int main(int argc, char **argv)
 {
@@ -65,21 +67,25 @@ int main(int argc, char **argv)
   viewer.setSceneRadius(scene->getSceneLimit());
   viewer.startTimer(50);
 
-  //open the channel to the robot
-  cedar::dev::kteam::SerialChannelPtr communication(new cedar::dev::kteam::SerialChannel());
-  std::string serial_communication_config = cedar::aux::locateResource("configs/epuck_serial_communication.json");
-  communication->readJson(serial_communication_config);
-  communication->open();
+  // instantiate the robot
+  cedar::dev::RobotPtr robot(new cedar::dev::Robot());
+  std::string robot_configuration = cedar::aux::locateResource("configs/epuck/default_configuration.json");
+  robot->readJson(robot_configuration);
 
-  //initialize the e-puck
-  cedar::dev::kteam::DriveSerialPtr drive(new cedar::dev::kteam::DriveSerial(communication));
-  std::string epuck_drive_config = cedar::aux::locateResource("configs/epuck.json");
-  drive->readJson(epuck_drive_config);
+  // get the drive from the robot
+  cedar::dev::kteam::DrivePtr drive
+    = robot->getComponent<cedar::dev::kteam::Drive>("drive");
+
+  // open the channel to the robot
+  cedar::dev::ChannelPtr channel = drive->getChannel();
+  channel->open();
 
   //initialize the model of the e-puck
   cedar::dev::kteam::OdometryPtr kteam_model(new cedar::dev::kteam::Odometry(drive));
+  kteam_model->startTimer(50);
   //add cylinder representing the robot
-  cedar::aux::gl::ObjectVisualizationPtr cylinder(new cedar::aux::gl::Cylinder(kteam_model, 0.07, 0.05));
+  cedar::aux::LocalCoordinateFramePtr coordinate_frame = kteam_model->getCoordinateFrame();
+  cedar::aux::gl::ObjectVisualizationPtr cylinder(new cedar::aux::gl::Cylinder(coordinate_frame, 0.07, 0.05));
   scene->addObjectVisualization(cylinder);
 
   // create scene widget
@@ -91,7 +97,7 @@ int main(int argc, char **argv)
   drive_control->show();
 
   //change the robot's initial orientation
-  kteam_model->setRotation(cedar::aux::math::pi / 2.0);
+  kteam_model->setRotation((cedar::aux::math::pi / 2.0) * boost::units::si::radians);
 
   //start the program
   application.exec();
