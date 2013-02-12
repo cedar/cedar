@@ -58,6 +58,14 @@ likely to undergo major changes:
 
 == current version ==
 
+- Buildsystem:
+  - fixed issues when linking to non-qt4 versions of QWT and libQGLViewer
+    when qt3 and qt4 versions were present on the system.
+
+- cedar::aux::net
+  - fixed issues with GCC 4.7 and the NetTransporter (Reader/Writer) code
+    (only occured when the optional YARP dependency was included)
+
 == Version 1.0.7
 - cedar::aux::gui
   - fixed a bug in how matrix plots handle changing data dimensionality
