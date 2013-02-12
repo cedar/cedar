@@ -53,8 +53,10 @@ namespace
 // Interactive test program
 // ---------------------------------------------------------------------------------------------------------------------
 
-// Use this, if you want to test with a firewire camera
+// Use this, if you want to test with a firewire camera (only possible, if cedar is compiled with dc1394 support)
+#ifdef CEDAR_USE_LIB_DC1394
 #define USE_FIREWIRE_BACKEND
+#endif
 
 int main(int argc, char* argv[])
 {
@@ -283,6 +285,7 @@ int main(int argc, char* argv[])
   cedar::aux::gui::ImagePlotPtr p_plot = cedar::aux::gui::ImagePlotPtr(new cedar::aux::gui::ImagePlot());
   cedar::aux::MatDataPtr p_data = cedar::aux::MatDataPtr(new cedar::aux::MatData(frame0));
   p_plot->plot(p_data,window_title);
+  p_plot->setWindowTitle(QString::fromStdString(window_title));
   p_plot->show();
   p_plot->resize(frame0.cols,frame0.rows);
 

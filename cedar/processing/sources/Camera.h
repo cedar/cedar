@@ -76,23 +76,17 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
 
-//public slots:
-//
-//  //!@brief Set the debayer function on or off
-//  void setDeBayer();
-//
-//  /*!@brief Set the busId
-//   *
-//   * If this value is set on grabbing, the cameragrabber will be destroyed and with the new busId recreated
-//   */
-//  void setBusId();
-
+  ///! @brief Action-method for applying the new parameter
   void applyParameter();
 
   ///! @brief gets a new frame from the grabber (if already created)
   void updateFrame();
+
+public slots:
+
+  ///! @brief invoke this slot, when the size of the grabbed frame have been changed
+  void changedFrameSize();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -106,7 +100,7 @@ protected:
 private:
   void compute(const cedar::proc::Arguments&);
   void onStart();
-  //void onCreateGrabber();
+  void onStop();
 
   //!@brief Cast the base GrabberBasePtr to derived class CameraGrabberPtr
   inline cedar::dev::sensors::camera::GrabberPtr getCameraGrabber()

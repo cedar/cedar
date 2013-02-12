@@ -121,6 +121,7 @@ private:
 };
 
 #include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/auxiliaries/Singleton.h"
 
 namespace cedar
 {

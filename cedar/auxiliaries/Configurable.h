@@ -159,14 +159,28 @@ public:
   void copyTo(ConfigurablePtr target) const;
 
   /*!@brief Returns the parameter associated with the path.
-   * @todo This should be const, but that conflicts with the intrusive pointers
    */
   cedar::aux::ParameterPtr getParameter(const std::string& path);
 
+  /*!@brief Returns a constant pointer to the parameter associated with the given path.
+   */
+  cedar::aux::ConstParameterPtr getParameter(const std::string& path) const;
+
+  /*!@brief Returns the tpye-specific parameter associated with the path.
+   */
+  template <class T>
+  boost::intrusive_ptr<T> getParameter(const std::string& path)
+  {
+    return boost::dynamic_pointer_cast<T>(this->getParameter(path));
+  }
+
   /*!@brief Returns the configurable child associated with the path.
-   * @todo This should be const, but that conflicts with the intrusive pointers in getParameter
    */
   cedar::aux::ConfigurablePtr getConfigurableChild(const std::string& path);
+
+  /*!@brief Returns the configurable child associated with the path as a const pointer.
+   */
+  cedar::aux::ConstConfigurablePtr getConfigurableChild(const std::string& path) const;
 
   /*!@brief Locks all parameters of the configurable.
    */

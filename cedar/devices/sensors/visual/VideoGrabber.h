@@ -102,8 +102,9 @@ public cedar::dev::sensors::visual::Grabber
 public:
 
   /*! @brief  Constructor for a single-file grabber
-   *  @param grabberName  Name of the grabber
    *  @param videoFileName  Filename to grab from
+   *  @param looped Flag, if the grabbing should restart at the end of the video file. Default is true
+   *  @param speedFactor Grab at an other framerate as the one from the video file. Default is one
    */
   VideoGrabber
   (
@@ -113,9 +114,10 @@ public:
   );
 
   /*! @brief Constructor for a stereo-file grabber
-   *  @param grabberName  Name of the grabber
    *  @param videoFileName0 Filename to grab from for channel 0
    *  @param videoFileName1 Filename to grab from for channel 1
+   *  @param looped Flag, if the grabbing should restart at the end of the video file. Default is true
+   *  @param speedFactor Grab at an other framerate as the one from the video file. Default is one
    */
   VideoGrabber
   (
@@ -124,6 +126,7 @@ public:
     bool looped = true,
     bool speedFactor = 1
   );
+
   //!@brief Destructor
   ~VideoGrabber();
 
@@ -239,8 +242,10 @@ protected:
    *      In case of looping through the files, the shortest file define the restart moment
    *      The image matrix in getImage() could be empty also if the return value is true.
    *      This happens if looped is false and all frames grabbed from the file, i.e. it is over.
+   *
+   *  @param channel The channel, which should be grabbed
    */
-  bool onGrab();
+  bool onGrab(unsigned int channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

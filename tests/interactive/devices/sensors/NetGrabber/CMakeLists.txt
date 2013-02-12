@@ -37,5 +37,6 @@
 if (CEDAR_USE_YARP)
   cedar_add_interactive_test( "NetGrabber" NetGrabberTest.cpp )
   cedar_add_interactive_test( "StereoNetGrabber" StereoNetGrabberTest.cpp )
+  cedar_add_interactive_test( "NetTransmitter" NetTransmitter.cpp)
 endif()
 
