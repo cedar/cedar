@@ -240,8 +240,16 @@ public:
    * @param propertyId The wanted property
    * @return A shared pointer to the CamProperty object of the given property
    */
-  cedar::dev::sensors::camera::CamPropertyPtr getPropertyClass(Property::Id propertyId);
+  cedar::dev::sensors::camera::CamPropertyPtr getPropertyObject(Property::Id propertyId);
 
+
+  /*! @brief Enable or disable the eventhandling of the properties on setValue() methods
+   *
+   * @param block True if no signal-processing should be done, otherwise false
+   *
+   * @remarks This method invokes the QObject::blockSignals() method for every used property
+   */
+  void blockSignals(bool block);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

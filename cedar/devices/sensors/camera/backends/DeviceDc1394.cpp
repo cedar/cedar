@@ -418,8 +418,8 @@ void cedar::dev::sensors::camera::DeviceDc1394::getFeaturesFromLibDc()
     cedar::dev::sensors::camera::Property::Id prop_id
       = cedar::dev::sensors::camera::Property::type().list().at(prop).id();
 
-    //the class which handles the actual property
-    cedar::dev::sensors::camera::CamPropertyPtr p_prop = mpCameraChannel->mpProperties->getPropertyClass(prop_id);
+    //the object which handles the actual property
+    cedar::dev::sensors::camera::CamPropertyPtr p_prop = mpCameraChannel->mpProperties->getPropertyObject(prop_id);
     p_prop->doNotHandleEvents = true;
 
     //search for current property in the feature-list

@@ -138,7 +138,15 @@ void cedar::proc::sources::Camera::onStart()
   std::cout << "processing step: " <<  __PRETTY_FUNCTION__ << std::endl;
 #endif
 
-  this->getCameraGrabber()->setIsGrabbing(true);
+  if (!this->getCameraGrabber()->isCreated())
+  {
+    this->applyParameter();
+  }
+
+  if (this->getCameraGrabber()->isCreated())
+  {
+    this->getCameraGrabber()->setIsGrabbing(true);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -148,7 +156,6 @@ void cedar::proc::sources::Camera::onStop()
   std::cout << "processing step: " <<  __PRETTY_FUNCTION__ << std::endl;
 #endif
 
-  // gh todo: check if needed! (perhaps delete setIsGrabbing)
   this->getCameraGrabber()->setIsGrabbing(false);
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -156,21 +163,18 @@ void cedar::proc::sources::Camera::applyParameter()
 {
   if (this->getCameraGrabber()->applyParameter())
   {
-    for (int i = 0; i < 5; ++i)
-    {
-      cedar::aux::sleep(cedar::unit::Milliseconds(5));
-      this->onTrigger();
-      this->annotateImage();
-    }
+    this->updateFrame();
   }
   else
   {
-    cedar::aux::LogSingleton::getInstance()->debugMessage
+    cedar::aux::LogSingleton::getInstance()->error
                                              (
                                                this->getCameraGrabber()->getName() + ": ERROR on applying parameter",
                                                "void cedar::proc::sources::Camera::applyParameter()"
                                              );
   }
+
+  //this->callReset();
 }
 
 
@@ -179,9 +183,9 @@ void cedar::proc::sources::Camera::updateFrame()
 {
   if (this->getCameraGrabber()->isCreated())
   {
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 5; ++i)
     {
-      usleep(50000);
+      cedar::aux::sleep(cedar::unit::Milliseconds(50));
       this->onTrigger();
       this->annotateImage();
     }
