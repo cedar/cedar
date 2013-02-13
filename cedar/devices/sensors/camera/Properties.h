@@ -115,16 +115,20 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  ///! set the value to the cv::VideoCapture object with respect to capabilities and settings
+  /*! @brief Set the value to the cv::VideoCapture object with respect to capabilities and settings
+   *
+   * @param propertyId The Id of the property as cedar::dev::sensors::camera::Property::Id
+   * @param value The value to set the property
+   * @return true if the property could be set, otherwise false
+   */
   bool setProperty(cedar::dev::sensors::camera::Property::Id propertyId, double value);
 
-  ///! get the value from the cv::VideoCapture object with respect to capabilities and settings
-  /// @return If the value is negative, then the mode of the property is either BACKEND_DEFAULT or AUTO
+  /*! get the value from the cv::VideoCapture object with respect to capabilities and settings
+   *
+   * @param propertyId The Id of the property as cedar::dev::sensors::camera::Property::Id
+   * @return The value of the property
+   */
   double getProperty(cedar::dev::sensors::camera::Property::Id propertyId);
-
-
-//  cedar::dev::sensors::camera::PropertiesMap& getPropertiesList();
-  // void setPropertiesList(cedar::dev::sensors::camera::PropertyMap propertiesList);
 
   /// Get the mode of operation of the used parameter
   cedar::dev::sensors::camera::PropertyMode::Id getMode
@@ -132,67 +136,67 @@ public:
     cedar::dev::sensors::camera::Property::Id propertyId
   );
 
-  /// Set the mode of operation
+  /*! @brief Set the mode of operation of the property
+   *
+   * @param propertyId The Id of the property as cedar::dev::sensors::camera::Property::Id
+   * @param modeId The new mode (auto, manual, backendDefault) as cedar::dev::sensors::camera::PropertyMode::Id
+   */
   void setMode
   (
     cedar::dev::sensors::camera::Property::Id propertyId,
     cedar::dev::sensors::camera::PropertyMode::Id modeId
   );
 
+  /*! Disable the Property with the given ID
+   *
+   * @param propertyId The Id of the property as cedar::dev::sensors::camera::Property::Id
+   */
   void disableProperty(cedar::dev::sensors::camera::Property::Id propertyId);
+
+  /*! Enable the Property with the given ID
+   *
+   * @param propertyId The Id of the property as cedar::dev::sensors::camera::Property::Id
+   */
   void enableProperty(cedar::dev::sensors::camera::Property::Id propertyId);
 
+
+  /*! @brief Set the default value of the property
+   *
+   *  Normally, this value comes from the backend, but it is possible to change it
+   * @param propertyId The Id of the property as cedar::dev::sensors::camera::Property::Id
+   * @param value The new value, which should be used as default value
+   */
   void setDefaultValue(cedar::dev::sensors::camera::Property::Id propertyId, double value);
 
-  /*! \brief Get the minimum possible value that can be set of the given property
-   *  \param propId The id of the property
+  /*! @brief Get the minimum possible value that can be set of the given property
+   *  @param propertyId The id of the property
    */
   double getMinValue(cedar::dev::sensors::camera::Property::Id propertyId);
 
-  /*! \brief Get the maximum possible value that can be set of the given property
-   *  \param propId The id of the property
+  /*! @brief Get the maximum possible value that can be set of the given property
+   *  @param propertyId The id of the property
    */
   double getMaxValue(cedar::dev::sensors::camera::Property::Id propertyId);
 
-  /*! \brief This method tells you, if the given property is supported by the used camera
-   *  \param propId The id of the  property
+  /*! @brief This method tells you, if the given property is supported by the used camera
+   *  @param propertyId The id of the  property
    */
   bool isSupported(cedar::dev::sensors::camera::Property::Id propertyId);
 
-  /*! \brief This method tells you, if the given property can be set to auto-mode
-   *  \param propId The id of the  property
+  /*! @brief This method tells you, if the given property can be set to auto-mode
+   *  @param propertyId The id of the  property
    */
   bool isAutoCapable(cedar::dev::sensors::camera::Property::Id propertyId);
 
-  /*! \brief This method tells you, if the given property can be set manually
-   *  \param propId The id of the  property
+  /*! @brief This method tells you, if the given property can be set manually
+   *  @param propertyId The id of the  property
    */
   bool isManualCapable(cedar::dev::sensors::camera::Property::Id propertyId);
 
-  /*! \brief This method tells you, if the given property can be set to an absolute value
-   *  \param propId The id of the  property
-   */
-  // bool isAbsoluteCapable(Property::Id propId);
-
-    /*! \brief This method tells you, if the given property supports the OnePushAuto mode
-   *
-   *     OnePushAuto is a special mode. <br>
-   *     It is used as follows: Set a value to a property and then to OnePushAuto mode.
-   *     The camera now will try to hold this value automatically.
-   *  \param propId The id of the  property
-   */
-  // bool isOnePushCapable(Property::Id propId);
-
-  /*! \brief This method tells you, if the given property could be turn off and on
-   *  \param propId The id of the  property
-   */
-  // bool isOnOffCapable(Property::Id propId);
-
-
-  /*! \brief Set the mode of the wanted property
-   *  \param propId The id of the property
-   *  \param modeId the new mode
-   *  \return True if new value is properly set
+  /*! @brief Set the mode of the wanted property
+   *  @param propertyId The id of the property
+   *  @param modeId the new mode
+   *  @return True if new value is properly set
    */
   bool setPropertyMode
   (
@@ -200,9 +204,9 @@ public:
     cedar::dev::sensors::camera::PropertyMode::Id modeId
   );
 
-  /*! \brief get the mode of the wanted property
-   *  \param propId The id of the property
-   *  \return A value from the PropertyMode enum class
+  /*! @brief get the mode of the wanted property
+   *  @param propertyId The id of the property
+   *  @return A value from the PropertyMode enum class
    */
   cedar::dev::sensors::camera::PropertyMode::Id getPropertyMode
   (
@@ -210,6 +214,13 @@ public:
   );
 
 
+  /*! @brief Set the internally used VideoCapture object to a new one
+   *
+   * It is necessary to change the object, because OpenCv uses shared-pointer like structures for the VideoCapture.
+   * At the creation of a new object in the backend, it doesn't change at the properties
+   *
+   * @param capture The new capture object
+   */
   void setVideoCaptureObject(cv::VideoCapture capture);
 
 
@@ -224,8 +235,21 @@ public:
    */
   double getPropertyFromCamera(unsigned int propertyId);
 
-  cedar::dev::sensors::camera::CamPropertyPtr getPropertyClass(Property::Id propertyId);
+  /*! @brief Get the object of the Property class
+   *
+   * @param propertyId The wanted property
+   * @return A shared pointer to the CamProperty object of the given property
+   */
+  cedar::dev::sensors::camera::CamPropertyPtr getPropertyObject(Property::Id propertyId);
 
+
+  /*! @brief Enable or disable the eventhandling of the properties on setValue() methods
+   *
+   * @param block True if no signal-processing should be done, otherwise false
+   *
+   * @remarks This method invokes the QObject::blockSignals() method for every used property
+   */
+  void blockSignals(bool block);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

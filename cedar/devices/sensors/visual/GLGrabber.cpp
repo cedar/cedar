@@ -28,7 +28,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 04 23
 
-    Description: Implementation of a Grabber to grab from OpenGL, i.e from a QGLWidget
+    Description: Implementation of a Grabber to grab from a QGLWidget
 
     Credits:
 
@@ -113,7 +113,7 @@ cedar::dev::sensors::visual::GLGrabber::~GLGrabber()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::dev::sensors::visual::GLGrabber::onInit()
+bool cedar::dev::sensors::visual::GLGrabber::onCreateGrabber()
 {
   unsigned int num_cams = getNumCams();
   std::stringstream init_message;
@@ -128,13 +128,18 @@ bool cedar::dev::sensors::visual::GLGrabber::onInit()
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
                                             this->getName() + init_message.str(),
-                                             "cedar::dev::sensors::visual::OglGrabber::onInit()"
+                                             "cedar::dev::sensors::visual::OglGrabber::onCreateGrabber()"
                                            );
-  // Grab first frames
-  onGrab();
-
   return true;
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+void cedar::dev::sensors::visual::GLGrabber::onCloseGrabber()
+{
+  this->onCleanUp();
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::GLGrabber::onCleanUp()
@@ -151,67 +156,50 @@ void cedar::dev::sensors::visual::GLGrabber::onCleanUp()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// void cedar::dev::sensors::visual::GLGrabber::onAddChannel()
-//{
-//  // create the channel structure for one channel
-//  GLChannelPtr channel(new GLChannel);
-//  channel->mpQGLWidget = NULL;
-//  mChannels.push_back(channel);
-//}
-
-//----------------------------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::GLGrabber::onDeclareParameters()
-{
-  return true;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::GLGrabber::onUpdateSourceInfo(unsigned int channel)
+std::string cedar::dev::sensors::visual::GLGrabber::onUpdateSourceInfo(unsigned int channel)
 {
   // value of channel is already checked by GraberInterface::getSourceInfo()
-  setChannelInfoString(channel, "Channel " + boost::lexical_cast<std::string>(channel)
+  return "Channel " + boost::lexical_cast<std::string>(channel)
                                       + ": QT::OGLWidget class \""
                                       + typeid(getGLChannel(channel)->mpQGLWidget).name()
-                                      + "\"");
+                                      + "\"";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::GLGrabber::onGrab()
+bool cedar::dev::sensors::visual::GLGrabber::onGrab(unsigned int channel)
 {
   bool ogl_valid = true;
-  unsigned int num_cams = getNumCams();
-  for(unsigned int channel = 0; channel < num_cams; ++channel)
+
+  if (getGLChannel(channel)->mpQGLWidget != NULL)
   {
-    if (getGLChannel(channel)->mpQGLWidget != NULL)
-    {
-      QGLWidget* p_channel_widget = getGLChannel(channel)->mpQGLWidget;
+    QGLWidget* p_channel_widget = getGLChannel(channel)->mpQGLWidget;
 
-      // grab framebuffer without alpha-channel. possible values
-      // GL_FRONT_LEFT, GL_FRONT_RIGHT, GL_BACK_LEFT, GL_BACK_RIGHT, GL_FRONT, GL_BACK, GL_LEFT, GL_RIGHT, GL_AUXi,
-      // where i is between 0 and the value of GL_AUX_BUFFERS minus 1.
+    // grab framebuffer without alpha-channel. possible values
+    // GL_FRONT_LEFT, GL_FRONT_RIGHT, GL_BACK_LEFT, GL_BACK_RIGHT, GL_FRONT, GL_BACK, GL_LEFT, GL_RIGHT, GL_AUXi,
+    // where i is between 0 and the value of GL_AUX_BUFFERS minus 1.
 
-      // activate this thread for painting
-      // problem: qgl-widget painting also have to be multithreaded, i.e also have to invoke makeCurrent(), doneCurrent()
-      // p_channel_widget->makeCurrent();
-      glReadBuffer(GL_FRONT_RIGHT);
-      QImage qimage = p_channel_widget->grabFrameBuffer(false);
-      // p_channel_widget->doneCurrent();
+    // activate this thread for painting
+    // problem: qgl-widget painting also have to be multithreaded, i.e also have to invoke makeCurrent(), doneCurrent()
+    // p_channel_widget->makeCurrent();
+    glReadBuffer(GL_FRONT_RIGHT);
+    QImage qimage = p_channel_widget->grabFrameBuffer(false);
+    // p_channel_widget->doneCurrent();
 
-      // QImage to cv::Mat
-      cv::Mat mat = cv::Mat(qimage.height(), qimage.width(), CV_8UC4,(uchar*)qimage.bits(), qimage.bytesPerLine());
-      cv::Mat mat2 = cv::Mat(mat.rows, mat.cols, CV_8UC3 );
-      int from_to[] = { 0,0, 1,1, 2,2 };
-      cv::mixChannels( &mat, 1, &mat2, 1, from_to, 3 );
+    // QImage to cv::Mat
+    cv::Mat mat =
+       cv::Mat(qimage.height(), qimage.width(), CV_8UC4, static_cast<uchar*>(qimage.bits()), qimage.bytesPerLine());
+    cv::Mat mat2 = cv::Mat(mat.rows, mat.cols, CV_8UC3 );
+    int from_to[] = { 0,0, 1,1, 2,2 };
+    cv::mixChannels( &mat, 1, &mat2, 1, from_to, 3 );
 
-      // apply the new content to the channel image
-      getImageMat(channel) = mat2.clone();
-    }
-    else
-    {
-      // if opengl context isn't valid, then an empty matrix will be return
-      ogl_valid = false;
-      getImageMat(channel) = cv::Mat();
-    }
+    // apply the new content to the channel image
+    getImageMat(channel) = mat2.clone();
+  }
+  else
+  {
+    // if opengl context isn't valid, then an empty matrix will be return
+    ogl_valid = false;
+    getImageMat(channel) = cv::Mat();
   }
   return ogl_valid;
 }
@@ -228,9 +216,9 @@ void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGL
       "cedar::dev::sensors::visual::GLGrabber::setWidget"
     );
   }
+
   if (qglWidget != NULL)
   {
-
     bool restart_grabber = LoopedThread::isRunning();
 
     // stop grabbing thread if running
@@ -242,10 +230,10 @@ void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGL
     // change source
     getGLChannel(channel)->mpQGLWidget = qglWidget;
     cedar::aux::LogSingleton::getInstance()->debugMessage
-                                            (
-                                             this->getName() + ": New Widget applied",
-                                              "cedar::dev::sensors::visual::GLGrabber::setWidget"
-                                            );
+                                             (
+                                               this->getName() + ": New Widget applied",
+                                               "cedar::dev::sensors::visual::GLGrabber::setWidget"
+                                             );
     this->grab();
     if (restart_grabber)
     {

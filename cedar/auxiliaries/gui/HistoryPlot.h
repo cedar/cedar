@@ -92,7 +92,7 @@ protected:
   // none yet
 private:
   cedar::aux::ConstDataPtr mData;
-  QWidget *mpCurrentPlotWidget;
+  cedar::aux::gui::PlotInterface* mpCurrentPlotWidget;
 }; // class cedar::aux::gui::HistoryPlot
 
 #endif // CEDAR_AUX_GUI_HISTORY_PLOT_H

@@ -34,5 +34,4 @@
 #
 #=======================================================================================================================
 
-cedar_add_example(GrabbableGrabberTutorial PREFIX "examples/grabber" )
-
+cedar_add_interactive_test("GLGrabber" GLGrabberTest.cpp)

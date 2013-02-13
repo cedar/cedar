@@ -38,6 +38,7 @@
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Network.h"
 #include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/DoubleData.h"
 
 
 class TestModule : public cedar::proc::Step
