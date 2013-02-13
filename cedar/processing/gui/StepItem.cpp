@@ -132,6 +132,8 @@ mDisplayMode(cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT)
 
 void cedar::proc::gui::StepItem::construct()
 {
+  QObject::connect(this, SIGNAL(stepStateChanged()), this, SLOT(updateStepState()));
+
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
                                );
@@ -285,7 +287,7 @@ bool cedar::proc::gui::StepItem::hasGuiConnection
   return p_source_slot->hasGuiConnectionTo(p_target_slot);
 }
 
-void cedar::proc::gui::StepItem::stepStateChanged()
+void cedar::proc::gui::StepItem::updateStepState()
 {
   switch (this->mStep->getState())
   {
@@ -356,7 +358,7 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
   this->addTriggerItems();
   this->addDecorations();
 
-  mStateChangedConnection = step->connectToStateChanged(boost::bind(&cedar::proc::gui::StepItem::stepStateChanged, this));
+  mStateChangedConnection = step->connectToStateChanged(boost::bind(&cedar::proc::gui::StepItem::emitStepStateChanged, this));
   QObject::connect(step.get(), SIGNAL(nameChanged()), this, SLOT(redraw()));
 
   mSlotAddedConnection.disconnect();
@@ -366,6 +368,11 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
     = step->connectToSlotAdded(boost::bind(&cedar::proc::gui::StepItem::slotAdded, this, _1, _2));
   mSlotRemovedConnection
     = step->connectToSlotRemoved(boost::bind(&cedar::proc::gui::StepItem::slotRemoved, this, _1, _2));
+}
+
+void cedar::proc::gui::StepItem::emitStepStateChanged()
+{
+  emit stepStateChanged();
 }
 
 void cedar::proc::gui::StepItem::readConfiguration(const cedar::aux::ConfigurationNode& node)
