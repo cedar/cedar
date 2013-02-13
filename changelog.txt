@@ -60,6 +60,16 @@ likely to undergo major changes:
 - all:
   - enabled C++0x / C++11 compiler flag for GCC
 
+- cedar::aux
+  - DoubleData now inherits MatData. It therefore is also no longer just a typedef of a template, so make sure you
+    include the proper header (cedar/auxiliaries/DoubleData) in your code.
+  - Parameters and Configurables can now be marked as advanced. Those that are, are not displayed to the user unless
+    they opt to have them displayed by checking a box in the property pane.
+  
+- cedar::aux::gui
+  - LinePlots now have an option in their context menu to set fixed limits for the y axis.
+  - There is now a history plot for 1D matrices.
+
 - cedar::dev
   - KinematicChain instances now need to be started via ->start() by the implementor. They do not start threading on their own, anymore
 
@@ -69,12 +79,35 @@ likely to undergo major changes:
 - cedar::dyn
   - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   
 
+== Version 1.0.7
+- cedar::aux::gui
+  - fixed a bug in how matrix plots handle changing data dimensionality
+- cedar::proc
+  - fixed a potential crash in Network::getElement("path") 
+
+== Version 1.0.6 ==
+- General
+  - added support for OpenCV 2.2
+  - fixed build on Windows
+- cedar::aux::conv
+  - fixed a memory leak in FFTW-based convolution
+
+== Version 1.0.5 ==
+- Build system
+  - 'make install' can be used without having Doxygen installed
+
+== Version 1.0.4 ==
+- Build system
+  - Moved the version information to a separate file (cmake/version.txt).
+- cedar::aux::math
+  - Fixed a bug in the function gaussMatrix that discretized the center position of cyclic Gaussian curves.
+
 == Version 1.0.3 ==
 - cedar::aux
   - Fixed some minor bad code in the gui::LinePlot
   
 - cedar::proc
-  - Fixed a bug in the procection step that could lead to a crash when the destination dimensions of a 3d to a 2d matrix
+  - Fixed a bug in the projection step that could lead to a crash when the destination dimensions of a 3d to a 2d matrix
     were swapped.
 
 == Version 1.0.2 ==

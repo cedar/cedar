@@ -126,13 +126,14 @@ private:
   inline int interpolateBin(double value)
   {
     double interpolated = (value - this->getLowerLimit()) / mInterval;
-    if (interpolated < 0.0 || interpolated > 1.0)
+    // this also works for NaN 
+    if (interpolated >= 0.0 && interpolated <= 1.0)
     {
-      return -1;
+      return static_cast<int>(cedar::aux::math::round(interpolated * (this->getNumberOfBins() - 1)));
     }
     else
     {
-      return static_cast<int>(cedar::aux::math::round(interpolated * (this->getNumberOfBins() - 1)));
+      return -1;      
     }
   }
 
