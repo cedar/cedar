@@ -1,0 +1,27 @@
+{
+  "name": "default Khepera robot",
+  "description file": "khepera/configs/description.json",
+  "component slots":
+  {
+    "drive":
+    {
+      "channel type": "serial"
+    },
+    "ambient light sensor":
+    {
+      "channel type": "serial"
+    },
+    "proximity sensor":
+    {
+      "channel type": "serial"
+    },
+    "led":
+    {
+      "channel type": "serial"
+    },
+    "gripper":
+    {
+      "channel type": "serial"
+    },
+  }
+}
