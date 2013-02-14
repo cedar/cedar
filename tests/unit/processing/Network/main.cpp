@@ -125,6 +125,31 @@ int main(int /* argc */, char** /* argv */)
     std::cout << "Properly threw something." << std::endl;
   }
 
+  // test duplicate
+  std::cout << "test duplication of steps" << std::endl;
+  try
+  {
+    std::string new_name = network->getUniqueName("stepB");
+    network->duplicate("stepB");
+    network->getElement(new_name);
+  }
+  catch(cedar::aux::ExceptionBase&) // simple copy did not work
+  {
+    std::cout << "simple duplication did not work" << std::endl;
+    ++errors;
+  }
+
+  try
+  {
+    network->duplicate("stepB", "copied step B");
+    network->getElement("copied step B");
+  }
+  catch(cedar::aux::ExceptionBase&) // named copy did not work
+  {
+    std::cout << "named duplication did not work" << std::endl;
+    ++errors;
+  }
+
   // test nested networks
   std::cout << "Test nested network." << std::endl;
   cedar::proc::NetworkPtr network_parent(new cedar::proc::Network());
