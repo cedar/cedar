@@ -38,6 +38,7 @@
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/LengthParameter.h"
 #include "cedar/auxiliaries/TimeParameter.h"
+#include "cedar/auxiliaries/VelocityParameter.h"
 
 // SYSTEM INCLUDES
 #include <boost/filesystem.hpp>
@@ -65,12 +66,22 @@ public:
       "time",
       0 * boost::units::si::seconds
     )
+  ),
+  mVelocity
+  (
+    new cedar::aux::VelocityParameter
+    (
+      this,
+      "velocity",
+      1 * boost::units::si::meters / boost::units::si::second
+    )
   )
   {
   }
 
   cedar::aux::LengthParameterPtr mLength;
   cedar::aux::TimeParameterPtr mTime;
+  cedar::aux::VelocityParameterPtr mVelocity;
 };
 
 CEDAR_GENERATE_POINTER_TYPES(TestConfigurable);
@@ -97,7 +108,8 @@ int test_reading
     (
       const std::string& fileName,
       const boost::units::quantity<boost::units::si::length>& expectedLength,
-      const boost::units::quantity<boost::units::si::time>& expectedTime
+      const boost::units::quantity<boost::units::si::time>& expectedTime,
+      const boost::units::quantity<boost::units::si::velocity>& expectedVelocity
     )
 {
   int errors = 0;
@@ -106,12 +118,14 @@ int test_reading
   {
     TestConfigurablePtr conf(new TestConfigurable());
 
-    std::cout << "Reading of file \"" << fileName << "\" finished with " << errors << " error(s)." << std::endl;
     conf->readJson(fileName);
 
     errors += check(expectedLength, conf->mLength);
     errors += check(expectedTime, conf->mTime);
+    errors += check(expectedVelocity, conf->mVelocity);
   }
+
+  std::cout << "Reading of file \"" << fileName << "\" finished with " << errors << " error(s)." << std::endl;
   return errors;
 }
 
@@ -133,9 +147,27 @@ int main(int, char**)
 {
   int errors = 0;
 
-  errors += test_reading("test1-read.json", 1.0 * boost::units::si::meters, 5.0 * boost::units::si::seconds);
-  errors += test_reading("test2-read.json", 1.0 * boost::units::si::meters, 5.0 * boost::units::si::seconds);
-  errors += test_reading("test3-read.json", 1.0 * boost::units::si::meters, 5.0 * boost::units::si::seconds);
+  errors += test_reading
+            (
+              "test1-read.json",
+              1.0 * boost::units::si::meters,
+              5.0 * boost::units::si::seconds,
+              1.0 * boost::units::si::meters / boost::units::si::seconds
+            );
+  errors += test_reading
+            (
+              "test2-read.json",
+              1.0 * boost::units::si::meters,
+              5.0 * boost::units::si::seconds,
+              1.0 * boost::units::si::meters / boost::units::si::seconds
+            );
+  errors += test_reading
+            (
+              "test3-read.json",
+              1.0 * boost::units::si::meters,
+              5.0 * boost::units::si::seconds,
+              1.0 * boost::units::si::meters / boost::units::si::seconds
+            );
   errors += test_writing("test1-write.json");
 
   std::cout << "Test finished with " << errors << " error(s)." << std::endl;
