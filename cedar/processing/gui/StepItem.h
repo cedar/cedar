@@ -199,10 +199,13 @@ public:
 
 public slots:
   //!@brief handles changes in the state of a step (e.g. from error to non-error state)
-  void stepStateChanged();
+  void updateStepState();
 
   //!@brief handles a redraw of the graphical representation
   void redraw();
+
+signals:
+  void stepStateChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -214,6 +217,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  void emitStepStateChanged();
+
   //!@briefs adds graphical representations for all data items
   void addDataItems();
 

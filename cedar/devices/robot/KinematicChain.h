@@ -557,8 +557,8 @@ private:
 
   /*!@brief gives the temporal derivative of a joint twist in the current configuration
    *
-   * @param jointIndex    index of the joint twist
-   * @return    derivative of the joint twist, 6 \f$\times\f$ 1 matrix
+   * @param jointIndex index of the joint twist
+   * @return derivative of the joint twist, 6 \f$\times\f$ 1 matrix
    */
   cv::Mat calculateTwistTemporalDerivative(unsigned int jointIndex);
 

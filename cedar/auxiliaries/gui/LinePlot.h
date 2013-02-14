@@ -187,9 +187,20 @@ public:
   //!@todo Generalize this for n-dimensional matrix plots.
   cedar::aux::math::Limits<double> getXLimits() const;
 
+  //!@brief Returns the limits of the y axis.
+  //!@todo Generalize this for n-dimensional matrix plots.
+  cedar::aux::math::Limits<double> getYLimits() const;
+
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
   void convert();
+
+public slots:
+  void setAutomaticYAxisScaling();
+
+  void setFixedYAxisScaling();
+
+  void setFixedYAxisScaling(double lower, double upper);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

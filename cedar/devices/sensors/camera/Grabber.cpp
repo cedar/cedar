@@ -44,6 +44,7 @@
 #include "cedar/devices/sensors/camera/Grabber.h"
 #include "cedar/devices/sensors/camera/enums/Setting.h"
 #include "cedar/devices/sensors/camera/backends/DeviceCvVideoCapture.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 #ifdef CEDAR_USE_VIDEO_FOR_LINUX
 #include "cedar/devices/sensors/camera/backends/DeviceVfl.h"
@@ -150,15 +151,24 @@ void cedar::dev::sensors::camera::Grabber::connectSignals()
                getCameraChannel(channel)->_mpBackendType.get(),
                SIGNAL(valueChanged()),
                this,
+               //SLOT(cameraChanged())
+               SLOT(backendChanged())
+             );
+
+    QObject::connect
+             (
+               getCameraChannel(channel).get(),
+               SIGNAL(changeCamera()),
+               this,
                SLOT(cameraChanged())
              );
 
     QObject::connect
              (
                getCameraChannel(channel).get(),
-               SIGNAL(settingsChanged()),
+               SIGNAL(changeSetting()),
                this,
-               SLOT(cameraChanged())
+               SLOT(settingChanged())
              );
   }
 }
@@ -182,36 +192,72 @@ void cedar::dev::sensors::camera::Grabber::channelAdded(int) // int index
 }
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::camera::Grabber::cameraChanged()
+void cedar::dev::sensors::camera::Grabber::backendChanged()
 {
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+#endif
 
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                           (
-                                             this->getName() + ": cameraChanged signal",
-                                             "cedar::dev::sensors::camera::Grabber::cameraChanged()"
-                                           );
+  // update visible fields and create a new backend
+  unsigned int num_cams = getNumCams();
+  for (unsigned int channel = 0; channel < num_cams; ++channel)
+  {
+    getCameraChannel(channel)->setBackendType(getCameraChannel(channel)->_mpBackendType->getValue());
+  }
 
-//  getCameraChannel(0)->setBackendType(getCameraChannel(0)->_mpBackendType->getValue());
-
-  // only apply parameters directly, if the camera is already in use.
-  // which is set by a loopedTrigger or by the applyParameter-action
-  if (mCaptureDeviceCreated)
+  //if already created, apply used parameter
+  if (this->isCreated())
   {
     // delete and recreate all channels
+#ifdef DEBUG_CAMERA_GRABBER
+    std::cout << "\tdo applyParameter (i.e. recreate)" << std::endl;
+#endif
     this->applyParameter();
-  }
-  else
-  {
-    // otherwise only update visible fields
-    unsigned int num_cams = getNumCams();
-    for (unsigned int channel = 0; channel < num_cams; ++channel)
-    {
-//      std::cout << "set Backendtype to "
-//        << cedar::dev::sensors::camera::BackendType::type().get(getCameraChannel(channel)->_mpBackendType->getValue()).prettyString() << std::endl;
-      getCameraChannel(channel)->setBackendType(getCameraChannel(channel)->_mpBackendType->getValue());
-    }
-  }
 
+    emit frameSizeChanged();
+  }
+}
+
+//gh todo: delete method, same as settingChanged
+//----------------------------------------------------------------------------------------------------
+void cedar::dev::sensors::camera::Grabber::cameraChanged()
+{
+  // Settings have changed. This slot is only invoked if the capture-device is already created.
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+  std::cout << "\tRecreate Grabber Object! And update frames" << std::endl;
+#endif
+
+  // recreate grabber
+  this->applyParameter(); // don't use this, because it sets mode to default
+
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+  std::cout << "\tupdate frames" << std::endl;
+#endif
+
+  emit frameSizeChanged();
+}
+
+
+//----------------------------------------------------------------------------------------------------
+void cedar::dev::sensors::camera::Grabber::settingChanged()
+{
+  // Settings have changed. This slot is only invoked if the capture-device is already created.
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+  std::cout << "\tRecreate Grabber Object! And update frames" << std::endl;
+#endif
+
+  // recreate grabber
+  this->applyParameter(); // don't use this, because it sets mode to default
+
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+  std::cout << "\tupdate frames" << std::endl;
+#endif
+
+  emit frameSizeChanged();
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -231,13 +277,20 @@ void cedar::dev::sensors::camera::Grabber::onCloseGrabber()
 //----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::camera::Grabber::onCreateGrabber()
 {
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << " start" << std::endl;
+#endif
+
+  // number of channels
+  unsigned int num_cams = getNumCams();
+
   if (this->isCreated())
   {
     this->closeGrabber();
+    //std::cout << "old grabber closed" << std::endl;
   }
 
   bool result = false;
-  unsigned int num_cams = getNumCams();
 
   // init message
   std::stringstream init_message;
@@ -254,13 +307,17 @@ bool cedar::dev::sensors::camera::Grabber::onCreateGrabber()
     {
       init_message << "Bus-ID: ";
     }
-    init_message << getCameraChannel(channel)->getCameraId() << std::endl;
+    init_message << getCameraChannel(channel)->getCameraId();
   }
-  cedar::aux::LogSingleton::getInstance()->debugMessage
+  cedar::aux::LogSingleton::getInstance()->message
                                            (
                                              this->getName() + init_message.str(),
                                              "cedar::dev::sensors::camera::Grabber::onCreateGrabber()"
                                            );
+
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << "\t"<< this->getName() + init_message.str() << std::endl;
+#endif
 
   // create capture device, which depends on the chosen backend
   try
@@ -268,7 +325,15 @@ bool cedar::dev::sensors::camera::Grabber::onCreateGrabber()
     bool all_devices_created = true;
     for (unsigned int channel = 0; channel < num_cams; ++channel)
     {
-      getCameraChannel(channel)->createBackend();
+      //backend already created on initialization, but destroyed on onApplyParameter()/onCreateGrabber()
+      if (!getCameraChannel(channel)->mpBackend)
+      {
+       getCameraChannel(channel)->createBackend();
+#ifdef DEBUG_CAMERA_GRABBER
+       std::cout << "\tBackend recreated" << std::endl;
+#endif
+      }
+
       bool device_created = getCameraChannel(channel)->mpBackend->createCaptureDevice();
 
       if (device_created)
@@ -290,6 +355,10 @@ bool cedar::dev::sensors::camera::Grabber::onCreateGrabber()
   {
     result = false;
   }
+
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << " end" << std::endl;
+#endif
 
   return result;
 }
@@ -427,58 +496,35 @@ std::vector<std::string> cedar::dev::sensors::camera::Grabber::getAllProperties(
 }
 
 
-
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::camera::Grabber::onGrab()
+bool cedar::dev::sensors::camera::Grabber::onGrab(unsigned int channel)
 {
-  bool result = true;
-  unsigned int num_cams = getNumCams();
+  getCameraChannel(channel)->mpVideoCaptureLock->lockForWrite();
 
-  // grab and retrieve
-   for(unsigned int channel = 0; channel < num_cams; ++channel)
-   {
+  bool result = false;
+  result = getCameraChannel(channel)->mVideoCapture.read(getImageMat(channel));
 
-     getCameraChannel(channel)->mpVideoCaptureLock->lockForWrite();
-     result = getCameraChannel(channel)->mVideoCapture.read(getImageMat(channel)) & result;
+#ifdef DEBUG_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << " grab channel " << channel << "; result of read-function: "
+            << std::boolalpha << result
+            << " thread: " << QThread::currentThread() << std::endl;
+#endif
 
-     // check if conversion from bayer-pattern to cv::Mat BGR format is needed
-     cedar::dev::sensors::camera::Decoding::Id debayer_fiter;
-     debayer_fiter = this->getCameraChannel(channel)->_mpDecodeFilter->getValue();
+  if (result)
+  {
+    // check if conversion from bayer-pattern to cv::Mat BGR format is needed
+    cedar::dev::sensors::camera::Decoding::Id debayer_fiter;
+    debayer_fiter = this->getCameraChannel(channel)->_mpDecodeFilter->getValue();
 
-     if (debayer_fiter != cedar::dev::sensors::camera::Decoding::NONE)
-     {
-       cv::cvtColor(getImageMat(channel),getImageMat(channel),debayer_fiter);
-     }
+    if (debayer_fiter != cedar::dev::sensors::camera::Decoding::NONE)
+    {
+      cv::cvtColor(getImageMat(channel),getImageMat(channel),debayer_fiter);
+    }
+  }
 
-     getCameraChannel(channel)->mpVideoCaptureLock->unlock();
-
-   }
-
-  // OpenCV documentation:
-  // for better synchronizing between the cameras,
-  // first grab internally in camera
-  // lock for concurrent access in the grabber-thread and in the get/set properties
-
-//  for(unsigned int channel = 0; channel < num_cams; ++channel)
-//  {
-//    getCameraChannel(channel)->mpVideoCaptureLock->lockForWrite();
-//    result = getCameraChannel(channel)->mVideoCapture.grab() && result;
-//    getCameraChannel(channel)->mpVideoCaptureLock->unlock();
-//  }
-//
-//  // and then retrieve the frames
-//  if (result)
-//  {
-//    for(unsigned int channel = 0; channel < num_cams; ++channel)
-//    {
-//      getCameraChannel(channel)->mpVideoCaptureLock->lockForWrite();
-//      result = getCameraChannel(channel)->mVideoCapture.retrieve(getImageMat(channel)) && result;
-//      getCameraChannel(channel)->mpVideoCaptureLock->unlock();
-//    }
-//  }
+  getCameraChannel(channel)->mpVideoCaptureLock->unlock();
   return result;
 }
-
 
 
 //----------------------------------------------------------------------------------------------------
@@ -529,6 +575,7 @@ unsigned int cedar::dev::sensors::camera::Grabber::getCameraId(unsigned int chan
   return getCameraChannel(channel)->getCameraId();
 }
 
+//----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::camera::Grabber::isGuid(unsigned int channel)
 {
   if (channel >= getNumCams())

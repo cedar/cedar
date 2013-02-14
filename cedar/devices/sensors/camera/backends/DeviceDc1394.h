@@ -80,19 +80,22 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //! does the backend initialization
-  void initDevice();
+  void init();
 
   //! update settings from gui
   //void updateSettings();
+
+  //!@brief Enable/disable framerates for the current selected frame mode
+  void updateFps();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void setProperties();
+
+  // derived from class Device
   void applySettingsToCamera();
   bool createCaptureObject();
-  void applyStateToCamera();
 
   /*! @brief Opens the wanted camera with libDc methods
    *
@@ -109,7 +112,7 @@ protected:
    */
   void getFrameRatesFromLibDc(cedar::dev::sensors::camera::VideoMode::Id modeId);
 
-  //! get all available modes and enable them in the enum-class, disable all others
+  //! get all available modes and enable them in the enum-class, disable all others and set mode to "AUTO"
   void getGrabModesFromLibDc();
 
   //--------------------------------------------------------------------------------------------------------------------

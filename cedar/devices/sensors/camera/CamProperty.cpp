@@ -135,6 +135,7 @@ void cedar::dev::sensors::camera::CamProperty::propertyModeSlot()
       mpPropertyValue->setConstant(true);
   }
   emit propertyModeChanged(mId, mpPropertyMode->getValue());
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------

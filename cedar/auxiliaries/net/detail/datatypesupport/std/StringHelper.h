@@ -39,7 +39,6 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
-#include "cedar/auxiliaries/net/detail/datatypesupport/interfaces/InterfaceCollatedData.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/CollatedTraits.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/header/BasicNetHeader.h"
 
@@ -58,7 +57,7 @@ namespace cedar {
 
 //!@brief a helper class which implements InterfacCollatedData for opencv types
 template <typename CVT>
-class StringHelper  : virtual protected InterfaceCollatedData<CVT>
+class StringHelper
 {
 
   //---------------------------------------------------------------------------

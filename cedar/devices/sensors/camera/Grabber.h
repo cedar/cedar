@@ -96,15 +96,27 @@ public:
 
   protected slots:
 
-  //!@brief A slot that must be triggered if a camera-settings has changed. In that case,
-  // a new camera-device will be created
+  /*!@brief A slot that must be triggered if a camera-settings has changed. In that case,
+   * a new camera-device will be created. It is internally connected with the CameraChannel->settingsChanged signal.
+   */
+  void settingChanged();
+
+
   void cameraChanged();
 
+  /*!@brief A slot that must be triggered if the backend has changed. It is internally connected with the
+   *      CameraChannel->Backend Enum-Parameter valueChanged() signal.
+   */
+  void backendChanged();
 
-  // signals:
+  signals:
 
-  //!@brief This signal is emitted, when a new picture is available with the getImage() method.
- // void pictureChanged();
+  /*!@brief This signal is raised, if the grabber will be recreated
+   *
+   *   This signal is used from the processingIde Camera step to annotate a new imagesize
+   */
+  void frameSizeChanged();
+
 
   private:
   /*! @brief Boost slot method. Invoked if a channel is added as an ObjectListParameter as an object
@@ -397,7 +409,7 @@ protected:
   double getPropertyFromCamera(unsigned int channel, unsigned int propertyId);
 
   // inherited from Grabber
-  bool onGrab();
+  bool onGrab(unsigned int channel);
   void onCleanUp();
   bool onCreateGrabber();
   void onCloseGrabber();
