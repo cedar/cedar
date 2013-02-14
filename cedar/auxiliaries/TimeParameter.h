@@ -55,6 +55,8 @@ namespace cedar
       if (map.empty())
       {
         addBaseUnitToMaps<boost::units::si::second_base_unit>(map, boost::units::si::seconds);
+        addAliasToMaps(map, "second", "seconds");
+
         addSubUnitToMaps<boost::units::si::second_base_unit>
         (
           map,
@@ -68,7 +70,7 @@ namespace cedar
         (
           map,
           boost::units::si::seconds,
-          "minute", "m",
+          "minute", "min",
           60.0
         );
         addAliasToMaps(map, "minute", "minutes");
