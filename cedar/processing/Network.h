@@ -154,6 +154,18 @@ public:
    */
   void add(std::list<cedar::proc::ElementPtr> elements);
 
+  /*!@brief Duplicates an existing element.
+   *
+   * @param elementName Identifier of the existing element.
+   * @param newName Name to be given to the new element.
+   */
+  void duplicate(std::string elementName, std::string newName = "");
+
+  /*!@brief unmodifiedName unmodified name, possibly non-unique in network
+   * @return unique name created by attaching a number if name is already taken
+   */
+  std::string getUniqueName(const std::string& unmodifiedName) const;
+
   /*!@brief Returns the element with the given name as a pointer of the specified type.
    */
   template <class T>
