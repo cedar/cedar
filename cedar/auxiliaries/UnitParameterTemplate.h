@@ -45,6 +45,9 @@
 #include "cedar/auxiliaries/ParameterTemplate.h"
 
 // SYSTEM INCLUDES
+#include <boost/units/base_dimension.hpp>
+#include <boost/units/derived_dimension.hpp>
+#include <boost/units/get_dimension.hpp>
 #include <boost/units/quantity.hpp>
 #include <boost/units/io.hpp>
 #include <boost/static_assert.hpp>
@@ -128,8 +131,87 @@ namespace cedar
       //!@todo Proper exception
       CEDAR_ASSERT(false);
     }
-  }
-}
+
+    /*!
+     * @remarks Ignores the exponents in the string, the calling function has to take care of this.
+     */
+    template <typename TUnit>
+    boost::units::quantity<TUnit> parseUnitString(const std::string& unitStr)
+    {
+      std::vector<std::string> split;
+      cedar::aux::split(unitStr, "^", split);
+
+      CEDAR_ASSERT(split.size() > 0);
+      CEDAR_ASSERT(split.size() <= 2);
+
+      return cedar::aux::getUnitFromPostFix<TUnit>(split.at(0));
+    }
+
+    template <typename T, typename Numerator, typename Denominator>
+    boost::units::quantity<T> parseCompoundUnit(const std::string& unitStr)
+    {
+      // normalize the white space in the unit
+      std::string unit_str = cedar::aux::regexReplace(unitStr, "\\s+", " ");
+
+      // normalize exponents
+      unit_str = cedar::aux::regexReplace(unit_str, "\\s*\\^\\s*", "^");
+
+      std::vector<std::string> component_strs;
+      cedar::aux::split(unit_str, " ", component_strs);
+
+      // there must be at least two strings specifying the unit, otherwise it would not be a compound.
+      CEDAR_ASSERT(component_strs.size() > 1);
+
+      double numerator = 1.0;
+      double denominator = 1.0;
+
+      Numerator i_numerator;
+      Denominator i_denominator;
+
+      for (auto iter = component_strs.begin(); iter != component_strs.end(); ++iter)
+      {
+        const std::string& component_unit = *iter;
+
+        if (component_unit.empty())
+        {
+          continue;
+        }
+
+        std::vector<std::string> split;
+        cedar::aux::split(component_unit, "^", split);
+
+        // strings should only be of the form x or x^n
+        CEDAR_ASSERT(split.size() > 0);
+        CEDAR_ASSERT(split.size() <= 2);
+        const std::string& unit = split.at(0);
+
+        if (split.size() == 1)
+        {
+          // this is a unit in the numerator, no powers attached
+          numerator *= cedar::aux::parseUnitString<Numerator>(unit) / i_numerator;
+        }
+        else
+        {
+          const std::string& exponent = split.at(1);
+
+          CEDAR_ASSERT(exponent.size() >= 1);
+
+          if (exponent.at(0) == '-')
+          {
+            denominator *= cedar::aux::parseUnitString<Denominator>(unit) / i_denominator;
+          }
+          else
+          {
+            numerator *= cedar::aux::parseUnitString<Numerator>(unit) / i_numerator;
+          }
+        }
+
+      } // for loop
+      return (numerator / denominator) * (i_numerator / i_denominator);
+    }
+
+  } // namespace aux
+} // namespace cedar
 
 
 // Custom translator for bool (only supports std::string)
@@ -151,10 +233,23 @@ namespace cedar
         size_t delim = str.find_first_not_of("0123456789.");
         std::string number_str = str.substr(0, delim);
         std::string unit_str = str.substr(delim);
-        unit_str = cedar::aux::erase(unit_str, " ");
+
+        // normalize the white space in the unit
+        unit_str = cedar::aux::regexReplace(unit_str, "\\s+", " ");
+
+        // remove whitespace at the beginning of the unit string
+        delim = unit_str.find_first_not_of(" ");
+        if (delim == std::string::npos)
+        {
+          delim = 0;
+        }
+        unit_str = unit_str.substr(delim);
+
+        // get the number to put in front of the unit
         double number = cedar::aux::fromString<double>(number_str);
 
-        return boost::optional<external_type>(number * cedar::aux::getUnitFromPostFix<T>(unit_str));
+        // unit is not a combined one, just return plain unit
+        return boost::optional<external_type>(number * cedar::aux::parseUnitString<T>(unit_str));
       }
 
       // Converts a bool to string
