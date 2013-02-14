@@ -551,6 +551,64 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
   this->mElementAddedSignal(this, element);
 }
 
+void cedar::proc::Network::duplicate(std::string elementName, std::string newName)
+{
+  try
+  {
+    // determine class
+    cedar::proc::ElementPtr elem = this->getElement(elementName);
+    std::string class_name = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(elem);
+    // allocate object
+    cedar::proc::ElementPtr new_elem = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_name);
+    // copy configuration tree
+    new_elem->copyFrom(elem);
+    // get unique name
+    std::string modified_name;
+    if (!newName.empty()) // desired name given
+    {
+      modified_name = this->getUniqueName(newName);
+    }
+    else // default name
+    {
+      modified_name = this->getUniqueName(elementName);
+    }
+    // set unique name
+    new_elem->setName(modified_name);
+    // add to network
+    this->add(new_elem);
+  }
+  catch (cedar::proc::InvalidNameException& exc)
+  {
+    CEDAR_THROW
+    (
+      cedar::proc::InvalidNameException,
+      "cannot duplicate element of name " + elementName + ", it does not exist in network" + this->getName()
+    )
+  }
+}
+
+std::string cedar::proc::Network::getUniqueName(const std::string& unmodifiedName) const
+{
+  std::string adjusted_name;
+  try
+  {
+    unsigned int new_id = 1;
+    adjusted_name = unmodifiedName;
+    while (this->getElement(adjusted_name))
+    {
+      std::stringstream str;
+      str << unmodifiedName << " " << new_id;
+      adjusted_name = str.str();
+      ++new_id;
+    }
+  }
+  catch(cedar::proc::InvalidNameException& exc)
+  {
+    // nothing to do here, name not duplicate, use this as a name
+  }
+  return adjusted_name;
+}
+
 cedar::proc::ConstElementPtr cedar::proc::Network::getElement(const std::string& name) const
 {
   ElementMap::const_iterator iter;
