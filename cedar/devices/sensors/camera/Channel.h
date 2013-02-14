@@ -71,7 +71,6 @@ class cedar::dev::sensors::camera::Channel
 :
 public QObject,
 public cedar::dev::sensors::visual::GrabberChannel
-//public boost::enable_shared_from_this<cedar::dev::sensors::camera::Channel>
 {
 
   Q_OBJECT
@@ -84,18 +83,38 @@ protected slots:
 
   /*! @brief A slot that is triggered from the used parameters if a setting has changed
    *
-   *  Internally, the settingsChanges() signal is emitted
+   *  Internally, the cameraChanged() signal is emitted
    */
-  void settingChanged();
+  void deviceChanged();
 
+  //! @brief Slot invoked, if the framerate is changed
+  void fpsChanged();
+
+  //! @brief Slot invoked, if the grabmode is changed
+  void grabModeChanged();
+
+#ifdef CEDAR_USE_LIB_DC1394
+  //! @brief Slot invoked, if the isospeed is changed
+  void isoSpeedChanged();
+#endif
 
 signals:
 
-  /*!@brief This signal is emitted, when a setting has changed.
+  /*!@brief This signal is emitted, when a different camera should be used.
    *
    * The CameraGrabber have to react on this signal, to recreate the backend with the new settings
    */
-  void settingsChanged();
+  void changeCamera();
+
+
+  /*!@brief This signal is emitted, when a setting has changed.
+   *
+   * The CameraGrabber have to react on this signal. If the grabber is already working,
+   * then a new grabbing-object with the new settings will be created. Otherwise this signal
+   * could be ignored.
+   */
+  void changeSetting();
+
 
   // friend classes of this channel for direct access to the members
   friend class cedar::dev::sensors::camera::Grabber;

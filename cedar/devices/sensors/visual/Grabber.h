@@ -59,7 +59,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
 
-
 /*! @class cedar::dev::sensors::visual::Grabber
  *  @brief This is the base class for all grabber.
  *
@@ -493,6 +492,11 @@ public:
    */
   std::string getChannelSaveFilenameAddition(int channel) const;
 
+  /*!@brief Set the internal used flag when the grabbing is switched on
+   *
+   * Internally used in the processing Step "Camera" when running with a looped trigger
+   */
+  void setIsGrabbing(bool isGrabbing);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -561,8 +565,11 @@ protected:
    *
    *      This method is called by grab() and has to be implemented by the inherited grabber.
    *      This is where the grabbing takes place.
+   *
+   *  @param channel The channel to grab from
+   *
    */
-  virtual bool onGrab();
+  virtual bool onGrab(unsigned int channel);
 
 
   /*! @brief Updates the channel informations
@@ -598,6 +605,12 @@ protected:
    * @param info The new info-string for that channel
    */
   void setChannelInfoString(unsigned int channel, std::string info);
+
+  /*! @brief Set the internal used flag with locking
+   *
+   * @param isCreated Flag, if the Grabber is already created or not
+   */
+  void setIsCreated(bool isCreated);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -640,21 +653,13 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-    ///! @brief Flag which indicates if the capture devices of all channels are correctly created or not
-    bool mCaptureDeviceCreated;
-
-    //! Flag, that determins if grabbing is on either via the LoopedThread or via the LoopedTrigger from the gui
-    bool mIsGrabbing;
-
     /*! @brief Read/write lock
      *
      *  Used for concurrent access to the mImageMatVector - matrices
      */
     QReadWriteLock* mpReadWriteLock;
     
-    /*! @brief The actual measured fps of grabbing
-     *
-     */
+    //! @brief The actual measured fps of grabbing
     double mFpsMeasured;
     
     /*! @brief  Flag if recording is on     */
@@ -664,6 +669,21 @@ protected:
 //    bool mStartUp;
 
 private:
+
+    //! @brief Flag which indicates if the capture devices of all channels are correctly created or not
+    bool mCaptureDeviceCreated;
+
+    //! @brief Used for concurrent access to the mCaptureDeviceCreated flag
+    QReadWriteLock* mpLockCaptureDeviceCreated;
+
+    //! Flag, that determins if grabbing is on either via the LoopedThread or via the LoopedTrigger from the gui
+    bool mIsGrabbing;
+
+    //! @brief Used for concurrent access to the mIsGrabbing flag
+    QReadWriteLock* mpLockIsGrabbing;
+
+    //! @brief Used for blocking other threads while grabber is created
+    QReadWriteLock* mpLockIsCreating;
 
     ///! @brief Flag which indicates if the GrabberThread was started during startRecording
     bool mGrabberThreadStartedOnRecording;

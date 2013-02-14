@@ -53,6 +53,10 @@
 // namespace for class camera
 //------------------------------------------------------------------------
 
+//enable debug output
+//#define DEBUG_CAMERA_GRABBER
+//#define DEBUG_CAMERA_STEP
+
 namespace cedar
 {
   namespace dev

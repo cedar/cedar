@@ -47,9 +47,8 @@
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
-//#include <map>
 
-
+//#define DEBUG_GRABBER
 
 //------------------------------------------------------------------------
 // namespace for classes

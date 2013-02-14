@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,24 +22,29 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        BoolParameter.h
+    File:        main.cpp
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 12 09
+    Maintainer:  
+    Email:       
+    Date:        
 
-    Description: This is a dummy header for the typedef BoolParameter (which is actually a
-                 cedar::aux::ParameterTemplate<bool>).
+    Description: A test that purposefully fails (for testing the buildserver).
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_BOOL_PARAMETER_H
-#define CEDAR_AUX_BOOL_PARAMETER_H
-
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/ParameterTemplate.h"
 
-#endif // CEDAR_AUX_BOOL_PARAMETER_H
+// SYSTEM INCLUDES
+
+
+int main()
+{
+#if 0
+  return 1; // Fail the test.
+#else
+  return 0; // Pass the test.
+#endif
+}
+

@@ -194,7 +194,7 @@ void cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()
                                                  this->getName() + ": New file successfully read.",
                                                  "cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()"
                                                );
-      mCaptureDeviceCreated = true;
+      setIsCreated(true);
       onUpdateSourceInfo(channel);
       emit pictureChanged();
     }
@@ -264,15 +264,9 @@ bool cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()
 }
 
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::PictureGrabber::onGrab()
+bool cedar::dev::sensors::visual::PictureGrabber::onGrab(unsigned int channel)
 {
-  bool result = true;
-  unsigned int num_cams = getNumCams();
-  for(unsigned int channel = 0; channel < num_cams; ++channel)
-  {
-    result = !(getImageMat(channel).empty()) && result;
-  }
-  return result;
+  return !(getImageMat(channel).empty());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        HistoryPlot.h
+    File:        HistoryPlot1D.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 09 23
+    Date:        2013 01 25
 
     Description:
 
@@ -34,56 +34,58 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_HISTORY_PLOT_H
-#define CEDAR_AUX_GUI_HISTORY_PLOT_H
+#ifndef CEDAR_AUX_GUI_HISTORY_PLOT1D_H
+#define CEDAR_AUX_GUI_HISTORY_PLOT1D_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/PlotInterface.h"
 
 // SYSTEM INCLUDES
-#include <QWidget>
 
-/*!@brief A plot that records and displays the history of numerical data.
+
+/*!@todo describe.
+ *
+ * @todo describe more.
  */
-class cedar::aux::gui::HistoryPlot : public cedar::aux::gui::PlotInterface
+class cedar::aux::gui::HistoryPlot1D : public cedar::aux::gui::PlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  HistoryPlot(QWidget *pParent = NULL);
-
-  //!@brief Destructor
-  ~HistoryPlot();
+  HistoryPlot1D(QWidget *pParent = NULL);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief plot data
-   * @param data plotted data
-   * @param title title of the plot window
-   */
+  //!@brief Display data.
   void plot(cedar::aux::ConstDataPtr data, const std::string& title);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void timerEvent(QTimerEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //! Takes the current data and puts it into the history
+  void advanceHistory();
+
+  //! Resets the history to contain only the current state.
+  void resetHistory();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -91,8 +93,18 @@ private:
 protected:
   // none yet
 private:
-  cedar::aux::ConstDataPtr mData;
-  cedar::aux::gui::PlotInterface* mpCurrentPlotWidget;
-}; // class cedar::aux::gui::HistoryPlot
+  //! Data used for storing the history of the activation.
+  cedar::aux::MatDataPtr mHistory;
 
-#endif // CEDAR_AUX_GUI_HISTORY_PLOT_H
+  //! Data from which the history is being recorded.
+  cedar::aux::ConstMatDataPtr mData;
+
+  //! Subplot used for plotting the history matrix.
+  cedar::aux::gui::SurfacePlot* mpHistoryPlot;
+
+  int mMaxHistSize;
+
+}; // class cedar::aux::gui::HistoryPlot1D
+
+#endif // CEDAR_AUX_GUI_HISTORY_PLOT1D_H
+

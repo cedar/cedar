@@ -126,7 +126,7 @@ public:
   /*! get the value from the cv::VideoCapture object with respect to capabilities and settings
    *
    * @param propertyId The Id of the property as cedar::dev::sensors::camera::Property::Id
-   * @return If the value is negative, then the mode of the property is either BACKEND_DEFAULT or AUTO
+   * @return The value of the property
    */
   double getProperty(cedar::dev::sensors::camera::Property::Id propertyId);
 
@@ -240,8 +240,16 @@ public:
    * @param propertyId The wanted property
    * @return A shared pointer to the CamProperty object of the given property
    */
-  cedar::dev::sensors::camera::CamPropertyPtr getPropertyClass(Property::Id propertyId);
+  cedar::dev::sensors::camera::CamPropertyPtr getPropertyObject(Property::Id propertyId);
 
+
+  /*! @brief Enable or disable the eventhandling of the properties on setValue() methods
+   *
+   * @param block True if no signal-processing should be done, otherwise false
+   *
+   * @remarks This method invokes the QObject::blockSignals() method for every used property
+   */
+  void blockSignals(bool block);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
