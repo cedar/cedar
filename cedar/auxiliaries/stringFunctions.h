@@ -264,6 +264,13 @@ namespace cedar
       return result;
     }
 
+    /*! @brief Returns a strint with all occurrences of needle removed from the given string haystack.
+     */
+    inline std::string erase(const std::string& haystack, const std::string& needle)
+    {
+      return replace(haystack, needle, "");
+    }
+
     /*!@brief Template function that converts an STL string to a simple data type.
      *
      * @param value The data value that will be converted to a string.

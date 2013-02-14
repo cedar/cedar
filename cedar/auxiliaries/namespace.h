@@ -115,6 +115,8 @@ namespace cedar
     template <typename T> class NumericParameter;
     //!@brief a template class for vector parameters (of same type)
     template <typename T> class VectorParameter;
+    //!@brief A template class for parameters holding boost::units.
+    template <typename T> class UnitParameterTemplate;
     //!@brief a template class for vector parameters (of numeric type)
     template <typename T> class NumericVectorParameter;
     //!@brief a template class for map parameters (of primitive type)
