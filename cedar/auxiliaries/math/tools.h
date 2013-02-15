@@ -77,11 +77,6 @@
  *  some precompiler macros are also defined here
  */
 
-/* epsilon surrounding for near zero values */
-#ifndef EQN_EPS
-#define EQN__EPS 1e-9
-#endif
-
 namespace cedar
 {
   namespace aux
