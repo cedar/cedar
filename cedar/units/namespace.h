@@ -47,7 +47,12 @@
 // SYSTEM INCLUDES
 #include <string>
 #include <boost/smart_ptr.hpp>
-
+#include <boost/units/quantity.hpp>
+#include <boost/units/systems/si/length.hpp>
+#include <boost/units/systems/si/time.hpp>
+#include <boost/units/systems/si/velocity.hpp>
+#include <boost/units/systems/si/acceleration.hpp>
+#include <boost/units/systems/si/plane_angle.hpp>
 
 namespace cedar
 {
@@ -74,12 +79,38 @@ namespace cedar
      */
     template <unsigned int factor, const char* suffix> class TimeUnit;
 
-    //!@brief the template concretization for microseconds
+    //!@brief the template concretion for microseconds
     typedef TimeUnit<1, prefix_us> Microseconds;
-    //!@brief the template concretization for milliseconds
+    //!@brief the template concretion for milliseconds
     typedef TimeUnit<1000, prefix_ms> Milliseconds;
-    //!@brief the template concretization for seconds
+    //!@brief the template concretion for seconds
     typedef TimeUnit<1000000, prefix_s> Seconds;
+
+    //!@cond SKIPPED_DOCUMENTATION
+    template <typename DimensionType> struct UnitMatrix;
+    //!@endcond
+
+    //!@brief template concretion for lengths
+    typedef UnitMatrix<boost::units::si::length> LengthMatrix;
+    //!@brief template concretion for time
+    typedef UnitMatrix<boost::units::si::time> TimeMatrix;
+    //!@brief template concretion for velocities
+    typedef UnitMatrix<boost::units::si::velocity> VelocityMatrix;
+    //!@brief template concretion for angles
+    typedef UnitMatrix<boost::units::si::plane_angle> PlaneAngleMatrix;
+    //!@brief template concretion for accelerations
+    typedef UnitMatrix<boost::units::si::acceleration> AccelerationMatrix;
+
+    //!@brief default unit for length
+    extern CEDAR_UNITS_LIB_EXPORT const boost::units::quantity<boost::units::si::length> DEFAULT_LENGTH_UNIT;
+    //!@brief default unit for time
+    extern CEDAR_UNITS_LIB_EXPORT const boost::units::quantity<boost::units::si::time> DEFAULT_TIME_UNIT;
+    //!@brief default unit for velocities
+    extern CEDAR_UNITS_LIB_EXPORT const boost::units::quantity<boost::units::si::velocity> DEFAULT_VELOCITY_UNIT;
+    //!@brief default unit for acceleration
+    extern CEDAR_UNITS_LIB_EXPORT const boost::units::quantity<boost::units::si::acceleration> DEFAULT_ACCELERATION_UNIT;
+    //!@brief default unit for (plane) angles
+    extern CEDAR_UNITS_LIB_EXPORT const boost::units::quantity<boost::units::si::plane_angle> DEFAULT_PLANE_ANGLE_UNIT;
   }
 }
 

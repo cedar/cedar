@@ -62,9 +62,9 @@ int main(int, char**)
   cv::Mat kevin(3, 1, CV_64FC1);
   cedar::aux::math::sphericalToCartesian<double>(horst, kevin);
   if (
-       IsZero(kevin.at<double>(0, 0) -1.0)
-       && IsZero(kevin.at<double>(1, 0) -1.0)
-       && IsZero(kevin.at<double>(2, 0) + 0.0)
+       cedar::aux::math::isZero<double>(kevin.at<double>(0, 0) -1.0)
+       && cedar::aux::math::isZero<double>(kevin.at<double>(1, 0) -1.0)
+       && cedar::aux::math::isZero<double>(kevin.at<double>(2, 0) + 0.0)
      )
   {
     ;
@@ -85,9 +85,9 @@ int main(int, char**)
   cv::Mat jaqueline(3, 1, CV_32FC1);
   cedar::aux::math::sphericalToCartesian<float>(chantalle, jaqueline);
   if (
-       IsZero(jaqueline.at<float>(0, 0) - 0.5)
-       && IsZero(jaqueline.at<float>(1, 0) - 0.5)
-       && IsZero(jaqueline.at<float>(2, 0) - sqrt(2.0)/2.0)
+       cedar::aux::math::isZero<double>(jaqueline.at<float>(0, 0) - 0.5)
+       && cedar::aux::math::isZero<double>(jaqueline.at<float>(1, 0) - 0.5)
+       && cedar::aux::math::isZero<double>(jaqueline.at<float>(2, 0) - sqrt(2.0)/2.0)
      )
   {
     ;
@@ -103,9 +103,9 @@ int main(int, char**)
   std::cout << "test: cartesianToSpherical<double>" << std::endl;
   cedar::aux::math::cartesianToSpherical<double>(kevin, horst);
   if (
-       IsZero(horst.at<double>(0, 0) -sqrt(2.0))
-       && IsZero(horst.at<double>(1, 0) - cedar::aux::math::pi/2.0)
-       && IsZero(horst.at<double>(2, 0) - cedar::aux::math::pi/4.0)
+       cedar::aux::math::isZero<double>(horst.at<double>(0, 0) -sqrt(2.0))
+       && cedar::aux::math::isZero<double>(horst.at<double>(1, 0) - cedar::aux::math::pi/2.0)
+       && cedar::aux::math::isZero<double>(horst.at<double>(2, 0) - cedar::aux::math::pi/4.0)
      )
   {
     ;

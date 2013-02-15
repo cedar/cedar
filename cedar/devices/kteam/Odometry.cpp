@@ -82,7 +82,7 @@ void cedar::dev::kteam::Odometry::initialize()
   mOldEncoders[1] = 0;
 
   // set starting-position
-  setTranslation(0 * meters, 0 * meters);
+  setTranslation(0.0 * cedar::unit::DEFAULT_LENGTH_UNIT, 0.0 * cedar::unit::DEFAULT_LENGTH_UNIT);
   //setRotation(0);
   mDrive->reset();
 
@@ -137,8 +137,8 @@ void cedar::dev::kteam::Odometry::calculatePositionAndOrientation(const std::vec
 //  double new_orientation = getOrientation() + dphi;
 
   // this assumes the heading direction of the vehicle is the x-axis of the local coordinate system
-  quantity<length> new_x_position = getCoordinateFrame()->getTranslationX() * meters + ds * getCoordinateFrame()->getTransformation().at<double>(0, 1);
-  quantity<length> new_y_position = getCoordinateFrame()->getTranslationY() * meters + ds * getCoordinateFrame()->getTransformation().at<double>(1, 1);
+  quantity<length> new_x_position = getCoordinateFrame()->getTranslationX() + ds * getCoordinateFrame()->getTransformation().at<double>(0, 1);
+  quantity<length> new_y_position = getCoordinateFrame()->getTranslationY() + ds * getCoordinateFrame()->getTransformation().at<double>(1, 1);
 
   std::cout << "new x position:" << new_x_position << std::endl;
   std::cout << "new y position:" << new_x_position << std::endl;
@@ -149,7 +149,7 @@ void cedar::dev::kteam::Odometry::calculatePositionAndOrientation(const std::vec
 
   // update both position and orientation
   setTranslation(new_x_position, new_y_position);
-  getCoordinateFrame()->rotate(2, dphi/radians); //!todo
+  getCoordinateFrame()->rotate(2, dphi); //!todo
 //  setRotation(new_orientation);
 }
 

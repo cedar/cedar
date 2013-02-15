@@ -41,12 +41,16 @@
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
+#include "cedar/units/LengthMatrix.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
 #include <QReadWriteLock>
+#include <boost/units/quantity.hpp>
+#include <boost/units/systems/si/length.hpp>
+#include <boost/units/systems/si/plane_angle.hpp>
 
 /*!@brief Provides the geometry of a rigid object
  *
@@ -78,22 +82,22 @@ public:
   /*!@brief returns translation of the object in homogeneous coordinates
    * @return translation of the local frame origin in the world frame
    */
-  cv::Mat getTranslation() const;
+  cedar::unit::LengthMatrix getTranslation() const;
 
   /*!@brief returns x-translation of the local frame origin in world frame
    * @return translation of the local frame origin in the world frame
    */
-  double getTranslationX() const;
+  boost::units::quantity<boost::units::si::length> getTranslationX() const;
 
   /*!@brief returns y-translation of the local frame origin in world frame
    * @return translation of the local frame origin in the world frame in x-direction
    */
-  double getTranslationY() const;
+  boost::units::quantity<boost::units::si::length> getTranslationY() const;
 
   /*!@brief returns z-translation of the local frame origin in world frame
    * @return translation of the local frame origin in the world frame in y-direction
    */
-  double getTranslationZ() const;
+  boost::units::quantity<boost::units::si::length> getTranslationZ() const;
 
   /*!@brief returns rotation of the local frame origin in world frame
    * @return rotation of the local frame relative to the world frame
@@ -119,34 +123,44 @@ public slots:
    * @param y new translation along the y-axis
    * @param z new translation along the z-axis
    */
-  void setTranslation(double x, double y, double z);
+  void setTranslation
+       (
+         const boost::units::quantity<boost::units::si::length>& x,
+         const boost::units::quantity<boost::units::si::length>& y,
+         const boost::units::quantity<boost::units::si::length>& z
+       );
 
   /*!@brief set the translation of the object frame origin in the world frame
    * @param translation new translation vector in homogeneous coordinates
    */
-  void setTranslation(const cv::Mat& translation);
+  void setTranslation(const cedar::unit::LengthMatrix& translation);
 
   /*!@brief set the translation of the object frame origin in the world frame
    * @param translation new translation vector in homogeneous coordinates
    */
-  void setTranslation(const std::vector<double>& translation);
+  void setTranslation(const std::vector<boost::units::quantity<boost::units::si::length> >& translation);
 
   /*!@brief add the provided values to the translation of the local frame origin in the world frame
    * @param x additional translation along the x-axis
    * @param y additional translation along the y-axis
    * @param z additional translation along the z-axis
    */
-  void translate(double x, double y, double z);
+  void translate
+       (
+         const boost::units::quantity<boost::units::si::length>& x,
+         const boost::units::quantity<boost::units::si::length>& y,
+         const boost::units::quantity<boost::units::si::length>& z
+       );
 
   /*!@brief set the translation of the object frame origin in the world frame
    * @param translation additional translation in homogeneous coordinates
    */
-  void translate(const cv::Mat& translation);
+  void translate(const cedar::unit::LengthMatrix& translation);
 
   /*!@brief set the translation of the object frame origin in the world frame
    * @param translation additional translation in homogeneous coordinates
    */
-  void translate(const std::vector<double>& translation);
+  void translate(const std::vector<boost::units::quantity<boost::units::si::length> >& translation);
 
   /*!@brief set the rotation of the object frame in the world frame
    * @param rotation new rotation matrix
@@ -157,11 +171,12 @@ public slots:
    * @param  rotation new rotation matrix
    */
   void setRotation(const std::vector<double>& rotation);
+
   /*!@brief rotates the object around one of the main axes of the object frame
    * @param axis    index of the axis to rotate around, between 0 and 2
    * @param angle    value of angle that the object is rotated by, in radians
    */
-  void rotate(unsigned int axis, double angle);
+  void rotate(unsigned int axis, const boost::units::quantity<boost::units::si::plane_angle>& angle);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

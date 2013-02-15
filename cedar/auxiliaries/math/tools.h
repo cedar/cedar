@@ -79,13 +79,9 @@
 
 /* epsilon surrounding for near zero values */
 #ifndef EQN_EPS
-#define EQN_EPS 1e-9
+#define EQN__EPS 1e-9
 #endif
 
-//!@todo The IsZero macros should be called IS_ZERO; maybe this should even be an inline function
-#ifndef IsZero
-#define IsZero(x) ((x) > -EQN_EPS && (x) < EQN_EPS)
-#endif
 namespace cedar
 {
   namespace aux
@@ -109,7 +105,14 @@ namespace cedar
       //!\todo move write(cv::Mat) to aux::utilities
       //!\todo rework (template for copy & paste code)
       //!\todo add log file capability
-      CEDAR_AUX_LIB_EXPORT void write(cv::Mat matrix);
+      CEDAR_DECLARE_DEPRECATED(CEDAR_AUX_LIB_EXPORT void write(cv::Mat matrix));
+
+      //!@brief returns whether the input is zero within small bounds
+      template <typename T> inline bool isZero(T x, unsigned int positionAfterDecimalPoint = 9)
+      {
+        double epsilon = pow(0.1, positionAfterDecimalPoint);
+        return (x > -epsilon && x < epsilon);
+      }
 
       //!@brief a templated round function
       template <typename T> inline T round(T val)

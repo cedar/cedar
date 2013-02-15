@@ -71,14 +71,16 @@ cedar::dev::Odometry::~Odometry()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cv::Mat cedar::dev::Odometry::getTranslation() const
+cedar::unit::LengthMatrix cedar::dev::Odometry::getTranslation() const
 {
+  //
+
   //construct the matrix to return
-  cv::Mat translation = cedar::dev::Odometry::LengthMatrix(2, 1);
+  cedar::unit::LengthMatrix translation(cv::Mat(2, 1, CV_64FC1), cedar::unit::DEFAULT_LENGTH_UNIT);
 
   //store the x- and y-position in the new matrix (gets are from LocalCoordinateFrame.h)
-  translation.at<quantity<length> >(0, 0) = getCoordinateFrame()->getTranslationX() * meters;
-  translation.at<quantity<length> >(1, 0) = getCoordinateFrame()->getTranslationY() * meters;
+  translation.matrix.at<double>(0, 0) = getCoordinateFrame()->getTranslationX() / cedar::unit::DEFAULT_LENGTH_UNIT;
+  translation.matrix.at<double>(1, 0) = getCoordinateFrame()->getTranslationY() / cedar::unit::DEFAULT_LENGTH_UNIT;
 
   return translation;
 }
@@ -92,7 +94,7 @@ quantity<plane_angle> cedar::dev::Odometry::getRotation()
          (
            getCoordinateFrame()->getTransformation().at<double>(1, 0),
            getCoordinateFrame()->getTransformation().at<double>(0, 0)
-         ) * radians;
+         ) * cedar::unit::DEFAULT_PLANE_ANGLE_UNIT;
   //  return atan2(getOrientationQuaternion(2) , getOrientationQuaternion(1));
 }
 
@@ -100,7 +102,7 @@ void cedar::dev::Odometry::setTranslation(const quantity<length>& x, const quant
 {
   //!todo
   //sets x- and y-position only (z-position = 0)
-  getCoordinateFrame()->setTranslation(x/meters, y/meters, 0);
+  getCoordinateFrame()->setTranslation(x, y, 0.0 * cedar::unit::DEFAULT_LENGTH_UNIT);
 }
 
 void cedar::dev::Odometry::setRotation(quantity<plane_angle> angle)
