@@ -47,6 +47,7 @@
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/LoopMode.h"
+#include "cedar/auxiliaries/ThreadWrapper.h"
 #include "cedar/auxiliaries/LoopedThreadWorker.h"
 
 // SYSTEM INCLUDES
@@ -97,15 +98,8 @@
  *
  * \todo Use units instead of doubles
  */
-class cedar::aux::LoopedThread : public QObject,
-                                 virtual public cedar::aux::Configurable
+class cedar::aux::LoopedThread : public cedar::aux::ThreadWrapper
 {
-  //----------------------------------------------------------------------------
-  // macros
-  //----------------------------------------------------------------------------
-
-  Q_OBJECT
-   
 
   //----------------------------------------------------------------------------
   // constructors and destructor
@@ -148,19 +142,6 @@ public:
    */
   virtual void step(double time) = 0;
 
-  /*!@brief Stops the thread.
-   *
-   * Since the thread might be busy executing step(), it makes sense to wait a
-   * moment for the thread to finish its work.
-   *
-   * @param timeout the max. time to wait for the thread (in milliseconds).
-   * @param suppressWarning by default a warning about occurring timing problems will be given
-   */
-  void stop(unsigned int timeout = 500, bool suppressWarning = false); // TODO: say it is thread-safe and re-entry will abort with a warning
-
-  void start(); // TODO: manpage TODO: say it is thread-safe and re-entry will abort with a warning
-  bool isRunning() const; // TODO manpage, TODO: say it is thread-safe
-
   /*!@brief Performs a single step with default step size (or simulated time).
    *
    * This has no effect if the thread is already running.
@@ -197,22 +178,13 @@ public:
    */
   void setSimulatedTime(double simulatedTime = 0.0);
 
-  /*!@brief Returns true if the thread is running but stop() was called.
-   *
-   */
-  bool stopRequested();
-
-  inline void wait(int i = 0)
-  {
-    i = 42;
-    // TODO
-    // TODO: brauchen wir diese funktion ueberhaupt? wird bislang nur zum
-    // Pruefen auf Beenden des Threads verwendet, oder?
-  }
-
-
   //! get the duration of the fixed trigger step
   inline double getStepSize() const
+  {
+    return this->_mStepSize->getValue();
+  }
+  //! get the duration of the fixed trigger step
+  inline double getStepSize() 
   {
     return this->_mStepSize->getValue();
   }
@@ -259,9 +231,6 @@ public:
   }
 #endif  
 
-public slots:
-  void finishedThread(); // thread-safe
-
   //----------------------------------------------------------------------------
   // protected methods
   //----------------------------------------------------------------------------
@@ -271,10 +240,7 @@ protected:
   // private methods
   //----------------------------------------------------------------------------
 private:
-  bool validWorker() const; // thread-UN-safe
-  bool validThread() const; // thread-UN-safe
   void stopStatistics(bool suppressWarnings); // TODO: are the stats locked? // thread un-safe
-  bool isRunningUnlocked() const; // is NOT thread-safe
 
   //----------------------------------------------------------------------------
   // members
@@ -290,12 +256,7 @@ protected:
   // none yet
 
 private:
-  QThread* mpThread;
-  mutable bool mDestructing; 
-  mutable QMutex mDestructingMutex;
-
-  cedar::aux::detail::LoopedThreadWorker *mpWorker;
-  mutable QReadWriteLock mGeneralAccessLock;
+  cedar::aux::detail::LoopedThreadWorker* mpWorker;
 
   //!@brief desired length of a single step, in milliseconds
   cedar::aux::DoubleParameterPtr _mStepSize;
@@ -308,6 +269,9 @@ private:
 
   //! The loop mode of the trigger
   cedar::aux::EnumParameterPtr _mLoopMode;
+
+  cedar::aux::detail::ThreadWorker* newWorker();
+
 }; // class cedar::aux::LoopedThread
 
 #endif // CEDAR_AUX_LOOPED_THREAD_H

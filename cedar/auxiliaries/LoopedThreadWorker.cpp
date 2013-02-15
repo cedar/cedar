@@ -35,39 +35,22 @@
 =============================================================================*/
 
 // LOCAL INCLUDES
-#include "LoopedThreadWorker.h"
 #include "cedar/auxiliaries/namespace.h"
-
-// CEDAR INCLUDES
 #include "cedar/auxiliaries/LoopedThreadWorker.h"
 #include "cedar/auxiliaries/LoopedThread.h"
+
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 
 cedar::aux::detail::LoopedThreadWorker::LoopedThreadWorker(cedar::aux::LoopedThread *wrapper) 
-: mpWrapper(wrapper), mStop(false)
+: ThreadWorker( wrapper ), mpWrapper(wrapper)
 {
   initStatistics();
 }
 
 cedar::aux::detail::LoopedThreadWorker::~LoopedThreadWorker() 
 {
-  // Note: do not delete mpWrapper here! it should delete us
-}
-
-void cedar::aux::detail::LoopedThreadWorker::requestStop()
-{
-  // this will stop and exit the loop (not the thread - the thread is stopped
-  // by the wrapper LoopedThread)
-
-  // TODO: needs to be locked!
-  mStop = true;
-}
-
-bool cedar::aux::detail::LoopedThreadWorker::stopRequested()
-{
-  // TODO: locking
-  return mStop;
 }
 
 void cedar::aux::detail::LoopedThreadWorker::work()
