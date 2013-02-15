@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/LoopMode.h"
+#include "cedar/auxiliaries/ThreadWorker.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -55,22 +56,8 @@
 #include <QThread>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
-namespace cedar
+class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::ThreadWorker
 {
-  namespace aux
-  {
-    namespace detail
-    {
-      class LoopedThreadWorker; // doesnt need to be in namespace.h (internal)
-    };
-  };
-};
-
-
-class cedar::aux::detail::LoopedThreadWorker : public QObject
-{
-  Q_OBJECT
-
   public: 
     LoopedThreadWorker(cedar::aux::LoopedThread* wrapper);
     ~LoopedThreadWorker();
@@ -79,9 +66,8 @@ class cedar::aux::detail::LoopedThreadWorker : public QObject
     void initStatistics();
     inline void updateStatistics(double stepsTaken);
 
-
-  public slots:
-    void work();
+  public:
+    void work(); // is a virtual slot in parent
 
   public:
     /*!@brief Returns the last timesteps start time.
@@ -102,14 +88,9 @@ class cedar::aux::detail::LoopedThreadWorker : public QObject
     unsigned long getNumberOfSteps();
     double getMaxStepsTaken();
 
-    void requestStop();
-    bool stopRequested();
-
   private:
-    cedar::aux::LoopedThread *mpWrapper;
-
-    //!@brief stop is requested
-    volatile bool mStop; // volatile disables some optimizations, but doesn't add thread-safety
+  
+    cedar::aux::LoopedThread* mpWrapper;
 
     //!@brief total number of steps since start()
     unsigned long mNumberOfSteps;
