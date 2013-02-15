@@ -48,10 +48,121 @@
 #include <boost/numeric/conversion/bounds.hpp>
 #include <limits>
 #include <iostream>
+#include <boost/units/base_dimension.hpp>
+#include <boost/units/derived_dimension.hpp>
+#include <boost/units/get_dimension.hpp>
+#include <boost/units/quantity.hpp>
+#include <boost/units/io.hpp>
+#include <boost/units/systems/si/length.hpp>
+#include <boost/units/systems/si/time.hpp>
+#include <boost/units/systems/si/velocity.hpp>
 
 // \todo find a more generic version of this
 #undef DEBUG_VERBOSE
 
+namespace cedar
+{
+  namespace aux
+  {
+    namespace math
+    {
+      template<class Unit>
+      class UnitHelper
+      {
+        public:
+        static inline Unit unit()
+        {
+          BOOST_STATIC_ASSERT(sizeof(Unit) == 0);
+        }
+      };
+
+      template<>
+      class UnitHelper<boost::units::quantity<boost::units::si::time>>
+      {
+      public:
+        static inline boost::units::quantity<boost::units::si::time> unit()
+        {
+          return 1 * boost::units::si::seconds;
+        }
+      };
+
+      template<>
+      class UnitHelper<boost::units::quantity<boost::units::si::length>>
+      {
+      public:
+        static inline boost::units::quantity<boost::units::si::length> unit()
+        {
+          return 1 * boost::units::si::meters;
+        }
+      };
+
+      template<>
+      class UnitHelper<boost::units::quantity<boost::units::si::velocity>>
+      {
+      public:
+        static inline boost::units::quantity<boost::units::si::velocity> unit()
+        {
+          return 1 * boost::units::si::meters/boost::units::si::seconds;
+        }
+      };
+
+      template <typename T>
+      class NumericHelper
+      {
+      public:
+        static inline T zero()
+        {
+          return static_cast<T>(0);
+        }
+
+        static inline T smallestNegative()
+        {
+          if (std::numeric_limits<T>::is_integer)
+          {
+            return static_cast<T>(-1);
+          }
+          else
+          {
+            return static_cast<T>(-boost::numeric::bounds<T>::smallest());
+          }
+        }
+
+        static inline T smallestPositive()
+        {
+          if (std::numeric_limits<T>::is_integer)
+          {
+            return static_cast<T>(1);
+          }
+          else
+          {
+            return static_cast<T>(boost::numeric::bounds<T>::smallest());
+          }
+        }
+      };
+
+      template<class Unit, class T>
+      class NumericHelper<boost::units::quantity<Unit, T> >
+      {
+        typedef boost::units::quantity<Unit, T> Quantity;
+        public:
+        static inline Quantity zero()
+        {
+          return static_cast<double>(0) * UnitHelper<Quantity>::unit();
+        }
+
+        static inline Quantity smallestNegative()
+        {
+          return -1 * boost::numeric::bounds<T>::smallest() * UnitHelper<Quantity>::unit();
+        }
+
+        static inline Quantity smallestPositive()
+        {
+          return boost::numeric::bounds<T>::smallest() * UnitHelper<Quantity>::unit();
+        }
+      };
+    }
+  }
+}
 
 /*!@brief Structure representing the limits of an interval.
  */
@@ -75,8 +186,8 @@ public:
   //!@brief Default constructor
   Limits()
   :
-  mLowerLimit(0),
-  mUpperLimit(1)
+  mLowerLimit(NumericHelper<T>::zero()),
+  mUpperLimit(NumericHelper<T>::smallestPositive())
   {
   }
 
@@ -144,41 +255,25 @@ public:
   //!@brief Constructs a limits object that covers only the positive interval (including 0).
   static Limits positiveZero(const T& upper = boost::numeric::bounds<T>::highest())
   {
-    return Limits(0, upper);
+    return Limits(NumericHelper<T>::zero(), upper);
   }
 
   //!@brief Constructs a limits object that covers only the positive interval, excluding 0.
   static Limits positive(const T& upper = boost::numeric::bounds<T>::highest())
   {
-    // because smallest == 0 for integers, we have to differentiate here
-    if (std::numeric_limits<T>::is_integer)
-    {
-      return Limits(1, upper);
-    }
-    else
-    {
-      return Limits(boost::numeric::bounds<T>::smallest(), upper);
-    }
+    return Limits(NumericHelper<T>::smallestPositive(), upper);
   }
 
   //!@brief Constructs a limits object that covers only the negative interval (including 0).
   static Limits negativeZero(const T& lower = boost::numeric::bounds<T>::lowest())
   {
-    return Limits(lower, 0);
+    return Limits(lower, NumericHelper<T>::zero());
   }
 
   //!@brief Constructs a limits object that covers only the negative interval, excluding 0.
   static Limits negative(const T& lower = boost::numeric::bounds<T>::lowest())
   {
-    // because smallest == 0 for integers, we have to differentiate here
-    if (std::numeric_limits<T>::is_integer)
-    {
-      return Limits(lower, -1);
-    }
-    else
-    {
-      return Limits(lower, -boost::numeric::bounds<T>::smallest());
-    }
+    return Limits(lower, NumericHelper<T>::smallestNegative());
   }
 
   //!@brief Returns a limits object that covers the full range of values.
@@ -257,5 +352,28 @@ private:
   //! maximum limit
   T mUpperLimit;
 }; // class cedar::aux::math::Limits
+
+namespace boost
+{
+  namespace numeric
+  {
+    template<class Unit, class T>
+    struct bounds<boost::units::quantity<Unit, T> >
+    {
+      static boost::units::quantity<Unit, T> lowest()
+      {
+        return boost::numeric::bounds<T>::lowest() * cedar::aux::math::UnitHelper<boost::units::quantity<Unit, T> >::unit();
+      }
+      static boost::units::quantity<Unit, T> highest()
+      {
+        return boost::numeric::bounds<T>::highest() * cedar::aux::math::UnitHelper<boost::units::quantity<Unit, T> >::unit();
+      }
+      static boost::units::quantity<Unit, T> smallest()
+      {
+        return boost::numeric::bounds<T>::smallest() * cedar::aux::math::UnitHelper<boost::units::quantity<Unit, T> >::unit();
+      }
+    };
+  }
+}
 
 #endif // CEDAR_AUX_MATH_LIMITS_H
