@@ -199,6 +199,7 @@ public:
     this->Super::set(index, this->mLimits.limit(value), lock);
   }
 
+  //! Returns the limits for the values of this parameter.
   const LimitType& getLimits() const
   {
     return this->mLimits;

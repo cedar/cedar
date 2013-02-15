@@ -204,6 +204,10 @@ public slots:
   void redraw();
 
 signals:
+  /*!@brief Emitted whenever the state of the step displayed by this step item changes.
+   *
+   * @remarks This signal is used to transfer the underlying signal from the processing thread to the gui thread.
+   */
   void stepStateChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
