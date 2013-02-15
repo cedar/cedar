@@ -52,11 +52,16 @@
 #include "cedar/devices/gui/MountedCameraViewer.h"
 #include "cedar/devices/SimulatedKinematicChain.h"
 #include "cedar/devices/gui/MountedCameraViewer.h"
+#include "cedar/auxiliaries/math/constants.h"
 
 // SYSTEM INCLUDES
-
 #include <iostream>
 #include <QApplication>
+#include <boost/units/systems/si/length.hpp>
+#include <boost/units/systems/si/plane_angle.hpp>
+
+// namespaces for units
+using namespace boost::units::si;
 
 //------------------------------------------------------------------------------
 // methods
@@ -85,34 +90,34 @@ int main(int argc, char **argv)
   // create a prism visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr prism_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
   prism_local_coordinate_frame->setName("prism");
-  prism_local_coordinate_frame->setTranslation(0.5, 0.5, .5);
+  prism_local_coordinate_frame->setTranslation(0.5 * meters, 0.5 * meters, .5 * meters);
   cedar::aux::gl::ObjectVisualizationPtr prism
   (
     new cedar::aux::gl::Prism(prism_local_coordinate_frame, .2, .1)
   );
-  prism_local_coordinate_frame->rotate(0, M_PI/2);
+  prism_local_coordinate_frame->rotate(0, cedar::aux::math::pi/2.0 * radians);
   scene->addObjectVisualization(prism);
 
   // create a torus visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr torus_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
   torus_local_coordinate_frame->setName("torus");
-  torus_local_coordinate_frame->setTranslation(.0, 1.5, .5);
+  torus_local_coordinate_frame->setTranslation(.0 * meters, 1.5 * meters, .5 * meters);
   cedar::aux::gl::ObjectVisualizationPtr torus
   (
     new cedar::aux::gl::Torus(torus_local_coordinate_frame, .2, 0.03, 1, 0.5, 0)
   );
-  torus_local_coordinate_frame->rotate(0, M_PI/3);
+  torus_local_coordinate_frame->rotate(0, cedar::aux::math::pi/3.0 * radians);
   scene->addObjectVisualization(torus);
 
   // create an ellipse visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr ellipse_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
   ellipse_local_coordinate_frame->setName("ellipse");
-  ellipse_local_coordinate_frame->setTranslation(.0, 1.8, .5);
+  ellipse_local_coordinate_frame->setTranslation(.0 * meters, 1.8 * meters, .5 * meters);
   cedar::aux::gl::ObjectVisualizationPtr ellipse
   (
     new cedar::aux::gl::Ellipse(ellipse_local_coordinate_frame, .1, .2, 0.03, 1, 1, 0)
   );
-  ellipse_local_coordinate_frame->rotate(0, M_PI/4);
+  ellipse_local_coordinate_frame->rotate(0, cedar::aux::math::pi/4.0 * radians);
   scene->addObjectVisualization(ellipse);
 
   // create a simple viewer for the scene

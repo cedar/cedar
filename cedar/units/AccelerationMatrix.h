@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,42 +22,24 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.cpp
+    File:        AccelerationMatrix.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 03
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2013 02 14
 
-    Description: Namespace file for cedar::units.
+    Description: This is a dummy header for the typedef AccelerationMatrix (which is actually a
+                 cedar::unit::AccelerationMatrix<boost::units::si::acceleration>).
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_UNITS_ACCELERATION_MATRIX_H
+#define CEDAR_UNITS_ACCELERATION_MATRIX_H
+
 // CEDAR INCLUDES
 #include "cedar/units/namespace.h"
+#include "cedar/units/UnitMatrix.h"
 
-// SYSTEM INCLUDES
-#include <boost/units/quantity.hpp>
-#include <boost/units/systems/si/length.hpp>
-#include <boost/units/systems/si/time.hpp>
-#include <boost/units/systems/si/velocity.hpp>
-#include <boost/units/systems/si/acceleration.hpp>
-#include <boost/units/systems/si/plane_angle.hpp>
-
-using namespace boost::units;
-using namespace boost::units::si;
-
-const char cedar::unit::prefix_us[] = "µs";
-const char cedar::unit::prefix_ms[] = "ms";
-const char cedar::unit::prefix_s[] = "s";
-
-const quantity<length> cedar::unit::DEFAULT_LENGTH_UNIT = 1 * meter;
-const quantity<boost::units::si::time> cedar::unit::DEFAULT_TIME_UNIT = 1 * second;
-const quantity<velocity> cedar::unit::DEFAULT_VELOCITY_UNIT = 1 * meter_per_second;
-const quantity<acceleration> cedar::unit::DEFAULT_ACCELERATION_UNIT = 1 * meter_per_second_squared;
-const quantity<plane_angle> cedar::unit::DEFAULT_PLANE_ANGLE_UNIT = 1 * radian;
+#endif // CEDAR_UNITS_ACCELERATION_MATRIX_H

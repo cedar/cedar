@@ -90,7 +90,8 @@ private:
     if (mpArm->isMovable())
     {
       // calculate direction of movement
-      cv::Mat vector_to_target_hom = (mTarget->getTranslation() - mpArm->calculateEndEffectorPosition());
+      cv::Mat vector_to_target_hom
+        = (mTarget->getTranslation().matrix - mpArm->calculateEndEffectorPosition());
       cv::Mat vector_to_target(vector_to_target_hom, cv::Rect(0, 0, 1, 3));
       if (norm(vector_to_target) == 0)
       {

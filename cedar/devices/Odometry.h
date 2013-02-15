@@ -60,11 +60,6 @@ class cedar::dev::Odometry : public QObject
 public:
   Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
-  //--------------------------------------------------------------------------------------------------------------------
-  typedef cv::Mat_<boost::units::quantity<boost::units::si::length> > LengthMatrix;
-
-  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -84,7 +79,7 @@ public:
   /*!@brief Returns the current position of the robot as a matrix.
    *@return vector with position on x- (1st element) and y-axis (2nd element) [both in m]
    */
-  cv::Mat getTranslation() const;
+  cedar::unit::LengthMatrix getTranslation() const;
 
   /*!@brief The get-function of the robot's current orientation.
    *@return The current orientation [in rad].

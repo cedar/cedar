@@ -24,11 +24,17 @@
 #include "cedar/auxiliaries/gui/SceneWidget.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gl/Block.h"
+#include "cedar/auxiliaries/math/constants.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
 #include <boost/lexical_cast.hpp>
 #include <ios>
+#include <boost/units/systems/si/length.hpp>
+#include <boost/units/systems/si/plane_angle.hpp>
+
+// namespaces for units
+using namespace boost::units::si;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Local methods
@@ -97,13 +103,13 @@ int main(int argc, char **argv)
 
   // create a rectangular block and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_block_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
-  p_block_local_coordinate_frame->setTranslation(3, -3, 3);
+  p_block_local_coordinate_frame->setTranslation(3.0 * meters, -3 * meters, 3 * meters);
   cedar::aux::gl::ObjectVisualizationPtr p_block
   (
     new cedar::aux::gl::Block(p_block_local_coordinate_frame, 1, 2, 3, 0, 1, 0.5)
   );
   p_scene->addObjectVisualization(p_block);
-  p_block_local_coordinate_frame->rotate(0, M_PI/2);
+  p_block_local_coordinate_frame->rotate(0, cedar::aux::math::pi/2.0 * radians);
 
   processQtEvents();
 
