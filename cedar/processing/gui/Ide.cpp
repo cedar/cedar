@@ -222,19 +222,16 @@ void cedar::proc::gui::Ide::exportSvg()
 void cedar::proc::gui::Ide::duplicateStep()
 {
   QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
-  if (selected_items.size() >= 1)
+  for (int i = 0; i < selected_items.size(); ++i)
   {
-    for (int i = 0; i < selected_items.size(); ++i)
+    if (cedar::proc::gui::GraphicsBase* p_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected_items.at(i)))
     {
-      if (cedar::proc::gui::GraphicsBase* p_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected_items.at(i)))
+      try
       {
-        try
-        {
-          this->mNetwork->getNetwork()->duplicate(p_base->getElement()->getName());
-        }
-        catch (cedar::aux::ExceptionBase& exc)
-        {
-        }
+        this->mNetwork->getNetwork()->duplicate(p_base->getElement()->getName());
+      }
+      catch (cedar::aux::ExceptionBase& exc)
+      {
       }
     }
   }

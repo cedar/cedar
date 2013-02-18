@@ -126,6 +126,8 @@ int main(int /* argc */, char** /* argv */)
   }
 
   // test duplicate
+  //!@todo duplicate should return pointer to new object
+  //!@todo check for null pointer, right element in right network, values
   std::cout << "test duplication of steps" << std::endl;
   try
   {
