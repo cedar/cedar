@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PropertyPane.cpp
+    File:        PluginDeclaration.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 03 09
+    Date:        2013 01 18
 
     Description:
 
@@ -34,13 +34,11 @@
 
 ======================================================================================================================*/
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
-#include "cedar/processing/gui/PropertyPane.h"
-#include "cedar/processing/Step.h"
-#include "cedar/processing/Manager.h"
-#include "cedar/processing/ElementDeclaration.h"
-#include "cedar/processing/DeclarationRegistry.h"
-#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/PluginDeclaration.h"
 
 // SYSTEM INCLUDES
 
@@ -48,9 +46,21 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::PropertyPane::PropertyPane(QWidget *pParent)
+cedar::aux::PluginDeclaration::PluginDeclaration()
 :
-cedar::aux::gui::PropertyPane(pParent)
+mIsDeprecated(false)
+{
+}
+
+cedar::aux::PluginDeclaration::PluginDeclaration(const std::string& className, const std::string& category)
+:
+mClassName(className),
+mCategory(category),
+mIsDeprecated(false)
+{
+}
+
+cedar::aux::PluginDeclaration::~PluginDeclaration()
 {
 }
 
@@ -58,19 +68,34 @@ cedar::aux::gui::PropertyPane(pParent)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-std::string cedar::proc::gui::PropertyPane::getInstanceTypeId(cedar::aux::ConfigurablePtr pConfigurable) const
+/*!
+ * @brief Returns the class name without the preceding namespace.
+ */
+std::string cedar::aux::PluginDeclaration::getClassNameWithoutNamespace() const
 {
-  //!@todo This can probably be simplified greatly by using only ElementManagerSingleton::getTypeId()?
-  if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(pConfigurable))
+  std::size_t index = this->getClassName().rfind('.');
+  if (index != std::string::npos)
   {
-    return cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(step)->getClassName();
-  }
-  else if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(pConfigurable))
-  {
-    return cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(trigger)->getClassName();
+    return this->getClassName().substr(index + 1);
   }
   else
   {
-    return this->cedar::aux::gui::PropertyPane::getInstanceTypeId(pConfigurable);
+    return this->getClassName();
+  }
+}
+
+/*!
+ * @brief Returns the namespace name without the class name.
+ */
+std::string cedar::aux::PluginDeclaration::getNamespaceName() const
+{
+  std::size_t index = this->getClassName().rfind('.');
+  if (index != std::string::npos)
+  {
+    return this->getClassName().substr(0, index);
+  }
+  else
+  {
+    return this->getClassName();
   }
 }

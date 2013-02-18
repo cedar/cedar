@@ -338,13 +338,17 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 {
   this->setElement(step);
   this->mStep = step;
-  this->mClassId = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(this->mStep);
+  this->mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->mStep);
+  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(this->mClassId))
+  cedar::proc::ConstElementDeclarationPtr elem_decl
+    = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(this->mClassId);
+
 
   //!@todo This code is redundant with code in ElementClassList; unify
-  QResource ex_test(QString::fromStdString(this->mClassId->getIconPath()));
+  QResource ex_test(QString::fromStdString(elem_decl->getIconPath()));
   if (ex_test.isValid())
   {
-    this->mStepIcon = QIcon(QString::fromStdString(this->mClassId->getIconPath()));
+    this->mStepIcon = QIcon(QString::fromStdString(elem_decl->getIconPath()));
     if (this->mStepIcon.isNull())
     {
       this->mStepIcon = QIcon(":/steps/no_icon.svg");
@@ -649,7 +653,7 @@ void cedar::proc::gui::StepItem::addRoleSeparator(const cedar::aux::Enum& e, QMe
 void cedar::proc::gui::StepItem::fillPlots
      (
        QMenu* pMenu,
-       std::map<QAction*, std::pair<cedar::aux::gui::PlotDeclarationPtr, cedar::aux::Enum> >& declMap
+       std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
      )
 {
   /*typedef cedar::aux::gui::PlotDeclarationManager::Node PlotNode;
@@ -682,7 +686,7 @@ void cedar::proc::gui::StepItem::fillPlots
         }
         else
         {
-          std::set<cedar::aux::gui::PlotDeclarationPtr> plots;
+          std::set<cedar::aux::gui::ConstPlotDeclarationPtr> plots;
           cedar::aux::gui::PlotManagerSingleton::getInstance()->getPlotClassesFor(data, plots);
 
           if (plots.empty())
@@ -692,15 +696,10 @@ void cedar::proc::gui::StepItem::fillPlots
           }
           else
           {
-            for
-            (
-              std::set<cedar::aux::gui::PlotDeclarationPtr>::iterator iter = plots.begin();
-              iter != plots.end();
-              ++iter
-            )
+            for (auto iter = plots.begin(); iter != plots.end(); ++iter)
             {
-              cedar::aux::gui::PlotDeclarationPtr declaration = *iter;
-              QAction *p_action = p_menu->addAction(QString::fromStdString(declaration->getPlotClass()));
+              cedar::aux::gui::ConstPlotDeclarationPtr declaration = *iter;
+              QAction *p_action = p_menu->addAction(QString::fromStdString(declaration->getClassName()));
               p_action->setData(QString::fromStdString(slot->getName()));
               declMap[p_action] = std::make_pair(declaration, e);
 
@@ -796,7 +795,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
-  std::map<QAction*, std::pair<cedar::aux::gui::PlotDeclarationPtr, cedar::aux::Enum> > advanced_plot_map;
+  std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> > advanced_plot_map;
   this->fillPlots(p_advanced_plotting, advanced_plot_map);
 
   QMenu *p_actions_menu = menu.addMenu("actions");
@@ -893,7 +892,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   // advanced plots
   else if (advanced_plot_map.find(a) != advanced_plot_map.end())
   {
-    cedar::aux::gui::PlotDeclarationPtr declaration = advanced_plot_map.find(a)->second.first;
+    cedar::aux::gui::ConstPlotDeclarationPtr declaration = advanced_plot_map.find(a)->second.first;
     const cedar::aux::Enum& e = advanced_plot_map.find(a)->second.second;
 
     std::string data_name = a->data().toString().toStdString();
@@ -909,17 +908,18 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
 void cedar::proc::gui::StepItem::fillDefinedPlots(QMenu* pMenu, const QPoint& plotPosition)
 {
   // get declaration of the element displayed by this item
-  cedar::proc::ElementDeclarationPtr decl
-    = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(this->mStep);
+  auto decl = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->mStep);
+  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(decl));
+  auto elem_decl = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(decl);
 
-  if (!decl)
+  if (!decl || !elem_decl)
   {
     pMenu->setDisabled(true);
     pMenu->setToolTip("No declaration was found for this element.");
     return;
   }
 
-  if (decl->definedPlots().empty())
+  if (elem_decl->definedPlots().empty())
   {
     pMenu->setDisabled(true);
     pMenu->setToolTip("No plots defined for this element.");
@@ -929,9 +929,9 @@ void cedar::proc::gui::StepItem::fillDefinedPlots(QMenu* pMenu, const QPoint& pl
   QObject::connect(pMenu, SIGNAL(triggered(QAction*)), this, SLOT(openDefinedPlotAction(QAction*)));
 
   // list all defined plots, if available
-  for (size_t i = 0; i < decl->definedPlots().size(); ++i)
+  for (size_t i = 0; i < elem_decl->definedPlots().size(); ++i)
   {
-    const std::string& plot_name = decl->definedPlots()[i].first;
+    const std::string& plot_name = elem_decl->definedPlots()[i].first;
     QAction* p_action = pMenu->addAction(QString::fromStdString(plot_name));
     p_action->setData(plotPosition);
   }
@@ -942,14 +942,15 @@ void cedar::proc::gui::StepItem::openDefinedPlotAction(QAction* pAction)
   std::string plot_name = pAction->text().toStdString();
 
   // get declaration of the element displayed by this item
-  cedar::proc::ElementDeclarationPtr decl
-    = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(this->mStep);
+  auto decl = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->mStep);
+  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(decl));
+  auto elem_decl = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(decl);
 
   // find the list of data to plot for this item
-  size_t list_index = decl->definedPlots().size();
-  for (size_t i = 0; i < decl->definedPlots().size(); ++i)
+  size_t list_index = elem_decl->definedPlots().size();
+  for (size_t i = 0; i < elem_decl->definedPlots().size(); ++i)
   {
-    const std::string& name = decl->definedPlots()[i].first;
+    const std::string& name = elem_decl->definedPlots()[i].first;
     if (plot_name == name)
     {
       list_index = i;
@@ -957,7 +958,7 @@ void cedar::proc::gui::StepItem::openDefinedPlotAction(QAction* pAction)
     }
   }
 
-  if (list_index >= decl->definedPlots().size())
+  if (list_index >= elem_decl->definedPlots().size())
   {
     cedar::aux::LogSingleton::getInstance()->error
     (
@@ -968,7 +969,7 @@ void cedar::proc::gui::StepItem::openDefinedPlotAction(QAction* pAction)
     return;
   }
 
-  this->multiplot(pAction->data().toPoint(), decl->definedPlots()[list_index].second);
+  this->multiplot(pAction->data().toPoint(), elem_decl->definedPlots()[list_index].second);
 }
 
 void cedar::proc::gui::StepItem::fillDisplayStyleMenu(QMenu* pMenu)
@@ -1211,7 +1212,7 @@ void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGrap
 
   if (this->mDisplayMode == cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT)
   {
-    painter->drawText(QPointF(2 * padding + mIconSize, 15), this->mClassId->getClassName().c_str());
+    painter->drawText(QPointF(2 * padding + mIconSize, 15), this->mClassId->getClassNameWithoutNamespace().c_str());
     painter->drawText(QPointF(2 * padding + mIconSize, 25), this->mStep->getName().c_str());
   }
 

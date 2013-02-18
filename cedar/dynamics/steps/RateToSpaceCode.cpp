@@ -58,7 +58,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr rate_to_space_decl
+    ElementDeclarationPtr declaration
     (
       new ElementDeclarationTemplate<cedar::dyn::RateToSpaceCode>
       (
@@ -66,13 +66,14 @@ namespace
         "cedar.dynamics.RateToSpaceCode"
       )
     );
-    rate_to_space_decl->setIconPath(":/steps/rate_to_space_code.svg");
-    rate_to_space_decl->setDescription
+    declaration->setIconPath(":/steps/rate_to_space_code.svg");
+    declaration->setDescription
     (
       "Transforms rate code to space code. A Gaussian distribution is mapped to the metric represented by space code, "
       "centering at the value given by the rate code."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(rate_to_space_decl);
+
+    declaration->declare();
 
     return true;
   }

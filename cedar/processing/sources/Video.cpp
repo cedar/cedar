@@ -68,7 +68,8 @@ namespace
     (
       "Reads a video file and outputs the images. Supported formats depend on which ones are available via opencv."
     );
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }

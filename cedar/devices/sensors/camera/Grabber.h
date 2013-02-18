@@ -102,8 +102,6 @@ public:
   void settingChanged();
 
 
-  /*!@brief Slot that is called whenever the camera changes.
-   */
   void cameraChanged();
 
   /*!@brief A slot that must be triggered if the backend has changed. It is internally connected with the
@@ -411,7 +409,7 @@ protected:
   double getPropertyFromCamera(unsigned int channel, unsigned int propertyId);
 
   // inherited from Grabber
-  bool onGrab();
+  bool onGrab(unsigned int channel);
   void onCleanUp();
   bool onCreateGrabber();
   void onCloseGrabber();

@@ -193,6 +193,13 @@ public slots:
    */
   void exportSvg();
 
+  /*!@brief Duplicates a selected step
+   */
+  void duplicateStep();
+
+  /*!@brief Select all elements
+   */
+  void selectAll();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

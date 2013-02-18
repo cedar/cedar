@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -15,134 +15,125 @@
     License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
-    along with cedar. If not, see <http:// www.gnu.org/licenses/>.
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
 
 ========================================================================================================================
 
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GLGrabber.h
+    File:        PluginDeclarationTemplate.h
 
-    Maintainer:  Georg.Hartinger
-    Email:       georg.hartinger@ini.rub.de
-    Date:        2011 08 01
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 01 18
 
-    Description: Header for the @em @em cedar::dev::sensors::visual::GLGrabber class.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_GL_GRABBER_H
-#define CEDAR_DEV_SENSORS_VISUAL_GL_GRABBER_H
+#ifndef CEDAR_AUX_PLUGIN_DECLARATION_TEMPLATE_H
+#define CEDAR_AUX_PLUGIN_DECLARATION_TEMPLATE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/Grabber.h"
-#include "cedar/devices/sensors/visual/GLChannel.h"
-#include "cedar/auxiliaries/casts.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/PluginDeclaration.h"
+#include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/DeclarationManagerTemplate.h"
 
 // SYSTEM INCLUDES
-#include <opencv2/opencv.hpp>
-#include <QGLWidget>
 
-/*! @brief A grabber to grab from a QGLWidget
+
+/*!@todo describe.
  *
- *  Be aware, that the grabbing have to be done in the gui-thread.
- *  The grabbing will fail, if you start the grabberthread to grab in the background.
- *  You have to grab in your main gui-thread with the grab() memberfunction of the class.
- *  The getImage() member could be also invoked in threads running in the background
+ * @tparam BaseClass The direct base class for this class. This class must either be or inherit
+ *         cedar::aux::PluginDeclarationBaseTemplate<BaseClassPtr>.
+ * @todo describe more.
  */
-class cedar::dev::sensors::visual::GLGrabber
+template <class BaseClassPtr, class PluginClassPtr, class BaseClass = cedar::aux::PluginDeclarationBaseTemplate<BaseClassPtr> >
+class cedar::aux::PluginDeclarationTemplate
 :
-public cedar::dev::sensors::visual::Grabber
+public BaseClass,
+public boost::enable_shared_from_this<cedar::aux::PluginDeclarationTemplate<BaseClassPtr, PluginClassPtr, BaseClass> >
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef typename cedar::aux::Singleton<cedar::aux::FactoryManager<BaseClassPtr> > PluginFactoryManager;
+  typedef typename cedar::aux::Singleton<cedar::aux::DeclarationManagerTemplate<BaseClassPtr> > DeclarationManager;
+  typedef typename PluginClassPtr::element_type PluginClass;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-  /*! @brief  Constructor for a single channel grabber
-   *  @param grabberName  Name of the grabber
-   *  @param qglWidget Class derived from QGLWidget to grab from
+  /*!@brief The constructor.
+   *
+   * @param category  Category of the declaration.
+   * @param className Class name to use. A name will automatically be generated when this is left empty.
+   *
+   * @remarks The className parameter is essentially a legacy parameter to provide downward-compatibility; it should
+   *          usually be left empty.
    */
-  GLGrabber
-  (
-    QGLWidget *qglWidget,
-    const std::string& grabberName = "GLGrabber"
-  );
-
-  /*! @brief Constructor for a stereo channel grabber
-   *  @param grabberName  Name of the grabber
-   *  @param qglWidget0 Class derived from QGLWidget to grab from for channel 0
-   *  @param qglWidget1 Class derived from QGLWidget to grab from for channel 1
-   */
-  GLGrabber
-  (
-    QGLWidget *qglWidget0,
-    QGLWidget *qglWidget1,
-    const std::string& grabberName = "StereoGLGrabber"
-  );
-
-  //!@brief Destructor
-  ~GLGrabber();
+  PluginDeclarationTemplate(const std::string& category, const std::string& className = std::string())
+  :
+  BaseClass(category, className)
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-
-  /*! @brief Set a new Widget to grab from
-   *
+  /*!@brief Declares this plugin at the appropriate factory.
    */
-  void setWidget(unsigned int channel, QGLWidget *qglWidget);
+  void declare() const
+  {
+    DeclarationManager::getInstance()->addDeclaration(this->shared_from_this());
+    this->onDeclare();
+  }
+
+  std::string getClassName() const
+  {
+    if (!this->mClassName.empty())
+    {
+      return this->mClassName;
+    }
+    else
+    {
+      return PluginFactoryManager::getInstance()->template generateTypeName<PluginClassPtr>();
+    }
+  }
+
+  /*!@brief Checks if an Element is of the plugin class's type.
+   *
+   * @param pointer Instance that is checked
+   */
+  bool isObjectInstanceOf(BaseClassPtr pointer) const
+  {
+    return boost::dynamic_pointer_cast<PluginClass>(pointer);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-  // inherited from Grabber
-  void onCleanUp();
-  bool onGrab(unsigned int channel);
-  bool onCreateGrabber();
-  void onCloseGrabber();
-  std::string onUpdateSourceInfo(unsigned int channel);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-
-  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
-  inline GLChannelPtr getGLChannel(unsigned int channel)
+  virtual void onDeclare() const
   {
-    return boost::static_pointer_cast<GLChannel>
-           (
-             cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
-           );
-  }
-
-  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
-  inline ConstGLChannelPtr getGLChannel(unsigned int channel) const
-  {
-    return boost::static_pointer_cast<const GLChannel>
-       (
-         cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
-       );
+    PluginFactoryManager::getInstance()->template registerType<PluginClassPtr>(this->mClassName);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -153,7 +144,6 @@ protected:
 private:
   // none yet
 
-
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -163,6 +153,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::dev::sensors::visual::GLGrabber
+}; // class cedar::aux::PluginDeclarationTemplate
 
-#endif // CEDAR_DEV_SENSORS_VISUAL_GL_GRABBER_H
+#endif // CEDAR_AUX_PLUGIN_DECLARATION_TEMPLATE_H
+
