@@ -104,7 +104,7 @@ void cedar::aux::LoopedThread::stopStatistics(bool suppressWarning)
     cedar::aux::LogSingleton::getInstance()->warning
     (
       message,
-      "cedar::aux::LoopedThread::stop(unsigned int, bool)"
+      "cedar::aux::LoopedThread::stopStatistics()"
     );
   }
 }
