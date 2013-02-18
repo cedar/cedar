@@ -143,7 +143,6 @@ void cedar::aux::Configurable::configurationLoaded()
   }
 }
 
-
 cedar::aux::ConfigurablePtr cedar::aux::Configurable::getConfigurableChild(const std::string& path)
 {
   return boost::const_pointer_cast<cedar::aux::Configurable>

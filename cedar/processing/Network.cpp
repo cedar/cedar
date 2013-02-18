@@ -551,7 +551,7 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
   this->mElementAddedSignal(this, element);
 }
 
-void cedar::proc::Network::duplicate(std::string elementName, std::string newName)
+void cedar::proc::Network::duplicate(const std::string& elementName, const std::string& newName)
 {
   try
   {

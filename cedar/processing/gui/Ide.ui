@@ -501,14 +501,6 @@
     <string>Ctrl+D</string>
    </property>
   </action>
-  <action name="mpActionPaste">
-   <property name="text">
-    <string>Paste</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+V</string>
-   </property>
-  </action>
   <action name="mpActionSelectAll">
    <property name="text">
     <string>Select All</string>
