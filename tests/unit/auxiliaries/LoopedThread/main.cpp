@@ -36,9 +36,12 @@
 
 
 #include "cedar/auxiliaries/LoopedThread.h"
+#include "cedar/auxiliaries/CallFunctionThread.h"
 
 #include <cstdlib>
 #include <iostream>
+
+#include <QCoreApplication>
 
 #include <boost/lexical_cast.hpp>
 
@@ -154,10 +157,11 @@ int testConfiguration
 }
 
 
-int main()
-{
-  int errors = 0;
+int errors = 0;
+QCoreApplication* app;
 
+void runTests()
+{
   double timeInterval = 100.0;  // milliseconds
   MyTestThread thread(timeInterval);
   //thread.useFixedStepSize(false);
@@ -169,6 +173,18 @@ int main()
   std::cout << "Stopping thread ..." << std::endl;
   thread.stop();
 
+  if (thread.isRunning())
+  {
+    std::cout << "... Thread NOT stopped! error" << std::endl;
+    errors++;
+    return;
+  }
+  else
+  {
+    std::cout << "... thread stopped." << std::endl;
+  }
+
+
   std::cout << std::endl;
   std::cout << "Starting thread again with an artificially unreliable execution time ..." << std::endl;
   thread.setArtificalDelay(true);
@@ -176,6 +192,7 @@ int main()
   thread.wait(1000);
   std::cout << "Stopping thread ..." << std::endl;
   thread.stop();
+
   thread.setArtificalDelay(false);
 
   std::cout << std::endl;
@@ -190,5 +207,22 @@ int main()
 
   std::cout << "Test finished, there were " << errors << " error(s)." << std::endl;
 
+  app->exit(); // return from app->exec() 
+}
+
+int main(int argc, char* argv[])
+{
+  app = new QCoreApplication(argc,argv);
+
+  auto testThread = new cedar::aux::CallFunctionThread(runTests);
+
+  testThread->start();
+  app->exec();
+
+  delete testThread;
+  delete app;
+
   return errors;
 }
+
+
