@@ -242,8 +242,10 @@ protected:
    *      In case of looping through the files, the shortest file define the restart moment
    *      The image matrix in getImage() could be empty also if the return value is true.
    *      This happens if looped is false and all frames grabbed from the file, i.e. it is over.
+   *
+   *  @param channel The channel, which should be grabbed
    */
-  bool onGrab();
+  bool onGrab(unsigned int channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

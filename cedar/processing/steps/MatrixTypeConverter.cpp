@@ -69,7 +69,8 @@ namespace
     (
       "Converts a matrix from one type to another."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }

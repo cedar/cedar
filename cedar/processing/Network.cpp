@@ -40,16 +40,17 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Network.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/DataSlot.h"
-#include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/TriggerConnection.h"
 #include "cedar/processing/PromotedExternalData.h"
 #include "cedar/processing/PromotedOwnedData.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Log.h"
@@ -89,7 +90,7 @@ namespace
     (
       "A grouping element for steps."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(network_decl);
+    network_decl->declare();
 
     return true;
   }
@@ -366,7 +367,7 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
 
 void cedar::proc::Network::add(std::string className, std::string instanceName)
 {
-  cedar::proc::ElementPtr element = DeclarationRegistrySingleton::getInstance()->allocateClass(className);
+  cedar::proc::ElementPtr element = cedar::proc::ElementManagerSingleton::getInstance()->allocate(className);
   this->add(element, instanceName);
 }
 
@@ -548,6 +549,64 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
 
   this->mNewElementAddedSignal(element);
   this->mElementAddedSignal(this, element);
+}
+
+void cedar::proc::Network::duplicate(std::string elementName, std::string newName)
+{
+  try
+  {
+    // determine class
+    cedar::proc::ElementPtr elem = this->getElement(elementName);
+    std::string class_name = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(elem);
+    // allocate object
+    cedar::proc::ElementPtr new_elem = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_name);
+    // copy configuration tree
+    new_elem->copyFrom(elem);
+    // get unique name
+    std::string modified_name;
+    if (!newName.empty()) // desired name given
+    {
+      modified_name = this->getUniqueName(newName);
+    }
+    else // default name
+    {
+      modified_name = this->getUniqueName(elementName);
+    }
+    // set unique name
+    new_elem->setName(modified_name);
+    // add to network
+    this->add(new_elem);
+  }
+  catch (cedar::proc::InvalidNameException& exc)
+  {
+    CEDAR_THROW
+    (
+      cedar::proc::InvalidNameException,
+      "cannot duplicate element of name " + elementName + ", it does not exist in network" + this->getName()
+    )
+  }
+}
+
+std::string cedar::proc::Network::getUniqueName(const std::string& unmodifiedName) const
+{
+  std::string adjusted_name;
+  try
+  {
+    unsigned int new_id = 1;
+    adjusted_name = unmodifiedName;
+    while (this->getElement(adjusted_name))
+    {
+      std::stringstream str;
+      str << unmodifiedName << " " << new_id;
+      adjusted_name = str.str();
+      ++new_id;
+    }
+  }
+  catch(cedar::proc::InvalidNameException& exc)
+  {
+    // nothing to do here, name not duplicate, use this as a name
+  }
+  return adjusted_name;
 }
 
 cedar::proc::ConstElementPtr cedar::proc::Network::getElement(const std::string& name) const
@@ -962,10 +1021,10 @@ void cedar::proc::Network::writeSteps(cedar::aux::ConfigurationNode& steps)
 #ifdef DEBUG_FILE_WRITING
       std::cout << "Saving " << iter->first << "." << std::endl;
 #endif
-      cedar::proc::ElementDeclarationPtr decl = DeclarationRegistrySingleton::getInstance()->getDeclarationOf(step);
+      std::string class_name = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(step);
       cedar::aux::ConfigurationNode step_node;
       step->writeConfiguration(step_node);
-      steps.push_back(cedar::aux::ConfigurationNode::value_type(decl->getClassId(), step_node));
+      steps.push_back(cedar::aux::ConfigurationNode::value_type(class_name, step_node));
     }
   }
 }
@@ -994,7 +1053,7 @@ void cedar::proc::Network::readSteps
     cedar::proc::ElementPtr step;
     try
     {
-      step = cedar::proc::DeclarationRegistrySingleton::getInstance()->allocateClass(class_id);
+      step = cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_id);
     }
     catch (cedar::aux::ExceptionBase& e)
     {
@@ -1036,10 +1095,10 @@ void cedar::proc::Network::writeTriggers(cedar::aux::ConfigurationNode& triggers
 #ifdef DEBUG_FILE_WRITING
       std::cout << "Saving " << iter->first << "." << std::endl;
 #endif
-      cedar::proc::ElementDeclarationPtr decl = DeclarationRegistrySingleton::getInstance()->getDeclarationOf(trigger);
+      std::string class_name = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(trigger);
       cedar::aux::ConfigurationNode trigger_node;
       trigger->writeConfiguration(trigger_node);
-      triggers.push_back(cedar::aux::ConfigurationNode::value_type(decl->getClassId(), trigger_node));
+      triggers.push_back(cedar::aux::ConfigurationNode::value_type(class_name, trigger_node));
     }
   }
 }
@@ -1070,7 +1129,7 @@ void cedar::proc::Network::readTriggers
     {
       trigger = boost::shared_dynamic_cast<cedar::proc::Trigger>
                 (
-                  cedar::proc::DeclarationRegistrySingleton::getInstance()->allocateClass(class_id)
+                  cedar::proc::ElementManagerSingleton::getInstance()->allocate(class_id)
                 );
     }
     catch (cedar::aux::ExceptionBase& e)
@@ -1194,7 +1253,7 @@ void cedar::proc::Network::readNetworks
       network
         = boost::shared_dynamic_cast<cedar::proc::Network>
           (
-            cedar::proc::DeclarationRegistrySingleton::getInstance()->allocateClass("cedar.processing.Network")
+            cedar::proc::ElementManagerSingleton::getInstance()->allocate("cedar.processing.Network")
           );
     }
     catch (cedar::aux::ExceptionBase& e)

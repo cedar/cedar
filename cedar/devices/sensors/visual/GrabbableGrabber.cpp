@@ -151,8 +151,6 @@ bool cedar::dev::sensors::visual::GrabbableGrabber::onCreateGrabber()
     }
   }
 
-  // grab first image
-  onGrab();
   return true;
 }
 
@@ -186,24 +184,19 @@ std::string cedar::dev::sensors::visual::GrabbableGrabber::onUpdateSourceInfo(un
 }
 
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::GrabbableGrabber::onGrab()
+bool cedar::dev::sensors::visual::GrabbableGrabber::onGrab(unsigned int channel)
 {
   bool result = true;
-  unsigned int num_cams = getNumCams();
-  for(unsigned int channel = 0; channel < num_cams; ++channel)
-   {
-     // apply the new content to the channel image
-     try
-     {
-       getGrabbableChannel(channel)->mpGrabberLock->lockForRead();
-       getImageMat(channel) = getGrabbableChannel(channel)->mpSourceInterfaceClass->grabImage().clone();
-       getGrabbableChannel(channel)->mpGrabberLock->unlock();
-     }
-     catch(...)
-     {
-       result = false;
-     }
-   }
+  try
+  {
+    getGrabbableChannel(channel)->mpGrabberLock->lockForRead();
+    getImageMat(channel) = getGrabbableChannel(channel)->mpSourceInterfaceClass->grabImage().clone();
+    getGrabbableChannel(channel)->mpGrabberLock->unlock();
+  }
+  catch(...)
+  {
+    result = false;
+  }
   return result;
 }
 

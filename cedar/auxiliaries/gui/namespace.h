@@ -128,7 +128,7 @@ namespace cedar
           cedar::aux::TypeHierarchyMap
           <
             cedar::aux::Data,
-            std::vector<cedar::aux::gui::PlotDeclarationPtr>
+            std::vector<cedar::aux::gui::ConstPlotDeclarationPtr>
           >
           PlotDeclarationManager;
 

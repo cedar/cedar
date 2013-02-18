@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/camera/backends/Device.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 
@@ -74,7 +75,9 @@ bool cedar::dev::sensors::camera::Device::createCaptureDevice()
 
   // lock
   this->mpCameraChannel->mpVideoCaptureLock->lockForWrite();
-
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << " Lock: " << this->mpCameraChannel->mpVideoCaptureLock << std::endl;
+#endif
   // close old videoCapture device
   this->mpCameraChannel->mVideoCapture = cv::VideoCapture();
 //  this->mpCameraChannel->mVideoCapture.release();
@@ -84,20 +87,70 @@ bool cedar::dev::sensors::camera::Device::createCaptureDevice()
 
   if (!result)
   {
+    #ifdef DEBUG_CAMERA_GRABBER
+      std::cout << __PRETTY_FUNCTION__ << " Error: Couldn't create captue object" << std::endl;
+    #endif
     return false;
   }
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << " captue object created" << std::endl;
+#endif
+
 
   // fill p_capabilities with the right values (depends on backend and camera if this is necessary at this stage)
   getAvailablePropertiesFromCamera();
 
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << " setVideoCaptureObject to channel" << std::endl;
+#endif
+
   // pass the new created capture to the channel structure
   mpCameraChannel->mpProperties->setVideoCaptureObject(mpCameraChannel->mVideoCapture);
+
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << " applySettingsToCamera" << std::endl;
+#endif
 
   // apply settings from p_settings structure
   applySettingsToCamera();
 
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << " applyStateToCamera" << std::endl;
+#endif
+
   // restore state of the device with the values in p_state
   applyStateToCamera();
+
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << " get first image" << std::endl;
+#endif
+
+  //get first image
+  unsigned int timeout = 0;
+  while (! this->mpCameraChannel->mVideoCapture.read(this->mpCameraChannel->mImageMat))
+  {
+    #ifdef DEBUG_CAMERA_GRABBER
+      std::cout << __PRETTY_FUNCTION__ << " Try to get an image" << std::endl;
+    #endif
+    ++timeout;
+    cedar::aux::sleep(cedar::unit::Milliseconds(50));
+    if (timeout>100)
+    {
+      #ifdef DEBUG_CAMERA_GRABBER
+        std::cout << __PRETTY_FUNCTION__ << " Timeout on cv::VideoCapture.read()!" << std::endl;
+      #endif
+      break;
+    }
+  }
+
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << " image grabbed" << std::endl;
+
+  if (this->mpCameraChannel->mImageMat.empty())
+  {
+    std::cout << __PRETTY_FUNCTION__ << " grabbed image is empty" << std::endl;
+  }
+#endif
 
   // unlock
   this->mpCameraChannel->mpVideoCaptureLock->unlock();
@@ -111,6 +164,10 @@ void cedar::dev::sensors::camera::Device::applyStateToCamera()
   std::cout << __PRETTY_FUNCTION__ << std::endl;
 #endif
 
+  // disable signals for properties when value is updated with the camera-values
+  this->mpCameraChannel->mpProperties->blockSignals(true);
+
+  // apply values to camera
   int num_properties = cedar::dev::sensors::camera::Property::type().list().size();
   for (int i=0; i<num_properties; i++)
   {
@@ -142,6 +199,9 @@ void cedar::dev::sensors::camera::Device::applyStateToCamera()
       this->mpCameraChannel->mpProperties->setDefaultValue(prop_id,set_value);
     }
   }
+
+  // allow signal processing for all properties, when changed in the processingGui or from program execution
+  this->mpCameraChannel->mpProperties->blockSignals(false);
 }
 
 

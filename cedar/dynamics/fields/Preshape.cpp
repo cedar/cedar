@@ -55,18 +55,18 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr preshape_decl
+    ElementDeclarationPtr declaration
     (
       new cedar::proc::ElementDeclarationTemplate<cedar::dyn::Preshape>("DFT", "cedar.dynamics.Preshape")
     );
-    preshape_decl->setIconPath(":/steps/preshape.svg");
-    preshape_decl->setDescription
+    declaration->setIconPath(":/steps/preshape.svg");
+    declaration->setDescription
     (
       "A dynamical system that slowly accumulates activation at locations of strongly active input. The activation "
       "decays slowly over time."
     );
 
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(preshape_decl);
+    declaration->declare();
 
     return true;
   }

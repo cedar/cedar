@@ -65,7 +65,8 @@ namespace
     );
     declaration->setIconPath(":/steps/boost.svg");
     declaration->setDescription("Generates a 1x1 boost matrix. This can be input to, e.g., a field.");
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }
