@@ -65,6 +65,8 @@ class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::Thread
   private:
     void initStatistics();
     inline void updateStatistics(double stepsTaken);
+    void safeRequestStop();
+    bool safeStopRequested();
 
   public:
     void work(); // is a virtual slot in parent
@@ -89,7 +91,6 @@ class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::Thread
     double getMaxStepsTaken();
 
   private:
-  
     cedar::aux::LoopedThread* mpWrapper;
 
     //!@brief total number of steps since start()

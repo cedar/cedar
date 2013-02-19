@@ -54,6 +54,7 @@
 #include <QThread>
 #include <QMutex>
 #include <QReadWriteLock>
+#include <QCoreApplication>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
 
@@ -146,10 +147,13 @@ public:
   void start(); // TODO: manpage TODO: say it is thread-safe and re-entry will abort with a warning
   bool isRunning() const; // TODO manpage, TODO: say it is thread-safe
 
+  // TODO: manpage
+  void requestStop();
   /*!@brief Returns true if the thread is running but stop() was called.
    *
    */
   bool stopRequested();
+
 
 // js: changed signature. now more like QT
 //  inline void wait(int i = 0)
@@ -157,22 +161,20 @@ public:
   {
     bool ret = false;
 
-//std::cout << "ThreadWrapper: Trying to wait ..." << std::endl;    
     if (validThread())
     {
       ret = mpThread->wait(time);
-//std::cout << "ThreadWrapper: ... resuming" << std::endl;    
     }
     else
     {
-//std::cout << "ThreadWrapper: no thread to wait upon!" << std::endl;
     }
 
     return ret;
   }
 
 public slots:
-  void finishedThread(); // thread-safe
+  void finishedThreadSlot(); // thread-safe needs to be TODO
+  void startedThreadSlot(); // dito TODO
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -183,7 +185,11 @@ protected:
   // private methods
   //----------------------------------------------------------------------------
 private:
-  virtual cedar::aux::detail::ThreadWorker* newWorker() = 0;
+  virtual cedar::aux::detail::ThreadWorker* resetWorker() = 0;
+  void deleteWorkerUnlocked();
+
+  virtual void applyStop(bool suppressWarning);
+  virtual void applyStart();
 
   //----------------------------------------------------------------------------
   // members
@@ -205,6 +211,10 @@ private:
   QThread* mpThread;
   mutable bool mDestructing; 
   mutable QMutex mDestructingMutex;
+  mutable QMutex mFinishedThreadMutex;
+
+  //!@brief stop is requested
+  volatile bool mStopRequested; // note: volatile disables some optimizations, but doesn't add thread-safety
 
 protected:
   cedar::aux::detail::ThreadWorker* mpWorker;

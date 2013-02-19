@@ -44,7 +44,7 @@
 #include "cedar/auxiliaries/stringFunctions.h"
 
 cedar::aux::detail::LoopedThreadWorker::LoopedThreadWorker(cedar::aux::LoopedThread *wrapper) 
-: ThreadWorker( wrapper ), mpWrapper(wrapper)
+: mpWrapper(wrapper)
 {
   initStatistics();
 }
@@ -57,7 +57,8 @@ void cedar::aux::detail::LoopedThreadWorker::work()
 {
   // TODO: check whether wrapper (mpWrapper) still exists (paranoid)
 
-  mStop = false; // TODO: locking
+  if (safeStopRequested())
+    return; // stop() was called right after start() 
 
   // we do not want to change the step size while running
   boost::posix_time::time_duration step_size
@@ -73,7 +74,7 @@ void cedar::aux::detail::LoopedThreadWorker::work()
       mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
       boost::posix_time::time_duration time_difference;
 
-      while (!mStop) // TODO: locking // note: mStop ist volatile, which is good
+      while (!safeStopRequested())
       {
         mLastTimeStepStart = mLastTimeStepEnd;
         mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
@@ -86,7 +87,7 @@ void cedar::aux::detail::LoopedThreadWorker::work()
     }
     case cedar::aux::LoopMode::Simulated:
     {
-      while (!mStop) // TODO: locking // note: mStop is volatile, which is good
+      while (!safeStopRequested())
       {
         mpWrapper->step(mpWrapper->getSimulatedTimeParameter());
         usleep(static_cast<unsigned int>(1000 * mpWrapper->getIdleTimeParameter() + 0.5));
@@ -117,13 +118,13 @@ void cedar::aux::detail::LoopedThreadWorker::work()
       boost::posix_time::time_duration sleep_duration = boost::posix_time::microseconds(0);
       boost::posix_time::time_duration step_duration = boost::posix_time::microseconds(0);
 
-      while (!mStop) // TODO: locking // note: mStop is volatile, which is good
+      while (!safeStopRequested())
       {
         // sleep until next wake up time
         sleep_duration = scheduled_wakeup - boost::posix_time::microsec_clock::universal_time();
         usleep(std::max<int>(0, sleep_duration.total_microseconds()));
       
-        if (mStop) // a lot can happen in a few us // TODO: locking
+        if (safeStopRequested())
           break;
 
         // determine time since last run
@@ -143,7 +144,7 @@ void cedar::aux::detail::LoopedThreadWorker::work()
         // call step function
         mpWrapper->step(full_steps_taken * step_size.total_microseconds() * 0.001);
 
-        if (mStop) // a lot can happen in a step() // TODO: locking
+        if (safeStopRequested())
           break;
 
         // schedule the next wake up
@@ -167,13 +168,13 @@ void cedar::aux::detail::LoopedThreadWorker::work()
       boost::posix_time::time_duration sleep_duration = boost::posix_time::microseconds(0);
       boost::posix_time::time_duration step_duration = boost::posix_time::microseconds(0);
 
-      while (!mStop) // TODO: locking // note: mStop ist volatile, which is good
+      while (!safeStopRequested())
       {
         // sleep until next wake up time
         sleep_duration = scheduled_wakeup - boost::posix_time::microsec_clock::universal_time();
         usleep(std::max<int>(0, sleep_duration.total_microseconds()));
 
-        if (mStop) // a lot can happen in a few us // TODO: locking
+        if (safeStopRequested()) // a lot can happen in a few us 
           break;
 
         // determine time since last run
@@ -192,7 +193,7 @@ void cedar::aux::detail::LoopedThreadWorker::work()
         // call step function
         mpWrapper->step(steps_taken * step_size.total_microseconds() * 0.001);
 
-        if (mStop) // a lot can happen in a step() // TODO: locking
+        if (safeStopRequested()) // a lot can happen in a step() // TODO: locking
           break;
 
         // schedule the next wake up
@@ -213,7 +214,7 @@ void cedar::aux::detail::LoopedThreadWorker::work()
     }
   }
 
-  mStop = false; // TODO: locking
+  safeRequestStop();
   return;
 }
 
@@ -274,4 +275,21 @@ double cedar::aux::detail::LoopedThreadWorker::getMaxStepsTaken()
   return mMaxStepsTaken;
 }
 
+void cedar::aux::detail::LoopedThreadWorker::safeRequestStop()
+{
+  if (mpWrapper != NULL)
+  {
+    mpWrapper->requestStop();
+  }
+}
+
+bool cedar::aux::detail::LoopedThreadWorker::safeStopRequested()
+{
+  if (mpWrapper != NULL)
+  {
+    return mpWrapper->stopRequested();
+  }
+
+  return true; // (!) no wrapper means, we are not running
+}
 

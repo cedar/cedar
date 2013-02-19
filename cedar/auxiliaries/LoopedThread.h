@@ -100,6 +100,11 @@
  */
 class cedar::aux::LoopedThread : public cedar::aux::ThreadWrapper
 {
+  //----------------------------------------------------------------------------
+  // friends
+  //----------------------------------------------------------------------------
+ 
+  friend class cedar::aux::detail::LoopedThreadWorker;
 
   //----------------------------------------------------------------------------
   // constructors and destructor
@@ -134,14 +139,6 @@ public:
   // public methods
   //----------------------------------------------------------------------------
 public:
-
-	//!@todo This should be private -- loopedthreadworker should be a friend
-  /*!@brief All calculations for each time step are put into step().
-   *
-   * @param time length of the time step to be calculated in milliseconds
-   */
-  virtual void step(double time) = 0;
-
   /*!@brief Performs a single step with default step size (or simulated time).
    *
    * This has no effect if the thread is already running.
@@ -242,12 +239,24 @@ protected:
 private:
   void stopStatistics(bool suppressWarnings); // TODO: are the stats locked? // thread un-safe
 
+  cedar::aux::detail::ThreadWorker* resetWorker();
+
+	//!@todo This should be private -- loopedthreadworker should be a friend
+  /*!@brief All calculations for each time step are put into step().
+   *
+   * @param time length of the time step to be calculated in milliseconds
+   */
+  virtual void step(double time) = 0;
+
+  void applyStop(bool suppressWarning);
+
   //----------------------------------------------------------------------------
   // members
   //----------------------------------------------------------------------------
 protected:
 
 private:
+  cedar::aux::detail::LoopedThreadWorker* mpWorker;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -256,7 +265,6 @@ protected:
   // none yet
 
 private:
-  cedar::aux::detail::LoopedThreadWorker* mpWorker;
 
   //!@brief desired length of a single step, in milliseconds
   cedar::aux::DoubleParameterPtr _mStepSize;
@@ -269,8 +277,6 @@ private:
 
   //! The loop mode of the trigger
   cedar::aux::EnumParameterPtr _mLoopMode;
-
-  cedar::aux::detail::ThreadWorker* newWorker();
 
 }; // class cedar::aux::LoopedThread
 

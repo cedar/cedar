@@ -60,25 +60,16 @@ class cedar::aux::detail::ThreadWorker : public QObject
   Q_OBJECT
 
   public: 
-    ThreadWorker(cedar::aux::ThreadWrapper* wrapper);
+    ThreadWorker();
     virtual ~ThreadWorker();
 
-  public slots:
     virtual void work() = 0;
 
-  public:
-    void requestStop();
-    bool stopRequested();
+  public slots:
+    void workSlot();
 
-  private:
-    cedar::aux::ThreadWrapper *mpWrapper;
-
-// TODO: change
-protected:
-    //!@brief stop is requested
-    volatile bool mStop; // volatile disables some optimizations, but doesn't add thread-safety
-private:
-
+  signals:
+    void signalFinishedWorking();
 };
 
 

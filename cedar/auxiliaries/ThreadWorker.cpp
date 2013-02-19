@@ -42,28 +42,17 @@
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 
-cedar::aux::detail::ThreadWorker::ThreadWorker(cedar::aux::ThreadWrapper *wrapper) 
-: mpWrapper(wrapper), mStop(false)
+cedar::aux::detail::ThreadWorker::ThreadWorker()
 {
 }
 
 cedar::aux::detail::ThreadWorker::~ThreadWorker() 
 {
-  // Note: do not delete mpWrapper here! it should delete us
 }
 
-void cedar::aux::detail::ThreadWorker::requestStop()
+void cedar::aux::detail::ThreadWorker::workSlot()
 {
-  // this will stop and exit the loop (not the thread - the thread is stopped
-  // by the wrapper LoopedThread)
-
-  // TODO: needs to be locked!
-  mStop = true;
-}
-
-bool cedar::aux::detail::ThreadWorker::stopRequested()
-{
-  // TODO: locking
-  return mStop;
+  work(); // children will have implemented their own work()
+  emit signalFinishedWorking();
 }
 

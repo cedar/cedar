@@ -61,10 +61,17 @@
 
 class cedar::aux::CallFunctionThread : public cedar::aux::ThreadWrapper
 {
+  //----------------------------------------------------------------------------
+  // friends
+  //----------------------------------------------------------------------------
+
+  friend class cedar::aux::detail::CallFunctionThreadWorker;
+
 public:
   //----------------------------------------------------------------------------
   // typedefs
   //----------------------------------------------------------------------------
+
   typedef std::function< void(void) > FunctionType;
 
   //----------------------------------------------------------------------------
@@ -72,23 +79,7 @@ public:
   //----------------------------------------------------------------------------
 public:
 
-  /*!@brief Constructor with step size parameter.
-   *
-   * This constructor creates a CallFunctionThread with certain time interval
-   * (stepSize) in which the step() function is called.
-   *
-   * If stepSize == 0 the step() function is called as fast as possible with a
-   * short idle time in between to keep the system responsive.
-   *
-   * @param stepSize time window for each step function in milliseconds
-   * @param idleTime idle time (in milliseconds) used in fast running mode (i.e. stepSize = 0)
-   * @param simulatedTime a fixed time that is sent to all connected Triggerables regardless of real execution time
-   * @param mode the operational mode of this trigger
-   */
-  CallFunctionThread
-  (
-    FunctionType fun
-  );
+  CallFunctionThread(FunctionType fun);
 
   //!@brief Destructor
   virtual ~CallFunctionThread();
@@ -98,8 +89,6 @@ public:
   //----------------------------------------------------------------------------
 public:
 
-	//!@todo This should be private -- loopedthreadworker should be a friend
-  void call();
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -110,6 +99,10 @@ protected:
   // private methods
   //----------------------------------------------------------------------------
 private:
+  void call();
+
+  cedar::aux::detail::ThreadWorker* resetWorker();
+
 
   //----------------------------------------------------------------------------
   // members
@@ -127,9 +120,6 @@ protected:
 
 private:
   cedar::aux::detail::CallFunctionThreadWorker* mpWorker;
-
-  cedar::aux::detail::ThreadWorker* newWorker();
-
 }; // class cedar::aux::CallFunctionThread
 
 #endif // CEDAR_AUX_LOOPED_THREAD_H
