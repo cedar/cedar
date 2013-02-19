@@ -61,6 +61,9 @@ likely to undergo major changes:
 - Buildsystem:
   - fixed issues when linking to non-qt4 versions of QWT and libQGLViewer
     when qt3 and qt4 versions were present on the system.
+  - Disabled the as-needed switch of gcc/ld; on newer Linux versions, this caused cedardyn to not be loaded properly at
+    runtime, which meant fields and other steps from that library not showing up properly. This problem still persists
+    on Windows/MSVC.  
 
 - cedar::aux::net
   - fixed issues with GCC 4.7 and the NetTransporter (Reader/Writer) code
