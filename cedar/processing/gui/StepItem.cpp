@@ -85,8 +85,6 @@ const qreal cedar::proc::gui::StepItem::mDefaultWidth = 160;
 const qreal cedar::proc::gui::StepItem::mDefaultHeight = 50;
 const qreal cedar::proc::gui::StepItem::mBaseDataSlotSize = 12.0;
 
-QIcon cedar::proc::gui::StepItem::mLoopedIcon(":/decorations/looped.svg");
-
 #ifndef CEDAR_COMPILER_MSVC
 const cedar::proc::gui::StepItem::DisplayMode::Id cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT;
 const cedar::proc::gui::StepItem::DisplayMode::Id cedar::proc::gui::StepItem::DisplayMode::ICON_ONLY;
@@ -150,13 +148,13 @@ void cedar::proc::gui::StepItem::construct()
 cedar::proc::gui::StepItem::Decoration::Decoration
 (
   cedar::proc::gui::StepItem* pStep,
-  const QIcon& icon,
+  const QString& icon,
   const QString& description
 )
-:
-mIconSource(icon)
 {
   this->mpRectangle = new QGraphicsRectItem(-1, -1, 10, 10, pStep);
+  this->mIconSource = QIcon(icon);
+  CEDAR_ASSERT(!this->mIconSource.isNull());
   this->mpIcon = new QGraphicsPixmapItem
                  (
                    mIconSource.pixmap(static_cast<int>(cedar::proc::gui::StepItem::mBaseDataSlotSize)),
@@ -402,7 +400,12 @@ void cedar::proc::gui::StepItem::addDecorations()
   {
     DecorationPtr decoration
     (
-      new Decoration(this, mLoopedIcon, "This step is looped, i.e., it expects to be connected to a looped trigger.")
+      new Decoration
+      (
+        this,
+        ":/decorations/looped.svg",
+        "This step is looped, i.e., it expects to be connected to a looped trigger."
+      )
     );
 
     this->mDecorations.push_back(decoration);
