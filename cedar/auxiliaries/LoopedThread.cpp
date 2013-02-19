@@ -110,7 +110,7 @@ void cedar::aux::LoopedThread::stopStatistics(bool suppressWarning)
 }
 
 
-void cedar::aux::LoopedThread::singleStep() // TODO: needs to be virtual
+void cedar::aux::LoopedThread::singleStep()
 {
   if (!this->isRunning()) // use thread-safe variant  
   {
@@ -137,6 +137,11 @@ void cedar::aux::LoopedThread::singleStep() // TODO: needs to be virtual
   }
 }
 
+void cedar::aux::LoopedThread::applyStop(bool suppressWarning)
+{
+  stopStatistics(suppressWarning);
+}
+
 
 void cedar::aux::LoopedThread::setStepSize(double stepSize)
 {
@@ -153,7 +158,7 @@ void cedar::aux::LoopedThread::setSimulatedTime(double simulatedTime)
   _mSimulatedTime->setValue(simulatedTime);
 }
  
-cedar::aux::detail::ThreadWorker* cedar::aux::LoopedThread::newWorker()
+cedar::aux::detail::ThreadWorker* cedar::aux::LoopedThread::resetWorker()
 {
   mpWorker = new cedar::aux::detail::LoopedThreadWorker(this);
   return mpWorker;

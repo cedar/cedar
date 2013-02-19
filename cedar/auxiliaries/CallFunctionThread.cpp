@@ -64,13 +64,12 @@ cedar::aux::CallFunctionThread::~CallFunctionThread()
 
 void cedar::aux::CallFunctionThread::call()
 {
+  // called via friend worker class
   mFunction();
 }
 
-cedar::aux::detail::ThreadWorker* cedar::aux::CallFunctionThread::newWorker()
+cedar::aux::detail::ThreadWorker* cedar::aux::CallFunctionThread::resetWorker()
 {
-  mpWorker = new cedar::aux::detail::CallFunctionThreadWorker(this);
-  return mpWorker;
+  return new cedar::aux::detail::CallFunctionThreadWorker(this);
 }
-
 

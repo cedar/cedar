@@ -45,6 +45,10 @@
 
 #include <boost/lexical_cast.hpp>
 
+// global variables
+int errors = 0;
+QCoreApplication* app;
+
 //!@brief threaded test class
 class MyTestThread : public cedar::aux::LoopedThread
 {
@@ -157,8 +161,6 @@ int testConfiguration
 }
 
 
-int errors = 0;
-QCoreApplication* app;
 
 void runTests()
 {
@@ -181,9 +183,23 @@ void runTests()
   }
   else
   {
-    std::cout << "... thread stopped." << std::endl;
+    //std::cout << "... thread stopped." << std::endl;
   }
 
+  std::cout << "Immediately stopping a thread should invalidate a start ..." << std::endl;
+  thread.start();
+  thread.stop();
+
+  if (thread.isRunning())
+  {
+    std::cout << "... Thread NOT stopped! error" << std::endl;
+    errors++;
+    return;
+  }
+  else
+  {
+    std::cout << "... thread immediately stopped. OK." << std::endl;
+  }
 
   std::cout << std::endl;
   std::cout << "Starting thread again with an artificially unreliable execution time ..." << std::endl;

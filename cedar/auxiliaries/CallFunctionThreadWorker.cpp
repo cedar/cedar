@@ -44,7 +44,7 @@
 #include "cedar/auxiliaries/stringFunctions.h"
 
 cedar::aux::detail::CallFunctionThreadWorker::CallFunctionThreadWorker(cedar::aux::CallFunctionThread *wrapper) 
-: ThreadWorker( wrapper ), mpWrapper(wrapper)
+: mpWrapper(wrapper)
 {
 }
 
@@ -56,11 +56,10 @@ void cedar::aux::detail::CallFunctionThreadWorker::work()
 {
   // TODO: check whether wrapper (mpWrapper) still exists (paranoid)
 
-  mStop = false; // TODO: locking
-
   mpWrapper->call();
 
-  mStop = false; // TODO: locking
+  mpWrapper->requestStop();
+
   return;
 }
 
