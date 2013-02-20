@@ -166,18 +166,10 @@ void cedar::dev::robot::gl::KukaArm::drawBase()
   this->drawElement(mBaseSegmentVertexVboId, mBaseSegmentIndexVboId, mBaseSegmentFacesNumber);
   setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
   this->drawElement(mBaseRingVertexVboId, mBaseRingIndexVboId, mBaseRingFacesNumber);
-  // move to the base of the block
-  glRotated(-60.0, 1.0, 0.0, 0.0);
-  glTranslated(0.0, 0.01, -0.14205771365940052);
-//  cedar::aux::gl::drawCross(0.1);
-
-
+  // move to the base of the block and draw it
+  glRotated(90.0, 1.0, 0.0, 0.0);
+  glTranslated(0.0, -0.055, -0.13);
   drawBaseBlock();
-
-
-
-
-
   setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
 }
 

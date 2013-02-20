@@ -79,10 +79,10 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void setProperties();
+  // derived from class Device
   void applySettingsToCamera();
-  bool createCaptureDevice();
-  void applyStateToCamera();
+  bool createCaptureObject();
+  void getAvailablePropertiesFromCamera();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

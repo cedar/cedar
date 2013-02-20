@@ -45,7 +45,7 @@
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/MultiTrigger.h"
 #include "cedar/processing/PluginProxy.h"
-#include "cedar/processing/PluginDeclaration.h"
+#include "cedar/auxiliaries/PluginDeclarationList.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/gui/Settings.h"
@@ -84,9 +84,12 @@ void cedar::proc::Manager::loadDefaultPlugins()
   const std::set<std::string>& plugins = cedar::proc::gui::Settings::instance().pluginsToLoad();
   for (std::set<std::string>::const_iterator iter = plugins.begin(); iter != plugins.end(); ++ iter)
   {
+    std::string action = "reading";
     try
     {
+      action = "opening";
       cedar::proc::PluginProxyPtr plugin(new cedar::proc::PluginProxy(*iter));
+      action = "loading";
       cedar::proc::Manager::getInstance().load(plugin);
       cedar::aux::LogSingleton::getInstance()->message
       (
@@ -98,7 +101,24 @@ void cedar::proc::Manager::loadDefaultPlugins()
     {
       cedar::aux::LogSingleton::getInstance()->error
       (
-        "Error while loading default plugin \"" + (*iter) + "\": " + e.exceptionInfo(),
+        "Error while " + action + " default plugin \"" + (*iter) + "\": " + e.exceptionInfo(),
+        "void cedar::proc::Manager::loadDefaultPlugins()"
+      );
+    }
+    catch (std::exception& e)
+    {
+      std::string what = e.what();
+      cedar::aux::LogSingleton::getInstance()->error
+      (
+        "Error while " + action + " default plugin \"" + (*iter) + "\": " + what,
+        "void cedar::proc::Manager::loadDefaultPlugins()"
+      );
+    }
+    catch (...)
+    {
+      cedar::aux::LogSingleton::getInstance()->error
+      (
+        "Unknown error while " + action + " default plugin.",
         "void cedar::proc::Manager::loadDefaultPlugins()"
       );
     }
@@ -118,10 +138,7 @@ void cedar::proc::Manager::load(cedar::proc::PluginProxyPtr plugin)
 void cedar::proc::Manager::load(cedar::proc::PluginDeclarationPtr declaration)
 {
   // load steps
-  for (size_t i = 0; i < declaration->elementDeclarations().size(); ++i)
-  {
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration->elementDeclarations().at(i));
-  }
+  declaration->declareAll();
 }
 
 void cedar::proc::Manager::registerThread(cedar::aux::LoopedThreadPtr thread)

@@ -34,5 +34,5 @@
 #
 #=======================================================================================================================
 
-cedar_add_example(CameraGrabberTutorial PREFIX "examples/grabber" )
+cedar_add_interactive_test( "Grabber" TestGrabber.cpp )
 

@@ -39,9 +39,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/TypeHierarchyMap.h"
 #include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/PluginDeclaration.h"
 
 // SYSTEM INCLUDES
 #include <boost/enable_shared_from_this.hpp>
@@ -49,7 +51,8 @@
 
 /*!@brief A class used for declaring a plot to the plot manager.
  */
-class cedar::aux::gui::PlotDeclaration : public boost::enable_shared_from_this<cedar::aux::gui::PlotDeclaration>
+class cedar::aux::gui::PlotDeclaration : public cedar::aux::PluginDeclaration,
+                                         public boost::enable_shared_from_this<cedar::aux::gui::PlotDeclaration>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // friends
@@ -73,10 +76,10 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief returns the plot class name
-  virtual std::string getPlotClass() const = 0;
+  virtual std::string getClassName() const = 0;
 
   //!@brief allocates a new plot
-  virtual cedar::aux::gui::PlotInterface* createPlot() = 0;
+  virtual cedar::aux::gui::PlotInterface* createPlot() const = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -88,7 +91,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  virtual void declare() = 0;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -119,17 +122,34 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Returns the class of the plot as a string.
-  std::string getPlotClass() const
+  std::string getClassName() const
   {
     return cedar::aux::typeToString<PlotType>();
   }
 
   //!@brief allocates a new plot of the template type
-  cedar::aux::gui::PlotInterface* createPlot()
+  cedar::aux::gui::PlotInterface* createPlot() const
   {
     return new PlotType();
   }
 
+  void declare() const
+  {
+    //!@todo Should/can this go into the plot manager?
+    try
+    {
+      std::vector<cedar::aux::gui::ConstPlotDeclarationPtr>& declarations =
+        cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find<DataType>()->getData();
+      declarations.push_back(this->shared_from_this());
+    }
+    catch(cedar::aux::UnknownTypeException&)
+    {
+      std::vector<cedar::aux::gui::ConstPlotDeclarationPtr> declarations;
+      declarations.push_back(this->shared_from_this());
+      cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->insert<DataType>(declarations);
+    }
+    cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(this->shared_from_this());
+  }
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -140,21 +160,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void declare()
-  {
-    try
-    {
-      std::vector<cedar::aux::gui::PlotDeclarationPtr>& declarations =
-        cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find<DataType>()->getData();
-      declarations.push_back(this->shared_from_this());
-    }
-    catch(cedar::aux::UnknownTypeException&)
-    {
-      std::vector<cedar::aux::gui::PlotDeclarationPtr> declarations;
-      declarations.push_back(this->shared_from_this());
-      cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->insert<DataType>(declarations);
-    }
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

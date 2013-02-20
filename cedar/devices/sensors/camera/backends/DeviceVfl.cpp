@@ -72,7 +72,7 @@ void cedar::dev::sensors::camera::DeviceVfl::setProperties()
 
 }
 
-bool cedar::dev::sensors::camera::DeviceVfl::createCaptureDevice()
+bool cedar::dev::sensors::camera::DeviceVfl::createCaptureObject()
 {
 
 }

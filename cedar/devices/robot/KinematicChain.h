@@ -110,7 +110,7 @@ public:
   //----------------------------------------------------------------------------
 public:
   //!@brief The different modes to operate the kinematic chain
-  enum ActionType { ANGLE, VELOCITY, ACCELERATION };
+  enum ActionType { ANGLE, VELOCITY, ACCELERATION, STOP };
 
 protected:
   // none yet
@@ -557,24 +557,29 @@ private:
 
   /*!@brief gives the temporal derivative of a joint twist in the current configuration
    *
-   * @param index    index of the joint twist
-   * @return    derivative of the joint twist, 6 \f$\times\f$ 1 matrix
+   * @param jointIndex index of the joint twist
+   * @return derivative of the joint twist, 6 \f$\times\f$ 1 matrix
    */
-  cv::Mat calculateTwistTemporalDerivative(unsigned int index);
+  cv::Mat calculateTwistTemporalDerivative(unsigned int jointIndex);
 
 
   //----------------------------------------------------------------------------
   // members
   //----------------------------------------------------------------------------
 protected:
-  //!@brief current state of the joint angles
+  //!@brief current state of the joint angles, see also mAnglesLock
   cv::Mat mJointAngles;
+  //!@brief the lock of the mJointAngles
+  mutable QReadWriteLock mAnglesLock;
 
 private:
   bool mUseCurrentHardwareValues;
   cv::Mat mJointVelocities;
+  mutable QReadWriteLock mVelocitiesLock;
   cv::Mat mJointAccelerations;
-  ActionType mCurrentWorkingMode;
+  mutable QReadWriteLock mAccelerationsLock;
+  ActionType mWorkingMode;
+  mutable QReadWriteLock mWorkingModeLock;
 
   //! vector of all joints
   JointListParameterPtr mpJoints;

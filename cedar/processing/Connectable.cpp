@@ -291,13 +291,14 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar
     }
     else
     {
+      this->lockAll(cedar::aux::LOCK_TYPE_READ);
       // get the validity from the user-implemented function
       validity = this->determineInputValidity(slot, data);
+      this->unlockAll();
     }
 
     // assign the validity to the slot
     slot->setValidity(validity);
-
   }
 
   // return the validity stored in the slot

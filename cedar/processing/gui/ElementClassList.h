@@ -74,7 +74,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief for a given category, show all registered steps (their icon and name)
-  void showList(const cedar::proc::DeclarationRegistry::CategoryEntries& stepEntries);
+  void showList(const cedar::proc::ElementManager::BasePluginList& entries);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

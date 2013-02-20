@@ -80,12 +80,12 @@ namespace
 
       default:
 
-        capFile << featureName << "_is_supported"<< " = " << (bool)featureInfo.available << ";\n";
-        capFile << featureName << "_is_readable"<< " = " << (bool)featureInfo.readout_capable << ";\n";
+        capFile << featureName << "_is_supported"<< " = " << static_cast<bool>(featureInfo.available) << ";\n";
+        capFile << featureName << "_is_readable"<< " = " << static_cast<bool>(featureInfo.readout_capable) << ";\n";
         capFile << featureName << "_min_value"<< " = " << featureInfo.min << ";\n";
         capFile << featureName << "_max_value" << " = " << featureInfo.max << ";\n";
-        capFile << featureName << "_is_on_off_capable"<< " = " << (bool)featureInfo.on_off_capable << ";\n";
-        capFile << featureName << "_is_absolute_capable"<< " = " << (bool)featureInfo.absolute_capable << ";\n";
+        capFile << featureName << "_is_on_off_capable"<< " = " << static_cast<bool>(featureInfo.on_off_capable) << ";\n";
+        capFile << featureName << "_is_absolute_capable"<< " = " << static_cast<bool>(featureInfo.absolute_capable) << ";\n";
 
         //check supported modes
         dc1394feature_modes_t& supported_modes = featureInfo.modes;
@@ -143,7 +143,7 @@ int main(int , char**)
     //Get GUID of camera
     uint64_t guid;
     guid = fw_interface.getCamGuid(camera_nr);
-    unsigned int guid_int = (unsigned int)(guid&0x00000000FFFFFFFF);  //only lower 32bit
+    unsigned int guid_int = static_cast<unsigned int>(guid&0x00000000FFFFFFFF);  //only lower 32bit
 
     if (guid == 0)
     {

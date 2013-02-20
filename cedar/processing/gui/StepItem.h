@@ -43,6 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
+#include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/auxiliaries/gui/namespace.h"
@@ -206,6 +207,10 @@ public slots:
   void redraw();
 
 signals:
+  /*!@brief Emitted whenever the state of the step displayed by this step item changes.
+   *
+   * @remarks This signal is used to transfer the underlying signal from the processing thread to the gui thread.
+   */
   void stepStateChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -238,7 +243,7 @@ private:
   void fillPlots
   (
     QMenu* pMenu,
-    std::map<QAction*, std::pair<cedar::aux::gui::PlotDeclarationPtr, cedar::aux::Enum> >& declMap
+    std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
   );
 
   //!@brief Fills the defined plots into the given menu.
@@ -285,12 +290,14 @@ private:
 
   void addDataItemFor(cedar::proc::DataSlotPtr slot);
 
-  QDockWidget* createPlotDockWidget(const std::string& title) const;
+  QDockWidget* createDockWidget(const std::string& title) const;
 
 private slots:
   void displayStyleMenuTriggered(QAction* pAction);
 
   void openDefinedPlotAction(QAction* pAction);
+
+  void openProperties();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -326,7 +333,7 @@ private:
   boost::signals2::connection mSlotRemovedConnection;
 
   //!@brief the class id of the step
-  cedar::proc::ElementDeclarationPtr mClassId;
+  cedar::aux::ConstPluginDeclarationPtr mClassId;
 
   //!@brief the main window in which the current graphical representation is embedded
   QMainWindow* mpMainWindow;

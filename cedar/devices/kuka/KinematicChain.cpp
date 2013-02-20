@@ -163,7 +163,7 @@ void cedar::dev::kuka::KinematicChain::setJointAngle(unsigned int index, double 
 void cedar::dev::kuka::KinematicChain::setWorkingMode(cedar::dev::robot::KinematicChain::ActionType actionType)
 {
   // Set the desired working mode
-  KinematicChain::setWorkingMode(actionType);
+  cedar::dev::robot::KinematicChain::setWorkingMode(actionType);
   // Reset the commanded position to the measured joint position
   mCommandedJointPosition = mMeasuredJointPosition;
   // restart the thread, since it was stopped by KinematicChain::setWorkingMode()

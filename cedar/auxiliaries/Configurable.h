@@ -44,16 +44,25 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/threadingUtilities.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <map>
 #include <list>
+#include <fstream> // for write_csv()
+#include <string>  // for write_csv()
+#include <ostream> // for write_csv()
+#include <iomanip> // for write_csv()
+#include <iostream> // for write_csv() debugging
+#include <boost/next_prior.hpp> // for write_csv()
 #include <boost/signals2/signal.hpp>
 #include <boost/signals2/connection.hpp>
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
 
 /*!@brief An interface for classes that can store and load parameters from files.
+ *
+ * @todo Lock this class -- accessing the parameter list is currently not thread safe.
  */
 class cedar::aux::Configurable : public boost::noncopyable
 {
@@ -114,6 +123,9 @@ public:
   //!@brief write a configuration to a cedar::aux::ConfigurationNode tree and store this tree in a json file
   void writeJson(const std::string& filename) const;
 
+  //!@brief write a configuration to a cedar::aux::ConfigurationNode tree and store this tree in a csv spreadsheet file
+  void writeCsv(const std::string& filename, const char separator = ',') const;
+
   //!@brief get a map of all children of the current Configurable
   const Children& configurableChildren() const;
 
@@ -147,14 +159,28 @@ public:
   void copyTo(ConfigurablePtr target) const;
 
   /*!@brief Returns the parameter associated with the path.
-   * @todo This should be const, but that conflicts with the intrusive pointers
    */
   cedar::aux::ParameterPtr getParameter(const std::string& path);
 
+  /*!@brief Returns a constant pointer to the parameter associated with the given path.
+   */
+  cedar::aux::ConstParameterPtr getParameter(const std::string& path) const;
+
+  /*!@brief Returns the tpye-specific parameter associated with the path.
+   */
+  template <class T>
+  boost::intrusive_ptr<T> getParameter(const std::string& path)
+  {
+    return boost::dynamic_pointer_cast<T>(this->getParameter(path));
+  }
+
   /*!@brief Returns the configurable child associated with the path.
-   * @todo This should be const, but that conflicts with the intrusive pointers in getParameter
    */
   cedar::aux::ConfigurablePtr getConfigurableChild(const std::string& path);
+
+  /*!@brief Returns the configurable child associated with the path as a const pointer.
+   */
+  cedar::aux::ConstConfigurablePtr getConfigurableChild(const std::string& path) const;
 
   /*!@brief Locks all parameters of the configurable.
    */
@@ -163,6 +189,29 @@ public:
   /*!@brief Unlocks all parameters of the configurable.
    */
   void unlockParameters() const;
+
+  //! Returns the number of advanced parameters & configurable children in this configurable.
+  size_t countAdvanced() const;
+
+  /*!@brief   Marks this configurable as advanced.
+   *
+   *          Advanced configurable are those that usually don't need to be changed. This is mainly used by user
+   *          interfaces to avoid cluttering lists with parameters that are rarely needed, or may need specific
+   *          knowledge to be set to proper values.
+   *
+   * @remarks Currently, this should not be changed at runtime; call this once, right after you add the parameter to a
+   *          configurable.
+   */
+  void markAdvanced(bool advanced = true)
+  {
+    this->mIsAdvanced = advanced;
+  }
+
+  //!@brief Returns whether this parameter is marked as advanced.
+  bool isAdvanced() const
+  {
+    return this->mIsAdvanced;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -195,6 +244,105 @@ private:
   //!@brief Appends the locks of this configurable and its children to the set.
   void appendLocks(std::set<QReadWriteLock*>& locks);
 
+  //!@brief make sure the directories exist 
+  std::string normalizeFilename(const std::string& filename) const;
+
+  //!@brief helper function to write a Ptree to .csv. internals start here. opens the stream
+  template<class Ptree>
+  void writeCsvConfiguration(const std::string& filename, const Ptree& pt, 
+                             const char separator) const
+  {
+    // heavily copied + simplified from boost
+    std::basic_ofstream<typename Ptree::key_type::value_type>
+    stream(filename.c_str());
+    if (!stream)
+    {
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "cannot write file: " + filename,
+        "cedar::aux::Configurable::writeCsv()"
+      );
+    }
+    writeCsvStream(stream, pt, filename, separator);
+  }
+
+
+  //!@brief helper function to write a Ptree to .csv. internal. check stream
+  template<class Ptree>
+  void writeCsvStream(std::basic_ostream<typename Ptree::key_type::value_type>& stream, 
+                            const Ptree& pt,
+                            const std::string& filename,
+                            const char separator) const
+  {
+
+    writeCsvItem(stream, pt, 0, separator);
+    stream << std::endl;
+    if (!stream.good())
+    {
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "write error: " + filename,
+        "cedar::aux::Configurable::writeCsv()"
+      );
+
+    }
+  }
+
+  //!@brief helper function to write a Ptree to .csv. internal. write structure
+  template<class Ptree>
+  void writeCsvItem(std::basic_ostream<typename Ptree::key_type::value_type>& stream, 
+                        const Ptree& pt, int indent,
+                        const char separator) const
+  {
+    typedef typename Ptree::key_type::value_type Ch;
+    typedef typename std::basic_string<Ch> Str;
+
+    // vectors of Parameters fully written into one row:
+    // one value per cell;
+    // every level 0 container element starts new row;
+    // all level >= 1 containers with non-values also start new row
+    // rows first cell is always the containers Parameter name;
+    //     A   B   C   D   E 
+    //    name 42  43  44  45
+
+    if (pt.empty() && indent > 0)
+    {      
+      // write value:
+      //<< std::setprecision(4) // set decimal precision for data. saves a lot of bytes ;)
+      stream << ( pt.template get_value<Str>() ); 
+        // TODO: add escaping special characters
+    }
+    else if (pt.count(Str()) == pt.size() && indent > 0)
+    {
+      // sub-array:
+      typename Ptree::const_iterator it = pt.begin();
+      for (; it != pt.end(); ++it)
+      {
+        // write-out one level lower:
+        writeCsvItem(stream, it->second, indent + 1, separator);
+        if (boost::next(it) != pt.end())
+        {
+          // separator for cells (columns):
+          stream << Ch(separator);
+        }
+      }
+    }
+    else
+    {
+      // iterate over first level:
+      typename Ptree::const_iterator it = pt.begin();
+      for (; it != pt.end(); ++it)
+      {
+        stream << Ch('\n'); // every entry on new line (row)
+        stream << (it->first) << Ch(separator); // name in first cell of row
+
+        writeCsvItem(stream, it->second, indent + 1, separator);
+      }
+
+      stream << Ch('\n'); // NL on last row
+    }
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -219,6 +367,9 @@ private:
 
   //!@brief map of children of this Configurable instance
   Children mChildren;
+
+  //!@brief Whether this is an advanced configurable; usually only makes sense, when this is a child.
+  bool mIsAdvanced;
 
   /*!@brief   The lockable used for locking this configurable and all its parameters.
    *

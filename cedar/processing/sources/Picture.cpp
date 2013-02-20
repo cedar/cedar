@@ -70,7 +70,8 @@ namespace
       "Reads an image from a file. What filetypes are supported depends on what your opencv "
       "version supports."
     );
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }

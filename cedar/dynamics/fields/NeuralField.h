@@ -127,6 +127,13 @@ public:
    */
   bool activationIsOutput() const;
 
+  /*!@brief Marks the activation as output.
+   */
+  void setActivationIsOutput(bool value)
+  {
+    this->_mOutputActivation->setValue(value);
+  }
+
 public slots:
   //!@brief handle a change in dimensionality, which leads to creating new matrices
   void dimensionalityChanged();

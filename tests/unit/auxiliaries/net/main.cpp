@@ -136,7 +136,7 @@ int main()
   // mat8 is a bit smaller, but has multi channels
   for (int i=0; i < 20; i++)
   {
-    struct three_t rgb= { 1, 2, i };
+    struct three_t rgb= { 1.0, 2.0, static_cast<float>(i) };
 
     mat8.at<three_t>(i,0)= rgb;
     mat8.at<three_t>(i,1)= rgb;

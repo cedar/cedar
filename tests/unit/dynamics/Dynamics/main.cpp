@@ -75,7 +75,7 @@ int main(int, char**)
   std::cout << "done." << std::endl;
 
   std::cout << "Adding declaration to the registry ... ";
-  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(neuron_declaration);
+  neuron_declaration->declare();
   std::cout << "done." << std::endl;
 
   std::cout << "Reading Setup1.json ... ";
