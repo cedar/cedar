@@ -69,12 +69,12 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr field_decl
+    ElementDeclarationPtr declaration
     (
       new cedar::proc::ElementDeclarationTemplate<cedar::dyn::NeuralField>("DFT", "cedar.dynamics.NeuralField")
     );
-    field_decl->setIconPath(":/steps/field_temp.svg");
-    field_decl->setDescription
+    declaration->setIconPath(":/steps/field_temp.svg");
+    declaration->setDescription
     (
       "An implementation of Amari's dynamic neural fields."
     );
@@ -84,10 +84,10 @@ namespace
     field_plot_data.push_back(std::make_pair(DataRole::BUFFER, "input sum"));
     field_plot_data.push_back(std::make_pair(DataRole::BUFFER, "activation"));
     field_plot_data.push_back(std::make_pair(DataRole::OUTPUT, "sigmoided activation"));
-    field_decl->definePlot("field plot", field_plot_data);
+    declaration->definePlot("field plot", field_plot_data);
 
     // add declaration to the registry
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(field_decl);
+    declaration->declare();
 
     return true;
   }
@@ -225,6 +225,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   allowed_convolution_modes.insert(cedar::aux::conv::Mode::Same);
 
   this->addConfigurableChild("noise correlation kernel", mNoiseCorrelationKernel);
+  mNoiseCorrelationKernel->markAdvanced();
   this->_mNoiseCorrelationKernelConvolution->getKernelList()->append(mNoiseCorrelationKernel);
   this->_mNoiseCorrelationKernelConvolution->setMode(cedar::aux::conv::Mode::Same);
   this->_mNoiseCorrelationKernelConvolution->setBorderType(cedar::aux::conv::BorderType::Zero);

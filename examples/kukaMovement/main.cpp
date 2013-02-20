@@ -237,6 +237,7 @@ int main(int argc, char **argv)
 
   // start everything
   arm->setWorkingMode(cedar::dev::robot::KinematicChain::VELOCITY);
+  arm->start();
   worker.start();
   a.exec();
 

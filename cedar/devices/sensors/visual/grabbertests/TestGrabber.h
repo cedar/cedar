@@ -28,7 +28,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 04 23
 
-    Description: Header for the @em @em cedar::dev::sensors::visual::TestGrabber class.
+    Description: Header for the @em cedar::dev::sensors::visual::TestGrabber class.
 
     Credits:
 
@@ -42,12 +42,15 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/Grabber.h"
+#include "cedar/devices/sensors/visual/grabbertests/TestChannel.h"
 #include "cedar/auxiliaries/StringParameter.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
-/*! @brief A simple Grabber class for testing the Grabber interface
+/*! @class cedar::dev::sensors::visual::TestGrabber
+ *
+ *  @brief A simple Grabber class for testing the Grabber interface
  *
  *  This grabber class is used to test the grabber interface. It
  *  creates a Grabber with a TestParam (default-value 123) and FPS set to 15
@@ -61,39 +64,6 @@ class cedar::dev::sensors::visual::TestGrabber
 public cedar::dev::sensors::visual::Grabber
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
-  //--------------------------------------------------------------------------------------------------------------------
-
-  //!@cond SKIPPED_DOCUMENTATION
-public:
-
-  /*! @struct TestChannel
-   *  @brief Additional data of a grabbing channel
-   *  @remarks For grabber developers<br>
-   *    You don't have to create an extended channel structure, until you need more channel data.
-   *    But when, then you have to implement the onAddChannel() member function as well
-   */
-  struct TestChannel
-  :
-  cedar::dev::sensors::visual::GrabberChannel
-  {
-  public:
-    TestChannel(const std::string& defaultFileName = "./default_parameter_value_for_processingGui_instantiation")
-    :
-    cedar::dev::sensors::visual::GrabberChannel(),
-    _mpSourceFileName(new cedar::aux::StringParameter(this, "name_of_parameter", defaultFileName))
-    {
-    }
-
-    //! @brief The filenames
-    cedar::aux::StringParameterPtr _mpSourceFileName;
-  };
-
-  CEDAR_GENERATE_POINTER_TYPES(TestChannel);
-
-  //!@endcond
-
-  //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
 
@@ -103,7 +73,6 @@ public:
 public:
 
   /*! @brief  Constructor for a single channel grabber
-   *  @param grabberName  Name of the grabber
    *  @param sourceFileName Filename to grab from (here only for demonstration and testing)
    */
   TestGrabber
@@ -112,7 +81,6 @@ public:
   );
 
   /*! @brief Constructor for a stereo channel grabber
-   *  @param grabberName  Name of the grabber
    *  @param sourceFileName0 Filename to grab from for channel 0 (here only for demonstration and testing)
    *  @param sourceFileName1 Filename to grab from for channel 1 (here only for demonstration and testing)
    */
@@ -135,15 +103,21 @@ public:
    */
   unsigned int getCounter();
 
+  /*! @brief Get the filename of the channel
+   *
+   */
+  std::string getSourceFileName(unsigned int channel);
+
   /*! @brief Simple get-function for the test parameter
    *
    */
   int getTestParam();
 
+
   /*! @brief Simple set-function for the test parameter
    *
    */
-  void setTestParam(int mTest);
+  void setTestParam(int testParameter);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -155,14 +129,12 @@ protected:
   void onCloseGrabber();
   void onCleanUp();
   bool onGrab();
+  std::string onUpdateSourceInfo(unsigned int channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-
-  /// @brief updates the channel informations
-  void setChannelInfo(unsigned int channel);
 
   ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
   inline TestChannelPtr getTestChannel(unsigned int channel)
@@ -182,7 +154,6 @@ private:
        );
   }
 
-
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -193,14 +164,12 @@ private:
   //!@brief The counter
   unsigned int mCounter;
 
-  //!@brief The test parameter
-  int _mTest;
-
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief The test parameter
+  cedar::aux::IntParameterPtr _mTestParam;
 
 private:
   // none yet

@@ -46,7 +46,7 @@ namespace
 {
   bool declared
     = cedar::dev::sensors::visual::Grabber::ChannelManagerSingleton::getInstance()
-        ->registerType<cedar::dev::sensors::visual::TestGrabber::TestChannelPtr>();
+        ->registerType<cedar::dev::sensors::visual::TestChannelPtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -63,12 +63,12 @@ cedar::dev::sensors::visual::TestGrabber::TestGrabber
 cedar::dev::sensors::visual::Grabber
 (
   "TestGrabber",
-  cedar::dev::sensors::visual::TestGrabber::TestChannelPtr
+  cedar::dev::sensors::visual::TestChannelPtr
   (
-    new cedar::dev::sensors::visual::TestGrabber::TestChannel(sourceFileName)
+    new cedar::dev::sensors::visual::TestChannel(sourceFileName)
   )
-)//,
-// _mSourceFileName(new cedar::aux::FileParameter(this, "fileName", cedar::aux::FileParameter::READ, fileName))
+),
+_mTestParam(new cedar::aux::IntParameter(this, "testparameter", 0))
 {
   // information logging
   cedar::aux::LogSingleton::getInstance()->allocating(this);
@@ -94,16 +94,16 @@ cedar::dev::sensors::visual::TestGrabber::TestGrabber
 cedar::dev::sensors::visual::Grabber
 (
   "StereoTestGrabber",
-  cedar::dev::sensors::visual::TestGrabber::TestChannelPtr
+  cedar::dev::sensors::visual::TestChannelPtr
   (
-    new cedar::dev::sensors::visual::TestGrabber::TestChannel(sourceFileName0)
+    new cedar::dev::sensors::visual::TestChannel(sourceFileName0)
   ),
-  cedar::dev::sensors::visual::TestGrabber::TestChannelPtr
+  cedar::dev::sensors::visual::TestChannelPtr
   (
-    new cedar::dev::sensors::visual::TestGrabber::TestChannel(sourceFileName1)
+    new cedar::dev::sensors::visual::TestChannel(sourceFileName1)
   )
-)//,
-// _mSourceFileName(new cedar::aux::FileParameter(this, "fileName", cedar::aux::FileParameter::READ, fileName))
+),
+_mTestParam(new cedar::aux::IntParameter(this, "testparameter", 0))
 {
   // debug information logging
   cedar::aux::LogSingleton::getInstance()->allocating(this);
@@ -161,7 +161,7 @@ bool cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()
   for(unsigned int channel = 0; channel < num_cams; ++channel)
   {
     init_message << "Channel " << channel << ": capture from Source: "
-                 << getTestChannel(channel)->_mpSourceFileName->getValue() << std::endl;
+                 << getTestChannel(channel)->_mSourceFileName->getPath() << std::endl;
   }
   cedar::aux::LogSingleton::getInstance()->message
                                            (
@@ -179,9 +179,6 @@ bool cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()
 
     // apply the new content to the channel image
     getImageMat(channel) = frame;
-
-    // don't forget to update the channel info
-    this->setChannelInfo(channel);
   }
 
 
@@ -218,15 +215,15 @@ void cedar::dev::sensors::visual::TestGrabber::onCloseGrabber()
 
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::TestGrabber::setChannelInfo(unsigned int channel)
+std::string cedar::dev::sensors::visual::TestGrabber::onUpdateSourceInfo(unsigned int channel)
 {
 
   // no range-check is needed, because this method is a private method
 
   // give some information about the used source like channelname, filename, devicename
   // or something like that
-  setChannelInfoString(channel,this->getName() + " Channel " + boost::lexical_cast<std::string>(channel)
-                               + " : "+ getTestChannel(channel)->_mpSourceFileName->getValue());
+  return this->getName() + " Channel " + boost::lexical_cast<std::string>(channel)
+                               + " : "+ getTestChannel(channel)->_mSourceFileName->getPath();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -260,13 +257,19 @@ unsigned int cedar::dev::sensors::visual::TestGrabber::getCounter()
 int cedar::dev::sensors::visual::TestGrabber::getTestParam()
 {
   // a simple get-method
-  return _mTest;
+  return _mTestParam->getValue();
 }
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::TestGrabber::setTestParam(int mTest)
+void cedar::dev::sensors::visual::TestGrabber::setTestParam(int testParameter)
 {
   // a simple set-method
-  _mTest=mTest;
+  _mTestParam->setValue(testParameter);
+}
+
+//----------------------------------------------------------------------------------------------------
+std::string cedar::dev::sensors::visual::TestGrabber:: getSourceFileName(unsigned int channel)
+{
+  return getTestChannel(channel)->_mSourceFileName->getPath();
 }
 

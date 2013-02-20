@@ -58,6 +58,30 @@ likely to undergo major changes:
 
 == current version ==
 
+- all:
+  - enabled C++0x / C++11 compiler flag for GCC
+
+- cedar::aux
+  - DoubleData now inherits MatData. It therefore is also no longer just a typedef of a template, so make sure you
+    include the proper header (cedar/auxiliaries/DoubleData) in your code.
+  - Parameters and Configurables can now be marked as advanced. Those that are, are not displayed to the user unless
+    they opt to have them displayed by checking a box in the property pane.
+  
+- cedar::aux::gui
+  - LinePlots now have an option in their context menu to set fixed limits for the y axis.
+  - There is now a history plot for 1D matrices.
+
+- cedar::dev
+  - KinematicChain instances now need to be started via ->start() by the implementor. They do not start threading on their own, anymore
+
+- cedar::proc
+  - The processingIde can now be started with the "--no-log" option. This will redirect all log messages to the terminal
+    and can be very helpful when steps send too many log messages, leading to a lock-up of the user interface.
+- cedar::dyn
+  - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   
+  
+== current stable ==
+
 - Buildsystem:
   - fixed issues when linking to non-qt4 versions of QWT and libQGLViewer
     when qt3 and qt4 versions were present on the system.
