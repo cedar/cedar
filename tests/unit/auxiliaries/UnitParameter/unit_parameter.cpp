@@ -40,6 +40,7 @@
 #include "cedar/auxiliaries/TimeParameter.h"
 #include "cedar/auxiliaries/VelocityParameter.h"
 #include "cedar/auxiliaries/PlaneAngleParameter.h"
+#include "cedar/auxiliaries/FrequencyParameter.h"
 
 // SYSTEM INCLUDES
 #include <boost/filesystem.hpp>
@@ -85,6 +86,15 @@ public:
       "plane angle",
       1 * boost::units::si::radian
     )
+  ),
+  mFrequencyParameter
+  (
+    new cedar::aux::FrequencyParameter
+    (
+      this,
+      "frequency",
+      1 * boost::units::si::hertz
+    )
   )
   {
   }
@@ -93,6 +103,7 @@ public:
   cedar::aux::TimeParameterPtr mTime;
   cedar::aux::VelocityParameterPtr mVelocity;
   cedar::aux::PlaneAngleParameterPtr mPlaneAngle;
+  cedar::aux::FrequencyParameterPtr mFrequencyParameter;
 };
 
 CEDAR_GENERATE_POINTER_TYPES(TestConfigurable);
@@ -121,7 +132,8 @@ int test_reading
       const boost::units::quantity<boost::units::si::length>& expectedLength,
       const boost::units::quantity<boost::units::si::time>& expectedTime,
       const boost::units::quantity<boost::units::si::velocity>& expectedVelocity,
-      const boost::units::quantity<boost::units::si::plane_angle>& expectedPlaneAngle
+      const boost::units::quantity<boost::units::si::plane_angle>& expectedPlaneAngle,
+      const boost::units::quantity<boost::units::si::frequency>& expectedFrequency
     )
 {
   int errors = 0;
@@ -136,6 +148,7 @@ int test_reading
     errors += check(expectedTime, conf->mTime);
     errors += check(expectedVelocity, conf->mVelocity);
     errors += check(expectedPlaneAngle, conf->mPlaneAngle);
+    errors += check(expectedFrequency, conf->mFrequencyParameter);
   }
 
   std::cout << "Reading of file \"" << fileName << "\" finished with " << errors << " error(s)." << std::endl;
@@ -145,7 +158,7 @@ int test_reading
 int test_writing(const std::string& fileName)
 {
   int errors = 0;
-  std::cout << "Testing reading of file \"" << fileName << "\"." << std::endl;
+  std::cout << "Testing writing of file \"" << fileName << "\"." << std::endl;
 
   TestConfigurablePtr conf(new TestConfigurable());
   conf->writeJson(fileName);
@@ -166,7 +179,8 @@ int main(int, char**)
               1.0 * boost::units::si::meters,
               5.0 * boost::units::si::seconds,
               1.0 * boost::units::si::meters / boost::units::si::seconds,
-              2.0 * boost::units::si::radians
+              2.0 * boost::units::si::radians,
+              20.0 * boost::units::si::hertz
             );
   errors += test_reading
             (
@@ -174,7 +188,8 @@ int main(int, char**)
               1.0 * boost::units::si::meters,
               5.0 * boost::units::si::seconds,
               1.0 * boost::units::si::meters / boost::units::si::seconds,
-              2.0 * boost::units::si::radians
+              2.0 * boost::units::si::radians,
+              20.0 * boost::units::si::hertz
             );
   errors += test_reading
             (
@@ -182,7 +197,8 @@ int main(int, char**)
               1.0 * boost::units::si::meters,
               5.0 * boost::units::si::seconds,
               1.0 * boost::units::si::meters / boost::units::si::seconds,
-              2.0 * boost::units::si::radians
+              2.0 * boost::units::si::radians,
+              20.0 * boost::units::si::hertz
             );
   errors += test_writing("test1-write.json");
 

@@ -2,5 +2,6 @@
     "length": "1 m",
     "time": "5 s",
     "velocity": "1m s  ^-1",
-    "plane angle": "2 rad"
+    "plane angle": "2 rad",
+    "frequency": "20 hertz"
 }
