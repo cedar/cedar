@@ -47,49 +47,6 @@ namespace cedar
 {
   namespace aux
   {
-//    template <>
-//    boost::units::quantity<boost::units::si::velocity> getUnitFromPostFix(const std::string& postFix)
-//    {
-//      /*static std::map<std::string, boost::units::quantity<boost::units::si::time> > map;
-//
-//      if (map.empty())
-//      {
-//        addBaseUnitToMaps<boost::units::si::second_base_unit>(map, boost::units::si::seconds);
-//        addAliasToMaps(map, "second", "seconds");
-//
-//        addSubUnitToMaps<boost::units::si::second_base_unit>
-//        (
-//          map,
-//          boost::units::si::seconds,
-//          "millisecond", "ms",
-//          0.001
-//        );
-//        addAliasToMaps(map, "millisecond", "milliseconds");
-//
-//        addSubUnitToMaps<boost::units::si::second_base_unit>
-//        (
-//          map,
-//          boost::units::si::seconds,
-//          "minute", "min",
-//          60.0
-//        );
-//        addAliasToMaps(map, "minute", "minutes");
-//
-//        addSubUnitToMaps<boost::units::si::second_base_unit>
-//        (
-//          map,
-//          boost::units::si::seconds,
-//          "hour", "h",
-//          60.0 * 60.0
-//        );
-//        addAliasToMaps(map, "hour", "hours");
-//      }
-//
-//      return cedar::aux::findUnit(postFix, map);*/
-//
-//      return 1.0 * boost::units::si::meter / boost::units::si::second;
-//    }
-
     template <>
     boost::units::quantity<boost::units::si::velocity>
       parseUnitString<boost::units::si::velocity>(const std::string& unitStr)
