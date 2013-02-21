@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/VelocityParameter.h"
 #include "cedar/auxiliaries/PlaneAngleParameter.h"
 #include "cedar/auxiliaries/FrequencyParameter.h"
+#include "cedar/auxiliaries/AngularVelocityParameter.h"
 
 // SYSTEM INCLUDES
 #include <boost/filesystem.hpp>
@@ -95,6 +96,15 @@ public:
       "frequency",
       1 * boost::units::si::hertz
     )
+  ),
+  mAngularVelocity
+  (
+    new cedar::aux::AngularVelocityParameter
+    (
+      this,
+      "angular velocity",
+      1 * boost::units::si::radian_per_second
+    )
   )
   {
   }
@@ -104,6 +114,7 @@ public:
   cedar::aux::VelocityParameterPtr mVelocity;
   cedar::aux::PlaneAngleParameterPtr mPlaneAngle;
   cedar::aux::FrequencyParameterPtr mFrequencyParameter;
+  cedar::aux::AngularVelocityParameterPtr mAngularVelocity;
 };
 
 CEDAR_GENERATE_POINTER_TYPES(TestConfigurable);
@@ -133,7 +144,8 @@ int test_reading
       const boost::units::quantity<boost::units::si::time>& expectedTime,
       const boost::units::quantity<boost::units::si::velocity>& expectedVelocity,
       const boost::units::quantity<boost::units::si::plane_angle>& expectedPlaneAngle,
-      const boost::units::quantity<boost::units::si::frequency>& expectedFrequency
+      const boost::units::quantity<boost::units::si::frequency>& expectedFrequency,
+      const boost::units::quantity<boost::units::si::angular_velocity>& expectedAngularVelocity
     )
 {
   int errors = 0;
@@ -149,6 +161,7 @@ int test_reading
     errors += check(expectedVelocity, conf->mVelocity);
     errors += check(expectedPlaneAngle, conf->mPlaneAngle);
     errors += check(expectedFrequency, conf->mFrequencyParameter);
+    errors += check(expectedAngularVelocity, conf->mAngularVelocity);
   }
 
   std::cout << "Reading of file \"" << fileName << "\" finished with " << errors << " error(s)." << std::endl;
@@ -180,7 +193,8 @@ int main(int, char**)
               5.0 * boost::units::si::seconds,
               1.0 * boost::units::si::meters / boost::units::si::seconds,
               2.0 * boost::units::si::radians,
-              20.0 * boost::units::si::hertz
+              20.0 * boost::units::si::hertz,
+              5.0 * boost::units::si::radian_per_second
             );
   errors += test_reading
             (
@@ -189,7 +203,8 @@ int main(int, char**)
               5.0 * boost::units::si::seconds,
               1.0 * boost::units::si::meters / boost::units::si::seconds,
               2.0 * boost::units::si::radians,
-              20.0 * boost::units::si::hertz
+              20.0 * boost::units::si::hertz,
+              5.0 * boost::units::si::radian_per_second
             );
   errors += test_reading
             (
@@ -198,7 +213,8 @@ int main(int, char**)
               5.0 * boost::units::si::seconds,
               1.0 * boost::units::si::meters / boost::units::si::seconds,
               2.0 * boost::units::si::radians,
-              20.0 * boost::units::si::hertz
+              20.0 * boost::units::si::hertz,
+              5.0 * boost::units::si::radian_per_second
             );
   errors += test_writing("test1-write.json");
 

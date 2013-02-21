@@ -3,5 +3,6 @@
     "time": "5 s",
     "velocity": "1m s  ^-1",
     "plane angle": "2 rad",
-    "frequency": "20 hertz"
+    "frequency": "20 hertz",
+    "angular velocity": "5 rad s^-1"
 }
