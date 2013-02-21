@@ -230,9 +230,15 @@ namespace cedar
       // Converts a string to bool
       boost::optional<external_type> get_value(const internal_type& str)
       {
-        size_t delim = str.find_first_not_of("0123456789.");
-        std::string number_str = str.substr(0, delim);
-        std::string unit_str = str.substr(delim);
+        // normalize all white space to a single space
+        std::string norm_str = cedar::aux::regexReplace(str, "\\s+", " ");
+
+        // remove white space at the beginning and end of the string
+        norm_str = cedar::aux::regexReplace(norm_str, "(^\\s+|\\s+$)", "");
+
+        size_t delim = norm_str.find_first_not_of("0123456789.");
+        std::string number_str = norm_str.substr(0, delim);
+        std::string unit_str = norm_str.substr(delim);
 
         // normalize the white space in the unit
         unit_str = cedar::aux::regexReplace(unit_str, "\\s+", " ");
