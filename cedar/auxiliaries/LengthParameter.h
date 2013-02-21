@@ -55,7 +55,7 @@ namespace cedar
       if (map.empty())
       {
         addBaseUnitToMaps<boost::units::si::meter_base_unit>(map, boost::units::si::meters);
-        addSubUnitToMaps<boost::units::si::meter_base_unit>
+        addSubUnitToMaps
         (
           map,
           boost::units::si::meters,
@@ -64,7 +64,7 @@ namespace cedar
         );
         addAliasToMaps(map, "centimeter", "centimeters");
 
-        addSubUnitToMaps<boost::units::si::meter_base_unit>
+        addSubUnitToMaps
         (
           map,
           boost::units::si::meters,

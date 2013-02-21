@@ -54,7 +54,7 @@ namespace cedar
 
       if (map.empty())
       {
-        addSubUnitToMaps<boost::units::si::second_base_unit>
+        addSubUnitToMaps
         (
           map,
           boost::units::si::radian,

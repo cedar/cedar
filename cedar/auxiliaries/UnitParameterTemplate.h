@@ -73,7 +73,7 @@ namespace cedar
 {
   namespace aux
   {
-    template<typename BaseUnit, typename Dimension, typename Unit>
+    template<typename Dimension, typename Unit>
     void addSubUnitToMaps
     (
       std::map<std::string, boost::units::quantity<Dimension> >& map,
