@@ -182,7 +182,7 @@ void cedar::aux::math::write(cv::Mat matrix)
     {
       for (int j = 0; j < matrix.cols; j++)
       {
-        if (IsZero(matrix.at<unsigned char>(i, j)))
+        if (cedar::aux::math::isZero<double>(matrix.at<unsigned char>(i, j)))
         {
           std::cout << "0" << " ";
         }
@@ -199,7 +199,7 @@ void cedar::aux::math::write(cv::Mat matrix)
     {
       for (int j = 0; j < matrix.cols; j++)
       {
-        if (IsZero(matrix.at<char>(i, j)))
+        if (cedar::aux::math::isZero<double>(matrix.at<char>(i, j)))
         {
           std::cout << "0" << " ";
         }
@@ -216,7 +216,7 @@ void cedar::aux::math::write(cv::Mat matrix)
       {
         for (int j = 0; j < matrix.cols; j++)
         {
-          if (IsZero(matrix.at<unsigned short int>(i, j)))
+          if (cedar::aux::math::isZero<double>(matrix.at<unsigned short int>(i, j)))
           {
             std::cout << "0" << " ";
           }
@@ -233,7 +233,7 @@ void cedar::aux::math::write(cv::Mat matrix)
       {
         for (int j = 0; j < matrix.cols; j++)
         {
-          if (IsZero(matrix.at<short int>(i, j)))
+          if (cedar::aux::math::isZero<double>(matrix.at<short int>(i, j)))
           {
             std::cout << "0" << " ";
           }
@@ -250,7 +250,7 @@ void cedar::aux::math::write(cv::Mat matrix)
       {
         for (int j=0; j<matrix.cols; j++)
         {
-          if (IsZero(matrix.at<int>(i, j)))
+          if (cedar::aux::math::isZero<double>(matrix.at<int>(i, j)))
           {
             std::cout << "0" << " ";
           }
@@ -267,7 +267,7 @@ void cedar::aux::math::write(cv::Mat matrix)
     {
       for (int j=0; j<matrix.cols; j++)
       {
-        if (IsZero(matrix.at<float>(i, j)))
+        if (cedar::aux::math::isZero<double>(matrix.at<float>(i, j)))
         {
           std::cout << "0" << " ";
         }
@@ -284,7 +284,7 @@ void cedar::aux::math::write(cv::Mat matrix)
   {
     for (int j=0; j<matrix.cols; j++)
     {
-      if (IsZero(matrix.at<double>(i, j)))
+      if (cedar::aux::math::isZero<double>(matrix.at<double>(i, j)))
       {
         std::cout << "0" << " ";
       }

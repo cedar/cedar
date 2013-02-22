@@ -40,8 +40,11 @@
 // CEDAR INCLUDES
 #include "cedar/devices/Odometry.h"
 #include "cedar/devices/kteam/Drive.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/PlaneAngle.h"
 
 // SYSTEM INCLUDES
+
 
 /*!@brief The kinematics model of a differential drive robot with encoders.
  *
@@ -58,6 +61,9 @@ public:
   //!@brief Constructor
   //!@param[in] drive drive component of the robot we are modeling
   Odometry(cedar::dev::kteam::DrivePtr drive);
+
+  //!@brief Constructor
+  Odometry(cedar::dev::kteam::DrivePtr drive, cedar::aux::LocalCoordinateFramePtr coordinateFrame);
 
   //!@brief Destructor
   virtual ~Odometry();
@@ -78,10 +84,13 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief Initialize the object
+  void initialize();
+
   /*!@brief Calculates the current position and orientation of the robot based on its current encoder-values.
    * @param[in] encoders the encoder values of the left and right wheel
    */
-   void calculatePositionAndOrientation(const std::vector<int>& encoders);
+  void calculatePositionAndOrientation(const std::vector<int>& encoders);
 
   /*!@brief Updates the current position.
    *
@@ -94,14 +103,22 @@ private:
    * @param[in] newEncoders the encoder values of both wheels at time step t
    * @return the distance the robot has moved [m]
    */
-  double calculateDifferencePosition(const std::vector<int>& oldEncoders, const std::vector<int>& newEncoders) const;
+  cedar::unit::Length calculateDifferencePosition
+                      (
+                        const std::vector<int>& oldEncoders,
+                        const std::vector<int>& newEncoders
+                      ) const;
 
   /*!@brief Calculates the angle the robot has turned since the last update.
    * @param[in] oldEncoders the encoder values of both wheels at time step t-1
    * @param[in] newEncoders the encoder values of both wheels at time step t
    * @return the angle the robot has turned [rad]
    */
-  double calculateDifferenceOrientation(const std::vector<int>& oldEncoders, const std::vector<int>& newEncoders) const;
+  cedar::unit::PlaneAngle calculateDifferenceOrientation
+                          (
+                            const std::vector<int>& oldEncoders,
+                            const std::vector<int>& newEncoders
+                          ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
