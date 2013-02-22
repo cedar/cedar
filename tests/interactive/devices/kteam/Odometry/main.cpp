@@ -46,11 +46,11 @@
 #include "cedar/devices/kteam/gui/DriveControlWidget.h"
 #include "cedar/devices/kteam/SerialChannel.h"
 #include "cedar/devices/Robot.h"
+#include "cedar/units/PlaneAngle.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
 #include <math.h>
-#include <boost/units/systems/si/plane_angle.hpp>
 
 int main(int argc, char **argv)
 {
@@ -97,7 +97,7 @@ int main(int argc, char **argv)
   drive_control->show();
 
   //change the robot's initial orientation
-  kteam_model->setRotation((cedar::aux::math::pi / 2.0) * boost::units::si::radians);
+  kteam_model->setRotation((cedar::aux::math::pi / 2.0) * cedar::unit::radians);
 
   //start the program
   application.exec();

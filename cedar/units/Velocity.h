@@ -22,24 +22,45 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        AccelerationMatrix.h
+    File:        Velocity.h
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
     Date:        2013 02 14
 
-    Description: This is a dummy header for the typedef AccelerationMatrix (which is actually a
-                 cedar::unit::AccelerationMatrix<boost::units::si::acceleration>).
+    Description: This is a header for all velocity-related units.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_UNITS_ACCELERATION_MATRIX_H
-#define CEDAR_UNITS_ACCELERATION_MATRIX_H
+#ifndef CEDAR_UNITS_VELOCITY_H
+#define CEDAR_UNITS_VELOCITY_H
 
 // CEDAR INCLUDES
 #include "cedar/units/namespace.h"
 #include "cedar/units/UnitMatrix.h"
 
-#endif // CEDAR_UNITS_ACCELERATION_MATRIX_H
+// SYSTEM INCLUDES
+#include <boost/units/quantity.hpp>
+#include <boost/units/systems/si/velocity.hpp>
+
+namespace cedar
+{
+  namespace unit
+  {
+    typedef boost::units::quantity<boost::units::si::velocity> Velocity;
+    using boost::units::si::meter_per_second;
+    using boost::units::si::meters_per_second;
+    using boost::units::si::metre_per_second;
+    using boost::units::si::metres_per_second;
+
+    //!@brief template concretion for velocity
+    typedef UnitMatrix<boost::units::si::velocity> VelocityMatrix;
+
+    //!@brief default unit for velocities
+    extern CEDAR_UNITS_LIB_EXPORT const cedar::unit::Velocity DEFAULT_VELOCITY_UNIT;
+  }
+}
+
+#endif // CEDAR_UNITS_VELOCITY_H

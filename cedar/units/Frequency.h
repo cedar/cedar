@@ -22,24 +22,42 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LengthMatrix.h
+    File:        Frequency.h
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
     Date:        2013 02 14
 
-    Description: This is a dummy header for the typedef LengthMatrix (which is actually a
-                 cedar::unit::LengthMatrix<boost::units::si::length>).
+    Description: This is a header for all frequency-related units.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_UNITS_LENGTH_MATRIX_H
-#define CEDAR_UNITS_LENGTH_MATRIX_H
+#ifndef CEDAR_UNITS_FREQUENCY_H
+#define CEDAR_UNITS_FREQUENCY_H
 
 // CEDAR INCLUDES
 #include "cedar/units/namespace.h"
 #include "cedar/units/UnitMatrix.h"
 
-#endif // CEDAR_UNITS_LENGTH_MATRIX_H
+// SYSTEM INCLUDES
+#include <boost/units/quantity.hpp>
+#include <boost/units/systems/si/frequency.hpp>
+
+namespace cedar
+{
+  namespace unit
+  {
+    typedef boost::units::quantity<boost::units::si::frequency> Frequency;
+    using boost::units::si::hertz;
+
+    //!@brief template concretion for frequency
+    typedef UnitMatrix<boost::units::si::frequency> FrequencyMatrix;
+
+    //!@brief default unit for frequency
+    extern CEDAR_UNITS_LIB_EXPORT const cedar::unit::Frequency DEFAULT_FREQUENCY_UNIT;
+  }
+}
+
+#endif // CEDAR_UNITS_FREQUENCY_H

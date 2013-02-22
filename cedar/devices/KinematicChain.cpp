@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/math/constants.h"
+#include "cedar/units/Length.h"
 
 // SYSTEM INCLUDES
 

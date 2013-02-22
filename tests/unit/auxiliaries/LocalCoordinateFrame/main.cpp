@@ -39,17 +39,12 @@
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/constants.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/PlaneAngle.h"
 
 // SYSTEM INCLUDES
 #include <string>
 #include <math.h>
-#include <boost/units/quantity.hpp>
-#include <boost/units/systems/si/length.hpp>
-
-// namespaces for units
-using namespace boost::units;
-using namespace boost::units::si;
-
 
 int main()
 {
@@ -63,7 +58,12 @@ int main()
   // translation
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: translation" << std::endl;
-  local_coordinate_frame.setTranslation(1337.0 * meters, 0.0 * meters, cedar::aux::math::pi * meters);
+  local_coordinate_frame.setTranslation
+  (
+    1337.0 * cedar::unit::meters,
+    0.0 * cedar::unit::meters,
+    cedar::aux::math::pi * cedar::unit::meters
+  );
   if (
          !cedar::aux::math::isZero<double>
           (
@@ -83,7 +83,7 @@ int main()
     std::cout << "ERROR with setTranslation(double, double, double) or getTranslationX/Y/Z()" << std::endl;
   }
 
-  cedar::unit::LengthMatrix p1(cv::Mat::ones(4, 1, CV_64FC1), 1 * meters);
+  cedar::unit::LengthMatrix p1(cv::Mat::ones(4, 1, CV_64FC1), 1 * cedar::unit::meters);
   p1.matrix.at<double>(0, 0) = 555.555;
   p1.matrix.at<double>(1, 0) = 2;
   p1.matrix.at<double>(2, 0) = sqrt(3.0);
@@ -101,10 +101,10 @@ int main()
     std::cout << "ERROR with setTranslation(Mat) or getTranslation()" << std::endl;
   }
 
-  std::vector<quantity<length> > translation;
-  translation.push_back(1.2 * meters);
-  translation.push_back(3.4 * meters);
-  translation.push_back(5.6 * meters);
+  std::vector<cedar::unit::Length> translation;
+  translation.push_back(1.2 * cedar::unit::meters);
+  translation.push_back(3.4 * cedar::unit::meters);
+  translation.push_back(5.6 * cedar::unit::meters);
   local_coordinate_frame.setTranslation(translation);
   cedar::unit::LengthMatrix p3 = local_coordinate_frame.getTranslation();
   if (
@@ -118,11 +118,11 @@ int main()
     std::cout << "ERROR with setTranslation(std::vector<double>) or getTranslation()" << std::endl;
   }
 
-  local_coordinate_frame.translate(1.2 * meters, 3.4 * meters, 5.6 * meters);
+  local_coordinate_frame.translate(1.2 * cedar::unit::meters, 3.4 * cedar::unit::meters, 5.6 * cedar::unit::meters);
   if (
-      local_coordinate_frame.getTranslationX() != 2.4 * meters
-      || local_coordinate_frame.getTranslationY() != 6.8 * meters
-      || local_coordinate_frame.getTranslationZ() != 11.2 * meters
+      local_coordinate_frame.getTranslationX() != 2.4 * cedar::unit::meters
+      || local_coordinate_frame.getTranslationY() != 6.8 * cedar::unit::meters
+      || local_coordinate_frame.getTranslationZ() != 11.2 * cedar::unit::meters
       )
   {
     errors++;
@@ -163,9 +163,14 @@ int main()
   // rotate
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: rotate" << std::endl;
-  local_coordinate_frame.setTranslation(0.0 * meters, 0.0 * meters, 0.0 * meters);
-  local_coordinate_frame.rotate(0, cedar::aux::math::pi/2 * radians);
-  local_coordinate_frame.rotate(1, cedar::aux::math::pi/4 * radians);
+  local_coordinate_frame.setTranslation
+  (
+    0.0 * cedar::unit::meters,
+    0.0 * cedar::unit::meters,
+    0.0 * cedar::unit::meters
+  );
+  local_coordinate_frame.rotate(0, cedar::aux::math::pi/2 * cedar::unit::radians);
+  local_coordinate_frame.rotate(1, cedar::aux::math::pi/4 * cedar::unit::radians);
 
   cv::Mat D = local_coordinate_frame.getTransformation();
   if

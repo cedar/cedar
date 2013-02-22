@@ -48,14 +48,11 @@
 #include "cedar/auxiliaries/gl/Chessboard.h"
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/math/constants.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/PlaneAngle.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
-#include <boost/units/systems/si/length.hpp>
-
-// namespaces for units
-using namespace boost::units::si;
-
 
 int main(int argc, char **argv)
 {
@@ -75,18 +72,28 @@ int main(int argc, char **argv)
   // create a rectangular block and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_block_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
   p_block_local_coordinate_frame->setName("block");
-  p_block_local_coordinate_frame->setTranslation(3.0 * meters, -3.0 * meters, 3.0 * meters);
+  p_block_local_coordinate_frame->setTranslation
+  (
+    3.0 * cedar::unit::meters,
+    -3.0 * cedar::unit::meters,
+    3.0 * cedar::unit::meters
+  );
   cedar::aux::gl::ObjectVisualizationPtr p_block
   (
     new cedar::aux::gl::Block(p_block_local_coordinate_frame, 1, 2, 3, 0, 1, 0.5)
   );
   p_scene->addObjectVisualization(p_block);
-  p_block_local_coordinate_frame->rotate(0, cedar::aux::math::pi/2.0 * radians);
+  p_block_local_coordinate_frame->rotate(0, cedar::aux::math::pi/2.0 * cedar::unit::radians);
 
   // create a sphere visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_sphere_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
   p_sphere_local_coordinate_frame->setName("sphere");
-  p_sphere_local_coordinate_frame->setTranslation(3.0 * meters, 3.0 * meters, 3.0 * meters);
+  p_sphere_local_coordinate_frame->setTranslation
+  (
+    3.0 * cedar::unit::meters,
+    3.0 * cedar::unit::meters,
+    3.0 * cedar::unit::meters
+  );
   cedar::aux::gl::ObjectVisualizationPtr p_sphere
   (
     new cedar::aux::gl::Sphere(p_sphere_local_coordinate_frame, 1, 1, 0, 0.5)
@@ -96,7 +103,12 @@ int main(int argc, char **argv)
   // create a cone visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_cone_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
   p_cone_local_coordinate_frame->setName("cone");
-  p_cone_local_coordinate_frame->setTranslation(-3.0 * meters, 3.0 * meters, 3.0 * meters);
+  p_cone_local_coordinate_frame->setTranslation
+  (
+    -3.0 * cedar::unit::meters,
+    3.0 * cedar::unit::meters,
+    3.0 * cedar::unit::meters
+  );
   cedar::aux::gl::ObjectVisualizationPtr p_cone
   (
     new cedar::aux::gl::Cone(p_cone_local_coordinate_frame, 1, 3, 0, 0, 1)
@@ -106,7 +118,12 @@ int main(int argc, char **argv)
   // create a cylinder visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_cylinder_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
   p_cylinder_local_coordinate_frame->setName("cylinder");
-  p_cylinder_local_coordinate_frame->setTranslation(-3.0 * meters, -3.0 * meters, 3.0 * meters);
+  p_cylinder_local_coordinate_frame->setTranslation
+  (
+    -3.0 * cedar::unit::meters,
+    -3.0 * cedar::unit::meters,
+    3.0 * cedar::unit::meters
+  );
   cedar::aux::gl::ObjectVisualizationPtr p_cylinder
   (
     new cedar::aux::gl::Cylinder(p_cylinder_local_coordinate_frame, 1, 3, 0, 1, 1)
@@ -116,7 +133,12 @@ int main(int argc, char **argv)
   // create a pyramid visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_pyramid_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
   p_pyramid_local_coordinate_frame->setName("pyramid");
-  p_pyramid_local_coordinate_frame->setTranslation(9.0 * meters, -3.0 * meters, 3.0 * meters);
+  p_pyramid_local_coordinate_frame->setTranslation
+  (
+    9.0 * cedar::unit::meters,
+    -3.0 * cedar::unit::meters,
+    3.0 * cedar::unit::meters
+  );
   cedar::aux::gl::ObjectVisualizationPtr p_pyramid
   (
     new cedar::aux::gl::Pyramid(p_pyramid_local_coordinate_frame, 2, 1.5, 1.5, 1, 1, 0)
@@ -126,7 +148,12 @@ int main(int argc, char **argv)
   // create a prism visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_prism_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
   p_prism_local_coordinate_frame->setName("prism");
-  p_prism_local_coordinate_frame->setTranslation(0.0 * meters, 0.0 * meters, 5.0 * meters);
+  p_prism_local_coordinate_frame->setTranslation
+  (
+    0.0 * cedar::unit::meters,
+    0.0 * cedar::unit::meters,
+    5.0 * cedar::unit::meters
+  );
   cedar::aux::gl::ObjectVisualizationPtr p_prism
   (
     new cedar::aux::gl::Prism(p_prism_local_coordinate_frame, 2, 1)
@@ -136,7 +163,12 @@ int main(int argc, char **argv)
   // create a torus visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_torus_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
   p_torus_local_coordinate_frame->setName("torus");
-  p_torus_local_coordinate_frame->setTranslation(-7.5 * meters, 3.0 * meters, 3.0 * meters);
+  p_torus_local_coordinate_frame->setTranslation
+  (
+    -7.5 * cedar::unit::meters,
+    3.0 * cedar::unit::meters,
+    3.0 * cedar::unit::meters
+  );
   cedar::aux::gl::ObjectVisualizationPtr p_torus
   (
     new cedar::aux::gl::Torus(p_torus_local_coordinate_frame, 2, 0.3, 1, 0.5, 0)
@@ -146,7 +178,12 @@ int main(int argc, char **argv)
   // create an ellipse visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_ellipse_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
   p_ellipse_local_coordinate_frame->setName("ellipse");
-  p_ellipse_local_coordinate_frame->setTranslation(-7.5 * meters, -3.0 * meters, 3.0 * meters);
+  p_ellipse_local_coordinate_frame->setTranslation
+  (
+    -7.5 * cedar::unit::meters,
+    -3.0 * cedar::unit::meters,
+    3.0 * cedar::unit::meters
+  );
   cedar::aux::gl::ObjectVisualizationPtr p_ellipse
   (
     new cedar::aux::gl::Ellipse(p_ellipse_local_coordinate_frame, 1, 2, 0.3, 1, 1, 0)
@@ -161,7 +198,12 @@ int main(int argc, char **argv)
   // create a chessboard visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_chessboard_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
   p_chessboard_local_coordinate_frame->setName("chess board");
-  p_chessboard_local_coordinate_frame->setTranslation(7.5 * meters, 1.5 * meters, 3.0 * meters);
+  p_chessboard_local_coordinate_frame->setTranslation
+  (
+    7.5 * cedar::unit::meters,
+    1.5 * cedar::unit::meters,
+    3.0 * cedar::unit::meters
+  );
   cedar::aux::gl::ObjectVisualizationPtr p_chessboard
   (
     new cedar::aux::gl::Chessboard(p_chessboard_local_coordinate_frame, 3, 3, 0.2, 8, 8, 0, 0, 0)

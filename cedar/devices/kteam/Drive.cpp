@@ -42,15 +42,12 @@
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/devices/kteam/Drive.h"
 #include "cedar/devices/exceptions.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/Frequency.h"
 
 // SYSTEM INCLUDES
 #include <vector>
 #include <boost/units/cmath.hpp>
-#include <boost/units/systems/si/length.hpp>
-#include <boost/units/systems/si/velocity.hpp>
-
-using namespace boost::units;
-using namespace boost::units::si;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -74,7 +71,7 @@ _mEncoderLimits(new cedar::aux::math::IntLimitsParameter(this, "encoder limits",
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-quantity<length> cedar::dev::kteam::Drive::getDistancePerPulse() const
+cedar::unit::Length cedar::dev::kteam::Drive::getDistancePerPulse() const
 {
   return 2.0 * cedar::aux::math::pi * getWheelRadius() / getNumberOfPulsesPerRevolution();
 }
@@ -101,17 +98,21 @@ void cedar::dev::kteam::Drive::reset()
   setEncoders(encoders);
 }
 
-std::vector<quantity<frequency> > cedar::dev::kteam::Drive::convertWheelSpeedToPulses
-                 (
-                   const std::vector<quantity<velocity> >& wheelSpeed
-                 ) const
+std::vector<cedar::unit::Frequency> cedar::dev::kteam::Drive::convertWheelSpeedToPulses
+                                    (
+                                      const std::vector<cedar::unit::Velocity>& wheelSpeed
+                                    ) const
 {
   CEDAR_ASSERT(wheelSpeed.size() == 2);
 
   // the speed has be thresholded based on the maximum possible number
   // of pulses per second (this is hardware-specific).
   // first: convert speed from m/s into Pulses/s ...
-  std::vector<quantity<frequency> > wheel_speed_pulses(wheelSpeed.size(), 0 * hertz);
+  std::vector<cedar::unit::Frequency> wheel_speed_pulses
+                                      (
+                                        wheelSpeed.size(),
+                                        0.0 * cedar::unit::DEFAULT_FREQUENCY_UNIT
+                                      );
 
   for (unsigned int i = 0; i < wheelSpeed.size(); ++i)
   {

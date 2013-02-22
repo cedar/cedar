@@ -43,12 +43,6 @@
 
 // SYSTEM INCLUDES
 
-#ifdef EQN_EPS
-#undef EQN_EPS
-#endif
-#define EQN_EPS 1e-5
-
-
 int main(int, char**)
 {
   // the number of errors encountered in this test
@@ -85,9 +79,9 @@ int main(int, char**)
   cv::Mat jaqueline(3, 1, CV_32FC1);
   cedar::aux::math::sphericalToCartesian<float>(chantalle, jaqueline);
   if (
-       cedar::aux::math::isZero<double>(jaqueline.at<float>(0, 0) - 0.5)
-       && cedar::aux::math::isZero<double>(jaqueline.at<float>(1, 0) - 0.5)
-       && cedar::aux::math::isZero<double>(jaqueline.at<float>(2, 0) - sqrt(2.0)/2.0)
+       cedar::aux::math::isZero<float>(jaqueline.at<float>(0, 0) - 0.5, 5)
+       && cedar::aux::math::isZero<float>(jaqueline.at<float>(1, 0) - 0.5, 5)
+       && cedar::aux::math::isZero<float>(jaqueline.at<float>(2, 0) - sqrt(2.0)/2.0, 5)
      )
   {
     ;

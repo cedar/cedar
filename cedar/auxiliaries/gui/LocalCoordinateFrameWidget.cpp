@@ -38,7 +38,8 @@
 #include "cedar/auxiliaries/gui/LocalCoordinateFrameWidget.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/math/tools.h"
-#include "cedar/units/namespace.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/PlaneAngle.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>

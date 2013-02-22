@@ -20,8 +20,9 @@
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
-#include "cedar/units/TimeUnit.h"
 #include "cedar/auxiliaries/net/Writer.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <QtGui/QApplication>
@@ -211,7 +212,7 @@ int main(int argc, char* argv[])
       ).total_milliseconds() < (frame_time_ms)
     )
     {
-      cedar::aux::sleep(cedar::unit::Milliseconds(10));
+      cedar::aux::sleep(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
     }
   }
 

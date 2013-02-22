@@ -42,6 +42,8 @@
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -199,8 +201,9 @@ void cedar::dyn::SpaceToRateCode::eulerStep(const cedar::unit::Time& time)
   // the result is simply input * gain; see explanation above for variable names
   double s = cv::sum(this->mInput->getData()).val[0];
   double o = cv::sum(this->mInput->getData().mul(mRamp)).val[0];
-  double dt = cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(1.0);
-  double tau = cedar::unit::Milliseconds(this->getTau()) / cedar::unit::Milliseconds(1.0);
+  double dt = time / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second);
+  //!todo this should be a time in milliseconds
+  double tau = this->getTau();
 
   double h = dt;
   if (h / tau * s >= 2) // stability criterion

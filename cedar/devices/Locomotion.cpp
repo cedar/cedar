@@ -38,14 +38,10 @@
 #include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/devices/Locomotion.h"
+#include "cedar/units/Velocity.h"
+#include "cedar/units/AngularVelocity.h"
 
 // SYSTEM INCLUDES
-#include <boost/units/quantity.hpp>
-#include <boost/units/systems/si/velocity.hpp>
-
-// units namespaces
-using namespace boost::units;
-using namespace boost::units::si;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -122,31 +118,35 @@ _mTurningRateLimits
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-quantity<velocity> cedar::dev::Locomotion::getForwardVelocity() const
+cedar::unit::Velocity cedar::dev::Locomotion::getForwardVelocity() const
 {
   return mForwardVelocity;
 }
 
-quantity<angular_velocity> cedar::dev::Locomotion::getTurningRate() const
+cedar::unit::AngularVelocity cedar::dev::Locomotion::getTurningRate() const
 {
   return mTurningRate;
 }
 
-void cedar::dev::Locomotion::thresholdForwardVelocity(quantity<velocity>& forwardVelocity) const
+void cedar::dev::Locomotion::thresholdForwardVelocity(cedar::unit::Velocity& forwardVelocity) const
 {
   //!todo fix this by writing a VelocityLimitsPatameter
-  double forward_velocity = forwardVelocity / meters_per_second;
-  forwardVelocity = _mForwardVelocityLimits->getValue().limit(forward_velocity) * meters_per_second;
+  double forward_velocity = forwardVelocity / cedar::unit::DEFAULT_VELOCITY_UNIT;
+  forwardVelocity = _mForwardVelocityLimits->getValue().limit(forward_velocity) * cedar::unit::DEFAULT_VELOCITY_UNIT;
 }
 
-void cedar::dev::Locomotion::thresholdTurningRate(quantity<angular_velocity>& turningRate) const
+void cedar::dev::Locomotion::thresholdTurningRate(cedar::unit::AngularVelocity& turningRate) const
 {
   //!todo fix this by writing a AngularVelocityLimitsPatameter
-  double turning_rate = turningRate / radians_per_second;
-  turningRate = _mTurningRateLimits->getValue().limit(turning_rate) * radians_per_second;
+  double turning_rate = turningRate / cedar::unit::DEFAULT_ANGULAR_VELOCITY_UNIT;
+  turningRate = _mTurningRateLimits->getValue().limit(turning_rate) * cedar::unit::DEFAULT_ANGULAR_VELOCITY_UNIT;
 }
 
 void cedar::dev::Locomotion::stop()
 {
-  setForwardVelocityAndTurningRate(0.0 * meters_per_second, 0.0 * radians_per_second);
+  setForwardVelocityAndTurningRate
+  (
+    0.0 * cedar::unit::DEFAULT_VELOCITY_UNIT,
+    0.0 * cedar::unit::DEFAULT_ANGULAR_VELOCITY_UNIT
+  );
 }

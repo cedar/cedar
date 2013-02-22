@@ -40,11 +40,11 @@
 // CEDAR INCLUDES
 #include "cedar/devices/Odometry.h"
 #include "cedar/devices/kteam/Drive.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/PlaneAngle.h"
 
 // SYSTEM INCLUDES
-#include <boost/units/quantity.hpp>
-#include <boost/units/systems/si/length.hpp>
-#include <boost/units/systems/si/plane_angle.hpp>
+
 
 /*!@brief The kinematics model of a differential drive robot with encoders.
  *
@@ -103,22 +103,22 @@ private:
    * @param[in] newEncoders the encoder values of both wheels at time step t
    * @return the distance the robot has moved [m]
    */
-  boost::units::quantity<boost::units::si::length> calculateDifferencePosition
-                                                   (
-                                                     const std::vector<int>& oldEncoders,
-                                                     const std::vector<int>& newEncoders
-                                                   ) const;
+  cedar::unit::Length calculateDifferencePosition
+                      (
+                        const std::vector<int>& oldEncoders,
+                        const std::vector<int>& newEncoders
+                      ) const;
 
   /*!@brief Calculates the angle the robot has turned since the last update.
    * @param[in] oldEncoders the encoder values of both wheels at time step t-1
    * @param[in] newEncoders the encoder values of both wheels at time step t
    * @return the angle the robot has turned [rad]
    */
-  boost::units::quantity<boost::units::si::plane_angle> calculateDifferenceOrientation
-                                                        (
-                                                          const std::vector<int>& oldEncoders,
-                                                          const std::vector<int>& newEncoders
-                                                        ) const;
+  cedar::unit::PlaneAngle calculateDifferenceOrientation
+                          (
+                            const std::vector<int>& oldEncoders,
+                            const std::vector<int>& newEncoders
+                          ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
