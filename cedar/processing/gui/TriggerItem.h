@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -46,6 +46,7 @@
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 
@@ -160,7 +161,7 @@ protected:
 
 private:
   //!@brief the class id of the internal trigger, used for a tooltip
-  cedar::proc::ElementDeclarationPtr mClassId;
+  cedar::aux::ConstPluginDeclarationPtr mClassId;
 
 }; // class TriggerItem
 

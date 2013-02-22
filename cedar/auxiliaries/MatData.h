@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -85,6 +85,12 @@ public:
    * @remarks Calls cedar::aux::math::getDimensionalityOf(this->getData()) to determine the dimensionality.
    */
   unsigned int getDimensionality() const;
+
+  //! Convenience method that returns the opencv-type of the stored matrix.
+  inline int getCvType() const
+  {
+    return this->getData().type();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

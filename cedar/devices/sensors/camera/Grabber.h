@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -96,15 +96,27 @@ public:
 
   protected slots:
 
-  //!@brief A slot that must be triggered if a camera-settings has changed. In that case,
-  // a new camera-device will be created
+  /*!@brief A slot that must be triggered if a camera-settings has changed. In that case,
+   * a new camera-device will be created. It is internally connected with the CameraChannel->settingsChanged signal.
+   */
+  void settingChanged();
+
+
   void cameraChanged();
 
+  /*!@brief A slot that must be triggered if the backend has changed. It is internally connected with the
+   *      CameraChannel->Backend Enum-Parameter valueChanged() signal.
+   */
+  void backendChanged();
 
-  // signals:
+  signals:
 
-  //!@brief This signal is emitted, when a new picture is available with the getImage() method.
- // void pictureChanged();
+  /*!@brief This signal is raised, if the grabber will be recreated
+   *
+   *   This signal is used from the processingIde Camera step to annotate a new imagesize
+   */
+  void frameSizeChanged();
+
 
   private:
   /*! @brief Boost slot method. Invoked if a channel is added as an ObjectListParameter as an object
@@ -116,33 +128,18 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  /*! @brief Constructor for a camera grabber with one connected camera
-   *  @param configFileName Filename for the configuration
-   *  @param camera Device to grab from. Look at OpenCV cv::VideoCapture documentation for details
-   *  @param isGuid This flag have to be set, if the value in parameter camera is the guid of the camera. In this
-   *         case, the camera with this guid will be searched on the bus.
-   *  @param finishInitialization Flag, if the initialization should be finished. In this case it isn't possible to
-   *         change the camera resolution or the camera framerate if you use a firewire camera. <br>
-   *         The settings will be restored from the configfile. If there is no configfile,
-   *         the best settings (i.e. highest framerate, largest picture size) will be used.
-   *         If the finishInitialization flag isn't set, you can change this settings before you grab the first Frame.<br>
-   *         But be aware, that getImage() will return empty matrices unless the first frame have been grabbed.
-   *         This is done by starting the grabbing thread via the startGrabber() method or manually grab the first picture
-   *         with grab().
-   *  @remarks
-   *    OpenCV selects the capture framework at the basis of the camera parameter. Use a multiple of 100 to select
-   *    the interface or use the CV_CAP_xxx constants in /usr/local/include/opencv2/highgui/highgui_c.h for a
-   *    base unit (like CV_CAP_FIREWIRE, CV_CAP_ANY)
-   */
-
-
-
   /*! @brief  Constructor for a single camera grabber
-   *  @param backendType  The type of the backend you want to use.
    *  @param cameraId  The identification of the camera. In case of a firewirecamera this could be the GUID of the
    *                   wanted cam. In all other backends, this is the bus id
    *  @param isGuid This flag is only available, when CEDAR is built with libdc/firewire support. If this flag is set
    *                true, then the value in cameraId is treated as the unique GUID of the camera you want.
+   *  @param backendType Use this backend for the camera
+   *  @param decodeFilter Use this decode filter
+   *
+   *  @remarks
+   *    OpenCV selects the capture framework at the basis of the cameraId parameter. Use a multiple of 100 to select
+   *    the interface or use the CV_CAP_xxx constants in /usr/local/include/opencv2/highgui/highgui_c.h for a
+   *    base unit (like CV_CAP_FIREWIRE, CV_CAP_ANY)
    */
   Grabber
   (
@@ -155,13 +152,14 @@ public:
   );
 
   /*! @brief  Constructor for a stereo camera grabber
-   *  @param backendType  The type of the backend you want to use.
    *  @param cameraId0  The identification of the camera on channel 0. In case of a firewire camera
    *                  this could be the GUID of the wanted cam. In all other backends, this is the bus id.
    *  @param cameraId1  The identification of the camera on channel 1. In case of a firewire camera
    *                  this could be the GUID of the wanted cam. In all other backends, this is the bus id.
    *  @param isGuid This flag is only available, when CEDAR is built with libdc/firewire support. If this flag is set
    *                true, then the value in cameraId is treated as the unique GUID of the camera you want.
+   *  @param backendType Use this backend for the camera
+   *  @param decodeFilter Use this decode filter
    */
   Grabber
   (
@@ -173,21 +171,6 @@ public:
     cedar::dev::sensors::camera::Decoding::Id decodeFilter
        = cedar::dev::sensors::camera::Decoding::NONE
   );
-
-
-  /*! @brief Constructor for a camera grabber. The complete configuration will be read from configuration file.<br>
-   *   If the system can't find the wanted camera, initialization will fail.
-   *  @par
-   *        The camera always will be initialized (i.e. the first frame is already grabbed on initialization)
-   *  @param configFileName Filename for the configuration
-   *  @param numCameras How many cameras you want to use
-   *  @remarks
-   *        If there is no configuration file with the given name, a new one will be created. But be aware,
-   *        the default camera capabilities filename (build with guid or busId) will be used. It is possible,
-   *        that this file isn't the right one for your camera.
-   */
-  // Grabber(unsigned int numCameras);
-
 
   /*! @brief Destructor */
   ~Grabber();
@@ -380,12 +363,29 @@ public:
    */
   std::vector<std::string> getAllSettings(unsigned int channel);
 
-
+  /*! @brief Set the decoding filter for the grabbed frames
+   *
+   * @param channel The channel you want to change
+   * @param filterId The decode-filter to use as cedar::dev::sensors::camera::Decoding::Id
+   */
   void setDecodeFilter(unsigned int channel, cedar::dev::sensors::camera::Decoding::Id filterId);
 
+  /*! @brief Set the decoding filter for the grabbed frames
+   *
+   *  This method changes the decode-filter on the first channel.
+   *  For a multi-channel grabber, have a look at
+   *   @see setDecodeFilter(unsigned int, cedar::dev::sensors::camera::Decoding::Id)
+   *
+   *  @param filterId The decode-filter to use as cedar::dev::sensors::camera::Decoding::Id
+   */
   void setDecodeFilter(cedar::dev::sensors::camera::Decoding::Id filterId);
 
 
+  /*! @brief Get the used decoding filter
+   *
+   * @param channel The channel you want the decode-filter
+   * @return The Filter as cedar::dev::sensors::camera::Decoding::Id
+   */
   cedar::dev::sensors::camera::Decoding::Id getDecodeFilter(unsigned int channel = 0);
 
 
@@ -401,19 +401,19 @@ protected:
    *    or Setting() class. But be aware, that there is no check if the wanted property is supported
    *    by the used backend
    *
+   *  @param channel The channel you want to change the property
    *  @param propertyId The OpenCV constants for cv::VideoCapture.set() method
    *  @return Value, that indicates the exit-state of cv::VideoCapture.set()
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
   double getPropertyFromCamera(unsigned int channel, unsigned int propertyId);
 
-  //------------------------------------------------------------------------
-  // From Grabber
-  //------------------------------------------------------------------------
-  bool onGrab();
+  // inherited from Grabber
+  bool onGrab(unsigned int channel);
   void onCleanUp();
   bool onCreateGrabber();
   void onCloseGrabber();
+  std::string onUpdateSourceInfo(unsigned int channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -426,26 +426,6 @@ private:
    */
   void connectSignals();
 
-  /// @brief updates the channel informations
-  void setChannelInfo(unsigned int channel);
-
-  /// @brief Sets the channel-id which depends on the isGuid-flag (only used in constructor)
-  // void setChannelId(unsigned int channel, unsigned int id, bool isGuid);
-
-  /*! This string identifies, that the default-filename (containing grabber-guid) should be used
-   * If the entry in the configuration file is different, then that file will be used
-   */
-/*  inline std::string useAutogeneratedFilenameString()
-  {
-    return "USE_AUTOGENERATED_FILENAME_WITH_GUID";
-  }
-
-  /// @brief Default filename for the config-file of the camera capabilities
-  inline std::string getCapabilitiesFilename(unsigned int guid)
-  {
-    return "camera_"+boost::lexical_cast<std::string>(guid)+".capabilities";
-  }
-*/
   /// @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class ChannelPtr
   inline cedar::dev::sensors::camera::ChannelPtr getCameraChannel(unsigned int channel)
   {
@@ -471,11 +451,8 @@ private:
 protected:
   // none yet
 
-
 private:
-
-  /// Set if Initialization should be finished in constructor
-  // bool mFinishInitialization;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

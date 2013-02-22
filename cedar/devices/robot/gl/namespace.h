@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -59,6 +59,7 @@ namespace cedar
         CEDAR_DECLARE_DEV_CLASS(CoraHead);
         CEDAR_DECLARE_DEV_CLASS(KukaArm);
         CEDAR_DECLARE_DEV_CLASS(Sdh);
+        CEDAR_DECLARE_DEV_CLASS(Caren);
         //!@endcond
       }
     }

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -57,11 +57,17 @@
 
 cedar::dev::robot::gl::Sdh::Sdh
 (
-  cedar::dev::robot::KinematicChainPtr pKinematicChain
+  cedar::dev::robot::KinematicChainPtr fingerOne,
+  cedar::dev::robot::KinematicChainPtr fingerTwo,
+  cedar::dev::robot::KinematicChainPtr fingerThree,
+  cedar::dev::robot::KinematicChainPtr palm
 )
 :
-cedar::aux::gl::ObjectVisualization(pKinematicChain->getRootCoordinateFrame()),
-mpKinematicChain(pKinematicChain)
+cedar::aux::gl::ObjectVisualization(palm->getRootCoordinateFrame()),
+mpFingerOne(fingerOne),
+mpFingerTwo(fingerTwo),
+mpFingerThree(fingerThree),
+mpPalm(palm)
 {
   loadData();
 }
@@ -175,7 +181,7 @@ void cedar::dev::robot::gl::Sdh::draw()
 
     // first finger root
     glTranslated(.019053, -0.033, .098);
-    glRotated(mpKinematicChain->getJointAngle(6)*180.0/cedar::aux::math::pi, 0, 0, -1);
+    glRotated(mpPalm->getJointAngle(0)*180.0/cedar::aux::math::pi, 0, 0, -1);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
@@ -192,7 +198,7 @@ void cedar::dev::robot::gl::Sdh::draw()
 
     // first finger proximal link
     glTranslated(.0, 0.0, .0175);
-    glRotated(mpKinematicChain->getJointAngle(0)*180.0/cedar::aux::math::pi, 0, -1, 0);
+    glRotated(mpFingerOne->getJointAngle(0)*180.0/cedar::aux::math::pi, 0, -1, 0);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
@@ -211,7 +217,7 @@ void cedar::dev::robot::gl::Sdh::draw()
 
     // first finger distal link
     glTranslated(0, 0, 0.104);
-    glRotated(mpKinematicChain->getJointAngle(1)*180.0/cedar::aux::math::pi, 0, -1, 0);
+    glRotated(mpFingerOne->getJointAngle(1)*180.0/cedar::aux::math::pi, 0, -1, 0);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
@@ -250,7 +256,7 @@ void cedar::dev::robot::gl::Sdh::draw()
 
     // second finger proximal link
     glTranslated(.0, 0.0, .0175);
-    glRotated(mpKinematicChain->getJointAngle(2)*180.0/cedar::aux::math::pi, 0, -1, 0);
+    glRotated(mpFingerTwo->getJointAngle(0)*180.0/cedar::aux::math::pi, 0, -1, 0);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
@@ -269,7 +275,7 @@ void cedar::dev::robot::gl::Sdh::draw()
 
     // second finger distal link
     glTranslated(0, 0, 0.104);
-    glRotated(mpKinematicChain->getJointAngle(3)*180.0/cedar::aux::math::pi, 0, -1, 0);
+    glRotated(mpFingerTwo->getJointAngle(1)*180.0/cedar::aux::math::pi, 0, -1, 0);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
@@ -289,7 +295,7 @@ void cedar::dev::robot::gl::Sdh::draw()
 
     // third finger root
     glTranslated(.019053, 0.033, .098);
-    glRotated(mpKinematicChain->getJointAngle(6)*180.0/cedar::aux::math::pi, 0, 0, 1);
+    glRotated(mpPalm->getJointAngle(0)*180.0/cedar::aux::math::pi, 0, 0, 1);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
@@ -306,7 +312,7 @@ void cedar::dev::robot::gl::Sdh::draw()
 
     // third finger proximal link
     glTranslated(.0, 0.0, .0175);
-    glRotated(mpKinematicChain->getJointAngle(4)*180.0/cedar::aux::math::pi, 0, -1, 0);
+    glRotated(mpFingerThree->getJointAngle(0)*180.0/cedar::aux::math::pi, 0, -1, 0);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
@@ -325,7 +331,7 @@ void cedar::dev::robot::gl::Sdh::draw()
 
     // first finger distal link
     glTranslated(0, 0, 0.104);
-    glRotated(mpKinematicChain->getJointAngle(5)*180.0/cedar::aux::math::pi, 0, -1, 0);
+    glRotated(mpFingerThree->getJointAngle(1)*180.0/cedar::aux::math::pi, 0, -1, 0);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);

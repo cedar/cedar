@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -43,6 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
+#include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/auxiliaries/gui/namespace.h"
@@ -198,10 +199,17 @@ public:
 
 public slots:
   //!@brief handles changes in the state of a step (e.g. from error to non-error state)
-  void stepStateChanged();
+  void updateStepState();
 
   //!@brief handles a redraw of the graphical representation
   void redraw();
+
+signals:
+  /*!@brief Emitted whenever the state of the step displayed by this step item changes.
+   *
+   * @remarks This signal is used to transfer the underlying signal from the processing thread to the gui thread.
+   */
+  void stepStateChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -213,6 +221,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  void emitStepStateChanged();
+
   //!@briefs adds graphical representations for all data items
   void addDataItems();
 
@@ -231,7 +241,7 @@ private:
   void fillPlots
   (
     QMenu* pMenu,
-    std::map<QAction*, std::pair<cedar::aux::gui::PlotDeclarationPtr, cedar::aux::Enum> >& declMap
+    std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
   );
 
   //!@brief Fills the defined plots into the given menu.
@@ -278,12 +288,14 @@ private:
 
   void addDataItemFor(cedar::proc::DataSlotPtr slot);
 
-  QDockWidget* createPlotDockWidget(const std::string& title) const;
+  QDockWidget* createDockWidget(const std::string& title) const;
 
 private slots:
   void displayStyleMenuTriggered(QAction* pAction);
 
   void openDefinedPlotAction(QAction* pAction);
+
+  void openProperties();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -319,7 +331,7 @@ private:
   boost::signals2::connection mSlotRemovedConnection;
 
   //!@brief the class id of the step
-  cedar::proc::ElementDeclarationPtr mClassId;
+  cedar::aux::ConstPluginDeclarationPtr mClassId;
 
   //!@brief the main window in which the current graphical representation is embedded
   QMainWindow* mpMainWindow;

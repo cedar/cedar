@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -71,7 +71,8 @@ namespace
     (
       "Splits a matrix with up to four channels into the according number of separate matrices."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }
@@ -110,19 +111,23 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::ChannelSplit::determineInput
 {
   if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
   {
-    try
+    if
+    (
+      mat_data->getData().channels() > 1
+      && mat_data->getData().channels() <= 4
+      && cedar::aux::math::getDimensionalityOf(mat_data->getData()) < 3
+    )
     {
-      mat_data->getAnnotation<cedar::aux::annotation::ColorSpace>();
-
-      if (mat_data->getData().channels() <= 4 && cedar::aux::math::getDimensionalityOf(mat_data->getData()) < 3)
+      try
       {
+        mat_data->getAnnotation<cedar::aux::annotation::ColorSpace>();
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
-    }
-    catch (cedar::aux::AnnotationNotFoundException)
-    {
-      // the data is mat data but not annotated; that's ok
-      return cedar::proc::DataSlot::VALIDITY_WARNING;
+      catch (cedar::aux::AnnotationNotFoundException)
+      {
+        // the data is mat data but not annotated; that's ok
+        return cedar::proc::DataSlot::VALIDITY_WARNING;
+      }
     }
   }
 

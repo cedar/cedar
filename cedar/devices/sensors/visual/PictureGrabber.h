@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -152,10 +152,10 @@ public:
 protected:
 
   // inherited from Grabber
-  bool onGrab();
+  bool onGrab(unsigned int channel);
   bool onCreateGrabber();
   void onCloseGrabber();
-
+  std::string onUpdateSourceInfo(unsigned int channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -164,9 +164,6 @@ private:
   /*! @brief This function does internal variable initialization in  constructor
    */
   void init();
-
-  /// @brief updates the channel informations
-  void setChannelInfo(unsigned int channel);
 
   /// @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
   inline PictureChannelPtr getPictureChannel(unsigned int channel)

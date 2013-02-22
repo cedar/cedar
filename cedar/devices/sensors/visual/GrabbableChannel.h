@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -100,8 +100,10 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! @brief The class to grab from
+  //! The object to grab from
   cedar::aux::Grabbable* mpSourceInterfaceClass;
+
+  //! The used lock
   QReadWriteLock* mpGrabberLock;
 
 private:

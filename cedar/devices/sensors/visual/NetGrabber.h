@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -47,9 +47,6 @@
 
 // SYSTEM INCLUDES
 
-
-#define SHOW_INIT_INFORMATION_NETGRABBER
-
 /*! @class cedar::dev::sensors::visual::NetGrabber
  *  @brief This grabber grabs images from a yarp-server located somewhere in the network
  *
@@ -80,13 +77,11 @@ public:
 
 
   /*! @brief  Constructor for a single channel grabber
-   *  @param grabberName  Name of the grabber
    *  @param yarpChannelName  Filename to grab from
    */
   NetGrabber
   (
-    const std::string& yarpChannelName = "grabberYarpChannel",
-    const std::string& grabberName = "NetGrabber"
+    const std::string& yarpChannelName = "grabberYarpChannel"
   );
 
   /*! @brief Constructor for a stereo channel grabber
@@ -97,8 +92,7 @@ public:
   NetGrabber
   (
     const std::string& yarpChannelName0,
-    const std::string& yarpChannelName1,
-    const std::string& grabberName = "StereoNetGrabber"
+    const std::string& yarpChannelName1
   );
 
   //!@brief Destructor
@@ -117,14 +111,12 @@ public:
 
 protected:
 
-  //------------------------------------------------------------------------
-  // From Grabber
-  //------------------------------------------------------------------------
-  bool onInit();
-  bool onGrab();
-  void onUpdateSourceInfo(unsigned int channel);
-
+  // inherited from Grabber
+  bool onCreateGrabber();
+  bool onGrab(unsigned int channel);
+  std::string onUpdateSourceInfo(unsigned int channel);
   void onCleanUp();
+  void onCloseGrabber();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

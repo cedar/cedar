@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -102,20 +102,15 @@ int main(int, char**)
 
   unsigned int errors = 0;
 
-  cedar::proc::DeclarationRegistryPtr declaration_registry = cedar::proc::DeclarationRegistrySingleton::getInstance();
-  const cedar::proc::DeclarationRegistry::Declarations& declarations = declaration_registry->declarations();
-  for
-  (
-    cedar::proc::DeclarationRegistry::Declarations::const_iterator declaration = declarations.begin();
-    declaration != declarations.end();
-    ++declaration
-  )
+  auto declarations = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarations();
+  for (auto declaration_iter = declarations.begin(); declaration_iter != declarations.end(); ++declaration_iter)
   {
+    cedar::aux::ConstPluginDeclarationPtr declaration = *declaration_iter;
     cedar::proc::NetworkPtr network(new cedar::proc::Network());
-    cedar::proc::ElementPtr elem = declaration_registry->allocateClass(declaration->second->getClassId());
+    cedar::proc::ElementPtr elem = cedar::proc::ElementManagerSingleton::getInstance()->allocate(declaration->getClassName());
     if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(elem))
     {
-      std::cout << "Testing class " << declaration->second->getClassId() << std::endl;
+      std::cout << "Testing class " << declaration->getClassName() << std::endl;
       network->readFile("processing_steps.json");
       errors += testStep(network, step);
     }

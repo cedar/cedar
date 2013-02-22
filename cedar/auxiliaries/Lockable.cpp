@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -65,6 +65,11 @@ cedar::aux::Lockable::~Lockable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+size_t cedar::aux::Lockable::getLockCount() const
+{
+  return this->mLockSets[this->getLockSetHandle("all")].size();
+}
+
 //!@brief Defines a lock set.
 cedar::aux::Lockable::LockSetHandle cedar::aux::Lockable::defineLockSet(const std::string& lockSet)
 {
@@ -91,6 +96,25 @@ cedar::aux::Lockable::LockSetHandle cedar::aux::Lockable::getLockSetHandle(const
   return iter->second;
 }
 
+void cedar::aux::Lockable::lockAll(cedar::aux::LOCK_TYPE lockType, LockSetHandle lockSet) const
+{
+  QReadLocker locker(&this->mLocksLock);
+
+  CEDAR_ASSERT(lockSet < this->mLockSets.size());
+
+  QReadWriteLock* p_last = NULL;
+  for (Locks::const_iterator iter = this->mLockSets[lockSet].begin(); iter != this->mLockSets[lockSet].end(); ++iter)
+  {
+    QReadWriteLock* p_lock = iter->first;
+
+    if (p_lock != p_last)
+    {
+      p_last = p_lock;
+      cedar::aux::Lockable::applyLockType(p_lock, lockType);
+    }
+  }
+}
+
 void cedar::aux::Lockable::lockAll(LockSetHandle lockSet) const
 {
   QReadLocker locker(&this->mLocksLock);
@@ -105,18 +129,7 @@ void cedar::aux::Lockable::lockAll(LockSetHandle lockSet) const
     if (p_lock != p_last)
     {
       p_last = p_lock;
-
-      // switch based on the lock type
-      switch (iter->second)
-      {
-        case cedar::aux::LOCK_TYPE_READ:
-          p_lock->lockForRead();
-          break;
-
-        case cedar::aux::LOCK_TYPE_WRITE:
-          p_lock->lockForWrite();
-          break;
-      }
+      this->applyLockType(p_lock, iter->second);
     }
   }
 }

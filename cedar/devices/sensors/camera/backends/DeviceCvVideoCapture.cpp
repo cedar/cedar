@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -69,8 +69,7 @@ cedar::dev::sensors::camera::DeviceCvVideoCapture::~DeviceCvVideoCapture()
 //}
 
 
-// 1. step
-bool cedar::dev::sensors::camera::DeviceCvVideoCapture::createCaptureDevice()
+bool cedar::dev::sensors::camera::DeviceCvVideoCapture::createCaptureObject()
 {
 
 //  std::cout << "Create camera with cv::VideoCapture Backend\n"
@@ -88,10 +87,13 @@ bool cedar::dev::sensors::camera::DeviceCvVideoCapture::createCaptureDevice()
   return false;
 }
 
-// 2. step
-void cedar::dev::sensors::camera::DeviceCvVideoCapture::setProperties()
+
+void cedar::dev::sensors::camera::DeviceCvVideoCapture::getAvailablePropertiesFromCamera()
 {
-  //std::cout << "get capabilities from camera" << std::endl;
+#ifdef DEBUG_CAMERA_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
+#endif
+
   int num_properties = cedar::dev::sensors::camera::Property::type().list().size();
   for (int i=0; i<num_properties; i++)
   {
@@ -100,7 +102,6 @@ void cedar::dev::sensors::camera::DeviceCvVideoCapture::setProperties()
 
     //try to get the value from the camera
     double value = this->getPropertyFromCamera(prop_id);
-
 
     if (value == CAMERA_PROPERTY_NOT_SUPPORTED )
     {
@@ -113,8 +114,6 @@ void cedar::dev::sensors::camera::DeviceCvVideoCapture::setProperties()
   }
 }
 
-
-// 3. step
 void cedar::dev::sensors::camera::DeviceCvVideoCapture::applySettingsToCamera()
 {
   //only the video mode could be set in cv::Videocapture backend
@@ -130,42 +129,4 @@ void cedar::dev::sensors::camera::DeviceCvVideoCapture::applySettingsToCamera()
   }
 
   //std::cout << "applySettingsToCamera finished" << std::endl;
-}
-
-// 4. step
-void cedar::dev::sensors::camera::DeviceCvVideoCapture::applyStateToCamera()
-{
-//  std::cout << "applyStateToCamera" << std::endl;
-  int num_properties = cedar::dev::sensors::camera::Property::type().list().size();
-  for (int i=0; i<num_properties; i++)
-  {
-    cedar::dev::sensors::camera::Property::Id prop_id
-      = cedar::dev::sensors::camera::Property::type().list().at(i).id();
-
-    // get the value from the configuration file or from the parameters
-    double value = this->mpCameraChannel->mpProperties->getProperty(prop_id);
-
-    // get property-mode, the real value set depends on the mode!
-    cedar::dev::sensors::camera::PropertyMode::Id prop_mode_id;
-    prop_mode_id = this->mpCameraChannel->mpProperties->getMode(prop_id);
-
-    switch (prop_mode_id)
-    {
-    case cedar::dev::sensors::camera::PropertyMode::MANUAL:
-      this->setPropertyToCamera(prop_id,value);
-      break;
-
-    // if auto: set to auto and get value form camera
-    case cedar::dev::sensors::camera::PropertyMode::AUTO:
-      this->setPropertyToCamera(prop_id,CAMERA_PROPERTY_MODE_AUTO);
-
-    // if default and on mode auto: get value from camera and disable the value field
-    default:  //BACKEND_DEFAULT
-
-      double set_value = this->getPropertyFromCamera(prop_id);
-      this->mpCameraChannel->mpProperties->setProperty(prop_id,set_value);
-      this->mpCameraChannel->mpProperties->setDefaultValue(prop_id,set_value);
-    }
-  }
-//  std::cout << "applyStateToCamera finished" << std::endl;
 }

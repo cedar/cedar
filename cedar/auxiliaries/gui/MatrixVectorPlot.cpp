@@ -37,7 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/MatrixVectorPlot.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
-#include "cedar/auxiliaries/gui/PlotManager.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/math/Limits.h"
 #include "cedar/auxiliaries/MatData.h"
@@ -46,8 +46,8 @@
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
-#include <qwt/qwt_legend.h>
-#include <qwt/qwt_scale_div.h>
+#include <qwt_legend.h>
+#include <qwt_scale_div.h>
 #include <QContextMenuEvent>
 #include <QVBoxLayout>
 #include <QPalette>
@@ -65,9 +65,9 @@ namespace
             <
               cedar::aux::MatData,
               cedar::aux::gui::MatrixVectorPlot
-            > DeclarationTypeM;
-    boost::shared_ptr<DeclarationTypeM> declaration(new DeclarationTypeM());
-    cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(declaration);
+            > DeclarationType;
+    boost::shared_ptr<DeclarationType> declaration(new DeclarationType());
+    declaration->declare();
 
     return true;
   }

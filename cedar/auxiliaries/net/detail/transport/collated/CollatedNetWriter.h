@@ -1,6 +1,6 @@
 /*=============================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -108,6 +108,9 @@ public:
 #endif
   }
 
+private:
+  virtual bool checkCollatedDataForWrite(const typename CollatedTraits<T>::DataType &data,
+                                         typename CollatedTraits<T>::HeaderType &header) = 0;
 
   //---------------------------------------------------------------------------
   // public methods

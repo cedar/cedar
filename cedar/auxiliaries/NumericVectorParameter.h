@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -197,6 +197,12 @@ public:
   void set(size_t index, const T& value, bool lock = false)
   {
     this->Super::set(index, this->mLimits.limit(value), lock);
+  }
+
+  //! Returns the limits for the values of this parameter.
+  const LimitType& getLimits() const
+  {
+    return this->mLimits;
   }
 
   //--------------------------------------------------------------------------------------------------------------------

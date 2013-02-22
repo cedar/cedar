@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -24,8 +24,8 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Georg Hartinger
-#   Email:       georg.hartinger@rub.de
+#   Maintainer:  
+#   Email:       
 #   Date:        
 #
 #   Description:
@@ -34,5 +34,4 @@
 #
 #=======================================================================================================================
 
-cedar_add_example(GrabbableGrabberTutorial PREFIX "examples/grabber" )
-
+cedar_add_unit_test(CTestTest main.cpp)

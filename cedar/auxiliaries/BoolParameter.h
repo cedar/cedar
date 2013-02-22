@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -35,11 +35,11 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_STRING_PARAMETER_H
-#define CEDAR_AUX_STRING_PARAMETER_H
+#ifndef CEDAR_AUX_BOOL_PARAMETER_H
+#define CEDAR_AUX_BOOL_PARAMETER_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/ParameterTemplate.h"
 
-#endif // CEDAR_AUX_STRING_PARAMETER_H
+#endif // CEDAR_AUX_BOOL_PARAMETER_H

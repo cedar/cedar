@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -153,6 +153,18 @@ public:
   /*!@brief adds a list of elements and takes care of existing connections between those elements
    */
   void add(std::list<cedar::proc::ElementPtr> elements);
+
+  /*!@brief Duplicates an existing element.
+   *
+   * @param elementName Identifier of the existing element.
+   * @param newName Name to be given to the new element.
+   */
+  void duplicate(const std::string& elementName, const std::string& newName = "");
+
+  /*!@brief unmodifiedName unmodified name, possibly non-unique in network
+   * @return unique name created by attaching a number if name is already taken
+   */
+  std::string getUniqueName(const std::string& unmodifiedName) const;
 
   /*!@brief Returns the element with the given name as a pointer of the specified type.
    */

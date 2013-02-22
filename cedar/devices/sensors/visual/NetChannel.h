@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -54,14 +54,16 @@ class cedar::dev::sensors::visual::NetChannel
 :
 public cedar::dev::sensors::visual::GrabberChannel
 {
-  //!@brief friend class of NetGrabber for direct access to the members
+  //!@cond SKIPPED_DOCUMENTATION
+  //friend class of NetGrabber for direct access to the members
   friend class cedar::dev::sensors::visual::NetGrabber;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@cond SKIPPED_DOCUMENTATION
+
+  //internally used type of the NetReader with cv::Mat as data
   typedef cedar::aux::net::Reader<cv::Mat> MatNetReader;
   typedef boost::shared_ptr<cedar::aux::net::Reader<cv::Mat> > MatNetReaderPtr;
   //!@endcond

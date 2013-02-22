@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -43,7 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/dynamics/lib.h"
-#include "cedar/processing/PluginDeclaration.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -65,7 +65,7 @@ namespace cedar
     //!@endcond
 
     //!@brief A function for loading the declarations of the dynamics namespace as plugin.
-    CEDAR_DECLARE_DEPRECATED(CEDAR_DYN_LIB_EXPORT void getPluginDesciption(cedar::proc::PluginDeclarationPtr plugin));
+    CEDAR_DECLARE_DEPRECATED(CEDAR_DYN_LIB_EXPORT void getPluginDesciption(cedar::aux::PluginDeclarationListPtr plugin));
   }
 }
 

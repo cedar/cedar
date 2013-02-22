@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -79,10 +79,10 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void setProperties();
+  // derived from class Device
   void applySettingsToCamera();
-  bool createCaptureDevice();
-  void applyStateToCamera();
+  bool createCaptureObject();
+  void getAvailablePropertiesFromCamera();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

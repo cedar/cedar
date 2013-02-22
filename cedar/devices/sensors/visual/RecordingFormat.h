@@ -68,8 +68,10 @@ class cedar::dev::sensors::visual::RecordingFormat
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Typedef for the enum values
   typedef cedar::aux::EnumId Id;
 public:
+  //! Typedef for this enum as shared pointer
   typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
 private:
@@ -89,9 +91,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Construct
   static void construct();
 
+  //! Type
   static const cedar::aux::EnumBase& type();
+
+  //! Type Pointer
   static const cedar::dev::sensors::visual::RecordingFormat::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -200,7 +200,7 @@ void cedar::proc::gui::TriggerItem::setTrigger(cedar::proc::TriggerPtr trigger)
 {
   this->setElement(trigger);
   this->mTrigger = trigger;
-  this->mClassId = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(mTrigger);
+  this->mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(mTrigger);
   
   std::string tool_tip = this->mTrigger->getName() + " (" + this->mClassId->getClassName() + ")";
   this->setToolTip(tool_tip.c_str());

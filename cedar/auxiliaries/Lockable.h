@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -86,8 +86,14 @@ public:
   //!@brief Locks all locks associated with this object.
   void lockAll(LockSetHandle lockSet = 0) const;
 
+  //!@brief Locks all locks associated with this object with the given lock type (reading, writing).
+  void lockAll(cedar::aux::LOCK_TYPE lockType, LockSetHandle lockSet) const;
+
   //!@brief Unlocks all locks associated with this object.
   void unlockAll(LockSetHandle lockSet = 0) const;
+
+  //!@brief Returns the number of locks.
+  size_t getLockCount() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -109,7 +115,19 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  inline static void applyLockType(QReadWriteLock* pLock, cedar::aux::LOCK_TYPE lockType)
+  {
+    switch (lockType)
+    {
+      case cedar::aux::LOCK_TYPE_READ:
+        pLock->lockForRead();
+        break;
+
+      case cedar::aux::LOCK_TYPE_WRITE:
+        pLock->lockForWrite();
+        break;
+    }
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
