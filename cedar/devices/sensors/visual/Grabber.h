@@ -55,7 +55,7 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 #include <QReadWriteLock>
-#include <boost/utility.hpp>      //boost::noncopyable
+#include <boost/utility.hpp>      //boost::noncopyable //!@todo (Where) is this used?
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -174,12 +174,12 @@ public:
    */
   bool applyParameter();
 
-  /*!@brief This functin indicates, if the grabber is already in grabbing mode
+  /*!@brief This function indicates, if the grabber is already in grabbing mode
    *
-   * This is usefull, if you want to check if the automatically created grabbers from a config-file are fully
+   * This is useful, if you want to check if the automatically created grabbers from a config-file are fully
    * functional, or if there was a problem during startup with the default parameters.
    *
-   * At an instantiation, the grabber always will be created. If the capure-device also will be created depends on
+   * At an instantiation, the grabber always will be created. If the capture-device also will be created depends on
    * the default parameter. If there is no error, then the capture-device will be created and the grabber is fully
    * functional.
    *
@@ -191,7 +191,7 @@ public:
 
   /*! @brief Resets the Grabber to initialization values, without opening the device
    *
-   *  Call this method if you want to change settings of the caputre device, which couldn't be set if the device is
+   *  Call this method if you want to change settings of the capture device, which couldn't be set if the device is
    *  already opened (like the size of the frames of a camera-grabber)
    */
   void closeGrabber();
@@ -502,13 +502,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-  //! @brief read the configuration from the config-file
-  //
-  //          Derived from cedar::aux::Configurable
-  //void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
-  /*! @brief  Periodically call of grab()
+  /*! @brief  Periodically calls the grab() method.
    *
    *  For details have a look at cedar::aux::LoopedThread
    */
@@ -685,29 +679,29 @@ private:
     //! @brief Used for blocking other threads while grabber is created
     QReadWriteLock* mpLockIsCreating;
 
-    ///! @brief Flag which indicates if the GrabberThread was started during startRecording
+    //! @brief Flag which indicates if the GrabberThread was started during startRecording
     bool mGrabberThreadStartedOnRecording;
 
-    ///! @brief Flag which indicates if the CleanUp was already done (perhaps due to an error)
+    //! @brief Flag which indicates if the CleanUp was already done (perhaps due to an error)
     bool mCleanUpAlreadyDone;
     
 
-    ///! @brief Timestamp at startGrabber time to measure the real fps of grabbing
+    //! @brief Timestamp at startGrabber time to measure the real fps of grabbing
     boost::posix_time::ptime mFpsMeasureStart;
 
-    ///! @brief Timestamp at end time to measure the real fps of grabbing
+    //! @brief Timestamp at end time to measure the real fps of grabbing
     boost::posix_time::ptime mFpsMeasureStop;
 
-    ///! @brief Counter to measure the real fps of grabbing
+    //! @brief Counter to measure the real fps of grabbing
     unsigned int mFpsCounter;
 
-    ///! @brief The vector containing references to the instances of all created grabbers
+    //! @brief The vector containing references to the instances of all created grabbers
     static GrabberInstancesVector mInstances;
 
-    ///! @brief Flag which indicates if the CTRL-C Handler should be registered or not
+    //! @brief Flag which indicates if the CTRL-C Handler should be registered or not
     static bool mRegisterTerminationHandler;
 
-    ///! @brief Flag, if this is the first instance of a grabber (used for the ctrl-c handler)
+    //! @brief Flag, if this is the first instance of a grabber (used for the ctrl-c handler)
     bool mFirstGrabberInstance;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -716,10 +710,9 @@ private:
 protected:
   //------------------------------------------------------------------------
   //!@brief Constant which defines how often getFpsMeasured() will be updated (in frames).
-  // Default value is every 5 frames
   static const int UPDATE_FPS_MEASURE_FRAME_COUNT = 5;
 
-  ///! A vector which contains for every grabbing-channel one channel structure
+  //! A vector which contains for every grabbing-channel one channel structure
   ChannelParameterPtr _mChannels;
 
 

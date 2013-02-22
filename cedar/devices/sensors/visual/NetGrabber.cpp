@@ -296,17 +296,13 @@ std::string cedar::dev::sensors::visual::NetGrabber::onUpdateSourceInfo(unsigned
 //----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::NetGrabber::onGrab(unsigned int channel)
 {
-  // unsigned int numCams = getNumCams();
   int result = true;
 
   try
   {
     // the read() function pop the image from the NetReader class.
     // If already read, then an exception is thrown.
-    cv::Mat frame =  getNetChannel(channel)->mpMatNetReader->read();
-
-    // got a new frame
-    getImageMat(channel) = frame;
+    getImageMat(channel) =  getNetChannel(channel)->mpMatNetReader->read();
   }
   catch (cedar::aux::net::NetUnexpectedDataException &E)
   {
