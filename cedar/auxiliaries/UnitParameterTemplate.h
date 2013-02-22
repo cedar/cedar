@@ -50,6 +50,7 @@
 #include <boost/units/derived_dimension.hpp>
 #include <boost/units/get_dimension.hpp>
 #include <boost/units/quantity.hpp>
+#include <boost/units/pow.hpp>
 #include <boost/units/systems/si/dimensionless.hpp>
 #include <boost/units/io.hpp>
 #include <boost/static_assert.hpp>
@@ -157,9 +158,19 @@ namespace cedar
       return cedar::aux::getUnitFromPostFix<TUnit>(split.at(0));
     }
 
-    template <typename T, typename Numerator, typename Denominator>
+    template
+    <
+      typename T,
+      typename Numerator,
+      typename Denominator,
+      long NumeratorPower = 1,
+      long DenominatorPower = 1
+    >
     boost::units::quantity<T> parseCompoundUnit(const std::string& unitStr)
     {
+      typedef typename boost::units::static_rational<NumeratorPower>::type NumeratorRational;
+      typedef typename boost::units::static_rational<DenominatorPower>::type DenominatorRational;
+
       // normalize the white space in the unit
       std::string unit_str = cedar::aux::regexReplace(unitStr, "\\s+", " ");
 
@@ -177,6 +188,8 @@ namespace cedar
 
       Numerator i_numerator;
       Denominator i_denominator;
+      auto numerator_pow = boost::units::pow<NumeratorRational>(i_numerator);
+      auto denominator_pow = boost::units::pow<DenominatorRational>(i_denominator);
 
       for (auto iter = component_strs.begin(); iter != component_strs.end(); ++iter)
       {
@@ -202,22 +215,25 @@ namespace cedar
         }
         else
         {
-          const std::string& exponent = split.at(1);
+          const std::string& exponent_str = split.at(1);
+          long exponent = cedar::aux::fromString<long>(exponent_str);
 
-          CEDAR_ASSERT(exponent.size() >= 1);
+          CEDAR_ASSERT(exponent_str.size() >= 1);
 
-          if (exponent.at(0) == '-')
+          if (exponent < 0)
           {
+            CEDAR_ASSERT(abs(exponent) == DenominatorPower);
             denominator *= cedar::aux::parseUnitString<Denominator>(unit) / i_denominator;
           }
           else
           {
+            CEDAR_ASSERT(abs(exponent) == NumeratorPower);
             numerator *= cedar::aux::parseUnitString<Numerator>(unit) / i_numerator;
           }
         }
 
       } // for loop
-      return (numerator / denominator) * (i_numerator / i_denominator);
+      return (numerator / denominator) * (numerator_pow / denominator_pow);
     }
 
   } // namespace aux
