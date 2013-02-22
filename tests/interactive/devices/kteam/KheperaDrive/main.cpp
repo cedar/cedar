@@ -40,6 +40,7 @@
 #include "cedar/devices/kteam/DriveSerial.h"
 #include "cedar/devices/kteam/SerialChannel.h"
 #include "cedar/devices/kteam/gui/DriveControlWidget.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -66,9 +67,9 @@ int main(int argc, char **argv)
   // close and open the gripper
   //!@todo Reenable this once the robot framework is completed
 //  drive->closeGripper();
-  cedar::aux::sleep(cedar::unit::Seconds(5));
+  cedar::aux::sleep(cedar::unit::Time(5.0 * cedar::unit::seconds));
 //  drive->openGripper();
-  cedar::aux::sleep(cedar::unit::Seconds(5));
+  cedar::aux::sleep(cedar::unit::Time(5.0 * cedar::unit::seconds));
 
   //start the program
   application.exec();

@@ -24,15 +24,11 @@
 
     File:        Time.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 03
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2013 02 14
 
-    Description:
+    Description: This is a header for all time-related units.
 
     Credits:
 
@@ -43,64 +39,35 @@
 
 // CEDAR INCLUDES
 #include "cedar/units/namespace.h"
+#include "cedar/units/UnitMatrix.h"
 
 // SYSTEM INCLUDES
+#include <boost/units/make_scaled_unit.hpp>
+#include <boost/units/quantity.hpp>
+#include <boost/units/systems/si/time.hpp>
 
-
-/*!@brief Base class for time units.
- *
- * More detailed description of the class.
- *
- * @todo explain here that functions expecting a time as argument should always use this class and not, e.g.,
- *       cedar::units::Milliseconds.
- */
-class cedar::unit::Time
+namespace cedar
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
+  namespace unit
+  {
+    typedef boost::units::quantity<boost::units::si::time> Time;
+    using boost::units::si::second;
+    using boost::units::si::seconds;
+    typedef boost::units::make_scaled_unit
+            <
+              boost::units::si::time,
+              boost::units::scale<10, boost::units::static_rational<-3> >
+            >::type millisecond;
+    typedef millisecond milliseconds;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // constructors and destructor
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // This class has no public constructors because it should not be used directly.
 
-  //!@brief Destructor
-  virtual ~Time();
+    //!@brief template concretion for time
+    typedef UnitMatrix<boost::units::si::time> TimeMatrix;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // public methods
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  /*!@brief returns the raw time (currently, this is microseconds), mainly used in conversion methods
-   * @return raw time (currently microseconds)
-   */
-  double getRawTime() const;
+    //!@brief default unit for time
+    extern CEDAR_UNITS_LIB_EXPORT const cedar::unit::Time DEFAULT_TIME_UNIT;
+  }
+}
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // protected methods
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-  //!@brief The constructor.
-  Time(double amount);
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // private methods
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // members
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  //!@brief the internal representation of time, currently expressed in microseconds
-  double mAmountInMicroSeconds;
-private:
-  // none yet
-
-}; // class cedar::unit::Time
 
 #endif // CEDAR_UNITS_TIME_H

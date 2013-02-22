@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gui/SceneWidget.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -96,7 +97,7 @@ int main(int argc, char **argv)
 
   p_cora_arm->stop();
   p_cora_head->stop();
-  cedar::aux::sleep(cedar::unit::Seconds(1));
+  cedar::aux::sleep(cedar::unit::Time(1.0 * cedar::unit::second));
 
   return 0;
 }

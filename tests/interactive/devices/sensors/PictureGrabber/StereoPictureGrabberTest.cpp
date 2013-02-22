@@ -20,6 +20,8 @@
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <QtGui/QApplication>
@@ -225,7 +227,7 @@ int main(int argc, char* argv[])
     //nothing else to do here. No new frames
     //but it is possible to change the frames.
     //Have a look at the single channel picture grabber for details
-    cedar::aux::sleep(cedar::unit::Milliseconds(100));
+    cedar::aux::sleep(cedar::unit::Time(100.0 * cedar::unit::milli * cedar::unit::second));
     std::cout << "." << std::flush;
   }
 

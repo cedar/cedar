@@ -20,6 +20,8 @@
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 
 // SYSTEM INCLUDES
@@ -241,7 +243,7 @@ int main(int argc, char* argv[])
 
     // watch the output - everything should be fine.
     //The video is much slower than 100 fps.
-    cedar::aux::sleep(cedar::unit::Milliseconds(10));
+    cedar::aux::sleep(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
   }
 
   std::cout << std::endl;
