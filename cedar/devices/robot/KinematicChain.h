@@ -38,6 +38,7 @@
 #define CEDAR_DEV_ROBOT_KINEMATIC_CHAIN_H
 
 // CEDAR INCLUDES
+#include "cedar/defines.h"
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/math/Limits.h"
@@ -187,13 +188,19 @@ public:
    *
    * @return    vector of joint angles
    */
-  std::vector<double> getJointAngles() const;
+  CEDAR_DECLARE_DEPRECATED(std::vector<double> getJointAngles() const);
 
   /*!@brief get current state of all joint angles
    *
    * @return    vector of joint angles
    */
-  cv::Mat getJointAnglesMatrix() const;
+  CEDAR_DECLARE_DEPRECATED(cv::Mat getJointAnglesMatrix() const);
+
+  /*!@brief get current state of all joint angles
+   *
+   * @return    vector of joint angles
+   */
+  cv::Mat getCachedJointAngles() const;
 
   /*!@brief get current state of a single joint velocity
    *
@@ -206,13 +213,19 @@ public:
    *
    * @return    vector of joint velocities
    */
-  std::vector<double> getJointVelocities() const;
+  CEDAR_DECLARE_DEPRECATED(std::vector<double> getJointVelocities() const);
 
   /*!@brief get current state of all joint velocities
    *
    * @return    vector of joint velocities
    */
-  cv::Mat getJointVelocitiesMatrix() const;
+  CEDAR_DECLARE_DEPRECATED(cv::Mat getJointVelocitiesMatrix() const);
+
+  /*!@brief get current state of all joint velocities
+   *
+   * @return    vector of joint velocities
+   */
+  cv::Mat getCachedJointVelocities() const;
 
   /*!@brief get current state of a single joint acceleration
    *
@@ -225,13 +238,19 @@ public:
    *
    * @return    vector of joint accelerations
    */
-  std::vector<double> getJointAccelerations() const;
+  CEDAR_DECLARE_DEPRECATED(std::vector<double> getJointAccelerations() const);
 
   /*!@brief get current state of all joint accelerations
    *
    * @return    vector of joint accelerations
    */
-  cv::Mat getJointAccelerationsMatrix() const;
+  CEDAR_DECLARE_DEPRECATED(cv::Mat getJointAccelerationsMatrix() const);
+
+  /*!@brief get current state of all joint accelerations
+   *
+   * @return    vector of joint accelerations
+   */
+  cv::Mat getCachedJointAccelerations() const;
 
   /*!@brief returns the mode in which the joints positions are set (angle/velocity/acceleration)
    *
