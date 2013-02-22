@@ -119,7 +119,7 @@
   #define CV_CAP_PROP_DC1394_MODE_AUTO -2
 #endif // CV_CAP_PROP_DC1394_MODE_AUTO
 
-//return value, if a property is not supported from the actual device
+//return value, if a property is not supported by the actual device
 //have to be larger than the highest value of the properties!
 #define CAMERA_PROPERTY_NOT_SUPPORTED 100000
 

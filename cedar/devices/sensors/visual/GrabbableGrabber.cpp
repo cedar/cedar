@@ -173,7 +173,6 @@ void cedar::dev::sensors::visual::GrabbableGrabber::onCleanUp()
     getGrabbableChannel(channel)->mpSourceInterfaceClass = NULL;
     getGrabbableChannel(channel)->mpGrabberLock = NULL;
   }
-
 }
 
 //----------------------------------------------------------------------------------------------------
