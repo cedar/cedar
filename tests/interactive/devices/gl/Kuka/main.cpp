@@ -84,6 +84,7 @@ int main(int argc, char **argv)
   widget_arm.show();
   viewer.startTimer(20);
   p_kuka_arm->startTimer(20);
+  p_kuka_arm->start();
   a.exec();
 
   return 0;

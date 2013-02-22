@@ -455,62 +455,40 @@ bool cedar::dev::robot::KinematicChain::setJointAccelerations(const cv::Mat& acc
 
 void cedar::dev::robot::KinematicChain::step(double time)
 {
-  // update the angle according to working mode
-  switch (getWorkingMode())
+  if(mUseCurrentHardwareValues)
   {
-    case STOP:
-      break;
-
-    case ANGLE:
-      break;
-
-    case ACCELERATION:
-
-      if(mUseCurrentHardwareValues)
-      {
-        mJointVelocities = getCachedJointVelocities();
-      }
-
-      {
-        QWriteLocker locker(&mVelocitiesLock);
-        mJointVelocities += getCachedJointAccelerations() * ( time / 1000.0 );
-      }
-      applyVelocityLimits(mJointVelocities);
-
-      if(setJointVelocities(mJointVelocities))
-      {
-        break;
-      }
-
-    case VELOCITY:
-
-      if(mUseCurrentHardwareValues)
-      {
-        mJointAngles = getCachedJointAngles();
-      }
-
-      {
-        QWriteLocker locker(&mAnglesLock);
-        mJointAngles += getCachedJointVelocities() * ( time / 1000.0 );
-      }
-      applyAngleLimits(mJointAngles);
-      setJointAngles(mJointAngles);
-      break;
-
-    default:
-      //!@todo Should this throw an exception?
-      cedar::aux::LogSingleton::getInstance()->error
-      (
-        "Oh oh, something went terribly wrong in cedar::dev::robot::KinematicChain::step(double)!",
-        "cedar::dev::robot::KinematicChain::step(double)"
-      );
+    mJointVelocities = getCachedJointVelocities();
   }
 
-  return;
+  {
+    QWriteLocker locker(&mVelocitiesLock);
+    mJointVelocities += getCachedJointAccelerations() * ( time / 1000.0 );
+  }
+
+  applyVelocityLimits(mJointVelocities);
+
+  if(setJointVelocities(mJointVelocities))
+  {
+    return;
+  }
+
+  if(mUseCurrentHardwareValues)
+  {
+    mJointAngles = getCachedJointAngles();
+  }
+
+  {
+    QWriteLocker locker(&mAnglesLock);
+    mJointAngles += getCachedJointVelocities() * ( time / 1000.0 );
+  }
+
+  applyAngleLimits(mJointAngles);
+  setJointAngles(mJointAngles);
 }
 
-void cedar::dev::robot::KinematicChain::setWorkingMode(ActionType actionType)
+void cedar::dev::robot::KinematicChain::setWorkingMode(ActionType)
 {
+#if 0  
   QWriteLocker locker(&mWorkingModeLock);
 
   cv::Mat zeros = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
@@ -558,6 +536,7 @@ void cedar::dev::robot::KinematicChain::setWorkingMode(ActionType actionType)
   }
 
   return;
+#endif
 }
 
 void cedar::dev::robot::KinematicChain::init()
@@ -669,6 +648,8 @@ void cedar::dev::robot::KinematicChain::applyVelocityLimits(cv::Mat& /*velocitie
 //  }
 }
 
+#if 0
+// TODO: remove
 /*
  * Overwritten start function of QThread
  */
@@ -713,6 +694,7 @@ void cedar::dev::robot::KinematicChain::start(Priority priority)
 
   return;
 }
+#endif
 
 void cedar::dev::robot::KinematicChain::useCurrentHardwareValues(bool useCurrentHardwareValues)
 {
@@ -1281,17 +1263,13 @@ bool cedar::dev::robot::KinematicChain::applyInitialConfiguration(std::string s)
 
 // TODO: --> to its own virtual method ...
     // better to drive slowly to this configuration ...
-    if (0) // TODO: !isSimulated())
+    if (0) // TODO: !isSimulated()) // dont do this in simulated mode
     {
-      // TODO: setWorkingMode( RESETSAFE );
+      // TODO: need to implement an automatic mode
     }
     else
     {
-      auto mode = getWorkingMode();
-
-      setWorkingMode( ANGLE );
       setJointAngles( f->second );
-      setWorkingMode( mode );
     }
 
     return true;

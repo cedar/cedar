@@ -256,7 +256,7 @@ public:
    *
    * @return current working mode
    */
-  ActionType getWorkingMode();
+  CEDAR_DECLARE_DEPRECATED(ActionType getWorkingMode());
 
   /*!@brief set current state of a single joint angle
    *
@@ -365,7 +365,7 @@ public:
    *
    * @param actionType new working mode
    */
-  virtual void setWorkingMode(ActionType actionType);
+  CEDAR_DECLARE_DEPRECATED(virtual void setWorkingMode(ActionType actionType));
 
   /*!@brief Controls if real hardware values are used when integrating velocity/acceleration.
    *
@@ -379,13 +379,15 @@ public:
    */
   void useCurrentHardwareValues(bool useCurrentHardwareValues);
 
-
+#if 0
+// TODO: remove
   /*!@brief Starts the kinematic chain as a thread
    *
    * If you want to use velocity or acceleration control but your hardware
    * does not support this, start the thread to "simulate" these values.
    */
   virtual void start(Priority priority = InheritPriority);
+#endif  
 
   /*!@brief returns a smart-pointer to the local coordinate frame of the end-effector
    *
@@ -644,8 +646,8 @@ private:
   mutable QReadWriteLock mVelocitiesLock;
   cv::Mat mJointAccelerations;
   mutable QReadWriteLock mAccelerationsLock;
-  ActionType mWorkingMode;
-  mutable QReadWriteLock mWorkingModeLock;
+  ActionType mWorkingMode; // TODO: remove
+  mutable QReadWriteLock mWorkingModeLock; // TODO: remove
 
   //! vector of all joints
   JointListParameterPtr mpJoints;
