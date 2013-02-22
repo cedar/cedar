@@ -41,16 +41,14 @@
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
-#include "cedar/units/LengthMatrix.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/PlaneAngle.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
 #include <QReadWriteLock>
-#include <boost/units/quantity.hpp>
-#include <boost/units/systems/si/length.hpp>
-#include <boost/units/systems/si/plane_angle.hpp>
 
 /*!@brief Provides the geometry of a rigid object
  *
@@ -87,17 +85,17 @@ public:
   /*!@brief returns x-translation of the local frame origin in world frame
    * @return translation of the local frame origin in the world frame
    */
-  boost::units::quantity<boost::units::si::length> getTranslationX() const;
+  cedar::unit::Length getTranslationX() const;
 
   /*!@brief returns y-translation of the local frame origin in world frame
    * @return translation of the local frame origin in the world frame in x-direction
    */
-  boost::units::quantity<boost::units::si::length> getTranslationY() const;
+  cedar::unit::Length getTranslationY() const;
 
   /*!@brief returns z-translation of the local frame origin in world frame
    * @return translation of the local frame origin in the world frame in y-direction
    */
-  boost::units::quantity<boost::units::si::length> getTranslationZ() const;
+  cedar::unit::Length getTranslationZ() const;
 
   /*!@brief returns rotation of the local frame origin in world frame
    * @return rotation of the local frame relative to the world frame
@@ -125,9 +123,9 @@ public slots:
    */
   void setTranslation
        (
-         const boost::units::quantity<boost::units::si::length>& x,
-         const boost::units::quantity<boost::units::si::length>& y,
-         const boost::units::quantity<boost::units::si::length>& z
+         const cedar::unit::Length& x,
+         const cedar::unit::Length& y,
+         const cedar::unit::Length& z
        );
 
   /*!@brief set the translation of the object frame origin in the world frame
@@ -138,7 +136,7 @@ public slots:
   /*!@brief set the translation of the object frame origin in the world frame
    * @param translation new translation vector in homogeneous coordinates
    */
-  void setTranslation(const std::vector<boost::units::quantity<boost::units::si::length> >& translation);
+  void setTranslation(const std::vector<cedar::unit::Length>& translation);
 
   /*!@brief add the provided values to the translation of the local frame origin in the world frame
    * @param x additional translation along the x-axis
@@ -147,9 +145,9 @@ public slots:
    */
   void translate
        (
-         const boost::units::quantity<boost::units::si::length>& x,
-         const boost::units::quantity<boost::units::si::length>& y,
-         const boost::units::quantity<boost::units::si::length>& z
+         const cedar::unit::Length& x,
+         const cedar::unit::Length& y,
+         const cedar::unit::Length& z
        );
 
   /*!@brief set the translation of the object frame origin in the world frame
@@ -160,7 +158,7 @@ public slots:
   /*!@brief set the translation of the object frame origin in the world frame
    * @param translation additional translation in homogeneous coordinates
    */
-  void translate(const std::vector<boost::units::quantity<boost::units::si::length> >& translation);
+  void translate(const std::vector<cedar::unit::Length >& translation);
 
   /*!@brief set the rotation of the object frame in the world frame
    * @param rotation new rotation matrix
@@ -176,7 +174,7 @@ public slots:
    * @param axis    index of the axis to rotate around, between 0 and 2
    * @param angle    value of angle that the object is rotated by, in radians
    */
-  void rotate(unsigned int axis, const boost::units::quantity<boost::units::si::plane_angle>& angle);
+  void rotate(unsigned int axis, const cedar::unit::PlaneAngle& angle);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

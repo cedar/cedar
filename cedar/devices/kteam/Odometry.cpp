@@ -37,14 +37,11 @@
 // CEDAR INCLUDES
 #include "cedar/devices/kteam/Odometry.h"
 #include "cedar/auxiliaries/math/IntLimitsParameter.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/PlaneAngle.h"
 
 // SYSTEM INCLUDES
-#include <boost/units/systems/si/length.hpp>
 #include <boost/units/systems/si/io.hpp>
-
-// namespaces for units
-using namespace boost::units;
-using namespace boost::units::si;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -124,10 +121,10 @@ void cedar::dev::kteam::Odometry::update()
 void cedar::dev::kteam::Odometry::calculatePositionAndOrientation(const std::vector<int>& encoders)
 {
   // calculate the moved distance since last update
-  quantity<length> ds = calculateDifferencePosition(mOldEncoders, encoders);
+  cedar::unit::Length ds = calculateDifferencePosition(mOldEncoders, encoders);
 
   // calculate the angle rotated since last update
-  quantity<plane_angle> dphi = calculateDifferenceOrientation(mOldEncoders, encoders);
+  cedar::unit::PlaneAngle dphi = calculateDifferenceOrientation(mOldEncoders, encoders);
 
   // calculate new position on x- and y-axis
   //!@todo: changed to use matrices instead of quaternions, check whether this still works (HR)
@@ -137,11 +134,10 @@ void cedar::dev::kteam::Odometry::calculatePositionAndOrientation(const std::vec
 //  double new_orientation = getOrientation() + dphi;
 
   // this assumes the heading direction of the vehicle is the x-axis of the local coordinate system
-  quantity<length> new_x_position = getCoordinateFrame()->getTranslationX() + ds * getCoordinateFrame()->getTransformation().at<double>(0, 1);
-  quantity<length> new_y_position = getCoordinateFrame()->getTranslationY() + ds * getCoordinateFrame()->getTransformation().at<double>(1, 1);
-
-  std::cout << "new x position:" << new_x_position << std::endl;
-  std::cout << "new y position:" << new_x_position << std::endl;
+  cedar::unit::Length new_x_position
+    = getCoordinateFrame()->getTranslationX() + ds * getCoordinateFrame()->getTransformation().at<double>(0, 1);
+  cedar::unit::Length new_y_position
+    = getCoordinateFrame()->getTranslationY() + ds * getCoordinateFrame()->getTransformation().at<double>(1, 1);
 
   // get old orientation and calculate new orientation
   // don't need that at the moment (SZ)
@@ -149,11 +145,11 @@ void cedar::dev::kteam::Odometry::calculatePositionAndOrientation(const std::vec
 
   // update both position and orientation
   setTranslation(new_x_position, new_y_position);
-  getCoordinateFrame()->rotate(2, dphi); //!todo
+  getCoordinateFrame()->rotate(2, dphi);
 //  setRotation(new_orientation);
 }
 
-quantity<length> cedar::dev::kteam::Odometry::calculateDifferencePosition
+cedar::unit::Length cedar::dev::kteam::Odometry::calculateDifferencePosition
        (
          const std::vector<int>& oldEncoders,
          const std::vector<int>& newEncoders
@@ -163,12 +159,12 @@ quantity<length> cedar::dev::kteam::Odometry::calculateDifferencePosition
          * mDrive->getDistancePerPulse() / 2.0;
 }
 
-quantity<plane_angle> cedar::dev::kteam::Odometry::calculateDifferenceOrientation
+cedar::unit::PlaneAngle cedar::dev::kteam::Odometry::calculateDifferenceOrientation
        (
            const std::vector<int>& oldEncoders,
            const std::vector<int>& newEncoders
        ) const
 {
   return static_cast<double>((newEncoders[1] - oldEncoders[1]) - (newEncoders[0] - oldEncoders[0]))
-         * mDrive->getDistancePerPulse() / (mDrive->getWheelDistance() / radians);
+         * mDrive->getDistancePerPulse() / (mDrive->getWheelDistance() / cedar::unit::DEFAULT_PLANE_ANGLE_UNIT);
 }

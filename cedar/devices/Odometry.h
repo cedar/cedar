@@ -40,14 +40,13 @@
 // CEDAR INCLUDES
 #include "cedar/devices/namespace.h"
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/PlaneAngle.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 #include <QObject>
 #include <QTime>
-#include <boost/units/quantity.hpp>
-#include <boost/units/systems/si/length.hpp>
-#include <boost/units/systems/si/plane_angle.hpp>
 
 /*!@brief An object of this class represents the model of a mobile robot's kinematics.
  *
@@ -84,12 +83,12 @@ public:
   /*!@brief The get-function of the robot's current orientation.
    *@return The current orientation [in rad].
    */
-  boost::units::quantity<boost::units::si::plane_angle> getRotation();
+  cedar::unit::PlaneAngle getRotation();
 
   /*!@brief The set-function of the robot's orientation.
    *@param angle Orientation of the robot [in rad].
    */
-  void setRotation(boost::units::quantity<boost::units::si::plane_angle> angle);
+  void setRotation(const cedar::unit::PlaneAngle& angle);
 
   //!@brief Returns the coordinate frame on which the calculations of this class are based.
   cedar::aux::LocalCoordinateFramePtr getCoordinateFrame() const;
@@ -109,8 +108,8 @@ protected:
    */
   void setTranslation
        (
-         const boost::units::quantity<boost::units::si::length>& x,
-         const boost::units::quantity<boost::units::si::length>& y
+         const cedar::unit::Length& x,
+         const cedar::unit::Length& y
        );
 
   /*!@brief Updates the current position.

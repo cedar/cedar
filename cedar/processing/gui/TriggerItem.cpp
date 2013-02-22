@@ -56,6 +56,8 @@
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/casts.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -257,7 +259,7 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
       while (p_looped_trigger->isRunning())
       {
         QApplication::processEvents();
-        cedar::aux::sleep(cedar::unit::Milliseconds(10));
+        cedar::aux::sleep(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
       }
 
       this->setFillColor(mDefaultFillColor);

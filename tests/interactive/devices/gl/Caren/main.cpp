@@ -44,10 +44,10 @@
 #include "cedar/auxiliaries/gui/SceneWidget.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/gl/Cylinder.h"
+#include "cedar/units/Length.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
-#include <boost/units/systems/si/length.hpp>
 
 // namespaces for units
 using namespace boost::units::si;
@@ -125,7 +125,12 @@ int main(int argc, char **argv)
   // create a cylinder visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr cylinder_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
   cylinder_local_coordinate_frame->setName("cylinder");
-  cylinder_local_coordinate_frame->setTranslation(.3 * meters, .0 * meters, 1.0 * meters);
+  cylinder_local_coordinate_frame->setTranslation
+  (
+    0.3 * cedar::unit::meters,
+    0.0 * cedar::unit::meters,
+    1.0 * cedar::unit::meters
+  );
   cedar::aux::gl::ObjectVisualizationPtr cylinder
   (
     new cedar::aux::gl::Cylinder(cylinder_local_coordinate_frame, .1, .2, 0, 0.8, 0)

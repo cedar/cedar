@@ -22,24 +22,43 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TimeMatrix.h
+    File:        AngularVelocity.h
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
     Date:        2013 02 14
 
-    Description: This is a dummy header for the typedef TimeMatrix (which is actually a
-                 cedar::unit::TimeMatrix<boost::units::si::time>).
+    Description: This is a header for all angular-velocity-related units.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_UNITS_TIME_MATRIX_H
-#define CEDAR_UNITS_TIME_MATRIX_H
+#ifndef CEDAR_UNITS_ANGULAR_VELOCITY_H
+#define CEDAR_UNITS_ANGULAR_VELOCITY_H
 
 // CEDAR INCLUDES
 #include "cedar/units/namespace.h"
 #include "cedar/units/UnitMatrix.h"
 
-#endif // CEDAR_UNITS_TIME_MATRIX_H
+// SYSTEM INCLUDES
+#include <boost/units/quantity.hpp>
+#include <boost/units/systems/si/angular_velocity.hpp>
+
+namespace cedar
+{
+  namespace unit
+  {
+    typedef boost::units::quantity<boost::units::si::angular_velocity> AngularVelocity;
+    using boost::units::si::radian_per_second;
+    using boost::units::si::radians_per_second;
+
+    //!@brief template concretion for angular_velocity
+    typedef UnitMatrix<boost::units::si::angular_velocity> AngularVelocityMatrix;
+
+    //!@brief default unit for angular_velocity
+    extern CEDAR_UNITS_LIB_EXPORT const cedar::unit::AngularVelocity DEFAULT_ANGULAR_VELOCITY_UNIT;
+  }
+}
+
+#endif // CEDAR_UNITS_ANGULAR_VELOCITY_H

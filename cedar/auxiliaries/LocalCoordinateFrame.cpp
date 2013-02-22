@@ -39,17 +39,13 @@
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/screwCalculus.h"
 #include "cedar/auxiliaries/assert.h"
-#include "cedar/units/LengthMatrix.h"
-#include "cedar/units/namespace.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/PlaneAngle.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 #include <QReadLocker>
 #include <QWriteLocker>
-
-// namespaces for units
-using namespace boost::units;
-using namespace boost::units::si;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -121,17 +117,17 @@ cedar::unit::LengthMatrix cedar::aux::LocalCoordinateFrame::getTranslation() con
   return translation;
 }
 
-quantity<length> cedar::aux::LocalCoordinateFrame::getTranslationX() const
+cedar::unit::Length cedar::aux::LocalCoordinateFrame::getTranslationX() const
 {
   return mTransformation.at<double>(0, 3) * cedar::unit::DEFAULT_LENGTH_UNIT;
 }
 
-quantity<length> cedar::aux::LocalCoordinateFrame::getTranslationY() const
+cedar::unit::Length cedar::aux::LocalCoordinateFrame::getTranslationY() const
 {
   return mTransformation.at<double>(1, 3) * cedar::unit::DEFAULT_LENGTH_UNIT;
 }
 
-quantity<length> cedar::aux::LocalCoordinateFrame::getTranslationZ() const
+cedar::unit::Length cedar::aux::LocalCoordinateFrame::getTranslationZ() const
 {
   return mTransformation.at<double>(2, 3) * cedar::unit::DEFAULT_LENGTH_UNIT;
 }
@@ -161,9 +157,9 @@ void cedar::aux::LocalCoordinateFrame::update()
 
 void cedar::aux::LocalCoordinateFrame::setTranslation
      (
-       const quantity<length>& x,
-       const quantity<length>& y,
-       const quantity<length>& z
+       const cedar::unit::Length& x,
+       const cedar::unit::Length& y,
+       const cedar::unit::Length& z
      )
 {
   QWriteLocker locker(&mLock);
@@ -182,7 +178,7 @@ void cedar::aux::LocalCoordinateFrame::setTranslation(const cedar::unit::LengthM
   mTransformation.at<double>(2, 3) = translation.matrix.at<double>(2, 0) * conversion_factor;
 }
 
-void cedar::aux::LocalCoordinateFrame::setTranslation(const std::vector<quantity<length> >& translation)
+void cedar::aux::LocalCoordinateFrame::setTranslation(const std::vector<cedar::unit::Length >& translation)
 {
   QWriteLocker locker(&mLock);
   CEDAR_ASSERT(translation.size() >=3);
@@ -193,9 +189,9 @@ void cedar::aux::LocalCoordinateFrame::setTranslation(const std::vector<quantity
 
 void cedar::aux::LocalCoordinateFrame::translate
      (
-       const quantity<length>& x,
-       const quantity<length>& y,
-       const quantity<length>& z
+       const cedar::unit::Length& x,
+       const cedar::unit::Length& y,
+       const cedar::unit::Length& z
      )
 {
   QWriteLocker locker(&mLock);
@@ -217,7 +213,7 @@ void cedar::aux::LocalCoordinateFrame::translate(const cedar::unit::LengthMatrix
 
 void cedar::aux::LocalCoordinateFrame::translate
      (
-       const std::vector<quantity<length> >& translation
+       const std::vector<cedar::unit::Length >& translation
      )
 {
   QWriteLocker locker(&mLock);
@@ -264,7 +260,7 @@ void cedar::aux::LocalCoordinateFrame::setRotation(const std::vector<double>& ro
   mTransformation.at<double>(2, 1) = rotation[7];
   mTransformation.at<double>(2, 2) = rotation[8];
 }
-void cedar::aux::LocalCoordinateFrame::rotate(unsigned int axis, const quantity<plane_angle>& angle)
+void cedar::aux::LocalCoordinateFrame::rotate(unsigned int axis, const cedar::unit::PlaneAngle& angle)
 {
   QWriteLocker locker(&mLock);
   mTransformation(cv::Rect(0, 0, 3, 3))

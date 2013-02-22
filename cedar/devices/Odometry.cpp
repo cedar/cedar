@@ -36,17 +36,12 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/Odometry.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/PlaneAngle.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
-#include <boost/units/quantity.hpp>
 #include <boost/units/cmath.hpp>
-#include <boost/units/systems/si/length.hpp>
-#include <boost/units/systems/si/plane_angle.hpp>
-
-// namespaces for units
-using namespace boost::units;
-using namespace boost::units::si;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -85,7 +80,7 @@ cedar::unit::LengthMatrix cedar::dev::Odometry::getTranslation() const
   return translation;
 }
 
-quantity<plane_angle> cedar::dev::Odometry::getRotation()
+cedar::unit::PlaneAngle cedar::dev::Odometry::getRotation()
 {
   //calculates the orientation from the quaternion stored in LocalCoordinateFrame.h.
   //todo: changed to use matrices instead of quaternions, check whether this still works (HR)
@@ -98,14 +93,14 @@ quantity<plane_angle> cedar::dev::Odometry::getRotation()
   //  return atan2(getOrientationQuaternion(2) , getOrientationQuaternion(1));
 }
 
-void cedar::dev::Odometry::setTranslation(const quantity<length>& x, const quantity<length>& y)
+void cedar::dev::Odometry::setTranslation(const cedar::unit::Length& x, const cedar::unit::Length& y)
 {
   //!todo
   //sets x- and y-position only (z-position = 0)
   getCoordinateFrame()->setTranslation(x, y, 0.0 * cedar::unit::DEFAULT_LENGTH_UNIT);
 }
 
-void cedar::dev::Odometry::setRotation(quantity<plane_angle> angle)
+void cedar::dev::Odometry::setRotation(const cedar::unit::PlaneAngle& angle)
 {
   //construct a new matrix as parameter for setOrientationQuaternion
   cv::Mat rotation = cv::Mat(4, 1, CV_64FC1);
