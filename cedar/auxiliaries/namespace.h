@@ -231,6 +231,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(UnhandledValueException);
     CEDAR_DECLARE_AUX_CLASS(UnknownNameException);
     CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
+    CEDAR_DECLARE_AUX_CLASS(UnknownUnitSuffixException);
     CEDAR_DECLARE_AUX_CLASS(UnmanglingFailedException);
     CEDAR_DECLARE_AUX_CLASS(ValidationFailedException);
     //!@endcond
