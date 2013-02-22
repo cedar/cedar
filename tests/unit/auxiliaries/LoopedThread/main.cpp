@@ -36,7 +36,7 @@
 
 
 #include "cedar/auxiliaries/LoopedThread.h"
-#include "cedar/auxiliaries/CallFunctionThread.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -227,7 +227,7 @@ int main(int argc, char* argv[])
 {
   app = new QCoreApplication(argc,argv);
 
-  auto testThread = new cedar::aux::CallFunctionThread(runTests);
+  auto testThread = new cedar::aux::CallFunctionInThread(runTests);
 
   QObject::connect( testThread, SIGNAL(signalFinished()), app, SLOT(quit()), Qt::QueuedConnection );  // alternatively: call app->quit() in runTests()
 

@@ -23,7 +23,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CallFunctionThreadWorker.h
+    File:        CallFunctionInThreadWorker.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
@@ -56,11 +56,11 @@
 #include <QThread>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
-class cedar::aux::detail::CallFunctionThreadWorker : public cedar::aux::detail::ThreadWorker
+class cedar::aux::detail::CallFunctionInThreadWorker : public cedar::aux::detail::ThreadWorker
 {
   public: 
-    CallFunctionThreadWorker(cedar::aux::CallFunctionThread* wrapper);
-    ~CallFunctionThreadWorker();
+    CallFunctionInThreadWorker(cedar::aux::CallFunctionInThread* wrapper);
+    ~CallFunctionInThreadWorker();
 
   private:
 
@@ -70,7 +70,7 @@ class cedar::aux::detail::CallFunctionThreadWorker : public cedar::aux::detail::
   public:
 
   private:
-    cedar::aux::CallFunctionThread* mpWrapper;
+    cedar::aux::CallFunctionInThread* mpWrapper;
 };
 
 

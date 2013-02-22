@@ -57,7 +57,7 @@ namespace cedar
       // TODO: mapnage
       class ThreadWorker;
       class LoopedThreadWorker;
-      class CallFunctionThreadWorker;
+      class CallFunctionInThreadWorker;
     }
 
     //!@cond SKIPPED_DOCUMENTATION
@@ -67,7 +67,7 @@ namespace cedar
 
     CEDAR_DECLARE_AUX_CLASS(ThreadWrapper);
     CEDAR_DECLARE_AUX_CLASS(LoopedThread);
-    CEDAR_DECLARE_AUX_CLASS(CallFunctionThread);
+    CEDAR_DECLARE_AUX_CLASS(CallFunctionInThread);
     CEDAR_DECLARE_AUX_CLASS(LoopMode);
     CEDAR_DECLARE_AUX_CLASS(UserData);
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(IntrusivePtrBase);
