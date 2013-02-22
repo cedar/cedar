@@ -136,7 +136,7 @@ std::vector<double> cedar::dev::robot::KinematicChain::getJointAngles() const
   return dummy;
 }
 
-cv::Mat cedar::dev::robot::KinematicChain::getJointAnglesMatrix() const
+cv::Mat cedar::dev::robot::KinematicChain::getCachedJointAngles() const
 {
   cv::Mat dummy = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
 
@@ -146,6 +146,11 @@ cv::Mat cedar::dev::robot::KinematicChain::getJointAnglesMatrix() const
   }
 
   return dummy;
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::getJointAnglesMatrix() const
+{
+  return getCachedJointAngles();
 }
 
 double cedar::dev::robot::KinematicChain::getJointVelocity(unsigned int index) const
@@ -174,11 +179,16 @@ std::vector<double> cedar::dev::robot::KinematicChain::getJointVelocities() cons
   return dummy;
 }
 
-cv::Mat cedar::dev::robot::KinematicChain::getJointVelocitiesMatrix() const
+cv::Mat cedar::dev::robot::KinematicChain::getCachedJointVelocities() const
 {
   QReadLocker locker(&mVelocitiesLock);
 
   return mJointVelocities.clone();
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::getJointVelocitiesMatrix() const
+{
+  return getCachedJointVelocities();
 }
 
 double cedar::dev::robot::KinematicChain::getJointAcceleration(unsigned int index) const
@@ -205,11 +215,16 @@ std::vector<double> cedar::dev::robot::KinematicChain::getJointAccelerations() c
   return dummy;
 }
 
-cv::Mat cedar::dev::robot::KinematicChain::getJointAccelerationsMatrix() const
+cv::Mat cedar::dev::robot::KinematicChain::getCachedJointAccelerations() const
 {
   QReadLocker locker(&mAccelerationsLock);
 
   return mJointAccelerations.clone();
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::getJointAccelerationsMatrix() const
+{
+  return getCachedJointAccelerations();
 }
 
 cedar::dev::robot::KinematicChain::ActionType cedar::dev::robot::KinematicChain::getWorkingMode()
@@ -453,12 +468,12 @@ void cedar::dev::robot::KinematicChain::step(double time)
 
       if(mUseCurrentHardwareValues)
       {
-        mJointVelocities = getJointVelocitiesMatrix();
+        mJointVelocities = getCachedJointVelocities();
       }
 
       {
         QWriteLocker locker(&mVelocitiesLock);
-        mJointVelocities += getJointAccelerationsMatrix() * ( time / 1000.0 );
+        mJointVelocities += getCachedJointAccelerations() * ( time / 1000.0 );
       }
       applyVelocityLimits(mJointVelocities);
 
@@ -471,12 +486,12 @@ void cedar::dev::robot::KinematicChain::step(double time)
 
       if(mUseCurrentHardwareValues)
       {
-        mJointAngles = getJointAnglesMatrix();
+        mJointAngles = getCachedJointAngles();
       }
 
       {
         QWriteLocker locker(&mAnglesLock);
-        mJointAngles += getJointVelocitiesMatrix() * ( time / 1000.0 );
+        mJointAngles += getCachedJointVelocities() * ( time / 1000.0 );
       }
       applyAngleLimits(mJointAngles);
       setJointAngles(mJointAngles);
@@ -686,7 +701,7 @@ void cedar::dev::robot::KinematicChain::start(Priority priority)
   case VELOCITY:
   case ACCELERATION:
     {
-      cv::Mat tmp = getJointAnglesMatrix();
+      cv::Mat tmp = getCachedJointAngles();
       
       QWriteLocker locker(&mAnglesLock);
       mJointAngles = tmp;
@@ -885,7 +900,7 @@ cv::Mat cedar::dev::robot::KinematicChain::calculateVelocity
   }
   return cedar::aux::math::wedgeTwist<double>
          (
-           calculateSpatialJacobian(jointIndex) * getJointVelocitiesMatrix()
+           calculateSpatialJacobian(jointIndex) * getCachedJointVelocities()
          )
          * point_world;
 }
@@ -919,11 +934,11 @@ cv::Mat cedar::dev::robot::KinematicChain::calculateAcceleration
   }
   cv::Mat J = calculateSpatialJacobian(jointIndex);
   cv::Mat J_dot = calculateSpatialJacobianTemporalDerivative(jointIndex);
-  cv::Mat T1 = J_dot * getJointVelocitiesMatrix();
-  cv::Mat T2 = J * getJointAccelerationsMatrix();
+  cv::Mat T1 = J_dot * getCachedJointVelocities();
+  cv::Mat T2 = J * getCachedJointAccelerations();
   cv::Mat S1 = cedar::aux::math::wedgeTwist<double>(T1 + T2) * point_world;
   cv::Mat S2 = cedar::aux::math::wedgeTwist<double>(calculateSpatialJacobian(jointIndex)
-               * getJointVelocitiesMatrix())
+               * getCachedJointVelocities())
            * calculateVelocity(point_world, jointIndex, WORLD_COORDINATES);
   return S1 + S2;
 }

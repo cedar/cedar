@@ -208,7 +208,7 @@ void cedar::dev::kuka::KinematicChain::step(double)
       {
         case ACCELERATION:
         // increase speed for all joints
-        setJointVelocities(getJointVelocitiesMatrix() + getJointAccelerationsMatrix() * mpFriRemote->getSampleTime());
+        setJointVelocities(getCachedJointVelocities() + getCachedJointAccelerations() * mpFriRemote->getSampleTime());
         case VELOCITY:
           // change position for all joints
           for (unsigned i=0; i<LBR_MNJ; i++)
