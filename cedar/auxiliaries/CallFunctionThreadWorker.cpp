@@ -54,7 +54,7 @@ cedar::aux::detail::CallFunctionThreadWorker::~CallFunctionThreadWorker()
 
 void cedar::aux::detail::CallFunctionThreadWorker::work()
 {
-  // TODO: check whether wrapper (mpWrapper) still exists (paranoid)
+  CEDAR_ASSERT( mpWrapper != NULL );
 
   mpWrapper->call();
 

@@ -174,7 +174,6 @@ void runTests()
   thread.wait(1000);
   std::cout << "Stopping thread ..." << std::endl;
   thread.stop();
-
   if (thread.isRunning())
   {
     std::cout << "... Thread NOT stopped! error" << std::endl;
@@ -222,8 +221,6 @@ void runTests()
   errors += testConfiguration(0.0, 0.01, 1, cedar::aux::LoopMode::Fixed);
 
   std::cout << "Test finished, there were " << errors << " error(s)." << std::endl;
-
-  app->exit(); // return from app->exec() 
 }
 
 int main(int argc, char* argv[])
@@ -231,6 +228,8 @@ int main(int argc, char* argv[])
   app = new QCoreApplication(argc,argv);
 
   auto testThread = new cedar::aux::CallFunctionThread(runTests);
+
+  QObject::connect( testThread, SIGNAL(signalFinished()), app, SLOT(quit()), Qt::QueuedConnection );  // alternatively: call app->quit() in runTests()
 
   testThread->start();
   app->exec();

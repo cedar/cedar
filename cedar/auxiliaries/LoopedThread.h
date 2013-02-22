@@ -204,29 +204,23 @@ public:
     return this->_mLoopMode->getValue();
   }
 
-#if 0
-// TODO: finish this
   inline boost::posix_time::ptime getLastTimeStepStart() const
   {
-    if (validWorker())
-      return mpWorker->getLastTimeStepStart();
-    return 0;
+    CEDAR_ASSERT( mpWorker != NULL );
+    return mpWorker->getLastTimeStepStart();
   }
 
   inline boost::posix_time::ptime getLastTimeStepEnd() const
   {
-    if (validWorker())
-      return mpWorker->getLastTimeStepEnd();
-    return 0;
+    CEDAR_ASSERT( mpWorker != NULL );
+    return mpWorker->getLastTimeStepEnd();
   }
 
   inline boost::posix_time::time_duration getLastTimeStepDuration() const
   {
-    if (validWorker())
-      return mpWorker->getLastTimeStepDuration();
-    return 0;
+    CEDAR_ASSERT( mpWorker != NULL );
+    return mpWorker->getLastTimeStepDuration();
   }
-#endif  
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -237,7 +231,7 @@ protected:
   // private methods
   //----------------------------------------------------------------------------
 private:
-  void stopStatistics(bool suppressWarnings); // TODO: are the stats locked? // thread un-safe
+  void stopStatistics(bool suppressWarnings); // thread un-safe
 
   cedar::aux::detail::ThreadWorker* resetWorker();
 

@@ -65,7 +65,7 @@ class cedar::aux::detail::CallFunctionThreadWorker : public cedar::aux::detail::
   private:
 
   public:
-    void work(); // is a virtual slot in parent
+    void work(); // virtual in parent
 
   public:
 
