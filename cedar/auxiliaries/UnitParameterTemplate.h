@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/ParameterTemplate.h"
 
 // SYSTEM INCLUDES
@@ -49,6 +50,7 @@
 #include <boost/units/derived_dimension.hpp>
 #include <boost/units/get_dimension.hpp>
 #include <boost/units/quantity.hpp>
+#include <boost/units/systems/si/dimensionless.hpp>
 #include <boost/units/io.hpp>
 #include <boost/static_assert.hpp>
 
@@ -63,6 +65,14 @@ namespace cedar
       // If you see an error generated from here, you are using a dimension that is not implemented with parameters.
       // Specialize this function for the given dimension to prevent the error.
       BOOST_STATIC_ASSERT(sizeof(T) == 0);
+    }
+
+
+    template <>
+    boost::units::quantity<boost::units::si::dimensionless> getUnitFromPostFix(const std::string& postFix)
+    {
+      CEDAR_ASSERT(postFix.empty());
+      return 1.0;
     }
   }
 }
@@ -129,7 +139,7 @@ namespace cedar
 
       // could not find unit, throw exception
       //!@todo Proper exception
-      CEDAR_ASSERT(false);
+      CEDAR_THROW(cedar::aux::UnknownUnitSuffixException, "Could not find unit for suffix \"" + postFix + "\".");
     }
 
     /*!
@@ -159,8 +169,8 @@ namespace cedar
       std::vector<std::string> component_strs;
       cedar::aux::split(unit_str, " ", component_strs);
 
-      // there must be at least two strings specifying the unit, otherwise it would not be a compound.
-      CEDAR_ASSERT(component_strs.size() > 1);
+      // there must be at least one unit string
+      CEDAR_ASSERT(component_strs.size() >= 1);
 
       double numerator = 1.0;
       double denominator = 1.0;
@@ -236,9 +246,13 @@ namespace cedar
         // remove white space at the beginning and end of the string
         norm_str = cedar::aux::regexReplace(norm_str, "(^\\s+|\\s+$)", "");
 
-        size_t delim = norm_str.find_first_not_of("0123456789.");
+        size_t delim = norm_str.find_first_not_of("-0123456789.");
         std::string number_str = norm_str.substr(0, delim);
         std::string unit_str = norm_str.substr(delim);
+
+        //!@todo Proper exceptions
+        CEDAR_ASSERT(!number_str.empty());
+        CEDAR_ASSERT(!unit_str.empty());
 
         // normalize the white space in the unit
         unit_str = cedar::aux::regexReplace(unit_str, "\\s+", " ");

@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/UnitParameterTemplate.h"
+#include "cedar/auxiliaries/TimeParameter.h"
 
 // SYSTEM INCLUDES
 #include <boost/units/systems/si/frequency.hpp>
@@ -63,7 +64,26 @@ namespace cedar
         );
       }
 
-      return cedar::aux::findUnit(postFix, map);
+      try
+      {
+        return cedar::aux::findUnit(postFix, map);
+      }
+      catch (const cedar::aux::UnknownUnitSuffixException&)
+      {
+        return
+          cedar::aux::parseCompoundUnit
+                      <
+                        boost::units::si::frequency,
+                        boost::units::si::dimensionless,
+                        boost::units::si::time
+                      >(postFix);
+      }
+    }
+
+    template <>
+    boost::units::quantity<boost::units::si::frequency> parseUnitString(const std::string& unitStr)
+    {
+      return getUnitFromPostFix<boost::units::si::frequency>(unitStr);
     }
 
     // Generate types for the length parameter.
