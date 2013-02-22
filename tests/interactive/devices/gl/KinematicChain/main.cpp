@@ -82,7 +82,6 @@ int main(int argc, char **argv)
   cedar::aux::gui::SceneWidgetPtr scene_widget(new cedar::aux::gui::SceneWidget(scene));
   scene_widget->show();
 
-  test_arm->setWorkingMode(cedar::dev::robot::KinematicChain::VELOCITY);
   test_arm->start();
   test_arm->setJointVelocity(0, 0.31);
   test_arm->setJointVelocity(1, -.045);
@@ -101,7 +100,6 @@ int main(int argc, char **argv)
   second_arm_visualization->setDisplayBase(false);
   scene->addObjectVisualization(second_arm_visualization);
   test_arm->setEndEffector(second_arm->getRootCoordinateFrame());
-  second_arm->setWorkingMode(cedar::dev::robot::KinematicChain::VELOCITY);
   second_arm->setJointVelocity(0, 0.31);
   second_arm->setJointVelocity(1, -.45);
   second_arm->setJointVelocity(2, -.15);
