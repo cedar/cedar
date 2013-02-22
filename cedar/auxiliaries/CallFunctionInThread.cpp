@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CallFunctionThread.cpp
+    File:        CallFunctionInThread.cpp
 
     Maintainer:  Stephan Zibner
     Email:       stephan.zibner@ini.rub.de
     Date:        2010 12 02
 
-    Description: Implementation of the @em cedar::aux::CallFunctionThread class.
+    Description: Implementation of the @em cedar::aux::CallFunctionInThread class.
 
     Credits:
 
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/CallFunctionThread.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 
@@ -46,7 +46,7 @@
 //------------------------------------------------------------------------------
 // constructors and destructor
 //------------------------------------------------------------------------------
-cedar::aux::CallFunctionThread::CallFunctionThread
+cedar::aux::CallFunctionInThread::CallFunctionInThread
 (
   FunctionType fun
 )
@@ -54,7 +54,7 @@ cedar::aux::CallFunctionThread::CallFunctionThread
 {
 }
 
-cedar::aux::CallFunctionThread::~CallFunctionThread()
+cedar::aux::CallFunctionInThread::~CallFunctionInThread()
 {
 }
 
@@ -62,14 +62,14 @@ cedar::aux::CallFunctionThread::~CallFunctionThread()
 // methods
 //------------------------------------------------------------------------------
 
-void cedar::aux::CallFunctionThread::call()
+void cedar::aux::CallFunctionInThread::call()
 {
   // called via friend worker class
   mFunction();
 }
 
-cedar::aux::detail::ThreadWorker* cedar::aux::CallFunctionThread::resetWorker()
+cedar::aux::detail::ThreadWorker* cedar::aux::CallFunctionInThread::resetWorker()
 {
-  return new cedar::aux::detail::CallFunctionThreadWorker(this);
+  return new cedar::aux::detail::CallFunctionInThreadWorker(this);
 }
 

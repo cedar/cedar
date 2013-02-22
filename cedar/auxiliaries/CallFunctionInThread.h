@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CallFunctionThread.h
+    File:        CallFunctionInThread.h
 
     Maintainer:  Stephan Zibner
     Email:       stephan.zibner@ini.rub.de
     Date:        2010 12 02
 
-    Description: Header for the @em cedar::aux::CallFunctionThread class.
+    Description: Header for the @em cedar::aux::CallFunctionInThread class.
 
     Credits:
 
@@ -48,7 +48,7 @@
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/LoopMode.h"
 #include "cedar/auxiliaries/ThreadWrapper.h"
-#include "cedar/auxiliaries/CallFunctionThreadWorker.h"
+#include "cedar/auxiliaries/CallFunctionInThreadWorker.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -59,13 +59,13 @@
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
 
-class cedar::aux::CallFunctionThread : public cedar::aux::ThreadWrapper
+class cedar::aux::CallFunctionInThread : public cedar::aux::ThreadWrapper
 {
   //----------------------------------------------------------------------------
   // friends
   //----------------------------------------------------------------------------
 
-  friend class cedar::aux::detail::CallFunctionThreadWorker;
+  friend class cedar::aux::detail::CallFunctionInThreadWorker;
 
 public:
   //----------------------------------------------------------------------------
@@ -79,10 +79,10 @@ public:
   //----------------------------------------------------------------------------
 public:
 
-  CallFunctionThread(FunctionType fun);
+  CallFunctionInThread(FunctionType fun);
 
   //!@brief Destructor
-  virtual ~CallFunctionThread();
+  virtual ~CallFunctionInThread();
 
   //----------------------------------------------------------------------------
   // public methods
@@ -119,7 +119,7 @@ protected:
   // none yet
 
 private:
-  cedar::aux::detail::CallFunctionThreadWorker* mpWorker;
-}; // class cedar::aux::CallFunctionThread
+  cedar::aux::detail::CallFunctionInThreadWorker* mpWorker;
+}; // class cedar::aux::CallFunctionInThread
 
 #endif // CEDAR_AUX_LOOPED_THREAD_H
