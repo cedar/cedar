@@ -24,8 +24,38 @@
 
 // SYSTEM INCLUDES
 #include <QtGui/QApplication>
+#include <ios>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Local methods
+// ---------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  void processQtEvents()
+  {
+#ifdef CEDAR_OS_APPLE
+    unsigned int event_counter = 0;
+    while (QApplication::hasPendingEvents() && (++event_counter < 1000))
+#else
+    while (QApplication::hasPendingEvents())
+#endif
+    {
+      QApplication::processEvents();
+    }
+  }
 
+  void showUsage(std::string programName)
+  {
+    std::cout << "\n\nInteractive test for the VideoGrabber class.\n\n"
+        << "Usage: \t" << programName << " <VideoFile>\n"
+        << std::endl;
+  }
+
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Interactive test program
+// ---------------------------------------------------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
 
@@ -33,33 +63,41 @@ int main(int argc, char* argv[])
   //constants
   //--------------------------------------------------------------------------------------------------------------------
 
-  const std::string FILE_NAME_0 = "/home/ghartinger/Videos/rhinos.avi";
-  const std::string FILE_NAME_1 = "/home/ghartinger/Videos/traffic.avi";
-
-  const std::string GRABBER_NAME = "stereo_p_grabber_testcase";
-  const std::string CONFIG_FILE_NAME = "stereo_p_grabber_testcase.config";
-
-  //title of highgui window
-  const std::string window_title0 = FILE_NAME_0;
-  const std::string window_title1 = FILE_NAME_1;
+  const std::string GRABBER_NAME = "VideoGrabber_testcase";
+  const std::string CONFIG_FILE_NAME = "VideoGrabber_testcase.config";
 
   //--------------------------------------------------------------------------------------------------------------------
   //main test
   //--------------------------------------------------------------------------------------------------------------------
 
-  std::cout << "\n\nInteractive test of the VideoGrabber class\n";
-  std::cout << "--------------------------------------------\n\n";
+  //get filename of video
+  if (argc < 2)
+  {
+    showUsage(argv[0]);
+    return -1;
+  }
 
+  const std::string filename_channel0 = std::string(argv[1]);
+  const std::string window_title = "VideoGrabber: \""+ filename_channel0 + "\"";
+
+  std::cout.setf(std::ios::fixed,std::ios::floatfield);
+  std::cout.precision(3);
+
+  std::cout << "\n\nInteractive test of the VideoGrabber class (mono)\n";
+  std::cout << "--------------------------------------------\n\n";
 
   //----------------------------------------------------------------------------------------
   //Create the grabber
   //----------------------------------------------------------------------------------------
 
   std::cout << "Create a VideoGrabber:\n";
-  cedar::dev::sensors::visual::VideoGrabber *p_grabber=NULL;
+  cedar::dev::sensors::visual::VideoGrabberPtr p_grabber;
   try
   {
-     p_grabber = new cedar::dev::sensors::visual::VideoGrabber(FILE_NAME_0, FILE_NAME_1);
+    p_grabber = cedar::dev::sensors::visual::VideoGrabberPtr
+                (
+                  new cedar::dev::sensors::visual::VideoGrabber(filename_channel0)
+                );
   }
   catch (cedar::aux::InitializationException &e)
   {
@@ -68,15 +106,10 @@ int main(int argc, char* argv[])
     std::cout << "Error on creation of the VideoGrabber class:\n"
               << e.exceptionInfo() << std::endl;
 
-    if (p_grabber)
-    {
-      delete p_grabber;
-    }
-
     return -1;
   }
 
-  //test: installCrashHandler
+  // install crash-handler not necessary. No hardware and no files for writing needed
   cedar::dev::sensors::visual::Grabber::installCrashHandler();
 
   //----------------------------------------------------------------------------------------
@@ -91,68 +124,78 @@ int main(int argc, char* argv[])
     std::cout << "No configuration exists!" << std::endl;
   }
 
-  // this step is essential. If you don't apply the default or loaded Parameter, the grabber will not work
+  //----------------------------------------------------------------------------------------
+  // apply configuration. this step is mandatory.
+  //----------------------------------------------------------------------------------------
+  // if you don't apply the default or loaded Parameter, the grabber will not work
   // check if grabber is created successfully
   if (! p_grabber->applyParameter())
   {
     // an error occured during initialization. Perhaps the file doesn't exist
-    if (p_grabber)
-    {
-      delete p_grabber;
-    }
     return -1;
   }
 
   //----------------------------------------------------------------------------------------
-  //Create a cedar::aux::gui ImagePlot widget to show grabbed frames
+  // grab first frame
   //----------------------------------------------------------------------------------------
 
   //the first frame is already grabbed on initialization
-  cv::Mat frame0 = p_grabber->getImage();
-  cv::Mat frame1 = p_grabber->getImage(1);
+  //p_grabber->grab();
+
+  //the first frame is now grabbed and could be read
+  //always use the QReadWriteLock for locking the cv::Mat image object on access
+  QReadWriteLock* p_lock = p_grabber->getReadWriteLockPointer();
+
+  //the local image buffer
+  cv::Mat frame0;
+
+  //get the picture from the grabber
+  p_lock->lockForRead();
+  frame0 = p_grabber->getImage();
+  p_lock->unlock();
+
+  //----------------------------------------------------------------------------------------
+  // Create a cedar::aux::gui ImagePlot widget to show grabbed frames
+  //----------------------------------------------------------------------------------------
 
   QApplication app(argc, argv);
-  cedar::aux::gui::ImagePlotPtr p_plot0 = cedar::aux::gui::ImagePlotPtr(new cedar::aux::gui::ImagePlot());
-  cedar::aux::MatDataPtr p_data0 = cedar::aux::MatDataPtr(new cedar::aux::MatData(frame0));
-  p_plot0->plot(p_data0,window_title0);
-  p_plot0->show();
-  p_plot0->resize(frame0.cols,frame0.rows);
+  cedar::aux::gui::ImagePlotPtr p_plot = cedar::aux::gui::ImagePlotPtr(new cedar::aux::gui::ImagePlot());
+  cedar::aux::MatDataPtr p_data = cedar::aux::MatDataPtr(new cedar::aux::MatData(frame0));
+  p_plot->plot(p_data,window_title);
+  p_plot->setWindowTitle(QString::fromStdString(window_title));
+  p_plot->show();
+  p_plot->resize(frame0.cols,frame0.rows);
 
-  cedar::aux::gui::ImagePlotPtr p_plot1 = cedar::aux::gui::ImagePlotPtr(new cedar::aux::gui::ImagePlot());
-  cedar::aux::MatDataPtr p_data1 = cedar::aux::MatDataPtr(new cedar::aux::MatData(frame1));
-  p_plot1->plot(p_data1,window_title1);
-  p_plot1->show();
-  p_plot1->resize(frame1.cols,frame1.rows);
+  //process the events generated inside QT-Framework
+  processQtEvents();
 
-
-  while (QApplication::hasPendingEvents())
-  {
-    QApplication::processEvents();
-  }
+  //----------------------------------------------------------------------------------------
+  //start the grabber-thread for updating camera images with 30 fps
+  //----------------------------------------------------------------------------------------
 
   //start the grabbing-thread. It is possible to set a speedfactor
   p_grabber->setSpeedFactor(1);
-
 
   std::cout << "VideoGrabber thread FPS    : " << p_grabber->getFps() << std::endl;
   p_grabber->start();
 
   unsigned int counter_stat = 0;
 
-  //get frames until avi is over
-  //here: never because we have set loop to true
-  while (!frame0.empty() && !frame1.empty() && p_plot0->isVisible() && p_plot1->isVisible())
+  //get frames until avi is over, but here: never because we have set loop to true
+  //close window to finish test
+  while (!frame0.empty() && p_plot->isVisible())
   {
-    while (QApplication::hasPendingEvents())
-    {
-      QApplication::processEvents();
-    }
+    //process the events generated inside QT-Framework
+    processQtEvents();
 
-    frame0 = p_grabber->getImage(0);
-    frame1 = p_grabber->getImage(1);
+    p_lock->lockForRead();
+    p_data->lockForWrite();
+    frame0 = p_grabber->getImage();
+    p_data->unlock();
+    p_lock->unlock();
 
     //status
-    if (++counter_stat %= 3 )
+    if (!(++counter_stat %= 100))
     {
       std::cout << "Measured FPS: " << p_grabber->getFpsMeasured()
                 << "\tPos_Rel: "<< p_grabber->getPositionRelative()
@@ -160,7 +203,10 @@ int main(int argc, char* argv[])
                 << std::endl;
     }
 
-    cedar::aux::sleep(cedar::unit::Milliseconds(1));
+    // watch the output - everything should be fine.
+    //The video is much slower than 100 fps.
+    cedar::aux::sleep(cedar::unit::Milliseconds(10));
+
   }
 
   //----------------------------------------------------------------------------------------
@@ -175,16 +221,9 @@ int main(int argc, char* argv[])
 
   //stop grabbing-thread if running
   //recording will also be stopped
-  if (p_grabber->isRunning())
-  {
-    p_grabber->stop();
-  }
+  p_grabber->stopGrabber();
 
-  if (p_grabber)
-  {
-   delete p_grabber;
-  }
-
+  //delete p_grabber is done via the shared-pointer class
   std::cout << "finished\n";
 
   return 0;

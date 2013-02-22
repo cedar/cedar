@@ -1,6 +1,6 @@
 /*=============================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinforsik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinforsik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -39,8 +39,6 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/datatypesupport/std/StringHelper.h"
-
-#include "cedar/auxiliaries/net/detail/datatypesupport/interfaces/InterfaceCollatedData.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatNetHeader.h"
 
 // PROJECT INCLUDES

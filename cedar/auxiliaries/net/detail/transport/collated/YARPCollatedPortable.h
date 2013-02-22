@@ -1,6 +1,6 @@
 /*=============================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -148,7 +148,7 @@ public:
       // (i.e. cv::Mat) so we can only do this at the time of the first
       // read
     
-      mpVals= static_cast<char*>( malloc( data_size ) );
+      mpVals= static_cast<char*>(malloc(data_size));
 
       if (mpVals == NULL)
       {
@@ -163,8 +163,7 @@ public:
       mNetType.mData= mNetType.lateInitDataFromHeader();
     }
 
-    connection.expectBlock( static_cast<char*>(mpVals),
-                            data_size );
+    connection.expectBlock(static_cast<char*>(mpVals), data_size );
 
     //////////// now we have the data-part ///////////
 
@@ -206,13 +205,12 @@ public:
     // write matrix content to network ...
     if (mpVals == NULL)
     {
-      mpVals= static_cast<char*>( malloc( data_size ) );
+      mpVals= static_cast<char*>(malloc(data_size));
     }
 
     mNetType.writeToMemory(mpVals); // specialized depending on T
  
-    connection.appendBlock( static_cast<char*>(mpVals),
-                           data_size );
+    connection.appendBlock(static_cast<char*>(mpVals), data_size );
       // YARP will copy this block internally TODO: ist that necessary?
  
     connection.convertTextMode(); // if connection is text-mode, convert!

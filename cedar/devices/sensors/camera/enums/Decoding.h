@@ -50,7 +50,7 @@
 /*!@brief Enum class to determine the applied bayer pattern (if needed)
  *
  *  For all available filters have a look at:
- *    <OPENCV>/modules/imgproc/include/opencv2/imgproc/types_c.h
+ *      &lt;OpenCV_dir&gt;/modules/imgproc/include/opencv2/imgproc/types_c.h
  *
  *  cv::Mat stores the images in BGR format, so only that filters mapped here
  *
@@ -61,27 +61,29 @@ class cedar::dev::sensors::camera::Decoding
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Typedef for the enum values
   typedef cedar::aux::EnumId Id;
 public:
+  //! Typedef for this enum as shared pointer
   typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
-
-private:
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-
-  //!@brief Destructor
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Construct
   static void construct();
 
+  //! Type
   static const cedar::aux::EnumBase& type();
+
+  //! Type Pointer
   static const cedar::dev::sensors::camera::Decoding::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------

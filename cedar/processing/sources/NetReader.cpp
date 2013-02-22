@@ -1,6 +1,6 @@
 /*=============================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -63,7 +63,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr input_declaration
+    ElementDeclarationPtr declaration
     (
       new ElementDeclarationTemplate<cedar::proc::sources::NetReader>
       (
@@ -71,9 +71,10 @@ namespace
         "cedar.processing.sources.NetReader"
       )
     );
-    input_declaration->setIconPath(":/steps/net_reader.svg");
-    input_declaration->setDescription("Reads a matrix from a yarp port.");
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(input_declaration);
+    declaration->setIconPath(":/steps/net_reader.svg");
+    declaration->setDescription("Reads a matrix from a yarp port.");
+
+    declaration->declare();
 
     return true;
   }

@@ -1,6 +1,6 @@
 /*=============================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -331,6 +331,13 @@ public:
                        : cedar::aux::net::detail::CollatedNetReader<std::string, false>(s)
   {
   }
+
+private:
+  bool checkCollatedDataForRead(const cedar::aux::net::detail::CollatedTraits<std::string>::HeaderType &header)
+  {
+    return cedar::aux::net::detail::StringHelper<std::string>::checkCollatedDataForRead(header);
+  }
+
 };
 
   //---------------------------------------------------------------------------
@@ -349,6 +356,13 @@ public:
                            cedar::aux::net::detail::CollatedNetReader<cv::Mat, false>(myPortName)
   {
   }
+
+private:
+  bool checkCollatedDataForRead(const cedar::aux::net::detail::CollatedTraits<cv::Mat>::HeaderType &header)
+  {
+    return cedar::aux::net::detail::cvMatHelper<cv::Mat>::checkCollatedDataForRead(header);
+  }
+
 };
 
   //---------------------------------------------------------------------------
@@ -368,6 +382,13 @@ public:
                            cedar::aux::net::detail::CollatedNetReader< cv::Mat_<float> , false>(myPortName)
   {
   }
+
+private:
+  bool checkCollatedDataForRead(const cedar::aux::net::detail::CollatedTraits<cv::Mat_<float> >::HeaderType &header)
+  {
+    return cedar::aux::net::detail::cvMatHelper<cv::Mat_<float> >::checkCollatedDataForRead(header);
+  }
+
 };
 
 //!@endcond

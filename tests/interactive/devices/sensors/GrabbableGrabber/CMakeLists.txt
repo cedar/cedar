@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -35,6 +35,6 @@
 #=======================================================================================================================
 
 if (CEDAR_USE_YARP)
-  cedar_add_interactive_test( "GrabbableGrabberTest" GrabbableGrabberTest.cpp )
+  cedar_add_interactive_test( "GrabbableGrabber" GrabbableGrabberTest.cpp )
 endif()
 

@@ -1,6 +1,6 @@
 /*=============================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -29,7 +29,6 @@
     Date:        Wed 20 Jul 2011
 
     Description: Helper class for openCV matrices. Implements some checks 
-                 we need to conform to the InterfaceCollatedData 
 
     Credits:
 
@@ -41,7 +40,6 @@
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatHelper.h"
 
-#include "cedar/auxiliaries/net/detail/datatypesupport/interfaces/InterfaceCollatedData.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatNetHeader.h"
 #include "cedar/auxiliaries/net/exceptions.h"
 

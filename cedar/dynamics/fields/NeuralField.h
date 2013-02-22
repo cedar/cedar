@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -126,6 +126,13 @@ public:
   /*!@brief Whether the activation is currently declared as output or buffer.
    */
   bool activationIsOutput() const;
+
+  /*!@brief Marks the activation as output.
+   */
+  void setActivationIsOutput(bool value)
+  {
+    this->_mOutputActivation->setValue(value);
+  }
 
 public slots:
   //!@brief handle a change in dimensionality, which leads to creating new matrices

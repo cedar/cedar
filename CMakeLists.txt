@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -57,6 +57,9 @@ set(CEDAR_CMAKE_DIR "${CEDAR_HOME}/cmake" CACHE PATH "Directory all additional C
 # include the macro section
 include(${CEDAR_CMAKE_DIR}/macros.txt)
 
+#include the version information
+include(${CEDAR_CMAKE_DIR}/version.txt)
+
 # general setup of cedar variables
 include(${CEDAR_CMAKE_DIR}/setup.txt)
 
@@ -69,12 +72,15 @@ include(${CEDAR_CMAKE_DIR}/testing.txt)
 # setup of executables
 include(${CEDAR_CMAKE_DIR}/executables.txt)
 
+# setup documentation
+include(${CEDAR_CMAKE_DIR}/doxygen.txt)
+
 # setup of files that are installed (additionally to the libraries)
 include(${CEDAR_CMAKE_DIR}/install.txt)
 
 # setup of packaging
 include(${CEDAR_CMAKE_DIR}/packaging.txt)
 
-# setup documentation
-include(${CEDAR_CMAKE_DIR}/doxygen.txt)
+# output configuration summary
+include(${CEDAR_CMAKE_DIR}/summary.txt)
 

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -93,7 +93,7 @@ int main()
   std::cout << "Testing Configurable::copyTo" << std::endl;
   b->setI(7);
   b->copyTo(a);
-  if (b->getI() != 7)
+  if (boost::dynamic_pointer_cast<TestClass>(a)->getI() != 7)
   {
     ++errors;
     std::cout << "Configurable::copyTo did not copy correctly";
@@ -142,5 +142,24 @@ int main()
 
     std::cout << "done." << std::endl;
   }
+
+  {
+    std::cout << "Testing access to parameter ... ";
+
+    cedar::aux::ParameterPtr my_parameter = a->getParameter("i");
+    if (boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(my_parameter)->getValue() != 7)
+    {
+      std::cout << "ERROR failed to access the parameter using a non-templated getParameter()." << std::endl;
+      ++errors;      
+    }
+    
+    cedar::aux::UIntParameterPtr my_uint_parameter = a->getParameter<cedar::aux::UIntParameter>("i");
+    if (my_uint_parameter->getValue() != 7)
+    {
+      std::cout << "ERROR failed to access the parameter using a templated getParameter()." << std::endl;
+      ++errors;      
+    }
+  }
+
   return errors;
 }

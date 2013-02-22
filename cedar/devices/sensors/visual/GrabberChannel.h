@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -74,7 +74,6 @@ public:
   _mSnapshotName(new cedar::aux::FileParameter(this,"snapshot file",cedar::aux::FileParameter::WRITE,"./snapshot.jpg")),
   _mRecordName(new cedar::aux::FileParameter(this, "record file",cedar::aux::FileParameter::WRITE,"./record.avi"))
   {
-    //init classes
   };
 
   //!@brief Destructor
@@ -127,7 +126,6 @@ protected:
 
 private:
   // none yet
-
 
 }; // class cedar::dev::sensors::visual::GrabberChannel
 

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -81,6 +81,8 @@ mAutoLockInputsAndOutputs(true),
 _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
+
+  this->_mRunInThread->markAdvanced();
 
   // create the finished trigger singleton.
   this->getFinishedTrigger();

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -83,7 +83,14 @@ cv::Mat cedar::aux::conv::KernelList::getCombinedKernel() const
       {
         int dw = std::max(0, (kernel_mat.cols - new_combined_kernel.cols + 1)/2);
         int dh = std::max(0, (kernel_mat.rows - new_combined_kernel.rows + 1)/2);
+        // in-place copyMakeBorder is apparently not supported in opencv < 2.4
+#if CV_MAJOR_VERSION < 2 || (CV_MAJOR_VERSION <= 2 && CV_MINOR_VERSION < 4)
+        cv::Mat tmp;
+        cv::copyMakeBorder(new_combined_kernel, tmp, dh, dh, dw, dw, cv::BORDER_CONSTANT, cv::Scalar(0));
+        new_combined_kernel = tmp;
+#else // OpenCV version >= 2.4
         cv::copyMakeBorder(new_combined_kernel, new_combined_kernel, dh, dh, dw, dw, cv::BORDER_CONSTANT, cv::Scalar(0));
+#endif // OpenCV version
       }
       int row_lower = (new_combined_kernel.rows - kernel_mat.rows)/2;
       int row_upper = row_lower + kernel_mat.rows;

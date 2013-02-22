@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -42,12 +42,13 @@
 #define CEDAR_PROC_ELEMENT_DECLARATION_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/DeclarationBase.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/DataRole.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/FactoryDerived.h"
+#include "cedar/auxiliaries/PluginDeclaration.h"
+#include "cedar/auxiliaries/PluginDeclarationTemplate.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -57,11 +58,7 @@
  * create a step of this id. It is a concretization of DeclarationBase.
  * @todo With the revised factory, passing the factory type is probably unnecessary
  */
-class cedar::proc::ElementDeclaration : public cedar::proc::DeclarationBase
-                                               <
-                                                 cedar::proc::Element,
-                                                 cedar::aux::Factory<cedar::proc::ElementPtr>
-                                               >
+class cedar::proc::ElementDeclaration : public cedar::aux::PluginDeclarationBaseTemplate<cedar::proc::ElementPtr>
 {
 public:
   //!@brief list that pairs a data role with the desired plot
@@ -72,24 +69,10 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  //!@brief The standard constructor.
-  ElementDeclaration(
-                      cedar::proc::ElementFactoryPtr classFactory,
-                      const std::string& classId,
-                      const std::string& category
-                    )
+public:
+  ElementDeclaration(const std::string& category, const std::string& className = "")
   :
-  DeclarationBase<cedar::proc::Element, cedar::aux::Factory<cedar::proc::ElementPtr> >
-  (
-    classFactory,
-    classId,
-    category
-  )
-  {
-  }
-
-  //!@brief Destructor
-  ~ElementDeclaration()
+  cedar::aux::PluginDeclarationBaseTemplate<cedar::proc::ElementPtr>(category, className)
   {
   }
 
@@ -154,6 +137,9 @@ public:
     return this->mPlots;
   }
 
+  //! Overriden in the templated version by the super class implementation.
+  virtual void declare() const = 0;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -186,11 +172,22 @@ private:
 /*!@brief This is a template class for comfortably generating element declarations.
  */
 template <class DerivedClass>
-class cedar::proc::ElementDeclarationTemplate : public ElementDeclaration
+class cedar::proc::ElementDeclarationTemplate
+    :
+    public cedar::aux::PluginDeclarationTemplate
+    <
+      cedar::proc::ElementPtr,
+      boost::shared_ptr<DerivedClass>,
+      cedar::proc::ElementDeclaration
+    >
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef
+      cedar::aux::PluginDeclarationTemplate<cedar::proc::ElementPtr, boost::shared_ptr<DerivedClass>, cedar::proc::ElementDeclaration>
+      DeclarationSuper;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -203,38 +200,19 @@ public:
    *                 example, a class test::namespaceName::ClassName will result in the name
    *                 test.namespaceName.ClassName.
    */
-
   ElementDeclarationTemplate(const std::string& category, const std::string& classId = "")
   :
-  ElementDeclaration
+  DeclarationSuper
   (
-    cedar::proc::ElementFactoryPtr
-    (
-      new cedar::aux::FactoryDerived<cedar::proc::ElementPtr, boost::shared_ptr<DerivedClass> >()
-    ),
-    classId,
-    category
+    category,
+    classId
   )
   {
-    // if no class name is specified,
-    if (classId.empty())
-    {
-      std::string class_name = cedar::aux::unmangleName(typeid(DerivedClass));
-      class_name = cedar::aux::replace(class_name, "::", ".");
-      this->setClassId(class_name);
-    }
   }
 
-  //!@brief Destructor
-  ~ElementDeclarationTemplate()
+  void declare() const
   {
-  }
-
-  //!@brief checks if a generic Element is of a given child type (the template parameter of ElementDeclarationT)
-  //!@param pointer step instance that is checked
-  bool isObjectInstanceOf(cedar::proc::ElementPtr pointer)
-  {
-    return dynamic_cast<DerivedClass*>(pointer.get()) != NULL;
+    DeclarationSuper::declare();
   }
 }; // class cedar::proc::ElementDeclarationTemplate
 

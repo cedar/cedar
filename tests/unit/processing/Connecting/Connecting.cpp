@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -38,6 +38,7 @@
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Network.h"
 #include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/DoubleData.h"
 
 
 class TestModule : public cedar::proc::Step

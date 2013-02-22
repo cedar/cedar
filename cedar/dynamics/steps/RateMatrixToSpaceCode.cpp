@@ -58,7 +58,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr rate_to_space_decl
+    ElementDeclarationPtr declaration
     (
       new ElementDeclarationTemplate<cedar::dyn::RateMatrixToSpaceCode>
       (
@@ -66,8 +66,8 @@ namespace
         "cedar.dynamics.RateMatrixToSpaceCode"
       )
     );
-    rate_to_space_decl->setIconPath(":/steps/rate_matrix_to_space_code.svg");
-    rate_to_space_decl->setDescription
+    declaration->setIconPath(":/steps/rate_matrix_to_space_code.svg");
+    declaration->setDescription
     (
       "Transforms a (2D) matrix of rate code to (3D) space code. This step assumes that the input contains rate code "
       "values in a meaningful interval described by the parameters lower and upper boundary. For each entry, this step"
@@ -75,7 +75,8 @@ namespace
       "fills the resulting 3D matrix with ones for each rate code bin entry. If other values are desired, a separate"
       "input can be used to provide those."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(rate_to_space_decl);
+
+    declaration->declare();
 
     return true;
   }

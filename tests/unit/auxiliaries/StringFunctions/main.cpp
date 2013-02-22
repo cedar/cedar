@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -121,6 +121,27 @@ int main()
     if (result.at(0) != to_split)
     {
       std::cout << "Error: split returned the wrong result." << std::endl;
+      ++errors;
+    }
+  }
+
+  to_split = "split::test::multichar";
+  std::cout << "Splitting string: \"" << to_split << "\"" << std::endl;
+  cedar::aux::split(to_split, "::", result);
+  if (result.size() != 3)
+  {
+    std::cout << "Error: split result has the wrong size." << std::endl;
+    ++errors;
+  }
+  else
+  {
+    if (result[0] != "split" || result[1] != "test" || result[2] != "multichar")
+    {
+      std::cout << "Error: split result is wrong. Components: "
+                << "\"" << result[0] << "\", "
+                << "\"" << result[1] << "\", "
+                << "\"" << result[2] << "\"."
+                << std::endl;
       ++errors;
     }
   }

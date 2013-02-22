@@ -1,6 +1,6 @@
 /*=============================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -69,7 +69,8 @@ namespace
     );
     input_declaration->setIconPath(":/steps/net_writer.svg");
     input_declaration->setDescription("Writes incoming matrices to a yarp port.");
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(input_declaration);
+
+    input_declaration->declare();
 
     return true;
   }

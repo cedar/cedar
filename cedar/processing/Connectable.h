@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -146,7 +146,14 @@ public:
   //!@brief Checks the validity of a slot.
   cedar::proc::DataSlot::VALIDITY getInputValidity(const std::string& slotName);
 
-  //!@brief Function that determines the validity of input data.
+  /*!@brief   Function that determines the validity of input data.
+   *
+   *          This can be overloaded in child classes to provide custom validation for incoming data.
+   *
+   * @remarks This method is thread-safe, i.e., all inputs, outputs and buffers are locked for reading.
+   *
+   * @return  Whether setting the data in the slot would be valid.
+   */
   virtual cedar::proc::DataSlot::VALIDITY determineInputValidity
                                           (
                                             cedar::proc::ConstDataSlotPtr slot,

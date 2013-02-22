@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -110,6 +110,26 @@ public:
   //!@brief set flag if this parameter is hidden (for GUI)
   void setHidden(bool hide);
 
+  /*!@brief   Marks this parameter as advanced.
+   *
+   *          Advanced parameters are those that usually don't need to be changed. This is mainly used by user interfaces
+   *          to avoid cluttering lists with parameters that are rarely needed, or may need specific knowledge to be
+   *          set to proper values.
+   *
+   * @remarks Currently, this should not be changed at runtime; call this once, right after you add the parameter to a
+   *          configurable.
+   */
+  void markAdvanced(bool advanced = true)
+  {
+    this->mAdvanced = advanced;
+  }
+
+  //!@brief Returns whether this parameter is marked as advanced.
+  bool isAdvanced() const
+  {
+    return this->mAdvanced;
+  }
+
   //!@brief emit the value changed signal
   void emitChangedSignal();
   //!@brief emit the property changed signal
@@ -199,6 +219,9 @@ private:
 
   //! Flag that indicates whether this parameter was changed since the last file reading.
   bool mChanged;
+
+  //! Flag that indicates whether this parameter is advanced.
+  bool mAdvanced;
 
   //! Lock for the parameter.
   mutable QReadWriteLock* mpLock;

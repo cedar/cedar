@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -61,13 +61,12 @@ class cedar::dev::sensors::visual::GrabberRecordingException : public cedar::aux
 {
 };
 
-
 //--------------------------------------------------------------------------------------------------------------------
 
 /*! @brief Exception for errors while recording a stream
  *
  *    This exception would be thrown when an error occurs during recording.
- * \remarks
+ *  @remarks
  *    This is a critical exception. The grabber-cleanup is performed right before this exception is thrown.<br>
  *    In this case, it is not possible to work any longer with this grabber.
  */
