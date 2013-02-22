@@ -43,8 +43,10 @@
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/math/constants.h"
+#include "cedar/processing/exceptions.h" // for DuplicateNameException
 
 // SYSTEM INCLUDES
+#include <boost/lexical_cast.hpp>
 
 namespace
 {
@@ -79,6 +81,7 @@ mpEndEffectorCoordinateFrame(pEndEffector)
 //! destructor
 cedar::dev::robot::KinematicChain::~KinematicChain()
 {
+  // TODO: jokeit: is this necessary? seems buggy.
   if (isRunning())
   {
     this->stop();
@@ -219,7 +222,7 @@ cedar::dev::robot::KinematicChain::ActionType cedar::dev::robot::KinematicChain:
 void cedar::dev::robot::KinematicChain::setJointAngles(const std::vector<double>& angles)
 {
   // @todo: for security reasons setting angles should be only allowed
-  //        in STOP or ANGLE mode
+  //        in STOP or ANGLE mode. except initial set!
 
   if(angles.size() != getNumberOfJoints())
   {
@@ -243,7 +246,7 @@ void cedar::dev::robot::KinematicChain::setJointAngles(const std::vector<double>
     angle = std::min<double>(angle, getJoint(i)->_mpAngleLimits->getUpperLimit());
 
     setJointAngle(i, angle);
-    // locking done in setJointAngle()
+    // locking is done in setJointAngle()
   }
 
   return;
@@ -560,6 +563,8 @@ void cedar::dev::robot::KinematicChain::init()
   default_joint->_mpVelocityLimits->setUpperLimit(2*cedar::aux::math::pi);
   this->mpJoints->pushBack(default_joint);
   initializeFromJointList();
+
+  checkInitialConfigurations();
 }
 
 void cedar::dev::robot::KinematicChain::initializeFromJointList()
@@ -626,6 +631,7 @@ void cedar::dev::robot::KinematicChain::initializeFromJointList()
 
 void cedar::dev::robot::KinematicChain::applyAngleLimits(cv::Mat& /*angles*/)
 {
+// TODO: jokeit, why is this commented-out?
 //  for (unsigned i = 0; i < getNumberOfJoints(); i++)
 //  {
 //    double angle = angles.at<double>(i, 0);
@@ -638,6 +644,7 @@ void cedar::dev::robot::KinematicChain::applyAngleLimits(cv::Mat& /*angles*/)
 
 void cedar::dev::robot::KinematicChain::applyVelocityLimits(cv::Mat& /*velocities*/)
 {
+// TODO: jokeit, why is this commented-out?
 //  for (unsigned i = 0; i < getNumberOfJoints(); i++)
 //  {
 //    double velocity = velocities.at<double>(i, 0);
@@ -694,6 +701,7 @@ void cedar::dev::robot::KinematicChain::start(Priority priority)
 
 void cedar::dev::robot::KinematicChain::useCurrentHardwareValues(bool useCurrentHardwareValues)
 {
+  // TODO: needs locking, but not important
   mUseCurrentHardwareValues = useCurrentHardwareValues;
 }
 
@@ -1151,3 +1159,230 @@ const cedar::dev::robot::KinematicChain::JointPtr cedar::dev::robot::KinematicCh
 {
   return mpJoints->at(index);
 }
+
+
+
+void cedar::dev::robot::KinematicChain::setInitialConfigurations(std::map<std::string, cv::Mat> configs)
+{
+  QWriteLocker wlock(&mCurrentInitialConfigurationLock);
+
+  mInitialConfigurations.clear();
+  for( std::map< std::string, cv::Mat >::const_iterator it = configs.begin(); it != configs.end(); ++it)
+  {
+    mInitialConfigurations[ it->first ] = it->second.clone();
+    // it is important to clone the cv::Mats!
+  }
+
+  wlock.unlock();
+  checkInitialConfigurations();
+}
+
+void cedar::dev::robot::KinematicChain::addInitialConfiguration(const std::string &name, const cv::Mat &config)
+{
+  QWriteLocker wlock(&mCurrentInitialConfigurationLock);
+
+  auto found = mInitialConfigurations.find(name);
+  if (found != mInitialConfigurations.end())
+  {
+    CEDAR_THROW( cedar::proc::DuplicateNameException , 
+                 "You are adding the initial configuration name '"
+                   + name + "' which already exists. Delete it first." );
+    return;
+  }
+
+  mInitialConfigurations[ name ] = config.clone();
+
+  wlock.unlock();
+  checkInitialConfigurations();
+}
+
+void cedar::dev::robot::KinematicChain::deleteInitialConfiguration(const std::string &name)
+{
+  QWriteLocker wlock(&mCurrentInitialConfigurationLock);
+
+  auto found = mInitialConfigurations.find(name);
+  if (found == mInitialConfigurations.end())
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "You are deleting the initial configuration " + name 
+      + " which doesn't exist.",
+      "cedar::dev::robot::KinematicChain::deleteInitialConfiguration(const std::string &name)"
+    );
+    return;
+  }
+
+  mInitialConfigurations.erase(found);
+
+  wlock.unlock();
+  checkInitialConfigurations();
+}
+
+void cedar::dev::robot::KinematicChain::checkInitialConfigurations()
+{
+  QReadLocker rlock(&mCurrentInitialConfigurationLock);
+  
+  // no known initial configuration ...
+  if (mInitialConfigurations.empty())
+  {
+    rlock.unlock();
+    // ... set a default initial configuration:
+    addInitialConfiguration("zeros", cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1) ); // note, this recurses back to checkInitialConfigurations() but not into this if-branch
+    return;
+  }
+
+  // non-empty initial configuration map:
+  if (mCurrentInitialConfiguration.empty()
+      || mCurrentInitialConfiguration == "")
+  {
+    rlock.unlock();
+    // does not apply, only sets the currently active initial config:
+    setCurrentInitialConfiguration( mInitialConfigurations.begin()->first );
+  }
+}
+
+bool cedar::dev::robot::KinematicChain::setCurrentInitialConfiguration(const std::string &s)
+{
+  // intentionally no checks here
+  // private method (maybe this doesnt need to be private?)
+  // we are sure that s is a valid configuration
+
+  QWriteLocker wlock(&mCurrentInitialConfigurationLock);
+
+  mCurrentInitialConfiguration = s;
+  return true;
+}
+
+bool cedar::dev::robot::KinematicChain::applyInitialConfiguration(std::string s)
+{
+  QReadLocker rlock(&mCurrentInitialConfigurationLock);
+
+  auto f = mInitialConfigurations.find(s);
+  if (f != mInitialConfigurations.end())
+  {
+    rlock.unlock();
+
+    setCurrentInitialConfiguration(s);
+
+// TODO: --> to its own virtual method ...
+    // better to drive slowly to this configuration ...
+    if (0) // TODO: !isSimulated())
+    {
+      // TODO: setWorkingMode( RESETSAFE );
+    }
+    else
+    {
+      auto mode = getWorkingMode();
+
+      setWorkingMode( ANGLE );
+      setJointAngles( f->second );
+      setWorkingMode( mode );
+    }
+
+    return true;
+  }
+
+  cedar::aux::LogSingleton::getInstance()->warning
+  (
+    "You tried to apply an initial configuration that was not registered. "
+    "Doing nothing.",
+    "cedar::dev::robot::KinematicChain::applyInitialConfiguration(std::string)"
+  );
+  return false;
+}
+
+
+bool cedar::dev::robot::KinematicChain::applyInitialConfiguration(unsigned int index)
+{
+  QReadLocker rlock(&mCurrentInitialConfigurationLock);
+
+  if (index >= mInitialConfigurations.size())
+  {
+    CEDAR_THROW( cedar::proc::InvalidNameException , 
+               "You tried to apply an initial configuration with index "
+                 + boost::lexical_cast<std::string>(index) 
+                 + "' which doesnt exist. Size: " 
+                 + boost::lexical_cast<std::string>(mInitialConfigurations.size()) );
+    return false;
+  }
+
+  unsigned int j = 0;
+  for( std::map< std::string, cv::Mat >::const_iterator it = mInitialConfigurations.begin(); it != mInitialConfigurations.end(); it++ )
+  {
+    if (index == j)
+    {
+      rlock.unlock();
+      return applyInitialConfiguration(it->first);
+    }
+    j++;
+  }
+
+  // you cant land here
+  return false;
+}
+
+unsigned int cedar::dev::robot::KinematicChain::getCurrentInitialConfigurationIndex()
+{
+  QReadLocker lock(&mCurrentInitialConfigurationLock);
+  unsigned int j;
+
+  for( std::map< std::string, cv::Mat >::const_iterator it = mInitialConfigurations.begin(); it != mInitialConfigurations.end(); it++ )
+  {
+    if (it->first == mCurrentInitialConfiguration)
+    {
+      return j;
+    }
+    j++;
+  }
+
+  CEDAR_THROW( cedar::proc::InvalidNameException,
+               "Current initial configuration index is not a valid "
+               "initial configuration" );
+  return 0;
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::getInitialConfiguration(std::string s)
+{
+  QReadLocker lock(&mCurrentInitialConfigurationLock);
+
+  auto f = mInitialConfigurations.find(s);
+  if (f == mInitialConfigurations.end())
+  {
+    CEDAR_THROW( cedar::proc::InvalidNameException,
+                 "You requested initial configuration "
+                 + s + " which is not registered. "
+                 "Use addInitialConfiguration().");
+  }
+
+  return f->second;
+}
+
+std::vector<std::string> cedar::dev::robot::KinematicChain::getInitialConfigurationIndices()
+{
+  QReadLocker lock(&mCurrentInitialConfigurationLock);
+  std::vector<std::string> result;
+
+  for( std::map<std::string,cv::Mat>::const_iterator it = mInitialConfigurations.begin(); it != mInitialConfigurations.end(); ++it )
+  {
+    result.push_back( (*it).first );
+  }
+  return result;
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::getCurrentInitialConfiguration()
+{
+  QReadLocker lock(&mCurrentInitialConfigurationLock);
+
+  std::map< std::string, cv::Mat >::const_iterator found = mInitialConfigurations.find(mCurrentInitialConfiguration);
+  if (found == mInitialConfigurations.end())
+  {
+    // you cant really land here, but lets be paranoid:
+    CEDAR_THROW( cedar::proc::InvalidNameException,
+                 "You requested the current initial configuration, "
+                 "but none is set. "
+                 "Use addInitialConfiguration().");
+  }
+
+  return mInitialConfigurations[ mCurrentInitialConfiguration ];
+}
+
