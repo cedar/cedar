@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/PlaneAngleParameter.h"
 #include "cedar/auxiliaries/FrequencyParameter.h"
 #include "cedar/auxiliaries/AngularVelocityParameter.h"
+#include "cedar/auxiliaries/AccelerationParameter.h"
 
 // SYSTEM INCLUDES
 #include <boost/filesystem.hpp>
@@ -105,6 +106,15 @@ public:
       "angular velocity",
       1 * boost::units::si::radian_per_second
     )
+  ),
+  mAcceleration
+  (
+    new cedar::aux::AccelerationParameter
+    (
+      this,
+      "acceleration",
+      1.0 * boost::units::si::meters_per_second_squared
+    )
   )
   {
   }
@@ -115,6 +125,7 @@ public:
   cedar::aux::PlaneAngleParameterPtr mPlaneAngle;
   cedar::aux::FrequencyParameterPtr mFrequency;
   cedar::aux::AngularVelocityParameterPtr mAngularVelocity;
+  cedar::aux::AccelerationParameterPtr mAcceleration;
 };
 
 CEDAR_GENERATE_POINTER_TYPES(TestConfigurable);
@@ -146,7 +157,8 @@ int test_reading
       const boost::units::quantity<boost::units::si::velocity>& expectedVelocity,
       const boost::units::quantity<boost::units::si::plane_angle>& expectedPlaneAngle,
       const boost::units::quantity<boost::units::si::frequency>& expectedFrequency,
-      const boost::units::quantity<boost::units::si::angular_velocity>& expectedAngularVelocity
+      const boost::units::quantity<boost::units::si::angular_velocity>& expectedAngularVelocity,
+      const boost::units::quantity<boost::units::si::acceleration>& expectedAcceleration
     )
 {
   int errors = 0;
@@ -163,6 +175,7 @@ int test_reading
     errors += check(expectedPlaneAngle, conf->mPlaneAngle);
     errors += check(expectedFrequency, conf->mFrequency);
     errors += check(expectedAngularVelocity, conf->mAngularVelocity);
+    errors += check(expectedAcceleration, conf->mAcceleration);
   }
 
   std::cout << "Reading of file \"" << fileName << "\" finished with " << errors << " error(s)." << std::endl;
@@ -177,7 +190,8 @@ int test_writing
       const boost::units::quantity<boost::units::si::velocity>& expectedVelocity,
       const boost::units::quantity<boost::units::si::plane_angle>& expectedPlaneAngle,
       const boost::units::quantity<boost::units::si::frequency>& expectedFrequency,
-      const boost::units::quantity<boost::units::si::angular_velocity>& expectedAngularVelocity
+      const boost::units::quantity<boost::units::si::angular_velocity>& expectedAngularVelocity,
+      const boost::units::quantity<boost::units::si::acceleration>& expectedAcceleration
     )
 {
   int errors = 0;
@@ -191,6 +205,7 @@ int test_writing
   conf->mPlaneAngle->setValue(expectedPlaneAngle);
   conf->mFrequency->setValue(expectedFrequency);
   conf->mAngularVelocity->setValue(expectedAngularVelocity);
+  conf->mAcceleration->setValue(expectedAcceleration);
 
   conf->writeJson(fileName);
 
@@ -202,7 +217,8 @@ int test_writing
               conf->mVelocity->getValue(),
               conf->mPlaneAngle->getValue(),
               conf->mFrequency->getValue(),
-              conf->mAngularVelocity->getValue()
+              conf->mAngularVelocity->getValue(),
+              conf->mAcceleration->getValue()
             );
 
   boost::filesystem::remove(fileName.c_str());
@@ -223,7 +239,8 @@ int main(int, char**)
               1.0 * boost::units::si::meters / boost::units::si::seconds,
               2.0 * boost::units::si::radians,
               20.0 * boost::units::si::hertz,
-              5.0 * boost::units::si::radian_per_second
+              5.0 * boost::units::si::radian_per_second,
+              7.0 * boost::units::si::meters_per_second_squared
             );
   errors += test_reading
             (
@@ -233,7 +250,8 @@ int main(int, char**)
               1.0 * boost::units::si::meters / boost::units::si::seconds,
               2.0 * boost::units::si::radians,
               20.0 * boost::units::si::hertz,
-              5.0 * boost::units::si::radian_per_second
+              5.0 * boost::units::si::radian_per_second,
+              7.0 * boost::units::si::meters_per_second_squared
             );
   errors += test_reading
             (
@@ -243,7 +261,8 @@ int main(int, char**)
               1.0 * boost::units::si::meters / boost::units::si::seconds,
               2.0 * boost::units::si::radians,
               20.0 * boost::units::si::hertz,
-              5.0 * boost::units::si::radian_per_second
+              5.0 * boost::units::si::radian_per_second,
+              7.0 * boost::units::si::meters_per_second_squared
             );
   errors += test_writing
             (
@@ -253,7 +272,8 @@ int main(int, char**)
               -5.0 * boost::units::si::meters / boost::units::si::seconds,
               8.0 * boost::units::si::radians,
               8.0 * boost::units::si::hertz,
-              -6.0 * boost::units::si::radian_per_second
+              -6.0 * boost::units::si::radian_per_second,
+              -8.0 * boost::units::si::meters_per_second_squared
             );
 
   std::cout << "Test finished with " << errors << " error(s)." << std::endl;
