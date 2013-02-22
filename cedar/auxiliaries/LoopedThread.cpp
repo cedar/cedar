@@ -82,12 +82,6 @@ void cedar::aux::LoopedThread::stopStatistics(bool suppressWarning)
 {
   // is intentionally thread un-safe
 
-  if (!isRunningUnlocked()) // use thread-UN-safe variant
-    return;
-
-  if (!validWorker())
-    return;
-
   unsigned long numberOfSteps = mpWorker->getNumberOfSteps();
 
   if (suppressWarning == false && numberOfSteps > 1.01 && getSimulatedTimeParameter() <= 0.0)

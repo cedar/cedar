@@ -173,53 +173,46 @@ public:
   }
 
 public slots:
-  void finishedThreadSlot(); // thread-safe needs to be TODO
-  void startedThreadSlot(); // dito TODO
+  void quittedThreadSlot(); // TODO: manpage: "runs in the new thread"
+  void startedThreadSlot(); // TODO: manpage: "runs in the first thread"
+  void finishedWorkSlot();  // TODO: manpage: "runs in the new thread"
+
+signals:
+  void signalFinished();
 
   //----------------------------------------------------------------------------
   // protected methods
   //----------------------------------------------------------------------------
 protected:
 
+
   //----------------------------------------------------------------------------
   // private methods
   //----------------------------------------------------------------------------
 private:
   virtual cedar::aux::detail::ThreadWorker* resetWorker() = 0;
-  void deleteWorkerUnlocked();
 
   virtual void applyStop(bool suppressWarning);
   virtual void applyStart();
 
-  //----------------------------------------------------------------------------
-  // members
-  //----------------------------------------------------------------------------
-protected:
   bool validWorker() const; // thread-UN-safe
   bool validThread() const; // thread-UN-safe
   bool isRunningUnlocked() const; // is NOT thread-safe
 
-private:
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
+  //----------------------------------------------------------------------------
+  // members
+  //----------------------------------------------------------------------------
 private:
   QThread* mpThread;
   mutable bool mDestructing; 
   mutable QMutex mDestructingMutex;
   mutable QMutex mFinishedThreadMutex;
+  mutable QReadWriteLock mGeneralAccessLock;
+  mutable QReadWriteLock mStopRequestedLock;
 
   //!@brief stop is requested
-  volatile bool mStopRequested; // note: volatile disables some optimizations, but doesn't add thread-safety
-
-protected:
+  bool mStopRequested; 
   cedar::aux::detail::ThreadWorker* mpWorker;
-private:
-  mutable QReadWriteLock mGeneralAccessLock;
 
 }; // class cedar::aux::ThreadWrapper
 
