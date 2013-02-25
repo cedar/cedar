@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraSettings.h
+    File:        Channel.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 07 04
 
-    Description:  Header for the cedar::dev::sensors::camera::Settings class
+    Description:  Header for the cedar::dev::sensors::camera::Channel class
 
     Credits:
 
@@ -64,9 +64,7 @@
 #include <boost/enable_shared_from_this.hpp>
 
 
-/*! @brief Additional data of a camera channel
- *
- */
+/*! @brief Additional data of a camera channel */
 class cedar::dev::sensors::camera::Channel
 :
 public QObject,
@@ -118,10 +116,10 @@ signals:
 
   // friend classes of this channel for direct access to the members
   friend class cedar::dev::sensors::camera::Grabber;
-  friend class cedar::dev::sensors::camera::Device;
-  friend class cedar::dev::sensors::camera::DeviceCvVideoCapture;
+  friend class cedar::dev::sensors::camera::Backend;
+  friend class cedar::dev::sensors::camera::BackendCvVideoCapture;
 #ifdef CEDAR_USE_LIB_DC1394
-  friend class cedar::dev::sensors::camera::DeviceDc1394;
+  friend class cedar::dev::sensors::camera::BackendDc1394;
 #endif // CEDAR_USE_LIB_DC1394
 
 
@@ -256,7 +254,7 @@ protected:
    *
    *  Only used until all parameters applied and the grabbing cv::VideoCapture object is created
    */
-  cedar::dev::sensors::camera::DevicePtr mpBackend;
+  cedar::dev::sensors::camera::BackendPtr mpBackend;
 
 
 private:

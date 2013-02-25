@@ -43,20 +43,23 @@
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/devices/sensors/camera/Grabber.h"
 #include "cedar/devices/sensors/camera/enums/Setting.h"
-#include "cedar/devices/sensors/camera/backends/DeviceCvVideoCapture.h"
+#include "cedar/devices/sensors/camera/backends/BackendCvVideoCapture.h"
+#include "cedar/devices/sensors/visual/exceptions.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 
+
 #ifdef CEDAR_USE_VIDEO_FOR_LINUX
-#include "cedar/devices/sensors/camera/backends/DeviceVfl.h"
+#include "cedar/devices/sensors/camera/backends/BackendV4L.h"
 #endif // CEDAR_USE_VIDEO_FOR_LINUX
 
 #ifdef CEDAR_USE_LIB_DC1394
-#include "cedar/devices/sensors/camera/backends/DeviceDc1394.h"
+#include "cedar/devices/sensors/camera/backends/BackendDc1394.h"
 #endif // CEDAR_USE_LIB_DC1394
 
 // SYSTEM INCLUDES
 #include <boost/lexical_cast.hpp>
 #include <boost/math/special_functions/round.hpp> // rounding from double to int in cv::VideoCapture get and set methods
+#include <QWriteLocker>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -275,7 +278,7 @@ void cedar::dev::sensors::camera::Grabber::onCloseGrabber()
 }
 
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::camera::Grabber::onCreateGrabber()
+void cedar::dev::sensors::camera::Grabber::onCreateGrabber()
 {
 #ifdef DEBUG_CAMERA_GRABBER
   std::cout << __PRETTY_FUNCTION__ << " start" << std::endl;
@@ -289,8 +292,6 @@ bool cedar::dev::sensors::camera::Grabber::onCreateGrabber()
     this->closeGrabber();
     //std::cout << "old grabber closed" << std::endl;
   }
-
-  bool result = false;
 
   // init message
   std::stringstream init_message;
@@ -320,9 +321,9 @@ bool cedar::dev::sensors::camera::Grabber::onCreateGrabber()
 #endif
 
   // create capture device, which depends on the chosen backend
+  std::string msg = "";
   try
   {
-    bool all_devices_created = true;
     for (unsigned int channel = 0; channel < num_cams; ++channel)
     {
       //backend already created on initialization, but destroyed on onApplyParameter()/onCreateGrabber()
@@ -334,33 +335,43 @@ bool cedar::dev::sensors::camera::Grabber::onCreateGrabber()
 #endif
       }
 
-      bool device_created = getCameraChannel(channel)->mpBackend->createCaptureDevice();
+      //@todo gh: was createCaptureDevice() - check it
+      bool device_created = getCameraChannel(channel)->mpBackend->createCaptureBackend();
 
       if (device_created)
       {
-      	setChannelInfoString(channel,this->onUpdateSourceInfo(channel));
+        setChannelInfoString(channel,this->onUpdateSourceInfo(channel));
       }
       else
       {
-        all_devices_created = false;
+        if (msg != "")
+        {
+          msg = msg + "\n";
+        }
+        msg = msg + "Channel " + boost::lexical_cast<std::string>(channel) + ": Could not create Backend";
       }
 
       // Backend device not longer used. Channel::mVideoCapture does the job
       getCameraChannel(channel)->mpBackend.reset();
     }
-
-    result = all_devices_created;
   }
-  catch (...)
+  catch (std::exception& e)
   {
-    result = false;
+    if (msg != "")
+    {
+      msg = msg + "\n";
+    }
+    msg = msg + "Exception catched: \""+e.what()+"\"";
   }
 
 #ifdef DEBUG_CAMERA_GRABBER
   std::cout << __PRETTY_FUNCTION__ << " end" << std::endl;
 #endif
 
-  return result;
+  if (msg != "")
+  {
+    CEDAR_THROW(cedar::dev::sensors::visual::CreateGrabberException,msg)
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -497,33 +508,33 @@ std::vector<std::string> cedar::dev::sensors::camera::Grabber::getAllProperties(
 
 
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::camera::Grabber::onGrab(unsigned int channel)
+void cedar::dev::sensors::camera::Grabber::onGrab(unsigned int channel)
 {
-  getCameraChannel(channel)->mpVideoCaptureLock->lockForWrite();
+  // lock videocapture object
+  QWriteLocker locking(getCameraChannel(channel)->mpVideoCaptureLock);
 
-  bool result = false;
-  result = getCameraChannel(channel)->mVideoCapture.read(getImageMat(channel));
-
-#ifdef DEBUG_GRABBER
-  std::cout << __PRETTY_FUNCTION__ << " grab channel " << channel << "; result of read-function: "
-            << std::boolalpha << result
-            << " thread: " << QThread::currentThread() << std::endl;
-#endif
-
-  if (result)
+  // read the frame
+  if (!getCameraChannel(channel)->mVideoCapture.read(getImageMat(channel)))
   {
-    // check if conversion from bayer-pattern to cv::Mat BGR format is needed
-    cedar::dev::sensors::camera::Decoding::Id debayer_fiter;
-    debayer_fiter = this->getCameraChannel(channel)->_mpDecodeFilter->getValue();
-
-    if (debayer_fiter != cedar::dev::sensors::camera::Decoding::NONE)
-    {
-      cv::cvtColor(getImageMat(channel),getImageMat(channel),debayer_fiter);
-    }
+    std::string msg = "Could not read from cv::VideoCapture on channel " + boost::lexical_cast<std::string>(channel);
+    CEDAR_THROW(cedar::dev::sensors::visual::GrabberGrabException,msg)
   }
 
-  getCameraChannel(channel)->mpVideoCaptureLock->unlock();
-  return result;
+#ifdef DEBUG_GRABBER
+  std::cout << __PRETTY_FUNCTION__ << ": Channel " << channel
+            << " grabbed; Thread address: " << QThread::currentThread() << std::endl;
+#endif
+
+  // check if conversion from bayer-pattern to cv::Mat BGR format is needed
+  cedar::dev::sensors::camera::Decoding::Id debayer_fiter;
+  debayer_fiter = this->getCameraChannel(channel)->_mpDecodeFilter->getValue();
+
+  if (debayer_fiter != cedar::dev::sensors::camera::Decoding::NONE)
+  {
+    cv::cvtColor(getImageMat(channel),getImageMat(channel),debayer_fiter);
+  }
+
+  //unlock object done by QWriteLocker destructor
 }
 
 

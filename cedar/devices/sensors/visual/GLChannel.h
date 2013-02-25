@@ -28,7 +28,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 09 28
 
-    Description: Class GLChannel
+    Description: Class GLChannel contains additional data of a QGLWidget-grabbing channel
 
     Credits:
 

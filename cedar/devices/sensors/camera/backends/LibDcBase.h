@@ -73,7 +73,9 @@ class cedar::dev::sensors::camera::LibDcBase
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
+  /*!@brief The standard constructor.
+   * @throw cedar::dev::sensors::camera::LibDcInitException Thrown, on initialization errors in libdc
+   */
   // opens the firewire bus context and query the number of available cameras
   LibDcBase();
   

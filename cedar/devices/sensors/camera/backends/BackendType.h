@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraBackendType.h
+    File:        BackendType.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 07 04
 
-    Description:  Header for CameraBackendType enum-type class
+    Description:  Header for BackendType enum-type class
 
     Credits:
 
@@ -46,8 +46,7 @@
 
 // SYSTEM INCLUDES
 
-/*!@brief Enum class to determine the used backend for the camera grabber
- */
+/*!@brief Enum class to determine the used backend for the camera grabber */
 class cedar::dev::sensors::camera::BackendType
 {
   //--------------------------------------------------------------------------------------------------------------------

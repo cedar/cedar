@@ -107,6 +107,10 @@ public:
 
   /*! @brief Set a new Widget to grab from
    *
+   * @param channel The channel to assign the new widget
+   * @param qglWidget The new widget
+   * @throw cedar::aux::IndexOutOfRangeException When the channel is out of range
+   * @throw cedar::dev::sensors::visual::InvalidParameterException When the qglWidget is a NULL-pointer
    */
   void setWidget(unsigned int channel, QGLWidget *qglWidget);
 
@@ -117,8 +121,8 @@ protected:
 
   // inherited from Grabber
   void onCleanUp();
-  bool onGrab(unsigned int channel);
-  bool onCreateGrabber();
+  void onGrab(unsigned int channel);
+  void onCreateGrabber();
   void onCloseGrabber();
   std::string onUpdateSourceInfo(unsigned int channel);
 

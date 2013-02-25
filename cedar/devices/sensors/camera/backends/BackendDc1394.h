@@ -22,38 +22,41 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DeviceCvVideoCapture.h
+    File:        CameraBackendDc1394.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 07 04
 
-    Description:  Header for the cedar::dev::sensors::camera::DeviceCvVideoCapture class
+    Description:  Header for the cedar::dev::sensors::camera::BackendDc1394 class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_CAMERA_DEVICE_CVVIDEOCAPTURE_H
-#define CEDAR_DEV_SENSORS_CAMERA_DEVICE_CVVIDEOCAPTURE_H
+#ifndef CEDAR_DEV_SENSORS_CAMERA_BACKEND_DC1394_H
+#define CEDAR_DEV_SENSORS_CAMERA_BACKEND_DC1394_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
+#ifdef CEDAR_USE_LIB_DC1394
+
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/camera/namespace.h"
-#include "cedar/devices/sensors/camera/backends/Device.h"
+#include "cedar/devices/sensors/camera/backends/Backend.h"
 
 // SYSTEM INCLUDES
+
 
 
 /*!@brief Base class of the misc camera grabber backends.
  *
  * Implements the common features of a camera device
  */
-class cedar::dev::sensors::camera::DeviceCvVideoCapture
+class cedar::dev::sensors::camera::BackendDc1394
 :
-public cedar::dev::sensors::camera::Device
+public cedar::dev::sensors::camera::Backend
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -64,25 +67,53 @@ public cedar::dev::sensors::camera::Device
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DeviceCvVideoCapture(cedar::dev::sensors::camera::Channel* pCameraChannel);
+  BackendDc1394
+  (
+    cedar::dev::sensors::camera::Channel* pCameraChannel
+  );
 
   //!@brief Destructor
-  ~DeviceCvVideoCapture();
+  ~BackendDc1394();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  //! does the backend initialization
+  void init();
+
+  //! update settings from gui
+  //void updateSettings();
+
+  //!@brief Enable/disable framerates for the current selected frame mode
+  void updateFps();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+
   // derived from class Device
   void applySettingsToCamera();
   bool createCaptureObject();
-  void getAvailablePropertiesFromCamera();
+
+  /*! @brief Opens the wanted camera with libDc methods
+   *
+   *  The wanted camera is determind from the camereaId of the channel (set in the constructor or in the gui)
+   *  @returns True, if camera was successfully opened, otherwise false
+   */
+  bool openLibDcCamera();
+
+  //! get all features from cam
+  void getFeaturesFromLibDc();
+
+  /*! get all framerates and enable them in the enum-class, disable all others
+   *  \param modeId The grabbing mode for the framerates (framerate selection depends on actual used grabbing mode)
+   */
+  void getFrameRatesFromLibDc(cedar::dev::sensors::camera::VideoMode::Id modeId);
+
+  //! get all available modes and enable them in the enum-class, disable all others and set mode to "AUTO"
+  void getGrabModesFromLibDc();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -90,11 +121,14 @@ protected:
 private:
   // none yet
 
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //! firewire interface for available settings and properties from camera
+  cedar::dev::sensors::camera::LibDcBasePtr mpLibDcInterface;
+
 private:
   // none yet
 
@@ -107,7 +141,9 @@ protected:
 private:
   // none yet
 
-}; // class cedar::dev::sensors::camera::DeviceCvVideoCapture
+}; // class cedar::dev::sensors::camera::BackendDc1394
 
-#endif // CEDAR_DEV_SENSORS_CAMERA_DEVICE_CVVIDEOCAPTURE_H
+#endif // defined CEDAR_USE_LIB_DC1394
+
+#endif // CEDAR_DEV_SENSORS_CAMERA_BACKEND_DC1394_H
 

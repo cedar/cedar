@@ -174,7 +174,6 @@ void cedar::proc::sources::Camera::applyParameter()
                                                "void cedar::proc::sources::Camera::applyParameter()"
                                              );
   }
-
   //this->callReset();
 }
 

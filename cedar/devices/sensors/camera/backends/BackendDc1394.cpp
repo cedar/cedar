@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraDeviceDc1394.cpp
+    File:        CameraBackendDc1394.cpp
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@rub.de
     Date:        2012 07 04
 
-    Description:  Implementation for the cedar::dev::sensors::camera::DeviceDc1394 class
+    Description:  Implementation for the cedar::dev::sensors::camera::BackendDc1394 class
 
     Credits:
 
@@ -40,7 +40,7 @@
 #ifdef CEDAR_USE_LIB_DC1394
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/camera/backends/DeviceDc1394.h"
+#include "cedar/devices/sensors/camera/backends/BackendDc1394.h"
 #include "cedar/devices/sensors/camera/backends/LibDcBase.h"
 #include "cedar/devices/sensors/camera/exceptions.h"
 
@@ -51,23 +51,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::sensors::camera::DeviceDc1394::DeviceDc1394
+cedar::dev::sensors::camera::BackendDc1394::BackendDc1394
 (
   cedar::dev::sensors::camera::Channel* pCameraChannel
 )
 :
-cedar::dev::sensors::camera::Device(pCameraChannel),
+cedar::dev::sensors::camera::Backend(pCameraChannel),
 mpLibDcInterface(new cedar::dev::sensors::camera::LibDcBase)
 {
 }
 
 
-cedar::dev::sensors::camera::DeviceDc1394::~DeviceDc1394()
+cedar::dev::sensors::camera::BackendDc1394::~BackendDc1394()
 {
 }
 
 
-void cedar::dev::sensors::camera::DeviceDc1394::init()
+void cedar::dev::sensors::camera::BackendDc1394::init()
 {
 #ifdef DEBUG_CAMERA_GRABBER
   std::cout << __PRETTY_FUNCTION__ << std::endl;
@@ -75,7 +75,7 @@ void cedar::dev::sensors::camera::DeviceDc1394::init()
 
   if (!this->openLibDcCamera())
   {
-    //CEDAR_THROW(cedar::dev::sensors::camera::LibDcInitException,"cedar::dev::sensors::camera::DeviceDc1394::initDevice()");
+    //CEDAR_THROW(cedar::dev::sensors::camera::LibDcInitException,"cedar::dev::sensors::camera::BackendDc1394::initDevice()");
     return;
   }
 
@@ -97,7 +97,7 @@ void cedar::dev::sensors::camera::DeviceDc1394::init()
 //----------------------------------------------------------------------------------------------------------------------
 
 /*
-void cedar::dev::sensors::camera::DeviceDc1394::updateSettings()
+void cedar::dev::sensors::camera::BackendDc1394::updateSettings()
 {
   //get framerates of newly set video mode
 
@@ -111,7 +111,7 @@ void cedar::dev::sensors::camera::DeviceDc1394::updateSettings()
 }
 */
 
-void cedar::dev::sensors::camera::DeviceDc1394::updateFps()
+void cedar::dev::sensors::camera::BackendDc1394::updateFps()
 {
 #ifdef DEBUG_CAMERA_GRABBER
   std::cout << __PRETTY_FUNCTION__ << std::endl;
@@ -120,7 +120,7 @@ void cedar::dev::sensors::camera::DeviceDc1394::updateFps()
 }
 
 
-bool cedar::dev::sensors::camera::DeviceDc1394::createCaptureObject()
+bool cedar::dev::sensors::camera::BackendDc1394::createCaptureObject()
 {
 #ifdef DEBUG_CAMERA_GRABBER
   std::cout << __PRETTY_FUNCTION__ << std::endl;
@@ -146,7 +146,7 @@ bool cedar::dev::sensors::camera::DeviceDc1394::createCaptureObject()
 }
 
 
-void cedar::dev::sensors::camera::DeviceDc1394::getGrabModesFromLibDc()
+void cedar::dev::sensors::camera::BackendDc1394::getGrabModesFromLibDc()
 {
   //only invoked at the creation of the backend
 
@@ -205,7 +205,7 @@ void cedar::dev::sensors::camera::DeviceDc1394::getGrabModesFromLibDc()
 }
 
 
-void cedar::dev::sensors::camera::DeviceDc1394::getFrameRatesFromLibDc
+void cedar::dev::sensors::camera::BackendDc1394::getFrameRatesFromLibDc
 (
   cedar::dev::sensors::camera::VideoMode::Id modeId
 )
@@ -317,7 +317,7 @@ void cedar::dev::sensors::camera::DeviceDc1394::getFrameRatesFromLibDc
   }
 }
 
-bool cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()
+bool cedar::dev::sensors::camera::BackendDc1394::openLibDcCamera()
 {
   unsigned int camera_id = mpCameraChannel->getCameraId();
   unsigned int bus_id = 0;
@@ -332,7 +332,7 @@ bool cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()
                                             (
                                               "Searching for camera with GUID "
                                                + boost::lexical_cast<std::string>(camera_id) + " on the bus...",
-                                              "cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()"
+                                              "cedar::dev::sensors::camera::BackendDc1394::openLibDcCamera()"
                                             );
 
     unsigned int cams_on_bus = mpLibDcInterface->getNumCams();
@@ -342,7 +342,7 @@ bool cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()
       cedar::aux::LogSingleton::getInstance()->error
                                                (
                                                  "No cameras on the firewire bus!",
-                                                 "cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()"
+                                                 "cedar::dev::sensors::camera::BackendDc1394::openLibDcCamera()"
                                                );
       return false;
     }
@@ -360,7 +360,7 @@ bool cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()
                                               (
                                                 "Found: at Bus-Id " + boost::lexical_cast<std::string>(cam)
                                                   + ": GUID " + boost::lexical_cast<std::string>(guid),
-                                                "cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()"
+                                                "cedar::dev::sensors::camera::BackendDc1394::openLibDcCamera()"
                                               );
       cam_found = (guid == camera_id);
       if (cam_found)
@@ -377,7 +377,7 @@ bool cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()
                                                (
                                                  "No cameras with GUID "+boost::lexical_cast<std::string>(camera_id)
                                                  +" not found on the firewire bus!",
-                                                 "cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()"
+                                                 "cedar::dev::sensors::camera::BackendDc1394::openLibDcCamera()"
                                                );
       return false;
     }
@@ -397,7 +397,7 @@ bool cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()
                                             (
                                               "Open camera with bus Id " + boost::lexical_cast<std::string>(bus_id)
                                                 + ": GUID " + boost::lexical_cast<std::string>(guid),
-                                              "cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()"
+                                              "cedar::dev::sensors::camera::BackendDc1394::openLibDcCamera()"
                                             );
   }
 
@@ -406,7 +406,7 @@ bool cedar::dev::sensors::camera::DeviceDc1394::openLibDcCamera()
   return mpLibDcInterface->openCamera(cam_guid);
 }
 
-void cedar::dev::sensors::camera::DeviceDc1394::getFeaturesFromLibDc()
+void cedar::dev::sensors::camera::BackendDc1394::getFeaturesFromLibDc()
 {
   // get all features from cam
   dc1394featureset_t cam_features = mpLibDcInterface->getCamFeatures();
@@ -538,7 +538,7 @@ void cedar::dev::sensors::camera::DeviceDc1394::getFeaturesFromLibDc()
 }
 
 
-void cedar::dev::sensors::camera::DeviceDc1394::applySettingsToCamera()
+void cedar::dev::sensors::camera::BackendDc1394::applySettingsToCamera()
 {
 #ifdef DEBUG_CAMERA_GRABBER
   std::cout << __PRETTY_FUNCTION__ << std::endl;

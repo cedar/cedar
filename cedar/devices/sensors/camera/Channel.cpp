@@ -41,9 +41,9 @@
 #include "cedar/devices/sensors/camera/Channel.h"
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/devices/sensors/camera/backends/BackendType.h"
-#include "cedar/devices/sensors/camera/backends/DeviceCvVideoCapture.h"
-#include "cedar/devices/sensors/camera/backends/DeviceDc1394.h"
-#include "cedar/devices/sensors/camera/backends/DeviceVfl.h"
+#include "cedar/devices/sensors/camera/backends/BackendCvVideoCapture.h"
+#include "cedar/devices/sensors/camera/backends/BackendDc1394.h"
+#include "cedar/devices/sensors/camera/backends/BackendV4L.h"
 
 // SYSTEM INCLUDES
 
@@ -258,8 +258,8 @@ void cedar::dev::sensors::camera::Channel::grabModeChanged()
 #ifdef CEDAR_USE_LIB_DC1394
     if (_mpBackendType->getValue() == cedar::dev::sensors::camera::BackendType::DC1394)
     {
-      cedar::dev::sensors::camera::DeviceDc1394Ptr p_backend;
-      p_backend = boost::static_pointer_cast<cedar::dev::sensors::camera::DeviceDc1394>(mpBackend);
+      cedar::dev::sensors::camera::BackendDc1394Ptr p_backend;
+      p_backend = boost::static_pointer_cast<cedar::dev::sensors::camera::BackendDc1394>(mpBackend);
 
       //disable signals from fps:
       _mpFPS->blockSignals(true);
@@ -421,9 +421,9 @@ void cedar::dev::sensors::camera::Channel::createBackend()
 #ifdef CEDAR_USE_LIB_DC1394
     case cedar::dev::sensors::camera::BackendType::DC1394 :
     {
-      cedar::dev::sensors::camera::DeviceDc1394Ptr dc1394_device
+      cedar::dev::sensors::camera::BackendDc1394Ptr dc1394_device
                                                    (
-                                                     new cedar::dev::sensors::camera::DeviceDc1394
+                                                     new cedar::dev::sensors::camera::BackendDc1394
                                                          (
                                                            this
                                                          )
@@ -443,9 +443,9 @@ void cedar::dev::sensors::camera::Channel::createBackend()
 
     default:
     {
-      cedar::dev::sensors::camera::DeviceCvVideoCapturePtr cv_device
+      cedar::dev::sensors::camera::BackendCvVideoCapturePtr cv_device
                                                            (
-                                                             new cedar::dev::sensors::camera::DeviceCvVideoCapture
+                                                             new cedar::dev::sensors::camera::BackendCvVideoCapture
                                                              (
                                                                this
                                                              )

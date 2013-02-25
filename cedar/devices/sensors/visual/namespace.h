@@ -112,16 +112,11 @@ namespace cedar
         //-----------------------------------------------------------------------------------------------
         // exceptions
         //-----------------------------------------------------------------------------------------------
-
-        //!@brief An exception for errors on recording
         class GrabberRecordingException;
-
-        //!@brief An exception for errors on saving a snapshot
         class GrabberSnapshotException;
-
-        //!@brief An exception for errors on grabbing
         class GrabberGrabException;
-
+        class InvalidParameterException;
+        class CreateGrabberException;
         //!@endcond
       }
     }

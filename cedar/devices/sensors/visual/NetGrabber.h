@@ -75,7 +75,6 @@ public cedar::dev::sensors::visual::Grabber
 
 public:
 
-
   /*! @brief  Constructor for a single channel grabber
    *  @param yarpChannelName  Filename to grab from
    */
@@ -112,8 +111,8 @@ public:
 protected:
 
   // inherited from Grabber
-  bool onCreateGrabber();
-  bool onGrab(unsigned int channel);
+  void onCreateGrabber();
+  void onGrab(unsigned int channel);
   std::string onUpdateSourceInfo(unsigned int channel);
   void onCleanUp();
   void onCloseGrabber();
@@ -134,7 +133,6 @@ public:
 
 protected:
   // none yet
-
 
 private:
 

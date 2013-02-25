@@ -101,7 +101,7 @@ signals:
 public:
 
 #ifdef CEDAR_USE_LIB_DC1394
-  friend class cedar::dev::sensors::camera::DeviceDc1394;
+  friend class cedar::dev::sensors::camera::BackendDc1394;
 #endif // CEDAR_USE_LIB_DC1394
 
   //!@brief The standard constructor.

@@ -57,7 +57,7 @@
 
 // backends
 #include "cedar/devices/sensors/camera/backends/BackendType.h"
-#include "cedar/devices/sensors/camera/backends/Device.h"
+#include "cedar/devices/sensors/camera/backends/Backend.h"
 //#include "cedar/devices/sensors/camera/backends/DeviceCvVideoCapture.h"
 //
 //#ifdef CEDAR_USE_VIDEO_FOR_LINUX
@@ -409,9 +409,9 @@ protected:
   double getPropertyFromCamera(unsigned int channel, unsigned int propertyId);
 
   // inherited from Grabber
-  bool onGrab(unsigned int channel);
+  void onGrab(unsigned int channel);
   void onCleanUp();
-  bool onCreateGrabber();
+  void onCreateGrabber();
   void onCloseGrabber();
   std::string onUpdateSourceInfo(unsigned int channel);
 

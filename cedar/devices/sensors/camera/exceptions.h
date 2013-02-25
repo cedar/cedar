@@ -42,8 +42,22 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/devices/sensors/camera/namespace.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
+
+
+
+/*!@brief Exception when a property is not supported by the used backend
+ */
+class cedar::dev::sensors::camera::PropertyNotSupportedException : public cedar::aux::ExceptionBase
+{
+};
+
+/*!@brief Exception when the used cv::VideoCapture object is not working
+ */
+class cedar::dev::sensors::camera::VideoCaptureNotOpenedException : public cedar::aux::ExceptionBase
+{
+};
 
 
 #ifdef CEDAR_USE_LIB_DC1394

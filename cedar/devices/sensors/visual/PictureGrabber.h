@@ -77,6 +77,7 @@ public cedar::dev::sensors::visual::Grabber
   void pictureChanged();
 
   private:
+
   /*! @brief Boost slot method. Invoked if a channel is added as an ObjectListParameter as an object
    */
   void channelAdded(int index);
@@ -152,8 +153,8 @@ public:
 protected:
 
   // inherited from Grabber
-  bool onGrab(unsigned int channel);
-  bool onCreateGrabber();
+  void onGrab(unsigned int channel);
+  void onCreateGrabber();
   void onCloseGrabber();
   std::string onUpdateSourceInfo(unsigned int channel);
 

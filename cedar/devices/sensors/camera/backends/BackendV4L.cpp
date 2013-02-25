@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraDeviceVfl.cpp
+    File:        BackendV4L.cpp
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 07 04
 
-    Description:  Implementation for the cedar::dev::sensors::camera::DeviceVfl class
+    Description:  Implementation for the cedar::dev::sensors::camera::BackendV4L class
 
     Credits:
 
@@ -40,7 +40,7 @@
 #ifdef CEDAR_USE_VIDEO_FOR_LINUX
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/camera/backends/DeviceVfl.h"
+#include "cedar/devices/sensors/camera/backends/BackendV4L.h"
 
 
 // SYSTEM INCLUDES
@@ -48,7 +48,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::sensors::camera::DeviceVfl::CameraDeviceVfl
+cedar::dev::sensors::camera::BackendV4L::CameraBackendV4L
 (
   cedar::dev::sensors::camera::Channel* pCameraChannel
 )
@@ -58,7 +58,7 @@ cedar::dev::sensors::camera::Device::CameraDevice(pCameraGrabber,pCameraChannel)
 }
 
 
-cedar::dev::sensors::camera::DeviceVfl::~CameraDeviceVfl()
+cedar::dev::sensors::camera::BackendV4L::~CameraBackendV4L()
 {
 }
 
@@ -67,22 +67,22 @@ cedar::dev::sensors::camera::DeviceVfl::~CameraDeviceVfl()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::sensors::camera::DeviceVfl::setProperties()
+void cedar::dev::sensors::camera::BackendV4L::setProperties()
 {
 
 }
 
-bool cedar::dev::sensors::camera::DeviceVfl::createCaptureObject()
+bool cedar::dev::sensors::camera::BackendV4L::createCaptureObject()
 {
 
 }
 
-void cedar::dev::sensors::camera::DeviceVfl::applySettingsToCamera()
+void cedar::dev::sensors::camera::BackendV4L::applySettingsToCamera()
 {
 
 }
 
-void cedar::dev::sensors::camera::DeviceVfl::applyStateToCamera()
+void cedar::dev::sensors::camera::BackendV4L::applyStateToCamera()
 {
 
 }

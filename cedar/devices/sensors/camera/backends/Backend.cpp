@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraBackendType.h
+    File:        Backend.cpp
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 07 04
 
-    Description:  Implementation for the cedar::dev::sensors::camera::Device class
+    Description:  Implementation for the cedar::dev::sensors::camera::Backend class
 
     Credits:
 
@@ -38,7 +38,9 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/camera/backends/Device.h"
+#include "cedar/devices/sensors/camera/backends/Backend.h"
+#include "cedar/devices/sensors/camera/exceptions.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
@@ -46,13 +48,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::sensors::camera::Device::Device(cedar::dev::sensors::camera::Channel* pCameraChannel)
+cedar::dev::sensors::camera::Backend::Backend(cedar::dev::sensors::camera::Channel* pCameraChannel)
 :
 mpCameraChannel(pCameraChannel)
 {
 }
 
-cedar::dev::sensors::camera::Device::~Device()
+cedar::dev::sensors::camera::Backend::~Backend()
 {
 }
 
@@ -60,12 +62,12 @@ cedar::dev::sensors::camera::Device::~Device()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::camera::Device::init()
+void cedar::dev::sensors::camera::Backend::init()
 {
 
 }
 
-bool cedar::dev::sensors::camera::Device::createCaptureDevice()
+bool cedar::dev::sensors::camera::Backend::createCaptureBackend()
 {
 #ifdef DEBUG_CAMERA_GRABBER
   std::cout << __PRETTY_FUNCTION__ << std::endl;
@@ -97,7 +99,7 @@ bool cedar::dev::sensors::camera::Device::createCaptureDevice()
 #endif
 
 
-  // fill p_capabilities with the right values (depends on backend and camera if this is necessary at this stage)
+  // fill p_capabilities with values (depends on backend and camera if this is necessary at this stage)
   getAvailablePropertiesFromCamera();
 
 #ifdef DEBUG_CAMERA_GRABBER
@@ -158,7 +160,7 @@ bool cedar::dev::sensors::camera::Device::createCaptureDevice()
   return true;
 }
 
-void cedar::dev::sensors::camera::Device::applyStateToCamera()
+void cedar::dev::sensors::camera::Backend::applyStateToCamera()
 {
 #ifdef DEBUG_CAMERA_GRABBER
   std::cout << __PRETTY_FUNCTION__ << std::endl;
@@ -205,7 +207,7 @@ void cedar::dev::sensors::camera::Device::applyStateToCamera()
 }
 
 
-bool cedar::dev::sensors::camera::Device::setPropertyToCamera(unsigned int propertyId, double value)
+bool cedar::dev::sensors::camera::Backend::setPropertyToCamera(unsigned int propertyId, double value)
 {
   // no lock needed, the cvVideoCapture object is globally locked
   std::string prop_name = cedar::dev::sensors::camera::Property::type().get(propertyId).prettyString();
@@ -236,25 +238,36 @@ bool cedar::dev::sensors::camera::Device::setPropertyToCamera(unsigned int prope
 //                                           (
 //                                             "property " + prop_name
 //                                             + " couldn't set to " + boost::lexical_cast<std::string>(value),
-//                                             "cedar::dev::sensors::camera::Device::setPropertyToCamera()"
+//                                             "cedar::dev::sensors::camera::Backend::setPropertyToCamera()"
 //                                           );
   return result;
 }
 
-double cedar::dev::sensors::camera::Device::getPropertyFromCamera(unsigned int propertyId)
+double cedar::dev::sensors::camera::Backend::getPropertyFromCamera(unsigned int propertyId)
 {
-  double result = CAMERA_PROPERTY_NOT_SUPPORTED;
-
-  if (this->mpCameraChannel->mVideoCapture.isOpened())
+  if (! this->mpCameraChannel->mVideoCapture.isOpened())
   {
-    if (this->mpCameraChannel->mpProperties->isSupported(propertyId))
-    {
-      result = this->mpCameraChannel->mVideoCapture.get(propertyId);
-    }
-    else
-    {
-      result = CAMERA_PROPERTY_NOT_SUPPORTED;
-    }
+    return CAMERA_PROPERTY_NOT_SUPPORTED;
+    /*CEDAR_THROW
+    (
+      //cedar::dev::sensors::camera::VideoCaptureNotOpenedException,
+      cedar::dev::sensors::camera::LibDcInitException,
+      "cedar::dev::sensors::camera::Backend::getPropertyFromCamera(): VideoCaputure object is not opened"
+    )*/
   }
-  return result;
+    
+  if (! this->mpCameraChannel->mpProperties->isSupported(propertyId))
+  {
+    return CAMERA_PROPERTY_NOT_SUPPORTED;
+    /*
+    std::string prop_name = cedar::dev::sensors::camera::Property::type().get(propertyId).prettyString();
+    CEDAR_THROW
+    (
+      cedar::dev::sensors::camera::PropertyNotSupportedException,
+      "cedar::dev::sensors::camera::Backend::getPropertyFromCamera(): Property \"" 
+        + prop_name + "\" not supported by the used backend"
+    ) */
+  }
+  //double result = CAMERA_PROPERTY_NOT_SUPPORTED;
+  return this->mpCameraChannel->mVideoCapture.get(propertyId);
 }

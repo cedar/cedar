@@ -41,6 +41,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/NetGrabber.h"
+#include "cedar/devices/sensors/visual/exceptions.h"
 #include "cedar/auxiliaries/net/Reader.h"
 #include "cedar/auxiliaries/net/exceptions.h"
 #include "cedar/auxiliaries/exceptions.h"
@@ -142,8 +143,9 @@ void cedar::dev::sensors::visual::NetGrabber::onCleanUp()
 }
 
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
+void cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
 {
+  // create debug-message
   const std::string method_name="cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()";
   unsigned int num_cams = getNumCams();
   std::stringstream info;
@@ -201,8 +203,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
         if (++timeout_counter > 10)
         {
           std::string msg = this->getName() + ": Couldn't open the YARP channel \""+channel_name+"\"\nGiving up!";
-          cedar::aux::LogSingleton::getInstance()->error(msg, method_name);
-          return false;  // throws an initialization-exception
+          CEDAR_THROW(cedar::dev::sensors::visual::CreateGrabberException,msg);
         }
         else
         {
@@ -215,8 +216,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
       {
         std::string msg = this->getName() + ": Unknown Error on initialization of NetReader for channel \""
                                           + channel_name + "\"";
-        cedar::aux::LogSingleton::getInstance()->error(msg, method_name);
-        return false;  // throws an initialization-exception
+        CEDAR_THROW(cedar::dev::sensors::visual::CreateGrabberException,msg);
       }
 
     } while (!yarp_reader.get()); // check the raw pointer
@@ -253,8 +253,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
         if (++timeout_counter > 40)
         {
           std::string msg = this->getName() + ": Couldn't retrieve an image from YARP-channel \"" + channel_name + "\"";
-          cedar::aux::LogSingleton::getInstance()->error(msg, method_name);
-          return false;  // throws an initialization-exception
+          CEDAR_THROW(cedar::dev::sensors::visual::CreateGrabberException,msg);
         }
         else
         {
@@ -267,7 +266,7 @@ bool cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
         std::string msg = this->getName() + ": Unknown error while trying to retrieve an image from YARP-channel \""
                           + channel_name + "\"";
         cedar::aux::LogSingleton::getInstance()->error(msg, method_name);
-        return false;  // throws an initialization-exception
+        CEDAR_THROW(cedar::dev::sensors::visual::CreateGrabberException,msg);
       }
 
     } while (!reading_ok);
@@ -281,10 +280,8 @@ bool cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
   // determine framerate of the source
   //-------------------------------------------------
 
-  this->setFps(100.f);
   // TODO get fps from source: measure the difference between two frames
-
-  return true;
+  this->setFps(100.f);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -294,10 +291,8 @@ std::string cedar::dev::sensors::visual::NetGrabber::onUpdateSourceInfo(unsigned
 }
 
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::NetGrabber::onGrab(unsigned int channel)
+void cedar::dev::sensors::visual::NetGrabber::onGrab(unsigned int channel)
 {
-  int result = true;
-
   try
   {
     // the read() function pop the image from the NetReader class.
@@ -306,13 +301,14 @@ bool cedar::dev::sensors::visual::NetGrabber::onGrab(unsigned int channel)
   }
   catch (cedar::aux::net::NetUnexpectedDataException &E)
   {
-    // no new frame
+    // no new frame (could be ignored, because the old frame is in the image buffer)
   }
-  catch (...)
+  catch (std::exception& e)
   {
-    result = false;
+    std::string msg = "Unknown exception on channel " + boost::lexical_cast<std::string>(channel)
+                        + ": " + e.what();
+    CEDAR_THROW(cedar::dev::sensors::visual::GrabberGrabException,msg)
   }
-  return result;
 }
 
 #endif // CEDAR_USE_YARP

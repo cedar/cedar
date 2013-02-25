@@ -28,7 +28,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 09 28
 
-    Description: Class GrabberChannel
+    Description: Class GrabberChannel contains the data for a grabbing channel
 
     Credits:
 

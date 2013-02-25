@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraBackendType.cpp
+    File:        ackendType.cpp
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 07 04
 
-    Description: Implementation of the CameraBackendType enum-type class
+    Description: Implementation of the BackendType enum-type class
 
     Credits:
 

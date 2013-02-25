@@ -220,7 +220,7 @@ public:
 
   /*! @brief Get the used file to grab from
    *  @param channel The channel which filename should be read
-   *  @throws IndexOutOfRangeException If channel isn't fit
+   *  @throw IndexOutOfRangeException If channel isn't fit
    */
   const std::string getSourceFile(unsigned int channel = 0);
 
@@ -231,7 +231,7 @@ public:
 protected:
 
   // inherited from Grabber
-  bool onCreateGrabber();
+  void onCreateGrabber();
   void onCloseGrabber();
   std::string onUpdateSourceInfo(unsigned int channel);
   void onCleanUp();
@@ -245,7 +245,7 @@ protected:
    *
    *  @param channel The channel, which should be grabbed
    */
-  bool onGrab(unsigned int channel);
+  void onGrab(unsigned int channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

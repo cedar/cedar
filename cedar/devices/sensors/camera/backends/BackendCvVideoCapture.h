@@ -22,40 +22,35 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraDevice.h
+    File:        BackendCvVideoCapture.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 07 04
 
-    Description:  Header for the cedar::dev::sensors::camera::Device class
+    Description:  Header for the cedar::dev::sensors::camera::BackendCvVideoCapture class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_CAMERA_DEVICE_VFL_H
-#define CEDAR_DEV_SENSORS_CAMERA_DEVICE_VFL_H
+#ifndef CEDAR_DEV_SENSORS_CAMERA_BACKEND_CVVIDEOCAPTURE_H
+#define CEDAR_DEV_SENSORS_CAMERA_BACKEND_CVVIDEOCAPTURE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-#ifdef CEDAR_USE_VIDEO_FOR_LINUX
-
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/camera/namespace.h"
-#include "cedar/devices/sensors/camera/backends/Device.h"
+#include "cedar/devices/sensors/camera/backends/Backend.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Base class of the misc camera grabber backends.
- *
- * Implements the common features of a camera device
- */
-class cedar::dev::sensors::camera::DeviceVfl
+/*!@brief Implements an OpenCV CvVideoCapture-object as camera-backend */
+class cedar::dev::sensors::camera::BackendCvVideoCapture
 :
-public cedar::dev::sensors::camera::Device
+public cedar::dev::sensors::camera::Backend
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -66,13 +61,10 @@ public cedar::dev::sensors::camera::Device
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  CameraDeviceVfl
-  (
-    cedar::dev::sensors::camera::Channel* pCameraChannel
-  );
+  BackendCvVideoCapture(cedar::dev::sensors::camera::Channel* pCameraChannel);
 
   //!@brief Destructor
-  ~CameraDeviceVfl();
+  ~BackendCvVideoCapture();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -84,10 +76,10 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void setProperties();
+  // derived from class Device
   void applySettingsToCamera();
   bool createCaptureObject();
-  void applyStateToCamera();
+  void getAvailablePropertiesFromCamera();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -112,9 +104,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::dev::sensors::camera::DeviceVfl
+}; // class cedar::dev::sensors::camera::BackendCvVideoCapture
 
-
-#endif // CEDAR_USE_VIDEO_FOR_LINUX
-#endif // CEDAR_DEV_SENSORS_CAMERA_DEVICE_VFL_H
+#endif // CEDAR_DEV_SENSORS_CAMERA_BACKEND_CVVIDEOCAPTURE_H
 

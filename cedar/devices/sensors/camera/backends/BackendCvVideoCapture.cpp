@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DeviceCvVideoCapture.cpp
+    File:        BackendCvVideoCapture.cpp
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 07 04
 
-    Description:  Implementation for the cedar::dev::sensors::camera::DeviceCvVideoCapture class
+    Description:  Implementation for the cedar::dev::sensors::camera::BackendCvVideoCapture class
 
     Credits:
 
@@ -38,24 +38,24 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/camera/backends/DeviceCvVideoCapture.h"
+#include "cedar/devices/sensors/camera/backends/BackendCvVideoCapture.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::sensors::camera::DeviceCvVideoCapture::DeviceCvVideoCapture
+cedar::dev::sensors::camera::BackendCvVideoCapture::BackendCvVideoCapture
 (
   cedar::dev::sensors::camera::Channel* pCameraChannel
 )
 :
-cedar::dev::sensors::camera::Device(pCameraChannel)
+cedar::dev::sensors::camera::Backend(pCameraChannel)
 {
 }
 
 
-cedar::dev::sensors::camera::DeviceCvVideoCapture::~DeviceCvVideoCapture()
+cedar::dev::sensors::camera::BackendCvVideoCapture::~BackendCvVideoCapture()
 {
 }
 
@@ -64,12 +64,12 @@ cedar::dev::sensors::camera::DeviceCvVideoCapture::~DeviceCvVideoCapture()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-// void cedar::dev::sensors::camera::DeviceCvVideoCapture::createPropertyAndSetting()
+// void cedar::dev::sensors::camera::BackendCvVideoCapture::createPropertyAndSetting()
 //{
 //}
 
 
-bool cedar::dev::sensors::camera::DeviceCvVideoCapture::createCaptureObject()
+bool cedar::dev::sensors::camera::BackendCvVideoCapture::createCaptureObject()
 {
 
 //  std::cout << "Create camera with cv::VideoCapture Backend\n"
@@ -88,7 +88,7 @@ bool cedar::dev::sensors::camera::DeviceCvVideoCapture::createCaptureObject()
 }
 
 
-void cedar::dev::sensors::camera::DeviceCvVideoCapture::getAvailablePropertiesFromCamera()
+void cedar::dev::sensors::camera::BackendCvVideoCapture::getAvailablePropertiesFromCamera()
 {
 #ifdef DEBUG_CAMERA_GRABBER
   std::cout << __PRETTY_FUNCTION__ << std::endl;
@@ -114,7 +114,7 @@ void cedar::dev::sensors::camera::DeviceCvVideoCapture::getAvailablePropertiesFr
   }
 }
 
-void cedar::dev::sensors::camera::DeviceCvVideoCapture::applySettingsToCamera()
+void cedar::dev::sensors::camera::BackendCvVideoCapture::applySettingsToCamera()
 {
   //only the video mode could be set in cv::Videocapture backend
 

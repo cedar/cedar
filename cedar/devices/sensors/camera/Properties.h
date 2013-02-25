@@ -280,7 +280,7 @@ private:
 protected:
   // none yet
 private:
-  ///!The list of properties
+  /// The list of properties
   CamPropertiesMapPtr mpPropertiesList;
 
   /// Camera interface

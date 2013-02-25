@@ -78,23 +78,23 @@ public:
 
   /*! @brief  Constructor for a single channel grabber
    *  @param grabberName  Name of the grabber
-   *  @param grabbable Class that implements the grabbable interface to grab from
+   *  @param grabbableObject Object to grab from (have to implement the Grabbable-Interface)
    */
   GrabbableGrabber
   (
-    cedar::aux::Grabbable* grabbable = NULL,
+    cedar::aux::Grabbable* grabbableObject = NULL,
     const std::string& grabberName = "GrabbableGrabber"
   );
 
   /*! @brief Constructor for a stereo channel grabber
    *  @param grabberName  Name of the grabber
-   *  @param grabbable0 Class that implements the grabbable interface to grab from for channel 0
-   *  @param grabbable1 Class that implements the grabbable interface to grab from for channel 0
+   *  @param grabbableObject0 Object to grab from (have to implement the Grabbable-Interface) for channel 0
+   *  @param grabbableObject1 Object to grab from (have to implement the Grabbable-Interface) for channel 1
    */
   GrabbableGrabber
   (
-    cedar::aux::Grabbable* grabbable0,
-    cedar::aux::Grabbable* grabbable1,
+    cedar::aux::Grabbable* grabbableObject0,
+    cedar::aux::Grabbable* grabbableObject1,
     const std::string& grabberName = "StereoGrabbableGrabber"
   );
 
@@ -114,8 +114,8 @@ protected:
 
   // inherited from Grabber
   void onCleanUp();
-  bool onGrab(unsigned int channel);
-  bool onCreateGrabber();
+  void onGrab(unsigned int channel);
+  void onCreateGrabber();
   void onCloseGrabber();
   std::string onUpdateSourceInfo(unsigned int channel);
 

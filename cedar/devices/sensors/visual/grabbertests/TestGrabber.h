@@ -125,10 +125,10 @@ public:
 protected:
 
   // derived from Grabber
-  bool onCreateGrabber();
+  void onCreateGrabber();
   void onCloseGrabber();
   void onCleanUp();
-  bool onGrab();
+  void onGrab();
   std::string onUpdateSourceInfo(unsigned int channel);
 
   //--------------------------------------------------------------------------------------------------------------------

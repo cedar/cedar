@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Device.h
+    File:        Backend.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 07 04
 
-    Description:  Header for the cedar::dev::sensors::camera::Device class
+    Description:  Header for the cedar::dev::sensors::camera::Backend class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_CAMERA_DEVICE_H
-#define CEDAR_DEV_SENSORS_CAMERA_DEVICE_H
+#ifndef CEDAR_DEV_SENSORS_CAMERA_BACKEND_H
+#define CEDAR_DEV_SENSORS_CAMERA_BACKEND_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -53,9 +53,9 @@
 
 /*!@brief Base class of the misc camera grabber backends.
  *
- * Implements the common features of a camera device
+ * Implements the common features of the backends
  */
-class cedar::dev::sensors::camera::Device
+class cedar::dev::sensors::camera::Backend
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -67,22 +67,23 @@ class cedar::dev::sensors::camera::Device
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief The standard constructor.
-  Device(cedar::dev::sensors::camera::Channel* pCameraChannel);
+  Backend(cedar::dev::sensors::camera::Channel* pCameraChannel);
 
 public:
   //!@brief Destructor
-  virtual ~Device();
+  virtual ~Backend();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  /*! In this method, properties and settings from the backend could be set
-   *
-   *  read the values probably with the help of external libraries in order to read
-   *  min/max values or supported features from the wanted device and set them in the channel structure.
-   *  This method is called before createCaptureDevice() is invoked.
+  /*! @brief This method initializes the backend. It have to be invoked after the creation of the class
+   * 
+   *  In this method, properties and settings from the backend should be set.
+   *  The values could be read probably with the help of external libraries probably in order to read
+   *  min/max values or supported features from the wanted Backend and set them in the channel structure.
+   *  This method is called before createCaptureBackend() is invoked.
    *
    */
   virtual void init();
@@ -93,14 +94,14 @@ public:
    *
    * @return True, if the cameras are successfully initialized, otherwise false.
    */
-  bool createCaptureDevice();
+  bool createCaptureBackend();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  //! Create a new Capture device
+  //! Create a new Capture Backend
   virtual bool createCaptureObject() = 0;
 
   //! Apply all Settings to the Camera
@@ -110,7 +111,7 @@ protected:
   void applyStateToCamera();
 
 
-  //! Test all properties from the device and enable/disable the properties of the channel
+  //! Test all properties from the Backend and enable/disable the properties of the channel
   virtual void getAvailablePropertiesFromCamera(){};
 
 
@@ -130,6 +131,8 @@ protected:
    *    by the used backend
    *
    *  @param propertyId The OpenCV constants for cv::VideoCapture.set() method
+   *  @throw VideoCaptureNotOpenedException Throws this exception when the used cv::VideoCapture is not opened.
+   *  @throw PropertyNotSupportedException Thrown, when the given property is not supported by the actual used backend
    *  @return Value, that indicates the exit-state of cv::VideoCapture.set()
    */
   double getPropertyFromCamera(unsigned int propertyId);
@@ -159,10 +162,10 @@ protected:
 private:
   // none yet
 
-}; // class cedar::dev::sensors::camera::Device
+}; // class cedar::dev::sensors::camera::Backend
 
 /*
-// The typedefs for the manager of the Devices
+// The typedefs for the manager of the Backends
 #include "cedar/auxiliaries/FactoryManager.h"
 
 namespace cedar
@@ -174,24 +177,24 @@ namespace cedar
       namespace visual
       {
         //!@brief The manager of all sigmoind instances
-        typedef cedar::aux::FactoryManager<DevicePtr> DeviceManager;
+        typedef cedar::aux::FactoryManager<BackendPtr> BackendManager;
 
 #ifdef MSVC
 #ifdef CEDAR_LIB_EXPORTS_DEV
         // dllexport
-        template class __declspec(dllexport) cedar::aux::Singleton<DeviceManager>;
+        template class __declspec(dllexport) cedar::aux::Singleton<BackendManager>;
 #else // CEDAR_LIB_EXPORTS_DEV
       // dllimport
-        extern template class __declspec(dllimport) cedar::aux::Singleton<DeviceManager>;
+        extern template class __declspec(dllimport) cedar::aux::Singleton<BackendManager>;
 #endif // CEDAR_LIB_EXPORTS_DEV
 #endif // MSVC
 
         //!@brief The singleton object of the TransferFunctionFactory.
-        typedef cedar::aux::Singleton<DeviceManager> DeviceManagerSingleton;
+        typedef cedar::aux::Singleton<BackendManager> BackendManagerSingleton;
       }
     }
   }
 }
 */
-#endif // CEDAR_DEV_SENSORS_CAMERA_DEVICE_H
+#endif // CEDAR_DEV_SENSORS_CAMERA_BACKEND_H
 

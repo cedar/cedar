@@ -36,6 +36,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/grabbertests/TestGrabber.h"
+#include "cedar/devices/sensors/visual/exceptions.h"
+
 
 // SYSTEM INCLUDES
 
@@ -142,7 +144,7 @@ cedar::dev::sensors::visual::TestGrabber::~TestGrabber()
 //----------------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()
+void cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()
 {
 
   // do the initialization of your Grabber in this method,
@@ -179,6 +181,12 @@ bool cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()
 
     // apply the new content to the channel image
     getImageMat(channel) = frame;
+
+    // on errors, throw an exception
+    if (frame.empty())
+    {
+      CEDAR_THROW(cedar::dev::sensors::visual::CreateGrabberException,"Error, frame is empty")
+    }
   }
 
 
@@ -188,7 +196,6 @@ bool cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()
                                            this->getName() + ": Initialization finished",
                                             "cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()"
                                           );
-  return true;
 
 }
 
@@ -227,21 +234,29 @@ std::string cedar::dev::sensors::visual::TestGrabber::onUpdateSourceInfo(unsigne
 }
 
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::TestGrabber::onGrab()
+void cedar::dev::sensors::visual::TestGrabber::onGrab()
 {
   // this is the main grabbing method.
-  // read a new picture from the source and set the picture in the mImageMatVector.at()
+  // read a new picture from the source and set the picture in the channel image buffer
+
+  std::cout << "TestGrabber::onGrab()" << std::endl;
 
   unsigned int num_cams = getNumCams();
   for(unsigned int channel = 0; channel < num_cams; ++channel)
    {
      // apply the new content to the channel image
      // getTestChannel(channel)->mImageMat = grab_new_content();
+
+     // check on errors an throw an exception
+     if (getTestChannel(channel)->mImageMat.empty())
+     {
+       std::string msg = "Channel " + boost::lexical_cast<std::string>(channel) + ": An error occurred";
+       CEDAR_THROW(cedar::dev::sensors::visual::GrabberGrabException,msg);
+     }
    }
 
   // here we just want to count how often onGrab is invoked, due to a fps-check
   mCounter ++;
-  return true;
 }
 
 //----------------------------------------------------------------------------------------------------

@@ -28,7 +28,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 09 28
 
-    Description: Class NetChannel
+    Description: Class NetChannel contains additional data of a net-grabbing channel
 
     Credits:
 

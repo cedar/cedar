@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/GLGrabber.h"
+#include "cedar/devices/sensors/visual/exceptions.h"
 
 // SYSTEM INCLUDES
 
@@ -113,8 +114,9 @@ cedar::dev::sensors::visual::GLGrabber::~GLGrabber()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::dev::sensors::visual::GLGrabber::onCreateGrabber()
+void cedar::dev::sensors::visual::GLGrabber::onCreateGrabber()
 {
+  // create debug-message
   unsigned int num_cams = getNumCams();
   std::stringstream init_message;
   init_message << ": Initialize grabber with " << getNumCams() << " channels ..." << std::endl;
@@ -130,7 +132,7 @@ bool cedar::dev::sensors::visual::GLGrabber::onCreateGrabber()
                                             this->getName() + init_message.str(),
                                              "cedar::dev::sensors::visual::OglGrabber::onCreateGrabber()"
                                            );
-  return true;
+  // nothing else to do
 }
 
 
@@ -166,42 +168,42 @@ std::string cedar::dev::sensors::visual::GLGrabber::onUpdateSourceInfo(unsigned 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::GLGrabber::onGrab(unsigned int channel)
+void cedar::dev::sensors::visual::GLGrabber::onGrab(unsigned int channel)
 {
-  bool ogl_valid = true;
+  // pointer to the QGLWidget
+  QGLWidget* p_channel_widget = getGLChannel(channel)->mpQGLWidget;
 
-  if (getGLChannel(channel)->mpQGLWidget != NULL)
+  if (p_channel_widget == NULL)
   {
-    QGLWidget* p_channel_widget = getGLChannel(channel)->mpQGLWidget;
-
-    // grab framebuffer without alpha-channel. possible values
-    // GL_FRONT_LEFT, GL_FRONT_RIGHT, GL_BACK_LEFT, GL_BACK_RIGHT, GL_FRONT, GL_BACK, GL_LEFT, GL_RIGHT, GL_AUXi,
-    // where i is between 0 and the value of GL_AUX_BUFFERS minus 1.
-
-    // activate this thread for painting
-    // problem: qgl-widget painting also have to be multithreaded, i.e also have to invoke makeCurrent(), doneCurrent()
-    // p_channel_widget->makeCurrent();
-    glReadBuffer(GL_FRONT_RIGHT);
-    QImage qimage = p_channel_widget->grabFrameBuffer(false);
-    // p_channel_widget->doneCurrent();
-
-    // QImage to cv::Mat
-    cv::Mat mat =
-       cv::Mat(qimage.height(), qimage.width(), CV_8UC4, static_cast<uchar*>(qimage.bits()), qimage.bytesPerLine());
-    cv::Mat mat2 = cv::Mat(mat.rows, mat.cols, CV_8UC3 );
-    int from_to[] = { 0,0, 1,1, 2,2 };
-    cv::mixChannels( &mat, 1, &mat2, 1, from_to, 3 );
-
-    // apply the new content to the channel image
-    getImageMat(channel) = mat2.clone();
+    std::string msg = "Channel " + boost::lexical_cast<std::string>(channel) + ": "
+                      + "The Widget to grab from is not valid (i.e. it is a NULL-pointer)";
+    CEDAR_THROW(cedar::dev::sensors::visual::GrabberGrabException,msg)
   }
-  else
-  {
-    // if opengl context isn't valid, then an empty matrix will be return
-    ogl_valid = false;
-    getImageMat(channel) = cv::Mat();
-  }
-  return ogl_valid;
+
+  // grab framebuffer without alpha-channel. possible values
+  // GL_FRONT_LEFT, GL_FRONT_RIGHT, GL_BACK_LEFT, GL_BACK_RIGHT, GL_FRONT, GL_BACK, GL_LEFT, GL_RIGHT, GL_AUXi,
+  // where i is between 0 and the value of GL_AUX_BUFFERS minus 1.
+
+  // activate this thread for painting
+  // p_channel_widget->makeCurrent();
+
+  // problem: qgl-widget painting also have to be multithreaded, i.e also have to invoke makeCurrent(), doneCurrent()
+  //   It is not possible to reach this from this grabber. So keep in mind:
+  // ATTENTION: This grabbing is only possible in the GUI-Thread!!!
+
+  glReadBuffer(GL_FRONT_RIGHT);
+  QImage qimage = p_channel_widget->grabFrameBuffer(false);
+  // p_channel_widget->doneCurrent();
+
+  // convert QImage to cv::Mat
+  cv::Mat mat =
+     cv::Mat(qimage.height(), qimage.width(), CV_8UC4, static_cast<uchar*>(qimage.bits()), qimage.bytesPerLine());
+  cv::Mat mat2 = cv::Mat(mat.rows, mat.cols, CV_8UC3 );
+  int from_to[] = { 0,0, 1,1, 2,2 };
+  cv::mixChannels( &mat, 1, &mat2, 1, from_to, 3 );
+
+  // apply the new content to the channel image
+  getImageMat(channel) = mat2.clone();
 }
 
 
@@ -210,35 +212,40 @@ void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGL
 {
   if (channel >= getNumCams())
   {
+    CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"The wanted channel is out of range");
+  }
+
+  // check if a valid widget is there
+  if (qglWidget == NULL)
+  {
     CEDAR_THROW
     (
-      cedar::aux::IndexOutOfRangeException,
-      "cedar::dev::sensors::visual::GLGrabber::setWidget"
+      cedar::dev::sensors::visual::InvalidParameterException,
+      "The new Widget to grab from is invalid (NULL-pointer)"
     );
   }
 
-  if (qglWidget != NULL)
+  // stop grabbing thread if running
+  bool restart_grabber = LoopedThread::isRunning();
+  if (restart_grabber)
   {
-    bool restart_grabber = LoopedThread::isRunning();
+    this->stopGrabber();
+  }
 
-    // stop grabbing thread if running
-    if (restart_grabber)
-    {
-      this->stopGrabber();
-    }
+  // change source
+  getGLChannel(channel)->mpQGLWidget = qglWidget;
+  cedar::aux::LogSingleton::getInstance()->debugMessage
+                                           (
+                                             this->getName() + ": New Widget applied",
+                                             "cedar::dev::sensors::visual::GLGrabber::setWidget"
+                                           );
+  // get first new image
+  this->grab();
 
-    // change source
-    getGLChannel(channel)->mpQGLWidget = qglWidget;
-    cedar::aux::LogSingleton::getInstance()->debugMessage
-                                             (
-                                               this->getName() + ": New Widget applied",
-                                               "cedar::dev::sensors::visual::GLGrabber::setWidget"
-                                             );
-    this->grab();
-    if (restart_grabber)
-    {
-      this->startGrabber();
-    }
+  // restart grabbing-thread (if running before)
+  if (restart_grabber)
+  {
+    this->startGrabber();
   }
 }
 

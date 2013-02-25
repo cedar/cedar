@@ -74,15 +74,15 @@ namespace cedar
         //-----------------------------------------------------------------------------------------------
 
         // backend implementation
-        CEDAR_DECLARE_DEV_CLASS(Device);
-        CEDAR_DECLARE_DEV_CLASS(DeviceCvVideoCapture);
+        CEDAR_DECLARE_DEV_CLASS(Backend);
+        CEDAR_DECLARE_DEV_CLASS(BackendCvVideoCapture);
 
   #ifdef CEDAR_USE_VIDEO_FOR_LINUX
-        CEDAR_DECLARE_DEV_CLASS(CameraDeviceVfl);
+        CEDAR_DECLARE_DEV_CLASS(BackendV4L);
   #endif // CEDAR_USE_VIDEO_FOR_LINUX
 
   #ifdef CEDAR_USE_LIB_DC1394
-        CEDAR_DECLARE_DEV_CLASS(DeviceDc1394);
+        CEDAR_DECLARE_DEV_CLASS(BackendDc1394);
         CEDAR_DECLARE_DEV_CLASS(LibDcBase);
   #endif
 
@@ -116,20 +116,23 @@ namespace cedar
         // camera settings
         CEDAR_DECLARE_DEV_CLASS(CamSetting);
 
+        // camera channel
         CEDAR_DECLARE_DEV_CLASS(Channel);
 
+        // map from property-id to the corresponding object, which manage the property
         typedef std::map<unsigned int, cedar::dev::sensors::camera::CamPropertyPtr> PropertyMap;
 
         //-----------------------------------------------------------------------------------------------
         // exceptions
         //-----------------------------------------------------------------------------------------------
 
+        CEDAR_DECLARE_DEV_CLASS(PropertyNotSupportedException);
+        //class PropertyNotSupportedException;
+        CEDAR_DECLARE_DEV_CLASS(VideoCaptureNotOpenedException);
+        
+
 #ifdef CEDAR_USE_LIB_DC1394
-
-        //!@brief An exception for errors on initialization of the LibDC class
-        class LibDcInitException;
-
-        //!@brief An exception for errors in the LibDc class
+        CEDAR_DECLARE_DEV_CLASS(LibDcInitException);
         class LibDcException;
 #endif //CEDAR_USE_LIB_DC1394
 
