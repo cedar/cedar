@@ -25,6 +25,11 @@
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gl/Block.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/auxiliaries/math/constants.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/PlaneAngle.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -32,7 +37,6 @@
 #include <opencv2/opencv.hpp>
 #include <boost/lexical_cast.hpp>
 #include <ios>
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Local methods
@@ -101,17 +105,22 @@ int main(int argc, char **argv)
 
   // create a rectangular block and add it to the scene
   cedar::aux::LocalCoordinateFramePtr p_block_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
-  p_block_local_coordinate_frame->setTranslation(3, -3, 3);
+  p_block_local_coordinate_frame->setTranslation
+  (
+    3.0 * cedar::unit::meters,
+    -3.0 * cedar::unit::meters,
+    3.0 * cedar::unit::meters
+  );
   cedar::aux::gl::ObjectVisualizationPtr p_block
   (
     new cedar::aux::gl::Block(p_block_local_coordinate_frame, 1, 2, 3, 0, 1, 0.5)
   );
   p_scene->addObjectVisualization(p_block);
-  p_block_local_coordinate_frame->rotate(0, M_PI/2);
+  p_block_local_coordinate_frame->rotate(0, cedar::aux::math::pi/2.0 * cedar::unit::radians);
 
   // wait until viewer is finished with its creation
   processQtEvents();
-  cedar::aux::sleep(cedar::unit::Milliseconds(100));
+  cedar::aux::sleep(cedar::unit::Time(100.0 * cedar::unit::milli * cedar::unit::seconds));
 
   // -------------------------------------------------------------------------------------------------------------------
   // Create grabber, with viewer-class as parameter
@@ -174,7 +183,7 @@ int main(int argc, char **argv)
   for (int i = 0; i < 100; ++i)
   {
     processQtEvents();
-    cedar::aux::sleep(cedar::unit::Milliseconds(10));
+    cedar::aux::sleep(cedar::unit::Time(10.0 * cedar::unit::milli * cedar::unit::seconds));
   }
 
 
@@ -246,7 +255,7 @@ int main(int argc, char **argv)
       // display real reached fps
       std::cout << "Thread FPS: " << p_grabber->getFpsMeasured() << std::endl;
     }
-    cedar::aux::sleep(cedar::unit::Milliseconds(1));
+    cedar::aux::sleep(cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds));
   }
 
   //----------------------------------------------------------------------------------------

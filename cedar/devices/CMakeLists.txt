@@ -48,6 +48,7 @@ endif(CEDAR_USE_LIB_DC1394)
 cedar_add_library(cedardev
                   MOC_HEADERS
                   SerialChannel.h
+                  Odometry.h
                   gui/KinematicChainWidget.h
                   gui/KinematicChainMonitorWidget.h
                   gui/KinematicChainCommandWidget.h

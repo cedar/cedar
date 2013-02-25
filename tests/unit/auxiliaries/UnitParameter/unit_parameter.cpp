@@ -39,6 +39,10 @@
 #include "cedar/auxiliaries/LengthParameter.h"
 #include "cedar/auxiliaries/TimeParameter.h"
 #include "cedar/auxiliaries/VelocityParameter.h"
+#include "cedar/auxiliaries/PlaneAngleParameter.h"
+#include "cedar/auxiliaries/FrequencyParameter.h"
+#include "cedar/auxiliaries/AngularVelocityParameter.h"
+#include "cedar/auxiliaries/AccelerationParameter.h"
 
 // SYSTEM INCLUDES
 #include <boost/filesystem.hpp>
@@ -77,6 +81,42 @@ public:
       "velocity",
       1 * boost::units::si::meters / boost::units::si::second
     )
+  ),
+  mPlaneAngle
+  (
+    new cedar::aux::PlaneAngleParameter
+    (
+      this,
+      "plane angle",
+      1 * boost::units::si::radian
+    )
+  ),
+  mFrequency
+  (
+    new cedar::aux::FrequencyParameter
+    (
+      this,
+      "frequency",
+      1 * boost::units::si::hertz
+    )
+  ),
+  mAngularVelocity
+  (
+    new cedar::aux::AngularVelocityParameter
+    (
+      this,
+      "angular velocity",
+      1 * boost::units::si::radian_per_second
+    )
+  ),
+  mAcceleration
+  (
+    new cedar::aux::AccelerationParameter
+    (
+      this,
+      "acceleration",
+      1.0 * boost::units::si::meters_per_second_squared
+    )
   )
   {
   }
@@ -84,6 +124,10 @@ public:
   cedar::aux::LengthParameterPtr mLength;
   cedar::aux::TimeParameterPtr mTime;
   cedar::aux::VelocityParameterPtr mVelocity;
+  cedar::aux::PlaneAngleParameterPtr mPlaneAngle;
+  cedar::aux::FrequencyParameterPtr mFrequency;
+  cedar::aux::AngularVelocityParameterPtr mAngularVelocity;
+  cedar::aux::AccelerationParameterPtr mAcceleration;
 };
 
 CEDAR_GENERATE_POINTER_TYPES(TestConfigurable);
@@ -94,13 +138,14 @@ int check(const boost::units::quantity<T>& expected, boost::intrusive_ptr<cedar:
 {
   if (param->getValue() != expected)
   {
-    std::cout << "<<ERROR>>: Wrong unit was read for parameter \"" << param->getName() << "\": expected " << expected
+    std::cout << "  <<ERROR>>: Wrong quantity/unit was read for parameter \"" << param->getName()
+              << "\": expected " << expected
               << ", read: " << param->getValue() << std::endl;
     return 1;
   }
   else
   {
-    std::cout << "Parameter \"" << param->getName() << "\" was read correctly ("
+    std::cout << "  Parameter \"" << param->getName() << "\" was read correctly ("
               << param->getValue() << " == " << expected << ")." << std::endl;
     return 0;
   }
@@ -111,7 +156,11 @@ int test_reading
       const std::string& fileName,
       const boost::units::quantity<boost::units::si::length>& expectedLength,
       const boost::units::quantity<boost::units::si::time>& expectedTime,
-      const boost::units::quantity<boost::units::si::velocity>& expectedVelocity
+      const boost::units::quantity<boost::units::si::velocity>& expectedVelocity,
+      const boost::units::quantity<boost::units::si::plane_angle>& expectedPlaneAngle,
+      const boost::units::quantity<boost::units::si::frequency>& expectedFrequency,
+      const boost::units::quantity<boost::units::si::angular_velocity>& expectedAngularVelocity,
+      const boost::units::quantity<boost::units::si::acceleration>& expectedAcceleration
     )
 {
   int errors = 0;
@@ -125,19 +174,54 @@ int test_reading
     errors += check(expectedLength, conf->mLength);
     errors += check(expectedTime, conf->mTime);
     errors += check(expectedVelocity, conf->mVelocity);
+    errors += check(expectedPlaneAngle, conf->mPlaneAngle);
+    errors += check(expectedFrequency, conf->mFrequency);
+    errors += check(expectedAngularVelocity, conf->mAngularVelocity);
+    errors += check(expectedAcceleration, conf->mAcceleration);
   }
 
   std::cout << "Reading of file \"" << fileName << "\" finished with " << errors << " error(s)." << std::endl;
   return errors;
 }
 
-int test_writing(const std::string& fileName)
+int test_writing
+    (
+      const std::string& fileName,
+      const boost::units::quantity<boost::units::si::length>& expectedLength,
+      const boost::units::quantity<boost::units::si::time>& expectedTime,
+      const boost::units::quantity<boost::units::si::velocity>& expectedVelocity,
+      const boost::units::quantity<boost::units::si::plane_angle>& expectedPlaneAngle,
+      const boost::units::quantity<boost::units::si::frequency>& expectedFrequency,
+      const boost::units::quantity<boost::units::si::angular_velocity>& expectedAngularVelocity,
+      const boost::units::quantity<boost::units::si::acceleration>& expectedAcceleration
+    )
 {
   int errors = 0;
-  std::cout << "Testing reading of file \"" << fileName << "\"." << std::endl;
+  std::cout << "Testing writing of file \"" << fileName << "\"." << std::endl;
 
   TestConfigurablePtr conf(new TestConfigurable());
+
+  conf->mLength->setValue(expectedLength);
+  conf->mTime->setValue(expectedTime);
+  conf->mVelocity->setValue(expectedVelocity);
+  conf->mPlaneAngle->setValue(expectedPlaneAngle);
+  conf->mFrequency->setValue(expectedFrequency);
+  conf->mAngularVelocity->setValue(expectedAngularVelocity);
+  conf->mAcceleration->setValue(expectedAcceleration);
+
   conf->writeJson(fileName);
+
+  errors += test_reading
+            (
+              fileName,
+              conf->mLength->getValue(),
+              conf->mTime->getValue(),
+              conf->mVelocity->getValue(),
+              conf->mPlaneAngle->getValue(),
+              conf->mFrequency->getValue(),
+              conf->mAngularVelocity->getValue(),
+              conf->mAcceleration->getValue()
+            );
 
   boost::filesystem::remove(fileName.c_str());
 
@@ -186,23 +270,45 @@ int main(int, char**)
               "test1-read.json",
               1.0 * boost::units::si::meters,
               5.0 * boost::units::si::seconds,
-              1.0 * boost::units::si::meters / boost::units::si::seconds
+              1.0 * boost::units::si::meters / boost::units::si::seconds,
+              2.0 * boost::units::si::radians,
+              20.0 * boost::units::si::hertz,
+              5.0 * boost::units::si::radian_per_second,
+              7.0 * boost::units::si::meters_per_second_squared
             );
   errors += test_reading
             (
               "test2-read.json",
               1.0 * boost::units::si::meters,
               5.0 * boost::units::si::seconds,
-              1.0 * boost::units::si::meters / boost::units::si::seconds
+              1.0 * boost::units::si::meters / boost::units::si::seconds,
+              2.0 * boost::units::si::radians,
+              20.0 * boost::units::si::hertz,
+              5.0 * boost::units::si::radian_per_second,
+              7.0 * boost::units::si::meters_per_second_squared
             );
   errors += test_reading
             (
               "test3-read.json",
               1.0 * boost::units::si::meters,
               5.0 * boost::units::si::seconds,
-              1.0 * boost::units::si::meters / boost::units::si::seconds
+              1.0 * boost::units::si::meters / boost::units::si::seconds,
+              2.0 * boost::units::si::radians,
+              20.0 * boost::units::si::hertz,
+              5.0 * boost::units::si::radian_per_second,
+              7.0 * boost::units::si::meters_per_second_squared
             );
-  errors += test_writing("test1-write.json");
+  errors += test_writing
+            (
+              "test1-write.json",
+              3.0 * boost::units::si::meters,
+              2.0 * boost::units::si::seconds,
+              -5.0 * boost::units::si::meters / boost::units::si::seconds,
+              8.0 * boost::units::si::radians,
+              8.0 * boost::units::si::hertz,
+              -6.0 * boost::units::si::radian_per_second,
+              -8.0 * boost::units::si::meters_per_second_squared
+            );
 
   errors += test_limits();
 

@@ -38,6 +38,8 @@
 #include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/devices/Locomotion.h"
+#include "cedar/units/Velocity.h"
+#include "cedar/units/AngularVelocity.h"
 
 // SYSTEM INCLUDES
 
@@ -50,7 +52,17 @@ cedar::dev::Locomotion::Locomotion()
 :
 _mForwardVelocityLimits
 (
-  new cedar::aux::math::DoubleLimitsParameter(this, "forward velocity limits", -2.0, 2.0, -4.0, 4.0, -4.0, 4.0)
+  new cedar::aux::math::DoubleLimitsParameter
+      (
+        this,
+        "forward velocity limits",
+        -2.0,
+        2.0,
+        -4.0,
+        4.0,
+        -4.0,
+        4.0
+      )
 ),
 _mTurningRateLimits
 (
@@ -58,12 +70,12 @@ _mTurningRateLimits
       (
         this,
         "turning rate limits",
-        -2.0 * cedar::aux::math::pi,
-        2.0 * cedar::aux::math::pi,
-        -20.0 * cedar::aux::math::pi,
-        20.0 * cedar::aux::math::pi,
-        -20.0 * cedar::aux::math::pi,
-        20.0 * cedar::aux::math::pi
+        -2.0,
+        2.0,
+        -20.0,
+        20.0,
+        -20.0,
+        20.0
       )
 )
 {}
@@ -74,7 +86,17 @@ cedar::dev::Locomotion::Locomotion(cedar::dev::ChannelPtr channel)
 cedar::dev::Component(channel),
 _mForwardVelocityLimits
 (
-  new cedar::aux::math::DoubleLimitsParameter(this, "forward velocity limits", -2.0, 2.0, -4.0, 4.0, -4.0, 4.0)
+  new cedar::aux::math::DoubleLimitsParameter
+      (
+        this,
+        "forward velocity limits",
+        -2.0,
+        2.0,
+        -4.0,
+        4.0,
+        -4.0,
+        4.0
+      )
 ),
 _mTurningRateLimits
 (
@@ -82,12 +104,12 @@ _mTurningRateLimits
       (
         this,
         "turning rate limits",
-        -2.0 * cedar::aux::math::pi,
-        2.0 * cedar::aux::math::pi,
-        -20.0 * cedar::aux::math::pi,
-        20.0 * cedar::aux::math::pi,
-        -20.0 * cedar::aux::math::pi,
-        20.0 * cedar::aux::math::pi
+        -2.0,
+        2.0,
+        -20.0,
+        20.0,
+        -20.0,
+        20.0
       )
 )
 {}
@@ -96,27 +118,35 @@ _mTurningRateLimits
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double cedar::dev::Locomotion::getForwardVelocity() const
+cedar::unit::Velocity cedar::dev::Locomotion::getForwardVelocity() const
 {
   return mForwardVelocity;
 }
 
-double cedar::dev::Locomotion::getTurningRate() const
+cedar::unit::AngularVelocity cedar::dev::Locomotion::getTurningRate() const
 {
   return mTurningRate;
 }
 
-void cedar::dev::Locomotion::thresholdForwardVelocity(double& forwardVelocity) const
+void cedar::dev::Locomotion::thresholdForwardVelocity(cedar::unit::Velocity& forwardVelocity) const
 {
-  forwardVelocity = _mForwardVelocityLimits->getValue().limit(forwardVelocity);
+  //!todo fix this by writing a VelocityLimitsPatameter
+  double forward_velocity = forwardVelocity / cedar::unit::DEFAULT_VELOCITY_UNIT;
+  forwardVelocity = _mForwardVelocityLimits->getValue().limit(forward_velocity) * cedar::unit::DEFAULT_VELOCITY_UNIT;
 }
 
-void cedar::dev::Locomotion::thresholdTurningRate(double& turningRate) const
+void cedar::dev::Locomotion::thresholdTurningRate(cedar::unit::AngularVelocity& turningRate) const
 {
-  turningRate = _mTurningRateLimits->getValue().limit(turningRate);
+  //!todo fix this by writing a AngularVelocityLimitsPatameter
+  double turning_rate = turningRate / cedar::unit::DEFAULT_ANGULAR_VELOCITY_UNIT;
+  turningRate = _mTurningRateLimits->getValue().limit(turning_rate) * cedar::unit::DEFAULT_ANGULAR_VELOCITY_UNIT;
 }
 
 void cedar::dev::Locomotion::stop()
 {
-  setForwardVelocityAndTurningRate(0.0, 0.0);
+  setForwardVelocityAndTurningRate
+  (
+    0.0 * cedar::unit::DEFAULT_VELOCITY_UNIT,
+    0.0 * cedar::unit::DEFAULT_ANGULAR_VELOCITY_UNIT
+  );
 }

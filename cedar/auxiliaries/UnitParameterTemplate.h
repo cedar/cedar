@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 
 // SYSTEM INCLUDES
@@ -49,6 +50,8 @@
 #include <boost/units/derived_dimension.hpp>
 #include <boost/units/get_dimension.hpp>
 #include <boost/units/quantity.hpp>
+#include <boost/units/pow.hpp>
+#include <boost/units/systems/si/dimensionless.hpp>
 #include <boost/units/io.hpp>
 #include <boost/static_assert.hpp>
 
@@ -64,6 +67,14 @@ namespace cedar
       // Specialize this function for the given dimension to prevent the error.
       BOOST_STATIC_ASSERT(sizeof(T) == 0);
     }
+
+
+    template <>
+    boost::units::quantity<boost::units::si::dimensionless> getUnitFromPostFix(const std::string& postFix)
+    {
+      CEDAR_ASSERT(postFix.empty());
+      return 1.0;
+    }
   }
 }
 
@@ -73,7 +84,7 @@ namespace cedar
 {
   namespace aux
   {
-    template<typename BaseUnit, typename Dimension, typename Unit>
+    template<typename Dimension, typename Unit>
     void addSubUnitToMaps
     (
       std::map<std::string, boost::units::quantity<Dimension> >& map,
@@ -129,7 +140,7 @@ namespace cedar
 
       // could not find unit, throw exception
       //!@todo Proper exception
-      CEDAR_ASSERT(false);
+      CEDAR_THROW(cedar::aux::UnknownUnitSuffixException, "Could not find unit for suffix \"" + postFix + "\".");
     }
 
     /*!
@@ -147,9 +158,19 @@ namespace cedar
       return cedar::aux::getUnitFromPostFix<TUnit>(split.at(0));
     }
 
-    template <typename T, typename Numerator, typename Denominator>
+    template
+    <
+      typename T,
+      typename Numerator,
+      typename Denominator,
+      long NumeratorPower = 1,
+      long DenominatorPower = 1
+    >
     boost::units::quantity<T> parseCompoundUnit(const std::string& unitStr)
     {
+      typedef typename boost::units::static_rational<NumeratorPower>::type NumeratorRational;
+      typedef typename boost::units::static_rational<DenominatorPower>::type DenominatorRational;
+
       // normalize the white space in the unit
       std::string unit_str = cedar::aux::regexReplace(unitStr, "\\s+", " ");
 
@@ -159,14 +180,16 @@ namespace cedar
       std::vector<std::string> component_strs;
       cedar::aux::split(unit_str, " ", component_strs);
 
-      // there must be at least two strings specifying the unit, otherwise it would not be a compound.
-      CEDAR_ASSERT(component_strs.size() > 1);
+      // there must be at least one unit string
+      CEDAR_ASSERT(component_strs.size() >= 1);
 
       double numerator = 1.0;
       double denominator = 1.0;
 
       Numerator i_numerator;
       Denominator i_denominator;
+      auto numerator_pow = boost::units::pow<NumeratorRational>(i_numerator);
+      auto denominator_pow = boost::units::pow<DenominatorRational>(i_denominator);
 
       for (auto iter = component_strs.begin(); iter != component_strs.end(); ++iter)
       {
@@ -192,22 +215,25 @@ namespace cedar
         }
         else
         {
-          const std::string& exponent = split.at(1);
+          const std::string& exponent_str = split.at(1);
+          long exponent = cedar::aux::fromString<long>(exponent_str);
 
-          CEDAR_ASSERT(exponent.size() >= 1);
+          CEDAR_ASSERT(exponent_str.size() >= 1);
 
-          if (exponent.at(0) == '-')
+          if (exponent < 0)
           {
+            CEDAR_ASSERT(abs(exponent) == DenominatorPower);
             denominator *= cedar::aux::parseUnitString<Denominator>(unit) / i_denominator;
           }
           else
           {
+            CEDAR_ASSERT(abs(exponent) == NumeratorPower);
             numerator *= cedar::aux::parseUnitString<Numerator>(unit) / i_numerator;
           }
         }
 
       } // for loop
-      return (numerator / denominator) * (i_numerator / i_denominator);
+      return (numerator / denominator) * (numerator_pow / denominator_pow);
     }
 
   } // namespace aux
@@ -230,9 +256,19 @@ namespace cedar
       // Converts a string to bool
       boost::optional<external_type> get_value(const internal_type& str)
       {
-        size_t delim = str.find_first_not_of("0123456789.");
-        std::string number_str = str.substr(0, delim);
-        std::string unit_str = str.substr(delim);
+        // normalize all white space to a single space
+        std::string norm_str = cedar::aux::regexReplace(str, "\\s+", " ");
+
+        // remove white space at the beginning and end of the string
+        norm_str = cedar::aux::regexReplace(norm_str, "(^\\s+|\\s+$)", "");
+
+        size_t delim = norm_str.find_first_not_of("-0123456789.");
+        std::string number_str = norm_str.substr(0, delim);
+        std::string unit_str = norm_str.substr(delim);
+
+        //!@todo Proper exceptions
+        CEDAR_ASSERT(!number_str.empty());
+        CEDAR_ASSERT(!unit_str.empty());
 
         // normalize the white space in the unit
         unit_str = cedar::aux::regexReplace(unit_str, "\\s+", " ");
@@ -288,7 +324,6 @@ class cedar::aux::UnitParameterTemplate : public cedar::aux::NumericParameter<bo
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //typedef cedar::aux::ParameterTemplate<boost::units::quantity<T> > Super;
   typedef cedar::aux::NumericParameter<boost::units::quantity<T> > Super;
 
   //--------------------------------------------------------------------------------------------------------------------

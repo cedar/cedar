@@ -20,6 +20,8 @@
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <QtGui/QApplication>
@@ -267,7 +269,7 @@ int main(int argc, char* argv[])
     }
 
     // change to 100 ms or 1 second
-    cedar::aux::sleep(cedar::unit::Milliseconds(1));
+    cedar::aux::sleep(cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second));
   }
 
 
