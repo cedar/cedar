@@ -40,25 +40,26 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/UnitParameterTemplate.h"
 #include "cedar/auxiliaries/TimeParameter.h"
+#include "cedar/units/Frequency.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
-#include <boost/units/systems/si/frequency.hpp>
 
 namespace cedar
 {
   namespace aux
   {
     template <>
-    boost::units::quantity<boost::units::si::frequency> getUnitFromPostFix(const std::string& postFix)
+    cedar::unit::Frequency getUnitFromPostFix(const std::string& postFix)
     {
-      static std::map<std::string, boost::units::quantity<boost::units::si::frequency> > map;
+      static std::map<std::string, cedar::unit::Frequency> map;
 
       if (map.empty())
       {
         addSubUnitToMaps
         (
           map,
-          boost::units::si::hertz,
+          cedar::unit::hertz,
           "hertz", "Hz",
           1
         );
@@ -73,21 +74,21 @@ namespace cedar
         return
           cedar::aux::parseCompoundUnit
                       <
-                        boost::units::si::frequency,
+                        cedar::unit::Frequency::unit_type,
                         boost::units::si::dimensionless,
-                        boost::units::si::time
+                        cedar::unit::Time::unit_type
                       >(postFix);
       }
     }
 
     template <>
-    boost::units::quantity<boost::units::si::frequency> parseUnitString(const std::string& unitStr)
+    cedar::unit::Frequency parseUnitString(const std::string& unitStr)
     {
-      return getUnitFromPostFix<boost::units::si::frequency>(unitStr);
+      return getUnitFromPostFix<cedar::unit::Frequency::unit_type>(unitStr);
     }
 
     // Generate types for the length parameter.
-    typedef cedar::aux::UnitParameterTemplate<boost::units::si::frequency> FrequencyParameter;
+    typedef cedar::aux::UnitParameterTemplate<cedar::unit::Frequency::unit_type> FrequencyParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(FrequencyParameter);
   }
 }

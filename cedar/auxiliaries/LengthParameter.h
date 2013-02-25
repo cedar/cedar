@@ -39,26 +39,26 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/UnitParameterTemplate.h"
+#include "cedar/units/Length.h"
 
 // SYSTEM INCLUDES
-#include <boost/units/systems/si/length.hpp>
 
 namespace cedar
 {
   namespace aux
   {
     template <>
-    boost::units::quantity<boost::units::si::length> getUnitFromPostFix(const std::string& postFix)
+    cedar::unit::Length getUnitFromPostFix(const std::string& postFix)
     {
-      static std::map<std::string, boost::units::quantity<boost::units::si::length> > map;
+      static std::map<std::string, cedar::unit::Length> map;
 
       if (map.empty())
       {
-        addBaseUnitToMaps<boost::units::si::meter_base_unit>(map, boost::units::si::meters);
+        addBaseUnitToMaps<boost::units::si::meter_base_unit>(map, cedar::unit::meter);
         addSubUnitToMaps
         (
           map,
-          boost::units::si::meters,
+          cedar::unit::meter,
           "centimeter", "cm",
           0.01
         );
@@ -67,7 +67,7 @@ namespace cedar
         addSubUnitToMaps
         (
           map,
-          boost::units::si::meters,
+          cedar::unit::meter,
           "kilometer", "km",
           1000.0
         );
@@ -78,7 +78,7 @@ namespace cedar
     }
 
     // Generate types for the length parameter.
-    typedef cedar::aux::UnitParameterTemplate<boost::units::si::length> LengthParameter;
+    typedef cedar::aux::UnitParameterTemplate<cedar::unit::Length::unit_type> LengthParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(LengthParameter);
   }
 }

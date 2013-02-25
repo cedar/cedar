@@ -39,6 +39,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/UnitParameterTemplate.h"
+#include "cedar/units/AngularVelocity.h"
+#include "cedar/units/PlaneAngle.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <boost/units/systems/si/angular_velocity.hpp>
@@ -48,20 +51,20 @@ namespace cedar
   namespace aux
   {
     template <>
-    boost::units::quantity<boost::units::si::angular_velocity>
-      parseUnitString<boost::units::si::angular_velocity>(const std::string& unitStr)
+    cedar::unit::AngularVelocity
+      parseUnitString<cedar::unit::AngularVelocity::unit_type>(const std::string& unitStr)
     {
       return
         cedar::aux::parseCompoundUnit
                     <
-                      boost::units::si::angular_velocity,
-                      boost::units::si::plane_angle,
-                      boost::units::si::time
+                      cedar::unit::AngularVelocity::unit_type,
+                      cedar::unit::PlaneAngle::unit_type,
+                      cedar::unit::Time::unit_type
                     >(unitStr);
     }
 
     // Generate types for the length parameter.
-    typedef cedar::aux::UnitParameterTemplate<boost::units::si::angular_velocity> AngularVelocityParameter;
+    typedef cedar::aux::UnitParameterTemplate<cedar::unit::AngularVelocity::unit_type> AngularVelocityParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(AngularVelocityParameter);
   }
 }

@@ -39,31 +39,33 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/UnitParameterTemplate.h"
+#include "cedar/units/Acceleration.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
-#include <boost/units/systems/si/acceleration.hpp>
 
 namespace cedar
 {
   namespace aux
   {
     template <>
-    boost::units::quantity<boost::units::si::acceleration>
-      parseUnitString<boost::units::si::acceleration>(const std::string& unitStr)
+    cedar::unit::Acceleration
+      parseUnitString<cedar::unit::Acceleration::unit_type>(const std::string& unitStr)
     {
       return
         cedar::aux::parseCompoundUnit
                     <
-                      boost::units::si::acceleration,
-                      boost::units::si::length,
-                      boost::units::si::time,
+                      cedar::unit::Acceleration::unit_type,
+                      cedar::unit::Length::unit_type,
+                      cedar::unit::Time::unit_type,
                       1, // power of length is 1 (m^1 / s^2)
                       2 // power of time is 2 (m / s^2)
                     >(unitStr);
     }
 
     // Generate types for the length parameter.
-    typedef cedar::aux::UnitParameterTemplate<boost::units::si::acceleration> AccelerationParameter;
+    typedef cedar::aux::UnitParameterTemplate<cedar::unit::Acceleration::unit_type> AccelerationParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(AccelerationParameter);
   }
 }

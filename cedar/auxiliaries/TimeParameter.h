@@ -39,28 +39,28 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/UnitParameterTemplate.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
-#include <boost/units/systems/si/time.hpp>
 
 namespace cedar
 {
   namespace aux
   {
     template <>
-    boost::units::quantity<boost::units::si::time> getUnitFromPostFix(const std::string& postFix)
+    cedar::unit::Time getUnitFromPostFix(const std::string& postFix)
     {
-      static std::map<std::string, boost::units::quantity<boost::units::si::time> > map;
+      static std::map<std::string, cedar::unit::Time> map;
 
       if (map.empty())
       {
-        addBaseUnitToMaps<boost::units::si::second_base_unit>(map, boost::units::si::seconds);
+        addBaseUnitToMaps<boost::units::si::second_base_unit>(map, cedar::unit::seconds);
         addAliasToMaps(map, "second", "seconds");
 
         addSubUnitToMaps
         (
           map,
-          boost::units::si::seconds,
+          cedar::unit::seconds,
           "millisecond", "ms",
           0.001
         );
@@ -69,7 +69,7 @@ namespace cedar
         addSubUnitToMaps
         (
           map,
-          boost::units::si::seconds,
+          cedar::unit::seconds,
           "minute", "min",
           60.0
         );
@@ -78,7 +78,7 @@ namespace cedar
         addSubUnitToMaps
         (
           map,
-          boost::units::si::seconds,
+          cedar::unit::seconds,
           "hour", "h",
           60.0 * 60.0
         );
@@ -89,7 +89,7 @@ namespace cedar
     }
 
     // Generate types for the length parameter.
-    typedef cedar::aux::UnitParameterTemplate<boost::units::si::time> TimeParameter;
+    typedef cedar::aux::UnitParameterTemplate<cedar::unit::Time::unit_type> TimeParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(TimeParameter);
   }
 }

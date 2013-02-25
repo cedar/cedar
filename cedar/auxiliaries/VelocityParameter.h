@@ -39,29 +39,30 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/UnitParameterTemplate.h"
+#include "cedar/units/Velocity.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
-#include <boost/units/systems/si/velocity.hpp>
 
 namespace cedar
 {
   namespace aux
   {
     template <>
-    boost::units::quantity<boost::units::si::velocity>
-      parseUnitString<boost::units::si::velocity>(const std::string& unitStr)
+    cedar::unit::Velocity parseUnitString<cedar::unit::Velocity::unit_type>(const std::string& unitStr)
     {
       return
         cedar::aux::parseCompoundUnit
                     <
-                      boost::units::si::velocity,
-                      boost::units::si::length,
-                      boost::units::si::time
+                      cedar::unit::Velocity::unit_type,
+                      cedar::unit::Length::unit_type,
+                      cedar::unit::Time::unit_type
                     >(unitStr);
     }
 
     // Generate types for the length parameter.
-    typedef cedar::aux::UnitParameterTemplate<boost::units::si::velocity> VelocityParameter;
+    typedef cedar::aux::UnitParameterTemplate<cedar::unit::Velocity::unit_type> VelocityParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(VelocityParameter);
   }
 }
