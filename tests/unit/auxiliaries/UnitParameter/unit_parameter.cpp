@@ -59,9 +59,9 @@ public:
     (
       this,
       "length",
-      0 * boost::units::si::meters,
-      -1.0 * boost::units::si::meters,
-      1.0 * boost::units::si::meters
+      0 * cedar::unit::meters,
+      -1.0 * cedar::unit::meters,
+      1.0 * cedar::unit::meters
     )
   ),
   mTime
@@ -70,7 +70,7 @@ public:
     (
       this,
       "time",
-      0 * boost::units::si::seconds
+      0 * cedar::unit::seconds
     )
   ),
   mVelocity
@@ -79,7 +79,7 @@ public:
     (
       this,
       "velocity",
-      1 * boost::units::si::meters / boost::units::si::second
+      1 * cedar::unit::meters / cedar::unit::second
     )
   ),
   mPlaneAngle
@@ -88,7 +88,7 @@ public:
     (
       this,
       "plane angle",
-      1 * boost::units::si::radian
+      1 * cedar::unit::radian
     )
   ),
   mFrequency
@@ -97,7 +97,7 @@ public:
     (
       this,
       "frequency",
-      1 * boost::units::si::hertz
+      1 * cedar::unit::hertz
     )
   ),
   mAngularVelocity
@@ -106,7 +106,7 @@ public:
     (
       this,
       "angular velocity",
-      1 * boost::units::si::radian_per_second
+      1 * cedar::unit::radian_per_second
     )
   ),
   mAcceleration
@@ -115,7 +115,7 @@ public:
     (
       this,
       "acceleration",
-      1.0 * boost::units::si::meters_per_second_squared
+      1.0 * cedar::unit::meters_per_second_squared
     )
   )
   {
@@ -154,13 +154,13 @@ int check(const boost::units::quantity<T>& expected, boost::intrusive_ptr<cedar:
 int test_reading
     (
       const std::string& fileName,
-      const boost::units::quantity<boost::units::si::length>& expectedLength,
-      const boost::units::quantity<boost::units::si::time>& expectedTime,
-      const boost::units::quantity<boost::units::si::velocity>& expectedVelocity,
-      const boost::units::quantity<boost::units::si::plane_angle>& expectedPlaneAngle,
-      const boost::units::quantity<boost::units::si::frequency>& expectedFrequency,
-      const boost::units::quantity<boost::units::si::angular_velocity>& expectedAngularVelocity,
-      const boost::units::quantity<boost::units::si::acceleration>& expectedAcceleration
+      const cedar::unit::Length& expectedLength,
+      const cedar::unit::Time& expectedTime,
+      const cedar::unit::Velocity& expectedVelocity,
+      const cedar::unit::PlaneAngle& expectedPlaneAngle,
+      const cedar::unit::Frequency& expectedFrequency,
+      const cedar::unit::AngularVelocity& expectedAngularVelocity,
+      const cedar::unit::Acceleration& expectedAcceleration
     )
 {
   int errors = 0;
@@ -187,13 +187,13 @@ int test_reading
 int test_writing
     (
       const std::string& fileName,
-      const boost::units::quantity<boost::units::si::length>& expectedLength,
-      const boost::units::quantity<boost::units::si::time>& expectedTime,
-      const boost::units::quantity<boost::units::si::velocity>& expectedVelocity,
-      const boost::units::quantity<boost::units::si::plane_angle>& expectedPlaneAngle,
-      const boost::units::quantity<boost::units::si::frequency>& expectedFrequency,
-      const boost::units::quantity<boost::units::si::angular_velocity>& expectedAngularVelocity,
-      const boost::units::quantity<boost::units::si::acceleration>& expectedAcceleration
+      const cedar::unit::Length& expectedLength,
+      const cedar::unit::Time& expectedTime,
+      const cedar::unit::Velocity& expectedVelocity,
+      const cedar::unit::PlaneAngle& expectedPlaneAngle,
+      const cedar::unit::Frequency& expectedFrequency,
+      const cedar::unit::AngularVelocity& expectedAngularVelocity,
+      const cedar::unit::Acceleration& expectedAcceleration
     )
 {
   int errors = 0;
@@ -234,28 +234,28 @@ int test_limits()
   int errors = 0;
   std::cout << "Testing parameter limits" << std::endl;
   TestConfigurablePtr conf(new TestConfigurable());
-  conf->mLength->setValue(-2 * boost::units::si::meters);
-  if (conf->mLength->getValue() != -1 * boost::units::si::meters)
+  conf->mLength->setValue(-2 * cedar::unit::meters);
+  if (conf->mLength->getValue() != -1 * cedar::unit::meters)
   {
-    std::cout << "Expected " << -1 * boost::units::si::seconds << " got " << conf->mLength->getValue() << std::endl;
+    std::cout << "Expected " << -1 * cedar::unit::seconds << " got " << conf->mLength->getValue() << std::endl;
     ++errors;
   }
-  conf->mLength->setValue(2 * boost::units::si::meters);
-  if (conf->mLength->getValue() != 1 * boost::units::si::meters)
+  conf->mLength->setValue(2 * cedar::unit::meters);
+  if (conf->mLength->getValue() != 1 * cedar::unit::meters)
   {
-    std::cout << "Expected " << 1 * boost::units::si::seconds << " got " << conf->mLength->getValue() << std::endl;
+    std::cout << "Expected " << 1 * cedar::unit::seconds << " got " << conf->mLength->getValue() << std::endl;
     ++errors;
   }
-  conf->mTime->setValue(2 * boost::units::si::seconds);
-  if (conf->mTime->getValue() != 2 * boost::units::si::seconds)
+  conf->mTime->setValue(2 * cedar::unit::seconds);
+  if (conf->mTime->getValue() != 2 * cedar::unit::seconds)
   {
-    std::cout << "Expected " << 2 * boost::units::si::seconds << " got " << conf->mTime->getValue() << std::endl;
+    std::cout << "Expected " << 2 * cedar::unit::seconds << " got " << conf->mTime->getValue() << std::endl;
     ++errors;
   }
-  conf->mVelocity->setValue(2 * boost::units::si::meters / boost::units::si::seconds);
-  if (conf->mVelocity->getValue() != 2 * boost::units::si::meters / boost::units::si::seconds)
+  conf->mVelocity->setValue(2 * cedar::unit::meters / cedar::unit::seconds);
+  if (conf->mVelocity->getValue() != 2 * cedar::unit::meters / cedar::unit::seconds)
   {
-    std::cout << "Expected " << 2 * boost::units::si::meters / boost::units::si::seconds << " got " << conf->mVelocity->getValue() << std::endl;
+    std::cout << "Expected " << 2 * cedar::unit::meters / cedar::unit::seconds << " got " << conf->mVelocity->getValue() << std::endl;
     ++errors;
   }
   return errors;
@@ -268,46 +268,46 @@ int main(int, char**)
   errors += test_reading
             (
               "test1-read.json",
-              1.0 * boost::units::si::meters,
-              5.0 * boost::units::si::seconds,
-              1.0 * boost::units::si::meters / boost::units::si::seconds,
-              2.0 * boost::units::si::radians,
-              20.0 * boost::units::si::hertz,
-              5.0 * boost::units::si::radian_per_second,
-              7.0 * boost::units::si::meters_per_second_squared
+              1.0 * cedar::unit::meters,
+              5.0 * cedar::unit::seconds,
+              1.0 * cedar::unit::meters / cedar::unit::seconds,
+              2.0 * cedar::unit::radians,
+              20.0 * cedar::unit::hertz,
+              5.0 * cedar::unit::radian_per_second,
+              7.0 * cedar::unit::meters_per_second_squared
             );
   errors += test_reading
             (
               "test2-read.json",
-              1.0 * boost::units::si::meters,
-              5.0 * boost::units::si::seconds,
-              1.0 * boost::units::si::meters / boost::units::si::seconds,
-              2.0 * boost::units::si::radians,
-              20.0 * boost::units::si::hertz,
-              5.0 * boost::units::si::radian_per_second,
-              7.0 * boost::units::si::meters_per_second_squared
+              1.0 * cedar::unit::meters,
+              5.0 * cedar::unit::seconds,
+              1.0 * cedar::unit::meters / cedar::unit::seconds,
+              2.0 * cedar::unit::radians,
+              20.0 * cedar::unit::hertz,
+              5.0 * cedar::unit::radian_per_second,
+              7.0 * cedar::unit::meters_per_second_squared
             );
   errors += test_reading
             (
               "test3-read.json",
-              1.0 * boost::units::si::meters,
-              5.0 * boost::units::si::seconds,
-              1.0 * boost::units::si::meters / boost::units::si::seconds,
-              2.0 * boost::units::si::radians,
-              20.0 * boost::units::si::hertz,
-              5.0 * boost::units::si::radian_per_second,
-              7.0 * boost::units::si::meters_per_second_squared
+              1.0 * cedar::unit::meters,
+              5.0 * cedar::unit::seconds,
+              1.0 * cedar::unit::meters / cedar::unit::seconds,
+              2.0 * cedar::unit::radians,
+              20.0 * cedar::unit::hertz,
+              5.0 * cedar::unit::radian_per_second,
+              7.0 * cedar::unit::meters_per_second_squared
             );
   errors += test_writing
             (
               "test1-write.json",
-              3.0 * boost::units::si::meters,
-              2.0 * boost::units::si::seconds,
-              -5.0 * boost::units::si::meters / boost::units::si::seconds,
-              8.0 * boost::units::si::radians,
-              8.0 * boost::units::si::hertz,
-              -6.0 * boost::units::si::radian_per_second,
-              -8.0 * boost::units::si::meters_per_second_squared
+              3.0 * cedar::unit::meters,
+              2.0 * cedar::unit::seconds,
+              -5.0 * cedar::unit::meters / cedar::unit::seconds,
+              8.0 * cedar::unit::radians,
+              8.0 * cedar::unit::hertz,
+              -6.0 * cedar::unit::radian_per_second,
+              -8.0 * cedar::unit::meters_per_second_squared
             );
 
   errors += test_limits();

@@ -91,7 +91,7 @@ namespace cedar
       };
 
       template<>
-      class UnitHelper<cedar::unit::Length >
+      class UnitHelper<cedar::unit::Length>
       {
       public:
         static inline cedar::unit::Length unit()
@@ -101,7 +101,7 @@ namespace cedar
       };
 
       template<>
-      class UnitHelper<cedar::unit::Velocity >
+      class UnitHelper<cedar::unit::Velocity>
       {
       public:
         static inline cedar::unit::Velocity unit()
@@ -111,7 +111,7 @@ namespace cedar
       };
 
       template<>
-      class UnitHelper<cedar::unit::Acceleration >
+      class UnitHelper<cedar::unit::Acceleration>
       {
       public:
         static inline cedar::unit::Acceleration unit()
@@ -121,7 +121,7 @@ namespace cedar
       };
 
       template<>
-      class UnitHelper<cedar::unit::Frequency >
+      class UnitHelper<cedar::unit::Frequency>
       {
       public:
         static inline cedar::unit::Frequency unit()
@@ -131,7 +131,7 @@ namespace cedar
       };
 
       template<>
-      class UnitHelper<cedar::unit::AngularVelocity >
+      class UnitHelper<cedar::unit::AngularVelocity>
       {
       public:
         static inline cedar::unit::AngularVelocity unit()
@@ -141,7 +141,7 @@ namespace cedar
       };
 
       template<>
-      class UnitHelper<cedar::unit::PlaneAngle >
+      class UnitHelper<cedar::unit::PlaneAngle>
       {
       public:
         static inline cedar::unit::PlaneAngle unit()
