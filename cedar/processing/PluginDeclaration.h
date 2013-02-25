@@ -42,7 +42,7 @@
 #include "cedar/auxiliaries/PluginDeclarationList.h"
 
 // SYSTEM INCLUDES
-#warning Including this header is deprecated; use cedar/aux/ElementDeclaration instead.
+#warning Including this header is deprecated; use cedar/aux/PluginDeclarationList instead.
 
 #endif // CEDAR_PROC_PLUGIN_DECLARATION_H
 
