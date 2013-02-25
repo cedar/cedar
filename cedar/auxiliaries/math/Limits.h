@@ -43,6 +43,13 @@
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/units/Acceleration.h"
+#include "cedar/units/AngularVelocity.h"
+#include "cedar/units/Frequency.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/PlaneAngle.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/Velocity.h"
 
 // SYSTEM INCLUDES
 #include <boost/numeric/conversion/bounds.hpp>
@@ -53,9 +60,6 @@
 #include <boost/units/get_dimension.hpp>
 #include <boost/units/quantity.hpp>
 #include <boost/units/io.hpp>
-#include <boost/units/systems/si/length.hpp>
-#include <boost/units/systems/si/time.hpp>
-#include <boost/units/systems/si/velocity.hpp>
 
 // \todo find a more generic version of this
 #undef DEBUG_VERBOSE
@@ -77,32 +81,72 @@ namespace cedar
       };
 
       template<>
-      class UnitHelper<boost::units::quantity<boost::units::si::time>>
+      class UnitHelper<cedar::unit::Time>
       {
       public:
-        static inline boost::units::quantity<boost::units::si::time> unit()
+        static inline cedar::unit::Time unit()
         {
-          return 1 * boost::units::si::seconds;
+          return cedar::unit::DEFAULT_TIME_UNIT;
         }
       };
 
       template<>
-      class UnitHelper<boost::units::quantity<boost::units::si::length>>
+      class UnitHelper<cedar::unit::Length >
       {
       public:
-        static inline boost::units::quantity<boost::units::si::length> unit()
+        static inline cedar::unit::Length unit()
         {
-          return 1 * boost::units::si::meters;
+          return cedar::unit::DEFAULT_LENGTH_UNIT;
         }
       };
 
       template<>
-      class UnitHelper<boost::units::quantity<boost::units::si::velocity>>
+      class UnitHelper<cedar::unit::Velocity >
       {
       public:
-        static inline boost::units::quantity<boost::units::si::velocity> unit()
+        static inline cedar::unit::Velocity unit()
         {
-          return 1 * boost::units::si::meters/boost::units::si::seconds;
+          return cedar::unit::DEFAULT_VELOCITY_UNIT;
+        }
+      };
+
+      template<>
+      class UnitHelper<cedar::unit::Acceleration >
+      {
+      public:
+        static inline cedar::unit::Acceleration unit()
+        {
+          return cedar::unit::DEFAULT_ACCELERATION_UNIT;
+        }
+      };
+
+      template<>
+      class UnitHelper<cedar::unit::Frequency >
+      {
+      public:
+        static inline cedar::unit::Frequency unit()
+        {
+          return cedar::unit::DEFAULT_FREQUENCY_UNIT;
+        }
+      };
+
+      template<>
+      class UnitHelper<cedar::unit::AngularVelocity >
+      {
+      public:
+        static inline cedar::unit::AngularVelocity unit()
+        {
+          return cedar::unit::DEFAULT_ANGULAR_VELOCITY_UNIT;
+        }
+      };
+
+      template<>
+      class UnitHelper<cedar::unit::PlaneAngle >
+      {
+      public:
+        static inline cedar::unit::PlaneAngle unit()
+        {
+          return cedar::unit::DEFAULT_PLANE_ANGLE_UNIT;
         }
       };
 
