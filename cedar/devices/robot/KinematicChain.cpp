@@ -1316,7 +1316,7 @@ bool cedar::dev::robot::KinematicChain::applyInitialConfiguration(unsigned int i
 unsigned int cedar::dev::robot::KinematicChain::getCurrentInitialConfigurationIndex()
 {
   QReadLocker lock(&mCurrentInitialConfigurationLock);
-  unsigned int j;
+  unsigned int j = 0;
 
   for( std::map< std::string, cv::Mat >::const_iterator it = mInitialConfigurations.begin(); it != mInitialConfigurations.end(); it++ )
   {
