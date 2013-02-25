@@ -11,6 +11,13 @@
           {
             "parameter 1": "1"
           }
+        },
+        "channel 2":
+        {
+          "cedar.tests.unit.dev.Robot.TestComponent":
+          {
+            "parameter 1": "2"
+          }
         }
       },
       "common component parameters":
@@ -21,19 +28,7 @@
   },
   "channels":
   {
-    "channel 1":
-    {
-      "cedar.tests.unit.dev.Robot.TestChannel":
-      {
-        "info": "channel 1 info"
-      }
-    },
-    "channel 2":
-    {
-      "cedar.tests.unit.dev.Robot.TestChannel":
-      {
-        "info": "channel 2 info"
-      }
-    }
+    "channel 1": "cedar.tests.unit.dev.Robot.TestChannel",
+    "channel 2": "cedar.tests.unit.dev.Robot.TestChannel"
   }
 }

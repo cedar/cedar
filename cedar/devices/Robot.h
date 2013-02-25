@@ -157,6 +157,12 @@ private:
   //! Reads and instantiates the slots given in the configuration.
   void readComponentSlotInstantiations(const cedar::aux::ConfigurationNode& node);
 
+  //! Reads the channels and their configurations and instantiates the selected channels.
+  void readChannels(const cedar::aux::ConfigurationNode& node);
+
+  //! Allocates the channel of the given name.
+  void allocateChannel(const std::string& channelName);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -164,7 +170,14 @@ protected:
   // none yet
 
 private:
-  // none yet
+  //! Map of all the channel names to their type names.
+  std::map<std::string, std::string> mChannelTypes;
+
+  //! Map of all the channel names to channel configurations.
+  std::map<std::string, cedar::aux::ConfigurationNode> mChannelConfigurations;
+
+  //! Map from channel names to instances.
+  std::map<std::string, cedar::dev::ChannelPtr> mChannelInstances;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -179,8 +192,9 @@ private:
   //! mapping of all slot names to their component slots
   ComponentSlotParameter _mComponentSlots;
 
+
   //! mapping of all channel names to the channel
-  ChannelParameterPtr _mChannels;
+//  ChannelParameterPtr _mChannels;
 
 }; // class cedar::dev::Robot
 #endif // CEDAR_DEV_ROBOT_H

@@ -52,7 +52,6 @@ namespace
   {
     cedar::dev::ChannelManagerSingleton::getInstance()->
         registerType<cedar::tests::unit::dev::Robot::TestChannelPtr>();
-    std::cout << "registr call for test channel!" << std::endl;
     return true;
   }
 

@@ -42,13 +42,20 @@
 #include "cedar/devices/Robot.h"
 #include "cedar/devices/ComponentSlot.h"
 #include "unit/devices/Robot/TestComponent.h"
+#include "unit/devices/Robot/TestChannel.h"
 
 // SYSTEM INCLUDES
 #include <string>
 
 const std::string component_slot_1_name = "component slot 1";
 
-int testConfiguration(const std::string& configFileName)
+int testConfiguration
+    (
+      const std::string& configFileName,
+      const std::string& expectedChannel,
+      const std::string& expectedChannelInfo,
+      unsigned int expectedParameter1Value
+    )
 {
   int errors = 0;
   cedar::dev::RobotPtr robot(new cedar::dev::Robot());
@@ -64,9 +71,9 @@ int testConfiguration(const std::string& configFileName)
   }
   else
   {
-    if (component->_mParameter1->getValue() != 1)
+    if (component->_mParameter1->getValue() != expectedParameter1Value)
     {
-      std::cout << "Error: parameter 1 has the wrong value (should be 1, is "
+      std::cout << "Error: parameter 1 has the wrong value (should be " << expectedParameter1Value << ", is "
                 << component->_mParameter1->getValue() << ")" << std::endl;
       ++errors;
     }
@@ -79,7 +86,29 @@ int testConfiguration(const std::string& configFileName)
     }
   }
 
+  cedar::dev::ChannelPtr channel = robot->getChannel(expectedChannel);
+  if (!channel)
+  {
+    std::cout << "ERROR: channel was not instantiated properly." << std::endl;
+    ++errors;
+  }
 
+  cedar::tests::unit::dev::Robot::TestChannelPtr test_channel
+    = boost::dynamic_pointer_cast<cedar::tests::unit::dev::Robot::TestChannel>(channel);
+  if (!test_channel)
+  {
+    std::cout << "ERROR: wrong channel type was instantiated." << std::endl;
+    ++errors;
+  }
+  else
+  {
+    if (test_channel->_mInfo->getValue() != expectedChannelInfo)
+    {
+      std::cout << "ERROR: Wrong channel info; expceted: \"" << expectedChannelInfo
+          << "\", got: \"" << test_channel->_mInfo->getValue() << "\"." << std::endl;
+      ++errors;
+    }
+  }
 
   std::cout << "Final robot:" << std::endl;
   std::cout << robot << std::endl;
@@ -92,7 +121,8 @@ int main()
 {
   int errors = 0;
 
-  errors += testConfiguration("RobotConfiguration_1.json");
+  errors += testConfiguration("RobotConfiguration_1.json", "channel 1", "channel 1 info 1", 1);
+  errors += testConfiguration("RobotConfiguration_2.json", "channel 2", "channel 2 info 2", 2);
 
   return errors;
 }

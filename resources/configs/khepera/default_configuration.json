@@ -5,23 +5,34 @@
   {
     "drive":
     {
-      "channel type": "serial"
+      "channel": "serial"
     },
     "ambient light sensor":
     {
-      "channel type": "serial"
+      "channel": "serial"
     },
     "proximity sensor":
     {
-      "channel type": "serial"
+      "channel": "serial"
     },
     "led":
     {
-      "channel type": "serial"
+      "channel": "serial"
     },
     "gripper":
     {
-      "channel type": "serial"
+      "channel": "serial"
     },
+  },
+  "channel configurations":
+  {
+    "cedar.dev.kteam.SerialChannel":
+    {
+      "name": "serial channel",
+      "device path": "/dev/ttyUSB0",
+      "baud rate": "38400",
+      "escaped command delimiter": "\\r\\n",
+      "time out": "0.25"
+    }
   }
 }

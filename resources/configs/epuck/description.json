@@ -97,16 +97,6 @@
   },
   "channels":
   {
-    "serial":
-    {
-      "cedar.dev.kteam.SerialChannel":
-      {
-        "name": "serial channel",
-        "device path": "/dev/rfcomm0",
-        "baud rate": "115200",
-        "escaped command delimiter": "\\r\\n",
-        "time out": "5.25"
-      }
-    }
+    "serial": "cedar.dev.kteam.SerialChannel"
   }
 }

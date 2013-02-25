@@ -5,14 +5,14 @@
   {
     "component slot 1":
     {
-      "channel": "channel 1"
+      "channel": "channel 2"
     }
   },
   "channel configurations":
   {
-    "channel 1":
+    "channel 2":
     {
-      "info": "channel 1 info 1"
+      "info": "channel 2 info 2"
     }
   }
 }

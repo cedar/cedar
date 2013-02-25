@@ -57,9 +57,9 @@
 //! constructor
 cedar::dev::Robot::Robot()
 :
-_mRobotDescription(new cedar::aux::Configurable()),
+_mRobotDescription(new cedar::aux::Configurable()) //,
 //_mComponentSlots(new cedar::dev::Robot::ComponentSlotParameter(_mRobotDescription.get(), "component slots")),
-_mChannels(new cedar::dev::Robot::ChannelParameter(_mRobotDescription.get(), "channels"))
+//_mChannels(new cedar::dev::Robot::ChannelParameter(_mRobotDescription.get(), "channels"))
 {
 }
 
@@ -137,12 +137,14 @@ void cedar::dev::Robot::setChannel(const std::string& channel)
 
 cedar::dev::ConstChannelPtr cedar::dev::Robot::getChannel(const std::string& channel) const
 {
-  return this->_mChannels->get(channel);
+  CEDAR_ASSERT(this->hasChannelInstance(channel));
+  return this->mChannelInstances.find(channel)->second;
 }
 
 cedar::dev::ChannelPtr cedar::dev::Robot::getChannel(const std::string& channel)
 {
-  return this->_mChannels->get(channel);
+  CEDAR_ASSERT(this->hasChannelInstance(channel));
+  return this->mChannelInstances.find(channel)->second;
 }
 
 std::vector<std::string> cedar::dev::Robot::listComponentSlots() const
@@ -161,7 +163,7 @@ std::vector<std::string> cedar::dev::Robot::listChannels() const
 {
   std::vector<std::string> channels;
 
-  for (auto channel_iter = _mChannels->begin(); channel_iter != _mChannels->end(); ++channel_iter)
+  for (auto channel_iter = mChannelTypes.begin(); channel_iter != mChannelTypes.end(); ++channel_iter)
   {
     channels.push_back(channel_iter->first);
   }
@@ -171,7 +173,7 @@ std::vector<std::string> cedar::dev::Robot::listChannels() const
 
 bool cedar::dev::Robot::hasChannelInstance(const std::string& channel) const
 {
-  return this->_mChannels->instanceCreated(channel);
+  return this->mChannelInstances.find(channel) != this->mChannelInstances.end();
 }
 
 void cedar::dev::Robot::performConsistencyCheck() const
@@ -212,7 +214,7 @@ void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& nod
   this->_mRobotDescription->readConfiguration(node);
 
   // read the component slots
-  const cedar::aux::ConfigurationNode::const_assoc_iterator desc_file_node = node.find("component slots");
+  auto desc_file_node = node.find("component slots");
   if (desc_file_node == node.not_found())
   {
     cedar::aux::LogSingleton::getInstance()->warning
@@ -238,6 +240,21 @@ void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& nod
     }
   }
 
+  // read the channel types
+  auto channel_node = node.find("channels");
+  if (channel_node != node.not_found())
+  {
+    //!@todo Maybe this kind of list/map of configurables of fixed type can be generalized to a parameter?
+    mChannelTypes.clear();
+    for (auto slot_iter = channel_node->second.begin(); slot_iter != channel_node->second.end(); ++slot_iter)
+    {
+      const std::string& channel_name = slot_iter->first;
+      const std::string& channel_type = slot_iter->second.get_value<std::string>();
+
+      mChannelTypes[channel_name] = channel_type;
+    }
+  }
+
   this->performConsistencyCheck();
 }
 
@@ -260,7 +277,27 @@ void cedar::dev::Robot::readConfiguration(const cedar::aux::ConfigurationNode& n
 
   this->Super::readConfiguration(node);
 
+  this->readChannels(node);
   this->readComponentSlotInstantiations(node);
+}
+
+void cedar::dev::Robot::readChannels(const cedar::aux::ConfigurationNode& node)
+{
+  auto component_slots_iter = node.find("channel configurations");
+
+  if (component_slots_iter != node.not_found())
+  {
+    for (auto iter = component_slots_iter->second.begin(); iter != component_slots_iter->second.end(); ++iter)
+    {
+      const std::string& channel_name = iter->first;
+      const cedar::aux::ConfigurationNode& channel_configuration = iter->second;
+
+      // check for duplicate channel configurations
+      CEDAR_ASSERT(this->mChannelConfigurations.find(channel_name) == this->mChannelConfigurations.end());
+
+      this->mChannelConfigurations[channel_name] = channel_configuration;
+    }
+  }
 }
 
 void cedar::dev::Robot::readComponentSlotInstantiations(const cedar::aux::ConfigurationNode& node)
@@ -287,10 +324,31 @@ void cedar::dev::Robot::readComponentSlotInstantiations(const cedar::aux::Config
       );
       continue;
     }
-    const std::string& channel_type = slot_iter->second.get<std::string>("channel type");
+    const std::string& channel_name = slot_iter->second.get<std::string>("channel");
 
-    this->getComponentSlot(slot_name)->setChannel(channel_type);
+    this->allocateChannel(channel_name);
+    this->getComponentSlot(slot_name)->setChannel(channel_name);
   }
+}
+
+void cedar::dev::Robot::allocateChannel(const std::string& channelName)
+{
+  if (this->mChannelInstances.find(channelName) != this->mChannelInstances.end())
+  {
+    // channel already instantiated, nothing to do.
+    return;
+  }
+
+  // allocate channel with the stored configuration.
+  CEDAR_ASSERT(this->mChannelConfigurations.find(channelName) != this->mChannelConfigurations.end());
+  cedar::aux::ConfigurationNode channel_configuration = this->mChannelConfigurations.find(channelName)->second;
+
+  CEDAR_ASSERT(this->mChannelTypes.find(channelName) != this->mChannelTypes.end());
+  std::string channel_type = this->mChannelTypes.find(channelName)->second;
+
+  cedar::dev::ChannelPtr channel = cedar::dev::ChannelManagerSingleton::getInstance()->allocate(channel_type);
+  channel->readConfiguration(channel_configuration);
+  this->mChannelInstances[channelName] = channel;
 }
 
 cedar::dev::ComponentPtr cedar::dev::Robot::getComponent(const std::string& componentSlotName) const

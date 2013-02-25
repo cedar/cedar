@@ -112,19 +112,18 @@ bool cedar::dev::ComponentSlot::hasChannel(const std::string& name) const
 
 void cedar::dev::ComponentSlot::setChannel(const std::string& channel)
 {
+  _mChannelType->setValue(channel);
+
   //TODO who is responsible for calling this?
   auto iter = mComponentTypeIds.find(channel);
 
   //TODO proper exception
   CEDAR_ASSERT(iter != mComponentTypeIds.end());
 
-  const std::string& type_id = iter->second;
-  this->mComponent = cedar::dev::ComponentManagerSingleton::getInstance()->allocate(type_id);
-
   cedar::aux::ConfigurationNode configuration;
   configuration.insert(configuration.end(), this->mCommonParameters.begin(), this->mCommonParameters.end());
 
-  auto conf_iter = this->_mComponentConfigurations.find(type_id);
+  auto conf_iter = this->_mComponentConfigurations.find(channel);
 
   if (conf_iter != this->_mComponentConfigurations.end())
   {
@@ -132,9 +131,9 @@ void cedar::dev::ComponentSlot::setChannel(const std::string& channel)
     configuration.insert(configuration.end(), tree.begin(), tree.end());
   }
 
-  this->mComponent->setChannel(this->mRobot->getChannel(channel));
+  this->getComponent()->setChannel(this->mRobot->getChannel(channel));
 
-  this->mComponent->readConfiguration(configuration);
+  this->getComponent()->readConfiguration(configuration);
 }
 
 
@@ -168,10 +167,10 @@ void cedar::dev::ComponentSlot::readConfiguration(const cedar::aux::Configuratio
       const cedar::aux::ConfigurationNode& conf = type_node->second;
 
       //!@todo Actual exception
-      CEDAR_ASSERT(this->_mComponentConfigurations.find(type_str) == this->_mComponentConfigurations.end());
+      CEDAR_ASSERT(this->_mComponentConfigurations.find(channel_name) == this->_mComponentConfigurations.end());
       CEDAR_ASSERT(this->mComponentTypeIds.find(channel_name) == this->mComponentTypeIds.end());
 
-      this->_mComponentConfigurations[type_str] = conf;
+      this->_mComponentConfigurations[channel_name] = conf;
       this->mComponentTypeIds[channel_name] = type_str;
     }
   }

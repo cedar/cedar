@@ -5,23 +5,34 @@
   {
     "drive":
     {
-      "channel type": "serial"
+      "channel": "serial"
     },
     "ambient light sensor":
     {
-      "channel type": "serial"
+      "channel": "serial"
     },
     "proximity sensor":
     {
-      "channel type": "serial"
+      "channel": "serial"
     },
     "acceleration sensor":
     {
-      "channel type": "serial"
+      "channel": "serial"
     },
     "led":
     {
-      "channel type": "serial"
+      "channel": "serial"
+    }
+  },
+  "channel configurations":
+  {
+    "serial":
+    {
+      "name": "serial channel",
+      "device path": "/dev/rfcomm0",
+      "baud rate": "115200",
+      "escaped command delimiter": "\\r\\n",
+      "time out": "5.25"
     }
   }
 }
