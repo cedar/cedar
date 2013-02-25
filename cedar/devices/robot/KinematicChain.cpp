@@ -455,7 +455,7 @@ bool cedar::dev::robot::KinematicChain::setJointAccelerations(const cv::Mat& acc
 
 void cedar::dev::robot::KinematicChain::step(double time)
 {
-  if(mUseCurrentHardwareValues)
+  if (mUseCurrentHardwareValues)
   {
     mJointVelocities = getCachedJointVelocities();
   }
@@ -467,12 +467,12 @@ void cedar::dev::robot::KinematicChain::step(double time)
 
   applyVelocityLimits(mJointVelocities);
 
-  if(setJointVelocities(mJointVelocities))
+  if (setJointVelocities(mJointVelocities))
   {
     return;
   }
 
-  if(mUseCurrentHardwareValues)
+  if (mUseCurrentHardwareValues)
   {
     mJointAngles = getCachedJointAngles();
   }
@@ -1184,7 +1184,6 @@ void cedar::dev::robot::KinematicChain::addInitialConfiguration(const std::strin
     CEDAR_THROW( cedar::proc::DuplicateNameException , 
                  "You are adding the initial configuration name '"
                    + name + "' which already exists. Delete it first." );
-    return;
   }
 
   mInitialConfigurations[ name ] = config.clone();
@@ -1247,7 +1246,7 @@ bool cedar::dev::robot::KinematicChain::setCurrentInitialConfiguration(const std
   QWriteLocker wlock(&mCurrentInitialConfigurationLock);
 
   mCurrentInitialConfiguration = s;
-  return true;
+  return true; //TODO: should this use a return value to communicate potential errors?
 }
 
 bool cedar::dev::robot::KinematicChain::applyInitialConfiguration(std::string s)
