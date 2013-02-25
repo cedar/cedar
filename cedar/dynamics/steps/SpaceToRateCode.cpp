@@ -93,7 +93,16 @@ mFixPoint(new cedar::aux::MatData(cv::Mat(1,1, CV_32F))),
 // parameters
 _mLowerLimit(new cedar::aux::DoubleParameter(this, "lowerLimit", 0.0, -10000.0, 10000.0)),
 _mUpperLimit(new cedar::aux::DoubleParameter(this, "upperLimit", 1.0, -10000.0, 10000.0)),
-_mTau(new cedar::aux::DoubleParameter(this, "tau", 100.0, cedar::aux::DoubleParameter::LimitType::positive()))
+_mTau(new cedar::aux::TimeParameter
+          (
+            this,
+            "tau",
+            cedar::unit::Time
+            (
+              100.0 * cedar::unit::milli * cedar::unit::seconds, cedar::aux::TimeParameter::LimitType::positive()
+            )
+          )
+     )
 {
   // declare all data
   this->declareInput("input");
@@ -202,8 +211,8 @@ void cedar::dyn::SpaceToRateCode::eulerStep(const cedar::unit::Time& time)
   double s = cv::sum(this->mInput->getData()).val[0];
   double o = cv::sum(this->mInput->getData().mul(mRamp)).val[0];
   double dt = time / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second);
-  //!todo this should be a time in milliseconds
-  double tau = this->getTau();
+  //!@todo use the time unit throughout the computation
+  double tau = this->getTau() / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second);
 
   double h = dt;
   if (h / tau * s >= 2) // stability criterion
