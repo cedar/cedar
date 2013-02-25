@@ -42,3 +42,10 @@
 template struct cedar::aux::math::Limits<double>;
 template struct cedar::aux::math::Limits<int>;
 template struct cedar::aux::math::Limits<unsigned int>;
+template struct cedar::aux::math::Limits<boost::units::quantity<boost::units::si::time> >;
+template struct cedar::aux::math::Limits<boost::units::quantity<boost::units::si::length> >;
+template struct cedar::aux::math::Limits<boost::units::quantity<boost::units::si::velocity> >;
+template struct cedar::aux::math::Limits<boost::units::quantity<boost::units::si::plane_angle> >;
+template struct cedar::aux::math::Limits<boost::units::quantity<boost::units::si::frequency> >;
+template struct cedar::aux::math::Limits<boost::units::quantity<boost::units::si::angular_velocity> >;
+template struct cedar::aux::math::Limits<boost::units::quantity<boost::units::si::acceleration> >;

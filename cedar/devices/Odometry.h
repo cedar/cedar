@@ -40,6 +40,8 @@
 // CEDAR INCLUDES
 #include "cedar/devices/namespace.h"
 #include "cedar/auxiliaries/LocalCoordinateFrame.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/PlaneAngle.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -52,44 +54,44 @@
  * informations. Because this class has no access to the robot's sensors, it is an abstract class. The actual
  * implementation is handled in its subclasses.
  */
-//!@todo why inheriting from LocalCoordinateFrame here? HR: this mirrors how KinematicChainModel inherits from
-//! LocalCoordinateFrame - only these classes are sufficiently powerful and provide enough information to satisfy
-//! LocalCoordinateFrame requirements
-class cedar::dev::Odometry : public cedar::aux::LocalCoordinateFrame
+class cedar::dev::Odometry : public QObject
 {
+public:
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! The standard constructor.
+  Odometry();
+
+  //! Constructor taking a coordinate system
+  Odometry(cedar::aux::LocalCoordinateFramePtr coordinateFrame);
+
+  //! The destructor.
+  ~Odometry();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-  /*!@brief The get-function of the robot's current position.
-   *@return Vector with position on x- (1st element) and y-axis (2nd element) [both in m]
+  /*!@brief Returns the current position of the robot as a matrix.
+   *@return vector with position on x- (1st element) and y-axis (2nd element) [both in m]
    */
-  cv::Mat getTranslation() const;
+  cedar::unit::LengthMatrix getTranslation() const;
 
   /*!@brief The get-function of the robot's current orientation.
    *@return The current orientation [in rad].
    */
-  double getRotation();
-
-  /*!@brief The set-function of the robot's position.
-   *@param x new translation of the robot coordinate system on the world x-axis [in m].
-   *@param y new translation of the robot coordinate system on the world y-axis [in m].
-   */
-  void setTranslation(double x, double y);
+  cedar::unit::PlaneAngle getRotation();
 
   /*!@brief The set-function of the robot's orientation.
    *@param angle Orientation of the robot [in rad].
    */
-  void setRotation(double angle);
+  void setRotation(const cedar::unit::PlaneAngle& angle);
 
-  //!@brief Sets the Debug-flag
-  void setDebug(bool debug);
+  //!@brief Returns the coordinate frame on which the calculations of this class are based.
+  cedar::aux::LocalCoordinateFramePtr getCoordinateFrame() const;
 
   /*!@brief reset elapsed time.
    */
@@ -100,9 +102,19 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
+  /*!@brief The set-function of the robot's position.
+   *@param x new translation of the robot coordinate system on the world x-axis [in m].
+   *@param y new translation of the robot coordinate system on the world y-axis [in m].
+   */
+  void setTranslation
+       (
+         const cedar::unit::Length& x,
+         const cedar::unit::Length& y
+       );
+
   /*!@brief Updates the current position.
    *
-   * This function is called by timerEvent(). Implement it in the sublass
+   * This function is called by timerEvent(). Implement it in the subclass
    * so that it updates the robot's position.
    */
   virtual void update() = 0;
@@ -120,11 +132,9 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief The debug-flag.
-  bool mDebug;
+  // none yet
 
 private:
-  // none yet
+  cedar::aux::LocalCoordinateFramePtr mCoordinateFrame;
 }; // class cedar::dev::Odometry
 #endif // CEDAR_DEV_ODOMETRY_H
-

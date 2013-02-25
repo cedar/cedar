@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/math/constants.h"
+#include "cedar/units/Length.h"
 
 // SYSTEM INCLUDES
 
@@ -1068,7 +1069,8 @@ cv::Mat cedar::dev::KinematicChain::calculateTwistTemporalDerivative(unsigned in
 
 cv::Mat cedar::dev::KinematicChain::calculateEndEffectorPosition()
 {
-  return mpEndEffectorCoordinateFrame->getTranslation();
+  //!todo
+  return mpEndEffectorCoordinateFrame->getTranslation().matrix;
 }
 
 cv::Mat cedar::dev::KinematicChain::getRootTransformation()

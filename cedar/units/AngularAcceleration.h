@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,37 +22,38 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        AngularAcceleration.h
 
     Maintainer:  Mathis Richter
-
     Email:       mathis.richter@ini.rub.de
+    Date:        2013 02 22
 
-    Date:        2013 02 18
-
-    Description: Namespace file for cedar::units.
+    Description: This is a header for all angular-acceleration-related units.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_UNITS_NAMESPACE_H
-#define CEDAR_UNITS_NAMESPACE_H
+#ifndef CEDAR_UNITS_ANGULAR_ACCELERATION_H
+#define CEDAR_UNITS_ANGULAR_ACCELERATION_H
 
 // CEDAR INCLUDES
-#include "cedar/units/lib.h"
+#include "cedar/units/namespace.h"
+#include "cedar/units/UnitMatrix.h"
 
 // SYSTEM INCLUDES
+#include <boost/units/quantity.hpp>
+#include <boost/units/systems/si/angular_acceleration.hpp>
 
 namespace cedar
 {
-  /*!@brief Namespace for all aux classes. */
   namespace unit
   {
-    //!@cond SKIPPED_DOCUMENTATION
-    template <typename DimensionType> struct UnitMatrix;
-    //!@endcond
+    typedef boost::units::quantity<boost::units::si::angular_acceleration> AngularAcceleration;
+
+    //!@brief template concretion for angular_acceleration
+    typedef UnitMatrix<boost::units::si::angular_acceleration> AngularAccelerationMatrix;
   }
 }
 
-#endif // CEDAR_UNITS_NAMESPACE_H
+#endif // CEDAR_UNITS_ANGULAR_ACCELERATION_H

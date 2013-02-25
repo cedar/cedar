@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,37 +22,43 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        PlaneAngle.h
 
     Maintainer:  Mathis Richter
-
     Email:       mathis.richter@ini.rub.de
+    Date:        2013 02 14
 
-    Date:        2013 02 18
-
-    Description: Namespace file for cedar::units.
+    Description: This is a header for all plane-angle-related units.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_UNITS_NAMESPACE_H
-#define CEDAR_UNITS_NAMESPACE_H
+#ifndef CEDAR_UNITS_PLANE_ANGLE_H
+#define CEDAR_UNITS_PLANE_ANGLE_H
 
 // CEDAR INCLUDES
-#include "cedar/units/lib.h"
+#include "cedar/units/namespace.h"
+#include "cedar/units/UnitMatrix.h"
 
 // SYSTEM INCLUDES
+#include <boost/units/quantity.hpp>
+#include <boost/units/systems/si/plane_angle.hpp>
 
 namespace cedar
 {
-  /*!@brief Namespace for all aux classes. */
   namespace unit
   {
-    //!@cond SKIPPED_DOCUMENTATION
-    template <typename DimensionType> struct UnitMatrix;
-    //!@endcond
+    typedef boost::units::quantity<boost::units::si::plane_angle> PlaneAngle;
+    using boost::units::si::radian;
+    using boost::units::si::radians;
+
+    //!@brief template concretion for plane_angle
+    typedef UnitMatrix<boost::units::si::plane_angle> PlaneAngleMatrix;
+
+    //!@brief default unit for plane_angle
+    extern CEDAR_UNITS_LIB_EXPORT const cedar::unit::PlaneAngle DEFAULT_PLANE_ANGLE_UNIT;
   }
 }
 
-#endif // CEDAR_UNITS_NAMESPACE_H
+#endif // CEDAR_UNITS_PLANE_ANGLE_H

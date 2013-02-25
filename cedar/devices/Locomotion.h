@@ -38,10 +38,11 @@
 #define CEDAR_DEV_LOCOMOTION_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
-#include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
 #include "cedar/devices/namespace.h"
 #include "cedar/devices/Component.h"
+#include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
+#include "cedar/units/Velocity.h"
+#include "cedar/units/AngularVelocity.h"
 
 // SYSTEM INCLUDES
 
@@ -67,10 +68,10 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Returns the forward velocity [in m/s] of the robot.
-  double getForwardVelocity() const;
+  cedar::unit::Velocity getForwardVelocity() const;
 
   //!@brief Returns the turning rate [in rad/s] of the robot.
-  double getTurningRate() const;
+  cedar::unit::AngularVelocity getTurningRate() const;
 
   //!@brief Stops the robot.
   virtual void stop();
@@ -90,13 +91,17 @@ public:
   //virtual double getEstimatedTurningRate() const = 0;
 
   //!@brief Sets the current forward velocity [in m/s] of the robot.
-  virtual void setForwardVelocity(double forwardVelocity) = 0;
+  virtual void setForwardVelocity(cedar::unit::Velocity forwardVelocity) = 0;
 
   //!@brief Sets the turning rate [in rad/s] of the robot.
-  virtual void setTurningRate(double turningRate) = 0;
+  virtual void setTurningRate(cedar::unit::AngularVelocity turningRate) = 0;
 
   //!@brief Sets both the forward velocity [in m/s] and turning rate [in rad/s] of the robot.
-  virtual void setForwardVelocityAndTurningRate(double forwardVelocity, double turningRate) = 0;
+  virtual void setForwardVelocityAndTurningRate
+               (
+                 cedar::unit::Velocity forwardVelocity,
+                 cedar::unit::AngularVelocity turningRate
+               ) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -105,12 +110,12 @@ protected:
   /*!@brief Checks the given forward velocity against the configured limits and thresholds it if necessary.
    * @param[in,out] forwardVelocity forward velocity to be thresholded [m/s]
    */
-  virtual void thresholdForwardVelocity(double& forwardVelocity) const;
+  virtual void thresholdForwardVelocity(cedar::unit::Velocity& forwardVelocity) const;
 
   /*!@brief Checks the given turning rate against the configured limits and thresholds it if necessary.
    * @param[in,out] turningRate turning rate to be thresholded [m/s]
    */
-  virtual void thresholdTurningRate(double& turningRate) const;
+  virtual void thresholdTurningRate(cedar::unit::AngularVelocity& turningRate) const;
 
   //!@brief Actually sends the movement commands to the robot.
   virtual void sendMovementCommand() = 0;
@@ -126,9 +131,9 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //! desired forward velocity [m/s]
-  double mForwardVelocity;
+  cedar::unit::Velocity mForwardVelocity;
   //! desired turning rate of the robot [rad/s]
-  double mTurningRate;
+  cedar::unit::AngularVelocity mTurningRate;
 
 private:
   // none yet

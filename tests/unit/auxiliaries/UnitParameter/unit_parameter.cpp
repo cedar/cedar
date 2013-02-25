@@ -59,7 +59,9 @@ public:
     (
       this,
       "length",
-      0 * boost::units::si::meters
+      0 * boost::units::si::meters,
+      -1.0 * boost::units::si::meters,
+      1.0 * boost::units::si::meters
     )
   ),
   mTime
@@ -227,6 +229,38 @@ int test_writing
   return errors;
 }
 
+int test_limits()
+{
+  int errors = 0;
+  std::cout << "Testing parameter limits" << std::endl;
+  TestConfigurablePtr conf(new TestConfigurable());
+  conf->mLength->setValue(-2 * boost::units::si::meters);
+  if (conf->mLength->getValue() != -1 * boost::units::si::meters)
+  {
+    std::cout << "Expected " << -1 * boost::units::si::seconds << " got " << conf->mLength->getValue() << std::endl;
+    ++errors;
+  }
+  conf->mLength->setValue(2 * boost::units::si::meters);
+  if (conf->mLength->getValue() != 1 * boost::units::si::meters)
+  {
+    std::cout << "Expected " << 1 * boost::units::si::seconds << " got " << conf->mLength->getValue() << std::endl;
+    ++errors;
+  }
+  conf->mTime->setValue(2 * boost::units::si::seconds);
+  if (conf->mTime->getValue() != 2 * boost::units::si::seconds)
+  {
+    std::cout << "Expected " << 2 * boost::units::si::seconds << " got " << conf->mTime->getValue() << std::endl;
+    ++errors;
+  }
+  conf->mVelocity->setValue(2 * boost::units::si::meters / boost::units::si::seconds);
+  if (conf->mVelocity->getValue() != 2 * boost::units::si::meters / boost::units::si::seconds)
+  {
+    std::cout << "Expected " << 2 * boost::units::si::meters / boost::units::si::seconds << " got " << conf->mVelocity->getValue() << std::endl;
+    ++errors;
+  }
+  return errors;
+}
+
 int main(int, char**)
 {
   int errors = 0;
@@ -275,6 +309,8 @@ int main(int, char**)
               -6.0 * boost::units::si::radian_per_second,
               -8.0 * boost::units::si::meters_per_second_squared
             );
+
+  errors += test_limits();
 
   std::cout << "Test finished with " << errors << " error(s)." << std::endl;
   return errors;

@@ -36,9 +36,10 @@
 
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/grabbertests/TestGrabber.h"
-#include "cedar/units/TimeUnit.h"
 #include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -74,7 +75,7 @@ namespace
         ).total_milliseconds() < (FPS_TEST_DURATION_IN_SEC*1000)
       )
       {
-        cedar::aux::sleep(cedar::unit::Milliseconds(200));
+        cedar::aux::sleep(cedar::unit::Time(200.0 * cedar::unit::milli * cedar::unit::second));
         std::cout << "measured fps: "<< grabber.getFpsMeasured()<<std::endl;
        }
 
@@ -209,7 +210,7 @@ int main(int , char **)
   delete grabber_1;
   grabber_1 = NULL;
 
-  cedar::aux::sleep(cedar::unit::Milliseconds(1));
+  cedar::aux::sleep(cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second));
   cedar::dev::sensors::visual::TestGrabber *grabber_2 = new cedar::dev::sensors::visual::TestGrabber
                                                             (
                                                               CHANNEL_0_NAME,
@@ -275,7 +276,7 @@ int main(int , char **)
 
 
   std::cout << "\n\nPress now CTRL-C\n";
-  cedar::aux::sleep(cedar::unit::Seconds(static_cast<double>(3*FPS_TEST_DURATION_IN_SEC)));
+  cedar::aux::sleep(cedar::unit::Time(static_cast<double>(3*FPS_TEST_DURATION_IN_SEC) * cedar::unit::seconds));
 
   //no ctrl-c pressed
   std::cout << "\n\nWARNING: No CTRL-C catched - do normal cleanup\n";
