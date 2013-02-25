@@ -39,25 +39,25 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/UnitParameterTemplate.h"
+#include "cedar/units/PlaneAngle.h"
 
 // SYSTEM INCLUDES
-#include <boost/units/systems/si/plane_angle.hpp>
 
 namespace cedar
 {
   namespace aux
   {
     template <>
-    boost::units::quantity<boost::units::si::plane_angle> getUnitFromPostFix(const std::string& postFix)
+    cedar::unit::PlaneAngle getUnitFromPostFix(const std::string& postFix)
     {
-      static std::map<std::string, boost::units::quantity<boost::units::si::plane_angle> > map;
+      static std::map<std::string, cedar::unit::PlaneAngle> map;
 
       if (map.empty())
       {
         addSubUnitToMaps
         (
           map,
-          boost::units::si::radian,
+          cedar::unit::radian,
           "radian", "rad",
           1.0
         );
@@ -68,7 +68,7 @@ namespace cedar
     }
 
     // Generate types for the length parameter.
-    typedef cedar::aux::UnitParameterTemplate<boost::units::si::plane_angle> PlaneAngleParameter;
+    typedef cedar::aux::UnitParameterTemplate<cedar::unit::PlaneAngle::unit_type> PlaneAngleParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(PlaneAngleParameter);
   }
 }
