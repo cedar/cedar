@@ -43,7 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/exceptions.h"
-#include "cedar/auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/NumericParameter.h"
 
 // SYSTEM INCLUDES
 #include <boost/units/base_dimension.hpp>
@@ -318,13 +318,13 @@ namespace boost
  * @todo describe more.
  */
 template <class T>
-class cedar::aux::UnitParameterTemplate : public cedar::aux::ParameterTemplate<boost::units::quantity<T> >
+class cedar::aux::UnitParameterTemplate : public cedar::aux::NumericParameter<boost::units::quantity<T> >//public cedar::aux::ParameterTemplate<boost::units::quantity<T> >
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  typedef cedar::aux::ParameterTemplate<boost::units::quantity<T> > Super;
+  typedef cedar::aux::NumericParameter<boost::units::quantity<T> > Super;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -339,6 +339,19 @@ public:
   )
   :
   Super(pOwner, name, defaultValue)
+  {
+  }
+
+  UnitParameterTemplate
+  (
+    cedar::aux::Configurable* pOwner,
+    const std::string& name,
+    const boost::units::quantity<T>& defaultValue,
+    const boost::units::quantity<T>& minimum,
+    const boost::units::quantity<T>& maximum
+  )
+  :
+  Super(pOwner, name, defaultValue, minimum, maximum)
   {
   }
 

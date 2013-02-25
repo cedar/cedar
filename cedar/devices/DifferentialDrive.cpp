@@ -40,6 +40,10 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/devices/namespace.h"
 #include "cedar/devices/DifferentialDrive.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/Velocity.h"
+#include "cedar/units/AngularVelocity.h"
+#include "cedar/units/PlaneAngle.h"
 
 // SYSTEM INCLUDES
 
@@ -48,7 +52,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dev::DifferentialDrive::DifferentialDrive()
 :
-mWheelSpeed(2, 0),
+mWheelSpeed(2, 0.0 * cedar::unit::DEFAULT_VELOCITY_UNIT),
 _mWheelDistance(new cedar::aux::DoubleParameter(this, "wheel distance", 0.1, 0.0, 1.0)),
 _mWheelRadius(new cedar::aux::DoubleParameter(this, "wheel radius", 0.01, 0.0, 1.0)),
 _mHardwareSpeedLimits(new cedar::aux::math::DoubleLimitsParameter(this, "hardware speed limits", 0.0, 0.2, 0.2, 2.0))
@@ -57,7 +61,7 @@ _mHardwareSpeedLimits(new cedar::aux::math::DoubleLimitsParameter(this, "hardwar
 cedar::dev::DifferentialDrive::DifferentialDrive(cedar::dev::ChannelPtr channel)
 :
 cedar::dev::Locomotion(channel),
-mWheelSpeed(2, 0),
+mWheelSpeed(2, 0.0 * cedar::unit::DEFAULT_VELOCITY_UNIT),
 _mWheelDistance(new cedar::aux::DoubleParameter(this, "wheel distance", 0.1, 0.0, 1.0)),
 _mWheelRadius(new cedar::aux::DoubleParameter(this, "wheel radius", 0.01, 0.0, 1.0)),
 _mHardwareSpeedLimits(new cedar::aux::math::DoubleLimitsParameter(this, "hardware speed limits", 0.0, 0.2, 0.2, 2.0))
@@ -67,14 +71,18 @@ _mHardwareSpeedLimits(new cedar::aux::math::DoubleLimitsParameter(this, "hardwar
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double cedar::dev::DifferentialDrive::getWheelDistance() const
+cedar::unit::Length cedar::dev::DifferentialDrive::getWheelDistance() const
 {
-  return _mWheelDistance->getValue();
+  //!todo fix this by introducing a LengthParameter class
+  cedar::unit::Length wheel_distance = _mWheelDistance->getValue() * cedar::unit::DEFAULT_LENGTH_UNIT;
+  return wheel_distance;
 }
 
-double cedar::dev::DifferentialDrive::getWheelRadius() const
+cedar::unit::Length cedar::dev::DifferentialDrive::getWheelRadius() const
 {
-  return _mWheelRadius->getValue();
+  //!todo fix this by introducing a LengthParameter class
+  cedar::unit::Length wheel_radius = _mWheelRadius->getValue() * cedar::unit::DEFAULT_LENGTH_UNIT;
+  return wheel_radius;
 }
 
 cedar::aux::math::DoubleLimitsParameterPtr cedar::dev::DifferentialDrive::getHardwareSpeedLimits() const
@@ -82,41 +90,41 @@ cedar::aux::math::DoubleLimitsParameterPtr cedar::dev::DifferentialDrive::getHar
   return _mHardwareSpeedLimits;
 }
 
-const std::vector<double>& cedar::dev::DifferentialDrive::getWheelSpeed() const
+const std::vector<cedar::unit::Velocity>& cedar::dev::DifferentialDrive::getWheelSpeed() const
 {
   return mWheelSpeed;
 }
 
-void cedar::dev::DifferentialDrive::setWheelSpeed(std::vector<double>& wheelSpeed)
+void cedar::dev::DifferentialDrive::setWheelSpeed(std::vector<cedar::unit::Velocity >& wheelSpeed)
 {
-  double forward_velocity = 0;
-  double turning_rate = 0;
+  cedar::unit::Velocity forward_velocity = 0.0 * cedar::unit::DEFAULT_VELOCITY_UNIT;
+  cedar::unit::AngularVelocity turning_rate = 0.0 * cedar::unit::DEFAULT_ANGULAR_VELOCITY_UNIT;
 
   convertToForwardVelocityAndTurningRate(wheelSpeed[0], wheelSpeed[1], forward_velocity, turning_rate);
   setForwardVelocityAndTurningRate(forward_velocity, turning_rate);
 }
 
-void cedar::dev::DifferentialDrive::setForwardVelocity(double forwardVelocity)
+void cedar::dev::DifferentialDrive::setForwardVelocity(cedar::unit::Velocity forwardVelocity)
 {
   setForwardVelocityAndTurningRate(forwardVelocity, getTurningRate());
 }
 
-void cedar::dev::DifferentialDrive::setTurningRate(double turningRate)
+void cedar::dev::DifferentialDrive::setTurningRate(cedar::unit::AngularVelocity turningRate)
 {
   setForwardVelocityAndTurningRate(getForwardVelocity(), turningRate);
 }
 
 void cedar::dev::DifferentialDrive::setForwardVelocityAndTurningRate
      (
-       double forwardVelocity,
-       double turningRate
+       cedar::unit::Velocity forwardVelocity,
+       cedar::unit::AngularVelocity turningRate
      )
 {
   thresholdForwardVelocity(forwardVelocity);
   thresholdTurningRate(turningRate);
 
-  double left_wheel_speed = 0;
-  double right_wheel_speed = 0;
+  cedar::unit::Velocity left_wheel_speed = 0.0 * cedar::unit::DEFAULT_VELOCITY_UNIT;
+  cedar::unit::Velocity right_wheel_speed = 0.0 * cedar::unit::DEFAULT_VELOCITY_UNIT;
   convertToWheelSpeed(forwardVelocity, turningRate, left_wheel_speed, right_wheel_speed);
   thresholdToHardwareLimits(left_wheel_speed, right_wheel_speed);
   mWheelSpeed[0] = left_wheel_speed;
@@ -128,34 +136,41 @@ void cedar::dev::DifferentialDrive::setForwardVelocityAndTurningRate
 
 void cedar::dev::DifferentialDrive::thresholdToHardwareLimits
      (
-       double& leftWheelSpeed,
-       double& rightWheelSpeed
+       cedar::unit::Velocity& leftWheelSpeed,
+       cedar::unit::Velocity& rightWheelSpeed
      )
 {
-  leftWheelSpeed = _mHardwareSpeedLimits->getValue().limit(leftWheelSpeed);
-  rightWheelSpeed = _mHardwareSpeedLimits->getValue().limit(rightWheelSpeed);
+  //!todo fix this by introducing a VelocityLimitsParameter class
+  double left_wheel_speed = leftWheelSpeed / cedar::unit::DEFAULT_VELOCITY_UNIT;
+  double right_wheel_speed = rightWheelSpeed / cedar::unit::DEFAULT_VELOCITY_UNIT;
+  leftWheelSpeed = _mHardwareSpeedLimits->getValue().limit(left_wheel_speed) * cedar::unit::DEFAULT_VELOCITY_UNIT;
+  rightWheelSpeed = _mHardwareSpeedLimits->getValue().limit(right_wheel_speed) * cedar::unit::DEFAULT_VELOCITY_UNIT;
 }
 
 void cedar::dev::DifferentialDrive::convertToWheelSpeed
      (
-       double forwardVelocity,
-       double turningRate,
-       double& leftWheelSpeed,
-       double& rightWheelSpeed
+       cedar::unit::Velocity forwardVelocity,
+       cedar::unit::AngularVelocity turningRate,
+       cedar::unit::Velocity& leftWheelSpeed,
+       cedar::unit::Velocity& rightWheelSpeed
      ) const
 {
-  leftWheelSpeed = forwardVelocity - turningRate * _mWheelDistance->getValue() / 2.0;
-  rightWheelSpeed = forwardVelocity + turningRate * _mWheelDistance->getValue() / 2.0;
+  cedar::unit::Length wheel_distance = _mWheelDistance->getValue() * cedar::unit::DEFAULT_LENGTH_UNIT;
+
+  leftWheelSpeed = forwardVelocity - turningRate * wheel_distance / (2.0 * cedar::unit::DEFAULT_PLANE_ANGLE_UNIT);
+  rightWheelSpeed = forwardVelocity + turningRate * wheel_distance / (2.0 * cedar::unit::DEFAULT_PLANE_ANGLE_UNIT);
 }
 
 void cedar::dev::DifferentialDrive::convertToForwardVelocityAndTurningRate
      (
-       double leftWheelSpeed,
-       double rightWheelSpeed,
-       double& forwardVelocity,
-       double& turningRate
+       cedar::unit::Velocity leftWheelSpeed,
+       cedar::unit::Velocity rightWheelSpeed,
+       cedar::unit::Velocity& forwardVelocity,
+       cedar::unit::AngularVelocity& turningRate
      ) const
 {
+  cedar::unit::Length wheel_distance = _mWheelDistance->getValue() * cedar::unit::DEFAULT_LENGTH_UNIT;
+
   forwardVelocity = (rightWheelSpeed + leftWheelSpeed) / 2.0;
-  turningRate = (rightWheelSpeed - leftWheelSpeed) / _mWheelDistance->getValue();
+  turningRate = (rightWheelSpeed - leftWheelSpeed) / (wheel_distance / cedar::unit::DEFAULT_PLANE_ANGLE_UNIT);
 }

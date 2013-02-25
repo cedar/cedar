@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        default_units.cpp
 
     Maintainer:  Mathis Richter
 
@@ -30,29 +30,28 @@
 
     Date:        2013 02 18
 
-    Description: Namespace file for cedar::units.
+    Description: Initializations for the default units in cedar.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_UNITS_NAMESPACE_H
-#define CEDAR_UNITS_NAMESPACE_H
-
 // CEDAR INCLUDES
-#include "cedar/units/lib.h"
+#include "cedar/units/namespace.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/Velocity.h"
+#include "cedar/units/Acceleration.h"
+#include "cedar/units/PlaneAngle.h"
+#include "cedar/units/Frequency.h"
+#include "cedar/units/AngularVelocity.h"
 
 // SYSTEM INCLUDES
 
-namespace cedar
-{
-  /*!@brief Namespace for all aux classes. */
-  namespace unit
-  {
-    //!@cond SKIPPED_DOCUMENTATION
-    template <typename DimensionType> struct UnitMatrix;
-    //!@endcond
-  }
-}
-
-#endif // CEDAR_UNITS_NAMESPACE_H
+const cedar::unit::Length cedar::unit::DEFAULT_LENGTH_UNIT = 1 * meter;
+const cedar::unit::Time cedar::unit::DEFAULT_TIME_UNIT = 1 * second;
+const cedar::unit::Velocity cedar::unit::DEFAULT_VELOCITY_UNIT = 1 * meter_per_second;
+const cedar::unit::Acceleration cedar::unit::DEFAULT_ACCELERATION_UNIT = 1 * meter_per_second_squared;
+const cedar::unit::PlaneAngle cedar::unit::DEFAULT_PLANE_ANGLE_UNIT = 1 * radian;
+const cedar::unit::Frequency cedar::unit::DEFAULT_FREQUENCY_UNIT = 1 * hertz;
+const cedar::unit::AngularVelocity cedar::unit::DEFAULT_ANGULAR_VELOCITY_UNIT = 1 * radian_per_second;
