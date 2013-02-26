@@ -86,7 +86,7 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
 
   // we also wait for finishedThread() to execute:
   mFinishedThreadMutex.lock(); 
-// TODO: js: need to unlock here, too!
+  mFinishedThreadMutex.unlock();
 
   ////////////////////////////////////////////////////////////////////////////
   //
