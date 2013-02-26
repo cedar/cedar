@@ -89,8 +89,9 @@ cedar::proc::sources::NetReader::NetReader()
 :
 mOutput(new cedar::aux::MatData(cv::Mat())),
 // outputs
-mReader()
+mReader(),
 // parameters
+_mPort(new cedar::aux::StringParameter(this, "port", "DEMOCHANNEL"))
 {
   // declare all data
   this->declareOutput("output", mOutput);
@@ -102,15 +103,24 @@ mReader()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::sources::NetReader::onStart()
+void cedar::proc::sources::NetReader::reset()
+{
+  mReader.reset();
+  this->connect();
+}
+
+void cedar::proc::sources::NetReader::connect()
 {
   // instantiate the reader, if not yet done
   if (!mReader)
   {
     try 
     {
-      mReader= boost::shared_ptr< cedar::aux::net::Reader< cedar::aux::MatData::DataType > >(new cedar::aux::net::Reader< cedar::aux::MatData::DataType >("DEMOCHANNEL"));
-      // TODO: make channel configurable
+      mReader
+        = boost::shared_ptr< cedar::aux::net::Reader< cedar::aux::MatData::DataType > >
+          (
+            new cedar::aux::net::Reader< cedar::aux::MatData::DataType >(this->getPort())
+          );
     }
     catch ( cedar::aux::net::NetWaitingForWriterException &e )
     {
@@ -127,8 +137,16 @@ void cedar::proc::sources::NetReader::onStart()
   }
 }
 
+void cedar::proc::sources::NetReader::onStart()
+{
+  this->_mPort->setConstant(true);
+
+  this->connect();
+}
+
 void cedar::proc::sources::NetReader::onStop()
 {
+  this->_mPort->setConstant(false);
   mReader.reset();
 }
 
@@ -154,8 +172,6 @@ void cedar::proc::sources::NetReader::compute(const cedar::proc::Arguments&)
     // CHANGE NOTHING
     return;
   }
-
 }
 
-#endif
-
+#endif // CEDAR_USE_YARP
