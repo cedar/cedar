@@ -299,6 +299,7 @@ void cedar::aux::ThreadWrapper::quittedThreadSlot()
     //std::cout << "deleting thread: " << mpThread << " ( current thread: " << QThread::currentThread() << std::endl;    
 
     // TODO: this will leak IF the upper thread will not have time to tick its event loop (ie when shutting down the app):
+    // TODO: it will also lead to a destruction to a held mutex in that case
     mpThread->deleteLater();
     mpThread = NULL; // allow me to restart a new thread/worker
 
