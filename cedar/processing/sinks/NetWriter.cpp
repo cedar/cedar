@@ -184,7 +184,7 @@ void cedar::proc::sinks::NetWriter::inputConnectionChanged(const std::string& in
   // Assign the input to the member. This saves us from casting in every computation step.
   this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
 
-  if(!this->mInput)
+  if (!this->mInput)
   {
     return;
   }

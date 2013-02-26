@@ -205,7 +205,7 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
 
   // check if filenames are there (no filename could happen on startup in the processingGui)
 
-  for(unsigned int channel = 0; channel < num_cams; ++channel)
+  for (unsigned int channel = 0; channel < num_cams; ++channel)
   {
     if (getVideoChannel(channel)->_mSourceFileName->getPath() == ".")
     {
@@ -235,7 +235,7 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
   {
     cv::VideoCapture capture(getVideoChannel(channel)->_mSourceFileName->getPath());
 
-    if (! capture.isOpened())
+    if (!capture.isOpened())
     {
       std::string msg = this->getName() + ": Grabbing failed on Channel " + boost::lexical_cast<std::string>(channel)
                         + " from \"" + getVideoChannel(channel)->_mSourceFileName->getPath() + "\"";

@@ -280,13 +280,13 @@ private:
 protected:
   // none yet
 private:
-  /// The list of properties
+  //! The list of properties
   CamPropertiesMapPtr mpPropertiesList;
 
-  /// Camera interface
+  //! Camera interface
   cv::VideoCapture mVideoCapture;
 
-  /// The lock for the concurrent access to the cv::VideoCapture
+  //! The lock for the concurrent access to the cv::VideoCapture
   QReadWriteLock* mpVideoCaptureLock;
 
   //--------------------------------------------------------------------------------------------------------------------
