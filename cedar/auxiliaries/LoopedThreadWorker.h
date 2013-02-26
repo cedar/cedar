@@ -115,6 +115,16 @@ class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::Thread
     //!@brief remember time stamps of last step
     boost::posix_time::ptime mLastTimeStepEnd;
 
+    //! lock for mNumberOfSteps
+    mutable QReadWriteLock mNumberOfStepsLock;
+    //! lock for mSumOfStepsTaken
+    mutable QReadWriteLock mSumOfStepsTakenLock;
+    //! lock for mMaxStepsTaken
+    mutable QReadWriteLock mMaxStepsTakenLock;
+    //! lock for mLastTimeStepStart
+    mutable QReadWriteLock mLastTimeStepStartLock;
+    //! lock for mLastTimeStepEnd
+    mutable QReadWriteLock mLastTimeStepEndLock;
 };
 
 
