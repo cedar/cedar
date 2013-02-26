@@ -205,7 +205,7 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
 
   // check if filenames are there (no filename could happen on startup in the processingGui)
 
-  for(unsigned int channel = 0; channel < num_channels; ++channel)
+  for (unsigned int channel = 0; channel < num_channels; ++channel)
   {
     if (getVideoChannel(channel)->_mSourceFileName->getPath() == ".")
     {
