@@ -85,7 +85,8 @@ cedar::proc::sinks::NetWriter::NetWriter()
 :
 // outputs
 mInput(new cedar::aux::MatData(cv::Mat())),
-mWriter()
+mWriter(),
+_mPort(new cedar::aux::StringParameter(this, "port", "DEMOCHANNEL"))
 {
   // declare all data
   this->declareInput("input");
@@ -96,6 +97,7 @@ mWriter()
 
 void cedar::proc::sinks::NetWriter::onStart()
 {
+  _mPort->setConstant(true);
   // instantiate the reader, if not yet done
   if (!mWriter)
   {
@@ -104,9 +106,8 @@ void cedar::proc::sinks::NetWriter::onStart()
       mWriter
         = boost::shared_ptr<cedar::aux::net::Writer<cedar::aux::MatData::DataType> >
           (
-            new cedar::aux::net::Writer<cedar::aux::MatData::DataType>("DEMOCHANNEL")
+            new cedar::aux::net::Writer<cedar::aux::MatData::DataType>(this->getPort())
           );
-      // TODO: make channel configurable
     }
     catch (cedar::aux::net::NetMissingRessourceException& e)
     {
@@ -121,6 +122,7 @@ void cedar::proc::sinks::NetWriter::onStart()
 void cedar::proc::sinks::NetWriter::onStop()
 {
   mWriter.reset();
+  _mPort->setConstant(false);
 }
 
 
