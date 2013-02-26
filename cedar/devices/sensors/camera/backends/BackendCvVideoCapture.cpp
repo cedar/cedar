@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/camera/backends/BackendCvVideoCapture.h"
+#include "cedar/devices/sensors/camera/exceptions.h"
 
 // SYSTEM INCLUDES
 
@@ -63,28 +64,19 @@ cedar::dev::sensors::camera::BackendCvVideoCapture::~BackendCvVideoCapture()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-// void cedar::dev::sensors::camera::BackendCvVideoCapture::createPropertyAndSetting()
-//{
-//}
-
-
-bool cedar::dev::sensors::camera::BackendCvVideoCapture::createCaptureObject()
+void cedar::dev::sensors::camera::BackendCvVideoCapture::init()
 {
+}
 
-//  std::cout << "Create camera with cv::VideoCapture Backend\n"
-//      << "BusId:" << mpCameraChannel->getBusId() << "\n"
-//      << "Guid:" << mpCameraChannel->getGuid() << "\n"
-//      << "ByGuid:" << mpCameraChannel->getByGuid() << "\n"
-//      << std::endl;
 
+void cedar::dev::sensors::camera::BackendCvVideoCapture::createCaptureObject()
+{
   cv::VideoCapture capture(mpCameraChannel->getCameraId());
-  if(capture.isOpened())
+  if (!capture.isOpened())
   {
-    mpCameraChannel->mVideoCapture = capture;
-    return true;
+    CEDAR_THROW(cedar::dev::sensors::camera::CreateBackendException,"Error: Couldn't create capture object");
   }
-  return false;
+  mpCameraChannel->mVideoCapture = capture;
 }
 
 

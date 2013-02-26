@@ -113,7 +113,7 @@ protected:
   // inherited from Grabber
   void onCreateGrabber();
   void onGrab(unsigned int channel);
-  std::string onUpdateSourceInfo(unsigned int channel);
+  std::string onGetSourceInfo(unsigned int channel);
   void onCleanUp();
   void onCloseGrabber();
 

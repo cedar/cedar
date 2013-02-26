@@ -35,8 +35,8 @@
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_EXCEPTIONS_H
-#define CEDAR_DEV_SENSORS_VISUAL_EXCEPTIONS_H
+#ifndef CEDAR_DEV_SENSORS_CAMERA_EXCEPTIONS_H
+#define CEDAR_DEV_SENSORS_CAMERA_EXCEPTIONS_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -53,9 +53,21 @@ class cedar::dev::sensors::camera::PropertyNotSupportedException : public cedar:
 {
 };
 
+/*!@brief Exception when a property could not set in the backend device
+ */
+class cedar::dev::sensors::camera::PropertyNotSetException : public cedar::aux::ExceptionBase
+{
+};
+
 /*!@brief Exception when the used cv::VideoCapture object is not working
  */
 class cedar::dev::sensors::camera::VideoCaptureNotOpenedException : public cedar::aux::ExceptionBase
+{
+};
+
+/*!@brief Exception when the camera backend could not be created
+ */
+class cedar::dev::sensors::camera::CreateBackendException : public cedar::aux::ExceptionBase
 {
 };
 
@@ -78,4 +90,4 @@ class cedar::dev::sensors::camera::LibDcException : public cedar::aux::Exception
 
 
 
-#endif /* CEDAR_DEV_SENSORS_VISUAL_EXCEPTIONS_H */
+#endif /* CEDAR_DEV_SENSORS_CAMERA_EXCEPTIONS_H */

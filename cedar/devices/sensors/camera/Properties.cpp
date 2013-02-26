@@ -67,10 +67,12 @@ mpVideoCaptureLock(lock)
   cedar::aux::ConfigurablePtr properties(new cedar::aux::Configurable());
   pOwner->addConfigurableChild("properties", properties);
 
-  mpPropertiesList = cedar::dev::sensors::camera::Properties::CamPropertiesMapPtr
+/*
+  mPropertiesList = cedar::dev::sensors::camera::Properties::CamPropertiesMapPtr
                      (
                        new cedar::dev::sensors::camera::Properties::CamPropertiesMap
                      );
+*/
 
   // Add all properties to the properties-list
   int num_properties = cedar::dev::sensors::camera::Property::type().list().size();
@@ -86,7 +88,7 @@ mpVideoCaptureLock(lock)
     cedar::dev::sensors::camera::CamPropertyPtr p_prop(new cedar::dev::sensors::camera::CamProperty(prop_id,prop_name));
 
     //add to properties-list
-    mpPropertiesList->insert(std::pair<unsigned int, CamPropertyPtr>(prop_id,p_prop));
+    mPropertiesList.insert(std::pair<unsigned int, CamPropertyPtr>(prop_id,p_prop));
     properties->addConfigurableChild(prop_name, p_prop);
 
     QObject::connect(
@@ -128,7 +130,7 @@ void cedar::dev::sensors::camera::Properties::blockSignals(bool block)
   for (int i=0; i<num_properties; i++)
   {
     cedar::dev::sensors::camera::Property::Id prop_id = cedar::dev::sensors::camera::Property::type().list().at(i).id();
-    (*mpPropertiesList)[prop_id]->blockSignals(block);
+    mPropertiesList[prop_id]->blockSignals(block);
   }
 }
 
@@ -145,7 +147,7 @@ void cedar::dev::sensors::camera::Properties::propertyValueChanged
 #endif
 
   // get the used CamProperty
-  cedar::dev::sensors::camera::CamPropertyPtr p_prop = (*mpPropertiesList)[propertyId];
+  cedar::dev::sensors::camera::CamPropertyPtr p_prop = mPropertiesList[propertyId];
 
   // and the mode
   cedar::dev::sensors::camera::PropertyMode::Id prop_mode_id = p_prop->getMode();
@@ -180,7 +182,7 @@ void cedar::dev::sensors::camera::Properties::propertyModeChanged
   //std::cout << "[propertyModeChanged] prop :" << propertyId << " to " << newMode << std::endl;
 #endif
   // get the used CamProperty
-  cedar::dev::sensors::camera::CamPropertyPtr p_prop = (*mpPropertiesList)[propertyId];
+  cedar::dev::sensors::camera::CamPropertyPtr p_prop = mPropertiesList[propertyId];
 
 //  if (p_prop->getMode() != newMode)
 //  {
@@ -214,7 +216,7 @@ void cedar::dev::sensors::camera::Properties::setDefaultValue
   double value
 )
 {
-  (*mpPropertiesList)[propertyId]->setDefaultValue(value);
+  mPropertiesList[propertyId]->setDefaultValue(value);
 }
 //--------------------------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::camera::Properties::setProperty
@@ -224,17 +226,17 @@ bool cedar::dev::sensors::camera::Properties::setProperty
 )
 {
   // check if new value is different from old
-  if ((*mpPropertiesList)[propertyId]->getValue() == value)
+  if (mPropertiesList[propertyId]->getValue() == value)
   {
     return true;
   }
 
   // set value
-  (*mpPropertiesList)[propertyId]->setValue(value);
+  mPropertiesList[propertyId]->setValue(value);
 
   // check if value is set to the right value
 
-  if ((*mpPropertiesList)[propertyId]->getValue() == value)
+  if (mPropertiesList[propertyId]->getValue() == value)
   {
     return true;
   }
@@ -248,7 +250,7 @@ bool cedar::dev::sensors::camera::Properties::setPropertyMode
   cedar::dev::sensors::camera::PropertyMode::Id mode
 )
 {
-  cedar::dev::sensors::camera::CamPropertyPtr p_prop = (*mpPropertiesList)[propertyId];
+  cedar::dev::sensors::camera::CamPropertyPtr p_prop = mPropertiesList[propertyId];
   p_prop->setMode(mode);
   return (p_prop->getMode() == mode);
 }
@@ -259,10 +261,7 @@ cedar::dev::sensors::camera::PropertyMode::Id cedar::dev::sensors::camera::Prope
   cedar::dev::sensors::camera::Property::Id propertyId
 )
 {
-  // get the used CamProperty
-  cedar::dev::sensors::camera::CamPropertyPtr p_prop = (*mpPropertiesList)[propertyId];
-
-  return p_prop->getMode();
+  return (mPropertiesList[propertyId])->getMode();
 }
 
 
@@ -272,7 +271,7 @@ double cedar::dev::sensors::camera::Properties::getProperty
   cedar::dev::sensors::camera::Property::Id propertyId
 )
 {
-  cedar::dev::sensors::camera::CamPropertyPtr p_prop = (*mpPropertiesList)[propertyId];
+  cedar::dev::sensors::camera::CamPropertyPtr p_prop = mPropertiesList[propertyId];
 
   // only return this value, if set to manual or if backend-default value
   if (!(p_prop->isSupported()))
@@ -370,13 +369,13 @@ double cedar::dev::sensors::camera::Properties::getPropertyFromCamera(unsigned i
 //--------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::camera::Properties::disableProperty(cedar::dev::sensors::camera::Property::Id propertyId)
 {
-  (*mpPropertiesList)[propertyId]->disable();
+  mPropertiesList[propertyId]->disable();
 }
 
 //--------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::camera::Properties::enableProperty(cedar::dev::sensors::camera::Property::Id propertyId)
 {
-  (*mpPropertiesList)[propertyId]->enable();
+  mPropertiesList[propertyId]->enable();
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -386,8 +385,8 @@ cedar::dev::sensors::camera::PropertyMode::Id cedar::dev::sensors::camera::Prope
 )
 {
 //  std::cout << __PRETTY_FUNCTION__ << " from Property " << propertyId
-//            << ": mode " <<(*mpPropertiesList)[propertyId]->getMode()<< std::endl;
-  return (*mpPropertiesList)[propertyId]->getMode();
+//            << ": mode " <<mPropertiesList[propertyId]->getMode()<< std::endl;
+  return mPropertiesList[propertyId]->getMode();
 }
 
 
@@ -398,42 +397,42 @@ void cedar::dev::sensors::camera::Properties::setMode
   cedar::dev::sensors::camera::PropertyMode::Id modeId
 )
 {
-  (*mpPropertiesList)[propertyId]->setMode(modeId);
+  mPropertiesList[propertyId]->setMode(modeId);
 }
 
 //--------------------------------------------------------------------------------------------------------------------
 double cedar::dev::sensors::camera::Properties::getMinValue(Property::Id propertyId)
 {
-  return (*mpPropertiesList)[propertyId]->getMinValue();
+  return mPropertiesList[propertyId]->getMinValue();
 }
 
 //--------------------------------------------------------------------------------------------------------------------
 double cedar::dev::sensors::camera::Properties::getMaxValue(Property::Id propertyId)
 {
-  return (*mpPropertiesList)[propertyId]->getMaxValue();
+  return mPropertiesList[propertyId]->getMaxValue();
 }
 
 //--------------------------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::camera::Properties::isSupported(Property::Id propertyId)
 {
-  return (*mpPropertiesList)[propertyId]->isSupported();
+  return mPropertiesList[propertyId]->isSupported();
 }
 
 //--------------------------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::camera::Properties::isAutoCapable(Property::Id propertyId)
 {
-  return (*mpPropertiesList)[propertyId]->isAutoCapable();
+  return mPropertiesList[propertyId]->isAutoCapable();
 }
 
 //--------------------------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::camera::Properties::isManualCapable(Property::Id propertyId)
 {
-  return (*mpPropertiesList)[propertyId]->isManualCapable();
+  return mPropertiesList[propertyId]->isManualCapable();
 }
 
 //--------------------------------------------------------------------------------------------------------------------
 cedar::dev::sensors::camera::CamPropertyPtr
   cedar::dev::sensors::camera::Properties::getPropertyObject(Property::Id propertyId)
 {
-  return (*mpPropertiesList)[propertyId];
+  return mPropertiesList[propertyId];
 }

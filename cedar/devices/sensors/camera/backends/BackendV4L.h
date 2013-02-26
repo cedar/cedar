@@ -66,28 +66,28 @@ public cedar::dev::sensors::camera::Backend
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  CameraBackendV4L
+  BackendV4L
   (
     cedar::dev::sensors::camera::Channel* pCameraChannel
   );
 
   //!@brief Destructor
-  ~CameraBackendV4L();
+  ~BackendV4L();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  void init();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void setProperties();
+
+  // derived from class Backend
   void applySettingsToCamera();
-  bool createCaptureObject();
-  void applyStateToCamera();
+  void createCaptureObject();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

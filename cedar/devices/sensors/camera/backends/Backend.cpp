@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
+#include <QWriteLocker>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -62,38 +63,27 @@ cedar::dev::sensors::camera::Backend::~Backend()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::camera::Backend::init()
-{
 
-}
-
-bool cedar::dev::sensors::camera::Backend::createCaptureBackend()
+void cedar::dev::sensors::camera::Backend::createCaptureBackend()
 {
 #ifdef DEBUG_CAMERA_GRABBER
   std::cout << __PRETTY_FUNCTION__ << std::endl;
 #endif
 
-  bool result = true;
 
   // lock
-  this->mpCameraChannel->mpVideoCaptureLock->lockForWrite();
+  QWriteLocker videocapture_locking(this->mpCameraChannel->mpVideoCaptureLock);
+
 #ifdef DEBUG_CAMERA_GRABBER
   std::cout << __PRETTY_FUNCTION__ << " Lock: " << this->mpCameraChannel->mpVideoCaptureLock << std::endl;
 #endif
   // close old videoCapture device
   this->mpCameraChannel->mVideoCapture = cv::VideoCapture();
-//  this->mpCameraChannel->mVideoCapture.release();
 
   // create cv::VideoCapture
-  result = createCaptureObject();
+  // on error, a cedar::dev::sensors::camera::CreateBackendException will be thrown
+  this->createCaptureObject();
 
-  if (!result)
-  {
-    #ifdef DEBUG_CAMERA_GRABBER
-      std::cout << __PRETTY_FUNCTION__ << " Error: Couldn't create captue object" << std::endl;
-    #endif
-    return false;
-  }
 #ifdef DEBUG_CAMERA_GRABBER
   std::cout << __PRETTY_FUNCTION__ << " captue object created" << std::endl;
 #endif
@@ -154,10 +144,7 @@ bool cedar::dev::sensors::camera::Backend::createCaptureBackend()
   }
 #endif
 
-  // unlock
-  this->mpCameraChannel->mpVideoCaptureLock->unlock();
-
-  return true;
+  // unlock done by the QWriteLocker "videocapture_locking" object
 }
 
 void cedar::dev::sensors::camera::Backend::applyStateToCamera()
@@ -207,40 +194,46 @@ void cedar::dev::sensors::camera::Backend::applyStateToCamera()
 }
 
 
-bool cedar::dev::sensors::camera::Backend::setPropertyToCamera(unsigned int propertyId, double value)
+void cedar::dev::sensors::camera::Backend::setPropertyToCamera(unsigned int propertyId, double value)
 {
-  // no lock needed, the cvVideoCapture object is globally locked
-  std::string prop_name = cedar::dev::sensors::camera::Property::type().get(propertyId).prettyString();
+  // no lock needed, the cvVideoCapture object is locked globally
 #ifdef DEBUG_CAMERA_GRABBER
+  std::string prop_name = cedar::dev::sensors::camera::Property::type().get(propertyId).prettyString();
   std::cout << "setPropertyToCamera "<< prop_name <<"( ID: " << propertyId << ") Value: " << value << std::endl;
 #endif
-  bool result = false;
+  bool result = true;
   if (this->mpCameraChannel->mVideoCapture.isOpened())
   {
     //set only real values or CAMERA_PROPERTY_MODE_AUTO
     if ( (value != CAMERA_PROPERTY_NOT_SUPPORTED) || (value != CAMERA_PROPERTY_MODE_DEFAULT) )
     {
-      result = this->mpCameraChannel->mVideoCapture.set(propertyId, value);
+      // set value
+      if (this->mpCameraChannel->mVideoCapture.set(propertyId, value))
+      {
+        // check if set:
+        //if (! this->getPropertyFromCamera(propertyId) == value)
+        //{
+        //  result = false;
+        //}
+      }
+      else
+      {
+        result = false;
+      }
     }
   }
 
-//  // check if set
-//  if (result)
-//  {
-//    if (this->getPropertyFromCamera(propertyId) == value)
-//    {
-//      return true;
-//    }
-//  }
-//
-//  std::string prop_name = cedar::dev::sensors::camera::Property::type().get(propertyId).prettyString();
-//  cedar::aux::LogSingleton::getInstance()->warning
-//                                           (
-//                                             "property " + prop_name
-//                                             + " couldn't set to " + boost::lexical_cast<std::string>(value),
-//                                             "cedar::dev::sensors::camera::Backend::setPropertyToCamera()"
-//                                           );
-  return result;
+  // warning, if not set correct
+  if (!result)
+  {
+    std::string prop_name = cedar::dev::sensors::camera::Property::type().get(propertyId).prettyString();
+    cedar::aux::LogSingleton::getInstance()->warning
+                                             (
+                                               "Property " + prop_name
+                                               + " couldn't set to " + boost::lexical_cast<std::string>(value),
+                                               "cedar::dev::sensors::camera::Backend::setPropertyToCamera()"
+                                             );
+  }
 }
 
 double cedar::dev::sensors::camera::Backend::getPropertyFromCamera(unsigned int propertyId)
@@ -248,26 +241,12 @@ double cedar::dev::sensors::camera::Backend::getPropertyFromCamera(unsigned int 
   if (! this->mpCameraChannel->mVideoCapture.isOpened())
   {
     return CAMERA_PROPERTY_NOT_SUPPORTED;
-    /*CEDAR_THROW
-    (
-      //cedar::dev::sensors::camera::VideoCaptureNotOpenedException,
-      cedar::dev::sensors::camera::LibDcInitException,
-      "cedar::dev::sensors::camera::Backend::getPropertyFromCamera(): VideoCaputure object is not opened"
-    )*/
   }
     
   if (! this->mpCameraChannel->mpProperties->isSupported(propertyId))
   {
     return CAMERA_PROPERTY_NOT_SUPPORTED;
-    /*
-    std::string prop_name = cedar::dev::sensors::camera::Property::type().get(propertyId).prettyString();
-    CEDAR_THROW
-    (
-      cedar::dev::sensors::camera::PropertyNotSupportedException,
-      "cedar::dev::sensors::camera::Backend::getPropertyFromCamera(): Property \"" 
-        + prop_name + "\" not supported by the used backend"
-    ) */
   }
-  //double result = CAMERA_PROPERTY_NOT_SUPPORTED;
+
   return this->mpCameraChannel->mVideoCapture.get(propertyId);
 }

@@ -48,17 +48,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::sensors::camera::BackendV4L::CameraBackendV4L
+cedar::dev::sensors::camera::BackendV4L::BackendV4L
 (
   cedar::dev::sensors::camera::Channel* pCameraChannel
 )
 :
-cedar::dev::sensors::camera::Device::CameraDevice(pCameraGrabber,pCameraChannel)
+cedar::dev::sensors::camera::Backend(pCameraChannel)
 {
 }
 
 
-cedar::dev::sensors::camera::BackendV4L::~CameraBackendV4L()
+cedar::dev::sensors::camera::BackendV4L::~BackendV4L()
 {
 }
 
@@ -67,24 +67,17 @@ cedar::dev::sensors::camera::BackendV4L::~CameraBackendV4L()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::sensors::camera::BackendV4L::setProperties()
+void cedar::dev::sensors::camera::BackendV4L::init()
 {
-
-}
-
-bool cedar::dev::sensors::camera::BackendV4L::createCaptureObject()
-{
-
 }
 
 void cedar::dev::sensors::camera::BackendV4L::applySettingsToCamera()
 {
-
 }
 
-void cedar::dev::sensors::camera::BackendV4L::applyStateToCamera()
+void cedar::dev::sensors::camera::BackendV4L::createCaptureObject()
 {
-
 }
+
 
 #endif // CEDAR_USE_VIDEO_FOR_LINUX

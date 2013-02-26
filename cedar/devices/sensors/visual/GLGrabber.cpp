@@ -117,11 +117,11 @@ cedar::dev::sensors::visual::GLGrabber::~GLGrabber()
 void cedar::dev::sensors::visual::GLGrabber::onCreateGrabber()
 {
   // create debug-message
-  unsigned int num_cams = getNumCams();
+  unsigned int num_channels = getNumChannels();
   std::stringstream init_message;
-  init_message << ": Initialize grabber with " << getNumCams() << " channels ..." << std::endl;
+  init_message << ": Initialize grabber with " << getNumChannels() << " channels ..." << std::endl;
 
-  for(unsigned int channel = 0; channel < num_cams; ++channel)
+  for(unsigned int channel = 0; channel < num_channels; ++channel)
   {
     init_message << "Channel " << channel
                  << ": QT::OGLWidget class \"" << typeid(getGLChannel(channel)->mpQGLWidget).name()
@@ -150,15 +150,15 @@ void cedar::dev::sensors::visual::GLGrabber::onCleanUp()
   // on an exception or a CTRL-C only onCleanUp will be invoked (no destructor)
 
   // delete all pointer-references to external widgets
-  unsigned int num_cams = getNumCams();
-  for(unsigned int channel = 0; channel < num_cams; ++channel)
+  unsigned int num_channels = getNumChannels();
+  for(unsigned int channel = 0; channel < num_channels; ++channel)
   {
     getGLChannel(channel)->mpQGLWidget = NULL;
   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-std::string cedar::dev::sensors::visual::GLGrabber::onUpdateSourceInfo(unsigned int channel)
+std::string cedar::dev::sensors::visual::GLGrabber::onGetSourceInfo(unsigned int channel)
 {
   // value of channel is already checked by GraberInterface::getSourceInfo()
   return "Channel " + boost::lexical_cast<std::string>(channel)
@@ -210,7 +210,7 @@ void cedar::dev::sensors::visual::GLGrabber::onGrab(unsigned int channel)
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGLWidget *qglWidget)
 {
-  if (channel >= getNumCams())
+  if (channel >= getNumChannels())
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"The wanted channel is out of range");
   }

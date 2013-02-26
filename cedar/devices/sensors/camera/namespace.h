@@ -57,6 +57,7 @@
 //#define DEBUG_CAMERA_GRABBER
 //#define DEBUG_CAMERA_STEP
 
+
 namespace cedar
 {
   namespace dev
@@ -126,13 +127,13 @@ namespace cedar
         // exceptions
         //-----------------------------------------------------------------------------------------------
 
-        CEDAR_DECLARE_DEV_CLASS(PropertyNotSupportedException);
-        //class PropertyNotSupportedException;
-        CEDAR_DECLARE_DEV_CLASS(VideoCaptureNotOpenedException);
-        
+        class PropertyNotSupportedException;
+        class PropertyNotSetException;
+        class VideoCaptureNotOpenedException;
+        class CreateBackendException;
 
 #ifdef CEDAR_USE_LIB_DC1394
-        CEDAR_DECLARE_DEV_CLASS(LibDcInitException);
+        class LibDcInitException;
         class LibDcException;
 #endif //CEDAR_USE_LIB_DC1394
 

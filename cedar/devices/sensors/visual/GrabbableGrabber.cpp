@@ -127,11 +127,11 @@ cedar::dev::sensors::visual::GrabbableGrabber::~GrabbableGrabber()
 void cedar::dev::sensors::visual::GrabbableGrabber::onCreateGrabber()
 {
   // create
-  unsigned int num_cams = getNumCams();
+  unsigned int num_channels = getNumChannels();
   std::stringstream init_message;
-  init_message << ": Initialize GrabbableGrabber with " << num_cams << " channels ..." << std::endl;
+  init_message << ": Initialize GrabbableGrabber with " << num_channels << " channels ..." << std::endl;
 
-  for(unsigned int channel = 0; channel < num_cams; ++channel)
+  for(unsigned int channel = 0; channel < num_channels; ++channel)
   {
     init_message << "Channel " << channel << ": capture from Source: "
                  << typeid(getGrabbableChannel(channel)->mpSourceInterfaceClass).name() << std::endl;
@@ -143,7 +143,7 @@ void cedar::dev::sensors::visual::GrabbableGrabber::onCreateGrabber()
                                            );
 
   // register this grabber in the grabbable object and store the readwrite-lock
-  for(unsigned int channel=0; channel < num_cams;++channel)
+  for(unsigned int channel=0; channel < num_channels;++channel)
   {
     getGrabbableChannel(channel)->mpGrabberLock = getGrabbableChannel(channel)->mpSourceInterfaceClass->registerGrabber();
 
@@ -168,8 +168,8 @@ void cedar::dev::sensors::visual::GrabbableGrabber::onCleanUp()
 {
   // do the cleanup of used hardware in this method
   // on an exception or a CTRL-C only onCleanUp will be invoked (no destructor)
-  unsigned int num_cams = getNumCams();
-  for(unsigned int channel = 0; channel < num_cams; ++channel)
+  unsigned int num_channels = getNumChannels();
+  for(unsigned int channel = 0; channel < num_channels; ++channel)
   {
     getGrabbableChannel(channel)->mpSourceInterfaceClass->deregisterGrabber(getGrabbableChannel(channel)->mpGrabberLock);
     // remove the references to the external classes
@@ -179,7 +179,7 @@ void cedar::dev::sensors::visual::GrabbableGrabber::onCleanUp()
 }
 
 //----------------------------------------------------------------------------------------------------
-std::string cedar::dev::sensors::visual::GrabbableGrabber::onUpdateSourceInfo(unsigned int channel)
+std::string cedar::dev::sensors::visual::GrabbableGrabber::onGetSourceInfo(unsigned int channel)
 {
   return this->getName() + ": Channel " + boost::lexical_cast<std::string>(channel) + ": "
                + typeid(getGrabbableChannel(channel)->mpSourceInterfaceClass).name();
@@ -196,9 +196,9 @@ void cedar::dev::sensors::visual::GrabbableGrabber::onGrab(unsigned int channel)
   }
   catch(std::exception& e)
   {
-    std::string msg = "Unknown exception on channel " + boost::lexical_cast<std::string>(channel)
-                        + ": " + e.what();
+    std::string msg = "Unknown exception on channel " + boost::lexical_cast<std::string>(channel) + ": " + e.what();
     CEDAR_THROW(cedar::dev::sensors::visual::GrabberGrabException,msg)
   }
+  // unlocking done by QReadLocker
 }
 

@@ -123,8 +123,8 @@ cedar::dev::sensors::visual::NetGrabber::~NetGrabber()
 
 void cedar::dev::sensors::visual::NetGrabber::onCloseGrabber()
 {
-  unsigned int num_cams = getNumCams();
-  for(unsigned int channel = 0; channel < num_cams; ++channel)
+  unsigned int num_channels = getNumChannels();
+  for(unsigned int channel = 0; channel < num_channels; ++channel)
   {
     getNetChannel(channel)->mpMatNetReader.reset();
   }
@@ -147,11 +147,11 @@ void cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
 {
   // create debug-message
   const std::string method_name="cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()";
-  unsigned int num_cams = getNumCams();
+  unsigned int num_channels = getNumChannels();
   std::stringstream info;
-  info << "Initialize NetGrabber with " << num_cams << " channels ..." << std::endl;
+  info << "Initialize NetGrabber with " << num_channels << " channels ..." << std::endl;
 
-  for(unsigned int channel = 0; channel < num_cams; ++channel)
+  for(unsigned int channel = 0; channel < num_channels; ++channel)
   {
     info << "Channel " << channel << ": capture from YARP-hannel: "
          << getNetChannel(channel)->_mpYarpChannelName->getValue()<< "\n";
@@ -166,7 +166,7 @@ void cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
   cedar::dev::sensors::visual::NetChannel::MatNetReaderPtr yarp_reader;
 
   // loop until connection established or an error occurs
-  for (unsigned int channel = 0; channel < num_cams; ++channel)
+  for (unsigned int channel = 0; channel < num_channels; ++channel)
   {
     const std::string channel_name = getNetChannel(channel)->_mpYarpChannelName->getValue();
 
@@ -212,10 +212,10 @@ void cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
           cedar::aux::sleep(cedar::unit::Milliseconds(100));
         }
       }
-      catch (...)
+      catch (std::exception& e)
       {
         std::string msg = this->getName() + ": Unknown Error on initialization of NetReader for channel \""
-                                          + channel_name + "\"";
+                                          + channel_name + "\" :" + e.what();
         CEDAR_THROW(cedar::dev::sensors::visual::CreateGrabberException,msg);
       }
 
@@ -261,10 +261,10 @@ void cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
           cedar::aux::sleep(cedar::unit::Milliseconds(50));
         }
       }
-      catch (...)
+      catch (std::exception& e)
       {
         std::string msg = this->getName() + ": Unknown error while trying to retrieve an image from YARP-channel \""
-                          + channel_name + "\"";
+                          + channel_name + "\" :" + e.what();
         cedar::aux::LogSingleton::getInstance()->error(msg, method_name);
         CEDAR_THROW(cedar::dev::sensors::visual::CreateGrabberException,msg);
       }
@@ -281,11 +281,11 @@ void cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
   //-------------------------------------------------
 
   // TODO get fps from source: measure the difference between two frames
-  this->setFps(100.f);
+  this->setFramerate(100.f);
 }
 
 //----------------------------------------------------------------------------------------------------
-std::string cedar::dev::sensors::visual::NetGrabber::onUpdateSourceInfo(unsigned int channel)
+std::string cedar::dev::sensors::visual::NetGrabber::onGetSourceInfo(unsigned int channel)
 {
   return this->getName() + ": " + getNetChannel(channel)->_mpYarpChannelName->getValue();
 }

@@ -71,7 +71,7 @@
  *     - to control the grabbing-thread: <br>
  *             => isRunning() : from QThread<br>
  *             => startGrabber(), stopGrabber() <br>
- *             => setFps(), getFps(), getFpsMeasured <br>
+ *             => setFramerate(), getFramerate(), getMeasuredFramerate <br>
  *     - grabbing: <br>
  *             => grab manually a new image: grab()  <br>
  *             => get the image from the internal buffer: getImage() <br>
@@ -186,7 +186,7 @@ public:
    * On an error, only the grabber is created, without the capture-device. It is possible to adjust the parameter
    * and try to create the capture-device again with the applyParameter() method
    */
-  bool isCreated();
+  bool isCreated() const;
 
 
   /*! @brief Resets the Grabber to initialization values, without opening the device
@@ -196,9 +196,8 @@ public:
    */
   void closeGrabber();
 
-  /*! @brief Get the number of currently used channels (sources).
-   */
-  unsigned int getNumCams() const;
+  //! @brief Get the number of currently used channels (sources).
+  unsigned int getNumChannels() const;
 
   /*! @brief Get the size of a specified camera-channel as cv::Size.
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
@@ -207,7 +206,7 @@ public:
    *       In the mono case you do not need to supply this value. Default is 0.<br>
    *       In the stereo case it may be 0 or 1.
    */
-  cv::Size getSize(unsigned int channel=0 ) const;
+  cv::Size getSize(unsigned int channel = 0) const;
 
   /*! @brief Get information about the used device, i.e. the filename or the mount-point
    *
@@ -217,7 +216,7 @@ public:
    *       In the mono case you do not need to supply this value. Default is 0.<br>
    *       In the stereo case it may be 0 or 1.
    */
-  std::string getSourceInfo(unsigned int channel=0);
+  std::string getSourceInfo(unsigned int channel = 0) const;
 
   //------------------------------------------------------------------------
   // Thread related methods
@@ -226,10 +225,10 @@ public:
   /*! @brief Get the framerate which LoopedThread is set for grabbing
    *
    *      This value doesn't indicate, if the thread is running or not.
-   *      To get the actual grabbing speed use getFpsMeasured.
+   *      To get the actual grabbing speed use getMeasuredFramerate.
    *  @see startGrabber(), stopGrabber(), QThread::isRunning()
    */
-  double getFps() const;
+  double getFramerate() const;
 
   /*! @brief Set the framerate of the loopedthread speed for grabbing
    *
@@ -238,14 +237,14 @@ public:
    *          This is done in this function, but keep it in mind.
    *  @see startGrabber(), stopGrabber()
    */
-  void setFps(double fps);
+  void setFramerate(double fps);
 
   /*! @brief Get the framerate of actual grabbing speed
    *
    *          Calculates the framerate by counting the invocation of the grab() method
    *          This value is updated every 5 (default value set in defines.h) grabbed frames
    */
-  double getFpsMeasured() const;
+  double getMeasuredFramerate() const;
 
   /*! @brief Stop the grabbing thread
    *
@@ -260,7 +259,7 @@ public:
    *          some initialization due to the measurement of FPS. <br>
    *
    *          To control the grabbing speed (i.e. the FPS) use
-   *          setFps(), getFps() or getFpsMeasured()
+   *          setFramerate(), getFramerate() or getMeasuredFramerate()
    */
   void startGrabber();
 
@@ -278,7 +277,7 @@ public:
    *      In the stereo case it may be 0 or 1.
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    *  @see
-   *      getNumCams
+   *      getNumChannels
    */
   cv::Mat getImage(unsigned int channel=0) const;
 
@@ -286,10 +285,14 @@ public:
   /*! @brief Grab a new image (or images in stereo case) from the source (channel, picture, avi...).
    *
    *      This method is called automatically by the grabber thread.<br>
-   *      If you don't use the grabber thread you have to call it by yourself to get new images.
+   *      If you don't use the grabber thread:<br>
+   *        - you have to call it by yourself to get new images.<br>
+   *        - before and after grabbing, set/unset the "isgrabbing"-flag via the setIsGrabbing(bool) method to<br>
+   *          indicate, that the grabbing is active.
+   *
    *  @throw cedar::aux::GrabberGrabException Thrown on an error while grabbing
    *  @throw cedar::aux::GrabberRecordingException Thrown on an error while recording
-   *  @see startGrabber, setFps
+   *  @see startGrabber, setFramerate
    */
   void grab();
 
@@ -452,11 +455,13 @@ public:
    *      The transcoding is entirely done via the opencv-API.<br>
    *      Look at the OPENCV manual to determine the usable FOURCC's
    *
+   *  @throw GrabberRecordingException Thrown, if not all channels could be recorded
+   *
    *  @see
-   *      setRecordName, getFps, VideoGrabber::getSourceFps
+   *      setRecordName, getFramerate, VideoGrabber::getSourceFps
    */
 
-  bool startRecording
+  void startRecording
   (
     double fps,
     cedar::dev::sensors::visual::RecordingFormat::Id recFormat
@@ -489,9 +494,13 @@ public:
    */
   std::string getChannelSaveFilenameAddition(int channel) const;
 
-  /*!@brief Set the internal used flag when the grabbing is switched on
+
+  /*!@brief Set the grabbing-flag when the grabbing is done manually
    *
-   * Internally used in the processing Step "Camera" when running with a looped trigger
+   * You have to set/unset this, if your grabbing is done through a periodic call of grab() method
+   * and not with the build-in thread.
+   *
+   * Also used in the processing Step "Camera" when running with a looped trigger
    */
   void setIsGrabbing(bool isGrabbing);
 
@@ -499,6 +508,8 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+
+
   /*! @brief  Periodically calls the grab() method.
    *
    *  For details have a look at cedar::aux::LoopedThread
@@ -560,17 +571,17 @@ protected:
    *      or if the grabbing fails
    *  @param channel The channel to grab from
    */
-  virtual void onGrab(unsigned int channel);
+  virtual void onGrab(unsigned int channel) = 0;
 
 
-  /*! @brief Updates the channel informations
+  /*! @brief Get the channel informations from the derived grabber-classes
    *
    *  This method is used internally to update the channel info string. It will be called after the onCreate()-method
    *  of the derived grabber-classes is invoked.
    *
-   *  @param channel The channel which should be updated
+   *  @param channel The channel which to get the informations
    */
-  virtual std::string onUpdateSourceInfo(unsigned int channel) = 0;
+  virtual std::string onGetSourceInfo(unsigned int channel) = 0;
 
   /*!@brief Get the Image buffer
    *
@@ -583,7 +594,7 @@ protected:
 
   /*! @brief Updates the info string of the given channel
    *
-   * Call this method in the derived class in the method onUpdateSourceInfo()
+   * Call this method in the derived class in the method onGetSourceInfo()
    * to update the infos about the channel source
    *
    * @param channel The channel you want to update
@@ -596,6 +607,22 @@ protected:
    * @param isCreated Flag, if the Grabber is already created or not
    */
   void setIsCreated(bool isCreated);
+
+  /*! @brief Create the out of range error message for the channel parameter
+   *
+   *    This message is used internally to build the error message for the range check of the paramter "channel"
+   *  @param channel The channel to create the message
+   */
+  inline std::string buildChannelErrorMessage(unsigned int channel) const
+  {
+    std::string msg = "Channel " + boost::lexical_cast<std::string>(channel) + "is out of range! Only channel 0";
+    if (this->getNumChannels() > 1)
+    {
+      msg = msg + ".." + boost::lexical_cast<std::string>(this->getNumChannels());
+    }
+    msg = msg + " available";
+    return msg;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -700,7 +727,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //------------------------------------------------------------------------
-  //!@brief Constant which defines how often getFpsMeasured() will be updated (in frames).
+  //!@brief Constant which defines how often getMeasuredFramerate() will be updated (in frames).
   static const int UPDATE_FPS_MEASURE_FRAME_COUNT = 5;
 
   //! A vector which contains for every grabbing-channel one channel structure

@@ -71,9 +71,17 @@ public cedar::aux::Configurable
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
 
-  // typedef cedar::aux::ObjectMapParameterTemplate<CamProperty> CamPropertiesMap;
+  /*! Store all properties in this map.
+   *
+   *   It maps from the OpenCV Property-ID (from cv::VideoCapture.get()/set() methods)
+   *   to the appropriate object that handles the property
+   */
   typedef std::map<unsigned int, CamPropertyPtr> CamPropertiesMap;
-  CEDAR_GENERATE_POINTER_TYPES(CamPropertiesMap);
+  //CEDAR_GENERATE_POINTER_TYPES(CamPropertiesMap);
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // signals and slots
+  //--------------------------------------------------------------------------------------------------------------------
 
   Q_OBJECT
 
@@ -281,7 +289,7 @@ protected:
   // none yet
 private:
   /// The list of properties
-  CamPropertiesMapPtr mpPropertiesList;
+  CamPropertiesMap mPropertiesList;
 
   /// Camera interface
   cv::VideoCapture mVideoCapture;

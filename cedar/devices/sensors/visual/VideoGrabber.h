@@ -138,7 +138,7 @@ public:
   void setLooped(bool loop = true);
 
   //! @brief Check if looping is on or off
-  bool getLooped();
+  bool getLooped() const;
 
   /*! @brief Set the factor for grabbing speed
    *
@@ -208,7 +208,7 @@ public:
    *    Default channel is 0
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
-  double getSourceFps(unsigned int channel=0);
+  double getSourceFramerate(unsigned int channel = 0);
 
   /*! @brief Get the codec for the given channel. This value will be read from the appropriate video-file.
    *
@@ -216,13 +216,13 @@ public:
    *    This value is the FOURCC-code from the video-file.
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
-  double getSourceEncoding(unsigned int channel=0);
+  double getSourceEncoding(unsigned int channel = 0);
 
   /*! @brief Get the used file to grab from
    *  @param channel The channel which filename should be read
    *  @throw IndexOutOfRangeException If channel isn't fit
    */
-  const std::string getSourceFile(unsigned int channel = 0);
+  const std::string getSourceFile(unsigned int channel = 0) const;
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -233,7 +233,7 @@ protected:
   // inherited from Grabber
   void onCreateGrabber();
   void onCloseGrabber();
-  std::string onUpdateSourceInfo(unsigned int channel);
+  std::string onGetSourceInfo(unsigned int channel);
   void onCleanUp();
 
   /*! @brief Grab on all available files

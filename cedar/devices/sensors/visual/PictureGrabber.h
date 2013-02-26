@@ -145,7 +145,7 @@ public:
    *  @param channel The channel which filename should be read
    *  @throws IndexOutOfRangeException If channel isn't fit
    */
-  const std::string getSourceFile(unsigned int channel = 0);
+  const std::string getSourceFile(unsigned int channel = 0) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -156,7 +156,7 @@ protected:
   void onGrab(unsigned int channel);
   void onCreateGrabber();
   void onCloseGrabber();
-  std::string onUpdateSourceInfo(unsigned int channel);
+  std::string onGetSourceInfo(unsigned int channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

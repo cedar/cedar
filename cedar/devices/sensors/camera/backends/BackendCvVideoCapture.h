@@ -70,7 +70,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  void init();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -78,7 +78,7 @@ public:
 protected:
   // derived from class Device
   void applySettingsToCamera();
-  bool createCaptureObject();
+  void createCaptureObject();
   void getAvailablePropertiesFromCamera();
 
   //--------------------------------------------------------------------------------------------------------------------

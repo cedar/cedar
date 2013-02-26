@@ -103,15 +103,15 @@ public:
    */
   unsigned int getCounter();
 
-  /*! @brief Get the filename of the channel
+  /*! @brief Get the filename of the channel (example)
    *
    */
-  std::string getSourceFileName(unsigned int channel);
+  std::string getSourceFileName(unsigned int channel) const;
 
   /*! @brief Simple get-function for the test parameter
    *
    */
-  int getTestParam();
+  int getTestParam() const;
 
 
   /*! @brief Simple set-function for the test parameter
@@ -128,8 +128,8 @@ protected:
   void onCreateGrabber();
   void onCloseGrabber();
   void onCleanUp();
-  void onGrab();
-  std::string onUpdateSourceInfo(unsigned int channel);
+  void onGrab(unsigned int channel);
+  std::string onGetSourceInfo(unsigned int channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

@@ -101,9 +101,6 @@ public:
    */
   void settingChanged();
 
-
-  void cameraChanged();
-
   /*!@brief A slot that must be triggered if the backend has changed. It is internally connected with the
    *      CameraChannel->Backend Enum-Parameter valueChanged() signal.
    */
@@ -231,7 +228,7 @@ public:
   (
     unsigned int channel,
     cedar::dev::sensors::camera::Property::Id propId
-  );
+  ) const;
 
 
   /*! @brief Set the mode of a property
@@ -279,7 +276,7 @@ public:
    *  @param channel This is the index of the source you want to set the parameter value.
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
-  cedar::dev::sensors::camera::VideoMode::Id getCameraVideoMode(unsigned int channel);
+  cedar::dev::sensors::camera::VideoMode::Id getCameraVideoMode(unsigned int channel) const;
 
   /*! @brief Set the framerate of the camera.
    *
@@ -292,13 +289,13 @@ public:
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    * @see setCameraFps
    */
-  void setCameraFps(unsigned int channel, FrameRate::Id fpsId);
+  void setCameraFramerate(unsigned int channel, FrameRate::Id fpsId);
 
   /*! @brief Gets the actual fps of the camera.
    *  @param channel This is the index of the source you want to set the parameter value.
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
-  FrameRate::Id getCameraFps(unsigned int channel);
+  FrameRate::Id getCameraFramerate(unsigned int channel) const;
 
 #ifdef CEDAR_USE_LIB_DC1394
 
@@ -318,7 +315,7 @@ public:
   /*! @brief Gets the actual ISO-Speed of the IEEE1394/firewire bus.
    *  @param channel This is the index of the source you want to set the parameter value.
    */
-  IsoSpeed::Id getCameraIsoSpeed(unsigned int channel);
+  IsoSpeed::Id getCameraIsoSpeed(unsigned int channel) const;
 
 #endif
 
@@ -331,7 +328,7 @@ public:
    *  @param channel This is the index of the source channel
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
-  unsigned int getCameraId( unsigned int channel);
+  unsigned int getCameraId( unsigned int channel) const;
 
   /*! @brief Flag if the camera is instantiated by its Guid or by the Bus-ID
    *  @param channel This is the index of the source channel.
@@ -339,7 +336,7 @@ public:
    *  @see getCamereaId
    *  @remarks Only firewire cameras support the GUID field.
    */
-  bool isGuid(unsigned int channel);
+  bool isGuid(unsigned int channel) const;
 
   /*! @brief Gets the actual framesize.
    *  @param channel This is the index of the source channel.
@@ -386,7 +383,7 @@ public:
    * @param channel The channel you want the decode-filter
    * @return The Filter as cedar::dev::sensors::camera::Decoding::Id
    */
-  cedar::dev::sensors::camera::Decoding::Id getDecodeFilter(unsigned int channel = 0);
+  cedar::dev::sensors::camera::Decoding::Id getDecodeFilter(unsigned int channel = 0) const;
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -413,7 +410,7 @@ protected:
   void onCleanUp();
   void onCreateGrabber();
   void onCloseGrabber();
-  std::string onUpdateSourceInfo(unsigned int channel);
+  std::string onGetSourceInfo(unsigned int channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

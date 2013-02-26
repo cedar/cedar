@@ -86,23 +86,25 @@ public:
    *  This method is called before createCaptureBackend() is invoked.
    *
    */
-  virtual void init();
+  virtual void init() = 0;
 
   /*! @brief Initialization of the class
    *
    *  This function have to be called after the class was created.
-   *
-   * @return True, if the cameras are successfully initialized, otherwise false.
+   *  @throw CreateBackendException This exception is thrown, if the cameras could not initialized
    */
-  bool createCaptureBackend();
+  void createCaptureBackend();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  //! Create a new Capture Backend
-  virtual bool createCaptureObject() = 0;
+  /*! Create a new capture - object for the backend
+   *
+   *   @throw cedar::dev::sensors::camera::CreateBackendException This exception will be thrown, if an error occurs
+   */
+  virtual void createCaptureObject() = 0;
 
   //! Apply all Settings to the Camera
   virtual void applySettingsToCamera() = 0;
@@ -119,9 +121,8 @@ protected:
    *
    *  @param propertyId The OpenCV constants for cv::VideoCapture.set() method
    *  @param value The new value
-   *  @return Boolean value, that indicates if the value is properly set
    */
-  bool setPropertyToCamera(unsigned int propertyId, double value);
+  void setPropertyToCamera(unsigned int propertyId, double value);
 
 
   /*! @brief Get a property directly form the cv::VideoCapture

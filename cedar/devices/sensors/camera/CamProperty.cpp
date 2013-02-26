@@ -90,7 +90,7 @@ mpPropertyMode(new cedar::aux::EnumParameter
   // by default, all properties are in BACKEND_DEFAULT mode. It isn't allowed to change the value manually
   mpPropertyValue->setConstant(true);
 
-  this->updateGuiElements();
+  this->update();
   doNotHandleEvents = false;
 }
 
@@ -142,7 +142,7 @@ void cedar::dev::sensors::camera::CamProperty::propertyModeSlot()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::sensors::camera::CamProperty::updateGuiElements()
+void cedar::dev::sensors::camera::CamProperty::update()
 {
   if (!mSupported)
   {
@@ -200,12 +200,12 @@ void cedar::dev::sensors::camera::CamProperty::setDefaultValue(double value)
   mDefaultValue = value;
 }
 
-cedar::dev::sensors::camera::Property::Id cedar::dev::sensors::camera::CamProperty::getId()
+cedar::dev::sensors::camera::Property::Id cedar::dev::sensors::camera::CamProperty::getId() const
 {
   return mId;
 }
 
-double cedar::dev::sensors::camera::CamProperty::getValue()
+double cedar::dev::sensors::camera::CamProperty::getValue() const
 {
   return mpPropertyValue->getValue();
 }
@@ -216,7 +216,7 @@ void cedar::dev::sensors::camera::CamProperty::setValue(double value)
 }
 
 
-cedar::dev::sensors::camera::PropertyMode::Id cedar::dev::sensors::camera::CamProperty::getMode()
+cedar::dev::sensors::camera::PropertyMode::Id cedar::dev::sensors::camera::CamProperty::getMode() const
 {
   return static_cast<cedar::dev::sensors::camera::PropertyMode::Id>(mpPropertyMode->getValue());
 }
@@ -234,29 +234,29 @@ void cedar::dev::sensors::camera::CamProperty::setMode(cedar::dev::sensors::came
 }
 
 
-double cedar::dev::sensors::camera::CamProperty::getMinValue()
+double cedar::dev::sensors::camera::CamProperty::getMinValue() const
 {
   return mpPropertyValue->getMinimum();
 }
 
 
-double cedar::dev::sensors::camera::CamProperty::getMaxValue()
+double cedar::dev::sensors::camera::CamProperty::getMaxValue() const
 {
   return mpPropertyValue->getMaximum();
 }
 
-bool cedar::dev::sensors::camera::CamProperty::isSupported()
+bool cedar::dev::sensors::camera::CamProperty::isSupported() const
 {
   return mSupported;
 }
 
 
-bool cedar::dev::sensors::camera::CamProperty::isAutoCapable()
+bool cedar::dev::sensors::camera::CamProperty::isAutoCapable() const
 {
   return mAutoCapable;
 }
 
-bool cedar::dev::sensors::camera::CamProperty::isManualCapable()
+bool cedar::dev::sensors::camera::CamProperty::isManualCapable() const
 {
   return mManualCapable;
 }

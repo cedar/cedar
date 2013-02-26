@@ -72,6 +72,9 @@ cedar::dev::sensors::visual::Grabber
 ),
 _mTestParam(new cedar::aux::IntParameter(this, "testparameter", 0))
 {
+
+  std::cout << "TestGrabber::TestGrabber()" << std::endl;
+
   // information logging
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
@@ -107,6 +110,9 @@ cedar::dev::sensors::visual::Grabber
 ),
 _mTestParam(new cedar::aux::IntParameter(this, "testparameter", 0))
 {
+
+  std::cout << "TestGrabber::TestGrabber() STEREO" << std::endl;
+
   // debug information logging
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
@@ -146,21 +152,22 @@ cedar::dev::sensors::visual::TestGrabber::~TestGrabber()
 //----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()
 {
+  std::cout << "TestGrabber::onCreateGrabber()" << std::endl;
 
   // do the initialization of your Grabber in this method,
   // grab the first pictures and initialize the mImageMatVector with
   // these pictures
 
-  // if everything was fine, return true.
-  // if there where errors, return false. In this case, the base Grabber() class will envoke closeGrabber()
+  // if there where errors, throw a CreateGrabberException.
+  // In this case, the base Grabber() class will envoke closeGrabber()
   // so be sure, that onCloseGrabber() resets the Grabber to initialization state.
 
   //-------------------------------------------------
   // init message
   std::stringstream init_message;
-  unsigned int num_cams = getNumCams();
-  init_message << ": Initialize test grabber with " << getNumCams() << " channels ..." << std::endl;
-  for(unsigned int channel = 0; channel < num_cams; ++channel)
+  unsigned int num_channels = getNumChannels();
+  init_message << ": Initialize test grabber with " << getNumChannels() << " channels ..." << std::endl;
+  for(unsigned int channel = 0; channel < num_channels; ++channel)
   {
     init_message << "Channel " << channel << ": capture from Source: "
                  << getTestChannel(channel)->_mSourceFileName->getPath() << std::endl;
@@ -173,7 +180,7 @@ void cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()
 
   //-------------------------------------------------
   // load pictures one by one
-  for(unsigned int channel = 0; channel < num_cams; ++channel)
+  for(unsigned int channel = 0; channel < num_channels; ++channel)
   {
 
     // here we apply empty 1x1 matrizes to test the interface
@@ -222,7 +229,7 @@ void cedar::dev::sensors::visual::TestGrabber::onCloseGrabber()
 
 
 //----------------------------------------------------------------------------------------------------
-std::string cedar::dev::sensors::visual::TestGrabber::onUpdateSourceInfo(unsigned int channel)
+std::string cedar::dev::sensors::visual::TestGrabber::onGetSourceInfo(unsigned int channel)
 {
 
   // no range-check is needed, because this method is a private method
@@ -234,29 +241,26 @@ std::string cedar::dev::sensors::visual::TestGrabber::onUpdateSourceInfo(unsigne
 }
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::TestGrabber::onGrab()
+void cedar::dev::sensors::visual::TestGrabber::onGrab(unsigned int channel)
 {
   // this is the main grabbing method.
   // read a new picture from the source and set the picture in the channel image buffer
 
-  std::cout << "TestGrabber::onGrab()" << std::endl;
+  // apply the new content to the channel image
+  // getTestChannel(channel)->mImageMat = grab_new_content();
 
-  unsigned int num_cams = getNumCams();
-  for(unsigned int channel = 0; channel < num_cams; ++channel)
-   {
-     // apply the new content to the channel image
-     // getTestChannel(channel)->mImageMat = grab_new_content();
-
-     // check on errors an throw an exception
-     if (getTestChannel(channel)->mImageMat.empty())
-     {
-       std::string msg = "Channel " + boost::lexical_cast<std::string>(channel) + ": An error occurred";
-       CEDAR_THROW(cedar::dev::sensors::visual::GrabberGrabException,msg);
-     }
-   }
+  // check on errors an throw an exception
+  if (getTestChannel(channel)->mImageMat.empty())
+  {
+    std::string msg = "Channel " + boost::lexical_cast<std::string>(channel) + ": An error occurred";
+    CEDAR_THROW(cedar::dev::sensors::visual::GrabberGrabException,msg);
+  }
 
   // here we just want to count how often onGrab is invoked, due to a fps-check
-  mCounter ++;
+  if (channel == 0)
+  {
+    mCounter ++;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -269,7 +273,7 @@ unsigned int cedar::dev::sensors::visual::TestGrabber::getCounter()
 }
 
 //----------------------------------------------------------------------------------------------------
-int cedar::dev::sensors::visual::TestGrabber::getTestParam()
+int cedar::dev::sensors::visual::TestGrabber::getTestParam() const
 {
   // a simple get-method
   return _mTestParam->getValue();
@@ -283,7 +287,7 @@ void cedar::dev::sensors::visual::TestGrabber::setTestParam(int testParameter)
 }
 
 //----------------------------------------------------------------------------------------------------
-std::string cedar::dev::sensors::visual::TestGrabber:: getSourceFileName(unsigned int channel)
+std::string cedar::dev::sensors::visual::TestGrabber:: getSourceFileName(unsigned int channel) const
 {
   return getTestChannel(channel)->_mSourceFileName->getPath();
 }

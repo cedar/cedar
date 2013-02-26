@@ -139,11 +139,11 @@ public:
   void setDefaultValue(double value);
 
   /// Get the id of the actual Property
-  cedar::dev::sensors::camera::Property::Id getId();
+  cedar::dev::sensors::camera::Property::Id getId() const;
 
 
   /// Get the mode of operation of the used parameter
-  cedar::dev::sensors::camera::PropertyMode::Id getMode();
+  cedar::dev::sensors::camera::PropertyMode::Id getMode() const;
 
   /*! @brief Set the mode of operation
    *
@@ -152,7 +152,7 @@ public:
   void setMode(cedar::dev::sensors::camera::PropertyMode::Id modeId);
 
   ///! Get the value of the property
-  double getValue();
+  double getValue() const;
 
   /*! @brief Set the value of the property
    *  @param value The new value to set
@@ -160,23 +160,23 @@ public:
   void setValue(double value);
 
   ///! Get the minimum possible value of the property
-  double getMinValue();
+  double getMinValue() const;
 
   /*! \brief Get the maximum possible value that can be set of the given property
    */
-  double getMaxValue();
+  double getMaxValue() const;
 
   /*! \brief This method tells you, if the given property is supported by the used camera
    */
-  bool isSupported();
+  bool isSupported() const;
 
   /*! \brief This method tells you, if the given property can be set to auto-mode
    */
-  bool isAutoCapable();
+  bool isAutoCapable() const;
 
   /*! \brief This method tells you, if the given property can be set manually
    */
-  bool isManualCapable();
+  bool isManualCapable() const;
 
   // ACTUALLY NOT SUPPORTED BY CEDAR
   /*! \brief This method tells you, if the given property can be set to an absolute value
@@ -209,7 +209,8 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
 
-  void updateGuiElements();
+  //! Update the the state of the property (i.e. disable it, or set a specific mode dependent on internal variables)
+  void update();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

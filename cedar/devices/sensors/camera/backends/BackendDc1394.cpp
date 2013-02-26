@@ -120,7 +120,7 @@ void cedar::dev::sensors::camera::BackendDc1394::updateFps()
 }
 
 
-bool cedar::dev::sensors::camera::BackendDc1394::createCaptureObject()
+void cedar::dev::sensors::camera::BackendDc1394::createCaptureObject()
 {
 #ifdef DEBUG_CAMERA_GRABBER
   std::cout << __PRETTY_FUNCTION__ << std::endl;
@@ -136,13 +136,14 @@ bool cedar::dev::sensors::camera::BackendDc1394::createCaptureObject()
 
   //open camera with OpenCv VideoCapture class
   cv::VideoCapture capture(mpCameraChannel->getCameraId());
-  if(capture.isOpened())
+
+  // throw an exception if not successful
+  if(!capture.isOpened())
   {
-    mpCameraChannel->mVideoCapture = capture;
-    return true;
+    CEDAR_THROW(cedar::dev::sensors::camera::CreateBackendException,"Error: Couldn't create capture object");
   }
 
-  return false;
+  mpCameraChannel->mVideoCapture = capture;
 }
 
 
@@ -532,7 +533,7 @@ void cedar::dev::sensors::camera::BackendDc1394::getFeaturesFromLibDc()
         p_prop->mSupported=false;
       }
     }
-    p_prop->updateGuiElements();
+    p_prop->update();
     p_prop->doNotHandleEvents = false;
   }
 }
@@ -556,7 +557,7 @@ void cedar::dev::sensors::camera::BackendDc1394::applySettingsToCamera()
   }
 
   //framerate
-  cedar::dev::sensors::camera::FrameRate::Id framerate_id = mpCameraChannel->getFPS();
+  cedar::dev::sensors::camera::FrameRate::Id framerate_id = mpCameraChannel->getFramerate();
   if (framerate_id != cedar::dev::sensors::camera::FrameRate::FPS_NOT_SET)
   {
 #ifdef DEBUG_CAMERA_GRABBER

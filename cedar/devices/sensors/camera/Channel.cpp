@@ -315,22 +315,22 @@ void cedar::dev::sensors::camera::Channel::deviceChanged()
   }
 }
 
-unsigned int cedar::dev::sensors::camera::Channel::getCameraId()
+unsigned int cedar::dev::sensors::camera::Channel::getCameraId() const
 {
   return _mpCameraId->getValue();
 }
 
-bool cedar::dev::sensors::camera::Channel::getByGuid()
+bool cedar::dev::sensors::camera::Channel::getByGuid() const
 {
   return _mpByGuid->getValue();
 }
 
-cedar::dev::sensors::camera::VideoMode::Id cedar::dev::sensors::camera::Channel::getVideoMode()
+cedar::dev::sensors::camera::VideoMode::Id cedar::dev::sensors::camera::Channel::getVideoMode() const
 {
   return _mpGrabMode->getValue();
 }
 
-cedar::dev::sensors::camera::FrameRate::Id cedar::dev::sensors::camera::Channel::getFPS()
+cedar::dev::sensors::camera::FrameRate::Id cedar::dev::sensors::camera::Channel::getFramerate()  const
 {
   return _mpFPS->getValue();
 }
@@ -357,7 +357,7 @@ void cedar::dev::sensors::camera::Channel::setVideoMode(cedar::dev::sensors::cam
   }
 }
 
-void cedar::dev::sensors::camera::Channel::setFPS(cedar::dev::sensors::camera::FrameRate::Id fps)
+void cedar::dev::sensors::camera::Channel::setFramerate(cedar::dev::sensors::camera::FrameRate::Id fps)
 {
   if (_mpFPS->getValue() != fps)
   {
@@ -368,7 +368,7 @@ void cedar::dev::sensors::camera::Channel::setFPS(cedar::dev::sensors::camera::F
 
 #ifdef CEDAR_USE_LIB_DC1394
 
-cedar::dev::sensors::camera::IsoSpeed::Id cedar::dev::sensors::camera::Channel::getIsoSpeed()
+cedar::dev::sensors::camera::IsoSpeed::Id cedar::dev::sensors::camera::Channel::getIsoSpeed() const
 {
   return _mpIsoSpeed->getValue();
 }

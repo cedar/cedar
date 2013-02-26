@@ -91,8 +91,8 @@ void cedar::dev::sensors::camera::BackendType::construct()
 #ifdef CEDAR_USE_VIDEO_FOR_LINUX
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::camera::BackendType::VFL,
-                                      "VFL",
-                                      "VfL (Video for Linux)"
+                                      "V4L",
+                                      "V4L (Video for Linux)"
                                     ));
 #endif // CEDAR_USE_VIDEO_FOR_LINUX
 

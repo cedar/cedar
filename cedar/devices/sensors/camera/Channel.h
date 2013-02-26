@@ -151,29 +151,29 @@ public:
    *
    * @return The id as unsigned int
    */
-  unsigned int getCameraId();
+  unsigned int getCameraId() const;
 
   /// @brief Flag to indicate, if the grabber was created by using the GUID of the camera
-  bool getByGuid();
+  bool getByGuid() const;
 
   /*! @brief Get the actual used video mode of the camera
    *
    * @return The used video mode as enum parameter
    */
-  cedar::dev::sensors::camera::VideoMode::Id getVideoMode();
+  cedar::dev::sensors::camera::VideoMode::Id getVideoMode() const;
 
   /*! @brief Get the actual used framerate of the camera
    *
    * @return The used framerate as enum parameter
    */
-  cedar::dev::sensors::camera::FrameRate::Id getFPS();
+  cedar::dev::sensors::camera::FrameRate::Id getFramerate() const;
 
 #ifdef CEDAR_USE_LIB_DC1394
   /*! @brief Get the actual used ISO-speed of the Firewire-bus
    *  @return The used ISO-speed as enum parameter
    *  @remarks This method is only available, if cedar was built with firewire support
    */
-  cedar::dev::sensors::camera::IsoSpeed::Id getIsoSpeed();
+  cedar::dev::sensors::camera::IsoSpeed::Id getIsoSpeed() const;
 
   /*! @brief Set the actual used ISO-speed of the Firewire-bus
    *  @remarks This method is only available, if cedar was built with firewire support
@@ -208,7 +208,7 @@ public:
    *
    * @param fps The wanted framerate as enum parameter
    */
-  void setFPS(cedar::dev::sensors::camera::FrameRate::Id fps);
+  void setFramerate(cedar::dev::sensors::camera::FrameRate::Id fps);
 
   /*! Set a new backendtype to the used channel.
    *

@@ -93,9 +93,9 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  // derived from class Device
+  // derived from class Backend
   void applySettingsToCamera();
-  bool createCaptureObject();
+  void createCaptureObject();
 
   /*! @brief Opens the wanted camera with libDc methods
    *
