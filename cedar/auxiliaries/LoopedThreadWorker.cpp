@@ -70,26 +70,16 @@ void cedar::aux::detail::LoopedThreadWorker::work()
   {
     case cedar::aux::LoopMode::RealTime:
     {
-      {
-        QWriteLocker locker1(&mLastTimeStepStartLock);
-        QWriteLocker locker2(&mLastTimeStepEndLock);
-
-        mLastTimeStepStart = boost::posix_time::microsec_clock::universal_time();
-        mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
-      }
+      setLastTimeStepStart( boost::posix_time::microsec_clock::universal_time() );
+      setLastTimeStepEnd( boost::posix_time::microsec_clock::universal_time() );
 
       boost::posix_time::time_duration time_difference;
 
       while (!safeStopRequested())
       {
-        {
-          QWriteLocker locker1(&mLastTimeStepStartLock);
-          QWriteLocker locker2(&mLastTimeStepEndLock);
-
-          mLastTimeStepStart = mLastTimeStepEnd;
-          mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
-          time_difference = mLastTimeStepEnd - mLastTimeStepStart;
-        }
+        setLastTimeStepStart( getLastTimeStepEnd() );
+        setLastTimeStepEnd( boost::posix_time::microsec_clock::universal_time() );
+        time_difference = getLastTimeStepEnd() - getLastTimeStepStart();
         
         mpWrapper->step(time_difference.total_microseconds() * 0.001);
         usleep(static_cast<unsigned int>(1000 * mpWrapper->getIdleTimeParameter() + 0.5));
@@ -120,14 +110,10 @@ void cedar::aux::detail::LoopedThreadWorker::work()
 
       // initialization
       boost::posix_time::ptime scheduled_wakeup;
-      {
-        QWriteLocker locker1(&mLastTimeStepStartLock);
-        QWriteLocker locker2(&mLastTimeStepEndLock);
+      setLastTimeStepStart( boost::posix_time::microsec_clock::universal_time() );
+      setLastTimeStepEnd( getLastTimeStepStart() );
+      scheduled_wakeup = getLastTimeStepEnd() + step_size;
 
-        mLastTimeStepStart = boost::posix_time::microsec_clock::universal_time();
-        mLastTimeStepEnd = mLastTimeStepStart;
-        scheduled_wakeup = mLastTimeStepEnd + step_size;
-      }
       //!@todo Should this really be here?
       srand(boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds());
 
@@ -144,15 +130,10 @@ void cedar::aux::detail::LoopedThreadWorker::work()
         if (safeStopRequested())
           break;
 
-        {
-          QWriteLocker locker1(&mLastTimeStepStartLock);
-          QWriteLocker locker2(&mLastTimeStepEndLock);
-
-          // determine time since last run
-          mLastTimeStepStart = mLastTimeStepEnd;
-          mLastTimeStepEnd = scheduled_wakeup;
-          step_duration = mLastTimeStepEnd - mLastTimeStepStart;
-        }
+        // determine time since last run
+        setLastTimeStepStart( getLastTimeStepEnd() );
+        setLastTimeStepEnd( scheduled_wakeup );
+        step_duration = getLastTimeStepEnd() - getLastTimeStepStart();
 
         // calculate number of time steps taken
         double steps_taken
@@ -182,14 +163,10 @@ void cedar::aux::detail::LoopedThreadWorker::work()
     {
       // initialization
       boost::posix_time::ptime scheduled_wakeup;
-      {
-        QWriteLocker locker1(&mLastTimeStepStartLock);
-        QWriteLocker locker2(&mLastTimeStepEndLock);
-
-        mLastTimeStepStart = boost::posix_time::microsec_clock::universal_time();
-        mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
-        scheduled_wakeup = mLastTimeStepEnd + step_size;
-      }
+      
+      setLastTimeStepStart( boost::posix_time::microsec_clock::universal_time() );
+      setLastTimeStepEnd( boost::posix_time::microsec_clock::universal_time() );
+      scheduled_wakeup = getLastTimeStepEnd() + step_size;
 
       srand(boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds());
 
@@ -207,14 +184,9 @@ void cedar::aux::detail::LoopedThreadWorker::work()
           break;
 
         // determine time since last run
-        {
-          QWriteLocker locker1(&mLastTimeStepStartLock);
-          QWriteLocker locker2(&mLastTimeStepEndLock);
-
-          mLastTimeStepStart = mLastTimeStepEnd;
-          mLastTimeStepEnd = scheduled_wakeup;
-          step_duration = mLastTimeStepEnd - mLastTimeStepStart;
-        }
+        setLastTimeStepStart( getLastTimeStepEnd() );
+        setLastTimeStepEnd( scheduled_wakeup );
+        step_duration = getLastTimeStepEnd() - getLastTimeStepStart();
 
         // calculate number of time steps taken
         double steps_taken
@@ -285,10 +257,10 @@ void cedar::aux::detail::LoopedThreadWorker::updateStatistics(double stepsTaken)
       "Value overflow in thread statistics. Statistics will be reset.",
       "cedar::aux::LoopedThread::updateStatistics(double)"
     );
-    initStatistics();
-  }
 
-  return;
+    initStatistics();
+    return;
+  }
 }
 
 boost::posix_time::ptime cedar::aux::detail::LoopedThreadWorker::getLastTimeStepStart() const
@@ -297,10 +269,22 @@ boost::posix_time::ptime cedar::aux::detail::LoopedThreadWorker::getLastTimeStep
   return mLastTimeStepStart;
 }
 
+void cedar::aux::detail::LoopedThreadWorker::setLastTimeStepStart(const boost::posix_time::ptime& time)
+{
+  QWriteLocker locker(&mLastTimeStepStartLock);
+  mLastTimeStepStart = time;
+}
+
 boost::posix_time::ptime cedar::aux::detail::LoopedThreadWorker::getLastTimeStepEnd() const
 {
   QReadLocker locker(&mLastTimeStepEndLock);
   return mLastTimeStepEnd;
+}
+
+void cedar::aux::detail::LoopedThreadWorker::setLastTimeStepEnd(const boost::posix_time::ptime& time)
+{
+  QWriteLocker locker(&mLastTimeStepEndLock);
+  mLastTimeStepEnd = time;
 }
 
 boost::posix_time::time_duration cedar::aux::detail::LoopedThreadWorker::getLastTimeStepDuration() const
