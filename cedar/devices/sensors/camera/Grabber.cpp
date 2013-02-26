@@ -346,9 +346,9 @@ void cedar::dev::sensors::camera::Grabber::onCreateGrabber()
       {
         if (msg != "")
         {
-          msg = msg + "\n";
+          msg += "\n";
         }
-        msg = msg + "Channel " + boost::lexical_cast<std::string>(channel) + ": Could not create Backend";
+        msg += "Channel " + boost::lexical_cast<std::string>(channel) + ": Could not create Backend";
       }
 
       // Backend device not longer used. Channel::mVideoCapture does the job
@@ -359,9 +359,9 @@ void cedar::dev::sensors::camera::Grabber::onCreateGrabber()
   {
     if (msg != "")
     {
-      msg = msg + "\n";
+      msg += "\n";
     }
-    msg = msg + "Exception catched: \""+e.what()+"\"";
+    msg += "Exception caught: \"" + e.what() + "\"";
   }
 
 #ifdef DEBUG_CAMERA_GRABBER
