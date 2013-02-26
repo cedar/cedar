@@ -173,8 +173,8 @@ int main(int argc, char* argv[])
   //----------------------------------------------------------------------------------------
 
   //get the timediff between two frames
-  std::cout << "Videoframe: " << p_grabber->getSourceFps() << std::endl;
-  double frame_time_ms = 1000.f/p_grabber->getSourceFps();
+  std::cout << "Videoframe: " << p_grabber->getSourceFramerate() << std::endl;
+  double frame_time_ms = 1000.f/p_grabber->getSourceFramerate();
   boost::posix_time::ptime time_start;
 
   unsigned int counter = 0;
@@ -199,7 +199,7 @@ int main(int argc, char* argv[])
     //every 20 frames
     if (!(++counter %= 20))
     {
-      std::cout << "Grabbing framerate: " << p_grabber->getFpsMeasured() << " fps" << std::endl;
+      std::cout << "Grabbing framerate: " << p_grabber->getMeasuredFramerate() << " fps" << std::endl;
     }
 
     //send frames with equal framerate like the video, do busy-waiting instead of an extra thread
