@@ -361,7 +361,7 @@ void cedar::dev::sensors::camera::Grabber::onCreateGrabber()
     {
       msg += "\n";
     }
-    msg += "Exception caught: \"" + e.what() + "\"";
+    msg += "Exception caught: \"" + std::string(e.what()) + "\"";
   }
 
 #ifdef DEBUG_CAMERA_GRABBER
