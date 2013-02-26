@@ -97,10 +97,8 @@ _mTau(new cedar::aux::TimeParameter
           (
             this,
             "tau",
-            cedar::unit::Time
-            (
-              100.0 * cedar::unit::milli * cedar::unit::seconds, cedar::aux::TimeParameter::LimitType::positive()
-            )
+            cedar::unit::Time(100.0 * cedar::unit::milli * cedar::unit::seconds),
+            cedar::aux::TimeParameter::LimitType::positive()
           )
      )
 {

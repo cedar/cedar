@@ -60,7 +60,7 @@ namespace cedar
   namespace aux
   {
     template <typename T>
-    boost::units::quantity<T> getUnitFromPostFix(const std::string& /* postFix */)
+    inline boost::units::quantity<T> getUnitFromPostFix(const std::string& /* postFix */)
     {
       // default implementation -- should not be used
       // If you see an error generated from here, you are using a dimension that is not implemented with parameters.
@@ -70,7 +70,7 @@ namespace cedar
 
 
     template <>
-    boost::units::quantity<boost::units::si::dimensionless> getUnitFromPostFix(const std::string& postFix)
+    inline boost::units::quantity<boost::units::si::dimensionless> getUnitFromPostFix(const std::string& postFix)
     {
       CEDAR_ASSERT(postFix.empty());
       return 1.0;
@@ -333,12 +333,14 @@ public:
   //!@brief The standard constructor.
   UnitParameterTemplate
   (
-    cedar::aux::Configurable* pOwner,
+    cedar::aux::Configurable *pOwner,
     const std::string& name,
-    const boost::units::quantity<T>& defaultValue
+    const boost::units::quantity<T>& defaultValue,
+    const typename cedar::aux::NumericParameter<boost::units::quantity<T> >::LimitType& limits
+      = cedar::aux::NumericParameter<boost::units::quantity<T> >::LimitType::full()
   )
   :
-  Super(pOwner, name, defaultValue)
+  Super(pOwner, name, defaultValue, limits)
   {
   }
 

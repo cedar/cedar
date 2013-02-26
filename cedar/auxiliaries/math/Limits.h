@@ -247,8 +247,8 @@ public:
   template <typename U>
   Limits(const Limits<U> &otherLimits)
   :
-  mLowerLimit(otherLimits.mLowerLimit),
-  mUpperLimit(otherLimits.mUpperLimit)
+  mLowerLimit(otherLimits.getLower()),
+  mUpperLimit(otherLimits.getUpper())
   {
   }
   
