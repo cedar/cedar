@@ -53,6 +53,6 @@ cedar::aux::detail::ThreadWorker::~ThreadWorker()
 void cedar::aux::detail::ThreadWorker::workSlot()
 {
   work(); // children will have implemented their own work()
-  emit signalFinishedWorking();
+  emit finishedWorking();
 }
 

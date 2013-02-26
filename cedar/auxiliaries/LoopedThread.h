@@ -178,29 +178,40 @@ public:
   //! get the duration of the fixed trigger step
   inline double getStepSize() const
   {
+    QReadLocker locker(&mStepSizeLock);
+
     return this->_mStepSize->getValue();
   }
+
   //! get the duration of the fixed trigger step
   inline double getStepSize() 
   {
+    QReadLocker locker(&mStepSizeLock);
+
     return this->_mStepSize->getValue();
   }
 
   //! get the idle time that is used in-between sending trigger signals
   inline double getIdleTimeParameter() const
   {
+    QReadLocker locker(&mIdleTimeLock);
+
     return this->_mIdleTime->getValue();
   }
 
   //! get the duration of the simulated time step
   inline double getSimulatedTimeParameter() const
   {
+    QReadLocker locker(&mSimulatedTimeLock);
+
     return this->_mSimulatedTime->getValue();
   }
 
   //! get the loop mode
   inline cedar::aux::Enum getLoopModeParameter() const
   {
+    QReadLocker locker(&mLoopModeLock);
+
     return this->_mLoopMode->getValue();
   }
 
@@ -271,6 +282,11 @@ private:
 
   //! The loop mode of the trigger
   cedar::aux::EnumParameterPtr _mLoopMode;
+
+  mutable QReadWriteLock mStepSizeLock;
+  mutable QReadWriteLock mIdleTimeLock;
+  mutable QReadWriteLock mSimulatedTimeLock;
+  mutable QReadWriteLock mLoopModeLock;
 
 }; // class cedar::aux::LoopedThread
 

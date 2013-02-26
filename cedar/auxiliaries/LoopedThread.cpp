@@ -139,16 +139,22 @@ void cedar::aux::LoopedThread::applyStop(bool suppressWarning)
 
 void cedar::aux::LoopedThread::setStepSize(double stepSize)
 {
+  QWriteLocker locker(&mStepSizeLock);
+
   this->_mStepSize->setValue(stepSize);
 }
 
 void cedar::aux::LoopedThread::setIdleTime(double idleTime)
 {
+  QWriteLocker locker(&mIdleTimeLock);
+
   _mIdleTime->setValue(idleTime);
 }
 
 void cedar::aux::LoopedThread::setSimulatedTime(double simulatedTime)
 {
+  QWriteLocker locker(&mSimulatedTimeLock);
+
   _mSimulatedTime->setValue(simulatedTime);
 }
  
@@ -156,6 +162,7 @@ cedar::aux::detail::ThreadWorker* cedar::aux::LoopedThread::resetWorker()
 {
   mpWorker = new cedar::aux::detail::LoopedThreadWorker(this);
   return mpWorker;
+    // intentionally return pointer, see parent
 }
 
 

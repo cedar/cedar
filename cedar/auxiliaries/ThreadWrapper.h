@@ -178,7 +178,7 @@ public slots:
   void finishedWorkSlot();  // TODO: manpage: "runs in the new thread"
 
 signals:
-  void signalFinished();
+  void finishedThread();
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -190,10 +190,22 @@ protected:
   // private methods
   //----------------------------------------------------------------------------
 private:
+  /*!@brief create a new Worker (base class) pointer
+   * 
+   * Creates a new Worker base class pointer and returns it to be used
+   * as the new Worker class.
+   *
+   * Override in children and create the appropriate Worker class
+   * (i.e. LoopedThreadWorker for a LoopedThread).
+   *
+   * Children also need to reset their own pointers to the 
+   * Worker if they are holding one.
+   *
+   */
   virtual cedar::aux::detail::ThreadWorker* resetWorker() = 0;
 
-  virtual void applyStop(bool suppressWarning);
-  virtual void applyStart();
+  virtual void applyStop(bool suppressWarning); // context: the old thread, guaranteed that the worker still exists. called while the thread may still be running, but after the requestStop-flag has been set.
+  virtual void applyStart(); // context: the holding thread. guaranteed that  the worker class already exists. called before the thread starts.
 
   bool validWorker() const; // thread-UN-safe
   bool validThread() const; // thread-UN-safe
@@ -204,6 +216,7 @@ private:
   //----------------------------------------------------------------------------
 private:
   QThread* mpThread;
+    // inentionally a raw pointer. will be destroyed via QT's deleteLater()
   mutable bool mDestructing; 
   mutable QMutex mDestructingMutex;
   mutable QMutex mFinishedThreadMutex;
@@ -213,6 +226,7 @@ private:
   //!@brief stop is requested
   bool mStopRequested; 
   cedar::aux::detail::ThreadWorker* mpWorker;
+    // inentionally a raw pointer. will be destroyed via QT's deleteLater()
 
 }; // class cedar::aux::ThreadWrapper
 

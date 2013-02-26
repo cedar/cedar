@@ -71,5 +71,6 @@ void cedar::aux::CallFunctionInThread::call()
 cedar::aux::detail::ThreadWorker* cedar::aux::CallFunctionInThread::resetWorker()
 {
   return new cedar::aux::detail::CallFunctionInThreadWorker(this);
+    // intentionally returns a raw pointer, see parent
 }
 
