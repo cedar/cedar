@@ -61,6 +61,12 @@ mpWorker(NULL)
 cedar::aux::ThreadWrapper::~ThreadWrapper()
 {
   //std::cout << "destructor for this: " << this << " and thread " << mpThread << std::endl;  
+  // If other threads enter start() or stop() after this point,
+  // they will test mDestructing and abort.
+  mDestructing = true;
+    // note: you don't want them to wait for the destructor, but to abort
+    // quickly
+    // note: mDestructing is only written-to here!
 
   if (!mDestructingMutex.tryLock())
   {
@@ -72,13 +78,6 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
                 "cedar::aux::ThreadWrapper::~ThreadWrapper() called twice!");
     // note: never unlock
   }
-
-  // If other threads enter start() or stop() after this point,
-  // they will test mDestructing and abort.
-  mDestructing = true;
-    // note: you don't want them to wait for the destructor, but to abort
-    // quickly
-    // note: mDestructing is only written-to here!
 
   // If other threads had already entered start() or stop(), _we_ wait:
   QWriteLocker locker(&mGeneralAccessLock);
@@ -167,6 +166,9 @@ bool cedar::aux::ThreadWrapper::isRunning() const
 
 void cedar::aux::ThreadWrapper::start()
 {
+  if (mDestructing) // quick abort, see below
+    return;
+
   // make sure we only enter one and one of start(), stop() at a time:
   QWriteLocker locker(&mGeneralAccessLock);
        
@@ -276,6 +278,8 @@ void cedar::aux::ThreadWrapper::quittedThreadSlot()
 {
   // is called in the new thread's context(!)
   // we land here after the thread ended
+  if (mDestructing) // quick abort, see below
+    return;
 
   //std::cout << "called quittedThreadSlot() for " << this << std::endl;  
 
@@ -332,6 +336,9 @@ bool cedar::aux::ThreadWrapper::validThread() const
 
 void cedar::aux::ThreadWrapper::stop(unsigned int time, bool suppressWarning)
 {
+  if (mDestructing) // quick abort, see below
+    return;
+
   // make sure we wait for a running start() or finishedThread() or
   // only enther stop() once:
   QWriteLocker locker(&mGeneralAccessLock);
