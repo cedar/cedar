@@ -229,7 +229,7 @@ int main(int argc, char* argv[])
 
   auto testThread = new cedar::aux::CallFunctionInThread(runTests);
 
-  QObject::connect( testThread, SIGNAL(signalFinished()), app, SLOT(quit()), Qt::QueuedConnection );  // alternatively: call app->quit() in runTests()
+  QObject::connect( testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection );  // alternatively: call app->quit() in runTests()
 
   testThread->start();
   app->exec();

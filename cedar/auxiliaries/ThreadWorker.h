@@ -63,13 +63,14 @@ class cedar::aux::detail::ThreadWorker : public QObject
     ThreadWorker();
     virtual ~ThreadWorker();
 
+  private:
     virtual void work() = 0;
 
   public slots:
     void workSlot();
 
   signals:
-    void signalFinishedWorking();
+    void finishedWorking();
 };
 
 

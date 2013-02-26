@@ -169,27 +169,25 @@ void cedar::aux::ThreadWrapper::start()
 {
   // make sure we only enter one and one of start(), stop() at a time:
   QWriteLocker locker(&mGeneralAccessLock);
-
+       
   if (mDestructing) // dont start the thread if we are in the destructor
     return;        
-    // note:
-    // mDestructing is a volatile bool and is only written-to in the destructor
-    // A corrupted read here will either result in a:
-    //   correct FALSE: no problem
-    //   correct TRUE:  no problem
-    //   incorrect FALSE: doesnt happen, since is only changed to FALSE,
-    //                    and that only once
-    //   incorrect TRUE: (i.e. is just being set to FALSE but we incorrectly
-    //                   read as TRUE) will be handled
-    //                   like as if start() was called before the destructor
-
+      // note:
+      // mDestructing is a volatile bool and is only written-to in the destructor
+      // A corrupted read here will either result in a:
+      //   correct FALSE: no problem
+      //   correct TRUE:  no problem
+      //   incorrect FALSE: doesnt happen, since is only changed to FALSE,
+      //                    and that only once
+      //   incorrect TRUE: (i.e. is just being set to FALSE but we incorrectly
+      //                   read as TRUE) will be handled
+      //                   like as if start() was called before the destructor
 
   if (true)
   {
     QWriteLocker locker(&mStopRequestedLock);
     mStopRequested = false;
   }
-
 
   // EXPLANATION:  
   //              We initialize a new thread (a QThread object) and
@@ -235,7 +233,7 @@ void cedar::aux::ThreadWrapper::start()
     connect( mpThread, SIGNAL(started()), mpWorker, SLOT(workSlot()), Qt::QueuedConnection );
 
     // when the thread finishes (returns from run()), react to it:
-    connect( mpWorker, SIGNAL(signalFinishedWorking()), this, SLOT(finishedWorkSlot()), Qt::DirectConnection );
+    connect( mpWorker, SIGNAL(finishedWorking()), this, SLOT(finishedWorkSlot()), Qt::DirectConnection );
     // this will be called on a thread termination:
     connect( mpThread, SIGNAL(finished()), this, SLOT(quittedThreadSlot()), Qt::DirectConnection );
   }
@@ -245,10 +243,10 @@ void cedar::aux::ThreadWrapper::start()
       "Re-starting a not cleanly finished thread. Continuing.");
   }
 
+  applyStart(); // overridden by children
+
   // start the thread 
   mpThread->start();
-
-  applyStart(); // overridden by children
 }
 
 void cedar::aux::ThreadWrapper::startedThreadSlot()
@@ -310,7 +308,7 @@ void cedar::aux::ThreadWrapper::quittedThreadSlot()
   }
 
 
-  emit signalFinished();
+  emit finishedThread();
 }
 
 bool cedar::aux::ThreadWrapper::validWorker() const
@@ -346,6 +344,7 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time, bool suppressWarning)
   if (isRunningUnlocked())
   {
     applyStop(suppressWarning);
+      // intentionally called while the thread may still be running. we need to guarantee that the worker class hasn't been destroyed, yet. This is only possible here or in quittedThreadSlot(). But historically, stop() also carries the suppressWarning parameter, which we only have access too, here.
 
     // avoid dead-locking if called from the same thread:
     if (QThread::currentThread() != mpThread)
@@ -354,6 +353,7 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time, bool suppressWarning)
       // std::cout << "  (current thread: " << QThread::currentThread() << std::endl;
       mpThread->wait(time);
       //std::cout << "  resuming from wait." << std::endl;      
+
     }
   }
 
