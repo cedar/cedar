@@ -103,9 +103,14 @@ _mPort(new cedar::aux::StringParameter(this, "port", "DEMOCHANNEL"))
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::sources::NetReader::onStart()
+void cedar::proc::sources::NetReader::reset()
 {
-  this->_mPort->setConstant(true);
+  mReader.reset();
+  this->connect();
+}
+
+void cedar::proc::sources::NetReader::connect()
+{
   // instantiate the reader, if not yet done
   if (!mReader)
   {
@@ -130,6 +135,13 @@ void cedar::proc::sources::NetReader::onStart()
       throw( e ); // lets try this ...
     }
   }
+}
+
+void cedar::proc::sources::NetReader::onStart()
+{
+  this->_mPort->setConstant(true);
+
+  this->connect();
 }
 
 void cedar::proc::sources::NetReader::onStop()
