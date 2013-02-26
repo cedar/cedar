@@ -41,6 +41,7 @@
 #include "cedar/devices/namespace.h"
 #include "cedar/devices/Locomotion.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/LengthParameter.h"
 #include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
 #include "cedar/units/Length.h"
 #include "cedar/units/Velocity.h"
@@ -174,9 +175,9 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //! distance between the wheels [in m]
-  cedar::aux::DoubleParameterPtr _mWheelDistance;
+  cedar::aux::LengthParameterPtr _mWheelDistance;
   //! radius of the wheel [in m]
-  cedar::aux::DoubleParameterPtr _mWheelRadius;
+  cedar::aux::LengthParameterPtr _mWheelRadius;
   //! limits for the speed of the wheels [in m/s]
   cedar::aux::math::DoubleLimitsParameterPtr _mHardwareSpeedLimits;
 }; // class cedar::dev::DifferentialDrive
