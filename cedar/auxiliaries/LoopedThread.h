@@ -61,23 +61,30 @@
 
 /*!@brief Cedar interface for looped threads
  *
- * Use this interface if your class should be executable as a Qt thread.
- * Just inherit from this class and implement a step function with the
- * given parameter. This step function is called in a loop until the thread is
+ * Use this interface if your class should execute a step() method
+ * you provide in discrete time intervals in a thread.
+ *
+ * Just inherit from this class and implement a step() method with the
+ * given parameter. This step() method is called in a loop until the thread is
  * stopped again.
  *
- * - to start your thread, call start()
- * - to stop your thread, call stop()
- * - before you delete your object, make sure that there was enough time
- *   to stop the current execution of step()
+ * - to start ticking step(), call start()
+ * - to set the time intervals the step() method is to be called, use 
+ *   setTimeStep()
+ * - to stop ticking step(), call stop() - note that this will abort the loop
+ *   but not terminate the current iteration until it is finished.
  *
+ * The current implementation of LoopedThread uses QT threads and needs a
+ * running main event loop, i.e. you must start a Q(Core)Application's exec().
+ * 
  * LoopedThread has several different working modes regarding the timing and the
- * handling of unexpected time delays. By default the step() function is called
+ * handling of unexpected time delays. By default the step() method is called
  * in fixed intervals controlled by stepTime. If the system becomes too slow to
  * stay to the scheduled time interval the affected steps are skipped and for
- * the next regular step the step() function is called with the corresponding
- * multiple of stepSize. If you do not want to wait for the next regular step in
- * cases of delay but want to execute the next step as soon as possible, this
+ * the next regular step the step() method is called with the corresponding
+ * multiple of stepSize as an argument. 
+ * If you do not want to wait for the next regular step in cases of delay
+ * but want to execute the next step as soon as possible, this
  * behavior can be controlled through useFixedStepSize().
  *
  * Also the behavior changes if a stepSize of zero is given. In this case step()
@@ -86,7 +93,7 @@
  * setIdleTime().
  *
  * An additional way to use LoopedThread is the simulation mode. If
- * simulatedTime is set to a value above zero, the step function is called with
+ * simulatedTime is set to a value above zero, the step method is called with
  * this simulated time instead of the real (measured) time. This can be useful
  * if only the behavior of a dynamical system is of interest but not it's
  * relation to real time.
@@ -98,6 +105,7 @@
  *
  * \todo Use units instead of doubles
  */
+// TODO: js: I don't get the last paragraph, is it still valid?
 class cedar::aux::LoopedThread : public cedar::aux::ThreadWrapper
 {
   //----------------------------------------------------------------------------
@@ -114,12 +122,12 @@ public:
   /*!@brief Constructor with step size parameter.
    *
    * This constructor creates a LoopedThread with certain time interval
-   * (stepSize) in which the step() function is called.
+   * (stepSize) in which the step() method is called.
    *
-   * If stepSize == 0 the step() function is called as fast as possible with a
+   * If stepSize == 0 the step() method is called as fast as possible with a
    * short idle time in between to keep the system responsive.
    *
-   * @param stepSize time window for each step function in milliseconds
+   * @param stepSize time window for each step() method in milliseconds
    * @param idleTime idle time (in milliseconds) used in fast running mode (i.e. stepSize = 0)
    * @param simulatedTime a fixed time that is sent to all connected Triggerables regardless of real execution time
    * @param mode the operational mode of this trigger
@@ -142,13 +150,15 @@ public:
   /*!@brief Performs a single step with default step size (or simulated time).
    *
    * This has no effect if the thread is already running.
+   * 
+   * This method is not re-entrant. It is thread-safe if your step() implementation is thread-safe.
    */
-  void singleStep(); // TODO: say this function is not re-entrant TODO: does this need to be thread-safe? TODO: needs to be virtual if step() is virtual! TODO: in kimenaticChain: you need to overwrite this
+  void singleStep(); 
 
   /*!@brief Sets a new step size
    *
-   * Sets the a new time interval for calling the step() function. If the
-   * thread is running, the new value has its effect only after restarting it.
+   * Sets the a new time interval for calling the step() method. If the
+   * thread is already running, the new value has its effect only after restarting the thread, i.e. calling stop() and start().
    *
    * @param stepSize the new step size in milliseconds
    */
@@ -215,18 +225,21 @@ public:
     return this->_mLoopMode->getValue();
   }
 
+  //! get the the time of the LoopedThread's last step() entry
   inline boost::posix_time::ptime getLastTimeStepStart() const
   {
     CEDAR_ASSERT( mpWorker != NULL );
     return mpWorker->getLastTimeStepStart();
   }
 
+  //! get the end of the LoopedThread's last step() exit
   inline boost::posix_time::ptime getLastTimeStepEnd() const
   {
     CEDAR_ASSERT( mpWorker != NULL );
     return mpWorker->getLastTimeStepEnd();
   }
 
+  //! get the duration of the LoopedThread's last step() execution
   inline boost::posix_time::time_duration getLastTimeStepDuration() const
   {
     CEDAR_ASSERT( mpWorker != NULL );
@@ -242,17 +255,19 @@ protected:
   // private methods
   //----------------------------------------------------------------------------
 private:
-  void stopStatistics(bool suppressWarnings); // thread un-safe
+  //! end counting the statistics. is not thread-safe
+  void stopStatistics(bool suppressWarnings); 
 
+  //! overwritten method. return the new worker object for LoopedThread
   cedar::aux::detail::ThreadWorker* resetWorker();
 
-	//!@todo This should be private -- loopedthreadworker should be a friend
   /*!@brief All calculations for each time step are put into step().
    *
    * @param time length of the time step to be calculated in milliseconds
    */
   virtual void step(double time) = 0;
 
+  //! overwritten method. called when the thread finishes via stop().
   void applyStop(bool suppressWarning);
 
   //----------------------------------------------------------------------------
@@ -261,6 +276,7 @@ private:
 protected:
 
 private:
+  //! keep our own pointer of the worker. it is guaranteed that it is still valid when we use it in work() and stopStatistics()
   cedar::aux::detail::LoopedThreadWorker* mpWorker;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -283,9 +299,13 @@ private:
   //! The loop mode of the trigger
   cedar::aux::EnumParameterPtr _mLoopMode;
 
+  //! lock for _mStepSize
   mutable QReadWriteLock mStepSizeLock;
+  //! lock for _mIdleTime
   mutable QReadWriteLock mIdleTimeLock;
+  //! lock for _mSimulatedTime
   mutable QReadWriteLock mSimulatedTimeLock;
+  //! lock for _mLoopMode
   mutable QReadWriteLock mLoopModeLock;
 
 }; // class cedar::aux::LoopedThread

@@ -52,9 +52,9 @@ namespace cedar
   /*!@brief Namespace for all aux classes. */
   namespace aux
   {
+    /*!@bierf Namespace for implementation details you should not use. */
     namespace detail
     {
-      // TODO: mapnage
       class ThreadWorker;
       class LoopedThreadWorker;
       class CallFunctionInThreadWorker;

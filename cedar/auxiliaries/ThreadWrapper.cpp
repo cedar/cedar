@@ -86,6 +86,7 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
 
   // we also wait for finishedThread() to execute:
   mFinishedThreadMutex.lock(); 
+// TODO: js: need to unlock here, too!
 
   ////////////////////////////////////////////////////////////////////////////
   //
@@ -351,7 +352,11 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time, bool suppressWarning)
   if (isRunningUnlocked())
   {
     applyStop(suppressWarning);
-      // intentionally called while the thread may still be running. we need to guarantee that the worker class hasn't been destroyed, yet. This is only possible here or in quittedThreadSlot(). But historically, stop() also carries the suppressWarning parameter, which we only have access too, here.
+      // intentionally called while the thread may still be running. 
+      // we need to guarantee that the worker class hasn't been destroyed, yet.
+      // This is only possible here or in quittedThreadSlot(). 
+      // But historically, stop() also carries the suppressWarning parameter,
+      // which we only have access too, so we call applyStop() here.
 
     // avoid dead-locking if called from the same thread:
     if (QThread::currentThread() != mpThread)

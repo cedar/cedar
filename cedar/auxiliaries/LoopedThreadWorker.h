@@ -56,20 +56,28 @@
 #include <QThread>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
+//! the corresponding worker class for the LoopedThread class
 class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::ThreadWorker
 {
   public: 
-    LoopedThreadWorker(cedar::aux::LoopedThread* wrapper);
+    //! constructor
+    explicit LoopedThreadWorker(cedar::aux::LoopedThread* wrapper);
+    //! destructor
     ~LoopedThreadWorker();
 
   private:
+    //! initialize statistics at construction time
     void initStatistics();
+    //! update statistics 
     inline void updateStatistics(double stepsTaken);
+    //! request stop in the wrapper
     void safeRequestStop();
+    // check whether a stop has been requested
     bool safeStopRequested();
 
   public:
-    void work(); // is a virtual slot in parent
+    //! overwritten method that does the actual work
+    void work();
 
   public:
     /*!@brief Returns the last timesteps start time.
@@ -87,10 +95,13 @@ class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::Thread
      */
     boost::posix_time::time_duration getLastTimeStepDuration() const;
 
+    //! return the current counter of steps
     unsigned long getNumberOfSteps();
+    //@todo: needs documentation. I don't get it. js
     double getMaxStepsTaken();
 
   private:
+    //! we keep a pointer to the wrapper
     cedar::aux::LoopedThread* mpWrapper;
 
     //!@brief total number of steps since start()
