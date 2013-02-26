@@ -48,7 +48,7 @@ namespace cedar
   namespace aux
   {
     template <>
-    cedar::unit::Length getUnitFromPostFix(const std::string& postFix)
+    inline cedar::unit::Length getUnitFromPostFix(const std::string& postFix)
     {
       static std::map<std::string, cedar::unit::Length> map;
 

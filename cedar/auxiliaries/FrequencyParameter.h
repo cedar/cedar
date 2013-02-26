@@ -50,7 +50,7 @@ namespace cedar
   namespace aux
   {
     template <>
-    cedar::unit::Frequency getUnitFromPostFix(const std::string& postFix)
+    inline cedar::unit::Frequency getUnitFromPostFix(const std::string& postFix)
     {
       static std::map<std::string, cedar::unit::Frequency> map;
 

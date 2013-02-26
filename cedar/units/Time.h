@@ -53,13 +53,6 @@ namespace cedar
     typedef boost::units::quantity<boost::units::si::time> Time;
     using boost::units::si::second;
     using boost::units::si::seconds;
-    typedef boost::units::make_scaled_unit
-            <
-              boost::units::si::time,
-              boost::units::scale<10, boost::units::static_rational<-3> >
-            >::type millisecond;
-    typedef millisecond milliseconds;
-
 
     //!@brief template concretion for time
     typedef UnitMatrix<boost::units::si::time> TimeMatrix;

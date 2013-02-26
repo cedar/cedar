@@ -67,7 +67,7 @@
 
 cedar::dev::amtec::KinematicChain::KinematicChain()
 :
-cedar::dev::robot::KinematicChain(),
+cedar::dev::KinematicChain(),
 _mInitString(new cedar::aux::StringParameter(this, "amtec init string", "ESD:1,1000")),
 _mModuleMap
 (

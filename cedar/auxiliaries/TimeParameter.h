@@ -48,7 +48,7 @@ namespace cedar
   namespace aux
   {
     template <>
-    cedar::unit::Time getUnitFromPostFix(const std::string& postFix)
+    inline cedar::unit::Time getUnitFromPostFix(const std::string& postFix)
     {
       static std::map<std::string, cedar::unit::Time> map;
 
