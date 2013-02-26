@@ -56,6 +56,7 @@
 #include <QThread>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
+//! the corresponding worker class for the CallFunctionInThread class
 class cedar::aux::detail::CallFunctionInThreadWorker : public cedar::aux::detail::ThreadWorker
 {
   public: 

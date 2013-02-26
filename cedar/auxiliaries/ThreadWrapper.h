@@ -58,44 +58,11 @@
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
 
-/*!@brief Cedar interface for looped threads
+/*!@brief Base class for utility classes that start their own worker in a thread
+ * 
+ * Implementers should not use this class.
  *
- * Use this interface if your class should be executable as a Qt thread.
- * Just inherit from this class and implement a step function with the
- * given parameter. This step function is called in a loop until the thread is
- * stopped again.
- *
- * - to start your thread, call start()
- * - to stop your thread, call stop()
- * - before you delete your object, make sure that there was enough time
- *   to stop the current execution of step()
- *
- * ThreadWrapper has several different working modes regarding the timing and the
- * handling of unexpected time delays. By default the step() function is called
- * in fixed intervals controlled by stepTime. If the system becomes too slow to
- * stay to the scheduled time interval the affected steps are skipped and for
- * the next regular step the step() function is called with the corresponding
- * multiple of stepSize. If you do not want to wait for the next regular step in
- * cases of delay but want to execute the next step as soon as possible, this
- * behavior can be controlled through useFixedStepSize().
- *
- * Also the behavior changes if a stepSize of zero is given. In this case step()
- * is called in a loop as fast as possible. There's only a short sleep in
- * between to keep the system responsive. This idle time can be controlled by
- * setIdleTime().
- *
- * An additional way to use ThreadWrapper is the simulation mode. If
- * simulatedTime is set to a value above zero, the step function is called with
- * this simulated time instead of the real (measured) time. This can be useful
- * if only the behavior of a dynamical system is of interest but not it's
- * relation to real time.
- *
- * Note that every child class must implement step(). If you design your own wrapper
- * thread with multiple objects that inherit the thread interface, you can call
- * all step functions consecutively and also pass measured time to each step function
- * to fulfill real-time constraints.
- *
- * \todo Use units instead of doubles
+ *@see LoopedThread, CallFunctionInThread
  */
 class cedar::aux::ThreadWrapper : public QObject,
                                   virtual public cedar::aux::Configurable
@@ -111,19 +78,7 @@ class cedar::aux::ThreadWrapper : public QObject,
   //----------------------------------------------------------------------------
 public:
 
-  /*!@brief Constructor with step size parameter.
-   *
-   * This constructor creates a ThreadWrapper with certain time interval
-   * (stepSize) in which the step() function is called.
-   *
-   * If stepSize == 0 the step() function is called as fast as possible with a
-   * short idle time in between to keep the system responsive.
-   *
-   * @param stepSize time window for each step function in milliseconds
-   * @param idleTime idle time (in milliseconds) used in fast running mode (i.e. stepSize = 0)
-   * @param simulatedTime a fixed time that is sent to all connected Triggerables regardless of real execution time
-   * @param mode the operational mode of this trigger
-   */
+  //! constructor
   ThreadWrapper();
 
   //!@brief Destructor
@@ -134,29 +89,51 @@ public:
   //----------------------------------------------------------------------------
 public:
 
-  /*!@brief Stops the thread.
+  /*! stop the thread and wait for the worker to finish.
    *
-   * Since the thread might be busy executing step(), it makes sense to wait a
-   * moment for the thread to finish its work.
+   * stop() will block the execution and return after the worker thread
+   * has finished (or timeout expired).
    *
-   * @param timeout the max. time to wait for the thread (in milliseconds).
-   * @param suppressWarning by default a warning about occurring timing problems will be given
+   * This method is thread-safe.
+   * Re-entry or calling stop() twice will be detected and will 
+   * abort be ignored.
+   *
+   *@param timeout: a value != 0 will abort waiting on the worker thread after
+   *        the timeout-period. Use with caution.
+   *@param suppressWarning: will be passed to applyStop()
    */
-  void stop(unsigned int timeout = 500, bool suppressWarning = false); // TODO: say it is thread-safe and re-entry will abort with a warning
+  void stop(unsigned int timeout = 500, bool suppressWarning = false); 
 
-  void start(); // TODO: manpage TODO: say it is thread-safe and re-entry will abort with a warning
-  bool isRunning() const; // TODO manpage, TODO: say it is thread-safe
-
-  // TODO: manpage
-  void requestStop();
-  /*!@brief Returns true if the thread is running but stop() was called.
+  /*! start the thread and initialize the worker
    *
+   * This method is thread-safe.
+   * Re-entry or calling start() twice will be detected and will 
+   * abort with a cedar-warning.
+   */
+  void start(); 
+
+  //! is the thread still running? Is thread-safe.
+  bool isRunning() const; 
+
+  /*!Tell the thread to abort as soon as possible
+   *
+   * This method does not block as it only registers the stop request.
+   * If you wish to really stop the thread, use stop().
+   * This method is thread-safe.
+   * 
+   *@see: stopRequested(), stop()
+   */
+  void requestStop();
+
+  /*!@brief Returns true if a stop request was sent. 
+   *
+   * This method is thread-safe.
+   *@see: requestStop
    */
   bool stopRequested();
 
 
-// js: changed signature. now more like QT
-//  inline void wait(int i = 0)
+  //! wait for the thread to finish
   inline bool wait(unsigned long time = 0)
   {
     bool ret = false;
@@ -173,17 +150,16 @@ public:
   }
 
 public slots:
-  void quittedThreadSlot(); // TODO: manpage: "runs in the new thread"
-  void startedThreadSlot(); // TODO: manpage: "runs in the first thread"
-  void finishedWorkSlot();  // TODO: manpage: "runs in the new thread"
+  //! slot called when thread finishes. context: the new thread
+  void quittedThreadSlot(); 
+  //! slot called when thread starts, context: the calling thread
+  void startedThreadSlot();
+  //! slot called when the worker finishes, context: the new thread
+  void finishedWorkSlot();
 
 signals:
+  //! signal is emitted when the worker normally finished its work.
   void finishedThread();
-
-  //----------------------------------------------------------------------------
-  // protected methods
-  //----------------------------------------------------------------------------
-protected:
 
 
   //----------------------------------------------------------------------------
@@ -204,27 +180,53 @@ private:
    */
   virtual cedar::aux::detail::ThreadWorker* resetWorker() = 0;
 
-  virtual void applyStop(bool suppressWarning); // context: the old thread, guaranteed that the worker still exists. called while the thread may still be running, but after the requestStop-flag has been set.
-  virtual void applyStart(); // context: the holding thread. guaranteed that  the worker class already exists. called before the thread starts.
+  /*! you may override in child. is called when a thread is about to finish
+   *
+   * Called in context of the holding thread. 
+   * The thread (and worker) may still be executing, but the requestStop
+   * has been set.
+   *
+   * Preconditions: the worker exists and its pointer is still valid.
+   */
+  virtual void applyStop(bool suppressWarning); 
 
-  bool validWorker() const; // thread-UN-safe
-  bool validThread() const; // thread-UN-safe
-  bool isRunningUnlocked() const; // is NOT thread-safe
+  /*! you may override in child. is called when a thread is about to start
+   *
+   * Called in context of the holding thread. 
+   *
+   * Preconditions: the worker exists and its pointer is still valid.
+   */
+  virtual void applyStart();
+
+  //! is the worker (still) in memory? thread-un-safe
+  bool validWorker() const;
+  //! is the thread (still) in memory? thread-un-safe
+  bool validThread() const; 
+  //! unblocked, thread-un-safe version of isRunning()
+  bool isRunningUnlocked() const; 
 
   //----------------------------------------------------------------------------
   // members
   //----------------------------------------------------------------------------
 private:
+  //! the new thread's QThread holding object
   QThread* mpThread;
     // inentionally a raw pointer. will be destroyed via QT's deleteLater()
+
+  //! are we currently destructing?
   mutable bool mDestructing; 
+  //! catch double destructs
   mutable QMutex mDestructingMutex;
+  //! lock for the quittedThreadSlot
   mutable QMutex mFinishedThreadMutex;
+  //! lock for start() and stop()
   mutable QReadWriteLock mGeneralAccessLock;
+  //! lock for mStopRequested
   mutable QReadWriteLock mStopRequestedLock;
 
   //!@brief stop is requested
   bool mStopRequested; 
+  //! keep a raw pointer of my worker
   cedar::aux::detail::ThreadWorker* mpWorker;
     // inentionally a raw pointer. will be destroyed via QT's deleteLater()
 

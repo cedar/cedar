@@ -58,7 +58,19 @@
 #include <QReadWriteLock>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
-
+/*!@brief This class wraps a function call into a thread.
+ *
+ * This class allows you to execute a function (accessed via a pointer
+ * to the function) in a thread.
+ * The thread ends when the function returns.
+ *
+ * The function needs to return void and have no parameters.
+ *
+ * The current implementation of CallFunctionInThread uses QT threads and needs a
+ * running main event loop, i.e. you must start a Q(Core)Application's exec().
+ * 
+ * Pass a pointer to the function callback in CallFunctionInThread's constructor. When you start() the CallFunctionInThread object, a new thread will spawn and execute your function callback.
+ */
 class cedar::aux::CallFunctionInThread : public cedar::aux::ThreadWrapper
 {
   //----------------------------------------------------------------------------
@@ -72,6 +84,7 @@ public:
   // typedefs
   //----------------------------------------------------------------------------
 
+  //! the type we use to store function calls
   typedef std::function< void(void) > FunctionType;
 
   //----------------------------------------------------------------------------
@@ -79,6 +92,12 @@ public:
   //----------------------------------------------------------------------------
 public:
 
+  /*! Construct a new CallFunctionInThread.
+   *
+   * Start the thread via start().
+   *
+   *@param fun is a std::function< void(void) > and thus can be a function pointer or function object.
+   */
   CallFunctionInThread(FunctionType fun);
 
   //!@brief Destructor
@@ -89,35 +108,28 @@ public:
   //----------------------------------------------------------------------------
 public:
 
-
-  //----------------------------------------------------------------------------
-  // protected methods
-  //----------------------------------------------------------------------------
-protected:
-
   //----------------------------------------------------------------------------
   // private methods
   //----------------------------------------------------------------------------
 private:
+  //! function that executes the stored function pointer
   void call();
 
+  //! overwritten method. return a new worker pointer
   cedar::aux::detail::ThreadWorker* resetWorker();
 
   //----------------------------------------------------------------------------
   // members
   //----------------------------------------------------------------------------
-protected:
-
 private:
+  //! the call-back
   FunctionType mFunction;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
 private:
+  //! the worker pointer
   cedar::aux::detail::CallFunctionInThreadWorker* mpWorker;
 }; // class cedar::aux::CallFunctionInThread
 

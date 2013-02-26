@@ -55,21 +55,31 @@
 #include <QThread>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
+/*!The worker base class that goes with ThreadWrapper
+ *
+ * Implementors should not use this.
+ *@see LoopedThread, CallFunctionInThread
+ */
 class cedar::aux::detail::ThreadWorker : public QObject
 {
   Q_OBJECT
 
   public: 
+    //! constructor
     ThreadWorker();
+    //! destructor
     virtual ~ThreadWorker();
 
   private:
+    //! children will do the work, here
     virtual void work() = 0;
 
   public slots:
+    //! slot to start the work in the new thread
     void workSlot();
 
   signals:
+    //! slot that signals that work() has ended.
     void finishedWorking();
 };
 
