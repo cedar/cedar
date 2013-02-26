@@ -75,6 +75,12 @@ class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::Thread
     // check whether a stop has been requested
     bool safeStopRequested();
 
+    //! set the step start time
+    void setLastTimeStepStart(const boost::posix_time::ptime& time);
+    //! set the step end time
+    void setLastTimeStepEnd(const boost::posix_time::ptime& time);
+
+
   public:
     //! overwritten method that does the actual work
     void work();
