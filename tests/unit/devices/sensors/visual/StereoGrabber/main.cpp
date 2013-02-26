@@ -143,8 +143,8 @@ int main(int , char **)
 
   try
   {
-    pGrabber->setFps(40);
-    if (pGrabber->getFps() != 40)
+    pGrabber->setFramerate(40);
+    if (pGrabber->getFramerate() != 40)
     {
       throw ( -1 );
     }
@@ -159,7 +159,7 @@ int main(int , char **)
   std::cout << "test no " << test_number++ <<": getFpsMeasured()" << std::endl;
   try
   {
-    pGrabber->getFpsMeasured();
+    pGrabber->getMeasuredFramerate();
   }
   catch (...)
   {
@@ -184,7 +184,7 @@ int main(int , char **)
   //test number of channels
   std::cout << "test no " << test_number++ <<": getNumCams" << std::endl;
 
-  if (pGrabber->getNumCams() != 2 )
+  if (pGrabber->getNumChannels() != 2 )
   {
     std::cout << "error" << std::endl;
     errors++;

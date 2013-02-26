@@ -236,7 +236,7 @@ int main(int argc, char* argv[])
     //status
     if (!(++counter_stat %= 100))
     {
-      std::cout << "Measured FPS: " << p_grabber->getFpsMeasured() << std::endl;
+      std::cout << "Measured FPS: " << p_grabber->getMeasuredFramerate() << std::endl;
     }
 
     // watch the output - everything should be fine.

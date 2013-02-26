@@ -147,7 +147,7 @@ int main(int argc, char* argv[])
 
   // you have to check if the framerate is supported by the used camera
   // on firewirecameras only supperted framerates could be set
-  p_grabber->setCameraFps(0,cedar::dev::sensors::camera::FrameRate::FPS_15);
+  p_grabber->setCameraFramerate(0,cedar::dev::sensors::camera::FrameRate::FPS_15);
 
 
   //----------------------------------------------------------------------------------------
@@ -191,8 +191,8 @@ int main(int argc, char* argv[])
   cedar::dev::sensors::camera::VideoMode::Id mode = p_grabber->getCameraVideoMode(0);
   std::cout << " (" << cedar::dev::sensors::camera::VideoMode::type().get(mode).name() << ")" << std::endl;
 
-  std::cout << "\tCamera FPS  :\t" << p_grabber->getCameraFps(0);
-  cedar::dev::sensors::camera::FrameRate::Id fps = p_grabber->getCameraFps(0);
+  std::cout << "\tCamera FPS  :\t" << p_grabber->getCameraFramerate(0);
+  cedar::dev::sensors::camera::FrameRate::Id fps = p_grabber->getCameraFramerate(0);
   std::cout << " (" << cedar::dev::sensors::camera::FrameRate::type().get(fps).name() << ")" << std::endl;
 
 #ifdef USE_FIREWIRE_BACKEND
@@ -295,7 +295,7 @@ int main(int argc, char* argv[])
   //----------------------------------------------------------------------------------------
   //start the grabber-thread for updating camera images with 30 fps
   //----------------------------------------------------------------------------------------
-  p_grabber->setFps(30);
+  p_grabber->setFramerate(30);
   std::cout << "Start grabbing in the background" << std::endl;
   p_grabber->startGrabber();
 
@@ -334,7 +334,7 @@ int main(int argc, char* argv[])
     if (! (++counter %= 200))
     {
       //display real reached fps
-      std::cout << "Thread FPS: " << p_grabber->getFpsMeasured() << std::endl;
+      std::cout << "Thread FPS: " << p_grabber->getMeasuredFramerate() << std::endl;
     }
 
     cedar::aux::sleep(cedar::unit::Milliseconds(1));
