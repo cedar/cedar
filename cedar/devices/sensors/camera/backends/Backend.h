@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/SetParameter.h"
 #include "cedar/devices/sensors/camera/Properties.h"
 #include "cedar/devices/sensors/camera/Channel.h"
+#include "cedar/devices/sensors/camera/exceptions.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -85,13 +86,16 @@ public:
    *  min/max values or supported features from the wanted Backend and set them in the channel structure.
    *  This method is called before createCaptureBackend() is invoked.
    *
+   *  @throw cedar::dev::sensors::camera::CreateBackendException Thrown, if the backend couldn't be created
+   *
    */
   virtual void init() = 0;
 
   /*! @brief Initialization of the class
    *
    *  This function have to be called after the class was created.
-   *  @throw CreateBackendException This exception is thrown, if the cameras could not initialized
+   *  @throw cedar::dev::sensors::camera::CreateBackendException This exception is thrown,
+   *         if the cameras could not initialized
    */
   void createCaptureBackend();
 

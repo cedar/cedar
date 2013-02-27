@@ -245,16 +245,18 @@ int main(int argc, char* argv[])
   cedar::dev::sensors::camera::Property::Id prop_id;
   prop_id = cedar::dev::sensors::camera::Property::PROP_BRIGHTNESS;
 
-
-  if (p_grabber->setPropertyMode(0,prop_id,cedar::dev::sensors::camera::PropertyMode::MANUAL))
+  try
   {
-    bool test = p_grabber->setProperty(prop_id, 100);
+    p_grabber->setPropertyMode(0,prop_id,cedar::dev::sensors::camera::PropertyMode::MANUAL);
+    p_grabber->setProperty(prop_id, 100);
     std::cout << "Set " << cedar::dev::sensors::camera::Property::type().get(prop_id).name()
-              << " to " << 100
-              << ": Result: " << std::boolalpha << test << std::endl;
-    std::cout << "Value after: " << p_grabber->getProperty(prop_id) << std::endl;
-    std::cout << "Raw value from camera: " << p_grabber->getPropertyValue(0,prop_id) << std::endl;
-
+              << " to 100\n"
+              << "Value after (from backend): " << p_grabber->getProperty(prop_id) << std::endl
+              << "Raw value   (from camera) : " << p_grabber->getPropertyValue(0,prop_id) << std::endl;
+  }
+  catch(cedar::dev::sensors::camera::PropertyNotSetException& e)
+  {
+    std::cout << "ERROR: " << e.getMessage();
   }
 
 
