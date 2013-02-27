@@ -127,9 +127,9 @@ public:
    *
    * @param propertyId The Id of the property as cedar::dev::sensors::camera::Property::Id
    * @param value The value to set the property
-   * @return true if the property could be set, otherwise false
+   * @throw cedar::dev::sensors::camera::PropertyNotSetException Thrown, if property could not set
    */
-  bool setProperty(cedar::dev::sensors::camera::Property::Id propertyId, double value);
+  void setProperty(cedar::dev::sensors::camera::Property::Id propertyId, double value);
 
   /*! get the value from the cv::VideoCapture object with respect to capabilities and settings
    *
@@ -204,9 +204,9 @@ public:
   /*! @brief Set the mode of the wanted property
    *  @param propertyId The id of the property
    *  @param modeId the new mode
-   *  @return True if new value is properly set
+   *  @throw cedar::dev::sensors::camera::PropertyNotSetException Thrown, if property mode could not set
    */
-  bool setPropertyMode
+  void setPropertyMode
   (
     cedar::dev::sensors::camera::Property::Id propertyId,
     cedar::dev::sensors::camera::PropertyMode::Id modeId
@@ -268,9 +268,9 @@ protected:
    *
    *  @param propertyId The OpenCV constants for cv::VideoCapture.set() method
    *  @param value The new value
-   *  @return Boolean value, that indicates if the value is properly set
+   *  @throw cedar::dev::sensors::camera::PropertyNotSetException Thrown, if the value is not properly set
    */
-  bool setPropertyToCamera(unsigned int propertyId, double value);
+  void setPropertyToCamera(unsigned int propertyId, double value);
 
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -47,26 +47,22 @@
 
 
 
-/*!@brief Exception when a property is not supported by the used backend
- */
+/*!@brief Exception when a property is not supported by the used backend  */
 class cedar::dev::sensors::camera::PropertyNotSupportedException : public cedar::aux::ExceptionBase
 {
 };
 
-/*!@brief Exception when a property could not set in the backend device
- */
+/*!@brief Exception when a property could not set in the backend device */
 class cedar::dev::sensors::camera::PropertyNotSetException : public cedar::aux::ExceptionBase
 {
 };
 
-/*!@brief Exception when the used cv::VideoCapture object is not working
- */
+/*!@brief Exception when the used cv::VideoCapture object is not working */
 class cedar::dev::sensors::camera::VideoCaptureNotOpenedException : public cedar::aux::ExceptionBase
 {
 };
 
-/*!@brief Exception when the camera backend could not be created
- */
+/*!@brief Exception when the camera backend could not be created */
 class cedar::dev::sensors::camera::CreateBackendException : public cedar::aux::ExceptionBase
 {
 };
@@ -74,15 +70,18 @@ class cedar::dev::sensors::camera::CreateBackendException : public cedar::aux::E
 
 #ifdef CEDAR_USE_LIB_DC1394
 
-/*!@brief Exception on an error while initializing the LibDc class
- */
+/*!@brief Exception on an error while initializing the LibDc class  */
 class cedar::dev::sensors::camera::LibDcInitException : public cedar::aux::ExceptionBase
 {
 };
 
-/*!@brief Exception on an error while using the LibDc class
- */
+/*!@brief Exception on an error while using the LibDc class */
 class cedar::dev::sensors::camera::LibDcException : public cedar::aux::ExceptionBase
+{
+};
+
+/*!@brief Exception on an error while using the LibDc class, camera not found */
+class cedar::dev::sensors::camera::LibDcCameraNotFoundException : public cedar::aux::ExceptionBase
 {
 };
 

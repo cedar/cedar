@@ -45,7 +45,6 @@
 #include "cedar/devices/sensors/visual/exceptions.h"
 #include "cedar/devices/sensors/camera/Grabber.h"
 #include "cedar/devices/sensors/camera/enums/Setting.h"
-#include "cedar/devices/sensors/camera/exceptions.h"
 #include "cedar/devices/sensors/camera/backends/BackendCvVideoCapture.h"
 
 
@@ -298,55 +297,32 @@ void cedar::dev::sensors::camera::Grabber::onCreateGrabber()
 #endif
 
   // create capture device, which depends on the chosen backend
-  std::string msg = "";
-  try
+  for (unsigned int channel = 0; channel < num_channels; ++channel)
   {
-    for (unsigned int channel = 0; channel < num_channels; ++channel)
+    try
     {
-      //backend already created on initialization, but destroyed on onApplyParameter()/onCreateGrabber()
+      // backend already created on initialization, but destroyed on onApplyParameter()/onCreateGrabber()
+      // so create it again, if it was already destroyed
       if (!getCameraChannel(channel)->mpBackend)
       {
+       //throws a cedar::dev::sensors::camera::CreateBackendException
        getCameraChannel(channel)->createBackend();
-#ifdef DEBUG_CAMERA_GRABBER
-       std::cout << "\tBackend recreated" << std::endl;
-#endif
       }
 
-      // create backend
-      try
-      {
-        getCameraChannel(channel)->mpBackend->createCaptureBackend();
-        setChannelInfoString(channel,this->onGetSourceInfo(channel));
-      }
-      catch(cedar::dev::sensors::camera::CreateBackendException)
-      {
-        if (msg != "")
-        {
-          msg += "\n";
-        }
-        msg = msg + "Channel " + boost::lexical_cast<std::string>(channel) + ": Could not create Backend";
-      }
+      // create capture device
+      //throws a cedar::dev::sensors::camera::CreateBackendException
+      getCameraChannel(channel)->mpBackend->createCaptureBackend();
+      setChannelInfoString(channel,this->onGetSourceInfo(channel));
 
       // Backend device not longer used. Channel::mVideoCapture does the job
       getCameraChannel(channel)->mpBackend.reset();
     }
-  }
-  catch (std::exception& e)
-  {
-    if (msg != "")
+    catch(cedar::dev::sensors::camera::CreateBackendException& e)
     {
-      msg += "\n";
+      std::string msg = this->getName() + " Channel " + boost::lexical_cast<std::string>(channel)
+                          + ": " + e.getMessage();
+      CEDAR_THROW(cedar::dev::sensors::visual::CreateGrabberException,msg)
     }
-    msg = msg + "Exception catched: \"" + e.what() + "\"";
-  }
-
-#ifdef DEBUG_CAMERA_GRABBER
-  std::cout << __PRETTY_FUNCTION__ << " end" << std::endl;
-#endif
-
-  if (msg != "")
-  {
-    CEDAR_THROW(cedar::dev::sensors::visual::CreateGrabberException,msg)
   }
 }
 
@@ -554,6 +530,7 @@ bool cedar::dev::sensors::camera::Grabber::isGuid(unsigned int channel) const
 //----------------------------------------------------------------------------------------------------
 double cedar::dev::sensors::camera::Grabber::getProperty(unsigned int channel, Property::Id propId)
 {
+  //!@ todo: throw exceptions instead of returning constants for special values
   if (channel >= getNumChannels())
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException,buildChannelErrorMessage(channel));
@@ -579,6 +556,7 @@ double cedar::dev::sensors::camera::Grabber::getProperty(unsigned int channel, P
 //----------------------------------------------------------------------------------------------------
 double cedar::dev::sensors::camera::Grabber::getPropertyValue(unsigned int channel,Property::Id propId)
 {
+  //!@ todo: throw exceptions instead of returning constants for special values
   if (channel >= getNumChannels())
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException,buildChannelErrorMessage(channel));
@@ -613,7 +591,7 @@ double cedar::dev::sensors::camera::Grabber::getProperty(Property::Id propId)
 }
 
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::camera::Grabber::setProperty
+void cedar::dev::sensors::camera::Grabber::setProperty
 (
   unsigned int channel,
   Property::Id propId,
@@ -625,15 +603,19 @@ bool cedar::dev::sensors::camera::Grabber::setProperty
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException,buildChannelErrorMessage(channel));
   }
 
+  /*
   std::string prop = Property::type().get(propId).prettyString();
-  std::string info = boost::lexical_cast<std::string>(boost::math::iround(value));
+  std::string info = boost::lexical_cast<std::string>(value);
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
                                              this->getName() + ": try to set " + prop + " to " + info,
                                              "cedar::dev::sensors::camera::Grabber::setCameraProperty()"
                                            );
+*/
 
-  return getCameraChannel(channel)->mpProperties->setProperty(propId, value);
+  // throws cedar::dev::sensors::camera::PropertyNotSetException if property could not set
+  //std::cout << __PRETTY_FUNCTION__ << std::endl;
+  getCameraChannel(channel)->mpProperties->setProperty(propId, value);
 }
 
 
@@ -650,20 +632,22 @@ cedar::dev::sensors::camera::PropertyMode::Id cedar::dev::sensors::camera::Grabb
 
 
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::camera::Grabber::setPropertyMode
+void cedar::dev::sensors::camera::Grabber::setPropertyMode
 (
   unsigned int channel,
   cedar::dev::sensors::camera::Property::Id propId,
   cedar::dev::sensors::camera::PropertyMode::Id modeId
 )
 {
-  return getCameraChannel(channel)->mpProperties->setPropertyMode(propId, modeId);
+  //std::cout << __PRETTY_FUNCTION__ << std::endl;
+  // throws cedar::dev::sensors::camera::PropertyNotSetException if property could not set
+  getCameraChannel(channel)->mpProperties->setPropertyMode(propId, modeId);
 }
 
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::camera::Grabber::setProperty(Property::Id propId, double value)
+void cedar::dev::sensors::camera::Grabber::setProperty(Property::Id propId, double value)
 {
-  return setProperty(0,propId, value);
+  setProperty(0,propId, value);
 }
 
 //----------------------------------------------------------------------------------------------------

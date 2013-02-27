@@ -55,13 +55,13 @@
  *
  *    It is only used for the CameraGrabber
  *
- * \remarks: Opens the bus and handles the firewire device context handle.<br>
- *  USAGE:
- *    1. scan bus
- *    2. select device
- *    3. open it
- *    4. work with opened device
- *    5. close device
+ * @remarks: Opens the bus and handles the firewire device context handle.<br>
+ *  USAGE:<br>
+ *    1. scan bus<br>
+ *    2. select device<br>
+ *    3. open it<br>
+ *    4. work with opened device<br>
+ *    5. close device<br>
  */
 class cedar::dev::sensors::camera::LibDcBase
 {
@@ -87,32 +87,32 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  ///! Release all Handles and memory
+  //! Release all Handles and memory
   void cleanUp();
   
-  ///! After creation of the class, this method gives the camera count
+  //! After creation of the class, this method gives the camera count
   unsigned int getNumCams();
   
-  ///! Gives the GUID of given camera. Returns 0 if unsupported camNr
+  //! Gives the GUID of given camera. Returns 0 if unsupported camNr
   uint64_t getCamGuid(unsigned int camNr);
 
-  ///! Print out all features of the currently opened camera
+  //! Print out all features of the currently opened camera
   void printAllFeatures();
   
  
   // camera methods:
 
-  ///! Open a given camera. Methods like getCamFeatures rely on an opend camera.
+  //! Open a given camera. Methods like getCamFeatures rely on an opend camera.
   //   This is the first command if you want to get informations on a specific device
   bool openCamera(uint64_t camGuid);
   
-  ///! Close actual opened camera. Call this method at the end of your work
+  //! Close actual opened camera. Call this method at the end of your work
   //   or just before you like to open another camera
   void closeCamera();
   
 
   /*! Get the names of all features of a camera
-   * \returns An empty vector, if no camera was opened before
+   * @return An empty vector, if no camera was opened before
    *
    */
   std::string getAllFeaturesAsString();
@@ -120,7 +120,7 @@ public:
 
   /*! Returns a libdc1394 featureset with all features and all informations about that features
    *
-   * \returns A libdc1394 struct of all supported video modes.
+   * @return A libdc1394 struct of all supported video modes.
    *  If there wasn't a camera opened,
    *  then all fields of the struct are set to zero
    */
@@ -129,7 +129,7 @@ public:
 
   /*! Returns all supported video modes
    *
-   * \returns A libdc1394 struct of all supported video modes.
+   * @return A libdc1394 struct of all supported video modes.
    *  If there wasn't a camera opened,
    *  then all fields of the struct are set to zero
    *
@@ -138,9 +138,9 @@ public:
   
   /*! Returns a libdc1394 struct of all supported framerates of the given grabbing mode
    *
-   * \param mode The wanted grabbing mode as a constant of the dc1394video_mode_t enum
+   * @param mode The wanted grabbing mode as a constant of the dc1394video_mode_t enum
    *
-   * \returns A libdc1394 struct of all supported video modes.
+   * @return A libdc1394 struct of all supported video modes.
    *  If there wasn't a camera opened,
    *  then all fields of the struct are set to zero
    */
@@ -149,28 +149,28 @@ public:
  
   // utility methods
     
-  ///! Translate a DC1394-int-framerate to a string
+  //! Translate a DC1394-int-framerate to a string
   std::string DC1394FrameRateToString(dc1394framerate_t framerate) const;
   
-  ///! Translate a DC1394-int-mode to a string
+  //! Translate a DC1394-int-mode to a string
   std::string DC1394VideoModeToString(dc1394video_mode_t mode) const;
   
-  ///! Translate a DC1394-int-feature to a string
+  //! Translate a DC1394-int-feature to a string
   std::string DC1394FeatureToString(dc1394feature_t feature) const;
   
-  ///! Translate a DC1394-int-feature to a CameraGrabber property string
-  //   features not supported by the backend will return an empty string
+  //! Translate a DC1394-int-feature to a CameraGrabber property string
+  //!   features not supported by the backend will return an empty string
   std::string DC1394FeatureToCameraGrabberPropertyString(dc1394feature_t feature) const;
 
-  ///! Returns the last error string
+  //! Returns the last error string
   std::string getErrorString() const;
 
-  ///! Reset the the actual opened camera
-  //   A camera have to be opened before you can do this
+  //! Reset the the actual opened camera
+  //!   A camera have to be opened before you can do this
   bool resetCam();
   
-  ///! Reset the firewire bus
-  //   a camera have to be opened before you can do this
+  //! Reset the firewire bus
+  //!   a camera have to be opened before you can do this
   bool resetFwBus();
 
 
@@ -191,16 +191,16 @@ private:
 protected:
   // none yet
 private:
-  ///! Firewire bus context
+  //! Firewire bus context
   dc1394_t* mpFwContext;
   
-  ///! List of all available cameras
+  //! List of all available cameras
   dc1394camera_list_t* mpCameraList;
   
-  ///! The actual opened Camera
+  //! The actual opened Camera
   dc1394camera_t* mpCamera;
   
-  ///! Last error
+  //! Last error
   dc1394error_t mError;
   
   

@@ -135,6 +135,7 @@ namespace cedar
 #ifdef CEDAR_USE_LIB_DC1394
         class LibDcInitException;
         class LibDcException;
+        class LibDcCameraNotFoundException;
 #endif //CEDAR_USE_LIB_DC1394
 
         //!@endcond
