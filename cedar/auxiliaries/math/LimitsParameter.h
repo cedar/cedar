@@ -84,6 +84,7 @@ public:
   }
 
   //!@brief the constructor
+  CEDAR_DECLARE_DEPRECATED(
   LimitsParameter
   (
     cedar::aux::Configurable* pOwner,
@@ -92,9 +93,11 @@ public:
     const T& defaultLowerLimitMaximum,
     const T& defaultUpperLimitMinimum,
     const T& defaultUpperLimitMaximum
-  )
+  ))
   :
   cedar::aux::Parameter(pOwner, name),
+  mLowerLimitDefault(defaultLowerLimitMinimum),
+  mUpperLimitDefault(defaultUpperLimitMinimum),
   mLowerLimitMinimum(defaultLowerLimitMinimum),
   mLowerLimitMaximum(defaultLowerLimitMaximum),
   mUpperLimitMinimum(defaultUpperLimitMinimum),
