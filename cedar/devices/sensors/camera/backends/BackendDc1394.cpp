@@ -120,18 +120,23 @@ void cedar::dev::sensors::camera::BackendDc1394::createCaptureObject()
 
   // the BusID or the GUID
   unsigned int cam_id = mpCameraChannel->getCameraId();
+  unsigned int bus_id = 0;
 
   // if GUID, search for bus-ID
   if (mpCameraChannel->getByGuid())
   {
     try
     {
-      cam_id = this->getBusIdFromGuid(cam_id);
+      bus_id = this->getBusIdFromGuid(cam_id);
     }
     catch(cedar::dev::sensors::camera::LibDcCameraNotFoundException& e)
     {
       CEDAR_THROW(cedar::dev::sensors::camera::CreateBackendException,e.getMessage());
     }
+  }
+  else
+  {
+    bus_id = cam_id;
   }
 
   if (mpLibDcInterface)
@@ -143,12 +148,14 @@ void cedar::dev::sensors::camera::BackendDc1394::createCaptureObject()
   }
 
   //open camera with OpenCv VideoCapture class
-  cv::VideoCapture capture(cam_id);
+  cv::VideoCapture capture(bus_id);
 
   // throw an exception if not successful
   if(!capture.isOpened())
   {
-    CEDAR_THROW(cedar::dev::sensors::camera::CreateBackendException,"Error: Couldn't create capture object");
+    std::string msg = "Error: Couldn't create capture object with camera from Bus-ID "
+                        + boost::lexical_cast<std::string>(bus_id);
+    CEDAR_THROW(cedar::dev::sensors::camera::CreateBackendException,msg);
   }
 
   mpCameraChannel->mVideoCapture = capture;
