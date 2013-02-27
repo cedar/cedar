@@ -42,8 +42,11 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/camera/namespace.h"
+#include "cedar/auxiliaries/IntParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/devices/sensors/visual/Grabber.h"
+#include "cedar/devices/sensors/camera/namespace.h"
+#include "cedar/devices/sensors/camera/exceptions.h"
 #include "cedar/devices/sensors/camera/enums/IsoSpeed.h"
 #include "cedar/devices/sensors/camera/enums/Property.h"
 #include "cedar/devices/sensors/camera/enums/VideoMode.h"
@@ -51,22 +54,8 @@
 #include "cedar/devices/sensors/camera/enums/Decoding.h"
 #include "cedar/devices/sensors/camera/Properties.h"
 #include "cedar/devices/sensors/camera/Channel.h"
-#include "cedar/auxiliaries/IntParameter.h"
-#include "cedar/auxiliaries/BoolParameter.h"
-
-
-// backends
 #include "cedar/devices/sensors/camera/backends/BackendType.h"
 #include "cedar/devices/sensors/camera/backends/Backend.h"
-//#include "cedar/devices/sensors/camera/backends/DeviceCvVideoCapture.h"
-//
-//#ifdef CEDAR_USE_VIDEO_FOR_LINUX
-//#include "cedar/devices/sensors/camera/backends/DeviceVfl.h"
-//#endif // CEDAR_USE_VIDEO_FOR_LINUX
-//
-//#ifdef CEDAR_USE_LIB_DC1394
-//#include "cedar/devices/sensors/camera/backends/DeviceDc1394.h"
-//#endif // CEDAR_USE_LIB_DC1394
 
 // SYSTEM INCLUDES
 
@@ -236,38 +225,40 @@ public:
    *  @param propId This is any known property-Id from class Property
    *  @param modeId This is the new mode
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
-   *  @return Returns True if the mode is set successfully
+   *  @throw cedar::dev::sensors::camera::PropertyNotSetException Thrown, if property mode could not set
    */
-  bool setPropertyMode
+  void setPropertyMode
   (
     unsigned int channel,
     cedar::dev::sensors::camera::Property::Id propId,
     cedar::dev::sensors::camera::PropertyMode::Id modeId
   );
 
-  /*!  @brief With this method, it is possible to set a property
-   *   @param channel This is the index of the source you want to set the parameter value.
-   *   @param propId This is any known property-Id<br>
-   *     If property-id is not supported or unknown, return value will be false.
-   *   @param value This is the new value.
-   *   @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
-   *   @see Property
+  /*!@brief With this method, it is possible to set a property
+   * @param channel This is the index of the source you want to set the parameter value.
+   * @param propId This is any known property-Id<br>
+   *   If property-id is not supported or unknown, return value will be false.
+   * @param value This is the new value.
+   * @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+   * @throw cedar::dev::sensors::camera::PropertyNotSetException Thrown, if property mode could not set
+   * @see Property
    */
-  bool setProperty(unsigned int channel, Property::Id propId, double value);
+  void setProperty(unsigned int channel, Property::Id propId, double value);
   
-  /*!  @brief Set informations on camera 0
-   *   @param propId This is any knoqn property-Id<br>
-   *     If property-id is not supported or unknown, return value will be false.
-   *   @param value This is the new value.
+  /*!@brief Set informations on camera 0
+   * @param propId This is any knoqn property-Id<br>
+   *   If property-id is not supported or unknown, return value will be false.
+   * @param value This is the new value.
+   * @throw cedar::dev::sensors::camera::PropertyNotSetException Thrown, if property mode could not set
    */
-  bool setProperty(Property::Id propId, double value);
+  void setProperty(Property::Id propId, double value);
 
-  /*! @brief Set the video mode of the camera.
+  /*!@brief Set the video mode of the camera.
    *
-   *   This can only be done, if the first frame wasn't already grabbed
-   *  @param channel This is the index of the source you want to set the parameter value.
-   *  @param modeId The new value from class VideoMode
-   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+   *  This can only be done, if the first frame wasn't already grabbed
+   * @param channel This is the index of the source you want to set the parameter value.
+   * @param modeId The new value from class VideoMode
+   * @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    * @see getCameraMode
    */
   void setCameraVideoMode(unsigned int channel, cedar::dev::sensors::camera::VideoMode::Id modeId);

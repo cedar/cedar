@@ -119,7 +119,7 @@ void cedar::proc::sources::GrabberBase::setRecording()
     if (want_recording)
     {
       //record
-      //!@todo:change to speed from looped trigger or grab via grabbing-thread
+      //!@todo: change to speed from looped trigger (not possible to get this) or grab via grabbing-thread
       this->mpGrabber->startRecording(15,0,true,false);
       info = "Recording ON";
       cedar::aux::LogSingleton::getInstance()->message(info,"cedar::proc::sources::GrabberSource::setRecording()");

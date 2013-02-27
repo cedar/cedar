@@ -70,13 +70,9 @@ void cedar::dev::sensors::camera::Backend::createCaptureBackend()
   std::cout << __PRETTY_FUNCTION__ << std::endl;
 #endif
 
-
   // lock
   QWriteLocker videocapture_locking(this->mpCameraChannel->mpVideoCaptureLock);
 
-#ifdef DEBUG_CAMERA_GRABBER
-  std::cout << __PRETTY_FUNCTION__ << " Lock: " << this->mpCameraChannel->mpVideoCaptureLock << std::endl;
-#endif
   // close old videoCapture device
   this->mpCameraChannel->mVideoCapture = cv::VideoCapture();
 
@@ -84,75 +80,34 @@ void cedar::dev::sensors::camera::Backend::createCaptureBackend()
   // on error, a cedar::dev::sensors::camera::CreateBackendException will be thrown
   this->createCaptureObject();
 
-#ifdef DEBUG_CAMERA_GRABBER
-  std::cout << __PRETTY_FUNCTION__ << " captue object created" << std::endl;
-#endif
-
-
   // fill p_capabilities with values (depends on backend and camera if this is necessary at this stage)
   getAvailablePropertiesFromCamera();
-
-#ifdef DEBUG_CAMERA_GRABBER
-  std::cout << __PRETTY_FUNCTION__ << " setVideoCaptureObject to channel" << std::endl;
-#endif
 
   // pass the new created capture to the channel structure
   mpCameraChannel->mpProperties->setVideoCaptureObject(mpCameraChannel->mVideoCapture);
 
-#ifdef DEBUG_CAMERA_GRABBER
-  std::cout << __PRETTY_FUNCTION__ << " applySettingsToCamera" << std::endl;
-#endif
-
   // apply settings from p_settings structure
   applySettingsToCamera();
 
-#ifdef DEBUG_CAMERA_GRABBER
-  std::cout << __PRETTY_FUNCTION__ << " applyStateToCamera" << std::endl;
-#endif
-
   // restore state of the device with the values in p_state
   applyStateToCamera();
-
-#ifdef DEBUG_CAMERA_GRABBER
-  std::cout << __PRETTY_FUNCTION__ << " get first image" << std::endl;
-#endif
 
   //get first image
   unsigned int timeout = 0;
   while (! this->mpCameraChannel->mVideoCapture.read(this->mpCameraChannel->mImageMat))
   {
-    #ifdef DEBUG_CAMERA_GRABBER
-      std::cout << __PRETTY_FUNCTION__ << " Try to get an image" << std::endl;
-    #endif
     ++timeout;
     cedar::aux::sleep(cedar::unit::Milliseconds(50));
     if (timeout>100)
     {
-      #ifdef DEBUG_CAMERA_GRABBER
-        std::cout << __PRETTY_FUNCTION__ << " Timeout on cv::VideoCapture.read()!" << std::endl;
-      #endif
       break;
     }
   }
-
-#ifdef DEBUG_CAMERA_GRABBER
-  std::cout << __PRETTY_FUNCTION__ << " image grabbed" << std::endl;
-
-  if (this->mpCameraChannel->mImageMat.empty())
-  {
-    std::cout << __PRETTY_FUNCTION__ << " grabbed image is empty" << std::endl;
-  }
-#endif
-
   // unlock done by the QWriteLocker "videocapture_locking" object
 }
 
 void cedar::dev::sensors::camera::Backend::applyStateToCamera()
 {
-#ifdef DEBUG_CAMERA_GRABBER
-  std::cout << __PRETTY_FUNCTION__ << std::endl;
-#endif
-
   // disable signals for properties when value is updated with the camera-values
   this->mpCameraChannel->mpProperties->blockSignals(true);
 
@@ -184,7 +139,14 @@ void cedar::dev::sensors::camera::Backend::applyStateToCamera()
     default:  //BACKEND_DEFAULT
 
       double set_value = this->getPropertyFromCamera(prop_id);
-      this->mpCameraChannel->mpProperties->setProperty(prop_id,set_value);
+      try
+      {
+        this->mpCameraChannel->mpProperties->setProperty(prop_id,set_value);
+      }
+      catch(cedar::dev::sensors::camera::PropertyNotSetException)
+      {
+        // just ignore such errors, because all possible, but not necessary available, properties are set here
+      }
       this->mpCameraChannel->mpProperties->setDefaultValue(prop_id,set_value);
     }
   }
