@@ -111,7 +111,7 @@ public:
    std::string name = "property",
    double minValue = static_cast<double>(INT_MIN),
    double maxValue = static_cast<double>(INT_MAX),
-   double defaultValue = 128,
+   double defaultValue = 0,
    bool supported = true,
    bool autoCapable = false,
    bool manualCapable = true

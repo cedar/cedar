@@ -81,20 +81,13 @@ protected slots:
 
   /*! @brief A slot that is triggered from the used parameters if a setting has changed
    *
-   *  Internally, the cameraChanged() signal is emitted
+   *  If this slot is invoked, the changeSetting() signal is emitted.
+   *  This slot is internally invoked if one of the fields Framerate, IsoSpeed or the CameraId is changed
    */
   void deviceChanged();
 
-  //! @brief Slot invoked, if the framerate is changed
-  void fpsChanged();
-
   //! @brief Slot invoked, if the grabmode is changed
   void grabModeChanged();
-
-#ifdef CEDAR_USE_LIB_DC1394
-  //! @brief Slot invoked, if the isospeed is changed
-  void isoSpeedChanged();
-#endif
 
 signals:
 
@@ -127,7 +120,7 @@ signals:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /// The standard constructor.
+  //! The standard constructor.
   Channel
   (
    unsigned int cameraId = 0,
@@ -135,7 +128,7 @@ public:
    cedar::dev::sensors::camera::BackendType::Id backendType = cedar::dev::sensors::camera::BackendType::AUTO,
    cedar::dev::sensors::camera::Decoding::Id decodeFilter = cedar::dev::sensors::camera::Decoding::NONE
  );
-  /// Destructor
+  //! Destructor
   ~Channel();
 
 
@@ -144,16 +137,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  // bool setSetting(cedar::dev::sensors::camera::Setting::Id settingId, double value);
-  // double getSetting(cedar::dev::sensors::camera::Setting::Id settingId);
-
   /*! @brief Get the ID of the used Camera
    *
    * @return The id as unsigned int
    */
   unsigned int getCameraId() const;
 
-  /// @brief Flag to indicate, if the grabber was created by using the GUID of the camera
+  //! @brief Flag to indicate, if the grabber was created by using the GUID of the camera
   bool getByGuid() const;
 
   /*! @brief Get the actual used video mode of the camera
@@ -229,17 +219,20 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
 
-  /// Method to all Videomodes related to DC1394 in the VideoMode enum parameter to disabled
+  //! Method to all Videomodes related to DC1394 in the VideoMode enum parameter to disabled
   void hideFwVideoModes();
 
-  /// Method to create the wanted backend which depends on the Backend enum parameter
+  /*! @brief Method to create the wanted backend which depends on the Backend enum parameter
+   *  @throw cedar::dev::sensors::camera::CreateBackendException Thrown on an error, for example if the
+   *         camera could not be found
+   */
   void createBackend();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /// Camera interface
+  //! Camera interface
   cv::VideoCapture mVideoCapture;
 
   /*!@brief The lock for the concurrent access to the cv::VideoCapture.
@@ -259,7 +252,7 @@ protected:
 
 private:
 
-  /// The actual used backend for the camera
+  //! The actual used backend for the camera
   cedar::dev::sensors::camera::BackendType::Id mBackendType;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -267,31 +260,31 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  /// The backend to use
+  //! The backend to use
   cedar::aux::EnumParameterPtr _mpBackendType;
 
-  /// Set the the camera bayer pattern filter (if any is needed)
+  //! Set the the camera bayer pattern filter (if any is needed)
   cedar::aux::EnumParameterPtr _mpDecodeFilter;
 
-  /// Class for all properties
+  //! Class for all properties
   cedar::dev::sensors::camera::PropertiesPtr mpProperties;
 
 
-  /// Create with guid or with bus id
+  //! Create with guid or with bus id
   cedar::aux::BoolParameterPtr _mpByGuid;
 
-  /// Camera-ID. Either the Bus-ID or the GUID (depends on _mpByGuid)
+  //! Camera-ID. Either the Bus-ID or the GUID (depends on _mpByGuid)
   cedar::aux::UIntParameterPtr _mpCameraId;
 
-  /// Framesize as mode
+  //! Framesize as mode
   cedar::aux::EnumParameterPtr _mpGrabMode;
 
-  /// Framerate of grabbing
+  //! Framerate of grabbing
   cedar::aux::EnumParameterPtr _mpFPS;
 
 
 #ifdef CEDAR_USE_LIB_DC1394
-  /// The iso-speed of the firewire bus
+  //! The iso-speed of the firewire bus
   cedar::aux::EnumParameterPtr _mpIsoSpeed;
 #endif
 

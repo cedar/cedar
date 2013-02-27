@@ -121,7 +121,7 @@
 
 //return value, if a property is not supported by the actual device
 //have to be larger than the highest value of the properties!
-#define CAMERA_PROPERTY_NOT_SUPPORTED 100000
+#define CAMERA_PROPERTY_NOT_SUPPORTED -1
 
 //mappings from OpenCV constants
 
@@ -221,6 +221,7 @@ public:
   static const Id PROP_GAMMA = CV_CAP_PROP_GAMMA; //22;
   /// @see PROP_BRIGHTNESS
   static const Id PROP_TEMPERATURE = CV_CAP_PROP_TEMPERATURE; // 23;
+
   /* until now: not supported by cedar
   /// @see PROP_BRIGHTNESS
   static const Id PROP_TRIGGER = CV_CAP_PROP_TRIGGER; // 24;

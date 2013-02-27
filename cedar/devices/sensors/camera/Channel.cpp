@@ -120,10 +120,10 @@ _mpIsoSpeed(new cedar::aux::EnumParameter
   QObject::connect(_mpByGuid.get(),SIGNAL(valueChanged()),this,SLOT(deviceChanged()));
   QObject::connect(_mpCameraId.get(),SIGNAL(valueChanged()),this,SLOT(deviceChanged()));
   QObject::connect(_mpGrabMode.get(),SIGNAL(valueChanged()),this,SLOT(grabModeChanged()));
-  QObject::connect(_mpFPS.get(),SIGNAL(valueChanged()),this,SLOT(fpsChanged()));
+  QObject::connect(_mpFPS.get(),SIGNAL(valueChanged()),this,SLOT(deviceChanged()));
 
 #ifdef CEDAR_USE_LIB_DC1394
-  QObject::connect(_mpIsoSpeed.get(),SIGNAL(valueChanged()),this,SLOT(isoSpeedChanged()));
+  QObject::connect(_mpIsoSpeed.get(),SIGNAL(valueChanged()),this,SLOT(deviceChanged()));
 #endif
 
 }
@@ -226,21 +226,6 @@ void cedar::dev::sensors::camera::Channel::setBackendType
   }
 }
 
-//gh todo: delete method, same as deviceChanged
-void cedar::dev::sensors::camera::Channel::fpsChanged()
-{
-#ifdef DEBUG_CAMERA_GRABBER
-  std::cout << __PRETTY_FUNCTION__ << std::endl;
-#endif
-  // only recreate when grabbing, otherwise nothing to do
-  if (!mpBackend)
-  {
-#ifdef DEBUG_CAMERA_GRABBER
-    std::cout << "\tGrabber online, create new grabbing-object" << std::endl;
-#endif
-    emit changeSetting();
-  }
-}
 
 void cedar::dev::sensors::camera::Channel::grabModeChanged()
 {
@@ -277,23 +262,6 @@ void cedar::dev::sensors::camera::Channel::grabModeChanged()
   }
 }
 
-//gh todo: delete method, same as deviceChanged
-#ifdef CEDAR_USE_LIB_DC1394
-void cedar::dev::sensors::camera::Channel::isoSpeedChanged()
-{
-#ifdef DEBUG_CAMERA_GRABBER
-  std::cout << __PRETTY_FUNCTION__ << std::endl;
-#endif
-  // recreate grabber when grabbing, otherwise nothing to do
-  if (!mpBackend)
-  {
-#ifdef DEBUG_CAMERA_GRABBER
-    std::cout << "\tGrabber online, create new grabbing-object" << std::endl;
-#endif
-    emit changeSetting();
-  }
-}
-#endif
 
 void cedar::dev::sensors::camera::Channel::deviceChanged()
 {
@@ -311,6 +279,9 @@ void cedar::dev::sensors::camera::Channel::deviceChanged()
   // recreate grabber when grabbing, otherwise nothing to do
   if (!mpBackend)
   {
+#ifdef DEBUG_CAMERA_GRABBER
+    std::cout << "\tGrabber online, create new grabbing-object" << std::endl;
+#endif
     emit changeCamera();
   }
 }
@@ -453,6 +424,8 @@ void cedar::dev::sensors::camera::Channel::createBackend()
       mpBackend = cv_device;
     }
   } // switch
+
+  // throws a cedar::dev::sensors::camera::CreateBackendException
   mpBackend->init();
 
   //restore previous used mode - if available;

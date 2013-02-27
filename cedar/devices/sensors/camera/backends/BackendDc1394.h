@@ -100,9 +100,11 @@ protected:
   /*! @brief Opens the wanted camera with libDc methods
    *
    *  The wanted camera is determind from the camereaId of the channel (set in the constructor or in the gui)
-   *  @returns True, if camera was successfully opened, otherwise false
+   *  @throw cedar::dev::sensors::camera::LibDcCameraNotFoundException Thrown, if the wanted or no camera is not found
+   *  @throw cedar::dev::sensors::camera::LibDcException Thrown, if the camera couldn't be opened by
+   *         the firewire backend
    */
-  bool openLibDcCamera();
+  void openLibDcCamera();
 
   //! get all features from cam
   void getFeaturesFromLibDc();
@@ -119,7 +121,13 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  /*! @brief Search the Firewire-Bus for the camera with the given GUID and return the bus-ID
+   *  @param guid The GUID of the camera to search
+   *  @throw  cedar::dev::sensors::camera::LibDcCameraNotFoundException Thrown, if the wanted camera is not found
+   *  @return The Bus-ID of the Camera.
+   */
+  unsigned int getBusIdFromGuid(unsigned int guid);
+
 
 
   //--------------------------------------------------------------------------------------------------------------------
