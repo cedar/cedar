@@ -114,6 +114,7 @@ void cedar::proc::sources::NetReader::connect()
   // instantiate the reader, if not yet done
   if (!mReader)
   {
+
     try 
     {
       mReader
@@ -126,6 +127,12 @@ void cedar::proc::sources::NetReader::connect()
     {
       // the writer hasnt declared the channel yet ... abort, better luck
       // on the next compute()
+      this->setState( cedar::proc::Triggerable::STATE_EXCEPTION,
+                      "The writer hasn't initialized this port/channel, yet. "
+                      "Please check whether the name is correct and it "
+                      "is running, then "
+                      "select reset in the context menu." );
+        // TODO: would be nice to have a state for temporarily disabling
       return;
     }
     catch ( cedar::aux::net::NetMissingRessourceException &e )
