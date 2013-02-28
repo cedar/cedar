@@ -135,11 +135,19 @@ std::string cedar::aux::locateResource(const std::string& resourcePath)
   {
     cedar_resource_path = p_resource_path;
   }
-  
+
+  bool is_directory = false;
   if (boost::filesystem::exists(resourcePath))
   {
-    cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" locally.", function_name);
-    return resourcePath;
+    if (boost::filesystem::is_regular_file(resourcePath))
+    {
+      cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" locally.", function_name);
+      return resourcePath;
+    }
+    else
+    {
+      is_directory = true;
+    }
   }
   
   if (!cedar_resource_path.empty())
@@ -154,22 +162,54 @@ std::string cedar::aux::locateResource(const std::string& resourcePath)
     std::string path = cedar_resource_path + "/" + resourcePath;
     if (boost::filesystem::exists(path))
     {
-      cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + path + "\".", function_name);
-      return path;
+      if (boost::filesystem::is_regular_file(path))
+      {
+        cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + path + "\".", function_name);
+        return path;
+      }
+      else
+      {
+        is_directory = true;
+      }
     }
   }
   
   if (boost::filesystem::exists(in_home))
   {
-    cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + in_home + "\".", function_name);
-    return in_home;
+    if (boost::filesystem::is_regular_file(in_home))
+    {
+      cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + in_home + "\".", function_name);
+      return in_home;
+    }
+    else
+    {
+      is_directory = true;
+    }
   }
   if (boost::filesystem::exists(in_install))
   {
-    cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + in_install + "\".", function_name);
-    return in_install;
+    if (boost::filesystem::is_regular_file(in_install))
+    {
+      cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + in_install + "\".", function_name);
+      return in_install;
+    }
+    else
+    {
+      is_directory = true;
+    }
   }
   
-  CEDAR_THROW(cedar::aux::ResourceNotFoundException, "The resource \"" + resourcePath + "\" could not be found.");
+  if (is_directory)
+  {
+    CEDAR_THROW
+    (
+      cedar::aux::ResourceNotFoundException,
+      "The resource \"" + resourcePath + "\" could not be found: all instances seem to be directories."
+    );
+  }
+  else
+  {
+    CEDAR_THROW(cedar::aux::ResourceNotFoundException, "The resource \"" + resourcePath + "\" could not be found.");
+  }
 }
 
