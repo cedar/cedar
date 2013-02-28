@@ -85,19 +85,19 @@ public:
 
   protected slots:
 
-  /*!@brief A slot that must be triggered if a camera-settings has changed. In that case,
+  /*! @brief A slot that must be triggered if a camera-settings has changed. In that case,
    * a new camera-device will be created. It is internally connected with the CameraChannel->settingsChanged signal.
    */
   void settingChanged();
 
-  /*!@brief A slot that must be triggered if the backend has changed. It is internally connected with the
+  /*! @brief A slot that must be triggered if the backend has changed. It is internally connected with the
    *      CameraChannel->Backend Enum-Parameter valueChanged() signal.
    */
   void backendChanged();
 
   signals:
 
-  /*!@brief This signal is raised, if the grabber will be recreated
+  /*! @brief This signal is raised, if the grabber will be recreated
    *
    *   This signal is used from the processingIde Camera step to annotate a new imagesize
    */
@@ -166,18 +166,18 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!  @brief With this method, it is possible to get Information on any channel.
+  /*! @brief With this method, it is possible to get Information on any channel.
    *
-   *   This method passes the arguments directly to the corresponding capture device
-   *   @param channel This is the index of the source you want to get the parameter value.
-   *   @param propId This is any supported property-Id<br>
-   *     If property-id is not supported or unknown, return value will be -1.
-   *   @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
-   *   @return Returns either a double value or one of the following constants:
-   *          - CAMERA_PROPERTY_NOT_SUPPORTED
-   *          - CAMERA_PROPERTY_MODE_AUTO
-   *          - CAMERA_PROPERTY_MODE_DEFAULT
-   *   @see Property
+   *  This method passes the arguments directly to the corresponding capture device
+   *  @param channel This is the index of the source you want to get the parameter value.
+   *  @param propId This is any supported property-Id<br>
+   *    If property-id is not supported or unknown, return value will be -1.
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+   *  @return Returns either a double value or one of the following constants:
+   *         - CAMERA_PROPERTY_NOT_SUPPORTED
+   *         - CAMERA_PROPERTY_MODE_AUTO
+   *         - CAMERA_PROPERTY_MODE_DEFAULT
+   *  @see Property
    */
   double getProperty(unsigned int channel, Property::Id propId);
 
@@ -353,26 +353,25 @@ public:
 
   /*! @brief Set the decoding filter for the grabbed frames
    *
-   * @param channel The channel you want to change
-   * @param filterId The decode-filter to use as cedar::dev::sensors::camera::Decoding::Id
+   *  @param channel The channel you want to change
+   *  @param filterId The decode-filter to use as cedar::dev::sensors::camera::Decoding::Id
    */
   void setDecodeFilter(unsigned int channel, cedar::dev::sensors::camera::Decoding::Id filterId);
 
   /*! @brief Set the decoding filter for the grabbed frames
    *
-   *  This method changes the decode-filter on the first channel.
-   *  For a multi-channel grabber, have a look at
-   *   @see setDecodeFilter(unsigned int, cedar::dev::sensors::camera::Decoding::Id)
+   *   This method changes the decode-filter on the first channel.
+   *   For a multi-channel grabber, have a look at
+   *  @see setDecodeFilter(unsigned int, cedar::dev::sensors::camera::Decoding::Id)
    *
    *  @param filterId The decode-filter to use as cedar::dev::sensors::camera::Decoding::Id
    */
   void setDecodeFilter(cedar::dev::sensors::camera::Decoding::Id filterId);
 
-
   /*! @brief Get the used decoding filter
    *
-   * @param channel The channel you want the decode-filter
-   * @return The Filter as cedar::dev::sensors::camera::Decoding::Id
+   *  @param channel The channel you want the decode-filter
+   *  @return The Filter as cedar::dev::sensors::camera::Decoding::Id
    */
   cedar::dev::sensors::camera::Decoding::Id getDecodeFilter(unsigned int channel = 0) const;
 
@@ -431,7 +430,6 @@ private:
              cedar::dev::sensors::camera::Grabber::_mChannels->at(channel)
            );
   }
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

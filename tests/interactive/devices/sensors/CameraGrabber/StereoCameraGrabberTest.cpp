@@ -55,10 +55,9 @@ namespace
 
 int main(int argc, char* argv[])
 {
-
   // grab from device number on the bus (as an integer)
-  const int DEVICE_ID_CHANNEL0 = 0; //197055
-  const int DEVICE_ID_CHANNEL1 = 1; //197105
+  const int DEVICE_ID_CHANNEL0 = 0;
+  const int DEVICE_ID_CHANNEL1 = 1;
 
   // given device-ID is the guid of the cam. or the id on the bus
   const bool  IS_GUID = false;

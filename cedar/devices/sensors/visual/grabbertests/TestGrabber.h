@@ -52,8 +52,8 @@
  *
  *  @brief A simple Grabber class for testing the Grabber interface
  *
- *  This grabber class is used to test the grabber interface. It
- *  creates a Grabber with a TestParam (default-value 123) and FPS set to 15
+ *   This grabber class is used to test the grabber interface. It
+ *   creates a Grabber with a TestParam (default-value 123) and FPS set to 15
  *
  *  @remarks For grabber developers<br>
  *    This class can also be used as a template to create other classes derived from GrabberInstance
@@ -136,7 +136,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
 
-  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
+  //! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
   inline TestChannelPtr getTestChannel(unsigned int channel)
   {
     return boost::static_pointer_cast<TestChannel>
@@ -145,7 +145,7 @@ private:
            );
   }
 
-  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
+  //! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
   inline ConstTestChannelPtr getTestChannel(unsigned int channel) const
   {
     return boost::static_pointer_cast<const TestChannel>
@@ -159,23 +159,21 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 private:
 
-  //!@brief The counter
+  //! @brief The counter
   unsigned int mCounter;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief The test parameter
+  //! @brief The test parameter
   cedar::aux::IntParameterPtr _mTestParam;
 
 private:
   // none yet
-
-  //! @brief The filename of the picture you want to grab from
-  // cedar::aux::FileParameterPtr _mSourceFileName;
 
 }; // class cedar::dev::sensors::visual::TestGrabber
 

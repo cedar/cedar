@@ -106,7 +106,7 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! Read the video file with this object
+  //! @brief Read the video file with this object
   cv::VideoCapture mVideoCapture;
 
   //! @brief The filename of the video file to grab from

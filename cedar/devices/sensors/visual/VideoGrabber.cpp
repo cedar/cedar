@@ -61,7 +61,6 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 
 
-//----------------------------------------------------------------------------------------------------
 // Constructor for single-file grabber
 cedar::dev::sensors::visual::VideoGrabber::VideoGrabber
 (
@@ -84,7 +83,7 @@ _mSpeedFactor(new cedar::aux::IntParameter(this, "speed factor", speedFactor,1,2
   init();
 }
 
-//----------------------------------------------------------------------------------------------------
+
 // Constructor for stereo-file grabber
 cedar::dev::sensors::visual::VideoGrabber::VideoGrabber
 (
@@ -112,7 +111,7 @@ _mSpeedFactor(new cedar::aux::IntParameter(this, "speed factor", speedFactor,1,2
   init();
 }
 
-//----------------------------------------------------------------------------------------------------
+
 void cedar::dev::sensors::visual::VideoGrabber::init()
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
@@ -140,7 +139,7 @@ void cedar::dev::sensors::visual::VideoGrabber::init()
               );
 }
 
-//----------------------------------------------------------------------------------------------------
+
 cedar::dev::sensors::visual::VideoGrabber::~VideoGrabber()
 {
   doCleanUp();
@@ -151,7 +150,7 @@ cedar::dev::sensors::visual::VideoGrabber::~VideoGrabber()
 // slots
 //--------------------------------------------------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------------------------------
+
 void cedar::dev::sensors::visual::VideoGrabber::channelAdded(int index)
 {
   QObject::connect
@@ -163,7 +162,7 @@ void cedar::dev::sensors::visual::VideoGrabber::channelAdded(int index)
            );
 }
 
-//----------------------------------------------------------------------------------------------------
+
 void cedar::dev::sensors::visual::VideoGrabber::speedFactorChanged()
 {
   if (isCreated())
@@ -174,7 +173,7 @@ void cedar::dev::sensors::visual::VideoGrabber::speedFactorChanged()
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+
 void cedar::dev::sensors::visual::VideoGrabber::fileNameChanged()
 {
   // set all channels to their parameters
@@ -189,22 +188,19 @@ void cedar::dev::sensors::visual::VideoGrabber::fileNameChanged()
 //----------------------------------------------------------------------------------------------------------------------
 
 
-//----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::VideoGrabber::onCleanUp()
 {
   // close all captures
   // mChannels.clear() is done in Grabberinterface
 }
 
-//----------------------------------------------------------------------------------------------------
+
 void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
 {
   // local and/or stored Parameters are already initialized
-
   unsigned int num_channels = getNumChannels();
 
   // check if filenames are there (no filename could happen on startup in the processingGui)
-
   for (unsigned int channel = 0; channel < num_channels; ++channel)
   {
     if (getVideoChannel(channel)->_mSourceFileName->getPath() == ".")
@@ -229,7 +225,6 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
                                            );
 
 
-  //----------------------------------------
   // open capture one by one
   for (unsigned int channel = 0; channel < num_channels; ++channel)
   {
@@ -249,8 +244,6 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
     getVideoChannel(channel)->mVideoCapture >> getImageMat(channel);
   }
 
-
-  //----------------------------------------
   // all grabbers successfully initialized, now search for the smallest avi-file
   unsigned int smallest = UINT_MAX;
   for (unsigned int channel = 0; channel < num_channels; ++channel)
@@ -263,7 +256,6 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
   }
   mFramesCount = smallest;
 
-  //----------------------------------------
   // check for equal FPS
   double fps_ch0 = getVideoChannel(0)->mVideoCapture.get(CV_CAP_PROP_FPS);
 
@@ -282,12 +274,11 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
     }
   }
 
-  //----------------------------------------
   // set stepsize for LoopedThread to the framerate from the video-files
   setFramerate(fps_ch0 * _mSpeedFactor->getValue());
 }
 
-//----------------------------------------------------------------------------------------------------
+
 void cedar::dev::sensors::visual::VideoGrabber::onCloseGrabber()
 {
   unsigned int num_channels = getNumChannels();
@@ -299,15 +290,12 @@ void cedar::dev::sensors::visual::VideoGrabber::onCloseGrabber()
 }
 
 
-//----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::VideoGrabber::onGrab(unsigned int channel)
 {
 
   // rewinding is done very inefficient, because for the moment it is not possible to break the grabbing loop in
   // the base grabber-class.
-
-  //!@todo Rewrite the video-grabbing and the rewinding more efficient
-
+  //! @todo Rewrite the video-grabbing and the rewinding more efficient
 
   // read next frame from file for this channel
   (getVideoChannel(channel)->mVideoCapture) >> getImageMat(channel);
@@ -353,37 +341,38 @@ void cedar::dev::sensors::visual::VideoGrabber::onGrab(unsigned int channel)
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+
 std::string cedar::dev::sensors::visual::VideoGrabber::onGetSourceInfo(unsigned int channel)
 {
   return this->getName() + " - channel " + boost::lexical_cast<std::string>(channel)
                          + ": " + getVideoChannel(channel)->_mSourceFileName->getPath();
 }
 
-//----------------------------------------------------------------------------------------------------
+
 void cedar::dev::sensors::visual::VideoGrabber::setSpeedFactor(double speedFactor)
 {
   _mSpeedFactor->setValue(speedFactor);
 }
 
-//----------------------------------------------------------------------------------------------------
+
 double cedar::dev::sensors::visual::VideoGrabber::getSpeedFactor() const
 {
   return _mSpeedFactor->getValue();
 }
 
-//----------------------------------------------------------------------------------------------------
+
 void cedar::dev::sensors::visual::VideoGrabber::setLooped(bool loop)
 {
   _mLooped->setValue(loop);
 }
-//----------------------------------------------------------------------------------------------------
+
+
 bool cedar::dev::sensors::visual::VideoGrabber::getLooped() const
 {
   return _mLooped->getValue();
 }
 
-//----------------------------------------------------------------------------------------------------
+
 void cedar::dev::sensors::visual::VideoGrabber::setPositionRelative(double newPositionRel)
 {
   // calculate relative position which depends on the shortest file.
@@ -430,7 +419,7 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionRelative(double newPo
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+
 double cedar::dev::sensors::visual::VideoGrabber::getPositionRelative()
 {
   // the shortest file defines the length of the avi
@@ -443,7 +432,7 @@ double cedar::dev::sensors::visual::VideoGrabber::getPositionRelative()
   return pos_abs / count;
 }
 
-//----------------------------------------------------------------------------------------------------
+
 void cedar::dev::sensors::visual::VideoGrabber::setPositionAbsolute(unsigned int newPositionAbs)
 {
   // newPos can't be smaller than zero, because it is an unsigned int. Only check upper border
@@ -470,20 +459,20 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionAbsolute(unsigned int
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+
 unsigned int cedar::dev::sensors::visual::VideoGrabber::getPositionAbsolute()
 {
   // the position in all avi's should be the same
   return getVideoChannel(0)->mVideoCapture.get(CV_CAP_PROP_POS_FRAMES);
 }
 
-//----------------------------------------------------------------------------------------------------
+
 unsigned int cedar::dev::sensors::visual::VideoGrabber::getFrameCount() const
 {
   return mFramesCount;
 }
 
-//----------------------------------------------------------------------------------------------------
+
 double cedar::dev::sensors::visual::VideoGrabber::getSourceProperty(unsigned int channel,int propId)
 {
   if (channel >= getNumChannels())
@@ -493,19 +482,19 @@ double cedar::dev::sensors::visual::VideoGrabber::getSourceProperty(unsigned int
   return getVideoChannel(channel)->mVideoCapture.get(propId);
 }
 
-//----------------------------------------------------------------------------------------------------
+
 double cedar::dev::sensors::visual::VideoGrabber::getSourceFramerate(unsigned int channel)
 {
   return getSourceProperty(channel,CV_CAP_PROP_FPS);
 }
 
-//----------------------------------------------------------------------------------------------------
+
 double cedar::dev::sensors::visual::VideoGrabber::getSourceEncoding(unsigned int channel)
 {
   return getSourceProperty(channel,CV_CAP_PROP_FOURCC);
 }
 
-//----------------------------------------------------------------------------------------------------
+
 const std::string cedar::dev::sensors::visual::VideoGrabber::getSourceFile(unsigned int channel) const
 {
   if (channel >= getNumChannels())

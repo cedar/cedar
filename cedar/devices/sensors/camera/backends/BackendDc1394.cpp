@@ -45,8 +45,6 @@
 #include "cedar/devices/sensors/camera/exceptions.h"
 
 // SYSTEM INCLUDES
-//#include <boost/lexical_cast.hpp>
-
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -69,10 +67,7 @@ cedar::dev::sensors::camera::BackendDc1394::~BackendDc1394()
 
 void cedar::dev::sensors::camera::BackendDc1394::init()
 {
-#ifdef DEBUG_CAMERA_GRABBER
-  std::cout << __PRETTY_FUNCTION__ << std::endl;
-#endif
-
+  // open libdc
   try
   {
     this->openLibDcCamera();
@@ -86,16 +81,10 @@ void cedar::dev::sensors::camera::BackendDc1394::init()
     CEDAR_THROW(cedar::dev::sensors::camera::CreateBackendException,e.getMessage());
   }
 
-//  std::cout << "DC1394: initDevice. Camera successfully opened through libdc" << std::endl;
-  //set available properties and their values
-
-  this->getFeaturesFromLibDc();
-  this->getGrabModesFromLibDc();
-
-//  std::cout << "Set Grabmode to "
-//    << cedar::dev::sensors::camera::VideoMode::type().get(mpCameraChannel->_mpGrabMode->getValue()).prettyString()
-//    << std::endl;
-  this->getFrameRatesFromLibDc(mpCameraChannel->_mpGrabMode->getValue());
+  //read features
+  this->readFeaturesFromLibDc();
+  this->readGrabModesFromLibDc();
+  this->readFrameRatesFromLibDc(mpCameraChannel->_mpGrabMode->getValue());
 }
 
 
@@ -105,10 +94,7 @@ void cedar::dev::sensors::camera::BackendDc1394::init()
 
 void cedar::dev::sensors::camera::BackendDc1394::updateFps()
 {
-#ifdef DEBUG_CAMERA_GRABBER
-  std::cout << __PRETTY_FUNCTION__ << std::endl;
-#endif
-  this->getFrameRatesFromLibDc(mpCameraChannel->_mpGrabMode->getValue());
+  this->readFrameRatesFromLibDc(mpCameraChannel->_mpGrabMode->getValue());
 }
 
 
@@ -162,7 +148,7 @@ void cedar::dev::sensors::camera::BackendDc1394::createCaptureObject()
 }
 
 
-void cedar::dev::sensors::camera::BackendDc1394::getGrabModesFromLibDc()
+void cedar::dev::sensors::camera::BackendDc1394::readGrabModesFromLibDc()
 {
   //only invoked at the creation of the backend
 
@@ -223,7 +209,7 @@ void cedar::dev::sensors::camera::BackendDc1394::getGrabModesFromLibDc()
 }
 
 
-void cedar::dev::sensors::camera::BackendDc1394::getFrameRatesFromLibDc
+void cedar::dev::sensors::camera::BackendDc1394::readFrameRatesFromLibDc
 (
   cedar::dev::sensors::camera::VideoMode::Id modeId
 )
@@ -423,7 +409,7 @@ unsigned int cedar::dev::sensors::camera::BackendDc1394::getBusIdFromGuid(unsign
   CEDAR_THROW(cedar::dev::sensors::camera::LibDcCameraNotFoundException,msg);
 }
 
-void cedar::dev::sensors::camera::BackendDc1394::getFeaturesFromLibDc()
+void cedar::dev::sensors::camera::BackendDc1394::readFeaturesFromLibDc()
 {
   // get all features from cam
   dc1394featureset_t cam_features = mpLibDcInterface->getCamFeatures();

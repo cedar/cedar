@@ -39,15 +39,16 @@
 #define CEDAR_DEV_SENSORS_VISUAL_GRABBER_H
 
 
-//*! \brief Single include file for the grabber classes
+// Single include file for all grabber classes
 
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/namespace.h"
-#include "cedar/devices/sensors/visual/GrabberInterface.h"
+#include "cedar/devices/sensors/visual/GrabbableGrabber.h"
 #include "cedar/devices/sensors/visual/VideoGrabber.h"
 #include "cedar/devices/sensors/visual/PictureGrabber.h"
 #include "cedar/devices/sensors/visual/NetGrabber.h"
-#include "cedar/devices/sensors/visual/CameraGrabber.h"
+#include "cedar/devices/sensors/visual/GLGrabber.h"
+#include "cedar/devices/sensors/camera/Grabber.h"
 
 
 // PROJECT INCLUDES

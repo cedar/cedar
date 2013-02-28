@@ -124,7 +124,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
 
-  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class InterfaceChannelPtr
+  //! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class InterfaceChannelPtr
   inline GrabbableChannelPtr getGrabbableChannel(unsigned int channel)
   {
     return boost::static_pointer_cast<GrabbableChannel>
@@ -133,7 +133,7 @@ private:
            );
   }
 
-  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class InterfaceChannellPtr
+  //! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class InterfaceChannellPtr
   inline ConstGrabbableChannelPtr getGrabbableChannel(unsigned int channel) const
   {
     return boost::static_pointer_cast<const GrabbableChannel>
@@ -149,7 +149,6 @@ protected:
   // none yet
 private:
   // none yet
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
