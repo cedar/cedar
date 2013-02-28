@@ -55,6 +55,7 @@ namespace cedar
       CEDAR_DECLARE_DEV_CLASS(KinematicChainMonitorWidget);
       CEDAR_DECLARE_DEV_CLASS(KinematicChainCommandWidget);
       CEDAR_DECLARE_DEV_CLASS(MountedCameraViewer);
+      CEDAR_DECLARE_DEV_CLASS(RobotManager);
       //!@endcond
     }
   }

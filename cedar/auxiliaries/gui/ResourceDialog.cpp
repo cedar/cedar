@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,55 +22,55 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        ResourceDialog.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2012 04 13
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 02 27
 
-    Description: Namespace file for cedar::dev.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_NAMESPACE_H
-#define CEDAR_DEV_NAMESPACE_H
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/lib.h"
-#include "cedar/defines.h"
+#include "cedar/auxiliaries/gui/ResourceDialog.h"
 
 // SYSTEM INCLUDES
 
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
 
-namespace cedar
+cedar::aux::gui::ResourceDialog::ResourceDialog()
 {
-  /*!@brief Namespace for all devices classes. */
-  namespace dev
-  {
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_DEV_CLASS(Robot);
-    CEDAR_DECLARE_DEV_CLASS(ComponentSlot);
-    CEDAR_DECLARE_DEV_CLASS(Component);
-    CEDAR_DECLARE_DEV_CLASS(Channel);
-    CEDAR_DECLARE_DEV_CLASS(SerialChannel);
-    CEDAR_DECLARE_DEV_CLASS(Locomotion);
-    CEDAR_DECLARE_DEV_CLASS(DifferentialDrive);
-    CEDAR_DECLARE_DEV_CLASS(KinematicChain);
-    CEDAR_DECLARE_DEV_CLASS(Odometry);
-    CEDAR_DECLARE_DEV_CLASS(RobotManager);
-    CEDAR_DECLARE_DEV_CLASS(Sensor);
-    CEDAR_DECLARE_DEV_CLASS(SimulatedKinematicChain);
-
-    // exceptions
-    CEDAR_DECLARE_DEV_CLASS(UnresponsiveRobotException);
-    CEDAR_DECLARE_DEV_CLASS(SerialCommunicationException);
-    CEDAR_DECLARE_DEV_CLASS(UnknownOperatingSystemException);
-    CEDAR_DECLARE_DEV_CLASS(ResourceNotAvailableException);
-    CEDAR_DECLARE_DEV_CLASS(TimeoutException);
-    //!@endcond
-  }
+  this->setupUi(this);
 }
 
-#endif // CEDAR_DEV_NAMESPACE_H
+cedar::aux::gui::ResourceDialog::~ResourceDialog()
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+std::string cedar::aux::gui::ResourceDialog::openResource(QWidget* pParent)
+{
+  cedar::aux::gui::ResourceDialog* p_dialog = new cedar::aux::gui::ResourceDialog();
+
+  int res = p_dialog->exec();
+
+  if (res == QDialog::Accepted)
+  {
+    return p_dialog->mpSelectedText->text().toStdString();
+  }
+  else
+  {
+    return std::string();
+  }
+}
