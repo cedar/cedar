@@ -40,7 +40,8 @@
 // CEDAR INCLUDES
 #include "cedar/devices/namespace.h"
 #include "cedar/devices/Component.h"
-#include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
+#include "cedar/auxiliaries/math/VelocityLimitsParameter.h"
+#include "cedar/auxiliaries/math/AngularVelocityLimitsParameter.h"
 #include "cedar/units/Velocity.h"
 #include "cedar/units/AngularVelocity.h"
 
@@ -146,9 +147,9 @@ protected:
 
 private:
   //! limits for the forward velocity of the robot [m/s]
-  cedar::aux::math::DoubleLimitsParameterPtr _mForwardVelocityLimits;
+  cedar::aux::math::VelocityLimitsParameterPtr _mForwardVelocityLimits;
   //! limits for the turning rate of the robot [rad/s]
-  cedar::aux::math::DoubleLimitsParameterPtr _mTurningRateLimits;
+  cedar::aux::math::AngularVelocityLimitsParameterPtr _mTurningRateLimits;
 
 }; // class cedar::dev::Locomotion
 #endif // CEDAR_DEV_LOCOMOTION_H

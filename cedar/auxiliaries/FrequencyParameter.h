@@ -82,7 +82,7 @@ namespace cedar
     }
 
     template <>
-    cedar::unit::Frequency parseUnitString(const std::string& unitStr)
+    inline cedar::unit::Frequency parseUnitString(const std::string& unitStr)
     {
       return getUnitFromPostFix<cedar::unit::Frequency::unit_type>(unitStr);
     }

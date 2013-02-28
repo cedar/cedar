@@ -47,7 +47,7 @@ class TestClass : public cedar::aux::Configurable
 public:
   TestClass()
   :
-  _mpLimitsParameter(new cedar::aux::math::LimitsParameter<double>(this, "limits", 0.0, 1.0, -10.0, 1.0, -1.0, 10.0)),
+  _mpLimitsParameter(new cedar::aux::math::LimitsParameter<double>(this, "limits", 0.0, -10.0, 1.0, 1.0, -1.0, 10.0)),
   _mpLengthsLimitsParameter
   (
     new cedar::aux::math::LengthLimitsParameter
@@ -55,8 +55,8 @@ public:
           this,
           "length limits",
           0.0 * cedar::unit::meters,
-          1.0 * cedar::unit::meters,
           -10.0 * cedar::unit::meters,
+          1.0 * cedar::unit::meters,
           1.0 * cedar::unit::meters,
           -1.0 * cedar::unit::meters,
           10.0 * cedar::unit::meters

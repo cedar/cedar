@@ -40,6 +40,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/Channel.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/TimeParameter.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -88,7 +91,7 @@ public:
   unsigned int getBaudRate() const;
 
   //!@brief Returns the timeout in seconds.
-  double getTimeout() const;
+  const cedar::unit::Time& getTimeout() const;
 
   /*!@brief Writes a string to the serial port.
    * Always supply commands without the trailing command delimiter, as it is automatically added.
@@ -187,7 +190,7 @@ private:
   /*!@brief Time (s) until the current read or write operation times out.
    * Default is 0.25 s (250 ms).
    */
-  cedar::aux::DoubleParameterPtr _mTimeout;
+  cedar::aux::TimeParameterPtr _mTimeout;
 
 }; // class cedar::dev::SerialChannel
 #endif // CEDAR_DEV_SERIAL_CHANNEL_H

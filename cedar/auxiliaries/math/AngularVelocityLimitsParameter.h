@@ -42,5 +42,7 @@
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/math/LimitsParameter.h"
 #include "cedar/auxiliaries/AngularVelocityParameter.h"
+#include "cedar/auxiliaries/PlaneAngleParameter.h"
+#include "cedar/auxiliaries/TimeParameter.h"
 
 #endif // CEDAR_AUX_MATH_ANGULAR_VELOCITY_LIMITS_PARAMETER_H
