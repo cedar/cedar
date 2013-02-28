@@ -106,16 +106,16 @@ protected:
    */
   void openLibDcCamera();
 
-  //! get all features from cam
-  void getFeaturesFromLibDc();
+  //! @brief Get all features of the opened camera from libdc
+  void readFeaturesFromLibDc();
 
-  /*! get all framerates and enable them in the enum-class, disable all others
-   *  \param modeId The grabbing mode for the framerates (framerate selection depends on actual used grabbing mode)
+  /*! @brief Get all framerates and enable them in the enum-class, disable all others
+   *  @param modeId The grabbing mode for the framerates (framerate selection depends on actual used grabbing mode)
    */
-  void getFrameRatesFromLibDc(cedar::dev::sensors::camera::VideoMode::Id modeId);
+  void readFrameRatesFromLibDc(cedar::dev::sensors::camera::VideoMode::Id modeId);
 
-  //! get all available modes and enable them in the enum-class, disable all others and set mode to "AUTO"
-  void getGrabModesFromLibDc();
+  //! @brief Get all available modes and enable them in the enum-class, disable all others and set mode to "AUTO"
+  void readGrabModesFromLibDc();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -134,7 +134,7 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! firewire interface for available settings and properties from camera
+  //! @brief The firewire interface for available settings and properties from camera
   cedar::dev::sensors::camera::LibDcBasePtr mpLibDcInterface;
 
 private:

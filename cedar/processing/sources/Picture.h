@@ -75,11 +75,11 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Loads the given file into the picture source.
+  //! @brief Loads the given file into the picture source.
   void setSourceFileName(const std::string& imagePath);
 
 public slots:
-  //!@brief a slot that takes care of updating the output picture
+  //! @brief a slot that takes care of updating the output picture
   void updatePicture();
 
   //--------------------------------------------------------------------------------------------------------------------

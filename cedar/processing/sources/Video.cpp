@@ -143,7 +143,7 @@ void cedar::proc::sources::Video::reset()
   }
 }
 
-//----------------------------------------------------------------------------------------------------------------------
+
 void cedar::proc::sources::Video::compute(const cedar::proc::Arguments &arguments)
 {
   if (this->getVideoGrabber()->isCreated())
@@ -171,7 +171,7 @@ void cedar::proc::sources::Video::compute(const cedar::proc::Arguments &argument
   }
 }
 
-//----------------------------------------------------------------------------------------------------------------------
+
 void cedar::proc::sources::Video::updateVideo()
 {
   this->mImage->setData(this->getVideoGrabber()->getImage());
@@ -180,7 +180,6 @@ void cedar::proc::sources::Video::updateVideo()
   mRecording->setValue(this->getVideoGrabber()->isRecording());
 }
 
-//----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Video::updateSpeedFactor()
 {
   mFrameDuration = 1000/this->getVideoGrabber()->getFramerate();

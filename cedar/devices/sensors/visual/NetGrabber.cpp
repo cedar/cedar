@@ -65,7 +65,6 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 
 
-//----------------------------------------------------------------------------------------------------
 // Constructor for single-channel grabber
 cedar::dev::sensors::visual::NetGrabber::NetGrabber
 (
@@ -85,7 +84,6 @@ cedar::dev::sensors::visual::Grabber
 }
 
 
-//----------------------------------------------------------------------------------------------------
 // Constructor for stereo-channel grabber
 cedar::dev::sensors::visual::NetGrabber::NetGrabber
 (
@@ -109,7 +107,6 @@ cedar::dev::sensors::visual::Grabber
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 }
 
-//----------------------------------------------------------------------------------------------------
 cedar::dev::sensors::visual::NetGrabber::~NetGrabber()
 {
   doCleanUp();
@@ -130,7 +127,6 @@ void cedar::dev::sensors::visual::NetGrabber::onCloseGrabber()
   }
 }
 
-//----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::NetGrabber::onCleanUp()
 {
   cedar::aux::LogSingleton::getInstance()->debugMessage
@@ -142,7 +138,6 @@ void cedar::dev::sensors::visual::NetGrabber::onCleanUp()
   // mNetReaders.clear(); done in Grabber
 }
 
-//----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
 {
   // create debug-message
@@ -195,7 +190,6 @@ void cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
         cedar::aux::LogSingleton::getInstance()->debugMessage("Connection established", method_name);
       }
       catch (cedar::aux::net::NetWaitingForWriterException &E)
-      //catch (cedar::aux::ExceptionBase &E)
       {
         // An error occured: No Yarp writer with appropriate channel name
         // This could be normal on startup, so try again for about 10 times
@@ -212,10 +206,10 @@ void cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
           cedar::aux::sleep(cedar::unit::Milliseconds(100));
         }
       }
-      catch (std::exception& e)
+      catch (cedar::aux::ExceptionBase& e)
       {
         std::string msg = this->getName() + ": Unknown Error on initialization of NetReader for channel \""
-                                          + channel_name + "\" :" + e.what();
+                                          + channel_name + "\" :" + e.getMessage();
         CEDAR_THROW(cedar::dev::sensors::visual::CreateGrabberException,msg);
       }
 
@@ -284,13 +278,13 @@ void cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
   this->setFramerate(100.f);
 }
 
-//----------------------------------------------------------------------------------------------------
+
 std::string cedar::dev::sensors::visual::NetGrabber::onGetSourceInfo(unsigned int channel)
 {
   return this->getName() + ": " + getNetChannel(channel)->_mpYarpChannelName->getValue();
 }
 
-//----------------------------------------------------------------------------------------------------
+
 void cedar::dev::sensors::visual::NetGrabber::onGrab(unsigned int channel)
 {
   try

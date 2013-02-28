@@ -55,7 +55,6 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------------------------------
 // Constructor for a single-channel grabber
 cedar::dev::sensors::visual::TestGrabber::TestGrabber
 (
@@ -86,9 +85,6 @@ _mTestParam(new cedar::aux::IntParameter(this, "testparameter", 0))
 }
 
 
-
-
-//----------------------------------------------------------------------------------------------------
 // Constructor for a stereo grabber
 cedar::dev::sensors::visual::TestGrabber::TestGrabber
 (
@@ -123,7 +119,7 @@ _mTestParam(new cedar::aux::IntParameter(this, "testparameter", 0))
                                           );
 }
 
-//----------------------------------------------------------------------------------------------------
+
 // Destructor
 cedar::dev::sensors::visual::TestGrabber::~TestGrabber()
 {
@@ -149,7 +145,6 @@ cedar::dev::sensors::visual::TestGrabber::~TestGrabber()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()
 {
   std::cout << "TestGrabber::onCreateGrabber()" << std::endl;
@@ -206,7 +201,7 @@ void cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()
 
 }
 
-//----------------------------------------------------------------------------------------------------
+
 void cedar::dev::sensors::visual::TestGrabber::onCleanUp()
 {
   // do the cleanup of used hardware in this method
@@ -218,7 +213,7 @@ void cedar::dev::sensors::visual::TestGrabber::onCleanUp()
                                           );
 }
 
-//----------------------------------------------------------------------------------------------------
+
 void cedar::dev::sensors::visual::TestGrabber::onCloseGrabber()
 {
   // close all opened files here and reset the grabber to initialization state
@@ -228,7 +223,6 @@ void cedar::dev::sensors::visual::TestGrabber::onCloseGrabber()
 }
 
 
-//----------------------------------------------------------------------------------------------------
 std::string cedar::dev::sensors::visual::TestGrabber::onGetSourceInfo(unsigned int channel)
 {
 
@@ -240,7 +234,7 @@ std::string cedar::dev::sensors::visual::TestGrabber::onGetSourceInfo(unsigned i
                                + " : "+ getTestChannel(channel)->_mSourceFileName->getPath();
 }
 
-//----------------------------------------------------------------------------------------------------
+
 void cedar::dev::sensors::visual::TestGrabber::onGrab(unsigned int channel)
 {
   // this is the main grabbing method.
@@ -263,7 +257,7 @@ void cedar::dev::sensors::visual::TestGrabber::onGrab(unsigned int channel)
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+
 unsigned int cedar::dev::sensors::visual::TestGrabber::getCounter()
 {
   // a simple get-method
@@ -272,21 +266,21 @@ unsigned int cedar::dev::sensors::visual::TestGrabber::getCounter()
   return ct;
 }
 
-//----------------------------------------------------------------------------------------------------
+
 int cedar::dev::sensors::visual::TestGrabber::getTestParam() const
 {
   // a simple get-method
   return _mTestParam->getValue();
 }
 
-//----------------------------------------------------------------------------------------------------
+
 void cedar::dev::sensors::visual::TestGrabber::setTestParam(int testParameter)
 {
   // a simple set-method
   _mTestParam->setValue(testParameter);
 }
 
-//----------------------------------------------------------------------------------------------------
+
 std::string cedar::dev::sensors::visual::TestGrabber:: getSourceFileName(unsigned int channel) const
 {
   return getTestChannel(channel)->_mSourceFileName->getPath();

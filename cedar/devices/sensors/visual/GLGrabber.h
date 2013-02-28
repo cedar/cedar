@@ -104,7 +104,6 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-
   /*! @brief Set a new Widget to grab from
    *
    * @param channel The channel to assign the new widget

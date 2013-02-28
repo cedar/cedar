@@ -77,7 +77,6 @@ cedar::dev::sensors::visual::Grabber
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
 // Constructor for a stereo grabber
 cedar::dev::sensors::visual::GLGrabber::GLGrabber
 (
@@ -102,7 +101,6 @@ cedar::dev::sensors::visual::Grabber
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 }
 
-//----------------------------------------------------------------------------------------------------------------------
 // Destructor
 cedar::dev::sensors::visual::GLGrabber::~GLGrabber()
 {
@@ -136,14 +134,12 @@ void cedar::dev::sensors::visual::GLGrabber::onCreateGrabber()
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::GLGrabber::onCloseGrabber()
 {
   this->onCleanUp();
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::GLGrabber::onCleanUp()
 {
   // do the cleanup of used hardware in this method
@@ -157,7 +153,7 @@ void cedar::dev::sensors::visual::GLGrabber::onCleanUp()
   }
 }
 
-//----------------------------------------------------------------------------------------------------------------------
+
 std::string cedar::dev::sensors::visual::GLGrabber::onGetSourceInfo(unsigned int channel)
 {
   // value of channel is already checked by GraberInterface::getSourceInfo()
@@ -167,7 +163,7 @@ std::string cedar::dev::sensors::visual::GLGrabber::onGetSourceInfo(unsigned int
                                       + "\"";
 }
 
-//----------------------------------------------------------------------------------------------------------------------
+
 void cedar::dev::sensors::visual::GLGrabber::onGrab(unsigned int channel)
 {
   // pointer to the QGLWidget
@@ -207,7 +203,6 @@ void cedar::dev::sensors::visual::GLGrabber::onGrab(unsigned int channel)
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGLWidget *qglWidget)
 {
   if (channel >= getNumChannels())

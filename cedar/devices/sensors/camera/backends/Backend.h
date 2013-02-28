@@ -116,11 +116,6 @@ protected:
   //! Apply all Parameters from the GUI to the Camera
   void applyStateToCamera();
 
-
-  //! Test all properties from the Backend and enable/disable the properties of the channel
-  virtual void getAvailablePropertiesFromCamera(){};
-
-
   /*! @brief Set a property direct in the cv::VideoCapture class
    *
    *  @param propertyId The OpenCV constants for cv::VideoCapture.set() method
@@ -152,7 +147,7 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! The channel structure
+  //! @brief The channel structure
   cedar::dev::sensors::camera::Channel* mpCameraChannel;
 
 private:
@@ -168,38 +163,5 @@ private:
   // none yet
 
 }; // class cedar::dev::sensors::camera::Backend
-
-/*
-// The typedefs for the manager of the Backends
-#include "cedar/auxiliaries/FactoryManager.h"
-
-namespace cedar
-{
-  namespace dev
-  {
-    namespace sensors
-    {
-      namespace visual
-      {
-        //!@brief The manager of all sigmoind instances
-        typedef cedar::aux::FactoryManager<BackendPtr> BackendManager;
-
-#ifdef MSVC
-#ifdef CEDAR_LIB_EXPORTS_DEV
-        // dllexport
-        template class __declspec(dllexport) cedar::aux::Singleton<BackendManager>;
-#else // CEDAR_LIB_EXPORTS_DEV
-      // dllimport
-        extern template class __declspec(dllimport) cedar::aux::Singleton<BackendManager>;
-#endif // CEDAR_LIB_EXPORTS_DEV
-#endif // MSVC
-
-        //!@brief The singleton object of the TransferFunctionFactory.
-        typedef cedar::aux::Singleton<BackendManager> BackendManagerSingleton;
-      }
-    }
-  }
-}
-*/
 #endif // CEDAR_DEV_SENSORS_CAMERA_BACKEND_H
 

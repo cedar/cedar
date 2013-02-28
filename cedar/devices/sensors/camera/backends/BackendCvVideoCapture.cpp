@@ -71,10 +71,13 @@ void cedar::dev::sensors::camera::BackendCvVideoCapture::init()
 
 void cedar::dev::sensors::camera::BackendCvVideoCapture::createCaptureObject()
 {
-  cv::VideoCapture capture(mpCameraChannel->getCameraId());
+  unsigned int cam_id = mpCameraChannel->getCameraId();
+  cv::VideoCapture capture(cam_id);
   if (!capture.isOpened())
   {
-    CEDAR_THROW(cedar::dev::sensors::camera::CreateBackendException,"Error: Couldn't create capture object");
+    std::string msg = "CvVideoCapture-Backend error: Couldn't create capture object for camera with ID "
+                      + boost::lexical_cast<std::string>(cam_id);
+    CEDAR_THROW(cedar::dev::sensors::camera::CreateBackendException,msg);
   }
   mpCameraChannel->mVideoCapture = capture;
 }
@@ -82,10 +85,6 @@ void cedar::dev::sensors::camera::BackendCvVideoCapture::createCaptureObject()
 
 void cedar::dev::sensors::camera::BackendCvVideoCapture::getAvailablePropertiesFromCamera()
 {
-#ifdef DEBUG_CAMERA_GRABBER
-  std::cout << __PRETTY_FUNCTION__ << std::endl;
-#endif
-
   int num_properties = cedar::dev::sensors::camera::Property::type().list().size();
   for (int i=0; i<num_properties; i++)
   {
@@ -110,8 +109,6 @@ void cedar::dev::sensors::camera::BackendCvVideoCapture::applySettingsToCamera()
 {
   //only the video mode could be set in cv::Videocapture backend
 
-  //std::cout << "applySettingsToCamera" << std::endl;
-
   //get the mode and check if it is set manually
   cedar::dev::sensors::camera::VideoMode::Id video_mode_id = mpCameraChannel->getVideoMode();
   if (video_mode_id != cedar::dev::sensors::camera::VideoMode::MODE_NOT_SET)
@@ -119,6 +116,4 @@ void cedar::dev::sensors::camera::BackendCvVideoCapture::applySettingsToCamera()
     double value = static_cast<double>(video_mode_id);
     this->setPropertyToCamera(cedar::dev::sensors::camera::Setting::MODE,value);
   }
-
-  //std::cout << "applySettingsToCamera finished" << std::endl;
 }

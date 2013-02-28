@@ -77,7 +77,6 @@ public cedar::aux::Configurable
    *   to the appropriate object that handles the property
    */
   typedef std::map<unsigned int, CamPropertyPtr> CamPropertiesMap;
-  //CEDAR_GENERATE_POINTER_TYPES(CamPropertiesMap);
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals and slots
@@ -86,9 +85,6 @@ public cedar::aux::Configurable
   Q_OBJECT
 
 protected slots:
-
-//!@brief A slot is used, to set the changed property in the camera
-//  void propertyChanged();
 
   //!@brief This signal is emitted, when the value of the property has changed.
   void propertyValueChanged(cedar::dev::sensors::camera::Property::Id propertyId, double newValue);
@@ -103,7 +99,7 @@ protected slots:
 
 signals:
 
-//!@brief This signal is emitted, when a setting has changed.
+  //! @brief This signal is emitted, when a setting has changed.
   void propertiesChanged();
 
 public:
@@ -125,20 +121,20 @@ public:
 
   /*! @brief Set the value to the cv::VideoCapture object with respect to capabilities and settings
    *
-   * @param propertyId The Id of the property as cedar::dev::sensors::camera::Property::Id
-   * @param value The value to set the property
-   * @throw cedar::dev::sensors::camera::PropertyNotSetException Thrown, if property could not set
+   *  @param propertyId The Id of the property as cedar::dev::sensors::camera::Property::Id
+   *  @param value The value to set the property
+   *  @throw cedar::dev::sensors::camera::PropertyNotSetException Thrown, if property could not set
    */
   void setProperty(cedar::dev::sensors::camera::Property::Id propertyId, double value);
 
-  /*! get the value from the cv::VideoCapture object with respect to capabilities and settings
+  /*! @brief Get the value from the cv::VideoCapture object with respect to capabilities and settings
    *
    * @param propertyId The Id of the property as cedar::dev::sensors::camera::Property::Id
    * @return The value of the property
    */
   double getProperty(cedar::dev::sensors::camera::Property::Id propertyId);
 
-  /// Get the mode of operation of the used parameter
+  //! @brief Get the mode of operation of the used parameter
   cedar::dev::sensors::camera::PropertyMode::Id getMode
   (
     cedar::dev::sensors::camera::Property::Id propertyId
@@ -146,8 +142,8 @@ public:
 
   /*! @brief Set the mode of operation of the property
    *
-   * @param propertyId The Id of the property as cedar::dev::sensors::camera::Property::Id
-   * @param modeId The new mode (auto, manual, backendDefault) as cedar::dev::sensors::camera::PropertyMode::Id
+   *  @param propertyId The Id of the property as cedar::dev::sensors::camera::Property::Id
+   *  @param modeId The new mode (auto, manual, backendDefault) as cedar::dev::sensors::camera::PropertyMode::Id
    */
   void setMode
   (
@@ -155,24 +151,24 @@ public:
     cedar::dev::sensors::camera::PropertyMode::Id modeId
   );
 
-  /*! Disable the Property with the given ID
+  /*! @brief Disable the Property with the given ID
    *
-   * @param propertyId The Id of the property as cedar::dev::sensors::camera::Property::Id
+   *  @param propertyId The Id of the property as cedar::dev::sensors::camera::Property::Id
    */
   void disableProperty(cedar::dev::sensors::camera::Property::Id propertyId);
 
-  /*! Enable the Property with the given ID
+  /*! @brief Enable the Property with the given ID
    *
-   * @param propertyId The Id of the property as cedar::dev::sensors::camera::Property::Id
+   *  @param propertyId The Id of the property as cedar::dev::sensors::camera::Property::Id
    */
   void enableProperty(cedar::dev::sensors::camera::Property::Id propertyId);
 
 
   /*! @brief Set the default value of the property
    *
-   *  Normally, this value comes from the backend, but it is possible to change it
-   * @param propertyId The Id of the property as cedar::dev::sensors::camera::Property::Id
-   * @param value The new value, which should be used as default value
+   *   Normally, this value comes from the backend, but it is possible to change it
+   *  @param propertyId The Id of the property as cedar::dev::sensors::camera::Property::Id
+   *  @param value The new value, which should be used as default value
    */
   void setDefaultValue(cedar::dev::sensors::camera::Property::Id propertyId, double value);
 
@@ -224,10 +220,10 @@ public:
 
   /*! @brief Set the internally used VideoCapture object to a new one
    *
-   * It is necessary to change the object, because OpenCv uses shared-pointer like structures for the VideoCapture.
-   * At the creation of a new object in the backend, it doesn't change at the properties
+   *   It is necessary to change the object, because OpenCv uses shared-pointer like structures for the VideoCapture.
+   *   At the creation of a new object in the backend, it doesn't change at the properties
    *
-   * @param capture The new capture object
+   *  @param capture The new capture object
    */
   void setVideoCaptureObject(cv::VideoCapture capture);
 
@@ -245,17 +241,17 @@ public:
 
   /*! @brief Get the object of the Property class
    *
-   * @param propertyId The wanted property
-   * @return A shared pointer to the CamProperty object of the given property
+   *  @param propertyId The wanted property
+   *  @return A shared pointer to the CamProperty object of the given property
    */
   cedar::dev::sensors::camera::CamPropertyPtr getPropertyObject(Property::Id propertyId);
 
 
   /*! @brief Enable or disable the eventhandling of the properties on setValue() methods
    *
-   * @param block True if no signal-processing should be done, otherwise false
+   *  @param block True if no signal-processing should be done, otherwise false
    *
-   * @remarks This method invokes the QObject::blockSignals() method for every used property
+   *  @remarks This method invokes the QObject::blockSignals() method for every used property
    */
   void blockSignals(bool block);
 
@@ -277,16 +273,14 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // return CamProperty
-  //@exception std::out_of_range if the searched value doesn't exist
-  // cedar::dev::sensors::visual::CamPropertyPtr getPropertyPtr(Property::Id propId);
-
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 private:
   //! The list of properties
   CamPropertiesMap mPropertiesList;

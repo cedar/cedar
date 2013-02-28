@@ -66,10 +66,6 @@ cedar::dev::sensors::camera::Backend::~Backend()
 
 void cedar::dev::sensors::camera::Backend::createCaptureBackend()
 {
-#ifdef DEBUG_CAMERA_GRABBER
-  std::cout << __PRETTY_FUNCTION__ << std::endl;
-#endif
-
   // lock
   QWriteLocker videocapture_locking(this->mpCameraChannel->mpVideoCaptureLock);
 
@@ -79,9 +75,6 @@ void cedar::dev::sensors::camera::Backend::createCaptureBackend()
   // create cv::VideoCapture
   // on error, a cedar::dev::sensors::camera::CreateBackendException will be thrown
   this->createCaptureObject();
-
-  // fill p_capabilities with values (depends on backend and camera if this is necessary at this stage)
-  getAvailablePropertiesFromCamera();
 
   // pass the new created capture to the channel structure
   mpCameraChannel->mpProperties->setVideoCaptureObject(mpCameraChannel->mVideoCapture);
@@ -159,10 +152,6 @@ void cedar::dev::sensors::camera::Backend::applyStateToCamera()
 void cedar::dev::sensors::camera::Backend::setPropertyToCamera(unsigned int propertyId, double value)
 {
   // no lock needed, the cvVideoCapture object is locked globally
-#ifdef DEBUG_CAMERA_GRABBER
-  std::string prop_name = cedar::dev::sensors::camera::Property::type().get(propertyId).prettyString();
-  std::cout << "setPropertyToCamera "<< prop_name <<"( ID: " << propertyId << ") Value: " << value << std::endl;
-#endif
   bool result = true;
   if (this->mpCameraChannel->mVideoCapture.isOpened())
   {
@@ -170,15 +159,7 @@ void cedar::dev::sensors::camera::Backend::setPropertyToCamera(unsigned int prop
     if ( (value != CAMERA_PROPERTY_NOT_SUPPORTED) || (value != CAMERA_PROPERTY_MODE_DEFAULT) )
     {
       // set value
-      if (this->mpCameraChannel->mVideoCapture.set(propertyId, value))
-      {
-        // check if set:
-        //if (! this->getPropertyFromCamera(propertyId) == value)
-        //{
-        //  result = false;
-        //}
-      }
-      else
+      if (!this->mpCameraChannel->mVideoCapture.set(propertyId, value))
       {
         result = false;
       }

@@ -47,16 +47,6 @@
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
-//#include <map>
-
-//------------------------------------------------------------------------
-// namespace for class camera
-//------------------------------------------------------------------------
-
-//enable debug output
-//#define DEBUG_CAMERA_GRABBER
-//#define DEBUG_CAMERA_STEP
-
 
 namespace cedar
 {
@@ -64,15 +54,12 @@ namespace cedar
   {
     namespace sensors
     {
-
-      //! \brief Namespace for camera devices
+      //! @brief Namespace for camera devices
       namespace camera
       {
         //!@cond SKIPPED_DOCUMENTATION
         CEDAR_DECLARE_DEV_CLASS(Grabber);
-        //-----------------------------------------------------------------------------------------------
-        // camera grabber helper classes
-        //-----------------------------------------------------------------------------------------------
+        CEDAR_DECLARE_DEV_CLASS(Channel);
 
         // backend implementation
         CEDAR_DECLARE_DEV_CLASS(Backend);
@@ -87,7 +74,7 @@ namespace cedar
         CEDAR_DECLARE_DEV_CLASS(LibDcBase);
   #endif
 
-        // enum classes for camera
+        // enum classes for camera settings and properties
         CEDAR_DECLARE_DEV_CLASS(BackendType);
         CEDAR_DECLARE_DEV_CLASS(Decoding);
         CEDAR_DECLARE_DEV_CLASS(FrameRate);
@@ -98,27 +85,20 @@ namespace cedar
         CEDAR_DECLARE_DEV_CLASS(IsoSpeed);
         CEDAR_DECLARE_DEV_CLASS(DebayerPattern);
 
-        // properties
-
         // all properties from one channel
         CEDAR_DECLARE_DEV_CLASS(Properties);
 
-        // one property with name, enum-parameter for mode and double-parameter for value
+        // one property
         CEDAR_DECLARE_DEV_CLASS(CamProperty);
         CEDAR_DECLARE_DEV_CLASS(PropertyMode);
 
-        // settings
-
-        // all settings from one channel
+        // the settings for one channel
         CEDAR_DECLARE_DEV_CLASS(Settings);
         CEDAR_DECLARE_DEV_CLASS(Capabilities);
         CEDAR_DECLARE_DEV_CLASS(State);
 
-        // camera settings
+        // camera settings (possible settings)
         CEDAR_DECLARE_DEV_CLASS(CamSetting);
-
-        // camera channel
-        CEDAR_DECLARE_DEV_CLASS(Channel);
 
         // map from property-id to the corresponding object, which manage the property
         typedef std::map<unsigned int, cedar::dev::sensors::camera::CamPropertyPtr> PropertyMap;
@@ -139,12 +119,9 @@ namespace cedar
 #endif //CEDAR_USE_LIB_DC1394
 
         //!@endcond
-
       }
     }
   }
 }
-
-
 
 #endif /* CEDAR_DEV_SENSORS_CAMERA_NAMESPACE_H */

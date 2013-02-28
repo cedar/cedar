@@ -42,13 +42,12 @@
 #include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/devices/sensors/visual/namespace.h"
 
-//--------------------------------------------------------------------------------------------------------------------
 /*!@brief Exception when an error in the creation of a grabber occur*/
 class cedar::dev::sensors::visual::CreateGrabberException : public cedar::aux::ExceptionBase
 {
 };
 
-//--------------------------------------------------------------------------------------------------------------------
+
 /*!@brief Exception for errors while saving a snapshots
  *
  *    This exception would be thrown when an error occurs while writing a snapshot to disk
@@ -57,7 +56,6 @@ class cedar::dev::sensors::visual::GrabberSnapshotException : public cedar::aux:
 {
 };
 
-//--------------------------------------------------------------------------------------------------------------------
 
 /*! @brief Exception for errors while recording a stream
  *
@@ -67,7 +65,6 @@ class cedar::dev::sensors::visual::GrabberRecordingException : public cedar::aux
 {
 };
 
-//--------------------------------------------------------------------------------------------------------------------
 
 /*! @brief Exception for errors while recording a stream
  *
@@ -80,7 +77,7 @@ class cedar::dev::sensors::visual::GrabberGrabException : public cedar::aux::Exc
 {
 };
 
-//--------------------------------------------------------------------------------------------------------------------
+
 /*!@brief Exception when an invalid parameter (false range, NULL-Pointer, ...) is given */
 class cedar::dev::sensors::visual::InvalidParameterException : public cedar::aux::ExceptionBase
 {

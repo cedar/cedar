@@ -121,7 +121,7 @@ public:
   static const Id RECORD_RAW = 0;
 
   /// Record in MP42 format
-  static const Id RECORD_MP42 = CEDAR_FOURCC('M','P','4','2'); // CV_FOURCC('M','P','4','2')
+  static const Id RECORD_MP42 = CEDAR_FOURCC('M','P','4','2'); // the same as CV_FOURCC('M','P','4','2')
 
   /// Record in MJPG
   static const Id RECORD_MJPG = CEDAR_FOURCC('M','J','P','G');

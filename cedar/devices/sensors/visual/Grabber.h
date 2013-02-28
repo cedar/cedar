@@ -64,7 +64,7 @@
  *
  *      This class implements all the common features, each grabber has to be capable of.
  *      That is e.g. managing the configuration file, recording, threaded grabbing and other stuff like this.
-
+ *
  *   <br><br>
  *   USAGE:
  *     - to set a name for the grabber: getName, setName form cedar::base<br>
@@ -251,6 +251,7 @@ public:
    *          This method invokes internally LoopedThread::stop() and does
    *          some cleanup like stopRecording or set the measured FPS to zero
    */
+  //!@todo Overload LoopedThread::stop() method
   void stopGrabber();
 
   /*! @brief Start the grabbing thread
@@ -261,6 +262,7 @@ public:
    *          To control the grabbing speed (i.e. the FPS) use
    *          setFramerate(), getFramerate() or getMeasuredFramerate()
    */
+  //!@todo Overload LoopedThread::start() method
   void startGrabber();
 
 
@@ -495,12 +497,12 @@ public:
   std::string getChannelSaveFilenameAddition(int channel) const;
 
 
-  /*!@brief Set the grabbing-flag when the grabbing is done manually
+  /*! @brief Set the grabbing-flag when the grabbing is done manually
    *
-   * You have to set/unset this, if your grabbing is done through a periodic call of grab() method
-   * and not with the build-in thread.
+   *   You have to set/unset this, if your grabbing is done through a periodic call of grab() method
+   *   and not with the build-in thread.
    *
-   * Also used in the processing Step "Camera" when running with a looped trigger
+   *   Also used in the processing Step "Camera" when running with a looped trigger
    */
   void setIsGrabbing(bool isGrabbing);
 
@@ -539,8 +541,8 @@ protected:
   /*! @brief Resets the Grabber to initialization values, closes previously opened cv::VideoCaptures or similar
    *    used classes.
    *
-   *  Call this method if you want to change settings of the capture device, which couldn't be set if the device is
-   *  already opened (like the size of the frames of a camera-grabber)
+   *    Call this method if you want to change settings of the capture device, which couldn't be set if the device is
+   *    already opened (like the size of the frames of a camera-grabber)
    *
    *  @remarks For Grabber developers<br>
    *    You have only reset the derived class things.
@@ -554,7 +556,7 @@ protected:
    *      This function is invoked by the doCleanUp method in the Grabber.
    *      Override this method in the derived class and do only the absolutely necessary cleanup here.<br><br>
    *
-   *   @note
+   *  @note
    *      This method is also invoked by the CTRL-C handler. Therefore, it is the only possibility
    *      to do the necessarily cleanup like hardware-reinit, shutting down cameras or to close file handles.
    *
@@ -576,8 +578,8 @@ protected:
 
   /*! @brief Get the channel informations from the derived grabber-classes
    *
-   *  This method is used internally to update the channel info string. It will be called after the onCreate()-method
-   *  of the derived grabber-classes is invoked.
+   *    This method is used internally to update the channel info string. It will be called after the onCreate()-method
+   *    of the derived grabber-classes is invoked.
    *
    *  @param channel The channel which to get the informations
    */
@@ -585,7 +587,7 @@ protected:
 
   /*!@brief Get the Image buffer
    *
-   *  Before this buffer can be read out or written in, it have to be locked with the mpReadWriteLock() lock!
+   *    Before this buffer can be read out or written in, it have to be locked with the mpReadWriteLock() lock!
    *
    *  @param channel This is the index of the source you want to print the properties.
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
@@ -594,17 +596,17 @@ protected:
 
   /*! @brief Updates the info string of the given channel
    *
-   * Call this method in the derived class in the method onGetSourceInfo()
-   * to update the infos about the channel source
+   *   Call this method in the derived class in the method onGetSourceInfo()
+   *   to update the infos about the channel source
    *
-   * @param channel The channel you want to update
-   * @param info The new info-string for that channel
+   *  @param channel The channel you want to update
+   *  @param info The new info-string for that channel
    */
   void setChannelInfoString(unsigned int channel, std::string info);
 
   /*! @brief Set the internal used flag with locking
    *
-   * @param isCreated Flag, if the Grabber is already created or not
+   *  @param isCreated Flag, if the Grabber is already created or not
    */
   void setIsCreated(bool isCreated);
 
@@ -637,9 +639,9 @@ private:
   /*! @brief Callback function to respond to a captured CTRL-C event
    *
    *      This function calls the static emergencyCleanup function of all registered grabbers and then exit(1).
-   *   @see
-   *      emergencyCleanup, doCleanUp, installCrashHandler
-   *   @param signalNo The captured signal. Only CTRL-C is implemented
+   *  @see
+   *     emergencyCleanup, doCleanUp, installCrashHandler
+   *  @param signalNo The captured signal. Only CTRL-C is implemented
    */
   static void interruptSignalHandler(int signalNo);
 
@@ -665,10 +667,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-    /*! @brief Read/write lock
-     *
-     *  Used for concurrent access to the mImageMatVector - matrices
-     */
+    //! @brief Read/write lock used for concurrent access to the mImageMatVector - matrices
     QReadWriteLock* mpReadWriteLock;
     
     //! @brief The actual measured fps of grabbing
@@ -677,8 +676,6 @@ protected:
     /*! @brief  Flag if recording is on     */
     bool mRecording;
 
-//    /// Between Constructor and applyParameter(), this value is false, otherwise it will be true
-//    bool mStartUp;
 
 private:
 
@@ -727,12 +724,11 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //------------------------------------------------------------------------
-  //!@brief Constant which defines how often getMeasuredFramerate() will be updated (in frames).
+  //! @brief Constant which defines how often getMeasuredFramerate() will be updated (in frames).
   static const int UPDATE_FPS_MEASURE_FRAME_COUNT = 5;
 
-  //! A vector which contains for every grabbing-channel one channel structure
+  //! @brief A vector which contains for every grabbing-channel one channel structure
   ChannelParameterPtr _mChannels;
-
 
 private:
 

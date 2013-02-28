@@ -136,7 +136,7 @@ protected:
 
 private:
 
-  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class NetChannelPtr
+  //! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class NetChannelPtr
   inline NetChannelPtr getNetChannel(unsigned int channel)
   {
     return boost::static_pointer_cast<NetChannel>
@@ -145,7 +145,7 @@ private:
            );
   }
 
-  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
+  //! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
   inline ConstNetChannelPtr getNetChannel(unsigned int channel) const
   {
     return boost::static_pointer_cast<const NetChannel>

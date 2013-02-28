@@ -62,8 +62,8 @@ int main(int argc, char* argv[])
 {
 
   // grab from device number on the bus (as an integer)
+  // it is possible to specify th GUID of the camera here (if so, set the IS_GUID paramter to true)
   const int CHANNEL_0_DEVICE = 0;
-  //  const int CHANNEL_0_DEVICE = 197055;
 
   // given device-ID is the guid of the cam. or the id on the bus
   const bool  IS_GUID = false;

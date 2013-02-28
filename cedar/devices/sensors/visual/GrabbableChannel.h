@@ -120,4 +120,3 @@ private:
 }; // class cedar::dev::sensors::visual::GrabbableChannel
 
 #endif // CEDAR_DEV_SENSORS_VISUAL_GRABBABLE_CHANNEL_H
-
