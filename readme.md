@@ -49,7 +49,7 @@ have to install before you can compile our library. The version numbers are
 the oldest versions supported.
 
 * CMake
-* Boost 1.47
+* Boost 1.47 (except version 1.49)
 * OpenCV 2.2
 * Qt 4.6.2
 * qwt 5.2.1
