@@ -23,22 +23,22 @@
           "lower limit": "-32768",
           "upper limit": "32767"
         },
-        "wheel distance": "0.053",
-        "wheel radius": "0.0205",
+        "wheel distance": "0.053 m",
+        "wheel radius": "0.0205 m",
         "hardware speed limits":
         {
-          "lower limit": "-1.0",
-          "upper limit": "1.0"
+          "lower limit": "-1.0 m s^-1",
+          "upper limit": "1.0 m s^-1"
         },
         "forward velocity limits":
         {
-          "lower limit": "-1.0",
-          "upper limit": "1.0"
+          "lower limit": "-1.0 m s^-1",
+          "upper limit": "1.0 m s^-1"
         },
         "turning rate limits":
         {
-          "lower limit": "-3.141",
-          "upper limit": "3.141"
+          "lower limit": "-3.141 rad s^-1",
+          "upper limit": "3.141 rad s^-1"
         }
       }
     },

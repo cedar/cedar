@@ -41,7 +41,7 @@
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/UIntParameter.h"
-#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/TimeParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
 
 // SYSTEM INCLUDES
@@ -65,7 +65,17 @@ mTimer(mIoService),
 _mDevicePath(new cedar::aux::StringParameter(this, "device path", "/dev/rfcomm0")),
 _mEscapedCommandDelimiter(new cedar::aux::StringParameter(this, "escaped command delimiter", "\\r\\n")),
 _mBaudRate(new cedar::aux::UIntParameter(this, "baud rate", 115200, 0, 8000000)),
-_mTimeout(new cedar::aux::DoubleParameter(this, "time out", 0.25, 0, 1000))
+_mTimeout
+(
+  new cedar::aux::TimeParameter
+  (
+    this,
+    "time out",
+    0.25 * cedar::unit::seconds,
+    0.0 * cedar::unit::seconds,
+    1000.0 * cedar::unit::seconds
+  )
+)
 {
   // whenever the user changes the (escaped) command delimiter, the unescaped version needs to be updated accordingly
   QObject::connect(_mEscapedCommandDelimiter.get(), SIGNAL(valueChanged()),
@@ -104,7 +114,7 @@ unsigned int cedar::dev::SerialChannel::getBaudRate() const
   return _mBaudRate->getValue();
 }
 
-double cedar::dev::SerialChannel::getTimeout() const
+const cedar::unit::Time& cedar::dev::SerialChannel::getTimeout() const
 {
   return _mTimeout->getValue();
 }
@@ -171,7 +181,8 @@ std::string cedar::dev::SerialChannel::read()
   setupRead();
 
   // start the timer for the timeout
-  mTimer.expires_from_now(boost::posix_time::time_duration(boost::posix_time::seconds(_mTimeout->getValue())));
+  boost::posix_time::seconds timeout_boost_seconds(getTimeout() / cedar::unit::Time(1.0 * cedar::unit::second));
+  mTimer.expires_from_now(boost::posix_time::time_duration(timeout_boost_seconds));
   // wait for the timeout to expire and call cedar::dev::SerialChannel::timeoutExpired when it does
   mTimer.async_wait(boost::bind(&cedar::dev::SerialChannel::timeoutExpired, this, boost::asio::placeholders::error));
 

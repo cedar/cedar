@@ -35,9 +35,9 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/VelocityParameter.h"
 #include "cedar/auxiliaries/LengthParameter.h"
-#include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
+#include "cedar/auxiliaries/math/VelocityLimitsParameter.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/devices/namespace.h"
 #include "cedar/devices/DifferentialDrive.h"
@@ -54,50 +54,84 @@
 cedar::dev::DifferentialDrive::DifferentialDrive()
 :
 mWheelSpeed(2, 0.0 * cedar::unit::DEFAULT_VELOCITY_UNIT),
-_mWheelDistance(new cedar::aux::LengthParameter
-                    (
-                      this,
-                      "wheel distance",
-                      0.1 * cedar::unit::meters,
-                      0.0 * cedar::unit::meters,
-                      1.0 * cedar::unit::meter
-                    )
-               ),
-_mWheelRadius(new cedar::aux::LengthParameter
-                  (
-                    this,
-                    "wheel radius",
-                    0.01 * cedar::unit::meters,
-                    0.0 * cedar::unit::meters,
-                    1.0 * cedar::unit::meter
-                  )
-             ),
-_mHardwareSpeedLimits(new cedar::aux::math::DoubleLimitsParameter(this, "hardware speed limits", 0.0, 0.2, 0.2, 2.0))
+_mWheelDistance
+(
+  new cedar::aux::LengthParameter
+  (
+    this,
+    "wheel distance",
+    0.1 * cedar::unit::meters,
+    0.0 * cedar::unit::meters,
+    1.0 * cedar::unit::meter
+  )
+),
+_mWheelRadius
+(
+  new cedar::aux::LengthParameter
+  (
+    this,
+    "wheel radius",
+    0.01 * cedar::unit::meters,
+    0.0 * cedar::unit::meters,
+    1.0 * cedar::unit::meter
+  )
+),
+_mHardwareSpeedLimits
+(
+  new cedar::aux::math::VelocityLimitsParameter
+  (
+    this,
+    "hardware speed limits",
+    0.1 * cedar::unit::meters_per_second,
+    0.0 * cedar::unit::meters_per_second,
+    0.2 * cedar::unit::meters_per_second,
+    0.1 * cedar::unit::meters_per_second,
+    0.2 * cedar::unit::meters_per_second,
+    2.0 * cedar::unit::meters_per_second
+  )
+)
 {}
 
 cedar::dev::DifferentialDrive::DifferentialDrive(cedar::dev::ChannelPtr channel)
 :
 cedar::dev::Locomotion(channel),
 mWheelSpeed(2, 0.0 * cedar::unit::DEFAULT_VELOCITY_UNIT),
-_mWheelDistance(new cedar::aux::LengthParameter
-                    (
-                      this,
-                      "wheel distance",
-                      0.1 * cedar::unit::meters,
-                      0.0 * cedar::unit::meters,
-                      1.0 * cedar::unit::meter
-                    )
-               ),
-_mWheelRadius(new cedar::aux::LengthParameter
-                  (
-                    this,
-                    "wheel radius",
-                    0.01 * cedar::unit::meters,
-                    0.0 * cedar::unit::meters,
-                    1.0 * cedar::unit::meter
-                  )
-             ),
-_mHardwareSpeedLimits(new cedar::aux::math::DoubleLimitsParameter(this, "hardware speed limits", 0.0, 0.2, 0.2, 2.0))
+_mWheelDistance
+(
+  new cedar::aux::LengthParameter
+  (
+    this,
+    "wheel distance",
+    0.1 * cedar::unit::meters,
+    0.0 * cedar::unit::meters,
+    1.0 * cedar::unit::meter
+  )
+),
+_mWheelRadius
+(
+  new cedar::aux::LengthParameter
+  (
+    this,
+    "wheel radius",
+    0.01 * cedar::unit::meters,
+    0.0 * cedar::unit::meters,
+    1.0 * cedar::unit::meter
+  )
+),
+_mHardwareSpeedLimits
+(
+  new cedar::aux::math::VelocityLimitsParameter
+  (
+    this,
+    "hardware speed limits",
+    0.1 * cedar::unit::meters_per_second,
+    0.0 * cedar::unit::meters_per_second,
+    0.2 * cedar::unit::meters_per_second,
+    0.1 * cedar::unit::meters_per_second,
+    0.2 * cedar::unit::meters_per_second,
+    2.0 * cedar::unit::meters_per_second
+  )
+)
 {}
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -114,7 +148,7 @@ cedar::unit::Length cedar::dev::DifferentialDrive::getWheelRadius() const
   return _mWheelRadius->getValue();
 }
 
-cedar::aux::math::DoubleLimitsParameterPtr cedar::dev::DifferentialDrive::getHardwareSpeedLimits() const
+cedar::aux::math::VelocityLimitsParameterPtr cedar::dev::DifferentialDrive::getHardwareSpeedLimits() const
 {
   return _mHardwareSpeedLimits;
 }
@@ -155,7 +189,9 @@ void cedar::dev::DifferentialDrive::setForwardVelocityAndTurningRate
   cedar::unit::Velocity left_wheel_speed = 0.0 * cedar::unit::DEFAULT_VELOCITY_UNIT;
   cedar::unit::Velocity right_wheel_speed = 0.0 * cedar::unit::DEFAULT_VELOCITY_UNIT;
   convertToWheelSpeed(forwardVelocity, turningRate, left_wheel_speed, right_wheel_speed);
+
   thresholdToHardwareLimits(left_wheel_speed, right_wheel_speed);
+
   mWheelSpeed[0] = left_wheel_speed;
   mWheelSpeed[1] = right_wheel_speed;
 
@@ -169,11 +205,8 @@ void cedar::dev::DifferentialDrive::thresholdToHardwareLimits
        cedar::unit::Velocity& rightWheelSpeed
      )
 {
-  //!todo fix this by introducing a VelocityLimitsParameter class
-  double left_wheel_speed = leftWheelSpeed / cedar::unit::DEFAULT_VELOCITY_UNIT;
-  double right_wheel_speed = rightWheelSpeed / cedar::unit::DEFAULT_VELOCITY_UNIT;
-  leftWheelSpeed = _mHardwareSpeedLimits->getValue().limit(left_wheel_speed) * cedar::unit::DEFAULT_VELOCITY_UNIT;
-  rightWheelSpeed = _mHardwareSpeedLimits->getValue().limit(right_wheel_speed) * cedar::unit::DEFAULT_VELOCITY_UNIT;
+  leftWheelSpeed = _mHardwareSpeedLimits->getValue().limit(leftWheelSpeed);
+  rightWheelSpeed = _mHardwareSpeedLimits->getValue().limit(rightWheelSpeed);
 }
 
 void cedar::dev::DifferentialDrive::convertToWheelSpeed

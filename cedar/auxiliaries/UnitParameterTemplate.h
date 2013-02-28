@@ -85,7 +85,7 @@ namespace cedar
   namespace aux
   {
     template<typename Dimension, typename Unit>
-    void addSubUnitToMaps
+    inline void addSubUnitToMaps
     (
       std::map<std::string, boost::units::quantity<Dimension> >& map,
       const Unit& unit,
@@ -99,7 +99,7 @@ namespace cedar
     }
 
     template<typename BaseUnit, typename Dimension, typename Unit>
-    void addBaseUnitToMaps
+    inline void addBaseUnitToMaps
     (
       std::map<std::string, boost::units::quantity<Dimension> >& map,
       const Unit& unit
@@ -110,7 +110,7 @@ namespace cedar
     }
 
     template <typename Dimension>
-    void addAliasToMaps
+    inline void addAliasToMaps
     (
       std::map<std::string, boost::units::quantity<Dimension> >& map,
       const std::string& name,
@@ -125,7 +125,7 @@ namespace cedar
     }
 
     template <typename Dimension>
-    boost::units::quantity<Dimension> findUnit
+    inline boost::units::quantity<Dimension> findUnit
     (
       const std::string& postFix,
       std::map<std::string, boost::units::quantity<Dimension> >& map
@@ -147,7 +147,7 @@ namespace cedar
      * @remarks Ignores the exponents in the string, the calling function has to take care of this.
      */
     template <typename TUnit>
-    boost::units::quantity<TUnit> parseUnitString(const std::string& unitStr)
+    inline boost::units::quantity<TUnit> parseUnitString(const std::string& unitStr)
     {
       std::vector<std::string> split;
       cedar::aux::split(unitStr, "^", split);
@@ -166,7 +166,7 @@ namespace cedar
       long NumeratorPower = 1,
       long DenominatorPower = 1
     >
-    boost::units::quantity<T> parseCompoundUnit(const std::string& unitStr)
+    inline boost::units::quantity<T> parseCompoundUnit(const std::string& unitStr)
     {
       typedef typename boost::units::static_rational<NumeratorPower>::type NumeratorRational;
       typedef typename boost::units::static_rational<DenominatorPower>::type DenominatorRational;
