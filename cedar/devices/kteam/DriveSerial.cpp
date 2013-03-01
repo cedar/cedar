@@ -97,9 +97,9 @@ void cedar::dev::kteam::DriveSerial::sendMovementCommand()
   std::ostringstream command;
   command << _mCommandSetSpeed->getValue()
           << ","
-          << wheel_speed_pulses[0] / cedar::unit::DEFAULT_FREQUENCY_UNIT
+          << static_cast<int>(wheel_speed_pulses[0] / cedar::unit::DEFAULT_FREQUENCY_UNIT)
           << ","
-          << wheel_speed_pulses[1] / cedar::unit::DEFAULT_FREQUENCY_UNIT;
+          << static_cast<int>(wheel_speed_pulses[1] / cedar::unit::DEFAULT_FREQUENCY_UNIT);
 
   // wait for an answer
   std::string answer = convertToSerialChannel(getChannel())->writeAndReadLocked(command.str());

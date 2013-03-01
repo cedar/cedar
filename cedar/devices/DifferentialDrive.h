@@ -40,8 +40,8 @@
 // CEDAR INCLUDES
 #include "cedar/devices/namespace.h"
 #include "cedar/devices/Locomotion.h"
-#include "cedar/auxiliaries/DoubleParameter.h"
-#include "cedar/auxiliaries/math/DoubleLimitsParameter.h"
+#include "cedar/auxiliaries/LengthParameter.h"
+#include "cedar/auxiliaries/math/VelocityLimitsParameter.h"
 #include "cedar/units/Length.h"
 #include "cedar/units/Velocity.h"
 #include "cedar/units/AngularVelocity.h"
@@ -79,7 +79,7 @@ public:
   cedar::unit::Length getWheelRadius() const;
 
   //!@brief Returns the speed limits dictated by the robotic hardware [in m/s].
-  cedar::aux::math::DoubleLimitsParameterPtr getHardwareSpeedLimits() const;
+  cedar::aux::math::VelocityLimitsParameterPtr getHardwareSpeedLimits() const;
 
   /*!@brief Returns the current speed of the wheels [in m/s].
    * @return Vector holding the wheel speed of the left (1st element) and right wheel (2nd element) [both in m/s]
@@ -174,10 +174,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //! distance between the wheels [in m]
-  cedar::aux::DoubleParameterPtr _mWheelDistance;
+  cedar::aux::LengthParameterPtr _mWheelDistance;
   //! radius of the wheel [in m]
-  cedar::aux::DoubleParameterPtr _mWheelRadius;
+  cedar::aux::LengthParameterPtr _mWheelRadius;
   //! limits for the speed of the wheels [in m/s]
-  cedar::aux::math::DoubleLimitsParameterPtr _mHardwareSpeedLimits;
+  cedar::aux::math::VelocityLimitsParameterPtr _mHardwareSpeedLimits;
 }; // class cedar::dev::DifferentialDrive
 #endif // CEDAR_DEV_DIFFERENTIAL_DRIVE_H
