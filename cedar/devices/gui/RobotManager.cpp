@@ -154,7 +154,7 @@ void cedar::dev::gui::RobotManager::loadConfiguration(const std::string& configu
 
 void cedar::dev::gui::RobotManager::loadConfigurationFromResourceTriggered()
 {
-  std::string resource = cedar::aux::gui::ResourceDialog::openResource();
+  std::string resource = cedar::aux::gui::ResourceDialog::openResource(this, {".json"});
 
   if (!resource.empty())
   {

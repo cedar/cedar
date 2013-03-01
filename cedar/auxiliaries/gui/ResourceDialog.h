@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/gui/ui_ResourceDialog.h"
 
 // SYSTEM INCLUDES
+#include <QFileIconProvider>
 
 
 /*!@todo describe.
@@ -53,6 +54,8 @@
  */
 class cedar::aux::gui::ResourceDialog : public QDialog, public Ui_ResourceDialog
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -62,7 +65,11 @@ class cedar::aux::gui::ResourceDialog : public QDialog, public Ui_ResourceDialog
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ResourceDialog();
+  ResourceDialog
+  (
+    QWidget* pParent = NULL,
+    const std::vector<std::string>& extensions = std::vector<std::string>()
+  );
 
   //!@brief Destructor
   virtual ~ResourceDialog();
@@ -71,7 +78,11 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  static std::string openResource(QWidget* pParent = NULL);
+  static std::string openResource
+  (
+    QWidget* pParent = NULL,
+    const std::vector<std::string>& extensions = std::vector<std::string>()
+  );
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -83,7 +94,21 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void fill();
+
+  void removeEmpty(QTreeWidgetItem* pParent);
+
+  void appendDirectories(const std::string& path, QTreeWidgetItem* pParent);
+  void appendFiles(const std::string& path, QTreeWidgetItem* pParent);
+
+  QTreeWidgetItem* findPathNode(const std::string& relativePath, QTreeWidgetItem* pParent = NULL) const;
+
+  void setTextFromItem(QTreeWidgetItem* pItem);
+
+private slots:
+  void itemSelected();
+
+  void itemActivated(QTreeWidgetItem* pItem, int);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -91,7 +116,12 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  std::vector<std::string> mExtensions;
+
+  QFileIconProvider* mIconProvider;
+
+  static const int ITEM_TYPE_FOLDER;
+  static const int ITEM_TYPE_FILE;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

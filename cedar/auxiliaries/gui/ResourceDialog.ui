@@ -24,11 +24,6 @@
        <string>Resources</string>
       </property>
      </column>
-     <item>
-      <property name="text">
-       <string>For now, please enter the resource manually below; a tree-like list of all available resources will follow here.</string>
-      </property>
-     </item>
     </widget>
    </item>
    <item>
