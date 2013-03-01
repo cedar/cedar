@@ -51,7 +51,7 @@ namespace cedar
   namespace aux
   {
     template <>
-    cedar::unit::AngularVelocity
+    inline cedar::unit::AngularVelocity
       parseUnitString<cedar::unit::AngularVelocity::unit_type>(const std::string& unitStr)
     {
       return

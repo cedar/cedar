@@ -32,7 +32,7 @@
       "device path": "/dev/rfcomm0",
       "baud rate": "115200",
       "escaped command delimiter": "\\r\\n",
-      "time out": "5.25"
+      "time out": "5.25 s"
     }
   }
 }

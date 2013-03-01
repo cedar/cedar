@@ -22,37 +22,25 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LimitsParameter.cpp
+    File:        LengthLimitsParameter.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 12 09
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2013 02 27
 
-    Description: Specialization for the @em cedar::aux::math::LimitsParameter struct.
+    Description: This is a dummy header for the typedef LengthLimitsParameter (which is actually a
+                 cedar::aux::math::LimitsParameter<cedar::unit::Length>).
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_AUX_MATH_LENGTH_LIMITS_PARAMETER_H
+#define CEDAR_AUX_MATH_LENGTH_LIMITS_PARAMETER_H
+
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/math/LimitsParameter.h"
 #include "cedar/auxiliaries/LengthParameter.h"
-#include "cedar/auxiliaries/TimeParameter.h"
-#include "cedar/auxiliaries/VelocityParameter.h"
-#include "cedar/auxiliaries/AccelerationParameter.h"
-#include "cedar/auxiliaries/PlaneAngleParameter.h"
-#include "cedar/auxiliaries/AngularVelocityParameter.h"
-#include "cedar/auxiliaries/FrequencyParameter.h"
 
-// SYSTEM INCLUDES
-
-template class cedar::aux::math::LimitsParameter<double>;
-template class cedar::aux::math::LimitsParameter<int>;
-template class cedar::aux::math::LimitsParameter<unsigned int>;
-template class cedar::aux::math::LimitsParameter<cedar::unit::Length>;
-template class cedar::aux::math::LimitsParameter<cedar::unit::Time>;
-template class cedar::aux::math::LimitsParameter<cedar::unit::Velocity>;
-template class cedar::aux::math::LimitsParameter<cedar::unit::Acceleration>;
-template class cedar::aux::math::LimitsParameter<cedar::unit::PlaneAngle>;
-template class cedar::aux::math::LimitsParameter<cedar::unit::AngularVelocity>;
-template class cedar::aux::math::LimitsParameter<cedar::unit::Frequency>;
+#endif // CEDAR_AUX_MATH_LENGTH_LIMITS_PARAMETER_H

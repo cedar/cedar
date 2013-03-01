@@ -53,7 +53,7 @@
 
 cedar::dev::kteam::khepera::Gripper::Gripper()
 :
-_mArmPositionLimits(new cedar::aux::math::UIntLimitsParameter(this, "arm position limits", 0, 255, 0, 255))
+_mArmPositionLimits(new cedar::aux::math::UIntLimitsParameter(this, "arm position limits", 0, 0, 255, 255, 0, 255))
 {
   initialize();
 }
@@ -62,7 +62,7 @@ _mArmPositionLimits(new cedar::aux::math::UIntLimitsParameter(this, "arm positio
 cedar::dev::kteam::khepera::Gripper::Gripper(cedar::dev::ChannelPtr channel)
 :
 cedar::dev::Component(channel),
-_mArmPositionLimits(new cedar::aux::math::UIntLimitsParameter(this, "arm position limits", 0, 255, 0, 255))
+_mArmPositionLimits(new cedar::aux::math::UIntLimitsParameter(this, "arm position limits", 0, 0, 255, 255, 0, 255))
 {
   initialize();
 }
