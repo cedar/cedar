@@ -224,7 +224,7 @@ private:
     parameter->lockForRead();
     if (parameter->getValue() != WidgetPolicy::getValue(this->mpWidget))
     {
-      this->mpWidget->setValue(parameter->getValue());
+      WidgetPolicy::setValue(this->mpWidget, parameter->getValue());
     }
     parameter->unlock();
     this->mpWidget->blockSignals(blocked);
