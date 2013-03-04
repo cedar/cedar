@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        RobotManager.h
+    File:        RobotCard.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 02 27
+    Date:        2013 03 04
 
     Description:
 
@@ -34,27 +34,55 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_GUI_ROBOT_MANAGER_H
-#define CEDAR_DEV_GUI_ROBOT_MANAGER_H
+#ifndef CEDAR_DEV_GUI_ROBOT_CARD_H
+#define CEDAR_DEV_GUI_ROBOT_CARD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/devices/gui/namespace.h"
-#include "cedar/devices/namespace.h"
-#include "cedar/devices/gui/ui_RobotManager.h"
 
 // SYSTEM INCLUDES
-#include <QTreeWidgetItem>
-#include <QWidget>
+#include <QFrame>
+#include <QLabel>
+#include <QListWidgetItem>
+#include <QComboBox>
+#include <QLineEdit>
 
 
-/*!@brief A gui for the manager of robot instances.
+/*!@brief A class that displays an icon in the RobotCard widget.
  */
-class cedar::dev::gui::RobotManager : public QWidget, public Ui_RobotManager
+class cedar::dev::gui::RobotCardIconHolder : public QLabel
 {
   Q_OBJECT
+
+  public:
+    RobotCardIconHolder();
+
+  signals:
+    void robotDropped(const QString& robotName);
+
+  protected:
+    void dragEnterEvent(QDragEnterEvent* pEvent);
+    void dropEvent(QDropEvent* pEvent);
+
+  private:
+    QListWidgetItem* itemFromMime(QDropEvent* pEvent);
+
+    void setRobotFromTemplate(const std::string& name);
+};
+
+
+
+/*!@todo describe.
+ *
+ * @todo describe more.
+ */
+class cedar::dev::gui::RobotCard : public QFrame
+{
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -64,21 +92,24 @@ class cedar::dev::gui::RobotManager : public QWidget, public Ui_RobotManager
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  RobotManager();
+  RobotCard(const QString& robotName);
 
-  //!@brief The destructor.
-  ~RobotManager();
+  //!@brief Destructor
+  virtual ~RobotCard();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void loadConfiguration(const std::string& configuration);
+  std::string getRobotName() const;
 
-signals:
-  void robotNameAdded(QString addedRobotName);
+  std::string getRobotTemplateName() const
+  {
+    return this->mRobotTemplateName;
+  }
 
-  void robotConfigurationLoaded(QString addedRobotName);
+public slots:
+  void robotDropped(const QString& robotName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -89,38 +120,8 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  void deselectRobot();
-
-  void selectRobot(const std::string& robotName);
-
-  std::string getSelectedRobotName() const;
-
-  cedar::dev::RobotPtr getSelectedRobot() const;
-
-  // signal translators
-  void robotAddedSignalTranslator(const std::string& addedRobotName);
-
-  void robotConfigurationLoadedSignalTranslator(const std::string& robotName);
-
-  void fillSimpleRobotList();
-
 private slots:
-  void loadConfigurationTriggered();
-
-  void loadConfigurationFromResourceTriggered();
-
-  void addRobotClicked();
-
-  void addRobotName(QString addedRobotName);
-
-  void updateRobotConfiguration(QString addedRobotName);
-
-  void robotNameSelected(int nameIndex);
-
-  void partSelected(QTreeWidgetItem* pCurrent, QTreeWidgetItem* pPrevious);
-
-  void simpleModeAddClicked();
+  void selectedConfigurationChanged(int index);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -128,22 +129,12 @@ private slots:
 protected:
   // none yet
 private:
-  boost::signals2::connection mRobotAddedConnection;
-  boost::signals2::connection mRobotConfigurationChangedConnection;
+  QComboBox* mpConfigurationSelector;
 
-  QTreeWidgetItem* mpComponentsNode;
-  QTreeWidgetItem* mpChannelsNode;
+  QLineEdit* mpRobotNameEdit;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
+  std::string mRobotTemplateName;
+}; // class cedar::dev::gui::RobotCard
 
-private:
-  // none yet
-
-}; // class cedar::dev::gui::RobotManager
-
-#endif // CEDAR_DEV_GUI_ROBOT_MANAGER_H
+#endif // CEDAR_DEV_GUI_ROBOT_CARD_H
 
