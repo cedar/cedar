@@ -105,6 +105,8 @@ private:
 
   void fillSimpleRobotList();
 
+  void robotRemoved(const std::string& robotName);
+
 private slots:
   void loadConfigurationTriggered();
 
@@ -122,6 +124,8 @@ private slots:
 
   void simpleModeAddClicked();
 
+  void removeClicked();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -130,6 +134,7 @@ protected:
 private:
   boost::signals2::connection mRobotAddedConnection;
   boost::signals2::connection mRobotConfigurationChangedConnection;
+  boost::signals2::connection mRobotRemovedConnection;
 
   QTreeWidgetItem* mpComponentsNode;
   QTreeWidgetItem* mpChannelsNode;
