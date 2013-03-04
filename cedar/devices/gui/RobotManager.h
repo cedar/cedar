@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/gui/namespace.h"
+#include "cedar/devices/namespace.h"
 #include "cedar/devices/gui/ui_RobotManager.h"
 
 // SYSTEM INCLUDES
@@ -95,6 +96,8 @@ private:
 
   std::string getSelectedRobotName() const;
 
+  cedar::dev::RobotPtr getSelectedRobot() const;
+
   // signal translators
   void robotAddedSignalTranslator(const std::string& addedRobotName);
 
@@ -112,6 +115,8 @@ private slots:
   void updateRobotConfiguration(QString addedRobotName);
 
   void robotNameSelected(int nameIndex);
+
+  void partSelected(QTreeWidgetItem* pCurrent, QTreeWidgetItem* pPrevious);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
