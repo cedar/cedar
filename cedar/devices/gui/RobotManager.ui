@@ -98,7 +98,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="cedar::aux::gui::PropertyPane" name="widget" native="true"/>
+       <widget class="cedar::aux::gui::PropertyPane" name="mpPropertyPane" native="true"/>
       </item>
      </layout>
     </widget>

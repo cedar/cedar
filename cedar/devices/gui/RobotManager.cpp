@@ -102,6 +102,13 @@ mpChannelsNode(NULL)
                                            );
 
   QObject::connect(this->mpRobotSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(robotNameSelected(int)));
+  QObject::connect
+  (
+    this->mpRobotTree,
+    SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)),
+    this,
+    SLOT(partSelected(QTreeWidgetItem*, QTreeWidgetItem*))
+  );
 }
 
 cedar::dev::gui::RobotManager::~RobotManager()
@@ -113,6 +120,37 @@ cedar::dev::gui::RobotManager::~RobotManager()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dev::gui::RobotManager::partSelected(QTreeWidgetItem* pCurrent, QTreeWidgetItem*)
+{
+  if (pCurrent == NULL || this->getSelectedRobotName().empty() || !this->getSelectedRobot())
+  {
+    this->mpPropertyPane->resetContents();
+  }
+  else
+  {
+    cedar::aux::ConfigurablePtr to_display;
+    if (pCurrent->parent() == this->mpComponentsNode)
+    {
+      std::string component_name = pCurrent->text(0).toStdString();
+      to_display = this->getSelectedRobot()->getComponent(component_name);
+    }
+    else if (pCurrent->parent() == this->mpChannelsNode)
+    {
+      std::string channel_name = pCurrent->text(0).toStdString();
+      to_display = this->getSelectedRobot()->getChannel(channel_name);
+    }
+
+    if (to_display)
+    {
+      this->mpPropertyPane->display(to_display);
+    }
+    else
+    {
+      this->mpPropertyPane->resetContents();
+    }
+  }
+}
 
 void cedar::dev::gui::RobotManager::addRobotClicked()
 {
@@ -178,6 +216,11 @@ void cedar::dev::gui::RobotManager::loadConfigurationFromResourceTriggered()
       );
     }
   }
+}
+
+cedar::dev::RobotPtr cedar::dev::gui::RobotManager::getSelectedRobot() const
+{
+  return cedar::dev::RobotManagerSingleton::getInstance()->getRobot(this->getSelectedRobotName());
 }
 
 std::string cedar::dev::gui::RobotManager::getSelectedRobotName() const
