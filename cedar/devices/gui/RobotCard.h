@@ -42,6 +42,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/gui/namespace.h"
+#include "cedar/devices/namespace.h"
 
 // SYSTEM INCLUDES
 #include <QFrame>
@@ -134,6 +135,8 @@ private:
   QLineEdit* mpRobotNameEdit;
 
   std::string mRobotTemplateName;
+
+  cedar::dev::RobotPtr mRobot;
 }; // class cedar::dev::gui::RobotCard
 
 #endif // CEDAR_DEV_GUI_ROBOT_CARD_H

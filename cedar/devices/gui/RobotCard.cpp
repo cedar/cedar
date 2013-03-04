@@ -55,6 +55,10 @@
 
 cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
 {
+  // associate robot with this card
+  this->mRobot = cedar::dev::RobotManagerSingleton::getInstance()->getRobot(robotName.toStdString());
+
+  // build user interface
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
   this->setFixedWidth(200);
   this->setFrameShape(QFrame::StyledPanel);
