@@ -50,6 +50,7 @@
 #include <QListWidgetItem>
 #include <QComboBox>
 #include <QLineEdit>
+#include <boost/signals2.hpp>
 
 
 /*!@brief A class that displays an icon in the RobotCard widget.
@@ -121,8 +122,13 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  void robotRemoved(const std::string& robotName);
+
 private slots:
   void selectedConfigurationChanged(int index);
+
+  void deleteClicked();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -137,6 +143,8 @@ private:
   std::string mRobotTemplateName;
 
   cedar::dev::RobotPtr mRobot;
+
+  boost::signals2::connection mRobotRemovedConnection;
 }; // class cedar::dev::gui::RobotCard
 
 #endif // CEDAR_DEV_GUI_ROBOT_CARD_H

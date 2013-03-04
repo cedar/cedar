@@ -169,6 +169,20 @@ void cedar::dev::RobotManager::addRobotName(const std::string& robotName)
   this->mRobotNameAddedSignal(robotName);
 }
 
+void cedar::dev::RobotManager::removeRobot(const std::string& robotName)
+{
+  auto iter = mRobotInstances.find(robotName);
+
+  if (iter == mRobotInstances.end())
+  {
+    CEDAR_THROW(cedar::aux::UnknownNameException, "Could not find a robot by the name \"" + robotName + "\".");
+  }
+
+  this->mRobotInstances.erase(iter);
+
+  this->mRobotRemovedSignal(robotName);
+}
+
 cedar::dev::RobotPtr cedar::dev::RobotManager::getRobot(const std::string& robotName) const
 {
   auto iter = this->mRobotInstances.find(robotName);

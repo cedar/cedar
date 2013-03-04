@@ -58,6 +58,17 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
   // associate robot with this card
   this->mRobot = cedar::dev::RobotManagerSingleton::getInstance()->getRobot(robotName.toStdString());
 
+  this->mRobotRemovedConnection
+    = cedar::dev::RobotManagerSingleton::getInstance()->connectToRobotRemovedSignal
+      (
+        boost::bind
+        (
+          &cedar::dev::gui::RobotCard::robotRemoved,
+          this,
+          _1
+        )
+      );
+
   // build user interface
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
   this->setFixedWidth(200);
@@ -90,6 +101,7 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
 
   QObject::connect(p_drop_area, SIGNAL(robotDropped(const QString&)), this, SLOT(robotDropped(const QString&)));
   QObject::connect(mpConfigurationSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(selectedConfigurationChanged(int)));
+  QObject::connect(p_recycle_button, SIGNAL(clicked()), this, SLOT(deleteClicked()));
 }
 
 cedar::dev::gui::RobotCardIconHolder::RobotCardIconHolder()
@@ -101,11 +113,25 @@ cedar::dev::gui::RobotCardIconHolder::RobotCardIconHolder()
 
 cedar::dev::gui::RobotCard::~RobotCard()
 {
+  this->mRobotRemovedConnection.disconnect();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dev::gui::RobotCard::deleteClicked()
+{
+  cedar::dev::RobotManagerSingleton::getInstance()->removeRobot(this->getRobotName());
+}
+
+void cedar::dev::gui::RobotCard::robotRemoved(const std::string& robotName)
+{
+  if (robotName == this->getRobotName())
+  {
+    this->deleteLater();
+  }
+}
 
 std::string cedar::dev::gui::RobotCard::getRobotName() const
 {

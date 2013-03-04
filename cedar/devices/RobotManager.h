@@ -101,9 +101,19 @@ public:
 public:
   void addRobotName(const std::string& robotName);
 
+  void removeRobot(const std::string& robotName);
+
   void loadRobotConfigurationFromResource(const std::string& robotName, const std::string& resourcePath);
 
   cedar::dev::RobotPtr getRobot(const std::string& robotName) const;
+
+  std::string getNewRobotName() const;
+
+  void addRobotTemplate(const std::string& name, const Template& robotTemplate);
+
+  std::vector<std::string> getRobotTemplateNames() const;
+
+  const Template& getRobotTemplate(const std::string& name) const;
 
   inline boost::signals2::connection connectToRobotNameAddedSignal(boost::function<void (const std::string&)> slot)
   {
@@ -115,13 +125,10 @@ public:
     return this->mRobotConfigurationLoadedSignal.connect(slot);
   }
 
-  std::string getNewRobotName() const;
-
-  void addRobotTemplate(const std::string& name, const Template& robotTemplate);
-
-  std::vector<std::string> getRobotTemplateNames() const;
-
-  const Template& getRobotTemplate(const std::string& name) const;
+  inline boost::signals2::connection connectToRobotRemovedSignal(boost::function<void (const std::string&)> slot)
+  {
+    return this->mRobotRemovedSignal.connect(slot);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -147,6 +154,8 @@ private:
   std::map<std::string, std::string> mRobotResourceConfigurations;
 
   boost::signals2::signal<void (const std::string&)> mRobotNameAddedSignal;
+
+  boost::signals2::signal<void (const std::string&)> mRobotRemovedSignal;
 
   boost::signals2::signal<void (const std::string&)> mRobotConfigurationLoadedSignal;
 

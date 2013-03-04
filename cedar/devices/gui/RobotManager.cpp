@@ -102,6 +102,17 @@ mpChannelsNode(NULL)
                                              )
                                            );
 
+  mRobotRemovedConnection = cedar::dev::RobotManagerSingleton::getInstance()->
+                                connectToRobotRemovedSignal
+                                (
+                                  boost::bind
+                                  (
+                                    &cedar::dev::gui::RobotManager::robotRemoved,
+                                    this,
+                                    _1
+                                  )
+                                );
+
   QObject::connect(this->mpRobotSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(robotNameSelected(int)));
   QObject::connect
   (
@@ -110,6 +121,8 @@ mpChannelsNode(NULL)
     this,
     SLOT(partSelected(QTreeWidgetItem*, QTreeWidgetItem*))
   );
+
+  QObject::connect(this->mpRemoveButton, SIGNAL(clicked()), this, SLOT(removeClicked()));
 
   // simple mode
   QObject::connect(this->mpSimpleModeAddButton, SIGNAL(clicked()), this, SLOT(simpleModeAddClicked()));
@@ -122,12 +135,26 @@ mpChannelsNode(NULL)
 cedar::dev::gui::RobotManager::~RobotManager()
 {
   mRobotAddedConnection.disconnect();
+  mRobotRemovedConnection.disconnect();
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dev::gui::RobotManager::removeClicked()
+{
+  cedar::dev::RobotManagerSingleton::getInstance()->removeRobot(this->getSelectedRobotName());
+}
+
+void cedar::dev::gui::RobotManager::robotRemoved(const std::string& robotName)
+{
+  int index = this->mpRobotSelector->findData(QString::fromStdString(robotName));
+  CEDAR_ASSERT(index >= 0);
+
+  this->mpRobotSelector->removeItem(index);
+}
 
 void cedar::dev::gui::RobotManager::fillSimpleRobotList()
 {
@@ -156,7 +183,13 @@ void cedar::dev::gui::RobotManager::simpleModeAddClicked()
 
 void cedar::dev::gui::RobotManager::partSelected(QTreeWidgetItem* pCurrent, QTreeWidgetItem*)
 {
-  if (pCurrent == NULL || this->getSelectedRobotName().empty() || !this->getSelectedRobot())
+  if
+  (
+    pCurrent == NULL
+    || this->mpRobotSelector->currentIndex() == -1
+    || this->getSelectedRobotName().empty()
+    || !this->getSelectedRobot()
+  )
   {
     this->mpPropertyPane->resetContents();
   }
@@ -276,12 +309,12 @@ void cedar::dev::gui::RobotManager::loadConfigurationTriggered()
 
 void cedar::dev::gui::RobotManager::robotNameSelected(int nameIndex)
 {
-  bool nothing_selected = (nameIndex != -1);
-  this->mpLoadButton->setEnabled(nothing_selected);
+  bool something_selected = (nameIndex != -1);
+  this->mpLoadButton->setEnabled(something_selected);
   // TODO enable once they are implemented
 //  this->mpRenameButton->setEnabled(nothing_selected);
 //  this->mpSaveButton->setEnabled(nothing_selected);
-//  this->mpRemoveButton->setEnabled(nothing_selected);
+  this->mpRemoveButton->setEnabled(something_selected);
 
   if (nameIndex == -1)
   {
