@@ -62,6 +62,31 @@ class cedar::dev::RobotManager
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  class Template
+  {
+    public:
+      void addNamedResource(const std::string& name, const std::string& resourcePath);
+
+      std::vector<std::string> getConfigurationNames() const;
+
+      inline void setIconPath(const std::string& iconPath)
+      {
+        this->mIconPath = iconPath;
+      }
+
+      inline const std::string& getIconPath() const
+      {
+        return this->mIconPath;
+      }
+
+      std::string getConfiguration(const std::string& name) const;
+
+    private:
+      std::map<std::string, std::string> mNamedResourcePaths;
+
+      std::string mIconPath;
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -90,6 +115,14 @@ public:
     return this->mRobotConfigurationLoadedSignal.connect(slot);
   }
 
+  std::string getNewRobotName() const;
+
+  void addRobotTemplate(const std::string& name, const Template& robotTemplate);
+
+  std::vector<std::string> getRobotTemplateNames() const;
+
+  const Template& getRobotTemplate(const std::string& name) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -116,6 +149,8 @@ private:
   boost::signals2::signal<void (const std::string&)> mRobotNameAddedSignal;
 
   boost::signals2::signal<void (const std::string&)> mRobotConfigurationLoadedSignal;
+
+  std::map<std::string, Template> mRobotTemplates;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

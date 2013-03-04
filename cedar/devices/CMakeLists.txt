@@ -53,6 +53,7 @@ cedar_add_library(cedardev
                   gui/KinematicChainMonitorWidget.h
                   gui/KinematicChainCommandWidget.h
                   gui/RobotManager.h
+                  gui/RobotCard.h
                   gui/MountedCameraViewer.h
                   kteam/gui/DriveControlWidget.h
                   sensors/visual/VideoGrabber.h
@@ -62,6 +63,8 @@ cedar_add_library(cedardev
                   sensors/camera/CamProperty.h
                   sensors/camera/Properties.h
                   ${kuka_moc_files}
+				  RESOURCES
+				  gui/icons.qrc
                   LINK_LIBRARIES
                   cedaraux
                   ${linked_libs}

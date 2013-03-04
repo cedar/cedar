@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/gui/RobotManager.h"
+#include "cedar/devices/gui/RobotCard.h"
 #include "cedar/devices/RobotManager.h"
 #include "cedar/devices/Robot.h"
 #include "cedar/devices/Component.h"
@@ -109,6 +110,13 @@ mpChannelsNode(NULL)
     this,
     SLOT(partSelected(QTreeWidgetItem*, QTreeWidgetItem*))
   );
+
+  // simple mode
+  QObject::connect(this->mpSimpleModeAddButton, SIGNAL(clicked()), this, SLOT(simpleModeAddClicked()));
+
+  this->fillSimpleRobotList();
+
+  this->mpSimpleRobotIconList->viewport()->setAcceptDrops(true);
 }
 
 cedar::dev::gui::RobotManager::~RobotManager()
@@ -120,6 +128,31 @@ cedar::dev::gui::RobotManager::~RobotManager()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dev::gui::RobotManager::fillSimpleRobotList()
+{
+  std::vector<std::string> robot_names = cedar::dev::RobotManagerSingleton::getInstance()->getRobotTemplateNames();
+
+  for (size_t i = 0; i < robot_names.size(); ++i)
+  {
+    const std::string& robot_name = robot_names.at(i);
+    auto p_item = new QListWidgetItem(QString::fromStdString(robot_name));
+
+    auto robot_template = cedar::dev::RobotManagerSingleton::getInstance()->getRobotTemplate(robot_name);
+
+    p_item->setFlags(p_item->flags() | Qt::ItemIsDragEnabled);
+    p_item->setIcon(QIcon(QString::fromStdString(robot_template.getIconPath())));
+    p_item->setData(Qt::UserRole, QString::fromStdString(robot_name));
+
+    this->mpSimpleRobotIconList->addItem(p_item);
+  }
+}
+
+void cedar::dev::gui::RobotManager::simpleModeAddClicked()
+{
+  std::string new_robot_name = cedar::dev::RobotManagerSingleton::getInstance()->getNewRobotName();
+  cedar::dev::RobotManagerSingleton::getInstance()->addRobotName(new_robot_name);
+}
 
 void cedar::dev::gui::RobotManager::partSelected(QTreeWidgetItem* pCurrent, QTreeWidgetItem*)
 {
@@ -354,6 +387,11 @@ void cedar::dev::gui::RobotManager::addRobotName(QString addedRobotName)
    * not be changed.
    */
   this->mpRobotSelector->addItem(addedRobotName, addedRobotName);
+
+  // add a card for the simple mode
+  auto p_card = new cedar::dev::gui::RobotCard(addedRobotName);
+  int index = std::max(0, this->mpSimpleRobotListLayout->count() - 2);
+  this->mpSimpleRobotListLayout->insertWidget(index, p_card);
 }
 
 void cedar::dev::gui::RobotManager::robotAddedSignalTranslator(const std::string& addedRobotName)

@@ -44,6 +44,24 @@
 
 // SYSTEM INCLUDES
 
+// list of known robots
+//!@todo Find a better place for this list of robots
+namespace
+{
+  bool register_robots()
+  {
+    cedar::dev::RobotManager::Template epuck_template;
+    epuck_template.setIconPath(":/cedar/dev/gui/icons/epuck_icon_256.png");
+    epuck_template.addNamedResource("hardware", "configs/epuck/default_configuration.json");
+    epuck_template.addNamedResource("test-dummy", "configs/epuck/default_configuration.json");
+    cedar::dev::RobotManagerSingleton::getInstance()->addRobotTemplate("epuck", epuck_template);
+
+    return true;
+  }
+
+  bool caller = register_robots();
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -59,6 +77,85 @@ cedar::dev::RobotManager::~RobotManager()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+std::string cedar::dev::RobotManager::Template::getConfiguration(const std::string& name) const
+{
+  auto iter = this->mNamedResourcePaths.find(name);
+  CEDAR_ASSERT(iter != this->mNamedResourcePaths.end());
+
+  return iter->second;
+}
+
+std::vector<std::string> cedar::dev::RobotManager::Template::getConfigurationNames() const
+{
+  std::vector<std::string> names;
+
+  for (auto iter = this->mNamedResourcePaths.begin(); iter != this->mNamedResourcePaths.end(); ++iter)
+  {
+    names.push_back(iter->first);
+  }
+
+  return names;
+}
+
+void cedar::dev::RobotManager::Template::addNamedResource(const std::string& name, const std::string& resourcePath)
+{
+  CEDAR_ASSERT(this->mNamedResourcePaths.find(name) == this->mNamedResourcePaths.end());
+  this->mNamedResourcePaths[name] = resourcePath;
+}
+
+std::vector<std::string> cedar::dev::RobotManager::getRobotTemplateNames() const
+{
+  std::vector<std::string> names;
+
+  for (auto iter = this->mRobotTemplates.begin(); iter != this->mRobotTemplates.end(); ++iter)
+  {
+    names.push_back(iter->first);
+  }
+
+  return names;
+}
+
+const cedar::dev::RobotManager::Template& cedar::dev::RobotManager::getRobotTemplate(const std::string& name) const
+{
+  auto iter = this->mRobotTemplates.find(name);
+  CEDAR_ASSERT(iter != this->mRobotTemplates.end());
+
+  return iter->second;
+}
+
+void cedar::dev::RobotManager::addRobotTemplate(const std::string& name, const Template& robotTemplate)
+{
+  CEDAR_ASSERT(this->mRobotTemplates.find(name) == this->mRobotTemplates.end());
+
+  this->mRobotTemplates[name] = robotTemplate;
+}
+
+std::string cedar::dev::RobotManager::getNewRobotName() const
+{
+  std::string base = "new robot";
+  unsigned int ctr = 1;
+
+  std::map<std::string, cedar::dev::RobotPtr>::const_iterator iter;
+  while (true)
+  {
+    std::string combined = base;
+    if (ctr > 1)
+    {
+      combined += " " + cedar::aux::toString(ctr);
+    }
+    ++ctr;
+
+    iter = this->mRobotInstances.find(combined);
+
+    if (iter == this->mRobotInstances.end())
+    {
+      return combined;
+    }
+  }
+
+  return "";
+}
 
 void cedar::dev::RobotManager::addRobotName(const std::string& robotName)
 {
