@@ -22,55 +22,31 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        robotManager.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2012 04 13
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 02 27
 
-    Description: Namespace file for cedar::dev.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_NAMESPACE_H
-#define CEDAR_DEV_NAMESPACE_H
-
 // CEDAR INCLUDES
-#include "cedar/devices/lib.h"
-#include "cedar/defines.h"
+#include "cedar/devices/gui/RobotManager.h"
 
 // SYSTEM INCLUDES
+#include <QApplication>
 
 
-namespace cedar
+int main(int argc, char** argv)
 {
-  /*!@brief Namespace for all devices classes. */
-  namespace dev
-  {
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_DEV_CLASS(Robot);
-    CEDAR_DECLARE_DEV_CLASS(ComponentSlot);
-    CEDAR_DECLARE_DEV_CLASS(Component);
-    CEDAR_DECLARE_DEV_CLASS(Channel);
-    CEDAR_DECLARE_DEV_CLASS(SerialChannel);
-    CEDAR_DECLARE_DEV_CLASS(Locomotion);
-    CEDAR_DECLARE_DEV_CLASS(DifferentialDrive);
-    CEDAR_DECLARE_DEV_CLASS(KinematicChain);
-    CEDAR_DECLARE_DEV_CLASS(Odometry);
-    CEDAR_DECLARE_DEV_CLASS(RobotManager);
-    CEDAR_DECLARE_DEV_CLASS(Sensor);
-    CEDAR_DECLARE_DEV_CLASS(SimulatedKinematicChain);
+  QApplication app(argc, argv);
 
-    // exceptions
-    CEDAR_DECLARE_DEV_CLASS(UnresponsiveRobotException);
-    CEDAR_DECLARE_DEV_CLASS(SerialCommunicationException);
-    CEDAR_DECLARE_DEV_CLASS(UnknownOperatingSystemException);
-    CEDAR_DECLARE_DEV_CLASS(ResourceNotAvailableException);
-    CEDAR_DECLARE_DEV_CLASS(TimeoutException);
-    //!@endcond
-  }
+  cedar::dev::gui::RobotManager* p_manager = new cedar::dev::gui::RobotManager();
+  p_manager->show();
+
+  return app.exec();
 }
-
-#endif // CEDAR_DEV_NAMESPACE_H

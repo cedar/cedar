@@ -77,6 +77,7 @@ cedar_add_library(cedaraux
   gui/UIntVectorParameter.h
   gui/IntVectorParameter.h
   gui/VelocityParameter.h
+  gui/ResourceDialog.h
   convolution/Convolution.h
   Parameter.h
   kernel/Separable.h
