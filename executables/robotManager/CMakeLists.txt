@@ -24,9 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Mathis Richter
-#   Email:       mathis.richter@ini.rub.de
-#   Date:        2010 11 29
+#   Maintainer:  Oliver Lomp
+#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+#   Date:        2013 02 27
 #
 #   Description:
 #
@@ -34,38 +34,4 @@
 #
 #=======================================================================================================================
 
-if (CEDAR_USE_KUKA_LWR)
-  set(kuka_moc_files kuka/gui/FriStatusWidget.h)
-else(CEDAR_USE_KUKA_LWR)
-  set(kuka_moc_files "")
-endif(CEDAR_USE_KUKA_LWR)
-
-set (linked_libs "")
-if (CEDAR_USE_LIB_DC1394)
-	set (linked_libs dc1394)
-endif(CEDAR_USE_LIB_DC1394)
-
-cedar_add_library(cedardev
-                  MOC_HEADERS
-                  SerialChannel.h
-                  Odometry.h
-                  gui/KinematicChainWidget.h
-                  gui/KinematicChainMonitorWidget.h
-                  gui/KinematicChainCommandWidget.h
-                  gui/RobotManager.h
-                  gui/RobotCard.h
-                  gui/MountedCameraViewer.h
-                  kteam/gui/DriveControlWidget.h
-                  sensors/visual/VideoGrabber.h
-                  sensors/visual/PictureGrabber.h
-                  sensors/camera/Grabber.h
-                  sensors/camera/Channel.h
-                  sensors/camera/CamProperty.h
-                  sensors/camera/Properties.h
-                  ${kuka_moc_files}
-				  RESOURCES
-				  gui/icons.qrc
-                  LINK_LIBRARIES
-                  cedaraux
-                  ${linked_libs}
-                  )
+cedar_add_executable(robotManager)
