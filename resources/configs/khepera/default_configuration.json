@@ -1,6 +1,6 @@
 {
   "name": "default Khepera robot",
-  "description file": "khepera/configs/description.json",
+  "description file": "configs/khepera/description.json",
   "component slots":
   {
     "drive":
@@ -22,11 +22,11 @@
     "gripper":
     {
       "channel": "serial"
-    },
+    }
   },
   "channel configurations":
   {
-    "cedar.dev.kteam.SerialChannel":
+    "serial":
     {
       "name": "serial channel",
       "device path": "/dev/ttyUSB0",

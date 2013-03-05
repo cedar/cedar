@@ -340,7 +340,15 @@ void cedar::dev::Robot::allocateChannel(const std::string& channelName)
   }
 
   // allocate channel with the stored configuration.
-  CEDAR_ASSERT(this->mChannelConfigurations.find(channelName) != this->mChannelConfigurations.end());
+  auto config_iter = this->mChannelConfigurations.find(channelName);
+  if (config_iter == this->mChannelConfigurations.end())
+  {
+    CEDAR_THROW
+    (
+      cedar::dev::ChannelConfigurationNotFoundException,
+      "Could not find configuration for channel \"" + channelName + "\"."
+    );
+  }
   cedar::aux::ConfigurationNode channel_configuration = this->mChannelConfigurations.find(channelName)->second;
 
   CEDAR_ASSERT(this->mChannelTypes.find(channelName) != this->mChannelTypes.end());
