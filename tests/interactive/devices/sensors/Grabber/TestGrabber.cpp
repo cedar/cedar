@@ -42,8 +42,8 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
-#include <ios>
 #include <boost/math/special_functions/round.hpp>
+#include <ios>
 
 //--------------------------------------------------------------------------------------------------------------------
 // Local methods

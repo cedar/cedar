@@ -41,6 +41,8 @@
 
 // Single include file for all grabber classes
 
+//!@todo remove this file?
+
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/namespace.h"
 #include "cedar/devices/sensors/visual/GrabbableGrabber.h"
