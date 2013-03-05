@@ -278,12 +278,10 @@ void cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
   this->setFramerate(100.f);
 }
 
-
 std::string cedar::dev::sensors::visual::NetGrabber::onGetSourceInfo(unsigned int channel)
 {
   return this->getName() + ": " + getNetChannel(channel)->_mpYarpChannelName->getValue();
 }
-
 
 void cedar::dev::sensors::visual::NetGrabber::onGrab(unsigned int channel)
 {

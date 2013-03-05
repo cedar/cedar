@@ -127,7 +127,7 @@ void cedar::dev::sensors::visual::GrabbableGrabber::onCreateGrabber()
   std::stringstream init_message;
   init_message << ": Initialize GrabbableGrabber with " << num_channels << " channels ..." << std::endl;
 
-  for(unsigned int channel = 0; channel < num_channels; ++channel)
+  for (unsigned int channel = 0; channel < num_channels; ++channel)
   {
     init_message << "Channel " << channel << ": capture from Source: "
                  << typeid(getGrabbableChannel(channel)->mpSourceInterfaceClass).name() << std::endl;
@@ -139,7 +139,7 @@ void cedar::dev::sensors::visual::GrabbableGrabber::onCreateGrabber()
                                            );
 
   // register this grabber in the grabbable object and store the readwrite-lock
-  for(unsigned int channel=0; channel < num_channels;++channel)
+  for (unsigned int channel=0; channel < num_channels;++channel)
   {
     getGrabbableChannel(channel)->mpGrabberLock = getGrabbableChannel(channel)->mpSourceInterfaceClass->registerGrabber();
 
@@ -164,7 +164,7 @@ void cedar::dev::sensors::visual::GrabbableGrabber::onCleanUp()
   // do the cleanup of used hardware in this method
   // on an exception or a CTRL-C only onCleanUp will be invoked (no destructor)
   unsigned int num_channels = getNumChannels();
-  for(unsigned int channel = 0; channel < num_channels; ++channel)
+  for (unsigned int channel = 0; channel < num_channels; ++channel)
   {
     getGrabbableChannel(channel)->mpSourceInterfaceClass->deregisterGrabber(getGrabbableChannel(channel)->mpGrabberLock);
     // remove the references to the external classes

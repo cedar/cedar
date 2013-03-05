@@ -364,7 +364,7 @@ void cedar::dev::sensors::camera::BackendDc1394::openLibDcCamera()
   // guid is needed to open the camera wit libdc
   cam_guid = mpLibDcInterface->getCamGuid(bus_id);
 
-  unsigned int guid = static_cast<unsigned int>(cam_guid&0x00000000FFFFFFFF);
+  unsigned int guid = static_cast<unsigned int>(cam_guid & 0x00000000FFFFFFFF);
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
                                             "Open camera with bus Id " + boost::lexical_cast<std::string>(bus_id)

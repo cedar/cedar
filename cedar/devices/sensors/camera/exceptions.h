@@ -47,7 +47,7 @@
 
 
 
-/*!@brief Exception when a property is not supported by the used backend  */
+/*!@brief Exception when a property is not supported by the used backend */
 class cedar::dev::sensors::camera::PropertyNotSupportedException : public cedar::aux::ExceptionBase
 {
 };
@@ -70,7 +70,7 @@ class cedar::dev::sensors::camera::CreateBackendException : public cedar::aux::E
 
 #ifdef CEDAR_USE_LIB_DC1394
 
-/*!@brief Exception on an error while initializing the LibDc class  */
+/*!@brief Exception on an error while initializing the LibDc class */
 class cedar::dev::sensors::camera::LibDcInitException : public cedar::aux::ExceptionBase
 {
 };

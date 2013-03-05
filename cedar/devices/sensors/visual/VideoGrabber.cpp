@@ -213,7 +213,7 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
 
   std::stringstream init_message;
   init_message << ": Initialize video grabber with " << num_channels << " files ..." << std::endl;
-  for(unsigned int channel = 0; channel < num_channels; ++channel)
+  for (unsigned int channel = 0; channel < num_channels; ++channel)
   {
     init_message << "Channel " << channel << ": capture from: "
                  << getVideoChannel(channel)->_mSourceFileName->getPath() << std::endl;
@@ -230,7 +230,7 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
   {
     cv::VideoCapture capture(getVideoChannel(channel)->_mSourceFileName->getPath());
 
-    if (! capture.isOpened())
+    if (!capture.isOpened())
     {
       std::string msg = this->getName() + ": Grabbing failed on Channel " + boost::lexical_cast<std::string>(channel)
                         + " from \"" + getVideoChannel(channel)->_mSourceFileName->getPath() + "\"";
