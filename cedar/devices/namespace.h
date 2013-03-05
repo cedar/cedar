@@ -64,11 +64,12 @@ namespace cedar
     CEDAR_DECLARE_DEV_CLASS(SimulatedKinematicChain);
 
     // exceptions
-    CEDAR_DECLARE_DEV_CLASS(UnresponsiveRobotException);
-    CEDAR_DECLARE_DEV_CLASS(SerialCommunicationException);
-    CEDAR_DECLARE_DEV_CLASS(UnknownOperatingSystemException);
+    CEDAR_DECLARE_DEV_CLASS(ChannelConfigurationNotFoundException);
     CEDAR_DECLARE_DEV_CLASS(ResourceNotAvailableException);
+    CEDAR_DECLARE_DEV_CLASS(SerialCommunicationException);
     CEDAR_DECLARE_DEV_CLASS(TimeoutException);
+    CEDAR_DECLARE_DEV_CLASS(UnknownOperatingSystemException);
+    CEDAR_DECLARE_DEV_CLASS(UnresponsiveRobotException);
     //!@endcond
   }
 }

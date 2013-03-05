@@ -44,6 +44,7 @@
 #include "cedar/devices/Robot.h"
 #include "cedar/devices/Component.h"
 #include "cedar/devices/Channel.h"
+#include "cedar/devices/exceptions.h"
 #include "cedar/auxiliaries/gui/ResourceDialog.h"
 #include "cedar/auxiliaries/Log.h"
 
@@ -280,6 +281,20 @@ void cedar::dev::gui::RobotManager::loadConfigurationFromResourceTriggered()
       (
         this,
         "Resource not found.",
+        QString::fromStdString(e.exceptionInfo())
+      );
+    }
+    catch (const cedar::dev::ChannelConfigurationNotFoundException& e)
+    {
+      cedar::aux::LogSingleton::getInstance()->error
+      (
+        e.exceptionInfo(),
+        "void cedar::dev::gui::RobotManager::loadConfigurationFromResourceTriggered()"
+      );
+      QMessageBox::critical
+      (
+        this,
+        "Invalid configuration file.",
         QString::fromStdString(e.exceptionInfo())
       );
     }

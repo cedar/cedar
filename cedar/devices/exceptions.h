@@ -70,4 +70,9 @@ class cedar::dev::ResourceNotAvailableException : public cedar::aux::ExceptionBa
 {
 }; // class cedar::dev::ComponentNotAvailableException
 
+//!@brief Exception that occurs when a configuration for a given channel is not found.
+class cedar::dev::ChannelConfigurationNotFoundException : public cedar::aux::ExceptionBase
+{
+};
+
 #endif // CEDAR_DEV_EXCEPTIONS_H
