@@ -50,11 +50,17 @@ namespace
 {
   bool register_robots()
   {
+    // epuck -----------------------------------------------------------------------------------------------------------
     cedar::dev::RobotManager::Template epuck_template;
     epuck_template.setIconPath(":/cedar/dev/gui/icons/epuck_icon_256.png");
     epuck_template.addNamedResource("hardware", "configs/epuck/default_configuration.json");
-    epuck_template.addNamedResource("test-dummy", "configs/epuck/default_configuration.json");
     cedar::dev::RobotManagerSingleton::getInstance()->addRobotTemplate("epuck", epuck_template);
+
+    // khepera ---------------------------------------------------------------------------------------------------------
+    cedar::dev::RobotManager::Template khepera_template;
+    khepera_template.setIconPath(":/cedar/dev/gui/icons/khepera_icon_256.png");
+    khepera_template.addNamedResource("hardware", "configs/khepera/default_configuration.json");
+    cedar::dev::RobotManagerSingleton::getInstance()->addRobotTemplate("khepera", khepera_template);
 
     return true;
   }

@@ -2,6 +2,7 @@
 <RCC version="1.0">
   <qresource prefix="/cedar/dev/gui">
     <file>icons/epuck_icon_256.png</file>
+    <file>icons/khepera_icon_256.png</file>
   </qresource>
 </RCC>
 
