@@ -109,6 +109,7 @@ cedar::dev::gui::RobotCardIconHolder::RobotCardIconHolder()
   this->setAcceptDrops(true);
   this->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
   this->setBackgroundRole(QPalette::Light);
+  this->setMinimumHeight(200);
 }
 
 cedar::dev::gui::RobotCard::~RobotCard()

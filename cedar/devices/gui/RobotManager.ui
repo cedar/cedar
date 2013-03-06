@@ -63,7 +63,7 @@
              <bool>true</bool>
             </property>
             <property name="dragDropMode">
-             <enum>QAbstractItemView::DragOnly</enum>
+             <enum>QAbstractItemView::DragDrop</enum>
             </property>
             <property name="movement">
              <enum>QListView::Snap</enum>
@@ -93,6 +93,21 @@
        </item>
        <item>
         <widget class="QScrollArea" name="mpSimpleModeScrollArea">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>250</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
          <property name="widgetResizable">
           <bool>true</bool>
          </property>
