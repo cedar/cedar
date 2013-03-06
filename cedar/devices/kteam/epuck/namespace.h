@@ -54,6 +54,9 @@ namespace cedar
         //!@cond SKIPPED_DOCUMENTATION
         CEDAR_DECLARE_DEV_CLASS(AccelerationSensorSerial);
         //!@endcond
+#ifdef CEDAR_USE_YARP
+        CEDAR_DECLARE_DEV_CLASS(YarpDrive);
+#endif // CEDAR_USE_YARP
       }
     }
   }

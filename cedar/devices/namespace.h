@@ -58,13 +58,19 @@ namespace cedar
     CEDAR_DECLARE_DEV_CLASS(Locomotion);
     CEDAR_DECLARE_DEV_CLASS(DifferentialDrive);
     CEDAR_DECLARE_DEV_CLASS(KinematicChain);
+    CEDAR_DECLARE_DEV_CLASS(NetworkChannel);
     CEDAR_DECLARE_DEV_CLASS(Odometry);
     CEDAR_DECLARE_DEV_CLASS(RobotManager);
     CEDAR_DECLARE_DEV_CLASS(Sensor);
     CEDAR_DECLARE_DEV_CLASS(SimulatedKinematicChain);
 
+#ifdef CEDAR_USE_YARP
+    template <typename T> class YarpChannel;
+#endif
+
     // exceptions
     CEDAR_DECLARE_DEV_CLASS(ChannelConfigurationNotFoundException);
+    CEDAR_DECLARE_DEV_CLASS(CommunicationException);
     CEDAR_DECLARE_DEV_CLASS(ResourceNotAvailableException);
     CEDAR_DECLARE_DEV_CLASS(SerialCommunicationException);
     CEDAR_DECLARE_DEV_CLASS(TimeoutException);
