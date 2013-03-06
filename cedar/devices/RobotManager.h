@@ -107,11 +107,19 @@ public:
 
   cedar::dev::RobotPtr getRobot(const std::string& robotName) const;
 
+  const std::string& getRobotName(cedar::dev::ConstRobotPtr robot) const;
+
   std::string getNewRobotName() const;
 
   void addRobotTemplate(const std::string& name, const Template& robotTemplate);
 
+  /*!@brief Get a list of all the robot templates known to the robot manager
+   */
   std::vector<std::string> getRobotTemplateNames() const;
+
+  /*!@brief Get a list of all the robots stored in the manager.
+   */
+  std::vector<std::string> getRobotNames() const;
 
   const Template& getRobotTemplate(const std::string& name) const;
 

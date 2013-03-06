@@ -110,6 +110,18 @@ void cedar::dev::RobotManager::Template::addNamedResource(const std::string& nam
   this->mNamedResourcePaths[name] = resourcePath;
 }
 
+std::vector<std::string> cedar::dev::RobotManager::getRobotNames() const
+{
+  std::vector<std::string> names;
+
+  for (auto iter = this->mRobotInstances.begin(); iter != this->mRobotInstances.end(); ++iter)
+  {
+    names.push_back(iter->first);
+  }
+
+  return names;
+}
+
 std::vector<std::string> cedar::dev::RobotManager::getRobotTemplateNames() const
 {
   std::vector<std::string> names;
@@ -198,6 +210,20 @@ cedar::dev::RobotPtr cedar::dev::RobotManager::getRobot(const std::string& robot
   }
 
   return iter->second;
+}
+
+const std::string& cedar::dev::RobotManager::getRobotName(cedar::dev::ConstRobotPtr robot) const
+{
+  for (auto iter = this->mRobotInstances.begin(); iter != this->mRobotInstances.end(); ++iter)
+  {
+    if (iter->second == robot)
+    {
+      return iter->first;
+    }
+  }
+
+  //!@todo Proper exception (RobotNotFound)
+  CEDAR_ASSERT(false);
 }
 
 void cedar::dev::RobotManager::loadRobotConfigurationFromResource

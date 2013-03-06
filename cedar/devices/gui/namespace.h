@@ -51,6 +51,7 @@ namespace cedar
     namespace gui
     {
       //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_DEV_CLASS(ComponentParameter);
       CEDAR_DECLARE_DEV_CLASS(KinematicChainWidget);
       CEDAR_DECLARE_DEV_CLASS(KinematicChainMonitorWidget);
       CEDAR_DECLARE_DEV_CLASS(KinematicChainCommandWidget);

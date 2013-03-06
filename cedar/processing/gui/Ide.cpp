@@ -53,6 +53,7 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/LoopedTrigger.h"
+#include "cedar/devices/gui/RobotManager.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/Log.h"
@@ -179,6 +180,11 @@ cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui)
                    SIGNAL(triggered()),
                    this,
                    SLOT(exportSvg()));
+
+  QObject::connect(mpActionShowRobotManager,
+                   SIGNAL(triggered()),
+                   this,
+                   SLOT(showRobotManager()));
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -189,6 +195,15 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::showRobotManager()
+{
+  auto p_dialog = new QDialog(this);
+  auto p_layout = new QVBoxLayout();
+  p_dialog->setLayout(p_layout);
+  p_layout->addWidget(new cedar::dev::gui::RobotManager());
+  p_dialog->show();
+}
 
 void cedar::proc::gui::Ide::exportSvg()
 {
@@ -315,7 +330,7 @@ void cedar::proc::gui::Ide::toggleGrid(bool triggered)
 void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
 {
   this->storeSettings();
-  //!@todo Without this, the gui_ProcessingIde crashes when exiting in certain circumstanges (see unit test gui_ProcessingIde)
+  //!@todo Without this, the gui_ProcessingIde crashes when exiting in certain circumstances (see unit test gui_ProcessingIde)
   this->mpPropertyTable->resetContents();
   pEvent->accept();
 }
