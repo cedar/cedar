@@ -42,6 +42,7 @@
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
+#include <boost/intrusive_ptr.hpp>
 
 
 namespace cedar
@@ -53,6 +54,7 @@ namespace cedar
     CEDAR_DECLARE_DEV_CLASS(Robot);
     CEDAR_DECLARE_DEV_CLASS(ComponentSlot);
     CEDAR_DECLARE_DEV_CLASS(Component);
+    CEDAR_DECLARE_DEV_CLASS_INTRUSIVE(ComponentParameter);
     CEDAR_DECLARE_DEV_CLASS(Channel);
     CEDAR_DECLARE_DEV_CLASS(SerialChannel);
     CEDAR_DECLARE_DEV_CLASS(Locomotion);

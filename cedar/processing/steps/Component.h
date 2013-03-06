@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,91 +22,55 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ComponentSlot.h
+    File:        Component.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2012 11 23
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 03 05
 
-    Description: Slot for components of a robot (e.g., a kinematic chain).
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_COMPONENT_SLOT_H
-#define CEDAR_DEV_COMPONENT_SLOT_H
+#ifndef CEDAR_PROC_STEPS_COMPONENT_H
+#define CEDAR_PROC_STEPS_COMPONENT_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/namespace.h"
-#include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/MapParameter.h"
+#include "cedar/processing/steps/namespace.h"
+#include "cedar/processing/Step.h"
+#include "cedar/devices/ComponentParameter.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Slot for a single robot component.
- *
- * @todo More detailed description of the class.
+/*!@brief A step for bringing device components into a processing architecture.
  */
-class cedar::dev::ComponentSlot : public cedar::aux::Configurable
+class cedar::proc::steps::Component : public cedar::proc::Step
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // friends
-  //--------------------------------------------------------------------------------------------------------------------
-  friend std::ostream& operator<<(std::ostream& stream, const cedar::dev::ComponentSlot& slot);
-
-  friend std::ostream& operator<<(std::ostream& stream, cedar::dev::ConstComponentSlotPtr slot);
-
-  friend std::ostream& operator<<(std::ostream& stream, cedar::dev::ComponentSlotPtr slot);
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  //!@brief a singleton factory manager for components
-  typedef cedar::aux::Singleton<cedar::aux::FactoryManager<cedar::dev::ComponentPtr> > FactorySingleton;
-
-  typedef std::map<std::string, cedar::aux::ConfigurationNode> ComponentConfigurations;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  ComponentSlot(cedar::dev::RobotPtr robot, const std::string& name);
+  //!@brief The standard constructor.
+  Component();
+
+  //!@brief Destructor
+  virtual ~Component();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Returns a pointer to the robot this component slot belongs to.
-   *
-   * @returns pointer to this slot's robot
-   */
-  inline cedar::dev::RobotPtr getRobot() const
-  {
-    return mRobot;
-  }
-
-  /*!@brief Returns the component currently docked to this component slot.
-   *
-   * @returns pointer to the component
-   */
-  cedar::dev::ComponentPtr getComponent();
-
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
-  //!@brief Lists all channels in this component.
-  std::vector<std::string> listChannels() const;
-
-  //!@brief Checks if a channel of the given name exists.
-  bool hasChannel(const std::string& name) const;
-
-  //!@brief Sets the channel for this component.
-  void setChannel(const std::string& channel);
-
-  //! Returns a path that identifies this component.
-  std::string getPath() const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -118,39 +82,26 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void compute(const cedar::proc::Arguments&);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-
 private:
-  //! robot the component slot belongs to
-  cedar::dev::RobotPtr mRobot;
-
-  //! component that is currently docked to this slot
-  cedar::dev::ComponentPtr mComponent;
-
-  //! Name of the component.
-  std::string mName;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 private:
-  //! Type of the channel stored in this component.
-  cedar::aux::StringParameterPtr _mChannelType;
+  cedar::dev::ComponentParameterPtr _mComponent;
 
-  //! mapping of channel types to class names of components
-  std::map<std::string, std::string> mComponentTypeIds;
+}; // class cedar::proc::steps::Component
 
-  ComponentConfigurations _mComponentConfigurations;
+#endif // CEDAR_PROC_STEPS_COMPONENT_H
 
-  cedar::aux::ConfigurationNode mCommonParameters;
-
-}; // class cedar::dev::ComponentSlot
-#endif // CEDAR_DEV_COMPONENT_SLOT_H
