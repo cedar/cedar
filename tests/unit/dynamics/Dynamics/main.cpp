@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -77,7 +77,7 @@ int main(int, char**)
   std::cout << "done." << std::endl;
 
   std::cout << "Adding declaration to the registry ... ";
-  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(neuron_declaration);
+  neuron_declaration->declare();
   std::cout << "done." << std::endl;
 
   std::cout << "Reading Setup1.json ... ";

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -55,6 +55,7 @@ class cedar::aux::DoubleData : public cedar::aux::MatData
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //! The super class of this type.
   typedef cedar::aux::MatData Super;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -79,16 +80,22 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Returns a const reference to the stored parameter value.
+   */
   const double& getData() const
   {
     return this->Super::getData().at<double>(0, 0);
   }
 
+  /*!@brief Returns a reference to the stored parameter value.
+   */
   double& getData()
   {
     return this->Super::getData().at<double>(0, 0);
   }
 
+  /*!@brief Sets the given value in the parameter.
+   */
   void setData(double value)
   {
     this->Super::getData().at<double>(0, 0) = value;

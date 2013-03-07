@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -78,23 +78,23 @@ public:
 
   /*! @brief  Constructor for a single channel grabber
    *  @param grabberName  Name of the grabber
-   *  @param grabbable Class that implements the grabbable interface to grab from
+   *  @param grabbableObject Object to grab from (have to implement the Grabbable-Interface)
    */
   GrabbableGrabber
   (
-    cedar::aux::Grabbable* grabbable = NULL,
+    cedar::aux::Grabbable* grabbableObject = NULL,
     const std::string& grabberName = "GrabbableGrabber"
   );
 
   /*! @brief Constructor for a stereo channel grabber
    *  @param grabberName  Name of the grabber
-   *  @param grabbable0 Class that implements the grabbable interface to grab from for channel 0
-   *  @param grabbable1 Class that implements the grabbable interface to grab from for channel 0
+   *  @param grabbableObject0 Object to grab from (have to implement the Grabbable-Interface) for channel 0
+   *  @param grabbableObject1 Object to grab from (have to implement the Grabbable-Interface) for channel 1
    */
   GrabbableGrabber
   (
-    cedar::aux::Grabbable* grabbable0,
-    cedar::aux::Grabbable* grabbable1,
+    cedar::aux::Grabbable* grabbableObject0,
+    cedar::aux::Grabbable* grabbableObject1,
     const std::string& grabberName = "StereoGrabbableGrabber"
   );
 
@@ -114,17 +114,17 @@ protected:
 
   // inherited from Grabber
   void onCleanUp();
-  bool onGrab();
-  bool onCreateGrabber();
+  void onGrab(unsigned int channel);
+  void onCreateGrabber();
   void onCloseGrabber();
-  std::string onUpdateSourceInfo(unsigned int channel);
+  std::string onGetSourceInfo(unsigned int channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
 
-  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class InterfaceChannelPtr
+  //! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class InterfaceChannelPtr
   inline GrabbableChannelPtr getGrabbableChannel(unsigned int channel)
   {
     return boost::static_pointer_cast<GrabbableChannel>
@@ -133,7 +133,7 @@ private:
            );
   }
 
-  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class InterfaceChannellPtr
+  //! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class InterfaceChannellPtr
   inline ConstGrabbableChannelPtr getGrabbableChannel(unsigned int channel) const
   {
     return boost::static_pointer_cast<const GrabbableChannel>
@@ -149,7 +149,6 @@ protected:
   // none yet
 private:
   // none yet
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

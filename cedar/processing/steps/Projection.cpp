@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -75,7 +75,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr projection_decl
+    ElementDeclarationPtr declaration
     (
       new ElementDeclarationTemplate<cedar::proc::steps::Projection>
       (
@@ -83,12 +83,13 @@ namespace
         "cedar.processing.Projection"
       )
     );
-    projection_decl->setIconPath(":/steps/projection.svg");
-    projection_decl->setDescription
+    declaration->setIconPath(":/steps/projection.svg");
+    declaration->setDescription
     (
       "Projects N-Dimensional matrices onto M-Dimensions."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(projection_decl);
+
+    declaration->declare();
 
     return true;
   }

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -71,12 +71,12 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr field_decl
+    ElementDeclarationPtr declaration
     (
       new cedar::proc::ElementDeclarationTemplate<cedar::dyn::NeuralField>("DFT", "cedar.dynamics.NeuralField")
     );
-    field_decl->setIconPath(":/steps/field_temp.svg");
-    field_decl->setDescription
+    declaration->setIconPath(":/steps/field_temp.svg");
+    declaration->setDescription
     (
       "An implementation of Amari's dynamic neural fields."
     );
@@ -86,10 +86,10 @@ namespace
     field_plot_data.push_back(std::make_pair(DataRole::BUFFER, "input sum"));
     field_plot_data.push_back(std::make_pair(DataRole::BUFFER, "activation"));
     field_plot_data.push_back(std::make_pair(DataRole::OUTPUT, "sigmoided activation"));
-    field_decl->definePlot("field plot", field_plot_data);
+    declaration->definePlot("field plot", field_plot_data);
 
     // add declaration to the registry
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(field_decl);
+    declaration->declare();
 
     return true;
   }

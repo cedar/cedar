@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -196,10 +196,17 @@ signals:
   void convert();
 
 public slots:
+  //! When called, the y axis scaling is determined automatically every time the plot updates.
   void setAutomaticYAxisScaling();
 
+  /*! @brief Slot that is called when the menu entry in the plot is called.
+   *
+   *  This function opens a dialog that lets the user enter the desired interval for the Y axis.
+   */
   void setFixedYAxisScaling();
 
+  /*! @brief Sets the minimum and maximum for the y axis.
+   */
   void setFixedYAxisScaling(double lower, double upper);
 
   //--------------------------------------------------------------------------------------------------------------------

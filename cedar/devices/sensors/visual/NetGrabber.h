@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -75,7 +75,6 @@ public cedar::dev::sensors::visual::Grabber
 
 public:
 
-
   /*! @brief  Constructor for a single channel grabber
    *  @param yarpChannelName  Filename to grab from
    */
@@ -112,9 +111,9 @@ public:
 protected:
 
   // inherited from Grabber
-  bool onCreateGrabber();
-  bool onGrab();
-  std::string onUpdateSourceInfo(unsigned int channel);
+  void onCreateGrabber();
+  void onGrab(unsigned int channel);
+  std::string onGetSourceInfo(unsigned int channel);
   void onCleanUp();
   void onCloseGrabber();
 
@@ -135,10 +134,9 @@ public:
 protected:
   // none yet
 
-
 private:
 
-  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class NetChannelPtr
+  //! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class NetChannelPtr
   inline NetChannelPtr getNetChannel(unsigned int channel)
   {
     return boost::static_pointer_cast<NetChannel>
@@ -147,7 +145,7 @@ private:
            );
   }
 
-  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
+  //! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
   inline ConstNetChannelPtr getNetChannel(unsigned int channel) const
   {
     return boost::static_pointer_cast<const NetChannel>

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -22,70 +22,72 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CommunicationWidget.h
+    File:        BackendV4L.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Georg Hartinger
+    Email:       georg.hartinger@ini.rub.de
+    Date:        2012 07 04
 
-    Description: Graphical User Interface for testing the class Communication.
+    Description:  Header for the cedar::dev::sensors::camera::BackendV4L class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_COM_GUI_COMMUNICATION_WIDGET_H
-#define CEDAR_DEV_COM_GUI_COMMUNICATION_WIDGET_H
+#ifndef CEDAR_DEV_SENSORS_CAMERA_BACKEND_V4L_H
+#define CEDAR_DEV_SENSORS_CAMERA_BACKEND_V4L_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_VIDEO_FOR_LINUX
 
 // CEDAR INCLUDES
-#include "cedar/devices/namespace.h"
-#include "cedar/devices/communication/gui/ui_CommunicationWidget.h"
-#include "cedar/devices/communication/gui/namespace.h"
-#include "cedar/auxiliaries/gui/BaseWidget.h"
+#include "cedar/devices/sensors/camera/namespace.h"
+#include "cedar/devices/sensors/camera/backends/Backend.h"
 
 // SYSTEM INCLUDES
-#include <Qt>
-#include <QString>
 
-/*!@brief Graphical User Interface for testing the class Communication.
+
+/*!@brief Base class of the misc camera grabber backends.
  *
- * Type the string to be sent into 'command' and click 'send'. The answer of the device is then displayed in 'answer'.
+ * Implements the common features of a camera device
  */
-class cedar::dev::com::gui::CommunicationWidget : public cedar::aux::gui::BaseWidget, private Ui_CommunicationWidget
+class cedar::dev::sensors::camera::BackendV4L
+:
+public cedar::dev::sensors::camera::Backend
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Constructs the GUI.
-   * @param communication Pointer to the communication-class to be tested.
-   */
-  CommunicationWidget(cedar::dev::SerialChannelPtr channel);
+  //!@brief The standard constructor.
+  BackendV4L
+  (
+    cedar::dev::sensors::camera::Channel* pCameraChannel
+  );
 
-  //!@brief Destructs the GUI.
-  virtual ~CommunicationWidget();
+  //!@brief Destructor
+  ~BackendV4L();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public slots:
-  /*!@brief Sends the string.
-   *
-   * This function calls 'send' of the linked communication class with the string typed into 'command' as parameter.
-   */
-  void send();
+public:
+  void init();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+
+  // derived from class Backend
+  void applySettingsToCamera();
+  void createCaptureObject();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -98,10 +100,21 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+private:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
 private:
-  // pointer to the Communication-class.
-  cedar::dev::SerialChannelPtr mChannel;
-}; // class cedar::dev::gui::CommunicationWidget
-#endif // CEDAR_DEV_COM_GUI_COMMUNICATION_WIDGET_H
+  // none yet
+
+}; // class cedar::dev::sensors::camera::BackendV4L
+
+
+#endif // CEDAR_USE_VIDEO_FOR_LINUX
+#endif // CEDAR_DEV_SENSORS_CAMERA_BACKEND_V4L_H
 

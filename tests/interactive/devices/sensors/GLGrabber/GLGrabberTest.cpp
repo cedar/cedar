@@ -1,4 +1,23 @@
-/*========================================================================================================================
+/*======================================================================================================================
+
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+
+    This file is part of cedar.
+
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+========================================================================================================================
 
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
@@ -227,7 +246,7 @@ int main(int argc, char **argv)
   // The grabbing have to be done in the GUI-thread!
   // If you start background-grabbing, a segmentation-fault occur!
 
-  // p_grabber->setFps(50);
+  // p_grabber->setFramerate(50);
   // p_grabber->startGrabber();
 
   unsigned int counter=0;
@@ -255,7 +274,7 @@ int main(int argc, char **argv)
     if (! (++counter %= 200))
     {
       // display real reached fps
-      std::cout << "Thread FPS: " << p_grabber->getFpsMeasured() << std::endl;
+      std::cout << "Thread FPS: " << p_grabber->getMeasuredFramerate() << std::endl;
     }
     cedar::aux::sleep(cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::seconds));
   }

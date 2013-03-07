@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -42,7 +42,7 @@
 #include "cedar/auxiliaries/gui/HistoryPlot.h"
 #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
 #include "cedar/auxiliaries/gui/HistoryPlot1D.h"
-#include "cedar/auxiliaries/gui/PlotManager.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/DoubleData.h"
@@ -58,13 +58,18 @@ namespace
 {
   bool registerPlot()
   {
-    typedef cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::DoubleData, cedar::aux::gui::HistoryPlot> DeclarationType;
-    boost::shared_ptr<DeclarationType> decl(new DeclarationType());
-    cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(decl);
+    typedef
+      cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::DoubleData, cedar::aux::gui::HistoryPlot>
+      DeclarationType;
 
-    typedef cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::MatData, cedar::aux::gui::HistoryPlot> DeclarationType2;
+    boost::shared_ptr<DeclarationType> declaration(new DeclarationType());
+    declaration->declare();
+
+    typedef
+      cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::MatData, cedar::aux::gui::HistoryPlot>
+      DeclarationType2;
     boost::shared_ptr<DeclarationType2> decl2(new DeclarationType2());
-    cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(decl2);
+    decl2->declare();
 
     return true;
   }

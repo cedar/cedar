@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -47,9 +47,7 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief A plot that keeps a history of a 1D matrix for a certain time and plots this history.
  */
 class cedar::aux::gui::HistoryPlot1D : public cedar::aux::gui::PlotInterface
 {
@@ -75,6 +73,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //! Periodically called by qt. Updates the plot.
   void timerEvent(QTimerEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -102,6 +101,7 @@ private:
   //! Subplot used for plotting the history matrix.
   cedar::aux::gui::SurfacePlot* mpHistoryPlot;
 
+  //! Maximum number of states in the history.
   int mMaxHistSize;
 
 }; // class cedar::aux::gui::HistoryPlot1D

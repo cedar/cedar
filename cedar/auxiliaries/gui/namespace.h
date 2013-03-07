@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -137,7 +137,7 @@ namespace cedar
           cedar::aux::TypeHierarchyMap
           <
             cedar::aux::Data,
-            std::vector<cedar::aux::gui::PlotDeclarationPtr>
+            std::vector<cedar::aux::gui::ConstPlotDeclarationPtr>
           >
           PlotDeclarationManager;
 

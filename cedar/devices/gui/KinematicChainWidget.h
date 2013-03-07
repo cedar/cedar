@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_GUI_KINEMATIC_CHAIN__WIDGET_H
-#define CEDAR_DEV_GUI_KINEMATIC_CHAIN__WIDGET_H
+#ifndef CEDAR_DEV_GUI_KINEMATIC_CHAIN_WIDGET_H
+#define CEDAR_DEV_GUI_KINEMATIC_CHAIN_WIDGET_H
 
 // CEDAR INCLUDES
 #include "cedar/devices/lib.h"
@@ -118,4 +118,4 @@ private:
 
 };
 
-#endif /* CEDAR_DEV_GUI_KINEMATIC_CHAIN__WIDGET_H */
+#endif // CEDAR_DEV_GUI_KINEMATIC_CHAIN_WIDGET_H

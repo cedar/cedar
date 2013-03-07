@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -57,6 +57,7 @@
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -185,6 +186,10 @@ cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui)
                    SIGNAL(triggered()),
                    this,
                    SLOT(showRobotManager()));
+
+  QObject::connect(mpActionDuplicate, SIGNAL(triggered()), this, SLOT(duplicateStep()));
+
+  QObject::connect(mpActionSelectAll, SIGNAL(triggered()), this, SLOT(selectAll()));
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -226,6 +231,33 @@ void cedar::proc::gui::Ide::exportSvg()
 
     QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
     last_dir->setValue(path);
+  }
+}
+
+void cedar::proc::gui::Ide::duplicateStep()
+{
+  QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
+  for (int i = 0; i < selected_items.size(); ++i)
+  {
+    if (cedar::proc::gui::GraphicsBase* p_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected_items.at(i)))
+    {
+      try
+      {
+        this->mNetwork->getNetwork()->duplicate(p_base->getElement()->getName());
+      }
+      catch (cedar::aux::ExceptionBase& exc)
+      {
+      }
+    }
+  }
+}
+
+void cedar::proc::gui::Ide::selectAll()
+{
+  QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->items();
+  for (int i = 0; i < selected_items.size(); ++i)
+  {
+    selected_items.at(i)->setSelected(true);
   }
 }
 
@@ -404,10 +436,8 @@ void cedar::proc::gui::Ide::resetStepList()
 {
   using cedar::proc::Manager;
 
-  for (cedar::proc::DeclarationRegistry::CategoryList::const_iterator iter
-         = DeclarationRegistrySingleton::getInstance()->getCategories().begin();
-       iter != DeclarationRegistrySingleton::getInstance()->getCategories().end();
-       ++iter)
+  std::set<std::string> categories = ElementManagerSingleton::getInstance()->listCategories();
+  for (auto iter = categories.begin(); iter != categories.end(); ++iter)
   {
     const std::string& category_name = *iter;
     cedar::proc::gui::ElementClassList *p_tab;
@@ -421,9 +451,7 @@ void cedar::proc::gui::Ide::resetStepList()
     {
       p_tab = mElementClassListWidgets[category_name];
     }
-    p_tab->showList(
-                     DeclarationRegistrySingleton::getInstance()->getCategoryEntries(category_name)
-                   );
+    p_tab->showList(ElementManagerSingleton::getInstance()->getCategoryEntries(category_name));
   }
 }
 

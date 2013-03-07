@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -56,7 +56,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr static_gain_decl
+    ElementDeclarationPtr declaration
     (
       new ElementDeclarationTemplate<cedar::proc::steps::StaticGain>
       (
@@ -64,12 +64,13 @@ namespace
         "cedar.processing.StaticGain"
       )
     );
-    static_gain_decl->setIconPath(":/steps/static_gain.svg");
-    static_gain_decl->setDescription
+    declaration->setIconPath(":/steps/static_gain.svg");
+    declaration->setDescription
     (
       "Multiplies a matrix with a scalar value that can be set as a parameter."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(static_gain_decl);
+
+    declaration->declare();
 
     return true;
   }

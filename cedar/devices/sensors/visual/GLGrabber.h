@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -104,9 +104,12 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-
   /*! @brief Set a new Widget to grab from
    *
+   * @param channel The channel to assign the new widget
+   * @param qglWidget The new widget
+   * @throw cedar::aux::IndexOutOfRangeException When the channel is out of range
+   * @throw cedar::dev::sensors::visual::InvalidParameterException When the qglWidget is a NULL-pointer
    */
   void setWidget(unsigned int channel, QGLWidget *qglWidget);
 
@@ -117,10 +120,10 @@ protected:
 
   // inherited from Grabber
   void onCleanUp();
-  bool onGrab();
-  bool onCreateGrabber();
+  void onGrab(unsigned int channel);
+  void onCreateGrabber();
   void onCloseGrabber();
-  std::string onUpdateSourceInfo(unsigned int channel);
+  std::string onGetSourceInfo(unsigned int channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

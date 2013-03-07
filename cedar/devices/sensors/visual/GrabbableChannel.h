@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -28,7 +28,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 09 28
 
-    Description: Class GrabbableChannel
+    Description: Class GrabbableChannel contains additional data of a grabbable-grabbing channel
 
     Credits:
 
@@ -47,7 +47,7 @@
 // SYSTEM INCLUDES
 
 
-//!@brief GrabbableChannel contains additional data of a net-grabbing channel
+//!@brief GrabbableChannel contains additional data of a grabbing channel for the Grabbable-Interface
 class cedar::dev::sensors::visual::GrabbableChannel
 :
 public cedar::dev::sensors::visual::GrabberChannel
@@ -71,7 +71,6 @@ public:
   mpGrabberLock(NULL)
   {
   }
-
 
   //!@brief Destructor
   virtual ~GrabbableChannel()
@@ -100,10 +99,10 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! The object to grab from
+  //! The object to grab from (have to be a child of the Grabbable-Interface)
   cedar::aux::Grabbable* mpSourceInterfaceClass;
 
-  //! The used lock
+  //! The lock for access to the grabbed image
   QReadWriteLock* mpGrabberLock;
 
 private:
@@ -121,4 +120,3 @@ private:
 }; // class cedar::dev::sensors::visual::GrabbableChannel
 
 #endif // CEDAR_DEV_SENSORS_VISUAL_GRABBABLE_CHANNEL_H
-

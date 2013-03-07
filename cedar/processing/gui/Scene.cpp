@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -763,23 +763,7 @@ cedar::proc::ElementPtr cedar::proc::gui::Scene::addElement(const std::string& c
   CEDAR_DEBUG_ASSERT(split_class_name.size() > 0);
   std::string name = "new " + split_class_name.back();
 
-  std::string adjusted_name;
-  try
-  {
-    unsigned int new_id = 1;
-    adjusted_name = name;
-    while (mNetwork->getNetwork()->getElement(adjusted_name))
-    {
-      std::stringstream str;
-      str << name << " " << new_id;
-      adjusted_name = str.str();
-      ++new_id;
-    }
-  }
-  catch(cedar::proc::InvalidNameException& exc)
-  {
-    // nothing to do here, name not duplicate, use this as a name
-  }
+  std::string adjusted_name = mNetwork->getNetwork()->getUniqueName(name);
 
   try
   {

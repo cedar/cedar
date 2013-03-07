@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -59,7 +59,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr space_to_rate_decl
+    ElementDeclarationPtr declaration
     (
       new ElementDeclarationTemplate<cedar::dyn::SpaceToRateCode>
       (
@@ -67,14 +67,15 @@ namespace
         "cedar.dynamics.SpaceToRateCode"
       )
     );
-    space_to_rate_decl->setIconPath(":/steps/space_to_rate_code.svg");
-    space_to_rate_decl->setDescription
+    declaration->setIconPath(":/steps/space_to_rate_code.svg");
+    declaration->setDescription
     (
       "Transforms space code to rate code. A dynamical system relaxes over time to the center of mass of the "
       "represented metrical interval. The resulting rate code value estimates the center of the distribution if there"
       "is only one maximum and if the distribution is symmetrical."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(space_to_rate_decl);
+
+    declaration->declare();
 
     return true;
   }

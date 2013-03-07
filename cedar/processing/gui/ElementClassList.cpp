@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -41,6 +41,8 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/auxiliaries/PluginDeclarationTemplate.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -70,30 +72,34 @@ cedar::proc::gui::ElementClassList::~ElementClassList()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::ElementClassList::showList(const cedar::proc::DeclarationRegistry::CategoryEntries& entries)
+void cedar::proc::gui::ElementClassList::showList(const cedar::proc::ElementManager::BasePluginList& entries)
 {
   using cedar::proc::Manager;
   using cedar::proc::ElementDeclarationPtr;
 
   this->clear();
 
-  for (cedar::proc::DeclarationRegistry::CategoryEntries::const_iterator iter = entries.begin();
-       iter != entries.end();
-       ++iter
-      )
+  for (auto iter = entries.begin(); iter != entries.end(); ++iter)
   {
-    const ElementDeclarationPtr& class_id = *iter;
-    QString label = class_id->getClassName().c_str();
+    cedar::proc::ElementManager::ConstBasePluginDeclarationPtr class_id = *iter;
+    auto elem_decl = boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(class_id);
+    CEDAR_ASSERT(elem_decl);
+
+    std::string only_class_name = class_id->getClassNameWithoutNamespace();
+//    std::string namespace_name = class_id->getNamespaceName();
+
+    QString label = QString::fromStdString(only_class_name);
     QListWidgetItem *p_item = new QListWidgetItem(label);
     p_item->setFlags(p_item->flags() | Qt::ItemIsDragEnabled);
 
     QIcon icon;
-    if (!class_id->getIconPath().empty())
+    std::string icon_path = elem_decl->getIconPath();
+    if (!icon_path.empty())
     {
-      QResource ex_test(QString::fromStdString(class_id->getIconPath()));
+      QResource ex_test(QString::fromStdString(icon_path));
       if (ex_test.isValid())
       {
-        icon = QIcon(class_id->getIconPath().c_str());
+        icon = QIcon(QString::fromStdString(icon_path));
       }
       else
       {
@@ -107,7 +113,7 @@ void cedar::proc::gui::ElementClassList::showList(const cedar::proc::Declaration
     p_item->setIcon(icon);
 
     QString class_description;
-    class_description += "<nobr>class <big><b>" + QString::fromStdString(class_id->getClassName()) + "</b></big></nobr>";
+    class_description += "<nobr>class <big><b>" + QString::fromStdString(only_class_name) + "</b></big></nobr>";
 
     if (class_id->isDeprecated())
     {
@@ -116,10 +122,10 @@ void cedar::proc::gui::ElementClassList::showList(const cedar::proc::Declaration
     }
 
     class_description += "<hr />";
-    class_description += "<div align=\"right\"><nobr><small><i>" + QString::fromStdString(class_id->getClassId()) + "</i></small></nobr></div>";
-    if (!class_id->getDescription().empty())
+    class_description += "<div align=\"right\"><nobr><small><i>" + QString::fromStdString(class_id->getClassName()) + "</i></small></nobr></div>";
+    if (!elem_decl->getDescription().empty())
     {
-      QString description = "<p>" + QString::fromStdString(class_id->getDescription()).replace("\n", "<br />") + "</p>";
+      QString description = "<p>" + QString::fromStdString(elem_decl->getDescription()).replace("\n", "<br />") + "</p>";
       class_description += description;
     }
 
@@ -132,7 +138,7 @@ void cedar::proc::gui::ElementClassList::showList(const cedar::proc::Declaration
 
     p_item->setToolTip(class_description);
 
-    p_item->setData(Qt::UserRole, QVariant(class_id->getClassId().c_str()));
+    p_item->setData(Qt::UserRole, QVariant(class_id->getClassName().c_str()));
     this->addItem(p_item);
   }
 }

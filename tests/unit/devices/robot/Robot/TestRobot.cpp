@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -22,69 +22,63 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraDeviceVfl.cpp
+    File:        TestRobot.cpp
 
-    Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.rub.de
-    Date:        2012 07 04
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2010 11 08
 
-    Description:  Implementation for the cedar::dev::sensors::camera::DeviceVfl class
+    Description: Implementation of the @em TestRobot class.
 
     Credits:
 
 ======================================================================================================================*/
 
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
+// LOCAL INCLUDES
+#include "unit/devices/robot/Robot/TestRobot.h"
+#include "unit/devices/robot/Robot/TestComponent.h"
 
-#ifdef CEDAR_USE_VIDEO_FOR_LINUX
-
-// CEDAR INCLUDES
-#include "cedar/devices/sensors/camera/backends/DeviceVfl.h"
-
+// PROJECT INCLUDES
+#include "cedar/devices/robot/Robot.h"
+#include "cedar/devices/robot/Component.h"
 
 // SYSTEM INCLUDES
+#include <string>
+#include <set>
+#include <iostream>
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::sensors::camera::DeviceVfl::CameraDeviceVfl
-(
-  cedar::dev::sensors::camera::Channel* pCameraChannel
-)
+
+//! constructor
+cedar::tests::unit::dev::robot::Robot::TestRobot::TestRobot(void)
 :
-cedar::dev::sensors::camera::Device::CameraDevice(pCameraGrabber,pCameraChannel)
+cedar::dev::robot::Robot()
 {
+  _mSubComponentNames["TestComponent1"] = std::set<std::string>();
+  _mSubComponentNames["TestComponent2"] = std::set<std::string>();
 }
 
-
-cedar::dev::sensors::camera::DeviceVfl::~CameraDeviceVfl()
+//! destructor
+cedar::tests::unit::dev::robot::Robot::TestRobot::~TestRobot()
 {
 }
-
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::sensors::camera::DeviceVfl::setProperties()
+cedar::dev::robot::ComponentPtr
+  cedar::tests::unit::dev::robot::Robot::TestRobot::createComponent(const std::string& rComponentName)
 {
+  cedar::dev::robot::ComponentPtr test_component
+  (
+    new cedar::tests::unit::dev::robot::Robot::TestComponent(rComponentName)
+  );
 
+  return test_component;
 }
 
-bool cedar::dev::sensors::camera::DeviceVfl::createCaptureObject()
-{
 
-}
-
-void cedar::dev::sensors::camera::DeviceVfl::applySettingsToCamera()
-{
-
-}
-
-void cedar::dev::sensors::camera::DeviceVfl::applyStateToCamera()
-{
-
-}
-
-#endif // CEDAR_USE_VIDEO_FOR_LINUX

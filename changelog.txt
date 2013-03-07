@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -47,16 +47,17 @@ likely to undergo major changes:
 
 
 == known issues ==
-  - cedardyn is not properly loaded on some OSs when using processingIde. If you want to use its content, manually load
-    cedardyn using the plugin dialog. You then may want to go to the Manage.. dialog and mark this plugin to be loaded
-    on every start.
-  - On windows, some of the GL drawing functionality for kinematic chains and related classes is not implemented.
+  - cedardyn is not properly loaded on some OSs (mainly Windows) when using processingIde. If you want to use its
+    content, manually load cedardyn using the plugin dialog. You then may want to go to the Manage.. dialog and mark
+    this plugin to be loaded on every start.
+  - On Windows, some of the GL drawing functionality for kinematic chains and related classes is not implemented.
   - Grouping steps into networks is buggy. Please use with caution and report any errors you encounter.
   - cedar::dev::sensors::visual::CameraGrabber is not working at the moment.
   - network functionality in the processing framework has several issues; for now, we recommend not using it because
     there are some annoying bugs related to it.
 
-== current version ==
+== Version 1.0.8 ==
+
 - all:
   - enabled C++0x / C++11 compiler flag for GCC
 
@@ -78,6 +79,19 @@ likely to undergo major changes:
     and can be very helpful when steps send too many log messages, leading to a lock-up of the user interface.
 - cedar::dyn
   - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   
+  
+== current stable ==
+
+- Buildsystem:
+  - fixed issues when linking to non-qt4 versions of QWT and libQGLViewer
+    when qt3 and qt4 versions were present on the system.
+  - Disabled the as-needed switch of gcc/ld; on newer Linux versions, this caused cedardyn to not be loaded properly at
+    runtime, which meant fields and other steps from that library not showing up properly. This problem still persists
+    on Windows/MSVC.  
+
+- cedar::aux::net
+  - fixed issues with GCC 4.7 and the NetTransporter (Reader/Writer) code
+    (only occured when the optional YARP dependency was included)
 
 == Version 1.0.7
 - cedar::aux::gui

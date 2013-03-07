@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -196,6 +196,14 @@ public slots:
   /*!@brief Opens a dialog that contains the robot manager widget.
    */
   void showRobotManager();
+  
+  /*!@brief Duplicates a selected step
+   */
+  void duplicateStep();
+
+  /*!@brief Select all elements
+   */
+  void selectAll();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
