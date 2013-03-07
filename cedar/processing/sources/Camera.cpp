@@ -182,7 +182,7 @@ void cedar::proc::sources::Camera::updateFrame()
   {
     for (int i = 0; i < 5; ++i)
     {
-      cedar::aux::sleep(50.0 * cedar::unit::milli * cedar::unit::seconds);
+      cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
       this->onTrigger();
       this->annotateImage();
     }
