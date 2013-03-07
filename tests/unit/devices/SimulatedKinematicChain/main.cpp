@@ -85,10 +85,10 @@ int main()
   angle_vector.push_back(3.5);
   test_arm->setJointAngles(angle_vector);
   if (
-      !cedar::aux::math::isZero<double>(test_arm->getCachedJointAngles()[0] - 0.5)
-      || !cedar::aux::math::isZero<double>(test_arm->getCachedJointAngles()[1] - 1.5)
-      || !cedar::aux::math::isZero<double>(test_arm->getCachedJointAngles()[2] - 2.5)
-      || !cedar::aux::math::isZero<double>(test_arm->getCachedJointAngles()[3] - 3.5)
+      !cedar::aux::math::isZero<double>(test_arm->getJointAngle(0) - 0.5)
+      || !cedar::aux::math::isZero<double>(test_arm->getJointAngle(1) - 1.5)
+      || !cedar::aux::math::isZero<double>(test_arm->getJointAngle(2) - 2.5)
+      || !cedar::aux::math::isZero<double>(test_arm->getJointAngle(3) - 3.5)
       )
   {
     errors++;
