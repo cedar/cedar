@@ -418,7 +418,7 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
     iterator it = elements.begin(); it != elements.end(); ++it
   )
   {
-    if (old_network = (*(elements.begin()))->getNetwork())
+    if ((old_network = (*(elements.begin()))->getNetwork()))
     {
       break;
     }
