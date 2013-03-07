@@ -42,17 +42,36 @@
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
+#include <boost/intrusive_ptr.hpp>
 
 
 namespace cedar
 {
-  /*!@brief Namespace for all dev classes. */
+  /*!@brief Namespace for all devices classes. */
   namespace dev
   {
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_DEV_CLASS(UnresponsiveRobotException);
+    CEDAR_DECLARE_DEV_CLASS(Robot);
+    CEDAR_DECLARE_DEV_CLASS(ComponentSlot);
+    CEDAR_DECLARE_DEV_CLASS(Component);
+    CEDAR_DECLARE_DEV_CLASS_INTRUSIVE(ComponentParameter);
+    CEDAR_DECLARE_DEV_CLASS(Channel);
+    CEDAR_DECLARE_DEV_CLASS(SerialChannel);
+    CEDAR_DECLARE_DEV_CLASS(Locomotion);
+    CEDAR_DECLARE_DEV_CLASS(DifferentialDrive);
+    CEDAR_DECLARE_DEV_CLASS(KinematicChain);
+    CEDAR_DECLARE_DEV_CLASS(Odometry);
+    CEDAR_DECLARE_DEV_CLASS(RobotManager);
+    CEDAR_DECLARE_DEV_CLASS(Sensor);
+    CEDAR_DECLARE_DEV_CLASS(SimulatedKinematicChain);
+
+    // exceptions
+    CEDAR_DECLARE_DEV_CLASS(ChannelConfigurationNotFoundException);
+    CEDAR_DECLARE_DEV_CLASS(ResourceNotAvailableException);
     CEDAR_DECLARE_DEV_CLASS(SerialCommunicationException);
+    CEDAR_DECLARE_DEV_CLASS(TimeoutException);
     CEDAR_DECLARE_DEV_CLASS(UnknownOperatingSystemException);
+    CEDAR_DECLARE_DEV_CLASS(UnresponsiveRobotException);
     //!@endcond
   }
 }

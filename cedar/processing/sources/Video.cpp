@@ -42,6 +42,7 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/StepTime.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 
@@ -84,8 +85,8 @@ namespace
 cedar::proc::sources::Video::Video()
 :
 cedar::proc::sources::GrabberBase(),
-mFrameDuration(0.0),
-mTimeElapsed(0.0)
+mFrameDuration(0.0 * cedar::unit::seconds),
+mTimeElapsed(0.0 * cedar::unit::seconds)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
@@ -153,8 +154,7 @@ void cedar::proc::sources::Video::compute(const cedar::proc::Arguments &argument
     {
       const cedar::proc::StepTime& step_time = dynamic_cast<const cedar::proc::StepTime&>(arguments);
       const cedar::unit::Time& t = step_time.getStepTime();
-      cedar::unit::Milliseconds step_time_ms(t);
-      mTimeElapsed += step_time_ms;
+      mTimeElapsed += t;
     }
     catch (const std::bad_cast& e)
     {
@@ -166,7 +166,7 @@ void cedar::proc::sources::Video::compute(const cedar::proc::Arguments &argument
     {
       this->getVideoGrabber()->grab();
       this->mImage->setData(this->getVideoGrabber()->getImage());
-      mTimeElapsed = 0.0;
+      mTimeElapsed = 0.0 * cedar::unit::seconds;
     }
   }
 }
@@ -175,13 +175,15 @@ void cedar::proc::sources::Video::compute(const cedar::proc::Arguments &argument
 void cedar::proc::sources::Video::updateVideo()
 {
   this->mImage->setData(this->getVideoGrabber()->getImage());
-  mFrameDuration = 1000/this->getVideoGrabber()->getFramerate();
-  mTimeElapsed = 0.0;
+  //!@todo fix getFps() to include frequency as unit
+  mFrameDuration = 1000.0 / this->getVideoGrabber()->getFramerate() * cedar::unit::seconds;
+  mTimeElapsed = 0.0 * cedar::unit::seconds;
   mRecording->setValue(this->getVideoGrabber()->isRecording());
 }
 
 void cedar::proc::sources::Video::updateSpeedFactor()
 {
-  mFrameDuration = 1000/this->getVideoGrabber()->getFramerate();
+  //!@todo fix getFps() to include frequency as unit
+  mFrameDuration = 1000/this->getVideoGrabber()->getFramerate() * cedar::unit::seconds;
 }
 

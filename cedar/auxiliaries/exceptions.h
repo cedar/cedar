@@ -205,4 +205,10 @@ class cedar::aux::ValidationFailedException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::ValidationFailedException
 
+/*!@brief Exception that occurs when a parameter validation fails.
+ */
+class cedar::aux::UnknownUnitSuffixException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::UnknownUnitSuffixException
+
 #endif // CEDAR_AUX_EXCEPTIONS_H

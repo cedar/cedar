@@ -34,15 +34,16 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_KTEAM_DRIVE_H
-#define CEDAR_DEV_ROBOT_KTEAM_DRIVE_H
+#ifndef CEDAR_DEV_KTEAM_DRIVE_H
+#define CEDAR_DEV_KTEAM_DRIVE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
-#include "cedar/auxiliaries/math/IntLimitsParameter.h"
-#include "cedar/devices/robot/DifferentialDrive.h"
+#include "cedar/devices/namespace.h"
 #include "cedar/devices/kteam/namespace.h"
-#include "cedar/devices/communication/namespace.h"
+#include "cedar/devices/DifferentialDrive.h"
+#include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/units/Length.h"
+#include "cedar/units/Frequency.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -52,14 +53,17 @@
  * This is an abstract class with functions and attributes common to differential drive robots with
  * pulse-width-modulation driven wheels. These are, for instance, the mobile robots E-Puck, Khepera and Koala.
  */
-class cedar::dev::kteam::Drive : public cedar::dev::robot::DifferentialDrive
+class cedar::dev::kteam::Drive : public cedar::dev::DifferentialDrive
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The constructor
-  Drive(cedar::dev::com::SerialCommunicationPtr communication);
+  //!@brief Constructor
+  Drive();
+
+  //!@brief Constructor taking an externally created channel
+  Drive(cedar::dev::ChannelPtr channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -69,62 +73,30 @@ public:
   double getNumberOfPulsesPerRevolution() const;
 
   //!@brief Returns the distance a wheel moves for a single pulse [in m].
-  double getDistancePerPulse() const;
+  cedar::unit::Length getDistancePerPulse() const;
 
   //!@brief Returns the limits for the encoder values.
   cedar::aux::math::IntLimitsParameterPtr getEncoderLimits() const;
 
   //!@brief Returns the current encoder value of the left and right wheel.
-  virtual std::vector<int> getEncoders() const;
+  virtual std::vector<int> getEncoders() const = 0;
 
   /*!@brief Sets the encoder values of both wheels.
    * @param[in] encoders encoder value for the left and right wheel
    */
-  virtual void setEncoders(const std::vector<int>& encoders);
+  virtual void setEncoders(const std::vector<int>& encoders) = 0;
 
-  //! @see Base class.
+  //! @see base class.
   virtual void reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! @see Base class.
-  virtual void sendMovementCommand();
-
-  //!@brief Returns the character used to start a command which sets the robots speed.
-  virtual std::string getCommandSetSpeed() const;
-
-  //!@brief Returns the character used to set the encoders of the robot.
-  virtual std::string getCommandSetEncoder() const;
-
-  //!@brief Returns the character used to get the encoders of the robot.
-  virtual std::string getCommandGetEncoder() const;
-
-  /*!@brief Determines the expected answer for a command with a given command string prefix.
-   *
-   * Command strings always begin with an upper-case character (e.g., 'D').
-   * The correct answer to every command will begin with the lower-case version
-   * of that character (e.g., 'd').
-   *
-   * @param[in] commandString the command prefix
-   * @note The method makes a copy of the given string to not alter it.
-   */
-  std::string determineCorrectAnswer(std::string commandString) const;
-
-  /*!@brief Checks whether the answer begins with the correct first character.
-   * The method throws an exception when the answer is not correct.
-   * @param[in] answer the answer to check
-   * @param[in] command the command string producing the received answer
-   * @param[in] expectedAnswer The answer expected from the robot.
-   */
-  void checkAnswer(const std::string& answer, const std::string& command, const std::string& expectedAnswer = "") const;
-
-  /*!@brief Checks whether the stream is still valid.
-   * @param[in] answerStream string stream to be checked
-   * @param[in] atEndOfStream denotes whether the stream is believed to be at the end
-   */
-  void checkStream(const std::istringstream& answerStream, bool atEndOfStream) const;
+  std::vector<cedar::unit::Frequency> convertWheelSpeedToPulses
+                   (
+                     const std::vector<cedar::unit::Velocity>& wheelSpeed
+                   ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -136,12 +108,9 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Returns the serial communication object.
-  cedar::dev::com::SerialCommunicationPtr getSerialCommunication() const;
-
+  // none yet
 private:
-  //! serial communication channel
-  cedar::dev::com::SerialCommunicationPtr mSerialCommunication;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -153,4 +122,4 @@ protected:
   cedar::aux::math::IntLimitsParameterPtr _mEncoderLimits;
 }; // class cedar::dev::kteam::Drive
 
-#endif // CEDAR_DEV_ROBOT_KTEAM_DRIVE_H
+#endif // CEDAR_DEV_KTEAM_DRIVE_H

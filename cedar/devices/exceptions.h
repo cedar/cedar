@@ -55,9 +55,24 @@ class cedar::dev::SerialCommunicationException : public cedar::aux::ExceptionBas
 {
 }; // class cedar::dev::SerialCommunicationException
 
+//!@brief Exception that occurs when a timeout expires.
+class cedar::dev::TimeoutException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::dev::TimeoutException
+
 //!@brief Exception that occurs when the operating system of the computer cannot be determined.
 class cedar::dev::UnknownOperatingSystemException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::dev::UnknownOperatingSystemException
+
+//!@brief Exception that occurs a resource (e.g., a component or channel) is not available.
+class cedar::dev::ResourceNotAvailableException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::dev::ComponentNotAvailableException
+
+//!@brief Exception that occurs when a configuration for a given channel is not found.
+class cedar::dev::ChannelConfigurationNotFoundException : public cedar::aux::ExceptionBase
+{
+};
 
 #endif // CEDAR_DEV_EXCEPTIONS_H
