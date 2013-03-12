@@ -418,6 +418,7 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
     iterator it = elements.begin(); it != elements.end(); ++it
   )
   {
+    // need two parentheses here because otherwise clang throws a warning
     if ((old_network = (*(elements.begin()))->getNetwork()))
     {
       break;
