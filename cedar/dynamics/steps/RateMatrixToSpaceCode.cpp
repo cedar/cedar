@@ -249,7 +249,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::RateMatrixToSpaceCode::determineInpu
   // First, let's make sure that this is really the input in case anyone ever changes our interface.
   if (slot->getName() == "bin map")
   {
-    if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+    if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
     {
       // Mat data is accepted, but only 2D.
       unsigned int dimensionality = cedar::aux::math::getDimensionalityOf(mat_data->getData());
@@ -261,7 +261,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::RateMatrixToSpaceCode::determineInpu
   }
   if (slot->getName() == "values")
   {
-    if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+    if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
     {
       // Mat data is accepted, but only 2D.
       unsigned int dimensionality = cedar::aux::math::getDimensionalityOf(mat_data->getData());
@@ -280,7 +280,7 @@ void cedar::dyn::RateMatrixToSpaceCode::inputConnectionChanged(const std::string
   if (inputName == "bin map")
   {
     // Assign the input to the member. This saves us from casting in every computation step.
-    this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
+    this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
 
     if (!this->mInput)
     {
