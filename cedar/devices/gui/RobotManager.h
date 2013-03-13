@@ -107,6 +107,8 @@ private:
 
   void robotRemoved(const std::string& robotName);
 
+  void fillExistingRobots();
+
 private slots:
   void loadConfigurationTriggered();
 

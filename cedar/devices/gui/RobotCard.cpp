@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/devices/gui/RobotCard.h"
 #include "cedar/devices/RobotManager.h"
+#include "cedar/devices/exceptions.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
@@ -90,8 +91,8 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
   p_header_layout->addWidget(p_recycle_button);
 
   // center
-  auto p_drop_area = new cedar::dev::gui::RobotCardIconHolder();
-  p_outer_layout->addWidget(p_drop_area, 1);
+  this->mpIcon = new cedar::dev::gui::RobotCardIconHolder(this);
+  p_outer_layout->addWidget(this->mpIcon, 1);
 
   // footer
   mpConfigurationSelector = new QComboBox();
@@ -99,13 +100,28 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
 
   this->setLayout(p_outer_layout);
 
-  QObject::connect(p_drop_area, SIGNAL(robotDropped(const QString&)), this, SLOT(robotDropped(const QString&)));
+  QObject::connect(this->mpIcon, SIGNAL(robotDropped(const QString&)), this, SLOT(robotDropped(const QString&)));
   QObject::connect(mpConfigurationSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(selectedConfigurationChanged(int)));
   QObject::connect(p_recycle_button, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+
+  try
+  {
+    this->setRobotTemplate
+          (
+            cedar::dev::RobotManagerSingleton::getInstance()->getRobotTemplateName(robotName.toStdString())
+          );
+  }
+  catch (const cedar::dev::TemplateNotFoundException&)
+  {
+    // ok -- nothing to do here
+  }
 }
 
-cedar::dev::gui::RobotCardIconHolder::RobotCardIconHolder()
+cedar::dev::gui::RobotCardIconHolder::RobotCardIconHolder(cedar::dev::gui::RobotCard* pCard)
+:
+mpCard(pCard)
 {
+  CEDAR_ASSERT(this->mpCard != NULL);
   this->setAcceptDrops(true);
   this->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
   this->setBackgroundRole(QPalette::Light);
@@ -120,6 +136,12 @@ cedar::dev::gui::RobotCard::~RobotCard()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dev::gui::RobotCard::setRobotTemplate(const std::string& templateName)
+{
+  this->robotDropped(QString::fromStdString(templateName));
+  this->mpIcon->setIconFromTemplate(templateName);
+}
 
 void cedar::dev::gui::RobotCard::deleteClicked()
 {
@@ -148,37 +170,64 @@ void cedar::dev::gui::RobotCard::selectedConfigurationChanged(int index)
     return;
   }
 
-  auto robot_template
-    = cedar::dev::RobotManagerSingleton::getInstance()->getRobotTemplate(this->getRobotTemplateName());
-
-  std::string configuration = robot_template.getConfiguration(combo_text.toStdString());
-  cedar::dev::RobotManagerSingleton::getInstance()->loadRobotConfigurationFromResource(this->getRobotName(), configuration);
+  cedar::dev::RobotManagerSingleton::getInstance()->loadRobotTemplateConfiguration(this->getRobotName(), combo_text.toStdString());
 }
 
-void cedar::dev::gui::RobotCard::robotDropped(const QString& robotName)
+void cedar::dev::gui::RobotCard::robotDropped(const QString& robotTypeName)
 {
-  auto robot_template = cedar::dev::RobotManagerSingleton::getInstance()->getRobotTemplate(robotName.toStdString());
+  auto robot_template = cedar::dev::RobotManagerSingleton::getInstance()->getTemplate(robotTypeName.toStdString());
 
-  this->mRobotTemplateName = robotName.toStdString();
+  this->mRobotTemplateName = robotTypeName.toStdString();
 
+  bool blocked = this->mpConfigurationSelector->blockSignals(true);
   this->mpConfigurationSelector->clear();
 
   this->mpConfigurationSelector->addItem("-- select to instantiate --");
 
   auto configuration_names = robot_template.getConfigurationNames();
 
+  std::string loaded_configuration;
+  try
+  {
+    loaded_configuration
+      = cedar::dev::RobotManagerSingleton::getInstance()->getRobotTemplateConfiguration(this->getRobotName());
+  }
+  catch(const cedar::dev::NoTemplateConfigurationLoadedException& e)
+  {
+    // nothing loaded, nothing to do
+  }
+
+  int selected = 0;
   for (size_t i = 0; i < configuration_names.size(); ++i)
   {
-    this->mpConfigurationSelector->addItem(QString::fromStdString(configuration_names.at(i)));
+    const std::string configuration = configuration_names.at(i);
+    this->mpConfigurationSelector->addItem(QString::fromStdString(configuration));
+    if (configuration == loaded_configuration)
+    {
+      selected = this->mpConfigurationSelector->count() - 1;
+    }
   }
+  this->mpConfigurationSelector->setCurrentIndex(selected);
+  this->mpConfigurationSelector->blockSignals(blocked);
 }
 
-void cedar::dev::gui::RobotCardIconHolder::setRobotFromTemplate(const std::string& name)
+std::string cedar::dev::gui::RobotCardIconHolder::getRobotName() const
 {
-  auto robot_template = cedar::dev::RobotManagerSingleton::getInstance()->getRobotTemplate(name);
+  return this->mpCard->getRobotName();
+}
 
+void cedar::dev::gui::RobotCardIconHolder::setIconFromTemplate(const std::string& templateName)
+{
+  auto robot_template = cedar::dev::RobotManagerSingleton::getInstance()->getTemplate(templateName);
   QIcon icon(QString::fromStdString(robot_template.getIconPath()));
   this->setPixmap(icon.pixmap(QSize(200, 200)));
+}
+
+void cedar::dev::gui::RobotCardIconHolder::setRobotFromTemplate(const std::string& templateName)
+{
+  cedar::dev::RobotManagerSingleton::getInstance()->setRobotTemplateName(this->getRobotName(), templateName);
+
+  this->setIconFromTemplate(templateName);
 }
 
 void cedar::dev::gui::RobotCardIconHolder::dragEnterEvent(QDragEnterEvent* pEvent)

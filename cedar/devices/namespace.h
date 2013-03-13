@@ -67,8 +67,11 @@ namespace cedar
 
     // exceptions
     CEDAR_DECLARE_DEV_CLASS(ChannelConfigurationNotFoundException);
+    CEDAR_DECLARE_DEV_CLASS(NoTemplateConfigurationLoadedException);
+    CEDAR_DECLARE_DEV_CLASS(NoTemplateLoadedException);
     CEDAR_DECLARE_DEV_CLASS(ResourceNotAvailableException);
     CEDAR_DECLARE_DEV_CLASS(SerialCommunicationException);
+    CEDAR_DECLARE_DEV_CLASS(TemplateNotFoundException);
     CEDAR_DECLARE_DEV_CLASS(TimeoutException);
     CEDAR_DECLARE_DEV_CLASS(UnknownOperatingSystemException);
     CEDAR_DECLARE_DEV_CLASS(UnresponsiveRobotException);

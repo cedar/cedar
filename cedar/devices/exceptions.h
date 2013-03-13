@@ -75,4 +75,19 @@ class cedar::dev::ChannelConfigurationNotFoundException : public cedar::aux::Exc
 {
 };
 
+//!@brief Exception that occurs when no template has been loaded for a robot.
+class cedar::dev::NoTemplateLoadedException : public cedar::aux::ExceptionBase
+{
+};
+
+//!@brief Exception that occurs when no template has been loaded for a robot.
+class cedar::dev::NoTemplateConfigurationLoadedException : public cedar::aux::ExceptionBase
+{
+};
+
+//!@brief Exception that occurs when no template by the given name exists.
+class cedar::dev::TemplateNotFoundException : public cedar::aux::ExceptionBase
+{
+};
+
 #endif // CEDAR_DEV_EXCEPTIONS_H

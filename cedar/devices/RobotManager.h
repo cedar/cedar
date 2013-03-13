@@ -88,6 +88,14 @@ public:
       std::string mIconPath;
   };
 
+private:
+  struct RobotInfo
+  {
+    std::string mTemplateName;
+    std::string mLoadedTemplateConfigurationName;
+    std::string mLoadedTemplateConfiguration;
+  };
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -105,6 +113,10 @@ public:
 
   void loadRobotConfigurationFromResource(const std::string& robotName, const std::string& resourcePath);
 
+  void loadRobotTemplateConfiguration(const std::string& robotName, const std::string& configurationName);
+
+  void setRobotTemplateConfigurationName(const std::string& robotName, const std::string& templateName);
+
   cedar::dev::RobotPtr getRobot(const std::string& robotName) const;
 
   const std::string& getRobotName(cedar::dev::ConstRobotPtr robot) const;
@@ -121,7 +133,11 @@ public:
    */
   std::vector<std::string> getRobotNames() const;
 
-  const Template& getRobotTemplate(const std::string& name) const;
+  const Template& getTemplate(const std::string& name) const;
+
+  void setRobotTemplateName(const std::string& robotName, const std::string& templateName);
+
+  const std::string& getRobotTemplateName(const std::string& robotName) const;
 
   inline boost::signals2::connection connectToRobotNameAddedSignal(boost::function<void (const std::string&)> slot)
   {
@@ -138,6 +154,16 @@ public:
     return this->mRobotRemovedSignal.connect(slot);
   }
 
+  /*!
+   * @remarks Throws if no template has been loaded for the robot.
+   */
+  const std::string& getRobotTemplateConfigurationName(const std::string& robotName) const;
+
+  /*!
+   * @remarks Throws if no configuration is loaded for the robot.
+   */
+  const std::string& getRobotTemplateConfiguration(const std::string& robotName) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -151,6 +177,20 @@ private:
   //!@brief The standard constructor. Private beacuse this is a singleton object.
   RobotManager();
 
+  RobotInfo& retrieveRobotInfo(const std::string& robotName)
+  {
+    auto iter = this->mRobotInfos.find(robotName);
+    if (iter == this->mRobotInfos.end())
+    {
+      this->mRobotInfos[robotName] = RobotInfo();
+      return this->mRobotInfos[robotName];
+    }
+    else
+    {
+      return iter->second;
+    }
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -160,6 +200,9 @@ private:
   std::map<std::string, cedar::dev::RobotPtr> mRobotInstances;
 
   std::map<std::string, std::string> mRobotResourceConfigurations;
+
+  //! An association from robot names to the template that have been set for them.
+  std::map<std::string, RobotInfo> mRobotInfos;
 
   boost::signals2::signal<void (const std::string&)> mRobotNameAddedSignal;
 
