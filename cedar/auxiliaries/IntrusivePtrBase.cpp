@@ -63,7 +63,7 @@ cedar::aux::IntrusivePtrBase::~IntrusivePtrBase()
  *
  *        Required for boost::intrusive_ptr.
  */
-void cedar::aux::intrusive_ptr_add_ref(cedar::aux::IntrusivePtrBase const *pObject)
+void boost::intrusive_ptr_add_ref(cedar::aux::IntrusivePtrBase const *pObject)
 {
   CEDAR_DEBUG_ASSERT(pObject->mReferenceCount >= 0);
   ++(pObject->mReferenceCount);
@@ -73,7 +73,7 @@ void cedar::aux::intrusive_ptr_add_ref(cedar::aux::IntrusivePtrBase const *pObje
  *
  *        Required for boost::intrusive_ptr
  */
-void cedar::aux::intrusive_ptr_release(cedar::aux::IntrusivePtrBase const *pObject)
+void boost::intrusive_ptr_release(cedar::aux::IntrusivePtrBase const *pObject)
 {
   CEDAR_DEBUG_ASSERT(pObject->mReferenceCount > 0);
 
