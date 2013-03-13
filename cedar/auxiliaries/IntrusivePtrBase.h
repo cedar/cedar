@@ -48,13 +48,10 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
 
-namespace cedar
+namespace boost
 {
-  namespace aux
-  {
-    extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_add_ref(cedar::aux::IntrusivePtrBase const *pObject);
-    extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_release(cedar::aux::IntrusivePtrBase const *pObject);
-  }
+  extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_add_ref(cedar::aux::IntrusivePtrBase const *pObject);
+  extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_release(cedar::aux::IntrusivePtrBase const *pObject);
 }
 
 /*!@brief A base class for any classes that make use of boost::intrusive_ptr.
@@ -64,8 +61,8 @@ class cedar::aux::IntrusivePtrBase
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend void cedar::aux::intrusive_ptr_add_ref(cedar::aux::IntrusivePtrBase const *pObject);
-  friend void cedar::aux::intrusive_ptr_release(cedar::aux::IntrusivePtrBase const *pObject);
+  friend void boost::intrusive_ptr_add_ref(cedar::aux::IntrusivePtrBase const *pObject);
+  friend void boost::intrusive_ptr_release(cedar::aux::IntrusivePtrBase const *pObject);
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
