@@ -427,7 +427,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
 {
   if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "input")
   {
-    if (cedar::aux::ConstMatDataPtr input = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+    if (cedar::aux::ConstMatDataPtr input = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
     {
       if (!this->isMatrixCompatibleInput(input->getData()))
       {

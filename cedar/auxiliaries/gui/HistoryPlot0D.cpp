@@ -294,8 +294,8 @@ double cedar::aux::gui::HistoryPlot0D::getDataValue(size_t index)
 void cedar::aux::gui::HistoryPlot0D::CurveInfo::setData(cedar::aux::ConstDataPtr data)
 {
   this->mData = data;
-  this->mDoubleData = boost::shared_dynamic_cast<cedar::aux::ConstDoubleData>(data);
-  this->mMatData = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data);
+  this->mDoubleData = boost::dynamic_pointer_cast<cedar::aux::ConstDoubleData>(data);
+  this->mMatData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
 
   if (!this->mDoubleData && !this->mMatData)
   {

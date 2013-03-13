@@ -61,7 +61,7 @@ cedar::proc::ExternalData
 ),
 mDataSlot(promotedSlot)
 {
-  CEDAR_DEBUG_ASSERT(boost::shared_dynamic_cast<cedar::proc::ExternalData>(mDataSlot));
+  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ExternalData>(mDataSlot));
   this->setCollection(boost::shared_static_cast<cedar::proc::ExternalData>(mDataSlot)->isCollection());
 }
 
@@ -110,7 +110,7 @@ std::string cedar::proc::PromotedExternalData::getPromotionPath() const
   if
   (
     cedar::proc::PromotedExternalDataPtr promoted
-      = boost::shared_dynamic_cast<cedar::proc::PromotedExternalData>(mDataSlot)
+      = boost::dynamic_pointer_cast<cedar::proc::PromotedExternalData>(mDataSlot)
   )
   {
     return this->mpParent->getName() + "." + promoted->getPromotionPath();

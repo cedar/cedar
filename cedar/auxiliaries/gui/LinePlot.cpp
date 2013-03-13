@@ -211,7 +211,7 @@ void cedar::aux::gui::LinePlot::doAppend(cedar::aux::ConstDataPtr data, const st
   mpLock->lockForWrite();
   mPlotSeriesVector.push_back(plot_series);
 
-  plot_series->mMatData = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data);
+  plot_series->mMatData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
 
 
   if (!plot_series->mMatData)
