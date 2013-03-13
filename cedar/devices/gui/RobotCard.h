@@ -60,7 +60,11 @@ class cedar::dev::gui::RobotCardIconHolder : public QLabel
   Q_OBJECT
 
   public:
-    RobotCardIconHolder();
+    RobotCardIconHolder(cedar::dev::gui::RobotCard* pCard);
+
+    std::string getRobotName() const;
+
+    void setIconFromTemplate(const std::string& templateName);
 
   signals:
     void robotDropped(const QString& robotName);
@@ -73,6 +77,9 @@ class cedar::dev::gui::RobotCardIconHolder : public QLabel
     QListWidgetItem* itemFromMime(QDropEvent* pEvent);
 
     void setRobotFromTemplate(const std::string& name);
+
+  private:
+    cedar::dev::gui::RobotCard* mpCard;
 };
 
 
@@ -110,6 +117,8 @@ public:
     return this->mRobotTemplateName;
   }
 
+  void setRobotTemplate(const std::string& templateName);
+
 public slots:
   void robotDropped(const QString& robotName);
 
@@ -139,6 +148,8 @@ private:
   QComboBox* mpConfigurationSelector;
 
   QLineEdit* mpRobotNameEdit;
+
+  cedar::dev::gui::RobotCardIconHolder* mpIcon;
 
   std::string mRobotTemplateName;
 

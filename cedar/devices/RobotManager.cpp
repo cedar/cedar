@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/devices/RobotManager.h"
 #include "cedar/devices/Robot.h"
+#include "cedar/devices/exceptions.h"
 #include "cedar/auxiliaries/systemFunctions.h"
 
 // SYSTEM INCLUDES
@@ -134,10 +135,13 @@ std::vector<std::string> cedar::dev::RobotManager::getRobotTemplateNames() const
   return names;
 }
 
-const cedar::dev::RobotManager::Template& cedar::dev::RobotManager::getRobotTemplate(const std::string& name) const
+const cedar::dev::RobotManager::Template& cedar::dev::RobotManager::getTemplate(const std::string& name) const
 {
   auto iter = this->mRobotTemplates.find(name);
-  CEDAR_ASSERT(iter != this->mRobotTemplates.end());
+  if(iter == this->mRobotTemplates.end())
+  {
+    CEDAR_THROW(cedar::dev::TemplateNotFoundException, "Cannot find a template by the name \"" + name + "\"");
+  }
 
   return iter->second;
 }
@@ -189,14 +193,18 @@ void cedar::dev::RobotManager::addRobotName(const std::string& robotName)
 
 void cedar::dev::RobotManager::removeRobot(const std::string& robotName)
 {
-  auto iter = mRobotInstances.find(robotName);
-
-  if (iter == mRobotInstances.end())
+  auto instance_iter = mRobotInstances.find(robotName);
+  if (instance_iter == mRobotInstances.end())
   {
     CEDAR_THROW(cedar::aux::UnknownNameException, "Could not find a robot by the name \"" + robotName + "\".");
   }
+  this->mRobotInstances.erase(instance_iter);
 
-  this->mRobotInstances.erase(iter);
+  auto info_iter = this->mRobotInfos.find(robotName);
+  if (info_iter != this->mRobotInfos.end())
+  {
+    this->mRobotInfos.erase(info_iter);
+  }
 
   this->mRobotRemovedSignal(robotName);
 }
@@ -243,4 +251,74 @@ void cedar::dev::RobotManager::loadRobotConfigurationFromResource
   this->mRobotInstances[robotName]->readJson(full_path);
 
   this->mRobotConfigurationLoadedSignal(robotName);
+}
+
+void cedar::dev::RobotManager::setRobotTemplateName(const std::string& robotName, const std::string& templateName)
+{
+  this->retrieveRobotInfo(robotName).mTemplateName = templateName;
+}
+
+const std::string& cedar::dev::RobotManager::getRobotTemplateName(const std::string& robotName) const
+{
+  auto iter = this->mRobotInfos.find(robotName);
+  if (iter == this->mRobotInfos.end())
+  {
+    CEDAR_THROW(cedar::dev::TemplateNotFoundException, "No template has been set for robot \"" + robotName + "\"");
+  }
+
+  return iter->second.mTemplateName;
+}
+
+void cedar::dev::RobotManager::setRobotTemplateConfigurationName(const std::string& robotName, const std::string& templateName)
+{
+  this->retrieveRobotInfo(robotName).mLoadedTemplateConfigurationName = templateName;
+}
+
+const std::string& cedar::dev::RobotManager::getRobotTemplateConfigurationName(const std::string& robotName) const
+{
+  auto iter = this->mRobotInfos.find(robotName);
+  if (iter == this->mRobotInfos.end())
+  {
+    CEDAR_THROW(cedar::dev::NoTemplateLoadedException, "No template has been loaded for robot \"" + robotName + "\"");
+  }
+
+  return iter->second.mLoadedTemplateConfigurationName;
+}
+
+const std::string& cedar::dev::RobotManager::getRobotTemplateConfiguration(const std::string& robotName) const
+{
+  auto iter = this->mRobotInfos.find(robotName);
+  if (iter == this->mRobotInfos.end())
+  {
+    CEDAR_THROW
+    (
+      cedar::dev::NoTemplateConfigurationLoadedException,
+      "No template configuration has been loaded for robot \"" + robotName + "\""
+    );
+  }
+
+  return iter->second.mLoadedTemplateConfiguration;
+}
+
+void cedar::dev::RobotManager::loadRobotTemplateConfiguration
+     (
+       const std::string& robotName,
+       const std::string& configurationName
+     )
+{
+  try
+  {
+    auto robot_template
+      = cedar::dev::RobotManagerSingleton::getInstance()->getTemplate(this->getRobotTemplateName(robotName));
+
+    std::string configuration = robot_template.getConfiguration(configurationName);
+    cedar::dev::RobotManagerSingleton::getInstance()->loadRobotConfigurationFromResource(robotName, configuration);
+    this->retrieveRobotInfo(robotName).mLoadedTemplateConfiguration = configurationName;
+  }
+  catch (const cedar::dev::NoTemplateLoadedException&)
+  {
+    // throw the same with a more informative message
+    CEDAR_THROW(cedar::dev::NoTemplateLoadedException, "Cannot load configuration \"" + configurationName
+        + "\" for robot \"" + robotName + "\": no template has been set for the robot.");
+  }
 }
