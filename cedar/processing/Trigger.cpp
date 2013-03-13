@@ -149,7 +149,7 @@ void cedar::proc::Trigger::addListener(cedar::proc::TriggerablePtr step)
   if (iter == this->mListeners.end())
   {
     this->mListeners.push_back(step);
-    if (cedar::proc::TriggerPtr trigger = boost::shared_dynamic_cast<cedar::proc::Trigger>(step))
+    if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(step))
     {
       trigger->notifyConnected(boost::shared_static_cast<cedar::proc::Trigger>(this->shared_from_this()));
     }
@@ -169,7 +169,7 @@ void cedar::proc::Trigger::removeListener(cedar::proc::TriggerablePtr step)
   iter = this->find(step);
   if (iter != this->mListeners.end())
   {
-    if (cedar::proc::TriggerPtr trigger = boost::shared_dynamic_cast<cedar::proc::Trigger>(step))
+    if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(step))
     {
       trigger->notifyDisconnected(boost::shared_static_cast<cedar::proc::Trigger>(this->shared_from_this()));
     }
@@ -210,7 +210,7 @@ void cedar::proc::Trigger::writeConfiguration(cedar::aux::ConfigurationNode& nod
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
     cedar::proc::TriggerablePtr& step = this->mListeners.at(i);
-    cedar::aux::ConfigurationNode listener(boost::shared_dynamic_cast<cedar::proc::Element>(step)->getName());
+    cedar::aux::ConfigurationNode listener(boost::dynamic_pointer_cast<cedar::proc::Element>(step)->getName());
     listeners.push_back(cedar::aux::ConfigurationNode::value_type("", listener));
   }
   if (!listeners.empty())
