@@ -169,7 +169,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Convolution::determineInputV
   // First, let's make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(slot->getName() == "matrix" || slot->getName() == "kernel");
 
-  if (boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+  if (boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
   {
     // Mat data is accepted.
     return cedar::proc::DataSlot::VALIDITY_VALID;
@@ -189,7 +189,7 @@ void cedar::proc::steps::Convolution::inputConnectionChanged(const std::string& 
   if (inputName == "matrix")
   {
     // Assign the input to the member. This saves us from casting in every computation step.
-    this->mMatrix = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
+    this->mMatrix = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
     // This should always work since other types should not be accepted.
     if(!this->mMatrix)
     {
@@ -204,7 +204,7 @@ void cedar::proc::steps::Convolution::inputConnectionChanged(const std::string& 
   else if (inputName == "kernel")
   {
     // Assign the input to the member. This saves us from casting in every computation step.
-    this->mKernel = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
+    this->mKernel = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
   }
 }
 

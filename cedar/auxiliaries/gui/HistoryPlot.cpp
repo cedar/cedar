@@ -95,7 +95,7 @@ void cedar::aux::gui::HistoryPlot::plot(cedar::aux::ConstDataPtr data, const std
     this->mpCurrentPlotWidget = NULL;
   }
 
-  if (this->mData = boost::shared_dynamic_cast<cedar::aux::ConstDoubleData>(data))
+  if (this->mData = boost::dynamic_pointer_cast<cedar::aux::ConstDoubleData>(data))
   {
     this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData, title);
   }

@@ -355,7 +355,7 @@ void cedar::proc::gui::Scene::promoteElementToExistingGroup()
   else
   {
    target_network
-     = boost::shared_dynamic_cast<cedar::proc::Network>(this->mNetwork->getNetwork()->getElement(target_network_name));
+     = boost::dynamic_pointer_cast<cedar::proc::Network>(this->mNetwork->getNetwork()->getElement(target_network_name));
   }
   CEDAR_ASSERT(target_network);
   cedar::proc::gui::Network *p_network
@@ -644,7 +644,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
                 if
                 (
                   cedar::proc::ConstPromotedExternalDataPtr ptr
-                    = boost::shared_dynamic_cast<const cedar::proc::PromotedExternalData>(p_data_target->getSlot())
+                    = boost::dynamic_pointer_cast<const cedar::proc::PromotedExternalData>(p_data_target->getSlot())
                 )
                 {
                   target_name = ptr->getParentPtr()->getName() + std::string(".") + p_data_target->getSlot()->getName();
