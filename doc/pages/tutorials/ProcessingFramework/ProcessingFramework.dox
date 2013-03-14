@@ -459,7 +459,7 @@ cedar::proc::DataSlot::VALIDITY SimpleSummation::determineInputValidity
                                   cedar::aux::ConstDataPtr data
                                 ) const
 {
-  if (boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data))
+  if (boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
     return cedar::proc::DataSlot::VALIDITY_VALID;
   }

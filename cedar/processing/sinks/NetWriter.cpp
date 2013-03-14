@@ -152,7 +152,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::sinks::NetWriter::determineInputVal
   // First, let's make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(slot->getName() == "input")
 
-  if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+  if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
   {
     const cv::Mat& matref= mat_data->getData();
 
@@ -179,7 +179,7 @@ void cedar::proc::sinks::NetWriter::inputConnectionChanged(const std::string& in
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
   // Assign the input to the member. This saves us from casting in every computation step.
-  this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
+  this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
 
   if(!this->mInput)
   {

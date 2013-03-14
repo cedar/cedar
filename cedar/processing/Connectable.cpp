@@ -678,7 +678,7 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
   if (role == cedar::proc::DataRole::INPUT)
   {
     this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_READ, this->getLockSetForRole(role));
-    CEDAR_DEBUG_ASSERT(boost::shared_dynamic_cast<cedar::proc::ExternalData>(slot));
+    CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ExternalData>(slot));
     slot->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
   }
   else
@@ -867,7 +867,7 @@ void cedar::proc::Connectable::declarePromotedData(DataSlotPtr promotedSlot)
     iter->second[dotted_name]
       = cedar::proc::DataSlotPtr(new cedar::proc::PromotedExternalData(promotedSlot, this));
     mSlotConnection
-      = boost::shared_dynamic_cast<cedar::proc::ExternalData>
+      = boost::dynamic_pointer_cast<cedar::proc::ExternalData>
         (
           iter->second[dotted_name]
         )->connectToExternalDataChanged
