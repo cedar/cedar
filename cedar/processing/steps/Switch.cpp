@@ -76,7 +76,7 @@ namespace
       "factor must be either DoubleData or zero-dimensional MatData."
     );
 
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(declaration);
+    declaration->declare();
 
     return true;
   }

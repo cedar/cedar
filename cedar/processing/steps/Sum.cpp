@@ -70,7 +70,8 @@ namespace
     (
       "Calculates the sum of an arbitrary set of input matrices. All matrices must have the same size."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }

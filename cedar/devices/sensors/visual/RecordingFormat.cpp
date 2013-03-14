@@ -68,33 +68,33 @@ void cedar::dev::sensors::visual::RecordingFormat::construct()
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::RecordingFormat::RECORD_RAW,
                                       "RECORD_RAW",
-                                      "RAW"
+                                      "raw"
                                     ));
 
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::RecordingFormat::RECORD_MP42,
                                       "RECORD_MP42",
-                                      "MP42"
+                                      "mp42"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::RecordingFormat::RECORD_MJPG,
                                       "RECORD_MJPG",
-                                      "MJPG"
+                                      "mjpg"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::RecordingFormat::RECORD_MPEG2,
                                       "RECORD_MPEG2",
-                                      "MPEG2"
+                                      "mpeg2"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::RecordingFormat::RECORD_H264,
                                       "RECORD_H264",
-                                      "H264"
+                                      "h264"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::RecordingFormat::RECORD_H263,
                                       "RECORD_H263",
-                                      "H263"
+                                      "h263"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::RecordingFormat::RECORD_VP3,

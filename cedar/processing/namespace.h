@@ -74,8 +74,6 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(Manager);
     CEDAR_DECLARE_PROC_CLASS(Network);
     CEDAR_DECLARE_PROC_CLASS(OwnedData);
-    CEDAR_DECLARE_PROC_CLASS(PluginProxy);
-    CEDAR_DECLARE_PROC_CLASS(PluginDeclaration);
     CEDAR_DECLARE_PROC_CLASS(PromotedExternalData);
     CEDAR_DECLARE_PROC_CLASS(PromotedOwnedData);
     CEDAR_DECLARE_PROC_CLASS(Triggerable);
@@ -87,9 +85,13 @@ namespace cedar
     //!@cond SKIPPED_DOCUMENTATION
     template <class BaseClass, class FactoryType> class DeclarationBase;
     template <class DerivedClass> class ElementDeclarationTemplate;
-    template <class DerivedClass> class StepDeclarationT;
-    template <class DerivedClass> class TriggerDeclarationT;
+
+    CEDAR_DECLARE_PROC_CLASS(PluginProxy);
     //!@endcond
+
+    //!@todo Deprecate this
+    typedef cedar::aux::PluginDeclarationList PluginDeclaration;
+    CEDAR_GENERATE_POINTER_TYPES(PluginDeclaration);
 
     //!@brief a factory for elements
     typedef boost::shared_ptr<cedar::aux::Factory<ElementPtr> > ElementFactoryPtr;

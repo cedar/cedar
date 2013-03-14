@@ -70,7 +70,8 @@ namespace
       "Reads an image from a file. What filetypes are supported depends on what your opencv "
       "version supports."
     );
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }
@@ -146,7 +147,6 @@ void cedar::proc::sources::Picture::reset()
 }
 
 
-//----------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Picture::updatePicture()
 {
   cedar::aux::LogSingleton::getInstance()->debugMessage
@@ -155,11 +155,10 @@ void cedar::proc::sources::Picture::updatePicture()
                                              "cedar::dev::sensors::visual::Picture::updatePicture()"
                                            );
   onTrigger();
-  // update the annotation
   this->annotateImage();
 }
 
-//----------------------------------------------------------------------------------------------------
+
 void cedar::proc::sources::Picture::compute(const cedar::proc::Arguments&)
 {
   if (getPictureGrabber()->isCreated())

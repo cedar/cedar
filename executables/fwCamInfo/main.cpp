@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
     }
   }
 
-  std::cout << "Informations on camera no. " << (int)camera_nr << "\n" <<  std::endl;
+  std::cout << "Informations on camera no. " << static_cast<int>(camera_nr) << "\n" <<  std::endl;
 
   //create firewire interface
   cedar::dev::sensors::camera::LibDcBase fw_interface;

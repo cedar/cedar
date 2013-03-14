@@ -46,6 +46,7 @@
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 
@@ -160,7 +161,7 @@ protected:
 
 private:
   //!@brief the class id of the internal trigger, used for a tooltip
-  cedar::proc::ElementDeclarationPtr mClassId;
+  cedar::aux::ConstPluginDeclarationPtr mClassId;
 
 }; // class TriggerItem
 

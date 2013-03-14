@@ -49,7 +49,7 @@ have to install before you can compile our library. The version numbers are
 the oldest versions supported.
 
 * CMake
-* Boost 1.47
+* Boost 1.47 (except version 1.49, which apparently does not work with c++11)
 * OpenCV 2.2
 * Qt 4.6.2
 * qwt 5.2.1
@@ -86,6 +86,41 @@ As part of the installation, the Debian package will also download, compile,
 and install a patched version of qwtplot3d (0.3), which sadly is no longer
 available anywhere else on the web.
 
+### Mac OS X 10.8.x
+We recommend using [homebrew](http://mxcl.github.com/homebrew/) to install the above dependencies. Homebrew has recipe's for all of cedar's dependencies except for *qwtplot3d*. The latter you will need to download from our [repository](https://bitbucket.org/cedar/dependencies/downloads/qwtplot3d-0.3.0-patched.tar.gz).
+
+#### Installing qwtplot3d
+Download it [here](https://bitbucket.org/cedar/dependencies/downloads/qwtplot3d-0.3.0-patched.tar.gz) then open a terminal and go to the folder containing the downloaded file. Run 
+
+    tar -xvf qwtplot3d-0.3.0-patched.tar.gz
+
+Switch into the extracted folder `qwtplot3d` and run
+
+    qmake && make
+
+followed by
+
+    sudo make install
+
+if *qwtplot3d* compiled successfully.
+
+#### Link the frameworks
+Cedar currently does not support Mac frameworks. Therefore you have to create symbolic links to the frameworks such that cedar can find the installed dependencies.
+If you installed the dependencies with homebrew, you can simply copy the following statement, put in version numbers and execute it. Otherwise you might have to adapt the paths to fit your environment:
+
+    sudo ln -s "/usr/local/Cellar/libqglviewer/[__VERSION__]/QGLViewer.framework" "/Library/Frameworks/QGLViewer.framework"
+    
+    sudo ln -s "/Library/Frameworks/QGLViewer.framework/QGLViewer" "/Library/Frameworks/QGLViewer.framework/libQGLViewer.dylib"
+    
+    sudo ln -s "/usr/local/Cellar/qwt/[__VERSION__]/lib/qwt.framework/Versions/6/Headers" "/usr/local/Cellar/qwt/[__VERSION__]/lib/qwt.framework/Headers"
+    
+    sudo ln -s "/usr/local/Cellar/qwt/[__VERSION__]/lib/qwt.framework/Versions/6/qwt" "/usr/local/Cellar/qwt/[__VERSION__]/lib/qwt.framework/qwt"
+
+#### Install GCC and don't use Clang!
+To compile cedar you should **use the GCC compiler**. To install the GCC compiler version 4.2 open *XCode*, go to *Preferences* -> *Downloads* and install the *Command Line Tools*. Note however, that GCC 4.2 does not support C++11. The unstable version of cedar uses C++11 features. Thus you need to install GCC 4.7.2 if you want to compile the unstable version. Homebrew provides a [formula](https://github.com/Homebrew/homebrew-dupes/blob/master/gcc.rb), just follow the instructions to install homebrew/dupes/gcc.
+When configuring cedar with cmake change the compiler to GCC. You can do this by using *ccmake*:
+
+Switch to advanced mode and then set the value of `CMAKE_CXX_COMPILER` to `/usr/bin/llvm-g++`.
 
 ## Clone the cedar repository
 

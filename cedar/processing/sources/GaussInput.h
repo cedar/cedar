@@ -83,6 +83,9 @@ public:
   //!@brief Sets the amplitude of the Gauss input.
   void setAmplitude(double amplitude);
 
+  //!@brief Returns the amplitude of the Gauss input.
+  double getAmplitude() const;
+
 public slots:
   //!@brief a slot that is triggered if any of the Gauss function parameters are changed
   void updateMatrix();

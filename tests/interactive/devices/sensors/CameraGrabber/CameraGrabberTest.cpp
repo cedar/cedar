@@ -7,76 +7,123 @@
 
     Maintainer:  Georg.Hartinger
     Email:       georg.hartinger@ini.rub.de
-    Date:        2011 08 01
+    Date:        2013 01 11
 
-    Description: Simple application to grab from a camera (mono-case)
+    Description: Interactive test for a camera-grabber (mono-case)
 
     Credits:
 
 ======================================================================================================================*/
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // LOCAL INCLUDES
-#include "cedar/devices/sensors/visual/CameraGrabber.h"
-
-
-// PROJECT INCLUDES
+#include "cedar/devices/sensors/camera/Grabber.h"
+#include "cedar/auxiliaries/gui/ImagePlot.h"
+#include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
-#include <QReadWriteLock>
+#include <QtGui/QApplication>
+#include <opencv2/opencv.hpp>
 #include <boost/lexical_cast.hpp>
+#include <ios>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Local methods
+// ---------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  void processQtEvents()
+  {
+#ifdef CEDAR_OS_APPLE
+    unsigned int event_counter = 0;
+    while (QApplication::hasPendingEvents() && (++event_counter < 1000))
+#else
+    while (QApplication::hasPendingEvents())
+#endif
+    {
+      QApplication::processEvents();
+    }
+  }
+}
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Interactive test program
+// ---------------------------------------------------------------------------------------------------------------------
 
-int main(int , char **)
+// Use this, if you want to test with a firewire camera (only possible, if cedar is compiled with dc1394 support)
+#ifdef CEDAR_USE_LIB_DC1394
+#define USE_FIREWIRE_BACKEND
+#endif
+
+int main(int argc, char* argv[])
 {
 
   // grab from device number on the bus (as an integer)
+  // it is possible to specify th GUID of the camera here (if so, set the IS_GUID paramter to true)
   const int CHANNEL_0_DEVICE = 0;
-  //  const int CHANNEL_0_DEVICE = 197055;
 
-  // channel_0_device is the bus-id or the guid
+  // given device-ID is the guid of the cam. or the id on the bus
   const bool  IS_GUID = false;
 
   // the name of the grabber
   // only used in the configuration file
-  const std::string GRABBER_NAME = "Grabber_TestCase";
+  const std::string GRABBER_NAME = "CameraGrabber_TestCase";
 
-  // the basename for the configuration file
-  const std::string CONFIG_FILE_NAME = "grabber_simple_testcase.config";
+  // the name of the configuration file
+  const std::string CONFIG_FILE_NAME = "cameragrabber_simple_testcase.config";
 
-  //title of highgui window
-  std::string highgui_window_name = GRABBER_NAME + ": " + boost::lexical_cast<std::string>(CHANNEL_0_DEVICE);
+  //title of plot window
+  std::string window_title = GRABBER_NAME + ": " + boost::lexical_cast<std::string>(CHANNEL_0_DEVICE);
 
+  //--------------------------------------------------------------------------------------------------------------------
+  //main test
+  //--------------------------------------------------------------------------------------------------------------------
+  std::cout.setf(std::ios::fixed,std::ios::floatfield);
+  std::cout.precision(3);
 
   std::cout << "\n\nInteractive test of the CameraGrabber class\n";
-  std::cout << "--------------------------------------------\n\n";
+  std::cout << "-------------------------------------------\n\n";
 
 
-  //------------------------------------------------------------------
+  //----------------------------------------------------------------------------------------
   //Create the grabber
+  //----------------------------------------------------------------------------------------
   std::cout << "Create a CameraGrabber:\n";
-  cedar::dev::sensors::visual::CameraGrabberPtr p_grabber;
+  cedar::dev::sensors::camera::GrabberPtr p_grabber;
   try
   {
-    p_grabber = cedar::dev::sensors::visual::CameraGrabberPtr
+    p_grabber = cedar::dev::sensors::camera::GrabberPtr
                 (
-                  new cedar::dev::sensors::visual::CameraGrabber(CHANNEL_0_DEVICE,IS_GUID)
+                  new cedar::dev::sensors::camera::Grabber
+                      (
+                        CHANNEL_0_DEVICE,
+                        IS_GUID
+#ifdef USE_FIREWIRE_BACKEND
+                        ,
+                        cedar::dev::sensors::camera::BackendType::DC1394
+#endif //USE_FIREWIRE_BACKEND
+                      )
                 );
   }
   catch (cedar::aux::InitializationException &e)
   {
     //after an InitializationExeception the grabber class isn't initialized correctly
     //and couldn't be used
-    std::cout << "Error on creation of the VideoGrabber class:\n"
+    std::cout << "Error on creation of the CameraGrabber class:\n"
               << e.exceptionInfo() << std::endl;
 
     //delete p_grabber is done via the shared-pointer class
     return -1;
   }
 
+  // activate crash-handler if there is any hardware-related stuff which has to be cleaned up
+  p_grabber->installCrashHandler();
+
   //----------------------------------------------------------------------------------------
-  // load configuration or apply settings manual.
-  // this step is optional.
+  // load configuration. this step is optional.
   //----------------------------------------------------------------------------------------
   try
   {
@@ -87,13 +134,20 @@ int main(int , char **)
     std::cout << "No configuration exists!" << std::endl;
   }
 
+  //----------------------------------------------------------------------------------------
+  // change settings or properties
+  //----------------------------------------------------------------------------------------
+
+#ifdef USE_FIREWIRE_BACKEND
+#ifdef CEDAR_USE_LIB_DC1394
   //only available for firewire cameras:
-  p_grabber->setCameraIsoSpeed(0,cedar::dev::sensors::visual::CameraIsoSpeed::ISO_200);
+  p_grabber->setCameraIsoSpeed(0,cedar::dev::sensors::camera::IsoSpeed::ISO_200);
+#endif // CEDAR_USE_LIB_DC1394
+#endif // USE_FIREWIRE_BACKEND
 
   // you have to check if the framerate is supported by the used camera
-  // on firewirecameras only suppertd framerates could be set
-  p_grabber->setCameraFps(0,cedar::dev::sensors::visual::CameraFrameRate::FPS_15);
-
+  // on firewirecameras only supperted framerates could be set
+  p_grabber->setCameraFramerate(0,cedar::dev::sensors::camera::FrameRate::FPS_15);
 
 
   //----------------------------------------------------------------------------------------
@@ -116,7 +170,8 @@ int main(int , char **)
    * WITHOUT configuration file (readJson):
    *  - loopedThread isn't running (startGrabber threaded background grabbing with startGrabber() )
    *  - grabbername is set to default, i.e. CameraGrabber
-   *  - the first found camera is used with default backend parameter values
+   *  - if no backend specified in the constructor, then the first found camera will be
+   *    used with default backend parameter values
    *
    * WITH configuration file:
    *  the values depends on the configuration
@@ -124,25 +179,29 @@ int main(int , char **)
 
   //first lets set a custom name for our grabber. This name will be used later in the configuration file
   p_grabber->setName(GRABBER_NAME);
+  std::string info = std::string(p_grabber->getSourceInfo());
   std::cout << "\nGrab channel 0 from \"" << p_grabber->getSourceInfo()<< "\"" << std::endl;
-
 
   //----------------------------------------------------------------------------------------
   // print the settings and properties from the camera
   //----------------------------------------------------------------------------------------
 
   std::cout << "Default settings:" << std::endl;
-  std::cout << "\tCamera Mode :\t" << (int) p_grabber->getCameraVideoMode(0);
-  cedar::dev::sensors::visual::CameraVideoMode::Id mode = p_grabber->getCameraVideoMode(0);
-  std::cout << " (" << cedar::dev::sensors::visual::CameraVideoMode::type().get(mode).name() << ")" << std::endl;
+  std::cout << "\tCamera Mode :\t" << static_cast<int>(p_grabber->getCameraVideoMode(0));
+  cedar::dev::sensors::camera::VideoMode::Id mode = p_grabber->getCameraVideoMode(0);
+  std::cout << " (" << cedar::dev::sensors::camera::VideoMode::type().get(mode).name() << ")" << std::endl;
 
-  std::cout << "\tCamera FPS  :\t" << p_grabber->getCameraFps(0);
-  cedar::dev::sensors::visual::CameraFrameRate::Id fps = p_grabber->getCameraFps(0);
-  std::cout << " (" << cedar::dev::sensors::visual::CameraFrameRate::type().get(fps).name() << ")" << std::endl;
+  std::cout << "\tCamera FPS  :\t" << p_grabber->getCameraFramerate(0);
+  cedar::dev::sensors::camera::FrameRate::Id fps = p_grabber->getCameraFramerate(0);
+  std::cout << " (" << cedar::dev::sensors::camera::FrameRate::type().get(fps).name() << ")" << std::endl;
 
+#ifdef USE_FIREWIRE_BACKEND
+#ifdef CEDAR_USE_LIB_DC1394
   std::cout << "\tCamera ISO-Speed :\t" << p_grabber->getCameraIsoSpeed(0);
-  cedar::dev::sensors::visual::CameraIsoSpeed::Id iso_speed = p_grabber->getCameraIsoSpeed(0);
-  std::cout << " (" << cedar::dev::sensors::visual::CameraIsoSpeed::type().get(iso_speed).name() << ")" << std::endl;
+  cedar::dev::sensors::camera::IsoSpeed::Id iso_speed = p_grabber->getCameraIsoSpeed(0);
+  std::cout << " (" << cedar::dev::sensors::camera::IsoSpeed::type().get(iso_speed).name() << ")" << std::endl;
+#endif // CEDAR_USE_LIB_DC1394
+#endif // USE_FIREWIRE_BACKEND
 
   //read properties of camera
   std::cout << "\n\nChannel 0 properties:\n Negative values have special meaning and belongs to the mode.\n"
@@ -153,32 +212,27 @@ int main(int , char **)
 
   //use the enum-types from cedar to get information about the used cameras
   std::cout << "\tBrightness: "
-    << p_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_BRIGHTNESS) << std::endl;
+    << p_grabber->getProperty(cedar::dev::sensors::camera::Property::PROP_BRIGHTNESS) << std::endl;
   std::cout << "\tSaturation: "
-    << p_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_SATURATION) << std::endl;
+    << p_grabber->getProperty(cedar::dev::sensors::camera::Property::PROP_SATURATION) << std::endl;
   std::cout << "\tHue:        "
-    << p_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_HUE) << std::endl;
+    << p_grabber->getProperty(cedar::dev::sensors::camera::Property::PROP_HUE) << std::endl;
   std::cout << "\tGain:       "
-    << p_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_GAIN) << std::endl;
+    << p_grabber->getProperty(cedar::dev::sensors::camera::Property::PROP_GAIN) << std::endl;
   std::cout << "\tGamma:      "
-    << p_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_GAMMA) << std::endl;
+    << p_grabber->getProperty(cedar::dev::sensors::camera::Property::PROP_GAMMA) << std::endl;
   std::cout << "\tTemperature:"
-    << p_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_TEMPERATURE) << std::endl;
+    << p_grabber->getProperty(cedar::dev::sensors::camera::Property::PROP_TEMPERATURE) << std::endl;
 
   std::cout << "\tZoom:       "
-    << p_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_ZOOM) << std::endl;
+    << p_grabber->getProperty(cedar::dev::sensors::camera::Property::PROP_ZOOM) << std::endl;
   std::cout << "\tFocus:      "
-    << p_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_FOCUS) << std::endl;
+    << p_grabber->getProperty(cedar::dev::sensors::camera::Property::PROP_FOCUS) << std::endl;
 
   std::cout << "\tExposure:      "
-    << p_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_EXPOSURE) << std::endl;
+    << p_grabber->getProperty(cedar::dev::sensors::camera::Property::PROP_EXPOSURE) << std::endl;
   std::cout << "\tAuto-Exposure: "
-    << p_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_AUTO_EXPOSURE) << std::endl;
-
-  std::cout << "\tTrigger:       "
-    << p_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_TRIGGER) << std::endl;
-  std::cout << "\tTrigger-Delay: "
-    << p_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_TRIGGER_DELAY) << std::endl;
+    << p_grabber->getProperty(cedar::dev::sensors::camera::Property::PROP_AUTO_EXPOSURE) << std::endl;
 
   std::cout << "\n--------------------------------------------------------------------------------\n" << std::endl;
 
@@ -188,85 +242,115 @@ int main(int , char **)
   //----------------------------------------------------------------------------------------
 
   // in order to set a property, you have to switch over to manual mode for that property
-  cedar::dev::sensors::visual::CameraProperty::Id prop_id;
-  prop_id = cedar::dev::sensors::visual::CameraProperty::PROP_BRIGHTNESS;
+  cedar::dev::sensors::camera::Property::Id prop_id;
+  prop_id = cedar::dev::sensors::camera::Property::PROP_BRIGHTNESS;
 
-
-  if (p_grabber->setCameraPropertyMode(0,prop_id,cedar::dev::sensors::visual::CameraPropertyMode::MANUAL))
+  try
   {
-    bool test = p_grabber->setCameraProperty(prop_id, 100);
-    std::cout << "Set " << cedar::dev::sensors::visual::CameraProperty::type().get(prop_id).name()
-              << " to " << 100
-              << ": Result: " << std::boolalpha << test << std::endl;
-    std::cout << "Value after: " << p_grabber->getCameraProperty(prop_id) << std::endl;
+    p_grabber->setPropertyMode(0,prop_id,cedar::dev::sensors::camera::PropertyMode::MANUAL);
+    p_grabber->setProperty(prop_id, 100);
+    std::cout << "Set " << cedar::dev::sensors::camera::Property::type().get(prop_id).name()
+              << " to 100\n"
+              << "Value after (from backend): " << p_grabber->getProperty(prop_id) << std::endl
+              << "Raw value   (from camera) : " << p_grabber->getPropertyValue(0,prop_id) << std::endl;
+  }
+  catch(cedar::dev::sensors::camera::PropertyNotSetException& e)
+  {
+    std::cout << "ERROR: " << e.getMessage();
   }
 
 
   //----------------------------------------------------------------------------------------
-  // show frames
+  // grab first frame
   //----------------------------------------------------------------------------------------
-
-  //Create an OpenCV highgui window to show grabbed frames
-  cv::namedWindow(highgui_window_name,CV_WINDOW_KEEPRATIO);
-
-  //the first frame is already grabbed and could be read
-  //always use the QReadWriteLock for locking the cv::Mat image object
-  //on access
-  QReadWriteLock* p_lock;
-  p_lock = p_grabber->getReadWriteLockPointer();
 
   //grab a picture
   p_grabber->grab();
 
-  //startGrabber the grabber-thread for updating camera images
-  p_grabber->setFps(15);
+  //the first frame is now grabbed and could be read
+  //always use the QReadWriteLock for locking the cv::Mat image object on access
+  QReadWriteLock* p_lock = p_grabber->getReadWriteLockPointer();
+
+  //the local image buffer
+  cv::Mat frame0;
+
+  //get the picture from the grabber
+  p_lock->lockForRead();
+  frame0 = p_grabber->getImage();
+  p_lock->unlock();
+
+  //----------------------------------------------------------------------------------------
+  // Create a cedar::aux::gui ImagePlot widget to show grabbed frames
+  //----------------------------------------------------------------------------------------
+
+  QApplication app(argc, argv);
+  cedar::aux::gui::ImagePlotPtr p_plot = cedar::aux::gui::ImagePlotPtr(new cedar::aux::gui::ImagePlot());
+  cedar::aux::MatDataPtr p_data = cedar::aux::MatDataPtr(new cedar::aux::MatData(frame0));
+  p_plot->plot(p_data,window_title);
+  p_plot->setWindowTitle(QString::fromStdString(window_title));
+  p_plot->show();
+  p_plot->resize(frame0.cols,frame0.rows);
+
+  //process events of the ImagePlot widget
+  processQtEvents();
+
+  //----------------------------------------------------------------------------------------
+  //start the grabber-thread for updating camera images with 30 fps
+  //----------------------------------------------------------------------------------------
+  p_grabber->setFramerate(30);
   std::cout << "Start grabbing in the background" << std::endl;
   p_grabber->startGrabber();
 
   // get the image from the image buffer
-  p_lock->lockForRead();
-  cv::Mat frame = p_grabber->getImage();
-  p_lock->unlock();
+//  p_lock->lockForRead();
+//  p_data->lockForWrite();
+//  frame0 = p_grabber->getImage();
+//  p_data->unlock();
+//  p_lock->unlock();
 
   //startGrabber recording
   //std::cout << "\nStart Recording\n";
   //p_grabber->startRecording(15);
 
-  unsigned int counter=0;
-  std::cout << "\nDisplay camera frames\n";
+  // If the camera need a decode filter like from an debayer-filter or something like this
+  //p_grabber->setDecodeFilter(cedar::dev::sensors::camera::Decoding::GB_TO_BGR);
 
-  //get frames for a while
-  while (!frame.empty())
+  //get frames
+  std::cout << "\nDisplay camera frames\n";
+  unsigned int counter=0;
+
+  while (!frame0.empty() && p_plot->isVisible())
   {
-    cv::imshow(highgui_window_name,frame);
+    //process events of the ImagePlot widget
+    processQtEvents();
 
     //get new images, this is independent from camera-thread
     //if camera-thread is faster than your processing, images will be skipped
     p_lock->lockForRead();
-    frame = p_grabber->getImage();
+    p_data->lockForWrite();
+    frame0 = p_grabber->getImage();
+    p_data->unlock();
     p_lock->unlock();
 
-    counter++;
-
-    //exit after 5 seconds
-    if (counter == 500)
-    {
-      break;
-    }
-
-    //every second
-    if (! (counter % 100))
+    // state messages
+    if (! (++counter %= 200))
     {
       //display real reached fps
-      std::cout << "Thread FPS: " << p_grabber->getFpsMeasured() << std::endl;
+      std::cout << "Thread FPS: " << p_grabber->getMeasuredFramerate() << std::endl;
     }
 
-    //wait 10ms (needed for highgui) => get images from thread with 100 fps
-    cv::waitKey(10);
+    cedar::aux::sleep(cedar::unit::Milliseconds(1));
   }
 
-  //------------------------------------------------------------------
+
+  //----------------------------------------------------------------------------------------
+  // save configuration. this step is optional.
+  //----------------------------------------------------------------------------------------
+  //p_grabber->writeJson(CONFIG_FILE_NAME);
+
+  //----------------------------------------------------------------------------------------
   //clean up
+  //----------------------------------------------------------------------------------------
 
   //stopGrabber grabbing-thread if running
   //recording will also be stopped
@@ -274,13 +358,8 @@ int main(int , char **)
   {
     p_grabber->stopGrabber();
   }
-
-  cv::destroyWindow(highgui_window_name);
-  //p_grabber->writeConfiguration();
-
-  //delete p_grabber is done into the shared-pointer class
-
   std::cout << "finished\n";
 
+  // p_grabber is deleted in the shared-pointer class
   return 0;
 }

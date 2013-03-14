@@ -58,7 +58,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr rate_to_space_decl
+    ElementDeclarationPtr declaration
     (
       new ElementDeclarationTemplate<cedar::dyn::RateMatrixToSpaceCode>
       (
@@ -66,8 +66,8 @@ namespace
         "cedar.dynamics.RateMatrixToSpaceCode"
       )
     );
-    rate_to_space_decl->setIconPath(":/steps/rate_matrix_to_space_code.svg");
-    rate_to_space_decl->setDescription
+    declaration->setIconPath(":/steps/rate_matrix_to_space_code.svg");
+    declaration->setDescription
     (
       "Transforms a (2D) matrix of rate code to (3D) space code. This step assumes that the input contains rate code "
       "values in a meaningful interval described by the parameters lower and upper boundary. For each entry, this step"
@@ -75,7 +75,8 @@ namespace
       "fills the resulting 3D matrix with ones for each rate code bin entry. If other values are desired, a separate"
       "input can be used to provide those."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(rate_to_space_decl);
+
+    declaration->declare();
 
     return true;
   }
@@ -173,34 +174,64 @@ void cedar::dyn::RateMatrixToSpaceCode::interpolate()
   const cv::Mat& input = this->getInput("bin map")->getData<cv::Mat>();
   cv::Mat& output = this->mOutput->getData();
   output = 0.0;
-  if (this->getInput("values"))
+  if (this->getInput("values") && cedar::aux::math::matrixSizesEqual(this->getInput("values")->getData<cv::Mat>(), input))
   {
     const cv::Mat& values = this->getInput("values")->getData<cv::Mat>();
-    for (int row = 0; row < input.rows; ++row)
+    if (mDimensionality == 3)
     {
-      for (int col = 0; col < input.cols; ++col)
+      for (int row = 0; row < input.rows; ++row)
+      {
+        for (int col = 0; col < input.cols; ++col)
+        {
+          index.at(0) = row;
+          index.at(1) = col;
+          index.at(2) = this->interpolateBin(input.at<float>(row, col));
+          if (index.at(2) != -1)
+          {
+            //!@todo This should probably use cedar::aux::math::getMatrixEntry
+            output.at<float>(&(index.front())) = values.at<float>(row, col);
+          }
+        }
+      }
+    }
+    else if (mDimensionality == 2)
+    {
+      for (int row = 0; row < input.rows; ++row)
       {
         index.at(0) = row;
-        index.at(1) = col;
-        index.at(2) = this->interpolateBin(input.at<float>(row, col));
-        if (index.at(2) != -1)
+        index.at(1) = this->interpolateBin(input.at<float>(row, 0));
+        if (index.at(1) != -1)
         {
-          //!@todo This should probably use cedar::aux::math::getMatrixEntry
-          output.at<float>(&(index.front())) = values.at<float>(row, col);
+          output.at<float>(&(index.front())) = values.at<float>(row, 0);
         }
       }
     }
   }
   else
   {
-    for (int row = 0; row < input.rows; ++row)
+    if (mDimensionality == 3)
     {
-      for (int col = 0; col < input.cols; ++col)
+      for (int row = 0; row < input.rows; ++row)
+      {
+        for (int col = 0; col < input.cols; ++col)
+        {
+          index.at(0) = row;
+          index.at(1) = col;
+          index.at(2) = this->interpolateBin(input.at<float>(row, col));
+          if (index.at(2) != -1)
+          {
+            output.at<float>(&(index.front())) = 1.0;
+          }
+        }
+      }
+    }
+    else if (mDimensionality == 2)
+    {
+      for (int row = 0; row < input.rows; ++row)
       {
         index.at(0) = row;
-        index.at(1) = col;
-        index.at(2) = this->interpolateBin(input.at<float>(row, col));
-        if (index.at(2) != -1)
+        index.at(1) = this->interpolateBin(input.at<float>(row, 0));
+        if (index.at(1) != -1)
         {
           output.at<float>(&(index.front())) = 1.0;
         }
@@ -222,7 +253,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::RateMatrixToSpaceCode::determineInpu
     {
       // Mat data is accepted, but only 2D.
       unsigned int dimensionality = cedar::aux::math::getDimensionalityOf(mat_data->getData());
-      if (dimensionality == 2 && mat_data->getData().type() == CV_32F)
+      if ((dimensionality == 1 || dimensionality == 2) && mat_data->getData().type() == CV_32F)
       {
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
@@ -234,7 +265,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::RateMatrixToSpaceCode::determineInpu
     {
       // Mat data is accepted, but only 2D.
       unsigned int dimensionality = cedar::aux::math::getDimensionalityOf(mat_data->getData());
-      if (dimensionality == 2 && mat_data->getData().type() == CV_32F)
+      if ((dimensionality == 1 || dimensionality == 2) && mat_data->getData().type() == CV_32F)
       {
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }

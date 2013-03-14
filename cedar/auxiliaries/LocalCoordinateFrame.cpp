@@ -87,7 +87,7 @@ cedar::aux::LocalCoordinateFrame::~LocalCoordinateFrame()
 
 void cedar::aux::LocalCoordinateFrame::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
-  cedar::aux::Configurable::readConfiguration(node);
+  cedar::aux::NamedConfigurable::readConfiguration(node);
   setTranslation(_mInitialTranslation->getValue());
 
   CEDAR_ASSERT(_mInitialRotation->size() >=9);
