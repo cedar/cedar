@@ -135,7 +135,7 @@ void cedar::proc::Network::onNameChanged()
   if (cedar::proc::ElementPtr parent_network = this->mRegisteredAt.lock())
   {
     // update the name in the parent network
-    boost::shared_static_cast<cedar::proc::Network>(parent_network)->updateObjectName(this);
+    boost::static_pointer_cast<cedar::proc::Network>(parent_network)->updateObjectName(this);
   }
 }
 
@@ -546,7 +546,7 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
   {
     old_network->remove(element);
   }
-  element->setNetwork(boost::shared_static_cast<cedar::proc::Network>(this->shared_from_this()));
+  element->setNetwork(boost::static_pointer_cast<cedar::proc::Network>(this->shared_from_this()));
 
   this->mNewElementAddedSignal(element);
   this->mElementAddedSignal(this, element);

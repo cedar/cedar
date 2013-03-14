@@ -132,7 +132,7 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
     this->mListeners.at(i)->onTrigger
                             (
                               arguments,
-                              boost::shared_static_cast<cedar::proc::Trigger>(this->shared_from_this())
+                              boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this())
                             );
   }
 }
@@ -151,7 +151,7 @@ void cedar::proc::Trigger::addListener(cedar::proc::TriggerablePtr step)
     this->mListeners.push_back(step);
     if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(step))
     {
-      trigger->notifyConnected(boost::shared_static_cast<cedar::proc::Trigger>(this->shared_from_this()));
+      trigger->notifyConnected(boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this()));
     }
   }
 }
@@ -171,7 +171,7 @@ void cedar::proc::Trigger::removeListener(cedar::proc::TriggerablePtr step)
   {
     if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(step))
     {
-      trigger->notifyDisconnected(boost::shared_static_cast<cedar::proc::Trigger>(this->shared_from_this()));
+      trigger->notifyDisconnected(boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this()));
     }
     this->mListeners.erase(iter);
   }

@@ -62,7 +62,7 @@ cedar::proc::ExternalData
 mDataSlot(promotedSlot)
 {
   CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ExternalData>(mDataSlot));
-  this->setCollection(boost::shared_static_cast<cedar::proc::ExternalData>(mDataSlot)->isCollection());
+  this->setCollection(boost::static_pointer_cast<cedar::proc::ExternalData>(mDataSlot)->isCollection());
 }
 
 cedar::proc::PromotedExternalData::~PromotedExternalData()
