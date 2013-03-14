@@ -65,7 +65,7 @@ cedar_add_library(cedardev
                   sensors/camera/Properties.h
                   ${kuka_moc_files}
 				  RESOURCES
-				  gui/icons.qrc
+				  gui/cedar_dev_gui_icons.qrc
                   LINK_LIBRARIES
                   cedaraux
                   ${linked_libs}
