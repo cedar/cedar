@@ -533,7 +533,7 @@ void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, 
     p_item->writeConfiguration(node);
     scene.push_back(cedar::aux::ConfigurationNode::value_type("", node));
 
-    cedar::proc::NetworkPtr network = boost::shared_dynamic_cast<cedar::proc::Network>(element);
+    cedar::proc::NetworkPtr network = boost::dynamic_pointer_cast<cedar::proc::Network>(element);
     cedar::proc::gui::Network *p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_item);
 
     if (network && p_network_item)
@@ -765,7 +765,7 @@ void cedar::proc::gui::Network::checkTriggerConnection
   cedar::proc::gui::GraphicsBase* target_element
     = this->mpScene->getGraphicsItemFor
       (
-        this->getNetwork()->getElement(boost::shared_dynamic_cast<cedar::proc::Element>(target)->getName()).get()
+        this->getNetwork()->getElement(boost::dynamic_pointer_cast<cedar::proc::Element>(target)->getName()).get()
       );
   if (added)
   {
@@ -796,20 +796,20 @@ void cedar::proc::gui::Network::processStepAddedSignal(cedar::proc::ElementPtr e
   // store the type, which can be compared to entries in a configuration node
   std::string current_type;
   cedar::proc::gui::GraphicsBase* p_scene_element = NULL;
-  if (cedar::proc::StepPtr step = boost::shared_dynamic_cast<cedar::proc::Step>(element))
+  if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(element))
   {
     this->mpScene->addProcessingStep(step, QPointF(0, 0));
     current_type = "step";
 
     p_scene_element = this->mpScene->getStepItemFor(step.get());
   }
-  else if (cedar::proc::NetworkPtr network = boost::shared_dynamic_cast<cedar::proc::Network>(element))
+  else if (cedar::proc::NetworkPtr network = boost::dynamic_pointer_cast<cedar::proc::Network>(element))
   {
     this->mpScene->addNetwork(QPointF(0, 0), network);
     current_type = "network";
     p_scene_element = this->mpScene->getNetworkFor(network.get());
   }
-  else if (cedar::proc::TriggerPtr trigger = boost::shared_dynamic_cast<cedar::proc::Trigger>(element))
+  else if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(element))
   {
     this->mpScene->addTrigger(trigger, QPointF(0, 0));
     current_type = "trigger";

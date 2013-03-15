@@ -412,7 +412,7 @@ void cedar::dev::sensors::visual::Grabber::setFramerate(double fps)
     cedar::aux::LogSingleton::getInstance()->debugMessage
                                              (
                                                this->getName()
-                                                 + ": Switch to " + boost::lexical_cast<std::string>(fps) + " fps",
+                                                 + ": Switch to " + cedar::aux::toString(fps) + " fps",
                                                "cedar::dev::sensors::visual::Grabber::setFps()"
                                              );
   }
@@ -483,7 +483,7 @@ void cedar::dev::sensors::visual::Grabber::startGrabber()
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
                                              this->getName() + ": Grabbing started with "
-                                               + boost::lexical_cast<std::string>(getFramerate()) + " FPS.",
+                                               + cedar::aux::toString(getFramerate()) + " FPS.",
                                              "cedar::dev::sensors::visual::Grabber::startGrabber()"
                                            );
 }
@@ -513,7 +513,7 @@ void cedar::dev::sensors::visual::Grabber::grab()
         {
           error_info = error_info + "\n";
         }
-        error_info = error_info + "Channel " + boost::lexical_cast<std::string>(channel) + ": cvCapture.read() error!";
+        error_info = error_info + "Channel " + cedar::aux::toString(channel) + ": cvCapture.read() error!";
         result = false;
       }
     }
@@ -705,7 +705,7 @@ void cedar::dev::sensors::visual::Grabber::saveSnapshot(unsigned int channel) co
     }
     catch (std::exception &e)
     {
-      std::string msg = this->getName() + " Channel " + boost::lexical_cast<std::string>(channel)
+      std::string msg = this->getName() + " Channel " + cedar::aux::toString(channel)
                           + ": could not save snapshot! " + e.what();
       CEDAR_THROW(cedar::dev::sensors::visual::GrabberSnapshotException,msg);
     }
@@ -713,7 +713,7 @@ void cedar::dev::sensors::visual::Grabber::saveSnapshot(unsigned int channel) co
   else
   {
     std::string info = "[Grabber::saveSnapshot] Channel "
-                       + boost::lexical_cast<std::string>(channel)
+                       + cedar::aux::toString(channel)
                        + ": Image matrix is empty!";
     CEDAR_THROW(cedar::dev::sensors::visual::GrabberSnapshotException,info);
   }
@@ -854,7 +854,7 @@ void cedar::dev::sensors::visual::Grabber::startRecording
       // save it in channel-struct
       getGrabberChannel(channel)->mVideoWriter = writer;
 
-      std::string info = ": Channel " + boost::lexical_cast<std::string>(channel) + " recording to " + record_name;
+      std::string info = ": Channel " + cedar::aux::toString(channel) + " recording to " + record_name;
 
       cedar::aux::LogSingleton::getInstance()->message
                                                (
@@ -867,8 +867,8 @@ void cedar::dev::sensors::visual::Grabber::startRecording
 
   if (recording_channels != num_channels)
   {
-    std::string msg = "Start recording: only " + boost::lexical_cast<std::string>(recording_channels)
-                        + " of " + boost::lexical_cast<std::string>(num_channels) + " recording!";
+    std::string msg = "Start recording: only " + cedar::aux::toString(recording_channels)
+                        + " of " + cedar::aux::toString(num_channels) + " recording!";
     CEDAR_THROW(cedar::dev::sensors::visual::GrabberRecordingException,msg);
   }
 
@@ -928,7 +928,7 @@ void cedar::dev::sensors::visual::Grabber::step(double)
 
 std::string cedar::dev::sensors::visual::Grabber::getChannelSaveFilenameAddition(int channel) const
 {
-  return "_ch["+boost::lexical_cast<std::string>(channel)+"]";
+  return "_ch[" + cedar::aux::toString(channel) + "]";
 }
 
 cv::Mat& cedar::dev::sensors::visual::Grabber::getImageMat(unsigned int channel)

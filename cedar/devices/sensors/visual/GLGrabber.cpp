@@ -157,7 +157,7 @@ void cedar::dev::sensors::visual::GLGrabber::onCleanUp()
 std::string cedar::dev::sensors::visual::GLGrabber::onGetSourceInfo(unsigned int channel)
 {
   // value of channel is already checked by GraberInterface::getSourceInfo()
-  return "Channel " + boost::lexical_cast<std::string>(channel)
+  return "Channel " + cedar::aux::toString(channel)
                                       + ": QT::OGLWidget class \""
                                       + typeid(getGLChannel(channel)->mpQGLWidget).name()
                                       + "\"";
@@ -171,7 +171,7 @@ void cedar::dev::sensors::visual::GLGrabber::onGrab(unsigned int channel)
 
   if (p_channel_widget == NULL)
   {
-    std::string msg = "Channel " + boost::lexical_cast<std::string>(channel) + ": "
+    std::string msg = "Channel " + cedar::aux::toString(channel) + ": "
                       + "The Widget to grab from is not valid (i.e. it is a NULL-pointer)";
     CEDAR_THROW(cedar::dev::sensors::visual::GrabberGrabException,msg)
   }

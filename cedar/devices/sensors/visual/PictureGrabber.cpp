@@ -179,7 +179,7 @@ void cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()
     if (getImageMat(channel).empty())
     {
       std::string message = this->getName() + ": Grabbing failed on Channel "
-                            + boost::lexical_cast<std::string>(channel) + " from \"" + filename + "\"" ;
+                            + cedar::aux::toString(channel) + " from \"" + filename + "\"" ;
       cedar::aux::LogSingleton::getInstance()->error
                                                (
                                                  message,
@@ -238,7 +238,7 @@ void cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()
     // test if successful
     if (frame.empty())
     {
-      std::string msg = name + " Channel " + boost::lexical_cast<std::string>(channel)
+      std::string msg = name + " Channel " + cedar::aux::toString(channel)
                         + ": Could not read from \""+ getPictureChannel(channel)->_mSourceFileName->getPath() + "\"";
       CEDAR_THROW(cedar::dev::sensors::visual::CreateGrabberException,msg);
     }
@@ -256,7 +256,7 @@ void cedar::dev::sensors::visual::PictureGrabber::onGrab(unsigned int channel)
 {
   if (getImageMat(channel).empty())
   {
-    std::string msg = "Image is empty on channel " + boost::lexical_cast<std::string>(channel);
+    std::string msg = "Image is empty on channel " + cedar::aux::toString(channel);
     CEDAR_THROW(cedar::dev::sensors::visual::GrabberGrabException,msg)
   }
 }

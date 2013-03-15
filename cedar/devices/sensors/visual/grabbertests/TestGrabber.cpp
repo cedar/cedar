@@ -230,7 +230,7 @@ std::string cedar::dev::sensors::visual::TestGrabber::onGetSourceInfo(unsigned i
 
   // give some information about the used source like channelname, filename, devicename
   // or something like that
-  return this->getName() + " Channel " + boost::lexical_cast<std::string>(channel)
+  return this->getName() + " Channel " + cedar::aux::toString(channel)
                                + " : "+ getTestChannel(channel)->_mSourceFileName->getPath();
 }
 
@@ -246,7 +246,7 @@ void cedar::dev::sensors::visual::TestGrabber::onGrab(unsigned int channel)
   // check on errors an throw an exception
   if (getTestChannel(channel)->mImageMat.empty())
   {
-    std::string msg = "Channel " + boost::lexical_cast<std::string>(channel) + ": An error occurred";
+    std::string msg = "Channel " + cedar::aux::toString(channel) + ": An error occurred";
     CEDAR_THROW(cedar::dev::sensors::visual::GrabberGrabException,msg);
   }
 

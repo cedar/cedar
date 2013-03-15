@@ -217,7 +217,7 @@ void cedar::proc::Step::onNameChanged()
   if (cedar::proc::ElementPtr parent_network = this->mRegisteredAt.lock())
   {
     // update the name
-    boost::shared_static_cast<cedar::proc::Network>(parent_network)->updateObjectName(this);
+    boost::static_pointer_cast<cedar::proc::Network>(parent_network)->updateObjectName(this);
 
     // emit a signal to notify anyone interested in this
     emit nameChanged();
