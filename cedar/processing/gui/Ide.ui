@@ -7,11 +7,15 @@
     <x>0</x>
     <y>0</y>
     <width>988</width>
-    <height>761</height>
+    <height>762</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Processing IDE</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="icons/icons.qrc">
+    <normaloff>:/processing_ide_app_icon.svg</normaloff>:/processing_ide_app_icon.svg</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -161,7 +165,7 @@
      <x>0</x>
      <y>0</y>
      <width>988</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -289,8 +293,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>121</width>
-          <height>423</height>
+          <width>124</width>
+          <height>418</height>
          </rect>
         </property>
         <attribute name="label">
@@ -302,8 +306,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>98</width>
-          <height>28</height>
+          <width>124</width>
+          <height>417</height>
          </rect>
         </property>
         <attribute name="label">
