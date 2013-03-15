@@ -1,19 +1,37 @@
-/*========================================================================================================================
+/*======================================================================================================================
 
-    Institute:   Ruhr-Universitaet Bochum
-                 Institut fuer Neuroinformatik
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
-    File:        NetGrabberTest.cpp
+    This file is part of cedar.
 
-    Maintainer:  Georg.Hartinger
-    Email:       georg.hartinger@ini.rub.de
-    Date:        2011 08 01
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
 
-    Description: Simple application to grab from a Yarp-server (mono-case)
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
 
-    Credits:
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
 
-======================================================================================================================*/
+========================================================================================================================
+
+ ----- Institute:   Ruhr-Universitaet Bochum
+                    Institut fuer Neuroinformatik
+
+ ----- File:        NetGrabberTest.cpp
+
+ ----- Author:      Georg Hartinger
+ ----- Email:       georg.hartinger@ini.rub.de
+ ----- Date:        2011 08 01
+
+ ----- Description: Simple application to grab from a Yarp-server (mono-case)
+
+ ----- Credits:
+ ---------------------------------------------------------------------------------------------------------------------*/
 
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/NetGrabber.h"
@@ -212,7 +230,7 @@ int main(int argc, char* argv[])
     //status
     if (!(++counter_stat %= 100))
     {
-      std::cout << "Measured FPS: " << p_grabber->getFpsMeasured() << std::endl;
+      std::cout << "Measured FPS: " << p_grabber->getMeasuredFramerate() << std::endl;
     }
 
     // watch the output - everything should be fine.

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/MatDataPlot.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
@@ -63,7 +64,7 @@ namespace
     typedef cedar::aux::gui::PlotDeclarationTemplate<MatData, MatDataPlot> DeclarationType;
 
     boost::shared_ptr<DeclarationType> declaration(new DeclarationType());
-    cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(declaration);
+    declaration->declare();
     cedar::aux::gui::PlotManagerSingleton::getInstance()->setDefault<MatData, MatDataPlot>();
     return true;
   }
@@ -123,7 +124,7 @@ void cedar::aux::gui::MatDataPlot::doAppend(cedar::aux::ConstDataPtr data, const
 
 void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
-  this->mData= boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data);
+  this->mData= boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
   if (!this->mData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,

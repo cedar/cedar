@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DeviceCvVideoCapture.cpp
+    File:        BackendCvVideoCapture.cpp
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 07 04
 
-    Description:  Implementation for the cedar::dev::sensors::camera::DeviceCvVideoCapture class
+    Description:  Implementation for the cedar::dev::sensors::camera::BackendCvVideoCapture class
 
     Credits:
 
@@ -38,24 +38,25 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/camera/backends/DeviceCvVideoCapture.h"
+#include "cedar/devices/sensors/camera/backends/BackendCvVideoCapture.h"
+#include "cedar/devices/sensors/camera/exceptions.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::sensors::camera::DeviceCvVideoCapture::DeviceCvVideoCapture
+cedar::dev::sensors::camera::BackendCvVideoCapture::BackendCvVideoCapture
 (
   cedar::dev::sensors::camera::Channel* pCameraChannel
 )
 :
-cedar::dev::sensors::camera::Device(pCameraChannel)
+cedar::dev::sensors::camera::Backend(pCameraChannel)
 {
 }
 
 
-cedar::dev::sensors::camera::DeviceCvVideoCapture::~DeviceCvVideoCapture()
+cedar::dev::sensors::camera::BackendCvVideoCapture::~BackendCvVideoCapture()
 {
 }
 
@@ -63,37 +64,27 @@ cedar::dev::sensors::camera::DeviceCvVideoCapture::~DeviceCvVideoCapture()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-// void cedar::dev::sensors::camera::DeviceCvVideoCapture::createPropertyAndSetting()
-//{
-//}
-
-
-bool cedar::dev::sensors::camera::DeviceCvVideoCapture::createCaptureObject()
+void cedar::dev::sensors::camera::BackendCvVideoCapture::init()
 {
-
-//  std::cout << "Create camera with cv::VideoCapture Backend\n"
-//      << "BusId:" << mpCameraChannel->getBusId() << "\n"
-//      << "Guid:" << mpCameraChannel->getGuid() << "\n"
-//      << "ByGuid:" << mpCameraChannel->getByGuid() << "\n"
-//      << std::endl;
-
-  cv::VideoCapture capture(mpCameraChannel->getCameraId());
-  if(capture.isOpened())
-  {
-    mpCameraChannel->mVideoCapture = capture;
-    return true;
-  }
-  return false;
 }
 
 
-void cedar::dev::sensors::camera::DeviceCvVideoCapture::getAvailablePropertiesFromCamera()
+void cedar::dev::sensors::camera::BackendCvVideoCapture::createCaptureObject()
 {
-#ifdef DEBUG_CAMERA_GRABBER
-  std::cout << __PRETTY_FUNCTION__ << std::endl;
-#endif
+  unsigned int cam_id = mpCameraChannel->getCameraId();
+  cv::VideoCapture capture(cam_id);
+  if (!capture.isOpened())
+  {
+    std::string msg = "CvVideoCapture-Backend error: Couldn't create capture object for camera with ID "
+                      + cedar::aux::toString(cam_id);
+    CEDAR_THROW(cedar::dev::sensors::camera::CreateBackendException,msg);
+  }
+  mpCameraChannel->mVideoCapture = capture;
+}
 
+
+void cedar::dev::sensors::camera::BackendCvVideoCapture::getAvailablePropertiesFromCamera()
+{
   int num_properties = cedar::dev::sensors::camera::Property::type().list().size();
   for (int i=0; i<num_properties; i++)
   {
@@ -114,11 +105,9 @@ void cedar::dev::sensors::camera::DeviceCvVideoCapture::getAvailablePropertiesFr
   }
 }
 
-void cedar::dev::sensors::camera::DeviceCvVideoCapture::applySettingsToCamera()
+void cedar::dev::sensors::camera::BackendCvVideoCapture::applySettingsToCamera()
 {
   //only the video mode could be set in cv::Videocapture backend
-
-  //std::cout << "applySettingsToCamera" << std::endl;
 
   //get the mode and check if it is set manually
   cedar::dev::sensors::camera::VideoMode::Id video_mode_id = mpCameraChannel->getVideoMode();
@@ -127,6 +116,4 @@ void cedar::dev::sensors::camera::DeviceCvVideoCapture::applySettingsToCamera()
     double value = static_cast<double>(video_mode_id);
     this->setPropertyToCamera(cedar::dev::sensors::camera::Setting::MODE,value);
   }
-
-  //std::cout << "applySettingsToCamera finished" << std::endl;
 }

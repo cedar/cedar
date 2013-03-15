@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -76,7 +76,7 @@ namespace
       "factor must be either DoubleData or zero-dimensional MatData."
     );
 
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(declaration);
+    declaration->declare();
 
     return true;
   }
@@ -149,7 +149,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Switch::determineInputValidi
 {
   if (slot->getName() == "input 1" || slot->getName() == "input 2")
   {
-    if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+    if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
     {
       // check fitting sizes
       if (slot->getName() == "input 1" && this->mInput2)
@@ -176,14 +176,14 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Switch::determineInputValidi
     // the slot should be one of the ones we have declared above
     CEDAR_DEBUG_ASSERT(slot->getName() == "factor");
 
-    if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data))
+    if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
     {
       if (cedar::aux::math::getDimensionalityOf(mat_data->getData()) == 0)
       {
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
-    else if (boost::shared_dynamic_cast<cedar::aux::ConstDoubleData>(data))
+    else if (boost::dynamic_pointer_cast<cedar::aux::ConstDoubleData>(data))
     {
       return cedar::proc::DataSlot::VALIDITY_VALID;
     }
@@ -203,11 +203,11 @@ void cedar::proc::steps::Switch::inputConnectionChanged(const std::string& input
       return;
     }
 
-    if (boost::shared_dynamic_cast<cedar::aux::ConstMatData>(this->mFactor))
+    if (boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(this->mFactor))
     {
       this->mFactorDataType = FACTOR_IS_MATRIX;
     }
-    else if (boost::shared_dynamic_cast<cedar::aux::ConstDoubleData>(this->mFactor))
+    else if (boost::dynamic_pointer_cast<cedar::aux::ConstDoubleData>(this->mFactor))
     {
       this->mFactorDataType = FACTOR_IS_DOUBLE;
     }

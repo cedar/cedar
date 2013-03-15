@@ -7,11 +7,15 @@
     <x>0</x>
     <y>0</y>
     <width>988</width>
-    <height>761</height>
+    <height>762</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Processing IDE</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="icons/icons.qrc">
+    <normaloff>:/processing_ide_app_icon.svg</normaloff>:/processing_ide_app_icon.svg</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -200,6 +204,8 @@
     </property>
     <addaction name="mpActionSettings"/>
     <addaction name="separator"/>
+    <addaction name="mpActionShowRobotManager"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -207,7 +213,15 @@
     </property>
     <addaction name="mpActionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="mpActionDuplicate"/>
+    <addaction name="mpActionSelectAll"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
    <addaction name="menuPlugins"/>
    <addaction name="menuSimulation"/>
    <addaction name="mpMenuWindows"/>
@@ -282,7 +296,7 @@
           <x>0</x>
           <y>0</y>
           <width>124</width>
-          <height>417</height>
+          <height>418</height>
          </rect>
         </property>
         <attribute name="label">
@@ -483,6 +497,30 @@
   <action name="mpActionExportSVG">
    <property name="text">
     <string>Export SVG ...</string>
+   </property>
+  </action>
+  <action name="mpActionShowRobotManager">
+   <property name="text">
+    <string>Robot Manager ...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+M</string>
+   </property>
+  </action>
+  <action name="mpActionDuplicate">
+   <property name="text">
+    <string>Duplicate</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="mpActionSelectAll">
+   <property name="text">
+    <string>Select All</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
    </property>
   </action>
  </widget>

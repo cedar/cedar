@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -28,38 +28,34 @@
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description:  Namespace file for cedar::dev::com::gui.
+    Description: Namespace file for cedar::dev::com.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_COM_GUI_NAMESPACE_H
-#define CEDAR_DEV_COM_GUI_NAMESPACE_H
+#ifndef CEDAR_DEV_COM_NAMESPACE_H
+#define CEDAR_DEV_COM_NAMESPACE_H
 
 // CEDAR INCLUDES
 #include "cedar/devices/lib.h"
 
 // SYSTEM INCLUDES
-
-
 #include <boost/smart_ptr.hpp>
 
 namespace cedar
 {
   namespace dev
   {
+    /*! @brief Namespace for communication classes. */
     namespace com
     {
-      /*! @brief Namespace for gui communication classes. */
-      namespace gui
-      {
-        //!@cond SKIPPED_DOCUMENTATION
-        CEDAR_DECLARE_DEV_CLASS(CommunicationWidget);
-        //!@endcond
-      }
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_DEV_CLASS(Communication);
+      CEDAR_DECLARE_DEV_CLASS(SerialCommunication);
+      //!@endcond
     }
   }
 }
 
-#endif // CEDAR_DEV_COM_GUI_NAMESPACE_H
+#endif // CEDAR_DEV_COM_NAMESPACE_H

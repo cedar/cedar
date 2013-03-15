@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -75,7 +75,7 @@ cedar::dev::gui::KinematicChainWidget::~KinematicChainWidget()
 
 void cedar::dev::gui::KinematicChainWidget::init(cedar::dev::KinematicChainPtr kinematicChain)
 {
-  setWindowTitle(QString(kinematicChain->getName().c_str()));
+  setWindowTitle(QString::fromStdString(kinematicChain->getName()));
 
   QGridLayout* p_layout = new QGridLayout();
   QGroupBox* p_monitor_group = new QGroupBox();

@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -75,6 +75,10 @@ macro(cedar_add_target_executable)
   # add_executable(<executable name> [WIN32] [MACOSX_BUNDLE] [EXCLUDE_FROM_ALL] source1 source2 ... sourceN)
   add_executable(${executableExecutableName} ${sourceFiles})
   
+  if (CMAKE_COMPILER_IS_GNUCC)
+  	set_target_properties(${executableExecutableName} PROPERTIES LINK_FLAGS "-Wl,--no-as-needed")
+  endif(CMAKE_COMPILER_IS_GNUCC)
+  
   # link all cedar and third party libraries into the demo executable
   target_link_libraries(${executableExecutableName} ${CEDAR_LIBS} ${CEDAR_THIRD_PARTY_LIBS})
   
@@ -128,6 +132,10 @@ macro(cedar_add_test)
   #
   # add_executable(<executable name> [WIN32] [MACOSX_BUNDLE] [EXCLUDE_FROM_ALL] source1 source2 ... sourceN)
   add_executable(${testExecutableName} ${testSources})
+  
+  if (CMAKE_COMPILER_IS_GNUCC)
+  	set_target_properties(${testExecutableName} PROPERTIES LINK_FLAGS "-Wl,--no-as-needed")
+  endif(CMAKE_COMPILER_IS_GNUCC)
   
   # add the unit test to the CMake build system (will create a build target and run the test when calling 'make test')
   # This sets up the unit test so that it is run as if the executable were lying in the source path of the unit test,

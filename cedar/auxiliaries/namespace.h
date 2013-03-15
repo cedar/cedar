@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -100,6 +100,7 @@ namespace cedar
     template <class BaseTypePtr> class Factory;
     template <class BaseTypePtr, class DerivedTypePtr> class FactoryDerived;
     template <class BaseTypePtr> class FactoryManager;
+    template <class BaseTypePtr> class DeclarationManagerTemplate;
 
     template <typename KeyBasePtr, typename ValueBasePtr> class TypeBasedFactory;
 
@@ -107,6 +108,13 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(Parameter);
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(ObjectParameter);
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(ObjectListParameter);
+    //!@endcond
+
+    //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_DECLARE_AUX_CLASS(PluginDeclaration);
+    CEDAR_DECLARE_AUX_CLASS(PluginDeclarationList);
+    template <class BaseClassPtr> class PluginDeclarationBaseTemplate;
+    template <class BaseClassPtr, class PluginClassPtr, class BaseClass> class PluginDeclarationTemplate;
     //!@endcond
 
     //!@brief a template class for parameters

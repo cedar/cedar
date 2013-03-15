@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -73,7 +73,7 @@ class cedar::dev::ComponentSlot : public cedar::aux::Configurable
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  ComponentSlot(cedar::dev::RobotPtr robot);
+  ComponentSlot(cedar::dev::RobotPtr robot, const std::string& name);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -105,6 +105,9 @@ public:
   //!@brief Sets the channel for this component.
   void setChannel(const std::string& channel);
 
+  //! Returns a path that identifies this component.
+  std::string getPath() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -130,15 +133,15 @@ private:
   //! component that is currently docked to this slot
   cedar::dev::ComponentPtr mComponent;
 
+  //! Name of the component.
+  std::string mName;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
 private:
-  //! name of the component slot
-  cedar::aux::StringParameterPtr _mName;
-
   //! Type of the channel stored in this component.
   cedar::aux::StringParameterPtr _mChannelType;
 

@@ -101,7 +101,7 @@ signals:
 public:
 
 #ifdef CEDAR_USE_LIB_DC1394
-  friend class cedar::dev::sensors::camera::DeviceDc1394;
+  friend class cedar::dev::sensors::camera::BackendDc1394;
 #endif // CEDAR_USE_LIB_DC1394
 
   //!@brief The standard constructor.
@@ -111,11 +111,10 @@ public:
    std::string name = "property",
    double minValue = static_cast<double>(INT_MIN),
    double maxValue = static_cast<double>(INT_MAX),
-   double defaultValue = 128,
+   double defaultValue = 0,
    bool supported = true,
    bool autoCapable = false,
    bool manualCapable = true
-//   bool onOffCapable = false
   );
 
   //!@brief Destructor
@@ -138,12 +137,12 @@ public:
    */
   void setDefaultValue(double value);
 
-  /// Get the id of the actual Property
-  cedar::dev::sensors::camera::Property::Id getId();
+  //! Get the id of the actual Property
+  cedar::dev::sensors::camera::Property::Id getId() const;
 
 
-  /// Get the mode of operation of the used parameter
-  cedar::dev::sensors::camera::PropertyMode::Id getMode();
+  //! Get the mode of operation of the used parameter
+  cedar::dev::sensors::camera::PropertyMode::Id getMode() const;
 
   /*! @brief Set the mode of operation
    *
@@ -151,53 +150,32 @@ public:
    */
   void setMode(cedar::dev::sensors::camera::PropertyMode::Id modeId);
 
-  ///! Get the value of the property
-  double getValue();
+  //! ! Get the value of the property
+  double getValue() const;
 
   /*! @brief Set the value of the property
    *  @param value The new value to set
    */
   void setValue(double value);
 
-  ///! Get the minimum possible value of the property
-  double getMinValue();
+  //! ! Get the minimum possible value of the property
+  double getMinValue() const;
 
-  /*! \brief Get the maximum possible value that can be set of the given property
+  /*! @brief Get the maximum possible value that can be set of the given property
    */
-  double getMaxValue();
+  double getMaxValue() const;
 
-  /*! \brief This method tells you, if the given property is supported by the used camera
+  /*! @brief This method tells you, if the given property is supported by the used camera
    */
-  bool isSupported();
+  bool isSupported() const;
 
-  /*! \brief This method tells you, if the given property can be set to auto-mode
+  /*! @brief This method tells you, if the given property can be set to auto-mode
    */
-  bool isAutoCapable();
+  bool isAutoCapable() const;
 
-  /*! \brief This method tells you, if the given property can be set manually
+  /*! @brief This method tells you, if the given property can be set manually
    */
-  bool isManualCapable();
-
-  // ACTUALLY NOT SUPPORTED BY CEDAR
-  /*! \brief This method tells you, if the given property can be set to an absolute value
-   */
-  // bool isAbsoluteCapable();
-
-  /*! \brief This method tells you, if the given property supports the OnePushAuto mode
-   *
-   *     OnePushAuto is a special mode. <br>
-   *     It is used as follows: Set a value to a property and then to OnePushAuto mode.
-   *     The camera now will try to hold this value automatically.
-   *  \param propId The id of the  property
-   */
-  // bool isOnePushCapable(CameraProperty::Id propId);
-
-  /*! \brief This method tells you, if the given property could be turn off and on
-   */
-  // bool isOnOffCapable();
-
-  /// Set the mode of operation internal to the backend
-  // void setModeToCam(cedar::dev::sensors::camera::PropertyMode::Id modeId);
+  bool isManualCapable() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -209,7 +187,9 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
 
-  void updateGuiElements();
+  //! @brief Update the the state of the property
+  //!        (i.e. disable it, or set a specific mode dependent on internal variables)
+  void update();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -218,26 +198,26 @@ protected:
   // none yet
 private:
 
-  /// The ID of the Property.
+  //! @brief The ID of the Property.
   cedar::dev::sensors::camera::Property::Id mId;
 
-  /// The displayed name in the property pane of the processingIde
+  //! @brief The displayed name in the property pane of the processingIde
   std::string mName;
 
-  /// A flag, if this property is supported by the used camera
+  //! @brief A flag, if this property is supported by the used camera
   bool mSupported;
 
-  /// A flag, to indicate if this property could be set to mode: auto
+  //! @brief A flag, to indicate if this property could be set to mode: auto
   bool mAutoCapable;
 
 
-  /// A flag, to indicate if this property could be set to mode: manual
+  //! @brief A flag, to indicate if this property could be set to mode: manual
   bool mManualCapable;
 
-  /// Stores the default value from the camera initialization
+  //! @brief Stores the default value from the camera initialization
   double mDefaultValue;
 
-  /// A Flag, to disable the event-handling for enum parameters during initialization and update
+  //! @brief A Flag, to disable the event-handling for enum parameters during initialization and update
   bool doNotHandleEvents;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -245,10 +225,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  /// The real value of the parameter from the camera
+  //! @brief The real value of the parameter from the camera
   cedar::aux::DoubleParameterPtr mpPropertyValue;
 
-  /// The current set operational mode of the property
+  //! @brief The current set operational mode of the property
   cedar::aux::EnumParameterPtr mpPropertyMode;
 
 private:

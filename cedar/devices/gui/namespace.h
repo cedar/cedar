@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -51,6 +51,7 @@ namespace cedar
     namespace gui
     {
       //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_DEV_CLASS(ComponentParameter);
       CEDAR_DECLARE_DEV_CLASS(KinematicChainWidget);
       CEDAR_DECLARE_DEV_CLASS(KinematicChainMonitorWidget);
       CEDAR_DECLARE_DEV_CLASS(KinematicChainCommandWidget);

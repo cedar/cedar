@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -521,14 +521,14 @@ int main()
   double delta_t = 1e-07;
   complex_test_arm->setJointAngles
   (
-    complex_test_arm->getJointAnglesMatrix()
-    + delta_t*complex_test_arm->getJointVelocitiesMatrix()
-    + delta_t*delta_t*complex_test_arm->getJointAccelerationsMatrix()
+    complex_test_arm->getCachedJointAngles()
+    + delta_t*complex_test_arm->getCachedJointVelocities()
+    + delta_t*delta_t*complex_test_arm->getCachedJointAccelerations()
   );
   complex_test_arm->setJointVelocities
   (
-    complex_test_arm->getJointVelocitiesMatrix()
-    + delta_t*complex_test_arm->getJointAccelerationsMatrix()
+    complex_test_arm->getCachedJointVelocities()
+    + delta_t*complex_test_arm->getCachedJointAccelerations()
   );
   complex_test_arm->updateTransformations();
 

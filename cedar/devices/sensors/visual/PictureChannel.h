@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -28,7 +28,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 09 28
 
-    Description: Class GrabberChannel
+    Description: Class PictureChannel contains additional data of a picture-grabbing channel
 
     Credits:
 
@@ -105,7 +105,7 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! @brief The filename of the picture you want to grab from
+  //! @brief The filename of the picture to grab from
   cedar::aux::FileParameterPtr _mSourceFileName;
 
 private:

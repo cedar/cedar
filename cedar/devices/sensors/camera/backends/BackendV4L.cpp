@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -22,48 +22,62 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CommunicationWidget.cpp
+    File:        BackendV4L.cpp
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Georg Hartinger
+    Email:       georg.hartinger@ini.rub.de
+    Date:        2012 07 04
 
-    Description: Graphical User Interface for testing the class Communication.
+    Description:  Implementation for the cedar::dev::sensors::camera::BackendV4L class
 
     Credits:
 
 ======================================================================================================================*/
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_VIDEO_FOR_LINUX
+
 // CEDAR INCLUDES
-#include "cedar/devices/SerialChannel.h"
-#include "cedar/devices/communication/gui/CommunicationWidget.h"
+#include "cedar/devices/sensors/camera/backends/BackendV4L.h"
+
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::com::gui::CommunicationWidget::CommunicationWidget(cedar::dev::SerialChannelPtr channel)
+cedar::dev::sensors::camera::BackendV4L::BackendV4L
+(
+  cedar::dev::sensors::camera::Channel* pCameraChannel
+)
+:
+cedar::dev::sensors::camera::Backend(pCameraChannel)
 {
-  mChannel = channel;
-  setupUi(this);
-  connect(pushButtonSend, SIGNAL(pressed()), this, SLOT(send()));
 }
 
-cedar::dev::com::gui::CommunicationWidget::~CommunicationWidget()
-{
 
+cedar::dev::sensors::camera::BackendV4L::~BackendV4L()
+{
 }
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::dev::com::gui::CommunicationWidget::send()
+
+void cedar::dev::sensors::camera::BackendV4L::init()
 {
-  mChannel->lock();
-  mChannel->send(boxCommand->text().toStdString()); //send the text typed into boxCommand
-  std::string answer = mChannel->receive();
-  mChannel->unlock();
-  QString q_answer;
-  boxAnswer->setText(q_answer.fromStdString(answer)); //type received string into boxAnswer
 }
+
+void cedar::dev::sensors::camera::BackendV4L::applySettingsToCamera()
+{
+}
+
+void cedar::dev::sensors::camera::BackendV4L::createCaptureObject()
+{
+}
+
+
+#endif // CEDAR_USE_VIDEO_FOR_LINUX

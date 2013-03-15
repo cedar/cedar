@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraDeviceVfl.cpp
+    File:        PluginDeclaration.cpp
 
-    Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.rub.de
-    Date:        2012 07 04
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 01 18
 
-    Description:  Implementation for the cedar::dev::sensors::camera::DeviceVfl class
+    Description:
 
     Credits:
 
@@ -37,54 +37,65 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-#ifdef CEDAR_USE_VIDEO_FOR_LINUX
-
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/camera/backends/DeviceVfl.h"
-
+#include "cedar/auxiliaries/PluginDeclaration.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::sensors::camera::DeviceVfl::CameraDeviceVfl
-(
-  cedar::dev::sensors::camera::Channel* pCameraChannel
-)
+
+cedar::aux::PluginDeclaration::PluginDeclaration()
 :
-cedar::dev::sensors::camera::Device::CameraDevice(pCameraGrabber,pCameraChannel)
+mIsDeprecated(false)
 {
 }
 
-
-cedar::dev::sensors::camera::DeviceVfl::~CameraDeviceVfl()
+cedar::aux::PluginDeclaration::PluginDeclaration(const std::string& className, const std::string& category)
+:
+mClassName(className),
+mCategory(category),
+mIsDeprecated(false)
 {
 }
 
+cedar::aux::PluginDeclaration::~PluginDeclaration()
+{
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::sensors::camera::DeviceVfl::setProperties()
+/*!
+ * @brief Returns the class name without the preceding namespace.
+ */
+std::string cedar::aux::PluginDeclaration::getClassNameWithoutNamespace() const
 {
-
+  std::size_t index = this->getClassName().rfind('.');
+  if (index != std::string::npos)
+  {
+    return this->getClassName().substr(index + 1);
+  }
+  else
+  {
+    return this->getClassName();
+  }
 }
 
-bool cedar::dev::sensors::camera::DeviceVfl::createCaptureObject()
+/*!
+ * @brief Returns the namespace name without the class name.
+ */
+std::string cedar::aux::PluginDeclaration::getNamespaceName() const
 {
-
+  std::size_t index = this->getClassName().rfind('.');
+  if (index != std::string::npos)
+  {
+    return this->getClassName().substr(0, index);
+  }
+  else
+  {
+    return this->getClassName();
+  }
 }
-
-void cedar::dev::sensors::camera::DeviceVfl::applySettingsToCamera()
-{
-
-}
-
-void cedar::dev::sensors::camera::DeviceVfl::applyStateToCamera()
-{
-
-}
-
-#endif // CEDAR_USE_VIDEO_FOR_LINUX

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -130,6 +130,8 @@ mpChannelsNode(NULL)
 
   this->fillSimpleRobotList();
 
+  this->fillExistingRobots();
+
   this->mpSimpleRobotIconList->viewport()->setAcceptDrops(true);
 }
 
@@ -143,6 +145,17 @@ cedar::dev::gui::RobotManager::~RobotManager()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dev::gui::RobotManager::fillExistingRobots()
+{
+  std::vector<std::string> robot_names = cedar::dev::RobotManagerSingleton::getInstance()->getRobotNames();
+
+  for (auto robot_name_iter = robot_names.begin(); robot_name_iter != robot_names.end(); ++robot_name_iter)
+  {
+    const std::string& robot_name = *robot_name_iter;
+    this->addRobotName(QString::fromStdString(robot_name));
+  }
+}
 
 void cedar::dev::gui::RobotManager::removeClicked()
 {
@@ -166,7 +179,7 @@ void cedar::dev::gui::RobotManager::fillSimpleRobotList()
     const std::string& robot_name = robot_names.at(i);
     auto p_item = new QListWidgetItem(QString::fromStdString(robot_name));
 
-    auto robot_template = cedar::dev::RobotManagerSingleton::getInstance()->getRobotTemplate(robot_name);
+    auto robot_template = cedar::dev::RobotManagerSingleton::getInstance()->getTemplate(robot_name);
 
     p_item->setFlags(p_item->flags() | Qt::ItemIsDragEnabled);
     p_item->setIcon(QIcon(QString::fromStdString(robot_template.getIconPath())));

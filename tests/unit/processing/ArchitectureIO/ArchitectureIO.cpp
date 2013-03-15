@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -121,8 +121,8 @@ int main(int, char**)
   std::cout << "done." << std::endl;
 
   std::cout << "Adding declarations to the registry ... ";
-  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(test_module_decl);
-  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(double_test_module_decl);
+  test_module_decl->declare();
+  double_test_module_decl->declare();
   std::cout << "done." << std::endl;
 
   std::cout << "Creating network ... " << std::endl;
@@ -293,7 +293,7 @@ int main(int, char**)
     std::cout << "Listeners of trigger are:" << std::endl;
     for (size_t i = 0; i < trigger->getListeners().size(); ++i)
     {
-      std::cout << " -- " << boost::shared_dynamic_cast<cedar::proc::Element>(trigger->getListeners().at(i))->getName() << std::endl;
+      std::cout << " -- " << boost::dynamic_pointer_cast<cedar::proc::Element>(trigger->getListeners().at(i))->getName() << std::endl;
     }
   }
 

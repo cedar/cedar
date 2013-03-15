@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,113 +22,125 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraDeviceDc1394.h
+    File:        PluginDeclarationTemplate.h
 
-    Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.rub.de
-    Date:        2012 07 04
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 01 18
 
-    Description:  Header for the cedar::dev::sensors::camera::DeviceDc1394 class
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_CAMERA_DEVICE_DC1394_H
-#define CEDAR_DEV_SENSORS_CAMERA_DEVICE_DC1394_H
+#ifndef CEDAR_AUX_PLUGIN_DECLARATION_TEMPLATE_H
+#define CEDAR_AUX_PLUGIN_DECLARATION_TEMPLATE_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-#ifdef CEDAR_USE_LIB_DC1394
-
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/camera/namespace.h"
-#include "cedar/devices/sensors/camera/backends/Device.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/PluginDeclaration.h"
+#include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/DeclarationManagerTemplate.h"
 
 // SYSTEM INCLUDES
 
 
-
-/*!@brief Base class of the misc camera grabber backends.
+/*!@todo describe.
  *
- * Implements the common features of a camera device
+ * @tparam BaseClass The direct base class for this class. This class must either be or inherit
+ *         cedar::aux::PluginDeclarationBaseTemplate<BaseClassPtr>.
+ * @todo describe more.
  */
-class cedar::dev::sensors::camera::DeviceDc1394
+template <class BaseClassPtr, class PluginClassPtr, class BaseClass = cedar::aux::PluginDeclarationBaseTemplate<BaseClassPtr> >
+class cedar::aux::PluginDeclarationTemplate
 :
-public cedar::dev::sensors::camera::Device
+public BaseClass,
+public boost::enable_shared_from_this<cedar::aux::PluginDeclarationTemplate<BaseClassPtr, PluginClassPtr, BaseClass> >
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef typename cedar::aux::Singleton<cedar::aux::FactoryManager<BaseClassPtr> > PluginFactoryManager;
+  typedef typename cedar::aux::Singleton<cedar::aux::DeclarationManagerTemplate<BaseClassPtr> > DeclarationManager;
+  typedef typename PluginClassPtr::element_type PluginClass;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  DeviceDc1394
-  (
-    cedar::dev::sensors::camera::Channel* pCameraChannel
-  );
-
-  //!@brief Destructor
-  ~DeviceDc1394();
+  /*!@brief The constructor.
+   *
+   * @param category  Category of the declaration.
+   * @param className Class name to use. A name will automatically be generated when this is left empty.
+   *
+   * @remarks The className parameter is essentially a legacy parameter to provide downward-compatibility; it should
+   *          usually be left empty.
+   */
+  PluginDeclarationTemplate(const std::string& category, const std::string& className = std::string())
+  :
+  BaseClass(category, className)
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! does the backend initialization
-  void init();
+  /*!@brief Declares this plugin at the appropriate factory.
+   */
+  void declare() const
+  {
+    DeclarationManager::getInstance()->addDeclaration(this->shared_from_this());
+    this->onDeclare();
+  }
 
-  //! update settings from gui
-  //void updateSettings();
+  std::string getClassName() const
+  {
+    if (!this->mClassName.empty())
+    {
+      return this->mClassName;
+    }
+    else
+    {
+      return PluginFactoryManager::getInstance()->template generateTypeName<PluginClassPtr>();
+    }
+  }
 
-  //!@brief Enable/disable framerates for the current selected frame mode
-  void updateFps();
+  /*!@brief Checks if an Element is of the plugin class's type.
+   *
+   * @param pointer Instance that is checked
+   */
+  bool isObjectInstanceOf(BaseClassPtr pointer) const
+  {
+    return boost::dynamic_pointer_cast<PluginClass>(pointer);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-  // derived from class Device
-  void applySettingsToCamera();
-  bool createCaptureObject();
-
-  /*! @brief Opens the wanted camera with libDc methods
-   *
-   *  The wanted camera is determind from the camereaId of the channel (set in the constructor or in the gui)
-   *  @returns True, if camera was successfully opened, otherwise false
-   */
-  bool openLibDcCamera();
-
-  //! get all features from cam
-  void getFeaturesFromLibDc();
-
-  /*! get all framerates and enable them in the enum-class, disable all others
-   *  \param modeId The grabbing mode for the framerates (framerate selection depends on actual used grabbing mode)
-   */
-  void getFrameRatesFromLibDc(cedar::dev::sensors::camera::VideoMode::Id modeId);
-
-  //! get all available modes and enable them in the enum-class, disable all others and set mode to "AUTO"
-  void getGrabModesFromLibDc();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
-
+  virtual void onDeclare() const
+  {
+    PluginFactoryManager::getInstance()->template registerType<PluginClassPtr>(this->mClassName);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! firewire interface for available settings and properties from camera
-  cedar::dev::sensors::camera::LibDcBasePtr mpLibDcInterface;
-
+  // none yet
 private:
   // none yet
 
@@ -141,9 +153,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::dev::sensors::camera::DeviceDc1394
+}; // class cedar::aux::PluginDeclarationTemplate
 
-#endif // defined CEDAR_USE_LIB_DC1394
-
-#endif // CEDAR_DEV_SENSORS_CAMERA_DEVICE_DC1394_H
+#endif // CEDAR_AUX_PLUGIN_DECLARATION_TEMPLATE_H
 

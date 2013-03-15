@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -59,7 +59,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr space_to_rate_decl
+    ElementDeclarationPtr declaration
     (
       new ElementDeclarationTemplate<cedar::dyn::SpaceToRateCode>
       (
@@ -67,14 +67,15 @@ namespace
         "cedar.dynamics.SpaceToRateCode"
       )
     );
-    space_to_rate_decl->setIconPath(":/steps/space_to_rate_code.svg");
-    space_to_rate_decl->setDescription
+    declaration->setIconPath(":/steps/space_to_rate_code.svg");
+    declaration->setDescription
     (
       "Transforms space code to rate code. A dynamical system relaxes over time to the center of mass of the "
       "represented metrical interval. The resulting rate code value estimates the center of the distribution if there"
       "is only one maximum and if the distribution is symmetrical."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(space_to_rate_decl);
+
+    declaration->declare();
 
     return true;
   }
@@ -262,7 +263,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::SpaceToRateCode::determineInputValid
   // First, let's make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(slot->getName() == "input")
 
-  if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+  if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
   {
     if (mat_data->getDimensionality() == 1 && mat_data->getData().type() == CV_32F)
     {
@@ -281,7 +282,7 @@ void cedar::dyn::SpaceToRateCode::inputConnectionChanged(const std::string& inpu
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
   // Assign the input to the member. This saves us from casting in every computation step.
-  this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
+  this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
   // This should always work since other types should not be accepted.
   if(!this->mInput)
   {

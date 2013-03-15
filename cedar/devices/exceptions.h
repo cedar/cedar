@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -77,6 +77,31 @@ class cedar::dev::ResourceNotAvailableException : public cedar::aux::ExceptionBa
 
 //!@brief Exception that occurs when a configuration for a given channel is not found.
 class cedar::dev::ChannelConfigurationNotFoundException : public cedar::aux::ExceptionBase
+{
+};
+
+//!@brief Exception that occurs when no template has been loaded for a robot.
+class cedar::dev::NoTemplateLoadedException : public cedar::aux::ExceptionBase
+{
+};
+
+//!@brief Exception that occurs when no template has been loaded for a robot.
+class cedar::dev::NoTemplateConfigurationLoadedException : public cedar::aux::ExceptionBase
+{
+};
+
+//!@brief Exception that occurs when no template by the given name exists.
+class cedar::dev::TemplateNotFoundException : public cedar::aux::ExceptionBase
+{
+};
+
+//!@brief Exception that occurs when no component has been selected.
+class cedar::dev::NoComponentSelectedException : public cedar::aux::ExceptionBase
+{
+};
+
+//!@brief Thrown when an invalid component path is found by the system.
+class cedar::dev::InvalidComponentPathException : public cedar::aux::ExceptionBase
 {
 };
 

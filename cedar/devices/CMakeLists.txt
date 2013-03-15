@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -52,6 +52,7 @@ cedar_add_library(cedardev
                   gui/KinematicChainWidget.h
                   gui/KinematicChainMonitorWidget.h
                   gui/KinematicChainCommandWidget.h
+                  gui/ComponentParameter.h
                   gui/RobotManager.h
                   gui/RobotCard.h
                   gui/MountedCameraViewer.h
@@ -64,7 +65,7 @@ cedar_add_library(cedardev
                   sensors/camera/Properties.h
                   ${kuka_moc_files}
 				  RESOURCES
-				  gui/icons.qrc
+				  gui/cedar_dev_gui_icons.qrc
                   LINK_LIBRARIES
                   cedaraux
                   ${linked_libs}

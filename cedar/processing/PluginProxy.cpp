@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -36,7 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/PluginProxy.h"
-#include "cedar/processing/PluginDeclaration.h"
+#include "cedar/auxiliaries/PluginDeclarationList.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/Log.h"

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -39,6 +39,7 @@
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/devices/ComponentSlot.h"
 #include "cedar/devices/Component.h"
+#include "cedar/devices/RobotManager.h"
 #include "cedar/devices/Robot.h"
 
 // SYSTEM INCLUDES
@@ -47,9 +48,10 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::ComponentSlot::ComponentSlot(cedar::dev::RobotPtr robot)
+cedar::dev::ComponentSlot::ComponentSlot(cedar::dev::RobotPtr robot, const std::string& name)
 :
 mRobot(robot),
+mName(name),
 _mChannelType(new cedar::aux::StringParameter(this, "channel type", ""))
 {
 }
@@ -103,6 +105,11 @@ std::vector<std::string> cedar::dev::ComponentSlot::listChannels() const
     list.push_back(iter->first);
   }
   return list;
+}
+
+std::string cedar::dev::ComponentSlot::getPath() const
+{
+  return cedar::dev::RobotManagerSingleton::getInstance()->getRobotName(this->getRobot()) + "." + this->mName;
 }
 
 bool cedar::dev::ComponentSlot::hasChannel(const std::string& name) const

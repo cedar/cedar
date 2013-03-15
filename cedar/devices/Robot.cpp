@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -234,7 +234,7 @@ void cedar::dev::Robot::readDescription(const cedar::aux::ConfigurationNode& nod
       const std::string& slot_name = slot_iter->first;
       const cedar::aux::ConfigurationNode& slot_config = slot_iter->second;
 
-      cedar::dev::ComponentSlotPtr slot(new cedar::dev::ComponentSlot(this->shared_from_this()));
+      cedar::dev::ComponentSlotPtr slot(new cedar::dev::ComponentSlot(this->shared_from_this(), slot_name));
       slot->readConfiguration(slot_config);
       _mComponentSlots[slot_name] = slot;
     }

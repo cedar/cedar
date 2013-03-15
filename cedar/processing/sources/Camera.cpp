@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -71,7 +71,8 @@ namespace
       "A source that reads images from a camera.\nNote:\nAn exception will be thrown when changing "
       "settings while a looped trigger is active. In this case reset the grabber."
     );
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }
@@ -123,9 +124,6 @@ cedar::proc::sources::Camera::~Camera()
 
 void cedar::proc::sources::Camera::changedFrameSize()
 {
-#ifdef DEBUG_CAMERA_STEP
-  std::cout << "processing step: " <<  __PRETTY_FUNCTION__ << std::endl;
-#endif
   this->updateFrame();
 }
 
@@ -133,57 +131,58 @@ void cedar::proc::sources::Camera::changedFrameSize()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Camera::onStart()
 {
-#ifdef DEBUG_CAMERA_STEP
-  std::cout << "processing step: " <<  __PRETTY_FUNCTION__ << std::endl;
-#endif
+  if (!this->getCameraGrabber()->isCreated())
+  {
+    this->applyParameter();
+  }
 
-  this->getCameraGrabber()->setIsGrabbing(true);
+  if (this->getCameraGrabber()->isCreated())
+  {
+    this->getCameraGrabber()->setIsGrabbing(true);
+  }
 }
 
-//----------------------------------------------------------------------------------------------------------------------
+
 void cedar::proc::sources::Camera::onStop()
 {
-#ifdef DEBUG_CAMERA_STEP
-  std::cout << "processing step: " <<  __PRETTY_FUNCTION__ << std::endl;
-#endif
-
-  // gh todo: check if needed! (perhaps delete setIsGrabbing)
   this->getCameraGrabber()->setIsGrabbing(false);
 }
-//----------------------------------------------------------------------------------------------------------------------
+
+
 void cedar::proc::sources::Camera::applyParameter()
 {
+  if (this->getCameraGrabber()->isCreated() && this->getCameraGrabber()->isRunning())
+  {
+    std::string msg = this->getCameraGrabber()->getName() + ": Already grabbing! Please stop grabbing and try again!";
+    cedar::aux::LogSingleton::getInstance()->warning(msg,"void cedar::proc::sources::Camera::applyParameter()");
+    return;
+  }
+
   if (this->getCameraGrabber()->applyParameter())
   {
-    for (int i = 0; i < 5; ++i)
-    {
-      cedar::aux::sleep(cedar::unit::Time(5.0 * cedar::unit::milli * cedar::unit::seconds));
-      this->onTrigger();
-      this->annotateImage();
-    }
+    this->updateFrame();
   }
   else
   {
-    cedar::aux::LogSingleton::getInstance()->debugMessage
+    cedar::aux::LogSingleton::getInstance()->error
                                              (
                                                this->getCameraGrabber()->getName() + ": ERROR on applying parameter",
                                                "void cedar::proc::sources::Camera::applyParameter()"
                                              );
   }
+  //this->callReset();
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Camera::updateFrame()
 {
   if (this->getCameraGrabber()->isCreated())
   {
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 5; ++i)
     {
-      usleep(50000);
+      cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
       this->onTrigger();
       this->annotateImage();
     }
@@ -191,7 +190,6 @@ void cedar::proc::sources::Camera::updateFrame()
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Camera::compute(const cedar::proc::Arguments&)
 {
   // get the time-diff between two steps

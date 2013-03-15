@@ -1,6 +1,6 @@
 # License
 
-Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum,
+Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum,
 Germany
  
 This file is part of cedar.
@@ -49,7 +49,7 @@ have to install before you can compile our library. The version numbers are
 the oldest versions supported.
 
 * CMake
-* Boost 1.47
+* Boost 1.47 (except version 1.49, which apparently does not work with c++11)
 * OpenCV 2.2
 * Qt 4.6.2
 * qwt 5.2.1

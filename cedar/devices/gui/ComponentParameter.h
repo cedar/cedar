@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,41 +22,40 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraDevice.h
+    File:        ComponentParameter.h
 
-    Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.rub.de
-    Date:        2012 07 04
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 03 05
 
-    Description:  Header for the cedar::dev::sensors::camera::Device class
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_CAMERA_DEVICE_VFL_H
-#define CEDAR_DEV_SENSORS_CAMERA_DEVICE_VFL_H
+#ifndef CEDAR_DEV_GUI_COMPONENT_PARAMETER_H
+#define CEDAR_DEV_GUI_COMPONENT_PARAMETER_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-#ifdef CEDAR_USE_VIDEO_FOR_LINUX
-
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/camera/namespace.h"
-#include "cedar/devices/sensors/camera/backends/Device.h"
+#include "cedar/devices/gui/namespace.h"
+#include "cedar/devices/namespace.h"
+#include "cedar/auxiliaries/gui/Parameter.h"
 
 // SYSTEM INCLUDES
+#include <QLineEdit>
+#include <QTreeWidgetItem>
 
 
-/*!@brief Base class of the misc camera grabber backends.
- *
- * Implements the common features of a camera device
+/*!@brief GUI representation of a cedar::dev::ComponentParameter.
  */
-class cedar::dev::sensors::camera::DeviceVfl
-:
-public cedar::dev::sensors::camera::Device
+class cedar::dev::gui::ComponentParameter : public cedar::aux::gui::Parameter
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -66,13 +65,10 @@ public cedar::dev::sensors::camera::Device
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  CameraDeviceVfl
-  (
-    cedar::dev::sensors::camera::Channel* pCameraChannel
-  );
+  ComponentParameter();
 
   //!@brief Destructor
-  ~CameraDeviceVfl();
+  virtual ~ComponentParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -84,16 +80,23 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void setProperties();
-  void applySettingsToCamera();
-  bool createCaptureObject();
-  void applyStateToCamera();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void selectComponent(cedar::dev::ComponentSlotPtr slot);
+private slots:
+  void openComponentSelector();
+
+  void updatePathText();
+
+  void parameterChanged();
+
+private:
+  void fillRobots(QTreeWidgetItem* pItem);
+  void fillComponents(QTreeWidgetItem* pItem, cedar::dev::RobotPtr robot);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -101,20 +104,11 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  QLineEdit* mpComponentPathDisplay;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
+  cedar::dev::ComponentParameterPtr mParameter;
 
-private:
-  // none yet
+}; // class cedar::dev::gui::ComponentParameter
 
-}; // class cedar::dev::sensors::camera::DeviceVfl
-
-
-#endif // CEDAR_USE_VIDEO_FOR_LINUX
-#endif // CEDAR_DEV_SENSORS_CAMERA_DEVICE_VFL_H
+#endif // CEDAR_DEV_GUI_COMPONENT_PARAMETER_H
 

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -81,7 +81,7 @@ mSlot(slot)
 {
   this->setParentItem(pParent);
   this->generateTooltip();
-  if (cedar::proc::ExternalDataPtr ext_data = boost::shared_dynamic_cast<cedar::proc::ExternalData>(slot))
+  if (cedar::proc::ExternalDataPtr ext_data = boost::dynamic_pointer_cast<cedar::proc::ExternalData>(slot))
   {
     if (ext_data->isCollection())
     {
@@ -140,7 +140,7 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo
   //!@todo This all seems a bit sketchy
   // either a slot is a collection ...
   cedar::proc::ConstExternalDataPtr target_slot
-                      = boost::shared_dynamic_cast<const cedar::proc::ExternalData>(p_target_slot->getSlot());
+                      = boost::dynamic_pointer_cast<const cedar::proc::ExternalData>(p_target_slot->getSlot());
   if (target_slot && target_slot->isCollection())
   {
     // ... then we cannot connect only if we are already connected ...
@@ -259,8 +259,8 @@ void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuE
   // no slot can be demoted, if it was not promoted before
   if
   (
-    (boost::shared_dynamic_cast<cedar::proc::PromotedExternalData>(this->mSlot)
-      || boost::shared_dynamic_cast<cedar::proc::PromotedOwnedData>(this->mSlot))
+    (boost::dynamic_pointer_cast<cedar::proc::PromotedExternalData>(this->mSlot)
+      || boost::dynamic_pointer_cast<cedar::proc::PromotedOwnedData>(this->mSlot))
       && this->getNumberOfConnections() == 0
   )
   {
@@ -301,7 +301,7 @@ void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOption
   painter->save(); // save current painter settings
   //!@todo may call setBaseShape when receiving a signal, not every time paint() is called
   this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND);
-  if (cedar::proc::ExternalDataPtr ext_data = boost::shared_dynamic_cast<cedar::proc::ExternalData>(mSlot))
+  if (cedar::proc::ExternalDataPtr ext_data = boost::dynamic_pointer_cast<cedar::proc::ExternalData>(mSlot))
   {
     if (ext_data->isCollection())
     {

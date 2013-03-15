@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -42,8 +42,11 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/camera/namespace.h"
+#include "cedar/auxiliaries/IntParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/devices/sensors/visual/Grabber.h"
+#include "cedar/devices/sensors/camera/namespace.h"
+#include "cedar/devices/sensors/camera/exceptions.h"
 #include "cedar/devices/sensors/camera/enums/IsoSpeed.h"
 #include "cedar/devices/sensors/camera/enums/Property.h"
 #include "cedar/devices/sensors/camera/enums/VideoMode.h"
@@ -51,22 +54,8 @@
 #include "cedar/devices/sensors/camera/enums/Decoding.h"
 #include "cedar/devices/sensors/camera/Properties.h"
 #include "cedar/devices/sensors/camera/Channel.h"
-#include "cedar/auxiliaries/IntParameter.h"
-#include "cedar/auxiliaries/BoolParameter.h"
-
-
-// backends
 #include "cedar/devices/sensors/camera/backends/BackendType.h"
-#include "cedar/devices/sensors/camera/backends/Device.h"
-//#include "cedar/devices/sensors/camera/backends/DeviceCvVideoCapture.h"
-//
-//#ifdef CEDAR_USE_VIDEO_FOR_LINUX
-//#include "cedar/devices/sensors/camera/backends/DeviceVfl.h"
-//#endif // CEDAR_USE_VIDEO_FOR_LINUX
-//
-//#ifdef CEDAR_USE_LIB_DC1394
-//#include "cedar/devices/sensors/camera/backends/DeviceDc1394.h"
-//#endif // CEDAR_USE_LIB_DC1394
+#include "cedar/devices/sensors/camera/backends/Backend.h"
 
 // SYSTEM INCLUDES
 
@@ -96,22 +85,19 @@ public:
 
   protected slots:
 
-  /*!@brief A slot that must be triggered if a camera-settings has changed. In that case,
+  /*! @brief A slot that must be triggered if a camera-settings has changed. In that case,
    * a new camera-device will be created. It is internally connected with the CameraChannel->settingsChanged signal.
    */
   void settingChanged();
 
-
-  void cameraChanged();
-
-  /*!@brief A slot that must be triggered if the backend has changed. It is internally connected with the
+  /*! @brief A slot that must be triggered if the backend has changed. It is internally connected with the
    *      CameraChannel->Backend Enum-Parameter valueChanged() signal.
    */
   void backendChanged();
 
   signals:
 
-  /*!@brief This signal is raised, if the grabber will be recreated
+  /*! @brief This signal is raised, if the grabber will be recreated
    *
    *   This signal is used from the processingIde Camera step to annotate a new imagesize
    */
@@ -180,18 +166,18 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!  @brief With this method, it is possible to get Information on any channel.
+  /*! @brief With this method, it is possible to get Information on any channel.
    *
-   *   This method passes the arguments directly to the corresponding capture device
-   *   @param channel This is the index of the source you want to get the parameter value.
-   *   @param propId This is any supported property-Id<br>
-   *     If property-id is not supported or unknown, return value will be -1.
-   *   @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
-   *   @return Returns either a double value or one of the following constants:
-   *          - CAMERA_PROPERTY_NOT_SUPPORTED
-   *          - CAMERA_PROPERTY_MODE_AUTO
-   *          - CAMERA_PROPERTY_MODE_DEFAULT
-   *   @see Property
+   *  This method passes the arguments directly to the corresponding capture device
+   *  @param channel This is the index of the source you want to get the parameter value.
+   *  @param propId This is any supported property-Id<br>
+   *    If property-id is not supported or unknown, return value will be -1.
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+   *  @return Returns either a double value or one of the following constants:
+   *         - CAMERA_PROPERTY_NOT_SUPPORTED
+   *         - CAMERA_PROPERTY_MODE_AUTO
+   *         - CAMERA_PROPERTY_MODE_DEFAULT
+   *  @see Property
    */
   double getProperty(unsigned int channel, Property::Id propId);
 
@@ -231,7 +217,7 @@ public:
   (
     unsigned int channel,
     cedar::dev::sensors::camera::Property::Id propId
-  );
+  ) const;
 
 
   /*! @brief Set the mode of a property
@@ -239,38 +225,40 @@ public:
    *  @param propId This is any known property-Id from class Property
    *  @param modeId This is the new mode
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
-   *  @return Returns True if the mode is set successfully
+   *  @throw cedar::dev::sensors::camera::PropertyNotSetException Thrown, if property mode could not set
    */
-  bool setPropertyMode
+  void setPropertyMode
   (
     unsigned int channel,
     cedar::dev::sensors::camera::Property::Id propId,
     cedar::dev::sensors::camera::PropertyMode::Id modeId
   );
 
-  /*!  @brief With this method, it is possible to set a property
-   *   @param channel This is the index of the source you want to set the parameter value.
-   *   @param propId This is any known property-Id<br>
-   *     If property-id is not supported or unknown, return value will be false.
-   *   @param value This is the new value.
-   *   @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
-   *   @see Property
+  /*!@brief With this method, it is possible to set a property
+   * @param channel This is the index of the source you want to set the parameter value.
+   * @param propId This is any known property-Id<br>
+   *   If property-id is not supported or unknown, return value will be false.
+   * @param value This is the new value.
+   * @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+   * @throw cedar::dev::sensors::camera::PropertyNotSetException Thrown, if property mode could not set
+   * @see Property
    */
-  bool setProperty(unsigned int channel, Property::Id propId, double value);
+  void setProperty(unsigned int channel, Property::Id propId, double value);
   
-  /*!  @brief Set informations on camera 0
-   *   @param propId This is any knoqn property-Id<br>
-   *     If property-id is not supported or unknown, return value will be false.
-   *   @param value This is the new value.
+  /*!@brief Set informations on camera 0
+   * @param propId This is any knoqn property-Id<br>
+   *   If property-id is not supported or unknown, return value will be false.
+   * @param value This is the new value.
+   * @throw cedar::dev::sensors::camera::PropertyNotSetException Thrown, if property mode could not set
    */
-  bool setProperty(Property::Id propId, double value);
+  void setProperty(Property::Id propId, double value);
 
-  /*! @brief Set the video mode of the camera.
+  /*!@brief Set the video mode of the camera.
    *
-   *   This can only be done, if the first frame wasn't already grabbed
-   *  @param channel This is the index of the source you want to set the parameter value.
-   *  @param modeId The new value from class VideoMode
-   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+   *  This can only be done, if the first frame wasn't already grabbed
+   * @param channel This is the index of the source you want to set the parameter value.
+   * @param modeId The new value from class VideoMode
+   * @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    * @see getCameraMode
    */
   void setCameraVideoMode(unsigned int channel, cedar::dev::sensors::camera::VideoMode::Id modeId);
@@ -279,7 +267,7 @@ public:
    *  @param channel This is the index of the source you want to set the parameter value.
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
-  cedar::dev::sensors::camera::VideoMode::Id getCameraVideoMode(unsigned int channel);
+  cedar::dev::sensors::camera::VideoMode::Id getCameraVideoMode(unsigned int channel) const;
 
   /*! @brief Set the framerate of the camera.
    *
@@ -292,13 +280,13 @@ public:
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    * @see setCameraFps
    */
-  void setCameraFps(unsigned int channel, FrameRate::Id fpsId);
+  void setCameraFramerate(unsigned int channel, FrameRate::Id fpsId);
 
   /*! @brief Gets the actual fps of the camera.
    *  @param channel This is the index of the source you want to set the parameter value.
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
-  FrameRate::Id getCameraFps(unsigned int channel);
+  FrameRate::Id getCameraFramerate(unsigned int channel) const;
 
 #ifdef CEDAR_USE_LIB_DC1394
 
@@ -318,7 +306,7 @@ public:
   /*! @brief Gets the actual ISO-Speed of the IEEE1394/firewire bus.
    *  @param channel This is the index of the source you want to set the parameter value.
    */
-  IsoSpeed::Id getCameraIsoSpeed(unsigned int channel);
+  IsoSpeed::Id getCameraIsoSpeed(unsigned int channel) const;
 
 #endif
 
@@ -331,7 +319,7 @@ public:
    *  @param channel This is the index of the source channel
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
-  unsigned int getCameraId( unsigned int channel);
+  unsigned int getCameraId( unsigned int channel) const;
 
   /*! @brief Flag if the camera is instantiated by its Guid or by the Bus-ID
    *  @param channel This is the index of the source channel.
@@ -339,7 +327,7 @@ public:
    *  @see getCamereaId
    *  @remarks Only firewire cameras support the GUID field.
    */
-  bool isGuid(unsigned int channel);
+  bool isGuid(unsigned int channel) const;
 
   /*! @brief Gets the actual framesize.
    *  @param channel This is the index of the source channel.
@@ -365,28 +353,27 @@ public:
 
   /*! @brief Set the decoding filter for the grabbed frames
    *
-   * @param channel The channel you want to change
-   * @param filterId The decode-filter to use as cedar::dev::sensors::camera::Decoding::Id
+   *  @param channel The channel you want to change
+   *  @param filterId The decode-filter to use as cedar::dev::sensors::camera::Decoding::Id
    */
   void setDecodeFilter(unsigned int channel, cedar::dev::sensors::camera::Decoding::Id filterId);
 
   /*! @brief Set the decoding filter for the grabbed frames
    *
-   *  This method changes the decode-filter on the first channel.
-   *  For a multi-channel grabber, have a look at
-   *   @see setDecodeFilter(unsigned int, cedar::dev::sensors::camera::Decoding::Id)
+   *   This method changes the decode-filter on the first channel.
+   *   For a multi-channel grabber, have a look at
+   *  @see setDecodeFilter(unsigned int, cedar::dev::sensors::camera::Decoding::Id)
    *
    *  @param filterId The decode-filter to use as cedar::dev::sensors::camera::Decoding::Id
    */
   void setDecodeFilter(cedar::dev::sensors::camera::Decoding::Id filterId);
 
-
   /*! @brief Get the used decoding filter
    *
-   * @param channel The channel you want the decode-filter
-   * @return The Filter as cedar::dev::sensors::camera::Decoding::Id
+   *  @param channel The channel you want the decode-filter
+   *  @return The Filter as cedar::dev::sensors::camera::Decoding::Id
    */
-  cedar::dev::sensors::camera::Decoding::Id getDecodeFilter(unsigned int channel = 0);
+  cedar::dev::sensors::camera::Decoding::Id getDecodeFilter(unsigned int channel = 0) const;
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -409,11 +396,11 @@ protected:
   double getPropertyFromCamera(unsigned int channel, unsigned int propertyId);
 
   // inherited from Grabber
-  bool onGrab();
+  void onGrab(unsigned int channel);
   void onCleanUp();
-  bool onCreateGrabber();
+  void onCreateGrabber();
   void onCloseGrabber();
-  std::string onUpdateSourceInfo(unsigned int channel);
+  std::string onGetSourceInfo(unsigned int channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -443,7 +430,6 @@ private:
              cedar::dev::sensors::camera::Grabber::_mChannels->at(channel)
            );
   }
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -1,19 +1,38 @@
-/*========================================================================================================================
+/*======================================================================================================================
 
-    Institute:   Ruhr-Universitaet Bochum
-                 Institut fuer Neuroinformatik
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
-    File:        YarpTransmitter.cpp
+    This file is part of cedar.
 
-    Maintainer:  Georg.Hartinger
-    Email:       georg.hartinger@ini.rub.de
-    Date:        2013 01 17
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
 
-    Description: Application to grab from an AVI-file and transmit the frames through a YARP-channel
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
 
-    Credits:
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
 
-======================================================================================================================*/
+========================================================================================================================
+
+ ----- Institute:   Ruhr-Universitaet Bochum
+                    Institut fuer Neuroinformatik
+
+ ----- File:        NetTransmitter.cpp
+
+ ----- Author:      Georg Hartinger
+ ----- Email:       georg.hartinger@ini.rub.de
+ ----- Date:        2013 01 17
+
+ ----- Description: Application to grab from an AVI-file and transmit the frames through a YARP-channel
+
+ ----- Credits:
+ ---------------------------------------------------------------------------------------------------------------------*/
+
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/VideoGrabber.h"
@@ -174,8 +193,8 @@ int main(int argc, char* argv[])
   //----------------------------------------------------------------------------------------
 
   //get the timediff between two frames
-  std::cout << "Videoframe: " << p_grabber->getSourceFps() << std::endl;
-  double frame_time_ms = 1000.f/p_grabber->getSourceFps();
+  std::cout << "Videoframe: " << p_grabber->getSourceFramerate() << std::endl;
+  double frame_time_ms = 1000.f/p_grabber->getSourceFramerate();
   boost::posix_time::ptime time_start;
 
   unsigned int counter = 0;
@@ -200,7 +219,7 @@ int main(int argc, char* argv[])
     //every 20 frames
     if (!(++counter %= 20))
     {
-      std::cout << "Grabbing framerate: " << p_grabber->getFpsMeasured() << " fps" << std::endl;
+      std::cout << "Grabbing framerate: " << p_grabber->getMeasuredFramerate() << " fps" << std::endl;
     }
 
     //send frames with equal framerate like the video, do busy-waiting instead of an extra thread

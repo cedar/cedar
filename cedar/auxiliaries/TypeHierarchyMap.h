@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -216,13 +216,13 @@ public:
           NodePtr child = *child_iter;
           if (child->matchesDerived(probeInstance))
           {
-            correspondingNode = child->insert<T>(probeInstance, data, correspondingNode);
+            correspondingNode = child->template insert<T>(probeInstance, data, correspondingNode);
             is_child = true;
           }
-          else if (child->derivesFrom<T>())
+          else if (child->template derivesFrom<T>())
           {
             // in this case, nothing else may be done.
-            return this->insertSuperClass<T>(data, correspondingNode);
+            return this->template insertSuperClass<T>(data, correspondingNode);
           }
         }
 
@@ -582,7 +582,7 @@ public:
         )
         {
           NodePtr child = *child_iter;
-          if (child->derivesFrom<T>())
+          if (child->template derivesFrom<T>())
           {
             insertedNode->addChild(child);
             children_to_remove.insert(child);
@@ -737,7 +737,7 @@ public:
   void insert(const DataType& data)
   {
     RootTypePtr instance(new T());
-    this->mRootNode->insert<T>(instance, data);
+    this->mRootNode->template insert<T>(instance, data);
   }
 
   /*!@brief Returns all the data along the path of the instance.

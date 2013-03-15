@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -42,6 +42,7 @@
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
+#include <boost/intrusive_ptr.hpp>
 
 
 namespace cedar
@@ -53,6 +54,7 @@ namespace cedar
     CEDAR_DECLARE_DEV_CLASS(Robot);
     CEDAR_DECLARE_DEV_CLASS(ComponentSlot);
     CEDAR_DECLARE_DEV_CLASS(Component);
+    CEDAR_DECLARE_DEV_CLASS_INTRUSIVE(ComponentParameter);
     CEDAR_DECLARE_DEV_CLASS(Channel);
     CEDAR_DECLARE_DEV_CLASS(SerialChannel);
     CEDAR_DECLARE_DEV_CLASS(Locomotion);
@@ -71,8 +73,13 @@ namespace cedar
     // exceptions
     CEDAR_DECLARE_DEV_CLASS(ChannelConfigurationNotFoundException);
     CEDAR_DECLARE_DEV_CLASS(CommunicationException);
+    CEDAR_DECLARE_DEV_CLASS(InvalidComponentPathException);
+    CEDAR_DECLARE_DEV_CLASS(NoComponentSelectedException);
+    CEDAR_DECLARE_DEV_CLASS(NoTemplateConfigurationLoadedException);
+    CEDAR_DECLARE_DEV_CLASS(NoTemplateLoadedException);
     CEDAR_DECLARE_DEV_CLASS(ResourceNotAvailableException);
     CEDAR_DECLARE_DEV_CLASS(SerialCommunicationException);
+    CEDAR_DECLARE_DEV_CLASS(TemplateNotFoundException);
     CEDAR_DECLARE_DEV_CLASS(TimeoutException);
     CEDAR_DECLARE_DEV_CLASS(UnknownOperatingSystemException);
     CEDAR_DECLARE_DEV_CLASS(UnresponsiveRobotException);

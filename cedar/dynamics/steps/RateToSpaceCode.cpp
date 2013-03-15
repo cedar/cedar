@@ -58,7 +58,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr rate_to_space_decl
+    ElementDeclarationPtr declaration
     (
       new ElementDeclarationTemplate<cedar::dyn::RateToSpaceCode>
       (
@@ -66,13 +66,14 @@ namespace
         "cedar.dynamics.RateToSpaceCode"
       )
     );
-    rate_to_space_decl->setIconPath(":/steps/rate_to_space_code.svg");
-    rate_to_space_decl->setDescription
+    declaration->setIconPath(":/steps/rate_to_space_code.svg");
+    declaration->setDescription
     (
       "Transforms rate code to space code. A Gaussian distribution is mapped to the metric represented by space code, "
       "centering at the value given by the rate code."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(rate_to_space_decl);
+
+    declaration->declare();
 
     return true;
   }
@@ -191,7 +192,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::RateToSpaceCode::determineInputValid
   // First, let's make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(slot->getName() == "input")
 
-  if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+  if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
   {
     // Mat data is accepted, but only 0D and 1D.
     unsigned int dimensionality = cedar::aux::math::getDimensionalityOf(mat_data->getData());
@@ -210,7 +211,7 @@ void cedar::dyn::RateToSpaceCode::inputConnectionChanged(const std::string& inpu
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
   // Assign the input to the member. This saves us from casting in every computation step.
-  this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
+  this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
 
   if (!this->mInput)
   {

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -56,7 +56,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr static_gain_decl
+    ElementDeclarationPtr declaration
     (
       new ElementDeclarationTemplate<cedar::proc::steps::StaticGain>
       (
@@ -64,12 +64,13 @@ namespace
         "cedar.processing.StaticGain"
       )
     );
-    static_gain_decl->setIconPath(":/steps/static_gain.svg");
-    static_gain_decl->setDescription
+    declaration->setIconPath(":/steps/static_gain.svg");
+    declaration->setDescription
     (
       "Multiplies a matrix with a scalar value that can be set as a parameter."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(static_gain_decl);
+
+    declaration->declare();
 
     return true;
   }
@@ -119,7 +120,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::StaticGain::determineInputVa
   // First, let's make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(slot->getName() == "input")
 
-  if (boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data))
+  if (boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
     // Mat data is accepted.
     return cedar::proc::DataSlot::VALIDITY_VALID;
@@ -137,7 +138,7 @@ void cedar::proc::steps::StaticGain::inputConnectionChanged(const std::string& i
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
   // Assign the input to the member. This saves us from casting in every computation step.
-  this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
+  this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
 
   if(!this->mInput)
   {
