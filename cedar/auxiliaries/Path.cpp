@@ -40,14 +40,18 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Path.h"
 #include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/systemFunctions.h"
+#include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
+#include <boost/filesystem.hpp>
 
 
 //----------------------------------------------------------------------------------------------------------------------
 // static constants
 //----------------------------------------------------------------------------------------------------------------------
 const std::string cedar::aux::Path::M_PROTOCOL_ABSOLUTE_STR = "absolute";
+const std::string cedar::aux::Path::M_PROTOCOL_RESOURCE_STR = "resource";
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -69,11 +73,27 @@ cedar::aux::Path::~Path()
 
 cedar::aux::Path cedar::aux::Path::absolute() const
 {
-  return cedar::aux::Path();
+  if (this->isResource())
+  {
+    std::string path = cedar::aux::locateResource(this->toString());
+    return cedar::aux::Path(path);
+  }
+
+  if (this->isAbsolute())
+  {
+    return *this;
+  }
+
+  // if the path is neither a resource, nor absolute, it should be relative
+  return cedar::aux::Path(boost::filesystem::current_path().string() + "/" + this->toString(false));
 }
 
 bool cedar::aux::Path::isResource() const
 {
+  if (this->mProtocol == cedar::aux::Path::M_PROTOCOL_RESOURCE_STR)
+  {
+    return true;
+  }
   return false;
 }
 
@@ -83,6 +103,7 @@ bool cedar::aux::Path::isAbsolute() const
   {
     return true;
   }
+  // TODO this should probably return true in other circumstances!
   return false;
 }
 
@@ -112,7 +133,13 @@ void cedar::aux::Path::setPath(const std::string& path)
         switch (c)
         {
           case '/':
+            if (this->mComponents.front().empty())
+            {
+              this->mProtocol = cedar::aux::Path::M_PROTOCOL_ABSOLUTE_STR;
+            }
           case '\\':
+            this->mComponents.push_back(std::string());
+            state = STATE_PATH;
             break;
 
           case ':':
@@ -159,6 +186,7 @@ void cedar::aux::Path::setPath(const std::string& path)
             this->mComponents.back() += ':';
             this->mComponents.push_back(std::string());
             this->mComponents.back() += c;
+            this->mProtocol = cedar::aux::Path::M_PROTOCOL_ABSOLUTE_STR;
             state = STATE_PATH;
         } // switch (c)
         break;
@@ -179,6 +207,20 @@ void cedar::aux::Path::setPath(const std::string& path)
         break;
       }
     }
+  }
+
+  // special things to do at the end
+  switch (state)
+  {
+    case STATE_PROTOCOL_OR_PATH_COLON:
+    case STATE_PROTOCOL_OR_PATH_COLON_SLASH:
+      // wasn't really a protocol -- add the colon to the path
+      this->mComponents.back() += ':';
+      this->mProtocol = cedar::aux::Path::M_PROTOCOL_ABSOLUTE_STR;
+      break;
+
+    default:
+      break;
   }
 
   // erase empty components
@@ -210,12 +252,11 @@ std::string cedar::aux::Path::toString(bool withProtocol) const
     }
   }
 
-#ifdef CEDAR_OS_UNIX
-  if (this->isAbsolute())
+  CEDAR_ASSERT(!this->mComponents.front().empty());
+  if (this->isAbsolute() && this->mComponents.front().at(this->mComponents.front().size() - 1) != ':')
   {
     path += '/';
   }
-#endif
 
   for (auto iter = this->mComponents.begin(); iter != this->mComponents.end(); ++iter)
   {
