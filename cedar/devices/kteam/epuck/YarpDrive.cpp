@@ -80,8 +80,8 @@ cedar::dev::kteam::epuck::YarpDrive::YarpDrive
 cedar::dev::kteam::Drive(channel),
 mYarpChannel(channel)
 {
-  channel->setWriterPort("motorCommands");
-  channel->setReaderPort("encoderValues");
+  channel->addWriterPort("motorCommands");
+  channel->addReaderPort("encoderValues");
   channel->open();
 }
 
@@ -95,7 +95,7 @@ cedar::dev::kteam::epuck::YarpDrive::~YarpDrive()
 
 std::vector<int> cedar::dev::kteam::epuck::YarpDrive::getEncoders() const
 {
-  cv::Mat encoder_matrix = mYarpChannel->read();
+  cv::Mat encoder_matrix = mYarpChannel->read("encoderValues");
   std::vector<int> encoders;
   encoders.push_back(encoder_matrix.at<float>(0,0));
   encoders.push_back(encoder_matrix.at<float>(1,0));
@@ -116,6 +116,6 @@ void cedar::dev::kteam::epuck::YarpDrive::sendMovementCommand()
   cv::Mat velocities(2, 1, CV_32F);
   velocities.at<float>(0,0) = static_cast<int>(wheel_speed_pulses[0] / cedar::unit::DEFAULT_FREQUENCY_UNIT);
   velocities.at<float>(1,0) = static_cast<int>(wheel_speed_pulses[1] / cedar::unit::DEFAULT_FREQUENCY_UNIT);
-  mYarpChannel->write(velocities);
+  mYarpChannel->write(velocities, "motorCommands");
 }
 #endif
