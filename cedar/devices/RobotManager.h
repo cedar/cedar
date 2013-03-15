@@ -164,6 +164,11 @@ public:
    */
   const std::string& getRobotTemplateConfiguration(const std::string& robotName) const;
 
+  /*!@brief  Finds the component slot specified by the given path.
+   *         The slot must be given in the form "robot name.slot name".
+   */
+  cedar::dev::ComponentSlotPtr findComponentSlot(const std::string& componentPath) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

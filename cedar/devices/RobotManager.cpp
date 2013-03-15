@@ -111,6 +111,21 @@ void cedar::dev::RobotManager::Template::addNamedResource(const std::string& nam
   this->mNamedResourcePaths[name] = resourcePath;
 }
 
+cedar::dev::ComponentSlotPtr cedar::dev::RobotManager::findComponentSlot(const std::string& componentPath) const
+{
+  std::vector<std::string> parts;
+  cedar::aux::split(componentPath, ".", parts);
+
+  if (parts.size() != 2)
+  {
+    CEDAR_THROW(cedar::dev::InvalidComponentPathException, "Invalid component path: \"" + componentPath + "\"");
+  }
+  const std::string& robot_name = parts[0];
+  const std::string& component_slot_name = parts[1];
+  cedar::dev::RobotPtr robot = this->getRobot(robot_name);
+  return robot->getComponentSlot(component_slot_name);
+}
+
 std::vector<std::string> cedar::dev::RobotManager::getRobotNames() const
 {
   std::vector<std::string> names;
