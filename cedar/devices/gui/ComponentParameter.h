@@ -90,6 +90,10 @@ private:
 private slots:
   void openComponentSelector();
 
+  void updatePathText();
+
+  void parameterChanged();
+
 private:
   void fillRobots(QTreeWidgetItem* pItem);
   void fillComponents(QTreeWidgetItem* pItem, cedar::dev::RobotPtr robot);
@@ -101,6 +105,8 @@ protected:
   // none yet
 private:
   QLineEdit* mpComponentPathDisplay;
+
+  cedar::dev::ComponentParameterPtr mParameter;
 
 }; // class cedar::dev::gui::ComponentParameter
 

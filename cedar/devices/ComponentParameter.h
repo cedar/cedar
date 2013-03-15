@@ -82,6 +82,9 @@ public:
 
   void setValue(cedar::dev::ComponentSlotPtr component);
 
+  //! Returns the string-representation of the currently selected component.
+  std::string getStringRepresentation() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

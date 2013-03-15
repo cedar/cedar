@@ -43,6 +43,7 @@
 #include "cedar/devices/ComponentSlot.h"
 #include "cedar/devices/RobotManager.h"
 #include "cedar/devices/Robot.h"
+#include "cedar/devices/exceptions.h"
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
@@ -89,6 +90,7 @@ cedar::dev::gui::ComponentParameter::ComponentParameter()
   this->setLayout(p_layout);
 
   QObject::connect(p_button, SIGNAL(clicked()), this, SLOT(openComponentSelector()));
+  QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterChanged()));
 
   p_button->setMinimumWidth(20);
   p_button->setMaximumWidth(30);
@@ -101,6 +103,16 @@ cedar::dev::gui::ComponentParameter::~ComponentParameter()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dev::gui::ComponentParameter::parameterChanged()
+{
+  this->mParameter = boost::dynamic_pointer_cast<cedar::dev::ComponentParameter>(this->getParameter());
+  QObject::connect(this->mParameter.get(), SIGNAL(valueChanged()), this, SLOT(updatePathText()));
+
+  bool blocked = this->mpComponentPathDisplay->blockSignals(true);
+  this->updatePathText();
+  this->mpComponentPathDisplay->blockSignals(blocked);
+}
 
 void cedar::dev::gui::ComponentParameter::openComponentSelector()
 {
@@ -127,7 +139,7 @@ void cedar::dev::gui::ComponentParameter::openComponentSelector()
     QTreeWidgetItem* p_selected = p_tree->currentItem();
 
     //TODO proper error handling
-    if (p_selected->parent() == NULL || p_selected->parent() == p_tree->invisibleRootItem())
+    if (p_selected == NULL || p_selected->parent() == NULL || p_selected->parent() == p_tree->invisibleRootItem())
     {
       return;
     }
@@ -144,10 +156,21 @@ void cedar::dev::gui::ComponentParameter::openComponentSelector()
 
 void cedar::dev::gui::ComponentParameter::selectComponent(cedar::dev::ComponentSlotPtr slot)
 {
-  std::string path = slot->getPath();
   cedar::aux::asserted_pointer_cast<cedar::dev::ComponentParameter>(this->getParameter())->setValue(slot);
-  // this belongs in a slot that reacts to changes in the parameter
-//  this->mpComponentPathDisplay->setText(QString::fromStdString(path));
+}
+
+void cedar::dev::gui::ComponentParameter::updatePathText()
+{
+  std::string text;
+  try
+  {
+    text = this->mParameter->getStringRepresentation();
+  }
+  catch (const cedar::dev::NoComponentSelectedException&)
+  {
+    // nothing to do -- text remains empty.
+  }
+  this->mpComponentPathDisplay->setText(QString::fromStdString(text));
 }
 
 void cedar::dev::gui::ComponentParameter::fillRobots(QTreeWidgetItem* pItem)
