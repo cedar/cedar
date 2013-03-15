@@ -227,6 +227,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(IndexOutOfRangeException);
     CEDAR_DECLARE_AUX_CLASS(InitializationException);
     CEDAR_DECLARE_AUX_CLASS(InvalidNameException);
+    CEDAR_DECLARE_AUX_CLASS(InvalidPathException);
     CEDAR_DECLARE_AUX_CLASS(MatrixMismatchException);
     CEDAR_DECLARE_AUX_CLASS(NoDefaultException);
     CEDAR_DECLARE_AUX_CLASS(NotFoundException);
@@ -246,6 +247,7 @@ namespace cedar
     
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Grabbable);
+    CEDAR_DECLARE_AUX_CLASS(Path);
     //!@endcond
 
     // Log related classes --------------------------------------------------------------------------------------------
