@@ -41,7 +41,13 @@
 
 // SYSTEM INCLUDES
 
-int test_path(const std::string& pathStr, const std::string& expectedProtocol, const std::string& expectedPlainPath)
+int test_path
+    (
+      const std::string& pathStr,
+      const std::string& expectedProtocol,
+      const std::string& expectedPlainPath,
+      bool shouldExist
+    )
 {
   std::cout << " Testing path \"" << pathStr << "\"." << std::endl;
   int errors = 0;
@@ -50,14 +56,14 @@ int test_path(const std::string& pathStr, const std::string& expectedProtocol, c
 
   if (path.getProtocol() != expectedProtocol)
   {
-    std::cout << " path protocol was not extracted properly. Expected: \""
+    std::cout << "  path protocol was not extracted properly. Expected: \""
         << expectedProtocol << "\", got: \"" << path.getProtocol() << "\"" << std::endl;
     ++errors;
   }
 
   if (path.toString(false) != expectedPlainPath)
   {
-    std::cout << "Plain path was not built properly: expected \"" << expectedPlainPath
+    std::cout << "  Plain path was not built properly: expected \"" << expectedPlainPath
         << "\", got: \"" << path.toString(false) << "\"." << std::endl;
     ++errors;
   }
@@ -67,10 +73,25 @@ int test_path(const std::string& pathStr, const std::string& expectedProtocol, c
     std::string expected_fluffy_path = expectedProtocol + "://" + expectedPlainPath;
     if (path.toString(true) != expected_fluffy_path)
     {
-      std::cout << "Path was not built properly: expected \"" << expected_fluffy_path
+      std::cout << "  Path was not built properly: expected \"" << expected_fluffy_path
           << "\", got: \"" << path.toString(true) << "\"." << std::endl;
       ++errors;
     }
+  }
+
+  try
+  {
+    std::cout << "  Absolute path is: \"" << path.absolute().toString() << "\"." << std::endl;
+  }
+  catch (const cedar::aux::ResourceNotFoundException&)
+  {
+    std::cout << "  Cannot determine aboslute path, resource does not exist. This is ";
+    if (shouldExist)
+    {
+      std::cout << "NOT ";
+      ++errors;
+    }
+    std::cout << "ok." << std::endl;
   }
 
   std::cout << " Path test revealed " << errors << " error(s)." << std::endl;
@@ -99,11 +120,17 @@ int main()
   int errors = 0;
 
   errors += test_invalid_path("wrong:path");
-  errors += test_path("relative://rel/test/path", "relative", "rel/test/path");
-  errors += test_path("absolute:///abs/test/path", "absolute", "/abs/test/path");
-  errors += test_path("resource://test/resource", "resource", "test/resource");
-  errors += test_path("c:\\a\\windows\\path", std::string(), "c:/a/windows/path");
-  errors += test_path("c:/a/weird/windows/path", std::string(), "c:/a/weird/windows/path");
+  errors += test_path("relative://rel/test/path", "relative", "rel/test/path", false);
+  errors += test_path("absolute:///abs/test/path", "absolute", "/abs/test/path", false);
+  errors += test_path("resource://test/resource", "resource", "test/resource", false);
+  errors += test_path("c:\\a\\windows\\path", "absolute", "c:/a/windows/path", false);
+  errors += test_path("c:/a/weird/windows/path", "absolute", "c:/a/weird/windows/path", false);
+  errors += test_path("c:/", "absolute", "c:", false);
+  errors += test_path("c:", "absolute", "c:", false);
+  errors += test_path("/absolute/path/without/protocol", "absolute", "/absolute/path/without/protocol", false);
+  errors += test_path("relative/path/without/protocol", "", "relative/path/without/protocol", false);
+  errors += test_path("relative\\path", "", "relative/path", false);
+  errors += test_path("resource://configs/epuck/description.json", "resource", "configs/epuck/description.json", true);
 
   std::cout << "Test finished with " << errors << " error(s)." << std::endl;
   return errors;

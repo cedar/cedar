@@ -114,6 +114,7 @@ private:
   std::deque<std::string> mComponents;
 
   static const std::string M_PROTOCOL_ABSOLUTE_STR;
+  static const std::string M_PROTOCOL_RESOURCE_STR;
 
 }; // class cedar::aux::Path
 
