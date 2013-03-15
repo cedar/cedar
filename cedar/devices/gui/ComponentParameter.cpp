@@ -84,7 +84,8 @@ cedar::dev::gui::ComponentParameter::ComponentParameter()
   this->mpComponentPathDisplay->setReadOnly(true);
   p_layout->addWidget(this->mpComponentPathDisplay, 1);
 
-  auto p_button = new QPushButton("...");
+  auto p_button = new QPushButton(QIcon(":/cedar/dev/gui/icons/select_component.svg"), "");
+  p_button->setIconSize(QSize(16, 16));
   p_layout->addWidget(p_button, 0);
 
   this->setLayout(p_layout);
