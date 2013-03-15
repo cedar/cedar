@@ -43,6 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/ui_ResourceDialog.h"
+#include "cedar/auxiliaries/Path.h"
 
 // SYSTEM INCLUDES
 #include <QFileIconProvider>
@@ -78,7 +79,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  static std::string openResource
+  static cedar::aux::Path openResource
   (
     QWidget* pParent = NULL,
     const std::vector<std::string>& extensions = std::vector<std::string>()

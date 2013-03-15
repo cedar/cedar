@@ -54,13 +54,13 @@ namespace
     // epuck -----------------------------------------------------------------------------------------------------------
     cedar::dev::RobotManager::Template epuck_template;
     epuck_template.setIconPath(":/cedar/dev/gui/icons/epuck_icon_256.png");
-    epuck_template.addNamedResource("hardware", "configs/epuck/default_configuration.json");
+    epuck_template.addNamedConfiguration("hardware", cedar::aux::Path("resource://configs/epuck/default_configuration.json"));
     cedar::dev::RobotManagerSingleton::getInstance()->addRobotTemplate("epuck", epuck_template);
 
     // khepera ---------------------------------------------------------------------------------------------------------
     cedar::dev::RobotManager::Template khepera_template;
     khepera_template.setIconPath(":/cedar/dev/gui/icons/khepera_icon_256.png");
-    khepera_template.addNamedResource("hardware", "configs/khepera/default_configuration.json");
+    khepera_template.addNamedConfiguration("hardware", cedar::aux::Path("resource://configs/khepera/default_configuration.json"));
     cedar::dev::RobotManagerSingleton::getInstance()->addRobotTemplate("khepera", khepera_template);
 
     return true;
@@ -85,10 +85,10 @@ cedar::dev::RobotManager::~RobotManager()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-std::string cedar::dev::RobotManager::Template::getConfiguration(const std::string& name) const
+cedar::aux::Path cedar::dev::RobotManager::Template::getConfiguration(const std::string& name) const
 {
-  auto iter = this->mNamedResourcePaths.find(name);
-  CEDAR_ASSERT(iter != this->mNamedResourcePaths.end());
+  auto iter = this->mNamedPaths.find(name);
+  CEDAR_ASSERT(iter != this->mNamedPaths.end());
 
   return iter->second;
 }
@@ -97,7 +97,7 @@ std::vector<std::string> cedar::dev::RobotManager::Template::getConfigurationNam
 {
   std::vector<std::string> names;
 
-  for (auto iter = this->mNamedResourcePaths.begin(); iter != this->mNamedResourcePaths.end(); ++iter)
+  for (auto iter = this->mNamedPaths.begin(); iter != this->mNamedPaths.end(); ++iter)
   {
     names.push_back(iter->first);
   }
@@ -105,10 +105,10 @@ std::vector<std::string> cedar::dev::RobotManager::Template::getConfigurationNam
   return names;
 }
 
-void cedar::dev::RobotManager::Template::addNamedResource(const std::string& name, const std::string& resourcePath)
+void cedar::dev::RobotManager::Template::addNamedConfiguration(const std::string& name, const cedar::aux::Path& configuration)
 {
-  CEDAR_ASSERT(this->mNamedResourcePaths.find(name) == this->mNamedResourcePaths.end());
-  this->mNamedResourcePaths[name] = resourcePath;
+  CEDAR_ASSERT(this->mNamedPaths.find(name) == this->mNamedPaths.end());
+  this->mNamedPaths[name] = configuration;
 }
 
 cedar::dev::ComponentSlotPtr cedar::dev::RobotManager::findComponentSlot(const std::string& componentPath) const
@@ -249,21 +249,16 @@ const std::string& cedar::dev::RobotManager::getRobotName(cedar::dev::ConstRobot
   CEDAR_ASSERT(false);
 }
 
-void cedar::dev::RobotManager::loadRobotConfigurationFromResource
+void cedar::dev::RobotManager::loadRobotConfiguration
      (
        const std::string& robotName,
-       const std::string& resourcePath
+       const cedar::aux::Path& configuration
      )
 {
-  if (this->mRobotInstances.find(robotName) == this->mRobotInstances.end())
-  {
-    CEDAR_THROW(cedar::aux::UnknownNameException, "Cannot find a robot by the name \"" + robotName + "\".");
-  }
+  cedar::dev::RobotPtr robot = this->getRobot(robotName);
 
-  mRobotResourceConfigurations[robotName] = resourcePath;
-  std::string full_path = cedar::aux::locateResource(resourcePath);
-
-  this->mRobotInstances[robotName]->readJson(full_path);
+  this->mRobotConfigurations[robotName] = configuration;
+  robot->readJson(configuration.absolute().toString());
 
   this->mRobotConfigurationLoadedSignal(robotName);
 }
@@ -326,8 +321,8 @@ void cedar::dev::RobotManager::loadRobotTemplateConfiguration
     auto robot_template
       = cedar::dev::RobotManagerSingleton::getInstance()->getTemplate(this->getRobotTemplateName(robotName));
 
-    std::string configuration = robot_template.getConfiguration(configurationName);
-    cedar::dev::RobotManagerSingleton::getInstance()->loadRobotConfigurationFromResource(robotName, configuration);
+    cedar::aux::Path configuration = robot_template.getConfiguration(configurationName);
+    cedar::dev::RobotManagerSingleton::getInstance()->loadRobotConfiguration(robotName, configuration);
     this->retrieveRobotInfo(robotName).mLoadedTemplateConfiguration = configurationName;
   }
   catch (const cedar::dev::NoTemplateLoadedException&)

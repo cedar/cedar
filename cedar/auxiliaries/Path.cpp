@@ -88,6 +88,11 @@ cedar::aux::Path cedar::aux::Path::absolute() const
   return cedar::aux::Path(boost::filesystem::current_path().string() + "/" + this->toString(false));
 }
 
+bool cedar::aux::Path::isEmpty() const
+{
+  return this->mComponents.empty();
+}
+
 bool cedar::aux::Path::isResource() const
 {
   if (this->mProtocol == cedar::aux::Path::M_PROTOCOL_RESOURCE_STR)
