@@ -80,6 +80,9 @@ public:
 
   bool isAbsolute() const;
 
+  //! Returns true if there are no entries in this path, i.e., the path is "".
+  bool isEmpty() const;
+
   //! Sets the stored path from a string.
   void setPath(const std::string& path);
 
