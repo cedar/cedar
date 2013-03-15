@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/devices/ComponentParameter.h"
 #include "cedar/devices/ComponentSlot.h"
+#include "cedar/devices/RobotManager.h"
 #include "cedar/devices/exceptions.h"
 
 // SYSTEM INCLUDES
@@ -85,14 +86,21 @@ void cedar::dev::ComponentParameter::setValue(cedar::dev::ComponentSlotPtr compo
   this->emitChangedSignal();
 }
 
+void cedar::dev::ComponentParameter::setValue(const std::string& componentPath)
+{
+  auto slot = cedar::dev::RobotManagerSingleton::getInstance()->findComponentSlot(componentPath);
+  this->setValue(slot);
+}
+
+
 void cedar::dev::ComponentParameter::readFromNode(const cedar::aux::ConfigurationNode& node)
 {
-  // TODO
+  this->setValue(node.get_value<std::string>());
 }
 
 void cedar::dev::ComponentParameter::writeToNode(cedar::aux::ConfigurationNode& root) const
 {
-  // TODO
+  root.put(this->getName(), this->getStringRepresentation());
 }
 
 void cedar::dev::ComponentParameter::makeDefault()

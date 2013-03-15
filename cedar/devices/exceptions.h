@@ -95,5 +95,9 @@ class cedar::dev::NoComponentSelectedException : public cedar::aux::ExceptionBas
 {
 };
 
+//!@brief Thrown when an invalid component path is found by the system.
+class cedar::dev::InvalidComponentPathException : public cedar::aux::ExceptionBase
+{
+};
 
 #endif // CEDAR_DEV_EXCEPTIONS_H
