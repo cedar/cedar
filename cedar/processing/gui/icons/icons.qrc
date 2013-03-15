@@ -44,5 +44,6 @@
     <file>toolbaricons/save.svg</file>
     <file>toolbaricons/grid.svg</file>
     <file>toolbaricons/reset.svg</file>
+    <file>processing_ide_app_icon.svg</file>
   </qresource>
 </RCC>
