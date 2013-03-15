@@ -559,7 +559,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Projection::determineInputVa
                                 ) const
 {
   CEDAR_DEBUG_ASSERT(slot->getName() == "input")
-  if (boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data))
+  if (boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
     return cedar::proc::DataSlot::VALIDITY_VALID;
   }
@@ -573,7 +573,7 @@ void cedar::proc::steps::Projection::inputConnectionChanged(const std::string& i
 {
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
-  this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
+  this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
 
   if (!this->mInput)
   {

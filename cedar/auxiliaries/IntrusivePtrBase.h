@@ -48,8 +48,6 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
 
-extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_add_ref(cedar::aux::IntrusivePtrBase const *pObject);
-extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_release(cedar::aux::IntrusivePtrBase const *pObject);
 
 /*!@brief A base class for any classes that make use of boost::intrusive_ptr.
  */
@@ -58,8 +56,32 @@ class cedar::aux::IntrusivePtrBase
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend void ::intrusive_ptr_add_ref(cedar::aux::IntrusivePtrBase const *pObject);
-  friend void ::intrusive_ptr_release(cedar::aux::IntrusivePtrBase const *pObject);
+  /*!@brief Function that increases the reference counter of the object.
+   *
+   *        Required for boost::intrusive_ptr.
+   */
+  friend inline void intrusive_ptr_add_ref(cedar::aux::IntrusivePtrBase const *pObject)
+  {
+    CEDAR_DEBUG_ASSERT(pObject->mReferenceCount >= 0);
+    ++(pObject->mReferenceCount);
+  }
+
+  /*!@brief Function that decreases the reference counter of the object and deletes it if the counter goes to zero.
+   *
+   *        Required for boost::intrusive_ptr
+   */
+  friend inline void intrusive_ptr_release(cedar::aux::IntrusivePtrBase const *pObject)
+  {
+    CEDAR_DEBUG_ASSERT(pObject->mReferenceCount > 0);
+
+    --(pObject->mReferenceCount);
+
+    if (pObject->mReferenceCount == 0)
+    {
+      // call Base's destructor
+      delete pObject;
+    }
+  }
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------

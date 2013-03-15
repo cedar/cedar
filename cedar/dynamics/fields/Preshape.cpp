@@ -123,7 +123,7 @@ void cedar::dyn::Preshape::eulerStep(const cedar::unit::Time& time)
   if
   (
     cedar::aux::ConstMatDataPtr peak_detector
-      = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(this->getInput("peak detector"))
+      = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(this->getInput("peak detector"))
   )
   {
     peak = cedar::aux::math::getMatrixEntry<double>(peak_detector->getData(), 0, 0);
@@ -148,7 +148,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
   if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "input")
   {
     //!@todo Reenable this once the annotations for space code are introduced.
-    /* if (cedar::dyn::ConstSpaceCodePtr input = boost::shared_dynamic_cast<const cedar::dyn::SpaceCode>(data))
+    /* if (cedar::dyn::ConstSpaceCodePtr input = boost::dynamic_pointer_cast<const cedar::dyn::SpaceCode>(data))
     {
       if (!this->isMatrixCompatibleInput(input->getData()))
       {
@@ -159,7 +159,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
-    else */ if (cedar::aux::ConstMatDataPtr input = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+    else */ if (cedar::aux::ConstMatDataPtr input = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
     {
       if (!this->isMatrixCompatibleInput(input->getData()))
       {
@@ -175,7 +175,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
   }
   else if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "peak detector")
   {
-    if (cedar::aux::ConstMatDataPtr input = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+    if (cedar::aux::ConstMatDataPtr input = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
     {
       if (cedar::aux::math::getDimensionalityOf(input->getData()) != 0)
       {

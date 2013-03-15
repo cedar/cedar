@@ -140,7 +140,7 @@ void cedar::dev::sensors::camera::BackendDc1394::createCaptureObject()
   if(!capture.isOpened())
   {
     std::string msg = "Error: Couldn't create capture object with camera from Bus-ID "
-                        + boost::lexical_cast<std::string>(bus_id);
+                        + cedar::aux::toString(bus_id);
     CEDAR_THROW(cedar::dev::sensors::camera::CreateBackendException,msg);
   }
 
@@ -341,7 +341,7 @@ void cedar::dev::sensors::camera::BackendDc1394::openLibDcCamera()
     cedar::aux::LogSingleton::getInstance()->debugMessage
                                             (
                                               "Searching for camera with GUID "
-                                               + boost::lexical_cast<std::string>(camera_id) + " on the bus...",
+                                               + cedar::aux::toString(camera_id) + " on the bus...",
                                               "cedar::dev::sensors::camera::BackendDc1394::openLibDcCamera()"
                                             );
 
@@ -350,7 +350,7 @@ void cedar::dev::sensors::camera::BackendDc1394::openLibDcCamera()
 
     cedar::aux::LogSingleton::getInstance()->debugMessage
                                             (
-                                              "Found cam at Bus-Id " + boost::lexical_cast<std::string>(bus_id),
+                                              "Found cam at Bus-Id " + cedar::aux::toString(bus_id),
                                               "cedar::dev::sensors::camera::BackendDc1394::openLibDcCamera()"
                                             );
 
@@ -367,15 +367,15 @@ void cedar::dev::sensors::camera::BackendDc1394::openLibDcCamera()
   unsigned int guid = static_cast<unsigned int>(cam_guid & 0x00000000FFFFFFFF);
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
-                                            "Open camera with bus Id " + boost::lexical_cast<std::string>(bus_id)
-                                              + ": GUID " + boost::lexical_cast<std::string>(guid),
+                                            "Open camera with bus Id " + cedar::aux::toString(bus_id)
+                                              + ": GUID " + cedar::aux::toString(guid),
                                             "cedar::dev::sensors::camera::BackendDc1394::openLibDcCamera()"
                                           );
   // open camera with libdc to get the capabilities
   if (!mpLibDcInterface->openCamera(cam_guid))
   {
-    std::string msg = "Could not open camera with BusID " + boost::lexical_cast<std::string>(bus_id)
-                         + " and GUID " + boost::lexical_cast<std::string>(guid);
+    std::string msg = "Could not open camera with BusID " + cedar::aux::toString(bus_id)
+                         + " and GUID " + cedar::aux::toString(guid);
     CEDAR_THROW(cedar::dev::sensors::camera::LibDcException,msg)
   }
 }
@@ -405,7 +405,7 @@ unsigned int cedar::dev::sensors::camera::BackendDc1394::getBusIdFromGuid(unsign
   }
 
   // not found, throw an exception
-  std::string msg = "Camera with GUID " + boost::lexical_cast<std::string>(guid) + " not found on the firewire bus";
+  std::string msg = "Camera with GUID " + cedar::aux::toString(guid) + " not found on the firewire bus";
   CEDAR_THROW(cedar::dev::sensors::camera::LibDcCameraNotFoundException,msg);
 }
 

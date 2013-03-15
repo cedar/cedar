@@ -124,7 +124,7 @@ void cedar::aux::gui::MatDataPlot::doAppend(cedar::aux::ConstDataPtr data, const
 
 void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
-  this->mData= boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data);
+  this->mData= boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
   if (!this->mData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,

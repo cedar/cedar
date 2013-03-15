@@ -215,7 +215,7 @@ void cedar::dev::sensors::camera::Properties::setProperty
   if (mPropertiesList[propertyId]->getValue() != value)
   {
     std::string prop_name = Property::type().get(propertyId).prettyString();
-    std::string msg =  "Could not set Property " + prop_name + " to value " + boost::lexical_cast<std::string>(value);
+    std::string msg =  "Could not set Property " + prop_name + " to value " + cedar::aux::toString(value);
     CEDAR_THROW(cedar::dev::sensors::camera::PropertyNotSetException,msg);
   }
 }
@@ -296,8 +296,8 @@ void cedar::dev::sensors::camera::Properties::setPropertyToCamera(unsigned int p
     if ( set_value != value)
     {
       std::string prop_name = cedar::dev::sensors::camera::Property::type().get(propertyId).prettyString();
-      std::string msg = "Property " + prop_name + " couldn't set to " + boost::lexical_cast<std::string>(value)
-                           + ". New value: " + boost::lexical_cast<std::string>(set_value);
+      std::string msg = "Property " + prop_name + " couldn't set to " + cedar::aux::toString(value)
+                           + ". New value: " + cedar::aux::toString(set_value);
       CEDAR_THROW(cedar::dev::sensors::camera::PropertyNotSetException,msg)
     }
   }
