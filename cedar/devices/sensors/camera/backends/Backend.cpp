@@ -175,7 +175,7 @@ void cedar::dev::sensors::camera::Backend::setPropertyToCamera(unsigned int prop
     cedar::aux::LogSingleton::getInstance()->warning
                                              (
                                                "Property " + prop_name
-                                               + " couldn't set to " + boost::lexical_cast<std::string>(value),
+                                               + " couldn't set to " + cedar::aux::toString(value),
                                                "cedar::dev::sensors::camera::Backend::setPropertyToCamera()"
                                              );
   }

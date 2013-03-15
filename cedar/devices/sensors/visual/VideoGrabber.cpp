@@ -205,7 +205,7 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
   {
     if (getVideoChannel(channel)->_mSourceFileName->getPath() == ".")
     {
-      std::string msg = this->getName() + " channel " + boost::lexical_cast<std::string>(channel)
+      std::string msg = this->getName() + " channel " + cedar::aux::toString(channel)
                           + ": No video-file specified";
       CEDAR_THROW(cedar::dev::sensors::visual::CreateGrabberException,msg)
     }
@@ -232,7 +232,7 @@ void cedar::dev::sensors::visual::VideoGrabber::onCreateGrabber()
 
     if (!capture.isOpened())
     {
-      std::string msg = this->getName() + ": Grabbing failed on Channel " + boost::lexical_cast<std::string>(channel)
+      std::string msg = this->getName() + ": Grabbing failed on Channel " + cedar::aux::toString(channel)
                         + " from \"" + getVideoChannel(channel)->_mSourceFileName->getPath() + "\"";
       CEDAR_THROW(cedar::dev::sensors::visual::CreateGrabberException,msg)
     }
@@ -306,7 +306,7 @@ void cedar::dev::sensors::visual::VideoGrabber::onGrab(unsigned int channel)
     // is it a read error somewhere in the middle of the file?
     if (getVideoChannel(channel)->mVideoCapture.get(CV_CAP_PROP_POS_FRAMES) < (mFramesCount))
     {
-      std::string msg = "Could not read from video file on channel " + boost::lexical_cast<std::string>(channel);
+      std::string msg = "Could not read from video file on channel " + cedar::aux::toString(channel);
       CEDAR_THROW(cedar::dev::sensors::visual::GrabberGrabException,msg)
     }
 
@@ -344,7 +344,7 @@ void cedar::dev::sensors::visual::VideoGrabber::onGrab(unsigned int channel)
 
 std::string cedar::dev::sensors::visual::VideoGrabber::onGetSourceInfo(unsigned int channel)
 {
-  return this->getName() + " - channel " + boost::lexical_cast<std::string>(channel)
+  return this->getName() + " - channel " + cedar::aux::toString(channel)
                          + ": " + getVideoChannel(channel)->_mSourceFileName->getPath();
 }
 
