@@ -90,4 +90,10 @@ class cedar::dev::TemplateNotFoundException : public cedar::aux::ExceptionBase
 {
 };
 
+//!@brief Exception that occurs when no component has been selected.
+class cedar::dev::NoComponentSelectedException : public cedar::aux::ExceptionBase
+{
+};
+
+
 #endif // CEDAR_DEV_EXCEPTIONS_H

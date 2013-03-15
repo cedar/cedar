@@ -67,6 +67,7 @@ namespace cedar
 
     // exceptions
     CEDAR_DECLARE_DEV_CLASS(ChannelConfigurationNotFoundException);
+    CEDAR_DECLARE_DEV_CLASS(NoComponentSelectedException);
     CEDAR_DECLARE_DEV_CLASS(NoTemplateConfigurationLoadedException);
     CEDAR_DECLARE_DEV_CLASS(NoTemplateLoadedException);
     CEDAR_DECLARE_DEV_CLASS(ResourceNotAvailableException);

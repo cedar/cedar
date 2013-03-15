@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/devices/ComponentParameter.h"
 #include "cedar/devices/ComponentSlot.h"
+#include "cedar/devices/exceptions.h"
 
 // SYSTEM INCLUDES
 
@@ -64,6 +65,18 @@ cedar::dev::ComponentParameter::~ComponentParameter()
 cedar::dev::ComponentPtr cedar::dev::ComponentParameter::getValue() const
 {
   return this->mComponent->getComponent();
+}
+
+std::string cedar::dev::ComponentParameter::getStringRepresentation() const
+{
+  if (this->mComponent)
+  {
+    return this->mComponent->getPath();
+  }
+  else
+  {
+    CEDAR_THROW(cedar::dev::NoComponentSelectedException, "No component was selected for parameter \"" + this->getName() + "\".");
+  }
 }
 
 void cedar::dev::ComponentParameter::setValue(cedar::dev::ComponentSlotPtr component)
