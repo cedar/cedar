@@ -112,7 +112,9 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(DataPlotter);
       CEDAR_DECLARE_AUX_CLASS(MatrixPlot);
       CEDAR_DECLARE_AUX_CLASS(LinePlot);
+      CEDAR_DECLARE_AUX_CLASS(VtkLinePlot);
       CEDAR_DECLARE_AUX_CLASS(SurfacePlot);
+      CEDAR_DECLARE_AUX_CLASS(VtkSurfacePlot);
       CEDAR_DECLARE_AUX_CLASS(MatrixSlicePlot3D);
       CEDAR_DECLARE_AUX_CLASS(MatrixVectorPlot);
       CEDAR_DECLARE_AUX_CLASS(ImagePlot);
