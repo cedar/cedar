@@ -355,7 +355,19 @@ void cedar::dev::RobotManager::restore()
   cedar::aux::Path config_path = cedar::aux::Path::globalCofigurationBaseDirectory() + "robots.json";
 
   cedar::aux::ConfigurationNode root, robots;
-  boost::property_tree::read_json(config_path.toString(), root);
+  try
+  {
+    boost::property_tree::read_json(config_path.toString(), root);
+  }
+  catch (const boost::property_tree::json_parser::json_parser_error& e)
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Could not read robots. Boost says: \"" + std::string(e.what()) + "\".",
+      "void cedar::dev::RobotManager::restore()"
+    );
+    return;
+  }
 
   robots = root.get_child("robots");
 
