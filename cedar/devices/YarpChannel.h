@@ -76,19 +76,17 @@ public:
 public:
   T read(const std::string& port)
   {
-    if (mReaderMap.find(port) != mReaderMap.end())
+    auto iter = mReaderMap.find(port);
+    if (iter != mReaderMap.end() && iter->second)
     {
       try
       {
-        return mReaderMap[port]->read();
+        return iter->second->read();
       }
       catch (cedar::aux::net::NetUnexpectedDataException& exc)
       {
-        CEDAR_THROW(cedar::dev::CommunicationException, "port is not open");
-      }
-      catch (cedar::aux::net::NetWaitingForWriterException& exc)
-      {
-        CEDAR_THROW(cedar::dev::CommunicationException, "port is not open");
+        // this is ok, happens when reader is faster than writer
+        return T();
       }
       catch (cedar::aux::net::NetMissingRessourceException &e)
       {
@@ -97,9 +95,13 @@ public:
     }
     else
     {
-      CEDAR_THROW(cedar::dev::CommunicationException, "port is not open");
+      // try to open it once more!
+      iter->second = TypeReaderPtr(new TypeReader(port));
+      return this->read(port);
+//      CEDAR_THROW(cedar::dev::CommunicationException, "port \"" + port + "\" is unknown");
     }
   }
+
   void write(T value, const std::string& port)
   {
     if (mWriterMap.find(port) != mWriterMap.end())
@@ -121,9 +123,9 @@ public:
 
   void addReaderPort(const std::string& port)
   {
-    if (mReaderPorts.find(port) == mReaderPorts.end())
+    if (mReaderMap.find(port) == mReaderMap.end())
     {
-      this->mReaderPorts.insert(port);
+      this->mReaderMap[port] = TypeReaderPtr();
     }
     else
     { //TODO: exception
@@ -133,9 +135,9 @@ public:
 
   void addWriterPort(const std::string& port)
   {
-    if (mWriterPorts.find(port) == mWriterPorts.end())
+    if (mWriterMap.find(port) == mWriterMap.end())
     {
-      this->mWriterPorts.insert(port);
+      this->mWriterMap[port] = TypeWriterPtr();
     }
     else
     { //TODO: exception
@@ -151,22 +153,29 @@ protected:
   {
     if (!mIsOpen)
     {
-      for (auto it = mReaderPorts.begin(); it != mReaderPorts.end(); ++it)
+      for (auto it = mReaderMap.begin(); it != mReaderMap.end(); ++it)
       {
-        const std::string& port = *it;
-        try
+        const std::string& port = it->first;
+        if (!it->second) // no object instance allocated before
         {
-          mReaderMap[port] = TypeReaderPtr(new TypeReader(port));
-        }
-        catch (cedar::aux::net::NetWaitingForWriterException& exc)
-        {
-          // that's ok
+          try
+          {
+            it->second = TypeReaderPtr(new TypeReader(port));
+          }
+          catch (cedar::aux::net::NetWaitingForWriterException& exc)
+          {
+            // that's ok, but reset pointer
+            it->second = TypeReaderPtr();
+          }
         }
       }
-      for (auto it = mWriterPorts.begin(); it != mWriterPorts.end(); ++it)
+      for (auto it = mWriterMap.begin(); it != mWriterMap.end(); ++it)
       {
-        const std::string& port = *it;
-        mWriterMap[port] = TypeWriterPtr(new TypeWriter(port));
+        const std::string& port = it->first;
+        if (!it->second) // no object instance allocated before
+        {
+          it->second = TypeWriterPtr(new TypeWriter(port));
+        }
       }
       mIsOpen = true;
     }
@@ -196,8 +205,6 @@ protected:
 private:
   std::map<std::string, TypeReaderPtr> mReaderMap;
   std::map<std::string, TypeWriterPtr> mWriterMap;
-  std::set<std::string> mReaderPorts;
-  std::set<std::string> mWriterPorts;
   bool mIsOpen;
 
   //--------------------------------------------------------------------------------------------------------------------

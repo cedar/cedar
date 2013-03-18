@@ -95,11 +95,22 @@ cedar::dev::kteam::epuck::YarpDrive::~YarpDrive()
 
 std::vector<int> cedar::dev::kteam::epuck::YarpDrive::getEncoders() const
 {
-  cv::Mat encoder_matrix = mYarpChannel->read("encoderValues");
+  cv::Mat encoder_matrix;
   std::vector<int> encoders;
-  encoders.push_back(encoder_matrix.at<float>(0,0));
-  encoders.push_back(encoder_matrix.at<float>(1,0));
-  return encoders;
+  try
+  {
+    encoder_matrix = mYarpChannel->read("encoderValues");
+    if (!encoder_matrix.empty())
+    {
+      encoders.push_back(encoder_matrix.at<float>(0,0));
+      encoders.push_back(encoder_matrix.at<float>(1,0));
+    }
+    return encoders;
+  }
+  catch (cedar::aux::net::NetWaitingForWriterException& exc)
+  {
+    return encoders;
+  }
 }
 
 void cedar::dev::kteam::epuck::YarpDrive::setEncoders(const std::vector<int>& /*encoders*/)
