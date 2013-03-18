@@ -92,6 +92,15 @@ public:
   //! Returns a string representation of the path.
   std::string toString(bool withProtocol = false) const;
 
+  //! Appends the given path to this one.
+  cedar::aux::Path operator+ (const std::string& other) const;
+
+  //! Appends the given path to this one.
+  cedar::aux::Path operator+ (const cedar::aux::Path& other) const;
+
+  //! Returns the base directory for storing global cedar settings.
+  static cedar::aux::Path globalCofigurationBaseDirectory();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

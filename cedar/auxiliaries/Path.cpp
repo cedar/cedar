@@ -280,3 +280,21 @@ const std::string& cedar::aux::Path::getProtocol() const
 {
   return this->mProtocol;
 }
+
+cedar::aux::Path cedar::aux::Path::operator+ (const std::string& other) const
+{
+  cedar::aux::Path other_path(other);
+  return this->operator +(other_path);
+}
+
+cedar::aux::Path cedar::aux::Path::operator+ (const cedar::aux::Path& other) const
+{
+  cedar::aux::Path combined = *this;
+  combined.mComponents.insert(combined.mComponents.end(), other.mComponents.begin(), other.mComponents.end());
+  return combined;
+}
+
+cedar::aux::Path cedar::aux::Path::globalCofigurationBaseDirectory()
+{
+  return cedar::aux::Path(cedar::aux::getUserHomeDirectory() + "/.cedar");
+}
