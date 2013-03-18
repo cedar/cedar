@@ -44,30 +44,9 @@
 #include "cedar/auxiliaries/systemFunctions.h"
 
 // SYSTEM INCLUDES
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
-// list of known robots
-//!@todo Find a better place for this list of robots
-namespace
-{
-  bool register_robots()
-  {
-    // epuck -----------------------------------------------------------------------------------------------------------
-    cedar::dev::RobotManager::Template epuck_template;
-    epuck_template.setIconPath(":/cedar/dev/gui/icons/epuck_icon_256.png");
-    epuck_template.addNamedConfiguration("hardware", cedar::aux::Path("resource://configs/epuck/default_configuration.json"));
-    cedar::dev::RobotManagerSingleton::getInstance()->addRobotTemplate("epuck", epuck_template);
-
-    // khepera ---------------------------------------------------------------------------------------------------------
-    cedar::dev::RobotManager::Template khepera_template;
-    khepera_template.setIconPath(":/cedar/dev/gui/icons/khepera_icon_256.png");
-    khepera_template.addNamedConfiguration("hardware", cedar::aux::Path("resource://configs/khepera/default_configuration.json"));
-    cedar::dev::RobotManagerSingleton::getInstance()->addRobotTemplate("khepera", khepera_template);
-
-    return true;
-  }
-
-  bool caller = register_robots();
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -75,10 +54,25 @@ namespace
 
 cedar::dev::RobotManager::RobotManager()
 {
+  //!@todo Find a better place for this list of robots
+  // epuck -----------------------------------------------------------------------------------------------------------
+  cedar::dev::RobotManager::Template epuck_template;
+  epuck_template.setIconPath(":/cedar/dev/gui/icons/epuck_icon_256.png");
+  epuck_template.addNamedConfiguration("hardware", cedar::aux::Path("resource://configs/epuck/default_configuration.json"));
+  this->addRobotTemplate("epuck", epuck_template);
+
+  // khepera ---------------------------------------------------------------------------------------------------------
+  cedar::dev::RobotManager::Template khepera_template;
+  khepera_template.setIconPath(":/cedar/dev/gui/icons/khepera_icon_256.png");
+  khepera_template.addNamedConfiguration("hardware", cedar::aux::Path("resource://configs/khepera/default_configuration.json"));
+  this->addRobotTemplate("khepera", khepera_template);
+
+  this->restore();
 }
 
 cedar::dev::RobotManager::~RobotManager()
 {
+  this->store();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -318,11 +312,10 @@ void cedar::dev::RobotManager::loadRobotTemplateConfiguration
 {
   try
   {
-    auto robot_template
-      = cedar::dev::RobotManagerSingleton::getInstance()->getTemplate(this->getRobotTemplateName(robotName));
+    auto robot_template = this->getTemplate(this->getRobotTemplateName(robotName));
 
     cedar::aux::Path configuration = robot_template.getConfiguration(configurationName);
-    cedar::dev::RobotManagerSingleton::getInstance()->loadRobotConfiguration(robotName, configuration);
+    this->loadRobotConfiguration(robotName, configuration);
     this->retrieveRobotInfo(robotName).mLoadedTemplateConfiguration = configurationName;
   }
   catch (const cedar::dev::NoTemplateLoadedException&)
@@ -332,3 +325,75 @@ void cedar::dev::RobotManager::loadRobotTemplateConfiguration
         + "\" for robot \"" + robotName + "\": no template has been set for the robot.");
   }
 }
+
+void cedar::dev::RobotManager::store() const
+{
+  cedar::aux::Path config_path = cedar::aux::Path::globalCofigurationBaseDirectory() + "robots.json";
+
+  cedar::aux::ConfigurationNode root, robots;
+
+  for (auto iter = this->mRobotInfos.begin(); iter != this->mRobotInfos.end(); ++iter)
+  {
+    const std::string& robot_name = iter->first;
+    auto robot_info = iter->second;
+
+    cedar::aux::ConfigurationNode robot;
+    robot.put("name", robot_name);
+    robot.put("template name", robot_info.mTemplateName);
+    robot.put("loaded template configuration", robot_info.mLoadedTemplateConfiguration);
+    robot.put("loaded template configuration name", robot_info.mLoadedTemplateConfigurationName);
+
+    robots.push_back(cedar::aux::ConfigurationNode::value_type("robot", robot));
+  }
+
+  root.push_back(cedar::aux::ConfigurationNode::value_type("robots", robots));
+  boost::property_tree::write_json(config_path.toString(), root);
+}
+
+void cedar::dev::RobotManager::restore()
+{
+  cedar::aux::Path config_path = cedar::aux::Path::globalCofigurationBaseDirectory() + "robots.json";
+
+  cedar::aux::ConfigurationNode root, robots;
+  boost::property_tree::read_json(config_path.toString(), root);
+
+  robots = root.get_child("robots");
+
+  for(auto child_iter = robots.begin(); child_iter != robots.end(); ++child_iter)
+  {
+    if (child_iter->first != "robot")
+    {
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Unexpected node type \"" + child_iter->first + "\". Assuming this was meant to be \"robot\".",
+        "void cedar::dev::RobotManager::restore()"
+      );
+    }
+    const cedar::aux::ConfigurationNode& robot = child_iter->second;
+
+    std::string name = robot.get<std::string>("name");
+    std::string template_name = robot.get<std::string>("template name");
+    std::string loaded_template_configuration = robot.get<std::string>("loaded template configuration");
+    std::string loaded_template_configuration_name = robot.get<std::string>("loaded template configuration name");
+    if (!name.empty())
+    {
+      this->addRobotName(name);
+
+      if (!template_name.empty())
+      {
+        this->setRobotTemplateName(name, template_name);
+      }
+
+      if (!loaded_template_configuration.empty())
+      {
+        this->loadRobotTemplateConfiguration(name, loaded_template_configuration);
+      }
+
+      if (!loaded_template_configuration_name.empty())
+      {
+        this->setRobotTemplateConfigurationName(name, loaded_template_configuration_name);
+      }
+    }
+  }
+}
+
