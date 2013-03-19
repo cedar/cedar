@@ -49,6 +49,7 @@
 #include <QDropEvent>
 #include <QListWidget>
 #include <QModelIndex>
+#include <QMessageBox>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -85,9 +86,10 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
   mpRobotNameEdit = new QLineEdit();
   p_header_layout->addWidget(mpRobotNameEdit);
   mpRobotNameEdit->setText(robotName);
-  auto p_recycle_button = new QPushButton("d");
+  auto p_recycle_button = new QPushButton(QIcon(":/cedar/auxiliaries/gui/trashcan.svg"), "");
   p_recycle_button->setFixedWidth(24);
   p_recycle_button->setFixedHeight(24);
+  p_recycle_button->setIconSize(QSize(16, 16));
   p_header_layout->addWidget(p_recycle_button);
 
   // center
@@ -145,7 +147,18 @@ void cedar::dev::gui::RobotCard::setRobotTemplate(const std::string& templateNam
 
 void cedar::dev::gui::RobotCard::deleteClicked()
 {
-  cedar::dev::RobotManagerSingleton::getInstance()->removeRobot(this->getRobotName());
+  QMessageBox::StandardButton res = QMessageBox::question
+            (
+              this,
+              "Delete robot?",
+              QString::fromStdString("Are you sure you want to delete the robot \"" + this->getRobotName() + "\"?"),
+              QMessageBox::Yes | QMessageBox::No
+            );
+
+  if (res == QMessageBox::Yes)
+  {
+    cedar::dev::RobotManagerSingleton::getInstance()->removeRobot(this->getRobotName());
+  }
 }
 
 void cedar::dev::gui::RobotCard::robotRemoved(const std::string& robotName)
