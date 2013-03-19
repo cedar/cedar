@@ -76,7 +76,7 @@ public:
   virtual void closeHook();
 
   //!@brief Checks whether the port is open.
-  bool isOpen();
+  bool isOpen() const;
 
   //!@brief Returns the device path and name of the serial port.
   const std::string& getDevicePath() const;

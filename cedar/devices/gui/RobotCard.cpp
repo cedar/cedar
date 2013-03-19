@@ -40,9 +40,11 @@
 // CEDAR INCLUDES
 #include "cedar/devices/gui/RobotCard.h"
 #include "cedar/devices/RobotManager.h"
+#include "cedar/devices/Robot.h"
 #include "cedar/devices/exceptions.h"
 
 // SYSTEM INCLUDES
+#include <QApplication>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -76,12 +78,14 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
   this->setFixedWidth(200);
   this->setFrameShape(QFrame::StyledPanel);
 
+  const int contents_margins = 2;
+
   auto p_outer_layout = new QVBoxLayout();
-  p_outer_layout->setContentsMargins(2, 2, 2, 2);
+  p_outer_layout->setContentsMargins(contents_margins, contents_margins, contents_margins, contents_margins);
 
   // header
   auto p_header_layout = new QHBoxLayout();
-  p_header_layout->setContentsMargins(2, 2, 2, 2);
+  p_header_layout->setContentsMargins(contents_margins, contents_margins, contents_margins, contents_margins);
   p_outer_layout->addLayout(p_header_layout, 0);
   mpRobotNameEdit = new QLineEdit();
   p_header_layout->addWidget(mpRobotNameEdit);
@@ -97,8 +101,18 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
   p_outer_layout->addWidget(this->mpIcon, 1);
 
   // footer
+  auto p_footer_layout = new QHBoxLayout();
+  p_footer_layout->setContentsMargins(contents_margins, contents_margins, contents_margins, contents_margins);
+  p_outer_layout->addLayout(p_footer_layout, 0);
   mpConfigurationSelector = new QComboBox();
-  p_outer_layout->addWidget(mpConfigurationSelector, 0);
+  p_footer_layout->addWidget(mpConfigurationSelector, 1);
+
+  this->mpConnectButton = new QPushButton(QIcon(":/cedar/dev/gui/icons/not_connected.svg"), "");
+  QSizePolicy policy = this->mpConnectButton->sizePolicy();
+  policy.setVerticalPolicy(QSizePolicy::Expanding);
+  this->mpConnectButton->setSizePolicy(policy);
+  p_footer_layout->addWidget(this->mpConnectButton, 0);
+  QObject::connect(this->mpConnectButton, SIGNAL(clicked()), this, SLOT(connectClicked()));
 
   this->setLayout(p_outer_layout);
 
@@ -138,6 +152,54 @@ cedar::dev::gui::RobotCard::~RobotCard()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dev::gui::RobotCard::connectClicked()
+{
+  this->mpConnectButton->setEnabled(false);
+  this->mpConnectButton->setIcon(QIcon(":/cedar/dev/gui/icons/connecting.svg"));
+  this->mpConnectButton->setToolTip("");
+
+  unsigned int count;
+
+  count = 0;
+  while (QApplication::hasPendingEvents() && ++count < 1000)
+  {
+    QApplication::processEvents();
+  }
+
+  try
+  {
+    cedar::dev::RobotPtr robot = cedar::dev::RobotManagerSingleton::getInstance()->getRobot(this->getRobotName());
+    robot->openChannels();
+
+    unsigned int open = robot->countOpenChannels();
+
+    if (open == robot->getNumberOfChannels())
+    {
+      this->mpConnectButton->setIcon(QIcon(":/cedar/dev/gui/icons/connected.svg"));
+    }
+    else if (open > 0)
+    {
+      this->mpConnectButton->setIcon(QIcon(":/cedar/dev/gui/icons/partially_connected.svg"));
+    }
+    else
+    {
+      this->mpConnectButton->setIcon(QIcon(":/cedar/dev/gui/icons/not_connected.svg"));
+    }
+  }
+  catch (const cedar::aux::ExceptionBase& e)
+  {
+    this->mpConnectButton->setIcon(QIcon(":/cedar/auxiliaries/gui/error.svg"));
+    this->mpConnectButton->setToolTip(QString::fromStdString(e.exceptionInfo()));
+  }
+  catch (const std::exception& e)
+  {
+    this->mpConnectButton->setIcon(QIcon(":/cedar/auxiliaries/gui/error.svg"));
+    this->mpConnectButton->setToolTip(e.what());
+  }
+
+  this->mpConnectButton->setEnabled(true);
+}
 
 void cedar::dev::gui::RobotCard::setRobotTemplate(const std::string& templateName)
 {

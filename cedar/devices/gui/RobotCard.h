@@ -50,6 +50,7 @@
 #include <QListWidgetItem>
 #include <QComboBox>
 #include <QLineEdit>
+#include <QPushButton>
 #include <boost/signals2.hpp>
 
 
@@ -139,6 +140,8 @@ private slots:
 
   void deleteClicked();
 
+  void connectClicked();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -150,6 +153,8 @@ private:
   QLineEdit* mpRobotNameEdit;
 
   cedar::dev::gui::RobotCardIconHolder* mpIcon;
+
+  QPushButton* mpConnectButton;
 
   std::string mRobotTemplateName;
 

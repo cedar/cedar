@@ -126,6 +126,35 @@ std::ostream& cedar::dev::operator<<(std::ostream& stream, cedar::dev::RobotPtr 
   return stream;
 }
 
+void cedar::dev::Robot::openChannels()
+{
+  for (auto iter = this->mChannelInstances.begin(); iter != this->mChannelInstances.end(); ++iter)
+  {
+    cedar::dev::ChannelPtr channel = iter->second;
+    channel->open();
+  }
+}
+
+unsigned int cedar::dev::Robot::countOpenChannels() const
+{
+  unsigned int open_channels = 0;
+  for (auto iter = this->mChannelInstances.begin(); iter != this->mChannelInstances.end(); ++iter)
+  {
+    cedar::dev::ChannelPtr channel = iter->second;
+    if (channel->isOpen())
+    {
+      open_channels += 1;
+    }
+  }
+
+  return open_channels;
+}
+
+unsigned int cedar::dev::Robot::getNumberOfChannels() const
+{
+  return this->mChannelInstances.size();
+}
+
 void cedar::dev::Robot::setChannel(const std::string& channel)
 {
   for (auto slot_iter = _mComponentSlots.begin(); slot_iter != _mComponentSlots.end(); ++slot_iter)

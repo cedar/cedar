@@ -138,6 +138,18 @@ public:
     return boost::dynamic_pointer_cast<T>(component);
   }
 
+  /*!@brief Opens all channels that are in use.
+   */
+  void openChannels();
+
+  /*!@brief Returns the number of channels that are open.
+   */
+  unsigned int countOpenChannels() const;
+
+  /*!@brief Returns the overall number of channels.
+   */
+  unsigned int getNumberOfChannels() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

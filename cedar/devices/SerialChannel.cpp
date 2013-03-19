@@ -325,7 +325,7 @@ void cedar::dev::SerialChannel::updateCommandDelimiter()
   this->setCommandDelimiter(_mEscapedCommandDelimiter->getValue());
 }
 
-bool cedar::dev::SerialChannel::isOpen()
+bool cedar::dev::SerialChannel::isOpen() const
 {
   return mPort.is_open();
 }

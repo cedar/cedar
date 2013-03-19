@@ -87,6 +87,9 @@ public:
   //!@brief Closes the channel.
   void close();
 
+  //!@brief Returns whether the channel is open.
+  virtual bool isOpen() const = 0;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -121,6 +124,7 @@ private:
 protected:
   //! read/write lock for the channel
   QReadWriteLock mLock;
+
 private:
   // none yet
 
