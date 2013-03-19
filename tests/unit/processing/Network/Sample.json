@@ -1,0 +1,17 @@
+{
+  "required":
+  [
+    "TestModule"
+  ],
+  "steps":
+  {
+    "TestModule":
+    {
+      "name": "stepA"
+    },
+    "TestModule":
+    {
+      "name": "stepB"
+    }
+  }
+}
