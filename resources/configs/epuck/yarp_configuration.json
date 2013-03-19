@@ -1,5 +1,5 @@
 {
-  "name": "default e-puck robot",
+  "name": "webots",
   "description file": "configs/epuck/description.json",
   "component slots":
   {

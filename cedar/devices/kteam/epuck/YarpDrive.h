@@ -112,6 +112,8 @@ protected:
   // none yet
 private:
   YarpMatChannelPtr mYarpChannel;
+  std::string mMotorCommandPortWithPrefix;
+  std::string mEncoderValuesPortWithPrefix;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

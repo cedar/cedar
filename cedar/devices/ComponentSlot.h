@@ -44,13 +44,13 @@
 #include "cedar/auxiliaries/MapParameter.h"
 
 // SYSTEM INCLUDES
-
+#include <boost/enable_shared_from_this.hpp>
 
 /*!@brief Slot for a single robot component.
  *
  * @todo More detailed description of the class.
  */
-class cedar::dev::ComponentSlot : public cedar::aux::Configurable
+class cedar::dev::ComponentSlot : public cedar::aux::Configurable, public boost::enable_shared_from_this<cedar::dev::ComponentSlot>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // friends
