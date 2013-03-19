@@ -48,6 +48,7 @@
 #include "cedar/devices/kteam/Drive.h"
 #include "cedar/devices/kteam/epuck/namespace.h"
 #include "cedar/devices/YarpChannel.h"
+#include "cedar/auxiliaries/StringParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -89,6 +90,8 @@ public:
    */
   void setEncoders(const std::vector<int>& encoders);
 
+  void open();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -117,7 +120,8 @@ protected:
   // none yet
 
 private:
-  // none yet
+  cedar::aux::StringParameterPtr _mMotorCommandsPort;
+  cedar::aux::StringParameterPtr _mEncoderValuesPort;
 
 }; // class cedar::dev::kteam::epuck::YarpDrive
 
