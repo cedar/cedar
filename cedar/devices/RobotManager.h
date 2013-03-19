@@ -43,6 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/devices/namespace.h"
 #include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/Path.h"
 
 // SYSTEM INCLUDES
 #include <boost/signals2.hpp>
@@ -66,7 +67,7 @@ public:
   class Template
   {
     public:
-      void addNamedResource(const std::string& name, const std::string& resourcePath);
+      void addNamedConfiguration(const std::string& name, const cedar::aux::Path& resource);
 
       std::vector<std::string> getConfigurationNames() const;
 
@@ -80,10 +81,10 @@ public:
         return this->mIconPath;
       }
 
-      std::string getConfiguration(const std::string& name) const;
+      cedar::aux::Path getConfiguration(const std::string& name) const;
 
     private:
-      std::map<std::string, std::string> mNamedResourcePaths;
+      std::map<std::string, cedar::aux::Path> mNamedPaths;
 
       std::string mIconPath;
   };
@@ -111,7 +112,7 @@ public:
 
   void removeRobot(const std::string& robotName);
 
-  void loadRobotConfigurationFromResource(const std::string& robotName, const std::string& resourcePath);
+  void loadRobotConfiguration(const std::string& robotName, const cedar::aux::Path& configuration);
 
   void loadRobotTemplateConfiguration(const std::string& robotName, const std::string& configurationName);
 
@@ -196,6 +197,12 @@ private:
     }
   }
 
+  //! Saves the state of the robot manager to a file.
+  void store() const;
+
+  //! Restores the state of the robot manager.
+  void restore();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -204,7 +211,7 @@ protected:
 private:
   std::map<std::string, cedar::dev::RobotPtr> mRobotInstances;
 
-  std::map<std::string, std::string> mRobotResourceConfigurations;
+  std::map<std::string, cedar::aux::Path> mRobotConfigurations;
 
   //! An association from robot names to the template that have been set for them.
   std::map<std::string, RobotInfo> mRobotInfos;

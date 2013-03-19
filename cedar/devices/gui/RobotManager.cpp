@@ -274,14 +274,14 @@ void cedar::dev::gui::RobotManager::loadConfigurationFromResourceTriggered()
 {
   std::vector<std::string> extensions;
   extensions.push_back(".json");
-  std::string resource = cedar::aux::gui::ResourceDialog::openResource(this, extensions);
+  cedar::aux::Path resource = cedar::aux::gui::ResourceDialog::openResource(this, extensions);
 
-  if (!resource.empty())
+  if (!resource.isEmpty())
   {
     std::string robot_name = this->getSelectedRobotName();
     try
     {
-      cedar::dev::RobotManagerSingleton::getInstance()->loadRobotConfigurationFromResource(robot_name, resource);
+      cedar::dev::RobotManagerSingleton::getInstance()->loadRobotConfiguration(robot_name, resource);
     }
     catch (const cedar::aux::ResourceNotFoundException& e)
     {
