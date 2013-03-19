@@ -135,6 +135,8 @@ protected:
 private:
   void robotRemoved(const std::string& robotName);
 
+  void updateConnectionIcon();
+
 private slots:
   void selectedConfigurationChanged(int index);
 

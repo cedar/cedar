@@ -142,6 +142,10 @@ public:
    */
   void openChannels();
 
+  /*!@brief Closes all channels that are in use.
+   */
+  void closeChannels();
+
   /*!@brief Returns the number of channels that are open.
    */
   unsigned int countOpenChannels() const;
