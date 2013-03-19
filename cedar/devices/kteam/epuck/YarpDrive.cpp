@@ -45,6 +45,8 @@
 #include "cedar/devices/kteam/epuck/YarpDrive.h"
 #include "cedar/devices/YarpChannel.h"
 #include "cedar/devices/kteam/serialChannelHelperFunctions.h"
+#include "cedar/devices/ComponentSlot.h"
+#include "cedar/devices/Robot.h"
 
 // SYSTEM INCLUDES
 
@@ -97,9 +99,13 @@ cedar::dev::kteam::epuck::YarpDrive::~YarpDrive()
 
 void cedar::dev::kteam::epuck::YarpDrive::open()
 {
+  CEDAR_ASSERT(this->getChannel());
   mYarpChannel = boost::dynamic_pointer_cast<YarpMatChannel>(this->getChannel());
-  mYarpChannel->addWriterPort(_mMotorCommandsPort->getValue());
-  mYarpChannel->addReaderPort(_mEncoderValuesPort->getValue());
+  std::string robot_name = this->getSlot().lock()->getRobot()->getName() + "/";
+  mMotorCommandPortWithPrefix = robot_name + _mMotorCommandsPort->getValue();
+  mEncoderValuesPortWithPrefix = robot_name + _mEncoderValuesPort->getValue();
+  mYarpChannel->addWriterPort(mMotorCommandPortWithPrefix);
+  mYarpChannel->addReaderPort(mEncoderValuesPortWithPrefix);
   mYarpChannel->open();
 }
 
@@ -109,7 +115,7 @@ std::vector<int> cedar::dev::kteam::epuck::YarpDrive::getEncoders() const
   std::vector<int> encoders;
   try
   {
-    encoder_matrix = mYarpChannel->read(_mEncoderValuesPort->getValue());
+    encoder_matrix = mYarpChannel->read(mEncoderValuesPortWithPrefix);
     if (!encoder_matrix.empty())
     {
       encoders.push_back(encoder_matrix.at<float>(0,0));
@@ -137,6 +143,6 @@ void cedar::dev::kteam::epuck::YarpDrive::sendMovementCommand()
   cv::Mat velocities(2, 1, CV_32F);
   velocities.at<float>(0,0) = static_cast<int>(wheel_speed_pulses[0] / cedar::unit::DEFAULT_FREQUENCY_UNIT);
   velocities.at<float>(1,0) = static_cast<int>(wheel_speed_pulses[1] / cedar::unit::DEFAULT_FREQUENCY_UNIT);
-  mYarpChannel->write(velocities, _mMotorCommandsPort->getValue());
+  mYarpChannel->write(velocities, mMotorCommandPortWithPrefix);
 }
 #endif
