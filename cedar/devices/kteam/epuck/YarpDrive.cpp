@@ -43,7 +43,7 @@
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/devices/kteam/epuck/YarpDrive.h"
-#include "cedar/devices/kteam/SerialChannel.h"
+#include "cedar/devices/YarpChannel.h"
 #include "cedar/devices/kteam/serialChannelHelperFunctions.h"
 
 // SYSTEM INCLUDES
@@ -69,6 +69,9 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::dev::kteam::epuck::YarpDrive::YarpDrive()
+:
+_mMotorCommandsPort(new cedar::aux::StringParameter(this, "motor commands port", "motorCommands")),
+_mEncoderValuesPort(new cedar::aux::StringParameter(this, "encoder values port", "encoderValues"))
 {
 }
 
@@ -94,6 +97,7 @@ cedar::dev::kteam::epuck::YarpDrive::~YarpDrive()
 
 void cedar::dev::kteam::epuck::YarpDrive::open()
 {
+  mYarpChannel = boost::dynamic_pointer_cast<YarpMatChannel>(this->getChannel());
   mYarpChannel->addWriterPort(_mMotorCommandsPort->getValue());
   mYarpChannel->addReaderPort(_mEncoderValuesPort->getValue());
   mYarpChannel->open();
