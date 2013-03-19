@@ -119,6 +119,25 @@ int main()
   // the number of errors encountered in this test
   int errors = 0;
 
+  // compilation tests
+  {
+    cedar::aux::Path path_1 = "this/is/a/test/of/the const char assignment operator";
+    std::cout << path_1 << std::endl;
+
+    cedar::aux::Path path_2 = std::string("this/is/a/test/of/the string assignment operator");
+    std::cout << path_2 << std::endl;
+
+    cedar::aux::Path path_3 = path_1 + "add/test";
+    std::cout << path_3 << std::endl;
+
+    cedar::aux::Path path_4 = path_1 + std::string("add/test");
+    std::cout << path_4 << std::endl;
+
+    cedar::aux::Path path_5 = "path 1/" + std::string("add/test");
+    std::cout << path_5 << std::endl;
+  }
+
+  // functionality tests
   errors += test_invalid_path("wrong:path");
   errors += test_path("relative://rel/test/path", "relative", "rel/test/path", false);
   errors += test_path("absolute:///abs/test/path", "absolute", "/abs/test/path", false);
