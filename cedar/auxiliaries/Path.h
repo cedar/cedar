@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ResourceDialog.h
+    File:        Path.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 02 27
+    Date:        2013 03 15
 
     Description:
 
@@ -34,29 +34,23 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_RESOURCE_DIALOG_H
-#define CEDAR_AUX_GUI_RESOURCE_DIALOG_H
+#ifndef CEDAR_AUX_PATH_H
+#define CEDAR_AUX_PATH_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/ui_ResourceDialog.h"
-#include "cedar/auxiliaries/Path.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
-#include <QFileIconProvider>
+#include <deque>
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief A class for representing paths to files and directories.
  */
-class cedar::aux::gui::ResourceDialog : public QDialog, public Ui_ResourceDialog
+class cedar::aux::Path
 {
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -66,24 +60,46 @@ class cedar::aux::gui::ResourceDialog : public QDialog, public Ui_ResourceDialog
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ResourceDialog
-  (
-    QWidget* pParent = NULL,
-    const std::vector<std::string>& extensions = std::vector<std::string>()
-  );
+  Path(const std::string& path = std::string());
 
   //!@brief Destructor
-  virtual ~ResourceDialog();
+  virtual ~Path();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  static cedar::aux::Path openResource
-  (
-    QWidget* pParent = NULL,
-    const std::vector<std::string>& extensions = std::vector<std::string>()
-  );
+  /*!@brief Returns the absolute path to the file/directory stored in this path.
+   *
+   *        If the stored path is a resource, the location of the resource is looked up.
+   */
+  cedar::aux::Path absolute() const;
+
+  //! Returns true if the stored path is a path to a resource, false otherwise.
+  bool isResource() const;
+
+  bool isAbsolute() const;
+
+  //! Returns true if there are no entries in this path, i.e., the path is "".
+  bool isEmpty() const;
+
+  //! Sets the stored path from a string.
+  void setPath(const std::string& path);
+
+  //! Returns the stored protocol.
+  const std::string& getProtocol() const;
+
+  //! Returns a string representation of the path.
+  std::string toString(bool withProtocol = false) const;
+
+  //! Appends the given path to this one.
+  cedar::aux::Path operator+ (const std::string& other) const;
+
+  //! Appends the given path to this one.
+  cedar::aux::Path operator+ (const cedar::aux::Path& other) const;
+
+  //! Returns the base directory for storing global cedar settings.
+  static cedar::aux::Path globalCofigurationBaseDirectory();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -95,21 +111,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void fill();
-
-  void removeEmpty(QTreeWidgetItem* pParent);
-
-  void appendDirectories(const std::string& path, QTreeWidgetItem* pParent);
-  void appendFiles(const std::string& path, QTreeWidgetItem* pParent);
-
-  QTreeWidgetItem* findPathNode(const std::string& relativePath, QTreeWidgetItem* pParent = NULL) const;
-
-  void setTextFromItem(QTreeWidgetItem* pItem);
-
-private slots:
-  void itemSelected();
-
-  void itemActivated(QTreeWidgetItem* pItem, int);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -117,23 +119,16 @@ private slots:
 protected:
   // none yet
 private:
-  std::vector<std::string> mExtensions;
+  //! The protocol used for finding the absolute path. Can be: resource, absolute, relative
+  std::string mProtocol;
 
-  QFileIconProvider* mIconProvider;
+  //! Components of the path.
+  std::deque<std::string> mComponents;
 
-  static const int ITEM_TYPE_FOLDER;
-  static const int ITEM_TYPE_FILE;
+  static const std::string M_PROTOCOL_ABSOLUTE_STR;
+  static const std::string M_PROTOCOL_RESOURCE_STR;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
+}; // class cedar::aux::Path
 
-private:
-  // none yet
-
-}; // class cedar::aux::gui::ResourceDialog
-
-#endif // CEDAR_AUX_GUI_RESOURCE_DIALOG_H
+#endif // CEDAR_AUX_PATH_H
 

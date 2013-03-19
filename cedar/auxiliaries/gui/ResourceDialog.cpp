@@ -337,11 +337,11 @@ QTreeWidgetItem* cedar::aux::gui::ResourceDialog::findPathNode
 }
 
 
-std::string cedar::aux::gui::ResourceDialog::openResource
-            (
-              QWidget* pParent,
-              const std::vector<std::string>& extensions
-            )
+cedar::aux::Path cedar::aux::gui::ResourceDialog::openResource
+                 (
+                   QWidget* pParent,
+                   const std::vector<std::string>& extensions
+                 )
 {
   cedar::aux::gui::ResourceDialog* p_dialog = new cedar::aux::gui::ResourceDialog(pParent, extensions);
 
@@ -349,10 +349,10 @@ std::string cedar::aux::gui::ResourceDialog::openResource
 
   if (res == QDialog::Accepted)
   {
-    return p_dialog->mpSelectedText->text().toStdString();
+    return cedar::aux::Path("resource://" + p_dialog->mpSelectedText->text().toStdString());
   }
   else
   {
-    return std::string();
+    return cedar::aux::Path();
   }
 }
