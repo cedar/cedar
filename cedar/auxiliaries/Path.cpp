@@ -58,9 +58,18 @@ const std::string cedar::aux::Path::M_PROTOCOL_RESOURCE_STR = "resource";
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::aux::Path::Path()
+{
+}
+
 cedar::aux::Path::Path(const std::string& path)
 {
   this->setPath(path);
+}
+
+cedar::aux::Path::Path(const char* path)
+{
+  this->setPath(std::string(path));
 }
 
 cedar::aux::Path::~Path()
@@ -281,17 +290,23 @@ const std::string& cedar::aux::Path::getProtocol() const
   return this->mProtocol;
 }
 
-cedar::aux::Path cedar::aux::Path::operator+ (const std::string& other) const
-{
-  cedar::aux::Path other_path(other);
-  return this->operator +(other_path);
-}
-
 cedar::aux::Path cedar::aux::Path::operator+ (const cedar::aux::Path& other) const
 {
   cedar::aux::Path combined = *this;
   combined.mComponents.insert(combined.mComponents.end(), other.mComponents.begin(), other.mComponents.end());
   return combined;
+}
+
+cedar::aux::Path& cedar::aux::Path::operator= (const std::string& pathStr)
+{
+  this->setPath(pathStr);
+  return *this;
+}
+
+cedar::aux::Path& cedar::aux::Path::operator= (const char* pathStr)
+{
+  this->setPath(std::string(pathStr));
+  return *this;
 }
 
 cedar::aux::Path cedar::aux::Path::globalCofigurationBaseDirectory()

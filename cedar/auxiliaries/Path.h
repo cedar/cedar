@@ -52,15 +52,26 @@
 class cedar::aux::Path
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // friends
   //--------------------------------------------------------------------------------------------------------------------
+  friend std::ostream& operator<<(std::ostream& stream, const cedar::aux::Path& path)
+  {
+    stream << path.toString();
+    return stream;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  Path(const std::string& path = std::string());
+  //!@brief The default constructor.
+  Path();
+
+  //!@brief Constructor that reads a path from a std::string.
+  Path(const std::string& path);
+
+  //!@brief Constructor that reads a path from a const char* string.
+  Path(const char* path);
 
   //!@brief Destructor
   virtual ~Path();
@@ -89,17 +100,20 @@ public:
   //! Returns the stored protocol.
   const std::string& getProtocol() const;
 
+  //! Returns the base directory for storing global cedar settings.
+  static cedar::aux::Path globalCofigurationBaseDirectory();
+
   //! Returns a string representation of the path.
   std::string toString(bool withProtocol = false) const;
 
   //! Appends the given path to this one.
-  cedar::aux::Path operator+ (const std::string& other) const;
-
-  //! Appends the given path to this one.
   cedar::aux::Path operator+ (const cedar::aux::Path& other) const;
 
-  //! Returns the base directory for storing global cedar settings.
-  static cedar::aux::Path globalCofigurationBaseDirectory();
+  //! Assigns a path.
+  cedar::aux::Path& operator= (const std::string& pathStr);
+
+  //! Assigns a path.
+  cedar::aux::Path& operator= (const char* pathStr);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
