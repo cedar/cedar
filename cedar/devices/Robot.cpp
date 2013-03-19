@@ -135,6 +135,15 @@ void cedar::dev::Robot::openChannels()
   }
 }
 
+void cedar::dev::Robot::closeChannels()
+{
+  for (auto iter = this->mChannelInstances.begin(); iter != this->mChannelInstances.end(); ++iter)
+  {
+    cedar::dev::ChannelPtr channel = iter->second;
+    channel->close();
+  }
+}
+
 unsigned int cedar::dev::Robot::countOpenChannels() const
 {
   unsigned int open_channels = 0;

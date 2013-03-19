@@ -131,6 +131,8 @@ cedar::dev::gui::RobotCard::RobotCard(const QString& robotName)
   {
     // ok -- nothing to do here
   }
+
+  this->updateConnectionIcon();
 }
 
 cedar::dev::gui::RobotCardIconHolder::RobotCardIconHolder(cedar::dev::gui::RobotCard* pCard)
@@ -153,6 +155,25 @@ cedar::dev::gui::RobotCard::~RobotCard()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::dev::gui::RobotCard::updateConnectionIcon()
+{
+  cedar::dev::RobotPtr robot = cedar::dev::RobotManagerSingleton::getInstance()->getRobot(this->getRobotName());
+  unsigned int open = robot->countOpenChannels();
+
+  if (open > 0 && open == robot->getNumberOfChannels())
+  {
+    this->mpConnectButton->setIcon(QIcon(":/cedar/dev/gui/icons/connected.svg"));
+  }
+  else if (open > 0)
+  {
+    this->mpConnectButton->setIcon(QIcon(":/cedar/dev/gui/icons/partially_connected.svg"));
+  }
+  else
+  {
+    this->mpConnectButton->setIcon(QIcon(":/cedar/dev/gui/icons/not_connected.svg"));
+  }
+}
+
 void cedar::dev::gui::RobotCard::connectClicked()
 {
   this->mpConnectButton->setEnabled(false);
@@ -170,22 +191,18 @@ void cedar::dev::gui::RobotCard::connectClicked()
   try
   {
     cedar::dev::RobotPtr robot = cedar::dev::RobotManagerSingleton::getInstance()->getRobot(this->getRobotName());
-    robot->openChannels();
-
     unsigned int open = robot->countOpenChannels();
 
-    if (open == robot->getNumberOfChannels())
+    if (open == 0)
     {
-      this->mpConnectButton->setIcon(QIcon(":/cedar/dev/gui/icons/connected.svg"));
-    }
-    else if (open > 0)
-    {
-      this->mpConnectButton->setIcon(QIcon(":/cedar/dev/gui/icons/partially_connected.svg"));
+      robot->openChannels();
     }
     else
     {
-      this->mpConnectButton->setIcon(QIcon(":/cedar/dev/gui/icons/not_connected.svg"));
+      robot->closeChannels();
     }
+
+    this->updateConnectionIcon();
   }
   catch (const cedar::aux::ExceptionBase& e)
   {
