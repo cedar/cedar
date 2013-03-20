@@ -80,6 +80,8 @@ public:
   //!@brief Returns the current readings of the sensor.
   virtual cv::Mat getData();
 
+  virtual void updateMeasuredValues();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -108,6 +110,9 @@ protected:
 
 private:
   cedar::aux::StringParameterPtr _mCommandGetInfrared;
+
+  //!@todo Should this be some kind of unit data?
+  cedar::aux::MatDataPtr mValues;
 
 }; // class cedar::dev::kteam::InfraredSensorSerial
 

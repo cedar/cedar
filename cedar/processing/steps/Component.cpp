@@ -41,6 +41,7 @@
 #include "cedar/processing/steps/Component.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/devices/Component.h"
 
 // SYSTEM INCLUDES
 
@@ -83,6 +84,7 @@ cedar::proc::steps::Component::Component()
 :
 _mComponent(new cedar::dev::ComponentParameter(this, "component"))
 {
+  QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SLOT(componentChanged()));
 }
 
 cedar::proc::steps::Component::~Component()
@@ -95,5 +97,40 @@ cedar::proc::steps::Component::~Component()
 
 void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
 {
-  // TODO
+  this->getComponent()->updateMeasuredValues();
+}
+
+void cedar::proc::steps::Component::componentChanged()
+{
+  cedar::dev::ComponentPtr component = this->_mComponent->getValue();
+
+  // static because this doesn't change for different instances
+  static std::vector<cedar::dev::Component::DataType> types;
+  if (types.empty())
+  {
+    types.push_back(cedar::dev::Component::COMMANDED);
+    types.push_back(cedar::dev::Component::MEASURED);
+  }
+
+  for (auto type_it = types.begin(); type_it != types.end(); ++type_it)
+  {
+    cedar::dev::Component::DataType type = *type_it;
+
+    std::vector<std::string> data_names = component->getDataNames(type);
+
+    for (auto name_iter = data_names.begin(); name_iter != data_names.end(); ++name_iter)
+    {
+      const std::string& name = *name_iter;
+      switch (type)
+      {
+        case cedar::dev::Component::COMMANDED:
+          this->declareInput(name);
+          break;
+
+        case cedar::dev::Component::MEASURED:
+          this->declareOutput(name, component->getMeasuredData(name));
+          break;
+      }
+    }
+  }
 }
