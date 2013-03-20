@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,44 +22,40 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        YarpChannel.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2012 11 26
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2013 03 19
 
-    Description: Namespace file for cedar::dev::kteam::epuck.
+    Description: Communication channel for a component or device over Yarp.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KTEAM_EPUCK_NAMESPACE_H
-#define CEDAR_DEV_KTEAM_EPUCK_NAMESPACE_H
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_YARP
 
 // CEDAR INCLUDES
-#include "cedar/devices/lib.h"
+#include "cedar/devices/YarpChannel.h"
 
-// SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
+//----------------------------------------------------------------------------------------------------------------------
+// type registration
+//----------------------------------------------------------------------------------------------------------------------
 
-namespace cedar
+namespace
 {
-  namespace dev
+  bool registered()
   {
-    namespace kteam
-    {
-      namespace epuck
-      {
-        //!@cond SKIPPED_DOCUMENTATION
-        CEDAR_DECLARE_DEV_CLASS(AccelerationSensorSerial);
-        //!@endcond
-#ifdef CEDAR_USE_YARP
-        CEDAR_DECLARE_DEV_CLASS(YarpDrive);
-#endif // CEDAR_USE_YARP
-      }
-    }
+    cedar::dev::ChannelManagerSingleton::getInstance()->
+        registerType<boost::shared_ptr<cedar::dev::YarpChannel<cv::Mat> > >();
+    return true;
   }
+
+  bool registerFnCall = registered();
 }
 
-#endif // CEDAR_DEV_KTEAM_EPUCK_NAMESPACE_H
+#endif // CEDAR_USE_YARP

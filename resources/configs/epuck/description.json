@@ -13,6 +13,14 @@
             "command set encoder": "P",
             "command get encoder": "Q"
           }
+        },
+        "yarp":
+        {
+          "cedar.dev.kteam.epuck.YarpDrive":
+          {
+            "motor commands port": "motorCommands",
+            "encoder values port": "encoderValues"
+          }
         }
       },
       "common component parameters":
@@ -97,6 +105,7 @@
   },
   "channels":
   {
-    "serial": "cedar.dev.kteam.SerialChannel"
+    "serial": "cedar.dev.kteam.SerialChannel",
+    "yarp": "cedar.dev.YarpChannel<cv.Mat>"
   }
 }
