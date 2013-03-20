@@ -55,6 +55,11 @@ class cedar::dev::SerialCommunicationException : public cedar::aux::ExceptionBas
 {
 }; // class cedar::dev::SerialCommunicationException
 
+//!@brief Exception that occurs when something goes wrong during any communication with a robot.
+class cedar::dev::CommunicationException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::dev::CommunicationException
+
 //!@brief Exception that occurs when a timeout expires.
 class cedar::dev::TimeoutException : public cedar::aux::ExceptionBase
 {

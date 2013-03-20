@@ -192,6 +192,7 @@ cedar::dev::ComponentPtr cedar::dev::ComponentSlot::getComponent()
     std::string channel_type = _mChannelType->getValue();
     std::string component_type_id = mComponentTypeIds[channel_type];
     mComponent = FactorySingleton::getInstance()->allocate(component_type_id);
+    mComponent->setSlot(this->shared_from_this());
   }
 
   return mComponent;

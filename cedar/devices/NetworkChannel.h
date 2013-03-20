@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,126 +22,76 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Component.h
+    File:        NetworkChannel.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2012 11 23
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2013 03 06
 
-    Description: Abstract component of a robot (e.g., a kinematic chain).
+    Description: Communication channel for a component or device over network.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_DEV_NETWORK_CHANNEL_H
+#define CEDAR_DEV_NETWORK_CHANNEL_H
 
-#ifndef CEDAR_DEV_COMPONENT_H
-#define CEDAR_DEV_COMPONENT_H
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/devices/namespace.h"
 #include "cedar/devices/Channel.h"
+#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief Base class for components of robots.
+/*!@brief Communication channel for a component or device over network.
  *
- * @todo More detailed description of the class.
+ * @todo describe more.
  */
-class cedar::dev::Component : public cedar::aux::NamedConfigurable
+class cedar::dev::NetworkChannel : public cedar::dev::Channel
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // friends
-  //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::dev::ComponentSlot;
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  enum DataType
-  {
-    MEASURED,
-    COMMANDED
-  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Constructor
-  Component();
-
-  //!@brief Constructor taking an externally created channel
-  Component(cedar::dev::ChannelPtr channel);
-
-  //!@brief Destructor
-  ~Component();
+  //!@brief The standard constructor.
+  NetworkChannel();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Returns the channel associated with the component.
-  inline cedar::dev::ChannelPtr getChannel() const
-  {
-    return mChannel;
-  }
-
-  inline void setChannel(cedar::dev::ChannelPtr channel)
-  {
-    this->mChannel = channel;
-  }
-
-  std::vector<std::string> getDataNames(cedar::dev::Component::DataType type) const;
-
-  cedar::aux::DataPtr getCommandedData(const std::string& name) const;
-
-  cedar::aux::DataPtr getMeasuredData(const std::string& name) const;
-
-  //!@todo This needs proper design - supply an update function for each measured data via boost bind, make this non-virtual?
-  virtual void updateMeasuredValues();
+  const std::string& getIPAddress() const;
+  unsigned int getPort() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  inline cedar::dev::ComponentSlotWeakPtr getSlot()
-  {
-    return this->mSlot;
-  }
-
-  inline void setSlot(cedar::dev::ComponentSlotWeakPtr slot)
-  {
-    this->mSlot = slot;
-  }
- 
-  void addCommandedData(const std::string& name, cedar::aux::DataPtr data);
-
-  void addMeasuredData(const std::string& name, cedar::aux::DataPtr data);
+  void setIPAddress(const std::string& ip);
+  void setPort(unsigned int port);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void addData(cedar::dev::Component::DataType type, const std::string& name, cedar::aux::DataPtr data);
-
-  cedar::aux::DataPtr getData(cedar::dev::Component::DataType type, const std::string& name) const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-
 private:
-  //! channel of communication
-  cedar::dev::ChannelPtr mChannel;
-  cedar::dev::ComponentSlotWeakPtr mSlot;
-
-  //! The data of the channel, i.e., measured and commanded values.
-  std::map<cedar::dev::Component::DataType, std::map<std::string, cedar::aux::DataPtr> > mData;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -149,29 +99,10 @@ private:
 protected:
   // none yet
 private:
-  // none yet
-}; // class cedar::dev::Component
+  cedar::aux::StringParameterPtr _mIPAddress;
+  cedar::aux::UIntParameterPtr _mPort;
 
+}; // class cedar::dev::NetworkChannel
 
-// Code for the component factory manager ==============================================================================
+#endif // CEDAR_DEV_NETWORK_CHANNEL_H
 
-#include "cedar/auxiliaries/FactoryManager.h"
-
-
-namespace cedar
-{
-  namespace dev
-  {
-    //!@brief The manager of all sigmoind instances
-    typedef cedar::aux::FactoryManager<cedar::dev::ComponentPtr> ComponentManager;
-
-    //!@brief The singleton object of the TransferFunctionFactory.
-    typedef cedar::aux::Singleton<cedar::dev::ComponentManager> ComponentManagerSingleton;
-
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_INSTANTIATE_DEV_TEMPLATE(cedar::aux::Singleton<cedar::dev::ComponentManager>);
-    //!@endcond
-  }
-}
-
-#endif // CEDAR_DEV_COMPONENT_H

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,156 +22,112 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Component.h
+    File:        YarpDrive.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2012 11 23
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2013 03 06
 
-    Description: Abstract component of a robot (e.g., a kinematic chain).
+    Description: Yarp implementation of an epuck drive.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_DEV_KTEAM_EPUCK_YARP_DRIVE_H
+#define CEDAR_DEV_KTEAM_EPUCK_YARP_DRIVE_H
 
-#ifndef CEDAR_DEV_COMPONENT_H
-#define CEDAR_DEV_COMPONENT_H
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_YARP
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/NamedConfigurable.h"
-#include "cedar/devices/namespace.h"
-#include "cedar/devices/Channel.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/devices/kteam/namespace.h"
+#include "cedar/devices/kteam/Drive.h"
+#include "cedar/devices/kteam/epuck/namespace.h"
+#include "cedar/devices/YarpChannel.h"
+#include "cedar/auxiliaries/StringParameter.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief Base class for components of robots.
- *
- * @todo More detailed description of the class.
- */
-class cedar::dev::Component : public cedar::aux::NamedConfigurable
-{
-  //--------------------------------------------------------------------------------------------------------------------
-  // friends
-  //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::dev::ComponentSlot;
 
+/*!@brief Yarp implementation of an epuck drive.
+ *
+ * @todo describe more.
+ */
+class cedar::dev::kteam::epuck::YarpDrive : public cedar::dev::kteam::Drive
+{
+public:
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  enum DataType
-  {
-    MEASURED,
-    COMMANDED
-  };
-
+  typedef cedar::dev::YarpChannel<cv::Mat> YarpMatChannel;
+  CEDAR_GENERATE_POINTER_TYPES(YarpMatChannel);
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Constructor
-  Component();
+  //!@brief The standard constructor.
+  YarpDrive();
 
-  //!@brief Constructor taking an externally created channel
-  Component(cedar::dev::ChannelPtr channel);
+  //!@brief Constructor taking an externally created channel.
+  YarpDrive(YarpMatChannelPtr channel);
 
   //!@brief Destructor
-  ~Component();
+  virtual ~YarpDrive();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Returns the channel associated with the component.
-  inline cedar::dev::ChannelPtr getChannel() const
-  {
-    return mChannel;
-  }
+  //!@brief Returns the current encoder value of the left and right wheel.
+  std::vector<int> getEncoders() const;
 
-  inline void setChannel(cedar::dev::ChannelPtr channel)
-  {
-    this->mChannel = channel;
-  }
+  /*!@brief Sets the encoder values of both wheels.
+   * @param[in] encoders encoder value for the left and right wheel
+   */
+  void setEncoders(const std::vector<int>& encoders);
 
-  std::vector<std::string> getDataNames(cedar::dev::Component::DataType type) const;
-
-  cedar::aux::DataPtr getCommandedData(const std::string& name) const;
-
-  cedar::aux::DataPtr getMeasuredData(const std::string& name) const;
-
-  //!@todo This needs proper design - supply an update function for each measured data via boost bind, make this non-virtual?
-  virtual void updateMeasuredValues();
+  void open();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  inline cedar::dev::ComponentSlotWeakPtr getSlot()
-  {
-    return this->mSlot;
-  }
-
-  inline void setSlot(cedar::dev::ComponentSlotWeakPtr slot)
-  {
-    this->mSlot = slot;
-  }
- 
-  void addCommandedData(const std::string& name, cedar::aux::DataPtr data);
-
-  void addMeasuredData(const std::string& name, cedar::aux::DataPtr data);
+  //! @see cedar::dev::Locomotion.
+  void sendMovementCommand();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void addData(cedar::dev::Component::DataType type, const std::string& name, cedar::aux::DataPtr data);
-
-  cedar::aux::DataPtr getData(cedar::dev::Component::DataType type, const std::string& name) const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-
 private:
-  //! channel of communication
-  cedar::dev::ChannelPtr mChannel;
-  cedar::dev::ComponentSlotWeakPtr mSlot;
-
-  //! The data of the channel, i.e., measured and commanded values.
-  std::map<cedar::dev::Component::DataType, std::map<std::string, cedar::aux::DataPtr> > mData;
+  YarpMatChannelPtr mYarpChannel;
+  std::string mMotorCommandPortWithPrefix;
+  std::string mEncoderValuesPortWithPrefix;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 private:
-  // none yet
-}; // class cedar::dev::Component
+  cedar::aux::StringParameterPtr _mMotorCommandsPort;
+  cedar::aux::StringParameterPtr _mEncoderValuesPort;
 
+}; // class cedar::dev::kteam::epuck::YarpDrive
 
-// Code for the component factory manager ==============================================================================
+#endif // CEDAR_USE_YARP
 
-#include "cedar/auxiliaries/FactoryManager.h"
+#endif // CEDAR_DEV_KTEAM_EPUCK_YARP_DRIVE_H
 
-
-namespace cedar
-{
-  namespace dev
-  {
-    //!@brief The manager of all sigmoind instances
-    typedef cedar::aux::FactoryManager<cedar::dev::ComponentPtr> ComponentManager;
-
-    //!@brief The singleton object of the TransferFunctionFactory.
-    typedef cedar::aux::Singleton<cedar::dev::ComponentManager> ComponentManagerSingleton;
-
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_INSTANTIATE_DEV_TEMPLATE(cedar::aux::Singleton<cedar::dev::ComponentManager>);
-    //!@endcond
-  }
-}
-
-#endif // CEDAR_DEV_COMPONENT_H
