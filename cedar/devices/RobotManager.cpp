@@ -58,7 +58,8 @@ cedar::dev::RobotManager::RobotManager()
   // epuck -----------------------------------------------------------------------------------------------------------
   cedar::dev::RobotManager::Template epuck_template;
   epuck_template.setIconPath(":/cedar/dev/gui/icons/epuck_icon_256.png");
-  epuck_template.addNamedConfiguration("hardware", cedar::aux::Path("resource://configs/epuck/default_configuration.json"));
+  epuck_template.addNamedConfiguration("hardware", cedar::aux::Path("resource://configs/epuck/hardware_configuration.json"));
+  epuck_template.addNamedConfiguration("yarp/webots", cedar::aux::Path("resource://configs/epuck/yarp_configuration.json"));
   this->addRobotTemplate("epuck", epuck_template);
 
   // khepera ---------------------------------------------------------------------------------------------------------

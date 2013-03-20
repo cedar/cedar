@@ -121,6 +121,11 @@ public:
     }
   }
 
+  bool isOpen() const
+  {
+    return this->mIsOpen;
+  }
+
   void addReaderPort(const std::string& port)
   {
     if (mReaderMap.find(port) == mReaderMap.end())
