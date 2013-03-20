@@ -73,6 +73,13 @@
           {
             "command get infrared": "N"
           }
+        },
+        "yarp":
+        {
+          "cedar.dev.kteam.InfraredSensorYarp":
+          {
+            "sensor port": "infraredSensors"
+          }
         }
       }
     },
