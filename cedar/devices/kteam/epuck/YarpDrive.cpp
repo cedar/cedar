@@ -121,12 +121,12 @@ std::vector<int> cedar::dev::kteam::epuck::YarpDrive::getEncoders() const
       encoders.push_back(encoder_matrix.at<float>(0,0));
       encoders.push_back(encoder_matrix.at<float>(1,0));
     }
-    return encoders;
   }
   catch (cedar::aux::net::NetWaitingForWriterException& exc)
   {
-    return encoders;
+    // this can happen, just ignore it
   }
+  return encoders;
 }
 
 void cedar::dev::kteam::epuck::YarpDrive::setEncoders(const std::vector<int>& /*encoders*/)
