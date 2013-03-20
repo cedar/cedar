@@ -73,19 +73,7 @@ cedar::dev::kteam::InfraredSensorSerial::InfraredSensorSerial()
 _mCommandGetInfrared(new cedar::aux::StringParameter(this, "command get infrared", "N")),
 mValues(new cedar::aux::MatData(cv::Mat::zeros(1, 8, CV_32F)))
 {
-  this->addMeasuredData("proximity", mValues);
-}
-
-cedar::dev::kteam::InfraredSensorSerial::InfraredSensorSerial
-(
-  cedar::dev::kteam::SerialChannelPtr channel
-)
-:
-cedar::dev::Sensor(cedar::aux::asserted_pointer_cast<cedar::dev::Channel>(channel)),
-_mCommandGetInfrared(new cedar::aux::StringParameter(this, "command get infrared", "N")),
-mValues(new cedar::aux::MatData(cv::Mat::zeros(1, 8, CV_32F)))
-{
-  this->addMeasuredData("proximity", mValues);
+  this->addMeasuredData("proximity", mValues, boost::bind(&cedar::dev::kteam::InfraredSensorSerial::updateIrValues, this));
 }
 
 cedar::dev::kteam::InfraredSensorSerial::~InfraredSensorSerial()
@@ -101,7 +89,7 @@ cv::Mat cedar::dev::kteam::InfraredSensorSerial::getData()
   return mValues->getData();
 }
 
-void cedar::dev::kteam::InfraredSensorSerial::updateMeasuredValues()
+void cedar::dev::kteam::InfraredSensorSerial::updateIrValues()
 {
   // the left and right encoder value will be saved in this vector
   cv::Mat& infrared_values = this->mValues->getData();
