@@ -67,9 +67,6 @@ public:
   //!@brief The standard constructor.
   InfraredSensorSerial();
 
-  //!@brief Constructor taking an externally created channel.
-  InfraredSensorSerial(cedar::dev::kteam::SerialChannelPtr channel);
-
   //!@brief Destructor
   virtual ~InfraredSensorSerial();
 
@@ -80,7 +77,7 @@ public:
   //!@brief Returns the current readings of the sensor.
   virtual cv::Mat getData();
 
-  virtual void updateMeasuredValues();
+  void updateIrValues();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
