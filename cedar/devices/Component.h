@@ -66,6 +66,13 @@ public:
     COMMANDED
   };
 
+private:
+  struct DataSlot
+  {
+    cedar::aux::DataPtr mData;
+    boost::function<void ()> mUpdateFunction;
+  };
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -100,8 +107,11 @@ public:
 
   cedar::aux::DataPtr getMeasuredData(const std::string& name) const;
 
-  //!@todo This needs proper design - supply an update function for each measured data via boost bind, make this non-virtual?
-  virtual void updateMeasuredValues();
+  void updateMeasuredValues();
+
+  void updateCommandedValues();
+
+  void updateValues(cedar::dev::Component::DataType type);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -117,15 +127,20 @@ protected:
     this->mSlot = slot;
   }
  
-  void addCommandedData(const std::string& name, cedar::aux::DataPtr data);
+  void addCommandedData(const std::string& name, cedar::aux::DataPtr data, boost::function<void()> updateFun);
 
-  void addMeasuredData(const std::string& name, cedar::aux::DataPtr data);
+  void addMeasuredData(const std::string& name, cedar::aux::DataPtr data, boost::function<void()> updateFun);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void addData(cedar::dev::Component::DataType type, const std::string& name, cedar::aux::DataPtr data);
+  void addData
+  (
+    cedar::dev::Component::DataType type,
+    const std::string& name, cedar::aux::DataPtr data,
+    boost::function<void()> updateFun
+  );
 
   cedar::aux::DataPtr getData(cedar::dev::Component::DataType type, const std::string& name) const;
 
@@ -141,7 +156,7 @@ private:
   cedar::dev::ComponentSlotWeakPtr mSlot;
 
   //! The data of the channel, i.e., measured and commanded values.
-  std::map<cedar::dev::Component::DataType, std::map<std::string, cedar::aux::DataPtr> > mData;
+  std::map<cedar::dev::Component::DataType, std::map<std::string, DataSlot> > mData;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
