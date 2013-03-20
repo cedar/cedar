@@ -38,11 +38,13 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/casts.h"
-#include "cedar/auxiliaries/math/tools.h"
 #include "cedar/devices/kteam/InfraredSensorSerial.h"
 #include "cedar/devices/kteam/SerialChannel.h"
 #include "cedar/devices/kteam/serialChannelHelperFunctions.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 
@@ -68,8 +70,10 @@ namespace
 
 cedar::dev::kteam::InfraredSensorSerial::InfraredSensorSerial()
 :
-_mCommandGetInfrared(new cedar::aux::StringParameter(this, "command get infrared", "N"))
+_mCommandGetInfrared(new cedar::aux::StringParameter(this, "command get infrared", "N")),
+mValues(new cedar::aux::MatData(cv::Mat::zeros(1, 8, CV_32F)))
 {
+  this->addMeasuredData("proximity", mValues);
 }
 
 cedar::dev::kteam::InfraredSensorSerial::InfraredSensorSerial
@@ -78,8 +82,10 @@ cedar::dev::kteam::InfraredSensorSerial::InfraredSensorSerial
 )
 :
 cedar::dev::Sensor(cedar::aux::asserted_pointer_cast<cedar::dev::Channel>(channel)),
-_mCommandGetInfrared(new cedar::aux::StringParameter(this, "command get infrared", "N"))
+_mCommandGetInfrared(new cedar::aux::StringParameter(this, "command get infrared", "N")),
+mValues(new cedar::aux::MatData(cv::Mat::zeros(1, 8, CV_32F)))
 {
+  this->addMeasuredData("proximity", mValues);
 }
 
 cedar::dev::kteam::InfraredSensorSerial::~InfraredSensorSerial()
@@ -92,12 +98,16 @@ cedar::dev::kteam::InfraredSensorSerial::~InfraredSensorSerial()
 
 cv::Mat cedar::dev::kteam::InfraredSensorSerial::getData()
 {
+  return mValues->getData();
+}
+
+void cedar::dev::kteam::InfraredSensorSerial::updateMeasuredValues()
+{
   // the left and right encoder value will be saved in this vector
-  cv::Mat infrared_values = cv::Mat::zeros(1, 8, CV_32F);
+  cv::Mat& infrared_values = this->mValues->getData();
 
   // cast the channel into a serial channel
-  cedar::dev::kteam::SerialChannelPtr serial_channel
-    = convertToSerialChannel(getChannel());
+  cedar::dev::kteam::SerialChannelPtr serial_channel = convertToSerialChannel(getChannel());
 
   // send the command to receive the values of the encoders
   std::string answer = serial_channel->writeAndReadLocked(_mCommandGetInfrared->getValue());
@@ -105,25 +115,16 @@ cv::Mat cedar::dev::kteam::InfraredSensorSerial::getData()
   // check whether the answer begins with the correct character
   checkSerialCommunicationAnswer(answer, _mCommandGetInfrared->getValue());
 
-  std::istringstream answer_stream;
-  answer_stream.str(answer);
+  std::vector<std::string> parts;
+  cedar::aux::split(answer, ",", parts);
 
-  // skip the answer characters (e.g., 'q,') at the beginning
-  answer_stream.ignore(2);
-  checkStreamValidity(answer_stream, false);
+  // should be ['n', 'number1', ..., 'numberN'] where N = size of infrared_values
+  CEDAR_ASSERT(parts.size() == cedar::aux::math::get1DMatrixSize(infrared_values) + 1);
 
-  for (unsigned int i = 0; i < static_cast<unsigned int>(infrared_values.size().height); ++i)
+  for (unsigned int i = 0; i < cedar::aux::math::get1DMatrixSize(infrared_values); ++i)
   {
-    // read the left encoder value
-    answer_stream >> infrared_values.at<float>(i);
-    checkStreamValidity(answer_stream, false);
-
-    // skip the colon separating the encoder values
-    if (i < static_cast<unsigned int>(infrared_values.size().height) - 1)
-    {
-      answer_stream.ignore(1);
-      checkStreamValidity(answer_stream, false);
-    }
+    const std::string& value = parts[i + 1]; // +1 to skip the command/reply string
+    infrared_values.at<float>(i) = cedar::aux::fromString<float>(value);
   }
 
 #ifdef DEBUG_VERBOSE
@@ -135,6 +136,4 @@ cv::Mat cedar::dev::kteam::InfraredSensorSerial::getData()
     "Received infrared values"
   );
 #endif // DEBUG_VERBOSE
-
-  return infrared_values;
 }

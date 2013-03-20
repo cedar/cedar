@@ -38,6 +38,7 @@
 #include "cedar/auxiliaries/math/VelocityLimitsParameter.h"
 #include "cedar/auxiliaries/math/AngularVelocityLimitsParameter.h"
 #include "cedar/auxiliaries/math/constants.h"
+#include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/devices/Locomotion.h"
 #include "cedar/units/Velocity.h"
 #include "cedar/units/AngularVelocity.h"
@@ -50,6 +51,7 @@
 
 cedar::dev::Locomotion::Locomotion()
 :
+mTurningRate(new cedar::dev::AngularVelocityData(0.0 * cedar::unit::radians_per_second)),
 _mForwardVelocityLimits
 (
   new cedar::aux::math::VelocityLimitsParameter
@@ -78,12 +80,15 @@ _mTurningRateLimits
         20.0 * cedar::unit::radian_per_second
       )
 )
-{}
+{
+  this->addCommandedData("turning rate", this->mTurningRate);
+}
 
 // constructor taking an externally created channel
 cedar::dev::Locomotion::Locomotion(cedar::dev::ChannelPtr channel)
 :
 cedar::dev::Component(channel),
+mTurningRate(new cedar::dev::AngularVelocityData(0.0 * cedar::unit::radians_per_second)),
 _mForwardVelocityLimits
 (
   new cedar::aux::math::VelocityLimitsParameter
@@ -112,7 +117,9 @@ _mTurningRateLimits
         20.0 * cedar::unit::radian_per_second
       )
 )
-{}
+{
+  this->addCommandedData("turning rate", this->mTurningRate);
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -125,7 +132,7 @@ cedar::unit::Velocity cedar::dev::Locomotion::getForwardVelocity() const
 
 cedar::unit::AngularVelocity cedar::dev::Locomotion::getTurningRate() const
 {
-  return mTurningRate;
+  return mTurningRate->getData();
 }
 
 void cedar::dev::Locomotion::thresholdForwardVelocity(cedar::unit::Velocity& forwardVelocity) const

@@ -52,6 +52,16 @@
 class cedar::dev::Component : public cedar::aux::NamedConfigurable
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  enum DataType
+  {
+    MEASURED,
+    COMMANDED
+  };
+
+  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -79,17 +89,30 @@ public:
     this->mChannel = channel;
   }
 
+  std::vector<std::string> getDataNames(cedar::dev::Component::DataType type) const;
+
+  cedar::aux::DataPtr getCommandedData(const std::string& name) const;
+
+  cedar::aux::DataPtr getMeasuredData(const std::string& name) const;
+
+  //!@todo This needs proper design - supply an update function for each measured data via boost bind, make this non-virtual?
+  virtual void updateMeasuredValues();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void addCommandedData(const std::string& name, cedar::aux::DataPtr data);
+
+  void addMeasuredData(const std::string& name, cedar::aux::DataPtr data);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void addData(cedar::dev::Component::DataType type, const std::string& name, cedar::aux::DataPtr data);
+
+  cedar::aux::DataPtr getData(cedar::dev::Component::DataType type, const std::string& name) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -100,6 +123,9 @@ protected:
 private:
   //! channel of communication
   cedar::dev::ChannelPtr mChannel;
+
+  //! The data of the channel, i.e., measured and commanded values.
+  std::map<cedar::dev::Component::DataType, std::map<std::string, cedar::aux::DataPtr> > mData;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

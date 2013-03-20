@@ -133,11 +133,9 @@ private:
 protected:
   //! desired forward velocity [m/s]
   cedar::unit::Velocity mForwardVelocity;
-  //! desired turning rate of the robot [rad/s]
-  cedar::unit::AngularVelocity mTurningRate;
 
-private:
-  // none yet
+  //! desired turning rate of the robot [rad/s]
+  cedar::dev::AngularVelocityDataPtr mTurningRate;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

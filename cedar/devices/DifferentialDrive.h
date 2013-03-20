@@ -42,6 +42,7 @@
 #include "cedar/devices/Locomotion.h"
 #include "cedar/auxiliaries/LengthParameter.h"
 #include "cedar/auxiliaries/math/VelocityLimitsParameter.h"
+#include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/units/Length.h"
 #include "cedar/units/Velocity.h"
 #include "cedar/units/AngularVelocity.h"
