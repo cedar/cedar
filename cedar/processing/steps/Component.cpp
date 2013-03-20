@@ -102,6 +102,8 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
 
 void cedar::proc::steps::Component::componentChanged()
 {
+  this->clearDataSlots();
+
   cedar::dev::ComponentPtr component = this->_mComponent->getValue();
 
   // static because this doesn't change for different instances
