@@ -81,7 +81,7 @@ _mTurningRateLimits
       )
 )
 {
-  this->addCommandedData("turning rate", this->mTurningRate);
+  this->addCommandedData("turning rate", this->mTurningRate, boost::bind(&cedar::dev::Locomotion::applyTurningRate, this));
 }
 
 // constructor taking an externally created channel
@@ -118,12 +118,17 @@ _mTurningRateLimits
       )
 )
 {
-  this->addCommandedData("turning rate", this->mTurningRate);
+  this->addCommandedData("turning rate", this->mTurningRate, boost::bind(&cedar::dev::Locomotion::applyTurningRate, this));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dev::Locomotion::applyTurningRate()
+{
+  //!@todo Fill in
+}
 
 cedar::unit::Velocity cedar::dev::Locomotion::getForwardVelocity() const
 {

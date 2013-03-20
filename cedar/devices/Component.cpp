@@ -62,46 +62,70 @@ cedar::dev::Component::~Component()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::dev::Component::updateValues(cedar::dev::Component::DataType type)
+{
+  auto map_iter = this->mData.find(type);
+  CEDAR_ASSERT(map_iter != this->mData.end());
+  const std::map<std::string, DataSlot>& map = map_iter->second;
+
+  for (auto iter = map.begin(); iter != map.end(); ++iter)
+  {
+    const DataSlot& slot = iter->second;
+    slot.mUpdateFunction();
+  }
+}
+
 void cedar::dev::Component::updateMeasuredValues()
 {
-  // empty default implementation
+  updateValues(cedar::dev::Component::MEASURED);
+}
+
+void cedar::dev::Component::updateCommandedValues()
+{
+  updateValues(cedar::dev::Component::COMMANDED);
 }
 
 void cedar::dev::Component::addData
      (
        cedar::dev::Component::DataType type,
        const std::string& name,
-       cedar::aux::DataPtr data
+       cedar::aux::DataPtr data,
+       boost::function<void()> updateFun
      )
 {
   // make sure a map for the given type exists
   if (this->mData.find(type) == this->mData.end())
   {
-    this->mData[type] = std::map<std::string, cedar::aux::DataPtr>();
+    this->mData[type] = std::map<std::string, DataSlot>();
   }
 
   //!@todo Check if data by that name already exists.
 
   // insert the data
-  this->mData[type][name] = data;
+  DataSlot slot;
+  slot.mData = data;
+  slot.mUpdateFunction = updateFun;
+  this->mData[type][name] = slot;
 }
 
 void cedar::dev::Component::addMeasuredData
      (
        const std::string& name,
-       cedar::aux::DataPtr data
+       cedar::aux::DataPtr data,
+       boost::function<void()> updateFun
      )
 {
-  this->addData(cedar::dev::Component::MEASURED, name, data);
+  this->addData(cedar::dev::Component::MEASURED, name, data, updateFun);
 }
 
 void cedar::dev::Component::addCommandedData
      (
        const std::string& name,
-       cedar::aux::DataPtr data
+       cedar::aux::DataPtr data,
+       boost::function<void()> updateFun
      )
 {
-  this->addData(cedar::dev::Component::COMMANDED, name, data);
+  this->addData(cedar::dev::Component::COMMANDED, name, data, updateFun);
 }
 
 cedar::aux::DataPtr cedar::dev::Component::getCommandedData(const std::string& name) const
@@ -127,7 +151,7 @@ cedar::aux::DataPtr cedar::dev::Component::getData(cedar::dev::Component::DataTy
   //!@todo Exception.
   CEDAR_ASSERT(data_iter != map.end());
 
-  return data_iter->second;
+  return data_iter->second.mData;
 }
 
 
