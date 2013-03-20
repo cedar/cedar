@@ -80,7 +80,7 @@ public:
   //!@brief Returns the current readings of the sensor.
   virtual cv::Mat getData();
 
-  virtual void updateMeasuredValues();
+  void updateSensorValues();
 
   /*!@brief   Overrides the default configuration reading.
    *
