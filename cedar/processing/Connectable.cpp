@@ -74,6 +74,21 @@ cedar::proc::Connectable::~Connectable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Connectable::clearDataSlots()
+{
+  for (auto role_iter = this->mSlotMaps.begin(); role_iter != this->mSlotMaps.end(); ++role_iter)
+  {
+    cedar::proc::DataRole::Id role = role_iter->first;
+    const SlotMap& slot_map = role_iter->second;
+
+    while (!slot_map.empty())
+    {
+      auto first_it = slot_map.begin();
+      this->removeSlot(role, first_it->first);
+    }
+  }
+}
+
 void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& name)
 {
   std::map<DataRole::Id, SlotMap>::iterator map_iter;
@@ -88,7 +103,7 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
   SlotMap::iterator slot_map_iter = slot_map.find(name);
   if (slot_map_iter == slot_map.end())
   {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "No slot of the given name found.");
+    CEDAR_THROW(cedar::proc::InvalidNameException, "No slot of the name \"" + name + "\" found.");
   }
 
   cedar::proc::DataSlotPtr slot = slot_map_iter->second;
