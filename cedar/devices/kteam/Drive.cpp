@@ -122,3 +122,32 @@ std::vector<cedar::unit::Frequency> cedar::dev::kteam::Drive::convertWheelSpeedT
 
   return wheel_speed_pulses;
 }
+
+std::vector<cedar::unit::Velocity> cedar::dev::kteam::Drive::convertPulsesToWheelSpeed
+                                    (
+                                      const std::vector<cedar::unit::Frequency>& wheelSpeedPulses
+                                    ) const
+{
+  CEDAR_ASSERT(wheelSpeedPulses.size() == 2);
+
+  // first: convert speed from Pulses/s into m/s ...
+  std::vector<cedar::unit::Velocity> wheel_speed
+                                      (
+                                        wheelSpeedPulses.size(),
+                                        0.0 * cedar::unit::DEFAULT_VELOCITY_UNIT
+                                      );
+
+  for (unsigned int i = 0; i < wheelSpeedPulses.size(); ++i)
+  {
+    // compute the number of pulses per second and round the value to a natural number
+    wheel_speed[i] = wheelSpeedPulses[i] * this->getDistancePerPulse();
+  }
+
+  return wheel_speed;
+}
+
+void cedar::dev::kteam::Drive::setWheelSpeedPulses(const std::vector<cedar::unit::Frequency>& wheelSpeedPulses)
+{
+  std::vector<cedar::unit::Velocity> wheel_speeds = convertPulsesToWheelSpeed(wheelSpeedPulses);
+  this->setWheelSpeed(wheel_speeds);
+}
