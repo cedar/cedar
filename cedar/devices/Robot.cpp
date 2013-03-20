@@ -181,7 +181,10 @@ cedar::dev::ConstChannelPtr cedar::dev::Robot::getChannel(const std::string& cha
 
 cedar::dev::ChannelPtr cedar::dev::Robot::getChannel(const std::string& channel)
 {
-  CEDAR_ASSERT(this->hasChannelInstance(channel));
+  if(!this->hasChannelInstance(channel))
+  {
+    CEDAR_THROW(cedar::dev::ChannelNotInstantiatedException, "Channel \"" + channel + "\" has not been instantiated.");
+  }
   return this->mChannelInstances.find(channel)->second;
 }
 

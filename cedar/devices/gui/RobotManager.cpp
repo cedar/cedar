@@ -218,7 +218,14 @@ void cedar::dev::gui::RobotManager::partSelected(QTreeWidgetItem* pCurrent, QTre
     else if (pCurrent->parent() == this->mpChannelsNode)
     {
       std::string channel_name = pCurrent->text(0).toStdString();
-      to_display = this->getSelectedRobot()->getChannel(channel_name);
+      try
+      {
+        to_display = this->getSelectedRobot()->getChannel(channel_name);
+      }
+      catch (const cedar::dev::ChannelNotInstantiatedException&)
+      {
+        // ok -- nothing to do
+      }
     }
 
     if (to_display)
@@ -423,7 +430,15 @@ void cedar::dev::gui::RobotManager::selectRobot(const std::string& robotName)
   for (auto channel_iter = channel_names.begin(); channel_iter != channel_names.end(); ++channel_iter)
   {
     const std::string& channel_name = *channel_iter;
-    cedar::dev::ConstChannelPtr channel = robot->getChannel(channel_name);
+    cedar::dev::ConstChannelPtr channel;
+    try
+    {
+      channel = robot->getChannel(channel_name);
+    }
+    catch (const cedar::dev::ChannelNotInstantiatedException&)
+    {
+      // ok -- do nothing
+    }
 
     QStringList channel_infos;
     channel_infos << QString::fromStdString(channel_name);

@@ -74,6 +74,7 @@ namespace cedar
 
     // exceptions
     CEDAR_DECLARE_DEV_CLASS(ChannelConfigurationNotFoundException);
+    CEDAR_DECLARE_DEV_CLASS(ChannelNotInstantiatedException);
     CEDAR_DECLARE_DEV_CLASS(CommunicationException);
     CEDAR_DECLARE_DEV_CLASS(InvalidComponentPathException);
     CEDAR_DECLARE_DEV_CLASS(NoComponentSelectedException);

@@ -100,6 +100,11 @@ class cedar::dev::NoComponentSelectedException : public cedar::aux::ExceptionBas
 {
 };
 
+//!@brief Thrown when a channel has no instance.
+class cedar::dev::ChannelNotInstantiatedException : public cedar::aux::ExceptionBase
+{
+};
+
 //!@brief Thrown when an invalid component path is found by the system.
 class cedar::dev::InvalidComponentPathException : public cedar::aux::ExceptionBase
 {
