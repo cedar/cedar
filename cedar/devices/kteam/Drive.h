@@ -89,6 +89,11 @@ public:
   //! @see base class.
   virtual void reset();
 
+  /*!@brief Sets the speed of the left and right wheel.
+   * @param[in] wheelSpeedPulses The wheel speed of the left and right wheel to be set [in pulses/s].
+   */
+  virtual void setWheelSpeedPulses(const std::vector<cedar::unit::Frequency>& wheelSpeedPulses);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -96,6 +101,11 @@ protected:
   std::vector<cedar::unit::Frequency> convertWheelSpeedToPulses
                    (
                      const std::vector<cedar::unit::Velocity>& wheelSpeed
+                   ) const;
+
+  std::vector<cedar::unit::Velocity> convertPulsesToWheelSpeed
+                   (
+                     const std::vector<cedar::unit::Frequency>& wheelSpeed
                    ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
