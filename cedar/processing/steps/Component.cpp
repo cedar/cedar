@@ -102,6 +102,7 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
 
 void cedar::proc::steps::Component::componentChanged()
 {
+  //!@todo Clearing all slots means that all connections are lost. This is bad! Existing slots should remain.
   this->clearDataSlots();
 
   cedar::dev::ComponentPtr component = this->_mComponent->getValue();
