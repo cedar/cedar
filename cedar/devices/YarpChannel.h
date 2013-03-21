@@ -156,7 +156,7 @@ public:
 protected:
   void openHook()
   {
-    if (!mIsOpen)
+//    if (!mIsOpen)
     {
       for (auto it = mReaderMap.begin(); it != mReaderMap.end(); ++it)
       {

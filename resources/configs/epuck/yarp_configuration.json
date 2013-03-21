@@ -5,7 +5,7 @@
   {
     "drive":
     {
-      "channel": "yarp"
+      "channel": "serial"
     },
     "ambient light sensor":
     {
@@ -13,7 +13,7 @@
     },
     "proximity sensor":
     {
-      "channel": "serial"
+      "channel": "yarp"
     },
     "acceleration sensor":
     {

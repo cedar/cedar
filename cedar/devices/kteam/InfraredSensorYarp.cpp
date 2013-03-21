@@ -110,6 +110,7 @@ void cedar::dev::kteam::InfraredSensorYarp::open()
   std::string robot_name = this->getSlot().lock()->getRobot()->getName() + "/";
   mSensorPortWithPrefix = robot_name + _mSensorPort->getValue();
   yarp_channel->addReaderPort(mSensorPortWithPrefix);
+  yarp_channel->open();
 }
 
 cv::Mat cedar::dev::kteam::InfraredSensorYarp::getData()
@@ -119,15 +120,12 @@ cv::Mat cedar::dev::kteam::InfraredSensorYarp::getData()
 
 void cedar::dev::kteam::InfraredSensorYarp::updateSensorValues()
 {
-  // the left and right encoder value will be saved in this vector
-  cv::Mat& infrared_values = this->mValues->getData();
-
   // cast the channel into a serial channel
   YarpMatChannelPtr yarp_channel = boost::static_pointer_cast<YarpMatChannel>(this->getChannel());
   cv::Mat measured_values = yarp_channel->read(mSensorPortWithPrefix);
   if (measured_values.rows == 8)
   {
-    infrared_values = measured_values;
+    this->mValues->setData(measured_values);
   }
 }
 
