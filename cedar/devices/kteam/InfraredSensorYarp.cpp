@@ -110,7 +110,6 @@ void cedar::dev::kteam::InfraredSensorYarp::open()
   std::string robot_name = this->getSlot().lock()->getRobot()->getName() + "/";
   mSensorPortWithPrefix = robot_name + _mSensorPort->getValue();
   yarp_channel->addReaderPort(mSensorPortWithPrefix);
-  yarp_channel->open();
 }
 
 cv::Mat cedar::dev::kteam::InfraredSensorYarp::getData()

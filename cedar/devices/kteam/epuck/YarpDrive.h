@@ -90,7 +90,12 @@ public:
    */
   void setEncoders(const std::vector<int>& encoders);
 
-  void open();
+  /*!@brief   Overrides the default configuration reading.
+   *
+   * @remarks This method provides downwards-compatibility for reading fields that were written with a previous version.
+   *          Currently, it takes care of reading the kernels and the sigmoid properly.
+   */
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -103,7 +108,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void open();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
