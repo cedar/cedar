@@ -59,3 +59,22 @@ cedar::aux::IntrusivePtrBase::~IntrusivePtrBase()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void intrusive_ptr_add_ref(cedar::aux::IntrusivePtrBase const *pObject)
+{
+  CEDAR_DEBUG_ASSERT(pObject->mReferenceCount >= 0);
+  ++(pObject->mReferenceCount);
+}
+
+void intrusive_ptr_release(cedar::aux::IntrusivePtrBase const *pObject)
+{
+  CEDAR_DEBUG_ASSERT(pObject->mReferenceCount > 0);
+
+  --(pObject->mReferenceCount);
+
+  if (pObject->mReferenceCount == 0)
+  {
+    // call Base's destructor
+    delete pObject;
+  }
+}
