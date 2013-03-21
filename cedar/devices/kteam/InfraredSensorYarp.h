@@ -80,8 +80,6 @@ public:
   //!@brief Returns the current readings of the sensor.
   virtual cv::Mat getData();
 
-  void updateSensorValues();
-
   /*!@brief   Overrides the default configuration reading.
    *
    * @remarks This method provides downwards-compatibility for reading fields that were written with a previous version.
@@ -101,6 +99,7 @@ protected:
 private:
   void open();
 
+  void updateSensorValues();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

@@ -106,7 +106,6 @@ void cedar::dev::kteam::epuck::YarpDrive::open()
   mEncoderValuesPortWithPrefix = robot_name + _mEncoderValuesPort->getValue();
   mYarpChannel->addWriterPort(mMotorCommandPortWithPrefix);
   mYarpChannel->addReaderPort(mEncoderValuesPortWithPrefix);
-  mYarpChannel->open();
 }
 
 std::vector<int> cedar::dev::kteam::epuck::YarpDrive::getEncoders() const
@@ -144,5 +143,11 @@ void cedar::dev::kteam::epuck::YarpDrive::sendMovementCommand()
   velocities.at<float>(0,0) = static_cast<int>(wheel_speed_pulses[0] / cedar::unit::DEFAULT_FREQUENCY_UNIT);
   velocities.at<float>(1,0) = static_cast<int>(wheel_speed_pulses[1] / cedar::unit::DEFAULT_FREQUENCY_UNIT);
   mYarpChannel->write(velocities, mMotorCommandPortWithPrefix);
+}
+
+void cedar::dev::kteam::epuck::YarpDrive::readConfiguration(const cedar::aux::ConfigurationNode& node)
+{
+  cedar::dev::kteam::Drive::readConfiguration(node);
+  this->open();
 }
 #endif

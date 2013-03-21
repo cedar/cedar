@@ -5,7 +5,7 @@
   {
     "drive":
     {
-      "channel": "serial"
+      "channel": "yarp"
     },
     "ambient light sensor":
     {
