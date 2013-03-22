@@ -75,10 +75,9 @@ cedar::dev::kteam::InfraredSensorYarp::InfraredSensorYarp()
 :
 mSensorPortWithPrefix(""),
 mValues(new cedar::aux::MatData(cv::Mat::zeros(1, 8, CV_32F))),
-_mGetInfrared(new cedar::aux::BoolParameter(this, "get proximity", true)),
-_mSensorPort(new cedar::aux::StringParameter(this, "sensor port", "infraredSensors"))
+_mSensorPort(new cedar::aux::StringParameter(this, "sensor port", "proximitySensors"))
 {
-  this->addMeasuredData("proximity", mValues, boost::bind(&cedar::dev::kteam::InfraredSensorYarp::updateSensorValues, this));
+  this->addMeasuredData("sensor values", mValues, boost::bind(&cedar::dev::kteam::InfraredSensorYarp::updateSensorValues, this));
 }
 
 cedar::dev::kteam::InfraredSensorYarp::InfraredSensorYarp
@@ -89,10 +88,9 @@ cedar::dev::kteam::InfraredSensorYarp::InfraredSensorYarp
 cedar::dev::Sensor(channel),
 mSensorPortWithPrefix(""),
 mValues(new cedar::aux::MatData(cv::Mat::zeros(1, 8, CV_32F))),
-_mGetInfrared(new cedar::aux::BoolParameter(this, "get proximity", true)),
-_mSensorPort(new cedar::aux::StringParameter(this, "sensor port", "infraredSensors"))
+_mSensorPort(new cedar::aux::StringParameter(this, "sensor port", "proximitySensors"))
 {
-  this->addMeasuredData("proximity", mValues, boost::bind(&cedar::dev::kteam::InfraredSensorYarp::updateSensorValues, this));
+  this->addMeasuredData("sensor values", mValues, boost::bind(&cedar::dev::kteam::InfraredSensorYarp::updateSensorValues, this));
 }
 
 cedar::dev::kteam::InfraredSensorYarp::~InfraredSensorYarp()

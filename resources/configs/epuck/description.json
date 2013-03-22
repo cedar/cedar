@@ -60,6 +60,13 @@
           {
             "command get infrared": "O"
           }
+        },
+        "yarp":
+        {
+          "cedar.dev.kteam.InfraredSensorYarp":
+          {
+            "sensor port": "ambientSensors"
+          }
         }
       }
     },
@@ -78,7 +85,7 @@
         {
           "cedar.dev.kteam.InfraredSensorYarp":
           {
-            "sensor port": "infraredSensors"
+            "sensor port": "proximitySensors"
           }
         }
       }
