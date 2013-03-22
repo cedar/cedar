@@ -9,7 +9,7 @@
     },
     "ambient light sensor":
     {
-      "channel": "serial"
+      "channel": "yarp"
     },
     "proximity sensor":
     {

@@ -118,7 +118,6 @@ protected:
   // none yet
 
 private:
-  cedar::aux::BoolParameterPtr _mGetInfrared;
   cedar::aux::StringParameterPtr _mSensorPort;
 
 }; // class cedar::dev::kteam::InfraredSensorYarp
