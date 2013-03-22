@@ -103,6 +103,7 @@ void test_convolution_time_1d(TestSet& test)
   std::string case_id = test.id();
 
   cedar::aux::conv::ConvolutionPtr conv(new cedar::aux::conv::Convolution());
+  conv->setBorderType(test.mBorderType);
 
   cedar::aux::kernel::GaussPtr gauss (new cedar::aux::kernel::Gauss(1, 1.0, test.mSigma, 0.0, test.mLimit));
 
