@@ -50,6 +50,14 @@ int main(int, char**)
 {
   std::cout << "==================================" << std::endl;
   std::cout << "  This is cedar version " << cedar::aux::versionNumberToString(CEDAR_VERSION) << std::endl;
+  std::cout << "                (";
+#ifdef DEBUG
+  std::cout << "debug";
+#else
+  std::cout << "release";
+#endif // DEBUG
+  std::cout << " build)";
+  std::cout << std::endl;
   std::cout << "----------------------------------" << std::endl;
   std::cout << std::endl;
   std::cout << " built on " <<
