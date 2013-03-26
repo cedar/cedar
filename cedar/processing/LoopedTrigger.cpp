@@ -42,11 +42,12 @@
 // CEDAR INCLUDES
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/StepTime.h"
-#include "cedar/units/TimeUnit.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <algorithm>
@@ -145,9 +146,14 @@ void cedar::proc::LoopedTrigger::stopTrigger()
   }
 }
 
+//!@todo this should take a cedar::unit::Time as argument
 void cedar::proc::LoopedTrigger::step(double time)
 {
-  cedar::proc::ArgumentsPtr arguments (new cedar::proc::StepTime(cedar::unit::Milliseconds(time)));
+  cedar::proc::ArgumentsPtr arguments(new cedar::proc::StepTime
+                                          (
+                                            cedar::unit::Time(time * cedar::unit::milli * cedar::unit::seconds)
+                                          )
+                                     );
 
   this->trigger(arguments);
 

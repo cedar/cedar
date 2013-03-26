@@ -49,7 +49,8 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/Log.h"
-#include "cedar/units/TimeUnit.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
@@ -73,8 +74,10 @@ Triggerable(isLooped),
 // initialize members
 mBusy(false),
 mpArgumentsLock(new QReadWriteLock()),
-mMovingAverageIterationTime(100), // average the last 100 iteration times
-mLockingTime(100), // average the last 100 iteration times
+// average the last 100 iteration times
+mMovingAverageIterationTime(100),
+// average the last 100 iteration times
+mLockingTime(100),
 // initialize parameters
 mRNGState(0),
 mAutoLockInputsAndOutputs(true),
@@ -355,9 +358,9 @@ void cedar::proc::Step::run()
   this->lock(cedar::aux::LOCK_TYPE_READ);
 
   clock_t lock_end = clock();
-  clock_t lock_elapsed = lock_end - lock_start;
-  double lock_elapsed_s = static_cast<double>(lock_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
-  this->setLockTimeMeasurement(cedar::unit::Seconds(lock_elapsed_s));
+  cedar::unit::Time lock_elapsed
+    = static_cast<double>(lock_end - lock_start) * cedar::unit::seconds / static_cast<double>(CLOCKS_PER_SEC);
+  this->setLockTimeMeasurement(lock_elapsed);
 
   // start measuring the execution time.
   clock_t run_start = clock();
@@ -413,14 +416,14 @@ void cedar::proc::Step::run()
   }
 
   clock_t run_end = clock();
-  clock_t run_elapsed = run_end - run_start;
-  double run_elapsed_s = static_cast<double>(run_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
+  cedar::unit::Time run_elapsed
+    = static_cast<double>(run_end - run_start) * cedar::unit::seconds / static_cast<double>(CLOCKS_PER_SEC);
 
   // unlock the step
   this->unlock();
 
   // take time measurements
-  this->setRunTimeMeasurement(cedar::unit::Seconds(run_elapsed_s));
+  this->setRunTimeMeasurement(run_elapsed);
 
   // remove the argumens, as they have been processed.
   this->getFinishedTrigger()->trigger();
@@ -430,13 +433,13 @@ void cedar::proc::Step::run()
 void cedar::proc::Step::setRunTimeMeasurement(const cedar::unit::Time& time)
 {
   QWriteLocker locker(&this->mLastIterationTimeLock);
-  this->mMovingAverageIterationTime.append(cedar::unit::Seconds(time));
+  this->mMovingAverageIterationTime.append(time);
 }
 
 void cedar::proc::Step::setLockTimeMeasurement(const cedar::unit::Time& time)
 {
   QWriteLocker locker(&this->mLockTimeLock);
-  this->mLockingTime.append(cedar::unit::Seconds(time));
+  this->mLockingTime.append(time);
 }
 
 cedar::unit::Time cedar::proc::Step::getRunTimeMeasurement() const
@@ -448,7 +451,7 @@ cedar::unit::Time cedar::proc::Step::getRunTimeMeasurement() const
   }
   else
   {
-    return cedar::unit::Milliseconds(0.0);
+    return cedar::unit::Time(0.0 * cedar::unit::seconds);
   }
 }
 
@@ -461,7 +464,7 @@ cedar::unit::Time cedar::proc::Step::getLockTimeMeasurement() const
   }
   else
   {
-    return cedar::unit::Milliseconds(0.0);
+    return cedar::unit::Time(0.0 * cedar::unit::seconds);
   }
 }
 
@@ -474,7 +477,7 @@ cedar::unit::Time cedar::proc::Step::getRunTimeAverage() const
   }
   else
   {
-    return cedar::unit::Milliseconds(-1.0);
+    return cedar::unit::Time(-1.0 * cedar::unit::milli * cedar::unit::second);
   }
 }
 
@@ -487,7 +490,7 @@ cedar::unit::Time cedar::proc::Step::getLockTimeAverage() const
   }
   else
   {
-    return cedar::unit::Milliseconds(-1.0);
+    return cedar::unit::Time(-1.0 * cedar::unit::milli * cedar::unit::second);
   }
 }
 

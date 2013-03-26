@@ -42,6 +42,8 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 
@@ -180,7 +182,7 @@ void cedar::proc::sources::Camera::updateFrame()
   {
     for (int i = 0; i < 5; ++i)
     {
-      cedar::aux::sleep(cedar::unit::Milliseconds(50));
+      cedar::aux::sleep(cedar::unit::Time(50.0 * cedar::unit::milli * cedar::unit::seconds));
       this->onTrigger();
       this->annotateImage();
     }

@@ -40,20 +40,57 @@
 // CEDAR INCLUDES
 #include "cedar/devices/lib.h"
 #include "cedar/defines.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/units/AngularVelocity.h"
 
 // SYSTEM INCLUDES
+#include <boost/intrusive_ptr.hpp>
 
 
 namespace cedar
 {
-  /*!@brief Namespace for all dev classes. */
+  /*!@brief Namespace for all devices classes. */
   namespace dev
   {
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_DEV_CLASS(UnresponsiveRobotException);
+    CEDAR_DECLARE_DEV_CLASS(Robot);
+    CEDAR_DECLARE_DEV_CLASS(ComponentSlot);
+    CEDAR_DECLARE_DEV_CLASS(Component);
+    CEDAR_DECLARE_DEV_CLASS_INTRUSIVE(ComponentParameter);
+    CEDAR_DECLARE_DEV_CLASS(Channel);
+    CEDAR_DECLARE_DEV_CLASS(SerialChannel);
+    CEDAR_DECLARE_DEV_CLASS(Locomotion);
+    CEDAR_DECLARE_DEV_CLASS(DifferentialDrive);
+    CEDAR_DECLARE_DEV_CLASS(KinematicChain);
+    CEDAR_DECLARE_DEV_CLASS(NetworkChannel);
+    CEDAR_DECLARE_DEV_CLASS(Odometry);
+    CEDAR_DECLARE_DEV_CLASS(RobotManager);
+    CEDAR_DECLARE_DEV_CLASS(Sensor);
+    CEDAR_DECLARE_DEV_CLASS(SimulatedKinematicChain);
+
+#ifdef CEDAR_USE_YARP
+    template <typename T> class YarpChannel;
+#endif
+
+    // exceptions
+    CEDAR_DECLARE_DEV_CLASS(ChannelConfigurationNotFoundException);
+    CEDAR_DECLARE_DEV_CLASS(ChannelNotInstantiatedException);
+    CEDAR_DECLARE_DEV_CLASS(CommunicationException);
+    CEDAR_DECLARE_DEV_CLASS(InvalidComponentPathException);
+    CEDAR_DECLARE_DEV_CLASS(NoComponentSelectedException);
+    CEDAR_DECLARE_DEV_CLASS(NoTemplateConfigurationLoadedException);
+    CEDAR_DECLARE_DEV_CLASS(NoTemplateLoadedException);
+    CEDAR_DECLARE_DEV_CLASS(ResourceNotAvailableException);
     CEDAR_DECLARE_DEV_CLASS(SerialCommunicationException);
+    CEDAR_DECLARE_DEV_CLASS(TemplateNotFoundException);
+    CEDAR_DECLARE_DEV_CLASS(TimeoutException);
     CEDAR_DECLARE_DEV_CLASS(UnknownOperatingSystemException);
+    CEDAR_DECLARE_DEV_CLASS(UnresponsiveRobotException);
     //!@endcond
+
+    //!@todo This probably isn't the right place ...
+    typedef cedar::aux::DataTemplate<cedar::unit::AngularVelocity> AngularVelocityData;
+    CEDAR_GENERATE_POINTER_TYPES(AngularVelocityData);
   }
 }
 

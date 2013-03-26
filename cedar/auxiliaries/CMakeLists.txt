@@ -38,6 +38,8 @@ cedar_add_library(cedaraux
   MOC_HEADERS
   LocalCoordinateFrame.h
   gl/ObjectVisualization.h
+  gui/AccelerationParameter.h
+  gui/AngularVelocityParameter.h
   gui/BaseWidget.h
   gui/BoolParameter.h
   gui/BoolVectorParameter.h
@@ -47,7 +49,9 @@ cedar_add_library(cedaraux
   gui/DoubleVectorParameter.h
   gui/EnumParameter.h
   gui/FileParameter.h
+  gui/FrequencyParameter.h
   gui/IntParameter.h
+  gui/LengthParameter.h
   gui/Log.h
   gui/ObjectParameter.h
   gui/ObjectListParameter.h
@@ -66,10 +70,14 @@ cedar_add_library(cedaraux
   gui/MatrixVectorPlot.h
   gui/PropertyPane.h
   gui/ImagePlot.h
+  gui/PlaneAngleParameter.h
   gui/StringParameter.h
+  gui/TimeParameter.h
   gui/UIntParameter.h
   gui/UIntVectorParameter.h
   gui/IntVectorParameter.h
+  gui/VelocityParameter.h
+  gui/ResourceDialog.h
   convolution/Convolution.h
   Parameter.h
   kernel/Separable.h
@@ -77,7 +85,7 @@ cedar_add_library(cedaraux
   kernel/Gauss.h
   kernel/Box.h
   RESOURCES
-  gui/icons/message_icons.qrc
+  gui/icons/cedar_aux_gui_icons.qrc
   LINK_LIBRARIES
   cedarunits
 )

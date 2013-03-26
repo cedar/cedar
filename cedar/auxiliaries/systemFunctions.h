@@ -70,6 +70,13 @@ namespace cedar
      */
     CEDAR_AUX_LIB_EXPORT std::string locateResource(const std::string& resourcePath);
 
+    /*!@brief   Lists all the paths that are searched for resources.
+     *
+     *          Paths will be searched in their order in the vector, i.e., the system first looks in paths[0], then
+     *          paths[1] and so on.
+     */
+    CEDAR_AUX_LIB_EXPORT std::vector<std::string> listResourcePaths();
+
     /*!@brief This function opens a crash report file in a standardized location.
      */
     CEDAR_AUX_LIB_EXPORT void openCrashFile(std::ofstream& stream, std::string& fileName);

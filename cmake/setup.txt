@@ -116,6 +116,7 @@ add_definitions(-D CEDAR_LOG_DIR=\\"${CEDAR_LOG_DIR}/\\")
 
 if (WIN32)
   set(CMAKE_DEBUG_POSTFIX "d") # TODO for linux too?
+  add_definitions(-DWIN32_LEAN_AND_MEAN)
 endif (WIN32)
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" buildTypeLower)

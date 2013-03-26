@@ -61,7 +61,7 @@
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/assert.h"
-#include "cedar/units/TimeUnit.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <QPen>
@@ -231,10 +231,10 @@ void cedar::proc::gui::StepItem::slotRemoved(cedar::proc::DataRole::Id role, con
 
 void cedar::proc::gui::StepItem::timerEvent(QTimerEvent * /* pEvent */)
 {
-  cedar::unit::Milliseconds run_time(this->mStep->getRunTimeMeasurement());
-  cedar::unit::Milliseconds run_time_avg(this->mStep->getRunTimeAverage());
-  cedar::unit::Milliseconds lock_time(this->mStep->getLockTimeMeasurement());
-  cedar::unit::Milliseconds lock_time_avg(this->mStep->getLockTimeAverage());
+  cedar::unit::Time run_time(this->mStep->getRunTimeMeasurement());
+  cedar::unit::Time run_time_avg(this->mStep->getRunTimeAverage());
+  cedar::unit::Time lock_time(this->mStep->getLockTimeMeasurement());
+  cedar::unit::Time lock_time_avg(this->mStep->getLockTimeAverage());
   QString tool_tip
     = QString("<table>"
               "  <tr>"

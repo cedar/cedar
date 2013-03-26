@@ -34,16 +34,17 @@
  -----------------------------------------------------------------------------*/
 
 // CEDAR INCLUDES
-#include "cedar/devices/robot/SimulatedKinematicChain.h"
-#include "cedar/devices/robot/gl/Caren.h"
-#include "cedar/devices/robot/gui/KinematicChainWidget.h"
-#include "cedar/devices/robot/gui/MountedCameraViewer.h"
+#include "cedar/devices/SimulatedKinematicChain.h"
+#include "cedar/devices/gl/Caren.h"
+#include "cedar/devices/gui/KinematicChainWidget.h"
+#include "cedar/devices/gui/MountedCameraViewer.h"
 #include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gui/SceneWidget.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/gl/Cylinder.h"
+#include "cedar/units/Length.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -64,19 +65,19 @@ int main(int argc, char **argv)
   std::string palm_configuration_file = cedar::aux::locateResource("configs/sdh_palm.json");
 
   // create simulated kinematic chains
-  cedar::dev::robot::KinematicChainPtr caren_trunk(new cedar::dev::robot::SimulatedKinematicChain());
+  cedar::dev::KinematicChainPtr caren_trunk(new cedar::dev::SimulatedKinematicChain());
   caren_trunk->readJson(trunk_configuration_file);
-  cedar::dev::robot::KinematicChainPtr caren_arm(new cedar::dev::robot::SimulatedKinematicChain());
+  cedar::dev::KinematicChainPtr caren_arm(new cedar::dev::SimulatedKinematicChain());
   caren_arm->readJson(arm_configuration_file);
-  cedar::dev::robot::KinematicChainPtr caren_head(new cedar::dev::robot::SimulatedKinematicChain());
+  cedar::dev::KinematicChainPtr caren_head(new cedar::dev::SimulatedKinematicChain());
   caren_head->readJson(head_configuration_file);
-  cedar::dev::robot::KinematicChainPtr finger_one(new cedar::dev::robot::SimulatedKinematicChain());
+  cedar::dev::KinematicChainPtr finger_one(new cedar::dev::SimulatedKinematicChain());
   finger_one->readJson(finger_one_configuration_file);
-  cedar::dev::robot::KinematicChainPtr finger_two(new cedar::dev::robot::SimulatedKinematicChain());
+  cedar::dev::KinematicChainPtr finger_two(new cedar::dev::SimulatedKinematicChain());
   finger_two->readJson(finger_two_configuration_file);
-  cedar::dev::robot::KinematicChainPtr finger_three(new cedar::dev::robot::SimulatedKinematicChain());
+  cedar::dev::KinematicChainPtr finger_three(new cedar::dev::SimulatedKinematicChain());
   finger_three->readJson(finger_three_configuration_file);
-  cedar::dev::robot::KinematicChainPtr palm(new cedar::dev::robot::SimulatedKinematicChain());
+  cedar::dev::KinematicChainPtr palm(new cedar::dev::SimulatedKinematicChain());
   palm->readJson(palm_configuration_file);
 
   // link kinematic chains to each other
@@ -91,9 +92,9 @@ int main(int argc, char **argv)
   viewer.setSceneRadius(scene->getSceneLimit());
 
   // create visualization objects
-  cedar::dev::robot::gl::CarenPtr caren_visualization
+  cedar::dev::gl::CarenPtr caren_visualization
   (
-    new cedar::dev::robot::gl::Caren
+    new cedar::dev::gl::Caren
     (
       caren_trunk,
       caren_arm,
@@ -110,18 +111,23 @@ int main(int argc, char **argv)
 
   // create control widgets for the scene and the arm
   cedar::aux::gui::SceneWidgetPtr scene_widget(new cedar::aux::gui::SceneWidget(scene));
-  cedar::dev::robot::gui::KinematicChainWidget widget_trunk(caren_trunk);
-  cedar::dev::robot::gui::KinematicChainWidget widget_arm(caren_arm);
-  cedar::dev::robot::gui::KinematicChainWidget widget_head(caren_head);
-  cedar::dev::robot::gui::KinematicChainWidget widget_finger_one(finger_one);
-  cedar::dev::robot::gui::KinematicChainWidget widget_finger_two(finger_two);
-  cedar::dev::robot::gui::KinematicChainWidget widget_finger_three(finger_three);
-  cedar::dev::robot::gui::KinematicChainWidget widget_palm(palm);
+  cedar::dev::gui::KinematicChainWidget widget_trunk(caren_trunk);
+  cedar::dev::gui::KinematicChainWidget widget_arm(caren_arm);
+  cedar::dev::gui::KinematicChainWidget widget_head(caren_head);
+  cedar::dev::gui::KinematicChainWidget widget_finger_one(finger_one);
+  cedar::dev::gui::KinematicChainWidget widget_finger_two(finger_two);
+  cedar::dev::gui::KinematicChainWidget widget_finger_three(finger_three);
+  cedar::dev::gui::KinematicChainWidget widget_palm(palm);
 
   // create a cylinder visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr cylinder_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
   cylinder_local_coordinate_frame->setName("cylinder");
-  cylinder_local_coordinate_frame->setTranslation(.3, .0, 1.0);
+  cylinder_local_coordinate_frame->setTranslation
+  (
+    0.3 * cedar::unit::meters,
+    0.0 * cedar::unit::meters,
+    1.0 * cedar::unit::meters
+  );
   cedar::aux::gl::ObjectVisualizationPtr cylinder
   (
     new cedar::aux::gl::Cylinder(cylinder_local_coordinate_frame, .1, .2, 0, 0.8, 0)
@@ -129,7 +135,7 @@ int main(int argc, char **argv)
   scene->addObjectVisualization(cylinder);
 
   // create a mounted camera viewer
-  cedar::dev::robot::gui::MountedCameraViewer camera_viewer(scene, caren_head);
+  cedar::dev::gui::MountedCameraViewer camera_viewer(scene, caren_head);
   camera_viewer.readJson(camera_middle_configuration_file);
   camera_viewer.setSceneRadius(scene->getSceneLimit());
 
