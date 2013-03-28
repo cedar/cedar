@@ -52,6 +52,7 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/gui/Configurable.h"
 #include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
@@ -759,6 +760,15 @@ void cedar::proc::gui::StepItem::openProperties()
   p_widget->show();
 }
 
+void cedar::proc::gui::StepItem::openPropertiesNewWidget()
+{
+  QDockWidget *p_widget = this->createDockWidget("Properties");
+  cedar::aux::gui::Configurable* props = new cedar::aux::gui::Configurable();
+  p_widget->setWidget(props);
+  props->display(this->getStep());
+  p_widget->show();
+}
+
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
   //!@todo Would be nice to have icons for these actions
@@ -795,6 +805,9 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   QAction *p_properties = menu.addAction("open properties widget");
   QObject::connect(p_properties, SIGNAL(triggered()), this, SLOT(openProperties()));
   p_properties->setIcon(QIcon(":/menus/properties.svg"));
+
+  p_properties = menu.addAction("open new properties widget");
+  QObject::connect(p_properties, SIGNAL(triggered()), this, SLOT(openPropertiesNewWidget()));
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
