@@ -201,6 +201,14 @@ public slots:
    */
   void selectAll();
 
+  /*!@brief Hide all trigger connections
+   */
+  void hideTriggerConnections();
+
+  /*!@brief Show all trigger connections
+   */
+  void showTriggerConnections();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
