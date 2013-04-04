@@ -95,6 +95,21 @@ public:
     return this->mCurrentZoomLevel;
   }
 
+  void hideTriggerConnections()
+  {
+    this->mpScene->setTriggerDisplayMode(cedar::proc::gui::Scene::MODE_HIDE_ALL);
+  }
+
+  void showTriggerConnections()
+  {
+    this->mpScene->setTriggerDisplayMode(cedar::proc::gui::Scene::MODE_SHOW_ALL);
+  }
+
+  void smartTriggerConnections()
+  {
+
+  }
+
 public slots:
   /*!@brief Changes the current zoom level of the architecture.
    */

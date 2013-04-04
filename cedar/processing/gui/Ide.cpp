@@ -184,6 +184,9 @@ cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui)
   QObject::connect(mpActionDuplicate, SIGNAL(triggered()), this, SLOT(duplicateStep()));
 
   QObject::connect(mpActionSelectAll, SIGNAL(triggered()), this, SLOT(selectAll()));
+
+  QObject::connect(mpActionTriggerHideAll, SIGNAL(triggered()), this, SLOT(hideTriggerConnections()));
+  QObject::connect(mpActionTriggerShowAll, SIGNAL(triggered()), this, SLOT(showTriggerConnections()));
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -796,4 +799,24 @@ void cedar::proc::gui::Ide::fillRecentFilesList()
   }
 
   this->mpRecentFiles->setMenu(p_menu);
+}
+
+void cedar::proc::gui::Ide::hideTriggerConnections()
+{
+  // first, update the gui
+  this->mpActionTriggerHideAll->setEnabled(false);
+  this->mpActionTriggerShowAll->setEnabled(true);
+
+  // then, notify view
+  mpProcessingDrawer->hideTriggerConnections();
+}
+
+void cedar::proc::gui::Ide::showTriggerConnections()
+{
+  // first, update the gui
+  this->mpActionTriggerHideAll->setEnabled(true);
+  this->mpActionTriggerShowAll->setEnabled(false);
+
+  // then, notify view
+  mpProcessingDrawer->showTriggerConnections();
 }

@@ -218,8 +218,23 @@
     <addaction name="mpActionDuplicate"/>
     <addaction name="mpActionSelectAll"/>
    </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <widget class="QMenu" name="menuTrigger_Connections">
+     <property name="title">
+      <string>Trigger Connections</string>
+     </property>
+     <addaction name="mpActionTriggerHideAll"/>
+     <addaction name="mpActionTriggerShowAll"/>
+     <addaction name="mpActionTriggerSmartHide"/>
+    </widget>
+    <addaction name="menuTrigger_Connections"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuView"/>
    <addaction name="menuPlugins"/>
    <addaction name="menuSimulation"/>
    <addaction name="mpMenuWindows"/>
@@ -293,7 +308,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>124</width>
+          <width>122</width>
           <height>418</height>
          </rect>
         </property>
@@ -306,8 +321,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>124</width>
-          <height>417</height>
+          <width>122</width>
+          <height>418</height>
          </rect>
         </property>
         <attribute name="label">
@@ -378,10 +393,16 @@
    <property name="text">
     <string>Save as ...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
   </action>
   <action name="mpActionLoad">
    <property name="text">
     <string>Load ...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
    </property>
   </action>
   <action name="mpActionExit">
@@ -511,6 +532,42 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="mpActionTriggerHideAll">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Hide all</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="mpActionTriggerShowAll">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Show all</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+T</string>
+   </property>
+  </action>
+  <action name="mpActionTriggerSmartHide">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Smart hide</string>
    </property>
   </action>
  </widget>
