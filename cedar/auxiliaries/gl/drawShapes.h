@@ -67,6 +67,26 @@ namespace cedar
        */
       CEDAR_AUX_LIB_EXPORT void drawBlock(double length, double width, double height, bool wireFrame=false);
       
+      /*!@brief  draws a rectangular block in the current coordinate frame
+       * @param front extension in positive x-direction of current coordinate frame
+       * @param back extension in negative x-direction of current coordinate frame
+       * @param right extension in positive y-direction of current coordinate frame
+       * @param left extension in negative y-direction of current coordinate frame
+       * @param up extension in positive z-direction of current coordinate frame
+       * @param down extension in negative z-direction of current coordinate frame
+       * @param wireFrame decides whether to draw full surfaces or only a wire frame
+       */
+      CEDAR_AUX_LIB_EXPORT void drawBlock
+      (
+        double front,
+        double back,
+        double right,
+        double left,
+        double up,
+        double down,
+        bool wireFrame=false
+      );
+
       /*!@brief  draws a cone in direction of the z-axis of the current coordinate frame
        * @param floor distance from the floor to the xy-plane along the z-axis
        * @param ceiling distance from the xy-plane to the ceiling along the z-axis
