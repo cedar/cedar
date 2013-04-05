@@ -88,7 +88,9 @@ protected:
 private:
   //!@brief draws the base
   void drawBase();
-  //!@brief draws a camera
+  //!@brief draws the head
+  void drawHead();
+  //!@brief draws a single camera
   void drawCamera();
 
   //--------------------------------------------------------------------------------------------------------------------
