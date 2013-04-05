@@ -100,8 +100,9 @@ void cedar::dev::robot::gl::Caren::draw()
   drawBase();
   mTrunkVisualization->draw();
   mArmVisualization->draw();
-//  mHandVisualization->draw();
-//  mHeadVisualization->draw();
+  mHandVisualization->draw();
+  mHeadVisualization->draw();
+  drawHead();
 }
 
 void cedar::dev::robot::gl::Caren::drawBase()
@@ -110,9 +111,10 @@ void cedar::dev::robot::gl::Caren::drawBase()
   glPopMatrix();
   glPushMatrix();
 
-  // move to object coordinates
+  // go to trunk frame
   mTransformationTranspose = mTrunk->getRootTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  // go to table frame
   glTranslated(0, 0, -0.36);
   glRotated(180, 0, 0, 1);
 
@@ -125,6 +127,18 @@ void cedar::dev::robot::gl::Caren::drawBase()
   // trunk block
   glTranslated(0, 0, 0.012);
   cedar::aux::gl::drawBlock(.07, .07, 0.075, .165, .225, 0, mIsDrawnAsWireFrame);
+
+  // vertical neck bar
+  glTranslated(0, -0.1875, -0.012);
+  cedar::aux::gl::drawBlock(.0225, .0225, 0.0225, .0225, .823, 0, mIsDrawnAsWireFrame);
+  // horizontal neck bar
+  glTranslated(0, 0, 0.8005);
+  cedar::aux::gl::drawBlock(.0225, .0225, .2475, 0.0225, .0225, 0.0225, mIsDrawnAsWireFrame);
+  // neck plate
+  glTranslated(0, 0.1875, 0.0225);
+  cedar::aux::gl::drawBlock(.045, .045, .07, 0.07, .01, 0.0, mIsDrawnAsWireFrame);
+
+
   setMaterial(NO_MATERIAL);
 
   // move to origin
@@ -132,20 +146,63 @@ void cedar::dev::robot::gl::Caren::drawBase()
   glPushMatrix();
 }
 
+void cedar::dev::robot::gl::Caren::drawHead()
+{
+  // move to origin
+  glPopMatrix();
+  glPushMatrix();
+
+  // go to head end-effector frame
+  mTransformationTranspose = mHead->getEndEffectorTransformation().t();
+  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+
+  // draw camera base plate
+  setMaterial(CHROME);
+  cedar::aux::gl::drawBlock(.045, .045, .125, 0.125, .008, 0.0, mIsDrawnAsWireFrame);
+
+  // draw middle camera
+  glTranslated(0.016, 0.0, 0.008);
+  drawCamera();
+
+  // draw left camera
+  glTranslated(0.0, 0.075, 0.0);
+  drawCamera();
+
+  // draw right camera
+  glTranslated(0.0, -0.15, 0.0);
+  drawCamera();
+
+
+  setMaterial(NO_MATERIAL);
+}
+
 void cedar::dev::robot::gl::Caren::drawCamera()
 {
-//  setMaterial(WHITE_PLASTIC);
-//  glRotated(90, 1, 0, 0);
-//  glTranslated(0, .020, -.005);
-//  cedar::aux::gl::drawBlock(.060, .110, .060, mIsDrawnAsWireFrame);
-//  glTranslated(0, .055, 0);
-//  setMaterial(BLACK_METAL);
-//  glRotated(-90, 1, 0, 0);
-//  cedar::aux::gl::drawCone(0, .003, .0185, .0185, mResolution, mIsDrawnAsWireFrame);
-//  cedar::aux::gl::drawCone(0, .003, .0225, .0225, mResolution, mIsDrawnAsWireFrame);
-//  glTranslated(0, 0, .0001);
-//  cedar::aux::gl::drawDisk(0, .0185, mResolution, mResolution, false, mIsDrawnAsWireFrame);
-//  glTranslated(0, 0, .0029);
-//  cedar::aux::gl::drawDisk(.0185, .0225, mResolution, mResolution, false, mIsDrawnAsWireFrame);
-//  setMaterial(NO_MATERIAL);
+  // save current transformation
+  glPushMatrix();
+
+  // draw body of the camera
+  setMaterial(CHROME);
+  cedar::aux::gl::drawBlock(.029, .029, .022, 0.022, .033, 0.0, mIsDrawnAsWireFrame);
+
+  // move to lens
+  glTranslated(0.029, 0.0, 0.0165);
+  glRotated(90, 0, 1, 0);
+
+  // lens holder
+  cedar::aux::gl::drawCone(0, .008, .0145, .0145, mResolution, mIsDrawnAsWireFrame);
+  glTranslated(0.0, 0.0, 0.008);
+  cedar::aux::gl::drawDisk(.0145, .018, mResolution, mResolution, true, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawCone(0, .0065, .018, .018, mResolution, mIsDrawnAsWireFrame);
+  glTranslated(0.0, 0.0, 0.0065);
+  setMaterial(BLACK);
+  cedar::aux::gl::drawDisk(.018, .02, mResolution, mResolution, true, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawCone(0, .029, .02, .02, mResolution, mIsDrawnAsWireFrame);
+  glTranslated(0.0, 0.0, 0.024);
+  cedar::aux::gl::drawDisk(.0, .02, mResolution, mResolution, false, mIsDrawnAsWireFrame);
+  glTranslated(0.0, 0.0, -0.01);
+  setMaterial(CHROME);
+  cedar::aux::gl::drawSphere(0.015, mResolution, mResolution, mIsDrawnAsWireFrame);
+  // get back to previous transformation
+  glPopMatrix();
 }
