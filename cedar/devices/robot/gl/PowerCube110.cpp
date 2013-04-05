@@ -122,36 +122,6 @@ void cedar::dev::robot::gl::PowerCube110::drawBase()
   setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
   this->drawElement(mProximalLinkVertexVboId, mProximalLinkIndexVboId, mProximalLinkFacesNumber);
   this->drawElement(mConnectorVertexVboId, mConnectorIndexVboId, mConnectorFacesNumber);
-
-
-
-//  cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
-//
-//  // save hand origin to stack
-//  glPushMatrix();
-//
-//  // draw the base
-//  if (isDrawingLocalCoordinateFrame())
-//  {
-//    cedar::aux::gl::drawAxes(0.05);
-//    cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
-//  }
-//
-//  // transform to make up for data file organization
-//  glRotated(90, 1, 0, 0);
-//  glTranslated(0, 0.1105, 0);
-//
-//  // draw
-//  setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
-//  this->drawElement(mProximalLinkVertexVboId, mProximalLinkIndexVboId, mProximalLinkFacesNumber);
-//  this->drawElement(mConnectorVertexVboId, mConnectorIndexVboId, mConnectorFacesNumber);
-//  glRotated(mpKinematicChain->getJointAngle(0)*180.0/cedar::aux::math::pi, 0, 1, 0);
-//  this->drawElement(mDistalLinkVertexVboId, mDistalLinkIndexVboId, mDistalLinkFacesNumber);
-//  setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
-//  glPopMatrix();
-
-
-
 }
 
 void cedar::dev::robot::gl::PowerCube110::drawSegment(unsigned int index)
