@@ -117,10 +117,17 @@ void cedar::aux::conv::Convolution::slotKernelRemoved(size_t)
 
 void cedar::aux::conv::Convolution::updateCombinedKernel()
 {
-  cv::Mat new_combined_kernel = this->getKernelList()->getCombinedKernel();
-  this->mCombinedKernel->lockForWrite();
-  this->mCombinedKernel->setData(new_combined_kernel);
-  this->mCombinedKernel->unlock();
+  try
+  {
+    cv::Mat new_combined_kernel = this->getKernelList()->getCombinedKernel();
+    this->mCombinedKernel->lockForWrite();
+    this->mCombinedKernel->setData(new_combined_kernel);
+    this->mCombinedKernel->unlock();
+  }
+  catch (cedar::aux::DimensionalityMismatchException& exc)
+  {
+    // may happen due to dimensionality updates in kernel list, ignore
+  }
 }
 
 void cedar::aux::conv::Convolution::selectedEngineChanged()
