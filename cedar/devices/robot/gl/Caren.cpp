@@ -100,41 +100,36 @@ void cedar::dev::robot::gl::Caren::draw()
   drawBase();
   mTrunkVisualization->draw();
   mArmVisualization->draw();
-  mHandVisualization->draw();
-  mHeadVisualization->draw();
+//  mHandVisualization->draw();
+//  mHeadVisualization->draw();
 }
 
 void cedar::dev::robot::gl::Caren::drawBase()
 {
-//  // move to origin
-//  glPopMatrix();
-//  glPushMatrix();
-//
-//  // move to object coordinates
-//  mTransformationTranspose = mTrunk->getRootTransformation().t();
-//  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
-//
-////  setMaterial(CHROME);
-//  glTranslated(-.090 - .025, 0, .010 + .070);
-//  cedar::aux::gl::drawBlock(.050, .050, .140, mIsDrawnAsWireFrame); // this is the aluminum block
-////  setMaterial(DARK_BLUE_METAL);
-//  glTranslated(-.025 - .010, 0, 0);
-//  cedar::aux::gl::drawBlock(.020, .050, .140, mIsDrawnAsWireFrame); // this is the small blue block
-//  glTranslated(-.010 - .025, 0, .1625);
-//  cedar::aux::gl::drawBlock(.050, .050, .465, mIsDrawnAsWireFrame); // this is the tall pole
-////  setMaterial(CHROME);
-//  glTranslated(0, 0, .2325 + .004);
-//  cedar::aux::gl::drawBlock(.050, .050, .008, mIsDrawnAsWireFrame); // now comes the aluminum connector
-//  glTranslated(0, 0, .004 + .013);
-//  glRotated(45, 0, 0, 1);
-//  cedar::aux::gl::drawBlock(.031, .031, .026, mIsDrawnAsWireFrame);
-//  glRotated(-45, 0, 0, 1);
-//  glTranslated(0, 0, .013 + .023);
-//  cedar::aux::gl::drawBlock(.050, .050, .046, mIsDrawnAsWireFrame);
-//  glTranslated(-.025 + .1175, 0, .023 + .005);
-//  cedar::aux::gl::drawBlock(.235, .050, .010, mIsDrawnAsWireFrame); // this is the long horizontal piece
-////  setMaterial(NO_MATERIAL);
+  // move to origin
+  glPopMatrix();
+  glPushMatrix();
 
+  // move to object coordinates
+  mTransformationTranspose = mTrunk->getRootTransformation().t();
+  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  glTranslated(0, 0, -0.36);
+  glRotated(180, 0, 0, 1);
+
+  setMaterial(CHROME);
+  // table connector plate
+  cedar::aux::gl::drawBlock(.1, .1, 1.4625, .3375, .012, 0, mIsDrawnAsWireFrame);
+  // base plate
+  glTranslated(0, 0, 0.012);
+  cedar::aux::gl::drawBlock(.1, .1, 0.075, .165, .012, 0, mIsDrawnAsWireFrame);
+  // trunk block
+  glTranslated(0, 0, 0.012);
+  cedar::aux::gl::drawBlock(.07, .07, 0.075, .165, .225, 0, mIsDrawnAsWireFrame);
+  setMaterial(NO_MATERIAL);
+
+  // move to origin
+  glPopMatrix();
+  glPushMatrix();
 }
 
 void cedar::dev::robot::gl::Caren::drawCamera()
