@@ -129,9 +129,14 @@ int main(int argc, char **argv)
   scene->addObjectVisualization(cylinder);
 
   // create a mounted camera viewer
-  cedar::dev::robot::gui::MountedCameraViewer camera_viewer(scene, caren_head);
+  cedar::dev::robot::gui::MountedCameraViewer camera_viewer(scene, caren_head, false);
   camera_viewer.readJson(camera_middle_configuration_file);
   camera_viewer.setSceneRadius(scene->getSceneLimit());
+
+//  std::cout << "camera type = " << camera_viewer.camera()->type() << std::endl;
+//  std::cout << "camera zNear = " << camera_viewer.camera()->zNear() << std::endl;
+//  camera_viewer.camera()->setZNearCoefficient(0.025);
+//  std::cout << "camera zNear = " << camera_viewer.camera()->zNear() << std::endl;
 
   // show widgets
   scene_widget->show();
