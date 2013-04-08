@@ -226,8 +226,7 @@
      <property name="title">
       <string>Trigger Connections</string>
      </property>
-     <addaction name="mpActionTriggerHideAll"/>
-     <addaction name="mpActionTriggerShowAll"/>
+     <addaction name="mpActionToggleTriggerVisibility"/>
      <addaction name="mpActionTriggerSmartHide"/>
     </widget>
     <addaction name="menuTrigger_Connections"/>
@@ -369,9 +368,7 @@
    <addaction name="mpActionSave"/>
    <addaction name="mpActionResetRootNetwork"/>
    <addaction name="separator"/>
-   <addaction name="mpActionTriggerHideAll"/>
-   <addaction name="mpActionTriggerShowAll"/>
-   <addaction name="separator"/>
+   <addaction name="mpActionToggleTriggerVisibility"/>
   </widget>
   <action name="mpActionNew">
    <property name="text">
@@ -538,46 +535,26 @@
     <string>Ctrl+A</string>
    </property>
   </action>
-  <action name="mpActionTriggerHideAll">
+  <action name="mpActionToggleTriggerVisibility">
    <property name="checkable">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="checked">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="icon">
     <iconset resource="icons/icons.qrc">
-     <normaloff>:/toolbaricons/hide_triggers.svg</normaloff>:/toolbaricons/hide_triggers.svg</iconset>
+     <normaloff>:/toolbaricons/hide_triggers.svg</normaloff>
+     <normalon>:/toolbaricons/show_triggers.svg</normalon>:/toolbaricons/hide_triggers.svg</iconset>
    </property>
    <property name="text">
-    <string>Hide all</string>
+    <string>toggle visibility</string>
    </property>
    <property name="toolTip">
-    <string>Hide all triggers</string>
+    <string>Toggle visibility of triggers.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+T</string>
-   </property>
-  </action>
-  <action name="mpActionTriggerShowAll">
-   <property name="checkable">
-    <bool>false</bool>
-   </property>
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="icons/icons.qrc">
-     <normaloff>:/toolbaricons/show_triggers.svg</normaloff>:/toolbaricons/show_triggers.svg</iconset>
-   </property>
-   <property name="text">
-    <string>Show all</string>
-   </property>
-   <property name="toolTip">
-    <string>Show all triggers.</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+T</string>
    </property>
   </action>
   <action name="mpActionTriggerSmartHide">
