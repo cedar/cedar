@@ -308,7 +308,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>122</width>
+          <width>124</width>
           <height>418</height>
          </rect>
         </property>
@@ -321,7 +321,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>122</width>
+          <width>124</width>
           <height>418</height>
          </rect>
         </property>
@@ -368,6 +368,10 @@
    <addaction name="mpActionShowHideGrid"/>
    <addaction name="mpActionSave"/>
    <addaction name="mpActionResetRootNetwork"/>
+   <addaction name="separator"/>
+   <addaction name="mpActionTriggerHideAll"/>
+   <addaction name="mpActionTriggerShowAll"/>
+   <addaction name="separator"/>
   </widget>
   <action name="mpActionNew">
    <property name="text">
@@ -541,8 +545,15 @@
    <property name="checked">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset resource="icons/icons.qrc">
+     <normaloff>:/toolbaricons/hide_triggers.svg</normaloff>:/toolbaricons/hide_triggers.svg</iconset>
+   </property>
    <property name="text">
     <string>Hide all</string>
+   </property>
+   <property name="toolTip">
+    <string>Hide all triggers</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+T</string>
@@ -555,8 +566,15 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset resource="icons/icons.qrc">
+     <normaloff>:/toolbaricons/show_triggers.svg</normaloff>:/toolbaricons/show_triggers.svg</iconset>
+   </property>
    <property name="text">
     <string>Show all</string>
+   </property>
+   <property name="toolTip">
+    <string>Show all triggers.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+T</string>
