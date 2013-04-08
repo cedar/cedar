@@ -69,7 +69,7 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief the constructor */
-  Viewer(cedar::aux::gl::ScenePtr pScene);
+  Viewer(cedar::aux::gl::ScenePtr pScene, bool readFromFile=true);
 
   /*!@brief the constructor */
   ~Viewer();
@@ -148,6 +148,9 @@ private:
 
   ///!@brief internal flag if grabber is connected
   bool mGrabberConnected;
+
+  ///!@brief internal flag if saved state should be read
+  bool mReadFromFile;
 
   std::string mRegisteredGrabber;
 };

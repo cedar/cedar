@@ -47,10 +47,11 @@
 cedar::dev::robot::gui::MountedCameraViewer::MountedCameraViewer
 (
   cedar::aux::gl::ScenePtr pScene,
-  const cedar::dev::robot::KinematicChainPtr chain
+  const cedar::dev::robot::KinematicChainPtr chain,
+  bool readFromFile
 )
 :
-cedar::aux::gui::Viewer(pScene),
+cedar::aux::gui::Viewer(pScene, readFromFile),
 mArm(chain),
 mCameraCoordinateFrame(new cedar::aux::LocalCoordinateFrame()),
 _mMountingJoint
@@ -140,6 +141,7 @@ void cedar::dev::robot::gui::MountedCameraViewer::draw()
   // export these to the camera in the viewer
   qglviewer::Camera* viewer_camera = this->camera();
   viewer_camera->setFromProjectionMatrix(projection_matrix_float.ptr<float>());
+  viewer_camera->setZNearCoefficient(0.025);
 
   cedar::aux::gui::Viewer::draw();
 }
