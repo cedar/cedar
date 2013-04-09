@@ -119,7 +119,7 @@ void cedar::dev::robot::gl::PowerCube110::drawBase()
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   }
-  setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
+  setMaterial(cedar::aux::gl::ObjectVisualization::BRASS);
   this->drawElement(mProximalLinkVertexVboId, mProximalLinkIndexVboId, mProximalLinkFacesNumber);
   this->drawElement(mConnectorVertexVboId, mConnectorIndexVboId, mConnectorFacesNumber);
 }
@@ -152,7 +152,7 @@ void cedar::dev::robot::gl::PowerCube110::drawSegment(unsigned int index)
   switch (index)
   {
   case 0:
-    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::BRASS);
     this->drawElement(mDistalLinkVertexVboId, mDistalLinkIndexVboId, mDistalLinkFacesNumber);
     setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     break;

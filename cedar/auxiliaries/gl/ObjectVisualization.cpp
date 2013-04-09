@@ -46,18 +46,37 @@
  #include <QFile>
 
 const float cedar::aux::gl::ObjectVisualization::mNoSpecular[3] = {0.0f, 0.0f, 0.0f};
+
 const float cedar::aux::gl::ObjectVisualization::mSegment_Ambient[3] = {0.0f, 0.0f, 0.0f};
 const float cedar::aux::gl::ObjectVisualization::mSegment_Diffuse[3] = {1.0f, 0.39215699f, 0.0f};
 const float cedar::aux::gl::ObjectVisualization::mSegment_Specular[3] = {0.40000001f, 0.16078401f, 0.0f};
 const float cedar::aux::gl::ObjectVisualization::mSegment_Shininess[1] = {1.0f};
+
+const float cedar::aux::gl::ObjectVisualization::mPowerCube_Ambient[3] = {0.5f, 0.5f, 0.0f};
+const float cedar::aux::gl::ObjectVisualization::mPowerCube_Diffuse[3] = {0.5f, 0.5f, 0.0f};
+const float cedar::aux::gl::ObjectVisualization::mPowerCube_Specular[3] = {0.8f, 0.8f, 0.8f};
+const float cedar::aux::gl::ObjectVisualization::mPowerCube_Shininess[1] = {0.5f};
+
 const float cedar::aux::gl::ObjectVisualization::mChrome_Ambient[3] = {0.25f, 0.25f, 0.25f};
 const float cedar::aux::gl::ObjectVisualization::mChrome_Diffuse[3] = {0.4f, 0.4f, 0.4f};
 const float cedar::aux::gl::ObjectVisualization::mChrome_Specular[3] = {0.774597f, 0.774597f, 0.774597f};
-const float cedar::aux::gl::ObjectVisualization::mChrome_Shininess[1] = {0.6f};
+const float cedar::aux::gl::ObjectVisualization::mChrome_Shininess[1] = {76.8f};
+
+const float cedar::aux::gl::ObjectVisualization::mBronze_Ambient[3] = {0.2125f, 0.1275f, 0.054f};
+const float cedar::aux::gl::ObjectVisualization::mBronze_Diffuse[3] = {0.714f, 0.4284f, 0.18144f};
+const float cedar::aux::gl::ObjectVisualization::mBronze_Specular[3] = {0.393548f, 0.271906f, 0.166721f};
+const float cedar::aux::gl::ObjectVisualization::mBronze_Shininess[1] = {0.2f};
+
+const float cedar::aux::gl::ObjectVisualization::mBrass_Ambient[3] = {0.329412f, 0.223529f, 0.027451f};
+const float cedar::aux::gl::ObjectVisualization::mBrass_Diffuse[3] = {0.780392f, 0.568627f, 0.113725f};
+const float cedar::aux::gl::ObjectVisualization::mBrass_Specular[3] = {0.992157f, 0.941176f, 0.807843f};
+const float cedar::aux::gl::ObjectVisualization::mBrass_Shininess[1] = {27.8974f};
+
 const float cedar::aux::gl::ObjectVisualization::mBlack_Ambient[3] = {0.0f, 0.0f, 0.0f};
 const float cedar::aux::gl::ObjectVisualization::mBlack_Diffuse[3] = {0.01f, 0.01f, 0.01f};
 const float cedar::aux::gl::ObjectVisualization::mBlack_Specular[3] = {0.2f, 0.2f, 0.2f};
 const float cedar::aux::gl::ObjectVisualization::mBlack_Shininess[1] = {0.05f};
+
 const float cedar::aux::gl::ObjectVisualization::mWhite_Ambient[3] = {1.0f, 1.0f, 1.0f};
 const float cedar::aux::gl::ObjectVisualization::mWhite_Diffuse[3] = {0.9f, 0.9f, 0.9f};
 const float cedar::aux::gl::ObjectVisualization::mWhite_Specular[3] = {0.8f, 0.8f, 0.8f};
@@ -307,6 +326,9 @@ void cedar::aux::gl::ObjectVisualization::drawElement
 
 void cedar::aux::gl::ObjectVisualization::setMaterial(int material)
 {
+  glDisable(GL_COLOR_MATERIAL);
+//  glEnable(GL_BLEND);
+//  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   switch (material)
   {
   case NO_MATERIAL:
@@ -315,25 +337,46 @@ void cedar::aux::gl::ObjectVisualization::setMaterial(int material)
     glEnable(GL_COLOR_MATERIAL);
     break;
   case SEGMENT:
-    glDisable(GL_COLOR_MATERIAL);
     glMaterialfv(GL_FRONT, GL_AMBIENT, mSegment_Ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, mSegment_Diffuse);
     glMaterialfv(GL_FRONT, GL_SPECULAR, mSegment_Specular);
     glMaterialfv(GL_FRONT, GL_SHININESS, mSegment_Shininess);
     break;
+  case POWERCUBE:
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mPowerCube_Ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mPowerCube_Diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mPowerCube_Specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mPowerCube_Shininess);
+    break;
   case CHROME:
-    glDisable(GL_COLOR_MATERIAL);
     glMaterialfv(GL_FRONT, GL_AMBIENT, mChrome_Ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, mChrome_Diffuse);
     glMaterialfv(GL_FRONT, GL_SPECULAR, mChrome_Specular);
     glMaterialfv(GL_FRONT, GL_SHININESS, mChrome_Shininess);
     break;
+  case BRONZE:
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mBronze_Ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mBronze_Diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mBronze_Specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mBronze_Shininess);
+    break;
+  case BRASS:
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mBrass_Ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mBrass_Diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mBrass_Specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mBrass_Shininess);
+    break;
   case BLACK:
-    glDisable(GL_COLOR_MATERIAL);
     glMaterialfv(GL_FRONT, GL_AMBIENT, mBlack_Ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, mBlack_Diffuse);
     glMaterialfv(GL_FRONT, GL_SPECULAR, mBlack_Specular);
     glMaterialfv(GL_FRONT, GL_SHININESS, mBlack_Shininess);
+    break;
+  case WHITE:
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mWhite_Ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mWhite_Diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mWhite_Specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mWhite_Shininess);
     break;
   }
 }
