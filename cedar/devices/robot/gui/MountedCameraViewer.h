@@ -65,7 +65,7 @@ public:
   (
     cedar::aux::gl::ScenePtr pScene,
     const cedar::dev::robot::KinematicChainPtr chain,
-    bool readFromFile
+    bool readFromFile=true
   );
 
   /*!@brief the constructor */
