@@ -58,6 +58,10 @@ const float cedar::aux::gl::ObjectVisualization::mBlack_Ambient[3] = {0.0f, 0.0f
 const float cedar::aux::gl::ObjectVisualization::mBlack_Diffuse[3] = {0.01f, 0.01f, 0.01f};
 const float cedar::aux::gl::ObjectVisualization::mBlack_Specular[3] = {0.2f, 0.2f, 0.2f};
 const float cedar::aux::gl::ObjectVisualization::mBlack_Shininess[1] = {0.05f};
+const float cedar::aux::gl::ObjectVisualization::mWhite_Ambient[3] = {1.0f, 1.0f, 1.0f};
+const float cedar::aux::gl::ObjectVisualization::mWhite_Diffuse[3] = {0.9f, 0.9f, 0.9f};
+const float cedar::aux::gl::ObjectVisualization::mWhite_Specular[3] = {0.8f, 0.8f, 0.8f};
+const float cedar::aux::gl::ObjectVisualization::mWhite_Shininess[1] = {0.05f};
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

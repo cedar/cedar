@@ -252,7 +252,8 @@ protected:
                       NO_MATERIAL,
                       SEGMENT,
                       CHROME,
-                      BLACK
+                      BLACK,
+                      WHITE
                     };
 
   //! Static member for no specularity.
@@ -293,6 +294,18 @@ protected:
 
   //! Static member for the shininess factor of black parts.
   static const float mBlack_Shininess[1];
+
+  //! Static member for the ambient color of white parts.
+  static const float mWhite_Ambient[3];
+
+  //! Static member for the diffuse color of white parts.
+  static const float mWhite_Diffuse[3];
+
+  //! Static member for the specular color of white parts.
+  static const float mWhite_Specular[3];
+
+  //! Static member for the shininess factor of white parts.
+  static const float mWhite_Shininess[1];
 
 private:
   // none yet
