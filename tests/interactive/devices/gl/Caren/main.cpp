@@ -84,10 +84,13 @@ int main(int argc, char **argv)
   caren_trunk->setEndEffector(caren_arm->getRootCoordinateFrame());
   caren_arm->setEndEffector(palm->getRootCoordinateFrame());
 
+  // initialize head to look straight down
+  caren_head->setJointAngle(1, 1.4);
+
   // create scene and viewer to display the arm
   cedar::aux::gl::ScenePtr scene(new cedar::aux::gl::Scene());
   scene->setSceneLimit(2);
-  scene->drawFloor(true);
+  scene->drawFloor(false);
   cedar::aux::gui::Viewer viewer(scene);
   viewer.setSceneRadius(scene->getSceneLimit());
 
@@ -141,22 +144,10 @@ int main(int argc, char **argv)
 
 
 
-
-
-
-
-
-
-
   // create a mounted camera viewer
   cedar::dev::robot::gui::MountedCameraViewer camera_viewer(scene, caren_head, false);
   camera_viewer.readJson(camera_middle_configuration_file);
   camera_viewer.setSceneRadius(scene->getSceneLimit());
-
-//  std::cout << "camera type = " << camera_viewer.camera()->type() << std::endl;
-//  std::cout << "camera zNear = " << camera_viewer.camera()->zNear() << std::endl;
-//  camera_viewer.camera()->setZNearCoefficient(0.025);
-//  std::cout << "camera zNear = " << camera_viewer.camera()->zNear() << std::endl;
 
   // show widgets
   scene_widget->show();
