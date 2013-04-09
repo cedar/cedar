@@ -133,14 +133,34 @@ int main(int argc, char **argv)
   scene->addObjectVisualization(cylinder);
 
   // create a chess board visualization and add it to the scene
-  cedar::aux::LocalCoordinateFramePtr chessboard_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
-  chessboard_local_coordinate_frame->setName("chess board");
-  chessboard_local_coordinate_frame->setTranslation(.1, -.14, .0);
-  cedar::aux::gl::ObjectVisualizationPtr chessboard
+  cedar::aux::LocalCoordinateFramePtr chessboard_one_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  chessboard_one_local_coordinate_frame->setName("chess board");
+  chessboard_one_local_coordinate_frame->setTranslation(.1, -.14, .0);
+  cedar::aux::gl::ObjectVisualizationPtr chessboard_one
   (
-    new cedar::aux::gl::Chessboard(chessboard_local_coordinate_frame, .175, .245, 0.0001, 5, 7, 0, 0, 0)
+    new cedar::aux::gl::Chessboard(chessboard_one_local_coordinate_frame, .175, .245, 0.0001, 5, 7, 0, 0, 0)
   );
-  scene->addObjectVisualization(chessboard);
+  scene->addObjectVisualization(chessboard_one);
+
+  // create a chess board visualization and add it to the scene
+  cedar::aux::LocalCoordinateFramePtr chessboard_two_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  chessboard_two_local_coordinate_frame->setName("chess board");
+  chessboard_two_local_coordinate_frame->setTranslation(.553, -.3745, .0);
+  cedar::aux::gl::ObjectVisualizationPtr chessboard_two
+  (
+    new cedar::aux::gl::Chessboard(chessboard_two_local_coordinate_frame, .175, .245, 0.0001, 5, 7, 0, 0, 0)
+  );
+  scene->addObjectVisualization(chessboard_two);
+
+  // create a chess board visualization and add it to the scene
+  cedar::aux::LocalCoordinateFramePtr chessboard_three_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  chessboard_three_local_coordinate_frame->setName("chess board");
+  chessboard_three_local_coordinate_frame->setTranslation(.553, 1.2535, .0);
+  cedar::aux::gl::ObjectVisualizationPtr chessboard_three
+  (
+    new cedar::aux::gl::Chessboard(chessboard_three_local_coordinate_frame, .175, .245, 0.0001, 5, 7, 0, 0, 0)
+  );
+  scene->addObjectVisualization(chessboard_three);
 
 
 
