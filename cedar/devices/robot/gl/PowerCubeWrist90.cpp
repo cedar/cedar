@@ -134,7 +134,7 @@ void cedar::dev::robot::gl::PowerCubeWrist90::drawBase()
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   }
-  setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
+  setMaterial(cedar::aux::gl::ObjectVisualization::BRASS);
   this->drawElement(mWristLinkVertexVboId, mWristLinkIndexVboId, mWristLinkFacesNumber);
 }
 
@@ -165,12 +165,12 @@ void cedar::dev::robot::gl::PowerCubeWrist90::drawSegment(unsigned int index)
   switch (index)
   {
   case 0:
-    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::BRASS);
     this->drawElement(mDistalLinkVertexVboId, mDistalLinkIndexVboId, mDistalLinkFacesNumber);
     setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     break;
   case 1:
-    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::BRASS);
     this->drawElement(mProximalLinkVertexVboId, mProximalLinkIndexVboId, mProximalLinkFacesNumber);
     setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     break;
