@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/gui/SceneWidget.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/gl/Cylinder.h"
+#include "cedar/auxiliaries/gl/Chessboard.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -127,6 +128,25 @@ int main(int argc, char **argv)
     new cedar::aux::gl::Cylinder(cylinder_local_coordinate_frame, .1, .2, 0, 0.8, 0)
   );
   scene->addObjectVisualization(cylinder);
+
+  // create a chess board visualization and add it to the scene
+  cedar::aux::LocalCoordinateFramePtr chessboard_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  chessboard_local_coordinate_frame->setName("chess board");
+  chessboard_local_coordinate_frame->setTranslation(.1, -.14, .0);
+  cedar::aux::gl::ObjectVisualizationPtr chessboard
+  (
+    new cedar::aux::gl::Chessboard(chessboard_local_coordinate_frame, .175, .245, 0.0001, 5, 7, 0, 0, 0)
+  );
+  scene->addObjectVisualization(chessboard);
+
+
+
+
+
+
+
+
+
 
   // create a mounted camera viewer
   cedar::dev::robot::gui::MountedCameraViewer camera_viewer(scene, caren_head, false);
