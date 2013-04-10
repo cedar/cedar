@@ -55,6 +55,7 @@ likely to undergo major changes:
   - cedar::dev::sensors::visual::CameraGrabber is not working at the moment.
   - network functionality in the processing framework has several issues; for now, we recommend not using it because
     there are some annoying bugs related to it.
+  - using multiple 3D convolutions in separate threads slows down all involved convolutions
 
 == Version 1.0.8 ==
 
@@ -68,6 +69,10 @@ likely to undergo major changes:
 - cedar::aux::net
   - fixed issues with GCC 4.7 and the NetTransporter (Reader/Writer) code
     (only occured when the optional YARP dependency was included)
+    
+- cedar::aux::conv
+  - using 3D convolutions in separate threads doesn't crash anymore, but the introduced lock slows down
+    all involved convolutions (FFTW plan creation is not thread-safe). This will be fixed with a rewrite of FFTW code.
 
 == Version 1.0.7
 - cedar::aux::gui
