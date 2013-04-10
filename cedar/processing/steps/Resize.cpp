@@ -142,7 +142,7 @@ void cedar::proc::steps::Resize::compute(const cedar::proc::Arguments&)
     case 1:
     {
       cv::Size size = this->getOutputSize();
-      cv::Mat src = cedar::aux::math::canonicalColVector(input);
+      cv::Mat src = cedar::aux::math::canonicalRowVector(input);
       cv::resize(src, output, size, 0, 0, this->_mInterpolationType->getValue());
       break;
     }
