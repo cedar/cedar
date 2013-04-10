@@ -55,6 +55,10 @@ likely to undergo major changes:
   - cedar::dev::sensors::visual::CameraGrabber is not working at the moment.
   - network functionality in the processing framework has several issues; for now, we recommend not using it because
     there are some annoying bugs related to it.
+    
+== current stable ==
+- cedar::proc
+  - Fixed a bug in the resize step that lead to weird results when the step was being used with 1d inputs.
 
 == Version 1.0.8 ==
 
