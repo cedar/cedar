@@ -37,6 +37,9 @@
 // CEDAR INCLUDES
 #include "cedar/devices/robot/gui/namespace.h"
 #include "cedar/devices/robot/gui/MountedCameraViewer.h"
+#include "cedar/auxiliaries/math/screwCalculus.h"
+#include "cedar/auxiliaries/gl/drawShapes.h"
+#include "cedar/auxiliaries/gl/gl.h"
 
 // SYSTEM INCLUDES
 
@@ -142,6 +145,50 @@ void cedar::dev::robot::gui::MountedCameraViewer::draw()
   qglviewer::Camera* viewer_camera = this->camera();
   viewer_camera->setFromProjectionMatrix(projection_matrix_float.ptr<float>());
   viewer_camera->setZNearCoefficient(0.025);
+
+  // calculate the coordinates of a 3d-point in the camera image
+  cv::Mat R = external(cv::Rect(0, 0, 3, 3)).clone();
+  cv::Mat axis = cv::Mat::zeros(3, 1, CV_64FC1);
+  double theta=0;
+  cv::Mat point_world = cv::Mat::zeros(1, 3, CV_64FC1);
+  point_world.at<double>(0, 0) = 0.5;
+  cedar::aux::math::logAxis<double>(R, axis, theta);
+  cv::Mat rvec = axis*theta;
+  cv::Mat tvec = external(cv::Rect(3, 0, 1, 3)).clone();
+  cv::Mat distortion_coefficients = cv::Mat::zeros(1, 5, CV_64FC1);
+
+  cv::Mat point_image = cv::Mat::zeros(1, 2, CV_64FC1);
+  cv::projectPoints(point_world, rvec, tvec, mCalibrationMatrix, distortion_coefficients, point_image);
+
+//  GLdouble camera_projection[16];
+//  viewer_camera->getProjectionMatrix(camera_projection);
+//  std::cout << camera_projection[0] << " " << camera_projection[4] << " " << camera_projection[8] << " " << camera_projection[12] << std::endl
+//      << camera_projection[1] << " " << camera_projection[5] << " " << camera_projection[9] << " " << camera_projection[13] << std::endl
+//      << camera_projection[2] << " " << camera_projection[6] << " " << camera_projection[10] << " " << camera_projection[14] << std::endl
+//      << camera_projection[3] << " " << camera_projection[7] << " " << camera_projection[11] << " " << camera_projection[15] << std::endl << std::endl;
+//
+//  cedar::aux::math::write(mCalibrationMatrix);
+//  cedar::aux::math::write(mProjection);
+//  cedar::aux::math::write(external);
+//  cedar::aux::math::write(mCalibrationMatrix * mProjection * external);
+//  cedar::aux::math::write(external);
+//  cedar::aux::math::write(R);
+//  cedar::aux::math::write(tvec);
+//  std::cout << theta << std::endl;
+//  cedar::aux::math::write(point_image);
+//
+//  std::cout << point_image.at<double>(0, 0) << ", " << point_image.at<double>(0, 1) << std::endl;
+//  std::cout << "--------------------------------------------------------" << std::endl;
+
+
+//  this->startScreenCoordinatesSystem();
+//  glTranslated( point_image.at<double>(0, 0), point_image.at<double>(0, 1), 0);
+//  cedar::aux::gl::setColor(1, 0, 0);
+//  cedar::aux::gl::drawCross(10, 1);
+//  this->stopScreenCoordinatesSystem();
+
+
+
 
   cedar::aux::gui::Viewer::draw();
 }
