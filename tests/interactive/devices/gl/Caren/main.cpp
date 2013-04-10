@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/gui/SceneWidget.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/gl/Cylinder.h"
+#include "cedar/auxiliaries/gl/Sphere.h"
 #include "cedar/auxiliaries/gl/Chessboard.h"
 
 // SYSTEM INCLUDES
@@ -125,12 +126,22 @@ int main(int argc, char **argv)
   // create a cylinder visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr cylinder_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
   cylinder_local_coordinate_frame->setName("cylinder");
-  cylinder_local_coordinate_frame->setTranslation(.3, .0, 1.0);
+  cylinder_local_coordinate_frame->setTranslation(1, 0, 1);
   cedar::aux::gl::ObjectVisualizationPtr cylinder
   (
-    new cedar::aux::gl::Cylinder(cylinder_local_coordinate_frame, .1, .2, 0, 0.8, 0)
+    new cedar::aux::gl::Cylinder(cylinder_local_coordinate_frame, .01, .02, 0, 0.8, 0)
   );
   scene->addObjectVisualization(cylinder);
+
+  // create a sphere visualization and add it to the scene
+  cedar::aux::LocalCoordinateFramePtr sphere_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  sphere_local_coordinate_frame->setName("sphere");
+  sphere_local_coordinate_frame->setTranslation(.5, .0, 0.0);
+  cedar::aux::gl::ObjectVisualizationPtr sphere
+  (
+    new cedar::aux::gl::Sphere(sphere_local_coordinate_frame, .005, 0, 0.8, 0)
+  );
+  scene->addObjectVisualization(sphere);
 
   // create a chess board visualization and add it to the scene
   cedar::aux::LocalCoordinateFramePtr chessboard_one_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
