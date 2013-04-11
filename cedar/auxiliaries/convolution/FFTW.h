@@ -136,7 +136,8 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  //!@brief plan creation and destruction is not thread-safe, must be locked
+  static QReadWriteLock mPlanLock;
 
 }; // cedar::aux::conv::FFTW
 
