@@ -58,6 +58,8 @@ likely to undergo major changes:
   - using multiple 3D convolutions in separate threads slows down all involved convolutions
     
 == current stable ==
+
+== Version 1.0.9 ==
 - cedar::proc
   - Fixed a bug in the resize step that lead to weird results when the step was being used with 1d inputs.
 - cedar::aux::conv
