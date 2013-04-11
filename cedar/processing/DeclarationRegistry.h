@@ -54,10 +54,13 @@ namespace cedar
 {
   namespace proc
   {
+    /*! Manages declarations of element classes.
+     */
     typedef
       cedar::aux::DeclarationManagerTemplate<cedar::proc::ElementPtr>
       ElementManager;
 
+    //! Sinleton of the element manager.
     typedef
       cedar::aux::Singleton<ElementManager>
       ElementManagerSingleton;

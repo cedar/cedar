@@ -132,11 +132,13 @@ public:
   //! Declares all plugins in this list.
   void declareAll() const;
 
+  //! Returns the number of declarations in this list.
   size_t size() const
   {
     return this->mDeclarations.size();
   }
 
+  //! Returns the declaration at the given index.
   cedar::aux::PluginDeclarationPtr at(size_t i) const
   {
     return this->mDeclarations.at(i);

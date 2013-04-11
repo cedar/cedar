@@ -100,6 +100,8 @@ public:
     this->onDeclare();
   }
 
+  /*! Returns name of the class stored in this declaration.
+   */
   std::string getClassName() const
   {
     if (!this->mClassName.empty())
