@@ -118,7 +118,7 @@ void cedar::dev::robot::gl::Caren::drawBase()
   glTranslated(0, 0, -0.36);
   glRotated(180, 0, 0, 1);
 
-  // table connector plate
+  // table plate
   setMaterial(WHITE);
   cedar::aux::gl::drawBlock(.728, .12, 1.4985, .3745, .0, 0.06, mIsDrawnAsWireFrame);
 
