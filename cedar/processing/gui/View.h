@@ -95,19 +95,23 @@ public:
     return this->mCurrentZoomLevel;
   }
 
+  //! Hides all trigger connections in this view's scene.
   void hideTriggerConnections()
   {
     this->mpScene->setTriggerDisplayMode(cedar::proc::gui::Scene::MODE_HIDE_ALL);
   }
 
+  //! Shows all trigger connections in this view's scene.
   void showTriggerConnections()
   {
     this->mpScene->setTriggerDisplayMode(cedar::proc::gui::Scene::MODE_SHOW_ALL);
   }
 
+  /*! Sets the smart-hide method for the trigger connections.
+   * @todo Implement this method.
+   */
   void smartTriggerConnections()
   {
-
   }
 
 public slots:

@@ -90,8 +90,11 @@ namespace cedar
     //!@endcond
 
     //!@todo Deprecate this
+
+    //!@cond SKIPPED_DOCUMENTATION
     typedef cedar::aux::PluginDeclarationList PluginDeclaration;
     CEDAR_GENERATE_POINTER_TYPES(PluginDeclaration);
+    //!@endcond
 
     //!@brief a factory for elements
     typedef boost::shared_ptr<cedar::aux::Factory<ElementPtr> > ElementFactoryPtr;

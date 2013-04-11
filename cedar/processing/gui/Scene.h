@@ -258,6 +258,8 @@ public:
    */
   void exportSvg(const QString& file);
 
+  /*! Sets the display mode for triggers.
+   */
   void setTriggerDisplayMode(TRIGGER_CONNECTION_MODE mode)
   {
     this->mTriggerMode = mode;

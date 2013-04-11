@@ -70,6 +70,7 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Constructor that takes a category and an (optional) class name to use for the element.
   ElementDeclaration(const std::string& category, const std::string& className = "")
   :
   cedar::aux::PluginDeclarationBaseTemplate<cedar::proc::ElementPtr>(category, className)
