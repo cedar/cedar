@@ -92,6 +92,19 @@ public:
     return this->getData().type();
   }
 
+  void copyValueFrom(cedar::aux::ConstDataPtr data)
+  {
+    if (ConstMatDataPtr mat_data_ptr = boost::dynamic_pointer_cast<ConstMatData>(data))
+    {
+      this->setData(mat_data_ptr->getData().clone());
+    }
+    else
+    {
+      CEDAR_THROW(cedar::aux::TypeMismatchException, "Cannot cast given data to matrix data.");
+    }
+  }
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

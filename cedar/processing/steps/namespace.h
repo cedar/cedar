@@ -68,6 +68,7 @@ namespace cedar
       CEDAR_DECLARE_PROC_CLASS(Switch);
       CEDAR_DECLARE_PROC_CLASS(TransformationDirection);
       CEDAR_DECLARE_PROC_CLASS(TransformationType);
+      CEDAR_DECLARE_PROC_CLASS(UnitConverter);
 
 #ifdef CEDAR_USE_YARP
       CEDAR_DECLARE_PROC_CLASS(NetWriterSink);
