@@ -51,7 +51,8 @@
 
 cedar::dev::Locomotion::Locomotion()
 :
-mTurningRate(new cedar::dev::AngularVelocityData(0.0 * cedar::unit::radians_per_second)),
+mForwardVelocity(new cedar::aux::VelocityData(0.0 * cedar::unit::meters_per_second)),
+mTurningRate(new cedar::aux::AngularVelocityData(0.0 * cedar::unit::radians_per_second)),
 _mForwardVelocityLimits
 (
   new cedar::aux::math::VelocityLimitsParameter
@@ -82,13 +83,15 @@ _mTurningRateLimits
 )
 {
   this->addCommandedData("turning rate", this->mTurningRate, boost::bind(&cedar::dev::Locomotion::applyTurningRate, this));
+  this->addCommandedData("forward velocity", this->mForwardVelocity, boost::bind(&cedar::dev::Locomotion::applyTurningRate, this));
 }
 
 // constructor taking an externally created channel
 cedar::dev::Locomotion::Locomotion(cedar::dev::ChannelPtr channel)
 :
 cedar::dev::Component(channel),
-mTurningRate(new cedar::dev::AngularVelocityData(0.0 * cedar::unit::radians_per_second)),
+mForwardVelocity(new cedar::aux::VelocityData(0.0 * cedar::unit::meters_per_second)),
+mTurningRate(new cedar::aux::AngularVelocityData(0.0 * cedar::unit::radians_per_second)),
 _mForwardVelocityLimits
 (
   new cedar::aux::math::VelocityLimitsParameter
@@ -118,7 +121,9 @@ _mTurningRateLimits
       )
 )
 {
+  //!@todo It is inefficient to call two different functions for setting turning rate and velocity, there should be only one call.
   this->addCommandedData("turning rate", this->mTurningRate, boost::bind(&cedar::dev::Locomotion::applyTurningRate, this));
+  this->addCommandedData("forward velocity", this->mForwardVelocity, boost::bind(&cedar::dev::Locomotion::applyTurningRate, this));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -127,12 +132,17 @@ _mTurningRateLimits
 
 void cedar::dev::Locomotion::applyTurningRate()
 {
-  //!@todo Fill in
+  this->setTurningRate(this->mTurningRate->getData());
+}
+
+void cedar::dev::Locomotion::applyForwardVelocity()
+{
+  this->setForwardVelocity(this->mForwardVelocity->getData());
 }
 
 cedar::unit::Velocity cedar::dev::Locomotion::getForwardVelocity() const
 {
-  return mForwardVelocity;
+  return mForwardVelocity->getData();
 }
 
 cedar::unit::AngularVelocity cedar::dev::Locomotion::getTurningRate() const

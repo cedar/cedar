@@ -1500,8 +1500,9 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
                                                      )
 {
   //!@todo This code needs to be cleaned up, simplified and commented
-  std::string source_name = (*it)->getSource()->getParent();
-  std::string target_name = (*it)->getTarget()->getParent();
+  cedar::proc::DataConnectionPtr connection = *it;
+  std::string source_name = connection->getSource()->getParent();
+  std::string target_name = connection->getTarget()->getParent();
   std::string real_source_name = source_name;
   if (cedar::proc::ConstPromotedExternalDataPtr ext = boost::dynamic_pointer_cast<const cedar::proc::PromotedExternalData>((*it)->getSource()))
   {
@@ -1534,7 +1535,8 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
   CEDAR_DEBUG_ASSERT(triggerable_target);
   if (!triggerable_target->isLooped())
   {
-    target_name = (*it)->getTarget()->getParent(); // reset target_name
+    target_name = connection->getTarget()->getParent(); // reset target_name
+    connection->disconnect();
     // check that both Connectables are not connected through some other DataSlots
     cedar::proc::ConnectablePtr target_connectable = this->getElement<cedar::proc::Connectable>(target_name);
     it = mDataConnections.erase(it);
@@ -1563,6 +1565,7 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
   }
   else
   {
+    connection->disconnect();
     it = mDataConnections.erase(it);
   }
   return it;

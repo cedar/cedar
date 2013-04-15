@@ -64,13 +64,14 @@ cedar_add_library(cedarproc
   gui/ToolBox.h
   gui/View.h
   sources/GaussInput.h
-  steps/StaticGain.h
   steps/Component.h
   steps/Convolution.h
   steps/ColorConversion.h
   steps/CoordinateTransformation.h
   steps/MatrixTypeConverter.h
   steps/Flip.h
+  steps/StaticGain.h
+  steps/UnitConverter.h
   sources/Boost.h
   sources/Noise.h
   sources/Picture.h

@@ -126,15 +126,17 @@ protected:
 private:
   void applyTurningRate();
 
+  void applyForwardVelocity();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //! desired forward velocity [m/s]
-  cedar::unit::Velocity mForwardVelocity;
+  cedar::aux::VelocityDataPtr mForwardVelocity;
 
   //! desired turning rate of the robot [rad/s]
-  cedar::dev::AngularVelocityDataPtr mTurningRate;
+  cedar::aux::AngularVelocityDataPtr mTurningRate;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

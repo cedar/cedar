@@ -42,8 +42,10 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/devices/Component.h"
+#include "cedar/auxiliaries/Data.h"
 
 // SYSTEM INCLUDES
+#include <typeinfo>
 
 //----------------------------------------------------------------------------------------------------------------------
 // declaration
@@ -82,6 +84,7 @@ namespace
 
 cedar::proc::steps::Component::Component()
 :
+cedar::proc::Step(false, true),
 _mComponent(new cedar::dev::ComponentParameter(this, "component"))
 {
   QObject::connect(this->_mComponent.get(), SIGNAL(valueChanged()), this, SLOT(componentChanged()));
@@ -98,6 +101,38 @@ cedar::proc::steps::Component::~Component()
 void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
 {
   this->getComponent()->updateMeasuredValues();
+
+  // read values from the inputs
+  std::vector<std::string> data_names = this->getComponent()->getDataNames(cedar::dev::Component::COMMANDED);
+  for (auto name_iter = data_names.begin(); name_iter != data_names.end(); ++name_iter)
+  {
+    const std::string& name = *name_iter;
+    this->getComponent()->getCommandedData(name)->copyValueFrom(this->getInput(name));
+  }
+
+  // update the commands
+  this->getComponent()->updateCommandedValues();
+}
+
+cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Component::determineInputValidity
+                                (
+                                  cedar::proc::ConstDataSlotPtr slot,
+                                  cedar::aux::ConstDataPtr data
+                                ) const
+{
+  const std::string& name = slot->getName();
+
+  // only commanded data are inputs
+  cedar::aux::ConstDataPtr component_data = this->getComponent()->getCommandedData(name);
+
+  if (typeid(*component_data) == typeid(*data))
+  {
+    return cedar::proc::DataSlot::VALIDITY_VALID;
+  }
+  else
+  {
+    return cedar::proc::DataSlot::VALIDITY_ERROR;
+  }
 }
 
 void cedar::proc::steps::Component::componentChanged()
@@ -127,7 +162,7 @@ void cedar::proc::steps::Component::componentChanged()
       switch (type)
       {
         case cedar::dev::Component::COMMANDED:
-          this->declareInput(name);
+          this->declareInput(name, false);
           break;
 
         case cedar::dev::Component::MEASURED:

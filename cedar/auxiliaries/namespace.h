@@ -39,6 +39,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
+#include "cedar/units/AngularVelocity.h"
+#include "cedar/units/Velocity.h"
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
@@ -207,6 +209,12 @@ namespace cedar
     //!@brief A concretization of DataTemplate for a set of simple matrices (std::vector<cv::Mat>).
     typedef DataTemplate<std::vector<cv::Mat> > ImageSetData;
 
+    typedef cedar::aux::DataTemplate<cedar::unit::AngularVelocity> AngularVelocityData;
+    CEDAR_GENERATE_POINTER_TYPES(AngularVelocityData);
+
+    typedef cedar::aux::DataTemplate<cedar::unit::Velocity> VelocityData;
+    CEDAR_GENERATE_POINTER_TYPES(VelocityData);
+
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(MatData);
     CEDAR_DECLARE_AUX_CLASS(DoubleData);
@@ -231,6 +239,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(MatrixMismatchException);
     CEDAR_DECLARE_AUX_CLASS(NoDefaultException);
     CEDAR_DECLARE_AUX_CLASS(NotFoundException);
+    CEDAR_DECLARE_AUX_CLASS(NotImplementedException);
     CEDAR_DECLARE_AUX_CLASS(NullPointerException);
     CEDAR_DECLARE_AUX_CLASS(ParameterNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(RangeException);

@@ -41,7 +41,6 @@
 #include "cedar/devices/lib.h"
 #include "cedar/defines.h"
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/units/AngularVelocity.h"
 
 // SYSTEM INCLUDES
 #include <boost/intrusive_ptr.hpp>
@@ -87,10 +86,6 @@ namespace cedar
     CEDAR_DECLARE_DEV_CLASS(UnknownOperatingSystemException);
     CEDAR_DECLARE_DEV_CLASS(UnresponsiveRobotException);
     //!@endcond
-
-    //!@todo This probably isn't the right place ...
-    typedef cedar::aux::DataTemplate<cedar::unit::AngularVelocity> AngularVelocityData;
-    CEDAR_GENERATE_POINTER_TYPES(AngularVelocityData);
   }
 }
 

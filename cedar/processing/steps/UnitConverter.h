@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Component.h
+    File:        UnitConverter.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 03 05
+    Date:        2013 03 26
 
     Description:
 
@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_COMPONENT_H
-#define CEDAR_PROC_STEPS_COMPONENT_H
+#ifndef CEDAR_PROC_STEPS_UNIT_CONVERTER_H
+#define CEDAR_PROC_STEPS_UNIT_CONVERTER_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -43,39 +43,67 @@
 // CEDAR INCLUDES
 #include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/Step.h"
-#include "cedar/devices/ComponentParameter.h"
+#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief A step for bringing device components into a processing architecture.
+/*!@brief Step that converts a scalar value to a value with a unit.
  */
-class cedar::proc::steps::Component : public cedar::proc::Step
+class cedar::proc::steps::UnitConverter : public cedar::proc::Step
 {
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  class UnitType
+  {
+    public:
+      //! the id of an enum entry
+      typedef cedar::aux::EnumId Id;
+
+      //! constructs the enum for all ids
+      static void construct()
+      {
+        mType.type()->def(cedar::aux::Enum(Velocity, "Velocity"));
+        mType.type()->def(cedar::aux::Enum(AngularVelocity, "AngularVelocity"));
+      }
+
+      //! @returns A const reference to the base enum object.
+      static const cedar::aux::EnumBase& type()
+      {
+        return *(mType.type());
+      }
+
+      //! @returns A pointer to the base enum object.
+      static const cedar::proc::DataRole::TypePtr& typePtr()
+      {
+        return mType.type();
+      }
+
+    public:
+      static const Id Velocity = 0;
+      static const Id AngularVelocity = 1;
+
+    private:
+      static cedar::aux::EnumType<UnitType> mType;
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Component();
-
-  //!@brief Destructor
-  virtual ~Component();
+  UnitConverter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  inline cedar::dev::ComponentPtr getComponent() const
-  {
-    return this->_mComponent->getValue();
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -87,16 +115,19 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void compute(const cedar::proc::Arguments&);
-
+  //!@brief Determines whether the data item can be connected to the slot.
   cedar::proc::DataSlot::VALIDITY determineInputValidity
                                   (
                                     cedar::proc::ConstDataSlotPtr slot,
                                     cedar::aux::ConstDataPtr data
                                   ) const;
 
+  void inputConnectionChanged(const std::string& inputName);
+
+  void compute(const cedar::proc::Arguments&);
+
 private slots:
-  void componentChanged();
+  void outputTypeChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -104,18 +135,20 @@ private slots:
 protected:
   // none yet
 private:
-  // none yet
+  cedar::aux::ConstMatDataPtr mInput;
+
+  cedar::aux::DataPtr mOutput;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
 private:
-  cedar::dev::ComponentParameterPtr _mComponent;
+  //! Factor by which the value is multiplied before conversion. Useful if the input is not a unit type, yet.
+  cedar::aux::DoubleParameterPtr _mConversionFactor;
 
-}; // class cedar::proc::steps::Component
+  cedar::aux::EnumParameterPtr _mTargetType;
 
-#endif // CEDAR_PROC_STEPS_COMPONENT_H
+}; // class cedar::proc::steps::UnitConverter
+
+#endif // CEDAR_PROC_STEPS_UNIT_CONVERTER_H
 

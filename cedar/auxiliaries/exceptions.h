@@ -214,4 +214,9 @@ class cedar::aux::UnknownUnitSuffixException : public cedar::aux::ExceptionBase
 //! Exception that signals an invalid path.
 class cedar::aux::InvalidPathException : public cedar::aux::ExceptionBase {};
 
+
+/*!@brief An exception thrown when a method is not implemented.
+ */
+class cedar::aux::NotImplementedException : public cedar::aux::ExceptionBase {};
+
 #endif // CEDAR_AUX_EXCEPTIONS_H

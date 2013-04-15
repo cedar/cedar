@@ -65,7 +65,12 @@ cedar::dev::Component::~Component()
 void cedar::dev::Component::updateValues(cedar::dev::Component::DataType type)
 {
   auto map_iter = this->mData.find(type);
-  CEDAR_ASSERT(map_iter != this->mData.end());
+  if(map_iter == this->mData.end())
+  {
+    // no values to update
+    return;
+  }
+
   const std::map<std::string, DataSlot>& map = map_iter->second;
 
   for (auto iter = map.begin(); iter != map.end(); ++iter)

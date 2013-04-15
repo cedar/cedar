@@ -196,8 +196,10 @@ void cedar::dev::DifferentialDrive::setForwardVelocityAndTurningRate
   mWheelSpeed[1] = right_wheel_speed;
 
   cedar::unit::AngularVelocity turning_rate;
-  convertToForwardVelocityAndTurningRate(left_wheel_speed, right_wheel_speed, mForwardVelocity, turning_rate);
-  mTurningRate->setData(turning_rate);
+  cedar::unit::Velocity forward_velocity;
+  convertToForwardVelocityAndTurningRate(left_wheel_speed, right_wheel_speed, forward_velocity, turning_rate);
+  this->mTurningRate->setData(turning_rate);
+  this->mForwardVelocity->setData(forward_velocity);
 
   sendMovementCommand();
 }
