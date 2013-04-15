@@ -107,7 +107,12 @@ void cedar::proc::steps::Component::compute(const cedar::proc::Arguments&)
   for (auto name_iter = data_names.begin(); name_iter != data_names.end(); ++name_iter)
   {
     const std::string& name = *name_iter;
-    this->getComponent()->getCommandedData(name)->copyValueFrom(this->getInput(name));
+    cedar::aux::ConstDataPtr data = this->getInput(name);
+
+    if (data)
+    {
+      this->getComponent()->getCommandedData(name)->copyValueFrom(data);
+    }
   }
 
   // update the commands
