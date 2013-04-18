@@ -61,7 +61,9 @@ cedar_add_library(cedaraux
   gui/HistoryPlot0D.h
   gui/MatrixPlot.h
   gui/LinePlot.h
+  gui/VtkLinePlot.h
   gui/SurfacePlot.h
+  gui/VtkSurfacePlot.h
   gui/MatrixSlicePlot3D.h
   gui/MatrixVectorPlot.h
   gui/PropertyPane.h
