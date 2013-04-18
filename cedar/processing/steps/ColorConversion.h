@@ -76,6 +76,7 @@ public:
         mType.type()->def(cedar::aux::Enum(AUTO, "AUTO"));
         mType.type()->def(cedar::aux::Enum(BGR, "BGR"));
         mType.type()->def(cedar::aux::Enum(HSV, "HSV"));
+        mType.type()->def(cedar::aux::Enum(YUV, "YUV"));
       }
 
       //! @returns A const reference to the base enum object.
@@ -97,6 +98,8 @@ public:
       static const Id BGR = 1;
       //! flag for HSV color space (hue, saturation, value)
       static const Id HSV = 2;
+      //! flag for YUV color space (luma, chrominance)
+      static const Id YUV = 3;
 
     private:
       static cedar::aux::EnumType<ColorSpace> mType;
