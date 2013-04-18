@@ -105,21 +105,6 @@ public:
     return this->mDescription;
   }
 
-  /*!@brief Reads some values such as the icon path from the configuration node.
-   */
-  virtual void read(const cedar::aux::ConfigurationNode& node)
-  {
-    if (node.find("icon") != node.not_found())
-    {
-      this->setIconPath(node.get_child("icon").get_value<std::string>());
-    }
-
-    if (node.find("description") != node.not_found())
-    {
-      this->setDescription(node.get_child("description").get_value<std::string>());
-    }
-  }
-
   /*!@brief Defines a new plot for this type of element
    *
    * @param plotName    Name of the plot, displayed in the UI.
@@ -151,7 +136,18 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void customRead(const cedar::aux::ConfigurationNode& node)
+  {
+    if (node.find("icon") != node.not_found())
+    {
+      this->setIconPath(node.get_child("icon").get_value<std::string>());
+    }
+
+    if (node.find("description") != node.not_found())
+    {
+      this->setDescription(node.get_child("description").get_value<std::string>());
+    }
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
