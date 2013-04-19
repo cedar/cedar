@@ -747,7 +747,7 @@ void cedar::proc::gui::Scene::addTriggerItem(cedar::proc::gui::TriggerItem *pTri
   CEDAR_DEBUG_ASSERT(this->mElementMap.find(pTrigger->getTrigger().get()) == this->mElementMap.end());
   this->mElementMap[pTrigger->getTrigger().get()] = pTrigger;
 
-  // hide triggers if mode is right
+  // hide new triggers
   this->handleTriggerModeChange();
 }
 
