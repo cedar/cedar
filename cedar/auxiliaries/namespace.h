@@ -198,10 +198,15 @@ namespace cedar
 
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Data);
+
+    CEDAR_DECLARE_AUX_CLASS(UnitData);
     //!@endcond
 
     //!@brief a templated version of cedar::aux::Data
     template <typename T> class DataTemplate;
+
+    //!@brief a templated version of cedar::aux::UnitData
+    template <typename T> class UnitDataTemplate;
 
     //!@brief A concretization of DataTemplate for simple points (cv::Point).
     typedef DataTemplate<cv::Point> CvPointData;
@@ -209,10 +214,10 @@ namespace cedar
     //!@brief A concretization of DataTemplate for a set of simple matrices (std::vector<cv::Mat>).
     typedef DataTemplate<std::vector<cv::Mat> > ImageSetData;
 
-    typedef cedar::aux::DataTemplate<cedar::unit::AngularVelocity> AngularVelocityData;
+    typedef cedar::aux::UnitDataTemplate<cedar::unit::AngularVelocity> AngularVelocityData;
     CEDAR_GENERATE_POINTER_TYPES(AngularVelocityData);
 
-    typedef cedar::aux::DataTemplate<cedar::unit::Velocity> VelocityData;
+    typedef cedar::aux::UnitDataTemplate<cedar::unit::Velocity> VelocityData;
     CEDAR_GENERATE_POINTER_TYPES(VelocityData);
 
     //!@cond SKIPPED_DOCUMENTATION

@@ -42,6 +42,7 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/devices/namespace.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/UnitDataTemplate.h"
 #include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
