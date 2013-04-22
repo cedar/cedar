@@ -35,12 +35,13 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/devices/namespace.h"
+#include "cedar/devices/DifferentialDrive.h"
 #include "cedar/auxiliaries/VelocityParameter.h"
 #include "cedar/auxiliaries/LengthParameter.h"
 #include "cedar/auxiliaries/math/VelocityLimitsParameter.h"
 #include "cedar/auxiliaries/assert.h"
-#include "cedar/devices/namespace.h"
-#include "cedar/devices/DifferentialDrive.h"
+#include "cedar/auxiliaries/UnitDataTemplate.h"
 #include "cedar/units/Length.h"
 #include "cedar/units/Velocity.h"
 #include "cedar/units/AngularVelocity.h"

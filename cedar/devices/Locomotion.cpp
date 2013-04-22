@@ -38,7 +38,7 @@
 #include "cedar/auxiliaries/math/VelocityLimitsParameter.h"
 #include "cedar/auxiliaries/math/AngularVelocityLimitsParameter.h"
 #include "cedar/auxiliaries/math/constants.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/UnitDataTemplate.h"
 #include "cedar/devices/Locomotion.h"
 #include "cedar/units/Velocity.h"
 #include "cedar/units/AngularVelocity.h"
