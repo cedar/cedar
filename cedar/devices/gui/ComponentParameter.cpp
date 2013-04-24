@@ -76,6 +76,9 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::dev::gui::ComponentParameter::ComponentParameter()
+:
+mpComponentDialog(NULL),
+mpComponentTree(NULL)
 {
   auto p_layout = new QHBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
@@ -115,32 +118,58 @@ void cedar::dev::gui::ComponentParameter::parameterChanged()
   this->mpComponentPathDisplay->blockSignals(blocked);
 }
 
+void cedar::dev::gui::ComponentParameter::componentDoubleClicked()
+{
+  QTreeWidgetItem* p_selected = this->mpComponentTree->currentItem();
+
+  //TODO proper error handling
+  if (p_selected == NULL || p_selected->parent() == NULL || p_selected->parent() == this->mpComponentTree->invisibleRootItem())
+  {
+    return;
+  }
+
+  this->mpComponentDialog->accept();
+}
+
 void cedar::dev::gui::ComponentParameter::openComponentSelector()
 {
-  auto p_dialog = new QDialog();
-  p_dialog->setModal(true);
+  if (mpComponentDialog != NULL)
+  {
+    delete this->mpComponentDialog;
+  }
+  this->mpComponentDialog = new QDialog();
+
+  this->mpComponentDialog->setModal(true);
   auto p_layout = new QVBoxLayout();
 
-  auto p_tree = new QTreeWidget();
-  p_layout->addWidget(p_tree, 1);
-  p_tree->setColumnCount(1);
-  p_tree->setHeaderHidden(true);
-  this->fillRobots(p_tree->invisibleRootItem());
+  this->mpComponentTree = new QTreeWidget();
+  p_layout->addWidget(this->mpComponentTree, 1);
+  this->mpComponentTree->setColumnCount(1);
+  this->mpComponentTree->setHeaderHidden(true);
+  this->fillRobots(this->mpComponentTree->invisibleRootItem());
+
+  QObject::connect
+  (
+    this->mpComponentTree,
+    SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)),
+    this,
+    SLOT(componentDoubleClicked())
+  );
 
   auto p_buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-  QObject::connect(p_buttons, SIGNAL(accepted()), p_dialog, SLOT(accept()));
-  QObject::connect(p_buttons, SIGNAL(rejected()), p_dialog, SLOT(reject()));
+  QObject::connect(p_buttons, SIGNAL(accepted()), this->mpComponentDialog, SLOT(accept()));
+  QObject::connect(p_buttons, SIGNAL(rejected()), this->mpComponentDialog, SLOT(reject()));
   p_layout->addWidget(p_buttons);
 
-  p_dialog->setLayout(p_layout);
+  this->mpComponentDialog->setLayout(p_layout);
 
-  int res = p_dialog->exec();
+  int res = this->mpComponentDialog->exec();
   if (res == QDialog::Accepted)
   {
-    QTreeWidgetItem* p_selected = p_tree->currentItem();
+    QTreeWidgetItem* p_selected = this->mpComponentTree->currentItem();
 
     //TODO proper error handling
-    if (p_selected == NULL || p_selected->parent() == NULL || p_selected->parent() == p_tree->invisibleRootItem())
+    if (p_selected == NULL || p_selected->parent() == NULL || p_selected->parent() == this->mpComponentTree->invisibleRootItem())
     {
       return;
     }
@@ -185,6 +214,7 @@ void cedar::dev::gui::ComponentParameter::fillRobots(QTreeWidgetItem* pItem)
 
     auto p_robot_item = new QTreeWidgetItem();
     p_robot_item->setText(0, QString::fromStdString(robot_name));
+    p_robot_item->setFlags(p_robot_item->flags() & (~Qt::ItemIsSelectable));
     this->fillComponents(p_robot_item, robot);
 
     pItem->addChild(p_robot_item);
