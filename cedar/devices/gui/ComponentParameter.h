@@ -94,6 +94,8 @@ private slots:
 
   void parameterChanged();
 
+  void componentDoubleClicked();
+
 private:
   void fillRobots(QTreeWidgetItem* pItem);
   void fillComponents(QTreeWidgetItem* pItem, cedar::dev::RobotPtr robot);
@@ -107,6 +109,10 @@ private:
   QLineEdit* mpComponentPathDisplay;
 
   cedar::dev::ComponentParameterPtr mParameter;
+
+  QDialog* mpComponentDialog;
+
+  QTreeWidget* mpComponentTree;
 
 }; // class cedar::dev::gui::ComponentParameter
 
