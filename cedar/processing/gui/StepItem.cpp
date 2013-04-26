@@ -235,6 +235,8 @@ void cedar::proc::gui::StepItem::timerEvent(QTimerEvent * /* pEvent */)
   cedar::unit::Milliseconds run_time_avg(this->mStep->getRunTimeAverage());
   cedar::unit::Milliseconds lock_time(this->mStep->getLockTimeMeasurement());
   cedar::unit::Milliseconds lock_time_avg(this->mStep->getLockTimeAverage());
+  cedar::unit::Milliseconds round_time(this->mStep->getRoundTimeMeasurement());
+  cedar::unit::Milliseconds round_time_avg(this->mStep->getRoundTimeAverage());
   QString tool_tip
     = QString("<table>"
               "  <tr>"
@@ -253,9 +255,14 @@ void cedar::proc::gui::StepItem::timerEvent(QTimerEvent * /* pEvent */)
               "    <td>%2</td>"
               "  </tr>"
               "  <tr>"
-              "    <td>sum</td>"
+              "    <td>locking + compute</td>"
               "    <td>%5</td>"
               "    <td>%6</td>"
+              "  </tr>"
+              "  <tr>"
+              "    <td>round time</td>"
+              "    <td>%7</td>"
+              "    <td>%8</td>"
               "  </tr>"
               " </table>")
       .arg(QString::fromStdString(cedar::aux::toString(run_time)))
@@ -264,6 +271,8 @@ void cedar::proc::gui::StepItem::timerEvent(QTimerEvent * /* pEvent */)
       .arg(QString::fromStdString(cedar::aux::toString(lock_time_avg)))
       .arg(QString::fromStdString(cedar::aux::toString(run_time + lock_time)))
       .arg(QString::fromStdString(cedar::aux::toString(run_time_avg + lock_time_avg)))
+      .arg(QString::fromStdString(cedar::aux::toString(round_time)))
+      .arg(QString::fromStdString(cedar::aux::toString(round_time_avg)))
       ;
   this->setToolTip(tool_tip);
 }
