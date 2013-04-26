@@ -99,3 +99,17 @@ std::string cedar::aux::PluginDeclaration::getNamespaceName() const
     return this->getClassName();
   }
 }
+
+void cedar::aux::PluginDeclaration::read(const cedar::aux::ConfigurationNode& node)
+{
+  //!@todo Read deprecated names etc. from here.
+
+  // read custom information
+  this->customRead(node);
+}
+
+void cedar::aux::PluginDeclaration::customRead(const cedar::aux::ConfigurationNode& /* node */)
+{
+  // empty default implementation, override in derived classes to read custom information
+}
+

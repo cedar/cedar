@@ -218,8 +218,22 @@
     <addaction name="mpActionDuplicate"/>
     <addaction name="mpActionSelectAll"/>
    </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <widget class="QMenu" name="menuTrigger_Connections">
+     <property name="title">
+      <string>Trigger Connections</string>
+     </property>
+     <addaction name="mpActionToggleTriggerVisibility"/>
+     <addaction name="mpActionTriggerSmartHide"/>
+    </widget>
+    <addaction name="menuTrigger_Connections"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuView"/>
    <addaction name="menuPlugins"/>
    <addaction name="menuSimulation"/>
    <addaction name="mpMenuWindows"/>
@@ -307,7 +321,7 @@
           <x>0</x>
           <y>0</y>
           <width>124</width>
-          <height>417</height>
+          <height>418</height>
          </rect>
         </property>
         <attribute name="label">
@@ -353,6 +367,8 @@
    <addaction name="mpActionShowHideGrid"/>
    <addaction name="mpActionSave"/>
    <addaction name="mpActionResetRootNetwork"/>
+   <addaction name="separator"/>
+   <addaction name="mpActionToggleTriggerVisibility"/>
   </widget>
   <action name="mpActionNew">
    <property name="text">
@@ -378,10 +394,16 @@
    <property name="text">
     <string>Save as ...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
   </action>
   <action name="mpActionLoad">
    <property name="text">
     <string>Load ...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
    </property>
   </action>
   <action name="mpActionExit">
@@ -511,6 +533,36 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="mpActionToggleTriggerVisibility">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons/icons.qrc">
+     <normaloff>:/toolbaricons/hide_triggers.svg</normaloff>
+     <normalon>:/toolbaricons/show_triggers.svg</normalon>:/toolbaricons/hide_triggers.svg</iconset>
+   </property>
+   <property name="text">
+    <string>toggle visibility</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle visibility of triggers.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="mpActionTriggerSmartHide">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Smart hide</string>
    </property>
   </action>
  </widget>
