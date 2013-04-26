@@ -591,16 +591,36 @@ void cedar::proc::gui::Ide::logError(const std::string& message)
 
 void cedar::proc::gui::Ide::startThreads()
 {
-  cedar::proc::Manager::getInstance().startThreads();
-  this->mpThreadsStartAll->setEnabled(false);
-  this->mpThreadsStopAll->setEnabled(true);
+  cedar::proc::NetworkPtr network = this->mNetwork->getNetwork();
+
+  for (auto iter = network->elements().begin(); iter != network->elements().end(); ++iter)
+  {
+    cedar::proc::ElementPtr element = iter->second;
+    if (cedar::proc::LoopedTriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(element))
+    {
+      if (!trigger->isRunning())
+      {
+        trigger->startTrigger();
+      }
+    }
+  }
 }
 
 void cedar::proc::gui::Ide::stopThreads()
 {
-  cedar::proc::Manager::getInstance().stopThreads();
-  this->mpThreadsStartAll->setEnabled(true);
-  this->mpThreadsStopAll->setEnabled(false);
+  cedar::proc::NetworkPtr network = this->mNetwork->getNetwork();
+
+  for (auto iter = network->elements().begin(); iter != network->elements().end(); ++iter)
+  {
+    cedar::proc::ElementPtr element = iter->second;
+    if (cedar::proc::LoopedTriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(element))
+    {
+      if (trigger->isRunning())
+      {
+        trigger->stopTrigger();
+      }
+    }
+  }
 }
 
 void cedar::proc::gui::Ide::newFile()

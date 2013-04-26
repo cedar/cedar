@@ -369,6 +369,9 @@
    <addaction name="mpActionResetRootNetwork"/>
    <addaction name="separator"/>
    <addaction name="mpActionToggleTriggerVisibility"/>
+   <addaction name="separator"/>
+   <addaction name="mpThreadsStartAll"/>
+   <addaction name="mpThreadsStopAll"/>
   </widget>
   <action name="mpActionNew">
    <property name="text">
@@ -417,19 +420,27 @@
    </property>
   </action>
   <action name="mpThreadsStartAll">
-   <property name="enabled">
-    <bool>false</bool>
+   <property name="icon">
+    <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
+     <normaloff>:/cedar/auxiliaries/gui/start.svg</normaloff>:/cedar/auxiliaries/gui/start.svg</iconset>
    </property>
    <property name="text">
-    <string>Start</string>
+    <string>Start all triggers</string>
+   </property>
+   <property name="toolTip">
+    <string>Starts all triggers!</string>
    </property>
   </action>
   <action name="mpThreadsStopAll">
-   <property name="enabled">
-    <bool>false</bool>
+   <property name="icon">
+    <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
+     <normaloff>:/cedar/auxiliaries/gui/stop.svg</normaloff>:/cedar/auxiliaries/gui/stop.svg</iconset>
    </property>
    <property name="text">
-    <string>Stop</string>
+    <string>Stop all triggers</string>
+   </property>
+   <property name="toolTip">
+    <string>Stops all triggers!</string>
    </property>
   </action>
   <action name="mpActionShowHideItems">
@@ -592,6 +603,7 @@
  </customwidgets>
  <resources>
   <include location="icons/icons.qrc"/>
+  <include location="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc"/>
  </resources>
  <connections>
   <connection>
