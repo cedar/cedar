@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
+#include "cedar/auxiliaries/annotation/Disparity.h"
 #include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
@@ -137,6 +138,7 @@ void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std
     this->mpCurrentPlotWidget = NULL;
   }
 
+  // color space-annotated data
   try
   {
     // data should be plotted as an image
@@ -147,10 +149,28 @@ void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std
   }
   catch(cedar::aux::AnnotationNotFoundException&)
   {
+  }
+
+  // disparity-annotated data
+  try
+  {
+    // data should be plotted as an image
+    auto color_space = this->mData->getAnnotation<cedar::aux::annotation::Disparity>();
+    cedar::aux::gui::ImagePlot* p_plot = new cedar::aux::gui::ImagePlot();
+    p_plot->plot(this->mData, title);
+    this->mpCurrentPlotWidget = p_plot;
+  }
+  catch(cedar::aux::AnnotationNotFoundException&)
+  {
+  }
+
+  if (this->mpCurrentPlotWidget == NULL)
+  {
     // data should be plotted as a matrix
     cedar::aux::gui::MatrixPlot* p_plot = new cedar::aux::gui::MatrixPlot();
     p_plot->plot(this->mData, title);
     this->mpCurrentPlotWidget = p_plot;
   }
+
   this->layout()->addWidget(this->mpCurrentPlotWidget);
 }
