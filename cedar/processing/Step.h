@@ -169,6 +169,14 @@ public:
    */
   cedar::unit::Time getLockTimeAverage() const;
 
+  /*!@brief Returns the last round time measured for this step, i.e., the time between the last two compute calls.
+   */
+  cedar::unit::Time getRoundTimeMeasurement() const;
+
+  /*!@brief Returns the average round time measured for this step, i.e., the average time between compute calls.
+   */
+  cedar::unit::Time getRoundTimeAverage() const;
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
@@ -281,6 +289,10 @@ private:
    */
   void setLockTimeMeasurement(const cedar::unit::Time& time);
 
+  /*!@brief Sets the current round time measurement.
+   */
+  void setRoundTimeMeasurement(const cedar::unit::Time& time);
+
   /*!@brief Locks the data and parameters of the step.
    */
   void lock(cedar::aux::LOCK_TYPE parameterAccessType = cedar::aux::LOCK_TYPE_READ) const;
@@ -330,11 +342,19 @@ private:
   //!@brief Moving average of the iteration time.
   cedar::aux::MovingAverage<cedar::unit::Milliseconds> mLockingTime;
 
+  //!@brief Moving average of the time between compute calls.
+  cedar::aux::MovingAverage<cedar::unit::Milliseconds> mRoundTime;
+
+  clock_t mLastComputeCall;
+
   //!@brief Lock for the last iteration time.
   mutable QReadWriteLock mLastIterationTimeLock;
 
   //!@brief Lock for the last iteration time.
   mutable QReadWriteLock mLockTimeLock;
+
+  //!@brief Lock for the round time.
+  mutable QReadWriteLock mRoundTimeLock;
 
   //! The state of open-cv's RNG.
   uint64 mRNGState;
