@@ -537,7 +537,6 @@ cedar::unit::Time cedar::proc::Step::getRoundTimeAverage() const
   }
 }
 
-
 void cedar::proc::Step::setThreaded(bool isThreaded)
 {
   this->_mRunInThread->setValue(isThreaded);
