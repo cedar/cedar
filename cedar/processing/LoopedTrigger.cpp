@@ -49,6 +49,7 @@
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
+#include <QApplication>
 #include <algorithm>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -127,22 +128,46 @@ void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr trigger
 
 void cedar::proc::LoopedTrigger::startTrigger()
 {
+  emit triggerStarting();
+
+  //!@todo This feels like a dirty hack, but the starting signal won't get processed otherwise; really, this should all
+  //!      be done in a second thread.
+  int count = 0;
+  while (QApplication::hasPendingEvents() && ++count < 500)
+  {
+    QApplication::processEvents();
+  }
+
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
     this->mListeners.at(i)->callOnStart();
   }
   CEDAR_NON_CRITICAL_ASSERT(!this->isRunning());
   this->start();
+
+  emit triggerStarted();
 }
 
 void cedar::proc::LoopedTrigger::stopTrigger()
 {
+  emit triggerStopping();
+
+  //!@todo This feels like a dirty hack, but the starting signal won't get processed otherwise; really, this should all
+  //!      be done in a second thread.
+  int count = 0;
+  while (QApplication::hasPendingEvents() && ++count < 500)
+  {
+    QApplication::processEvents();
+  }
+
   this->stop(2000);
 
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
     this->mListeners.at(i)->callOnStop();
   }
+
+  emit triggerStopped();
 }
 
 void cedar::proc::LoopedTrigger::step(double time)
