@@ -58,6 +58,8 @@
 class cedar::proc::LoopedTrigger : public cedar::aux::LoopedThread,
                                    public cedar::proc::Trigger
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
@@ -88,6 +90,14 @@ public:
   /*!@brief Stops the trigger loop.
    */
   void stopTrigger();
+
+public slots:
+  //!@brief This slot is called when the step's name is changed.
+  void onNameChanged();
+
+signals:
+  //!@brief Signal that is emitted whenever the step's name is changed.
+  void nameChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

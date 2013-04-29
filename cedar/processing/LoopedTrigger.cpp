@@ -42,11 +42,12 @@
 // CEDAR INCLUDES
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/StepTime.h"
-#include "cedar/units/TimeUnit.h"
 #include "cedar/processing/Manager.h"
+#include "cedar/processing/Network.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/units/TimeUnit.h"
 
 // SYSTEM INCLUDES
 #include <algorithm>
@@ -97,6 +98,8 @@ cedar::proc::Trigger(name, true),
 //!@todo Make a TimeParameter and use it here instead.
 mWait(new cedar::aux::BoolParameter(this, "wait", true))
 {
+  // When the name changes, we need to tell the manager about this.
+  QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 }
 
 cedar::proc::LoopedTrigger::~LoopedTrigger()
@@ -107,6 +110,22 @@ cedar::proc::LoopedTrigger::~LoopedTrigger()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+/*! This method takes care of changing the step's name in the registry as well.
+ * @todo This should be solved better; currently, this has to be done for LoopedTriggers and Steps, with is copied code.
+ */
+void cedar::proc::LoopedTrigger::onNameChanged()
+{
+  if (cedar::proc::NetworkPtr parent_network = this->mRegisteredAt.lock())
+  {
+    // update the name
+    parent_network->updateObjectName(this);
+
+    // emit a signal to notify anyone interested in this
+    emit nameChanged();
+  }
+}
+
 void cedar::proc::LoopedTrigger::removeListener(cedar::proc::TriggerablePtr triggerable)
 {
   this->cedar::proc::Trigger::removeListener(triggerable);
