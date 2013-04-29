@@ -80,6 +80,7 @@ cedar_add_library(cedarproc
   steps/Resize.h
   Network.h
   Step.h
+  LoopedTrigger.h
   ${libdc_moc_headers}
   ${yarp_moc_headers}
   RESOURCES
