@@ -90,6 +90,14 @@ public:
    */
   void stopTrigger();
 
+public slots:
+  //!@brief This slot is called when the step's name is changed.
+  void onNameChanged();
+
+signals:
+  //!@brief Signal that is emitted whenever the step's name is changed.
+  void nameChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
