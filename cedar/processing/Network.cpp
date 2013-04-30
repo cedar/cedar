@@ -1530,6 +1530,7 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
   {
     target_name = real_target_name;
   }
+
   cedar::proc::TriggerablePtr triggerable_target = this->getElement<cedar::proc::Triggerable>(target_name);
   CEDAR_DEBUG_ASSERT(triggerable_target);
   if (!triggerable_target->isLooped())
@@ -1537,20 +1538,30 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
     target_name = (*it)->getTarget()->getParent(); // reset target_name
     // check that both Connectables are not connected through some other DataSlots
     cedar::proc::ConnectablePtr target_connectable = this->getElement<cedar::proc::Connectable>(target_name);
-    it = mDataConnections.erase(it);
     for (DataConnectionVector::iterator iter = mDataConnections.begin(); iter != mDataConnections.end(); ++iter)
     {
-      if ((*iter)->connects(
-                             this->getElement<cedar::proc::Connectable>(source_name),
-                             target_connectable
-                           )
-         )
+      if
+      (
+        // check if this is the connection being erased
+        iter != it &&
+        // if it isn't, check if it connects to the ssame target
+        (*iter)->connects
+        (
+          this->getElement<cedar::proc::Connectable>(source_name),
+          target_connectable
+        )
+      )
       {
+        it = mDataConnections.erase(it);
+
+        // recheck if the inputs of the target are still valid
+        triggerable_target->onTrigger();
+
         // found another connection between those two Connectables, do not delete done trigger and return
         return it;
       }
     }
-    // found no other connection, delete the TriggerConnection as well
+    // found no other connection, delete the TriggerConnection first to avoid trigger calls with unconnected input
     if (!real_target_name.empty()) // the target is a nested element
     {
       target_name = real_target_name;
@@ -1559,6 +1570,11 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
                              this->getElement<cedar::proc::Triggerable>(real_source_name)->getFinishedTrigger(),
                              this->getElement<cedar::proc::Triggerable>(target_name)
                            );
+
+    // then, erase the connection
+    it = mDataConnections.erase(it);
+
+    // recheck if the inputs of the target are still valid
     triggerable_target->onTrigger();
   }
   else

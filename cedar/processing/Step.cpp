@@ -75,6 +75,8 @@ mBusy(false),
 mpArgumentsLock(new QReadWriteLock()),
 mMovingAverageIterationTime(100), // average the last 100 iteration times
 mLockingTime(100), // average the last 100 iteration times
+mRoundTime(100), // average the last 100 iteration times
+mLastComputeCall(0),
 // initialize parameters
 mRNGState(0),
 mAutoLockInputsAndOutputs(true),
@@ -325,7 +327,6 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::T
 
 void cedar::proc::Step::run()
 {
-
   this->mBusy = true;
 
   // Read out the arguments
@@ -358,6 +359,19 @@ void cedar::proc::Step::run()
   clock_t lock_elapsed = lock_end - lock_start;
   double lock_elapsed_s = static_cast<double>(lock_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
   this->setLockTimeMeasurement(cedar::unit::Seconds(lock_elapsed_s));
+
+  if (this->mLastComputeCall != 0)
+  {
+    clock_t last = this->mLastComputeCall;
+    this->mLastComputeCall = clock();
+    clock_t elapsed = this->mLastComputeCall - last;
+    double elapsed_s = static_cast<double>(elapsed) / static_cast<double>(CLOCKS_PER_SEC);
+    this->setRoundTimeMeasurement(cedar::unit::Seconds(elapsed_s));
+  }
+  else
+  {
+    this->mLastComputeCall = clock();
+  }
 
   // start measuring the execution time.
   clock_t run_start = clock();
@@ -439,6 +453,12 @@ void cedar::proc::Step::setLockTimeMeasurement(const cedar::unit::Time& time)
   this->mLockingTime.append(cedar::unit::Seconds(time));
 }
 
+void cedar::proc::Step::setRoundTimeMeasurement(const cedar::unit::Time& time)
+{
+  QWriteLocker locker(&this->mRoundTimeLock);
+  this->mRoundTime.append(cedar::unit::Seconds(time));
+}
+
 cedar::unit::Time cedar::proc::Step::getRunTimeMeasurement() const
 {
   QReadLocker locker(&this->mLastIterationTimeLock);
@@ -484,6 +504,32 @@ cedar::unit::Time cedar::proc::Step::getLockTimeAverage() const
   if (this->mLockingTime.size() > 0)
   {
     return this->mLockingTime.getAverage();
+  }
+  else
+  {
+    return cedar::unit::Milliseconds(-1.0);
+  }
+}
+
+cedar::unit::Time cedar::proc::Step::getRoundTimeMeasurement() const
+{
+  QReadLocker locker(&this->mRoundTimeLock);
+  if (this->mRoundTime.size() > 0)
+  {
+    return this->mRoundTime.getNewest();
+  }
+  else
+  {
+    return cedar::unit::Milliseconds(0.0);
+  }
+}
+
+cedar::unit::Time cedar::proc::Step::getRoundTimeAverage() const
+{
+  QReadLocker locker(&this->mRoundTimeLock);
+  if (this->mRoundTime.size() > 0)
+  {
+    return this->mRoundTime.getAverage();
   }
   else
   {
