@@ -42,13 +42,15 @@
 // CEDAR INCLUDES
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/StepTime.h"
-#include "cedar/units/TimeUnit.h"
 #include "cedar/processing/Manager.h"
+#include "cedar/processing/Network.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/units/TimeUnit.h"
 
 // SYSTEM INCLUDES
+#include <QApplication>
 #include <algorithm>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -97,6 +99,8 @@ cedar::proc::Trigger(name, true),
 //!@todo Make a TimeParameter and use it here instead.
 mWait(new cedar::aux::BoolParameter(this, "wait", true))
 {
+  // When the name changes, we need to tell the manager about this.
+  QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 }
 
 cedar::proc::LoopedTrigger::~LoopedTrigger()
@@ -107,6 +111,22 @@ cedar::proc::LoopedTrigger::~LoopedTrigger()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+/*! This method takes care of changing the step's name in the registry as well.
+ * @todo This should be solved better; currently, this has to be done for LoopedTriggers and Steps, with is copied code.
+ */
+void cedar::proc::LoopedTrigger::onNameChanged()
+{
+  if (cedar::proc::NetworkPtr parent_network = this->mRegisteredAt.lock())
+  {
+    // update the name
+    parent_network->updateObjectName(this);
+
+    // emit a signal to notify anyone interested in this
+    emit nameChanged();
+  }
+}
+
 void cedar::proc::LoopedTrigger::removeListener(cedar::proc::TriggerablePtr triggerable)
 {
   this->cedar::proc::Trigger::removeListener(triggerable);
@@ -127,22 +147,46 @@ void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr trigger
 
 void cedar::proc::LoopedTrigger::startTrigger()
 {
+  emit triggerStarting();
+
+  //!@todo This feels like a dirty hack, but the starting signal won't get processed otherwise; really, this should all
+  //!      be done in a second thread.
+  int count = 0;
+  while (QApplication::hasPendingEvents() && ++count < 500)
+  {
+    QApplication::processEvents();
+  }
+
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
     this->mListeners.at(i)->callOnStart();
   }
   CEDAR_NON_CRITICAL_ASSERT(!this->isRunning());
   this->start();
+
+  emit triggerStarted();
 }
 
 void cedar::proc::LoopedTrigger::stopTrigger()
 {
+  emit triggerStopping();
+
+  //!@todo This feels like a dirty hack, but the starting signal won't get processed otherwise; really, this should all
+  //!      be done in a second thread.
+  int count = 0;
+  while (QApplication::hasPendingEvents() && ++count < 500)
+  {
+    QApplication::processEvents();
+  }
+
   this->stop(2000);
 
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
     this->mListeners.at(i)->callOnStop();
   }
+
+  emit triggerStopped();
 }
 
 void cedar::proc::LoopedTrigger::step(double time)

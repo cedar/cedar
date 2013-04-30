@@ -77,7 +77,7 @@ cedar_add_library(cedaraux
   kernel/Gauss.h
   kernel/Box.h
   RESOURCES
-  gui/icons/message_icons.qrc
+  gui/icons/cedar_aux_gui_icons.qrc
   LINK_LIBRARIES
   cedarunits
 )

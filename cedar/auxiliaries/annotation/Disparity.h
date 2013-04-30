@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LoopedTrigger.h
+    File:        Dimensions.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 06
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 06 29
 
     Description:
 
@@ -38,65 +34,44 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_LOOPED_TRIGGER_H
-#define CEDAR_PROC_LOOPED_TRIGGER_H
+#ifndef CEDAR_AUX_ANNOTATION_DISPARITY_H
+#define CEDAR_AUX_ANNOTATION_DISPARITY_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
-#include "cedar/processing/Trigger.h"
-#include "cedar/auxiliaries/LoopedThread.h"
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/annotation/namespace.h"
+#include "cedar/auxiliaries/annotation/Annotation.h"
+#include "cedar/auxiliaries/Cloneable.h"
 
 // SYSTEM INCLUDES
-#include <vector>
-#include <QObject>
 
-/*!@brief A Trigger that sends trigger events in a constant loop.
- *
- *        This class is a translation of the cedar::aux::LoopedThread concept into the processing framework.
+/*!@brief An annotation that indicates disparity data.
  */
-class cedar::proc::LoopedTrigger : public cedar::aux::LoopedThread,
-                                   public cedar::proc::Trigger
+class cedar::aux::annotation::Disparity
+:
+public cedar::aux::annotation::Annotation,
+public cedar::aux::Cloneable<cedar::aux::annotation::Disparity, cedar::aux::annotation::Annotation>
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
+public:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  LoopedTrigger(double stepSize = 1.0, const std::string& name = "");
-
-  //!@brief Destructor
-  virtual ~LoopedTrigger();
+  //!@brief Constructor.
+  Disparity();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Step method implemented from the superclass.
-   */
-  void step(double time);
-
-  /*!@brief Starts the trigger loop.
-   * @todo Make the start/stop methods in LoopedThread virtual and overload them in LoopedTrigger instead?
-   */
-  void startTrigger();
-
-  /*!@brief Stops the trigger loop.
-   */
-  void stopTrigger();
-
-public slots:
-  //!@brief This slot is called when the step's name is changed.
-  void onNameChanged();
-
-signals:
-  //!@brief Signal that is emitted whenever the step's name is changed.
-  void nameChanged();
+  std::string getDescription() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -104,50 +79,21 @@ signals:
 protected:
   // none yet
 
-signals:
-  //! Emitted before the trigger is started.
-  void triggerStarting();
-
-  //! Emitted whenever the trigger is started.
-  void triggerStarted();
-
-  //! Emitted before the trigger is stopped.
-  void triggerStopping();
-
-  //! Emitted whenever the trigger is stopped.
-  void triggerStopped();
-
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Removes the triggerable from the list of listeners of this trigger.
-   */
-  void removeListener(cedar::proc::TriggerablePtr triggerable);
-
-  /*!@brief Adds the triggerable to the listeners of this of this trigger.
-   */
-  void addListener(cedar::proc::TriggerablePtr triggerable);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-
 private:
   // none yet
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
+}; // class cedar::aux::annotation::Disparity
 
-private:
-  //!@brief Whether the looped trigger waits for all its listeners to finish their processing.
-  cedar::aux::BoolParameterPtr mWait;
+#endif // CEDAR_AUX_ANNOTATION_DISPARITY_H
 
-}; // class cedar::proc::LoopedTrigger
-
-#endif // CEDAR_PROC_LOOPED_TRIGGER_H
