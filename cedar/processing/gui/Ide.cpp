@@ -52,7 +52,6 @@
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Manager.h"
-#include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/Log.h"
@@ -591,36 +590,12 @@ void cedar::proc::gui::Ide::logError(const std::string& message)
 
 void cedar::proc::gui::Ide::startThreads()
 {
-  cedar::proc::NetworkPtr network = this->mNetwork->getNetwork();
-
-  for (auto iter = network->elements().begin(); iter != network->elements().end(); ++iter)
-  {
-    cedar::proc::ElementPtr element = iter->second;
-    if (cedar::proc::LoopedTriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(element))
-    {
-      if (!trigger->isRunning())
-      {
-        trigger->startTrigger();
-      }
-    }
-  }
+  this->mNetwork->getNetwork()->startTriggers();
 }
 
 void cedar::proc::gui::Ide::stopThreads()
 {
-  cedar::proc::NetworkPtr network = this->mNetwork->getNetwork();
-
-  for (auto iter = network->elements().begin(); iter != network->elements().end(); ++iter)
-  {
-    cedar::proc::ElementPtr element = iter->second;
-    if (cedar::proc::LoopedTriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(element))
-    {
-      if (trigger->isRunning())
-      {
-        trigger->stopTrigger();
-      }
-    }
-  }
+  this->mNetwork->getNetwork()->stopTriggers();
 }
 
 void cedar::proc::gui::Ide::newFile()
