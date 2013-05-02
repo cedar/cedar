@@ -469,7 +469,7 @@ cedar::unit::Time cedar::proc::Step::getRunTimeMeasurement() const
   }
   else
   {
-    return cedar::unit::Milliseconds(0.0);
+    CEDAR_THROW(cedar::proc::NoMeasurementException, "No measurements, yet.");
   }
 }
 
@@ -482,7 +482,7 @@ cedar::unit::Time cedar::proc::Step::getLockTimeMeasurement() const
   }
   else
   {
-    return cedar::unit::Milliseconds(0.0);
+    CEDAR_THROW(cedar::proc::NoMeasurementException, "No measurements, yet.");
   }
 }
 
@@ -495,7 +495,7 @@ cedar::unit::Time cedar::proc::Step::getRunTimeAverage() const
   }
   else
   {
-    return cedar::unit::Milliseconds(-1.0);
+    CEDAR_THROW(cedar::proc::NoMeasurementException, "No measurements, yet.");
   }
 }
 
@@ -508,7 +508,7 @@ cedar::unit::Time cedar::proc::Step::getLockTimeAverage() const
   }
   else
   {
-    return cedar::unit::Milliseconds(-1.0);
+    CEDAR_THROW(cedar::proc::NoMeasurementException, "No measurements, yet.");
   }
 }
 
@@ -521,7 +521,7 @@ cedar::unit::Time cedar::proc::Step::getRoundTimeMeasurement() const
   }
   else
   {
-    return cedar::unit::Milliseconds(0.0);
+    CEDAR_THROW(cedar::proc::NoMeasurementException, "No measurements, yet.");
   }
 }
 
@@ -534,7 +534,7 @@ cedar::unit::Time cedar::proc::Step::getRoundTimeAverage() const
   }
   else
   {
-    return cedar::unit::Milliseconds(-1.0);
+    CEDAR_THROW(cedar::proc::NoMeasurementException, "No measurements, yet.");
   }
 }
 
