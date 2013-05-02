@@ -340,6 +340,12 @@ public:
   /*!@brief Remove all connections that connect up to a specified slot */
   void removeAllConnectionsFromSlot(cedar::proc::ConstDataSlotPtr slot);
 
+  //!@brief Starts all triggers in this network (that haven't been started yet).
+  void startTriggers();
+
+  //!@brief Stops all running triggers in this network.
+  void stopTriggers();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
