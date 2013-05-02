@@ -23,6 +23,7 @@
     <file>steps/space_to_rate_code.svg</file>
     <file>steps/static_gain.svg</file>
     <file>steps/switch.svg</file>
+    <file>steps/matrix_multiply.svg</file>
     <file>steps/matrix_type_conversion.svg</file>
     <file>steps/net_reader.svg</file>
     <file>steps/net_writer.svg</file>
