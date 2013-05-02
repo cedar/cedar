@@ -56,6 +56,7 @@ namespace cedar
       //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_PROC_CLASS(TransformationDirection);
       CEDAR_DECLARE_PROC_CLASS(TransformationType);
+      CEDAR_DECLARE_PROC_CLASS(ComponentMultiply);
       CEDAR_DECLARE_PROC_CLASS(CoordinateTransformation);
       CEDAR_DECLARE_PROC_CLASS(ChannelSplit);
       CEDAR_DECLARE_PROC_CLASS(Convolution);

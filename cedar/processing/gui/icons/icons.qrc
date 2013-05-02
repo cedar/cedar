@@ -13,6 +13,7 @@
     <file>steps/camera_grabber.svg</file>
     <file>steps/channel_split.svg</file>
     <file>steps/color_conversion.svg</file>
+    <file>steps/component_multiply.svg</file>
     <file>steps/convolution.svg</file>
     <file>steps/coordinate_transformation.svg</file>
     <file>steps/field_temp.svg</file>
