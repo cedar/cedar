@@ -68,6 +68,7 @@ cedar_add_library(cedarproc
   steps/StaticGain.h
   steps/Convolution.h
   steps/ColorConversion.h
+  steps/ComponentMultiply.h
   steps/CoordinateTransformation.h
   steps/MatrixMultiply.h
   steps/MatrixTypeConverter.h
