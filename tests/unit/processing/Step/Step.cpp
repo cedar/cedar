@@ -139,7 +139,7 @@ int testStartingStopping()
   network->add(trigger, "trigger");
 
   network->connectSlots("step1.output", "step3.input1");
-  network->connectSlots("step2.output", "step3.input1");
+  network->connectSlots("step2.output", "step3.input2");
   network->connectTrigger(trigger, step1);
   network->connectTrigger(trigger, step2);
 
