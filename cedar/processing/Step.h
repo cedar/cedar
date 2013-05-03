@@ -53,6 +53,7 @@
 // SYSTEM INCLUDES
 #include <QThread>
 #include <QReadWriteLock>
+#include <QMutex>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <map>
@@ -176,6 +177,12 @@ public:
   /*!@brief Returns the average round time measured for this step, i.e., the average time between compute calls.
    */
   cedar::unit::Time getRoundTimeAverage() const;
+
+  //! Returns the mutex that is prevents mutual access in run calls.
+  QMutex& getComputeMutex() const
+  {
+    return this->mBusy;
+  }
 
 public slots:
   //!@brief This slot is called when the step's name is changed.
@@ -322,7 +329,7 @@ protected:
 private:
   //!@brief flag that states if step is still computing its latest output
   //!@todo Should busy be a part of STATE_*? Or even a lock?
-  bool mBusy;
+  mutable QMutex mBusy;
 
   //!@brief The lock used for protecting the computation arguments of the step.
   QReadWriteLock* mpArgumentsLock;
