@@ -49,7 +49,8 @@
 cedar::proc::Triggerable::Triggerable(bool isLooped)
 :
 mIsLooped(isLooped),
-mState(cedar::proc::Triggerable::STATE_UNKNOWN)
+mState(cedar::proc::Triggerable::STATE_UNKNOWN),
+mStartCalls(0)
 {
 }
 
@@ -84,7 +85,15 @@ cedar::proc::TriggerPtr cedar::proc::Triggerable::getParentTrigger()
 
 void cedar::proc::Triggerable::callOnStart()
 {
-  this->onStart();
+  // only call onStart if this triggerable hasn't been started yet
+  if (this->mStartCalls == 0)
+  {
+    this->onStart();
+  }
+
+  // count how often this triggerable was started
+  ++this->mStartCalls;
+
   if (mFinished)
   {
     for (size_t i = 0; i < this->mFinished->getListeners().size(); ++i)
@@ -96,8 +105,18 @@ void cedar::proc::Triggerable::callOnStart()
 
 void cedar::proc::Triggerable::callOnStop()
 {
-  this->onStop();
+  // only call onStop if there is only one trigger left that started this triggerable
+  if (this->mStartCalls == 1)
+  {
+    this->onStop();
+  }
+
+  // count how often this was stopped
+  CEDAR_ASSERT(this->mStartCalls > 0);
+  --this->mStartCalls;
+
   this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
+
   if (mFinished)
   {
     for (size_t i = 0; i < this->mFinished->getListeners().size(); ++i)
