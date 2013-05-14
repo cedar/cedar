@@ -49,15 +49,13 @@
 #include "cedar/auxiliaries/FileParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/devices/sensors/visual/RecordingFormat.h"
 #include "cedar/devices/sensors/visual/GrabberChannel.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 #include <QReadWriteLock>
-#include <boost/utility.hpp>      //boost::noncopyable //!@todo (Where) is this used?
-#include <boost/lexical_cast.hpp>
-#include <boost/shared_ptr.hpp>
 
 /*! @class cedar::dev::sensors::visual::Grabber
  *  @brief This is the base class for all grabber.
@@ -616,10 +614,10 @@ protected:
    */
   inline std::string buildChannelErrorMessage(unsigned int channel) const
   {
-    std::string msg = "Channel " + boost::lexical_cast<std::string>(channel) + "is out of range! Only channel 0";
+    std::string msg = "Channel " + cedar::aux::toString(channel) + "is out of range! Only channel 0";
     if (this->getNumChannels() > 1)
     {
-      msg = msg + ".." + boost::lexical_cast<std::string>(this->getNumChannels());
+      msg = msg + ".." + cedar::aux::toString(this->getNumChannels());
     }
     msg = msg + " available";
     return msg;

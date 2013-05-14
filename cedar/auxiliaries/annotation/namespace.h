@@ -59,6 +59,7 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(Annotatable);
       CEDAR_DECLARE_AUX_CLASS(ColorSpace);
       CEDAR_DECLARE_AUX_CLASS(Dimensions);
+      CEDAR_DECLARE_AUX_CLASS(Disparity);
       //!@endcond
     }
   }

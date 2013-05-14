@@ -143,7 +143,7 @@ void cedar::proc::steps::Resize::compute(const cedar::proc::Arguments&)
     case 1:
     {
       cv::Size size = this->getOutputSize();
-      cv::Mat src = cedar::aux::math::canonicalColVector(input);
+      cv::Mat src = cedar::aux::math::canonicalRowVector(input);
       cv::resize(src, output, size, 0, 0, this->_mInterpolationType->getValue());
       break;
     }
@@ -350,7 +350,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Resize::determineInputValidi
   // First, let's make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(slot->getName() == "input")
 
-  if (boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data))
+  if (boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
     // Mat data is accepted.
     return cedar::proc::DataSlot::VALIDITY_VALID;
@@ -368,7 +368,7 @@ void cedar::proc::steps::Resize::inputConnectionChanged(const std::string& input
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
   // Assign the input to the member. This saves us from casting in every computation step.
-  this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
+  this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
 
   if( !this->mInput)
   {

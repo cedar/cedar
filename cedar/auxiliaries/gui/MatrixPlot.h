@@ -41,6 +41,8 @@
 #ifndef CEDAR_AUX_GUI_MATRIX_PLOT_H
 #define CEDAR_AUX_GUI_MATRIX_PLOT_H
 
+#ifdef CEDAR_PLOT_SUPPORT
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/MultiPlotInterface.h"
@@ -127,4 +129,5 @@ private:
 
 }; // class cedar::aux::gui::MatrixPlot
 
+#endif // CEDAR_PLOT_SUPPORT
 #endif // CEDAR_AUX_GUI_MATRIX_PLOT_H

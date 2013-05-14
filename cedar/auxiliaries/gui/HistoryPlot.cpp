@@ -38,6 +38,8 @@
 
 ======================================================================================================================*/
 
+#ifdef CEDAR_PLOT_SUPPORT
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/HistoryPlot.h"
 #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
@@ -107,11 +109,11 @@ void cedar::aux::gui::HistoryPlot::plot(cedar::aux::ConstDataPtr data, const std
   }
 
   this->mData = data;
-  if (boost::shared_dynamic_cast<cedar::aux::ConstDoubleData>(data))
+  if (boost::dynamic_pointer_cast<cedar::aux::ConstDoubleData>(data))
   {
     this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D();
   }
-  else if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data))
+  else if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
     switch (mat_data->getDimensionality())
     {
@@ -135,3 +137,5 @@ void cedar::aux::gui::HistoryPlot::plot(cedar::aux::ConstDataPtr data, const std
   this->mpCurrentPlotWidget->plot(this->mData, title);
   this->layout()->addWidget(this->mpCurrentPlotWidget);
 }
+
+#endif // CEDAR_PLOT_SUPPORT

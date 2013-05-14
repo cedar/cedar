@@ -34,6 +34,8 @@
 
 ======================================================================================================================*/
 
+#ifdef CEDAR_USE_QWTPLOT3D
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
@@ -178,3 +180,4 @@ void cedar::aux::gui::HistoryPlot1D::advanceHistory()
   this->mHistory->setData(new_hist);
 }
 
+#endif // CEDAR_USE_QWTPLOT3D

@@ -44,9 +44,56 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/convolution/FFTW.h"
+#include "cedar/auxiliaries/LoopedThread.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
+
+class Convolve3DTestThread : public cedar::aux::LoopedThread
+{
+  public:
+    Convolve3DTestThread()
+    :
+    mFftw(new cedar::aux::conv::FFTW())
+    {
+      // step once to create the plan
+      this->step(0.0);
+    }
+
+    void step(double)
+    {
+      int sizes_3D[3] = {31, 20, 57};
+      int sizes_kernel_3D[3] = {5, 4, 16};
+      cv::Mat matrix_3D(3, sizes_3D, CV_64F);
+      cv::Mat kernel_3D(3, sizes_kernel_3D, CV_64F);
+      cv::Mat result_3D = this->mFftw->convolve(matrix_3D, kernel_3D, cedar::aux::conv::BorderType::Cyclic);
+    }
+
+    cedar::aux::conv::FFTWPtr mFftw;
+};
+CEDAR_GENERATE_POINTER_TYPES(Convolve3DTestThread);
+
+void multi_thread_test()
+{
+  // this test doesn't check for errors, but tests for crashes
+  std::vector<Convolve3DTestThreadPtr> threads;
+  threads.resize(4);
+
+  for (size_t i = 0; i < threads.size(); ++i)
+  {
+    threads[i] = Convolve3DTestThreadPtr(new Convolve3DTestThread());
+    threads[i]->start();
+  }
+
+  cedar::aux::sleep(cedar::unit::Seconds(1));
+
+  for (size_t i = 0; i < threads.size(); ++i)
+  {
+    threads[i]->stop();
+    threads[i]->wait();
+  }
+}
 
 int main()
 {
@@ -177,11 +224,14 @@ int main()
   kernel_pad = cv::Mat(3, sizes_kernel, CV_32F);
   padded = fftw->padKernel(matrix_pad, kernel_pad);
 
+  multi_thread_test();
+
   std::cout << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
   {
     errors = 255;
   }
+
   return errors;
 }
 #endif // CEDAR_USE_FFTW

@@ -168,7 +168,7 @@ void cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
     cedar::aux::LogSingleton::getInstance()->debugMessage
                                              (
                                                this->getName() + ": Create channel "
-                                                 + boost::lexical_cast<std::string>(channel) + ": "
+                                                 + cedar::aux::toString(channel) + ": "
                                                  + channel_name,
                                                method_name
                                              );
@@ -222,7 +222,7 @@ void cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
     //-------------------------------------------------
     // try to get the first frame
     //-------------------------------------------------
-    std::string msg = this->getName() + ": Try to grab from channel " + boost::lexical_cast<std::string>(channel);
+    std::string msg = this->getName() + ": Try to grab from channel " + cedar::aux::toString(channel);
     cedar::aux::LogSingleton::getInstance()->debugMessage(msg, method_name);
 
     cv::Mat frame;
@@ -297,7 +297,7 @@ void cedar::dev::sensors::visual::NetGrabber::onGrab(unsigned int channel)
   }
   catch (std::exception& e)
   {
-    std::string msg = "Unknown exception on channel " + boost::lexical_cast<std::string>(channel)
+    std::string msg = "Unknown exception on channel " + cedar::aux::toString(channel)
                         + ": " + e.what();
     CEDAR_THROW(cedar::dev::sensors::visual::GrabberGrabException,msg)
   }

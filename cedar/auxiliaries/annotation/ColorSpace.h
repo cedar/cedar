@@ -119,6 +119,9 @@ public:
   //! Generates the a description of the color space.
   std::string getDescription() const;
 
+  //! Returns a channel code, e.g., BGR, HSV, ...
+  std::string getChannelCode() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

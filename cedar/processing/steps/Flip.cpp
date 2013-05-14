@@ -133,7 +133,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Flip::determineInputValidity
   // First, let's make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(slot->getName() == "input")
 
-  if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+  if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
   {
     // Mat data is accepted, but only one- and two-dimensional matrices.
     unsigned int dim = cedar::aux::math::getDimensionalityOf(mat_data->getData());
@@ -152,7 +152,7 @@ void cedar::proc::steps::Flip::inputConnectionChanged(const std::string& inputNa
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
   // Assign the input to the member. This saves us from casting in every computation step.
-  this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
+  this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
   // This should always work since other types should not be accepted.
   if (!this->mInput)
   {

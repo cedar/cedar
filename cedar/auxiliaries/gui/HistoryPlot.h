@@ -37,6 +37,8 @@
 #ifndef CEDAR_AUX_GUI_HISTORY_PLOT_H
 #define CEDAR_AUX_GUI_HISTORY_PLOT_H
 
+#ifdef CEDAR_PLOT_SUPPORT
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/PlotInterface.h"
@@ -95,4 +97,5 @@ private:
   cedar::aux::gui::PlotInterface* mpCurrentPlotWidget;
 }; // class cedar::aux::gui::HistoryPlot
 
+#endif // CEDAR_PLOT_SUPPORT
 #endif // CEDAR_AUX_GUI_HISTORY_PLOT_H

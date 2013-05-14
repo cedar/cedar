@@ -53,15 +53,14 @@
 
 /*!@brief Representation of a cedar::proc::Trigger in a cedar::proc::gui::Scene.
  */
-class cedar::proc::gui::TriggerItem : public cedar::proc::gui::GraphicsBase
+class cedar::proc::gui::TriggerItem : public QObject, public cedar::proc::gui::GraphicsBase
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::gui::Network;
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -143,6 +142,13 @@ protected:
 private:
   //!@brief sets the trigger associated with this graphical representation
   void setTrigger(cedar::proc::TriggerPtr trigger);
+
+private slots:
+  void triggerStateChanging();
+
+  void triggerStarted();
+
+  void triggerStopped();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

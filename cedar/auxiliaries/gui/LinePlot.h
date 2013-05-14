@@ -41,6 +41,8 @@
 #ifndef CEDAR_AUX_GUI_LINE_PLOT_H
 #define CEDAR_AUX_GUI_LINE_PLOT_H
 
+#ifdef CEDAR_USE_QWT
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/MultiPlotInterface.h"
@@ -261,4 +263,5 @@ private:
 
 }; // class cedar::aux::gui::LinePlot
 
+#endif // CEDAR_USE_QWT
 #endif // CEDAR_AUX_GUI_LINE_PLOT_H

@@ -34,6 +34,8 @@
 
 ======================================================================================================================*/
 
+#ifdef CEDAR_USE_VTK
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/VtkLinePlot.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
@@ -385,3 +387,5 @@ void cedar::aux::gui::VtkLinePlot::timerEvent(QTimerEvent * /* pEvent */)
 
   emit convert();
 }
+
+#endif

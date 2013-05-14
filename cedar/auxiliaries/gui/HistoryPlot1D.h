@@ -37,6 +37,8 @@
 #ifndef CEDAR_AUX_GUI_HISTORY_PLOT1D_H
 #define CEDAR_AUX_GUI_HISTORY_PLOT1D_H
 
+#ifdef CEDAR_USE_QWTPLOT3D
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
@@ -106,5 +108,5 @@ private:
 
 }; // class cedar::aux::gui::HistoryPlot1D
 
+#endif // CEDAR_USE_QWTPLOT3D
 #endif // CEDAR_AUX_GUI_HISTORY_PLOT1D_H
-

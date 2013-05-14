@@ -37,6 +37,8 @@
 #ifndef CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H
 #define CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H
 
+#ifdef CEDAR_PLOT_SUPPORT
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
@@ -140,5 +142,5 @@ private:
   unsigned int mDesiredColumns;
 }; // class cedar::aux::gui::MatrixSlicePlot3D
 
+#endif // CEDAR_PLOT_SUPPORT
 #endif // CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H
-
