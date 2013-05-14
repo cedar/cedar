@@ -115,6 +115,7 @@ cedar_summary_h3("Misc. Libraries")
 
 cedar_summary_lib_found("FFTW" CEDAR_USE_FFTW)
 cedar_summary_lib_found("Yarp" CEDAR_USE_YARP)
+cedar_summary_lib_found("Vtk" VTK_FOUND)
 
 message("")
 
