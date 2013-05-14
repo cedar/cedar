@@ -37,6 +37,8 @@
 #ifndef CEDAR_AUX_GUI_PLOT_INTERFACE_H
 #define CEDAR_AUX_GUI_PLOT_INTERFACE_H
 
+#ifdef CEDAR_PLOT_SUPPORT
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/namespace.h"
@@ -102,4 +104,5 @@ private:
 
 }; // class cedar::aux::gui::PlotInterface
 
+#endif // CEDAR_PLOT_SUPPORT
 #endif // CEDAR_AUX_GUI_PLOT_INTERFACE_H

@@ -34,6 +34,8 @@
 
 ======================================================================================================================*/
 
+#ifdef CEDAR_PLOT_SUPPORT
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
@@ -45,6 +47,7 @@
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
+#include "cedar/auxiliaries/annotation/Disparity.h"
 #include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
@@ -124,7 +127,7 @@ void cedar::aux::gui::MatDataPlot::doAppend(cedar::aux::ConstDataPtr data, const
 
 void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
-  this->mData= boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data);
+  this->mData= boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
   if (!this->mData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
@@ -137,6 +140,7 @@ void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std
     this->mpCurrentPlotWidget = NULL;
   }
 
+  // color space-annotated data
   try
   {
     // data should be plotted as an image
@@ -147,10 +151,30 @@ void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std
   }
   catch(cedar::aux::AnnotationNotFoundException&)
   {
+  }
+
+  // disparity-annotated data
+  try
+  {
+    // data should be plotted as an image
+    auto color_space = this->mData->getAnnotation<cedar::aux::annotation::Disparity>();
+    cedar::aux::gui::ImagePlot* p_plot = new cedar::aux::gui::ImagePlot();
+    p_plot->plot(this->mData, title);
+    this->mpCurrentPlotWidget = p_plot;
+  }
+  catch(cedar::aux::AnnotationNotFoundException&)
+  {
+  }
+
+  if (this->mpCurrentPlotWidget == NULL)
+  {
     // data should be plotted as a matrix
     cedar::aux::gui::MatrixPlot* p_plot = new cedar::aux::gui::MatrixPlot();
     p_plot->plot(this->mData, title);
     this->mpCurrentPlotWidget = p_plot;
   }
+
   this->layout()->addWidget(this->mpCurrentPlotWidget);
 }
+
+#endif // CEDAR_PLOT_SUPPORT

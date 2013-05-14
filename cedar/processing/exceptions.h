@@ -136,6 +136,12 @@ class cedar::proc::DuplicateConnectionException : public cedar::aux::ExceptionBa
 {
 }; // class cedar::proc::DuplicateConnectionException
 
+/*!@brief An exception that is thrown by processing steps when no measurements for lock time etc. are present.
+ */
+class cedar::proc::NoMeasurementException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::proc::NoMeasurementException
+
 /*!@brief An exception that is thrown by ProjectionMapping when a user wants to look up a mapping that does not exist.
  */
 class cedar::proc::NoMappingException : public cedar::aux::ExceptionBase

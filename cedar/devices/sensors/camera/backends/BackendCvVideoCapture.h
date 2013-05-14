@@ -80,6 +80,11 @@ protected:
   // derived from class Device
   void applySettingsToCamera();
   void createCaptureObject();
+
+  /*! Updates the properties of the camera.
+   *
+   * @todo This name is misleading (this is not a 'get' function.)
+   */
   void getAvailablePropertiesFromCamera();
 
   //--------------------------------------------------------------------------------------------------------------------

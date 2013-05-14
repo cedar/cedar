@@ -76,7 +76,7 @@ void cedar::dev::sensors::camera::BackendCvVideoCapture::createCaptureObject()
   if (!capture.isOpened())
   {
     std::string msg = "CvVideoCapture-Backend error: Couldn't create capture object for camera with ID "
-                      + boost::lexical_cast<std::string>(cam_id);
+                      + cedar::aux::toString(cam_id);
     CEDAR_THROW(cedar::dev::sensors::camera::CreateBackendException,msg);
   }
   mpCameraChannel->mVideoCapture = capture;

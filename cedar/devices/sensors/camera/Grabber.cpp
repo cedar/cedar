@@ -289,7 +289,7 @@ void cedar::dev::sensors::camera::Grabber::onCreateGrabber()
     }
     catch(cedar::dev::sensors::camera::CreateBackendException& e)
     {
-      std::string msg = this->getName() + " Channel " + boost::lexical_cast<std::string>(channel)
+      std::string msg = this->getName() + " Channel " + cedar::aux::toString(channel)
                           + ": " + e.getMessage();
       CEDAR_THROW(cedar::dev::sensors::visual::CreateGrabberException,msg)
     }
@@ -341,7 +341,7 @@ std::vector<std::string> cedar::dev::sensors::camera::Grabber::getAllSettings(un
   cedar::dev::sensors::camera::ConstChannelPtr p_channel = this->getCameraChannel(channel);
 
   std::vector<std::string> settings;
-  settings.push_back("all settings of channel " + boost::lexical_cast<std::string>(channel) + ":");
+  settings.push_back("all settings of channel " + cedar::aux::toString(channel) + ":");
 
 
   std::string s;
@@ -349,7 +349,7 @@ std::vector<std::string> cedar::dev::sensors::camera::Grabber::getAllSettings(un
   settings.push_back("camera video mode:\t" + s);
 
   cv::Size size = this->getCameraFrameSize(channel);
-  s = boost::lexical_cast<std::string>(size.width) + " x "+ boost::lexical_cast<std::string>(size.height);
+  s = cedar::aux::toString(size.width) + " x "+ cedar::aux::toString(size.height);
   settings.push_back("camera framesize:\t" + s);
 
 #ifdef CEDAR_USE_LIB_DC1394
@@ -376,7 +376,7 @@ std::vector<std::string> cedar::dev::sensors::camera::Grabber::getAllProperties(
 
   // write out all properties as set in our structure as well as the values directly read from cam
   std::vector<std::string> properties;
-  properties.push_back("All properties of channel " + boost::lexical_cast<std::string>(channel) + ":");
+  properties.push_back("All properties of channel " + cedar::aux::toString(channel) + ":");
 
   int num_properties = cedar::dev::sensors::camera::Property::type().list().size();
   for (int i=0; i<num_properties; i++)
@@ -398,11 +398,11 @@ std::vector<std::string> cedar::dev::sensors::camera::Grabber::getAllProperties(
       prop_value_text << prop_value;
     }
 
-    properties.push_back("\tId: " + boost::lexical_cast<std::string>(prop_id));
+    properties.push_back("\tId: " + cedar::aux::toString(prop_id));
     properties.push_back("\tName: " + prop_name);
     properties.push_back("\tDescription: " + prop_description);
     properties.push_back("\tValue: " + prop_value_text.str());
-    properties.push_back("\tRaw-Value: " + boost::lexical_cast<std::string>(prop_raw_value));
+    properties.push_back("\tRaw-Value: " + cedar::aux::toString(prop_raw_value));
   }
 
   return properties;
@@ -417,7 +417,7 @@ void cedar::dev::sensors::camera::Grabber::onGrab(unsigned int channel)
   // read the frame
   if (!getCameraChannel(channel)->mVideoCapture.read(getImageMat(channel)))
   {
-    std::string msg = "Could not read from cv::VideoCapture on channel " + boost::lexical_cast<std::string>(channel);
+    std::string msg = "Could not read from cv::VideoCapture on channel " + cedar::aux::toString(channel);
     CEDAR_THROW(cedar::dev::sensors::visual::GrabberGrabException,msg)
   }
 

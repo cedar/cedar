@@ -171,7 +171,7 @@ public:
   template <class T>
   boost::shared_ptr<T> getElement(const std::string& name)
   {
-    return boost::shared_dynamic_cast<T>(this->getElement(name));
+    return boost::dynamic_pointer_cast<T>(this->getElement(name));
   }
 
   /*!@brief Returns the element with the given name as a const pointer of the specified type.
@@ -179,7 +179,7 @@ public:
   template <class T>
   boost::shared_ptr<const T> getElement(const std::string& name) const
   {
-    return boost::shared_dynamic_cast<const T>(this->getElement(name));
+    return boost::dynamic_pointer_cast<const T>(this->getElement(name));
   }
 
   /*!@brief  Returns a pointer to the element with the given name. Uses the const function getElement.
@@ -339,6 +339,12 @@ public:
 
   /*!@brief Remove all connections that connect up to a specified slot */
   void removeAllConnectionsFromSlot(cedar::proc::ConstDataSlotPtr slot);
+
+  //!@brief Starts all triggers in this network (that haven't been started yet).
+  void startTriggers();
+
+  //!@brief Stops all running triggers in this network.
+  void stopTriggers();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

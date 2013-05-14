@@ -57,7 +57,7 @@ mTarget(target)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
-  CEDAR_DEBUG_ASSERT(boost::shared_dynamic_cast<cedar::proc::OwnedData>(source));
+  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::OwnedData>(source));
   // add the source data to target
   //!@todo This code is redundant with the code below -- unify this
   if (source && target)
@@ -67,7 +67,7 @@ mTarget(target)
     while
     (
       cedar::proc::PromotedExternalDataPtr promoted
-        = boost::shared_dynamic_cast<cedar::proc::PromotedExternalData>(real_target)
+        = boost::dynamic_pointer_cast<cedar::proc::PromotedExternalData>(real_target)
     )
     {
       real_target = promoted->mDataSlot;
@@ -91,7 +91,7 @@ cedar::proc::DataConnection::~DataConnection()
     while
     (
       cedar::proc::PromotedExternalDataPtr promoted
-        = boost::shared_dynamic_cast<cedar::proc::PromotedExternalData>(real_target)
+        = boost::dynamic_pointer_cast<cedar::proc::PromotedExternalData>(real_target)
     )
     {
       real_target = promoted->mDataSlot;

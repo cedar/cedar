@@ -38,6 +38,8 @@
 
 ======================================================================================================================*/
 
+#ifdef CEDAR_PLOT_SUPPORT
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h" // for the color map
@@ -99,7 +101,7 @@ mSmoothScaling(true)
   this->setLayout(p_layout);
   this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
-  mpImageDisplay = new cedar::aux::gui::ImagePlot::ImageDisplay("no image loaded");
+  mpImageDisplay = new cedar::aux::gui::ImagePlot::ImageDisplay(this, "no image loaded");
   p_layout->addWidget(mpImageDisplay);
 
   this->mpWorkerThread = new QThread();
@@ -112,9 +114,10 @@ mSmoothScaling(true)
   this->mpWorkerThread->start(QThread::LowPriority);
 }
 
-cedar::aux::gui::ImagePlot::ImageDisplay::ImageDisplay(const QString& text)
+cedar::aux::gui::ImagePlot::ImageDisplay::ImageDisplay(cedar::aux::gui::ImagePlot* pPlot, const QString& text)
 :
-QLabel(text)
+QLabel(text),
+mpPlot(pPlot)
 {
   this->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
   this->setWordWrap(true);
@@ -212,6 +215,13 @@ void cedar::aux::gui::ImagePlot::ImageDisplay::mousePressEvent(QMouseEvent * pEv
       QToolTip::showText(pEvent->globalPos(), QString("Matrix channel count (%1) not handled.").arg(matrix.channels()));
       return;
   }
+
+  // if applicable, display color space as well
+  if (this->mpPlot->mDataColorSpace)
+  {
+    info_text += QString(" (%1)").arg(QString::fromStdString(this->mpPlot->mDataColorSpace->getChannelCode()));
+  }
+
   locker.unlock();
 
   QToolTip::showText(pEvent->globalPos(), info_text);
@@ -246,9 +256,29 @@ void cedar::aux::gui::detail::ImagePlotWorker::convert()
 
     case CV_8UC3:
     {
-      this->mpPlot->mData->lockForRead();
-      this->mpPlot->imageFromMat(this->mpPlot->mData->getData());
-      this->mpPlot->mData->unlock();
+
+      // check if this is a HSV image
+      if
+      (
+        this->mpPlot->mDataColorSpace
+        && this->mpPlot->mDataColorSpace->getNumberOfChannels() == 3
+        && this->mpPlot->mDataColorSpace->getChannelType(0) == cedar::aux::annotation::ColorSpace::Hue
+        && this->mpPlot->mDataColorSpace->getChannelType(1) == cedar::aux::annotation::ColorSpace::Saturation
+        && this->mpPlot->mDataColorSpace->getChannelType(2) == cedar::aux::annotation::ColorSpace::Value
+      )
+      {
+        this->mpPlot->mData->lockForRead();
+        cv::Mat converted;
+        cv::cvtColor(this->mpPlot->mData->getData(), converted, CV_HSV2BGR);
+        this->mpPlot->mData->unlock();
+        this->mpPlot->imageFromMat(converted);
+      }
+      else
+      {
+        this->mpPlot->mData->lockForRead();
+        this->mpPlot->imageFromMat(this->mpPlot->mData->getData());
+        this->mpPlot->mData->unlock();
+      }
       break;
     }
 
@@ -558,3 +588,5 @@ void cedar::aux::gui::ImagePlot::resizePixmap()
     this->mpImageDisplay->setPixmap(QPixmap::fromImage(scaled_image));
   }
 }
+
+#endif // CEDAR_PLOT_SUPPORT

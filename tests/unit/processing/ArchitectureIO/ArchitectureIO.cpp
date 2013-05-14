@@ -293,7 +293,7 @@ int main(int, char**)
     std::cout << "Listeners of trigger are:" << std::endl;
     for (size_t i = 0; i < trigger->getListeners().size(); ++i)
     {
-      std::cout << " -- " << boost::shared_dynamic_cast<cedar::proc::Element>(trigger->getListeners().at(i))->getName() << std::endl;
+      std::cout << " -- " << boost::dynamic_pointer_cast<cedar::proc::Element>(trigger->getListeners().at(i))->getName() << std::endl;
     }
   }
 

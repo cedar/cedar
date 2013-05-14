@@ -37,6 +37,8 @@
 #ifndef CEDAR_AUX_GUI_IMAGE_PLOT_H
 #define CEDAR_AUX_GUI_IMAGE_PLOT_H
 
+#ifdef CEDAR_PLOT_SUPPORT
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/PlotInterface.h"
@@ -119,13 +121,15 @@ private:
   class ImageDisplay : public QLabel
   {
     public:
-      ImageDisplay(const QString& text);
+      ImageDisplay(cedar::aux::gui::ImagePlot* pPlot, const QString& text);
 
     protected:
       void mousePressEvent(QMouseEvent * pEvent);
 
     public:
       cedar::aux::ConstMatDataPtr mData;
+
+      cedar::aux::gui::ImagePlot* mpPlot;
   };
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -236,4 +240,6 @@ private:
   static QReadWriteLock mLookupTableLock;
 
 }; // class cedar::aux::gui::ImagePlot
+
+#endif // CEDAR_PLOT_SUPPORT
 #endif // CEDAR_AUX_GUI_IMAGE_PLOT_H

@@ -34,6 +34,8 @@
 
 ======================================================================================================================*/
 
+#ifdef CEDAR_PLOT_SUPPORT
+
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
@@ -304,3 +306,5 @@ void cedar::aux::gui::MatrixSlicePlot3D::keyPressEvent(QKeyEvent* pEvent)
       this->PlotInterface::keyPressEvent(pEvent);
   }
 }
+
+#endif // CEDAR_PLOT_SUPPORT

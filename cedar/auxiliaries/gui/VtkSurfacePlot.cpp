@@ -34,6 +34,8 @@
 
 ======================================================================================================================*/
 
+#ifdef CEDAR_USE_VTK
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/VtkSurfacePlot.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
@@ -408,7 +410,7 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
   }
   //!@endcond
 
-#endif
+#endif // VTK_MAJOR_VERSION
 
 void cedar::aux::gui::VtkSurfacePlot::timerEvent(QTimerEvent * /* pEvent */)
 {
@@ -419,3 +421,5 @@ void cedar::aux::gui::VtkSurfacePlot::timerEvent(QTimerEvent * /* pEvent */)
 
   emit convert();
 }
+
+#endif // CEDAR_USE_VTK

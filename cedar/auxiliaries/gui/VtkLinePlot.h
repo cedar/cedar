@@ -37,6 +37,7 @@
 #ifndef CEDAR_AUX_GUI_VTK_LINE_PLOT_H
 #define CEDAR_AUX_GUI_VTK_LINE_PLOT_H
 
+#ifdef CEDAR_USE_VTK
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
@@ -272,4 +273,5 @@ private:
 
 }; // class cedar::aux::gui::LinePlot
 
+#endif // CEDAR_USE_VTK
 #endif // CEDAR_AUX_GUI_VTK_LINE_PLOT_H

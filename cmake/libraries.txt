@@ -119,9 +119,13 @@ else(QGLViewer_FOUND)
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} optimized QGLViewer2 debug QGLViewerd2)
 endif(QGLViewer_FOUND)
 
+# enable plots
+option(CEDAR_PLOT_SUPPORT "Build cedar with plots." ON)
+
 # libQwt
+option(CEDAR_USE_QWT "Include Qwt based plots if possible." ON)
 message("-- Searching for qwt...")
-find_package(Qwt REQUIRED)
+find_package(Qwt)
 if(qwt_FOUND)
   if (CEDAR_VERBOSE_BUILD_SYSTEM)
     message("-- qwt was found in ${qwt_INCLUDE_DIRS}")
@@ -131,14 +135,14 @@ if(qwt_FOUND)
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${qwt_LIBS})
   include_directories(${qwt_INCLUDE_DIRS})
 else(qwt_FOUND)
-  message(${CEDAR_LIB_ERROR_TYPE} "   Required library qwt was not found on your system!
-  You can try to alter the default search paths in cedar.conf.")
-  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} qwt)
+  message("-- Qwt not found")
+  set(CEDAR_USE_QWT OFF)
 endif(qwt_FOUND)
 
 # qwtplot3d
+option(CEDAR_USE_QWTPLOT3D "Include QwtPlot3d surface plots if possible." ON)
 message("-- Searching for qwtplot3d...")
-find_package(QwtPlot3D REQUIRED)
+find_package(QwtPlot3D)
 if(qwtplot3d_FOUND)
   if (CEDAR_VERBOSE_BUILD_SYSTEM)
     message("-- qwtplot3d was found in ${qwtplot3d_INCLUDE_DIRS}")
@@ -148,14 +152,14 @@ if(qwtplot3d_FOUND)
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${qwtplot3d_LIBS})
   include_directories(${qwtplot3d_INCLUDE_DIRS})
 else(qwtplot3d_FOUND)
-  message(${CEDAR_LIB_ERROR_TYPE} "   Required library qwtplot3d was not found on your system!
-  You can try to alter the default search paths in cedar.conf.")
-  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} qwtplot3d)
+  message("-- QwtPlot3d not found")
+  set(CEDAR_USE_QWTPLOT3D OFF)
 endif(qwtplot3d_FOUND)
 
 # VTK
+option(CEDAR_USE_VTK "Include VTK plots if possible." ON)
 message("-- Searching for VTK...")
-find_package(VTK REQUIRED)
+find_package(VTK)
 if(VTK_FOUND)
   if (CEDAR_VERBOSE_BUILD_SYSTEM)
     message("-- VTK was found in ${VTK_INCLUDE_DIRS}")
@@ -165,8 +169,8 @@ if(VTK_FOUND)
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${VTK_LIBRARIES})
   include(${VTK_USE_FILE})
 else(VTK_FOUND)
-  message(${CEDAR_LIB_ERROR_TYPE} "   Required library VTK was not found on your system!
-  You can try to alter the default search paths in cedar.conf.")
+  message("-- VTK not found")
+  set(CEDAR_USE_VTK OFF)
 endif(VTK_FOUND)
 
 # OpenGL
