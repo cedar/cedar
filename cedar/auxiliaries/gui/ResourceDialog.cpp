@@ -45,6 +45,12 @@
 // SYSTEM INCLUDES
 #include <QTreeWidgetItem>
 #include <QDir>
+
+#if (BOOST_VERSION / 100 % 1000 < 46) // there was an interface change in boost
+  #define BOOST_FILESYSTEM_VERSION 2
+#else
+  #define BOOST_FILESYSTEM_VERSION 3
+#endif
 #include <boost/filesystem.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -254,7 +260,11 @@ void cedar::aux::gui::ResourceDialog::appendFiles
 
       if (!this->mExtensions.empty())
       {
+#if (BOOST_VERSION / 100 % 1000 < 46) // there was an interface change in boost
         std::string extension = file.extension();
+#else
+        std::string extension = file.extension().string();
+#endif
         if (extension.empty())
         {
           // file has no extension, but there are extensions to be looked for
@@ -305,7 +315,11 @@ QTreeWidgetItem* cedar::aux::gui::ResourceDialog::findPathNode
 
   CEDAR_ASSERT(pParent != NULL);
 
+#if (BOOST_VERSION / 100 % 1000 < 46) // there was an interface change in boost
   std::string part = (*path.begin());
+#else
+  std::string part = (*path.begin()).string();
+#endif
   boost::filesystem::path sub_path;
 
   auto path_iter = path.begin();
