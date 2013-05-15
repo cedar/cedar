@@ -78,7 +78,7 @@ void cedar::dev::kteam::SerialChannel::postOpenHook()
     CEDAR_THROW
     (
       cedar::dev::SerialCommunicationException,
-      "Initialization of serial communication failed."
+      "Initialization of serial communication failed: received wrong answer (" + answer + ")."
     );
   }
 #ifdef DEBUG
