@@ -55,6 +55,21 @@
 #include <QThread>
 #include <iostream>
 
+// VTK INCLUDES
+#if VTK_MAJOR_VERSION <= 5
+  #include <vtkPointData.h>
+  #include <vtkPolyDataMapper.h>
+  #include <vtkTransform.h>
+  #include <vtkCamera.h>
+  #include <vtkCubeAxesActor2D.h>
+  #include <vtkInteractorStyleTrackballCamera.h>
+  #include <vtkInteractorStyleTrackball.h>
+  #include <vtkProperty2D.h>
+  #include <vtkTextProperty.h>
+#else // VTK_MAJOR_VERSION <= 5
+  #include <vtkContextScene.h>
+  #include <vtkVector.h>
+#endif // VTK_MAJOR_VERSION <= 5
 
 //----------------------------------------------------------------------------------------------------------------------
 // type registration
@@ -150,9 +165,9 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
     
     mpData = vtkSmartPointer<vtkPolyData>::New();
     
-    mMatData = cedar::aux::MatDataPtr(new MatData(cv::Mat::zeros(300,300, CV_64F)));
+    mMatData = cedar::aux::MatDataPtr(new MatData(cv::Mat::zeros(3,3, CV_64F)));
     //build the plane
-    buildPlane(300,300);
+    buildPlane(3,3);
 
     //prepare warp
     mpWarper = vtkSmartPointer<vtkWarpScalar>::New();
@@ -175,7 +190,7 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
     
     // add the actor (the plane) to the view
     mpRenderer->AddActor(pActor);
-    mpRenderer->SetBackground(.3, .3, .3);
+    mpRenderer->SetBackground(1.0, 1.0, 1.0);
     
     mpRenderWindow->Render();
     //setup plot interaction & set interactor style to trackball (the way you move in the plot with the mouse)
@@ -185,7 +200,11 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
     // create and add CubeAxes to the plot
     vtkSmartPointer<vtkCubeAxesActor2D> pAxes = vtkSmartPointer<vtkCubeAxesActor2D>::New();
     pAxes->SetInput(mpWarper->GetOutput());
-    pAxes->SetFontFactor(2.0);
+    pAxes->SetFontFactor(1.0);
+    // axis & labels should be black
+    pAxes->GetProperty()->SetColor(.0, .0, .0);
+    pAxes->GetAxisLabelTextProperty()->SetColor(.0, .0, .0);
+    pAxes->GetAxisTitleTextProperty()->SetColor(.0, .0, .0);
     //axes shouldn't jump around
     pAxes->SetInertia(0);
     pAxes->SetFlyModeToNone();
