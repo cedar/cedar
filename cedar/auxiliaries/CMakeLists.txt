@@ -35,7 +35,7 @@
 #=======================================================================================================================
 
 if (CEDAR_USE_VTK)
-  set(vtk_moc_files gui/VtkLinePlot.h gui/VtkSurfacePlot.h)
+  set(vtk_moc_files gui/VtkLinePlot.h gui/VtkSurfacePlot.h gui/VtkMatrixPlot.h)
 else(CEDAR_USE_VTK)
   set(vtk_moc_files "")
 endif(CEDAR_USE_VTK)
