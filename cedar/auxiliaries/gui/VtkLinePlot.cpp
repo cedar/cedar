@@ -285,7 +285,11 @@ void cedar::aux::gui::VtkLinePlot::doAppend(cedar::aux::ConstDataPtr data, const
   size_t num;
   QReadLocker mat_locker(&data->getLock());
   const cv::Mat& mat = plot_series->mMatData->getData();
-
+  if(mat.rows != 1 && mat.cols != 1)
+  {
+    CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
+                "Cannot plot data of this dimensionality with cedar::aux::gui::VtkLinePlot.");
+  }
   //!@todo This throws an exception when null data (or data of other dimensionality than 1) is passed.
   num = cedar::aux::math::get1DMatrixSize(mat);
   mat_locker.unlock();
