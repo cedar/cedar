@@ -38,14 +38,20 @@
 
 ======================================================================================================================*/
 
-#ifdef CEDAR_PLOT_SUPPORT
-
 #define NOMINMAX // prevents MSVC conflicts
 
 // CEDAR INCLUDES
+#include "cedar/configuration.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
-#include "cedar/auxiliaries/gui/LinePlot.h"
-#include "cedar/auxiliaries/gui/SurfacePlot.h"
+#ifdef CEDAR_USE_QWT
+  #include "cedar/auxiliaries/gui/LinePlot.h"
+  #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
+#endif // CEDAR_USE_QWT
+#ifdef CEDAR_USE_QWTPLOT3D
+  #include "cedar/auxiliaries/gui/SurfacePlot.h"
+#else // CEDAR_USE_QWTPLOT3D
+  #include "cedar/auxiliaries/gui/ImagePlot.h"
+#endif // CEDAR_USE_QWTPLOT3D
 #include "cedar/auxiliaries/gui/MatrixSlicePlot3D.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
@@ -53,7 +59,6 @@
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/tools.h"
-#include "cedar/auxiliaries/gui/HistoryPlot0D.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
@@ -158,6 +163,7 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
 
   switch (dims)
   {
+  #ifdef CEDAR_USE_QWT
     case 0:
       this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
@@ -167,12 +173,17 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
       this->mpCurrentPlotWidget = new cedar::aux::gui::LinePlot(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
+  #endif // CEDAR_USE_QWT
 
     case 2:
+    #ifdef CEDAR_USE_QWTPLOT3D
       this->mpCurrentPlotWidget = new cedar::aux::gui::SurfacePlot(this->mData, title);
+    #else
+      this->mpCurrentPlotWidget = new cedar::aux::gui::ImagePlot();
+      static_cast<cedar::aux::gui::PlotInterface*>(this->mpCurrentPlotWidget)->plot(this->mData, title);
+    #endif // CEDAR_USE_QWTPLOT3D
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
-
     case 3:
     {
       //!@todo This should work the same as in the other cases, i.e., passing the data & title to the constructor.
@@ -244,5 +255,3 @@ void cedar::aux::gui::MatrixPlot::processChangedData()
 {
   this->plot(this->mData, "");
 }
-
-#endif // CEDAR_PLOT_SUPPORT

@@ -34,6 +34,8 @@
 
 ======================================================================================================================*/
 
+#include "cedar/configuration.h"
+
 #ifdef CEDAR_USE_VTK
 
 // CEDAR INCLUDES
@@ -41,10 +43,11 @@
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
+#include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
-#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <qwt_legend.h>
@@ -54,6 +57,7 @@
 #include <QPalette>
 #include <QMenu>
 #include <QThread>
+#include <QMessageBox>
 #include <iostream>
 
 
@@ -253,7 +257,7 @@ bool cedar::aux::gui::VtkLinePlot::canAppend(cedar::aux::ConstDataPtr data) cons
   return true;
 }
 
-void cedar::aux::gui::VtkLinePlot::doAppend(cedar::aux::ConstDataPtr data, const std::string& title)
+void cedar::aux::gui::VtkLinePlot::doAppend(cedar::aux::ConstDataPtr data, const std::string&)
 {
   PlotSeriesPtr plot_series(new PlotSeries());
   plot_series->mpVtkTable = this->mpVtkTable;
@@ -278,12 +282,13 @@ void cedar::aux::gui::VtkLinePlot::doAppend(cedar::aux::ConstDataPtr data, const
   plot_series->mpCurve = this->mpChart->AddPlot(vtkChart::LINE);
   applyStyle(line_id, plot_series->mpCurve);
 
-  data->lockForRead();
+  size_t num;
+  QReadLocker mat_locker(&data->getLock());
   const cv::Mat& mat = plot_series->mMatData->getData();
 
   //!@todo This throws an exception when null data (or data of other dimensionality than 1) is passed.
-  size_t num = cedar::aux::math::get1DMatrixSize(mat);
-  data->unlock();
+  num = cedar::aux::math::get1DMatrixSize(mat);
+  mat_locker.unlock();
 
   // skip if the matrix is empty
   if (num == 0)
@@ -295,7 +300,7 @@ void cedar::aux::gui::VtkLinePlot::doAppend(cedar::aux::ConstDataPtr data, const
   this->mpVtkTable->AddColumn(y_arr);
 
   plot_series->buildXAxis(num);
-  CEDAR_DEBUG_ASSERT(this->mpVtkTable->GetNumberOfRows() == num);
+  CEDAR_DEBUG_ASSERT(static_cast<size_t>(this->mpVtkTable->GetNumberOfRows()) == num);
 
   // assert that column was added.
   CEDAR_DEBUG_ASSERT(this->mpVtkTable->GetColumn(plot_series->mYColumn) != NULL);

@@ -41,8 +41,6 @@
 #ifndef CEDAR_PROC_GUI_DATA_PLOTTER_H
 #define CEDAR_PROC_GUI_DATA_PLOTTER_H
 
-#ifdef CEDAR_PLOT_SUPPORT
-
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/MultiPlotInterface.h"
@@ -119,5 +117,4 @@ private:
 
 }; // class cedar::aux::gui::DataPlotter
 
-#endif // CEDAR_PLOT_SUPPORT
 #endif // CEDAR_PROC_GUI_DATA_PLOTTER_H

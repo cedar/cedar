@@ -37,6 +37,8 @@
 #ifndef CEDAR_AUX_GUI_VTK_SURFACE_PLOT_H
 #define CEDAR_AUX_GUI_VTK_SURFACE_PLOT_H
 
+#include "cedar/configuration.h"
+
 #ifdef CEDAR_USE_VTK
 
 // CEDAR INCLUDES
@@ -213,6 +215,7 @@ private:
     //! maps the points of warped plane into polygons
     vtkSmartPointer<vtkDataSetMapper> mpMapper;
     //! renders the plot
+    vtkSmartPointer<vtkRenderer> mpRenderer;
     vtkSmartPointer<vtkRenderWindow> mpRenderWindow;
 
     vtkSmartPointer<vtkPoints> mpPlanePoints;

@@ -52,14 +52,6 @@ else(CEDAR_USE_QWTPLOT3D)
   set(qwtplot3d_moc_files "")
 endif(CEDAR_USE_QWTPLOT3D)
 
-if (CEDAR_PLOT_SUPPORT)
-  set(plot_moc_files gui/PlotInterface.h gui/HistoryPlot.h gui/MatrixPlot.h gui/MatrixSlicePlot3D.h gui/ImagePlot.h)
-else(CEDAR_PLOT_SUPPORT)
-  set(plot_moc_files "")
-  set(vtk_moc_files "")
-  set(qwt_moc_files "")
-endif(CEDAR_PLOT_SUPPORT)
-
 cedar_add_library(cedaraux
   MOC_HEADERS
   LocalCoordinateFrame.h
@@ -87,7 +79,11 @@ cedar_add_library(cedaraux
   gui/UIntParameter.h
   gui/UIntVectorParameter.h
   gui/IntVectorParameter.h
-  ${plot_moc_files}
+  gui/PlotInterface.h
+  gui/HistoryPlot.h
+  gui/MatrixPlot.h
+  gui/MatrixSlicePlot3D.h
+  gui/ImagePlot.h
   ${qwt_moc_files}
   ${vtk_moc_files}
   ${qwtplot3d_moc_files}

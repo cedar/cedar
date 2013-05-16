@@ -37,8 +37,6 @@
 #ifndef CEDAR_AUX_GUI_IMAGE_PLOT_H
 #define CEDAR_AUX_GUI_IMAGE_PLOT_H
 
-#ifdef CEDAR_PLOT_SUPPORT
-
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/PlotInterface.h"
@@ -138,6 +136,9 @@ private:
 public:
   //!@brief The standard constructor.
   ImagePlot(QWidget *pParent = NULL);
+
+  //!@todo implement this constructor (see SurfacePlot.cpp)
+  // ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
 
   //!@brief Destructor.
   ~ImagePlot();
@@ -241,5 +242,4 @@ private:
 
 }; // class cedar::aux::gui::ImagePlot
 
-#endif // CEDAR_PLOT_SUPPORT
 #endif // CEDAR_AUX_GUI_IMAGE_PLOT_H

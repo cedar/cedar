@@ -37,6 +37,8 @@
 #ifndef CEDAR_AUX_GUI_NAMESPACE_H
 #define CEDAR_AUX_GUI_NAMESPACE_H
 
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
 #include "cedar/auxiliaries/namespace.h"
@@ -110,19 +112,24 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(PlotInterface);
       CEDAR_DECLARE_AUX_CLASS(MultiPlotInterface);
       CEDAR_DECLARE_AUX_CLASS(DataPlotter);
-      CEDAR_DECLARE_AUX_CLASS(MatrixPlot);
-      CEDAR_DECLARE_AUX_CLASS(LinePlot);
-      CEDAR_DECLARE_AUX_CLASS(VtkLinePlot);
-      CEDAR_DECLARE_AUX_CLASS(SurfacePlot);
-      CEDAR_DECLARE_AUX_CLASS(VtkSurfacePlot);
       CEDAR_DECLARE_AUX_CLASS(MatrixSlicePlot3D);
-      CEDAR_DECLARE_AUX_CLASS(MatrixVectorPlot);
-      CEDAR_DECLARE_AUX_CLASS(ImagePlot);
+      CEDAR_DECLARE_AUX_CLASS(MatrixPlot);
       CEDAR_DECLARE_AUX_CLASS(MatDataPlot);
-
+      CEDAR_DECLARE_AUX_CLASS(ImagePlot);
       CEDAR_DECLARE_AUX_CLASS(HistoryPlot);
-      CEDAR_DECLARE_AUX_CLASS(HistoryPlot0D);
       CEDAR_DECLARE_AUX_CLASS(HistoryPlot1D);
+      #ifdef CEDAR_USE_VTK
+        CEDAR_DECLARE_AUX_CLASS(VtkLinePlot);
+        CEDAR_DECLARE_AUX_CLASS(VtkSurfacePlot);
+      #endif // CEDAR_USE_VTK
+      #ifdef CEDAR_USE_QWT
+        CEDAR_DECLARE_AUX_CLASS(LinePlot);
+        CEDAR_DECLARE_AUX_CLASS(MatrixVectorPlot);
+        CEDAR_DECLARE_AUX_CLASS(HistoryPlot0D);
+      #endif // CEDAR_USE_QWT
+      #ifdef CEDAR_USE_QWTPLOT3D
+        CEDAR_DECLARE_AUX_CLASS(SurfacePlot);
+      #endif // CEDAR_USE_QWTPLOT3D
       //!@endcond
 
       //!@brief The manager for plot widgets

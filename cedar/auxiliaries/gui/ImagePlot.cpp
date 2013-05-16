@@ -38,8 +38,6 @@
 
 ======================================================================================================================*/
 
-#ifdef CEDAR_PLOT_SUPPORT
-
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h" // for the color map
@@ -588,5 +586,3 @@ void cedar::aux::gui::ImagePlot::resizePixmap()
     this->mpImageDisplay->setPixmap(QPixmap::fromImage(scaled_image));
   }
 }
-
-#endif // CEDAR_PLOT_SUPPORT

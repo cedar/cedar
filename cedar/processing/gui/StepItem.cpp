@@ -55,6 +55,7 @@
 #include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
+#include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/TypeHierarchyMap.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/Singleton.h"
@@ -73,6 +74,7 @@
 #include <QLayout>
 #include <QResource>
 #include <iostream>
+#include <QMessageBox>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -890,8 +892,24 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     cedar::aux::DataPtr p_data = this->mStep->getData(e, data_name);
     cedar::proc::DataSlotPtr slot = this->mStep->getSlot(e, data_name);
     cedar::aux::gui::DataPlotter *p_plotter = new cedar::aux::gui::DataPlotter();
-    p_plotter->plot(p_data, slot->getText());
-    this->showPlot(event->screenPos(), p_plotter, slot);
+    try
+    {
+      p_plotter->plot(p_data, slot->getText());
+      this->showPlot(event->screenPos(), p_plotter, slot);
+    }
+    catch (const cedar::aux::gui::InvalidPlotData& e)
+    {
+      //!@todo this should be a call to an ide function
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        e.exceptionInfo(),
+        "cedar::proc::gui::StepItem::contextMenuEvent"
+      );
+      QMessageBox::warning(0,
+                          "An exception has occurred.",
+                          QString::fromStdString(e.getMessage()),
+                          QMessageBox::Ok);
+    }
   }
   // plot all data slots
   else if (a == p_plot_all)
@@ -914,9 +932,25 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
 
     cedar::aux::DataPtr p_data = this->mStep->getData(e, data_name);
     cedar::proc::DataSlotPtr slot = this->mStep->getSlot(e, data_name);
-    cedar::aux::gui::PlotInterface *p_plotter = declaration->createPlot();
-    p_plotter->plot(p_data, slot->getText());
-    this->showPlot(event->screenPos(), p_plotter, slot);
+    try
+    {
+      cedar::aux::gui::PlotInterface *p_plotter = declaration->createPlot();
+      p_plotter->plot(p_data, slot->getText());
+      this->showPlot(event->screenPos(), p_plotter, slot);
+    }
+    catch (const cedar::aux::gui::InvalidPlotData& e)
+    {
+      //!@todo this should be a call to an ide function
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        e.exceptionInfo(),
+        "cedar::proc::gui::StepItem::contextMenuEvent"
+      );
+      QMessageBox::warning(0,
+                          "An exception has occurred.",
+                          QString::fromStdString(e.getMessage()),
+                          QMessageBox::Ok);
+    }
   }
 }
 

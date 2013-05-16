@@ -34,6 +34,8 @@
 
 ======================================================================================================================*/
 
+#include "cedar/configuration.h"
+
 #ifdef CEDAR_USE_VTK
 
 // CEDAR INCLUDES
@@ -154,7 +156,7 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
 
     //prepare warp
     mpWarper = vtkSmartPointer<vtkWarpScalar>::New();
-    mpWarper->SetInput(mpData)
+    mpWarper->SetInput(mpData);
     mpWarper->XYPlaneOn();
     mpWarper->SetScaleFactor(0.0);
    
@@ -167,18 +169,18 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
     // link the datamapper with the actor
     pActor->SetMapper(mpMapper);
 
-    vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
+    mpRenderer = vtkSmartPointer<vtkRenderer>::New();
     mpRenderWindow = mpVtkWidget->GetRenderWindow();
-    mpRenderWindow->AddRenderer(pRenderer);
+    mpRenderWindow->AddRenderer(mpRenderer);
     
     // add the actor (the plane) to the view
-    pRenderer->AddActor(pActor);
-    pRenderer->SetBackground(.3, .3, .3);
+    mpRenderer->AddActor(pActor);
+    mpRenderer->SetBackground(.3, .3, .3);
     
     mpRenderWindow->Render();
     //setup plot interaction & set interactor style to trackball (the way you move in the plot with the mouse)
     mpVtkWidget->GetInteractor()->SetInteractorStyle(vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New());
-    pRenderer->GetActiveCamera()->SetFocalPoint(0,0,0);
+    mpRenderer->GetActiveCamera()->SetFocalPoint(0,0,0);
 
     // create and add CubeAxes to the plot
     vtkSmartPointer<vtkCubeAxesActor2D> pAxes = vtkSmartPointer<vtkCubeAxesActor2D>::New();
@@ -187,8 +189,8 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
     //axes shouldn't jump around
     pAxes->SetInertia(0);
     pAxes->SetFlyModeToNone();
-    pAxes->SetCamera(pRenderer->GetActiveCamera());
-    pRenderer->AddViewProp(pAxes);
+    pAxes->SetCamera(mpRenderer->GetActiveCamera());
+    mpRenderer->AddViewProp(pAxes);
 
     mpWorkerThread = new QThread();
 
@@ -203,7 +205,7 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
     QObject::connect(mConversionWorker.get(), SIGNAL(done()),        this,                    SLOT(conversionDone()));
   }
 
-  void cedar::aux::gui::VtkSurfacePlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
+  void cedar::aux::gui::VtkSurfacePlot::plot(cedar::aux::ConstDataPtr data, const std::string&)
   {
     this->mMatData = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data);
 
@@ -213,9 +215,9 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
                   "Could not cast to cedar::aux::MatData in cedar::aux::gui::SurfacePlot::plot.");
     }
     buildPlane(static_cast<unsigned int>(mMatData->getData().rows), static_cast<unsigned int>(mMatData->getData().cols));
-    this->mpRenderWindow->GetRenderer()->GetActiveCamera()->SetFocalPoint(mMatData->getData().rows / 2,mMatData->getData().cols / 2, 0);
-    this->mpRenderWindow->GetRenderer()->GetActiveCamera()->SetPosition(mMatData->getData().rows / 2, -2 * mMatData->getData().cols, 8 * cedar::aux::math::max(mMatData->getData()));
-    this->mpRenderWindow->GetRenderer()->GetActiveCamera()->SetClippingRange(0.1, mMatData->getData().cols * 3);
+    this->mpRenderer->GetActiveCamera()->SetFocalPoint(mMatData->getData().rows / 2,mMatData->getData().cols / 2, 0);
+    this->mpRenderer->GetActiveCamera()->SetPosition(mMatData->getData().rows / 2, -2 * mMatData->getData().cols, 8 * cedar::aux::math::max(mMatData->getData()));
+    this->mpRenderer->GetActiveCamera()->SetClippingRange(0.1, mMatData->getData().cols * 3);
     this->startTimer(60); //!@todo make the refresh time configurable.
   }
 
@@ -258,9 +260,9 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
     if ((data.rows-1) != mpPlot->mpPlane->GetYResolution() || (data.cols-1) != mpPlot->mpPlane->GetXResolution())
     {
       mpPlot->buildPlane(static_cast<unsigned int>(data.rows), static_cast<unsigned int>(data.cols));
-      mpPlot->mpRenderWindow->GetRenderer()->GetActiveCamera()->SetFocalPoint(data.rows / 2,data.cols / 2, 0);
-      mpPlot->mpRenderWindow->GetRenderer()->GetActiveCamera()->SetPosition(data.rows / 2, -2 * data.cols, 8 * cedar::aux::math::max(data));
-      mpPlot->mpRenderWindow->GetRenderer()->GetActiveCamera()->SetClippingRange(0.1, data.cols * 3);
+      mpPlot->mpRenderer->GetActiveCamera()->SetFocalPoint(data.rows / 2,data.cols / 2, 0);
+      mpPlot->mpRenderer->GetActiveCamera()->SetPosition(data.rows / 2, -2 * data.cols, 8 * cedar::aux::math::max(data));
+      mpPlot->mpRenderer->GetActiveCamera()->SetClippingRange(0.1, data.cols * 3);
     }
 
     int point_number = 0;

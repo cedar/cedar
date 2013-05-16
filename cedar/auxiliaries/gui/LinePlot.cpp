@@ -37,6 +37,9 @@
     Credits:
 
 ======================================================================================================================*/
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_QWT
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/LinePlot.h"
@@ -525,3 +528,5 @@ void cedar::aux::gui::LinePlot::timerEvent(QTimerEvent * /* pEvent */)
 
   emit convert();
 }
+
+#endif // CEDAR_USE_QWT

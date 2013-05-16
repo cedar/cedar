@@ -38,8 +38,6 @@
 
 ======================================================================================================================*/
 
-#ifdef CEDAR_PLOT_SUPPORT
-
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
@@ -130,5 +128,3 @@ void cedar::aux::gui::DataPlotter::dataChanged()
 {
   this->plot(mData, this->mTitle);
 }
-
-#endif // CEDAR_PLOT_SUPPORT

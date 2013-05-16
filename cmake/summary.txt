@@ -103,6 +103,8 @@ message("")
 
 cedar_summary_h2("Optional Libraries")
 
+cedar_summary_h3("Plot Libraries")
+
 cedar_summary_lib_found("Qwt" qwt_FOUND)
 cedar_summary_lib_found("QwtPlot3d" qwtplot3d_FOUND)
 if(VTK_MAJOR_VERSION GREATER 5)
@@ -111,11 +113,12 @@ else(VTK_MAJOR_VERSION GREATER 5)
   cedar_summary_lib_found("Vtk 5 (or earlier)" VTK_FOUND)
 endif(VTK_MAJOR_VERSION GREATER 5)
 
+message("")
+
 cedar_summary_h3("Misc. Libraries")
 
 cedar_summary_lib_found("FFTW" CEDAR_USE_FFTW)
 cedar_summary_lib_found("Yarp" CEDAR_USE_YARP)
-cedar_summary_lib_found("Vtk" VTK_FOUND)
 
 message("")
 

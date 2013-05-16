@@ -37,8 +37,6 @@
 #ifndef CEDAR_AUX_GUI_MAT_DATA_PLOT_H
 #define CEDAR_AUX_GUI_MAT_DATA_PLOT_H
 
-#ifdef CEDAR_PLOT_SUPPORT
-
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
@@ -102,5 +100,4 @@ private:
 
 }; // class cedar::aux::gui::MatDataPlot
 
-#endif // CEDAR_PLOT_SUPPORT
 #endif // CEDAR_AUX_GUI_MAT_DATA_PLOT_H

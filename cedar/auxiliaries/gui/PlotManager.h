@@ -37,8 +37,6 @@
 #ifndef CEDAR_AUX_GUI_PLOT_MANAGER_H
 #define CEDAR_AUX_GUI_PLOT_MANAGER_H
 
-#ifdef CEDAR_PLOT_SUPPORT
-
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/Singleton.h"
@@ -141,5 +139,4 @@ namespace cedar
   }
 }
 
-#endif // CEDAR_PLOT_SUPPORT
 #endif // CEDAR_AUX_GUI_PLOT_MANAGER_H

@@ -41,6 +41,8 @@
 #ifndef CEDAR_AUX_GUI_SURFACE_PLOT_H
 #define CEDAR_AUX_GUI_SURFACE_PLOT_H
 
+#include "cedar/configuration.h"
+
 #ifdef CEDAR_USE_QWTPLOT3D
 
 // CEDAR INCLUDES
