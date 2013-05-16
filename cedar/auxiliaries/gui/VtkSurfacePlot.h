@@ -62,25 +62,16 @@
 #if VTK_MAJOR_VERSION <= 5
   #include <vtkPlaneSource.h>
   #include <vtkPoints.h>
-  #include <vtkPointData.h>
   #include <vtkPolyData.h>
-  #include <vtkPolyDataMapper.h>
   #include <vtkDataSetMapper.h>
   #include <vtkTransformPolyDataFilter.h>
-  #include <vtkTransform.h>
-  #include <vtkCamera.h>
-  #include <vtkCubeAxesActor2D.h>
-  #include <vtkInteractorStyleTrackballCamera.h>
-  #include <vtkInteractorStyleTrackball.h>
   #include <vtkWarpScalar.h>
-#else
+#else // VTK_MAJOR_VERSION <= 5
   #include <vtkChartXYZ.h>
   #include <vtkContextView.h>
-  #include <vtkContextScene.h>
   #include <vtkPlotSurface.h>
   #include <vtkTable.h>
-  #include <vtkVector.h>
-#endif
+#endif // VTK_MAJOR_VERSION <= 5
 
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar
