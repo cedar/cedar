@@ -38,6 +38,8 @@
 
 ======================================================================================================================*/
 
+#include "cedar/configuration.h"
+
 #ifdef CEDAR_USE_QWTPLOT3D
 
 #define NOMINMAX // prevents MSVC conflicts

@@ -37,8 +37,6 @@
 #ifndef CEDAR_AUX_GUI_HISTORY_PLOT1D_H
 #define CEDAR_AUX_GUI_HISTORY_PLOT1D_H
 
-#ifdef CEDAR_USE_QWTPLOT3D
-
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
@@ -101,12 +99,15 @@ private:
   cedar::aux::ConstMatDataPtr mData;
 
   //! Subplot used for plotting the history matrix.
-  cedar::aux::gui::SurfacePlot* mpHistoryPlot;
+  #ifdef CEDAR_USE_QWTPLOT3D
+    cedar::aux::gui::SurfacePlot* mpHistoryPlot;
+  #else // CEDAR_USE_QWTPLOT3D
+    cedar::aux::gui::ImagePlot* mpHistoryPlot;
+  #endif // CEDAR_USE_QWTPLOT3D
 
   //! Maximum number of states in the history.
   int mMaxHistSize;
 
 }; // class cedar::aux::gui::HistoryPlot1D
 
-#endif // CEDAR_USE_QWTPLOT3D
 #endif // CEDAR_AUX_GUI_HISTORY_PLOT1D_H

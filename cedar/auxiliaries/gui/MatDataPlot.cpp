@@ -34,8 +34,6 @@
 
 ======================================================================================================================*/
 
-#ifdef CEDAR_PLOT_SUPPORT
-
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
@@ -176,5 +174,3 @@ void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std
 
   this->layout()->addWidget(this->mpCurrentPlotWidget);
 }
-
-#endif // CEDAR_PLOT_SUPPORT

@@ -119,9 +119,6 @@ else(QGLViewer_FOUND)
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} optimized QGLViewer2 debug QGLViewerd2)
 endif(QGLViewer_FOUND)
 
-# enable plots
-option(CEDAR_PLOT_SUPPORT "Build cedar with plots." ON)
-
 # libQwt
 option(CEDAR_USE_QWT "Include Qwt based plots if possible." ON)
 message("-- Searching for qwt...")
@@ -160,13 +157,21 @@ endif(qwtplot3d_FOUND)
 option(CEDAR_USE_VTK "Include VTK plots if possible." ON)
 message("-- Searching for VTK...")
 find_package(VTK)
+
 if(VTK_FOUND)
   if (CEDAR_VERBOSE_BUILD_SYSTEM)
     message("-- VTK was found in ${VTK_INCLUDE_DIRS}")
   else()
     message("-- VTK was found")
   endif()
+  
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${VTK_LIBRARIES})
+
+  # Vtk 5 and lower must explicitly link qvtk
+  if(NOT VTK_MAJOR_VERSION GREATER 5)
+    set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} QVTK)
+  endif()
+  
   include(${VTK_USE_FILE})
 else(VTK_FOUND)
   message("-- VTK not found")

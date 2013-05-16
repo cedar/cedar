@@ -37,6 +37,8 @@
 #ifndef CEDAR_AUX_GUI_MATRIX_VECTOR_PLOT_H
 #define CEDAR_AUX_GUI_MATRIX_VECTOR_PLOT_H
 
+#include "cedar/configuration.h"
+
 #ifdef CEDAR_USE_QWT
 
 // CEDAR INCLUDES

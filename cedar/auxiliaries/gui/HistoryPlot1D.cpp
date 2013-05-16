@@ -34,14 +34,16 @@
 
 ======================================================================================================================*/
 
-#ifdef CEDAR_USE_QWTPLOT3D
-
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/HistoryPlot1D.h"
-#include "cedar/auxiliaries/gui/SurfacePlot.h"
+#ifdef CEDAR_USE_QWTPLOT3D
+  #include "cedar/auxiliaries/gui/SurfacePlot.h"
+#else // CEDAR_USE_QWTPLOT3D
+  #include "cedar/auxiliaries/gui/ImagePlot.h"
+#endif // CEDAR_USE_QWTPLOT3D
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -63,7 +65,11 @@ mMaxHistSize(150)
   auto p_layout = new QVBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(p_layout);
+#ifdef CEDAR_USE_QWTPLOT3D
   this->mpHistoryPlot = new cedar::aux::gui::SurfacePlot();
+#else // CEDAR_USE_QWTPLOT3D
+  this->mpHistoryPlot = new cedar::aux::gui::ImagePlot();
+#endif // CEDAR_USE_QWTPLOT3D
   p_layout->addWidget(this->mpHistoryPlot);
 
   cedar::aux::annotation::DimensionsPtr time_annotation(new cedar::aux::annotation::Dimensions(2));
@@ -179,5 +185,3 @@ void cedar::aux::gui::HistoryPlot1D::advanceHistory()
 
   this->mHistory->setData(new_hist);
 }
-
-#endif // CEDAR_USE_QWTPLOT3D

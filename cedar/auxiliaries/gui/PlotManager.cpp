@@ -34,8 +34,6 @@
 
 ======================================================================================================================*/
 
-#ifdef CEDAR_PLOT_SUPPORT
-
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
@@ -143,5 +141,3 @@ cedar::aux::gui::ConstPlotDeclarationPtr cedar::aux::gui::PlotManager::getDefaul
   auto decls = closest_node->getData();
   return decls.at(0);
 }
-
-#endif // CEDAR_PLOT_SUPPORT
