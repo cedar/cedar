@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatrixPlot.cpp
+    File:        VtkMatrixPlot.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -42,17 +42,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/configuration.h"
-#include "cedar/auxiliaries/gui/MatrixPlot.h"
-#ifdef CEDAR_USE_QWT
-  #include "cedar/auxiliaries/gui/LinePlot.h"
-  #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
-#endif // CEDAR_USE_QWT
-#ifdef CEDAR_USE_QWTPLOT3D
-  #include "cedar/auxiliaries/gui/SurfacePlot.h"
-#else // CEDAR_USE_QWTPLOT3D
-  #include "cedar/auxiliaries/gui/ImagePlot.h"
-#endif // CEDAR_USE_QWTPLOT3D
-#include "cedar/auxiliaries/gui/MatrixSlicePlot3D.h"
+#include "cedar/auxiliaries/gui/VtkMatrixPlot.h"
+#ifdef CEDAR_USE_VTK
+  #include "cedar/auxiliaries/gui/VtkLinePlot.h"
+  #include "cedar/auxiliaries/gui/VtkSurfacePlot.h"
+#endif // CEDAR_USE_VTK
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
@@ -75,9 +69,9 @@ namespace
   bool registerPlot()
   {
     using cedar::aux::MatData;
-    using cedar::aux::gui::MatrixPlot;
+    using cedar::aux::gui::VtkMatrixPlot;
 
-    typedef cedar::aux::gui::PlotDeclarationTemplate<MatData, MatrixPlot> DeclarationType;
+    typedef cedar::aux::gui::PlotDeclarationTemplate<MatData, VtkMatrixPlot> DeclarationType;
 
     boost::shared_ptr<DeclarationType> declaration(new DeclarationType());
     declaration->declare();
@@ -91,13 +85,12 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 // static members
 //----------------------------------------------------------------------------------------------------------------------
-Qwt3D::ColorVector cedar::aux::gui::MatrixPlot::mStandardColorVector;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gui::MatrixPlot::MatrixPlot(QWidget *pParent)
+cedar::aux::gui::VtkMatrixPlot::VtkMatrixPlot(QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
 mpCurrentPlotWidget(NULL)
@@ -113,7 +106,7 @@ mpCurrentPlotWidget(NULL)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::aux::gui::MatrixPlot::canAppend(cedar::aux::ConstDataPtr data) const
+bool cedar::aux::gui::VtkMatrixPlot::canAppend(cedar::aux::ConstDataPtr data) const
 {
   if (this->mpCurrentPlotWidget == NULL)
   {
@@ -133,7 +126,7 @@ bool cedar::aux::gui::MatrixPlot::canAppend(cedar::aux::ConstDataPtr data) const
   }
 }
 
-void cedar::aux::gui::MatrixPlot::doAppend(cedar::aux::ConstDataPtr data, const std::string& title)
+void cedar::aux::gui::VtkMatrixPlot::doAppend(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   CEDAR_DEBUG_ASSERT(this->mpCurrentPlotWidget != NULL);
   cedar::aux::gui::MultiPlotInterface *p_multi_plot
@@ -143,13 +136,13 @@ void cedar::aux::gui::MatrixPlot::doAppend(cedar::aux::ConstDataPtr data, const 
   p_multi_plot->append(data, title);
 }
 
-void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
+void cedar::aux::gui::VtkMatrixPlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   this->mData= boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
   if (!this->mData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
-                "Cannot cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot::display.");
+                "Cannot cast to cedar::aux::MatData in cedar::aux::gui::VtkMatrixPlot::display.");
   }
 
   if (this->mpCurrentPlotWidget)
@@ -163,42 +156,23 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
 
   switch (dims)
   {
-#ifdef CEDAR_USE_QWT
-    case 0:
-      this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData, title);
-      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
-      break;
-
+#ifdef CEDAR_USE_VTK
     case 1:
-      this->mpCurrentPlotWidget = new cedar::aux::gui::LinePlot(this->mData, title);
+      this->mpCurrentPlotWidget = new cedar::aux::gui::VtkLinePlot(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
-#endif // CEDAR_USE_QWT
 
     case 2:
-#ifdef CEDAR_USE_QWTPLOT3D
-      this->mpCurrentPlotWidget = new cedar::aux::gui::SurfacePlot(this->mData, title);
-#else
-      this->mpCurrentPlotWidget = new cedar::aux::gui::ImagePlot();
-      static_cast<cedar::aux::gui::PlotInterface*>(this->mpCurrentPlotWidget)->plot(this->mData, title);
-#endif // CEDAR_USE_QWTPLOT3D
+      this->mpCurrentPlotWidget = new cedar::aux::gui::VtkSurfacePlot(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
-    case 3:
-    {
-      //!@todo This should work the same as in the other cases, i.e., passing the data & title to the constructor.
-      cedar::aux::gui::MatrixSlicePlot3D* p_plot = new cedar::aux::gui::MatrixSlicePlot3D();
-      this->mpCurrentPlotWidget = p_plot;
-      p_plot->plot(this->mData, title);
-      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
-      break;
-    }
+#endif // CEDAR_USE_VTK
 
     default:
     {
-      std::string message = "The matrix plot widget can not handle a matrix with the given dimensionality (";
+      std::string message = "The VTK matrix plot widget can not handle a matrix with the given dimensionality (";
       message += cedar::aux::toString(mat.dims);
-      message += "\nPress here to refresh the plot after you have changed the dimensionality.";
+      message += ")\nPress here to refresh the plot after you have changed the dimensionality.";
       this->mpCurrentPlotWidget = new QPushButton(QString::fromStdString(message));
       connect(this->mpCurrentPlotWidget, SIGNAL(pressed()), this, SLOT(processChangedData()));
     }
@@ -206,52 +180,7 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
   this->layout()->addWidget(this->mpCurrentPlotWidget);
 }
 
-const Qwt3D::ColorVector& cedar::aux::gui::MatrixPlot::getStandardColorVector()
-{
-  if (cedar::aux::gui::MatrixPlot::mStandardColorVector.empty())
-  {
-    Qwt3D::RGBA rgb;
-    rgb.a = 1;
-    for(double i = 0; i < 256; i++)
-    {
-      if(i < 32.0)
-      {
-        rgb.r = 0.0;
-        rgb.g = 0.0;
-        rgb.b = 0.5 + 0.5 * i/32.0;
-      }
-      else if(i < 96.0)
-      {
-        rgb.r = 0.0;
-        rgb.g = (i - 32.0) / 64.0;
-        rgb.b = 1;
-      }
-      else if(i < 160.0)
-      {
-        rgb.r = (i - 96.0) / 64.0;
-        rgb.g = 1.0;
-        rgb.b = 1.0 - (i - 96.0) / 64.0;
-      }
-      else if(i < 224.0)
-      {
-        rgb.r = 1.0;
-        rgb.g = 1.0 - (i - 160.0) / 64.0;
-        rgb.b = 0.0;
-      }
-      else if(i < 256.0)
-      {
-        rgb.r = 1.0 - (i - 224.0) / 64.0;
-        rgb.g = 0.0;
-        rgb.b = 0.0;
-      }
-      cedar::aux::gui::MatrixPlot::mStandardColorVector.push_back(rgb);
-    }
-  }
-
-  return cedar::aux::gui::MatrixPlot::mStandardColorVector;
-}
-
-void cedar::aux::gui::MatrixPlot::processChangedData()
+void cedar::aux::gui::VtkMatrixPlot::processChangedData()
 {
   this->plot(this->mData, "");
 }
