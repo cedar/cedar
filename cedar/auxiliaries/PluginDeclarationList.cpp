@@ -136,7 +136,7 @@ void cedar::aux::PluginDeclarationList::readDeclaration(const cedar::aux::Config
 
   try
   {
-    this->findPluginDeclaration(class_id);
+    this->findPluginDeclaration(class_id)->read(declaration);
   }
   catch(const cedar::aux::UnknownNameException&)
   {

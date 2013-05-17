@@ -231,40 +231,52 @@ void cedar::proc::gui::StepItem::slotRemoved(cedar::proc::DataRole::Id role, con
 
 void cedar::proc::gui::StepItem::timerEvent(QTimerEvent * /* pEvent */)
 {
-  cedar::unit::Time run_time(this->mStep->getRunTimeMeasurement());
-  cedar::unit::Time run_time_avg(this->mStep->getRunTimeAverage());
-  cedar::unit::Time lock_time(this->mStep->getLockTimeMeasurement());
-  cedar::unit::Time lock_time_avg(this->mStep->getLockTimeAverage());
   QString tool_tip
     = QString("<table>"
-              "  <tr>"
-              "    <th>Measurement:</th>"
-              "    <th>Last</th>"
-              "    <th>Average</th>"
-              "  </tr>"
-              "  <tr>"
-              "    <td>locking</td>"
-              "    <td>%3</td>"
-              "    <td>%4</td>"
-              "  </tr>"
-              "  <tr>"
-              "    <td>compute call</td>"
-              "    <td>%1</td>"
-              "    <td>%2</td>"
-              "  </tr>"
-              "  <tr>"
-              "    <td>sum</td>"
-              "    <td>%5</td>"
-              "    <td>%6</td>"
-              "  </tr>"
-              " </table>")
-      .arg(QString::fromStdString(cedar::aux::toString(run_time)))
-      .arg(QString::fromStdString(cedar::aux::toString(run_time_avg)))
-      .arg(QString::fromStdString(cedar::aux::toString(lock_time)))
-      .arg(QString::fromStdString(cedar::aux::toString(lock_time_avg)))
-      .arg(QString::fromStdString(cedar::aux::toString(run_time + lock_time)))
-      .arg(QString::fromStdString(cedar::aux::toString(run_time_avg + lock_time_avg)))
-      ;
+                "<tr>"
+                  "<th>Measurement:</th>"
+                  "<th>Last</th>"
+                  "<th>Average</th>"
+                "</tr>"
+                "<tr>"
+                  "<td>locking</td>"
+                  "<td align=\"right\">%3</td>"
+                  "<td align=\"right\">%4</td>"
+                "</tr>"
+                "<tr>"
+                  "<td>compute call</td>"
+                  "<td align=\"right\">%1</td>"
+                  "<td align=\"right\">%2</td>"
+                "</tr>"
+                "<tr>"
+                  "<td>round time</td>"
+                  "<td align=\"right\">%5</td>"
+                  "<td align=\"right\">%6</td>"
+                "</tr>"
+              "</table>");
+
+  std::vector<boost::function<cedar::unit::Time ()> > measurements;
+  measurements.push_back(boost::bind(&cedar::proc::Step::getRunTimeMeasurement, this->mStep));
+  measurements.push_back(boost::bind(&cedar::proc::Step::getRunTimeAverage, this->mStep));
+  measurements.push_back(boost::bind(&cedar::proc::Step::getLockTimeMeasurement, this->mStep));
+  measurements.push_back(boost::bind(&cedar::proc::Step::getLockTimeAverage, this->mStep));
+  measurements.push_back(boost::bind(&cedar::proc::Step::getRoundTimeMeasurement, this->mStep));
+  measurements.push_back(boost::bind(&cedar::proc::Step::getRoundTimeAverage, this->mStep));
+
+  for (size_t i = 0; i < measurements.size(); ++i)
+  {
+    try
+    {
+      cedar::unit::Milliseconds ms = measurements.at(i)();
+      double dval = ms / cedar::unit::Milliseconds(1);
+      tool_tip = tool_tip.arg(QString("%1 ms").arg(dval, 0, 'f', 1));
+    }
+    catch (const cedar::proc::NoMeasurementException&)
+    {
+      tool_tip = tool_tip.arg("n/a");
+    }
+  }
+
   this->setToolTip(tool_tip);
 }
 
@@ -292,8 +304,8 @@ void cedar::proc::gui::StepItem::updateStepState()
   {
     case cedar::proc::Step::STATE_EXCEPTION:
     case cedar::proc::Step::STATE_NOT_RUNNING:
-      this->setOutlineColor(Qt::darkGray);
-      this->setFillColor(QColor(235, 235, 235));
+      this->setOutlineColor(Qt::red);
+      this->setFillColor(QColor(255, 175, 175));
 
       if (this->mRunTimeMeasurementTimerId != 0)
       {

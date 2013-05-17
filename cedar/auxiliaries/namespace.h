@@ -232,6 +232,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(BadConnectionException);
     CEDAR_DECLARE_AUX_CLASS(ConversionFailedException);
     CEDAR_DECLARE_AUX_CLASS(DeadReferenceException);
+    CEDAR_DECLARE_AUX_CLASS(DimensionalityMismatchException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateIdException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateNameException);
     CEDAR_DECLARE_AUX_CLASS(ExceptionBase);

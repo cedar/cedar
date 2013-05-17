@@ -55,8 +55,14 @@ likely to undergo major changes:
   - cedar::dev::sensors::visual::CameraGrabber is not working at the moment.
   - network functionality in the processing framework has several issues; for now, we recommend not using it because
     there are some annoying bugs related to it.
-
-== current version ==
+  - using multiple 3D convolutions in separate threads slows down all involved convolutions
+    
+== current stable ==
+- cedar::proc::gui
+  - Fixed an issue that could lead to an exception when connecting renamed looped triggers.
+    (see also issue #10 in stable)
+    
+== current testing ==
 
 - build system
   - enabled C++0x / C++11 compiler flag for GCC
@@ -72,6 +78,19 @@ likely to undergo major changes:
 - cedar::dev
   - KinematicChain instances now need to be started via ->start() by the implementor. They do not start threading on
     their own, anymore.
+- cedar::proc
+  - The processingIde can now be started with the "--no-log" option. This will redirect all log messages to the terminal
+    and can be very helpful when steps send too many log messages, leading to a lock-up of the user interface.
+- cedar::dyn
+  - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   
+  
+
+== Version 1.0.9 ==
+- cedar::proc
+  - Fixed a bug in the resize step that lead to weird results when the step was being used with 1d inputs.
+- cedar::aux::conv
+  - using 3D convolutions in separate threads doesn't crash anymore, but the introduced lock slows down
+    all involved convolutions (FFTW plan creation is not thread-safe). This will be fixed with a rewrite of FFTW code.
 
 == Version 1.0.8 ==
 
@@ -84,12 +103,7 @@ likely to undergo major changes:
 - cedar::aux::net
   - fixed issues with GCC 4.7 and the NetTransporter (Reader/Writer) code
     (only occured when the optional YARP dependency was included)
-- cedar::proc
-  - The processingIde can now be started with the "--no-log" option. This will redirect all log messages to the terminal
-    and can be very helpful when steps send too many log messages, leading to a lock-up of the user interface.
-- cedar::dyn
-  - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   
-  
+
 == Version 1.0.7
 - cedar::aux::gui
   - fixed a bug in how matrix plots handle changing data dimensionality

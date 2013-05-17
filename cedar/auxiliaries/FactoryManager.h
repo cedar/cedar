@@ -129,6 +129,7 @@ public:
     return true;
   }
 
+  //! Converts the given class's type to a string.
   template <class TypePtr>
   std::string generateTypeName() const
   {

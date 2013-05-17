@@ -65,8 +65,14 @@ private:
   typedef cedar::aux::Singleton<BaseFactoryManager> BaseFactoryManagerSingleton;
 
 public:
+  //! Typedef for the PluginDeclaration template containing a BaseType.
   typedef cedar::aux::PluginDeclarationBaseTemplate<BaseTypePtr> BasePluginDeclaration;
+
+  //!@cond SKIPPED_DOCUMENTATION
   CEDAR_GENERATE_POINTER_TYPES(BasePluginDeclaration);
+  //!@endcond SKIPPED_DOCUMENTATION
+
+  //! List of base plugin declarations.
   typedef std::vector<ConstBasePluginDeclarationPtr> BasePluginList;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -82,6 +88,7 @@ private:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Adds the given declaration to this manager.
   void addDeclaration(ConstBasePluginDeclarationPtr declaration)
   {
     mDeclarations.push_back(declaration);
@@ -95,21 +102,26 @@ public:
     mDeclarationsByCategory[category].push_back(declaration);
   }
 
+  //! Returns the factory manager for this declaration manager.
   boost::shared_ptr<BaseFactoryManager> getFactoryManager() const
   {
     return BaseFactoryManagerSingleton::getInstance();
   }
 
+  //! Allocates an object of the given class.
   BaseTypePtr allocate(const std::string& className) const
   {
     return this->getFactoryManager()->allocate(className);
   }
 
+  /*! Returns the class name used to allocate the given object as a string.
+   */
   std::string getTypeId(BaseTypePtr object) const
   {
     return this->getFactoryManager()->getTypeId(object);
   }
 
+  //! Returns the declaration that was used to instantiate the given object.
   cedar::aux::ConstPluginDeclarationPtr getDeclarationOf(BaseTypePtr object) const
   {
     for (size_t i = 0; i < mDeclarations.size(); ++i)
@@ -123,6 +135,7 @@ public:
     CEDAR_THROW(cedar::aux::UnknownTypeException, "Could not find the declaration for the given object.");
   }
 
+  //! Lists all categories stored in this manager.
   std::set<std::string> listCategories() const
   {
     std::set<std::string> result;
@@ -138,6 +151,7 @@ public:
     return result;
   }
 
+  //! Returns all entries for the given category.
   const BasePluginList& getCategoryEntries(const std::string& categoryName) const
   {
     typename std::map<std::string, BasePluginList>::const_iterator iter
@@ -149,6 +163,7 @@ public:
     return iter->second;
   }
 
+  //! Returns the plugin list that contains all declarations in this manager.
   const BasePluginList& getDeclarations() const
   {
     return this->mDeclarations;
@@ -172,8 +187,10 @@ private:
 protected:
   // none yet
 private:
+  //! List of all declarations.
   BasePluginList mDeclarations;
 
+  //! By-category storage of declarations.
   std::map<std::string, BasePluginList> mDeclarationsByCategory;
 
 }; // class cedar::aux::DeclarationManagerTemplate

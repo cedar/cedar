@@ -87,6 +87,7 @@ public:
   ThreadRegistry& threads();
 
   //!@brief register a thread (Manager holds a collection of threads, which can be started at once)
+  //!@todo Remove? This should be per network.
   void registerThread(cedar::aux::LoopedThreadPtr thread);
 
   //!@brief load a plugin
@@ -99,9 +100,11 @@ public:
   void loadDefaultPlugins();
 
   //!@brief start all registered threads
+  //!@todo Remove?
   void startThreads();
 
   //!@brief stop all threads
+  //!@todo Remove?
   void stopThreads(bool wait = false);
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -245,7 +245,6 @@ int main(int argc, char **argv)
   worker.setStepSize(10);
 
   // start everything
-  arm->setWorkingMode(cedar::dev::KinematicChain::VELOCITY);
   arm->start();
   worker.start();
   a.exec();

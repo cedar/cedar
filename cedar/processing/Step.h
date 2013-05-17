@@ -52,6 +52,7 @@
 // SYSTEM INCLUDES
 #include <QThread>
 #include <QReadWriteLock>
+#include <QMutex>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <map>
@@ -168,6 +169,20 @@ public:
    */
   cedar::unit::Time getLockTimeAverage() const;
 
+  /*!@brief Returns the last round time measured for this step, i.e., the time between the last two compute calls.
+   */
+  cedar::unit::Time getRoundTimeMeasurement() const;
+
+  /*!@brief Returns the average round time measured for this step, i.e., the average time between compute calls.
+   */
+  cedar::unit::Time getRoundTimeAverage() const;
+
+  //! Returns the mutex that is prevents mutual access in run calls.
+  QMutex& getComputeMutex() const
+  {
+    return this->mBusy;
+  }
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
@@ -248,6 +263,18 @@ protected:
    */
   void setAutoLockInputsAndOutputs(bool autoLock);
 
+  /*!@brief Locks the data and parameters of the step.
+   *
+   * @remarks Usually, this should only be called automatically.
+   */
+  void lock(cedar::aux::LOCK_TYPE parameterAccessType = cedar::aux::LOCK_TYPE_READ) const;
+
+  /*!@brief Unlocks the data and parameters of the step.
+   *
+   * @remarks Usually, this should only be called automatically.
+   */
+  void unlock() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -280,13 +307,9 @@ private:
    */
   void setLockTimeMeasurement(const cedar::unit::Time& time);
 
-  /*!@brief Locks the data and parameters of the step.
+  /*!@brief Sets the current round time measurement.
    */
-  void lock(cedar::aux::LOCK_TYPE parameterAccessType = cedar::aux::LOCK_TYPE_READ) const;
-
-  /*!@brief Unlocks the data and parameters of the step.
-   */
-  void unlock() const;
+  void setRoundTimeMeasurement(const cedar::unit::Time& time);
 
   /*!@brief Locks the data of the step according to the current method.
    *
@@ -309,7 +332,7 @@ protected:
 private:
   //!@brief flag that states if step is still computing its latest output
   //!@todo Should busy be a part of STATE_*? Or even a lock?
-  bool mBusy;
+  mutable QMutex mBusy;
 
   //!@brief The lock used for protecting the computation arguments of the step.
   QReadWriteLock* mpArgumentsLock;
@@ -329,11 +352,19 @@ private:
   //!@brief Moving average of the iteration time.
   cedar::aux::MovingAverage<cedar::unit::Time> mLockingTime;
 
+  //!@brief Moving average of the time between compute calls.
+  cedar::aux::MovingAverage<cedar::unit::Milliseconds> mRoundTime;
+
+  clock_t mLastComputeCall;
+
   //!@brief Lock for the last iteration time.
   mutable QReadWriteLock mLastIterationTimeLock;
 
   //!@brief Lock for the last iteration time.
   mutable QReadWriteLock mLockTimeLock;
+
+  //!@brief Lock for the round time.
+  mutable QReadWriteLock mRoundTimeLock;
 
   //! The state of open-cv's RNG.
   uint64 mRNGState;

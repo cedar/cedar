@@ -128,6 +128,10 @@ public:
    */
   std::string getNamespaceName() const;
 
+  /*! @brief Reads parts of the class from the given configuration node.
+   */
+  void read(const cedar::aux::ConfigurationNode& node);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -138,7 +142,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //! Implement this to read custom values from plugin description files.
+  virtual void customRead(const cedar::aux::ConfigurationNode& node);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

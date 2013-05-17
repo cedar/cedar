@@ -60,6 +60,7 @@ cedar_add_library(cedarproc
   gui/Scene.h
   gui/SettingsDialog.h
   gui/StepItem.h
+  gui/TriggerItem.h
   gui/Network.h
   gui/ToolBox.h
   gui/View.h
@@ -82,6 +83,7 @@ cedar_add_library(cedarproc
   steps/Resize.h
   Network.h
   Step.h
+  LoopedTrigger.h
   ${libdc_moc_headers}
   ${yarp_moc_headers}
   RESOURCES

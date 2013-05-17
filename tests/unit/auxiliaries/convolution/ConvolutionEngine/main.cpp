@@ -161,6 +161,30 @@ class DemoSeparable2D : public cedar::aux::kernel::Separable
 
 CEDAR_GENERATE_POINTER_TYPES(DemoSeparable2D);
 
+// Collection of information for a matrix x kernel test.
+struct TestSetMatKernel
+{
+  TestSetMatKernel
+  (
+    cv::Mat matrix,
+    cedar::aux::conv::BorderType::Id borderType,
+    cedar::aux::conv::Mode::Id mode,
+    const std::string& specialName = std::string()
+  )
+  :
+  mBorderType(borderType),
+  mMode(mode),
+  mMatrix(matrix),
+  mSpecialName(specialName)
+  {
+  }
+
+  cedar::aux::conv::BorderType::Id mBorderType;
+  cedar::aux::conv::Mode::Id mMode;
+  cv::Mat mMatrix;
+  std::string mSpecialName;
+};
+
 void printMatrix(cv::Mat m, std::string name = "", int setW = 5)
 {
   // if name is given print name
@@ -587,7 +611,6 @@ void testMatrixKernelOperation
   return;
 }
 
-
 template <typename T> // T = cedar::aux::conv::{KernelPtr, SeparablePtr}
 void testMatrixKernelOperations
      (
@@ -596,33 +619,11 @@ void testMatrixKernelOperations
        int& ok, int& skipped, int& errors
      )
 {
-  struct TestSet
-  {
-    TestSet
-    (
-      cv::Mat matrix,
-      cedar::aux::conv::BorderType::Id borderType,
-      cedar::aux::conv::Mode::Id mode,
-      const std::string& specialName = std::string()
-    )
-    :
-    mBorderType(borderType),
-    mMode(mode),
-    mMatrix(matrix),
-    mSpecialName(specialName)
-    {
-    }
-
-    cedar::aux::conv::BorderType::Id mBorderType;
-    cedar::aux::conv::Mode::Id mMode;
-    cv::Mat mMatrix;
-    std::string mSpecialName;
-  };
   std::cout << "-----------------------------------------------------------------------------" << std::endl;
   std::cout << "                                          Testing matrix * kernel operations." << std::endl;
   std::cout << "-----------------------------------------------------------------------------" << std::endl;
 
-  std::vector<TestSet> test_sets;
+  std::vector<TestSetMatKernel> test_sets;
 
   // automatically generated test-cases
   const size_t dims_size = 3;
@@ -635,20 +636,20 @@ void testMatrixKernelOperations
       for (size_t mode_type_i = 0; mode_type_i < cedar::aux::conv::Mode::type().list().size(); ++mode_type_i)
       {
         cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::type().list().at(mode_type_i);
-        test_sets.push_back(TestSet(dims[dim_i], border_type, mode));
+        test_sets.push_back(TestSetMatKernel(dims[dim_i], border_type, mode));
       }
     }
   }
 
   // hand-crafted test-cases
-  test_sets.push_back(TestSet(cv::Mat::zeros(3, 3, CV_32F), cedar::aux::conv::BorderType::Zero, cedar::aux::conv::Mode::Valid));
-  test_sets.push_back(TestSet(cv::Mat::ones(4, 4, CV_32F), cedar::aux::conv::BorderType::Zero, cedar::aux::conv::Mode::Valid, "even"));
-  test_sets.push_back(TestSet(cv::Mat::ones(1, 1, CV_32F), cedar::aux::conv::BorderType::Zero, cedar::aux::conv::Mode::Valid, "void"));
+  test_sets.push_back(TestSetMatKernel(cv::Mat::zeros(3, 3, CV_32F), cedar::aux::conv::BorderType::Zero, cedar::aux::conv::Mode::Valid));
+  test_sets.push_back(TestSetMatKernel(cv::Mat::ones(4, 4, CV_32F), cedar::aux::conv::BorderType::Zero, cedar::aux::conv::Mode::Valid, "even"));
+  test_sets.push_back(TestSetMatKernel(cv::Mat::ones(1, 1, CV_32F), cedar::aux::conv::BorderType::Zero, cedar::aux::conv::Mode::Valid, "void"));
 
   // execute test-cases
   for (auto iter = test_sets.begin(); iter != test_sets.end(); ++iter)
   {
-    const TestSet& test_set = *iter;
+    const TestSetMatKernel& test_set = *iter;
     std::cout << "(" << cedar::aux::conv::BorderType::type().get(test_set.mBorderType).prettyString()
         << " " << cedar::aux::math::getDimensionalityOf(test_set.mMatrix) << "D, "
         << cedar::aux::conv::Mode::type().get(test_set.mMode).prettyString();
@@ -670,7 +671,6 @@ void testMatrixKernelOperations
   }
 }
 
-
 void testMatrixKernelOperations
      (
        cedar::aux::conv::EnginePtr engine,
@@ -682,30 +682,8 @@ void testMatrixKernelOperations
   std::cout << "                 Testing matrix * kernel list operations. (passed on the fly)" << std::endl;
   std::cout << "-----------------------------------------------------------------------------" << std::endl;
 
-  struct TestSet
-  {
-    TestSet
-    (
-      cv::Mat matrix,
-      cedar::aux::conv::BorderType::Id borderType,
-      cedar::aux::conv::Mode::Id mode,
-      const std::string& specialName = std::string()
-    )
-    :
-    mBorderType(borderType),
-    mMode(mode),
-    mMatrix(matrix),
-    mSpecialName(specialName)
-    {
-    }
 
-    cedar::aux::conv::BorderType::Id mBorderType;
-    cedar::aux::conv::Mode::Id mMode;
-    cv::Mat mMatrix;
-    std::string mSpecialName;
-  };
-
-  std::vector<TestSet> test_sets;
+  std::vector<TestSetMatKernel> test_sets;
 
   // automatically generated test-cases
   const size_t dims_size = 3;
@@ -718,20 +696,20 @@ void testMatrixKernelOperations
       for (size_t mode_type_i = 0; mode_type_i < cedar::aux::conv::Mode::type().list().size(); ++mode_type_i)
       {
         cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::type().list().at(mode_type_i);
-        test_sets.push_back(TestSet(dims[dim_i], border_type, mode));
+        test_sets.push_back(TestSetMatKernel(dims[dim_i], border_type, mode));
       }
     }
   }
 
   // hand-crafted test-cases
-  test_sets.push_back(TestSet(cv::Mat::zeros(3, 3, CV_32F), cedar::aux::conv::BorderType::Zero, cedar::aux::conv::Mode::Valid));
-  test_sets.push_back(TestSet(cv::Mat::ones(4, 4, CV_32F), cedar::aux::conv::BorderType::Zero, cedar::aux::conv::Mode::Valid, "even"));
-  test_sets.push_back(TestSet(cv::Mat::ones(1, 1, CV_32F), cedar::aux::conv::BorderType::Zero, cedar::aux::conv::Mode::Valid, "void"));
+  test_sets.push_back(TestSetMatKernel(cv::Mat::zeros(3, 3, CV_32F), cedar::aux::conv::BorderType::Zero, cedar::aux::conv::Mode::Valid));
+  test_sets.push_back(TestSetMatKernel(cv::Mat::ones(4, 4, CV_32F), cedar::aux::conv::BorderType::Zero, cedar::aux::conv::Mode::Valid, "even"));
+  test_sets.push_back(TestSetMatKernel(cv::Mat::ones(1, 1, CV_32F), cedar::aux::conv::BorderType::Zero, cedar::aux::conv::Mode::Valid, "void"));
 
   // execute test-cases
   for (auto iter = test_sets.begin(); iter != test_sets.end(); ++iter)
   {
-    const TestSet& test_set = *iter;
+    const TestSetMatKernel& test_set = *iter;
     std::cout << "(" << cedar::aux::conv::BorderType::type().get(test_set.mBorderType).prettyString()
         << " " << cedar::aux::math::getDimensionalityOf(test_set.mMatrix) << "D, "
         << cedar::aux::conv::Mode::type().get(test_set.mMode).prettyString();
@@ -762,7 +740,7 @@ void testMatrixKernelOperations
   // execute test-cases
   for (auto iter = test_sets.begin(); iter != test_sets.end(); ++iter)
   {
-    const TestSet& test_set = *iter;
+    const TestSetMatKernel& test_set = *iter;
     std::cout << "(" << cedar::aux::conv::BorderType::type().get(test_set.mBorderType).prettyString()
         << " " << cedar::aux::math::getDimensionalityOf(test_set.mMatrix) << "D, "
         << cedar::aux::conv::Mode::type().get(test_set.mMode).prettyString();

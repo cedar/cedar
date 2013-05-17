@@ -6,5 +6,7 @@
     <file>message.svg</file>
     <file>debug.svg</file>
     <file>trashcan.svg</file>
+    <file>start.svg</file>
+    <file>stop.svg</file>
   </qresource>
 </RCC>

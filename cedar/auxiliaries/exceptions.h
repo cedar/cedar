@@ -126,6 +126,12 @@ class cedar::aux::TypeMismatchException : public cedar::aux::ExceptionBase
 {
 };
 
+/*!@brief Exception that occurs when an given dimensionalities do not match.
+ */
+class cedar::aux::DimensionalityMismatchException : public cedar::aux::ExceptionBase
+{
+};
+
 /*!@brief Exception thrown when a connection (i.e. a network connection) is too bad to continue.
  */
 class cedar::aux::BadConnectionException : public cedar::aux::ExceptionBase

@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PluginDeclarationTemplate.h
+    File:        Dimensions.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 01 18
+    Date:        2012 06 29
 
     Description:
 
@@ -34,94 +34,44 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_PLUGIN_DECLARATION_TEMPLATE_H
-#define CEDAR_AUX_PLUGIN_DECLARATION_TEMPLATE_H
+#ifndef CEDAR_AUX_ANNOTATION_DISPARITY_H
+#define CEDAR_AUX_ANNOTATION_DISPARITY_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/PluginDeclaration.h"
-#include "cedar/auxiliaries/FactoryManager.h"
-#include "cedar/auxiliaries/Singleton.h"
-#include "cedar/auxiliaries/DeclarationManagerTemplate.h"
+#include "cedar/auxiliaries/annotation/namespace.h"
+#include "cedar/auxiliaries/annotation/Annotation.h"
+#include "cedar/auxiliaries/Cloneable.h"
 
 // SYSTEM INCLUDES
 
-
-/*!@todo describe.
- *
- * @tparam BaseClass The direct base class for this class. This class must either be or inherit
- *         cedar::aux::PluginDeclarationBaseTemplate<BaseClassPtr>.
- * @todo describe more.
+/*!@brief An annotation that indicates disparity data.
  */
-template <class BaseClassPtr, class PluginClassPtr, class BaseClass = cedar::aux::PluginDeclarationBaseTemplate<BaseClassPtr> >
-class cedar::aux::PluginDeclarationTemplate
+class cedar::aux::annotation::Disparity
 :
-public BaseClass,
-public boost::enable_shared_from_this<cedar::aux::PluginDeclarationTemplate<BaseClassPtr, PluginClassPtr, BaseClass> >
+public cedar::aux::annotation::Annotation,
+public cedar::aux::Cloneable<cedar::aux::annotation::Disparity, cedar::aux::annotation::Annotation>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  typedef typename cedar::aux::Singleton<cedar::aux::FactoryManager<BaseClassPtr> > PluginFactoryManager;
-  typedef typename cedar::aux::Singleton<cedar::aux::DeclarationManagerTemplate<BaseClassPtr> > DeclarationManager;
-  typedef typename PluginClassPtr::element_type PluginClass;
+public:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief The constructor.
-   *
-   * @param category  Category of the declaration.
-   * @param className Class name to use. A name will automatically be generated when this is left empty.
-   *
-   * @remarks The className parameter is essentially a legacy parameter to provide downward-compatibility; it should
-   *          usually be left empty.
-   */
-  PluginDeclarationTemplate(const std::string& category, const std::string& className = std::string())
-  :
-  BaseClass(category, className)
-  {
-  }
+  //!@brief Constructor.
+  Disparity();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Declares this plugin at the appropriate factory.
-   */
-  void declare() const
-  {
-    DeclarationManager::getInstance()->addDeclaration(this->shared_from_this());
-    this->onDeclare();
-  }
-
-  /*! Returns name of the class stored in this declaration.
-   */
-  std::string getClassName() const
-  {
-    if (!this->mClassName.empty())
-    {
-      return this->mClassName;
-    }
-    else
-    {
-      return PluginFactoryManager::getInstance()->template generateTypeName<PluginClassPtr>();
-    }
-  }
-
-  /*!@brief Checks if an Element is of the plugin class's type.
-   *
-   * @param pointer Instance that is checked
-   */
-  bool isObjectInstanceOf(BaseClassPtr pointer) const
-  {
-    return boost::dynamic_pointer_cast<PluginClass>(pointer);
-  }
+  std::string getDescription() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -133,10 +83,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  virtual void onDeclare() const
-  {
-    PluginFactoryManager::getInstance()->template registerType<PluginClassPtr>(this->mClassName);
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -146,16 +93,7 @@ protected:
 private:
   // none yet
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
+}; // class cedar::aux::annotation::Disparity
 
-private:
-  // none yet
-
-}; // class cedar::aux::PluginDeclarationTemplate
-
-#endif // CEDAR_AUX_PLUGIN_DECLARATION_TEMPLATE_H
+#endif // CEDAR_AUX_ANNOTATION_DISPARITY_H
 
