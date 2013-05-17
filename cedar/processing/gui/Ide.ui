@@ -204,6 +204,8 @@
     </property>
     <addaction name="mpActionSettings"/>
     <addaction name="separator"/>
+    <addaction name="mpActionShowRobotManager"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -528,6 +530,14 @@
   <action name="mpActionExportSVG">
    <property name="text">
     <string>Export SVG ...</string>
+   </property>
+  </action>
+  <action name="mpActionShowRobotManager">
+   <property name="text">
+    <string>Robot Manager ...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+M</string>
    </property>
   </action>
   <action name="mpActionDuplicate">

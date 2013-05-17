@@ -36,6 +36,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/algebraTools.h"
 #include "cedar/auxiliaries/math/constants.h"
 
@@ -54,7 +55,7 @@ std::vector<double> cedar::aux::math::solveQuadric(const std::vector<double>& rC
   
   D = p * p - q;
   
-  if (IsZero(D))
+  if (cedar::aux::math::isZero<double>(D))
   {
     solutions.push_back(-p);
     return solutions;
@@ -100,9 +101,9 @@ std::vector<double> cedar::aux::math::solveCubic(const std::vector<double>& rCoe
   cb_p = p * p * p;
   D = q * q + cb_p;
   
-  if (IsZero(D))
+  if (cedar::aux::math::isZero<double>(D))
   {
-    if (IsZero(q)) /* one triple solution */
+    if (cedar::aux::math::isZero<double>(q)) /* one triple solution */
     {
       solutions.push_back(0);
     }
@@ -168,7 +169,7 @@ std::vector<double> cedar::aux::math::solveQuartic(const std::vector<double>& rC
   q = 1.0/8.0*sq_A*A - 1.0/2.0*A*B + C;
   r = -3.0/256.0*sq_A*sq_A + 1.0/16.0*sq_A*B - 1.0/4.0*A*C + D;
   
-  if (IsZero(r))
+  if (cedar::aux::math::isZero<double>(r))
   {
     /* no absolute term: y(y^3 + py + q) = 0 */
     std::vector<double> cubic_coefficients;
@@ -196,7 +197,7 @@ std::vector<double> cedar::aux::math::solveQuartic(const std::vector<double>& rC
     u = z * z - r;
     v = 2 * z - p;
     
-    if (IsZero(u))
+    if (cedar::aux::math::isZero<double>(u))
     {
       u = 0;
     }
@@ -209,7 +210,7 @@ std::vector<double> cedar::aux::math::solveQuartic(const std::vector<double>& rC
       return solutions;
     }
     
-    if (IsZero(v))
+    if (cedar::aux::math::isZero<double>(v))
     {
       v = 0;
     }

@@ -47,7 +47,6 @@
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/auxiliaries/MovingAverage.h"
-#include "cedar/units/TimeUnit.h"
 #include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
@@ -348,10 +347,10 @@ private:
   ActionMap mActions;
 
   //!@brief Moving average of the iteration time.
-  cedar::aux::MovingAverage<cedar::unit::Milliseconds> mMovingAverageIterationTime;
+  cedar::aux::MovingAverage<cedar::unit::Time> mMovingAverageIterationTime;
 
   //!@brief Moving average of the iteration time.
-  cedar::aux::MovingAverage<cedar::unit::Milliseconds> mLockingTime;
+  cedar::aux::MovingAverage<cedar::unit::Time> mLockingTime;
 
   //!@brief Moving average of the time between compute calls.
   cedar::aux::MovingAverage<cedar::unit::Milliseconds> mRoundTime;

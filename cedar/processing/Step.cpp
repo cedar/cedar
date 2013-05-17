@@ -49,7 +49,8 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/Log.h"
-#include "cedar/units/TimeUnit.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
@@ -75,8 +76,10 @@ cedar::proc::Step::Step(bool runInThread, bool isLooped)
 Triggerable(isLooped),
 // initialize members
 mpArgumentsLock(new QReadWriteLock()),
-mMovingAverageIterationTime(100), // average the last 100 iteration times
-mLockingTime(100), // average the last 100 iteration times
+// average the last 100 iteration times
+mMovingAverageIterationTime(100),
+// average the last 100 iteration times
+mLockingTime(100),
 mRoundTime(100), // average the last 100 iteration times
 mLastComputeCall(0),
 // initialize parameters
@@ -447,19 +450,19 @@ void cedar::proc::Step::run()
 void cedar::proc::Step::setRunTimeMeasurement(const cedar::unit::Time& time)
 {
   QWriteLocker locker(&this->mLastIterationTimeLock);
-  this->mMovingAverageIterationTime.append(cedar::unit::Seconds(time));
+  this->mMovingAverageIterationTime.append(time);
 }
 
 void cedar::proc::Step::setLockTimeMeasurement(const cedar::unit::Time& time)
 {
   QWriteLocker locker(&this->mLockTimeLock);
-  this->mLockingTime.append(cedar::unit::Seconds(time));
+  this->mLockingTime.append(time);
 }
 
 void cedar::proc::Step::setRoundTimeMeasurement(const cedar::unit::Time& time)
 {
   QWriteLocker locker(&this->mRoundTimeLock);
-  this->mRoundTime.append(cedar::unit::Seconds(time));
+  this->mRoundTime.append(time);
 }
 
 cedar::unit::Time cedar::proc::Step::getRunTimeMeasurement() const

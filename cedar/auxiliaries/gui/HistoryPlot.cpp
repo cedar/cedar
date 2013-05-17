@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/DoubleData.h"
+#include "cedar/auxiliaries/UnitData.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
@@ -58,18 +59,29 @@ namespace
 {
   bool registerPlot()
   {
+    // Double data plot ----------------------------------------------------------------------------
     typedef
       cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::DoubleData, cedar::aux::gui::HistoryPlot>
-      DeclarationType;
+      DoubleDataDeclaration;
 
-    boost::shared_ptr<DeclarationType> declaration(new DeclarationType());
+    boost::shared_ptr<DoubleDataDeclaration> declaration(new DoubleDataDeclaration());
     declaration->declare();
 
+    // Mat data plot -------------------------------------------------------------------------------
     typedef
       cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::MatData, cedar::aux::gui::HistoryPlot>
-      DeclarationType2;
-    boost::shared_ptr<DeclarationType2> decl2(new DeclarationType2());
+      MatDataDeclaration;
+
+    boost::shared_ptr<MatDataDeclaration> decl2(new MatDataDeclaration());
     decl2->declare();
+
+    // Unit data plot ------------------------------------------------------------------------------
+    typedef
+      cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::UnitData, cedar::aux::gui::HistoryPlot>
+      UnitDataDeclaration;
+
+    boost::shared_ptr<UnitDataDeclaration> decl3(new UnitDataDeclaration());
+    decl3->declare();
 
     return true;
   }
@@ -107,7 +119,11 @@ void cedar::aux::gui::HistoryPlot::plot(cedar::aux::ConstDataPtr data, const std
   }
 
   this->mData = data;
-  if (boost::dynamic_pointer_cast<cedar::aux::ConstDoubleData>(data))
+  if
+  (
+    boost::dynamic_pointer_cast<cedar::aux::ConstDoubleData>(data)
+    || boost::dynamic_pointer_cast<cedar::aux::ConstUnitData>(data)
+  )
   {
     this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D();
   }

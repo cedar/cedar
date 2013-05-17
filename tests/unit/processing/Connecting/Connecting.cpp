@@ -61,6 +61,20 @@ class TestModule : public cedar::proc::Step
       double data2 = this->getInput("input2")->getData<double>();
       std::cout << "input2:" << data2 << std::endl;
     }
+
+    bool containsInputLock(QReadWriteLock* pLock)
+    {
+      auto locks = this->getLocks(this->getInputLockSet());
+      for (auto iter = locks.begin(); iter != locks.end(); ++iter)
+      {
+        if (iter->first == pLock)
+        {
+          return true;
+        }
+      }
+
+      return false;
+    }
 };
 CEDAR_GENERATE_POINTER_TYPES(TestModule);
 
@@ -83,6 +97,125 @@ class TestSource : public cedar::proc::Step
 };
 CEDAR_GENERATE_POINTER_TYPES(TestSource);
 
+
+class TestSource2 : public cedar::proc::Step
+{
+  public:
+    TestSource2()
+    :
+    mOutput(new cedar::aux::DoubleData(0.0))
+    {
+      this->declareOutput("output", mOutput);
+    }
+
+    void compute(const cedar::proc::Arguments&)
+    {
+      // nothing to do here
+    }
+
+    void changeOutputPtr()
+    {
+      mOutput = cedar::aux::DoubleDataPtr(new cedar::aux::DoubleData(1.0));
+      this->setOutput("output", mOutput);
+    }
+
+    bool containsOutputLock(QReadWriteLock* pLock)
+    {
+      auto locks = this->getLocks(this->getOutputLockSet());
+      for (auto iter = locks.begin(); iter != locks.end(); ++iter)
+      {
+        if (iter->first == pLock)
+        {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    cedar::aux::DoubleDataPtr mOutput;
+};
+CEDAR_GENERATE_POINTER_TYPES(TestSource2);
+
+
+int testPtrChange()
+{
+  int errors = 0;
+
+  cedar::proc::NetworkPtr network (new cedar::proc::Network());
+  TestSource2Ptr src(new TestSource2());
+  TestModulePtr tar(new TestModule());
+  network->add(src, "source");
+  network->add(tar, "target");
+
+  network->connectSlots("source.output", "target.input1");
+
+  cedar::aux::ConstDataPtr data_src = src->getOutput("output");
+  if (!data_src)
+  {
+    std::cout << "ERROR: data was not connected properly." << std::endl;
+    ++errors;
+    return errors;
+  }
+
+  // remember address of the initial lock
+  QReadWriteLock* p_first_lock = &data_src->getLock();
+
+  cedar::aux::ConstDataPtr data_tar = tar->getInput("input1");
+  if (!data_tar)
+  {
+    std::cout << "ERROR: data was not connected properly." << std::endl;
+    ++errors;
+    return errors;
+  }
+
+  if (data_src != data_tar)
+  {
+    std::cout << "ERROR: data was connected, but the pointers aren't right." << std::endl;
+    ++errors;
+    return errors;
+  }
+
+  src->changeOutputPtr();
+
+  data_src = src->getOutput("output");
+  if (!data_src)
+  {
+    std::cout << "ERROR after pointer change: data was not connected properly." << std::endl;
+    ++errors;
+    return errors;
+  }
+
+  data_tar = tar->getInput("input1");
+  if (!data_tar)
+  {
+    std::cout << "ERROR after pointer change: data was not connected properly." << std::endl;
+    ++errors;
+    return errors;
+  }
+
+
+  if (data_src != data_tar)
+  {
+    std::cout << "ERROR after pointer change: data was connected, but the pointers aren't right." << std::endl;
+    ++errors;
+    return errors;
+  }
+
+  if (tar->containsInputLock(p_first_lock))
+  {
+    std::cout << "ERROR: lock of initial data was not properly removed from target." << std::endl;
+    ++errors;
+  }
+
+  if (src->containsOutputLock(p_first_lock))
+  {
+    std::cout << "ERROR: lock of initial data was not properly removed from source." << std::endl;
+    ++errors;
+  }
+
+  return errors;
+}
 
 int testOnlineDisconnecting()
 {
@@ -136,7 +269,6 @@ int testOnlineDisconnecting()
   return errors;
 }
 
-
 int main(int, char**)
 {
   unsigned int errors = 0;
@@ -149,6 +281,7 @@ int main(int, char**)
   network->connectSlots("source1.output", "target.input1");
   network->connectSlots("source2.output", "target.input2");
 
+  errors += testPtrChange();
   errors += testOnlineDisconnecting();
 
   std::cout << "Done. There were " << errors << " error(s)." << std::endl;

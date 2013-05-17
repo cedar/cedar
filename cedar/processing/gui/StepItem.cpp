@@ -61,7 +61,7 @@
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/assert.h"
-#include "cedar/units/TimeUnit.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <QPen>
