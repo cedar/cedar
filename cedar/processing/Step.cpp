@@ -120,12 +120,14 @@ cedar::proc::Step::~Step()
 
 void cedar::proc::Step::lock(cedar::aux::LOCK_TYPE parameterAccessType) const
 {
+  this->mpConnectionLock->lockForRead();
   this->lockData();
   this->lockParameters(parameterAccessType);
 }
 
 void cedar::proc::Step::unlock() const
 {
+  this->mpConnectionLock->unlock();
   this->unlockParameters();
   this->unlockData();
 }
