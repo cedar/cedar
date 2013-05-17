@@ -304,8 +304,8 @@ void cedar::proc::gui::StepItem::updateStepState()
   {
     case cedar::proc::Step::STATE_EXCEPTION:
     case cedar::proc::Step::STATE_NOT_RUNNING:
-      this->setOutlineColor(Qt::darkGray);
-      this->setFillColor(QColor(235, 235, 235));
+      this->setOutlineColor(Qt::red);
+      this->setFillColor(QColor(255, 175, 175));
 
       if (this->mRunTimeMeasurementTimerId != 0)
       {
