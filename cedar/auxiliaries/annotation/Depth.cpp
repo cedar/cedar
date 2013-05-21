@@ -24,8 +24,8 @@
 
     File:        Dimensions.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Maintainer:  Guido Knips
+    Email:       guido.knips@ini.ruhr-uni-bochum.de
     Date:        2012 06 29
 
     Description:
