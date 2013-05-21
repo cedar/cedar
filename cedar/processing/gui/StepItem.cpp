@@ -267,8 +267,8 @@ void cedar::proc::gui::StepItem::timerEvent(QTimerEvent * /* pEvent */)
   {
     try
     {
-      cedar::unit::Milliseconds ms = measurements.at(i)();
-      double dval = ms / cedar::unit::Milliseconds(1);
+      cedar::unit::Time ms = measurements.at(i)();
+      double dval = ms / (0.001 * cedar::unit::seconds);
       tool_tip = tool_tip.arg(QString("%1 ms").arg(dval, 0, 'f', 1));
     }
     catch (const cedar::proc::NoMeasurementException&)

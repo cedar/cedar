@@ -353,7 +353,7 @@ private:
   cedar::aux::MovingAverage<cedar::unit::Time> mLockingTime;
 
   //!@brief Moving average of the time between compute calls.
-  cedar::aux::MovingAverage<cedar::unit::Milliseconds> mRoundTime;
+  cedar::aux::MovingAverage<cedar::unit::Time> mRoundTime;
 
   clock_t mLastComputeCall;
 
