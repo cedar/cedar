@@ -354,7 +354,7 @@ void cedar::proc::Step::run()
     clock_t lock_end = clock();
     clock_t lock_elapsed = lock_end - lock_start;
     double lock_elapsed_s = static_cast<double>(lock_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
-    this->setLockTimeMeasurement(cedar::unit::Seconds(lock_elapsed_s));
+    this->setLockTimeMeasurement(lock_elapsed_s * cedar::unit::seconds);
 
     if (this->mLastComputeCall != 0)
     {
@@ -362,7 +362,7 @@ void cedar::proc::Step::run()
       this->mLastComputeCall = clock();
       clock_t elapsed = this->mLastComputeCall - last;
       double elapsed_s = static_cast<double>(elapsed) / static_cast<double>(CLOCKS_PER_SEC);
-      this->setRoundTimeMeasurement(cedar::unit::Seconds(elapsed_s));
+      this->setRoundTimeMeasurement(elapsed_s * cedar::unit::seconds);
     }
     else
     {
@@ -430,7 +430,7 @@ void cedar::proc::Step::run()
     this->unlock();
 
     // take time measurements
-    this->setRunTimeMeasurement(cedar::unit::Seconds(run_elapsed_s));
+    this->setRunTimeMeasurement(run_elapsed_s * cedar::unit::seconds);
 
     // remove the argumens, as they have been processed.
     this->getFinishedTrigger()->trigger();

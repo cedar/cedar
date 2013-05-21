@@ -234,11 +234,11 @@ int testOnlineDisconnecting()
 
     trigger->startTrigger();
 
-    cedar::aux::sleep(cedar::unit::Milliseconds(50));
+    cedar::aux::sleep(0.05 * cedar::unit::seconds);
 
     network->disconnectSlots("step.result", "projection.input");
 
-    cedar::aux::sleep(cedar::unit::Milliseconds(50));
+    cedar::aux::sleep(0.05 * cedar::unit::seconds);
 
     trigger->stopTrigger();
   }
@@ -255,11 +255,11 @@ int testOnlineDisconnecting()
     trigger1->startTrigger();
     trigger2->startTrigger();
 
-    cedar::aux::sleep(cedar::unit::Milliseconds(50));
+    cedar::aux::sleep(0.05 * cedar::unit::seconds);
 
     network->disconnectSlots("step.Gauss input", "projection.input");
 
-    cedar::aux::sleep(cedar::unit::Milliseconds(50));
+    cedar::aux::sleep(0.05 * cedar::unit::seconds);
 
     trigger1->stopTrigger();
     trigger2->stopTrigger();

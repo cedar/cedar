@@ -86,7 +86,7 @@ void multi_thread_test()
     threads[i]->start();
   }
 
-  cedar::aux::sleep(cedar::unit::Seconds(1));
+  cedar::aux::sleep(1.0 * cedar::unit::seconds);
 
   for (size_t i = 0; i < threads.size(); ++i)
   {
