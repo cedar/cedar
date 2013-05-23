@@ -65,6 +65,8 @@
   #include <vtkInteractorStyleTrackballCamera.h>
   #include <vtkInteractorStyleTrackball.h>
   #include <vtkProperty2D.h>
+  #include <vtkProperty.h>
+  #include <vtkLookupTable.h>
   #include <vtkTextProperty.h>
 #else // VTK_MAJOR_VERSION <= 5
   #include <vtkContextScene.h>
@@ -180,10 +182,19 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
     mpMapper = vtkSmartPointer<vtkDataSetMapper>::New();
     mpMapper->SetInputConnection(mpWarper->GetOutputPort());
 
+    // create lookup table for coloring
+    vtkLookupTable *pLut = vtkLookupTable::New();
+    pLut->SetHueRange(0.7, 0);
+    mpMapper->SetLookupTable(pLut);
+
     // Setup the view
     vtkSmartPointer<vtkActor> pActor = vtkSmartPointer<vtkActor>::New();
     // link the datamapper with the actor
     pActor->SetMapper(mpMapper);
+    // we don't want directional light
+    pActor->GetProperty()->SetAmbient(1.0);
+    pActor->GetProperty()->SetDiffuse(0.0);
+    pActor->GetProperty()->SetSpecular(0.0);
 
     mpRenderer = vtkSmartPointer<vtkRenderer>::New();
     mpRenderWindow = mpVtkWidget->GetRenderWindow();
@@ -287,6 +298,7 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
 
     int point_number = 0;
     double point[3];
+    double scalar_range[2] = {data.at<double>(0, 0), data.at<double>(0, 0)};
     for(int i=0; i<data.rows; i++)
     {
       for(int j=0; j<data.cols; j++)
@@ -298,14 +310,22 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
         // create the point
         mpPlot->mpPlanePoints->SetPoint(point_number, point);
         // store the z value in z_scalars for coloring
-        mpPlot->mpZScalars->SetValue(point_number, data.at<double>(i,j));
+        mpPlot->mpZScalars->SetValue(point_number, point[2]);
         point_number++;
+
+        // find out the scalar range
+        if(scalar_range[0] > point[2])
+        {
+          scalar_range[0] = point[2];
+        }
+        else if(scalar_range[1] < point[2])
+        {
+          scalar_range[1] = point[2];
+        }
       }
     }
     //color plane
-    double tmp[2];
-    mpPlot->mpData->GetScalarRange(tmp);
-    mpPlot->mpMapper->SetScalarRange(tmp[0],tmp[1]);
+    mpPlot->mpMapper->SetScalarRange(scalar_range);
 
     plot_locker.unlock();
     emit done();
