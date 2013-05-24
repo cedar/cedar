@@ -77,6 +77,7 @@ public:
         mType.type()->def(cedar::aux::Enum(BGR, "BGR"));
         mType.type()->def(cedar::aux::Enum(HSV, "HSV"));
         mType.type()->def(cedar::aux::Enum(YUV, "YUV"));
+        mType.type()->def(cedar::aux::Enum(YUV, "YCrCb"));
       }
 
       //! @returns A const reference to the base enum object.
