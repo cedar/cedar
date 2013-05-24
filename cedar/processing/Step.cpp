@@ -467,7 +467,8 @@ cedar::unit::Time cedar::proc::Step::getRunTimeMeasurement() const
   QReadLocker locker(&this->mLastIterationTimeLock);
   if (this->mMovingAverageIterationTime.size() > 0)
   {
-    return this->mMovingAverageIterationTime.getNewest();
+    cedar::unit::Time copy = this->mMovingAverageIterationTime.getNewest();
+    return copy;
   }
   else
   {
@@ -480,7 +481,8 @@ cedar::unit::Time cedar::proc::Step::getLockTimeMeasurement() const
   QReadLocker locker(&this->mLockTimeLock);
   if (this->mLockingTime.size() > 0)
   {
-    return this->mLockingTime.getNewest();
+    cedar::unit::Time copy = this->mLockingTime.getNewest();
+    return copy;
   }
   else
   {
@@ -493,7 +495,8 @@ cedar::unit::Time cedar::proc::Step::getRunTimeAverage() const
   QReadLocker locker(&this->mLastIterationTimeLock);
   if (this->mMovingAverageIterationTime.size() > 0)
   {
-    return this->mMovingAverageIterationTime.getAverage();
+    cedar::unit::Time copy = this->mMovingAverageIterationTime.getNewest();
+    return copy;
   }
   else
   {
@@ -506,7 +509,8 @@ cedar::unit::Time cedar::proc::Step::getLockTimeAverage() const
   QReadLocker locker(&this->mLockTimeLock);
   if (this->mLockingTime.size() > 0)
   {
-    return this->mLockingTime.getAverage();
+    cedar::unit::Time copy = this->mLockingTime.getNewest();
+    return copy;
   }
   else
   {
@@ -519,7 +523,8 @@ cedar::unit::Time cedar::proc::Step::getRoundTimeMeasurement() const
   QReadLocker locker(&this->mRoundTimeLock);
   if (this->mRoundTime.size() > 0)
   {
-    return this->mRoundTime.getNewest();
+    cedar::unit::Time copy = this->mLockingTime.getNewest();
+    return copy;
   }
   else
   {
@@ -532,7 +537,8 @@ cedar::unit::Time cedar::proc::Step::getRoundTimeAverage() const
   QReadLocker locker(&this->mRoundTimeLock);
   if (this->mRoundTime.size() > 0)
   {
-    return this->mRoundTime.getAverage();
+    cedar::unit::Time copy = this->mRoundTime.getNewest();
+    return copy;
   }
   else
   {
