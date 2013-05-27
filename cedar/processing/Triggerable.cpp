@@ -42,6 +42,7 @@
 // SYSTEM INCLUDES
 #include <QReadLocker>
 #include <QWriteLocker>
+#include <QMutexLocker>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -49,13 +50,15 @@
 cedar::proc::Triggerable::Triggerable(bool isLooped)
 :
 mIsLooped(isLooped),
-mState(cedar::proc::Triggerable::STATE_UNKNOWN)
+mState(cedar::proc::Triggerable::STATE_UNKNOWN),
+mStartCalls(0),
+mpStartCallsLock(new QMutex())
 {
 }
 
 cedar::proc::Triggerable::~Triggerable()
 {
-  // empty default implementation
+  delete this->mpStartCallsLock;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -84,7 +87,20 @@ cedar::proc::TriggerPtr cedar::proc::Triggerable::getParentTrigger()
 
 void cedar::proc::Triggerable::callOnStart()
 {
-  this->onStart();
+  // make sure no other thread can start the step
+  QMutexLocker locker(this->mpStartCallsLock);
+
+  //!@todo onStart might take a long time - can/should this be done better, e.g., by first storing a bool, then incrementing, then unlocking, then calling onStart?
+  // only call onStart if this triggerable hasn't been started yet
+  if (this->mStartCalls == 0)
+  {
+    this->onStart();
+  }
+
+  // count how often this triggerable was started
+  ++this->mStartCalls;
+  locker.unlock();
+
   if (mFinished)
   {
     for (size_t i = 0; i < this->mFinished->getListeners().size(); ++i)
@@ -96,8 +112,20 @@ void cedar::proc::Triggerable::callOnStart()
 
 void cedar::proc::Triggerable::callOnStop()
 {
-  this->onStop();
+  // only call onStop if there is only one trigger left that started this triggerable
+  QMutexLocker locker(this->mpStartCallsLock);
+  if (this->mStartCalls == 1)
+  {
+    this->onStop();
+  }
+
+  // count how often this was stopped
+  CEDAR_ASSERT(this->mStartCalls > 0);
+  --this->mStartCalls;
+  locker.unlock();
+
   this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
+
   if (mFinished)
   {
     for (size_t i = 0; i < this->mFinished->getListeners().size(); ++i)

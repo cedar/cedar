@@ -37,6 +37,8 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/MatData.h"
+#include "cedar/processing/Network.h"
+#include "cedar/processing/LoopedTrigger.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -79,6 +81,113 @@ class TestStep : public cedar::proc::Step
 
 CEDAR_GENERATE_POINTER_TYPES(TestStep);
 
+
+
+class StartStopTester : public cedar::proc::Step
+{
+public:
+  StartStopTester()
+  :
+  mStartCount(0),
+  mStopCount(0),
+  mData(new cedar::aux::MatData())
+  {
+    this->declareOutput("output", this->mData);
+    this->declareInput("input1", false);
+    this->declareInput("input2", false);
+  }
+
+private:
+  void onStart()
+  {
+    mStartCount += 1;
+  }
+
+  void onStop()
+  {
+    mStopCount += 1;
+  }
+
+  void compute(const cedar::proc::Arguments&)
+  {
+  }
+
+public:
+  int mStartCount;
+  int mStopCount;
+
+private:
+
+  cedar::aux::MatDataPtr mData;
+};
+CEDAR_GENERATE_POINTER_TYPES(StartStopTester);
+
+
+int testStartingStopping()
+{
+  int errors = 0;
+
+  cedar::proc::NetworkPtr network(new cedar::proc::Network());
+  StartStopTesterPtr step1(new StartStopTester());
+  StartStopTesterPtr step2(new StartStopTester());
+  StartStopTesterPtr step3(new StartStopTester());
+  cedar::proc::LoopedTriggerPtr trigger(new cedar::proc::LoopedTrigger());
+
+  network->add(step1, "step1");
+  network->add(step2, "step2");
+  network->add(step3, "step3");
+  network->add(trigger, "trigger");
+
+  network->connectSlots("step1.output", "step3.input1");
+  network->connectSlots("step2.output", "step3.input2");
+  network->connectTrigger(trigger, step1);
+  network->connectTrigger(trigger, step2);
+
+  trigger->startTrigger();
+
+  if (step1->mStartCount != 1)
+  {
+    std::cout << "ERROR: step1 has the wrong start count. Should be one, is " << step1->mStartCount << std::endl;
+    ++errors;
+  }
+
+  if (step2->mStartCount != 1)
+  {
+    std::cout << "ERROR: step2 has the wrong start count. Should be one, is " << step2->mStartCount << std::endl;
+    ++errors;
+  }
+
+  if (step3->mStartCount != 1)
+  {
+    std::cout << "ERROR: step3 has the wrong start count. Should be one, is " << step3->mStartCount << std::endl;
+    ++errors;
+  }
+
+  trigger->stopTrigger();
+
+  if (step1->mStopCount != 1)
+  {
+    std::cout << "ERROR: step1 has the wrong stop count. Should be one, is " << step1->mStopCount << std::endl;
+    ++errors;
+  }
+
+  if (step2->mStopCount != 1)
+  {
+    std::cout << "ERROR: step2 has the wrong stop count. Should be one, is " << step2->mStopCount << std::endl;
+    ++errors;
+  }
+
+  if (step3->mStopCount != 1)
+  {
+    std::cout << "ERROR: step3 has the wrong stop count. Should be one, is " << step3->mStopCount << std::endl;
+    ++errors;
+  }
+
+  std::cout << "Start/stop test uncovered " << errors << " error(s)." << std::endl;
+  return errors;
+}
+
+
 int main(int, char**)
 {
   int errors = 0;
@@ -101,6 +210,8 @@ int main(int, char**)
     std::cout << "Error in lock set check." << std::endl;
     ++errors;
   }
+
+  errors += testStartingStopping();
 
   std::cout << "test finished with " << errors << " error(s)." << std::endl;
   return errors;

@@ -56,6 +56,7 @@
 
 cedar::proc::Connectable::Connectable()
 :
+mpConnectionLock(new QReadWriteLock()),
 mMandatoryConnectionsAreSet(true)
 {
   for (size_t i = 0; i < cedar::proc::DataRole::type().list().size(); ++i)
@@ -68,6 +69,7 @@ mMandatoryConnectionsAreSet(true)
 
 cedar::proc::Connectable::~Connectable()
 {
+  delete this->mpConnectionLock;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -76,6 +78,7 @@ cedar::proc::Connectable::~Connectable()
 
 void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& name)
 {
+  QWriteLocker locker(this->mpConnectionLock);
   std::map<DataRole::Id, SlotMap>::iterator map_iter;
 
   map_iter = this->mSlotMaps.find(role);
@@ -141,11 +144,15 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
                         );
   }
 
+  locker.unlock();
+
   this->mSlotRemoved(role, name);
 }
 
 bool cedar::proc::Connectable::hasSlot(DataRole::Id role, const std::string& name) const
 {
+  QReadLocker locker(this->mpConnectionLock);
+
   std::map<DataRole::Id, SlotMap>::const_iterator map_iter = this->mSlotMaps.find(role);
 
   if (map_iter == this->mSlotMaps.end())
@@ -159,6 +166,8 @@ bool cedar::proc::Connectable::hasSlot(DataRole::Id role, const std::string& nam
 
 bool cedar::proc::Connectable::ownsDataOf(cedar::proc::ConstOwnedDataPtr slot) const
 {
+  QReadLocker locker(this->mpConnectionLock);
+
   // iterate over all buffers
   std::map<DataRole::Id, SlotMap>::const_iterator map_iter = this->mSlotMaps.find(cedar::proc::DataRole::BUFFER);
   if (map_iter != this->mSlotMaps.end())
@@ -396,6 +405,8 @@ void cedar::proc::Connectable::checkMandatoryConnections()
 
 void cedar::proc::Connectable::declareData(DataRole::Id role, const std::string& name, bool mandatory)
 {
+  QWriteLocker locker(this->mpConnectionLock);
+
   // first, create a new slot map if necessary
   std::map<DataRole::Id, SlotMap>::iterator iter = this->mSlotMaps.find(role);
   if (iter == this->mSlotMaps.end())
@@ -457,6 +468,8 @@ void cedar::proc::Connectable::declareData(DataRole::Id role, const std::string&
 
   // since the data has (potentially) changed, re-check the inputs
   this->checkMandatoryConnections();
+
+  locker.unlock();
 
   this->mSlotAdded(role, name);
 }
@@ -647,6 +660,7 @@ void cedar::proc::Connectable::removeLock
 
 void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data)
 {
+  QWriteLocker locker(this->mpConnectionLock);
   std::map<DataRole::Id, SlotMap>::iterator iter = this->mSlotMaps.find(role);
   if (iter == this->mSlotMaps.end())
   {
@@ -690,11 +704,14 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
 
   slot->setData(data);
 
+  locker.unlock();
+
   this->checkMandatoryConnections();
 }
 
 void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& name)
 {
+  QWriteLocker locker(this->mpConnectionLock);
   std::map<DataRole::Id, SlotMap>::iterator iter = this->mSlotMaps.find(role);
   if (iter == this->mSlotMaps.end())
   {
@@ -721,6 +738,8 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& na
                 " name \"" + name + "\" does not exist.");
     return;
   }
+  locker.unlock();
+
   this->checkMandatoryConnections();
 }
 
@@ -792,6 +811,7 @@ cedar::aux::ConstDataPtr cedar::proc::Connectable::getOutput(const std::string& 
 
 cedar::aux::DataPtr cedar::proc::Connectable::getData(DataRole::Id role, const std::string& name) const
 {
+  QReadLocker locker(this->mpConnectionLock);
   std::map<DataRole::Id, SlotMap>::const_iterator iter = this->mSlotMaps.find(role);
   if (iter == this->mSlotMaps.end())
   {
@@ -904,6 +924,7 @@ void cedar::proc::Connectable::renameOutput(const std::string& oldName, const st
   {
     return;
   }
+  QWriteLocker locker(this->mpConnectionLock);
   CEDAR_ASSERT(mSlotMaps.find(DataRole::OUTPUT) != mSlotMaps.end());
   SlotMap::iterator elem = mSlotMaps[DataRole::OUTPUT].find(oldName);
   if (elem != mSlotMaps[DataRole::OUTPUT].end())
@@ -921,6 +942,8 @@ void cedar::proc::Connectable::renameInput(const std::string& oldName, const std
   {
     return;
   }
+
+  QWriteLocker locker(this->mpConnectionLock);
   CEDAR_ASSERT(mSlotMaps.find(DataRole::INPUT) != mSlotMaps.end());
   SlotMap::iterator elem = mSlotMaps[DataRole::INPUT].find(oldName);
   if (elem != mSlotMaps[DataRole::INPUT].end())

@@ -119,13 +119,15 @@ private:
   class ImageDisplay : public QLabel
   {
     public:
-      ImageDisplay(const QString& text);
+      ImageDisplay(cedar::aux::gui::ImagePlot* pPlot, const QString& text);
 
     protected:
       void mousePressEvent(QMouseEvent * pEvent);
 
     public:
       cedar::aux::ConstMatDataPtr mData;
+
+      cedar::aux::gui::ImagePlot* mpPlot;
   };
 
   //--------------------------------------------------------------------------------------------------------------------

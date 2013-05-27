@@ -429,6 +429,9 @@ protected:
 
   //!@brief Vector with the names of all invalid input data.
   std::vector<std::string> mInvalidInputNames;
+
+  //!@brief Lock for making accesses to the connections thread-safe.
+  QReadWriteLock* mpConnectionLock;
 private:
   //!@brief a map of slot maps, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
   std::map<DataRole::Id, SlotMap> mSlotMaps;

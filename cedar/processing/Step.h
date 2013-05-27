@@ -53,6 +53,7 @@
 // SYSTEM INCLUDES
 #include <QThread>
 #include <QReadWriteLock>
+#include <QMutex>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <map>
@@ -177,6 +178,12 @@ public:
    */
   cedar::unit::Time getRoundTimeAverage() const;
 
+  //! Returns the mutex that is prevents mutual access in run calls.
+  QMutex& getComputeMutex() const
+  {
+    return this->mBusy;
+  }
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
@@ -257,6 +264,18 @@ protected:
    */
   void setAutoLockInputsAndOutputs(bool autoLock);
 
+  /*!@brief Locks the data and parameters of the step.
+   *
+   * @remarks Usually, this should only be called automatically.
+   */
+  void lock(cedar::aux::LOCK_TYPE parameterAccessType = cedar::aux::LOCK_TYPE_READ) const;
+
+  /*!@brief Unlocks the data and parameters of the step.
+   *
+   * @remarks Usually, this should only be called automatically.
+   */
+  void unlock() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -293,14 +312,6 @@ private:
    */
   void setRoundTimeMeasurement(const cedar::unit::Time& time);
 
-  /*!@brief Locks the data and parameters of the step.
-   */
-  void lock(cedar::aux::LOCK_TYPE parameterAccessType = cedar::aux::LOCK_TYPE_READ) const;
-
-  /*!@brief Unlocks the data and parameters of the step.
-   */
-  void unlock() const;
-
   /*!@brief Locks the data of the step according to the current method.
    *
    * For a description of the method, see setAutoLockInputsAndOutputs(bool).
@@ -322,7 +333,7 @@ protected:
 private:
   //!@brief flag that states if step is still computing its latest output
   //!@todo Should busy be a part of STATE_*? Or even a lock?
-  bool mBusy;
+  mutable QMutex mBusy;
 
   //!@brief The lock used for protecting the computation arguments of the step.
   QReadWriteLock* mpArgumentsLock;
