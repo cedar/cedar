@@ -179,6 +179,7 @@ private:
 
   #if VTK_MAJOR_VERSION <= 5
     void buildPlane(unsigned int x_size, unsigned int y_size);
+    void setupCamera(vtkCamera* pCamera, const cv::Mat& data);
   #endif
 
 private slots:

@@ -245,10 +245,8 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
       CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
                   "Could not cast to cedar::aux::MatData in cedar::aux::gui::SurfacePlot::plot.");
     }
-    buildPlane(static_cast<unsigned int>(mMatData->getData().rows), static_cast<unsigned int>(mMatData->getData().cols));
-    this->mpRenderer->GetActiveCamera()->SetFocalPoint(mMatData->getData().rows / 2,mMatData->getData().cols / 2, 0);
-    this->mpRenderer->GetActiveCamera()->SetPosition(mMatData->getData().rows / 2, -2 * mMatData->getData().cols, 8 * cedar::aux::math::max(mMatData->getData()));
-    this->mpRenderer->GetActiveCamera()->SetClippingRange(0.1, mMatData->getData().cols * 3);
+    buildPlane(static_cast<unsigned int>(mMatData->getData().cols), static_cast<unsigned int>(mMatData->getData().rows));
+    setupCamera(this->mpRenderer->GetActiveCamera(), mMatData->getData());
     this->startTimer(60); //!@todo make the refresh time configurable.
   }
 
@@ -273,6 +271,24 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
     mpData->GetPointData()->SetScalars(mpZScalars);
   }
 
+  void cedar::aux::gui::VtkSurfacePlot::setupCamera(vtkCamera* pCamera, const cv::Mat& data)
+  {
+    // the center of the plot should be our focal point
+    pCamera->SetFocalPoint(data.rows / 2,data.cols / 2, 0);
+    // we assume a camera view angle of 30 degrees (this is the standard camera view angle in vtk)
+    CEDAR_DEBUG_ASSERT(pCamera->GetViewAngle() == 30.0);
+
+    // dd is the minimum distance to view the diagonal d of the bounding box; 0.2618 rad == 15 degree
+    double dd = sqrt(pow(cedar::aux::math::max(data), 2) + pow(data.rows, 2) + pow(data.cols, 2)) / (2 * tan(0.2618));
+    // h is a suitable height to view the plot, it is 1.5 times the length of a cathetus in a isoscele-right triangle (45-45-90)
+    double h = sqrt(1.5 * dd / 2);
+    // point A of that isoscele-right triangle lies in the center of the bounding box, thus the coordinates for the camera are...
+    double z = 3 * h + (cedar::aux::math::max(data));
+    double y = -data.cols - h * 3;
+    pCamera->SetPosition(data.rows/2, y, z);
+    pCamera->SetClippingRange(0.1, 1.5 * dd);
+  }
+
   //!@cond SKIPPED_DOCUMENTATION
   void cedar::aux::gui::detail::VtkSurfacePlotWorker::convert()
   {
@@ -288,12 +304,10 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
       return;
     }
 
-    if ((data.rows-1) != mpPlot->mpPlane->GetYResolution() || (data.cols-1) != mpPlot->mpPlane->GetXResolution())
+    if ((data.cols-1) != mpPlot->mpPlane->GetYResolution() || (data.rows-1) != mpPlot->mpPlane->GetXResolution())
     {
-      mpPlot->buildPlane(static_cast<unsigned int>(data.rows), static_cast<unsigned int>(data.cols));
-      mpPlot->mpRenderer->GetActiveCamera()->SetFocalPoint(data.rows / 2,data.cols / 2, 0);
-      mpPlot->mpRenderer->GetActiveCamera()->SetPosition(data.rows / 2, -2 * data.cols, 8 * cedar::aux::math::max(data));
-      mpPlot->mpRenderer->GetActiveCamera()->SetClippingRange(0.1, data.cols * 3);
+      mpPlot->buildPlane(static_cast<unsigned int>(data.cols), static_cast<unsigned int>(data.rows));
+      mpPlot->setupCamera(mpPlot->mpRenderer->GetActiveCamera(), data);
     }
 
     int point_number = 0;
