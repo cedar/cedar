@@ -120,6 +120,7 @@ cedar::aux::gui::Configurable::Configurable()
   this->mpPropertyTree = new QTreeWidget();
   p_layout->addWidget(mpPropertyTree, 1);
   p_layout->setContentsMargins(0, 0, 0, 0);
+  this->mpPropertyTree->setAlternatingRowColors(true);
 
   // setup header
   this->mpPropertyTree->setColumnCount(2);
