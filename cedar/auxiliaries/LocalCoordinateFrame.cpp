@@ -55,7 +55,7 @@ _mInitialTranslation
 (
   new cedar::aux::DoubleVectorParameter
   (
-    this, "initial translation", 3, 0.0, -std::numeric_limits<double>::max(), -std::numeric_limits<double>::max()
+    this, "initial translation", 3, 0.0, -std::numeric_limits<double>::max(), std::numeric_limits<double>::max()
   )
 )
 {
