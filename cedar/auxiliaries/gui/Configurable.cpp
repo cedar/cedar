@@ -127,6 +127,10 @@ cedar::aux::gui::Configurable::Configurable()
   QStringList header_labels;
   header_labels << "Property" << "Value";
   this->mpPropertyTree->setHeaderLabels(header_labels);
+
+  // make first section stretch
+  this->mpPropertyTree->header()->setResizeMode(0, QHeaderView::Stretch);
+  this->mpPropertyTree->header()->setResizeMode(1, QHeaderView::ResizeToContents);
 }
 
 
@@ -146,6 +150,7 @@ void cedar::aux::gui::Configurable::display(cedar::aux::ConfigurablePtr configur
   QTreeWidgetItem* p_item = new QTreeWidgetItem(text);
   this->mpPropertyTree->addTopLevelItem(p_item);
   this->mpPropertyTree->setFirstItemColumnSpanned(p_item, true);
+  p_item->setExpanded(true);
 
   this->append(configurable, p_item, std::string());
 }
@@ -178,6 +183,7 @@ void cedar::aux::gui::Configurable::append(cedar::aux::ConfigurablePtr configura
     pItem->addChild(child_item);
     this->mpPropertyTree->setFirstItemColumnSpanned(child_item, true);
     this->append(child, child_item, path);
+    child_item->setExpanded(true);
   }
 }
 
