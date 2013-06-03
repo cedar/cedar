@@ -562,9 +562,24 @@ bool cedar::proc::Step::setNextArguments(cedar::proc::ArgumentsPtr arguments)
   // first, check if new arguments have already been set.
   {
     QReadLocker arg_lock(mpArgumentsLock);
-    if (this->isRunning() || !this->mBusy.tryLock() || this->mNextArguments)
+    if (this->isRunning())
     {
       return false;
+    }
+    else
+    {
+      if (this->mBusy.tryLock())
+      {
+        if (this->mNextArguments)
+        {
+          this->mBusy.unlock();
+          return false;
+        }
+      }
+      else
+      {
+        return false;
+      }
     }
   }
 
