@@ -50,8 +50,6 @@
 #include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
-#include <qwt_legend.h>
-#include <qwt_scale_div.h>
 #include <QContextMenuEvent>
 #include <QVBoxLayout>
 #include <QPalette>
@@ -80,7 +78,7 @@ const int cedar::aux::gui::VtkLinePlot::DOT_DASH_DASHED_LINE = 5;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gui::VtkLinePlot::VtkLinePlot(QWidget *pParent)
+cedar::aux::gui::VtkLinePlot::VtkLinePlot(QWidget* pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
 mpLock(new QReadWriteLock())
@@ -88,7 +86,7 @@ mpLock(new QReadWriteLock())
   this->init();
 }
 
-cedar::aux::gui::VtkLinePlot::VtkLinePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent)
+cedar::aux::gui::VtkLinePlot::VtkLinePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
 mpLock(new QReadWriteLock())
@@ -123,7 +121,7 @@ void cedar::aux::gui::VtkLinePlot::init()
   palette.setColor(QPalette::Window, Qt::white);
   this->setPalette(palette);
 
-  QVBoxLayout *p_layout = new QVBoxLayout();
+  QVBoxLayout* p_layout = new QVBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(p_layout);
 
@@ -166,11 +164,9 @@ void cedar::aux::gui::VtkLinePlot::plot(cedar::aux::ConstDataPtr data, const std
   mpLock->unlock();
 
   this->append(data, title);
-
-  this->startTimer(30); //!@todo make the refresh time configurable.
 }
 
-void cedar::aux::gui::VtkLinePlot::applyStyle(size_t lineId, vtkPlot *pCurve)
+void cedar::aux::gui::VtkLinePlot::applyStyle(size_t lineId, vtkPlot* pCurve)
 {
   // initialize vectors, if this has not happened, yet
   if (mLineColors.empty() || mLineStyles.empty())
@@ -207,7 +203,7 @@ void cedar::aux::gui::VtkLinePlot::applyStyle(size_t lineId, vtkPlot *pCurve)
   vtkSmartPointer<vtkPen> pen = pCurve->GetPen();
 
   // modify accordingly
-  pen->SetColor(mLineColors.at(color_id).to_a());
+  pen->SetColor(mLineColors.at(color_id).toA());
   pen->SetLineType(mLineStyles.at(style_id));
   pen->SetWidth(2.0);
 }

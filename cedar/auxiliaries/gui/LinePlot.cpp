@@ -274,8 +274,6 @@ void cedar::aux::gui::LinePlot::plot(cedar::aux::ConstDataPtr data, const std::s
   mpLock->unlock();
 
   this->append(data, title);
-
-  this->startTimer(30); //!@todo make the refresh time configurable.
 }
 
 void cedar::aux::gui::LinePlot::init()

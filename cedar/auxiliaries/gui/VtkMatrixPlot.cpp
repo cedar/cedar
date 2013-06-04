@@ -33,16 +33,16 @@
     Credits:
 
 ======================================================================================================================*/
-
 #define NOMINMAX // prevents MSVC conflicts
 
 // CEDAR INCLUDES
 #include "cedar/configuration.h"
-#include "cedar/auxiliaries/gui/VtkMatrixPlot.h"
+
 #ifdef CEDAR_USE_VTK
-  #include "cedar/auxiliaries/gui/VtkLinePlot.h"
-  #include "cedar/auxiliaries/gui/VtkSurfacePlot.h"
-#endif // CEDAR_USE_VTK
+
+#include "cedar/auxiliaries/gui/VtkMatrixPlot.h"
+#include "cedar/auxiliaries/gui/VtkLinePlot.h"
+#include "cedar/auxiliaries/gui/VtkSurfacePlot.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
@@ -86,12 +86,12 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gui::VtkMatrixPlot::VtkMatrixPlot(QWidget *pParent)
+cedar::aux::gui::VtkMatrixPlot::VtkMatrixPlot(QWidget* pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
 mpCurrentPlotWidget(NULL)
 {
-  QVBoxLayout *p_layout = new QVBoxLayout();
+  QVBoxLayout* p_layout = new QVBoxLayout();
   this->setLayout(p_layout);
 
   this->setContentsMargins(0, 0, 0, 0);
@@ -110,7 +110,7 @@ bool cedar::aux::gui::VtkMatrixPlot::canAppend(cedar::aux::ConstDataPtr data) co
   }
   else if
   (
-    cedar::aux::gui::MultiPlotInterface *p_multi_plot
+    cedar::aux::gui::MultiPlotInterface* p_multi_plot
       = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlotWidget)
   )
   {
@@ -125,7 +125,7 @@ bool cedar::aux::gui::VtkMatrixPlot::canAppend(cedar::aux::ConstDataPtr data) co
 void cedar::aux::gui::VtkMatrixPlot::doAppend(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   CEDAR_DEBUG_ASSERT(this->mpCurrentPlotWidget != NULL);
-  cedar::aux::gui::MultiPlotInterface *p_multi_plot
+  cedar::aux::gui::MultiPlotInterface* p_multi_plot
     = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlotWidget);
 
   CEDAR_DEBUG_ASSERT(p_multi_plot != NULL);
@@ -152,7 +152,6 @@ void cedar::aux::gui::VtkMatrixPlot::plot(cedar::aux::ConstDataPtr data, const s
 
   switch (dims)
   {
-#ifdef CEDAR_USE_VTK
     case 1:
       this->mpCurrentPlotWidget = new cedar::aux::gui::VtkLinePlot(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
@@ -162,7 +161,6 @@ void cedar::aux::gui::VtkMatrixPlot::plot(cedar::aux::ConstDataPtr data, const s
       this->mpCurrentPlotWidget = new cedar::aux::gui::VtkSurfacePlot(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
-#endif // CEDAR_USE_VTK
 
     default:
     {
@@ -180,3 +178,5 @@ void cedar::aux::gui::VtkMatrixPlot::processChangedData()
 {
   this->plot(this->mData, "");
 }
+
+#endif // CEDAR_USE_VTK

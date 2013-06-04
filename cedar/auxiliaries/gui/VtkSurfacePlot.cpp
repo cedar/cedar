@@ -82,7 +82,7 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gui::VtkSurfacePlot::VtkSurfacePlot(QWidget *pParent)
+cedar::aux::gui::VtkSurfacePlot::VtkSurfacePlot(QWidget* pParent)
 :
 cedar::aux::gui::PlotInterface(pParent),
 mpLock(new QReadWriteLock())
@@ -90,7 +90,7 @@ mpLock(new QReadWriteLock())
   this->init();
 }
 
-cedar::aux::gui::VtkSurfacePlot::VtkSurfacePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent)
+cedar::aux::gui::VtkSurfacePlot::VtkSurfacePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent)
 :
 cedar::aux::gui::PlotInterface(pParent),
 mpLock(new QReadWriteLock())
@@ -123,7 +123,7 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
 
   void cedar::aux::gui::VtkSurfacePlot::init()
   {
-    QVBoxLayout *p_layout = new QVBoxLayout();
+    QVBoxLayout* p_layout = new QVBoxLayout();
     p_layout->setContentsMargins(0, 0, 0, 0);
     this->setLayout(p_layout);
 
@@ -162,7 +162,7 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
     mpMapper->SetInputConnection(mpWarper->GetOutputPort());
 
     // create lookup table for coloring
-    vtkLookupTable *pLut = vtkLookupTable::New();
+    vtkLookupTable* pLut = vtkLookupTable::New();
     pLut->SetHueRange(0.7, 0);
     mpMapper->SetLookupTable(pLut);
 
@@ -341,7 +341,7 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
   {
     mpVtkWidget = new QVTKWidget;
 
-    QVBoxLayout *p_layout = new QVBoxLayout();
+    QVBoxLayout* p_layout = new QVBoxLayout();
     p_layout->setContentsMargins(0, 0, 0, 0);
     setLayout(p_layout);
 

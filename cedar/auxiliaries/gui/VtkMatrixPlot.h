@@ -41,6 +41,10 @@
 #ifndef CEDAR_AUX_GUI_VTK_MATRIX_PLOT_H
 #define CEDAR_AUX_GUI_VTK_MATRIX_PLOT_H
 
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_VTK
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/MultiPlotInterface.h"
@@ -77,7 +81,7 @@ class cedar::aux::gui::VtkMatrixPlot : public cedar::aux::gui::MultiPlotInterfac
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  VtkMatrixPlot(QWidget *pParent = NULL);
+  VtkMatrixPlot(QWidget* pParent = NULL);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -117,8 +121,9 @@ private:
   cedar::aux::ConstMatDataPtr mData;
 
   //!@brief the plot widget
-  QWidget *mpCurrentPlotWidget;
+  QWidget* mpCurrentPlotWidget;
 
 }; // class cedar::aux::gui::VtkMatrixPlot
 
+#endif // CEDAR_USE_VTK
 #endif // CEDAR_AUX_GUI_VTK_MATRIX_PLOT_H

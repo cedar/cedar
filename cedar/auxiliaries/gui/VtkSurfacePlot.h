@@ -91,7 +91,7 @@ namespace cedar
           Q_OBJECT
 
           public:
-            VtkSurfacePlotWorker(cedar::aux::gui::VtkSurfacePlot *pPlot)
+            VtkSurfacePlotWorker(cedar::aux::gui::VtkSurfacePlot* pPlot)
             :
             mpPlot(pPlot)
             {
@@ -106,7 +106,7 @@ namespace cedar
             void dataChanged();
 
           public:
-            cedar::aux::gui::VtkSurfacePlot *mpPlot;
+            cedar::aux::gui::VtkSurfacePlot* mpPlot;
         };
         CEDAR_GENERATE_POINTER_TYPES(VtkSurfacePlotWorker);
       }
@@ -143,10 +143,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  VtkSurfacePlot(QWidget *pParent = NULL);
+  VtkSurfacePlot(QWidget* pParent = NULL);
 
   //!@brief Constructor expecting a DataPtr.
-  VtkSurfacePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
+  VtkSurfacePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent = NULL);
 
   //!@brief Destructor
   ~VtkSurfacePlot();
@@ -159,7 +159,7 @@ public:
   void plot(cedar::aux::ConstDataPtr matData, const std::string& title);
 
   //!@brief handle timer events
-  void timerEvent(QTimerEvent *pEvent);
+  void timerEvent(QTimerEvent* pEvent);
 
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
@@ -192,7 +192,7 @@ protected:
   // none yet
 private:
   //!@brief QVTKWidget nested in QWidget. Contains the View.
-  QVTKWidget *mpVtkWidget;
+  QVTKWidget* mpVtkWidget;
   //! the displayed MatData
   cedar::aux::ConstMatDataPtr mMatData;
   #if VTK_MAJOR_VERSION <= 5
@@ -225,7 +225,7 @@ private:
 
 
   //! For locking the plot itself.
-  QReadWriteLock *mpLock;
+  QReadWriteLock* mpLock;
 
   //! Thread in which matrix data is converted to a qwt-ready format.
   QThread* mpWorkerThread;
