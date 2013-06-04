@@ -264,6 +264,18 @@ protected:
    */
   void setAutoLockInputsAndOutputs(bool autoLock);
 
+  /*!@brief Locks the data and parameters of the step.
+   *
+   * @remarks Usually, this should only be called automatically.
+   */
+  void lock(cedar::aux::LOCK_TYPE parameterAccessType = cedar::aux::LOCK_TYPE_READ) const;
+
+  /*!@brief Unlocks the data and parameters of the step.
+   *
+   * @remarks Usually, this should only be called automatically.
+   */
+  void unlock() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -299,14 +311,6 @@ private:
   /*!@brief Sets the current round time measurement.
    */
   void setRoundTimeMeasurement(const cedar::unit::Time& time);
-
-  /*!@brief Locks the data and parameters of the step.
-   */
-  void lock(cedar::aux::LOCK_TYPE parameterAccessType = cedar::aux::LOCK_TYPE_READ) const;
-
-  /*!@brief Unlocks the data and parameters of the step.
-   */
-  void unlock() const;
 
   /*!@brief Locks the data of the step according to the current method.
    *

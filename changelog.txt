@@ -61,6 +61,8 @@ likely to undergo major changes:
 - cedar::proc::gui
   - Fixed an issue that could lead to an exception when connecting renamed looped triggers.
     (see also issue #10 in stable)
+- cedar::dyn
+  - Fixed a potential deadlock in the neural field that occurred when the activation was set as output and an exception occurred during the Euler step.
     
 == current testing ==
 

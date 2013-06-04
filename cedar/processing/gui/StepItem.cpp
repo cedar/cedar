@@ -304,8 +304,8 @@ void cedar::proc::gui::StepItem::updateStepState()
   {
     case cedar::proc::Step::STATE_EXCEPTION:
     case cedar::proc::Step::STATE_NOT_RUNNING:
-      this->setOutlineColor(Qt::darkGray);
-      this->setFillColor(QColor(235, 235, 235));
+      this->setOutlineColor(Qt::red);
+      this->setFillColor(QColor(255, 175, 175));
 
       if (this->mRunTimeMeasurementTimerId != 0)
       {
@@ -751,22 +751,20 @@ void cedar::proc::gui::StepItem::showPlot
     title += "." + slot->getName() + ")";
   }
 
-  QDockWidget *p_dock = this->createDockWidget(title);
+  auto p_dock = this->createDockWidget(title, pPlot);
 
   QRect geometry = p_dock->geometry();
   geometry.setTopLeft(position);
   geometry.setSize(QSize(200, 200));
   p_dock->setGeometry(geometry);
 
-  p_dock->setWidget(pPlot);
   p_dock->show();
 }
 
 void cedar::proc::gui::StepItem::openProperties()
 {
-  QDockWidget *p_widget = this->createDockWidget("Properties");
   cedar::proc::gui::PropertyPane* props = new cedar::proc::gui::PropertyPane();
-  p_widget->setWidget(props);
+  auto p_widget = this->createDockWidget("Properties", props);
   props->display(this->getStep());
   p_widget->show();
 }
@@ -1039,14 +1037,27 @@ void cedar::proc::gui::StepItem::setDisplayMode(cedar::proc::gui::StepItem::Disp
   this->update();
 }
 
-QDockWidget* cedar::proc::gui::StepItem::createDockWidget(const std::string& title) const
+QWidget* cedar::proc::gui::StepItem::createDockWidget(const std::string& title, QWidget* pPlot) const
 {
-  QDockWidget *p_dock = new QDockWidget(QString::fromStdString(title), this->mpMainWindow);
-  p_dock->setFloating(true);
-  p_dock->setContentsMargins(0, 0, 0, 0);
-  p_dock->setAllowedAreas(Qt::NoDockWidgetArea);
+  if (this->mpMainWindow)
+  {
+    QDockWidget *p_dock = new QDockWidget(QString::fromStdString(title), this->mpMainWindow);
+    p_dock->setFloating(true);
+    p_dock->setContentsMargins(0, 0, 0, 0);
+    p_dock->setAllowedAreas(Qt::NoDockWidgetArea);
+    p_dock->setWidget(pPlot);
 
-  return p_dock;
+    return p_dock;
+  }
+  else
+  {
+    QWidget* p_widget = new QWidget();
+    p_widget->setWindowTitle(QString::fromStdString(title));
+    auto p_layout = new QVBoxLayout();
+    p_layout->addWidget(pPlot);
+    p_widget->setLayout(p_layout);
+    return p_widget;
+  }
 }
 
 void cedar::proc::gui::StepItem::multiplot
@@ -1085,12 +1096,11 @@ void cedar::proc::gui::StepItem::multiplot
   }
 
   // initialize dock
-  QDockWidget *p_dock = createDockWidget(this->getStep()->getName());
+  QWidget *p_widget = new QWidget();
+  auto p_dock = createDockWidget(this->getStep()->getName(), p_widget);
 
   // initialize widget & layout
-  QWidget *p_widget = new QWidget();
   p_widget->setContentsMargins(0, 0, 0, 0);
-  p_dock->setWidget(p_widget);
   QGridLayout *p_layout = new QGridLayout();
   p_layout->setContentsMargins(grid_spacing, grid_spacing, grid_spacing, grid_spacing);
   p_layout->setSpacing(grid_spacing);
