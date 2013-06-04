@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -118,6 +118,9 @@ public:
 
   //! Generates the a description of the color space.
   std::string getDescription() const;
+
+  //! Returns a channel code, e.g., BGR, HSV, ...
+  std::string getChannelCode() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

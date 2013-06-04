@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -93,14 +93,6 @@ public:
    *  \throws std::out_of_range if index is out of range
    */
   virtual void setJointAngle(unsigned int index, double angle);
-
-  /*!@brief Sets the mode in which the joints positions are set (angle/velocity/acceleration)
-   *
-   * this function restarts the looped thread
-   * \throws std::out_of_range if index is out of range
-   * @param actionType new working mode
-   */
-  virtual void setWorkingMode(cedar::dev::robot::KinematicChain::ActionType actionType);
 
   /*!@brief starts the looped thread
    *

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -94,6 +94,7 @@ namespace cedar
     template <class BaseTypePtr> class Factory;
     template <class BaseTypePtr, class DerivedTypePtr> class FactoryDerived;
     template <class BaseTypePtr> class FactoryManager;
+    template <class BaseTypePtr> class DeclarationManagerTemplate;
 
     template <typename KeyBasePtr, typename ValueBasePtr> class TypeBasedFactory;
 
@@ -101,6 +102,13 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(Parameter);
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(ObjectParameter);
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(ObjectListParameter);
+    //!@endcond
+
+    //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_DECLARE_AUX_CLASS(PluginDeclaration);
+    CEDAR_DECLARE_AUX_CLASS(PluginDeclarationList);
+    template <class BaseClassPtr> class PluginDeclarationBaseTemplate;
+    template <class BaseClassPtr, class PluginClassPtr, class BaseClass> class PluginDeclarationTemplate;
     //!@endcond
 
     //!@brief a template class for parameters
@@ -183,16 +191,13 @@ namespace cedar
     //!@brief A concretization of DataTemplate for simple points (cv::Point).
     typedef DataTemplate<cv::Point> CvPointData;
 
-    //!@brief A concretization of DataTemplate for double values.
-    typedef DataTemplate<double> DoubleData;
-
     //!@brief A concretization of DataTemplate for a set of simple matrices (std::vector<cv::Mat>).
     typedef DataTemplate<std::vector<cv::Mat> > ImageSetData;
 
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(MatData);
+    CEDAR_DECLARE_AUX_CLASS(DoubleData);
     CEDAR_GENERATE_POINTER_TYPES(CvPointData);
-    CEDAR_GENERATE_POINTER_TYPES(DoubleData);
     CEDAR_GENERATE_POINTER_TYPES(ImageSetData);
     CEDAR_DECLARE_AUX_CLASS(ImageData);
     CEDAR_DECLARE_AUX_CLASS(StereoImageData);
@@ -201,6 +206,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(BadConnectionException);
     CEDAR_DECLARE_AUX_CLASS(ConversionFailedException);
     CEDAR_DECLARE_AUX_CLASS(DeadReferenceException);
+    CEDAR_DECLARE_AUX_CLASS(DimensionalityMismatchException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateIdException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateNameException);
     CEDAR_DECLARE_AUX_CLASS(ExceptionBase);

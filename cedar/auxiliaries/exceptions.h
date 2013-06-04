@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -123,6 +123,12 @@ class cedar::aux::InvalidNameException : public cedar::aux::ExceptionBase
 /*!@brief Exception that occurs when an given type does not match an expected type.
  */
 class cedar::aux::TypeMismatchException : public cedar::aux::ExceptionBase
+{
+};
+
+/*!@brief Exception that occurs when an given dimensionalities do not match.
+ */
+class cedar::aux::DimensionalityMismatchException : public cedar::aux::ExceptionBase
 {
 };
 

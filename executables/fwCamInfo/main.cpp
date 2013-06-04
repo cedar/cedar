@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
     }
   }
 
-  std::cout << "Informations on camera no. " << (int)camera_nr << "\n" <<  std::endl;
+  std::cout << "Informations on camera no. " << static_cast<int>(camera_nr) << "\n" <<  std::endl;
 
   //create firewire interface
   cedar::dev::sensors::camera::LibDcBase fw_interface;

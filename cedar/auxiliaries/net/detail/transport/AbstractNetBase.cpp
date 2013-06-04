@@ -1,6 +1,6 @@
 /*=============================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -149,7 +149,7 @@ bool AbstractNetBase::connectTwo(const std::string &writerPort, const std::strin
 
   if (!mNetwork.connect( writerPort.c_str(),
                          readerPort.c_str(),
-                         "mcast",
+                         0, //"mcast",
                          true ) ) // 4. Argument: quiet = true
   {
     mIsConnected= false;

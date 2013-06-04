@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -119,13 +119,15 @@ private:
   class ImageDisplay : public QLabel
   {
     public:
-      ImageDisplay(const QString& text);
+      ImageDisplay(cedar::aux::gui::ImagePlot* pPlot, const QString& text);
 
     protected:
       void mousePressEvent(QMouseEvent * pEvent);
 
     public:
       cedar::aux::ConstMatDataPtr mData;
+
+      cedar::aux::gui::ImagePlot* mpPlot;
   };
 
   //--------------------------------------------------------------------------------------------------------------------

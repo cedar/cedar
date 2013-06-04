@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -128,6 +128,7 @@ private:
   cedar::dev::robot::ConstKinematicChainPtr mpKinematicChain;
   QGridLayout* mpGridLayout;
   unsigned int mDecimals;
+  int mTimerId;
 };
 
 #endif /* CEDAR_DEV_ROBOT_GUI_KINEMATIC_CHAIN_MONITOR_WIDGET_H */

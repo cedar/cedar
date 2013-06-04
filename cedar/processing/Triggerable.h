@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -199,6 +199,12 @@ protected:
 private:
   //!@brief the finished trigger singleton, which is triggered once the computation of this step is done
   cedar::proc::TriggerPtr mFinished;
+
+  //! Counts how often callOnStart was called. This is required to prevent multiple onStart calls.
+  unsigned int mStartCalls;
+
+  //! Lock for mStartCalls.
+  QMutex* mpStartCallsLock;
 
 }; // class cedar::proc::Triggerable
 

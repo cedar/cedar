@@ -1,6 +1,6 @@
 # License
 
-Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum,
+Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum,
 Germany
  
 This file is part of cedar.
@@ -49,7 +49,7 @@ have to install before you can compile our library. The version numbers are
 the oldest versions supported.
 
 * CMake
-* Boost 1.47
+* Boost 1.47 (except version 1.49, which apparently does not work with c++11)
 * OpenCV 2.2
 * Qt 4.6.2
 * qwt 5.2.1
@@ -117,7 +117,8 @@ If you installed the dependencies with homebrew, you can simply copy the followi
     sudo ln -s "/usr/local/Cellar/qwt/[__VERSION__]/lib/qwt.framework/Versions/6/qwt" "/usr/local/Cellar/qwt/[__VERSION__]/lib/qwt.framework/qwt"
 
 #### Install GCC and don't use Clang!
-To compile cedar you should **use the GCC compiler**. To install the GCC compiler open *XCode*, go to *Preferences* -> *Downloads* and install the *Command Line Tools*. When configuring cedar with cmake change the compiler to GCC. You can do this by using *ccmake*:
+To compile cedar you should **use the GCC compiler**. To install the GCC compiler version 4.2 open *XCode*, go to *Preferences* -> *Downloads* and install the *Command Line Tools*. Note however, that GCC 4.2 does not support C++11. The unstable version of cedar uses C++11 features. Thus you need to install GCC 4.7.2 if you want to compile the unstable version. Homebrew provides a [formula](https://github.com/Homebrew/homebrew-dupes/blob/master/gcc.rb), just follow the instructions to install homebrew/dupes/gcc.
+When configuring cedar with cmake change the compiler to GCC. You can do this by using *ccmake*:
 
 Switch to advanced mode and then set the value of `CMAKE_CXX_COMPILER` to `/usr/bin/llvm-g++`.
 

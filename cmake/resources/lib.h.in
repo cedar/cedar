@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -57,10 +57,10 @@
   
   #ifdef CEDAR_LIB_EXPORTS_@CAP_LIB_NAME@
     #define CEDAR_INSTANTIATE_@CAP_LIB_NAME@_TEMPLATE(TEMPLATE) \
-      template class __declspec(dllexport) TEMPLATE;
+      template class __declspec(dllexport) TEMPLATE
   #else
     #define CEDAR_INSTANTIATE_@CAP_LIB_NAME@_TEMPLATE(TEMPLATE) \
-       extern template class __declspec(dllimport) TEMPLATE;
+       extern template class __declspec(dllimport) TEMPLATE
   #endif
   
 #else // CEDAR_COMPILER_MSVC

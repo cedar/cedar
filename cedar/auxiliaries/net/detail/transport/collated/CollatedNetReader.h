@@ -1,6 +1,6 @@
 /*=============================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -92,6 +92,8 @@ private:
   // CollatedNetReader();
   CollatedNetReader(const CollatedNetReader &C); // not copyable
   CollatedNetReader &operator=(const CollatedNetReader &C); // not copyable
+
+  virtual bool checkCollatedDataForRead(const typename CollatedTraits<T>::HeaderType &header) = 0;
 
 public:
   //!@brief use this constructor

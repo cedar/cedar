@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -159,17 +159,6 @@ void cedar::dev::kuka::KinematicChain::setJointAngle(unsigned int index, double 
   }
 }
 
-
-void cedar::dev::kuka::KinematicChain::setWorkingMode(cedar::dev::robot::KinematicChain::ActionType actionType)
-{
-  // Set the desired working mode
-  KinematicChain::setWorkingMode(actionType);
-  // Reset the commanded position to the measured joint position
-  mCommandedJointPosition = mMeasuredJointPosition;
-  // restart the thread, since it was stopped by KinematicChain::setWorkingMode()
-  this->start();
-}
-
 /*
  * Overwritten start function of KinematicChain
  * the function inherited from KinematicChain does some things we do not want.
@@ -204,18 +193,19 @@ void cedar::dev::kuka::KinematicChain::step(double)
     // this will leave commanded_joint uninitialized, however, in this case it won't be used by doPositionControl()
     if (mpFriRemote->isPowerOn() && mpFriRemote->getState() == FRI_STATE_CMD)
     {
-      switch (getWorkingMode())
+      // TODO: js, this needs to be rewritten. Was a check on working mode
+      switch (1)
       {
-        case ACCELERATION:
+        case 1:
         // increase speed for all joints
-        setJointVelocities(getJointVelocitiesMatrix() + getJointAccelerationsMatrix() * mpFriRemote->getSampleTime());
-        case VELOCITY:
+        setJointVelocities(getCachedJointVelocities() + getCachedJointAccelerations() * mpFriRemote->getSampleTime());
+        case 2:
           // change position for all joints
           for (unsigned i=0; i<LBR_MNJ; i++)
           {
             mCommandedJointPosition.at(i) += getJointVelocity(i) * mpFriRemote->getSampleTime();
           }
-        case ANGLE:
+        case 3:
           for(unsigned i=0; i<LBR_MNJ; i++)
           {
             // if the joint position exceeds the one in the reference geometry, reset the angle

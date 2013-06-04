@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -47,22 +47,39 @@ likely to undergo major changes:
 
 
 == known issues ==
-  - cedardyn is not properly loaded on some OSs when using processingIde. If you want to use its content, manually load
-    cedardyn using the plugin dialog. You then may want to go to the Manage.. dialog and mark this plugin to be loaded
-    on every start.
-  - On windows, some of the GL drawing functionality for kinematic chains and related classes is not implemented.
+  - cedardyn is not properly loaded on some OSs (mainly Windows) when using processingIde. If you want to use its
+    content, manually load cedardyn using the plugin dialog. You then may want to go to the Manage.. dialog and mark
+    this plugin to be loaded on every start.
+  - On Windows, some of the GL drawing functionality for kinematic chains and related classes is not implemented.
   - Grouping steps into networks is buggy. Please use with caution and report any errors you encounter.
   - cedar::dev::sensors::visual::CameraGrabber is not working at the moment.
   - network functionality in the processing framework has several issues; for now, we recommend not using it because
     there are some annoying bugs related to it.
+  - using multiple 3D convolutions in separate threads slows down all involved convolutions
+    
+== current stable ==
+- cedar::proc::gui
+  - Fixed an issue that could lead to an exception when connecting renamed looped triggers.
+    (see also issue #10 in stable)
+- cedar::dyn
+  - Fixed a potential deadlock in the neural field that occurred when the activation was set as output and an exception occurred during the Euler step.
+    
+== current testing ==
 
-== current version ==
-- all:
+- build system
   - enabled C++0x / C++11 compiler flag for GCC
-
+  - cedar should now also compile when using clang.
+- cedar::aux
+  - DoubleData now inherits MatData. It therefore is also no longer just a typedef of a template, so make sure you
+    include the proper header (cedar/auxiliaries/DoubleData) in your code.
+  - Parameters and Configurables can now be marked as advanced. Those that are, are not displayed to the user unless
+    they opt to have them displayed by checking a box in the property pane.
+- cedar::aux::gui
+  - LinePlots now have an option in their context menu to set fixed limits for the y axis.
+  - There is now a history plot for 1D matrices.
 - cedar::dev
-  - KinematicChain instances now need to be started via ->start() by the implementor. They do not start threading on their own, anymore
-  
+  - KinematicChain instances now need to be started via ->start() by the implementor. They do not start threading on
+    their own, anymore.
 - cedar::proc
   - The processingIde can now be started with the "--no-log" option. This will redirect all log messages to the terminal
     and can be very helpful when steps send too many log messages, leading to a lock-up of the user interface.
@@ -71,13 +88,56 @@ likely to undergo major changes:
 
 - cedar::dyn
   - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   
+  
+
+== Version 1.0.9 ==
+- cedar::proc
+  - Fixed a bug in the resize step that lead to weird results when the step was being used with 1d inputs.
+- cedar::aux::conv
+  - using 3D convolutions in separate threads doesn't crash anymore, but the introduced lock slows down
+    all involved convolutions (FFTW plan creation is not thread-safe). This will be fixed with a rewrite of FFTW code.
+
+== Version 1.0.8 ==
+
+- build system
+  - fixed issues when linking to non-qt4 versions of QWT and libQGLViewer
+    when qt3 and qt4 versions were present on the system.
+  - Disabled the as-needed switch of gcc/ld; on newer Linux versions, this caused cedardyn to not be loaded properly at
+    runtime, which meant fields and other steps from that library not showing up properly. This problem still persists
+    on Windows/MSVC.
+- cedar::aux::net
+  - fixed issues with GCC 4.7 and the NetTransporter (Reader/Writer) code
+    (only occured when the optional YARP dependency was included)
+
+== Version 1.0.7
+- cedar::aux::gui
+  - fixed a bug in how matrix plots handle changing data dimensionality
+- cedar::proc
+  - fixed a potential crash in Network::getElement("path") 
+
+== Version 1.0.6 ==
+- General
+  - added support for OpenCV 2.2
+  - fixed build on Windows
+- cedar::aux::conv
+  - fixed a memory leak in FFTW-based convolution
+
+== Version 1.0.5 ==
+- Build system
+  - 'make install' can be used without having Doxygen installed
+
+== Version 1.0.4 ==
+- Build system
+  - Moved the version information to a separate file (cmake/version.txt).
+- cedar::aux::math
+  - Fixed a bug in the function gaussMatrix that discretized the center position of cyclic Gaussian curves.
 
 == Version 1.0.3 ==
 - cedar::aux
   - Fixed some minor bad code in the gui::LinePlot
   
 - cedar::proc
-  - Fixed a bug in the procection step that could lead to a crash when the destination dimensions of a 3d to a 2d matrix
+  - Fixed a bug in the projection step that could lead to a crash when the destination dimensions of a 3d to a 2d matrix
     were swapped.
 
 == Version 1.0.2 ==

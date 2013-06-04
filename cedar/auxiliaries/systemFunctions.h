@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -74,6 +74,6 @@ namespace cedar
      */
     CEDAR_AUX_LIB_EXPORT void openCrashFile(std::ofstream& stream, std::string& fileName);
   }
-}; // namespace cedar::aux
+} // namespace cedar::aux
 
 #endif // CEDAR_AUX_SYSTEM_FUNCTIONS_H

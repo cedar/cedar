@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -50,12 +50,13 @@
 cedar::dev::robot::gui::KinematicChainMonitorWidget::KinematicChainMonitorWidget
 (
   cedar::dev::robot::KinematicChainPtr kinematicChain,
-  QWidget * parent,
+  QWidget* parent,
   Qt::WindowFlags f
 )
 :
 QWidget(parent, f),
-mpKinematicChain(kinematicChain)
+mpKinematicChain(kinematicChain),
+mTimerId(0)
 {
   mDecimals = 6;
 
@@ -119,7 +120,10 @@ void cedar::dev::robot::gui::KinematicChainMonitorWidget::initWindow()
   setLayout(mpGridLayout);
 
   // start a timer to update the interface
-  startTimer(mUpdateInterval);
+  if (!mTimerId)
+  {
+    mTimerId =  startTimer(mUpdateInterval);
+  }
 
   return;
 }

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -118,6 +118,11 @@ void cedar::aux::gui::MatrixSlicePlot3D::timerEvent(QTimerEvent* /*pEvent*/)
   }
 
   const cv::Mat& mat = this->mData->getData();
+  if (cedar::aux::math::getDimensionalityOf(mat) != 3) // plot is no longer capable of displaying the data
+  {
+    emit dataChanged();
+    return;
+  }
 
   this->mData->lockForRead();
   if (mat.empty())

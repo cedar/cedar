@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -87,7 +87,7 @@ cedar::aux::LocalCoordinateFrame::~LocalCoordinateFrame()
 
 void cedar::aux::LocalCoordinateFrame::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
-  cedar::aux::Configurable::readConfiguration(node);
+  cedar::aux::NamedConfigurable::readConfiguration(node);
   setTranslation(_mInitialTranslation->getValue());
 
   CEDAR_ASSERT(_mInitialRotation->size() >=9);

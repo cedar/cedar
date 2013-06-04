@@ -212,7 +212,7 @@ int main(int argc, char**) // we still don't use the arguments
       "The Category you Would Like the Step to Have, Used Mainly by the UI"
     )
   );
-  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(sum_declaration);
+  sum_declaration->declare();
 @endcode
 We assume that the SimpleSummation class lives in some namespace @em yourNamespace. Using the
 cedar::proc::ElementDeclaration shown above, the framework will be able to create new objects of the class
@@ -318,7 +318,7 @@ int main(int, char**)
       "The Category you Would Like the Step to Have, Used Mainly by the UI"
     )
   );
-  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(sum_declaration);
+  sum_declaration->declare();
   
   cedar::proc::NetworkPtr network(new cedar::proc::Network());
 @endcode
@@ -356,9 +356,9 @@ The first step towards this is to move the SimpleSummation step into a separate 
 #ifndef SIMPLE_SUMMATION_PLUGIN_H
 #define SIMPLE_SUMMATION_PLUGIN_H
 
-#include <cedar/processing/PluginDeclaration.h>
+#include <cedar/auxiliaries/PluginDeclarationList.h>
 
-CEDAR_DECLARE_PROC_PLUGIN_FUNCTION(void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin));
+CEDAR_DECLARE_PROC_PLUGIN_FUNCTION(void pluginDeclaration(cedar::aux::PluginDeclarationListPtr plugin));
 
 #endif // SIMPLE_SUMMATION_PLUGIN_H
 @endcode
@@ -371,7 +371,7 @@ the cedar::proc::PluginDeclaration. Therefore, we declare our summation step in 
 
 #include <cedar/processing/ElementDeclaration.h>
 
-void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin)
+void pluginDeclaration(cedar::aux::PluginDeclarationListPtr plugin)
 {
   cedar::proc::ElementDeclarationPtr summation_decl
   (
@@ -460,7 +460,7 @@ cedar::proc::DataSlot::VALIDITY SimpleSummation::determineInputValidity
                                   cedar::aux::ConstDataPtr data
                                 ) const
 {
-  if (boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data))
+  if (boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
     return cedar::proc::DataSlot::VALIDITY_VALID;
   }

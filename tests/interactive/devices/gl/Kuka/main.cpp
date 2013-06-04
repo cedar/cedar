@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -84,6 +84,7 @@ int main(int argc, char **argv)
   widget_arm.show();
   viewer.startTimer(20);
   p_kuka_arm->startTimer(20);
+  p_kuka_arm->start();
   a.exec();
 
   return 0;

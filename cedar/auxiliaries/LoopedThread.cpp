@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -191,7 +191,7 @@ void cedar::aux::LoopedThread::run()
         usleep(std::max<int>(0, sleep_duration.total_microseconds()));
       
         if (mStop) // a lot can happen in a few us
-          return;
+          break;
 
         // determine time since last run
         mLastTimeStepStart = mLastTimeStepEnd;
@@ -211,7 +211,7 @@ void cedar::aux::LoopedThread::run()
         step(full_steps_taken * step_size.total_microseconds() * 0.001);
 
         if (mStop) // a lot can happen in a step()
-          return;
+          break;
 
         // schedule the next wake up
         while (scheduled_wakeup < boost::posix_time::microsec_clock::universal_time())
@@ -241,7 +241,7 @@ void cedar::aux::LoopedThread::run()
         usleep(std::max<int>(0, sleep_duration.total_microseconds()));
 
         if (mStop) // a lot can happen in a few us
-          return;
+          break;
 
         // determine time since last run
         mLastTimeStepStart = mLastTimeStepEnd;
@@ -260,7 +260,7 @@ void cedar::aux::LoopedThread::run()
         step(steps_taken * step_size.total_microseconds() * 0.001);
 
         if (mStop) // a lot can happen in a step()
-          return;
+          break;
 
         // schedule the next wake up
         scheduled_wakeup = std::max<boost::posix_time::ptime>

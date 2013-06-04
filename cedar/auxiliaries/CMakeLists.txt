@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -77,7 +77,7 @@ cedar_add_library(cedaraux
   kernel/Gauss.h
   kernel/Box.h
   RESOURCES
-  gui/icons/message_icons.qrc
+  gui/icons/cedar_aux_gui_icons.qrc
   LINK_LIBRARIES
   cedarunits
 )

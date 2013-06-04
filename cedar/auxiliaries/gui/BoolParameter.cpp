@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -94,6 +94,7 @@ void cedar::aux::gui::BoolParameter::parameterPointerChanged()
   parameter->unlock();
   this->mpCheckBox->setChecked(checked);
   QObject::connect(this->mpCheckBox, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
+  QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(parameterValueChanged()));
 }
 
 void cedar::aux::gui::BoolParameter::stateChanged(int state)
@@ -103,3 +104,14 @@ void cedar::aux::gui::BoolParameter::stateChanged(int state)
   parameter->setValue(state == Qt::Checked, true);
 }
 
+void cedar::aux::gui::BoolParameter::parameterValueChanged()
+{
+  bool blocked = this->mpCheckBox->blockSignals(true);
+
+  cedar::aux::BoolParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::aux::BoolParameter>(this->getParameter());
+
+  this->mpCheckBox->setChecked(parameter->getValue());
+
+  this->mpCheckBox->blockSignals(blocked);
+}

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -28,7 +28,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 09 28
 
-    Description: Class GrabberChannel
+    Description: Class GrabberChannel contains the data for a grabbing channel
 
     Credits:
 
@@ -55,7 +55,7 @@ class cedar::dev::sensors::visual::GrabberChannel
 :
 virtual public cedar::aux::Configurable
 {
-  //!@brief friend class of Grabber for direct access to the members
+  //! @brief friend class of Grabber for direct access to the members
   friend class cedar::dev::sensors::visual::Grabber;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -74,10 +74,9 @@ public:
   _mSnapshotName(new cedar::aux::FileParameter(this,"snapshot file",cedar::aux::FileParameter::WRITE,"./snapshot.jpg")),
   _mRecordName(new cedar::aux::FileParameter(this, "record file",cedar::aux::FileParameter::WRITE,"./record.avi"))
   {
-    //init classes
   };
 
-  //!@brief Destructor
+  //! @brief Destructor
   virtual ~GrabberChannel()
   {
   };
@@ -103,13 +102,13 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! the picture frame
+  //! @brief The picture frame
   cv::Mat mImageMat;
 
-  //! for recordings
+  //! @brief Needed to to the recordings
   cv::VideoWriter mVideoWriter;
 
-  //! The channel information
+  //! @brief The channel information
   std::string mChannelInfo;
 
 private:
@@ -119,15 +118,14 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! Filename for snapshot
+  //! @brief Filename for snapshot-file
   cedar::aux::FileParameterPtr _mSnapshotName;
 
-  //! Filename for recording
+  //! @brief Filename for recording-file
   cedar::aux::FileParameterPtr _mRecordName;
 
 private:
   // none yet
-
 
 }; // class cedar::dev::sensors::visual::GrabberChannel
 

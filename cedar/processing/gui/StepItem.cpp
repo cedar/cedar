@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -45,6 +45,7 @@
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/exceptions.h"
+#include "cedar/processing/gui/PropertyPane.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/Step.h"
@@ -84,8 +85,6 @@ const int cedar::proc::gui::StepItem::mIconSize = 40;
 const qreal cedar::proc::gui::StepItem::mDefaultWidth = 160;
 const qreal cedar::proc::gui::StepItem::mDefaultHeight = 50;
 const qreal cedar::proc::gui::StepItem::mBaseDataSlotSize = 12.0;
-
-QIcon cedar::proc::gui::StepItem::mLoopedIcon(":/decorations/looped.svg");
 
 #ifndef CEDAR_COMPILER_MSVC
 const cedar::proc::gui::StepItem::DisplayMode::Id cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT;
@@ -132,6 +131,8 @@ mDisplayMode(cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT)
 
 void cedar::proc::gui::StepItem::construct()
 {
+  QObject::connect(this, SIGNAL(stepStateChanged()), this, SLOT(updateStepState()));
+
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
                                );
@@ -148,13 +149,13 @@ void cedar::proc::gui::StepItem::construct()
 cedar::proc::gui::StepItem::Decoration::Decoration
 (
   cedar::proc::gui::StepItem* pStep,
-  const QIcon& icon,
+  const QString& icon,
   const QString& description
 )
-:
-mIconSource(icon)
 {
   this->mpRectangle = new QGraphicsRectItem(-1, -1, 10, 10, pStep);
+  this->mIconSource = QIcon(icon);
+  CEDAR_ASSERT(!this->mIconSource.isNull());
   this->mpIcon = new QGraphicsPixmapItem
                  (
                    mIconSource.pixmap(static_cast<int>(cedar::proc::gui::StepItem::mBaseDataSlotSize)),
@@ -230,40 +231,52 @@ void cedar::proc::gui::StepItem::slotRemoved(cedar::proc::DataRole::Id role, con
 
 void cedar::proc::gui::StepItem::timerEvent(QTimerEvent * /* pEvent */)
 {
-  cedar::unit::Milliseconds run_time(this->mStep->getRunTimeMeasurement());
-  cedar::unit::Milliseconds run_time_avg(this->mStep->getRunTimeAverage());
-  cedar::unit::Milliseconds lock_time(this->mStep->getLockTimeMeasurement());
-  cedar::unit::Milliseconds lock_time_avg(this->mStep->getLockTimeAverage());
   QString tool_tip
     = QString("<table>"
-              "  <tr>"
-              "    <th>Measurement:</th>"
-              "    <th>Last</th>"
-              "    <th>Average</th>"
-              "  </tr>"
-              "  <tr>"
-              "    <td>locking</td>"
-              "    <td>%3</td>"
-              "    <td>%4</td>"
-              "  </tr>"
-              "  <tr>"
-              "    <td>compute call</td>"
-              "    <td>%1</td>"
-              "    <td>%2</td>"
-              "  </tr>"
-              "  <tr>"
-              "    <td>sum</td>"
-              "    <td>%5</td>"
-              "    <td>%6</td>"
-              "  </tr>"
-              " </table>")
-      .arg(QString::fromStdString(cedar::aux::toString(run_time)))
-      .arg(QString::fromStdString(cedar::aux::toString(run_time_avg)))
-      .arg(QString::fromStdString(cedar::aux::toString(lock_time)))
-      .arg(QString::fromStdString(cedar::aux::toString(lock_time_avg)))
-      .arg(QString::fromStdString(cedar::aux::toString(run_time + lock_time)))
-      .arg(QString::fromStdString(cedar::aux::toString(run_time_avg + lock_time_avg)))
-      ;
+                "<tr>"
+                  "<th>Measurement:</th>"
+                  "<th>Last</th>"
+                  "<th>Average</th>"
+                "</tr>"
+                "<tr>"
+                  "<td>locking</td>"
+                  "<td align=\"right\">%3</td>"
+                  "<td align=\"right\">%4</td>"
+                "</tr>"
+                "<tr>"
+                  "<td>compute call</td>"
+                  "<td align=\"right\">%1</td>"
+                  "<td align=\"right\">%2</td>"
+                "</tr>"
+                "<tr>"
+                  "<td>round time</td>"
+                  "<td align=\"right\">%5</td>"
+                  "<td align=\"right\">%6</td>"
+                "</tr>"
+              "</table>");
+
+  std::vector<boost::function<cedar::unit::Time ()> > measurements;
+  measurements.push_back(boost::bind(&cedar::proc::Step::getRunTimeMeasurement, this->mStep));
+  measurements.push_back(boost::bind(&cedar::proc::Step::getRunTimeAverage, this->mStep));
+  measurements.push_back(boost::bind(&cedar::proc::Step::getLockTimeMeasurement, this->mStep));
+  measurements.push_back(boost::bind(&cedar::proc::Step::getLockTimeAverage, this->mStep));
+  measurements.push_back(boost::bind(&cedar::proc::Step::getRoundTimeMeasurement, this->mStep));
+  measurements.push_back(boost::bind(&cedar::proc::Step::getRoundTimeAverage, this->mStep));
+
+  for (size_t i = 0; i < measurements.size(); ++i)
+  {
+    try
+    {
+      cedar::unit::Milliseconds ms = measurements.at(i)();
+      double dval = ms / cedar::unit::Milliseconds(1);
+      tool_tip = tool_tip.arg(QString("%1 ms").arg(dval, 0, 'f', 1));
+    }
+    catch (const cedar::proc::NoMeasurementException&)
+    {
+      tool_tip = tool_tip.arg("n/a");
+    }
+  }
+
   this->setToolTip(tool_tip);
 }
 
@@ -285,14 +298,14 @@ bool cedar::proc::gui::StepItem::hasGuiConnection
   return p_source_slot->hasGuiConnectionTo(p_target_slot);
 }
 
-void cedar::proc::gui::StepItem::stepStateChanged()
+void cedar::proc::gui::StepItem::updateStepState()
 {
   switch (this->mStep->getState())
   {
     case cedar::proc::Step::STATE_EXCEPTION:
     case cedar::proc::Step::STATE_NOT_RUNNING:
-      this->setOutlineColor(Qt::darkGray);
-      this->setFillColor(QColor(235, 235, 235));
+      this->setOutlineColor(Qt::red);
+      this->setFillColor(QColor(255, 175, 175));
 
       if (this->mRunTimeMeasurementTimerId != 0)
       {
@@ -335,13 +348,17 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 {
   this->setElement(step);
   this->mStep = step;
-  this->mClassId = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(this->mStep);
+  this->mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->mStep);
+  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(this->mClassId))
+  cedar::proc::ConstElementDeclarationPtr elem_decl
+    = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(this->mClassId);
+
 
   //!@todo This code is redundant with code in ElementClassList; unify
-  QResource ex_test(QString::fromStdString(this->mClassId->getIconPath()));
+  QResource ex_test(QString::fromStdString(elem_decl->getIconPath()));
   if (ex_test.isValid())
   {
-    this->mStepIcon = QIcon(QString::fromStdString(this->mClassId->getIconPath()));
+    this->mStepIcon = QIcon(QString::fromStdString(elem_decl->getIconPath()));
     if (this->mStepIcon.isNull())
     {
       this->mStepIcon = QIcon(":/steps/no_icon.svg");
@@ -356,7 +373,7 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
   this->addTriggerItems();
   this->addDecorations();
 
-  mStateChangedConnection = step->connectToStateChanged(boost::bind(&cedar::proc::gui::StepItem::stepStateChanged, this));
+  mStateChangedConnection = step->connectToStateChanged(boost::bind(&cedar::proc::gui::StepItem::emitStepStateChanged, this));
   QObject::connect(step.get(), SIGNAL(nameChanged()), this, SLOT(redraw()));
 
   mSlotAddedConnection.disconnect();
@@ -366,6 +383,11 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
     = step->connectToSlotAdded(boost::bind(&cedar::proc::gui::StepItem::slotAdded, this, _1, _2));
   mSlotRemovedConnection
     = step->connectToSlotRemoved(boost::bind(&cedar::proc::gui::StepItem::slotRemoved, this, _1, _2));
+}
+
+void cedar::proc::gui::StepItem::emitStepStateChanged()
+{
+  emit stepStateChanged();
 }
 
 void cedar::proc::gui::StepItem::readConfiguration(const cedar::aux::ConfigurationNode& node)
@@ -395,7 +417,12 @@ void cedar::proc::gui::StepItem::addDecorations()
   {
     DecorationPtr decoration
     (
-      new Decoration(this, mLoopedIcon, "This step is looped, i.e., it expects to be connected to a looped trigger.")
+      new Decoration
+      (
+        this,
+        ":/decorations/looped.svg",
+        "This step is looped, i.e., it expects to be connected to a looped trigger."
+      )
     );
 
     this->mDecorations.push_back(decoration);
@@ -641,7 +668,7 @@ void cedar::proc::gui::StepItem::addRoleSeparator(const cedar::aux::Enum& e, QMe
 void cedar::proc::gui::StepItem::fillPlots
      (
        QMenu* pMenu,
-       std::map<QAction*, std::pair<cedar::aux::gui::PlotDeclarationPtr, cedar::aux::Enum> >& declMap
+       std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
      )
 {
   /*typedef cedar::aux::gui::PlotDeclarationManager::Node PlotNode;
@@ -674,7 +701,7 @@ void cedar::proc::gui::StepItem::fillPlots
         }
         else
         {
-          std::set<cedar::aux::gui::PlotDeclarationPtr> plots;
+          std::set<cedar::aux::gui::ConstPlotDeclarationPtr> plots;
           cedar::aux::gui::PlotManagerSingleton::getInstance()->getPlotClassesFor(data, plots);
 
           if (plots.empty())
@@ -684,15 +711,10 @@ void cedar::proc::gui::StepItem::fillPlots
           }
           else
           {
-            for
-            (
-              std::set<cedar::aux::gui::PlotDeclarationPtr>::iterator iter = plots.begin();
-              iter != plots.end();
-              ++iter
-            )
+            for (auto iter = plots.begin(); iter != plots.end(); ++iter)
             {
-              cedar::aux::gui::PlotDeclarationPtr declaration = *iter;
-              QAction *p_action = p_menu->addAction(QString::fromStdString(declaration->getPlotClass()));
+              cedar::aux::gui::ConstPlotDeclarationPtr declaration = *iter;
+              QAction *p_action = p_menu->addAction(QString::fromStdString(declaration->getClassName()));
               p_action->setData(QString::fromStdString(slot->getName()));
               declMap[p_action] = std::make_pair(declaration, e);
 
@@ -729,19 +751,27 @@ void cedar::proc::gui::StepItem::showPlot
     title += "." + slot->getName() + ")";
   }
 
-  QDockWidget *p_dock = this->createPlotDockWidget(title);
+  auto p_dock = this->createDockWidget(title, pPlot);
 
   QRect geometry = p_dock->geometry();
   geometry.setTopLeft(position);
   geometry.setSize(QSize(200, 200));
   p_dock->setGeometry(geometry);
 
-  p_dock->setWidget(pPlot);
   p_dock->show();
+}
+
+void cedar::proc::gui::StepItem::openProperties()
+{
+  cedar::proc::gui::PropertyPane* props = new cedar::proc::gui::PropertyPane();
+  auto p_widget = this->createDockWidget("Properties", props);
+  props->display(this->getStep());
+  p_widget->show();
 }
 
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
+  //!@todo Would be nice to have icons for these actions
   cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
   CEDAR_DEBUG_ASSERT(p_scene);
 
@@ -755,22 +785,35 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   }
 
   QMenu *p_data = menu.addMenu("data");
+  p_data->setIcon(QIcon(":/menus/data.svg"));
 
-  menu.addSeparator();
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
   QAction *p_plot_all = menu.addAction("plot all");
-  QMenu *p_element_plots = menu.addMenu("defined plots");
-  QMenu *p_advanced_plotting = menu.addMenu("advanced plotting");
+  p_plot_all->setIcon(QIcon(":/menus/plot_all.svg"));
 
-  menu.addSeparator();
+  QMenu *p_element_plots = menu.addMenu("defined plots");
+  p_element_plots->setIcon(QIcon(":/menus/plot.svg"));
+
+  QMenu *p_advanced_plotting = menu.addMenu("advanced plotting");
+  p_advanced_plotting->setIcon(QIcon(":/menus/plot_advanced.svg"));
 
   this->fillDefinedPlots(p_element_plots, event->screenPos());
 
-  std::map<QAction*, std::pair<cedar::aux::gui::PlotDeclarationPtr, cedar::aux::Enum> > advanced_plot_map;
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+
+  QAction *p_properties = menu.addAction("open properties widget");
+  QObject::connect(p_properties, SIGNAL(triggered()), this, SLOT(openProperties()));
+  p_properties->setIcon(QIcon(":/menus/properties.svg"));
+
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
+
+  std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> > advanced_plot_map;
   this->fillPlots(p_advanced_plotting, advanced_plot_map);
 
   QMenu *p_actions_menu = menu.addMenu("actions");
-  menu.addSeparator();
+  p_actions_menu->setIcon(QIcon(":/menus/actions.svg"));
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
   const cedar::proc::Step::ActionMap& map = this->mStep->getActions();
   if (map.empty())
@@ -785,7 +828,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     }
   }
 
-  menu.addSeparator();
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
   p_scene->networkGroupingContextMenuEvent(menu);
 
   // Actions for data plotting -----------------------------------------------------------------------------------------
@@ -828,7 +871,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     p_action->setEnabled(false);
   }
 
-  menu.addSeparator();
+  menu.addSeparator(); // ----------------------------------------------------------------------------------------------
   this->fillDisplayStyleMenu(&menu);
 
   QAction *a = menu.exec(event->screenPos());
@@ -862,7 +905,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   // advanced plots
   else if (advanced_plot_map.find(a) != advanced_plot_map.end())
   {
-    cedar::aux::gui::PlotDeclarationPtr declaration = advanced_plot_map.find(a)->second.first;
+    cedar::aux::gui::ConstPlotDeclarationPtr declaration = advanced_plot_map.find(a)->second.first;
     const cedar::aux::Enum& e = advanced_plot_map.find(a)->second.second;
 
     std::string data_name = a->data().toString().toStdString();
@@ -878,17 +921,18 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
 void cedar::proc::gui::StepItem::fillDefinedPlots(QMenu* pMenu, const QPoint& plotPosition)
 {
   // get declaration of the element displayed by this item
-  cedar::proc::ElementDeclarationPtr decl
-    = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(this->mStep);
+  auto decl = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->mStep);
+  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(decl));
+  auto elem_decl = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(decl);
 
-  if (!decl)
+  if (!decl || !elem_decl)
   {
     pMenu->setDisabled(true);
     pMenu->setToolTip("No declaration was found for this element.");
     return;
   }
 
-  if (decl->definedPlots().empty())
+  if (elem_decl->definedPlots().empty())
   {
     pMenu->setDisabled(true);
     pMenu->setToolTip("No plots defined for this element.");
@@ -898,9 +942,9 @@ void cedar::proc::gui::StepItem::fillDefinedPlots(QMenu* pMenu, const QPoint& pl
   QObject::connect(pMenu, SIGNAL(triggered(QAction*)), this, SLOT(openDefinedPlotAction(QAction*)));
 
   // list all defined plots, if available
-  for (size_t i = 0; i < decl->definedPlots().size(); ++i)
+  for (size_t i = 0; i < elem_decl->definedPlots().size(); ++i)
   {
-    const std::string& plot_name = decl->definedPlots()[i].first;
+    const std::string& plot_name = elem_decl->definedPlots()[i].first;
     QAction* p_action = pMenu->addAction(QString::fromStdString(plot_name));
     p_action->setData(plotPosition);
   }
@@ -911,14 +955,15 @@ void cedar::proc::gui::StepItem::openDefinedPlotAction(QAction* pAction)
   std::string plot_name = pAction->text().toStdString();
 
   // get declaration of the element displayed by this item
-  cedar::proc::ElementDeclarationPtr decl
-    = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(this->mStep);
+  auto decl = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->mStep);
+  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(decl));
+  auto elem_decl = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(decl);
 
   // find the list of data to plot for this item
-  size_t list_index = decl->definedPlots().size();
-  for (size_t i = 0; i < decl->definedPlots().size(); ++i)
+  size_t list_index = elem_decl->definedPlots().size();
+  for (size_t i = 0; i < elem_decl->definedPlots().size(); ++i)
   {
-    const std::string& name = decl->definedPlots()[i].first;
+    const std::string& name = elem_decl->definedPlots()[i].first;
     if (plot_name == name)
     {
       list_index = i;
@@ -926,7 +971,7 @@ void cedar::proc::gui::StepItem::openDefinedPlotAction(QAction* pAction)
     }
   }
 
-  if (list_index >= decl->definedPlots().size())
+  if (list_index >= elem_decl->definedPlots().size())
   {
     cedar::aux::LogSingleton::getInstance()->error
     (
@@ -937,12 +982,13 @@ void cedar::proc::gui::StepItem::openDefinedPlotAction(QAction* pAction)
     return;
   }
 
-  this->multiplot(pAction->data().toPoint(), decl->definedPlots()[list_index].second);
+  this->multiplot(pAction->data().toPoint(), elem_decl->definedPlots()[list_index].second);
 }
 
 void cedar::proc::gui::StepItem::fillDisplayStyleMenu(QMenu* pMenu)
 {
   QMenu* p_sub_menu = pMenu->addMenu("display style");
+  p_sub_menu->setIcon(QIcon(":/menus/display_style.svg"));
 
   for (size_t i = 0; i < cedar::proc::gui::StepItem::DisplayMode::type().list().size(); ++i)
   {
@@ -991,14 +1037,27 @@ void cedar::proc::gui::StepItem::setDisplayMode(cedar::proc::gui::StepItem::Disp
   this->update();
 }
 
-QDockWidget* cedar::proc::gui::StepItem::createPlotDockWidget(const std::string& title) const
+QWidget* cedar::proc::gui::StepItem::createDockWidget(const std::string& title, QWidget* pPlot) const
 {
-  QDockWidget *p_dock = new QDockWidget(QString::fromStdString(title), this->mpMainWindow);
-  p_dock->setFloating(true);
-  p_dock->setContentsMargins(0, 0, 0, 0);
-  p_dock->setAllowedAreas(Qt::NoDockWidgetArea);
+  if (this->mpMainWindow)
+  {
+    QDockWidget *p_dock = new QDockWidget(QString::fromStdString(title), this->mpMainWindow);
+    p_dock->setFloating(true);
+    p_dock->setContentsMargins(0, 0, 0, 0);
+    p_dock->setAllowedAreas(Qt::NoDockWidgetArea);
+    p_dock->setWidget(pPlot);
 
-  return p_dock;
+    return p_dock;
+  }
+  else
+  {
+    QWidget* p_widget = new QWidget();
+    p_widget->setWindowTitle(QString::fromStdString(title));
+    auto p_layout = new QVBoxLayout();
+    p_layout->addWidget(pPlot);
+    p_widget->setLayout(p_layout);
+    return p_widget;
+  }
 }
 
 void cedar::proc::gui::StepItem::multiplot
@@ -1037,12 +1096,11 @@ void cedar::proc::gui::StepItem::multiplot
   }
 
   // initialize dock
-  QDockWidget *p_dock = createPlotDockWidget(this->getStep()->getName());
+  QWidget *p_widget = new QWidget();
+  auto p_dock = createDockWidget(this->getStep()->getName(), p_widget);
 
   // initialize widget & layout
-  QWidget *p_widget = new QWidget();
   p_widget->setContentsMargins(0, 0, 0, 0);
-  p_dock->setWidget(p_widget);
   QGridLayout *p_layout = new QGridLayout();
   p_layout->setContentsMargins(grid_spacing, grid_spacing, grid_spacing, grid_spacing);
   p_layout->setSpacing(grid_spacing);
@@ -1179,7 +1237,7 @@ void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGrap
 
   if (this->mDisplayMode == cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT)
   {
-    painter->drawText(QPointF(2 * padding + mIconSize, 15), this->mClassId->getClassName().c_str());
+    painter->drawText(QPointF(2 * padding + mIconSize, 15), this->mClassId->getClassNameWithoutNamespace().c_str());
     painter->drawText(QPointF(2 * padding + mIconSize, 25), this->mStep->getName().c_str());
   }
 

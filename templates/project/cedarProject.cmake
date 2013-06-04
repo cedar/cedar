@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -216,6 +216,7 @@ macro(cedar_project_setup directory)
   if (CMAKE_COMPILER_IS_GNUCC)
     add_definitions(-Wall -Wextra)
     add_definitions(-DGNUCC -D__GNUCC__ -D__GCC__ -DGCC)
+    add_definitions(-std=gnu++0x)
   elseif (MSVC)
     add_definitions(-W2)
     add_definitions(-DMSVC)

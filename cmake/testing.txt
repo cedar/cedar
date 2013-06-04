@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -45,7 +45,7 @@ if(CEDAR_BUILD_TESTS)
 
 ########################################################################################################################
 # cedar unit and interactive tests
-  list(APPEND subdirectories ${CEDAR_UNIT_TEST_DIR} ${CEDAR_INTERACTIVE_TEST_DIR})
+  list(APPEND subdirectories ${CEDAR_UNIT_TEST_DIR} ${CEDAR_INTERACTIVE_TEST_DIR} ${CEDAR_PERFORMANCE_TEST_DIR})
   list(LENGTH subdirectories numberOfSubdirectories)
   
   while (${numberOfSubdirectories} STRGREATER 0)

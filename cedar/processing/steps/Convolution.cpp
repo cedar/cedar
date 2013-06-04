@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -60,7 +60,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr convolution_decl
+    ElementDeclarationPtr declaration
     (
       new ElementDeclarationTemplate<cedar::proc::steps::Convolution>
       (
@@ -68,7 +68,7 @@ namespace
         "cedar.processing.steps.Convolution"
       )
     );
-    convolution_decl->setDescription
+    declaration->setDescription
                       (
                         "This processing step convolves a matrix with a kernel or kernel list.\n"
                         "Convolution can be done with to different engines: OpenCV and FFTW. "
@@ -78,8 +78,9 @@ namespace
                         "The step can either use an kernel matrix (input) to perform the convolution, or it can use "
                         " a list of kernels set via parameters."
                       );
-    convolution_decl->setIconPath(":/steps/convolution.svg");
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(convolution_decl);
+    declaration->setIconPath(":/steps/convolution.svg");
+
+    declaration->declare();
 
     return true;
   }
@@ -169,7 +170,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Convolution::determineInputV
   // First, let's make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(slot->getName() == "matrix" || slot->getName() == "kernel");
 
-  if (boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+  if (boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
   {
     // Mat data is accepted.
     return cedar::proc::DataSlot::VALIDITY_VALID;
@@ -189,7 +190,7 @@ void cedar::proc::steps::Convolution::inputConnectionChanged(const std::string& 
   if (inputName == "matrix")
   {
     // Assign the input to the member. This saves us from casting in every computation step.
-    this->mMatrix = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
+    this->mMatrix = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
     // This should always work since other types should not be accepted.
     if(!this->mMatrix)
     {
@@ -204,7 +205,7 @@ void cedar::proc::steps::Convolution::inputConnectionChanged(const std::string& 
   else if (inputName == "kernel")
   {
     // Assign the input to the member. This saves us from casting in every computation step.
-    this->mKernel = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
+    this->mKernel = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
   }
 }
 

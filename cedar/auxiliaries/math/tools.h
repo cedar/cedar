@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -48,7 +48,7 @@
 #include <opencv2/opencv.hpp>
 
 //!@todo This should be its own header
-#ifdef CEDAR_COMPILER_MSVC
+#if defined CEDAR_COMPILER_MSVC && _MSC_VER < 1600 // MSVC with a version greater than 1600 should come with the stdint header.
   typedef __int8 int8_t;
   typedef unsigned __int8 uint8_t;
   typedef __int16 int16_t;
@@ -332,7 +332,7 @@ namespace cedar
        * @param[out] destination a 2D matrix destination (must be same type as src)
        * @param[in] dimensionToReduce along which dimension should be reduced?
        * @param[in] reductionOperator reduction operator (again, same choices as cvReduce)
-       * @param[in] switchDimensions whether to switch the other two dimensions
+       * @param[in] swapDimensions whether to switch the other two dimensions
        *
        * @todo The signature of this function should be revised - it should probably take a mapping.
        */

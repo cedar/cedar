@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -393,7 +393,14 @@ private:
   //!@brief Method that is called whenever an input is connected to the Connectable.
   virtual void inputConnectionChanged(const std::string& inputName);
 
-  //!@brief Function that determines the validity of input data.
+  /*!@brief   Function that determines the validity of input data.
+   *
+   *          This can be overloaded in child classes to provide custom validation for incoming data.
+   *
+   * @remarks This method is thread-safe, i.e., all inputs, outputs and buffers are locked for reading.
+   *
+   * @return  Whether setting the data in the slot would be valid.
+   */
   virtual cedar::proc::DataSlot::VALIDITY determineInputValidity
                                           (
                                             cedar::proc::ConstDataSlotPtr slot,
@@ -441,6 +448,9 @@ protected:
 
   //!@brief Vector with the names of all invalid input data.
   std::vector<std::string> mInvalidInputNames;
+
+  //!@brief Lock for making accesses to the connections thread-safe.
+  QReadWriteLock* mpConnectionLock;
 private:
   //!@brief a map of slot maps, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
   std::map<DataRole::Id, SlotMap> mSlotMaps;

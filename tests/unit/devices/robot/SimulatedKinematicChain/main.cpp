@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -73,27 +73,6 @@ int main()
     errors++;
     std::cout << "ERROR with setJointAngle() or getJointAngle()" << std::endl;
   }
-  
-  //--------------------------------------------------------------------------------------------------------------------
-  // std::vector of angle values
-  //--------------------------------------------------------------------------------------------------------------------
-  std::cout << "test: std::vector angle functions" << std::endl;
-  std::vector<double> angle_vector;
-  angle_vector.push_back(0.5);
-  angle_vector.push_back(1.5);
-  angle_vector.push_back(2.5);
-  angle_vector.push_back(3.5);
-  test_arm->setJointAngles(angle_vector);
-  if (
-      !IsZero(test_arm->getJointAngles()[0] - 0.5)
-      || !IsZero(test_arm->getJointAngles()[1] - 1.5)
-      || !IsZero(test_arm->getJointAngles()[2] - 2.5)
-      || !IsZero(test_arm->getJointAngles()[3] - 3.5)
-      )
-  {
-    errors++;
-    std::cout << "ERROR with setJointAngles() or getJointAngles()" << std::endl;
-  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // cv::Mat of angle values
@@ -106,14 +85,14 @@ int main()
   angle_matrix.at<double>(3, 0) = 0.4;
   test_arm->setJointAngles(angle_matrix);
   if (
-      !IsZero(test_arm->getJointAnglesMatrix().at<double>(0, 0) - 0.1)
-      || !IsZero(test_arm->getJointAnglesMatrix().at<double>(1, 0) - 0.2)
-      || !IsZero(test_arm->getJointAnglesMatrix().at<double>(2, 0) - 0.3)
-      || !IsZero(test_arm->getJointAnglesMatrix().at<double>(3, 0) - 0.4)
+      !IsZero(test_arm->getCachedJointAngles().at<double>(0, 0) - 0.1)
+      || !IsZero(test_arm->getCachedJointAngles().at<double>(1, 0) - 0.2)
+      || !IsZero(test_arm->getCachedJointAngles().at<double>(2, 0) - 0.3)
+      || !IsZero(test_arm->getCachedJointAngles().at<double>(3, 0) - 0.4)
       )
   {
     errors++;
-    std::cout << "ERROR with setJointAnglesMatrix() or getJointAnglesMatrix()" << std::endl;
+    std::cout << "ERROR with setJointAngles() or getCachedJointAngles()" << std::endl;
   }
   
   std::cout << "test finished, there were " << errors << " errors" << std::endl;

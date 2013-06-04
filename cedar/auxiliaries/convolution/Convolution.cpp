@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -77,6 +77,7 @@ _mEngine
   new cedar::aux::conv::EngineParameter(this, "engine", cedar::aux::conv::EnginePtr(new cedar::aux::conv::OpenCV()))
 )
 {
+  this->_mEngine->markAdvanced();
   this->selectedEngineChanged();
 
   QObject::connect(this->_mEngine.get(), SIGNAL(valueChanged()), this, SLOT(selectedEngineChanged()));
@@ -116,10 +117,17 @@ void cedar::aux::conv::Convolution::slotKernelRemoved(size_t)
 
 void cedar::aux::conv::Convolution::updateCombinedKernel()
 {
-  cv::Mat new_combined_kernel = this->getKernelList()->getCombinedKernel();
-  this->mCombinedKernel->lockForWrite();
-  this->mCombinedKernel->setData(new_combined_kernel);
-  this->mCombinedKernel->unlock();
+  try
+  {
+    cv::Mat new_combined_kernel = this->getKernelList()->getCombinedKernel();
+    this->mCombinedKernel->lockForWrite();
+    this->mCombinedKernel->setData(new_combined_kernel);
+    this->mCombinedKernel->unlock();
+  }
+  catch (cedar::aux::DimensionalityMismatchException& exc)
+  {
+    // may happen due to dimensionality updates in kernel list, ignore
+  }
 }
 
 void cedar::aux::conv::Convolution::selectedEngineChanged()

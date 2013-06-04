@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -58,7 +58,8 @@ cedar::dev::robot::gui::KinematicChainCommandWidget::KinematicChainCommandWidget
 )
 :
 QWidget(parent, f),
-mpKinematicChain(kinematicChain)
+mpKinematicChain(kinematicChain),
+mTimerId(0)
 {
   initWindow();
 }
@@ -96,7 +97,9 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::setSingleStep(double s
 
 void cedar::dev::robot::gui::KinematicChainCommandWidget::changeWorkingMode(int mode)
 {
-  mpKinematicChain->setWorkingMode(static_cast<cedar::dev::robot::KinematicChain::ActionType>(mode));
+  // the kinematic chain has no working mode, anymore. this only has
+  // relevance for the user of this widget.
+  mpModeBox->setCurrentIndex(mode);
   update();
 }
 
@@ -126,7 +129,7 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::commandJoints()
 
 void cedar::dev::robot::gui::KinematicChainCommandWidget::stopMovement()
 {
-  mpModeBox->setCurrentIndex(1);
+  // js: don't need to change the user selection mpModeBox->setCurrentIndex(1);
   for(unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
   {
     mpKinematicChain->setJointVelocity(j, 0);
@@ -136,10 +139,7 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::stopMovement()
 
 void cedar::dev::robot::gui::KinematicChainCommandWidget::update()
 {
-  // update mode box in case the working mode has been changed by third party
-  mpModeBox->blockSignals(true);
-  mpModeBox->setCurrentIndex(static_cast<int>(mpKinematicChain->getWorkingMode()));
-  mpModeBox->blockSignals(false);
+
   // update command boxes
   CEDAR_DEBUG_ASSERT(mpKinematicChain->getNumberOfJoints() == mCommandBoxes.size());
   switch(mpModeBox->currentIndex())
@@ -168,6 +168,7 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::update()
       mCommandBoxes[j]->setValue(mpKinematicChain->getJointAcceleration(j));
       mCommandBoxes[j]->blockSignals(false);
     }
+  case 3: // STOP
     break;
   default:
     CEDAR_THROW(cedar::aux::UnhandledValueException, "This is not a handled case.");
@@ -178,6 +179,10 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::setKeepSendingState(in
 {
   if (state)
   {
+    if (mTimerId)
+    {
+      killTimer(mTimerId);
+    }
     mTimerId = startTimer(mUpdateInterval);
   }
   else
@@ -193,14 +198,16 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::initWindow()
   mpGridLayout = new QGridLayout();
 
   // mode selection
-  QLabel* mode_label = new QLabel(QApplication::translate("KinematicChainWindow", "mode:"));
+  QLabel* mode_label = new QLabel(QApplication::translate("KinematicChainWindow", "operate on:"));
   mode_label->setAlignment(Qt::AlignLeft);
   mpGridLayout->addWidget(mode_label, 0, 0);
   mpModeBox = new QComboBox();
   mpModeBox->addItem(QString("position"));
   mpModeBox->addItem(QString("velocity"));
   mpModeBox->addItem(QString("acceleration"));
-  mpModeBox->setCurrentIndex(mpKinematicChain->getWorkingMode());
+
+  mpModeBox->setCurrentIndex(0);
+
   mpGridLayout->addWidget(mpModeBox, 1, 0);
   connect(mpModeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(changeWorkingMode(int)));
 

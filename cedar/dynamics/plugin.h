@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -39,11 +39,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/dynamics/lib.h"
-#include "cedar/processing/PluginDeclaration.h"
+#include "cedar/auxiliaries/PluginDeclarationList.h"
 
 CEDAR_BEGIN_PLUGIN_DECLARATION
 //!@brief Function that declares plugin exports.
-CEDAR_DECLARE_DEPRECATED(CEDAR_DYN_LIB_EXPORT void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin));
+CEDAR_DECLARE_DEPRECATED(CEDAR_DYN_LIB_EXPORT void pluginDeclaration(cedar::aux::PluginDeclarationListPtr plugin));
 CEDAR_END_PLUGIN_DECLARATION
 
 #endif // CEDAR_DYN_PLUGIN_H

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -103,7 +103,7 @@ namespace cedar
       {
         std::string chunk = str.substr(last_index, index - last_index);
         parts.push_back(chunk);
-        last_index = index + 1;
+        last_index = index + separator.size();
         index = str.find(separator, last_index);
       }
       std::string chunk = str.substr(last_index, index - last_index);

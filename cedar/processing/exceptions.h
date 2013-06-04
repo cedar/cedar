@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -135,6 +135,12 @@ class cedar::proc::ConnectionMemberDeletedException : public cedar::aux::Excepti
 class cedar::proc::DuplicateConnectionException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::proc::DuplicateConnectionException
+
+/*!@brief An exception that is thrown by processing steps when no measurements for lock time etc. are present.
+ */
+class cedar::proc::NoMeasurementException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::proc::NoMeasurementException
 
 /*!@brief An exception that is thrown by ProjectionMapping when a user wants to look up a mapping that does not exist.
  */
