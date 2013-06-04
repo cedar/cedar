@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,48 +22,40 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        Dimensions.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 06 28
+    Maintainer:  Guido Knips
+    Email:       guido.knips@ini.ruhr-uni-bochum.de
+    Date:        2012 06 29
 
-    Description: Namespace file for cedar::aux::annotations.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_ANNOTATIONS_NAMESPACE_H
-#define CEDAR_AUX_ANNOTATIONS_NAMESPACE_H
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/lib.h"
-#include "cedar/defines.h"
+#include "cedar/auxiliaries/annotation/Depth.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <opencv2/opencv.hpp>
+
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
 
 
-namespace cedar
+cedar::aux::annotation::Depth::Depth()
 {
-  /*!@brief Namespace for all aux classes. */
-  namespace aux
-  {
-    namespace annotation
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_AUX_CLASS(Annotation);
-      CEDAR_DECLARE_AUX_CLASS(Annotatable);
-      CEDAR_DECLARE_AUX_CLASS(ColorSpace);
-      CEDAR_DECLARE_AUX_CLASS(Dimensions);
-      CEDAR_DECLARE_AUX_CLASS(Disparity);
-      CEDAR_DECLARE_AUX_CLASS(Depth);
-      //!@endcond
-    }
-  }
 }
 
-#endif // CEDAR_AUX_ANNOTATIONS_NAMESPACE_H
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+std::string cedar::aux::annotation::Depth::getDescription() const
+{
+  return "Depth";
+}
