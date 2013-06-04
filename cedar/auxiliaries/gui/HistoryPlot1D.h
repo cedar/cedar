@@ -62,6 +62,9 @@ public:
   //!@brief The standard constructor.
   HistoryPlot1D(QWidget *pParent = NULL);
 
+  //!@brief Constructor that expects a DataPtr
+  HistoryPlot1D(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -86,6 +89,8 @@ private:
   //! Resets the history to contain only the current state.
   void resetHistory();
 
+  //!@brief initialize
+  void init();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

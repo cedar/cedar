@@ -62,6 +62,21 @@ cedar::aux::gui::PlotInterface(pParent),
 mHistory(new cedar::aux::MatData(cv::Mat())),
 mMaxHistSize(150)
 {
+  this->init();
+}
+
+cedar::aux::gui::HistoryPlot1D::HistoryPlot1D(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent)
+:
+cedar::aux::gui::PlotInterface(pParent),
+mHistory(new cedar::aux::MatData(cv::Mat())),
+mMaxHistSize(150)
+{
+  this->init();
+  this->plot(matData, title);
+}
+
+void cedar::aux::gui::HistoryPlot1D::init()
+{
   auto p_layout = new QVBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(p_layout);

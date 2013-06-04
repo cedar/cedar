@@ -149,7 +149,7 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
   if (!this->mData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
-                "Cannot cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot::display.");
+                "Cannot cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot::plot.");
   }
 
   if (this->mpCurrentPlotWidget)
