@@ -74,27 +74,6 @@
 #endif // VTK_MAJOR_VERSION <= 5
 
 //----------------------------------------------------------------------------------------------------------------------
-// type registration
-//----------------------------------------------------------------------------------------------------------------------
-/* we don't need this anymore
-namespace {
-  bool registerPlot()
-  {
-    using cedar::aux::MatData;
-    using cedar::aux::gui::VtkSurfacePlot;
-
-    typedef cedar::aux::gui::PlotDeclarationTemplate<MatData, VtkSurfacePlot> DeclarationType;
-    boost::shared_ptr<DeclarationType> declaration(new DeclarationType());
-    declaration->declare();
-    
-    return true;
-  }
-
-  bool registered = registerPlot();
-}
-*/
-
-//----------------------------------------------------------------------------------------------------------------------
 // static members
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -279,13 +258,13 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
     CEDAR_DEBUG_ASSERT(pCamera->GetViewAngle() == 30.0);
 
     // dd is the minimum distance to view the diagonal d of the bounding box; 0.2618 rad == 15 degree
-    double dd = sqrt(pow(cedar::aux::math::max(data), 2) + pow(data.rows, 2) + pow(data.cols, 2)) / (2 * tan(0.2618));
+    double dd = sqrt(pow(cedar::aux::math::max(data), 2.0) + pow(data.rows, 2.0) + pow(data.cols, 2.0)) / (2.0 * tan(0.2618));
     // h is a suitable height to view the plot, it is 1.5 times the length of a cathetus in a isoscele-right triangle (45-45-90)
-    double h = sqrt(1.5 * dd / 2);
+    double h = sqrt(1.5 * dd / 2.0);
     // point A of that isoscele-right triangle lies in the center of the bounding box, thus the coordinates for the camera are...
-    double z = 3 * h + (cedar::aux::math::max(data));
-    double y = -data.cols - h * 3;
-    pCamera->SetPosition(data.rows/2, y, z);
+    double z = 3.0 * h + (cedar::aux::math::max(data));
+    double y = -data.cols - h * 3.0;
+    pCamera->SetPosition(data.rows/2.0, y, z);
     pCamera->SetClippingRange(0.1, 1.5 * dd);
   }
 
