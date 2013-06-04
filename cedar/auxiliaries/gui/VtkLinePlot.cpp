@@ -62,27 +62,6 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
-// type registration
-//----------------------------------------------------------------------------------------------------------------------
-/* we don't need this anymore
-namespace {
-  bool registerPlot()
-  {
-    using cedar::aux::MatData;
-    using cedar::aux::gui::VtkLinePlot;
-
-    typedef cedar::aux::gui::PlotDeclarationTemplate<MatData, VtkLinePlot> DeclarationType;
-    boost::shared_ptr<DeclarationType> declaration(new DeclarationType());
-    declaration->declare();
-    
-    return true;
-  }
-
-  bool registered = registerPlot();
-}
-*/
-
-//----------------------------------------------------------------------------------------------------------------------
 // static members
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -156,7 +135,7 @@ void cedar::aux::gui::VtkLinePlot::init()
   mpChart = vtkSmartPointer<vtkChartXY>::New();
   this->mpView->GetScene()->AddItem(mpChart);
 
-  this->layout()->addWidget(mpVtkWidget);
+  p_layout->addWidget(mpVtkWidget);
   
   //initialize dataTable
   mpVtkTable = vtkSmartPointer<vtkTable>::New();

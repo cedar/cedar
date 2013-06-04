@@ -24,13 +24,9 @@
 
     File:        VtkMatrixPlot.cpp
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 14
+    Maintainer:  Kai Kuchenbecker
+    Email:       Kai.Kuchenbecker@ini.ruhr-uni-bochum.de,
+    Date:        2013 05 05
 
     Description:
 
