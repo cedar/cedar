@@ -155,6 +155,7 @@ void cedar::aux::gui::HistoryPlot1D::advanceHistory()
 
   if (this->mData->getDimensionality() != 1)
   {
+    data_locker.unlock();
     emit dataChanged();
     return;
   }
