@@ -97,7 +97,7 @@ namespace cedar
             void dataChanged();
 
           public:
-            cedar::aux::gui::VtkLinePlot *mpPlot;
+            cedar::aux::gui::VtkLinePlot* mpPlot;
         };
         CEDAR_GENERATE_POINTER_TYPES(VtkLinePlotWorker);
       }
@@ -146,7 +146,7 @@ private:
     //!@brief the displayed data
     cedar::aux::ConstMatDataPtr mMatData;
     //!@brief a curve inside the plot
-    vtkPlot *mpCurve;
+    vtkPlot* mpCurve;
     vtkWeakPointer<vtkTable> mpVtkTable;
     //!@brief reference to the x values of the plot, currently the same for all plots
     vtkIdType mXColumn;
@@ -161,11 +161,11 @@ private:
 
   struct LineColor
   {
-    LineColor(unsigned char _r, unsigned char _g, unsigned char _b)
+    LineColor(unsigned char r, unsigned char g, unsigned char b)
     :
-    r(_r),
-    g(_g),
-    b(_b)
+    mR(r),
+    mG(g),
+    mB(b)
     {
     }
 
@@ -174,17 +174,16 @@ private:
     }
 
     //convenience method
-    unsigned char* to_a()
+    unsigned char* toA()
     {
-      m_arr[0] = r;
-      m_arr[1] = g;
-      m_arr[2] = b;
-      return m_arr;
+      unsigned char* colorTuple = new unsigned char[3];
+      colorTuple[0] = mR;
+      colorTuple[1] = mG;
+      colorTuple[2] = mB;
+      return colorTuple;
     }
 
-    unsigned char r,g,b;
-    //for convenience
-    unsigned char m_arr [3];
+    unsigned char mR, mG, mB;
   };
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -192,10 +191,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  VtkLinePlot(QWidget *pParent = NULL);
+  VtkLinePlot(QWidget* pParent = NULL);
 
   //!@brief Constructor expecting a DataPtr.
-  VtkLinePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
+  VtkLinePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent = NULL);
 
   //!@brief Destructor
   ~VtkLinePlot();
@@ -208,7 +207,7 @@ public:
   void plot(cedar::aux::ConstDataPtr matData, const std::string& title);
 
   //!@brief handle timer events
-  void timerEvent(QTimerEvent *pEvent);
+  void timerEvent(QTimerEvent* pEvent);
 
   bool canAppend(cedar::aux::ConstDataPtr data) const;
 
@@ -231,7 +230,7 @@ private:
   void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
 
   //!@brief Applies a plot style to a given curve.
-  static void applyStyle(size_t lineId, vtkPlot *pCurve);
+  static void applyStyle(size_t lineId, vtkPlot* pCurve);
 
 private slots:
   void conversionDone();
@@ -243,7 +242,7 @@ protected:
   // none yet
 private:
   //!@brief QVTKWidget nested in QWidget
-  QVTKWidget *mpVtkWidget;
+  QVTKWidget* mpVtkWidget;
   //! Table holding the data of a plot
   vtkSmartPointer<vtkTable> mpVtkTable;
   vtkSmartPointer<vtkChartXY> mpChart;
@@ -253,7 +252,7 @@ private:
   PlotSeriesVector mPlotSeriesVector;
 
   //! For locking the plot itself.
-  QReadWriteLock *mpLock;
+  QReadWriteLock* mpLock;
 
   //! VtkPen Line Types
   static const int SOLID_LINE;
