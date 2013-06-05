@@ -77,6 +77,9 @@ likely to undergo major changes:
 - cedar::aux::gui
   - LinePlots now have an option in their context menu to set fixed limits for the y axis.
   - There is now a history plot for 1D matrices.
+  - We added line and surface plots that are based on Vtk. This means that instead of (or in addition to) Qwt and
+    qwtplot3d, you can now use these plots.
+  - Some plotting libraries (Qwt and qwtplot3d) have now become optional.
 - cedar::dev
   - KinematicChain instances now need to be started via ->start() by the implementor. They do not start threading on
     their own, anymore.
