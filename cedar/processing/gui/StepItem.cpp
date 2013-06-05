@@ -1130,7 +1130,7 @@ void cedar::proc::gui::StepItem::multiplot
   }
 
   // initialize dock
-  QWidget *p_widget = new QWidget();
+  QWidget* p_widget = new QWidget();
   auto p_dock = createDockWidget(this->getStep()->getName(), p_widget);
 
   // initialize widget & layout
