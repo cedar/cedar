@@ -413,8 +413,10 @@ void cedar::proc::Connectable::checkMandatoryConnections()
   }
 }
 
-cedar::proc::DataSlotPtr
-  cedar::proc::Connectable::declareData(DataRole::Id role, const std::string& name, bool mandatory)
+cedar::proc::DataSlotPtr cedar::proc::Connectable::declareData
+                         (
+                           DataRole::Id role, const std::string& name, bool mandatory
+                         )
 {
   QWriteLocker locker(this->mpConnectionLock);
 
