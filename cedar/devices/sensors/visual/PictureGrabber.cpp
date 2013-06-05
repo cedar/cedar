@@ -69,7 +69,7 @@ cedar::dev::sensors::visual::PictureGrabber::PictureGrabber
 :
 cedar::dev::sensors::visual::Grabber
 (
-  "PictureGraber",
+  "PictureGrabber",
   cedar::dev::sensors::visual::PictureChannelPtr
   (
     new cedar::dev::sensors::visual::PictureChannel(pictureFileName)
@@ -89,7 +89,7 @@ cedar::dev::sensors::visual::PictureGrabber::PictureGrabber
 :
 cedar::dev::sensors::visual::Grabber
 (
-  "StereoPictureGraber",
+  "StereoPictureGrabber",
   cedar::dev::sensors::visual::PictureChannelPtr
   (
     new cedar::dev::sensors::visual::PictureChannel(pictureFileName0)

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StaticGain.h
+    File:        TypeCheck.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 10 28
+    Date:        2012 10 10
 
     Description:
 
@@ -34,63 +34,70 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_STATIC_GAIN_H
-#define CEDAR_PROC_STEPS_STATIC_GAIN_H
+#ifndef CEDAR_PROC_TYPE_CHECK_TYPE_CHECK_H
+#define CEDAR_PROC_TYPE_CHECK_TYPE_CHECK_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/steps/namespace.h"
-#include "cedar/processing/Step.h"
-#include "cedar/auxiliaries/MatData.h"
-#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/processing/DataSlot.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief   This is a static gain step that allows multiplying a matrix input with a factor.
- *
- *          This step implements the cedar::proc::Step interface and allows a user to easily multiply any matrix with a
- *          gain factor. This step is called a static gain step because the gain factor is determined by a parameter,
- *          rather than being an input that might change over time.
- *
- * @remarks This step declares the following interface:
- *          input - any matrix data
- *          output - the output, i.e., input multiplied by gainFactor
- *
- *          Parameters of the step are:
- *          gainFactor - the gain factor.
+/*!@brief Basic interface for type checks that automate the determineInputValidty functionality.
  */
-class cedar::proc::steps::StaticGain : public cedar::proc::Step
+class cedar::proc::typecheck::TypeCheck
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  StaticGain();
+  //!@brief The constructor.
+  TypeCheck
+  (
+    cedar::proc::DataSlot::VALIDITY returnedOnOk = cedar::proc::DataSlot::VALIDITY_VALID,
+    cedar::proc::DataSlot::VALIDITY returnedOnFail = cedar::proc::DataSlot::VALIDITY_ERROR
+  );
+
+  //!@brief Destructor
+  virtual ~TypeCheck();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Returns the current gain factor.
-  inline double getGainFactor() const
+  /*!@brief Checks the validity of the given data for the given slot.
+   *
+   *        Override this function to implement your own validity check. Note, that this should either return
+   *        validityOk() or validityBad(), rather than the direct constants.
+   */
+  virtual cedar::proc::DataSlot::VALIDITY check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr) const = 0;
+
+  /*!@brief The validity that is to be returned when the check succeeds.
+   */
+  inline cedar::proc::DataSlot::VALIDITY validityOk() const
   {
-    return this->_mGainFactor->getValue();
+    return this->mReturnedOnOk;
   }
 
-  //!@brief Sets the current gain factor.
-  inline void setGainFactor(double gainFactor)
+  /*!@brief The validity that is to be returned when the check fails.
+   */
+  inline cedar::proc::DataSlot::VALIDITY validityBad() const
   {
-    this->_mGainFactor->setValue(gainFactor);
+    return this->mReturnedOnFail;
   }
 
-public slots:
-  //!@brief This slot is connected to the valueChanged() event of the gain value parameter.
-  void gainChanged();
+  cedar::proc::DataSlot::VALIDITY operator()(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data) const
+  {
+    return this->check(slot, data);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -102,32 +109,19 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief Reacts to a change in the input connection.
-  void inputConnectionChanged(const std::string& inputName);
-
-  //!@brief Updates the output matrix.
-  void compute(const cedar::proc::Arguments& arguments);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief MatrixData representing the input. Storing it like this saves time during computation.
-  cedar::aux::ConstMatDataPtr mInput;
-
-  //!@brief The data containing the output.
-  cedar::aux::MatDataPtr mOutput;
+  // none yet
 private:
+  cedar::proc::DataSlot::VALIDITY mReturnedOnOk;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  //!@brief The factor by which the input is multiplied.
-  cedar::aux::DoubleParameterPtr _mGainFactor;
+  cedar::proc::DataSlot::VALIDITY mReturnedOnFail;
 
-private:
+}; // class cedar::proc::typecheck::TypeCheck
 
-}; // class cedar::proc::steps::StaticGain
+#endif // CEDAR_PROC_TYPE_CHECK_TYPE_CHECK_H
 
-#endif // CEDAR_PROC_STEPS_STATIC_GAIN_H
