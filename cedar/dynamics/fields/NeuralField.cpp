@@ -440,9 +440,9 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
-    return cedar::proc::DataSlot::VALIDITY_ERROR;
   }
-  return this->cedar::proc::Step::determineInputValidity(slot, data);
+
+  return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
 void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)

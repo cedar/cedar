@@ -141,4 +141,3 @@ private:
 }; // class cedar::aux::gui::MatrixSlicePlot3D
 
 #endif // CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H
-

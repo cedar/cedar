@@ -34,6 +34,10 @@
 
 ======================================================================================================================*/
 
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_QWT
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/MatrixVectorPlot.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
@@ -456,3 +460,5 @@ void cedar::aux::gui::MatrixVectorPlot::timerEvent(QTimerEvent * /* pEvent */)
   this->mpPlot->replot();
   mpLock->unlock();
 }
+
+#endif // CEDAR_USE_QWT

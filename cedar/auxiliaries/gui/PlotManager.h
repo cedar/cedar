@@ -140,4 +140,3 @@ namespace cedar
 }
 
 #endif // CEDAR_AUX_GUI_PLOT_MANAGER_H
-

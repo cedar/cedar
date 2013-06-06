@@ -34,6 +34,24 @@
 #
 #=======================================================================================================================
 
+if (CEDAR_USE_VTK)
+  set(vtk_moc_files gui/VtkLinePlot.h gui/VtkSurfacePlot.h gui/VtkMatrixPlot.h)
+else(CEDAR_USE_VTK)
+  set(vtk_moc_files "")
+endif(CEDAR_USE_VTK)
+
+if (CEDAR_USE_QWT)
+  set(qwt_moc_files gui/HistoryPlot0D.h gui/LinePlot.h gui/MatrixVectorPlot.h)
+else(CEDAR_USE_QWT)
+  set(qwt_moc_files "")
+endif(CEDAR_USE_QWT)
+
+if (CEDAR_USE_QWTPLOT3D)
+  set(qwtplot3d_moc_files gui/SurfacePlot.h)
+else(CEDAR_USE_QWTPLOT3D)
+  set(qwtplot3d_moc_files "")
+endif(CEDAR_USE_QWTPLOT3D)
+
 cedar_add_library(cedaraux
   MOC_HEADERS
   LocalCoordinateFrame.h
@@ -54,22 +72,21 @@ cedar_add_library(cedaraux
   gui/Parameter.h
   gui/LocalCoordinateFrameWidget.h
   gui/ObjectVisualizationWidget.h
-  gui/PlotInterface.h
   gui/Viewer.h
   gui/SceneWidget.h
-  gui/HistoryPlot.h
-  gui/HistoryPlot0D.h
-  gui/MatrixPlot.h
-  gui/LinePlot.h
-  gui/SurfacePlot.h
-  gui/MatrixSlicePlot3D.h
-  gui/MatrixVectorPlot.h
   gui/PropertyPane.h
-  gui/ImagePlot.h
   gui/StringParameter.h
   gui/UIntParameter.h
   gui/UIntVectorParameter.h
   gui/IntVectorParameter.h
+  gui/PlotInterface.h
+  gui/HistoryPlot.h
+  gui/MatrixPlot.h
+  gui/MatrixSlicePlot3D.h
+  gui/ImagePlot.h
+  ${qwt_moc_files}
+  ${vtk_moc_files}
+  ${qwtplot3d_moc_files}
   convolution/Convolution.h
   Parameter.h
   kernel/Separable.h

@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatrixPlot.cpp
+    File:        HistoryPlot0D.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -37,6 +37,9 @@
     Credits:
 
 ======================================================================================================================*/
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_QWT
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
@@ -266,7 +269,7 @@ double cedar::aux::gui::HistoryPlot0D::getDataValue(size_t index)
   CEDAR_DEBUG_ASSERT(index < this->mCurves.size());
 
   // lock the data
-  this->mCurves[index]->mData->lockForRead();
+  QReadLocker data_locker(&this->mCurves[index]->mData->getLock());
 
   // read out the double value
   double val = 0.0;
@@ -280,14 +283,14 @@ double cedar::aux::gui::HistoryPlot0D::getDataValue(size_t index)
     //!@todo This check if the data still has the correct format should be somewhere else (probably)
     if (cedar::aux::math::getDimensionalityOf(matrix) != 0 || matrix.empty()) // plot is no longer capable of displaying the data
     {
-      this->mCurves[index]->mData->unlock();
+      data_locker.unlock();
       emit dataChanged();
       return 0.0;
     }
     val = cedar::aux::math::getMatrixEntry<double>(matrix, 0, 0);
   }
 
-  this->mCurves[index]->mData->unlock();
+  data_locker.unlock();
   return val;
 }
 
@@ -401,3 +404,5 @@ void cedar::aux::gui::HistoryPlot0D::timerEvent(QTimerEvent* /* pEvent */)
 
   emit convert();
 }
+
+#endif // CEDAR_USE_QWT

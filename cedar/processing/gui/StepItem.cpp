@@ -55,6 +55,7 @@
 #include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
+#include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/TypeHierarchyMap.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/Singleton.h"
@@ -73,6 +74,7 @@
 #include <QLayout>
 #include <QResource>
 #include <iostream>
+#include <QMessageBox>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -231,49 +233,52 @@ void cedar::proc::gui::StepItem::slotRemoved(cedar::proc::DataRole::Id role, con
 
 void cedar::proc::gui::StepItem::timerEvent(QTimerEvent * /* pEvent */)
 {
-  cedar::unit::Milliseconds run_time(this->mStep->getRunTimeMeasurement());
-  cedar::unit::Milliseconds run_time_avg(this->mStep->getRunTimeAverage());
-  cedar::unit::Milliseconds lock_time(this->mStep->getLockTimeMeasurement());
-  cedar::unit::Milliseconds lock_time_avg(this->mStep->getLockTimeAverage());
-  cedar::unit::Milliseconds round_time(this->mStep->getRoundTimeMeasurement());
-  cedar::unit::Milliseconds round_time_avg(this->mStep->getRoundTimeAverage());
   QString tool_tip
     = QString("<table>"
-              "  <tr>"
-              "    <th>Measurement:</th>"
-              "    <th>Last</th>"
-              "    <th>Average</th>"
-              "  </tr>"
-              "  <tr>"
-              "    <td>locking</td>"
-              "    <td>%3</td>"
-              "    <td>%4</td>"
-              "  </tr>"
-              "  <tr>"
-              "    <td>compute call</td>"
-              "    <td>%1</td>"
-              "    <td>%2</td>"
-              "  </tr>"
-              "  <tr>"
-              "    <td>locking + compute</td>"
-              "    <td>%5</td>"
-              "    <td>%6</td>"
-              "  </tr>"
-              "  <tr>"
-              "    <td>round time</td>"
-              "    <td>%7</td>"
-              "    <td>%8</td>"
-              "  </tr>"
-              " </table>")
-      .arg(QString::fromStdString(cedar::aux::toString(run_time)))
-      .arg(QString::fromStdString(cedar::aux::toString(run_time_avg)))
-      .arg(QString::fromStdString(cedar::aux::toString(lock_time)))
-      .arg(QString::fromStdString(cedar::aux::toString(lock_time_avg)))
-      .arg(QString::fromStdString(cedar::aux::toString(run_time + lock_time)))
-      .arg(QString::fromStdString(cedar::aux::toString(run_time_avg + lock_time_avg)))
-      .arg(QString::fromStdString(cedar::aux::toString(round_time)))
-      .arg(QString::fromStdString(cedar::aux::toString(round_time_avg)))
-      ;
+                "<tr>"
+                  "<th>Measurement:</th>"
+                  "<th>Last</th>"
+                  "<th>Average</th>"
+                "</tr>"
+                "<tr>"
+                  "<td>locking</td>"
+                  "<td align=\"right\">%3</td>"
+                  "<td align=\"right\">%4</td>"
+                "</tr>"
+                "<tr>"
+                  "<td>compute call</td>"
+                  "<td align=\"right\">%1</td>"
+                  "<td align=\"right\">%2</td>"
+                "</tr>"
+                "<tr>"
+                  "<td>round time</td>"
+                  "<td align=\"right\">%5</td>"
+                  "<td align=\"right\">%6</td>"
+                "</tr>"
+              "</table>");
+
+  std::vector<boost::function<cedar::unit::Time ()> > measurements;
+  measurements.push_back(boost::bind(&cedar::proc::Step::getRunTimeMeasurement, this->mStep));
+  measurements.push_back(boost::bind(&cedar::proc::Step::getRunTimeAverage, this->mStep));
+  measurements.push_back(boost::bind(&cedar::proc::Step::getLockTimeMeasurement, this->mStep));
+  measurements.push_back(boost::bind(&cedar::proc::Step::getLockTimeAverage, this->mStep));
+  measurements.push_back(boost::bind(&cedar::proc::Step::getRoundTimeMeasurement, this->mStep));
+  measurements.push_back(boost::bind(&cedar::proc::Step::getRoundTimeAverage, this->mStep));
+
+  for (size_t i = 0; i < measurements.size(); ++i)
+  {
+    try
+    {
+      cedar::unit::Milliseconds ms = measurements.at(i)();
+      double dval = ms / cedar::unit::Milliseconds(1);
+      tool_tip = tool_tip.arg(QString("%1 ms").arg(dval, 0, 'f', 1));
+    }
+    catch (const cedar::proc::NoMeasurementException&)
+    {
+      tool_tip = tool_tip.arg("n/a");
+    }
+  }
+
   this->setToolTip(tool_tip);
 }
 
@@ -301,8 +306,8 @@ void cedar::proc::gui::StepItem::updateStepState()
   {
     case cedar::proc::Step::STATE_EXCEPTION:
     case cedar::proc::Step::STATE_NOT_RUNNING:
-      this->setOutlineColor(Qt::darkGray);
-      this->setFillColor(QColor(235, 235, 235));
+      this->setOutlineColor(Qt::red);
+      this->setFillColor(QColor(255, 175, 175));
 
       if (this->mRunTimeMeasurementTimerId != 0)
       {
@@ -748,22 +753,20 @@ void cedar::proc::gui::StepItem::showPlot
     title += "." + slot->getName() + ")";
   }
 
-  QDockWidget *p_dock = this->createDockWidget(title);
+  auto p_dock = this->createDockWidget(title, pPlot);
 
   QRect geometry = p_dock->geometry();
   geometry.setTopLeft(position);
   geometry.setSize(QSize(200, 200));
   p_dock->setGeometry(geometry);
 
-  p_dock->setWidget(pPlot);
   p_dock->show();
 }
 
 void cedar::proc::gui::StepItem::openProperties()
 {
-  QDockWidget *p_widget = this->createDockWidget("Properties");
   cedar::proc::gui::PropertyPane* props = new cedar::proc::gui::PropertyPane();
-  p_widget->setWidget(props);
+  auto p_widget = this->createDockWidget("Properties", props);
   props->display(this->getStep());
   p_widget->show();
 }
@@ -887,8 +890,24 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     cedar::aux::DataPtr p_data = this->mStep->getData(e, data_name);
     cedar::proc::DataSlotPtr slot = this->mStep->getSlot(e, data_name);
     cedar::aux::gui::DataPlotter *p_plotter = new cedar::aux::gui::DataPlotter();
-    p_plotter->plot(p_data, slot->getText());
-    this->showPlot(event->screenPos(), p_plotter, slot);
+    try
+    {
+      p_plotter->plot(p_data, slot->getText());
+      this->showPlot(event->screenPos(), p_plotter, slot);
+    }
+    catch (const cedar::aux::gui::InvalidPlotData& e)
+    {
+      //!@todo this should be a call to an ide function
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        e.exceptionInfo(),
+        "cedar::proc::gui::StepItem::contextMenuEvent"
+      );
+      QMessageBox::warning(0,
+                          "An exception has occurred.",
+                          QString::fromStdString(e.getMessage()),
+                          QMessageBox::Ok);
+    }
   }
   // plot all data slots
   else if (a == p_plot_all)
@@ -911,9 +930,25 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
 
     cedar::aux::DataPtr p_data = this->mStep->getData(e, data_name);
     cedar::proc::DataSlotPtr slot = this->mStep->getSlot(e, data_name);
-    cedar::aux::gui::PlotInterface *p_plotter = declaration->createPlot();
-    p_plotter->plot(p_data, slot->getText());
-    this->showPlot(event->screenPos(), p_plotter, slot);
+    try
+    {
+      cedar::aux::gui::PlotInterface *p_plotter = declaration->createPlot();
+      p_plotter->plot(p_data, slot->getText());
+      this->showPlot(event->screenPos(), p_plotter, slot);
+    }
+    catch (const cedar::aux::gui::InvalidPlotData& e)
+    {
+      //!@todo this should be a call to an ide function
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        e.exceptionInfo(),
+        "cedar::proc::gui::StepItem::contextMenuEvent"
+      );
+      QMessageBox::warning(0,
+                          "An exception has occurred.",
+                          QString::fromStdString(e.getMessage()),
+                          QMessageBox::Ok);
+    }
   }
 }
 
@@ -1036,14 +1071,27 @@ void cedar::proc::gui::StepItem::setDisplayMode(cedar::proc::gui::StepItem::Disp
   this->update();
 }
 
-QDockWidget* cedar::proc::gui::StepItem::createDockWidget(const std::string& title) const
+QWidget* cedar::proc::gui::StepItem::createDockWidget(const std::string& title, QWidget* pPlot) const
 {
-  QDockWidget *p_dock = new QDockWidget(QString::fromStdString(title), this->mpMainWindow);
-  p_dock->setFloating(true);
-  p_dock->setContentsMargins(0, 0, 0, 0);
-  p_dock->setAllowedAreas(Qt::NoDockWidgetArea);
+  if (this->mpMainWindow)
+  {
+    QDockWidget *p_dock = new QDockWidget(QString::fromStdString(title), this->mpMainWindow);
+    p_dock->setFloating(true);
+    p_dock->setContentsMargins(0, 0, 0, 0);
+    p_dock->setAllowedAreas(Qt::NoDockWidgetArea);
+    p_dock->setWidget(pPlot);
 
-  return p_dock;
+    return p_dock;
+  }
+  else
+  {
+    QWidget* p_widget = new QWidget();
+    p_widget->setWindowTitle(QString::fromStdString(title));
+    auto p_layout = new QVBoxLayout();
+    p_layout->addWidget(pPlot);
+    p_widget->setLayout(p_layout);
+    return p_widget;
+  }
 }
 
 void cedar::proc::gui::StepItem::multiplot
@@ -1082,12 +1130,11 @@ void cedar::proc::gui::StepItem::multiplot
   }
 
   // initialize dock
-  QDockWidget *p_dock = createDockWidget(this->getStep()->getName());
+  QWidget* p_widget = new QWidget();
+  auto p_dock = createDockWidget(this->getStep()->getName(), p_widget);
 
   // initialize widget & layout
-  QWidget *p_widget = new QWidget();
   p_widget->setContentsMargins(0, 0, 0, 0);
-  p_dock->setWidget(p_widget);
   QGridLayout *p_layout = new QGridLayout();
   p_layout->setContentsMargins(grid_spacing, grid_spacing, grid_spacing, grid_spacing);
   p_layout->setSpacing(grid_spacing);

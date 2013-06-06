@@ -103,6 +103,8 @@ protected:
 private:
   void compute(const cedar::proc::Arguments& arguments);
 
+  void reset();
+
 private slots:
   void recompute();
 
@@ -127,6 +129,9 @@ private:
 
   //! Whether or not the boost is active.
   cedar::aux::BoolParameterPtr _mActive;
+
+  //! Whether or not the boost is deactivated when a reset occurs.
+  cedar::aux::BoolParameterPtr _mDeactivateOnReset;
 }; // class cedar::proc::sources::Boost
 
 #endif // CEDAR_PROC_SOURCES_BOOST_H

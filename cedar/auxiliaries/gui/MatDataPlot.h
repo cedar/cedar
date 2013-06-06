@@ -101,4 +101,3 @@ private:
 }; // class cedar::aux::gui::MatDataPlot
 
 #endif // CEDAR_AUX_GUI_MAT_DATA_PLOT_H
-
