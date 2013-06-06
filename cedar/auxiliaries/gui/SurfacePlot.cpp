@@ -38,6 +38,10 @@
 
 ======================================================================================================================*/
 
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_QWTPLOT3D
+
 #define NOMINMAX // prevents MSVC conflicts
 
 // CEDAR INCLUDES
@@ -358,3 +362,5 @@ void cedar::aux::gui::SurfacePlot::contextMenuEvent(QContextMenuEvent * pEvent)
     }
   }
 }
+
+#endif // CEDAR_USE_QWTPLOT3D

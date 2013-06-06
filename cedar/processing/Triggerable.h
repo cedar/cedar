@@ -200,6 +200,12 @@ private:
   //!@brief the finished trigger singleton, which is triggered once the computation of this step is done
   cedar::proc::TriggerPtr mFinished;
 
+  //! Counts how often callOnStart was called. This is required to prevent multiple onStart calls.
+  unsigned int mStartCalls;
+
+  //! Lock for mStartCalls.
+  QMutex* mpStartCallsLock;
+
 }; // class cedar::proc::Triggerable
 
 #endif // CEDAR_PROC_TRIGGERABLE_H

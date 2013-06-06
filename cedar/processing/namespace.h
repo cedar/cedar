@@ -114,9 +114,11 @@ namespace cedar
     class CEDAR_PROC_LIB_EXPORT InvalidCategoryException;
     class CEDAR_PROC_LIB_EXPORT MissingConnectionException;
     class CEDAR_PROC_LIB_EXPORT MissingDeclarationException;
+    class CEDAR_PROC_LIB_EXPORT NoCheckException;
+    class CEDAR_PROC_LIB_EXPORT NoMappingException;
+    class CEDAR_PROC_LIB_EXPORT NoMeasurementException;
     class CEDAR_PROC_LIB_EXPORT ParseException;
     class CEDAR_PROC_LIB_EXPORT PluginException;
-    class CEDAR_PROC_LIB_EXPORT NoMappingException;
     //!@endcond
   }
 }

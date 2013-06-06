@@ -51,6 +51,7 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Log.h"
@@ -129,6 +130,36 @@ cedar::proc::Network::~Network()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::Network::startTriggers()
+{
+  for (auto iter = this->elements().begin(); iter != this->elements().end(); ++iter)
+  {
+    cedar::proc::ElementPtr element = iter->second;
+    if (cedar::proc::LoopedTriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(element))
+    {
+      if (!trigger->isRunning())
+      {
+        trigger->startTrigger();
+      }
+    }
+  }
+}
+
+void cedar::proc::Network::stopTriggers()
+{
+  for (auto iter = this->elements().begin(); iter != this->elements().end(); ++iter)
+  {
+    cedar::proc::ElementPtr element = iter->second;
+    if (cedar::proc::LoopedTriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(element))
+    {
+      if (trigger->isRunning())
+      {
+        trigger->stopTrigger();
+      }
+    }
+  }
+}
 
 void cedar::proc::Network::onNameChanged()
 {

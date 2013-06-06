@@ -62,6 +62,9 @@ public:
   //!@brief The standard constructor.
   HistoryPlot1D(QWidget *pParent = NULL);
 
+  //!@brief Constructor that expects a DataPtr
+  HistoryPlot1D(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -86,6 +89,8 @@ private:
   //! Resets the history to contain only the current state.
   void resetHistory();
 
+  //!@brief initialize
+  void init();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -99,7 +104,11 @@ private:
   cedar::aux::ConstMatDataPtr mData;
 
   //! Subplot used for plotting the history matrix.
-  cedar::aux::gui::SurfacePlot* mpHistoryPlot;
+  #ifdef CEDAR_USE_QWTPLOT3D
+    cedar::aux::gui::SurfacePlot* mpHistoryPlot;
+  #else // CEDAR_USE_QWTPLOT3D
+    cedar::aux::gui::ImagePlot* mpHistoryPlot;
+  #endif // CEDAR_USE_QWTPLOT3D
 
   //! Maximum number of states in the history.
   int mMaxHistSize;
@@ -107,4 +116,3 @@ private:
 }; // class cedar::aux::gui::HistoryPlot1D
 
 #endif // CEDAR_AUX_GUI_HISTORY_PLOT1D_H
-

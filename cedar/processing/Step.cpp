@@ -53,6 +53,9 @@
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
+#include <QMutexLocker>
+#include <QReadLocker>
+#include <QWriteLocker>
 #include <iostream>
 #include <ctime>
 #include <opencv2/opencv.hpp>
@@ -71,7 +74,6 @@ cedar::proc::Step::Step(bool runInThread, bool isLooped)
 :
 Triggerable(isLooped),
 // initialize members
-mBusy(false),
 mpArgumentsLock(new QReadWriteLock()),
 mMovingAverageIterationTime(100), // average the last 100 iteration times
 mLockingTime(100), // average the last 100 iteration times
@@ -118,12 +120,14 @@ cedar::proc::Step::~Step()
 
 void cedar::proc::Step::lock(cedar::aux::LOCK_TYPE parameterAccessType) const
 {
+  this->mpConnectionLock->lockForRead();
   this->lockData();
   this->lockParameters(parameterAccessType);
 }
 
 void cedar::proc::Step::unlock() const
 {
+  this->mpConnectionLock->unlock();
   this->unlockParameters();
   this->unlockData();
 }
@@ -295,150 +299,149 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::T
     return;
   }
 
-  //!@todo Busy should be a lock object
-  if (!this->mBusy)
-  {
-    // if we get to this point, set the state to running
-    this->setState(cedar::proc::Triggerable::STATE_RUNNING, "");
+  // if we get to this point, set the state to running
+  this->setState(cedar::proc::Triggerable::STATE_RUNNING, "");
 
-    if (this->_mRunInThread->getValue())
-    {
-      // if the thread was already running, start() would have no effect, so that should not happen
-      CEDAR_DEBUG_NON_CRITICAL_ASSERT(!this->isRunning());
-      // start this step's thread (this will eventually call the run method)
-      this->start();
-    }
-    else
-    {
-      // call the run function directly
-      this->run();
-    }
+  if (this->_mRunInThread->getValue())
+  {
+    // if the thread was already running, start() would have no effect, so that should not happen
+    CEDAR_DEBUG_NON_CRITICAL_ASSERT(!this->isRunning());
+    // start this step's thread (this will eventually call the run method)
+    this->start();
   }
   else
   {
-    cedar::aux::LogSingleton::getInstance()->warning
-    (
-      "Step \"" + this->getName() + "\" was busy during its onTrigger() call, computation skipped.",
-      "cedar::proc::Step::onTrigger(cedar::proc::TriggerPtr)"
-    );
+    // call the run function directly
+    this->run();
   }
 }
 
 
 void cedar::proc::Step::run()
 {
-  this->mBusy = true;
-
-  // Read out the arguments
-  cedar::proc::ArgumentsPtr arguments;
-  // if no arguments have been set, create default ones.
-  this->mpArgumentsLock->lockForWrite();
-
-  // check if arguments are set for the step.
-  if (!this->mNextArguments)
+  if (this->mBusy.tryLock())
   {
-    // if not, use empty ones.
-    arguments = cedar::proc::ArgumentsPtr(new cedar::proc::Arguments());
+    // Read out the arguments
+    cedar::proc::ArgumentsPtr arguments;
+
+    // if no arguments have been set, create default ones.
+    this->mpArgumentsLock->lockForWrite();
+
+    // check if arguments are set for the step.
+    if (!this->mNextArguments)
+    {
+      // if not, use empty ones.
+      arguments = cedar::proc::ArgumentsPtr(new cedar::proc::Arguments());
+    }
+    else
+    {
+      // read out the next arguments
+      arguments = this->mNextArguments;
+
+      this->mNextArguments.reset();
+    }
+    this->mpArgumentsLock->unlock();
+
+    // start measuring the execution time.
+    clock_t lock_start = clock();
+
+    // lock the step
+    this->lock(cedar::aux::LOCK_TYPE_READ);
+
+    clock_t lock_end = clock();
+    clock_t lock_elapsed = lock_end - lock_start;
+    double lock_elapsed_s = static_cast<double>(lock_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
+    this->setLockTimeMeasurement(cedar::unit::Seconds(lock_elapsed_s));
+
+    if (this->mLastComputeCall != 0)
+    {
+      clock_t last = this->mLastComputeCall;
+      this->mLastComputeCall = clock();
+      clock_t elapsed = this->mLastComputeCall - last;
+      double elapsed_s = static_cast<double>(elapsed) / static_cast<double>(CLOCKS_PER_SEC);
+      this->setRoundTimeMeasurement(cedar::unit::Seconds(elapsed_s));
+    }
+    else
+    {
+      this->mLastComputeCall = clock();
+    }
+
+    // start measuring the execution time.
+    clock_t run_start = clock();
+
+    try
+    {
+      /* since the cv::RNG is initialized once for every thread, we have to store its state for subsequent calls
+       * to run() - otherwise, the sequence of generated random numbers will be identical for each execution of run()
+       */
+      if (this->isThreaded() && mRNGState != 0)
+      {
+        cv::RNG& my_rng = cv::theRNG();
+        my_rng.state = mRNGState;
+      }
+      // call the compute function with the given arguments
+      this->compute(*(arguments.get()));
+      if (this->isThreaded())
+      {
+        cv::RNG& my_rng = cv::theRNG();
+        mRNGState = my_rng.state;
+      }
+    }
+    // catch exceptions and translate them to the given state/message
+    catch(const cedar::aux::ExceptionBase& e)
+    {
+      cedar::aux::LogSingleton::getInstance()->error
+      (
+        "An exception occurred in step \"" + this->getName() + "\": " + e.exceptionInfo(),
+        "cedar::proc::Step::run()",
+        this->getName()
+      );
+      this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + e.exceptionInfo());
+    }
+    catch(const std::exception& e)
+    {
+      cedar::aux::LogSingleton::getInstance()->error
+      (
+        "An exception occurred in step \"" + this->getName() + "\": " + std::string(e.what()),
+        "cedar::proc::Step::run()",
+        this->getName()
+      );
+      this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + std::string(e.what()));
+    }
+    catch(...)
+    {
+      cedar::aux::LogSingleton::getInstance()->error
+      (
+        "An exception of unknown type occurred in step \"" + this->getName() + "\".",
+        "cedar::proc::Step::run()",
+        this->getName()
+      );
+      this->setState(cedar::proc::Step::STATE_EXCEPTION, "An unknown exception type occurred.");
+    }
+
+    clock_t run_end = clock();
+    clock_t run_elapsed = run_end - run_start;
+    double run_elapsed_s = static_cast<double>(run_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
+
+    // unlock the step
+    this->unlock();
+
+    // take time measurements
+    this->setRunTimeMeasurement(cedar::unit::Seconds(run_elapsed_s));
+
+    // remove the argumens, as they have been processed.
+    this->getFinishedTrigger()->trigger();
+
+    this->mBusy.unlock();
   }
   else
   {
-    // read out the next arguments
-    arguments = this->mNextArguments;
-
-    this->mNextArguments.reset();
-  }
-  this->mpArgumentsLock->unlock();
-
-  // start measuring the execution time.
-  clock_t lock_start = clock();
-
-  // lock the step
-  this->lock(cedar::aux::LOCK_TYPE_READ);
-
-  clock_t lock_end = clock();
-  clock_t lock_elapsed = lock_end - lock_start;
-  double lock_elapsed_s = static_cast<double>(lock_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
-  this->setLockTimeMeasurement(cedar::unit::Seconds(lock_elapsed_s));
-
-  if (this->mLastComputeCall != 0)
-  {
-    clock_t last = this->mLastComputeCall;
-    this->mLastComputeCall = clock();
-    clock_t elapsed = this->mLastComputeCall - last;
-    double elapsed_s = static_cast<double>(elapsed) / static_cast<double>(CLOCKS_PER_SEC);
-    this->setRoundTimeMeasurement(cedar::unit::Seconds(elapsed_s));
-  }
-  else
-  {
-    this->mLastComputeCall = clock();
-  }
-
-  // start measuring the execution time.
-  clock_t run_start = clock();
-
-  try
-  {
-    /* since the cv::RNG is initialized once for every thread, we have to store its state for subsequent calls
-     * to run() - otherwise, the sequence of generated random numbers will be identical for each execution of run()
-     */
-    if (this->isThreaded() && mRNGState != 0)
-    {
-      cv::RNG& my_rng = cv::theRNG();
-      my_rng.state = mRNGState;
-    }
-    // call the compute function with the given arguments
-    this->compute(*(arguments.get()));
-    if (this->isThreaded())
-    {
-      cv::RNG& my_rng = cv::theRNG();
-      mRNGState = my_rng.state;
-    }
-  }
-  // catch exceptions and translate them to the given state/message
-  catch(const cedar::aux::ExceptionBase& e)
-  {
-    cedar::aux::LogSingleton::getInstance()->error
+    cedar::aux::LogSingleton::getInstance()->warning
     (
-      "An exception occurred in step \"" + this->getName() + "\": " + e.exceptionInfo(),
-      "cedar::proc::Step::run()",
-      this->getName()
+      "Step \"" + this->getName() + "\" was busy during its run() call, computation skipped.",
+      "cedar::proc::Step::run()"
     );
-    this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + e.exceptionInfo());
   }
-  catch(const std::exception& e)
-  {
-    cedar::aux::LogSingleton::getInstance()->error
-    (
-      "An exception occurred in step \"" + this->getName() + "\": " + std::string(e.what()),
-      "cedar::proc::Step::run()",
-      this->getName()
-    );
-    this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + std::string(e.what()));
-  }
-  catch(...)
-  {
-    cedar::aux::LogSingleton::getInstance()->error
-    (
-      "An exception of unknown type occurred in step \"" + this->getName() + "\".",
-      "cedar::proc::Step::run()",
-      this->getName()
-    );
-    this->setState(cedar::proc::Step::STATE_EXCEPTION, "An unknown exception type occurred.");
-  }
-
-  clock_t run_end = clock();
-  clock_t run_elapsed = run_end - run_start;
-  double run_elapsed_s = static_cast<double>(run_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
-
-  // unlock the step
-  this->unlock();
-
-  // take time measurements
-  this->setRunTimeMeasurement(cedar::unit::Seconds(run_elapsed_s));
-
-  // remove the argumens, as they have been processed.
-  this->getFinishedTrigger()->trigger();
-  this->mBusy = false;
 }
 
 void cedar::proc::Step::setRunTimeMeasurement(const cedar::unit::Time& time)
@@ -464,11 +467,12 @@ cedar::unit::Time cedar::proc::Step::getRunTimeMeasurement() const
   QReadLocker locker(&this->mLastIterationTimeLock);
   if (this->mMovingAverageIterationTime.size() > 0)
   {
-    return this->mMovingAverageIterationTime.getNewest();
+    cedar::unit::Time copy = this->mMovingAverageIterationTime.getNewest();
+    return copy;
   }
   else
   {
-    return cedar::unit::Milliseconds(0.0);
+    CEDAR_THROW(cedar::proc::NoMeasurementException, "No measurements, yet.");
   }
 }
 
@@ -477,11 +481,12 @@ cedar::unit::Time cedar::proc::Step::getLockTimeMeasurement() const
   QReadLocker locker(&this->mLockTimeLock);
   if (this->mLockingTime.size() > 0)
   {
-    return this->mLockingTime.getNewest();
+    cedar::unit::Time copy = this->mLockingTime.getNewest();
+    return copy;
   }
   else
   {
-    return cedar::unit::Milliseconds(0.0);
+    CEDAR_THROW(cedar::proc::NoMeasurementException, "No measurements, yet.");
   }
 }
 
@@ -490,11 +495,12 @@ cedar::unit::Time cedar::proc::Step::getRunTimeAverage() const
   QReadLocker locker(&this->mLastIterationTimeLock);
   if (this->mMovingAverageIterationTime.size() > 0)
   {
-    return this->mMovingAverageIterationTime.getAverage();
+    cedar::unit::Time copy = this->mMovingAverageIterationTime.getNewest();
+    return copy;
   }
   else
   {
-    return cedar::unit::Milliseconds(-1.0);
+    CEDAR_THROW(cedar::proc::NoMeasurementException, "No measurements, yet.");
   }
 }
 
@@ -503,11 +509,12 @@ cedar::unit::Time cedar::proc::Step::getLockTimeAverage() const
   QReadLocker locker(&this->mLockTimeLock);
   if (this->mLockingTime.size() > 0)
   {
-    return this->mLockingTime.getAverage();
+    cedar::unit::Time copy = this->mLockingTime.getNewest();
+    return copy;
   }
   else
   {
-    return cedar::unit::Milliseconds(-1.0);
+    CEDAR_THROW(cedar::proc::NoMeasurementException, "No measurements, yet.");
   }
 }
 
@@ -516,11 +523,12 @@ cedar::unit::Time cedar::proc::Step::getRoundTimeMeasurement() const
   QReadLocker locker(&this->mRoundTimeLock);
   if (this->mRoundTime.size() > 0)
   {
-    return this->mRoundTime.getNewest();
+    cedar::unit::Time copy = this->mLockingTime.getNewest();
+    return copy;
   }
   else
   {
-    return cedar::unit::Milliseconds(0.0);
+    CEDAR_THROW(cedar::proc::NoMeasurementException, "No measurements, yet.");
   }
 }
 
@@ -529,11 +537,12 @@ cedar::unit::Time cedar::proc::Step::getRoundTimeAverage() const
   QReadLocker locker(&this->mRoundTimeLock);
   if (this->mRoundTime.size() > 0)
   {
-    return this->mRoundTime.getAverage();
+    cedar::unit::Time copy = this->mRoundTime.getNewest();
+    return copy;
   }
   else
   {
-    return cedar::unit::Milliseconds(-1.0);
+    CEDAR_THROW(cedar::proc::NoMeasurementException, "No measurements, yet.");
   }
 }
 
@@ -551,17 +560,33 @@ void cedar::proc::Step::setThreaded(bool isThreaded)
 bool cedar::proc::Step::setNextArguments(cedar::proc::ArgumentsPtr arguments)
 {
   // first, check if new arguments have already been set.
-  mpArgumentsLock->lockForRead();
-  if (this->isRunning() || this->mBusy || this->mNextArguments.get() != NULL)
   {
-    mpArgumentsLock->unlock();
-    return false;
+    QReadLocker arg_lock(mpArgumentsLock);
+    if (this->isRunning())
+    {
+      return false;
+    }
+    else
+    {
+      if (this->mBusy.tryLock())
+      {
+        if (this->mNextArguments)
+        {
+          this->mBusy.unlock();
+          return false;
+        }
+      }
+      else
+      {
+        return false;
+      }
+    }
   }
-  mpArgumentsLock->unlock();
 
-  mpArgumentsLock->lockForWrite();
+  QWriteLocker arg_lock(mpArgumentsLock);
   this->mNextArguments = arguments;
-  mpArgumentsLock->unlock();
+  arg_lock.unlock();
+  this->mBusy.unlock();
   return true;
 }
 
