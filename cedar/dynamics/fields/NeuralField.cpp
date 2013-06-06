@@ -442,9 +442,9 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
-    return cedar::proc::DataSlot::VALIDITY_ERROR;
   }
-  return this->cedar::proc::Step::determineInputValidity(slot, data);
+
+  return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
 void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
@@ -462,9 +462,10 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   cedar::aux::conv::ConvolutionPtr convolution_ptr = this->getConvolution();
   cedar::aux::conv::Convolution& lateral_convolution = *convolution_ptr;
 
+  boost::shared_ptr<QReadLocker> activation_read_locker;
   if (this->activationIsOutput())
   {
-    this->mActivation->lockForRead();
+    activation_read_locker = boost::shared_ptr<QReadLocker>(new QReadLocker(&this->mActivation->getLock()));
   }
 
   QWriteLocker sigmoid_u_lock(&this->mSigmoidalActivation->getLock());
@@ -509,19 +510,15 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   d_u += 1.0 / sqrt(time / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second))
          *_mInputNoiseGain->getValue() * input_noise;
 
+  boost::shared_ptr<QWriteLocker> activation_write_locker;
   if (this->activationIsOutput())
   {
-    this->mActivation->unlock();
-    this->mActivation->lockForWrite();
+    activation_read_locker->unlock();
+    activation_write_locker = boost::shared_ptr<QWriteLocker>(new QWriteLocker(&this->mActivation->getLock()));
   }
 
   // integrate one time step
   u += time / cedar::unit::Time(tau * cedar::unit::milli * cedar::unit::seconds) * d_u;
-
-  if (this->activationIsOutput())
-  {
-    this->mActivation->unlock();
-  }
 }
 
 void cedar::dyn::NeuralField::updateInputSum()

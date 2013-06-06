@@ -42,6 +42,7 @@
 // SYSTEM INCLUDES
 #include <QReadLocker>
 #include <QWriteLocker>
+#include <QMutexLocker>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -50,13 +51,14 @@ cedar::proc::Triggerable::Triggerable(bool isLooped)
 :
 mIsLooped(isLooped),
 mState(cedar::proc::Triggerable::STATE_UNKNOWN),
-mStartCalls(0)
+mStartCalls(0),
+mpStartCallsLock(new QMutex())
 {
 }
 
 cedar::proc::Triggerable::~Triggerable()
 {
-  // empty default implementation
+  delete this->mpStartCallsLock;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -85,6 +87,10 @@ cedar::proc::TriggerPtr cedar::proc::Triggerable::getParentTrigger()
 
 void cedar::proc::Triggerable::callOnStart()
 {
+  // make sure no other thread can start the step
+  QMutexLocker locker(this->mpStartCallsLock);
+
+  //!@todo onStart might take a long time - can/should this be done better, e.g., by first storing a bool, then incrementing, then unlocking, then calling onStart?
   // only call onStart if this triggerable hasn't been started yet
   if (this->mStartCalls == 0)
   {
@@ -93,6 +99,7 @@ void cedar::proc::Triggerable::callOnStart()
 
   // count how often this triggerable was started
   ++this->mStartCalls;
+  locker.unlock();
 
   if (mFinished)
   {
@@ -106,6 +113,7 @@ void cedar::proc::Triggerable::callOnStart()
 void cedar::proc::Triggerable::callOnStop()
 {
   // only call onStop if there is only one trigger left that started this triggerable
+  QMutexLocker locker(this->mpStartCallsLock);
   if (this->mStartCalls == 1)
   {
     this->onStop();
@@ -114,6 +122,7 @@ void cedar::proc::Triggerable::callOnStop()
   // count how often this was stopped
   CEDAR_ASSERT(this->mStartCalls > 0);
   --this->mStartCalls;
+  locker.unlock();
 
   this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
 

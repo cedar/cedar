@@ -22,11 +22,15 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatrixSlicePlot3D.h
+    File:        VtkMatrixPlot.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2012 05 29
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 07 14
 
     Description:
 
@@ -34,24 +38,38 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H
-#define CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H
+#ifndef CEDAR_AUX_GUI_VTK_MATRIX_PLOT_H
+#define CEDAR_AUX_GUI_VTK_MATRIX_PLOT_H
 
-// CEDAR CONFIGURATION
 #include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_VTK
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/PlotInterface.h"
+#include "cedar/auxiliaries/gui/MultiPlotInterface.h"
 
 // SYSTEM INCLUDES
-#include <QLabel>
+#include <QWidget>
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
+#include <qwtplot3d/qwt3d_types.h>
 
-/*!@brief A slice-plot for 3D matrices.
+/*!@brief Base class for plots that can display matrices.
+ *
+ *        Based on the dimensionality of the data plotted, this class decides which type of plot to open. Currently,
+ *        these are:
+ *
+ *        none              for 0D matrices,
+ *
+ *        VtkLinePlot       for 1D matrices,
+ *
+ *        VtkSurfacePlot    for 2D matrices and
+ *
+ *        none              for 3D matrices.
+ *
  */
-class cedar::aux::gui::MatrixSlicePlot3D : public cedar::aux::gui::PlotInterface
+class cedar::aux::gui::VtkMatrixPlot : public cedar::aux::gui::MultiPlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -59,58 +77,39 @@ class cedar::aux::gui::MatrixSlicePlot3D : public cedar::aux::gui::PlotInterface
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
-  //--------------------------------------------------------------------------------------------------------------------
-
-  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The constructor.
-  MatrixSlicePlot3D(QWidget* pParent = NULL);
-  //!@brief Destructor
+  //!@brief The standard constructor.
+  VtkMatrixPlot(QWidget* pParent = NULL);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Displays the data.
-   *
-   * @param data A pointer to the data to display. If this isn't a pointer to a cedar::aux::MatData, the function
-   *             throws.
-   * @param title title of the plot window
-   */
+  //!@brief display a MatData
   void plot(cedar::aux::ConstDataPtr data, const std::string& title);
 
-  /*!@brief Updates the plot periodically.
+  bool canAppend(cedar::aux::ConstDataPtr data) const;
+
+public slots:
+  /*!@brief Reacts to a change in the plotted data.
+   *
+   * When the dimensionality of the plotted data changes, this causes a switch of the plot type.
    */
-  void timerEvent(QTimerEvent *pEvent);
+  void processChangedData();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief Reacts to a resize of the plot.
-   */
-  void resizeEvent(QResizeEvent *event);
-
-  /*!@brief Processes key events.
-   *
-   * This function handles ctrl+G, which saves the window settings.
-   */
-  virtual void keyPressEvent(QKeyEvent* pEvent);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Creates the image based on the matrix.
-   */
-  void slicesFromMat(const cv::Mat& mat);
-
-  /*!@brief Resizes the pixmap used to display the image data.
-   */
-  void resizePixmap();
+  void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -118,26 +117,13 @@ private:
 protected:
   // none yet
 private:
-  //! Label used for displaying the image.
-  QLabel* mpImageDisplay;
-
-  //! Data displayed by the plot.
+  //!@brief the displayed MatData
   cedar::aux::ConstMatDataPtr mData;
 
-  //! Converted image.
-  QImage mImage;
+  //!@brief the plot widget
+  QWidget* mpCurrentPlotWidget;
 
-  //! Id of the timer used for updating the plot.
-  int mTimerId;
+}; // class cedar::aux::gui::VtkMatrixPlot
 
-  cv::Mat mSliceMatrix;
-  cv::Mat mSliceMatrixByte;
-  cv::Mat mSliceMatrixByteC3;
-  cv::Mat mSliceSize;
-  bool mDataIsSet;
-
-  //! desired columns of the slice plot
-  unsigned int mDesiredColumns;
-}; // class cedar::aux::gui::MatrixSlicePlot3D
-
-#endif // CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H
+#endif // CEDAR_USE_VTK
+#endif // CEDAR_AUX_GUI_VTK_MATRIX_PLOT_H

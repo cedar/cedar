@@ -37,6 +37,9 @@
     Credits:
 
 ======================================================================================================================*/
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_QWT
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/LinePlot.h"
@@ -271,8 +274,6 @@ void cedar::aux::gui::LinePlot::plot(cedar::aux::ConstDataPtr data, const std::s
   mpLock->unlock();
 
   this->append(data, title);
-
-  this->startTimer(30); //!@todo make the refresh time configurable.
 }
 
 void cedar::aux::gui::LinePlot::init()
@@ -525,3 +526,5 @@ void cedar::aux::gui::LinePlot::timerEvent(QTimerEvent * /* pEvent */)
 
   emit convert();
 }
+
+#endif // CEDAR_USE_QWT

@@ -41,6 +41,10 @@
 #ifndef CEDAR_AUX_GUI_SURFACE_PLOT_H
 #define CEDAR_AUX_GUI_SURFACE_PLOT_H
 
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_QWTPLOT3D
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/PlotInterface.h"
@@ -231,4 +235,5 @@ private:
   cedar::aux::gui::detail::SurfacePlotWorkerPtr mWorker;
 }; // class cedar::aux::gui::SurfacePlot
 
+#endif // CEDAR_USE_QWTPLOT3D
 #endif // CEDAR_AUX_GUI_SURFACE_PLOT_H

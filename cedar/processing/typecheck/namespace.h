@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -25,45 +25,37 @@
     File:        namespace.h
 
     Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 06 28
+    Email:       oliver.lomp@ini.rub.de
+    Date:        2011 05 23
 
-    Description: Namespace file for cedar::aux::annotations.
+    Description: Namespace file for cedar::aux::comp.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_ANNOTATIONS_NAMESPACE_H
-#define CEDAR_AUX_ANNOTATIONS_NAMESPACE_H
+#ifndef CEDAR_PROC_TYPECHECK_NAMESPACE_H
+#define CEDAR_PROC_TYPECHECK_NAMESPACE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/lib.h"
-#include "cedar/defines.h"
+#include "cedar/processing/lib.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <opencv2/opencv.hpp>
-
 
 namespace cedar
 {
-  /*!@brief Namespace for all aux classes. */
-  namespace aux
+  namespace proc
   {
-    namespace annotation
+    /*! @brief Namespace containing classes related to type checks.
+     */
+    namespace typecheck
     {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_AUX_CLASS(Annotation);
-      CEDAR_DECLARE_AUX_CLASS(Annotatable);
-      CEDAR_DECLARE_AUX_CLASS(ColorSpace);
-      CEDAR_DECLARE_AUX_CLASS(Dimensions);
-      CEDAR_DECLARE_AUX_CLASS(Disparity);
-      CEDAR_DECLARE_AUX_CLASS(Depth);
-      //!@endcond
+      CEDAR_DECLARE_PROC_CLASS(TypeCheck);
+
+      template <class T> class DerivedFrom;
     }
   }
 }
 
-#endif // CEDAR_AUX_ANNOTATIONS_NAMESPACE_H
+#endif // CEDAR_PROC_TYPECHECK_NAMESPACE_H

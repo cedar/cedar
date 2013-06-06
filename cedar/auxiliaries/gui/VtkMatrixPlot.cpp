@@ -22,36 +22,40 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatDataPlot.cpp
+    File:        VtkMatrixPlot.cpp
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 08 28
+    Maintainer:  Kai Kuchenbecker
+    Email:       Kai.Kuchenbecker@ini.ruhr-uni-bochum.de,
+    Date:        2013 05 05
 
     Description:
 
     Credits:
 
 ======================================================================================================================*/
-
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
+#define NOMINMAX // prevents MSVC conflicts
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/MatDataPlot.h"
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_VTK
+
+#include "cedar/auxiliaries/gui/VtkMatrixPlot.h"
+#include "cedar/auxiliaries/gui/VtkLinePlot.h"
+#include "cedar/auxiliaries/gui/VtkSurfacePlot.h"
+#include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
-#include "cedar/auxiliaries/gui/ImagePlot.h"
-#include "cedar/auxiliaries/gui/MatrixPlot.h"
-#include "cedar/auxiliaries/gui/exceptions.h"
-#include "cedar/auxiliaries/annotation/ColorSpace.h"
-#include "cedar/auxiliaries/annotation/Disparity.h"
-#include "cedar/auxiliaries/annotation/Depth.h"
+#include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
-#include <QLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // type registration
@@ -61,13 +65,13 @@ namespace
   bool registerPlot()
   {
     using cedar::aux::MatData;
-    using cedar::aux::gui::MatDataPlot;
+    using cedar::aux::gui::VtkMatrixPlot;
 
-    typedef cedar::aux::gui::PlotDeclarationTemplate<MatData, MatDataPlot> DeclarationType;
+    typedef cedar::aux::gui::PlotDeclarationTemplate<MatData, VtkMatrixPlot> DeclarationType;
 
     boost::shared_ptr<DeclarationType> declaration(new DeclarationType());
     declaration->declare();
-    cedar::aux::gui::PlotManagerSingleton::getInstance()->setDefault<MatData, MatDataPlot>();
+
     return true;
   }
 
@@ -75,15 +79,19 @@ namespace
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+// static members
+//----------------------------------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gui::MatDataPlot::MatDataPlot(QWidget *pParent)
+cedar::aux::gui::VtkMatrixPlot::VtkMatrixPlot(QWidget* pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
 mpCurrentPlotWidget(NULL)
 {
-  QVBoxLayout *p_layout = new QVBoxLayout();
+  QVBoxLayout* p_layout = new QVBoxLayout();
   this->setLayout(p_layout);
 
   this->setContentsMargins(0, 0, 0, 0);
@@ -94,7 +102,7 @@ mpCurrentPlotWidget(NULL)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::aux::gui::MatDataPlot::canAppend(cedar::aux::ConstDataPtr data) const
+bool cedar::aux::gui::VtkMatrixPlot::canAppend(cedar::aux::ConstDataPtr data) const
 {
   if (this->mpCurrentPlotWidget == NULL)
   {
@@ -102,7 +110,7 @@ bool cedar::aux::gui::MatDataPlot::canAppend(cedar::aux::ConstDataPtr data) cons
   }
   else if
   (
-    cedar::aux::gui::MultiPlotInterface *p_multi_plot
+    cedar::aux::gui::MultiPlotInterface* p_multi_plot
       = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlotWidget)
   )
   {
@@ -114,23 +122,23 @@ bool cedar::aux::gui::MatDataPlot::canAppend(cedar::aux::ConstDataPtr data) cons
   }
 }
 
-void cedar::aux::gui::MatDataPlot::doAppend(cedar::aux::ConstDataPtr data, const std::string& title)
+void cedar::aux::gui::VtkMatrixPlot::doAppend(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   CEDAR_DEBUG_ASSERT(this->mpCurrentPlotWidget != NULL);
-  cedar::aux::gui::MultiPlotInterface *p_multi_plot
+  cedar::aux::gui::MultiPlotInterface* p_multi_plot
     = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlotWidget);
 
   CEDAR_DEBUG_ASSERT(p_multi_plot != NULL);
   p_multi_plot->append(data, title);
 }
 
-void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
+void cedar::aux::gui::VtkMatrixPlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   this->mData= boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
   if (!this->mData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
-                "Cannot cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot::display.");
+                "Cannot cast to cedar::aux::MatData in cedar::aux::gui::VtkMatrixPlot::display.");
   }
 
   if (this->mpCurrentPlotWidget)
@@ -139,52 +147,36 @@ void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std
     this->mpCurrentPlotWidget = NULL;
   }
 
-  // color space-annotated data
-  try
-  {
-    // data should be plotted as an image
-    cedar::aux::annotation::ConstColorSpacePtr color_space = this->mData->getAnnotation<cedar::aux::annotation::ColorSpace>();
-    cedar::aux::gui::ImagePlot* p_plot = new cedar::aux::gui::ImagePlot();
-    p_plot->plot(this->mData, title);
-    this->mpCurrentPlotWidget = p_plot;
-  }
-  catch(cedar::aux::AnnotationNotFoundException&)
-  {
-  }
+  const cv::Mat& mat = this->mData->getData();
+  unsigned int dims = cedar::aux::math::getDimensionalityOf(mat);
 
-  // disparity-annotated data
-  try
+  switch (dims)
   {
-    // data should be plotted as an image
-    auto color_space = this->mData->getAnnotation<cedar::aux::annotation::Disparity>();
-    cedar::aux::gui::ImagePlot* p_plot = new cedar::aux::gui::ImagePlot();
-    p_plot->plot(this->mData, title);
-    this->mpCurrentPlotWidget = p_plot;
-  }
-  catch(cedar::aux::AnnotationNotFoundException&)
-  {
-  }
+    case 1:
+      this->mpCurrentPlotWidget = new cedar::aux::gui::VtkLinePlot(this->mData, title);
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
+      break;
 
-  // depth-annotated data
-  try
-  {
-    //data should be plotted as an image
-    auto colorSpace = this->mData->getAnnotation<cedar::aux::annotation::Depth>();
-    cedar::aux::gui::ImagePlot* p_plot = new cedar::aux::gui::ImagePlot();
-    p_plot->plot(this->mData, title);
-    this->mpCurrentPlotWidget = p_plot;
-  }
-  catch(cedar::aux::AnnotationNotFoundException&)
-  {
-  }
+    case 2:
+      this->mpCurrentPlotWidget = new cedar::aux::gui::VtkSurfacePlot(this->mData, title);
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
+      break;
 
-  if (this->mpCurrentPlotWidget == NULL)
-  {
-    // data should be plotted as a matrix
-    cedar::aux::gui::MatrixPlot* p_plot = new cedar::aux::gui::MatrixPlot();
-    p_plot->plot(this->mData, title);
-    this->mpCurrentPlotWidget = p_plot;
+    default:
+    {
+      std::string message = "The VTK matrix plot widget can not handle a matrix with the given dimensionality (";
+      message += cedar::aux::toString(mat.dims);
+      message += ")\nPress here to refresh the plot after you have changed the dimensionality.";
+      this->mpCurrentPlotWidget = new QPushButton(QString::fromStdString(message));
+      connect(this->mpCurrentPlotWidget, SIGNAL(pressed()), this, SLOT(processChangedData()));
+    }
   }
-
   this->layout()->addWidget(this->mpCurrentPlotWidget);
 }
+
+void cedar::aux::gui::VtkMatrixPlot::processChangedData()
+{
+  this->plot(this->mData, "");
+}
+
+#endif // CEDAR_USE_VTK

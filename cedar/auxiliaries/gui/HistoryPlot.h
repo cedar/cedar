@@ -73,6 +73,12 @@ public:
    */
   void plot(cedar::aux::ConstDataPtr data, const std::string& title);
 
+public slots:
+  /*!@brief Reacts to a change in the plotted data.
+   *
+   * When the dimensionality of the plotted data changes, this causes a switch of the plot type.
+   */
+  void processChangedData();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -91,7 +97,7 @@ private:
 protected:
   // none yet
 private:
-  cedar::aux::ConstDataPtr mData;
+  cedar::aux::ConstMatDataPtr mData;
   cedar::aux::gui::PlotInterface* mpCurrentPlotWidget;
 }; // class cedar::aux::gui::HistoryPlot
 
