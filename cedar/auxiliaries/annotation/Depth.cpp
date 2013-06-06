@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Dimensions.h
+    File:        Depth.h
 
     Maintainer:  Guido Knips
     Email:       guido.knips@ini.ruhr-uni-bochum.de
-    Date:        2012 06 29
+    Date:        2013 05 03
 
     Description:
 
