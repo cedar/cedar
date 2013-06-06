@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatrixSlicePlot3D.h
+    File:        TypeCheck.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2012 05 29
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 10 10
 
     Description:
 
@@ -34,30 +34,23 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H
-#define CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H
+#ifndef CEDAR_PROC_TYPE_CHECK_TYPE_CHECK_H
+#define CEDAR_PROC_TYPE_CHECK_TYPE_CHECK_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/PlotInterface.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/processing/DataSlot.h"
 
 // SYSTEM INCLUDES
-#include <QLabel>
-#include <QReadWriteLock>
-#include <opencv2/opencv.hpp>
 
-/*!@brief A slice-plot for 3D matrices.
+
+/*!@brief Basic interface for type checks that automate the determineInputValidty functionality.
  */
-class cedar::aux::gui::MatrixSlicePlot3D : public cedar::aux::gui::PlotInterface
+class cedar::proc::typecheck::TypeCheck
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -67,50 +60,56 @@ class cedar::aux::gui::MatrixSlicePlot3D : public cedar::aux::gui::PlotInterface
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The constructor.
-  MatrixSlicePlot3D(QWidget* pParent = NULL);
+  TypeCheck
+  (
+    cedar::proc::DataSlot::VALIDITY returnedOnOk = cedar::proc::DataSlot::VALIDITY_VALID,
+    cedar::proc::DataSlot::VALIDITY returnedOnFail = cedar::proc::DataSlot::VALIDITY_ERROR
+  );
+
   //!@brief Destructor
+  virtual ~TypeCheck();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Displays the data.
+  /*!@brief Checks the validity of the given data for the given slot.
    *
-   * @param data A pointer to the data to display. If this isn't a pointer to a cedar::aux::MatData, the function
-   *             throws.
-   * @param title title of the plot window
+   *        Override this function to implement your own validity check. Note, that this should either return
+   *        validityOk() or validityBad(), rather than the direct constants.
    */
-  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
+  virtual cedar::proc::DataSlot::VALIDITY check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr) const = 0;
 
-  /*!@brief Updates the plot periodically.
+  /*!@brief The validity that is to be returned when the check succeeds.
    */
-  void timerEvent(QTimerEvent *pEvent);
+  inline cedar::proc::DataSlot::VALIDITY validityOk() const
+  {
+    return this->mReturnedOnOk;
+  }
+
+  /*!@brief The validity that is to be returned when the check fails.
+   */
+  inline cedar::proc::DataSlot::VALIDITY validityBad() const
+  {
+    return this->mReturnedOnFail;
+  }
+
+  cedar::proc::DataSlot::VALIDITY operator()(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data) const
+  {
+    return this->check(slot, data);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief Reacts to a resize of the plot.
-   */
-  void resizeEvent(QResizeEvent *event);
-
-  /*!@brief Processes key events.
-   *
-   * This function handles ctrl+G, which saves the window settings.
-   */
-  virtual void keyPressEvent(QKeyEvent* pEvent);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Creates the image based on the matrix.
-   */
-  void slicesFromMat(const cv::Mat& mat);
-
-  /*!@brief Resizes the pixmap used to display the image data.
-   */
-  void resizePixmap();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -118,26 +117,11 @@ private:
 protected:
   // none yet
 private:
-  //! Label used for displaying the image.
-  QLabel* mpImageDisplay;
+  cedar::proc::DataSlot::VALIDITY mReturnedOnOk;
 
-  //! Data displayed by the plot.
-  cedar::aux::ConstMatDataPtr mData;
+  cedar::proc::DataSlot::VALIDITY mReturnedOnFail;
 
-  //! Converted image.
-  QImage mImage;
+}; // class cedar::proc::typecheck::TypeCheck
 
-  //! Id of the timer used for updating the plot.
-  int mTimerId;
+#endif // CEDAR_PROC_TYPE_CHECK_TYPE_CHECK_H
 
-  cv::Mat mSliceMatrix;
-  cv::Mat mSliceMatrixByte;
-  cv::Mat mSliceMatrixByteC3;
-  cv::Mat mSliceSize;
-  bool mDataIsSet;
-
-  //! desired columns of the slice plot
-  unsigned int mDesiredColumns;
-}; // class cedar::aux::gui::MatrixSlicePlot3D
-
-#endif // CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H

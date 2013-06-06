@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatrixSlicePlot3D.h
+    File:        Depth.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2012 05 29
+    Maintainer:  Guido Knips
+    Email:       guido.knips@ini.ruhr-uni-bochum.de
+    Date:        2013 05 03
 
     Description:
 
@@ -34,83 +34,56 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H
-#define CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H
+#ifndef CEDAR_AUX_ANNOTATION_DEPTH_H
+#define CEDAR_AUX_ANNOTATION_DEPTH_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/PlotInterface.h"
+#include "cedar/auxiliaries/annotation/namespace.h"
+#include "cedar/auxiliaries/annotation/Annotation.h"
+#include "cedar/auxiliaries/Cloneable.h"
 
 // SYSTEM INCLUDES
-#include <QLabel>
-#include <QReadWriteLock>
-#include <opencv2/opencv.hpp>
 
-/*!@brief A slice-plot for 3D matrices.
+/*!@brief An annotation that indicates depth data.
  */
-class cedar::aux::gui::MatrixSlicePlot3D : public cedar::aux::gui::PlotInterface
+class cedar::aux::annotation::Depth
+:
+public cedar::aux::annotation::Annotation,
+public cedar::aux::Cloneable<cedar::aux::annotation::Depth, cedar::aux::annotation::Annotation>
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The constructor.
-  MatrixSlicePlot3D(QWidget* pParent = NULL);
-  //!@brief Destructor
+  //!@brief Constructor.
+  Depth();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Displays the data.
-   *
-   * @param data A pointer to the data to display. If this isn't a pointer to a cedar::aux::MatData, the function
-   *             throws.
-   * @param title title of the plot window
-   */
-  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
-
-  /*!@brief Updates the plot periodically.
-   */
-  void timerEvent(QTimerEvent *pEvent);
+  std::string getDescription() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief Reacts to a resize of the plot.
-   */
-  void resizeEvent(QResizeEvent *event);
-
-  /*!@brief Processes key events.
-   *
-   * This function handles ctrl+G, which saves the window settings.
-   */
-  virtual void keyPressEvent(QKeyEvent* pEvent);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Creates the image based on the matrix.
-   */
-  void slicesFromMat(const cv::Mat& mat);
-
-  /*!@brief Resizes the pixmap used to display the image data.
-   */
-  void resizePixmap();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -118,26 +91,9 @@ private:
 protected:
   // none yet
 private:
-  //! Label used for displaying the image.
-  QLabel* mpImageDisplay;
+  // none yet
 
-  //! Data displayed by the plot.
-  cedar::aux::ConstMatDataPtr mData;
+}; // class cedar::aux::annotation::Depth
 
-  //! Converted image.
-  QImage mImage;
+#endif // CEDAR_AUX_ANNOTATION_DEPTH_H
 
-  //! Id of the timer used for updating the plot.
-  int mTimerId;
-
-  cv::Mat mSliceMatrix;
-  cv::Mat mSliceMatrixByte;
-  cv::Mat mSliceMatrixByteC3;
-  cv::Mat mSliceSize;
-  bool mDataIsSet;
-
-  //! desired columns of the slice plot
-  unsigned int mDesiredColumns;
-}; // class cedar::aux::gui::MatrixSlicePlot3D
-
-#endif // CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H

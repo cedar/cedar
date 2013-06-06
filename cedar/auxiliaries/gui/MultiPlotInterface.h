@@ -101,4 +101,3 @@ private:
 }; // class cedar::aux::gui::MultiPlotInterface
 
 #endif // CEDAR_AUX_GUI_MULTI_PLOT_INTERFACE_H
-

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,32 +22,56 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ImagePlot.h
+    File:        VtkSurfacePlot.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 22
+    Maintainer:  Kai Kuchenbecker
+    Email:       Kai.Kuchenbecker@ini.ruhr-uni-bochum.de
+    Date:        2012 11 07
 
-    Description:
+    Description: 
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_IMAGE_PLOT_H
-#define CEDAR_AUX_GUI_IMAGE_PLOT_H
+#ifndef CEDAR_AUX_GUI_VTK_SURFACE_PLOT_H
+#define CEDAR_AUX_GUI_VTK_SURFACE_PLOT_H
+
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_VTK
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/PlotInterface.h"
-#include "cedar/auxiliaries/annotation/namespace.h"
+#include "cedar/auxiliaries/math/namespace.h"
 
 // SYSTEM INCLUDES
-#include <QLabel>
+#include <QWidget>
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
-#include <qwtplot3d/qwt3d_types.h>
-
+// VTK INCLUDES
+#include <vtkVersion.h>
+#include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkSmartPointer.h>
+#include <vtkDoubleArray.h>
+#include <QVTKWidget.h>
+#include <QVTKInteractor.h>
+#if VTK_MAJOR_VERSION <= 5
+  #include <vtkPlaneSource.h>
+  #include <vtkPoints.h>
+  #include <vtkPolyData.h>
+  #include <vtkDataSetMapper.h>
+  #include <vtkTransformPolyDataFilter.h>
+  #include <vtkWarpScalar.h>
+#else // VTK_MAJOR_VERSION <= 5
+  #include <vtkChartXYZ.h>
+  #include <vtkContextView.h>
+  #include <vtkPlotSurface.h>
+  #include <vtkTable.h>
+#endif // VTK_MAJOR_VERSION <= 5
 
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar
@@ -58,19 +82,20 @@ namespace cedar
     {
       namespace detail
       {
-        /* This is an internal class of ImagePlot that cannot be nested because Qt's moc doesn't support nested classes.
+        /* This is an internal class of VtkSurfacePlot that cannot be nested because Qt's moc doesn't support nested classes.
          *
-         * Don't use it outside of the ImagePlot!
+         * Don't use it outside of the VtkSurfacePlot!
          */
-        class ImagePlotWorker : public QObject
+        class VtkSurfacePlotWorker : public QObject
         {
           Q_OBJECT
 
           public:
-            ImagePlotWorker(cedar::aux::gui::ImagePlot* pPlot)
+            VtkSurfacePlotWorker(cedar::aux::gui::VtkSurfacePlot* pPlot)
             :
             mpPlot(pPlot)
             {
+
             }
 
           public slots:
@@ -78,20 +103,25 @@ namespace cedar
 
           signals:
             void done();
+            void dataChanged();
 
           public:
-            cedar::aux::gui::ImagePlot *mpPlot;
+            cedar::aux::gui::VtkSurfacePlot* mpPlot;
         };
-        CEDAR_GENERATE_POINTER_TYPES(ImagePlotWorker);
+        CEDAR_GENERATE_POINTER_TYPES(VtkSurfacePlotWorker);
       }
     }
   }
 }
 //!@endcond
 
-/*!@brief A plot for images.
+
+/*!@brief Matrix plot that can display 1D matrices (i.e. vectors).
+ *
+ *        This plot is capable of displaying any matrix data with a dimensionality of one. It displays the data as a
+ *        line, assuming the indices of the matrix as the x axis.
  */
-class cedar::aux::gui::ImagePlot : public cedar::aux::gui::PlotInterface
+class cedar::aux::gui::VtkSurfacePlot : public cedar::aux::gui::PlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -101,67 +131,35 @@ class cedar::aux::gui::ImagePlot : public cedar::aux::gui::PlotInterface
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::aux::gui::detail::ImagePlotWorker;
+  friend class cedar::aux::gui::detail::VtkSurfacePlotWorker;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //! Enum for quickly accessing the type of the data displayed by the viewer.
-  enum DataType
-  {
-    DATA_TYPE_IMAGE,
-    DATA_TYPE_MAT,
-    DATA_TYPE_UNKNOWN
-  };
-
-  //! Widget used for displaying the image.
-  class ImageDisplay : public QLabel
-  {
-    public:
-      ImageDisplay(cedar::aux::gui::ImagePlot* pPlot, const QString& text);
-
-    protected:
-      void mousePressEvent(QMouseEvent * pEvent);
-
-    public:
-      cedar::aux::ConstMatDataPtr mData;
-
-      cedar::aux::gui::ImagePlot* mpPlot;
-  };
-
+  
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ImagePlot(QWidget *pParent = NULL);
+  VtkSurfacePlot(QWidget* pParent = NULL);
 
-  //!@todo implement this constructor (see SurfacePlot.cpp)
-  // ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
+  //!@brief Constructor expecting a DataPtr.
+  VtkSurfacePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent = NULL);
 
-  //!@brief Destructor.
-  ~ImagePlot();
+  //!@brief Destructor
+  ~VtkSurfacePlot();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Displays the data.
-   *
-   * @param data A pointer to the data to display. If this isn't a pointer to a cedar::aux::ImageData, the function
-   *             throws.
-   * @param title title of the plot window
-   */
-  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
+  //!@brief display data
+  void plot(cedar::aux::ConstDataPtr matData, const std::string& title);
 
-  /*!@brief Updates the plot periodically.
-   */
-  void timerEvent(QTimerEvent *pEvent);
-
-  /*!@brief Set the scaling mode of the plot.
-   */
-  void setSmoothScaling(bool smooth);
+  //!@brief handle timer events
+  void timerEvent(QTimerEvent* pEvent);
 
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
@@ -171,26 +169,18 @@ signals:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief Reacts to a resize of the plot.
-   */
-  void resizeEvent(QResizeEvent *event);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Resizes the pixmap used to display the image data.
-   */
-  void resizePixmap();
+  //!@brief initialize
+  void init();
 
-  /*!@brief Converts a one-channel input matrix to a three-channel matrix that contains the one-channel matrix in all
-   *        channels.
-   */
-  cv::Mat threeChannelGrayscale(const cv::Mat& in) const;
-
-  /*!@brief Creates the image based on the matrix.
-   */
-  void imageFromMat(const cv::Mat& mat);
+  #if VTK_MAJOR_VERSION <= 5
+    void buildPlane(unsigned int x_size, unsigned int y_size);
+    void setupCamera(vtkCamera* pCamera, const cv::Mat& data);
+  #endif
 
 private slots:
   void conversionDone();
@@ -201,45 +191,49 @@ private slots:
 protected:
   // none yet
 private:
-  //! Label used for displaying the image.
-  cedar::aux::gui::ImagePlot::ImageDisplay *mpImageDisplay;
+  //!@brief QVTKWidget nested in QWidget. Contains the View.
+  QVTKWidget* mpVtkWidget;
+  //! the displayed MatData
+  cedar::aux::ConstMatDataPtr mMatData;
+  #if VTK_MAJOR_VERSION <= 5
+    //! plane that is displayed
+    vtkSmartPointer<vtkPlaneSource> mpPlane;
+    //transform-filter; builds the plane.
+    vtkSmartPointer<vtkTransformPolyDataFilter> mpTransformFilter;
+    //! contains converted data points
+    vtkSmartPointer<vtkPolyData> mpData;
+    //! warps the plane according to scalar values
+    vtkSmartPointer<vtkWarpScalar> mpWarper;
+    //! maps the points of warped plane into polygons
+    vtkSmartPointer<vtkDataSetMapper> mpMapper;
+    //! renders the plot
+    vtkSmartPointer<vtkRenderer> mpRenderer;
+    vtkSmartPointer<vtkRenderWindow> mpRenderWindow;
 
-  //! Data displayed by the plot.
-  cedar::aux::ConstMatDataPtr mData;
+    vtkSmartPointer<vtkPoints> mpPlanePoints;
+    vtkSmartPointer<vtkDoubleArray> mpZScalars;
+  #else
+    //! the converted data
+    vtkSmartPointer<vtkTable> mpTable;
+    //! the 3D-Chart containing the plot
+    vtkSmartPointer<vtkChartXYZ> mpChart;
+    //! the surface plot
+    vtkSmartPointer<vtkPlotSurface> mpSurface;
+    //! the view containing the 3D-Chart
+    vtkSmartPointer<vtkContextView> mpView;
+  #endif
 
-  //! The color space annotation of the data (if present).
-  cedar::aux::annotation::ConstColorSpacePtr mDataColorSpace;
 
-  //! Converted image.
-  QImage mImage;
+  //! For locking the plot itself.
+  QReadWriteLock* mpLock;
 
-  //! Lock for mImage.
-  QReadWriteLock mImageLock;
-
-  //! Id of the timer used for updating the plot.
-  int mTimerId;
-
-  //! Type of the data.
-  DataType mDataType;
-
-  //! Thread in which conversion of mat data to qwt triple is done.
+  //! Thread in which matrix data is converted to a qwt-ready format.
   QThread* mpWorkerThread;
 
-  //! Worker object.
-  cedar::aux::gui::detail::ImagePlotWorkerPtr mWorker;
+  //! The worker that does actual converison.
+  cedar::aux::gui::detail::VtkSurfacePlotWorkerPtr mConversionWorker;
 
-  //! True if the plot is currently converting the data to the internal format. Used to skip overlapping timer events.
-  bool mConverting;
+}; // class cedar::aux::gui::SurfacePlot
 
-  //! Whether the matrix should be smoothed during scaling.
-  bool mSmoothScaling;
-
-  static std::vector<char> mLookupTableR;
-  static std::vector<char> mLookupTableG;
-  static std::vector<char> mLookupTableB;
-
-  static QReadWriteLock mLookupTableLock;
-
-}; // class cedar::aux::gui::ImagePlot
-
-#endif // CEDAR_AUX_GUI_IMAGE_PLOT_H
+#endif // CEDAR_USE_VTK
+#endif // CEDAR_AUX_GUI_VTK_SURFACE_PLOT_H

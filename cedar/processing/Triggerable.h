@@ -203,6 +203,9 @@ private:
   //! Counts how often callOnStart was called. This is required to prevent multiple onStart calls.
   unsigned int mStartCalls;
 
+  //! Lock for mStartCalls.
+  QMutex* mpStartCallsLock;
+
 }; // class cedar::proc::Triggerable
 
 #endif // CEDAR_PROC_TRIGGERABLE_H

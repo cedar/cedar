@@ -37,6 +37,10 @@
 #ifndef CEDAR_AUX_GUI_HISTORY_PLOT_0D_H
 #define CEDAR_AUX_GUI_HISTORY_PLOT_0D_H
 
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_QWT
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/MultiPlotInterface.h"
@@ -234,4 +238,5 @@ private:
 
 }; // class cedar::aux::gui::HistoryPlot0D
 
+#endif // CEDAR_USE_QWT
 #endif // CEDAR_AUX_GUI_HISTORY_PLOT_0D_H

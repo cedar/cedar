@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatrixSlicePlot3D.h
+    File:        DerivedFrom.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2012 05 29
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 10 10
 
     Description:
 
@@ -34,30 +34,24 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H
-#define CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H
+#ifndef CEDAR_PROC_TYPECHECK_DERIVED_FROM_H
+#define CEDAR_PROC_TYPECHECK_DERIVED_FROM_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/PlotInterface.h"
+#include "cedar/processing/typecheck/namespace.h"
+#include "cedar/processing/typecheck/TypeCheck.h"
 
 // SYSTEM INCLUDES
-#include <QLabel>
-#include <QReadWriteLock>
-#include <opencv2/opencv.hpp>
 
-/*!@brief A slice-plot for 3D matrices.
+
+/*!@brief A type check that expects either the given type or one of its derived classes.
  */
-class cedar::aux::gui::MatrixSlicePlot3D : public cedar::aux::gui::PlotInterface
+template <class T>
+class cedar::proc::typecheck::DerivedFrom : public cedar::proc::typecheck::TypeCheck
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -66,51 +60,35 @@ class cedar::aux::gui::MatrixSlicePlot3D : public cedar::aux::gui::PlotInterface
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The constructor.
-  MatrixSlicePlot3D(QWidget* pParent = NULL);
-  //!@brief Destructor
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Displays the data.
-   *
-   * @param data A pointer to the data to display. If this isn't a pointer to a cedar::aux::MatData, the function
-   *             throws.
-   * @param title title of the plot window
-   */
-  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
-
-  /*!@brief Updates the plot periodically.
-   */
-  void timerEvent(QTimerEvent *pEvent);
+  cedar::proc::DataSlot::VALIDITY check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr data) const
+  {
+    if (boost::dynamic_pointer_cast<const T>(data))
+    {
+      return this->validityOk();
+    }
+    else
+    {
+      return this->validityBad();
+    }
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief Reacts to a resize of the plot.
-   */
-  void resizeEvent(QResizeEvent *event);
-
-  /*!@brief Processes key events.
-   *
-   * This function handles ctrl+G, which saves the window settings.
-   */
-  virtual void keyPressEvent(QKeyEvent* pEvent);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Creates the image based on the matrix.
-   */
-  void slicesFromMat(const cv::Mat& mat);
-
-  /*!@brief Resizes the pixmap used to display the image data.
-   */
-  void resizePixmap();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -118,26 +96,18 @@ private:
 protected:
   // none yet
 private:
-  //! Label used for displaying the image.
-  QLabel* mpImageDisplay;
+  // none yet
 
-  //! Data displayed by the plot.
-  cedar::aux::ConstMatDataPtr mData;
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-  //! Converted image.
-  QImage mImage;
+private:
+  // none yet
 
-  //! Id of the timer used for updating the plot.
-  int mTimerId;
+}; // class cedar::proc::typecheck::DerivedFrom
 
-  cv::Mat mSliceMatrix;
-  cv::Mat mSliceMatrixByte;
-  cv::Mat mSliceMatrixByteC3;
-  cv::Mat mSliceSize;
-  bool mDataIsSet;
+#endif // CEDAR_PROC_TYPECHECK_DERIVED_FROM_H
 
-  //! desired columns of the slice plot
-  unsigned int mDesiredColumns;
-}; // class cedar::aux::gui::MatrixSlicePlot3D
-
-#endif // CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H

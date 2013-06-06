@@ -186,9 +186,8 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
-    return cedar::proc::DataSlot::VALIDITY_ERROR;
   }
-  return this->cedar::proc::Step::determineInputValidity(slot, data);
+  return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
 bool cedar::dyn::Preshape::isMatrixCompatibleInput(const cv::Mat& matrix) const
