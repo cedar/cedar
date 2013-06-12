@@ -113,7 +113,7 @@ cedar_summary_h3("Plot Libraries")
 
 cedar_summary_lib_found("Qwt" qwt_FOUND)
 cedar_summary_lib_found("QwtPlot3d" qwtplot3d_FOUND)
-cedar_summary_lib_found("Vtk" VTK_FOUND ${VTK_MAJOR_VERSION})
+cedar_summary_lib_found("Vtk" CEDAR_USE_VTK ${VTK_MAJOR_VERSION})
 message("")
 
 cedar_summary_h3("Misc. Libraries")
