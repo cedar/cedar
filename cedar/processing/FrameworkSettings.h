@@ -83,6 +83,10 @@ public:
    */
   void addKnownPlugin(const std::string& file);
 
+  /*!@brief Removes a plugin from the list of plugins known by the processing framework.
+   */
+  void removeKnownPlugin(const std::string& file);
+
   /*!@brief Returns the set of plugins known by the processing framework.
    */
   const std::set<std::string>& getKnownPlugins() const;
