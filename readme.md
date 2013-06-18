@@ -45,13 +45,21 @@ are hosted on [bitbucket](https://bitbucket.org/cedar).
 # Installing cedar
 
 ## Supported operating systems
-For now, Ubuntu Linux is the only supported operating system for cedar. The
+For now, Ubuntu Linux is the only fully supported operating system for cedar. The
 following manual for installing cedar is geared toward Ubuntu Linux and other
 Debian-based Linux distributions. That being said, we have successfully
 installed cedar on all major operating systems (other Linux distributions,
 MacOS, and Windows). In a lot of cases, the installation is not as easy and you
 will have to get creative here and there - but it is possible. Bear with us as
 we try to make cedar more platform independent.
+
+## Supported compilers
+In general, we support GCC versions >= 4.4.5 (including MinGW ports) and MSVC versions >= 2010. 
+You might also use Clang on Mac OS, but its support is provisional. As mentioned above, 
+our main priority is the Linux operating system, so we cannot guarantee that compiling cedar 
+on a different operating system / with a different compiler works out of the box. We are, however, 
+able to help you with the most common problems when trying out non-Linux solutions, so just 
+drop us a message if you are experiencing any problems.
 
 ## Install all dependencies
 
