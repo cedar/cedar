@@ -743,7 +743,6 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& na
                 " does not exist in Connectable \""
                 + this->getName() +
                 "\".");
-    return;
   }
 
   SlotMap::iterator map_iterator = iter->second.find(name);
@@ -758,10 +757,9 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& na
                 "The requested " +
                 cedar::proc::DataRole::type().get(role).prettyString() +
                 " name \"" + name + "\" does not exist.");
-    return;
   }
   locker.unlock();
-
+  
   this->checkMandatoryConnections();
 }
 
