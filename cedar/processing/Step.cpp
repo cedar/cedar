@@ -275,6 +275,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::T
     return;
   }
 
+  QReadLocker connections_lock(this->mpConnectionLock);
   if (!this->mandatoryConnectionsAreSet())
   {
     std::string errors = cedar::aux::join(mInvalidInputNames, ", ");
