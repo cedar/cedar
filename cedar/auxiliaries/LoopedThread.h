@@ -93,12 +93,14 @@
  *
  * \todo Use units instead of doubles
  */
-class cedar::aux::LoopedThread : virtual public cedar::aux::Configurable,
-                                 public QThread
+class cedar::aux::LoopedThread : public QThread,
+                                 virtual public cedar::aux::Configurable
 {
   //----------------------------------------------------------------------------
   // macros
   //----------------------------------------------------------------------------
+  Q_OBJECT
+
   //----------------------------------------------------------------------------
   // constructors and destructor
   //----------------------------------------------------------------------------
@@ -242,6 +244,8 @@ private:
 
   inline void updateStatistics(double stepsTaken);
 
+private slots:
+  void modeChanged();
   //----------------------------------------------------------------------------
   // members
   //----------------------------------------------------------------------------

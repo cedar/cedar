@@ -69,6 +69,10 @@ _mLoopMode
 )
 {
   mStop  = false;
+  // connect to mode change signal
+  QObject::connect(_mLoopMode.get(), SIGNAL(valueChanged()), this, SLOT(modeChanged()));
+  // initially set available parameters
+  this->modeChanged();
   initStatistics();
 }
 
@@ -381,4 +385,38 @@ boost::posix_time::ptime cedar::aux::LoopedThread::getLastTimeStepEnd() const
 boost::posix_time::time_duration cedar::aux::LoopedThread::getLastTimeStepDuration() const
 {
   return mLastTimeStepStart - mLastTimeStepEnd;
+}
+
+void cedar::aux::LoopedThread::modeChanged()
+{
+  switch (_mLoopMode->getValue())
+  {
+    case cedar::aux::LoopMode::Simulated:
+    {
+      this->_mStepSize->setConstant(true);
+      this->_mIdleTime->setConstant(false);
+      this->_mSimulatedTime->setConstant(false);
+      break;
+    }
+    case cedar::aux::LoopMode::RealTime:
+    {
+      this->_mStepSize->setConstant(true);
+      this->_mIdleTime->setConstant(false);
+      this->_mSimulatedTime->setConstant(true);
+      break;
+    }
+    case cedar::aux::LoopMode::Fixed:
+    case cedar::aux::LoopMode::FixedAdaptive:
+    {
+      this->_mStepSize->setConstant(false);
+      this->_mIdleTime->setConstant(true);
+      this->_mSimulatedTime->setConstant(true);
+      break;
+    }
+    default:
+    {
+      // all valid cases are covered above
+      CEDAR_ASSERT(false);
+    }
+  }
 }

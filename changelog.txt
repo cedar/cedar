@@ -56,6 +56,7 @@ likely to undergo major changes:
   - network functionality in the processing framework has several issues; for now, we recommend not using it because
     there are some annoying bugs related to it.
   - using multiple 3D convolutions in separate threads slows down all involved convolutions
+  - the constness of parameters in the PropertyPane is sometimes not updated correctly - de- and reselecting helps
     
 == current stable ==
 - cedar::proc::gui
