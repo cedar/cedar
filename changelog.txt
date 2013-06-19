@@ -56,6 +56,7 @@ likely to undergo major changes:
   - network functionality in the processing framework has several issues; for now, we recommend not using it because
     there are some annoying bugs related to it.
   - using multiple 3D convolutions in separate threads slows down all involved convolutions
+  - the constness of parameters in the PropertyPane is sometimes not updated correctly - de- and reselecting helps
     
 == current stable ==
 - cedar::proc::gui
@@ -77,6 +78,9 @@ likely to undergo major changes:
 - cedar::aux::gui
   - LinePlots now have an option in their context menu to set fixed limits for the y axis.
   - There is now a history plot for 1D matrices.
+  - We added line and surface plots that are based on Vtk. This means that instead of (or in addition to) Qwt and
+    qwtplot3d, you can now use these plots.
+  - Some plotting libraries (Qwt and qwtplot3d) have now become optional.
 - cedar::dev
   - KinematicChain instances now need to be started via ->start() by the implementor. They do not start threading on
     their own, anymore.
@@ -84,7 +88,11 @@ likely to undergo major changes:
   - The processingIde can now be started with the "--no-log" option. This will redirect all log messages to the terminal
     and can be very helpful when steps send too many log messages, leading to a lock-up of the user interface.
   - There is now a system to automatically perform input type checks in processing steps; this can replace writing of
-    the determineInputValidity function. See the documentation and processing tutorial for details.
+    the determineInputValidyity function. See the documentation and processing tutorial for details.
+  - In the processingIde, you can now select a default display mode for steps. The available modes are: icon and text
+    (old behavior, newly created steps are always shown with icon and text), icon only (newly created steps show only
+    an icon) and text for looped (newly created steps always show their icon, text is only shown if the steps are looped,
+    this is the new default)
 
 - cedar::dyn
   - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   

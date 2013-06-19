@@ -73,6 +73,9 @@ NeuralField has both an output and an input slot. Create a connection between th
 of NeuralField. A yellow colored connection should appear, linking up these two slots. Now add a cedar::proc::LoopedTrigger
 from the \b triggers tab. Connect the LoopedTrigger to the NeuralField. Start the LoopedTrigger by right-clicking and
 choosing \b start. The architecture is now running. You can inspect the ongoing processing in NeuralField by right-clicking
-on the element and choosing <i>plot all</i>. If you change the <i>center</i> property of the GaussInput, you can see how
+on the element and choosing <i>defined plots -> field plot</i>. If you change the <i>center</i> property of the GaussInput, you can see how
 a change in input affects the neural field. 
+
+This is the result of the assembly described above:
+@image html doc/pages/tutorials/ProcessingGui/images/processingIde_sample_architecture.png
 */
