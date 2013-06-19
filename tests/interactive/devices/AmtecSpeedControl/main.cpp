@@ -28,7 +28,7 @@
     Email:       bjoern.weghenkel@ini.rub.de
     Date:        2011 01 06
 
-    Description: Example for an @em cedar::dev::robot::KinematicChainWidget.
+    Description: Example for an @em cedar::dev::KinematicChainWidget.
 
     Credits:
 

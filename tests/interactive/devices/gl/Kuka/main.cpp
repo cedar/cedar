@@ -34,9 +34,9 @@
  -----------------------------------------------------------------------------*/
 
 // CEDAR INCLUDES
-#include "cedar/devices/robot/SimulatedKinematicChain.h"
-#include "cedar/devices/robot/gl/KukaArm.h"
-#include "cedar/devices/robot/gui/KinematicChainWidget.h"
+#include "cedar/devices/SimulatedKinematicChain.h"
+#include "cedar/devices/gl/KukaArm.h"
+#include "cedar/devices/gui/KinematicChainWidget.h"
 #include "cedar/auxiliaries/systemFunctions.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
@@ -55,14 +55,14 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create simulated kinematic chains
-  cedar::dev::robot::KinematicChainPtr p_kuka_arm(new cedar::dev::robot::SimulatedKinematicChain());
+  cedar::dev::KinematicChainPtr p_kuka_arm(new cedar::dev::SimulatedKinematicChain());
   p_kuka_arm->readJson(configuration_file);
 
   // create gl visualization objects
   cedar::aux::gl::ObjectVisualizationPtr p_arm_visualization;
-  cedar::dev::robot::gl::KinematicChainPtr p_kuka_arm_visualization
+  cedar::dev::gl::KinematicChainPtr p_kuka_arm_visualization
   (
-    new cedar::dev::robot::gl::KukaArm(p_kuka_arm)
+    new cedar::dev::gl::KukaArm(p_kuka_arm)
   );
   p_arm_visualization = p_kuka_arm_visualization;
 
@@ -77,7 +77,7 @@ int main(int argc, char **argv)
 
   // create control widgets for the scene and the arm
   cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));
-  cedar::dev::robot::gui::KinematicChainWidget widget_arm(p_kuka_arm);
+  cedar::dev::gui::KinematicChainWidget widget_arm(p_kuka_arm);
 
   // show and start everything
   p_scene_widget->show();

@@ -127,10 +127,14 @@ class cedar::aux::gui::HistoryPlot0D : public cedar::aux::gui::MultiPlotInterfac
     cedar::aux::ConstDataPtr mData;
 
     //! The data of this curve, as double data
+    //!@todo Can this be removed? I think that by now, double data inherits MatData...
     cedar::aux::ConstDoubleDataPtr mDoubleData;
 
     //! The data of this curve, as matrix data
     cedar::aux::ConstMatDataPtr mMatData;
+
+    //! The data of this curve, as matrix data
+    cedar::aux::ConstUnitDataPtr mUnitData;
 
     //! The qwt curve
     QwtPlotCurve* mCurve;

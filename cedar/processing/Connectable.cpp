@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Connectable.h"
+#include "cedar/processing/DataConnection.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ExternalData.h"
@@ -76,6 +77,21 @@ cedar::proc::Connectable::~Connectable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Connectable::clearDataSlots()
+{
+  for (auto role_iter = this->mSlotMaps.begin(); role_iter != this->mSlotMaps.end(); ++role_iter)
+  {
+    cedar::proc::DataRole::Id role = role_iter->first;
+    const SlotMap& slot_map = role_iter->second;
+
+    while (!slot_map.empty())
+    {
+      auto first_it = slot_map.begin();
+      this->removeSlot(role, first_it->first);
+    }
+  }
+}
+
 void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& name)
 {
   QWriteLocker locker(this->mpConnectionLock);
@@ -91,7 +107,7 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
   SlotMap::iterator slot_map_iter = slot_map.find(name);
   if (slot_map_iter == slot_map.end())
   {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "No slot of the given name found.");
+    CEDAR_THROW(cedar::proc::InvalidNameException, "No slot of the name \"" + name + "\" found.");
   }
 
   cedar::proc::DataSlotPtr slot = slot_map_iter->second;
@@ -683,6 +699,7 @@ void cedar::proc::Connectable::removeLock
 void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data)
 {
   QWriteLocker locker(this->mpConnectionLock);
+  // find the slot map corresponding to the given role.
   std::map<DataRole::Id, SlotMap>::iterator iter = this->mSlotMaps.find(role);
   if (iter == this->mSlotMaps.end())
   {
@@ -699,6 +716,7 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
   std::cout << "Data/lock: " << this->getName() << "." << name << "/" << (&data->getLock()) << std::endl;
 #endif // DEBUG_LOCKS
 
+  // find the slot with the given name
   SlotMap::iterator map_iterator = iter->second.find(name);
   if (map_iterator == iter->second.end())
   {
@@ -708,18 +726,24 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
                 " name \"" + name + "\" does not exist.");
     return;
   }
-
   cedar::proc::DataSlotPtr slot = map_iterator->second;
 
   // inputs come from a different Connectable
   if (role == cedar::proc::DataRole::INPUT)
   {
+    // no need to remove the old data from the lock set -- this is done via signals/slots
     this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_READ, this->getLockSetForRole(role));
-    CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ExternalData>(slot));
     slot->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
   }
   else
   {
+    // remove old data from the lock set, if any
+    //!@todo This will potentially cause trouble (in the shape of a deadlock) when called while locked.
+    //!@todo Use signals/slots for this as well, as in the input case
+    if (slot->getData())
+    {
+      this->removeLock(slot->getData(), cedar::aux::LOCK_TYPE_WRITE, this->getLockSetForRole(role));
+    }
     this->addLock(&data->getLock(), cedar::aux::LOCK_TYPE_WRITE, this->getLockSetForRole(role));
     data->setOwner(this);
   }
@@ -759,7 +783,7 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& na
                 " name \"" + name + "\" does not exist.");
   }
   locker.unlock();
-  
+
   this->checkMandatoryConnections();
 }
 
@@ -784,6 +808,20 @@ void cedar::proc::Connectable::setBuffer(const std::string& name, cedar::aux::Da
 void cedar::proc::Connectable::setOutput(const std::string& name, cedar::aux::DataPtr data)
 {
   this->setData(DataRole::OUTPUT, name, data);
+
+  std::vector<cedar::proc::DataConnectionPtr> connections;
+  this->getNetwork()->getDataConnections
+  (
+    boost::static_pointer_cast<cedar::proc::Connectable>(this->shared_from_this()),
+    name,
+    connections
+  );
+
+  for (size_t i = 0; i < connections.size(); ++i)
+  {
+    cedar::proc::DataConnectionPtr connection = connections.at(i);
+    connection->getTarget()->getParentPtr()->setInput(connection->getTarget()->getName(), data);
+  }
 }
 
 void cedar::proc::Connectable::freeInput(const std::string& name, cedar::aux::ConstDataPtr data)

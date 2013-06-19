@@ -53,6 +53,8 @@
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ExternalData.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -101,7 +103,7 @@ int main(int, char**)
                << neuron_2->getActivity()
                << std::endl;
     }
-    cedar::aux::sleep(cedar::unit::Milliseconds(1));
+    cedar::aux::sleep(cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second));
   }
 
   // stop the processing

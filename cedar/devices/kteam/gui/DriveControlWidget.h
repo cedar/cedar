@@ -38,7 +38,7 @@
 #define CEDAR_DEV_KTEAM_GUI_DRIVE_CONTROL_WIDGET_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/kteam/EPuckDrive.h"
+#include "cedar/devices/kteam/namespace.h"
 #include "cedar/devices/kteam/gui/ui_DriveControlWidget.h"
 #include "cedar/devices/kteam/gui/namespace.h"
 #include "cedar/auxiliaries/gui/BaseWidget.h"
