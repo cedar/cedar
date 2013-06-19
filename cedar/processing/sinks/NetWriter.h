@@ -75,6 +75,7 @@ public:
   void onStart();
   void onStop();
 
+
   /*! Returns the name of the port.
    */
   inline const std::string& getPort() const
@@ -108,6 +109,9 @@ protected:
 private:
   //!@brief Reacts to a change in the input connection.
   void inputConnectionChanged(const std::string& inputName);
+  //!@brief Resets the step and recreates the yarp connection.
+  void reset();
+  void connect();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

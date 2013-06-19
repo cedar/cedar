@@ -98,6 +98,12 @@ _mPort(new cedar::aux::StringParameter(this, "port", "DEMOCHANNEL"))
 void cedar::proc::sinks::NetWriter::onStart()
 {
   _mPort->setConstant(true);
+
+  this->connect();
+}
+
+void cedar::proc::sinks::NetWriter::connect()
+{
   // instantiate the reader, if not yet done
   if (!mWriter)
   {
@@ -125,6 +131,11 @@ void cedar::proc::sinks::NetWriter::onStop()
   _mPort->setConstant(false);
 }
 
+void cedar::proc::sinks::NetWriter::reset()
+{
+  mWriter.reset();
+  this->connect();
+}
 
 void cedar::proc::sinks::NetWriter::compute(const cedar::proc::Arguments&)
 {
