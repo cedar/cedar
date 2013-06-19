@@ -103,6 +103,7 @@ public:
    *@param suppressWarning: will be passed to applyStop()
    */
   void stop(unsigned int timeout = 500, bool suppressWarning = false); 
+    // TODO: why is this uint and the arg of wait() is ulong?
 
   /*! start the thread and initialize the worker
    *
