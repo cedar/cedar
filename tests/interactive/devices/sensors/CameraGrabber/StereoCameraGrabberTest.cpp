@@ -55,10 +55,9 @@ namespace
 
 int main(int argc, char* argv[])
 {
-
   // grab from device number on the bus (as an integer)
-  const int DEVICE_ID_CHANNEL0 = 0; //197055
-  const int DEVICE_ID_CHANNEL1 = 1; //197105
+  const int DEVICE_ID_CHANNEL0 = 0;
+  const int DEVICE_ID_CHANNEL1 = 1;
 
   // given device-ID is the guid of the cam. or the id on the bus
   const bool  IS_GUID = false;
@@ -146,7 +145,7 @@ int main(int argc, char* argv[])
 
   // you have to check if the framerate is supported by the used camera
   // on firewirecameras only supperted framerates could be set
-  p_grabber->setCameraFps(0,cedar::dev::sensors::camera::FrameRate::FPS_15);
+  p_grabber->setCameraFramerate(0,cedar::dev::sensors::camera::FrameRate::FPS_15);
 
   //----------------------------------------------------------------------------------------
   // apply configuration. this step is essential.
@@ -179,7 +178,7 @@ int main(int argc, char* argv[])
   //check framerate of the grabber-thread (thread isn't started yet)
   //remember: grabberthread have to be started to get new content.
   //          or call CameraGrabber.grab() manually
-  std::cout << "CameraGrabber thread default FPS : " << p_grabber->getFps() << std::endl;
+  std::cout << "CameraGrabber thread default FPS : " << p_grabber->getFramerate() << std::endl;
 
   //----------------------------------------------------------------------------------------
   // grab first frame
@@ -234,7 +233,7 @@ int main(int argc, char* argv[])
   //----------------------------------------------------------------------------------------
   //read the video-files with 30 fps. If the video is slower, then grabber-steps will be bypassed
   //on creation, the framerate will be set, to the value read from the video-file
-  p_grabber->setFps(30);
+  p_grabber->setFramerate(30);
   std::cout << "Start grabbing in the background" << std::endl;
   p_grabber->startGrabber();
 
@@ -263,7 +262,7 @@ int main(int argc, char* argv[])
     if (! (++counter % 200))
     {
       //display real reached fps
-      std::cout << "Thread FPS: " << p_grabber->getFpsMeasured() << std::endl;
+      std::cout << "Thread FPS: " << p_grabber->getMeasuredFramerate() << std::endl;
     }
 
     // change to 100 ms or 1 second

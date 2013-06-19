@@ -47,7 +47,17 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <QMainWindow>
 
+cedar::aux::EnumType<cedar::proc::gui::Settings::StepDisplayMode>
+  cedar::proc::gui::Settings::StepDisplayMode::mType("cedar::proc::gui::Settings::StepDisplayMode::");
+
+// this has to be initialized after mTyoe above (because that is used in its constructor)
 cedar::proc::gui::Settings cedar::proc::gui::Settings::mInstance;
+
+#ifndef CEDAR_COMPILER_MSVC
+const cedar::proc::gui::Settings::StepDisplayMode::Id cedar::proc::gui::Settings::StepDisplayMode::ICON_ONLY;
+const cedar::proc::gui::Settings::StepDisplayMode::Id cedar::proc::gui::Settings::StepDisplayMode::TEXT_FOR_LOOPED;
+const cedar::proc::gui::Settings::StepDisplayMode::Id cedar::proc::gui::Settings::StepDisplayMode::ICON_AND_TEXT;
+#endif // CEDAR_COMPILER_MSVC
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -87,6 +97,7 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   ui_settings->addConfigurableChild("tools", mTools);
   ui_settings->addConfigurableChild("properties", mProperties);
 
+
   this->mSnapToGrid = cedar::aux::BoolParameterPtr
                       (
                         new cedar::aux::BoolParameter
@@ -108,6 +119,17 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
                                       false
                                     )
                                   );
+
+  this->_mDefaultStepDisplayMode = cedar::aux::EnumParameterPtr
+      (
+        new cedar::aux::EnumParameter
+        (
+          display_settings.get(),
+          "default step display mode",
+          cedar::proc::gui::Settings::StepDisplayMode::typePtr(),
+          cedar::proc::gui::Settings::StepDisplayMode::TEXT_FOR_LOOPED
+        )
+      );
 
   cedar::aux::ConfigurablePtr recent_files(new cedar::aux::Configurable());
   this->addConfigurableChild("fileHistory", recent_files);

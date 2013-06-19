@@ -119,13 +119,15 @@ private:
   class ImageDisplay : public QLabel
   {
     public:
-      ImageDisplay(const QString& text);
+      ImageDisplay(cedar::aux::gui::ImagePlot* pPlot, const QString& text);
 
     protected:
       void mousePressEvent(QMouseEvent * pEvent);
 
     public:
       cedar::aux::ConstMatDataPtr mData;
+
+      cedar::aux::gui::ImagePlot* mpPlot;
   };
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -134,6 +136,9 @@ private:
 public:
   //!@brief The standard constructor.
   ImagePlot(QWidget *pParent = NULL);
+
+  //!@todo implement this constructor (see SurfacePlot.cpp)
+  // ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
 
   //!@brief Destructor.
   ~ImagePlot();
@@ -236,4 +241,5 @@ private:
   static QReadWriteLock mLookupTableLock;
 
 }; // class cedar::aux::gui::ImagePlot
+
 #endif // CEDAR_AUX_GUI_IMAGE_PLOT_H

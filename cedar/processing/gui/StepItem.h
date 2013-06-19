@@ -114,7 +114,7 @@ private:
   class Decoration
   {
     public:
-      Decoration(StepItem* pStep, const QIcon& icon, const QString& description);
+      Decoration(StepItem* pStep, const QString& icon, const QString& description);
 
       ~Decoration()
       {
@@ -131,7 +131,9 @@ private:
 
       QGraphicsRectItem* mpRectangle;
 
-      const QIcon& mIconSource;
+      QIcon mIconSource;
+
+      QString mIconFile;
   };
 
   CEDAR_GENERATE_POINTER_TYPES(Decoration);
@@ -288,7 +290,7 @@ private:
 
   void addDataItemFor(cedar::proc::DataSlotPtr slot);
 
-  QDockWidget* createDockWidget(const std::string& title) const;
+  QWidget* createDockWidget(const std::string& title, QWidget* pPlot) const;
 
 private slots:
   void displayStyleMenuTriggered(QAction* pAction);
@@ -348,8 +350,6 @@ private:
   //! The decorations for this step.
   std::vector<DecorationPtr> mDecorations;
 
-  //! Icon for indicating that a step is looped.
-  static QIcon mLoopedIcon;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------

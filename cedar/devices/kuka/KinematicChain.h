@@ -94,14 +94,6 @@ public:
    */
   virtual void setJointAngle(unsigned int index, double angle);
 
-  /*!@brief Sets the mode in which the joints positions are set (angle/velocity/acceleration)
-   *
-   * this function restarts the looped thread
-   * \throws std::out_of_range if index is out of range
-   * @param actionType new working mode
-   */
-  virtual void setWorkingMode(cedar::dev::robot::KinematicChain::ActionType actionType);
-
   /*!@brief starts the looped thread
    *
    * the KinematicChain class does some things in this function that are not needed

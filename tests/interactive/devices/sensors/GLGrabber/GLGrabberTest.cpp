@@ -217,7 +217,7 @@ int main(int argc, char **argv)
   // The grabbing have to be done in the GUI-thread!
   // If you start background-grabbing, a segmentation-fault occur!
 
-  // p_grabber->setFps(50);
+  // p_grabber->setFramerate(50);
   // p_grabber->startGrabber();
 
   unsigned int counter=0;
@@ -245,7 +245,7 @@ int main(int argc, char **argv)
     if (! (++counter %= 200))
     {
       // display real reached fps
-      std::cout << "Thread FPS: " << p_grabber->getFpsMeasured() << std::endl;
+      std::cout << "Thread FPS: " << p_grabber->getMeasuredFramerate() << std::endl;
     }
     cedar::aux::sleep(cedar::unit::Milliseconds(1));
   }

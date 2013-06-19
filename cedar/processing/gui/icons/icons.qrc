@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/">
+    <file>decorations/looped.svg</file>
     <file>modeicons/select.svg</file>
     <file>modeicons/connect.svg</file>
     <file>modeicons/group.svg</file>
@@ -43,6 +44,8 @@
     <file>toolbaricons/save.svg</file>
     <file>toolbaricons/grid.svg</file>
     <file>toolbaricons/reset.svg</file>
-    <file>decorations/looped.svg</file>
+    <file>toolbaricons/show_triggers.svg</file>
+    <file>toolbaricons/hide_triggers.svg</file>
+    <file>processing_ide_app_icon.svg</file>
   </qresource>
 </RCC>

@@ -38,6 +38,10 @@
 
 ======================================================================================================================*/
 
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_QWTPLOT3D
+
 #define NOMINMAX // prevents MSVC conflicts
 
 // CEDAR INCLUDES
@@ -176,7 +180,7 @@ void cedar::aux::gui::SurfacePlot::Perspective::applyTo(Qwt3D::Plot3D* pPlot)
 
 void cedar::aux::gui::SurfacePlot::plot(cedar::aux::ConstDataPtr data, const std::string& /* title */)
 {
-  this->mMatData = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data);
+  this->mMatData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
 
   if (!this->mMatData)
   {
@@ -358,3 +362,5 @@ void cedar::aux::gui::SurfacePlot::contextMenuEvent(QContextMenuEvent * pEvent)
     }
   }
 }
+
+#endif // CEDAR_USE_QWTPLOT3D

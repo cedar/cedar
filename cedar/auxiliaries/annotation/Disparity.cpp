@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraDeviceVfl.cpp
+    File:        Dimensions.h
 
-    Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.rub.de
-    Date:        2012 07 04
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 06 29
 
-    Description:  Implementation for the cedar::dev::sensors::camera::DeviceVfl class
+    Description:
 
     Credits:
 
@@ -37,54 +37,25 @@
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-#ifdef CEDAR_USE_VIDEO_FOR_LINUX
-
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/camera/backends/DeviceVfl.h"
-
+#include "cedar/auxiliaries/annotation/Disparity.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::sensors::camera::DeviceVfl::CameraDeviceVfl
-(
-  cedar::dev::sensors::camera::Channel* pCameraChannel
-)
-:
-cedar::dev::sensors::camera::Device::CameraDevice(pCameraGrabber,pCameraChannel)
+
+
+cedar::aux::annotation::Disparity::Disparity()
 {
 }
-
-
-cedar::dev::sensors::camera::DeviceVfl::~CameraDeviceVfl()
-{
-}
-
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::sensors::camera::DeviceVfl::setProperties()
+std::string cedar::aux::annotation::Disparity::getDescription() const
 {
-
+  return "Disparity";
 }
-
-bool cedar::dev::sensors::camera::DeviceVfl::createCaptureObject()
-{
-
-}
-
-void cedar::dev::sensors::camera::DeviceVfl::applySettingsToCamera()
-{
-
-}
-
-void cedar::dev::sensors::camera::DeviceVfl::applyStateToCamera()
-{
-
-}
-
-#endif // CEDAR_USE_VIDEO_FOR_LINUX

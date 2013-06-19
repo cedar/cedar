@@ -121,7 +121,7 @@ void cedar::dyn::Preshape::eulerStep(const cedar::unit::Time& time)
   if
   (
     cedar::aux::ConstMatDataPtr peak_detector
-      = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(this->getInput("peak detector"))
+      = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(this->getInput("peak detector"))
   )
   {
     peak = cedar::aux::math::getMatrixEntry<double>(peak_detector->getData(), 0, 0);
@@ -146,7 +146,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
   if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "input")
   {
     //!@todo Reenable this once the annotations for space code are introduced.
-    /* if (cedar::dyn::ConstSpaceCodePtr input = boost::shared_dynamic_cast<const cedar::dyn::SpaceCode>(data))
+    /* if (cedar::dyn::ConstSpaceCodePtr input = boost::dynamic_pointer_cast<const cedar::dyn::SpaceCode>(data))
     {
       if (!this->isMatrixCompatibleInput(input->getData()))
       {
@@ -157,7 +157,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
-    else */ if (cedar::aux::ConstMatDataPtr input = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+    else */ if (cedar::aux::ConstMatDataPtr input = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
     {
       if (!this->isMatrixCompatibleInput(input->getData()))
       {
@@ -173,7 +173,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
   }
   else if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "peak detector")
   {
-    if (cedar::aux::ConstMatDataPtr input = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+    if (cedar::aux::ConstMatDataPtr input = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
     {
       if (cedar::aux::math::getDimensionalityOf(input->getData()) != 0)
       {
@@ -184,38 +184,20 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
-    return cedar::proc::DataSlot::VALIDITY_ERROR;
   }
-  return this->cedar::proc::Step::determineInputValidity(slot, data);
+  return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
 bool cedar::dyn::Preshape::isMatrixCompatibleInput(const cv::Mat& matrix) const
 {
-  // special case due to opencv's strange handling of 1d-matrices
-  if(matrix.dims == 2 && (matrix.rows == 1 || matrix.cols == 1))
+  if (matrix.type() != CV_32F)
   {
-    // if this field is set to more dimensions than the input (in this case 1), they are not compatible
-    if (this->_mDimensionality->getValue() != 1)
-      return false;
-
-    CEDAR_DEBUG_ASSERT(this->_mSizes->getValue().size() == 1);
-
-    // if the dimensions are both 1, rows or cols must be the same as the field size
-    if (static_cast<int>(this->_mSizes->at(0)) != matrix.rows
-        && static_cast<int>(this->_mSizes->at(0)) != matrix.cols)
-      return false;
+    return false;
   }
-  else
-  {
-    if (static_cast<int>(this->_mDimensionality->getValue()) != matrix.dims)
-      return false;
-    for (unsigned int dim = 0; dim < this->_mSizes->getValue().size(); ++dim)
-    {
-      if (matrix.size[static_cast<int>(dim)] != static_cast<int>(this->_mSizes->at(dim)))
-        return false;
-    }
-  }
-  return true;
+
+  unsigned int matrix_dim = cedar::aux::math::getDimensionalityOf(matrix);
+  return this->_mDimensionality->getValue() == matrix_dim
+           && cedar::aux::math::matrixSizesEqual(matrix, this->mActivation->getData());
 }
 
 void cedar::dyn::Preshape::dimensionalityChanged()

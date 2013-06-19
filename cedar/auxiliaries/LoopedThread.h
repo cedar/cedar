@@ -270,6 +270,8 @@ private:
   //! overwritten method. called when the thread finishes via stop().
   void applyStop(bool suppressWarning);
 
+private slots:
+  void modeChanged();
   //----------------------------------------------------------------------------
   // members
   //----------------------------------------------------------------------------

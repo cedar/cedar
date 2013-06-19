@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,128 +22,108 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraDeviceDc1394.h
+    File:        VtkMatrixPlot.h
 
-    Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.rub.de
-    Date:        2012 07 04
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 07 14
 
-    Description:  Header for the cedar::dev::sensors::camera::DeviceDc1394 class
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_CAMERA_DEVICE_DC1394_H
-#define CEDAR_DEV_SENSORS_CAMERA_DEVICE_DC1394_H
+#ifndef CEDAR_AUX_GUI_VTK_MATRIX_PLOT_H
+#define CEDAR_AUX_GUI_VTK_MATRIX_PLOT_H
 
-// CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
-#ifdef CEDAR_USE_LIB_DC1394
+#ifdef CEDAR_USE_VTK
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/camera/namespace.h"
-#include "cedar/devices/sensors/camera/backends/Device.h"
+#include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/gui/MultiPlotInterface.h"
 
 // SYSTEM INCLUDES
+#include <QWidget>
+#include <QReadWriteLock>
+#include <opencv2/opencv.hpp>
+#include <qwtplot3d/qwt3d_types.h>
 
-
-
-/*!@brief Base class of the misc camera grabber backends.
+/*!@brief Base class for plots that can display matrices.
  *
- * Implements the common features of a camera device
+ *        Based on the dimensionality of the data plotted, this class decides which type of plot to open. Currently,
+ *        these are:
+ *
+ *        none              for 0D matrices,
+ *
+ *        VtkLinePlot       for 1D matrices,
+ *
+ *        VtkSurfacePlot    for 2D matrices and
+ *
+ *        none              for 3D matrices.
+ *
  */
-class cedar::dev::sensors::camera::DeviceDc1394
-:
-public cedar::dev::sensors::camera::Device
+class cedar::aux::gui::VtkMatrixPlot : public cedar::aux::gui::MultiPlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DeviceDc1394
-  (
-    cedar::dev::sensors::camera::Channel* pCameraChannel
-  );
-
-  //!@brief Destructor
-  ~DeviceDc1394();
+  VtkMatrixPlot(QWidget* pParent = NULL);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! does the backend initialization
-  void init();
+  //!@brief display a MatData
+  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
 
-  //! update settings from gui
-  //void updateSettings();
+  bool canAppend(cedar::aux::ConstDataPtr data) const;
 
-  //!@brief Enable/disable framerates for the current selected frame mode
-  void updateFps();
+public slots:
+  /*!@brief Reacts to a change in the plotted data.
+   *
+   * When the dimensionality of the plotted data changes, this causes a switch of the plot type.
+   */
+  void processChangedData();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-  // derived from class Device
-  void applySettingsToCamera();
-  bool createCaptureObject();
-
-  /*! @brief Opens the wanted camera with libDc methods
-   *
-   *  The wanted camera is determind from the camereaId of the channel (set in the constructor or in the gui)
-   *  @returns True, if camera was successfully opened, otherwise false
-   */
-  bool openLibDcCamera();
-
-  //! get all features from cam
-  void getFeaturesFromLibDc();
-
-  /*! get all framerates and enable them in the enum-class, disable all others
-   *  \param modeId The grabbing mode for the framerates (framerate selection depends on actual used grabbing mode)
-   */
-  void getFrameRatesFromLibDc(cedar::dev::sensors::camera::VideoMode::Id modeId);
-
-  //! get all available modes and enable them in the enum-class, disable all others and set mode to "AUTO"
-  void getGrabModesFromLibDc();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
-
+  void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! firewire interface for available settings and properties from camera
-  cedar::dev::sensors::camera::LibDcBasePtr mpLibDcInterface;
-
+  // none yet
 private:
-  // none yet
+  //!@brief the displayed MatData
+  cedar::aux::ConstMatDataPtr mData;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
+  //!@brief the plot widget
+  QWidget* mpCurrentPlotWidget;
 
-private:
-  // none yet
+}; // class cedar::aux::gui::VtkMatrixPlot
 
-}; // class cedar::dev::sensors::camera::DeviceDc1394
-
-#endif // defined CEDAR_USE_LIB_DC1394
-
-#endif // CEDAR_DEV_SENSORS_CAMERA_DEVICE_DC1394_H
-
+#endif // CEDAR_USE_VTK
+#endif // CEDAR_AUX_GUI_VTK_MATRIX_PLOT_H

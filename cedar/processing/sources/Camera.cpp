@@ -122,9 +122,6 @@ cedar::proc::sources::Camera::~Camera()
 
 void cedar::proc::sources::Camera::changedFrameSize()
 {
-#ifdef DEBUG_CAMERA_STEP
-  std::cout << "processing step: " <<  __PRETTY_FUNCTION__ << std::endl;
-#endif
   this->updateFrame();
 }
 
@@ -132,13 +129,8 @@ void cedar::proc::sources::Camera::changedFrameSize()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Camera::onStart()
 {
-#ifdef DEBUG_CAMERA_STEP
-  std::cout << "processing step: " <<  __PRETTY_FUNCTION__ << std::endl;
-#endif
-
   if (!this->getCameraGrabber()->isCreated())
   {
     this->applyParameter();
@@ -150,18 +142,22 @@ void cedar::proc::sources::Camera::onStart()
   }
 }
 
-//----------------------------------------------------------------------------------------------------------------------
+
 void cedar::proc::sources::Camera::onStop()
 {
-#ifdef DEBUG_CAMERA_STEP
-  std::cout << "processing step: " <<  __PRETTY_FUNCTION__ << std::endl;
-#endif
-
   this->getCameraGrabber()->setIsGrabbing(false);
 }
-//----------------------------------------------------------------------------------------------------------------------
+
+
 void cedar::proc::sources::Camera::applyParameter()
 {
+  if (this->getCameraGrabber()->isCreated() && this->getCameraGrabber()->isRunning())
+  {
+    std::string msg = this->getCameraGrabber()->getName() + ": Already grabbing! Please stop grabbing and try again!";
+    cedar::aux::LogSingleton::getInstance()->warning(msg,"void cedar::proc::sources::Camera::applyParameter()");
+    return;
+  }
+
   if (this->getCameraGrabber()->applyParameter())
   {
     this->updateFrame();
@@ -174,12 +170,10 @@ void cedar::proc::sources::Camera::applyParameter()
                                                "void cedar::proc::sources::Camera::applyParameter()"
                                              );
   }
-
   //this->callReset();
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Camera::updateFrame()
 {
   if (this->getCameraGrabber()->isCreated())
@@ -194,7 +188,6 @@ void cedar::proc::sources::Camera::updateFrame()
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Camera::compute(const cedar::proc::Arguments&)
 {
   // get the time-diff between two steps

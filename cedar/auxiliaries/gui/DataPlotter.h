@@ -116,4 +116,5 @@ private:
   cedar::aux::gui::PlotInterface *mpCurrentPlot;
 
 }; // class cedar::aux::gui::DataPlotter
+
 #endif // CEDAR_PROC_GUI_DATA_PLOTTER_H

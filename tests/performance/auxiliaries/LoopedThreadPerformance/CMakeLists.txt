@@ -24,13 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Oliver Lomp,
-#                Mathis Richter,
-#                Stephan Zibner
-#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-#                mathis.richter@ini.ruhr-uni-bochum.de,
-#                stephan.zibner@ini.ruhr-uni-bochum.de
-#   Date:        2011 05 23
+#   Maintainer:  Jean-Stephane Jokeit
+#   Email:       jean-stehane.jokeit@ini.ruhr-uni-bochum.de
+#   Date:        2013 06 19
 #
 #   Description:
 #
@@ -38,6 +34,4 @@
 #
 #=======================================================================================================================
 
-if(CEDAR_USE_LIB_DC1394)
-  cedar_add_executable(fwCameraSaveCapabilities)
-endif(CEDAR_USE_LIB_DC1394)
+cedar_add_performance_test(LoopedThreadPerformance main.cpp)

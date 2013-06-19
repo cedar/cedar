@@ -49,9 +49,7 @@
 
 // SYSTEM INCLUDES
 
-
-/*! @class cedar::dev::sensors::visual::VideoGrabber
- *  @brief This grabber grabs images from video-files
+/*! @brief This grabber grabs images from video-files
  *
  *    This grabber will grab from all video-files known by OpenCV and/or ffmpeg
  *    Please look at their documentation for supported types (i.e. mpg, avi, ogg,...)
@@ -68,18 +66,18 @@ public cedar::dev::sensors::visual::Grabber
 
   protected slots:
 
-  //!@brief A slot that is triggered if a new filename is set
+  //! @brief A slot that is triggered if a new filename is set
   void fileNameChanged();
 
-  //!@brief A slot that is triggered if the speedfactor is set
+  //! @brief A slot that is triggered if the speedfactor is set
   void speedFactorChanged();
 
   signals:
 
-  //!@brief This signal is emitted, when a new videofile is successfully opened.
+  //! @brief This signal is emitted, when a new videofile is successfully opened.
   void doVideoChanged();
 
-  //!@brief This signal is emitted, when the speedFactor is changed.
+  //! @brief This signal is emitted, when the speedFactor is changed.
   void doSpeedFactorChanged();
 
   private:
@@ -138,7 +136,7 @@ public:
   void setLooped(bool loop = true);
 
   //! @brief Check if looping is on or off
-  bool getLooped();
+  bool getLooped() const;
 
   /*! @brief Set the factor for grabbing speed
    *
@@ -193,7 +191,7 @@ public:
 
   /*! @brief This passes the arguments directly to the corresponding capture
    *
-   *  With this Method, it is possible to get Information on any channel.
+   *    With this Method, it is possible to get Information on any channel.
    *  @param channel This is the index of the source you want parameter value.< br >
    *  @param propId This is any supported property - Id<br>
    *    If property-id is not supported or unknown, return value will be 0
@@ -208,7 +206,7 @@ public:
    *    Default channel is 0
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
-  double getSourceFps(unsigned int channel=0);
+  double getSourceFramerate(unsigned int channel = 0);
 
   /*! @brief Get the codec for the given channel. This value will be read from the appropriate video-file.
    *
@@ -216,13 +214,13 @@ public:
    *    This value is the FOURCC-code from the video-file.
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
-  double getSourceEncoding(unsigned int channel=0);
+  double getSourceEncoding(unsigned int channel = 0);
 
   /*! @brief Get the used file to grab from
    *  @param channel The channel which filename should be read
-   *  @throws IndexOutOfRangeException If channel isn't fit
+   *  @throw IndexOutOfRangeException If channel isn't fit
    */
-  const std::string getSourceFile(unsigned int channel = 0);
+  const std::string getSourceFile(unsigned int channel = 0) const;
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -231,21 +229,21 @@ public:
 protected:
 
   // inherited from Grabber
-  bool onCreateGrabber();
+  void onCreateGrabber();
   void onCloseGrabber();
-  std::string onUpdateSourceInfo(unsigned int channel);
+  std::string onGetSourceInfo(unsigned int channel);
   void onCleanUp();
 
   /*! @brief Grab on all available files
    *
-   *      The shortest file determine the end.<br>
-   *      In case of looping through the files, the shortest file define the restart moment
-   *      The image matrix in getImage() could be empty also if the return value is true.
-   *      This happens if looped is false and all frames grabbed from the file, i.e. it is over.
+   *     The shortest file determine the end.<br>
+   *     In case of looping through the files, the shortest file define the restart moment
+   *     The image matrix in getImage() could be empty also if the return value is true.
+   *     This happens if looped is false and all frames grabbed from the file, i.e. it is over.
    *
    *  @param channel The channel, which should be grabbed
    */
-  bool onGrab(unsigned int channel);
+  void onGrab(unsigned int channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -256,7 +254,7 @@ private:
   void init();
 
 
-  /*! Cast the storage vector from base channel struct "GrabberChannelPtr" to
+  /*! @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to
    *  derived class VideoChannelPtr
    */
   inline VideoChannelPtr getVideoChannel(unsigned int channel)
@@ -267,7 +265,7 @@ private:
            );
   }
 
-  /*! Cast the storage vector from base channel struct "GrabberChannelPtr" to
+  /*! @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to
    *  derived class VideoChannellPtr
    */
   inline ConstVideoChannelPtr getVideoChannel(unsigned int channel) const
@@ -310,7 +308,6 @@ private:
    *    so effective FPS should be _mSpeedFactor*AVI-Speed
    */
   cedar::aux::IntParameterPtr _mSpeedFactor;
-
 
 }; // class cedar::dev::sensors::visual::VideoGrabber
 

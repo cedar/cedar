@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatrixPlot.cpp
+    File:        HistoryPlot0D.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -37,6 +37,9 @@
     Credits:
 
 ======================================================================================================================*/
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_QWT
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
@@ -54,6 +57,7 @@
 #include <QMenu>
 #include <QThread>
 #include <iostream>
+#include <limits.h>
 
 // MACROS
 // Enable to show information on locking/unlocking
@@ -71,6 +75,7 @@
 
 std::vector<QColor> cedar::aux::gui::HistoryPlot0D::mLineColors;
 std::vector<Qt::PenStyle> cedar::aux::gui::HistoryPlot0D::mLineStyles;
+boost::posix_time::ptime cedar::aux::gui::HistoryPlot0D::mPlotStartTime = boost::posix_time::microsec_clock::local_time();
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -184,7 +189,6 @@ void cedar::aux::gui::HistoryPlot0D::init()
 {
   mMaxHistorySize = 500;
 
-  mXArray.resize(mMaxHistorySize);
   this->mCurves.clear();
   this->mCurves.push_back(CurveInfoPtr(new CurveInfo()));
 
@@ -195,8 +199,9 @@ void cedar::aux::gui::HistoryPlot0D::init()
   QVBoxLayout *p_layout = new QVBoxLayout();
   this->setLayout(p_layout);
 
-  mpPlot = new QwtPlot(this);
+  this->mpPlot = new QwtPlot(this);
   this->layout()->addWidget(mpPlot);
+  this->mpPlot->setAxisTitle(QwtPlot::xBottom, "time (s)");
 
   mpWorkerThread = new QThread();
   mWorker = cedar::aux::gui::detail::HistoryPlot0DWorkerPtr(new cedar::aux::gui::detail::HistoryPlot0DWorker(this));
@@ -266,7 +271,7 @@ double cedar::aux::gui::HistoryPlot0D::getDataValue(size_t index)
   CEDAR_DEBUG_ASSERT(index < this->mCurves.size());
 
   // lock the data
-  this->mCurves[index]->mData->lockForRead();
+  QReadLocker data_locker(&this->mCurves[index]->mData->getLock());
 
   // read out the double value
   double val = 0.0;
@@ -280,22 +285,22 @@ double cedar::aux::gui::HistoryPlot0D::getDataValue(size_t index)
     //!@todo This check if the data still has the correct format should be somewhere else (probably)
     if (cedar::aux::math::getDimensionalityOf(matrix) != 0 || matrix.empty()) // plot is no longer capable of displaying the data
     {
-      this->mCurves[index]->mData->unlock();
+      data_locker.unlock();
       emit dataChanged();
       return 0.0;
     }
     val = cedar::aux::math::getMatrixEntry<double>(matrix, 0, 0);
   }
 
-  this->mCurves[index]->mData->unlock();
+  data_locker.unlock();
   return val;
 }
 
 void cedar::aux::gui::HistoryPlot0D::CurveInfo::setData(cedar::aux::ConstDataPtr data)
 {
   this->mData = data;
-  this->mDoubleData = boost::shared_dynamic_cast<cedar::aux::ConstDoubleData>(data);
-  this->mMatData = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data);
+  this->mDoubleData = boost::dynamic_pointer_cast<cedar::aux::ConstDoubleData>(data);
+  this->mMatData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
 
   if (!this->mDoubleData && !this->mMatData)
   {
@@ -319,32 +324,26 @@ void cedar::aux::gui::HistoryPlot0D::doAppend(cedar::aux::ConstDataPtr data, con
   curve->mCurve = new QwtPlotCurve(QString::fromStdString(title));
   curve->mCurve->attach(this->mpPlot);
   this->applyStyle(index, curve->mCurve);
-
-  double val = this->getDataValue(index);
-  curve->mYValues.assign(this->mpXValues.size(), val);
 }
 
 //!@cond SKIPPED_DOCUMENTATION
 void cedar::aux::gui::detail::HistoryPlot0DWorker::convert()
 {
-  //!@todo: Use actual time measurements here
-  if (this->mpPlot->mpXValues.empty())
-  {
-    this->mpPlot->mpXValues.push_back(0);
-  }
-  else
-  {
-    this->mpPlot->mpXValues.push_back(this->mpPlot->mpXValues.back() + 1);
-  }
-
-  while (this->mpPlot->mpXValues.size() > this->mpPlot->mMaxHistorySize)
-  {
-    this->mpPlot->mpXValues.pop_front();
-  }
-
   for (size_t curve_index = 0; curve_index < this->mpPlot->mCurves.size(); ++curve_index)
   {
     cedar::aux::gui::HistoryPlot0D::CurveInfoPtr curve = this->mpPlot->mCurves[curve_index];
+
+    // update x value
+    boost::posix_time::time_duration time
+      = boost::posix_time::microsec_clock::local_time() - this->mpPlot->mPlotStartTime;
+    curve->mXValues.push_back(static_cast<double>(time.total_milliseconds())/1000.0);
+
+    while (curve->mXValues.size() > this->mpPlot->mMaxHistorySize)
+    {
+      curve->mXValues.pop_front();
+    }
+
+    // update y value
     curve->mYValues.push_back(this->mpPlot->getDataValue(curve_index));
 
     while (curve->mYValues.size() > this->mpPlot->mMaxHistorySize)
@@ -352,11 +351,11 @@ void cedar::aux::gui::detail::HistoryPlot0DWorker::convert()
       curve->mYValues.pop_front();
     }
 
-    this->mpPlot->mXArray.assign(this->mpPlot->mpXValues.begin(), this->mpPlot->mpXValues.end());
+    curve->mXArray.assign(curve->mXValues.begin(), curve->mXValues.end());
     curve->mYArray.assign(curve->mYValues.begin(), curve->mYValues.end());
 
-    CEDAR_DEBUG_ASSERT(this->mpPlot->mpXValues.size() == curve->mYValues.size());
-    CEDAR_DEBUG_ASSERT(this->mpPlot->mXArray.size() == curve->mYArray.size());
+    CEDAR_DEBUG_ASSERT(curve->mXValues.size() == curve->mYValues.size());
+    CEDAR_DEBUG_ASSERT(curve->mXArray.size() == curve->mYArray.size());
   }
 
   emit done();
@@ -365,30 +364,37 @@ void cedar::aux::gui::detail::HistoryPlot0DWorker::convert()
 
 void cedar::aux::gui::HistoryPlot0D::conversionDone()
 {
+  double x_min = std::numeric_limits<double>::max(), x_max = 1.0;
   for (size_t curve_index = 0; curve_index < this->mCurves.size(); ++curve_index)
   {
     CurveInfoPtr curve = this->mCurves[curve_index];
+
+    x_min = std::min(x_min, curve->mXArray.front());
+    x_max = std::max(x_max, curve->mXArray.back());
 
     // choose the right function depending on the qwt version
     //!@todo write a macro that does this check (see MatrixPlot1D.cpp)
 #if (QWT_VERSION >> 16) == 5
     curve->mCurve->setData
     (
-      &this->mXArray.front(),
+      &curve->mXArray.front(),
       &curve->mYArray.front(),
-      static_cast<int>(this->mpXValues.size())
+      static_cast<int>(curve->mXValues.size())
     );
 #elif (QWT_VERSION >> 16) == 6
     curve->mCurve->setRawSamples
     (
-      &this->mXArray.front(),
+      &curve->mXArray.front(),
       &curve->mYArray.front(),
-      static_cast<int>(this->mpXValues.size())
+      static_cast<int>(curve->mXValues.size())
     );
 #else
 #error unsupported qwt version
 #endif
   }
+
+  this->mpPlot->setAxisScale(QwtPlot::xBottom, x_min, x_max);
+
   this->mpPlot->replot();
 }
 
@@ -401,3 +407,5 @@ void cedar::aux::gui::HistoryPlot0D::timerEvent(QTimerEvent* /* pEvent */)
 
   emit convert();
 }
+
+#endif // CEDAR_USE_QWT

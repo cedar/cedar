@@ -22,130 +22,120 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Device.h
+    File:        CameraBackendDc1394.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 07 04
 
-    Description:  Header for the cedar::dev::sensors::camera::Device class
+    Description:  Header for the cedar::dev::sensors::camera::BackendDc1394 class
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_CAMERA_DEVICE_H
-#define CEDAR_DEV_SENSORS_CAMERA_DEVICE_H
+#ifndef CEDAR_DEV_SENSORS_CAMERA_BACKEND_DC1394_H
+#define CEDAR_DEV_SENSORS_CAMERA_BACKEND_DC1394_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
+#ifdef CEDAR_USE_LIB_DC1394
+
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/camera/namespace.h"
-#include "cedar/auxiliaries/SetParameter.h"
-#include "cedar/devices/sensors/camera/Properties.h"
-#include "cedar/devices/sensors/camera/Channel.h"
+#include "cedar/devices/sensors/camera/backends/Backend.h"
 
 // SYSTEM INCLUDES
-#include <opencv2/opencv.hpp>
-#include <QReadWriteLock>
+
 
 
 /*!@brief Base class of the misc camera grabber backends.
  *
  * Implements the common features of a camera device
  */
-class cedar::dev::sensors::camera::Device
+class cedar::dev::sensors::camera::BackendDc1394
+:
+public cedar::dev::sensors::camera::Backend
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-  //!@brief The standard constructor.
-  Device(cedar::dev::sensors::camera::Channel* pCameraChannel);
-
 public:
+  //!@brief The standard constructor.
+  BackendDc1394
+  (
+    cedar::dev::sensors::camera::Channel* pCameraChannel
+  );
+
   //!@brief Destructor
-  virtual ~Device();
+  ~BackendDc1394();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! does the backend initialization
+  void init();
 
-  /*! In this method, properties and settings from the backend could be set
-   *
-   *  read the values probably with the help of external libraries in order to read
-   *  min/max values or supported features from the wanted device and set them in the channel structure.
-   *  This method is called before createCaptureDevice() is invoked.
-   *
-   */
-  virtual void init();
+  //! update settings from gui
+  //void updateSettings();
 
-  /*! @brief Initialization of the class
-   *
-   *  This function have to be called after the class was created.
-   *
-   * @return True, if the cameras are successfully initialized, otherwise false.
-   */
-  bool createCaptureDevice();
+  //!@brief Enable/disable framerates for the current selected frame mode
+  void updateFps();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  //! Create a new Capture device
-  virtual bool createCaptureObject() = 0;
+  // derived from class Backend
+  void applySettingsToCamera();
+  void createCaptureObject();
 
-  //! Apply all Settings to the Camera
-  virtual void applySettingsToCamera() = 0;
-
-  //! Apply all Parameters from the GUI to the Camera
-  void applyStateToCamera();
-
-
-  //! Test all properties from the device and enable/disable the properties of the channel
-  virtual void getAvailablePropertiesFromCamera(){};
-
-
-  /*! @brief Set a property direct in the cv::VideoCapture class
+  /*! @brief Opens the wanted camera with libDc methods
    *
-   *  @param propertyId The OpenCV constants for cv::VideoCapture.set() method
-   *  @param value The new value
-   *  @return Boolean value, that indicates if the value is properly set
+   *  The wanted camera is determind from the camereaId of the channel (set in the constructor or in the gui)
+   *  @throw cedar::dev::sensors::camera::LibDcCameraNotFoundException Thrown, if the wanted or no camera is not found
+   *  @throw cedar::dev::sensors::camera::LibDcException Thrown, if the camera couldn't be opened by
+   *         the firewire backend
    */
-  bool setPropertyToCamera(unsigned int propertyId, double value);
+  void openLibDcCamera();
 
+  //! @brief Get all features of the opened camera from libdc
+  void readFeaturesFromLibDc();
 
-  /*! @brief Get a property directly form the cv::VideoCapture
-   *
-   *    Use this method only for properties which are not (yet) supported by cedar CameraProperty()
-   *    or CameraSetting() class. But be aware, that there is no check if the wanted property is supported
-   *    by the used backend
-   *
-   *  @param propertyId The OpenCV constants for cv::VideoCapture.set() method
-   *  @return Value, that indicates the exit-state of cv::VideoCapture.set()
+  /*! @brief Get all framerates and enable them in the enum-class, disable all others
+   *  @param modeId The grabbing mode for the framerates (framerate selection depends on actual used grabbing mode)
    */
-  double getPropertyFromCamera(unsigned int propertyId);
+  void readFrameRatesFromLibDc(cedar::dev::sensors::camera::VideoMode::Id modeId);
+
+  //! @brief Get all available modes and enable them in the enum-class, disable all others and set mode to "AUTO"
+  void readGrabModesFromLibDc();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  /*! @brief Search the Firewire-Bus for the camera with the given GUID and return the bus-ID
+   *  @param guid The GUID of the camera to search
+   *  @throw  cedar::dev::sensors::camera::LibDcCameraNotFoundException Thrown, if the wanted camera is not found
+   *  @return The Bus-ID of the Camera.
+   */
+  unsigned int getBusIdFromGuid(unsigned int guid);
+
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! The channel structure
-  cedar::dev::sensors::camera::Channel* mpCameraChannel;
+  //! @brief The firewire interface for available settings and properties from camera
+  cedar::dev::sensors::camera::LibDcBasePtr mpLibDcInterface;
 
 private:
   // none yet
@@ -159,39 +149,9 @@ protected:
 private:
   // none yet
 
-}; // class cedar::dev::sensors::camera::Device
+}; // class cedar::dev::sensors::camera::BackendDc1394
 
-/*
-// The typedefs for the manager of the Devices
-#include "cedar/auxiliaries/FactoryManager.h"
+#endif // defined CEDAR_USE_LIB_DC1394
 
-namespace cedar
-{
-  namespace dev
-  {
-    namespace sensors
-    {
-      namespace visual
-      {
-        //!@brief The manager of all sigmoind instances
-        typedef cedar::aux::FactoryManager<DevicePtr> DeviceManager;
-
-#ifdef MSVC
-#ifdef CEDAR_LIB_EXPORTS_DEV
-        // dllexport
-        template class __declspec(dllexport) cedar::aux::Singleton<DeviceManager>;
-#else // CEDAR_LIB_EXPORTS_DEV
-      // dllimport
-        extern template class __declspec(dllimport) cedar::aux::Singleton<DeviceManager>;
-#endif // CEDAR_LIB_EXPORTS_DEV
-#endif // MSVC
-
-        //!@brief The singleton object of the TransferFunctionFactory.
-        typedef cedar::aux::Singleton<DeviceManager> DeviceManagerSingleton;
-      }
-    }
-  }
-}
-*/
-#endif // CEDAR_DEV_SENSORS_CAMERA_DEVICE_H
+#endif // CEDAR_DEV_SENSORS_CAMERA_BACKEND_DC1394_H
 

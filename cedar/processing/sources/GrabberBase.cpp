@@ -108,19 +108,28 @@ void cedar::proc::sources::GrabberBase::setRecording()
     bool want_recording = this->mRecording->getValue();
     bool is_recording = this->mpGrabber->isRecording();
 
+    //check if already recording or not
     if (want_recording == is_recording)
     {
       return;
     }
 
-    //check if already recording or not
     std::string info;
-
     if (want_recording)
     {
       //record
-      //!@todo:change to speed from looped trigger or grab via grabbing-thread
-      this->mpGrabber->startRecording(15,0,true,false);
+
+      //!@todo: change to speed from looped trigger (not possible to get this) or grab via grabbing-thread
+      //!@todo: record with given encoding from enum RecordType
+
+      // try to get measured fps (but this could only be calculated if setIsGrabbing is set to true)
+      double fps = this->mpGrabber->getMeasuredFramerate();
+      if (fps < 1)
+      {
+        fps = 15;
+      }
+
+      this->mpGrabber->startRecording(fps,0,true,false);
       info = "Recording ON";
       cedar::aux::LogSingleton::getInstance()->message(info,"cedar::proc::sources::GrabberSource::setRecording()");
 

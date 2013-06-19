@@ -34,6 +34,10 @@
 
 ======================================================================================================================*/
 
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_QWT
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/MatrixVectorPlot.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
@@ -203,7 +207,7 @@ void cedar::aux::gui::MatrixVectorPlot::doAppend(cedar::aux::ConstDataPtr data, 
   mpLock->lockForWrite();
   mPlotSeriesVector.push_back(plot_series);
 
-  plot_series->mMatData = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data);
+  plot_series->mMatData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
 
 
   if (!plot_series->mMatData)
@@ -456,3 +460,5 @@ void cedar::aux::gui::MatrixVectorPlot::timerEvent(QTimerEvent * /* pEvent */)
   this->mpPlot->replot();
   mpLock->unlock();
 }
+
+#endif // CEDAR_USE_QWT

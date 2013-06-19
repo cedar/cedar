@@ -52,7 +52,6 @@
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Manager.h"
-#include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/Log.h"
@@ -184,6 +183,8 @@ cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui)
   QObject::connect(mpActionDuplicate, SIGNAL(triggered()), this, SLOT(duplicateStep()));
 
   QObject::connect(mpActionSelectAll, SIGNAL(triggered()), this, SLOT(selectAll()));
+
+  QObject::connect(mpActionToggleTriggerVisibility, SIGNAL(triggered(bool)), this, SLOT(showTriggerConnections(bool)));
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -589,16 +590,12 @@ void cedar::proc::gui::Ide::logError(const std::string& message)
 
 void cedar::proc::gui::Ide::startThreads()
 {
-  cedar::proc::Manager::getInstance().startThreads();
-  this->mpThreadsStartAll->setEnabled(false);
-  this->mpThreadsStopAll->setEnabled(true);
+  this->mNetwork->getNetwork()->startTriggers();
 }
 
 void cedar::proc::gui::Ide::stopThreads()
 {
-  cedar::proc::Manager::getInstance().stopThreads();
-  this->mpThreadsStartAll->setEnabled(true);
-  this->mpThreadsStopAll->setEnabled(false);
+  this->mNetwork->getNetwork()->stopTriggers();
 }
 
 void cedar::proc::gui::Ide::newFile()
@@ -796,4 +793,17 @@ void cedar::proc::gui::Ide::fillRecentFilesList()
   }
 
   this->mpRecentFiles->setMenu(p_menu);
+}
+
+void cedar::proc::gui::Ide::showTriggerConnections(bool show)
+{
+  // then, notify view
+  if (show)
+  {
+    mpProcessingDrawer->showTriggerConnections();
+  }
+  else
+  {
+    mpProcessingDrawer->hideTriggerConnections();
+  }
 }

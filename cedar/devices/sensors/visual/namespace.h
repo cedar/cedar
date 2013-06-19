@@ -65,10 +65,6 @@ namespace cedar
       {
         //!@cond SKIPPED_DOCUMENTATION
 
-        //-----------------------------------------------------------------------------------------------
-        // grabber classes
-        //-----------------------------------------------------------------------------------------------
-
         // common base classes for all grabbers
         CEDAR_DECLARE_DEV_CLASS(Grabber);
         CEDAR_DECLARE_DEV_CLASS(GrabberChannel);
@@ -95,33 +91,21 @@ namespace cedar
         CEDAR_DECLARE_DEV_CLASS(TestGrabber);
         CEDAR_DECLARE_DEV_CLASS(TestChannel);
 
-        //-----------------------------------------------------------------------------------------------
-        // enum classes
-        //-----------------------------------------------------------------------------------------------
-        CEDAR_DECLARE_DEV_CLASS(RecordingFormat);
-
-        //-----------------------------------------------------------------------------------------------
-        // misc
-        //-----------------------------------------------------------------------------------------------
         // the channels as ObjectList for the processingGUI
         typedef cedar::aux::ObjectListParameterTemplate<GrabberChannel> ChannelParameter;
         CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(ChannelParameter);
 
-
+        // enum class
+        CEDAR_DECLARE_DEV_CLASS(RecordingFormat);
 
         //-----------------------------------------------------------------------------------------------
         // exceptions
         //-----------------------------------------------------------------------------------------------
-
-        //!@brief An exception for errors on recording
         class GrabberRecordingException;
-
-        //!@brief An exception for errors on saving a snapshot
         class GrabberSnapshotException;
-
-        //!@brief An exception for errors on grabbing
         class GrabberGrabException;
-
+        class InvalidParameterException;
+        class CreateGrabberException;
         //!@endcond
       }
     }

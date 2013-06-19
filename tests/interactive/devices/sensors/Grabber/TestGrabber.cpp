@@ -42,6 +42,7 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
+#include <boost/math/special_functions/round.hpp>
 #include <ios>
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -57,7 +58,7 @@ namespace
     //---------------------------------------------------------------
     bool  test_framrate(cedar::dev::sensors::visual::TestGrabber& grabber )
     {
-      double fps = grabber.getFps();
+      double fps = grabber.getFramerate();
       std::cout << "Start thread . . . " << std::endl;
 
       //startGrabber grabbing and wait
@@ -75,7 +76,7 @@ namespace
       )
       {
         cedar::aux::sleep(cedar::unit::Milliseconds(200));
-        std::cout << "measured fps: "<< grabber.getFpsMeasured()<<std::endl;
+        std::cout << "measured fps: "<< grabber.getMeasuredFramerate()<<std::endl;
        }
 
       //stopGrabber
@@ -87,8 +88,13 @@ namespace
       unsigned int real_count = grabber.getCounter();
       double theoretical_count = fps * test_duration.total_milliseconds() / 1000.0;
 
+      // give 5% measuring inaccuracy
+      double bound = theoretical_count / 100 * 5;
+      unsigned int upper_bound = boost::math::iround(theoretical_count + bound);
+      unsigned int lower_bound = boost::math::iround(theoretical_count - bound);
+
       std::cout << "test finished - ";
-      if ((unsigned int)theoretical_count == real_count)
+      if ( (real_count >= lower_bound) && (real_count <= upper_bound) )
       {
         std::cout << "PASSED"<<std::endl;
         return true;
@@ -154,7 +160,7 @@ int main(int , char **)
 
   //save default values
   int grabber_1_testparam = grabber_1->getTestParam();
-  double grabber_1_fps = grabber_1->getFps();
+  double grabber_1_fps = grabber_1->getFramerate();
   std::string grabber_1_name = grabber_1->getName();
 
   //-----------------------------------------------------------
@@ -165,24 +171,24 @@ int main(int , char **)
             << "---------------------------\n";
 
   std::cout << "\nSet Fps to \"40\" and start thread\n";
-  grabber_1->setFps(40);
+  grabber_1->setFramerate(40);
   test_framrate(*grabber_1);
 
   std::cout << "\nSet Fps to \"100\" and start thread\n";
-  grabber_1->setFps(100);
+  grabber_1->setFramerate(100);
   test_framrate(*grabber_1);
 
   std::cout << "\nSet Fps to \"200\" and start thread\n";
-  grabber_1->setFps(200);
+  grabber_1->setFramerate(200);
   test_framrate(*grabber_1);
 
   std::cout << "\nSet Fps to \"500\" and start thread\n";
-  grabber_1->setFps(500);
+  grabber_1->setFramerate(500);
   test_framrate(*grabber_1);
 
   std::cout << "\nEnforce an error and check the maximum available FPS\n";
   std::cout << "\nSet Fps to \"50000\" and start thread\n";
-  grabber_1->setFps(50000);
+  grabber_1->setFramerate(50000);
   test_framrate(*grabber_1);
 
 
@@ -197,7 +203,7 @@ int main(int , char **)
 
   //do with another number
   grabber_1->setTestParam(456);
-  grabber_1->setFps(50);
+  grabber_1->setFramerate(50);
   grabber_1->setName(GRABBER_NAME_1);
 
   std::cout << "Set:\n\tGrabbername to \"" << GRABBER_NAME_1 << "\"\n"
@@ -222,11 +228,11 @@ int main(int , char **)
   std::cout << "A new grabber created:\n"
             << "\tGrabbername \""<< grabber_2->getName() << "\"\n"
             << "\tTestParam \"" << grabber_2->getTestParam() << "\"\n"
-            << "\tFps \""<< grabber_2->getFps() << "\"\n";
+            << "\tFps \""<< grabber_2->getFramerate() << "\"\n";
 
   //restore default values
   grabber_2->setTestParam(grabber_1_testparam);
-  grabber_2->setFps(grabber_1_fps);
+  grabber_2->setFramerate(grabber_1_fps);
   grabber_2->setName(grabber_1_name);
 
 
@@ -250,7 +256,7 @@ int main(int , char **)
 
   std::cout << "-> A new grabber created with name \""<<grabber_3->getName()<<"\"\n";
   std::cout << "-> grabber_1->getTestParam "<< grabber_3->getTestParam()<<std::endl;
-  std::cout << "-> grabber_1->getFps "<< grabber_3->getFps()<<std::endl;
+  std::cout << "-> grabber_1->getFps "<< grabber_3->getFramerate()<<std::endl;
 
   //create another grabber (a static one)
   std::cout << "\n2.\n";

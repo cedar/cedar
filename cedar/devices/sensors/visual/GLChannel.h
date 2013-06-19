@@ -28,7 +28,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 09 28
 
-    Description: Class GLChannel
+    Description: Class GLChannel contains additional data of a QGLWidget-grabbing channel
 
     Credits:
 
@@ -114,5 +114,4 @@ private:
 }; // class cedar::dev::sensors::visual::GLChannel
 
 #endif // CEDAR_DEV_SENSORS_VISUAL_GLGRABBER_CHANNEL_H
-
 

@@ -191,8 +191,8 @@ int main(int argc, char* argv[])
   p_grabber->setSpeedFactor(1);
   p_grabber->setLooped(true);
 
-  std::cout << "Video FPS              : " << p_grabber->getSourceFps() << std::endl;
-  std::cout << "VideoGrabber thread FPS: " << p_grabber->getFps() << std::endl;
+  std::cout << "Video FPS              : " << p_grabber->getSourceFramerate() << std::endl;
+  std::cout << "VideoGrabber thread FPS: " << p_grabber->getFramerate() << std::endl;
   p_grabber->start();
 
   unsigned int counter_stat = 0;
@@ -219,7 +219,7 @@ int main(int argc, char* argv[])
     //status
     if (!(++counter_stat %= 100) )
     {
-      std::cout << "Measured FPS: " << p_grabber->getFpsMeasured()
+      std::cout << "Measured FPS: " << p_grabber->getMeasuredFramerate()
                 << "\tPos_Rel: "<< p_grabber->getPositionRelative()
                 << "\tPos_Abs: "<< p_grabber->getPositionAbsolute()
                 << std::endl;

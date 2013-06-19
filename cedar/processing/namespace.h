@@ -90,8 +90,11 @@ namespace cedar
     //!@endcond
 
     //!@todo Deprecate this
+
+    //!@cond SKIPPED_DOCUMENTATION
     typedef cedar::aux::PluginDeclarationList PluginDeclaration;
     CEDAR_GENERATE_POINTER_TYPES(PluginDeclaration);
+    //!@endcond
 
     //!@brief a factory for elements
     typedef boost::shared_ptr<cedar::aux::Factory<ElementPtr> > ElementFactoryPtr;
@@ -111,9 +114,11 @@ namespace cedar
     class CEDAR_PROC_LIB_EXPORT InvalidCategoryException;
     class CEDAR_PROC_LIB_EXPORT MissingConnectionException;
     class CEDAR_PROC_LIB_EXPORT MissingDeclarationException;
+    class CEDAR_PROC_LIB_EXPORT NoCheckException;
+    class CEDAR_PROC_LIB_EXPORT NoMappingException;
+    class CEDAR_PROC_LIB_EXPORT NoMeasurementException;
     class CEDAR_PROC_LIB_EXPORT ParseException;
     class CEDAR_PROC_LIB_EXPORT PluginException;
-    class CEDAR_PROC_LIB_EXPORT NoMappingException;
     //!@endcond
   }
 }

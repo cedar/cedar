@@ -37,10 +37,13 @@
     Credits:
 
 ======================================================================================================================*/
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/HistoryPlot.h"
-#include "cedar/auxiliaries/gui/HistoryPlot0D.h"
+#ifdef CEDAR_USE_QWT
+  #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
+#endif // CEDAR_USE_QWT
 #include "cedar/auxiliaries/gui/HistoryPlot1D.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
@@ -99,6 +102,12 @@ cedar::aux::gui::HistoryPlot::~HistoryPlot()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::aux::gui::HistoryPlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
+  this->mData= boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
+  if (!this->mData)
+  {
+    CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
+                "Cannot cast to cedar::aux::MatData in cedar::aux::gui::HistoryPlot::plot.");
+  }
   //!@todo implement for matrices and more dimensions
   if (this->mpCurrentPlotWidget)
   {
@@ -106,32 +115,36 @@ void cedar::aux::gui::HistoryPlot::plot(cedar::aux::ConstDataPtr data, const std
     this->mpCurrentPlotWidget = NULL;
   }
 
-  this->mData = data;
-  if (boost::shared_dynamic_cast<cedar::aux::ConstDoubleData>(data))
-  {
-    this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D();
-  }
-  else if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data))
-  {
-    switch (mat_data->getDimensionality())
-    {
-      case 1:
-        this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot1D();
-        break;
+  const cv::Mat& mat = this->mData->getData();
+  unsigned int dims = cedar::aux::math::getDimensionalityOf(mat);
 
-      default:
-        CEDAR_THROW
-        (
-          cedar::aux::gui::InvalidPlotData,
-          "Don't know how to plot MatData with the given dimensionality ("
-            + cedar::aux::toString(mat_data->getDimensionality()) + "."
-        );
-    }
-  }
-  else
+  switch (dims)
   {
-    CEDAR_THROW(cedar::aux::gui::InvalidPlotData, "Don't know how to plot this data.");
+#ifdef CEDAR_USE_QWT
+    case 0:
+      this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData, title);
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
+      break;
+#endif // CEDAR_USE_QWT
+    case 1:
+      this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot1D(this->mData, title);
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
+      break;
+
+    default:
+      CEDAR_THROW
+      (
+        cedar::aux::gui::InvalidPlotData,
+        "Don't know how to plot MatData with the given dimensionality ("
+          + cedar::aux::toString(mat.dims) + ")."
+      );
   }
+  
   this->mpCurrentPlotWidget->plot(this->mData, title);
   this->layout()->addWidget(this->mpCurrentPlotWidget);
+}
+
+void cedar::aux::gui::HistoryPlot::processChangedData()
+{
+  this->plot(this->mData, "");
 }

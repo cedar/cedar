@@ -61,6 +61,7 @@
  *@see LoopedThread, CallFunctionInThread
  */
 class cedar::aux::detail::ThreadWorker : public QObject
+  // js: TODO important: does this need to inherit Configurable
 {
   Q_OBJECT
 

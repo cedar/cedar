@@ -196,7 +196,7 @@ void cedar::dev::sensors::camera::LibDcBase::closeCamera()
 //----------------------------------------------------------------------------------------------------------------------
 std::string cedar::dev::sensors::camera::LibDcBase::getAllFeaturesAsString()
 {
-  //return an empty vector if no camera opened
+  // return an empty vector if no camera opened
   if (! mpCamera)
   {
     return "";
@@ -388,7 +388,6 @@ std::string cedar::dev::sensors::camera::LibDcBase::DC1394VideoModeToString
     "DC1394_VIDEO_MODE_FORMAT7_6",
     "DC1394_VIDEO_MODE_FORMAT7_7"
   };
-
   return modes[(int)mode - DC1394_VIDEO_MODE_MIN];
 }
 
@@ -433,7 +432,7 @@ std::string cedar::dev::sensors::camera::LibDcBase::DC1394FeatureToCameraGrabber
   dc1394feature_t feature
 ) const
 {
-  // CameraGrabber CameraProperty::Id have the same values like their OpenCv counterparts
+  // CameraGrabber CameraProperty::Id have the same values like their OpenCV counterparts and not dc1394 values
   // so we have to translate to DC1394 features
    
   std::string features[]=

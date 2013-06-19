@@ -120,8 +120,9 @@ else(QGLViewer_FOUND)
 endif(QGLViewer_FOUND)
 
 # libQwt
+option(CEDAR_USE_QWT "Include Qwt based plots if possible." ON)
 message("-- Searching for qwt...")
-find_package(Qwt REQUIRED)
+find_package(Qwt)
 if(qwt_FOUND)
   if (CEDAR_VERBOSE_BUILD_SYSTEM)
     message("-- qwt was found in ${qwt_INCLUDE_DIRS}")
@@ -131,14 +132,14 @@ if(qwt_FOUND)
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${qwt_LIBS})
   include_directories(${qwt_INCLUDE_DIRS})
 else(qwt_FOUND)
-  message(${CEDAR_LIB_ERROR_TYPE} "   Required library qwt was not found on your system!
-  You can try to alter the default search paths in cedar.conf.")
-  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} qwt)
+  message("-- Qwt not found")
+  set(CEDAR_USE_QWT OFF)
 endif(qwt_FOUND)
 
 # qwtplot3d
+option(CEDAR_USE_QWTPLOT3D "Include QwtPlot3d surface plots if possible." ON)
 message("-- Searching for qwtplot3d...")
-find_package(QwtPlot3D REQUIRED)
+find_package(QwtPlot3D)
 if(qwtplot3d_FOUND)
   if (CEDAR_VERBOSE_BUILD_SYSTEM)
     message("-- qwtplot3d was found in ${qwtplot3d_INCLUDE_DIRS}")
@@ -148,10 +149,34 @@ if(qwtplot3d_FOUND)
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${qwtplot3d_LIBS})
   include_directories(${qwtplot3d_INCLUDE_DIRS})
 else(qwtplot3d_FOUND)
-  message(${CEDAR_LIB_ERROR_TYPE} "   Required library qwtplot3d was not found on your system!
-  You can try to alter the default search paths in cedar.conf.")
-  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} qwtplot3d)
+  message("-- QwtPlot3d not found")
+  set(CEDAR_USE_QWTPLOT3D OFF)
 endif(qwtplot3d_FOUND)
+
+# VTK
+option(CEDAR_USE_VTK "Include VTK plots if possible." ON)
+message("-- Searching for VTK...")
+find_package(VTK)
+
+if(VTK_FOUND AND (VTK_MAJOR_VERSION GREATER 5 OR (VTK_MAJOR_VERSION EQUAL 5 AND VTK_MINOR_VERSION GREATER 5)))
+  if (CEDAR_VERBOSE_BUILD_SYSTEM)
+    message("-- VTK ${VTK_VERSION} was found in ${VTK_INCLUDE_DIRS}")
+  else()
+    message("-- VTK ${VTK_VERSION} was found")
+  endif()
+  
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${VTK_LIBRARIES})
+
+  # Vtk 5 and lower must explicitly link qvtk
+  if(NOT VTK_MAJOR_VERSION GREATER 5)
+    set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} QVTK)
+  endif()
+  
+  include(${VTK_USE_FILE})
+else()
+  message("-- VTK 5.6 or higher not found")
+  set(CEDAR_USE_VTK OFF)
+endif()
 
 # OpenGL
 find_package(OpenGL)

@@ -39,6 +39,7 @@
 #include "cedar/auxiliaries/convolution/KernelList.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
 
@@ -68,6 +69,20 @@ void cedar::aux::conv::KernelList::remove(size_t index)
 
 cv::Mat cedar::aux::conv::KernelList::getCombinedKernel() const
 {
+  // sanity check
+  if (this->size() > 1)
+  {
+    unsigned int dim = this->getKernel(0)->getDimensionality();
+    for (unsigned int i = 1; i < this->size(); ++i)
+    {
+      if (dim != this->getKernel(i)->getDimensionality())
+      {
+        // inconsistency, happens while kernels are being updated, ignore
+        CEDAR_THROW(cedar::aux::DimensionalityMismatchException, "not all kernels in this list have the same size");
+      }
+    }
+  }
+
   cv::Mat new_combined_kernel;
   if (this->size() > 0 && this->getKernel(0)->getDimensionality() < 3)
   {

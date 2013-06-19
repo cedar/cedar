@@ -215,7 +215,7 @@ int main(int argc, char **argv)
 
   // start the grabber-thread for reading the GL images in the background
   std::cout << "Start grabbing in the background" << std::endl;
-  p_grabber->setFps(50);
+  p_grabber->setFramerate(50);
   p_grabber->startGrabber();
 
   // start recording (if you like)
@@ -244,7 +244,7 @@ int main(int argc, char **argv)
     if (! (++counter %= 200))
     {
       // display real reached fps
-      std::cout << "Thread FPS: " << p_grabber->getFpsMeasured() << std::endl;
+      std::cout << "Thread FPS: " << p_grabber->getMeasuredFramerate() << std::endl;
     }
     cedar::aux::sleep(cedar::unit::Milliseconds(1));
   }
