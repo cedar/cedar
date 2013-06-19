@@ -158,11 +158,11 @@ option(CEDAR_USE_VTK "Include VTK plots if possible." ON)
 message("-- Searching for VTK...")
 find_package(VTK)
 
-if(VTK_FOUND)
+if(VTK_FOUND AND (VTK_MAJOR_VERSION GREATER 5 OR (VTK_MAJOR_VERSION EQUAL 5 AND VTK_MINOR_VERSION GREATER 5)))
   if (CEDAR_VERBOSE_BUILD_SYSTEM)
-    message("-- VTK was found in ${VTK_INCLUDE_DIRS}")
+    message("-- VTK ${VTK_VERSION} was found in ${VTK_INCLUDE_DIRS}")
   else()
-    message("-- VTK was found")
+    message("-- VTK ${VTK_VERSION} was found")
   endif()
   
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${VTK_LIBRARIES})
@@ -173,10 +173,10 @@ if(VTK_FOUND)
   endif()
   
   include(${VTK_USE_FILE})
-else(VTK_FOUND)
-  message("-- VTK not found")
+else()
+  message("-- VTK 5.6 or higher not found")
   set(CEDAR_USE_VTK OFF)
-endif(VTK_FOUND)
+endif()
 
 # OpenGL
 find_package(OpenGL)

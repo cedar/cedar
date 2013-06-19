@@ -41,6 +41,9 @@
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/Enum.h"
+#include "cedar/auxiliaries/EnumType.h"
 #include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
@@ -87,6 +90,49 @@ public:
   //!@cond SKIPPED_DOCUMENTATION
   CEDAR_GENERATE_POINTER_TYPES(DockSettings);
   //!@endcond
+
+  class StepDisplayMode
+  {
+    public:
+      //! The base type of enum ids of this class.
+      typedef cedar::aux::EnumId Id;
+
+      //! Typedef of the shared pointer of enum values belonging to this class.
+      typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+
+      /*! @brief Construct method that fills the enum.
+       *  @see cedar::aux::EnumBase
+       */
+      static void construct()
+      {
+        mType.type()->def(cedar::aux::Enum(ICON_ONLY, "ICON_ONLY", "icon only"));
+        mType.type()->def(cedar::aux::Enum(TEXT_FOR_LOOPED, "TEXT_FOR_LOOPED", "text for looped steps"));
+        mType.type()->def(cedar::aux::Enum(ICON_AND_TEXT, "ICON_AND_TEXT", "icon and text"));
+      }
+
+      //! @returns A const reference to the base enum object.
+      static const cedar::aux::EnumBase& type()
+      {
+        return *(mType.type());
+      }
+
+      //! @returns A pointer to the base enum object.
+      static TypePtr typePtr()
+      {
+        return mType.type();
+      }
+
+      //! Identifier for the role input.
+      static const Id ICON_ONLY = 0;
+      //! Identifier for the role output.
+      static const Id TEXT_FOR_LOOPED = 1;
+      //! Identifier for the role buffer.
+      static const Id ICON_AND_TEXT = 2;
+
+    private:
+      //! The base enum object.
+      static cedar::aux::EnumType<cedar::proc::gui::Settings::StepDisplayMode> mType;
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -164,6 +210,12 @@ public:
     this->mWritingDisabled = disable;
   }
 
+  //! Default display mode for steps.
+  StepDisplayMode::Id getDefaultDisplayMode() const
+  {
+    return this->_mDefaultStepDisplayMode->getValue();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -233,6 +285,9 @@ private:
 
   //!@brief Disables or enables graphics item shadows.
   cedar::aux::BoolParameterPtr mSnapToGrid;
+
+  //! Default display mode for steps.
+  cedar::aux::EnumParameterPtr _mDefaultStepDisplayMode;
 
 }; // class cedar::proc::gui::Settings
 

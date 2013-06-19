@@ -54,7 +54,9 @@ QWidget(pParent)
 {
   this->setupUi(this);
 
-  mpUseGraphicsEffectsEdit->setParameter(cedar::proc::gui::Settings::instance().mUseGraphicsItemShadowEffects);
+  cedar::proc::gui::Settings& settings = cedar::proc::gui::Settings::instance();
+  this->mpUseGraphicsEffectsEdit->setParameter(settings.mUseGraphicsItemShadowEffects);
+  this->mpStepDisplayMode->setParameter(settings._mDefaultStepDisplayMode);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
