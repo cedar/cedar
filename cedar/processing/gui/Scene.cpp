@@ -297,13 +297,16 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
   }
 }
 
-void cedar::proc::gui::Scene::networkGroupingContextMenuEvent(QMenu& menu)
+void cedar::proc::gui::Scene::networkGroupingContextMenuEvent(QMenu& /* menu */)
 {
+  //!@todo Fix networks and reenable this functionality
+  /*
   QAction *p_add_to_new_network = menu.addAction("group into new network");
   QObject::connect(p_add_to_new_network, SIGNAL(triggered()), this, SLOT(promoteElementToNewGroup()));
 
   QMenu *p_add_to_existing_network = menu.addMenu("move to existing network");
   this->addNetworkNames(p_add_to_existing_network, this->mNetwork->getNetwork(), "");
+  */
 }
 
 void cedar::proc::gui::Scene::addNetworkNames
