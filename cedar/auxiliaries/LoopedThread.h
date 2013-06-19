@@ -108,6 +108,8 @@
 // TODO: js: I don't get the last paragraph, is it still valid?
 class cedar::aux::LoopedThread : public cedar::aux::ThreadWrapper
 {
+  Q_OBJECT
+
   //----------------------------------------------------------------------------
   // friends
   //----------------------------------------------------------------------------
