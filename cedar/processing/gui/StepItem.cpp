@@ -978,14 +978,18 @@ void cedar::proc::gui::StepItem::fillDefinedPlots(QMenu& menu, const QPoint& plo
 
     // find declaration for the default plot
     size_t default_index = 0;
+#ifdef DEBUG    
     bool found = false;
+#endif    
     for (size_t i = 0; i < elem_decl->definedPlots().size(); ++i)
     {
       const std::string& plot_name = elem_decl->definedPlots()[i].mName;
       if (plot_name == elem_decl->getDefaultPlot())
       {
         default_index = i;
+#ifdef DEBUG        
         found = true;
+#endif        
         break;
       }
     }
