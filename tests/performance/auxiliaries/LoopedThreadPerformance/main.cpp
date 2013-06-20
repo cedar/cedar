@@ -89,9 +89,10 @@ struct MyThread : public cedar::aux::LoopedThread
 {
   unsigned long mNumSteps;
   double mTotalRealStep;
+  double mMaxRealStep;
 
   MyThread() 
-  : mNumSteps(0), mTotalRealStep(0)
+  : mNumSteps(0), mTotalRealStep(0), mMaxRealStep(0)
   {
   }
 
@@ -100,6 +101,8 @@ private:
   {
     mNumSteps++;
     mTotalRealStep += real_step;
+    if (real_step > mMaxRealStep)
+      mMaxRealStep= real_step;
 
     // stall for a given time. simulate doing work
 
@@ -176,16 +179,21 @@ int main(int, char**)
 
   unsigned int num_steps_all7= 0;
   double total_real_step_all= 0;
+  double max_real_step_all= 0;
 
   auto it = threads.begin();
   for (; it != threads.end(); it++ )
   {
     num_steps_all7 = (*it)->mNumSteps;
     total_real_step_all = (*it)->mTotalRealStep;
+
+    if ( (*it)->mMaxRealStep > max_real_step_all )
+      max_real_step_all= (*it)->mMaxRealStep;
   }
  
   write_measurement("num steps", num_steps_all7);
   write_measurement("real-step size", total_real_step_all );
+  write_measurement("real-step max", max_real_step_all );
   write_measurement("rel deviatiation", ( total_real_step_all 
                                            / num_steps_all7 )
                                         - STEP_SIZE );                                        
