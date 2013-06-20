@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="/cedar/dynamics/gui">
+    <file>field_plot.svg</file>
+  </qresource>
+</RCC>
