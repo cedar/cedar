@@ -1000,9 +1000,14 @@ void cedar::proc::gui::StepItem::fillDefinedPlots(QMenu* pMenu, const QPoint& pl
   // list all defined plots, if available
   for (size_t i = 0; i < elem_decl->definedPlots().size(); ++i)
   {
-    const std::string& plot_name = elem_decl->definedPlots()[i].first;
+    const std::string& plot_name = elem_decl->definedPlots()[i].mName;
     QAction* p_action = pMenu->addAction(QString::fromStdString(plot_name));
     p_action->setData(plotPosition);
+
+    if (!elem_decl->definedPlots()[i].mIcon.empty())
+    {
+      p_action->setIcon(QIcon(QString::fromStdString(elem_decl->definedPlots()[i].mIcon)));
+    }
   }
 }
 
@@ -1019,7 +1024,7 @@ void cedar::proc::gui::StepItem::openDefinedPlotAction(QAction* pAction)
   size_t list_index = elem_decl->definedPlots().size();
   for (size_t i = 0; i < elem_decl->definedPlots().size(); ++i)
   {
-    const std::string& name = elem_decl->definedPlots()[i].first;
+    const std::string& name = elem_decl->definedPlots()[i].mName;
     if (plot_name == name)
     {
       list_index = i;
@@ -1038,7 +1043,7 @@ void cedar::proc::gui::StepItem::openDefinedPlotAction(QAction* pAction)
     return;
   }
 
-  this->multiplot(pAction->data().toPoint(), elem_decl->definedPlots()[list_index].second);
+  this->multiplot(pAction->data().toPoint(), elem_decl->definedPlots()[list_index].mData);
 }
 
 void cedar::proc::gui::StepItem::fillDisplayStyleMenu(QMenu* pMenu)

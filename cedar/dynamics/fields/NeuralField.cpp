@@ -80,12 +80,12 @@ namespace
     );
 
     // define field plot
-    ElementDeclaration::DataList field_plot_data;
-    field_plot_data.push_back(ElementDeclaration::PlotData(DataRole::BUFFER, "input sum"));
-    field_plot_data.push_back(ElementDeclaration::PlotData(DataRole::BUFFER, "activation", true));
-    field_plot_data.push_back(ElementDeclaration::PlotData(DataRole::OUTPUT, "activation", true));
-    field_plot_data.push_back(ElementDeclaration::PlotData(DataRole::OUTPUT, "sigmoided activation"));
-    declaration->definePlot("field plot", field_plot_data);
+    ElementDeclaration::PlotDefinition field_plot_data("field plot", ":/cedar/dynamics/gui/field_plot.svg");
+    field_plot_data.appendData(DataRole::BUFFER, "input sum");
+    field_plot_data.appendData(DataRole::BUFFER, "activation", true);
+    field_plot_data.appendData(DataRole::OUTPUT, "activation", true);
+    field_plot_data.appendData(DataRole::OUTPUT, "sigmoided activation");
+    declaration->definePlot(field_plot_data);
 
     // add declaration to the registry
     declaration->declare();

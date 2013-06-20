@@ -76,10 +76,10 @@ public:
     {
     }
 
-    //! Role of the plot.
+    //! Role of the data to be plotted.
     cedar::proc::DataRole::Id mId;
 
-    //! Name of the plot.
+    //! Name of the data to be plotted.
     std::string mName;
 
     //! If true, no exception will be thrown if the data cannot be found.
@@ -88,8 +88,33 @@ public:
 
   //!@brief list that pairs a data role with the desired plot
   typedef std::vector<PlotData> DataList;
+
+  struct PlotDefinition
+  {
+    PlotDefinition(const std::string& name, const std::string& icon = std::string())
+    :
+    mName(name),
+    mIcon(icon)
+    {
+    }
+
+    void appendData(cedar::proc::DataRole::Id id, const std::string& dataName, bool ignoreIfMissing = false)
+    {
+      this->mData.push_back(PlotData(id, dataName, ignoreIfMissing));
+    }
+
+    //! Name of the plot.
+    std::string mName;
+
+    //! Icon of the plot.
+    std::string mIcon;
+
+    //! Data to be plotted.
+    DataList mData;
+  };
+
   //!@brief list of plot definitions
-  typedef std::vector<std::pair<std::string, DataList> > PlotDefinitionList;
+  typedef std::vector<PlotDefinition> PlotDefinitionList;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -137,9 +162,9 @@ public:
    *
    * @todo  This should also be read from the plugin xml file.
    */
-  void definePlot(const std::string& plotName, const DataList& slotsToPlot)
+  void definePlot(const PlotDefinition& plotDefinition)
   {
-    this->mPlots.push_back(std::make_pair(plotName, slotsToPlot));
+    this->mPlots.push_back(plotDefinition);
   }
 
   //!@brief Returns the defined plots for this declaration.
