@@ -248,7 +248,7 @@ private:
   );
 
   //!@brief Fills the defined plots into the given menu.
-  void fillDefinedPlots(QMenu* pMenu, const QPoint& plotPosition);
+  void fillDefinedPlots(QMenu& menu, const QPoint& plotPosition);
 
   //! Fills in the actions for the display style.
   void fillDisplayStyleMenu(QMenu* pMenu);
@@ -292,12 +292,16 @@ private:
 
   QWidget* createDockWidget(const std::string& title, QWidget* pPlot) const;
 
+  void addPlotAllAction(QMenu& menu, const QPoint& plotPosition);
+
 private slots:
   void displayStyleMenuTriggered(QAction* pAction);
 
-  void openDefinedPlotAction(QAction* pAction);
+  void openDefinedPlotAction();
 
   void openProperties();
+
+  void plotAll();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

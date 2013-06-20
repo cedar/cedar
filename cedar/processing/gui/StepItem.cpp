@@ -813,16 +813,11 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
-  QAction *p_plot_all = menu.addAction("plot all");
-  p_plot_all->setIcon(QIcon(":/menus/plot_all.svg"));
-
-  QMenu *p_element_plots = menu.addMenu("defined plots");
-  p_element_plots->setIcon(QIcon(":/menus/plot.svg"));
+  this->fillDefinedPlots(menu, event->screenPos());
 
   QMenu *p_advanced_plotting = menu.addMenu("advanced plotting");
   p_advanced_plotting->setIcon(QIcon(":/menus/plot_advanced.svg"));
 
-  this->fillDefinedPlots(p_element_plots, event->screenPos());
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
@@ -931,11 +926,6 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
                           QMessageBox::Ok);
     }
   }
-  // plot all data slots
-  else if (a == p_plot_all)
-  {
-    this->multiplot(event->screenPos());
-  }
   // execute an action
   else if (a->parentWidget() == p_actions_menu)
   {
@@ -974,46 +964,94 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   }
 }
 
-void cedar::proc::gui::StepItem::fillDefinedPlots(QMenu* pMenu, const QPoint& plotPosition)
+void cedar::proc::gui::StepItem::fillDefinedPlots(QMenu& menu, const QPoint& plotPosition)
 {
+
   // get declaration of the element displayed by this item
   auto decl = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->mStep);
   CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(decl));
   auto elem_decl = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(decl);
 
-  if (!decl || !elem_decl)
+  if (!elem_decl->getDefaultPlot().empty())
   {
-    pMenu->setDisabled(true);
-    pMenu->setToolTip("No declaration was found for this element.");
-    return;
-  }
+    QAction* p_default_plot = menu.addAction(QString::fromStdString(elem_decl->getDefaultPlot()));
 
-  if (elem_decl->definedPlots().empty())
-  {
-    pMenu->setDisabled(true);
-    pMenu->setToolTip("No plots defined for this element.");
-    return;
-  }
-
-  QObject::connect(pMenu, SIGNAL(triggered(QAction*)), this, SLOT(openDefinedPlotAction(QAction*)));
-
-  // list all defined plots, if available
-  for (size_t i = 0; i < elem_decl->definedPlots().size(); ++i)
-  {
-    const std::string& plot_name = elem_decl->definedPlots()[i].mName;
-    QAction* p_action = pMenu->addAction(QString::fromStdString(plot_name));
-    p_action->setData(plotPosition);
-
-    if (!elem_decl->definedPlots()[i].mIcon.empty())
+    // find declaration for the default plot
+    size_t default_index = 0;
+    bool found = false;
+    for (size_t i = 0; i < elem_decl->definedPlots().size(); ++i)
     {
-      p_action->setIcon(QIcon(QString::fromStdString(elem_decl->definedPlots()[i].mIcon)));
+      const std::string& plot_name = elem_decl->definedPlots()[i].mName;
+      if (plot_name == elem_decl->getDefaultPlot())
+      {
+        default_index = i;
+        found = true;
+        break;
+      }
+    }
+    CEDAR_DEBUG_ASSERT(found);
+
+    if (!elem_decl->definedPlots()[default_index].mIcon.empty())
+    {
+      p_default_plot->setIcon(QIcon(QString::fromStdString(elem_decl->definedPlots()[default_index].mIcon)));
+    }
+    QObject::connect(p_default_plot, SIGNAL(triggered()), this, SLOT(openDefinedPlotAction()));
+  }
+  else
+  {
+    this->addPlotAllAction(menu, plotPosition);
+  }
+
+  if (!decl || !elem_decl || elem_decl->definedPlots().empty() || elem_decl->getDefaultPlot().empty())
+  {
+    QAction *p_defined_plots = menu.addAction("defined plots");
+    p_defined_plots->setIcon(QIcon(":/menus/plot.svg"));
+    p_defined_plots->setDisabled(true);
+  }
+  else
+  {
+    QMenu *p_defined_plots = menu.addMenu("defined plots");
+    p_defined_plots->setIcon(QIcon(":/menus/plot.svg"));
+
+    this->addPlotAllAction(*p_defined_plots, plotPosition);
+    p_defined_plots->addSeparator();
+
+    // list all defined plots, if available
+    for (size_t i = 0; i < elem_decl->definedPlots().size(); ++i)
+    {
+      const std::string& plot_name = elem_decl->definedPlots()[i].mName;
+      QAction* p_action = p_defined_plots->addAction(QString::fromStdString(plot_name));
+      p_action->setData(plotPosition);
+
+      if (!elem_decl->definedPlots()[i].mIcon.empty())
+      {
+        p_action->setIcon(QIcon(QString::fromStdString(elem_decl->definedPlots()[i].mIcon)));
+      }
+      QObject::connect(p_action, SIGNAL(triggered()), this, SLOT(openDefinedPlotAction()));
     }
   }
 }
 
-void cedar::proc::gui::StepItem::openDefinedPlotAction(QAction* pAction)
+void cedar::proc::gui::StepItem::addPlotAllAction(QMenu& menu, const QPoint& plotPosition)
 {
-  std::string plot_name = pAction->text().toStdString();
+  QAction* p_plot_all = menu.addAction("plot all");
+  p_plot_all->setIcon(QIcon(":/menus/plot_all.svg"));
+  p_plot_all->setData(plotPosition);
+  QObject::connect(p_plot_all, SIGNAL(triggered()), this, SLOT(plotAll()));
+}
+
+void cedar::proc::gui::StepItem::plotAll()
+{
+  QAction* p_sender = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(p_sender != NULL);
+  this->multiplot(p_sender->data().toPoint());
+}
+
+void cedar::proc::gui::StepItem::openDefinedPlotAction()
+{
+  QAction* p_action = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(p_action != NULL);
+  std::string plot_name = p_action->text().toStdString();
 
   // get declaration of the element displayed by this item
   auto decl = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->mStep);
@@ -1043,7 +1081,7 @@ void cedar::proc::gui::StepItem::openDefinedPlotAction(QAction* pAction)
     return;
   }
 
-  this->multiplot(pAction->data().toPoint(), elem_decl->definedPlots()[list_index].mData);
+  this->multiplot(p_action->data().toPoint(), elem_decl->definedPlots()[list_index].mData);
 }
 
 void cedar::proc::gui::StepItem::fillDisplayStyleMenu(QMenu* pMenu)
