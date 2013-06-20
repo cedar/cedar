@@ -71,6 +71,7 @@ likely to undergo major changes:
   - enabled C++0x / C++11 compiler flag for GCC
   - cedar should now also compile when using clang.
 - cedar::aux
+  - when using LoopedThread a running QApplication or QCoreApplication is now required for its QT event loop (call exec() for the app).
   - DoubleData now inherits MatData. It therefore is also no longer just a typedef of a template, so make sure you
     include the proper header (cedar/auxiliaries/DoubleData) in your code.
   - Parameters and Configurables can now be marked as advanced. Those that are, are not displayed to the user unless
