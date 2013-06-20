@@ -62,28 +62,34 @@ mpWorker(NULL)
 cedar::aux::ThreadWrapper::~ThreadWrapper()
 {
   //std::cout << "destructor for this: " << this << " and thread " << mpThread << std::endl;  
+
   // If other threads enter start() or stop() after this point,
   // they will test mDestructing and abort.
   mDestructing = true;
     // note: you don't want them to wait for the destructor, but to abort
-    // quickly
+    //       as quickly as possible. Thats why we dont use a lock, here.
     // note: mDestructing is only written-to here!
 
   if (!mDestructingMutex.tryLock())
   {
     // You have a BIG problem.
-    // this check is just performed for user-convenience, it tests
+    // This check is just performed for user-convenience, it tests
     // for a major flaw in the ownership-handling of this object and
-    // may help finding errors. the destructor should not be called twice!
+    // may help finding errors. The destructor should not be called twice!
     CEDAR_THROW(cedar::aux::ThreadingErrorException, 
-                "cedar::aux::ThreadWrapper::~ThreadWrapper() called twice!");
+                "cedar::aux::ThreadWrapper::~ThreadWrapper() called twice! "
+                "Ownership is probably being released by two separate "
+                "threads at the same time.");
     // note: never unlock
   }
 
   // If other threads had already entered start() or stop(), _we_ wait:
   QWriteLocker locker(&mGeneralAccessLock);
-  locker.unlock(); // see above, dont permanently lock _anything_
-                   // in the destructor!
+  locker.unlock(); // never permanently lock _anything_ in the destructor!
+                   // (there is always the possibility that a concurrent
+                   // thread will wait for that lock to be released
+                   // and then continue at the destructed objects address
+                   // or spin the destructed lock)
 
   // we also wait for finishedThread() to execute:
   mFinishedThreadMutex.lock(); 
@@ -100,13 +106,13 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
   if (validWorker())
   {
     requestStop(); // set stopped state first, 
-                   // note: this may exit cleanly for some workers
+                   // note: this may help some workers to exit cleanly/quickly
   }
 
   if (validThread())
   {
     mpThread->disconnect(this); // dont execute directly connected slots
-    this->disconnect(mpThread);
+    this->disconnect(mpThread); // ... (especially the one quit() calls)
     mpThread->quit(); // end the event loop
 
     // avoid dead-locking if called from the same thread:
@@ -115,7 +121,7 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
       // need to wait for the thread to finish of its own accord, to make sure
       // the worker doesnt continue with work() (or step()) after we 
       // have been detructed
-      mpThread->wait();
+      mpThread->wait(); // blocks until finished
     }
     else
     {
@@ -123,7 +129,6 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
 
       // This will only go well, if step() immediately aborts afterwards.
       // note: requestStop() has already been sent, so test for that
-      //       if you need such a behavior.
 
       cedar::aux::LogSingleton::getInstance()->warning
       (
@@ -161,24 +166,25 @@ bool cedar::aux::ThreadWrapper::isRunning() const
 
 void cedar::aux::ThreadWrapper::start()
 {
-  if (mDestructing) // quick abort, see below
-    return;
+  if (mDestructing) // quick abort if already destructing
+    return;         // this if is not strictly necessary
+                    // but may abort faster
 
-  // make sure we only enter one and one of start(), stop() at a time:
+  // make sure we only enter one and one only of start(), stop() at a time:
   QWriteLocker locker(&mGeneralAccessLock);
        
   if (mDestructing) // dont start the thread if we are in the destructor
-    return;        
+    return;         // this if is neceassary
       // note:
-      // mDestructing is a volatile bool and is only written-to in the destructor
+      // mDestructing is a bool and is only written-to in the destructor.
       // A corrupted read here will either result in a:
       //   correct FALSE: no problem
       //   correct TRUE:  no problem
-      //   incorrect FALSE: doesnt happen, since is only changed to FALSE,
+      //   incorrect TRUE: doesnt happen, since is only changed to TRUE,
       //                    and that only once
-      //   incorrect TRUE: (i.e. is just being set to FALSE but we incorrectly
-      //                   read as TRUE) will be handled
-      //                   like as if start() was called before the destructor
+      //   incorrect FALSE: (i.e. changed to TRUE but we incorrectly
+      //                   read as FALSE) the Destructor will wait for the 
+      //                   GeneralAccessLock released at the end of start
 
   if (true)
   {
@@ -217,21 +223,22 @@ void cedar::aux::ThreadWrapper::start()
                                       // the new thread
 
     ////////// connect slots:
-    // an important note: incoming slots to *this need to be connected
-    // via Qt:DirectConnection and not be queued(!), in case that the thread
-    // holding *this will wait() on the mpThread. 
-    // (i.e. this' EventLoop will not be executed if the holding thread 
-    // waits and the slots will otherwise not be called when mpThread finishes)
+    // An important note: incoming slots to *this need to be connected
+    // via Qt:DirectConnection and not be queued(!), because ...
+    //   There is an obscure case that the thread holding (starting) *this 
+    //   will wait() on this* later on.
+    //   Then this' EventLoop will not be executed if the holding thread 
+    //   waits and the slots will not be called when mpThread finishes)
     //
 
-    // notify me when thread starts:
+    // notify me when thread starts, as I would like to react to it:
     connect( mpThread, SIGNAL(started()), this, SLOT(startedThreadSlot()), Qt::DirectConnection );
     // when the thread starts, start the work() in the worker:
     connect( mpThread, SIGNAL(started()), mpWorker, SLOT(workSlot()), Qt::QueuedConnection );
 
     // when the thread finishes (returns from run()), react to it:
     connect( mpWorker, SIGNAL(finishedWorking()), this, SLOT(finishedWorkSlot()), Qt::DirectConnection );
-    // this will be called on a thread termination:
+    // this will be called on a thread termination (should not happen):
     connect( mpThread, SIGNAL(finished()), this, SLOT(quittedThreadSlot()), Qt::DirectConnection );
   }
   else
@@ -248,7 +255,8 @@ void cedar::aux::ThreadWrapper::start()
 
 void cedar::aux::ThreadWrapper::startedThreadSlot()
 {
-  // only here for debuggin purposes atm
+  // dummy slot. only here for debuggin purposes atm
+
   //std::cout << "called startedThread() for " << this << " thread: " << mpThread << std::endl;  
 }
 
@@ -265,7 +273,9 @@ void cedar::aux::ThreadWrapper::applyStop(bool)
 void cedar::aux::ThreadWrapper::finishedWorkSlot()
 {
   // is called in the new thread's context(!)
+
   // std::cout << "finished work" << std::endl;
+
   QThread::currentThread()->quit();
 }
 
@@ -280,7 +290,7 @@ void cedar::aux::ThreadWrapper::quittedThreadSlot()
 
   // make sure we enter this function only once:
   QMutexLocker locker(&mFinishedThreadMutex);
-    // note, mGeneralAccessLock can already be held by stop()
+    // note, mGeneralAccessLock can already be held by stop(), so dont use it
 
   // note, we cannot test isRunning(), here, per premise that we
   // are operating without locks TODO: isRunning() has no locks anymore. still valid?
@@ -292,8 +302,8 @@ void cedar::aux::ThreadWrapper::quittedThreadSlot()
   {
     //std::cout << "deleting thread: " << mpThread << " ( current thread: " << QThread::currentThread() << std::endl;    
 
-    // TODO: this will leak IF the upper thread will not have time to tick its event loop (ie when shutting down the app):
-    // TODO: it will also lead to a destruction to a held mutex in that case
+    // TODO: this will leak IF the upper thread will not have time to tick its event loop (ie when shutting down the app): not that important
+    // TODO: it will also lead to a destruction of a held mutex (in helgrind). not that important
     mpThread->deleteLater();
     mpThread = NULL; // allow me to restart a new thread/worker
 
@@ -393,5 +403,4 @@ bool cedar::aux::ThreadWrapper::stopRequested()
 
   return mStopRequested;
 }
-
 

@@ -92,11 +92,14 @@ public:
   /*! stop the thread and wait for the worker to finish.
    *
    * stop() will block the execution and return after the worker thread
-   * has finished (or timeout expired).
+   * has finished (or the timeout expired).
    *
    * This method is thread-safe.
    * Re-entry or calling stop() twice will be detected and will 
-   * abort be ignored.
+   * be silently aborted.
+   *
+   * Note, the method can be made in a pseudo-non-blocking way if
+   * timeout is set to a rediculously small interval.
    *
    *@param timeout: a value != 0 will abort waiting on the worker thread after
    *        the timeout-period. Use with caution.
@@ -134,7 +137,7 @@ public:
   bool stopRequested();
 
 
-  //! wait for the thread to finish
+  //! wait for the thread to finish. The calling thread will pause!
   inline bool wait(unsigned long time = 0)
   {
     bool ret = false;
