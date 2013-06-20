@@ -52,11 +52,22 @@ namespace cedar
   /*!@brief Namespace for all aux classes. */
   namespace aux
   {
+    /*!@bierf Namespace for implementation details you should not use. */
+    namespace detail
+    {
+      class ThreadWorker;
+      class LoopedThreadWorker;
+      class CallFunctionInThreadWorker;
+    }
+
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Configurable);
     CEDAR_DECLARE_AUX_CLASS(NamedConfigurable);
     CEDAR_DECLARE_AUX_CLASS(Lockable);
+
+    CEDAR_DECLARE_AUX_CLASS(ThreadWrapper);
     CEDAR_DECLARE_AUX_CLASS(LoopedThread);
+    CEDAR_DECLARE_AUX_CLASS(CallFunctionInThread);
     CEDAR_DECLARE_AUX_CLASS(LoopMode);
     CEDAR_DECLARE_AUX_CLASS(UserData);
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(IntrusivePtrBase);
@@ -229,6 +240,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
     CEDAR_DECLARE_AUX_CLASS(UnmanglingFailedException);
     CEDAR_DECLARE_AUX_CLASS(ValidationFailedException);
+    CEDAR_DECLARE_AUX_CLASS(ThreadingErrorException);
     //!@endcond
     
     //!@cond SKIPPED_DOCUMENTATION

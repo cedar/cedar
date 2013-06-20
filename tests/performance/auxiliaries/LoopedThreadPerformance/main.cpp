@@ -37,11 +37,19 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/LoopedThread.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 
 // SYSTEM INCLUDES
 #include <functional>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <QReadWriteLock>
+#include <QCoreApplication>
+
+
+// global variables
+int errors = 0;
+
+
 
 void write_measurement
      (
@@ -166,8 +174,10 @@ void delete_test()
   }
 }
 
-int main(int, char**)
+void run_test()
 {
+  errors= 0;
+
   test_time("create threads", create_test );
   test_time("start threads", start_test );
 
@@ -198,6 +208,24 @@ int main(int, char**)
                                            / num_steps_all7 )
                                         - STEP_SIZE );                                        
   test_time("delete threads", delete_test );
-  return 0;
 }
+
+int main(int argc, char* argv[])
+{
+  QCoreApplication* app;
+  app = new QCoreApplication(argc,argv);
+
+  auto testThread = new cedar::aux::CallFunctionInThread(run_test);
+
+  QObject::connect( testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection );  // alternatively: call app->quit() in runTests()
+
+  testThread->start();
+  app->exec();
+
+  delete testThread;
+  delete app;
+
+  return errors;
+}
+
 
