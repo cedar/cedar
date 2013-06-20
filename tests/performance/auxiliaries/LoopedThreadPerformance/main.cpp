@@ -152,7 +152,7 @@ void stop_test()
 
   for (; it != threads.end(); it++ )
   {
-    (*it)->stop(2000);
+    (*it)->stop();
   }
 }
 
