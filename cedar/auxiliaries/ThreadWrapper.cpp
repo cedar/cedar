@@ -45,6 +45,7 @@
 #include <QWriteLocker>
 #include <QReadLocker>
 #include <QMutexLocker>
+#include <boost/lexical_cast.hpp>
 
 //------------------------------------------------------------------------------
 // constructors and destructor
@@ -150,19 +151,12 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
 // methods
 //------------------------------------------------------------------------------
 
-bool cedar::aux::ThreadWrapper::isRunningUnlocked() const
+bool cedar::aux::ThreadWrapper::isRunning() const
 {
   if (mpThread == NULL)
     return false;
 
   return mpThread->isRunning();
-}
-
-bool cedar::aux::ThreadWrapper::isRunning() const
-{
-  QReadLocker locker(&mGeneralAccessLock);
-
-  return isRunningUnlocked();
 }
 
 void cedar::aux::ThreadWrapper::start()
@@ -202,7 +196,7 @@ void cedar::aux::ThreadWrapper::start()
 
   CEDAR_ASSERT( validWorker() == validThread() );
 
-  if (isRunningUnlocked())
+  if (isRunning())
   {
     cedar::aux::LogSingleton::getInstance()->warning
     (
@@ -289,7 +283,7 @@ void cedar::aux::ThreadWrapper::quittedThreadSlot()
     // note, mGeneralAccessLock can already be held by stop()
 
   // note, we cannot test isRunning(), here, per premise that we
-  // are operating without locks
+  // are operating without locks TODO: isRunning() has no locks anymore. still valid?
 
   if (mDestructing) // always test after locking, see start()
     return;
@@ -350,7 +344,7 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time, bool suppressWarning)
 
   requestStop(); // change internal state, will abort the thread earlier
 
-  if (isRunningUnlocked())
+  if (isRunning())
   {
     applyStop(suppressWarning);
       // intentionally called while the thread may still be running. 
@@ -370,11 +364,17 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time, bool suppressWarning)
     }
   }
 
-  if (this->isRunningUnlocked())
+  if (this->isRunning())
   {
     cedar::aux::LogSingleton::getInstance()->warning
     (
+#ifdef DEBUG
+      "Thread " 
+      + boost::lexical_cast<std::string>(this)
+      + " is still running after call of stop()!",
+#else
       "Thread is still running after call of stop()!",
+#endif      
       "cedar::aux::ThreadWrapper::stop(unsigned int, bool)"
     );
   }

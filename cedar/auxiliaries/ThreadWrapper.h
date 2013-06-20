@@ -113,7 +113,7 @@ public:
    */
   void start(); 
 
-  //! is the thread still running? Is thread-safe.
+  //! is the thread still running?
   bool isRunning() const; 
 
   /*!Tell the thread to abort as soon as possible
@@ -203,8 +203,6 @@ private:
   bool validWorker() const;
   //! is the thread (still) in memory? thread-un-safe
   bool validThread() const; 
-  //! unblocked, thread-un-safe version of isRunning()
-  bool isRunningUnlocked() const; 
 
   //----------------------------------------------------------------------------
   // members
