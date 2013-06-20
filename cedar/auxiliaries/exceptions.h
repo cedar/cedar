@@ -211,4 +211,10 @@ class cedar::aux::ValidationFailedException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::ValidationFailedException
 
+/*!@brief Exception that occurs when threading code is mis-used
+ */
+class cedar::aux::ThreadingErrorException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::ThreadingErrorException
+
 #endif // CEDAR_AUX_EXCEPTIONS_H
