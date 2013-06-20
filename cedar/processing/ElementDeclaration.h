@@ -61,8 +61,33 @@
 class cedar::proc::ElementDeclaration : public cedar::aux::PluginDeclarationBaseTemplate<cedar::proc::ElementPtr>
 {
 public:
+  struct PlotData
+  {
+    PlotData
+    (
+      cedar::proc::DataRole::Id id = cedar::proc::DataRole::OUTPUT,
+      const std::string& name = "",
+      bool ignoreIfMissing = false
+    )
+    :
+    mId(id),
+    mName(name),
+    mIgnoreIfMissing(ignoreIfMissing)
+    {
+    }
+
+    //! Role of the plot.
+    cedar::proc::DataRole::Id mId;
+
+    //! Name of the plot.
+    std::string mName;
+
+    //! If true, no exception will be thrown if the data cannot be found.
+    bool mIgnoreIfMissing;
+  };
+
   //!@brief list that pairs a data role with the desired plot
-  typedef std::vector<std::pair<cedar::proc::DataRole::Id, std::string> > DataList;
+  typedef std::vector<PlotData> DataList;
   //!@brief list of plot definitions
   typedef std::vector<std::pair<std::string, DataList> > PlotDefinitionList;
 

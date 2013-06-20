@@ -81,9 +81,10 @@ namespace
 
     // define field plot
     ElementDeclaration::DataList field_plot_data;
-    field_plot_data.push_back(std::make_pair(DataRole::BUFFER, "input sum"));
-    field_plot_data.push_back(std::make_pair(DataRole::BUFFER, "activation"));
-    field_plot_data.push_back(std::make_pair(DataRole::OUTPUT, "sigmoided activation"));
+    field_plot_data.push_back(ElementDeclaration::PlotData(DataRole::BUFFER, "input sum"));
+    field_plot_data.push_back(ElementDeclaration::PlotData(DataRole::BUFFER, "activation", true));
+    field_plot_data.push_back(ElementDeclaration::PlotData(DataRole::OUTPUT, "activation", true));
+    field_plot_data.push_back(ElementDeclaration::PlotData(DataRole::OUTPUT, "sigmoided activation"));
     declaration->definePlot("field plot", field_plot_data);
 
     // add declaration to the registry

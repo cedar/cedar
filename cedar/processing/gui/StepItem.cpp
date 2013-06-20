@@ -1119,11 +1119,9 @@ QWidget* cedar::proc::gui::StepItem::createDockWidget(const std::string& title, 
 void cedar::proc::gui::StepItem::multiplot
      (
        const QPoint& position,
-       std::vector<std::pair<cedar::proc::DataRole::Id, std::string> > data
+       cedar::proc::ElementDeclaration::DataList data
      )
 {
-  typedef std::vector<std::pair<cedar::proc::DataRole::Id, std::string> > PlotList;
-
   int grid_spacing = 2;
   int columns = 2;
 
@@ -1141,7 +1139,7 @@ void cedar::proc::gui::StepItem::multiplot
         for (cedar::proc::Step::SlotMap::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
         {
           cedar::proc::DataSlotPtr slot = iter->second;
-          data.push_back(std::make_pair(e.id(), slot->getName()));
+          data.push_back(cedar::proc::ElementDeclaration::PlotData(e.id(), slot->getName()));
         }
       }
       catch (const cedar::proc::InvalidRoleException& e)
@@ -1168,13 +1166,13 @@ void cedar::proc::gui::StepItem::multiplot
   bool is_multiplot = false;
   cedar::aux::gui::DataPlotter *p_plotter = NULL;
 
-  for (PlotList::const_iterator iter = data.begin(); iter != data.end(); ++iter)
+  for (auto iter = data.begin(); iter != data.end(); ++iter)
   {
 
     try
     {
-      const std::string& slot_name = iter->second;
-      cedar::proc::DataRole::Id role = iter->first;
+      const std::string& slot_name = iter->mName;
+      cedar::proc::DataRole::Id role = iter->mId;
       cedar::proc::DataSlotPtr slot = this->mStep->getSlot(role, slot_name);
       cedar::aux::DataPtr data = slot->getData();
       const std::string& title = slot->getText();
@@ -1228,19 +1226,25 @@ void cedar::proc::gui::StepItem::multiplot
     }
     catch (const cedar::proc::InvalidRoleException& e)
     {
-      cedar::aux::LogSingleton::getInstance()->warning
-      (
-        "Could not plot data. Exception: " + e.exceptionInfo(),
-        "cedar::proc::gui::StepItem::multiplot"
-      );
+      if (!iter->mIgnoreIfMissing)
+      {
+        cedar::aux::LogSingleton::getInstance()->warning
+        (
+          "Could not plot data. Exception: " + e.exceptionInfo(),
+          "cedar::proc::gui::StepItem::multiplot"
+        );
+      }
     }
     catch (const cedar::proc::InvalidNameException& e)
     {
-      cedar::aux::LogSingleton::getInstance()->warning
-      (
-        "Could not plot data. Exception: " + e.exceptionInfo(),
-        "cedar::proc::gui::StepItem::multiplot"
-      );
+      if (!iter->mIgnoreIfMissing)
+      {
+        cedar::aux::LogSingleton::getInstance()->warning
+        (
+          "Could not plot data. Exception: " + e.exceptionInfo(),
+          "cedar::proc::gui::StepItem::multiplot"
+        );
+      }
     }
   }
 
