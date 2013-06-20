@@ -46,6 +46,7 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/EnumType.h"
 
@@ -247,7 +248,7 @@ private:
   );
 
   //!@brief Fills the defined plots into the given menu.
-  void fillDefinedPlots(QMenu* pMenu, const QPoint& plotPosition);
+  void fillDefinedPlots(QMenu& menu, const QPoint& plotPosition);
 
   //! Fills in the actions for the display style.
   void fillDisplayStyleMenu(QMenu* pMenu);
@@ -265,8 +266,7 @@ private:
   void multiplot
   (
     const QPoint& position,
-    std::vector<std::pair<cedar::proc::DataRole::Id, std::string> > data
-      = (std::vector<std::pair<cedar::proc::DataRole::Id, std::string> >())
+    cedar::proc::ElementDeclaration::DataList data = (cedar::proc::ElementDeclaration::DataList())
   );
 
   //! Updates the display of the step's run time measurements.
@@ -292,12 +292,16 @@ private:
 
   QWidget* createDockWidget(const std::string& title, QWidget* pPlot) const;
 
+  void addPlotAllAction(QMenu& menu, const QPoint& plotPosition);
+
 private slots:
   void displayStyleMenuTriggered(QAction* pAction);
 
-  void openDefinedPlotAction(QAction* pAction);
+  void openDefinedPlotAction();
 
   void openProperties();
+
+  void plotAll();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -95,14 +95,22 @@ const double WORK_SEC = 0.015;
 
 struct MyThread : public cedar::aux::LoopedThread
 {
-  unsigned long num_steps = 0;
-  double total_real_step = 0.0;
+  unsigned long mNumSteps;
+  double mTotalRealStep;
+  double mMaxRealStep;
+
+  MyThread() 
+  : mNumSteps(0), mTotalRealStep(0), mMaxRealStep(0)
+  {
+  }
 
 private:
   void step(double real_step)
   {
-    num_steps++;
-    total_real_step += real_step;
+    mNumSteps++;
+    mTotalRealStep += real_step;
+    if (real_step > mMaxRealStep)
+      mMaxRealStep= real_step;
 
     // stall for a given time. simulate doing work
 
@@ -179,20 +187,25 @@ void all_tests()
 
   // evaluation statistics for all threads:
 
-  unsigned int num_steps_all= 0;
+  unsigned int num_steps_all7= 0;
   double total_real_step_all= 0;
+  double max_real_step_all= 0;
 
   auto it = threads.begin();
   for (; it != threads.end(); it++ )
   {
-    num_steps_all = (*it)->num_steps;
-    total_real_step_all = (*it)->total_real_step;
+    num_steps_all7 = (*it)->mNumSteps;
+    total_real_step_all = (*it)->mTotalRealStep;
+
+    if ( (*it)->mMaxRealStep > max_real_step_all )
+      max_real_step_all= (*it)->mMaxRealStep;
   }
  
-  write_measurement("num steps", num_steps_all);
+  write_measurement("num steps", num_steps_all7);
   write_measurement("real-step size", total_real_step_all );
+  write_measurement("real-step max", max_real_step_all );
   write_measurement("rel deviatiation", ( total_real_step_all 
-                                           / num_steps_all )
+                                           / num_steps_all7 )
                                         - STEP_SIZE );                                        
   test_time("delete threads", delete_test );
 }
