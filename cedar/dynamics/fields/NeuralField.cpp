@@ -80,11 +80,18 @@ namespace
     );
 
     // define field plot
-    ElementDeclaration::DataList field_plot_data;
-    field_plot_data.push_back(std::make_pair(DataRole::BUFFER, "input sum"));
-    field_plot_data.push_back(std::make_pair(DataRole::BUFFER, "activation"));
-    field_plot_data.push_back(std::make_pair(DataRole::OUTPUT, "sigmoided activation"));
-    declaration->definePlot("field plot", field_plot_data);
+    ElementDeclaration::PlotDefinition field_plot_data("field plot", ":/cedar/dynamics/gui/field_plot.svg");
+    field_plot_data.appendData(DataRole::BUFFER, "input sum");
+    field_plot_data.appendData(DataRole::BUFFER, "activation", true);
+    field_plot_data.appendData(DataRole::OUTPUT, "activation", true);
+    field_plot_data.appendData(DataRole::OUTPUT, "sigmoided activation");
+    declaration->definePlot(field_plot_data);
+
+    ElementDeclaration::PlotDefinition kernel_plot_data("kernel", ":/cedar/dynamics/gui/kernel_plot.svg");
+    kernel_plot_data.appendData(DataRole::BUFFER, "lateral kernel");
+    declaration->definePlot(kernel_plot_data);
+
+    declaration->setDefaultPlot("field plot");
 
     // add declaration to the registry
     declaration->declare();
