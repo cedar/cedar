@@ -176,6 +176,17 @@ public:
   //! Overriden in the templated version by the super class implementation.
   virtual void declare() const = 0;
 
+  //! Set the default plot. When the plot is an empty string, "plot all" will be the default.
+  void setDefaultPlot(const std::string& plotName)
+  {
+    this->mDefaultPlot = plotName;
+  }
+
+  const std::string& getDefaultPlot() const
+  {
+    return this->mDefaultPlot;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -213,6 +224,9 @@ private:
 
   //!@brief Declarations of plots.
   PlotDefinitionList mPlots;
+
+  //! Default plot to open (if empty, all data is plotted).
+  std::string mDefaultPlot;
 };
 
 

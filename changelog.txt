@@ -93,6 +93,8 @@ likely to undergo major changes:
     (old behavior, newly created steps are always shown with icon and text), icon only (newly created steps show only
     an icon) and text for looped (newly created steps always show their icon, text is only shown if the steps are looped,
     this is the new default)
+  - The "plot all" function can now be replaced by other plots where appropriate. For example, for neural fields, the
+    field plot now replaces it. In such cases, plot all can still be accessed from the "defined plots" menu. 
 
 - cedar::dyn
   - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   

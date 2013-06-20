@@ -87,6 +87,8 @@ namespace
     field_plot_data.appendData(DataRole::OUTPUT, "sigmoided activation");
     declaration->definePlot(field_plot_data);
 
+    declaration->setDefaultPlot("field plot");
+
     // add declaration to the registry
     declaration->declare();
 
