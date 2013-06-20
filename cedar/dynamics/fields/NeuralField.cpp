@@ -87,6 +87,10 @@ namespace
     field_plot_data.appendData(DataRole::OUTPUT, "sigmoided activation");
     declaration->definePlot(field_plot_data);
 
+    ElementDeclaration::PlotDefinition kernel_plot_data("kernel", ":/cedar/dynamics/gui/kernel_plot.svg");
+    kernel_plot_data.appendData(DataRole::BUFFER, "lateral kernel");
+    declaration->definePlot(kernel_plot_data);
+
     declaration->setDefaultPlot("field plot");
 
     // add declaration to the registry
