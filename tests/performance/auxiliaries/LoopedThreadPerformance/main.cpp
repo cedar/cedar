@@ -87,14 +87,19 @@ const double WORK_SEC = 0.015;
 
 struct MyThread : public cedar::aux::LoopedThread
 {
-  unsigned long num_steps = 0;
-  double total_real_step = 0.0;
+  unsigned long mNumSteps;
+  double mTotalRealStep;
+
+  MyThread() 
+  : mNumSteps(0), mTotalRealStep(0)
+  {
+  }
 
 private:
   void step(double real_step)
   {
-    num_steps++;
-    total_real_step += real_step;
+    mNumSteps++;
+    mTotalRealStep += real_step;
 
     // stall for a given time. simulate doing work
 
@@ -169,20 +174,20 @@ int main(int, char**)
 
   // evaluation statistics for all threads:
 
-  unsigned int num_steps_all= 0;
+  unsigned int num_steps_all7= 0;
   double total_real_step_all= 0;
 
   auto it = threads.begin();
   for (; it != threads.end(); it++ )
   {
-    num_steps_all = (*it)->num_steps;
-    total_real_step_all = (*it)->total_real_step;
+    num_steps_all7 = (*it)->mNumSteps;
+    total_real_step_all = (*it)->mTotalRealStep;
   }
  
-  write_measurement("num steps", num_steps_all);
+  write_measurement("num steps", num_steps_all7);
   write_measurement("real-step size", total_real_step_all );
   write_measurement("rel deviatiation", ( total_real_step_all 
-                                           / num_steps_all )
+                                           / num_steps_all7 )
                                         - STEP_SIZE );                                        
   test_time("delete threads", delete_test );
   return 0;
