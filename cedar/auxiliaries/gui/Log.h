@@ -47,6 +47,7 @@
 // SYSTEM INCLUDES
 #include <QTabWidget>
 #include <QTableWidget>
+#include <QGraphicsSceneContextMenuEvent>
 
 
 /*!@brief A default log widget.
@@ -117,13 +118,18 @@ public:
    */
   void uninstallHandlers();
 
+public slots:
+  void showContextMenu(const QPoint& point);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+
 signals:
   //!@brief signals reception of a signal
   void messageReceived(int type, QString title, QString message);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
