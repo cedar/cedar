@@ -174,7 +174,7 @@ void delete_test()
   }
 }
 
-void all_tests()
+void run_test()
 {
   errors= 0;
 
@@ -215,7 +215,7 @@ int main(int argc, char* argv[])
   QCoreApplication* app;
   app = new QCoreApplication(argc,argv);
 
-  auto testThread = new cedar::aux::CallFunctionInThread(all_tests);
+  auto testThread = new cedar::aux::CallFunctionInThread(run_test);
 
   QObject::connect( testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection );  // alternatively: call app->quit() in runTests()
 
