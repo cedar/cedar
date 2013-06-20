@@ -45,6 +45,7 @@ s
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/net/exceptions.h"
 
@@ -92,7 +93,10 @@ mOutput(new cedar::aux::MatData(cv::Mat())),
 // outputs
 mReader(),
 // parameters
-_mPort(new cedar::aux::StringParameter(this, "port", "DEMOCHANNEL"))
+_mPort(new cedar::aux::StringParameter(this, "port",
+                                       "CEDAR/" 
+                                       + cedar::aux::versionNumberToString(CEDAR_VERSION)
+                                       + "/MISC" ))
 {
   // declare all data
   this->declareOutput("output", mOutput);
