@@ -966,7 +966,6 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
 
 void cedar::proc::gui::StepItem::fillDefinedPlots(QMenu& menu, const QPoint& plotPosition)
 {
-
   // get declaration of the element displayed by this item
   auto decl = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->mStep);
   CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(decl));

@@ -757,7 +757,7 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& na
                 " name \"" + name + "\" does not exist.");
   }
   locker.unlock();
-  
+
   this->checkMandatoryConnections();
 }
 

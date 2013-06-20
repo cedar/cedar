@@ -125,11 +125,9 @@ public slots:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
 signals:
   //!@brief signals reception of a signal
   void messageReceived(int type, QString title, QString message);
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

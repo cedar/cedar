@@ -116,7 +116,6 @@ void cedar::aux::gui::Log::uninstallHandlers()
 void cedar::aux::gui::Log::addPane(cedar::aux::LOG_LEVEL level, const std::string& title, const std::string& icon)
 {
   QTableWidget* p_pane = this->addPane(title, icon);
-
   mpPanes[level] = p_pane;
   mIcons[level] = icon;
 }
@@ -236,7 +235,9 @@ void cedar::aux::gui::Log::printMessage(int type, QString title, QString message
 void cedar::aux::gui::Log::showContextMenu(const QPoint& point)
 {
   if (point.isNull())
+  {
     return;
+  }
 
   QMenu menu(this);
   QAction* p_delete_here = menu.addAction(tr("Delete messages in this tab"));
