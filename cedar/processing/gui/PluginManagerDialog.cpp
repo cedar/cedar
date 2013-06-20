@@ -76,7 +76,7 @@ void cedar::proc::gui::PluginManagerDialog::accepted()
     QCheckBox *p_cb = dynamic_cast<QCheckBox*>(this->mpPluginList->cellWidget(row, 0));
     CEDAR_DEBUG_ASSERT(p_cb != NULL);
 
-    QLabel *p_path = dynamic_cast<QLabel*>(this->mpPluginList->cellWidget(row, 3));
+    QLabel* p_path = dynamic_cast<QLabel*>(this->mpPluginList->cellWidget(row, 3));
     CEDAR_DEBUG_ASSERT(p_path != NULL);
 
     std::string path = p_path->text().toStdString();

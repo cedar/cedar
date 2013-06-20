@@ -709,7 +709,6 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
                 " does not exist in Connectable \""
                 + this->getName() +
                 "\".");
-    return;
   }
 
 #ifdef DEBUG_LOCKS
@@ -724,7 +723,6 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
                 "The requested " +
                 cedar::proc::DataRole::type().get(role).prettyString() +
                 " name \"" + name + "\" does not exist.");
-    return;
   }
   cedar::proc::DataSlotPtr slot = map_iterator->second;
 
