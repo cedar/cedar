@@ -28,14 +28,14 @@
     Email:       bjoern.weghenkel@ini.rub.de
     Date:        2011 01 06
 
-    Description: Example for an @em cedar::dev::robot::KinematicChainWidget.
+    Description: Example for an @em cedar::dev::KinematicChainWidget.
 
     Credits:
 
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/devices/robot/gui/KinematicChainWidget.h"
+#include "cedar/devices/gui/KinematicChainWidget.h"
 #include "cedar/devices/amtec/KinematicChain.h"
 #include "cedar/auxiliaries/systemFunctions.h"
 
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
 
     //p_kinematic_chain->useCurrentHardwareValues(true);
     QApplication app(argc, argv);
-    cedar::dev::robot::gui::KinematicChainWidget widget(p_kinematic_chain);
+    cedar::dev::gui::KinematicChainWidget widget(p_kinematic_chain);
     widget.show();
     return app.exec();
   }
