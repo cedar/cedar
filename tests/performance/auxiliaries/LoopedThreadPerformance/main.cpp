@@ -38,10 +38,9 @@
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
+#include "cedar/auxiliaries/testingFunctions.h"
 
 // SYSTEM INCLUDES
-#include <functional>
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <QReadWriteLock>
 #include <QCoreApplication>
 
@@ -49,42 +48,6 @@
 // global variables
 int errors = 0;
 
-
-
-void write_measurement
-     (
-       const std::string& id,
-       double duration
-     )
-{
-  std::cout
-      << "<DartMeasurement"
-      << " name=\""
-      << id
-      << " (seconds)\""
-      << " type=\"numeric/double\">"
-      << cedar::aux::toString(duration)
-      << "</DartMeasurement>"
-      << std::endl;
-}
-
-void test_time(std::string id, std::function< void() > fun)
-{
-  using boost::posix_time::ptime;
-  using boost::posix_time::microsec_clock;
-
-  double duration;
-
-  auto start = microsec_clock::local_time();
-
-  // execute the test:
-  fun();
-
-  auto end = microsec_clock::local_time();
-
-  duration = static_cast<double>((end - start).total_milliseconds()) / 1000.0;
-  write_measurement(id, duration);
-}
 
 // changing these values will obviously have system and load dependent
 // variations
@@ -178,12 +141,12 @@ void run_test()
 {
   errors= 0;
 
-  test_time("create threads", create_test );
-  test_time("start threads", start_test );
+  cedar::aux::testing::test_time("create threads", create_test );
+  cedar::aux::testing::test_time("start threads", start_test );
 
   usleep(1000*1000*3);
 
-  test_time("stop threads", stop_test );
+  cedar::aux::testing::test_time("stop threads", stop_test );
 
   // evaluation statistics for all threads:
 
@@ -201,13 +164,13 @@ void run_test()
       max_real_step_all= (*it)->mMaxRealStep;
   }
  
-  write_measurement("num steps", num_steps_all7);
-  write_measurement("real-step size", total_real_step_all );
-  write_measurement("real-step max", max_real_step_all );
-  write_measurement("rel deviatiation", ( total_real_step_all 
+  cedar::aux::testing::write_measurement("num steps", num_steps_all7);
+  cedar::aux::testing::write_measurement("real-step size", total_real_step_all );
+  cedar::aux::testing::write_measurement("real-step max", max_real_step_all );
+  cedar::aux::testing::write_measurement("rel deviatiation", ( total_real_step_all 
                                            / num_steps_all7 )
                                         - STEP_SIZE );                                        
-  test_time("delete threads", delete_test );
+  cedar::aux::testing::test_time("delete threads", delete_test );
 }
 
 int main(int argc, char* argv[])
