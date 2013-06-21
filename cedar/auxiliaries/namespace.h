@@ -59,12 +59,29 @@ namespace cedar
       template <typename ValueType> class Instantly;
       template <typename ValueType> class OnDemand;
     }
+    
+    /*!@brief Namespace for implementation details you should not use. */
+    namespace detail
+    {
+      class ThreadWorker;
+      class LoopedThreadWorker;
+      class CallFunctionInThreadWorker;
+    }
+
+    /*!@brief Namespace for shared testing (unit-tests, etc) code. TODO: will be moved or changed in the near future */
+    namespace testing
+    {
+    }
 
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Configurable);
     CEDAR_DECLARE_AUX_CLASS(NamedConfigurable);
     CEDAR_DECLARE_AUX_CLASS(Lockable);
+    CEDAR_DECLARE_AUX_CLASS(Settings);
+
+    CEDAR_DECLARE_AUX_CLASS(ThreadWrapper);
     CEDAR_DECLARE_AUX_CLASS(LoopedThread);
+    CEDAR_DECLARE_AUX_CLASS(CallFunctionInThread);
     CEDAR_DECLARE_AUX_CLASS(LoopMode);
     CEDAR_DECLARE_AUX_CLASS(UserData);
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(IntrusivePtrBase);
@@ -248,6 +265,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(NotImplementedException);
     CEDAR_DECLARE_AUX_CLASS(NullPointerException);
     CEDAR_DECLARE_AUX_CLASS(ParameterNotFoundException);
+    CEDAR_DECLARE_AUX_CLASS(ParseException);
     CEDAR_DECLARE_AUX_CLASS(RangeException);
     CEDAR_DECLARE_AUX_CLASS(ResourceNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(TypeMismatchException);
@@ -258,6 +276,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(UnknownUnitSuffixException);
     CEDAR_DECLARE_AUX_CLASS(UnmanglingFailedException);
     CEDAR_DECLARE_AUX_CLASS(ValidationFailedException);
+    CEDAR_DECLARE_AUX_CLASS(ThreadingErrorException);
     //!@endcond
     
     //!@cond SKIPPED_DOCUMENTATION

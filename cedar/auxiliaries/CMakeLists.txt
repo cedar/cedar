@@ -54,6 +54,9 @@ endif(CEDAR_USE_QWTPLOT3D)
 
 cedar_add_library(cedaraux
   MOC_HEADERS
+  ThreadWrapper.h
+  ThreadWorker.h
+  LoopedThread.h
   LocalCoordinateFrame.h
   gl/ObjectVisualization.h
   gui/AccelerationParameter.h
@@ -96,7 +99,6 @@ cedar_add_library(cedaraux
   ${vtk_moc_files}
   ${qwtplot3d_moc_files}
   convolution/Convolution.h
-  LoopedThread.h
   Parameter.h
   kernel/Separable.h
   kernel/Kernel.h

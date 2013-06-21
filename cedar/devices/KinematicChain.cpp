@@ -81,12 +81,14 @@ mpEndEffectorCoordinateFrame(pEndEffector)
 //! destructor
 cedar::dev::KinematicChain::~KinematicChain()
 {
-  // TODO: jokeit: is this necessary? seems buggy.
+#if 0
+// JS: das wird schon in LoopedThread geprueft
   if (isRunning())
   {
     this->stop();
     this->wait();
   }
+#endif
 }
 
 //! constructor
@@ -714,7 +716,7 @@ void cedar::dev::KinematicChain::start(Priority priority)
       mJointAngles = tmp;
     }
 
-    QThread::start(priority);
+    LoopedThread::start();
     break;
   }
 

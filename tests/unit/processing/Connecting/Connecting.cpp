@@ -38,6 +38,7 @@
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Network.h"
 #include "cedar/processing/LoopedTrigger.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/DoubleData.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
@@ -269,9 +270,12 @@ int testOnlineDisconnecting()
   return errors;
 }
 
-int main(int, char**)
+// global variable:
+unsigned int global_errors;
+
+void run_test()
 {
-  unsigned int errors = 0;
+  global_errors = 0;
 
   cedar::proc::NetworkPtr network (new cedar::proc::Network());
   network->add(TestSourcePtr(new TestSource(1)), "source1");
@@ -281,9 +285,27 @@ int main(int, char**)
   network->connectSlots("source1.output", "target.input1");
   network->connectSlots("source2.output", "target.input2");
 
-  errors += testPtrChange();
-  errors += testOnlineDisconnecting();
+  global_errors += testPtrChange();
+  global_errors += testOnlineDisconnecting();
 
-  std::cout << "Done. There were " << errors << " error(s)." << std::endl;
-  return errors;
+  std::cout << "Done. There were " << global_errors << " error(s)." << std::endl;
 }
+
+int main(int argc, char* argv[])
+{
+  QCoreApplication* app;
+  app = new QCoreApplication(argc,argv);
+
+  auto testThread = new cedar::aux::CallFunctionInThread(run_test);
+
+  QObject::connect( testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection );  // alternatively: call app->quit() in runTests()
+
+  testThread->start();
+  app->exec();
+
+  delete testThread;
+  delete app;
+
+  return global_errors;
+}
+

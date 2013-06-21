@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/gui/Log.h"
 #include "cedar/auxiliaries/logFilter/All.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/Settings.h"
 
 // SYSTEM INCLUDES
 #include <QHeaderView>
@@ -64,7 +65,10 @@ QTabWidget(pParent)
 
 #ifdef DEBUG
   this->addPane(cedar::aux::LOG_LEVEL_DEBUG, "debug", ":/cedar/auxiliaries/gui/debug.svg");
-  this->addPane(cedar::aux::LOG_LEVEL_MEM_DEBUG, "memory", ":/cedar/auxiliaries/gui/memory.svg");
+  if (cedar::aux::SettingsSingleton::getInstance()->getMemoryDebugOutput())
+  {
+    this->addPane(cedar::aux::LOG_LEVEL_MEM_DEBUG, "memory", ":/cedar/auxiliaries/gui/memory.svg");
+  }
 #endif // DEBUG
 
   QObject::connect

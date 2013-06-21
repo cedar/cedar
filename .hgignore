@@ -61,6 +61,7 @@ build/*
 cedar/doc/*
 CTestTestfile.cmake
 */lib.h
+cedar/processing/Testing/Temporary/*
 
 syntax: regexp
 ^tests/unit/processing/ArchitectureIO/architecture1\.json$

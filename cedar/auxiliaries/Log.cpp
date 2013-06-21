@@ -39,6 +39,7 @@
 #include "cedar/auxiliaries/LogFilter.h"
 #include "cedar/auxiliaries/LogInterface.h"
 #include "cedar/auxiliaries/ConsoleLog.h"
+#include "cedar/auxiliaries/Settings.h"
 
 // SYSTEM INCLUDES
 
@@ -117,3 +118,7 @@ void cedar::aux::Log::log(cedar::aux::LOG_LEVEL level, const std::string& messag
   }
 }
 
+bool cedar::aux::Log::getMemoryDebugFlag()
+{
+  return cedar::aux::SettingsSingleton::getInstance()->getMemoryDebugOutput();
+}
