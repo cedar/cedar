@@ -91,7 +91,7 @@ cedar::aux::Configurable()
   {
     this->load();
   }
-  catch(cedar::proc::ParseException& exc)
+  catch(cedar::aux::ParseException& exc)
   {
     //!\todo pass a log message to somewhere
 #ifdef DEBUG
@@ -106,7 +106,7 @@ cedar::proc::FrameworkSettings::~FrameworkSettings()
   {
     this->save();
   }
-  catch(cedar::proc::ParseException& exc)
+  catch(cedar::aux::ParseException& exc)
   {
     //!\todo pass a log message to somewhere
     std::cout << "error saving framework settings, please check file permissions in "
@@ -173,7 +173,7 @@ void cedar::proc::FrameworkSettings::load()
   }
   catch (const boost::property_tree::json_parser::json_parser_error& e)
   {
-    CEDAR_THROW(cedar::proc::ParseException, "Error reading framework settings: " + std::string(e.what()));
+    CEDAR_THROW(cedar::aux::ParseException, "Error reading framework settings: " + std::string(e.what()));
   }
 }
 
@@ -186,6 +186,6 @@ void cedar::proc::FrameworkSettings::save()
   }
   catch (const boost::property_tree::json_parser::json_parser_error& e)
   {
-    CEDAR_THROW(cedar::proc::ParseException, "Error saving framework settings: " + std::string(e.what()));
+    CEDAR_THROW(cedar::aux::ParseException, "Error saving framework settings: " + std::string(e.what()));
   }
 }
