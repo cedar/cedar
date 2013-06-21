@@ -328,7 +328,10 @@ int cedar::aux::gui::PropertyPane::getSenderParameterRowWidget() const
   cedar::aux::gui::Parameter *p_parameter = dynamic_cast<cedar::aux::gui::Parameter*>(QObject::sender());
   CEDAR_DEBUG_ASSERT(p_parameter != NULL);
 
-  CEDAR_DEBUG_ASSERT(this->mParameterWidgetRowIndex.find(p_parameter) != this->mParameterWidgetRowIndex.end());
+  if (this->mParameterWidgetRowIndex.find(p_parameter) == this->mParameterWidgetRowIndex.end())
+  {
+    CEDAR_THROW(cedar::aux::ParameterNotFoundException, "cannot find given parameter's widget");
+  }
   return this->mParameterWidgetRowIndex.find(p_parameter)->second;
 }
 
@@ -356,7 +359,16 @@ void cedar::aux::gui::PropertyPane::parameterChangeFlagChanged()
 
 void cedar::aux::gui::PropertyPane::rowSizeChanged()
 {
-  int row = this->getSenderParameterRowWidget();
+
+  int row;
+  try
+  {
+    row = this->getSenderParameterRowWidget();
+  }
+  catch (cedar::aux::ParameterNotFoundException& exc)
+  {
+    return;
+  }
 
   // the process-events call is only necessary because qt does otherwise not detect the new size properly.
   // should this bug ever be fixed, this can be removed.
