@@ -59,6 +59,8 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/Log.h"
 
+#include "cedar/processing/consistency/LoopedStepNotConnected.h"
+
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/string_path.hpp>
@@ -130,6 +132,56 @@ cedar::proc::Network::~Network()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+std::vector<cedar::proc::ConsistencyIssuePtr> cedar::proc::Network::checkConsistency() const
+{
+  std::vector<cedar::proc::ConsistencyIssuePtr> issues;
+
+  // generate a list of all looped triggers in the architecture
+  //!@todo There should probably be a function for this.
+  std::vector<cedar::proc::LoopedTriggerPtr> looped_triggers;
+  for (auto iter = this->elements().begin(); iter != this->elements().end(); ++iter)
+  {
+    cedar::proc::ElementPtr element = iter->second;
+    if (cedar::proc::LoopedTriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(element))
+    {
+      looped_triggers.push_back(trigger);
+    }
+  }
+
+  // == Check for looped steps that are not connected to looped triggers ===============================================
+  for (auto iter = this->elements().begin(); iter != this->elements().end(); ++iter)
+  {
+    cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(iter->second);
+
+    if (!step)
+    {
+      continue;
+    }
+
+    if (step->isLooped())
+    {
+      bool is_triggered = false;
+      // check if there is a looped trigger to which this element is connected
+      for (size_t i = 0; i < looped_triggers.size(); ++i)
+      {
+        cedar::proc::LoopedTriggerPtr trigger = looped_triggers[i];
+        if (trigger->isListener(step))
+        {
+          is_triggered = true;
+          break;
+        }
+      }
+
+      if (!is_triggered)
+      {
+        issues.push_back(boost::make_shared<cedar::proc::LoopedStepNotConnected>(step));
+      }
+    } // is looped
+  }
+
+  return issues;
+}
 
 void cedar::proc::Network::startTriggers()
 {

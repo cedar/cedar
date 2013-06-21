@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatrixPlot.h
+    File:        ConsistencyIssue.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 14
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 06 20
 
     Description:
 
@@ -38,65 +34,46 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_MATRIX_PLOT_H
-#define CEDAR_AUX_GUI_MATRIX_PLOT_H
+#ifndef CEDAR_PROC_CONSISTENCY_ISSUE_H
+#define CEDAR_PROC_CONSISTENCY_ISSUE_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/MultiPlotInterface.h"
+#include "cedar/processing/namespace.h"
 
 // SYSTEM INCLUDES
-#include <QWidget>
-#include <QReadWriteLock>
-#include <opencv2/opencv.hpp>
-#include <qwtplot3d/qwt3d_types.h>
 
-/*!@brief Base class for plots that can display matrices.
+
+/*!@todo describe.
  *
- *        Based on the dimensionality of the data plotted, this class decides which type of plot to open. Currently,
- *        these are:
- *
- *        HistoryPlot0D     for 0D matrices,
- *
- *        LinePlot          for 1D matrices,
- *
- *        SurfacePlot       for 2D matrices and
- *
- *        MatrixSlicePlot3D for 3D matrices.
- *
+ * @todo describe more.
  */
-class cedar::aux::gui::MatrixPlot : public cedar::aux::gui::MultiPlotInterface
+class cedar::proc::ConsistencyIssue
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  MatrixPlot(QWidget *pParent = NULL);
+  ConsistencyIssue();
+
+  //!@brief Destructor
+  virtual ~ConsistencyIssue();
+
+  //!@brief Returns a textual description of the issue. May include html code.
+  virtual std::string getDescription() const = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief display a MatData
-  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
-
-  bool canAppend(cedar::aux::ConstDataPtr data) const;
-
-  //!@brief return vector of standard colors
-  static const Qwt3D::ColorVector& getStandardColorVector();
-
-public slots:
-  /*!@brief Reacts to a change in the plotted data.
-   *
-   * When the dimensionality of the plotted data changes, this causes a switch of the plot type.
-   */
-  void processChangedData();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -108,7 +85,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -116,15 +93,18 @@ private:
 protected:
   // none yet
 private:
-  //!@brief the displayed MatData
-  cedar::aux::ConstMatDataPtr mData;
+  // none yet
 
-  //!@brief the plot widget
-  QWidget* mpCurrentPlotWidget;
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-  //!@brief vector filled with standard colors
-  static Qwt3D::ColorVector mStandardColorVector;
+private:
+  // none yet
 
-}; // class cedar::aux::gui::MatrixPlot
+}; // class cedar::proc::ConsistencyIssue
 
-#endif // CEDAR_AUX_GUI_MATRIX_PLOT_H
+#endif // CEDAR_PROC_CONSISTENCY_ISSUE_H
+
