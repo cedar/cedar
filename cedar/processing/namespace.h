@@ -121,7 +121,6 @@ namespace cedar
     class CEDAR_PROC_LIB_EXPORT NoCheckException;
     class CEDAR_PROC_LIB_EXPORT NoMappingException;
     class CEDAR_PROC_LIB_EXPORT NoMeasurementException;
-    class CEDAR_PROC_LIB_EXPORT ParseException;
     class CEDAR_PROC_LIB_EXPORT PluginException;
     //!@endcond
   }
