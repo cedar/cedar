@@ -137,6 +137,9 @@ public:
   //!@brief The standard constructor.
   ImagePlot(QWidget *pParent = NULL);
 
+  //!@brief Constructor that plots some data.
+  ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
+
   //!@todo implement this constructor (see SurfacePlot.cpp)
   // ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
 
@@ -191,6 +194,8 @@ private:
   /*!@brief Creates the image based on the matrix.
    */
   void imageFromMat(const cv::Mat& mat);
+
+  void construct();
 
 private slots:
   void conversionDone();
