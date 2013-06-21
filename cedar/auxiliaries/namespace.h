@@ -52,7 +52,7 @@ namespace cedar
   /*!@brief Namespace for all aux classes. */
   namespace aux
   {
-    /*!@bierf Namespace for implementation details you should not use. */
+    /*!@brief Namespace for implementation details you should not use. */
     namespace detail
     {
       class ThreadWorker;
