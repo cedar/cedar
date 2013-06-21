@@ -98,7 +98,10 @@ likely to undergo major changes:
     this is the new default)
   - gui::PluginManagerDialog now allows you to remove unused entries of plugins.
   - The "plot all" function can now be replaced by other plots where appropriate. For example, for neural fields, the
-    field plot now replaces it. In such cases, plot all can still be accessed from the "defined plots" menu. 
+    field plot now replaces it. In such cases, plot all can still be accessed from the "defined plots" menu.
+  - The processingIde now offers a tool for checking architecture consistency. It is still a very early version and will
+    be extended in the future. For now, it only checks if all looped steps in the current architecture are connected to
+    a looped trigger. The tool can be accessed from the "windows" menu.
 
 - cedar::dyn
   - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   

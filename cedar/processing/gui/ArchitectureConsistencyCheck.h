@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatrixPlot.h
+    File:        ArchitectureConsistencyCheck.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 14
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 06 20
 
     Description:
 
@@ -38,65 +34,50 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_MATRIX_PLOT_H
-#define CEDAR_AUX_GUI_MATRIX_PLOT_H
+#ifndef CEDAR_PROC_GUI_ARCHITECTURE_CONSISTENCY_CHECK_H
+#define CEDAR_PROC_GUI_ARCHITECTURE_CONSISTENCY_CHECK_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/MultiPlotInterface.h"
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/gui/ui_ArchitectureConsistencyCheck.h"
+#include "cedar/processing/consistency/ConsistencyIssue.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
-#include <QReadWriteLock>
-#include <opencv2/opencv.hpp>
-#include <qwtplot3d/qwt3d_types.h>
 
-/*!@brief Base class for plots that can display matrices.
- *
- *        Based on the dimensionality of the data plotted, this class decides which type of plot to open. Currently,
- *        these are:
- *
- *        HistoryPlot0D     for 0D matrices,
- *
- *        LinePlot          for 1D matrices,
- *
- *        SurfacePlot       for 2D matrices and
- *
- *        MatrixSlicePlot3D for 3D matrices.
- *
+
+/*!@brief Widget that alerts users about potential flaws in their architecture
  */
-class cedar::aux::gui::MatrixPlot : public cedar::aux::gui::MultiPlotInterface
+class cedar::proc::gui::ArchitectureConsistencyCheck : public QWidget, public Ui_ConsistencyCheck
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  MatrixPlot(QWidget *pParent = NULL);
+  ArchitectureConsistencyCheck(cedar::proc::gui::View* pView,cedar::proc::gui::Scene* pScene);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief display a MatData
-  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
+  void setNetwork(cedar::proc::gui::NetworkPtr network);
 
-  bool canAppend(cedar::aux::ConstDataPtr data) const;
-
-  //!@brief return vector of standard colors
-  static const Qwt3D::ColorVector& getStandardColorVector();
+  void clear();
 
 public slots:
-  /*!@brief Reacts to a change in the plotted data.
-   *
-   * When the dimensionality of the plotted data changes, this causes a switch of the plot type.
-   */
-  void processChangedData();
+  void recheck();
+
+  void itemAction(int row, int column);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -108,7 +89,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
+  void addIssue(size_t issueId, cedar::proc::ConsistencyIssuePtr issue);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -116,15 +97,15 @@ private:
 protected:
   // none yet
 private:
-  //!@brief the displayed MatData
-  cedar::aux::ConstMatDataPtr mData;
+  cedar::proc::gui::NetworkPtr mNetwork;
 
-  //!@brief the plot widget
-  QWidget* mpCurrentPlotWidget;
+  cedar::proc::gui::Scene* mpScene;
 
-  //!@brief vector filled with standard colors
-  static Qwt3D::ColorVector mStandardColorVector;
+  cedar::proc::gui::View* mpView;
 
-}; // class cedar::aux::gui::MatrixPlot
+  std::vector<cedar::proc::ConsistencyIssuePtr> mIssues;
 
-#endif // CEDAR_AUX_GUI_MATRIX_PLOT_H
+}; // class cedar::proc::gui::ArchitectureConsistencyCheck
+
+#endif // CEDAR_PROC_GUI_ARCHITECTURE_CONSISTENCY_CHECK_H
+
