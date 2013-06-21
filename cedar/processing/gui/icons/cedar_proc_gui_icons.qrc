@@ -48,5 +48,6 @@
     <file>toolbaricons/show_triggers.svg</file>
     <file>toolbaricons/hide_triggers.svg</file>
     <file>processing_ide_app_icon.svg</file>
+    <file>processing_ide_app_icon_48.png</file>
   </qresource>
 </RCC>

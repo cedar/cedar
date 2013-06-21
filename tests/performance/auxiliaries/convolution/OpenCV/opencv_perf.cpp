@@ -40,7 +40,7 @@
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/math/tools.h"
-#include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/testingFunctions.h"
 #include "cedar/configuration.h"
 
 // SYSTEM INCLUDES
@@ -78,23 +78,6 @@ struct TestSet
   double mDuration;
 };
 
-void write_measurement
-     (
-       const std::string& id,
-       double duration
-     )
-{
-  std::cout
-      << "<DartMeasurement"
-      << " name=\""
-      << id
-      << " (seconds)\""
-      << " type=\"numeric/double\">"
-      << cedar::aux::toString(duration)
-      << "</DartMeasurement>"
-      << std::endl;
-}
-
 void test_convolution_time_1d(TestSet& test)
 {
   using boost::posix_time::ptime;
@@ -119,7 +102,7 @@ void test_convolution_time_1d(TestSet& test)
   ptime end = microsec_clock::local_time();
 
   test.mDuration = static_cast<double>((end - start).total_milliseconds()) / 1000.0;
-  write_measurement(case_id, test.mDuration);
+  cedar::aux::testing::write_measurement(case_id, test.mDuration);
 }
 
 

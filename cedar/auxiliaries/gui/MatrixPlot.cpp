@@ -179,8 +179,7 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
 #ifdef CEDAR_USE_QWTPLOT3D
       this->mpCurrentPlotWidget = new cedar::aux::gui::SurfacePlot(this->mData, title);
 #else
-      this->mpCurrentPlotWidget = new cedar::aux::gui::ImagePlot();
-      this->mpCurrentPlotWidget->plot(this->mData, title);
+      this->mpCurrentPlotWidget = new cedar::aux::gui::ImagePlot(this->mData, title);
 #endif // CEDAR_USE_QWTPLOT3D
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;

@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="icons/icons.qrc">
-    <normaloff>:/processing_ide_app_icon.svg</normaloff>:/processing_ide_app_icon.svg</iconset>
+    <normaloff>:/processing_ide_app_icon_48.png</normaloff>:/processing_ide_app_icon_48.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -206,6 +206,7 @@
     <addaction name="separator"/>
     <addaction name="mpActionShowRobotManager"/>
     <addaction name="separator"/>
+    <addaction name="mpActionArchitectureConsistencyCheck"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -309,8 +310,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>124</width>
-          <height>418</height>
+          <width>116</width>
+          <height>422</height>
          </rect>
         </property>
         <attribute name="label">
@@ -322,8 +323,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>124</width>
-          <height>418</height>
+          <width>116</width>
+          <height>422</height>
          </rect>
         </property>
         <attribute name="label">
@@ -584,6 +585,11 @@
    </property>
    <property name="text">
     <string>Smart hide</string>
+   </property>
+  </action>
+  <action name="mpActionArchitectureConsistencyCheck">
+   <property name="text">
+    <string>Architecture consistency check ...</string>
    </property>
   </action>
  </widget>
