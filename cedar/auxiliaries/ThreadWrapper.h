@@ -51,6 +51,7 @@
 // SYSTEM INCLUDES
 #include <string>
 #include <iostream>
+#include <climits>
 #include <QThread>
 #include <QMutex>
 #include <QReadWriteLock>
@@ -105,7 +106,7 @@ public:
    *        the timeout-period. Use with caution.
    *@param suppressWarning: will be passed to applyStop()
    */
-  void stop(unsigned int timeout = 500, bool suppressWarning = false); 
+  void stop(unsigned int timeout = UINT_MAX, bool suppressWarning = false); 
     // TODO: why is this uint and the arg of wait() is ulong?
 
   /*! start the thread and initialize the worker
