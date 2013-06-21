@@ -692,7 +692,6 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
                 " does not exist in Connectable \""
                 + this->getName() +
                 "\".");
-    return;
   }
 
 #ifdef DEBUG_LOCKS
@@ -706,7 +705,6 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
                 "The requested " +
                 cedar::proc::DataRole::type().get(role).prettyString() +
                 " name \"" + name + "\" does not exist.");
-    return;
   }
 
   cedar::proc::DataSlotPtr slot = map_iterator->second;
@@ -743,7 +741,6 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& na
                 " does not exist in Connectable \""
                 + this->getName() +
                 "\".");
-    return;
   }
 
   SlotMap::iterator map_iterator = iter->second.find(name);
@@ -758,7 +755,6 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& na
                 "The requested " +
                 cedar::proc::DataRole::type().get(role).prettyString() +
                 " name \"" + name + "\" does not exist.");
-    return;
   }
   locker.unlock();
 

@@ -72,6 +72,8 @@ public slots:
   /*!@brief Slot that is called when the dialog is closed by clicking ok.
    */
   void accepted();
+  void removePlugins();
+  void toggleDeleteButton();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

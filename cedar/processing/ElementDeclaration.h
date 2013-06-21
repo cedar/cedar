@@ -61,10 +61,60 @@
 class cedar::proc::ElementDeclaration : public cedar::aux::PluginDeclarationBaseTemplate<cedar::proc::ElementPtr>
 {
 public:
+  struct PlotData
+  {
+    PlotData
+    (
+      cedar::proc::DataRole::Id id = cedar::proc::DataRole::OUTPUT,
+      const std::string& name = "",
+      bool ignoreIfMissing = false
+    )
+    :
+    mId(id),
+    mName(name),
+    mIgnoreIfMissing(ignoreIfMissing)
+    {
+    }
+
+    //! Role of the data to be plotted.
+    cedar::proc::DataRole::Id mId;
+
+    //! Name of the data to be plotted.
+    std::string mName;
+
+    //! If true, no exception will be thrown if the data cannot be found.
+    bool mIgnoreIfMissing;
+  };
+
   //!@brief list that pairs a data role with the desired plot
-  typedef std::vector<std::pair<cedar::proc::DataRole::Id, std::string> > DataList;
+  typedef std::vector<PlotData> DataList;
+
+  struct PlotDefinition
+  {
+    PlotDefinition(const std::string& name, const std::string& icon = std::string())
+    :
+    mName(name),
+    mIcon(icon)
+    {
+    }
+
+    void appendData(cedar::proc::DataRole::Id id, const std::string& dataName, bool ignoreIfMissing = false)
+    {
+      this->mData.push_back(PlotData(id, dataName, ignoreIfMissing));
+    }
+
+    //! Name of the plot.
+    std::string mName;
+
+    //! Icon of the plot.
+    std::string mIcon;
+
+    //! Data to be plotted.
+    DataList mData;
+  };
+
   //!@brief list of plot definitions
-  typedef std::vector<std::pair<std::string, DataList> > PlotDefinitionList;
+  typedef std::vector<PlotDefinition> PlotDefinitionList;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -112,9 +162,9 @@ public:
    *
    * @todo  This should also be read from the plugin xml file.
    */
-  void definePlot(const std::string& plotName, const DataList& slotsToPlot)
+  void definePlot(const PlotDefinition& plotDefinition)
   {
-    this->mPlots.push_back(std::make_pair(plotName, slotsToPlot));
+    this->mPlots.push_back(plotDefinition);
   }
 
   //!@brief Returns the defined plots for this declaration.
@@ -125,6 +175,17 @@ public:
 
   //! Overriden in the templated version by the super class implementation.
   virtual void declare() const = 0;
+
+  //! Set the default plot. When the plot is an empty string, "plot all" will be the default.
+  void setDefaultPlot(const std::string& plotName)
+  {
+    this->mDefaultPlot = plotName;
+  }
+
+  const std::string& getDefaultPlot() const
+  {
+    return this->mDefaultPlot;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -163,6 +224,9 @@ private:
 
   //!@brief Declarations of plots.
   PlotDefinitionList mPlots;
+
+  //! Default plot to open (if empty, all data is plotted).
+  std::string mDefaultPlot;
 };
 
 

@@ -275,15 +275,6 @@ void cedar::proc::Step::onTrigger(cedar::proc::ArgumentsPtr args, cedar::proc::T
     return;
   }
 
-  if (!this->mandatoryConnectionsAreSet())
-  {
-    std::string errors = cedar::aux::join(mInvalidInputNames, ", ");
-
-    this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING,
-                   "Unconnected mandatory inputs prevent the step from running. These inputs are:" + errors);
-    return;
-  } // this->mMandatoryConnectionsAreSet
-
   if (!this->setNextArguments(args))
   {
     this->mpArgumentsLock->lockForWrite();
@@ -352,6 +343,18 @@ void cedar::proc::Step::run()
     clock_t lock_elapsed = lock_end - lock_start;
     double lock_elapsed_s = static_cast<double>(lock_elapsed) / static_cast<double>(CLOCKS_PER_SEC);
     this->setLockTimeMeasurement(cedar::unit::Seconds(lock_elapsed_s));
+
+    if (!this->mandatoryConnectionsAreSet())
+    {
+      std::string errors = cedar::aux::join(mInvalidInputNames, ", ");
+
+      this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING,
+                     "Unconnected mandatory inputs prevent the step from running. These inputs are:" + errors);
+      this->unlock();
+      this->mBusy.unlock();
+      return;
+    } // this->mMandatoryConnectionsAreSet
+
 
     if (this->mLastComputeCall != 0)
     {

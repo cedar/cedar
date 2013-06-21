@@ -88,6 +88,7 @@ cedar_add_library(cedaraux
   ${vtk_moc_files}
   ${qwtplot3d_moc_files}
   convolution/Convolution.h
+  LoopedThread.h
   Parameter.h
   kernel/Separable.h
   kernel/Kernel.h
