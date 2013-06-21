@@ -109,13 +109,6 @@ class cedar::proc::PluginException: public cedar::aux::ExceptionBase
 {
 }; // class cedar::proc::PluginException
 
-/*!@brief An exception that is thrown, when FrameworkSettings encounters a parsing error during loading or saving
- * of settings.
- */
-class cedar::proc::ParseException: public cedar::aux::ExceptionBase
-{
-}; // class cedar::proc::ParseException
-
 /*!@brief An exception that is thrown by the Manager, if a connection that is marked for deletion, cannot be found in
  * the list of connections.
  */

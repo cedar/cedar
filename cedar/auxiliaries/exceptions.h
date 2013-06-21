@@ -217,4 +217,10 @@ class cedar::aux::ThreadingErrorException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::ThreadingErrorException
 
+/*!@brief An exception that is thrown, when reading or writing jsons encounters a parsing error.
+ */
+class cedar::aux::ParseException: public cedar::aux::ExceptionBase
+{
+}; // class cedar::proc::ParseException
+
 #endif // CEDAR_AUX_EXCEPTIONS_H
