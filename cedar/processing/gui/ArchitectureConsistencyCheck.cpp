@@ -84,21 +84,19 @@ void cedar::proc::gui::ArchitectureConsistencyCheck::recheck()
 
   this->clear();
 
-  for (size_t issue_id = 0; issue_id < this->mIssues.size(); ++issue_id)
+  if (this->mIssues.size() > 0)
   {
-    auto issue = this->mIssues.at(issue_id);
-    this->addIssue(issue_id, issue);
-    /*
-    if (auto looped_not_connected = boost::dynamic_pointer_cast<cedar::proc::LoopedStepNotConnected>(issue))
+    for (size_t issue_id = 0; issue_id < this->mIssues.size(); ++issue_id)
     {
-      std::cout << "LOOPED STUFF!" << std::endl;
+      auto issue = this->mIssues.at(issue_id);
+      this->addIssue(issue_id, issue);
     }
-    else
-    {
-      // should not happen -- if it does, someone needs to implement a new check!
-      CEDAR_DEBUG_NON_CRITICAL_ASSERT(false);
-    }
-    */
+  }
+  else
+  {
+    int row = this->mpIssueTable->rowCount();
+    this->mpIssueTable->setRowCount(row + 1);
+    this->mpIssueTable->setItem(row, 1, new QTableWidgetItem("No issues found"));
   }
 }
 
