@@ -64,6 +64,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(Configurable);
     CEDAR_DECLARE_AUX_CLASS(NamedConfigurable);
     CEDAR_DECLARE_AUX_CLASS(Lockable);
+    CEDAR_DECLARE_AUX_CLASS(Settings);
 
     CEDAR_DECLARE_AUX_CLASS(ThreadWrapper);
     CEDAR_DECLARE_AUX_CLASS(LoopedThread);
@@ -231,6 +232,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(NotFoundException);
     CEDAR_DECLARE_AUX_CLASS(NullPointerException);
     CEDAR_DECLARE_AUX_CLASS(ParameterNotFoundException);
+    CEDAR_DECLARE_AUX_CLASS(ParseException);
     CEDAR_DECLARE_AUX_CLASS(RangeException);
     CEDAR_DECLARE_AUX_CLASS(ResourceNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(TypeMismatchException);
