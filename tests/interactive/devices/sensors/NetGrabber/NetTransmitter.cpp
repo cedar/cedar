@@ -24,7 +24,7 @@
 #include "cedar/auxiliaries/net/Writer.h"
 
 // SYSTEM INCLUDES
-#include <QtGui/QApplication>
+#include <QApplication>
 #include <ios>
 
 // ---------------------------------------------------------------------------------------------------------------------

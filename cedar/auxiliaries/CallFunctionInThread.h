@@ -57,6 +57,7 @@
 #include <QMutex>
 #include <QReadWriteLock>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/function.hpp>
 
 /*!@brief This class wraps a function call into a thread.
  *
@@ -85,7 +86,7 @@ public:
   //----------------------------------------------------------------------------
 
   //! the type we use to store function calls
-  typedef std::function< void(void) > FunctionType;
+  typedef boost::function< void(void) > FunctionType;
 
   //----------------------------------------------------------------------------
   // constructors and destructor
@@ -96,7 +97,7 @@ public:
    *
    * Start the thread via start().
    *
-   *@param fun is a std::function< void(void) > and thus can be a function pointer or function object.
+   *@param fun is a boost::function< void(void) > and thus can be a function pointer or function object.
    */
   CallFunctionInThread(FunctionType fun);
 

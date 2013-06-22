@@ -37,6 +37,9 @@
 #ifndef CEDAR_NET_BLOCKING_READER_H
 #define CEDAR_NET_BLOCKING_READER_H
 
+#include "cedar/configuration.h"
+#ifdef CEDAR_USE_YARP
+
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/namespace.h"
 #include "cedar/auxiliaries/net/exceptions.h"
@@ -387,5 +390,7 @@ private:
 
 //!@endcond
 } } } // end namespaces
+
+#endif // CEDAR_USE_YARP
 
 #endif

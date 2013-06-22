@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -59,15 +59,33 @@ if (DEBUG_CEDAR_BUILD_SYSTEM)
   message ("  >> cedar home is set to ${CEDAR_HOME}")
 endif(DEBUG_CEDAR_BUILD_SYSTEM)
 
-# Look for qt  
+# Look for qt
 find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml REQUIRED)
-
 if(QT4_FOUND)
   # Include qt's cmake scripts
   include(${QT_USE_FILE})
   
   # Add qt include directories
   include_directories(${QT_INCLUDE_DIRS})
+else(QT4_FOUND)
+  find_package(Qt5Widgets REQUIRED)
+  find_package(Qt5OpenGL REQUIRED)
+  find_package(Qt5Xml REQUIRED)
+
+  if(Qt5Widgets_FOUND)
+    include_directories(${Qt5Widgets_INCLUDE_DIRS})
+    add_definitions(${Qt5Widgets_DEFINITIONS})
+  endif(Qt5Widgets_FOUND)
+
+  if(Qt5OpenGL_FOUND)
+    include_directories(${Qt5OpenGL_INCLUDE_DIRS})
+    add_definitions(${Qt5OpenGL_DEFINITIONS})
+  endif(Qt5OpenGL_FOUND)
+
+  if(Qt5Xml_FOUND)
+    include_directories(${Qt5Xml_INCLUDE_DIRS})
+    add_definitions(${Qt5Xml_DEFINITIONS})
+  endif(Qt5Xml_FOUND)
 endif(QT4_FOUND)
 
 # Look for opencv
@@ -177,9 +195,9 @@ macro(cedar_project_add_target)
   set(CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated_project_files)
   include_directories(${CMAKE_CURRENT_BINARY_DIR})
   
-  qt4_add_resources(compiled_resource_paths ${project_resources})
-  qt4_wrap_cpp(moc_headers ${moc_headers})
-  qt4_wrap_ui(forms ${project_forms})
+  qt5_add_resources(compiled_resource_paths ${project_resources})
+  qt5_wrap_cpp(moc_headers ${moc_headers})
+  qt5_wrap_ui(forms ${project_forms})
   
   set(CMAKE_CURRENT_BINARY_DIR ${old_binary_dir})
   
@@ -216,7 +234,6 @@ macro(cedar_project_setup directory)
   if (CMAKE_COMPILER_IS_GNUCC)
     add_definitions(-Wall -Wextra)
     add_definitions(-DGNUCC -D__GNUCC__ -D__GCC__ -DGCC)
-    add_definitions(-std=gnu++0x)
   elseif (MSVC)
     add_definitions(-W2)
     add_definitions(-DMSVC)

@@ -41,6 +41,8 @@
 #ifndef CEDAR_AUX_TESTING_FUNCTIONS_H
 #define CEDAR_AUX_TESTING_FUNCTIONS_H
 
+#include <boost/function.hpp>
+
 // CEDAR INCLUDES
 
 // SYSTEM INCLUDES
@@ -59,7 +61,7 @@ namespace cedar
       CEDAR_AUX_LIB_EXPORT void test_time
                                 (
                                   std::string id, 
-                                  std::function< void() > fun
+                                  boost::function< void(void) > fun
                                 );
     }
   }
