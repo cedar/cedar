@@ -22,7 +22,7 @@
 #include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
-#include <QtGui/QApplication>
+#include <QApplication>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Local methods

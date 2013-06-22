@@ -28,7 +28,7 @@
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
-#include <QtGui/QApplication>
+#include <QApplication>
 #include <opencv2/opencv.hpp>
 #include <boost/lexical_cast.hpp>
 #include <ios>

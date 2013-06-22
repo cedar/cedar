@@ -22,7 +22,7 @@
 #include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
-#include <QtGui/QApplication>
+#include <QApplication>
 #include <opencv2/opencv.hpp>
 #include <boost/lexical_cast.hpp>
 #include <ios>

@@ -120,7 +120,11 @@ cedar::aux::math::Limits<double> cedar::aux::gui::LinePlot::getXLimits() const
 {
   cedar::aux::math::Limits<double> limits;
 
+#if QWT_VERSION >= 0x060100
+  const QwtScaleDiv* p_interval = &this->mpPlot->axisScaleDiv(QwtPlot::xBottom);
+#else // QWT_VERSION >= 0x060100
   QwtScaleDiv* p_interval = this->mpPlot->axisScaleDiv(QwtPlot::xBottom);
+#endif // QWT_VERSION >= 0x060100
   limits.setLower(p_interval->lowerBound());
   limits.setUpper(p_interval->upperBound());
   return limits;
@@ -130,7 +134,11 @@ cedar::aux::math::Limits<double> cedar::aux::gui::LinePlot::getYLimits() const
 {
   cedar::aux::math::Limits<double> limits;
 
-  QwtScaleDiv* p_interval = this->mpPlot->axisScaleDiv(QwtPlot::yLeft);
+#if QWT_VERSION >= 0x060100
+  const QwtScaleDiv* p_interval = &this->mpPlot->axisScaleDiv(QwtPlot::yLeft);
+#else // QWT_VERSION >= 0x060100
+  QwtScaleDiv* p_interval = this->mpPlot->axisScaleDiv(QwtPlot::yLeft;
+#endif // QWT_VERSION >= 0x060100
   limits.setLower(p_interval->lowerBound());
   limits.setUpper(p_interval->upperBound());
   return limits;
@@ -407,7 +415,7 @@ void cedar::aux::gui::LinePlot::showLegend(bool show)
   if (show)
   {
     // show legend
-    QwtLegend *p_legend = this->mpPlot->legend();
+    QwtLegend *p_legend = cedar::aux::asserted_cast<QwtLegend *>(this->mpPlot->legend());
     if (p_legend == NULL)
     {
       p_legend = new QwtLegend();

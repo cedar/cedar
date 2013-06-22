@@ -43,6 +43,9 @@
 #ifndef CEDAR_COLLATED_NET_READER_H
 #define CEDAR_COLLATED_NET_READER_H
 
+#include "cedar/configuration.h"
+#ifdef CEDAR_USE_YARP
+
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetBase.h"
@@ -209,5 +212,6 @@ public:
 
 } } } }  // end namespaces
 
-#endif
+#endif // CEDAR_USE_YARP
 
+#endif
