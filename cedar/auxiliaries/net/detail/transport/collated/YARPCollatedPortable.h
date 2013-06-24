@@ -44,9 +44,6 @@
 #ifndef CEDAR_COLLATED_NET_YARP_PORTABLE_H
 #define CEDAR_COLLATED_NET_YARP_PORTABLE_H
 
-#include "cedar/configuration.h"
-#ifdef CEDAR_USE_YARP
-
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/MatrixTypeWrapper.h"
@@ -224,8 +221,5 @@ public:
 
 } } } } // end namespaces
 
-#endif // CEDAR_USE_YARP
-
 //!@endcond
 #endif
-

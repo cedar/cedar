@@ -39,9 +39,6 @@
 #ifndef CEDAR_SIMPLE_NET_READER_H
 #define CEDAR_SIMPLE_NET_READER_H
 
-#include "cedar/configuration.h"
-#ifdef CEDAR_USE_YARP
-
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
 #include "cedar/auxiliaries/net/detail/transport/AbstractNetReader.h"
@@ -157,7 +154,4 @@ public:
 
 } } } } // end namespaces
 
-#endif // CEDAR_USE_YARP
-
 #endif
-
