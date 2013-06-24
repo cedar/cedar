@@ -40,7 +40,7 @@ cmake_minimum_required(VERSION 2.8)
 set(CEDAR_HOME ${CMAKE_CURRENT_SOURCE_DIR} CACHE PATH "Home of cedar; should NOT be altered.")
 
 # set the path of the Qt uic executable -- usually only needed for Qt5
-if(NOT EXISTS ${QT_UIC_EXECUTABLE})
+if(NOT ${QT_UIC_EXECUTABLE})
 	set(QT_UIC_EXECUTABLE "/usr/local/bin/uic")
 endif()
 

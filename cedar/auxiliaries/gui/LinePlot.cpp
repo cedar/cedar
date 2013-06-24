@@ -137,7 +137,7 @@ cedar::aux::math::Limits<double> cedar::aux::gui::LinePlot::getYLimits() const
 #if QWT_VERSION >= 0x060100
   const QwtScaleDiv* p_interval = &this->mpPlot->axisScaleDiv(QwtPlot::yLeft);
 #else // QWT_VERSION >= 0x060100
-  QwtScaleDiv* p_interval = this->mpPlot->axisScaleDiv(QwtPlot::yLeft;
+  QwtScaleDiv* p_interval = this->mpPlot->axisScaleDiv(QwtPlot::yLeft);
 #endif // QWT_VERSION >= 0x060100
   limits.setLower(p_interval->lowerBound());
   limits.setUpper(p_interval->upperBound());
