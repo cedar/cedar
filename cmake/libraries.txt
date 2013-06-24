@@ -63,9 +63,6 @@ if(NOT WITH_QT5)
     if (CEDAR_VERBOSE_BUILD_SYSTEM)
       message("   Qt was found in ${QT_INCLUDE_DIRS}")
     endif(CEDAR_VERBOSE_BUILD_SYSTEM)
-  else(QT4_FOUND)
-    message(${CEDAR_LIB_ERROR_TYPE} "   Required library qt4 was not found on your system! 
-    You can try to alter the default search paths in cedar.conf.")
   endif(QT4_FOUND)
 
   SET(QT_FOUND ${QT4_FOUND})
@@ -133,6 +130,11 @@ if(WITH_QT5 OR NOT QT4_FOUND)
   endif()
   SET(QT5_FOUND ${QT_FOUND})
 endif(WITH_QT5 OR NOT QT4_FOUND)
+
+if(NOT QT_FOUND)
+  message(${CEDAR_LIB_ERROR_TYPE} "   Required library qt was not found on your system! 
+  You can try to alter the default search paths in cedar.conf.")
+endif(NOT QT_FOUND)
 
 # Boost
 if (${CMAKE_BUILD_STATIC_LIBS})
