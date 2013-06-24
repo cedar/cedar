@@ -71,7 +71,8 @@ _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", dimension
                  std::numeric_limits<int>::max()
                )
              );
-
+  this->_mAnchor->markAdvanced();
+  this->_mDimensionality->markAdvanced();
   mpReadWriteLockOutput = new QReadWriteLock();
   _mDimensionality->setValue(dimensionality);
   _mDimensionality->setConstant(true);

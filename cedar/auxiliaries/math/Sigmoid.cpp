@@ -42,6 +42,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+cedar::aux::math::Sigmoid::Sigmoid(double threshold)
+:
+mThreshold(new DoubleParameter(this, "threshold", threshold))
+{
+  this->mThreshold->markAdvanced();
+}
 
 cedar::aux::math::Sigmoid::~Sigmoid()
 {
