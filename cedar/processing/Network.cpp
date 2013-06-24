@@ -64,6 +64,7 @@
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/string_path.hpp>
+#include <boost/make_shared.hpp>
 #include <algorithm>
 
 // Define that helps to debug file reading.
