@@ -60,7 +60,7 @@ if (DEBUG_CEDAR_BUILD_SYSTEM)
 endif(DEBUG_CEDAR_BUILD_SYSTEM)
 
 # Look for qt
-find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml REQUIRED)
+find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml)
 if(QT4_FOUND)
   # Include qt's cmake scripts
   include(${QT_USE_FILE})
@@ -74,19 +74,26 @@ else(QT4_FOUND)
 
   if(Qt5Widgets_FOUND)
     include_directories(${Qt5Widgets_INCLUDE_DIRS})
-    add_definitions(${Qt5Widgets_DEFINITIONS})
+    SET(QT_LIBRARIES ${QT_LIBRARIES} ${Qt5Widgets_LIBRARIES})
   endif(Qt5Widgets_FOUND)
 
   if(Qt5OpenGL_FOUND)
     include_directories(${Qt5OpenGL_INCLUDE_DIRS})
-    add_definitions(${Qt5OpenGL_DEFINITIONS})
+    SET(QT_LIBRARIES ${QT_LIBRARIES} ${Qt5OpenGL_LIBRARIES})
   endif(Qt5OpenGL_FOUND)
 
   if(Qt5Xml_FOUND)
     include_directories(${Qt5Xml_INCLUDE_DIRS})
-    add_definitions(${Qt5Xml_DEFINITIONS})
+    SET(QT_LIBRARIES ${QT_LIBRARIES} ${Qt5Xml_LIBRARIES})
   endif(Qt5Xml_FOUND)
 endif(QT4_FOUND)
+
+# libQGLViewer
+message("-- Searching for QGLViewer...")
+find_package(QGLViewer REQUIRED)
+if(QGLViewer_FOUND)
+  include_directories(${QGLViewer_INCLUDE_DIRS})
+endif(QGLViewer_FOUND)
 
 # Look for opencv
 link_libraries(opencv_highgui opencv_core)
@@ -209,7 +216,7 @@ macro(cedar_project_add_target)
     add_library(${target_name} SHARED ${files})
   endif()
   
-  target_link_libraries(${target_name} cedarunits cedaraux cedardev cedarproc cedardyn ${QT_LIBRARIES})
+  target_link_libraries(${target_name} cedarunits cedaraux cedardev cedarproc cedardyn ${QT_LIBRARIES} ${QGLViewer_LIBS})
   
   foreach (dependency ${add_DEPENDS_ON})
     cedar_project_depends_on(${target_name} DEPENDS_ON ${dependency})
@@ -286,4 +293,30 @@ macro(cedar_project_parse_arguments prefix arg_names option_names)
   set(${prefix}_${current_arg_name} ${current_arg_list})
 endmacro(cedar_project_parse_arguments)
 
+################################################################################################################
+# Wrapper around QT4/5 macros
+#
 
+macro(qt_wrap_cpp)
+  if(QT_VERSION GREATER 4)
+    qt5_wrap_cpp(${ARGV})
+  else(QT_VERSION GREATER 4)
+    qt4_wrap_cpp(${ARGV})
+  endif(QT_VERSION GREATER 4)
+endmacro(qt_wrap_cpp)
+
+macro(qt_add_resources)
+  if(QT_VERSION GREATER 4)
+    qt5_add_resources(${ARGV})
+  else(QT_VERSION GREATER 4)
+    qt4_add_resources(${ARGV})
+  endif(QT_VERSION GREATER 4)
+endmacro(qt_add_resources)
+
+macro(qt_wrap_ui ${ARGV})
+  if(QT_VERSION GREATER 4)
+    qt5_wrap_ui(${ARGV})
+  else(QT_VERSION GREATER 4)
+    qt4_wrap_ui(${ARGV})
+  endif(QT_VERSION GREATER 4)
+endmacro(qt_wrap_ui)
