@@ -69,25 +69,32 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr field_decl
+    ElementDeclarationPtr declaration
     (
       new cedar::proc::ElementDeclarationTemplate<cedar::dyn::NeuralField>("DFT", "cedar.dynamics.NeuralField")
     );
-    field_decl->setIconPath(":/steps/field_temp.svg");
-    field_decl->setDescription
+    declaration->setIconPath(":/steps/field_temp.svg");
+    declaration->setDescription
     (
       "An implementation of Amari's dynamic neural fields."
     );
 
     // define field plot
-    ElementDeclaration::DataList field_plot_data;
-    field_plot_data.push_back(std::make_pair(DataRole::BUFFER, "input sum"));
-    field_plot_data.push_back(std::make_pair(DataRole::BUFFER, "activation"));
-    field_plot_data.push_back(std::make_pair(DataRole::OUTPUT, "sigmoided activation"));
-    field_decl->definePlot("field plot", field_plot_data);
+    ElementDeclaration::PlotDefinition field_plot_data("field plot", ":/cedar/dynamics/gui/field_plot.svg");
+    field_plot_data.appendData(DataRole::BUFFER, "input sum");
+    field_plot_data.appendData(DataRole::BUFFER, "activation", true);
+    field_plot_data.appendData(DataRole::OUTPUT, "activation", true);
+    field_plot_data.appendData(DataRole::OUTPUT, "sigmoided activation");
+    declaration->definePlot(field_plot_data);
+
+    ElementDeclaration::PlotDefinition kernel_plot_data("kernel", ":/cedar/dynamics/gui/kernel_plot.svg");
+    kernel_plot_data.appendData(DataRole::BUFFER, "lateral kernel");
+    declaration->definePlot(kernel_plot_data);
+
+    declaration->setDefaultPlot("field plot");
 
     // add declaration to the registry
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(field_decl);
+    declaration->declare();
 
     return true;
   }
@@ -225,6 +232,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   allowed_convolution_modes.insert(cedar::aux::conv::Mode::Same);
 
   this->addConfigurableChild("noise correlation kernel", mNoiseCorrelationKernel);
+  mNoiseCorrelationKernel->markAdvanced();
   this->_mNoiseCorrelationKernelConvolution->getKernelList()->append(mNoiseCorrelationKernel);
   this->_mNoiseCorrelationKernelConvolution->setMode(cedar::aux::conv::Mode::Same);
   this->_mNoiseCorrelationKernelConvolution->setBorderType(cedar::aux::conv::BorderType::Zero);
@@ -439,9 +447,9 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
-    return cedar::proc::DataSlot::VALIDITY_ERROR;
   }
-  return this->cedar::proc::Step::determineInputValidity(slot, data);
+
+  return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
 void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)

@@ -35,6 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/processing/typecheck/DerivedFrom.h"
 #include "cedar/processing/steps/StaticGain.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ElementDeclaration.h"
@@ -56,7 +57,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr static_gain_decl
+    ElementDeclarationPtr declaration
     (
       new ElementDeclarationTemplate<cedar::proc::steps::StaticGain>
       (
@@ -64,12 +65,13 @@ namespace
         "cedar.processing.StaticGain"
       )
     );
-    static_gain_decl->setIconPath(":/steps/static_gain.svg");
-    static_gain_decl->setDescription
+    declaration->setIconPath(":/steps/static_gain.svg");
+    declaration->setDescription
     (
       "Multiplies a matrix with a scalar value that can be set as a parameter."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(static_gain_decl);
+
+    declaration->declare();
 
     return true;
   }
@@ -88,8 +90,10 @@ mOutput(new cedar::aux::MatData(cv::Mat())),
 _mGainFactor(new cedar::aux::DoubleParameter(this, "gain factor", 1.0, -10000.0, 10000.0))
 {
   // declare all data
-  this->declareInput("input");
+  cedar::proc::DataSlotPtr input = this->declareInput("input");
   this->declareOutput("output", mOutput);
+
+  input->setCheck(cedar::proc::typecheck::DerivedFrom<cedar::aux::MatData>());
 
   // connect the parameter's change signal
   QObject::connect(_mGainFactor.get(), SIGNAL(valueChanged()), this, SLOT(gainChanged()));
@@ -108,27 +112,6 @@ void cedar::proc::steps::StaticGain::gainChanged()
 {
   // when the gain changes, the output needs to be recalculated.
   this->onTrigger();
-}
-
-cedar::proc::DataSlot::VALIDITY cedar::proc::steps::StaticGain::determineInputValidity
-                                (
-                                  cedar::proc::ConstDataSlotPtr CEDAR_DEBUG_ONLY(slot),
-                                  cedar::aux::ConstDataPtr data
-                                ) const
-{
-  // First, let's make sure that this is really the input in case anyone ever changes our interface.
-  CEDAR_DEBUG_ASSERT(slot->getName() == "input")
-
-  if (boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
-  {
-    // Mat data is accepted.
-    return cedar::proc::DataSlot::VALIDITY_VALID;
-  }
-  else
-  {
-    // Everything else is rejected.
-    return cedar::proc::DataSlot::VALIDITY_ERROR;
-  }
 }
 
 void cedar::proc::steps::StaticGain::inputConnectionChanged(const std::string& inputName)

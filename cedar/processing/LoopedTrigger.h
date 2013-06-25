@@ -58,11 +58,10 @@
 class cedar::proc::LoopedTrigger : public cedar::aux::LoopedThread,
                                    public cedar::proc::Trigger
 {
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -104,6 +103,19 @@ signals:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
+signals:
+  //! Emitted before the trigger is started.
+  void triggerStarting();
+
+  //! Emitted whenever the trigger is started.
+  void triggerStarted();
+
+  //! Emitted before the trigger is stopped.
+  void triggerStopping();
+
+  //! Emitted whenever the trigger is stopped.
+  void triggerStopped();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

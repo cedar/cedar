@@ -41,7 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h" // for the color map
-#include "cedar/auxiliaries/gui/PlotManager.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
@@ -64,9 +64,9 @@ namespace
 {
   bool registerPlot()
   {
-    typedef cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::MatData, cedar::aux::gui::ImagePlot> DeclarationTypeM;
-    boost::shared_ptr<DeclarationTypeM> declaration(new DeclarationTypeM());
-    cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(declaration);
+    typedef cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::MatData, cedar::aux::gui::ImagePlot> DeclarationType;
+    boost::shared_ptr<DeclarationType> declaration(new DeclarationType());
+    declaration->declare();
 
     return true;
   }
@@ -91,14 +91,15 @@ cedar::aux::gui::ImagePlot::ImagePlot(QWidget *pParent)
 cedar::aux::gui::PlotInterface(pParent),
 mTimerId(0),
 mDataType(DATA_TYPE_UNKNOWN),
-mConverting(false)
+mConverting(false),
+mSmoothScaling(true)
 {
   QVBoxLayout *p_layout = new QVBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(p_layout);
   this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
-  mpImageDisplay = new cedar::aux::gui::ImagePlot::ImageDisplay("no image loaded");
+  mpImageDisplay = new cedar::aux::gui::ImagePlot::ImageDisplay(this, "no image loaded");
   p_layout->addWidget(mpImageDisplay);
 
   this->mpWorkerThread = new QThread();
@@ -112,9 +113,10 @@ mConverting(false)
   this->mpWorkerThread->start(QThread::LowPriority);
 }
 
-cedar::aux::gui::ImagePlot::ImageDisplay::ImageDisplay(const QString& text)
+cedar::aux::gui::ImagePlot::ImageDisplay::ImageDisplay(cedar::aux::gui::ImagePlot* pPlot, const QString& text)
 :
-QLabel(text)
+QLabel(text),
+mpPlot(pPlot)
 {
   this->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
   this->setWordWrap(true);
@@ -135,15 +137,21 @@ cedar::aux::gui::ImagePlot::~ImagePlot()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::gui::ImagePlot::setSmoothScaling(bool smooth)
+{
+  this->mSmoothScaling = smooth;
+}
+
 void cedar::aux::gui::ImagePlot::ImageDisplay::mousePressEvent(QMouseEvent * pEvent)
 {
   //!@todo Use the channel annotation for values from three channel images
   if (!this->pixmap() || !this->mData)
     return;
 
+  QReadLocker locker(&this->mData->getLock());
+  
   const cv::Mat& matrix = this->mData->getData();
 
-  QReadLocker locker(&this->mData->getLock());
   if (matrix.empty())
   {
     return;
@@ -206,6 +214,13 @@ void cedar::aux::gui::ImagePlot::ImageDisplay::mousePressEvent(QMouseEvent * pEv
       QToolTip::showText(pEvent->globalPos(), QString("Matrix channel count (%1) not handled.").arg(matrix.channels()));
       return;
   }
+
+  // if applicable, display color space as well
+  if (this->mpPlot->mDataColorSpace)
+  {
+    info_text += QString(" (%1)").arg(QString::fromStdString(this->mpPlot->mDataColorSpace->getChannelCode()));
+  }
+
   locker.unlock();
 
   QToolTip::showText(pEvent->globalPos(), info_text);
@@ -244,8 +259,27 @@ void cedar::aux::gui::detail::ImagePlotWorker::convert()
 
     case CV_8UC3:
     {
-      this->mpPlot->imageFromMat(this->mpPlot->mData->getData());
-      read_lock.unlock();
+
+      // check if this is a HSV image
+      if
+      (
+        this->mpPlot->mDataColorSpace
+        && this->mpPlot->mDataColorSpace->getNumberOfChannels() == 3
+        && this->mpPlot->mDataColorSpace->getChannelType(0) == cedar::aux::annotation::ColorSpace::Hue
+        && this->mpPlot->mDataColorSpace->getChannelType(1) == cedar::aux::annotation::ColorSpace::Saturation
+        && this->mpPlot->mDataColorSpace->getChannelType(2) == cedar::aux::annotation::ColorSpace::Value
+      )
+      {
+        cv::Mat converted;
+        cv::cvtColor(this->mpPlot->mData->getData(), converted, CV_HSV2BGR);
+				read_lock.unlock();
+        this->mpPlot->imageFromMat(converted);
+      }
+      else
+      {
+        this->mpPlot->imageFromMat(this->mpPlot->mData->getData());
+				read_lock.unlock();
+      }
       break;
     }
 
@@ -553,9 +587,19 @@ void cedar::aux::gui::ImagePlot::resizePixmap()
         && !this->mImage.isNull()
       )
   {
+    Qt::TransformationMode transformation_mode;
+    if (this->mSmoothScaling)
+    {
+      transformation_mode = Qt::SmoothTransformation;
+    }
+    else
+    {
+      transformation_mode = Qt::FastTransformation;
+    }
+
     QImage scaled_image = this->mImage.scaled(this->mpImageDisplay->size(),
                                               Qt::KeepAspectRatio,
-                                              Qt::SmoothTransformation);
+                                              transformation_mode);
     this->mpImageDisplay->setPixmap(QPixmap::fromImage(scaled_image));
   }
 }

@@ -62,6 +62,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::aux::Configurable::Configurable()
+:
+mIsAdvanced(false)
 {
   this->connectToTreeChangedSignal(boost::bind(&cedar::aux::Configurable::updateLockSet, this));
 }
@@ -74,6 +76,33 @@ cedar::aux::Configurable::~Configurable()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+size_t cedar::aux::Configurable::countAdvanced() const
+{
+  size_t advanced_count = 0;
+  for (auto iter = mParameterList.begin(); iter != mParameterList.end(); ++iter)
+  {
+    cedar::aux::ConstParameterPtr parameter = *iter;
+    if (parameter->isAdvanced())
+    {
+      ++advanced_count;
+    }
+  }
+
+  for (auto iter = this->mChildren.begin(); iter != this->mChildren.end(); ++iter)
+  {
+    cedar::aux::ConfigurablePtr conf = iter->second;
+
+    if (conf->isAdvanced())
+    {
+      ++advanced_count;
+    }
+
+    advanced_count += conf->countAdvanced();
+  }
+
+  return advanced_count;
+}
 
 void cedar::aux::Configurable::lockParameters(cedar::aux::LOCK_TYPE lockType) const
 {
@@ -116,6 +145,14 @@ void cedar::aux::Configurable::configurationLoaded()
 
 cedar::aux::ConfigurablePtr cedar::aux::Configurable::getConfigurableChild(const std::string& path)
 {
+  return boost::const_pointer_cast<cedar::aux::Configurable>
+         (
+           static_cast<const cedar::aux::Configurable*>(this)->getConfigurableChild(path)
+         );
+}
+
+cedar::aux::ConstConfigurablePtr cedar::aux::Configurable::getConfigurableChild(const std::string& path) const
+{
   std::vector<std::string> path_components;
   cedar::aux::split(path, ".", path_components);
 
@@ -127,7 +164,7 @@ cedar::aux::ConfigurablePtr cedar::aux::Configurable::getConfigurableChild(const
     CEDAR_THROW(cedar::aux::UnknownNameException, "Child \"" + path + "\" not found.");
   }
 
-  cedar::aux::ConfigurablePtr child = iter->second;
+  cedar::aux::ConstConfigurablePtr child = iter->second;
   if (path_components.size() == 1)
   {
     return child;
@@ -146,13 +183,24 @@ cedar::aux::ConfigurablePtr cedar::aux::Configurable::getConfigurableChild(const
   }
 }
 
-
 cedar::aux::ParameterPtr cedar::aux::Configurable::getParameter(const std::string& path)
 {
+  return boost::const_pointer_cast<cedar::aux::Parameter>
+         (
+           static_cast<const cedar::aux::Configurable*>(this)->getParameter(path)
+         );
+}
+
+cedar::aux::ConstParameterPtr cedar::aux::Configurable::getParameter(const std::string& path) const
+{
+  // this method looks for configurables by traversing a dot-separated path of names
+  // each entry in this path should address a configurable child, except the final one which addresses the
+  // parameter in the child.
   std::vector<std::string> path_components, subpath_components;
   cedar::aux::split(path, ".", path_components);
 
-  cedar::aux::Configurable *p_configurable = this;
+  // the first configruable we look at is the this object
+  const cedar::aux::Configurable* p_configurable = this;
 
   if (path_components.size() > 1)
   {
@@ -165,13 +213,12 @@ cedar::aux::ParameterPtr cedar::aux::Configurable::getParameter(const std::strin
     p_configurable = this->getConfigurableChild(subpath).get();
   }
 
-  ParameterMap::iterator iter = p_configurable->mParameterAssociations.find(path_components.back());
+  auto iter = p_configurable->mParameterAssociations.find(path_components.back());
   if (iter == p_configurable->mParameterAssociations.end())
   {
     CEDAR_THROW(cedar::aux::UnknownNameException, "Parameter \"" + path + "\" was not found.");
   }
-  cedar::aux::ParameterPtr parameter = *(iter->second);
-  return parameter;
+  return *(iter->second);
 }
 
 
@@ -262,8 +309,7 @@ void cedar::aux::Configurable::newFormatToOld(cedar::aux::ConfigurationNode& nod
   }
 }
 
-
-void cedar::aux::Configurable::writeJson(const std::string& filename) const
+std::string cedar::aux::Configurable::normalizeFilename(const std::string& filename) const
 {
   std::string dir = filename;
 
@@ -274,9 +320,25 @@ void cedar::aux::Configurable::writeJson(const std::string& filename) const
     boost::filesystem::create_directories(dir);
   }
 
+  return filename;
+}
+
+void cedar::aux::Configurable::writeJson(const std::string& filename) const
+{
+  std::string new_filename = normalizeFilename(filename);
+
   cedar::aux::ConfigurationNode configuration;
   this->writeConfiguration(configuration);
   boost::property_tree::write_json(filename, configuration);
+}
+
+void cedar::aux::Configurable::writeCsv(const std::string& filename, const char separator) const
+{
+  std::string new_filename = normalizeFilename(filename);
+
+  cedar::aux::ConfigurationNode configuration;
+  this->writeConfiguration(configuration);
+  writeCsvConfiguration(new_filename, configuration, separator);
 }
 
 void cedar::aux::Configurable::registerParameter(cedar::aux::Parameter* parameter)

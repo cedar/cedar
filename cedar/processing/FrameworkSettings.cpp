@@ -143,6 +143,12 @@ void cedar::proc::FrameworkSettings::addKnownPlugin(const std::string& file)
   this->mKnownPlugins->insert(modified_path);
 }
 
+void cedar::proc::FrameworkSettings::removeKnownPlugin(const std::string& file)
+{
+  CEDAR_ASSERT(this->mKnownPlugins->contains(file))
+  this->mKnownPlugins->erase(file);
+}
+
 const std::set<std::string>& cedar::proc::FrameworkSettings::getKnownPlugins() const
 {
   return this->mKnownPlugins->get();

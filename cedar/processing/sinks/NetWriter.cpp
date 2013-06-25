@@ -69,7 +69,8 @@ namespace
     );
     input_declaration->setIconPath(":/steps/net_writer.svg");
     input_declaration->setDescription("Writes incoming matrices to a yarp port.");
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(input_declaration);
+
+    input_declaration->declare();
 
     return true;
   }
@@ -84,7 +85,8 @@ cedar::proc::sinks::NetWriter::NetWriter()
 :
 // outputs
 mInput(new cedar::aux::MatData(cv::Mat())),
-mWriter()
+mWriter(),
+_mPort(new cedar::aux::StringParameter(this, "port", "DEMOCHANNEL"))
 {
   // declare all data
   this->declareInput("input");
@@ -95,6 +97,13 @@ mWriter()
 
 void cedar::proc::sinks::NetWriter::onStart()
 {
+  _mPort->setConstant(true);
+
+  this->connect();
+}
+
+void cedar::proc::sinks::NetWriter::connect()
+{
   // instantiate the reader, if not yet done
   if (!mWriter)
   {
@@ -103,9 +112,8 @@ void cedar::proc::sinks::NetWriter::onStart()
       mWriter
         = boost::shared_ptr<cedar::aux::net::Writer<cedar::aux::MatData::DataType> >
           (
-            new cedar::aux::net::Writer<cedar::aux::MatData::DataType>("DEMOCHANNEL")
+            new cedar::aux::net::Writer<cedar::aux::MatData::DataType>(this->getPort())
           );
-      // TODO: make channel configurable
     }
     catch (cedar::aux::net::NetMissingRessourceException& e)
     {
@@ -120,8 +128,14 @@ void cedar::proc::sinks::NetWriter::onStart()
 void cedar::proc::sinks::NetWriter::onStop()
 {
   mWriter.reset();
+  _mPort->setConstant(false);
 }
 
+void cedar::proc::sinks::NetWriter::reset()
+{
+  mWriter.reset();
+  this->connect();
+}
 
 void cedar::proc::sinks::NetWriter::compute(const cedar::proc::Arguments&)
 {
@@ -181,7 +195,7 @@ void cedar::proc::sinks::NetWriter::inputConnectionChanged(const std::string& in
   // Assign the input to the member. This saves us from casting in every computation step.
   this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
 
-  if(!this->mInput)
+  if (!this->mInput)
   {
     return;
   }

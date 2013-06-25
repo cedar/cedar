@@ -43,8 +43,10 @@
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/math/constants.h"
+#include "cedar/processing/exceptions.h" // for DuplicateNameException
 
 // SYSTEM INCLUDES
+#include <boost/lexical_cast.hpp>
 
 namespace
 {
@@ -66,12 +68,12 @@ cedar::dev::robot::KinematicChain::KinematicChain
   cedar::aux::LocalCoordinateFramePtr pEndEffector
 )
 :
+mUseCurrentHardwareValues(false),
+mWorkingMode(STOP),
 mpJoints(new JointListParameter(this, "joints")),
 mpRootCoordinateFrame(new cedar::aux::LocalCoordinateFrame()),
 mpEndEffectorCoordinateFrame(pEndEffector)
 {
-  setWorkingMode(ANGLE);
-  mUseCurrentHardwareValues = false;
   init();
 }
 
@@ -79,6 +81,7 @@ mpEndEffectorCoordinateFrame(pEndEffector)
 //! destructor
 cedar::dev::robot::KinematicChain::~KinematicChain()
 {
+  // TODO: jokeit: is this necessary? seems buggy.
   if (isRunning())
   {
     this->stop();
@@ -112,8 +115,9 @@ void cedar::dev::robot::KinematicChain::updateTransformations()
 
 void cedar::dev::robot::KinematicChain::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
-  cedar::aux::Configurable::readConfiguration(node);
+  cedar::aux::NamedConfigurable::readConfiguration(node);
   initializeFromJointList();
+  getRootCoordinateFrame()->setName(this->getName());
 }
 
 unsigned int cedar::dev::robot::KinematicChain::getNumberOfJoints() const
@@ -132,7 +136,7 @@ std::vector<double> cedar::dev::robot::KinematicChain::getJointAngles() const
   return dummy;
 }
 
-cv::Mat cedar::dev::robot::KinematicChain::getJointAnglesMatrix() const
+cv::Mat cedar::dev::robot::KinematicChain::getCachedJointAngles() const
 {
   cv::Mat dummy = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
 
@@ -144,6 +148,11 @@ cv::Mat cedar::dev::robot::KinematicChain::getJointAnglesMatrix() const
   return dummy;
 }
 
+cv::Mat cedar::dev::robot::KinematicChain::getJointAnglesMatrix() const
+{
+  return getCachedJointAngles();
+}
+
 double cedar::dev::robot::KinematicChain::getJointVelocity(unsigned int index) const
 {
   if (index >= getNumberOfJoints())
@@ -151,6 +160,7 @@ double cedar::dev::robot::KinematicChain::getJointVelocity(unsigned int index) c
     return 0.0;
   }
 
+  QReadLocker locker(&mVelocitiesLock);
   return mJointVelocities.at<double>(index, 0);
 }
 
@@ -158,6 +168,8 @@ double cedar::dev::robot::KinematicChain::getJointVelocity(unsigned int index) c
 std::vector<double> cedar::dev::robot::KinematicChain::getJointVelocities() const
 {
   std::vector<double> dummy(getNumberOfJoints());
+
+  QReadLocker locker(&mVelocitiesLock);
 
   for (unsigned int i = 0; i < getNumberOfJoints(); ++i)
   {
@@ -167,9 +179,16 @@ std::vector<double> cedar::dev::robot::KinematicChain::getJointVelocities() cons
   return dummy;
 }
 
+cv::Mat cedar::dev::robot::KinematicChain::getCachedJointVelocities() const
+{
+  QReadLocker locker(&mVelocitiesLock);
+
+  return mJointVelocities.clone();
+}
+
 cv::Mat cedar::dev::robot::KinematicChain::getJointVelocitiesMatrix() const
 {
-  return mJointVelocities.clone();
+  return getCachedJointVelocities();
 }
 
 double cedar::dev::robot::KinematicChain::getJointAcceleration(unsigned int index) const
@@ -179,6 +198,7 @@ double cedar::dev::robot::KinematicChain::getJointAcceleration(unsigned int inde
     return 0.0;
   }
 
+  QReadLocker locker(&mAccelerationsLock);
   return mJointAccelerations.at<double>(index, 0);
 }
 
@@ -191,21 +211,34 @@ std::vector<double> cedar::dev::robot::KinematicChain::getJointAccelerations() c
     dummy[i] = mJointAccelerations.at<double>(i,0);
   }
 
+  QReadLocker locker(&mAccelerationsLock);
   return dummy;
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::getCachedJointAccelerations() const
+{
+  QReadLocker locker(&mAccelerationsLock);
+
+  return mJointAccelerations.clone();
 }
 
 cv::Mat cedar::dev::robot::KinematicChain::getJointAccelerationsMatrix() const
 {
-  return mJointAccelerations.clone();
+  return getCachedJointAccelerations();
 }
 
 cedar::dev::robot::KinematicChain::ActionType cedar::dev::robot::KinematicChain::getWorkingMode()
 {
-  return mCurrentWorkingMode;
+  QReadLocker locker(&mWorkingModeLock);
+
+  return mWorkingMode;
 }
 
 void cedar::dev::robot::KinematicChain::setJointAngles(const std::vector<double>& angles)
 {
+  // @todo: for security reasons setting angles should be only allowed
+  //        in STOP or ANGLE mode. except initial set!
+
   if(angles.size() != getNumberOfJoints())
   {
     //!@todo Should this throw an exception?
@@ -228,6 +261,7 @@ void cedar::dev::robot::KinematicChain::setJointAngles(const std::vector<double>
     angle = std::min<double>(angle, getJoint(i)->_mpAngleLimits->getUpperLimit());
 
     setJointAngle(i, angle);
+    // locking is done in setJointAngle()
   }
 
   return;
@@ -258,6 +292,7 @@ void cedar::dev::robot::KinematicChain::setJointAngles(const cv::Mat& angles)
     angle = std::min<double>(angle, getJoint(i)->_mpAngleLimits->getUpperLimit());
 
     setJointAngle(i, angle);
+    // locking done in setJointAngle()
   }
 
   return;
@@ -281,6 +316,7 @@ bool cedar::dev::robot::KinematicChain::setJointVelocity(unsigned int index, dou
   velocity = std::max<double>(velocity, getJoint(index)->_mpVelocityLimits->getLowerLimit());
   velocity = std::min<double>(velocity, getJoint(index)->_mpVelocityLimits->getUpperLimit());
 
+  QWriteLocker locker(&mVelocitiesLock);
   mJointVelocities.at<double>(index,0) = velocity;
 
   return false;
@@ -307,6 +343,7 @@ bool cedar::dev::robot::KinematicChain::setJointVelocities(const std::vector<dou
 
   for(unsigned i = 0; i < getNumberOfJoints(); i++)
   {
+    // locking done in setJointVelocity()
     if(!setJointVelocity(i, velocities[i]))
     {
       hardware_velocity = false;
@@ -337,6 +374,7 @@ bool cedar::dev::robot::KinematicChain::setJointVelocities(const cv::Mat& veloci
 
   for (unsigned i = 0; i < getNumberOfJoints(); i++)
   {
+    // locking done in setJointVelocity()
     if (!setJointVelocity(i, velocities.at<double>(i, 0)))
     {
       hardware_velocity = false;
@@ -361,7 +399,9 @@ bool cedar::dev::robot::KinematicChain::setJointAcceleration(unsigned int index,
     return false;
   }
 
+  QWriteLocker locker(&mAccelerationsLock);
   mJointAccelerations.at<double>(index,0) = acceleration;
+
   return false;
 }
 
@@ -382,6 +422,7 @@ bool cedar::dev::robot::KinematicChain::setJointAccelerations(const std::vector<
     return false;
   }
 
+  QWriteLocker locker(&mAccelerationsLock);
   for(unsigned int i = 0; i < getNumberOfJoints(); ++i)
   {
     mJointAccelerations.at<double>(i,0) = accelerations[i];
@@ -407,91 +448,95 @@ bool cedar::dev::robot::KinematicChain::setJointAccelerations(const cv::Mat& acc
     return false;
   }
 
+  QWriteLocker locker(&mAccelerationsLock);
   mJointAccelerations = accelerations;
   return false;
 }
 
 void cedar::dev::robot::KinematicChain::step(double time)
 {
-
-  // update the angle according to working mode
-  switch (mCurrentWorkingMode)
+  if (mUseCurrentHardwareValues)
   {
-    case ANGLE:
-
-      break;
-
-    case ACCELERATION:
-
-      if(mUseCurrentHardwareValues)
-      {
-        mJointVelocities = getJointVelocitiesMatrix();
-      }
-
-      mJointVelocities += getJointAccelerationsMatrix() * ( time / 1000.0 );
-      applyVelocityLimits(mJointVelocities);
-
-      if(setJointVelocities(mJointVelocities))
-      {
-        break;
-      }
-
-    case VELOCITY:
-
-      if(mUseCurrentHardwareValues)
-      {
-        mJointAngles = getJointAnglesMatrix();
-      }
-
-      mJointAngles += getJointVelocitiesMatrix() * ( time / 1000.0 );
-      applyAngleLimits(mJointAngles);
-      setJointAngles(mJointAngles);
-      break;
-
-    default:
-      //!@todo Should this throw an exception?
-      cedar::aux::LogSingleton::getInstance()->error
-      (
-        "Oh oh, something went terribly wrong in cedar::dev::robot::KinematicChain::step(double)!",
-        "cedar::dev::robot::KinematicChain::step(double)"
-      );
+    mJointVelocities = getCachedJointVelocities();
   }
 
-  return;
+  {
+    QWriteLocker locker(&mVelocitiesLock);
+    mJointVelocities += getCachedJointAccelerations() * ( time / 1000.0 );
+  }
+
+  applyVelocityLimits(mJointVelocities);
+
+  if (setJointVelocities(mJointVelocities))
+  {
+    return;
+  }
+
+  if (mUseCurrentHardwareValues)
+  {
+    mJointAngles = getCachedJointAngles();
+  }
+
+  {
+    QWriteLocker locker(&mAnglesLock);
+    mJointAngles += getCachedJointVelocities() * ( time / 1000.0 );
+  }
+
+  applyAngleLimits(mJointAngles);
+  setJointAngles(mJointAngles);
 }
 
-void cedar::dev::robot::KinematicChain::setWorkingMode(ActionType actionType)
+void cedar::dev::robot::KinematicChain::setWorkingMode(ActionType)
 {
-  stop();
+#if 0  
+  QWriteLocker locker(&mWorkingModeLock);
 
   cv::Mat zeros = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
 
   // need to stop something?
-  switch (mCurrentWorkingMode)
+  switch (mWorkingMode)
   {
+    case STOP:
+      // fall-through
     case ACCELERATION:
-      setJointAccelerations(zeros);
+      {
+        setJointAccelerations(zeros);
+      }
+      // fall-through
     case VELOCITY:
-      setJointVelocities(zeros);
+      {
+        setJointVelocities(zeros);
+      }
+      // fall-through
     case ANGLE:
       break;
   }
 
-  mCurrentWorkingMode = actionType;
+  mWorkingMode = actionType;
 
   // reset variables where necessary (HR: is that really necessary?)
-  switch (mCurrentWorkingMode)
+  switch (mWorkingMode)
   {
     case ACCELERATION:
-      mJointAccelerations = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+      {
+        QWriteLocker locker(&mAccelerationsLock);
+        mJointAccelerations = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+      }
+      // fall-through
     case VELOCITY:
-      mJointVelocities = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
-      start();
+      {
+        QWriteLocker locker(&mVelocitiesLock);
+        mJointVelocities = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+      }
+      // fall-through
     case ANGLE:
+      // fall-through
+    case STOP:
       break;
   }
 
   return;
+#endif
 }
 
 void cedar::dev::robot::KinematicChain::init()
@@ -512,6 +557,8 @@ void cedar::dev::robot::KinematicChain::init()
   default_joint->_mpVelocityLimits->setUpperLimit(2*cedar::aux::math::pi);
   this->mpJoints->pushBack(default_joint);
   initializeFromJointList();
+
+  checkInitialConfigurations();
 }
 
 void cedar::dev::robot::KinematicChain::initializeFromJointList()
@@ -525,9 +572,18 @@ void cedar::dev::robot::KinematicChain::initializeFromJointList()
   mJointTwists.clear();
 
   // create state variables
-  mJointAngles = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
-  mJointVelocities = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
-  mJointAccelerations = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+  {
+    QWriteLocker locker(&mAnglesLock);
+    mJointAngles = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+  }
+  {
+    QWriteLocker locker(&mVelocitiesLock);
+    mJointVelocities = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+  }
+  {
+    QWriteLocker locker(&mAccelerationsLock);
+    mJointAccelerations = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+  }
 
   // transform joint geometry into twist coordinates
   cv::Mat xi;
@@ -569,6 +625,7 @@ void cedar::dev::robot::KinematicChain::initializeFromJointList()
 
 void cedar::dev::robot::KinematicChain::applyAngleLimits(cv::Mat& /*angles*/)
 {
+// TODO: jokeit, why is this commented-out?
 //  for (unsigned i = 0; i < getNumberOfJoints(); i++)
 //  {
 //    double angle = angles.at<double>(i, 0);
@@ -581,6 +638,7 @@ void cedar::dev::robot::KinematicChain::applyAngleLimits(cv::Mat& /*angles*/)
 
 void cedar::dev::robot::KinematicChain::applyVelocityLimits(cv::Mat& /*velocities*/)
 {
+// TODO: jokeit, why is this commented-out?
 //  for (unsigned i = 0; i < getNumberOfJoints(); i++)
 //  {
 //    double velocity = velocities.at<double>(i, 0);
@@ -590,6 +648,8 @@ void cedar::dev::robot::KinematicChain::applyVelocityLimits(cv::Mat& /*velocitie
 //  }
 }
 
+#if 0
+// TODO: remove
 /*
  * Overwritten start function of QThread
  */
@@ -600,8 +660,17 @@ void cedar::dev::robot::KinematicChain::start(Priority priority)
     return;
   }
 
-  switch (mCurrentWorkingMode)
+  switch (getWorkingMode())
   {
+  case STOP:
+    //!@todo Should this throw an exception?
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Error: KinematicChain is in working mode STOP!",
+      "cedar::dev::robot::KinematicChain::start(Priority)"
+    );
+    return;
+
   case ANGLE:
     //!@todo Should this throw an exception?
     cedar::aux::LogSingleton::getInstance()->error
@@ -612,16 +681,24 @@ void cedar::dev::robot::KinematicChain::start(Priority priority)
     return;
   case VELOCITY:
   case ACCELERATION:
-    mJointAngles = getJointAnglesMatrix();
+    {
+      cv::Mat tmp = getCachedJointAngles();
+      
+      QWriteLocker locker(&mAnglesLock);
+      mJointAngles = tmp;
+    }
+
     QThread::start(priority);
     break;
   }
 
   return;
 }
+#endif
 
 void cedar::dev::robot::KinematicChain::useCurrentHardwareValues(bool useCurrentHardwareValues)
 {
+  // TODO: needs locking, but not important
   mUseCurrentHardwareValues = useCurrentHardwareValues;
 }
 
@@ -805,7 +882,7 @@ cv::Mat cedar::dev::robot::KinematicChain::calculateVelocity
   }
   return cedar::aux::math::wedgeTwist<double>
          (
-           calculateSpatialJacobian(jointIndex) * getJointVelocitiesMatrix()
+           calculateSpatialJacobian(jointIndex) * getCachedJointVelocities()
          )
          * point_world;
 }
@@ -839,11 +916,11 @@ cv::Mat cedar::dev::robot::KinematicChain::calculateAcceleration
   }
   cv::Mat J = calculateSpatialJacobian(jointIndex);
   cv::Mat J_dot = calculateSpatialJacobianTemporalDerivative(jointIndex);
-  cv::Mat T1 = J_dot * getJointVelocitiesMatrix();
-  cv::Mat T2 = J * getJointAccelerationsMatrix();
+  cv::Mat T1 = J_dot * getCachedJointVelocities();
+  cv::Mat T2 = J * getCachedJointAccelerations();
   cv::Mat S1 = cedar::aux::math::wedgeTwist<double>(T1 + T2) * point_world;
   cv::Mat S2 = cedar::aux::math::wedgeTwist<double>(calculateSpatialJacobian(jointIndex)
-               * getJointVelocitiesMatrix())
+               * getCachedJointVelocities())
            * calculateVelocity(point_world, jointIndex, WORLD_COORDINATES);
   return S1 + S2;
 }
@@ -881,36 +958,117 @@ cv::Mat cedar::dev::robot::KinematicChain::calculateSpatialJacobianTemporalDeriv
   return J;
 }
 
-cv::Mat cedar::dev::robot::KinematicChain::calculateTwistTemporalDerivative(unsigned int j)
+cv::Mat cedar::dev::robot::KinematicChain::calculateTwistTemporalDerivative(unsigned int jointIndex)
 {
   // calculate transformation to (j-1)-th joint frame
   cv::Mat g = cv::Mat::zeros(4, 4, CV_64FC1);
   // g is a product of j-1 exponentials, so the temporal derivative is a sum with j-1 summands
-  for (unsigned int k = 0; k < j; k++)
+  for (unsigned int k = 0; k < jointIndex; k++)
   {
-    // for the k-th summand, we derive the k-th factor and leave the other ones
-    cv::Mat s_k = cv::Mat::eye(4, 4, CV_64FC1); // k-th summand
+    /*******************************************************************************************************************
+     * the k-th summand, deriving the factor with positive sign theta_k
+     ******************************************************************************************************************/
+    cv::Mat s_k = cv::Mat::eye(4, 4, CV_64FC1); // summand where the factor with the positive sign theta_k is derived
     // factors before the k-th
-    for (unsigned int i = 0; i < k; i++)
+    for (unsigned int j = 0; j < k; j++)
     {
-      // i-th factor stays the same for i < k
-      s_k = s_k * mTwistExponentials[i];
+      // j-th factor stays the same for j < k
+      s_k = s_k * mTwistExponentials[j];
+//      if((jointIndex == 2) && (k == 1))
+//      {
+//        std::cout << "joint index = " << jointIndex << ", k = " << k << std::endl;
+//        std::cout << "j = " << j << std::endl;
+//        std::cout << "s_k:" << std::endl;
+//        cedar::aux::math::write(s_k);
+//      }
+
     }
-    // the k-th factor of the k-th summand is derived by time
-    s_k = s_k * cedar::aux::math::wedgeTwist<double>(mReferenceJointTwists[k])
-              * mTwistExponentials[k]
-              * getJointVelocity(k);
+    // k-th factor is derived by time
+    s_k = s_k * cedar::aux::math::wedgeTwist<double>(mReferenceJointTwists[k]) * mTwistExponentials[k];
+
+//    if((jointIndex == 2) && (k == 1))
+//    {
+//      std::cout << "j = " << k << std::endl;
+//
+//      std::cout << "s_k:" << std::endl;
+//      cedar::aux::math::write(s_k);
+//      std::cout << "cedar::aux::math::wedgeTwist<double>(mReferenceJointTwists[k]):" << std::endl;
+//      cedar::aux::math::write(cedar::aux::math::wedgeTwist<double>(mReferenceJointTwists[k]));
+//      std::cout << "mTwistExponentials[k]:" << std::endl;
+//      cedar::aux::math::write(mTwistExponentials[k]);
+//    }
     // factors after the k-th
-    for (unsigned int i = k+1; i < j-1; i++)
+    for (unsigned int j = k+1; j < jointIndex; j++)
     {
-      // i-th factor stays the same for i > k
-      s_k = s_k * mTwistExponentials[i];
+      // j-th factor stays the same for j > k
+      s_k = s_k * mTwistExponentials[j];
+//      if((jointIndex == 2) && (k == 1))
+//      {
+//        std::cout << "j = " << j << std::endl;
+//        std::cout << "s_k:" << std::endl;
+//        cedar::aux::math::write(s_k);
+//      }
     }
+    s_k = s_k * cedar::aux::math::wedgeTwist<double>(mReferenceJointTwists[jointIndex])
+              * mProductsOfExponentials[jointIndex-1].inv();
+//    if((jointIndex == 2) && (k == 1))
+//    {
+//      std::cout << "final s_k:" << std::endl;
+//      cedar::aux::math::write(s_k);
+//    }
+    /*******************************************************************************************************************
+     * the (2*(j-1)-k)-th summand, deriving the factor with negative sign theta_k
+     ******************************************************************************************************************/
+    cv::Mat t_k; // summand where the factor with the negative sign theta_k is derived
+    t_k = mProductsOfExponentials[jointIndex-1]
+            * cedar::aux::math::wedgeTwist<double>(mReferenceJointTwists[jointIndex]);
+    // factors before the k-th
+    for (unsigned int j = jointIndex-1; j > k; j--)
+    {
+      // j-th factor stays the same for j > k
+      t_k = t_k * mTwistExponentials[j].inv();
+    }
+    // k-th factor is derived by time
+    t_k = t_k * cedar::aux::math::wedgeTwist<double>(mReferenceJointTwists[k]) * mTwistExponentials[k].inv();
+    // factors after the k-th
+    for (int j = k-1; j >= 0; j--)
+    {
+      // j-th factor stays the same for j < k
+      t_k = t_k * mTwistExponentials[j].inv();
+    }
+
+//    if((jointIndex == 2) && (k == 1))
+//    {
+//      std::cout << "final s_k:" << std::endl;
+//      cedar::aux::math::write(s_k);
+//      std::cout << "final t_k:" << std::endl;
+//      cedar::aux::math::write(t_k);
+//      std::cout << "g:" << std::endl;
+//      cedar::aux::math::write(g);
+//    }
     // add this summand to the sum
-    g = g + s_k;
+    g = g + getJointVelocity(k)*(s_k - t_k);
+
+//    std::cout << "joint index = " << jointIndex << ", summand " << k << std::endl;
+//    std::cout << "final s_k:" << std::endl;
+//    cedar::aux::math::write(s_k);
+//    std::cout << "final t_k:" << std::endl;
+//    cedar::aux::math::write(t_k);
+//    std::cout << "g:" << std::endl;
+//    cedar::aux::math::write(g);
   }
+
+//  std::cout << "twist exponentials:" << std::endl;
+//  for (unsigned int l = 0; l <= jointIndex; l++)
+//  {
+//    cedar::aux::math::write(mTwistExponentials[l]);
+//  }
+//  std::cout << "cedar::aux::math::veeTwist<double>(g):" << std::endl;
+//  cedar::aux::math::write(cedar::aux::math::veeTwist<double>(g));
+//  std::cout << "------------------------------------------------------" << std::endl;
+
   // adjoint of the calculated sum times the j-th twist is the derivative
-  return cedar::aux::math::rigidToAdjointTransformation<double>(g) * mReferenceJointTwists[j];
+  return cedar::aux::math::veeTwist<double>(g);
  }
 
 cv::Mat cedar::dev::robot::KinematicChain::calculateEndEffectorPosition()
@@ -998,3 +1156,225 @@ const cedar::dev::robot::KinematicChain::JointPtr cedar::dev::robot::KinematicCh
 {
   return mpJoints->at(index);
 }
+
+
+
+void cedar::dev::robot::KinematicChain::setInitialConfigurations(std::map<std::string, cv::Mat> configs)
+{
+  QWriteLocker wlock(&mCurrentInitialConfigurationLock);
+
+  mInitialConfigurations.clear();
+  for( std::map< std::string, cv::Mat >::const_iterator it = configs.begin(); it != configs.end(); ++it)
+  {
+    mInitialConfigurations[ it->first ] = it->second.clone();
+    // it is important to clone the cv::Mats!
+  }
+
+  wlock.unlock();
+  checkInitialConfigurations();
+}
+
+void cedar::dev::robot::KinematicChain::addInitialConfiguration(const std::string &name, const cv::Mat &config)
+{
+  QWriteLocker wlock(&mCurrentInitialConfigurationLock);
+
+  auto found = mInitialConfigurations.find(name);
+  if (found != mInitialConfigurations.end())
+  {
+    CEDAR_THROW( cedar::proc::DuplicateNameException , 
+                 "You are adding the initial configuration name '"
+                   + name + "' which already exists. Delete it first." );
+  }
+
+  mInitialConfigurations[ name ] = config.clone();
+
+  wlock.unlock();
+  checkInitialConfigurations();
+}
+
+void cedar::dev::robot::KinematicChain::deleteInitialConfiguration(const std::string &name)
+{
+  QWriteLocker wlock(&mCurrentInitialConfigurationLock);
+
+  auto found = mInitialConfigurations.find(name);
+  if (found == mInitialConfigurations.end())
+  {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "You are deleting the initial configuration " + name 
+      + " which doesn't exist.",
+      "cedar::dev::robot::KinematicChain::deleteInitialConfiguration(const std::string &name)"
+    );
+    return;
+  }
+
+  mInitialConfigurations.erase(found);
+
+  wlock.unlock();
+  checkInitialConfigurations();
+}
+
+void cedar::dev::robot::KinematicChain::checkInitialConfigurations()
+{
+  QReadLocker rlock(&mCurrentInitialConfigurationLock);
+  
+  // no known initial configuration ...
+  if (mInitialConfigurations.empty())
+  {
+    rlock.unlock();
+    // ... set a default initial configuration:
+    addInitialConfiguration("zeros", cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1) ); // note, this recurses back to checkInitialConfigurations() but not into this if-branch
+    return;
+  }
+
+  // non-empty initial configuration map:
+  if (mCurrentInitialConfiguration.empty()
+      || mCurrentInitialConfiguration == "")
+  {
+    rlock.unlock();
+    // does not apply, only sets the currently active initial config:
+    setCurrentInitialConfiguration( mInitialConfigurations.begin()->first );
+  }
+}
+
+bool cedar::dev::robot::KinematicChain::setCurrentInitialConfiguration(const std::string &s)
+{
+  // intentionally no checks here
+  // private method (maybe this doesnt need to be private?)
+  // we are sure that s is a valid configuration
+
+  QWriteLocker wlock(&mCurrentInitialConfigurationLock);
+
+  mCurrentInitialConfiguration = s;
+  return true; //TODO: should this use a return value to communicate potential errors?
+}
+
+bool cedar::dev::robot::KinematicChain::applyInitialConfiguration(std::string s)
+{
+  QReadLocker rlock(&mCurrentInitialConfigurationLock);
+
+  auto f = mInitialConfigurations.find(s);
+  if (f != mInitialConfigurations.end())
+  {
+    rlock.unlock();
+
+    setCurrentInitialConfiguration(s);
+
+// TODO: --> to its own virtual method ...
+    // better to drive slowly to this configuration ...
+    if (0) // TODO: !isSimulated()) // dont do this in simulated mode
+    {
+      // TODO: need to implement an automatic mode
+    }
+    else
+    {
+      setJointAngles( f->second );
+    }
+
+    return true;
+  }
+
+  cedar::aux::LogSingleton::getInstance()->warning
+  (
+    "You tried to apply an initial configuration that was not registered. "
+    "Doing nothing.",
+    "cedar::dev::robot::KinematicChain::applyInitialConfiguration(std::string)"
+  );
+  return false;
+}
+
+
+bool cedar::dev::robot::KinematicChain::applyInitialConfiguration(unsigned int index)
+{
+  QReadLocker rlock(&mCurrentInitialConfigurationLock);
+
+  if (index >= mInitialConfigurations.size())
+  {
+    CEDAR_THROW( cedar::proc::InvalidNameException , 
+               "You tried to apply an initial configuration with index "
+                 + boost::lexical_cast<std::string>(index) 
+                 + "' which doesnt exist. Size: " 
+                 + boost::lexical_cast<std::string>(mInitialConfigurations.size()) );
+    return false;
+  }
+
+  unsigned int j = 0;
+  for( std::map< std::string, cv::Mat >::const_iterator it = mInitialConfigurations.begin(); it != mInitialConfigurations.end(); it++ )
+  {
+    if (index == j)
+    {
+      rlock.unlock();
+      return applyInitialConfiguration(it->first);
+    }
+    j++;
+  }
+
+  // you cant land here
+  return false;
+}
+
+unsigned int cedar::dev::robot::KinematicChain::getCurrentInitialConfigurationIndex()
+{
+  QReadLocker lock(&mCurrentInitialConfigurationLock);
+  unsigned int j = 0;
+
+  for( std::map< std::string, cv::Mat >::const_iterator it = mInitialConfigurations.begin(); it != mInitialConfigurations.end(); it++ )
+  {
+    if (it->first == mCurrentInitialConfiguration)
+    {
+      return j;
+    }
+    j++;
+  }
+
+  CEDAR_THROW( cedar::proc::InvalidNameException,
+               "Current initial configuration index is not a valid "
+               "initial configuration" );
+  return 0;
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::getInitialConfiguration(std::string s)
+{
+  QReadLocker lock(&mCurrentInitialConfigurationLock);
+
+  auto f = mInitialConfigurations.find(s);
+  if (f == mInitialConfigurations.end())
+  {
+    CEDAR_THROW( cedar::proc::InvalidNameException,
+                 "You requested initial configuration "
+                 + s + " which is not registered. "
+                 "Use addInitialConfiguration().");
+  }
+
+  return f->second;
+}
+
+std::vector<std::string> cedar::dev::robot::KinematicChain::getInitialConfigurationIndices()
+{
+  QReadLocker lock(&mCurrentInitialConfigurationLock);
+  std::vector<std::string> result;
+
+  for( std::map<std::string,cv::Mat>::const_iterator it = mInitialConfigurations.begin(); it != mInitialConfigurations.end(); ++it )
+  {
+    result.push_back( (*it).first );
+  }
+  return result;
+}
+
+cv::Mat cedar::dev::robot::KinematicChain::getCurrentInitialConfiguration()
+{
+  QReadLocker lock(&mCurrentInitialConfigurationLock);
+
+  std::map< std::string, cv::Mat >::const_iterator found = mInitialConfigurations.find(mCurrentInitialConfiguration);
+  if (found == mInitialConfigurations.end())
+  {
+    // you cant really land here, but lets be paranoid:
+    CEDAR_THROW( cedar::proc::InvalidNameException,
+                 "You requested the current initial configuration, "
+                 "but none is set. "
+                 "Use addInitialConfiguration().");
+  }
+
+  return mInitialConfigurations[ mCurrentInitialConfiguration ];
+}
+

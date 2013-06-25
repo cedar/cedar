@@ -69,6 +69,10 @@ _mLoopMode
 )
 {
   mStop  = false;
+  // connect to mode change signal
+  QObject::connect(_mLoopMode.get(), SIGNAL(valueChanged()), this, SLOT(modeChanged()));
+  // initially set available parameters
+  this->modeChanged();
   initStatistics();
 }
 
@@ -85,6 +89,13 @@ void cedar::aux::LoopedThread::stop(unsigned int time, bool suppressWarning)
   if (this->isRunning())
   {
     mStop = true;
+
+    // avoid dead-locking if called from the same thread:
+    if (QThread::currentThread() == this)
+    {
+      return;
+    }
+
     wait(time);
 
     if (this->isRunning())
@@ -182,6 +193,9 @@ void cedar::aux::LoopedThread::run()
         // sleep until next wake up time
         sleep_duration = scheduled_wakeup - boost::posix_time::microsec_clock::universal_time();
         usleep(std::max<int>(0, sleep_duration.total_microseconds()));
+      
+        if (mStop) // a lot can happen in a few us
+          break;
 
         // determine time since last run
         mLastTimeStepStart = mLastTimeStepEnd;
@@ -199,6 +213,9 @@ void cedar::aux::LoopedThread::run()
 
         // call step function
         step(full_steps_taken * step_size.total_microseconds() * 0.001);
+
+        if (mStop) // a lot can happen in a step()
+          break;
 
         // schedule the next wake up
         while (scheduled_wakeup < boost::posix_time::microsec_clock::universal_time())
@@ -227,6 +244,9 @@ void cedar::aux::LoopedThread::run()
         sleep_duration = scheduled_wakeup - boost::posix_time::microsec_clock::universal_time();
         usleep(std::max<int>(0, sleep_duration.total_microseconds()));
 
+        if (mStop) // a lot can happen in a few us
+          break;
+
         // determine time since last run
         mLastTimeStepStart = mLastTimeStepEnd;
         mLastTimeStepEnd = scheduled_wakeup;
@@ -243,6 +263,8 @@ void cedar::aux::LoopedThread::run()
         // call step function
         step(steps_taken * step_size.total_microseconds() * 0.001);
 
+        if (mStop) // a lot can happen in a step()
+          break;
 
         // schedule the next wake up
         scheduled_wakeup = std::max<boost::posix_time::ptime>
@@ -363,4 +385,38 @@ boost::posix_time::ptime cedar::aux::LoopedThread::getLastTimeStepEnd() const
 boost::posix_time::time_duration cedar::aux::LoopedThread::getLastTimeStepDuration() const
 {
   return mLastTimeStepStart - mLastTimeStepEnd;
+}
+
+void cedar::aux::LoopedThread::modeChanged()
+{
+  switch (_mLoopMode->getValue())
+  {
+    case cedar::aux::LoopMode::Simulated:
+    {
+      this->_mStepSize->setConstant(true);
+      this->_mIdleTime->setConstant(false);
+      this->_mSimulatedTime->setConstant(false);
+      break;
+    }
+    case cedar::aux::LoopMode::RealTime:
+    {
+      this->_mStepSize->setConstant(true);
+      this->_mIdleTime->setConstant(false);
+      this->_mSimulatedTime->setConstant(true);
+      break;
+    }
+    case cedar::aux::LoopMode::Fixed:
+    case cedar::aux::LoopMode::FixedAdaptive:
+    {
+      this->_mStepSize->setConstant(false);
+      this->_mIdleTime->setConstant(true);
+      this->_mSimulatedTime->setConstant(true);
+      break;
+    }
+    default:
+    {
+      // all valid cases are covered above
+      CEDAR_ASSERT(false);
+    }
+  }
 }

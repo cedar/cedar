@@ -200,10 +200,18 @@ void cedar::proc::gui::TriggerItem::setTrigger(cedar::proc::TriggerPtr trigger)
 {
   this->setElement(trigger);
   this->mTrigger = trigger;
-  this->mClassId = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(mTrigger);
+  this->mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(mTrigger);
   
   std::string tool_tip = this->mTrigger->getName() + " (" + this->mClassId->getClassName() + ")";
   this->setToolTip(tool_tip.c_str());
+
+  if (auto looped_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(this->mTrigger))
+  {
+    QObject::connect(looped_trigger.get(), SIGNAL(triggerStarting()), this, SLOT(triggerStateChanging()));
+    QObject::connect(looped_trigger.get(), SIGNAL(triggerStopping()), this, SLOT(triggerStateChanging()));
+    QObject::connect(looped_trigger.get(), SIGNAL(triggerStarted()), this, SLOT(triggerStarted()));
+    QObject::connect(looped_trigger.get(), SIGNAL(triggerStopped()), this, SLOT(triggerStopped()));
+  }
 }
 
 void cedar::proc::gui::TriggerItem::readConfiguration(const cedar::aux::ConfigurationNode& node)
@@ -217,12 +225,27 @@ void cedar::proc::gui::TriggerItem::writeConfiguration(cedar::aux::Configuration
   this->cedar::proc::gui::GraphicsBase::writeConfiguration(root);
 }
 
+void cedar::proc::gui::TriggerItem::triggerStateChanging()
+{
+  this->setFillColor(mValidityColorWarning);
+}
+
+void cedar::proc::gui::TriggerItem::triggerStarted()
+{
+  this->setFillColor(mValidityColorValid);
+}
+
+void cedar::proc::gui::TriggerItem::triggerStopped()
+{
+  this->setFillColor(mDefaultFillColor);
+}
+
 void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 {
   cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
   CEDAR_DEBUG_ASSERT(p_scene);
 
-  if (cedar::proc::LoopedTrigger* p_looped_trigger = dynamic_cast<cedar::proc::LoopedTrigger*>(this->mTrigger.get()))
+  if (auto looped_trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(this->mTrigger))
   {
     QMenu menu;
     QAction *p_start = menu.addAction("start");
@@ -231,7 +254,7 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
     menu.addSeparator();
     p_scene->networkGroupingContextMenuEvent(menu);
 
-    if (p_looped_trigger->isRunning())
+    if (looped_trigger->isRunning())
     {
       p_start->setEnabled(false);
     }
@@ -244,23 +267,11 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
 
     if (a == p_start)
     {
-      /*!@todo Rather than reacting this way, the trigger should emit a signal when it is started/stopped which leads to
-       *       the color change
-       */
-      p_looped_trigger->startTrigger();
-      this->setFillColor(mValidityColorValid);
+      looped_trigger->startTrigger();
     }
     else if (a == p_stop)
     {
-      this->setFillColor(mValidityColorWarning);
-      p_looped_trigger->stopTrigger();
-      while (p_looped_trigger->isRunning())
-      {
-        QApplication::processEvents();
-        cedar::aux::sleep(cedar::unit::Milliseconds(10));
-      }
-
-      this->setFillColor(mDefaultFillColor);
+      looped_trigger->stopTrigger();
     }
   }
   else

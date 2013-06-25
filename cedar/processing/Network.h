@@ -154,6 +154,18 @@ public:
    */
   void add(std::list<cedar::proc::ElementPtr> elements);
 
+  /*!@brief Duplicates an existing element.
+   *
+   * @param elementName Identifier of the existing element.
+   * @param newName Name to be given to the new element.
+   */
+  void duplicate(const std::string& elementName, const std::string& newName = "");
+
+  /*!@brief unmodifiedName unmodified name, possibly non-unique in network
+   * @return unique name created by attaching a number if name is already taken
+   */
+  std::string getUniqueName(const std::string& unmodifiedName) const;
+
   /*!@brief Returns the element with the given name as a pointer of the specified type.
    */
   template <class T>
@@ -327,6 +339,12 @@ public:
 
   /*!@brief Remove all connections that connect up to a specified slot */
   void removeAllConnectionsFromSlot(cedar::proc::ConstDataSlotPtr slot);
+
+  //!@brief Starts all triggers in this network (that haven't been started yet).
+  void startTriggers();
+
+  //!@brief Stops all running triggers in this network.
+  void stopTriggers();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

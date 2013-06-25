@@ -68,7 +68,7 @@ void cedar::dev::sensors::camera::IsoSpeed::construct()
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::camera::IsoSpeed::ISO_NOT_SET,
                                       "ISO_NOT_SET",
-                                      "automatic"
+                                      "auto"
                                     ));
 
   mType.type()->def(cedar::aux::Enum(

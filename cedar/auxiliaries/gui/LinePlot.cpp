@@ -37,6 +37,9 @@
     Credits:
 
 ======================================================================================================================*/
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_QWT
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/LinePlot.h"
@@ -48,14 +51,22 @@
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
+#include <boost/numeric/conversion/bounds.hpp>
 #include <qwt_legend.h>
 #include <qwt_scale_div.h>
 #include <QContextMenuEvent>
 #include <QVBoxLayout>
+#include <QGridLayout>
 #include <QPalette>
 #include <QMenu>
 #include <QThread>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QDoubleSpinBox>
+#include <QPushButton>
+#include <QLabel>
 #include <iostream>
+#include <limits.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 // static members
@@ -110,6 +121,16 @@ cedar::aux::math::Limits<double> cedar::aux::gui::LinePlot::getXLimits() const
   cedar::aux::math::Limits<double> limits;
 
   QwtScaleDiv* p_interval = this->mpPlot->axisScaleDiv(QwtPlot::xBottom);
+  limits.setLower(p_interval->lowerBound());
+  limits.setUpper(p_interval->upperBound());
+  return limits;
+}
+
+cedar::aux::math::Limits<double> cedar::aux::gui::LinePlot::getYLimits() const
+{
+  cedar::aux::math::Limits<double> limits;
+
+  QwtScaleDiv* p_interval = this->mpPlot->axisScaleDiv(QwtPlot::yLeft);
   limits.setLower(p_interval->lowerBound());
   limits.setUpper(p_interval->upperBound());
   return limits;
@@ -253,8 +274,6 @@ void cedar::aux::gui::LinePlot::plot(cedar::aux::ConstDataPtr data, const std::s
   mpLock->unlock();
 
   this->append(data, title);
-
-  this->startTimer(30); //!@todo make the refresh time configurable.
 }
 
 void cedar::aux::gui::LinePlot::init()
@@ -302,6 +321,19 @@ void cedar::aux::gui::LinePlot::contextMenuEvent(QContextMenuEvent *pEvent)
   QObject::connect(p_legend, SIGNAL(toggled(bool)), this, SLOT(showLegend(bool)));
   p_legend->setChecked(this->mpPlot->legend() != NULL);
 
+  //!@todo This should be generalized for all plots so that plots only have to supply a method for (re-)setting the limits.
+  menu.addSeparator();
+  QMenu* p_y_scaling_menu = menu.addMenu("y axis scaling");
+  QAction* p_y_scaling_auto = p_y_scaling_menu->addAction("automatic");
+  p_y_scaling_auto->setCheckable(true);
+  p_y_scaling_auto->setChecked(this->mpPlot->axisAutoScale(QwtPlot::yLeft));
+  QObject::connect(p_y_scaling_auto, SIGNAL(triggered()), this, SLOT(setAutomaticYAxisScaling()));
+
+  QAction* p_y_scaling_fixed = p_y_scaling_menu->addAction("fixed");
+  p_y_scaling_fixed->setCheckable(true);
+  p_y_scaling_fixed->setChecked(this->mpPlot->axisAutoScale(QwtPlot::yLeft) == false);
+  QObject::connect(p_y_scaling_fixed, SIGNAL(triggered()), this, SLOT(setFixedYAxisScaling()));
+
   QAction *p_action = menu.exec(pEvent->globalPos());
   if (p_action == NULL)
   {
@@ -316,6 +348,58 @@ void cedar::aux::gui::LinePlot::contextMenuEvent(QContextMenuEvent *pEvent)
       series->mpCurve->setRenderHint(QwtPlotItem::RenderAntialiased, p_action->isChecked());
     }
   }
+}
+
+void cedar::aux::gui::LinePlot::setAutomaticYAxisScaling()
+{
+  this->mpPlot->setAxisAutoScale(QwtPlot::yLeft);
+}
+
+void cedar::aux::gui::LinePlot::setFixedYAxisScaling()
+{
+  QDialog* p_dialog = new QDialog();
+  p_dialog->setModal(true);
+  auto p_layout = new QGridLayout();
+  p_dialog->setLayout(p_layout);
+  QLabel* p_label;
+  p_label = new QLabel("lower limit:");
+  p_layout->addWidget(p_label, 0, 0);
+
+  cedar::aux::math::Limits<double> y_limits = this->getYLimits();
+  auto p_lower = new QDoubleSpinBox();
+  p_layout->addWidget(p_lower, 0, 1);
+  p_lower->setMinimum(boost::numeric::bounds<double>::lowest());
+  p_lower->setMaximum(boost::numeric::bounds<double>::highest());
+  p_lower->setValue(y_limits.getLower());
+
+  p_label = new QLabel("upper limit:");
+  p_layout->addWidget(p_label, 1, 0);
+
+  auto p_upper = new QDoubleSpinBox();
+  p_layout->addWidget(p_upper, 1, 1);
+  p_upper->setMinimum(boost::numeric::bounds<double>::lowest());
+  p_upper->setMaximum(boost::numeric::bounds<double>::highest());
+  p_upper->setValue(y_limits.getUpper());
+
+  auto p_buttons = new QDialogButtonBox();
+  p_buttons->addButton(QDialogButtonBox::Ok);
+  p_buttons->addButton(QDialogButtonBox::Cancel);
+  p_layout->addWidget(p_buttons, 2, 0, 1, 2);
+
+  QObject::connect(p_buttons->button(QDialogButtonBox::Ok), SIGNAL(clicked()), p_dialog, SLOT(accept()));
+  QObject::connect(p_buttons->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), p_dialog, SLOT(reject()));
+
+  int res = p_dialog->exec();
+
+  if (res == QDialog::Accepted)
+  {
+    this->setFixedYAxisScaling(p_lower->value(), p_upper->value());
+  }
+}
+
+void cedar::aux::gui::LinePlot::setFixedYAxisScaling(double lower, double upper)
+{
+  this->mpPlot->setAxisScale(QwtPlot::yLeft, lower, upper);
 }
 
 void cedar::aux::gui::LinePlot::showLegend(bool show)
@@ -442,3 +526,5 @@ void cedar::aux::gui::LinePlot::timerEvent(QTimerEvent * /* pEvent */)
 
   emit convert();
 }
+
+#endif // CEDAR_USE_QWT

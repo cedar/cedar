@@ -41,6 +41,7 @@
 #include "cedar/processing/sources/Camera.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 
@@ -65,9 +66,11 @@ namespace
     declaration->setIconPath(":/steps/camera_grabber.svg");
     declaration->setDescription
     (
-      "A source that reads images from a camera."
+      "A source that reads images from a camera.\nNote:\nAn exception will be thrown when changing "
+      "settings while a looped trigger is active. In this case reset the grabber."
     );
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }
@@ -92,16 +95,11 @@ cedar::proc::sources::GrabberBase()
                new cedar::dev::sensors::camera::Grabber()
             );
 
-  //no exception here, so we could use it
+  // no exception here, so we could use it
   this->mpGrabber = grabber;
 
   this->addConfigurableChild("CameraGrabber", this->getCameraGrabber());
   this->declareOutput("camera", mImage);
-
-  //this->reset();
-
-  //QObject::connect(mDeBayer.get(), SIGNAL(valueChanged()), this, SLOT(setDeBayer()));
-  //QObject::connect(mBusId.get(), SIGNAL(valueChanged()), this, SLOT(setBusId()));
 
   // applyParameter as an action
   this->registerFunction("apply parameter", boost::bind(&cedar::proc::sources::Camera::applyParameter, this));
@@ -109,6 +107,8 @@ cedar::proc::sources::GrabberBase()
   // update picture as an action
   this->registerFunction("update frame", boost::bind(&cedar::proc::sources::Camera::updateFrame, this));
 
+  // listen to changed framesize in order to annotate a new image
+  QObject::connect(grabber.get(),SIGNAL(frameSizeChanged()),this, SLOT(changedFrameSize()));
 }
 
 cedar::proc::sources::Camera::~Camera()
@@ -117,48 +117,70 @@ cedar::proc::sources::Camera::~Camera()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+// slots
+//----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::sources::Camera::changedFrameSize()
+{
+  this->updateFrame();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Camera::onStart()
 {
   if (!this->getCameraGrabber()->isCreated())
   {
+    this->applyParameter();
+  }
+
+  if (this->getCameraGrabber()->isCreated())
+  {
+    this->getCameraGrabber()->setIsGrabbing(true);
   }
 }
 
-//----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::sources::Camera::onStop()
+{
+  this->getCameraGrabber()->setIsGrabbing(false);
+}
+
+
 void cedar::proc::sources::Camera::applyParameter()
 {
+  if (this->getCameraGrabber()->isCreated() && this->getCameraGrabber()->isRunning())
+  {
+    std::string msg = this->getCameraGrabber()->getName() + ": Already grabbing! Please stop grabbing and try again!";
+    cedar::aux::LogSingleton::getInstance()->warning(msg,"void cedar::proc::sources::Camera::applyParameter()");
+    return;
+  }
+
   if (this->getCameraGrabber()->applyParameter())
   {
-    for (int i = 0; i < 5; ++i)
-    {
-      usleep(5000);
-      this->onTrigger();
-      this->annotateImage();
-    }
+    this->updateFrame();
   }
   else
   {
-    cedar::aux::LogSingleton::getInstance()->debugMessage
+    cedar::aux::LogSingleton::getInstance()->error
                                              (
                                                this->getCameraGrabber()->getName() + ": ERROR on applying parameter",
                                                "void cedar::proc::sources::Camera::applyParameter()"
                                              );
   }
+  //this->callReset();
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Camera::updateFrame()
 {
   if (this->getCameraGrabber()->isCreated())
   {
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 5; ++i)
     {
-      usleep(50000);
+      cedar::aux::sleep(cedar::unit::Milliseconds(50));
       this->onTrigger();
       this->annotateImage();
     }
@@ -166,7 +188,6 @@ void cedar::proc::sources::Camera::updateFrame()
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Camera::compute(const cedar::proc::Arguments&)
 {
   // get the time-diff between two steps
@@ -184,8 +205,6 @@ void cedar::proc::sources::Camera::compute(const cedar::proc::Arguments&)
   if (this->getCameraGrabber()->isCreated())
   {
     this->getCameraGrabber()->grab();
-    //!@todo Don't constantly reannotate here!
-    //this->annotateImage();
     this->mImage->setData(this->getCameraGrabber()->getImage().clone());
   }
 }

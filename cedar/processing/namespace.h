@@ -74,8 +74,6 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(Manager);
     CEDAR_DECLARE_PROC_CLASS(Network);
     CEDAR_DECLARE_PROC_CLASS(OwnedData);
-    CEDAR_DECLARE_PROC_CLASS(PluginProxy);
-    CEDAR_DECLARE_PROC_CLASS(PluginDeclaration);
     CEDAR_DECLARE_PROC_CLASS(PromotedExternalData);
     CEDAR_DECLARE_PROC_CLASS(PromotedOwnedData);
     CEDAR_DECLARE_PROC_CLASS(Triggerable);
@@ -87,8 +85,15 @@ namespace cedar
     //!@cond SKIPPED_DOCUMENTATION
     template <class BaseClass, class FactoryType> class DeclarationBase;
     template <class DerivedClass> class ElementDeclarationTemplate;
-    template <class DerivedClass> class StepDeclarationT;
-    template <class DerivedClass> class TriggerDeclarationT;
+
+    CEDAR_DECLARE_PROC_CLASS(PluginProxy);
+    //!@endcond
+
+    //!@todo Deprecate this
+
+    //!@cond SKIPPED_DOCUMENTATION
+    typedef cedar::aux::PluginDeclarationList PluginDeclaration;
+    CEDAR_GENERATE_POINTER_TYPES(PluginDeclaration);
     //!@endcond
 
     //!@brief a factory for elements
@@ -109,9 +114,11 @@ namespace cedar
     class CEDAR_PROC_LIB_EXPORT InvalidCategoryException;
     class CEDAR_PROC_LIB_EXPORT MissingConnectionException;
     class CEDAR_PROC_LIB_EXPORT MissingDeclarationException;
+    class CEDAR_PROC_LIB_EXPORT NoCheckException;
+    class CEDAR_PROC_LIB_EXPORT NoMappingException;
+    class CEDAR_PROC_LIB_EXPORT NoMeasurementException;
     class CEDAR_PROC_LIB_EXPORT ParseException;
     class CEDAR_PROC_LIB_EXPORT PluginException;
-    class CEDAR_PROC_LIB_EXPORT NoMappingException;
     //!@endcond
   }
 }

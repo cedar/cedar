@@ -28,7 +28,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 09 28
 
-    Description: Class VideoChannel
+    Description: Class VideoChannel contains additional data of an Video-grabbing channel
 
     Credits:
 
@@ -106,10 +106,10 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! Camera interface
+  //! @brief Read the video file with this object
   cv::VideoCapture mVideoCapture;
 
-  //! @brief The filename of the video file you want to grab from
+  //! @brief The filename of the video file to grab from
   cedar::aux::FileParameterPtr _mSourceFileName;
 
 private:

@@ -74,7 +74,8 @@ namespace
     declaration->setIconPath(":/steps/gauss_input.svg");
     declaration->setDescription("Generates a matrix that contains a sampled Gauss function.");
     declaration->deprecatedName("cedar.processing.source.GaussInput");
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }
@@ -113,6 +114,11 @@ void cedar::proc::sources::GaussInput::setCenter(unsigned int dimension, double 
 {
   CEDAR_ASSERT(dimension < this->_mCenters->size());
   this->_mCenters->set(dimension, center);
+}
+
+double cedar::proc::sources::GaussInput::getAmplitude() const
+{
+  return this->_mAmplitude->getValue();
 }
 
 void cedar::proc::sources::GaussInput::setAmplitude(double amplitude)

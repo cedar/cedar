@@ -170,6 +170,7 @@ int main(int argc, char **argv)
   // create interface to the arm
   cedar::dev::kuka::gui::FriStatusWidget* p_fri_status_widget = 0;
   cedar::dev::robot::KinematicChainPtr arm;
+
   if (use_hardware)
   {
     // hardware interface
@@ -186,14 +187,21 @@ int main(int argc, char **argv)
     // simulated arm
     cedar::dev::robot::KinematicChainPtr sim(new cedar::dev::robot::SimulatedKinematicChain());
     sim->readJson(configuration_file);
-    // set simulated arm to useful initial condition
-    sim->setJointAngle(0, 0.1);
-    sim->setJointAngle(1, 0.2);
-    sim->setJointAngle(2, 0.1);
-    sim->setJointAngle(3, 0.2);
-    sim->setJointAngle(5, 0.2);
     arm = sim;
+
   }
+
+  // define some initial configurations we can choose from
+  double initial_config1[][1] = { {0.1}, {0.2}, {0.1}, {0.2}, {0.0}, {0.2}, {0.0} };
+  std::map< std::string, cv::Mat > initial_configs = {
+    {"near zero", cv::Mat( 7, 1, CV_64F, initial_config1) },
+    // add your configs here ...
+  };
+  arm->setInitialConfigurations( initial_configs );
+
+  // set simulated arm to initial configuration
+  if (!use_hardware)
+    arm->applyInitialConfiguration("near zero");
 
   // create the scene for the visualization
   cedar::aux::gl::ScenePtr scene(new cedar::aux::gl::Scene);
@@ -236,7 +244,7 @@ int main(int argc, char **argv)
   worker.setStepSize(10);
 
   // start everything
-  arm->setWorkingMode(cedar::dev::robot::KinematicChain::VELOCITY);
+  arm->start();
   worker.start();
   a.exec();
 

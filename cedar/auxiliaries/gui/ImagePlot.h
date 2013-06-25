@@ -120,13 +120,15 @@ private:
   class ImageDisplay : public QLabel
   {
     public:
-      ImageDisplay(const QString& text);
+      ImageDisplay(cedar::aux::gui::ImagePlot* pPlot, const QString& text);
 
     protected:
       void mousePressEvent(QMouseEvent * pEvent);
 
     public:
       cedar::aux::ConstMatDataPtr mData;
+
+      cedar::aux::gui::ImagePlot* mpPlot;
   };
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -135,6 +137,9 @@ private:
 public:
   //!@brief The standard constructor.
   ImagePlot(QWidget *pParent = NULL);
+
+  //!@todo implement this constructor (see SurfacePlot.cpp)
+  // ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
 
   //!@brief Destructor.
   ~ImagePlot();
@@ -154,6 +159,10 @@ public:
   /*!@brief Updates the plot periodically.
    */
   void timerEvent(QTimerEvent *pEvent);
+
+  /*!@brief Set the scaling mode of the plot.
+   */
+  void setSmoothScaling(bool smooth);
 
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
@@ -224,6 +233,9 @@ private:
   //! True if the plot is currently converting the data to the internal format. Used to skip overlapping timer events.
   bool mConverting;
 
+  //! Whether the matrix should be smoothed during scaling.
+  bool mSmoothScaling;
+
   static std::vector<char> mLookupTableR;
   static std::vector<char> mLookupTableG;
   static std::vector<char> mLookupTableB;
@@ -231,4 +243,5 @@ private:
   static QReadWriteLock mLookupTableLock;
 
 }; // class cedar::aux::gui::ImagePlot
+
 #endif // CEDAR_AUX_GUI_IMAGE_PLOT_H

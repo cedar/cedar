@@ -41,6 +41,10 @@
 #ifndef CEDAR_AUX_GUI_LINE_PLOT_H
 #define CEDAR_AUX_GUI_LINE_PLOT_H
 
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_QWT
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/MultiPlotInterface.h"
@@ -187,9 +191,27 @@ public:
   //!@todo Generalize this for n-dimensional matrix plots.
   cedar::aux::math::Limits<double> getXLimits() const;
 
+  //!@brief Returns the limits of the y axis.
+  //!@todo Generalize this for n-dimensional matrix plots.
+  cedar::aux::math::Limits<double> getYLimits() const;
+
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
   void convert();
+
+public slots:
+  //! When called, the y axis scaling is determined automatically every time the plot updates.
+  void setAutomaticYAxisScaling();
+
+  /*! @brief Slot that is called when the menu entry in the plot is called.
+   *
+   *  This function opens a dialog that lets the user enter the desired interval for the Y axis.
+   */
+  void setFixedYAxisScaling();
+
+  /*! @brief Sets the minimum and maximum for the y axis.
+   */
+  void setFixedYAxisScaling(double lower, double upper);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -243,4 +265,5 @@ private:
 
 }; // class cedar::aux::gui::LinePlot
 
+#endif // CEDAR_USE_QWT
 #endif // CEDAR_AUX_GUI_LINE_PLOT_H
