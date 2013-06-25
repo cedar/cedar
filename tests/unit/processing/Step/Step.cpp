@@ -39,6 +39,7 @@
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/processing/Network.h"
 #include "cedar/processing/LoopedTrigger.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -187,10 +188,12 @@ int testStartingStopping()
   return errors;
 }
 
+// global variable:
+int global_errors;
 
-int main(int, char**)
+void run_test()
 {
-  int errors = 0;
+  global_errors = 0;
   
   TestStepPtr step (new TestStep());
 
@@ -199,7 +202,7 @@ int main(int, char**)
   if (!step->checkLockSets())
   {
     std::cout << "Error in lock set check." << std::endl;
-    ++errors;
+    ++global_errors;
   }
 
   std::cout << "Removing and re-registering data." << std::endl;
@@ -208,11 +211,30 @@ int main(int, char**)
   if (!step->checkLockSets())
   {
     std::cout << "Error in lock set check." << std::endl;
-    ++errors;
+    ++global_errors;
   }
 
-  errors += testStartingStopping();
+  global_errors += testStartingStopping();
 
-  std::cout << "test finished with " << errors << " error(s)." << std::endl;
-  return errors;
+  std::cout << "test finished with " << global_errors << " error(s)." << std::endl;
 }
+
+int main(int argc, char* argv[])
+{
+  QCoreApplication* app;
+  app = new QCoreApplication(argc,argv);
+
+  auto testThread = new cedar::aux::CallFunctionInThread(run_test);
+
+  QObject::connect( testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection );  // alternatively: call app->quit() in runTests()
+
+  testThread->start();
+  app->exec();
+
+  delete testThread;
+  delete app;
+
+  return global_errors;
+}
+
+

@@ -213,6 +213,10 @@ public slots:
    */
   void setFixedYAxisScaling(double lower, double upper);
 
+  /*! @brief Sets the minimum and maximum for the x axis.
+   */
+  void setFixedXAxisScaling(double lower, double upper);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

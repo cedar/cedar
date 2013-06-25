@@ -67,16 +67,21 @@ likely to undergo major changes:
     
 == current testing ==
 
+- general
+  - Parameters of several classes are marked as "advanced" based on how often one normally uses these. Affected are
+    for example anchor, shift, and limit of kernels and threshold of sigmoids. 
 - build system
   - enabled C++0x / C++11 compiler flag for GCC
   - cedar should now also compile when using clang.
 - cedar::aux
+  - when using LoopedThread a running QApplication or QCoreApplication is now required for its QT event loop (call exec() for the app).
   - DoubleData now inherits MatData. It therefore is also no longer just a typedef of a template, so make sure you
     include the proper header (cedar/auxiliaries/DoubleData) in your code.
   - Parameters and Configurables can now be marked as advanced. Those that are, are not displayed to the user unless
     they opt to have them displayed by checking a box in the property pane.
   - Log entries in gui::Log can now be removed using the right-click context menu.
   - Parameters of LoopedThread are now set to constant depending on the current mode (e.g., blocking "simulated time").
+  - Memory debug output is turned off by default, can be activated through a configuration file.
 - cedar::aux::gui
   - LinePlots now have an option in their context menu to set fixed limits for the y axis.
   - There is now a history plot for 1D matrices.
@@ -97,7 +102,10 @@ likely to undergo major changes:
     this is the new default)
   - gui::PluginManagerDialog now allows you to remove unused entries of plugins.
   - The "plot all" function can now be replaced by other plots where appropriate. For example, for neural fields, the
-    field plot now replaces it. In such cases, plot all can still be accessed from the "defined plots" menu. 
+    field plot now replaces it. In such cases, plot all can still be accessed from the "defined plots" menu.
+  - The processingIde now offers a tool for checking architecture consistency. It is still a very early version and will
+    be extended in the future. For now, it only checks if all looped steps in the current architecture are connected to
+    a looped trigger. The tool can be accessed from the "windows" menu.
 
 - cedar::dyn
   - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   

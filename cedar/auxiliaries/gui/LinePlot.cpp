@@ -402,6 +402,11 @@ void cedar::aux::gui::LinePlot::setFixedYAxisScaling(double lower, double upper)
   this->mpPlot->setAxisScale(QwtPlot::yLeft, lower, upper);
 }
 
+void cedar::aux::gui::LinePlot::setFixedXAxisScaling(double lower, double upper)
+{
+  this->mpPlot->setAxisScale(QwtPlot::xBottom, lower, upper);
+}
+
 void cedar::aux::gui::LinePlot::showLegend(bool show)
 {
   if (show)
@@ -489,6 +494,8 @@ void cedar::aux::gui::detail::LinePlotWorker::convert()
 void cedar::aux::gui::LinePlot::conversionDone()
 {
   QReadLocker locker(this->mpLock);
+
+  double x_min = std::numeric_limits<double>::max(), x_max = 0.0;
   for (size_t i = 0; i < this->mPlotSeriesVector.size(); ++i)
   {
     PlotSeriesPtr series = this->mPlotSeriesVector.at(i);
@@ -512,7 +519,12 @@ void cedar::aux::gui::LinePlot::conversionDone()
     #else
     #error unsupported qwt version
     #endif
+
+    x_min = std::min(series->mXValues.front(), x_min);
+    x_max = std::max(series->mXValues.back(), x_max);
   }
+
+  this->setFixedXAxisScaling(x_min, x_max);
 
   this->mpPlot->replot();
 }

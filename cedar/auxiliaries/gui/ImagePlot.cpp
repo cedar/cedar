@@ -88,29 +88,18 @@ QReadWriteLock cedar::aux::gui::ImagePlot::mLookupTableLock;
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::gui::ImagePlot::ImagePlot(QWidget *pParent)
 :
-cedar::aux::gui::PlotInterface(pParent),
-mTimerId(0),
-mDataType(DATA_TYPE_UNKNOWN),
-mConverting(false),
-mSmoothScaling(true)
+cedar::aux::gui::PlotInterface(pParent)
 {
-  QVBoxLayout *p_layout = new QVBoxLayout();
-  p_layout->setContentsMargins(0, 0, 0, 0);
-  this->setLayout(p_layout);
-  this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+  this->construct();
+}
 
-  mpImageDisplay = new cedar::aux::gui::ImagePlot::ImageDisplay(this, "no image loaded");
-  p_layout->addWidget(mpImageDisplay);
+cedar::aux::gui::ImagePlot::ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent)
+:
+cedar::aux::gui::PlotInterface(pParent)
+{
+  this->construct();
 
-  this->mpWorkerThread = new QThread();
-  mWorker = cedar::aux::gui::detail::ImagePlotWorkerPtr(new cedar::aux::gui::detail::ImagePlotWorker(this));
-  mWorker->moveToThread(this->mpWorkerThread);
-
-  QObject::connect(this, SIGNAL(convert()), mWorker.get(), SLOT(convert()));
-  QObject::connect(mWorker.get(), SIGNAL(done()), this, SLOT(conversionDone()));
-  QObject::connect(mWorker.get(), SIGNAL(failed()), this, SLOT(conversionFailed()));
-
-  this->mpWorkerThread->start(QThread::LowPriority);
+  this->plot(matData, title);
 }
 
 cedar::aux::gui::ImagePlot::ImageDisplay::ImageDisplay(cedar::aux::gui::ImagePlot* pPlot, const QString& text)
@@ -136,6 +125,32 @@ cedar::aux::gui::ImagePlot::~ImagePlot()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::ImagePlot::construct()
+{
+  this->mTimerId = 0;
+  this->mDataType = DATA_TYPE_UNKNOWN;
+  this->mConverting = false;
+  this->mSmoothScaling = true;
+
+  QVBoxLayout *p_layout = new QVBoxLayout();
+  p_layout->setContentsMargins(0, 0, 0, 0);
+  this->setLayout(p_layout);
+  this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+
+  mpImageDisplay = new cedar::aux::gui::ImagePlot::ImageDisplay(this, "no image loaded");
+  p_layout->addWidget(mpImageDisplay);
+
+  this->mpWorkerThread = new QThread();
+  mWorker = cedar::aux::gui::detail::ImagePlotWorkerPtr(new cedar::aux::gui::detail::ImagePlotWorker(this));
+  mWorker->moveToThread(this->mpWorkerThread);
+
+  QObject::connect(this, SIGNAL(convert()), mWorker.get(), SLOT(convert()));
+  QObject::connect(mWorker.get(), SIGNAL(done()), this, SLOT(conversionDone()));
+  QObject::connect(mWorker.get(), SIGNAL(failed()), this, SLOT(conversionFailed()));
+
+  this->mpWorkerThread->start(QThread::LowPriority);
+}
 
 void cedar::aux::gui::ImagePlot::setSmoothScaling(bool smooth)
 {

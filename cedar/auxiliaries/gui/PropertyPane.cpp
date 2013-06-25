@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/Settings.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -151,7 +152,10 @@ void cedar::aux::gui::PropertyPane::display(cedar::aux::ConfigurablePtr pConfigu
 
   std::string label = this->getInstanceTypeId(pConfigurable);
 #ifdef DEBUG
-  label += " " + cedar::aux::toString(pConfigurable.get());
+  if (cedar::aux::SettingsSingleton::getInstance()->getMemoryDebugOutput())
+  {
+    label += " " + cedar::aux::toString(pConfigurable.get());
+  }
 #endif // DEBUG
   this->addLabelRow(label);
 
@@ -328,7 +332,10 @@ int cedar::aux::gui::PropertyPane::getSenderParameterRowWidget() const
   cedar::aux::gui::Parameter *p_parameter = dynamic_cast<cedar::aux::gui::Parameter*>(QObject::sender());
   CEDAR_DEBUG_ASSERT(p_parameter != NULL);
 
-  CEDAR_DEBUG_ASSERT(this->mParameterWidgetRowIndex.find(p_parameter) != this->mParameterWidgetRowIndex.end());
+  if (this->mParameterWidgetRowIndex.find(p_parameter) == this->mParameterWidgetRowIndex.end())
+  {
+    CEDAR_THROW(cedar::aux::ParameterNotFoundException, "cannot find given parameter's widget");
+  }
   return this->mParameterWidgetRowIndex.find(p_parameter)->second;
 }
 
@@ -356,7 +363,16 @@ void cedar::aux::gui::PropertyPane::parameterChangeFlagChanged()
 
 void cedar::aux::gui::PropertyPane::rowSizeChanged()
 {
-  int row = this->getSenderParameterRowWidget();
+
+  int row;
+  try
+  {
+    row = this->getSenderParameterRowWidget();
+  }
+  catch (cedar::aux::ParameterNotFoundException& exc)
+  {
+    return;
+  }
 
   // the process-events call is only necessary because qt does otherwise not detect the new size properly.
   // should this bug ever be fixed, this can be removed.

@@ -164,6 +164,10 @@ public:
   template <typename T>
   inline void allocating(T* pInstance)
   {
+    if (!this->getMemoryDebugFlag())
+    {
+      return;
+    }
     std::string message = "allocating ";
     message += cedar::aux::unmangleName(typeid(T));
     message += " (pointer = ";
@@ -177,6 +181,10 @@ public:
   template <typename T>
   inline void freeing(T* pInstance)
   {
+    if (!this->getMemoryDebugFlag())
+    {
+      return;
+    }
     std::string message = "destroyed ";
     message += cedar::aux::unmangleName(typeid(T));
     message += " (pointer = ";
@@ -196,6 +204,8 @@ protected:
 private:
   //!@brief The constructor.
   Log();
+
+  bool getMemoryDebugFlag();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
