@@ -78,6 +78,7 @@ namespace cedar
 
           signals:
             void done();
+            void failed();
 
           public:
             cedar::aux::gui::ImagePlot *mpPlot;
@@ -194,6 +195,7 @@ private:
 
 private slots:
   void conversionDone();
+  void conversionFailed();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
