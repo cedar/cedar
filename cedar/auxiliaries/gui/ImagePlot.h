@@ -167,6 +167,10 @@ public:
    */
   void setSmoothScaling(bool smooth);
 
+  /*!@brief Applies a color scale to a matrix.
+   */
+  static cv::Mat colorizedMatrix(cv::Mat matrix);
+
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
   void convert();

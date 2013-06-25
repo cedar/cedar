@@ -363,11 +363,9 @@ void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
   emit convert();
 }
 
-//!@todo encapsulate lookup table functionality in own class
-cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) const
+cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix)
 {
-  CEDAR_DEBUG_ASSERT(in.channels() == 1);
-
+  //!@todo encapsulate lookup table functionality in own class / opencv might have functionality for this by now
   QReadLocker lookup_readlock(&mLookupTableLock);
   if (mLookupTableR.empty() || mLookupTableG.empty() || mLookupTableB.empty())
   {
@@ -423,6 +421,48 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
     lookup_writelock.unlock();
     lookup_readlock.relock();
   }
+
+  // accept only char type matrices
+  CEDAR_ASSERT(matrix.depth() != sizeof(char));
+
+  int channels = matrix.channels();
+
+  int rows = matrix.rows * channels;
+  int cols = matrix.cols;
+
+  if (matrix.isContinuous())
+  {
+    cols *= rows;
+    rows = 1;
+  }
+
+  cv::Mat converted = cv::Mat(matrix.rows, matrix.cols, CV_8UC3);
+
+  int i,j;
+  const unsigned char* p_in;
+  unsigned char* p_converted;
+  for (i = 0; i < rows; ++i)
+  {
+    p_in = matrix.ptr<unsigned char>(i);
+    p_converted = converted.ptr<unsigned char>(i);
+    for ( j = 0; j < cols; ++j)
+    {
+      size_t v = static_cast<size_t>(p_in[j]);
+      // channel 0
+      p_converted[3 * j + 0] = mLookupTableB.at(v);
+      // channel 1
+      p_converted[3 * j + 1] = mLookupTableG.at(v);
+      // channel 2
+      p_converted[3 * j + 2] = mLookupTableR.at(v);
+    }
+  }
+
+  return converted;
+}
+
+cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) const
+{
+  CEDAR_DEBUG_ASSERT(in.channels() == 1);
 
   switch (this->mDataType)
   {
@@ -489,41 +529,7 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
 
     case DATA_TYPE_MAT:
     {
-      // accept only char type matrices
-      CEDAR_ASSERT(in.depth() != sizeof(char));
-
-      int channels = in.channels();
-
-      int rows = in.rows * channels;
-      int cols = in.cols;
-
-      if (in.isContinuous())
-      {
-          cols *= rows;
-          rows = 1;
-      }
-
-      cv::Mat converted = cv::Mat(in.rows, in.cols, CV_8UC3);
-
-      int i,j;
-      const unsigned char* p_in;
-      unsigned char* p_converted;
-      for( i = 0; i < rows; ++i)
-      {
-          p_in = in.ptr<unsigned char>(i);
-          p_converted = converted.ptr<unsigned char>(i);
-          for ( j = 0; j < cols; ++j)
-          {
-            size_t v = static_cast<size_t>(p_in[j]);
-            // channel 0
-            p_converted[3 * j + 0] = mLookupTableB.at(v);
-            // channel 1
-            p_converted[3 * j + 1] = mLookupTableG.at(v);
-            // channel 2
-            p_converted[3 * j + 2] = mLookupTableR.at(v);
-          }
-      }
-      return converted;
+      return cedar::aux::gui::ImagePlot::colorizedMatrix(in);
     }
   }
 }
