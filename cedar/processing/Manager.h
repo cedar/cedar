@@ -80,8 +80,6 @@ public:
 public:
   //!@brief get the singleton instance of Manager
   static Manager& getInstance();
-  //!@brief access the FrameworkSettings
-  cedar::proc::FrameworkSettings& settings();
 
   //!\brief access to thread registry
   ThreadRegistry& threads();
@@ -130,9 +128,6 @@ private:
 
   //! a registry for all managed threads, which can be globally started or stopped (e.g., LoopedTrigger)
   ThreadRegistry mThreadRegistry;
-
-  //!@brief the framework settings
-  cedar::proc::FrameworkSettings mSettings;
 
 }; // class cedar::Manager
 
