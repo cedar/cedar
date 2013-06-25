@@ -148,7 +148,7 @@ public:
 
   /*!@brief The wait method.
    */
-  void wait()
+  void waitForProcessing()
   {
     this->QThread::wait();
   }
