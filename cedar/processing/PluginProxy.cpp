@@ -150,8 +150,8 @@ std::string cedar::proc::PluginProxy::findPluginFile(const std::string& file) co
     return file;
   }
 
-  cedar::proc::FrameworkSettings& settings = cedar::proc::Manager::getInstance().settings();
-  std::string loc = settings.getPluginWorkspace() + "/" + file;
+  cedar::proc::FrameworkSettingsPtr settings = cedar::proc::FrameworkSettingsSingleton::getInstance();
+  std::string loc = settings->getPluginWorkspace() + "/" + file;
   searched_locs += loc;
   if (boost::filesystem::exists(loc))
   {
@@ -159,8 +159,8 @@ std::string cedar::proc::PluginProxy::findPluginFile(const std::string& file) co
   }
 
   std::string ret_path;
-  std::set<std::string>::const_iterator path = settings.getPluginDirectories().begin();
-  std::set<std::string>::const_iterator path_end = settings.getPluginDirectories().end();
+  std::set<std::string>::const_iterator path = settings->getPluginDirectories().begin();
+  std::set<std::string>::const_iterator path_end = settings->getPluginDirectories().end();
   if (path != path_end)
   {
     do
@@ -264,7 +264,7 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   }
 
   // Finally, if nothing failed, add the plugin to the list of known plugins.
-  cedar::proc::Manager::getInstance().settings().addKnownPlugin(file);
+  cedar::proc::FrameworkSettingsSingleton::getInstance()->addKnownPlugin(file);
 }
 
 cedar::proc::PluginDeclarationPtr cedar::proc::PluginProxy::getDeclaration()
