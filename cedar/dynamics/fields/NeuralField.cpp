@@ -200,6 +200,8 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 
   this->declareInputCollection("input");
 
+  this->_mOutputActivation->markAdvanced();
+
   // setup default kernels
   std::vector<cedar::aux::kernel::KernelPtr> kernel_defaults;
   for (unsigned int i = 0; i < 1; i++)
