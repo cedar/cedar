@@ -138,7 +138,7 @@ public:
   boost::signals2::connection connectToStateChanged(boost::function<void ()> slot);
 
   //!@brief Waits for the trigger signal to be finished.
-  virtual void wait() = 0;
+  virtual void waitForProcessing() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

@@ -61,11 +61,7 @@ class cedar::aux::math::Sigmoid : public TransferFunction
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Sigmoid(double threshold = 0.0)
-  :
-  mThreshold(new DoubleParameter(this, "threshold", threshold))
-  {
-  }
+  Sigmoid(double threshold = 0.0);
 
   //!@brief Destructor
   virtual ~Sigmoid();
