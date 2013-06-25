@@ -112,12 +112,12 @@ cedar::proc::Trigger::~Trigger()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::Trigger::wait()
+void cedar::proc::Trigger::waitForProcessing()
 {
   QReadLocker lock(&mpListenersLock);
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
-    this->mListeners.at(i)->wait();
+    this->mListeners.at(i)->waitForProcessing();
   }
 }
 

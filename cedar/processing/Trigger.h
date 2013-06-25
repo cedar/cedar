@@ -101,7 +101,7 @@ public:
   void writeConfiguration(cedar::aux::ConfigurationNode& node);
 
   //!@brief The wait method.
-  void wait();
+  void waitForProcessing();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
