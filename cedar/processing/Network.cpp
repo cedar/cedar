@@ -253,6 +253,30 @@ void cedar::proc::Network::stopTriggers(bool wait)
   }
 }
 
+void cedar::proc::Network::stepTriggers()
+{
+  std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
+  double time_step = std::numeric_limits<double>::max();
+  // find the shortest time step of all triggers
+  for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
+  {
+    auto trigger = *iter;
+    if (trigger->getSimulatedTimeParameter() < time_step)
+    {
+      time_step = trigger->getSimulatedTimeParameter();
+    }
+  }
+  // step all triggers with this time step
+  for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
+  {
+    auto trigger = *iter;
+    if (!trigger->isRunning())
+    {
+      trigger->step(time_step);
+    }
+  }
+}
+
 void cedar::proc::Network::onNameChanged()
 {
   if (cedar::proc::ElementPtr parent_network = this->mRegisteredAt.lock())
