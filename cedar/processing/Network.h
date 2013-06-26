@@ -346,6 +346,9 @@ public:
   //!@brief Stops all running triggers in this network.
   void stopTriggers(bool wait = false);
 
+  //!@brief Single-steps all triggers in this network.
+  void stepTriggers();
+
   //! Returns a list of issues in the network.
   std::vector<cedar::proc::ConsistencyIssuePtr> checkConsistency() const;
 
