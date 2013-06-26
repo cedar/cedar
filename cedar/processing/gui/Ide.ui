@@ -165,7 +165,7 @@
      <x>0</x>
      <y>0</y>
      <width>988</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -195,6 +195,7 @@
      <string>Simulation</string>
     </property>
     <addaction name="mpThreadsStartAll"/>
+    <addaction name="mpThreadsSingleStep"/>
     <addaction name="mpThreadsStopAll"/>
     <addaction name="mpActionResetRootNetwork"/>
    </widget>
@@ -308,8 +309,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>116</width>
-          <height>422</height>
+          <width>121</width>
+          <height>424</height>
          </rect>
         </property>
         <attribute name="label">
@@ -321,8 +322,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>116</width>
-          <height>422</height>
+          <width>121</width>
+          <height>424</height>
          </rect>
         </property>
         <attribute name="label">
@@ -372,6 +373,7 @@
    <addaction name="mpActionToggleTriggerVisibility"/>
    <addaction name="separator"/>
    <addaction name="mpThreadsStartAll"/>
+   <addaction name="mpThreadsSingleStep"/>
    <addaction name="mpThreadsStopAll"/>
   </widget>
   <action name="mpActionNew">
@@ -580,6 +582,21 @@
   <action name="mpActionArchitectureConsistencyCheck">
    <property name="text">
     <string>Architecture consistency check ...</string>
+   </property>
+  </action>
+  <action name="mpThreadsSingleStep">
+   <property name="icon">
+    <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
+     <normaloff>:/cedar/auxiliaries/gui/singleStep.svg</normaloff>:/cedar/auxiliaries/gui/singleStep.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Single-step each trigger</string>
+   </property>
+   <property name="toolTip">
+    <string>do a singles step with each trigger</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl++</string>
    </property>
   </action>
  </widget>
