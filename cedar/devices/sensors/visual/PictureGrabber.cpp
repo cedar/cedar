@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/PictureGrabber.h"
+#include "cedar/devices/sensors/visual/exceptions.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/casts.h"
 
@@ -60,7 +61,6 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 
 
-//----------------------------------------------------------------------------------------------------
 // Constructor for single-file grabber
 cedar::dev::sensors::visual::PictureGrabber::PictureGrabber
 (
@@ -69,7 +69,7 @@ cedar::dev::sensors::visual::PictureGrabber::PictureGrabber
 :
 cedar::dev::sensors::visual::Grabber
 (
-  "PictureGraber",
+  "PictureGrabber",
   cedar::dev::sensors::visual::PictureChannelPtr
   (
     new cedar::dev::sensors::visual::PictureChannel(pictureFileName)
@@ -79,7 +79,7 @@ cedar::dev::sensors::visual::Grabber
   init();
 }
 
-//----------------------------------------------------------------------------------------------------
+
 // Constructor for stereo-file grabber
 cedar::dev::sensors::visual::PictureGrabber::PictureGrabber
 (
@@ -89,7 +89,7 @@ cedar::dev::sensors::visual::PictureGrabber::PictureGrabber
 :
 cedar::dev::sensors::visual::Grabber
 (
-  "StereoPictureGraber",
+  "StereoPictureGrabber",
   cedar::dev::sensors::visual::PictureChannelPtr
   (
     new cedar::dev::sensors::visual::PictureChannel(pictureFileName0)
@@ -103,7 +103,7 @@ cedar::dev::sensors::visual::Grabber
   init();
 }
 
-//----------------------------------------------------------------------------------------------------
+
 void cedar::dev::sensors::visual::PictureGrabber::init()
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
@@ -127,7 +127,8 @@ void cedar::dev::sensors::visual::PictureGrabber::init()
               );
 
 }
-//----------------------------------------------------------------------------------------------------
+
+
 cedar::dev::sensors::visual::PictureGrabber::~PictureGrabber()
 {
   doCleanUp();
@@ -138,7 +139,6 @@ cedar::dev::sensors::visual::PictureGrabber::~PictureGrabber()
 // slots
 //--------------------------------------------------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::PictureGrabber::channelAdded(int index)
 {
   QObject::connect
@@ -150,7 +150,7 @@ void cedar::dev::sensors::visual::PictureGrabber::channelAdded(int index)
            );
 }
 
-//----------------------------------------------------------------------------------------------------
+
 void cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()
 {
   // get sender
@@ -158,7 +158,7 @@ void cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()
     = cedar::aux::FileParameterPtr(cedar::aux::asserted_cast<cedar::aux::FileParameter * >(QObject::sender()));
 
   // search for the changed channel
-  unsigned int num_channels = getNumCams();
+  unsigned int num_channels = getNumChannels();
   unsigned int channel = 0;
 
   while ((channel < num_channels) && (p_sender != getPictureChannel(channel)->_mSourceFileName))
@@ -179,7 +179,7 @@ void cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()
     if (getImageMat(channel).empty())
     {
       std::string message = this->getName() + ": Grabbing failed on Channel "
-                            + boost::lexical_cast<std::string>(channel) + " from \"" + filename + "\"" ;
+                            + cedar::aux::toString(channel) + " from \"" + filename + "\"" ;
       cedar::aux::LogSingleton::getInstance()->error
                                                (
                                                  message,
@@ -194,33 +194,31 @@ void cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()
                                                  this->getName() + ": New file successfully read.",
                                                  "cedar::dev::sensors::visual::PictureGrabber::fileNameChanged()"
                                                );
-      mCaptureDeviceCreated = true;
-      onUpdateSourceInfo(channel);
+      setIsCreated(true);
+      onGetSourceInfo(channel);
       emit pictureChanged();
     }
   }
 
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-// grabber
-//----------------------------------------------------------------------------------------------------------------------
+
 void cedar::dev::sensors::visual::PictureGrabber::onCloseGrabber()
 {
   // nothing to reset here
 }
 
-//----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()
+
+void cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()
 {
   const std::string name = this->getName();
-  unsigned int num_cams = getNumCams();
+  unsigned int num_channels = getNumChannels();
 
-  // show debug message
+  // create debug message
   std::stringstream init_message;
-  init_message << "Initialize picture grabber with " << getNumCams() << " channel(s) ...";
+  init_message << "Initialize picture grabber with " << getNumChannels() << " channel(s) ...";
 
-  for(unsigned int channel = 0; channel < num_cams; ++channel)
+  for(unsigned int channel = 0; channel < num_channels; ++channel)
   {
     init_message << std::endl << "\tChannel " << channel << ": capture from Picture: "
                  << getPictureChannel(channel)->_mSourceFileName->getPath();
@@ -232,58 +230,41 @@ bool cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()
                                            );
 
   // for every channel, read from image-file
-  bool result = true;
-
-  for (unsigned int channel = 0; channel < num_cams; ++channel)
+  for (unsigned int channel = 0; channel < num_channels; ++channel)
   {
+    // read from file
     cv::Mat frame = cv::imread(getPictureChannel(channel)->_mSourceFileName->getPath());
 
-    if (!frame.empty())
+    // test if successful
+    if (frame.empty())
     {
-      getImageMat(channel) = frame;
+      std::string msg = name + " Channel " + cedar::aux::toString(channel)
+                        + ": Could not read from \""+ getPictureChannel(channel)->_mSourceFileName->getPath() + "\"";
+      CEDAR_THROW(cedar::dev::sensors::visual::CreateGrabberException,msg);
     }
-    else
-    {
-      result = false;
-      cedar::aux::LogSingleton::getInstance()->error
-                                               (
-                                                  name + ": Grabbing failed on Channel "
-                                                  + boost::lexical_cast<std::string>(channel) + " from \""
-                                                  + getPictureChannel(channel)->_mSourceFileName->getPath() + "\"",
-                                                "cedar::dev::sensors::visual::PictureGrabber::onCreateGrabber()"
-                                               );
-    }
+
+    // copy frame to the channel image matrix
+    getImageMat(channel) = frame;
   }
 
-  if (result)
-  {
-    emit pictureChanged();
-  }
-
-  return result;
+  // signal to indicate, that there is a new frame
+  emit pictureChanged();
 }
 
-//----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::PictureGrabber::onGrab()
+
+void cedar::dev::sensors::visual::PictureGrabber::onGrab(unsigned int channel)
 {
-  bool result = true;
-  unsigned int num_cams = getNumCams();
-  for(unsigned int channel = 0; channel < num_cams; ++channel)
+  if (getImageMat(channel).empty())
   {
-    result = !(getImageMat(channel).empty()) && result;
+    std::string msg = "Image is empty on channel " + cedar::aux::toString(channel);
+    CEDAR_THROW(cedar::dev::sensors::visual::GrabberGrabException,msg)
   }
-  return result;
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-// picturegrabber
-//----------------------------------------------------------------------------------------------------------------------
 
-
-//----------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::PictureGrabber::setSourceFile(unsigned int channel, const std::string& fileName)
 {
-  if (channel >= getNumCams())
+  if (channel >= getNumChannels())
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"PictureGrabber::setSourceFile");
   }
@@ -292,26 +273,24 @@ void cedar::dev::sensors::visual::PictureGrabber::setSourceFile(unsigned int cha
   getPictureChannel(channel)->_mSourceFileName->setValue(fileName);
 }
 
-//----------------------------------------------------------------------------------------------------
+
 void cedar::dev::sensors::visual::PictureGrabber::setSourceFile(const std::string& fileName)
 {
   setSourceFile(0,fileName);
 }
 
-//----------------------------------------------------------------------------------------------------
-const std::string cedar::dev::sensors::visual::PictureGrabber::getSourceFile(unsigned int channel)
+
+const std::string cedar::dev::sensors::visual::PictureGrabber::getSourceFile(unsigned int channel) const
 {
-  if (channel >= getNumCams())
+  if (channel >= getNumChannels())
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException,"PictureGrabber::setSourceFile");
   }
-
   return getPictureChannel(channel)->_mSourceFileName->getPath();
 }
 
 
-//----------------------------------------------------------------------------------------------------
-std::string cedar::dev::sensors::visual::PictureGrabber::onUpdateSourceInfo(unsigned int channel)
+std::string cedar::dev::sensors::visual::PictureGrabber::onGetSourceInfo(unsigned int channel)
 {
   return getPictureChannel(channel)->_mSourceFileName->getPath();
 }

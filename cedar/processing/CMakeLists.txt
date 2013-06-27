@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -50,6 +50,7 @@ cedar_add_library(cedarproc
   cedarunits
   cedardev
   MOC_HEADERS
+  gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureToolBox.h
   gui/ElementClassList.h
   gui/Ide.h
@@ -60,6 +61,7 @@ cedar_add_library(cedarproc
   gui/Scene.h
   gui/SettingsDialog.h
   gui/StepItem.h
+  gui/TriggerItem.h
   gui/Network.h
   gui/ToolBox.h
   gui/View.h
@@ -80,6 +82,7 @@ cedar_add_library(cedarproc
   steps/Resize.h
   Network.h
   Step.h
+  LoopedTrigger.h
   ${libdc_moc_headers}
   ${yarp_moc_headers}
   RESOURCES

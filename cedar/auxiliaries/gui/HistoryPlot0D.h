@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -37,6 +37,10 @@
 #ifndef CEDAR_AUX_GUI_HISTORY_PLOT_0D_H
 #define CEDAR_AUX_GUI_HISTORY_PLOT_0D_H
 
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_QWT
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/MultiPlotInterface.h"
@@ -44,6 +48,7 @@
 // SYSTEM INCLUDES
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
+#include <boost/date_time.hpp>
 #include <deque>
 
 //!@cond SKIPPED_DOCUMENTATION
@@ -132,6 +137,12 @@ class cedar::aux::gui::HistoryPlot0D : public cedar::aux::gui::MultiPlotInterfac
     QwtPlotCurve* mCurve;
 
     //! y values of plot, stored as double-ended queue
+    std::deque<double> mXValues;
+
+    //! y values of plot, stored as vector (needed to pass this to qwt plot because deque is not stored linearly)
+    std::vector<double> mXArray;
+
+    //! y values of plot, stored as double-ended queue
     std::deque<double> mYValues;
 
     //! y values of plot, stored as vector (needed to pass this to qwt plot because deque is not stored linearly)
@@ -207,12 +218,6 @@ private:
   //!@brief a plot
   QwtPlot *mpPlot;
 
-  //!@brief x values of plot, stored as double-ended queue
-  std::deque<double> mpXValues;
-
-  //!@brief x values of plot, stored as vector (needed to pass this to qwt plot)
-  std::vector<double> mXArray;
-
   //!@brief number of steps in the past, which are still plotted
   size_t mMaxHistorySize; //!@todo Make a parameter/configurable somehow.
 
@@ -228,6 +233,9 @@ private:
   //! A vector containing all the line stypes for the plot.
   static std::vector<Qt::PenStyle> mLineStyles;
 
+  static boost::posix_time::ptime mPlotStartTime;
+
 }; // class cedar::aux::gui::HistoryPlot0D
 
+#endif // CEDAR_USE_QWT
 #endif // CEDAR_AUX_GUI_HISTORY_PLOT_0D_H

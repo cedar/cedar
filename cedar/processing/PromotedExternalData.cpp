@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -61,8 +61,8 @@ cedar::proc::ExternalData
 ),
 mDataSlot(promotedSlot)
 {
-  CEDAR_DEBUG_ASSERT(boost::shared_dynamic_cast<cedar::proc::ExternalData>(mDataSlot));
-  this->setCollection(boost::shared_static_cast<cedar::proc::ExternalData>(mDataSlot)->isCollection());
+  CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ExternalData>(mDataSlot));
+  this->setCollection(boost::static_pointer_cast<cedar::proc::ExternalData>(mDataSlot)->isCollection());
 }
 
 cedar::proc::PromotedExternalData::~PromotedExternalData()
@@ -110,7 +110,7 @@ std::string cedar::proc::PromotedExternalData::getPromotionPath() const
   if
   (
     cedar::proc::PromotedExternalDataPtr promoted
-      = boost::shared_dynamic_cast<cedar::proc::PromotedExternalData>(mDataSlot)
+      = boost::dynamic_pointer_cast<cedar::proc::PromotedExternalData>(mDataSlot)
   )
   {
     return this->mpParent->getName() + "." + promoted->getPromotionPath();

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -42,6 +42,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+cedar::aux::math::Sigmoid::Sigmoid(double threshold)
+:
+mThreshold(new DoubleParameter(this, "threshold", threshold))
+{
+  this->mThreshold->markAdvanced();
+}
 
 cedar::aux::math::Sigmoid::~Sigmoid()
 {

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -77,7 +77,7 @@ namespace
                             "Cartesian and log-polar coordinates.\n\n<b>This class is still under development.</b>"
                           );
     coord_transform_decl->setIconPath(":/steps/coordinate_transformation.svg");
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(coord_transform_decl);
+    coord_transform_decl->declare();
 
     return true;
   }

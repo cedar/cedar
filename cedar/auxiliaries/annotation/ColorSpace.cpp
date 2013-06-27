@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -90,6 +90,61 @@ cedar::aux::annotation::Annotation(copy)
 //----------------------------------------------------------------------------------------------------------------------
 // named constructors
 //----------------------------------------------------------------------------------------------------------------------
+
+std::string cedar::aux::annotation::ColorSpace::getChannelCode() const
+{
+  std::string code;
+  for (size_t i = 0; i < this->getNumberOfChannels(); ++i)
+  {
+    switch (this->getChannelType(i))
+    {
+      case Red:
+        code += "R";
+        break;
+
+      case Green:
+        code += "G";
+        break;
+
+      case Blue:
+        code += "B";
+        break;
+
+      case Gray:
+        code += "Gr";
+        break;
+
+      case Hue:
+        code += "H";
+        break;
+
+      case Saturation:
+        code += "S";
+        break;
+
+      case Value:
+        code += "V";
+        break;
+
+      case Alpha:
+        code += "A";
+        break;
+
+      case Luminance:
+        code += "Y";
+        break;
+
+      case ChromaticRed:
+        code += "Cr";
+        break;
+
+      case ChromaticBlue:
+        code += "Cb";
+        break;
+    }
+  }
+  return code;
+}
 
 cedar::aux::annotation::ColorSpacePtr cedar::aux::annotation::ColorSpace::bgr()
 {

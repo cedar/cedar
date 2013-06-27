@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -45,7 +45,7 @@
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/MultiTrigger.h"
 #include "cedar/processing/PluginProxy.h"
-#include "cedar/processing/PluginDeclaration.h"
+#include "cedar/auxiliaries/PluginDeclarationList.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/gui/Settings.h"
@@ -74,11 +74,6 @@ cedar::proc::Manager::~Manager()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::FrameworkSettings& cedar::proc::Manager::settings()
-{
-  return this->mSettings;
-}
-
 void cedar::proc::Manager::loadDefaultPlugins()
 {
   const std::set<std::string>& plugins = cedar::proc::gui::Settings::instance().pluginsToLoad();
@@ -138,10 +133,7 @@ void cedar::proc::Manager::load(cedar::proc::PluginProxyPtr plugin)
 void cedar::proc::Manager::load(cedar::proc::PluginDeclarationPtr declaration)
 {
   // load steps
-  for (size_t i = 0; i < declaration->elementDeclarations().size(); ++i)
-  {
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration->elementDeclarations().at(i));
-  }
+  declaration->declareAll();
 }
 
 void cedar::proc::Manager::registerThread(cedar::aux::LoopedThreadPtr thread)

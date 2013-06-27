@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -94,20 +94,12 @@ public:
    */
   virtual void setJointAngle(unsigned int index, double angle);
 
-  /*!@brief Sets the mode in which the joints positions are set (angle/velocity/acceleration)
-   *
-   * this function restarts the looped thread
-   * \throws std::out_of_range if index is out of range
-   * @param actionType new working mode
-   */
-  virtual void setWorkingMode(cedar::dev::robot::KinematicChain::ActionType actionType);
-
   /*!@brief starts the looped thread
    *
    * the KinematicChain class does some things in this function that are not needed
    * @param priority thread priority
    */
-  virtual void start(Priority priority = InheritPriority);
+  virtual void start();
 
   /*Wrapping of some FRI-Functions that are needed for ensuring connection quality*/
 
@@ -141,6 +133,12 @@ public:
    */
   bool isPowerOn() const;
 
+  /*!@brief every step is used to do communication between FRI and KUKA-RC
+   *
+   * if in velocity- or acceleration mode, every step will also change joint angles/velocity
+   * @parameter time is not used
+   */
+  void step(double time);
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -158,12 +156,7 @@ private:
    */
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
-  /*!@brief every step is used to do communication between FRI and KUKA-RC
-   *
-   * if in velocity- or acceleration mode, every step will also change joint angles/velocity
-   * @parameter time is not used
-   */
-  void step(double time);
+
 
   //!@brief copies data from the FRI to member variables for access from outside the loop thread
   void copyFromFRI();

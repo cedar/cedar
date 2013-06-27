@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -52,11 +52,14 @@ cedar::dev::robot::SimulatedKinematicChain::SimulatedKinematicChain()
 
 cedar::dev::robot::SimulatedKinematicChain::~SimulatedKinematicChain()
 {
+#if 0  
+// JS: wird schon in LoopedThread gemacht
   if (isRunning())
   {
     this->stop();
     this->wait();
   }
+#endif  
 }
 
 //----------------------------------------------------------------------------------------------------------------------

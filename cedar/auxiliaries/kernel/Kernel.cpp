@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -71,7 +71,8 @@ _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", dimension
                  std::numeric_limits<int>::max()
                )
              );
-
+  this->_mAnchor->markAdvanced();
+  this->_mDimensionality->markAdvanced();
   mpReadWriteLockOutput = new QReadWriteLock();
   _mDimensionality->setValue(dimensionality);
   _mDimensionality->setConstant(true);

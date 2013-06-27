@@ -1,6 +1,6 @@
 /*=============================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -298,7 +298,7 @@ public:
   // template specialization for std::string
   //---------------------------------------------------------------------------
 
-//!@brief float specialization, see BlockingReader for details.
+//!@brief std::string specialization, see BlockingReader for details.
 template <>
 class BlockingReader<std::string> : public cedar::aux::net::detail::StringHelper<std::string>,
                             public cedar::aux::net::detail::CollatedNetReader<std::string, true>
@@ -309,6 +309,13 @@ public:
                        : cedar::aux::net::detail::CollatedNetReader<std::string, true>(s)
   {
   }
+
+private:
+  bool checkCollatedDataForRead(const cedar::aux::net::detail::CollatedTraits<std::string>::HeaderType &header)
+  {
+    return cedar::aux::net::detail::StringHelper<std::string>::checkCollatedDataForRead(header);
+  }
+
 };
 
   //---------------------------------------------------------------------------
@@ -343,6 +350,13 @@ public:
                            cedar::aux::net::detail::CollatedNetReader<cv::Mat, true>(myPortName)
   {
   }
+
+private:
+  bool checkCollatedDataForRead(const cedar::aux::net::detail::CollatedTraits<cv::Mat>::HeaderType &header)
+  {
+    return cedar::aux::net::detail::cvMatHelper<cv::Mat>::checkCollatedDataForRead(header);
+  }
+
 };
 
   //---------------------------------------------------------------------------
@@ -353,7 +367,7 @@ public:
 template <>
 class BlockingReader< cv::Mat_<float> > 
                          : public cedar::aux::net::detail::cvMatHelper< cv::Mat_<float> >,
-                           public cedar::aux::net::detail::CollatedNetReader< cv::Mat_<float> , true> 
+                           public cedar::aux::net::detail::CollatedNetReader< cv::Mat_<float> , true>
 {
 public:
   //!@brief use this constructor. See BlockingReader for details.
@@ -362,6 +376,13 @@ public:
                            cedar::aux::net::detail::CollatedNetReader< cv::Mat_<float> , true>(myPortName)
   {
   }
+
+private:
+  bool checkCollatedDataForRead(const cedar::aux::net::detail::CollatedTraits<cv::Mat_<float> >::HeaderType &header)
+  {
+    return cedar::aux::net::detail::cvMatHelper<cv::Mat_<float> >::checkCollatedDataForRead(header);
+  }
+
 };
 
 //!@endcond

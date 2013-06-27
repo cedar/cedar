@@ -1,6 +1,6 @@
 /*=============================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -45,6 +45,7 @@
 
 // PROJECT INCLUDES
 #include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/net/Writer.h"
@@ -75,6 +76,20 @@ public:
   void onStop();
 
 
+  /*! Returns the name of the port.
+   */
+  inline const std::string& getPort() const
+  {
+    return this->_mPort->getValue();
+  }
+
+  /*! Sets the name of the port.
+   */
+  inline void setPort(const std::string& port)
+  {
+    this->_mPort->setValue(port);
+  }
+
 public slots:
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -94,6 +109,9 @@ protected:
 private:
   //!@brief Reacts to a change in the input connection.
   void inputConnectionChanged(const std::string& inputName);
+  //!@brief Resets the step and recreates the yarp connection.
+  void reset();
+  void connect();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -109,9 +127,8 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-
 private:
+  cedar::aux::StringParameterPtr _mPort;
 
 }; // class cedar::proc::sinks::NetWriter
 

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -35,28 +35,53 @@
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_EXCEPTIONS_H
-#define CEDAR_DEV_SENSORS_VISUAL_EXCEPTIONS_H
+#ifndef CEDAR_DEV_SENSORS_CAMERA_EXCEPTIONS_H
+#define CEDAR_DEV_SENSORS_CAMERA_EXCEPTIONS_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/devices/sensors/camera/namespace.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
+
+
+
+/*!@brief Exception when a property is not supported by the used backend */
+class cedar::dev::sensors::camera::PropertyNotSupportedException : public cedar::aux::ExceptionBase
+{
+};
+
+/*!@brief Exception when a property could not set in the backend device */
+class cedar::dev::sensors::camera::PropertyNotSetException : public cedar::aux::ExceptionBase
+{
+};
+
+/*!@brief Exception when the used cv::VideoCapture object is not working */
+class cedar::dev::sensors::camera::VideoCaptureNotOpenedException : public cedar::aux::ExceptionBase
+{
+};
+
+/*!@brief Exception when the camera backend could not be created */
+class cedar::dev::sensors::camera::CreateBackendException : public cedar::aux::ExceptionBase
+{
+};
 
 
 #ifdef CEDAR_USE_LIB_DC1394
 
-/*!@brief Exception on an error while initializing the LibDc class
- */
+/*!@brief Exception on an error while initializing the LibDc class */
 class cedar::dev::sensors::camera::LibDcInitException : public cedar::aux::ExceptionBase
 {
 };
 
-/*!@brief Exception on an error while using the LibDc class
- */
+/*!@brief Exception on an error while using the LibDc class */
 class cedar::dev::sensors::camera::LibDcException : public cedar::aux::ExceptionBase
+{
+};
+
+/*!@brief Exception on an error while using the LibDc class, camera not found */
+class cedar::dev::sensors::camera::LibDcCameraNotFoundException : public cedar::aux::ExceptionBase
 {
 };
 
@@ -64,4 +89,4 @@ class cedar::dev::sensors::camera::LibDcException : public cedar::aux::Exception
 
 
 
-#endif /* CEDAR_DEV_SENSORS_VISUAL_EXCEPTIONS_H */
+#endif /* CEDAR_DEV_SENSORS_CAMERA_EXCEPTIONS_H */

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -77,6 +77,8 @@ _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigmas", dimensionality, s
 _mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", dimensionality, shifts, -10000.0, 10000)),
 _mLimit(new cedar::aux::DoubleParameter(this, "limit", limit, 0.01, 1000.0))
 {
+  this->_mLimit->markAdvanced();
+  this->_mShifts->markAdvanced();
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->setDimensionality(dimensionality);
   
@@ -128,9 +130,12 @@ void cedar::aux::kernel::Gauss::onInit()
 
 void cedar::aux::kernel::Gauss::calculateParts()
 {
-  mpReadWriteLockOutput->lockForWrite();
+  QWriteLocker lock(mpReadWriteLockOutput);
   unsigned int dimensionality = this->getDimensionality();
-  const double& amplitude = _mAmplitude->getValue();
+  QReadLocker amp_lock(this->_mAmplitude->getLock());
+  double amplitude = _mAmplitude->getValue();
+  amp_lock.unlock();
+
   // sanity check
 
   // assert the correct size of all parameters & lists
@@ -144,7 +149,14 @@ void cedar::aux::kernel::Gauss::calculateParts()
   {
     for (unsigned int dim = 0; dim < dimensionality; dim++)
     {
+      QReadLocker sigma_lock(_mSigmas->getLock());
       double sigma = _mSigmas->at(dim);
+      sigma_lock.unlock();
+
+      QReadLocker shift_lock(_mShifts->getLock());
+      double shift = _mShifts->at(dim);
+      shift_lock.unlock();
+
       // estimate width
       if (sigma != 0)
       {
@@ -154,7 +166,7 @@ void cedar::aux::kernel::Gauss::calculateParts()
       {
         this->mSizes.at(dim) = 1;
       }
-      this->mCenters.at(dim) = static_cast<int>(mSizes.at(dim) / 2) + _mShifts->at(dim);
+      this->mCenters.at(dim) = static_cast<int>(mSizes.at(dim) / 2) + shift;
       cv::Mat kernel_part = cv::Mat::zeros(mSizes.at(dim), 1, CV_32F);
 
       // calculate kernel part
@@ -183,8 +195,6 @@ void cedar::aux::kernel::Gauss::calculateParts()
   {
     this->setKernelPart(0, amplitude * cv::Mat::ones(1, 1, CV_32F));
   }
-
-  mpReadWriteLockOutput->unlock();
 }
 
 void cedar::aux::kernel::Gauss::setSigma(unsigned int dimension, double sigma)

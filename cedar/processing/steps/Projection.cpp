@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -75,7 +75,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr projection_decl
+    ElementDeclarationPtr declaration
     (
       new ElementDeclarationTemplate<cedar::proc::steps::Projection>
       (
@@ -83,12 +83,13 @@ namespace
         "cedar.processing.Projection"
       )
     );
-    projection_decl->setIconPath(":/steps/projection.svg");
-    projection_decl->setDescription
+    declaration->setIconPath(":/steps/projection.svg");
+    declaration->setDescription
     (
       "Projects N-Dimensional matrices onto M-Dimensions."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(projection_decl);
+
+    declaration->declare();
 
     return true;
   }
@@ -558,7 +559,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Projection::determineInputVa
                                 ) const
 {
   CEDAR_DEBUG_ASSERT(slot->getName() == "input")
-  if (boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data))
+  if (boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
     return cedar::proc::DataSlot::VALIDITY_VALID;
   }
@@ -572,7 +573,7 @@ void cedar::proc::steps::Projection::inputConnectionChanged(const std::string& i
 {
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
-  this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
+  this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
 
   if (!this->mInput)
   {

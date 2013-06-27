@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -74,7 +74,8 @@ namespace
     declaration->setIconPath(":/steps/gauss_input.svg");
     declaration->setDescription("Generates a matrix that contains a sampled Gauss function.");
     declaration->deprecatedName("cedar.processing.source.GaussInput");
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }

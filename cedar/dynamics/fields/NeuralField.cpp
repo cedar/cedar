@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -69,25 +69,32 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr field_decl
+    ElementDeclarationPtr declaration
     (
       new cedar::proc::ElementDeclarationTemplate<cedar::dyn::NeuralField>("DFT", "cedar.dynamics.NeuralField")
     );
-    field_decl->setIconPath(":/steps/field_temp.svg");
-    field_decl->setDescription
+    declaration->setIconPath(":/steps/field_temp.svg");
+    declaration->setDescription
     (
       "An implementation of Amari's dynamic neural fields."
     );
 
     // define field plot
-    ElementDeclaration::DataList field_plot_data;
-    field_plot_data.push_back(std::make_pair(DataRole::BUFFER, "input sum"));
-    field_plot_data.push_back(std::make_pair(DataRole::BUFFER, "activation"));
-    field_plot_data.push_back(std::make_pair(DataRole::OUTPUT, "sigmoided activation"));
-    field_decl->definePlot("field plot", field_plot_data);
+    ElementDeclaration::PlotDefinition field_plot_data("field plot", ":/cedar/dynamics/gui/field_plot.svg");
+    field_plot_data.appendData(DataRole::BUFFER, "input sum");
+    field_plot_data.appendData(DataRole::BUFFER, "activation", true);
+    field_plot_data.appendData(DataRole::OUTPUT, "activation", true);
+    field_plot_data.appendData(DataRole::OUTPUT, "sigmoided activation");
+    declaration->definePlot(field_plot_data);
+
+    ElementDeclaration::PlotDefinition kernel_plot_data("kernel", ":/cedar/dynamics/gui/kernel_plot.svg");
+    kernel_plot_data.appendData(DataRole::BUFFER, "lateral kernel");
+    declaration->definePlot(kernel_plot_data);
+
+    declaration->setDefaultPlot("field plot");
 
     // add declaration to the registry
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(field_decl);
+    declaration->declare();
 
     return true;
   }
@@ -192,6 +199,8 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   this->declareOutput("sigmoided activation", mSigmoidalActivation);
 
   this->declareInputCollection("input");
+
+  this->_mOutputActivation->markAdvanced();
 
   // setup default kernels
   std::vector<cedar::aux::kernel::KernelPtr> kernel_defaults;
@@ -427,7 +436,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
 {
   if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "input")
   {
-    if (cedar::aux::ConstMatDataPtr input = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+    if (cedar::aux::ConstMatDataPtr input = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
     {
       if (!this->isMatrixCompatibleInput(input->getData()))
       {
@@ -440,9 +449,9 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
-    return cedar::proc::DataSlot::VALIDITY_ERROR;
   }
-  return this->cedar::proc::Step::determineInputValidity(slot, data);
+
+  return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
 void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
@@ -460,9 +469,10 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   cedar::aux::conv::ConvolutionPtr convolution_ptr = this->getConvolution();
   cedar::aux::conv::Convolution& lateral_convolution = *convolution_ptr;
 
+  boost::shared_ptr<QReadLocker> activation_read_locker;
   if (this->activationIsOutput())
   {
-    this->mActivation->lockForRead();
+    activation_read_locker = boost::shared_ptr<QReadLocker>(new QReadLocker(&this->mActivation->getLock()));
   }
 
   QWriteLocker sigmoid_u_lock(&this->mSigmoidalActivation->getLock());
@@ -507,19 +517,15 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   d_u += 1.0 / sqrt(cedar::unit::Milliseconds(time)/cedar::unit::Milliseconds(1.0))
          *_mInputNoiseGain->getValue() * input_noise;
 
+  boost::shared_ptr<QWriteLocker> activation_write_locker;
   if (this->activationIsOutput())
   {
-    this->mActivation->unlock();
-    this->mActivation->lockForWrite();
+    activation_read_locker->unlock();
+    activation_write_locker = boost::shared_ptr<QWriteLocker>(new QWriteLocker(&this->mActivation->getLock()));
   }
 
   // integrate one time step
   u += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau) * d_u;
-
-  if (this->activationIsOutput())
-  {
-    this->mActivation->unlock();
-  }
 }
 
 void cedar::dyn::NeuralField::updateInputSum()

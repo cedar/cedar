@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -42,6 +42,7 @@
 
 // SYSTEM INCLUDES
 #include <QCheckBox>
+#include <QPushButton>
 #include <QLabel>
 #include <set>
 
@@ -57,6 +58,8 @@ QDialog(pParent)
   this->populate();
 
   QObject::connect(this->mpButtonBox, SIGNAL(accepted()), this, SLOT(accepted()));
+  QObject::connect(this->mpDeleteButton, SIGNAL(clicked()), this, SLOT(removePlugins()));
+  this->mpDeleteButton->setEnabled(false);
 }
 
 
@@ -73,7 +76,7 @@ void cedar::proc::gui::PluginManagerDialog::accepted()
     QCheckBox *p_cb = dynamic_cast<QCheckBox*>(this->mpPluginList->cellWidget(row, 0));
     CEDAR_DEBUG_ASSERT(p_cb != NULL);
 
-    QLabel *p_path = dynamic_cast<QLabel*>(this->mpPluginList->cellWidget(row, 2));
+    QLabel* p_path = dynamic_cast<QLabel*>(this->mpPluginList->cellWidget(row, 3));
     CEDAR_DEBUG_ASSERT(p_path != NULL);
 
     std::string path = p_path->text().toStdString();
@@ -100,7 +103,7 @@ void cedar::proc::gui::PluginManagerDialog::populate()
     this->addPlugin(*iter);
   }
 
-  const std::set<std::string>& known_plugins = cedar::proc::Manager::getInstance().settings().getKnownPlugins();
+  const std::set<std::string>& known_plugins = cedar::proc::FrameworkSettingsSingleton::getInstance()->getKnownPlugins();
   for (std::set<std::string>::const_iterator iter = known_plugins.begin(); iter != known_plugins.end(); ++iter)
   {
     if (plugins_to_load.find(*iter) == plugins_to_load.end())
@@ -119,13 +122,69 @@ void cedar::proc::gui::PluginManagerDialog::addPlugin(const std::string& path)
   int row = this->mpPluginList->rowCount();
   this->mpPluginList->insertRow(row);
 
-  QCheckBox *p_cb = new QCheckBox();
+  QCheckBox* p_cb = new QCheckBox();
   p_cb->setChecked(plugins_to_load.find(path) != plugins_to_load.end());
   this->mpPluginList->setCellWidget(row, 0, p_cb);
 
-  QLabel *p_name = new QLabel();
-  this->mpPluginList->setCellWidget(row, 1, p_name);
+  QCheckBox* p_delete = new QCheckBox();
+  p_delete->setChecked(false);
+  QObject::connect(p_delete, SIGNAL(stateChanged(int)), this, SLOT(toggleDeleteButton()));
+  this->mpPluginList->setCellWidget(row, 1, p_delete);
 
-  QLabel *p_path = new QLabel(path.c_str());
-  this->mpPluginList->setCellWidget(row, 2, p_path);
+  QLabel* p_name = new QLabel();
+  this->mpPluginList->setCellWidget(row, 2, p_name);
+
+  QLabel* p_path = new QLabel(path.c_str());
+  this->mpPluginList->setCellWidget(row, 3, p_path);
+}
+
+void cedar::proc::gui::PluginManagerDialog::removePlugins()
+{
+  cedar::proc::gui::Settings& settings = cedar::proc::gui::Settings::instance();
+  cedar::proc::FrameworkSettingsPtr known_plugins = cedar::proc::FrameworkSettingsSingleton::getInstance();
+  unsigned int deleted_items = 0;
+  for (int row = 0; row < this->mpPluginList->rowCount(); ++row)
+  {
+    QCheckBox* p_cb = dynamic_cast<QCheckBox*>(this->mpPluginList->cellWidget(row, 0));
+    CEDAR_DEBUG_ASSERT(p_cb != NULL);
+
+    QCheckBox* p_delete = dynamic_cast<QCheckBox*>(this->mpPluginList->cellWidget(row, 1));
+    CEDAR_DEBUG_ASSERT(p_delete != NULL);
+
+    QLabel* p_path = dynamic_cast<QLabel*>(this->mpPluginList->cellWidget(row, 3));
+    CEDAR_DEBUG_ASSERT(p_path != NULL);
+
+    std::string path = p_path->text().toStdString();
+
+    if (p_delete->isChecked())
+    {
+      if (p_cb->isChecked())
+      {
+        settings.removePluginToLoad(path);
+      }
+      known_plugins->removeKnownPlugin(path);
+      ++deleted_items;
+    }
+  }
+  if (deleted_items)
+  {
+    this->mpPluginList->setRowCount(0);
+    this->populate();
+    this->mpDeleteButton->setEnabled(false);
+  }
+}
+
+void cedar::proc::gui::PluginManagerDialog::toggleDeleteButton()
+{
+  for (int row = 0; row < this->mpPluginList->rowCount(); ++row)
+  {
+    QCheckBox* p_delete = dynamic_cast<QCheckBox*>(this->mpPluginList->cellWidget(row, 1));
+    CEDAR_DEBUG_ASSERT(p_delete != NULL);
+    if (p_delete->isChecked())
+    {
+      this->mpDeleteButton->setEnabled(true);
+      return;
+    }
+  }
+  this->mpDeleteButton->setEnabled(false);
 }

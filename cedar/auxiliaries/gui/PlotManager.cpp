@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -52,7 +52,7 @@
 void cedar::aux::gui::PlotManager::getPlotClassesFor
      (
        cedar::aux::ConstDataPtr data,
-       std::set<cedar::aux::gui::PlotDeclarationPtr>& declarations
+       std::set<cedar::aux::gui::ConstPlotDeclarationPtr>& declarations
      )
 {
   typedef cedar::aux::gui::PlotDeclarationManager::Node PlotNode;
@@ -66,30 +66,28 @@ void cedar::aux::gui::PlotManager::getPlotClassesFor
   for(std::set<ConstPlotNodePtr>::iterator iter = bases.begin(); iter != bases.end(); ++iter)
   {
     ConstPlotNodePtr node = *iter;
-    const std::vector<cedar::aux::gui::PlotDeclarationPtr>& node_declarations = node->getData();
+    auto node_declarations = node->getData();
     for (size_t i = 0; i < node_declarations.size(); ++i)
     {
-      cedar::aux::gui::PlotDeclarationPtr declaration = node_declarations.at(i);
-      if (plots_already_added.find(declaration->getPlotClass()) == plots_already_added.end())
+      cedar::aux::gui::ConstPlotDeclarationPtr declaration = node_declarations.at(i);
+      if (plots_already_added.find(declaration->getClassName()) == plots_already_added.end())
       {
-        plots_already_added.insert(declaration->getPlotClass());
+        plots_already_added.insert(declaration->getClassName());
         declarations.insert(declaration);
       }
     }
   }
 }
 
-void cedar::aux::gui::PlotManager::declare(cedar::aux::gui::PlotDeclarationPtr declaration)
+void cedar::aux::gui::PlotManager::declare(cedar::aux::gui::ConstPlotDeclarationPtr declaration)
 {
-  declaration->declare();
-
-  mPlotTypeDeclarations[getNormalizedTypeName(declaration->getPlotClass())] = declaration;
+  mPlotTypeDeclarations[getNormalizedTypeName(declaration->getClassName())] = declaration;
 }
 
-cedar::aux::gui::PlotDeclarationPtr cedar::aux::gui::PlotManager::getDefaultDeclarationFor
-                                    (
-                                      cedar::aux::ConstDataPtr data
-                                    )
+cedar::aux::gui::ConstPlotDeclarationPtr cedar::aux::gui::PlotManager::getDefaultDeclarationFor
+                                         (
+                                           cedar::aux::ConstDataPtr data
+                                         )
 {
   //!@todo Add a configurable option that specifies a default
 
@@ -123,8 +121,7 @@ cedar::aux::gui::PlotDeclarationPtr cedar::aux::gui::PlotManager::getDefaultDecl
   if (iter != this->mDefaultPlots.end())
   {
     const std::string& default_plot_type = iter->second;
-    std::map<std::string, cedar::aux::gui::PlotDeclarationPtr>::iterator decl_iter;
-    decl_iter = this->mPlotTypeDeclarations.find(default_plot_type);
+    auto decl_iter = this->mPlotTypeDeclarations.find(default_plot_type);
     if (decl_iter != this->mPlotTypeDeclarations.end())
     {
       return decl_iter->second;
@@ -141,6 +138,6 @@ cedar::aux::gui::PlotDeclarationPtr cedar::aux::gui::PlotManager::getDefaultDecl
   }
 
   // otherwise, automatically determine a default plot (the first one in the vector)
-  const std::vector<cedar::aux::gui::PlotDeclarationPtr>& decls = closest_node->getData();
+  auto decls = closest_node->getData();
   return decls.at(0);
 }

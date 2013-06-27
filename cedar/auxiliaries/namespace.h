@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -52,11 +52,28 @@ namespace cedar
   /*!@brief Namespace for all aux classes. */
   namespace aux
   {
+    /*!@brief Namespace for implementation details you should not use. */
+    namespace detail
+    {
+      class ThreadWorker;
+      class LoopedThreadWorker;
+      class CallFunctionInThreadWorker;
+    }
+
+    /*!@brief Namespace for shared testing (unit-tests, etc) code. TODO: will be moved or changed in the near future */
+    namespace testing
+    {
+    }
+
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Configurable);
     CEDAR_DECLARE_AUX_CLASS(NamedConfigurable);
     CEDAR_DECLARE_AUX_CLASS(Lockable);
+    CEDAR_DECLARE_AUX_CLASS(Settings);
+
+    CEDAR_DECLARE_AUX_CLASS(ThreadWrapper);
     CEDAR_DECLARE_AUX_CLASS(LoopedThread);
+    CEDAR_DECLARE_AUX_CLASS(CallFunctionInThread);
     CEDAR_DECLARE_AUX_CLASS(LoopMode);
     CEDAR_DECLARE_AUX_CLASS(UserData);
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(IntrusivePtrBase);
@@ -94,6 +111,7 @@ namespace cedar
     template <class BaseTypePtr> class Factory;
     template <class BaseTypePtr, class DerivedTypePtr> class FactoryDerived;
     template <class BaseTypePtr> class FactoryManager;
+    template <class BaseTypePtr> class DeclarationManagerTemplate;
 
     template <typename KeyBasePtr, typename ValueBasePtr> class TypeBasedFactory;
 
@@ -101,6 +119,13 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(Parameter);
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(ObjectParameter);
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(ObjectListParameter);
+    //!@endcond
+
+    //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_DECLARE_AUX_CLASS(PluginDeclaration);
+    CEDAR_DECLARE_AUX_CLASS(PluginDeclarationList);
+    template <class BaseClassPtr> class PluginDeclarationBaseTemplate;
+    template <class BaseClassPtr, class PluginClassPtr, class BaseClass> class PluginDeclarationTemplate;
     //!@endcond
 
     //!@brief a template class for parameters
@@ -198,6 +223,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(BadConnectionException);
     CEDAR_DECLARE_AUX_CLASS(ConversionFailedException);
     CEDAR_DECLARE_AUX_CLASS(DeadReferenceException);
+    CEDAR_DECLARE_AUX_CLASS(DimensionalityMismatchException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateIdException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateNameException);
     CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
@@ -211,6 +237,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(NotFoundException);
     CEDAR_DECLARE_AUX_CLASS(NullPointerException);
     CEDAR_DECLARE_AUX_CLASS(ParameterNotFoundException);
+    CEDAR_DECLARE_AUX_CLASS(ParseException);
     CEDAR_DECLARE_AUX_CLASS(RangeException);
     CEDAR_DECLARE_AUX_CLASS(ResourceNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(TypeMismatchException);
@@ -220,6 +247,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
     CEDAR_DECLARE_AUX_CLASS(UnmanglingFailedException);
     CEDAR_DECLARE_AUX_CLASS(ValidationFailedException);
+    CEDAR_DECLARE_AUX_CLASS(ThreadingErrorException);
     //!@endcond
     
     //!@cond SKIPPED_DOCUMENTATION

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/gui/MatrixSlicePlot3D.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h" // for the color map
 #include "cedar/auxiliaries/gui/PlotManager.h"
+#include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/assert.h"
@@ -48,6 +49,9 @@
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
+#include <QThread>
+#include <QReadLocker>
+#include <QWriteLocker>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -57,7 +61,8 @@ cedar::aux::gui::MatrixSlicePlot3D::MatrixSlicePlot3D(QWidget* pParent)
 cedar::aux::gui::PlotInterface(pParent),
 mTimerId(0),
 mDataIsSet(false),
-mDesiredColumns(0)
+mDesiredColumns(0),
+mConverting(false)
 {
   QVBoxLayout* p_layout = new QVBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
@@ -70,6 +75,26 @@ mDesiredColumns(0)
   mpImageDisplay->setWordWrap(true);
   this->setFocusPolicy(Qt::StrongFocus);
   this->setToolTip(QString("Use + and - to alter number of columns."));
+
+  this->mpWorkerThread = new QThread();
+  mWorker = cedar::aux::gui::detail::MatrixSlicePlot3DWorkerPtr(new cedar::aux::gui::detail::MatrixSlicePlot3DWorker(this));
+  mWorker->moveToThread(this->mpWorkerThread);
+
+  QObject::connect(this, SIGNAL(convert()), mWorker.get(), SLOT(convert()));
+  QObject::connect(mWorker.get(), SIGNAL(done()), this, SLOT(conversionDone()));
+
+  this->mpWorkerThread->start(QThread::LowPriority);
+}
+
+cedar::aux::gui::MatrixSlicePlot3D::~MatrixSlicePlot3D()
+{
+  if (this->mpWorkerThread)
+  {
+    this->mpWorkerThread->quit();
+    this->mpWorkerThread->wait();
+    delete this->mpWorkerThread;
+    this->mpWorkerThread = NULL;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -107,48 +132,13 @@ void cedar::aux::gui::MatrixSlicePlot3D::plot(cedar::aux::ConstDataPtr data, con
 
 void cedar::aux::gui::MatrixSlicePlot3D::timerEvent(QTimerEvent* /*pEvent*/)
 {
-  if (!this->isVisible())
+  if (!this->isVisible() || !mDataIsSet || mConverting)
   {
     return;
   }
 
-  if (!mDataIsSet)
-  {
-    return;
-  }
-
-  const cv::Mat& mat = this->mData->getData();
-
-  this->mData->lockForRead();
-  if (mat.empty())
-  {
-    this->mpImageDisplay->setText("Matrix is empty.");
-    this->mData->unlock();
-    return;
-  }
-  int type = mat.type();
-  this->mData->unlock();
-
-  switch(type)
-  {
-//    case CV_8UC1:
-    case CV_32FC1:
-//    case CV_64FC1:
-    {
-      this->mData->lockForRead();
-      this->slicesFromMat(mat);
-      this->mData->unlock();
-      break;
-    }
-
-    default:
-      QString text = QString("Unhandled matrix type %1.").arg(mat.type());
-      this->mpImageDisplay->setText(text);
-      return;
-  }
-
-  this->mpImageDisplay->setPixmap(QPixmap::fromImage(this->mImage));
-  this->resizePixmap();
+  mConverting = true;
+  emit convert();
 }
 
 void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
@@ -236,12 +226,10 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
   cv::minMaxLoc(mSliceMatrix, &min, &max);
   cv::Mat scaled = (mSliceMatrix - min) / (max - min) * 255.0;
   scaled.convertTo(mSliceMatrixByte, CV_8U);
-  std::vector<cv::Mat> merger;
-  merger.push_back(mSliceMatrixByte);
-  merger.push_back(mSliceMatrixByte);
-  merger.push_back(mSliceMatrixByte);
-  cv::merge(merger, mSliceMatrixByteC3);
 
+  mSliceMatrixByteC3 = cedar::aux::gui::ImagePlot::colorizedMatrix(mSliceMatrixByte);
+
+  QWriteLocker lock(&this->mImageLock);
   this->mImage = QImage
   (
     mSliceMatrixByteC3.data,
@@ -259,6 +247,7 @@ void cedar::aux::gui::MatrixSlicePlot3D::resizeEvent(QResizeEvent* /*pEvent*/)
 
 void cedar::aux::gui::MatrixSlicePlot3D::resizePixmap()
 {
+  QReadLocker lock(&this->mImageLock);
   QSize scaled_size = this->mImage.size();
   scaled_size.scale(this->mpImageDisplay->size(), Qt::KeepAspectRatio);
   if ( (!this->mpImageDisplay->pixmap()
@@ -274,6 +263,63 @@ void cedar::aux::gui::MatrixSlicePlot3D::resizePixmap()
   }
 }
 
+//!@cond SKIPPED_DOCUMENTATION
+void cedar::aux::gui::detail::MatrixSlicePlot3DWorker::convert()
+{
+  // convert
+  this->mpPlot->updateData();
+
+  emit done();
+}
+//!@endcond
+
+void cedar::aux::gui::MatrixSlicePlot3D::updateData()
+{
+  const cv::Mat& mat = this->mData->getData();
+  if (cedar::aux::math::getDimensionalityOf(mat) != 3) // plot is no longer capable of displaying the data
+  {
+    emit dataChanged();
+    return;
+  }
+
+  this->mData->lockForRead();
+  if (mat.empty())
+  {
+    this->mpImageDisplay->setText("Matrix is empty.");
+    this->mData->unlock();
+    return;
+  }
+  int type = mat.type();
+  this->mData->unlock();
+
+  switch(type)
+  {
+//  case CV_8UC1:
+    case CV_32FC1:
+//  case CV_64FC1:
+    {
+      this->mData->lockForRead();
+      this->slicesFromMat(mat);
+      this->mData->unlock();
+      break;
+    }
+
+    default:
+      QString text = QString("Unhandled matrix type %1.").arg(mat.type());
+      this->mpImageDisplay->setText(text);
+      return;
+  }
+}
+
+void cedar::aux::gui::MatrixSlicePlot3D::conversionDone()
+{
+  QReadLocker lock(&this->mImageLock);
+  this->mpImageDisplay->setPixmap(QPixmap::fromImage(this->mImage));
+  lock.unlock();
+
+  this->resizePixmap();
+  mConverting = false;
+}
 void cedar::aux::gui::MatrixSlicePlot3D::keyPressEvent(QKeyEvent* pEvent)
 {
   switch (pEvent->key())

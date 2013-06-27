@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -121,6 +121,7 @@ private:
 };
 
 #include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/auxiliaries/Singleton.h"
 
 namespace cedar
 {

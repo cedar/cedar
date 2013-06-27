@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -58,6 +58,11 @@ QWidget(pParent)
 //!@brief Destructor
 cedar::aux::gui::Parameter::~Parameter()
 {
+  if (this->mParameter)
+  {
+    QObject::disconnect(this->mParameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertiesChanged()));
+    QObject::disconnect(this->mParameter.get(), SIGNAL(valueChanged()), this, SLOT(valueChanged()));
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

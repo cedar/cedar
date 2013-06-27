@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -37,8 +37,12 @@
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Network.h"
+#include "cedar/processing/LoopedTrigger.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/DoubleData.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/units/Time.h"
 
 
 class TestModule : public cedar::proc::Step
@@ -81,10 +85,64 @@ class TestSource : public cedar::proc::Step
 CEDAR_GENERATE_POINTER_TYPES(TestSource);
 
 
-
-int main(int, char**)
+int testOnlineDisconnecting()
 {
-  unsigned int errors = 0;
+  int errors = 0;
+
+  std::cout << "Testing projection for online removal ..." << std::endl;
+
+  size_t trials = 10;
+
+  for (size_t i = 0; i < trials; ++i)
+  {
+    cedar::proc::NetworkPtr network(new cedar::proc::Network());
+    network->readFile("projection.json");
+
+    auto trigger = network->getElement<cedar::proc::LoopedTrigger>("trigger");
+
+    trigger->startTrigger();
+
+    cedar::aux::sleep(cedar::unit::Milliseconds(50));
+
+    network->disconnectSlots("step.result", "projection.input");
+
+    cedar::aux::sleep(cedar::unit::Milliseconds(50));
+
+    trigger->stopTrigger();
+  }
+
+  for (size_t i = 0; i < trials; ++i)
+  {
+    std::cout << "Testing double-triggered case ..." << std::endl;
+    cedar::proc::NetworkPtr network(new cedar::proc::Network());
+    network->readFile("taste_the_double_trigger.json");
+
+    auto trigger1 = network->getElement<cedar::proc::LoopedTrigger>("trigger1");
+    auto trigger2 = network->getElement<cedar::proc::LoopedTrigger>("trigger2");
+
+    trigger1->startTrigger();
+    trigger2->startTrigger();
+
+    cedar::aux::sleep(cedar::unit::Milliseconds(50));
+
+    network->disconnectSlots("step.Gauss input", "projection.input");
+
+    cedar::aux::sleep(cedar::unit::Milliseconds(50));
+
+    trigger1->stopTrigger();
+    trigger2->stopTrigger();
+  }
+
+  std::cout << "Online (dis-)connecting revealed " << errors << " error(s)." << std::endl;
+  return errors;
+}
+
+// global variable:
+unsigned int global_errors;
+
+void run_test()
+{
+  global_errors = 0;
 
   cedar::proc::NetworkPtr network (new cedar::proc::Network());
   network->add(TestSourcePtr(new TestSource(1)), "source1");
@@ -94,6 +152,26 @@ int main(int, char**)
   network->connectSlots("source1.output", "target.input1");
   network->connectSlots("source2.output", "target.input2");
 
-  std::cout << "Done. There were " << errors << " error(s)." << std::endl;
-  return errors;
+  global_errors += testOnlineDisconnecting();
+
+  std::cout << "Done. There were " << global_errors << " error(s)." << std::endl;
 }
+
+int main(int argc, char* argv[])
+{
+  QCoreApplication* app;
+  app = new QCoreApplication(argc,argv);
+
+  auto testThread = new cedar::aux::CallFunctionInThread(run_test);
+
+  QObject::connect( testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection );  // alternatively: call app->quit() in runTests()
+
+  testThread->start();
+  app->exec();
+
+  delete testThread;
+  delete app;
+
+  return global_errors;
+}
+

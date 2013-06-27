@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -75,7 +75,12 @@ void cedar::aux::openCrashFile(std::ofstream& stream, std::string& crash_file)
 std::string cedar::aux::getUserHomeDirectory()
 {
 #ifdef CEDAR_OS_UNIX
-  std::string homedir = getenv("HOME");
+  std::string homedir;
+  char* p_home_env = getenv("HOME");
+  if (p_home_env != NULL)
+  {
+    homedir = p_home_env;
+  }
   return homedir;
 #elif defined CEDAR_OS_WINDOWS
   LPWSTR path = NULL;

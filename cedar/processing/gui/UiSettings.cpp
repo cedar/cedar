@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -54,7 +54,9 @@ QWidget(pParent)
 {
   this->setupUi(this);
 
-  mpUseGraphicsEffectsEdit->setParameter(cedar::proc::gui::Settings::instance().mUseGraphicsItemShadowEffects);
+  cedar::proc::gui::Settings& settings = cedar::proc::gui::Settings::instance();
+  this->mpUseGraphicsEffectsEdit->setParameter(settings.mUseGraphicsItemShadowEffects);
+  this->mpStepDisplayMode->setParameter(settings._mDefaultStepDisplayMode);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

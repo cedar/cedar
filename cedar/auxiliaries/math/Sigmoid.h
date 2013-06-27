@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -61,11 +61,7 @@ class cedar::aux::math::Sigmoid : public TransferFunction
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Sigmoid(double threshold = 0.0)
-  :
-  mThreshold(new DoubleParameter(this, "threshold", threshold))
-  {
-  }
+  Sigmoid(double threshold = 0.0);
 
   //!@brief Destructor
   virtual ~Sigmoid();

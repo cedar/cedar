@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -47,6 +47,7 @@
 // SYSTEM INCLUDES
 #include <QTabWidget>
 #include <QTableWidget>
+#include <QGraphicsSceneContextMenuEvent>
 
 
 /*!@brief A default log widget.
@@ -116,6 +117,9 @@ public:
   /*!@brief Removes the handlers that redirect log messages to this widget.
    */
   void uninstallHandlers();
+
+public slots:
+  void showContextMenu(const QPoint& point);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

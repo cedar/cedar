@@ -53,15 +53,17 @@ namespace
 // Interactive test program
 // ---------------------------------------------------------------------------------------------------------------------
 
-// Use this, if you want to test with a firewire camera
+// Use this, if you want to test with a firewire camera (only possible, if cedar is compiled with dc1394 support)
+#ifdef CEDAR_USE_LIB_DC1394
 #define USE_FIREWIRE_BACKEND
+#endif
 
 int main(int argc, char* argv[])
 {
 
   // grab from device number on the bus (as an integer)
+  // it is possible to specify th GUID of the camera here (if so, set the IS_GUID paramter to true)
   const int CHANNEL_0_DEVICE = 0;
-  //  const int CHANNEL_0_DEVICE = 197055;
 
   // given device-ID is the guid of the cam. or the id on the bus
   const bool  IS_GUID = false;
@@ -145,7 +147,7 @@ int main(int argc, char* argv[])
 
   // you have to check if the framerate is supported by the used camera
   // on firewirecameras only supperted framerates could be set
-  p_grabber->setCameraFps(0,cedar::dev::sensors::camera::FrameRate::FPS_15);
+  p_grabber->setCameraFramerate(0,cedar::dev::sensors::camera::FrameRate::FPS_15);
 
 
   //----------------------------------------------------------------------------------------
@@ -189,8 +191,8 @@ int main(int argc, char* argv[])
   cedar::dev::sensors::camera::VideoMode::Id mode = p_grabber->getCameraVideoMode(0);
   std::cout << " (" << cedar::dev::sensors::camera::VideoMode::type().get(mode).name() << ")" << std::endl;
 
-  std::cout << "\tCamera FPS  :\t" << p_grabber->getCameraFps(0);
-  cedar::dev::sensors::camera::FrameRate::Id fps = p_grabber->getCameraFps(0);
+  std::cout << "\tCamera FPS  :\t" << p_grabber->getCameraFramerate(0);
+  cedar::dev::sensors::camera::FrameRate::Id fps = p_grabber->getCameraFramerate(0);
   std::cout << " (" << cedar::dev::sensors::camera::FrameRate::type().get(fps).name() << ")" << std::endl;
 
 #ifdef USE_FIREWIRE_BACKEND
@@ -243,16 +245,18 @@ int main(int argc, char* argv[])
   cedar::dev::sensors::camera::Property::Id prop_id;
   prop_id = cedar::dev::sensors::camera::Property::PROP_BRIGHTNESS;
 
-
-  if (p_grabber->setPropertyMode(0,prop_id,cedar::dev::sensors::camera::PropertyMode::MANUAL))
+  try
   {
-    bool test = p_grabber->setProperty(prop_id, 100);
+    p_grabber->setPropertyMode(0,prop_id,cedar::dev::sensors::camera::PropertyMode::MANUAL);
+    p_grabber->setProperty(prop_id, 100);
     std::cout << "Set " << cedar::dev::sensors::camera::Property::type().get(prop_id).name()
-              << " to " << 100
-              << ": Result: " << std::boolalpha << test << std::endl;
-    std::cout << "Value after: " << p_grabber->getProperty(prop_id) << std::endl;
-    std::cout << "Raw value from camera: " << p_grabber->getPropertyValue(0,prop_id) << std::endl;
-
+              << " to 100\n"
+              << "Value after (from backend): " << p_grabber->getProperty(prop_id) << std::endl
+              << "Raw value   (from camera) : " << p_grabber->getPropertyValue(0,prop_id) << std::endl;
+  }
+  catch(cedar::dev::sensors::camera::PropertyNotSetException& e)
+  {
+    std::cout << "ERROR: " << e.getMessage();
   }
 
 
@@ -283,6 +287,7 @@ int main(int argc, char* argv[])
   cedar::aux::gui::ImagePlotPtr p_plot = cedar::aux::gui::ImagePlotPtr(new cedar::aux::gui::ImagePlot());
   cedar::aux::MatDataPtr p_data = cedar::aux::MatDataPtr(new cedar::aux::MatData(frame0));
   p_plot->plot(p_data,window_title);
+  p_plot->setWindowTitle(QString::fromStdString(window_title));
   p_plot->show();
   p_plot->resize(frame0.cols,frame0.rows);
 
@@ -292,7 +297,7 @@ int main(int argc, char* argv[])
   //----------------------------------------------------------------------------------------
   //start the grabber-thread for updating camera images with 30 fps
   //----------------------------------------------------------------------------------------
-  p_grabber->setFps(30);
+  p_grabber->setFramerate(30);
   std::cout << "Start grabbing in the background" << std::endl;
   p_grabber->startGrabber();
 
@@ -331,7 +336,7 @@ int main(int argc, char* argv[])
     if (! (++counter %= 200))
     {
       //display real reached fps
-      std::cout << "Thread FPS: " << p_grabber->getFpsMeasured() << std::endl;
+      std::cout << "Thread FPS: " << p_grabber->getMeasuredFramerate() << std::endl;
     }
 
     cedar::aux::sleep(cedar::unit::Milliseconds(1));

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -40,6 +40,10 @@
 
 #ifndef CEDAR_AUX_GUI_SURFACE_PLOT_H
 #define CEDAR_AUX_GUI_SURFACE_PLOT_H
+
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_QWTPLOT3D
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
@@ -231,4 +235,5 @@ private:
   cedar::aux::gui::detail::SurfacePlotWorkerPtr mWorker;
 }; // class cedar::aux::gui::SurfacePlot
 
+#endif // CEDAR_USE_QWTPLOT3D
 #endif // CEDAR_AUX_GUI_SURFACE_PLOT_H

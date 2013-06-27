@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -47,4 +47,6 @@ cedar_add_library(cedardyn
                   steps/RateMatrixToSpaceCode.h
                   steps/RateToSpaceCode.h
                   steps/SpaceToRateCode.h
+                  RESOURCES
+                  gui/icons/cedar_dynamics_gui_icons.qrc
                   )

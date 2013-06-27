@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -41,6 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
@@ -104,7 +105,7 @@ void cedar::aux::gui::DataPlotter::plot(cedar::aux::ConstDataPtr data, const std
   this->mTitle = title;
 
   // get the declaration corresponding to the data to be plotted
-  cedar::aux::gui::PlotDeclarationPtr declaration
+  cedar::aux::gui::ConstPlotDeclarationPtr declaration
     = cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(data);
 
   // remove current plot

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -41,16 +41,24 @@
 #define NOMINMAX // prevents MSVC conflicts
 
 // CEDAR INCLUDES
+#include "cedar/configuration.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
-#include "cedar/auxiliaries/gui/LinePlot.h"
-#include "cedar/auxiliaries/gui/SurfacePlot.h"
+#ifdef CEDAR_USE_QWT
+  #include "cedar/auxiliaries/gui/LinePlot.h"
+  #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
+#endif // CEDAR_USE_QWT
+#ifdef CEDAR_USE_QWTPLOT3D
+  #include "cedar/auxiliaries/gui/SurfacePlot.h"
+#else // CEDAR_USE_QWTPLOT3D
+  #include "cedar/auxiliaries/gui/ImagePlot.h"
+#endif // CEDAR_USE_QWTPLOT3D
 #include "cedar/auxiliaries/gui/MatrixSlicePlot3D.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/tools.h"
-#include "cedar/auxiliaries/gui/HistoryPlot0D.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
@@ -72,7 +80,8 @@ namespace
     typedef cedar::aux::gui::PlotDeclarationTemplate<MatData, MatrixPlot> DeclarationType;
 
     boost::shared_ptr<DeclarationType> declaration(new DeclarationType());
-    cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(declaration);
+    declaration->declare();
+
     return true;
   }
 
@@ -136,11 +145,11 @@ void cedar::aux::gui::MatrixPlot::doAppend(cedar::aux::ConstDataPtr data, const 
 
 void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
-  this->mData= boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data);
+  this->mData= boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
   if (!this->mData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
-                "Cannot cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot::display.");
+                "Cannot cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot::plot.");
   }
 
   if (this->mpCurrentPlotWidget)
@@ -154,28 +163,33 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
 
   switch (dims)
   {
+#ifdef CEDAR_USE_QWT
     case 0:
       this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData, title);
-      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
 
     case 1:
       this->mpCurrentPlotWidget = new cedar::aux::gui::LinePlot(this->mData, title);
-      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
+#endif // CEDAR_USE_QWT
 
     case 2:
+#ifdef CEDAR_USE_QWTPLOT3D
       this->mpCurrentPlotWidget = new cedar::aux::gui::SurfacePlot(this->mData, title);
-      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
+#else
+      this->mpCurrentPlotWidget = new cedar::aux::gui::ImagePlot(this->mData, title);
+#endif // CEDAR_USE_QWTPLOT3D
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
-
     case 3:
     {
       //!@todo This should work the same as in the other cases, i.e., passing the data & title to the constructor.
       cedar::aux::gui::MatrixSlicePlot3D* p_plot = new cedar::aux::gui::MatrixSlicePlot3D();
       this->mpCurrentPlotWidget = p_plot;
       p_plot->plot(this->mData, title);
-      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
     }
 
@@ -185,7 +199,7 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
       message += cedar::aux::toString(mat.dims);
       message += "\nPress here to refresh the plot after you have changed the dimensionality.";
       this->mpCurrentPlotWidget = new QPushButton(QString::fromStdString(message));
-      connect(this->mpCurrentPlotWidget, SIGNAL(pressed()), this, SIGNAL(dataChanged()));
+      connect(this->mpCurrentPlotWidget, SIGNAL(pressed()), this, SLOT(processChangedData()));
     }
   }
   this->layout()->addWidget(this->mpCurrentPlotWidget);
@@ -234,4 +248,9 @@ const Qwt3D::ColorVector& cedar::aux::gui::MatrixPlot::getStandardColorVector()
   }
 
   return cedar::aux::gui::MatrixPlot::mStandardColorVector;
+}
+
+void cedar::aux::gui::MatrixPlot::processChangedData()
+{
+  this->plot(this->mData, "");
 }

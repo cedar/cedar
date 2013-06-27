@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -70,7 +70,8 @@ namespace
     (
       "Calculates the sum of an arbitrary set of input matrices. All matrices must have the same size."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }
@@ -123,7 +124,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Sum::determineInputValidity
   // First, let's make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(slot->getName() == "terms")
 
-  if (cedar::aux::ConstMatDataPtr mat_data = boost::shared_dynamic_cast<cedar::aux::ConstMatData>(data))
+  if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
     if (this->mInputs->getDataCount() > 0)
     {
