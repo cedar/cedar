@@ -1,6 +1,6 @@
 #=======================================================================================================================
 #
-#   Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 # 
 #   This file is part of cedar.
 #
@@ -64,6 +64,8 @@ set (CEDAR_SOURCE_DIR           "${CEDAR_HOME}/cedar")
 set (CEDAR_TEST_DIR             "${CEDAR_HOME}/tests")
 # directory for all unit tests
 set (CEDAR_UNIT_TEST_DIR        "${CEDAR_TEST_DIR}/unit")
+# directory for all performance tests
+set (CEDAR_PERFORMANCE_TEST_DIR        "${CEDAR_TEST_DIR}/performance")
 # directory for all interactive tests
 set (CEDAR_INTERACTIVE_TEST_DIR "${CEDAR_TEST_DIR}/interactive")
 # directory for all tools

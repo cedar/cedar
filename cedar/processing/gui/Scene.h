@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -75,6 +75,17 @@ public:
     MODE_SELECT,
     //! Connection mode, i.e., connections can be created.
     MODE_CONNECT
+  };
+
+  //! Current trigger connection mode
+  enum TRIGGER_CONNECTION_MODE
+  {
+    //!
+    MODE_HIDE_ALL,
+    //!
+    MODE_SHOW_ALL,
+    //!
+    MODE_SMART
   };
 
   //! Type for associating cedar::proc::Steps to cedar::proc::gui::StepItems.
@@ -247,6 +258,14 @@ public:
    */
   void exportSvg(const QString& file);
 
+  /*! Sets the display mode for triggers.
+   */
+  void setTriggerDisplayMode(TRIGGER_CONNECTION_MODE mode)
+  {
+    this->mTriggerMode = mode;
+    this->handleTriggerModeChange();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals
   //--------------------------------------------------------------------------------------------------------------------
@@ -298,6 +317,8 @@ private:
    */
   void removeNetworkItem(cedar::proc::gui::Network* pNetwork);
 
+  void handleTriggerModeChange();
+
 private slots:
   void promoteElementToExistingGroup();
 
@@ -315,6 +336,9 @@ protected:
 private:
   //! The current mode.
   MODE mMode;
+
+  //! The current trigger mode.
+  TRIGGER_CONNECTION_MODE mTriggerMode;
 
   //! The parameter for the current mode.
   QString mModeParam;

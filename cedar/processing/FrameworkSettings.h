@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -83,6 +83,10 @@ public:
    */
   void addKnownPlugin(const std::string& file);
 
+  /*!@brief Removes a plugin from the list of plugins known by the processing framework.
+   */
+  void removeKnownPlugin(const std::string& file);
+
   /*!@brief Returns the set of plugins known by the processing framework.
    */
   const std::set<std::string>& getKnownPlugins() const;
@@ -134,5 +138,25 @@ private:
   // none yet
 
 }; // class cedar::proc::FrameworkSettings
+
+
+namespace cedar
+{
+  namespace proc
+  {
+#ifdef MSVC
+#ifdef CEDAR_LIB_EXPORTS_PROC
+    // dllexport
+    template class __declspec(dllexport) cedar::aux::Singleton<cedar::proc::FrameworkSettings>;
+#else // CEDAR_LIB_EXPORTS_PROC
+    // dllimport
+    extern template class __declspec(dllimport) cedar::aux::Singleton<cedar::proc::FrameworkSettings>;
+#endif // CEDAR_LIB_EXPORTS_PROC
+#endif // MSVC
+
+    //!@brief The singleton instance of the framework settings.
+    typedef cedar::aux::Singleton<cedar::proc::FrameworkSettings> FrameworkSettingsSingleton;
+  }
+}
 
 #endif // CEDAR_PROC_FRAMEWORK_SETTINGS_H

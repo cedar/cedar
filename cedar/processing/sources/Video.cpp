@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -68,7 +68,8 @@ namespace
     (
       "Reads a video file and outputs the images. Supported formats depend on which ones are available via opencv."
     );
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }
@@ -142,7 +143,7 @@ void cedar::proc::sources::Video::reset()
   }
 }
 
-//----------------------------------------------------------------------------------------------------------------------
+
 void cedar::proc::sources::Video::compute(const cedar::proc::Arguments &arguments)
 {
   if (this->getVideoGrabber()->isCreated())
@@ -170,18 +171,17 @@ void cedar::proc::sources::Video::compute(const cedar::proc::Arguments &argument
   }
 }
 
-//----------------------------------------------------------------------------------------------------------------------
+
 void cedar::proc::sources::Video::updateVideo()
 {
   this->mImage->setData(this->getVideoGrabber()->getImage());
-  mFrameDuration = 1000/this->getVideoGrabber()->getFps();
+  mFrameDuration = 1000/this->getVideoGrabber()->getFramerate();
   mTimeElapsed = 0.0;
   mRecording->setValue(this->getVideoGrabber()->isRecording());
 }
 
-//----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::sources::Video::updateSpeedFactor()
 {
-  mFrameDuration = 1000/this->getVideoGrabber()->getFps();
+  mFrameDuration = 1000/this->getVideoGrabber()->getFramerate();
 }
 

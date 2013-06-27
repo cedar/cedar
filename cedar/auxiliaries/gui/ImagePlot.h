@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -78,6 +78,7 @@ namespace cedar
 
           signals:
             void done();
+            void failed();
 
           public:
             cedar::aux::gui::ImagePlot *mpPlot;
@@ -119,13 +120,15 @@ private:
   class ImageDisplay : public QLabel
   {
     public:
-      ImageDisplay(const QString& text);
+      ImageDisplay(cedar::aux::gui::ImagePlot* pPlot, const QString& text);
 
     protected:
       void mousePressEvent(QMouseEvent * pEvent);
 
     public:
       cedar::aux::ConstMatDataPtr mData;
+
+      cedar::aux::gui::ImagePlot* mpPlot;
   };
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -134,6 +137,12 @@ private:
 public:
   //!@brief The standard constructor.
   ImagePlot(QWidget *pParent = NULL);
+
+  //!@brief Constructor that plots some data.
+  ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
+
+  //!@todo implement this constructor (see SurfacePlot.cpp)
+  // ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
 
   //!@brief Destructor.
   ~ImagePlot();
@@ -157,6 +166,10 @@ public:
   /*!@brief Set the scaling mode of the plot.
    */
   void setSmoothScaling(bool smooth);
+
+  /*!@brief Applies a color scale to a matrix.
+   */
+  static cv::Mat colorizedMatrix(cv::Mat matrix);
 
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
@@ -187,8 +200,11 @@ private:
    */
   void imageFromMat(const cv::Mat& mat);
 
+  void construct();
+
 private slots:
   void conversionDone();
+  void conversionFailed();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -236,4 +252,5 @@ private:
   static QReadWriteLock mLookupTableLock;
 
 }; // class cedar::aux::gui::ImagePlot
+
 #endif // CEDAR_AUX_GUI_IMAGE_PLOT_H

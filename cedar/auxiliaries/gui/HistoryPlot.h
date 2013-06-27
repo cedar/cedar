@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -73,6 +73,12 @@ public:
    */
   void plot(cedar::aux::ConstDataPtr data, const std::string& title);
 
+public slots:
+  /*!@brief Reacts to a change in the plotted data.
+   *
+   * When the dimensionality of the plotted data changes, this causes a switch of the plot type.
+   */
+  void processChangedData();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -91,8 +97,8 @@ private:
 protected:
   // none yet
 private:
-  cedar::aux::ConstDataPtr mData;
-  QWidget *mpCurrentPlotWidget;
+  cedar::aux::ConstMatDataPtr mData;
+  cedar::aux::gui::PlotInterface* mpCurrentPlotWidget;
 }; // class cedar::aux::gui::HistoryPlot
 
 #endif // CEDAR_AUX_GUI_HISTORY_PLOT_H

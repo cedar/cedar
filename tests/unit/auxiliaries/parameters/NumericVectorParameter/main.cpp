@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -53,7 +53,7 @@ int main()
   defaults.push_back(5);
   defaults.push_back(5);
 
-  std::cout << "Creating double parameter" << std::endl;
+  std::cout << "Creating double parameters" << std::endl;
   cedar::aux::DoubleVectorParameterPtr param
   (
     new cedar::aux::DoubleVectorParameter
@@ -66,12 +66,26 @@ int main()
     )
   );
 
+  cedar::aux::DoubleVectorParameterPtr param_2
+  (
+    new cedar::aux::DoubleVectorParameter
+    (
+      configurable.get(),
+      "second name",
+      defaults, // default
+      0.0, // min
+      10.0 // max
+    )
+  );
+
+  std::cout << "Checking default values" << std::endl;
   if (param->size() != 3)
   {
     std::cout << "Default values were not set properly." << std::endl;
     ++errors;
   }
 
+  std::cout << "Checking limits" << std::endl;
   param->set(1, -5.0);
   if (param->at(1) != 0.0)
   {
@@ -87,6 +101,12 @@ int main()
               << param->at(0) << std::endl;
     ++errors;
   }
+
+  std::cout << "Checking writing and reading from/to node" << std::endl;
+  cedar::aux::ConfigurationNode conf;
+  param->writeToNode(conf);
+
+  param_2->readFromNode(conf.get_child("name"));
 
   return errors;
 }

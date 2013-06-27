@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -95,7 +95,7 @@ int main(int /* argc */, char** /* argv */)
   std::cout << "done." << std::endl;
 
   std::cout << "Adding declaration to the registry ... ";
-  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(test_module_decl);
+  test_module_decl->declare();
   std::cout << "done." << std::endl;
 
   std::cout << "Reading Sample.json ... ";
@@ -110,6 +110,47 @@ int main(int /* argc */, char** /* argv */)
   StepPtr step_b = network->getElement<Step>("stepB");
   step_b->onTrigger();
   std::cout << "done." << std::endl;
+
+  std::cout << "Trying to access sub-element in a step (should not work)." << std::endl;
+  try
+  {
+    // if this works ...
+    network->getElement("stepB.foo");
+    // ... increase error count.
+    std::cout << "Somehow got past a call that was not supposed to work." << std::endl;
+    ++errors;
+  }
+  catch(cedar::aux::ExceptionBase&) // this should throw some cedar exception.
+  {
+    std::cout << "Properly threw something." << std::endl;
+  }
+
+  // test duplicate
+  //!@todo duplicate should return pointer to new object
+  //!@todo check for null pointer, right element in right network, values
+  std::cout << "test duplication of steps" << std::endl;
+  try
+  {
+    std::string new_name = network->getUniqueName("stepB");
+    network->duplicate("stepB");
+    network->getElement(new_name);
+  }
+  catch(cedar::aux::ExceptionBase&) // simple copy did not work
+  {
+    std::cout << "simple duplication did not work" << std::endl;
+    ++errors;
+  }
+
+  try
+  {
+    network->duplicate("stepB", "copied step B");
+    network->getElement("copied step B");
+  }
+  catch(cedar::aux::ExceptionBase&) // named copy did not work
+  {
+    std::cout << "named duplication did not work" << std::endl;
+    ++errors;
+  }
 
   // test nested networks
   std::cout << "Test nested network." << std::endl;

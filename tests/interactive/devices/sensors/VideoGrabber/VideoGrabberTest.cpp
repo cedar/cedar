@@ -47,7 +47,7 @@ namespace
   void showUsage(std::string programName)
   {
     std::cout << "\n\nInteractive test for the VideoGrabber class.\n\n"
-        << "Usage: \t" << programName << " <VideoFile>"
+        << "Usage: \t" << programName << " <VideoFile>\n"
         << std::endl;
   }
 
@@ -162,6 +162,7 @@ int main(int argc, char* argv[])
   cedar::aux::gui::ImagePlotPtr p_plot = cedar::aux::gui::ImagePlotPtr(new cedar::aux::gui::ImagePlot());
   cedar::aux::MatDataPtr p_data = cedar::aux::MatDataPtr(new cedar::aux::MatData(frame0));
   p_plot->plot(p_data,window_title);
+  p_plot->setWindowTitle(QString::fromStdString(window_title));
   p_plot->show();
   p_plot->resize(frame0.cols,frame0.rows);
 
@@ -175,7 +176,7 @@ int main(int argc, char* argv[])
   //start the grabbing-thread. It is possible to set a speedfactor
   p_grabber->setSpeedFactor(1);
 
-  std::cout << "VideoGrabber thread FPS    : " << p_grabber->getFps() << std::endl;
+  std::cout << "VideoGrabber thread FPS    : " << p_grabber->getFramerate() << std::endl;
   p_grabber->start();
 
   unsigned int counter_stat = 0;
@@ -196,7 +197,7 @@ int main(int argc, char* argv[])
     //status
     if (!(++counter_stat %= 100))
     {
-      std::cout << "Measured FPS: " << p_grabber->getFpsMeasured()
+      std::cout << "Measured FPS: " << p_grabber->getMeasuredFramerate()
                 << "\tPos_Rel: "<< p_grabber->getPositionRelative()
                 << "\tPos_Abs: "<< p_grabber->getPositionAbsolute()
                 << std::endl;

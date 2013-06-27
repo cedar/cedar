@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -40,10 +40,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/PluginLoadDialog.h"
-#include "cedar/processing/PluginDeclaration.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/gui/Settings.h"
+#include "cedar/auxiliaries/PluginDeclarationList.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -66,7 +66,7 @@ QDialog(pParent)
   this->mpFileNameEdit->lineEdit()->setReadOnly(true);
 
   this->mpFileNameEdit->addItem("");
-  const std::set<std::string>& known_plugins = cedar::proc::Manager::getInstance().settings().getKnownPlugins();
+  const std::set<std::string>& known_plugins = cedar::proc::FrameworkSettingsSingleton::getInstance()->getKnownPlugins();
   for (std::set<std::string>::const_iterator iter = known_plugins.begin(); iter != known_plugins.end(); ++iter)
   {
     this->mpFileNameEdit->addItem(iter->c_str());
@@ -121,14 +121,11 @@ void cedar::proc::gui::PluginLoadDialog::loadFile(const std::string& file)
 
   this->mpStepsList->clear();
 
-  cedar::proc::PluginDeclarationPtr declaration = this->mPlugin->getDeclaration();
-  if (declaration)
+  const cedar::aux::PluginDeclarationListPtr declarations = this->mPlugin->getDeclaration();
+  for (size_t i = 0; i < declarations->size(); ++i)
   {
-    for (size_t i = 0; i < declaration->elementDeclarations().size(); ++i)
-    {
-      const std::string& classId = declaration->elementDeclarations().at(i)->getClassId();
-      this->mpStepsList->addItem(QString(classId.c_str()));
-    }
+    const std::string& classId = declarations->at(i)->getClassName();
+    this->mpStepsList->addItem(QString::fromStdString(classId));
   }
 }
 

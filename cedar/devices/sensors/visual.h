@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -39,15 +39,18 @@
 #define CEDAR_DEV_SENSORS_VISUAL_GRABBER_H
 
 
-//*! \brief Single include file for the grabber classes
+// Single include file for all grabber classes
+
+//!@todo remove this file?
 
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/namespace.h"
-#include "cedar/devices/sensors/visual/GrabberInterface.h"
+#include "cedar/devices/sensors/visual/GrabbableGrabber.h"
 #include "cedar/devices/sensors/visual/VideoGrabber.h"
 #include "cedar/devices/sensors/visual/PictureGrabber.h"
 #include "cedar/devices/sensors/visual/NetGrabber.h"
-#include "cedar/devices/sensors/visual/CameraGrabber.h"
+#include "cedar/devices/sensors/visual/GLGrabber.h"
+#include "cedar/devices/sensors/camera/Grabber.h"
 
 
 // PROJECT INCLUDES

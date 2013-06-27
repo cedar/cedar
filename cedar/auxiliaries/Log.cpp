@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -39,6 +39,7 @@
 #include "cedar/auxiliaries/LogFilter.h"
 #include "cedar/auxiliaries/LogInterface.h"
 #include "cedar/auxiliaries/ConsoleLog.h"
+#include "cedar/auxiliaries/Settings.h"
 
 // SYSTEM INCLUDES
 
@@ -117,3 +118,7 @@ void cedar::aux::Log::log(cedar::aux::LOG_LEVEL level, const std::string& messag
   }
 }
 
+bool cedar::aux::Log::getMemoryDebugFlag()
+{
+  return cedar::aux::SettingsSingleton::getInstance()->getMemoryDebugOutput();
+}

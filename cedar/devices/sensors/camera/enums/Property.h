@@ -87,12 +87,41 @@
 #endif // CV_CAP_PROP_GAMMA
 
 #ifndef CV_CAP_PROP_DC1394_MODE_AUTO
-  #define CV_CAP_PROP_DC1394_MODE_AUTO 0
+  #define CV_CAP_PROP_DC1394_MODE_AUTO -2 // was 0
 #endif // CV_CAP_PROP_DC1394_MODE_AUTO
 
-//return value, if a property is not supported from the actual device
+// opencv 2.2 compatibility:
+#ifndef CV_CAP_PROP_WHITE_BALANCE_BLUE_U
+  #define CV_CAP_PROP_WHITE_BALANCE_BLUE_U 17
+#endif // CV_CAP_PROP_WHITE_BALANCE_BLUE_U
+
+#ifndef CV_CAP_PROP_SHARPNESS
+  #define CV_CAP_PROP_SHARPNESS 20
+#endif // CV_CAP_PROP_SHARPNESS
+
+#ifndef CV_CAP_PROP_AUTO_EXPOSURE
+  #define CV_CAP_PROP_AUTO_EXPOSURE 21
+#endif // CV_CAP_PROP_AUTO_EXPOSURE
+
+#ifndef CV_CAP_PROP_GAMMA
+  #define CV_CAP_PROP_GAMMA 22
+#endif // CV_CAP_PROP_GAMMA
+
+#ifndef CV_CAP_PROP_TEMPERATURE
+  #define CV_CAP_PROP_TEMPERATURE 24
+#endif // CV_CAP_PROP_TEMPERATURE
+
+#ifndef CV_CAP_PROP_WHITE_BALANCE_RED_V
+  #define CV_CAP_PROP_WHITE_BALANCE_RED_V 26
+#endif // CV_CAP_PROP_WHITE_BALANCE_RED_V
+
+#ifndef CV_CAP_PROP_DC1394_MODE_AUTO
+  #define CV_CAP_PROP_DC1394_MODE_AUTO -2
+#endif // CV_CAP_PROP_DC1394_MODE_AUTO
+
+//return value, if a property is not supported by the actual device
 //have to be larger than the highest value of the properties!
-#define CAMERA_PROPERTY_NOT_SUPPORTED 1000
+#define CAMERA_PROPERTY_NOT_SUPPORTED -1
 
 //mappings from OpenCV constants
 
@@ -104,7 +133,7 @@
 #define CAMERA_PROPERTY_MODE_DEFAULT -3
 
 //if a feature is on/off capable, this value turns it off //=-4
-#define CAMERA_PROPERTY_MODE_OFF CV_CAP_PROP_DC1394_OFF
+//#define CAMERA_PROPERTY_MODE_OFF CV_CAP_PROP_DC1394_OFF
 
 //this sets a property to its one_push_auto mode. The feature have to be one_push_auto capable.
 //one_push_auto: set the property to the wanted value and then to one_push_auto.
@@ -127,7 +156,10 @@ class cedar::dev::sensors::camera::Property
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Typedef for the enum values
   typedef cedar::aux::EnumId Id;
+public:
+  //! Typedef for this enum as shared pointer
   typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -140,9 +172,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Construct
   static void construct();
 
+  //! Type
   static const cedar::aux::EnumBase& type();
+
+  //! Type Pointer
   static const cedar::dev::sensors::camera::Property::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -185,6 +221,7 @@ public:
   static const Id PROP_GAMMA = CV_CAP_PROP_GAMMA; //22;
   /// @see PROP_BRIGHTNESS
   static const Id PROP_TEMPERATURE = CV_CAP_PROP_TEMPERATURE; // 23;
+
   /* until now: not supported by cedar
   /// @see PROP_BRIGHTNESS
   static const Id PROP_TRIGGER = CV_CAP_PROP_TRIGGER; // 24;

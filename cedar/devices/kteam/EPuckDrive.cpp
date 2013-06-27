@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -68,7 +68,8 @@ cedar::dev::kteam::Drive(communication)
     CEDAR_THROW
     (
       cedar::dev::SerialCommunicationException,
-      "Initialization of serial communication failed."
+      "Initialization of serial communication failed: wrong answer received. Expected a, z, or a vector, got \""
+      + answer + "\"."
     );
   }
 #ifdef DEBUG

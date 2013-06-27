@@ -1,6 +1,6 @@
 /*=============================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -39,7 +39,6 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
-#include "cedar/auxiliaries/net/detail/datatypesupport/interfaces/InterfaceCollatedData.h"
 #include "cedar/auxiliaries/net/detail/transport/interfaces/InterfaceOpenable.h"
 
 #include "cedar/auxiliaries/net/detail/datatypesupport/CollatedTraits.h"
@@ -64,8 +63,7 @@ namespace cedar {
  * More detailed description of the class.
  */
 template <typename T> 
-class CollatedNetBase : virtual protected InterfaceOpenable,
-                        virtual protected InterfaceCollatedData<T>
+class CollatedNetBase : virtual protected InterfaceOpenable
 {
   //---------------------------------------------------------------------------
   // members

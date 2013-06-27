@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -91,6 +91,13 @@ public:
   //!@brief return vector of standard colors
   static const Qwt3D::ColorVector& getStandardColorVector();
 
+public slots:
+  /*!@brief Reacts to a change in the plotted data.
+   *
+   * When the dimensionality of the plotted data changes, this causes a switch of the plot type.
+   */
+  void processChangedData();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -113,7 +120,7 @@ private:
   cedar::aux::ConstMatDataPtr mData;
 
   //!@brief the plot widget
-  QWidget *mpCurrentPlotWidget;
+  QWidget* mpCurrentPlotWidget;
 
   //!@brief vector filled with standard colors
   static Qwt3D::ColorVector mStandardColorVector;

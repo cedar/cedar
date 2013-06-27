@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -80,13 +80,12 @@ public:
 public:
   //!@brief get the singleton instance of Manager
   static Manager& getInstance();
-  //!@brief access the FrameworkSettings
-  cedar::proc::FrameworkSettings& settings();
 
   //!\brief access to thread registry
   ThreadRegistry& threads();
 
   //!@brief register a thread (Manager holds a collection of threads, which can be started at once)
+  //!@todo Remove? This should be per network.
   void registerThread(cedar::aux::LoopedThreadPtr thread);
 
   //!@brief load a plugin
@@ -99,9 +98,11 @@ public:
   void loadDefaultPlugins();
 
   //!@brief start all registered threads
+  //!@todo Remove?
   void startThreads();
 
   //!@brief stop all threads
+  //!@todo Remove?
   void stopThreads(bool wait = false);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -127,9 +128,6 @@ private:
 
   //! a registry for all managed threads, which can be globally started or stopped (e.g., LoopedTrigger)
   ThreadRegistry mThreadRegistry;
-
-  //!@brief the framework settings
-  cedar::proc::FrameworkSettings mSettings;
 
 }; // class cedar::Manager
 

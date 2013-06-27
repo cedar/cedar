@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -35,9 +35,11 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/processing/typecheck/TypeCheck.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/Network.h"
+#include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
@@ -70,15 +72,36 @@ cedar::proc::DataSlot::~DataSlot()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-/*!
- * @remarks Set to an empty string ("") to disable the text and use the name instead.
- */
+void cedar::proc::DataSlot::setCheck(const TypeCheckFunction& check)
+{
+  this->mTypeCheck = check;
+}
+
+const cedar::proc::DataSlot::TypeCheckFunction& cedar::proc::DataSlot::getCheck() const
+{
+  return this->mTypeCheck;
+}
+
+bool cedar::proc::DataSlot::hasValidityCheck() const
+{
+  return !this->getCheck().empty();
+}
+
+cedar::proc::DataSlot::VALIDITY cedar::proc::DataSlot::checkValidityOf(cedar::aux::ConstDataPtr data) const
+{
+  if (!this->hasValidityCheck())
+  {
+    CEDAR_THROW(cedar::proc::NoCheckException, "No check set for data slot \"" + this->getName() + "\".");
+  }
+
+  return this->getCheck()(this->shared_from_this(), data);
+}
+
 void cedar::proc::DataSlot::setText(const std::string& text)
 {
   this->mText = text;
 }
 
-//!@brief Returns the text to display to the user.
 const std::string& cedar::proc::DataSlot::getText() const
 {
   if (this->mText.empty())

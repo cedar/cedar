@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -84,10 +84,10 @@ public:
 
 public slots:
 
-  //! This slot should be invoked, when the video in the VideoGrabber has changed.
+  //!@brief This slot should be invoked, when the video in the VideoGrabber has changed.
   void updateVideo();
 
-  //! This slot should be invoked, when the speed factor in the VideoGrabber has changed.
+  //!@brief This slot should be invoked, when the speed factor in the VideoGrabber has changed.
   void updateSpeedFactor();
 
   //--------------------------------------------------------------------------------------------------------------------

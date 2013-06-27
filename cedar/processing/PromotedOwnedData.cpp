@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -108,7 +108,7 @@ std::string cedar::proc::PromotedOwnedData::getPromotionPath() const
   if
   (
     cedar::proc::PromotedOwnedDataPtr promoted
-      = boost::shared_dynamic_cast<cedar::proc::PromotedOwnedData>(mDataSlot)
+      = boost::dynamic_pointer_cast<cedar::proc::PromotedOwnedData>(mDataSlot)
   )
   {
     return this->mpParent->getName() + "." + promoted->getPromotionPath();

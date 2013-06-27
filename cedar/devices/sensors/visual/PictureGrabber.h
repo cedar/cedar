@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -67,16 +67,17 @@ public cedar::dev::sensors::visual::Grabber
 
   protected slots:
 
-  //!@brief A slot that is triggered if a new filename is set
+  //! @brief A slot that is triggered if a new filename is set
   void fileNameChanged();
 
 
   signals:
 
-  //!@brief This signal is emitted, when a new picture is available with the getImage() method.
+  //! @brief This signal is emitted, when a new picture is available with the getImage() method.
   void pictureChanged();
 
   private:
+
   /*! @brief Boost slot method. Invoked if a channel is added as an ObjectListParameter as an object
    */
   void channelAdded(int index);
@@ -122,29 +123,29 @@ public:
 
   /*! @brief Set a new picture to grab from
    *  @remarks
-   *  Supported image-types depend on operating system and installed libs. <br>
-   *  For details look at the OpenCV-documentation (Section "imread").
+   *    Supported image-types depend on operating system and installed libs. <br>
+   *    For details look at the OpenCV-documentation (Section "imread").
    *  @param channel which should be changed.
    *  @param fileName of the new picture.
-   *  @throws IndexOutOfRangeException If channel isn't fit
-   *  @throws InitializationException If the grabber couldn't grab from the file
+   *  @throw IndexOutOfRangeException If channel isn't fit
+   *  @throw InitializationException If the grabber couldn't grab from the file
    */
   void setSourceFile(unsigned int channel, const std::string& fileName);
 
   /*! @brief Set a new picture to grab from
-   *   This is for a single channel grabber or for channel 0 on a stereo grabber
+   *    This is for a single channel grabber or for channel 0 on a stereo grabber
    *  @param fileName of the new picture.
-   *  @throws IndexOutOfRangeException If channel isn't fit
-   *  @throws InitializationException If the grabber couldn't grab from the file
+   *  @throw IndexOutOfRangeException If channel isn't fit
+   *  @throw InitializationException If the grabber couldn't grab from the file
    *  @see setSourceFile(unsigned int, const std::string&)
    */
   void setSourceFile(const std::string& fileName);
 
   /*! @brief Get the used file to grab from
    *  @param channel The channel which filename should be read
-   *  @throws IndexOutOfRangeException If channel isn't fit
+   *  @throw  IndexOutOfRangeException If channel isn't fit
    */
-  const std::string getSourceFile(unsigned int channel = 0);
+  const std::string getSourceFile(unsigned int channel = 0) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -152,10 +153,10 @@ public:
 protected:
 
   // inherited from Grabber
-  bool onGrab();
-  bool onCreateGrabber();
+  void onGrab(unsigned int channel);
+  void onCreateGrabber();
   void onCloseGrabber();
-  std::string onUpdateSourceInfo(unsigned int channel);
+  std::string onGetSourceInfo(unsigned int channel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -165,7 +166,7 @@ private:
    */
   void init();
 
-  /// @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
+  //! @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
   inline PictureChannelPtr getPictureChannel(unsigned int channel)
   {
     return boost::static_pointer_cast<PictureChannel>
@@ -174,7 +175,7 @@ private:
            );
   }
 
-  /// @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
+  //! @brief Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
   inline ConstPictureChannelPtr getPictureChannel(unsigned int channel) const
   {
     return boost::static_pointer_cast<const PictureChannel>

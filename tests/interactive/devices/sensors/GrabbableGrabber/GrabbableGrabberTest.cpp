@@ -206,6 +206,7 @@ int main(int argc, char **argv)
   cedar::aux::gui::ImagePlotPtr p_plot = cedar::aux::gui::ImagePlotPtr(new cedar::aux::gui::ImagePlot());
   cedar::aux::MatDataPtr p_data = cedar::aux::MatDataPtr(new cedar::aux::MatData(frame));
   p_plot->plot(p_data,window_title);
+  p_plot->setWindowTitle(QString::fromStdString(window_title));
   p_plot->show();
   p_plot->resize(frame.cols,frame.rows);
 
@@ -214,7 +215,7 @@ int main(int argc, char **argv)
 
   // start the grabber-thread for reading the GL images in the background
   std::cout << "Start grabbing in the background" << std::endl;
-  p_grabber->setFps(50);
+  p_grabber->setFramerate(50);
   p_grabber->startGrabber();
 
   // start recording (if you like)
@@ -243,7 +244,7 @@ int main(int argc, char **argv)
     if (! (++counter %= 200))
     {
       // display real reached fps
-      std::cout << "Thread FPS: " << p_grabber->getFpsMeasured() << std::endl;
+      std::cout << "Thread FPS: " << p_grabber->getMeasuredFramerate() << std::endl;
     }
     cedar::aux::sleep(cedar::unit::Milliseconds(1));
   }

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -42,7 +42,47 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
+#include <boost/filesystem.hpp>
 
+int test_io()
+{
+  int errors = 0;
+
+  {
+    cedar::aux::kernel::GaussPtr gauss(new cedar::aux::kernel::Gauss(2, 1.0, 1.0, 1.0));
+    gauss->writeJson("test.json");
+  }
+
+  {
+    cedar::aux::kernel::GaussPtr gauss(new cedar::aux::kernel::Gauss());
+    gauss->readJson("test.json");
+
+    if (gauss->getDimensionality() != 2)
+    {
+      std::cout << "ERROR: Wrong size after read." << std::endl;
+      ++errors;
+    }
+
+    for (unsigned int i = 0; i < gauss->getDimensionality(); ++i)
+    {
+      if (gauss->getSigma(i) != 1.0)
+      {
+        std::cout << "ERROR: Wrong sigma in dimension " << i << std::endl;
+        ++errors;
+      }
+
+      if (gauss->getShift(i) != 1.0)
+      {
+        std::cout << "ERROR: Wrong shift in dimension " << i << std::endl;
+        ++errors;
+      }
+    }
+  }
+
+  boost::filesystem::remove("test.json");
+
+  return errors;
+}
 
 int main(int, char**)
 {
@@ -65,6 +105,8 @@ int main(int, char**)
     std::cout << "testing dimensionality " << dim << std::endl;
     cedar::aux::kernel::GaussPtr gaussian(new cedar::aux::kernel::Gauss(1.0, sigmas, shifts, 3, dim));
   }
+
+  errors += test_io();
 
   std::cout << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)

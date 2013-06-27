@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -126,6 +126,12 @@ class cedar::aux::TypeMismatchException : public cedar::aux::ExceptionBase
 {
 };
 
+/*!@brief Exception that occurs when an given dimensionalities do not match.
+ */
+class cedar::aux::DimensionalityMismatchException : public cedar::aux::ExceptionBase
+{
+};
+
 /*!@brief Exception thrown when a connection (i.e. a network connection) is too bad to continue.
  */
 class cedar::aux::BadConnectionException : public cedar::aux::ExceptionBase
@@ -204,5 +210,17 @@ class cedar::aux::ConversionFailedException : public cedar::aux::ExceptionBase
 class cedar::aux::ValidationFailedException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::ValidationFailedException
+
+/*!@brief Exception that occurs when threading code is mis-used
+ */
+class cedar::aux::ThreadingErrorException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::ThreadingErrorException
+
+/*!@brief An exception that is thrown, when reading or writing jsons encounters a parsing error.
+ */
+class cedar::aux::ParseException: public cedar::aux::ExceptionBase
+{
+}; // class cedar::proc::ParseException
 
 #endif // CEDAR_AUX_EXCEPTIONS_H

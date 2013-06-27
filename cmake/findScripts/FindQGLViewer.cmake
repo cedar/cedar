@@ -10,7 +10,7 @@ find_path(QGLViewer_INCLUDE_DIRS
 )
 # find library in set of paths
 find_library(QGLViewer_LIBS
-  NAMES qglviewer qglviewer-qt4 QGLViewer
+  NAMES qglviewer-qt4 QGLViewer qglviewer
   PATHS ${CEDAR_DEPENDENCY_LIBRARIES}
 )
 
