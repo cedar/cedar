@@ -34,4 +34,6 @@
 #
 #=======================================================================================================================
 
-cedar_add_performance_test(netPerformance main.cpp)
+if (CEDAR_USE_YARP)
+	cedar_add_performance_test(netPerformance main.cpp)
+endif()
