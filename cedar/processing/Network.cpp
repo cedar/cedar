@@ -221,7 +221,7 @@ void cedar::proc::Network::startTriggers(bool wait)
       auto trigger = *iter;
       while (!trigger->isRunning())
       {
-        cedar::aux::sleep(cedar::unit::Milliseconds(5));
+        cedar::aux::sleep(0.005 * cedar::unit::seconds);
       }
     }
   }
@@ -247,7 +247,7 @@ void cedar::proc::Network::stopTriggers(bool wait)
       auto trigger = *iter;
       while (trigger->isRunning())
       {
-        cedar::aux::sleep(cedar::unit::Milliseconds(5));
+        cedar::aux::sleep(0.005 * cedar::unit::seconds);
       }
     }
   }
