@@ -199,8 +199,7 @@ else(LIB_DC1394)
 endif(LIB_DC1394)
 
 # YARP
-#find_package(YARP QUIET)
-set(YARP_FOUND 0)
+find_package(YARP QUIET)
 if(YARP_FOUND)
   link_libraries(${YARP_LIBRARIES})
   include_directories(${YARP_INCLUDE_DIRS})

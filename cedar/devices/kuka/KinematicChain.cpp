@@ -85,7 +85,7 @@ cedar::dev::kuka::KinematicChain::~KinematicChain()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::kuka::KinematicChain::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
-  this->cedar::aux::Configurable::readConfiguration(node);
+  this->cedar::dev::robot::KinematicChain::readConfiguration(node);
 
   // create a new Instance of the friRemote
   if (_mRemoteHost->getValue() != "NULL")
@@ -101,7 +101,7 @@ void cedar::dev::kuka::KinematicChain::readConfiguration(const cedar::aux::Confi
   copyFromFRI();
 
   //set step size and idle time for the looped thread
-  setStepSize(0);
+  setStepSize(12.0);
   setIdleTime(0.01);
   //start the thread
   start();
