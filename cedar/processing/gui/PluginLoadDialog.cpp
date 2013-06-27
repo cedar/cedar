@@ -66,7 +66,7 @@ QDialog(pParent)
   this->mpFileNameEdit->lineEdit()->setReadOnly(true);
 
   this->mpFileNameEdit->addItem("");
-  const std::set<std::string>& known_plugins = cedar::proc::Manager::getInstance().settings().getKnownPlugins();
+  const std::set<std::string>& known_plugins = cedar::proc::FrameworkSettingsSingleton::getInstance()->getKnownPlugins();
   for (std::set<std::string>::const_iterator iter = known_plugins.begin(); iter != known_plugins.end(); ++iter)
   {
     this->mpFileNameEdit->addItem(iter->c_str());

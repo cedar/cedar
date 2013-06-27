@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/gui/MatrixSlicePlot3D.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h" // for the color map
 #include "cedar/auxiliaries/gui/PlotManager.h"
+#include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/assert.h"
@@ -225,11 +226,8 @@ void cedar::aux::gui::MatrixSlicePlot3D::slicesFromMat(const cv::Mat& mat)
   cv::minMaxLoc(mSliceMatrix, &min, &max);
   cv::Mat scaled = (mSliceMatrix - min) / (max - min) * 255.0;
   scaled.convertTo(mSliceMatrixByte, CV_8U);
-  std::vector<cv::Mat> merger;
-  merger.push_back(mSliceMatrixByte);
-  merger.push_back(mSliceMatrixByte);
-  merger.push_back(mSliceMatrixByte);
-  cv::merge(merger, mSliceMatrixByteC3);
+
+  mSliceMatrixByteC3 = cedar::aux::gui::ImagePlot::colorizedMatrix(mSliceMatrixByte);
 
   QWriteLocker lock(&this->mImageLock);
   this->mImage = QImage

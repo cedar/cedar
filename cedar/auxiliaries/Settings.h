@@ -124,7 +124,7 @@ namespace cedar
 #endif // CEDAR_LIB_EXPORTS_AUX
 #endif // MSVC
 
-    //!@brief The singleton instance of the kernel factory manager.
+    //!@brief The singleton instance of the auxiliaries settings.
     typedef cedar::aux::Singleton<cedar::aux::Settings> SettingsSingleton;
   }
 }

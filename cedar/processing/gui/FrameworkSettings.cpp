@@ -55,8 +55,8 @@ QWidget(pParent)
 {
   this->setupUi(this);
 
-  cedar::proc::FrameworkSettings& settings = cedar::proc::Manager::getInstance().settings();
-  this->mpPluginWorkspaceEdit->setParameter(settings.mPluginWorkspace);
+  cedar::proc::FrameworkSettingsPtr settings = cedar::proc::FrameworkSettingsSingleton::getInstance();
+  this->mpPluginWorkspaceEdit->setParameter(settings->mPluginWorkspace);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -65,12 +65,12 @@ QWidget(pParent)
 
 void cedar::proc::gui::FrameworkSettings::reject()
 {
-  cedar::proc::FrameworkSettings& settings = cedar::proc::Manager::getInstance().settings();
-  settings.load();
+  cedar::proc::FrameworkSettingsPtr settings = cedar::proc::FrameworkSettingsSingleton::getInstance();
+  settings->load();
 }
 
 void cedar::proc::gui::FrameworkSettings::accept()
 {
-  cedar::proc::FrameworkSettings& settings = cedar::proc::Manager::getInstance().settings();
-  settings.save();
+  cedar::proc::FrameworkSettingsPtr settings = cedar::proc::FrameworkSettingsSingleton::getInstance();
+  settings->save();
 }

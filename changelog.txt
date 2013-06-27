@@ -67,6 +67,9 @@ likely to undergo major changes:
     
 == current testing ==
 
+- general
+  - Parameters of several classes are marked as "advanced" based on how often one normally uses these. Affected are
+    for example anchor, shift, and limit of kernels and threshold of sigmoids. 
 - build system
   - enabled C++0x / C++11 compiler flag for GCC
   - cedar should now also compile when using clang.
