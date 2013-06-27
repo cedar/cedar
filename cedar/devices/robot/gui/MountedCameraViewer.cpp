@@ -127,6 +127,28 @@ void cedar::dev::robot::gui::MountedCameraViewer::readConfiguration(const cedar:
 
 void cedar::dev::robot::gui::MountedCameraViewer::draw()
 {
+  // legacy code of Michael project
+  /*
+  cv::Mat rotation(4,4,CV_64F);
+  rotation.at<double>(0, 0) = 9.9796810078988596e-01;
+  rotation.at<double>(0, 1) = 7.2274785738513161e-03;
+  rotation.at<double>(0, 2) = 6.3304291792045456e-02;
+  rotation.at<double>(0, 3) = 0.0;
+  rotation.at<double>(1, 0) = -7.0012000035480412e-03;
+  rotation.at<double>(1, 1) = 9.9996828796653037e-01;
+  rotation.at<double>(1, 2) = -3.7955579032020949e-03;
+  rotation.at<double>(1, 3) = 0.0;
+  rotation.at<double>(2, 0) = -6.3329716597646579e-02;
+  rotation.at<double>(2, 1) = 3.3446397041775626e-03;
+  rotation.at<double>(2, 2) = 9.9798705421508904e-01;
+  rotation.at<double>(2, 3) = 0.0;
+
+  rotation.at<double>(3, 0) = 0.0;
+  rotation.at<double>(3, 1) = 0.0;
+  rotation.at<double>(3, 2) = 0.0;
+  rotation.at<double>(3, 3) = 1.0;
+  */
+  
   // calculate coordinate transformation to camera frame, i.e. external transformation
   mCameraCoordinateFrame->setTransformation
   (
@@ -137,6 +159,7 @@ void cedar::dev::robot::gui::MountedCameraViewer::draw()
   cv::Mat external = mCameraCoordinateFrame->getTransformation().inv();
 
   // projection
+  //cv::Mat projection_matrix_double = mCalibrationMatrix * mProjection * rotation * external;
   cv::Mat projection_matrix_double = mCalibrationMatrix * mProjection * external;
   cv::Mat projection_matrix_float;
   projection_matrix_double.convertTo(projection_matrix_float, CV_32FC1);
@@ -145,7 +168,8 @@ void cedar::dev::robot::gui::MountedCameraViewer::draw()
   qglviewer::Camera* viewer_camera = this->camera();
   viewer_camera->setFromProjectionMatrix(projection_matrix_float.ptr<float>());
   viewer_camera->setZNearCoefficient(0.025);
-
+  //!@todo clean up this code
+/*
   // get single parameters
   double k1 = -3.4074914362123820e-01;
   double k2 = 9.6110175102466677e-01;
@@ -190,7 +214,7 @@ void cedar::dev::robot::gui::MountedCameraViewer::draw()
 
   double u = f_x * x_two_prime + c_x;
   double v = f_y * y_two_prime + c_y;
-
+*/
 //  GLdouble camera_projection[16];
 //  viewer_camera->getProjectionMatrix(camera_projection);
 //  std::cout << camera_projection[0] << " " << camera_projection[4] << " " << camera_projection[8] << " " << camera_projection[12] << std::endl
@@ -208,19 +232,12 @@ void cedar::dev::robot::gui::MountedCameraViewer::draw()
 //  std::cout << theta << std::endl;
 //  cedar::aux::math::write(point_image);
 //
-  std::cout << "projectPoint : " << point_image.at<double>(0, 0) << ", " << point_image.at<double>(0, 1) << std::endl;
-  std::cout << "by hand : " << u << ", " << v << std::endl;
-  std::cout << "--------------------------------------------------------" << std::endl;
-
 
 //  this->startScreenCoordinatesSystem();
 //  glTranslated( point_image.at<double>(0, 0), point_image.at<double>(0, 1), 0);
 //  cedar::aux::gl::setColor(1, 0, 0);
 //  cedar::aux::gl::drawCross(10, 1);
 //  this->stopScreenCoordinatesSystem();
-
-
-
 
   cedar::aux::gui::Viewer::draw();
 }
