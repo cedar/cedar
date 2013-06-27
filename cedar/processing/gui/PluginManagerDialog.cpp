@@ -103,7 +103,7 @@ void cedar::proc::gui::PluginManagerDialog::populate()
     this->addPlugin(*iter);
   }
 
-  const std::set<std::string>& known_plugins = cedar::proc::Manager::getInstance().settings().getKnownPlugins();
+  const std::set<std::string>& known_plugins = cedar::proc::FrameworkSettingsSingleton::getInstance()->getKnownPlugins();
   for (std::set<std::string>::const_iterator iter = known_plugins.begin(); iter != known_plugins.end(); ++iter)
   {
     if (plugins_to_load.find(*iter) == plugins_to_load.end())
@@ -141,7 +141,7 @@ void cedar::proc::gui::PluginManagerDialog::addPlugin(const std::string& path)
 void cedar::proc::gui::PluginManagerDialog::removePlugins()
 {
   cedar::proc::gui::Settings& settings = cedar::proc::gui::Settings::instance();
-  cedar::proc::FrameworkSettings& known_plugins = cedar::proc::Manager::getInstance().settings();
+  cedar::proc::FrameworkSettingsPtr known_plugins = cedar::proc::FrameworkSettingsSingleton::getInstance();
   unsigned int deleted_items = 0;
   for (int row = 0; row < this->mpPluginList->rowCount(); ++row)
   {
@@ -162,7 +162,7 @@ void cedar::proc::gui::PluginManagerDialog::removePlugins()
       {
         settings.removePluginToLoad(path);
       }
-      known_plugins.removeKnownPlugin(path);
+      known_plugins->removeKnownPlugin(path);
       ++deleted_items;
     }
   }

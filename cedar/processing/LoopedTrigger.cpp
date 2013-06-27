@@ -204,6 +204,6 @@ void cedar::proc::LoopedTrigger::step(double time)
   if (this->mWait->getValue())
   {
     // wait for all listeners
-    this->cedar::proc::Trigger::wait();
+    this->waitForProcessing();
   }
 }

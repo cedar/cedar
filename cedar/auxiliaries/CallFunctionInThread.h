@@ -57,6 +57,7 @@
 #include <QMutex>
 #include <QReadWriteLock>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <functional>
 
 /*!@brief This class wraps a function call into a thread.
  *

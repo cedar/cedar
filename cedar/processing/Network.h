@@ -341,13 +341,18 @@ public:
   void removeAllConnectionsFromSlot(cedar::proc::ConstDataSlotPtr slot);
 
   //!@brief Starts all triggers in this network (that haven't been started yet).
-  void startTriggers();
+  void startTriggers(bool wait = false);
 
   //!@brief Stops all running triggers in this network.
-  void stopTriggers();
+  void stopTriggers(bool wait = false);
+
+  //!@brief Single-steps all triggers in this network.
+  void stepTriggers();
 
   //! Returns a list of issues in the network.
   std::vector<cedar::proc::ConsistencyIssuePtr> checkConsistency() const;
+
+  std::vector<cedar::proc::LoopedTriggerPtr> listLoopedTriggers() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

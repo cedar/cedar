@@ -147,6 +147,7 @@ void cedar::aux::gui::ImagePlot::construct()
 
   QObject::connect(this, SIGNAL(convert()), mWorker.get(), SLOT(convert()));
   QObject::connect(mWorker.get(), SIGNAL(done()), this, SLOT(conversionDone()));
+  QObject::connect(mWorker.get(), SIGNAL(failed()), this, SLOT(conversionFailed()));
 
   this->mpWorkerThread->start(QThread::LowPriority);
 }
@@ -243,25 +244,29 @@ void cedar::aux::gui::ImagePlot::ImageDisplay::mousePressEvent(QMouseEvent * pEv
 //!@cond SKIPPED_DOCUMENTATION
 void cedar::aux::gui::detail::ImagePlotWorker::convert()
 {
+  QReadLocker read_lock(&this->mpPlot->mData->getLock());
+  if (this->mpPlot->mData->getDimensionality() > 2)
+  {
+    this->mpPlot->mpImageDisplay->setText("cannot display matrices of dimensionality > 2");
+    emit failed();
+    return;
+  }
   const cv::Mat& mat = this->mpPlot->mData->getData();
 
-  this->mpPlot->mData->lockForRead();
   if (mat.empty())
   {
     this->mpPlot->mpImageDisplay->setText("Matrix is empty.");
-    this->mpPlot->mData->unlock();
+    emit failed();
     return;
   }
   int type = mat.type();
-  this->mpPlot->mData->unlock();
 
   switch(type)
   {
     case CV_8UC1:
     {
-      this->mpPlot->mData->lockForRead();
       cv::Mat converted = this->mpPlot->threeChannelGrayscale(this->mpPlot->mData->getData());
-      this->mpPlot->mData->unlock();
+      read_lock.unlock();
       CEDAR_DEBUG_ASSERT(converted.type() == CV_8UC3);
       this->mpPlot->imageFromMat(converted);
       break;
@@ -280,17 +285,15 @@ void cedar::aux::gui::detail::ImagePlotWorker::convert()
         && this->mpPlot->mDataColorSpace->getChannelType(2) == cedar::aux::annotation::ColorSpace::Value
       )
       {
-        this->mpPlot->mData->lockForRead();
         cv::Mat converted;
         cv::cvtColor(this->mpPlot->mData->getData(), converted, CV_HSV2BGR);
-        this->mpPlot->mData->unlock();
+				read_lock.unlock();
         this->mpPlot->imageFromMat(converted);
       }
       else
       {
-        this->mpPlot->mData->lockForRead();
         this->mpPlot->imageFromMat(this->mpPlot->mData->getData());
-        this->mpPlot->mData->unlock();
+				read_lock.unlock();
       }
       break;
     }
@@ -301,11 +304,9 @@ void cedar::aux::gui::detail::ImagePlotWorker::convert()
       //!@todo Some code here is redundant
       // find min and max for scaling
       double min, max;
-
-      this->mpPlot->mData->lockForRead();
       cv::minMaxLoc(mat, &min, &max);
       cv::Mat scaled = (mat - min) / (max - min) * 255.0;
-      this->mpPlot->mData->unlock();
+      read_lock.unlock();
       cv::Mat mat_8u;
       scaled.convertTo(mat_8u, CV_8U);
 
@@ -318,9 +319,11 @@ void cedar::aux::gui::detail::ImagePlotWorker::convert()
 
     default:
     {
+      read_lock.unlock();
       std::string matrix_type_name = cedar::aux::math::matrixTypeToString(mat);
       QString text = "Cannot display matrix of type " + QString::fromStdString(matrix_type_name) + ".";
       this->mpPlot->mpImageDisplay->setText(text);
+      emit failed();
       return;
     }
   }
@@ -336,6 +339,11 @@ void cedar::aux::gui::ImagePlot::conversionDone()
   lock.unlock();
 
   this->resizePixmap();
+  mConverting = false;
+}
+
+void cedar::aux::gui::ImagePlot::conversionFailed()
+{
   mConverting = false;
 }
 
@@ -355,11 +363,9 @@ void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
   emit convert();
 }
 
-//!@todo encapsulate lookup table functionality in own class
-cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) const
+cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix)
 {
-  CEDAR_DEBUG_ASSERT(in.channels() == 1);
-
+  //!@todo encapsulate lookup table functionality in own class / opencv might have functionality for this by now
   QReadLocker lookup_readlock(&mLookupTableLock);
   if (mLookupTableR.empty() || mLookupTableG.empty() || mLookupTableB.empty())
   {
@@ -415,6 +421,48 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
     lookup_writelock.unlock();
     lookup_readlock.relock();
   }
+
+  // accept only char type matrices
+  CEDAR_ASSERT(matrix.depth() != sizeof(char));
+
+  int channels = matrix.channels();
+
+  int rows = matrix.rows * channels;
+  int cols = matrix.cols;
+
+  if (matrix.isContinuous())
+  {
+    cols *= rows;
+    rows = 1;
+  }
+
+  cv::Mat converted = cv::Mat(matrix.rows, matrix.cols, CV_8UC3);
+
+  int i,j;
+  const unsigned char* p_in;
+  unsigned char* p_converted;
+  for (i = 0; i < rows; ++i)
+  {
+    p_in = matrix.ptr<unsigned char>(i);
+    p_converted = converted.ptr<unsigned char>(i);
+    for ( j = 0; j < cols; ++j)
+    {
+      size_t v = static_cast<size_t>(p_in[j]);
+      // channel 0
+      p_converted[3 * j + 0] = mLookupTableB.at(v);
+      // channel 1
+      p_converted[3 * j + 1] = mLookupTableG.at(v);
+      // channel 2
+      p_converted[3 * j + 2] = mLookupTableR.at(v);
+    }
+  }
+
+  return converted;
+}
+
+cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) const
+{
+  CEDAR_DEBUG_ASSERT(in.channels() == 1);
 
   switch (this->mDataType)
   {
@@ -481,41 +529,7 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
 
     case DATA_TYPE_MAT:
     {
-      // accept only char type matrices
-      CEDAR_ASSERT(in.depth() != sizeof(char));
-
-      int channels = in.channels();
-
-      int rows = in.rows * channels;
-      int cols = in.cols;
-
-      if (in.isContinuous())
-      {
-          cols *= rows;
-          rows = 1;
-      }
-
-      cv::Mat converted = cv::Mat(in.rows, in.cols, CV_8UC3);
-
-      int i,j;
-      const unsigned char* p_in;
-      unsigned char* p_converted;
-      for( i = 0; i < rows; ++i)
-      {
-          p_in = in.ptr<unsigned char>(i);
-          p_converted = converted.ptr<unsigned char>(i);
-          for ( j = 0; j < cols; ++j)
-          {
-            size_t v = static_cast<size_t>(p_in[j]);
-            // channel 0
-            p_converted[3 * j + 0] = mLookupTableB.at(v);
-            // channel 1
-            p_converted[3 * j + 1] = mLookupTableG.at(v);
-            // channel 2
-            p_converted[3 * j + 2] = mLookupTableR.at(v);
-          }
-      }
-      return converted;
+      return cedar::aux::gui::ImagePlot::colorizedMatrix(in);
     }
   }
 }
@@ -546,6 +560,15 @@ void cedar::aux::gui::ImagePlot::plot(cedar::aux::ConstDataPtr data, const std::
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
                 "Cannot cast to cedar::aux::MatData in cedar::aux::gui::ImagePlot::plot.");
+  }
+
+  if (this->mData->getDimensionality() > 2)
+  {
+    mpImageDisplay->setText("cannot display matrices of dimensionality > 2");
+    // start the timer anyway
+    this->mTimerId = this->startTimer(70);
+    CEDAR_DEBUG_ASSERT(mTimerId != 0);
+    return;
   }
 
   this->mDataColorSpace.reset();

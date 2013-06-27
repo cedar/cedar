@@ -74,11 +74,6 @@ cedar::proc::Manager::~Manager()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::FrameworkSettings& cedar::proc::Manager::settings()
-{
-  return this->mSettings;
-}
-
 void cedar::proc::Manager::loadDefaultPlugins()
 {
   const std::set<std::string>& plugins = cedar::proc::gui::Settings::instance().pluginsToLoad();

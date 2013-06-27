@@ -104,6 +104,7 @@ mpConsistencyDock(NULL)
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(modeFinished()),
                    this, SLOT(architectureToolFinished()));
   QObject::connect(this->mpThreadsStartAll, SIGNAL(triggered()), this, SLOT(startThreads()));
+  QObject::connect(this->mpThreadsSingleStep, SIGNAL(triggered()), this, SLOT(stepThreads()));
   QObject::connect(this->mpThreadsStopAll, SIGNAL(triggered()), this, SLOT(stopThreads()));
   QObject::connect(this->mpActionNew, SIGNAL(triggered()), this, SLOT(newFile()));
   QObject::connect(this->mpActionSave, SIGNAL(triggered()), this, SLOT(save()));
@@ -634,6 +635,11 @@ void cedar::proc::gui::Ide::logError(const std::string& message)
 void cedar::proc::gui::Ide::startThreads()
 {
   this->mNetwork->getNetwork()->startTriggers();
+}
+
+void cedar::proc::gui::Ide::stepThreads()
+{
+  this->mNetwork->getNetwork()->stepTriggers();
 }
 
 void cedar::proc::gui::Ide::stopThreads()

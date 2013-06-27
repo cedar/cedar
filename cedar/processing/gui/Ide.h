@@ -117,6 +117,10 @@ public slots:
    */
   void stopThreads();
 
+  /*!@brief Single-step all looped triggers (and other derivatives of looped thread).
+   */
+  void stepThreads();
+
   /*!@brief Slot that is connected to the "new" item in the file menu.
    */
   void newFile();

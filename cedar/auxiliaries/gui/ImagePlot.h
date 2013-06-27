@@ -78,6 +78,7 @@ namespace cedar
 
           signals:
             void done();
+            void failed();
 
           public:
             cedar::aux::gui::ImagePlot *mpPlot;
@@ -166,6 +167,10 @@ public:
    */
   void setSmoothScaling(bool smooth);
 
+  /*!@brief Applies a color scale to a matrix.
+   */
+  static cv::Mat colorizedMatrix(cv::Mat matrix);
+
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
   void convert();
@@ -199,6 +204,7 @@ private:
 
 private slots:
   void conversionDone();
+  void conversionFailed();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
