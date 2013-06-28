@@ -99,6 +99,7 @@ void cedar::proc::Triggerable::callOnStart()
 
   // count how often this triggerable was started
   ++this->mStartCalls;
+
   locker.unlock();
 
   if (mFinished)
@@ -114,6 +115,7 @@ void cedar::proc::Triggerable::callOnStop()
 {
   // only call onStop if there is only one trigger left that started this triggerable
   QMutexLocker locker(this->mpStartCallsLock);
+
   if (this->mStartCalls == 1)
   {
     this->onStop();
