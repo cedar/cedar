@@ -138,6 +138,9 @@ public:
   //!@brief The standard constructor.
   ImagePlot(QWidget *pParent = NULL);
 
+  //!@brief Constructor that plots some data.
+  ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
+
   //!@todo implement this constructor (see SurfacePlot.cpp)
   // ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
 
@@ -163,6 +166,11 @@ public:
   /*!@brief Set the scaling mode of the plot.
    */
   void setSmoothScaling(bool smooth);
+
+  /*!@brief Applies a color scale to a matrix.
+   * @todo Put this functionality into its own class.
+   */
+  static cv::Mat colorizedMatrix(cv::Mat matrix);
 
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
@@ -192,6 +200,8 @@ private:
   /*!@brief Creates the image based on the matrix.
    */
   void imageFromMat(const cv::Mat& mat);
+
+  void construct();
 
 private slots:
   void conversionDone();

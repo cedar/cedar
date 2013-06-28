@@ -80,6 +80,10 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(TriggerConnection);
     CEDAR_DECLARE_PROC_CLASS(ProjectionMapping);
     CEDAR_DECLARE_PROC_CLASS_INTRUSIVE(ProjectionMappingParameter);
+
+    // consistency issues
+    CEDAR_DECLARE_PROC_CLASS(ConsistencyIssue);
+    CEDAR_DECLARE_PROC_CLASS(LoopedStepNotConnected);
     //!@endcond
 
     //!@cond SKIPPED_DOCUMENTATION
@@ -117,7 +121,6 @@ namespace cedar
     class CEDAR_PROC_LIB_EXPORT NoCheckException;
     class CEDAR_PROC_LIB_EXPORT NoMappingException;
     class CEDAR_PROC_LIB_EXPORT NoMeasurementException;
-    class CEDAR_PROC_LIB_EXPORT ParseException;
     class CEDAR_PROC_LIB_EXPORT PluginException;
     //!@endcond
   }

@@ -81,12 +81,14 @@ mpEndEffectorCoordinateFrame(pEndEffector)
 //! destructor
 cedar::dev::robot::KinematicChain::~KinematicChain()
 {
-  // TODO: jokeit: is this necessary? seems buggy.
+#if 0
+// JS: already being checked in LoopedThread
   if (isRunning())
   {
     this->stop();
     this->wait();
   }
+#endif
 }
 
 //! constructor
@@ -613,10 +615,10 @@ void cedar::dev::robot::KinematicChain::initializeFromJointList()
     mReferenceJointTransformations.push_back(T.clone());
 
     // create storage variables for intermediate results
-    mTwistExponentials.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
-    mProductsOfExponentials.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
-    mJointTransformations.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
-    mJointTwists.push_back(cv::Mat::zeros(6, 1, CV_64FC1));
+    mTwistExponentials.push_back(cv::Mat::eye(4, 4, CV_64FC1));
+    mProductsOfExponentials.push_back(cv::Mat::eye(4, 4, CV_64FC1));
+    mJointTransformations.push_back(cv::Mat::eye(4, 4, CV_64FC1));
+    mJointTwists.push_back(cv::Mat::eye(6, 1, CV_64FC1));
   }
 
   // end-effector
@@ -653,7 +655,7 @@ void cedar::dev::robot::KinematicChain::applyVelocityLimits(cv::Mat& /*velocitie
 /*
  * Overwritten start function of QThread
  */
-void cedar::dev::robot::KinematicChain::start(Priority priority)
+void cedar::dev::robot::KinematicChain::start()
 {
   if (isRunning())
   {
@@ -667,7 +669,7 @@ void cedar::dev::robot::KinematicChain::start(Priority priority)
     cedar::aux::LogSingleton::getInstance()->error
     (
       "Error: KinematicChain is in working mode STOP!",
-      "cedar::dev::robot::KinematicChain::start(Priority)"
+      "cedar::dev::robot::KinematicChain::start()"
     );
     return;
 
@@ -676,7 +678,7 @@ void cedar::dev::robot::KinematicChain::start(Priority priority)
     cedar::aux::LogSingleton::getInstance()->error
     (
       "KinematicChain refuses to work as a thread in ANGLE mode!",
-      "cedar::dev::robot::KinematicChain::start(Priority)"
+      "cedar::dev::robot::KinematicChain::start()"
     );
     return;
   case VELOCITY:
@@ -688,7 +690,7 @@ void cedar::dev::robot::KinematicChain::start(Priority priority)
       mJointAngles = tmp;
     }
 
-    QThread::start(priority);
+    LoopedThread::start();
     break;
   }
 

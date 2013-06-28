@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/gui/ArchitectureConsistencyCheck.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/SettingsDialog.h"
@@ -68,6 +69,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui)
+:
+mpConsistencyChecker(NULL),
+mpConsistencyDock(NULL)
 {
   this->setupUi(this);
 
@@ -99,6 +103,7 @@ cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui)
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(modeFinished()),
                    this, SLOT(architectureToolFinished()));
   QObject::connect(this->mpThreadsStartAll, SIGNAL(triggered()), this, SLOT(startThreads()));
+  QObject::connect(this->mpThreadsSingleStep, SIGNAL(triggered()), this, SLOT(stepThreads()));
   QObject::connect(this->mpThreadsStopAll, SIGNAL(triggered()), this, SLOT(stopThreads()));
   QObject::connect(this->mpActionNew, SIGNAL(triggered()), this, SLOT(newFile()));
   QObject::connect(this->mpActionSave, SIGNAL(triggered()), this, SLOT(save()));
@@ -185,6 +190,7 @@ cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui)
   QObject::connect(mpActionSelectAll, SIGNAL(triggered()), this, SLOT(selectAll()));
 
   QObject::connect(mpActionToggleTriggerVisibility, SIGNAL(triggered(bool)), this, SLOT(showTriggerConnections(bool)));
+  QObject::connect(mpActionArchitectureConsistencyCheck, SIGNAL(triggered()), this, SLOT(showConsistencyChecker()));
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -195,6 +201,23 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::showConsistencyChecker()
+{
+  if (this->mpConsistencyDock == NULL)
+  {
+    this->mpConsistencyDock = new QDockWidget(this);
+    this->mpConsistencyDock->setFloating(true);
+    this->mpConsistencyDock->setWindowTitle("consistency check");
+    this->mpConsistencyDock->setAllowedAreas(Qt::NoDockWidgetArea);
+    this->mpConsistencyChecker
+      = new cedar::proc::gui::ArchitectureConsistencyCheck(this->mpProcessingDrawer, this->mpProcessingDrawer->getScene());
+    this->mpConsistencyChecker->setNetwork(this->mNetwork);
+    this->mpConsistencyDock->setWidget(this->mpConsistencyChecker);
+  }
+
+  this->mpConsistencyDock->show();
+}
 
 void cedar::proc::gui::Ide::exportSvg()
 {
@@ -411,6 +434,11 @@ void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
   this->mpProcessingDrawer->getScene()->reset();
   this->mNetwork->addElementsToScene();
   this->mpPropertyTable->resetContents();
+
+  if (this->mpConsistencyChecker != NULL)
+  {
+    this->mpConsistencyChecker->setNetwork(network);
+  }
 }
 
 void cedar::proc::gui::Ide::architectureToolFinished()
@@ -591,6 +619,11 @@ void cedar::proc::gui::Ide::logError(const std::string& message)
 void cedar::proc::gui::Ide::startThreads()
 {
   this->mNetwork->getNetwork()->startTriggers();
+}
+
+void cedar::proc::gui::Ide::stepThreads()
+{
+  this->mNetwork->getNetwork()->stepTriggers();
 }
 
 void cedar::proc::gui::Ide::stopThreads()

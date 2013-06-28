@@ -56,12 +56,16 @@
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/Data.h"
-#include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/assert.h"
+
+#include "cedar/processing/consistency/LoopedStepNotConnected.h"
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/string_path.hpp>
+#include <boost/make_shared.hpp>
 #include <algorithm>
 
 // Define that helps to debug file reading.
@@ -131,32 +135,133 @@ cedar::proc::Network::~Network()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::Network::startTriggers()
+std::vector<cedar::proc::ConsistencyIssuePtr> cedar::proc::Network::checkConsistency() const
 {
+  std::vector<cedar::proc::ConsistencyIssuePtr> issues;
+  std::vector<cedar::proc::LoopedTriggerPtr> looped_triggers = listLoopedTriggers();
+
+  // Check for looped steps that are not connected to looped triggers
+  for (auto iter = this->elements().begin(); iter != this->elements().end(); ++iter)
+  {
+    cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(iter->second);
+
+    if (!step)
+    {
+      continue;
+    }
+
+    if (step->isLooped())
+    {
+      bool is_triggered = false;
+      // check if there is a looped trigger to which this element is connected
+      for (size_t i = 0; i < looped_triggers.size(); ++i)
+      {
+        cedar::proc::LoopedTriggerPtr trigger = looped_triggers[i];
+        if (trigger->isListener(step))
+        {
+          is_triggered = true;
+          break;
+        }
+      }
+
+      if (!is_triggered)
+      {
+        issues.push_back(boost::make_shared<cedar::proc::LoopedStepNotConnected>(step));
+      }
+    } // end is looped
+  }
+
+  return issues;
+}
+
+std::vector<cedar::proc::LoopedTriggerPtr> cedar::proc::Network::listLoopedTriggers() const
+{
+  std::vector<cedar::proc::LoopedTriggerPtr> triggers;
+
   for (auto iter = this->elements().begin(); iter != this->elements().end(); ++iter)
   {
     cedar::proc::ElementPtr element = iter->second;
     if (cedar::proc::LoopedTriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(element))
     {
-      if (!trigger->isRunning())
+      triggers.push_back(trigger);
+    }
+  }
+
+  return triggers;
+}
+
+void cedar::proc::Network::startTriggers(bool wait)
+{
+  std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
+
+  for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
+  {
+    auto trigger = *iter;
+    if (!trigger->isRunning())
+    {
+      trigger->startTrigger();
+    }
+  }
+
+  if (wait)
+  {
+    for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
+    {
+      auto trigger = *iter;
+      while (!trigger->isRunning())
       {
-        trigger->startTrigger();
+        cedar::aux::sleep(cedar::unit::Milliseconds(5));
       }
     }
   }
 }
 
-void cedar::proc::Network::stopTriggers()
+void cedar::proc::Network::stopTriggers(bool wait)
 {
-  for (auto iter = this->elements().begin(); iter != this->elements().end(); ++iter)
+  std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
+
+  for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
   {
-    cedar::proc::ElementPtr element = iter->second;
-    if (cedar::proc::LoopedTriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(element))
+    auto trigger = *iter;
+    if (trigger->isRunning())
     {
-      if (trigger->isRunning())
+      trigger->stopTrigger();
+    }
+  }
+
+  if (wait)
+  {
+    for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
+    {
+      auto trigger = *iter;
+      while (trigger->isRunning())
       {
-        trigger->stopTrigger();
+        cedar::aux::sleep(cedar::unit::Milliseconds(5));
       }
+    }
+  }
+}
+
+void cedar::proc::Network::stepTriggers()
+{
+  std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
+  double time_step = std::numeric_limits<double>::max();
+  // find the shortest time step of all triggers
+  for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
+  {
+    auto trigger = *iter;
+    if (trigger->getSimulatedTimeParameter() < time_step)
+    {
+      time_step = trigger->getSimulatedTimeParameter();
+    }
+  }
+  // step all triggers with this time step
+  for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
+  {
+    auto trigger = *iter;
+    if (!trigger->isRunning())
+    {
+      trigger->step(time_step);
     }
   }
 }

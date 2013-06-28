@@ -386,7 +386,7 @@ public:
    * If you want to use velocity or acceleration control but your hardware
    * does not support this, start the thread to "simulate" these values.
    */
-  virtual void start(Priority priority = InheritPriority);
+  virtual void start();
 #endif  
 
   /*!@brief returns a smart-pointer to the local coordinate frame of the end-effector
@@ -607,7 +607,7 @@ protected:
   // private methods
   //----------------------------------------------------------------------------
 private:
-  void step(double time);
+  virtual void step(double time);
   void init();
   void initializeFromJointList();
   void applyAngleLimits(cv::Mat& angles);

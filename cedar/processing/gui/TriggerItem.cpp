@@ -250,6 +250,7 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
     QMenu menu;
     QAction *p_start = menu.addAction("start");
     QAction *p_stop = menu.addAction("stop");
+    QAction *p_single = menu.addAction("single step");
 
     menu.addSeparator();
     p_scene->networkGroupingContextMenuEvent(menu);
@@ -257,6 +258,7 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
     if (looped_trigger->isRunning())
     {
       p_start->setEnabled(false);
+      p_single->setEnabled(false);
     }
     else
     {
@@ -272,6 +274,10 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
     else if (a == p_stop)
     {
       looped_trigger->stopTrigger();
+    }
+    else if (a == p_single)
+    {
+      looped_trigger->step(looped_trigger->getSimulatedTimeParameter());
     }
   }
   else

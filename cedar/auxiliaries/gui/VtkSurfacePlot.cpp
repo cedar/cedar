@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -253,18 +253,18 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
   void cedar::aux::gui::VtkSurfacePlot::setupCamera(vtkCamera* pCamera, const cv::Mat& data)
   {
     // the center of the plot should be our focal point
-    pCamera->SetFocalPoint(data.rows / 2,data.cols / 2, 0);
+    pCamera->SetFocalPoint(data.cols / 2,data.rows / 2, 0);
     // we assume a camera view angle of 30 degrees (this is the standard camera view angle in vtk)
     CEDAR_DEBUG_ASSERT(pCamera->GetViewAngle() == 30.0);
 
     // dd is the minimum distance to view the diagonal d of the bounding box; 0.2618 rad == 15 degree
-    double dd = sqrt(pow(cedar::aux::math::max(data), 2.0) + pow(data.rows, 2.0) + pow(data.cols, 2.0)) / (2.0 * tan(0.2618));
+    double dd = sqrt(pow(cedar::aux::math::max(data), 2.0) + pow(data.cols, 2.0) + pow(data.rows, 2.0)) / (2.0 * tan(0.2618));
     // h is a suitable height to view the plot, it is 1.5 times the length of a cathetus in a isoscele-right triangle (45-45-90)
     double h = sqrt(1.5 * dd / 2.0);
     // point A of that isoscele-right triangle lies in the center of the bounding box, thus the coordinates for the camera are...
     double z = 3.0 * h + (cedar::aux::math::max(data));
-    double y = -data.cols - h * 3.0;
-    pCamera->SetPosition(data.rows/2.0, y, z);
+    double y = -data.rows - h * 3.0;
+    pCamera->SetPosition(data.cols/2.0, y, z);
     pCamera->SetClippingRange(0.1, 1.5 * dd);
   }
 
@@ -283,7 +283,7 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
       return;
     }
 
-    if ((data.cols-1) != mpPlot->mpPlane->GetYResolution() || (data.rows-1) != mpPlot->mpPlane->GetXResolution())
+    if ((data.cols-1) != mpPlot->mpPlane->GetXResolution() || (data.rows-1) != mpPlot->mpPlane->GetYResolution())
     {
       mpPlot->buildPlane(static_cast<unsigned int>(data.cols), static_cast<unsigned int>(data.rows));
       mpPlot->setupCamera(mpPlot->mpRenderer->GetActiveCamera(), data);

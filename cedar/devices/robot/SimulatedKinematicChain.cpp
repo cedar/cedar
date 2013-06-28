@@ -52,11 +52,14 @@ cedar::dev::robot::SimulatedKinematicChain::SimulatedKinematicChain()
 
 cedar::dev::robot::SimulatedKinematicChain::~SimulatedKinematicChain()
 {
+#if 0  
+// JS: already being checked in LoopedThread
   if (isRunning())
   {
     this->stop();
     this->wait();
   }
+#endif  
 }
 
 //----------------------------------------------------------------------------------------------------------------------
