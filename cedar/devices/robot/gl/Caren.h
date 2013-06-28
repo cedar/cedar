@@ -88,14 +88,14 @@ protected:
 private:
   //!@brief draws the base
   void drawBase();
-  //!@brief draws a camera
+  //!@brief draws the head
+  void drawHead();
+  //!@brief draws a single camera
   void drawCamera();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -106,8 +106,10 @@ private:
   cedar::dev::robot::KinematicChainPtr mFingerOne;
   cedar::dev::robot::KinematicChainPtr mFingerTwo;
   cedar::dev::robot::KinematicChainPtr mFingerThree;
+  cedar::dev::robot::gl::KinematicChainPtr mTrunkVisualization;
   cedar::dev::robot::gl::KinematicChainPtr mArmVisualization;
   cedar::dev::robot::gl::SdhPtr mHandVisualization;
+  cedar::dev::robot::gl::KinematicChainPtr mHeadVisualization;
 
 }; // class cedar::dev::robot::gl::Caren
 #endif // CEDAR_DEV_ROBOT_GL_CAREN_H

@@ -120,7 +120,7 @@ private:
   cedar::aux::ConstMatDataPtr mData;
 
   //!@brief the plot widget
-  QWidget *mpCurrentPlotWidget;
+  QWidget* mpCurrentPlotWidget;
 
   //!@brief vector filled with standard colors
   static Qwt3D::ColorVector mStandardColorVector;

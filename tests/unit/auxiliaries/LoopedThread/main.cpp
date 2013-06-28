@@ -36,9 +36,18 @@
 
 
 #include "cedar/auxiliaries/LoopedThread.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 
 #include <cstdlib>
 #include <iostream>
+
+#include <QCoreApplication>
+
+#include <boost/lexical_cast.hpp>
+
+// global variables
+int errors = 0;
+QCoreApplication* app;
 
 //!@brief threaded test class
 class MyTestThread : public cedar::aux::LoopedThread
@@ -135,7 +144,9 @@ int testConfiguration
   // the thread should at least run for two iterations
   if (thread.mCounter < 2)
   {
-    std::cout << "ERROR: the thread didn't iterate often enough." << std::endl;
+    std::cout << "ERROR: the thread didn't iterate often enough, only " 
+              << boost::lexical_cast<std::string>(thread.mCounter) 
+              << " times." << std::endl;
     ++errors;
   }
   thread.stop();
@@ -150,10 +161,9 @@ int testConfiguration
 }
 
 
-int main()
-{
-  int errors = 0;
 
+void runTests()
+{
   double timeInterval = 100.0;  // milliseconds
   MyTestThread thread(timeInterval);
   //thread.useFixedStepSize(false);
@@ -164,6 +174,31 @@ int main()
   thread.wait(1000);
   std::cout << "Stopping thread ..." << std::endl;
   thread.stop();
+  if (thread.isRunning())
+  {
+    std::cout << "... Thread NOT stopped! error" << std::endl;
+    errors++;
+    return;
+  }
+  else
+  {
+    //std::cout << "... thread stopped." << std::endl;
+  }
+
+  std::cout << "Immediately stopping a thread should invalidate a start ..." << std::endl;
+  thread.start();
+  thread.stop();
+
+  if (thread.isRunning())
+  {
+    std::cout << "... Thread NOT stopped! error" << std::endl;
+    errors++;
+    return;
+  }
+  else
+  {
+    std::cout << "... thread immediately stopped. OK." << std::endl;
+  }
 
   std::cout << std::endl;
   std::cout << "Starting thread again with an artificially unreliable execution time ..." << std::endl;
@@ -172,6 +207,7 @@ int main()
   thread.wait(1000);
   std::cout << "Stopping thread ..." << std::endl;
   thread.stop();
+
   thread.setArtificalDelay(false);
 
   std::cout << std::endl;
@@ -185,6 +221,23 @@ int main()
   errors += testConfiguration(0.0, 0.01, 1, cedar::aux::LoopMode::Fixed);
 
   std::cout << "Test finished, there were " << errors << " error(s)." << std::endl;
+}
+
+int main(int argc, char* argv[])
+{
+  app = new QCoreApplication(argc,argv);
+
+  auto testThread = new cedar::aux::CallFunctionInThread(runTests);
+
+  QObject::connect( testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection );  // alternatively: call app->quit() in runTests()
+
+  testThread->start();
+  app->exec();
+
+  delete testThread;
+  delete app;
 
   return errors;
 }
+
+

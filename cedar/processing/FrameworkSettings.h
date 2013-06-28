@@ -56,14 +56,16 @@ class cedar::proc::FrameworkSettings : public cedar::aux::Configurable
   // friend
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::gui::FrameworkSettings;
+  friend class cedar::aux::Singleton<cedar::proc::FrameworkSettings>;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-public:
+private:
   //!@brief The standard constructor.
   FrameworkSettings();
 
+public:
   //!@brief The destructor.
   ~FrameworkSettings();
 
@@ -138,5 +140,25 @@ private:
   // none yet
 
 }; // class cedar::proc::FrameworkSettings
+
+
+namespace cedar
+{
+  namespace proc
+  {
+#ifdef MSVC
+#ifdef CEDAR_LIB_EXPORTS_PROC
+    // dllexport
+    template class __declspec(dllexport) cedar::aux::Singleton<cedar::proc::FrameworkSettings>;
+#else // CEDAR_LIB_EXPORTS_PROC
+    // dllimport
+    extern template class __declspec(dllimport) cedar::aux::Singleton<cedar::proc::FrameworkSettings>;
+#endif // CEDAR_LIB_EXPORTS_PROC
+#endif // MSVC
+
+    //!@brief The singleton instance of the framework settings.
+    typedef cedar::aux::Singleton<cedar::proc::FrameworkSettings> FrameworkSettingsSingleton;
+  }
+}
 
 #endif // CEDAR_PROC_FRAMEWORK_SETTINGS_H

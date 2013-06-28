@@ -99,7 +99,7 @@ public:
    * the KinematicChain class does some things in this function that are not needed
    * @param priority thread priority
    */
-  virtual void start(Priority priority = InheritPriority);
+  virtual void start();
 
   /*Wrapping of some FRI-Functions that are needed for ensuring connection quality*/
 
@@ -133,6 +133,12 @@ public:
    */
   bool isPowerOn() const;
 
+  /*!@brief every step is used to do communication between FRI and KUKA-RC
+   *
+   * if in velocity- or acceleration mode, every step will also change joint angles/velocity
+   * @parameter time is not used
+   */
+  void step(double time);
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -150,12 +156,7 @@ private:
    */
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
-  /*!@brief every step is used to do communication between FRI and KUKA-RC
-   *
-   * if in velocity- or acceleration mode, every step will also change joint angles/velocity
-   * @parameter time is not used
-   */
-  void step(double time);
+
 
   //!@brief copies data from the FRI to member variables for access from outside the loop thread
   void copyFromFRI();

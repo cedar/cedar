@@ -117,6 +117,10 @@ public slots:
    */
   void stopThreads();
 
+  /*!@brief Single-step all looped triggers (and other derivatives of looped thread).
+   */
+  void stepThreads();
+
   /*!@brief Slot that is connected to the "new" item in the file menu.
    */
   void newFile();
@@ -205,6 +209,10 @@ public slots:
    */
   void showTriggerConnections(bool show);
 
+  /*!@brief Shows a dialog for architecture consistency checking.
+   */
+  void showConsistencyChecker();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -269,6 +277,12 @@ private:
 
   //! The network currently displayed.
   cedar::proc::gui::NetworkPtr mNetwork;
+
+  //! Architecture consistency check widget.
+  cedar::proc::gui::ArchitectureConsistencyCheck* mpConsistencyChecker;
+
+  //! Dock widget for the consistency checker.
+  QDockWidget* mpConsistencyDock;
 
 }; // class cedar::MainWindow
 

@@ -85,7 +85,7 @@ cedar::dev::kuka::KinematicChain::~KinematicChain()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::kuka::KinematicChain::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
-  this->cedar::aux::Configurable::readConfiguration(node);
+  this->cedar::dev::robot::KinematicChain::readConfiguration(node);
 
   // create a new Instance of the friRemote
   if (_mRemoteHost->getValue() != "NULL")
@@ -101,7 +101,7 @@ void cedar::dev::kuka::KinematicChain::readConfiguration(const cedar::aux::Confi
   copyFromFRI();
 
   //set step size and idle time for the looped thread
-  setStepSize(0);
+  setStepSize(12.0);
   setIdleTime(0.01);
   //start the thread
   start();
@@ -163,14 +163,15 @@ void cedar::dev::kuka::KinematicChain::setJointAngle(unsigned int index, double 
  * Overwritten start function of KinematicChain
  * the function inherited from KinematicChain does some things we do not want.
  */
-void cedar::dev::kuka::KinematicChain::start(Priority priority)
+void cedar::dev::kuka::KinematicChain::start()
 {
   if (isRunning())
   {
     return;
   }
 
-  QThread::start(priority);
+  //QThread::start();
+  cedar::dev::robot::KinematicChain::start();
 }
 //----------------------------------------------------------------------------------------------------------------------
 // private member functions
