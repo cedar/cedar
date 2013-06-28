@@ -59,6 +59,11 @@
 class cedar::proc::Connectable : public cedar::proc::Element, public cedar::aux::Lockable
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::Network;
+  friend class cedar::proc::Step;
+  //--------------------------------------------------------------------------------------------------------------------
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -174,6 +179,7 @@ public:
                 std::string& connectableName,
                 std::string& dataName
               );
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -350,6 +356,8 @@ protected:
     return iter->second;
   }
 
+  void emitOutputPropertiesChangedSignal(const std::string& slot);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -439,6 +447,15 @@ public:
     return this->mSlotRemoved.connect(slot);
   }
 
+  //! connect to the output slot properties altered signal, which deals with revalidation
+  inline boost::signals2::connection connectToOutputPropertiesChanged
+                                     (
+                                       boost::function<void (const std::string&)> slot
+                                     )
+  {
+    return this->mOutputPropertiesChanged.connect(slot);
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -451,6 +468,9 @@ protected:
 
   //!@brief Lock for making accesses to the connections thread-safe.
   QReadWriteLock* mpConnectionLock;
+
+  // signal that is emitted if the properties of an output require data revalidation along connections
+  boost::signals2::signal<void (const std::string&)> mOutputPropertiesChanged;
 private:
   //!@brief a map of slot maps, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
   std::map<DataRole::Id, SlotMap> mSlotMaps;

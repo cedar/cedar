@@ -597,3 +597,9 @@ bool cedar::proc::Step::isThreaded() const
 {
   return this->_mRunInThread->getValue();
 }
+
+void cedar::proc::Step::callInputConnectionChanged(const std::string& slot)
+{
+  this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
+  this->inputConnectionChanged(slot);
+}

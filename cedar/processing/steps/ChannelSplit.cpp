@@ -242,7 +242,12 @@ void cedar::proc::steps::ChannelSplit::inputConnectionChanged(const std::string&
     // do nothing
     break;
   }
-
+  //!@todo fix this
+  this->onTrigger();
+  this->emitOutputPropertiesChangedSignal("channel 1");
+  this->emitOutputPropertiesChangedSignal("channel 2");
+  this->emitOutputPropertiesChangedSignal("channel 3");
+  this->emitOutputPropertiesChangedSignal("channel 4");
   this->onTrigger();
 }
 

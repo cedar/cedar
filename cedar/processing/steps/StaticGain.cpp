@@ -133,4 +133,5 @@ void cedar::proc::steps::StaticGain::inputConnectionChanged(const std::string& i
   this->mOutput->setData(input.clone());
 
   this->mOutput->copyAnnotationsFrom(this->mInput);
+  this->emitOutputPropertiesChangedSignal("output");
 }
