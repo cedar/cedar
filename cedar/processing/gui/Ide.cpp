@@ -75,6 +75,8 @@ mpConsistencyDock(NULL)
 {
   this->setupUi(this);
 
+  this->mDefaultWindowTitle = this->windowTitle();
+
   // first, setup the log to receive messages
   if (redirectLogToGui)
   {
@@ -201,6 +203,11 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::displayFilename(const std::string& filename)
+{
+  this->setWindowTitle(this->mDefaultWindowTitle + " - " + QString::fromStdString(filename));
+}
 
 void cedar::proc::gui::Ide::showConsistencyChecker()
 {
@@ -635,6 +642,8 @@ void cedar::proc::gui::Ide::newFile()
 {
   this->mpActionSave->setEnabled(false);
   this->resetTo(cedar::proc::gui::NetworkPtr(new cedar::proc::gui::Network(this, this->mpProcessingDrawer->getScene())));
+
+  this->displayFilename("unnamed file");
 }
 
 void cedar::proc::gui::Ide::save()
@@ -661,6 +670,8 @@ void cedar::proc::gui::Ide::saveAs()
     }
 
     this->mNetwork->write(file.toStdString());
+    //!@todo It would probably be better if the network sends a signal whenever its filename changes and the gui just reacted to that.
+    this->displayFilename(file.toStdString());
 
     cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(file.toStdString());
 
@@ -670,6 +681,7 @@ void cedar::proc::gui::Ide::saveAs()
     QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
     cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureLoadDialogDirectory();
     last_dir->setValue(path);
+
   }
 }
 
@@ -753,6 +765,8 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   this->mpActionSave->setEnabled(true);
 
   this->mNetwork = network;
+
+  this->displayFilename(file.toStdString());
 
   cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(file.toStdString());
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
