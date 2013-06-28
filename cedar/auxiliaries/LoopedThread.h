@@ -105,7 +105,6 @@
  *
  * \todo Use units instead of doubles
  */
-// TODO: js: I don't get the last paragraph, is it still valid?
 class cedar::aux::LoopedThread : public cedar::aux::ThreadWrapper
 {
   Q_OBJECT
@@ -190,61 +189,61 @@ public:
   //! get the duration of the fixed trigger step
   inline double getStepSize() const
   {
-    QReadLocker locker(&mStepSizeLock);
-
-    return this->_mStepSize->getValue();
+    QReadLocker locker(this->_mStepSize->getLock());
+		double value = this->_mStepSize->getValue();
+    return value;
   }
 
   //! get the duration of the fixed trigger step
   inline double getStepSize() 
   {
-    QReadLocker locker(&mStepSizeLock);
-
-    return this->_mStepSize->getValue();
+    QReadLocker locker(this->_mStepSize->getLock());
+		double value = this->_mStepSize->getValue();
+    return value;
   }
 
   //! get the idle time that is used in-between sending trigger signals
   inline double getIdleTimeParameter() const
   {
-    QReadLocker locker(&mIdleTimeLock);
-
-    return this->_mIdleTime->getValue();
+    QReadLocker locker(this->_mIdleTime->getLock());
+		double value = this->_mIdleTime->getValue();
+    return value;
   }
 
   //! get the duration of the simulated time step
   inline double getSimulatedTimeParameter() const
   {
-    QReadLocker locker(&mSimulatedTimeLock);
-
-    return this->_mSimulatedTime->getValue();
+    QReadLocker locker(this->_mSimulatedTime->getLock());
+		double value = this->_mSimulatedTime->getValue();
+    return value;
   }
 
   //! get the loop mode
   inline cedar::aux::Enum getLoopModeParameter() const
   {
-    QReadLocker locker(&mLoopModeLock);
-
-    return this->_mLoopMode->getValue();
+    QReadLocker locker(this->_mLoopMode->getLock());
+    cedar::aux::Enum value = this->_mLoopMode->getValue();
+    return value;
   }
 
   //! get the the time of the LoopedThread's last step() entry
   inline boost::posix_time::ptime getLastTimeStepStart() const
   {
-    CEDAR_ASSERT( mpWorker != NULL );
+    CEDAR_ASSERT(mpWorker != NULL);
     return mpWorker->getLastTimeStepStart();
   }
 
   //! get the end of the LoopedThread's last step() exit
   inline boost::posix_time::ptime getLastTimeStepEnd() const
   {
-    CEDAR_ASSERT( mpWorker != NULL );
+    CEDAR_ASSERT(mpWorker != NULL);
     return mpWorker->getLastTimeStepEnd();
   }
 
   //! get the duration of the LoopedThread's last step() execution
   inline boost::posix_time::time_duration getLastTimeStepDuration() const
   {
-    CEDAR_ASSERT( mpWorker != NULL );
+    CEDAR_ASSERT(mpWorker != NULL);
     return mpWorker->getLastTimeStepDuration();
   }
 
@@ -302,15 +301,6 @@ private:
 
   //! The loop mode of the trigger
   cedar::aux::EnumParameterPtr _mLoopMode;
-
-  //! lock for _mStepSize
-  mutable QReadWriteLock mStepSizeLock;
-  //! lock for _mIdleTime
-  mutable QReadWriteLock mIdleTimeLock;
-  //! lock for _mSimulatedTime
-  mutable QReadWriteLock mSimulatedTimeLock;
-  //! lock for _mLoopMode
-  mutable QReadWriteLock mLoopModeLock;
 
 }; // class cedar::aux::LoopedThread
 

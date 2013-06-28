@@ -46,7 +46,6 @@
 #include "cedar/auxiliaries/net/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 
-
 // SYSTEM INCLUDES
 #include <iostream>
 #include <vector>

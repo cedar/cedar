@@ -65,7 +65,7 @@ namespace cedar
        * @param height extension in z-direction of current coordinate frame
        * @param wireFrame decides whether to draw full surfaces or only a wire frame
        */
-      CEDAR_AUX_LIB_EXPORT void drawBlock(double length, double width, double height, bool wireFrame=false);
+      CEDAR_AUX_LIB_EXPORT void drawBlock(double length, double width, double height, bool wireFrame = false);
       
       /*!@brief  draws a rectangular block in the current coordinate frame
        * @param front extension in positive x-direction of current coordinate frame
@@ -84,7 +84,7 @@ namespace cedar
         double left,
         double up,
         double down,
-        bool wireFrame=false
+        bool wireFrame = false
       );
 
       /*!@brief  draws a cone in direction of the z-axis of the current coordinate frame

@@ -139,7 +139,7 @@ void delete_test()
 
 void run_test()
 {
-  errors= 0;
+  errors = 0;
 
   cedar::aux::testing::test_time("create threads", create_test );
   cedar::aux::testing::test_time("start threads", start_test );
@@ -167,9 +167,7 @@ void run_test()
   cedar::aux::testing::write_measurement("num steps", num_steps_all7);
   cedar::aux::testing::write_measurement("real-step size", total_real_step_all );
   cedar::aux::testing::write_measurement("real-step max", max_real_step_all );
-  cedar::aux::testing::write_measurement("rel deviatiation", ( total_real_step_all 
-                                           / num_steps_all7 )
-                                        - STEP_SIZE );                                        
+  cedar::aux::testing::write_measurement("rel deviatiation", (total_real_step_all / num_steps_all7) - STEP_SIZE );                                        
   cedar::aux::testing::test_time("delete threads", delete_test );
 }
 
@@ -180,7 +178,7 @@ int main(int argc, char* argv[])
 
   auto testThread = new cedar::aux::CallFunctionInThread(run_test);
 
-  QObject::connect( testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection );  // alternatively: call app->quit() in runTests()
+  QObject::connect(testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection);  // alternatively: call app->quit() in runTests()
 
   testThread->start();
   app->exec();
@@ -190,5 +188,3 @@ int main(int argc, char* argv[])
 
   return errors;
 }
-
-

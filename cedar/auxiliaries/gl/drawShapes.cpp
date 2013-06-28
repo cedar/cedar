@@ -109,9 +109,9 @@ void cedar::aux::gl::drawBlock
 )
 {
   glTranslated(front, right, up); // translate to corner
-  glTranslated(-(front+back)*0.5, -(right+left)*0.5, -(up+down)*0.5); // translate to corner
-  cedar::aux::gl::drawBlock(front+back, right+left, up+down, wireFrame);
-  glTranslated((front+back)*0.5, (right+left)*0.5, (up+down)*0.5); // translate to center
+  glTranslated(-(front + back) * 0.5, -(right + left) * 0.5, -(up + down) * 0.5); // translate to corner
+  cedar::aux::gl::drawBlock(front + back, right + left, up + down, wireFrame);
+  glTranslated((front + back) * 0.5, (right + left) * 0.5, (up + down) * 0.5); // translate to center
   glTranslated(-front, -right, -up); // translate to previous point
 }
 

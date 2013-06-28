@@ -205,6 +205,7 @@ private:
   //!@brief The constructor.
   Log();
 
+	// Has to be wrapped to avoid circular dependencies between Log and Settings.
   bool getMemoryDebugFlag();
 
   //--------------------------------------------------------------------------------------------------------------------

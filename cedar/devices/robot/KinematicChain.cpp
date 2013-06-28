@@ -82,7 +82,7 @@ mpEndEffectorCoordinateFrame(pEndEffector)
 cedar::dev::robot::KinematicChain::~KinematicChain()
 {
 #if 0
-// JS: das wird schon in LoopedThread geprueft
+// JS: already being checked in LoopedThread
   if (isRunning())
   {
     this->stop();
