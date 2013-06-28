@@ -52,6 +52,7 @@ cedar_add_library(cedarproc
   MOC_HEADERS
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureToolBox.h
+  gui/BoostControl.h
   gui/ElementClassList.h
   gui/Ide.h
   gui/IdeApplication.h
