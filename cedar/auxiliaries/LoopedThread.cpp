@@ -62,7 +62,7 @@ _mLoopMode
   new cedar::aux::EnumParameter
   (
     this,
-    "loop mode", // ??? TODO do still need this here?
+    "loop mode",
     cedar::aux::LoopMode::typePtr(),
     mode
   )
@@ -143,21 +143,21 @@ void cedar::aux::LoopedThread::applyStop(bool suppressWarning)
 
 void cedar::aux::LoopedThread::setStepSize(double stepSize)
 {
-  QWriteLocker locker(&mStepSizeLock);
+  QWriteLocker locker(this->_mStepSize->getLock());
 
   this->_mStepSize->setValue(stepSize);
 }
 
 void cedar::aux::LoopedThread::setIdleTime(double idleTime)
 {
-  QWriteLocker locker(&mIdleTimeLock);
+  QWriteLocker locker(_mIdleTime->getLock());
 
   _mIdleTime->setValue(idleTime);
 }
 
 void cedar::aux::LoopedThread::setSimulatedTime(double simulatedTime)
 {
-  QWriteLocker locker(&mSimulatedTimeLock);
+  QWriteLocker locker(_mSimulatedTime->getLock());
 
   _mSimulatedTime->setValue(simulatedTime);
 }

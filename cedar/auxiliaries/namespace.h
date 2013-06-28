@@ -60,7 +60,7 @@ namespace cedar
       class CallFunctionInThreadWorker;
     }
 
-    /*!@brief Namespace for shared testing (unit-tests, etc) code. TODO: will be moved or changed in the near future */
+    /*!@brief Namespace for shared testing (unit-tests, etc) code. @todo: will be moved or changed in the near future */
     namespace testing
     {
     }

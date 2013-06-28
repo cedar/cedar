@@ -56,14 +56,16 @@ class cedar::proc::FrameworkSettings : public cedar::aux::Configurable
   // friend
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::gui::FrameworkSettings;
+  friend class cedar::aux::Singleton<cedar::proc::FrameworkSettings>;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-public:
+private:
   //!@brief The standard constructor.
   FrameworkSettings();
 
+public:
   //!@brief The destructor.
   ~FrameworkSettings();
 

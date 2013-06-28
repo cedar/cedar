@@ -168,6 +168,7 @@ public:
   void setSmoothScaling(bool smooth);
 
   /*!@brief Applies a color scale to a matrix.
+   * @todo Put this functionality into its own class.
    */
   static cv::Mat colorizedMatrix(cv::Mat matrix);
 

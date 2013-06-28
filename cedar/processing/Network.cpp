@@ -138,20 +138,9 @@ cedar::proc::Network::~Network()
 std::vector<cedar::proc::ConsistencyIssuePtr> cedar::proc::Network::checkConsistency() const
 {
   std::vector<cedar::proc::ConsistencyIssuePtr> issues;
+  std::vector<cedar::proc::LoopedTriggerPtr> looped_triggers = listLoopedTriggers();
 
-  // generate a list of all looped triggers in the architecture
-  //!@todo There should probably be a function for this.
-  std::vector<cedar::proc::LoopedTriggerPtr> looped_triggers;
-  for (auto iter = this->elements().begin(); iter != this->elements().end(); ++iter)
-  {
-    cedar::proc::ElementPtr element = iter->second;
-    if (cedar::proc::LoopedTriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(element))
-    {
-      looped_triggers.push_back(trigger);
-    }
-  }
-
-  // == Check for looped steps that are not connected to looped triggers ===============================================
+  // Check for looped steps that are not connected to looped triggers
   for (auto iter = this->elements().begin(); iter != this->elements().end(); ++iter)
   {
     cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(iter->second);
@@ -179,7 +168,7 @@ std::vector<cedar::proc::ConsistencyIssuePtr> cedar::proc::Network::checkConsist
       {
         issues.push_back(boost::make_shared<cedar::proc::LoopedStepNotConnected>(step));
       }
-    } // is looped
+    } // end is looped
   }
 
   return issues;

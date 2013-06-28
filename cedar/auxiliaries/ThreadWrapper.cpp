@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -95,13 +95,13 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
   mFinishedThreadMutex.lock(); 
   mFinishedThreadMutex.unlock();
 
-  ////////////////////////////////////////////////////////////////////////////
+  // //////////////////////////////////////////////////////////////////////////
   //
   // We are now sure that there is no concurrent running start(), stop() or
   // finishedThread() after this point. this means, only we will work on
   // the mpWorker and mpThread objects.
   //
-  ///////////////////////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////////////////////
 
   if (validWorker())
   {
@@ -200,9 +200,9 @@ void cedar::aux::ThreadWrapper::start()
   //              Communication is done via the QT event loops (also of the
   //              QThread object).
 
-  CEDAR_ASSERT( validWorker() == validThread() );
+  CEDAR_ASSERT(validWorker() == validThread());
 
-  if (isRunning())
+  if (this->isRunning())
   {
     cedar::aux::LogSingleton::getInstance()->warning
     (
@@ -211,9 +211,9 @@ void cedar::aux::ThreadWrapper::start()
     );
     return; // already running, don't do anything
   }
-  else if (!validThread())
+  else if (!this->validThread())
   {
-    CEDAR_ASSERT( !validWorker() );
+    CEDAR_ASSERT(!this->validWorker());
 
     // we need a new worker object:
     mpWorker = resetWorker(); // overridden by children
@@ -222,7 +222,7 @@ void cedar::aux::ThreadWrapper::start()
     mpWorker->moveToThread(mpThread); // workers event loop belongs to
                                       // the new thread
 
-    ////////// connect slots:
+    // //////// connect slots:
     // An important note: incoming slots to *this need to be connected
     // via Qt:DirectConnection and not be queued(!), because ...
     //   There is an obscure case that the thread holding (starting) *this 
@@ -293,7 +293,8 @@ void cedar::aux::ThreadWrapper::quittedThreadSlot()
     // note, mGeneralAccessLock can already be held by stop(), so dont use it
 
   // note, we cannot test isRunning(), here, per premise that we
-  // are operating without locks TODO: isRunning() has no locks anymore. still valid?
+  // are operating without locks
+  //!@todo isRunning() has no locks anymore. still valid?
 
   if (mDestructing) // always test after locking, see start()
     return;
@@ -302,8 +303,8 @@ void cedar::aux::ThreadWrapper::quittedThreadSlot()
   {
     //std::cout << "deleting thread: " << mpThread << " ( current thread: " << QThread::currentThread() << std::endl;    
 
-    // TODO: this will leak IF the upper thread will not have time to tick its event loop (ie when shutting down the app): not that important
-    // TODO: it will also lead to a destruction of a held mutex (in helgrind). not that important
+    //!@todo this will leak IF the upper thread will not have time to tick its event loop (ie when shutting down the app): not that important
+    //!@todo it will also lead to a destruction of a held mutex (in helgrind). not that important
     mpThread->deleteLater();
     mpThread = NULL; // allow me to restart a new thread/worker
 
@@ -317,26 +318,19 @@ void cedar::aux::ThreadWrapper::quittedThreadSlot()
     CEDAR_ASSERT( !validWorker() );
   }
 
-
   emit finishedThread();
 }
 
 bool cedar::aux::ThreadWrapper::validWorker() const
 {
   // this is intentionally not thread-safe
-
-  if (mpWorker == NULL)
-    return false;
-  return true;
+  return mpWorker != NULL;
 }
 
 bool cedar::aux::ThreadWrapper::validThread() const
 {
   // this is intentionally not thread-safe
-
-  if (mpThread == NULL)
-    return false;
-  return true;
+  return mpThread != NULL;
 }
 
 
@@ -400,7 +394,7 @@ void cedar::aux::ThreadWrapper::requestStop()
 bool cedar::aux::ThreadWrapper::stopRequested()
 {
   QReadLocker locker(&mStopRequestedLock);
-
-  return mStopRequested;
+	bool value = mStopRequested;
+  return value;
 }
 
