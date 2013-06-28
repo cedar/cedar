@@ -64,6 +64,7 @@ cedar_add_library(cedarproc
   gui/Network.h
   gui/ToolBox.h
   gui/View.h
+  sources/BoxInput.h
   sources/GaussInput.h
   steps/StaticGain.h
   steps/Convolution.h
