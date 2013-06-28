@@ -263,6 +263,10 @@ private:
    */
   void logError(const std::string& message);
 
+  /*!@brief Sets the filename in the title of the main window.
+   */
+  void displayFilename(const std::string& filename);
+
   /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
    */
   static bool sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem);
@@ -283,6 +287,8 @@ private:
 
   //! Dock widget for the consistency checker.
   QDockWidget* mpConsistencyDock;
+
+  QString mDefaultWindowTitle;
 
 }; // class cedar::MainWindow
 
