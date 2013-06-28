@@ -651,6 +651,11 @@ void cedar::dyn::NeuralField::updateMatrices()
     }
     this->mNoiseCorrelationKernel->setDimensionality(dimensionality);
   }
+  if (this->activationIsOutput())
+  {
+    this->emitOutputPropertiesChangedSignal("activation");
+  }
+  this->emitOutputPropertiesChangedSignal("sigmoided activation");
 }
 
 void cedar::dyn::NeuralField::onStart()

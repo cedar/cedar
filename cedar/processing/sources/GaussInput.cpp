@@ -101,7 +101,7 @@ _mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
   QObject::connect(_mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mSigmas.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mCenters.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
-  QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
+  QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrixSize()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
   QObject::connect(_mIsCyclic.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   this->updateMatrix();
@@ -156,5 +156,14 @@ void cedar::proc::sources::GaussInput::updateDimensionality()
   _mCenters->setDefaultSize(new_dimensionality);
   _mSizes->resize(new_dimensionality, _mSizes->getDefaultValue());
   _mSizes->setDefaultSize(new_dimensionality);
+  this->onTrigger();
+  this->emitOutputPropertiesChangedSignal("Gauss input");
+  this->onTrigger();
+}
+
+void cedar::proc::sources::GaussInput::updateMatrixSize()
+{
+  this->onTrigger();
+  this->emitOutputPropertiesChangedSignal("Gauss input");
   this->onTrigger();
 }
