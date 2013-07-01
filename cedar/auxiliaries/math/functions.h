@@ -56,6 +56,17 @@ namespace cedar
         return exp(-pow(x, 2.0) / (2.0 * pow(sigma, 2.0)));
       }
 
+      //!@brief fills a matrix with a box input
+      CEDAR_AUX_LIB_EXPORT cv::Mat boxMatrix
+                           (
+                             unsigned int dimensionality,
+                             const std::vector<unsigned int>& matrixSizes,
+                             double boxAmplitude,
+                             double referenceLevel,
+                             const std::vector<unsigned int>& widths,
+                             const std::vector<unsigned int>& leftBounds
+                           );
+
       //!@brief fills a matrix with a Gaussian
       CEDAR_AUX_LIB_EXPORT cv::Mat gaussMatrix
                            (
