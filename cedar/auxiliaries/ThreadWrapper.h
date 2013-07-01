@@ -144,7 +144,7 @@ public:
 
 
   //! wait for the thread to finish. The calling thread will pause!
-  inline bool wait(unsigned long time = 0)
+  inline bool wait(unsigned long time = ULONG_MAX)
   {
     bool ret = false;
 
