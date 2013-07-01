@@ -66,11 +66,14 @@ cedar_add_library(cedarproc
   gui/Network.h
   gui/ToolBox.h
   gui/View.h
+  sources/BoxInput.h
   sources/GaussInput.h
   steps/StaticGain.h
   steps/Convolution.h
   steps/ColorConversion.h
+  steps/ComponentMultiply.h
   steps/CoordinateTransformation.h
+  steps/MatrixMultiply.h
   steps/MatrixTypeConverter.h
   steps/Flip.h
   sources/Boost.h
