@@ -149,3 +149,10 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Sum::determineInputValidity
     return cedar::proc::DataSlot::VALIDITY_ERROR;
   }
 }
+
+void cedar::proc::steps::Sum::inputConnectionChanged(const std::string& /*inputName*/)
+{
+  this->onTrigger();
+  this->emitOutputPropertiesChangedSignal("sum");
+  this->onTrigger();
+}

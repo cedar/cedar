@@ -494,6 +494,14 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
   cedar::proc::Network::ElementMap::iterator it = mElements.find(element->getName());
   if (it != this->mElements.end())
   {
+    // disconnect from revalidation signal
+    if (cedar::proc::ConnectablePtr connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(it->second))
+    {
+      this->mRevalidateConnections[connectable->getName()].disconnect();
+      std::map<std::string, boost::signals2::connection>::iterator conn_it
+        = this->mRevalidateConnections.find(connectable->getName());
+      this->mRevalidateConnections.erase(conn_it);
+    }
     mElements.erase(it);
   }
   this->mElementRemovedSignal(element);
@@ -686,6 +694,14 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
 
   this->mNewElementAddedSignal(element);
   this->mElementAddedSignal(this, element);
+
+
+  // connect to revalidation signal
+  if (cedar::proc::ConnectablePtr connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(element))
+  {
+    this->mRevalidateConnections[connectable->getName()]
+      = connectable->connectToOutputPropertiesChanged(boost::bind(&cedar::proc::Network::revalidateConnections, this, _1));
+  }
 }
 
 void cedar::proc::Network::duplicate(const std::string& elementName, const std::string& newName)
@@ -1906,5 +1922,19 @@ void cedar::proc::Network::removeAll()
   for (unsigned int i = 0; i < elements.size(); ++i)
   {
     this->remove(elements.at(i));
+  }
+}
+
+void cedar::proc::Network::revalidateConnections(const std::string& sender)
+{
+  std::string child;
+  std::string output;
+  cedar::aux::splitLast(sender, ".", child, output);
+  std::vector<cedar::proc::DataConnectionPtr> connections;
+  this->getDataConnections(this->getElement<Connectable>(child), output, connections);
+  for (unsigned i = 0; i < connections.size(); ++i)
+  {
+    cedar::proc::StepPtr receiver = this->getElement<Step>(connections.at(i)->getTarget()->getParent());
+    receiver->callInputConnectionChanged(connections.at(i)->getTarget()->getName());
   }
 }

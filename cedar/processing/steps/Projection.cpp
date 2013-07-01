@@ -163,11 +163,13 @@ void cedar::proc::steps::Projection::outputDimensionalityChanged()
   this->initializeOutputMatrix();
 
   this->reconfigure();
+  this->emitOutputPropertiesChangedSignal("output");
 }
 
 void cedar::proc::steps::Projection::outputDimensionSizesChanged()
 {
   this->initializeOutputMatrix();
+  this->emitOutputPropertiesChangedSignal("output");
 }
 
 void cedar::proc::steps::Projection::reconfigure()

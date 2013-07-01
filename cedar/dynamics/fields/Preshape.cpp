@@ -250,4 +250,5 @@ void cedar::dyn::Preshape::updateMatrices()
     this->mActivation->getData() = cv::Mat(dimensionality,&sizes.at(0), CV_32F, cv::Scalar(0));
   }
   this->unlockAll();
+  this->emitOutputPropertiesChangedSignal("activation");
 }
