@@ -70,7 +70,7 @@
  *
  * - to start ticking step(), call start()
  * - to set the time intervals the step() method is to be called, use 
- *   setTimeStep()
+ *   setTimeStep(). But do this before calling start()!
  * - to stop ticking step(), call stop() - note that this will abort the loop
  *   but not terminate the current iteration until it is finished.
  *
@@ -102,6 +102,8 @@
  * thread with multiple objects that inherit the thread interface, you can call
  * all step functions consecutively and also pass measured time to each step function
  * to fulfill real-time constraints.
+ *
+ * The preferred way to stop the thread from itself is to call requestStop().
  *
  * \todo Use units instead of doubles
  */
