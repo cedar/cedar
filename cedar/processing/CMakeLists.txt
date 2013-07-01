@@ -52,6 +52,7 @@ cedar_add_library(cedarproc
   MOC_HEADERS
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureToolBox.h
+  gui/BoostControl.h
   gui/ElementClassList.h
   gui/Ide.h
   gui/IdeApplication.h
@@ -86,6 +87,6 @@ cedar_add_library(cedarproc
   ${libdc_moc_headers}
   ${yarp_moc_headers}
   RESOURCES
-  gui/icons/icons.qrc
+  gui/icons/cedar_proc_gui_icons.qrc
   gui/images/images.qrc
   )

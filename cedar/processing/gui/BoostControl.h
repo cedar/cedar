@@ -22,81 +22,61 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatData.h
+    File:        BoostControl.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 12 09
+    Date:        2013 06 28
 
-    Description: This is a dummy header for the typedef MatData (which is actually a cedar::aux::DataTemplate<cv::Mat>).
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MAT_DATA_H
-#define CEDAR_AUX_MAT_DATA_H
+#ifndef CEDAR_PROC_GUI_BOOST_CONTROL_H
+#define CEDAR_PROC_GUI_BOOST_CONTROL_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/gui/ui_BoostControl.h"
+#include "cedar/processing/sources/namespace.h"
+#include "cedar/processing/namespace.h"
 
 // SYSTEM INCLUDES
-#include <QReadWriteLock>
+#include <boost/signals2.hpp>
 
-/*!@brief Data containing matrices.
+
+/*!@brief A widget for conveniently controlling the boosts in a network.
  */
-class cedar::aux::MatData : public cedar::aux::DataTemplate<cv::Mat>
+class cedar::proc::gui::BoostControl : public QWidget, public Ui_BoostControl
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  typedef cedar::aux::DataTemplate<cv::Mat> Super;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  MatData()
-  {
-  }
+  BoostControl();
 
-  //!@brief This constructor initializes the internal data to a value.
-  MatData(const cv::Mat& value)
-  :
-  cedar::aux::DataTemplate<cv::Mat>(value)
-  {
-  }
+  //!@brief The destructor.
+  ~BoostControl();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  std::string getDescription() const;
-
-  /*!@brief Returns the dimensionality of the matrix stored in this data.
-   *
-   * @remarks Calls cedar::aux::math::getDimensionalityOf(this->getData()) to determine the dimensionality.
+  /*!@brief Sets the network whose boosts are controlled by this widget.
    */
-  unsigned int getDimensionality() const;
-
-  //! Convenience method that returns the opencv-type of the stored matrix.
-  inline int getCvType() const
-  {
-    return this->getData().type();
-  }
-
-  //! Checks if the matrix is empty.
-  bool isEmpty() const
-  {
-    return this->getData().empty();
-  }
+  void setNetwork(cedar::proc::NetworkPtr network);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -108,17 +88,41 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void addBoost(cedar::proc::sources::BoostPtr boost);
+
+  void translateElementAddedSignal(cedar::proc::ElementPtr);
+
+  void translateElementRemovedSignal(cedar::proc::ConstElementPtr);
+
+signals:
+  void elementAddedSignal(QString);
+
+  void boostRemovedSignal(QString);
+
+private slots:
+  void elementAdded(QString elementName);
+
+  void boostRemoved(QString elementName);
+
+  void boostNameChanged();
+
+  void itemChanged(QTreeWidgetItem* pItem, int column);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-
 private:
-  // none yet
+  cedar::proc::NetworkPtr mNetwork;
 
-}; // class cedar::aux::MatData
+  boost::signals2::connection mElementAddedConnection;
 
-#endif // CEDAR_AUX_MAT_DATA_H
+  boost::signals2::connection mElementRemovedConnection;
+
+  std::map<const cedar::proc::sources::Boost*, QString> mBoostNames;
+
+}; // class cedar::proc::gui::BoostControl
+
+#endif // CEDAR_PROC_GUI_BOOST_CONTROL_H
+

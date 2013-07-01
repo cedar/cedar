@@ -196,13 +196,20 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::RateToSpaceCode::determineInputValid
   {
     // Mat data is accepted, but only 0D and 1D.
     unsigned int dimensionality = cedar::aux::math::getDimensionalityOf(mat_data->getData());
-    if (dimensionality == 0 || (dimensionality == 1 && cedar::aux::math::get1DMatrixSize(mat_data->getData()) < 4))
+    if
+    (
+      !mat_data->isEmpty()
+      &&
+      (
+        dimensionality == 0 || (dimensionality == 1 && cedar::aux::math::get1DMatrixSize(mat_data->getData()) < 4)
+      )
+    )
     {
       return cedar::proc::DataSlot::VALIDITY_VALID;
     }
   }
   // Everything else is rejected.
-    return cedar::proc::DataSlot::VALIDITY_ERROR;
+  return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
 void cedar::dyn::RateToSpaceCode::inputConnectionChanged(const std::string& inputName)

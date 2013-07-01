@@ -109,6 +109,8 @@ likely to undergo major changes:
     be extended in the future. For now, it only checks if all looped steps in the current architecture are connected to
     a looped trigger. The tool can be accessed from the "windows" menu.
   - LoopedTriggers in the processingIde can now be iterated manually, i.e., you can push a button to perform a single step.
+  - The proecssingIde now has a boost control widget. From it, you can activate and change the strength of any boost in
+    the current architecture. The widget can be accessed from the "tools" menu, or by pressing control+b.
 
 - cedar::dyn
   - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   

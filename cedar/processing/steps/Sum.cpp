@@ -126,6 +126,11 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Sum::determineInputValidity
 
   if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
+    if (mat_data->isEmpty())
+    {
+      return cedar::proc::DataSlot::VALIDITY_ERROR;
+    }
+
     if (this->mInputs->getDataCount() > 0)
     {
       const cv::Mat& first_mat

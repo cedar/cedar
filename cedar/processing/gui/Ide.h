@@ -213,6 +213,10 @@ public slots:
    */
   void showConsistencyChecker();
 
+  /*!@brief Opens a boost control widget.
+   */
+  void showBoostControl();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -289,6 +293,8 @@ private:
   QDockWidget* mpConsistencyDock;
 
   QString mDefaultWindowTitle;
+
+  cedar::proc::gui::BoostControl* mpBoostControl;
 
 }; // class cedar::MainWindow
 
