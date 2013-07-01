@@ -52,6 +52,27 @@
 #include <string>
 #include <vector>
 
+class EmptyMatrixProvider : public cedar::proc::Step
+{
+  public:
+  EmptyMatrixProvider()
+    :
+    mData(new cedar::aux::MatData(cv::Mat()))
+    {
+      this->declareOutput("empty matrix", this->mData);
+    }
+
+  private:
+    void compute(const cedar::proc::Arguments&)
+    {
+    }
+
+    cedar::aux::MatDataPtr mData;
+};
+
+CEDAR_GENERATE_POINTER_TYPES(EmptyMatrixProvider);
+
+
 unsigned int testStep(cedar::proc::NetworkPtr network, cedar::proc::StepPtr testStep)
 {
   unsigned int i = 0;
@@ -65,9 +86,10 @@ unsigned int testStep(cedar::proc::NetworkPtr network, cedar::proc::StepPtr test
     sources.push_back("1D.Gauss input");
     sources.push_back("2D.Gauss input");
     sources.push_back("3D.Gauss input");
+    sources.push_back("emp.empty matrix");
     for (unsigned int src = 0; src < sources.size(); ++src)
     {
-      std::cout << "Testing connecting to " << sources.at(src) << std::endl;
+      std::cout << "Connecting " << sources.at(src) << " to " << inputs.at(i)->getName() << std::endl;
       for (unsigned int i = 0; i < inputs.size(); ++i)
       {
         network->connectSlots(sources.at(src), std::string("testStep." + inputs.at(i)->getName()));
@@ -112,6 +134,10 @@ int main(int, char**)
     {
       std::cout << "Testing class " << declaration->getClassName() << std::endl;
       network->readFile("processing_steps.json");
+
+      EmptyMatrixProviderPtr empty_provider = EmptyMatrixProviderPtr(new EmptyMatrixProvider());
+      network->add(empty_provider, "emp");
+
       errors += testStep(network, step);
     }
   }
