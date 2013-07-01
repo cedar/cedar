@@ -42,7 +42,10 @@
 #include "cedar/processing/sources/Boost.h"
 #include "cedar/processing/Network.h"
 #include "cedar/processing/Element.h"
+#include "cedar/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
@@ -61,6 +64,7 @@ cedar::proc::gui::BoostControl::BoostControl()
   QObject::connect(this->mpBoostTree, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(itemChanged(QTreeWidgetItem*, int)));
 
   this->mpBoostTree->header()->setResizeMode(0, QHeaderView::Stretch);
+  this->mpBoostTree->header()->setResizeMode(1, QHeaderView::ResizeToContents);
 }
 
 cedar::proc::gui::BoostControl::~BoostControl()
@@ -174,10 +178,21 @@ void cedar::proc::gui::BoostControl::addBoost(cedar::proc::sources::BoostPtr boo
   labels << QString::fromStdString(boost->getName());
 
   auto p_item = new QTreeWidgetItem(labels);
-  p_item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsSelectable);
-  p_item->setCheckState(0, boost->isActive()? Qt::Checked : Qt::Unchecked);
+  p_item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 
   this->mpBoostTree->invisibleRootItem()->addChild(p_item);
+
+  cedar::aux::ParameterPtr active_parameter = boost->getParameter("active");
+  cedar::aux::gui::Parameter* p_enabler
+    = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(active_parameter)->allocateRaw();
+  this->mpBoostTree->setItemWidget(p_item, 1, p_enabler);
+  p_enabler->setParameter(active_parameter);
+
+  cedar::aux::ParameterPtr strength_parameter = boost->getParameter("strength");
+  cedar::aux::gui::Parameter* p_strength
+    = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(strength_parameter)->allocateRaw();
+  this->mpBoostTree->setItemWidget(p_item, 2, p_strength);
+  p_strength->setParameter(strength_parameter);
 }
 
 void cedar::proc::gui::BoostControl::itemChanged(QTreeWidgetItem* pItem, int)
