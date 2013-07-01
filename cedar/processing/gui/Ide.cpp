@@ -41,6 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.h"
+#include "cedar/processing/gui/BoostControl.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/SettingsDialog.h"
@@ -71,7 +72,8 @@
 cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui)
 :
 mpConsistencyChecker(NULL),
-mpConsistencyDock(NULL)
+mpConsistencyDock(NULL),
+mpBoostControl(NULL)
 {
   this->setupUi(this);
 
@@ -193,6 +195,7 @@ mpConsistencyDock(NULL)
 
   QObject::connect(mpActionToggleTriggerVisibility, SIGNAL(triggered(bool)), this, SLOT(showTriggerConnections(bool)));
   QObject::connect(mpActionArchitectureConsistencyCheck, SIGNAL(triggered()), this, SLOT(showConsistencyChecker()));
+  QObject::connect(mpActionBoostControl, SIGNAL(triggered()), this, SLOT(showBoostControl()));
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -207,6 +210,28 @@ cedar::proc::gui::Ide::~Ide()
 void cedar::proc::gui::Ide::displayFilename(const std::string& filename)
 {
   this->setWindowTitle(this->mDefaultWindowTitle + " - " + QString::fromStdString(filename));
+}
+
+void cedar::proc::gui::Ide::showBoostControl()
+{
+  if (mpBoostControl == NULL)
+  {
+    auto p_dock = new QDockWidget(this);
+    this->mpBoostControl = new cedar::proc::gui::BoostControl();
+    p_dock->setFloating(true);
+    p_dock->setWindowTitle(this->mpBoostControl->windowTitle());
+    p_dock->setAllowedAreas(Qt::NoDockWidgetArea);
+    p_dock->setWidget(this->mpBoostControl);
+    this->mpBoostControl->setNetwork(this->mNetwork->getNetwork());
+    p_dock->show();
+  }
+  else
+  {
+    if (auto p_widget = dynamic_cast<QWidget*>(this->mpBoostControl->parent()))
+    {
+      p_widget->show();
+    }
+  }
 }
 
 void cedar::proc::gui::Ide::showConsistencyChecker()
@@ -445,6 +470,11 @@ void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
   if (this->mpConsistencyChecker != NULL)
   {
     this->mpConsistencyChecker->setNetwork(network);
+  }
+
+  if (this->mpBoostControl != NULL)
+  {
+    this->mpBoostControl->setNetwork(network->getNetwork());
   }
 }
 
@@ -765,6 +795,11 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   this->mpActionSave->setEnabled(true);
 
   this->mNetwork = network;
+
+  if (this->mpBoostControl)
+  {
+    this->mpBoostControl->setNetwork(this->mNetwork->getNetwork());
+  }
 
   this->displayFilename(file.toStdString());
 

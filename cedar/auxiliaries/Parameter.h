@@ -170,6 +170,12 @@ public:
   //!@brief Removes all the locks needed to lock this parameter properly from the set.
   virtual void removeLocks(std::set<QReadWriteLock*>& locks) const;
 
+  //! Returns the owner of the parameter.
+  cedar::aux::Configurable* getOwner() const
+  {
+    return this->mpOwner;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
