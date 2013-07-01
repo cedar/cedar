@@ -124,6 +124,8 @@ int main(int, char**)
 
   unsigned int errors = 0;
 
+  std::vector<std::string> failed_steps;
+
   auto declarations = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarations();
   for (auto declaration_iter = declarations.begin(); declaration_iter != declarations.end(); ++declaration_iter)
   {
@@ -132,16 +134,35 @@ int main(int, char**)
     cedar::proc::ElementPtr elem = cedar::proc::ElementManagerSingleton::getInstance()->allocate(declaration->getClassName());
     if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(elem))
     {
-      std::cout << "Testing class " << declaration->getClassName() << std::endl;
+      std::cout << "=========================================" << std::endl;
+      std::cout << "  Testing class " << declaration->getClassName() << std::endl;
+      std::cout << "=========================================" << std::endl;
       network->readFile("processing_steps.json");
 
       EmptyMatrixProviderPtr empty_provider = EmptyMatrixProviderPtr(new EmptyMatrixProvider());
       network->add(empty_provider, "emp");
 
-      errors += testStep(network, step);
+      int error_count = testStep(network, step);
+      errors += error_count;
+
+      if (error_count > 0)
+      {
+        failed_steps.push_back(declaration->getClassName());
+      }
     }
   }
 
-  std::cout << "Done. There were " << errors << " error(s)." << std::endl;
+  std::cout << "Test finished with " << errors << " error(s)." << std::endl;
+
+  if (!failed_steps.empty())
+  {
+    std::cout << "The following steps produced errors:" << std::endl;
+
+    for (size_t i = 0; i < failed_steps.size(); ++i)
+    {
+      std::cout << "- " << failed_steps.at(i) << std::endl;
+    }
+  }
+
   return errors;
 }
