@@ -34,11 +34,13 @@
 
 ======================================================================================================================*/
 
+// cedar includes
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/Network.h"
 #include "cedar/processing/DataRole.h"
+#include "cedar/processing/StepTime.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/processing/steps/Resize.h"
@@ -48,6 +50,8 @@
 #include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/logFilter/Type.h"
 #include "cedar/auxiliaries/NullLogger.h"
+
+// global includes
 #include <exception>
 #include <string>
 #include <vector>
@@ -55,7 +59,7 @@
 class EmptyMatrixProvider : public cedar::proc::Step
 {
   public:
-  EmptyMatrixProvider()
+    EmptyMatrixProvider()
     :
     mData(new cedar::aux::MatData(cv::Mat()))
     {
@@ -94,7 +98,17 @@ unsigned int testStep(cedar::proc::NetworkPtr network, cedar::proc::StepPtr test
       {
         network->connectSlots(sources.at(src), std::string("testStep." + inputs.at(i)->getName()));
       }
-      testStep->onTrigger();
+
+      if (!testStep->isLooped())
+      {
+        testStep->onTrigger();
+      }
+      else
+      {
+        // send a dummy step time
+        cedar::proc::ArgumentsPtr arguments (new cedar::proc::StepTime(cedar::unit::Milliseconds(0.1)));
+        testStep->onTrigger(arguments);
+      }
 
       for (unsigned int i = 0; i < inputs.size(); ++i)
       {
