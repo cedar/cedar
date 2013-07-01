@@ -14,7 +14,7 @@
    <string>Processing IDE</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="icons/icons.qrc">
+   <iconset resource="icons/cedar_proc_gui_icons.qrc">
     <normaloff>:/processing_ide_app_icon_48.png</normaloff>:/processing_ide_app_icon_48.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -230,6 +230,7 @@
      <addaction name="mpActionTriggerSmartHide"/>
     </widget>
     <addaction name="menuTrigger_Connections"/>
+    <addaction name="mpActionShowHideGrid"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -383,6 +384,8 @@
    <addaction name="mpThreadsStartAll"/>
    <addaction name="mpThreadsSingleStep"/>
    <addaction name="mpThreadsStopAll"/>
+   <addaction name="separator"/>
+   <addaction name="mpActionBoostControl"/>
   </widget>
   <action name="mpActionNew">
    <property name="text">
@@ -394,7 +397,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="icons/icons.qrc">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/save.svg</normaloff>:/toolbaricons/save.svg</iconset>
    </property>
    <property name="text">
@@ -454,38 +457,6 @@
     <string>Stops all triggers!</string>
    </property>
   </action>
-  <action name="mpActionShowHideItems">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Steps</string>
-   </property>
-  </action>
-  <action name="mpActionShowHideTools">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Tools</string>
-   </property>
-  </action>
-  <action name="mpActionShowHideProperties">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Properties</string>
-   </property>
-  </action>
-  <action name="mpActionShowHideLog">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Log</string>
-   </property>
-  </action>
   <action name="mpActionLoadPlugin">
    <property name="text">
     <string>Load plugin ...</string>
@@ -496,14 +467,14 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="icons/icons.qrc">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/grid.svg</normaloff>:/toolbaricons/grid.svg</iconset>
    </property>
    <property name="text">
-    <string>grid</string>
+    <string>Toggle grid</string>
    </property>
    <property name="toolTip">
-    <string>Toggle Grid</string>
+    <string>Toggles the grid in the architecture pane. Elements will align to this grid.</string>
    </property>
   </action>
   <action name="mpRecentFiles">
@@ -512,6 +483,10 @@
    </property>
   </action>
   <action name="mpActionSettings">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/menus/settings.svg</normaloff>:/menus/settings.svg</iconset>
+   </property>
    <property name="text">
     <string>Settings...</string>
    </property>
@@ -523,7 +498,7 @@
   </action>
   <action name="mpActionResetRootNetwork">
    <property name="icon">
-    <iconset resource="icons/icons.qrc">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/reset.svg</normaloff>:/toolbaricons/reset.svg</iconset>
    </property>
    <property name="text">
@@ -565,7 +540,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="icons/icons.qrc">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/hide_triggers.svg</normaloff>
      <normalon>:/toolbaricons/show_triggers.svg</normalon>:/toolbaricons/hide_triggers.svg</iconset>
    </property>
@@ -588,6 +563,10 @@
    </property>
   </action>
   <action name="mpActionArchitectureConsistencyCheck">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/menus/consistency_check.svg</normaloff>:/menus/consistency_check.svg</iconset>
+   </property>
    <property name="text">
     <string>Architecture consistency check ...</string>
    </property>
@@ -609,7 +588,7 @@
   </action>
   <action name="mpActionBoostControl">
    <property name="icon">
-    <iconset resource="icons/icons.qrc">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/steps/boost.svg</normaloff>:/steps/boost.svg</iconset>
    </property>
    <property name="text">
@@ -648,7 +627,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="icons/icons.qrc"/>
+  <include location="icons/cedar_proc_gui_icons.qrc"/>
   <include location="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc"/>
  </resources>
  <connections>

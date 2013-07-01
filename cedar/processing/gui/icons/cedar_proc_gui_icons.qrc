@@ -40,6 +40,8 @@
     <file>menus/data.svg</file>
     <file>menus/actions.svg</file>
     <file>menus/display_style.svg</file>
+    <file>menus/consistency_check.svg</file>
+    <file>menus/settings.svg</file>
     <file>network.svg</file>
     <file>toolbaricons/save.svg</file>
     <file>toolbaricons/grid.svg</file>
