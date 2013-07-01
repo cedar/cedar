@@ -197,28 +197,30 @@ void cedar::proc::steps::Projection::reconfigure()
     // input and output dimensionality
     if (input_dimensionality == 3 && output_dimensionality == 2)
     {
-      unsigned int mapped[2];
-      unsigned int map_index = 0;
+      std::vector<unsigned int> mapped_indices;
+
       for (unsigned int index = 0; index < input_dimensionality; ++index)
       {
         if (!_mDimensionMappings->getValue()->isDropped(index))
         {
-          mapped[map_index] = _mDimensionMappings->getValue()->lookUp(index);
-          ++map_index;
+          mapped_indices.push_back(_mDimensionMappings->getValue()->lookUp(index));
         }
       }
 
-      CEDAR_DEBUG_ASSERT(mapped[0] != mapped[1]);
-
-      bool swapped = mapped[0] > mapped[1];
-
-      if (swapped)
+      if (mapped_indices.size() == 2)
       {
-        mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto2DSwapped;
-      }
-      else
-      {
-        mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto2D;
+        CEDAR_DEBUG_ASSERT(mapped_indices.at(0) != mapped_indices.at(1));
+
+        bool swapped = mapped_indices.at(0) > mapped_indices.at(1);
+
+        if (swapped)
+        {
+          mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto2DSwapped;
+        }
+        else
+        {
+          mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto2D;
+        }
       }
     }
     else if (input_dimensionality == 3 && output_dimensionality == 1)
