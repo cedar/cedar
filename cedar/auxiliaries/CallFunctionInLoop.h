@@ -22,65 +22,48 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CallFunctionInThread.h
+    File:        CallFunctionInLoop.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2010 12 02
+    Maintainer:  Jean-Stephane Jokeit
+    Email:       jean-stephane.jokeit@ini.rub.de
+    Date:        2013 07 01
 
-    Description: Header for the @em cedar::aux::CallFunctionInThread class.
+    Description: Header for the @em cedar::aux::CallFunctionInLoop class.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_CALL_FUN_THREAD_H
-#define CEDAR_AUX_CALL_FUN_THREAD_H
+#ifndef CEDAR_AUX_CALL_FUN_LOOP_THREAD_H
+#define CEDAR_AUX_CALL_FUN_LOOP_THREAD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/DoubleParameter.h"
-#include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/auxiliaries/EnumParameter.h"
-#include "cedar/auxiliaries/LoopMode.h"
-#include "cedar/auxiliaries/ThreadWrapper.h"
-#include "cedar/auxiliaries/CallFunctionInThreadWorker.h"
+#include "cedar/auxiliaries/LoopedThread.h"
 
 // SYSTEM INCLUDES
-#include <string>
-#include <iostream>
-#include <QThread>
-#include <QMutex>
-#include <QReadWriteLock>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <functional>
 
-/*!@brief This class wraps a function call into a thread.
+/*!@brief This class calls a function of your choice in a (threaded) loop
  *
  * This class allows you to execute a function (accessed via a pointer
- * to the function) in a thread.
- * The thread ends when the function returns.
+ * to the function) in a thread. It is called repeatedly in
+ * setStepSize() intervals.
+ * The thread ends when requestStop() is called.
  *
  * The function needs to return void and have no parameters.
  *
- * The current implementation of CallFunctionInThread uses QT threads and needs a
+ * The current implementation of CallFunctionInLoop uses QT threads and needs a
  * running main event loop, i.e. you must start a Q(Core)Application's exec().
  * 
- * Pass a pointer to the function callback in CallFunctionInThread's constructor. When you start() the CallFunctionInThread object, a new thread will spawn and execute your function callback.
+ * Pass a pointer to the function callback in CallFunctionInLoop's constructor. When you start() the CallFunctionInLoop object, a new thread will spawn and execute your function callback in a loop.
  * @see: CallFunctionInThread
  */
-class cedar::aux::CallFunctionInThread : public cedar::aux::ThreadWrapper
+class cedar::aux::CallFunctionInLoop : public cedar::aux::LoopedThread
 {
-  //----------------------------------------------------------------------------
-  // friends
-  //----------------------------------------------------------------------------
-
-  friend class cedar::aux::detail::CallFunctionInThreadWorker;
-
 public:
   //----------------------------------------------------------------------------
   // typedefs
@@ -94,16 +77,16 @@ public:
   //----------------------------------------------------------------------------
 public:
 
-  /*! Construct a new CallFunctionInThread.
+  /*! Construct a new CallFunctionInLoop.
    *
    * Start the thread via start().
    *
    *@param fun is a std::function< void(void) > and thus can be a function pointer or function object.
    */
-  CallFunctionInThread(FunctionType fun);
+  CallFunctionInLoop(FunctionType fun);
 
   //!@brief Destructor
-  virtual ~CallFunctionInThread();
+  virtual ~CallFunctionInLoop();
 
   //----------------------------------------------------------------------------
   // public methods
@@ -114,11 +97,7 @@ public:
   // private methods
   //----------------------------------------------------------------------------
 private:
-  //! function that executes the stored function pointer
-  void call();
-
-  //! overwritten method. return a new worker pointer
-  cedar::aux::detail::ThreadWorker* resetWorker();
+  void step(double time);
 
   //----------------------------------------------------------------------------
   // members
@@ -127,12 +106,7 @@ private:
   //! the call-back
   FunctionType mFunction;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-  //! the worker pointer
-  cedar::aux::detail::CallFunctionInThreadWorker* mpWorker;
-}; // class cedar::aux::CallFunctionInThread
+}
+; // class cedar::aux::CallFunctionInLoop
 
-#endif // CEDAR_AUX_LOOPED_THREAD_H
+#endif // CEDAR_AUX_FUN_LOOP_THREAD_H
