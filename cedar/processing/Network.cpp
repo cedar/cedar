@@ -1634,14 +1634,17 @@ void cedar::proc::Network::getDataConnections(
   connections.clear();
   for (size_t i = 0; i < this->mDataConnections.size(); ++i)
   {
-    cedar::proc::DataConnectionPtr con = this->mDataConnections.at(i);
-    if
-    (
-      this->getElement<cedar::proc::Step>(con->getSource()->getParent()) == source
-        && con->getSource()->getName() == sourceDataName
-    )
+    // check if con is a valid pointer - during deletion of a step, some deleted connections are still in this list
+    if (cedar::proc::DataConnectionPtr con = this->mDataConnections.at(i))
     {
-      connections.push_back(con);
+      if
+      (
+        this->getElement<cedar::proc::Step>(con->getSource()->getParent()) == source
+          && con->getSource()->getName() == sourceDataName
+      )
+      {
+        connections.push_back(con);
+      }
     }
   }
 }
