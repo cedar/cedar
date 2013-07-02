@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CallFunctionInLoop.h
+    File:        LoopFunctionInThread.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.rub.de
     Date:        2013 07 01
 
-    Description: Header for the @em cedar::aux::CallFunctionInLoop class.
+    Description: Header for the @em cedar::aux::LoopFunctionInThread class.
 
     Credits:
 
@@ -56,13 +56,13 @@
  *
  * The function needs to return void and have no parameters.
  *
- * The current implementation of CallFunctionInLoop uses QT threads and needs a
+ * The current implementation of LoopFunctionInThread uses QT threads and needs a
  * running main event loop, i.e. you must start a Q(Core)Application's exec().
  * 
- * Pass a pointer to the function callback in CallFunctionInLoop's constructor. When you start() the CallFunctionInLoop object, a new thread will spawn and execute your function callback in a loop.
+ * Pass a pointer to the function callback in LoopFunctionInThread's constructor. When you start() the LoopFunctionInThread object, a new thread will spawn and execute your function callback in a loop.
  * @see: CallFunctionInThread
  */
-class cedar::aux::CallFunctionInLoop : public cedar::aux::LoopedThread
+class cedar::aux::LoopFunctionInThread : public cedar::aux::LoopedThread
 {
 public:
   //----------------------------------------------------------------------------
@@ -77,16 +77,16 @@ public:
   //----------------------------------------------------------------------------
 public:
 
-  /*! Construct a new CallFunctionInLoop.
+  /*! Construct a new LoopFunctionInThread.
    *
    * Start the thread via start().
    *
    *@param fun is a std::function< void(void) > and thus can be a function pointer or function object.
    */
-  CallFunctionInLoop(FunctionType fun);
+  LoopFunctionInThread(FunctionType fun);
 
   //!@brief Destructor
-  virtual ~CallFunctionInLoop();
+  virtual ~LoopFunctionInThread();
 
   //----------------------------------------------------------------------------
   // public methods
@@ -107,6 +107,6 @@ private:
   FunctionType mFunction;
 
 }
-; // class cedar::aux::CallFunctionInLoop
+; // class cedar::aux::LoopFunctionInThread
 
 #endif // CEDAR_AUX_FUN_LOOP_THREAD_H
