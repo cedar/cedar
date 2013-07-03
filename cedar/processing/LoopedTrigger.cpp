@@ -203,7 +203,7 @@ void cedar::proc::LoopedTrigger::stopTrigger()
     QApplication::processEvents();
   }
 
-  this->stop(2000);
+  this->stop();
 
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
