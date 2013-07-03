@@ -56,6 +56,7 @@
 // SYSTEM INCLUDES
 #include <iostream>
 #include <boost/lexical_cast.hpp>
+#include <QApplication>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -144,6 +145,7 @@ mGlobalInhibition
   )
 ),
 // parameters
+_mOutputActivation(new cedar::aux::BoolParameter(this, "activation as output", false)),
 _mDimensionality
 (
   new cedar::aux::UIntParameter
@@ -165,7 +167,6 @@ _mSizes
     cedar::aux::UIntParameter::LimitType::positive(1000)
   )
 ),
-_mOutputActivation(new cedar::aux::BoolParameter(this, "activation as output", false)),
 _mInputNoiseGain
 (
   new cedar::aux::DoubleParameter
@@ -651,6 +652,12 @@ void cedar::dyn::NeuralField::updateMatrices()
     }
     this->mNoiseCorrelationKernel->setDimensionality(dimensionality);
   }
+
+  if (this->activationIsOutput())
+  {
+    this->emitOutputPropertiesChangedSignal("activation");
+  }
+  this->emitOutputPropertiesChangedSignal("sigmoided activation");
 }
 
 void cedar::dyn::NeuralField::onStart()

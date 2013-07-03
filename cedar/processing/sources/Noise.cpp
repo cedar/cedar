@@ -139,4 +139,5 @@ void cedar::proc::sources::Noise::updateMatrices()
     this->mRandomMatrix->getData() = cv::Mat(dimensionality,&sizes.at(0), CV_32F, cv::Scalar(0));
   }
   this->unlockAll();
+  this->emitOutputPropertiesChangedSignal("random");
 }

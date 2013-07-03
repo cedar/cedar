@@ -237,6 +237,7 @@ void cedar::proc::steps::Switch::inputConnectionChanged(const std::string& input
       else
       {
         this->mInput1.reset();
+        return;
       }
     }
     else if (inputName == "input 2")
@@ -248,6 +249,7 @@ void cedar::proc::steps::Switch::inputConnectionChanged(const std::string& input
       else
       {
         this->mInput2.reset();
+        return;
       }
     }
 
@@ -263,4 +265,5 @@ void cedar::proc::steps::Switch::inputConnectionChanged(const std::string& input
       }
     }
   }
+  this->emitOutputPropertiesChangedSignal("mixture");
 }

@@ -429,6 +429,8 @@ private:
                                                          cedar::proc::Network::DataConnectionVector::iterator it
                                                        );
 
+  void revalidateConnections(const std::string& sender);
+
 private slots:
   //!@brief Takes care of updating the network's name in the parent's map.
   //!@todo Find a more generic approach, react to name changes of each contained element rather than this way around.
@@ -459,6 +461,9 @@ private:
   TriggerConnectionVector mTriggerConnections;
 
   cedar::aux::ConfigurationNode mLastReadUINode;
+
+  //!@brief connection to state changed signal of step
+  std::map<std::string, boost::signals2::connection> mRevalidateConnections;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
