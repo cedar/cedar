@@ -34,4 +34,4 @@
 #
 #=======================================================================================================================
 
-cedar_add_unit_test(CallFunctionInLoop main.cpp)
+cedar_add_unit_test(LoopFunctionInThread main.cpp)

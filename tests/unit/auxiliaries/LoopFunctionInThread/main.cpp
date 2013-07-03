@@ -36,7 +36,7 @@
 
 
 #include "cedar/auxiliaries/CallFunctionInThread.h"
-#include "cedar/auxiliaries/CallFunctionInLoop.h"
+#include "cedar/auxiliaries/LoopFunctionInThread.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -49,7 +49,7 @@
 int errors = 0;
 int count_loops = 0;
 
-cedar::aux::CallFunctionInLoop* loop;
+cedar::aux::LoopFunctionInThread* loop;
 
 #define MAX_LOOPS 5
 
@@ -63,7 +63,7 @@ void loopedFun()
 
 void runTests()
 {
-  loop = new cedar::aux::CallFunctionInLoop(loopedFun);
+  loop = new cedar::aux::LoopFunctionInThread(loopedFun);
   loop->setStepSize(100);
 
   loop->start();
