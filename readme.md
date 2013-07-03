@@ -54,7 +54,7 @@ will have to get creative here and there - but it is possible. Bear with us as
 we try to make cedar more platform independent.
 
 ## Supported compilers
-In general, we support GCC versions >= 4.4.5 (including MinGW ports) and MSVC versions >= 2010. 
+In general, we support GCC versions >= 4.4.5 (including MinGW ports) and MSVC versions >= 2012. 
 You might also use Clang on Mac OS, but its support is provisional. As mentioned above, 
 our main priority is the Linux operating system, so we cannot guarantee that compiling cedar 
 on a different operating system / with a different compiler works out of the box. We are, however, 
