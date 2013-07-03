@@ -74,7 +74,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(ThreadWrapper);
     CEDAR_DECLARE_AUX_CLASS(LoopedThread);
     CEDAR_DECLARE_AUX_CLASS(CallFunctionInThread);
-    CEDAR_DECLARE_AUX_CLASS(CallFunctionInLoop);
+    CEDAR_DECLARE_AUX_CLASS(LoopFunctionInThread);
     CEDAR_DECLARE_AUX_CLASS(LoopMode);
     CEDAR_DECLARE_AUX_CLASS(UserData);
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(IntrusivePtrBase);

@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CallFunctionInLoop.cpp
+    File:        LoopFunctionInThread.cpp
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.rub.de
     Date:        2013 07 01
 
-    Description: Implementation of the @em cedar::aux::CallFunctionInLoop class.
+    Description: Implementation of the @em cedar::aux::LoopFunctionInThread class.
 
     Credits:
 
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/CallFunctionInLoop.h"
+#include "cedar/auxiliaries/LoopFunctionInThread.h"
 #include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
@@ -43,7 +43,7 @@
 //------------------------------------------------------------------------------
 // constructors and destructor
 //------------------------------------------------------------------------------
-cedar::aux::CallFunctionInLoop::CallFunctionInLoop
+cedar::aux::LoopFunctionInThread::LoopFunctionInThread
 (
   FunctionType fun
 )
@@ -51,7 +51,7 @@ cedar::aux::CallFunctionInLoop::CallFunctionInLoop
 {
 }
 
-cedar::aux::CallFunctionInLoop::~CallFunctionInLoop()
+cedar::aux::LoopFunctionInThread::~LoopFunctionInThread()
 {
 }
 
@@ -59,7 +59,7 @@ cedar::aux::CallFunctionInLoop::~CallFunctionInLoop()
 // methods
 //------------------------------------------------------------------------------
 
-void cedar::aux::CallFunctionInLoop::step(double)
+void cedar::aux::LoopFunctionInThread::step(double)
 {
   mFunction();
 }
