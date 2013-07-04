@@ -115,6 +115,8 @@ private:
   cedar::proc::gui::GraphicsBase *mpTarget;
   //!@brief arrow that points out the direction of the line
   QGraphicsPolygonItem *mpArrow;
+  //!@brief the last set validity
+  cedar::proc::gui::ConnectValidity mValidity;
 }; // class cedar::proc::gui::TriggerConnection
 
 #endif // CEDAR_PROC_GUI_CONNECTION_H
