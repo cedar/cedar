@@ -600,6 +600,11 @@ bool cedar::proc::Step::isThreaded() const
 
 void cedar::proc::Step::callInputConnectionChanged(const std::string& slot)
 {
+  this->revalidateInputSlot(slot);
+}
+
+void cedar::proc::Step::revalidateInputSlot(const std::string& slot)
+{
   this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
   this->getInputSlot(slot)->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
   this->inputConnectionChanged(slot);
