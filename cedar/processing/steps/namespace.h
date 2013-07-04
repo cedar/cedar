@@ -66,6 +66,7 @@ namespace cedar
       CEDAR_DECLARE_PROC_CLASS(MatrixTypeConverter);
       CEDAR_DECLARE_PROC_CLASS(Projection);
       CEDAR_DECLARE_PROC_CLASS(Resize);
+      CEDAR_DECLARE_PROC_CLASS(Sigmoid);
       CEDAR_DECLARE_PROC_CLASS(StaticGain);
       CEDAR_DECLARE_PROC_CLASS(Sum);
       CEDAR_DECLARE_PROC_CLASS(Switch);
