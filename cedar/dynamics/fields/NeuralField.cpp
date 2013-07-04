@@ -653,6 +653,8 @@ void cedar::dyn::NeuralField::updateMatrices()
     this->mNoiseCorrelationKernel->setDimensionality(dimensionality);
   }
 
+  this->revalidateInputSlot("input");
+
   if (this->activationIsOutput())
   {
     this->emitOutputPropertiesChangedSignal("activation");
