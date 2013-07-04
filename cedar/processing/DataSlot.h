@@ -45,7 +45,8 @@
 // SYSTEM INCLUDES
 #include <boost/function.hpp>
 #include <boost/enable_shared_from_this.hpp>
-
+#include <boost/signals2/connection.hpp>
+#include <boost/signals2/signal.hpp>
 
 /*!@brief This class represents data slots in connectable objects.
  *
@@ -184,6 +185,15 @@ public:
    */
   cedar::proc::DataSlot::VALIDITY checkValidityOf(cedar::aux::ConstDataPtr data) const;
 
+  //! connect to the validity changed signal
+  inline boost::signals2::connection connectToValidityChangedSignal
+                                     (
+                                       boost::function<void ()> slot
+                                     )
+  {
+    return this->mValidityChanged.connect(slot);
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -207,6 +217,8 @@ private:
 protected:
   //! The parent that owns the slot.
   cedar::proc::Connectable* mpParent;
+
+  boost::signals2::signal<void ()> mValidityChanged;
 
 private:
   //!@brief flag if this slot must be connected
