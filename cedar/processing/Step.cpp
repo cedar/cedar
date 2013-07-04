@@ -603,27 +603,5 @@ void cedar::proc::Step::callInputConnectionChanged(const std::string& slot)
   this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
   this->getInputSlot(slot)->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
   this->inputConnectionChanged(slot);
-  switch (this->getInputValidity(slot))
-  {
-    case cedar::proc::DataSlot::VALIDITY_VALID:
-    {
-      std::cout << "valid" << std::endl;
-      break;
-    }
-    case cedar::proc::DataSlot::VALIDITY_WARNING:
-    {
-      std::cout << "warning" << std::endl;
-      break;
-    }
-    case cedar::proc::DataSlot::VALIDITY_ERROR:
-    {
-      std::cout << "error" << std::endl;
-      break;
-    }
-    case cedar::proc::DataSlot::VALIDITY_UNKNOWN:
-    {
-      std::cout << "unknown" << std::endl;
-      break;
-    }
-  }
+  this->getInputValidity(slot);
 }
