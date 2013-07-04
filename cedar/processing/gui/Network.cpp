@@ -737,39 +737,9 @@ void cedar::proc::gui::Network::checkDataConnection
       }
       break;
     }
-    case cedar::proc::Network::CONNECTION_UPDATED:
+    default:
     {
-      QList<QGraphicsItem*> items = this->mpScene->items();
-      for (int i = 0; i < items.size(); ++i)
-      {
-        if (cedar::proc::gui::Connection* con = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
-        {
-          if (con->getSource() == source_slot && con->getTarget() == target_slot)
-          {
-            cedar::proc::gui::ConnectValidity validity = cedar::proc::gui::CONNECT_ERROR;
-            switch (target_slot->getSlot()->getValidity())
-            {
-              case cedar::proc::DataSlot::VALIDITY_VALID:
-                validity = cedar::proc::gui::CONNECT_YES;
-                break;
-
-              case cedar::proc::DataSlot::VALIDITY_WARNING:
-                validity = cedar::proc::gui::CONNECT_WARNING;
-                break;
-
-              case cedar::proc::DataSlot::VALIDITY_UNKNOWN:
-                validity = cedar::proc::gui::CONNECT_UNKNOWN;
-                break;
-
-              case cedar::proc::DataSlot::VALIDITY_ERROR:
-                validity = cedar::proc::gui::CONNECT_NO;
-                break;
-            }
-            con->setValidity(validity);
-          }
-        }
-      }
-      break;
+      CEDAR_ASSERT(false);
     }
   }
 }
