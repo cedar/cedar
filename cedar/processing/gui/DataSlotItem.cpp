@@ -92,6 +92,7 @@ mSlot(slot)
     {
       this->setOutlineColor(QColor(140, 140, 140));
     }
+    mSlotConnection = ext_data->connectToValidityChangedSignal(boost::bind(&cedar::proc::gui::DataSlotItem::updateConnections, this));
   }
 
   // data slots never snap to the grid; they are attached to the parent.
@@ -101,6 +102,7 @@ mSlot(slot)
 
 cedar::proc::gui::DataSlotItem::~DataSlotItem()
 {
+  mSlotConnection.disconnect();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -331,3 +333,34 @@ void cedar::proc::gui::DataSlotItem::generateTooltip()
   }
   this->setToolTip(tool_tip);
 }
+
+void cedar::proc::gui::DataSlotItem::updateConnections()
+{
+  auto connections =  this->getConnections();
+  for (unsigned int i = 0; i < connections.size(); ++i)
+  {
+    connections.at(i)->setValidity(this->translateValidity(this->mSlot->getValidity()));
+  }
+}
+
+cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::translateValidity(cedar::proc::DataSlot::VALIDITY validity) const
+{
+  switch (validity)
+  {
+    case cedar::proc::DataSlot::VALIDITY_VALID:
+      return cedar::proc::gui::CONNECT_YES;
+
+    case cedar::proc::DataSlot::VALIDITY_WARNING:
+      return cedar::proc::gui::CONNECT_WARNING;
+
+    case cedar::proc::DataSlot::VALIDITY_UNKNOWN:
+      return cedar::proc::gui::CONNECT_UNKNOWN;
+
+    case cedar::proc::DataSlot::VALIDITY_ERROR:
+      return cedar::proc::gui::CONNECT_NO;
+
+    default:
+      return cedar::proc::gui::CONNECT_UNKNOWN;
+  }
+}
+

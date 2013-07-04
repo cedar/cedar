@@ -123,6 +123,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::DataSlot::getValidlity() const
 void cedar::proc::DataSlot::setValidity(cedar::proc::DataSlot::VALIDITY validity)
 {
   this->mValidity = validity;
+  this->mValidityChanged();
 }
 
 bool cedar::proc::DataSlot::isMandatory() const
