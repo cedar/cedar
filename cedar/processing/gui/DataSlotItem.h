@@ -46,6 +46,7 @@
 #include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/processing/DataRole.h"
+#include "cedar/processing/DataSlot.h"
 
 // SYSTEM INCLUDES
 
@@ -128,6 +129,10 @@ private:
    */
   void generateTooltip();
 
+  void updateConnections();
+
+  cedar::proc::gui::ConnectValidity translateValidity(cedar::proc::DataSlot::VALIDITY validity) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -139,6 +144,9 @@ private:
 
   //! The slot itself.
   cedar::proc::DataSlotPtr mSlot;
+
+  //!@brief a connection to a signal emitted if validity of the data slot changes
+  boost::signals2::connection mSlotConnection;
 }; // class DataSlotItem
 
 #endif // CEDAR_PROC_GUI_DATA_SLOT_ITEM_H
