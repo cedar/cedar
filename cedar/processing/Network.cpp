@@ -357,7 +357,7 @@ void cedar::proc::Network::removeAllConnectionsFromSlot(cedar::proc::ConstDataSl
         (
           (*data_con)->getTarget()->getParent())->getInputSlot((*data_con)->getTarget()->getName()
         ),
-        false
+        cedar::proc::Network::CONNECTION_REMOVED
       );
       data_con = this->removeDataConnection(data_con);
     }
@@ -390,7 +390,7 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
         (
           (*data_con)->getTarget()->getParent()
         )->getInputSlot((*data_con)->getTarget()->getName()),
-        false
+        cedar::proc::Network::CONNECTION_REMOVED
       );
       data_con = this->removeDataConnection(data_con);
     }
@@ -875,7 +875,7 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
   (
     this->getElement<cedar::proc::Connectable>(source_name)->getOutputSlot(source_slot_name),
     this->getElement<cedar::proc::Connectable>(target_name)->getInputSlot(target_slot_name),
-    true
+    cedar::proc::Network::CONNECTION_ADDED
   );
 }
 
@@ -938,8 +938,8 @@ void cedar::proc::Network::disconnectSlots
     if ((*it)->equals(sourceSlot, targetSlot))
     {
       this->removeDataConnection(it);
-      // inform any interested listeners of this new connection
-      mDataConnectionChanged(sourceSlot, targetSlot, false);
+      // inform any interested listeners of this removed connection
+      mDataConnectionChanged(sourceSlot, targetSlot, cedar::proc::Network::CONNECTION_REMOVED);
       return;
     }
   }
@@ -1820,7 +1820,7 @@ boost::signals2::connection cedar::proc::Network::connectToTriggerConnectionChan
 
 boost::signals2::connection cedar::proc::Network::connectToDataConnectionChanged
                             (
-                              boost::function<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, bool)> slot
+                              boost::function<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, cedar::proc::Network::ConnectionChange)> slot
                             )
 {
   return mDataConnectionChanged.connect(slot);
@@ -1937,7 +1937,15 @@ void cedar::proc::Network::revalidateConnections(const std::string& sender)
   this->getDataConnections(this->getElement<Connectable>(child), output, connections);
   for (unsigned i = 0; i < connections.size(); ++i)
   {
+    cedar::proc::StepPtr sender = this->getElement<Step>(connections.at(i)->getSource()->getParent());
     cedar::proc::StepPtr receiver = this->getElement<Step>(connections.at(i)->getTarget()->getParent());
-    receiver->callInputConnectionChanged(connections.at(i)->getTarget()->getName());
+
+    // inform any interested listeners of this change
+    mDataConnectionChanged
+    (
+      sender->getOutputSlot(connections.at(i)->getSource()->getName()),
+      receiver->getInputSlot(connections.at(i)->getTarget()->getName()),
+      cedar::proc::Network::CONNECTION_UPDATED
+    );
   }
 }
