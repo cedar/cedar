@@ -76,8 +76,6 @@ public:
     CONNECTION_ADDED,
     //! The was removed.
     CONNECTION_REMOVED,
-    //! The was updated.
-    CONNECTION_UPDATED,
   };
 
   //--------------------------------------------------------------------------------------------------------------------
