@@ -1939,6 +1939,7 @@ void cedar::proc::Network::revalidateConnections(const std::string& sender)
   {
     cedar::proc::StepPtr sender = this->getElement<Step>(connections.at(i)->getSource()->getParent());
     cedar::proc::StepPtr receiver = this->getElement<Step>(connections.at(i)->getTarget()->getParent());
+    receiver->callInputConnectionChanged(connections.at(i)->getTarget()->getName());
 
     // inform any interested listeners of this change
     mDataConnectionChanged

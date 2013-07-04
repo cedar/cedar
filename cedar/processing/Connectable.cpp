@@ -981,7 +981,7 @@ void cedar::proc::Connectable::emitOutputPropertiesChangedSignal(const std::stri
   }
   catch (cedar::proc::InvalidNameException& exc)
   {
-    CEDAR_ASSERT(false)
+    CEDAR_THROW(cedar::proc::InvalidNameException, "Tried to emit a signal from an output that does not exist.");
   }
   this->mOutputPropertiesChanged(this->getName() + "." + slot);
 }
