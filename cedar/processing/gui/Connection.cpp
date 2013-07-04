@@ -62,7 +62,8 @@ cedar::proc::gui::Connection::Connection
 :
 mpSource(pSource),
 mpTarget(pTarget),
-mpArrow(0)
+mpArrow(0),
+mValidity(CONNECT_UNKNOWN)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->setFlags(this->flags() | QGraphicsItem::ItemStacksBehindParent | QGraphicsItem::ItemIsSelectable);
@@ -123,8 +124,13 @@ void cedar::proc::gui::Connection::disconnect()
 
 void cedar::proc::gui::Connection::setValidity(cedar::proc::gui::ConnectValidity validity)
 {
+  if (validity == mValidity)
+  {
+    return;
+  }
+  mValidity = validity;
   QPen pen = this->pen();
-  pen.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(validity));
+  pen.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(mValidity));
   this->setPen(pen);
 
   QVector<QPointF> arrow;
@@ -135,10 +141,10 @@ void cedar::proc::gui::Connection::setValidity(cedar::proc::gui::ConnectValidity
   {
     mpArrow = new QGraphicsPolygonItem(this);
     mpArrow->setPolygon(QPolygonF(arrow));
-    pen.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(validity));
+    pen.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(mValidity));
     mpArrow->setPen(pen);
     QBrush brush = this->brush();
-    brush.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(validity));
+    brush.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(mValidity));
     brush.setStyle(Qt::SolidPattern);
     mpArrow->setBrush(brush);
   }
