@@ -190,7 +190,7 @@ private:
   //!@brief Transforms the coordinates of a newly added child into the network's coordinate system.
   void transformChildCoordinates(cedar::proc::gui::GraphicsBase* pItem);
 
-  void checkDataConnection(cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target, bool added);
+  void checkDataConnection(cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target, cedar::proc::Network::ConnectionChange change);
 
   void checkTriggerConnection(cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool added);
 

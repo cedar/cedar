@@ -65,6 +65,20 @@
 class cedar::proc::Network : public QObject, public cedar::proc::Connectable
 {
   Q_OBJECT
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //! Enum that represents the change of a given connection.
+  enum ConnectionChange
+  {
+    //! The connection was added.
+    CONNECTION_ADDED,
+    //! The was removed.
+    CONNECTION_REMOVED,
+    //! The was updated.
+    CONNECTION_UPDATED,
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // types
@@ -316,7 +330,7 @@ public:
   //!@brief Register a function pointer to react to a changing data connection
   boost::signals2::connection connectToDataConnectionChanged
   (
-    boost::function<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, bool)> slot
+    boost::function<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, cedar::proc::Network::ConnectionChange)> slot
   );
 
   //!@brief Register a function pointer to react to adding an element
@@ -443,8 +457,8 @@ protected:
   boost::signals2::signal<void ()> mSlotChanged;
   //!@brief a boost signal that is emitted if a trigger connection changes (added/removed)
   boost::signals2::signal<void (cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool)> mTriggerConnectionChanged;
-  //!@brief a boost signal that is emitted if a data connection changes (added/removed)
-  boost::signals2::signal<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, bool)> mDataConnectionChanged;
+  //!@brief a boost signal that is emitted if a data connection changes (added/removed/changed)
+  boost::signals2::signal<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, cedar::proc::Network::ConnectionChange)> mDataConnectionChanged;
   //!@brief a boost signal that is emitted if an element is added to the network
   boost::signals2::signal<void (cedar::proc::ElementPtr)> mNewElementAddedSignal;
   //!@brief a boost signal that is emitted if an element is removed from the network
