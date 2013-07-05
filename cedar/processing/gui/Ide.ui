@@ -165,7 +165,7 @@
      <x>0</x>
      <y>0</y>
      <width>988</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -318,8 +318,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>116</width>
-          <height>422</height>
+          <width>121</width>
+          <height>424</height>
          </rect>
         </property>
         <attribute name="label">
@@ -331,8 +331,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>116</width>
-          <height>422</height>
+          <width>121</width>
+          <height>424</height>
          </rect>
         </property>
         <attribute name="label">
@@ -386,6 +386,8 @@
    <addaction name="mpThreadsStopAll"/>
    <addaction name="separator"/>
    <addaction name="mpActionBoostControl"/>
+   <addaction name="separator"/>
+   <addaction name="mpActionToggleSmartConnections"/>
   </widget>
   <action name="mpActionNew">
    <property name="text">
@@ -599,6 +601,17 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+B</string>
+   </property>
+  </action>
+  <action name="mpActionToggleSmartConnections">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Toggle smart connections</string>
+   </property>
+   <property name="toolTip">
+    <string>toggle smart connections</string>
    </property>
   </action>
  </widget>

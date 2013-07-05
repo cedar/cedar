@@ -117,6 +117,7 @@ mpBoostControl(NULL)
   QObject::connect(this->mpActionManagePlugins, SIGNAL(triggered()), this, SLOT(showManagePluginsDialog()));
   QObject::connect(this->mpActionSettings, SIGNAL(triggered()), this, SLOT(showSettingsDialog()));
   QObject::connect(this->mpActionShowHideGrid, SIGNAL(toggled(bool)), this, SLOT(toggleGrid(bool)));
+  QObject::connect(this->mpActionToggleSmartConnections, SIGNAL(toggled(bool)), this, SLOT(toggleSmartConnections(bool)));
 
   QObject::connect
   (
@@ -674,6 +675,11 @@ void cedar::proc::gui::Ide::newFile()
   this->resetTo(cedar::proc::gui::NetworkPtr(new cedar::proc::gui::Network(this, this->mpProcessingDrawer->getScene())));
 
   this->displayFilename("unnamed file");
+
+  // set the smart connection button
+  this->mpActionToggleSmartConnections->blockSignals(true);
+  this->mpActionToggleSmartConnections->setChecked(this->mNetwork->getSmartConnection());
+  this->mpActionToggleSmartConnections->blockSignals(false);
 }
 
 void cedar::proc::gui::Ide::save()
@@ -807,6 +813,11 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
   cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureLoadDialogDirectory();
   last_dir->setValue(path);
+
+  // set the smart connection button
+  this->mpActionToggleSmartConnections->blockSignals(true);
+  this->mpActionToggleSmartConnections->setChecked(this->mNetwork->getSmartConnection());
+  this->mpActionToggleSmartConnections->blockSignals(false);
 }
 
 void cedar::proc::gui::Ide::keyPressEvent(QKeyEvent* pEvent)
@@ -888,4 +899,9 @@ void cedar::proc::gui::Ide::showTriggerConnections(bool show)
   {
     mpProcessingDrawer->hideTriggerConnections();
   }
+}
+
+void cedar::proc::gui::Ide::toggleSmartConnections(bool smart)
+{
+  this->mNetwork->toggleSmartConnectionMode(smart);
 }

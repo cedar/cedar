@@ -80,7 +80,8 @@ GraphicsBase(width, height, GRAPHICS_GROUP_NETWORK),
 mNetwork(network),
 mpScene(scene),
 mpMainWindow(pMainWindow),
-mHoldFitToContents(false)
+mHoldFitToContents(false),
+_mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
@@ -103,6 +104,7 @@ mHoldFitToContents(false)
   //!@todo This isn't really a great solution, we need a better one!
   cedar::aux::ParameterPtr name_param = this->getNetwork()->getParameter("name");
   QObject::connect(name_param.get(), SIGNAL(valueChanged()), this, SLOT(networkNameChanged()));
+  QObject::connect(_mSmartMode.get(), SIGNAL(valueChanged()), this, SLOT(toggleSmartConnectionMode()));
 
   mSlotConnection
     = mNetwork->connectToSlotChangedSignal(boost::bind(&cedar::proc::gui::Network::checkSlots, this));
@@ -464,6 +466,10 @@ void cedar::proc::gui::Network::write(const std::string& destination)
   if (!scene.empty())
     root.add_child("ui", scene);
 
+  cedar::aux::ConfigurationNode generic;
+  this->writeConfiguration(generic);
+  root.add_child("ui generic", generic);
+
   write_json(destination, root);
 }
 
@@ -475,6 +481,14 @@ void cedar::proc::gui::Network::read(const std::string& source)
   read_json(source, root);
 
   this->mNetwork->readFrom(root);
+  try
+  {
+    this->readConfiguration(root.get_child("ui generic"));
+  }
+  catch (boost::property_tree::ptree_bad_path& exc) // doesn't exist yet
+  {
+    this->toggleSmartConnectionMode(false);
+  }
 }
 
 void cedar::proc::gui::Network::readConfiguration(const cedar::aux::ConfigurationNode& node)
@@ -855,4 +869,17 @@ void cedar::proc::gui::Network::processStepAddedSignal(cedar::proc::ElementPtr e
 void cedar::proc::gui::Network::processStepRemovedSignal(cedar::proc::ConstElementPtr element)
 {
   delete this->mpScene->getGraphicsItemFor(element.get());
+}
+
+void cedar::proc::gui::Network::toggleSmartConnectionMode()
+{
+  bool smart = this->_mSmartMode->getValue();
+  QList<QGraphicsItem*> items = this->mpScene->items();
+  for (int i = 0; i < items.size(); ++i)
+  {
+    if (cedar::proc::gui::Connection* con = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
+    {
+      con->setSmartMode(smart);
+    }
+  }
 }
