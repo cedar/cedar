@@ -837,7 +837,7 @@ void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPt
       {
         p_scene_element->readConfiguration(iter->second);
         ui.erase(iter);
-        return;
+        break;
       }
     }
   }
