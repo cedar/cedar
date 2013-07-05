@@ -255,13 +255,20 @@ void cedar::proc::Network::stepTriggers()
       time_step = trigger->getSimulatedTimeParameter();
     }
   }
+
+  this->stepTriggers(time_step);
+}
+
+void cedar::proc::Network::stepTriggers(double timeStep)
+{
+  std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
   // step all triggers with this time step
   for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
   {
     auto trigger = *iter;
     if (!trigger->isRunning())
     {
-      trigger->step(time_step);
+      trigger->step(timeStep);
     }
   }
 }

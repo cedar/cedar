@@ -134,12 +134,11 @@ namespace cedar
 
       //!@brief The singleton object of the TransferFunctionFactory.
       typedef cedar::aux::Singleton<TransferFunctionManager> TransferFunctionManagerSingleton;
-
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<TransferFunctionManager>);
       //!@endcond
     }
   }
 }
+
+CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::math::TransferFunctionManager);
 
 #endif  // CEDAR_AUX_MATH_TRANSFER_FUNCTION_H
