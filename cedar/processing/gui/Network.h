@@ -177,9 +177,6 @@ private:
   //!@brief write scene to a node
   void writeScene(cedar::aux::ConfigurationNode& root, cedar::aux::ConfigurationNode& scene);
 
-  //!@brief Reacts to elements being added in the underlying network.
-  void elementAdded(cedar::proc::Network* network, cedar::proc::ElementPtr pElement);
-
   //!@brief Determines whether the network is the root network.
   bool isRootNetwork();
 
@@ -194,11 +191,9 @@ private:
 
   void checkTriggerConnection(cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool added);
 
-  //!@todo why is this called StepAdded?
-  void processStepAddedSignal(cedar::proc::ElementPtr);
+  void processElementAddedSignal(cedar::proc::ElementPtr);
 
-  //!@todo why is this called StepRemoved?
-  void processStepRemovedSignal(cedar::proc::ConstElementPtr);
+  void processElementRemovedSignal(cedar::proc::ConstElementPtr);
 
 private slots:
   //!@brief Updates the label of the network.
