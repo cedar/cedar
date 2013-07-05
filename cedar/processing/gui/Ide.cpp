@@ -75,11 +75,34 @@ mpConsistencyChecker(NULL),
 mpConsistencyDock(NULL),
 mpBoostControl(NULL)
 {
+  // setup the (automatically generated) ui components
   this->setupUi(this);
 
+  // manually added components
+  auto p_enable_custom_time_step = new QCheckBox();
+  p_enable_custom_time_step->setToolTip("Enable/disable custom time step for architecture stepping.");
+  this->mpToolBar->insertWidget(this->mpActionBoostControl, p_enable_custom_time_step);
+
+  this->mpCustomTimeStep = new QDoubleSpinBox();
+  this->mpCustomTimeStep->setValue(10.0);
+  this->mpCustomTimeStep->setMinimum(1.0);
+  this->mpCustomTimeStep->setSuffix(" ms");
+  this->mpCustomTimeStep->setMaximum(10000.0);
+  this->mpCustomTimeStep->setDecimals(1);
+  this->mpCustomTimeStep->setAlignment(Qt::AlignRight);
+  this->mpToolBar->insertWidget(this->mpActionBoostControl, this->mpCustomTimeStep);
+
+  p_enable_custom_time_step->setChecked(false);
+  this->mpCustomTimeStep->setEnabled(false);
+
+  QObject::connect(p_enable_custom_time_step, SIGNAL(toggled(bool)), this->mpCustomTimeStep, SLOT(setEnabled(bool)));
+
+  this->mpToolBar->insertSeparator(this->mpActionBoostControl);
+
+  // set window title
   this->mDefaultWindowTitle = this->windowTitle();
 
-  // first, setup the log to receive messages
+  // setup the log to receive messages
   if (redirectLogToGui)
   {
     this->mpLog->installHandlers(true);
@@ -660,7 +683,14 @@ void cedar::proc::gui::Ide::startThreads()
 
 void cedar::proc::gui::Ide::stepThreads()
 {
-  this->mNetwork->getNetwork()->stepTriggers();
+  if (this->mpCustomTimeStep->isEnabled())
+  {
+    this->mNetwork->getNetwork()->stepTriggers(this->mpCustomTimeStep->value());
+  }
+  else
+  {
+    this->mNetwork->getNetwork()->stepTriggers();
+  }
 }
 
 void cedar::proc::gui::Ide::stopThreads()
