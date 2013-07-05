@@ -312,13 +312,6 @@ public:
   //!@brief Checks whether a name exists in the network.
   bool nameExists(const std::string& name) const;
 
-  /*!@brief Register a function pointer to react to an added element.
-   */
-  boost::signals2::connection connectToElementAdded
-  (
-    boost::function<void (cedar::proc::Network*, cedar::proc::ElementPtr)> slot
-  );
-
   //!@brief Register a function pointer to react to a changing trigger connection
   boost::signals2::connection connectToTriggerConnectionChanged
   (
@@ -498,13 +491,6 @@ private:
 protected:
   //!@brief a vector of all promoted slots
   cedar::aux::StringVectorParameterPtr _mPromotedSlots;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // signals
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-  //! Signal that is triggered whenever an element is added to the network.
-  boost::signals2::signal<void (cedar::proc::Network*, cedar::proc::ElementPtr)> mElementAddedSignal;
 
 }; // class cedar::proc::Network
 

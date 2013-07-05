@@ -210,7 +210,7 @@ void cedar::proc::steps::ChannelSplit::inputConnectionChanged(const std::string&
 
 std::string cedar::proc::steps::ChannelSplit::generateDataName(unsigned int channel) const
 {
-  return "channel " + cedar::aux::toString(channel);
+  return "channel " + cedar::aux::toString(channel + 1);
 }
 
 void cedar::proc::steps::ChannelSplit::compute(const cedar::proc::Arguments& /* arguments */)

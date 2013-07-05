@@ -282,14 +282,6 @@ void cedar::proc::Network::onNameChanged()
   }
 }
 
-boost::signals2::connection cedar::proc::Network::connectToElementAdded
-                            (
-                              boost::function<void (cedar::proc::Network*, cedar::proc::ElementPtr)> slot
-                            )
-{
-  return this->mElementAddedSignal.connect(slot);
-}
-
 std::string cedar::proc::Network::getUniqueIdentifier(const std::string& identifier) const
 {
   if (!this->nameExists(identifier))
@@ -700,8 +692,6 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
   element->setNetwork(boost::static_pointer_cast<cedar::proc::Network>(this->shared_from_this()));
 
   this->mNewElementAddedSignal(element);
-  this->mElementAddedSignal(this, element);
-
 
   // connect to revalidation signal
   if (cedar::proc::ConnectablePtr connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(element))
