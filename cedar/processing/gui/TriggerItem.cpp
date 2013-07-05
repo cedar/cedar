@@ -105,7 +105,7 @@ void cedar::proc::gui::TriggerItem::construct()
                                | QGraphicsItem::ItemSendsGeometryChanges
                                );
 
-  if (cedar::proc::gui::Settings::instance().useGraphicsItemShadowEffects())
+  if (cedar::proc::gui::SettingsSingleton::getInstance()->useGraphicsItemShadowEffects())
   {
     QGraphicsDropShadowEffect *p_effect = new QGraphicsDropShadowEffect();
     p_effect->setBlurRadius(5.0);

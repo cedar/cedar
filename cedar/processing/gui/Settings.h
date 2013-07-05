@@ -62,6 +62,7 @@ class cedar::proc::gui::Settings : public cedar::aux::Configurable
   // friends
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::gui::UiSettings;
+  friend class cedar::aux::Singleton<cedar::proc::gui::Settings>;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -141,6 +142,7 @@ private:
   //!@brief The standard constructor.
   Settings();
 
+public:
   //!@brief Destructor
   ~Settings();
 
@@ -148,9 +150,6 @@ private:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief singleton instance of gui::Settings
-  static cedar::proc::gui::Settings& instance();
-
   //!@brief loads the UI settings
   void load();
   //!@brief saves the UI settings
@@ -234,9 +233,6 @@ private:
 protected:
   // none yet
 private:
-  //!@brief the singleton instance of gui::Settings
-  static cedar::proc::gui::Settings mInstance;
-
   //! Disables writing of the properties; this is useful for unit tests that shouldn't alter the configuration.
   bool mWritingDisabled;
 
@@ -290,6 +286,19 @@ private:
   cedar::aux::EnumParameterPtr _mDefaultStepDisplayMode;
 
 }; // class cedar::proc::gui::Settings
+
+namespace cedar
+{
+  namespace proc
+  {
+    namespace gui
+    {
+      typedef cedar::aux::Singleton<cedar::proc::gui::Settings> SettingsSingleton;
+    }
+  }
+}
+
+CEDAR_PROC_EXPORT_SINGLETON(cedar::proc::gui::Settings);
 
 #endif // CEDAR_PROC_GUI_SETTINGS_H
 

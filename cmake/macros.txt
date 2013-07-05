@@ -263,6 +263,7 @@ macro(cedar_add_library)
   # generate lib.h files
   string(TOUPPER "${libraryName}" CAP_LIB_NAME)
   string(REGEX REPLACE "CEDAR" "" CAP_LIB_NAME "${CAP_LIB_NAME}")
+  string(REGEX REPLACE "cedar" "" LIB_NAMESPACE_NAME "${libraryName}")
   
   set(libHOutputFile "${CMAKE_CURRENT_BINARY_DIR}/lib.h")
   configure_file("${CEDAR_HOME}/cmake/resources/lib.h.in" ${libHOutputFile})

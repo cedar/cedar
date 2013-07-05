@@ -91,7 +91,7 @@ void cedar::proc::gui::PluginLoadDialog::browseFile()
 #elif defined CEDAR_OS_WINDOWS
   QString filter = "Plugins (*.dll)";
 #endif // CEDAR_OS_*
-  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastPluginLoadDialogLocation();
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastPluginLoadDialogLocation();
   QString file = QFileDialog::getOpenFileName
                               (
                                 this, // parent = 0,
