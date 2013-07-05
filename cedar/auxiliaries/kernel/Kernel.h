@@ -207,6 +207,8 @@ private:
 
 #include "cedar/auxiliaries/FactoryManager.h"
 
+CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::kernel::FactoryManager);
+
 namespace cedar
 {
   namespace aux
@@ -215,9 +217,6 @@ namespace cedar
     {
       //!@brief The singleton instance of the kernel factory manager.
       typedef cedar::aux::Singleton<FactoryManager> FactoryManagerSingleton;
-
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_INSTANTIATE_AUX_TEMPLATE(cedar::aux::Singleton<FactoryManager>);
       //!@endcond
     }
   }

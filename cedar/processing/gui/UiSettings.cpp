@@ -54,9 +54,8 @@ QWidget(pParent)
 {
   this->setupUi(this);
 
-  cedar::proc::gui::Settings& settings = cedar::proc::gui::Settings::instance();
-  this->mpUseGraphicsEffectsEdit->setParameter(settings.mUseGraphicsItemShadowEffects);
-  this->mpStepDisplayMode->setParameter(settings._mDefaultStepDisplayMode);
+  this->mpUseGraphicsEffectsEdit->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->mUseGraphicsItemShadowEffects);
+  this->mpStepDisplayMode->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mDefaultStepDisplayMode);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -66,11 +65,11 @@ QWidget(pParent)
 void cedar::proc::gui::UiSettings::reject()
 {
   // just (re-)load the settings that are currently stored on the disk
-  cedar::proc::gui::Settings::instance().load();
+  cedar::proc::gui::SettingsSingleton::getInstance()->load();
 }
 
 void cedar::proc::gui::UiSettings::accept()
 {
   // write the settings to the disk
-  cedar::proc::gui::Settings::instance().save();
+  cedar::proc::gui::SettingsSingleton::getInstance()->save();
 }

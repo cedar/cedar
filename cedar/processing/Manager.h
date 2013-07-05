@@ -62,6 +62,11 @@
 class cedar::proc::Manager
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // friend
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::aux::Singleton<cedar::proc::Manager>;
+
+  //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -78,9 +83,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief get the singleton instance of Manager
-  static Manager& getInstance();
-
   //!\brief access to thread registry
   ThreadRegistry& threads();
 
@@ -123,13 +125,12 @@ private:
 protected:
   // none yet
 private:
-  //! the manager singleton instance
-  static Manager mManager;
-
   //! a registry for all managed threads, which can be globally started or stopped (e.g., LoopedTrigger)
   ThreadRegistry mThreadRegistry;
 
 }; // class cedar::Manager
+
+CEDAR_PROC_SINGLETON(Manager);
 
 #endif // CEDAR_PROC_MANAGER_H
 

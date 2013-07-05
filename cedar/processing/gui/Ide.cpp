@@ -188,7 +188,7 @@ mpBoostControl(NULL)
 
   this->restoreSettings();
 
-  QObject::connect(cedar::proc::gui::Settings::instance().getArchitectureFileHistory().get(),
+  QObject::connect(cedar::proc::gui::SettingsSingleton::getInstance()->getArchitectureFileHistory().get(),
                    SIGNAL(valueChanged()),
                    this,
                    SLOT(fillRecentFilesList()));
@@ -276,7 +276,7 @@ void cedar::proc::gui::Ide::showConsistencyChecker()
 
 void cedar::proc::gui::Ide::exportSvg()
 {
-  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureExportDialogDirectory();
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureExportDialogDirectory();
 
   QString file = QFileDialog::getSaveFileName(this, // parent
                                               "Select where to export", // caption
@@ -433,31 +433,31 @@ void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
 
 void cedar::proc::gui::Ide::storeSettings()
 {
-  cedar::proc::gui::Settings::instance().logSettings()->getFrom(this->mpLogWidget);
-  cedar::proc::gui::Settings::instance().toolsSettings()->getFrom(this->mpToolsWidget);
-  cedar::proc::gui::Settings::instance().propertiesSettings()->getFrom(this->mpPropertiesWidget);
-  cedar::proc::gui::Settings::instance().stepsSettings()->getFrom(this->mpItemsWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->logSettings()->getFrom(this->mpLogWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->toolsSettings()->getFrom(this->mpToolsWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->getFrom(this->mpPropertiesWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->getFrom(this->mpItemsWidget);
 
-  cedar::proc::gui::Settings::instance().storeMainWindow(this);
+  cedar::proc::gui::SettingsSingleton::getInstance()->storeMainWindow(this);
 
-  cedar::proc::gui::Settings::instance().snapToGrid(this->mpProcessingDrawer->getScene()->getSnapToGrid());
+  cedar::proc::gui::SettingsSingleton::getInstance()->snapToGrid(this->mpProcessingDrawer->getScene()->getSnapToGrid());
 }
 
 void cedar::proc::gui::Ide::restoreSettings()
 {
-  cedar::proc::gui::Settings::instance().logSettings()->setTo(this->mpLogWidget);
-  cedar::proc::gui::Settings::instance().toolsSettings()->setTo(this->mpToolsWidget);
-  cedar::proc::gui::Settings::instance().propertiesSettings()->setTo(this->mpPropertiesWidget);
-  cedar::proc::gui::Settings::instance().stepsSettings()->setTo(this->mpItemsWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->logSettings()->setTo(this->mpLogWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->toolsSettings()->setTo(this->mpToolsWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->setTo(this->mpPropertiesWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->setTo(this->mpItemsWidget);
 
-  cedar::proc::gui::Settings::instance().restoreMainWindow(this);
+  cedar::proc::gui::SettingsSingleton::getInstance()->restoreMainWindow(this);
 
-  mpActionShowHideGrid->setChecked(cedar::proc::gui::Settings::instance().snapToGrid());
+  mpActionShowHideGrid->setChecked(cedar::proc::gui::SettingsSingleton::getInstance()->snapToGrid());
 }
 
 void cedar::proc::gui::Ide::loadDefaultPlugins()
 {
-  cedar::proc::Manager::getInstance().loadDefaultPlugins();
+  cedar::proc::ManagerSingleton::getInstance()->loadDefaultPlugins();
 }
 
 void cedar::proc::gui::Ide::showLoadPluginDialog()
@@ -467,7 +467,7 @@ void cedar::proc::gui::Ide::showLoadPluginDialog()
 
   if (res == QDialog::Accepted && p_dialog->plugin())
   {
-    cedar::proc::Manager::getInstance().load(p_dialog->plugin());
+    cedar::proc::ManagerSingleton::getInstance()->load(p_dialog->plugin());
     this->resetStepList();
   }
 
@@ -709,12 +709,12 @@ void cedar::proc::gui::Ide::newFile()
 void cedar::proc::gui::Ide::save()
 {
   this->mNetwork->write();
-  cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(this->mNetwork->getFileName());
+  cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(this->mNetwork->getFileName());
 }
 
 void cedar::proc::gui::Ide::saveAs()
 {
-  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureLoadDialogDirectory();
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
 
   QString file = QFileDialog::getSaveFileName(this, // parent
                                               "Select where to save", // caption
@@ -733,13 +733,13 @@ void cedar::proc::gui::Ide::saveAs()
     //!@todo It would probably be better if the network sends a signal whenever its filename changes and the gui just reacted to that.
     this->displayFilename(file.toStdString());
 
-    cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(file.toStdString());
+    cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
 
     this->mpActionSave->setEnabled(true);
 
-    cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(file.toStdString());
+    cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
     QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
-    cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureLoadDialogDirectory();
+    cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
     last_dir->setValue(path);
 
   }
@@ -747,7 +747,7 @@ void cedar::proc::gui::Ide::saveAs()
 
 void cedar::proc::gui::Ide::load()
 {
-  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureLoadDialogDirectory();
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
 
   QString file = QFileDialog::getOpenFileName(this, // parent
                                               "Select which file to load", // caption
@@ -833,9 +833,9 @@ void cedar::proc::gui::Ide::loadFile(QString file)
 
   this->displayFilename(file.toStdString());
 
-  cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(file.toStdString());
+  cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
-  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureLoadDialogDirectory();
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
   last_dir->setValue(path);
 }
 
@@ -874,7 +874,7 @@ void cedar::proc::gui::Ide::recentFileItemTriggered()
   catch(boost::property_tree::json_parser::json_parser_error& exc)
   {
     // remove this file from list of recent architectures
-    cedar::aux::StringVectorParameterPtr entries = cedar::proc::gui::Settings::instance().getArchitectureFileHistory();
+    cedar::aux::StringVectorParameterPtr entries = cedar::proc::gui::SettingsSingleton::getInstance()->getArchitectureFileHistory();
     entries->eraseAll(file.toStdString());
     std::string message = "File "
                           + file.toStdString()
@@ -887,7 +887,7 @@ void cedar::proc::gui::Ide::fillRecentFilesList()
 {
   QMenu *p_menu = new QMenu();
 
-  cedar::aux::StringVectorParameterPtr entries = cedar::proc::gui::Settings::instance().getArchitectureFileHistory();
+  cedar::aux::StringVectorParameterPtr entries = cedar::proc::gui::SettingsSingleton::getInstance()->getArchitectureFileHistory();
   if (entries->size() == 0)
   {
     this->mpRecentFiles->setEnabled(false);

@@ -112,23 +112,6 @@ private:
 
 }; // class cedar::aux::Settings
 
-namespace cedar
-{
-  namespace aux
-  {
-#ifdef MSVC
-#ifdef CEDAR_LIB_EXPORTS_AUX
-    // dllexport
-    template class __declspec(dllexport) cedar::aux::Singleton<cedar::aux::Settings>;
-#else // CEDAR_LIB_EXPORTS_AUX
-    // dllimport
-    extern template class __declspec(dllimport) cedar::aux::Singleton<cedar::aux::Settings>;
-#endif // CEDAR_LIB_EXPORTS_AUX
-#endif // MSVC
-
-    //!@brief The singleton instance of the auxiliaries settings.
-    typedef cedar::aux::Singleton<cedar::aux::Settings> SettingsSingleton;
-  }
-}
+CEDAR_AUX_SINGLETON(Settings);
 
 #endif // CEDAR_AUX_SETTINGS_H
