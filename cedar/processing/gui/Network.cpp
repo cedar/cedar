@@ -91,8 +91,6 @@ mHoldFitToContents(false)
 
   this->setElement(mNetwork);
 
-  this->mNetwork->connectToElementAdded(boost::bind(&cedar::proc::gui::Network::elementAdded, this, _1, _2));
-
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
                                );
@@ -126,12 +124,12 @@ mHoldFitToContents(false)
   mNewElementAddedConnection
     = mNetwork->connectToNewElementAddedSignal
       (
-        boost::bind(&cedar::proc::gui::Network::processStepAddedSignal, this, _1)
+        boost::bind(&cedar::proc::gui::Network::processElementAddedSignal, this, _1)
       );
   mElementRemovedConnection
     = mNetwork->connectToElementRemovedSignal
       (
-        boost::bind(&cedar::proc::gui::Network::processStepRemovedSignal, this, _1)
+        boost::bind(&cedar::proc::gui::Network::processElementRemovedSignal, this, _1)
       );
 
   this->update();
@@ -342,27 +340,6 @@ bool cedar::proc::gui::Network::isRootNetwork()
 void cedar::proc::gui::Network::transformChildCoordinates(cedar::proc::gui::GraphicsBase* pItem)
 {
   pItem->setPos(this->mapFromItem(pItem, QPointF(0, 0)));
-}
-
-void cedar::proc::gui::Network::elementAdded
-     (
-       cedar::proc::Network* CEDAR_DEBUG_ONLY(pNetwork),
-       cedar::proc::ElementPtr pElement
-     )
-{
-  CEDAR_DEBUG_ASSERT(pNetwork == this->getNetwork().get());
-
-  if (this->mpScene && !this->isRootNetwork())
-  {
-    cedar::proc::gui::GraphicsBase *p_element_item = this->mpScene->getGraphicsItemFor(pElement.get());
-    CEDAR_ASSERT(p_element_item != NULL);
-    if (p_element_item->parentItem() != this)
-    {
-      this->transformChildCoordinates(p_element_item);
-      p_element_item->setParentItem(this);
-      this->fitToContents();
-    }
-  }
 }
 
 void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& elements)
@@ -802,7 +779,7 @@ void cedar::proc::gui::Network::checkTriggerConnection
   }
 }
 
-void cedar::proc::gui::Network::processStepAddedSignal(cedar::proc::ElementPtr element)
+void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPtr element)
 {
   // store the type, which can be compared to entries in a configuration node
   std::string current_type;
@@ -850,9 +827,20 @@ void cedar::proc::gui::Network::processStepAddedSignal(cedar::proc::ElementPtr e
       }
     }
   }
+
+  if (this->mpScene && !this->isRootNetwork())
+  {
+    CEDAR_ASSERT(p_scene_element != NULL);
+    if (p_scene_element->parentItem() != this)
+    {
+      this->transformChildCoordinates(p_scene_element);
+      p_scene_element->setParentItem(this);
+      this->fitToContents();
+    }
+  }
 }
 
-void cedar::proc::gui::Network::processStepRemovedSignal(cedar::proc::ConstElementPtr element)
+void cedar::proc::gui::Network::processElementRemovedSignal(cedar::proc::ConstElementPtr element)
 {
   delete this->mpScene->getGraphicsItemFor(element.get());
 }
