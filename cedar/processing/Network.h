@@ -61,6 +61,8 @@
  *        elements in the network.
  *
  * @todo Write a private eraseConnection function to avoid duplicated code in disconnectSlots and remove
+ *
+ * @todo Write a separate class for the read/writeFromV1 method and all that belongs to it.
  */
 class cedar::proc::Network : public QObject, public cedar::proc::Connectable
 {
@@ -113,20 +115,28 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   /*!@brief Reads the network from a configuration node.
+   *
+   * @todo This should be called readConfiguration (as in Configurable).
    */
   void readFrom(const cedar::aux::ConfigurationNode& root);
 
   /*!@brief Writes the network to a configuration node.
+   *
+   * @todo This should be called writeConfiguration (as in Configurable).
    */
   void writeTo(cedar::aux::ConfigurationNode& root);
 
   /*!@brief Reads the network from a given json file.
    *
    *        This file must have the same format as the one output by cedar::proc::Network::writeFile.
+   *
+   * @todo Should be replaced by readJson (from Configurable)
    */
   void readFile(const std::string& filename);
 
   /*!@brief Writes the network to a given json file.
+   *
+   * @todo Should be replaced by writeJson (from Configurable)
    */
   void writeFile(const std::string& filename);
 
@@ -140,12 +150,12 @@ public:
    */
   void removeAll();
 
-  /*!@brief Adds a new element with the type given by className and the name instanceName.
+  /*!@brief Creates a new element with the type given by className and the name instanceName.
    *
-   * @param className    Identifier of the type registered at cedar::proc::DeclarationRegistry.
+   * @param className    Identifier of the type registered at cedar::aux::DeclarationManager.
    * @param instanceName Name to be given to the new element.
    */
-  void add(std::string className, std::string instanceName);
+  void create(std::string className, std::string instanceName);
 
   /*!@brief Adds a given element to the network under the instanceName.
    *
@@ -242,6 +252,8 @@ public:
    *
    * @param sourceSlot The source slot.
    * @param targetSlot The target slot.
+   *
+   * @todo Should this be private/protected?
    */
   void disconnectSlots(cedar::proc::ConstDataSlotPtr sourceSlot, cedar::proc::ConstDataSlotPtr targetSlot);
 
@@ -272,10 +284,13 @@ public:
   const cedar::proc::Network::DataConnectionVector& getDataConnections() const;
 
   /*!@brief Returns a const reference to the map of names to elements stored in the network.
+   *
+   * @todo Should be called getElements
    */
   const ElementMap& elements() const;
 
   /*!@brief Updates the name stored for the object.
+   * @todo This should be solved with signals/slots.
    */
   void updateObjectName(cedar::proc::Element* object);
 
@@ -334,6 +349,7 @@ public:
   boost::signals2::connection connectToSlotChangedSignal(boost::function<void ()> slot);
 
   //!@brief processes slot promotion
+  //!@todo Make this private?
   void processPromotedSlots();
 
   //!@brief returns the last ui node that was read

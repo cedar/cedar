@@ -508,7 +508,7 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
   this->processPromotedSlots();
 }
 
-void cedar::proc::Network::add(std::string className, std::string instanceName)
+void cedar::proc::Network::create(std::string className, std::string instanceName)
 {
   cedar::proc::ElementPtr element = cedar::proc::ElementManagerSingleton::getInstance()->allocate(className);
   this->add(element, instanceName);

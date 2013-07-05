@@ -297,16 +297,14 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
   }
 }
 
-void cedar::proc::gui::Scene::networkGroupingContextMenuEvent(QMenu& /* menu */)
+void cedar::proc::gui::Scene::networkGroupingContextMenuEvent(QMenu& menu)
 {
   //!@todo Fix networks and reenable this functionality
-  /*
   QAction *p_add_to_new_network = menu.addAction("group into new network");
   QObject::connect(p_add_to_new_network, SIGNAL(triggered()), this, SLOT(promoteElementToNewGroup()));
 
   QMenu *p_add_to_existing_network = menu.addMenu("move to existing network");
   this->addNetworkNames(p_add_to_existing_network, this->mNetwork->getNetwork(), "");
-  */
 }
 
 void cedar::proc::gui::Scene::addNetworkNames
@@ -774,7 +772,7 @@ cedar::proc::ElementPtr cedar::proc::gui::Scene::addElement(const std::string& c
 
   try
   {
-    mNetwork->getNetwork()->add(classId, adjusted_name);
+    mNetwork->getNetwork()->create(classId, adjusted_name);
     /*@todo check if this works in all cases since adding an item triggers a signal/slot chain,
      * which may not been processed completely
      */
