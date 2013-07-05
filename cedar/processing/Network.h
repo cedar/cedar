@@ -358,8 +358,21 @@ public:
   //!@brief Stops all running triggers in this network.
   void stopTriggers(bool wait = false);
 
-  //!@brief Single-steps all triggers in this network.
+  /*!@brief   Single-steps all triggers in this network.
+   *
+   *          The step time is in this case automatically determined by using the smallest step time of all triggers in
+   *          the network.
+   *
+   * @see     stepTriggers(double timeStep).
+   */
   void stepTriggers();
+
+  /*!@brief   Single-steps all triggers in this network with the given time step.
+   *
+   * @remarks Triggers that are running will not get stepped by this method. In general, it should only be called when
+   *          all triggers are stopped.
+   */
+  void stepTriggers(double stepTime);
 
   //! Returns a list of issues in the network.
   std::vector<cedar::proc::ConsistencyIssuePtr> checkConsistency() const;

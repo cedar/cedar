@@ -365,7 +365,7 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QToolBar" name="toolBar">
+  <widget class="QToolBar" name="mpToolBar">
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
@@ -382,9 +382,9 @@
    <addaction name="mpActionToggleTriggerVisibility"/>
    <addaction name="separator"/>
    <addaction name="mpThreadsStartAll"/>
-   <addaction name="mpThreadsSingleStep"/>
    <addaction name="mpThreadsStopAll"/>
    <addaction name="separator"/>
+   <addaction name="mpThreadsSingleStep"/>
    <addaction name="mpActionBoostControl"/>
   </widget>
   <action name="mpActionNew">

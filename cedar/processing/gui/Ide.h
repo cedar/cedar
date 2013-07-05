@@ -49,6 +49,7 @@
 // SYSTEM INCLUDES
 #include <QMainWindow>
 #include <QKeyEvent>
+#include <QDoubleSpinBox>
 #include <map>
 
 
@@ -295,6 +296,9 @@ private:
   QString mDefaultWindowTitle;
 
   cedar::proc::gui::BoostControl* mpBoostControl;
+
+  //! In which the user specifies the time step for single-step functionality.
+  QDoubleSpinBox* mpCustomTimeStep;
 
 }; // class cedar::MainWindow
 
