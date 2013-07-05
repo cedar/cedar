@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
 
@@ -85,18 +86,15 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::steps::ChannelSplit::ChannelSplit()
-:
-mChannel1(new cedar::aux::MatData(cv::Mat(2, 2, CV_32F))),
-mChannel2(new cedar::aux::MatData(cv::Mat(2, 2, CV_32F))),
-mChannel3(new cedar::aux::MatData(cv::Mat(2, 2, CV_32F))),
-mChannel4(new cedar::aux::MatData(cv::Mat(2, 2, CV_32F)))
 {
   this->declareInput("three channel input");
 
-  this->declareOutput("channel 1", mChannel1);
-  this->declareOutput("channel 2", mChannel2);
-  this->declareOutput("channel 3", mChannel3);
-  this->declareOutput("channel 4", mChannel4);
+  this->mChannelData.resize(4);
+  for (size_t i = 0; i < this->mChannelData.size(); ++i)
+  {
+    this->mChannelData.at(i) = cedar::aux::MatDataPtr(new cedar::aux::MatData(cv::Mat(2, 2, CV_32F)));
+    this->declareOutput(this->generateDataName(i), this->mChannelData.at(i));
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -113,7 +111,8 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::ChannelSplit::determineInput
   {
     if
     (
-      mat_data->getData().channels() > 1
+      !mat_data->isEmpty()
+      && mat_data->getData().channels() > 1
       && mat_data->getData().channels() <= 4
       && cedar::aux::math::getDimensionalityOf(mat_data->getData()) < 3
     )
@@ -148,10 +147,12 @@ void cedar::proc::steps::ChannelSplit::inputConnectionChanged(const std::string&
   this->mInput = cedar::aux::asserted_pointer_cast<cedar::aux::ConstMatData>(data);
 
   // copy annotations
-  this->mChannel1->copyAnnotationsFrom(this->mInput);
-  this->mChannel2->copyAnnotationsFrom(this->mInput);
-  this->mChannel3->copyAnnotationsFrom(this->mInput);
-  this->mChannel4->copyAnnotationsFrom(this->mInput);
+  for (size_t i = 0; i < this->mChannels.size(); ++i)
+  {
+    this->mChannelData.at(i)->copyAnnotationsFrom(this->mInput);
+  }
+
+  //!@todo Remove/add outputs based on the actual number of channels
 
   // split the channels
   unsigned int num_channels = static_cast<unsigned int>(this->mInput->getData().channels());
@@ -169,10 +170,10 @@ void cedar::proc::steps::ChannelSplit::inputConnectionChanged(const std::string&
 
 
   // reset channels
-  this->mChannel1->setData(cv::Mat::zeros(2, 2, this->mInput->getData().type()));
-  this->mChannel2->setData(cv::Mat::zeros(2, 2, this->mInput->getData().type()));
-  this->mChannel3->setData(cv::Mat::zeros(2, 2, this->mInput->getData().type()));
-  this->mChannel4->setData(cv::Mat::zeros(2, 2, this->mInput->getData().type()));
+  for (size_t i = 0; i < this->mChannelData.size(); ++i)
+  {
+    this->mChannelData.at(i)->setData(cv::Mat::zeros(2, 2, this->mInput->getData().type()));
+  }
 
   this->mChannels.resize(num_channels);
 
@@ -183,90 +184,45 @@ void cedar::proc::steps::ChannelSplit::inputConnectionChanged(const std::string&
     return;
   }
 
-  // apply channel annotations and preallocate matrices
-  switch (num_channels)
+  for (size_t i = 0; i < num_channels; ++i)
   {
-  case 4:
     if (color_space)
     {
-      this->mChannel4->setAnnotation
+      this->mChannelData.at(i)->setAnnotation
       (
-        cedar::aux::annotation::ColorSpacePtr(new cedar::aux::annotation::ColorSpace(color_space->getChannelType(3)))
+        cedar::aux::annotation::ColorSpacePtr(new cedar::aux::annotation::ColorSpace(color_space->getChannelType(i)))
       );
     }
-    this->mChannel4->setData
+    this->mChannelData.at(i)->setData
     (
       cv::Mat::zeros(this->mInput->getData().rows, this->mInput->getData().cols, type)
     );
-
-  case 3:
-    if (color_space)
-    {
-      this->mChannel3->setAnnotation
-      (
-        cedar::aux::annotation::ColorSpacePtr(new cedar::aux::annotation::ColorSpace(color_space->getChannelType(2)))
-      );
-    }
-    this->mChannel3->setData
-    (
-      cv::Mat::zeros(this->mInput->getData().rows, this->mInput->getData().cols, type)
-    );
-
-  case 2:
-    if (color_space)
-    {
-      this->mChannel2->setAnnotation
-      (
-        cedar::aux::annotation::ColorSpacePtr(new cedar::aux::annotation::ColorSpace(color_space->getChannelType(1)))
-      );
-    }
-    this->mChannel2->setData
-    (
-      cv::Mat::zeros(this->mInput->getData().rows, this->mInput->getData().cols, type)
-    );
-
-  case 1:
-    if (color_space)
-    {
-      this->mChannel1->setAnnotation
-      (
-        cedar::aux::annotation::ColorSpacePtr(new cedar::aux::annotation::ColorSpace(color_space->getChannelType(0)))
-      );
-    }
-    this->mChannel1->setData
-    (
-      cv::Mat::zeros(this->mInput->getData().rows, this->mInput->getData().cols, type)
-    );
-
-  default:
-    // do nothing
-    break;
   }
+
   //!@todo fix this
   this->onTrigger();
-  this->emitOutputPropertiesChangedSignal("channel 1");
-  this->emitOutputPropertiesChangedSignal("channel 2");
-  this->emitOutputPropertiesChangedSignal("channel 3");
-  this->emitOutputPropertiesChangedSignal("channel 4");
+  for (size_t i = 0; i < this->mChannelData.size(); ++i)
+  {
+    this->emitOutputPropertiesChangedSignal(this->generateDataName(i));
+  }
   this->onTrigger();
+}
+
+std::string cedar::proc::steps::ChannelSplit::generateDataName(unsigned int channel) const
+{
+  return "channel " + cedar::aux::toString(channel);
 }
 
 void cedar::proc::steps::ChannelSplit::compute(const cedar::proc::Arguments& /* arguments */)
 {
   const cv::Mat& input = this->mInput->getData();
 
+  CEDAR_ASSERT(static_cast<size_t>(input.channels()) <= this->mChannelData.size());
+
   cv::split(input, this->mChannels);
 
-  switch (input.channels())
+  for (size_t i = 0; i < static_cast<size_t>(input.channels()); ++i)
   {
-    case 4:
-      this->mChannel4->setData(this->mChannels.at(3));
-    case 3:
-      this->mChannel3->setData(this->mChannels.at(2));
-    case 2:
-      this->mChannel2->setData(this->mChannels.at(1));
-    case 1:
-    default:
-      this->mChannel1->setData(this->mChannels.at(0));
+    this->mChannelData.at(i)->setData(this->mChannels.at(i));
   }
 }

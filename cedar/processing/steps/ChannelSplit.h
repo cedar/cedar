@@ -96,6 +96,8 @@ private:
   //!@brief Updates the output matrix.
   void compute(const cedar::proc::Arguments& arguments);
 
+  std::string generateDataName(unsigned int channel) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -105,10 +107,7 @@ private:
   cedar::aux::ConstMatDataPtr mInput;
   cedar::aux::annotation::ConstColorSpacePtr mInputColorSpaceAnnotation;
 
-  cedar::aux::MatDataPtr mChannel1;
-  cedar::aux::MatDataPtr mChannel2;
-  cedar::aux::MatDataPtr mChannel3;
-  cedar::aux::MatDataPtr mChannel4;
+  std::vector<cedar::aux::MatDataPtr> mChannelData;
 
   std::vector<cv::Mat> mChannels;
 
