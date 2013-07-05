@@ -163,6 +163,16 @@ public:
     this->mNextElementUiConfigurations[element.get()] = uiDescription;
   }
 
+  void toggleSmartConnectionMode(bool smart)
+  {
+    this->_mSmartMode->setValue(smart);
+  }
+
+  bool getSmartConnection() const
+  {
+    return this->_mSmartMode->getValue();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -203,6 +213,8 @@ private:
 private slots:
   //!@brief Updates the label of the network.
   void networkNameChanged();
+
+  void toggleSmartConnectionMode();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -246,10 +258,12 @@ private:
   bool mHoldFitToContents;
 
   //! Text item used for displaying the name of the network.
-  QGraphicsTextItem *mpNameDisplay;
+  QGraphicsTextItem* mpNameDisplay;
 
   //! Configuration of the next element that is added to the scene.
   std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode> mNextElementUiConfigurations;
+
+  cedar::aux::BoolParameterPtr _mSmartMode;
 
 }; // class cedar::proc::gui::NetworkFile
 

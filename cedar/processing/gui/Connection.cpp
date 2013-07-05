@@ -62,8 +62,10 @@ cedar::proc::gui::Connection::Connection
 :
 mpSource(pSource),
 mpTarget(pTarget),
-mpArrow(0),
-mValidity(CONNECT_UNKNOWN)
+mpArrowStart(0),
+mpArrowEnd(0),
+mValidity(CONNECT_UNKNOWN),
+mSmartMode(false)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->setFlags(this->flags() | QGraphicsItem::ItemStacksBehindParent | QGraphicsItem::ItemIsSelectable);
@@ -92,13 +94,21 @@ mValidity(CONNECT_UNKNOWN)
     arrow.push_back(QPointF(5.0, 0.0));
     arrow.push_back(QPointF(-5.0, 0.0));
     arrow.push_back(QPointF(0.0, 8.0));
-    mpArrow = new QGraphicsPolygonItem(this);
-    mpArrow->setPolygon(QPolygonF(arrow));
-    mpArrow->setPen(pen);
+    mpArrowStart = new QGraphicsPolygonItem(this);
+    mpArrowStart->setPolygon(QPolygonF(arrow));
+    mpArrowStart->setPen(pen);
     QBrush brush = this->brush();
     brush.setColor(QColor(180, 180, 180));
     brush.setStyle(Qt::SolidPattern);
-    mpArrow->setBrush(brush);
+    mpArrowStart->setBrush(brush);
+
+    if (mSmartMode)
+    {
+      mpArrowEnd = new QGraphicsPolygonItem(this);
+      mpArrowEnd->setPolygon(QPolygonF(arrow));
+      mpArrowEnd->setPen(pen);
+      mpArrowEnd->setBrush(brush);
+    }
   }
   this->update();
 }
@@ -133,21 +143,36 @@ void cedar::proc::gui::Connection::setValidity(cedar::proc::gui::ConnectValidity
   pen.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(mValidity));
   this->setPen(pen);
 
-  if (mpArrow == 0)
+  if (mpArrowStart == 0)
   {
     QVector<QPointF> arrow;
     arrow.push_back(QPointF(5.0, 0.0));
     arrow.push_back(QPointF(-5.0, 0.0));
     arrow.push_back(QPointF(0.0, 8.0));
-    mpArrow = new QGraphicsPolygonItem(this);
-    mpArrow->setPolygon(QPolygonF(arrow));
+    mpArrowStart = new QGraphicsPolygonItem(this);
+    mpArrowStart->setPolygon(QPolygonF(arrow));
   }
   pen.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(mValidity));
-  mpArrow->setPen(pen);
+  mpArrowStart->setPen(pen);
   QBrush brush = this->brush();
   brush.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(mValidity));
   brush.setStyle(Qt::SolidPattern);
-  mpArrow->setBrush(brush);
+  mpArrowStart->setBrush(brush);
+
+  if (mpArrowEnd == 0 && mSmartMode)
+  {
+    QVector<QPointF> arrow;
+    arrow.push_back(QPointF(5.0, 0.0));
+    arrow.push_back(QPointF(-5.0, 0.0));
+    arrow.push_back(QPointF(0.0, 8.0));
+    mpArrowEnd = new QGraphicsPolygonItem(this);
+    mpArrowEnd->setPolygon(QPolygonF(arrow));
+  }
+  if (mSmartMode)
+  {
+    mpArrowEnd->setPen(pen);
+    mpArrowEnd->setBrush(brush);
+  }
   this->update();
 }
 
@@ -157,21 +182,129 @@ void cedar::proc::gui::Connection::update()
 
   QPointF source = this->mpSource->getConnectionAnchorInScene() - this->mpSource->scenePos();
   QPointF target = this->mpTarget->getConnectionAnchorInScene() - this->mpSource->scenePos();
-  QPointF middle_point = (target + source) / 2.0;
-  QPointF vector_src_tar = target - source;
-
   QPainterPath path(source);
-  path.lineTo(target);
-
-  this->setPath(path);
-  if (mpArrow != 0)
+  if (mSmartMode)
   {
-    QTransform matrix;
-    matrix.translate(middle_point.x(), middle_point.y());
-    matrix.rotate(atan2(vector_src_tar.y(), vector_src_tar.x()) * 180 / cedar::aux::math::pi - 90);
-    mpArrow->setTransform(matrix);
-  }
+    // the minimum length of each connection
+    qreal min_length = 30.0;
+    // some heuristics of the connection
+    bool going_right; // is the target to the right of the source?
+    bool too_close; // is there enough space between source and target to guarantee min_length?
+    if (target.x() < source.x())
+    {
+      going_right = false;
+    }
+    else
+    {
+      going_right = true;
+      if (target.x() - source.x() < 2 * min_length)
+      {
+        too_close = true;
+      }
+      else
+      {
+        too_close = false;
+      }
+    }
 
+    // case "going right"
+    if (going_right)
+    {
+      // first, leave the source node in a rightward direction
+      qreal length = (source.x() + target.x())/2.0;
+      if (length < min_length)
+      {
+        length = min_length;
+      }
+      QPointF first_point = QPointF(source.x() + length, source.y());
+      path.lineTo(first_point);
+      // source and target are too close to assure min_length, break again
+      if (too_close)
+      {
+        qreal move_left = min_length - (target.x() - source.x());
+        QPointF second_point = QPointF(source.x() + length, (source.y() + target.y()) / 2.0);
+        path.lineTo(second_point);
+        QPointF third_point = QPointF(source.x() - move_left, (source.y() + target.y()) / 2.0);
+        path.lineTo(third_point);
+        QPointF fourth_point = QPointF(source.x() - move_left, target.y());
+        path.lineTo(fourth_point);
+        path.lineTo(target);
+      }
+      else // this is the easy case, we just need one additional corner
+      {
+        QPointF second_point = QPointF(source.x() + length, target.y());
+        path.lineTo(second_point);
+        path.lineTo(target);
+      }
+    }
+    else
+    {
+      // first, leave the source node in a rightward direction
+      qreal length = (source.x() + target.x())/2.0;
+      if (length < min_length)
+      {
+        length = min_length;
+      }
+      // make sure that source's and target's vertical distance isn't too short
+      if (std::abs(source.y() - target.y()) < 2 * min_length)
+      {
+        too_close = true;
+      }
+      else
+      {
+        too_close = false;
+      }
+      QPointF first_point = QPointF(source.x() + length, source.y());
+      path.lineTo(first_point);
+      qreal move_left = min_length - (target.x() - source.x());
+      if (too_close)
+      {
+        QPointF second_point = QPointF(source.x() + length, source.y() - 2 * min_length);
+        path.lineTo(second_point);
+        QPointF third_point = QPointF(source.x() - move_left, source.y() - 2 * min_length);
+        path.lineTo(third_point);
+      }
+      else
+      {
+        QPointF second_point = QPointF(source.x() + length, (source.y() + target.y()) / 2.0);
+        path.lineTo(second_point);
+        QPointF third_point = QPointF(source.x() - move_left, (source.y() + target.y()) / 2.0);
+        path.lineTo(third_point);
+      }
+      QPointF fourth_point = QPointF(source.x() - move_left, target.y());
+      path.lineTo(fourth_point);
+      path.lineTo(target);
+    }
+    if (mpArrowStart != 0)
+    {
+      QTransform matrix;
+      matrix.translate(source.x() + min_length/2.0, source.y());
+      matrix.rotate(270.0);
+      mpArrowStart->setTransform(matrix);
+    }
+    if (mpArrowEnd != 0)
+    {
+      QTransform matrix;
+      matrix.translate(target.x() - min_length/2.0, target.y());
+      matrix.rotate(270.0);
+      mpArrowEnd->setTransform(matrix);
+    }
+  }
+  else
+  {
+    QPointF middle_point = (target + source) / 2.0;
+    QPointF vector_src_tar = target - source;
+
+    path.lineTo(target);
+    if (mpArrowStart != 0)
+    {
+      QTransform matrix;
+      matrix.translate(middle_point.x(), middle_point.y());
+      matrix.rotate(atan2(vector_src_tar.y(), vector_src_tar.x()) * 180 / cedar::aux::math::pi - 90);
+      mpArrowStart->setTransform(matrix);
+    }
+  }
+  this->setPath(path);
 }
 
 void cedar::proc::gui::Connection::paint(QPainter *pPainter, const QStyleOptionGraphicsItem*, QWidget*)
@@ -207,4 +340,45 @@ cedar::proc::gui::GraphicsBase* cedar::proc::gui::Connection::getSource()
 cedar::proc::gui::GraphicsBase* cedar::proc::gui::Connection::getTarget()
 {
   return this->mpTarget;
+}
+
+void cedar::proc::gui::Connection::setSmartMode(bool smart)
+{
+  this->mSmartMode = smart;
+  if (this->mSmartMode)
+  {
+    QPen pen = this->pen();
+    QBrush brush = this->brush();
+    if (mValidity != CONNECT_UNKNOWN)
+    {
+      pen.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(mValidity));
+      brush.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(mValidity));
+    }
+    else
+    {
+      pen.setColor(QColor(180, 180, 180));
+      brush.setColor(QColor(180, 180, 180));
+    }
+    brush.setStyle(Qt::SolidPattern);
+    if (mpArrowEnd == 0)
+    {
+      QVector<QPointF> arrow;
+      arrow.push_back(QPointF(5.0, 0.0));
+      arrow.push_back(QPointF(-5.0, 0.0));
+      arrow.push_back(QPointF(0.0, 8.0));
+      mpArrowEnd = new QGraphicsPolygonItem(this);
+      mpArrowEnd->setPolygon(QPolygonF(arrow));
+    }
+    mpArrowEnd->setPen(pen);
+    mpArrowEnd->setBrush(brush);
+  }
+  else
+  {
+    if (mpArrowEnd)
+    {
+      delete mpArrowEnd;
+      mpArrowEnd = 0;
+    }
+  }
+  this->update();
 }
