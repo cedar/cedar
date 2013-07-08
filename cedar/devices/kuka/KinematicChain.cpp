@@ -86,7 +86,7 @@ cedar::dev::kuka::KinematicChain::~KinematicChain()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::kuka::KinematicChain::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
-  this->cedar::dev::robot::KinematicChain::readConfiguration(node);
+  this->cedar::dev::KinematicChain::readConfiguration(node);
 
   // create a new Instance of the friRemote
   if (_mRemoteHost->getValue() != "NULL")
@@ -172,7 +172,7 @@ void cedar::dev::kuka::KinematicChain::start()
   }
 
   //QThread::start();
-  cedar::dev::robot::KinematicChain::start();
+  cedar::dev::KinematicChain::start();
 }
 //----------------------------------------------------------------------------------------------------------------------
 // private member functions

@@ -59,6 +59,7 @@
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/units/prefixes.h"
 
 #include "cedar/processing/consistency/LoopedStepNotConnected.h"
 
@@ -261,7 +262,9 @@ void cedar::proc::Network::stepTriggers()
 
 void cedar::proc::Network::stepTriggers(cedar::unit::Time stepTime)
 {
-  this->stepTriggers(cedar::unit::Milliseconds(stepTime) / cedar::unit::Milliseconds(1));
+  double time_milli = stepTime / cedar::unit::seconds * 1000;
+  std::cout << "milli " << time_milli << std::endl;
+  this->stepTriggers(time_milli);
 }
 
 void cedar::proc::Network::stepTriggers(double timeStep)
