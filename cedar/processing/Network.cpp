@@ -259,6 +259,11 @@ void cedar::proc::Network::stepTriggers()
   this->stepTriggers(time_step);
 }
 
+void cedar::proc::Network::stepTriggers(cedar::unit::Time stepTime)
+{
+  this->stepTriggers(cedar::unit::Milliseconds(stepTime) / cedar::unit::Milliseconds(1));
+}
+
 void cedar::proc::Network::stepTriggers(double timeStep)
 {
   std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();

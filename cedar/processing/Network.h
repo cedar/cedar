@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/namespace.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -372,14 +373,22 @@ public:
    *          The step time is in this case automatically determined by using the smallest step time of all triggers in
    *          the network.
    *
-   * @see     stepTriggers(double timeStep).
+   * @see     stepTriggers(double).
    */
   void stepTriggers();
 
   /*!@brief   Single-steps all triggers in this network with the given time step.
    *
+   * @see     stepTriggers(double).
+   */
+  void stepTriggers(cedar::unit::Time stepTime);
+
+  /*!@brief   Single-steps all triggers in this network with the given time step.
+   *
    * @remarks Triggers that are running will not get stepped by this method. In general, it should only be called when
    *          all triggers are stopped.
+   *
+   * @todo    Should a double-version of this method be available at all?
    */
   void stepTriggers(double stepTime);
 
