@@ -307,29 +307,7 @@ cedar::proc::ConstTriggerPtr cedar::proc::gui::TriggerItem::getTrigger() const
   return this->mTrigger;
 }
 
-void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::StepItem *pTarget)
+cedar::proc::gui::Connection* cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::GraphicsBase *pTarget)
 {
-  /*!@todo check that this connection isn't added twice; the check above doesn't to this because during file loading,
-   *       the "real" connections are already read via cedar::proc::Network, and then added to the ui afterwards using
-   *       this function.
-   */
-  this->scene()->addItem(new Connection(this, pTarget));
-}
-
-void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::TriggerItem *pTarget)
-{
-  /*!@todo check that this connection isn't added twice; the check above doesn't to this because during file loading,
-   *       the "real" connections are already read via cedar::proc::Network, and then added to the ui afterwards using
-   *       this function.
-   */
-  this->scene()->addItem(new Connection(this, pTarget));
-}
-
-void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::GraphicsBase *pTarget)
-{
-  /*!@todo check that this connection isn't added twice; the check above doesn't to this because during file loading,
-   *       the "real" connections are already read via cedar::proc::Network, and then added to the ui afterwards using
-   *       this function.
-   */
-  new Connection(this, pTarget);
+  return new Connection(this, pTarget);
 }
