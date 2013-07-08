@@ -61,7 +61,12 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief the constructor */
-  MountedCameraViewer(cedar::aux::gl::ScenePtr pScene, const cedar::dev::KinematicChainPtr chain);
+  MountedCameraViewer
+  (
+    cedar::aux::gl::ScenePtr pScene,
+    const cedar::dev::KinematicChainPtr chain,
+    bool readFromFile = true
+  );
 
   /*!@brief the constructor */
   ~MountedCameraViewer();

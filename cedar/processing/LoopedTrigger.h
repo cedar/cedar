@@ -148,6 +148,18 @@ private:
   //!@brief Whether the looped trigger waits for all its listeners to finish their processing.
   cedar::aux::BoolParameterPtr mWait;
 
+  //! Used to prevent multiple start calls to the trigger.
+  bool mStarting;
+
+  //! Used to prevent multiple start calls to the trigger.
+  QMutex mStartingMutex;
+
+  //! Used to prevent multiple start calls to the trigger.
+  bool mStopping;
+
+  //! Used to prevent multiple start calls to the trigger.
+  QMutex mStoppingMutex;
+
 }; // class cedar::proc::LoopedTrigger
 
 #endif // CEDAR_PROC_LOOPED_TRIGGER_H

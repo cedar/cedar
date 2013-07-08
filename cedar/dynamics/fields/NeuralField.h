@@ -245,14 +245,14 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief Parameter that lets the user decide whether the activation is an output.
+  cedar::aux::BoolParameterPtr _mOutputActivation;
+
   //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
   cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
 
   //!@brief the field sizes in each dimension
   cedar::aux::UIntVectorParameterPtr _mSizes;
-
-  //!@brief Parameter that lets the user decide whether the activation is an output.
-  cedar::aux::BoolParameterPtr _mOutputActivation;
 
   //!@brief input noise gain
   cedar::aux::DoubleParameterPtr _mInputNoiseGain;

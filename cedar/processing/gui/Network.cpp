@@ -80,7 +80,8 @@ GraphicsBase(width, height, GRAPHICS_GROUP_NETWORK),
 mNetwork(network),
 mpScene(scene),
 mpMainWindow(pMainWindow),
-mHoldFitToContents(false)
+mHoldFitToContents(false),
+_mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
@@ -90,8 +91,6 @@ mHoldFitToContents(false)
   }
 
   this->setElement(mNetwork);
-
-  this->mNetwork->connectToElementAdded(boost::bind(&cedar::proc::gui::Network::elementAdded, this, _1, _2));
 
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
@@ -103,6 +102,7 @@ mHoldFitToContents(false)
   //!@todo This isn't really a great solution, we need a better one!
   cedar::aux::ParameterPtr name_param = this->getNetwork()->getParameter("name");
   QObject::connect(name_param.get(), SIGNAL(valueChanged()), this, SLOT(networkNameChanged()));
+  QObject::connect(_mSmartMode.get(), SIGNAL(valueChanged()), this, SLOT(toggleSmartConnectionMode()));
 
   mSlotConnection
     = mNetwork->connectToSlotChangedSignal(boost::bind(&cedar::proc::gui::Network::checkSlots, this));
@@ -126,12 +126,12 @@ mHoldFitToContents(false)
   mNewElementAddedConnection
     = mNetwork->connectToNewElementAddedSignal
       (
-        boost::bind(&cedar::proc::gui::Network::processStepAddedSignal, this, _1)
+        boost::bind(&cedar::proc::gui::Network::processElementAddedSignal, this, _1)
       );
   mElementRemovedConnection
     = mNetwork->connectToElementRemovedSignal
       (
-        boost::bind(&cedar::proc::gui::Network::processStepRemovedSignal, this, _1)
+        boost::bind(&cedar::proc::gui::Network::processElementRemovedSignal, this, _1)
       );
 
   this->update();
@@ -344,27 +344,6 @@ void cedar::proc::gui::Network::transformChildCoordinates(cedar::proc::gui::Grap
   pItem->setPos(this->mapFromItem(pItem, QPointF(0, 0)));
 }
 
-void cedar::proc::gui::Network::elementAdded
-     (
-       cedar::proc::Network* CEDAR_DEBUG_ONLY(pNetwork),
-       cedar::proc::ElementPtr pElement
-     )
-{
-  CEDAR_DEBUG_ASSERT(pNetwork == this->getNetwork().get());
-
-  if (this->mpScene && !this->isRootNetwork())
-  {
-    cedar::proc::gui::GraphicsBase *p_element_item = this->mpScene->getGraphicsItemFor(pElement.get());
-    CEDAR_ASSERT(p_element_item != NULL);
-    if (p_element_item->parentItem() != this)
-    {
-      this->transformChildCoordinates(p_element_item);
-      p_element_item->setParentItem(this);
-      this->fitToContents();
-    }
-  }
-}
-
 void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& elements)
 {
   typedef std::list<QGraphicsItem*>::const_iterator const_iterator;
@@ -464,6 +443,10 @@ void cedar::proc::gui::Network::write(const std::string& destination)
   if (!scene.empty())
     root.add_child("ui", scene);
 
+  cedar::aux::ConfigurationNode generic;
+  this->writeConfiguration(generic);
+  root.add_child("ui generic", generic);
+
   write_json(destination, root);
 }
 
@@ -475,6 +458,14 @@ void cedar::proc::gui::Network::read(const std::string& source)
   read_json(source, root);
 
   this->mNetwork->readFrom(root);
+  try
+  {
+    this->readConfiguration(root.get_child("ui generic"));
+  }
+  catch (boost::property_tree::ptree_bad_path& exc) // doesn't exist yet
+  {
+    this->toggleSmartConnectionMode(false);
+  }
 }
 
 void cedar::proc::gui::Network::readConfiguration(const cedar::aux::ConfigurationNode& node)
@@ -682,7 +673,9 @@ void cedar::proc::gui::Network::disconnect()
 
 void cedar::proc::gui::Network::checkDataConnection
      (
-       cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target, bool added
+       cedar::proc::ConstDataSlotPtr source,
+       cedar::proc::ConstDataSlotPtr target,
+       cedar::proc::Network::ConnectionChange change
      )
 {
   cedar::proc::gui::DataSlotItem* source_slot = NULL;
@@ -711,24 +704,34 @@ void cedar::proc::gui::Network::checkDataConnection
   }
   CEDAR_ASSERT(target_slot);
 
-  if (added)
+  switch (change)
   {
-    source_slot->connectTo(target_slot);
-  }
-  else
-  {
-    QList<QGraphicsItem*> items = this->mpScene->items();
-    for (int i = 0; i < items.size(); ++i)
+    case cedar::proc::Network::CONNECTION_ADDED:
     {
-      if (cedar::proc::gui::Connection* con = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
+      cedar::proc::gui::Connection* p_con = source_slot->connectTo(target_slot);
+      p_con->setSmartMode(this->getSmartConnection());
+      break;
+    }
+    case cedar::proc::Network::CONNECTION_REMOVED:
+    {
+      QList<QGraphicsItem*> items = this->mpScene->items();
+      for (int i = 0; i < items.size(); ++i)
       {
-        if (con->getSource() == source_slot && con->getTarget() == target_slot)
+        if (cedar::proc::gui::Connection* con = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
         {
-          con->disconnect();
-          this->mpScene->removeItem(con);
-          delete con;
+          if (con->getSource() == source_slot && con->getTarget() == target_slot)
+          {
+            con->disconnect();
+            this->mpScene->removeItem(con);
+            delete con;
+          }
         }
       }
+      break;
+    }
+    default:
+    {
+      CEDAR_ASSERT(false);
     }
   }
 }
@@ -769,7 +772,8 @@ void cedar::proc::gui::Network::checkTriggerConnection
       );
   if (added)
   {
-    source_element->connectTo(target_element);
+    cedar::proc::gui::Connection* p_con = source_element->connectTo(target_element);
+    p_con->setSmartMode(this->getSmartConnection());
   }
   else
   {
@@ -791,7 +795,7 @@ void cedar::proc::gui::Network::checkTriggerConnection
   }
 }
 
-void cedar::proc::gui::Network::processStepAddedSignal(cedar::proc::ElementPtr element)
+void cedar::proc::gui::Network::processElementAddedSignal(cedar::proc::ElementPtr element)
 {
   // store the type, which can be compared to entries in a configuration node
   std::string current_type;
@@ -835,13 +839,37 @@ void cedar::proc::gui::Network::processStepAddedSignal(cedar::proc::ElementPtr e
       {
         p_scene_element->readConfiguration(iter->second);
         ui.erase(iter);
-        return;
+        break;
       }
+    }
+  }
+
+  if (this->mpScene && !this->isRootNetwork())
+  {
+    CEDAR_ASSERT(p_scene_element != NULL);
+    if (p_scene_element->parentItem() != this)
+    {
+      this->transformChildCoordinates(p_scene_element);
+      p_scene_element->setParentItem(this);
+      this->fitToContents();
     }
   }
 }
 
-void cedar::proc::gui::Network::processStepRemovedSignal(cedar::proc::ConstElementPtr element)
+void cedar::proc::gui::Network::processElementRemovedSignal(cedar::proc::ConstElementPtr element)
 {
   delete this->mpScene->getGraphicsItemFor(element.get());
+}
+
+void cedar::proc::gui::Network::toggleSmartConnectionMode()
+{
+  bool smart = this->_mSmartMode->getValue();
+  QList<QGraphicsItem*> items = this->mpScene->items();
+  for (int i = 0; i < items.size(); ++i)
+  {
+    if (cedar::proc::gui::Connection* con = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
+    {
+      con->setSmartMode(smart);
+    }
+  }
 }

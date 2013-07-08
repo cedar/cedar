@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/namespace.h"
+#include "cedar/units/Time.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -61,10 +62,24 @@
  *        elements in the network.
  *
  * @todo Write a private eraseConnection function to avoid duplicated code in disconnectSlots and remove
+ *
+ * @todo Write a separate class for the read/writeFromV1 method and all that belongs to it.
  */
 class cedar::proc::Network : public QObject, public cedar::proc::Connectable
 {
   Q_OBJECT
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //! Enum that represents the change of a given connection.
+  enum ConnectionChange
+  {
+    //! The connection was added.
+    CONNECTION_ADDED,
+    //! The was removed.
+    CONNECTION_REMOVED,
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // types
@@ -101,20 +116,28 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   /*!@brief Reads the network from a configuration node.
+   *
+   * @todo This should be called readConfiguration (as in Configurable).
    */
   void readFrom(const cedar::aux::ConfigurationNode& root);
 
   /*!@brief Writes the network to a configuration node.
+   *
+   * @todo This should be called writeConfiguration (as in Configurable).
    */
   void writeTo(cedar::aux::ConfigurationNode& root);
 
   /*!@brief Reads the network from a given json file.
    *
    *        This file must have the same format as the one output by cedar::proc::Network::writeFile.
+   *
+   * @todo Should be replaced by readJson (from Configurable)
    */
   void readFile(const std::string& filename);
 
   /*!@brief Writes the network to a given json file.
+   *
+   * @todo Should be replaced by writeJson (from Configurable)
    */
   void writeFile(const std::string& filename);
 
@@ -128,12 +151,12 @@ public:
    */
   void removeAll();
 
-  /*!@brief Adds a new element with the type given by className and the name instanceName.
+  /*!@brief Creates a new element with the type given by className and the name instanceName.
    *
-   * @param className    Identifier of the type registered at cedar::proc::DeclarationRegistry.
+   * @param className    Identifier of the type registered at cedar::aux::DeclarationManager.
    * @param instanceName Name to be given to the new element.
    */
-  void add(std::string className, std::string instanceName);
+  void create(std::string className, std::string instanceName);
 
   /*!@brief Adds a given element to the network under the instanceName.
    *
@@ -230,6 +253,8 @@ public:
    *
    * @param sourceSlot The source slot.
    * @param targetSlot The target slot.
+   *
+   * @todo Should this be private/protected?
    */
   void disconnectSlots(cedar::proc::ConstDataSlotPtr sourceSlot, cedar::proc::ConstDataSlotPtr targetSlot);
 
@@ -260,10 +285,13 @@ public:
   const cedar::proc::Network::DataConnectionVector& getDataConnections() const;
 
   /*!@brief Returns a const reference to the map of names to elements stored in the network.
+   *
+   * @todo Should be called getElements
    */
   const ElementMap& elements() const;
 
   /*!@brief Updates the name stored for the object.
+   * @todo This should be solved with signals/slots.
    */
   void updateObjectName(cedar::proc::Element* object);
 
@@ -300,13 +328,6 @@ public:
   //!@brief Checks whether a name exists in the network.
   bool nameExists(const std::string& name) const;
 
-  /*!@brief Register a function pointer to react to an added element.
-   */
-  boost::signals2::connection connectToElementAdded
-  (
-    boost::function<void (cedar::proc::Network*, cedar::proc::ElementPtr)> slot
-  );
-
   //!@brief Register a function pointer to react to a changing trigger connection
   boost::signals2::connection connectToTriggerConnectionChanged
   (
@@ -316,7 +337,7 @@ public:
   //!@brief Register a function pointer to react to a changing data connection
   boost::signals2::connection connectToDataConnectionChanged
   (
-    boost::function<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, bool)> slot
+    boost::function<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, cedar::proc::Network::ConnectionChange)> slot
   );
 
   //!@brief Register a function pointer to react to adding an element
@@ -329,6 +350,7 @@ public:
   boost::signals2::connection connectToSlotChangedSignal(boost::function<void ()> slot);
 
   //!@brief processes slot promotion
+  //!@todo Make this private?
   void processPromotedSlots();
 
   //!@brief returns the last ui node that was read
@@ -346,8 +368,29 @@ public:
   //!@brief Stops all running triggers in this network.
   void stopTriggers(bool wait = false);
 
-  //!@brief Single-steps all triggers in this network.
+  /*!@brief   Single-steps all triggers in this network.
+   *
+   *          The step time is in this case automatically determined by using the smallest step time of all triggers in
+   *          the network.
+   *
+   * @see     stepTriggers(double).
+   */
   void stepTriggers();
+
+  /*!@brief   Single-steps all triggers in this network with the given time step.
+   *
+   * @see     stepTriggers(double).
+   */
+  void stepTriggers(cedar::unit::Time stepTime);
+
+  /*!@brief   Single-steps all triggers in this network with the given time step.
+   *
+   * @remarks Triggers that are running will not get stepped by this method. In general, it should only be called when
+   *          all triggers are stopped.
+   *
+   * @todo    Should a double-version of this method be available at all?
+   */
+  void stepTriggers(double stepTime);
 
   //! Returns a list of issues in the network.
   std::vector<cedar::proc::ConsistencyIssuePtr> checkConsistency() const;
@@ -429,6 +472,10 @@ private:
                                                          cedar::proc::Network::DataConnectionVector::iterator it
                                                        );
 
+  //!@brief revalidates all outgoing connections of a slot
+  //!@todo this could be moved to Connectable, once it knows about its connections
+  void revalidateConnections(const std::string& sender);
+
 private slots:
   //!@brief Takes care of updating the network's name in the parent's map.
   //!@todo Find a more generic approach, react to name changes of each contained element rather than this way around.
@@ -441,8 +488,8 @@ protected:
   boost::signals2::signal<void ()> mSlotChanged;
   //!@brief a boost signal that is emitted if a trigger connection changes (added/removed)
   boost::signals2::signal<void (cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool)> mTriggerConnectionChanged;
-  //!@brief a boost signal that is emitted if a data connection changes (added/removed)
-  boost::signals2::signal<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, bool)> mDataConnectionChanged;
+  //!@brief a boost signal that is emitted if a data connection changes (added/removed/changed)
+  boost::signals2::signal<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, cedar::proc::Network::ConnectionChange)> mDataConnectionChanged;
   //!@brief a boost signal that is emitted if an element is added to the network
   boost::signals2::signal<void (cedar::proc::ElementPtr)> mNewElementAddedSignal;
   //!@brief a boost signal that is emitted if an element is removed from the network
@@ -460,19 +507,15 @@ private:
 
   cedar::aux::ConfigurationNode mLastReadUINode;
 
+  //!@brief connection to state changed signal of step
+  std::map<std::string, boost::signals2::connection> mRevalidateConnections;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief a vector of all promoted slots
   cedar::aux::StringVectorParameterPtr _mPromotedSlots;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // signals
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-  //! Signal that is triggered whenever an element is added to the network.
-  boost::signals2::signal<void (cedar::proc::Network*, cedar::proc::ElementPtr)> mElementAddedSignal;
 
 }; // class cedar::proc::Network
 

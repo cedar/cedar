@@ -163,6 +163,16 @@ public:
     this->mNextElementUiConfigurations[element.get()] = uiDescription;
   }
 
+  void toggleSmartConnectionMode(bool smart)
+  {
+    this->_mSmartMode->setValue(smart);
+  }
+
+  bool getSmartConnection() const
+  {
+    return this->_mSmartMode->getValue();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -177,9 +187,6 @@ private:
   //!@brief write scene to a node
   void writeScene(cedar::aux::ConfigurationNode& root, cedar::aux::ConfigurationNode& scene);
 
-  //!@brief Reacts to elements being added in the underlying network.
-  void elementAdded(cedar::proc::Network* network, cedar::proc::ElementPtr pElement);
-
   //!@brief Determines whether the network is the root network.
   bool isRootNetwork();
 
@@ -190,19 +197,19 @@ private:
   //!@brief Transforms the coordinates of a newly added child into the network's coordinate system.
   void transformChildCoordinates(cedar::proc::gui::GraphicsBase* pItem);
 
-  void checkDataConnection(cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target, bool added);
+  void checkDataConnection(cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target, cedar::proc::Network::ConnectionChange change);
 
   void checkTriggerConnection(cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool added);
 
-  //!@todo why is this called StepAdded?
-  void processStepAddedSignal(cedar::proc::ElementPtr);
+  void processElementAddedSignal(cedar::proc::ElementPtr);
 
-  //!@todo why is this called StepRemoved?
-  void processStepRemovedSignal(cedar::proc::ConstElementPtr);
+  void processElementRemovedSignal(cedar::proc::ConstElementPtr);
 
 private slots:
   //!@brief Updates the label of the network.
   void networkNameChanged();
+
+  void toggleSmartConnectionMode();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -246,10 +253,12 @@ private:
   bool mHoldFitToContents;
 
   //! Text item used for displaying the name of the network.
-  QGraphicsTextItem *mpNameDisplay;
+  QGraphicsTextItem* mpNameDisplay;
 
   //! Configuration of the next element that is added to the scene.
   std::map<cedar::proc::Element*, cedar::aux::ConfigurationNode> mNextElementUiConfigurations;
+
+  cedar::aux::BoolParameterPtr _mSmartMode;
 
 }; // class cedar::proc::gui::NetworkFile
 

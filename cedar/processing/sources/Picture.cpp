@@ -149,15 +149,11 @@ void cedar::proc::sources::Picture::reset()
 
 void cedar::proc::sources::Picture::updatePicture()
 {
-  cedar::aux::LogSingleton::getInstance()->debugMessage
-                                           (
-                                             this->getPictureGrabber()->getName() + ": Picture change detected.",
-                                             "cedar::dev::sensors::visual::Picture::updatePicture()"
-                                           );
   onTrigger();
   this->annotateImage();
+  this->emitOutputPropertiesChangedSignal("Picture");
+  onTrigger();
 }
-
 
 void cedar::proc::sources::Picture::compute(const cedar::proc::Arguments&)
 {

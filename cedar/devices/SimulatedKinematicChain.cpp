@@ -53,7 +53,7 @@ cedar::dev::SimulatedKinematicChain::SimulatedKinematicChain()
 cedar::dev::SimulatedKinematicChain::~SimulatedKinematicChain()
 {
 #if 0  
-// JS: wird schon in LoopedThread gemacht
+// JS: already being checked in LoopedThread
   if (isRunning())
   {
     this->stop();

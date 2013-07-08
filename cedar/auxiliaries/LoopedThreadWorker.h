@@ -1,7 +1,7 @@
 
 /*=============================================================================
 
-    Copyright 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -72,7 +72,7 @@ class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::Thread
     inline void updateStatistics(double stepsTaken);
     //! request stop in the wrapper
     void safeRequestStop();
-    // check whether a stop has been requested
+    //! check whether a stop has been requested
     bool safeStopRequested();
 
     //! set the step start time

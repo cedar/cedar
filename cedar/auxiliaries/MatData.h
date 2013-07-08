@@ -104,6 +104,11 @@ public:
     }
   }
 
+  //! Checks if the matrix is empty.
+  bool isEmpty() const
+  {
+    return this->getData().empty();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

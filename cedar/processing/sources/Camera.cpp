@@ -125,6 +125,7 @@ cedar::proc::sources::Camera::~Camera()
 void cedar::proc::sources::Camera::changedFrameSize()
 {
   this->updateFrame();
+  this->emitOutputPropertiesChangedSignal("camera");
 }
 
 //----------------------------------------------------------------------------------------------------------------------

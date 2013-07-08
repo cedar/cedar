@@ -41,6 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/ArchitectureConsistencyCheck.h"
+#include "cedar/processing/gui/BoostControl.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/SettingsDialog.h"
@@ -72,11 +73,37 @@
 cedar::proc::gui::Ide::Ide(bool loadDefaultPlugins, bool redirectLogToGui)
 :
 mpConsistencyChecker(NULL),
-mpConsistencyDock(NULL)
+mpConsistencyDock(NULL),
+mpBoostControl(NULL)
 {
+  // setup the (automatically generated) ui components
   this->setupUi(this);
 
-  // first, setup the log to receive messages
+  // manually added components
+  auto p_enable_custom_time_step = new QCheckBox();
+  p_enable_custom_time_step->setToolTip("Enable/disable custom time step for architecture stepping.");
+  this->mpToolBar->insertWidget(this->mpActionBoostControl, p_enable_custom_time_step);
+
+  this->mpCustomTimeStep = new QDoubleSpinBox();
+  this->mpCustomTimeStep->setValue(10.0);
+  this->mpCustomTimeStep->setMinimum(1.0);
+  this->mpCustomTimeStep->setSuffix(" ms");
+  this->mpCustomTimeStep->setMaximum(10000.0);
+  this->mpCustomTimeStep->setDecimals(1);
+  this->mpCustomTimeStep->setAlignment(Qt::AlignRight);
+  this->mpToolBar->insertWidget(this->mpActionBoostControl, this->mpCustomTimeStep);
+
+  p_enable_custom_time_step->setChecked(false);
+  this->mpCustomTimeStep->setEnabled(false);
+
+  QObject::connect(p_enable_custom_time_step, SIGNAL(toggled(bool)), this->mpCustomTimeStep, SLOT(setEnabled(bool)));
+
+  this->mpToolBar->insertSeparator(this->mpActionBoostControl);
+
+  // set window title
+  this->mDefaultWindowTitle = this->windowTitle();
+
+  // setup the log to receive messages
   if (redirectLogToGui)
   {
     this->mpLog->installHandlers(true);
@@ -114,6 +141,7 @@ mpConsistencyDock(NULL)
   QObject::connect(this->mpActionManagePlugins, SIGNAL(triggered()), this, SLOT(showManagePluginsDialog()));
   QObject::connect(this->mpActionSettings, SIGNAL(triggered()), this, SLOT(showSettingsDialog()));
   QObject::connect(this->mpActionShowHideGrid, SIGNAL(toggled(bool)), this, SLOT(toggleGrid(bool)));
+  QObject::connect(this->mpActionToggleSmartConnections, SIGNAL(toggled(bool)), this, SLOT(toggleSmartConnections(bool)));
 
   QObject::connect
   (
@@ -162,7 +190,7 @@ mpConsistencyDock(NULL)
 
   this->restoreSettings();
 
-  QObject::connect(cedar::proc::gui::Settings::instance().getArchitectureFileHistory().get(),
+  QObject::connect(cedar::proc::gui::SettingsSingleton::getInstance()->getArchitectureFileHistory().get(),
                    SIGNAL(valueChanged()),
                    this,
                    SLOT(fillRecentFilesList()));
@@ -197,6 +225,7 @@ mpConsistencyDock(NULL)
 
   QObject::connect(mpActionToggleTriggerVisibility, SIGNAL(triggered(bool)), this, SLOT(showTriggerConnections(bool)));
   QObject::connect(mpActionArchitectureConsistencyCheck, SIGNAL(triggered()), this, SLOT(showConsistencyChecker()));
+  QObject::connect(mpActionBoostControl, SIGNAL(triggered()), this, SLOT(showBoostControl()));
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -218,6 +247,33 @@ void cedar::proc::gui::Ide::showRobotManager()
   p_dialog->show();
 }
 
+void cedar::proc::gui::Ide::displayFilename(const std::string& filename)
+{
+  this->setWindowTitle(this->mDefaultWindowTitle + " - " + QString::fromStdString(filename));
+}
+
+void cedar::proc::gui::Ide::showBoostControl()
+{
+  if (mpBoostControl == NULL)
+  {
+    auto p_dock = new QDockWidget(this);
+    this->mpBoostControl = new cedar::proc::gui::BoostControl();
+    p_dock->setFloating(true);
+    p_dock->setWindowTitle(this->mpBoostControl->windowTitle());
+    p_dock->setAllowedAreas(Qt::NoDockWidgetArea);
+    p_dock->setWidget(this->mpBoostControl);
+    this->mpBoostControl->setNetwork(this->mNetwork->getNetwork());
+    p_dock->show();
+  }
+  else
+  {
+    if (auto p_widget = dynamic_cast<QWidget*>(this->mpBoostControl->parent()))
+    {
+      p_widget->show();
+    }
+  }
+}
+
 void cedar::proc::gui::Ide::showConsistencyChecker()
 {
   if (this->mpConsistencyDock == NULL)
@@ -237,7 +293,7 @@ void cedar::proc::gui::Ide::showConsistencyChecker()
 
 void cedar::proc::gui::Ide::exportSvg()
 {
-  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureExportDialogDirectory();
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureExportDialogDirectory();
 
   QString file = QFileDialog::getSaveFileName(this, // parent
                                               "Select where to export", // caption
@@ -279,11 +335,7 @@ void cedar::proc::gui::Ide::duplicateStep()
 
 void cedar::proc::gui::Ide::selectAll()
 {
-  QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->items();
-  for (int i = 0; i < selected_items.size(); ++i)
-  {
-    selected_items.at(i)->setSelected(true);
-  }
+  this->mpProcessingDrawer->getScene()->selectAll();
 }
 
 void cedar::proc::gui::Ide::resetRootNetwork()
@@ -394,31 +446,31 @@ void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
 
 void cedar::proc::gui::Ide::storeSettings()
 {
-  cedar::proc::gui::Settings::instance().logSettings()->getFrom(this->mpLogWidget);
-  cedar::proc::gui::Settings::instance().toolsSettings()->getFrom(this->mpToolsWidget);
-  cedar::proc::gui::Settings::instance().propertiesSettings()->getFrom(this->mpPropertiesWidget);
-  cedar::proc::gui::Settings::instance().stepsSettings()->getFrom(this->mpItemsWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->logSettings()->getFrom(this->mpLogWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->toolsSettings()->getFrom(this->mpToolsWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->getFrom(this->mpPropertiesWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->getFrom(this->mpItemsWidget);
 
-  cedar::proc::gui::Settings::instance().storeMainWindow(this);
+  cedar::proc::gui::SettingsSingleton::getInstance()->storeMainWindow(this);
 
-  cedar::proc::gui::Settings::instance().snapToGrid(this->mpProcessingDrawer->getScene()->getSnapToGrid());
+  cedar::proc::gui::SettingsSingleton::getInstance()->snapToGrid(this->mpProcessingDrawer->getScene()->getSnapToGrid());
 }
 
 void cedar::proc::gui::Ide::restoreSettings()
 {
-  cedar::proc::gui::Settings::instance().logSettings()->setTo(this->mpLogWidget);
-  cedar::proc::gui::Settings::instance().toolsSettings()->setTo(this->mpToolsWidget);
-  cedar::proc::gui::Settings::instance().propertiesSettings()->setTo(this->mpPropertiesWidget);
-  cedar::proc::gui::Settings::instance().stepsSettings()->setTo(this->mpItemsWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->logSettings()->setTo(this->mpLogWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->toolsSettings()->setTo(this->mpToolsWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->propertiesSettings()->setTo(this->mpPropertiesWidget);
+  cedar::proc::gui::SettingsSingleton::getInstance()->stepsSettings()->setTo(this->mpItemsWidget);
 
-  cedar::proc::gui::Settings::instance().restoreMainWindow(this);
+  cedar::proc::gui::SettingsSingleton::getInstance()->restoreMainWindow(this);
 
-  mpActionShowHideGrid->setChecked(cedar::proc::gui::Settings::instance().snapToGrid());
+  mpActionShowHideGrid->setChecked(cedar::proc::gui::SettingsSingleton::getInstance()->snapToGrid());
 }
 
 void cedar::proc::gui::Ide::loadDefaultPlugins()
 {
-  cedar::proc::Manager::getInstance().loadDefaultPlugins();
+  cedar::proc::ManagerSingleton::getInstance()->loadDefaultPlugins();
 }
 
 void cedar::proc::gui::Ide::showLoadPluginDialog()
@@ -428,7 +480,7 @@ void cedar::proc::gui::Ide::showLoadPluginDialog()
 
   if (res == QDialog::Accepted && p_dialog->plugin())
   {
-    cedar::proc::Manager::getInstance().load(p_dialog->plugin());
+    cedar::proc::ManagerSingleton::getInstance()->load(p_dialog->plugin());
     this->resetStepList();
   }
 
@@ -454,6 +506,11 @@ void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
   if (this->mpConsistencyChecker != NULL)
   {
     this->mpConsistencyChecker->setNetwork(network);
+  }
+
+  if (this->mpBoostControl != NULL)
+  {
+    this->mpBoostControl->setNetwork(network->getNetwork());
   }
 }
 
@@ -639,7 +696,14 @@ void cedar::proc::gui::Ide::startThreads()
 
 void cedar::proc::gui::Ide::stepThreads()
 {
-  this->mNetwork->getNetwork()->stepTriggers();
+  if (this->mpCustomTimeStep->isEnabled())
+  {
+    this->mNetwork->getNetwork()->stepTriggers(this->mpCustomTimeStep->value());
+  }
+  else
+  {
+    this->mNetwork->getNetwork()->stepTriggers();
+  }
 }
 
 void cedar::proc::gui::Ide::stopThreads()
@@ -651,17 +715,24 @@ void cedar::proc::gui::Ide::newFile()
 {
   this->mpActionSave->setEnabled(false);
   this->resetTo(cedar::proc::gui::NetworkPtr(new cedar::proc::gui::Network(this, this->mpProcessingDrawer->getScene())));
+
+  this->displayFilename("unnamed file");
+
+  // set the smart connection button
+  this->mpActionToggleSmartConnections->blockSignals(true);
+  this->mpActionToggleSmartConnections->setChecked(this->mNetwork->getSmartConnection());
+  this->mpActionToggleSmartConnections->blockSignals(false);
 }
 
 void cedar::proc::gui::Ide::save()
 {
   this->mNetwork->write();
-  cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(this->mNetwork->getFileName());
+  cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(this->mNetwork->getFileName());
 }
 
 void cedar::proc::gui::Ide::saveAs()
 {
-  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureLoadDialogDirectory();
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
 
   QString file = QFileDialog::getSaveFileName(this, // parent
                                               "Select where to save", // caption
@@ -677,21 +748,24 @@ void cedar::proc::gui::Ide::saveAs()
     }
 
     this->mNetwork->write(file.toStdString());
+    //!@todo It would probably be better if the network sends a signal whenever its filename changes and the gui just reacted to that.
+    this->displayFilename(file.toStdString());
 
-    cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(file.toStdString());
+    cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
 
     this->mpActionSave->setEnabled(true);
 
-    cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(file.toStdString());
+    cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
     QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
-    cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureLoadDialogDirectory();
+    cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
     last_dir->setValue(path);
+
   }
 }
 
 void cedar::proc::gui::Ide::load()
 {
-  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureLoadDialogDirectory();
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
 
   QString file = QFileDialog::getOpenFileName(this, // parent
                                               "Select which file to load", // caption
@@ -770,10 +844,22 @@ void cedar::proc::gui::Ide::loadFile(QString file)
 
   this->mNetwork = network;
 
-  cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(file.toStdString());
+  if (this->mpBoostControl)
+  {
+    this->mpBoostControl->setNetwork(this->mNetwork->getNetwork());
+  }
+
+  this->displayFilename(file.toStdString());
+
+  cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
-  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureLoadDialogDirectory();
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastArchitectureLoadDialogDirectory();
   last_dir->setValue(path);
+
+  // set the smart connection button
+  this->mpActionToggleSmartConnections->blockSignals(true);
+  this->mpActionToggleSmartConnections->setChecked(this->mNetwork->getSmartConnection());
+  this->mpActionToggleSmartConnections->blockSignals(false);
 }
 
 void cedar::proc::gui::Ide::keyPressEvent(QKeyEvent* pEvent)
@@ -811,7 +897,7 @@ void cedar::proc::gui::Ide::recentFileItemTriggered()
   catch(boost::property_tree::json_parser::json_parser_error& exc)
   {
     // remove this file from list of recent architectures
-    cedar::aux::StringVectorParameterPtr entries = cedar::proc::gui::Settings::instance().getArchitectureFileHistory();
+    cedar::aux::StringVectorParameterPtr entries = cedar::proc::gui::SettingsSingleton::getInstance()->getArchitectureFileHistory();
     entries->eraseAll(file.toStdString());
     std::string message = "File "
                           + file.toStdString()
@@ -824,7 +910,7 @@ void cedar::proc::gui::Ide::fillRecentFilesList()
 {
   QMenu *p_menu = new QMenu();
 
-  cedar::aux::StringVectorParameterPtr entries = cedar::proc::gui::Settings::instance().getArchitectureFileHistory();
+  cedar::aux::StringVectorParameterPtr entries = cedar::proc::gui::SettingsSingleton::getInstance()->getArchitectureFileHistory();
   if (entries->size() == 0)
   {
     this->mpRecentFiles->setEnabled(false);
@@ -855,4 +941,9 @@ void cedar::proc::gui::Ide::showTriggerConnections(bool show)
   {
     mpProcessingDrawer->hideTriggerConnections();
   }
+}
+
+void cedar::proc::gui::Ide::toggleSmartConnections(bool smart)
+{
+  this->mNetwork->toggleSmartConnectionMode(smart);
 }

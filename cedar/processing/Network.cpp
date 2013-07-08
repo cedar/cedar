@@ -138,20 +138,9 @@ cedar::proc::Network::~Network()
 std::vector<cedar::proc::ConsistencyIssuePtr> cedar::proc::Network::checkConsistency() const
 {
   std::vector<cedar::proc::ConsistencyIssuePtr> issues;
+  std::vector<cedar::proc::LoopedTriggerPtr> looped_triggers = listLoopedTriggers();
 
-  // generate a list of all looped triggers in the architecture
-  //!@todo There should probably be a function for this.
-  std::vector<cedar::proc::LoopedTriggerPtr> looped_triggers;
-  for (auto iter = this->elements().begin(); iter != this->elements().end(); ++iter)
-  {
-    cedar::proc::ElementPtr element = iter->second;
-    if (cedar::proc::LoopedTriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::LoopedTrigger>(element))
-    {
-      looped_triggers.push_back(trigger);
-    }
-  }
-
-  // == Check for looped steps that are not connected to looped triggers ===============================================
+  // Check for looped steps that are not connected to looped triggers
   for (auto iter = this->elements().begin(); iter != this->elements().end(); ++iter)
   {
     cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(iter->second);
@@ -179,7 +168,7 @@ std::vector<cedar::proc::ConsistencyIssuePtr> cedar::proc::Network::checkConsist
       {
         issues.push_back(boost::make_shared<cedar::proc::LoopedStepNotConnected>(step));
       }
-    } // is looped
+    } // end is looped
   }
 
   return issues;
@@ -266,13 +255,25 @@ void cedar::proc::Network::stepTriggers()
       time_step = trigger->getSimulatedTimeParameter();
     }
   }
+
+  this->stepTriggers(time_step);
+}
+
+void cedar::proc::Network::stepTriggers(cedar::unit::Time stepTime)
+{
+  this->stepTriggers(cedar::unit::Milliseconds(stepTime) / cedar::unit::Milliseconds(1));
+}
+
+void cedar::proc::Network::stepTriggers(double timeStep)
+{
+  std::vector<cedar::proc::LoopedTriggerPtr> triggers = this->listLoopedTriggers();
   // step all triggers with this time step
   for (auto iter = triggers.begin(); iter != triggers.end(); ++iter)
   {
     auto trigger = *iter;
     if (!trigger->isRunning())
     {
-      trigger->step(time_step);
+      trigger->step(timeStep);
     }
   }
 }
@@ -284,14 +285,6 @@ void cedar::proc::Network::onNameChanged()
     // update the name in the parent network
     boost::static_pointer_cast<cedar::proc::Network>(parent_network)->updateObjectName(this);
   }
-}
-
-boost::signals2::connection cedar::proc::Network::connectToElementAdded
-                            (
-                              boost::function<void (cedar::proc::Network*, cedar::proc::ElementPtr)> slot
-                            )
-{
-  return this->mElementAddedSignal.connect(slot);
 }
 
 std::string cedar::proc::Network::getUniqueIdentifier(const std::string& identifier) const
@@ -368,7 +361,7 @@ void cedar::proc::Network::removeAllConnectionsFromSlot(cedar::proc::ConstDataSl
         (
           (*data_con)->getTarget()->getParent())->getInputSlot((*data_con)->getTarget()->getName()
         ),
-        false
+        cedar::proc::Network::CONNECTION_REMOVED
       );
       data_con = this->removeDataConnection(data_con);
     }
@@ -401,7 +394,7 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
         (
           (*data_con)->getTarget()->getParent()
         )->getInputSlot((*data_con)->getTarget()->getName()),
-        false
+        cedar::proc::Network::CONNECTION_REMOVED
       );
       data_con = this->removeDataConnection(data_con);
     }
@@ -505,6 +498,14 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
   cedar::proc::Network::ElementMap::iterator it = mElements.find(element->getName());
   if (it != this->mElements.end())
   {
+    // disconnect from revalidation signal
+    if (cedar::proc::ConnectablePtr connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(it->second))
+    {
+      this->mRevalidateConnections[connectable->getName()].disconnect();
+      std::map<std::string, boost::signals2::connection>::iterator conn_it
+        = this->mRevalidateConnections.find(connectable->getName());
+      this->mRevalidateConnections.erase(conn_it);
+    }
     mElements.erase(it);
   }
   this->mElementRemovedSignal(element);
@@ -512,7 +513,7 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
   this->processPromotedSlots();
 }
 
-void cedar::proc::Network::add(std::string className, std::string instanceName)
+void cedar::proc::Network::create(std::string className, std::string instanceName)
 {
   cedar::proc::ElementPtr element = cedar::proc::ElementManagerSingleton::getInstance()->allocate(className);
   this->add(element, instanceName);
@@ -696,7 +697,13 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
   element->setNetwork(boost::static_pointer_cast<cedar::proc::Network>(this->shared_from_this()));
 
   this->mNewElementAddedSignal(element);
-  this->mElementAddedSignal(this, element);
+
+  // connect to revalidation signal
+  if (cedar::proc::ConnectablePtr connectable = boost::dynamic_pointer_cast<cedar::proc::Connectable>(element))
+  {
+    this->mRevalidateConnections[connectable->getName()]
+      = connectable->connectToOutputPropertiesChanged(boost::bind(&cedar::proc::Network::revalidateConnections, this, _1));
+  }
 }
 
 void cedar::proc::Network::duplicate(const std::string& elementName, const std::string& newName)
@@ -870,7 +877,7 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
   (
     this->getElement<cedar::proc::Connectable>(source_name)->getOutputSlot(source_slot_name),
     this->getElement<cedar::proc::Connectable>(target_name)->getInputSlot(target_slot_name),
-    true
+    cedar::proc::Network::CONNECTION_ADDED
   );
 }
 
@@ -933,8 +940,8 @@ void cedar::proc::Network::disconnectSlots
     if ((*it)->equals(sourceSlot, targetSlot))
     {
       this->removeDataConnection(it);
-      // inform any interested listeners of this new connection
-      mDataConnectionChanged(sourceSlot, targetSlot, false);
+      // inform any interested listeners of this removed connection
+      mDataConnectionChanged(sourceSlot, targetSlot, cedar::proc::Network::CONNECTION_REMOVED);
       return;
     }
   }
@@ -1629,14 +1636,17 @@ void cedar::proc::Network::getDataConnections(
   connections.clear();
   for (size_t i = 0; i < this->mDataConnections.size(); ++i)
   {
-    cedar::proc::DataConnectionPtr con = this->mDataConnections.at(i);
-    if
-    (
-      this->getElement<cedar::proc::Step>(con->getSource()->getParent()) == source
-        && con->getSource()->getName() == sourceDataName
-    )
+    // check if con is a valid pointer - during deletion of a step, some deleted connections are still in this list
+    if (cedar::proc::DataConnectionPtr con = this->mDataConnections.at(i))
     {
-      connections.push_back(con);
+      if
+      (
+        this->getElement<cedar::proc::Step>(con->getSource()->getParent()) == source
+          && con->getSource()->getName() == sourceDataName
+      )
+      {
+        connections.push_back(con);
+      }
     }
   }
 }
@@ -1815,7 +1825,7 @@ boost::signals2::connection cedar::proc::Network::connectToTriggerConnectionChan
 
 boost::signals2::connection cedar::proc::Network::connectToDataConnectionChanged
                             (
-                              boost::function<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, bool)> slot
+                              boost::function<void (cedar::proc::ConstDataSlotPtr, cedar::proc::ConstDataSlotPtr, cedar::proc::Network::ConnectionChange)> slot
                             )
 {
   return mDataConnectionChanged.connect(slot);
@@ -1920,5 +1930,20 @@ void cedar::proc::Network::removeAll()
   for (unsigned int i = 0; i < elements.size(); ++i)
   {
     this->remove(elements.at(i));
+  }
+}
+
+void cedar::proc::Network::revalidateConnections(const std::string& sender)
+{
+  std::string child;
+  std::string output;
+  cedar::aux::splitLast(sender, ".", child, output);
+  std::vector<cedar::proc::DataConnectionPtr> connections;
+  this->getDataConnections(this->getElement<Connectable>(child), output, connections);
+  for (unsigned i = 0; i < connections.size(); ++i)
+  {
+    cedar::proc::StepPtr sender = this->getElement<Step>(connections.at(i)->getSource()->getParent());
+    cedar::proc::StepPtr receiver = this->getElement<Step>(connections.at(i)->getTarget()->getParent());
+    receiver->callInputConnectionChanged(connections.at(i)->getTarget()->getName());
   }
 }

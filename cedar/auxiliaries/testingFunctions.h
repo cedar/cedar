@@ -50,12 +50,12 @@ namespace cedar
   {
     namespace testing
     {
-      //!@brief fills a matrix with a Gaussian
       CEDAR_AUX_LIB_EXPORT void write_measurement
                                 (
                                   const std::string& id,
                                   double duration
                                 );
+                                
       CEDAR_AUX_LIB_EXPORT void test_time
                                 (
                                   std::string id, 

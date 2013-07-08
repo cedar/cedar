@@ -50,9 +50,6 @@
 cedar::aux::EnumType<cedar::proc::gui::Settings::StepDisplayMode>
   cedar::proc::gui::Settings::StepDisplayMode::mType("cedar::proc::gui::Settings::StepDisplayMode::");
 
-// this has to be initialized after mTyoe above (because that is used in its constructor)
-cedar::proc::gui::Settings cedar::proc::gui::Settings::mInstance;
-
 #ifndef CEDAR_COMPILER_MSVC
 const cedar::proc::gui::Settings::StepDisplayMode::Id cedar::proc::gui::Settings::StepDisplayMode::ICON_ONLY;
 const cedar::proc::gui::Settings::StepDisplayMode::Id cedar::proc::gui::Settings::StepDisplayMode::TEXT_FOR_LOOPED;
@@ -318,12 +315,6 @@ cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::stepsSet
   return this->mSteps;
 }
 
-
-cedar::proc::gui::Settings& cedar::proc::gui::Settings::instance()
-{
-  return cedar::proc::gui::Settings::mInstance;
-}
-
 void cedar::proc::gui::Settings::load()
 {
   std::string path = cedar::aux::getUserApplicationDataDirectory() + "/.cedar/processingGui";
@@ -333,8 +324,11 @@ void cedar::proc::gui::Settings::load()
   }
   catch (const boost::property_tree::json_parser::json_parser_error& e)
   {
-    //!@todo proper signaling(?) of this message to the gui.
-    std::cout << "Error reading framework gui settings: " << e.what() << std::endl;
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      std::string("Error reading framework gui settings: ") + e.what(),
+      "void cedar::proc::gui::Settings::load()"
+    );
   }
 }
 
@@ -349,8 +343,11 @@ void cedar::proc::gui::Settings::save()
     }
     catch (const boost::property_tree::json_parser::json_parser_error& e)
     {
-      //!@todo proper signaling(?) of this message to the gui.
-      std::cout << "Error saving framework gui settings: " << e.what() << std::endl;
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        std::string("Error saving framework gui settings: ") + e.what(),
+        "void cedar::proc::gui::Settings::load()"
+      );
     }
   }
 }

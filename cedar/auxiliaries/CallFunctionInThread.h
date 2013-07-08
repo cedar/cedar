@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -71,6 +71,7 @@
  * running main event loop, i.e. you must start a Q(Core)Application's exec().
  * 
  * Pass a pointer to the function callback in CallFunctionInThread's constructor. When you start() the CallFunctionInThread object, a new thread will spawn and execute your function callback.
+ * @see: CallFunctionInThread
  */
 class cedar::aux::CallFunctionInThread : public cedar::aux::ThreadWrapper
 {

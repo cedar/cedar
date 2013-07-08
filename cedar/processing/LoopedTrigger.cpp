@@ -98,7 +98,9 @@ cedar::proc::LoopedTrigger::LoopedTrigger(double stepSize, const std::string& na
 cedar::aux::LoopedThread(stepSize),
 cedar::proc::Trigger(name, true),
 //!@todo Make a TimeParameter and use it here instead.
-mWait(new cedar::aux::BoolParameter(this, "wait", true))
+mWait(new cedar::aux::BoolParameter(this, "wait", true)),
+mStarting(false),
+mStopping(false)
 {
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
@@ -148,6 +150,16 @@ void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr trigger
 
 void cedar::proc::LoopedTrigger::startTrigger()
 {
+  QMutexLocker locker(&mStartingMutex);
+
+  if (this->isRunning() || mStarting)
+  {
+    return;
+  }
+
+  mStarting = true;
+  locker.unlock();
+
   emit triggerStarting();
 
   //!@todo This feels like a dirty hack, but the starting signal won't get processed otherwise; really, this should all
@@ -166,10 +178,22 @@ void cedar::proc::LoopedTrigger::startTrigger()
   this->start();
 
   emit triggerStarted();
+
+  locker.relock();
+  mStarting = false;
 }
 
 void cedar::proc::LoopedTrigger::stopTrigger()
 {
+  QMutexLocker locker(&mStoppingMutex);
+  if (!this->isRunning() || mStopping)
+  {
+    return;
+  }
+
+  mStopping = true;
+  locker.unlock();
+
   emit triggerStopping();
 
   //!@todo This feels like a dirty hack, but the starting signal won't get processed otherwise; really, this should all
@@ -180,7 +204,7 @@ void cedar::proc::LoopedTrigger::stopTrigger()
     QApplication::processEvents();
   }
 
-  this->stop(2000);
+  this->stop();
 
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
@@ -188,6 +212,9 @@ void cedar::proc::LoopedTrigger::stopTrigger()
   }
 
   emit triggerStopped();
+
+  locker.relock();
+  mStopping = false;
 }
 
 //!@todo this should take a cedar::unit::Time as argument

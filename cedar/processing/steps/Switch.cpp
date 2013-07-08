@@ -151,6 +151,11 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Switch::determineInputValidi
   {
     if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
     {
+      if (mat_data->isEmpty())
+      {
+        return cedar::proc::DataSlot::VALIDITY_ERROR;
+      }
+
       // check fitting sizes
       if (slot->getName() == "input 1" && this->mInput2)
       {
@@ -178,6 +183,11 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Switch::determineInputValidi
 
     if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
     {
+      if (mat_data->isEmpty())
+      {
+        return cedar::proc::DataSlot::VALIDITY_ERROR;
+      }
+
       if (cedar::aux::math::getDimensionalityOf(mat_data->getData()) == 0)
       {
         return cedar::proc::DataSlot::VALIDITY_VALID;
@@ -227,6 +237,7 @@ void cedar::proc::steps::Switch::inputConnectionChanged(const std::string& input
       else
       {
         this->mInput1.reset();
+        return;
       }
     }
     else if (inputName == "input 2")
@@ -238,6 +249,7 @@ void cedar::proc::steps::Switch::inputConnectionChanged(const std::string& input
       else
       {
         this->mInput2.reset();
+        return;
       }
     }
 
@@ -253,4 +265,5 @@ void cedar::proc::steps::Switch::inputConnectionChanged(const std::string& input
       }
     }
   }
+  this->emitOutputPropertiesChangedSignal("mixture");
 }

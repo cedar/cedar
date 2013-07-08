@@ -57,7 +57,10 @@ likely to undergo major changes:
     there are some annoying bugs related to it.
   - using multiple 3D convolutions in separate threads slows down all involved convolutions
   - the constness of parameters in the PropertyPane is sometimes not updated correctly - de- and reselecting helps
-    
+  - Some of the interactive Caren tests may not run if you do not have the corresponding meshes.
+  - Toggling the smart connections mode doesn't improve trigger connections. In fact, they are more strange than in
+    standard mode. For now, triggers and their strange connections can be hidden with Ctrl+T during smart mode.
+      
 == current stable ==
 - cedar::proc::gui
   - Fixed an issue that could lead to an exception when connecting renamed looped triggers.
@@ -73,6 +76,7 @@ likely to undergo major changes:
 - build system
   - enabled C++0x / C++11 compiler flag for GCC
   - cedar should now also compile when using clang.
+  - on Windows platform: we now require MSVC 2012 (express)
 - cedar::aux
   - when using LoopedThread a running QApplication or QCoreApplication is now required for its QT event loop (call exec() for the app).
   - DoubleData now inherits MatData. It therefore is also no longer just a typedef of a template, so make sure you
@@ -91,6 +95,7 @@ likely to undergo major changes:
 - cedar::dev
   - KinematicChain instances now need to be started via ->start() by the implementor. They do not start threading on
     their own, anymore.
+  - There is now a visualization for the Caren robot.
 - cedar::proc
   - The processingIde can now be started with the "--no-log" option. This will redirect all log messages to the terminal
     and can be very helpful when steps send too many log messages, leading to a lock-up of the user interface.
@@ -106,6 +111,11 @@ likely to undergo major changes:
   - The processingIde now offers a tool for checking architecture consistency. It is still a very early version and will
     be extended in the future. For now, it only checks if all looped steps in the current architecture are connected to
     a looped trigger. The tool can be accessed from the "windows" menu.
+  - LoopedTriggers in the processingIde can now be iterated manually, i.e., you can push a button to perform a single step.
+  - The proecssingIde now has a boost control widget. From it, you can activate and change the strength of any boost in
+    the current architecture. The widget can be accessed from the "tools" menu, or by pressing control+b.
+  - Connections can now be toggled to being "smart", i.e., having heuristically determined corners to unclutter 
+    architectures - this mode is fully automatic, so there's now way to move any lines around by hand.
 
 - cedar::dyn
   - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   

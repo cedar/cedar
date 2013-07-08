@@ -52,6 +52,7 @@ cedar_add_library(cedarproc
   MOC_HEADERS
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureToolBox.h
+  gui/BoostControl.h
   gui/ElementClassList.h
   gui/Ide.h
   gui/IdeApplication.h
@@ -65,15 +66,19 @@ cedar_add_library(cedarproc
   gui/Network.h
   gui/ToolBox.h
   gui/View.h
+  sources/BoxInput.h
   sources/GaussInput.h
   steps/Component.h
   steps/Convolution.h
   steps/ColorConversion.h
+  steps/ComponentMultiply.h
   steps/CoordinateTransformation.h
+  steps/MatrixMultiply.h
   steps/MatrixTypeConverter.h
   steps/Flip.h
   steps/StaticGain.h
   steps/UnitConverter.h
+  steps/Sigmoid.h
   sources/Boost.h
   sources/Noise.h
   sources/Picture.h

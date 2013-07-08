@@ -139,7 +139,7 @@ void cedar::proc::gui::StepItem::construct()
                                | QGraphicsItem::ItemIsMovable
                                );
 
-  if (cedar::proc::gui::Settings::instance().useGraphicsItemShadowEffects())
+  if (cedar::proc::gui::SettingsSingleton::getInstance()->useGraphicsItemShadowEffects())
   {
     QGraphicsDropShadowEffect *p_effect = new QGraphicsDropShadowEffect();
     p_effect->setBlurRadius(5.0);
@@ -348,7 +348,7 @@ void cedar::proc::gui::StepItem::redraw()
 
 void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 {
-  switch (cedar::proc::gui::Settings::instance().getDefaultDisplayMode())
+  switch (cedar::proc::gui::SettingsSingleton::getInstance()->getDefaultDisplayMode())
   {
     case cedar::proc::gui::Settings::StepDisplayMode::ICON_ONLY:
       this->setDisplayMode(cedar::proc::gui::StepItem::DisplayMode::ICON_ONLY);

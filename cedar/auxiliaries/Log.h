@@ -205,6 +205,7 @@ private:
   //!@brief The constructor.
   Log();
 
+	// Has to be wrapped to avoid circular dependencies between Log and Settings.
   bool getMemoryDebugFlag();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -218,24 +219,7 @@ private:
   cedar::aux::LogInterfacePtr mDefaultLogger;
 };
 
-namespace cedar
-{
-  namespace aux
-  {
-#ifdef MSVC
-#ifdef CEDAR_LIB_EXPORTS_AUX
-    // dllexport
-    template class __declspec(dllexport) cedar::aux::Singleton<cedar::aux::Log>;
-#else // CEDAR_LIB_EXPORTS_AUX
-    // dllimport
-    extern template class __declspec(dllimport) cedar::aux::Singleton<cedar::aux::Log>;
-#endif // CEDAR_LIB_EXPORTS_AUX
-#endif // MSVC
-
-    //!@brief The singleton instance of the kernel factory manager.
-    typedef cedar::aux::Singleton<cedar::aux::Log> LogSingleton;
-  }
-}
+CEDAR_AUX_SINGLETON(Log);
 
 #endif // CEDAR_AUX_LOG_H
 

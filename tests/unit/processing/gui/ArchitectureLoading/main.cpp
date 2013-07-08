@@ -162,7 +162,7 @@ int main(int argc, char** argv)
 
   unsigned int errors = 0;
 
-  cedar::proc::gui::Settings::instance().disableWriting();
+  cedar::proc::gui::SettingsSingleton::getInstance()->disableWriting();
 
   cedar::proc::gui::Ide *p_ide = new cedar::proc::gui::Ide(false);
 

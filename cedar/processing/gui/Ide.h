@@ -49,6 +49,7 @@
 // SYSTEM INCLUDES
 #include <QMainWindow>
 #include <QKeyEvent>
+#include <QDoubleSpinBox>
 #include <map>
 
 
@@ -217,6 +218,13 @@ public slots:
    */
   void showConsistencyChecker();
 
+  /*!@brief Opens a boost control widget.
+   */
+  void showBoostControl();
+
+  //!@brief toggle smart connections
+  void toggleSmartConnections(bool smart);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -267,6 +275,10 @@ private:
    */
   void logError(const std::string& message);
 
+  /*!@brief Sets the filename in the title of the main window.
+   */
+  void displayFilename(const std::string& filename);
+
   /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
    */
   static bool sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem);
@@ -287,6 +299,13 @@ private:
 
   //! Dock widget for the consistency checker.
   QDockWidget* mpConsistencyDock;
+
+  QString mDefaultWindowTitle;
+
+  cedar::proc::gui::BoostControl* mpBoostControl;
+
+  //! In which the user specifies the time step for single-step functionality.
+  QDoubleSpinBox* mpCustomTimeStep;
 
 }; // class cedar::MainWindow
 

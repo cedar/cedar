@@ -44,6 +44,8 @@
 #include "cedar/auxiliaries/gui/SceneWidget.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/auxiliaries/gl/Cylinder.h"
+#include "cedar/auxiliaries/gl/Sphere.h"
+#include "cedar/auxiliaries/gl/Chessboard.h"
 #include "cedar/units/Length.h"
 
 // SYSTEM INCLUDES
@@ -84,10 +86,13 @@ int main(int argc, char **argv)
   caren_trunk->setEndEffector(caren_arm->getRootCoordinateFrame());
   caren_arm->setEndEffector(palm->getRootCoordinateFrame());
 
+  // initialize head to look straight down
+  caren_head->setJointAngle(1, 1.4);
+
   // create scene and viewer to display the arm
   cedar::aux::gl::ScenePtr scene(new cedar::aux::gl::Scene());
   scene->setSceneLimit(2);
-  scene->drawFloor(true);
+  scene->drawFloor(false);
   cedar::aux::gui::Viewer viewer(scene);
   viewer.setSceneRadius(scene->getSceneLimit());
 
@@ -124,18 +129,60 @@ int main(int argc, char **argv)
   cylinder_local_coordinate_frame->setName("cylinder");
   cylinder_local_coordinate_frame->setTranslation
   (
-    0.3 * cedar::unit::meters,
+    1.0 * cedar::unit::meters,
     0.0 * cedar::unit::meters,
     1.0 * cedar::unit::meters
   );
   cedar::aux::gl::ObjectVisualizationPtr cylinder
   (
-    new cedar::aux::gl::Cylinder(cylinder_local_coordinate_frame, .1, .2, 0, 0.8, 0)
+    new cedar::aux::gl::Cylinder(cylinder_local_coordinate_frame, .01, .02, 0, 0.8, 0)
   );
   scene->addObjectVisualization(cylinder);
 
+  // create a sphere visualization and add it to the scene
+  cedar::aux::LocalCoordinateFramePtr sphere_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  sphere_local_coordinate_frame->setName("sphere");
+  sphere_local_coordinate_frame->setTranslation(.5, .0, 0.0);
+  cedar::aux::gl::ObjectVisualizationPtr sphere
+  (
+    new cedar::aux::gl::Sphere(sphere_local_coordinate_frame, .005, 0, 0.8, 0)
+  );
+  scene->addObjectVisualization(sphere);
+
+  // create a chess board visualization and add it to the scene
+  cedar::aux::LocalCoordinateFramePtr chessboard_one_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  chessboard_one_local_coordinate_frame->setName("chess board");
+  chessboard_one_local_coordinate_frame->setTranslation(.1, -.14, .0);
+  cedar::aux::gl::ObjectVisualizationPtr chessboard_one
+  (
+    new cedar::aux::gl::Chessboard(chessboard_one_local_coordinate_frame, .175, .245, 0.0001, 5, 7, 0, 0, 0)
+  );
+  scene->addObjectVisualization(chessboard_one);
+
+  // create a chess board visualization and add it to the scene
+  cedar::aux::LocalCoordinateFramePtr chessboard_two_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  chessboard_two_local_coordinate_frame->setName("chess board");
+  chessboard_two_local_coordinate_frame->setTranslation(.553, -.3745, .0);
+  cedar::aux::gl::ObjectVisualizationPtr chessboard_two
+  (
+    new cedar::aux::gl::Chessboard(chessboard_two_local_coordinate_frame, .175, .245, 0.0001, 5, 7, 0, 0, 0)
+  );
+  scene->addObjectVisualization(chessboard_two);
+
+  // create a chess board visualization and add it to the scene
+  cedar::aux::LocalCoordinateFramePtr chessboard_three_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  chessboard_three_local_coordinate_frame->setName("chess board");
+  chessboard_three_local_coordinate_frame->setTranslation(.553, 1.2535, .0);
+  cedar::aux::gl::ObjectVisualizationPtr chessboard_three
+  (
+    new cedar::aux::gl::Chessboard(chessboard_three_local_coordinate_frame, .175, .245, 0.0001, 5, 7, 0, 0, 0)
+  );
+  scene->addObjectVisualization(chessboard_three);
+
+
+
   // create a mounted camera viewer
-  cedar::dev::gui::MountedCameraViewer camera_viewer(scene, caren_head);
+  cedar::dev::gui::MountedCameraViewer camera_viewer(scene, caren_head, false);
   camera_viewer.readJson(camera_middle_configuration_file);
   camera_viewer.setSceneRadius(scene->getSceneLimit());
 

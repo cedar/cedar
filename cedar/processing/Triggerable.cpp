@@ -37,6 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/Trigger.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
@@ -89,6 +90,8 @@ void cedar::proc::Triggerable::callOnStart()
 {
   // make sure no other thread can start the step
   QMutexLocker locker(this->mpStartCallsLock);
+//  cedar::aux::NamedConfigurable* named = dynamic_cast<cedar::aux::NamedConfigurable*>(this);
+//  std::cout << named->getName() << "->callOnStart():" << __LINE__ << ": " << this->mStartCalls << std::endl;
 
   //!@todo onStart might take a long time - can/should this be done better, e.g., by first storing a bool, then incrementing, then unlocking, then calling onStart?
   // only call onStart if this triggerable hasn't been started yet
@@ -99,6 +102,9 @@ void cedar::proc::Triggerable::callOnStart()
 
   // count how often this triggerable was started
   ++this->mStartCalls;
+
+//  std::cout << named->getName() << "->callOnStart():" << __LINE__ << ": " << this->mStartCalls << std::endl;
+
   locker.unlock();
 
   if (mFinished)
@@ -114,18 +120,39 @@ void cedar::proc::Triggerable::callOnStop()
 {
   // only call onStop if there is only one trigger left that started this triggerable
   QMutexLocker locker(this->mpStartCallsLock);
-  if (this->mStartCalls == 1)
+  cedar::aux::NamedConfigurable* named = dynamic_cast<cedar::aux::NamedConfigurable*>(this);
+//  std::cout << named->getName() << "->callOnStop():" << __LINE__ << ": " << this->mStartCalls << std::endl;
+
+  // count how often this was stopped
+  if (this->mStartCalls == 0)
+  {
+    std::string name = "(unnamed step)";
+    if (named)
+    {
+      name = named->getName();
+    }
+    // should not happen, but to prevent lockups in the architecture, we just put out an error and stop doing stuff.
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Step \"" + name + "\" has an invalid start count.",
+      "void cedar::proc::Triggerable::callOnStop()"
+    );
+    return;
+  }
+  --this->mStartCalls;
+
+  if (this->mStartCalls == 0)
   {
     this->onStop();
   }
 
-  // count how often this was stopped
-  CEDAR_ASSERT(this->mStartCalls > 0);
-  --this->mStartCalls;
+//  std::cout << named->getName() << "->callOnStop():" << __LINE__ << ": " << this->mStartCalls << std::endl;
+
   locker.unlock();
 
   this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
 
+  // can only call subsequent listeners if the finished trigger exists
   if (mFinished)
   {
     for (size_t i = 0; i < this->mFinished->getListeners().size(); ++i)

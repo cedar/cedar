@@ -82,7 +82,7 @@ mpEndEffectorCoordinateFrame(pEndEffector)
 cedar::dev::KinematicChain::~KinematicChain()
 {
 #if 0
-// JS: das wird schon in LoopedThread geprueft
+// JS: already being checked in LoopedThread
   if (isRunning())
   {
     this->stop();
@@ -641,10 +641,10 @@ void cedar::dev::KinematicChain::initializeFromJointList()
     mReferenceJointTransformations.push_back(T.clone());
 
     // create storage variables for intermediate results
-    mTwistExponentials.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
-    mProductsOfExponentials.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
-    mJointTransformations.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
-    mJointTwists.push_back(cv::Mat::zeros(6, 1, CV_64FC1));
+    mTwistExponentials.push_back(cv::Mat::eye(4, 4, CV_64FC1));
+    mProductsOfExponentials.push_back(cv::Mat::eye(4, 4, CV_64FC1));
+    mJointTransformations.push_back(cv::Mat::eye(4, 4, CV_64FC1));
+    mJointTwists.push_back(cv::Mat::eye(6, 1, CV_64FC1));
   }
 
   // end-effector

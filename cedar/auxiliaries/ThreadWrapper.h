@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -24,9 +24,9 @@
 
     File:        ThreadWrapper.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2010 12 02
+    Maintainer:  Jean-Stephane Jokeit
+    Email:       jean-stephane.jokeit@ini.rub.de
+    Date:        2013 02 01
 
     Description: Header for the @em cedar::aux::ThreadWrapper class.
 
@@ -100,11 +100,15 @@ public:
    * be silently aborted.
    *
    * Note, the method can be made in a pseudo-non-blocking way if
-   * timeout is set to a rediculously small interval.
+   * timeout is set to a rediculously small interval, but the preferred
+   * way is to use requestStop() for this.
+   * For stopping the thread from the thread's own context, it is also preferred
+   * to use requestStop().
    *
    *@param timeout: a value != 0 will abort waiting on the worker thread after
    *        the timeout-period. Use with caution.
    *@param suppressWarning: will be passed to applyStop()
+   * @see requestStop()
    */
   void stop(unsigned int timeout = UINT_MAX, bool suppressWarning = false); 
     // TODO: why is this uint and the arg of wait() is ulong?
@@ -125,6 +129,7 @@ public:
    * This method does not block as it only registers the stop request.
    * If you wish to really stop the thread, use stop().
    * This method is thread-safe.
+   * This is the preferred way to stop the thread from the thread itself.
    * 
    *@see: stopRequested(), stop()
    */
@@ -139,7 +144,7 @@ public:
 
 
   //! wait for the thread to finish. The calling thread will pause!
-  inline bool wait(unsigned long time = 0)
+  inline bool wait(unsigned long time = ULONG_MAX)
   {
     bool ret = false;
 

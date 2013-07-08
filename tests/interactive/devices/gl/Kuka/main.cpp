@@ -50,6 +50,7 @@
 
 int main(int argc, char **argv)
 {
+  // find resources
   std::string configuration_file = cedar::aux::locateResource("configs/kuka_lwr4.json");
 
   QApplication a(argc, argv);
@@ -60,9 +61,13 @@ int main(int argc, char **argv)
 
   // create gl visualization objects
   cedar::aux::gl::ObjectVisualizationPtr p_arm_visualization;
-  cedar::dev::gl::KinematicChainPtr p_kuka_arm_visualization
+  //cedar::dev::gl::KinematicChainPtr p_kuka_arm_visualization
+  //(
+  //  new cedar::dev::gl::KukaArm(p_kuka_arm)
+  //);
+  cedar::dev::robot::gl::KukaArmPtr p_kuka_arm_visualization
   (
-    new cedar::dev::gl::KukaArm(p_kuka_arm)
+    new cedar::dev::robot::gl::KukaArm(p_kuka_arm)
   );
   p_arm_visualization = p_kuka_arm_visualization;
 
