@@ -699,6 +699,19 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
             break;
         } // switch (mpConnectionStart->getGroup())
       }
+      else if ( (target = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]))
+           && mpConnectionStart == target
+          )
+      {
+        this->mMode = MODE_SELECT;
+        mpeParentView->setMode(cedar::proc::gui::Scene::MODE_SELECT);
+        if (! (pMouseEvent->modifiers() & Qt::ControlModifier))
+        {
+          this->selectNone();
+        }
+        mpConnectionStart->setSelected(true);
+        QGraphicsScene::mouseReleaseEvent(pMouseEvent);
+      }
       else
       {
         this->mMode = MODE_SELECT;
@@ -969,5 +982,23 @@ void cedar::proc::gui::Scene::handleTriggerModeChange()
     {
       break;
     }
+  }
+}
+
+void cedar::proc::gui::Scene::selectAll()
+{
+  QList<QGraphicsItem*> selected_items = this->items();
+  for (int i = 0; i < selected_items.size(); ++i)
+  {
+    selected_items.at(i)->setSelected(true);
+  }
+}
+
+void cedar::proc::gui::Scene::selectNone()
+{
+  QList<QGraphicsItem*> selected_items = this->items();
+  for (int i = 0; i < selected_items.size(); ++i)
+  {
+    selected_items.at(i)->setSelected(false);
   }
 }
