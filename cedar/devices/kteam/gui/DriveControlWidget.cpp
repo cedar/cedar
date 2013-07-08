@@ -35,7 +35,9 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/devices/kteam/Drive.h"
 #include "cedar/devices/kteam/gui/DriveControlWidget.h"
+#include "cedar/units/Velocity.h"
 
 // SYSTEM INCLUDES
 
@@ -48,8 +50,8 @@ cedar::aux::gui::BaseWidget("DriveControlWidget", parent),
 mDrive(drive)
 {
   setupUi(this);
-  spinBoxForwardVelocity->setValue(mDrive->getForwardVelocity()); //initialize forwardVelocity
-  spinBoxTurningRate->setValue(mDrive->getTurningRate()); //initialize turningRate
+  spinBoxForwardVelocity->setValue(mDrive->getForwardVelocity() / cedar::unit::DEFAULT_VELOCITY_UNIT);
+  spinBoxTurningRate->setValue(mDrive->getTurningRate() / cedar::unit::DEFAULT_ANGULAR_VELOCITY_UNIT);
   connect(pushButtonStart, SIGNAL(pressed()), this, SLOT(drive()));
   connect(pushButtonStop, SIGNAL(pressed()), this, SLOT(stop()));
   connect(pushButtonReset, SIGNAL(pressed()), this, SLOT(reset()));
@@ -66,7 +68,11 @@ cedar::dev::kteam::gui::DriveControlWidget::~DriveControlWidget()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dev::kteam::gui::DriveControlWidget::drive()
 {
-  mDrive->setForwardVelocityAndTurningRate(spinBoxForwardVelocity->value(), spinBoxTurningRate->value());
+  mDrive->setForwardVelocityAndTurningRate
+          (
+            spinBoxForwardVelocity->value() * cedar::unit::DEFAULT_VELOCITY_UNIT,
+            spinBoxTurningRate->value() * cedar::unit::DEFAULT_ANGULAR_VELOCITY_UNIT
+          );
 }
 
 void cedar::dev::kteam::gui::DriveControlWidget::stop()
@@ -82,12 +88,12 @@ void cedar::dev::kteam::gui::DriveControlWidget::reset()
 void cedar::dev::kteam::gui::DriveControlWidget::timerEvent(QTimerEvent * /* event */)
 {
   // get new values
-  std::vector<double> wheel_speed = mDrive->getWheelSpeed();
+  std::vector<cedar::unit::Velocity> wheel_speed = mDrive->getWheelSpeed();
   std::vector<int> encoders = mDrive->getEncoders();
 
   // display new values
-  valueLeftWheelSpeed->display(wheel_speed[0]);
-  valueRightWheelSpeed->display(wheel_speed[1]);
+  valueLeftWheelSpeed->display(wheel_speed[0] / cedar::unit::DEFAULT_VELOCITY_UNIT);
+  valueRightWheelSpeed->display(wheel_speed[1] / cedar::unit::DEFAULT_VELOCITY_UNIT);
   valueLeftEncoder->display(encoders[0]);
   valueRightEncoder->display(encoders[1]);
 }

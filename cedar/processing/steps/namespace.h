@@ -54,13 +54,14 @@ namespace cedar
     namespace steps
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(TransformationDirection);
-      CEDAR_DECLARE_PROC_CLASS(TransformationType);
+
       CEDAR_DECLARE_PROC_CLASS(ComponentMultiply);
       CEDAR_DECLARE_PROC_CLASS(CoordinateTransformation);
       CEDAR_DECLARE_PROC_CLASS(ChannelSplit);
-      CEDAR_DECLARE_PROC_CLASS(Convolution);
       CEDAR_DECLARE_PROC_CLASS(ColorConversion);
+      CEDAR_DECLARE_PROC_CLASS(Component);
+      CEDAR_DECLARE_PROC_CLASS(Convolution);
+      CEDAR_DECLARE_PROC_CLASS(CoordinateTransformation);
       CEDAR_DECLARE_PROC_CLASS(Flip);
       CEDAR_DECLARE_PROC_CLASS(MatrixMultiply);
       CEDAR_DECLARE_PROC_CLASS(MatrixTypeConverter);
@@ -70,6 +71,9 @@ namespace cedar
       CEDAR_DECLARE_PROC_CLASS(StaticGain);
       CEDAR_DECLARE_PROC_CLASS(Sum);
       CEDAR_DECLARE_PROC_CLASS(Switch);
+      CEDAR_DECLARE_PROC_CLASS(TransformationDirection);
+      CEDAR_DECLARE_PROC_CLASS(TransformationType);
+      CEDAR_DECLARE_PROC_CLASS(UnitConverter);
 
 #ifdef CEDAR_USE_YARP
       CEDAR_DECLARE_PROC_CLASS(NetWriterSink);

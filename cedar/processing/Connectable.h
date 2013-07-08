@@ -356,6 +356,10 @@ protected:
     return iter->second;
   }
 
+  /*!@brief Removes all declared data slots.
+   */
+  void clearDataSlots();
+
   void emitOutputPropertiesChangedSignal(const std::string& slot);
 
   //--------------------------------------------------------------------------------------------------------------------

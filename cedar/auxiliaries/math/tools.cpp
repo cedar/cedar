@@ -182,7 +182,7 @@ void cedar::aux::math::write(cv::Mat matrix)
     {
       for (int j = 0; j < matrix.cols; j++)
       {
-        if (IsZero(matrix.at<unsigned char>(i, j)))
+        if (cedar::aux::math::isZero<double>(matrix.at<unsigned char>(i, j)))
         {
           std::cout << "0" << " ";
         }
@@ -199,7 +199,7 @@ void cedar::aux::math::write(cv::Mat matrix)
     {
       for (int j = 0; j < matrix.cols; j++)
       {
-        if (IsZero(matrix.at<char>(i, j)))
+        if (cedar::aux::math::isZero<double>(matrix.at<char>(i, j)))
         {
           std::cout << "0" << " ";
         }
@@ -216,7 +216,7 @@ void cedar::aux::math::write(cv::Mat matrix)
       {
         for (int j = 0; j < matrix.cols; j++)
         {
-          if (IsZero(matrix.at<unsigned short int>(i, j)))
+          if (cedar::aux::math::isZero<double>(matrix.at<unsigned short int>(i, j)))
           {
             std::cout << "0" << " ";
           }
@@ -233,7 +233,7 @@ void cedar::aux::math::write(cv::Mat matrix)
       {
         for (int j = 0; j < matrix.cols; j++)
         {
-          if (IsZero(matrix.at<short int>(i, j)))
+          if (cedar::aux::math::isZero<double>(matrix.at<short int>(i, j)))
           {
             std::cout << "0" << " ";
           }
@@ -250,7 +250,7 @@ void cedar::aux::math::write(cv::Mat matrix)
       {
         for (int j=0; j<matrix.cols; j++)
         {
-          if (IsZero(matrix.at<int>(i, j)))
+          if (cedar::aux::math::isZero<double>(matrix.at<int>(i, j)))
           {
             std::cout << "0" << " ";
           }
@@ -267,7 +267,7 @@ void cedar::aux::math::write(cv::Mat matrix)
     {
       for (int j=0; j<matrix.cols; j++)
       {
-        if (IsZero(matrix.at<float>(i, j)))
+        if (cedar::aux::math::isZero<double>(matrix.at<float>(i, j)))
         {
           std::cout << "0" << " ";
         }
@@ -284,7 +284,7 @@ void cedar::aux::math::write(cv::Mat matrix)
   {
     for (int j=0; j<matrix.cols; j++)
     {
-      if (IsZero(matrix.at<double>(i, j)))
+      if (cedar::aux::math::isZero<double>(matrix.at<double>(i, j)))
       {
         std::cout << "0" << " ";
       }
@@ -402,7 +402,7 @@ void cedar::aux::math::reduceCvMat3D
       {
         for (dim_2 = 0; dim_2 < source_size[1]; ++dim_2)
         {
-          max = std::numeric_limits<int>::min();
+          max = static_cast<T>(std::numeric_limits<int>::min());
           for (dim_dropped = 0; dim_dropped < dropped_size; ++dim_dropped)
           {
             max = std::max(max, source.at<T>(src_index));
@@ -418,7 +418,7 @@ void cedar::aux::math::reduceCvMat3D
       {
         for (dim_2 = 0; dim_2 < source_size[1]; ++dim_2)
         {
-          min = std::numeric_limits<int>::max();
+          min = static_cast<T>(std::numeric_limits<int>::max());
           for (dim_dropped = 0; dim_dropped < dropped_size; ++dim_dropped)
           {
             min = std::min(min, source.at<T>(src_index));

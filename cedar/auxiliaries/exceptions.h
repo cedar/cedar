@@ -211,6 +211,23 @@ class cedar::aux::ValidationFailedException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::ValidationFailedException
 
+/*!@brief Exception that occurs when a parameter validation fails.
+ */
+class cedar::aux::UnknownUnitSuffixException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::UnknownUnitSuffixException
+
+//! Exception that signals an invalid path.
+class cedar::aux::InvalidPathException : public cedar::aux::ExceptionBase
+{
+};
+
+/*!@brief An exception thrown when a method is not implemented.
+ */
+class cedar::aux::NotImplementedException : public cedar::aux::ExceptionBase
+{
+};
+
 /*!@brief Exception that occurs when threading code is mis-used
  */
 class cedar::aux::ThreadingErrorException : public cedar::aux::ExceptionBase

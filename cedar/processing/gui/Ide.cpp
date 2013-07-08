@@ -54,6 +54,7 @@
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Manager.h"
+#include "cedar/devices/gui/RobotManager.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/Log.h"
@@ -213,6 +214,11 @@ mpBoostControl(NULL)
                    this,
                    SLOT(exportSvg()));
 
+  QObject::connect(mpActionShowRobotManager,
+                   SIGNAL(triggered()),
+                   this,
+                   SLOT(showRobotManager()));
+
   QObject::connect(mpActionDuplicate, SIGNAL(triggered()), this, SLOT(duplicateStep()));
 
   QObject::connect(mpActionSelectAll, SIGNAL(triggered()), this, SLOT(selectAll()));
@@ -230,6 +236,16 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::showRobotManager()
+{
+  auto p_dialog = new QDialog(this);
+  auto p_layout = new QVBoxLayout();
+  p_dialog->setLayout(p_layout);
+  p_layout->addWidget(new cedar::dev::gui::RobotManager());
+  p_dialog->setMinimumHeight(500);
+  p_dialog->show();
+}
 
 void cedar::proc::gui::Ide::displayFilename(const std::string& filename)
 {
@@ -423,7 +439,7 @@ void cedar::proc::gui::Ide::toggleGrid(bool triggered)
 void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
 {
   this->storeSettings();
-  //!@todo Without this, the gui_ProcessingIde crashes when exiting in certain circumstanges (see unit test gui_ProcessingIde)
+  //!@todo Without this, the gui_ProcessingIde crashes when exiting in certain circumstances (see unit test gui_ProcessingIde)
   this->mpPropertyTable->resetContents();
   pEvent->accept();
 }

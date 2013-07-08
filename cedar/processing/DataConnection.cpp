@@ -80,6 +80,14 @@ cedar::proc::DataConnection::~DataConnection()
 {
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
+  this->disconnect();
+}
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::DataConnection::disconnect()
+{
   cedar::proc::DataSlotPtr source = mSource.lock();
   cedar::proc::DataSlotPtr target = mTarget.lock();
 
@@ -97,11 +105,12 @@ cedar::proc::DataConnection::~DataConnection()
       real_target = promoted->mDataSlot;
     }
     real_target->getParentPtr()->freeInput(real_target->getName(), source->getData());
+
+    mSource.reset();
+    mTarget.reset();
   }
 }
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
+
 bool cedar::proc::DataConnection::equals(
                                           cedar::proc::ConstDataSlotPtr source,
                                           cedar::proc::ConstDataSlotPtr target
@@ -134,6 +143,30 @@ bool cedar::proc::DataConnection::connects(
     return true;
   }
   return false;
+}
+
+cedar::proc::DataSlotPtr cedar::proc::DataConnection::getSource()
+{
+  if (cedar::proc::DataSlotPtr source_shared = mSource.lock())
+  {
+    return source_shared;
+  }
+  else
+  {
+    CEDAR_THROW(cedar::proc::ConnectionMemberDeletedException, "Shared pointer is already deleted.");
+  }
+}
+
+cedar::proc::DataSlotPtr cedar::proc::DataConnection::getTarget()
+{
+  if (cedar::proc::DataSlotPtr target_shared = mTarget.lock())
+  {
+    return target_shared;
+  }
+  else
+  {
+    CEDAR_THROW(cedar::proc::ConnectionMemberDeletedException, "Shared pointer is already deleted.");
+  }
 }
 
 cedar::proc::ConstDataSlotPtr cedar::proc::DataConnection::getSource() const

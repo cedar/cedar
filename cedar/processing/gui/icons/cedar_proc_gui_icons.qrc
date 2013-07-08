@@ -36,6 +36,7 @@
     <file>steps/resize.svg</file>
     <file>steps/sigmoid.svg</file>
     <file>steps/sum.svg</file>
+    <file>steps/unit_converter.svg</file>
     <file>steps/video_grabber.svg</file>
     <file>menus/properties.svg</file>
     <file>menus/plot.svg</file>

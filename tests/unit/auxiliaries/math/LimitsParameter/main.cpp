@@ -38,6 +38,7 @@
 #include "cedar/auxiliaries/math/LimitsParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/math/LengthLimitsParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -46,7 +47,21 @@ class TestClass : public cedar::aux::Configurable
 public:
   TestClass()
   :
-  _mpLimitsParameter(new cedar::aux::math::LimitsParameter<double>(this, "limits", -10.0, 1.0, -1.0, 10.0))
+  _mpLimitsParameter(new cedar::aux::math::LimitsParameter<double>(this, "limits", 0.0, -10.0, 1.0, 1.0, -1.0, 10.0)),
+  _mpLengthsLimitsParameter
+  (
+    new cedar::aux::math::LengthLimitsParameter
+        (
+          this,
+          "length limits",
+          0.0 * cedar::unit::meters,
+          -10.0 * cedar::unit::meters,
+          1.0 * cedar::unit::meters,
+          1.0 * cedar::unit::meters,
+          -1.0 * cedar::unit::meters,
+          10.0 * cedar::unit::meters
+        )
+  )
   {
   }
 
@@ -74,8 +89,29 @@ public:
     return this->_mpLimitsParameter;
   }
 
+  cedar::unit::Length getLowerLength() const
+  {
+    return this->_mpLengthsLimitsParameter->getLowerLimit();
+  }
+
+  cedar::unit::Length getUpperLength() const
+  {
+    return this->_mpLengthsLimitsParameter->getUpperLimit();
+  }
+
+  void setLowerLength(cedar::unit::Length value)
+  {
+    this->_mpLengthsLimitsParameter->setLowerLimit(value);
+  }
+
+  void setUpperLength(cedar::unit::Length value)
+  {
+    this->_mpLengthsLimitsParameter->setUpperLimit(value);
+  }
+
 private:
   cedar::aux::math::DoubleLimitsParameterPtr _mpLimitsParameter;
+  cedar::aux::math::LengthLimitsParameterPtr _mpLengthsLimitsParameter;
 };
 
 CEDAR_GENERATE_POINTER_TYPES(TestClass);
@@ -89,34 +125,34 @@ int main()
 
   // read from file
   limited->readJson("limits.json");
-  if (!(IsZero(limited->getLowerLimit() - (-2.0))))
+  if (!(cedar::aux::math::isZero<double>(limited->getLowerLimit() - (-2.0))))
   {
     std::cout << "lower limit was not read correctly, read:" << limited->getLowerLimit() << std::endl;
     ++number_of_errors;
   }
-  if (!(IsZero(limited->getUpperLimit() - (2.2))))
+  if (!(cedar::aux::math::isZero<double>(limited->getUpperLimit() - (2.2))))
   {
     std::cout << "upper limit was not read correctly, read:" << limited->getUpperLimit()<< std::endl;
     ++number_of_errors;
   }
 
   // check extrema
-  if (!(IsZero(limited->getLimitsParameter()->getLowerLimitMinimum() - (-10.0))))
+  if (!(cedar::aux::math::isZero<double>(limited->getLimitsParameter()->getLowerLimitMinimum() - (-10.0))))
   {
     std::cout << "lower limit minimum was not set correctly" << std::endl;
     ++number_of_errors;
   }
-  if (!(IsZero(limited->getLimitsParameter()->getLowerLimitMaximum() - (1.0))))
+  if (!(cedar::aux::math::isZero<double>(limited->getLimitsParameter()->getLowerLimitMaximum() - (1.0))))
   {
     std::cout << "lower limit maximum was not set correctly" << std::endl;
     ++number_of_errors;
   }
-  if (!(IsZero(limited->getLimitsParameter()->getUpperLimitMinimum() - (-1.0))))
+  if (!(cedar::aux::math::isZero<double>(limited->getLimitsParameter()->getUpperLimitMinimum() - (-1.0))))
   {
     std::cout << "upper limit minimum was not set correctly" << std::endl;
     ++number_of_errors;
   }
-  if (!(IsZero(limited->getLimitsParameter()->getUpperLimitMaximum() - (10.0))))
+  if (!(cedar::aux::math::isZero<double>(limited->getLimitsParameter()->getUpperLimitMaximum() - (10.0))))
   {
     std::cout << "upper limit maximum was not set correctly" << std::endl;
     ++number_of_errors;
@@ -124,43 +160,67 @@ int main()
 
   // check set functions
   limited->setLowerLimit(-5.6);
-  if (!(IsZero(limited->getLowerLimit() - (-5.6))))
+  if (!(cedar::aux::math::isZero<double>(limited->getLowerLimit() - (-5.6))))
   {
     std::cout << "lower limit was not set correctly" << std::endl;
     ++number_of_errors;
   }
   limited->setUpperLimit(6.7);
-  if (!(IsZero(limited->getUpperLimit() - (6.7))))
+  if (!(cedar::aux::math::isZero<double>(limited->getUpperLimit() - (6.7))))
   {
     std::cout << "upper limit was not set correctly" << std::endl;
     ++number_of_errors;
   }
   limited->getLimitsParameter()->setLowerLimitMinimum(-12.3);
-  if (!(IsZero(limited->getLimitsParameter()->getLowerLimitMinimum() - (-12.3))))
+  if (!(cedar::aux::math::isZero<double>(limited->getLimitsParameter()->getLowerLimitMinimum() - (-12.3))))
   {
     std::cout << "lower limit minimum was not set correctly" << std::endl;
     ++number_of_errors;
   }
   limited->getLimitsParameter()->setLowerLimitMaximum(3.4);
-  if (!(IsZero(limited->getLimitsParameter()->getLowerLimitMaximum() - (3.4))))
+  if (!(cedar::aux::math::isZero<double>(limited->getLimitsParameter()->getLowerLimitMaximum() - (3.4))))
   {
     std::cout << "lower limit maximum was not set correctly" << std::endl;
     ++number_of_errors;
   }
   limited->getLimitsParameter()->setUpperLimitMinimum(-4.5);
-  if (!(IsZero(limited->getLimitsParameter()->getUpperLimitMinimum() - (-4.5))))
+  if (!(cedar::aux::math::isZero<double>(limited->getLimitsParameter()->getUpperLimitMinimum() - (-4.5))))
   {
     std::cout << "upper limit minimum was not set correctly" << std::endl;
     ++number_of_errors;
   }
   limited->getLimitsParameter()->setUpperLimitMaximum(6.7);
-  if (!(IsZero(limited->getLimitsParameter()->getUpperLimitMaximum() - (6.7))))
+  if (!(cedar::aux::math::isZero<double>(limited->getLimitsParameter()->getUpperLimitMaximum() - (6.7))))
   {
     std::cout << "upper limit maximum was not set correctly" << std::endl;
     ++number_of_errors;
   }
 
+  if (limited->getLowerLength() != -2 * cedar::unit::meters)
+  {
+    std::cout << "lower length limit was not read correctly" << std::endl;
+    ++number_of_errors;
+  }
 
+  if (limited->getUpperLength() != 2.2 * cedar::unit::meters)
+  {
+    std::cout << "upper length limit was not read correctly" << std::endl;
+    ++number_of_errors;
+  }
+
+  limited->setLowerLength(-5.4 * cedar::unit::meters);
+  if (limited->getLowerLength() != -5.4 * cedar::unit::meters)
+  {
+    std::cout << "lower length limit was not set correctly" << std::endl;
+    ++number_of_errors;
+  }
+
+  limited->setUpperLength(6.3 * cedar::unit::meters);
+  if (limited->getUpperLength() != 6.3 * cedar::unit::meters)
+  {
+    std::cout << "upper length limit was not read correctly" << std::endl;
+    ++number_of_errors;
+  }
 
   return number_of_errors;
 }

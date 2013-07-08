@@ -68,7 +68,7 @@ cedar_add_library(cedarproc
   gui/View.h
   sources/BoxInput.h
   sources/GaussInput.h
-  steps/StaticGain.h
+  steps/Component.h
   steps/Convolution.h
   steps/ColorConversion.h
   steps/ComponentMultiply.h
@@ -76,6 +76,8 @@ cedar_add_library(cedarproc
   steps/MatrixMultiply.h
   steps/MatrixTypeConverter.h
   steps/Flip.h
+  steps/StaticGain.h
+  steps/UnitConverter.h
   steps/Sigmoid.h
   sources/Boost.h
   sources/Noise.h
@@ -92,5 +94,5 @@ cedar_add_library(cedarproc
   ${yarp_moc_headers}
   RESOURCES
   gui/icons/cedar_proc_gui_icons.qrc
-  gui/images/images.qrc
+  gui/images/cedar_proc_gui_images.qrc
   )

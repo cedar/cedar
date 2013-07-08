@@ -40,6 +40,7 @@
 #ifdef CEDAR_USE_KUKA_LWR
 
 // CEDAR INCLUDES
+#include "cedar/devices/KinematicChain.h"
 #include "cedar/devices/kuka/KinematicChain.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/math/LimitsParameter.h"

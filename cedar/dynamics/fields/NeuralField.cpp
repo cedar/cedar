@@ -52,6 +52,8 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -483,12 +485,12 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   {
     cv::randn(neural_noise, cv::Scalar(0), cv::Scalar(1));
     neural_noise = this->_mNoiseCorrelationKernelConvolution->convolve(neural_noise);
-    //!@todo not sure, if dividing time by 1000 (which is an implicit tau) makes any sense or should be a parameter
+    //!@todo not sure, if dividing time by 1s (which is an implicit tau) makes any sense or should be a parameter
     //!@todo not sure what sqrt(time) does here (i.e., within the sigmoid); check if this is correct, and, if so, explain it
     sigmoid_u = _mSigmoid->getValue()->compute<float>
                 (
                   u
-                  + sqrt(cedar::unit::Milliseconds(time)/cedar::unit::Milliseconds(1000.0))
+                  + sqrt(time / (1.0 * cedar::unit::second))
                     * neural_noise
                 );
   }
@@ -515,7 +517,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
    * the next line multiplies by time anyway)
    */
   cv::randn(input_noise, cv::Scalar(0), cv::Scalar(1));
-  d_u += 1.0 / sqrt(cedar::unit::Milliseconds(time)/cedar::unit::Milliseconds(1.0))
+  d_u += 1.0 / sqrt(time / cedar::unit::Time(1.0 * cedar::unit::milli * cedar::unit::second))
          *_mInputNoiseGain->getValue() * input_noise;
 
   boost::shared_ptr<QWriteLocker> activation_write_locker;
@@ -526,7 +528,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   }
 
   // integrate one time step
-  u += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau) * d_u;
+  u += time / cedar::unit::Time(tau * cedar::unit::milli * cedar::unit::seconds) * d_u;
 }
 
 void cedar::dyn::NeuralField::updateInputSum()
