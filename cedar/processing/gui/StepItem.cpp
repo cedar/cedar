@@ -1156,6 +1156,7 @@ QWidget* cedar::proc::gui::StepItem::createDockWidget(const std::string& title, 
     QWidget* p_widget = new QWidget();
     p_widget->setWindowTitle(QString::fromStdString(title));
     auto p_layout = new QVBoxLayout();
+    p_layout->setContentsMargins(2, 2, 2, 2);
     p_layout->addWidget(pPlot);
     p_widget->setLayout(p_layout);
     return p_widget;
