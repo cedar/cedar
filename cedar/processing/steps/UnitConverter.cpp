@@ -146,7 +146,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::UnitConverter::determineInpu
 {
   if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
-    if (mat_data->getDimensionality() == 0)
+    if (!mat_data->isEmpty() && mat_data->getDimensionality() == 0)
     {
       return cedar::proc::DataSlot::VALIDITY_VALID;
     }

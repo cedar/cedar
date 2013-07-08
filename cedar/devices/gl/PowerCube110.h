@@ -34,13 +34,13 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_GL_POWER_CUBE_110_H
-#define CEDAR_DEV_ROBOT_GL_POWER_CUBE_110_H
+#ifndef CEDAR_DEV_GL_POWER_CUBE_110_H
+#define CEDAR_DEV_GL_POWER_CUBE_110_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/robot/gl/namespace.h"
-#include "cedar/devices/robot/KinematicChain.h"
-#include "cedar/devices/robot/gl/KinematicChain.h"
+#include "cedar/devices/gl/namespace.h"
+#include "cedar/devices/KinematicChain.h"
+#include "cedar/devices/gl/KinematicChain.h"
 #include "cedar/auxiliaries/gl/gl.h"
 
 // SYSTEM INCLUDES
@@ -49,7 +49,7 @@
 /*!@brief Visualization of the PowerCube 110
  * ...
  */
-class cedar::dev::robot::gl::PowerCube110 : public cedar::dev::robot::gl::KinematicChain
+class cedar::dev::gl::PowerCube110 : public cedar::dev::gl::KinematicChain
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -58,7 +58,7 @@ public:
   //!@brief constructor
   PowerCube110
   (
-    cedar::dev::robot::KinematicChainPtr kinematicChain
+    cedar::dev::KinematicChainPtr kinematicChain
   );
   //!@brief destructor
   ~PowerCube110();
@@ -120,5 +120,5 @@ private:
   GLushort mConnectorIndex[mConnectorFacesNumber*3]; // index data
 
 }; // class cedar::dev::robot::gl::PowerCube110
-#endif // CEDAR_DEV_ROBOT_GL_POWER_CUBE_110_H
+#endif // CEDAR_DEV_GL_POWER_CUBE_110_H
 

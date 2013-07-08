@@ -44,9 +44,9 @@
 #include "cedar/auxiliaries/gl/gl.h"
 #include "cedar/auxiliaries/gl/glu.h"
 #include "cedar/auxiliaries/math/constants.h"
-#include "cedar/devices/robot/gl/namespace.h"
-#include "cedar/devices/robot/gl/PowerCube110.h"
-#include "cedar/devices/robot/KinematicChain.h"
+#include "cedar/devices/gl/namespace.h"
+#include "cedar/devices/gl/PowerCube110.h"
+#include "cedar/devices/KinematicChain.h"
 
 // SYSTEM INCLUDES
 
@@ -55,17 +55,17 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::robot::gl::PowerCube110::PowerCube110
+cedar::dev::gl::PowerCube110::PowerCube110
 (
-  cedar::dev::robot::KinematicChainPtr kinematicChain
+  cedar::dev::KinematicChainPtr kinematicChain
 )
 :
-cedar::dev::robot::gl::KinematicChain(kinematicChain)
+cedar::dev::gl::KinematicChain(kinematicChain)
 {
   loadData();
 }
 
-cedar::dev::robot::gl::PowerCube110::~PowerCube110()
+cedar::dev::gl::PowerCube110::~PowerCube110()
 {
 
 }
@@ -74,7 +74,7 @@ cedar::dev::robot::gl::PowerCube110::~PowerCube110()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::robot::gl::PowerCube110::initializeGl()
+void cedar::dev::gl::PowerCube110::initializeGl()
 {
   //!@todo Implement this so that it works on windows
 #ifndef CEDAR_OS_WINDOWS
@@ -107,7 +107,7 @@ void cedar::dev::robot::gl::PowerCube110::initializeGl()
 #endif // ndef CEDAR_OS_WINDOWS
 }
 
-void cedar::dev::robot::gl::PowerCube110::drawBase()
+void cedar::dev::gl::PowerCube110::drawBase()
 {
   prepareDraw();
   glRotated(90.0, 1.0, 0.0, 0.0);
@@ -124,7 +124,7 @@ void cedar::dev::robot::gl::PowerCube110::drawBase()
   this->drawElement(mConnectorVertexVboId, mConnectorIndexVboId, mConnectorFacesNumber);
 }
 
-void cedar::dev::robot::gl::PowerCube110::drawSegment(unsigned int index)
+void cedar::dev::gl::PowerCube110::drawSegment(unsigned int index)
 {
   // move to origin transformation and resave it to the stack
   glPopMatrix();
@@ -161,13 +161,13 @@ void cedar::dev::robot::gl::PowerCube110::drawSegment(unsigned int index)
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
-void cedar::dev::robot::gl::PowerCube110::drawEndEffector()
+void cedar::dev::gl::PowerCube110::drawEndEffector()
 {
 
 }
 
 
-void cedar::dev::robot::gl::PowerCube110::loadData()
+void cedar::dev::gl::PowerCube110::loadData()
 {
   // proximal link
   QString proximal_link_vertex_data_file_name

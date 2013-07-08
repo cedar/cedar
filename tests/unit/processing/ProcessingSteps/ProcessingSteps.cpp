@@ -50,6 +50,7 @@
 #include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/logFilter/Type.h"
 #include "cedar/auxiliaries/NullLogger.h"
+#include "cedar/units/prefixes.h"
 
 // global includes
 #include <exception>
@@ -106,7 +107,8 @@ unsigned int testStep(cedar::proc::NetworkPtr network, cedar::proc::StepPtr test
       else
       {
         // send a dummy step time
-        cedar::proc::ArgumentsPtr arguments (new cedar::proc::StepTime(cedar::unit::Milliseconds(0.1)));
+        cedar::unit::Time time(0.1 * cedar::unit::milli * cedar::unit::seconds);
+        cedar::proc::ArgumentsPtr arguments (new cedar::proc::StepTime(time));
         testStep->onTrigger(arguments);
       }
 

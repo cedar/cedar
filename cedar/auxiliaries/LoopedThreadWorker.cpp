@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/units/Time.h"
+#include "cedar/units/prefixes.h"
 
 cedar::aux::detail::LoopedThreadWorker::LoopedThreadWorker(cedar::aux::LoopedThread *wrapper) 
 : mpWrapper(wrapper)
@@ -84,7 +85,9 @@ void cedar::aux::detail::LoopedThreadWorker::work()
         time_difference = getLastTimeStepEnd() - getLastTimeStepStart();
         
         mpWrapper->step(time_difference.total_microseconds() * 0.001);
-        cedar::aux::sleep(cedar::unit::Milliseconds(static_cast<unsigned int>(mpWrapper->getIdleTimeParameter() + 0.5)));
+        double time = mpWrapper->getIdleTimeParameter();
+        cedar::unit::Time milliseconds(time * cedar::unit::milli * cedar::unit::seconds);
+        cedar::aux::sleep(milliseconds);
       }
       break;
     }
@@ -93,7 +96,9 @@ void cedar::aux::detail::LoopedThreadWorker::work()
       while (!safeStopRequested())
       {
         mpWrapper->step(mpWrapper->getSimulatedTimeParameter());
-        cedar::aux::sleep(cedar::unit::Milliseconds(static_cast<unsigned int>(mpWrapper->getIdleTimeParameter() + 0.5)));
+        double time = mpWrapper->getIdleTimeParameter();
+        cedar::unit::Time milliseconds(time * cedar::unit::milli * cedar::unit::seconds);
+        cedar::aux::sleep(milliseconds);
       }
       break;
     }
@@ -127,7 +132,9 @@ void cedar::aux::detail::LoopedThreadWorker::work()
       {
         // sleep until next wake up time
         sleep_duration = scheduled_wakeup - boost::posix_time::microsec_clock::universal_time();
-        cedar::aux::sleep(cedar::unit::Microseconds(std::max<int>(0, sleep_duration.total_microseconds())));
+        double time = std::max<double>(0.0, static_cast<double>(sleep_duration.total_microseconds()));
+        cedar::unit::Time seconds(time * cedar::unit::micro * cedar::unit::seconds);
+        cedar::aux::sleep(seconds);
       
         if (safeStopRequested())
           break;

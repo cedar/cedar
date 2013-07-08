@@ -40,6 +40,8 @@
 #include "cedar/devices/gl/Caren.h"
 #include "cedar/devices/gl/KukaArm.h"
 #include "cedar/devices/gl/Sdh.h"
+#include "cedar/devices/gl/PowerCube110.h"
+#include "cedar/devices/gl/PowerCubeWrist90.h"
 #include "cedar/auxiliaries/gl/gl.h"
 #include "cedar/auxiliaries/gl/drawShapes.h"
 
@@ -148,7 +150,7 @@ void cedar::dev::gl::Caren::drawBase()
   glPushMatrix();
 }
 
-void cedar::dev::robot::gl::Caren::drawHead()
+void cedar::dev::gl::Caren::drawHead()
 {
   // move to origin
   glPopMatrix();

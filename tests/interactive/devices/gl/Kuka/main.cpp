@@ -65,9 +65,9 @@ int main(int argc, char **argv)
   //(
   //  new cedar::dev::gl::KukaArm(p_kuka_arm)
   //);
-  cedar::dev::robot::gl::KukaArmPtr p_kuka_arm_visualization
+  cedar::dev::gl::KukaArmPtr p_kuka_arm_visualization
   (
-    new cedar::dev::robot::gl::KukaArm(p_kuka_arm)
+    new cedar::dev::gl::KukaArm(p_kuka_arm)
   );
   p_arm_visualization = p_kuka_arm_visualization;
 
