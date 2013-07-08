@@ -319,11 +319,7 @@ void cedar::proc::gui::Ide::duplicateStep()
 
 void cedar::proc::gui::Ide::selectAll()
 {
-  QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->items();
-  for (int i = 0; i < selected_items.size(); ++i)
-  {
-    selected_items.at(i)->setSelected(true);
-  }
+  this->mpProcessingDrawer->getScene()->selectAll();
 }
 
 void cedar::proc::gui::Ide::resetRootNetwork()
