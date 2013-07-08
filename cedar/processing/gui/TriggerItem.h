@@ -104,20 +104,10 @@ public:
   //!@brief create the context menu for TriggerItem
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
-  /*!@brief graphically connect to a StepItem
-   * @param pTarget pointer to StepItem
-   */
-  void connectTo(cedar::proc::gui::StepItem *pTarget);
-
-  /*!@brief graphically connect to a TriggerItem
-   * @param pTarget pointer to TriggerItem
-   */
-  void connectTo(cedar::proc::gui::TriggerItem *pTarget);
-
-  /*!@brief graphically connect to suiitable GraphicsItem
+  /*!@brief graphically connect to suitable GraphicsItem
    * @param pTarget pointer to GraphicsItem
    */
-  void connectTo(cedar::proc::gui::GraphicsBase *pTarget);
+  cedar::proc::gui::Connection* connectTo(cedar::proc::gui::GraphicsBase *pTarget);
 
   //!@brief read configuration from a node
   void readConfiguration(const cedar::aux::ConfigurationNode& node);

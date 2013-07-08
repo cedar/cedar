@@ -89,7 +89,7 @@ public:
 
   /*!@brief Connects the UI item and the underlying data slot to the target.
    */
-  void connectTo(cedar::proc::gui::DataSlotItem *pTarget);
+  cedar::proc::gui::Connection* connectTo(cedar::proc::gui::DataSlotItem *pTarget);
 
   /*!@brief Returns the name of the data slot.
    */
@@ -140,7 +140,7 @@ protected:
   // none yet
 private:
   //! The step item that this slot belongs to.
-  cedar::proc::gui::GraphicsBase *mpStep;
+  cedar::proc::gui::GraphicsBase* mpStep;
 
   //! The slot itself.
   cedar::proc::DataSlotPtr mSlot;
