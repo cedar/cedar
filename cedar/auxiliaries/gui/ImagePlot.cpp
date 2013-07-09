@@ -56,7 +56,11 @@
 #include <QMouseEvent>
 #include <QThread>
 #include <QMenu>
+#include <QDialog>
+#include <QDialogButtonBox>
 #include <QFrame>
+#include <QDoubleSpinBox>
+#include <QPushButton>
 #include <QLinearGradient>
 #include <QPalette>
 #include <iostream>
@@ -163,6 +167,7 @@ void cedar::aux::gui::ImagePlot::construct()
   this->mDataType = DATA_TYPE_UNKNOWN;
   this->mConverting = false;
   this->mSmoothScaling = true;
+  this->mAutoScaling = true;
   this->mpLegend = NULL;
 
   QHBoxLayout *p_layout = new QHBoxLayout();
@@ -184,6 +189,23 @@ void cedar::aux::gui::ImagePlot::construct()
   this->mpWorkerThread->start(QThread::LowPriority);
 }
 
+void cedar::aux::gui::ImagePlot::setLimits(double min, double max)
+{
+  if (this->mpLegend)
+  {
+    this->mpLegend->updateMinMax(min, max);
+  }
+  this->mValueLimits.setLower(min);
+  this->mValueLimits.setUpper(max);
+  this->mAutoScaling = false;
+}
+
+//! Enables automatic scaling.
+void cedar::aux::gui::ImagePlot::setAutomaticScaling()
+{
+  this->mAutoScaling = true;
+}
+
 void cedar::aux::gui::detail::ImagePlotLegend::updateMinMax(double min, double max)
 {
   this->mpMin->setText(QString("%1").arg(min));
@@ -192,6 +214,12 @@ void cedar::aux::gui::detail::ImagePlotLegend::updateMinMax(double min, double m
 
 void cedar::aux::gui::ImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
 {
+  if (mDataType != DATA_TYPE_MAT)
+  {
+    // currently, there are no context menu options for any plots other than matrices.
+    return;
+  }
+
   QMenu menu(this);
 
   QAction *p_legend = menu.addAction("legend");
@@ -199,7 +227,61 @@ void cedar::aux::gui::ImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
   QObject::connect(p_legend, SIGNAL(toggled(bool)), this, SLOT(showLegend(bool)));
   p_legend->setChecked(this->mpLegend != NULL && this->mpLegend->isVisible());
 
-  /* QAction *p_action = */ menu.exec(pEvent->globalPos());
+  QMenu* p_scaling = menu.addMenu("value scaling");
+
+  auto p_auto_scale = p_scaling->addAction("automatic");
+  p_auto_scale->setCheckable(true);
+  p_auto_scale->setChecked(this->mAutoScaling);
+  QObject::connect(p_auto_scale, SIGNAL(triggered()), this, SLOT(setAutomaticScaling()));
+
+  auto p_fixed_scaling = p_scaling->addAction("fixed ...");
+  p_fixed_scaling->setCheckable(true);
+  p_fixed_scaling->setChecked(!this->mAutoScaling);
+  QObject::connect(p_fixed_scaling, SIGNAL(triggered()), this, SLOT(queryFixedValueScale()));
+
+  menu.exec(pEvent->globalPos());
+}
+
+void cedar::aux::gui::ImagePlot::queryFixedValueScale()
+{
+  //!@todo This is copied & pasted from LinePlot. Put this in a class.
+  QDialog* p_dialog = new QDialog();
+  p_dialog->setModal(true);
+  auto p_layout = new QGridLayout();
+  p_dialog->setLayout(p_layout);
+  QLabel* p_label;
+  p_label = new QLabel("lower limit:");
+  p_layout->addWidget(p_label, 0, 0);
+
+  auto p_lower = new QDoubleSpinBox();
+  p_layout->addWidget(p_lower, 0, 1);
+  p_lower->setMinimum(boost::numeric::bounds<double>::lowest());
+  p_lower->setMaximum(boost::numeric::bounds<double>::highest());
+  p_lower->setValue(this->mValueLimits.getLower());
+
+  p_label = new QLabel("upper limit:");
+  p_layout->addWidget(p_label, 1, 0);
+
+  auto p_upper = new QDoubleSpinBox();
+  p_layout->addWidget(p_upper, 1, 1);
+  p_upper->setMinimum(boost::numeric::bounds<double>::lowest());
+  p_upper->setMaximum(boost::numeric::bounds<double>::highest());
+  p_upper->setValue(this->mValueLimits.getUpper());
+
+  auto p_buttons = new QDialogButtonBox();
+  p_buttons->addButton(QDialogButtonBox::Ok);
+  p_buttons->addButton(QDialogButtonBox::Cancel);
+  p_layout->addWidget(p_buttons, 2, 0, 1, 2);
+
+  QObject::connect(p_buttons->button(QDialogButtonBox::Ok), SIGNAL(clicked()), p_dialog, SLOT(accept()));
+  QObject::connect(p_buttons->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), p_dialog, SLOT(reject()));
+
+  int res = p_dialog->exec();
+
+  if (res == QDialog::Accepted)
+  {
+    this->setLimits(p_lower->value(), p_upper->value());
+  }
 }
 
 void cedar::aux::gui::ImagePlot::showLegend(bool show)
@@ -369,7 +451,16 @@ void cedar::aux::gui::detail::ImagePlotWorker::convert()
       //!@todo Some code here is redundant
       // find min and max for scaling
       double min, max;
-      cv::minMaxLoc(mat, &min, &max);
+
+      if (this->mpPlot->mAutoScaling)
+      {
+        cv::minMaxLoc(mat, &min, &max);
+      }
+      else
+      {
+        min = this->mpPlot->mValueLimits.getLower();
+        max = this->mpPlot->mValueLimits.getUpper();
+      }
       cv::Mat scaled = (mat - min) / (max - min) * 255.0;
       read_lock.unlock();
       cv::Mat mat_8u;

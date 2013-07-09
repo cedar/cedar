@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/PlotInterface.h"
 #include "cedar/auxiliaries/annotation/namespace.h"
+#include "cedar/auxiliaries/math/Limits.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -188,6 +189,10 @@ public:
    */
   void setSmoothScaling(bool smooth);
 
+  /*! Sets fixed limits for the plot values.
+   */
+  void setLimits(double min, double max);
+
   /*!@brief Applies a color scale to a matrix.
    * @todo Put this functionality into its own class.
    */
@@ -201,6 +206,8 @@ public slots:
   //! Toggles the visibility of the legend.
   void showLegend(bool show);
 
+  //! Enables automatic scaling.
+  void setAutomaticScaling();
 
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
@@ -241,6 +248,8 @@ private slots:
 
   void conversionFailed();
 
+  void queryFixedValueScale();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -279,6 +288,12 @@ private:
 
   //! Whether the matrix should be smoothed during scaling.
   bool mSmoothScaling;
+
+  //! Whether scaling of plots is determined automatically or fixed.
+  bool mAutoScaling;
+
+  //! Limits for fixed scaling.
+  cedar::aux::math::Limits<double> mValueLimits;
 
   //! Legend (if any).
   cedar::aux::gui::detail::ImagePlotLegend* mpLegend;
