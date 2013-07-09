@@ -92,6 +92,7 @@ likely to undergo major changes:
   - We added line and surface plots that are based on Vtk. This means that instead of (or in addition to) qwt and
     qwtplot3d, you can now use these plots.
   - Some plotting libraries (qwt and qwtplot3d) have now become optional.
+  - ImagePlots can now display a legend (use the right-click menu).
 - cedar::dev
   - KinematicChain instances now need to be started via ->start() by the implementor. They do not start threading on
     their own, anymore.

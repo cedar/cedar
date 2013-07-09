@@ -49,7 +49,6 @@
 #include <qwtplot3d/qwt3d_types.h>
 
 
-//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace aux
@@ -58,6 +57,7 @@ namespace cedar
     {
       namespace detail
       {
+        //!@cond SKIPPED_DOCUMENTATION
         /* This is an internal class of ImagePlot that cannot be nested because Qt's moc doesn't support nested classes.
          *
          * Don't use it outside of the ImagePlot!
@@ -79,16 +79,37 @@ namespace cedar
           signals:
             void done();
             void failed();
+            void minMaxChanged(double min, double max);
 
           public:
             cedar::aux::gui::ImagePlot *mpPlot;
         };
         CEDAR_GENERATE_POINTER_TYPES(ImagePlotWorker);
-      }
+        //!@endcond
+
+
+        /*! Class for displaying a legend for the image plot worker.
+         */
+        class ImagePlotLegend : public QWidget
+        {
+          Q_OBJECT
+
+        public:
+          ImagePlotLegend();
+
+        public slots:
+          void updateMinMax(double min, double max);
+
+        private:
+          QLabel* mpMin;
+          QLabel* mpMax;
+
+          QLinearGradient mGradient;
+        };
+      } // namespace detail
     }
   }
 }
-//!@endcond
 
 /*!@brief A plot for images.
  */
@@ -172,6 +193,15 @@ public:
    */
   static cv::Mat colorizedMatrix(cv::Mat matrix);
 
+  /*! Fills the gradient used for colorization into a QGradient
+   */
+  static void fillColorizationGradient(QGradient& gradient);
+
+public slots:
+  //! Toggles the visibility of the legend.
+  void showLegend(bool show);
+
+
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
   void convert();
@@ -183,6 +213,9 @@ protected:
   /*!@brief Reacts to a resize of the plot.
    */
   void resizeEvent(QResizeEvent *event);
+
+  //!@brief create and handle the context menu
+  void contextMenuEvent(QContextMenuEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -205,6 +238,7 @@ private:
 
 private slots:
   void conversionDone();
+
   void conversionFailed();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -245,6 +279,9 @@ private:
 
   //! Whether the matrix should be smoothed during scaling.
   bool mSmoothScaling;
+
+  //! Legend (if any).
+  cedar::aux::gui::detail::ImagePlotLegend* mpLegend;
 
   static std::vector<char> mLookupTableR;
   static std::vector<char> mLookupTableG;
