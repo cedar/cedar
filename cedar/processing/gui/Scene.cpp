@@ -576,6 +576,15 @@ void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEve
   {
     QPointF p2 = pMouseEvent->scenePos() - mpConnectionStart->scenePos();
 
+    for (auto iter = this->mStepMap.begin(); iter != this->mStepMap.end(); ++iter)
+    {
+      cedar::proc::gui::StepItem* p_step_gui = iter->second;
+      if (mpConnectionStart->canConnectTo(p_step_gui))
+      {
+        p_step_gui->magnetizeSlots(pMouseEvent->scenePos());
+      }
+    }
+
     // try to snap the target position of the line to a valid item, if one is found
     QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
     if (items.size() > 0)
@@ -736,6 +745,11 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
 
         default:
           break;
+      }
+
+      if (auto p_step = dynamic_cast<cedar::proc::gui::StepItem*>(item))
+      {
+        p_step->demagnetizeSlots();
       }
     }
   }

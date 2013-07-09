@@ -200,6 +200,12 @@ public:
     const std::string& toSlot
   ) const;
 
+  //! Resizes slots that are close to the mouse pointer in connection mode.
+  void magnetizeSlots(const QPointF& mousePositionInScene);
+
+  //! Removes all effects of magnetization
+  void demagnetizeSlots();
+
 public slots:
   //!@brief handles changes in the state of a step (e.g. from error to non-error state)
   void updateStepState();

@@ -192,6 +192,72 @@ cedar::proc::gui::StepItem::~StepItem()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::StepItem::demagnetizeSlots()
+{
+  auto slot_map_iter = this->mSlotMap.find(cedar::proc::DataRole::INPUT);
+
+  if (slot_map_iter == this->mSlotMap.end())
+  {
+    return;
+  }
+
+  bool changes = false;
+  auto slot_map = slot_map_iter->second;
+  for (auto slot_iter = slot_map.begin(); slot_iter != slot_map.end(); ++slot_iter)
+  {
+    cedar::proc::gui::DataSlotItem* p_slot = slot_iter->second;
+    if (p_slot->getMagneticScale() != 1.0)
+    {
+      changes = true;
+    }
+
+    p_slot->setMagneticScale(1.0);
+  }
+
+  if (changes)
+  {
+    this->updateDataSlotPositions();
+  }
+}
+
+void cedar::proc::gui::StepItem::magnetizeSlots(const QPointF& mousePositionInScene)
+{
+  double max_distance = 100.0;
+  double scale_factor = 2.0;
+  double scale_sensitivity = 4.0;
+  auto slot_map_iter = this->mSlotMap.find(cedar::proc::DataRole::INPUT);
+
+  if (slot_map_iter == this->mSlotMap.end())
+  {
+    return;
+  }
+
+  bool changes = false;
+  auto slot_map = slot_map_iter->second;
+  for (auto slot_iter = slot_map.begin(); slot_iter != slot_map.end(); ++slot_iter)
+  {
+    cedar::proc::gui::DataSlotItem* p_slot = slot_iter->second;
+    qreal min_distance = p_slot->width(); // since they are circular, both width and height correspond to the diameter
+    QPointF diff = p_slot->scenePos() - mousePositionInScene;
+    qreal distance = std::max(min_distance, sqrt(diff.x() * diff.x() + diff.y() * diff.y()));
+    if (distance < max_distance)
+    {
+      changes = true;
+      qreal closeness = static_cast<qreal>(1.0) - (distance - min_distance)/(max_distance - min_distance);
+      qreal factor = std::pow(closeness, scale_sensitivity);
+      CEDAR_DEBUG_ASSERT(factor <= static_cast<qreal>(1.0));
+      CEDAR_DEBUG_ASSERT(factor >= static_cast<qreal>(0.0));
+      qreal scale = (static_cast<qreal>(1.0) - factor) * static_cast<qreal>(1.0) + factor * scale_factor;
+      p_slot->setMagneticScale(scale);
+    }
+  }
+
+  if (changes)
+  {
+    this->updateDataSlotPositions();
+  }
+}
+
 void cedar::proc::gui::StepItem::Decoration::setPosition(const QPointF& pos)
 {
   this->mpRectangle->setPos(pos);
@@ -600,21 +666,27 @@ void cedar::proc::gui::StepItem::updateDataSlotPositions()
 
     const QPointF& origin = add_origins[role];
     const QPointF& direction = add_directions[role];
-    qreal slot_size = data_slot_size[role];
 
     try
     {
-      qreal count = 0;
+      QPointF current_origin = QPointF(0, 0);
       const cedar::proc::Step::SlotList& slotmap = this->mStep->getOrderedDataSlots(role);
       for (cedar::proc::Step::SlotList::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
         const std::string& slot_name = (*iter)->getName();
         CEDAR_DEBUG_ASSERT(slot_item_map.find(slot_name) != slot_item_map.end());
+
         cedar::proc::gui::DataSlotItem *p_item = slot_item_map[slot_name];
+
+        qreal slot_size = data_slot_size[role] * p_item->getMagneticScale();
+        qreal size_diff = slot_size - data_slot_size[role];
+
         p_item->setWidth(slot_size);
         p_item->setHeight(slot_size);
-        p_item->setPos(origin + count * direction * (slot_size + padding));
-        count += static_cast<qreal>(1.0);
+        qreal x = origin.x();
+        qreal y = origin.y();
+        p_item->setPos(QPointF(x - size_diff, y) + current_origin);
+        current_origin += direction * (slot_size + padding);
       }
     }
     catch(const cedar::proc::InvalidRoleException&)

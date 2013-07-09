@@ -77,7 +77,8 @@ cedar::proc::gui::GraphicsBase(10, 10,
                                cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND
                                ),
 mpStep(pParent),
-mSlot(slot)
+mSlot(slot),
+mMagneticScale(1.0)
 {
   this->setParentItem(pParent);
   this->generateTooltip();
