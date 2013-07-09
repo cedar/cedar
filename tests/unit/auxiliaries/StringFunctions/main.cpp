@@ -69,17 +69,26 @@ int test_to_and_from_string()
   values.push_back(static_cast<T>(-1.0));
   values.push_back(static_cast<T>(0.0));
   values.push_back(static_cast<T>(INFINITY));
+  values.push_back(static_cast<T>(-INFINITY));
 
   for (size_t i = 0; i < values.size(); ++i)
   {
     T value = values.at(i);
 
-    std::string to_str = cedar::aux::toString(value);
-    T from_str = cedar::aux::fromString<T>(to_str);
-    if (value != from_str)
+    try
+    {
+      std::string to_str = cedar::aux::toString(value);
+      T from_str = cedar::aux::fromString<T>(to_str);
+      if (value != from_str)
+      {
+        ++errors;
+        std::cout << "Error: value " << value << " was not converted properly." << std::endl;
+      }
+    }
+    catch (const cedar::aux::ConversionFailedException& e)
     {
       ++errors;
-      std::cout << "Error: value " << value << " was not converted properly." << std::endl;
+      std::cout << "Error: value " << value << " was not converted properly: " << e.exceptionInfo() << std::endl;
     }
   }
 
