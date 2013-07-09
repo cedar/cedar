@@ -50,6 +50,7 @@
 // static members
 //----------------------------------------------------------------------------------------------------------------------
 const qreal cedar::proc::gui::ResizeHandle::M_HANDLE_SIZE = static_cast<qreal>(10.0);
+const QSizeF cedar::proc::gui::ResizeHandle::M_MINIMUM_SIZE(static_cast<qreal>(50.0), static_cast<qreal>(20.0));
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -125,12 +126,14 @@ const std::vector<cedar::proc::gui::ResizeHandle::Direction>& cedar::proc::gui::
 
 QVariant cedar::proc::gui::ResizeHandle::itemChange(GraphicsItemChange change, const QVariant& value)
 {
+  QPointF new_value = value.toPointF();
+
   switch (change)
   {
     case ItemPositionChange:
     {
       qreal offset = M_HANDLE_SIZE / static_cast<qreal>(2.0);
-      QPointF center = this->pos() - this->mpResizedItem->pos() + QPointF(offset, offset);
+      QPointF center = new_value - this->mpResizedItem->pos() + QPointF(offset, offset);
       QRectF bounds = this->mpResizedItem->boundingRect();
 
       if (this->mPressed)
@@ -168,7 +171,43 @@ QVariant cedar::proc::gui::ResizeHandle::itemChange(GraphicsItemChange change, c
               "cedar::proc::gui::ResizeHandle::itemChange(GraphicsItemChange, const QVariant&)"
             );
             break;
+        }
 
+        if (bounds.width() < M_MINIMUM_SIZE.width())
+        {
+          switch (this->mDirection)
+          {
+            case cedar::proc::gui::ResizeHandle::NORTH_EAST:
+            case cedar::proc::gui::ResizeHandle::SOUTH_EAST:
+              bounds.setWidth(M_MINIMUM_SIZE.width());
+              new_value.setX(this->mpResizedItem->pos().x() + bounds.right() - M_HANDLE_SIZE / static_cast<qreal>(2));
+              break;
+
+            case cedar::proc::gui::ResizeHandle::NORTH_WEST:
+            case cedar::proc::gui::ResizeHandle::SOUTH_WEST:
+              bounds.setLeft(bounds.right() - M_MINIMUM_SIZE.width());
+              new_value.setX(this->mpResizedItem->pos().x() - bounds.left() - M_HANDLE_SIZE / static_cast<qreal>(2));
+              break;
+          }
+        }
+
+
+        if (bounds.height() < M_MINIMUM_SIZE.height())
+        {
+          switch (this->mDirection)
+          {
+            case cedar::proc::gui::ResizeHandle::SOUTH_EAST:
+            case cedar::proc::gui::ResizeHandle::SOUTH_WEST:
+              bounds.setHeight(M_MINIMUM_SIZE.height());
+              new_value.setY(this->mpResizedItem->pos().y() + bounds.bottom() - M_HANDLE_SIZE / static_cast<qreal>(2));
+              break;
+
+            case cedar::proc::gui::ResizeHandle::NORTH_EAST:
+            case cedar::proc::gui::ResizeHandle::NORTH_WEST:
+              bounds.setTop(bounds.bottom() - M_MINIMUM_SIZE.height());
+              new_value.setY(this->mpResizedItem->pos().y() - bounds.top() - M_HANDLE_SIZE / static_cast<qreal>(2));
+              break;
+          }
         }
 
         this->mpResizedItem->setBounds(bounds);
@@ -180,15 +219,13 @@ QVariant cedar::proc::gui::ResizeHandle::itemChange(GraphicsItemChange change, c
             this->mOtherHandles.at(i)->updatePosition();
           }
         }
+        return QGraphicsRectItem::itemChange(change, new_value);
       }
-      break;
-    }
+    } // case ItemPositionChange
 
     default:
-      break;
-  }
-
-  return QGraphicsRectItem::itemChange(change, value);
+      return QGraphicsRectItem::itemChange(change, value);
+  } // switch (change)
 }
 
 void cedar::proc::gui::ResizeHandle::updatePosition()
