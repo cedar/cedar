@@ -75,6 +75,7 @@
 #include <QResource>
 #include <iostream>
 #include <QMessageBox>
+#include <QPushButton>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -793,6 +794,24 @@ void cedar::proc::gui::StepItem::openProperties()
   p_widget->show();
 }
 
+void cedar::proc::gui::StepItem::openActionsDock()
+{
+  QWidget* p_actions = new QWidget();
+  QVBoxLayout* p_layout = new QVBoxLayout();
+  const cedar::proc::Step::ActionMap& map = this->mStep->getActions();
+  for (cedar::proc::Step::ActionMap::const_iterator iter = map.begin(); iter != map.end(); ++iter)
+  {
+    QPushButton* p_button = new QPushButton(iter->first.c_str());
+    p_layout->addWidget(p_button);
+    QObject::connect(p_button, SIGNAL(clicked()), this, SLOT(handleExternalActionButtons()));
+  }
+
+  p_actions->setLayout(p_layout);
+  std::string title = "Actions of step \"" + this->mStep->getName() + "\"";
+  auto p_widget = this->createDockWidget(title, p_actions);
+  p_widget->show();
+}
+
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
   //!@todo Would be nice to have icons for these actions
@@ -821,7 +840,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
-  QAction *p_properties = menu.addAction("open properties widget");
+  QAction* p_properties = menu.addAction("open properties widget");
   QObject::connect(p_properties, SIGNAL(triggered()), this, SLOT(openProperties()));
   p_properties->setIcon(QIcon(":/menus/properties.svg"));
 
@@ -845,6 +864,8 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     {
       p_actions_menu->addAction(iter->first.c_str());
     }
+    p_actions_menu->addSeparator();
+    p_actions_menu->addAction("open actions dock");
   }
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
@@ -930,7 +951,15 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   else if (a->parentWidget() == p_actions_menu)
   {
     std::string action = a->text().toStdString();
-    this->mStep->callAction(action);
+    // decide whether this is a normal action or the docking action
+    if (action != "open actions dock")
+    {
+      this->mStep->callAction(action);
+    }
+    else
+    {
+      this->openActionsDock();
+    }
   }
   // advanced plots
   else if (advanced_plot_map.find(a) != advanced_plot_map.end())
@@ -1358,4 +1387,10 @@ cedar::proc::StepPtr cedar::proc::gui::StepItem::getStep()
 
 void cedar::proc::gui::StepItem::disconnect()
 {
+}
+
+void cedar::proc::gui::StepItem::handleExternalActionButtons()
+{
+  std::string action = cedar::aux::asserted_cast<QPushButton*>(QObject::sender())->text().toStdString();
+  this->mStep->callAction(action);
 }

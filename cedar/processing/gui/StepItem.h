@@ -207,6 +207,8 @@ public slots:
   //!@brief handles a redraw of the graphical representation
   void redraw();
 
+  void handleExternalActionButtons();
+
 signals:
   /*!@brief Emitted whenever the state of the step displayed by this step item changes.
    *
@@ -300,6 +302,8 @@ private slots:
   void openDefinedPlotAction();
 
   void openProperties();
+
+  void openActionsDock();
 
   void plotAll();
 
