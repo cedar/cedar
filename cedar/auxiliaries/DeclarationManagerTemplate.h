@@ -43,6 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 
@@ -111,7 +112,28 @@ public:
   //! Allocates an object of the given class.
   BaseTypePtr allocate(const std::string& className) const
   {
-    return this->getFactoryManager()->allocate(className);
+    try
+    {
+      return this->getFactoryManager()->allocate(className);
+    }
+    catch (const cedar::aux::UnknownTypeException& e)
+    {
+      for (auto iter = this->mDeclarations.begin(); iter != this->mDeclarations.end(); ++iter)
+      {
+        auto declaration = *iter;
+        if (declaration->isDeprecatedName(className))
+        {
+          cedar::aux::LogSingleton::getInstance()->warning
+          (
+            "Using deprecated name \"" + className + "\" for class \"" + declaration->getClassName() + "\".",
+            "cedar::aux::DeclarationManagerTemplate::allocate(const std::string& className) const"
+          );
+          return this->getFactoryManager()->allocate(declaration->getClassName());
+        }
+      }
+
+      throw e;
+    }
   }
 
   /*! Returns the class name used to allocate the given object as a string.
