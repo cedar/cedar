@@ -46,6 +46,7 @@ cedar_add_library(cedardyn
                   fields/Preshape.h
                   steps/RateMatrixToSpaceCode.h
                   steps/RateToSpaceCode.h
+                  steps/SerialOrder.h
                   steps/SpaceToRateCode.h
                   RESOURCES
                   gui/icons/cedar_dynamics_gui_icons.qrc
