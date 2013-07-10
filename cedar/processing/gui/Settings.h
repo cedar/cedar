@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/Enum.h"
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/auxiliaries/namespace.h"
@@ -215,6 +216,23 @@ public:
     return this->_mDefaultStepDisplayMode->getValue();
   }
 
+  //! Scaling factor for data slots.
+  double getDataSlotScaling() const
+  {
+    return this->_mDataSlotScaling->getValue();
+  }
+
+  //! Sensitivity for slot items growth when the mouse approaches them while connecting.
+  double getDataSlotScalingSensitivity() const
+  {
+    return this->_mDataSlotScalingSensitivity->getValue();
+  }
+
+  bool getDataSlotScalingEnabled() const
+  {
+    return this->_mDataSlotScalingEnabled->getValue();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -284,6 +302,15 @@ private:
 
   //! Default display mode for steps.
   cedar::aux::EnumParameterPtr _mDefaultStepDisplayMode;
+
+  //!@brief Disables or enables dynamic resizing of data slot items.
+  cedar::aux::BoolParameterPtr _mDataSlotScalingEnabled;
+
+  //! Amount by which slot items grow when the mouse approaches them while connecting.
+  cedar::aux::DoubleParameterPtr _mDataSlotScaling;
+
+  //! Sensitivity for slot items growth when the mouse approaches them while connecting.
+  cedar::aux::DoubleParameterPtr _mDataSlotScalingSensitivity;
 
 }; // class cedar::proc::gui::Settings
 
