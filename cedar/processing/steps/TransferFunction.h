@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Sigmoid.h
+    File:        TransferFunction.h
 
     Maintainer:  Oliver Lomp
 
@@ -36,8 +36,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEPS_SIGMOID_H
-#define CEDAR_PROC_STEPS_SIGMOID_H
+#ifndef CEDAR_PROC_STEPS_TRANSFER_FUNCTION_H
+#define CEDAR_PROC_STEPS_TRANSFER_FUNCTION_H
 
 // LOCAL INCLUDES
 #include "cedar/processing/steps/namespace.h"
@@ -53,12 +53,11 @@
 #include "cedar/processing/Step.h"
 
 
-/*!@brief An implementation of the sigmoid function
+/*!@brief Applies a transfer function to its input.
  *
- * This class provides a cedar processing step. A sigmoid function is applied to the input.
- * The configurable cedar sigmoid object is used. This enables to choose style and parameter of the sigmoid function.
+ *        The transfer function can be chosen from the list of all available ones registered with cedar.
  */
-class cedar::proc::steps::Sigmoid : public cedar::proc::Step
+class cedar::proc::steps::TransferFunction : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -70,10 +69,10 @@ class cedar::proc::steps::Sigmoid : public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief a parameter for sigmoid objects
-  typedef cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction> SigmoidParameter;
+  typedef cedar::aux::ObjectParameterTemplate<cedar::aux::math::TransferFunction> TransferFunctionParameter;
 
   //!@cond SKIPPED_DOCUMENTATION
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(SigmoidParameter);
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(TransferFunctionParameter);
   //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -81,7 +80,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Sigmoid();
+  TransferFunction();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -122,12 +121,12 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief any sigmoid function
-  SigmoidParameterPtr _mSigmoid;
+  TransferFunctionParameterPtr _mTransferFunction;
 
 
 private:
   // none yet
 
-}; // class cedar::proc::steps::Sigmoid
+}; // class cedar::proc::steps::TransferFunction
 
-#endif // CEDAR_PROC_STEPS_SIGMOID_H
+#endif // CEDAR_PROC_STEPS_TRANSFER_FUNCTION_H

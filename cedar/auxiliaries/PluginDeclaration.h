@@ -118,6 +118,9 @@ public:
     return this->mDeprecatedNames;
   }
 
+  //! Returns whether the given name is a deprecated name of this declaration.
+  bool isDeprecatedName(const std::string& name) const;
+
   /*!
    * @brief Returns the class name without the preceding namespace.
    */

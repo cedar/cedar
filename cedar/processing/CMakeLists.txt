@@ -76,7 +76,7 @@ cedar_add_library(cedarproc
   steps/MatrixMultiply.h
   steps/MatrixTypeConverter.h
   steps/Flip.h
-  steps/Sigmoid.h
+  steps/TransferFunction.h
   sources/Boost.h
   sources/Noise.h
   sources/Picture.h

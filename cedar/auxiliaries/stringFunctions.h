@@ -302,7 +302,7 @@ namespace cedar
      * @param string The string the value will be extracted from.
      */
     template <class T>
-    T fromString(const std::string& string)
+    inline T fromString(const std::string& string)
     {
       T result;
       std::istringstream stream(string);
@@ -313,6 +313,64 @@ namespace cedar
           cedar::aux::ConversionFailedException,
           "Could not convert the string \"" + string + "\" to the requested type."
         );
+      }
+
+      return result;
+    }
+
+    //! Template specialization for double values.
+    template <>
+    inline double fromString<double>(const std::string& string)
+    {
+      double result;
+      std::istringstream stream(string);
+      if((stream >> result).fail())
+      {
+        if (string == "inf")
+        {
+          return INFINITY;
+        }
+        else if (string == "-inf")
+        {
+          return -INFINITY;
+        }
+        else
+        {
+          CEDAR_THROW
+          (
+            cedar::aux::ConversionFailedException,
+            "Could not convert the string \"" + string + "\" to the requested type."
+          );
+        }
+      }
+
+      return result;
+    }
+
+    //! Template specialization for float values.
+    template <>
+    inline float fromString<float>(const std::string& string)
+    {
+      float result;
+      std::istringstream stream(string);
+      if((stream >> result).fail())
+      {
+        if (string == "inf")
+        {
+          return INFINITY;
+        }
+        else if (string == "-inf")
+        {
+          return -INFINITY;
+        }
+        else
+        {
+          CEDAR_THROW
+          (
+            cedar::aux::ConversionFailedException,
+            "Could not convert the string \"" + string + "\" to the requested type."
+          );
+        }
       }
 
       return result;
