@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Annotatable.h
+    File:        DiscreteCoordinates.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 07 06
+    Date:        2013 07 10
 
     Description:
 
@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_ANNOTATION_ANNOTATABLE_H
-#define CEDAR_AUX_ANNOTATION_ANNOTATABLE_H
+#ifndef CEDAR_AUX_ANNOTATION_DISCRETE_COORDINATES_H
+#define CEDAR_AUX_ANNOTATION_DISCRETE_COORDINATES_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -43,80 +43,33 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/annotation/namespace.h"
 #include "cedar/auxiliaries/annotation/Annotation.h"
+#include "cedar/auxiliaries/Cloneable.h"
 
 // SYSTEM INCLUDES
 
-
-/*!@brief Base class for anything that can have annotations.
+/*!@brief An annotation that indicates disparity data.
  */
-class cedar::aux::annotation::Annotatable
+class cedar::aux::annotation::DiscreteCoordinates
+:
+public cedar::aux::annotation::Annotation,
+public cedar::aux::Cloneable<cedar::aux::annotation::DiscreteCoordinates, cedar::aux::annotation::Annotation>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  typedef std::vector<cedar::aux::annotation::AnnotationPtr> AnnotationList;
-  typedef AnnotationList::iterator AnnotationIterator;
-  typedef AnnotationList::const_iterator AnnotationConstIterator;
+public:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Destructor
-  virtual ~Annotatable();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! Sets an annotation. If there is already an annotation of the exact type of the given annotation, it is replaced.
-  void setAnnotation(cedar::aux::annotation::AnnotationPtr annotation);
-
-  /*! Returns an annotation of the given type.
-   *
-   *  @throws A cedar::aux::UnknownTypeException if no matching annotation can be found.
-   */
-  template <typename T>
-  boost::shared_ptr<T> getAnnotation()
-  {
-    return cedar::aux::asserted_pointer_cast<T>(this->mAnnotations[this->findAnnotation<T>()]);
-  }
-
-  /*! Returns an annotation of the given type as a constant pointer.
-   *
-   *  @throws A cedar::aux::AnnotationNotFoundException if no matching annotation can be found.
-   */
-  template <typename T>
-  boost::shared_ptr<const T> getAnnotation() const
-  {
-    return cedar::aux::asserted_pointer_cast<const T>(this->mAnnotations[this->findAnnotation<T>()]);
-  }
-
-  /*! Checks whether a certain annotation is present.
-   */
-  template <typename T>
-  bool hasAnnotation() const
-  {
-    try
-    {
-      this->findAnnotation<T>();
-      return true;
-    }
-    catch (cedar::aux::AnnotationNotFoundException)
-    {
-      return false;
-    }
-  }
-
-  //! Copies all annotations from the given data pointer.
-  void copyAnnotationsFrom(cedar::aux::annotation::ConstAnnotatablePtr other);
-
-  /*! @brief  Returns a description for the annotatable.
-   *
-   *          Built from the description of all the annotations in this object.
-   */
-  virtual std::string getDescription() const;
+  std::string getDescription() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -128,34 +81,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief Finds the index an annotation based on a type.
-  template <typename T>
-  size_t findAnnotation() const
-  {
-    for (size_t i = 0; i < this->mAnnotations.size(); ++i)
-    {
-      if (typeid(*this->mAnnotations[i]) == typeid(T))
-      {
-        return i;
-      }
-    }
-
-    CEDAR_THROW(cedar::aux::AnnotationNotFoundException, "Could not find an annotation of the given type.");
-  }
-
-  //!@brief Finds the index an annotation based on the type of a given object.
-  size_t findAnnotation(cedar::aux::annotation::AnnotationPtr annotation) const
-  {
-    for (size_t i = 0; i < this->mAnnotations.size(); ++i)
-    {
-      if (typeid(*this->mAnnotations[i]) == typeid(*annotation))
-      {
-        return i;
-      }
-    }
-
-    CEDAR_THROW(cedar::aux::AnnotationNotFoundException, "Could not find an annotation of the given type.");
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -163,10 +89,9 @@ private:
 protected:
   // none yet
 private:
-  //! List of annotations.
-  AnnotationList mAnnotations;
+  // none yet
 
-}; // class cedar::aux::annotation::Annotatable
+}; // class cedar::aux::annotation::DiscreteCoordinates
 
-#endif // CEDAR_AUX_ANNOTATION_ANNOTATABLE_H
+#endif // CEDAR_AUX_ANNOTATION_DISCRETE_COORDINATES_H
 

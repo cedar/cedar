@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,49 +22,35 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        DiscreteCoordinates.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 06 28
+    Date:        2013 07 10
 
-    Description: Namespace file for cedar::aux::annotations.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_ANNOTATIONS_NAMESPACE_H
-#define CEDAR_AUX_ANNOTATIONS_NAMESPACE_H
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/lib.h"
-#include "cedar/defines.h"
+#include "cedar/auxiliaries/annotation/DiscreteCoordinates.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <opencv2/opencv.hpp>
 
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
 
-namespace cedar
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+std::string cedar::aux::annotation::DiscreteCoordinates::getDescription() const
 {
-  /*!@brief Namespace for all aux classes. */
-  namespace aux
-  {
-    namespace annotation
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_AUX_CLASS(Annotation);
-      CEDAR_DECLARE_AUX_CLASS(Annotatable);
-      CEDAR_DECLARE_AUX_CLASS(ColorSpace);
-      CEDAR_DECLARE_AUX_CLASS(Depth);
-      CEDAR_DECLARE_AUX_CLASS(Dimensions);
-      CEDAR_DECLARE_AUX_CLASS(DiscreteCoordinates);
-      CEDAR_DECLARE_AUX_CLASS(Disparity);
-      //!@endcond
-    }
-  }
+  return "Coordinates are discrete.";
 }
-
-#endif // CEDAR_AUX_ANNOTATIONS_NAMESPACE_H

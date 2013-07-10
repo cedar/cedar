@@ -49,11 +49,13 @@
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/annotation/DiscreteCoordinates.h"
 
 // SYSTEM INCLUDES
 #include <boost/numeric/conversion/bounds.hpp>
 #include <qwt_legend.h>
 #include <qwt_scale_div.h>
+#include <qwt_symbol.h>
 #include <QContextMenuEvent>
 #include <QVBoxLayout>
 #include <QGridLayout>
@@ -136,10 +138,12 @@ cedar::aux::math::Limits<double> cedar::aux::gui::LinePlot::getYLimits() const
   return limits;
 }
 
-void cedar::aux::gui::LinePlot::applyStyle(size_t lineId, QwtPlotCurve *pCurve)
+void cedar::aux::gui::LinePlot::applyStyle(cedar::aux::ConstDataPtr data, size_t lineId, QwtPlotCurve *pCurve)
 {
+  static std::vector<QwtSymbol::Style> mLineSymbols;
+
   // initialize vectors, if this has not happened, yet
-  if (mLineColors.empty() || mLineStyles.empty())
+  if (mLineColors.empty() || mLineStyles.empty() || mLineSymbols.empty())
   {
     mLineColors.clear();
     mLineStyles.clear();
@@ -158,7 +162,18 @@ void cedar::aux::gui::LinePlot::applyStyle(size_t lineId, QwtPlotCurve *pCurve)
     mLineStyles.push_back(Qt::DashDotLine);
     mLineStyles.push_back(Qt::DashDotDotLine);
     mLineStyles.push_back(Qt::CustomDashLine);
+
+    mLineSymbols.push_back(QwtSymbol::Ellipse);
+    mLineSymbols.push_back(QwtSymbol::Rect);
+    mLineSymbols.push_back(QwtSymbol::Diamond);
+    mLineSymbols.push_back(QwtSymbol::Triangle);
+    mLineSymbols.push_back(QwtSymbol::Hexagon);
+    mLineSymbols.push_back(QwtSymbol::Star2);
+
+    // otherwise, the code below doesn't work
+    CEDAR_DEBUG_ASSERT(mLineStyles.size() == mLineSymbols.size());
   }
+
 
   const size_t color_count = mLineColors.size();
   const size_t style_count = mLineStyles.size();
@@ -178,6 +193,14 @@ void cedar::aux::gui::LinePlot::applyStyle(size_t lineId, QwtPlotCurve *pCurve)
 
   // pass pen back to curve
   pCurve->setPen(pen);
+
+  // Use symbols instead of curves for discrete data
+  if (data->hasAnnotation<cedar::aux::annotation::DiscreteCoordinates>())
+  {
+    pCurve->setStyle(QwtPlotCurve::NoCurve);
+    QwtSymbol symbol(mLineSymbols.at(style_id), QBrush(mLineColors.at(color_id)), pen, QSize(10, 10));
+    pCurve->setSymbol(symbol);
+  }
 }
 
 bool cedar::aux::gui::LinePlot::canAppend(cedar::aux::ConstDataPtr data) const
@@ -225,7 +248,7 @@ void cedar::aux::gui::LinePlot::doAppend(cedar::aux::ConstDataPtr data, const st
 
 
   plot_series->mpCurve = new QwtPlotCurve(title.c_str());
-  applyStyle(line_id, plot_series->mpCurve);
+  applyStyle(plot_series->mMatData, line_id, plot_series->mpCurve);
 
   data->lockForRead();
   const cv::Mat& mat = plot_series->mMatData->getData();
