@@ -92,6 +92,9 @@ likely to undergo major changes:
   - We added line and surface plots that are based on Vtk. This means that instead of (or in addition to) qwt and
     qwtplot3d, you can now use these plots.
   - Some plotting libraries (qwt and qwtplot3d) have now become optional.
+  - ImagePlots can now display a legend. There is also an option to set a fixed scale for the color.
+    These functions can be accessed via the right-click menu (note that they are only available if a matrix is being
+    plotted. For images, these options don't exist.)
 - cedar::dev
   - KinematicChain instances now need to be started via ->start() by the implementor. They do not start threading on
     their own, anymore.
@@ -116,6 +119,8 @@ likely to undergo major changes:
     the current architecture. The widget can be accessed from the "tools" menu, or by pressing control+b.
   - Connections can now be toggled to being "smart", i.e., having heuristically determined corners to unclutter 
     architectures - this mode is fully automatic, so there's now way to move any lines around by hand.
+  - DataSlots now scale when you drag a connection close to them. You can configure (and disable) this behavior in the
+    tools -> settings -> user interface menu of the processingIde.
 
 - cedar::dyn
   - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   

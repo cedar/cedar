@@ -77,7 +77,8 @@ cedar::proc::gui::GraphicsBase(10, 10,
                                cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND
                                ),
 mpStep(pParent),
-mSlot(slot)
+mSlot(slot),
+mMagneticScale(1.0)
 {
   this->setParentItem(pParent);
   this->generateTooltip();
@@ -207,10 +208,10 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo
   return cedar::proc::gui::CONNECT_NO;
 }
 
-void cedar::proc::gui::DataSlotItem::connectTo(cedar::proc::gui::DataSlotItem *pTarget)
+cedar::proc::gui::Connection* cedar::proc::gui::DataSlotItem::connectTo(cedar::proc::gui::DataSlotItem *pTarget)
 {
   //!@todo check validity at non-gui layer
-  cedar::proc::gui::Connection *p_connection = new cedar::proc::gui::Connection(this, pTarget);
+  cedar::proc::gui::Connection* p_connection = new cedar::proc::gui::Connection(this, pTarget);
   cedar::proc::gui::ConnectValidity validity = cedar::proc::gui::CONNECT_ERROR;
   switch (pTarget->getSlot()->getValidity())
   {
@@ -231,11 +232,12 @@ void cedar::proc::gui::DataSlotItem::connectTo(cedar::proc::gui::DataSlotItem *p
       break;
   }
   p_connection->setValidity(validity);
+  return p_connection;
 }
 
 void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 {
-  cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+  cedar::proc::gui::Scene* p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
   CEDAR_DEBUG_ASSERT(p_scene);
 
   QMenu menu;
@@ -246,7 +248,7 @@ void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuE
     menu.exec(event->screenPos());
     return;
   }
-  QAction *p_promote_action = menu.addAction("promote slot");
+  QAction* p_promote_action = menu.addAction("promote slot");
   // no slot can be promoted to the root network
   if
   (

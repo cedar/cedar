@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Sigmoid.cpp
+    File:        TransferFunction.cpp
 
     Maintainer:  Oliver Lomp
 
@@ -37,7 +37,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/processing/steps/Sigmoid.h"
+#include "cedar/processing/steps/TransferFunction.h"
 
 // SYSTEM CEDAR INCLUDES
 #include <cedar/processing/ExternalData.h>
@@ -45,7 +45,7 @@
 #include <cedar/processing/DeclarationRegistry.h>
 #include <cedar/processing/ElementDeclaration.h>
 #include <cedar/auxiliaries/MatData.h>
-#include <cedar/auxiliaries/math/Sigmoid.h>
+#include <cedar/auxiliaries/math/TransferFunction.h>
 #include <cedar/auxiliaries/math/sigmoids/AbsSigmoid.h>
 #include <cedar/auxiliaries/assert.h>
 #include <cedar/auxiliaries/math/tools.h>
@@ -67,13 +67,14 @@ namespace
 
     ElementDeclarationPtr declaration
     (
-      new ElementDeclarationTemplate<cedar::proc::steps::Sigmoid>
+      new ElementDeclarationTemplate<cedar::proc::steps::TransferFunction>
       (
         "Math Utilities",
-        "cedar.processing.Sigmoid"
+        "cedar.processing.TransferFunction"
       )
     );
-    declaration->setIconPath(":/steps/sigmoid.svg");
+    declaration->deprecatedName("cedar.processing.Sigmoid");
+    declaration->setIconPath(":/steps/transferFunction.svg");
     declaration->setDescription
     (
       "Applies a sigmoid function to its input."
@@ -90,16 +91,16 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::steps::Sigmoid::Sigmoid()
+cedar::proc::steps::TransferFunction::TransferFunction()
 :
 mOutput(new cedar::aux::MatData(cv::Mat::zeros(5, 5, CV_32F))),
-_mSigmoid
+_mTransferFunction
 (
-  new cedar::proc::steps::Sigmoid::SigmoidParameter
+  new cedar::proc::steps::TransferFunction::TransferFunctionParameter
   (
     this,
     "sigmoid",
-    cedar::aux::math::SigmoidPtr(new cedar::aux::math::AbsSigmoid(0.0, 100.0))
+    cedar::aux::math::TransferFunctionPtr(new cedar::aux::math::AbsSigmoid(0.0, 100.0))
   )
 )
 {
@@ -112,16 +113,16 @@ _mSigmoid
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Sigmoid::determineInputValidity
-                                                             (
-                                                               cedar::proc::ConstDataSlotPtr,
-                                                               cedar::aux::ConstDataPtr data
-                                                             ) const
+//!@todo Replace by type check
+cedar::proc::DataSlot::VALIDITY cedar::proc::steps::TransferFunction::determineInputValidity
+                                                                      (
+                                                                        cedar::proc::ConstDataSlotPtr,
+                                                                        cedar::aux::ConstDataPtr data
+                                                                      ) const
 {
   // check whether input is MatData
   if (cedar::aux::ConstMatDataPtr input = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
   {
-//    std::cout << this->getName() << " -> " << "isEmpty: " << input->isEmpty() << " type" << CV_32F << " " << input->getData().type() << std::endl;
     //check if input is 32 bit float
     if (!input->isEmpty() && input->getData().type() == CV_32F)
     {
@@ -131,17 +132,17 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Sigmoid::determineInputValid
   return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
-void cedar::proc::steps::Sigmoid::compute(const cedar::proc::Arguments&)
+void cedar::proc::steps::TransferFunction::compute(const cedar::proc::Arguments&)
 {
   // get all members
   const cv::Mat& input = this->mInput->getData();
   cv::Mat& sigmoid_u = this->mOutput->getData();
 
   // calculate output
-  sigmoid_u = _mSigmoid->getValue()->compute<float>(input);
+  sigmoid_u = _mTransferFunction->getValue()->compute<float>(input);
 }
 
-void cedar::proc::steps::Sigmoid::inputConnectionChanged(const std::string& inputName)
+void cedar::proc::steps::TransferFunction::inputConnectionChanged(const std::string& inputName)
 {
   // init input member
   this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));

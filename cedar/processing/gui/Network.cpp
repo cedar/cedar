@@ -708,7 +708,8 @@ void cedar::proc::gui::Network::checkDataConnection
   {
     case cedar::proc::Network::CONNECTION_ADDED:
     {
-      source_slot->connectTo(target_slot);
+      cedar::proc::gui::Connection* p_con = source_slot->connectTo(target_slot);
+      p_con->setSmartMode(this->getSmartConnection());
       break;
     }
     case cedar::proc::Network::CONNECTION_REMOVED:
@@ -771,7 +772,8 @@ void cedar::proc::gui::Network::checkTriggerConnection
       );
   if (added)
   {
-    source_element->connectTo(target_element);
+    cedar::proc::gui::Connection* p_con = source_element->connectTo(target_element);
+    p_con->setSmartMode(this->getSmartConnection());
   }
   else
   {
