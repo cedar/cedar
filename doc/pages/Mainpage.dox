@@ -1,0 +1,34 @@
+/*!
+
+@mainpage Cognition, embodiment, dynamics, and autonomy for robots
+Welcome to cedar!
+
+@section Motivation Motivation
+cedar is a C++ library that provides tools for scientific work in the fields of cognition, embodiment, dynamical
+systems, and autonomous robotics. cedar is primarily being developed at the Institut fuer Neuroinformatik in Bochum,
+Germany. It is a complete rewrite of a collection of powerful, yet somewhat fragmented code. cedar captures our
+scientific knowledge and ideology in a coherent framework. A lot of effort goes into keeping the different parts of
+cedar compatible to each other. Linking up perception and motor control of a robot and putting some cognitive processing
+in between should not be constrained by programming issues, but only be a question of applied concepts. cedar provides a
+tool aimed at facilitating the connection of modules to create robotic architectures. You can focus on "what" to
+connect, keeping the effort of "how" to connect it very low.
+
+@section Guidelines Guidelines
+We have assembled documents that assist users of cedar to get productive with this framework. Please refer to the
+category that fits your profile the most:
+- If you just want to use cedar, have a look at our @link UsersGuide tutorials @endlink on how to use the processing 
+framework and add custom steps.
+- If you want to add new features to cedar or fix existing bugs, please take a look at the @link DevelopersGuide 
+developers' guide @endlink.
+
+@section Installation Installing cedar
+Please refer to the "readme.txt" file in the root of the repository to find instructions on how to install cedar.
+
+@section Documentation How to get this documentation
+This documentation is included in your copy of cedar. cmake will create a Doxyfile in your build folder. You need
+Doxygen to create this documentation from the generated Doxyfile (see "readme.txt" file for more information about
+the build system). Doxygen will create an HTML and a PDF output of the code documentation and additional pages like
+this introductory page. Feel free to browse through the class documentation, or just dig into the concepts incorporated
+in the implementation. You can also start with one of our tutorials, to get accustomed to the ways cedar can be used.
+
+*/
