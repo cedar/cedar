@@ -54,8 +54,14 @@ QWidget(pParent)
 {
   this->setupUi(this);
 
+  // display settings
   this->mpUseGraphicsEffectsEdit->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->mUseGraphicsItemShadowEffects);
   this->mpStepDisplayMode->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mDefaultStepDisplayMode);
+
+  // slot item growth settings
+  this->mpSlotGrowthEnabled->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mDataSlotScalingEnabled);
+  this->mpGrowthFactor->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mDataSlotScaling);
+  this->mpSensitivity->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mDataSlotScalingSensitivity);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

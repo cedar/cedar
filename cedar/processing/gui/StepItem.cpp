@@ -223,8 +223,14 @@ void cedar::proc::gui::StepItem::demagnetizeSlots()
 void cedar::proc::gui::StepItem::magnetizeSlots(const QPointF& mousePositionInScene)
 {
   double max_distance = 100.0;
-  double scale_factor = 2.0;
-  double scale_sensitivity = 4.0;
+  double scale_factor = cedar::proc::gui::SettingsSingleton::getInstance()->getDataSlotScaling();
+  double scale_sensitivity = cedar::proc::gui::SettingsSingleton::getInstance()->getDataSlotScalingSensitivity();
+
+  if (!cedar::proc::gui::SettingsSingleton::getInstance()->getDataSlotScalingEnabled())
+  {
+    scale_factor = 1.0;
+  }
+
   auto slot_map_iter = this->mSlotMap.find(cedar::proc::DataRole::INPUT);
 
   if (slot_map_iter == this->mSlotMap.end())
