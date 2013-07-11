@@ -109,6 +109,25 @@ public:
     }
   }
 
+  //! Removes all instances of the given annotation type, if any. Does nothing if there are no annotations of this type.
+  template <typename T>
+  void removeAnnotations()
+  {
+    try
+    {
+      while (true)
+      {
+        size_t index = this->findAnnotation<T>();
+        this->mAnnotations.erase(this->mAnnotations.begin() + index);
+      }
+    }
+    catch (cedar::aux::AnnotationNotFoundException)
+    {
+      // done
+    }
+  }
+
+
   //! Copies all annotations from the given data pointer.
   void copyAnnotationsFrom(cedar::aux::annotation::ConstAnnotatablePtr other);
 

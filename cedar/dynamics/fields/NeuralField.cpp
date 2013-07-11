@@ -279,7 +279,14 @@ void cedar::dyn::NeuralField::discreteActivationChanged()
 
   for (size_t i = 0; i < data_items.size(); ++i)
   {
-    data_items.at(i)->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteCoordinates>());
+    if (this->_mDiscreteActivation->getValue() == true)
+    {
+      data_items.at(i)->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteCoordinates>());
+    }
+    else
+    {
+      data_items.at(i)->removeAnnotations<cedar::aux::annotation::DiscreteCoordinates>();
+    }
   }
 }
 
