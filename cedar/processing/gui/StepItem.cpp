@@ -525,6 +525,30 @@ void cedar::proc::gui::StepItem::addDecorations()
     this->mDecorations.push_back(decoration);
   }
 
+  auto declaration = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->getElement());
+
+  if (declaration->isDeprecated())
+  {
+    std::string dep_msg = "This step is deprecated.";
+
+    if (!declaration->getDeprecationDescription().empty())
+    {
+      dep_msg += " " + declaration->getDeprecationDescription();
+    }
+
+    DecorationPtr decoration
+    (
+      new Decoration
+      (
+        this,
+        ":/cedar/auxiliaries/gui/warning.svg",
+        QString::fromStdString(dep_msg)
+      )
+    );
+
+    this->mDecorations.push_back(decoration);
+  }
+
   this->updateDecorationPositions();
 }
 
