@@ -65,6 +65,7 @@
 #include <QPainter>
 #include <QAction>
 #include <QSvgGenerator>
+#include <QToolTip>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -585,6 +586,8 @@ void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEve
       }
     }
 
+    QToolTip::showText(pMouseEvent->screenPos(), "", this->mpMainWindow);
+
     // try to snap the target position of the line to a valid item, if one is found
     QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
     if (items.size() > 0)
@@ -599,6 +602,11 @@ void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEve
         {
           connected = true;
           p2 = target->getConnectionAnchorInScene() - mpConnectionStart->scenePos();
+
+          if (auto slot_item = dynamic_cast<cedar::proc::gui::DataSlotItem*>(target))
+          {
+            QToolTip::showText(pMouseEvent->screenPos(), QString::fromStdString(slot_item->getName()), this->mpMainWindow);
+          }
         }
       }
     }
