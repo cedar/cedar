@@ -198,7 +198,15 @@ void cedar::aux::gui::LinePlot::applyStyle(cedar::aux::ConstDataPtr data, size_t
   if (data->hasAnnotation<cedar::aux::annotation::DiscreteCoordinates>())
   {
     pCurve->setStyle(QwtPlotCurve::NoCurve);
-    QwtSymbol symbol(mLineSymbols.at(style_id), QBrush(mLineColors.at(color_id)), pen, QSize(10, 10));
+    QwtSymbol
+#if (QWT_VERSION >> 16) == 6
+    * // qwt 6.x expects a pointer
+#endif
+      symbol
+#if (QWT_VERSION >> 16) == 6
+      = new QwtSymbol
+#endif
+      (mLineSymbols.at(style_id), QBrush(mLineColors.at(color_id)), pen, QSize(10, 10));
     pCurve->setSymbol(symbol);
   }
 }
