@@ -48,6 +48,7 @@
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/PromotedExternalData.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/gui/PropertyPane.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -818,8 +819,9 @@ cedar::proc::ElementPtr cedar::proc::gui::Scene::addElement(const std::string& c
   }
   catch(const cedar::aux::ExceptionBase& e)
   {
-    QString message(e.exceptionInfo().c_str());
-    emit exception(message);
+    auto p_dialog = new cedar::aux::gui::ExceptionDialog();
+    p_dialog->displayCedarException(e);
+    p_dialog->exec();
   }
 
   return this->mNetwork->getNetwork()->getElement(adjusted_name);
