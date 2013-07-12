@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        IdeApplication.h
+    File:        ExceptionDialog.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 07
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 07 12
 
     Description:
 
@@ -38,94 +34,65 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_IDE_APPLICATION_H
-#define CEDAR_PROC_GUI_IDE_APPLICATION_H
+#ifndef CEDAR_AUX_GUI_EXCEPTION_DIALOG_H
+#define CEDAR_AUX_GUI_EXCEPTION_DIALOG_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/gui/Ide.h"
+#include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/gui/ui_ExceptionDialog.h"
 
 // SYSTEM INCLUDES
-#include <QApplication>
-
-#ifdef CEDAR_COMPILER_MSVC
-#include <Windows.h>
-#endif // CEDAR_COMPILER_MSVC
+#include <QDialog>
 
 
-/*!@brief The application for the processingIde.
+/*!@brief A dialog for showing exceptions.
  */
-class cedar::proc::gui::IdeApplication : public QApplication
+class cedar::aux::gui::ExceptionDialog : public QDialog, public Ui_ExceptionDialog
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  enum LastExceptionType
-  {
-    CEDAR_EXCEPTION,
-    STD_EXCEPTION,
-    UNKNOWN_EXCEPTION,
-    NONE
-  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  IdeApplication(int& argc, char** argv);
-
-  //!@brief Destructor.
-  ~IdeApplication();
-
+  ExceptionDialog();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Executes the main loop.
-   */
-  int exec();
+  //! Set a string that is shown before the exception information.
+  void setAdditionalString(const std::string& intro);
 
-  /*!@brief Handles notifications.
-   */
-  bool notify(QObject* pReceiver, QEvent* pEvent);
+  //! Display the given cedar exception.
+  void displayCedarException(const cedar::aux::ExceptionBase& exception);
 
-  //! returns the ide object
-  inline cedar::proc::gui::Ide* getIde() const
-  {
-    return this->mpIde;
-  }
+  //! Display a std::exception.
+  void displayStdException(const std::exception& exception);
+
+  //! Display an unknown exception.
+  void displayUnknownException();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-signals:
-  /*!@brief Signal that is sent when cedar::proc::gui::Ide::notify catches an otherwise unhandled exception.
-   */
-  void exception(const QString& message);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Handler for SEGV and other signals.
-   */
-  static void signalHandler(int signal);
+  void addAdditionalText();
 
-  static void cleanupAfterCrash();
-
-#ifdef CEDAR_COMPILER_MSVC
-  static LONG WINAPI vcCrashHandler(LPEXCEPTION_POINTERS);
-#endif // CEDAR_COMPILER_MSVC
+  void display(const std::string& message, const std::string& details);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -133,15 +100,9 @@ private:
 protected:
   // none yet
 private:
-  //! The main window.
-  cedar::proc::gui::Ide* mpIde;
+  QString mAdditionalString;
 
-  LastExceptionType mLastExceptionType;
+}; // class cedar::aux::gui::ExceptionDialog
 
-  //! Last cedar exception caught by the application.
-  cedar::aux::ExceptionBase mLastCedarException;
-
-}; // class cedar::proc::gui::IdeApplication
-
-#endif // CEDAR_PROC_GUI_IDE_APPLICATION_H
+#endif // CEDAR_AUX_GUI_EXCEPTION_DIALOG_H
 
