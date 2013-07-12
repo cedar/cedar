@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,47 +22,61 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        testingFunctions.h
+    File:        measurementFunctions.cpp
 
     Maintainer:  Jean-Stephane Jokeit
-    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        2013 06 21
+    Email:       jean-stephane.jokeit@ini.rub.de
+    Date:        2013 06 19
 
-    Description: Shared testing (unit-tests) code.
+    Description: Shared testing code for writing (dart) measurements that can be interpreted by the build server.
 
     Credits:
 
 ======================================================================================================================*/
 
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
-#include "cedar/auxiliaries/namespace.h"
-
-#ifndef CEDAR_AUX_TESTING_FUNCTIONS_H
-#define CEDAR_AUX_TESTING_FUNCTIONS_H
-
-// CEDAR INCLUDES
+// CEDAR_INCLUDES
+#include "cedar/testing/measurementFunctions.h"
+#include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
-namespace cedar
+#include <functional>
+#include <boost/date_time/posix_time/posix_time.hpp>
+
+void cedar::testing::write_measurement
+     (
+       const std::string& id,
+       double duration
+     )
 {
-  namespace aux
-  {
-    namespace testing
-    {
-      CEDAR_AUX_LIB_EXPORT void write_measurement
-                                (
-                                  const std::string& id,
-                                  double duration
-                                );
-                                
-      CEDAR_AUX_LIB_EXPORT void test_time
-                                (
-                                  std::string id, 
-                                  std::function< void() > fun
-                                );
-    }
-  }
+  std::cout
+      << "<DartMeasurement"
+      << " name=\""
+      << id
+      << " (seconds)\""
+      << " type=\"numeric/double\">"
+      << cedar::aux::toString(duration)
+      << "</DartMeasurement>"
+      << std::endl;
 }
 
-#endif // CEDAR_AUX_STRING_FUNCTIONS_H
+void cedar::testing::test_time(std::string id, std::function< void() > fun)
+{
+  using boost::posix_time::ptime;
+  using boost::posix_time::microsec_clock;
+
+  double duration;
+
+  auto start = microsec_clock::local_time();
+
+  // execute the test:
+  fun();
+
+  auto end = microsec_clock::local_time();
+
+  duration = static_cast<double>((end - start).total_milliseconds()) / 1000.0;
+  write_measurement(id, duration);
+}
+
+

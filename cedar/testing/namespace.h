@@ -22,61 +22,39 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        testingFunctions.cpp
+    File:        namespace.h
 
-    Maintainer:  Jean-Stephane Jokeit
-    Email:       jean-stephane.jokeit@ini.rub.de
-    Date:        2013 06 19
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 06 03
 
-    Description: Shared testing code.
+    Description: Namespace file for cedar::dyn.
 
     Credits:
 
 ======================================================================================================================*/
 
-// CEDAR_INCLUDES
-#include "cedar/auxiliaries/testingFunctions.h"
-#include "cedar/auxiliaries/assert.h"
-#include "cedar/auxiliaries/exceptions.h"
-#include "cedar/auxiliaries/stringFunctions.h"
+#ifndef CEDAR_TESTING_NAMESPACE_H
+#define CEDAR_TESTING_NAMESPACE_H
+
+// CEDAR INCLUDES
+#include "cedar/testing/lib.h"
 
 // SYSTEM INCLUDES
-#include <functional>
-#include <boost/date_time/posix_time/posix_time.hpp>
 
-void cedar::aux::testing::write_measurement
-     (
-       const std::string& id,
-       double duration
-     )
+namespace cedar
 {
-  std::cout
-      << "<DartMeasurement"
-      << " name=\""
-      << id
-      << " (seconds)\""
-      << " type=\"numeric/double\">"
-      << cedar::aux::toString(duration)
-      << "</DartMeasurement>"
-      << std::endl;
+  /*!@brief Namespace that encapsulates functionality shared across multiple unit/interactive tests.
+   *
+   *        This is an internal namespace of cedar. Functinonality in here should not be used outside of unit tests!
+   */
+  namespace testing
+  {
+  }
 }
 
-void cedar::aux::testing::test_time(std::string id, std::function< void() > fun)
-{
-  using boost::posix_time::ptime;
-  using boost::posix_time::microsec_clock;
-
-  double duration;
-
-  auto start = microsec_clock::local_time();
-
-  // execute the test:
-  fun();
-
-  auto end = microsec_clock::local_time();
-
-  duration = static_cast<double>((end - start).total_milliseconds()) / 1000.0;
-  write_measurement(id, duration);
-}
-
-
+#endif // CEDAR_TESTING_NAMESPACE_H

@@ -40,10 +40,10 @@
 
 #ifdef CEDAR_USE_YARP
 
+#include "cedar/testing/measurementFunctions.h"
 #include "cedar/auxiliaries/net/BlockingReader.h"
 #include "cedar/auxiliaries/net/Writer.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
-#include "cedar/auxiliaries/testingFunctions.h"
 
 // SYSTEM INCLUDES
 
@@ -86,7 +86,7 @@ void run_test()
 {
   errors = 0;
 
-  cedar::aux::testing::test_time("read/write cycle (cv::Mat)", mat_read_write);
+  cedar::testing::test_time("read/write cycle (cv::Mat)", mat_read_write);
 }
 
 int main(int argc, char* argv[])
