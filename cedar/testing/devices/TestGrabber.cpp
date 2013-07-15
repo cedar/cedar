@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/grabbertests/TestGrabber.h"
+#include "cedar/testing/devices/TestGrabber.h"
 #include "cedar/devices/sensors/visual/exceptions.h"
 
 
@@ -48,7 +48,7 @@ namespace
 {
   bool declared
     = cedar::dev::sensors::visual::Grabber::ChannelManagerSingleton::getInstance()
-        ->registerType<cedar::dev::sensors::visual::TestChannelPtr>();
+        ->registerType<cedar::testing::dev::TestChannelPtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 
 // Constructor for a single-channel grabber
-cedar::dev::sensors::visual::TestGrabber::TestGrabber
+cedar::testing::dev::TestGrabber::TestGrabber
 (
   const std::string& sourceFileName
 )
@@ -64,9 +64,9 @@ cedar::dev::sensors::visual::TestGrabber::TestGrabber
 cedar::dev::sensors::visual::Grabber
 (
   "TestGrabber",
-  cedar::dev::sensors::visual::TestChannelPtr
+  cedar::testing::dev::TestChannelPtr
   (
-    new cedar::dev::sensors::visual::TestChannel(sourceFileName)
+    new cedar::testing::dev::TestChannel(sourceFileName)
   )
 ),
 _mTestParam(new cedar::aux::IntParameter(this, "testparameter", 0))
@@ -80,13 +80,13 @@ _mTestParam(new cedar::aux::IntParameter(this, "testparameter", 0))
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
                                            this->getName() + ": Create a single channel grabber",
-                                            "cedar::dev::sensors::visual::TestGrabber::TestGrabber()"
+                                            "cedar::testing::dev::TestGrabber::TestGrabber()"
                                           );
 }
 
 
 // Constructor for a stereo grabber
-cedar::dev::sensors::visual::TestGrabber::TestGrabber
+cedar::testing::dev::TestGrabber::TestGrabber
 (
   const std::string& sourceFileName0,
   const std::string& sourceFileName1
@@ -95,13 +95,13 @@ cedar::dev::sensors::visual::TestGrabber::TestGrabber
 cedar::dev::sensors::visual::Grabber
 (
   "StereoTestGrabber",
-  cedar::dev::sensors::visual::TestChannelPtr
+  cedar::testing::dev::TestChannelPtr
   (
-    new cedar::dev::sensors::visual::TestChannel(sourceFileName0)
+    new cedar::testing::dev::TestChannel(sourceFileName0)
   ),
-  cedar::dev::sensors::visual::TestChannelPtr
+  cedar::testing::dev::TestChannelPtr
   (
-    new cedar::dev::sensors::visual::TestChannel(sourceFileName1)
+    new cedar::testing::dev::TestChannel(sourceFileName1)
   )
 ),
 _mTestParam(new cedar::aux::IntParameter(this, "testparameter", 0))
@@ -115,13 +115,13 @@ _mTestParam(new cedar::aux::IntParameter(this, "testparameter", 0))
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
                                            this->getName() + ": Create a stereo channel grabber",
-                                            "cedar::dev::sensors::visual::TestGrabber::TestGrabber()"
+                                            "cedar::testing::dev::TestGrabber::TestGrabber()"
                                           );
 }
 
 
 // Destructor
-cedar::dev::sensors::visual::TestGrabber::~TestGrabber()
+cedar::testing::dev::TestGrabber::~TestGrabber()
 {
   // call of doCleanup, to do the necessarily cleanup in Grabber
   doCleanUp();
@@ -132,7 +132,7 @@ cedar::dev::sensors::visual::TestGrabber::~TestGrabber()
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
                                            this->getName() + ": destructor",
-                                            "cedar::dev::sensors::visual::TestGrabber::~TestGrabber()"
+                                            "cedar::testing::dev::TestGrabber::~TestGrabber()"
                                           );
 
 
@@ -145,7 +145,7 @@ cedar::dev::sensors::visual::TestGrabber::~TestGrabber()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()
+void cedar::testing::dev::TestGrabber::onCreateGrabber()
 {
   std::cout << "TestGrabber::onCreateGrabber()" << std::endl;
 
@@ -170,7 +170,7 @@ void cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()
   cedar::aux::LogSingleton::getInstance()->message
                                            (
                                              this->getName() + init_message.str(),
-                                             "cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()"
+                                             "cedar::testing::dev::TestGrabber::onCreateGrabber()"
                                            );
 
   //-------------------------------------------------
@@ -196,25 +196,25 @@ void cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
                                            this->getName() + ": Initialization finished",
-                                            "cedar::dev::sensors::visual::TestGrabber::onCreateGrabber()"
+                                            "cedar::testing::dev::TestGrabber::onCreateGrabber()"
                                           );
 
 }
 
 
-void cedar::dev::sensors::visual::TestGrabber::onCleanUp()
+void cedar::testing::dev::TestGrabber::onCleanUp()
 {
   // do the cleanup of used hardware in this method
   // on an exception or a CTRL-C only onCleanUp will be invoked (no destructor)
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                           (
                                            this->getName() + ": Cleaning up",
-                                            "cedar::dev::sensors::visual::TestGrabber::onCleanUp()"
+                                            "cedar::testing::dev::TestGrabber::onCleanUp()"
                                           );
 }
 
 
-void cedar::dev::sensors::visual::TestGrabber::onCloseGrabber()
+void cedar::testing::dev::TestGrabber::onCloseGrabber()
 {
   // close all opened files here and reset the grabber to initialization state
   // no files should be opened.
@@ -223,7 +223,7 @@ void cedar::dev::sensors::visual::TestGrabber::onCloseGrabber()
 }
 
 
-std::string cedar::dev::sensors::visual::TestGrabber::onGetSourceInfo(unsigned int channel)
+std::string cedar::testing::dev::TestGrabber::onGetSourceInfo(unsigned int channel)
 {
 
   // no range-check is needed, because this method is a private method
@@ -235,7 +235,7 @@ std::string cedar::dev::sensors::visual::TestGrabber::onGetSourceInfo(unsigned i
 }
 
 
-void cedar::dev::sensors::visual::TestGrabber::onGrab(unsigned int channel)
+void cedar::testing::dev::TestGrabber::onGrab(unsigned int channel)
 {
   // this is the main grabbing method.
   // read a new picture from the source and set the picture in the channel image buffer
@@ -258,7 +258,7 @@ void cedar::dev::sensors::visual::TestGrabber::onGrab(unsigned int channel)
 }
 
 
-unsigned int cedar::dev::sensors::visual::TestGrabber::getCounter()
+unsigned int cedar::testing::dev::TestGrabber::getCounter()
 {
   // a simple get-method
   unsigned int ct = mCounter;
@@ -267,21 +267,21 @@ unsigned int cedar::dev::sensors::visual::TestGrabber::getCounter()
 }
 
 
-int cedar::dev::sensors::visual::TestGrabber::getTestParam() const
+int cedar::testing::dev::TestGrabber::getTestParam() const
 {
   // a simple get-method
   return _mTestParam->getValue();
 }
 
 
-void cedar::dev::sensors::visual::TestGrabber::setTestParam(int testParameter)
+void cedar::testing::dev::TestGrabber::setTestParam(int testParameter)
 {
   // a simple set-method
   _mTestParam->setValue(testParameter);
 }
 
 
-std::string cedar::dev::sensors::visual::TestGrabber:: getSourceFileName(unsigned int channel) const
+std::string cedar::testing::dev::TestGrabber:: getSourceFileName(unsigned int channel) const
 {
   return getTestChannel(channel)->_mSourceFileName->getPath();
 }

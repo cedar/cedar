@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,159 +22,98 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TestGrabber.h
+    File:        TestChannel.h
 
-    Maintainer:  Georg.Hartinger
+    Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
-    Date:        2012 04 23
+    Date:        2012 09 28
 
-    Description: Header for the @em cedar::dev::sensors::visual::TestGrabber class.
+    Description: Class TestChannel
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_TEST_GRABBER_H
-#define CEDAR_DEV_SENSORS_VISUAL_TEST_GRABBER_H
+#ifndef CEDAR_TESTING_DEV_TEST_CHANNEL_H
+#define CEDAR_TESTING_DEV_TEST_CHANNEL_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/Grabber.h"
-#include "cedar/devices/sensors/visual/grabbertests/TestChannel.h"
-#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/testing/devices/namespace.h"
+#include "cedar/devices/sensors/visual/GrabberChannel.h"
+#include "cedar/auxiliaries/IntParameter.h"
 
 // SYSTEM INCLUDES
-#include <opencv2/opencv.hpp>
 
-/*! @class cedar::dev::sensors::visual::TestGrabber
- *
- *  @brief A simple Grabber class for testing the Grabber interface
- *
- *   This grabber class is used to test the grabber interface. It
- *   creates a Grabber with a TestParam (default-value 123) and FPS set to 15
- *
- *  @remarks For grabber developers<br>
- *    This class can also be used as a template to create other classes derived from GrabberInstance
- *
- */
-class cedar::dev::sensors::visual::TestGrabber
+
+//!@brief TestChannel contains additional data of a picture grabbing channel
+class cedar::testing::dev::TestChannel
 :
-public cedar::dev::sensors::visual::Grabber
+public cedar::dev::sensors::visual::GrabberChannel
 {
+  //!@brief friend class of TestGrabber for direct access to the members
+  friend class cedar::testing::dev::TestGrabber;
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-  /*! @brief  Constructor for a single channel grabber
-   *  @param sourceFileName Filename to grab from (here only for demonstration and testing)
-   */
-  TestGrabber
-  (
-    const std::string& sourceFileName = "./default_parameter_value_for_code_instantiation"
-  );
-
-  /*! @brief Constructor for a stereo channel grabber
-   *  @param sourceFileName0 Filename to grab from for channel 0 (here only for demonstration and testing)
-   *  @param sourceFileName1 Filename to grab from for channel 1 (here only for demonstration and testing)
-   */
-  TestGrabber
-  (
-    const std::string& sourceFileName0,
-    const std::string& sourceFileName1
-  );
+  //!@brief The standard constructor.
+  TestChannel(const std::string& fileName = "")
+  :
+  cedar::dev::sensors::visual::GrabberChannel(),
+  _mSourceFileName(new cedar::aux::FileParameter(this, "filename", cedar::aux::FileParameter::READ, fileName))
+  {
+  };
 
   //!@brief Destructor
-  ~TestGrabber();
+  virtual ~TestChannel()
+  {
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-  /*! @brief Read the counter and reset it to zero
-   *  @remarks The counter counts the framerate (i.e. the call of the grab() method) of LoopedThread.
-   */
-  unsigned int getCounter();
-
-  /*! @brief Get the filename of the channel (example)
-   *
-   */
-  std::string getSourceFileName(unsigned int channel) const;
-
-  /*! @brief Simple get-function for the test parameter
-   *
-   */
-  int getTestParam() const;
-
-
-  /*! @brief Simple set-function for the test parameter
-   *
-   */
-  void setTestParam(int testParameter);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-  // derived from Grabber
-  void onCreateGrabber();
-  void onCloseGrabber();
-  void onCleanUp();
-  void onGrab(unsigned int channel);
-  std::string onGetSourceInfo(unsigned int channel);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-
-  //! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
-  inline TestChannelPtr getTestChannel(unsigned int channel)
-  {
-    return boost::static_pointer_cast<TestChannel>
-           (
-             cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
-           );
-  }
-
-  //! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
-  inline ConstTestChannelPtr getTestChannel(unsigned int channel) const
-  {
-    return boost::static_pointer_cast<const TestChannel>
-       (
-         cedar::dev::sensors::visual::Grabber::_mChannels->at(channel)
-       );
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-
 private:
-
-  //! @brief The counter
-  unsigned int mCounter;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! @brief The test parameter
-  cedar::aux::IntParameterPtr _mTestParam;
+  //!@brief The test parameter
+  cedar::aux::FileParameterPtr _mSourceFileName;
 
 private:
   // none yet
 
-}; // class cedar::dev::sensors::visual::TestGrabber
+}; // class cedar::testing::dev::TestChannel
 
-#endif // CEDAR_DEV_SENSORS_VISUAL_TEST_GRABBER_H
+#endif // CEDAR_TESTING_DEV_TEST_CHANNEL_H
+
+
