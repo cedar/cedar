@@ -638,9 +638,11 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
     for (int i = 0; i < items.size() && !connected; ++i)
     {
       cedar::proc::gui::GraphicsBase *target;
-      if ( (target = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]))
-           && mpConnectionStart->canConnectTo(target) != cedar::proc::gui::CONNECT_NO
-          )
+      if 
+      (
+        (target = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]))
+          && mpConnectionStart->canConnectTo(target) != cedar::proc::gui::CONNECT_NO
+      )
       {
         connected = true;
 
@@ -717,9 +719,11 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
             break;
         } // switch (mpConnectionStart->getGroup())
       }
-      else if ( (target = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]))
-           && mpConnectionStart == target
-          )
+      else if 
+      (
+        (target = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]))
+          && mpConnectionStart == target
+      )
       {
         this->mMode = MODE_SELECT;
         mpeParentView->setMode(cedar::proc::gui::Scene::MODE_SELECT);

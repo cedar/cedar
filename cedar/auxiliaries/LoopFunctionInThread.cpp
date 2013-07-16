@@ -47,7 +47,8 @@ cedar::aux::LoopFunctionInThread::LoopFunctionInThread
 (
   FunctionType fun
 )
-: mFunction(fun)
+:
+mFunction(fun)
 {
 }
 
@@ -59,8 +60,8 @@ cedar::aux::LoopFunctionInThread::~LoopFunctionInThread()
 // methods
 //------------------------------------------------------------------------------
 
-void cedar::aux::LoopFunctionInThread::step(double)
+void cedar::aux::LoopFunctionInThread::step(double timeStep)
 {
-  mFunction();
+  mFunction(timeStep);
 }
 
