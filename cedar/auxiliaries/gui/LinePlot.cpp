@@ -174,7 +174,6 @@ void cedar::aux::gui::LinePlot::applyStyle(cedar::aux::ConstDataPtr data, size_t
     CEDAR_DEBUG_ASSERT(mLineStyles.size() == mLineSymbols.size());
   }
 
-
   const size_t color_count = mLineColors.size();
   const size_t style_count = mLineStyles.size();
   const size_t max_line_id = mLineColors.size() * mLineStyles.size();

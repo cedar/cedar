@@ -134,7 +134,6 @@ namespace cedar
 
       //!@brief The singleton object of the TransferFunctionFactory.
       typedef cedar::aux::Singleton<TransferFunctionManager> TransferFunctionManagerSingleton;
-      //!@endcond
     }
   }
 }

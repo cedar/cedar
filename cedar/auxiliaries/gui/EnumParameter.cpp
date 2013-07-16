@@ -83,7 +83,7 @@ cedar::aux::gui::EnumParameter::~EnumParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gui::EnumParameter::paramterValueChanged()
+void cedar::aux::gui::EnumParameter::parameterValueChanged()
 {
   bool blocked = this->mpEdit->blockSignals(true);
 
@@ -156,7 +156,7 @@ void cedar::aux::gui::EnumParameter::parameterPointerChanged()
     SLOT(currentIndexChanged(const QString&))
   );
 
-  QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(paramterValueChanged()));
+  QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(parameterValueChanged()));
 }
 
 void cedar::aux::gui::EnumParameter::currentIndexChanged(const QString&)
