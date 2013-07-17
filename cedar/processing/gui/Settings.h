@@ -93,6 +93,7 @@ public:
   CEDAR_GENERATE_POINTER_TYPES(DockSettings);
   //!@endcond
 
+  //! Enum of the possible default step display modes.
   class StepDisplayMode
   {
     public:
@@ -124,11 +125,11 @@ public:
         return mType.type();
       }
 
-      //! Identifier for the role input.
+      //! Steps are always created with the icon only display mode
       static const Id ICON_ONLY = 0;
-      //! Identifier for the role output.
+      //! Looped steps have their text displayed, others are icon only.
       static const Id TEXT_FOR_LOOPED = 1;
-      //! Identifier for the role buffer.
+      //! All steps also show their text.
       static const Id ICON_AND_TEXT = 2;
 
     private:

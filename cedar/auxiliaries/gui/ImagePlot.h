@@ -99,6 +99,7 @@ namespace cedar
           ImagePlotLegend();
 
         public slots:
+          //! Updates the minimum and maximum value displayed by the legend.
           void updateMinMax(double min, double max);
 
         private:
