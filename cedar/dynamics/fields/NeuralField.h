@@ -136,9 +136,9 @@ public:
 
   /*!@brief Marks the activation in this field as discrete values.
    */
-  void setDiscreteActivation(bool value)
+  void setDiscreteMetric(bool value)
   {
-    this->_mDiscreteActivation->setValue(value);
+    this->_mDiscreteMetric->setValue(value);
   }
 
 public slots:
@@ -208,7 +208,7 @@ private:
 
 private slots:
   void activationAsOutputChanged();
-  void discreteActivationChanged();
+  void discreteMetricChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -257,7 +257,7 @@ protected:
   cedar::aux::BoolParameterPtr _mOutputActivation;
 
   //!@brief Whether the field activation represents discrete nodes (this is a temporary solution).
-  cedar::aux::BoolParameterPtr _mDiscreteActivation;
+  cedar::aux::BoolParameterPtr _mDiscreteMetric;
 
   //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
   cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
