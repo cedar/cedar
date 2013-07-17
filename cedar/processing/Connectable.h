@@ -468,7 +468,7 @@ protected:
   //!@brief Lock for making accesses to the connections thread-safe.
   QReadWriteLock* mpConnectionLock;
 
-  // signal that is emitted if the properties of an output require data revalidation along connections
+  //! signal that is emitted if the properties of an output require data revalidation along connections
   boost::signals2::signal<void (const std::string&)> mOutputPropertiesChanged;
 private:
   //!@brief a map of slot maps, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output

@@ -119,6 +119,7 @@ public:
   void uninstallHandlers();
 
 public slots:
+  //! Opens the context menu.
   void showContextMenu(const QPoint& point);
 
   //--------------------------------------------------------------------------------------------------------------------
