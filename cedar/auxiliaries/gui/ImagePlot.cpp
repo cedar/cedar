@@ -614,7 +614,7 @@ cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix)
   {
     p_in = matrix.ptr<unsigned char>(i);
     p_converted = converted.ptr<unsigned char>(i);
-    for ( j = 0; j < cols; ++j)
+    for (j = 0; j < cols; ++j)
     {
       size_t v = static_cast<size_t>(p_in[j]);
       // channel 0
