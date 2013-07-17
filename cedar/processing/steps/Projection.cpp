@@ -101,7 +101,6 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::steps::Projection::Projection()
 :
-mInput(new cedar::aux::MatData(cv::Mat())),
 mOutput(new cedar::aux::MatData(cv::Mat())),
 _mDimensionMappings(new cedar::proc::ProjectionMappingParameter(this, "dimension mapping")),
 _mOutputDimensionality(new cedar::aux::UIntParameter(this, "output dimensionality", 1, 0, 10)),
@@ -171,6 +170,16 @@ void cedar::proc::steps::Projection::outputDimensionSizesChanged()
 
 void cedar::proc::steps::Projection::reconfigure()
 {
+  // @todo this should be handled by a more suitable mechanism for users
+  if (!this->mInput)
+  {
+    this->setState(
+                    cedar::proc::Triggerable::STATE_EXCEPTION,
+                    "Cannot reconfigure without an input."
+                  );
+    return;
+  }
+
   unsigned int input_dimensionality = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
   unsigned int output_dimensionality = _mOutputDimensionality->getValue();
 
