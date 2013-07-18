@@ -83,6 +83,27 @@ cedar::aux::gui::EnumParameter::~EnumParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::gui::EnumParameter::parameterValueChanged()
+{
+  bool blocked = this->mpEdit->blockSignals(true);
+
+  auto parameter = boost::dynamic_pointer_cast<cedar::aux::EnumParameter>(this->getParameter());
+  int index = -1;
+  QString current_value = QString::fromStdString(parameter->getValue().name());
+  for (int i = 0; i < this->mpEdit->count(); ++i)
+  {
+    if (this->mpEdit->itemData(i) == current_value)
+    {
+      index = i;
+      break;
+    }
+  }
+  CEDAR_DEBUG_ASSERT(index != -1);
+
+  this->mpEdit->setCurrentIndex(index);
+  this->mpEdit->blockSignals(blocked);
+}
+
 void cedar::aux::gui::EnumParameter::parameterPointerChanged()
 {
   cedar::aux::EnumParameterPtr parameter;
@@ -134,6 +155,8 @@ void cedar::aux::gui::EnumParameter::parameterPointerChanged()
     this,
     SLOT(currentIndexChanged(const QString&))
   );
+
+  QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(parameterValueChanged()));
 }
 
 void cedar::aux::gui::EnumParameter::currentIndexChanged(const QString&)

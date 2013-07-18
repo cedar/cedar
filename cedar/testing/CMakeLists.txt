@@ -24,13 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Oliver Lomp,
-#                Mathis Richter,
-#                Stephan Zibner
-#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-#                mathis.richter@ini.ruhr-uni-bochum.de,
-#                stephan.zibner@ini.ruhr-uni-bochum.de
-#   Date:        2011 06 03
+#   Maintainer:  Oliver Lomp
+#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+#   Date:        2013 07 12
 #
 #   Description:
 #
@@ -38,16 +34,11 @@
 #
 #=======================================================================================================================
 
-cedar_add_library(cedardyn
+cedar_add_library(cedartesting
                   LINK_LIBRARIES
                   cedarproc
-                  MOC_HEADERS
-                  fields/NeuralField.h
-                  fields/Preshape.h
-                  steps/RateMatrixToSpaceCode.h
-                  steps/RateToSpaceCode.h
-                  steps/SerialOrder.h
-                  steps/SpaceToRateCode.h
-                  RESOURCES
-                  gui/icons/cedar_dynamics_gui_icons.qrc
+                  cedaraux
+                  cedardev
+                  cedardyn
+                  NO_AUTOLINK
                   )

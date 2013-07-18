@@ -113,6 +113,16 @@ public:
    */
   cedar::proc::gui::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
 
+  void setMagneticScale(qreal scale)
+  {
+    this->mMagneticScale = scale;
+  }
+
+  qreal getMagneticScale() const
+  {
+    return this->mMagneticScale;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -147,6 +157,9 @@ private:
 
   //!@brief a connection to a signal emitted if validity of the data slot changes
   boost::signals2::connection mSlotConnection;
+
+  //! How much the slot is currently being scaled due to attraction by the mouse pointer.
+  qreal mMagneticScale;
 }; // class DataSlotItem
 
 #endif // CEDAR_PROC_GUI_DATA_SLOT_ITEM_H

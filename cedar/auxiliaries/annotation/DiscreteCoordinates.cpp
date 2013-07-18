@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,52 +22,35 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        DiscreteCoordinates.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 03
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 07 10
 
-    Description: Namespace file for cedar::dyn.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DYN_NAMESPACE_H
-#define CEDAR_DYN_NAMESPACE_H
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/dynamics/lib.h"
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/annotation/DiscreteCoordinates.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-#include <opencv2/opencv.hpp>
 
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
 
-namespace cedar
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+std::string cedar::aux::annotation::DiscreteCoordinates::getDescription() const
 {
-  /*!@brief Namespace for all dyn classes. */
-  namespace dyn
-  {
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_DYN_CLASS(Dynamics);
-    CEDAR_DECLARE_DYN_CLASS(NeuralField);
-    CEDAR_DECLARE_DYN_CLASS(Preshape);
-    CEDAR_DECLARE_DYN_CLASS(RateMatrixToSpaceCode);
-    CEDAR_DECLARE_DYN_CLASS(RateToSpaceCode);
-    CEDAR_DECLARE_DYN_CLASS(SerialOrder);
-    CEDAR_DECLARE_DYN_CLASS(SpaceToRateCode);
-    //!@endcond
-
-    //!@brief A function for loading the declarations of the dynamics namespace as plugin.
-    CEDAR_DECLARE_DEPRECATED(CEDAR_DYN_LIB_EXPORT void getPluginDesciption(cedar::aux::PluginDeclarationListPtr plugin));
-  }
+  return "Coordinates are discrete.";
 }
-
-#endif // CEDAR_DYN_NAMESPACE_H

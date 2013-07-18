@@ -53,6 +53,7 @@
 #include "cedar/units/prefixes.h"
 
 // global includes
+#include <QApplication>
 #include <exception>
 #include <string>
 #include <vector>
@@ -80,6 +81,26 @@ CEDAR_GENERATE_POINTER_TYPES(EmptyMatrixProvider);
 
 unsigned int testStep(cedar::proc::NetworkPtr network, cedar::proc::StepPtr testStep)
 {
+  // test if the step reacts properly when its parameters change (without an input)
+  for
+  (
+    cedar::aux::Configurable::ParameterList::iterator i = testStep->getParameters().begin();
+    i != testStep->getParameters().end();
+    ++i
+  )
+  {
+    cedar::aux::ParameterPtr parameter = *i;
+    std::cout << "Emitting valueChanged() of parameter \"" << parameter->getName() << "\"." << std::endl;
+    parameter->emitChangedSignal();
+
+    size_t count = 0;
+    while (QApplication::hasPendingEvents() && ++count < 1000)
+    {
+      QApplication::processEvents();
+    }
+  }
+
+  // try connecting steps of different types
   unsigned int i = 0;
   try
   {

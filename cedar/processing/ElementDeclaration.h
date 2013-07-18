@@ -61,6 +61,7 @@
 class cedar::proc::ElementDeclaration : public cedar::aux::PluginDeclarationBaseTemplate<cedar::proc::ElementPtr>
 {
 public:
+  //! Holds information about data in a custom step plot.
   struct PlotData
   {
     PlotData
@@ -89,6 +90,8 @@ public:
   //!@brief list that pairs a data role with the desired plot
   typedef std::vector<PlotData> DataList;
 
+  /*!@brief Structure that holds information about custom plots defined for a processing step.
+   */
   struct PlotDefinition
   {
     PlotDefinition(const std::string& name, const std::string& icon = std::string())
