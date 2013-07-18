@@ -65,7 +65,14 @@ cedar::dev::ComponentParameter::~ComponentParameter()
 
 cedar::dev::ComponentPtr cedar::dev::ComponentParameter::getValue() const
 {
-  return this->mComponent->getComponent();
+  if (this->mComponent)
+  {
+    return this->mComponent->getComponent();
+  }
+  CEDAR_THROW
+  (
+    cedar::dev::NoComponentSelectedException, "The parameter" + this->getName() + "does not point to a component."
+  );
 }
 
 std::string cedar::dev::ComponentParameter::getStringRepresentation() const
