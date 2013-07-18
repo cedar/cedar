@@ -87,6 +87,7 @@ public:
     VALIDITY_UNKNOWN
   };
 
+  //! Type of the function that is called for type checks.
   typedef
     boost::function<VALIDITY (cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr)>
     TypeCheckFunction;
@@ -218,6 +219,7 @@ protected:
   //! The parent that owns the slot.
   cedar::proc::Connectable* mpParent;
 
+  //! Signal that is emitted when the validity of the data slot changes.
   boost::signals2::signal<void ()> mValidityChanged;
 
 private:

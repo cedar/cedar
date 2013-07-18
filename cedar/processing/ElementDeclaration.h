@@ -64,6 +64,12 @@ public:
   //! Holds information about data in a custom step plot.
   struct PlotData
   {
+    /*! Constructor.
+     *
+     * @param id Role of the data to be plotted.
+     * @param name Name of the data slot of the step whose data is to be plotted.
+     * @param ignoreIfMissing If true, no warning will be generated if the slot is missing.
+     */
     PlotData
     (
       cedar::proc::DataRole::Id id = cedar::proc::DataRole::OUTPUT,
@@ -94,6 +100,11 @@ public:
    */
   struct PlotDefinition
   {
+    /*! Constructor
+     *
+     * @param name Name of the plot to be displayed in the "defined plots" menu.
+     * @param icon (Optional) path to the icon to be used for the plot in the "defined plots" menu.
+     */
     PlotDefinition(const std::string& name, const std::string& icon = std::string())
     :
     mName(name),
@@ -101,6 +112,7 @@ public:
     {
     }
 
+    //! Appends data to the list of items to plot.
     void appendData(cedar::proc::DataRole::Id id, const std::string& dataName, bool ignoreIfMissing = false)
     {
       this->mData.push_back(PlotData(id, dataName, ignoreIfMissing));
@@ -160,10 +172,9 @@ public:
 
   /*!@brief Defines a new plot for this type of element
    *
-   * @param plotName    Name of the plot, displayed in the UI.
-   * @param slotsToPlot  List of data slots to plot.
+   * @param plotDefinition Definition of the plot.
    *
-   * @todo  This should also be read from the plugin xml file.
+   * @todo  This could also be read from the plugin xml file.
    */
   void definePlot(const PlotDefinition& plotDefinition)
   {
@@ -185,6 +196,7 @@ public:
     this->mDefaultPlot = plotName;
   }
 
+  //! Returns the name of the default plot. Empty if none is set.
   const std::string& getDefaultPlot() const
   {
     return this->mDefaultPlot;

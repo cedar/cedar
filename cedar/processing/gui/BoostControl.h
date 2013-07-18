@@ -88,24 +88,34 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //! Adds a boost to this control widget.
   void addBoost(cedar::proc::sources::BoostPtr boost);
 
+  //! Translates the boost signal by emitting a Qt signal.
   void translateElementAddedSignal(cedar::proc::ElementPtr);
 
+  //! Translates the boost signal by emitting a Qt signal.
   void translateElementRemovedSignal(cedar::proc::ConstElementPtr);
 
 signals:
+//! Used to translate a boost signal to a Qt signal.
   void elementAddedSignal(QString);
 
+  //! Used to translate a boost signal to a Qt signal.
   void boostRemovedSignal(QString);
 
 private slots:
+  //! Reacts to an element that has been added in the underlying network.
   void elementAdded(QString elementName);
 
+  //! Reacts to the removal of a boost in the underlying network.
   void boostRemoved(QString elementName);
 
+  //! Reacts to the change of the name of a boost in the underlying network.
   void boostNameChanged();
 
+  //! Reacts to a change of the check status of an item.
+  //!@todo Can this be removed?
   void itemChanged(QTreeWidgetItem* pItem, int column);
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -395,6 +395,7 @@ public:
   //! Returns a list of issues in the network.
   std::vector<cedar::proc::ConsistencyIssuePtr> checkConsistency() const;
 
+  //! Returns a list of all the looped triggers in this network.
   std::vector<cedar::proc::LoopedTriggerPtr> listLoopedTriggers() const;
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -229,6 +229,7 @@ public:
     return this->_mDataSlotScalingSensitivity->getValue();
   }
 
+  //! Returns wheter data slots should scalse based on the distance of the mouse.
   bool getDataSlotScalingEnabled() const
   {
     return this->_mDataSlotScalingEnabled->getValue();

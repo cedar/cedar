@@ -47,9 +47,7 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief A consistency issue that indicates a looped step that is not connected to a looped trigger.
  */
 class cedar::proc::LoopedStepNotConnected : public cedar::proc::ConsistencyIssue
 {
@@ -68,6 +66,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Returns the looped step that is not connected to a looped trigger.
   cedar::proc::StepPtr getUnconnectedStep() const
   {
     return this->mUnconnectedStep;
@@ -93,6 +92,7 @@ private:
 protected:
   // none yet
 private:
+  //! The unconnected step.
   cedar::proc::StepPtr mUnconnectedStep;
 
 }; // class cedar::proc::LoopedStepNotConnected
