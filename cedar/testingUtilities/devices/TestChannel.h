@@ -41,7 +41,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/testing/devices/namespace.h"
+#include "cedar/testingUtilities/devices/namespace.h"
 #include "cedar/devices/sensors/visual/GrabberChannel.h"
 #include "cedar/auxiliaries/IntParameter.h"
 
@@ -49,12 +49,12 @@
 
 
 //!@brief TestChannel contains additional data of a picture grabbing channel
-class cedar::testing::dev::TestChannel
+class cedar::test::dev::TestChannel
 :
 public cedar::dev::sensors::visual::GrabberChannel
 {
   //!@brief friend class of TestGrabber for direct access to the members
-  friend class cedar::testing::dev::TestGrabber;
+  friend class cedar::test::dev::TestGrabber;
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------

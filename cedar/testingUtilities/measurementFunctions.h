@@ -41,15 +41,14 @@
 #ifndef CEDAR_TESTING_FUNCTIONS_H
 #define CEDAR_TESTING_FUNCTIONS_H
 
-#include "cedar/testing/namespace.h"
-#include "cedar/testing/lib.h"
+#include "cedar/testingUtilities/namespace.h"
 
 // CEDAR INCLUDES
 
 // SYSTEM INCLUDES
 namespace cedar
 {
-  namespace testing
+  namespace test
   {
     /*! Writes a test measurement with the given id and duration to the cout stream in a manner that can automatically
      *  be parsed by the build server.

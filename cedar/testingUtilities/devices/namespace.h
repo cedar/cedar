@@ -24,37 +24,40 @@
 
     File:        namespace.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 03
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2013 07 15
 
-    Description: Namespace file for cedar::dyn.
+    Description: Namespace file for cedar::testing::dev.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_TESTING_NAMESPACE_H
-#define CEDAR_TESTING_NAMESPACE_H
+#ifndef CEDAR_TESTING_DEV_NAMESPACE_H
+#define CEDAR_TESTING_DEV_NAMESPACE_H
 
 // CEDAR INCLUDES
-#include "cedar/testing/lib.h"
+#include "cedar/testingUtilities/namespace.h"
 
 // SYSTEM INCLUDES
 
 namespace cedar
 {
-  /*!@brief Namespace that encapsulates functionality shared across multiple unit/interactive tests.
-   *
-   *        This is an internal namespace of cedar. Functinonality in here should not be used outside of unit tests!
-   */
-  namespace testing
+  namespace test
   {
+    /*!@brief Namespace that encapsulates functionality shared across dev unit/interactive tests.
+     *
+     *        This is an internal namespace of cedar. Functionality in here should not be used outside of unit tests!
+     */
+    namespace dev
+    {
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_TESTING_CLASS(TestGrabber);
+      CEDAR_DECLARE_TESTING_CLASS(TestChannel);
+      //!@endcond
+    }
   }
 }
 
-#endif // CEDAR_TESTING_NAMESPACE_H
+#endif // CEDAR_TESTING_DEV_NAMESPACE_H
