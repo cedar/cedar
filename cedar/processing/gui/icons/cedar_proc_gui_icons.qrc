@@ -22,6 +22,7 @@
     <file>steps/gauss_input.svg</file>
     <file>steps/rate_matrix_to_space_code.svg</file>
     <file>steps/rate_to_space_code.svg</file>
+    <file>steps/serial_order.svg</file>
     <file>steps/space_to_rate_code.svg</file>
     <file>steps/static_gain.svg</file>
     <file>steps/switch.svg</file>
@@ -34,9 +35,9 @@
     <file>steps/preshape.svg</file>
     <file>steps/projection.svg</file>
     <file>steps/resize.svg</file>
-    <file>steps/sigmoid.svg</file>
     <file>steps/sum.svg</file>
     <file>steps/unit_converter.svg</file>
+    <file>steps/transferFunction.svg</file>
     <file>steps/video_grabber.svg</file>
     <file>menus/properties.svg</file>
     <file>menus/plot.svg</file>

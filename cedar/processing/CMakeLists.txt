@@ -78,7 +78,7 @@ cedar_add_library(cedarproc
   steps/Flip.h
   steps/StaticGain.h
   steps/UnitConverter.h
-  steps/Sigmoid.h
+  steps/TransferFunction.h
   sources/Boost.h
   sources/Noise.h
   sources/Picture.h

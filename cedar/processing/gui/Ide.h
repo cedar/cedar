@@ -90,10 +90,6 @@ public:
   void resetTo(cedar::proc::gui::NetworkPtr network);
 
 public slots:
-  /*!@brief Slot that displays exceptions.
-   */
-  void exception(const QString& message);
-
   /*!@brief Slot that displays notifications.
    */
   void notify(const QString& message);

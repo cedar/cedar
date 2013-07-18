@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,47 +22,39 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        testingFunctions.h
+    File:        namespace.h
 
-    Maintainer:  Jean-Stephane Jokeit
-    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        2013 06 21
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 06 03
 
-    Description: Shared testing (unit-tests) code.
+    Description: Namespace file for cedar::dyn.
 
     Credits:
 
 ======================================================================================================================*/
 
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
-#include "cedar/auxiliaries/namespace.h"
-
-#ifndef CEDAR_AUX_TESTING_FUNCTIONS_H
-#define CEDAR_AUX_TESTING_FUNCTIONS_H
+#ifndef CEDAR_TESTING_NAMESPACE_H
+#define CEDAR_TESTING_NAMESPACE_H
 
 // CEDAR INCLUDES
+#include "cedar/testing/lib.h"
 
 // SYSTEM INCLUDES
+
 namespace cedar
 {
-  namespace aux
+  /*!@brief Namespace that encapsulates functionality shared across multiple unit/interactive tests.
+   *
+   *        This is an internal namespace of cedar. Functinonality in here should not be used outside of unit tests!
+   */
+  namespace testing
   {
-    namespace testing
-    {
-      CEDAR_AUX_LIB_EXPORT void write_measurement
-                                (
-                                  const std::string& id,
-                                  double duration
-                                );
-                                
-      CEDAR_AUX_LIB_EXPORT void test_time
-                                (
-                                  std::string id, 
-                                  std::function< void() > fun
-                                );
-    }
   }
 }
 
-#endif // CEDAR_AUX_STRING_FUNCTIONS_H
+#endif // CEDAR_TESTING_NAMESPACE_H

@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Log.h
+    File:        ExceptionDialog.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 04 13
+    Date:        2013 07 12
 
     Description:
 
@@ -34,121 +34,65 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_LOG_H
-#define CEDAR_AUX_GUI_LOG_H
+#ifndef CEDAR_AUX_GUI_EXCEPTION_DIALOG_H
+#define CEDAR_AUX_GUI_EXCEPTION_DIALOG_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/LogInterface.h"
+#include "cedar/auxiliaries/gui/ui_ExceptionDialog.h"
 
 // SYSTEM INCLUDES
-#include <QTabWidget>
-#include <QTableWidget>
-#include <QGraphicsSceneContextMenuEvent>
+#include <QDialog>
 
 
-/*!@brief A default log widget.
+/*!@brief A dialog for showing exceptions.
  */
-class cedar::aux::gui::Log : public QTabWidget
+class cedar::aux::gui::ExceptionDialog : public QDialog, public Ui_ExceptionDialog
 {
   Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  class LogInterface : public cedar::aux::LogInterface
-  {
-    public:
-      LogInterface(Log* pLog)
-      :
-      mpLog(pLog)
-      {
-      }
-
-      void message
-      (
-        cedar::aux::LOG_LEVEL level,
-        const std::string& message,
-        const std::string& title
-      )
-      {
-        this->mpLog->message(level, message, title);
-      }
-
-    private:
-      Log* mpLog;
-  };
-
-  CEDAR_GENERATE_POINTER_TYPES(LogInterface);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Log(QWidget *pParent = NULL);
-
-  //!@brief Destructor
-  ~Log();
+  ExceptionDialog();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief log a message with a given log level
-  void message
-  (
-    cedar::aux::LOG_LEVEL level,
-    const std::string& message,
-    const std::string& title
-  );
+  //! Set a string that is shown before the exception information.
+  void setAdditionalString(const std::string& intro);
 
-  /*!@brief Installs the handlers that redirect log messages to this widget.
-   *
-   *        Before calling this method, the log will not display anything. Also, remember to uninstall them when the
-   *        log's parent is destroyed!
-   */
-  void installHandlers(bool removeMessages = true);
+  //! Display the given cedar exception.
+  void displayCedarException(const cedar::aux::ExceptionBase& exception);
 
-  /*!@brief Removes the handlers that redirect log messages to this widget.
-   */
-  void uninstallHandlers();
+  //! Display a std::exception.
+  void displayStdException(const std::exception& exception);
 
-public slots:
-  //! Opens the context menu.
-  void showContextMenu(const QPoint& point);
+  //! Display an unknown exception.
+  void displayUnknownException();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-signals:
-  //!@brief signals reception of a signal
-  void messageReceived(int type, QString title, QString message);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void addPane(cedar::aux::LOG_LEVEL level, const std::string& title, const std::string& icon = "");
+  void addAdditionalText();
 
-  QTableWidget* addPane(const std::string& title, const std::string& icon = "");
-
-  void postMessage
-  (
-    QTableWidget* pTable,
-    const QString& message,
-    const QString& title,
-    const QString& icon = ""
-  );
-
-private slots:
-  void printMessage(int type, QString title, QString message);
-
+  void display(const std::string& message, const std::string& details);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -156,23 +100,9 @@ private slots:
 protected:
   // none yet
 private:
-  QTableWidget* mpDefaultPane;
+  QString mAdditionalString;
 
-  LogInterfacePtr mLogger;
+}; // class cedar::aux::gui::ExceptionDialog
 
-  std::map<cedar::aux::LOG_LEVEL, QTableWidget*> mpPanes;
-  std::map<cedar::aux::LOG_LEVEL, std::string> mIcons;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
-}; // class cedar::aux::gui::Log
-
-#endif // CEDAR_AUX_GUI_LOG_H
+#endif // CEDAR_AUX_GUI_EXCEPTION_DIALOG_H
 

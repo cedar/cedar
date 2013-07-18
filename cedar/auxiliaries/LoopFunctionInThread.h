@@ -70,7 +70,7 @@ public:
   //----------------------------------------------------------------------------
 
   //! the type we use to store function calls
-  typedef std::function< void(void) > FunctionType;
+  typedef std::function<void(double)> FunctionType;
 
   //----------------------------------------------------------------------------
   // constructors and destructor
@@ -81,7 +81,7 @@ public:
    *
    * Start the thread via start().
    *
-   *@param fun is a std::function< void(void) > and thus can be a function pointer or function object.
+   *@param fun is a std::function<void(void)> and thus can be a function pointer or function object.
    */
   LoopFunctionInThread(FunctionType fun);
 

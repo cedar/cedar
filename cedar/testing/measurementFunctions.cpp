@@ -22,46 +22,61 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LoopFunctionInThread.cpp
+    File:        measurementFunctions.cpp
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.rub.de
-    Date:        2013 07 01
+    Date:        2013 06 19
 
-    Description: Implementation of the @em cedar::aux::LoopFunctionInThread class.
+    Description: Shared testing code for writing (dart) measurements that can be interpreted by the build server.
 
     Credits:
 
 ======================================================================================================================*/
 
-// CEDAR INCLUDES
-#include "cedar/auxiliaries/LoopFunctionInThread.h"
-#include "cedar/auxiliaries/Log.h"
+// CEDAR_INCLUDES
+#include "cedar/testing/measurementFunctions.h"
+#include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
+#include <functional>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
-//------------------------------------------------------------------------------
-// constructors and destructor
-//------------------------------------------------------------------------------
-cedar::aux::LoopFunctionInThread::LoopFunctionInThread
-(
-  FunctionType fun
-)
-:
-mFunction(fun)
+void cedar::testing::write_measurement
+     (
+       const std::string& id,
+       double duration
+     )
 {
+  std::cout
+      << "<DartMeasurement"
+      << " name=\""
+      << id
+      << " (seconds)\""
+      << " type=\"numeric/double\">"
+      << cedar::aux::toString(duration)
+      << "</DartMeasurement>"
+      << std::endl;
 }
 
-cedar::aux::LoopFunctionInThread::~LoopFunctionInThread()
+void cedar::testing::test_time(std::string id, std::function< void() > fun)
 {
+  using boost::posix_time::ptime;
+  using boost::posix_time::microsec_clock;
+
+  double duration;
+
+  auto start = microsec_clock::local_time();
+
+  // execute the test:
+  fun();
+
+  auto end = microsec_clock::local_time();
+
+  duration = static_cast<double>((end - start).total_milliseconds()) / 1000.0;
+  write_measurement(id, duration);
 }
 
-//------------------------------------------------------------------------------
-// methods
-//------------------------------------------------------------------------------
-
-void cedar::aux::LoopFunctionInThread::step(double timeStep)
-{
-  mFunction(timeStep);
-}
 

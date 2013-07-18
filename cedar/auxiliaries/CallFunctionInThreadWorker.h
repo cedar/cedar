@@ -60,16 +60,19 @@
 class cedar::aux::detail::CallFunctionInThreadWorker : public cedar::aux::detail::ThreadWorker
 {
   public: 
+    //! Constructor.
     CallFunctionInThreadWorker(cedar::aux::CallFunctionInThread* wrapper);
 
   private:
 
   public:
+    //! Does the actual work.
     void work(); // virtual in parent
 
   public:
 
   private:
+    //! Wrapper that contains the function to be called.
     cedar::aux::CallFunctionInThread* mpWrapper;
 };
 

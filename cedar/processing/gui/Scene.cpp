@@ -48,6 +48,7 @@
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/PromotedExternalData.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/gui/PropertyPane.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -65,6 +66,7 @@
 #include <QPainter>
 #include <QAction>
 #include <QSvgGenerator>
+#include <QToolTip>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -576,6 +578,17 @@ void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEve
   {
     QPointF p2 = pMouseEvent->scenePos() - mpConnectionStart->scenePos();
 
+    for (auto iter = this->mStepMap.begin(); iter != this->mStepMap.end(); ++iter)
+    {
+      cedar::proc::gui::StepItem* p_step_gui = iter->second;
+      if (mpConnectionStart->canConnectTo(p_step_gui))
+      {
+        p_step_gui->magnetizeSlots(pMouseEvent->scenePos());
+      }
+    }
+
+    QToolTip::showText(pMouseEvent->screenPos(), "", this->mpMainWindow);
+
     // try to snap the target position of the line to a valid item, if one is found
     QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
     if (items.size() > 0)
@@ -590,6 +603,11 @@ void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEve
         {
           connected = true;
           p2 = target->getConnectionAnchorInScene() - mpConnectionStart->scenePos();
+
+          if (auto slot_item = dynamic_cast<cedar::proc::gui::DataSlotItem*>(target))
+          {
+            QToolTip::showText(pMouseEvent->screenPos(), QString::fromStdString(slot_item->getName()), this->mpMainWindow);
+          }
         }
       }
     }
@@ -620,9 +638,11 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
     for (int i = 0; i < items.size() && !connected; ++i)
     {
       cedar::proc::gui::GraphicsBase *target;
-      if ( (target = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]))
-           && mpConnectionStart->canConnectTo(target) != cedar::proc::gui::CONNECT_NO
-          )
+      if 
+      (
+        (target = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]))
+          && mpConnectionStart->canConnectTo(target) != cedar::proc::gui::CONNECT_NO
+      )
       {
         connected = true;
 
@@ -699,9 +719,11 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
             break;
         } // switch (mpConnectionStart->getGroup())
       }
-      else if ( (target = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]))
-           && mpConnectionStart == target
-          )
+      else if 
+      (
+        (target = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]))
+          && mpConnectionStart == target
+      )
       {
         this->mMode = MODE_SELECT;
         mpeParentView->setMode(cedar::proc::gui::Scene::MODE_SELECT);
@@ -736,6 +758,11 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
 
         default:
           break;
+      }
+
+      if (auto p_step = dynamic_cast<cedar::proc::gui::StepItem*>(item))
+      {
+        p_step->demagnetizeSlots();
       }
     }
   }
@@ -796,8 +823,9 @@ cedar::proc::ElementPtr cedar::proc::gui::Scene::addElement(const std::string& c
   }
   catch(const cedar::aux::ExceptionBase& e)
   {
-    QString message(e.exceptionInfo().c_str());
-    emit exception(message);
+    auto p_dialog = new cedar::aux::gui::ExceptionDialog();
+    p_dialog->displayCedarException(e);
+    p_dialog->exec();
   }
 
   return this->mNetwork->getNetwork()->getElement(adjusted_name);

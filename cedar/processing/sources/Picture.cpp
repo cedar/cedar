@@ -42,6 +42,7 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 
 // SYSTEM INCLUDES
@@ -149,10 +150,16 @@ void cedar::proc::sources::Picture::reset()
 
 void cedar::proc::sources::Picture::updatePicture()
 {
+  cv::Mat old_image = this->mImage->getData();
   onTrigger();
-  this->annotateImage();
-  this->emitOutputPropertiesChangedSignal("Picture");
-  onTrigger();
+
+  cv::Mat new_image = this->mImage->getData();
+  if (!cedar::aux::math::matrixSizesEqual(old_image, new_image) || old_image.type() != new_image.type())
+  {
+    this->annotateImage();
+    this->emitOutputPropertiesChangedSignal("Picture");
+    onTrigger();
+  }
 }
 
 void cedar::proc::sources::Picture::compute(const cedar::proc::Arguments&)

@@ -69,6 +69,7 @@ cedar_add_library(cedaraux
   gui/DoubleParameter.h
   gui/DoubleVectorParameter.h
   gui/EnumParameter.h
+  gui/ExceptionDialog.h
   gui/FileParameter.h
   gui/FrequencyParameter.h
   gui/IntParameter.h

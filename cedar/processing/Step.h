@@ -280,6 +280,10 @@ protected:
    */
   void unlock() const;
 
+  /*!@brief Redetermines the validity for an input slot.
+   *
+   * @param slot The slot to revalidate.
+   */
   void revalidateInputSlot(const std::string& slot);
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -55,6 +55,7 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/devices/gui/RobotManager.h"
+#include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/Log.h"
@@ -126,8 +127,6 @@ mpBoostControl(NULL)
   // set the property pane as the scene's property displayer
   this->mpProcessingDrawer->getScene()->setConfigurableWidget(this->mpPropertyTable);
 
-  QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(exception(const QString&)),
-                   this, SLOT(exception(const QString&)));
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(modeFinished()),
                    this, SLOT(architectureToolFinished()));
   QObject::connect(this->mpThreadsStartAll, SIGNAL(triggered()), this, SLOT(startThreads()));
@@ -661,19 +660,12 @@ void cedar::proc::gui::Ide::deleteElement(QGraphicsItem* pItem)
   }
 }
 
-void cedar::proc::gui::Ide::exception(const QString& message)
-{
-  this->logError("Exception: " + message.toStdString());
-  QMessageBox::critical(this,
-                        "An exception has occurred.",
-                        message);
-}
-
 void cedar::proc::gui::Ide::notify(const QString& message)
 {
   QMessageBox::critical(this,"Notification", message);
 }
 
+//!@todo Are these methods still necessary?
 void cedar::proc::gui::Ide::error(const QString& message)
 {
   this->logError("Error: " + message.toStdString());
@@ -834,11 +826,11 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   }
   catch(const cedar::aux::ExceptionBase& e)
   {
-    QString message = "An exception occurred during loading of the architecture."
-                      " Your architecture has probably not been loaded correctly!"
-                      " The exception is:\n";
-    message += QString::fromStdString(e.exceptionInfo());
-    this->exception(message);
+    auto p_dialog = new cedar::aux::gui::ExceptionDialog();
+    p_dialog->setAdditionalString("The exception occurred during loading of the architecture."
+                      " Your architecture has probably not been loaded correctly!");
+    p_dialog->displayCedarException(e);
+    p_dialog->exec();
   }
   this->mpActionSave->setEnabled(true);
 

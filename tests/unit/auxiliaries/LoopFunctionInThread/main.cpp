@@ -53,7 +53,7 @@ cedar::aux::LoopFunctionInThread* loop;
 
 #define MAX_LOOPS 5
 
-void loopedFun()
+void loopedFun(double)
 {
   count_loops++;
 
@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
 
   auto testThread = new cedar::aux::CallFunctionInThread(runTests);
 
-  QObject::connect( testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection );  // alternatively: call app->quit() in runTests()
+  QObject::connect(testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection);  // alternatively: call app->quit() in runTests()
 
   testThread->start();
   app->exec();

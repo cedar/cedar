@@ -22,66 +22,54 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GrabberChannel.h
+    File:        DiscreteCoordinates.h
 
-    Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.rub.de
-    Date:        2012 09 28
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 07 10
 
-    Description: Class GrabberChannel
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_TEST_CHANNEL_H
-#define CEDAR_DEV_SENSORS_VISUAL_TEST_CHANNEL_H
+#ifndef CEDAR_AUX_ANNOTATION_DISCRETE_COORDINATES_H
+#define CEDAR_AUX_ANNOTATION_DISCRETE_COORDINATES_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/namespace.h"
-#include "cedar/devices/sensors/visual/GrabberChannel.h"
-#include "cedar/auxiliaries/IntParameter.h"
+#include "cedar/auxiliaries/annotation/namespace.h"
+#include "cedar/auxiliaries/annotation/Annotation.h"
+#include "cedar/auxiliaries/Cloneable.h"
 
 // SYSTEM INCLUDES
 
-
-
-//!@brief TestChannel contains additional data of a picture grabbing channel
-class cedar::dev::sensors::visual::TestChannel
+/*!@brief An annotation that indicates disparity data.
+ */
+class cedar::aux::annotation::DiscreteCoordinates
 :
-public cedar::dev::sensors::visual::GrabberChannel
+public cedar::aux::annotation::Annotation,
+public cedar::aux::Cloneable<cedar::aux::annotation::DiscreteCoordinates, cedar::aux::annotation::Annotation>
 {
-  //!@brief friend class of TestGrabber for direct access to the members
-  friend class cedar::dev::sensors::visual::TestGrabber;
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  TestChannel(const std::string& fileName = "")
-  :
-  cedar::dev::sensors::visual::GrabberChannel(),
-  _mSourceFileName(new cedar::aux::FileParameter(this, "filename", cedar::aux::FileParameter::READ, fileName))
-  {
-  };
-
-  //!@brief Destructor
-  virtual ~TestChannel()
-  {
-  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  std::string getDescription() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -103,18 +91,7 @@ protected:
 private:
   // none yet
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  //!@brief The test parameter
-  cedar::aux::FileParameterPtr _mSourceFileName;
+}; // class cedar::aux::annotation::DiscreteCoordinates
 
-private:
-  // none yet
-
-}; // class cedar::dev::sensors::visual::TestChannel
-
-#endif // CEDAR_DEV_SENSORS_VISUAL_TEST_CHANNEL_H
-
+#endif // CEDAR_AUX_ANNOTATION_DISCRETE_COORDINATES_H
 

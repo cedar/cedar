@@ -233,6 +233,8 @@ macro(list_files_to_compile directory)
   file(GLOB_RECURSE project_forms ${directory}/*.ui)
   file(GLOB_RECURSE project_resources ${directory}/*.qrc)
   file(GLOB_RECURSE project_sources ${directory}/*.cpp)
+  file(GLOB_RECURSE project_sources_c ${directory}/*.c)
+  list(APPEND project_sources ${project_sources_c})
 endmacro(list_files_to_compile)
 
 

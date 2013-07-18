@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PluginDeclaration.cpp
+    File:        ExceptionDialog.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 01 18
+    Date:        2013 07 12
 
     Description:
 
@@ -38,91 +38,64 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/PluginDeclaration.h"
+#include "cedar/auxiliaries/gui/ExceptionDialog.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
+#include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
+#include <QStyle>
+#include <QApplication>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::PluginDeclaration::PluginDeclaration()
-:
-mIsDeprecated(false)
+cedar::aux::gui::ExceptionDialog::ExceptionDialog()
 {
-}
-
-cedar::aux::PluginDeclaration::PluginDeclaration(const std::string& className, const std::string& category)
-:
-mClassName(className),
-mCategory(category),
-mIsDeprecated(false)
-{
-}
-
-cedar::aux::PluginDeclaration::~PluginDeclaration()
-{
+  this->setupUi(this);
+  this->mpDetails->setVisible(false);
+  QIcon icon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxCritical);
+  this->mpIcon->setPixmap(icon.pixmap(64, 64));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::aux::PluginDeclaration::isDeprecatedName(const std::string& name) const
+void cedar::aux::gui::ExceptionDialog::setAdditionalString(const std::string& intro)
 {
-  for (size_t i = 0; i < this->mDeprecatedNames.size(); ++i)
-  {
-    if (this->mDeprecatedNames.at(i) == name)
-    {
-      return true;
-    }
-  }
-
-  return false;
+  this->mAdditionalString = QString::fromStdString(intro);
 }
 
-/*!
- * @brief Returns the class name without the preceding namespace.
- */
-std::string cedar::aux::PluginDeclaration::getClassNameWithoutNamespace() const
+void cedar::aux::gui::ExceptionDialog::displayCedarException(const cedar::aux::ExceptionBase& exception)
 {
-  std::size_t index = this->getClassName().rfind('.');
-  if (index != std::string::npos)
-  {
-    return this->getClassName().substr(index + 1);
-  }
-  else
-  {
-    return this->getClassName();
-  }
+  this->display(exception.getMessage(), exception.exceptionInfo());
 }
 
-/*!
- * @brief Returns the namespace name without the class name.
- */
-std::string cedar::aux::PluginDeclaration::getNamespaceName() const
+void cedar::aux::gui::ExceptionDialog::displayStdException(const std::exception& exception)
 {
-  std::size_t index = this->getClassName().rfind('.');
-  if (index != std::string::npos)
+  std::string type = cedar::aux::unmangleName(typeid(exception));
+  this->display(exception.what(), "The type of the exception is: " + type);
+}
+
+void cedar::aux::gui::ExceptionDialog::displayUnknownException()
+{
+  this->display("Unknown exception.", "The type of the exception was unexpected.");
+}
+
+void cedar::aux::gui::ExceptionDialog::display(const std::string& message, const std::string& details)
+{
+  this->mpExceptionInfo->setText(QString::fromStdString(message));
+
+  this->mpDetails->setText(QString::fromStdString(details));
+
+  this->addAdditionalText();
+}
+
+void cedar::aux::gui::ExceptionDialog::addAdditionalText()
+{
+  if (!this->mAdditionalString.isEmpty())
   {
-    return this->getClassName().substr(0, index);
-  }
-  else
-  {
-    return this->getClassName();
+    this->mpExceptionInfo->setText(this->mpExceptionInfo->text() + "\n\n" + this->mAdditionalString);
   }
 }
-
-void cedar::aux::PluginDeclaration::read(const cedar::aux::ConfigurationNode& node)
-{
-  //!@todo Read deprecated names etc. from here.
-
-  // read custom information
-  this->customRead(node);
-}
-
-void cedar::aux::PluginDeclaration::customRead(const cedar::aux::ConfigurationNode& /* node */)
-{
-  // empty default implementation, override in derived classes to read custom information
-}
-

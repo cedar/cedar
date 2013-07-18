@@ -60,7 +60,6 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(DataConnection);
     CEDAR_DECLARE_PROC_CLASS(DataRole);
     CEDAR_DECLARE_PROC_CLASS(DataSlot);
-    CEDAR_DECLARE_PROC_CLASS(DeclarationRegistry);
     CEDAR_DECLARE_PROC_CLASS(Element);
     CEDAR_DECLARE_PROC_CLASS(ElementDeclaration);
     CEDAR_DECLARE_PROC_CLASS(ExternalData);

@@ -97,7 +97,6 @@ public:
   /*!@brief starts the looped thread
    *
    * the KinematicChain class does some things in this function that are not needed
-   * @param priority thread priority
    */
   virtual void start();
 

@@ -44,6 +44,7 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/auxiliaries/annotation/DiscreteCoordinates.h"
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
@@ -58,6 +59,7 @@
 // SYSTEM INCLUDES
 #include <iostream>
 #include <boost/lexical_cast.hpp>
+#include <boost/make_shared.hpp>
 #include <QApplication>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -148,6 +150,7 @@ mGlobalInhibition
 ),
 // parameters
 _mOutputActivation(new cedar::aux::BoolParameter(this, "activation as output", false)),
+_mDiscreteMetric(new cedar::aux::BoolParameter(this, "discrete metric (workaround)", false)),
 _mDimensionality
 (
   new cedar::aux::UIntParameter
@@ -204,6 +207,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   this->declareInputCollection("input");
 
   this->_mOutputActivation->markAdvanced();
+  this->_mDiscreteMetric->markAdvanced();
 
   // setup default kernels
   std::vector<cedar::aux::kernel::KernelPtr> kernel_defaults;
@@ -248,6 +252,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
   QObject::connect(_mOutputActivation.get(), SIGNAL(valueChanged()), this, SLOT(activationAsOutputChanged()));
+  QObject::connect(_mDiscreteMetric.get(), SIGNAL(valueChanged()), this, SLOT(discreteMetricChanged()));
 
   mKernelAddedConnection
     = this->_mKernels->connectToObjectAddedSignal(boost::bind(&cedar::dyn::NeuralField::slotKernelAdded, this, _1));
@@ -266,6 +271,26 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dyn::NeuralField::discreteMetricChanged()
+{
+  std::vector<cedar::aux::DataPtr> data_items;
+  data_items.push_back(this->mActivation);
+  data_items.push_back(this->mSigmoidalActivation);
+  data_items.push_back(this->mLateralInteraction);
+
+  for (size_t i = 0; i < data_items.size(); ++i)
+  {
+    if (this->_mDiscreteMetric->getValue() == true)
+    {
+      data_items.at(i)->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteCoordinates>());
+    }
+    else
+    {
+      data_items.at(i)->removeAnnotations<cedar::aux::annotation::DiscreteCoordinates>();
+    }
+  }
+}
 
 bool cedar::dyn::NeuralField::activationIsOutput() const
 {
