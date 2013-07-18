@@ -163,11 +163,13 @@ public:
     this->mNextElementUiConfigurations[element.get()] = uiDescription;
   }
 
+  //! Sets the smart connection mode for all elements in this network.
   void toggleSmartConnectionMode(bool smart)
   {
     this->_mSmartMode->setValue(smart);
   }
 
+  //! Returns whether smart connection mode is used for all elements in this network.
   bool getSmartConnection() const
   {
     return this->_mSmartMode->getValue();

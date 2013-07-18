@@ -213,6 +213,8 @@ public slots:
   //!@brief handles a redraw of the graphical representation
   void redraw();
 
+  //! Slot that triggers an action based on a button in the action widget that can be opened for a step item.
+  //!@todo Should this be private?
   void handleExternalActionButtons();
 
 signals:

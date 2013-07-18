@@ -87,6 +87,7 @@ public:
   //!@brief Removes the underlying connection in the processing framework.
   void disconnect();
 
+  //! Displays this connection in smart mode.
   void setSmartMode(bool smart);
 
 public slots:

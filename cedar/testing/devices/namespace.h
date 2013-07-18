@@ -52,9 +52,10 @@ namespace cedar
      */
     namespace dev
     {
-      // grabber class only for unit-test
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_TESTING_CLASS(TestGrabber);
       CEDAR_DECLARE_TESTING_CLASS(TestChannel);
+      //!@endcond
     }
   }
 }

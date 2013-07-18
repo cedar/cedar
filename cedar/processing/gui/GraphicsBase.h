@@ -249,6 +249,7 @@ protected:
     this->mSnapToGrid = snap;
   }
 
+  //! Returns the vector of in- and outgoing (gui) connections for this (gui) element.
   std::vector<Connection*>& getConnections()
   {
     return this->mConnections;
