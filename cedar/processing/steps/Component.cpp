@@ -42,6 +42,7 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/devices/Component.h"
+#include "cedar/devices/exceptions.h"
 #include "cedar/auxiliaries/Data.h"
 
 // SYSTEM INCLUDES
@@ -145,7 +146,15 @@ void cedar::proc::steps::Component::componentChanged()
   //!@todo Clearing all slots means that all connections are lost. This is bad! Existing slots should remain.
   this->clearDataSlots();
 
-  cedar::dev::ComponentPtr component = this->_mComponent->getValue();
+  cedar::dev::ComponentPtr component;
+  try
+  {
+    component = this->_mComponent->getValue();
+  }
+  catch (cedar::dev::NoComponentSelectedException& exc)
+  {
+    return;
+  }
 
   // static because this doesn't change for different instances
   static std::vector<cedar::dev::Component::DataType> types;
