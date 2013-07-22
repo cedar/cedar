@@ -318,8 +318,6 @@ void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOption
   }
   this->paintFrame(painter, style, widget);
 
-  //! @todo make drawing pretty.
-
   painter->restore(); // restore saved painter settings
 }
 
