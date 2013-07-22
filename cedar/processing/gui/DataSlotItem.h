@@ -137,7 +137,6 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   /*!@brief Generates a tool tip depending on the content of DataSlot.
-   * @todo this should be called by a signal-slot mechanism
    */
   void generateTooltip();
 

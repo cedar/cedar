@@ -66,7 +66,6 @@ class cedar::proc::gui::GraphicsBase : public QGraphicsItem, public cedar::aux::
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief a group a GraphicsBase can belong to
-  //!@todo should be an enum/special flag
   typedef unsigned int GraphicsGroup;
   //!@brief group NONE
   const static GraphicsGroup GRAPHICS_GROUP_NONE = 0;
@@ -301,7 +300,6 @@ private:
   QPainterPath mPath;
 
   //!@brief The element associated with this graphics item
-  //!@todo Should this be a weak ptr?
   cedar::proc::ElementPtr mElement;
 
   //!@brief Whether the item snaps to the grid.
