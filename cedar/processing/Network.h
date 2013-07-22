@@ -472,7 +472,6 @@ private:
                                                        );
 
   //!@brief revalidates all outgoing connections of a slot
-  //!@todo this could be moved to Connectable, once it knows about its connections
   void revalidateConnections(const std::string& sender);
 
   //!@brief processes slot promotion

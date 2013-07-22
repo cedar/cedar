@@ -231,7 +231,6 @@ bool cedar::proc::gui::Network::sceneEventFilter(QGraphicsItem * pWatched, QEven
 
   switch(pEvent->type())
   {
-//!@todo Resizing the network while moving the mouse doesn't work.
 //    case QEvent::GraphicsSceneMouseMove:
 //    {
 //      this->fitToContents();
@@ -743,8 +742,7 @@ void cedar::proc::gui::Network::checkTriggerConnection
        bool added
      )
 {
-  /*@todo this is a quick fix: for processingDone triggers, there is no graphical representation.
-   * A signal is emitted regardless of the missing representation. This fails in finding "processingDone" in the current
+  /* A signal is emitted regardless of the missing representation. This fails in finding "processingDone" in the current
    * network and results in an InvalidNameException. This exception is caught here. A debug assert assures that no other
    * element caused this exception.
    */
@@ -762,7 +760,7 @@ void cedar::proc::gui::Network::checkTriggerConnection
   }
   catch(cedar::aux::InvalidNameException& exc)
   {
-    CEDAR_DEBUG_ASSERT(source->getName() == "processingDone");
+    CEDAR_ASSERT(source->getName() == "processingDone");
     return;
   }
   cedar::proc::gui::GraphicsBase* target_element
