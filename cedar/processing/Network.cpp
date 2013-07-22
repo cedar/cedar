@@ -1831,12 +1831,12 @@ void cedar::proc::Network::demoteSlot(cedar::proc::DataRole::Id role, const std:
   {
     this->getElement<cedar::proc::Connectable>(connectable)->getSlot(role, child_slot_name)->demote();
   }
-  catch (const cedar::aux::InvalidNameException& e)
+  catch (const cedar::aux::InvalidNameException&)
   {
-    throw e;
   }
   catch (cedar::aux::ExceptionBase& exc) // check that element does not exist in network
   {
+    throw exc;
   }
   this->mSlotChanged();
 }
