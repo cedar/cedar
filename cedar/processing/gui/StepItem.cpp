@@ -451,21 +451,7 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
   cedar::proc::ConstElementDeclarationPtr elem_decl
     = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(this->mClassId);
 
-
-  //!@todo This code is redundant with code in ElementClassList; unify
-  QResource ex_test(QString::fromStdString(elem_decl->getIconPath()));
-  if (ex_test.isValid())
-  {
-    this->mStepIcon = QIcon(QString::fromStdString(elem_decl->getIconPath()));
-    if (this->mStepIcon.isNull())
-    {
-      this->mStepIcon = QIcon(":/steps/no_icon.svg");
-    }
-  }
-  else
-  {
-    this->mStepIcon = QIcon(":/steps/broken_icon.svg");
-  }
+  this->mStepIcon = elem_decl->getIcon();
 
   this->addDataItems();
   this->addTriggerItems();
@@ -870,7 +856,6 @@ void cedar::proc::gui::StepItem::showPlot
   std::string title
 )
 {
-  //!@todo It would be better if setting the title would be part of the actual widget
   if (title.empty())
   {
     title = slot->getText();
@@ -1036,7 +1021,6 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     }
     catch (const cedar::aux::gui::InvalidPlotData& e)
     {
-      //!@todo this should be a call to an ide function
       cedar::aux::LogSingleton::getInstance()->warning
       (
         e.exceptionInfo(),
@@ -1080,7 +1064,6 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     }
     catch (const cedar::aux::gui::InvalidPlotData& e)
     {
-      //!@todo this should be a call to an ide function
       cedar::aux::LogSingleton::getInstance()->warning
       (
         e.exceptionInfo(),
@@ -1453,8 +1436,6 @@ void cedar::proc::gui::StepItem::multiplot
 void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
 {
   painter->save(); // save current painter settings
-
-  //! @todo make drawing of steps pretty.
 
   qreal padding;
 
