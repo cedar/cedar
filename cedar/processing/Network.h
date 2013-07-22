@@ -125,7 +125,7 @@ public:
 
   /*!@brief Writes the network to a configuration node.
    */
-  void writeConfiguration(cedar::aux::ConfigurationNode& root);
+  void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
 
   /*!@deprecated Use writeConfiguration instead.
    */
@@ -421,7 +421,7 @@ private:
 
   /*!@brief Writes the meta data to the configuration.
    */
-  void writeMetaData(cedar::aux::ConfigurationNode& root);
+  void writeMetaData(cedar::aux::ConfigurationNode& root) const;
 
   /*!@brief Reads steps from the configuration node and adds them to the network.
    */
@@ -429,7 +429,7 @@ private:
 
   /*!@brief Writes the steps in the network to the configuration node.
    */
-  void writeSteps(cedar::aux::ConfigurationNode& root);
+  void writeSteps(cedar::aux::ConfigurationNode& root) const;
 
   /*!@brief Reads triggers from a configuration node and adds them to the network.
    */
@@ -437,7 +437,7 @@ private:
 
   /*!@brief Writes the triggers in the network to the configuration node.
    */
-  void writeTriggers(cedar::aux::ConfigurationNode& root);
+  void writeTriggers(cedar::aux::ConfigurationNode& root) const;
 
   /*!@brief Reads networks from a configuration node and adds them to the parent network.
    */
@@ -445,7 +445,7 @@ private:
 
   /*!@brief Writes the child networks in the network to the configuration node.
    */
-  void writeNetworks(cedar::aux::ConfigurationNode& root);
+  void writeNetworks(cedar::aux::ConfigurationNode& root) const;
 
   /*!@brief Reads a data connection from a configuration node and adds it to the network.
    */
@@ -453,7 +453,7 @@ private:
 
   /*!@brief Writes a data connection to the configuration node.
    */
-  void writeDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::DataConnectionPtr connection);
+  void writeDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::DataConnectionPtr connection) const;
 
   /*!@brief Reads data connections from a configuration node and adds them to the network.
    */
@@ -461,7 +461,7 @@ private:
 
   /*!@brief Writes the data connections in the network to the configuration node.
    */
-  void writeDataConnections(cedar::aux::ConfigurationNode& root);
+  void writeDataConnections(cedar::aux::ConfigurationNode& root) const;
 
   /*!@brief remove a DataConnection and do a check, if any TriggerConnections must be deleted as well
    * @returns return the next iterator
