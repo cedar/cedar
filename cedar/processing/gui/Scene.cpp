@@ -856,7 +856,7 @@ cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::getGraphicsItemFor(cons
 cedar::proc::gui::StepItem* cedar::proc::gui::Scene::getStepItemFor(cedar::proc::Step* step)
 {
   StepMap::iterator iter = this->mStepMap.find(step);
-  CEDAR_ASSERT(iter == this->mStepMap.end());
+  CEDAR_ASSERT(iter != this->mStepMap.end());
   return iter->second;
 }
 
