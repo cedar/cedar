@@ -1292,8 +1292,8 @@ bool cedar::dev::robot::KinematicChain::applyInitialConfiguration(unsigned int i
 
   if (index >= mInitialConfigurations.size())
   {
-    CEDAR_THROW( cedar::proc::InvalidNameException , 
-               "You tried to apply an initial configuration with index "
+    CEDAR_THROW(cedar::aux::InvalidNameException ,
+                "You tried to apply an initial configuration with index "
                  + boost::lexical_cast<std::string>(index) 
                  + "' which doesnt exist. Size: " 
                  + boost::lexical_cast<std::string>(mInitialConfigurations.size()) );
@@ -1329,7 +1329,7 @@ unsigned int cedar::dev::robot::KinematicChain::getCurrentInitialConfigurationIn
     j++;
   }
 
-  CEDAR_THROW( cedar::proc::InvalidNameException,
+  CEDAR_THROW( cedar::aux::InvalidNameException,
                "Current initial configuration index is not a valid "
                "initial configuration" );
   return 0;
@@ -1342,7 +1342,7 @@ cv::Mat cedar::dev::robot::KinematicChain::getInitialConfiguration(std::string s
   auto f = mInitialConfigurations.find(s);
   if (f == mInitialConfigurations.end())
   {
-    CEDAR_THROW( cedar::proc::InvalidNameException,
+    CEDAR_THROW( cedar::aux::InvalidNameException,
                  "You requested initial configuration "
                  + s + " which is not registered. "
                  "Use addInitialConfiguration().");
@@ -1371,10 +1371,10 @@ cv::Mat cedar::dev::robot::KinematicChain::getCurrentInitialConfiguration()
   if (found == mInitialConfigurations.end())
   {
     // you cant really land here, but lets be paranoid:
-    CEDAR_THROW( cedar::proc::InvalidNameException,
-                 "You requested the current initial configuration, "
-                 "but none is set. "
-                 "Use addInitialConfiguration().");
+    CEDAR_THROW(cedar::aux::InvalidNameException,
+                "You requested the current initial configuration, "
+                "but none is set. "
+                "Use addInitialConfiguration().");
   }
 
   return mInitialConfigurations[ mCurrentInitialConfiguration ];

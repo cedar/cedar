@@ -109,7 +109,6 @@ namespace cedar
     class CEDAR_PROC_LIB_EXPORT DeadlockException;
     class CEDAR_PROC_LIB_EXPORT DuplicateConnectionException;
     class CEDAR_PROC_LIB_EXPORT DuplicateNameException;
-    class CEDAR_PROC_LIB_EXPORT InvalidNameException;
     class CEDAR_PROC_LIB_EXPORT InvalidObjectException;
     class CEDAR_PROC_LIB_EXPORT InvalidRoleException;
     class CEDAR_PROC_LIB_EXPORT InvalidArgumentsException;

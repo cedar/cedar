@@ -741,11 +741,11 @@ cedar::proc::gui::DataSlotItem const* cedar::proc::gui::StepItem::getSlotItem
   DataSlotNameMap::const_iterator iter = role_map->second.find(name);
   if (iter == role_map->second.end())
   {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "No slot item named \"" + name +
-                                                   "\" found for role "
-                                                   + cedar::proc::DataRole::type().get(role).prettyString()
-                                                   + " in StepItem for step \"" + this->mStep->getName() + "\"."
-                                                   );
+    CEDAR_THROW(cedar::aux::InvalidNameException, "No slot item named \"" + name +
+                                                  "\" found for role "
+                                                  + cedar::proc::DataRole::type().get(role).prettyString()
+                                                  + " in StepItem for step \"" + this->mStep->getName() + "\"."
+                                                  );
   }
 
   return iter->second;
@@ -1395,7 +1395,7 @@ void cedar::proc::gui::StepItem::multiplot
         );
       }
     }
-    catch (const cedar::proc::InvalidNameException& e)
+    catch (const cedar::aux::InvalidNameException& e)
     {
       if (!iter->mIgnoreIfMissing)
       {

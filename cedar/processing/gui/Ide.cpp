@@ -422,7 +422,7 @@ void cedar::proc::gui::Ide::toggleGrid(bool triggered)
 void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
 {
   this->storeSettings();
-  //!@todo Without this, the gui_ProcessingIde crashes when exiting in certain circumstances (see unit test gui_ProcessingIde)
+  // Without this, the gui_ProcessingIde crashes when exiting in certain circumstances (see unit test gui_ProcessingIde)
   this->mpPropertyTable->resetContents();
   pEvent->accept();
 }
@@ -658,7 +658,7 @@ void cedar::proc::gui::Ide::stepThreads()
 {
   if (this->mpCustomTimeStep->isEnabled())
   {
-    this->mNetwork->getNetwork()->stepTriggers(this->mpCustomTimeStep->value());
+    this->mNetwork->getNetwork()->stepTriggers(cedar::unit::Milliseconds(this->mpCustomTimeStep->value()));
   }
   else
   {

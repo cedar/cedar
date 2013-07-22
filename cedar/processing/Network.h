@@ -220,13 +220,13 @@ public:
 
   /*!@brief  Returns a pointer to the element with the given name. Uses the const function getElement.
    *
-   * @throws cedar::proc::InvalidNameException if no element is found with the given name.
+   * @throws cedar::aux::InvalidNameException if no element is found with the given name.
    */
   cedar::proc::ElementPtr getElement(const std::string& name);
 
   /*!@brief  Returns a const pointer to the element with the given name.
    *
-   * @throws cedar::proc::InvalidNameException if no element is found with the given name.
+   * @throws cedar::aux::InvalidNameException if no element is found with the given name.
    */
   cedar::proc::ConstElementPtr getElement(const std::string& name) const;
 
@@ -315,8 +315,6 @@ public:
 
   /*!@brief Find the complete path of an element, if it exists in the tree structure
    * @returns returns the dot-separated path to the element, or empty string if element is not found in tree
-   * @todo instead of returning an empty string, this function should throw an exception (catch it internally
-   * in recursive call)
    */
   std::string findPath(cedar::proc::ConstElementPtr findMe) const;
   
@@ -363,10 +361,6 @@ public:
   //!@brief Register a function pointer to react to changes in slots
   boost::signals2::connection connectToSlotChangedSignal(boost::function<void ()> slot);
 
-  //!@brief processes slot promotion
-  //!@todo Make this private?
-  void processPromotedSlots();
-
   //!@brief returns the last ui node that was read
   cedar::aux::ConfigurationNode& getLastReadUINode()
   {
@@ -396,15 +390,6 @@ public:
    * @see     stepTriggers(double).
    */
   void stepTriggers(cedar::unit::Time stepTime);
-
-  /*!@brief   Single-steps all triggers in this network with the given time step.
-   *
-   * @remarks Triggers that are running will not get stepped by this method. In general, it should only be called when
-   *          all triggers are stopped.
-   *
-   * @todo    Should a double-version of this method be available at all?
-   */
-  void stepTriggers(double stepTime);
 
   //! Returns a list of issues in the network.
   std::vector<cedar::proc::ConsistencyIssuePtr> checkConsistency() const;
@@ -480,7 +465,6 @@ private:
 
   /*!@brief remove a DataConnection and do a check, if any TriggerConnections must be deleted as well
    * @returns return the next iterator
-   * @todo clean up this function
    */
   cedar::proc::Network::DataConnectionVector::iterator removeDataConnection
                                                        (
@@ -491,9 +475,18 @@ private:
   //!@todo this could be moved to Connectable, once it knows about its connections
   void revalidateConnections(const std::string& sender);
 
+  //!@brief processes slot promotion
+  void processPromotedSlots();
+
+  /*!@brief   Single-steps all triggers in this network with the given time step.
+   *
+   * @remarks Triggers that are running will not get stepped by this method. In general, it should only be called when
+   *          all triggers are stopped.
+   */
+  void stepTriggers(double stepTime);
+
 private slots:
   //!@brief Takes care of updating the network's name in the parent's map.
-  //!@todo Find a more generic approach, react to name changes of each contained element rather than this way around.
   void onNameChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // members
