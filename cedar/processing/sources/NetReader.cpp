@@ -140,7 +140,7 @@ void cedar::proc::sources::NetReader::connect()
         // TODO: would be nice to have a state for temporarily disabling
       return;
     }
-    catch ( cedar::aux::net::NetMissingRessourceException &e )
+    catch (cedar::aux::net::NetMissingRessourceException &e)
     {
       // somehow YARP doesnt work ... :( typically fatal.
       // TODO: what to do?

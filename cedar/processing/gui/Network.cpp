@@ -641,11 +641,11 @@ cedar::proc::gui::DataSlotItem* cedar::proc::gui::Network::getSlotItem
   DataSlotNameMap::iterator iter = role_map->second.find(name);
   if (iter == role_map->second.end())
   {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "No slot item named \"" + name +
-                                                   "\" found for role "
-                                                   + cedar::proc::DataRole::type().get(role).prettyString()
-                                                   + " in Network for network \"" + this->mNetwork->getName() + "\"."
-                                                   );
+    CEDAR_THROW(cedar::aux::InvalidNameException, "No slot item named \"" + name +
+                                                  "\" found for role "
+                                                  + cedar::proc::DataRole::type().get(role).prettyString()
+                                                  + " in Network for network \"" + this->mNetwork->getName() + "\"."
+                                                  );
   }
 
   return iter->second;
@@ -760,7 +760,7 @@ void cedar::proc::gui::Network::checkTriggerConnection
           )
         );
   }
-  catch(cedar::proc::InvalidNameException& exc)
+  catch(cedar::aux::InvalidNameException& exc)
   {
     CEDAR_DEBUG_ASSERT(source->getName() == "processingDone");
     return;
@@ -777,7 +777,6 @@ void cedar::proc::gui::Network::checkTriggerConnection
   }
   else
   {
-    //!@todo iterating over all elements is very slow, solve this more efficiently
     QList<QGraphicsItem*> items = this->mpScene->items();
     for (int i = 0; i < items.size(); ++i)
     {

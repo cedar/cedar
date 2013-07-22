@@ -346,7 +346,6 @@ void cedar::proc::steps::Projection::expand0DtoND()
 }
 
 //! not used at the moment
-//!@todo check whether this is faster than the generic function
 void cedar::proc::steps::Projection::expand1Dto2D()
 {
   const cv::Mat& input = this->mInput->getData();

@@ -121,6 +121,9 @@ cedar::proc::Network::~Network()
 {
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
+  // stop all triggers.
+  this->stopTriggers();
+
   // read out all elements and call this->remove for each element
   this->removeAll();
 
@@ -469,7 +472,7 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
           false
         );
       }
-      catch (cedar::proc::InvalidNameException& exc)
+      catch (cedar::aux::InvalidNameException& exc)
       {
         CEDAR_DEBUG_ASSERT((*trigger_con)->getSourceTrigger()->getName() == "processingDone");
         CEDAR_DEBUG_ASSERT
@@ -539,7 +542,7 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
         "cedar::proc::Network::addElements(std::list<cedar::proc::ElementPtr> elements)"
       );
     }
-    catch(cedar::proc::InvalidNameException& exc)
+    catch(cedar::aux::InvalidNameException& exc)
     {
       ++it;
     }
@@ -727,7 +730,7 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
   std::string instanceName = element->getName();
   if (instanceName.empty())
   {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "no name present for given element in this module")
+    CEDAR_THROW(cedar::aux::InvalidNameException, "no name present for given element in this module")
   }
   else if (mElements.find(instanceName) != mElements.end())
   {
@@ -784,11 +787,11 @@ void cedar::proc::Network::duplicate(const std::string& elementName, const std::
     // add to network
     this->add(new_elem);
   }
-  catch (cedar::proc::InvalidNameException& exc)
+  catch (cedar::aux::InvalidNameException& exc)
   {
     CEDAR_THROW
     (
-      cedar::proc::InvalidNameException,
+      cedar::aux::InvalidNameException,
       "cannot duplicate element of name " + elementName + ", it does not exist in network" + this->getName()
     )
   }
@@ -809,7 +812,7 @@ std::string cedar::proc::Network::getUniqueName(const std::string& unmodifiedNam
       ++new_id;
     }
   }
-  catch(cedar::proc::InvalidNameException& exc)
+  catch(cedar::aux::InvalidNameException& exc)
   {
     // nothing to do here, name not duplicate, use this as a name
   }
@@ -829,7 +832,7 @@ cedar::proc::ConstElementPtr cedar::proc::Network::getElement(const std::string&
 
     if (!network)
     {
-      CEDAR_THROW(cedar::proc::InvalidNameException, "The given name does not specify a proper path in this network.");
+      CEDAR_THROW(cedar::aux::InvalidNameException, "The given name does not specify a proper path in this network.");
     }
 
     return network->getElement(rest);
@@ -847,7 +850,7 @@ cedar::proc::ConstElementPtr cedar::proc::Network::getElement(const std::string&
   {
     CEDAR_THROW
     (
-      cedar::proc::InvalidNameException, "No element of the name \"" + name
+      cedar::aux::InvalidNameException, "No element of the name \"" + name
         + "\" was found in the network \"" + this->getName() + "\"."
     );
   }
@@ -1781,7 +1784,7 @@ std::string cedar::proc::Network::findPath(cedar::proc::ConstElementPtr findMe) 
       return findMe->getName();
     }
   }
-  catch (cedar::proc::InvalidNameException& e) // this can happen if element is not found, no problem, see below
+  catch (cedar::aux::InvalidNameException& e) // this can happen if element is not found, no problem, see below
   {
   }
   // if element is not found, search in child networks
@@ -1827,12 +1830,12 @@ void cedar::proc::Network::demoteSlot(cedar::proc::DataRole::Id role, const std:
   {
     this->getElement<cedar::proc::Connectable>(connectable)->getSlot(role, child_slot_name)->demote();
   }
+  catch (const cedar::aux::InvalidNameException& e)
+  {
+    throw e;
+  }
   catch (cedar::aux::ExceptionBase& exc) // check that element does not exist in network
   {
-    if (typeid(exc) != typeid(cedar::proc::InvalidNameException))
-    {
-      throw exc;
-    }
   }
   this->mSlotChanged();
 }
@@ -1902,7 +1905,7 @@ void cedar::proc::Network::processPromotedSlots()
       }
       catch (cedar::aux::ExceptionBase& exc) // remove promoted slot
       {
-        if (typeid(exc) != typeid(cedar::proc::InvalidNameException))
+        if (typeid(exc) != typeid(cedar::aux::InvalidNameException))
         {
           throw exc;
         }
@@ -1914,7 +1917,7 @@ void cedar::proc::Network::processPromotedSlots()
     {
       if
       (
-        typeid(exc) != typeid(cedar::proc::InvalidNameException)
+        typeid(exc) != typeid(cedar::aux::InvalidNameException)
           && typeid(exc) != typeid(cedar::proc::InvalidRoleException)
       )
       {

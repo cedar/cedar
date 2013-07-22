@@ -197,7 +197,6 @@ void cedar::proc::steps::ChannelSplit::inputConnectionChanged(const std::string&
     );
   }
 
-  //!@todo fix this
   this->onTrigger();
   for (size_t i = 0; i < this->mChannelData.size(); ++i)
   {

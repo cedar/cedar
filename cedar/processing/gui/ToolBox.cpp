@@ -187,7 +187,7 @@ std::string cedar::proc::gui::ToolBox::getCurrentItemData() const
 {
   if (this->mpSelectedButton != NULL)
   {
-    return "TODO";
+    return "NOT IMPLEMENTED";
   }
   else
   {

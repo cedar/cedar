@@ -223,7 +223,6 @@ private:
   cedar::proc::ProjectionMappingParameterPtr _mDimensionMappings;
 
   //!@brief dimensionality of the output
-  //!@todo determine when the projection is connected to an output step
   cedar::aux::UIntParameterPtr _mOutputDimensionality;
 
   //!@brief sizes of all dimensions of the output of the projection

@@ -228,7 +228,7 @@ int main(int, char**)
       std::cout << "done." << std::endl;
     }
   }
-  catch (const cedar::proc::InvalidNameException&)
+  catch (const cedar::aux::InvalidNameException&)
   {
     std::cout << "NOT FOUND." << std::endl;
     ++errors;
@@ -253,7 +253,7 @@ int main(int, char**)
       std::cout << "done." << std::endl;
     }
   }
-  catch (const cedar::proc::InvalidNameException&)
+  catch (const cedar::aux::InvalidNameException&)
   {
     std::cout << "NOT FOUND." << std::endl;
     ++errors;
@@ -266,7 +266,7 @@ int main(int, char**)
     CEDAR_ASSERT(trigger);
     std::cout << "found." << std::endl;
   }
-  catch (const cedar::proc::InvalidNameException&)
+  catch (const cedar::aux::InvalidNameException&)
   {
     std::cout << "NOT FOUND." << std::endl;
     ++errors;
