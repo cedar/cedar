@@ -119,7 +119,7 @@ public:
    * Re-entry or calling start() twice will be detected and will 
    * abort with a cedar-warning.
    */
-  void start(); 
+  void start();
 
   //! is the thread still running?
   bool isRunning() const; 

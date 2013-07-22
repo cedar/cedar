@@ -1561,13 +1561,6 @@ bool cedar::proc::Network::isConnected(const std::string& source, const std::str
 
 bool cedar::proc::Network::isConnected(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target) const
 {
-  //!@todo check if source is in any way part of this network (may be a done trigger of a step)
-  //!@todo reactivate this check
-//  CEDAR_DEBUG_ASSERT
-//  (
-//    target
-//      == this->getElement<cedar::proc::Triggerable>(boost::dynamic_pointer_cast<cedar::proc::Element>(target)->getName())
-//  );
   for (size_t i = 0; i < mTriggerConnections.size(); ++i)
   {
     if (mTriggerConnections.at(i)->equals(source, target))

@@ -407,7 +407,6 @@ void cedar::proc::steps::CoordinateTransformation::createCartPolarMapBackward()
   {
     for (unsigned int col = 0; col < map_cols; ++col)
     {
-      //!@todo Check if this is correct
       float angle = fmod
                     (
                       atan2

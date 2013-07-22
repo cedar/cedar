@@ -48,9 +48,10 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
+/*!@brief A template for manager of plugin declarations.
  *
- * @todo describe more.
+ *        This class manages a set of cedar::aux::PluginDeclaration instances. It offers functionality for adding and
+ *        querying these instances, as well as allocation capabilities for the classes declared therein.
  */
 template <class BaseTypePtr>
 class cedar::aux::DeclarationManagerTemplate
