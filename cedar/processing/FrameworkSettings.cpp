@@ -93,10 +93,11 @@ cedar::aux::Configurable()
   }
   catch(cedar::aux::ParseException& exc)
   {
-    //!\todo pass a log message to somewhere
-#ifdef DEBUG
-    std::cout << "error loading framework settings, a new file will be generated" << std::endl;
-#endif
+    cedar::aux::LogSingleton::getInstance()->systemInfo
+    (
+      "Could not load framework settings. A new file will be created.",
+      "cedar::proc::FrameworkSettings::FrameworkSettings()"
+    );
   }
 }
 
@@ -108,9 +109,11 @@ cedar::proc::FrameworkSettings::~FrameworkSettings()
   }
   catch(cedar::aux::ParseException& exc)
   {
-    //!\todo pass a log message to somewhere
-    std::cout << "error saving framework settings, please check file permissions in "
-              << cedar::aux::getUserApplicationDataDirectory() << "/.cedar" << std::endl;
+    cedar::aux::LogSingleton::getInstance()->systemInfo
+    (
+      "Could not store framework settings. A new file will be created.",
+      "cedar::proc::FrameworkSettings::FrameworkSettings()"
+    );
   }
 }
 

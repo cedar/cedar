@@ -92,7 +92,7 @@ void cedar::proc::gui::BoostControl::setNetwork(cedar::proc::NetworkPtr network)
 
   this->mNetwork = network;
 
-  for (auto iter = this->mNetwork->elements().begin(); iter != this->mNetwork->elements().end(); ++iter)
+  for (auto iter = this->mNetwork->getElements().begin(); iter != this->mNetwork->getElements().end(); ++iter)
   {
     this->translateElementAddedSignal(iter->second);
   }

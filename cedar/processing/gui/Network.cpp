@@ -434,7 +434,7 @@ void cedar::proc::gui::Network::write(const std::string& destination)
 
   cedar::aux::ConfigurationNode root;
 
-  this->mNetwork->writeTo(root);
+  this->mNetwork->writeConfiguration(root);
 
   cedar::aux::ConfigurationNode scene;
   this->writeScene(root, scene);
@@ -456,7 +456,7 @@ void cedar::proc::gui::Network::read(const std::string& source)
   cedar::aux::ConfigurationNode root;
   read_json(source, root);
 
-  this->mNetwork->readFrom(root);
+  this->mNetwork->readConfiguration(root);
   try
   {
     this->readConfiguration(root.get_child("ui generic"));
@@ -480,7 +480,7 @@ void cedar::proc::gui::Network::writeConfiguration(cedar::aux::ConfigurationNode
 
 void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, cedar::aux::ConfigurationNode& scene)
 {
-  const cedar::proc::Network::ElementMap& elements = this->mNetwork->elements();
+  auto elements = this->mNetwork->getElements();
 
   for
   (

@@ -92,8 +92,6 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(PluginProxy);
     //!@endcond
 
-    //!@todo Deprecate this
-
     //!@cond SKIPPED_DOCUMENTATION
     typedef cedar::aux::PluginDeclarationList PluginDeclaration;
     CEDAR_GENERATE_POINTER_TYPES(PluginDeclaration);
@@ -107,6 +105,7 @@ namespace cedar
     class CEDAR_PROC_LIB_EXPORT ArchitectureLoadingException;
     class CEDAR_PROC_LIB_EXPORT ConnectionMemberDeletedException;
     class CEDAR_PROC_LIB_EXPORT ConnectionNotFoundException;
+    class CEDAR_PROC_LIB_EXPORT DataNotFoundException;
     class CEDAR_PROC_LIB_EXPORT DeadlockException;
     class CEDAR_PROC_LIB_EXPORT DuplicateConnectionException;
     class CEDAR_PROC_LIB_EXPORT DuplicateNameException;

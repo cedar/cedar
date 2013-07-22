@@ -60,10 +60,6 @@
  *        Whenever you want to connect up a number of processing steps, you should first add them to a network and then
  *        use the connect functions of this network. This ensures proper management of storage and deletion of all the
  *        elements in the network.
- *
- * @todo Write a private eraseConnection function to avoid duplicated code in disconnectSlots and remove
- *
- * @todo Write a separate class for the read/writeFromV1 method and all that belongs to it.
  */
 class cedar::proc::Network : public QObject, public cedar::proc::Connectable
 {
@@ -116,30 +112,47 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   /*!@brief Reads the network from a configuration node.
-   *
-   * @todo This should be called readConfiguration (as in Configurable).
    */
-  void readFrom(const cedar::aux::ConfigurationNode& root);
+  void readConfiguration(const cedar::aux::ConfigurationNode& root);
+
+  /*!@deprecated Use readConfiguration instead.
+   */
+  CEDAR_DECLARE_DEPRECATED(void readFrom(const cedar::aux::ConfigurationNode& root))
+  {
+    this->readConfiguration(root);
+  }
+
 
   /*!@brief Writes the network to a configuration node.
-   *
-   * @todo This should be called writeConfiguration (as in Configurable).
    */
-  void writeTo(cedar::aux::ConfigurationNode& root);
+  void writeConfiguration(cedar::aux::ConfigurationNode& root);
+
+  /*!@deprecated Use writeConfiguration instead.
+   */
+  CEDAR_DECLARE_DEPRECATED(void writeTo(cedar::aux::ConfigurationNode& root))
+  {
+    this->writeConfiguration(root);
+  }
 
   /*!@brief Reads the network from a given json file.
    *
    *        This file must have the same format as the one output by cedar::proc::Network::writeFile.
    *
-   * @todo Should be replaced by readJson (from Configurable)
+   * @deprecated Use readJson (from cedar::aux::Configurable)
    */
-  void readFile(const std::string& filename);
+  CEDAR_DECLARE_DEPRECATED(void readFile(const std::string& filename))
+  {
+    this->readJson(filename);
+  }
 
   /*!@brief Writes the network to a given json file.
    *
-   * @todo Should be replaced by writeJson (from Configurable)
+   * @deprecated Use writeJson (from cedar::aux::Configurable)
    */
-  void writeFile(const std::string& filename);
+  CEDAR_DECLARE_DEPRECATED(void writeFile(const std::string& filename))
+  {
+    this->writeJson(filename);
+  }
 
   /*!@brief Removes an element from the network.
    *
@@ -253,8 +266,6 @@ public:
    *
    * @param sourceSlot The source slot.
    * @param targetSlot The target slot.
-   *
-   * @todo Should this be private/protected?
    */
   void disconnectSlots(cedar::proc::ConstDataSlotPtr sourceSlot, cedar::proc::ConstDataSlotPtr targetSlot);
 
@@ -285,13 +296,16 @@ public:
   const cedar::proc::Network::DataConnectionVector& getDataConnections() const;
 
   /*!@brief Returns a const reference to the map of names to elements stored in the network.
-   *
-   * @todo Should be called getElements
    */
-  const ElementMap& elements() const;
+  const ElementMap& getElements() const;
+
+  //!@deprecated Use getElements instead.
+  CEDAR_DECLARE_DEPRECATED(const ElementMap& elements() const)
+  {
+    return this->getElements();
+  }
 
   /*!@brief Updates the name stored for the object.
-   * @todo This should be solved with signals/slots.
    */
   void updateObjectName(cedar::proc::Element* object);
 
@@ -410,7 +424,7 @@ protected:
 private:
   /*!@brief Reads the network from a configuration node and writes all exceptions into the given vector.
    */
-  void readFrom
+  void readConfiguration
   (
     const cedar::aux::ConfigurationNode& root,
     std::vector<std::string>& exceptions
