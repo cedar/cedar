@@ -215,8 +215,6 @@ public slots:
 protected:
 
   /*!@brief Deletes the list of graphics items.
-   *
-   * @todo This probably belongs somewhere else, e.g., cedar::proc::gui::Scene.
    */
   void deleteElements(QList<QGraphicsItem*>& items);
 
@@ -225,8 +223,6 @@ protected:
   void deleteElement(QGraphicsItem* pItem);
 
   /*!@brief Deletes the elements currently selected in the scene.
-   *
-   * @todo This probably belongs somewhere else, e.g., cedar::proc::gui::Scene.
    */
   void deleteSelectedElements();
 

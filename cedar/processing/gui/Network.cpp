@@ -99,7 +99,6 @@ _mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false))
   mpNameDisplay = new QGraphicsTextItem(this);
   this->networkNameChanged();
 
-  //!@todo This isn't really a great solution, we need a better one!
   cedar::aux::ParameterPtr name_param = this->getNetwork()->getParameter("name");
   QObject::connect(name_param.get(), SIGNAL(valueChanged()), this, SLOT(networkNameChanged()));
   QObject::connect(_mSmartMode.get(), SIGNAL(valueChanged()), this, SLOT(toggleSmartConnectionMode()));
@@ -548,8 +547,9 @@ void cedar::proc::gui::Network::checkSlots()
 
 void cedar::proc::gui::Network::checkDataItems()
 {
-  qreal data_size = 10.0; //!@todo don't hard-code the size of the data items
-  qreal padding = static_cast<qreal>(3);
+  qreal data_size = cedar::proc::gui::StepItem::M_BASE_DATA_SLOT_SIZE;
+  qreal padding = cedar::proc::gui::StepItem::M_DATA_SLOT_PADDING;
+
   std::map<cedar::proc::DataRole::Id, QPointF> add_origins;
   std::map<cedar::proc::DataRole::Id, QPointF> add_directions;
 

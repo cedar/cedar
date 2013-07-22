@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/Enum.h"
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/auxiliaries/namespace.h"
@@ -55,7 +56,6 @@
 /*!@brief All settings concerning the currently visible widgets of the ui: sizes, where they are docked and so on.
  *
  * More detailed description of the class.
- * @todo management of plugins could be moved somewhere else
  */
 class cedar::proc::gui::Settings : public cedar::aux::Configurable
 {
@@ -313,6 +313,9 @@ private:
 
   //! Sensitivity for slot items growth when the mouse approaches them while connecting.
   cedar::aux::DoubleParameterPtr _mDataSlotScalingSensitivity;
+
+  //! Maximum number of entries in the recent files list.
+  cedar::aux::UIntParameterPtr _mMaxFileHistorySize;
 
 }; // class cedar::proc::gui::Settings
 
