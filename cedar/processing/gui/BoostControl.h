@@ -114,10 +114,6 @@ private slots:
   //! Reacts to the change of the name of a boost in the underlying network.
   void boostNameChanged();
 
-  //! Reacts to a change of the check status of an item.
-  //!@todo Can this be removed?
-  void itemChanged(QTreeWidgetItem* pItem, int column);
-
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
