@@ -137,7 +137,6 @@ void cedar::proc::gui::Scene::itemSelected()
       }
     }
   }
-  //!@ todo Handle the cases: multiple
   else
   {
     this->mpConfigurableWidget->resetContents();
@@ -401,18 +400,11 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
    */
   cedar::proc::NetworkPtr new_parent_network;
 
-  //!@todo Solve this better
-  if (cedar::proc::gui::Network* p_element = dynamic_cast<cedar::proc::gui::Network*>(selected.at(0)))
+  auto p_base = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected.at(0));
+
+  if (p_base)
   {
-    new_parent_network = p_element->getNetwork()->getNetwork();
-  }
-  else if (cedar::proc::gui::StepItem* p_element = dynamic_cast<cedar::proc::gui::StepItem*>(selected.at(0)))
-  {
-    new_parent_network = p_element->getStep()->getNetwork();
-  }
-  else if (cedar::proc::gui::TriggerItem* p_element = dynamic_cast<cedar::proc::gui::TriggerItem*>(selected.at(0)))
-  {
-    new_parent_network = p_element->getTrigger()->getNetwork();
+    new_parent_network = p_base->getElement()->getNetwork();
   }
   else
   {
