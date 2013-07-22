@@ -649,22 +649,6 @@ void cedar::proc::gui::Ide::notify(const QString& message)
   QMessageBox::critical(this,"Notification", message);
 }
 
-//!@todo Are these methods still necessary?
-void cedar::proc::gui::Ide::error(const QString& message)
-{
-  this->logError("Error: " + message.toStdString());
-}
-
-void cedar::proc::gui::Ide::message(const QString& message)
-{
-  cedar::aux::LogSingleton::getInstance()->message(message.toStdString(), "cedar::proc::gui::Ide::message");
-}
-
-void cedar::proc::gui::Ide::logError(const std::string& message)
-{
-  cedar::aux::LogSingleton::getInstance()->error(message, "cedar::proc::gui::Ide::logError");
-}
-
 void cedar::proc::gui::Ide::startThreads()
 {
   this->mNetwork->getNetwork()->startTriggers();
