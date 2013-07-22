@@ -58,7 +58,6 @@
 
 /*!@brief A StepDeclaration contains the relation of a unique class id (as string) and the corresponding factory to
  * create a step of this id. It is a concretization of DeclarationBase.
- * @todo With the revised factory, passing the factory type is probably unnecessary
  */
 class cedar::proc::ElementDeclaration : public cedar::aux::PluginDeclarationBaseTemplate<cedar::proc::ElementPtr>
 {
@@ -197,8 +196,6 @@ public:
   /*!@brief Defines a new plot for this type of element
    *
    * @param plotDefinition Definition of the plot.
-   *
-   * @todo  This could also be read from the plugin xml file.
    */
   void definePlot(const PlotDefinition& plotDefinition)
   {

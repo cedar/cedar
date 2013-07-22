@@ -52,8 +52,6 @@
  *
  *        Connectable objects can have a number of DataSlots associated with them. These slots represent, e.g., inputs
  *        of the connectable and are used to define what data a connectable expects as input.
- *
- * @todo The design of having a parent and returning a shared pointer to connect two slots is not perfect.
  */
 class cedar::proc::DataSlot
 :

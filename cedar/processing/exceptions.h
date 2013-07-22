@@ -51,6 +51,12 @@ class cedar::proc::InvalidNameException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::proc::InvalidNameException
 
+/*!@brief An exception that occurs when data is not found.
+ */
+class cedar::proc::DataNotFoundException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::proc::DataNotFoundException
+
 /*!@brief An exception that occurs when a deadlock may be caused by a user action.
  */
 class cedar::proc::DeadlockException : public cedar::aux::ExceptionBase
