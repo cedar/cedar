@@ -94,14 +94,6 @@ public slots:
    */
   void notify(const QString& message);
 
-  /*!@brief Slot that displays errors.
-   */
-  void error(const QString& message);
-
-  /*!@brief Slot that displays messages.
-   */
-  void message(const QString& message);
-
   /*!@brief Changes the mode back to select when an architecture tool is finished.
    */
   void architectureToolFinished();
@@ -262,10 +254,6 @@ private:
    *        cedar::proc::gui::Ide::storeSettings.
    */
   void restoreSettings();
-
-  /*!@brief Writes an error message into the log window.
-   */
-  void logError(const std::string& message);
 
   /*!@brief Sets the filename in the title of the main window.
    */
