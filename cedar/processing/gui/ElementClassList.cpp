@@ -92,25 +92,7 @@ void cedar::proc::gui::ElementClassList::showList(const cedar::proc::ElementMana
     QListWidgetItem *p_item = new QListWidgetItem(label);
     p_item->setFlags(p_item->flags() | Qt::ItemIsDragEnabled);
 
-    QIcon icon;
-    std::string icon_path = elem_decl->getIconPath();
-    if (!icon_path.empty())
-    {
-      QResource ex_test(QString::fromStdString(icon_path));
-      if (ex_test.isValid())
-      {
-        icon = QIcon(QString::fromStdString(icon_path));
-      }
-      else
-      {
-        icon = QIcon(":/steps/broken_icon.svg");
-      }
-    }
-    else
-    {
-      icon = QIcon(":/steps/no_icon.svg");
-    }
-    p_item->setIcon(icon);
+    p_item->setIcon(elem_decl->getIcon());
 
     QString class_description;
     class_description += "<nobr>class <big><b>" + QString::fromStdString(only_class_name) + "</b></big></nobr>";

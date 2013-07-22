@@ -51,6 +51,8 @@
 #include "cedar/auxiliaries/PluginDeclarationTemplate.h"
 
 // SYSTEM INCLUDES
+#include <QIcon>
+#include <QResource>
 #include <vector>
 
 
@@ -156,6 +158,28 @@ public:
   const std::string& getIconPath() const
   {
     return this->mIconPath;
+  }
+
+  //!@brief Returns the actual icon for the element.
+  QIcon getIcon() const
+  {
+    QResource existance_test(QString::fromStdString(this->getIconPath()));
+    if (existance_test.isValid())
+    {
+      auto icon = QIcon(QString::fromStdString(this->getIconPath()));
+      if (icon.isNull())
+      {
+        return QIcon(":/steps/no_icon.svg");
+      }
+      else
+      {
+        return icon;
+      }
+    }
+    else
+    {
+      return QIcon(":/steps/broken_icon.svg");
+    }
   }
 
   //!@brief Method for setting the description of the element.
