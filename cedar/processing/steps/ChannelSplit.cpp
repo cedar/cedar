@@ -152,8 +152,6 @@ void cedar::proc::steps::ChannelSplit::inputConnectionChanged(const std::string&
     this->mChannelData.at(i)->copyAnnotationsFrom(this->mInput);
   }
 
-  //!@todo Remove/add outputs based on the actual number of channels
-
   // split the channels
   unsigned int num_channels = static_cast<unsigned int>(this->mInput->getData().channels());
 

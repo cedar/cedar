@@ -128,11 +128,9 @@ protected:
   // none yet
 private:
   //!@brief the time in ms between two frames. Depends on the the framerate of the video
-  //!@todo: change to cedar::unit::Time
   cedar::unit::Milliseconds mFrameDuration;
 
   //!@brief the time elapsed since the last frame is displayed
-  //!@todo: change to cedar::unit::Time
   cedar::unit::Milliseconds mTimeElapsed;
 
   //--------------------------------------------------------------------------------------------------------------------
