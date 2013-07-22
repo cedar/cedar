@@ -1030,7 +1030,7 @@ void cedar::proc::Network::disconnectTrigger(cedar::proc::TriggerPtr source, ced
   );
 }
 
-void cedar::proc::Network::writeConfiguration(cedar::aux::ConfigurationNode& root)
+void cedar::proc::Network::writeConfiguration(cedar::aux::ConfigurationNode& root) const
 {
   cedar::aux::ConfigurationNode meta;
   this->writeMetaData(meta);
@@ -1060,7 +1060,7 @@ void cedar::proc::Network::writeConfiguration(cedar::aux::ConfigurationNode& roo
   this->cedar::aux::Configurable::writeConfiguration(root);
 }
 
-void cedar::proc::Network::writeMetaData(cedar::aux::ConfigurationNode& meta)
+void cedar::proc::Network::writeMetaData(cedar::aux::ConfigurationNode& meta) const
 {
   meta.put("format", 1);
 }
@@ -1200,9 +1200,9 @@ void cedar::proc::Network::readFromV1
   }
 }
 
-void cedar::proc::Network::writeSteps(cedar::aux::ConfigurationNode& steps)
+void cedar::proc::Network::writeSteps(cedar::aux::ConfigurationNode& steps) const
 {
-  for (ElementMap::iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
+  for (auto iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
   {
     // if this is a step, write this to the configuration tree
     if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(iter->second))
@@ -1274,9 +1274,9 @@ void cedar::proc::Network::readSteps
   }
 }
 
-void cedar::proc::Network::writeTriggers(cedar::aux::ConfigurationNode& triggers)
+void cedar::proc::Network::writeTriggers(cedar::aux::ConfigurationNode& triggers) const
 {
-  for (ElementMap::iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
+  for (auto iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
   {
     // if this is a trigger, write this to the configuration tree
     if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(iter->second))
@@ -1397,9 +1397,9 @@ void cedar::proc::Network::readTriggers
   }
 }
 
-void cedar::proc::Network::writeNetworks(cedar::aux::ConfigurationNode& networks)
+void cedar::proc::Network::writeNetworks(cedar::aux::ConfigurationNode& networks) const
 {
-  for (ElementMap::iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
+  for (auto iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
   {
     // if this is a network, write this to the configuration tree
     if (cedar::proc::NetworkPtr network = boost::dynamic_pointer_cast<cedar::proc::Network>(iter->second))
@@ -1480,6 +1480,7 @@ void cedar::proc::Network::writeDataConnection
        cedar::aux::ConfigurationNode& root,
        const cedar::proc::DataConnectionPtr connection
      )
+     const
 {
   std::string source_str = connection->getSource()->getParent() + "." + connection->getSource()->getName();
   std::string target_str = connection->getTarget()->getParent() + "." + connection->getTarget()->getName();
@@ -1502,7 +1503,7 @@ void cedar::proc::Network::readDataConnection(const cedar::aux::ConfigurationNod
   this->connectSlots(source, target);
 }
 
-void cedar::proc::Network::writeDataConnections(cedar::aux::ConfigurationNode& root)
+void cedar::proc::Network::writeDataConnections(cedar::aux::ConfigurationNode& root) const
 {
   for (DataConnectionVector::const_iterator iter = mDataConnections.begin(); iter != mDataConnections.end(); ++iter)
   {
