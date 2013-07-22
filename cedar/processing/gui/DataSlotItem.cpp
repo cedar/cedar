@@ -281,7 +281,6 @@ void cedar::proc::gui::DataSlotItem::hoverEnterEvent(QGraphicsSceneHoverEvent* p
 void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
 {
   painter->save(); // save current painter settings
-  //!@todo may call setBaseShape when receiving a signal, not every time paint() is called
   this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND);
   if (cedar::proc::ExternalDataPtr ext_data = boost::dynamic_pointer_cast<cedar::proc::ExternalData>(mSlot))
   {
