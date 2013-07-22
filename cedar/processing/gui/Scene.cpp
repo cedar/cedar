@@ -301,7 +301,6 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
 void cedar::proc::gui::Scene::networkGroupingContextMenuEvent(QMenu& /*menu*/)
 {
   /*
-  //!@todo Fix networks and reenable this functionality
   QAction *p_add_to_new_network = menu.addAction("group into new network");
   QObject::connect(p_add_to_new_network, SIGNAL(triggered()), this, SLOT(promoteElementToNewGroup()));
 
@@ -638,7 +637,6 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
       {
         connected = true;
 
-        //!@todo a virtual connectTo method in cedar::proc::gui::GraphicsBase might be a better choice.
         switch (mpConnectionStart->getGroup())
         {
           // source item is a data item
@@ -656,7 +654,6 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
                   = p_source->getSlot()->getParent() + std::string(".") + p_source->getSlot()->getName();
                 std::string target_name
                   = p_data_target->getSlot()->getParent() + std::string(".") + p_data_target->getSlot()->getName();
-                //!@todo this code is really messy, think about restructuring the GUI
                 if
                 (
                   cedar::proc::ConstPromotedExternalDataPtr ptr
@@ -665,7 +662,6 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
                 {
                   target_name = ptr->getParentPtr()->getName() + std::string(".") + p_data_target->getSlot()->getName();
                 }
-                //!@todo decide, at which network those two steps must be connected
                 CEDAR_DEBUG_ASSERT(dynamic_cast<cedar::proc::Element*>(p_source->getSlot()->getParentPtr()));
                 static_cast<cedar::proc::Element*>
                 (
@@ -807,9 +803,6 @@ cedar::proc::ElementPtr cedar::proc::gui::Scene::addElement(const std::string& c
   try
   {
     mNetwork->getNetwork()->create(classId, adjusted_name);
-    /*@todo check if this works in all cases since adding an item triggers a signal/slot chain,
-     * which may not been processed completely
-     */
     CEDAR_DEBUG_ASSERT(mNetwork->getNetwork()->getElement<cedar::proc::Element>(adjusted_name).get());
     this->getGraphicsItemFor(mNetwork->getNetwork()->getElement<cedar::proc::Element>(adjusted_name).get())->setPos(position);
   }
@@ -860,22 +853,11 @@ cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::getGraphicsItemFor(cons
   }
 }
 
-
-//!@todo Shouldn't this be const pointers?
 cedar::proc::gui::StepItem* cedar::proc::gui::Scene::getStepItemFor(cedar::proc::Step* step)
 {
   StepMap::iterator iter = this->mStepMap.find(step);
-  if (iter == this->mStepMap.end())
-  {
-#ifdef DEBUG
-    std::cout << "Could not find step item for step \"" << step->getName() << "\"" << std::endl;
-#endif // DEBUG
-    return NULL;
-  }
-  else
-  {
-    return iter->second;
-  }
+  CEDAR_ASSERT(iter == this->mStepMap.end());
+  return iter->second;
 }
 
 cedar::proc::gui::Network* cedar::proc::gui::Scene::getNetworkFor(cedar::proc::Network* network)
@@ -996,7 +978,7 @@ void cedar::proc::gui::Scene::handleTriggerModeChange()
     }
     case MODE_SMART:
     {
-      //TODO do something smart here :)
+      // not yet implemented
     }
     default:
     {

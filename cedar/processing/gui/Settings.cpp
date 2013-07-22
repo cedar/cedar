@@ -142,6 +142,8 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
 
   cedar::aux::ConfigurablePtr recent_files(new cedar::aux::Configurable());
   this->addConfigurableChild("fileHistory", recent_files);
+  this->_mMaxFileHistorySize = new cedar::aux::UIntParameter(recent_files.get(), "maximum history size", 10);
+
   this->mPluginLoadDialogLocation = cedar::aux::DirectoryParameterPtr
       (
         new cedar::aux::DirectoryParameter
@@ -240,7 +242,7 @@ void cedar::proc::gui::Settings::appendArchitectureFileToHistory(const std::stri
     new_order.push_back(filePath);
   }
 
-  while (new_order.size() > 10) //!@todo Don't hardcode the value, rather make it a parameter that can be changed in some configuration dialog.
+  while (new_order.size() > this->_mMaxFileHistorySize->getValue())
   {
     new_order.erase(new_order.begin());
   }

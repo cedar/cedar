@@ -708,7 +708,6 @@ void cedar::proc::gui::Ide::saveAs()
     }
 
     this->mNetwork->write(file.toStdString());
-    //!@todo It would probably be better if the network sends a signal whenever its filename changes and the gui just reacted to that.
     this->displayFilename(file.toStdString());
 
     cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
@@ -824,7 +823,6 @@ void cedar::proc::gui::Ide::loadFile(QString file)
 
 void cedar::proc::gui::Ide::keyPressEvent(QKeyEvent* pEvent)
 {
-  //!@todo Move this to the graphics scene (or another more appropriate place)
   switch (pEvent->key())
   {
     case Qt::Key_Delete:
