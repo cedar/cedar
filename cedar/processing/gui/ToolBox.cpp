@@ -131,7 +131,9 @@ void cedar::proc::gui::ToolBox::addItem(const std::string& icon, const std::stri
   button->setMaximumSize(static_cast<int>(mButtonSize), static_cast<int>(mButtonSize));
   button->setMinimumHeight(static_cast<int>(mButtonSize));
 
-  //!@todo check for duplicates
+  // check for duplicates
+  CEDAR_ASSERT(mButtons.find(data) == mButtons.end());
+
   mButtons[data] = button;
 
   QObject::connect(button, SIGNAL(toggled(bool)), this, SLOT(toolButtonToggled(bool)));
@@ -158,7 +160,9 @@ void cedar::proc::gui::ToolBox::addStringItem(const std::string& icon, const std
 
   button->setFixedSize(32, 32);
 
-  //!@todo check for duplicates
+  // check for duplicates
+  CEDAR_ASSERT(mButtons.find(data) == mButtons.end());
+
   mButtons[data] = button;
 
   QObject::connect(button, SIGNAL(toggled(bool)), this, SLOT(toolButtonToggled(bool)));
