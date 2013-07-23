@@ -68,8 +68,6 @@
 #  include "auxiliaries/System.h"
 #endif
 
-//!@todo This class and the MatrixPlot1D share a lot of common code -- unify them
-
 //----------------------------------------------------------------------------------------------------------------------
 // static members
 //----------------------------------------------------------------------------------------------------------------------
@@ -238,7 +236,6 @@ void cedar::aux::gui::HistoryPlot0D::init()
 
 void cedar::aux::gui::HistoryPlot0D::applyStyle(size_t lineId, QwtPlotCurve *pCurve)
 {
-  //!@todo This is a carbon-copy from MatrixPlot1D; unify!
   // initialize vectors, if this has not happened, yet
   if (mLineColors.empty() || mLineStyles.empty())
   {
@@ -286,7 +283,7 @@ void cedar::aux::gui::HistoryPlot0D::plot(cedar::aux::ConstDataPtr data, const s
   this->mCurves.clear();
   this->doAppend(data, title);
 
-  this->startTimer(30); //!@todo make the refresh time configurable.
+  this->startTimer(30);
 }
 
 double cedar::aux::gui::HistoryPlot0D::getDataValue(size_t index)
@@ -309,8 +306,8 @@ double cedar::aux::gui::HistoryPlot0D::getDataValue(size_t index)
   else if (this->mCurves[index]->mMatData)
   {
     cv::Mat matrix = this->mCurves[index]->mMatData->getData();
-    //!@todo This check if the data still has the correct format should be somewhere else (probably)
-    if (cedar::aux::math::getDimensionalityOf(matrix) != 0 || matrix.empty()) // plot is no longer capable of displaying the data
+    // check if plot is no longer capable of displaying the data
+    if (cedar::aux::math::getDimensionalityOf(matrix) != 0 || matrix.empty())
     {
       data_locker.unlock();
       emit dataChanged();
@@ -406,7 +403,6 @@ void cedar::aux::gui::HistoryPlot0D::conversionDone()
     x_max = std::max(x_max, curve->mXArray.back());
 
     // choose the right function depending on the qwt version
-    //!@todo write a macro that does this check (see MatrixPlot1D.cpp)
 #if (QWT_VERSION >> 16) == 5
     curve->mCurve->setData
     (

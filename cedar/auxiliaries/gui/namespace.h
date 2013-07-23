@@ -106,9 +106,7 @@ namespace cedar
       class CEDAR_AUX_LIB_EXPORT InvalidPlotData;
       //!@endcond
 
-      /*! The factory for gui parameters.
-       * @todo It should be possible to add new gui parameters within a plugin.
-       */
+      //! The factory for gui parameters.
       typedef cedar::aux::TypeBasedFactory<cedar::aux::ParameterPtr, cedar::aux::gui::ParameterPtr> ParameterFactory;
 
       //!@brief singleton specialization for the parameter factory

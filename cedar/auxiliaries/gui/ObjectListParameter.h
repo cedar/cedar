@@ -91,7 +91,6 @@ private:
 
   inline cedar::aux::ObjectListParameterPtr getObjectList()
   {
-    //!@todo make this an asserted cast, because it should never fail.
     return cedar::aux::asserted_pointer_cast<cedar::aux::ObjectListParameter>(this->getParameter());
   }
 

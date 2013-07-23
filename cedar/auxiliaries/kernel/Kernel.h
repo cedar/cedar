@@ -90,7 +90,6 @@ public:
   /*! virtual function that in the derived classes actually does the job of initializing
    * the kernel from file
    */
-  //!@todo deal with boost PropertyTree here
   virtual void onInit(){};
 
   /*! virtual function for accessing the kernel matrix, in the 1d case this is the default
@@ -153,7 +152,6 @@ public:
   virtual unsigned int getSize(size_t dimension) const;
 
 public slots:
-  //!@todo merge update kernel and calculate, if calculate can be set to public and pure virtual works with Qt..
   void updateKernel();
 
 signals:
@@ -193,9 +191,6 @@ private:
 protected:
   //!@brief dimensionality of this kernel
   cedar::aux::UIntParameterPtr _mDimensionality;
-  //!@todo put this to a separate kernel implementation
-  // a file from which the kernel matrix can be loaded
-  //cedar::aux::StringParameterPtr _mKernelMatrixFile;
 
   //!@brief Anchor of the kernel, relative to the center.
   cedar::aux::IntVectorParameterPtr _mAnchor;

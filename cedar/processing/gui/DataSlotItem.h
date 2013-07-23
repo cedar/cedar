@@ -113,11 +113,13 @@ public:
    */
   cedar::proc::gui::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
 
+  //! Sets the scaling factor of the slot that occurs due to mouse interaction.
   void setMagneticScale(qreal scale)
   {
     this->mMagneticScale = scale;
   }
 
+  //! Returns how much the slot is currently scaled due to mouse interaction.
   qreal getMagneticScale() const
   {
     return this->mMagneticScale;
@@ -135,7 +137,6 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   /*!@brief Generates a tool tip depending on the content of DataSlot.
-   * @todo this should be called by a signal-slot mechanism
    */
   void generateTooltip();
 

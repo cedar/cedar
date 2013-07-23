@@ -60,17 +60,19 @@ cedar::aux::gui::PropertyPane(pParent)
 
 std::string cedar::proc::gui::PropertyPane::getInstanceTypeId(cedar::aux::ConfigurablePtr pConfigurable) const
 {
-  //!@todo This can probably be simplified greatly by using only ElementManagerSingleton::getTypeId()?
-  if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(pConfigurable))
+  cedar::proc::ElementPtr element = boost::dynamic_pointer_cast<cedar::proc::Element>(pConfigurable);
+
+  if (!element)
   {
-    return cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(step)->getClassName();
+    return "Cannot determine type: not an element.";
   }
-  else if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(pConfigurable))
+
+  try
   {
-    return cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(trigger)->getClassName();
+    return cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(element);
   }
-  else
+  catch (cedar::aux::UnknownTypeException)
   {
-    return this->cedar::aux::gui::PropertyPane::getInstanceTypeId(pConfigurable);
+    return "Could not determine type.";
   }
 }

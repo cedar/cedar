@@ -135,7 +135,7 @@ public:
   /*!@brief every step is used to do communication between FRI and KUKA-RC
    *
    * if in velocity- or acceleration mode, every step will also change joint angles/velocity
-   * @parameter time is not used
+   * @param time Unused.
    */
   void step(double time);
   //--------------------------------------------------------------------------------------------------------------------

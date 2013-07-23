@@ -213,8 +213,6 @@ public slots:
   //!@brief handles a redraw of the graphical representation
   void redraw();
 
-  void handleExternalActionButtons();
-
 signals:
   /*!@brief Emitted whenever the state of the step displayed by this step item changes.
    *
@@ -231,6 +229,10 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
+private slots:
+  //! Slot that triggers an action based on a button in the action widget that can be opened for a step item.
+  void handleExternalActionButtons();
+
 private:
   void emitStepStateChanged();
 
@@ -316,6 +318,13 @@ private slots:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  //! The base size of data slots (modified by display mode and other factors).
+  static const qreal M_BASE_DATA_SLOT_SIZE;
+
+  //! Amount of padding between data slots.
+  static const qreal M_DATA_SLOT_PADDING;
+
 protected:
   // none yet
 private:
@@ -339,9 +348,6 @@ private:
 
   //! The height of newly created steps.
   static const qreal mDefaultHeight;
-
-  //! The height of newly created steps.
-  static const qreal mBaseDataSlotSize;
 
   boost::signals2::connection mSlotAddedConnection;
   boost::signals2::connection mSlotRemovedConnection;

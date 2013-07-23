@@ -46,8 +46,8 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
+#include <type_traits>
 
-//!@todo This should be its own header
 #if defined CEDAR_COMPILER_MSVC && _MSC_VER < 1600 // MSVC with a version greater than 1600 should come with the stdint header.
   typedef __int8 int8_t;
   typedef unsigned __int8 uint8_t;
@@ -77,6 +77,12 @@
  *  some precompiler macros are also defined here
  */
 
+
+/* epsilon surrounding for near zero values */
+#ifndef EQN_EPS
+#define EQN_EPS 1e-9
+#endif
+
 namespace cedar
 {
   namespace aux
@@ -97,22 +103,27 @@ namespace cedar
       CEDAR_AUX_LIB_EXPORT unsigned int minIndex1D(const cv::Mat matrix);
 
       //! writes the matrix into the shell properly organized by columns and rows
-      //!\todo move write(cv::Mat) to aux::utilities
       //!\todo rework (template for copy & paste code)
       //!\todo add log file capability
       CEDAR_DECLARE_DEPRECATED(CEDAR_AUX_LIB_EXPORT void write(cv::Mat matrix));
-
-      //!@brief returns whether the input is zero within small bounds
-      template <typename T> inline bool isZero(T x, unsigned int positionAfterDecimalPoint = 9)
-      {
-        double epsilon = pow(0.1, positionAfterDecimalPoint);
-        return (x > -epsilon && x < epsilon);
-      }
 
       //!@brief a templated round function
       template <typename T> inline T round(T val)
       {
         return std::floor(val + static_cast<T>(0.5));
+      }
+
+      //!@brief checks the zero-ness of a floating point value with a given tolerance
+      template <typename T>  inline bool isZero(const T& value, const T& precision = static_cast<T>(1e-9))
+      {
+        if (std::is_floating_point<T>::value)
+        {
+          return value > -precision && value < precision;
+        }
+        else
+        {
+          return value == 0;
+        }
       }
 
       /*!@brief   Limits a number to be in the range [lower, upper].
@@ -331,8 +342,6 @@ namespace cedar
        * @param[in] dimensionToReduce along which dimension should be reduced?
        * @param[in] reductionOperator reduction operator (again, same choices as cvReduce)
        * @param[in] swapDimensions whether to switch the other two dimensions
-       *
-       * @todo The signature of this function should be revised - it should probably take a mapping.
        */
       template <typename T>
       void reduceCvMat3D(

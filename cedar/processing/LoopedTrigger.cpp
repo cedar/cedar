@@ -97,7 +97,6 @@ cedar::proc::LoopedTrigger::LoopedTrigger(double stepSize, const std::string& na
 :
 cedar::aux::LoopedThread(stepSize),
 cedar::proc::Trigger(name, true),
-//!@todo Make a TimeParameter and use it here instead.
 mWait(new cedar::aux::BoolParameter(this, "wait", true)),
 mStarting(false),
 mStopping(false)
@@ -116,7 +115,6 @@ cedar::proc::LoopedTrigger::~LoopedTrigger()
 //----------------------------------------------------------------------------------------------------------------------
 
 /*! This method takes care of changing the step's name in the registry as well.
- * @todo This should be solved better; currently, this has to be done for LoopedTriggers and Steps, with is copied code.
  */
 void cedar::proc::LoopedTrigger::onNameChanged()
 {
@@ -162,8 +160,6 @@ void cedar::proc::LoopedTrigger::startTrigger()
 
   emit triggerStarting();
 
-  //!@todo This feels like a dirty hack, but the starting signal won't get processed otherwise; really, this should all
-  //!      be done in a second thread.
   int count = 0;
   while (QApplication::hasPendingEvents() && ++count < 500)
   {
@@ -196,8 +192,6 @@ void cedar::proc::LoopedTrigger::stopTrigger()
 
   emit triggerStopping();
 
-  //!@todo This feels like a dirty hack, but the starting signal won't get processed otherwise; really, this should all
-  //!      be done in a second thread.
   int count = 0;
   while (QApplication::hasPendingEvents() && ++count < 500)
   {

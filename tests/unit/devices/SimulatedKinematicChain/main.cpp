@@ -64,10 +64,10 @@ int main()
   test_arm->setJointAngle(2, cedar::aux::math::pi/2);
   test_arm->setJointAngle(3, sqrt(2.0));
   if (
-      !cedar::aux::math::isZero<double>(test_arm->getJointAngle(0) - 1.0)
-      || !cedar::aux::math::isZero<double>(test_arm->getJointAngle(1) - 2.0)
-      || !cedar::aux::math::isZero<double>(test_arm->getJointAngle(2) - cedar::aux::math::pi/2.0)
-      || !cedar::aux::math::isZero<double>(test_arm->getJointAngle(3) - sqrt(2.0))
+      !cedar::aux::math::isZero(test_arm->getJointAngle(0) - 1.0)
+      || !cedar::aux::math::isZero(test_arm->getJointAngle(1) - 2.0)
+      || !cedar::aux::math::isZero(test_arm->getJointAngle(2) - cedar::aux::math::pi/2.0)
+      || !cedar::aux::math::isZero(test_arm->getJointAngle(3) - sqrt(2.0))
       )
   {
     errors++;
@@ -106,10 +106,10 @@ int main()
   angle_matrix.at<double>(3, 0) = 0.4;
   test_arm->setJointAngles(angle_matrix);
   if (
-      !cedar::aux::math::isZero<double>(test_arm->getCachedJointAngles().at<double>(0, 0) - 0.1)
-      || !cedar::aux::math::isZero<double>(test_arm->getCachedJointAngles().at<double>(1, 0) - 0.2)
-      || !cedar::aux::math::isZero<double>(test_arm->getCachedJointAngles().at<double>(2, 0) - 0.3)
-      || !cedar::aux::math::isZero<double>(test_arm->getCachedJointAngles().at<double>(3, 0) - 0.4)
+      !cedar::aux::math::isZero(test_arm->getCachedJointAngles().at<double>(0, 0) - 0.1)
+      || !cedar::aux::math::isZero(test_arm->getCachedJointAngles().at<double>(1, 0) - 0.2)
+      || !cedar::aux::math::isZero(test_arm->getCachedJointAngles().at<double>(2, 0) - 0.3)
+      || !cedar::aux::math::isZero(test_arm->getCachedJointAngles().at<double>(3, 0) - 0.4)
       )
   {
     errors++;

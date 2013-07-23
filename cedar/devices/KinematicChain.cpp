@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/units/Length.h"
+#include "cedar/processing/exceptions.h" // for DuplicateNameException
 
 // SYSTEM INCLUDES
 #include <boost/lexical_cast.hpp>
@@ -681,7 +682,7 @@ void cedar::dev::KinematicChain::applyVelocityLimits(cv::Mat& /*velocities*/)
 /*
  * Overwritten start function of QThread
  */
-void cedar::dev::KinematicChain::start(Priority priority)
+void cedar::dev::KinematicChain::start()
 {
   if (isRunning())
   {
@@ -695,7 +696,7 @@ void cedar::dev::KinematicChain::start(Priority priority)
     cedar::aux::LogSingleton::getInstance()->error
     (
       "Error: KinematicChain is in working mode STOP!",
-      "cedar::dev::robot::KinematicChain::start(Priority)"
+      "cedar::dev::robot::KinematicChain::start()"
     );
     return;
 
@@ -704,7 +705,7 @@ void cedar::dev::KinematicChain::start(Priority priority)
     cedar::aux::LogSingleton::getInstance()->error
     (
       "KinematicChain refuses to work as a thread in ANGLE mode!",
-      "cedar::dev::KinematicChain::start(Priority)"
+      "cedar::dev::KinematicChain::start()"
     );
     return;
   case VELOCITY:

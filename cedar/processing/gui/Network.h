@@ -56,8 +56,6 @@
  *
  *        This class takes care of loading cedar::proc::Networks in a manner that allows them to be added into
  *        cedar::proc::gui::Scenes as either the root network or a subnetwork.
- *
- * @todo  It should probably be possible to use this class without a scene/main window.
  */
 class cedar::proc::gui::Network : public QObject, public cedar::proc::gui::GraphicsBase
 {
@@ -134,7 +132,7 @@ public:
   //!@brief saves a configuration to a node
   void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
 
-  //!@todo dupliate function in Network and StepItem - move to generic parent class
+  //! Returns the slot item of the given role and name.
   cedar::proc::gui::DataSlotItem* getSlotItem(cedar::proc::DataRole::Id role, const std::string& name);
 
   //!@brief returns a map of all data slots of the same id
@@ -163,11 +161,13 @@ public:
     this->mNextElementUiConfigurations[element.get()] = uiDescription;
   }
 
+  //! Sets the smart connection mode for all elements in this network.
   void toggleSmartConnectionMode(bool smart)
   {
     this->_mSmartMode->setValue(smart);
   }
 
+  //! Returns whether smart connection mode is used for all elements in this network.
   bool getSmartConnection() const
   {
     return this->_mSmartMode->getValue();

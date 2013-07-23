@@ -61,7 +61,6 @@ cedar::proc::gui::BoostControl::BoostControl()
 
   QObject::connect(this, SIGNAL(elementAddedSignal(QString)), this, SLOT(elementAdded(QString)));
   QObject::connect(this, SIGNAL(boostRemovedSignal(QString)), this, SLOT(boostRemoved(QString)));
-  QObject::connect(this->mpBoostTree, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(itemChanged(QTreeWidgetItem*, int)));
 
   this->mpBoostTree->header()->setResizeMode(0, QHeaderView::Stretch);
   this->mpBoostTree->header()->setResizeMode(1, QHeaderView::ResizeToContents);
@@ -93,7 +92,7 @@ void cedar::proc::gui::BoostControl::setNetwork(cedar::proc::NetworkPtr network)
 
   this->mNetwork = network;
 
-  for (auto iter = this->mNetwork->elements().begin(); iter != this->mNetwork->elements().end(); ++iter)
+  for (auto iter = this->mNetwork->getElements().begin(); iter != this->mNetwork->getElements().end(); ++iter)
   {
     this->translateElementAddedSignal(iter->second);
   }
@@ -193,11 +192,4 @@ void cedar::proc::gui::BoostControl::addBoost(cedar::proc::sources::BoostPtr boo
     = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(strength_parameter)->allocateRaw();
   this->mpBoostTree->setItemWidget(p_item, 2, p_strength);
   p_strength->setParameter(strength_parameter);
-}
-
-void cedar::proc::gui::BoostControl::itemChanged(QTreeWidgetItem* pItem, int)
-{
-  QString boost_name = pItem->text(0);
-
-  this->mNetwork->getElement<cedar::proc::sources::Boost>(boost_name.toStdString())->setActive(pItem->checkState(0) == Qt::Checked);
 }

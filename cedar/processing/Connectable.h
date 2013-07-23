@@ -359,6 +359,12 @@ protected:
    */
   void clearDataSlots();
 
+  /*!@brief Notifies all following steps connected to the given slot that the properties of the data in said slot have
+   *        changed.
+   *
+   *        Examples of instances in which this function should be called are matrices that change size, type or
+   *        dimensionality.
+   */
   void emitOutputPropertiesChangedSignal(const std::string& slot);
 
   //--------------------------------------------------------------------------------------------------------------------

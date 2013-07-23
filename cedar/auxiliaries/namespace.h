@@ -68,11 +68,6 @@ namespace cedar
       class CallFunctionInThreadWorker;
     }
 
-    /*!@brief Namespace for shared testing (unit-tests, etc) code. @todo: will be moved or changed in the near future */
-    namespace testing
-    {
-    }
-
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Configurable);
     CEDAR_DECLARE_AUX_CLASS(NamedConfigurable);

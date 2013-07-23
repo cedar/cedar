@@ -62,7 +62,6 @@ mpLocalCoordinateFrame(localCoordinateFrame),
 // parameters
 _mDecimals(new cedar::aux::UIntParameter(this, "decimals", 2))
 {
-  //!@todo: make these configurable
   mRotationInterval = 10;
   mSingleTranslationStep = 0.1;
   mSingleRotationStep = 0.02;
@@ -247,7 +246,7 @@ void cedar::aux::gui::LocalCoordinateFrameWidget::update()
     {
       QLabel* p_label = static_cast<QLabel*>(mpGridLayout->itemAtPosition(i+3, (j+1)*2)->widget());
       double r = T.at<double>(i, j);
-      if (cedar::aux::math::isZero<double>(r))
+      if (cedar::aux::math::isZero(r))
       {
         r = 0;
       }

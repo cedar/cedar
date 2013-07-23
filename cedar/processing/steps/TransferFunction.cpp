@@ -113,7 +113,6 @@ _mTransferFunction
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-//!@todo Replace by type check
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::TransferFunction::determineInputValidity
                                                                       (
                                                                         cedar::proc::ConstDataSlotPtr,
