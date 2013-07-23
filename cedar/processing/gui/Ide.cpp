@@ -60,6 +60,7 @@
 #include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -674,7 +675,8 @@ void cedar::proc::gui::Ide::stepThreads()
 {
   if (this->mpCustomTimeStep->isEnabled())
   {
-    this->mNetwork->getNetwork()->stepTriggers(cedar::unit::Milliseconds(this->mpCustomTimeStep->value()));
+    cedar::unit::Time step_size(this->mpCustomTimeStep->value() * cedar::unit::milli * cedar::unit::seconds);
+    this->mNetwork->getNetwork()->stepTriggers(step_size);
   }
   else
   {
