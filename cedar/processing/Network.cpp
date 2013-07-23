@@ -526,6 +526,48 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element, std::string inst
   this->add(element);
 }
 
+// part of the cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements) function
+// put here because older gcc versions won't be able to compile this otherwise
+struct DataConnectionInfo
+{
+  DataConnectionInfo(const std::string& dataFrom, const std::string& dataTo)
+  :
+  from(dataFrom),
+  to(dataTo)
+  {
+  }
+
+  std::string from;
+  std::string to;
+};
+
+struct PromotedConnectionInfo
+{
+  PromotedConnectionInfo(const std::string& dataFrom, const std::string& dataTo)
+  :
+  from(dataFrom),
+  to(dataTo)
+  {
+  }
+
+  std::string from;
+  std::string to;
+};
+
+
+struct TriggerConnectionInfo
+{
+  TriggerConnectionInfo(cedar::proc::TriggerPtr dataFrom, cedar::proc::TriggerablePtr dataTo)
+  :
+  from(dataFrom),
+  to(dataTo)
+  {
+  }
+
+  cedar::proc::TriggerPtr from;
+  cedar::proc::TriggerablePtr to;
+};
+
 void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
 {
   typedef std::list<cedar::proc::ElementPtr>::iterator iterator;
@@ -553,45 +595,6 @@ void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
     return;
   }
   // check old connections
-  struct DataConnectionInfo
-  {
-    DataConnectionInfo(const std::string& dataFrom, const std::string& dataTo)
-    :
-    from(dataFrom),
-    to(dataTo)
-    {
-    }
-
-    std::string from;
-    std::string to;
-  };
-
-  struct PromotedConnectionInfo
-  {
-    PromotedConnectionInfo(const std::string& dataFrom, const std::string& dataTo)
-    :
-    from(dataFrom),
-    to(dataTo)
-    {
-    }
-
-    std::string from;
-    std::string to;
-  };
-
-
-  struct TriggerConnectionInfo
-  {
-    TriggerConnectionInfo(cedar::proc::TriggerPtr dataFrom, cedar::proc::TriggerablePtr dataTo)
-    :
-    from(dataFrom),
-    to(dataTo)
-    {
-    }
-
-    cedar::proc::TriggerPtr from;
-    cedar::proc::TriggerablePtr to;
-  };
 
   std::vector<DataConnectionInfo> data_connections;
   std::vector<TriggerConnectionInfo> trigger_connections;
