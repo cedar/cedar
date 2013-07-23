@@ -185,10 +185,7 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
       break;
     case 3:
     {
-      //!@todo This should work the same as in the other cases, i.e., passing the data & title to the constructor.
-      cedar::aux::gui::MatrixSlicePlot3D* p_plot = new cedar::aux::gui::MatrixSlicePlot3D();
-      this->mpCurrentPlotWidget = p_plot;
-      p_plot->plot(this->mData, title);
+      this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixSlicePlot3D(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
     }
@@ -211,7 +208,7 @@ const Qwt3D::ColorVector& cedar::aux::gui::MatrixPlot::getStandardColorVector()
   {
     Qwt3D::RGBA rgb;
     rgb.a = 1;
-    for(double i = 0; i < 256; i++)
+    for (double i = 0; i < 256; i++)
     {
       if(i < 32.0)
       {

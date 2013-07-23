@@ -115,7 +115,7 @@ void cedar::aux::gui::HistoryPlot1D::plot(cedar::aux::ConstDataPtr data, const s
 
   this->mpHistoryPlot->plot(this->mHistory, title + " (history)");
 
-  this->startTimer(100); //!@todo Make configurable/changeable
+  this->startTimer(100);
 }
 
 void cedar::aux::gui::HistoryPlot1D::timerEvent(QTimerEvent *)

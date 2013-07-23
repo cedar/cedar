@@ -117,7 +117,6 @@ cv::Mat cedar::aux::math::gaussMatrix
     kernel_parts.at(dim) = cv::Mat(static_cast<int>(matrixSizes.at(dim)), 1, CV_32F);
     CEDAR_DEBUG_ASSERT(sigmas.at(dim) > 0.0);
 
-    //!@todo may want to move this outside of (for dim) block, since all dims are cyclic
     if (cyclic) // is this a cyclic kernel? (only check once)
     {
       for (int row = 0; row < kernel_parts.at(dim).rows; ++row)

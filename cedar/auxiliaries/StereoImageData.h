@@ -50,8 +50,6 @@
  *
  * @todo More detailed description of the class.
  *
- * @remarks
- *
  */
 
 class cedar::aux::StereoImageData : public cedar::aux::Data

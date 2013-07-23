@@ -120,7 +120,7 @@ void cedar::aux::gui::HistoryPlot::plot(cedar::aux::ConstDataPtr data, const std
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
                 "Cannot cast to cedar::aux::MatData in cedar::aux::gui::HistoryPlot::plot.");
   }
-  //!@todo implement for matrices and more dimensions
+
   if (this->mpCurrentPlotWidget)
   {
     delete this->mpCurrentPlotWidget;

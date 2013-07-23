@@ -286,7 +286,6 @@ void cedar::aux::gl::ObjectVisualization::drawElement
 )
 {
   // bind the buffers
-  //!@todo Solve this for windows as well.
 #ifndef CEDAR_OS_WINDOWS
   glBindBuffer(GL_ARRAY_BUFFER, vertexVboId);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVboId);
@@ -333,7 +332,7 @@ void cedar::aux::gl::ObjectVisualization::setMaterial(int material)
   {
   case NO_MATERIAL:
     glMaterialfv(GL_FRONT, GL_SPECULAR, mNoSpecular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, mNoSpecular); //todo: this is probably an error
+    glMaterialfv(GL_FRONT, GL_SHININESS, mNoSpecular); // without material, there's no shininess
     glEnable(GL_COLOR_MATERIAL);
     break;
   case SEGMENT:

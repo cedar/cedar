@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,37 +22,42 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MultiPlotInterface.cpp
+    File:        namespace.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 03 27
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2013 07 15
 
-    Description:
+    Description: Namespace file for cedar::testing::dev.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_TESTING_DEV_NAMESPACE_H
+#define CEDAR_TESTING_DEV_NAMESPACE_H
+
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/MultiPlotInterface.h"
+#include "cedar/testingUtilities/namespace.h"
 
 // SYSTEM INCLUDES
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-
-cedar::aux::gui::MultiPlotInterface::MultiPlotInterface(QWidget *pParent)
-:
-cedar::aux::gui::PlotInterface(pParent)
+namespace cedar
 {
+  namespace test
+  {
+    /*!@brief Namespace that encapsulates functionality shared across dev unit/interactive tests.
+     *
+     *        This is an internal namespace of cedar. Functionality in here should not be used outside of unit tests!
+     */
+    namespace dev
+    {
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_TESTING_CLASS(TestGrabber);
+      CEDAR_DECLARE_TESTING_CLASS(TestChannel);
+      //!@endcond
+    }
+  }
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-void cedar::aux::gui::MultiPlotInterface::append(cedar::aux::ConstDataPtr data, const std::string& title)
-{
-  this->doAppend(data, title);
-}
+#endif // CEDAR_TESTING_DEV_NAMESPACE_H

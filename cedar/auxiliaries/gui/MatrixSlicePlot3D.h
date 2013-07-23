@@ -115,6 +115,9 @@ class cedar::aux::gui::MatrixSlicePlot3D : public cedar::aux::gui::PlotInterface
 public:
   //!@brief The constructor.
   MatrixSlicePlot3D(QWidget* pParent = NULL);
+
+  MatrixSlicePlot3D(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent = NULL);
+
   //!@brief Destructor
   ~MatrixSlicePlot3D();
   //--------------------------------------------------------------------------------------------------------------------
@@ -164,6 +167,9 @@ private:
   void resizePixmap();
 
   void updateData();
+
+  //! initialize the widget
+  void init();
 
 private slots:
   void conversionDone();

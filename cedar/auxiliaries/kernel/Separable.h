@@ -43,10 +43,7 @@
 
 // SYSTEM INCLUDES
 
-/*!@brief Meta class to derive separable kernels when implementing kernels.
- * @todo  The mKernel matrix should be automatically calculated here, rather than having to implement it in every
- *        derived class.
- */
+//!@brief Meta class to derive separable kernels when implementing kernels.
 class cedar::aux::kernel::Separable : public cedar::aux::kernel::Kernel
 {
   Q_OBJECT
@@ -105,9 +102,8 @@ private slots:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-protected:
+private:
   //!@brief the kernel parts for each dimension
-  //!@todo Make private?
   std::vector<cv::Mat> mKernelParts; //!< the separate parts of a separable kernel
 
 private:

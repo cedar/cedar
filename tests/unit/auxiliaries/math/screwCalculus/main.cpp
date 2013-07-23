@@ -45,7 +45,6 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
-
 int main()
 {
   // the number of errors encountered in this test
@@ -76,22 +75,22 @@ int main()
   cedar::aux::math::wedgeAxis(vec3_double, mat33_double);
   if (!
        (
-        cedar::aux::math::isZero<double>(mat33_double.at<double>(0, 0) - 0.0)
-        && cedar::aux::math::isZero<double>(mat33_double.at<double>(0, 1) - -7.0)
-        && cedar::aux::math::isZero<double>(mat33_double.at<double>(0, 2) - 5.0)
-        && cedar::aux::math::isZero<double>(mat33_double.at<double>(1, 0) - 7.0)
-        && cedar::aux::math::isZero<double>(mat33_double.at<double>(1, 1) - 0.0)
-        && cedar::aux::math::isZero<double>(mat33_double.at<double>(1, 2) - -3.0)
-        && cedar::aux::math::isZero<double>(mat33_double.at<double>(2, 0) - -5.0)
-        && cedar::aux::math::isZero<double>(mat33_double.at<double>(2, 1) - 3.0)
-        && cedar::aux::math::isZero<double>(mat33_double.at<double>(2, 2) - 0.0)
+        cedar::aux::math::isZero(mat33_double.at<double>(0, 0) - 0.0)
+        && cedar::aux::math::isZero(mat33_double.at<double>(0, 1) - -7.0)
+        && cedar::aux::math::isZero(mat33_double.at<double>(0, 2) - 5.0)
+        && cedar::aux::math::isZero(mat33_double.at<double>(1, 0) - 7.0)
+        && cedar::aux::math::isZero(mat33_double.at<double>(1, 1) - 0.0)
+        && cedar::aux::math::isZero(mat33_double.at<double>(1, 2) - -3.0)
+        && cedar::aux::math::isZero(mat33_double.at<double>(2, 0) - -5.0)
+        && cedar::aux::math::isZero(mat33_double.at<double>(2, 1) - 3.0)
+        && cedar::aux::math::isZero(mat33_double.at<double>(2, 2) - 0.0)
        )
      )
   {
     errors++;
     std::cout << "ERROR in function wedgeAxis[double](cv::Mat& axis, cv::Mat& result)" << std::endl;
   }
-  if (!cedar::aux::math::isZero<double>(cv::norm(mat33_double - cedar::aux::math::wedgeAxis(vec3_double))))
+  if (!cedar::aux::math::isZero(cv::norm(mat33_double - cedar::aux::math::wedgeAxis(vec3_double))))
   {
     errors++;
     std::cout << "ERROR in function wedgeAxis[double](cv::Mat& axis)" << std::endl;
@@ -119,7 +118,7 @@ int main()
     errors++;
     std::cout << "ERROR in function wedgeAxis[float](cv::Mat& vector, cv::Mat& result)" << std::endl;
   }
-  if (!cedar::aux::math::isZero<float>(cv::norm(mat33_float - cedar::aux::math::wedgeAxis(vec3_float)), 5))
+  if (!cedar::aux::math::isZero(cv::norm(mat33_float - cedar::aux::math::wedgeAxis(vec3_float)), 1e-5))
   {
     errors++;
     std::cout << "ERROR in function wedgeAxis[float](cv::Mat& vector)" << std::endl;
@@ -142,7 +141,7 @@ int main()
     errors++;
     std::cout << "ERROR in function veeAxis<double>(cv::Mat& vector, cv::Mat& result)" << std::endl;
   }
-  if (!cedar::aux::math::isZero<double>(cv::norm(vec3_double - cedar::aux::math::veeAxis(mat33_double))))
+  if (!cedar::aux::math::isZero(cv::norm(vec3_double - cedar::aux::math::veeAxis(mat33_double))))
   {
     errors++;
     std::cout << "ERROR in function veeAxis<double>(cv::Mat& matrix)" << std::endl;
@@ -162,7 +161,7 @@ int main()
     errors++;
     std::cout << "ERROR in function veeAxis<float>(cv::Mat& matrix, cv::Mat& result)" << std::endl;
   }
-  if (!cedar::aux::math::isZero<float>(cv::norm(vec3_float - cedar::aux::math::veeAxis(mat33_float)), 5))
+  if (!cedar::aux::math::isZero(cv::norm(vec3_float - cedar::aux::math::veeAxis(mat33_float)), 1e-5))
   {
     errors++;
     std::cout << "ERROR in function veeAxis<float>(cv::Mat& matrix)" << std::endl;
@@ -181,29 +180,29 @@ int main()
   cedar::aux::math::wedgeTwist(vec6_double, mat44_double);
   if (!
        (
-        cedar::aux::math::isZero<double>(mat44_double.at<double>(0, 0) - 0.0)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(0, 1) - -13.0)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(0, 2) - 11.0)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(0, 3) - 2.0)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(1, 0) - 13.0)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(1, 1) - 0.0)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(1, 2) - -7.0)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(1, 3) - 3.0)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(2, 0) - -11.0)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(2, 1) - 7.0)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(2, 2) - 0.0)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(2, 3) - 5.0)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(3, 0) - 0.0)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(3, 1) - 0.0)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(3, 2) - 0.0)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(3, 3) - 0.0)
+        cedar::aux::math::isZero(mat44_double.at<double>(0, 0) - 0.0)
+        && cedar::aux::math::isZero(mat44_double.at<double>(0, 1) - -13.0)
+        && cedar::aux::math::isZero(mat44_double.at<double>(0, 2) - 11.0)
+        && cedar::aux::math::isZero(mat44_double.at<double>(0, 3) - 2.0)
+        && cedar::aux::math::isZero(mat44_double.at<double>(1, 0) - 13.0)
+        && cedar::aux::math::isZero(mat44_double.at<double>(1, 1) - 0.0)
+        && cedar::aux::math::isZero(mat44_double.at<double>(1, 2) - -7.0)
+        && cedar::aux::math::isZero(mat44_double.at<double>(1, 3) - 3.0)
+        && cedar::aux::math::isZero(mat44_double.at<double>(2, 0) - -11.0)
+        && cedar::aux::math::isZero(mat44_double.at<double>(2, 1) - 7.0)
+        && cedar::aux::math::isZero(mat44_double.at<double>(2, 2) - 0.0)
+        && cedar::aux::math::isZero(mat44_double.at<double>(2, 3) - 5.0)
+        && cedar::aux::math::isZero(mat44_double.at<double>(3, 0) - 0.0)
+        && cedar::aux::math::isZero(mat44_double.at<double>(3, 1) - 0.0)
+        && cedar::aux::math::isZero(mat44_double.at<double>(3, 2) - 0.0)
+        && cedar::aux::math::isZero(mat44_double.at<double>(3, 3) - 0.0)
        )
      )
   {
     errors++;
     std::cout << "ERROR in function wedgeTwist<double>(cv::Mat& twist, cv::Mat& result)" << std::endl;
   }
-  if (!cedar::aux::math::isZero<double>(cv::norm(mat44_double - cedar::aux::math::wedgeTwist(vec6_double))))
+  if (!cedar::aux::math::isZero(cv::norm(mat44_double - cedar::aux::math::wedgeTwist(vec6_double))))
   {
     errors++;
     std::cout << "ERROR in function wedgeTwist<double>(cv::Mat& twist)" << std::endl;
@@ -219,29 +218,29 @@ int main()
   cedar::aux::math::wedgeTwist(vec6_float, mat44_float);
   if (!
        (
-        cedar::aux::math::isZero<float>(mat44_float.at<float>(0, 0) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(0, 1) - -13.0, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(0, 2) - 11.0, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(0, 3) - 2.0, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(1, 0) - 13.0, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(1, 1) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(1, 2) - -7.0, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(1, 3) - 3.0, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(2, 0) - -11.0, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(2, 1) - 7.0, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(2, 2) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(2, 3) - 5.0, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(3, 0) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(3, 1) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(3, 2) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(3, 3) - 0.0, 5)
+        cedar::aux::math::isZero(mat44_float.at<float>(0, 0) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(0, 1) - -13.0, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(0, 2) - 11.0, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(0, 3) - 2.0, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(1, 0) - 13.0, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(1, 1) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(1, 2) - -7.0, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(1, 3) - 3.0, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(2, 0) - -11.0, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(2, 1) - 7.0, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(2, 2) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(2, 3) - 5.0, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(3, 0) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(3, 1) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(3, 2) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(3, 3) - 0.0, 1e-5)
        )
      )
   {
     errors++;
     std::cout << "ERROR in function wedgeTwist<float>(cv::Mat& twist, cv::Mat& result)" << std::endl;
   }
-  if (!cedar::aux::math::isZero<float>(cv::norm(mat44_float - cedar::aux::math::wedgeTwist(vec6_float)), 5))
+  if (!cedar::aux::math::isZero(cv::norm(mat44_float - cedar::aux::math::wedgeTwist(vec6_float)), 1e-5))
   {
     errors++;
     std::cout << "ERROR in function wedgeTwist<float>(cv::Mat& twist)" << std::endl;
@@ -267,7 +266,7 @@ int main()
     errors++;
     std::cout << "ERROR in function veeTwist<double>(cv::Mat& vector, cv::Mat& result)" << std::endl;
   }
-  if (!cedar::aux::math::isZero<double>(cv::norm(vec6_double - cedar::aux::math::veeTwist(mat44_double))))
+  if (!cedar::aux::math::isZero(cv::norm(vec6_double - cedar::aux::math::veeTwist(mat44_double))))
   {
     errors++;
     std::cout << "ERROR in function veeTwist<double>(cv::Mat& matrix)" << std::endl;
@@ -290,7 +289,7 @@ int main()
     errors++;
     std::cout << "ERROR in function veeTwist<float>(cv::Mat& vector, cv::Mat& result)" << std::endl;
   }
-  if (!cedar::aux::math::isZero<float>(cv::norm(vec6_float - cedar::aux::math::veeTwist(mat44_float)), 5))
+  if (!cedar::aux::math::isZero(cv::norm(vec6_float - cedar::aux::math::veeTwist(mat44_float)), 1e-5))
   {
     errors++;
     std::cout << "ERROR in function veeTwist<float>(cv::Mat& matrix)" << std::endl;
@@ -307,22 +306,22 @@ int main()
   cedar::aux::math::expAxis(vec3_double, 1, mat33_double);
   if (!
        (
-        cedar::aux::math::isZero<double>(mat33_double.at<double>(0, 0) - 0.57313785544898699)
-        && cedar::aux::math::isZero<double>(mat33_double.at<double>(0, 1) - -0.60900664213739331)
-        && cedar::aux::math::isZero<double>(mat33_double.at<double>(0, 2) - 0.54829180960859991)
-        && cedar::aux::math::isZero<double>(mat33_double.at<double>(1, 0) - 0.74034884046078198)
-        && cedar::aux::math::isZero<double>(mat33_double.at<double>(1, 1) - 0.67164450419152844)
-        && cedar::aux::math::isZero<double>(mat33_double.at<double>(1, 2) - -0.027879282947946255)
-        && cedar::aux::math::isZero<double>(mat33_double.at<double>(2, 0) - -0.35127851212351696)
-        && cedar::aux::math::isZero<double>(mat33_double.at<double>(2, 1) - 0.42190587791811218)
-        && cedar::aux::math::isZero<double>(mat33_double.at<double>(2, 2) - 0.83582225209576411)
+        cedar::aux::math::isZero(mat33_double.at<double>(0, 0) - 0.57313785544898699)
+        && cedar::aux::math::isZero(mat33_double.at<double>(0, 1) - -0.60900664213739331)
+        && cedar::aux::math::isZero(mat33_double.at<double>(0, 2) - 0.54829180960859991)
+        && cedar::aux::math::isZero(mat33_double.at<double>(1, 0) - 0.74034884046078198)
+        && cedar::aux::math::isZero(mat33_double.at<double>(1, 1) - 0.67164450419152844)
+        && cedar::aux::math::isZero(mat33_double.at<double>(1, 2) - -0.027879282947946255)
+        && cedar::aux::math::isZero(mat33_double.at<double>(2, 0) - -0.35127851212351696)
+        && cedar::aux::math::isZero(mat33_double.at<double>(2, 1) - 0.42190587791811218)
+        && cedar::aux::math::isZero(mat33_double.at<double>(2, 2) - 0.83582225209576411)
        )
      )
   {
     errors++;
     std::cout << "ERROR in function expAxis<double>(const cv::Mat& matrix, double theta, cv::Mat& result)" << std::endl;
   }
-  if (!cedar::aux::math::isZero<double>(cv::norm(mat33_double - cedar::aux::math::expAxis(vec3_double, 1))))
+  if (!cedar::aux::math::isZero(cv::norm(mat33_double - cedar::aux::math::expAxis(vec3_double, 1))))
   {
     errors++;
     std::cout << "ERROR in function expAxis<double>(const cv::Mat& matrix, double theta)" << std::endl;
@@ -336,22 +335,22 @@ int main()
   cedar::aux::math::expAxis(vec3_float, 1, mat33_float);
   if (!
        (
-        cedar::aux::math::isZero<float>(mat33_float.at<float>(0, 0) - 0.57313785544898699, 5)
-        && cedar::aux::math::isZero<float>(mat33_float.at<float>(0, 1) - -0.60900664213739331, 5)
-        && cedar::aux::math::isZero<float>(mat33_float.at<float>(0, 2) - 0.54829180960859991, 5)
-        && cedar::aux::math::isZero<float>(mat33_float.at<float>(1, 0) - 0.74034884046078198, 5)
-        && cedar::aux::math::isZero<float>(mat33_float.at<float>(1, 1) - 0.67164450419152844, 5)
-        && cedar::aux::math::isZero<float>(mat33_float.at<float>(1, 2) - -0.027879282947946255, 5)
-        && cedar::aux::math::isZero<float>(mat33_float.at<float>(2, 0) - -0.35127851212351696, 5)
-        && cedar::aux::math::isZero<float>(mat33_float.at<float>(2, 1) - 0.42190587791811218, 5)
-        && cedar::aux::math::isZero<float>(mat33_float.at<float>(2, 2) - 0.83582225209576411, 5)
+        cedar::aux::math::isZero(mat33_float.at<float>(0, 0) - 0.57313785544898699, 1e-5)
+        && cedar::aux::math::isZero(mat33_float.at<float>(0, 1) - -0.60900664213739331, 1e-5)
+        && cedar::aux::math::isZero(mat33_float.at<float>(0, 2) - 0.54829180960859991, 1e-5)
+        && cedar::aux::math::isZero(mat33_float.at<float>(1, 0) - 0.74034884046078198, 1e-5)
+        && cedar::aux::math::isZero(mat33_float.at<float>(1, 1) - 0.67164450419152844, 1e-5)
+        && cedar::aux::math::isZero(mat33_float.at<float>(1, 2) - -0.027879282947946255, 1e-5)
+        && cedar::aux::math::isZero(mat33_float.at<float>(2, 0) - -0.35127851212351696, 1e-5)
+        && cedar::aux::math::isZero(mat33_float.at<float>(2, 1) - 0.42190587791811218, 1e-5)
+        && cedar::aux::math::isZero(mat33_float.at<float>(2, 2) - 0.83582225209576411, 1e-5)
        )
      )
   {
     errors++;
     std::cout << "ERROR in function expAxis<float>(const cv::Mat& matrix, float theta, cv::Mat& result)" << std::endl;
   }
-  if (!cedar::aux::math::isZero<float>(cv::norm(mat33_float - cedar::aux::math::expAxis(vec3_float, 1)), 5))
+  if (!cedar::aux::math::isZero(cv::norm(mat33_float - cedar::aux::math::expAxis(vec3_float, 1)), 1e-5))
   {
     errors++;
     std::cout << "ERROR in function expAxis<float>(const cv::Mat& matrix, double theta)" << std::endl;
@@ -365,9 +364,9 @@ int main()
   cedar::aux::math::logAxis(mat33_double, vec3_double, theta);
   if (!
        (
-        cedar::aux::math::isZero<double>(vec3_double.at<double>(0, 0) - 0.2672612419124244)
-        && cedar::aux::math::isZero<double>(vec3_double.at<double>(1, 0) - 0.53452248382484879)
-        && cedar::aux::math::isZero<double>(vec3_double.at<double>(2, 0) - 0.80178372573727308)
+        cedar::aux::math::isZero(vec3_double.at<double>(0, 0) - 0.2672612419124244)
+        && cedar::aux::math::isZero(vec3_double.at<double>(1, 0) - 0.53452248382484879)
+        && cedar::aux::math::isZero(vec3_double.at<double>(2, 0) - 0.80178372573727308)
        )
      )
   {
@@ -381,9 +380,9 @@ int main()
   cedar::aux::math::logAxis(mat33_float, vec3_float, theta);
   if (!
        (
-        cedar::aux::math::isZero<float>(vec3_float.at<float>(0, 0) - 0.2672612419124244, 5)
-        && cedar::aux::math::isZero<float>(vec3_float.at<float>(1, 0) - 0.53452248382484879, 5)
-        && cedar::aux::math::isZero<float>(vec3_float.at<float>(2, 0) - 0.80178372573727308, 5)
+        cedar::aux::math::isZero(vec3_float.at<float>(0, 0) - 0.2672612419124244, 1e-5)
+        && cedar::aux::math::isZero(vec3_float.at<float>(1, 0) - 0.53452248382484879, 1e-5)
+        && cedar::aux::math::isZero(vec3_float.at<float>(2, 0) - 0.80178372573727308, 1e-5)
        )
      ) 
   {
@@ -405,29 +404,29 @@ int main()
   cedar::aux::math::expTwist(vec6_double, cedar::aux::math::pi, mat44_double);
   if (!
        (
-        cedar::aux::math::isZero<double>(mat44_double.at<double>(0, 0) - -0.85714285714285676)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(0, 1) - 0.28571428571428564)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(0, 2) - 0.4285714285714286)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(0, 3) - 1.1428571428571423)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(1, 0) - 0.28571428571428586)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(1, 1) - -0.42857142857142816)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(1, 2) - 0.8571428571428571)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(1, 3) - 0.28571428571428537)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(2, 0) - 0.42857142857142849)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(2, 1) - 0.8571428571428571)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(2, 2) - 0.28571428571428559)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(2, 3) - -0.57142857142857117)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(3, 0) - 0.0)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(3, 1) - 0.0)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(3, 2) - 0.0)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(3, 3) - 1.0)
+        cedar::aux::math::isZero(mat44_double.at<double>(0, 0) - -0.85714285714285676)
+        && cedar::aux::math::isZero(mat44_double.at<double>(0, 1) - 0.28571428571428564)
+        && cedar::aux::math::isZero(mat44_double.at<double>(0, 2) - 0.4285714285714286)
+        && cedar::aux::math::isZero(mat44_double.at<double>(0, 3) - 1.1428571428571423)
+        && cedar::aux::math::isZero(mat44_double.at<double>(1, 0) - 0.28571428571428586)
+        && cedar::aux::math::isZero(mat44_double.at<double>(1, 1) - -0.42857142857142816)
+        && cedar::aux::math::isZero(mat44_double.at<double>(1, 2) - 0.8571428571428571)
+        && cedar::aux::math::isZero(mat44_double.at<double>(1, 3) - 0.28571428571428537)
+        && cedar::aux::math::isZero(mat44_double.at<double>(2, 0) - 0.42857142857142849)
+        && cedar::aux::math::isZero(mat44_double.at<double>(2, 1) - 0.8571428571428571)
+        && cedar::aux::math::isZero(mat44_double.at<double>(2, 2) - 0.28571428571428559)
+        && cedar::aux::math::isZero(mat44_double.at<double>(2, 3) - -0.57142857142857117)
+        && cedar::aux::math::isZero(mat44_double.at<double>(3, 0) - 0.0)
+        && cedar::aux::math::isZero(mat44_double.at<double>(3, 1) - 0.0)
+        && cedar::aux::math::isZero(mat44_double.at<double>(3, 2) - 0.0)
+        && cedar::aux::math::isZero(mat44_double.at<double>(3, 3) - 1.0)
        )
      )
   {
     errors++;
     std::cout << "ERROR in function expTwist<double>(const cv::Mat& xi, double theta, cv::Mat& result)" << std::endl;
   }
-  if (!cedar::aux::math::isZero<double>(cv::norm(mat44_double - cedar::aux::math::expTwist(vec6_double, cedar::aux::math::pi))))
+  if (!cedar::aux::math::isZero(cv::norm(mat44_double - cedar::aux::math::expTwist(vec6_double, cedar::aux::math::pi))))
   {
     errors++;
     std::cout << "ERROR in function expTwist<double>(const cv::Mat& xi, double theta, cv::Mat& result)" << std::endl;
@@ -443,29 +442,36 @@ int main()
   cedar::aux::math::expTwist(vec6_float, cedar::aux::math::pi, mat44_float);
   if (!
        (
-        cedar::aux::math::isZero<float>(mat44_float.at<float>(0, 0) - -0.85714285714285676, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(0, 1) - 0.28571428571428564, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(0, 2) - 0.4285714285714286, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(0, 3) - 1.1428571428571423, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(1, 0) - 0.28571428571428586, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(1, 1) - -0.42857142857142816, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(1, 2) - 0.8571428571428571, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(1, 3) - 0.28571428571428537, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(2, 0) - 0.42857142857142849, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(2, 1) - 0.8571428571428571, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(2, 2) - 0.28571428571428559, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(2, 3) - -0.57142857142857117, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(3, 0) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(3, 1) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(3, 2) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(3, 3) - 1.0, 5)
+        cedar::aux::math::isZero(mat44_float.at<float>(0, 0) - -0.85714285714285676, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(0, 1) - 0.28571428571428564, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(0, 2) - 0.4285714285714286, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(0, 3) - 1.1428571428571423, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(1, 0) - 0.28571428571428586, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(1, 1) - -0.42857142857142816, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(1, 2) - 0.8571428571428571, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(1, 3) - 0.28571428571428537, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(2, 0) - 0.42857142857142849, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(2, 1) - 0.8571428571428571, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(2, 2) - 0.28571428571428559, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(2, 3) - -0.57142857142857117, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(3, 0) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(3, 1) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(3, 2) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(3, 3) - 1.0, 1e-5)
        )
      )
   {
     errors++;
     std::cout << "ERROR in function expTwist<float>(const cv::Mat& xi, float theta, cv::Mat& result)" << std::endl;
   }
-  if (!cedar::aux::math::isZero<float>(cv::norm(mat44_float - cedar::aux::math::expTwist(vec6_float, cedar::aux::math::pi)), 5))
+  if
+  (
+    !cedar::aux::math::isZero
+     (
+       cv::norm(mat44_float - cedar::aux::math::expTwist(vec6_float, cedar::aux::math::pi)),
+       1e-5
+     )
+  )
   {
     errors++;
     std::cout << "ERROR in function expTwist<float>(const cv::Mat& xi, float theta, cv::Mat& result)" << std::endl;
@@ -479,9 +485,9 @@ int main()
   cedar::aux::math::logTwist(mat44_double, vec6_double, theta);
   if (!
        (
-        cedar::aux::math::isZero<double>(vec3_double.at<double>(0, 0) - 0.2672612419124244)
-        && cedar::aux::math::isZero<double>(vec3_double.at<double>(1, 0) - 0.53452248382484879)
-        && cedar::aux::math::isZero<double>(vec3_double.at<double>(2, 0) - 0.80178372573727308)
+        cedar::aux::math::isZero(vec3_double.at<double>(0, 0) - 0.2672612419124244)
+        && cedar::aux::math::isZero(vec3_double.at<double>(1, 0) - 0.53452248382484879)
+        && cedar::aux::math::isZero(vec3_double.at<double>(2, 0) - 0.80178372573727308)
        )
      )
   {
@@ -495,9 +501,9 @@ int main()
   cedar::aux::math::logTwist(mat44_float, vec6_float, theta);
   if (!
        (
-        cedar::aux::math::isZero<float>(vec3_float.at<float>(0, 0) - 0.2672612419124244, 5)
-        && cedar::aux::math::isZero<float>(vec3_float.at<float>(1, 0) - 0.53452248382484879, 5)
-        && cedar::aux::math::isZero<float>(vec3_float.at<float>(2, 0) - 0.80178372573727308, 5)
+        cedar::aux::math::isZero(vec3_float.at<float>(0, 0) - 0.2672612419124244, 1e-5)
+        && cedar::aux::math::isZero(vec3_float.at<float>(1, 0) - 0.53452248382484879, 1e-5)
+        && cedar::aux::math::isZero(vec3_float.at<float>(2, 0) - 0.80178372573727308, 1e-5)
        )
      )
   {
@@ -513,45 +519,45 @@ int main()
   cedar::aux::math::rigidToAdjointTransformation(mat44_double, mat66_double);
   if (!
        (
-        cedar::aux::math::isZero<double>(mat66_double.at<double>(0, 0) - -0.85714285714285676)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(0, 1) - 0.28571428571428564)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(0, 2) - 0.4285714285714286)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(1, 0) - 0.28571428571428586)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(1, 1) - -0.42857142857142816)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(1, 2) - 0.8571428571428571)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(2, 0) - 0.42857142857142849)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(2, 1) - 0.8571428571428571)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(2, 2) - 0.28571428571428559)
+        cedar::aux::math::isZero(mat66_double.at<double>(0, 0) - -0.85714285714285676)
+        && cedar::aux::math::isZero(mat66_double.at<double>(0, 1) - 0.28571428571428564)
+        && cedar::aux::math::isZero(mat66_double.at<double>(0, 2) - 0.4285714285714286)
+        && cedar::aux::math::isZero(mat66_double.at<double>(1, 0) - 0.28571428571428586)
+        && cedar::aux::math::isZero(mat66_double.at<double>(1, 1) - -0.42857142857142816)
+        && cedar::aux::math::isZero(mat66_double.at<double>(1, 2) - 0.8571428571428571)
+        && cedar::aux::math::isZero(mat66_double.at<double>(2, 0) - 0.42857142857142849)
+        && cedar::aux::math::isZero(mat66_double.at<double>(2, 1) - 0.8571428571428571)
+        && cedar::aux::math::isZero(mat66_double.at<double>(2, 2) - 0.28571428571428559)
 
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(3, 0) - 0.0)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(3, 1) - 0.0)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(3, 2) - 0.0)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(4, 0) - 0.0)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(4, 1) - 0.0)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(4, 2) - 0.0)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(5, 0) - 0.0)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(5, 1) - 0.0)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(5, 2) - 0.0)
+        && cedar::aux::math::isZero(mat66_double.at<double>(3, 0) - 0.0)
+        && cedar::aux::math::isZero(mat66_double.at<double>(3, 1) - 0.0)
+        && cedar::aux::math::isZero(mat66_double.at<double>(3, 2) - 0.0)
+        && cedar::aux::math::isZero(mat66_double.at<double>(4, 0) - 0.0)
+        && cedar::aux::math::isZero(mat66_double.at<double>(4, 1) - 0.0)
+        && cedar::aux::math::isZero(mat66_double.at<double>(4, 2) - 0.0)
+        && cedar::aux::math::isZero(mat66_double.at<double>(5, 0) - 0.0)
+        && cedar::aux::math::isZero(mat66_double.at<double>(5, 1) - 0.0)
+        && cedar::aux::math::isZero(mat66_double.at<double>(5, 2) - 0.0)
 
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(0, 3) - 0.28571428571428559)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(0, 4) - 0.0)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(0, 5) - 0.57142857142857106)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(1, 3) - 0.0)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(1, 4) - -1.1428571428571423)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(1, 5) - -0.57142857142857106)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(2, 3) - 0.57142857142857106)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(2, 4) - -0.57142857142857062)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(2, 5) - 0.85714285714285676)
+        && cedar::aux::math::isZero(mat66_double.at<double>(0, 3) - 0.28571428571428559)
+        && cedar::aux::math::isZero(mat66_double.at<double>(0, 4) - 0.0)
+        && cedar::aux::math::isZero(mat66_double.at<double>(0, 5) - 0.57142857142857106)
+        && cedar::aux::math::isZero(mat66_double.at<double>(1, 3) - 0.0)
+        && cedar::aux::math::isZero(mat66_double.at<double>(1, 4) - -1.1428571428571423)
+        && cedar::aux::math::isZero(mat66_double.at<double>(1, 5) - -0.57142857142857106)
+        && cedar::aux::math::isZero(mat66_double.at<double>(2, 3) - 0.57142857142857106)
+        && cedar::aux::math::isZero(mat66_double.at<double>(2, 4) - -0.57142857142857062)
+        && cedar::aux::math::isZero(mat66_double.at<double>(2, 5) - 0.85714285714285676)
 
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(3, 3) - -0.85714285714285676)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(3, 4) - 0.28571428571428564)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(3, 5) - 0.4285714285714286)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(4, 3) - 0.28571428571428586)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(4, 4) - -0.42857142857142816)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(4, 5) - 0.8571428571428571)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(5, 3) - 0.42857142857142849)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(5, 4) - 0.8571428571428571)
-        && cedar::aux::math::isZero<double>(mat66_double.at<double>(5, 5) - 0.28571428571428559)
+        && cedar::aux::math::isZero(mat66_double.at<double>(3, 3) - -0.85714285714285676)
+        && cedar::aux::math::isZero(mat66_double.at<double>(3, 4) - 0.28571428571428564)
+        && cedar::aux::math::isZero(mat66_double.at<double>(3, 5) - 0.4285714285714286)
+        && cedar::aux::math::isZero(mat66_double.at<double>(4, 3) - 0.28571428571428586)
+        && cedar::aux::math::isZero(mat66_double.at<double>(4, 4) - -0.42857142857142816)
+        && cedar::aux::math::isZero(mat66_double.at<double>(4, 5) - 0.8571428571428571)
+        && cedar::aux::math::isZero(mat66_double.at<double>(5, 3) - 0.42857142857142849)
+        && cedar::aux::math::isZero(mat66_double.at<double>(5, 4) - 0.8571428571428571)
+        && cedar::aux::math::isZero(mat66_double.at<double>(5, 5) - 0.28571428571428559)
        )
      )
   {
@@ -559,7 +565,7 @@ int main()
     std::cout << "ERROR in function rigidToAdjointTransformation<double>(const cv::Mat& rigidTransformation, "
               << "cv::Mat& adjointTransformation)" << std::endl;
   }
-  if (!cedar::aux::math::isZero<double>(cv::norm(mat66_double - cedar::aux::math::rigidToAdjointTransformation(mat44_double))))
+  if (!cedar::aux::math::isZero(cv::norm(mat66_double - cedar::aux::math::rigidToAdjointTransformation(mat44_double))))
   {
     errors++;
     std::cout << "ERROR in function rigidToAdjointTransformation<double>(const cv::Mat& rigidTransformation)" << std::endl;
@@ -569,45 +575,45 @@ int main()
   cedar::aux::math::rigidToAdjointTransformation(mat44_float, mat66_float);
   if (!
        (
-        cedar::aux::math::isZero<float>(mat66_float.at<float>(0, 0) - -0.85714285714285676, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(0, 1) - 0.28571428571428564, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(0, 2) - 0.4285714285714286, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(1, 0) - 0.28571428571428586, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(1, 1) - -0.42857142857142816, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(1, 2) - 0.8571428571428571, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(2, 0) - 0.42857142857142849, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(2, 1) - 0.8571428571428571, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(2, 2) - 0.28571428571428559, 5)
+        cedar::aux::math::isZero(mat66_float.at<float>(0, 0) - -0.85714285714285676, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(0, 1) - 0.28571428571428564, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(0, 2) - 0.4285714285714286, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(1, 0) - 0.28571428571428586, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(1, 1) - -0.42857142857142816, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(1, 2) - 0.8571428571428571, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(2, 0) - 0.42857142857142849, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(2, 1) - 0.8571428571428571, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(2, 2) - 0.28571428571428559, 1e-5)
 
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(3, 0) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(3, 1) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(3, 2) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(4, 0) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(4, 1) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(4, 2) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(5, 0) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(5, 1) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(5, 2) - 0.0, 5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(3, 0) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(3, 1) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(3, 2) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(4, 0) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(4, 1) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(4, 2) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(5, 0) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(5, 1) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(5, 2) - 0.0, 1e-5)
 
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(0, 3) - 0.28571428571428559, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(0, 4) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(0, 5) - 0.57142857142857106, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(1, 3) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(1, 4) - -1.1428571428571423, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(1, 5) - -0.57142857142857106, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(2, 3) - 0.57142857142857106, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(2, 4) - -0.57142857142857062, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(2, 5) - 0.85714285714285676, 5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(0, 3) - 0.28571428571428559, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(0, 4) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(0, 5) - 0.57142857142857106, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(1, 3) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(1, 4) - -1.1428571428571423, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(1, 5) - -0.57142857142857106, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(2, 3) - 0.57142857142857106, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(2, 4) - -0.57142857142857062, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(2, 5) - 0.85714285714285676, 1e-5)
 
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(3, 3) - -0.85714285714285676, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(3, 4) - 0.28571428571428564, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(3, 5) - 0.4285714285714286, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(4, 3) - 0.28571428571428586, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(4, 4) - -0.42857142857142816, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(4, 5) - 0.8571428571428571, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(5, 3) - 0.42857142857142849, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(5, 4) - 0.8571428571428571, 5)
-        && cedar::aux::math::isZero<float>(mat66_float.at<float>(5, 5) - 0.28571428571428559, 5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(3, 3) - -0.85714285714285676, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(3, 4) - 0.28571428571428564, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(3, 5) - 0.4285714285714286, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(4, 3) - 0.28571428571428586, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(4, 4) - -0.42857142857142816, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(4, 5) - 0.8571428571428571, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(5, 3) - 0.42857142857142849, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(5, 4) - 0.8571428571428571, 1e-5)
+        && cedar::aux::math::isZero(mat66_float.at<float>(5, 5) - 0.28571428571428559, 1e-5)
        )
      )
   {
@@ -615,7 +621,10 @@ int main()
     std::cout << "ERROR in function rigidToAdjointTransformation<float>(const cv::Mat& rigidTransformation, "
               << "cv::Mat& adjointTransformation)" << std::endl;
   }
-  if (!cedar::aux::math::isZero<float>(cv::norm(mat66_float - cedar::aux::math::rigidToAdjointTransformation(mat44_float)), 5))
+  if
+  (
+    !cedar::aux::math::isZero(cv::norm(mat66_float - cedar::aux::math::rigidToAdjointTransformation(mat44_float)), 1e-5)
+  )
   {
     errors++;
     std::cout << "ERROR in function rigidToAdjointTransformation<float>(const cv::Mat& rigidTransformation)" << std::endl;
@@ -628,22 +637,22 @@ int main()
   cedar::aux::math::adjointToRigidTransformation(mat66_double, mat44_double);
   if (!
        (
-        cedar::aux::math::isZero<double>(mat44_double.at<double>(0, 0) - -0.85714285714285676)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(0, 1) - 0.28571428571428564)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(0, 2) - 0.4285714285714286)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(0, 3) - 1.1428571428571423)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(1, 0) - 0.28571428571428586)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(1, 1) - -0.42857142857142816)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(1, 2) - 0.8571428571428571)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(1, 3) - 0.28571428571428537)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(2, 0) - 0.42857142857142849)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(2, 1) - 0.8571428571428571)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(2, 2) - 0.28571428571428559)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(2, 3) - -0.57142857142857117)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(3, 0) - 0.0)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(3, 1) - 0.0)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(3, 2) - 0.0)
-        && cedar::aux::math::isZero<double>(mat44_double.at<double>(3, 3) - 1.0)
+        cedar::aux::math::isZero(mat44_double.at<double>(0, 0) - -0.85714285714285676)
+        && cedar::aux::math::isZero(mat44_double.at<double>(0, 1) - 0.28571428571428564)
+        && cedar::aux::math::isZero(mat44_double.at<double>(0, 2) - 0.4285714285714286)
+        && cedar::aux::math::isZero(mat44_double.at<double>(0, 3) - 1.1428571428571423)
+        && cedar::aux::math::isZero(mat44_double.at<double>(1, 0) - 0.28571428571428586)
+        && cedar::aux::math::isZero(mat44_double.at<double>(1, 1) - -0.42857142857142816)
+        && cedar::aux::math::isZero(mat44_double.at<double>(1, 2) - 0.8571428571428571)
+        && cedar::aux::math::isZero(mat44_double.at<double>(1, 3) - 0.28571428571428537)
+        && cedar::aux::math::isZero(mat44_double.at<double>(2, 0) - 0.42857142857142849)
+        && cedar::aux::math::isZero(mat44_double.at<double>(2, 1) - 0.8571428571428571)
+        && cedar::aux::math::isZero(mat44_double.at<double>(2, 2) - 0.28571428571428559)
+        && cedar::aux::math::isZero(mat44_double.at<double>(2, 3) - -0.57142857142857117)
+        && cedar::aux::math::isZero(mat44_double.at<double>(3, 0) - 0.0)
+        && cedar::aux::math::isZero(mat44_double.at<double>(3, 1) - 0.0)
+        && cedar::aux::math::isZero(mat44_double.at<double>(3, 2) - 0.0)
+        && cedar::aux::math::isZero(mat44_double.at<double>(3, 3) - 1.0)
        )
      )
   {
@@ -651,7 +660,7 @@ int main()
     std::cout << "ERROR in function adjointToRigidTransformation<double>(const cv::Mat& adjointTransformation, "
              << "cv::Mat& rigidTransformation)" << std::endl;
   }
-  if (!cedar::aux::math::isZero<double>(cv::norm(mat44_double - cedar::aux::math::adjointToRigidTransformation(mat66_double))))
+  if (!cedar::aux::math::isZero(cv::norm(mat44_double - cedar::aux::math::adjointToRigidTransformation(mat66_double))))
   {
     errors++;
     std::cout << "ERROR in function adjointToRigidTransformation<double>(const cv::Mat& adjointTransformation)" << std::endl;
@@ -661,22 +670,22 @@ int main()
   cedar::aux::math::adjointToRigidTransformation(mat66_float, mat44_float);
   if (!
        (
-        cedar::aux::math::isZero<float>(mat44_float.at<float>(0, 0) - -0.85714285714285676, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(0, 1) - 0.28571428571428564, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(0, 2) - 0.4285714285714286, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(0, 3) - 1.1428571428571423, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(1, 0) - 0.28571428571428586, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(1, 1) - -0.42857142857142816, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(1, 2) - 0.8571428571428571, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(1, 3) - 0.28571428571428537, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(2, 0) - 0.42857142857142849, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(2, 1) - 0.8571428571428571, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(2, 2) - 0.28571428571428559, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(2, 3) - -0.57142857142857117, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(3, 0) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(3, 1) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(3, 2) - 0.0, 5)
-        && cedar::aux::math::isZero<float>(mat44_float.at<float>(3, 3) - 1.0, 5)
+        cedar::aux::math::isZero(mat44_float.at<float>(0, 0) - -0.85714285714285676, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(0, 1) - 0.28571428571428564, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(0, 2) - 0.4285714285714286, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(0, 3) - 1.1428571428571423, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(1, 0) - 0.28571428571428586, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(1, 1) - -0.42857142857142816, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(1, 2) - 0.8571428571428571, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(1, 3) - 0.28571428571428537, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(2, 0) - 0.42857142857142849, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(2, 1) - 0.8571428571428571, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(2, 2) - 0.28571428571428559, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(2, 3) - -0.57142857142857117, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(3, 0) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(3, 1) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(3, 2) - 0.0, 1e-5)
+        && cedar::aux::math::isZero(mat44_float.at<float>(3, 3) - 1.0, 1e-5)
        )
      )
   {
@@ -684,10 +693,14 @@ int main()
     std::cout << "ERROR in function adjointToRigidTransformation<float>(const cv::Mat& adjointTransformation, "
               << "cv::Mat& rigidTransformation)" << std::endl;
   }
-  if (!cedar::aux::math::isZero<double>(cv::norm(mat44_float - cedar::aux::math::adjointToRigidTransformation(mat66_float))))
+  if
+  (
+    !cedar::aux::math::isZero(cv::norm(mat44_float - cedar::aux::math::adjointToRigidTransformation(mat66_float)), 1e-5)
+  )
   {
     errors++;
-    std::cout << "ERROR in function adjointToRigidTransformation<float>(const cv::Mat& adjointTransformation)" << std::endl;
+    std::cout << "ERROR in function adjointToRigidTransformation<float>(const cv::Mat& adjointTransformation)"
+      << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -703,13 +716,13 @@ int main()
   cedar::aux::math::expTwist(vec6_double, 1, mat44_double);
   cedar::aux::math::rigidToAdjointTransformation(mat44_double, mat66_double);
   cedar::aux::math::invertAdjointTransformation(mat66_double, inverse66_double);
-  if (!cedar::aux::math::isZero<double>(cv::norm(inverse66_double - mat66_double.inv())))
+  if (!cedar::aux::math::isZero(cv::norm(inverse66_double - mat66_double.inv())))
   {
     errors++;
     std::cout << "ERROR in function invertAdjointTransformation<double>(const cv::Mat& adjointTransformation, "
              << "cv::Mat& inverse)" << std::endl;
   }
-  if (!cedar::aux::math::isZero<double>(cv::norm(cedar::aux::math::invertAdjointTransformation(mat66_double) - mat66_double.inv())))
+  if (!cedar::aux::math::isZero(cv::norm(cedar::aux::math::invertAdjointTransformation(mat66_double) - mat66_double.inv())))
   {
     errors++;
     std::cout << "ERROR in function invertAdjointTransformation<double>(const cv::Mat& adjointTransformation)" << std::endl;
@@ -725,16 +738,24 @@ int main()
   cedar::aux::math::expTwist(vec6_float, 1, mat44_float);
   cedar::aux::math::rigidToAdjointTransformation(mat44_float, mat66_float);
   cedar::aux::math::invertAdjointTransformation(mat66_float, inverse66_float);
-  if (!cedar::aux::math::isZero<float>(cv::norm(inverse66_float - mat66_float.inv()), 5))
+  if (!cedar::aux::math::isZero(cv::norm(inverse66_float - mat66_float.inv()), 1e-5))
   {
     errors++;
     std::cout << "ERROR in function invertAdjointTransformation<float>(const cv::Mat& adjointTransformation, "
               << "cv::Mat& inverse)" << std::endl;
   }
-  if (!cedar::aux::math::isZero<float>(cv::norm(cedar::aux::math::invertAdjointTransformation(mat66_float) - mat66_float.inv()), 5))
+  if
+  (
+    !cedar::aux::math::isZero
+     (
+       cv::norm(cedar::aux::math::invertAdjointTransformation(mat66_float) - mat66_float.inv()),
+       1e-5
+     )
+  )
   {
     errors++;
-    std::cout << "ERROR in function invertAdjointTransformation<float>(const cv::Mat& adjointTransformation)" << std::endl;
+    std::cout << "ERROR in function invertAdjointTransformation<float>(const cv::Mat& adjointTransformation)"
+      << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------

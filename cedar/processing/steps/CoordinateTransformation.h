@@ -193,9 +193,7 @@ private:
 /*!@brief Performs a coordinate transformation on an input matrix.
  *
  * @remarks This step is still under development.
- * @todo Develop this step.
  *
- * @todo Remove the second magnitude parameter
  * @todo Make the magnitude parameter const when it does not apply (i.e., for Cart <-> Polar)
  */
 class cedar::proc::steps::CoordinateTransformation : public cedar::proc::Step

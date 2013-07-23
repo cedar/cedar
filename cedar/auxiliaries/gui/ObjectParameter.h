@@ -49,10 +49,7 @@
 #include <boost/signals2.hpp>
 
 
-/*!@brief User interface representation of cedar::aux::ObjectListParameter.
- *
- * @todo React to a changed value in the parameter
- */
+//!@brief User interface representation of cedar::aux::ObjectListParameter.
 class cedar::aux::gui::ObjectParameter : public cedar::aux::gui::Parameter
 {
   Q_OBJECT
@@ -91,7 +88,6 @@ private:
 
   inline cedar::aux::ObjectParameterPtr getObjectParameter()
   {
-    //!@todo make this an asserted cast, because it should never fail.
     return cedar::aux::asserted_pointer_cast<cedar::aux::ObjectParameter>(this->getParameter());
   }
 

@@ -57,8 +57,8 @@ int main()
   std::vector<double> solutions_quadric = cedar::aux::math::solveQuadric(quadric_coefficients);
   if (
         (solutions_quadric.size() == 2)
-        && (cedar::aux::math::isZero<double>(solutions_quadric[0] - 2.0))
-        && (cedar::aux::math::isZero<double>(solutions_quadric[1] + 1.0))
+        && (cedar::aux::math::isZero(solutions_quadric[0] - 2.0))
+        && (cedar::aux::math::isZero(solutions_quadric[1] + 1.0))
     )
   {
     std::cout << "working correctly: solveQuadric" << std::endl;
@@ -79,9 +79,9 @@ int main()
   std::vector<double> solutions_cubic = cedar::aux::math::solveCubic(cubic_coefficients);
   if (
        (solutions_cubic.size() == 3)
-       && (cedar::aux::math::isZero<double>(solutions_cubic[0] - 4.0))
-       && (cedar::aux::math::isZero<double>(solutions_cubic[1] - 2.0))
-       && (cedar::aux::math::isZero<double>(solutions_cubic[2] + 1.0))
+       && (cedar::aux::math::isZero(solutions_cubic[0] - 4.0))
+       && (cedar::aux::math::isZero(solutions_cubic[1] - 2.0))
+       && (cedar::aux::math::isZero(solutions_cubic[2] + 1.0))
     )
   {
     std::cout << "working correctly: solveCubic" << std::endl;
@@ -103,9 +103,9 @@ int main()
   std::vector<double> solutions_quartic = cedar::aux::math::solveQuartic(quartic_coefficients);
   if (
        (solutions_quartic.size() == 3)
-       && (cedar::aux::math::isZero<double>(solutions_quartic[0] - 1.0))
-       && (cedar::aux::math::isZero<double>(solutions_quartic[1] + 1.0))
-       && (cedar::aux::math::isZero<double>(solutions_quartic[2] + 0.5))
+       && (cedar::aux::math::isZero(solutions_quartic[0] - 1.0))
+       && (cedar::aux::math::isZero(solutions_quartic[1] + 1.0))
+       && (cedar::aux::math::isZero(solutions_quartic[2] + 0.5))
      )
   {
     std::cout << "working correctly: solveQuartic" << std::endl;

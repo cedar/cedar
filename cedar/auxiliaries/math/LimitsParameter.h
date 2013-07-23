@@ -162,7 +162,6 @@ public:
   //!@brief sets the upper limit and emits a signal
   void setUpperLimit(const T& value)
   {
-    // todo: check whether the new upper limit is inside the provided extrema
     this->mLimits.setUpper(value);
     this->emitPropertyChangedSignal();
   }

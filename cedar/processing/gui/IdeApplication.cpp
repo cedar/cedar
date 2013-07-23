@@ -110,7 +110,6 @@ cedar::proc::gui::IdeApplication::~IdeApplication()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-//!@todo Generalize signal handling; allow the user to set a callback that receives a stacktrace on crash
 void cedar::proc::gui::IdeApplication::signalHandler(int signal_id)
 {
   std::string signal_name;

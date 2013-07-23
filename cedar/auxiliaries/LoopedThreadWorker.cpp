@@ -58,8 +58,6 @@ cedar::aux::detail::LoopedThreadWorker::~LoopedThreadWorker()
 
 void cedar::aux::detail::LoopedThreadWorker::work()
 {
-  // TODO: check whether wrapper (mpWrapper) still exists (paranoid)
-
   if (safeStopRequested())
     return; // stop() was called right after start() 
 
@@ -104,9 +102,9 @@ void cedar::aux::detail::LoopedThreadWorker::work()
     }
     case cedar::aux::LoopMode::Fixed:
     {
+      // this might happen because the widget cuts off non-displayable decimals
       if (step_size.total_milliseconds() == 0)
       {
-        //!@todo We may want to just prevent setting this value
         cedar::aux::LogSingleton::getInstance()->warning
         (
           "Step size is zero in cedar::aux::LoopMode::Fixed, defaulting to one millisecond.",
@@ -121,7 +119,7 @@ void cedar::aux::detail::LoopedThreadWorker::work()
       setLastTimeStepEnd( getLastTimeStepStart() );
       scheduled_wakeup = getLastTimeStepEnd() + step_size;
 
-      //!@todo Should this really be here?
+      // this makes sure that every thread has a different random seed
       srand(boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds());
 
       // some auxiliary variables
@@ -208,7 +206,7 @@ void cedar::aux::detail::LoopedThreadWorker::work()
         // call step function
         mpWrapper->step(steps_taken * step_size.total_microseconds() * 0.001);
 
-        if (safeStopRequested()) // a lot can happen in a step() // TODO: locking
+        if (safeStopRequested()) // a lot can happen in a step() //!@todo locking
           break;
 
         // schedule the next wake up

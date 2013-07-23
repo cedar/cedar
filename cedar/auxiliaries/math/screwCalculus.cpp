@@ -242,7 +242,7 @@ void cedar::aux::math::logAxis(const cv::Mat& rRotation, cv::Mat& rOmega, double
   rOmega.at<T>(2, 0) = 1 / (2 * sin_theta) * (rRotation.at<T>(1, 0) - rRotation.at<T>(0, 1));
   rOmega = rOmega * (1 / cv::norm(rOmega));
 
-  if (cedar::aux::math::isZero<double>(rTheta - cedar::aux::math::pi))
+  if (cedar::aux::math::isZero(rTheta - cedar::aux::math::pi))
   {
     // easy way of calculating axis fails for numerical reasons, choose different formula, depending on signs
     if ((rRotation.at<T>(1, 0) > 0) && (rRotation.at<T>(2, 0) > 0) && (rRotation.at<T>(2, 1) > 0))

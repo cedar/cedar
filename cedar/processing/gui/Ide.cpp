@@ -438,7 +438,7 @@ void cedar::proc::gui::Ide::toggleGrid(bool triggered)
 void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
 {
   this->storeSettings();
-  //!@todo Without this, the gui_ProcessingIde crashes when exiting in certain circumstances (see unit test gui_ProcessingIde)
+  // Without this, the gui_ProcessingIde crashes when exiting in certain circumstances (see unit test gui_ProcessingIde)
   this->mpPropertyTable->resetContents();
   pEvent->accept();
 }
@@ -665,22 +665,6 @@ void cedar::proc::gui::Ide::notify(const QString& message)
   QMessageBox::critical(this,"Notification", message);
 }
 
-//!@todo Are these methods still necessary?
-void cedar::proc::gui::Ide::error(const QString& message)
-{
-  this->logError("Error: " + message.toStdString());
-}
-
-void cedar::proc::gui::Ide::message(const QString& message)
-{
-  cedar::aux::LogSingleton::getInstance()->message(message.toStdString(), "cedar::proc::gui::Ide::message");
-}
-
-void cedar::proc::gui::Ide::logError(const std::string& message)
-{
-  cedar::aux::LogSingleton::getInstance()->error(message, "cedar::proc::gui::Ide::logError");
-}
-
 void cedar::proc::gui::Ide::startThreads()
 {
   this->mNetwork->getNetwork()->startTriggers();
@@ -690,7 +674,7 @@ void cedar::proc::gui::Ide::stepThreads()
 {
   if (this->mpCustomTimeStep->isEnabled())
   {
-    this->mNetwork->getNetwork()->stepTriggers(this->mpCustomTimeStep->value());
+    this->mNetwork->getNetwork()->stepTriggers(cedar::unit::Milliseconds(this->mpCustomTimeStep->value()));
   }
   else
   {
@@ -740,7 +724,6 @@ void cedar::proc::gui::Ide::saveAs()
     }
 
     this->mNetwork->write(file.toStdString());
-    //!@todo It would probably be better if the network sends a signal whenever its filename changes and the gui just reacted to that.
     this->displayFilename(file.toStdString());
 
     cedar::proc::gui::SettingsSingleton::getInstance()->appendArchitectureFileToHistory(file.toStdString());
@@ -856,7 +839,6 @@ void cedar::proc::gui::Ide::loadFile(QString file)
 
 void cedar::proc::gui::Ide::keyPressEvent(QKeyEvent* pEvent)
 {
-  //!@todo Move this to the graphics scene (or another more appropriate place)
   switch (pEvent->key())
   {
     case Qt::Key_Delete:
