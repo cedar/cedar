@@ -101,7 +101,6 @@ private:
 
 private slots:
   /*!@brief Reacts to a change of the parameter pointer.
-   * @todo Is it really necessary to make this a signal/slot thing?
    *
    * @remarks This method is implemented here because it is overridden in derived classes which cannot have slots
    *          because they are templated (which is not supported by Qt).

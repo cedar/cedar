@@ -103,6 +103,7 @@ class cedar::aux::detail::LoopedThreadWorker : public cedar::aux::detail::Thread
 
     //! return the current counter of steps
     unsigned long getNumberOfSteps();
+
     //@todo: needs documentation. I don't get it. js
     double getMaxStepsTaken();
 

@@ -59,8 +59,6 @@
  *
  * @remarks The iterator stores a reference to the matrix, which means that the iterator must be in the same scope as
  *          the matrix itself. Otherwise, hilarity ensues!
- *
- * @todo Write a unit test for this class.
  */
 class cedar::aux::MatrixIterator
 {

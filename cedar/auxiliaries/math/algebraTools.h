@@ -34,8 +34,6 @@
                  Author: Jochen Schwarze (schwarze@isa.de)
 
 ======================================================================================================================*/
-//!\todo why not rewrite these functions as templates?
-//!\todo implement solvePolynomial
 
 #ifndef CEDAR_AUX_MATH_ALGEBRA_TOOLS_H
 #define CEDAR_AUX_MATH_ALGEBRA_TOOLS_H
@@ -74,16 +72,15 @@ namespace cedar
        */
       CEDAR_AUX_LIB_EXPORT std::vector<double> solveQuartic(const std::vector<double>& rCoefficients);
 
-      /*! returns the zeroes of a quadratic polynomial (degree n<=4)
+      /* returns the zeroes of a quadratic polynomial (degree n<=4)
        * coefficients are given in increasing order, i.e. constant first
        * @param rCoefficients    coefficients of polynomial, beginning from x^0 to x^n
        * @return    vector of solutions
        */
-      CEDAR_AUX_LIB_EXPORT std::vector<double> solvePolynomial(const std::vector<double>& rCoefficients);
+      //CEDAR_AUX_LIB_EXPORT std::vector<double> solvePolynomial(const std::vector<double>& rCoefficients);
 
       //!@brief function that calculates the cubic root of a floating point value
-      //!@todo Rename this to proper coding standard
-      inline double fast_cuberoot(double in)
+      inline double fastCubeRoot(double in)
       {
 #ifdef CEDAR_COMPILER_MSVC
         return std::pow(in, 1.0/3.0);

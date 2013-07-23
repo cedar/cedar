@@ -50,7 +50,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::LocalCoordinateFrame::LocalCoordinateFrame()
 :
-mTransformation(4, 4, CV_64FC1),
+mTransformation(cv::Mat::eye(4, 4, CV_64FC1)),
 _mInitialTranslation
 (
   new cedar::aux::DoubleVectorParameter
@@ -69,9 +69,6 @@ _mInitialTranslation
   );
   _mInitialTranslation->makeDefault();
   _mInitialRotation->makeDefault();
-  
-  // todo: check whether this line is necessary
-  mTransformation = cv::Mat::eye(4, 4, CV_64FC1);
   
   init();
 }
@@ -184,7 +181,6 @@ void cedar::aux::LocalCoordinateFrame::translate(double x, double y, double z)
 
 void cedar::aux::LocalCoordinateFrame::translate(const cv::Mat& translation)
 {
-  // todo: check whether this function is tested properly
   QWriteLocker locker(&mLock);
   mTransformation(cv::Rect(3, 0, 1, 3))
     = mTransformation(cv::Rect(3, 0, 1, 3)) + translation(cv::Rect(0, 0, 1, 3));

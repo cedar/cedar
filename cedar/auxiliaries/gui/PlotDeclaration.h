@@ -135,7 +135,6 @@ public:
 
   void declare() const
   {
-    //!@todo Should/can this go into the plot manager?
     try
     {
       std::vector<cedar::aux::gui::ConstPlotDeclarationPtr>& declarations =

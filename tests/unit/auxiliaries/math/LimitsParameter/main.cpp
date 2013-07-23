@@ -89,34 +89,34 @@ int main()
 
   // read from file
   limited->readJson("limits.json");
-  if (!(IsZero(limited->getLowerLimit() - (-2.0))))
+  if (!(cedar::aux::math::isZero(limited->getLowerLimit() - (-2.0))))
   {
     std::cout << "lower limit was not read correctly, read:" << limited->getLowerLimit() << std::endl;
     ++number_of_errors;
   }
-  if (!(IsZero(limited->getUpperLimit() - (2.2))))
+  if (!(cedar::aux::math::isZero(limited->getUpperLimit() - (2.2))))
   {
     std::cout << "upper limit was not read correctly, read:" << limited->getUpperLimit()<< std::endl;
     ++number_of_errors;
   }
 
   // check extrema
-  if (!(IsZero(limited->getLimitsParameter()->getLowerLimitMinimum() - (-10.0))))
+  if (!(cedar::aux::math::isZero(limited->getLimitsParameter()->getLowerLimitMinimum() - (-10.0))))
   {
     std::cout << "lower limit minimum was not set correctly" << std::endl;
     ++number_of_errors;
   }
-  if (!(IsZero(limited->getLimitsParameter()->getLowerLimitMaximum() - (1.0))))
+  if (!(cedar::aux::math::isZero(limited->getLimitsParameter()->getLowerLimitMaximum() - (1.0))))
   {
     std::cout << "lower limit maximum was not set correctly" << std::endl;
     ++number_of_errors;
   }
-  if (!(IsZero(limited->getLimitsParameter()->getUpperLimitMinimum() - (-1.0))))
+  if (!(cedar::aux::math::isZero(limited->getLimitsParameter()->getUpperLimitMinimum() - (-1.0))))
   {
     std::cout << "upper limit minimum was not set correctly" << std::endl;
     ++number_of_errors;
   }
-  if (!(IsZero(limited->getLimitsParameter()->getUpperLimitMaximum() - (10.0))))
+  if (!(cedar::aux::math::isZero(limited->getLimitsParameter()->getUpperLimitMaximum() - (10.0))))
   {
     std::cout << "upper limit maximum was not set correctly" << std::endl;
     ++number_of_errors;
@@ -124,37 +124,37 @@ int main()
 
   // check set functions
   limited->setLowerLimit(-5.6);
-  if (!(IsZero(limited->getLowerLimit() - (-5.6))))
+  if (!(cedar::aux::math::isZero(limited->getLowerLimit() - (-5.6))))
   {
     std::cout << "lower limit was not set correctly" << std::endl;
     ++number_of_errors;
   }
   limited->setUpperLimit(6.7);
-  if (!(IsZero(limited->getUpperLimit() - (6.7))))
+  if (!(cedar::aux::math::isZero(limited->getUpperLimit() - (6.7))))
   {
     std::cout << "upper limit was not set correctly" << std::endl;
     ++number_of_errors;
   }
   limited->getLimitsParameter()->setLowerLimitMinimum(-12.3);
-  if (!(IsZero(limited->getLimitsParameter()->getLowerLimitMinimum() - (-12.3))))
+  if (!(cedar::aux::math::isZero(limited->getLimitsParameter()->getLowerLimitMinimum() - (-12.3))))
   {
     std::cout << "lower limit minimum was not set correctly" << std::endl;
     ++number_of_errors;
   }
   limited->getLimitsParameter()->setLowerLimitMaximum(3.4);
-  if (!(IsZero(limited->getLimitsParameter()->getLowerLimitMaximum() - (3.4))))
+  if (!(cedar::aux::math::isZero(limited->getLimitsParameter()->getLowerLimitMaximum() - (3.4))))
   {
     std::cout << "lower limit maximum was not set correctly" << std::endl;
     ++number_of_errors;
   }
   limited->getLimitsParameter()->setUpperLimitMinimum(-4.5);
-  if (!(IsZero(limited->getLimitsParameter()->getUpperLimitMinimum() - (-4.5))))
+  if (!(cedar::aux::math::isZero(limited->getLimitsParameter()->getUpperLimitMinimum() - (-4.5))))
   {
     std::cout << "upper limit minimum was not set correctly" << std::endl;
     ++number_of_errors;
   }
   limited->getLimitsParameter()->setUpperLimitMaximum(6.7);
-  if (!(IsZero(limited->getLimitsParameter()->getUpperLimitMaximum() - (6.7))))
+  if (!(cedar::aux::math::isZero(limited->getLimitsParameter()->getUpperLimitMaximum() - (6.7))))
   {
     std::cout << "upper limit maximum was not set correctly" << std::endl;
     ++number_of_errors;

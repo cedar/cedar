@@ -152,7 +152,7 @@ public:
   SurfacePlot(QWidget *pParent = NULL);
 
   //!@brief Constructor expecting a DataPtr.
-  SurfacePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
+  SurfacePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent = NULL);
 
   //!@brief Destructor
   ~SurfacePlot();

@@ -34,14 +34,15 @@
  ---------------------------------------------------------------------------------------------------------------------*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/tools.h"
-#include "cedar/auxiliaries/LocalCoordinateFrame.h"
-#include "cedar/auxiliaries/DoubleVectorParameter.h"
-#include "cedar/auxiliaries/math/LimitsParameter.h"
-#include "cedar/devices/robot/KinematicChain.h"
 #include "tests/unit/devices/robot/KinematicChain/TestKinematicChain.h"
+#include "cedar/devices/robot/KinematicChain.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/math/LimitsParameter.h"
 #include "cedar/auxiliaries/math/constants.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/systemFunctions.h"
+#include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
 CEDAR_GENERATE_POINTER_TYPES(TestKinematicChain);
@@ -72,73 +73,73 @@ int main()
   cedar::aux::LocalCoordinateFramePtr rootCoordinateFrame = test_arm->getRootCoordinateFrame();
   if
   (
-    !IsZero(rootCoordinateFrame->getTranslationX() - (2.0))
-    || !IsZero(rootCoordinateFrame->getTranslationY() - (0.0))
-    || !IsZero(rootCoordinateFrame->getTranslationZ() - (0.0))
+    !cedar::aux::math::isZero(rootCoordinateFrame->getTranslationX() - (2.0))
+    || !cedar::aux::math::isZero(rootCoordinateFrame->getTranslationY() - (0.0))
+    || !cedar::aux::math::isZero(rootCoordinateFrame->getTranslationZ() - (0.0))
   )
   {
     errors++;
     std::cout << "ERROR with root coordinate frame translation, read:" << std::endl;
-    cedar::aux::math::write(rootCoordinateFrame->getTranslation());
+    cedar::aux::write(rootCoordinateFrame->getTranslation());
   }
   cv::Mat rootRotation = rootCoordinateFrame->getRotation();
   if
   (
-    !IsZero(rootRotation.at<double>(0, 0) - (0.0))
-    || !IsZero(rootRotation.at<double>(0, 1) - (-1.0))
-    || !IsZero(rootRotation.at<double>(0, 2) - (0.0))
-    || !IsZero(rootRotation.at<double>(1, 0) - (1.0))
-    || !IsZero(rootRotation.at<double>(1, 1) - (0.0))
-    || !IsZero(rootRotation.at<double>(1, 2) - (0.0))
-    || !IsZero(rootRotation.at<double>(2, 0) - (0.0))
-    || !IsZero(rootRotation.at<double>(2, 1) - (0.0))
-    || !IsZero(rootRotation.at<double>(2, 2) - (1.0))
+    !cedar::aux::math::isZero(rootRotation.at<double>(0, 0) - (0.0))
+    || !cedar::aux::math::isZero(rootRotation.at<double>(0, 1) - (-1.0))
+    || !cedar::aux::math::isZero(rootRotation.at<double>(0, 2) - (0.0))
+    || !cedar::aux::math::isZero(rootRotation.at<double>(1, 0) - (1.0))
+    || !cedar::aux::math::isZero(rootRotation.at<double>(1, 1) - (0.0))
+    || !cedar::aux::math::isZero(rootRotation.at<double>(1, 2) - (0.0))
+    || !cedar::aux::math::isZero(rootRotation.at<double>(2, 0) - (0.0))
+    || !cedar::aux::math::isZero(rootRotation.at<double>(2, 1) - (0.0))
+    || !cedar::aux::math::isZero(rootRotation.at<double>(2, 2) - (1.0))
   )
   {
     errors++;
     std::cout << "ERROR with root coordinate frame rotation, read:" << std::endl;
-    cedar::aux::math::write(rootRotation);
+    cedar::aux::write(rootRotation);
   }
 
   std::cout << "checking the end-effector coordinate frame..." << std::endl;
   cedar::aux::LocalCoordinateFramePtr endEffectorCoordinateFrame = test_arm->getEndEffectorCoordinateFrame();
   if
   (
-    !IsZero(endEffectorCoordinateFrame->getTranslationX() - (0.0))
-    || !IsZero(endEffectorCoordinateFrame->getTranslationY() - (2.0))
-    || !IsZero(endEffectorCoordinateFrame->getTranslationZ() - (8.0))
+    !cedar::aux::math::isZero(endEffectorCoordinateFrame->getTranslationX() - (0.0))
+    || !cedar::aux::math::isZero(endEffectorCoordinateFrame->getTranslationY() - (2.0))
+    || !cedar::aux::math::isZero(endEffectorCoordinateFrame->getTranslationZ() - (8.0))
   )
   {
     errors++;
     std::cout << "ERROR with end-effector coordinate frame translation, read:" << std::endl;
-    cedar::aux::math::write(endEffectorCoordinateFrame->getTranslation());
+    cedar::aux::write(endEffectorCoordinateFrame->getTranslation());
   }
   cv::Mat eefRotation = endEffectorCoordinateFrame->getRotation();
   if
   (
-    !IsZero(eefRotation.at<double>(0, 0) - (1.0))
-    || !IsZero(eefRotation.at<double>(0, 1) - (0.0))
-    || !IsZero(eefRotation.at<double>(0, 2) - (0.0))
-    || !IsZero(eefRotation.at<double>(1, 0) - (0.0))
-    || !IsZero(eefRotation.at<double>(1, 1) - (1.0))
-    || !IsZero(eefRotation.at<double>(1, 2) - (0.0))
-    || !IsZero(eefRotation.at<double>(2, 0) - (0.0))
-    || !IsZero(eefRotation.at<double>(2, 1) - (0.0))
-    || !IsZero(eefRotation.at<double>(2, 2) - (1.0))
+    !cedar::aux::math::isZero(eefRotation.at<double>(0, 0) - (1.0))
+    || !cedar::aux::math::isZero(eefRotation.at<double>(0, 1) - (0.0))
+    || !cedar::aux::math::isZero(eefRotation.at<double>(0, 2) - (0.0))
+    || !cedar::aux::math::isZero(eefRotation.at<double>(1, 0) - (0.0))
+    || !cedar::aux::math::isZero(eefRotation.at<double>(1, 1) - (1.0))
+    || !cedar::aux::math::isZero(eefRotation.at<double>(1, 2) - (0.0))
+    || !cedar::aux::math::isZero(eefRotation.at<double>(2, 0) - (0.0))
+    || !cedar::aux::math::isZero(eefRotation.at<double>(2, 1) - (0.0))
+    || !cedar::aux::math::isZero(eefRotation.at<double>(2, 2) - (1.0))
   )
   {
     errors++;
     std::cout << "ERROR with end-effector coordinate frame rotation, read:" << std::endl;
-    cedar::aux::math::write(eefRotation);
+    cedar::aux::write(eefRotation);
   }
 
   std::cout << "checking the first joint ..." << std::endl;
   cedar::dev::robot::KinematicChain::JointPtr joint = test_arm->getJoint(0);
   if
   (
-    !IsZero(joint->_mpPosition->at(0) - (0.0))
-    || !IsZero(joint->_mpPosition->at(1) - (2.0))
-    || !IsZero(joint->_mpPosition->at(2) - (0.0))
+    !cedar::aux::math::isZero(joint->_mpPosition->at(0) - (0.0))
+    || !cedar::aux::math::isZero(joint->_mpPosition->at(1) - (2.0))
+    || !cedar::aux::math::isZero(joint->_mpPosition->at(2) - (0.0))
   )
   {
     errors++;
@@ -149,9 +150,9 @@ int main()
   }
   if
   (
-    !IsZero(joint->_mpAxis->at(0) - (0.0))
-    || !IsZero(joint->_mpAxis->at(1) - (1.0))
-    || !IsZero(joint->_mpAxis->at(2) - (0.0))
+    !cedar::aux::math::isZero(joint->_mpAxis->at(0) - (0.0))
+    || !cedar::aux::math::isZero(joint->_mpAxis->at(1) - (1.0))
+    || !cedar::aux::math::isZero(joint->_mpAxis->at(2) - (0.0))
   )
   {
     errors++;
@@ -162,8 +163,8 @@ int main()
   }
   if
   (
-    !IsZero(joint->_mpAngleLimits->getLowerLimit() - (-3.1415927))
-    || !IsZero(joint->_mpAngleLimits->getUpperLimit() - (3.1415927))
+    !cedar::aux::math::isZero(joint->_mpAngleLimits->getLowerLimit() - (-3.1415927))
+    || !cedar::aux::math::isZero(joint->_mpAngleLimits->getUpperLimit() - (3.1415927))
   )
   {
     errors++;
@@ -173,8 +174,8 @@ int main()
   }
   if
   (
-    !IsZero(joint->_mpVelocityLimits->getLowerLimit() - (-5.0))
-    || !IsZero(joint->_mpVelocityLimits->getUpperLimit() - (5.0))
+    !cedar::aux::math::isZero(joint->_mpVelocityLimits->getLowerLimit() - (-5.0))
+    || !cedar::aux::math::isZero(joint->_mpVelocityLimits->getUpperLimit() - (5.0))
   )
   {
     errors++;
@@ -201,12 +202,12 @@ int main()
   test_arm->updateTransformations();
   if
   (
-    !IsZero(test_arm->getJointAngle(0) - (0.0))
-    || !IsZero(test_arm->getJointAngle(1) - (0.0))
-    || !IsZero(test_arm->getJointAngle(2) - (-cedar::aux::math::pi*0.5))
-    || !IsZero(test_arm->getJointAngle(3) - (cedar::aux::math::pi*0.5))
-    || !IsZero(test_arm->getJointVelocity(1) - (1.0))
-    || !IsZero(test_arm->getJointVelocity(2) - (1.0))
+    !cedar::aux::math::isZero(test_arm->getJointAngle(0) - (0.0))
+    || !cedar::aux::math::isZero(test_arm->getJointAngle(1) - (0.0))
+    || !cedar::aux::math::isZero(test_arm->getJointAngle(2) - (-cedar::aux::math::pi*0.5))
+    || !cedar::aux::math::isZero(test_arm->getJointAngle(3) - (cedar::aux::math::pi*0.5))
+    || !cedar::aux::math::isZero(test_arm->getJointVelocity(1) - (1.0))
+    || !cedar::aux::math::isZero(test_arm->getJointVelocity(2) - (1.0))
   )
   {
     errors++;
@@ -221,8 +222,8 @@ int main()
   acceleration_test_arm->updateTransformations();
   if
   (
-    !IsZero(acceleration_test_arm->getJointAcceleration(0) - (2.1))
-    || !IsZero(acceleration_test_arm->getJointAcceleration(1) - (2.2))
+    !cedar::aux::math::isZero(acceleration_test_arm->getJointAcceleration(0) - (2.1))
+    || !cedar::aux::math::isZero(acceleration_test_arm->getJointAcceleration(1) - (2.2))
   )
   {
     errors++;
@@ -237,43 +238,43 @@ int main()
   cv::Mat joint_transformation_3 = test_arm->getJointTransformation(3);
   if (
       // transformation to joint 1 frame
-      !IsZero(joint_transformation_1.at<double>(0, 0) - 0)
-      || !IsZero(joint_transformation_1.at<double>(0, 1) - -1)
-      || !IsZero(joint_transformation_1.at<double>(0, 2) - 0)
+      !cedar::aux::math::isZero(joint_transformation_1.at<double>(0, 0) - 0)
+      || !cedar::aux::math::isZero(joint_transformation_1.at<double>(0, 1) - -1)
+      || !cedar::aux::math::isZero(joint_transformation_1.at<double>(0, 2) - 0)
 
-      || !IsZero(joint_transformation_1.at<double>(1, 0) - 1)
-      || !IsZero(joint_transformation_1.at<double>(1, 1) - 0)
-      || !IsZero(joint_transformation_1.at<double>(1, 2) - 0)
+      || !cedar::aux::math::isZero(joint_transformation_1.at<double>(1, 0) - 1)
+      || !cedar::aux::math::isZero(joint_transformation_1.at<double>(1, 1) - 0)
+      || !cedar::aux::math::isZero(joint_transformation_1.at<double>(1, 2) - 0)
 
-      || !IsZero(joint_transformation_1.at<double>(2, 0) - 0)
-      || !IsZero(joint_transformation_1.at<double>(2, 1) - 0)
-      || !IsZero(joint_transformation_1.at<double>(2, 2) - 1)
+      || !cedar::aux::math::isZero(joint_transformation_1.at<double>(2, 0) - 0)
+      || !cedar::aux::math::isZero(joint_transformation_1.at<double>(2, 1) - 0)
+      || !cedar::aux::math::isZero(joint_transformation_1.at<double>(2, 2) - 1)
 
-      || !IsZero(joint_transformation_1.at<double>(0, 3) - 0)
-      || !IsZero(joint_transformation_1.at<double>(1, 3) - 0)
-      || !IsZero(joint_transformation_1.at<double>(2, 3) - 2)
-      || !IsZero(joint_transformation_1.at<double>(3, 0) - 0)
-      || !IsZero(joint_transformation_1.at<double>(3, 1) - 0)
-      || !IsZero(joint_transformation_1.at<double>(3, 2) - 0)
-      || !IsZero(joint_transformation_1.at<double>(3, 3) - 1)
+      || !cedar::aux::math::isZero(joint_transformation_1.at<double>(0, 3) - 0)
+      || !cedar::aux::math::isZero(joint_transformation_1.at<double>(1, 3) - 0)
+      || !cedar::aux::math::isZero(joint_transformation_1.at<double>(2, 3) - 2)
+      || !cedar::aux::math::isZero(joint_transformation_1.at<double>(3, 0) - 0)
+      || !cedar::aux::math::isZero(joint_transformation_1.at<double>(3, 1) - 0)
+      || !cedar::aux::math::isZero(joint_transformation_1.at<double>(3, 2) - 0)
+      || !cedar::aux::math::isZero(joint_transformation_1.at<double>(3, 3) - 1)
       // transformation to joint 3 frame
-      || !IsZero(joint_transformation_3.at<double>(0, 0) - 0)
-      || !IsZero(joint_transformation_3.at<double>(0, 1) - -1)
-      || !IsZero(joint_transformation_3.at<double>(0, 2) - 0)
-      || !IsZero(joint_transformation_3.at<double>(1, 0) - 1)
-      || !IsZero(joint_transformation_3.at<double>(1, 1) - 0)
-      || !IsZero(joint_transformation_3.at<double>(1, 2) - 0)
-      || !IsZero(joint_transformation_3.at<double>(2, 0) - 0)
+      || !cedar::aux::math::isZero(joint_transformation_3.at<double>(0, 0) - 0)
+      || !cedar::aux::math::isZero(joint_transformation_3.at<double>(0, 1) - -1)
+      || !cedar::aux::math::isZero(joint_transformation_3.at<double>(0, 2) - 0)
+      || !cedar::aux::math::isZero(joint_transformation_3.at<double>(1, 0) - 1)
+      || !cedar::aux::math::isZero(joint_transformation_3.at<double>(1, 1) - 0)
+      || !cedar::aux::math::isZero(joint_transformation_3.at<double>(1, 2) - 0)
+      || !cedar::aux::math::isZero(joint_transformation_3.at<double>(2, 0) - 0)
 
-      || !IsZero(joint_transformation_3.at<double>(2, 1) - 0)
-      || !IsZero(joint_transformation_3.at<double>(2, 2) - 1)
-      || !IsZero(joint_transformation_3.at<double>(0, 3) - 0)
-      || !IsZero(joint_transformation_3.at<double>(1, 3) - -2)
-      || !IsZero(joint_transformation_3.at<double>(2, 3) - 4)
-      || !IsZero(joint_transformation_3.at<double>(3, 0) - 0)
-      || !IsZero(joint_transformation_3.at<double>(3, 1) - 0)
-      || !IsZero(joint_transformation_3.at<double>(3, 2) - 0)
-      || !IsZero(joint_transformation_3.at<double>(3, 3) - 1)
+      || !cedar::aux::math::isZero(joint_transformation_3.at<double>(2, 1) - 0)
+      || !cedar::aux::math::isZero(joint_transformation_3.at<double>(2, 2) - 1)
+      || !cedar::aux::math::isZero(joint_transformation_3.at<double>(0, 3) - 0)
+      || !cedar::aux::math::isZero(joint_transformation_3.at<double>(1, 3) - -2)
+      || !cedar::aux::math::isZero(joint_transformation_3.at<double>(2, 3) - 4)
+      || !cedar::aux::math::isZero(joint_transformation_3.at<double>(3, 0) - 0)
+      || !cedar::aux::math::isZero(joint_transformation_3.at<double>(3, 1) - 0)
+      || !cedar::aux::math::isZero(joint_transformation_3.at<double>(3, 2) - 0)
+      || !cedar::aux::math::isZero(joint_transformation_3.at<double>(3, 3) - 1)
       )
   {
     errors++;
@@ -292,19 +293,19 @@ int main()
   test_arm->calculateCartesianJacobian(origin, 3, jacobian_3, cedar::dev::robot::KinematicChain::LOCAL_COORDINATES);
   if (
       // Jacobian of joint 1
-      !IsZero(jacobian_1.at<double>(0, 0) - 0)
-      || !IsZero(jacobian_1.at<double>(1, 0) - 2)
-      || !IsZero(jacobian_1.at<double>(2, 0) - 0)
-      || !IsZero(jacobian_1.at<double>(0, 1) - 0)
-      || !IsZero(jacobian_1.at<double>(1, 1) - 0)
-      || !IsZero(jacobian_1.at<double>(2, 1) - 0)
-      || !IsZero(jacobian_1.at<double>(0, 2) - 0)
-      || !IsZero(jacobian_1.at<double>(1, 2) - 0)
-      || !IsZero(jacobian_1.at<double>(2, 2) - 0)
-      || !IsZero(jacobian_1.at<double>(0, 3) - 0)
-      || !IsZero(jacobian_1.at<double>(1, 3) - 0)
-      || !IsZero(jacobian_1.at<double>(2, 3) - 0)
-      || !IsZero
+      !cedar::aux::math::isZero(jacobian_1.at<double>(0, 0) - 0)
+      || !cedar::aux::math::isZero(jacobian_1.at<double>(1, 0) - 2)
+      || !cedar::aux::math::isZero(jacobian_1.at<double>(2, 0) - 0)
+      || !cedar::aux::math::isZero(jacobian_1.at<double>(0, 1) - 0)
+      || !cedar::aux::math::isZero(jacobian_1.at<double>(1, 1) - 0)
+      || !cedar::aux::math::isZero(jacobian_1.at<double>(2, 1) - 0)
+      || !cedar::aux::math::isZero(jacobian_1.at<double>(0, 2) - 0)
+      || !cedar::aux::math::isZero(jacobian_1.at<double>(1, 2) - 0)
+      || !cedar::aux::math::isZero(jacobian_1.at<double>(2, 2) - 0)
+      || !cedar::aux::math::isZero(jacobian_1.at<double>(0, 3) - 0)
+      || !cedar::aux::math::isZero(jacobian_1.at<double>(1, 3) - 0)
+      || !cedar::aux::math::isZero(jacobian_1.at<double>(2, 3) - 0)
+      || !cedar::aux::math::isZero
       (
         norm
         (
@@ -313,19 +314,19 @@ int main()
         )
       )
       // Jacobian of joint 3
-      || !IsZero(jacobian_3.at<double>(0, 0) - 0)
-      || !IsZero(jacobian_3.at<double>(1, 0) - 4)
-      || !IsZero(jacobian_3.at<double>(2, 0) - 2)
-      || !IsZero(jacobian_3.at<double>(0, 1) - 0)
-      || !IsZero(jacobian_3.at<double>(1, 1) - 2)
-      || !IsZero(jacobian_3.at<double>(2, 1) - 2)
-      || !IsZero(jacobian_3.at<double>(0, 2) - 0)
-      || !IsZero(jacobian_3.at<double>(1, 2) - 0)
-      || !IsZero(jacobian_3.at<double>(2, 2) - 2)
-      || !IsZero(jacobian_3.at<double>(0, 3) - 0)
-      || !IsZero(jacobian_3.at<double>(1, 3) - 0)
-      || !IsZero(jacobian_3.at<double>(2, 3) - 0)
-      || !IsZero
+      || !cedar::aux::math::isZero(jacobian_3.at<double>(0, 0) - 0)
+      || !cedar::aux::math::isZero(jacobian_3.at<double>(1, 0) - 4)
+      || !cedar::aux::math::isZero(jacobian_3.at<double>(2, 0) - 2)
+      || !cedar::aux::math::isZero(jacobian_3.at<double>(0, 1) - 0)
+      || !cedar::aux::math::isZero(jacobian_3.at<double>(1, 1) - 2)
+      || !cedar::aux::math::isZero(jacobian_3.at<double>(2, 1) - 2)
+      || !cedar::aux::math::isZero(jacobian_3.at<double>(0, 2) - 0)
+      || !cedar::aux::math::isZero(jacobian_3.at<double>(1, 2) - 0)
+      || !cedar::aux::math::isZero(jacobian_3.at<double>(2, 2) - 2)
+      || !cedar::aux::math::isZero(jacobian_3.at<double>(0, 3) - 0)
+      || !cedar::aux::math::isZero(jacobian_3.at<double>(1, 3) - 0)
+      || !cedar::aux::math::isZero(jacobian_3.at<double>(2, 3) - 0)
+      || !cedar::aux::math::isZero
       (
         norm
         (
@@ -342,33 +343,33 @@ int main()
   std::cout << "test: calculateSpatialJacobian" << std::endl;
   cv::Mat spatial_jacobian = test_arm->calculateSpatialJacobian(test_arm->getNumberOfJoints()-1);
   if (
-      !IsZero(spatial_jacobian.at<double>(0, 0) - 0)
-      || !IsZero(spatial_jacobian.at<double>(1, 0) - 0)
-      || !IsZero(spatial_jacobian.at<double>(2, 0) - 0)
-      || !IsZero(spatial_jacobian.at<double>(3, 0) - -1)
-      || !IsZero(spatial_jacobian.at<double>(4, 0) - 0)
-      || !IsZero(spatial_jacobian.at<double>(5, 0) - 0)
+      !cedar::aux::math::isZero(spatial_jacobian.at<double>(0, 0) - 0)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(1, 0) - 0)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(2, 0) - 0)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(3, 0) - -1)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(4, 0) - 0)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(5, 0) - 0)
 
-      || !IsZero(spatial_jacobian.at<double>(0, 1) - 0)
-      || !IsZero(spatial_jacobian.at<double>(1, 1) - -2)
-      || !IsZero(spatial_jacobian.at<double>(2, 1) - 0)
-      || !IsZero(spatial_jacobian.at<double>(3, 1) - -1)
-      || !IsZero(spatial_jacobian.at<double>(4, 1) - 0)
-      || !IsZero(spatial_jacobian.at<double>(5, 1) - 0)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(0, 1) - 0)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(1, 1) - -2)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(2, 1) - 0)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(3, 1) - -1)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(4, 1) - 0)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(5, 1) - 0)
 
-      || !IsZero(spatial_jacobian.at<double>(0, 2) - 0)
-      || !IsZero(spatial_jacobian.at<double>(1, 2) - -4)
-      || !IsZero(spatial_jacobian.at<double>(2, 2) - 0)
-      || !IsZero(spatial_jacobian.at<double>(3, 2) - -1)
-      || !IsZero(spatial_jacobian.at<double>(4, 2) - 0)
-      || !IsZero(spatial_jacobian.at<double>(5, 2) - 0)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(0, 2) - 0)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(1, 2) - -4)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(2, 2) - 0)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(3, 2) - -1)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(4, 2) - 0)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(5, 2) - 0)
 
-      || !IsZero(spatial_jacobian.at<double>(0, 3) - 0)
-      || !IsZero(spatial_jacobian.at<double>(1, 3) - -4)
-      || !IsZero(spatial_jacobian.at<double>(2, 3) - -2)
-      || !IsZero(spatial_jacobian.at<double>(3, 3) - -1)
-      || !IsZero(spatial_jacobian.at<double>(4, 3) - 0)
-      || !IsZero(spatial_jacobian.at<double>(5, 3) - 0)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(0, 3) - 0)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(1, 3) - -4)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(2, 3) - -2)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(3, 3) - -1)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(4, 3) - 0)
+      || !cedar::aux::math::isZero(spatial_jacobian.at<double>(5, 3) - 0)
      )
   {
     errors++;
@@ -381,10 +382,10 @@ int main()
   std::cout << "test: calculateEndEffectorPosition" << std::endl;
   cv::Mat end_effector_position = test_arm->calculateEndEffectorPosition();
   if (
-      !IsZero(end_effector_position.at<double>(0, 0) - 0)
-      || !IsZero(end_effector_position.at<double>(1, 0) - -2)
-      || !IsZero(end_effector_position.at<double>(2, 0) - 6)
-      || !IsZero(end_effector_position.at<double>(3, 0) - 1)
+      !cedar::aux::math::isZero(end_effector_position.at<double>(0, 0) - 0)
+      || !cedar::aux::math::isZero(end_effector_position.at<double>(1, 0) - -2)
+      || !cedar::aux::math::isZero(end_effector_position.at<double>(2, 0) - 6)
+      || !cedar::aux::math::isZero(end_effector_position.at<double>(3, 0) - 1)
      )
   {
     errors++;
@@ -397,22 +398,22 @@ int main()
   std::cout << "test: calculateEndEffectorTransformation" << std::endl;
   cv::Mat end_effector_transformation = test_arm->getEndEffectorTransformation();
   if (
-      !IsZero(end_effector_transformation.at<double>(0, 0) - 0)
-      || !IsZero(end_effector_transformation.at<double>(0, 1) - -1)
-      || !IsZero(end_effector_transformation.at<double>(0, 2) - 0)
-      || !IsZero(end_effector_transformation.at<double>(1, 0) - 1)
-      || !IsZero(end_effector_transformation.at<double>(1, 1) - 0)
-      || !IsZero(end_effector_transformation.at<double>(1, 2) - 0)
-      || !IsZero(end_effector_transformation.at<double>(2, 0) - 0)
-      || !IsZero(end_effector_transformation.at<double>(2, 1) - 0)
-      || !IsZero(end_effector_transformation.at<double>(2, 2) - 1)
-      || !IsZero(end_effector_transformation.at<double>(0, 3) - 0)
-      || !IsZero(end_effector_transformation.at<double>(1, 3) - -2)
-      || !IsZero(end_effector_transformation.at<double>(2, 3) - 6)
-      || !IsZero(end_effector_transformation.at<double>(3, 0) - 0)
-      || !IsZero(end_effector_transformation.at<double>(3, 1) - 0)
-      || !IsZero(end_effector_transformation.at<double>(3, 2) - 0)
-      || !IsZero(end_effector_transformation.at<double>(3, 3) - 1)
+      !cedar::aux::math::isZero(end_effector_transformation.at<double>(0, 0) - 0)
+      || !cedar::aux::math::isZero(end_effector_transformation.at<double>(0, 1) - -1)
+      || !cedar::aux::math::isZero(end_effector_transformation.at<double>(0, 2) - 0)
+      || !cedar::aux::math::isZero(end_effector_transformation.at<double>(1, 0) - 1)
+      || !cedar::aux::math::isZero(end_effector_transformation.at<double>(1, 1) - 0)
+      || !cedar::aux::math::isZero(end_effector_transformation.at<double>(1, 2) - 0)
+      || !cedar::aux::math::isZero(end_effector_transformation.at<double>(2, 0) - 0)
+      || !cedar::aux::math::isZero(end_effector_transformation.at<double>(2, 1) - 0)
+      || !cedar::aux::math::isZero(end_effector_transformation.at<double>(2, 2) - 1)
+      || !cedar::aux::math::isZero(end_effector_transformation.at<double>(0, 3) - 0)
+      || !cedar::aux::math::isZero(end_effector_transformation.at<double>(1, 3) - -2)
+      || !cedar::aux::math::isZero(end_effector_transformation.at<double>(2, 3) - 6)
+      || !cedar::aux::math::isZero(end_effector_transformation.at<double>(3, 0) - 0)
+      || !cedar::aux::math::isZero(end_effector_transformation.at<double>(3, 1) - 0)
+      || !cedar::aux::math::isZero(end_effector_transformation.at<double>(3, 2) - 0)
+      || !cedar::aux::math::isZero(end_effector_transformation.at<double>(3, 3) - 1)
      )
   {
     errors++;
@@ -425,18 +426,18 @@ int main()
   std::cout << "test: calculateEndEffectorJacobian" << std::endl;
   cv::Mat end_effector_jacobian = test_arm->calculateEndEffectorJacobian();
   if (
-      !IsZero(end_effector_jacobian.at<double>(0, 0) - 0)
-      || !IsZero(end_effector_jacobian.at<double>(1, 0) - 6)
-      || !IsZero(end_effector_jacobian.at<double>(2, 0) - 2)
-      || !IsZero(end_effector_jacobian.at<double>(0, 1) - 0)
-      || !IsZero(end_effector_jacobian.at<double>(1, 1) - 4)
-      || !IsZero(end_effector_jacobian.at<double>(2, 1) - 2)
-      || !IsZero(end_effector_jacobian.at<double>(0, 2) - 0)
-      || !IsZero(end_effector_jacobian.at<double>(1, 2) - 2)
-      || !IsZero(end_effector_jacobian.at<double>(2, 2) - 2)
-      || !IsZero(end_effector_jacobian.at<double>(0, 3) - 0)
-      || !IsZero(end_effector_jacobian.at<double>(1, 3) - 2)
-      || !IsZero(end_effector_jacobian.at<double>(2, 3) - 0)
+      !cedar::aux::math::isZero(end_effector_jacobian.at<double>(0, 0) - 0)
+      || !cedar::aux::math::isZero(end_effector_jacobian.at<double>(1, 0) - 6)
+      || !cedar::aux::math::isZero(end_effector_jacobian.at<double>(2, 0) - 2)
+      || !cedar::aux::math::isZero(end_effector_jacobian.at<double>(0, 1) - 0)
+      || !cedar::aux::math::isZero(end_effector_jacobian.at<double>(1, 1) - 4)
+      || !cedar::aux::math::isZero(end_effector_jacobian.at<double>(2, 1) - 2)
+      || !cedar::aux::math::isZero(end_effector_jacobian.at<double>(0, 2) - 0)
+      || !cedar::aux::math::isZero(end_effector_jacobian.at<double>(1, 2) - 2)
+      || !cedar::aux::math::isZero(end_effector_jacobian.at<double>(2, 2) - 2)
+      || !cedar::aux::math::isZero(end_effector_jacobian.at<double>(0, 3) - 0)
+      || !cedar::aux::math::isZero(end_effector_jacobian.at<double>(1, 3) - 2)
+      || !cedar::aux::math::isZero(end_effector_jacobian.at<double>(2, 3) - 0)
      )
   {
     errors++;
@@ -556,10 +557,10 @@ int main()
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateVelocity" << std::endl;
   if (
-      !IsZero(pow(norm(v0 - v0_numeric)/3.0, 2))
-      || !IsZero(pow(norm(v1 - v1_numeric)/3.0, 2))
-      || !IsZero(pow(norm(v2 - v2_numeric)/3.0, 2))
-      || !IsZero(pow(norm(v3 - v3_numeric)/3.0, 2))
+      !cedar::aux::math::isZero(pow(norm(v0 - v0_numeric)/3.0, 2))
+      || !cedar::aux::math::isZero(pow(norm(v1 - v1_numeric)/3.0, 2))
+      || !cedar::aux::math::isZero(pow(norm(v2 - v2_numeric)/3.0, 2))
+      || !cedar::aux::math::isZero(pow(norm(v3 - v3_numeric)/3.0, 2))
      )
   {
     errors++;
@@ -571,10 +572,10 @@ int main()
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateAcceleration" << std::endl;
   if (
-      !IsZero(pow(norm(a0 - a0_numeric)/3.0, 2))
-      || !IsZero(pow(norm(a1 - a1_numeric)/3.0, 2))
-      || !IsZero(pow(norm(a2 - a2_numeric)/3.0, 2))
-      || !IsZero(pow(norm(a3 - a3_numeric)/3.0, 2))
+      !cedar::aux::math::isZero(pow(norm(a0 - a0_numeric)/3.0, 2))
+      || !cedar::aux::math::isZero(pow(norm(a1 - a1_numeric)/3.0, 2))
+      || !cedar::aux::math::isZero(pow(norm(a2 - a2_numeric)/3.0, 2))
+      || !cedar::aux::math::isZero(pow(norm(a3 - a3_numeric)/3.0, 2))
      )
   {
     errors++;
@@ -586,7 +587,7 @@ int main()
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateSpatialJacobianTemporalDerivative" << std::endl;
   if (
-      !IsZero(pow(norm(spatial_jacobian_dot - spatial_jacobian_dot_numeric)/(spatial_jacobian_dot.cols*6), 2))
+      !cedar::aux::math::isZero(pow(norm(spatial_jacobian_dot - spatial_jacobian_dot_numeric)/(spatial_jacobian_dot.cols*6), 2))
      )
   {
     errors++;
@@ -598,7 +599,7 @@ int main()
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateCartesianJacobianTemporalDerivative" << std::endl;
   if (
-      !IsZero(pow(norm(cartesian_jacobian_dot - cartesian_jacobian_dot_numeric)/(cartesian_jacobian_dot.cols*3), 2))
+      !cedar::aux::math::isZero(pow(norm(cartesian_jacobian_dot - cartesian_jacobian_dot_numeric)/(cartesian_jacobian_dot.cols*3), 2))
      )
   {
     errors++;
@@ -609,7 +610,7 @@ int main()
   // end-effector velocity
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateEndEffectorVelocity" << std::endl;
-  if (!IsZero(pow(norm(v_eef - v_eef_numeric)/3.0, 2)))
+  if (!cedar::aux::math::isZero(pow(norm(v_eef - v_eef_numeric)/3.0, 2)))
   {
     errors++;
     std::cout << "ERROR with calculateEndEffectorVelocity()" << std::endl;
@@ -619,7 +620,7 @@ int main()
   // end-effector acceleration
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateEndEffectorAcceleration" << std::endl;
-  if (!IsZero(pow(norm(a_eef - a_eef_numeric)/3.0, 2)))
+  if (!cedar::aux::math::isZero(pow(norm(a_eef - a_eef_numeric)/3.0, 2)))
   {
     errors++;
     std::cout << "ERROR with calculateEndEffectorAcceleration()" << std::endl;
