@@ -472,8 +472,6 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
       }
       else
       {
-        //!@todo Output warning if the input is not space code
-        /* return cedar::proc::DataSlot::VALIDITY_WARNING; */
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
@@ -570,7 +568,6 @@ void cedar::dyn::NeuralField::updateInputSum()
     if (input)
     {
       QReadLocker locker(&input->getLock());
-      //!@todo This is probably slow -- store the type of each input and static_cast instead.
       cv::Mat& input_mat = input->getData<cv::Mat>();
 
       unsigned int input_dim = cedar::aux::math::getDimensionalityOf(input_mat);

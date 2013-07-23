@@ -265,12 +265,10 @@ cedar::dev::KinematicChain::ActionType cedar::dev::KinematicChain::getWorkingMod
 
 void cedar::dev::KinematicChain::setJointAngles(const std::vector<double>& angles)
 {
-  // @todo: for security reasons setting angles should be only allowed
-  //        in STOP or ANGLE mode. except initial set!
+  //!@todo: for security reasons setting angles should be only allowed in STOP or ANGLE mode. except initial set!
 
   if(angles.size() != getNumberOfJoints())
   {
-    //!@todo Should this throw an exception?
     cedar::aux::LogSingleton::getInstance()->error
     (
       "You provided a vector of angles with the wrong size (angles: "
@@ -300,7 +298,6 @@ void cedar::dev::KinematicChain::setJointAngles(const cv::Mat& angles)
 {
   if (angles.size().height != (int)getNumberOfJoints() || angles.size().width != 1)
   {
-    //!@todo This should probably throw an exception.
     cedar::aux::LogSingleton::getInstance()->error
     (
       "You provided a vector of angles with the wrong size (angles: "
@@ -331,7 +328,6 @@ bool cedar::dev::KinematicChain::setJointVelocity(unsigned int index, double vel
 {
   if (index >= getNumberOfJoints())
   {
-    //!@todo This should probably throw an exception.
     cedar::aux::LogSingleton::getInstance()->error
     (
       "Index out of range when setting velocity for joint "
@@ -355,7 +351,6 @@ bool cedar::dev::KinematicChain::setJointVelocities(const std::vector<double>& v
 {
   if (velocities.size() != getNumberOfJoints())
   {
-    //!@todo Should this throw an exception?
     cedar::aux::LogSingleton::getInstance()->error
     (
       "You provided a vector of velocities with the wrong size (provided: "
@@ -386,7 +381,6 @@ bool cedar::dev::KinematicChain::setJointVelocities(const cv::Mat& velocities)
 {
   if(velocities.size().height != (int)getNumberOfJoints() || velocities.size().width != 1)
   {
-    //!@todo Should this throw an exception?
     cedar::aux::LogSingleton::getInstance()->error
     (
       "You provided a matrix of velocities with the wrong size (provided: "
@@ -417,7 +411,6 @@ bool cedar::dev::KinematicChain::setJointAcceleration(unsigned int index, double
 {
   if (index >= getNumberOfJoints())
   {
-    //!@todo This should probably throw an exception.
     cedar::aux::LogSingleton::getInstance()->error
     (
       "Index out of range when setting acceleration for joint "
@@ -438,7 +431,6 @@ bool cedar::dev::KinematicChain::setJointAccelerations(const std::vector<double>
 {
   if(accelerations.size() != getNumberOfJoints())
   {
-    //!@todo Should this throw an exception?
     cedar::aux::LogSingleton::getInstance()->error
     (
       "You provided a vector of accelerations with the wrong size (provided: "
@@ -464,7 +456,6 @@ bool cedar::dev::KinematicChain::setJointAccelerations(const cv::Mat& accelerati
 {
   if(accelerations.size().height != (int)getNumberOfJoints() || accelerations.size().width != 1)
   {
-    //!@todo Should this throw an exception?
     cedar::aux::LogSingleton::getInstance()->error
     (
       "You provided a matrix of accelerations with the wrong size (provided: "
@@ -692,7 +683,6 @@ void cedar::dev::KinematicChain::start()
   switch (getWorkingMode())
   {
   case STOP:
-    //!@todo Should this throw an exception?
     cedar::aux::LogSingleton::getInstance()->error
     (
       "Error: KinematicChain is in working mode STOP!",
@@ -701,7 +691,6 @@ void cedar::dev::KinematicChain::start()
     return;
 
   case ANGLE:
-    //!@todo Should this throw an exception?
     cedar::aux::LogSingleton::getInstance()->error
     (
       "KinematicChain refuses to work as a thread in ANGLE mode!",
@@ -835,7 +824,7 @@ void cedar::dev::KinematicChain::calculateCartesianJacobianTemporalDerivative
     }
     case BASE_COORDINATES :
     {
-      //!\todo add base coordinate treatment
+      //!@todo add base coordinate treatment
 //      point_local = mJointTransformations[jointIndex].inv() * point; ...
       break;
     }
@@ -899,7 +888,7 @@ cv::Mat cedar::dev::KinematicChain::calculateVelocity
     }
     case BASE_COORDINATES :
     {
-      //!\todo add base coordinate treatment
+      //!@todo add base coordinate treatment
 //      point_local = mJointTransformations[jointIndex].inv() * point; ...
       break;
     }
@@ -933,7 +922,7 @@ cv::Mat cedar::dev::KinematicChain::calculateAcceleration
     }
     case BASE_COORDINATES :
     {
-      //! \todo: add base coordinate treatment
+      //!@todo: add base coordinate treatment
 //      point_local = mJointTransformations[jointIndex].inv() * point; ...
       break;
     }

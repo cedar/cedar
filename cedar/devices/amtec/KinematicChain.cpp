@@ -79,7 +79,7 @@ _mModuleMap
 {
   mpDevice = NULL;
 
-  // todo: this cannot be called from the constructor any more, because the number of joints is not known yet
+  //!@todo: this cannot be called from the constructor any more, because the number of joints is not known yet
   // current solution is to make it initDevice() public and call it from the main program after readJson() was called
   // a restructuring of this system might be in order
 //  if(!initDevice())
@@ -108,7 +108,7 @@ cedar::dev::amtec::KinematicChain::~KinematicChain()
 
 bool cedar::dev::amtec::KinematicChain::isMovable() const
 {
-  // todo: change this to something meaningful
+  //!@todo: change this to something meaningful
   return true;
 }
 
@@ -239,6 +239,7 @@ double cedar::dev::amtec::KinematicChain::getJointAngle(unsigned int joint) cons
         + " were found.",
       "cedar::dev::amtec::KinematicChain::getJointAngle(unsigned int) const"
     );
+    //!@todo Throw an exception instead
     return 0.0;
   }
 
@@ -365,7 +366,6 @@ bool cedar::dev::amtec::KinematicChain::calibrateModule(unsigned int module)
 {
   QMutexLocker mutex_locker(&mCanBusMutex);
 
-  //!@todo Use an assert here?
   if(!mpDevice)
   {
     cedar::aux::LogSingleton::getInstance()->error

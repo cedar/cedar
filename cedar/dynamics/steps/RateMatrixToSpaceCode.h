@@ -49,8 +49,6 @@
 
 
 /*!@brief A step that converts a 2-dimensional matrix of rate code values to a 3-dimensional matrix of space code.
- *
- * @todo clean up this step - interpolate() can be done for arbitrary dimensionality
  */
 class cedar::dyn::RateMatrixToSpaceCode : public cedar::proc::Step
 {
@@ -124,7 +122,6 @@ private:
     _mUpperLimit->setValue(limit);
   }
 
-  //!@todo generalize to a math utility function
   inline int interpolateBin(double value)
   {
     double interpolated = (value - this->getLowerLimit()) / mInterval;

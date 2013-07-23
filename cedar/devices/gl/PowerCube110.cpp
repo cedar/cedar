@@ -76,7 +76,6 @@ cedar::dev::gl::PowerCube110::~PowerCube110()
 
 void cedar::dev::gl::PowerCube110::initializeGl()
 {
-  //!@todo Implement this so that it works on windows
 #ifndef CEDAR_OS_WINDOWS
   // proximal link
   glGenBuffers(1, &mProximalLinkVertexVboId);
