@@ -47,7 +47,6 @@
 
 // SYSTEM INCLUDES
 
-
 /*!@todo describe.
  *
  * @todo describe more.

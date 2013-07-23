@@ -54,7 +54,7 @@ std::vector<double> cedar::aux::math::solveQuadric(const std::vector<double>& rC
   
   D = p * p - q;
   
-  if (IsZero(D))
+  if (cedar::aux::math::isZero(D))
   {
     solutions.push_back(-p);
     return solutions;
@@ -100,15 +100,15 @@ std::vector<double> cedar::aux::math::solveCubic(const std::vector<double>& rCoe
   cb_p = p * p * p;
   D = q * q + cb_p;
   
-  if (IsZero(D))
+  if (cedar::aux::math::isZero(D))
   {
-    if (IsZero(q)) /* one triple solution */
+    if (cedar::aux::math::isZero(q)) /* one triple solution */
     {
       solutions.push_back(0);
     }
     else /* one single and one double solution */
     {
-      double u = cedar::aux::math::fast_cuberoot(-q);
+      double u = cedar::aux::math::fastCubeRoot(-q);
       solutions.push_back(2 * u);
       solutions.push_back(-u);
     }
@@ -125,8 +125,8 @@ std::vector<double> cedar::aux::math::solveCubic(const std::vector<double>& rCoe
   else /* one real solution */
   {
     double sqrt_D = sqrt(D);
-    double u = cedar::aux::math::fast_cuberoot(sqrt_D - q);
-    double v = -cedar::aux::math::fast_cuberoot(sqrt_D + q);
+    double u = cedar::aux::math::fastCubeRoot(sqrt_D - q);
+    double v = -cedar::aux::math::fastCubeRoot(sqrt_D + q);
     
     solutions.push_back(u + v);
   }
@@ -168,7 +168,7 @@ std::vector<double> cedar::aux::math::solveQuartic(const std::vector<double>& rC
   q = 1.0/8.0*sq_A*A - 1.0/2.0*A*B + C;
   r = -3.0/256.0*sq_A*sq_A + 1.0/16.0*sq_A*B - 1.0/4.0*A*C + D;
   
-  if (IsZero(r))
+  if (cedar::aux::math::isZero(r))
   {
     /* no absolute term: y(y^3 + py + q) = 0 */
     std::vector<double> cubic_coefficients;
@@ -196,7 +196,7 @@ std::vector<double> cedar::aux::math::solveQuartic(const std::vector<double>& rC
     u = z * z - r;
     v = 2 * z - p;
     
-    if (IsZero(u))
+    if (cedar::aux::math::isZero(u))
     {
       u = 0;
     }
@@ -209,7 +209,7 @@ std::vector<double> cedar::aux::math::solveQuartic(const std::vector<double>& rC
       return solutions;
     }
     
-    if (IsZero(v))
+    if (cedar::aux::math::isZero(v))
     {
       v = 0;
     }
@@ -261,8 +261,10 @@ std::vector<double> cedar::aux::math::solveQuartic(const std::vector<double>& rC
   return solutions;
 }
 
-std::vector<double> cedar::aux::math::solvePolynomial(const std::vector<double>& /*rCoefficients*/)
+/*
+std::vector<double> cedar::aux::math::solvePolynomial(const std::vector<double>& rCoefficients)
 {
   std::vector<double> solutions;
   return solutions;
 }
+*/

@@ -96,7 +96,6 @@ public:
         return cv::BORDER_REPLICATE;
 
       case cedar::aux::conv::BorderType::Zero:
-        //!@todo This may actually make the border -1 rather than 0, at least according to the documentation
         return cv::BORDER_CONSTANT;
 
       default:

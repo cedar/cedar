@@ -260,7 +260,8 @@ void cedar::aux::gui::LinePlot::doAppend(cedar::aux::ConstDataPtr data, const st
   data->lockForRead();
   const cv::Mat& mat = plot_series->mMatData->getData();
 
-  //!@todo This throws an exception when null data (or data of other dimensionality than 1) is passed.
+  CEDAR_DEBUG_ASSERT(cedar::aux::math::getDimensionalityOf(mat) == 1);
+
   size_t num = cedar::aux::math::get1DMatrixSize(mat);
   data->unlock();
 
@@ -272,7 +273,6 @@ void cedar::aux::gui::LinePlot::doAppend(cedar::aux::ConstDataPtr data, const st
 
   plot_series->buildArrays(num);
 
-  //!@todo write a macro that does this check (see HistoryPlot0D.cpp)
 #if (QWT_VERSION >> 16) == 5
   plot_series->mpCurve->setData(&plot_series->mXValues.at(0), &plot_series->mYValues.at(0), num);
 #elif (QWT_VERSION >> 16) == 6
@@ -284,7 +284,7 @@ void cedar::aux::gui::LinePlot::doAppend(cedar::aux::ConstDataPtr data, const st
 
   mpLock->unlock();
 
-  this->startTimer(30); //!@todo make the refresh time configurable.
+  this->startTimer(30);
 }
 
 void cedar::aux::gui::LinePlot::attachMarker(QwtPlotMarker *pMarker)
@@ -324,7 +324,6 @@ void cedar::aux::gui::LinePlot::init()
   mConversionWorker = cedar::aux::gui::detail::LinePlotWorkerPtr(new cedar::aux::gui::detail::LinePlotWorker(this));
   mConversionWorker->moveToThread(mpWorkerThread);
 
-  //!@todo Add possibility to change priority
   this->mpWorkerThread->start(QThread::LowPriority);
 
   QObject::connect(mConversionWorker.get(), SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
@@ -351,7 +350,6 @@ void cedar::aux::gui::LinePlot::contextMenuEvent(QContextMenuEvent *pEvent)
   QObject::connect(p_legend, SIGNAL(toggled(bool)), this, SLOT(showLegend(bool)));
   p_legend->setChecked(this->mpPlot->legend() != NULL);
 
-  //!@todo This should be generalized for all plots so that plots only have to supply a method for (re-)setting the limits.
   menu.addSeparator();
   QMenu* p_y_scaling_menu = menu.addMenu("y axis scaling");
   QAction* p_y_scaling_auto = p_y_scaling_menu->addAction("automatic");
@@ -531,7 +529,6 @@ void cedar::aux::gui::LinePlot::conversionDone()
     PlotSeriesPtr series = this->mPlotSeriesVector.at(i);
 
     // choose the right function depending on the qwt version
-    //!@todo write a macro that does this check (see HistoryPlot0D.cpp)
     #if (QWT_VERSION >> 16) == 5
       series->mpCurve->setData
       (

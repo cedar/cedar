@@ -40,12 +40,13 @@
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include <cedar/auxiliaries/utilities.h>
 
 // SYSTEM INCLUDES
 #include <iostream>
 #include <math.h>
 #include <limits.h>
-
+#include <boost/static_assert.hpp>
 
 std::string cedar::aux::math::matrixTypeToString(const cv::Mat& matrix)
 {
@@ -175,130 +176,7 @@ double cedar::aux::math::min(const cv::Mat matrix)
 
 void cedar::aux::math::write(cv::Mat matrix)
 {
-  switch (matrix.type())
-  {
-  case CV_8U:
-    for(int i = 0; i < matrix.rows; i++)
-    {
-      for (int j = 0; j < matrix.cols; j++)
-      {
-        if (IsZero(matrix.at<unsigned char>(i, j)))
-        {
-          std::cout << "0" << " ";
-        }
-        else
-        {
-          std::cout << matrix.at<unsigned char>(i, j) << " ";
-        }
-      }
-      std::cout << "\n";
-    }
-  break;
-  case CV_8S:
-    for(int i = 0; i < matrix.rows; i++)
-    {
-      for (int j = 0; j < matrix.cols; j++)
-      {
-        if (IsZero(matrix.at<char>(i, j)))
-        {
-          std::cout << "0" << " ";
-        }
-        else
-        {
-          std::cout << matrix.at<char>(i, j) << " ";
-        }
-      }
-      std::cout << "\n";
-    }
-  break;
-  case CV_16U:
-      for(int i = 0; i < matrix.rows; i++)
-      {
-        for (int j = 0; j < matrix.cols; j++)
-        {
-          if (IsZero(matrix.at<unsigned short int>(i, j)))
-          {
-            std::cout << "0" << " ";
-          }
-          else
-          {
-            std::cout << matrix.at<unsigned short int>(i, j) << " ";
-          }
-        }
-        std::cout << "\n";
-      }
-    break;
-  case CV_16S:
-      for(int i = 0; i < matrix.rows; i++)
-      {
-        for (int j = 0; j < matrix.cols; j++)
-        {
-          if (IsZero(matrix.at<short int>(i, j)))
-          {
-            std::cout << "0" << " ";
-          }
-          else
-          {
-            std::cout << matrix.at<short int>(i, j) << " ";
-          }
-        }
-        std::cout << "\n";
-      }
-    break;
-  case CV_32S:
-      for(int i = 0; i < matrix.rows; i++)
-      {
-        for (int j=0; j<matrix.cols; j++)
-        {
-          if (IsZero(matrix.at<int>(i, j)))
-          {
-            std::cout << "0" << " ";
-          }
-          else
-          {
-            std::cout << matrix.at<int>(i, j) << " ";
-          }
-        }
-        std::cout << "\n";
-      }
-    break;
-  case CV_32F:
-    for(int i = 0; i < matrix.rows; i++)
-    {
-      for (int j=0; j<matrix.cols; j++)
-      {
-        if (IsZero(matrix.at<float>(i, j)))
-        {
-          std::cout << "0" << " ";
-        }
-        else
-        {
-          std::cout << matrix.at<float>(i, j) << " ";
-        }
-      }
-      std::cout << "\n";
-    }
-  break;
-  case CV_64F:
-  for(int i = 0; i < matrix.rows; i++)
-  {
-    for (int j=0; j<matrix.cols; j++)
-    {
-      if (IsZero(matrix.at<double>(i, j)))
-      {
-        std::cout << "0" << " ";
-      }
-      else
-      {
-        std::cout << matrix.at<double>(i, j) << " ";
-      }
-    }
-    std::cout << "\n";
-  }
-  default:
-    break;
-  }
-  std::cout << "\n";
+  cedar::aux::write(matrix);
 }
 
 template <typename T>

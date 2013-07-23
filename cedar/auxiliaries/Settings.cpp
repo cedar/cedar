@@ -59,10 +59,11 @@ _mMemoryDebugOutput(new cedar::aux::BoolParameter(this, "memory debug output", f
   }
   catch (cedar::aux::ParseException& exc)
   {
-    //!\todo pass a log message to somewhere
-#ifdef DEBUG
-    std::cout << "error loading settings, a new file will be generated" << std::endl;
-#endif
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Error loading settings, a new file will be generated.",
+      "cedar::aux::Settings::Settings()"
+    );
   }
 }
 
@@ -74,9 +75,12 @@ cedar::aux::Settings::~Settings()
   }
   catch(cedar::aux::ParseException& exc)
   {
-    //!\todo pass a log message to somewhere
-    std::cout << "error saving settings, please check file permissions in "
-              << cedar::aux::getUserApplicationDataDirectory() << "/.cedar" << std::endl;
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Error saving settings, please check file permissions in"
+        + cedar::aux::getUserApplicationDataDirectory() + "/.cedar",
+      "cedar::aux::Settings::~Settings()"
+    );
   }
 }
 

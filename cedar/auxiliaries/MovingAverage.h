@@ -101,7 +101,7 @@ public:
   MovingAverage(size_t maxNumSamples)
   :
   mMaxNumElements(maxNumSamples),
-  mElementSum(0) //!@todo Should initialization be a policy?
+  mElementSum(0)
   {
     CEDAR_ASSERT(maxNumSamples > 0);
   }

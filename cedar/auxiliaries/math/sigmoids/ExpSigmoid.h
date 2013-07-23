@@ -51,7 +51,7 @@
 
 /*!@brief Sigmoid function that is based on the exponential function.
  *
- * @todo Put the equation in here, describe it.
+ *
  */
 class cedar::aux::math::ExpSigmoid : public cedar::aux::math::Sigmoid
 {

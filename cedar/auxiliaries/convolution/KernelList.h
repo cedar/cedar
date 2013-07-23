@@ -118,7 +118,7 @@ public:
     return this->mKernelRemovedSignal.connect(slot);
   }
 
-  //!@todo store the result of this function in a member and only update on demand
+  //! this function calculates and returns the combined kernel of all kernels included in this list
   cv::Mat getCombinedKernel() const;
 
   //!@brief returns true if all kernels in list have same dimensionality and size

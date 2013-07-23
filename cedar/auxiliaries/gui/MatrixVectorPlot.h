@@ -55,8 +55,6 @@
 #include <opencv2/opencv.hpp>
 
 /*!@brief Matrix plot that can display 1D matrices (i.e. vectors) as vectors.
- *
- * @todo Write more detailed description of the class here.
  */
 class cedar::aux::gui::MatrixVectorPlot : public cedar::aux::gui::MultiPlotInterface
 {
@@ -131,7 +129,6 @@ public:
   bool canAppend(cedar::aux::ConstDataPtr data) const;
 
   //!@brief Returns the limits of the x axis.
-  //!@todo Generalize this for n-dimensional matrix plots.
   cedar::aux::math::Limits<double> getXLimits() const;
 
   //--------------------------------------------------------------------------------------------------------------------
