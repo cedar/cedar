@@ -42,7 +42,7 @@
 #define CEDAR_AUX_MATH_HEAVISIDE_SIGMOID_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/math/sigmoids/namespace.h"
 #include "cedar/auxiliaries/math/sigmoids.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
 

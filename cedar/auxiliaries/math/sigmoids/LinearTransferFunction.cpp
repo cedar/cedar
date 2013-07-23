@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SemiLinearSigmoid.cpp
+    File:        LinearSigmoid.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
@@ -35,8 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/sigmoids/SemiLinearSigmoid.h"
-#include "cedar/auxiliaries/math/sigmoids.h"
+#include "cedar/auxiliaries/math/sigmoids/LinearTransferFunction.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/Singleton.h"
 
@@ -48,18 +47,27 @@
 
 namespace
 {
-  bool registered
-    = cedar::aux::math::TransferFunctionManagerSingleton::getInstance()->registerType<cedar::aux::math::SemiLinearSigmoidPtr>();
+  bool register_function()
+  {
+    cedar::aux::math::TransferFunctionManagerSingleton::getInstance()
+      ->registerType<cedar::aux::math::LinearTransferFunctionPtr>();
+
+    cedar::aux::math::TransferFunctionManagerSingleton::getInstance()
+          ->addDeprecatedName<cedar::aux::math::LinearTransferFunctionPtr>("cedar.aux.math.LinearSigmoid");
+
+    return true;
+  }
+
+  bool registered = register_function();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::math::SemiLinearSigmoid::SemiLinearSigmoid(double threshold, double beta)
+cedar::aux::math::LinearTransferFunction::LinearTransferFunction()
 :
-cedar::aux::math::Sigmoid(threshold),
-_mBeta(new cedar::aux::DoubleParameter(this, "beta", beta))
+cedar::aux::math::TransferFunction()
 {
 }
 
@@ -67,7 +75,7 @@ _mBeta(new cedar::aux::DoubleParameter(this, "beta", beta))
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double cedar::aux::math::SemiLinearSigmoid::compute(double value) const
+double cedar::aux::math::LinearTransferFunction::compute(double value) const
 {
-  return cedar::aux::math::sigmoidSemiLinear(value, this->getThreshold(), this->getBeta());
+  return value;
 }

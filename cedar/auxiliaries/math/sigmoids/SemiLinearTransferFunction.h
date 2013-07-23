@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SemiLinearSigmoid.h
+    File:        SemiLinearTransferFunction.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
@@ -34,18 +34,19 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MATH_SEMI_LINEAR_SIGMOID_H
-#define CEDAR_AUX_MATH_SEMI_LINEAR_SIGMOID_H
+#ifndef CEDAR_AUX_MATH_SEMI_LINEAR_TRANSFER_FUNCTION_H
+#define CEDAR_AUX_MATH_SEMI_LINEAR_TRANSFER_FUNCTION_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
-#include "cedar/auxiliaries/math/Sigmoid.h"
+#include "cedar/auxiliaries/math/sigmoids/namespace.h"
+#include "cedar/auxiliaries/math/TransferFunction.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief Sigmoid function that is linear above a given threshold.
+/*!@brief Transfer function that is linear above a given threshold.
  */
-class cedar::aux::math::SemiLinearSigmoid : public cedar::aux::math::Sigmoid
+class cedar::aux::math::SemiLinearTransferFunction : public cedar::aux::math::TransferFunction
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -56,7 +57,7 @@ class cedar::aux::math::SemiLinearSigmoid : public cedar::aux::math::Sigmoid
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  SemiLinearSigmoid(double threshold = 0.0, double beta = 1.0);
+  SemiLinearTransferFunction(double threshold = 0.0, double beta = 1.0);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -71,6 +72,13 @@ public:
   inline double getBeta() const
   {
     return this->_mBeta->getValue();
+  }
+
+  /*! Returns the current threshold value.
+   */
+  inline double getThreshold() const
+  {
+    return this->_mThreshold->getValue();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -91,8 +99,11 @@ private:
 protected:
   // none yet
 private:
-  //!@brief steepness of the linear part of the sigmoid.
+  //!@brief Threshold.
+  cedar::aux::DoubleParameterPtr _mThreshold;
+
+  //!@brief Steepness of the linear part.
   cedar::aux::DoubleParameterPtr _mBeta;
 };
 
-#endif  // CEDAR_AUX_MATH_SEMI_LINEAR_SIGMOID_H
+#endif  // CEDAR_AUX_MATH_SEMI_LINEAR_TRANSFER_FUNCTION_H

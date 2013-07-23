@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LinearSigmoid.h
+    File:        LinearTransferFunction.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
@@ -34,18 +34,18 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MATH_LINEAR_SIGMOID_H
-#define CEDAR_AUX_MATH_LINEAR_SIGMOID_H
+#ifndef CEDAR_AUX_MATH_LINEAR_TRANSFER_FUNCTION_H
+#define CEDAR_AUX_MATH_LINEAR_TRANSFER_FUNCTION_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
-#include "cedar/auxiliaries/math/Sigmoid.h"
+#include "cedar/auxiliaries/math/sigmoids/namespace.h"
+#include "cedar/auxiliaries/math/TransferFunction.h"
 
 // SYSTEM INCLUDES
 
 /*!@brief Sigmoid function that is linear, i.e., multiplies the values with a scalar.
  */
-class cedar::aux::math::LinearSigmoid : public cedar::aux::math::Sigmoid
+class cedar::aux::math::LinearTransferFunction : public cedar::aux::math::TransferFunction
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -56,7 +56,7 @@ class cedar::aux::math::LinearSigmoid : public cedar::aux::math::Sigmoid
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  LinearSigmoid(double threshold = 0.0);
+  LinearTransferFunction();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -87,4 +87,4 @@ private:
   // none yet
 };
 
-#endif  // CEDAR_AUX_MATH_LINEAR_SIGMOID_H
+#endif  // CEDAR_AUX_MATH_LINEAR_TRANSFER_FUNCTION_H
