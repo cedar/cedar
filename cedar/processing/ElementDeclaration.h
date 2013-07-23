@@ -51,12 +51,13 @@
 #include "cedar/auxiliaries/PluginDeclarationTemplate.h"
 
 // SYSTEM INCLUDES
+#include <QIcon>
+#include <QResource>
 #include <vector>
 
 
 /*!@brief A StepDeclaration contains the relation of a unique class id (as string) and the corresponding factory to
  * create a step of this id. It is a concretization of DeclarationBase.
- * @todo With the revised factory, passing the factory type is probably unnecessary
  */
 class cedar::proc::ElementDeclaration : public cedar::aux::PluginDeclarationBaseTemplate<cedar::proc::ElementPtr>
 {
@@ -158,6 +159,28 @@ public:
     return this->mIconPath;
   }
 
+  //!@brief Returns the actual icon for the element.
+  QIcon getIcon() const
+  {
+    QResource existance_test(QString::fromStdString(this->getIconPath()));
+    if (existance_test.isValid())
+    {
+      auto icon = QIcon(QString::fromStdString(this->getIconPath()));
+      if (icon.isNull())
+      {
+        return QIcon(":/steps/no_icon.svg");
+      }
+      else
+      {
+        return icon;
+      }
+    }
+    else
+    {
+      return QIcon(":/steps/broken_icon.svg");
+    }
+  }
+
   //!@brief Method for setting the description of the element.
   void setDescription(const std::string& description)
   {
@@ -173,8 +196,6 @@ public:
   /*!@brief Defines a new plot for this type of element
    *
    * @param plotDefinition Definition of the plot.
-   *
-   * @todo  This could also be read from the plugin xml file.
    */
   void definePlot(const PlotDefinition& plotDefinition)
   {

@@ -100,7 +100,7 @@ int main(int /* argc */, char** /* argv */)
 
   std::cout << "Reading Sample.json ... ";
   cedar::proc::NetworkPtr network(new cedar::proc::Network());
-  network->readFile("Sample.json");
+  network->readJson("Sample.json");
   std::cout << "done." << std::endl;
 
   std::cout << "Trying to call compute functions ... ";
@@ -170,10 +170,10 @@ int main(int /* argc */, char** /* argv */)
   network_parent->add(network_child);
 
   std::cout << "Write nested network." << std::endl;
-  network_parent->writeFile("Nested.json");
+  network_parent->writeJson("Nested.json");
   std::cout << "Read nested network." << std::endl;
   cedar::proc::NetworkPtr network_nested(new cedar::proc::Network());
-  network_nested->readFile("Nested.json");
+  network_nested->readJson("Nested.json");
 
   std::cout << "testing Network::getElement for nested networks" << std::endl;
   network_nested->getElement<Step>("parent step");
