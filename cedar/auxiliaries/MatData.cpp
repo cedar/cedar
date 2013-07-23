@@ -43,10 +43,18 @@
 #include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
-
+#include <vector>
+#include <string>
+#include <fstream>
+#include <boost/lexical_cast.hpp>
+#include<iostream>
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::MatData::~MatData()
+{
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -95,6 +103,111 @@ std::string cedar::aux::MatData::getDescription() const
   this->unlock();
 
   return description;
+}
+
+std::string cedar::aux::MatData::serializeData()
+{
+  this->lockForRead();
+  // using of a string stream to cast doubles to strings. This is much faster compared to
+  // boost lexical_cast<>
+  std::ostringstream ss;
+
+  //creating index that addresses an element in the n dimensional Mat
+  std::vector<int> index;
+  for( int k=0; k<mData.dims; k++ )
+  {
+    index.push_back(0);
+  }
+
+  //iterate  as long the last dimension has exceeded
+  while(index[mData.dims-1] < mData.size[mData.dims-1])
+  {
+    // get memory address of the element
+    uchar* element = mData.data;
+    for(int i =0; i <mData.dims;i++)
+    {
+      element += mData.step[i]*index[i];
+    }
+    //check data type
+    for(int i=0;i<mData.channels();i++)
+    {
+      switch(mData.depth())
+      {
+        case CV_8U:
+        {
+          ss << (int)(*(uchar*)(element+i*1)) << ",";
+          break;
+        }
+        case CV_8S:
+        {
+          ss << (int)(*(schar*)(element+i*1)) << ",";
+          break;
+        }
+        case CV_16U:
+        {
+          ss << *(unsigned short*)(element+i*2) << ",";
+          break;
+        }
+        case CV_16S:
+        {
+          ss << *(short*)(element+i*2) << ",";
+          break;
+        }
+        case CV_32S:
+        {
+          ss << *(int*)(element+i*4) << ",";
+          break;
+        }
+        case CV_32F:
+        {
+          ss << *(float*)(element+i*4) << ",";
+          break;
+        }
+        case CV_64F:
+        {
+          ss << *(double*)(element+i*8) << ",";
+          break;
+        }
+      }
+    }
+
+    //increase index
+    index[0]++;
+    for(int i =0; i < mData.dims-1;i++)
+    {
+      if(index[i]>=mData.size[i])
+      {
+        index[i]=0;
+        index[i+1]++;
+      }
+    }
+  }
+
+  this->unlock();
+  return ss.str();
+}
+
+std::string cedar::aux::MatData::serializeHeader()
+{
+  this->lockForRead();
+  std::ostringstream s;
+  s << "Mat" << ",";
+  s << mData.type() << ",";
+  s << mData.dims << ",";
+  for(int i =0; i < mData.dims;i++)
+  {
+    s << mData.size[i] << ",";
+  }
+  this->unlock();
+  return s.str();
+}
+
+cedar::aux::DataPtr cedar::aux::MatData::clone()
+{
+  lockForRead();
+  MatDataPtr neu(new MatData(mData.clone()));
+  unlock();
+  return neu;
 }
 
 unsigned int cedar::aux::MatData::getDimensionality() const

@@ -106,7 +106,7 @@ public:
    *        the timeout-period. Use with caution.
    *@param suppressWarning: will be passed to applyStop()
    */
-  void stop(unsigned int timeout = UINT_MAX, bool suppressWarning = false); 
+  virtual void stop(unsigned int timeout = UINT_MAX, bool suppressWarning = false);
     // TODO: why is this uint and the arg of wait() is ulong?
 
   /*! start the thread and initialize the worker
@@ -115,7 +115,7 @@ public:
    * Re-entry or calling start() twice will be detected and will 
    * abort with a cedar-warning.
    */
-  void start(); 
+  virtual void start();
 
   //! is the thread still running?
   bool isRunning() const; 

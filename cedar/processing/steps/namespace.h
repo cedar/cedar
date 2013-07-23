@@ -67,6 +67,7 @@ namespace cedar
       CEDAR_DECLARE_PROC_CLASS(StaticGain);
       CEDAR_DECLARE_PROC_CLASS(Sum);
       CEDAR_DECLARE_PROC_CLASS(Switch);
+      CEDAR_DECLARE_PROC_CLASS(DataRecorder);
 
 #ifdef CEDAR_USE_YARP
       CEDAR_DECLARE_PROC_CLASS(NetWriterSink);

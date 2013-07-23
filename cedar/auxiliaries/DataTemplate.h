@@ -94,6 +94,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+  DataPtr clone()
+  {
+	  boost::shared_ptr<DataTemplate<T>> neu(new DataTemplate<T>());
+	  neu->mData = this->mData;
+	  return neu;
+  }
+
   //!@brief returns the internal data
   T& getData()
   {
