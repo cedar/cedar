@@ -253,7 +253,6 @@ double cedar::dev::sensors::camera::Properties::getProperty
   cedar::dev::sensors::camera::Property::Id propertyId
 )
 {
-  //!@ todo: throw exceptions instead of returning constants for special values
   cedar::dev::sensors::camera::CamPropertyPtr p_prop = mPropertiesList[propertyId];
 
   // only return this value, if set to manual or if backend-default value

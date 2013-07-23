@@ -159,7 +159,7 @@ const std::vector<cedar::unit::Velocity>& cedar::dev::DifferentialDrive::getWhee
   return mWheelSpeed;
 }
 
-void cedar::dev::DifferentialDrive::setWheelSpeed(std::vector<cedar::unit::Velocity >& wheelSpeed)
+void cedar::dev::DifferentialDrive::setWheelSpeed(const std::vector<cedar::unit::Velocity >& wheelSpeed)
 {
   cedar::unit::Velocity forward_velocity = 0.0 * cedar::unit::DEFAULT_VELOCITY_UNIT;
   cedar::unit::AngularVelocity turning_rate = 0.0 * cedar::unit::DEFAULT_ANGULAR_VELOCITY_UNIT;

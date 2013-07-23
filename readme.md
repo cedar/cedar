@@ -1,3 +1,6 @@
+Readme                                                                                                         {#readme}
+======
+
 # License
 
 Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum,

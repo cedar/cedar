@@ -276,7 +276,7 @@ void cedar::dev::sensors::visual::NetGrabber::onCreateGrabber()
   // determine framerate of the source
   //-------------------------------------------------
 
-  // TODO get fps from source: measure the difference between two frames
+  //!@todo get fps from source: measure the difference between two frames
   this->setFramerate(100.f);
 }
 

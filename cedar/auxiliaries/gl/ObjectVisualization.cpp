@@ -202,7 +202,7 @@ cedar::aux::LocalCoordinateFramePtr cedar::aux::gl::ObjectVisualization::getLoca
 void cedar::aux::gl::ObjectVisualization::prepareDraw()
 {
   // move to origin
-  glPopMatrix();
+  glPopMatrix(); //!@todo What is this pop doing here? The usual way to get to origin is to push, glLoadIdentity
   glPushMatrix();
 
   // move to object coordinates

@@ -48,9 +48,10 @@
 #include <QGridLayout>
 #include <QWidget>
 
-//!@brief A simple widget to access all the joints via GUI
-//!@todo I removed the CEDAR_DEV_LIB_EXPORT here, check if this still runs on Windows.
-//class CEDAR_DEV_LIB_EXPORT cedar::dev::gui::KinematicChainWidget
+/*!@brief A simple widget to access all the joints via GUI
+ *
+ * @todo This class does not conform to the usual template.
+ */
 class cedar::dev::gui::KinematicChainWidget
 :
 public QWidget

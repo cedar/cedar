@@ -46,8 +46,6 @@
 // SYSTEM INCLUDES
 
 /*!@brief Base class for components of robots.
- *
- * @todo More detailed description of the class.
  */
 class cedar::dev::Component : public cedar::aux::NamedConfigurable
 {

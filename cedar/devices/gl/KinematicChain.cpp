@@ -89,7 +89,7 @@ void cedar::dev::gl::KinematicChain::draw()
       drawEndEffectorAcceleration();
     }
 
-    glPopMatrix(); //!\todo check if this is needed
+    glPopMatrix(); //!@todo Is there a push corresponding to this?
   }
 }
 

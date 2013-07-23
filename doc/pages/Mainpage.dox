@@ -22,7 +22,12 @@ framework and add custom steps.
 developers' guide @endlink.
 
 @section Installation Installing cedar
-Please refer to the "readme.txt" file in the root of the repository to find instructions on how to install cedar.
+Please refer to the @ref readme page or the readme.md file in the root of the repository to find instructions on how to
+install cedar.
+
+@section VersionNotes Version notes
+Version notes can be found in the @ref changelog (or the changelog.md in the root directory of cedar). This also
+includes a list of known issues.
 
 @section Documentation How to get this documentation
 This documentation is included in your copy of cedar. cmake will create a Doxyfile in your build folder. You need
