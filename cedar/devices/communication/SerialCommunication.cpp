@@ -360,7 +360,6 @@ void cedar::dev::com::SerialCommunication::updateTranslatedEndOfCommandString()
 
 void cedar::dev::com::SerialCommunication::open()
 {
-  //!@todo There is a lot of duplicate code here for mac and linux -- make this less redundant
   if (!this->isInitialized())
   {
     this->initialize();
@@ -427,7 +426,6 @@ void cedar::dev::com::SerialCommunication::open()
     }
   }
 
-  //@todo what is going on here?
   cfsetospeed(&mTerminal, _mBaudrate->getValue());
   cfsetispeed(&mTerminal, _mBaudrate->getValue());
   mTerminal.c_cc[VMIN] = 0;

@@ -491,10 +491,9 @@ bool cedar::dev::sensors::camera::Grabber::isGuid(unsigned int channel) const
 
 double cedar::dev::sensors::camera::Grabber::getProperty(unsigned int channel, Property::Id propId)
 {
-  //!@ todo: throw exceptions instead of returning constants for special values
   if (channel >= getNumChannels())
   {
-    CEDAR_THROW(cedar::aux::IndexOutOfRangeException,buildChannelErrorMessage(channel));
+    CEDAR_THROW(cedar::aux::IndexOutOfRangeException, buildChannelErrorMessage(channel));
   }
 
   cedar::dev::sensors::camera::PropertiesPtr p_prop = this->getCameraChannel(channel)->mpProperties;
@@ -502,12 +501,10 @@ double cedar::dev::sensors::camera::Grabber::getProperty(unsigned int channel, P
 
   if (value == CAMERA_PROPERTY_NOT_SUPPORTED)
   {
-    std::string info = "is not supported!";
-
     std::string prop_name = Property::type().get(propId).prettyString();
     cedar::aux::LogSingleton::getInstance()->warning
                                              (
-                                               this->getName() + ": Property " + prop_name + info,
+                                               this->getName() + ": Property " + prop_name + "is not supported!",
                                                "cedar::dev::sensors::camera::Grabber::getProperty()"
                                              );
   }
@@ -517,7 +514,6 @@ double cedar::dev::sensors::camera::Grabber::getProperty(unsigned int channel, P
 
 double cedar::dev::sensors::camera::Grabber::getPropertyValue(unsigned int channel,Property::Id propId)
 {
-  //!@ todo: throw exceptions instead of returning constants for special values
   if (channel >= getNumChannels())
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException,buildChannelErrorMessage(channel));

@@ -48,8 +48,6 @@
 #include <set>
 
 /*!@brief Base class for components of robots.
- *
- * @todo More detailed description of the class.
  */
 class cedar::dev::robot::Component
 {
