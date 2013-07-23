@@ -66,7 +66,6 @@ cedar::proc::Manager::Manager()
 
 cedar::proc::Manager::~Manager()
 {
-  this->stopThreads();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -143,7 +142,6 @@ void cedar::proc::Manager::startThreads()
 {
   for (ThreadRegistry::iterator iter = this->mThreadRegistry.begin(); iter != this->mThreadRegistry.end(); ++iter)
   {
-    //!@todo Ugly solution -- is there a better one?
     if (cedar::proc::LoopedTrigger* looped_trigger = dynamic_cast<cedar::proc::LoopedTrigger*>(iter->get()))
     {
       looped_trigger->startTrigger();
@@ -160,7 +158,6 @@ void cedar::proc::Manager::stopThreads(bool wait)
   // Stop all the threads
   for (ThreadRegistry::iterator iter = this->mThreadRegistry.begin(); iter != this->mThreadRegistry.end(); ++iter)
   {
-    //!@todo Ugly solution -- is there a better one?
     if (cedar::proc::LoopedTrigger* looped_trigger = dynamic_cast<cedar::proc::LoopedTrigger*>(iter->get()))
     {
       looped_trigger->stopTrigger();

@@ -166,7 +166,7 @@ void cedar::proc::sources::Video::compute(const cedar::proc::Arguments &argument
     {
       this->getVideoGrabber()->grab();
       this->mImage->setData(this->getVideoGrabber()->getImage());
-      mTimeElapsed = 0.0;
+      this->mTimeElapsed = 0.0;
     }
   }
 }

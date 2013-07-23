@@ -51,7 +51,8 @@
 
 /*!@brief Graphical representation of connections.
  *
- * @todo Write more detailed description of the class here.
+ *        This class is responsible for displaying connections between either the data slots of processing steps, or
+ *        between (looped) triggers and processing steps.
  */
 class cedar::proc::gui::Connection : public QGraphicsPathItem
 {

@@ -84,7 +84,7 @@ void run_test()
 
   std::cout << "Reading Setup1.json ... ";
   cedar::proc::NetworkPtr network(new cedar::proc::Network());
-  network->readFile("Setup1.json");
+  network->readJson("Setup1.json");
   std::cout << "done." << std::endl;
 
   // Create trigger for the "main loop"

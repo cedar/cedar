@@ -194,7 +194,7 @@ int main(int, char**)
   std::cout << "done." << std::endl;
 
   std::cout << "Saving network ... ";
-  network->writeFile("architecture1.json");
+  network->writeJson("architecture1.json");
   std::cout << "done." << std::endl;
 
   std::cout << "Resetting ... ";
@@ -206,7 +206,7 @@ int main(int, char**)
 
   std::cout << "Loading network ... ";
   network = cedar::proc::NetworkPtr(new cedar::proc::Network());
-  network->readFile("architecture1.json");
+  network->readJson("architecture1.json");
   std::cout << "done." << std::endl;
 
   try
@@ -228,7 +228,7 @@ int main(int, char**)
       std::cout << "done." << std::endl;
     }
   }
-  catch (const cedar::proc::InvalidNameException&)
+  catch (const cedar::aux::InvalidNameException&)
   {
     std::cout << "NOT FOUND." << std::endl;
     ++errors;
@@ -253,7 +253,7 @@ int main(int, char**)
       std::cout << "done." << std::endl;
     }
   }
-  catch (const cedar::proc::InvalidNameException&)
+  catch (const cedar::aux::InvalidNameException&)
   {
     std::cout << "NOT FOUND." << std::endl;
     ++errors;
@@ -266,7 +266,7 @@ int main(int, char**)
     CEDAR_ASSERT(trigger);
     std::cout << "found." << std::endl;
   }
-  catch (const cedar::proc::InvalidNameException&)
+  catch (const cedar::aux::InvalidNameException&)
   {
     std::cout << "NOT FOUND." << std::endl;
     ++errors;

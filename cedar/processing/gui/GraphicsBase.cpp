@@ -308,7 +308,6 @@ void cedar::proc::gui::GraphicsBase::setHighlightMode(cedar::proc::gui::Graphics
 QRectF cedar::proc::gui::GraphicsBase::boundingRect() const
 {
   qreal padding = static_cast<qreal>(1.0);
-  //! @todo properly map the size to the scene coordinate system
   return QRectF(QPointF(-padding, -padding), QSizeF(this->width() + padding, this->height() + padding));
 }
 
