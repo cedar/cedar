@@ -264,7 +264,6 @@ void cedar::proc::Network::stepTriggers()
 void cedar::proc::Network::stepTriggers(cedar::unit::Time stepTime)
 {
   double time_milli = stepTime / cedar::unit::seconds * 1000;
-  std::cout << "milli " << time_milli << std::endl;
   this->stepTriggers(time_milli);
 }
 
@@ -1727,7 +1726,6 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
   if (!triggerable_target->isLooped())
   {
     target_name = connection->getTarget()->getParent(); // reset target_name
-    connection->disconnect();
     // check that both Connectables are not connected through some other DataSlots
     cedar::proc::ConnectablePtr target_connectable = this->getElement<cedar::proc::Connectable>(target_name);
     for (DataConnectionVector::iterator iter = mDataConnections.begin(); iter != mDataConnections.end(); ++iter)
@@ -1771,7 +1769,7 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
   }
   else
   {
-    connection->disconnect();
+
     it = mDataConnections.erase(it);
   }
   return it;

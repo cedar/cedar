@@ -123,9 +123,6 @@ cedar::proc::DataSlotPtr cedar::proc::DataConnection::getRealTarget() const
   else
   {
     CEDAR_THROW(cedar::proc::ConnectionMemberDeletedException, "Could not acquire source or target.");
-
-    mSource.reset();
-    mTarget.reset();
   }
 }
 
