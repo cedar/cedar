@@ -45,7 +45,6 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
-//!\todo add setColor function, so this is the only file that needs to include gl
 namespace cedar
 {
   namespace aux
@@ -102,7 +101,7 @@ namespace cedar
                      double radiusFloor,
                      double radiusCeiling,
                      int slices,
-                     bool wireFrame=false
+                     bool wireFrame = false
                    );
       
       /*!@brief  draws a cone around an arbitrary line segment in the current coordinate frame
@@ -120,7 +119,8 @@ namespace cedar
                      double radiusStart,
                      double radiusEnd,
                      int slices,
-                     bool wireFrame=false);
+                     bool wireFrame = false
+                   );
 
       /*!@brief draws an arrow between two arbitrary points in the current coordinate frame
        * @param start start of the arrow

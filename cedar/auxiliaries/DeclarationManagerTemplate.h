@@ -47,7 +47,6 @@
 
 // SYSTEM INCLUDES
 
-
 /*!@brief A template for manager of plugin declarations.
  *
  *        This class manages a set of cedar::aux::PluginDeclaration instances. It offers functionality for adding and

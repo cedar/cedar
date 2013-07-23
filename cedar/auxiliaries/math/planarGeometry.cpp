@@ -94,7 +94,7 @@ double cedar::aux::math::distancePointEllipse(double a, double b, double u, doub
     x0_candidate = roots[i];
     // calculate candidates for y0
     discriminant = (1 - b2 * x0_candidate * x0_candidate) / (a2);
-    if (IsZero(discriminant))
+    if (cedar::aux::math::isZero(discriminant))
     {
       discriminant = 0;
     }
@@ -132,6 +132,4 @@ double cedar::aux::math::distancePointEllipse(double a, double b, double u, doub
   }
 
   return distance;
-
-  //!\todo check for a = 0.63662; b = 0.63662; u = 1.15139; v = 0.198351
 }

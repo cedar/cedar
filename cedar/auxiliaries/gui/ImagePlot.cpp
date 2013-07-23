@@ -244,7 +244,6 @@ void cedar::aux::gui::ImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
 
 void cedar::aux::gui::ImagePlot::queryFixedValueScale()
 {
-  //!@todo This is copied & pasted from LinePlot. Put this in a class.
   QDialog* p_dialog = new QDialog();
   p_dialog->setModal(true);
   auto p_layout = new QGridLayout();
@@ -304,9 +303,8 @@ void cedar::aux::gui::ImagePlot::setSmoothScaling(bool smooth)
   this->mSmoothScaling = smooth;
 }
 
-void cedar::aux::gui::ImagePlot::ImageDisplay::mousePressEvent(QMouseEvent * pEvent)
+void cedar::aux::gui::ImagePlot::ImageDisplay::mousePressEvent(QMouseEvent* pEvent)
 {
-  //!@todo Use the channel annotation for values from three channel images
   if (!this->pixmap() || !this->mData || pEvent->button() != Qt::LeftButton)
     return;
 
@@ -447,8 +445,6 @@ void cedar::aux::gui::detail::ImagePlotWorker::convert()
 
     case CV_32FC1:
     {
-      //!@todo This should color-code when the data is not an image (i.e., a matrix)
-      //!@todo Some code here is redundant
       // find min and max for scaling
       double min, max;
 
@@ -523,7 +519,6 @@ void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
 
 void cedar::aux::gui::ImagePlot::fillColorizationGradient(QGradient& gradient)
 {
-  //!@todo this should be unified with the values in MatrixPlot.cpp
   gradient.setColorAt(static_cast<qreal>(1.0), QColor(0, 0, 127));
   gradient.setColorAt(static_cast<qreal>(1.0 - 32.0/256.0), QColor(0, 0, 255));
   gradient.setColorAt(static_cast<qreal>(1.0 - 96.0/256.0), QColor(0, 255, 255));
@@ -534,7 +529,6 @@ void cedar::aux::gui::ImagePlot::fillColorizationGradient(QGradient& gradient)
 
 cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix)
 {
-  //!@todo encapsulate lookup table functionality in own class / opencv might have functionality for this by now
   QReadLocker lookup_readlock(&mLookupTableLock);
   if (mLookupTableR.empty() || mLookupTableG.empty() || mLookupTableB.empty())
   {

@@ -45,8 +45,6 @@
 #include <QComboBox>
 
 /*!@brief Widget for displaying cedar::aux::EnumParameters.
- *
- * @todo React to changes in enabledness of enum values in the enum parameter
  */
 class cedar::aux::gui::EnumParameter : public cedar::aux::gui::Parameter
 {
@@ -60,7 +58,7 @@ class cedar::aux::gui::EnumParameter : public cedar::aux::gui::Parameter
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  EnumParameter(QWidget *pParent = NULL);
+  EnumParameter(QWidget* pParent = NULL);
 
   //!@brief Destructor
   virtual ~EnumParameter();

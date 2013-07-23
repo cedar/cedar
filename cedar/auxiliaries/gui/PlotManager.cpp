@@ -92,9 +92,6 @@ cedar::aux::gui::ConstPlotDeclarationPtr cedar::aux::gui::PlotManager::getDefaul
                                            cedar::aux::ConstDataPtr data
                                          )
 {
-  //!@todo Add a configurable option that specifies a default
-
-
   // check if a default is defined for the given type
   std::string data_type;
 
