@@ -56,11 +56,19 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+//!@brief The standard constructor.
+cedar::aux::math::AbsSigmoid::AbsSigmoid(double threshold, double beta)
+:
+cedar::aux::math::Sigmoid(threshold),
+_mBeta(new cedar::aux::DoubleParameter(this, "beta", beta, cedar::aux::DoubleParameter::LimitType::positive()))
+{
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
 double cedar::aux::math::AbsSigmoid::compute(double value) const
 {
-  return cedar::aux::math::sigmoidAbs(value, mBeta->getValue(), this->getThreshold());
+  return cedar::aux::math::sigmoidAbs(value, _mBeta->getValue(), this->getThreshold());
 }

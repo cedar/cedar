@@ -63,17 +63,7 @@ class cedar::aux::math::ExpSigmoid : public cedar::aux::math::Sigmoid
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ExpSigmoid(double threshold = 0.0, double beta = 100.0)
-  :
-  cedar::aux::math::Sigmoid(threshold),
-  mBeta(new cedar::aux::DoubleParameter(this, "beta", beta, -1000.0, 1000.0))
-  {
-  }
-
-  //!@brief Destructor
-  virtual ~ExpSigmoid()
-  {
-  }
+  ExpSigmoid(double threshold = 0.0, double beta = 100.0);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -100,7 +90,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief steepness of the exp-sigmoid
-  cedar::aux::DoubleParameterPtr mBeta;
+  cedar::aux::DoubleParameterPtr _mBeta;
 
 private:
   // none yet
