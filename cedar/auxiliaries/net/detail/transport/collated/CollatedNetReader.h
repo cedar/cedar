@@ -170,7 +170,7 @@ public:
     if ( p_net_portable == NULL )
     {
       CEDAR_THROW( cedar::aux::net::NetNoNewDataException,
-                   "YARP: unexpectedly read NULL from port" );
+                   "YARP: currently no data in buffer (reading)" );
     }
     else
     {
@@ -197,7 +197,7 @@ public:
       {
         CEDAR_THROW( cedar::aux::net::NetUnexpectedDataException,
                      "matrix has wrong size - you wrote matrices of "
-                     "different size/type before!" );
+                     "different size/type before! try to reset." );
       }
 #endif
 
