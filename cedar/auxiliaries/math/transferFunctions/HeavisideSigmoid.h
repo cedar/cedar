@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ExpSigmoid.h
+    File:        HeavysideSigmoid.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -32,47 +32,41 @@
                  stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 07 05
 
-    Description: Sigmoid function
+    Description: Sigmoid functions
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MATH_EXP_SIGMOID_H
-#define CEDAR_AUX_MATH_EXP_SIGMOID_H
+#ifndef CEDAR_AUX_MATH_HEAVISIDE_SIGMOID_H
+#define CEDAR_AUX_MATH_HEAVISIDE_SIGMOID_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/sigmoids/namespace.h"
-#include "cedar/auxiliaries/math/sigmoids.h"
+#include "cedar/auxiliaries/math/transferFunctions/namespace.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Sigmoid function that is based on the exponential function.
+/*!@brief A sigmoid step function, going from 0.0 to 1.0 when the input reaches or exceeds the threshold.
  *
- *
+ * This class internally calls the free function cedar::aux::math::sigmoidHeaviside.
  */
-class cedar::aux::math::ExpSigmoid : public cedar::aux::math::Sigmoid
+class cedar::aux::math::HeavisideSigmoid : public cedar::aux::math::Sigmoid
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ExpSigmoid(double threshold = 0.0, double beta = 100.0)
+  HeavisideSigmoid(double threshold = 0.0)
   :
-  cedar::aux::math::Sigmoid(threshold),
-  mBeta(new cedar::aux::DoubleParameter(this, "beta", beta, -1000.0, 1000.0))
+  cedar::aux::math::Sigmoid(threshold)
   {
   }
 
   //!@brief Destructor
-  virtual ~ExpSigmoid()
+  virtual ~HeavisideSigmoid()
   {
   }
 
@@ -80,7 +74,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief this function calculates the exp-based sigmoid function for a given double value.
+  /*!@brief this function calculates the Heaviside function for a given double value.
    */
   virtual double compute(double value) const;
 
@@ -100,11 +94,10 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief steepness of the exp-sigmoid
-  cedar::aux::DoubleParameterPtr mBeta;
+  // none yet
 
 private:
   // none yet
 };
 
-#endif  // CEDAR_AUX_MATH_EXP_SIGMOID_H
+#endif  // CEDAR_AUX_MATH_HEAVISIDE_SIGMOID_H

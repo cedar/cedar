@@ -46,7 +46,7 @@
 #include <cedar/processing/ElementDeclaration.h>
 #include <cedar/auxiliaries/MatData.h>
 #include <cedar/auxiliaries/math/TransferFunction.h>
-#include <cedar/auxiliaries/math/sigmoids/AbsSigmoid.h>
+#include <cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h>
 #include <cedar/auxiliaries/assert.h>
 #include <cedar/auxiliaries/math/tools.h>
 #include <cedar/auxiliaries/Log.h>

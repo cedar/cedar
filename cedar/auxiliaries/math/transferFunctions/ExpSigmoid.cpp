@@ -35,7 +35,8 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/sigmoids/ExpSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/ExpSigmoid.h"
+#include "cedar/auxiliaries/math/sigmoids.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/Singleton.h"
 

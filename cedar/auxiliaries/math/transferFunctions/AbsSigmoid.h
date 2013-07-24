@@ -22,11 +22,15 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LinearTransferFunction.h
+    File:        AbsSigmoid.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 05 16
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 07 05
 
     Description: Sigmoid functions
 
@@ -34,18 +38,20 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MATH_LINEAR_TRANSFER_FUNCTION_H
-#define CEDAR_AUX_MATH_LINEAR_TRANSFER_FUNCTION_H
+#ifndef CEDAR_AUX_MATH_ABS_SIGMOID_H
+#define CEDAR_AUX_MATH_ABS_SIGMOID_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/sigmoids/namespace.h"
-#include "cedar/auxiliaries/math/TransferFunction.h"
+#include "cedar/auxiliaries/math/transferFunctions/namespace.h"
+#include "cedar/auxiliaries/math/Sigmoid.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief Sigmoid function that is linear, i.e., multiplies the values with a scalar.
+/*!@brief Sigmoid function that is based on absolute values.
+ *
+ *        This function behaves similar to cedar::aux::math::ExpSigmoid, but computing it is less costly.
  */
-class cedar::aux::math::LinearTransferFunction : public cedar::aux::math::TransferFunction
+class cedar::aux::math::AbsSigmoid : public cedar::aux::math::Sigmoid
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -56,7 +62,17 @@ class cedar::aux::math::LinearTransferFunction : public cedar::aux::math::Transf
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  LinearTransferFunction();
+  AbsSigmoid(double threshold = 0.0, double beta = 100.0)
+  :
+  cedar::aux::math::Sigmoid(threshold),
+  mBeta(new cedar::aux::DoubleParameter(this, "beta", beta, -1000.0, 1000.0))
+  {
+  }
+
+  //!@brief Destructor
+  virtual ~AbsSigmoid()
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -82,9 +98,10 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief steepness of the abs-sigmoid
+  cedar::aux::DoubleParameterPtr mBeta;
 private:
   // none yet
 };
 
-#endif  // CEDAR_AUX_MATH_LINEAR_TRANSFER_FUNCTION_H
+#endif  // CEDAR_AUX_MATH_ABS_SIGMOID_H
