@@ -52,9 +52,6 @@
  * informations. Because this class has no access to the robot's sensors, it is an abstract class. The actual
  * implementation is handled in its subclasses.
  */
-//!@todo why inheriting from LocalCoordinateFrame here? HR: this mirrors how KinematicChainModel inherits from
-//! LocalCoordinateFrame - only these classes are sufficiently powerful and provide enough information to satisfy
-//! LocalCoordinateFrame requirements
 class cedar::dev::robot::Odometry : public cedar::aux::LocalCoordinateFrame
 {
   //--------------------------------------------------------------------------------------------------------------------

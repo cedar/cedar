@@ -127,7 +127,7 @@ private:
   //!@brief the sigmoided output of the memory nodes
   std::vector<cedar::aux::MatDataPtr> mMemoryNodeOutputs;
 
-  //!todo the following members are only used to have a nice way to plot the values of discrete nodes in the architecture
+  //!@todo the following members are only used to have a nice way to plot the values of discrete nodes in the architecture
   //!@brief buffer for the activation of all ordinal nodes
   cedar::aux::MatDataPtr mOrdinalNodeActivationBuffer;
   //!@brief buffer for the output of all ordinal nodes

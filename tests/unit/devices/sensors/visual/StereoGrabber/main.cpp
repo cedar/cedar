@@ -36,7 +36,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/LogFile.h"
-#include "cedar/testing/devices/TestGrabber.h"
+#include "cedar/testingUtilities/devices/TestGrabber.h"
 
 // PROJECT INCLUDES
 
@@ -66,7 +66,7 @@ int main(int , char **)
 
   //------------------------------------------------------------------------------------------------------------------
   //create a test-grabber (only a dummy grabber for testing)
-  cedar::testing::dev::TestGrabber *pGrabber = new cedar::testing::dev::TestGrabber
+  cedar::test::dev::TestGrabber *pGrabber = new cedar::test::dev::TestGrabber
                                                    (
                                                     GRABBER_PARAMETER_0,
                                                     GRABBER_PARAMETER_1

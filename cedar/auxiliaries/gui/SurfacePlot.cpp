@@ -188,7 +188,7 @@ void cedar::aux::gui::SurfacePlot::plot(cedar::aux::ConstDataPtr data, const std
                 "Could not cast to cedar::aux::MatData in cedar::aux::gui::SurfacePlot::plot.");
   }
 
-  this->startTimer(60); //!@todo make the refresh time configurable.
+  this->startTimer(60);
 }
 
 void cedar::aux::gui::SurfacePlot::init()
@@ -215,7 +215,6 @@ void cedar::aux::gui::SurfacePlot::init()
   this->mpPlot = new Qwt3D::GridPlot(this);
   p_layout->addWidget(this->mpPlot);
 
-  //!@todo Add this as an option to a right-click context menu for the plot.
   this->mpPlot->setCoordinateStyle(Qwt3D::BOX);
   this->resetPerspective();
   this->showGrid(false);

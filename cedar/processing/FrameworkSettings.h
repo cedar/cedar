@@ -47,8 +47,6 @@
 
 
 /*!@brief A singleton class for storing user-specific parameters related to the processing framework.
- *
- * @todo  Write a widget for these settings.
  */
 class cedar::proc::FrameworkSettings : public cedar::aux::Configurable
 {

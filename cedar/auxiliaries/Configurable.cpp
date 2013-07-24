@@ -54,7 +54,6 @@
 #include <sstream>
 #include <fstream> // only used for legacy configurable compatibility
 
-//!@todo Store parameter locks properly
 //!@todo Store parameter locks of children & subparameters properly
 
 //----------------------------------------------------------------------------------------------------------------------

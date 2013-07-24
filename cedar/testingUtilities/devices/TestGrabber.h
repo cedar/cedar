@@ -41,8 +41,8 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/testing/devices/namespace.h"
-#include "cedar/testing/devices/TestChannel.h"
+#include "cedar/testingUtilities/devices/namespace.h"
+#include "cedar/testingUtilities/devices/TestChannel.h"
 #include "cedar/devices/sensors/visual/Grabber.h"
 #include "cedar/auxiliaries/StringParameter.h"
 
@@ -60,7 +60,7 @@
  *    This class can also be used as a template to create other classes derived from GrabberInstance
  *
  */
-class cedar::testing::dev::TestGrabber
+class cedar::test::dev::TestGrabber
 :
 public cedar::dev::sensors::visual::Grabber
 {
@@ -176,6 +176,6 @@ protected:
 private:
   // none yet
 
-}; // class cedar::testing::dev::TestGrabber
+}; // class cedar::test::dev::TestGrabber
 
 #endif // CEDAR_TESTING_DEV_TEST_GRABBER_H

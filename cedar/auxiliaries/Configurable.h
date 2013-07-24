@@ -310,7 +310,6 @@ private:
       // write value:
       //<< std::setprecision(4) // set decimal precision for data. saves a lot of bytes ;)
       stream << ( pt.template get_value<Str>() ); 
-        // TODO: add escaping special characters
     }
     else if (pt.count(Str()) == pt.size() && indent > 0)
     {

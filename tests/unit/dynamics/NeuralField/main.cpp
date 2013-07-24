@@ -74,7 +74,7 @@ void run_test()
 
   std::cout << "Reading network.json ... " << std::endl;
   cedar::proc::NetworkPtr network(new cedar::proc::Network());
-  network->readFile("network.json");
+  network->readJson("network.json");
   std::cout << "done." << std::endl;
 
 #ifdef CEDAR_USE_FFTW

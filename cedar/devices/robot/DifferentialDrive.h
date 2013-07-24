@@ -80,10 +80,8 @@ public:
 
   /*!@brief Sets the speed of the left and right wheel.
    * @param[in] wheelSpeed The wheel speed of the left and right wheel to be set [in m/s].
-   *
-   * @todo Shouldn't the parameter be const?
    */
-  virtual void setWheelSpeed(std::vector<double>& wheelSpeed);
+  virtual void setWheelSpeed(const std::vector<double>& wheelSpeed);
 
   /*!@brief Sets the speed of the wheels based on the given forward velocity.
    * @param[in] forwardVelocity The forward velocity to be set [in m/s].

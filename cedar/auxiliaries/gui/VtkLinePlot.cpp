@@ -149,7 +149,6 @@ void cedar::aux::gui::VtkLinePlot::init()
   mConversionWorker = cedar::aux::gui::detail::VtkLinePlotWorkerPtr(new cedar::aux::gui::detail::VtkLinePlotWorker(this));
   mConversionWorker->moveToThread(mpWorkerThread);
 
-  //!@todo Add possibility to change priority
   this->mpWorkerThread->start(QThread::LowPriority);
 
   QObject::connect(mConversionWorker.get(), SIGNAL(dataChanged()), this,                    SIGNAL(dataChanged()));
@@ -266,7 +265,8 @@ void cedar::aux::gui::VtkLinePlot::doAppend(cedar::aux::ConstDataPtr data, const
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
                 "Cannot plot data of this dimensionality with cedar::aux::gui::VtkLinePlot.");
   }
-  //!@todo This throws an exception when null data (or data of other dimensionality than 1) is passed.
+
+  CEDAR_DEBUG_ASSERT(cedar::aux::math::getDimensionalityOf(mat) == 1);
   num = cedar::aux::math::get1DMatrixSize(mat);
   mat_locker.unlock();
 
@@ -285,7 +285,6 @@ void cedar::aux::gui::VtkLinePlot::doAppend(cedar::aux::ConstDataPtr data, const
   // assert that column was added.
   CEDAR_DEBUG_ASSERT(this->mpVtkTable->GetColumn(plot_series->mYColumn) != NULL);
 
-  //!@todo write a macro that does this check (see HistoryPlot0D.cpp)
 #if VTK_MAJOR_VERSION <= 5
   plot_series->mpCurve->SetInput(this->mpVtkTable, plot_series->mXColumn, plot_series->mYColumn);
 #else
@@ -294,7 +293,7 @@ void cedar::aux::gui::VtkLinePlot::doAppend(cedar::aux::ConstDataPtr data, const
 
   locker.unlock();
 
-  this->startTimer(30); //!@todo make the refresh time configurable.
+  this->startTimer(30);
 }
 
 void cedar::aux::gui::VtkLinePlot::PlotSeries::buildXAxis(unsigned int new_size)

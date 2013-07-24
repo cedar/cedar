@@ -50,8 +50,6 @@
 
 
 /*!@brief A cedar::proc::Step that approximates the solution of some dynamical system.
- *
- * @todo Describe the concept more.
  */
 class cedar::dyn::Dynamics : public cedar::proc::Step
 {
@@ -70,16 +68,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief this is the core method of dynamics - here, an euler step is executed with a given Time interval time
-   * @param time the time that has passed since the last call to this method
-   * @todo put this to private
-   */
-  virtual void eulerStep(const cedar::unit::Time& time) = 0;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -87,6 +82,11 @@ protected:
 private:
   //!@brief compute calls eulerStep
   void compute(const cedar::proc::Arguments& arguments);
+
+  /*!@brief this is the core method of dynamics - here, an euler step is executed with a given Time interval time
+   * @param time the time that has passed since the last call to this method
+   */
+  virtual void eulerStep(const cedar::unit::Time& time) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

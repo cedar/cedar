@@ -73,7 +73,6 @@ cedar::dev::robot::gl::PowerCubeWrist90::~PowerCubeWrist90()
 
 void cedar::dev::robot::gl::PowerCubeWrist90::initializeGl()
 {
-  //!@todo Implement this so that it works on windows
 #ifndef CEDAR_OS_WINDOWS
   // proximal link
   glGenBuffers(1, &mProximalLinkVertexVboId);

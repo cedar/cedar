@@ -227,19 +227,16 @@ void cedar::proc::PluginProxy::load(const std::string& file)
     CEDAR_THROW(cedar::proc::PluginException, "Error loading interface function: dlsym returned NULL.");
   }
 
-  //@todo this might segfault if the function pointer points to a bad function; handle this somehow.
 #elif defined CEDAR_OS_WINDOWS
   this->mpLibHandle = LoadLibraryEx(this->mFileName.c_str(), NULL, 0);
   if (!this->mpLibHandle)
   {
-    //!@todo use GetLastError to read out the error string
     CEDAR_THROW(cedar::proc::PluginException, "Could not load plugin: LoadLibraryEx failed: " + this->getLastError());
   }
   
   p_interface = (PluginInterfaceMethod) (GetProcAddress(this->mpLibHandle, TEXT("pluginDeclaration")));
   if (!p_interface)
   {
-    //!@todo use GetLastError to read out the error string
     CEDAR_THROW(cedar::proc::PluginException, "Error loading interface function: GetProcAddress failed: " + this->getLastError());
   }
 #endif // CEDAR_OS_UNIX / CEDAR_OS_WINDOWS

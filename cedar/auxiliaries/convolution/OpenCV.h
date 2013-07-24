@@ -45,11 +45,6 @@
 
 
 /*!@brief A convolution engine based on OpenCV's filter engine.
- *
- * @todo Intelligent strategies should be usable here, e.g., when multiple kernels in a row are TYPE_FULL, they can be
- *       summed together etc.
- *
- * @todo This class should also be able to work with matrices of more than two dimensions.
  */
 class cedar::aux::conv::OpenCV : public cedar::aux::conv::Engine
 {

@@ -259,7 +259,6 @@ void cedar::dev::kuka::KinematicChain::copyFromFRI()
 //----------------------------------------------------------------------------------------------------------------------
 // wrapped fri-functions
 //----------------------------------------------------------------------------------------------------------------------
-// todo: check whether the const works with the locks used here (and whether the locks are useful)
 FRI_STATE cedar::dev::kuka::KinematicChain::getFriState() const
 {
   mLock.lockForRead();

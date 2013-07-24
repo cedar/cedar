@@ -48,8 +48,6 @@
 // SYSTEM INCLUDES
 
 /*!@brief This step performs a convolution between an input and a kernel list or an explicitly specified kernel matrix.
- *
- * @todo A lot of the code for adding/removing kernels here is redundant with code in cedar::dyn::NeuralField
  */
 class cedar::proc::steps::Convolution : public cedar::proc::Step
 {

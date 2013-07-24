@@ -46,9 +46,9 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
+/*!@brief Base class for consistency issues.
  *
- * @todo describe more.
+ *        This is the base class that is used for reporting issues with processing architectures back to the user.
  */
 class cedar::proc::ConsistencyIssue
 {

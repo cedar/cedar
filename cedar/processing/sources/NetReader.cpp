@@ -140,11 +140,10 @@ void cedar::proc::sources::NetReader::connect()
         // TODO: would be nice to have a state for temporarily disabling
       return;
     }
-    catch ( cedar::aux::net::NetMissingRessourceException &e )
+    catch (cedar::aux::net::NetMissingRessourceException &e)
     {
       // somehow YARP doesnt work ... :( typically fatal.
-      // TODO: what to do?
-      throw( e ); // lets try this ...
+      throw e; // lets try this ...
     }
   }
   // now receive a matrix and tell subsequent steps that the matrix size is known now

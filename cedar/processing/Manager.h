@@ -56,8 +56,7 @@
 
 /*!@brief A manager for processing architectures.
  *
- * @deprecated This class will probably be removed.
- * @todo Remove this class?
+ * @deprecated This class will be removed in future releases.
  */
 class cedar::proc::Manager
 {
@@ -70,7 +69,7 @@ class cedar::proc::Manager
   // types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  typedef std::set<cedar::aux::LoopedThreadPtr> ThreadRegistry; //!<@todo Use a name?
+  typedef std::set<cedar::aux::LoopedThreadPtr> ThreadRegistry;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -87,7 +86,6 @@ public:
   ThreadRegistry& threads();
 
   //!@brief register a thread (Manager holds a collection of threads, which can be started at once)
-  //!@todo Remove? This should be per network.
   void registerThread(cedar::aux::LoopedThreadPtr thread);
 
   //!@brief load a plugin
@@ -99,13 +97,17 @@ public:
   //!@brief Loads the default plugins specified in cedar's configuration file.
   void loadDefaultPlugins();
 
-  //!@brief start all registered threads
-  //!@todo Remove?
-  void startThreads();
+  /*!@brief start all registered threads
+   *
+   * @deprecated Use the startTriggers function in cedar::proc::Network instead.
+   */
+  CEDAR_DECLARE_DEPRECATED(void startThreads());
 
-  //!@brief stop all threads
-  //!@todo Remove?
-  void stopThreads(bool wait = false);
+  /*!@brief stop all threads
+   *
+   * @deprecated Use the stopTriggers function in cedar::proc::Network instead.
+   */
+  CEDAR_DECLARE_DEPRECATED(void stopThreads(bool wait = false));
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

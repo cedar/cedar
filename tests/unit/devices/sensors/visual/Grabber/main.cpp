@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/testing/devices/TestGrabber.h"
+#include "cedar/testingUtilities/devices/TestGrabber.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -64,7 +64,7 @@ int main(int , char **)
 
   //------------------------------------------------------------------------------------------------------------------
   //create a test-grabber (only a dummy grabber for testing)
-  cedar::testing::dev::TestGrabber* pGrabber = new cedar::testing::dev::TestGrabber(GRABBER_PARAMETER_1);
+  cedar::test::dev::TestGrabber* pGrabber = new cedar::test::dev::TestGrabber(GRABBER_PARAMETER_1);
 
 
   //-----------------------------------------------------------
