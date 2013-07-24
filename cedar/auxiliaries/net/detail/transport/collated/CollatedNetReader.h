@@ -169,7 +169,7 @@ public:
  
     if ( p_net_portable == NULL )
     {
-      CEDAR_THROW( cedar::aux::net::NetUnexpectedDataException,
+      CEDAR_THROW( cedar::aux::net::NetNoNewDataException,
                    "YARP: unexpectedly read NULL from port" );
     }
     else
