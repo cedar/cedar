@@ -50,6 +50,7 @@
 #include "cedar/units/TimeUnit.h"
 
 // SYSTEM INCLUDES
+#include <QApplication>
 #include <algorithm>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -79,7 +80,7 @@ namespace
       "signal can be used as the step time, and the approximation can be updated using it."
     );
 
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(looped_trigger_declaration);
+    looped_trigger_declaration->declare();
 
     return true;
   }
@@ -96,7 +97,9 @@ cedar::proc::LoopedTrigger::LoopedTrigger(double stepSize, const std::string& na
 cedar::aux::LoopedThread(stepSize),
 cedar::proc::Trigger(name, true),
 //!@todo Make a TimeParameter and use it here instead.
-mWait(new cedar::aux::BoolParameter(this, "wait", true))
+mWait(new cedar::aux::BoolParameter(this, "wait", true)),
+mStarting(false),
+mStopping(false)
 {
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
@@ -146,22 +149,71 @@ void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr trigger
 
 void cedar::proc::LoopedTrigger::startTrigger()
 {
+  QMutexLocker locker(&mStartingMutex);
+
+  if (this->isRunning() || mStarting)
+  {
+    return;
+  }
+
+  mStarting = true;
+  locker.unlock();
+
+  emit triggerStarting();
+
+  //!@todo This feels like a dirty hack, but the starting signal won't get processed otherwise; really, this should all
+  //!      be done in a second thread.
+  int count = 0;
+  while (QApplication::hasPendingEvents() && ++count < 500)
+  {
+    QApplication::processEvents();
+  }
+
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
     this->mListeners.at(i)->callOnStart();
   }
   CEDAR_NON_CRITICAL_ASSERT(!this->isRunning());
   this->start();
+
+  emit triggerStarted();
+
+  locker.relock();
+  mStarting = false;
 }
 
 void cedar::proc::LoopedTrigger::stopTrigger()
 {
-  this->stop(2000);
+  QMutexLocker locker(&mStoppingMutex);
+  if (!this->isRunning() || mStopping)
+  {
+    return;
+  }
+
+  mStopping = true;
+  locker.unlock();
+
+  emit triggerStopping();
+
+  //!@todo This feels like a dirty hack, but the starting signal won't get processed otherwise; really, this should all
+  //!      be done in a second thread.
+  int count = 0;
+  while (QApplication::hasPendingEvents() && ++count < 500)
+  {
+    QApplication::processEvents();
+  }
+
+  this->stop();
 
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
     this->mListeners.at(i)->callOnStop();
   }
+
+  emit triggerStopped();
+
+  locker.relock();
+  mStopping = false;
 }
 
 void cedar::proc::LoopedTrigger::step(double time)

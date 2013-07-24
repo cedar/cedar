@@ -68,7 +68,8 @@ cedar::dev::kteam::Drive(communication)
     CEDAR_THROW
     (
       cedar::dev::SerialCommunicationException,
-      "Initialization of serial communication failed."
+      "Initialization of serial communication failed: wrong answer received. Expected a, z, or a vector, got \""
+      + answer + "\"."
     );
   }
 #ifdef DEBUG

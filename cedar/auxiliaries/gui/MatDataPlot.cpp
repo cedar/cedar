@@ -40,10 +40,13 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/MatDataPlot.h"
 #include "cedar/auxiliaries/gui/PlotManager.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
+#include "cedar/auxiliaries/annotation/Disparity.h"
+#include "cedar/auxiliaries/annotation/Depth.h"
 #include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
@@ -63,7 +66,7 @@ namespace
     typedef cedar::aux::gui::PlotDeclarationTemplate<MatData, MatDataPlot> DeclarationType;
 
     boost::shared_ptr<DeclarationType> declaration(new DeclarationType());
-    cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(declaration);
+    declaration->declare();
     cedar::aux::gui::PlotManagerSingleton::getInstance()->setDefault<MatData, MatDataPlot>();
     return true;
   }
@@ -136,6 +139,7 @@ void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std
     this->mpCurrentPlotWidget = NULL;
   }
 
+  // color space-annotated data
   try
   {
     // data should be plotted as an image
@@ -146,10 +150,41 @@ void cedar::aux::gui::MatDataPlot::plot(cedar::aux::ConstDataPtr data, const std
   }
   catch(cedar::aux::AnnotationNotFoundException&)
   {
+  }
+
+  // disparity-annotated data
+  try
+  {
+    // data should be plotted as an image
+    auto color_space = this->mData->getAnnotation<cedar::aux::annotation::Disparity>();
+    cedar::aux::gui::ImagePlot* p_plot = new cedar::aux::gui::ImagePlot();
+    p_plot->plot(this->mData, title);
+    this->mpCurrentPlotWidget = p_plot;
+  }
+  catch(cedar::aux::AnnotationNotFoundException&)
+  {
+  }
+
+  // depth-annotated data
+  try
+  {
+    //data should be plotted as an image
+    auto colorSpace = this->mData->getAnnotation<cedar::aux::annotation::Depth>();
+    cedar::aux::gui::ImagePlot* p_plot = new cedar::aux::gui::ImagePlot();
+    p_plot->plot(this->mData, title);
+    this->mpCurrentPlotWidget = p_plot;
+  }
+  catch(cedar::aux::AnnotationNotFoundException&)
+  {
+  }
+
+  if (this->mpCurrentPlotWidget == NULL)
+  {
     // data should be plotted as a matrix
     cedar::aux::gui::MatrixPlot* p_plot = new cedar::aux::gui::MatrixPlot();
     p_plot->plot(this->mData, title);
     this->mpCurrentPlotWidget = p_plot;
   }
+
   this->layout()->addWidget(this->mpCurrentPlotWidget);
 }

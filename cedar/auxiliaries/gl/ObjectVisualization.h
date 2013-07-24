@@ -251,8 +251,12 @@ protected:
   enum MaterialType {
                       NO_MATERIAL,
                       SEGMENT,
+                      POWERCUBE,
                       CHROME,
-                      BLACK
+                      BRONZE,
+                      BRASS,
+                      BLACK,
+                      WHITE
                     };
 
   //! Static member for no specularity.
@@ -270,6 +274,18 @@ protected:
   //! Static member for the shininess factor of segments.
   static const float mSegment_Shininess[1];
 
+  //! Static member for ambient color of power cubes.
+  static const float mPowerCube_Ambient[3];
+
+  //! Static member for diffuse color of power cubes.
+  static const float mPowerCube_Diffuse[3];
+
+  //! Static member for specilar color of power cubes.
+  static const float mPowerCube_Specular[3];
+
+  //! Static member for the shininess factor of power cubes.
+  static const float mPowerCube_Shininess[1];
+
   //! Static member for the ambient color of chrome parts.
   static const float mChrome_Ambient[3];
 
@@ -282,6 +298,30 @@ protected:
   //! Static member for the shininess factor of chrome parts.
   static const float mChrome_Shininess[1];
 
+  //! Static member for the ambient color of bronze parts.
+  static const float mBronze_Ambient[3];
+
+  //! Static member for the ambient color of bronze parts.
+  static const float mBronze_Diffuse[3];
+
+  //! Static member for the specular color of bronze parts.
+  static const float mBronze_Specular[3];
+
+  //! Static member for the shininess factor of bronze parts.
+  static const float mBronze_Shininess[1];
+
+  //! Static member for the ambient color of brass parts.
+  static const float mBrass_Ambient[3];
+
+  //! Static member for the ambient color of brass parts.
+  static const float mBrass_Diffuse[3];
+
+  //! Static member for the specular color of brass parts.
+  static const float mBrass_Specular[3];
+
+  //! Static member for the shininess factor of brass parts.
+  static const float mBrass_Shininess[1];
+
   //! Static member for the ambient color of black parts.
   static const float mBlack_Ambient[3];
 
@@ -293,6 +333,18 @@ protected:
 
   //! Static member for the shininess factor of black parts.
   static const float mBlack_Shininess[1];
+
+  //! Static member for the ambient color of white parts.
+  static const float mWhite_Ambient[3];
+
+  //! Static member for the diffuse color of white parts.
+  static const float mWhite_Diffuse[3];
+
+  //! Static member for the specular color of white parts.
+  static const float mWhite_Specular[3];
+
+  //! Static member for the shininess factor of white parts.
+  static const float mWhite_Shininess[1];
 
 private:
   // none yet

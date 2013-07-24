@@ -60,7 +60,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr convolution_decl
+    ElementDeclarationPtr declaration
     (
       new ElementDeclarationTemplate<cedar::proc::steps::Convolution>
       (
@@ -68,7 +68,7 @@ namespace
         "cedar.processing.steps.Convolution"
       )
     );
-    convolution_decl->setDescription
+    declaration->setDescription
                       (
                         "This processing step convolves a matrix with a kernel or kernel list.\n"
                         "Convolution can be done with to different engines: OpenCV and FFTW. "
@@ -78,8 +78,9 @@ namespace
                         "The step can either use an kernel matrix (input) to perform the convolution, or it can use "
                         " a list of kernels set via parameters."
                       );
-    convolution_decl->setIconPath(":/steps/convolution.svg");
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(convolution_decl);
+    declaration->setIconPath(":/steps/convolution.svg");
+
+    declaration->declare();
 
     return true;
   }

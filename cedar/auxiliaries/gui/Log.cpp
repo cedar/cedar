@@ -41,11 +41,13 @@
 #include "cedar/auxiliaries/gui/Log.h"
 #include "cedar/auxiliaries/logFilter/All.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/Settings.h"
 
 // SYSTEM INCLUDES
 #include <QHeaderView>
 #include <QLabel>
 #include <QScrollBar>
+#include <QMenu>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -63,7 +65,10 @@ QTabWidget(pParent)
 
 #ifdef DEBUG
   this->addPane(cedar::aux::LOG_LEVEL_DEBUG, "debug", ":/cedar/auxiliaries/gui/debug.svg");
-  this->addPane(cedar::aux::LOG_LEVEL_MEM_DEBUG, "memory", ":/cedar/auxiliaries/gui/memory.svg");
+  if (cedar::aux::SettingsSingleton::getInstance()->getMemoryDebugOutput())
+  {
+    this->addPane(cedar::aux::LOG_LEVEL_MEM_DEBUG, "memory", ":/cedar/auxiliaries/gui/memory.svg");
+  }
 #endif // DEBUG
 
   QObject::connect
@@ -73,6 +78,8 @@ QTabWidget(pParent)
     this,
     SLOT(printMessage(int, QString, QString))
   );
+  this->setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(showContextMenu(const QPoint&)));
 }
 
 cedar::aux::gui::Log::~Log()
@@ -226,5 +233,36 @@ void cedar::aux::gui::Log::printMessage(int type, QString title, QString message
         this->postMessage(p_level_pane, message, title, icon);
       }
       this->postMessage(this->mpDefaultPane, message, title, icon);
+  }
+}
+
+void cedar::aux::gui::Log::showContextMenu(const QPoint& point)
+{
+  if (point.isNull())
+  {
+    return;
+  }
+
+  QMenu menu(this);
+  QAction* p_delete_here = menu.addAction(tr("Delete messages in this tab"));
+  QAction* p_delete_all = menu.addAction(tr("Delete all messages"));
+
+  QAction* a = menu.exec(this->mapToGlobal(point));
+  if (a == p_delete_here)
+  {
+    QTableWidget* p_current_table = dynamic_cast<QTableWidget*>(this->currentWidget());
+    p_current_table->setRowCount(0);
+  }
+  else if (a == p_delete_all)
+  {
+    for (int i = 0; i < this->count(); ++i)
+    {
+      QTableWidget* p_current_table = dynamic_cast<QTableWidget*>(this->widget(i));
+      p_current_table->setRowCount(0);
+    }
+  }
+  else if (a != NULL)
+  {
+    std::cout << "Unmatched action in cedar::aux::gui::Log::contextMenuEvent." << std::endl;
   }
 }

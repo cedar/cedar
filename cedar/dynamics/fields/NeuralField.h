@@ -127,6 +127,20 @@ public:
    */
   bool activationIsOutput() const;
 
+  /*!@brief Marks the activation as output.
+   */
+  void setActivationIsOutput(bool value)
+  {
+    this->_mOutputActivation->setValue(value);
+  }
+
+  /*!@brief Marks the activation in this field as discrete values.
+   */
+  void setDiscreteActivation(bool value)
+  {
+    this->_mDiscreteActivation->setValue(value);
+  }
+
 public slots:
   //!@brief handle a change in dimensionality, which leads to creating new matrices
   void dimensionalityChanged();
@@ -194,6 +208,7 @@ private:
 
 private slots:
   void activationAsOutputChanged();
+  void discreteActivationChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -238,14 +253,17 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief Parameter that lets the user decide whether the activation is an output.
+  cedar::aux::BoolParameterPtr _mOutputActivation;
+
+  //!@brief Whether the field activation represents discrete nodes (this is a temporary solution).
+  cedar::aux::BoolParameterPtr _mDiscreteActivation;
+
   //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
   cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
 
   //!@brief the field sizes in each dimension
   cedar::aux::UIntVectorParameterPtr _mSizes;
-
-  //!@brief Parameter that lets the user decide whether the activation is an output.
-  cedar::aux::BoolParameterPtr _mOutputActivation;
 
   //!@brief input noise gain
   cedar::aux::DoubleParameterPtr _mInputNoiseGain;

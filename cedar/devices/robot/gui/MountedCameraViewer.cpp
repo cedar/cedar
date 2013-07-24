@@ -37,6 +37,9 @@
 // CEDAR INCLUDES
 #include "cedar/devices/robot/gui/namespace.h"
 #include "cedar/devices/robot/gui/MountedCameraViewer.h"
+#include "cedar/auxiliaries/math/screwCalculus.h"
+#include "cedar/auxiliaries/gl/drawShapes.h"
+#include "cedar/auxiliaries/gl/gl.h"
 
 // SYSTEM INCLUDES
 
@@ -47,10 +50,11 @@
 cedar::dev::robot::gui::MountedCameraViewer::MountedCameraViewer
 (
   cedar::aux::gl::ScenePtr pScene,
-  const cedar::dev::robot::KinematicChainPtr chain
+  const cedar::dev::robot::KinematicChainPtr chain,
+  bool readFromFile
 )
 :
-cedar::aux::gui::Viewer(pScene),
+cedar::aux::gui::Viewer(pScene, readFromFile),
 mArm(chain),
 mCameraCoordinateFrame(new cedar::aux::LocalCoordinateFrame()),
 _mMountingJoint
@@ -123,6 +127,28 @@ void cedar::dev::robot::gui::MountedCameraViewer::readConfiguration(const cedar:
 
 void cedar::dev::robot::gui::MountedCameraViewer::draw()
 {
+  // legacy code of Michael project
+  /*
+  cv::Mat rotation(4,4,CV_64F);
+  rotation.at<double>(0, 0) = 9.9796810078988596e-01;
+  rotation.at<double>(0, 1) = 7.2274785738513161e-03;
+  rotation.at<double>(0, 2) = 6.3304291792045456e-02;
+  rotation.at<double>(0, 3) = 0.0;
+  rotation.at<double>(1, 0) = -7.0012000035480412e-03;
+  rotation.at<double>(1, 1) = 9.9996828796653037e-01;
+  rotation.at<double>(1, 2) = -3.7955579032020949e-03;
+  rotation.at<double>(1, 3) = 0.0;
+  rotation.at<double>(2, 0) = -6.3329716597646579e-02;
+  rotation.at<double>(2, 1) = 3.3446397041775626e-03;
+  rotation.at<double>(2, 2) = 9.9798705421508904e-01;
+  rotation.at<double>(2, 3) = 0.0;
+
+  rotation.at<double>(3, 0) = 0.0;
+  rotation.at<double>(3, 1) = 0.0;
+  rotation.at<double>(3, 2) = 0.0;
+  rotation.at<double>(3, 3) = 1.0;
+  */
+  
   // calculate coordinate transformation to camera frame, i.e. external transformation
   mCameraCoordinateFrame->setTransformation
   (
@@ -133,6 +159,7 @@ void cedar::dev::robot::gui::MountedCameraViewer::draw()
   cv::Mat external = mCameraCoordinateFrame->getTransformation().inv();
 
   // projection
+  //cv::Mat projection_matrix_double = mCalibrationMatrix * mProjection * rotation * external;
   cv::Mat projection_matrix_double = mCalibrationMatrix * mProjection * external;
   cv::Mat projection_matrix_float;
   projection_matrix_double.convertTo(projection_matrix_float, CV_32FC1);
@@ -140,6 +167,77 @@ void cedar::dev::robot::gui::MountedCameraViewer::draw()
   // export these to the camera in the viewer
   qglviewer::Camera* viewer_camera = this->camera();
   viewer_camera->setFromProjectionMatrix(projection_matrix_float.ptr<float>());
+  viewer_camera->setZNearCoefficient(0.025);
+  //!@todo clean up this code
+/*
+  // get single parameters
+  double k1 = -3.4074914362123820e-01;
+  double k2 = 9.6110175102466677e-01;
+  double p1 = 0.0;
+  double p2 = 0.0;
+  double k3 = -2.4135931578999044e+00;
+  double f_x = mCalibrationMatrix.at<double>(0, 0);
+  double f_y = mCalibrationMatrix.at<double>(1, 1);
+  double c_x = mCalibrationMatrix.at<double>(0, 2);
+  double c_y = mCalibrationMatrix.at<double>(1, 2);
+
+  // calculate the coordinates of a 3d-point in the camera image
+  cv::Mat R = external(cv::Rect(0, 0, 3, 3)).clone();
+  cv::Mat axis = cv::Mat::zeros(3, 1, CV_64FC1);
+  double theta=0;
+  cv::Mat point_world = cv::Mat::zeros(1, 3, CV_64FC1);
+  point_world.at<double>(0, 0) = 0.6;
+  point_world.at<double>(0, 1) = 0.1;
+  point_world.at<double>(0, 2) = 0.0;
+  cedar::aux::math::logAxis<double>(R, axis, theta);
+  cv::Mat rvec = axis*theta;
+  cv::Mat tvec = external(cv::Rect(3, 0, 1, 3)).clone();
+  cv::Mat distortion_coefficients = cv::Mat::zeros(1, 5, CV_64FC1);
+  distortion_coefficients.at<double>(0, 0) = k1;
+  distortion_coefficients.at<double>(0, 1) = k2;
+  distortion_coefficients.at<double>(0, 2) = p1;
+  distortion_coefficients.at<double>(0, 3) = p2;
+  distortion_coefficients.at<double>(0, 4) = k3;
+
+  cv::Mat point_image = cv::Mat::zeros(1, 2, CV_64FC1);
+  cv::projectPoints(point_world, rvec, tvec, mCalibrationMatrix, distortion_coefficients, point_image);
+
+  // project points by hand
+  cv::Mat point_camera = R*point_world.t() + tvec;
+  double x_prime = point_camera.at<double>(0, 0) / point_camera.at<double>(2, 0);
+  double y_prime = point_camera.at<double>(1, 0) / point_camera.at<double>(2, 0);
+  double r = x_prime*x_prime + y_prime*y_prime;
+  double x_two_prime = x_prime * (1 + k1*r*r + k2*r*r*r*r + k3*r*r*r*r*r*r)
+                         + 2*p1*x_prime*y_prime + p2*(r*r+2*x_prime*x_prime);
+  double y_two_prime = y_prime * (1 + k1*r*r + k2*r*r*r*r + k3*r*r*r*r*r*r)
+                         + p1*(r*r+2*y_prime*y_prime) + 2*p2*x_prime*y_prime;
+
+  double u = f_x * x_two_prime + c_x;
+  double v = f_y * y_two_prime + c_y;
+*/
+//  GLdouble camera_projection[16];
+//  viewer_camera->getProjectionMatrix(camera_projection);
+//  std::cout << camera_projection[0] << " " << camera_projection[4] << " " << camera_projection[8] << " " << camera_projection[12] << std::endl
+//      << camera_projection[1] << " " << camera_projection[5] << " " << camera_projection[9] << " " << camera_projection[13] << std::endl
+//      << camera_projection[2] << " " << camera_projection[6] << " " << camera_projection[10] << " " << camera_projection[14] << std::endl
+//      << camera_projection[3] << " " << camera_projection[7] << " " << camera_projection[11] << " " << camera_projection[15] << std::endl << std::endl;
+//
+//  cedar::aux::math::write(mCalibrationMatrix);
+//  cedar::aux::math::write(mProjection);
+//  cedar::aux::math::write(external);
+//  cedar::aux::math::write(mCalibrationMatrix * mProjection * external);
+//  cedar::aux::math::write(external);
+//  cedar::aux::math::write(R);
+//  cedar::aux::math::write(tvec);
+//  std::cout << theta << std::endl;
+//  cedar::aux::math::write(point_image);
+//
+
+//  this->startScreenCoordinatesSystem();
+//  glTranslated( point_image.at<double>(0, 0), point_image.at<double>(0, 1), 0);
+//  cedar::aux::gl::setColor(1, 0, 0);
+//  cedar::aux::gl::drawCross(10, 1);
+//  this->stopScreenCoordinatesSystem();
 
   cedar::aux::gui::Viewer::draw();
 }

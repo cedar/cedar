@@ -70,7 +70,8 @@ namespace
     (
       "Flips a one- or two-dimensional matrix."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(flip_decl);
+
+    flip_decl->declare();
 
     return true;
   }
@@ -166,6 +167,7 @@ void cedar::proc::steps::Flip::inputConnectionChanged(const std::string& inputNa
     this->mOutput->setData(cv::Mat(input.rows, input.cols, input.type()));
   }
   this->mOutput->copyAnnotationsFrom(this->mInput);
+  this->emitOutputPropertiesChangedSignal("output");
 }
 
 void cedar::proc::steps::Flip::flipDirectionsChanged()

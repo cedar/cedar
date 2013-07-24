@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -58,7 +58,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr rate_to_space_decl
+    ElementDeclarationPtr declaration
     (
       new ElementDeclarationTemplate<cedar::dyn::RateToSpaceCode>
       (
@@ -66,13 +66,14 @@ namespace
         "cedar.dynamics.RateToSpaceCode"
       )
     );
-    rate_to_space_decl->setIconPath(":/steps/rate_to_space_code.svg");
-    rate_to_space_decl->setDescription
+    declaration->setIconPath(":/steps/rate_to_space_code.svg");
+    declaration->setDescription
     (
       "Transforms rate code to space code. A Gaussian distribution is mapped to the metric represented by space code, "
       "centering at the value given by the rate code."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(rate_to_space_decl);
+
+    declaration->declare();
 
     return true;
   }
@@ -195,13 +196,20 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::RateToSpaceCode::determineInputValid
   {
     // Mat data is accepted, but only 0D and 1D.
     unsigned int dimensionality = cedar::aux::math::getDimensionalityOf(mat_data->getData());
-    if (dimensionality == 0 || (dimensionality == 1 && cedar::aux::math::get1DMatrixSize(mat_data->getData()) < 4))
+    if
+    (
+      !mat_data->isEmpty()
+      &&
+      (
+        dimensionality == 0 || (dimensionality == 1 && cedar::aux::math::get1DMatrixSize(mat_data->getData()) < 4)
+      )
+    )
     {
       return cedar::proc::DataSlot::VALIDITY_VALID;
     }
   }
   // Everything else is rejected.
-    return cedar::proc::DataSlot::VALIDITY_ERROR;
+  return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
 void cedar::dyn::RateToSpaceCode::inputConnectionChanged(const std::string& inputName)
@@ -248,4 +256,5 @@ void cedar::dyn::RateToSpaceCode::outputSizesChanged()
   cv::Mat new_matrix(static_cast<int>(mDimensionality), &(sizes_signed.front()), CV_32F);
   this->mOutput->setData(new_matrix);
   this->recompute();
+  this->emitOutputPropertiesChangedSignal("output");
 }

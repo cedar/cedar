@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraBackendType.cpp
+    File:        ackendType.cpp
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 07 04
 
-    Description: Implementation of the CameraBackendType enum-type class
+    Description: Implementation of the BackendType enum-type class
 
     Credits:
 
@@ -91,8 +91,8 @@ void cedar::dev::sensors::camera::BackendType::construct()
 #ifdef CEDAR_USE_VIDEO_FOR_LINUX
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::camera::BackendType::VFL,
-                                      "VFL",
-                                      "VfL (Video for Linux)"
+                                      "V4L",
+                                      "V4L (Video for Linux)"
                                     ));
 #endif // CEDAR_USE_VIDEO_FOR_LINUX
 

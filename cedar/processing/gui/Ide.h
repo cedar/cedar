@@ -49,6 +49,7 @@
 // SYSTEM INCLUDES
 #include <QMainWindow>
 #include <QKeyEvent>
+#include <QDoubleSpinBox>
 #include <map>
 
 
@@ -65,8 +66,13 @@ class cedar::proc::gui::Ide : public QMainWindow, public Ui_Ide
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  Ide(bool loadDefaultPlugins = true);
+  /*!@brief The standard constructor.
+   *
+   * @param loadDefaultPlugins Loads all plugins set as default in the configuration.
+   * @param redirectLogToGui   Enables or disables redirection of log messages to the gui (can help when too many log
+   *                           messages lock up the user interface).
+   */
+  Ide(bool loadDefaultPlugins = true, bool redirectLogToGui = true);
 
   //!@brief Destructor
   ~Ide();
@@ -84,10 +90,6 @@ public:
   void resetTo(cedar::proc::gui::NetworkPtr network);
 
 public slots:
-  /*!@brief Slot that displays exceptions.
-   */
-  void exception(const QString& message);
-
   /*!@brief Slot that displays notifications.
    */
   void notify(const QString& message);
@@ -111,6 +113,10 @@ public slots:
   /*!@brief Stops all looped triggers (and other derivatives of looped thread).
    */
   void stopThreads();
+
+  /*!@brief Single-step all looped triggers (and other derivatives of looped thread).
+   */
+  void stepThreads();
 
   /*!@brief Slot that is connected to the "new" item in the file menu.
    */
@@ -188,6 +194,28 @@ public slots:
    */
   void exportSvg();
 
+  /*!@brief Duplicates a selected step
+   */
+  void duplicateStep();
+
+  /*!@brief Select all elements
+   */
+  void selectAll();
+
+  /*!@brief Show/hide all trigger connections
+   */
+  void showTriggerConnections(bool show);
+
+  /*!@brief Shows a dialog for architecture consistency checking.
+   */
+  void showConsistencyChecker();
+
+  /*!@brief Opens a boost control widget.
+   */
+  void showBoostControl();
+
+  //!@brief toggle smart connections
+  void toggleSmartConnections(bool smart);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -239,6 +267,10 @@ private:
    */
   void logError(const std::string& message);
 
+  /*!@brief Sets the filename in the title of the main window.
+   */
+  void displayFilename(const std::string& filename);
+
   /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
    */
   static bool sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem);
@@ -253,6 +285,19 @@ private:
 
   //! The network currently displayed.
   cedar::proc::gui::NetworkPtr mNetwork;
+
+  //! Architecture consistency check widget.
+  cedar::proc::gui::ArchitectureConsistencyCheck* mpConsistencyChecker;
+
+  //! Dock widget for the consistency checker.
+  QDockWidget* mpConsistencyDock;
+
+  QString mDefaultWindowTitle;
+
+  cedar::proc::gui::BoostControl* mpBoostControl;
+
+  //! In which the user specifies the time step for single-step functionality.
+  QDoubleSpinBox* mpCustomTimeStep;
 
 }; // class cedar::MainWindow
 

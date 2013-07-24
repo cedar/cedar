@@ -51,15 +51,11 @@ namespace cedar
 {
   namespace dev
   {
-
     //! \brief Namespace for all sensors
     namespace sensors
     {
-
     }
   }
 }
-
-
 
 #endif /* CEDAR_DEV_SENSORS_NAMESPACE_H */

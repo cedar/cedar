@@ -44,6 +44,7 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/auxiliaries/annotation/DiscreteCoordinates.h"
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
@@ -56,6 +57,8 @@
 // SYSTEM INCLUDES
 #include <iostream>
 #include <boost/lexical_cast.hpp>
+#include <boost/make_shared.hpp>
+#include <QApplication>
 
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
@@ -69,25 +72,32 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr field_decl
+    ElementDeclarationPtr declaration
     (
       new cedar::proc::ElementDeclarationTemplate<cedar::dyn::NeuralField>("DFT", "cedar.dynamics.NeuralField")
     );
-    field_decl->setIconPath(":/steps/field_temp.svg");
-    field_decl->setDescription
+    declaration->setIconPath(":/steps/field_temp.svg");
+    declaration->setDescription
     (
       "An implementation of Amari's dynamic neural fields."
     );
 
     // define field plot
-    ElementDeclaration::DataList field_plot_data;
-    field_plot_data.push_back(std::make_pair(DataRole::BUFFER, "input sum"));
-    field_plot_data.push_back(std::make_pair(DataRole::BUFFER, "activation"));
-    field_plot_data.push_back(std::make_pair(DataRole::OUTPUT, "sigmoided activation"));
-    field_decl->definePlot("field plot", field_plot_data);
+    ElementDeclaration::PlotDefinition field_plot_data("field plot", ":/cedar/dynamics/gui/field_plot.svg");
+    field_plot_data.appendData(DataRole::BUFFER, "input sum");
+    field_plot_data.appendData(DataRole::BUFFER, "activation", true);
+    field_plot_data.appendData(DataRole::OUTPUT, "activation", true);
+    field_plot_data.appendData(DataRole::OUTPUT, "sigmoided activation");
+    declaration->definePlot(field_plot_data);
+
+    ElementDeclaration::PlotDefinition kernel_plot_data("kernel", ":/cedar/dynamics/gui/kernel_plot.svg");
+    kernel_plot_data.appendData(DataRole::BUFFER, "lateral kernel");
+    declaration->definePlot(kernel_plot_data);
+
+    declaration->setDefaultPlot("field plot");
 
     // add declaration to the registry
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(field_decl);
+    declaration->declare();
 
     return true;
   }
@@ -137,6 +147,8 @@ mGlobalInhibition
   )
 ),
 // parameters
+_mOutputActivation(new cedar::aux::BoolParameter(this, "activation as output", false)),
+_mDiscreteActivation(new cedar::aux::BoolParameter(this, "discrete activation (workaround)", false)),
 _mDimensionality
 (
   new cedar::aux::UIntParameter
@@ -158,7 +170,6 @@ _mSizes
     cedar::aux::UIntParameter::LimitType::positive(1000)
   )
 ),
-_mOutputActivation(new cedar::aux::BoolParameter(this, "activation as output", false)),
 _mInputNoiseGain
 (
   new cedar::aux::DoubleParameter
@@ -193,6 +204,9 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 
   this->declareInputCollection("input");
 
+  this->_mOutputActivation->markAdvanced();
+  this->_mDiscreteActivation->markAdvanced();
+
   // setup default kernels
   std::vector<cedar::aux::kernel::KernelPtr> kernel_defaults;
   for (unsigned int i = 0; i < 1; i++)
@@ -225,6 +239,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   allowed_convolution_modes.insert(cedar::aux::conv::Mode::Same);
 
   this->addConfigurableChild("noise correlation kernel", mNoiseCorrelationKernel);
+  mNoiseCorrelationKernel->markAdvanced();
   this->_mNoiseCorrelationKernelConvolution->getKernelList()->append(mNoiseCorrelationKernel);
   this->_mNoiseCorrelationKernelConvolution->setMode(cedar::aux::conv::Mode::Same);
   this->_mNoiseCorrelationKernelConvolution->setBorderType(cedar::aux::conv::BorderType::Zero);
@@ -235,6 +250,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
   QObject::connect(_mOutputActivation.get(), SIGNAL(valueChanged()), this, SLOT(activationAsOutputChanged()));
+  QObject::connect(_mDiscreteActivation.get(), SIGNAL(valueChanged()), this, SLOT(discreteActivationChanged()));
 
   mKernelAddedConnection
     = this->_mKernels->connectToObjectAddedSignal(boost::bind(&cedar::dyn::NeuralField::slotKernelAdded, this, _1));
@@ -253,6 +269,26 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dyn::NeuralField::discreteActivationChanged()
+{
+  std::vector<cedar::aux::DataPtr> data_items;
+  data_items.push_back(this->mActivation);
+  data_items.push_back(this->mSigmoidalActivation);
+  data_items.push_back(this->mLateralInteraction);
+
+  for (size_t i = 0; i < data_items.size(); ++i)
+  {
+    if (this->_mDiscreteActivation->getValue() == true)
+    {
+      data_items.at(i)->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteCoordinates>());
+    }
+    else
+    {
+      data_items.at(i)->removeAnnotations<cedar::aux::annotation::DiscreteCoordinates>();
+    }
+  }
+}
 
 bool cedar::dyn::NeuralField::activationIsOutput() const
 {
@@ -439,9 +475,9 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
-    return cedar::proc::DataSlot::VALIDITY_ERROR;
   }
-  return this->cedar::proc::Step::determineInputValidity(slot, data);
+
+  return cedar::proc::DataSlot::VALIDITY_ERROR;
 }
 
 void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
@@ -641,6 +677,14 @@ void cedar::dyn::NeuralField::updateMatrices()
     }
     this->mNoiseCorrelationKernel->setDimensionality(dimensionality);
   }
+
+  this->revalidateInputSlot("input");
+
+  if (this->activationIsOutput())
+  {
+    this->emitOutputPropertiesChangedSignal("activation");
+  }
+  this->emitOutputPropertiesChangedSignal("sigmoided activation");
 }
 
 void cedar::dyn::NeuralField::onStart()

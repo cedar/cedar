@@ -87,6 +87,8 @@ public:
   //!@brief Removes the underlying connection in the processing framework.
   void disconnect();
 
+  void setSmartMode(bool smart);
+
 public slots:
   //!@brief update the position of this connection, depending on anchor points of source and target
   void update();
@@ -110,11 +112,17 @@ protected:
   // none yet
 private:
   //!@brief source of connection
-  cedar::proc::gui::GraphicsBase *mpSource;
+  cedar::proc::gui::GraphicsBase* mpSource;
   //!@brief target of connection
-  cedar::proc::gui::GraphicsBase *mpTarget;
-  //!@brief arrow that points out the direction of the line
-  QGraphicsPolygonItem *mpArrow;
+  cedar::proc::gui::GraphicsBase* mpTarget;
+  //!@brief arrow that points out the direction of the line at the starting point
+  QGraphicsPolygonItem* mpArrowStart;
+  //!@brief arrow that points out the direction of the line at the end point
+  QGraphicsPolygonItem* mpArrowEnd;
+  //!@brief the last set validity
+  cedar::proc::gui::ConnectValidity mValidity;
+  //!@brief smart mode flag (i.e., automatically draw nice lines with corners)
+  bool mSmartMode;
 }; // class cedar::proc::gui::TriggerConnection
 
 #endif // CEDAR_PROC_GUI_CONNECTION_H

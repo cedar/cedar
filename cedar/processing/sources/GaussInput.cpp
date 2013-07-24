@@ -74,7 +74,8 @@ namespace
     declaration->setIconPath(":/steps/gauss_input.svg");
     declaration->setDescription("Generates a matrix that contains a sampled Gauss function.");
     declaration->deprecatedName("cedar.processing.source.GaussInput");
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }
@@ -100,7 +101,7 @@ _mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
   QObject::connect(_mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mSigmas.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mCenters.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
-  QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
+  QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrixSize()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
   QObject::connect(_mIsCyclic.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
   this->updateMatrix();
@@ -113,6 +114,11 @@ void cedar::proc::sources::GaussInput::setCenter(unsigned int dimension, double 
 {
   CEDAR_ASSERT(dimension < this->_mCenters->size());
   this->_mCenters->set(dimension, center);
+}
+
+double cedar::proc::sources::GaussInput::getAmplitude() const
+{
+  return this->_mAmplitude->getValue();
 }
 
 void cedar::proc::sources::GaussInput::setAmplitude(double amplitude)
@@ -150,5 +156,14 @@ void cedar::proc::sources::GaussInput::updateDimensionality()
   _mCenters->setDefaultSize(new_dimensionality);
   _mSizes->resize(new_dimensionality, _mSizes->getDefaultValue());
   _mSizes->setDefaultSize(new_dimensionality);
+  this->onTrigger();
+  this->emitOutputPropertiesChangedSignal("Gauss input");
+  this->onTrigger();
+}
+
+void cedar::proc::sources::GaussInput::updateMatrixSize()
+{
+  this->onTrigger();
+  this->emitOutputPropertiesChangedSignal("Gauss input");
   this->onTrigger();
 }

@@ -28,7 +28,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 09 28
 
-    Description: Class NetChannel
+    Description: Class NetChannel contains additional data of a net-grabbing channel
 
     Credits:
 
@@ -54,14 +54,16 @@ class cedar::dev::sensors::visual::NetChannel
 :
 public cedar::dev::sensors::visual::GrabberChannel
 {
-  //!@brief friend class of NetGrabber for direct access to the members
+  //!@cond SKIPPED_DOCUMENTATION
+  //friend class of NetGrabber for direct access to the members
   friend class cedar::dev::sensors::visual::NetGrabber;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@cond SKIPPED_DOCUMENTATION
+
+  //! internally used type of the NetReader with cv::Mat as data
   typedef cedar::aux::net::Reader<cv::Mat> MatNetReader;
   typedef boost::shared_ptr<cedar::aux::net::Reader<cv::Mat> > MatNetReaderPtr;
   //!@endcond
@@ -114,10 +116,10 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //! The name of the used yarp channel
+  //! @brief The name of the used yarp channel
   cedar::aux::StringParameterPtr _mpYarpChannelName;
 
-  //! The Yarp Reader class instantiated for cv::Mat
+  //! @brief The Yarp Reader class instantiated for cv::Mat
   MatNetReaderPtr mpMatNetReader;
 
 private:

@@ -86,6 +86,18 @@ public:
    */
   unsigned int getDimensionality() const;
 
+  //! Convenience method that returns the opencv-type of the stored matrix.
+  inline int getCvType() const
+  {
+    return this->getData().type();
+  }
+
+  //! Checks if the matrix is empty.
+  bool isEmpty() const
+  {
+    return this->getData().empty();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

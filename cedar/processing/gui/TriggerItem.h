@@ -46,21 +46,21 @@
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 
 
 /*!@brief Representation of a cedar::proc::Trigger in a cedar::proc::gui::Scene.
  */
-class cedar::proc::gui::TriggerItem : public cedar::proc::gui::GraphicsBase
+class cedar::proc::gui::TriggerItem : public QObject, public cedar::proc::gui::GraphicsBase
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::gui::Network;
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -104,20 +104,10 @@ public:
   //!@brief create the context menu for TriggerItem
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
-  /*!@brief graphically connect to a StepItem
-   * @param pTarget pointer to StepItem
-   */
-  void connectTo(cedar::proc::gui::StepItem *pTarget);
-
-  /*!@brief graphically connect to a TriggerItem
-   * @param pTarget pointer to TriggerItem
-   */
-  void connectTo(cedar::proc::gui::TriggerItem *pTarget);
-
-  /*!@brief graphically connect to suiitable GraphicsItem
+  /*!@brief graphically connect to suitable GraphicsItem
    * @param pTarget pointer to GraphicsItem
    */
-  void connectTo(cedar::proc::gui::GraphicsBase *pTarget);
+  cedar::proc::gui::Connection* connectTo(cedar::proc::gui::GraphicsBase *pTarget);
 
   //!@brief read configuration from a node
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
@@ -143,6 +133,13 @@ private:
   //!@brief sets the trigger associated with this graphical representation
   void setTrigger(cedar::proc::TriggerPtr trigger);
 
+private slots:
+  void triggerStateChanging();
+
+  void triggerStarted();
+
+  void triggerStopped();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -160,7 +157,7 @@ protected:
 
 private:
   //!@brief the class id of the internal trigger, used for a tooltip
-  cedar::proc::ElementDeclarationPtr mClassId;
+  cedar::aux::ConstPluginDeclarationPtr mClassId;
 
 }; // class TriggerItem
 

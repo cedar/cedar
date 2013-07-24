@@ -45,6 +45,7 @@ s
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/net/exceptions.h"
 
@@ -63,7 +64,7 @@ namespace
     using cedar::proc::ElementDeclarationPtr;
     using cedar::proc::ElementDeclarationTemplate;
 
-    ElementDeclarationPtr input_declaration
+    ElementDeclarationPtr declaration
     (
       new ElementDeclarationTemplate<cedar::proc::sources::NetReader>
       (
@@ -71,9 +72,10 @@ namespace
         "cedar.processing.sources.NetReader"
       )
     );
-    input_declaration->setIconPath(":/steps/net_reader.svg");
-    input_declaration->setDescription("Reads a matrix from a yarp port.");
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(input_declaration);
+    declaration->setIconPath(":/steps/net_reader.svg");
+    declaration->setDescription("Reads a matrix from a yarp port.");
+
+    declaration->declare();
 
     return true;
   }
@@ -86,10 +88,15 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::sources::NetReader::NetReader()
 :
+cedar::proc::Step(false, true),
 mOutput(new cedar::aux::MatData(cv::Mat())),
 // outputs
-mReader()
+mReader(),
 // parameters
+_mPort(new cedar::aux::StringParameter(this, "port",
+                                       "CEDAR/" 
+                                       + cedar::aux::versionNumberToString(CEDAR_VERSION)
+                                       + "/MISC" ))
 {
   // declare all data
   this->declareOutput("output", mOutput);
@@ -101,20 +108,36 @@ mReader()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::sources::NetReader::onStart()
+void cedar::proc::sources::NetReader::reset()
+{
+  mReader.reset();
+  this->connect();
+}
+
+void cedar::proc::sources::NetReader::connect()
 {
   // instantiate the reader, if not yet done
   if (!mReader)
   {
+
     try 
     {
-      mReader= boost::shared_ptr< cedar::aux::net::Reader< cedar::aux::MatData::DataType > >(new cedar::aux::net::Reader< cedar::aux::MatData::DataType >("DEMOCHANNEL"));
-      // TODO: make channel configurable
+      mReader
+        = boost::shared_ptr< cedar::aux::net::Reader< cedar::aux::MatData::DataType > >
+          (
+            new cedar::aux::net::Reader< cedar::aux::MatData::DataType >(this->getPort())
+          );
     }
     catch ( cedar::aux::net::NetWaitingForWriterException &e )
     {
       // the writer hasnt declared the channel yet ... abort, better luck
       // on the next compute()
+      this->setState( cedar::proc::Triggerable::STATE_EXCEPTION,
+                      "The writer hasn't initialized this port/channel, yet. "
+                      "Please check whether the name is correct and it "
+                      "is running, then "
+                      "select reset in the context menu." );
+        // TODO: would be nice to have a state for temporarily disabling
       return;
     }
     catch ( cedar::aux::net::NetMissingRessourceException &e )
@@ -124,22 +147,11 @@ void cedar::proc::sources::NetReader::onStart()
       throw( e ); // lets try this ...
     }
   }
-}
-
-void cedar::proc::sources::NetReader::onStop()
-{
-  mReader.reset();
-}
-
-void cedar::proc::sources::NetReader::compute(const cedar::proc::Arguments&)
-{
-  if (!mReader)
-    return;
-
-  // read from net and set data
+  // now receive a matrix and tell subsequent steps that the matrix size is known now
   try
   {
-    this->mOutput->setData( mReader->read() );
+    this->mOutput->setData(mReader->read());
+    this->emitOutputPropertiesChangedSignal("output");
   }
   catch(cedar::aux::net::NetWaitingForWriterException& e)
   {
@@ -153,8 +165,43 @@ void cedar::proc::sources::NetReader::compute(const cedar::proc::Arguments&)
     // CHANGE NOTHING
     return;
   }
-
 }
 
-#endif
+void cedar::proc::sources::NetReader::onStart()
+{
+  this->_mPort->setConstant(true);
 
+  this->connect();
+}
+
+void cedar::proc::sources::NetReader::onStop()
+{
+  this->_mPort->setConstant(false);
+  mReader.reset();
+}
+
+void cedar::proc::sources::NetReader::compute(const cedar::proc::Arguments&)
+{
+  if (!mReader)
+    return;
+
+  // read from net and set data
+  try
+  {
+    this->mOutput->setData(mReader->read());
+  }
+  catch(cedar::aux::net::NetWaitingForWriterException& e)
+  {
+    // no writer instantiated yet? ignore
+    // CHANGE NOTHING
+    return;
+  }
+  catch (cedar::aux::net::NetUnexpectedDataException& e)
+  {
+    // communication problem? ignore
+    // CHANGE NOTHING
+    return;
+  }
+}
+
+#endif // CEDAR_USE_YARP

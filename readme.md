@@ -37,33 +37,34 @@ Universitaetsstr. 150
 D-44801 Bochum  
 Germany
 
-You can also reach us by phone under +49 234 32-28967.
-
-The current release of cedar as well as documentation can be found on our [official website](http://cedar.ini.rub.de/). Our repositories and issue-trackers are hosted on [bitbucket](https://bitbucket.org/cedar).
+You can also reach us by phone under +49 234 32-28The current release of cedar
+as well as documentation can be found on our
+[official website](http://cedar.ini.rub.de/). Our repositories and issue trackers
+are hosted on [bitbucket](https://bitbucket.org/cedar).
 
 # Installing cedar
 
+## Supported operating systems
+For now, Ubuntu Linux is the only fully supported operating system for cedar. The
+following manual for installing cedar is geared toward Ubuntu Linux and other
+Debian-based Linux distributions. That being said, we have successfully
+installed cedar on all major operating systems (other Linux distributions,
+MacOS, and Windows). In a lot of cases, the installation is not as easy and you
+will have to get creative here and there - but it is possible. Bear with us as
+we try to make cedar more platform independent.
+
+## Supported compilers
+In general, we support GCC versions >= 4.4.5 (including MinGW ports) and MSVC versions >= 2012. 
+You might also use Clang on Mac OS, but its support is provisional. As mentioned above, 
+our main priority is the Linux operating system, so we cannot guarantee that compiling cedar 
+on a different operating system / with a different compiler works out of the box. We are, however, 
+able to help you with the most common problems when trying out non-Linux solutions, so just 
+drop us a message if you are experiencing any problems.
+
 ## Install all dependencies
-cedar comes with a bunch of dependencies on other libraries. Here is what you
-have to install before you can compile our library. The version numbers are
-the oldest versions supported.
 
-* CMake
-* Boost 1.47
-* OpenCV 2.2
-* Qt 4.6.2
-* qwt 5.2.1
-* qwtplot3d 0.3
-* libqglviewer 2.3.6
+### Ubuntu 12.04 and 12.10
 
-optional dependencies:
-
-* YARP 2.3.6 (for YARP features like network connectivity)
-* libDC1394 (for firewire cameras)
-* fftw-3.2.2 (for FFT-based convolutions)
-* Doxygen (to generate HTML or LaTeX documentation)
-
-### Ubuntu 12.04 and 12.10:
 We provide a Debian meta-package, which installs all dependencies you need
 to compile cedar under Ubuntu 12.04 and 12.10. The package can be downloaded
 from our bitbucket page.
@@ -82,10 +83,87 @@ package you downloaded earlier.
 
     sudo gdebi cedar-dependencies.deb
 
-As part of the installation, the Debian package will also download, compile,
-and install a patched version of qwtplot3d (0.3), which sadly is no longer
-available anywhere else on the web.
+As part of the installation, the Debian package will download, compile, and
+install a patched version of *qwtplot3d* (0.3), which sadly is no longer
+available anywhere else on the web. We are working on removing this dependency
+from cedar but for now it is necessary for 3D plotting of data.
 
+### Mac OS X 10.8.x
+We recommend using [homebrew](http://mxcl.github.com/homebrew/) to install the
+above dependencies. Homebrew has recipes for all of cedar's dependencies
+except for *qwtplot3d*.
+
+#### Installing qwtplot3d
+Download the source code of *qwtplot3d* from our
+[repository](https://bitbucket.org/cedar/dependencies/downloads/qwtplot3d-0.3.0-patched.tar.gz)
+then open a terminal and go to the folder containing the downloaded file. Run
+
+    tar xvf qwtplot3d-0.3.0-patched.tar.gz
+
+Switch into the extracted folder `qwtplot3d` and run
+
+    qmake && make
+
+followed by
+
+    sudo make install
+
+if *qwtplot3d* compiled successfully.
+
+#### Link the frameworks
+cedar currently does not support Mac frameworks. Therefore you have to create
+symbolic links to the frameworks so that cedar can find the installed
+dependencies. If you have installed the dependencies with homebrew, you can
+simply copy the following statement, fill in the appropriate version numbers,
+and execute it. Otherwise you may have to adapt the paths to fit your system
+environment.
+
+    sudo ln -s "/usr/local/Cellar/libqglviewer/[__VERSION__]/QGLViewer.framework" "/Library/Frameworks/QGLViewer.framework"
+    
+    sudo ln -s "/Library/Frameworks/QGLViewer.framework/QGLViewer" "/Library/Frameworks/QGLViewer.framework/libQGLViewer.dylib"
+    
+    sudo ln -s "/usr/local/Cellar/qwt/[__VERSION__]/lib/qwt.framework/Versions/6/Headers" "/usr/local/Cellar/qwt/[__VERSION__]/lib/qwt.framework/Headers"
+    
+    sudo ln -s "/usr/local/Cellar/qwt/[__VERSION__]/lib/qwt.framework/Versions/6/qwt" "/usr/local/Cellar/qwt/[__VERSION__]/lib/qwt.framework/qwt"
+
+#### Install GCC (do not use Clang)
+To compile cedar you should **use the GCC compiler**. To install the GCC
+compiler version 4.2 open *XCode*, go to *Preferences* -> *Downloads* and install the
+*Command Line Tools*. Note however, that GCC 4.2 does not support C++11. The
+unstable version of cedar uses C++11 features. If you would like to compile
+the *unstable* branch of cedar, you need to install GCC 4.7.2. Homebrew provides a
+[formula](https://github.com/Homebrew/homebrew-dupes/blob/master/gcc.rb) for it.
+Follow its instructions to install homebrew/dupes/gcc. When configuring cedar with
+CMake, change the compiler to GCC. You can do this by using *ccmake*: Switch to
+advanced mode and then set the value of `CMAKE_CXX_COMPILER` to `/usr/bin/llvm-g++`.
+
+### Other operating systems
+
+If you are using a different operating system, unfortunately you will have to
+install all dependencies manually, using either the package manager of your
+system or compiling the dependencies from source. Here is what you have to
+install before you can compile cedar. The version numbers are the oldest
+versions supported.
+
+* CMake
+* Boost 1.47 (except version 1.49, which apparently does not work with c++11)
+* OpenCV 2.2
+* Qt 4.6.2
+* qwt 5.2.1
+* qwtplot3d 0.3
+* libqglviewer 2.3.6
+
+optional dependencies:
+
+* YARP 2.3.6 (for YARP features like network connectivity)
+* libDC1394 (for firewire cameras)
+* fftw-3.2.2 (for FFT-based convolutions)
+* Doxygen (to generate HTML or LaTeX documentation)
+
+We depend on a particular version of qwtplot3d, which we had to patch to
+fit our needs. You can get the
+[source code](https://bitbucket.org/cedar/dependencies/downloads/qwtplot3d-0.3.0-patched.tar.gz)
+of this library from our dependencies repository.
 
 ## Clone the cedar repository
 
@@ -96,7 +174,9 @@ Git). Install it through your package manager
 
         sudo apt-get install mercurial
 
-    and then clone our official repository.
+    and then clone our official repository. Replace [your cedar directory] with
+    a meaningful name for the folder in which the repository will be cloned
+    (e.g., `cedar` or `cedar.stable`)
 
         hg clone https://bitbucket.org/cedar/stable [your cedar directory]
 
@@ -110,10 +190,12 @@ containing the cedar sources from our
 
         tar xzf tip.tar.gz
 
-    and rename the resulting directory to something a bit cleaner than the
-    randomly generated name chosen by bitbucket
+    and rename the resulting directory. In the following command, replace
+    [random characters] with whatever the uncompressed tarball is called (it is
+    randomly generated by bitbucket). Replace [your cedar directory] with a
+    meaningful name for the folder (e.g., `cedar` or `cedar.stable`).
 
-        mv cedar-stable-[random letters] [your cedar directory]
+        mv cedar-stable-[random characters] [your cedar directory]
 
 ## Compilation
 
@@ -122,14 +204,15 @@ containing the cedar sources from our
         cd [your cedar directory]
 
 2. Create a copy of cedar.conf.example (in this folder) and name it
-   'cedar.conf'.
+   `cedar.conf`.
 
         cp cedar.conf.example cedar.conf
 
 3. By default, `cedar.conf` is set up to work on Ubuntu 12.04 and 12.10. If you
-   are on a different system, take a look at the file and make any changes for
-   your individual system (e.g., installation prefix, external include paths)
-   with an editor of your choosing (e.g., vim).
+   are running Ubuntu, skip this step. If you are running a different system,
+   take a look at the file and make any changes for your individual system
+   (e.g., installation prefix, external include paths) with an editor of your
+   choosing (e.g., vim).
 
         vim cedar.conf
 
@@ -138,30 +221,29 @@ containing the cedar sources from our
         mkdir build
         cd build 
 
-5. Call cmake to generate UNIX makefiles:
+5. Generate makefiles specific for your platform to be able to compile cedar:
 
         cmake ..
 
 6. Compile cedar. You can save some time by compiling in multiple threads in
-   parallel. To split the compilation process into n threads, supply the
-   parameter `-j n` to the following command:
+   parallel. To split the compilation process into n threads, add the
+   optional parameter `-j n` to the following command:
 
-        make
+        make [-j n]
 
 7. (optional) Run all unit tests to check whether everything works:
 
         make test
 
-8. (optional) (only works when doxygen is installed) Create the documentation. It
-   will be generated in the folder `build/doc`:
+8. (optional) (only works when doxygen is installed) Create the documentation.
+    It will be generated in the folder `build/doc`:
 
         make doc
 
-   Note, that this may generate some warnings that you can usually ignore
-   safely.
-]
+    Note that this may generate some warnings that you can usually ignore
+    safely.
 
-7. (optional) Install cedar
+9. (optional) Install cedar
 
         sudo make install
 
@@ -173,7 +255,7 @@ processing framework:
 
 1. Go into the binary folder of the cedar repository:
 
-        cd cedar/bin
+        cd [your cedar directory]/bin
 
 2. Start the processing framework:
 

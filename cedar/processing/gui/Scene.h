@@ -77,6 +77,17 @@ public:
     MODE_CONNECT
   };
 
+  //! Current trigger connection mode
+  enum TRIGGER_CONNECTION_MODE
+  {
+    //!
+    MODE_HIDE_ALL,
+    //!
+    MODE_SHOW_ALL,
+    //!
+    MODE_SMART
+  };
+
   //! Type for associating cedar::proc::Steps to cedar::proc::gui::StepItems.
   typedef std::map<const cedar::proc::Step*, cedar::proc::gui::StepItem*> StepMap;
 
@@ -247,13 +258,24 @@ public:
    */
   void exportSvg(const QString& file);
 
+  /*! Sets the display mode for triggers.
+   */
+  void setTriggerDisplayMode(TRIGGER_CONNECTION_MODE mode)
+  {
+    this->mTriggerMode = mode;
+    this->handleTriggerModeChange();
+  }
+
+  //! select all items
+  void selectAll();
+
+  //! deselect all items
+  void selectNone();
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals
   //--------------------------------------------------------------------------------------------------------------------
 signals:
-  /*!@brief Signal that is emitted when an exception occurs.
-   */
-  void exception(const QString& message);
   /*!@brief Signal that is emitted when the current mode finishes, e.g., when a connection has been made.
    */
   void modeFinished();
@@ -298,6 +320,8 @@ private:
    */
   void removeNetworkItem(cedar::proc::gui::Network* pNetwork);
 
+  void handleTriggerModeChange();
+
 private slots:
   void promoteElementToExistingGroup();
 
@@ -315,6 +339,9 @@ protected:
 private:
   //! The current mode.
   MODE mMode;
+
+  //! The current trigger mode.
+  TRIGGER_CONNECTION_MODE mTriggerMode;
 
   //! The parameter for the current mode.
   QString mModeParam;

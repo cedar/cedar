@@ -121,8 +121,8 @@ int main(int, char**)
   std::cout << "done." << std::endl;
 
   std::cout << "Adding declarations to the registry ... ";
-  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(test_module_decl);
-  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(double_test_module_decl);
+  test_module_decl->declare();
+  double_test_module_decl->declare();
   std::cout << "done." << std::endl;
 
   std::cout << "Creating network ... " << std::endl;

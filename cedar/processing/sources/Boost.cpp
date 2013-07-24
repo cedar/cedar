@@ -41,6 +41,7 @@
 #include "cedar/processing/sources/Boost.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
@@ -65,7 +66,8 @@ namespace
     );
     declaration->setIconPath(":/steps/boost.svg");
     declaration->setDescription("Generates a 1x1 boost matrix. This can be input to, e.g., a field.");
-    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }
@@ -81,7 +83,8 @@ cedar::proc::sources::Boost::Boost()
 :
 mBoost(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F))),
 _mStrength(new cedar::aux::DoubleParameter(this, "strength", 1.0)),
-_mActive(new cedar::aux::BoolParameter(this, "active", false))
+_mActive(new cedar::aux::BoolParameter(this, "active", false)),
+_mDeactivateOnReset(new cedar::aux::BoolParameter(this, "deactivate on reset", false))
 {
   this->declareOutput("boost", this->mBoost);
 
@@ -92,6 +95,20 @@ _mActive(new cedar::aux::BoolParameter(this, "active", false))
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::sources::Boost::reset()
+{
+  if (this->_mDeactivateOnReset->getValue())
+  {
+    // as the change in value will cause a recompute call, we have to unlock to prevent a deadlock ...
+    this->unlock();
+
+    this->_mActive->setValue(false, true);
+
+    // ... then lock again because the outer loop will want something to unlock
+    this->lock(cedar::aux::LOCK_TYPE_READ);
+  }
+}
 
 void cedar::proc::sources::Boost::compute(const cedar::proc::Arguments&)
 {

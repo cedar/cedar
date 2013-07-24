@@ -54,7 +54,14 @@ QWidget(pParent)
 {
   this->setupUi(this);
 
-  mpUseGraphicsEffectsEdit->setParameter(cedar::proc::gui::Settings::instance().mUseGraphicsItemShadowEffects);
+  // display settings
+  this->mpUseGraphicsEffectsEdit->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->mUseGraphicsItemShadowEffects);
+  this->mpStepDisplayMode->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mDefaultStepDisplayMode);
+
+  // slot item growth settings
+  this->mpSlotGrowthEnabled->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mDataSlotScalingEnabled);
+  this->mpGrowthFactor->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mDataSlotScaling);
+  this->mpSensitivity->setParameter(cedar::proc::gui::SettingsSingleton::getInstance()->_mDataSlotScalingSensitivity);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -64,11 +71,11 @@ QWidget(pParent)
 void cedar::proc::gui::UiSettings::reject()
 {
   // just (re-)load the settings that are currently stored on the disk
-  cedar::proc::gui::Settings::instance().load();
+  cedar::proc::gui::SettingsSingleton::getInstance()->load();
 }
 
 void cedar::proc::gui::UiSettings::accept()
 {
   // write the settings to the disk
-  cedar::proc::gui::Settings::instance().save();
+  cedar::proc::gui::SettingsSingleton::getInstance()->save();
 }

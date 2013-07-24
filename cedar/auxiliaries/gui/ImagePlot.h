@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/PlotInterface.h"
 #include "cedar/auxiliaries/annotation/namespace.h"
+#include "cedar/auxiliaries/math/Limits.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -49,7 +50,6 @@
 #include <qwtplot3d/qwt3d_types.h>
 
 
-//!@cond SKIPPED_DOCUMENTATION
 namespace cedar
 {
   namespace aux
@@ -58,6 +58,7 @@ namespace cedar
     {
       namespace detail
       {
+        //!@cond SKIPPED_DOCUMENTATION
         /* This is an internal class of ImagePlot that cannot be nested because Qt's moc doesn't support nested classes.
          *
          * Don't use it outside of the ImagePlot!
@@ -79,16 +80,37 @@ namespace cedar
           signals:
             void done();
             void failed();
+            void minMaxChanged(double min, double max);
 
           public:
             cedar::aux::gui::ImagePlot *mpPlot;
         };
         CEDAR_GENERATE_POINTER_TYPES(ImagePlotWorker);
-      }
+        //!@endcond
+
+
+        /*! Class for displaying a legend for the image plot worker.
+         */
+        class ImagePlotLegend : public QWidget
+        {
+          Q_OBJECT
+
+        public:
+          ImagePlotLegend();
+
+        public slots:
+          void updateMinMax(double min, double max);
+
+        private:
+          QLabel* mpMin;
+          QLabel* mpMax;
+
+          QLinearGradient mGradient;
+        };
+      } // namespace detail
     }
   }
 }
-//!@endcond
 
 /*!@brief A plot for images.
  */
@@ -120,13 +142,15 @@ private:
   class ImageDisplay : public QLabel
   {
     public:
-      ImageDisplay(const QString& text);
+      ImageDisplay(cedar::aux::gui::ImagePlot* pPlot, const QString& text);
 
     protected:
       void mousePressEvent(QMouseEvent * pEvent);
 
     public:
       cedar::aux::ConstMatDataPtr mData;
+
+      cedar::aux::gui::ImagePlot* mpPlot;
   };
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -135,6 +159,12 @@ private:
 public:
   //!@brief The standard constructor.
   ImagePlot(QWidget *pParent = NULL);
+
+  //!@brief Constructor that plots some data.
+  ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
+
+  //!@todo implement this constructor (see SurfacePlot.cpp)
+  // ImagePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
 
   //!@brief Destructor.
   ~ImagePlot();
@@ -155,6 +185,30 @@ public:
    */
   void timerEvent(QTimerEvent *pEvent);
 
+  /*!@brief Set the scaling mode of the plot.
+   */
+  void setSmoothScaling(bool smooth);
+
+  /*! Sets fixed limits for the plot values.
+   */
+  void setLimits(double min, double max);
+
+  /*!@brief Applies a color scale to a matrix.
+   * @todo Put this functionality into its own class.
+   */
+  static cv::Mat colorizedMatrix(cv::Mat matrix);
+
+  /*! Fills the gradient used for colorization into a QGradient
+   */
+  static void fillColorizationGradient(QGradient& gradient);
+
+public slots:
+  //! Toggles the visibility of the legend.
+  void showLegend(bool show);
+
+  //! Enables automatic scaling.
+  void setAutomaticScaling();
+
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
   void convert();
@@ -166,6 +220,9 @@ protected:
   /*!@brief Reacts to a resize of the plot.
    */
   void resizeEvent(QResizeEvent *event);
+
+  //!@brief create and handle the context menu
+  void contextMenuEvent(QContextMenuEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -184,9 +241,14 @@ private:
    */
   void imageFromMat(const cv::Mat& mat);
 
+  void construct();
+
 private slots:
   void conversionDone();
+
   void conversionFailed();
+
+  void queryFixedValueScale();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -224,6 +286,18 @@ private:
   //! True if the plot is currently converting the data to the internal format. Used to skip overlapping timer events.
   bool mConverting;
 
+  //! Whether the matrix should be smoothed during scaling.
+  bool mSmoothScaling;
+
+  //! Whether scaling of plots is determined automatically or fixed.
+  bool mAutoScaling;
+
+  //! Limits for fixed scaling.
+  cedar::aux::math::Limits<double> mValueLimits;
+
+  //! Legend (if any).
+  cedar::aux::gui::detail::ImagePlotLegend* mpLegend;
+
   static std::vector<char> mLookupTableR;
   static std::vector<char> mLookupTableG;
   static std::vector<char> mLookupTableB;
@@ -231,4 +305,5 @@ private:
   static QReadWriteLock mLookupTableLock;
 
 }; // class cedar::aux::gui::ImagePlot
+
 #endif // CEDAR_AUX_GUI_IMAGE_PLOT_H

@@ -7,11 +7,15 @@
     <x>0</x>
     <y>0</y>
     <width>988</width>
-    <height>761</height>
+    <height>762</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Processing IDE</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="icons/cedar_proc_gui_icons.qrc">
+    <normaloff>:/processing_ide_app_icon_48.png</normaloff>:/processing_ide_app_icon_48.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -161,7 +165,7 @@
      <x>0</x>
      <y>0</y>
      <width>988</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -191,6 +195,7 @@
      <string>Simulation</string>
     </property>
     <addaction name="mpThreadsStartAll"/>
+    <addaction name="mpThreadsSingleStep"/>
     <addaction name="mpThreadsStopAll"/>
     <addaction name="mpActionResetRootNetwork"/>
    </widget>
@@ -198,7 +203,6 @@
     <property name="title">
      <string>Windows</string>
     </property>
-    <addaction name="mpActionSettings"/>
     <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -207,9 +211,43 @@
     </property>
     <addaction name="mpActionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="mpActionDuplicate"/>
+    <addaction name="mpActionSelectAll"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <widget class="QMenu" name="menuTrigger_Connections">
+     <property name="title">
+      <string>Trigger Connections</string>
+     </property>
+     <addaction name="mpActionToggleTriggerVisibility"/>
+     <addaction name="mpActionTriggerSmartHide"/>
+    </widget>
+    <addaction name="menuTrigger_Connections"/>
+    <addaction name="mpActionShowHideGrid"/>
+    <addaction name="mpActionToggleSmartConnections"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="mpActionArchitectureConsistencyCheck"/>
+    <addaction name="mpActionBoostControl"/>
+    <addaction name="separator"/>
+    <addaction name="mpActionSettings"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuView"/>
    <addaction name="menuPlugins"/>
    <addaction name="menuSimulation"/>
+   <addaction name="menuTools"/>
    <addaction name="mpMenuWindows"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -281,8 +319,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>124</width>
-          <height>417</height>
+          <width>121</width>
+          <height>424</height>
          </rect>
         </property>
         <attribute name="label">
@@ -294,8 +332,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>124</width>
-          <height>417</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -328,7 +366,7 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QToolBar" name="toolBar">
+  <widget class="QToolBar" name="mpToolBar">
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
@@ -341,6 +379,16 @@
    <addaction name="mpActionShowHideGrid"/>
    <addaction name="mpActionSave"/>
    <addaction name="mpActionResetRootNetwork"/>
+   <addaction name="separator"/>
+   <addaction name="mpActionToggleTriggerVisibility"/>
+   <addaction name="separator"/>
+   <addaction name="mpThreadsStartAll"/>
+   <addaction name="mpThreadsStopAll"/>
+   <addaction name="separator"/>
+   <addaction name="mpThreadsSingleStep"/>
+   <addaction name="mpActionBoostControl"/>
+   <addaction name="separator"/>
+   <addaction name="mpActionToggleSmartConnections"/>
   </widget>
   <action name="mpActionNew">
    <property name="text">
@@ -352,7 +400,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="icons/icons.qrc">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/save.svg</normaloff>:/toolbaricons/save.svg</iconset>
    </property>
    <property name="text">
@@ -366,10 +414,16 @@
    <property name="text">
     <string>Save as ...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
   </action>
   <action name="mpActionLoad">
    <property name="text">
     <string>Load ...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
    </property>
   </action>
   <action name="mpActionExit">
@@ -383,51 +437,27 @@
    </property>
   </action>
   <action name="mpThreadsStartAll">
-   <property name="enabled">
-    <bool>false</bool>
+   <property name="icon">
+    <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
+     <normaloff>:/cedar/auxiliaries/gui/start.svg</normaloff>:/cedar/auxiliaries/gui/start.svg</iconset>
    </property>
    <property name="text">
-    <string>Start</string>
+    <string>Start all triggers</string>
+   </property>
+   <property name="toolTip">
+    <string>Starts all triggers!</string>
    </property>
   </action>
   <action name="mpThreadsStopAll">
-   <property name="enabled">
-    <bool>false</bool>
+   <property name="icon">
+    <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
+     <normaloff>:/cedar/auxiliaries/gui/stop.svg</normaloff>:/cedar/auxiliaries/gui/stop.svg</iconset>
    </property>
    <property name="text">
-    <string>Stop</string>
+    <string>Stop all triggers</string>
    </property>
-  </action>
-  <action name="mpActionShowHideItems">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Steps</string>
-   </property>
-  </action>
-  <action name="mpActionShowHideTools">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Tools</string>
-   </property>
-  </action>
-  <action name="mpActionShowHideProperties">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Properties</string>
-   </property>
-  </action>
-  <action name="mpActionShowHideLog">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Log</string>
+   <property name="toolTip">
+    <string>Stops all triggers!</string>
    </property>
   </action>
   <action name="mpActionLoadPlugin">
@@ -440,14 +470,14 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="icons/icons.qrc">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/grid.svg</normaloff>:/toolbaricons/grid.svg</iconset>
    </property>
    <property name="text">
-    <string>grid</string>
+    <string>Toggle grid</string>
    </property>
    <property name="toolTip">
-    <string>Toggle Grid</string>
+    <string>Toggles the grid in the architecture pane. Elements will align to this grid.</string>
    </property>
   </action>
   <action name="mpRecentFiles">
@@ -456,6 +486,10 @@
    </property>
   </action>
   <action name="mpActionSettings">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/menus/settings.svg</normaloff>:/menus/settings.svg</iconset>
+   </property>
    <property name="text">
     <string>Settings...</string>
    </property>
@@ -467,7 +501,7 @@
   </action>
   <action name="mpActionResetRootNetwork">
    <property name="icon">
-    <iconset resource="icons/icons.qrc">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
      <normaloff>:/toolbaricons/reset.svg</normaloff>:/toolbaricons/reset.svg</iconset>
    </property>
    <property name="text">
@@ -483,6 +517,107 @@
   <action name="mpActionExportSVG">
    <property name="text">
     <string>Export SVG ...</string>
+   </property>
+  </action>
+  <action name="mpActionDuplicate">
+   <property name="text">
+    <string>Duplicate</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="mpActionSelectAll">
+   <property name="text">
+    <string>Select All</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="mpActionToggleTriggerVisibility">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/hide_triggers.svg</normaloff>
+     <normalon>:/toolbaricons/show_triggers.svg</normalon>:/toolbaricons/hide_triggers.svg</iconset>
+   </property>
+   <property name="text">
+    <string>toggle visibility</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle visibility of triggers.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="mpActionTriggerSmartHide">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Smart hide</string>
+   </property>
+  </action>
+  <action name="mpActionArchitectureConsistencyCheck">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/menus/consistency_check.svg</normaloff>:/menus/consistency_check.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Architecture consistency check ...</string>
+   </property>
+  </action>
+  <action name="mpThreadsSingleStep">
+   <property name="icon">
+    <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
+     <normaloff>:/cedar/auxiliaries/gui/singleStep.svg</normaloff>:/cedar/auxiliaries/gui/singleStep.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Single-step each trigger</string>
+   </property>
+   <property name="toolTip">
+    <string>do a singles step with each trigger</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl++</string>
+   </property>
+  </action>
+  <action name="mpActionBoostControl">
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/steps/boost.svg</normaloff>:/steps/boost.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Boost control ...</string>
+   </property>
+   <property name="toolTip">
+    <string>Open a boost control widget.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+B</string>
+   </property>
+  </action>
+  <action name="mpActionToggleSmartConnections">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/standard_connections.svg</normaloff>
+     <normalon>:/toolbaricons/smart_connections.svg</normalon>:/toolbaricons/standard_connections.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle smart connections</string>
+   </property>
+   <property name="toolTip">
+    <string>toggle smart connections</string>
    </property>
   </action>
  </widget>
@@ -511,7 +646,8 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="icons/icons.qrc"/>
+  <include location="icons/cedar_proc_gui_icons.qrc"/>
+  <include location="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc"/>
  </resources>
  <connections>
   <connection>

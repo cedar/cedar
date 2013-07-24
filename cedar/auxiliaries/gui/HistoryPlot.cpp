@@ -37,11 +37,15 @@
     Credits:
 
 ======================================================================================================================*/
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/HistoryPlot.h"
-#include "cedar/auxiliaries/gui/HistoryPlot0D.h"
-#include "cedar/auxiliaries/gui/PlotManager.h"
+#ifdef CEDAR_USE_QWT
+  #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
+#endif // CEDAR_USE_QWT
+#include "cedar/auxiliaries/gui/HistoryPlot1D.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/DoubleData.h"
@@ -57,9 +61,19 @@ namespace
 {
   bool registerPlot()
   {
-    typedef cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::DoubleData, cedar::aux::gui::HistoryPlot> DeclarationType;
-    boost::shared_ptr<DeclarationType> decl(new DeclarationType());
-    cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(decl);
+    typedef
+      cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::DoubleData, cedar::aux::gui::HistoryPlot>
+      DeclarationType;
+
+    boost::shared_ptr<DeclarationType> declaration(new DeclarationType());
+    declaration->declare();
+
+    typedef
+      cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::MatData, cedar::aux::gui::HistoryPlot>
+      DeclarationType2;
+    boost::shared_ptr<DeclarationType2> decl2(new DeclarationType2());
+    decl2->declare();
+
     return true;
   }
 
@@ -88,6 +102,12 @@ cedar::aux::gui::HistoryPlot::~HistoryPlot()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::aux::gui::HistoryPlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
+  this->mData= boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
+  if (!this->mData)
+  {
+    CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
+                "Cannot cast to cedar::aux::MatData in cedar::aux::gui::HistoryPlot::plot.");
+  }
   //!@todo implement for matrices and more dimensions
   if (this->mpCurrentPlotWidget)
   {
@@ -95,13 +115,36 @@ void cedar::aux::gui::HistoryPlot::plot(cedar::aux::ConstDataPtr data, const std
     this->mpCurrentPlotWidget = NULL;
   }
 
-  if (this->mData = boost::dynamic_pointer_cast<cedar::aux::ConstDoubleData>(data))
+  const cv::Mat& mat = this->mData->getData();
+  unsigned int dims = cedar::aux::math::getDimensionalityOf(mat);
+
+  switch (dims)
   {
-    this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData, title);
+#ifdef CEDAR_USE_QWT
+    case 0:
+      this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData, title);
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
+      break;
+#endif // CEDAR_USE_QWT
+    case 1:
+      this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot1D(this->mData, title);
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
+      break;
+
+    default:
+      CEDAR_THROW
+      (
+        cedar::aux::gui::InvalidPlotData,
+        "Don't know how to plot MatData with the given dimensionality ("
+          + cedar::aux::toString(mat.dims) + ")."
+      );
   }
-  else
-  {
-    CEDAR_THROW(cedar::aux::gui::InvalidPlotData, "Don't know how to plot this data.");
-  }
+  
+  this->mpCurrentPlotWidget->plot(this->mData, title);
   this->layout()->addWidget(this->mpCurrentPlotWidget);
+}
+
+void cedar::aux::gui::HistoryPlot::processChangedData()
+{
+  this->plot(this->mData, "");
 }

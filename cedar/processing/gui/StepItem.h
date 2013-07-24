@@ -43,8 +43,10 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
+#include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/EnumType.h"
 
@@ -198,6 +200,12 @@ public:
     const std::string& toSlot
   ) const;
 
+  //! Resizes slots that are close to the mouse pointer in connection mode.
+  void magnetizeSlots(const QPointF& mousePositionInScene);
+
+  //! Removes all effects of magnetization
+  void demagnetizeSlots();
+
 public slots:
   //!@brief handles changes in the state of a step (e.g. from error to non-error state)
   void updateStepState();
@@ -205,7 +213,13 @@ public slots:
   //!@brief handles a redraw of the graphical representation
   void redraw();
 
+  void handleExternalActionButtons();
+
 signals:
+  /*!@brief Emitted whenever the state of the step displayed by this step item changes.
+   *
+   * @remarks This signal is used to transfer the underlying signal from the processing thread to the gui thread.
+   */
   void stepStateChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -238,11 +252,11 @@ private:
   void fillPlots
   (
     QMenu* pMenu,
-    std::map<QAction*, std::pair<cedar::aux::gui::PlotDeclarationPtr, cedar::aux::Enum> >& declMap
+    std::map<QAction*, std::pair<cedar::aux::gui::ConstPlotDeclarationPtr, cedar::aux::Enum> >& declMap
   );
 
   //!@brief Fills the defined plots into the given menu.
-  void fillDefinedPlots(QMenu* pMenu, const QPoint& plotPosition);
+  void fillDefinedPlots(QMenu& menu, const QPoint& plotPosition);
 
   //! Fills in the actions for the display style.
   void fillDisplayStyleMenu(QMenu* pMenu);
@@ -260,8 +274,7 @@ private:
   void multiplot
   (
     const QPoint& position,
-    std::vector<std::pair<cedar::proc::DataRole::Id, std::string> > data
-      = (std::vector<std::pair<cedar::proc::DataRole::Id, std::string> >())
+    cedar::proc::ElementDeclaration::DataList data = (cedar::proc::ElementDeclaration::DataList())
   );
 
   //! Updates the display of the step's run time measurements.
@@ -285,12 +298,20 @@ private:
 
   void addDataItemFor(cedar::proc::DataSlotPtr slot);
 
-  QDockWidget* createPlotDockWidget(const std::string& title) const;
+  QWidget* createDockWidget(const std::string& title, QWidget* pPlot) const;
+
+  void addPlotAllAction(QMenu& menu, const QPoint& plotPosition);
 
 private slots:
   void displayStyleMenuTriggered(QAction* pAction);
 
-  void openDefinedPlotAction(QAction* pAction);
+  void openDefinedPlotAction();
+
+  void openProperties();
+
+  void openActionsDock();
+
+  void plotAll();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -326,7 +347,7 @@ private:
   boost::signals2::connection mSlotRemovedConnection;
 
   //!@brief the class id of the step
-  cedar::proc::ElementDeclarationPtr mClassId;
+  cedar::aux::ConstPluginDeclarationPtr mClassId;
 
   //!@brief the main window in which the current graphical representation is embedded
   QMainWindow* mpMainWindow;

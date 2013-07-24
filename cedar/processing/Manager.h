@@ -62,6 +62,11 @@
 class cedar::proc::Manager
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // friend
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::aux::Singleton<cedar::proc::Manager>;
+
+  //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -78,15 +83,11 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief get the singleton instance of Manager
-  static Manager& getInstance();
-  //!@brief access the FrameworkSettings
-  cedar::proc::FrameworkSettings& settings();
-
   //!\brief access to thread registry
   ThreadRegistry& threads();
 
   //!@brief register a thread (Manager holds a collection of threads, which can be started at once)
+  //!@todo Remove? This should be per network.
   void registerThread(cedar::aux::LoopedThreadPtr thread);
 
   //!@brief load a plugin
@@ -99,9 +100,11 @@ public:
   void loadDefaultPlugins();
 
   //!@brief start all registered threads
+  //!@todo Remove?
   void startThreads();
 
   //!@brief stop all threads
+  //!@todo Remove?
   void stopThreads(bool wait = false);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -122,16 +125,12 @@ private:
 protected:
   // none yet
 private:
-  //! the manager singleton instance
-  static Manager mManager;
-
   //! a registry for all managed threads, which can be globally started or stopped (e.g., LoopedTrigger)
   ThreadRegistry mThreadRegistry;
 
-  //!@brief the framework settings
-  cedar::proc::FrameworkSettings mSettings;
-
 }; // class cedar::Manager
+
+CEDAR_PROC_SINGLETON(Manager);
 
 #endif // CEDAR_PROC_MANAGER_H
 

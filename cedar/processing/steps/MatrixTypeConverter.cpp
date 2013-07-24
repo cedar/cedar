@@ -69,7 +69,8 @@ namespace
     (
       "Converts a matrix from one type to another."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }
@@ -136,6 +137,9 @@ void cedar::proc::steps::MatrixTypeConverter::inputConnectionChanged(const std::
 
   this->mConverted->copyAnnotationsFrom(this->mMatrix);
 
+  //!@todo fix this
+  this->onTrigger();
+  this->emitOutputPropertiesChangedSignal("converted matrix");
   this->onTrigger();
 }
 

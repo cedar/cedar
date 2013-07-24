@@ -37,6 +37,9 @@
     Credits:
 
 ======================================================================================================================*/
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_QWT
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/LinePlot.h"
@@ -46,16 +49,26 @@
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/annotation/DiscreteCoordinates.h"
 
 // SYSTEM INCLUDES
+#include <boost/numeric/conversion/bounds.hpp>
 #include <qwt_legend.h>
 #include <qwt_scale_div.h>
+#include <qwt_symbol.h>
 #include <QContextMenuEvent>
 #include <QVBoxLayout>
+#include <QGridLayout>
 #include <QPalette>
 #include <QMenu>
 #include <QThread>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QDoubleSpinBox>
+#include <QPushButton>
+#include <QLabel>
 #include <iostream>
+#include <limits.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 // static members
@@ -115,10 +128,22 @@ cedar::aux::math::Limits<double> cedar::aux::gui::LinePlot::getXLimits() const
   return limits;
 }
 
-void cedar::aux::gui::LinePlot::applyStyle(size_t lineId, QwtPlotCurve *pCurve)
+cedar::aux::math::Limits<double> cedar::aux::gui::LinePlot::getYLimits() const
 {
+  cedar::aux::math::Limits<double> limits;
+
+  QwtScaleDiv* p_interval = this->mpPlot->axisScaleDiv(QwtPlot::yLeft);
+  limits.setLower(p_interval->lowerBound());
+  limits.setUpper(p_interval->upperBound());
+  return limits;
+}
+
+void cedar::aux::gui::LinePlot::applyStyle(cedar::aux::ConstDataPtr data, size_t lineId, QwtPlotCurve *pCurve)
+{
+  static std::vector<QwtSymbol::Style> mLineSymbols;
+
   // initialize vectors, if this has not happened, yet
-  if (mLineColors.empty() || mLineStyles.empty())
+  if (mLineColors.empty() || mLineStyles.empty() || mLineSymbols.empty())
   {
     mLineColors.clear();
     mLineStyles.clear();
@@ -137,6 +162,16 @@ void cedar::aux::gui::LinePlot::applyStyle(size_t lineId, QwtPlotCurve *pCurve)
     mLineStyles.push_back(Qt::DashDotLine);
     mLineStyles.push_back(Qt::DashDotDotLine);
     mLineStyles.push_back(Qt::CustomDashLine);
+
+    mLineSymbols.push_back(QwtSymbol::Ellipse);
+    mLineSymbols.push_back(QwtSymbol::Rect);
+    mLineSymbols.push_back(QwtSymbol::Diamond);
+    mLineSymbols.push_back(QwtSymbol::Triangle);
+    mLineSymbols.push_back(QwtSymbol::Hexagon);
+    mLineSymbols.push_back(QwtSymbol::Star2);
+
+    // otherwise, the code below doesn't work
+    CEDAR_DEBUG_ASSERT(mLineStyles.size() == mLineSymbols.size());
   }
 
   const size_t color_count = mLineColors.size();
@@ -157,6 +192,22 @@ void cedar::aux::gui::LinePlot::applyStyle(size_t lineId, QwtPlotCurve *pCurve)
 
   // pass pen back to curve
   pCurve->setPen(pen);
+
+  // Use symbols instead of curves for discrete data
+  if (data->hasAnnotation<cedar::aux::annotation::DiscreteCoordinates>())
+  {
+    pCurve->setStyle(QwtPlotCurve::NoCurve);
+    QwtSymbol
+#if (QWT_VERSION >> 16) == 6
+    * // qwt 6.x expects a pointer
+#endif
+      symbol
+#if (QWT_VERSION >> 16) == 6
+      = new QwtSymbol
+#endif
+      (mLineSymbols.at(style_id), QBrush(mLineColors.at(color_id)), pen, QSize(10, 10));
+    pCurve->setSymbol(symbol);
+  }
 }
 
 bool cedar::aux::gui::LinePlot::canAppend(cedar::aux::ConstDataPtr data) const
@@ -204,7 +255,7 @@ void cedar::aux::gui::LinePlot::doAppend(cedar::aux::ConstDataPtr data, const st
 
 
   plot_series->mpCurve = new QwtPlotCurve(title.c_str());
-  applyStyle(line_id, plot_series->mpCurve);
+  applyStyle(plot_series->mMatData, line_id, plot_series->mpCurve);
 
   data->lockForRead();
   const cv::Mat& mat = plot_series->mMatData->getData();
@@ -253,8 +304,6 @@ void cedar::aux::gui::LinePlot::plot(cedar::aux::ConstDataPtr data, const std::s
   mpLock->unlock();
 
   this->append(data, title);
-
-  this->startTimer(30); //!@todo make the refresh time configurable.
 }
 
 void cedar::aux::gui::LinePlot::init()
@@ -302,6 +351,19 @@ void cedar::aux::gui::LinePlot::contextMenuEvent(QContextMenuEvent *pEvent)
   QObject::connect(p_legend, SIGNAL(toggled(bool)), this, SLOT(showLegend(bool)));
   p_legend->setChecked(this->mpPlot->legend() != NULL);
 
+  //!@todo This should be generalized for all plots so that plots only have to supply a method for (re-)setting the limits.
+  menu.addSeparator();
+  QMenu* p_y_scaling_menu = menu.addMenu("y axis scaling");
+  QAction* p_y_scaling_auto = p_y_scaling_menu->addAction("automatic");
+  p_y_scaling_auto->setCheckable(true);
+  p_y_scaling_auto->setChecked(this->mpPlot->axisAutoScale(QwtPlot::yLeft));
+  QObject::connect(p_y_scaling_auto, SIGNAL(triggered()), this, SLOT(setAutomaticYAxisScaling()));
+
+  QAction* p_y_scaling_fixed = p_y_scaling_menu->addAction("fixed");
+  p_y_scaling_fixed->setCheckable(true);
+  p_y_scaling_fixed->setChecked(this->mpPlot->axisAutoScale(QwtPlot::yLeft) == false);
+  QObject::connect(p_y_scaling_fixed, SIGNAL(triggered()), this, SLOT(setFixedYAxisScaling()));
+
   QAction *p_action = menu.exec(pEvent->globalPos());
   if (p_action == NULL)
   {
@@ -316,6 +378,63 @@ void cedar::aux::gui::LinePlot::contextMenuEvent(QContextMenuEvent *pEvent)
       series->mpCurve->setRenderHint(QwtPlotItem::RenderAntialiased, p_action->isChecked());
     }
   }
+}
+
+void cedar::aux::gui::LinePlot::setAutomaticYAxisScaling()
+{
+  this->mpPlot->setAxisAutoScale(QwtPlot::yLeft);
+}
+
+void cedar::aux::gui::LinePlot::setFixedYAxisScaling()
+{
+  QDialog* p_dialog = new QDialog();
+  p_dialog->setModal(true);
+  auto p_layout = new QGridLayout();
+  p_dialog->setLayout(p_layout);
+  QLabel* p_label;
+  p_label = new QLabel("lower limit:");
+  p_layout->addWidget(p_label, 0, 0);
+
+  cedar::aux::math::Limits<double> y_limits = this->getYLimits();
+  auto p_lower = new QDoubleSpinBox();
+  p_layout->addWidget(p_lower, 0, 1);
+  p_lower->setMinimum(boost::numeric::bounds<double>::lowest());
+  p_lower->setMaximum(boost::numeric::bounds<double>::highest());
+  p_lower->setValue(y_limits.getLower());
+
+  p_label = new QLabel("upper limit:");
+  p_layout->addWidget(p_label, 1, 0);
+
+  auto p_upper = new QDoubleSpinBox();
+  p_layout->addWidget(p_upper, 1, 1);
+  p_upper->setMinimum(boost::numeric::bounds<double>::lowest());
+  p_upper->setMaximum(boost::numeric::bounds<double>::highest());
+  p_upper->setValue(y_limits.getUpper());
+
+  auto p_buttons = new QDialogButtonBox();
+  p_buttons->addButton(QDialogButtonBox::Ok);
+  p_buttons->addButton(QDialogButtonBox::Cancel);
+  p_layout->addWidget(p_buttons, 2, 0, 1, 2);
+
+  QObject::connect(p_buttons->button(QDialogButtonBox::Ok), SIGNAL(clicked()), p_dialog, SLOT(accept()));
+  QObject::connect(p_buttons->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), p_dialog, SLOT(reject()));
+
+  int res = p_dialog->exec();
+
+  if (res == QDialog::Accepted)
+  {
+    this->setFixedYAxisScaling(p_lower->value(), p_upper->value());
+  }
+}
+
+void cedar::aux::gui::LinePlot::setFixedYAxisScaling(double lower, double upper)
+{
+  this->mpPlot->setAxisScale(QwtPlot::yLeft, lower, upper);
+}
+
+void cedar::aux::gui::LinePlot::setFixedXAxisScaling(double lower, double upper)
+{
+  this->mpPlot->setAxisScale(QwtPlot::xBottom, lower, upper);
 }
 
 void cedar::aux::gui::LinePlot::showLegend(bool show)
@@ -405,6 +524,8 @@ void cedar::aux::gui::detail::LinePlotWorker::convert()
 void cedar::aux::gui::LinePlot::conversionDone()
 {
   QReadLocker locker(this->mpLock);
+
+  double x_min = std::numeric_limits<double>::max(), x_max = 0.0;
   for (size_t i = 0; i < this->mPlotSeriesVector.size(); ++i)
   {
     PlotSeriesPtr series = this->mPlotSeriesVector.at(i);
@@ -428,7 +549,12 @@ void cedar::aux::gui::LinePlot::conversionDone()
     #else
     #error unsupported qwt version
     #endif
+
+    x_min = std::min(series->mXValues.front(), x_min);
+    x_max = std::max(series->mXValues.back(), x_max);
   }
+
+  this->setFixedXAxisScaling(x_min, x_max);
 
   this->mpPlot->replot();
 }
@@ -442,3 +568,5 @@ void cedar::aux::gui::LinePlot::timerEvent(QTimerEvent * /* pEvent */)
 
   emit convert();
 }
+
+#endif // CEDAR_USE_QWT

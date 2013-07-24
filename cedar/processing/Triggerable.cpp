@@ -37,11 +37,13 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/Trigger.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
 #include <QReadLocker>
 #include <QWriteLocker>
+#include <QMutexLocker>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -49,13 +51,15 @@
 cedar::proc::Triggerable::Triggerable(bool isLooped)
 :
 mIsLooped(isLooped),
-mState(cedar::proc::Triggerable::STATE_UNKNOWN)
+mState(cedar::proc::Triggerable::STATE_UNKNOWN),
+mStartCalls(0),
+mpStartCallsLock(new QMutex())
 {
 }
 
 cedar::proc::Triggerable::~Triggerable()
 {
-  // empty default implementation
+  delete this->mpStartCallsLock;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -84,7 +88,25 @@ cedar::proc::TriggerPtr cedar::proc::Triggerable::getParentTrigger()
 
 void cedar::proc::Triggerable::callOnStart()
 {
-  this->onStart();
+  // make sure no other thread can start the step
+  QMutexLocker locker(this->mpStartCallsLock);
+//  cedar::aux::NamedConfigurable* named = dynamic_cast<cedar::aux::NamedConfigurable*>(this);
+//  std::cout << named->getName() << "->callOnStart():" << __LINE__ << ": " << this->mStartCalls << std::endl;
+
+  //!@todo onStart might take a long time - can/should this be done better, e.g., by first storing a bool, then incrementing, then unlocking, then calling onStart?
+  // only call onStart if this triggerable hasn't been started yet
+  if (this->mStartCalls == 0)
+  {
+    this->onStart();
+  }
+
+  // count how often this triggerable was started
+  ++this->mStartCalls;
+
+//  std::cout << named->getName() << "->callOnStart():" << __LINE__ << ": " << this->mStartCalls << std::endl;
+
+  locker.unlock();
+
   if (mFinished)
   {
     for (size_t i = 0; i < this->mFinished->getListeners().size(); ++i)
@@ -96,8 +118,41 @@ void cedar::proc::Triggerable::callOnStart()
 
 void cedar::proc::Triggerable::callOnStop()
 {
-  this->onStop();
+  // only call onStop if there is only one trigger left that started this triggerable
+  QMutexLocker locker(this->mpStartCallsLock);
+  cedar::aux::NamedConfigurable* named = dynamic_cast<cedar::aux::NamedConfigurable*>(this);
+//  std::cout << named->getName() << "->callOnStop():" << __LINE__ << ": " << this->mStartCalls << std::endl;
+
+  // count how often this was stopped
+  if (this->mStartCalls == 0)
+  {
+    std::string name = "(unnamed step)";
+    if (named)
+    {
+      name = named->getName();
+    }
+    // should not happen, but to prevent lockups in the architecture, we just put out an error and stop doing stuff.
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Step \"" + name + "\" has an invalid start count.",
+      "void cedar::proc::Triggerable::callOnStop()"
+    );
+    return;
+  }
+  --this->mStartCalls;
+
+  if (this->mStartCalls == 0)
+  {
+    this->onStop();
+  }
+
+//  std::cout << named->getName() << "->callOnStop():" << __LINE__ << ": " << this->mStartCalls << std::endl;
+
+  locker.unlock();
+
   this->setState(cedar::proc::Triggerable::STATE_UNKNOWN, "");
+
+  // can only call subsequent listeners if the finished trigger exists
   if (mFinished)
   {
     for (size_t i = 0; i < this->mFinished->getListeners().size(); ++i)

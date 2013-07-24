@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraBackendType.h
+    File:        BackendType.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 07 04
 
-    Description:  Header for CameraBackendType enum-type class
+    Description:  Header for BackendType enum-type class
 
     Credits:
 
@@ -46,16 +46,17 @@
 
 // SYSTEM INCLUDES
 
-/*!@brief Enum class to determine the used backend for the camera grabber
- */
+/*!@brief Enum class to determine the used backend for the camera grabber */
 class cedar::dev::sensors::camera::BackendType
 {
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Typedef for the enum values
   typedef cedar::aux::EnumId Id;
 public:
+  //! Typedef for this enum as shared pointer
   typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -68,9 +69,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Construct
   static void construct();
 
+  //! Type
   static const cedar::aux::EnumBase& type();
+
+  //! Type Pointer
   static const cedar::dev::sensors::camera::BackendType::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------

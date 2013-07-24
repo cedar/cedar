@@ -44,12 +44,13 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gui::Viewer::Viewer(cedar::aux::gl::ScenePtr pScene)
+cedar::aux::gui::Viewer::Viewer(cedar::aux::gl::ScenePtr pScene, bool readFromFile)
 :
 mpScene(pScene),
 mpGrabberLock(NULL),
 mGrabberBuffer(cv::Mat()),
 mGrabberConnected(false),
+mReadFromFile(readFromFile),
 mRegisteredGrabber("")
 {
   mpScene->addViewer(this);
@@ -70,7 +71,17 @@ cedar::aux::gui::Viewer::~Viewer()
 
 void cedar::aux::gui::Viewer::init()
 {
-  restoreStateFromFile();
+  if (mReadFromFile)
+  {
+    restoreStateFromFile();
+    // TODO: move this to logging
+    std::cout << "Restoring Viewer state from file" << std::endl;
+  }
+  else
+  {
+    // TODO: move this to logging
+    std::cout << "Not restoring Viewer state from file" << std::endl;
+  }
   mpScene->initGl();
 }
 

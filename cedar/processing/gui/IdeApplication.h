@@ -63,6 +63,18 @@ class cedar::proc::gui::IdeApplication : public QApplication
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  enum LastExceptionType
+  {
+    CEDAR_EXCEPTION,
+    STD_EXCEPTION,
+    UNKNOWN_EXCEPTION,
+    NONE
+  };
+
+  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -123,6 +135,11 @@ protected:
 private:
   //! The main window.
   cedar::proc::gui::Ide* mpIde;
+
+  LastExceptionType mLastExceptionType;
+
+  //! Last cedar exception caught by the application.
+  cedar::aux::ExceptionBase mLastCedarException;
 
 }; // class cedar::proc::gui::IdeApplication
 

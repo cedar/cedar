@@ -92,6 +92,10 @@ public:
   static const Qwt3D::ColorVector& getStandardColorVector();
 
 public slots:
+  /*!@brief Reacts to a change in the plotted data.
+   *
+   * When the dimensionality of the plotted data changes, this causes a switch of the plot type.
+   */
   void processChangedData();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -116,7 +120,7 @@ private:
   cedar::aux::ConstMatDataPtr mData;
 
   //!@brief the plot widget
-  QWidget *mpCurrentPlotWidget;
+  QWidget* mpCurrentPlotWidget;
 
   //!@brief vector filled with standard colors
   static Qwt3D::ColorVector mStandardColorVector;

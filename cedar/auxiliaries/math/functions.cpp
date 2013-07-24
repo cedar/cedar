@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -44,6 +44,60 @@
 // SYSTEM INCLUDES
 #include <iostream>
 #include <math.h>
+
+cv::Mat cedar::aux::math::boxMatrix
+        (
+          unsigned int dimensionality,
+          const std::vector<unsigned int>& matrixSizes,
+          double boxAmplitude,
+          double referenceLevel,
+          const std::vector<unsigned int>& widths,
+          const std::vector<unsigned int>& leftBounds
+        )
+{
+  std::vector<int> matrix_sizes_int(matrixSizes.size());
+  for (unsigned int i = 0; i < matrixSizes.size(); ++i)
+  {
+    matrix_sizes_int.at(i) = static_cast<int>(matrixSizes.at(i));
+  }
+
+  std::vector<int> box_widths_int(widths.size());
+  for (unsigned int i = 0; i < widths.size(); ++i)
+  {
+    box_widths_int.at(i) = static_cast<int>(widths.at(i));
+  }
+
+  if (dimensionality < 2)
+  {
+    matrix_sizes_int.push_back(1);
+    box_widths_int.push_back(1);
+  }
+
+  cv::Mat output = cv::Mat(static_cast<int>(dimensionality), &matrix_sizes_int.front(), CV_32F, cv::Scalar(referenceLevel));
+  cv::Mat box = cv::Mat(static_cast<int>(dimensionality), &box_widths_int.front(), CV_32F, cv::Scalar(boxAmplitude));
+
+  std::vector<cv::Range> box_ranges(dimensionality);
+  for (unsigned int i = 0; i < dimensionality; ++i)
+  {
+    unsigned int left = leftBounds.at(i);
+    unsigned int right = left + widths.at(i);
+    if (right > matrixSizes.at(i))
+    {
+      right = matrixSizes.at(i);
+    }
+    box_ranges.at(i) = cv::Range(left, right);
+  }
+
+  if (dimensionality < 2)
+  {
+    box_ranges.push_back(cv::Range::all());
+  }
+
+  cv::Mat tmp = output(&box_ranges.front());
+  box.copyTo(tmp);
+
+  return output;
+}
 
 cv::Mat cedar::aux::math::gaussMatrix
         (

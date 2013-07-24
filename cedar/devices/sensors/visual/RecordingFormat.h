@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -68,8 +68,10 @@ class cedar::dev::sensors::visual::RecordingFormat
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Typedef for the enum values
   typedef cedar::aux::EnumId Id;
 public:
+  //! Typedef for this enum as shared pointer
   typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
 private:
@@ -89,9 +91,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Construct
   static void construct();
 
+  //! Type
   static const cedar::aux::EnumBase& type();
+
+  //! Type Pointer
   static const cedar::dev::sensors::visual::RecordingFormat::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -115,7 +121,7 @@ public:
   static const Id RECORD_RAW = 0;
 
   /// Record in MP42 format
-  static const Id RECORD_MP42 = CEDAR_FOURCC('M','P','4','2'); // CV_FOURCC('M','P','4','2')
+  static const Id RECORD_MP42 = CEDAR_FOURCC('M','P','4','2'); // the same as CV_FOURCC('M','P','4','2')
 
   /// Record in MJPG
   static const Id RECORD_MJPG = CEDAR_FOURCC('M','J','P','G');

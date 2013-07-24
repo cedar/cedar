@@ -41,6 +41,10 @@
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/Enum.h"
+#include "cedar/auxiliaries/EnumType.h"
 #include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
@@ -59,6 +63,7 @@ class cedar::proc::gui::Settings : public cedar::aux::Configurable
   // friends
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::gui::UiSettings;
+  friend class cedar::aux::Singleton<cedar::proc::gui::Settings>;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -88,6 +93,49 @@ public:
   CEDAR_GENERATE_POINTER_TYPES(DockSettings);
   //!@endcond
 
+  class StepDisplayMode
+  {
+    public:
+      //! The base type of enum ids of this class.
+      typedef cedar::aux::EnumId Id;
+
+      //! Typedef of the shared pointer of enum values belonging to this class.
+      typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+
+      /*! @brief Construct method that fills the enum.
+       *  @see cedar::aux::EnumBase
+       */
+      static void construct()
+      {
+        mType.type()->def(cedar::aux::Enum(ICON_ONLY, "ICON_ONLY", "icon only"));
+        mType.type()->def(cedar::aux::Enum(TEXT_FOR_LOOPED, "TEXT_FOR_LOOPED", "text for looped steps"));
+        mType.type()->def(cedar::aux::Enum(ICON_AND_TEXT, "ICON_AND_TEXT", "icon and text"));
+      }
+
+      //! @returns A const reference to the base enum object.
+      static const cedar::aux::EnumBase& type()
+      {
+        return *(mType.type());
+      }
+
+      //! @returns A pointer to the base enum object.
+      static TypePtr typePtr()
+      {
+        return mType.type();
+      }
+
+      //! Identifier for the role input.
+      static const Id ICON_ONLY = 0;
+      //! Identifier for the role output.
+      static const Id TEXT_FOR_LOOPED = 1;
+      //! Identifier for the role buffer.
+      static const Id ICON_AND_TEXT = 2;
+
+    private:
+      //! The base enum object.
+      static cedar::aux::EnumType<cedar::proc::gui::Settings::StepDisplayMode> mType;
+  };
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -95,6 +143,7 @@ private:
   //!@brief The standard constructor.
   Settings();
 
+public:
   //!@brief Destructor
   ~Settings();
 
@@ -102,9 +151,6 @@ private:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief singleton instance of gui::Settings
-  static cedar::proc::gui::Settings& instance();
-
   //!@brief loads the UI settings
   void load();
   //!@brief saves the UI settings
@@ -164,6 +210,29 @@ public:
     this->mWritingDisabled = disable;
   }
 
+  //! Default display mode for steps.
+  StepDisplayMode::Id getDefaultDisplayMode() const
+  {
+    return this->_mDefaultStepDisplayMode->getValue();
+  }
+
+  //! Scaling factor for data slots.
+  double getDataSlotScaling() const
+  {
+    return this->_mDataSlotScaling->getValue();
+  }
+
+  //! Sensitivity for slot items growth when the mouse approaches them while connecting.
+  double getDataSlotScalingSensitivity() const
+  {
+    return this->_mDataSlotScalingSensitivity->getValue();
+  }
+
+  bool getDataSlotScalingEnabled() const
+  {
+    return this->_mDataSlotScalingEnabled->getValue();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -182,9 +251,6 @@ private:
 protected:
   // none yet
 private:
-  //!@brief the singleton instance of gui::Settings
-  static cedar::proc::gui::Settings mInstance;
-
   //! Disables writing of the properties; this is useful for unit tests that shouldn't alter the configuration.
   bool mWritingDisabled;
 
@@ -234,7 +300,32 @@ private:
   //!@brief Disables or enables graphics item shadows.
   cedar::aux::BoolParameterPtr mSnapToGrid;
 
+  //! Default display mode for steps.
+  cedar::aux::EnumParameterPtr _mDefaultStepDisplayMode;
+
+  //!@brief Disables or enables dynamic resizing of data slot items.
+  cedar::aux::BoolParameterPtr _mDataSlotScalingEnabled;
+
+  //! Amount by which slot items grow when the mouse approaches them while connecting.
+  cedar::aux::DoubleParameterPtr _mDataSlotScaling;
+
+  //! Sensitivity for slot items growth when the mouse approaches them while connecting.
+  cedar::aux::DoubleParameterPtr _mDataSlotScalingSensitivity;
+
 }; // class cedar::proc::gui::Settings
+
+namespace cedar
+{
+  namespace proc
+  {
+    namespace gui
+    {
+      typedef cedar::aux::Singleton<cedar::proc::gui::Settings> SettingsSingleton;
+    }
+  }
+}
+
+CEDAR_PROC_EXPORT_SINGLETON(cedar::proc::gui::Settings);
 
 #endif // CEDAR_PROC_GUI_SETTINGS_H
 

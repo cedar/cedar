@@ -35,9 +35,13 @@
 ======================================================================================================================*/
 
 #include "cedar/configuration.h"
-#include "cedar/auxiliaries/gui/HistoryPlot0D.h"
-#include "cedar/auxiliaries/gui/LinePlot.h"
-#include "cedar/auxiliaries/gui/SurfacePlot.h"
+#ifdef CEDAR_USE_QWT
+  #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
+  #include "cedar/auxiliaries/gui/LinePlot.h"
+#endif // CEDAR_USE_QWT
+#ifdef CEDAR_USE_QWTPLOT3D
+  #include "cedar/auxiliaries/gui/SurfacePlot.h"
+#endif // CEDAR_USE_QWTPLOT3D
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/utilities.h"
 
@@ -79,11 +83,14 @@ int main(int argc, char** argv)
 
   // the number of errors encountered in this test
   int errors = 0;
-
+#ifdef CEDAR_USE_QWT
   errors += testPlottingNullMatrix<cedar::aux::gui::HistoryPlot0D>();
+#endif // CEDAR_USE_QWT
   //!@todo Fix this class for this test.
 //  errors += testPlottingNullMatrix<cedar::aux::gui::LinePlot>();
+#ifdef CEDAR_USE_QWTPLOT3D
   errors += testPlottingNullMatrix<cedar::aux::gui::SurfacePlot>();
+#endif // CEDAR_USE_QWTPLOT3D
 
   std::cout << "Done with " << errors << " error(s)." << std::endl;
   return errors;

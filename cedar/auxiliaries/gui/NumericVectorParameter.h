@@ -77,6 +77,7 @@ public cedar::aux::gui::VectorParameterAbstraction<ValueT, WidgetT>
       bool signals_blocked = pWidget->blockSignals(true);
       setMinimum(pWidget, numeric_parameter->getMinimum());
       setMaximum(pWidget, numeric_parameter->getMaximum());
+      pWidget->setAlignment(Qt::AlignRight);
       pWidget->blockSignals(signals_blocked);
     }
 

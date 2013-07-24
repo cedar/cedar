@@ -43,7 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/dynamics/lib.h"
-#include "cedar/processing/PluginDeclaration.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -61,11 +61,12 @@ namespace cedar
     CEDAR_DECLARE_DYN_CLASS(Preshape);
     CEDAR_DECLARE_DYN_CLASS(RateMatrixToSpaceCode);
     CEDAR_DECLARE_DYN_CLASS(RateToSpaceCode);
+    CEDAR_DECLARE_DYN_CLASS(SerialOrder);
     CEDAR_DECLARE_DYN_CLASS(SpaceToRateCode);
     //!@endcond
 
     //!@brief A function for loading the declarations of the dynamics namespace as plugin.
-    CEDAR_DECLARE_DEPRECATED(CEDAR_DYN_LIB_EXPORT void getPluginDesciption(cedar::proc::PluginDeclarationPtr plugin));
+    CEDAR_DECLARE_DEPRECATED(CEDAR_DYN_LIB_EXPORT void getPluginDesciption(cedar::aux::PluginDeclarationListPtr plugin));
   }
 }
 

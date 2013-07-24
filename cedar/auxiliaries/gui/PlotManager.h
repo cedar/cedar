@@ -39,7 +39,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -48,9 +47,17 @@
 #include <set>
 
 /*!@brief A manager for different types of plots
+ *
+ * @todo Merge this class with some more generalized structure in cedar::aux.
  */
 class cedar::aux::gui::PlotManager
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  template <typename T, typename U> friend class cedar::aux::gui::PlotDeclarationTemplate;
+  friend class cedar::aux::Singleton<cedar::aux::gui::PlotManager>;
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -58,21 +65,18 @@ class cedar::aux::gui::PlotManager
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet
+private:
+  PlotManager();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief produces a vector of suitable plt classes for given data
-  void getPlotClassesFor(cedar::aux::ConstDataPtr data, std::set<cedar::aux::gui::PlotDeclarationPtr>& declarations);
+  void getPlotClassesFor(cedar::aux::ConstDataPtr data, std::set<cedar::aux::gui::ConstPlotDeclarationPtr>& declarations);
 
   //!@brief returns the default declaration for given data
-  cedar::aux::gui::PlotDeclarationPtr getDefaultDeclarationFor(cedar::aux::ConstDataPtr data);
-
-  //!@brief declare a plot type
-  void declare(cedar::aux::gui::PlotDeclarationPtr declaration);
+  cedar::aux::gui::ConstPlotDeclarationPtr getDefaultDeclarationFor(cedar::aux::ConstDataPtr data);
 
   //!@brief set default
   template <typename DataType, typename PlotterType>
@@ -96,6 +100,9 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief declare a plot type
+  void declare(cedar::aux::gui::ConstPlotDeclarationPtr declaration);
+
   static void normalizeTypeName(std::string& typeName)
   {
     typeName = cedar::aux::replace(typeName, "::", ".");
@@ -118,9 +125,11 @@ private:
   std::map<std::string, std::string> mDefaultPlots;
 
   //! Mapping from plot type strings to declarations
-  std::map<std::string, cedar::aux::gui::PlotDeclarationPtr> mPlotTypeDeclarations;
+  std::map<std::string, cedar::aux::gui::ConstPlotDeclarationPtr> mPlotTypeDeclarations;
 
 }; // class cedar::aux::gui::PlotManager
+
+CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::gui::PlotManager);
 
 namespace cedar
 {
@@ -129,7 +138,7 @@ namespace cedar
     namespace gui
     {
       /*!@brief singleton specialization for the plot manager
-       * @todo can this be moved to namespace.h?
+       * @todo Template instantiation
        */
       typedef cedar::aux::Singleton<cedar::aux::gui::PlotManager> PlotManagerSingleton;
     }
@@ -137,4 +146,3 @@ namespace cedar
 }
 
 #endif // CEDAR_AUX_GUI_PLOT_MANAGER_H
-

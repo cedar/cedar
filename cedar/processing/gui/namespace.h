@@ -54,7 +54,9 @@ namespace cedar
     namespace gui
     {
       //!@cond SKIPPED_DOCUMENTATION
+      class CEDAR_PROC_LIB_EXPORT ArchitectureConsistencyCheck;
       class CEDAR_PROC_LIB_EXPORT ArchitectureToolBox;
+      class CEDAR_PROC_LIB_EXPORT BoostControl;
       class CEDAR_PROC_LIB_EXPORT Connection;
       class CEDAR_PROC_LIB_EXPORT DataSlotItem;
       class CEDAR_PROC_LIB_EXPORT ElementClassList;

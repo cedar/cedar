@@ -47,7 +47,14 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <QMainWindow>
 
-cedar::proc::gui::Settings cedar::proc::gui::Settings::mInstance;
+cedar::aux::EnumType<cedar::proc::gui::Settings::StepDisplayMode>
+  cedar::proc::gui::Settings::StepDisplayMode::mType("cedar::proc::gui::Settings::StepDisplayMode::");
+
+#ifndef CEDAR_COMPILER_MSVC
+const cedar::proc::gui::Settings::StepDisplayMode::Id cedar::proc::gui::Settings::StepDisplayMode::ICON_ONLY;
+const cedar::proc::gui::Settings::StepDisplayMode::Id cedar::proc::gui::Settings::StepDisplayMode::TEXT_FOR_LOOPED;
+const cedar::proc::gui::Settings::StepDisplayMode::Id cedar::proc::gui::Settings::StepDisplayMode::ICON_AND_TEXT;
+#endif // CEDAR_COMPILER_MSVC
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -87,6 +94,19 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   ui_settings->addConfigurableChild("tools", mTools);
   ui_settings->addConfigurableChild("properties", mProperties);
 
+
+  cedar::aux::ConfigurablePtr slot_growth(new cedar::aux::Configurable());
+  this->addConfigurableChild("slot growth", slot_growth);
+
+  this->_mDataSlotScalingEnabled = new cedar::aux::BoolParameter(slot_growth.get(), "enabled", true);
+  auto growth_limits = cedar::aux::DoubleParameter::LimitType::positive();
+  growth_limits.setLower(1.0);
+  this->_mDataSlotScaling = new cedar::aux::DoubleParameter(slot_growth.get(), "factor", 1.3, growth_limits);
+
+  this->_mDataSlotScalingSensitivity
+    = new cedar::aux::DoubleParameter(slot_growth.get(), "sensitivity", 10.0, growth_limits);
+
+
   this->mSnapToGrid = cedar::aux::BoolParameterPtr
                       (
                         new cedar::aux::BoolParameter
@@ -108,6 +128,17 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
                                       false
                                     )
                                   );
+
+  this->_mDefaultStepDisplayMode = cedar::aux::EnumParameterPtr
+      (
+        new cedar::aux::EnumParameter
+        (
+          display_settings.get(),
+          "default step display mode",
+          cedar::proc::gui::Settings::StepDisplayMode::typePtr(),
+          cedar::proc::gui::Settings::StepDisplayMode::TEXT_FOR_LOOPED
+        )
+      );
 
   cedar::aux::ConfigurablePtr recent_files(new cedar::aux::Configurable());
   this->addConfigurableChild("fileHistory", recent_files);
@@ -296,12 +327,6 @@ cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::stepsSet
   return this->mSteps;
 }
 
-
-cedar::proc::gui::Settings& cedar::proc::gui::Settings::instance()
-{
-  return cedar::proc::gui::Settings::mInstance;
-}
-
 void cedar::proc::gui::Settings::load()
 {
   std::string path = cedar::aux::getUserApplicationDataDirectory() + "/.cedar/processingGui";
@@ -311,8 +336,11 @@ void cedar::proc::gui::Settings::load()
   }
   catch (const boost::property_tree::json_parser::json_parser_error& e)
   {
-    //!@todo proper signaling(?) of this message to the gui.
-    std::cout << "Error reading framework gui settings: " << e.what() << std::endl;
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      std::string("Error reading framework gui settings: ") + e.what(),
+      "void cedar::proc::gui::Settings::load()"
+    );
   }
 }
 
@@ -327,8 +355,11 @@ void cedar::proc::gui::Settings::save()
     }
     catch (const boost::property_tree::json_parser::json_parser_error& e)
     {
-      //!@todo proper signaling(?) of this message to the gui.
-      std::cout << "Error saving framework gui settings: " << e.what() << std::endl;
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        std::string("Error saving framework gui settings: ") + e.what(),
+        "void cedar::proc::gui::Settings::load()"
+      );
     }
   }
 }

@@ -45,6 +45,7 @@
 
 // SYSTEM INCLUDES
 #include <map>
+#include <set>
 
 
 /*!@brief A manager of factories.
@@ -60,8 +61,11 @@ class cedar::aux::FactoryManager
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
   typedef typename boost::shared_ptr< cedar::aux::Factory<BaseTypePtr> > FactoryTypePtr;
   typedef typename BaseTypePtr::element_type BaseType;
+
+  typedef std::map<std::string, std::vector<FactoryTypePtr> > CategoryMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -78,28 +82,37 @@ private:
 public:
   //!@brief register a new type at the factory manager
   template <class TypePtr>
-  bool registerType(std::string specifiedTypeName = "")
+  bool registerType(const std::string& specifiedTypeName = std::string())
   {
-    std::string generatedTypeName = cedar::aux::typeToString<typename TypePtr::element_type>();
-
+    std::string used_type_name = specifiedTypeName;
     // if no type name is supplied, generate type name from actual type
     if (specifiedTypeName.empty())
     {
-      specifiedTypeName = cedar::aux::replace(generatedTypeName, "::", ".");
+      used_type_name = this->generateTypeName<TypePtr>();
     }
 
-    mTypeNameMapping[generatedTypeName] = specifiedTypeName;
+    // store mapping from type name to specified name
+    mTypeNameMapping[cedar::aux::typeToString<typename TypePtr::element_type>()] = used_type_name;
 
     // check if typename exists
-    if (mRegisteredFactories.find(specifiedTypeName) != mRegisteredFactories.end())
+    if (mRegisteredFactories.find(used_type_name) != mRegisteredFactories.end())
     {
       CEDAR_THROW(cedar::aux::DuplicateNameException,
-        "A factory already exists for the type name \"" + specifiedTypeName + "\".");
+        "A factory already exists for the type name \"" + used_type_name + "\".");
     }
 
-    mRegisteredFactories[specifiedTypeName] = FactoryTypePtr(new cedar::aux::FactoryDerived<BaseTypePtr, TypePtr>());
+    FactoryTypePtr factory(new cedar::aux::FactoryDerived<BaseTypePtr, TypePtr>());
+    mRegisteredFactories[used_type_name] = factory;
 
     return true;
+  }
+
+  //! Converts the given class's type to a string.
+  template <class TypePtr>
+  std::string generateTypeName() const
+  {
+    std::string generated_type_name = cedar::aux::typeToString<typename TypePtr::element_type>();
+    return cedar::aux::replace(generated_type_name, "::", ".");
   }
 
   //!@brief allocate a new object of the given type

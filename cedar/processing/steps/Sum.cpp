@@ -70,7 +70,8 @@ namespace
     (
       "Calculates the sum of an arbitrary set of input matrices. All matrices must have the same size."
     );
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(declaration);
+
+    declaration->declare();
 
     return true;
   }
@@ -125,6 +126,11 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Sum::determineInputValidity
 
   if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
+    if (mat_data->isEmpty())
+    {
+      return cedar::proc::DataSlot::VALIDITY_ERROR;
+    }
+
     if (this->mInputs->getDataCount() > 0)
     {
       const cv::Mat& first_mat
@@ -142,4 +148,11 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Sum::determineInputValidity
     // Everything else is rejected.
     return cedar::proc::DataSlot::VALIDITY_ERROR;
   }
+}
+
+void cedar::proc::steps::Sum::inputConnectionChanged(const std::string& /*inputName*/)
+{
+  this->onTrigger();
+  this->emitOutputPropertiesChangedSignal("sum");
+  this->onTrigger();
 }
