@@ -22,30 +22,41 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SemiLinearSigmoid.h
+    File:        ExpSigmoid.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 05 16
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 07 05
 
-    Description: Sigmoid functions
+    Description: Sigmoid function
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MATH_SEMI_LINEAR_SIGMOID_H
-#define CEDAR_AUX_MATH_SEMI_LINEAR_SIGMOID_H
+#ifndef CEDAR_AUX_MATH_EXP_SIGMOID_H
+#define CEDAR_AUX_MATH_EXP_SIGMOID_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/math/transferFunctions/namespace.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief Sigmoid function that is linear above a given threshold.
+
+/*!@brief Sigmoid function that is based on the exponential function.
+ *
+ *        The equation for this sigmoid is:
+ *        @f[
+ *           \sigma(x) = \frac{1}{1 + e^{-\beta \cdot (x - \theta)}}
+ *        @f]
+ *        where \f$\theta\f$ is the threshold set for this function and \f$\beta\f$ is the steepness of the sigmoid.
  */
-class cedar::aux::math::SemiLinearSigmoid : public cedar::aux::math::Sigmoid
+class cedar::aux::math::ExpSigmoid : public cedar::aux::math::Sigmoid
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -56,22 +67,15 @@ class cedar::aux::math::SemiLinearSigmoid : public cedar::aux::math::Sigmoid
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  SemiLinearSigmoid(double threshold = 0.0, double beta = 1.0);
+  ExpSigmoid(double threshold = 0.0, double beta = 100.0);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief this function calculates the abs-based sigmoid function for a given double value.
+  /*!@brief this function calculates the exp-based sigmoid function for a given double value.
    */
   virtual double compute(double value) const;
-
-  /*!@brief Returns the current beta value.
-   */
-  inline double getBeta() const
-  {
-    return this->_mBeta->getValue();
-  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -89,10 +93,11 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-private:
-  //!@brief steepness of the linear part of the sigmoid.
+  //!@brief steepness of the exp-sigmoid
   cedar::aux::DoubleParameterPtr _mBeta;
+
+private:
+  // none yet
 };
 
-#endif  // CEDAR_AUX_MATH_SEMI_LINEAR_SIGMOID_H
+#endif  // CEDAR_AUX_MATH_EXP_SIGMOID_H

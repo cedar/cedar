@@ -79,6 +79,11 @@ cedar::aux::Parameter::~Parameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::Parameter::addDeprecatedName(const std::string& deprecatedName)
+{
+  this->mpOwner->addDeprecatedName(this, deprecatedName);
+}
+
 void cedar::aux::Parameter::lockForWrite() const
 {
   std::set<QReadWriteLock*> locks;
