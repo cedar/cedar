@@ -112,14 +112,18 @@ public:
   template <class TypePtr>
   void addDeprecatedName(const std::string& deprecatedName)
   {
-    auto iter = this->mDeprecatedNames.find(deprecatedName);
     std::string class_id = this->generateTypeName<TypePtr>();
+    this->addDeprecatedName(class_id, deprecatedName);
+  }
 
+  void addDeprecatedName(const std::string classId, const std::string& deprecatedName)
+  {
+    auto iter = this->mDeprecatedNames.find(deprecatedName);
     // check if the deprecated name exists
     if (iter != this->mDeprecatedNames.end())
     {
       // if it is different from the new one
-      if (iter->second != class_id)
+      if (iter->second != classId)
       {
         CEDAR_THROW
         (
@@ -128,7 +132,7 @@ public:
         );
       }
     }
-    this->mDeprecatedNames[deprecatedName] = class_id;
+    this->mDeprecatedNames[deprecatedName] = classId;
   }
 
   //! Converts the given class's type to a string.
@@ -141,7 +145,7 @@ public:
   //!@brief allocate a new object of the given type
   BaseTypePtr allocate(const std::string& typeName)
   {
-    typename std::map<std::string, FactoryTypePtr>::const_iterator iter = mRegisteredFactories.find(typeName);
+    auto iter = mRegisteredFactories.find(typeName);
 
     if (iter == mRegisteredFactories.end())
     {
