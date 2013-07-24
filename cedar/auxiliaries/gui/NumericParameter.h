@@ -154,6 +154,7 @@ public:
   {
     this->setLayout(new QHBoxLayout());
     this->mpWidget = WidgetPolicy::create();
+    this->mpWidget->setAlignment(Qt::AlignRight);
     this->layout()->setContentsMargins(0, 0, 0, 0);
     this->layout()->addWidget(this->mpWidget);
     WidgetPolicy::setPrecision(this->mpWidget, 4);

@@ -86,8 +86,8 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  // none yet
+private slots:
+  void parameterValueChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -96,7 +96,7 @@ protected:
   // none yet
 private:
   //! QComboBox used for displaying all available options.
-  QComboBox *mpEdit;
+  QComboBox* mpEdit;
 
 }; // class cedar::aux::gui::EnumParameter
 

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,99 +22,120 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GrabberChannel.h
+    File:        BoxInput.h
 
-    Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.rub.de
-    Date:        2012 09 28
+    Maintainer:  Mathis Richter
 
-    Description: Class GrabberChannel
+    Email:       mathis.richter@ini.rub.de
+
+    Date:        2013 05 03
+
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_TEST_CHANNEL_H
-#define CEDAR_DEV_SENSORS_VISUAL_TEST_CHANNEL_H
-
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
+#ifndef CEDAR_PROC_SOURCES_BOX_INPUT_H
+#define CEDAR_PROC_SOURCES_BOX_INPUT_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/namespace.h"
-#include "cedar/devices/sensors/visual/GrabberChannel.h"
-#include "cedar/auxiliaries/IntParameter.h"
+#include "cedar/processing/sources/namespace.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.h"
+#include "cedar/auxiliaries/UIntVectorParameter.h"
 
 // SYSTEM INCLUDES
 
 
-
-//!@brief TestChannel contains additional data of a picture grabbing channel
-class cedar::dev::sensors::visual::TestChannel
-:
-public cedar::dev::sensors::visual::GrabberChannel
+/*!@brief Generates a matrix with a box input at a specified position, amplitude, and extent.
+ */
+class cedar::proc::sources::BoxInput : public cedar::proc::Step
 {
-  //!@brief friend class of TestGrabber for direct access to the members
-  friend class cedar::dev::sensors::visual::TestGrabber;
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  TestChannel(const std::string& fileName = "")
-  :
-  cedar::dev::sensors::visual::GrabberChannel(),
-  _mSourceFileName(new cedar::aux::FileParameter(this, "filename", cedar::aux::FileParameter::READ, fileName))
-  {
-  };
+  BoxInput();
 
   //!@brief Destructor
-  virtual ~TestChannel()
-  {
-  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  //!@brief Sets the left edge of the box in the given dimension.
+  void setLeftBound(unsigned int dimension, unsigned int leftBound);
+
+  //!@brief Sets the amplitude of the box input.
+  void setAmplitude(double amplitude);
+
+  //!@brief Returns the amplitude of the box input.
+  double getAmplitude() const;
+
+  //!@brief Sets the reference level of the box input.
+  void setReferenceLevel(double referenceLevel);
+
+  //!@brief Returns the reference level of the box input.
+  double getReferenceLevel() const;
+
+  //!@brief Sets the width of the box input.
+  void setWidth(unsigned int dimension, unsigned int width);
+
+public slots:
+  //!@brief a slot that is triggered if any of the box function parameters are changed
+  void updateMatrix();
+
+  //!@brief a slot to process changes in dimensionality, including reinitializing the buffers
+  void updateDimensionality();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief refreshes the internal matrix containing the box input
+  void compute(const cedar::proc::Arguments& arguments);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief the buffer containing the output
+  cedar::aux::MatDataPtr mOutput;
 private:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief The test parameter
-  cedar::aux::FileParameterPtr _mSourceFileName;
+  //!@brief the amplitude of the box function
+  cedar::aux::DoubleParameterPtr _mAmplitude;
+  //!@brief the reference level of the box function
+  cedar::aux::DoubleParameterPtr _mReferenceLevel;
+  //!@brief the dimensionality of the box function
+  cedar::aux::UIntParameterPtr _mDimensionality;
+  //!@brief the vector of widths of the box function (one for each dimension)
+  cedar::aux::UIntVectorParameterPtr _mWidths;
+  //!@brief the vector of left bounds of the box function
+  cedar::aux::UIntVectorParameterPtr _mLeftBounds;
+  //!@brief the vector of sizes of matrix containing the box function for each dimension
+  cedar::aux::UIntVectorParameterPtr _mSizes;
 
 private:
-  // none yet
 
-}; // class cedar::dev::sensors::visual::TestChannel
+}; // class cedar::proc::source::BoxInput
 
-#endif // CEDAR_DEV_SENSORS_VISUAL_TEST_CHANNEL_H
-
-
+#endif // CEDAR_PROC_SOURCES_BOX_INPUT_H

@@ -55,7 +55,7 @@ install(CODE "execute_process(COMMAND ln -fsT ${CMAKE_INSTALL_PREFIX}/${CEDAR_HE
 if(DOXYGEN_FOUND) # only execute this part if Doxygen was found
 install(CODE "execute_process(COMMAND make doc)")
 install(DIRECTORY "${CEDAR_BUILD_DIR}/doc/html" DESTINATION "${CEDAR_DOC_INSTALL_DIR}-${CEDAR_VERSION}")
-install(FILES "${CEDAR_BUILD_DIR}/doc/latex/refman.pdf" DESTINATION "${CEDAR_DOC_INSTALL_DIR}-${CEDAR_VERSION}")
+install(FILES "${CEDAR_BUILD_DIR}/doc/latex/refman.pdf" DESTINATION "${CEDAR_DOC_INSTALL_DIR}-${CEDAR_VERSION}" OPTIONAL)
 endif(DOXYGEN_FOUND)
 
 #------------------------

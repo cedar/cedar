@@ -234,7 +234,7 @@ private:
   void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
 
   //!@brief Applies a plot style to a given curve.
-  static void applyStyle(size_t lineId, QwtPlotCurve *pCurve);
+  static void applyStyle(cedar::aux::ConstDataPtr data, size_t lineId, QwtPlotCurve *pCurve);
 
 private slots:
   void showLegend(bool show = true);

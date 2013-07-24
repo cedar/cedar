@@ -46,6 +46,7 @@
 #include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/processing/DataRole.h"
+#include "cedar/processing/DataSlot.h"
 
 // SYSTEM INCLUDES
 
@@ -88,7 +89,7 @@ public:
 
   /*!@brief Connects the UI item and the underlying data slot to the target.
    */
-  void connectTo(cedar::proc::gui::DataSlotItem *pTarget);
+  cedar::proc::gui::Connection* connectTo(cedar::proc::gui::DataSlotItem *pTarget);
 
   /*!@brief Returns the name of the data slot.
    */
@@ -112,6 +113,16 @@ public:
    */
   cedar::proc::gui::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
 
+  void setMagneticScale(qreal scale)
+  {
+    this->mMagneticScale = scale;
+  }
+
+  qreal getMagneticScale() const
+  {
+    return this->mMagneticScale;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -128,6 +139,10 @@ private:
    */
   void generateTooltip();
 
+  void updateConnections();
+
+  cedar::proc::gui::ConnectValidity translateValidity(cedar::proc::DataSlot::VALIDITY validity) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -135,10 +150,16 @@ protected:
   // none yet
 private:
   //! The step item that this slot belongs to.
-  cedar::proc::gui::GraphicsBase *mpStep;
+  cedar::proc::gui::GraphicsBase* mpStep;
 
   //! The slot itself.
   cedar::proc::DataSlotPtr mSlot;
+
+  //!@brief a connection to a signal emitted if validity of the data slot changes
+  boost::signals2::connection mSlotConnection;
+
+  //! How much the slot is currently being scaled due to attraction by the mouse pointer.
+  qreal mMagneticScale;
 }; // class DataSlotItem
 
 #endif // CEDAR_PROC_GUI_DATA_SLOT_ITEM_H

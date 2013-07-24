@@ -370,17 +370,30 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time, bool suppressWarning)
 
   if (this->isRunning())
   {
-    cedar::aux::LogSingleton::getInstance()->warning
-    (
+    if (QThread::currentThread() != mpThread)
+    {
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
 #ifdef DEBUG
-      "Thread " 
-      + boost::lexical_cast<std::string>(this)
-      + " is still running after call of stop()!",
+        "Thread " 
+        + boost::lexical_cast<std::string>(this)
+        + " is still running after call of stop()!",
 #else
-      "Thread is still running after call of stop()!",
+        "Thread is still running after call of stop()!",
 #endif      
-      "cedar::aux::ThreadWrapper::stop(unsigned int, bool)"
-    );
+        "cedar::aux::ThreadWrapper::stop(unsigned int, bool)"
+      );
+    }
+    else
+    {
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Trying to stop() the currently running thread will not work as "
+        "expected, prefer calling requestStop() to quit thread after "
+        "current execution yields (current LoopedThread::step() finishes).",
+        "cedar::aux::ThreadWrapper::stop(unsigned int, bool)"
+      );
+    }
   }
 }
 

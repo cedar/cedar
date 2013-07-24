@@ -141,24 +141,6 @@ private:
 
 }; // class cedar::proc::FrameworkSettings
 
-
-namespace cedar
-{
-  namespace proc
-  {
-#ifdef MSVC
-#ifdef CEDAR_LIB_EXPORTS_PROC
-    // dllexport
-    template class __declspec(dllexport) cedar::aux::Singleton<cedar::proc::FrameworkSettings>;
-#else // CEDAR_LIB_EXPORTS_PROC
-    // dllimport
-    extern template class __declspec(dllimport) cedar::aux::Singleton<cedar::proc::FrameworkSettings>;
-#endif // CEDAR_LIB_EXPORTS_PROC
-#endif // MSVC
-
-    //!@brief The singleton instance of the framework settings.
-    typedef cedar::aux::Singleton<cedar::proc::FrameworkSettings> FrameworkSettingsSingleton;
-  }
-}
+CEDAR_PROC_SINGLETON(FrameworkSettings);
 
 #endif // CEDAR_PROC_FRAMEWORK_SETTINGS_H

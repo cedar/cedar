@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,47 +22,46 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        testingFunctions.h
+    File:        LoopFunctionInThread.cpp
 
     Maintainer:  Jean-Stephane Jokeit
-    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        2013 06 21
+    Email:       jean-stephane.jokeit@ini.rub.de
+    Date:        2013 07 01
 
-    Description: Shared testing (unit-tests) code.
+    Description: Implementation of the @em cedar::aux::LoopFunctionInThread class.
 
     Credits:
 
 ======================================================================================================================*/
 
-// CEDAR CONFIGURATION
-#include "cedar/configuration.h"
-#include "cedar/auxiliaries/namespace.h"
-
-#ifndef CEDAR_AUX_TESTING_FUNCTIONS_H
-#define CEDAR_AUX_TESTING_FUNCTIONS_H
-
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/LoopFunctionInThread.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
-namespace cedar
+
+//------------------------------------------------------------------------------
+// constructors and destructor
+//------------------------------------------------------------------------------
+cedar::aux::LoopFunctionInThread::LoopFunctionInThread
+(
+  FunctionType fun
+)
+:
+mFunction(fun)
 {
-  namespace aux
-  {
-    namespace testing
-    {
-      CEDAR_AUX_LIB_EXPORT void write_measurement
-                                (
-                                  const std::string& id,
-                                  double duration
-                                );
-                                
-      CEDAR_AUX_LIB_EXPORT void test_time
-                                (
-                                  std::string id, 
-                                  std::function< void() > fun
-                                );
-    }
-  }
 }
 
-#endif // CEDAR_AUX_STRING_FUNCTIONS_H
+cedar::aux::LoopFunctionInThread::~LoopFunctionInThread()
+{
+}
+
+//------------------------------------------------------------------------------
+// methods
+//------------------------------------------------------------------------------
+
+void cedar::aux::LoopFunctionInThread::step(double timeStep)
+{
+  mFunction(timeStep);
+}
+

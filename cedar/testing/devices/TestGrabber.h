@@ -28,27 +28,28 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2012 04 23
 
-    Description: Header for the @em cedar::dev::sensors::visual::TestGrabber class.
+    Description: Header for the @em cedar::testing::dev::TestGrabber class.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_TEST_GRABBER_H
-#define CEDAR_DEV_SENSORS_VISUAL_TEST_GRABBER_H
+#ifndef CEDAR_TESTING_DEV_TEST_GRABBER_H
+#define CEDAR_TESTING_DEV_TEST_GRABBER_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
+#include "cedar/testing/devices/namespace.h"
+#include "cedar/testing/devices/TestChannel.h"
 #include "cedar/devices/sensors/visual/Grabber.h"
-#include "cedar/devices/sensors/visual/grabbertests/TestChannel.h"
 #include "cedar/auxiliaries/StringParameter.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
-/*! @class cedar::dev::sensors::visual::TestGrabber
+/*! @class cedar::testing::dev::TestGrabber
  *
  *  @brief A simple Grabber class for testing the Grabber interface
  *
@@ -59,7 +60,7 @@
  *    This class can also be used as a template to create other classes derived from GrabberInstance
  *
  */
-class cedar::dev::sensors::visual::TestGrabber
+class cedar::testing::dev::TestGrabber
 :
 public cedar::dev::sensors::visual::Grabber
 {
@@ -175,6 +176,6 @@ protected:
 private:
   // none yet
 
-}; // class cedar::dev::sensors::visual::TestGrabber
+}; // class cedar::testing::dev::TestGrabber
 
-#endif // CEDAR_DEV_SENSORS_VISUAL_TEST_GRABBER_H
+#endif // CEDAR_TESTING_DEV_TEST_GRABBER_H

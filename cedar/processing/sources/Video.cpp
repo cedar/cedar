@@ -178,6 +178,7 @@ void cedar::proc::sources::Video::updateVideo()
   mFrameDuration = 1000/this->getVideoGrabber()->getFramerate();
   mTimeElapsed = 0.0;
   mRecording->setValue(this->getVideoGrabber()->isRecording());
+  this->emitOutputPropertiesChangedSignal("Video");
 }
 
 void cedar::proc::sources::Video::updateSpeedFactor()

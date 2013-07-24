@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/Enum.h"
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/auxiliaries/namespace.h"
@@ -62,6 +63,7 @@ class cedar::proc::gui::Settings : public cedar::aux::Configurable
   // friends
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::gui::UiSettings;
+  friend class cedar::aux::Singleton<cedar::proc::gui::Settings>;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -141,6 +143,7 @@ private:
   //!@brief The standard constructor.
   Settings();
 
+public:
   //!@brief Destructor
   ~Settings();
 
@@ -148,9 +151,6 @@ private:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief singleton instance of gui::Settings
-  static cedar::proc::gui::Settings& instance();
-
   //!@brief loads the UI settings
   void load();
   //!@brief saves the UI settings
@@ -216,6 +216,23 @@ public:
     return this->_mDefaultStepDisplayMode->getValue();
   }
 
+  //! Scaling factor for data slots.
+  double getDataSlotScaling() const
+  {
+    return this->_mDataSlotScaling->getValue();
+  }
+
+  //! Sensitivity for slot items growth when the mouse approaches them while connecting.
+  double getDataSlotScalingSensitivity() const
+  {
+    return this->_mDataSlotScalingSensitivity->getValue();
+  }
+
+  bool getDataSlotScalingEnabled() const
+  {
+    return this->_mDataSlotScalingEnabled->getValue();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -234,9 +251,6 @@ private:
 protected:
   // none yet
 private:
-  //!@brief the singleton instance of gui::Settings
-  static cedar::proc::gui::Settings mInstance;
-
   //! Disables writing of the properties; this is useful for unit tests that shouldn't alter the configuration.
   bool mWritingDisabled;
 
@@ -289,7 +303,29 @@ private:
   //! Default display mode for steps.
   cedar::aux::EnumParameterPtr _mDefaultStepDisplayMode;
 
+  //!@brief Disables or enables dynamic resizing of data slot items.
+  cedar::aux::BoolParameterPtr _mDataSlotScalingEnabled;
+
+  //! Amount by which slot items grow when the mouse approaches them while connecting.
+  cedar::aux::DoubleParameterPtr _mDataSlotScaling;
+
+  //! Sensitivity for slot items growth when the mouse approaches them while connecting.
+  cedar::aux::DoubleParameterPtr _mDataSlotScalingSensitivity;
+
 }; // class cedar::proc::gui::Settings
+
+namespace cedar
+{
+  namespace proc
+  {
+    namespace gui
+    {
+      typedef cedar::aux::Singleton<cedar::proc::gui::Settings> SettingsSingleton;
+    }
+  }
+}
+
+CEDAR_PROC_EXPORT_SINGLETON(cedar::proc::gui::Settings);
 
 #endif // CEDAR_PROC_GUI_SETTINGS_H
 

@@ -972,3 +972,16 @@ void cedar::proc::Connectable::renameInput(const std::string& oldName, const std
     slot->setName(newName);
   }
 }
+
+void cedar::proc::Connectable::emitOutputPropertiesChangedSignal(const std::string& slot)
+{
+  try
+  {
+    this->getOutputSlot(slot);
+  }
+  catch (cedar::proc::InvalidNameException& exc)
+  {
+    CEDAR_THROW(cedar::proc::InvalidNameException, "Tried to emit a signal from an output that does not exist.");
+  }
+  this->mOutputPropertiesChanged(this->getName() + "." + slot);
+}
