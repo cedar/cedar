@@ -43,6 +43,10 @@
 #------------------------
 
 file(GLOB cedarHeaders "${CEDAR_SOURCE_DIR}/*.h")
+# delete olde header installation
+if(EXISTS "${CMAKE_INSTALL_PREFIX}/${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}/")
+  install(CODE "execute_process(COMMAND rm -r ${CMAKE_INSTALL_PREFIX}/${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION})")
+endif(EXISTS "${CMAKE_INSTALL_PREFIX}/${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}/")
 install(FILES ${cedarHeaders} DESTINATION "${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}")
 install(FILES ${CEDAR_CONFIGURATION_HEADER_OUTPUT} DESTINATION "${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}")
 # create links for the header directory
@@ -55,7 +59,7 @@ install(CODE "execute_process(COMMAND ln -fsT ${CMAKE_INSTALL_PREFIX}/${CEDAR_HE
 if(DOXYGEN_FOUND) # only execute this part if Doxygen was found
 install(CODE "execute_process(COMMAND make doc)")
 install(DIRECTORY "${CEDAR_BUILD_DIR}/doc/html" DESTINATION "${CEDAR_DOC_INSTALL_DIR}-${CEDAR_VERSION}")
-install(FILES "${CEDAR_BUILD_DIR}/doc/latex/refman.pdf" DESTINATION "${CEDAR_DOC_INSTALL_DIR}-${CEDAR_VERSION}")
+install(FILES "${CEDAR_BUILD_DIR}/doc/latex/refman.pdf" DESTINATION "${CEDAR_DOC_INSTALL_DIR}-${CEDAR_VERSION}" OPTIONAL)
 endif(DOXYGEN_FOUND)
 
 #------------------------
