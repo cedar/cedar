@@ -45,6 +45,18 @@
 // SYSTEM INCLUDES
 
 /*!@brief Transfer function that is linear above a given threshold.
+ *
+ *        The equation for this function is:
+ *        @f[
+ *           \sigma(x) =
+ *              \left\{
+ *                \begin{array}{ll}
+ *                  \theta: & x < \theta \\
+ *                  \theta + \beta \cdot (x - \theta): & \text{otherwise}
+ *                \end{array}
+ *              \right.
+ *        @f]
+ *        where \f$\theta\f$ is the threshold set for this function.
  */
 class cedar::aux::math::SemiLinearTransferFunction : public cedar::aux::math::TransferFunction
 {

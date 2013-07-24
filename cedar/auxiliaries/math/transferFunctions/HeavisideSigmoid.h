@@ -50,7 +50,19 @@
 
 /*!@brief A sigmoid step function, going from 0.0 to 1.0 when the input reaches or exceeds the threshold.
  *
- * This class internally calls the free function cedar::aux::math::sigmoidHeaviside.
+ *        This class internally calls the free function cedar::aux::math::sigmoidHeaviside.
+ *
+ *        The equation for this function is:
+ *        @f[
+ *           \sigma(x) =
+ *              \left\{
+ *                \begin{array}{ll}
+ *                  0:& x < \theta \\
+ *                  1:& \text{otherwise}
+ *                \end{array}
+ *              \right.
+ *        @f]
+ *        where \f$\theta\f$ is the threshold set for this function.
  */
 class cedar::aux::math::HeavisideSigmoid : public cedar::aux::math::Sigmoid
 {
