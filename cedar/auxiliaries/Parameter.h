@@ -176,6 +176,15 @@ public:
     return this->mpOwner;
   }
 
+  /*! @brief Adds a deprecated name to the parameter.
+   *
+   *         Values for this parameter can then be read under the deprecated name(s), but these names are no longer used
+   *         to write the value. Also, a warning about this will be printed.
+   *
+   * @param  deprecatedName
+   */
+  void addDeprecatedName(const std::string& deprecatedName);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

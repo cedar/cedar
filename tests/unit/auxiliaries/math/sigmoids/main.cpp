@@ -37,9 +37,9 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/math/sigmoids.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
-#include "cedar/auxiliaries/math/sigmoids/AbsSigmoid.h"
-#include "cedar/auxiliaries/math/sigmoids/ExpSigmoid.h"
-#include "cedar/auxiliaries/math/sigmoids/HeavisideSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/ExpSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/HeavisideSigmoid.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/TransferFunctionDeclaration.h"
 #include "cedar/auxiliaries/utilities.h"
