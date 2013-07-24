@@ -195,6 +195,12 @@ void cedar::proc::sources::NetReader::compute(const cedar::proc::Arguments&)
     // CHANGE NOTHING
     return;
   }
+  catch (cedar::aux::net::NetNoNewDataException& e)
+  {
+    // no new data has been sent. ignore
+    // CHANGE NOTHING
+    return;
+  }
   catch (cedar::aux::net::NetUnexpectedDataException& e)
   {
     // communication problem? ignore

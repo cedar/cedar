@@ -143,7 +143,7 @@ public:
     }
     else // you never know ...
     {
-      CEDAR_THROW( cedar::aux::net::NetUnexpectedDataException,
+      CEDAR_THROW( cedar::aux::net::NetNoNewDataException,
                    "YARP: unexpectedly read NULL from port" );
       return 0;
     }
