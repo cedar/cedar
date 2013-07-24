@@ -144,7 +144,7 @@ public:
     else // you never know ...
     {
       CEDAR_THROW( cedar::aux::net::NetNoNewDataException,
-                   "YARP: unexpectedly read NULL from port" );
+                   "YARP: currently no data in buffer (reading)" );
       return 0;
     }
   }
