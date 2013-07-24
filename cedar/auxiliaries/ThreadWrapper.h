@@ -147,7 +147,7 @@ public:
   {
     bool ret = false;
 
-    if (validThread())
+    if (isValidThread())
     {
       ret = mpThread->wait(time);
     }
@@ -210,7 +210,7 @@ private:
   //! is the worker (still) in memory? thread-un-safe
   bool validWorker() const;
   //! is the thread (still) in memory? thread-un-safe
-  bool validThread() const; 
+  bool isValidThread() const; 
 
   //----------------------------------------------------------------------------
   // members
