@@ -109,7 +109,7 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
                    // note: this may help some workers to exit cleanly/quickly
   }
 
-  if (validThread())
+  if (isValidThread())
   {
     mpThread->disconnect(this); // dont execute directly connected slots
     this->disconnect(mpThread); // ... (especially the one quit() calls)
@@ -146,7 +146,7 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
   }
 
   // free thread data
-  if (validThread())
+  if (isValidThread())
   {
     delete mpThread;
   }
@@ -200,7 +200,7 @@ void cedar::aux::ThreadWrapper::start()
   //              Communication is done via the QT event loops (also of the
   //              QThread object).
 
-  CEDAR_ASSERT(validWorker() == validThread());
+  CEDAR_ASSERT(validWorker() == isValidThread());
 
   if (this->isRunning())
   {
@@ -211,7 +211,7 @@ void cedar::aux::ThreadWrapper::start()
     );
     return; // already running, don't do anything
   }
-  else if (!this->validThread())
+  else if (!this->isValidThread())
   {
     CEDAR_ASSERT(!this->validWorker());
 
@@ -299,7 +299,7 @@ void cedar::aux::ThreadWrapper::quittedThreadSlot()
   if (mDestructing) // always test after locking, see start()
     return;
 
-  if (validThread())
+  if (isValidThread())
   {
     //std::cout << "deleting thread: " << mpThread << " ( current thread: " << QThread::currentThread() << std::endl;    
 
@@ -327,7 +327,7 @@ bool cedar::aux::ThreadWrapper::validWorker() const
   return mpWorker != NULL;
 }
 
-bool cedar::aux::ThreadWrapper::validThread() const
+bool cedar::aux::ThreadWrapper::isValidThread() const
 {
   // this is intentionally not thread-safe
   return mpThread != NULL;
