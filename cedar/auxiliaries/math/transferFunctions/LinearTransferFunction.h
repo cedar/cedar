@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SemiLinearTransferFunction.h
+    File:        LinearTransferFunction.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
@@ -34,19 +34,18 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MATH_SEMI_LINEAR_TRANSFER_FUNCTION_H
-#define CEDAR_AUX_MATH_SEMI_LINEAR_TRANSFER_FUNCTION_H
+#ifndef CEDAR_AUX_MATH_LINEAR_TRANSFER_FUNCTION_H
+#define CEDAR_AUX_MATH_LINEAR_TRANSFER_FUNCTION_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/sigmoids/namespace.h"
+#include "cedar/auxiliaries/math/transferFunctions/namespace.h"
 #include "cedar/auxiliaries/math/TransferFunction.h"
-#include "cedar/auxiliaries/DoubleParameter.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief Transfer function that is linear above a given threshold.
+/*!@brief Sigmoid function that is linear, i.e., multiplies the values with a scalar.
  */
-class cedar::aux::math::SemiLinearTransferFunction : public cedar::aux::math::TransferFunction
+class cedar::aux::math::LinearTransferFunction : public cedar::aux::math::TransferFunction
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -57,7 +56,7 @@ class cedar::aux::math::SemiLinearTransferFunction : public cedar::aux::math::Tr
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  SemiLinearTransferFunction(double threshold = 0.0, double beta = 1.0);
+  LinearTransferFunction();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -66,20 +65,6 @@ public:
   /*!@brief this function calculates the abs-based sigmoid function for a given double value.
    */
   virtual double compute(double value) const;
-
-  /*!@brief Returns the current beta value.
-   */
-  inline double getBeta() const
-  {
-    return this->_mBeta->getValue();
-  }
-
-  /*! Returns the current threshold value.
-   */
-  inline double getThreshold() const
-  {
-    return this->_mThreshold->getValue();
-  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -99,11 +84,7 @@ private:
 protected:
   // none yet
 private:
-  //!@brief Threshold.
-  cedar::aux::DoubleParameterPtr _mThreshold;
-
-  //!@brief Steepness of the linear part.
-  cedar::aux::DoubleParameterPtr _mBeta;
+  // none yet
 };
 
-#endif  // CEDAR_AUX_MATH_SEMI_LINEAR_TRANSFER_FUNCTION_H
+#endif  // CEDAR_AUX_MATH_LINEAR_TRANSFER_FUNCTION_H
