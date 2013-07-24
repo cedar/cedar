@@ -111,7 +111,6 @@ public:
    * @see requestStop()
    */
   void stop(unsigned int timeout = UINT_MAX, bool suppressWarning = false); 
-    // TODO: why is this uint and the arg of wait() is ulong?
 
   /*! start the thread and initialize the worker
    *
@@ -119,7 +118,7 @@ public:
    * Re-entry or calling start() twice will be detected and will 
    * abort with a cedar-warning.
    */
-  void start(); 
+  void start();
 
   //! is the thread still running?
   bool isRunning() const; 
@@ -148,7 +147,7 @@ public:
   {
     bool ret = false;
 
-    if (validThread())
+    if (isValidThread())
     {
       ret = mpThread->wait(time);
     }
@@ -211,7 +210,7 @@ private:
   //! is the worker (still) in memory? thread-un-safe
   bool validWorker() const;
   //! is the thread (still) in memory? thread-un-safe
-  bool validThread() const; 
+  bool isValidThread() const; 
 
   //----------------------------------------------------------------------------
   // members

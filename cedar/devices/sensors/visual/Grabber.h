@@ -249,7 +249,6 @@ public:
    *          This method invokes internally LoopedThread::stop() and does
    *          some cleanup like stopRecording or set the measured FPS to zero
    */
-  //!@todo Overload LoopedThread::stop() method
   void stopGrabber();
 
   /*! @brief Start the grabbing thread
@@ -260,7 +259,6 @@ public:
    *          To control the grabbing speed (i.e. the FPS) use
    *          setFramerate(), getFramerate() or getMeasuredFramerate()
    */
-  //!@todo Overload LoopedThread::start() method
   void startGrabber();
 
 

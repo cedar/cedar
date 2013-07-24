@@ -64,6 +64,37 @@ mDataIsSet(false),
 mDesiredColumns(0),
 mConverting(false)
 {
+  this->init();
+}
+
+cedar::aux::gui::MatrixSlicePlot3D::MatrixSlicePlot3D(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent)
+:
+cedar::aux::gui::PlotInterface(pParent),
+mTimerId(0),
+mDataIsSet(false),
+mDesiredColumns(0),
+mConverting(false)
+{
+  this->init();
+  this->plot(matData, title);
+}
+
+cedar::aux::gui::MatrixSlicePlot3D::~MatrixSlicePlot3D()
+{
+  if (this->mpWorkerThread)
+  {
+    this->mpWorkerThread->quit();
+    this->mpWorkerThread->wait();
+    delete this->mpWorkerThread;
+    this->mpWorkerThread = NULL;
+  }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+void cedar::aux::gui::MatrixSlicePlot3D::init()
+{
   QVBoxLayout* p_layout = new QVBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(p_layout);
@@ -86,20 +117,6 @@ mConverting(false)
   this->mpWorkerThread->start(QThread::LowPriority);
 }
 
-cedar::aux::gui::MatrixSlicePlot3D::~MatrixSlicePlot3D()
-{
-  if (this->mpWorkerThread)
-  {
-    this->mpWorkerThread->quit();
-    this->mpWorkerThread->wait();
-    delete this->mpWorkerThread;
-    this->mpWorkerThread = NULL;
-  }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
 void cedar::aux::gui::MatrixSlicePlot3D::plot(cedar::aux::ConstDataPtr data, const std::string& /* title */)
 {
   if (mTimerId != 0)

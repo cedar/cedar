@@ -74,13 +74,22 @@ void cedar::aux::gui::Viewer::init()
   if (mReadFromFile)
   {
     restoreStateFromFile();
-    // TODO: move this to logging
-    std::cout << "Restoring Viewer state from file" << std::endl;
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Restoring Viewer state from file.",
+      "cedar::aux::gui::Viewer",
+      "init"
+    );
   }
   else
   {
-    // TODO: move this to logging
-    std::cout << "Not restoring Viewer state from file" << std::endl;
+    cedar::aux::LogSingleton::getInstance()->debugMessage
+    (
+      "Not restoring Viewer state from file.",
+      "cedar::aux::gui::Viewer",
+      "init"
+    );
+
   }
   mpScene->initGl();
 }
@@ -140,7 +149,7 @@ QReadWriteLock* cedar::aux::gui::Viewer::registerGrabber()
   {
     return NULL;
   }
-  mpGrabberLock = new QReadWriteLock;
+  mpGrabberLock = new QReadWriteLock();
   mGrabberConnected = true;
   return mpGrabberLock;
 }
@@ -157,6 +166,6 @@ void cedar::aux::gui::Viewer::deregisterGrabber(QReadWriteLock* lock)
   }
   else
   {
-    //!@todo: think about an exception or switch to boolean return value
+    CEDAR_THROW(cedar::aux::NotFoundException, "Lock address does not match the stored address.");
   }
 }

@@ -47,10 +47,7 @@
 
 // SYSTEM INCLUDES
 
-/*!@brief A class for logging messages in a file.
- *
- * @todo Make this class thread-safe.
- */
+//!@brief A class for logging messages in a file.
 class cedar::aux::Log
 {
   //--------------------------------------------------------------------------------------------------------------------

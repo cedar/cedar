@@ -83,7 +83,7 @@ void cedar::dev::sensors::camera::BackendCvVideoCapture::createCaptureObject()
 }
 
 
-void cedar::dev::sensors::camera::BackendCvVideoCapture::getAvailablePropertiesFromCamera()
+void cedar::dev::sensors::camera::BackendCvVideoCapture::readCameraProperties()
 {
   int num_properties = cedar::dev::sensors::camera::Property::type().list().size();
   for (int i=0; i<num_properties; i++)

@@ -58,21 +58,15 @@ mTarget(target)
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
   CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::OwnedData>(source));
-  // add the source data to target
-  //!@todo This code is redundant with the code below -- unify this
-  if (source && target)
+  try
   {
-    // remove the source data from target
-    cedar::proc::DataSlotPtr real_target = target;
-    while
-    (
-      cedar::proc::PromotedExternalDataPtr promoted
-        = boost::dynamic_pointer_cast<cedar::proc::PromotedExternalData>(real_target)
-    )
-    {
-      real_target = promoted->mDataSlot;
-    }
+    // add the source data to target
+    cedar::proc::DataSlotPtr real_target = this->getRealTarget();
     real_target->getParentPtr()->setInput(real_target->getName(), source->getData());
+  }
+  catch (cedar::proc::ConnectionMemberDeletedException)
+  {
+    // ok
   }
 }
 
@@ -80,8 +74,28 @@ cedar::proc::DataConnection::~DataConnection()
 {
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
-  cedar::proc::DataSlotPtr source = mSource.lock();
-  cedar::proc::DataSlotPtr target = mTarget.lock();
+  if (cedar::proc::DataSlotPtr source = this->mSource.lock())
+  {
+    try
+    {
+      cedar::proc::DataSlotPtr real_target = this->getRealTarget();
+      this->getRealTarget()->getParentPtr()->freeInput(real_target->getName(), source->getData());
+    }
+    catch (cedar::proc::ConnectionMemberDeletedException)
+    {
+      // ok
+    }
+  }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::DataSlotPtr cedar::proc::DataConnection::getRealTarget() const
+{
+  cedar::proc::DataSlotPtr source = this->mSource.lock();
+  cedar::proc::DataSlotPtr target = this->mTarget.lock();
 
   // first make a check if pointers are valid for source and target
   if (source && target)
@@ -96,12 +110,14 @@ cedar::proc::DataConnection::~DataConnection()
     {
       real_target = promoted->mDataSlot;
     }
-    real_target->getParentPtr()->freeInput(real_target->getName(), source->getData());
+    return real_target;
+  }
+  else
+  {
+    CEDAR_THROW(cedar::proc::ConnectionMemberDeletedException, "Could not acquire source or target.");
   }
 }
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
+
 bool cedar::proc::DataConnection::equals(
                                           cedar::proc::ConstDataSlotPtr source,
                                           cedar::proc::ConstDataSlotPtr target

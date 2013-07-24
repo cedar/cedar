@@ -49,10 +49,6 @@
 #include <limits>
 #include <iostream>
 
-// \todo find a more generic version of this
-#undef DEBUG_VERBOSE
-
-
 /*!@brief Structure representing the limits of an interval.
  */
 template <typename T>
@@ -198,32 +194,10 @@ public:
   {
     if (value < getLower())
     {
-#ifdef DEBUG_VERBOSE
-      {
-        cedar::aux::LogSingleton::getInstance()->warning
-        (
-          "Thresholding a value to the lower limit.",
-          "cedar::aux::math::Limits",
-          "Tresholding"
-        );
-      }
-#endif // DEBUG_VERBOSE
-
       return getLower();
     }
     else if (value > getUpper())
     {
-#ifdef DEBUG_VERBOSE
-      {
-        cedar::aux::LogSingleton::getInstance()->warning
-        (
-          "Thresholding a value to the upper limit.",
-          "cedar::aux::math::Limits",
-          "Tresholding"
-        );
-      }
-#endif // DEBUG_VERBOSE
-
       return getUpper();
     }
 

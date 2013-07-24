@@ -51,18 +51,26 @@
 #include "cedar/auxiliaries/PluginDeclarationTemplate.h"
 
 // SYSTEM INCLUDES
+#include <QIcon>
+#include <QResource>
 #include <vector>
 
 
 /*!@brief A StepDeclaration contains the relation of a unique class id (as string) and the corresponding factory to
  * create a step of this id. It is a concretization of DeclarationBase.
- * @todo With the revised factory, passing the factory type is probably unnecessary
  */
 class cedar::proc::ElementDeclaration : public cedar::aux::PluginDeclarationBaseTemplate<cedar::proc::ElementPtr>
 {
 public:
+  //! Holds information about data in a custom step plot.
   struct PlotData
   {
+    /*! Constructor.
+     *
+     * @param id Role of the data to be plotted.
+     * @param name Name of the data slot of the step whose data is to be plotted.
+     * @param ignoreIfMissing If true, no warning will be generated if the slot is missing.
+     */
     PlotData
     (
       cedar::proc::DataRole::Id id = cedar::proc::DataRole::OUTPUT,
@@ -89,8 +97,15 @@ public:
   //!@brief list that pairs a data role with the desired plot
   typedef std::vector<PlotData> DataList;
 
+  /*!@brief Structure that holds information about custom plots defined for a processing step.
+   */
   struct PlotDefinition
   {
+    /*! Constructor
+     *
+     * @param name Name of the plot to be displayed in the "defined plots" menu.
+     * @param icon (Optional) path to the icon to be used for the plot in the "defined plots" menu.
+     */
     PlotDefinition(const std::string& name, const std::string& icon = std::string())
     :
     mName(name),
@@ -98,6 +113,7 @@ public:
     {
     }
 
+    //! Appends data to the list of items to plot.
     void appendData(cedar::proc::DataRole::Id id, const std::string& dataName, bool ignoreIfMissing = false)
     {
       this->mData.push_back(PlotData(id, dataName, ignoreIfMissing));
@@ -143,6 +159,28 @@ public:
     return this->mIconPath;
   }
 
+  //!@brief Returns the actual icon for the element.
+  QIcon getIcon() const
+  {
+    QResource existance_test(QString::fromStdString(this->getIconPath()));
+    if (existance_test.isValid())
+    {
+      auto icon = QIcon(QString::fromStdString(this->getIconPath()));
+      if (icon.isNull())
+      {
+        return QIcon(":/steps/no_icon.svg");
+      }
+      else
+      {
+        return icon;
+      }
+    }
+    else
+    {
+      return QIcon(":/steps/broken_icon.svg");
+    }
+  }
+
   //!@brief Method for setting the description of the element.
   void setDescription(const std::string& description)
   {
@@ -157,10 +195,7 @@ public:
 
   /*!@brief Defines a new plot for this type of element
    *
-   * @param plotName    Name of the plot, displayed in the UI.
-   * @param slotsToPlot  List of data slots to plot.
-   *
-   * @todo  This should also be read from the plugin xml file.
+   * @param plotDefinition Definition of the plot.
    */
   void definePlot(const PlotDefinition& plotDefinition)
   {
@@ -182,6 +217,7 @@ public:
     this->mDefaultPlot = plotName;
   }
 
+  //! Returns the name of the default plot. Empty if none is set.
   const std::string& getDefaultPlot() const
   {
     return this->mDefaultPlot;

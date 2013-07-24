@@ -1060,7 +1060,6 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
     CEDAR_THROW(cedar::aux::UnhandledValueException, "Cannot convolve matrices of the given dimensionality.");
   }
 
-  //!@todo Cache the flipped matrices?
   cv::Mat flipped_kernel;
   cv::flip(kernel, flipped_kernel, -1);
   cv::Mat result;

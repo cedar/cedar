@@ -60,8 +60,6 @@
 
 
 /*!@brief An implementation of Neural Fields for the processing framework.
- *
- * @todo Put a detailed description here, including the equation of the field dynamics and references to the relevant paper(s)
  */
 class cedar::dyn::NeuralField : public cedar::dyn::Dynamics
 {
@@ -136,9 +134,9 @@ public:
 
   /*!@brief Marks the activation in this field as discrete values.
    */
-  void setDiscreteActivation(bool value)
+  void setDiscreteMetric(bool value)
   {
-    this->_mDiscreteActivation->setValue(value);
+    this->_mDiscreteMetric->setValue(value);
   }
 
 public slots:
@@ -208,7 +206,7 @@ private:
 
 private slots:
   void activationAsOutputChanged();
-  void discreteActivationChanged();
+  void discreteMetricChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -236,7 +234,6 @@ protected:
   cedar::aux::DoubleParameterPtr mRestingLevel;
 
   //!@brief the relaxation rate of the field
-  //!@todo deal with units, now: milliseconds
   cedar::aux::DoubleParameterPtr mTau;
 
   //!@brief the global inhibition of the field, which is not contained in the kernel
@@ -257,10 +254,10 @@ protected:
   cedar::aux::BoolParameterPtr _mOutputActivation;
 
   //!@brief Whether the field activation represents discrete nodes (this is a temporary solution).
-  cedar::aux::BoolParameterPtr _mDiscreteActivation;
+  cedar::aux::BoolParameterPtr _mDiscreteMetric;
 
   //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
-  cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
+  cedar::aux::UIntParameterPtr _mDimensionality;
 
   //!@brief the field sizes in each dimension
   cedar::aux::UIntVectorParameterPtr _mSizes;

@@ -112,8 +112,6 @@ public:
   bool hasData(cedar::aux::ConstDataPtr data) const;
 
   /*!@brief   Removes the data pointer from the slot's collection.
-   *
-   * @todo    Should this (or some version of it) be in the cedar::proc::DataSlot class?
    */
   void removeData(cedar::aux::ConstDataPtr data);
 

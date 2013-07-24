@@ -45,8 +45,6 @@
 
 
 /*!@brief   This is a step that sums up a number of inputs.
- *
- * @todo    Allow adding double data and matrix data
  */
 class cedar::proc::steps::Sum : public cedar::proc::Step
 {

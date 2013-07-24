@@ -207,7 +207,6 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
     mConversionWorker = cedar::aux::gui::detail::VtkSurfacePlotWorkerPtr(new cedar::aux::gui::detail::VtkSurfacePlotWorker(this));
     mConversionWorker->moveToThread(mpWorkerThread);
 
-    //!@todo Add possibility to change priority
     this->mpWorkerThread->start(QThread::LowPriority);
 
     QObject::connect(mConversionWorker.get(), SIGNAL(dataChanged()), this,                    SIGNAL(dataChanged()));
@@ -226,7 +225,7 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
     }
     buildPlane(static_cast<unsigned int>(mMatData->getData().cols), static_cast<unsigned int>(mMatData->getData().rows));
     setupCamera(this->mpRenderer->GetActiveCamera(), mMatData->getData());
-    this->startTimer(60); //!@todo make the refresh time configurable.
+    this->startTimer(60);
   }
 
 
@@ -373,7 +372,6 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
     mConversionWorker = cedar::aux::gui::detail::VtkSurfacePlotWorkerPtr(new cedar::aux::gui::detail::VtkSurfacePlotWorker(this));
     mConversionWorker->moveToThread(mpWorkerThread);
 
-    //!@todo Add possibility to change priority
     mpWorkerThread->start(QThread::LowPriority);
 
     QObject::connect(mConversionWorker.get(), SIGNAL(dataChanged()), this,                    SIGNAL(dataChanged()));
@@ -391,7 +389,7 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
                   "Could not cast to cedar::aux::MatData in cedar::aux::gui::SurfacePlot::plot.");
     }
     mpView->GetRenderWindow()->Render();
-    startTimer(60); //!@todo make the refresh time configurable.
+    startTimer(60);
   }
 
 

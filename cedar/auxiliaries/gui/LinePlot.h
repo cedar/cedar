@@ -188,11 +188,9 @@ public:
   bool canAppend(cedar::aux::ConstDataPtr data) const;
 
   //!@brief Returns the limits of the x axis.
-  //!@todo Generalize this for n-dimensional matrix plots.
   cedar::aux::math::Limits<double> getXLimits() const;
 
   //!@brief Returns the limits of the y axis.
-  //!@todo Generalize this for n-dimensional matrix plots.
   cedar::aux::math::Limits<double> getYLimits() const;
 
 signals:

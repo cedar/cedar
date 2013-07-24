@@ -78,6 +78,7 @@ public:
    */
   void save();
 
+  //! Whether or not memory output is generated.
   bool getMemoryDebugOutput();
 
   //--------------------------------------------------------------------------------------------------------------------

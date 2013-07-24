@@ -36,7 +36,6 @@
 
 #ifndef CEDAR_DEV_COM_SERIAL_COMMUNICATION_H_
 #define CEDAR_DEV_COM_SERIAL_COMMUNICATION_H_
-//!@todo Serial communication needs implementation for windows.
 
 // CEDAR INCLUDES
 #include "cedar/devices/communication/Communication.h"
@@ -220,8 +219,6 @@ private:
 
   /*!@brief The Baudrate which shall be used by the serial port (in Bit/s).
    *        Set it to 15 for 38400 Bit/s or to 4098 for 115200 Bit/s (Default).
-   *
-   * @todo  This should be an enum of all possible values rather than an arbitrary integer.
    */
   cedar::aux::UIntParameterPtr _mBaudrate;
 
