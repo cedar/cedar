@@ -50,7 +50,11 @@
 
 /*!@brief Sigmoid function that is based on the exponential function.
  *
- *
+ *        The equation for this sigmoid is:
+ *        @f[
+ *           \sigma(x) = \frac{1}{1 + e^{-\beta \cdot (x - \theta)}}
+ *        @f]
+ *        where \f$\theta\f$ is the threshold set for this function and \f$\beta\f$ is the steepness of the sigmoid.
  */
 class cedar::aux::math::ExpSigmoid : public cedar::aux::math::Sigmoid
 {

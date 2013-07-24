@@ -50,6 +50,12 @@
 /*!@brief Sigmoid function that is based on absolute values.
  *
  *        This function behaves similar to cedar::aux::math::ExpSigmoid, but computing it is less costly.
+ *
+ *        The equation for this sigmoid is:
+ *        @f[
+ *           \sigma(x) = \frac{1}{2} \cdot \frac{1 + \beta \cdot (x - \theta)}{1 + \beta \cdot |x - \theta|}
+ *        @f]
+ *        where \f$\theta\f$ is the threshold set for this function and \f$\beta\f$ is the steepness of the sigmoid.
  */
 class cedar::aux::math::AbsSigmoid : public cedar::aux::math::Sigmoid
 {

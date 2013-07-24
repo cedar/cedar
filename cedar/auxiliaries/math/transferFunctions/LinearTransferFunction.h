@@ -44,6 +44,12 @@
 // SYSTEM INCLUDES
 
 /*!@brief Sigmoid function that is linear, i.e., multiplies the values with a scalar.
+ *
+ *        The equation for this function is:
+ *        @f[
+ *           \sigma(x) = x
+ *        @f]
+ *        where \f$\theta\f$ is the threshold set for this function.
  */
 class cedar::aux::math::LinearTransferFunction : public cedar::aux::math::TransferFunction
 {
