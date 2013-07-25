@@ -129,6 +129,9 @@ public:
   //!@brief Copies the value from another generic data pointer; throws an exception if this fails.
   virtual void copyValueFrom(cedar::aux::ConstDataPtr data);
 
+  //! Clones this data object.
+  virtual cedar::aux::DataPtr clone() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

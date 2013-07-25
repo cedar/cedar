@@ -94,3 +94,11 @@ void cedar::aux::Data::copyValueFrom(cedar::aux::ConstDataPtr)
   );
 }
 
+cedar::aux::DataPtr cedar::aux::Data::clone() const
+{
+  CEDAR_THROW
+  (
+    cedar::aux::NotImplementedException,
+    "Cloning is not implemented for this class. This class is: " + cedar::aux::objectTypeToString(this)
+  );
+}
