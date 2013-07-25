@@ -126,6 +126,11 @@ public:
     }
   }
 
+  cedar::aux::DataPtr clone() const
+  {
+    return SelfTypePtr(new SelfType(this->getData()));
+  }
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
