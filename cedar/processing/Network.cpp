@@ -200,7 +200,7 @@ void cedar::proc::Network::startTriggers(bool wait)
     auto trigger = *iter;
     if (!trigger->isRunning())
     {
-      trigger->startTrigger();
+      trigger->start();
     }
   }
 
@@ -226,7 +226,7 @@ void cedar::proc::Network::stopTriggers(bool wait)
     auto trigger = *iter;
     if (trigger->isRunning())
     {
-      trigger->stopTrigger();
+      trigger->stop();
     }
   }
 
