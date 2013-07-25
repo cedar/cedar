@@ -442,7 +442,7 @@ void cedar::dev::sensors::visual::Grabber::setFramerate(double fps)
                                            );
 }
 
-void cedar::dev::sensors::visual::Grabber::applyStop()
+void cedar::dev::sensors::visual::Grabber::applyStop(bool)
 {
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
