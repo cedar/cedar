@@ -358,8 +358,9 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time, bool suppressWarning)
       // which we only have access too, so we call applyStop() here.
 
     // avoid dead-locking if called from the same thread:
-    if (QThread::currentThread() != mpThread)
+    if (this->isValidThread() && QThread::currentThread() != mpThread)
     {
+      CEDAR_DEBUG_ASSERT(this->mpThread != NULL);
       // std::cout << "  waiting for thread: " << mpThread << std::endl;      
       // std::cout << "  (current thread: " << QThread::currentThread() << std::endl;
       mpThread->wait(time);
@@ -372,6 +373,8 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time, bool suppressWarning)
   {
     if (QThread::currentThread() != mpThread)
     {
+      CEDAR_DEBUG_ASSERT(this->mpThread != NULL);
+
       cedar::aux::LogSingleton::getInstance()->warning
       (
 #ifdef DEBUG
