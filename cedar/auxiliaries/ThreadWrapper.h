@@ -212,6 +212,9 @@ private:
   //! is the thread (still) in memory? thread-un-safe
   bool isValidThread() const; 
 
+  //! schedule the thread object for deletion
+  void scheduleThreadDeletion();
+
   //----------------------------------------------------------------------------
   // members
   //----------------------------------------------------------------------------
@@ -227,9 +230,12 @@ private:
   //! lock for the quittedThreadSlot
   mutable QMutex mFinishedThreadMutex;
   //! lock for start() and stop()
-  mutable QReadWriteLock mGeneralAccessLock;
+  mutable QReadWriteLock mGeneralAccessLock; // todo: make a Mutex
   //! lock for mStopRequested
   mutable QReadWriteLock mStopRequestedLock;
+  //! lock pointer ops
+  mutable QMutex mThreadPointerDeletionMutex;
+
 
   //!@brief stop is requested
   bool mStopRequested; 
