@@ -251,7 +251,7 @@ int main(int argc, char* argv[])
 
   //stop grabbing-thread if running
   //recording will also be stopped
-  p_grabber->stopGrabber();
+  p_grabber->stop();
 
   std::cout << "finished\n";
 
