@@ -53,15 +53,34 @@
 template<typename DimensionType>
 struct cedar::unit::UnitMatrix
 {
+private:
+  typedef cedar::unit::UnitMatrix<DimensionType> SelfType;
+public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   //!@brief The standard constructor.
+  //!@todo It is unclear here, to what unit will be initialized.
+  UnitMatrix()
+  {
+  }
+
+  //! Constructor that takes a matrix and a unit
   UnitMatrix(const cv::Mat& matrix, const boost::units::quantity<DimensionType>& unit)
   :
   matrix(matrix),
   unit(unit)
-  {}
+  {
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // methods
+  //--------------------------------------------------------------------------------------------------------------------
+
+  SelfType clone() const
+  {
+    return SelfType(this->matrix.clone(), this->unit);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
