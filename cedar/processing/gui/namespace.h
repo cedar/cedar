@@ -69,6 +69,7 @@ namespace cedar
       class CEDAR_PROC_LIB_EXPORT PluginLoadDialog;
       class CEDAR_PROC_LIB_EXPORT PropertyPane;
       class CEDAR_PROC_LIB_EXPORT PluginManagerDialog;
+      class CEDAR_PROC_LIB_EXPORT ResizeHandle;
       class CEDAR_PROC_LIB_EXPORT Scene;
       class CEDAR_PROC_LIB_EXPORT Settings;
       class CEDAR_PROC_LIB_EXPORT SettingsDialog;
