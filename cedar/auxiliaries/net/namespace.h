@@ -64,7 +64,7 @@ namespace cedar
       class Writer;
 
       template <typename T>
-      class BlockingReader;
+      class Reader;
 
       template <typename T>
       class BlockingReader;
