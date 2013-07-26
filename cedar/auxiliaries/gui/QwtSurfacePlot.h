@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LinePlot.h
+    File:        QwtSurfacePlot.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -38,25 +38,25 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_LINE_PLOT_H
-#define CEDAR_AUX_GUI_LINE_PLOT_H
+#ifndef CEDAR_AUX_GUI_QWT_SURFACE_PLOT_H
+#define CEDAR_AUX_GUI_QWT_SURFACE_PLOT_H
 
 #include "cedar/configuration.h"
 
-#ifdef CEDAR_USE_QWT
+#ifdef CEDAR_USE_QWTPLOT3D
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/MultiPlotInterface.h"
-#include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/gui/PlotInterface.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
 #include <QReadWriteLock>
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
-#include <qwt_plot_marker.h>
 #include <opencv2/opencv.hpp>
+#include <qwtplot3d/qwt3d_gridplot.h>
+#include <qwtplot3d/qwt3d_function.h>
+#include <qwtplot3d/qwt3d_plot3d.h>
+#include <qwtplot3d/qwt3d_io.h>
 
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar
@@ -67,20 +67,19 @@ namespace cedar
     {
       namespace detail
       {
-        /* This is an internal class of LinePlot that cannot be nested because Qt's moc doesn't support nested classes.
+        /* This is an internal class of QwtSurfacePlot that cannot be nested because Qt's moc doesn't support nested classes.
          *
-         * Don't use it outside of the LinePlot!
+         * Don't use it outside of the QwtSurfacePlot!
          */
-        class LinePlotWorker : public QObject
+        class QwtSurfacePlotWorker : public QObject
         {
           Q_OBJECT
 
           public:
-            LinePlotWorker(cedar::aux::gui::LinePlot* pPlot)
+            QwtSurfacePlotWorker(cedar::aux::gui::QwtSurfacePlot* pPlot)
             :
             mpPlot(pPlot)
             {
-
             }
 
           public slots:
@@ -88,12 +87,11 @@ namespace cedar
 
           signals:
             void done();
-            void dataChanged();
 
           public:
-            cedar::aux::gui::LinePlot *mpPlot;
+            cedar::aux::gui::QwtSurfacePlot *mpPlot;
         };
-        CEDAR_GENERATE_POINTER_TYPES(LinePlotWorker);
+        CEDAR_GENERATE_POINTER_TYPES(QwtSurfacePlotWorker);
       }
     }
   }
@@ -101,12 +99,12 @@ namespace cedar
 //!@endcond
 
 
-/*!@brief Matrix plot that can display 1D matrices (i.e. vectors).
+/*!@brief Matrix plot that can display 2D matrices (i.e. vectors).
  *
- *        This plot is capable of displaying any matrix data with a dimensionality of one. It displays the data as a
- *        line, assuming the indices of the matrix as the x axis.
+ *        Matrices displayed by this plot are plotted as a three-dimensional surface, where the x- and y-coordinates are
+ *        assumed to be the indices of the 2d matrix while the z-coordinate is the value stored within the matrix.
  */
-class cedar::aux::gui::LinePlot : public cedar::aux::gui::MultiPlotInterface
+class cedar::aux::gui::QwtSurfacePlot : public PlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -116,53 +114,48 @@ class cedar::aux::gui::LinePlot : public cedar::aux::gui::MultiPlotInterface
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::aux::gui::detail::LinePlotWorker;
+  friend class cedar::aux::gui::detail::QwtSurfacePlotWorker;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  struct PlotSeries
+  class Perspective
   {
-    PlotSeries()
-    :
-    mpCurve(NULL)
-    {
-    }
+    public:
+      Perspective(const std::string& name = "perspective",
+                  double rotationX = 0, double rotationY = 0, double rotationZ = 0,
+                  double scaleX = 1, double scaleY = 1, double scaleZ = 1,
+                  double shiftX = 0, double shiftY = 0, double shiftZ = 0,
+                  double zoom = 1);
 
-    ~PlotSeries()
-    {
-    }
+      void applyTo(Qwt3D::Plot3D* pPlot);
 
-    //!@brief (Re-)initializes the x and y value arrays.
-    void buildArrays(unsigned int new_size);
+      const std::string& getName() const
+      {
+        return this->mName;
+      }
 
-    //!@brief the displayed data
-    cedar::aux::ConstMatDataPtr mMatData;
-    //!@brief a curve inside the plot
-    QwtPlotCurve *mpCurve;
-    //!@brief the x values of the plot
-    std::vector<double> mXValues;
-    //!@brief the y values of the plot
-    std::vector<double> mYValues;
+    private:
+      std::string mName;
+      double mRotation[3];
+      double mScale[3];
+      double mShift[3];
+      double mZoom;
   };
-
-  CEDAR_GENERATE_POINTER_TYPES(PlotSeries);
-
-  typedef std::vector<PlotSeriesPtr> PlotSeriesVector;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  LinePlot(QWidget *pParent = NULL);
+  QwtSurfacePlot(QWidget *pParent = NULL);
 
   //!@brief Constructor expecting a DataPtr.
-  LinePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent = NULL);
+  QwtSurfacePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent = NULL);
 
   //!@brief Destructor
-  ~LinePlot();
+  ~QwtSurfacePlot();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -170,57 +163,21 @@ public:
 public:
   //!@brief display data
   void plot(cedar::aux::ConstDataPtr matData, const std::string& title);
-
+  //!@brief show or hide the plot grid
+  void showGrid(bool show);
   //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
-
-  /*!
-   * @remarks This method is a temporary way to provide annotations, a more general one will be added soon.
-   */
-  void attachMarker(QwtPlotMarker *pMarker);
-
-  /*!@brief Detaches and deletes all markers added to this plot.
-   *
-   * @remarks This method is a temporary way to provide annotations, a more general one will be added soon.
-   */
-  void clearMarkers();
-
-  bool canAppend(cedar::aux::ConstDataPtr data) const;
-
-  //!@brief Returns the limits of the x axis.
-  cedar::aux::math::Limits<double> getXLimits() const;
-
-  //!@brief Returns the limits of the y axis.
-  cedar::aux::math::Limits<double> getYLimits() const;
 
 signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
   void convert();
-
-public slots:
-  //! When called, the y axis scaling is determined automatically every time the plot updates.
-  void setAutomaticYAxisScaling();
-
-  /*! @brief Slot that is called when the menu entry in the plot is called.
-   *
-   *  This function opens a dialog that lets the user enter the desired interval for the Y axis.
-   */
-  void setFixedYAxisScaling();
-
-  /*! @brief Sets the minimum and maximum for the y axis.
-   */
-  void setFixedYAxisScaling(double lower, double upper);
-
-  /*! @brief Sets the minimum and maximum for the x axis.
-   */
-  void setFixedXAxisScaling(double lower, double upper);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief create and handle the context menu
-  void contextMenuEvent(QContextMenuEvent *pEvent);
+  void contextMenuEvent(QContextMenuEvent * pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -229,14 +186,19 @@ private:
   //!@brief initialize
   void init();
 
-  void doAppend(cedar::aux::ConstDataPtr data, const std::string& title);
+  //!@brief reset the perspective of the plot
+  void resetPerspective(size_t perspectiveIndex = 0);
 
-  //!@brief Applies a plot style to a given curve.
-  static void applyStyle(cedar::aux::ConstDataPtr data, size_t lineId, QwtPlotCurve *pCurve);
+  //!@brief delete the allocated array data
+  void deleteArrayData();
+
+  //!@brief update the allocated array data
+  void updateArrayData();
+
+  //!@brief Applies the labels from the data object to the plot.
+  void applyLabels();
 
 private slots:
-  void showLegend(bool show = true);
-
   void conversionDone();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -245,27 +207,33 @@ private slots:
 protected:
   // none yet
 private:
-  //!@brief a plot
-  QwtPlot *mpPlot;
+  //! the displayed MatData
+  cedar::aux::ConstMatDataPtr mMatData;
 
-  PlotSeriesVector mPlotSeriesVector;
+  //! flag if plot grid should be displayed
+  bool mShowGridLines;
 
-  //! For locking the plot itself.
-  QReadWriteLock *mpLock;
+  //! the plot object
+  Qwt3D::GridPlot* mpPlot;
 
-  //! A vector containing all the colors used for plot lines.
-  static std::vector<QColor> mLineColors;
+  //! vector of possible perspectives
+  std::vector<Perspective> mPerspectives;
 
-  //! A vector containing all the line stypes for the plot.
-  static std::vector<Qt::PenStyle> mLineStyles;
+  //! row count of data
+  size_t mDataRows;
 
-  //! Thread in which matrix data is converted to a qwt-ready format.
+  //! column count of data
+  size_t mDataCols;
+
+  //! 2D array data
+  Qwt3D::Triple** mppArrayData;
+
+  //! Thread in which conversion of mat data to qwt triple is done.
   QThread* mpWorkerThread;
 
-  //! The worker that does actual converison.
-  cedar::aux::gui::detail::LinePlotWorkerPtr mConversionWorker;
+  //! Worker object.
+  cedar::aux::gui::detail::QwtSurfacePlotWorkerPtr mWorker;
+}; // class cedar::aux::gui::QwtSurfacePlot
 
-}; // class cedar::aux::gui::LinePlot
-
-#endif // CEDAR_USE_QWT
-#endif // CEDAR_AUX_GUI_LINE_PLOT_H
+#endif // CEDAR_USE_QWTPLOT3D
+#endif // CEDAR_AUX_GUI_QWT_SURFACE_PLOT_H

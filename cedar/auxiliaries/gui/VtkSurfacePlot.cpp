@@ -221,7 +221,7 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
     if (!this->mMatData)
     {
       CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
-                  "Could not cast to cedar::aux::MatData in cedar::aux::gui::SurfacePlot::plot.");
+                  "Could not cast to cedar::aux::MatData in cedar::aux::gui::QwtSurfacePlot::plot.");
     }
     buildPlane(static_cast<unsigned int>(mMatData->getData().cols), static_cast<unsigned int>(mMatData->getData().rows));
     setupCamera(this->mpRenderer->GetActiveCamera(), mMatData->getData());
@@ -386,7 +386,7 @@ cedar::aux::gui::VtkSurfacePlot::~VtkSurfacePlot()
     if (!mMatData)
     {
       CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
-                  "Could not cast to cedar::aux::MatData in cedar::aux::gui::SurfacePlot::plot.");
+                  "Could not cast to cedar::aux::MatData in cedar::aux::gui::QwtSurfacePlot::plot.");
     }
     mpView->GetRenderWindow()->Render();
     startTimer(60);
