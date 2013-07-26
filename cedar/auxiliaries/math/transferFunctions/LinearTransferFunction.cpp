@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/sigmoids/LinearSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/LinearTransferFunction.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/Singleton.h"
 
@@ -47,17 +47,27 @@
 
 namespace
 {
-  bool registered
-    = cedar::aux::math::TransferFunctionManagerSingleton::getInstance()->registerType<cedar::aux::math::LinearSigmoidPtr>();
+  bool register_function()
+  {
+    cedar::aux::math::TransferFunctionManagerSingleton::getInstance()
+      ->registerType<cedar::aux::math::LinearTransferFunctionPtr>();
+
+    cedar::aux::math::TransferFunctionManagerSingleton::getInstance()
+          ->addDeprecatedName<cedar::aux::math::LinearTransferFunctionPtr>("cedar.aux.math.LinearSigmoid");
+
+    return true;
+  }
+
+  bool registered = register_function();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::math::LinearSigmoid::LinearSigmoid(double threshold)
+cedar::aux::math::LinearTransferFunction::LinearTransferFunction()
 :
-cedar::aux::math::Sigmoid(threshold)
+cedar::aux::math::TransferFunction()
 {
 }
 
@@ -65,7 +75,7 @@ cedar::aux::math::Sigmoid(threshold)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double cedar::aux::math::LinearSigmoid::compute(double value) const
+double cedar::aux::math::LinearTransferFunction::compute(double value) const
 {
   return value;
 }

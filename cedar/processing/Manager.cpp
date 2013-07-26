@@ -144,7 +144,7 @@ void cedar::proc::Manager::startThreads()
   {
     if (cedar::proc::LoopedTrigger* looped_trigger = dynamic_cast<cedar::proc::LoopedTrigger*>(iter->get()))
     {
-      looped_trigger->startTrigger();
+      looped_trigger->start();
     }
     else
     {
@@ -160,7 +160,7 @@ void cedar::proc::Manager::stopThreads(bool wait)
   {
     if (cedar::proc::LoopedTrigger* looped_trigger = dynamic_cast<cedar::proc::LoopedTrigger*>(iter->get()))
     {
-      looped_trigger->stopTrigger();
+      looped_trigger->stop();
     }
     else
     {

@@ -224,7 +224,7 @@ void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGL
   bool restart_grabber = LoopedThread::isRunning();
   if (restart_grabber)
   {
-    this->stopGrabber();
+    this->stop();
   }
 
   // change source
@@ -240,7 +240,7 @@ void cedar::dev::sensors::visual::GLGrabber::setWidget(unsigned int channel, QGL
   // restart grabbing-thread (if running before)
   if (restart_grabber)
   {
-    this->startGrabber();
+    this->start();
   }
 }
 
