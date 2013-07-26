@@ -98,10 +98,10 @@ class cedar::aux::DataSpectator : public cedar::aux::LoopedThread{
     cedar::aux::DataPtr data();
 
     //!@brief Starts the DataSpectator: Before starting the output file will be opened and the header be written.
-    void start();
+    void applyStart();
 
     //!@brief Stops the DataSpactator. Before stopping all RecordDatas in the queue will be written to disk.
-    void stop(unsigned int timeout /*= UINT_MAX*/, bool suppressWarning /*= false*/);
+    void applyStop(bool suppressWarning);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
