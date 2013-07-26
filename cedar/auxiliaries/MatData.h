@@ -66,6 +66,7 @@ public:
   MatData()
   {
   }
+  virtual ~MatData();
 
   //!@brief This constructor initializes the internal data to a value.
   MatData(const cv::Mat& value)
@@ -78,6 +79,10 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  std::string serializeData();
+  std::string serializeHeader();
+  cedar::aux::DataPtr clone();
+
   std::string getDescription() const;
 
   /*!@brief Returns the dimensionality of the matrix stored in this data.

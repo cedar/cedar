@@ -48,6 +48,7 @@
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
+#include <iostream>
 
 /*!@brief This is an abstract interface for all kinds of data.
  *
@@ -69,6 +70,12 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Returns a string that contains the data in CSV format. Should be overridden for all inheriting classes.
+  // Todo: Extend parameter for different Format(e. g. CSV, XML, BINARY).
+  virtual std::string serializeData();
+  //!@brief Returns a string that describes the data in CSV format. Should be overridden for all inheriting classes.
+  virtual std::string serializeHeader();
+  virtual DataPtr clone();
   //!@brief Returns the lock associated with this data object.
   QReadWriteLock& getLock();
 

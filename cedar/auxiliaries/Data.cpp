@@ -60,6 +60,21 @@ cedar::aux::Data::~Data()
   delete mpLock;
 }
 
+std::string cedar::aux::Data::serializeData()
+{
+  return "DataClass";
+}
+
+std::string cedar::aux::Data::serializeHeader()
+{
+  return "";
+}
+
+cedar::aux::DataPtr cedar::aux::Data::clone()
+{
+  return cedar::aux::DataPtr();
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -83,3 +98,5 @@ void cedar::aux::Data::setOwner(cedar::aux::Configurable* step)
 {
   this->mpeOwner = step;
 }
+
+
