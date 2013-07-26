@@ -36,11 +36,11 @@
 
 
 // LOCAL INCLUDES
+#include "cedar/testingUtilities/measurementFunctions.h"
 #include "cedar/auxiliaries/convolution/OpenCV.h"
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/math/tools.h"
-#include "cedar/auxiliaries/testingFunctions.h"
 #include "cedar/configuration.h"
 
 // SYSTEM INCLUDES
@@ -102,7 +102,7 @@ void test_convolution_time_1d(TestSet& test)
   ptime end = microsec_clock::local_time();
 
   test.mDuration = static_cast<double>((end - start).total_milliseconds()) / 1000.0;
-  cedar::aux::testing::write_measurement(case_id, test.mDuration);
+  cedar::test::write_measurement(case_id, test.mDuration);
 }
 
 

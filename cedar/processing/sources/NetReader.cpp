@@ -140,12 +140,29 @@ void cedar::proc::sources::NetReader::connect()
         // TODO: would be nice to have a state for temporarily disabling
       return;
     }
-    catch ( cedar::aux::net::NetMissingRessourceException &e )
+    catch (cedar::aux::net::NetMissingRessourceException &e)
     {
       // somehow YARP doesnt work ... :( typically fatal.
-      // TODO: what to do?
-      throw( e ); // lets try this ...
+      throw e; // lets try this ...
     }
+  }
+  // now receive a matrix and tell subsequent steps that the matrix size is known now
+  try
+  {
+    this->mOutput->setData(mReader->read());
+    this->emitOutputPropertiesChangedSignal("output");
+  }
+  catch(cedar::aux::net::NetWaitingForWriterException& e)
+  {
+    // no writer instantiated yet? ignore
+    // CHANGE NOTHING
+    return;
+  }
+  catch (cedar::aux::net::NetUnexpectedDataException& e)
+  {
+    // communication problem? ignore
+    // CHANGE NOTHING
+    return;
   }
 }
 
@@ -170,11 +187,17 @@ void cedar::proc::sources::NetReader::compute(const cedar::proc::Arguments&)
   // read from net and set data
   try
   {
-    this->mOutput->setData( mReader->read() );
+    this->mOutput->setData(mReader->read());
   }
   catch(cedar::aux::net::NetWaitingForWriterException& e)
   {
     // no writer instantiated yet? ignore
+    // CHANGE NOTHING
+    return;
+  }
+  catch (cedar::aux::net::NetNoNewDataException& e)
+  {
+    // no new data has been sent. ignore
     // CHANGE NOTHING
     return;
   }

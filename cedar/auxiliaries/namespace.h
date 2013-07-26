@@ -60,11 +60,6 @@ namespace cedar
       class CallFunctionInThreadWorker;
     }
 
-    /*!@brief Namespace for shared testing (unit-tests, etc) code. TODO: will be moved or changed in the near future */
-    namespace testing
-    {
-    }
-
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Configurable);
     CEDAR_DECLARE_AUX_CLASS(NamedConfigurable);
@@ -75,6 +70,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(LoopedThread);
     CEDAR_DECLARE_AUX_CLASS(ThreadCollection);
     CEDAR_DECLARE_AUX_CLASS(CallFunctionInThread);
+    CEDAR_DECLARE_AUX_CLASS(LoopFunctionInThread);
     CEDAR_DECLARE_AUX_CLASS(LoopMode);
     CEDAR_DECLARE_AUX_CLASS(UserData);
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(IntrusivePtrBase);

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -97,6 +97,12 @@ public:
   void declare() const
   {
     DeclarationManager::getInstance()->addDeclaration(this->shared_from_this());
+
+    for (size_t i = 0; i < this->deprecatedNames().size(); ++i)
+    {
+      PluginFactoryManager::getInstance()->addDeprecatedName(this->getClassName(), this->deprecatedNames().at(i));
+    }
+
     this->onDeclare();
   }
 

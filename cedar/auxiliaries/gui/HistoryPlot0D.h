@@ -94,8 +94,6 @@ namespace cedar
 /*!@brief A time-based plot for 0D values. Displays a history of this value from a certain point in the past up to now.
  *
  * More detailed description of the class.
- *
- * @todo Some of the code here is redundant with MatrixPlot1D.
  */
 class cedar::aux::gui::HistoryPlot0D : public cedar::aux::gui::MultiPlotInterface
 {
@@ -213,13 +211,13 @@ private:
   std::vector<CurveInfoPtr> mCurves;
 
   //!@brief the current widget that holds the plot
-  QWidget *mpCurrentPlotWidget;
+  QWidget* mpCurrentPlotWidget;
 
   //!@brief a plot
-  QwtPlot *mpPlot;
+  QwtPlot* mpPlot;
 
   //!@brief number of steps in the past, which are still plotted
-  size_t mMaxHistorySize; //!@todo Make a parameter/configurable somehow.
+  size_t mMaxHistorySize;
 
   //! Thread in which conversion of mat data to qwt triple is done.
   QThread* mpWorkerThread;

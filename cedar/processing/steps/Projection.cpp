@@ -102,7 +102,6 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::steps::Projection::Projection()
 :
-mInput(new cedar::aux::MatData(cv::Mat())),
 mOutput(new cedar::aux::MatData(cv::Mat())),
 _mDimensionMappings(new cedar::proc::ProjectionMappingParameter(this, "dimension mapping")),
 _mOutputDimensionality(new cedar::aux::UIntParameter(this, "output dimensionality", 1, 0, 10)),
@@ -163,15 +162,26 @@ void cedar::proc::steps::Projection::outputDimensionalityChanged()
   this->initializeOutputMatrix();
 
   this->reconfigure();
+  this->emitOutputPropertiesChangedSignal("output");
 }
 
 void cedar::proc::steps::Projection::outputDimensionSizesChanged()
 {
   this->initializeOutputMatrix();
+  this->emitOutputPropertiesChangedSignal("output");
 }
 
 void cedar::proc::steps::Projection::reconfigure()
 {
+  if (!this->mInput)
+  {
+    this->setState(
+                    cedar::proc::Triggerable::STATE_EXCEPTION,
+                    "Cannot reconfigure without an input."
+                  );
+    return;
+  }
+
   unsigned int input_dimensionality = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
   unsigned int output_dimensionality = _mOutputDimensionality->getValue();
 
@@ -195,28 +205,30 @@ void cedar::proc::steps::Projection::reconfigure()
     // input and output dimensionality
     if (input_dimensionality == 3 && output_dimensionality == 2)
     {
-      unsigned int mapped[2];
-      unsigned int map_index = 0;
+      std::vector<unsigned int> mapped_indices;
+
       for (unsigned int index = 0; index < input_dimensionality; ++index)
       {
         if (!_mDimensionMappings->getValue()->isDropped(index))
         {
-          mapped[map_index] = _mDimensionMappings->getValue()->lookUp(index);
-          ++map_index;
+          mapped_indices.push_back(_mDimensionMappings->getValue()->lookUp(index));
         }
       }
 
-      CEDAR_DEBUG_ASSERT(mapped[0] != mapped[1]);
-
-      bool swapped = mapped[0] > mapped[1];
-
-      if (swapped)
+      if (mapped_indices.size() == 2)
       {
-        mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto2DSwapped;
-      }
-      else
-      {
-        mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto2D;
+        CEDAR_DEBUG_ASSERT(mapped_indices.at(0) != mapped_indices.at(1));
+
+        bool swapped = mapped_indices.at(0) > mapped_indices.at(1);
+
+        if (swapped)
+        {
+          mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto2DSwapped;
+        }
+        else
+        {
+          mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto2D;
+        }
       }
     }
     else if (input_dimensionality == 3 && output_dimensionality == 1)
@@ -265,7 +277,6 @@ void cedar::proc::steps::Projection::reconfigure()
     }
   }
 
-  // @todo this should be handled by a more suitable mechanism for users
   if (this->_mDimensionMappings->getValue()->getValidity() == cedar::proc::ProjectionMapping::VALIDITY_ERROR)
   {
     this->setState(
@@ -333,7 +344,6 @@ void cedar::proc::steps::Projection::expand0DtoND()
 }
 
 //! not used at the moment
-//!@todo check whether this is faster than the generic function
 void cedar::proc::steps::Projection::expand1Dto2D()
 {
   const cv::Mat& input = this->mInput->getData();
@@ -559,8 +569,12 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Projection::determineInputVa
                                 ) const
 {
   CEDAR_DEBUG_ASSERT(slot->getName() == "input")
-  if (boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
+  if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
+    if (mat_data->isEmpty())
+    {
+      return cedar::proc::DataSlot::VALIDITY_ERROR;
+    }
     return cedar::proc::DataSlot::VALIDITY_VALID;
   }
   else
@@ -575,7 +589,7 @@ void cedar::proc::steps::Projection::inputConnectionChanged(const std::string& i
 
   this->mInput = boost::dynamic_pointer_cast<const cedar::aux::MatData>(this->getInput(inputName));
 
-  if (!this->mInput)
+  if (!this->mInput || this->mInput->isEmpty())
   {
     return;
   }

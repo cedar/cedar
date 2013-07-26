@@ -41,13 +41,13 @@ else(CEDAR_USE_VTK)
 endif(CEDAR_USE_VTK)
 
 if (CEDAR_USE_QWT)
-  set(qwt_moc_files gui/HistoryPlot0D.h gui/LinePlot.h gui/MatrixVectorPlot.h)
+  set(qwt_moc_files gui/HistoryPlot0D.h gui/QwtLinePlot.h gui/MatrixVectorPlot.h)
 else(CEDAR_USE_QWT)
   set(qwt_moc_files "")
 endif(CEDAR_USE_QWT)
 
 if (CEDAR_USE_QWTPLOT3D)
-  set(qwtplot3d_moc_files gui/SurfacePlot.h)
+  set(qwtplot3d_moc_files gui/QwtSurfacePlot.h)
 else(CEDAR_USE_QWTPLOT3D)
   set(qwtplot3d_moc_files "")
 endif(CEDAR_USE_QWTPLOT3D)
@@ -67,6 +67,7 @@ cedar_add_library(cedaraux
   gui/DoubleParameter.h
   gui/DoubleVectorParameter.h
   gui/EnumParameter.h
+  gui/ExceptionDialog.h
   gui/FileParameter.h
   gui/IntParameter.h
   gui/Log.h

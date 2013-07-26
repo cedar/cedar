@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -117,6 +117,9 @@ public:
   {
     return this->mDeprecatedNames;
   }
+
+  //! Returns whether the given name is a deprecated name of this declaration.
+  bool isDeprecatedName(const std::string& name) const;
 
   /*!
    * @brief Returns the class name without the preceding namespace.

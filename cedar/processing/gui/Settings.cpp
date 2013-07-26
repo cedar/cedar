@@ -50,9 +50,6 @@
 cedar::aux::EnumType<cedar::proc::gui::Settings::StepDisplayMode>
   cedar::proc::gui::Settings::StepDisplayMode::mType("cedar::proc::gui::Settings::StepDisplayMode::");
 
-// this has to be initialized after mTyoe above (because that is used in its constructor)
-cedar::proc::gui::Settings cedar::proc::gui::Settings::mInstance;
-
 #ifndef CEDAR_COMPILER_MSVC
 const cedar::proc::gui::Settings::StepDisplayMode::Id cedar::proc::gui::Settings::StepDisplayMode::ICON_ONLY;
 const cedar::proc::gui::Settings::StepDisplayMode::Id cedar::proc::gui::Settings::StepDisplayMode::TEXT_FOR_LOOPED;
@@ -98,6 +95,18 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   ui_settings->addConfigurableChild("properties", mProperties);
 
 
+  cedar::aux::ConfigurablePtr slot_growth(new cedar::aux::Configurable());
+  this->addConfigurableChild("slot growth", slot_growth);
+
+  this->_mDataSlotScalingEnabled = new cedar::aux::BoolParameter(slot_growth.get(), "enabled", true);
+  auto growth_limits = cedar::aux::DoubleParameter::LimitType::positive();
+  growth_limits.setLower(1.0);
+  this->_mDataSlotScaling = new cedar::aux::DoubleParameter(slot_growth.get(), "factor", 1.3, growth_limits);
+
+  this->_mDataSlotScalingSensitivity
+    = new cedar::aux::DoubleParameter(slot_growth.get(), "sensitivity", 10.0, growth_limits);
+
+
   this->mSnapToGrid = cedar::aux::BoolParameterPtr
                       (
                         new cedar::aux::BoolParameter
@@ -133,6 +142,8 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
 
   cedar::aux::ConfigurablePtr recent_files(new cedar::aux::Configurable());
   this->addConfigurableChild("fileHistory", recent_files);
+  this->_mMaxFileHistorySize = new cedar::aux::UIntParameter(recent_files.get(), "maximum history size", 10);
+
   this->mPluginLoadDialogLocation = cedar::aux::DirectoryParameterPtr
       (
         new cedar::aux::DirectoryParameter
@@ -231,7 +242,7 @@ void cedar::proc::gui::Settings::appendArchitectureFileToHistory(const std::stri
     new_order.push_back(filePath);
   }
 
-  while (new_order.size() > 10) //!@todo Don't hardcode the value, rather make it a parameter that can be changed in some configuration dialog.
+  while (new_order.size() > this->_mMaxFileHistorySize->getValue())
   {
     new_order.erase(new_order.begin());
   }
@@ -318,12 +329,6 @@ cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::stepsSet
   return this->mSteps;
 }
 
-
-cedar::proc::gui::Settings& cedar::proc::gui::Settings::instance()
-{
-  return cedar::proc::gui::Settings::mInstance;
-}
-
 void cedar::proc::gui::Settings::load()
 {
   std::string path = cedar::aux::getUserApplicationDataDirectory() + "/.cedar/processingGui";
@@ -333,8 +338,11 @@ void cedar::proc::gui::Settings::load()
   }
   catch (const boost::property_tree::json_parser::json_parser_error& e)
   {
-    //!@todo proper signaling(?) of this message to the gui.
-    std::cout << "Error reading framework gui settings: " << e.what() << std::endl;
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      std::string("Error reading framework gui settings: ") + e.what(),
+      "void cedar::proc::gui::Settings::load()"
+    );
   }
 }
 
@@ -349,8 +357,11 @@ void cedar::proc::gui::Settings::save()
     }
     catch (const boost::property_tree::json_parser::json_parser_error& e)
     {
-      //!@todo proper signaling(?) of this message to the gui.
-      std::cout << "Error saving framework gui settings: " << e.what() << std::endl;
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        std::string("Error saving framework gui settings: ") + e.what(),
+        "void cedar::proc::gui::Settings::load()"
+      );
     }
   }
 }

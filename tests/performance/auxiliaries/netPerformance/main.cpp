@@ -37,14 +37,16 @@
 
 // LOCAL INCLUDES
 #include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_YARP
+
+#include "cedar/testingUtilities/measurementFunctions.h"
 #include "cedar/auxiliaries/net/BlockingReader.h"
 #include "cedar/auxiliaries/net/Writer.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
-#include "cedar/auxiliaries/testingFunctions.h"
 
 // SYSTEM INCLUDES
 
-#ifdef CEDAR_USE_YARP
 
 
 // global variables
@@ -57,8 +59,8 @@ void mat_read_write()
 {
   unsigned int i;
 
-  cv::Mat mat= cv::Mat::eye(SIZE, 2, CV_64F);
-  cv::Mat mat2= cv::Mat::eye(SIZE, 2, CV_64F);
+  cv::Mat mat = cv::Mat::eye(SIZE, 2, CV_64F);
+  cv::Mat mat2 = cv::Mat::eye(SIZE, 2, CV_64F);
 
   i = 0;
   for (; i < SIZE; i++)
@@ -70,11 +72,11 @@ void mat_read_write()
   cedar::aux::net::BlockingReader<cv::Mat> myMatReader(MYPORT);
 
   myMatWriter.write(mat);
-  mat2= myMatReader.read();
+  mat2 = myMatReader.read();
 
   // dont need to check all the results, just the last
 
-  if (mat2.at<double>(SIZE-1,0) != i-1)
+  if (mat2.at<double>(SIZE - 1 , 0) != i - 1)
   {
     errors++;
   }
@@ -82,30 +84,29 @@ void mat_read_write()
 
 void run_test()
 {
-  errors= 0;
+  errors = 0;
 
-  cedar::aux::testing::test_time("read/write cycle (cv::Mat)", mat_read_write );
+  cedar::test::test_time("read/write cycle (cv::Mat)", mat_read_write);
 }
-
-
 
 int main(int argc, char* argv[])
 {
   QCoreApplication* app;
   app = new QCoreApplication(argc,argv);
 
-  auto testThread = new cedar::aux::CallFunctionInThread(run_test);
+  auto test_thread = new cedar::aux::CallFunctionInThread(run_test);
 
-  QObject::connect( testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection );  // alternatively: call app->quit() in runTests()
+  QObject::connect(test_thread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection);
+      // alternatively: call app->quit() in runTests()
 
-  testThread->start();
+  test_thread->start();
   app->exec();
 
-  delete testThread;
+  delete test_thread;
   delete app;
 
   return errors;
 }
 
-#endif
+#endif // CEDAR_USE_YARP
 

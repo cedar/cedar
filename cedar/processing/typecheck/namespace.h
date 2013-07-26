@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -47,13 +47,15 @@ namespace cedar
 {
   namespace proc
   {
-    /*! @brief Namespace containing classes related to type checks.
+    /*! @brief Namespace containing classes related to automatic type checks for slots in processing steps.
      */
     namespace typecheck
     {
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_PROC_CLASS(TypeCheck);
 
       template <class T> class DerivedFrom;
+      //!@endcond
     }
   }
 }

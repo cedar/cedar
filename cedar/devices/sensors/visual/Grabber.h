@@ -68,7 +68,7 @@
  *     - to set a name for the grabber: getName, setName form cedar::base<br>
  *     - to control the grabbing-thread: <br>
  *             => isRunning() : from QThread<br>
- *             => startGrabber(), stopGrabber() <br>
+ *             => start(), stop() <br>
  *             => setFramerate(), getFramerate(), getMeasuredFramerate <br>
  *     - grabbing: <br>
  *             => grab manually a new image: grab()  <br>
@@ -224,7 +224,7 @@ public:
    *
    *      This value doesn't indicate, if the thread is running or not.
    *      To get the actual grabbing speed use getMeasuredFramerate.
-   *  @see startGrabber(), stopGrabber(), QThread::isRunning()
+   *  @see start(), stop(), QThread::isRunning()
    */
   double getFramerate() const;
 
@@ -233,7 +233,7 @@ public:
    *          This value doesn't indicate, if the thread is running or not.
    *          The LoopedThread have to be restarted for changing the framerate.
    *          This is done in this function, but keep it in mind.
-   *  @see startGrabber(), stopGrabber()
+   *  @see start(), stop()
    */
   void setFramerate(double fps);
 
@@ -244,24 +244,17 @@ public:
    */
   double getMeasuredFramerate() const;
 
-  /*! @brief Stop the grabbing thread
-   *
-   *          This method invokes internally LoopedThread::stop() and does
-   *          some cleanup like stopRecording or set the measured FPS to zero
-   */
-  //!@todo Overload LoopedThread::stop() method
-  void stopGrabber();
+  //!@deprecated Use the stop() method (see cedar::aux::TreaadWrapper) instead.
+  CEDAR_DECLARE_DEPRECATED(void stopGrabber())
+  {
+    this->stop();
+  }
 
-  /*! @brief Start the grabbing thread
-   *
-   *          This method invokes internally LoopedThread::start() and does
-   *          some initialization due to the measurement of FPS. <br>
-   *
-   *          To control the grabbing speed (i.e. the FPS) use
-   *          setFramerate(), getFramerate() or getMeasuredFramerate()
-   */
-  //!@todo Overload LoopedThread::start() method
-  void startGrabber();
+  //!@deprecated Use the start() method (see cedar::aux::ThreadWrapper) instead.
+  CEDAR_DECLARE_DEPRECATED(void startGrabber())
+  {
+    this->start();
+  }
 
 
   //------------------------------------------------------------------------
@@ -292,7 +285,7 @@ public:
    *
    *  @throw cedar::aux::GrabberGrabException Thrown on an error while grabbing
    *  @throw cedar::aux::GrabberRecordingException Thrown on an error while recording
-   *  @see startGrabber, setFramerate
+   *  @see start, setFramerate
    */
   void grab();
 
@@ -429,10 +422,10 @@ public:
    */
   const std::string getRecordName(unsigned int channel=0) const;
 
-  /*! @brief Initialize and startGrabber recording
+  /*! @brief Initialize and start recording
    *
-   *      If the grabbing thread isn't running, startRecording will startGrabber the Thread
-   *      and stopRecording will stopGrabber it.
+   *      If the grabbing thread isn't running, startRecording will start the Thread
+   *      and stopRecording will stop it.
    *
    * Create the VideoWriter structures and set the record flag.
    *  @param
@@ -517,7 +510,7 @@ protected:
 
   /*! @brief Call this method at the beginning of the destructor in the derived class
    *
-   *      This method does the necessary clean up (like stopGrabber recording or stopping the grabbing thread)
+   *      This method does the necessary clean up (like stop recording or stopping the grabbing thread)
    *      and then it invokes the onCleanUp() method of the derived class.<br><br>
    *      Note:<br>You have to call this method in the destructor of a derived class.<br><br>
    *  @remarks
@@ -658,6 +651,23 @@ private:
     return _mChannels->at(channel);
   }
 
+  /*! @brief  Called when the grabbing thread is started.
+   *
+   *          This method invokes internally LoopedThread::start() and does
+   *          some initialization due to the measurement of FPS. <br>
+   *
+   *          To control the grabbing speed (i.e. the FPS) use
+   *          setFramerate(), getFramerate() or getMeasuredFramerate()
+   */
+  void applyStart();
+
+  /*! @brief Stop the grabbing thread
+   *
+   *          This method invokes internally LoopedThread::stop() and does
+   *          some cleanup like stopRecording or set the measured FPS to zero
+   */
+  void applyStop(bool);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -696,7 +706,7 @@ private:
     bool mCleanUpAlreadyDone;
     
 
-    //! @brief Timestamp at startGrabber time to measure the real fps of grabbing
+    //! @brief Timestamp at start time to measure the real fps of grabbing
     boost::posix_time::ptime mFpsMeasureStart;
 
     //! @brief Timestamp at end time to measure the real fps of grabbing

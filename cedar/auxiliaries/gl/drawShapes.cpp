@@ -97,6 +97,25 @@ void cedar::aux::gl::drawBlock(double l, double w, double h, bool wireFrame)
   }
 }
 
+void cedar::aux::gl::drawBlock
+(
+  double front,
+  double back,
+  double right,
+  double left,
+  double up,
+  double down,
+  bool wireFrame
+)
+{
+  glTranslated(front, right, up); // translate to corner
+  glTranslated(-(front + back) * 0.5, -(right + left) * 0.5, -(up + down) * 0.5); // translate to corner
+  cedar::aux::gl::drawBlock(front + back, right + left, up + down, wireFrame);
+  glTranslated((front + back) * 0.5, (right + left) * 0.5, (up + down) * 0.5); // translate to center
+  glTranslated(-front, -right, -up); // translate to previous point
+}
+
+
 void cedar::aux::gl::drawCone(
                                double floor,
                                double ceiling,
@@ -274,7 +293,7 @@ void cedar::aux::gl::drawDisk(
   }
 }
 
-//!\todo origin should be at the center of the base rectangle
+//!@todo origin should be at the center of the base rectangle
 void cedar::aux::gl::drawPyramid(
                                   double length,
                                   double width,
@@ -393,11 +412,9 @@ void cedar::aux::gl::drawEllipse(
                                   bool wireFrame
                                 )
 {
-  // TODO: rethink these narrowing operations 
-  //       (quickfix only)
-  float a= static_cast<float>(_a);
-  float b= static_cast<float>(_b);
-  float t= static_cast<float>(thickness);
+  float a = static_cast<float>(_a);
+  float b = static_cast<float>(_b);
+  float t = static_cast<float>(thickness);
   //  double t = thickness;
   float d = 4.0/3.0*(sqrt(2.0)-1);
 
@@ -523,13 +540,6 @@ void cedar::aux::gl::drawEllipse(
     {{-b, -d*a, -t}, {-b-d*t, -d*(a+d*t), -t}, {-b-t, -d*(a+t), -d*t}, {-b-t, -d*(a+t), 0.0}},
     {{-b, 0.0, -t}, {-b-d*t, 0.0, -t},    {-b-t, 0.0, -d*t},    {-b-t, 0.0, 0.0}}
   };
-
-
-
-  //!@todo check which of these should move to the init function
-//  glEnable(GL_DEPTH_TEST);
-//  glEnable(GL_MAP2_VERTEX_3);
-//  glEnable(GL_AUTO_NORMAL);
 
   if (wireFrame)
   {

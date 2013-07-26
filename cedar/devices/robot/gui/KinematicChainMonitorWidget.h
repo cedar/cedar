@@ -62,12 +62,11 @@ public QWidget
   //----------------------------------------------------------------------------
 
 public:
-//!@todo please check if we really need four constructors in this class
   /*!@brief Constructor for a single kinematic chain
    *
-   *@param kinematicChain pointer to a kinematic chain
-   *@param parent parent parameter of QWidget
-   *@param f WindowFlags for QWidget
+   * @param kinematicChain pointer to a kinematic chain
+   * @param parent parent parameter of QWidget
+   * @param f WindowFlags for QWidget
    */
   KinematicChainMonitorWidget
   (

@@ -56,8 +56,6 @@
 // SYSTEM INCLUDES
 #include <algorithm>
 
-cedar::proc::Manager cedar::proc::Manager::mManager;
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -68,20 +66,14 @@ cedar::proc::Manager::Manager()
 
 cedar::proc::Manager::~Manager()
 {
-  this->stopThreads();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::FrameworkSettings& cedar::proc::Manager::settings()
-{
-  return this->mSettings;
-}
-
 void cedar::proc::Manager::loadDefaultPlugins()
 {
-  const std::set<std::string>& plugins = cedar::proc::gui::Settings::instance().pluginsToLoad();
+  const std::set<std::string>& plugins = cedar::proc::gui::SettingsSingleton::getInstance()->pluginsToLoad();
   for (std::set<std::string>::const_iterator iter = plugins.begin(); iter != plugins.end(); ++ iter)
   {
     std::string action = "reading";
@@ -90,7 +82,7 @@ void cedar::proc::Manager::loadDefaultPlugins()
       action = "opening";
       cedar::proc::PluginProxyPtr plugin(new cedar::proc::PluginProxy(*iter));
       action = "loading";
-      cedar::proc::Manager::getInstance().load(plugin);
+      this->load(plugin);
       cedar::aux::LogSingleton::getInstance()->message
       (
         "Loaded default plugin \"" + (*iter) + "\"",
@@ -150,10 +142,9 @@ void cedar::proc::Manager::startThreads()
 {
   for (ThreadRegistry::iterator iter = this->mThreadRegistry.begin(); iter != this->mThreadRegistry.end(); ++iter)
   {
-    //!@todo Ugly solution -- is there a better one?
     if (cedar::proc::LoopedTrigger* looped_trigger = dynamic_cast<cedar::proc::LoopedTrigger*>(iter->get()))
     {
-      looped_trigger->startTrigger();
+      looped_trigger->start();
     }
     else
     {
@@ -167,10 +158,9 @@ void cedar::proc::Manager::stopThreads(bool wait)
   // Stop all the threads
   for (ThreadRegistry::iterator iter = this->mThreadRegistry.begin(); iter != this->mThreadRegistry.end(); ++iter)
   {
-    //!@todo Ugly solution -- is there a better one?
     if (cedar::proc::LoopedTrigger* looped_trigger = dynamic_cast<cedar::proc::LoopedTrigger*>(iter->get()))
     {
-      looped_trigger->stopTrigger();
+      looped_trigger->stop();
     }
     else
     {
@@ -191,10 +181,5 @@ void cedar::proc::Manager::stopThreads(bool wait)
 cedar::proc::Manager::ThreadRegistry& cedar::proc::Manager::threads()
 {
   return this->mThreadRegistry;
-}
-
-cedar::proc::Manager& cedar::proc::Manager::getInstance()
-{
-  return cedar::proc::Manager::mManager;
 }
 

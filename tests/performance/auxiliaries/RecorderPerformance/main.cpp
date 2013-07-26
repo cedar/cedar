@@ -40,7 +40,7 @@
 #include "cedar/auxiliaries/Recorder.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
-#include "cedar/auxiliaries/testingFunctions.h"
+#include "cedar/testingUtilities/measurementFunctions.h"
 
 //SYSTEM INCLUDES
 #include <iostream>
@@ -78,7 +78,7 @@ void run_test()
 {
   errors= 0;
 
-  cedar::aux::testing::test_time("Recording different Mats", record );
+  cedar::test::test_time("Recording different Mats", record );
 }
 
 

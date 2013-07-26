@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -253,7 +253,6 @@ double cedar::dev::sensors::camera::Properties::getProperty
   cedar::dev::sensors::camera::Property::Id propertyId
 )
 {
-  //!@ todo: throw exceptions instead of returning constants for special values
   cedar::dev::sensors::camera::CamPropertyPtr p_prop = mPropertiesList[propertyId];
 
   // only return this value, if set to manual or if backend-default value

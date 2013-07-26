@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -233,7 +233,7 @@ private:
   //! The worker that does actual converison.
   cedar::aux::gui::detail::VtkSurfacePlotWorkerPtr mConversionWorker;
 
-}; // class cedar::aux::gui::SurfacePlot
+}; // class cedar::aux::gui::VtkSurfacePlot
 
 #endif // CEDAR_USE_VTK
 #endif // CEDAR_AUX_GUI_VTK_SURFACE_PLOT_H

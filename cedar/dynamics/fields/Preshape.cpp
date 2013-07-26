@@ -145,7 +145,6 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
 {
   if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "input")
   {
-    //!@todo Reenable this once the annotations for space code are introduced.
     /* if (cedar::dyn::ConstSpaceCodePtr input = boost::dynamic_pointer_cast<const cedar::dyn::SpaceCode>(data))
     {
       if (!this->isMatrixCompatibleInput(input->getData()))
@@ -166,7 +165,6 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::Preshape::determineInputValidity
       else
       {
         return cedar::proc::DataSlot::VALIDITY_VALID;
-        /* return cedar::proc::DataSlot::VALIDITY_WARNING; */ // see above todo entry
       }
     }
     return cedar::proc::DataSlot::VALIDITY_ERROR;
@@ -250,4 +248,6 @@ void cedar::dyn::Preshape::updateMatrices()
     this->mActivation->getData() = cv::Mat(dimensionality,&sizes.at(0), CV_32F, cv::Scalar(0));
   }
   this->unlockAll();
+  this->revalidateInputSlot("input");
+  this->emitOutputPropertiesChangedSignal("activation");
 }

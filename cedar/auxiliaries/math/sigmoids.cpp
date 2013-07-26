@@ -40,9 +40,6 @@
 
 // SYSTEM INCLUDES
 
-
-//!@todo should the template functions be moved to the header?
-
 //!@cond SKIPPED_DOCUMENTATION
 double cedar::aux::math::sigmoid(const double x, const double beta, const double threshold)
 {

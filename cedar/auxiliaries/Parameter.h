@@ -170,6 +170,21 @@ public:
   //!@brief Removes all the locks needed to lock this parameter properly from the set.
   virtual void removeLocks(std::set<QReadWriteLock*>& locks) const;
 
+  //! Returns the owner of the parameter.
+  cedar::aux::Configurable* getOwner() const
+  {
+    return this->mpOwner;
+  }
+
+  /*! @brief Adds a deprecated name to the parameter.
+   *
+   *         Values for this parameter can then be read under the deprecated name(s), but these names are no longer used
+   *         to write the value. Also, a warning about this will be printed.
+   *
+   * @param  deprecatedName
+   */
+  void addDeprecatedName(const std::string& deprecatedName);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

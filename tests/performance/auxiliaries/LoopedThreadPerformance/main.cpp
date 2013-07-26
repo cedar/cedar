@@ -38,7 +38,7 @@
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
-#include "cedar/auxiliaries/testingFunctions.h"
+#include "cedar/testingUtilities/measurementFunctions.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -139,14 +139,14 @@ void delete_test()
 
 void run_test()
 {
-  errors= 0;
+  errors = 0;
 
-  cedar::aux::testing::test_time("create threads", create_test );
-  cedar::aux::testing::test_time("start threads", start_test );
+  cedar::test::test_time("create threads", create_test);
+  cedar::test::test_time("start threads", start_test);
 
   usleep(1000*1000*3);
 
-  cedar::aux::testing::test_time("stop threads", stop_test );
+  cedar::test::test_time("stop threads", stop_test );
 
   // evaluation statistics for all threads:
 
@@ -164,13 +164,11 @@ void run_test()
       max_real_step_all= (*it)->mMaxRealStep;
   }
  
-  cedar::aux::testing::write_measurement("num steps", num_steps_all7);
-  cedar::aux::testing::write_measurement("real-step size", total_real_step_all );
-  cedar::aux::testing::write_measurement("real-step max", max_real_step_all );
-  cedar::aux::testing::write_measurement("rel deviatiation", ( total_real_step_all 
-                                           / num_steps_all7 )
-                                        - STEP_SIZE );                                        
-  cedar::aux::testing::test_time("delete threads", delete_test );
+  cedar::test::write_measurement("num steps", num_steps_all7);
+  cedar::test::write_measurement("real-step size", total_real_step_all );
+  cedar::test::write_measurement("real-step max", max_real_step_all );
+  cedar::test::write_measurement("rel deviatiation", (total_real_step_all / num_steps_all7) - STEP_SIZE);
+  cedar::test::test_time("delete threads", delete_test);
 }
 
 int main(int argc, char* argv[])
@@ -180,7 +178,7 @@ int main(int argc, char* argv[])
 
   auto testThread = new cedar::aux::CallFunctionInThread(run_test);
 
-  QObject::connect( testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection );  // alternatively: call app->quit() in runTests()
+  QObject::connect(testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection);  // alternatively: call app->quit() in runTests()
 
   testThread->start();
   app->exec();
@@ -190,5 +188,3 @@ int main(int argc, char* argv[])
 
   return errors;
 }
-
-

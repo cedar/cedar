@@ -70,13 +70,17 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Sets the network whose consistency is to be checked.
   void setNetwork(cedar::proc::gui::NetworkPtr network);
 
+  //! Clears all issues.
   void clear();
 
 public slots:
+  //! Performs all checks again.
   void recheck();
 
+  //! Performs an action for the given item, if applicable.
   void itemAction(int row, int column);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -89,6 +93,11 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /*! Displays the given issue.
+   *
+   * @param issueId Index of the issue in the issue vector.
+   * @param issue The issue to display.
+   */
   void addIssue(size_t issueId, cedar::proc::ConsistencyIssuePtr issue);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -97,12 +106,16 @@ private:
 protected:
   // none yet
 private:
+  //! Network being checked.
   cedar::proc::gui::NetworkPtr mNetwork;
 
+  //! Scene in which the network is being displayed.
   cedar::proc::gui::Scene* mpScene;
 
+  //! View displaying the scene.
   cedar::proc::gui::View* mpView;
 
+  //! Vector of issues.
   std::vector<cedar::proc::ConsistencyIssuePtr> mIssues;
 
 }; // class cedar::proc::gui::ArchitectureConsistencyCheck

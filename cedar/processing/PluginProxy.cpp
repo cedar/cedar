@@ -150,8 +150,8 @@ std::string cedar::proc::PluginProxy::findPluginFile(const std::string& file) co
     return file;
   }
 
-  cedar::proc::FrameworkSettings& settings = cedar::proc::Manager::getInstance().settings();
-  std::string loc = settings.getPluginWorkspace() + "/" + file;
+  cedar::proc::FrameworkSettingsPtr settings = cedar::proc::FrameworkSettingsSingleton::getInstance();
+  std::string loc = settings->getPluginWorkspace() + "/" + file;
   searched_locs += loc;
   if (boost::filesystem::exists(loc))
   {
@@ -159,8 +159,8 @@ std::string cedar::proc::PluginProxy::findPluginFile(const std::string& file) co
   }
 
   std::string ret_path;
-  std::set<std::string>::const_iterator path = settings.getPluginDirectories().begin();
-  std::set<std::string>::const_iterator path_end = settings.getPluginDirectories().end();
+  std::set<std::string>::const_iterator path = settings->getPluginDirectories().begin();
+  std::set<std::string>::const_iterator path_end = settings->getPluginDirectories().end();
   if (path != path_end)
   {
     do
@@ -227,19 +227,16 @@ void cedar::proc::PluginProxy::load(const std::string& file)
     CEDAR_THROW(cedar::proc::PluginException, "Error loading interface function: dlsym returned NULL.");
   }
 
-  //@todo this might segfault if the function pointer points to a bad function; handle this somehow.
 #elif defined CEDAR_OS_WINDOWS
   this->mpLibHandle = LoadLibraryEx(this->mFileName.c_str(), NULL, 0);
   if (!this->mpLibHandle)
   {
-    //!@todo use GetLastError to read out the error string
     CEDAR_THROW(cedar::proc::PluginException, "Could not load plugin: LoadLibraryEx failed: " + this->getLastError());
   }
   
   p_interface = (PluginInterfaceMethod) (GetProcAddress(this->mpLibHandle, TEXT("pluginDeclaration")));
   if (!p_interface)
   {
-    //!@todo use GetLastError to read out the error string
     CEDAR_THROW(cedar::proc::PluginException, "Error loading interface function: GetProcAddress failed: " + this->getLastError());
   }
 #endif // CEDAR_OS_UNIX / CEDAR_OS_WINDOWS
@@ -264,7 +261,7 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   }
 
   // Finally, if nothing failed, add the plugin to the list of known plugins.
-  cedar::proc::Manager::getInstance().settings().addKnownPlugin(file);
+  cedar::proc::FrameworkSettingsSingleton::getInstance()->addKnownPlugin(file);
 }
 
 cedar::proc::PluginDeclarationPtr cedar::proc::PluginProxy::getDeclaration()

@@ -46,7 +46,6 @@
 #include "cedar/auxiliaries/net/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 
-
 // SYSTEM INCLUDES
 #include <iostream>
 #include <vector>
@@ -123,10 +122,9 @@ void cedar::proc::sinks::NetWriter::connect()
     catch (cedar::aux::net::NetMissingRessourceException& e)
     {
       // somehow YARP doesnt work ... :( typically fatal.
-      // TODO: set state of step
+      this->setState(cedar::proc::Step::STATE_EXCEPTION, "Yarp exception: " + e.exceptionInfo());
       throw (e); // lets try this ...
     }
-    // TODO: set state to OK
   }
 }
 
@@ -157,7 +155,7 @@ void cedar::proc::sinks::NetWriter::compute(const cedar::proc::Arguments&)
   catch (cedar::aux::net::NetMissingRessourceException& e)
   {
     // somehow YARP doesnt work ... :( typically fatal.
-    // TODO: set state of step
+    this->setState(cedar::proc::Step::STATE_EXCEPTION, "Yarp exception: " + e.exceptionInfo());
     throw (e); // lets try this ...
   }
 }

@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -67,6 +67,19 @@ cedar::aux::PluginDeclaration::~PluginDeclaration()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::aux::PluginDeclaration::isDeprecatedName(const std::string& name) const
+{
+  for (size_t i = 0; i < this->mDeprecatedNames.size(); ++i)
+  {
+    if (this->mDeprecatedNames.at(i) == name)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
 
 /*!
  * @brief Returns the class name without the preceding namespace.

@@ -49,6 +49,7 @@
 // SYSTEM INCLUDES
 #include <QMainWindow>
 #include <QKeyEvent>
+#include <QDoubleSpinBox>
 #include <map>
 
 
@@ -89,21 +90,9 @@ public:
   void resetTo(cedar::proc::gui::NetworkPtr network);
 
 public slots:
-  /*!@brief Slot that displays exceptions.
-   */
-  void exception(const QString& message);
-
   /*!@brief Slot that displays notifications.
    */
   void notify(const QString& message);
-
-  /*!@brief Slot that displays errors.
-   */
-  void error(const QString& message);
-
-  /*!@brief Slot that displays messages.
-   */
-  void message(const QString& message);
 
   /*!@brief Changes the mode back to select when an architecture tool is finished.
    */
@@ -116,6 +105,10 @@ public slots:
   /*!@brief Stops all looped triggers (and other derivatives of looped thread).
    */
   void stopThreads();
+
+  /*!@brief Single-step all looped triggers (and other derivatives of looped thread).
+   */
+  void stepThreads();
 
   /*!@brief Slot that is connected to the "new" item in the file menu.
    */
@@ -209,14 +202,19 @@ public slots:
    */
   void showConsistencyChecker();
 
+  /*!@brief Opens a boost control widget.
+   */
+  void showBoostControl();
+
+  //!@brief toggle smart connections
+  void toggleSmartConnections(bool smart);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
   /*!@brief Deletes the list of graphics items.
-   *
-   * @todo This probably belongs somewhere else, e.g., cedar::proc::gui::Scene.
    */
   void deleteElements(QList<QGraphicsItem*>& items);
 
@@ -225,8 +223,6 @@ protected:
   void deleteElement(QGraphicsItem* pItem);
 
   /*!@brief Deletes the elements currently selected in the scene.
-   *
-   * @todo This probably belongs somewhere else, e.g., cedar::proc::gui::Scene.
    */
   void deleteSelectedElements();
 
@@ -255,9 +251,9 @@ private:
    */
   void restoreSettings();
 
-  /*!@brief Writes an error message into the log window.
+  /*!@brief Sets the filename in the title of the main window.
    */
-  void logError(const std::string& message);
+  void displayFilename(const std::string& filename);
 
   /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
    */
@@ -279,6 +275,13 @@ private:
 
   //! Dock widget for the consistency checker.
   QDockWidget* mpConsistencyDock;
+
+  QString mDefaultWindowTitle;
+
+  cedar::proc::gui::BoostControl* mpBoostControl;
+
+  //! In which the user specifies the time step for single-step functionality.
+  QDoubleSpinBox* mpCustomTimeStep;
 
 }; // class cedar::MainWindow
 

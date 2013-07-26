@@ -60,8 +60,6 @@
 
 
 /*!@brief An implementation of Neural Fields for the processing framework.
- *
- * @todo Put a detailed description here, including the equation of the field dynamics and references to the relevant paper(s)
  */
 class cedar::dyn::NeuralField : public cedar::dyn::Dynamics
 {
@@ -134,6 +132,13 @@ public:
     this->_mOutputActivation->setValue(value);
   }
 
+  /*!@brief Marks the activation in this field as discrete values.
+   */
+  void setDiscreteMetric(bool value)
+  {
+    this->_mDiscreteMetric->setValue(value);
+  }
+
 public slots:
   //!@brief handle a change in dimensionality, which leads to creating new matrices
   void dimensionalityChanged();
@@ -201,6 +206,7 @@ private:
 
 private slots:
   void activationAsOutputChanged();
+  void discreteMetricChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -228,7 +234,6 @@ protected:
   cedar::aux::DoubleParameterPtr mRestingLevel;
 
   //!@brief the relaxation rate of the field
-  //!@todo deal with units, now: milliseconds
   cedar::aux::DoubleParameterPtr mTau;
 
   //!@brief the global inhibition of the field, which is not contained in the kernel
@@ -245,14 +250,17 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief Parameter that lets the user decide whether the activation is an output.
+  cedar::aux::BoolParameterPtr _mOutputActivation;
+
+  //!@brief Whether the field activation represents discrete nodes (this is a temporary solution).
+  cedar::aux::BoolParameterPtr _mDiscreteMetric;
+
   //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
-  cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
+  cedar::aux::UIntParameterPtr _mDimensionality;
 
   //!@brief the field sizes in each dimension
   cedar::aux::UIntVectorParameterPtr _mSizes;
-
-  //!@brief Parameter that lets the user decide whether the activation is an output.
-  cedar::aux::BoolParameterPtr _mOutputActivation;
 
   //!@brief input noise gain
   cedar::aux::DoubleParameterPtr _mInputNoiseGain;

@@ -66,7 +66,7 @@ QDialog(pParent)
   this->mpFileNameEdit->lineEdit()->setReadOnly(true);
 
   this->mpFileNameEdit->addItem("");
-  const std::set<std::string>& known_plugins = cedar::proc::Manager::getInstance().settings().getKnownPlugins();
+  const std::set<std::string>& known_plugins = cedar::proc::FrameworkSettingsSingleton::getInstance()->getKnownPlugins();
   for (std::set<std::string>::const_iterator iter = known_plugins.begin(); iter != known_plugins.end(); ++iter)
   {
     this->mpFileNameEdit->addItem(iter->c_str());
@@ -91,7 +91,7 @@ void cedar::proc::gui::PluginLoadDialog::browseFile()
 #elif defined CEDAR_OS_WINDOWS
   QString filter = "Plugins (*.dll)";
 #endif // CEDAR_OS_*
-  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastPluginLoadDialogLocation();
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastPluginLoadDialogLocation();
   QString file = QFileDialog::getOpenFileName
                               (
                                 this, // parent = 0,
@@ -116,7 +116,6 @@ void cedar::proc::gui::PluginLoadDialog::pluginFileChanged(const QString& file)
 
 void cedar::proc::gui::PluginLoadDialog::loadFile(const std::string& file)
 {
-  //!@todo handle plugin exceptions.
   mPlugin = cedar::proc::PluginProxyPtr(new cedar::proc::PluginProxy(file));
 
   this->mpStepsList->clear();

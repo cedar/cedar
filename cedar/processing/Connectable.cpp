@@ -91,7 +91,7 @@ void cedar::proc::Connectable::removeSlot(DataRole::Id role, const std::string& 
   SlotMap::iterator slot_map_iter = slot_map.find(name);
   if (slot_map_iter == slot_map.end())
   {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "No slot of the given name found.");
+    CEDAR_THROW(cedar::aux::InvalidNameException, "No slot of the given name found.");
   }
 
   cedar::proc::DataSlotPtr slot = slot_map_iter->second;
@@ -358,7 +358,6 @@ bool cedar::proc::Connectable::allInputsValid()
   // clear the list of invalid input names
   mInvalidInputNames.clear();
 
-  //!@todo Lock these inputs properly?
   std::map<DataRole::Id, SlotMap>::iterator slot_map_iter = this->mSlotMaps.find(cedar::proc::DataRole::INPUT);
   if (slot_map_iter == mSlotMaps.end())
   {
@@ -453,7 +452,7 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::declareData
   // check the name
   if (name.find('.') != std::string::npos)
   {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "Data names may not contain the character \".\". \""
+    CEDAR_THROW(cedar::aux::InvalidNameException, "Data names may not contain the character \".\". \""
                                                    + name + "\" in Connectable \"" + this->getName()
                                                    + "\" violates this rule.");
   }
@@ -553,7 +552,7 @@ void cedar::proc::Connectable::makeInputCollection(const std::string& name, bool
 
 /*!
  * @throws cedar::proc::InvalidRoleException If no slot exists for the given role.
- * @throws cedar::proc::InvalidNameException If @em name cannot be found in the list of slots for the given role.
+ * @throws cedar::aux::InvalidNameException If @em name cannot be found in the list of slots for the given role.
  */
 cedar::proc::DataSlotPtr cedar::proc::Connectable::getSlot(cedar::proc::DataRole::Id role, const std::string& name)
 {
@@ -583,7 +582,7 @@ cedar::proc::DataSlotPtr cedar::proc::Connectable::getSlot(cedar::proc::DataRole
     message += ", \"";
     message += name;
     message += "\").";
-    CEDAR_THROW(cedar::proc::InvalidNameException, message);
+    CEDAR_THROW(cedar::aux::InvalidNameException, message);
   }
 
   // if everything worked, return the actual slot.
@@ -617,7 +616,7 @@ cedar::proc::ConstDataSlotPtr cedar::proc::Connectable::getSlot
     message += "\")";
     message += " in connectable " + this->getName();
     message += ".";
-    CEDAR_THROW(cedar::proc::InvalidNameException, message);
+    CEDAR_THROW(cedar::aux::InvalidNameException, message);
   }
   return slot_iter->second;
 }
@@ -701,7 +700,7 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
   SlotMap::iterator map_iterator = iter->second.find(name);
   if (map_iterator == iter->second.end())
   {
-    CEDAR_THROW(cedar::proc::InvalidNameException,
+    CEDAR_THROW(cedar::aux::InvalidNameException,
                 "The requested " +
                 cedar::proc::DataRole::type().get(role).prettyString() +
                 " name \"" + name + "\" does not exist.");
@@ -751,7 +750,7 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& na
   }
   else
   {
-    CEDAR_THROW(cedar::proc::InvalidNameException,
+    CEDAR_THROW(cedar::aux::InvalidNameException,
                 "The requested " +
                 cedar::proc::DataRole::type().get(role).prettyString() +
                 " name \"" + name + "\" does not exist.");
@@ -789,7 +788,6 @@ void cedar::proc::Connectable::freeInput(const std::string& name, cedar::aux::Co
   cedar::proc::ExternalDataPtr slot = this->getInputSlot(name);
   // the slot for name should always be found
   CEDAR_ASSERT(slot);
-  //!@todo this if should be moved to the slot
   if (slot->isCollection())
   {
     slot->removeData(data);
@@ -842,11 +840,10 @@ cedar::aux::DataPtr cedar::proc::Connectable::getData(DataRole::Id role, const s
   SlotMap::const_iterator map_iterator = iter->second.find(name);
   if (map_iterator == iter->second.end())
   {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "The requested "
-                                                   + cedar::proc::DataRole::type().get(role).prettyString()
-                                                   + " name \"" + name + "\" does not exist in Connectable \""
-                                                   + this->getName() + "\".");
-    return cedar::aux::DataPtr();
+    CEDAR_THROW(cedar::aux::InvalidNameException, "The requested "
+                                                  + cedar::proc::DataRole::type().get(role).prettyString()
+                                                  + " name \"" + name + "\" does not exist in Connectable \""
+                                                  + this->getName() + "\".");
   }
   return map_iterator->second->getData();
 }
@@ -856,7 +853,7 @@ cedar::aux::DataPtr cedar::proc::Connectable::getData(DataRole::Id role, const s
  *
  *  @returns Nothing, output is written to the parameters @em connectableName and @em dataName.
  *
- *  @throws cedar::proc::InvalidNameException if the name cannot be parsed, e.g., if no dot is contained.
+ *  @throws cedar::aux::InvalidNameException if the name cannot be parsed, e.g., if no dot is contained.
  */
 void cedar::proc::Connectable::parseDataNameNoRole
                                (
@@ -869,7 +866,7 @@ void cedar::proc::Connectable::parseDataNameNoRole
   size_t dot_idx = instr.rfind('.');
   if (dot_idx == std::string::npos || dot_idx == 0 || dot_idx == instr.length()-1)
   {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "Invalid data name for Connectable. Path is: " + instr);
+    CEDAR_THROW(cedar::aux::InvalidNameException, "Invalid data name for Connectable. Path is: " + instr);
   }
 
   // Split the string. Step name is everything before the dot, dataName everything after it.
@@ -971,4 +968,17 @@ void cedar::proc::Connectable::renameInput(const std::string& oldName, const std
     mSlotMaps[DataRole::INPUT][newName] = slot;
     slot->setName(newName);
   }
+}
+
+void cedar::proc::Connectable::emitOutputPropertiesChangedSignal(const std::string& slot)
+{
+  try
+  {
+    this->getOutputSlot(slot);
+  }
+  catch (cedar::aux::InvalidNameException& exc)
+  {
+    CEDAR_THROW(cedar::aux::InvalidNameException, "Tried to emit a signal from an output that does not exist.");
+  }
+  this->mOutputPropertiesChanged(this->getName() + "." + slot);
 }

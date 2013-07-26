@@ -52,8 +52,12 @@
  */
 class cedar::aux::gui::PlotManager
 {
-  template <typename T, typename U>
-  friend class cedar::aux::gui::PlotDeclarationTemplate;
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  template <typename T, typename U> friend class cedar::aux::gui::PlotDeclarationTemplate;
+  friend class cedar::aux::Singleton<cedar::aux::gui::PlotManager>;
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -61,8 +65,8 @@ class cedar::aux::gui::PlotManager
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet
+private:
+  PlotManager();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -125,6 +129,8 @@ private:
 
 }; // class cedar::aux::gui::PlotManager
 
+CEDAR_AUX_EXPORT_SINGLETON(cedar::aux::gui::PlotManager);
+
 namespace cedar
 {
   namespace aux
@@ -132,7 +138,6 @@ namespace cedar
     namespace gui
     {
       /*!@brief singleton specialization for the plot manager
-       * @todo Template instantiation
        */
       typedef cedar::aux::Singleton<cedar::aux::gui::PlotManager> PlotManagerSingleton;
     }

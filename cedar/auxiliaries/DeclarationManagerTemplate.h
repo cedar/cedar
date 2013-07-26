@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -43,13 +43,14 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 
-
-/*!@todo describe.
+/*!@brief A template for manager of plugin declarations.
  *
- * @todo describe more.
+ *        This class manages a set of cedar::aux::PluginDeclaration instances. It offers functionality for adding and
+ *        querying these instances, as well as allocation capabilities for the classes declared therein.
  */
 template <class BaseTypePtr>
 class cedar::aux::DeclarationManagerTemplate

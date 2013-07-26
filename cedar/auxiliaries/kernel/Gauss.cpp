@@ -77,6 +77,8 @@ _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigmas", dimensionality, s
 _mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", dimensionality, shifts, -10000.0, 10000)),
 _mLimit(new cedar::aux::DoubleParameter(this, "limit", limit, 0.01, 1000.0))
 {
+  this->_mLimit->markAdvanced();
+  this->_mShifts->markAdvanced();
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->setDimensionality(dimensionality);
   
@@ -172,7 +174,6 @@ void cedar::aux::kernel::Gauss::calculateParts()
       {
         for (unsigned int j = 0; j < mSizes.at(dim); j++)
         {
-          //!\todo move filling up of matrix to some tool function
           kernel_part.at<float>(j, 0)
               = cedar::aux::math::gauss(static_cast<int>(j) - mCenters.at(dim), sigma);
         }

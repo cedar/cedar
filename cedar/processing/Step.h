@@ -81,6 +81,11 @@ class cedar::proc::Step : public QThread,
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::Network;
+
+  //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -118,9 +123,8 @@ public:
        );
 
   /*!@brief Sets the arguments used by the next execution of the run function.
-   *!@todo cedar::proc::Step::setNextArguments should take a const pointer.
    */
-  bool setNextArguments(cedar::proc::ArgumentsPtr arguments);
+  bool setNextArguments(cedar::proc::ConstArgumentsPtr arguments);
 
   /*!@brief Toggles if a step is executed as its own thread, or if the run() function is called in the same thread as
    *        the source of the trigger signal.
@@ -149,7 +153,7 @@ public:
 
   /*!@brief The wait method.
    */
-  void wait()
+  void waitForProcessing()
   {
     this->QThread::wait();
   }
@@ -276,6 +280,12 @@ protected:
    */
   void unlock() const;
 
+  /*!@brief Redetermines the validity for an input slot.
+   *
+   * @param slot The slot to revalidate.
+   */
+  void revalidateInputSlot(const std::string& slot);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -324,6 +334,10 @@ private:
    */
   void unlockData() const;
 
+  /*!@brief resets step state and calls Connectable::inputConnectionChanged for given slot for revalidation
+   *
+   */
+  void callInputConnectionChanged(const std::string& slot);
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -332,14 +346,13 @@ protected:
 
 private:
   //!@brief flag that states if step is still computing its latest output
-  //!@todo Should busy be a part of STATE_*? Or even a lock?
   mutable QMutex mBusy;
 
   //!@brief The lock used for protecting the computation arguments of the step.
   QReadWriteLock* mpArgumentsLock;
 
   //!@brief The arguments for the next cedar::proc::Step::compute call.
-  ArgumentsPtr mNextArguments;
+  ConstArgumentsPtr mNextArguments;
 
   //!@brief List of triggers belonging to this Step.
   std::vector<cedar::proc::TriggerPtr> mTriggers;

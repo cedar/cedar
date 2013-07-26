@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/utilities.h"
+#include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
@@ -103,8 +104,6 @@ std::string cedar::aux::unmangleName(const char* mangledName)
 #endif // CEDAR_COMPILER_GCC
 }
 
-//!@todo Move this to the cedar/defines.h or anoher apropriate place.
-#define CEDAR_MACRO_CONTENTS_TO_CSTR(x) #x
 std::ostream& cedar::aux::operator<< (std::ostream& stream, const cedar::aux::StackTrace& trace)
 {
   stream << "Backtrace generated with ";
@@ -311,4 +310,132 @@ cedar::aux::StackTrace::StackTrace()
   RtlCaptureContext(&context_record);
   this->init(&context_record);
 #endif // CEDAR_COMPILER_GCC
+}
+
+void cedar::aux::write(cv::Mat matrix)
+{
+  switch (matrix.type())
+  {
+  case CV_8U:
+    for(int i = 0; i < matrix.rows; i++)
+    {
+      for (int j = 0; j < matrix.cols; j++)
+      {
+        if (cedar::aux::math::isZero(matrix.at<unsigned char>(i, j)))
+        {
+          std::cout << "0" << " ";
+        }
+        else
+        {
+          std::cout << matrix.at<unsigned char>(i, j) << " ";
+        }
+      }
+      std::cout << "\n";
+    }
+  break;
+  case CV_8S:
+    for(int i = 0; i < matrix.rows; i++)
+    {
+      for (int j = 0; j < matrix.cols; j++)
+      {
+        if (cedar::aux::math::isZero(matrix.at<char>(i, j)))
+        {
+          std::cout << "0" << " ";
+        }
+        else
+        {
+          std::cout << matrix.at<char>(i, j) << " ";
+        }
+      }
+      std::cout << "\n";
+    }
+  break;
+  case CV_16U:
+      for(int i = 0; i < matrix.rows; i++)
+      {
+        for (int j = 0; j < matrix.cols; j++)
+        {
+          if (cedar::aux::math::isZero(matrix.at<unsigned short int>(i, j)))
+          {
+            std::cout << "0" << " ";
+          }
+          else
+          {
+            std::cout << matrix.at<unsigned short int>(i, j) << " ";
+          }
+        }
+        std::cout << "\n";
+      }
+    break;
+  case CV_16S:
+      for(int i = 0; i < matrix.rows; i++)
+      {
+        for (int j = 0; j < matrix.cols; j++)
+        {
+          if (cedar::aux::math::isZero(matrix.at<short int>(i, j)))
+          {
+            std::cout << "0" << " ";
+          }
+          else
+          {
+            std::cout << matrix.at<short int>(i, j) << " ";
+          }
+        }
+        std::cout << "\n";
+      }
+    break;
+  case CV_32S:
+      for(int i = 0; i < matrix.rows; i++)
+      {
+        for (int j=0; j<matrix.cols; j++)
+        {
+          if (cedar::aux::math::isZero(matrix.at<int>(i, j)))
+          {
+            std::cout << "0" << " ";
+          }
+          else
+          {
+            std::cout << matrix.at<int>(i, j) << " ";
+          }
+        }
+        std::cout << "\n";
+      }
+    break;
+  case CV_32F:
+    for(int i = 0; i < matrix.rows; i++)
+    {
+      for (int j=0; j<matrix.cols; j++)
+      {
+        if (cedar::aux::math::isZero(matrix.at<float>(i, j)))
+        {
+          std::cout << "0" << " ";
+        }
+        else
+        {
+          std::cout << matrix.at<float>(i, j) << " ";
+        }
+      }
+      std::cout << "\n";
+    }
+  break;
+  case CV_64F:
+  for(int i = 0; i < matrix.rows; i++)
+  {
+    for (int j=0; j<matrix.cols; j++)
+    {
+      if (cedar::aux::math::isZero(matrix.at<double>(i, j)))
+      {
+        std::cout << "0" << " ";
+      }
+      else
+      {
+        std::cout << matrix.at<double>(i, j) << " ";
+      }
+    }
+    std::cout << "\n";
+  }
+  default:
+    break;
+  }
+  std::cout << "\n";
 }

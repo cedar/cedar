@@ -601,13 +601,13 @@ public:
   //----------------------------------------------------------------------------
   // protected methods
   //----------------------------------------------------------------------------
-public:
-  virtual void step(double time);
+protected:
 
   //----------------------------------------------------------------------------
   // private methods
   //----------------------------------------------------------------------------
 private:
+  virtual void step(double time);
   void init();
   void initializeFromJointList();
   void applyAngleLimits(cv::Mat& angles);

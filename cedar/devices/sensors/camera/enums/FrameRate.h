@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -39,7 +39,6 @@
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
-//!@todo Why does this need libdc?
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/EnumType.h"

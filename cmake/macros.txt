@@ -169,7 +169,7 @@ macro(cedar_add_test)
   endif (test_AUTOMATIC)
   
   # link all cedar and third party libraries into the unit test executable
-  target_link_libraries(${testExecutableName} ${CEDAR_LIBS} ${CEDAR_THIRD_PARTY_LIBS})
+  target_link_libraries(${testExecutableName} ${CEDAR_LIBS} cedartesting ${CEDAR_THIRD_PARTY_LIBS})
   
   # change the runtime output directory back to the original value
   set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${originalRuntimeOutputDirectory})
@@ -236,14 +236,16 @@ endmacro(cedar_get_subdirectories)
 #                     [MOC_HEADERS header1 header2 ...]
 #                     [RESOURCES resource1 resource2 ...]
 #                     [LINK_LIBRARIES lib1 lib2 ...]
+#                     [NO_AUTOLINK]
 #                   )
 # library_name   name of the new library
 # MOC_HEADERS    header files that generate (Qt) moc-files
 # LINK_LIBRARIES libraries that need to link to from the new library (important for MacOS linking process)
+# NO_AUTOLINK    if provided, executables within cedar will not be linked to this library automatically.
 #
 # see http://www.cmake.org/Wiki/CMakeMacroParseArguments for a description of the parsing
 macro(cedar_add_library)
-  parse_arguments(library "MOC_HEADERS;RESOURCES;LINK_LIBRARIES" "" ${ARGN})
+  parse_arguments(library "MOC_HEADERS;RESOURCES;LINK_LIBRARIES" "NO_AUTOLINK" ${ARGN})
   car(libraryName ${library_DEFAULT_ARGS})
 
   # find files
@@ -263,6 +265,7 @@ macro(cedar_add_library)
   # generate lib.h files
   string(TOUPPER "${libraryName}" CAP_LIB_NAME)
   string(REGEX REPLACE "CEDAR" "" CAP_LIB_NAME "${CAP_LIB_NAME}")
+  string(REGEX REPLACE "cedar" "" LIB_NAMESPACE_NAME "${libraryName}")
   
   set(libHOutputFile "${CMAKE_CURRENT_BINARY_DIR}/lib.h")
   configure_file("${CEDAR_HOME}/cmake/resources/lib.h.in" ${libHOutputFile})
@@ -315,7 +318,10 @@ macro(cedar_add_library)
   endforeach(sourceFile ${sourceFiles})
 
   # add the library and link it to all relevant cedar and third party libraries
-  set(CEDAR_LIBS ${CEDAR_LIBS} ${libraryName} CACHE INTERNAL "")
+  if (NOT library_NO_AUTOLINK)
+    set(CEDAR_LIBS ${CEDAR_LIBS} ${libraryName} CACHE INTERNAL "")
+  endif()
+  
   add_library(${libraryName} ${CEDAR_LIB_TYPE} ${sourceFiles} ${headerFiles} ${recourceCompilerSrcs})
   cedar_set_common_target_properties(${libraryName})
   

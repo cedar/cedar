@@ -75,6 +75,7 @@
 #include <QResource>
 #include <iostream>
 #include <QMessageBox>
+#include <QPushButton>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -84,9 +85,10 @@
 cedar::aux::EnumType<cedar::proc::gui::StepItem::DisplayMode> cedar::proc::gui::StepItem::DisplayMode::mType;
 
 const int cedar::proc::gui::StepItem::mIconSize = 40;
-const qreal cedar::proc::gui::StepItem::mDefaultWidth = 160;
-const qreal cedar::proc::gui::StepItem::mDefaultHeight = 50;
-const qreal cedar::proc::gui::StepItem::mBaseDataSlotSize = 12.0;
+const qreal cedar::proc::gui::StepItem::mDefaultWidth = static_cast<qreal>(160);
+const qreal cedar::proc::gui::StepItem::mDefaultHeight = static_cast<qreal>(50);
+const qreal cedar::proc::gui::StepItem::M_BASE_DATA_SLOT_SIZE = static_cast<qreal>(12.0);
+const qreal cedar::proc::gui::StepItem::M_DATA_SLOT_PADDING = static_cast<qreal>(3.0);
 
 #ifndef CEDAR_COMPILER_MSVC
 const cedar::proc::gui::StepItem::DisplayMode::Id cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT;
@@ -139,7 +141,7 @@ void cedar::proc::gui::StepItem::construct()
                                | QGraphicsItem::ItemIsMovable
                                );
 
-  if (cedar::proc::gui::Settings::instance().useGraphicsItemShadowEffects())
+  if (cedar::proc::gui::SettingsSingleton::getInstance()->useGraphicsItemShadowEffects())
   {
     QGraphicsDropShadowEffect *p_effect = new QGraphicsDropShadowEffect();
     p_effect->setBlurRadius(5.0);
@@ -160,7 +162,7 @@ cedar::proc::gui::StepItem::Decoration::Decoration
   CEDAR_ASSERT(!this->mIconSource.isNull());
   this->mpIcon = new QGraphicsPixmapItem
                  (
-                   mIconSource.pixmap(static_cast<int>(cedar::proc::gui::StepItem::mBaseDataSlotSize)),
+                   mIconSource.pixmap(static_cast<int>(cedar::proc::gui::StepItem::M_BASE_DATA_SLOT_SIZE)),
                    this->mpRectangle
                  );
   this->mpIcon->setToolTip(description);
@@ -191,6 +193,78 @@ cedar::proc::gui::StepItem::~StepItem()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::StepItem::demagnetizeSlots()
+{
+  auto slot_map_iter = this->mSlotMap.find(cedar::proc::DataRole::INPUT);
+
+  if (slot_map_iter == this->mSlotMap.end())
+  {
+    return;
+  }
+
+  bool changes = false;
+  auto slot_map = slot_map_iter->second;
+  for (auto slot_iter = slot_map.begin(); slot_iter != slot_map.end(); ++slot_iter)
+  {
+    cedar::proc::gui::DataSlotItem* p_slot = slot_iter->second;
+    if (p_slot->getMagneticScale() != 1.0)
+    {
+      changes = true;
+    }
+
+    p_slot->setMagneticScale(1.0);
+  }
+
+  if (changes)
+  {
+    this->updateDataSlotPositions();
+  }
+}
+
+void cedar::proc::gui::StepItem::magnetizeSlots(const QPointF& mousePositionInScene)
+{
+  double max_distance = 100.0;
+  double scale_factor = cedar::proc::gui::SettingsSingleton::getInstance()->getDataSlotScaling();
+  double scale_sensitivity = cedar::proc::gui::SettingsSingleton::getInstance()->getDataSlotScalingSensitivity();
+
+  if (!cedar::proc::gui::SettingsSingleton::getInstance()->getDataSlotScalingEnabled())
+  {
+    scale_factor = 1.0;
+  }
+
+  auto slot_map_iter = this->mSlotMap.find(cedar::proc::DataRole::INPUT);
+
+  if (slot_map_iter == this->mSlotMap.end())
+  {
+    return;
+  }
+
+  bool changes = false;
+  auto slot_map = slot_map_iter->second;
+  for (auto slot_iter = slot_map.begin(); slot_iter != slot_map.end(); ++slot_iter)
+  {
+    cedar::proc::gui::DataSlotItem* p_slot = slot_iter->second;
+    qreal min_distance = p_slot->width(); // since they are circular, both width and height correspond to the diameter
+    QPointF diff = p_slot->scenePos() - mousePositionInScene;
+    qreal distance = std::max(min_distance, sqrt(diff.x() * diff.x() + diff.y() * diff.y()));
+    if (distance < max_distance)
+    {
+      changes = true;
+      qreal closeness = static_cast<qreal>(1.0) - (distance - min_distance)/(max_distance - min_distance);
+      qreal factor = std::pow(closeness, scale_sensitivity);
+      CEDAR_DEBUG_ASSERT(factor <= static_cast<qreal>(1.0));
+      CEDAR_DEBUG_ASSERT(factor >= static_cast<qreal>(0.0));
+      qreal scale = (static_cast<qreal>(1.0) - factor) * static_cast<qreal>(1.0) + factor * scale_factor;
+      p_slot->setMagneticScale(scale);
+    }
+  }
+
+  if (changes)
+  {
+    this->updateDataSlotPositions();
+  }
+}
+
 void cedar::proc::gui::StepItem::Decoration::setPosition(const QPointF& pos)
 {
   this->mpRectangle->setPos(pos);
@@ -201,7 +275,7 @@ void cedar::proc::gui::StepItem::Decoration::setSize(double sizeFactor)
   const qreal padding = 1;
   const qreal size = static_cast<qreal>(0.7)
                      * static_cast<qreal>(sizeFactor)
-                     * cedar::proc::gui::StepItem::mBaseDataSlotSize;
+                     * cedar::proc::gui::StepItem::M_BASE_DATA_SLOT_SIZE;
   QRectF new_dims = this->mpRectangle->rect();
   new_dims.setWidth(size + 2*padding);
   new_dims.setHeight(size + 2*padding);
@@ -319,7 +393,7 @@ void cedar::proc::gui::StepItem::updateStepState()
     case cedar::proc::Step::STATE_RUNNING:
       if (this->mRunTimeMeasurementTimerId == 0)
       {
-        this->mRunTimeMeasurementTimerId = this->startTimer(1000); //!@todo Add option to change the frequency
+        this->mRunTimeMeasurementTimerId = this->startTimer(1000);
       }
     default:
       this->setOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor);
@@ -348,7 +422,7 @@ void cedar::proc::gui::StepItem::redraw()
 
 void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 {
-  switch (cedar::proc::gui::Settings::instance().getDefaultDisplayMode())
+  switch (cedar::proc::gui::SettingsSingleton::getInstance()->getDefaultDisplayMode())
   {
     case cedar::proc::gui::Settings::StepDisplayMode::ICON_ONLY:
       this->setDisplayMode(cedar::proc::gui::StepItem::DisplayMode::ICON_ONLY);
@@ -377,21 +451,7 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
   cedar::proc::ConstElementDeclarationPtr elem_decl
     = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(this->mClassId);
 
-
-  //!@todo This code is redundant with code in ElementClassList; unify
-  QResource ex_test(QString::fromStdString(elem_decl->getIconPath()));
-  if (ex_test.isValid())
-  {
-    this->mStepIcon = QIcon(QString::fromStdString(elem_decl->getIconPath()));
-    if (this->mStepIcon.isNull())
-    {
-      this->mStepIcon = QIcon(":/steps/no_icon.svg");
-    }
-  }
-  else
-  {
-    this->mStepIcon = QIcon(":/steps/broken_icon.svg");
-  }
+  this->mStepIcon = elem_decl->getIcon();
 
   this->addDataItems();
   this->addTriggerItems();
@@ -446,6 +506,30 @@ void cedar::proc::gui::StepItem::addDecorations()
         this,
         ":/decorations/looped.svg",
         "This step is looped, i.e., it expects to be connected to a looped trigger."
+      )
+    );
+
+    this->mDecorations.push_back(decoration);
+  }
+
+  auto declaration = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->getElement());
+
+  if (declaration->isDeprecated())
+  {
+    std::string dep_msg = "This step is deprecated.";
+
+    if (!declaration->getDeprecationDescription().empty())
+    {
+      dep_msg += " " + declaration->getDeprecationDescription();
+    }
+
+    DecorationPtr decoration
+    (
+      new Decoration
+      (
+        this,
+        ":/cedar/auxiliaries/gui/warning.svg",
+        QString::fromStdString(dep_msg)
       )
     );
 
@@ -556,7 +640,6 @@ void cedar::proc::gui::StepItem::updateAttachedItems()
 
 void cedar::proc::gui::StepItem::updateDataSlotPositions()
 {
-  qreal padding = static_cast<qreal>(3);
   qreal style_factor;
 
   switch (this->mDisplayMode)
@@ -572,16 +655,16 @@ void cedar::proc::gui::StepItem::updateDataSlotPositions()
   std::map<cedar::proc::DataRole::Id, QPointF> add_directions;
   std::map<cedar::proc::DataRole::Id, qreal> data_slot_size;
 
-  data_slot_size[cedar::proc::DataRole::BUFFER] = mBaseDataSlotSize * static_cast<qreal>(0.75) * style_factor;
+  data_slot_size[cedar::proc::DataRole::BUFFER] = M_BASE_DATA_SLOT_SIZE * static_cast<qreal>(0.75) * style_factor;
   add_directions[cedar::proc::DataRole::BUFFER] = QPointF(1, 0);
-  add_origins[cedar::proc::DataRole::BUFFER] = QPointF(0, -padding - data_slot_size[cedar::proc::DataRole::BUFFER]);
+  add_origins[cedar::proc::DataRole::BUFFER] = QPointF(0, -M_DATA_SLOT_PADDING - data_slot_size[cedar::proc::DataRole::BUFFER]);
 
-  data_slot_size[cedar::proc::DataRole::INPUT] = mBaseDataSlotSize * style_factor;
-  add_origins[cedar::proc::DataRole::INPUT] = QPointF(-padding - data_slot_size[cedar::proc::DataRole::INPUT], 0);
+  data_slot_size[cedar::proc::DataRole::INPUT] = M_BASE_DATA_SLOT_SIZE * style_factor;
+  add_origins[cedar::proc::DataRole::INPUT] = QPointF(-M_DATA_SLOT_PADDING - data_slot_size[cedar::proc::DataRole::INPUT], 0);
   add_directions[cedar::proc::DataRole::INPUT] = QPointF(0, 1);
 
-  data_slot_size[cedar::proc::DataRole::OUTPUT] = mBaseDataSlotSize * style_factor;
-  add_origins[cedar::proc::DataRole::OUTPUT] = QPointF(this->width() + padding, 0);
+  data_slot_size[cedar::proc::DataRole::OUTPUT] = M_BASE_DATA_SLOT_SIZE * style_factor;
+  add_origins[cedar::proc::DataRole::OUTPUT] = QPointF(this->width() + M_DATA_SLOT_PADDING, 0);
   add_directions[cedar::proc::DataRole::OUTPUT] = QPointF(0, 1);
 
   for (DataSlotMap::iterator role_it = mSlotMap.begin(); role_it != mSlotMap.end(); ++role_it)
@@ -599,21 +682,27 @@ void cedar::proc::gui::StepItem::updateDataSlotPositions()
 
     const QPointF& origin = add_origins[role];
     const QPointF& direction = add_directions[role];
-    qreal slot_size = data_slot_size[role];
 
     try
     {
-      qreal count = 0;
+      QPointF current_origin = QPointF(0, 0);
       const cedar::proc::Step::SlotList& slotmap = this->mStep->getOrderedDataSlots(role);
       for (cedar::proc::Step::SlotList::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
         const std::string& slot_name = (*iter)->getName();
         CEDAR_DEBUG_ASSERT(slot_item_map.find(slot_name) != slot_item_map.end());
+
         cedar::proc::gui::DataSlotItem *p_item = slot_item_map[slot_name];
+
+        qreal slot_size = data_slot_size[role] * p_item->getMagneticScale();
+        qreal size_diff = slot_size - data_slot_size[role];
+
         p_item->setWidth(slot_size);
         p_item->setHeight(slot_size);
-        p_item->setPos(origin + count * direction * (slot_size + padding));
-        count += static_cast<qreal>(1.0);
+        qreal x = origin.x();
+        qreal y = origin.y();
+        p_item->setPos(QPointF(x - size_diff, y) + current_origin);
+        current_origin += direction * (slot_size + M_DATA_SLOT_PADDING);
       }
     }
     catch(const cedar::proc::InvalidRoleException&)
@@ -652,11 +741,11 @@ cedar::proc::gui::DataSlotItem const* cedar::proc::gui::StepItem::getSlotItem
   DataSlotNameMap::const_iterator iter = role_map->second.find(name);
   if (iter == role_map->second.end())
   {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "No slot item named \"" + name +
-                                                   "\" found for role "
-                                                   + cedar::proc::DataRole::type().get(role).prettyString()
-                                                   + " in StepItem for step \"" + this->mStep->getName() + "\"."
-                                                   );
+    CEDAR_THROW(cedar::aux::InvalidNameException, "No slot item named \"" + name +
+                                                  "\" found for role "
+                                                  + cedar::proc::DataRole::type().get(role).prettyString()
+                                                  + " in StepItem for step \"" + this->mStep->getName() + "\"."
+                                                  );
   }
 
   return iter->second;
@@ -767,7 +856,6 @@ void cedar::proc::gui::StepItem::showPlot
   std::string title
 )
 {
-  //!@todo It would be better if setting the title would be part of the actual widget
   if (title.empty())
   {
     title = slot->getText();
@@ -793,9 +881,26 @@ void cedar::proc::gui::StepItem::openProperties()
   p_widget->show();
 }
 
+void cedar::proc::gui::StepItem::openActionsDock()
+{
+  QWidget* p_actions = new QWidget();
+  QVBoxLayout* p_layout = new QVBoxLayout();
+  const cedar::proc::Step::ActionMap& map = this->mStep->getActions();
+  for (cedar::proc::Step::ActionMap::const_iterator iter = map.begin(); iter != map.end(); ++iter)
+  {
+    QPushButton* p_button = new QPushButton(iter->first.c_str());
+    p_layout->addWidget(p_button);
+    QObject::connect(p_button, SIGNAL(clicked()), this, SLOT(handleExternalActionButtons()));
+  }
+
+  p_actions->setLayout(p_layout);
+  std::string title = "Actions of step \"" + this->mStep->getName() + "\"";
+  auto p_widget = this->createDockWidget(title, p_actions);
+  p_widget->show();
+}
+
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
-  //!@todo Would be nice to have icons for these actions
   cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
   CEDAR_DEBUG_ASSERT(p_scene);
 
@@ -821,7 +926,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
-  QAction *p_properties = menu.addAction("open properties widget");
+  QAction* p_properties = menu.addAction("open properties widget");
   QObject::connect(p_properties, SIGNAL(triggered()), this, SLOT(openProperties()));
   p_properties->setIcon(QIcon(":/menus/properties.svg"));
 
@@ -845,6 +950,8 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     {
       p_actions_menu->addAction(iter->first.c_str());
     }
+    p_actions_menu->addSeparator();
+    p_actions_menu->addAction("open actions dock");
   }
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
@@ -914,7 +1021,6 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     }
     catch (const cedar::aux::gui::InvalidPlotData& e)
     {
-      //!@todo this should be a call to an ide function
       cedar::aux::LogSingleton::getInstance()->warning
       (
         e.exceptionInfo(),
@@ -930,7 +1036,15 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   else if (a->parentWidget() == p_actions_menu)
   {
     std::string action = a->text().toStdString();
-    this->mStep->callAction(action);
+    // decide whether this is a normal action or the docking action
+    if (action != "open actions dock")
+    {
+      this->mStep->callAction(action);
+    }
+    else
+    {
+      this->openActionsDock();
+    }
   }
   // advanced plots
   else if (advanced_plot_map.find(a) != advanced_plot_map.end())
@@ -950,7 +1064,6 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     }
     catch (const cedar::aux::gui::InvalidPlotData& e)
     {
-      //!@todo this should be a call to an ide function
       cedar::aux::LogSingleton::getInstance()->warning
       (
         e.exceptionInfo(),
@@ -1156,6 +1269,7 @@ QWidget* cedar::proc::gui::StepItem::createDockWidget(const std::string& title, 
     QWidget* p_widget = new QWidget();
     p_widget->setWindowTitle(QString::fromStdString(title));
     auto p_layout = new QVBoxLayout();
+    p_layout->setContentsMargins(2, 2, 2, 2);
     p_layout->addWidget(pPlot);
     p_widget->setLayout(p_layout);
     return p_widget;
@@ -1281,7 +1395,7 @@ void cedar::proc::gui::StepItem::multiplot
         );
       }
     }
-    catch (const cedar::proc::InvalidNameException& e)
+    catch (const cedar::aux::InvalidNameException& e)
     {
       if (!iter->mIgnoreIfMissing)
       {
@@ -1323,8 +1437,6 @@ void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGrap
 {
   painter->save(); // save current painter settings
 
-  //! @todo make drawing of steps pretty.
-
   qreal padding;
 
   switch (this->mDisplayMode)
@@ -1357,4 +1469,10 @@ cedar::proc::StepPtr cedar::proc::gui::StepItem::getStep()
 
 void cedar::proc::gui::StepItem::disconnect()
 {
+}
+
+void cedar::proc::gui::StepItem::handleExternalActionButtons()
+{
+  std::string action = cedar::aux::asserted_cast<QPushButton*>(QObject::sender())->text().toStdString();
+  this->mStep->callAction(action);
 }

@@ -61,6 +61,7 @@ namespace cedar
     CEDAR_DECLARE_DYN_CLASS(Preshape);
     CEDAR_DECLARE_DYN_CLASS(RateMatrixToSpaceCode);
     CEDAR_DECLARE_DYN_CLASS(RateToSpaceCode);
+    CEDAR_DECLARE_DYN_CLASS(SerialOrder);
     CEDAR_DECLARE_DYN_CLASS(SpaceToRateCode);
     //!@endcond
 

@@ -366,6 +366,8 @@ void cedar::proc::steps::ColorConversion::inputConnectionChanged(const std::stri
   this->updateCvConvertConstant();
 
   this->onTrigger();
+  this->emitOutputPropertiesChangedSignal("converted image");
+  this->onTrigger();
 }
 
 void cedar::proc::steps::ColorConversion::compute(const cedar::proc::Arguments& /* arguments */)

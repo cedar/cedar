@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -49,10 +49,10 @@ cedar::aux::EnumType<cedar::dev::sensors::camera::Decoding>
 //!@cond SKIPPED_DOCUMENTATION
 #ifndef CEDAR_COMPILER_MSVC
 const cedar::dev::sensors::camera::Decoding::Id cedar::dev::sensors::camera::Decoding::NONE;
-const cedar::dev::sensors::camera::Decoding::Id cedar::dev::sensors::camera::Decoding::BG_TO_BGR;
-const cedar::dev::sensors::camera::Decoding::Id cedar::dev::sensors::camera::Decoding::GB_TO_BGR;
-const cedar::dev::sensors::camera::Decoding::Id cedar::dev::sensors::camera::Decoding::RG_TO_BGR;
-const cedar::dev::sensors::camera::Decoding::Id cedar::dev::sensors::camera::Decoding::GR_TO_BGR;
+const cedar::dev::sensors::camera::Decoding::Id cedar::dev::sensors::camera::Decoding::FROM_BG;
+const cedar::dev::sensors::camera::Decoding::Id cedar::dev::sensors::camera::Decoding::FROM_GB;
+const cedar::dev::sensors::camera::Decoding::Id cedar::dev::sensors::camera::Decoding::FROM_RG;
+const cedar::dev::sensors::camera::Decoding::Id cedar::dev::sensors::camera::Decoding::FROM_GR;
 #endif // CEDAR_COMPILER_MSVC
 //!@endcond
 
@@ -69,22 +69,22 @@ void cedar::dev::sensors::camera::Decoding::construct()
                                       "NONE"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::camera::Decoding::BG_TO_BGR,
+                                      cedar::dev::sensors::camera::Decoding::FROM_BG,
                                       "BG_TO_BGR",
                                       "from blue/green"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::camera::Decoding::GB_TO_BGR,
+                                      cedar::dev::sensors::camera::Decoding::FROM_GB,
                                       "GB_TO_BGR",
                                       "from green/blue"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::camera::Decoding::RG_TO_BGR,
+                                      cedar::dev::sensors::camera::Decoding::FROM_RG,
                                       "RG_TO_BGR",
                                       "from red/green"
                                     ));
   mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::camera::Decoding::GR_TO_BGR,
+                                      cedar::dev::sensors::camera::Decoding::FROM_GR,
                                       "GR_TO_BGR",
                                       "from green/red"
                                     ));

@@ -45,14 +45,13 @@
 // SYSTEM INCLUDES
 #include <boost/function.hpp>
 #include <boost/enable_shared_from_this.hpp>
-
+#include <boost/signals2/connection.hpp>
+#include <boost/signals2/signal.hpp>
 
 /*!@brief This class represents data slots in connectable objects.
  *
  *        Connectable objects can have a number of DataSlots associated with them. These slots represent, e.g., inputs
  *        of the connectable and are used to define what data a connectable expects as input.
- *
- * @todo The design of having a parent and returning a shared pointer to connect two slots is not perfect.
  */
 class cedar::proc::DataSlot
 :
@@ -86,6 +85,7 @@ public:
     VALIDITY_UNKNOWN
   };
 
+  //! Type of the function that is called for type checks.
   typedef
     boost::function<VALIDITY (cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr)>
     TypeCheckFunction;
@@ -184,6 +184,15 @@ public:
    */
   cedar::proc::DataSlot::VALIDITY checkValidityOf(cedar::aux::ConstDataPtr data) const;
 
+  //! connect to the validity changed signal
+  inline boost::signals2::connection connectToValidityChangedSignal
+                                     (
+                                       boost::function<void ()> slot
+                                     )
+  {
+    return this->mValidityChanged.connect(slot);
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -207,6 +216,9 @@ private:
 protected:
   //! The parent that owns the slot.
   cedar::proc::Connectable* mpParent;
+
+  //! Signal that is emitted when the validity of the data slot changes.
+  boost::signals2::signal<void ()> mValidityChanged;
 
 private:
   //!@brief flag if this slot must be connected

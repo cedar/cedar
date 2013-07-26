@@ -225,14 +225,14 @@ void cedar::dev::sensors::visual::Grabber::doCleanUp()
                                              );
     mCleanUpAlreadyDone = true;
 
-    // stopGrabber LoopedThread
-    if (isRunning())
+    // stop LoopedThread
+    if (this->isRunning())
     {
       cedar::aux::LoopedThread::stop();
       this->wait();
     }
 
-    // stopGrabber Recording
+    // stop Recording
     stopRecording();
 
     // do the cleanup in derived class
@@ -364,7 +364,7 @@ void cedar::dev::sensors::visual::Grabber::closeGrabber()
 
   if (this->isRunning())
   {
-    this->stopGrabber();
+    this->stop();
   }
 
   // close the grabber-things in the derived class
@@ -403,11 +403,11 @@ double cedar::dev::sensors::visual::Grabber::getFramerate() const
 
 void cedar::dev::sensors::visual::Grabber::setFramerate(double fps)
 {
-  bool wasRunning = isRunning();
+  bool wasRunning = this->isRunning();
 
   if (wasRunning)
   {
-    stopGrabber();
+    this->stop();
 
     cedar::aux::LogSingleton::getInstance()->debugMessage
                                              (
@@ -423,11 +423,11 @@ void cedar::dev::sensors::visual::Grabber::setFramerate(double fps)
 
   if (wasRunning)
   {
-    startGrabber();
+    this->start();
   }
 
   std::string info;
-  if (isRunning())
+  if (this->isRunning())
   {
     info =  ": Thread running";
   }
@@ -442,18 +442,15 @@ void cedar::dev::sensors::visual::Grabber::setFramerate(double fps)
                                            );
 }
 
-void cedar::dev::sensors::visual::Grabber::stopGrabber()
+void cedar::dev::sensors::visual::Grabber::applyStop(bool)
 {
-  if (this->isRunning())
-  {
-    this->LoopedThread::stop();
-    cedar::aux::LogSingleton::getInstance()->debugMessage
-                                             (
-                                               this->getName() + ": Grabbing stopped",
-                                               "cedar::dev::sensors::visual::Grabber::stopGrabber()"
-                                             );
-    mFpsMeasured = 0;
-  }
+  cedar::aux::LogSingleton::getInstance()->debugMessage
+                                           (
+                                             this->getName() + ": Grabbing stopped",
+                                             "cedar::dev::sensors::visual::Grabber::stop()"
+                                           );
+  mFpsMeasured = 0;
+
   if (mRecording)
   {
     this->stopRecording();
@@ -470,7 +467,7 @@ void cedar::dev::sensors::visual::Grabber::setIsGrabbing(bool isGrabbing)
   mpLockIsGrabbing->unlock();
 }
 
-void cedar::dev::sensors::visual::Grabber::startGrabber()
+void cedar::dev::sensors::visual::Grabber::applyStart()
 {
   mpLockIsGrabbing->lockForWrite();
   mIsGrabbing = true;
@@ -479,12 +476,11 @@ void cedar::dev::sensors::visual::Grabber::startGrabber()
   mFpsMeasured = 0;
   mFpsCounter = 0;
   mFpsMeasureStart = boost::posix_time::microsec_clock::local_time();
-  LoopedThread::start();
   cedar::aux::LogSingleton::getInstance()->debugMessage
                                            (
                                              this->getName() + ": Grabbing started with "
                                                + cedar::aux::toString(getFramerate()) + " FPS.",
-                                             "cedar::dev::sensors::visual::Grabber::startGrabber()"
+                                             "cedar::dev::sensors::visual::Grabber::start()"
                                            );
 }
 
@@ -872,10 +868,10 @@ void cedar::dev::sensors::visual::Grabber::startRecording
     CEDAR_THROW(cedar::dev::sensors::visual::GrabberRecordingException,msg);
   }
 
-  // startGrabber the grabberthread if needed
+  // start the grabberthread if needed
   if (!mIsGrabbing)
   {
-    if (!isRunning() && startThread)
+    if (!this->isRunning() && startThread)
     {
       cedar::aux::LogSingleton::getInstance()->message
                                                (
@@ -883,7 +879,7 @@ void cedar::dev::sensors::visual::Grabber::startRecording
                                                  "cedar::dev::sensors::visual::Grabber::startRecording()"
                                                );
       mGrabberThreadStartedOnRecording = true;
-      startGrabber();
+      this->start();
     }
   }
 }
@@ -895,7 +891,7 @@ void cedar::dev::sensors::visual::Grabber::stopRecording()
     mRecording = false;
     if (mGrabberThreadStartedOnRecording)
     {
-      stopGrabber();
+      this->stop();
       mGrabberThreadStartedOnRecording = false;
       cedar::aux::LogSingleton::getInstance()->debugMessage
                                                (

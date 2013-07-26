@@ -138,6 +138,8 @@ void cedar::proc::steps::MatrixTypeConverter::inputConnectionChanged(const std::
   this->mConverted->copyAnnotationsFrom(this->mMatrix);
 
   this->onTrigger();
+  this->emitOutputPropertiesChangedSignal("converted matrix");
+  this->onTrigger();
 }
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::MatrixTypeConverter::determineInputValidity

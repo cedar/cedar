@@ -266,13 +266,16 @@ public:
     this->handleTriggerModeChange();
   }
 
+  //! select all items
+  void selectAll();
+
+  //! deselect all items
+  void selectNone();
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals
   //--------------------------------------------------------------------------------------------------------------------
 signals:
-  /*!@brief Signal that is emitted when an exception occurs.
-   */
-  void exception(const QString& message);
   /*!@brief Signal that is emitted when the current mode finishes, e.g., when a connection has been made.
    */
   void modeFinished();

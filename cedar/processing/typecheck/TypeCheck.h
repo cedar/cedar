@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011, 2012 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -94,6 +94,10 @@ public:
     return this->mReturnedOnFail;
   }
 
+  /*! Performs the type check for the given slot and data object.
+   *
+   *  @see check(cedar::proc::ConstDataSlotPtr, cedar::aux::ConstDataPtr)
+   */
   cedar::proc::DataSlot::VALIDITY operator()(cedar::proc::ConstDataSlotPtr slot, cedar::aux::ConstDataPtr data) const
   {
     return this->check(slot, data);

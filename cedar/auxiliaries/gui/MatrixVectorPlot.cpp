@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -232,7 +232,6 @@ void cedar::aux::gui::MatrixVectorPlot::doAppend(cedar::aux::ConstDataPtr data, 
 
   this->buildArrays(plot_series, num);
 
-  //!@todo write a macro that does this check (see HistoryPlot0D.cpp)
 #if (QWT_VERSION >> 16) == 5
   plot_series->mpCurve->setData(&plot_series->mXValues.at(0), &plot_series->mYValues.at(0), num);
 #elif (QWT_VERSION >> 16) == 6
@@ -244,7 +243,7 @@ void cedar::aux::gui::MatrixVectorPlot::doAppend(cedar::aux::ConstDataPtr data, 
 
   mpLock->unlock();
 
-  this->startTimer(30); //!@todo make the refresh time configurable.
+  this->startTimer(30);
 }
 
 void cedar::aux::gui::MatrixVectorPlot::attachMarker(QwtPlotMarker *pMarker)
@@ -265,7 +264,7 @@ void cedar::aux::gui::MatrixVectorPlot::plot(cedar::aux::ConstDataPtr data, cons
 
   this->append(data, title);
 
-  this->startTimer(30); //!@todo make the refresh time configurable.
+  this->startTimer(30);
 }
 
 void cedar::aux::gui::MatrixVectorPlot::init()
@@ -405,7 +404,6 @@ void cedar::aux::gui::MatrixVectorPlot::timerEvent(QTimerEvent * /* pEvent */)
     series->mYValues.at(1) = cedar::aux::math::getMatrixEntry<double>(mat, 1);
     series->mMatData->unlock();
 
-    //!@todo put the enum values for x and y in vectors
     for (unsigned int i = 0; i < 2; ++i)
     {
       QwtScaleDiv* p_lower;
@@ -437,7 +435,6 @@ void cedar::aux::gui::MatrixVectorPlot::timerEvent(QTimerEvent * /* pEvent */)
     }
 
     // choose the right function depending on the qwt version
-    //!@todo write a macro that does this check (see HistoryPlot0D.cpp)
 #if (QWT_VERSION >> 16) == 5
     series->mpCurve->setData
     (

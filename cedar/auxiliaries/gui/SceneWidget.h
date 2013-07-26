@@ -55,7 +55,6 @@
  * object can be changed by spin boxes. Objects can be deleted from and added to the scene.
  *
  * @remarks Not all functionalities are implemented yet.
- * @todo completely overhaul this widget!
  */
 class cedar::aux::gui::SceneWidget : public cedar::aux::gui::BaseWidget, private Ui_SceneWidget
 {

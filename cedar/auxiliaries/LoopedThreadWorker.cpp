@@ -1,6 +1,6 @@
 /*=============================================================================
 
-    Copyright 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
     This file is part of cedar.
 
@@ -42,6 +42,8 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/units/Time.h"
 
 cedar::aux::detail::LoopedThreadWorker::LoopedThreadWorker(cedar::aux::LoopedThread *wrapper) 
 : mpWrapper(wrapper)
@@ -55,8 +57,6 @@ cedar::aux::detail::LoopedThreadWorker::~LoopedThreadWorker()
 
 void cedar::aux::detail::LoopedThreadWorker::work()
 {
-  // TODO: check whether wrapper (mpWrapper) still exists (paranoid)
-
   if (safeStopRequested())
     return; // stop() was called right after start() 
 
@@ -66,7 +66,7 @@ void cedar::aux::detail::LoopedThreadWorker::work()
   initStatistics();
 
   // which mode?
-  switch ( mpWrapper->getLoopModeParameter() )
+  switch (mpWrapper->getLoopModeParameter())
   {
     case cedar::aux::LoopMode::RealTime:
     {
@@ -82,7 +82,7 @@ void cedar::aux::detail::LoopedThreadWorker::work()
         time_difference = getLastTimeStepEnd() - getLastTimeStepStart();
         
         mpWrapper->step(time_difference.total_microseconds() * 0.001);
-        usleep(static_cast<unsigned int>(1000 * mpWrapper->getIdleTimeParameter() + 0.5));
+        cedar::aux::sleep(cedar::unit::Milliseconds(static_cast<unsigned int>(mpWrapper->getIdleTimeParameter() + 0.5)));
       }
       break;
     }
@@ -91,15 +91,15 @@ void cedar::aux::detail::LoopedThreadWorker::work()
       while (!safeStopRequested())
       {
         mpWrapper->step(mpWrapper->getSimulatedTimeParameter());
-        usleep(static_cast<unsigned int>(1000 * mpWrapper->getIdleTimeParameter() + 0.5));
+        cedar::aux::sleep(cedar::unit::Milliseconds(static_cast<unsigned int>(mpWrapper->getIdleTimeParameter() + 0.5)));
       }
       break;
     }
     case cedar::aux::LoopMode::Fixed:
     {
+      // this might happen because the widget cuts off non-displayable decimals
       if (step_size.total_milliseconds() == 0)
       {
-        //!@todo We may want to just prevent setting this value
         cedar::aux::LogSingleton::getInstance()->warning
         (
           "Step size is zero in cedar::aux::LoopMode::Fixed, defaulting to one millisecond.",
@@ -114,7 +114,7 @@ void cedar::aux::detail::LoopedThreadWorker::work()
       setLastTimeStepEnd( getLastTimeStepStart() );
       scheduled_wakeup = getLastTimeStepEnd() + step_size;
 
-      //!@todo Should this really be here?
+      // this makes sure that every thread has a different random seed
       srand(boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds());
 
       // some auxiliary variables
@@ -125,7 +125,7 @@ void cedar::aux::detail::LoopedThreadWorker::work()
       {
         // sleep until next wake up time
         sleep_duration = scheduled_wakeup - boost::posix_time::microsec_clock::universal_time();
-        usleep(std::max<int>(0, sleep_duration.total_microseconds()));
+        cedar::aux::sleep(cedar::unit::Microseconds(std::max<int>(0, sleep_duration.total_microseconds())));
       
         if (safeStopRequested())
           break;
@@ -199,7 +199,7 @@ void cedar::aux::detail::LoopedThreadWorker::work()
         // call step function
         mpWrapper->step(steps_taken * step_size.total_microseconds() * 0.001);
 
-        if (safeStopRequested()) // a lot can happen in a step() // TODO: locking
+        if (safeStopRequested()) // a lot can happen in a step() //!@todo locking
           break;
 
         // schedule the next wake up
@@ -291,20 +291,24 @@ boost::posix_time::time_duration cedar::aux::detail::LoopedThreadWorker::getLast
 {
   QReadLocker locker1(&mLastTimeStepStartLock);
   QReadLocker locker2(&mLastTimeStepEndLock);
+  
+  boost::posix_time::time_duration difference = mLastTimeStepStart - mLastTimeStepEnd;
 
-  return mLastTimeStepStart - mLastTimeStepEnd;
+  return difference;
 }
 
 unsigned long cedar::aux::detail::LoopedThreadWorker::getNumberOfSteps()
 {
   QReadLocker locker(&mNumberOfStepsLock);
-  return mNumberOfSteps;
+  unsigned long value = mNumberOfSteps;
+  return value;
 }
 
 double cedar::aux::detail::LoopedThreadWorker::getMaxStepsTaken()
 {
   QReadLocker locker(&mMaxStepsTakenLock);
-  return mMaxStepsTaken;
+  double value = mMaxStepsTaken;
+  return value;
 }
 
 void cedar::aux::detail::LoopedThreadWorker::safeRequestStop()

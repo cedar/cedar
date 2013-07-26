@@ -200,6 +200,12 @@ public:
     const std::string& toSlot
   ) const;
 
+  //! Resizes slots that are close to the mouse pointer in connection mode.
+  void magnetizeSlots(const QPointF& mousePositionInScene);
+
+  //! Removes all effects of magnetization
+  void demagnetizeSlots();
+
 public slots:
   //!@brief handles changes in the state of a step (e.g. from error to non-error state)
   void updateStepState();
@@ -223,6 +229,10 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
+private slots:
+  //! Slot that triggers an action based on a button in the action widget that can be opened for a step item.
+  void handleExternalActionButtons();
+
 private:
   void emitStepStateChanged();
 
@@ -301,11 +311,20 @@ private slots:
 
   void openProperties();
 
+  void openActionsDock();
+
   void plotAll();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  //! The base size of data slots (modified by display mode and other factors).
+  static const qreal M_BASE_DATA_SLOT_SIZE;
+
+  //! Amount of padding between data slots.
+  static const qreal M_DATA_SLOT_PADDING;
+
 protected:
   // none yet
 private:
@@ -329,9 +348,6 @@ private:
 
   //! The height of newly created steps.
   static const qreal mDefaultHeight;
-
-  //! The height of newly created steps.
-  static const qreal mBaseDataSlotSize;
 
   boost::signals2::connection mSlotAddedConnection;
   boost::signals2::connection mSlotRemovedConnection;

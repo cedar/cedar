@@ -1,6 +1,6 @@
 /*======================================================================================================================
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+    Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
     This file is part of cedar.
 
@@ -107,17 +107,16 @@ public:
   static const Id NONE = 0;
 
   /// Apply  bayer filter Blue-Green to BGR
-  /// @todo change constants to FROM_BG, FROM_GB...
-  static const Id BG_TO_BGR = CV_BayerBG2BGR; //= 46;
+  static const Id FROM_BG = CV_BayerBG2BGR;
 
   /// Apply  bayer filter Green-Blue to BGR
-  static const Id GB_TO_BGR = CV_BayerGB2BGR; // = 47;
+  static const Id FROM_GB = CV_BayerGB2BGR;
 
   /// Apply  bayer filter Red-Green to BGR
-  static const Id RG_TO_BGR = CV_BayerRG2BGR; // = 48;
+  static const Id FROM_RG = CV_BayerRG2BGR;
 
   /// Apply  bayer filter Green-Red to BGR
-  static const Id GR_TO_BGR = CV_BayerGR2BGR; // = 49;
+  static const Id FROM_GR = CV_BayerGR2BGR;
 
 protected:
   // none yet

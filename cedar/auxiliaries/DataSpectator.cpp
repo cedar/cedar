@@ -83,7 +83,7 @@ void cedar::aux::DataSpectator::applyStart()
   writeHeader();
 }
 
-void cedar::aux::DataSpectator::applyStop(bool suppressWarning)
+void cedar::aux::DataSpectator::applyStop(bool/* suppressWarning*/)
 {
   writeAllRecordData();
   {

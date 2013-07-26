@@ -48,8 +48,6 @@
 #endif // CEDAR_OS_WINDOWS
 
 /*!@brief A class that encapsulates the OS dependent functionality for dynamically loading libraries.
- *
- * @todo In the long run, this should be moved into aux, along with proc::Manager as a more generalized PluginManager.
  */
 class cedar::proc::PluginProxy
 {

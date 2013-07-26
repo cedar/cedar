@@ -82,7 +82,8 @@ _mWidths
     1,
     std::numeric_limits<unsigned int>::max()
   )
-)/*, @todo This!
+)
+/*
 _mShifts
 (
   new cedar::aux::IntVectorParameter

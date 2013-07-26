@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/Settings.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -151,7 +152,10 @@ void cedar::aux::gui::PropertyPane::display(cedar::aux::ConfigurablePtr pConfigu
 
   std::string label = this->getInstanceTypeId(pConfigurable);
 #ifdef DEBUG
-  label += " " + cedar::aux::toString(pConfigurable.get());
+  if (cedar::aux::SettingsSingleton::getInstance()->getMemoryDebugOutput())
+  {
+    label += " " + cedar::aux::toString(pConfigurable.get());
+  }
 #endif // DEBUG
   this->addLabelRow(label);
 
@@ -272,7 +276,6 @@ void cedar::aux::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterPtr para
         = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter)->allocateRaw();
       p_widget->setParent(this);
       p_widget->setParameter(parameter);
-      p_widget->setEnabled(!parameter->isConstant());
       this->setCellWidget(row, 1, p_widget);
       this->resizeRowToContents(row);
 

@@ -128,7 +128,7 @@ void cedar::aux::Recorder::applyStart()
 
 }
 
-void cedar::aux::Recorder::applyStop(bool suppressWarning)
+void cedar::aux::Recorder::applyStop(bool /*suppressWarning*/)
 {
   //Stop all DataSpectators.They will automatically write all containing data to file.
   mDataSpectatorCollection.stopAll();

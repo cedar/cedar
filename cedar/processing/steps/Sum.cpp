@@ -105,7 +105,6 @@ void cedar::proc::steps::Sum::compute(const cedar::proc::Arguments&)
     this->mOutput->getData() *= 0;
     return;
   }
-  //!@todo this may be slow, as it may allocate a matrix on each compute()
   cv::Mat sum = cedar::aux::asserted_pointer_cast<cedar::aux::MatData>(this->mInputs->getData(0))->getData().clone();
   for (unsigned int data_id = 1; data_id < this->mInputs->getDataCount(); ++data_id)
   {
@@ -126,6 +125,11 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Sum::determineInputValidity
 
   if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
   {
+    if (mat_data->isEmpty())
+    {
+      return cedar::proc::DataSlot::VALIDITY_ERROR;
+    }
+
     if (this->mInputs->getDataCount() > 0)
     {
       const cv::Mat& first_mat
@@ -143,4 +147,11 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Sum::determineInputValidity
     // Everything else is rejected.
     return cedar::proc::DataSlot::VALIDITY_ERROR;
   }
+}
+
+void cedar::proc::steps::Sum::inputConnectionChanged(const std::string& /*inputName*/)
+{
+  this->onTrigger();
+  this->emitOutputPropertiesChangedSignal("sum");
+  this->onTrigger();
 }

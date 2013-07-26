@@ -334,6 +334,7 @@ void cedar::proc::steps::Resize::updateOutputMatrixSize()
   }
   cv::Mat new_output_mat = cv::Mat(size, &sizes.at(0), input.type(), cv::Scalar(0));
   this->mOutput->setData(new_output_mat);
+  this->emitOutputPropertiesChangedSignal("output");
 }
 
 void cedar::proc::steps::Resize::recompute()
