@@ -224,7 +224,7 @@ QVariant cedar::proc::gui::Network::itemChange(QGraphicsItem::GraphicsItemChange
 
 bool cedar::proc::gui::Network::sceneEventFilter(QGraphicsItem * pWatched, QEvent *pEvent)
 {
-  if(!dynamic_cast<cedar::proc::gui::GraphicsBase*>(pWatched))
+  if (!dynamic_cast<cedar::proc::gui::GraphicsBase*>(pWatched))
   {
     return cedar::proc::gui::GraphicsBase::sceneEventFilter(pWatched, pEvent);
   }
