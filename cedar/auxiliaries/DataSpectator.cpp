@@ -76,22 +76,20 @@ void cedar::aux::DataSpectator::step(double)
   record();
 }
 
-void cedar::aux::DataSpectator::start()
+void cedar::aux::DataSpectator::applyStart()
 {
   mOutputPath = cedar::aux::RecorderSingleton::getInstance()->getOutputDirectory() + "/" + mName;
   mpOutputStream->open(mOutputPath,std::ios::out | std::ios::app);
   writeHeader();
-  cedar::aux::LoopedThread::start();
 }
 
-void cedar::aux::DataSpectator::stop(unsigned int timeout /*= UINT_MAX*/, bool suppressWarning /*= false*/)
+void cedar::aux::DataSpectator::applyStop(bool suppressWarning)
 {
   writeAllRecordData();
   {
     QWriteLocker locker(mpOfstreamLock);
     mpOutputStream->close();
   }
-  cedar::aux::LoopedThread::stop(timeout, suppressWarning);
 }
 
 void cedar::aux::DataSpectator::writeHeader()

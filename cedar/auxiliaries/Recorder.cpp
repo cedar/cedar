@@ -101,7 +101,7 @@ void cedar::aux::Recorder::createOutputDirectory()
   boost::filesystem::create_directories(mOutputDirectory);
 }
 
-void cedar::aux::Recorder::start()
+void cedar::aux::Recorder::applyStart()
 {
 
   //Generate output directory
@@ -126,15 +126,10 @@ void cedar::aux::Recorder::start()
   mDataSpectatorCollection.startAll();
 
 
-  // Call start() from super class.
-  cedar::aux::LoopedThread::start();
 }
 
-void cedar::aux::Recorder::stop()
+void cedar::aux::Recorder::applyStop(bool suppressWarning)
 {
-  // Call stop() from super class. To stop writing data.
-  cedar::aux::LoopedThread::stop();
-
   //Stop all DataSpectators.They will automatically write all containing data to file.
   mDataSpectatorCollection.stopAll();
 

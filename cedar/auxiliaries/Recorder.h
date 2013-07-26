@@ -93,18 +93,7 @@ class cedar::aux::Recorder : public cedar::aux::LoopedThread
       *
       */
     void registerData(cedar::aux::DataPtr toSpectate,int recordIntv,std::string name);
-    /*!@brief Starts the recorder thread.
-     *
-     *              By calling start, every registered observer thread will automatically be started.
-     *              Additionally all files will be created and filled with headers.
-     */
-    void start();
 
-    /*!@brief Stops the recorder thread.
-     *
-     *              By calling stop, the calling thread waits until all recorded data has been written to disk.
-     */
-    void stop();
 
     //!@brief Sets the OutputDirectory
     void setOutputDirectory(std::string path);
@@ -119,6 +108,18 @@ class cedar::aux::Recorder : public cedar::aux::LoopedThread
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
   protected:
+   /*!@brief Starts the recorder thread.
+   *
+   *              By calling start, every registered observer thread will automatically be started.
+   *              Additionally all files will be created and filled with headers.
+   */
+  void applyStart();
+
+  /*!@brief Stops the recorder thread.
+   *
+   *              By calling stop, the calling thread waits until all recorded data has been written to disk.
+   */
+  void applyStop(bool suppressWarning);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
