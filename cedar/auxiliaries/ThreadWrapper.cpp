@@ -84,7 +84,7 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
   }
 
   // If other threads had already entered start() or stop(), _we_ wait:
-  QWriteLocker locker(&mGeneralAccessLock);
+  QMutexLocker locker(&mGeneralAccessLock);
   locker.unlock(); // never permanently lock _anything_ in the destructor!
                    // (there is always the possibility that a concurrent
                    // thread will wait for that lock to be released
@@ -174,7 +174,7 @@ void cedar::aux::ThreadWrapper::start()
                     // but may abort faster
 
   // make sure we only enter one and one only of start(), stop() at a time:
-  QWriteLocker locker(&mGeneralAccessLock);
+  QMutexLocker locker(&mGeneralAccessLock);
        
   if (mDestructing) // dont start the thread if we are in the destructor
     return;         // this if is neceassary
@@ -308,7 +308,7 @@ void cedar::aux::ThreadWrapper::quittedThreadSlot()
   {
     // if my own stop() is not running, then delete the pointers:
     // (this is a fall-back, if the thread was destroyed by any other means)
-    if (mGeneralAccessLock.tryLockForWrite())
+    if (mGeneralAccessLock.tryLock())
     {
       //std::cout << "deleting thread: " << mpThread << " ( current thread: " << QThread::currentThread() << ") in: " << this << std::endl;
 
@@ -370,7 +370,7 @@ void cedar::aux::ThreadWrapper::stop(unsigned int time, bool suppressWarning)
 
   // make sure we wait for a running start() or finishedThread() or
   // only enther stop() once:
-  QWriteLocker lockerGeneral(&mGeneralAccessLock);
+  QMutexLocker lockerGeneral(&mGeneralAccessLock);
 
   if (mDestructing) // see start()
     return;

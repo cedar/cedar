@@ -230,7 +230,7 @@ private:
   //! lock for the quittedThreadSlot
   mutable QMutex mFinishedThreadMutex;
   //! lock for start() and stop()
-  mutable QReadWriteLock mGeneralAccessLock; // todo: make a Mutex
+  mutable QMutex mGeneralAccessLock;
   //! lock for mStopRequested
   mutable QReadWriteLock mStopRequestedLock;
   //! lock pointer ops
