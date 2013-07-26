@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ExpSigmoid.cpp
+    File:        AbsSigmoid.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
@@ -35,7 +35,8 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/sigmoids/ExpSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h"
+#include "cedar/auxiliaries/math/sigmoids.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/Singleton.h"
 
@@ -44,21 +45,30 @@
 //----------------------------------------------------------------------------------------------------------------------
 // register class with the sigmoid factory manager
 //----------------------------------------------------------------------------------------------------------------------
+
 namespace
 {
   bool registered
-    = cedar::aux::math::TransferFunctionManagerSingleton::getInstance()->registerType<cedar::aux::math::ExpSigmoidPtr>();
+    = cedar::aux::math::TransferFunctionManagerSingleton::getInstance()->registerType<cedar::aux::math::AbsSigmoidPtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+//!@brief The standard constructor.
+cedar::aux::math::AbsSigmoid::AbsSigmoid(double threshold, double beta)
+:
+cedar::aux::math::Sigmoid(threshold),
+_mBeta(new cedar::aux::DoubleParameter(this, "beta", beta, cedar::aux::DoubleParameter::LimitType::positive()))
+{
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double cedar::aux::math::ExpSigmoid::compute(double value) const
+double cedar::aux::math::AbsSigmoid::compute(double value) const
 {
-  return cedar::aux::math::sigmoidExp(value, mBeta->getValue(), this->getThreshold());
+  return cedar::aux::math::sigmoidAbs(value, _mBeta->getValue(), this->getThreshold());
 }

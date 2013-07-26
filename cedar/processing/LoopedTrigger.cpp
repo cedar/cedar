@@ -106,7 +106,7 @@ mStopping(false)
 
 cedar::proc::LoopedTrigger::~LoopedTrigger()
 {
-  this->stopTrigger();
+  this->stop();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -145,7 +145,7 @@ void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr trigger
   }
 }
 
-void cedar::proc::LoopedTrigger::startTrigger()
+void cedar::proc::LoopedTrigger::applyStart()
 {
   QMutexLocker locker(&mStartingMutex);
 
@@ -170,7 +170,6 @@ void cedar::proc::LoopedTrigger::startTrigger()
     this->mListeners.at(i)->callOnStart();
   }
   CEDAR_NON_CRITICAL_ASSERT(!this->isRunning());
-  this->start();
 
   emit triggerStarted();
 
@@ -178,7 +177,7 @@ void cedar::proc::LoopedTrigger::startTrigger()
   mStarting = false;
 }
 
-void cedar::proc::LoopedTrigger::stopTrigger()
+void cedar::proc::LoopedTrigger::applyStop(bool)
 {
   QMutexLocker locker(&mStoppingMutex);
   if (!this->isRunning() || mStopping)
@@ -196,8 +195,6 @@ void cedar::proc::LoopedTrigger::stopTrigger()
   {
     QApplication::processEvents();
   }
-
-  this->stop();
 
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {

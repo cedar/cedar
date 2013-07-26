@@ -102,11 +102,13 @@ private:
   void onStart()
   {
     mStartCount += 1;
+    std::cout << "Step<" << this->getName() << ">::onStart() [n=" << this->mStartCount << "]" << std::endl;
   }
 
   void onStop()
   {
     mStopCount += 1;
+    std::cout << "Step<" << this->getName() << ">::onStop() [n=" << this->mStopCount << "]" << std::endl;
   }
 
   void compute(const cedar::proc::Arguments&)
@@ -144,7 +146,7 @@ int testStartingStopping()
   network->connectTrigger(trigger, step1);
   network->connectTrigger(trigger, step2);
 
-  trigger->startTrigger();
+  trigger->start();
 
   if (step1->mStartCount != 1)
   {
@@ -164,7 +166,7 @@ int testStartingStopping()
     ++errors;
   }
 
-  trigger->stopTrigger();
+  trigger->stop();
 
   if (step1->mStopCount != 1)
   {

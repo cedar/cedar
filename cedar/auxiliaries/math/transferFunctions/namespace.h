@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,43 +22,43 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        HeavisideSigmoid.cpp
+    File:        namespace.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 03 09
+    Date:        2013 07 23
 
-    Description:
+    Description: Namespace file for transfer functions in cedar::aux::math.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_AUX_MATH_TRANSFER_FUNCTIONS_NAMESPACE_H
+#define CEDAR_AUX_MATH_TRANSFER_FUNCTIONS_NAMESPACE_H
+
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/sigmoids/HeavisideSigmoid.h"
-#include "cedar/auxiliaries/FactoryManager.h"
-#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/math/namespace.h"
 
 // SYSTEM INCLUDES
+#include <boost/smart_ptr.hpp>
 
-//----------------------------------------------------------------------------------------------------------------------
-// register class with the sigmoid factory manager
-//----------------------------------------------------------------------------------------------------------------------
-namespace
+
+namespace cedar
 {
-  bool registered
-    = cedar::aux::math::TransferFunctionManagerSingleton::getInstance()->registerType<cedar::aux::math::HeavisideSigmoidPtr>();
+  namespace aux
+  {
+    namespace math
+    {
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_AUX_CLASS(AbsSigmoid);
+      CEDAR_DECLARE_AUX_CLASS(ExpSigmoid);
+      CEDAR_DECLARE_AUX_CLASS(HeavisideSigmoid);
+      CEDAR_DECLARE_AUX_CLASS(LinearTransferFunction);
+      CEDAR_DECLARE_AUX_CLASS(SemiLinearTransferFunction);
+      //!@endcond
+    }
+  }
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
-double cedar::aux::math::HeavisideSigmoid::compute(double value) const
-{
-  return cedar::aux::math::sigmoidHeaviside(value, this->getThreshold());
-}
+#endif // CEDAR_AUX_MATH_TRANSFER_FUNCTIONS_NAMESPACE_H

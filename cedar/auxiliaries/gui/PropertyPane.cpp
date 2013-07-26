@@ -276,7 +276,6 @@ void cedar::aux::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterPtr para
         = cedar::aux::gui::ParameterFactorySingleton::getInstance()->get(parameter)->allocateRaw();
       p_widget->setParent(this);
       p_widget->setParameter(parameter);
-      p_widget->setEnabled(!parameter->isConstant());
       this->setCellWidget(row, 1, p_widget);
       this->resizeRowToContents(row);
 

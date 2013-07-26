@@ -221,7 +221,7 @@ int main(int argc, char* argv[])
 
   //stop grabbing-thread if running
   //recording will also be stopped
-  p_grabber->stopGrabber();
+  p_grabber->stop();
 
   //delete p_grabber is done via the shared-pointer class
   std::cout << "finished\n";

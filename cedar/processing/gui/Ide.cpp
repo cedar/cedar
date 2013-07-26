@@ -774,6 +774,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
     p_layout->addWidget(p_intro_label);
 
     QListWidget* p_error_widget = new QListWidget();
+    p_error_widget->setWordWrap(true);
     p_layout->addWidget(p_error_widget);
 
     for (size_t i = 0; i < e.getMessages().size(); ++i)
