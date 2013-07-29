@@ -1257,6 +1257,7 @@ QWidget* cedar::proc::gui::StepItem::createDockWidget(const std::string& title, 
   if (this->mpMainWindow)
   {
     QDockWidget *p_dock = new QDockWidget(QString::fromStdString(title), this->mpMainWindow);
+    p_dock->setAttribute(Qt::WA_DeleteOnClose, true);
     p_dock->setFloating(true);
     p_dock->setContentsMargins(0, 0, 0, 0);
     p_dock->setAllowedAreas(Qt::NoDockWidgetArea);
@@ -1267,6 +1268,7 @@ QWidget* cedar::proc::gui::StepItem::createDockWidget(const std::string& title, 
   else
   {
     QWidget* p_widget = new QWidget();
+    p_widget->setAttribute(Qt::WA_DeleteOnClose, true);
     p_widget->setWindowTitle(QString::fromStdString(title));
     auto p_layout = new QVBoxLayout();
     p_layout->setContentsMargins(2, 2, 2, 2);
