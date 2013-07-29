@@ -528,6 +528,7 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element, std::string inst
 
 // part of the cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements) function
 // put here because older gcc versions won't be able to compile this otherwise
+//!@cond SKIPPED_DOCUMENTATION
 struct DataConnectionInfo
 {
   DataConnectionInfo(const std::string& dataFrom, const std::string& dataTo)
@@ -554,7 +555,6 @@ struct PromotedConnectionInfo
   std::string to;
 };
 
-
 struct TriggerConnectionInfo
 {
   TriggerConnectionInfo(cedar::proc::TriggerPtr dataFrom, cedar::proc::TriggerablePtr dataTo)
@@ -567,6 +567,7 @@ struct TriggerConnectionInfo
   cedar::proc::TriggerPtr from;
   cedar::proc::TriggerablePtr to;
 };
+//!@endcond
 
 void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
 {
