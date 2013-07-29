@@ -303,7 +303,7 @@ private:
 
   void addDataItemFor(cedar::proc::DataSlotPtr slot);
 
-  QWidget* createDockWidget(const std::string& title, QWidget* pPlot) const;
+  QWidget* createDockWidget(const std::string& title, QWidget* pPlot);
 
   void addPlotAllAction(QMenu& menu, const QPoint& plotPosition);
 
@@ -341,7 +341,7 @@ private:
   std::vector<cedar::proc::gui::TriggerItem*> mTriggers;
 
   //!@brief a vector of all child widgets fo the current step
-  mutable std::vector<QWidget*> mChildWidgets;
+  std::vector<QWidget*> mChildWidgets;
 
   //!@brief Identifier of the timer used for updating the run time measurements.
   int mRunTimeMeasurementTimerId;
