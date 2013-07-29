@@ -1281,6 +1281,10 @@ QWidget* cedar::proc::gui::StepItem::createDockWidget(const std::string& title, 
     p_layout->setContentsMargins(2, 2, 2, 2);
     p_layout->addWidget(pPlot);
     p_widget->setLayout(p_layout);
+
+    mChildWidgets.push_back(p_widget);
+    QObject::connect(p_widget, SIGNAL(destroyed()), this, SLOT(removeChildWidget()));
+
     return p_widget;
   }
 }
