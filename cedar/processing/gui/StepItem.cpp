@@ -177,6 +177,10 @@ cedar::proc::gui::StepItem::Decoration::Decoration
 
 cedar::proc::gui::StepItem::~StepItem()
 {
+  for(auto it = mChildWidgets.begin(); it != mChildWidgets.end(); ++it)
+  {
+    (*it)->close();
+  }
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
   mStateChangedConnection.disconnect();
@@ -1263,6 +1267,9 @@ QWidget* cedar::proc::gui::StepItem::createDockWidget(const std::string& title, 
     p_dock->setAllowedAreas(Qt::NoDockWidgetArea);
     p_dock->setWidget(pPlot);
 
+    mChildWidgets.push_back(p_dock);
+    QObject::connect(p_dock, SIGNAL(destroyed()), this, SLOT(removeChildWidget()));
+
     return p_dock;
   }
   else
@@ -1275,6 +1282,27 @@ QWidget* cedar::proc::gui::StepItem::createDockWidget(const std::string& title, 
     p_layout->addWidget(pPlot);
     p_widget->setLayout(p_layout);
     return p_widget;
+  }
+}
+
+void cedar::proc::gui::StepItem::removeChildWidget()
+{
+  auto it = mChildWidgets.begin();
+  while(*it != QObject::sender() && it != mChildWidgets.end())
+  {
+    it++;
+  }
+  if(*it == QObject::sender())
+  {
+    mChildWidgets.erase(it);
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Error: could not find a reference to the destroyed ChildWidget.",
+      "cedar::proc::gui::StepItem::removeChildWidget()"
+    );
   }
 }
 
