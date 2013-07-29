@@ -1256,7 +1256,7 @@ void cedar::proc::gui::StepItem::setDisplayMode(cedar::proc::gui::StepItem::Disp
   this->update();
 }
 
-QWidget* cedar::proc::gui::StepItem::createDockWidget(const std::string& title, QWidget* pPlot) const
+QWidget* cedar::proc::gui::StepItem::createDockWidget(const std::string& title, QWidget* pPlot)
 {
   if (this->mpMainWindow)
   {
