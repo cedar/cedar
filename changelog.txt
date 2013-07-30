@@ -58,6 +58,8 @@ likely to undergo major changes:
   - using multiple 3D convolutions in separate threads slows down all involved convolutions
     
 == current stable ==
+
+== Version 1.0.10 ==
 - cedar::proc::gui
   - Fixed an issue that could lead to an exception when connecting renamed looped triggers.
     (see also issue #10 in stable)
