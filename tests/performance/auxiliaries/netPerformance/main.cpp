@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/net/BlockingReader.h"
 #include "cedar/auxiliaries/net/Writer.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
+#include "cedar/auxiliaries/testingFunctions.h"
 
 // SYSTEM INCLUDES
 
@@ -88,6 +89,8 @@ void run_test()
 
   cedar::test::test_time("read/write cycle (cv::Mat)", mat_read_write);
 }
+
+
 
 int main(int argc, char* argv[])
 {
