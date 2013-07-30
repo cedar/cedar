@@ -116,7 +116,7 @@ cedar_summary_h1("Configuration")
 
 cedar_summary_h2("Mandatory Libraries")
 
-cedar_summary_lib_found("Qt4" QT4_FOUND)
+cedar_summary_lib_found("Qt" QT_FOUND ${QT_VERSION_MAJOR})
 cedar_summary_lib_found("Boost" Boost_FOUND)
 cedar_summary_lib_found("OpenCV" OpenCV_FOUND)
 cedar_summary_lib_found("QGLViewer" QGLViewer_FOUND)

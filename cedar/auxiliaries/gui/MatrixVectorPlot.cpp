@@ -123,7 +123,11 @@ cedar::aux::math::Limits<double> cedar::aux::gui::MatrixVectorPlot::getXLimits()
 {
   cedar::aux::math::Limits<double> limits;
 
+#if QWT_VERSION >= 0x060100
+  const QwtScaleDiv* p_interval = &this->mpPlot->axisScaleDiv(QwtPlot::xBottom);
+#else // QWT_VERSION >= 0x060100
   QwtScaleDiv* p_interval = this->mpPlot->axisScaleDiv(QwtPlot::xBottom);
+#endif // QWT_VERSION >= 0x060100
   limits.setLower(p_interval->lowerBound());
   limits.setUpper(p_interval->upperBound());
   return limits;
@@ -321,7 +325,7 @@ void cedar::aux::gui::MatrixVectorPlot::showLegend(bool show)
   if (show)
   {
     // show legend
-    QwtLegend *p_legend = this->mpPlot->legend();
+    QwtLegend *p_legend = cedar::aux::asserted_cast<QwtLegend *>(this->mpPlot->legend());
     if (p_legend == NULL)
     {
       p_legend = new QwtLegend();
@@ -406,17 +410,27 @@ void cedar::aux::gui::MatrixVectorPlot::timerEvent(QTimerEvent * /* pEvent */)
 
     for (unsigned int i = 0; i < 2; ++i)
     {
-      QwtScaleDiv* p_lower;
-      QwtScaleDiv* p_upper;
+      const QwtScaleDiv* p_lower;
+      const QwtScaleDiv* p_upper;
       if (i == 0)
       {
+#if QWT_VERSION >= 0x060100
+        p_lower = &this->mpPlot->axisScaleDiv(QwtPlot::xBottom);
+        p_upper = &this->mpPlot->axisScaleDiv(QwtPlot::xTop);
+#else // QWT_VERSION >= 0x060100
         p_lower = this->mpPlot->axisScaleDiv(QwtPlot::xBottom);
         p_upper = this->mpPlot->axisScaleDiv(QwtPlot::xTop);
+#endif // QWT_VERSION >= 0x060100
       }
       else
       {
+#if QWT_VERSION >= 0x060100
+        p_lower = &this->mpPlot->axisScaleDiv(QwtPlot::yLeft);
+        p_upper = &this->mpPlot->axisScaleDiv(QwtPlot::yRight);
+#else // QWT_VERSION >= 0x060100
         p_lower = this->mpPlot->axisScaleDiv(QwtPlot::yLeft);
         p_upper = this->mpPlot->axisScaleDiv(QwtPlot::yRight);
+#endif // QWT_VERSION >= 0x060100
       }
       double entry = std::abs(cedar::aux::math::getMatrixEntry<double>(mat, i));
       if (p_upper->upperBound() < entry || p_lower->lowerBound() > -1.0 * entry)
