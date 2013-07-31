@@ -213,9 +213,6 @@ public slots:
   //!@brief handles a redraw of the graphical representation
   void redraw();
 
-  //!@brief removes the reference of a child widget from the mChildWidgets vector (called when child got destroyed)
-  void removeChildWidget();
-
 signals:
   /*!@brief Emitted whenever the state of the step displayed by this step item changes.
    *
@@ -235,6 +232,9 @@ protected:
 private slots:
   //! Slot that triggers an action based on a button in the action widget that can be opened for a step item.
   void handleExternalActionButtons();
+
+  //! Slot that removes the reference of a child widget from the mChildWidgets vector
+  void removeChildWidget();
 
 private:
   void emitStepStateChanged();
