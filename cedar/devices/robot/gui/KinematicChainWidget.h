@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef KINEMATICCHAINWIDGET_H_
-#define KINEMATICCHAINWIDGET_H_
+#ifndef CEDAR_DEV_KINEMATIC_CHAIN_WIDGET_H
+#define CEDAR_DEV_KINEMATIC_CHAIN_WIDGET_H
 
 // CEDAR INCLUDES
 #include "cedar/devices/lib.h"
@@ -48,9 +48,10 @@
 #include <QGridLayout>
 #include <QWidget>
 
-//!@brief A simple widget to access all the joints via GUI
-//!@todo I removed the CEDAR_DEV_LIB_EXPORT here, check if this still runs on Windows.
-//class CEDAR_DEV_LIB_EXPORT cedar::dev::robot::gui::KinematicChainWidget
+/*!@brief A simple widget to access all the joints via GUI
+ *
+ * @todo This class does not conform to the usual template.
+ */
 class cedar::dev::robot::gui::KinematicChainWidget
 :
 public QWidget
@@ -118,4 +119,4 @@ private:
 
 };
 
-#endif /* KINEMATICCHAINWIDGET_H_ */
+#endif // CEDAR_DEV_KINEMATIC_CHAIN_WIDGET_H

@@ -42,7 +42,7 @@
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/math/tools.h"
-#include "cedar/auxiliaries/math/sigmoids/AbsSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 
@@ -338,7 +338,7 @@ void cedar::dyn::SerialOrder::eulerStep(const cedar::unit::Time& time)
       d_dot += c2 * mMemoryNodeOutputs.at(i-1)->getData();
     }
 
-    // todo explain that the expected input is positive (CoS signal)
+    //!@todo explain that the expected input is positive (CoS signal)
     if (this->mCosSignalInput)
     {
       d_dot -= this->mCosSignalInput->getData();
@@ -360,7 +360,7 @@ void cedar::dyn::SerialOrder::eulerStep(const cedar::unit::Time& time)
     dm += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau) * dm_dot;
 
     // save a copy of the output in the buffer
-    // todo: this is only needed because we don't have any nice way to plot all the discrete values yet
+    //!@todo this is only needed because we don't have any nice way to plot all the discrete values yet
     mOrdinalNodeActivationBuffer->getData().at<float>(i, 0) = d.at<float>(0, 0);
     mOrdinalNodeOutputBuffer->getData().at<float>(i, 0) = f_d.at<float>(0, 0);
     mMemoryNodeActivationBuffer->getData().at<float>(i, 0) = dm.at<float>(0, 0);

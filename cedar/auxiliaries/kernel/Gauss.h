@@ -116,7 +116,6 @@ protected slots:
 private:
   /*! virtual function that in the derived classes actually does the job of initializing
    * the kernel from file
-   * @todo deal with boost PropertyTree here
    */
   virtual void onInit();
 

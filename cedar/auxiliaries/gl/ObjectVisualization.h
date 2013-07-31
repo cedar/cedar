@@ -205,7 +205,6 @@ protected:
   );
 
   //!@brief set a material specified by an int value
-  //!@todo: this should be done with a struct for material
   void setMaterial(int material);
 
   //--------------------------------------------------------------------------------------------------------------------

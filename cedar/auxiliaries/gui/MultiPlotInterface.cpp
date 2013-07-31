@@ -52,3 +52,7 @@ cedar::aux::gui::PlotInterface(pParent)
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+void cedar::aux::gui::MultiPlotInterface::append(cedar::aux::ConstDataPtr data, const std::string& title)
+{
+  this->doAppend(data, title);
+}

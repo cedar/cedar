@@ -22,39 +22,27 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        version.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 03
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 07 22
 
-    Description: Namespace file for cedar::dyn.
+    Description: This file contains macros for accessing the version constants of cedar.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_TESTING_NAMESPACE_H
-#define CEDAR_TESTING_NAMESPACE_H
+#ifndef CEDAR_VERSION_H
+#define CEDAR_VERSION_H
 
-// CEDAR INCLUDES
-#include "cedar/testing/lib.h"
+#include "cedar/configuration.h"
 
-// SYSTEM INCLUDES
+#define CEDAR_MAKE_VERSION(MAJOR, MINOR, BUGFIX) ((MAJOR << 16) + (MINOR << 8) + (BUGFIX))
+#define CEDAR_GET_VERSION_MAJOR(VERSION) (VERSION >> 16)
+#define CEDAR_GET_VERSION_MINOR(VERSION) ((VERSION >> 8) & 0xFF)
+#define CEDAR_GET_VERSION_BUGFIX(VERSION) (VERSION & 0xFF)
+#define CEDAR_VERSION CEDAR_MAKE_VERSION(CEDAR_VERSION_MAJOR, CEDAR_VERSION_MINOR, CEDAR_VERSION_BUGFIX)
 
-namespace cedar
-{
-  /*!@brief Namespace that encapsulates functionality shared across multiple unit/interactive tests.
-   *
-   *        This is an internal namespace of cedar. Functinonality in here should not be used outside of unit tests!
-   */
-  namespace testing
-  {
-  }
-}
-
-#endif // CEDAR_TESTING_NAMESPACE_H
+#endif // CEDAR_VERSION_H

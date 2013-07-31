@@ -238,12 +238,10 @@ cedar::dev::robot::KinematicChain::ActionType cedar::dev::robot::KinematicChain:
 
 void cedar::dev::robot::KinematicChain::setJointAngles(const std::vector<double>& angles)
 {
-  // @todo: for security reasons setting angles should be only allowed
-  //        in STOP or ANGLE mode. except initial set!
+  //!@todo: for security reasons setting angles should be only allowed in STOP or ANGLE mode. except initial set!
 
   if(angles.size() != getNumberOfJoints())
   {
-    //!@todo Should this throw an exception?
     cedar::aux::LogSingleton::getInstance()->error
     (
       "You provided a vector of angles with the wrong size (angles: "
@@ -273,7 +271,6 @@ void cedar::dev::robot::KinematicChain::setJointAngles(const cv::Mat& angles)
 {
   if (angles.size().height != (int)getNumberOfJoints() || angles.size().width != 1)
   {
-    //!@todo This should probably throw an exception.
     cedar::aux::LogSingleton::getInstance()->error
     (
       "You provided a vector of angles with the wrong size (angles: "
@@ -304,7 +301,6 @@ bool cedar::dev::robot::KinematicChain::setJointVelocity(unsigned int index, dou
 {
   if (index >= getNumberOfJoints())
   {
-    //!@todo This should probably throw an exception.
     cedar::aux::LogSingleton::getInstance()->error
     (
       "Index out of range when setting velocity for joint "
@@ -328,7 +324,6 @@ bool cedar::dev::robot::KinematicChain::setJointVelocities(const std::vector<dou
 {
   if (velocities.size() != getNumberOfJoints())
   {
-    //!@todo Should this throw an exception?
     cedar::aux::LogSingleton::getInstance()->error
     (
       "You provided a vector of velocities with the wrong size (provided: "
@@ -359,7 +354,6 @@ bool cedar::dev::robot::KinematicChain::setJointVelocities(const cv::Mat& veloci
 {
   if(velocities.size().height != (int)getNumberOfJoints() || velocities.size().width != 1)
   {
-    //!@todo Should this throw an exception?
     cedar::aux::LogSingleton::getInstance()->error
     (
       "You provided a matrix of velocities with the wrong size (provided: "
@@ -390,7 +384,6 @@ bool cedar::dev::robot::KinematicChain::setJointAcceleration(unsigned int index,
 {
   if (index >= getNumberOfJoints())
   {
-    //!@todo This should probably throw an exception.
     cedar::aux::LogSingleton::getInstance()->error
     (
       "Index out of range when setting acceleration for joint "
@@ -411,7 +404,6 @@ bool cedar::dev::robot::KinematicChain::setJointAccelerations(const std::vector<
 {
   if(accelerations.size() != getNumberOfJoints())
   {
-    //!@todo Should this throw an exception?
     cedar::aux::LogSingleton::getInstance()->error
     (
       "You provided a vector of accelerations with the wrong size (provided: "
@@ -437,7 +429,6 @@ bool cedar::dev::robot::KinematicChain::setJointAccelerations(const cv::Mat& acc
 {
   if(accelerations.size().height != (int)getNumberOfJoints() || accelerations.size().width != 1)
   {
-    //!@todo Should this throw an exception?
     cedar::aux::LogSingleton::getInstance()->error
     (
       "You provided a matrix of accelerations with the wrong size (provided: "
@@ -665,7 +656,6 @@ void cedar::dev::robot::KinematicChain::start()
   switch (getWorkingMode())
   {
   case STOP:
-    //!@todo Should this throw an exception?
     cedar::aux::LogSingleton::getInstance()->error
     (
       "Error: KinematicChain is in working mode STOP!",
@@ -674,7 +664,6 @@ void cedar::dev::robot::KinematicChain::start()
     return;
 
   case ANGLE:
-    //!@todo Should this throw an exception?
     cedar::aux::LogSingleton::getInstance()->error
     (
       "KinematicChain refuses to work as a thread in ANGLE mode!",
@@ -808,7 +797,7 @@ void cedar::dev::robot::KinematicChain::calculateCartesianJacobianTemporalDeriva
     }
     case BASE_COORDINATES :
     {
-      //!\todo add base coordinate treatment
+      //!@todo add base coordinate treatment
 //      point_local = mJointTransformations[jointIndex].inv() * point; ...
       break;
     }
@@ -872,7 +861,7 @@ cv::Mat cedar::dev::robot::KinematicChain::calculateVelocity
     }
     case BASE_COORDINATES :
     {
-      //!\todo add base coordinate treatment
+      //!@todo add base coordinate treatment
 //      point_local = mJointTransformations[jointIndex].inv() * point; ...
       break;
     }
@@ -906,7 +895,7 @@ cv::Mat cedar::dev::robot::KinematicChain::calculateAcceleration
     }
     case BASE_COORDINATES :
     {
-      //! \todo: add base coordinate treatment
+      //!@todo: add base coordinate treatment
 //      point_local = mJointTransformations[jointIndex].inv() * point; ...
       break;
     }
@@ -1292,8 +1281,8 @@ bool cedar::dev::robot::KinematicChain::applyInitialConfiguration(unsigned int i
 
   if (index >= mInitialConfigurations.size())
   {
-    CEDAR_THROW( cedar::proc::InvalidNameException , 
-               "You tried to apply an initial configuration with index "
+    CEDAR_THROW(cedar::aux::InvalidNameException ,
+                "You tried to apply an initial configuration with index "
                  + boost::lexical_cast<std::string>(index) 
                  + "' which doesnt exist. Size: " 
                  + boost::lexical_cast<std::string>(mInitialConfigurations.size()) );
@@ -1329,7 +1318,7 @@ unsigned int cedar::dev::robot::KinematicChain::getCurrentInitialConfigurationIn
     j++;
   }
 
-  CEDAR_THROW( cedar::proc::InvalidNameException,
+  CEDAR_THROW( cedar::aux::InvalidNameException,
                "Current initial configuration index is not a valid "
                "initial configuration" );
   return 0;
@@ -1342,7 +1331,7 @@ cv::Mat cedar::dev::robot::KinematicChain::getInitialConfiguration(std::string s
   auto f = mInitialConfigurations.find(s);
   if (f == mInitialConfigurations.end())
   {
-    CEDAR_THROW( cedar::proc::InvalidNameException,
+    CEDAR_THROW( cedar::aux::InvalidNameException,
                  "You requested initial configuration "
                  + s + " which is not registered. "
                  "Use addInitialConfiguration().");
@@ -1371,10 +1360,10 @@ cv::Mat cedar::dev::robot::KinematicChain::getCurrentInitialConfiguration()
   if (found == mInitialConfigurations.end())
   {
     // you cant really land here, but lets be paranoid:
-    CEDAR_THROW( cedar::proc::InvalidNameException,
-                 "You requested the current initial configuration, "
-                 "but none is set. "
-                 "Use addInitialConfiguration().");
+    CEDAR_THROW(cedar::aux::InvalidNameException,
+                "You requested the current initial configuration, "
+                "but none is set. "
+                "Use addInitialConfiguration().");
   }
 
   return mInitialConfigurations[ mCurrentInitialConfiguration ];

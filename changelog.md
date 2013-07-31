@@ -1,40 +1,48 @@
-#=======================================================================================================================
-#
-#   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-# 
-#   This file is part of cedar.
-#
-#   cedar is free software: you can redistribute it and/or modify it under
-#   the terms of the GNU Lesser General Public License as published by the
-#   Free Software Foundation, either version 3 of the License, or (at your
-#   option) any later version.
-#
-#   cedar is distributed in the hope that it will be useful, but WITHOUT ANY
-#   WARRANTY; without even the implied warranty of MERCHANTABILITY or
-#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
-#   License for more details.
-#
-#   You should have received a copy of the GNU Lesser General Public License
-#   along with cedar. If not, see <http://www.gnu.org/licenses/>.
-#
-#=======================================================================================================================
-#
-#   Institute:   Ruhr-Universitaet Bochum
-#                Institut fuer Neuroinformatik
-#
-#   File:        changelog.txt
-#
-#   Maintainer:  all cedar developers
-#   Email:       cedar@ini.rub.de
-#   Date:        2012 01 12
-#
-#   Description: Cedar changelog
-#
-#   Credits:
-#
-#=======================================================================================================================
+List of changes                                                                                             {#changelog}
+===============
 
-== stable release ==
+ <!--
+=======================================================================================================================
+
+   Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
+   This file is part of cedar.
+
+   cedar is free software: you can redistribute it and/or modify it under
+   the terms of the GNU Lesser General Public License as published by the
+   Free Software Foundation, either version 3 of the License, or (at your
+   option) any later version.
+
+   cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+   WARRANTY; without even the implied warranty of MERCHANTABILITY or
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+   License for more details.
+
+   You should have received a copy of the GNU Lesser General Public License
+   along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+=======================================================================================================================
+
+   Institute:   Ruhr-Universitaet Bochum
+                Institut fuer Neuroinformatik
+
+   File:        changelog.txt
+
+   Maintainer:  all cedar developers
+   Email:       cedar@ini.rub.de
+   Date:        2012 01 12
+
+   Description: Cedar changelog
+
+   Credits:
+
+=======================================================================================================================
+-->
+
+Below, you can find a list of current changes for the different branches of cedar.
+
+stable release
+--------------
 
 Please keep in mind that "stable" refers to the state of our interfaces, i.e., doesn't mean the software is crash- or
 bug-free, but rather, that we'll try to not change any signatures of functions without deprecating them first.
@@ -46,7 +54,8 @@ likely to undergo major changes:
 - the class CoordinateTransformation in processing::steps
 
 
-== known issues ==
+known issues
+============
   - cedardyn is not properly loaded on some OSs (mainly Windows) when using processingIde. If you want to use its
     content, manually load cedardyn using the plugin dialog. You then may want to go to the Manage.. dialog and mark
     this plugin to be loaded on every start.
@@ -59,15 +68,24 @@ likely to undergo major changes:
   - Toggling the smart connections mode doesn't improve trigger connections. In fact, they are more strange than in
     standard mode. For now, triggers and their strange connections can be hidden with Ctrl+T during smart mode.
       
-== current stable ==
+Unreleased changes
+==================
+
+The following is a list of all the changes that have not been released in an official version, yet. You can get them by
+accessing the corresponding repositories.
+
+
+current stable
+--------------
 - cedar::proc::gui
   - Fixed an issue that could lead to an exception when connecting renamed looped triggers.
     (see also issue #10 in stable)
 - cedar::dyn
   - Fixed a potential deadlock in the neural field that occurred when the activation was set as output and an exception occurred during the Euler step.
-    
-== current testing ==
 
+
+current testing
+---------------
 - general
   - Parameters of several classes are marked as "advanced" based on how often one normally uses these. Affected are
     for example anchor, shift, and limit of kernels and threshold of sigmoids. 
@@ -122,17 +140,25 @@ likely to undergo major changes:
 
 - cedar::dyn
   - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   
-  
 
-== Version 1.0.9 ==
+Released versions
+=================
+
+The following are the changes made in the release versions. You can find these on the cedar home page as well as the
+repositories.
+
+
+Version 1.0.9
+-------------
 - cedar::proc
   - Fixed a bug in the resize step that lead to weird results when the step was being used with 1d inputs.
 - cedar::aux::conv
   - using 3D convolutions in separate threads doesn't crash anymore, but the introduced lock slows down
     all involved convolutions (FFTW plan creation is not thread-safe). This will be fixed with a rewrite of FFTW code.
 
-== Version 1.0.8 ==
 
+Version 1.0.8
+-------------
 - build system
   - fixed issues when linking to non-qt4 versions of QWT and libQGLViewer
     when qt3 and qt4 versions were present on the system.
@@ -143,30 +169,37 @@ likely to undergo major changes:
   - fixed issues with GCC 4.7 and the NetTransporter (Reader/Writer) code
     (only occured when the optional YARP dependency was included)
 
-== Version 1.0.7
+
+Version 1.0.7
+-------------
 - cedar::aux::gui
   - fixed a bug in how matrix plots handle changing data dimensionality
 - cedar::proc
   - fixed a potential crash in Network::getElement("path") 
 
-== Version 1.0.6 ==
+
+Version 1.0.6
+-------------
 - General
   - added support for OpenCV 2.2
   - fixed build on Windows
 - cedar::aux::conv
   - fixed a memory leak in FFTW-based convolution
 
-== Version 1.0.5 ==
+Version 1.0.5
+-------------
 - Build system
   - 'make install' can be used without having Doxygen installed
 
-== Version 1.0.4 ==
+Version 1.0.4
+-------------
 - Build system
   - Moved the version information to a separate file (cmake/version.txt).
 - cedar::aux::math
   - Fixed a bug in the function gaussMatrix that discretized the center position of cyclic Gaussian curves.
 
-== Version 1.0.3 ==
+Version 1.0.3
+-------------
 - cedar::aux
   - Fixed some minor bad code in the gui::LinePlot
   
@@ -174,18 +207,21 @@ likely to undergo major changes:
   - Fixed a bug in the projection step that could lead to a crash when the destination dimensions of a 3d to a 2d matrix
     were swapped.
 
-== Version 1.0.2 ==
+Version 1.0.2
+-------------
 - cedar::aux
   - Fixed some threading issues in the gui::ImagePlot.
   
 - cedar::proc
   - Fixed an unitialized value in the color conversion step.
 
-== Version 1.0.1 ==
+Version 1.0.1
+-------------
 - cedar::aux
   - Fixed a bug in the SemiLinear transfer function; the threshold is now applied properly.
 
-== Version 1.0.0 ==
+Version 1.0.0
+-------------
 - cedar::aux
   - The image plot, when clicked, now shows the value of the pixel under the cursor.
   
@@ -202,7 +238,8 @@ likely to undergo major changes:
     processing chain from running.
   - The processingIde can now export architectures into SVG files.
 
-== Version 0.9.1 ==
+Version 0.9.1
+-------------
 - general
   - cedar now accepts both qwt versions 5.x and 6.x
 - cedar::aux
@@ -239,7 +276,8 @@ likely to undergo major changes:
     this ever be needed.
   - removed dependency on libconfig
 
-== Version 0.9 ==
+Version 0.9
+-----------
 - cedar::aux
   - fixed a critical bug in LoopedThread::singleStep, which used microseconds instead of milliseconds for step()
   - cedar::aux::Configurable now inherits from boost::noncopyable, explicitly stating that you should never use
@@ -310,10 +348,12 @@ likely to undergo major changes:
   - It is no longer necessary to specify CEDAR_BUILD_DIR in the cedar.conf file. Instead, if the variable is not
     specified, the directory in which you call cmake is automatically selected.
 
-== Version 0.5.1 ==
+Version 0.5.1
+-------------
 - cedar::proc::steps
   - fixed compilation bug of cedar::proc::steps::GaussInput on Windows platforms
 
-== Version 0.5 ==
-
+Version 0.5
+-----------
 first release!
+

@@ -68,12 +68,7 @@ public:
    * @param data  The data to append.
    * @param title The tilte (legend entry) of the data object.
    */
-  void append(cedar::aux::ConstDataPtr data, const std::string& title)
-  {
-    //!@todo Move into cpp file
-    //!@todo Store data/title association?
-    this->doAppend(data, title);
-  }
+  void append(cedar::aux::ConstDataPtr data, const std::string& title);
 
   //!@brief check if given data can be appended to a plot
   virtual bool canAppend(cedar::aux::ConstDataPtr data) const = 0;

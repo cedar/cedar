@@ -82,13 +82,22 @@ public:
   void step(double time);
 
   /*!@brief Starts the trigger loop.
-   * @todo Make the start/stop methods in LoopedThread virtual and overload them in LoopedTrigger instead?
+   *
+   * @deprecated Use the ThreadWrapper::start() method instead.
    */
-  void startTrigger();
+  CEDAR_DECLARE_DEPRECATED(void startTrigger())
+  {
+    start();
+  }
 
   /*!@brief Stops the trigger loop.
+   *
+   * @deprecated Use the ThreadWrapper::stop() method instead.
    */
-  void stopTrigger();
+  CEDAR_DECLARE_DEPRECATED(void stopTrigger())
+  {
+    stop();
+  }
 
 public slots:
   //!@brief This slot is called when the step's name is changed.
@@ -128,6 +137,12 @@ private:
   /*!@brief Adds the triggerable to the listeners of this of this trigger.
    */
   void addListener(cedar::proc::TriggerablePtr triggerable);
+
+  //! Called when the trigger is started.
+  void applyStart();
+
+  //! Called when the trigger is started.
+  void applyStop(bool);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -77,7 +77,7 @@ const std::vector<double>& cedar::dev::robot::DifferentialDrive::getWheelSpeed()
   return mWheelSpeed;
 }
 
-void cedar::dev::robot::DifferentialDrive::setWheelSpeed(std::vector<double>& wheelSpeed)
+void cedar::dev::robot::DifferentialDrive::setWheelSpeed(const std::vector<double>& wheelSpeed)
 {
   double forward_velocity = 0;
   double turning_rate = 0;

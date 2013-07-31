@@ -172,7 +172,7 @@ int main(int, char**)
       std::cout << "=========================================" << std::endl;
       std::cout << "  Testing class " << declaration->getClassName() << std::endl;
       std::cout << "=========================================" << std::endl;
-      network->readFile("processing_steps.json");
+      network->readJson("processing_steps.json");
 
       EmptyMatrixProviderPtr empty_provider = EmptyMatrixProviderPtr(new EmptyMatrixProvider());
       network->add(empty_provider, "emp");

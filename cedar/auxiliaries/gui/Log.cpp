@@ -176,6 +176,7 @@ void cedar::aux::gui::Log::postMessage
   }
 
   QLabel* p_message_item = new QLabel(message);
+  p_message_item->setWordWrap(true);
   p_message_item->setToolTip("<p>" + message + "</p>");
 
   p_title_item->setFlags(item_flags);

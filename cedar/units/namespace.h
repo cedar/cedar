@@ -65,13 +65,6 @@ namespace cedar
     //!@brief the base class Time
     class CEDAR_UNITS_LIB_EXPORT Time;
 
-    /*! @todo This should probably be UnitBase and inherit from a class that is a template argument as well; that way,
-     *        it can be used for units other than time as well.
-     *        However, the downside might be that one can write something like
-     *        time = speed;
-     *        etc., which should not work. A solution might be to use Time (etc.) as a member, rather than inheriting
-     *        from it, and working with Time objects instead of doubles?
-     */
     template <unsigned int factor, const char* suffix> class TimeUnit;
 
     //!@brief the template concretization for microseconds

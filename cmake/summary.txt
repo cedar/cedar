@@ -34,7 +34,7 @@
 #
 #=======================================================================================================================
 
-set(CEDAR_SUMMARY_LINE_LENGTH 50)
+set(CEDAR_SUMMARY_LINE_LENGTH 60)
 
 # some useful macros ===================================================================================================
 
@@ -92,6 +92,22 @@ macro(cedar_summary_lib_found LIB_NAME LIB_FOUND)
   cedar_summary_table_entry(${lib_name_str} ${lib_found_str})    
 endmacro(cedar_summary_lib_found)
 
+macro(add_name_if_found PLOT_LIBS LIB_NAME LIB_FOUND)
+  if(${LIB_FOUND})
+    set(PLOT_LIBS "${${PLOT_LIBS}} ${LIB_NAME}")
+  endif()
+endmacro(add_name_if_found)
+
+macro(set_available_plot_lib_names)
+  foreach(arg ${ARGN})
+    add_name_if_found(PLOT_LIBS ${arg} "${arg}_FOUND")
+  endforeach()
+  if(PLOT_LIBS STREQUAL "")
+    set(PLOT_LIBS "none")
+  endif()
+endmacro(set_available_plot_lib_names)
+
+
 # end of macros ========================================================================================================
 
 
@@ -100,7 +116,7 @@ cedar_summary_h1("Configuration")
 
 cedar_summary_h2("Mandatory Libraries")
 
-cedar_summary_lib_found("Qt4" QT4_FOUND)
+cedar_summary_lib_found("Qt" QT_FOUND ${QT_VERSION_MAJOR})
 cedar_summary_lib_found("Boost" Boost_FOUND)
 cedar_summary_lib_found("OpenCV" OpenCV_FOUND)
 cedar_summary_lib_found("QGLViewer" QGLViewer_FOUND)
@@ -114,6 +130,17 @@ cedar_summary_h3("Plot Libraries")
 cedar_summary_lib_found("Qwt" qwt_FOUND)
 cedar_summary_lib_found("QwtPlot3d" qwtplot3d_FOUND)
 cedar_summary_lib_found("Vtk" CEDAR_USE_VTK ${VTK_MAJOR_VERSION})
+message("")
+
+set(PLOT_LIBS "")
+set_available_plot_lib_names("qwt" "VTK")
+cedar_summary_table_entry("Libraries for Line-Plots" ${PLOT_LIBS})
+set(PLOT_LIBS "")
+set_available_plot_lib_names("qwt")
+cedar_summary_table_entry("Libraries for Image-Plots" ${PLOT_LIBS})
+set(PLOT_LIBS "")
+set_available_plot_lib_names("qwtplot3d" "VTK")
+cedar_summary_table_entry("Libraries for Surface-Plots" ${PLOT_LIBS})
 message("")
 
 cedar_summary_h3("Misc. Libraries")

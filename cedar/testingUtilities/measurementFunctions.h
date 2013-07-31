@@ -37,31 +37,40 @@
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
+#include "cedar/auxiliaries/namespace.h"
 
-#ifndef CEDAR_TESTING_FUNCTIONS_H
-#define CEDAR_TESTING_FUNCTIONS_H
+#ifndef CEDAR_TESTING_UTILITIES_MEASUREMENT_FUNCTIONS_H
+#define CEDAR_TESTING_UTILITIES_MEASUREMENT_FUNCTIONS_H
 
-#include "cedar/testing/lib.h"
+#include "cedar/testingUtilities/namespace.h"
 
 // CEDAR INCLUDES
 
 // SYSTEM INCLUDES
 namespace cedar
 {
-  namespace testing
+  namespace test
   {
-    CEDAR_TESTING_LIB_EXPORT  void write_measurement
-                              (
-                                const std::string& id,
-                                double duration
-                              );
+    /*! Writes a test measurement with the given id and duration to the cout stream in a manner that can automatically
+     *  be parsed by the build server.
+     */
+    CEDAR_TESTING_LIB_EXPORT void write_measurement
+                             (
+                               const std::string& id,
+                               double duration
+                             );
 
-    CEDAR_TESTING_LIB_EXPORT  void test_time
-                              (
-                                std::string id,
-                                std::function< void() > fun
-                              );
+    /*! Measures the time it takes to run the given function and writes the measurement to the cout stream in a manner
+     *  that can automatically be parsed by the build server.
+     *
+     *  @see write_measurement
+     */
+    CEDAR_TESTING_LIB_EXPORT void test_time
+                             (
+                               std::string id,
+                               std::function<void()> fun
+                             );
   }
 }
 
-#endif // CEDAR_TESTING_FUNCTIONS_H
+#endif // CEDAR_TESTING_UTILITIES_MEASUREMENT_FUNCTIONS_H

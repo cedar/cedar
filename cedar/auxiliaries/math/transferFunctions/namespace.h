@@ -24,39 +24,41 @@
 
     File:        namespace.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2013 07 15
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2013 07 23
 
-    Description: Namespace file for cedar::testing::dev.
+    Description: Namespace file for transfer functions in cedar::aux::math.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_TESTING_DEV_NAMESPACE_H
-#define CEDAR_TESTING_DEV_NAMESPACE_H
+#ifndef CEDAR_AUX_MATH_TRANSFER_FUNCTIONS_NAMESPACE_H
+#define CEDAR_AUX_MATH_TRANSFER_FUNCTIONS_NAMESPACE_H
 
 // CEDAR INCLUDES
-#include "cedar/testing/lib.h"
+#include "cedar/auxiliaries/math/namespace.h"
 
 // SYSTEM INCLUDES
+#include <boost/smart_ptr.hpp>
+
 
 namespace cedar
 {
-  namespace testing
+  namespace aux
   {
-    /*!@brief Namespace that encapsulates functionality shared across dev unit/interactive tests.
-     *
-     *        This is an internal namespace of cedar. Functionality in here should not be used outside of unit tests!
-     */
-    namespace dev
+    namespace math
     {
-      // grabber class only for unit-test
-      CEDAR_DECLARE_TESTING_CLASS(TestGrabber);
-      CEDAR_DECLARE_TESTING_CLASS(TestChannel);
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_AUX_CLASS(AbsSigmoid);
+      CEDAR_DECLARE_AUX_CLASS(ExpSigmoid);
+      CEDAR_DECLARE_AUX_CLASS(HeavisideSigmoid);
+      CEDAR_DECLARE_AUX_CLASS(LinearTransferFunction);
+      CEDAR_DECLARE_AUX_CLASS(SemiLinearTransferFunction);
+      //!@endcond
     }
   }
 }
 
-#endif // CEDAR_TESTING_DEV_NAMESPACE_H
+#endif // CEDAR_AUX_MATH_TRANSFER_FUNCTIONS_NAMESPACE_H

@@ -96,7 +96,11 @@ void cedar::proc::gui::PluginLoadDialog::browseFile()
                               (
                                 this, // parent = 0,
                                 "Select a plugin", // caption = QString(),
+#if QT_VERSION >= 0x050000
+                                "/",
+#else
                                 last_dir->getValue().absolutePath(),
+#endif
                                 filter
                               );
   if (!file.isEmpty())
@@ -116,7 +120,6 @@ void cedar::proc::gui::PluginLoadDialog::pluginFileChanged(const QString& file)
 
 void cedar::proc::gui::PluginLoadDialog::loadFile(const std::string& file)
 {
-  //!@todo handle plugin exceptions.
   mPlugin = cedar::proc::PluginProxyPtr(new cedar::proc::PluginProxy(file));
 
   this->mpStepsList->clear();

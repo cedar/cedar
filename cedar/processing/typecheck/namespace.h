@@ -47,13 +47,15 @@ namespace cedar
 {
   namespace proc
   {
-    /*! @brief Namespace containing classes related to type checks.
+    /*! @brief Namespace containing classes related to automatic type checks for slots in processing steps.
      */
     namespace typecheck
     {
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_PROC_CLASS(TypeCheck);
 
       template <class T> class DerivedFrom;
+      //!@endcond
     }
   }
 }

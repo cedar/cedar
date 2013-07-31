@@ -41,7 +41,7 @@
 
 // Single include file for all grabber classes
 
-//!@todo remove this file?
+#warning Using this file is deprecated. Include the files you want to use directly!
 
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/namespace.h"

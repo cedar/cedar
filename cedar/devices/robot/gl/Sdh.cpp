@@ -83,7 +83,6 @@ cedar::dev::robot::gl::Sdh::~Sdh()
 
 void cedar::dev::robot::gl::Sdh::initializeGl()
 {
-  //!@todo Implement this so that it works on windows
 #ifndef CEDAR_OS_WINDOWS
   // palm
   glGenBuffers(1, &mPalmVertexVboId);
