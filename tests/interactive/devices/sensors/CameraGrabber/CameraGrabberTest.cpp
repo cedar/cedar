@@ -25,7 +25,7 @@
 #include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
-#include <QtGui/QApplication>
+#include <QApplication>
 #include <opencv2/opencv.hpp>
 #include <boost/lexical_cast.hpp>
 #include <ios>
@@ -168,7 +168,7 @@ int main(int argc, char* argv[])
    * with the grab() method
    *
    * WITHOUT configuration file (readJson):
-   *  - loopedThread isn't running (startGrabber threaded background grabbing with startGrabber() )
+   *  - loopedThread isn't running (start threaded background grabbing with start() )
    *  - grabbername is set to default, i.e. CameraGrabber
    *  - if no backend specified in the constructor, then the first found camera will be
    *    used with default backend parameter values
@@ -299,7 +299,7 @@ int main(int argc, char* argv[])
   //----------------------------------------------------------------------------------------
   p_grabber->setFramerate(30);
   std::cout << "Start grabbing in the background" << std::endl;
-  p_grabber->startGrabber();
+  p_grabber->start();
 
   // get the image from the image buffer
 //  p_lock->lockForRead();
@@ -308,7 +308,7 @@ int main(int argc, char* argv[])
 //  p_data->unlock();
 //  p_lock->unlock();
 
-  //startGrabber recording
+  //start recording
   //std::cout << "\nStart Recording\n";
   //p_grabber->startRecording(15);
 
@@ -352,11 +352,11 @@ int main(int argc, char* argv[])
   //clean up
   //----------------------------------------------------------------------------------------
 
-  //stopGrabber grabbing-thread if running
+  //stop grabbing-thread if running
   //recording will also be stopped
   if (p_grabber->isRunning())
   {
-    p_grabber->stopGrabber();
+    p_grabber->stop();
   }
   std::cout << "finished\n";
 

@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        HeavisideSigmoid.cpp
+    File:        LinearSigmoid.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 03 09
+    Date:        2012 05 16
 
     Description:
 
@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/sigmoids/HeavisideSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/LinearTransferFunction.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/Singleton.h"
 
@@ -44,21 +44,38 @@
 //----------------------------------------------------------------------------------------------------------------------
 // register class with the sigmoid factory manager
 //----------------------------------------------------------------------------------------------------------------------
+
 namespace
 {
-  bool registered
-    = cedar::aux::math::TransferFunctionManagerSingleton::getInstance()->registerType<cedar::aux::math::HeavisideSigmoidPtr>();
+  bool register_function()
+  {
+    cedar::aux::math::TransferFunctionManagerSingleton::getInstance()
+      ->registerType<cedar::aux::math::LinearTransferFunctionPtr>();
+
+    cedar::aux::math::TransferFunctionManagerSingleton::getInstance()
+          ->addDeprecatedName<cedar::aux::math::LinearTransferFunctionPtr>("cedar.aux.math.LinearSigmoid");
+
+    return true;
+  }
+
+  bool registered = register_function();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::aux::math::LinearTransferFunction::LinearTransferFunction()
+:
+cedar::aux::math::TransferFunction()
+{
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double cedar::aux::math::HeavisideSigmoid::compute(double value) const
+double cedar::aux::math::LinearTransferFunction::compute(double value) const
 {
-  return cedar::aux::math::sigmoidHeaviside(value, this->getThreshold());
+  return value;
 }

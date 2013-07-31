@@ -97,7 +97,7 @@ void checkValidProjection(const std::string& configurationFile, unsigned int& nu
   std::cout << "Checking file \"" << configurationFile << "\" (valid)" << std::endl;
 
   cedar::proc::NetworkPtr network(new cedar::proc::Network());
-  network->readFile(configurationFile);
+  network->readJson(configurationFile);
 
   // if the projection is in an invalid state, increase the error count
   if (checkProjectionState(network, cedar::proc::Triggerable::STATE_EXCEPTION) ||
@@ -119,7 +119,7 @@ void checkInvalidProjection(const std::string& configurationFile, unsigned int& 
 {
   std::cout << "Checking file \"" << configurationFile << "\" (invalid)" << std::endl;
   cedar::proc::NetworkPtr network(new cedar::proc::Network());
-  network->readFile(configurationFile);
+  network->readJson(configurationFile);
 
   if (!checkProjectionState(network, cedar::proc::Triggerable::STATE_EXCEPTION))
   {

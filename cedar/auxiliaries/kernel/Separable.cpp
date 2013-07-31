@@ -79,7 +79,7 @@ void cedar::aux::kernel::Separable::calculate()
 
 unsigned int cedar::aux::kernel::Separable::getSize(size_t dimension) const
 {
-  // make sure that casting to unsigned doesn't have bad sideeffects
+  // make sure that casting to unsigned doesn't have bad side effects
   CEDAR_DEBUG_ASSERT(this->getKernelPart(dimension).size[0] >= 0);
   return static_cast<unsigned int>(this->getKernelPart(dimension).size[0]);
 }

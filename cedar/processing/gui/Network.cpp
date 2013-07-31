@@ -99,7 +99,6 @@ _mSmartMode(new cedar::aux::BoolParameter(this, "smart mode", false))
   mpNameDisplay = new QGraphicsTextItem(this);
   this->networkNameChanged();
 
-  //!@todo This isn't really a great solution, we need a better one!
   cedar::aux::ParameterPtr name_param = this->getNetwork()->getParameter("name");
   QObject::connect(name_param.get(), SIGNAL(valueChanged()), this, SLOT(networkNameChanged()));
   QObject::connect(_mSmartMode.get(), SIGNAL(valueChanged()), this, SLOT(toggleSmartConnectionMode()));
@@ -225,14 +224,13 @@ QVariant cedar::proc::gui::Network::itemChange(QGraphicsItem::GraphicsItemChange
 
 bool cedar::proc::gui::Network::sceneEventFilter(QGraphicsItem * pWatched, QEvent *pEvent)
 {
-  if(!dynamic_cast<cedar::proc::gui::GraphicsBase*>(pWatched))
+  if (!dynamic_cast<cedar::proc::gui::GraphicsBase*>(pWatched))
   {
     return cedar::proc::gui::GraphicsBase::sceneEventFilter(pWatched, pEvent);
   }
 
   switch(pEvent->type())
   {
-//!@todo Resizing the network while moving the mouse doesn't work.
 //    case QEvent::GraphicsSceneMouseMove:
 //    {
 //      this->fitToContents();
@@ -435,7 +433,7 @@ void cedar::proc::gui::Network::write(const std::string& destination)
 
   cedar::aux::ConfigurationNode root;
 
-  this->mNetwork->writeTo(root);
+  this->mNetwork->writeConfiguration(root);
 
   cedar::aux::ConfigurationNode scene;
   this->writeScene(root, scene);
@@ -457,7 +455,7 @@ void cedar::proc::gui::Network::read(const std::string& source)
   cedar::aux::ConfigurationNode root;
   read_json(source, root);
 
-  this->mNetwork->readFrom(root);
+  this->mNetwork->readConfiguration(root);
   try
   {
     this->readConfiguration(root.get_child("ui generic"));
@@ -481,7 +479,7 @@ void cedar::proc::gui::Network::writeConfiguration(cedar::aux::ConfigurationNode
 
 void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root, cedar::aux::ConfigurationNode& scene)
 {
-  const cedar::proc::Network::ElementMap& elements = this->mNetwork->elements();
+  auto elements = this->mNetwork->getElements();
 
   for
   (
@@ -548,8 +546,9 @@ void cedar::proc::gui::Network::checkSlots()
 
 void cedar::proc::gui::Network::checkDataItems()
 {
-  qreal data_size = 10.0; //!@todo don't hard-code the size of the data items
-  qreal padding = static_cast<qreal>(3);
+  qreal data_size = cedar::proc::gui::StepItem::M_BASE_DATA_SLOT_SIZE;
+  qreal padding = cedar::proc::gui::StepItem::M_DATA_SLOT_PADDING;
+
   std::map<cedar::proc::DataRole::Id, QPointF> add_origins;
   std::map<cedar::proc::DataRole::Id, QPointF> add_directions;
 
@@ -641,11 +640,11 @@ cedar::proc::gui::DataSlotItem* cedar::proc::gui::Network::getSlotItem
   DataSlotNameMap::iterator iter = role_map->second.find(name);
   if (iter == role_map->second.end())
   {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "No slot item named \"" + name +
-                                                   "\" found for role "
-                                                   + cedar::proc::DataRole::type().get(role).prettyString()
-                                                   + " in Network for network \"" + this->mNetwork->getName() + "\"."
-                                                   );
+    CEDAR_THROW(cedar::aux::InvalidNameException, "No slot item named \"" + name +
+                                                  "\" found for role "
+                                                  + cedar::proc::DataRole::type().get(role).prettyString()
+                                                  + " in Network for network \"" + this->mNetwork->getName() + "\"."
+                                                  );
   }
 
   return iter->second;
@@ -743,8 +742,7 @@ void cedar::proc::gui::Network::checkTriggerConnection
        bool added
      )
 {
-  /*@todo this is a quick fix: for processingDone triggers, there is no graphical representation.
-   * A signal is emitted regardless of the missing representation. This fails in finding "processingDone" in the current
+  /* A signal is emitted regardless of the missing representation. This fails in finding "processingDone" in the current
    * network and results in an InvalidNameException. This exception is caught here. A debug assert assures that no other
    * element caused this exception.
    */
@@ -760,9 +758,9 @@ void cedar::proc::gui::Network::checkTriggerConnection
           )
         );
   }
-  catch(cedar::proc::InvalidNameException& exc)
+  catch(cedar::aux::InvalidNameException& exc)
   {
-    CEDAR_DEBUG_ASSERT(source->getName() == "processingDone");
+    CEDAR_ASSERT(source->getName() == "processingDone");
     return;
   }
   cedar::proc::gui::GraphicsBase* target_element
@@ -777,7 +775,6 @@ void cedar::proc::gui::Network::checkTriggerConnection
   }
   else
   {
-    //!@todo iterating over all elements is very slow, solve this more efficiently
     QList<QGraphicsItem*> items = this->mpScene->items();
     for (int i = 0; i < items.size(); ++i)
     {

@@ -43,6 +43,10 @@
 #------------------------
 
 file(GLOB cedarHeaders "${CEDAR_SOURCE_DIR}/*.h")
+# delete old header installation
+if(EXISTS "${CMAKE_INSTALL_PREFIX}/${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}/")
+  install(CODE "execute_process(COMMAND rm -r ${CMAKE_INSTALL_PREFIX}/${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION})")
+endif(EXISTS "${CMAKE_INSTALL_PREFIX}/${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}/")
 install(FILES ${cedarHeaders} DESTINATION "${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}")
 install(FILES ${CEDAR_CONFIGURATION_HEADER_OUTPUT} DESTINATION "${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}")
 # create links for the header directory

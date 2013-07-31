@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR_INCLUDES
-#include "cedar/testing/measurementFunctions.h"
+#include "cedar/testingUtilities/measurementFunctions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/stringFunctions.h"
@@ -43,8 +43,9 @@
 // SYSTEM INCLUDES
 #include <functional>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/function.hpp>
 
-void cedar::testing::write_measurement
+void cedar::test::write_measurement
      (
        const std::string& id,
        double duration
@@ -61,7 +62,7 @@ void cedar::testing::write_measurement
       << std::endl;
 }
 
-void cedar::testing::test_time(std::string id, std::function< void() > fun)
+void cedar::test::test_time(std::string id, std::function< void() > fun)
 {
   using boost::posix_time::ptime;
   using boost::posix_time::microsec_clock;

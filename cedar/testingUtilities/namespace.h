@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,44 +22,35 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        AbsSigmoid.cpp
+    File:        namespace.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 03 09
+    Date:        2013 07 18
 
-    Description:
+    Description: Namespace file for cedar::test.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_TESTING_UTILITIES_NAMESPACE_H
+#define CEDAR_TESTING_UTILITIES_NAMESPACE_H
+
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/sigmoids/AbsSigmoid.h"
-#include "cedar/auxiliaries/FactoryManager.h"
-#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/testingUtilities/lib.h"
 
 // SYSTEM INCLUDES
 
-//----------------------------------------------------------------------------------------------------------------------
-// register class with the sigmoid factory manager
-//----------------------------------------------------------------------------------------------------------------------
-
-namespace
+namespace cedar
 {
-  bool registered
-    = cedar::aux::math::TransferFunctionManagerSingleton::getInstance()->registerType<cedar::aux::math::AbsSigmoidPtr>();
+  /*!@brief Namespace that encapsulates functionality shared across multiple unit/interactive tests.
+   *
+   *        This is an internal namespace of cedar. Functionality in here should not be used outside of unit tests!
+   */
+  namespace test
+  {
+  }
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
-double cedar::aux::math::AbsSigmoid::compute(double value) const
-{
-  return cedar::aux::math::sigmoidAbs(value, mBeta->getValue(), this->getThreshold());
-}
+#endif // CEDAR_TESTING_UTILITIES_NAMESPACE_H

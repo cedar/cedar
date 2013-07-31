@@ -100,8 +100,6 @@ _mStandardDeviation(new cedar::aux::DoubleParameter(this, "standard deviation", 
 void cedar::proc::sources::Noise::compute(const cedar::proc::Arguments&)
 {
   cv::Mat& random = this->mRandomMatrix->getData();
-
-  // one possible preshape dynamic
   cv::randn(random, cv::Scalar(_mMean->getValue()), cv::Scalar(_mStandardDeviation->getValue()));
 }
 

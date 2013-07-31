@@ -82,10 +82,14 @@ protected:
   void createCaptureObject();
 
   /*! Updates the properties of the camera.
-   *
-   * @todo This name is misleading (this is not a 'get' function.)
    */
-  void getAvailablePropertiesFromCamera();
+  void readCameraProperties();
+
+  //!@deprecated Use readCameraProperties() instead.
+  CEDAR_DECLARE_DEPRECATED(void getAvailablePropertiesFromCamera())
+  {
+    this->readCameraProperties();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

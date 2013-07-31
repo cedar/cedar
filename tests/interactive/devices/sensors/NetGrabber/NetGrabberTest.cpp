@@ -23,7 +23,7 @@
 
 
 // SYSTEM INCLUDES
-#include <QtGui/QApplication>
+#include <QApplication>
 #include <ios>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -186,7 +186,7 @@ int main(int argc, char* argv[])
   //start the grabber-thread for updating camera images
   //----------------------------------------------------------------------------------------
 
-  p_grabber->startGrabber();
+  p_grabber->start();
 
   //----------------------------------------------------------------------------------------
   // send frames and show them on screen until window will be closed
@@ -231,7 +231,7 @@ int main(int argc, char* argv[])
 
   //stop grabbing-thread if running
   //recording will also be stopped
-  p_grabber->stopGrabber();
+  p_grabber->stop();
 
   //delete p_grabber is done via the shared-pointer class
   std::cout << "finished\n";

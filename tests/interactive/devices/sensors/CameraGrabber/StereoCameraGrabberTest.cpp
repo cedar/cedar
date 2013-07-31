@@ -22,7 +22,7 @@
 #include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
-#include <QtGui/QApplication>
+#include <QApplication>
 #include <opencv2/opencv.hpp>
 #include <boost/lexical_cast.hpp>
 #include <ios>
@@ -235,7 +235,7 @@ int main(int argc, char* argv[])
   //on creation, the framerate will be set, to the value read from the video-file
   p_grabber->setFramerate(30);
   std::cout << "Start grabbing in the background" << std::endl;
-  p_grabber->startGrabber();
+  p_grabber->start();
 
   //get frames
   std::cout << "\nDisplay camera frames\n";
@@ -279,11 +279,11 @@ int main(int argc, char* argv[])
   //clean up
   //----------------------------------------------------------------------------------------
 
-  //stopGrabber grabbing-thread if running
+  //stop grabbing-thread if running
   //recording will also be stopped
   if (p_grabber->isRunning())
   {
-    p_grabber->stopGrabber();
+    p_grabber->stop();
   }
   std::cout << "finished\n";
 

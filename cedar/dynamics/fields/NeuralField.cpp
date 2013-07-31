@@ -48,7 +48,7 @@
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
-#include "cedar/auxiliaries/math/sigmoids/AbsSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -148,7 +148,7 @@ mGlobalInhibition
 ),
 // parameters
 _mOutputActivation(new cedar::aux::BoolParameter(this, "activation as output", false)),
-_mDiscreteActivation(new cedar::aux::BoolParameter(this, "discrete activation (workaround)", false)),
+_mDiscreteMetric(new cedar::aux::BoolParameter(this, "discrete metric (workaround)", false)),
 _mDimensionality
 (
   new cedar::aux::UIntParameter
@@ -205,7 +205,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   this->declareInputCollection("input");
 
   this->_mOutputActivation->markAdvanced();
-  this->_mDiscreteActivation->markAdvanced();
+  this->_mDiscreteMetric->markAdvanced();
 
   // setup default kernels
   std::vector<cedar::aux::kernel::KernelPtr> kernel_defaults;
@@ -250,7 +250,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
   QObject::connect(_mOutputActivation.get(), SIGNAL(valueChanged()), this, SLOT(activationAsOutputChanged()));
-  QObject::connect(_mDiscreteActivation.get(), SIGNAL(valueChanged()), this, SLOT(discreteActivationChanged()));
+  QObject::connect(_mDiscreteMetric.get(), SIGNAL(valueChanged()), this, SLOT(discreteMetricChanged()));
 
   mKernelAddedConnection
     = this->_mKernels->connectToObjectAddedSignal(boost::bind(&cedar::dyn::NeuralField::slotKernelAdded, this, _1));
@@ -270,7 +270,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dyn::NeuralField::discreteActivationChanged()
+void cedar::dyn::NeuralField::discreteMetricChanged()
 {
   std::vector<cedar::aux::DataPtr> data_items;
   data_items.push_back(this->mActivation);
@@ -279,7 +279,7 @@ void cedar::dyn::NeuralField::discreteActivationChanged()
 
   for (size_t i = 0; i < data_items.size(); ++i)
   {
-    if (this->_mDiscreteActivation->getValue() == true)
+    if (this->_mDiscreteMetric->getValue() == true)
     {
       data_items.at(i)->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteCoordinates>());
     }
@@ -470,8 +470,6 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
       }
       else
       {
-        //!@todo Output warning if the input is not space code
-        /* return cedar::proc::DataSlot::VALIDITY_WARNING; */
         return cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
@@ -568,7 +566,6 @@ void cedar::dyn::NeuralField::updateInputSum()
     if (input)
     {
       QReadLocker locker(&input->getLock());
-      //!@todo This is probably slow -- store the type of each input and static_cast instead.
       cv::Mat& input_mat = input->getData<cv::Mat>();
 
       unsigned int input_dim = cedar::aux::math::getDimensionalityOf(input_mat);

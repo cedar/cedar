@@ -218,7 +218,7 @@ int main(int argc, char **argv)
   // If you start background-grabbing, a segmentation-fault occur!
 
   // p_grabber->setFramerate(50);
-  // p_grabber->startGrabber();
+  // p_grabber->start();
 
   unsigned int counter=0;
   std::cout << "\nDisplay GL frames\n";

@@ -308,8 +308,6 @@ protected:
 private:
   /*! Matrix representing the combined kernel. Convolving an image with this kernel is equivalent to convolving it with
    *  the kernel list.
-   *
-   *  @todo Make a unit test for this.
    */
   cedar::aux::MatDataPtr mCombinedKernel;
 

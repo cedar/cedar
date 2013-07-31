@@ -34,8 +34,6 @@
 
 ======================================================================================================================*/
 
-//TODO example architecture with description & interactive unit test
-
 // CEDAR INCLUDES
 #include "cedar/processing/steps/CoordinateTransformation.h"
 #include "cedar/auxiliaries/math/constants.h"
@@ -188,8 +186,8 @@ _mTransformationDirection
 ),
 _mSamplesPerDegree(new cedar::aux::DoubleParameter(this, "samples per degree", 1, 0.001, 100)),
 _mSamplesPerDistance(new cedar::aux::DoubleParameter(this, "samples per distance", 1, 0.001, 100)),
-_mNumberOfRows(new cedar::aux::UIntParameter(this, "rows size", 10)),
-_mNumberOfCols(new cedar::aux::UIntParameter(this, "cols size", 10)),
+_mNumberOfRows(new cedar::aux::UIntParameter(this, "rows size", 10, cedar::aux::UIntParameter::LimitType::positive())),
+_mNumberOfCols(new cedar::aux::UIntParameter(this, "cols size", 10, cedar::aux::UIntParameter::LimitType::positive())),
 _mMagnitudeForward(new cedar::aux::DoubleParameter(this, "magnitude forward", 10, 0, 1000)),
 _mMagnitudeBackward(new cedar::aux::DoubleParameter(this, "magnitude backward", 10, 0, 1000))
 {
@@ -409,7 +407,6 @@ void cedar::proc::steps::CoordinateTransformation::createCartPolarMapBackward()
   {
     for (unsigned int col = 0; col < map_cols; ++col)
     {
-      //!@todo Check if this is correct
       float angle = fmod
                     (
                       atan2
@@ -560,20 +557,10 @@ void cedar::proc::steps::CoordinateTransformation::inputConnectionChanged(const 
 
 void cedar::proc::steps::CoordinateTransformation::changeNumberOfRows()
 {
-  //!@todo This constraint should be expressed as limits of the parameter.
-  if (this->_mNumberOfRows->getValue() == 0)
-  {
-    this->_mNumberOfRows->setValue(1);
-  }
   this->recompute();
 }
 
 void cedar::proc::steps::CoordinateTransformation::changeNumberOfCols()
 {
-  //!@todo This constraint should be expressed as limits of the parameter.
-  if (this->_mNumberOfCols->getValue() == 0)
-  {
-    this->_mNumberOfCols->setValue(1);
-  }
   this->recompute();
 }

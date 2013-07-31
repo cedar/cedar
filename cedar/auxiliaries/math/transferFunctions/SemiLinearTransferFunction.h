@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        AbsSigmoid.h
+    File:        SemiLinearTransferFunction.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 05 16
 
     Description: Sigmoid functions
 
@@ -38,23 +34,31 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MATH_ABS_SIGMOID_H
-#define CEDAR_AUX_MATH_ABS_SIGMOID_H
+#ifndef CEDAR_AUX_MATH_SEMI_LINEAR_TRANSFER_FUNCTION_H
+#define CEDAR_AUX_MATH_SEMI_LINEAR_TRANSFER_FUNCTION_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
-#include "cedar/auxiliaries/math/sigmoids.h"
-#include "cedar/auxiliaries/math/Sigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/namespace.h"
+#include "cedar/auxiliaries/math/TransferFunction.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief Sigmoid function that is based on absolute values.
+/*!@brief Transfer function that is linear above a given threshold.
  *
- *        This function behaves similar to cedar::aux::math::ExpSigmoid, but computing it is less costly.
- *
- * @todo Put the equation in here, describe it.
+ *        The equation for this function is:
+ *        @f[
+ *           \sigma(x) =
+ *              \left\{
+ *                \begin{array}{ll}
+ *                  \theta: & x < \theta \\
+ *                  \theta + \beta \cdot (x - \theta): & \text{otherwise}
+ *                \end{array}
+ *              \right.
+ *        @f]
+ *        where \f$\theta\f$ is the threshold set for this function.
  */
-class cedar::aux::math::AbsSigmoid : public cedar::aux::math::Sigmoid
+class cedar::aux::math::SemiLinearTransferFunction : public cedar::aux::math::TransferFunction
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -65,17 +69,7 @@ class cedar::aux::math::AbsSigmoid : public cedar::aux::math::Sigmoid
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  AbsSigmoid(double threshold = 0.0, double beta = 100.0)
-  :
-  cedar::aux::math::Sigmoid(threshold),
-  mBeta(new cedar::aux::DoubleParameter(this, "beta", beta, -1000.0, 1000.0))
-  {
-  }
-
-  //!@brief Destructor
-  virtual ~AbsSigmoid()
-  {
-  }
+  SemiLinearTransferFunction(double threshold = 0.0, double beta = 1.0);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -84,6 +78,20 @@ public:
   /*!@brief this function calculates the abs-based sigmoid function for a given double value.
    */
   virtual double compute(double value) const;
+
+  /*!@brief Returns the current beta value.
+   */
+  inline double getBeta() const
+  {
+    return this->_mBeta->getValue();
+  }
+
+  /*! Returns the current threshold value.
+   */
+  inline double getThreshold() const
+  {
+    return this->_mThreshold->getValue();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -101,10 +109,13 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief steepness of the abs-sigmoid
-  cedar::aux::DoubleParameterPtr mBeta;
-private:
   // none yet
+private:
+  //!@brief Threshold.
+  cedar::aux::DoubleParameterPtr _mThreshold;
+
+  //!@brief Steepness of the linear part.
+  cedar::aux::DoubleParameterPtr _mBeta;
 };
 
-#endif  // CEDAR_AUX_MATH_ABS_SIGMOID_H
+#endif  // CEDAR_AUX_MATH_SEMI_LINEAR_TRANSFER_FUNCTION_H

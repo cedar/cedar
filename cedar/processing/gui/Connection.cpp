@@ -40,9 +40,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Connection.h"
+#include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 #include <QPainter>
@@ -110,6 +112,36 @@ mSmartMode(false)
       mpArrowEnd->setBrush(brush);
     }
   }
+
+
+  // update validity
+  if (pSource->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM)
+  {
+    // data slots should only be connected to other slots
+    CEDAR_DEBUG_ASSERT(pTarget->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM);
+
+    cedar::proc::gui::ConnectValidity validity = cedar::proc::gui::CONNECT_ERROR;
+    switch (cedar::aux::asserted_cast<cedar::proc::gui::DataSlotItem*>(pTarget)->getSlot()->getValidity())
+    {
+      case cedar::proc::DataSlot::VALIDITY_VALID:
+        validity = cedar::proc::gui::CONNECT_YES;
+        break;
+
+      case cedar::proc::DataSlot::VALIDITY_WARNING:
+        validity = cedar::proc::gui::CONNECT_WARNING;
+        break;
+
+      case cedar::proc::DataSlot::VALIDITY_UNKNOWN:
+        validity = cedar::proc::gui::CONNECT_UNKNOWN;
+        break;
+
+      case cedar::proc::DataSlot::VALIDITY_ERROR:
+        validity = cedar::proc::gui::CONNECT_NO;
+        break;
+    }
+    this->setValidity(validity);
+  }
+
   this->update();
 }
 

@@ -112,7 +112,6 @@ void cedar::aux::conv::Convolution::slotKernelChanged(size_t)
 void cedar::aux::conv::Convolution::slotKernelRemoved(size_t)
 {
   this->updateCombinedKernel();
-  //!@todo disconnect kernelUpdated slot!
 }
 
 void cedar::aux::conv::Convolution::updateCombinedKernel()

@@ -94,14 +94,6 @@ public slots:
    */
   void notify(const QString& message);
 
-  /*!@brief Slot that displays errors.
-   */
-  void error(const QString& message);
-
-  /*!@brief Slot that displays messages.
-   */
-  void message(const QString& message);
-
   /*!@brief Changes the mode back to select when an architecture tool is finished.
    */
   void architectureToolFinished();
@@ -223,8 +215,6 @@ public slots:
 protected:
 
   /*!@brief Deletes the list of graphics items.
-   *
-   * @todo This probably belongs somewhere else, e.g., cedar::proc::gui::Scene.
    */
   void deleteElements(QList<QGraphicsItem*>& items);
 
@@ -233,8 +223,6 @@ protected:
   void deleteElement(QGraphicsItem* pItem);
 
   /*!@brief Deletes the elements currently selected in the scene.
-   *
-   * @todo This probably belongs somewhere else, e.g., cedar::proc::gui::Scene.
    */
   void deleteSelectedElements();
 
@@ -262,10 +250,6 @@ private:
    *        cedar::proc::gui::Ide::storeSettings.
    */
   void restoreSettings();
-
-  /*!@brief Writes an error message into the log window.
-   */
-  void logError(const std::string& message);
 
   /*!@brief Sets the filename in the title of the main window.
    */

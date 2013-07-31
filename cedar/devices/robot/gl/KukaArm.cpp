@@ -66,8 +66,7 @@ cedar::dev::robot::gl::KukaArm::~KukaArm()
 
 void cedar::dev::robot::gl::KukaArm::initializeGl()
 {
-  //!@todo The following doesn't compile on windows! Needs glext.h
-#ifndef WIN32
+#ifndef CEDAR_OS_WINDOWS
   // base segment
   glGenBuffers(1, &mBaseSegmentVertexVboId);
   glBindBuffer(GL_ARRAY_BUFFER, mBaseSegmentVertexVboId);

@@ -108,7 +108,6 @@ public:
   }
 
   /*! Sets the smart-hide method for the trigger connections.
-   * @todo Implement this method.
    */
   void smartTriggerConnections()
   {
