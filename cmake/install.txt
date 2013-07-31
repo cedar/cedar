@@ -49,7 +49,7 @@ install(FILES "${CEDAR_BUILD_DIR}/cedar_configuration.cmake" DESTINATION "${CEDA
 #------------------------
 
 file(GLOB cedarHeaders "${CEDAR_SOURCE_DIR}/*.h")
-# delete olde header installation
+# delete old header installation
 if(EXISTS "${CMAKE_INSTALL_PREFIX}/${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}/")
   install(CODE "execute_process(COMMAND rm -r ${CMAKE_INSTALL_PREFIX}/${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION})")
 endif(EXISTS "${CMAKE_INSTALL_PREFIX}/${CEDAR_HEADER_INSTALL_DIR}-${CEDAR_VERSION}/")

@@ -177,6 +177,10 @@ cedar::proc::gui::StepItem::Decoration::Decoration
 
 cedar::proc::gui::StepItem::~StepItem()
 {
+  for(auto it = mChildWidgets.begin(); it != mChildWidgets.end(); ++it)
+  {
+    (*it)->close();
+  }
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
   mStateChangedConnection.disconnect();
@@ -1252,27 +1256,58 @@ void cedar::proc::gui::StepItem::setDisplayMode(cedar::proc::gui::StepItem::Disp
   this->update();
 }
 
-QWidget* cedar::proc::gui::StepItem::createDockWidget(const std::string& title, QWidget* pPlot) const
+QWidget* cedar::proc::gui::StepItem::createDockWidget(const std::string& title, QWidget* pPlot)
 {
+  //!@todo There's duplicated code here -- unify
   if (this->mpMainWindow)
   {
     QDockWidget *p_dock = new QDockWidget(QString::fromStdString(title), this->mpMainWindow);
+    p_dock->setAttribute(Qt::WA_DeleteOnClose, true);
     p_dock->setFloating(true);
     p_dock->setContentsMargins(0, 0, 0, 0);
     p_dock->setAllowedAreas(Qt::NoDockWidgetArea);
     p_dock->setWidget(pPlot);
+
+    mChildWidgets.push_back(p_dock);
+    QObject::connect(p_dock, SIGNAL(destroyed()), this, SLOT(removeChildWidget()));
 
     return p_dock;
   }
   else
   {
     QWidget* p_widget = new QWidget();
+    p_widget->setAttribute(Qt::WA_DeleteOnClose, true);
     p_widget->setWindowTitle(QString::fromStdString(title));
     auto p_layout = new QVBoxLayout();
     p_layout->setContentsMargins(2, 2, 2, 2);
     p_layout->addWidget(pPlot);
     p_widget->setLayout(p_layout);
+
+    mChildWidgets.push_back(p_widget);
+    QObject::connect(p_widget, SIGNAL(destroyed()), this, SLOT(removeChildWidget()));
+
     return p_widget;
+  }
+}
+
+void cedar::proc::gui::StepItem::removeChildWidget()
+{
+  auto it = mChildWidgets.begin();
+  while(*it != QObject::sender() && it != mChildWidgets.end())
+  {
+    it++;
+  }
+  if(*it == QObject::sender())
+  {
+    mChildWidgets.erase(it);
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "Could not find a reference to the destroyed ChildWidget.",
+      "cedar::proc::gui::StepItem::removeChildWidget()"
+    );
   }
 }
 

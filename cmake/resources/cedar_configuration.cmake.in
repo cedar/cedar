@@ -38,7 +38,12 @@
 #=======================================================================================================================
 
 find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml QtSvg REQUIRED)
-include(@QT_USE_FILE@)
+if(QT4_FOUND)
+  include(@QT_USE_FILE@)
+else(QT4_FOUND)
+  include_directories(@Qt5Widgets_INCLUDE_DIRS@ @Qt5OpenGL_INCLUDE_DIRS@ @Qt5Xml_INCLUDE_DIRS@)
+endif(QT4_FOUND)
+
 include_directories(@QT_INCLUDE_DIRS@)
 include_directories(@Boost_INCLUDE_DIRS@)
 include_directories(@QGLViewer_INCLUDE_DIRS@)
@@ -47,4 +52,4 @@ include_directories(@qwtplot3d_INCLUDE_DIRS@)
 include_directories(@FFTW_INCLUDE_DIRS@)
 include_directories(@YARP_INCLUDE_DIRS@)
 
-set(CEDAR_EXTERNAL_LIBS @CEDAR_THIRD_PARTY_LIBS@)
+set(CEDAR_EXTERNAL_LIBS @CEDAR_THIRD_PARTY_LIBS@ @QT_LIBRARIES@)
