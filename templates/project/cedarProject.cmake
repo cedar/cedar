@@ -59,20 +59,6 @@ if (DEBUG_CEDAR_BUILD_SYSTEM)
   message ("  >> cedar home is set to ${CEDAR_HOME}")
 endif(DEBUG_CEDAR_BUILD_SYSTEM)
 
-# Look for qt  
-find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml REQUIRED)
-
-if(QT4_FOUND)
-  # Include qt's cmake scripts
-  include(${QT_USE_FILE})
-  
-  # Add qt include directories
-  include_directories(${QT_INCLUDE_DIRS})
-endif(QT4_FOUND)
-
-# Look for opencv
-link_libraries(opencv_highgui opencv_core)
-
 if(CEDAR_HOME)
   message("-- Using local cedar version in ${CEDAR_HOME}")
   # Add include directories
@@ -81,6 +67,9 @@ if(CEDAR_HOME)
   # Add link directories
   link_directories("${CEDAR_HOME}/${CEDAR_LIB_DIR}")
   
+  # includes and libraries of external dependencies
+  include("${CEDAR_HOME}/build/cedar_configuration.cmake")
+  
 elseif(CEDAR_HOME_INSTALLED)
   message("-- Using installed cedar version in ${CEDAR_HOME_INSTALLED}")
   # Add include directories
@@ -88,33 +77,12 @@ elseif(CEDAR_HOME_INSTALLED)
 
   # Add link directories
   link_directories("${CEDAR_HOME_INSTALLED}/lib")
+
+  # includes and libraries of external dependencies
+  include("${CEDAR_HOME_INSTALLED}/share/cedar/cedar_configuration.cmake")
 endif(CEDAR_HOME)
 
 ## Macros ########################
-
-
-macro(cedar_project_use_boost_libraries)
-  # Boost
-  if (${CMAKE_BUILD_STATIC_LIBS})
-    set(Boost_USE_STATIC_LIBS ON)
-  else (${CMAKE_BUILD_STATIC_LIBS})
-    set(Boost_USE_STATIC_LIBS OFF)
-  endif (${CMAKE_BUILD_STATIC_LIBS})
-
-  set(Boost_USE_MULTITHREADED ON)
-  find_package(Boost 1.40.0 COMPONENTS system filesystem ${ARGV})
-
-  if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
-    link_libraries(${Boost_LIBRARIES})
-  else(Boost_FOUND)
-    message(FATAL_ERROR "Required library boost was not found on your system!")
-  endif(Boost_FOUND)
-  
-  set(Boost_Added On)
-endmacro(cedar_project_use_boost_libraries)
-
-
 
 macro(cedar_project_depends_on target DEPENDS_ON other_target)
   add_dependencies(${target} ${other_target})
@@ -191,21 +159,13 @@ macro(cedar_project_add_target)
     add_library(${target_name} SHARED ${files})
   endif()
   
-  target_link_libraries(${target_name} cedarunits cedaraux cedardev cedarproc cedardyn ${QT_LIBRARIES})
+  target_link_libraries(${target_name} cedarunits cedaraux cedardev cedarproc cedardyn ${CEDAR_EXTERNAL_LIBS})
   
   foreach (dependency ${add_DEPENDS_ON})
     cedar_project_depends_on(${target_name} DEPENDS_ON ${dependency})
   endforeach()
   
 endmacro(cedar_project_add_target)
-
-
-
-macro(cedar_project_init_boost)
-  if (NOT Boost_Added)
-    cedar_project_use_boost_libraries()
-  endif(NOT Boost_Added)
-endmacro(cedar_project_init_boost)
 
 
   
@@ -222,8 +182,6 @@ macro(cedar_project_setup directory)
     add_definitions(-DMSVC)
   endif (CMAKE_COMPILER_IS_GNUCC)
   
-  cedar_project_init_boost()
-  
 endmacro(cedar_project_setup)
 
 
@@ -236,6 +194,7 @@ macro(list_files_to_compile directory)
   file(GLOB_RECURSE project_sources_c ${directory}/*.c)
   list(APPEND project_sources ${project_sources_c})
 endmacro(list_files_to_compile)
+
 
 
 macro(cedar_project_parse_arguments prefix arg_names option_names)
