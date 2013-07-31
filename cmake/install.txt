@@ -37,6 +37,12 @@
 ########################################################################################################################
 # install setup
 
+#------------------------
+# cedar configuration
+#------------------------
+# configure the file exposing cmake variables to projects
+configure_file("${CEDAR_HOME}/cmake/resources/cedar_configuration.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/cedar_configuration.cmake")
+install(FILES "${CEDAR_BUILD_DIR}/cedar_configuration.cmake" DESTINATION "${CEDAR_DOC_INSTALL_DIR}" OPTIONAL)
 
 #------------------------
 # Header files
