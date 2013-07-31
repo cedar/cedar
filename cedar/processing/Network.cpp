@@ -1903,7 +1903,6 @@ void cedar::proc::Network::processPromotedSlots()
       }
       catch (const cedar::aux::InvalidNameException& exc)
       {
-        throw exc;
       }
       catch (cedar::aux::ExceptionBase& exc) // remove promoted slot
       {
@@ -1911,16 +1910,13 @@ void cedar::proc::Network::processPromotedSlots()
         slots_delete_later.push_back(slot_name);
       }
     }
-    catch (const cedar::aux::InvalidNameException& exc)
-    {
-      throw exc;
-    }
-    catch (const cedar::proc::InvalidRoleException& exc)
-    {
-      throw exc;
-    }
     catch (cedar::aux::ExceptionBase& exc) // it's not, create a new promoted slot
     {
+      if
+      (
+        typeid(exc) != typeid(cedar::aux::InvalidNameException)
+          && typeid(exc) != typeid(cedar::proc::InvalidRoleException)
+      )
       {
         throw exc;
       }
