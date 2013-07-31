@@ -129,6 +129,11 @@ if(WITH_QT5 OR NOT QT4_FOUND)
     SET(QT_FOUND 0)
   endif()
   SET(QT5_FOUND ${QT_FOUND})
+  
+  # set the path of the Qt uic executable -- usually only needed for Qt5
+  if(NOT ${QT_UIC_EXECUTABLE})
+	  set(QT_UIC_EXECUTABLE "/usr/local/bin/uic")
+  endif()
 endif(WITH_QT5 OR NOT QT4_FOUND)
 
 if(NOT QT_FOUND)
