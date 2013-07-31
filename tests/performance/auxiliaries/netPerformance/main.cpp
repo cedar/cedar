@@ -89,8 +89,6 @@ void run_test()
   cedar::test::test_time("read/write cycle (cv::Mat)", mat_read_write);
 }
 
-
-
 int main(int argc, char* argv[])
 {
   QCoreApplication* app;
