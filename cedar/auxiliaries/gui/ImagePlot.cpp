@@ -173,10 +173,12 @@ void cedar::aux::gui::ImagePlot::construct()
   QHBoxLayout *p_layout = new QHBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(p_layout);
-  this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+  this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
   mpImageDisplay = new cedar::aux::gui::ImagePlot::ImageDisplay(this, "no image loaded");
   p_layout->addWidget(mpImageDisplay);
+  mpImageDisplay->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+  mpImageDisplay->setMinimumSize(QSize(50, 50));
 
   this->mpWorkerThread = new QThread();
   mWorker = cedar::aux::gui::detail::ImagePlotWorkerPtr(new cedar::aux::gui::detail::ImagePlotWorker(this));
