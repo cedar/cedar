@@ -1258,6 +1258,7 @@ void cedar::proc::gui::StepItem::setDisplayMode(cedar::proc::gui::StepItem::Disp
 
 QWidget* cedar::proc::gui::StepItem::createDockWidget(const std::string& title, QWidget* pPlot)
 {
+  //!@todo There's duplicated code here -- unify
   if (this->mpMainWindow)
   {
     QDockWidget *p_dock = new QDockWidget(QString::fromStdString(title), this->mpMainWindow);
@@ -1304,7 +1305,7 @@ void cedar::proc::gui::StepItem::removeChildWidget()
   {
     cedar::aux::LogSingleton::getInstance()->error
     (
-      "Error: could not find a reference to the destroyed ChildWidget.",
+      "Could not find a reference to the destroyed ChildWidget.",
       "cedar::proc::gui::StepItem::removeChildWidget()"
     );
   }

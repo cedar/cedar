@@ -189,7 +189,7 @@ void cedar::proc::sources::NetReader::compute(const cedar::proc::Arguments&)
   {
     this->mOutput->setData(mReader->read());
   }
-  catch(cedar::aux::net::NetWaitingForWriterException& e)
+  catch (cedar::aux::net::NetWaitingForWriterException& e)
   {
     // no writer instantiated yet? ignore
     // CHANGE NOTHING

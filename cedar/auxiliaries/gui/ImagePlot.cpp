@@ -603,14 +603,13 @@ cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix)
 
   cv::Mat converted = cv::Mat(matrix.rows, matrix.cols, CV_8UC3);
 
-  int i,j;
   const unsigned char* p_in;
   unsigned char* p_converted;
-  for (i = 0; i < rows; ++i)
+  for (int i = 0; i < rows; ++i)
   {
     p_in = matrix.ptr<unsigned char>(i);
     p_converted = converted.ptr<unsigned char>(i);
-    for (j = 0; j < cols; ++j)
+    for (int j = 0; j < cols; ++j)
     {
       size_t v = static_cast<size_t>(p_in[j]);
       // channel 0

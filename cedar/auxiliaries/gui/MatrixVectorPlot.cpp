@@ -325,7 +325,7 @@ void cedar::aux::gui::MatrixVectorPlot::showLegend(bool show)
   if (show)
   {
     // show legend
-    QwtLegend *p_legend = cedar::aux::asserted_cast<QwtLegend *>(this->mpPlot->legend());
+    QwtLegend* p_legend = cedar::aux::asserted_cast<QwtLegend*>(this->mpPlot->legend());
     if (p_legend == NULL)
     {
       p_legend = new QwtLegend();

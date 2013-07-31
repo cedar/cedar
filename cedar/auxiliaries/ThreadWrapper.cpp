@@ -159,7 +159,7 @@ cedar::aux::ThreadWrapper::~ThreadWrapper()
 bool cedar::aux::ThreadWrapper::isRunning() const
 {
   // no locks, because they really slow things down, here ...
-  // todo: can I have a lockless-version that only is called from mpThread ?
+  //!@todo: can I have a lockless-version that only is called from mpThread?
 
   if (mpThread == NULL)
     return false;
