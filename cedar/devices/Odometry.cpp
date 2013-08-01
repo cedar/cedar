@@ -96,7 +96,7 @@ cedar::unit::PlaneAngle cedar::dev::Odometry::getRotation()
 void cedar::dev::Odometry::setTranslation(const cedar::unit::Length& x, const cedar::unit::Length& y)
 {
   //sets x- and y-position only (z-position = 0)
-  LocalCoordinateFrame::setTranslation(x, y, 0.0 * cedar::unit::DEFAULT_LENGTH_UNIT);
+  this->getCoordinateFrame()->setTranslation(x, y, 0.0 * cedar::unit::DEFAULT_LENGTH_UNIT);
 }
 
 void cedar::dev::Odometry::setRotation(const cedar::unit::PlaneAngle& angle)
