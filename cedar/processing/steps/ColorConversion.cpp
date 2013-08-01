@@ -159,7 +159,8 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::ColorConversion::determineIn
                                   cedar::aux::ConstDataPtr data
                                 ) const
 {
-  if (cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
+  cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data);
+  if (mat_data && mat_data->getData().channels() == 3)
   {
     try
     {
@@ -366,11 +367,15 @@ void cedar::proc::steps::ColorConversion::inputConnectionChanged(const std::stri
   this->updateTargetImageColorSpace();
   this->updateCvConvertConstant();
 
-  this->lock(cedar::aux::LOCK_TYPE_READ);
-  this->compute(cedar::proc::Arguments());
-  this->unlock();
-  this->emitOutputPropertiesChangedSignal("converted image");
-  this->onTrigger();
+  // check if input is "valid" and propagate change
+  if (this->mInput->getData().channels() == 3)
+  {
+    this->lock(cedar::aux::LOCK_TYPE_READ);
+    this->compute(cedar::proc::Arguments());
+    this->unlock();
+    this->emitOutputPropertiesChangedSignal("converted image");
+    this->onTrigger();
+  }
 }
 
 void cedar::proc::steps::ColorConversion::compute(const cedar::proc::Arguments& /* arguments */)
