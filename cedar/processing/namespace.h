@@ -72,6 +72,7 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(Trigger);
     CEDAR_DECLARE_PROC_CLASS(Manager);
     CEDAR_DECLARE_PROC_CLASS(Network);
+    CEDAR_DECLARE_PROC_CLASS(NetworkPath);
     CEDAR_DECLARE_PROC_CLASS(OwnedData);
     CEDAR_DECLARE_PROC_CLASS(PromotedExternalData);
     CEDAR_DECLARE_PROC_CLASS(PromotedOwnedData);
