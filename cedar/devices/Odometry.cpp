@@ -95,19 +95,18 @@ cedar::unit::PlaneAngle cedar::dev::Odometry::getRotation()
 
 void cedar::dev::Odometry::setTranslation(const cedar::unit::Length& x, const cedar::unit::Length& y)
 {
-  //!todo
   //sets x- and y-position only (z-position = 0)
-  getCoordinateFrame()->setTranslation(x, y, 0.0 * cedar::unit::DEFAULT_LENGTH_UNIT);
+  LocalCoordinateFrame::setTranslation(x, y, 0.0 * cedar::unit::DEFAULT_LENGTH_UNIT);
 }
 
 void cedar::dev::Odometry::setRotation(const cedar::unit::PlaneAngle& angle)
 {
   //construct a new matrix as parameter for setOrientationQuaternion
   cv::Mat rotation = cv::Mat(4, 1, CV_64FC1);
-  rotation.at<double>(0, 0) = 0;                        //orientation is a unit-quaternion
+  rotation.at<double>(0, 0) = 0; //orientation is a unit-quaternion
   rotation.at<double>(1, 0) = boost::units::cos(angle);
   rotation.at<double>(2, 0) = boost::units::sin(angle);
-  rotation.at<double>(3, 0) = 0;                        //no rotation in z-direction
+  rotation.at<double>(3, 0) = 0; //no rotation in z-direction
 
   //todo: fix this! (HR)
 //  setOrientationQuaternion(orientation_mat);

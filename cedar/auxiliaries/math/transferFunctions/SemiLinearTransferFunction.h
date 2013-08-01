@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LinearSigmoid.h
+    File:        SemiLinearTransferFunction.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
@@ -34,18 +34,31 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MATH_LINEAR_SIGMOID_H
-#define CEDAR_AUX_MATH_LINEAR_SIGMOID_H
+#ifndef CEDAR_AUX_MATH_SEMI_LINEAR_TRANSFER_FUNCTION_H
+#define CEDAR_AUX_MATH_SEMI_LINEAR_TRANSFER_FUNCTION_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
-#include "cedar/auxiliaries/math/Sigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/namespace.h"
+#include "cedar/auxiliaries/math/TransferFunction.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief Sigmoid function that is linear, i.e., multiplies the values with a scalar.
+/*!@brief Transfer function that is linear above a given threshold.
+ *
+ *        The equation for this function is:
+ *        @f[
+ *           \sigma(x) =
+ *              \left\{
+ *                \begin{array}{ll}
+ *                  \theta: & x < \theta \\
+ *                  \theta + \beta \cdot (x - \theta): & \text{otherwise}
+ *                \end{array}
+ *              \right.
+ *        @f]
+ *        where \f$\theta\f$ is the threshold set for this function.
  */
-class cedar::aux::math::LinearSigmoid : public cedar::aux::math::Sigmoid
+class cedar::aux::math::SemiLinearTransferFunction : public cedar::aux::math::TransferFunction
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -56,7 +69,7 @@ class cedar::aux::math::LinearSigmoid : public cedar::aux::math::Sigmoid
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  LinearSigmoid(double threshold = 0.0);
+  SemiLinearTransferFunction(double threshold = 0.0, double beta = 1.0);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -65,6 +78,20 @@ public:
   /*!@brief this function calculates the abs-based sigmoid function for a given double value.
    */
   virtual double compute(double value) const;
+
+  /*!@brief Returns the current beta value.
+   */
+  inline double getBeta() const
+  {
+    return this->_mBeta->getValue();
+  }
+
+  /*! Returns the current threshold value.
+   */
+  inline double getThreshold() const
+  {
+    return this->_mThreshold->getValue();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -84,7 +111,11 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  //!@brief Threshold.
+  cedar::aux::DoubleParameterPtr _mThreshold;
+
+  //!@brief Steepness of the linear part.
+  cedar::aux::DoubleParameterPtr _mBeta;
 };
 
-#endif  // CEDAR_AUX_MATH_LINEAR_SIGMOID_H
+#endif  // CEDAR_AUX_MATH_SEMI_LINEAR_TRANSFER_FUNCTION_H

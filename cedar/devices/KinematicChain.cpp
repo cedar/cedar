@@ -1091,7 +1091,6 @@ cv::Mat cedar::dev::KinematicChain::calculateTwistTemporalDerivative(unsigned in
 
 cv::Mat cedar::dev::KinematicChain::calculateEndEffectorPosition()
 {
-  //!todo
   return mpEndEffectorCoordinateFrame->getTranslation().matrix;
 }
 
@@ -1200,9 +1199,9 @@ void cedar::dev::KinematicChain::addInitialConfiguration(const std::string &name
   auto found = mInitialConfigurations.find(name);
   if (found != mInitialConfigurations.end())
   {
-    CEDAR_THROW( cedar::aux::DuplicateNameException ,
-                 "You are adding the initial configuration name '"
-                   + name + "' which already exists. Delete it first." );
+    CEDAR_THROW(cedar::aux::DuplicateNameException ,
+                "You are adding the initial configuration name '"
+                  + name + "' which already exists. Delete it first." );
   }
 
   mInitialConfigurations[ name ] = config.clone();
@@ -1309,8 +1308,8 @@ bool cedar::dev::KinematicChain::applyInitialConfiguration(unsigned int index)
 
   if (index >= mInitialConfigurations.size())
   {
-    CEDAR_THROW( cedar::aux::InvalidNameException ,
-               "You tried to apply an initial configuration with index "
+    CEDAR_THROW(cedar::aux::InvalidNameException ,
+                "You tried to apply an initial configuration with index "
                  + boost::lexical_cast<std::string>(index) 
                  + "' which doesnt exist. Size: " 
                  + boost::lexical_cast<std::string>(mInitialConfigurations.size()) );
@@ -1388,10 +1387,10 @@ cv::Mat cedar::dev::KinematicChain::getCurrentInitialConfiguration()
   if (found == mInitialConfigurations.end())
   {
     // you cant really land here, but lets be paranoid:
-    CEDAR_THROW( cedar::aux::InvalidNameException,
-                 "You requested the current initial configuration, "
-                 "but none is set. "
-                 "Use addInitialConfiguration().");
+    CEDAR_THROW(cedar::aux::InvalidNameException,
+                "You requested the current initial configuration, "
+                "but none is set. "
+                "Use addInitialConfiguration().");
   }
 
   return mInitialConfigurations[ mCurrentInitialConfiguration ];

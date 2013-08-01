@@ -59,6 +59,14 @@ class cedar::aux::net::NetUnexpectedDataException : public cedar::aux::Exception
 {
 }; // class 
 
+/*!@brief we expected data and there was none
+ *
+ * Derives from NetUnexpectedDataException for backwards-compatibility.
+ */
+class cedar::aux::net::NetNoNewDataException : public cedar::aux::net::NetUnexpectedDataException
+{
+}; // class 
+
 /*!@brief exception for when the transmitted data is explicitly not handled
  *
  */

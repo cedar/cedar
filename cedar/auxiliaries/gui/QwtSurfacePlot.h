@@ -22,11 +22,15 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatrixSlicePlot3D.h
+    File:        QwtSurfacePlot.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2012 05 29
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 07 14
 
     Description:
 
@@ -34,21 +38,25 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H
-#define CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H
+#ifndef CEDAR_AUX_GUI_QWT_SURFACE_PLOT_H
+#define CEDAR_AUX_GUI_QWT_SURFACE_PLOT_H
 
-// CEDAR CONFIGURATION
 #include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_QWTPLOT3D
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/PlotInterface.h"
 
 // SYSTEM INCLUDES
-#include <QLabel>
+#include <QWidget>
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
-
+#include <qwtplot3d/qwt3d_gridplot.h>
+#include <qwtplot3d/qwt3d_function.h>
+#include <qwtplot3d/qwt3d_plot3d.h>
+#include <qwtplot3d/qwt3d_io.h>
 
 //!@cond SKIPPED_DOCUMENTATION
 namespace cedar
@@ -59,16 +67,16 @@ namespace cedar
     {
       namespace detail
       {
-        /* This is an internal class of MatrixSlicePlot3D that cannot be nested because Qt's moc doesn't support nested classes.
+        /* This is an internal class of QwtSurfacePlot that cannot be nested because Qt's moc doesn't support nested classes.
          *
-         * Don't use it outside of the MatrixSlicePlot3D!
+         * Don't use it outside of the QwtSurfacePlot!
          */
-        class MatrixSlicePlot3DWorker : public QObject
+        class QwtSurfacePlotWorker : public QObject
         {
           Q_OBJECT
 
           public:
-            MatrixSlicePlot3DWorker(cedar::aux::gui::MatrixSlicePlot3D* pPlot)
+            QwtSurfacePlotWorker(cedar::aux::gui::QwtSurfacePlot* pPlot)
             :
             mpPlot(pPlot)
             {
@@ -81,9 +89,9 @@ namespace cedar
             void done();
 
           public:
-            cedar::aux::gui::MatrixSlicePlot3D *mpPlot;
+            cedar::aux::gui::QwtSurfacePlot *mpPlot;
         };
-        CEDAR_GENERATE_POINTER_TYPES(MatrixSlicePlot3DWorker);
+        CEDAR_GENERATE_POINTER_TYPES(QwtSurfacePlotWorker);
       }
     }
   }
@@ -91,9 +99,12 @@ namespace cedar
 //!@endcond
 
 
-/*!@brief A slice-plot for 3D matrices.
+/*!@brief Matrix plot that can display 2D matrices (i.e. vectors).
+ *
+ *        Matrices displayed by this plot are plotted as a three-dimensional surface, where the x- and y-coordinates are
+ *        assumed to be the indices of the 2d matrix while the z-coordinate is the value stored within the matrix.
  */
-class cedar::aux::gui::MatrixSlicePlot3D : public cedar::aux::gui::PlotInterface
+class cedar::aux::gui::QwtSurfacePlot : public PlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -103,38 +114,58 @@ class cedar::aux::gui::MatrixSlicePlot3D : public cedar::aux::gui::PlotInterface
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::aux::gui::detail::MatrixSlicePlot3DWorker;
+  friend class cedar::aux::gui::detail::QwtSurfacePlotWorker;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  class Perspective
+  {
+    public:
+      Perspective(const std::string& name = "perspective",
+                  double rotationX = 0, double rotationY = 0, double rotationZ = 0,
+                  double scaleX = 1, double scaleY = 1, double scaleZ = 1,
+                  double shiftX = 0, double shiftY = 0, double shiftZ = 0,
+                  double zoom = 1);
+
+      void applyTo(Qwt3D::Plot3D* pPlot);
+
+      const std::string& getName() const
+      {
+        return this->mName;
+      }
+
+    private:
+      std::string mName;
+      double mRotation[3];
+      double mScale[3];
+      double mShift[3];
+      double mZoom;
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The constructor.
-  MatrixSlicePlot3D(QWidget* pParent = NULL);
+  //!@brief The standard constructor.
+  QwtSurfacePlot(QWidget *pParent = NULL);
 
-  //!@brief A constructor taking both a data pointer and a title.
-  MatrixSlicePlot3D(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent = NULL);
+  //!@brief Constructor expecting a DataPtr.
+  QwtSurfacePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget* pParent = NULL);
 
   //!@brief Destructor
-  ~MatrixSlicePlot3D();
+  ~QwtSurfacePlot();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Displays the data.
-   *
-   * @param data A pointer to the data to display. If this isn't a pointer to a cedar::aux::MatData, the function
-   *             throws.
-   * @param title title of the plot window
-   */
-  void plot(cedar::aux::ConstDataPtr data, const std::string& title);
-
-  /*!@brief Updates the plot periodically.
-   */
+  //!@brief display data
+  void plot(cedar::aux::ConstDataPtr matData, const std::string& title);
+  //!@brief show or hide the plot grid
+  void showGrid(bool show);
+  //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
 
 signals:
@@ -145,32 +176,27 @@ signals:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief Reacts to a resize of the plot.
-   */
-  void resizeEvent(QResizeEvent *event);
-
-  /*!@brief Processes key events.
-   *
-   * This function handles ctrl+G, which saves the window settings.
-   */
-  virtual void keyPressEvent(QKeyEvent* pEvent);
+  //!@brief create and handle the context menu
+  void contextMenuEvent(QContextMenuEvent * pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief Creates the image based on the matrix.
-   */
-  void slicesFromMat(const cv::Mat& mat);
-
-  /*!@brief Resizes the pixmap used to display the image data.
-   */
-  void resizePixmap();
-
-  void updateData();
-
-  //! initialize the widget
+  //!@brief initialize
   void init();
+
+  //!@brief reset the perspective of the plot
+  void resetPerspective(size_t perspectiveIndex = 0);
+
+  //!@brief delete the allocated array data
+  void deleteArrayData();
+
+  //!@brief update the allocated array data
+  void updateArrayData();
+
+  //!@brief Applies the labels from the data object to the plot.
+  void applyLabels();
 
 private slots:
   void conversionDone();
@@ -181,39 +207,33 @@ private slots:
 protected:
   // none yet
 private:
-  //! Label used for displaying the image.
-  QLabel* mpImageDisplay;
+  //! the displayed MatData
+  cedar::aux::ConstMatDataPtr mMatData;
 
-  //! Data displayed by the plot.
-  cedar::aux::ConstMatDataPtr mData;
+  //! flag if plot grid should be displayed
+  bool mShowGridLines;
 
-  //! Converted image.
-  QImage mImage;
+  //! the plot object
+  Qwt3D::GridPlot* mpPlot;
 
-  //! Lock for mImage.
-  QReadWriteLock mImageLock;
+  //! vector of possible perspectives
+  std::vector<Perspective> mPerspectives;
 
-  //! Id of the timer used for updating the plot.
-  int mTimerId;
+  //! row count of data
+  size_t mDataRows;
+
+  //! column count of data
+  size_t mDataCols;
+
+  //! 2D array data
+  Qwt3D::Triple** mppArrayData;
 
   //! Thread in which conversion of mat data to qwt triple is done.
   QThread* mpWorkerThread;
 
   //! Worker object.
-  cedar::aux::gui::detail::MatrixSlicePlot3DWorkerPtr mWorker;
+  cedar::aux::gui::detail::QwtSurfacePlotWorkerPtr mWorker;
+}; // class cedar::aux::gui::QwtSurfacePlot
 
-  cv::Mat mSliceMatrix;
-  cv::Mat mSliceMatrixByte;
-  cv::Mat mSliceMatrixByteC3;
-  cv::Mat mSliceSize;
-  bool mDataIsSet;
-
-  //! desired columns of the slice plot
-  unsigned int mDesiredColumns;
-
-  //! True if the plot is currently converting the data to the internal format. Used to skip overlapping timer events.
-  bool mConverting;
-
-}; // class cedar::aux::gui::MatrixSlicePlot3D
-
-#endif // CEDAR_AUX_GUI_MATRIX_SLICE_PLOT_3D_H
+#endif // CEDAR_USE_QWTPLOT3D
+#endif // CEDAR_AUX_GUI_QWT_SURFACE_PLOT_H

@@ -62,9 +62,9 @@ namespace
       double fps = grabber.getFramerate();
       std::cout << "Start thread . . . " << std::endl;
 
-      //startGrabber grabbing and wait
+      //start grabbing and wait
       boost::posix_time::ptime test_start = boost::posix_time::microsec_clock::local_time();
-      grabber.startGrabber();
+      grabber.start();
 
       //sleep(FPS_TEST_DURATION_IN_SEC);
 
@@ -80,8 +80,8 @@ namespace
         std::cout << "measured fps: "<< grabber.getMeasuredFramerate()<<std::endl;
        }
 
-      //stopGrabber
-      grabber.stopGrabber();
+      //stop
+      grabber.stop();
       boost::posix_time::ptime test_end = boost::posix_time::microsec_clock::local_time();
 
       //calculate real diff:

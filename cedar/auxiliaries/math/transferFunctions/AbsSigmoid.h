@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        HeavysideSigmoid.h
+    File:        AbsSigmoid.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -38,44 +38,43 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MATH_HEAVISIDE_SIGMOID_H
-#define CEDAR_AUX_MATH_HEAVISIDE_SIGMOID_H
+#ifndef CEDAR_AUX_MATH_ABS_SIGMOID_H
+#define CEDAR_AUX_MATH_ABS_SIGMOID_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
-#include "cedar/auxiliaries/math/sigmoids.h"
+#include "cedar/auxiliaries/math/transferFunctions/namespace.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
 
 // SYSTEM INCLUDES
 
-
-/*!@brief A sigmoid step function, going from 0.0 to 1.0 when the input reaches or exceeds the threshold.
+/*!@brief Sigmoid function that is based on absolute values.
  *
- * This class internally calls the free function cedar::aux::math::sigmoidHeaviside.
+ *        This function behaves similar to cedar::aux::math::ExpSigmoid, but computing it is less costly.
+ *
+ *        The equation for this sigmoid is:
+ *        @f[
+ *           \sigma(x) = \frac{1}{2} \cdot \frac{1 + \beta \cdot (x - \theta)}{1 + \beta \cdot |x - \theta|}
+ *        @f]
+ *        where \f$\theta\f$ is the threshold set for this function and \f$\beta\f$ is the steepness of the sigmoid.
  */
-class cedar::aux::math::HeavisideSigmoid : public cedar::aux::math::Sigmoid
+class cedar::aux::math::AbsSigmoid : public cedar::aux::math::Sigmoid
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  HeavisideSigmoid(double threshold = 0.0)
-  :
-  cedar::aux::math::Sigmoid(threshold)
-  {
-  }
-
-  //!@brief Destructor
-  virtual ~HeavisideSigmoid()
-  {
-  }
+  AbsSigmoid(double threshold = 0.0, double beta = 100.0);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief this function calculates the Heaviside function for a given double value.
+  /*!@brief this function calculates the abs-based sigmoid function for a given double value.
    */
   virtual double compute(double value) const;
 
@@ -95,10 +94,10 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-
+  //!@brief steepness of the abs-sigmoid
+  cedar::aux::DoubleParameterPtr _mBeta;
 private:
   // none yet
 };
 
-#endif  // CEDAR_AUX_MATH_HEAVISIDE_SIGMOID_H
+#endif  // CEDAR_AUX_MATH_ABS_SIGMOID_H
