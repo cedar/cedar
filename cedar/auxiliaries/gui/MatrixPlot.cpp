@@ -44,11 +44,11 @@
 #include "cedar/configuration.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
 #ifdef CEDAR_USE_QWT
-  #include "cedar/auxiliaries/gui/LinePlot.h"
+  #include "cedar/auxiliaries/gui/QwtLinePlot.h"
   #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
 #endif // CEDAR_USE_QWT
 #ifdef CEDAR_USE_QWTPLOT3D
-  #include "cedar/auxiliaries/gui/SurfacePlot.h"
+  #include "cedar/auxiliaries/gui/QwtSurfacePlot.h"
 #else // CEDAR_USE_QWTPLOT3D
   #include "cedar/auxiliaries/gui/ImagePlot.h"
 #endif // CEDAR_USE_QWTPLOT3D
@@ -170,14 +170,14 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
       break;
 
     case 1:
-      this->mpCurrentPlotWidget = new cedar::aux::gui::LinePlot(this->mData, title);
+      this->mpCurrentPlotWidget = new cedar::aux::gui::QwtLinePlot(this->mData, title);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SLOT(processChangedData()));
       break;
 #endif // CEDAR_USE_QWT
 
     case 2:
 #ifdef CEDAR_USE_QWTPLOT3D
-      this->mpCurrentPlotWidget = new cedar::aux::gui::SurfacePlot(this->mData, title);
+      this->mpCurrentPlotWidget = new cedar::aux::gui::QwtSurfacePlot(this->mData, title);
 #else
       this->mpCurrentPlotWidget = new cedar::aux::gui::ImagePlot(this->mData, title);
 #endif // CEDAR_USE_QWTPLOT3D

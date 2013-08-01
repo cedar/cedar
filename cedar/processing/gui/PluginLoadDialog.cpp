@@ -96,7 +96,11 @@ void cedar::proc::gui::PluginLoadDialog::browseFile()
                               (
                                 this, // parent = 0,
                                 "Select a plugin", // caption = QString(),
+#if QT_VERSION >= 0x050000
+                                "/",
+#else
                                 last_dir->getValue().absolutePath(),
+#endif
                                 filter
                               );
   if (!file.isEmpty())

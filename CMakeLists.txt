@@ -39,8 +39,6 @@ cmake_minimum_required(VERSION 2.8)
 # set the cedar home directory to the current directory
 set(CEDAR_HOME ${CMAKE_CURRENT_SOURCE_DIR} CACHE PATH "Home of cedar; should NOT be altered.")
 
-
-
 # include config file
 set(CEDAR_CONF_FILE ${CEDAR_HOME}/cedar.conf CACHE FILEPATH "Default configuration file of cedar.")
 

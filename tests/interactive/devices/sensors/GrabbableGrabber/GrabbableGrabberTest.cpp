@@ -53,7 +53,7 @@
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
-#include <QtGui/QApplication>
+#include <QApplication>
 #include <opencv2/opencv.hpp>
 #include <boost/lexical_cast.hpp>
 #include <ios>
@@ -245,7 +245,7 @@ int main(int argc, char **argv)
   // start the grabber-thread for reading the GL images in the background
   std::cout << "Start grabbing in the background" << std::endl;
   p_grabber->setFramerate(50);
-  p_grabber->startGrabber();
+  p_grabber->start();
 
   // start recording (if you like)
   // std::cout << "\nStart Recording\n";
@@ -287,11 +287,11 @@ int main(int argc, char **argv)
   // clean up
   //----------------------------------------------------------------------------------------
 
-  // stopGrabber grabbing-thread if running
+  // stop grabbing-thread if running
   // recording will also be stopped
   if (p_grabber->isRunning())
   {
-    p_grabber->stopGrabber();
+    p_grabber->stop();
   }
   std::cout << "finished\n";
 

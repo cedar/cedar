@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SurfacePlot.cpp
+    File:        QwtSurfacePlot.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -45,7 +45,7 @@
 #define NOMINMAX // prevents MSVC conflicts
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/SurfacePlot.h"
+#include "cedar/auxiliaries/gui/QwtSurfacePlot.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
 #include "cedar/auxiliaries/annotation/Dimensions.h"
@@ -65,14 +65,14 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gui::SurfacePlot::SurfacePlot(QWidget *pParent)
+cedar::aux::gui::QwtSurfacePlot::QwtSurfacePlot(QWidget *pParent)
 :
 cedar::aux::gui::PlotInterface(pParent)
 {
   this->init();
 }
 
-cedar::aux::gui::SurfacePlot::Perspective::Perspective(const std::string& name,
+cedar::aux::gui::QwtSurfacePlot::Perspective::Perspective(const std::string& name,
                                                         double rotationX, double rotationY, double rotationZ,
                                                         double scaleX, double scaleY, double scaleZ,
                                                         double shiftX, double shiftY, double shiftZ,
@@ -92,7 +92,7 @@ mZoom(zoom)
   mShift[2]    = shiftZ;
 }
 
-cedar::aux::gui::SurfacePlot::SurfacePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent)
+cedar::aux::gui::QwtSurfacePlot::QwtSurfacePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent)
 :
 cedar::aux::gui::PlotInterface(pParent),
 mShowGridLines(false),
@@ -102,7 +102,7 @@ mppArrayData(NULL)
   this->plot(matData, title);
 }
 
-cedar::aux::gui::SurfacePlot::~SurfacePlot()
+cedar::aux::gui::QwtSurfacePlot::~QwtSurfacePlot()
 {
   if (this->mpWorkerThread)
   {
@@ -119,7 +119,7 @@ cedar::aux::gui::SurfacePlot::~SurfacePlot()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gui::SurfacePlot::deleteArrayData()
+void cedar::aux::gui::QwtSurfacePlot::deleteArrayData()
 {
   if (mppArrayData != NULL)
   {
@@ -131,7 +131,7 @@ void cedar::aux::gui::SurfacePlot::deleteArrayData()
   }
 }
 
-void cedar::aux::gui::SurfacePlot::updateArrayData()
+void cedar::aux::gui::QwtSurfacePlot::updateArrayData()
 {
   cv::Mat data;
   this->mMatData->lockForRead();
@@ -170,7 +170,7 @@ void cedar::aux::gui::SurfacePlot::updateArrayData()
   }
 }
 
-void cedar::aux::gui::SurfacePlot::Perspective::applyTo(Qwt3D::Plot3D* pPlot)
+void cedar::aux::gui::QwtSurfacePlot::Perspective::applyTo(Qwt3D::Plot3D* pPlot)
 {
   pPlot->setRotation(mRotation[0], mRotation[1], mRotation[2]);
   pPlot->setScale(mScale[0], mScale[1], mScale[2]);
@@ -178,20 +178,20 @@ void cedar::aux::gui::SurfacePlot::Perspective::applyTo(Qwt3D::Plot3D* pPlot)
   pPlot->setZoom(mZoom);
 }
 
-void cedar::aux::gui::SurfacePlot::plot(cedar::aux::ConstDataPtr data, const std::string& /* title */)
+void cedar::aux::gui::QwtSurfacePlot::plot(cedar::aux::ConstDataPtr data, const std::string& /* title */)
 {
   this->mMatData = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
 
   if (!this->mMatData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
-                "Could not cast to cedar::aux::MatData in cedar::aux::gui::SurfacePlot::plot.");
+                "Could not cast to cedar::aux::MatData in cedar::aux::gui::QwtSurfacePlot::plot.");
   }
 
   this->startTimer(60);
 }
 
-void cedar::aux::gui::SurfacePlot::init()
+void cedar::aux::gui::QwtSurfacePlot::init()
 {
   this->mPerspectives.push_back(Perspective("default",
                                             90, 0, -90,
@@ -228,7 +228,7 @@ void cedar::aux::gui::SurfacePlot::init()
   mDataRows = mDataCols = 0;
 
   this->mpWorkerThread = new QThread();
-  mWorker = cedar::aux::gui::detail::SurfacePlotWorkerPtr(new cedar::aux::gui::detail::SurfacePlotWorker(this));
+  mWorker = cedar::aux::gui::detail::QwtSurfacePlotWorkerPtr(new cedar::aux::gui::detail::QwtSurfacePlotWorker(this));
   mWorker->moveToThread(this->mpWorkerThread);
   QObject::connect(this, SIGNAL(convert()), mWorker.get(), SLOT(convert()));
   QObject::connect(mWorker.get(), SIGNAL(done()), this, SLOT(conversionDone()));
@@ -237,7 +237,7 @@ void cedar::aux::gui::SurfacePlot::init()
 }
 
 //!@cond SKIPPED_DOCUMENTATION
-void cedar::aux::gui::detail::SurfacePlotWorker::convert()
+void cedar::aux::gui::detail::QwtSurfacePlotWorker::convert()
 {
   this->mpPlot->updateArrayData();
 
@@ -245,7 +245,7 @@ void cedar::aux::gui::detail::SurfacePlotWorker::convert()
 }
 //!@endcond
 
-void cedar::aux::gui::SurfacePlot::conversionDone()
+void cedar::aux::gui::QwtSurfacePlot::conversionDone()
 {
   if(this->mppArrayData == NULL)
   {
@@ -257,7 +257,7 @@ void cedar::aux::gui::SurfacePlot::conversionDone()
   this->mpPlot->updateGL();
 }
 
-void cedar::aux::gui::SurfacePlot::timerEvent(QTimerEvent * /* pEvent */)
+void cedar::aux::gui::QwtSurfacePlot::timerEvent(QTimerEvent * /* pEvent */)
 {
   if (this->isVisible() && this->mMatData)
   {
@@ -266,7 +266,7 @@ void cedar::aux::gui::SurfacePlot::timerEvent(QTimerEvent * /* pEvent */)
 }
 
 
-void cedar::aux::gui::SurfacePlot::applyLabels()
+void cedar::aux::gui::QwtSurfacePlot::applyLabels()
 {
   try
   {
@@ -291,7 +291,7 @@ void cedar::aux::gui::SurfacePlot::applyLabels()
       cedar::aux::LogSingleton::getInstance()->debugMessage
       (
         "Wrong number of entries in dimension annotations.",
-        "cedar::aux::gui::SurfacePlot::plot"
+        "cedar::aux::gui::QwtSurfacePlot::plot"
       );
     }
   }
@@ -301,14 +301,14 @@ void cedar::aux::gui::SurfacePlot::applyLabels()
   }
 }
 
-void cedar::aux::gui::SurfacePlot::resetPerspective(size_t perspectiveIndex)
+void cedar::aux::gui::QwtSurfacePlot::resetPerspective(size_t perspectiveIndex)
 {
   CEDAR_ASSERT(perspectiveIndex < this->mPerspectives.size());
   Perspective& perspective = this->mPerspectives.at(perspectiveIndex);
   perspective.applyTo(this->mpPlot);
 }
 
-void cedar::aux::gui::SurfacePlot::showGrid(bool show)
+void cedar::aux::gui::QwtSurfacePlot::showGrid(bool show)
 {
   this->mShowGridLines = show;
   if (show)
@@ -323,7 +323,7 @@ void cedar::aux::gui::SurfacePlot::showGrid(bool show)
   }
 }
 
-void cedar::aux::gui::SurfacePlot::contextMenuEvent(QContextMenuEvent * pEvent)
+void cedar::aux::gui::QwtSurfacePlot::contextMenuEvent(QContextMenuEvent * pEvent)
 {
   QMenu menu(this);
 

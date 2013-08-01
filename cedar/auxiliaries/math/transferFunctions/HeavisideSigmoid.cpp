@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SemiLinearSigmoid.cpp
+    File:        HeavisideSigmoid.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 05 16
+    Date:        2012 03 09
 
     Description:
 
@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/sigmoids/SemiLinearSigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/HeavisideSigmoid.h"
 #include "cedar/auxiliaries/math/sigmoids.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/Singleton.h"
@@ -45,29 +45,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 // register class with the sigmoid factory manager
 //----------------------------------------------------------------------------------------------------------------------
-
 namespace
 {
   bool registered
-    = cedar::aux::math::TransferFunctionManagerSingleton::getInstance()->registerType<cedar::aux::math::SemiLinearSigmoidPtr>();
+    = cedar::aux::math::TransferFunctionManagerSingleton::getInstance()->registerType<cedar::aux::math::HeavisideSigmoidPtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::math::SemiLinearSigmoid::SemiLinearSigmoid(double threshold, double beta)
-:
-cedar::aux::math::Sigmoid(threshold),
-_mBeta(new cedar::aux::DoubleParameter(this, "beta", beta))
-{
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double cedar::aux::math::SemiLinearSigmoid::compute(double value) const
+double cedar::aux::math::HeavisideSigmoid::compute(double value) const
 {
-  return cedar::aux::math::sigmoidSemiLinear(value, this->getThreshold(), this->getBeta());
+  return cedar::aux::math::sigmoidHeaviside(value, this->getThreshold());
 }

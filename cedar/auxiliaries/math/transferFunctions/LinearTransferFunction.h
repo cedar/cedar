@@ -22,38 +22,36 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ExpSigmoid.h
+    File:        LinearTransferFunction.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 05 16
 
-    Description: Sigmoid function
+    Description: Sigmoid functions
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MATH_EXP_SIGMOID_H
-#define CEDAR_AUX_MATH_EXP_SIGMOID_H
+#ifndef CEDAR_AUX_MATH_LINEAR_TRANSFER_FUNCTION_H
+#define CEDAR_AUX_MATH_LINEAR_TRANSFER_FUNCTION_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/namespace.h"
-#include "cedar/auxiliaries/math/sigmoids.h"
-#include "cedar/auxiliaries/math/Sigmoid.h"
+#include "cedar/auxiliaries/math/transferFunctions/namespace.h"
+#include "cedar/auxiliaries/math/TransferFunction.h"
 
 // SYSTEM INCLUDES
 
-
-/*!@brief Sigmoid function that is based on the exponential function.
+/*!@brief Sigmoid function that is linear, i.e., multiplies the values with a scalar.
  *
- *
+ *        The equation for this function is:
+ *        @f[
+ *           \sigma(x) = x
+ *        @f]
+ *        where \f$\theta\f$ is the threshold set for this function.
  */
-class cedar::aux::math::ExpSigmoid : public cedar::aux::math::Sigmoid
+class cedar::aux::math::LinearTransferFunction : public cedar::aux::math::TransferFunction
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -64,23 +62,13 @@ class cedar::aux::math::ExpSigmoid : public cedar::aux::math::Sigmoid
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ExpSigmoid(double threshold = 0.0, double beta = 100.0)
-  :
-  cedar::aux::math::Sigmoid(threshold),
-  mBeta(new cedar::aux::DoubleParameter(this, "beta", beta, -1000.0, 1000.0))
-  {
-  }
-
-  //!@brief Destructor
-  virtual ~ExpSigmoid()
-  {
-  }
+  LinearTransferFunction();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief this function calculates the exp-based sigmoid function for a given double value.
+  /*!@brief this function calculates the abs-based sigmoid function for a given double value.
    */
   virtual double compute(double value) const;
 
@@ -100,11 +88,9 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief steepness of the exp-sigmoid
-  cedar::aux::DoubleParameterPtr mBeta;
-
+  // none yet
 private:
   // none yet
 };
 
-#endif  // CEDAR_AUX_MATH_EXP_SIGMOID_H
+#endif  // CEDAR_AUX_MATH_LINEAR_TRANSFER_FUNCTION_H

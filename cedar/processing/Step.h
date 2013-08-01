@@ -89,7 +89,7 @@ class cedar::proc::Step : public QThread,
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //! Map from action names to their corresponding functions.
-  typedef std::map<std::string, boost::function<void()> > ActionMap;
+  typedef std::map<std::string, std::pair<boost::function<void()>, bool> > ActionMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -208,6 +208,11 @@ protected:
 
   /*!@brief Method that registers a function of an object so that it can be used by the framework.
    *
+   * @param actionName Name of the action
+   * @param function The function to call (use boost::bind)
+   * @param autoLock Whether or not to automatically lock the data of the step. If false, the called method needs to
+   *                 take care of properly locking the data and parameters of the step.
+   *
    * As an example, consider a class A that has a function void A::foo():
    *
    * @code
@@ -233,7 +238,7 @@ protected:
    * @endcode
    *
    */
-  void registerFunction(const std::string& actionName, boost::function<void()> function);
+  void registerFunction(const std::string& actionName, boost::function<void()> function, bool autoLock = true);
 
   /*!@brief Sets whether inputs and outputs are locked automatically.
    *

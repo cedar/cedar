@@ -103,7 +103,7 @@ int main(int argc, char** argv)
     CEDAR_ASSERT(p_scene->selectedItems().contains(p_field_item));
 
     std::cout << "Starting trigger ..." << std::endl;
-    looped_trigger->startTrigger();
+    looped_trigger->start();
     simulateEventLoop();
   }
 

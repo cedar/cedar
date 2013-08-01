@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LinePlot.cpp
+    File:        QwtLinePlot.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -42,7 +42,7 @@
 #ifdef CEDAR_USE_QWT
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/LinePlot.h"
+#include "cedar/auxiliaries/gui/QwtLinePlot.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/math/Limits.h"
 #include "cedar/auxiliaries/MatData.h"
@@ -74,14 +74,14 @@
 // static members
 //----------------------------------------------------------------------------------------------------------------------
 
-std::vector<QColor> cedar::aux::gui::LinePlot::mLineColors;
-std::vector<Qt::PenStyle> cedar::aux::gui::LinePlot::mLineStyles;
+std::vector<QColor> cedar::aux::gui::QwtLinePlot::mLineColors;
+std::vector<Qt::PenStyle> cedar::aux::gui::QwtLinePlot::mLineStyles;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gui::LinePlot::LinePlot(QWidget *pParent)
+cedar::aux::gui::QwtLinePlot::QwtLinePlot(QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
 mpLock(new QReadWriteLock())
@@ -89,7 +89,7 @@ mpLock(new QReadWriteLock())
   this->init();
 }
 
-cedar::aux::gui::LinePlot::LinePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent)
+cedar::aux::gui::QwtLinePlot::QwtLinePlot(cedar::aux::ConstDataPtr matData, const std::string& title, QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
 mpLock(new QReadWriteLock())
@@ -98,7 +98,7 @@ mpLock(new QReadWriteLock())
   this->plot(matData, title);
 }
 
-cedar::aux::gui::LinePlot::~LinePlot()
+cedar::aux::gui::QwtLinePlot::~QwtLinePlot()
 {
   if (mpLock)
   {
@@ -118,7 +118,7 @@ cedar::aux::gui::LinePlot::~LinePlot()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::math::Limits<double> cedar::aux::gui::LinePlot::getXLimits() const
+cedar::aux::math::Limits<double> cedar::aux::gui::QwtLinePlot::getXLimits() const
 {
   cedar::aux::math::Limits<double> limits;
 
@@ -128,7 +128,7 @@ cedar::aux::math::Limits<double> cedar::aux::gui::LinePlot::getXLimits() const
   return limits;
 }
 
-cedar::aux::math::Limits<double> cedar::aux::gui::LinePlot::getYLimits() const
+cedar::aux::math::Limits<double> cedar::aux::gui::QwtLinePlot::getYLimits() const
 {
   cedar::aux::math::Limits<double> limits;
 
@@ -138,7 +138,7 @@ cedar::aux::math::Limits<double> cedar::aux::gui::LinePlot::getYLimits() const
   return limits;
 }
 
-void cedar::aux::gui::LinePlot::applyStyle(cedar::aux::ConstDataPtr data, size_t lineId, QwtPlotCurve *pCurve)
+void cedar::aux::gui::QwtLinePlot::applyStyle(cedar::aux::ConstDataPtr data, size_t lineId, QwtPlotCurve *pCurve)
 {
   static std::vector<QwtSymbol::Style> mLineSymbols;
 
@@ -210,7 +210,7 @@ void cedar::aux::gui::LinePlot::applyStyle(cedar::aux::ConstDataPtr data, size_t
   }
 }
 
-bool cedar::aux::gui::LinePlot::canAppend(cedar::aux::ConstDataPtr data) const
+bool cedar::aux::gui::QwtLinePlot::canAppend(cedar::aux::ConstDataPtr data) const
 {
   cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data);
   if (!mat_data)
@@ -235,7 +235,7 @@ bool cedar::aux::gui::LinePlot::canAppend(cedar::aux::ConstDataPtr data) const
   return true;
 }
 
-void cedar::aux::gui::LinePlot::doAppend(cedar::aux::ConstDataPtr data, const std::string& title)
+void cedar::aux::gui::QwtLinePlot::doAppend(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   PlotSeriesPtr plot_series(new PlotSeries());
 
@@ -250,7 +250,7 @@ void cedar::aux::gui::LinePlot::doAppend(cedar::aux::ConstDataPtr data, const st
   if (!plot_series->mMatData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
-                "Could not cast to cedar::aux::MatData in cedar::aux::gui::LinePlot::plot.");
+                "Could not cast to cedar::aux::MatData in cedar::aux::gui::QwtLinePlot::plot.");
   }
 
 
@@ -287,17 +287,17 @@ void cedar::aux::gui::LinePlot::doAppend(cedar::aux::ConstDataPtr data, const st
   this->startTimer(30);
 }
 
-void cedar::aux::gui::LinePlot::attachMarker(QwtPlotMarker *pMarker)
+void cedar::aux::gui::QwtLinePlot::attachMarker(QwtPlotMarker *pMarker)
 {
   pMarker->attach(this->mpPlot);
 }
 
-void cedar::aux::gui::LinePlot::clearMarkers()
+void cedar::aux::gui::QwtLinePlot::clearMarkers()
 {
   this->mpPlot->detachItems(QwtPlotMarker::Rtti_PlotMarker, true);
 }
 
-void cedar::aux::gui::LinePlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
+void cedar::aux::gui::QwtLinePlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
 {
   mpLock->lockForWrite();
   mPlotSeriesVector.clear();
@@ -306,7 +306,7 @@ void cedar::aux::gui::LinePlot::plot(cedar::aux::ConstDataPtr data, const std::s
   this->append(data, title);
 }
 
-void cedar::aux::gui::LinePlot::init()
+void cedar::aux::gui::QwtLinePlot::init()
 {
   QPalette palette = this->palette();
   palette.setColor(QPalette::Window, Qt::white);
@@ -321,7 +321,7 @@ void cedar::aux::gui::LinePlot::init()
 
   mpWorkerThread = new QThread();
 
-  mConversionWorker = cedar::aux::gui::detail::LinePlotWorkerPtr(new cedar::aux::gui::detail::LinePlotWorker(this));
+  mConversionWorker = cedar::aux::gui::detail::QwtLinePlotWorkerPtr(new cedar::aux::gui::detail::QwtLinePlotWorker(this));
   mConversionWorker->moveToThread(mpWorkerThread);
 
   this->mpWorkerThread->start(QThread::LowPriority);
@@ -331,7 +331,7 @@ void cedar::aux::gui::LinePlot::init()
   QObject::connect(mConversionWorker.get(), SIGNAL(done()), this, SLOT(conversionDone()));
 }
 
-void cedar::aux::gui::LinePlot::contextMenuEvent(QContextMenuEvent *pEvent)
+void cedar::aux::gui::QwtLinePlot::contextMenuEvent(QContextMenuEvent *pEvent)
 {
   QMenu menu(this);
   QAction *p_antialiasing = menu.addAction("antialiasing");
@@ -378,12 +378,12 @@ void cedar::aux::gui::LinePlot::contextMenuEvent(QContextMenuEvent *pEvent)
   }
 }
 
-void cedar::aux::gui::LinePlot::setAutomaticYAxisScaling()
+void cedar::aux::gui::QwtLinePlot::setAutomaticYAxisScaling()
 {
   this->mpPlot->setAxisAutoScale(QwtPlot::yLeft);
 }
 
-void cedar::aux::gui::LinePlot::setFixedYAxisScaling()
+void cedar::aux::gui::QwtLinePlot::setFixedYAxisScaling()
 {
   QDialog* p_dialog = new QDialog();
   p_dialog->setModal(true);
@@ -425,17 +425,17 @@ void cedar::aux::gui::LinePlot::setFixedYAxisScaling()
   }
 }
 
-void cedar::aux::gui::LinePlot::setFixedYAxisScaling(double lower, double upper)
+void cedar::aux::gui::QwtLinePlot::setFixedYAxisScaling(double lower, double upper)
 {
   this->mpPlot->setAxisScale(QwtPlot::yLeft, lower, upper);
 }
 
-void cedar::aux::gui::LinePlot::setFixedXAxisScaling(double lower, double upper)
+void cedar::aux::gui::QwtLinePlot::setFixedXAxisScaling(double lower, double upper)
 {
   this->mpPlot->setAxisScale(QwtPlot::xBottom, lower, upper);
 }
 
-void cedar::aux::gui::LinePlot::showLegend(bool show)
+void cedar::aux::gui::QwtLinePlot::showLegend(bool show)
 {
   if (show)
   {
@@ -461,7 +461,7 @@ void cedar::aux::gui::LinePlot::showLegend(bool show)
   }
 }
 
-void cedar::aux::gui::LinePlot::PlotSeries::buildArrays(unsigned int new_size)
+void cedar::aux::gui::QwtLinePlot::PlotSeries::buildArrays(unsigned int new_size)
 {
   CEDAR_DEBUG_ASSERT(this->mXValues.size() == this->mYValues.size());
 
@@ -477,12 +477,12 @@ void cedar::aux::gui::LinePlot::PlotSeries::buildArrays(unsigned int new_size)
 }
 
 //!@cond SKIPPED_DOCUMENTATION
-void cedar::aux::gui::detail::LinePlotWorker::convert()
+void cedar::aux::gui::detail::QwtLinePlotWorker::convert()
 {
   QWriteLocker plot_locker(this->mpPlot->mpLock);
   for (size_t series_index = 0; series_index < this->mpPlot->mPlotSeriesVector.size(); ++series_index)
   {
-    cedar::aux::gui::LinePlot::PlotSeriesPtr series = this->mpPlot->mPlotSeriesVector.at(series_index);
+    cedar::aux::gui::QwtLinePlot::PlotSeriesPtr series = this->mpPlot->mPlotSeriesVector.at(series_index);
 
     QReadLocker locker(&series->mMatData->getLock());
     const cv::Mat& mat = series->mMatData->getData();
@@ -519,7 +519,7 @@ void cedar::aux::gui::detail::LinePlotWorker::convert()
 }
 //!@endcond
 
-void cedar::aux::gui::LinePlot::conversionDone()
+void cedar::aux::gui::QwtLinePlot::conversionDone()
 {
   QReadLocker locker(this->mpLock);
 
@@ -556,7 +556,7 @@ void cedar::aux::gui::LinePlot::conversionDone()
   this->mpPlot->replot();
 }
 
-void cedar::aux::gui::LinePlot::timerEvent(QTimerEvent * /* pEvent */)
+void cedar::aux::gui::QwtLinePlot::timerEvent(QTimerEvent * /* pEvent */)
 {
   if (!this->isVisible())
   {

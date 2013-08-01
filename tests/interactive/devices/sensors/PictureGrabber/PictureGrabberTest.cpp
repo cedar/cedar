@@ -24,7 +24,7 @@
 #include "cedar/units/prefixes.h"
 
 // SYSTEM INCLUDES
-#include <QtGui/QApplication>
+#include <QApplication>
 #include <opencv2/opencv.hpp>
 #include <ios>
 
@@ -253,7 +253,7 @@ int main(int argc, char* argv[])
 
   //stop grabbing-thread if running
   //recording will also be stopped
-  p_grabber->stopGrabber();
+  p_grabber->stop();
 
   std::cout << "finished\n";
 

@@ -233,6 +233,9 @@ private slots:
   //! Slot that triggers an action based on a button in the action widget that can be opened for a step item.
   void handleExternalActionButtons();
 
+  //! Slot that removes the reference of a child widget from the mChildWidgets vector
+  void removeChildWidget();
+
 private:
   void emitStepStateChanged();
 
@@ -300,7 +303,7 @@ private:
 
   void addDataItemFor(cedar::proc::DataSlotPtr slot);
 
-  QWidget* createDockWidget(const std::string& title, QWidget* pPlot) const;
+  QWidget* createDockWidget(const std::string& title, QWidget* pPlot);
 
   void addPlotAllAction(QMenu& menu, const QPoint& plotPosition);
 
@@ -336,6 +339,9 @@ private:
 
   //!@brief a vector of all triggers of the current step
   std::vector<cedar::proc::gui::TriggerItem*> mTriggers;
+
+  //!@brief a vector of all child widgets fo the current step
+  std::vector<QWidget*> mChildWidgets;
 
   //!@brief Identifier of the timer used for updating the run time measurements.
   int mRunTimeMeasurementTimerId;

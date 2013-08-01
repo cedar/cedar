@@ -37,9 +37,10 @@
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
+#include "cedar/auxiliaries/namespace.h"
 
-#ifndef CEDAR_TESTING_FUNCTIONS_H
-#define CEDAR_TESTING_FUNCTIONS_H
+#ifndef CEDAR_TESTING_UTILITIES_MEASUREMENT_FUNCTIONS_H
+#define CEDAR_TESTING_UTILITIES_MEASUREMENT_FUNCTIONS_H
 
 #include "cedar/testingUtilities/namespace.h"
 
@@ -72,4 +73,4 @@ namespace cedar
   }
 }
 
-#endif // CEDAR_TESTING_FUNCTIONS_H
+#endif // CEDAR_TESTING_UTILITIES_MEASUREMENT_FUNCTIONS_H
