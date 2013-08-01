@@ -41,6 +41,7 @@
 #include "cedar/processing/steps/ChannelSplit.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/casts.h"
@@ -197,7 +198,9 @@ void cedar::proc::steps::ChannelSplit::inputConnectionChanged(const std::string&
     );
   }
 
-  this->onTrigger();
+  this->lock(cedar::aux::LOCK_TYPE_READ);
+  this->compute(cedar::proc::Arguments());
+  this->unlock();
   for (size_t i = 0; i < this->mChannelData.size(); ++i)
   {
     this->emitOutputPropertiesChangedSignal(this->generateDataName(i));
