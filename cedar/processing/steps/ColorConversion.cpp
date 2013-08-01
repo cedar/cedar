@@ -41,6 +41,7 @@
 #include "cedar/processing/steps/ColorConversion.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/annotation/ColorSpace.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/casts.h"
@@ -365,7 +366,9 @@ void cedar::proc::steps::ColorConversion::inputConnectionChanged(const std::stri
   this->updateTargetImageColorSpace();
   this->updateCvConvertConstant();
 
-  this->onTrigger();
+  this->lock(cedar::aux::LOCK_TYPE_READ);
+  this->compute(cedar::proc::Arguments());
+  this->unlock();
   this->emitOutputPropertiesChangedSignal("converted image");
   this->onTrigger();
 }

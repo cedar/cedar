@@ -152,6 +152,10 @@ void cedar::proc::sources::BoxInput::compute(const cedar::proc::Arguments&)
 
 void cedar::proc::sources::BoxInput::updateMatrix()
 {
+  this->lock(cedar::aux::LOCK_TYPE_READ);
+  this->compute(cedar::proc::Arguments());
+  this->unlock();
+  this->emitOutputPropertiesChangedSignal("box input");
   this->onTrigger();
 }
 
@@ -164,5 +168,9 @@ void cedar::proc::sources::BoxInput::updateDimensionality()
   _mLeftBounds->setDefaultSize(new_dimensionality);
   _mSizes->resize(new_dimensionality, _mSizes->getDefaultValue());
   _mSizes->setDefaultSize(new_dimensionality);
+  this->lock(cedar::aux::LOCK_TYPE_READ);
+  this->compute(cedar::proc::Arguments());
+  this->unlock();
+  this->emitOutputPropertiesChangedSignal("box input");
   this->onTrigger();
 }
