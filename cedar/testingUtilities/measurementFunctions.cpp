@@ -43,6 +43,7 @@
 // SYSTEM INCLUDES
 #include <functional>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/function.hpp>
 
 void cedar::test::write_measurement
      (

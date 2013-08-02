@@ -116,6 +116,7 @@ public:
     this->addDeprecatedName(class_id, deprecatedName);
   }
 
+  //! Adds a deprecated name for the given class id.
   void addDeprecatedName(const std::string classId, const std::string& deprecatedName)
   {
     auto iter = this->mDeprecatedNames.find(deprecatedName);

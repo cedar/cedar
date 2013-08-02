@@ -183,3 +183,7 @@ cedar::proc::Manager::ThreadRegistry& cedar::proc::Manager::threads()
   return this->mThreadRegistry;
 }
 
+cedar::proc::Manager& cedar::proc::Manager::getInstance()
+{
+  return *cedar::proc::ManagerSingleton::getInstance();
+}

@@ -53,6 +53,7 @@ cedar_add_library(cedarproc
   gui/ArchitectureConsistencyCheck.h
   gui/ArchitectureToolBox.h
   gui/BoostControl.h
+  gui/DataSlotItem.h
   gui/ElementClassList.h
   gui/Ide.h
   gui/IdeApplication.h

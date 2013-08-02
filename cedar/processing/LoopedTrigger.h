@@ -85,13 +85,19 @@ public:
    *
    * @deprecated Use the ThreadWrapper::start() method instead.
    */
-  CEDAR_DECLARE_DEPRECATED(void startTrigger());
+  CEDAR_DECLARE_DEPRECATED(void startTrigger())
+  {
+    start();
+  }
 
   /*!@brief Stops the trigger loop.
    *
    * @deprecated Use the ThreadWrapper::stop() method instead.
    */
-  CEDAR_DECLARE_DEPRECATED(void stopTrigger());
+  CEDAR_DECLARE_DEPRECATED(void stopTrigger())
+  {
+    stop();
+  }
 
 public slots:
   //!@brief This slot is called when the step's name is changed.

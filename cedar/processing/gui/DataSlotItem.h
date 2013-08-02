@@ -49,14 +49,17 @@
 #include "cedar/processing/DataSlot.h"
 
 // SYSTEM INCLUDES
+#include <QObject>
 
 /*!@brief User-Interface representation of a cedar::proc::DataSlot.
  *
  *        This class implements a cedar::proc::gui::GraphicsBase that is used to display a cedar::proc::DataSlot inside
  *        a cedar::proc::gui::Scene.
  */
-class cedar::proc::gui::DataSlotItem : public cedar::proc::gui::GraphicsBase
+class cedar::proc::gui::DataSlotItem : public QObject, public cedar::proc::gui::GraphicsBase
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
@@ -132,6 +135,9 @@ protected:
   //! creates a tool tip if the mouse cursor hovers over this object
   void hoverEnterEvent(QGraphicsSceneHoverEvent* pEvent);
 
+signals:
+  void connectionValidityChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -140,10 +146,12 @@ private:
    */
   void generateTooltip();
 
-  void updateConnections();
-
   cedar::proc::gui::ConnectValidity translateValidity(cedar::proc::DataSlot::VALIDITY validity) const;
 
+  void translateValidityChangedSignal();
+
+private slots:
+  void updateConnectionValidity();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
