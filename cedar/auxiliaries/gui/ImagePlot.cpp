@@ -173,10 +173,12 @@ void cedar::aux::gui::ImagePlot::construct()
   QHBoxLayout *p_layout = new QHBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(p_layout);
-  this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+  this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
   mpImageDisplay = new cedar::aux::gui::ImagePlot::ImageDisplay(this, "no image loaded");
   p_layout->addWidget(mpImageDisplay);
+  mpImageDisplay->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+  mpImageDisplay->setMinimumSize(QSize(50, 50));
 
   this->mpWorkerThread = new QThread();
   mWorker = cedar::aux::gui::detail::ImagePlotWorkerPtr(new cedar::aux::gui::detail::ImagePlotWorker(this));
@@ -601,14 +603,13 @@ cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix)
 
   cv::Mat converted = cv::Mat(matrix.rows, matrix.cols, CV_8UC3);
 
-  int i,j;
   const unsigned char* p_in;
   unsigned char* p_converted;
-  for (i = 0; i < rows; ++i)
+  for (int i = 0; i < rows; ++i)
   {
     p_in = matrix.ptr<unsigned char>(i);
     p_converted = converted.ptr<unsigned char>(i);
-    for (j = 0; j < cols; ++j)
+    for (int j = 0; j < cols; ++j)
     {
       size_t v = static_cast<size_t>(p_in[j]);
       // channel 0

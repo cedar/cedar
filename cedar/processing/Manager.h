@@ -69,6 +69,7 @@ class cedar::proc::Manager
   // types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief a registry for LoopedThreads
   typedef std::set<cedar::aux::LoopedThreadPtr> ThreadRegistry;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -109,6 +110,7 @@ public:
    */
   CEDAR_DECLARE_DEPRECATED(void stopThreads(bool wait = false));
 
+  CEDAR_DECLARE_DEPRECATED(static cedar::proc::Manager& getInstance());
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

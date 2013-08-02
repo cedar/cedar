@@ -528,6 +528,7 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element, std::string inst
 
 // part of the cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements) function
 // put here because older gcc versions won't be able to compile this otherwise
+//!@cond SKIPPED_DOCUMENTATION
 struct DataConnectionInfo
 {
   DataConnectionInfo(const std::string& dataFrom, const std::string& dataTo)
@@ -554,7 +555,6 @@ struct PromotedConnectionInfo
   std::string to;
 };
 
-
 struct TriggerConnectionInfo
 {
   TriggerConnectionInfo(cedar::proc::TriggerPtr dataFrom, cedar::proc::TriggerablePtr dataTo)
@@ -567,6 +567,7 @@ struct TriggerConnectionInfo
   cedar::proc::TriggerPtr from;
   cedar::proc::TriggerablePtr to;
 };
+//!@endcond
 
 void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
 {
@@ -1900,12 +1901,11 @@ void cedar::proc::Network::processPromotedSlots()
       {
         this->getElement<cedar::proc::Element>(child);
       }
+      catch (const cedar::aux::InvalidNameException& exc)
+      {
+      }
       catch (cedar::aux::ExceptionBase& exc) // remove promoted slot
       {
-        if (typeid(exc) != typeid(cedar::aux::InvalidNameException))
-        {
-          throw exc;
-        }
         types_delete_later.push_back(cedar::proc::DataRole::type().getFromPrettyString(slot_role));
         slots_delete_later.push_back(slot_name);
       }
