@@ -48,7 +48,6 @@
 #include "cedar/processing/PromotedOwnedData.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/DataRole.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/Network.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/MatData.h"

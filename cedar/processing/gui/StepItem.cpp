@@ -47,7 +47,6 @@
 #include "cedar/processing/gui/exceptions.h"
 #include "cedar/processing/gui/PropertyPane.h"
 #include "cedar/processing/DataSlot.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
