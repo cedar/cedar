@@ -41,6 +41,7 @@
 #include "cedar/processing/sources/Camera.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
@@ -122,7 +123,9 @@ cedar::proc::sources::Camera::~Camera()
 
 void cedar::proc::sources::Camera::changedFrameSize()
 {
-  this->updateFrame();
+  this->lock(cedar::aux::LOCK_TYPE_READ);
+  this->compute(cedar::proc::Arguments());
+  this->unlock();
   this->emitOutputPropertiesChangedSignal("camera");
 }
 
