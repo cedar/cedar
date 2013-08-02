@@ -39,6 +39,7 @@
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/assert.h"
@@ -151,7 +152,12 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Sum::determineInputValidity
 
 void cedar::proc::steps::Sum::inputConnectionChanged(const std::string& /*inputName*/)
 {
-  this->onTrigger();
-  this->emitOutputPropertiesChangedSignal("sum");
-  this->onTrigger();
+  if (this->mInputs->getDataCount() > 0)
+  {
+    this->lock(cedar::aux::LOCK_TYPE_READ);
+    this->compute(cedar::proc::Arguments());
+    this->unlock();
+    this->emitOutputPropertiesChangedSignal("sum");
+    this->onTrigger();
+  }
 }
