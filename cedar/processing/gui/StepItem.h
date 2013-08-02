@@ -206,6 +206,18 @@ public:
   //! Removes all effects of magnetization
   void demagnetizeSlots();
 
+  //! Returns the base size for data slots.
+  static qreal getBaseDataSlotSize()
+  {
+    return M_BASE_DATA_SLOT_SIZE;
+  }
+
+  //! Amount of padding between data slots.
+  static qreal getDataSlotPadding()
+  {
+    return M_DATA_SLOT_PADDING;
+  }
+
 public slots:
   //!@brief handles changes in the state of a step (e.g. from error to non-error state)
   void updateStepState();
@@ -321,13 +333,6 @@ private slots:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  //! The base size of data slots (modified by display mode and other factors).
-  static const qreal M_BASE_DATA_SLOT_SIZE;
-
-  //! Amount of padding between data slots.
-  static const qreal M_DATA_SLOT_PADDING;
-
 protected:
   // none yet
 private:
@@ -375,6 +380,12 @@ private:
 
   //! The decorations for this step.
   std::vector<DecorationPtr> mDecorations;
+
+  //! The base size of data slots (modified by display mode and other factors).
+  static const qreal M_BASE_DATA_SLOT_SIZE;
+
+  //! Amount of padding between data slots.
+  static const qreal M_DATA_SLOT_PADDING;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
