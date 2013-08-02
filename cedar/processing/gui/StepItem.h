@@ -51,6 +51,7 @@
 #include "cedar/auxiliaries/EnumType.h"
 
 // SYSTEM INCLUDES
+#include <QGraphicsSvgItem>
 #include <QMainWindow>
 #include <QIcon>
 #include <QObject>
@@ -115,7 +116,7 @@ private:
   class Decoration
   {
     public:
-      Decoration(StepItem* pStep, const QString& icon, const QString& description);
+      Decoration(StepItem* pStep, const QString& icon, const QString& description, const QColor& bg = QColor(255, 255, 255));
 
       ~Decoration()
       {
@@ -128,11 +129,9 @@ private:
       void setSize(double sizeFactor);
 
     private:
-      QGraphicsPixmapItem* mpIcon;
+      QGraphicsSvgItem* mpIcon;
 
       QGraphicsRectItem* mpRectangle;
-
-      QIcon mIconSource;
 
       QString mIconFile;
   };
@@ -319,6 +318,10 @@ private:
 
   void addPlotAllAction(QMenu& menu, const QPoint& plotPosition);
 
+  void updateIconGeometry();
+
+  qreal getContentsPadding() const;
+
 private slots:
   void displayStyleMenuTriggered(QAction* pAction);
 
@@ -369,9 +372,6 @@ private:
   //!@brief the main window in which the current graphical representation is embedded
   QMainWindow* mpMainWindow;
 
-  //!@brief the icon representing the contained step
-  QIcon mStepIcon;
-
   //!@brief connection to state changed signal of step
   boost::signals2::connection mStateChangedConnection;
 
@@ -380,6 +380,9 @@ private:
 
   //! The decorations for this step.
   std::vector<DecorationPtr> mDecorations;
+
+  //! SvgItem displaying the step's icon
+  QGraphicsSvgItem* mpIconDisplay;
 
   //! The base size of data slots (modified by display mode and other factors).
   static const qreal M_BASE_DATA_SLOT_SIZE;

@@ -106,8 +106,8 @@ cedar::proc::gui::GraphicsBase(cedar::proc::gui::StepItem::mDefaultWidth,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE),
 mRunTimeMeasurementTimerId(0),
 mpMainWindow(pMainWindow),
-mStepIcon(":/steps/no_icon.svg"),
-mDisplayMode(cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT)
+mDisplayMode(cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT),
+mpIconDisplay(NULL)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
@@ -124,7 +124,6 @@ cedar::proc::gui::GraphicsBase(cedar::proc::gui::StepItem::mDefaultWidth,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE),
 mRunTimeMeasurementTimerId(0),
 mpMainWindow(pMainWindow),
-mStepIcon(":/steps/no_icon.svg"),
 mDisplayMode(cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
@@ -153,23 +152,33 @@ cedar::proc::gui::StepItem::Decoration::Decoration
 (
   cedar::proc::gui::StepItem* pStep,
   const QString& icon,
-  const QString& description
+  const QString& description,
+  const QColor& bgColor
 )
 {
-  this->mpRectangle = new QGraphicsRectItem(-1, -1, 10, 10, pStep);
-  this->mIconSource = QIcon(icon);
-  CEDAR_ASSERT(!this->mIconSource.isNull());
-  this->mpIcon = new QGraphicsPixmapItem
+  qreal padding = 1;
+  this->mpRectangle = new QGraphicsRectItem
+                      (
+                        -padding,
+                        -padding,
+                        cedar::proc::gui::StepItem::M_BASE_DATA_SLOT_SIZE + 2 * padding,
+                        cedar::proc::gui::StepItem::M_BASE_DATA_SLOT_SIZE + 2 * padding,
+                        pStep
+                      );
+  this->mpIcon = new QGraphicsSvgItem
                  (
-                   mIconSource.pixmap(static_cast<int>(cedar::proc::gui::StepItem::M_BASE_DATA_SLOT_SIZE)),
+                   icon,
                    this->mpRectangle
                  );
   this->mpIcon->setToolTip(description);
 
+  qreal h = this->mpIcon->boundingRect().height();
+  this->mpIcon->setScale(cedar::proc::gui::StepItem::M_BASE_DATA_SLOT_SIZE / h);
+
   QPen pen = this->mpRectangle->pen();
   pen.setWidth(1);
   pen.setColor(QColor(0, 0, 0));
-  QBrush bg(QColor(255, 255, 255));
+  QBrush bg(bgColor);
   this->mpRectangle->setPen(pen);
   this->mpRectangle->setBrush(bg);
 }
@@ -276,14 +285,15 @@ void cedar::proc::gui::StepItem::Decoration::setPosition(const QPointF& pos)
 void cedar::proc::gui::StepItem::Decoration::setSize(double sizeFactor)
 {
   const qreal padding = 1;
-  const qreal size = static_cast<qreal>(0.7)
+  const qreal size = static_cast<qreal>(0.8)
                      * static_cast<qreal>(sizeFactor)
                      * cedar::proc::gui::StepItem::M_BASE_DATA_SLOT_SIZE;
   QRectF new_dims = this->mpRectangle->rect();
   new_dims.setWidth(size + 2*padding);
   new_dims.setHeight(size + 2*padding);
   this->mpRectangle->setRect(new_dims);
-  this->mpIcon->setPixmap(mIconSource.pixmap(static_cast<int>(size)));
+  qreal h = this->mpIcon->boundingRect().height();
+  this->mpIcon->setScale(size / h);
 }
 
 void cedar::proc::gui::StepItem::slotAdded(cedar::proc::DataRole::Id role, const std::string& name)
@@ -454,7 +464,13 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
   cedar::proc::ConstElementDeclarationPtr elem_decl
     = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(this->mClassId);
 
-  this->mStepIcon = elem_decl->getIcon();
+  if (this->mpIconDisplay != NULL)
+  {
+    delete this->mpIconDisplay;
+    this->mpIconDisplay = NULL;
+  }
+  this->mpIconDisplay = new QGraphicsSvgItem(elem_decl->determinedIconPath(), this);
+  this->updateIconGeometry();
 
   this->addDataItems();
   this->addTriggerItems();
@@ -470,6 +486,22 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
     = step->connectToSlotAdded(boost::bind(&cedar::proc::gui::StepItem::slotAdded, this, _1, _2));
   mSlotRemovedConnection
     = step->connectToSlotRemoved(boost::bind(&cedar::proc::gui::StepItem::slotRemoved, this, _1, _2));
+}
+
+void cedar::proc::gui::StepItem::updateIconGeometry()
+{
+  if (this->mpIconDisplay == NULL)
+  {
+    return;
+  }
+
+  qreal padding = this->getContentsPadding();
+  this->mpIconDisplay->setPos(padding, padding);
+  qreal dest = static_cast<qreal>(this->mIconSize);
+  qreal w = this->mpIconDisplay->boundingRect().width();
+  qreal h = this->mpIconDisplay->boundingRect().width();
+  qreal major = std::max(w, h);
+  this->mpIconDisplay->setScale(dest / major);
 }
 
 void cedar::proc::gui::StepItem::emitStepStateChanged()
@@ -532,7 +564,8 @@ void cedar::proc::gui::StepItem::addDecorations()
       (
         this,
         ":/cedar/auxiliaries/gui/warning.svg",
-        QString::fromStdString(dep_msg)
+        QString::fromStdString(dep_msg),
+        QColor(255, 240, 110)
       )
     );
 
@@ -1250,6 +1283,7 @@ void cedar::proc::gui::StepItem::setDisplayMode(cedar::proc::gui::StepItem::Disp
       break;
   }
 
+  this->updateIconGeometry();
   this->updateAttachedItems();
   this->updateConnections();
   this->update();
@@ -1467,25 +1501,26 @@ void cedar::proc::gui::StepItem::multiplot
   p_dock->show();
 }
 
+qreal cedar::proc::gui::StepItem::getContentsPadding() const
+{
+  switch (this->mDisplayMode)
+  {
+    case cedar::proc::gui::StepItem::DisplayMode::ICON_ONLY:
+      return static_cast<qreal>(0);
+      break;
+
+    default:
+      return static_cast<qreal>(5);
+  }
+}
+
 void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
 {
   painter->save(); // save current painter settings
 
-  qreal padding;
-
-  switch (this->mDisplayMode)
-  {
-    case cedar::proc::gui::StepItem::DisplayMode::ICON_ONLY:
-      padding = 0;
-      break;
-
-    default:
-      padding = 5;
-  }
+  qreal padding = this->getContentsPadding();
 
   this->paintFrame(painter, style, widget);
-
-  this->mStepIcon.paint(painter, padding, padding, mIconSize, mIconSize);
 
   if (this->mDisplayMode == cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT)
   {
