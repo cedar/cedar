@@ -53,7 +53,6 @@
 #include "cedar/processing/gui/PluginManagerDialog.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/exceptions.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
@@ -453,7 +452,7 @@ void cedar::proc::gui::Ide::restoreSettings()
 
 void cedar::proc::gui::Ide::loadDefaultPlugins()
 {
-  cedar::proc::ManagerSingleton::getInstance()->loadDefaultPlugins();
+  cedar::proc::gui::SettingsSingleton::getInstance()->loadDefaultPlugins();
 }
 
 void cedar::proc::gui::Ide::showLoadPluginDialog()
@@ -463,7 +462,7 @@ void cedar::proc::gui::Ide::showLoadPluginDialog()
 
   if (res == QDialog::Accepted && p_dialog->plugin())
   {
-    cedar::proc::ManagerSingleton::getInstance()->load(p_dialog->plugin());
+    p_dialog->plugin()->declare();
     this->resetStepList();
   }
 

@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/Settings.h"
+#include "cedar/processing/PluginProxy.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/SetParameter.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
@@ -199,6 +200,52 @@ cedar::proc::gui::Settings::~Settings()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Settings::loadDefaultPlugins()
+{
+  const std::set<std::string>& plugins = this->pluginsToLoad();
+  for (std::set<std::string>::const_iterator iter = plugins.begin(); iter != plugins.end(); ++ iter)
+  {
+    std::string action = "reading";
+    try
+    {
+      action = "opening";
+      cedar::proc::PluginProxyPtr plugin(new cedar::proc::PluginProxy(*iter));
+      action = "loading";
+      plugin->declare();
+      cedar::aux::LogSingleton::getInstance()->message
+      (
+        "Loaded default plugin \"" + (*iter) + "\"",
+        "void cedar::proc::Manager::loadDefaultPlugins()"
+      );
+    }
+    catch (const cedar::aux::ExceptionBase& e)
+    {
+      cedar::aux::LogSingleton::getInstance()->error
+      (
+        "Error while " + action + " default plugin \"" + (*iter) + "\": " + e.exceptionInfo(),
+        "void cedar::proc::Manager::loadDefaultPlugins()"
+      );
+    }
+    catch (std::exception& e)
+    {
+      std::string what = e.what();
+      cedar::aux::LogSingleton::getInstance()->error
+      (
+        "Error while " + action + " default plugin \"" + (*iter) + "\": " + what,
+        "void cedar::proc::Manager::loadDefaultPlugins()"
+      );
+    }
+    catch (...)
+    {
+      cedar::aux::LogSingleton::getInstance()->error
+      (
+        "Unknown error while " + action + " default plugin.",
+        "void cedar::proc::Manager::loadDefaultPlugins()"
+      );
+    }
+  }
+}
 
 bool cedar::proc::gui::Settings::snapToGrid() const
 {
