@@ -59,7 +59,7 @@ cedar::aux::Recorder::Recorder()
 
 cedar::aux::Recorder:: ~Recorder()
 {
-  stop();
+  clear();
 }
 
 void cedar::aux::Recorder::step(double)
@@ -67,19 +67,24 @@ void cedar::aux::Recorder::step(double)
   //Writing the first value of every DataSpectator queue.
   for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
-    boost::static_pointer_cast<cedar::aux::DataSpectator>(mDataSpectatorCollection[i])->writeOneRecordData();
+    mDataSpectatorCollection.get<DataSpectator>(i)->writeFirstRecordData();
   }
 }
 
-void cedar::aux::Recorder::registerData(cedar::aux::DataPtr toSpectate, int recordIntv, std::string name)
+void cedar::aux::Recorder::registerData(const cedar::aux::DataPtr toSpectate, int recordIntv,const  std::string& name)
 {
 
   //check if Name is not already in use
   for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
-    cedar::aux::DataSpectatorPtr spec = boost::static_pointer_cast<DataSpectator>(mDataSpectatorCollection[i]);
-    if(spec->mName == name)
+    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
+
+    //ToDO check DataPtr
+    if(spec->getName() == name)
+    {
+      CEDAR_THROW(cedar::aux::DuplicateNameException,"The data with name "+name+" is already registered");
       return;
+    }
   }
 
   // create new DataSpectaor and push it to the DataSpectator list
@@ -93,6 +98,19 @@ void cedar::aux::Recorder::registerData(cedar::aux::DataPtr toSpectate, int reco
     spec->start();
   }
 
+}
+
+void cedar::aux::Recorder::unregisterData(const std::string& name)
+{
+  for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+    {
+      cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
+      if(spec->getName() == name)
+      {
+        mDataSpectatorCollection.remove(i);
+        break;
+      }
+    }
 }
 
 void cedar::aux::Recorder::createOutputDirectory()
@@ -114,7 +132,7 @@ void cedar::aux::Recorder::applyStart()
   int min = 1000;
   for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
-    cedar::aux::DataSpectatorPtr spec = boost::static_pointer_cast<DataSpectator>(mDataSpectatorCollection[i]);
+    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
     if(spec->getStepSize()<min)
     {
       min = spec->getStepSize();
@@ -132,16 +150,22 @@ void cedar::aux::Recorder::applyStop(bool /*suppressWarning*/)
 {
   //Stop all DataSpectators.They will automatically write all containing data to file.
   mDataSpectatorCollection.stopAll();
+}
 
+void cedar::aux::Recorder::clear()
+{
+  stop();
   //remove all data.
   mDataSpectatorCollection.removeAll();
 }
-void cedar::aux::Recorder::setOutputDirectory(std::string path)
+
+
+void cedar::aux::Recorder::setOutputDirectory(const std::string& path)
 {
   this->mOutputDirectory = path;
 }
 
-std::string cedar::aux::Recorder::getOutputDirectory()
+const std::string& cedar::aux::Recorder::getOutputDirectory()
 {
   return this->mOutputDirectory;
 }

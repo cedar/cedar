@@ -79,8 +79,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  std::string serializeData();
-  std::string serializeHeader();
+  void serializeData(std::ostream& stream);
+  void serializeHeader(std::ostream& stream);
   cedar::aux::DataPtr clone();
 
   std::string getDescription() const;

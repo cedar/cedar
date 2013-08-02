@@ -40,23 +40,26 @@
 #include "cedar/auxiliaries/ThreadCollection.h"
 #include "cedar/auxiliaries/ThreadWrapper.h"
 
+
 cedar::aux::ThreadCollection::ThreadCollection()
 {
-
+  mpListLock = new QReadWriteLock();
 }
 
 cedar::aux::ThreadCollection::~ThreadCollection()
 {
-
+  delete mpListLock;
 }
 
 void cedar::aux::ThreadCollection::addThread(cedar::aux::ThreadWrapperPtr thread)
 {
+  QWriteLocker locker(mpListLock);
   mThreads.push_back(thread);
 }
 
 void  cedar::aux::ThreadCollection::startAll()
 {
+  QWriteLocker locker(mpListLock);
   for(unsigned int i = 0; i < mThreads.size(); i++)
   {
     mThreads[i]->start();
@@ -65,6 +68,7 @@ void  cedar::aux::ThreadCollection::startAll()
 
 void  cedar::aux::ThreadCollection::stopAll()
 {
+  QWriteLocker locker(mpListLock);
   //First performing a requestStop() to stop all thread as fast as possible without blocking
   for(unsigned int i = 0; i < mThreads.size(); i++)
   {
@@ -78,13 +82,24 @@ void  cedar::aux::ThreadCollection::stopAll()
   }
 }
 
+void cedar::aux::ThreadCollection::remove(int index)
+{
+  QWriteLocker locker(mpListLock);
+  mThreads.erase(mThreads.begin()+index);
+}
+
 void cedar::aux::ThreadCollection::removeAll()
 {
+  QWriteLocker locker(mpListLock);
   mThreads.clear();
 }
 
 unsigned int cedar::aux::ThreadCollection::size()
 {
+  QReadLocker locker(mpListLock);
   return mThreads.size();
 }
+
+
+
 

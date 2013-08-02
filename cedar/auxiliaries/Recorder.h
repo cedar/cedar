@@ -92,14 +92,24 @@ class cedar::aux::Recorder : public cedar::aux::LoopedThread
       *             exist in the Recorder, the DataPtr will not be registered.
       *
       */
-    void registerData(cedar::aux::DataPtr toSpectate,int recordIntv,std::string name);
+    void registerData(const cedar::aux::DataPtr toSpectate, int recordIntv, const std::string& name);
+
+    /*!@brief Used to unregister a DataPtr to stop him from beeing recorded.
+     *
+     */
+    void unregisterData(const std::string& name);
+
+    /*!@brief Unregister all DataPtr.
+     *
+     */
+    void clear();
 
 
     //!@brief Sets the OutputDirectory
-    void setOutputDirectory(std::string path);
+    void setOutputDirectory(const std::string& path);
 
     //!@brief Gets the OutputDirectory
-    std::string getOutputDirectory();
+    const std::string& getOutputDirectory();
 
     //!@brief Returns the elapsed time in ms since the REcorder thread has been started.
     int getTimeStamp();

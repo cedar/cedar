@@ -43,6 +43,7 @@
 
 //System includes
 #include <vector>
+#include<qreadwritelock.h>
 
 /*!@brief This class can be used for a collection of Threads.
  *            It provides some functions and tools for easily start, stop and access the threads.
@@ -80,30 +81,27 @@ public:
   //!@brief Removes all threads from the ThreadCollection.
   void removeAll();
 
+  //!@brief Removes a thread from the collection.
+  void remove(int index);
 
   //!@brief Returns the number of Threads in the ThreadCollection.
   unsigned int size();
 
-
-
-  //----------------------------------------------------------------------------
-  // overloaded operators
-  //----------------------------------------------------------------------------
-  inline cedar::aux::ThreadWrapperPtr operator[](unsigned int i)
+  //!@brief Returns thread i of the ThreadCollection and cast it to T.
+  template <typename T> boost::shared_ptr<T>
+  get(unsigned int index)
   {
-    return mThreads[i];
+    QReadLocker locker(mpListLock);
+    return boost::static_pointer_cast<T>(mThreads[index]);
   }
 
-  inline const cedar::aux::ThreadWrapperPtr operator[](unsigned int i) const
-  {
-    return mThreads[i];
-  }
 
   //----------------------------------------------------------------------------
   // private members
   //----------------------------------------------------------------------------
 private:
   std::vector<cedar::aux::ThreadWrapperPtr> mThreads;
+  QReadWriteLock* mpListLock;
 
 };
 
