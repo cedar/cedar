@@ -87,7 +87,7 @@ class cedar::aux::DataSpectator : public cedar::aux::LoopedThread{
     /*!@brief The private Constructor. Can only called by friend classes such as cedar::aux::Recorder. recordIntv should
      * be passed in ms. name is a unique name for this DataPtr, so a file with this name can be created in the output
      * dictionary.*/
-    DataSpectator(cedar::aux::DataPtr toSpectate, int recordIntv, std::string name);
+    DataSpectator(const cedar::aux::DataPtr toSpectate, int recordIntv, const std::string& name);
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -95,7 +95,7 @@ class cedar::aux::DataSpectator : public cedar::aux::LoopedThread{
   //--------------------------------------------------------------------------------------------------------------------
   public:
     //!@brief Gets the DataPtr.
-    cedar::aux::DataPtr data();
+    cedar::aux::DataPtr getData();
 
     //!@brief Starts the DataSpectator: Before starting the output file will be opened and the header be written.
     void applyStart();
@@ -103,6 +103,8 @@ class cedar::aux::DataSpectator : public cedar::aux::LoopedThread{
     //!@brief Stops the DataSpactator. Before stopping all RecordDatas in the queue will be written to disk.
     void applyStop(bool suppressWarning);
 
+    //!@brief Gets the unique Name.
+    const std::string& getName();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -120,7 +122,7 @@ class cedar::aux::DataSpectator : public cedar::aux::LoopedThread{
     void writeHeader();
 
     //!@brief Writes the first element of the RecordData queue to the output file.
-    void writeOneRecordData();
+    void writeFirstRecordData();
 
     //!@brief Writes the whole RecordData queue to the output file.
     void writeAllRecordData();
@@ -128,13 +130,10 @@ class cedar::aux::DataSpectator : public cedar::aux::LoopedThread{
     //!@brief Copies the DataPtr and stores it as new RecordData in the queue.
     void record();
 
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-
-  public:
-    //!@brief The unique name of the DataPtr. Will be used to name the file.
-    std::string mName;
 
   protected:
     // none yet
@@ -153,10 +152,13 @@ class cedar::aux::DataSpectator : public cedar::aux::LoopedThread{
     QReadWriteLock* mpOfstreamLock;
 
     //!@brief This queue will be write to disk every time step is called.
-    std::list<boost::shared_ptr<recordData>> mDataQueue;
+    std::list<recordData> mDataQueue;
 
     //!@brief Locks mDataQueue.
     QReadWriteLock* mpQueueLock;
+
+    //!@brief Unique name of the DataPtr.
+    std::string mName;
 
 };
 

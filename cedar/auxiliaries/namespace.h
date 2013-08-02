@@ -247,6 +247,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(UnmanglingFailedException);
     CEDAR_DECLARE_AUX_CLASS(ValidationFailedException);
     CEDAR_DECLARE_AUX_CLASS(ThreadingErrorException);
+    CEDAR_DECLARE_AUX_CLASS(NotImplementedException);
     //!@endcond
     
     //!@cond SKIPPED_DOCUMENTATION

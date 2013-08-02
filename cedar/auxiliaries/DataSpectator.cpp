@@ -45,7 +45,7 @@
 // constructors and destructor
 //------------------------------------------------------------------------------
 
-cedar::aux::DataSpectator::DataSpectator(cedar::aux::DataPtr toSpectate, int recordIntv,std::string name)
+cedar::aux::DataSpectator::DataSpectator(const cedar::aux::DataPtr toSpectate, int recordIntv, const std::string& name)
 {
   this->mpQueueLock = new QReadWriteLock();
   this->mpOfstreamLock = new QReadWriteLock();
@@ -56,7 +56,7 @@ cedar::aux::DataSpectator::DataSpectator(cedar::aux::DataPtr toSpectate, int rec
   mpOutputStream = boost::shared_ptr<std::ofstream>(new std::ofstream());
 }
 
-cedar::aux::DataPtr cedar::aux::DataSpectator::data()
+cedar::aux::DataPtr cedar::aux::DataSpectator::getData()
 {
   return this->mData;
 }
@@ -95,7 +95,8 @@ void cedar::aux::DataSpectator::applyStop(bool/* suppressWarning*/)
 void cedar::aux::DataSpectator::writeHeader()
 {
   QWriteLocker locker(mpOfstreamLock);
-  (*mpOutputStream) << mData->serializeHeader() << std::endl;
+  mData->serializeHeader(*mpOutputStream);
+  (*mpOutputStream) << std::endl;
 }
 
 void cedar::aux::DataSpectator::record()
@@ -103,17 +104,17 @@ void cedar::aux::DataSpectator::record()
   // Copy the Data
   cedar::aux::DataPtr d = mData->clone();
 
-  //Create new recordData
-  recordData* rec = new recordData();
-  rec->mData = d;
-  rec->mRecordTime = cedar::aux::RecorderSingleton::getInstance()->getTimeStamp();
+  //Create new recordData todo const?!
+  recordData rec;
+  rec.mData = d;
+  rec.mRecordTime = cedar::aux::RecorderSingleton::getInstance()->getTimeStamp();
 
   //Lock the Queue and push record Data
   QWriteLocker locker(mpQueueLock);
-  mDataQueue.push_back(boost::shared_ptr<recordData>(rec));
+  mDataQueue.push_back(rec);
 }
 
-void cedar::aux::DataSpectator::writeOneRecordData()
+void cedar::aux::DataSpectator::writeFirstRecordData()
 {
   // thread context: called from Recorder's thread.
   /* This function uses a lot of locks. It is important to dont lock the queue during the serialization(takes 25-30ms)
@@ -129,20 +130,18 @@ void cedar::aux::DataSpectator::writeOneRecordData()
   if(size > 0)
   {
     // Save data to disk.
-    recordData* data;
+    recordData data;
     {
-      QReadLocker locker(mpQueueLock);
-      data = mDataQueue.front().get();
+      QWriteLocker locker(mpQueueLock);
+      data = mDataQueue.front();
+      mDataQueue.pop_front();
     }
 
     {
       QWriteLocker locker(mpOfstreamLock);
-      (*mpOutputStream) <<data->mRecordTime << "," << data->mData->serializeData() << std::endl;
-    }
-
-    {
-      QWriteLocker locker(mpQueueLock);
-      mDataQueue.pop_front();
+      (*mpOutputStream) << data.mRecordTime << ",";
+      data.mData->serializeData(*mpOutputStream);
+      (*mpOutputStream)   << std::endl;
     }
   }
 }
@@ -156,16 +155,24 @@ void cedar::aux::DataSpectator::writeAllRecordData()
 
   while(mDataQueue.size() > 0)
   {
-    recordData* data;
-    data = mDataQueue.front().get();
+    recordData data;
+    data = mDataQueue.front();
 
     {
       QWriteLocker locker(mpOfstreamLock);
-      (*mpOutputStream) <<data->mRecordTime << "," << data->mData->serializeData() << std::endl;
+      (*mpOutputStream) << data.mRecordTime << ",";
+      data.mData->serializeData(*mpOutputStream);
+      (*mpOutputStream)   << std::endl;
     }
     mDataQueue.pop_front();
 
   }
+}
+
+
+const std::string& cedar::aux::DataSpectator::getName()
+{
+  return this->mName;
 }
 
 

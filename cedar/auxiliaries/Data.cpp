@@ -60,19 +60,20 @@ cedar::aux::Data::~Data()
   delete mpLock;
 }
 
-std::string cedar::aux::Data::serializeData()
+
+void cedar::aux::Data::serializeData(std::ostream& /*stream*/)
 {
-  return "DataClass";
+  CEDAR_THROW(cedar::aux::NotImplementedException,"serializeData function not implemented for this type of data");
 }
 
-std::string cedar::aux::Data::serializeHeader()
+void cedar::aux::Data::serializeHeader(std::ostream& /*stream*/)
 {
-  return "";
+  CEDAR_THROW(cedar::aux::NotImplementedException,"serializeHeader function not implemented for this type of data");
 }
 
 cedar::aux::DataPtr cedar::aux::Data::clone()
 {
-  return cedar::aux::DataPtr();
+  CEDAR_THROW(cedar::aux::NotImplementedException,"Clone function not implemented for this type of data");
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -105,12 +105,11 @@ std::string cedar::aux::MatData::getDescription() const
   return description;
 }
 
-std::string cedar::aux::MatData::serializeData()
+void cedar::aux::MatData::serializeData(std::ostream& stream)
 {
+
+  // todo input parameter stream
   this->lockForRead();
-  // using of a string stream to cast doubles to strings. This is much faster compared to
-  // boost lexical_cast<>
-  std::ostringstream ss;
 
   //creating index that addresses an element in the n dimensional Mat
   std::vector<int> index;
@@ -131,41 +130,42 @@ std::string cedar::aux::MatData::serializeData()
     //check data type
     for(int i=0;i<mData.channels();i++)
     {
+      //todo top
       switch(mData.depth())
       {
         case CV_8U:
         {
-          ss << (int)(*(uchar*)(element+i*1)) << ",";
+          stream << (int)(*(uchar*)(element+i*1)) << ",";
           break;
         }
         case CV_8S:
         {
-          ss << (int)(*(schar*)(element+i*1)) << ",";
+          stream  << (int)(*(schar*)(element+i*1)) << ",";
           break;
         }
         case CV_16U:
         {
-          ss << *(unsigned short*)(element+i*2) << ",";
+          stream  << *(unsigned short*)(element+i*2) << ",";
           break;
         }
         case CV_16S:
         {
-          ss << *(short*)(element+i*2) << ",";
+          stream  << *(short*)(element+i*2) << ",";
           break;
         }
         case CV_32S:
         {
-          ss << *(int*)(element+i*4) << ",";
+          stream  << *(int*)(element+i*4) << ",";
           break;
         }
         case CV_32F:
         {
-          ss << *(float*)(element+i*4) << ",";
+          stream  << *(float*)(element+i*4) << ",";
           break;
         }
         case CV_64F:
         {
-          ss << *(double*)(element+i*8) << ",";
+          stream  << *(double*)(element+i*8) << ",";
           break;
         }
       }
@@ -184,30 +184,27 @@ std::string cedar::aux::MatData::serializeData()
   }
 
   this->unlock();
-  return ss.str();
 }
 
-std::string cedar::aux::MatData::serializeHeader()
+void cedar::aux::MatData::serializeHeader(std::ostream& stream)
 {
   this->lockForRead();
-  std::ostringstream s;
-  s << "Mat" << ",";
-  s << mData.type() << ",";
-  s << mData.dims << ",";
+  stream << "Mat" << ",";
+  stream << mData.type() << ",";
+  stream << mData.dims << ",";
   for(int i =0; i < mData.dims;i++)
   {
-    s << mData.size[i] << ",";
+    stream << mData.size[i] << ",";
   }
   this->unlock();
-  return s.str();
 }
 
 cedar::aux::DataPtr cedar::aux::MatData::clone()
 {
   lockForRead();
-  MatDataPtr neu(new MatData(mData.clone()));
+  MatDataPtr cloned(new MatData(mData.clone()));
   unlock();
-  return neu;
+  return cloned;
 }
 
 unsigned int cedar::aux::MatData::getDimensionality() const
