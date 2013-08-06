@@ -349,12 +349,12 @@ void cedar::proc::gui::StepItem::timerEvent(QTimerEvent * /* pEvent */)
               "</table>");
 
   std::vector<boost::function<cedar::unit::Time ()> > measurements;
-  measurements.push_back(boost::bind(&cedar::proc::Step::getRunTimeMeasurement, this->mpStep));
-  measurements.push_back(boost::bind(&cedar::proc::Step::getRunTimeAverage, this->mpStep));
-  measurements.push_back(boost::bind(&cedar::proc::Step::getLockTimeMeasurement, this->mpStep));
-  measurements.push_back(boost::bind(&cedar::proc::Step::getLockTimeAverage, this->mpStep));
-  measurements.push_back(boost::bind(&cedar::proc::Step::getRoundTimeMeasurement, this->mpStep));
-  measurements.push_back(boost::bind(&cedar::proc::Step::getRoundTimeAverage, this->mpStep));
+  measurements.push_back(boost::bind(&cedar::proc::Step::getRunTimeMeasurement, this->mStep));
+  measurements.push_back(boost::bind(&cedar::proc::Step::getRunTimeAverage, this->mStep));
+  measurements.push_back(boost::bind(&cedar::proc::Step::getLockTimeMeasurement, this->mStep));
+  measurements.push_back(boost::bind(&cedar::proc::Step::getLockTimeAverage, this->mStep));
+  measurements.push_back(boost::bind(&cedar::proc::Step::getRoundTimeMeasurement, this->mStep));
+  measurements.push_back(boost::bind(&cedar::proc::Step::getRoundTimeAverage, this->mStep));
 
   for (size_t i = 0; i < measurements.size(); ++i)
   {
@@ -393,7 +393,7 @@ bool cedar::proc::gui::StepItem::hasGuiConnection
 
 void cedar::proc::gui::StepItem::updateStepState()
 {
-  switch (this->mpStep->getState())
+  switch (this->mStep->getState())
   {
     case cedar::proc::Step::STATE_EXCEPTION:
     case cedar::proc::Step::STATE_NOT_RUNNING:
@@ -417,7 +417,7 @@ void cedar::proc::gui::StepItem::updateStepState()
       this->setFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor);
   }
   // append <font>s to make this a rich text, thus automatically word-wrapping the tool tip.
-  const std::string& annotation = this->mpStep->getStateAnnotation();
+  const std::string& annotation = this->mStep->getStateAnnotation();
   QString tool_tip = "";
   if (!annotation.empty())
   {
@@ -462,8 +462,8 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
   }
 
   this->setElement(step);
-  this->mpStep = step;
-  this->mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->mpStep);
+  this->mStep = step;
+  this->mClassId = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->mStep);
   CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(this->mClassId))
   cedar::proc::ConstElementDeclarationPtr elem_decl
     = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(this->mClassId);
@@ -531,7 +531,7 @@ void cedar::proc::gui::StepItem::readConfiguration(const cedar::aux::Configurati
 
 void cedar::proc::gui::StepItem::writeConfiguration(cedar::aux::ConfigurationNode& root) const
 {
-  root.put("step", this->mpStep->getName());
+  root.put("step", this->mStep->getName());
   root.put("display style", cedar::proc::gui::StepItem::DisplayMode::type().get(this->mDisplayMode).name());
   this->cedar::proc::gui::GraphicsBase::writeConfiguration(root);
 }
@@ -619,16 +619,16 @@ void cedar::proc::gui::StepItem::updateDecorationPositions()
 
 void cedar::proc::gui::StepItem::addTriggerItems()
 {
-  CEDAR_DEBUG_ASSERT(this->mpStep);
+  CEDAR_DEBUG_ASSERT(this->mStep);
 
   qreal padding = static_cast<qreal>(3);
   QPointF origin(0, this->height() + padding);
   qreal trigger_size = 10.0;
   mTriggers.clear();
 
-  for (size_t i = 0; i < this->mpStep->getTriggerCount(); ++i)
+  for (size_t i = 0; i < this->mStep->getTriggerCount(); ++i)
   {
-    cedar::proc::TriggerPtr trigger = this->mpStep->getTrigger(i);
+    cedar::proc::TriggerPtr trigger = this->mStep->getTrigger(i);
     cedar::proc::gui::TriggerItem* p_trigger_item = new cedar::proc::gui::TriggerItem(trigger);
     p_trigger_item->setParentItem(this);
     p_trigger_item->setPos(origin + QPointF(0, 1) * static_cast<qreal>(i) * (trigger_size + padding));
@@ -653,11 +653,11 @@ void cedar::proc::gui::StepItem::addDataItems()
 
     try
     {
-      const cedar::proc::Step::SlotList& slotmap = this->mpStep->getOrderedDataSlots(*enum_it);
+      const cedar::proc::Step::SlotList& slotmap = this->mStep->getOrderedDataSlots(*enum_it);
       for (cedar::proc::Step::SlotList::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
         // use a non-const version of this slot
-        this->addDataItemFor(this->mpStep->getSlot(*enum_it, (*iter)->getName()));
+        this->addDataItemFor(this->mStep->getSlot(*enum_it, (*iter)->getName()));
       }
     }
     catch(const cedar::proc::InvalidRoleException&)
@@ -730,7 +730,7 @@ void cedar::proc::gui::StepItem::updateDataSlotPositions()
     try
     {
       QPointF current_origin = QPointF(0, 0);
-      const cedar::proc::Step::SlotList& slotmap = this->mpStep->getOrderedDataSlots(role);
+      const cedar::proc::Step::SlotList& slotmap = this->mStep->getOrderedDataSlots(role);
       for (cedar::proc::Step::SlotList::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
         const std::string& slot_name = (*iter)->getName();
@@ -788,7 +788,7 @@ cedar::proc::gui::DataSlotItem const* cedar::proc::gui::StepItem::getSlotItem
     CEDAR_THROW(cedar::aux::InvalidNameException, "No slot item named \"" + name +
                                                   "\" found for role "
                                                   + cedar::proc::DataRole::type().get(role).prettyString()
-                                                  + " in StepItem for step \"" + this->mpStep->getName() + "\"."
+                                                  + " in StepItem for step \"" + this->mStep->getName() + "\"."
                                                   );
   }
 
@@ -840,7 +840,7 @@ void cedar::proc::gui::StepItem::fillPlots
       const cedar::aux::Enum& e = *enum_it;
       this->addRoleSeparator(e, pMenu);
 
-      const cedar::proc::Step::SlotList& slotmap = this->mpStep->getOrderedDataSlots(e.id());
+      const cedar::proc::Step::SlotList& slotmap = this->mStep->getOrderedDataSlots(e.id());
       for
       (
         cedar::proc::Step::SlotList::const_iterator slot_iter = slotmap.begin();
@@ -900,7 +900,7 @@ void cedar::proc::gui::StepItem::showPlot
 )
 {
   cedar::aux::gui::ConstPlotDeclarationPtr decl =
-    cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(this->mpStep->getData(role, dataName));
+    cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(this->mStep->getData(role, dataName));
   showPlot(position, dataName, role, decl);
 }
 
@@ -916,8 +916,8 @@ void cedar::proc::gui::StepItem::showPlot
   cedar::proc::ElementDeclaration::DataList data_list;
   data_list.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(role.id(), dataName, false, declaration->getClassName())));
 
-  auto p_plot_widget = new cedar::proc::gui::PlotWidget(this->mpStep, data_list);
-  auto p_dock_widget = this->createDockWidgetForPlots(this->mpStep->getName(), p_plot_widget, position);
+  auto p_plot_widget = new cedar::proc::gui::PlotWidget(this->mStep, data_list);
+  auto p_dock_widget = this->createDockWidgetForPlots(this->mStep->getName(), p_plot_widget, position);
 
   p_dock_widget->show();
 }
@@ -934,7 +934,7 @@ void cedar::proc::gui::StepItem::openActionsDock()
 {
   QWidget* p_actions = new QWidget();
   QVBoxLayout* p_layout = new QVBoxLayout();
-  const cedar::proc::Step::ActionMap& map = this->mpStep->getActions();
+  const cedar::proc::Step::ActionMap& map = this->mStep->getActions();
   for (cedar::proc::Step::ActionMap::const_iterator iter = map.begin(); iter != map.end(); ++iter)
   {
     QPushButton* p_button = new QPushButton(iter->first.c_str());
@@ -943,7 +943,7 @@ void cedar::proc::gui::StepItem::openActionsDock()
   }
 
   p_actions->setLayout(p_layout);
-  std::string title = "Actions of step \"" + this->mpStep->getName() + "\"";
+  std::string title = "Actions of step \"" + this->mStep->getName() + "\"";
   auto p_dock_widget = this->createDockWidget(title, p_actions);
   p_dock_widget->show();
 }
@@ -991,7 +991,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   p_actions_menu->setIcon(QIcon(":/menus/actions.svg"));
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
-  const cedar::proc::Step::ActionMap& map = this->mpStep->getActions();
+  const cedar::proc::Step::ActionMap& map = this->mStep->getActions();
   if (map.empty())
   {
     p_actions_menu->setEnabled(false);
@@ -1022,7 +1022,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
       const cedar::aux::Enum& e = *enum_it;
       this->addRoleSeparator(e, p_data);
 
-      const cedar::proc::Step::SlotList& slotmap = this->mpStep->getOrderedDataSlots(e.id());
+      const cedar::proc::Step::SlotList& slotmap = this->mStep->getOrderedDataSlots(e.id());
       for (cedar::proc::Step::SlotList::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
         cedar::proc::DataSlotPtr slot = *iter;
@@ -1072,7 +1072,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     // decide whether this is a normal action or the docking action
     if (action != "open actions dock")
     {
-      this->mpStep->callAction(action);
+      this->mStep->callAction(action);
     }
     else
     {
@@ -1093,7 +1093,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
 void cedar::proc::gui::StepItem::fillDefinedPlots(QMenu& menu, const QPoint& plotPosition)
 {
   // get declaration of the element displayed by this item
-  auto decl = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->mpStep);
+  auto decl = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->mStep);
   CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(decl));
   auto elem_decl = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(decl);
 
@@ -1184,7 +1184,7 @@ void cedar::proc::gui::StepItem::plotAll()
 
     try
     {
-      const cedar::proc::Step::SlotMap& slotmap = this->mpStep->getDataSlots(e.id());
+      const cedar::proc::Step::SlotMap& slotmap = this->mStep->getDataSlots(e.id());
       for (cedar::proc::Step::SlotMap::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
         cedar::proc::DataSlotPtr slot = iter->second;
@@ -1197,8 +1197,8 @@ void cedar::proc::gui::StepItem::plotAll()
       // Kai: I disagree, exceptions should be exceptional see http://pragmatictips.com/34
     }
   }
-  auto p_plot_widget = new PlotWidget(this->mpStep, data);
-  auto p_dock_widget = this->createDockWidgetForPlots(this->mpStep->getName(), p_plot_widget, p_sender->data().toPoint());
+  auto p_plot_widget = new PlotWidget(this->mStep, data);
+  auto p_dock_widget = this->createDockWidgetForPlots(this->mStep->getName(), p_plot_widget, p_sender->data().toPoint());
   
   p_dock_widget->show();
 }
@@ -1210,7 +1210,7 @@ void cedar::proc::gui::StepItem::openDefinedPlotAction()
   std::string plot_name = p_action->text().toStdString();
 
   // get declaration of the element displayed by this item
-  auto decl = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->mpStep);
+  auto decl = cedar::proc::ElementManagerSingleton::getInstance()->getDeclarationOf(this->mStep);
   CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<cedar::proc::ConstElementDeclaration>(decl));
   auto elem_decl = boost::static_pointer_cast<cedar::proc::ConstElementDeclaration>(decl);
 
@@ -1237,7 +1237,7 @@ void cedar::proc::gui::StepItem::openDefinedPlotAction()
     return;
   }
 
-  auto p_plot_widget = new PlotWidget(this->mpStep, elem_decl->definedPlots()[list_index].mData);
+  auto p_plot_widget = new PlotWidget(this->mStep, elem_decl->definedPlots()[list_index].mData);
   auto p_dock_widget = this->createDockWidgetForPlots(plot_name, p_plot_widget, p_action->data().toPoint());
   
   p_dock_widget->show();
@@ -1392,7 +1392,7 @@ void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGrap
   if (this->mDisplayMode == cedar::proc::gui::StepItem::DisplayMode::ICON_AND_TEXT)
   {
     painter->drawText(QPointF(2 * padding + mIconSize, 15), this->mClassId->getClassNameWithoutNamespace().c_str());
-    painter->drawText(QPointF(2 * padding + mIconSize, 25), this->mpStep->getName().c_str());
+    painter->drawText(QPointF(2 * padding + mIconSize, 25), this->mStep->getName().c_str());
   }
 
   painter->restore(); // restore saved painter settings
@@ -1400,7 +1400,7 @@ void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGrap
 
 cedar::proc::StepPtr cedar::proc::gui::StepItem::getStep()
 {
-  return this->mpStep;
+  return this->mStep;
 }
 
 void cedar::proc::gui::StepItem::disconnect()
@@ -1410,7 +1410,7 @@ void cedar::proc::gui::StepItem::disconnect()
 void cedar::proc::gui::StepItem::handleExternalActionButtons()
 {
   std::string action = cedar::aux::asserted_cast<QPushButton*>(QObject::sender())->text().toStdString();
-  this->mpStep->callAction(action);
+  this->mStep->callAction(action);
 }
 
 void cedar::proc::gui::StepItem::writeOpenChildWidgets(cedar::aux::ConfigurationNode& node) const
@@ -1432,7 +1432,7 @@ void cedar::proc::gui::StepItem::writeOpenChildWidgets(cedar::aux::Configuration
 void cedar::proc::gui::StepItem::addPlotWidget(cedar::proc::gui::PlotWidget* pPlotWidget, int x, int y, int width, int height)
 {
   QPoint position = QPoint(x, y);
-  auto p_dock_widget = this->createDockWidgetForPlots(this->mpStep->getName(), pPlotWidget, position);
+  auto p_dock_widget = this->createDockWidgetForPlots(this->mStep->getName(), pPlotWidget, position);
   p_dock_widget->resize(width, height);
   p_dock_widget->show();
 }

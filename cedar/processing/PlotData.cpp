@@ -58,10 +58,10 @@ cedar::proc::PlotData::PlotData
     const std::string& plotDeclaration
 )
 :
-mpId(new cedar::aux::EnumParameter(this, "id", cedar::proc::DataRole::typePtr(), id)),
-mpName(new cedar::aux::StringParameter(this, "name", name)),
-mpIgnoreIfMissing(new cedar::aux::BoolParameter(this, "ignoreIfMissing", ignoreIfMissing)),
-mpPlotDeclaration(new cedar::aux::StringParameter(this, "plotDeclaration", plotDeclaration))
+mId(new cedar::aux::EnumParameter(this, "id", cedar::proc::DataRole::typePtr(), id)),
+mName(new cedar::aux::StringParameter(this, "name", name)),
+mIgnoreIfMissing(new cedar::aux::BoolParameter(this, "ignoreIfMissing", ignoreIfMissing)),
+mPlotDeclaration(new cedar::aux::StringParameter(this, "plotDeclaration", plotDeclaration))
 {
 };
 

@@ -53,6 +53,7 @@
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
+#include <QGraphicsSvgItem>
 #include <QIcon>
 #include <QObject>
 #include <map>
@@ -116,7 +117,7 @@ private:
   class Decoration
   {
     public:
-      Decoration(StepItem* pStep, const QString& icon, const QString& description);
+      Decoration(StepItem* pStep, const QString& icon, const QString& description, const QColor& bg = QColor(255, 255, 255));
 
       ~Decoration()
       {
@@ -129,11 +130,9 @@ private:
       void setSize(double sizeFactor);
 
     private:
-      QGraphicsPixmapItem* mpIcon;
+      QGraphicsSvgItem* mpIcon;
 
       QGraphicsRectItem* mpRectangle;
-
-      QIcon mIconSource;
 
       QString mIconFile;
   };
@@ -187,7 +186,7 @@ public:
   //!@brief resets the internal step
   void resetPointer()
   {
-    mpStep.reset();
+    mStep.reset();
   }
 
   //!@brief helper function to remove all connections to other graphical elements
@@ -320,6 +319,10 @@ private:
 
   void closeAllChildWidgets();
 
+  void updateIconGeometry();
+
+  qreal getContentsPadding() const;
+
 private slots:
   void displayStyleMenuTriggered(QAction* pAction);
 
@@ -345,7 +348,7 @@ protected:
   // none yet
 private:
   //!@brief the represented step
-  cedar::proc::StepPtr mpStep;
+  cedar::proc::StepPtr mStep;
 
   //!@brief a map of all data slots of the current step
   DataSlotMap mSlotMap;
@@ -377,9 +380,6 @@ private:
   //!@brief the main window in which the current graphical representation is embedded
   QMainWindow* mpMainWindow;
 
-  //!@brief the icon representing the contained step
-  QIcon mStepIcon;
-
   //!@brief connection to state changed signal of step
   boost::signals2::connection mStateChangedConnection;
 
@@ -388,6 +388,9 @@ private:
 
   //! The decorations for this step.
   std::vector<DecorationPtr> mDecorations;
+
+  //! SvgItem displaying the step's icon
+  QGraphicsSvgItem* mpIconDisplay;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

@@ -104,13 +104,13 @@ protected:
   // none yet
 private:
   //! Role of the data to be plotted.
-  cedar::aux::EnumParameterPtr mpId;
+  cedar::aux::EnumParameterPtr mId;
   //! Name of the data to be plotted.
-  cedar::aux::StringParameterPtr mpName;
+  cedar::aux::StringParameterPtr mName;
   //! If true, no exception will be thrown if the data cannot be found.
-  cedar::aux::BoolParameterPtr mpIgnoreIfMissing;
+  cedar::aux::BoolParameterPtr mIgnoreIfMissing;
   //! Plot Type to be used to plot the data
-  cedar::aux::StringParameterPtr mpPlotDeclaration;
+  cedar::aux::StringParameterPtr mPlotDeclaration;
 
 }; // cedar::proc::PlotData
 

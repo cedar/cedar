@@ -463,19 +463,17 @@ void cedar::proc::gui::Network::read(const std::string& source)
   {
     //!TODO: this weaves control-flow logic into exceptions, that's not proper!
     this->toggleSmartConnectionMode(false);
-    cedar::aux::LogSingleton::getInstance()->warning
-    (
-      "Architecture Loading Exception: Could not find " + exc.path<std::string>(),
-      "cedar::proc::gui::Network::read"
-    );
   }
 }
 
 void cedar::proc::gui::Network::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   this->cedar::proc::gui::GraphicsBase::readConfiguration(node);
-  auto plot_list = node.get_child("open plots");
-  this->readOpenPlots(plot_list);
+  auto plot_list = node.find("open plots");
+  if(plot_list != node.not_found())
+  {
+    this->readOpenPlots(plot_list->second);
+  }
 }
 
 void cedar::proc::gui::Network::readOpenPlots(const cedar::aux::ConfigurationNode& node)

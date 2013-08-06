@@ -132,7 +132,7 @@ protected:
   // none yet
 private:
   cedar::proc::ElementDeclaration::DataList mData;
-  cedar::proc::StepPtr mpStep;
+  cedar::proc::StepPtr mStep;
   LabeledPlot mLabeledPlot;
   int mGridSpacing;
   int mColumns;

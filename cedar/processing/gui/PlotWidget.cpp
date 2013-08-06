@@ -60,7 +60,7 @@ cedar::proc::gui::PlotWidget::PlotWidget
 )
 :
 mData(data),
-mpStep(step),
+mStep(step),
 mLabeledPlot(NULL),
 mGridSpacing(2),
 mColumns(2),
@@ -102,7 +102,7 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
     auto deit = *it;
     try
     {
-      cedar::proc::DataSlotPtr slot = mpStep->getSlot(deit->getParameter<cedar::aux::EnumParameter>("id")->getValue(), deit->getParameter<cedar::aux::StringParameter>("name")->getValue());
+      cedar::proc::DataSlotPtr slot = mStep->getSlot(deit->getParameter<cedar::aux::EnumParameter>("id")->getValue(), deit->getParameter<cedar::aux::StringParameter>("name")->getValue());
       cedar::aux::DataPtr p_data = slot->getData();
       const std::string& title = slot->getText();
 
@@ -257,7 +257,7 @@ int cedar::proc::gui::PlotWidget::getRowCount()
 
 void cedar::proc::gui::PlotWidget::writeConfiguration(cedar::aux::ConfigurationNode& root)
 {
-  root.put("step", this->mpStep->getName());
+  root.put("step", this->mStep->getName());
   root.put("position_x", this->parentWidget()->x());
   root.put("position_y", this->parentWidget()->y());
   root.put("width", this->parentWidget()->width());
