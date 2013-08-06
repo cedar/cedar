@@ -26,9 +26,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7"
-     inkscape:cx="-543.90377"
-     inkscape:cy="-102.55615"
+     inkscape:zoom="1.979899"
+     inkscape:cx="80.355998"
+     inkscape:cy="256.37304"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -257,8 +257,10 @@
        id="g3898">
       <path
          style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:18.75;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter"
-         d="m 33.03125,680.8125 a 9.3759375,9.3759375 0 0 0 -9.25,9.5 l 0,352.5625 a 9.3759375,9.3759375 0 1 0 18.75,0 l 0,-352.5625 a 9.3759375,9.3759375 0 0 0 -9.5,-9.5 z"
-         id="path3896" />
+         d="m 23.78125,706.3125 0,336.5625 c -0.03502,2.4765 0.959626,4.9517 2.698499,6.7153 1.738874,1.7637 4.199788,2.7932 6.676501,2.7932 2.476713,0 4.937627,-1.0295 6.676501,-2.7932 1.738873,-1.7636 2.733522,-4.2388 2.698499,-6.7153 l 0,-336.5625 z"
+         id="path3896"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ccsssccc" />
       <path
          id="path3904"
          d="m 33.170862,662.50876 25.892493,44.79402 -51.7849858,0 25.8924928,-44.79402 z"
@@ -268,8 +270,10 @@
        id="g3906">
       <path
          style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:18.75;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter"
-         d="m 11.125,868.2372 a 9.3759375,9.3759375 0 1 0 0,18.75 l 348.5,0 a 9.3759375,9.3759375 0 1 0 0,-18.75 l -348.5,0 z"
-         id="path3690" />
+         d="m 11.125,868.2372 c -2.4764654,-0.035 -4.9516922,0.95963 -6.7153309,2.6985 -1.7636388,1.73887 -2.7931879,4.19979 -2.7931879,6.6765 0,2.47671 1.0295491,4.93763 2.7931879,6.6765 1.7636387,1.73887 4.2388655,2.73352 6.7153309,2.6985 l 330.5,0 0,-18.75 z"
+         id="path3690"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cssscccc" />
       <path
          id="path3912"
          d="m 388.31266,877.60581 -46.55922,26.91285 0,-53.8257 46.55922,26.91285 z"
