@@ -56,14 +56,12 @@
 cedar::proc::gui::PlotWidget::PlotWidget
 (
     cedar::proc::StepPtr step,
-    const cedar::proc::ElementDeclaration::DataList& data,
-    cedar::aux::gui::ConstPlotDeclarationPtr declaration
+    const cedar::proc::ElementDeclaration::DataList& data
 )
 :
 mData(data),
 mpStep(step),
-mLabeledPlot({NULL, NULL}),
-mpPlotDeclaration(declaration),
+mLabeledPlot(NULL),
 mGridSpacing(2),
 mColumns(2),
 mpLayout(new QGridLayout())
@@ -97,6 +95,7 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
   // iterate over all data slots
   int count = 0;
   bool is_multiplot = false;
+  std::vector<cedar::proc::ElementDeclaration::DataList::iterator> invalid_data;
 
   for (auto it = mData.begin(); it != mData.end(); ++it)
   {
@@ -113,17 +112,44 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
       if (p_data)
       // skip slots that aren't set
       {
-        // the static cast is okay iff mpPlotDeclaration is false
-        if (mLabeledPlot.mpPlotter == NULL || mpPlotDeclaration || !cedar::aux::asserted_cast<cedar::aux::gui::DataPlotter*>(mLabeledPlot.mpPlotter)->canAppend(p_data))
-        // if no plotter exists or we cannot append the data to the current plotter (which is also the case
-        // if the PlotDeclaration is set) we have to create a new plotter and have it plot the data
+        // get the plot_class
+        std::string plot_declaration = deit->getParameter<cedar::aux::StringParameter>("plotDeclaration")->getValue();
+        auto declarations = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find(p_data)->getData();
+        auto decl = cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(p_data);
+        
+        for(auto iter = declarations.begin(); iter != declarations.end(); ++iter)
         {
-          count += createAndAddPlotToGrid(p_data, title, row, column) ? 1 : 0;
+          auto deIter = *iter;
+          if(deIter->getClassName() == plot_declaration)
+          {
+            decl = deIter;
+            break;
+          }
+        }
+        if
+         (
+            mLabeledPlot.mpPlotter == NULL
+            || mLabeledPlot.mpPlotDeclaration->getClassName() != plot_declaration
+            ||
+              !(
+                dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(mLabeledPlot.mpPlotter)
+                && static_cast<cedar::aux::gui::MultiPlotInterface*>(mLabeledPlot.mpPlotter)->canAppend(p_data)
+              )
+          )
+        // if no plotter exists or the declaration demands a different plotter or we cannot append
+        // the data to the current plotter, we have to create a new plotter and have it plot the data
+        {
+          count += createAndAddPlotToGrid(decl, p_data, title, row, column) ? 1 : 0;
         }
         else
         {
           is_multiplot = tryAppendDataToPlot(p_data, title);
         }
+      }
+      else
+      {
+        // mark for removal
+        invalid_data.push_back(it);
       }
     }
     catch (const cedar::proc::InvalidRoleException& e)
@@ -150,6 +176,10 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
     }
   }
 
+  for(auto it = invalid_data.begin(); it != invalid_data.end(); ++it)
+  {
+    mData.erase(*it);
+  }
   // if there is only one plot and it is a multiplot, we need no label
   if (count == 1 && is_multiplot)
   {
@@ -160,6 +190,7 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
 
 bool cedar::proc::gui::PlotWidget::createAndAddPlotToGrid
 (
+  cedar::aux::gui::ConstPlotDeclarationPtr decl,
   cedar::aux::DataPtr pData,
   const std::string& title,
   int row,
@@ -167,16 +198,8 @@ bool cedar::proc::gui::PlotWidget::createAndAddPlotToGrid
 )
 {
   bool success = true;
-  cedar::aux::gui::PlotInterface* data_plotter;
-  if(mpPlotDeclaration)
-  {
-    data_plotter = mpPlotDeclaration->createPlot();
-  }
-  else
-  {
-    data_plotter = new cedar::aux::gui::DataPlotter(); 
-  }
-  mLabeledPlot = LabeledPlot(new QLabel(QString::fromStdString(title)), data_plotter);
+
+  mLabeledPlot = LabeledPlot(new QLabel(QString::fromStdString(title)), decl);
   mpLayout->addWidget(mLabeledPlot.mpLabel, row, column);
   mpLayout->setRowStretch(row, 0);
   try
@@ -206,7 +229,7 @@ bool cedar::proc::gui::PlotWidget::tryAppendDataToPlot
 {
   try
   {
-    static_cast<cedar::aux::gui::DataPlotter*>(mLabeledPlot.mpPlotter)->append(pData, title);
+    cedar::aux::asserted_cast<cedar::aux::gui::MultiPlotInterface*>(mLabeledPlot.mpPlotter)->append(pData, title);
     mLabeledPlot.mpLabel->setText("");
     return true;
   }
@@ -239,14 +262,6 @@ void cedar::proc::gui::PlotWidget::writeConfiguration(cedar::aux::ConfigurationN
   root.put("position_y", this->parentWidget()->y());
   root.put("width", this->parentWidget()->width());
   root.put("height", this->parentWidget()->height());
-  if(mpPlotDeclaration)
-    {
-      root.put("PlotDeclaration", mpPlotDeclaration->getClassName());
-    }
-    else
-    {
-      root.put("PlotDeclaration", ""); 
-    }
   root.put_child("data_list", serialize(this->mData));
 }
 
@@ -271,7 +286,6 @@ void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::a
   int height = node.get<int>("height");
   int x = node.get<int>("position_x");
   int y = node.get<int>("position_y");
-  std::string plot_declaration = node.get<std::string>("PlotDeclaration");
   
   auto serialized_data_list = node.get_child("data_list");
   cedar::proc::ElementDeclaration::DataList data_list;
@@ -283,27 +297,6 @@ void cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(const cedar::a
     data_list.push_back(p_plot_data);
   }
   
-  auto data = pStepItem->getStep()->getSlot(
-                data_list.front()->getParameter<cedar::aux::EnumParameter>("id")->getValue(),
-                data_list.front()->getParameter<cedar::aux::StringParameter>("name")->getValue()
-              )->getData();
-  auto declarations = cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find(data)->getData();
-  cedar::aux::gui::ConstPlotDeclarationPtr decl;
-  
-  for(auto it = declarations.begin(); it != declarations.end(); ++it)
-  {
-    auto deit = *it;
-    if(deit->getClassName() == plot_declaration)
-    {
-      decl = deit;
-    }
-  }
-
-  if(!decl)
-  {
-    decl = cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(data);
-  }
-
-  auto p_plot_widget = new cedar::proc::gui::PlotWidget(pStepItem->getStep(), data_list, decl);
+  auto p_plot_widget = new cedar::proc::gui::PlotWidget(pStepItem->getStep(), data_list);
   pStepItem->addPlotWidget(p_plot_widget, x, y, width, height);
 }

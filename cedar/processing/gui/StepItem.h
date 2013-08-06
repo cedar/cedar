@@ -220,6 +220,8 @@ public slots:
   //!@brief removes the reference of a child widget from the mChildWidgets vector (called when child got destroyed)
   void removeChildWidget();
 
+  void closeAllPlots();
+
 signals:
   /*!@brief Emitted whenever the state of the step displayed by this step item changes.
    *
@@ -315,6 +317,8 @@ private:
   void addPlotAllAction(QMenu& menu, const QPoint& plotPosition);
 
   void writeOpenChildWidgets(cedar::aux::ConfigurationNode& node) const;
+
+  void closeAllChildWidgets();
 
 private slots:
   void displayStyleMenuTriggered(QAction* pAction);

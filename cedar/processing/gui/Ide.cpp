@@ -140,6 +140,8 @@ mpBoostControl(NULL)
   QObject::connect(this->mpActionSettings, SIGNAL(triggered()), this, SLOT(showSettingsDialog()));
   QObject::connect(this->mpActionShowHideGrid, SIGNAL(toggled(bool)), this, SLOT(toggleGrid(bool)));
   QObject::connect(this->mpActionToggleSmartConnections, SIGNAL(toggled(bool)), this, SLOT(toggleSmartConnections(bool)));
+  QObject::connect(this->mpActionCloseAllPlots, SIGNAL(triggered()), this, SLOT(closeAllPlots()));
+  
 
   QObject::connect
   (
@@ -905,4 +907,13 @@ void cedar::proc::gui::Ide::showTriggerConnections(bool show)
 void cedar::proc::gui::Ide::toggleSmartConnections(bool smart)
 {
   this->mNetwork->toggleSmartConnectionMode(smart);
+}
+
+void cedar::proc::gui::Ide::closeAllPlots()
+{
+  auto steps = this->mNetwork->getScene()->getStepMap();
+  for(auto it = steps.begin(); it != steps.end(); ++it)
+  {
+    it->second->closeAllPlots();
+  }
 }

@@ -50,6 +50,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+cedar::proc::PlotData::PlotData
+(
+    cedar::proc::DataRole::Id id,
+    const std::string& name,
+    bool ignoreIfMissing,
+    const std::string& plotDeclaration
+)
+:
+mpId(new cedar::aux::EnumParameter(this, "id", cedar::proc::DataRole::typePtr(), id)),
+mpName(new cedar::aux::StringParameter(this, "name", name)),
+mpIgnoreIfMissing(new cedar::aux::BoolParameter(this, "ignoreIfMissing", ignoreIfMissing)),
+mpPlotDeclaration(new cedar::aux::StringParameter(this, "plotDeclaration", plotDeclaration))
+{
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
