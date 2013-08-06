@@ -168,10 +168,20 @@ void cedar::proc::gui::Scene::reset()
 
 const cedar::proc::gui::Scene::StepMap& cedar::proc::gui::Scene::stepMap() const
 {
+  return this->getStepMap();
+}
+
+const cedar::proc::gui::Scene::StepMap& cedar::proc::gui::Scene::getStepMap() const
+{
   return this->mStepMap;
 }
 
 const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::triggerMap() const
+{
+  return this->getTriggerMap();
+}
+
+const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::getTriggerMap() const
 {
   return this->mTriggerMap;
 }

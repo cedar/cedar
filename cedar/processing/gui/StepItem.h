@@ -46,6 +46,7 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/processing/gui/PlotWidget.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/EnumType.h"
@@ -186,7 +187,7 @@ public:
   //!@brief resets the internal step
   void resetPointer()
   {
-    mStep.reset();
+    mpStep.reset();
   }
 
   //!@brief helper function to remove all connections to other graphical elements
@@ -205,6 +206,9 @@ public:
 
   //! Removes all effects of magnetization
   void demagnetizeSlots();
+
+  //! Adds a PlotWidget to the step (usually after loading a stored network that had open Plots)
+  void addPlotWidget(cedar::proc::gui::PlotWidget* pPlotWidget, int x, int y, int width, int height);
 
 public slots:
   //!@brief handles changes in the state of a step (e.g. from error to non-error state)
@@ -266,20 +270,21 @@ private:
   //! Fills in the actions for the display style.
   void fillDisplayStyleMenu(QMenu* pMenu);
 
+  //!@brief Gets the default plotter and then opens a new DockWidget to show the plot.
+  void showPlot
+  (
+    const QPoint& position,
+    std::string& dataName,
+    const cedar::aux::Enum& role
+  );
+
   //!@brief Opens a new DockWidget to show the plot.
   void showPlot
   (
     const QPoint& position,
-    cedar::aux::gui::PlotInterface* plot,
-    cedar::proc::DataSlotPtr slot,
-    std::string title = ""
-  );
-
-  //! Opens plots for all data in this step.
-  void multiplot
-  (
-    const QPoint& position,
-    cedar::proc::ElementDeclaration::DataList data = (cedar::proc::ElementDeclaration::DataList())
+    std::string& dataName,
+    const cedar::aux::Enum& role,
+    cedar::aux::gui::ConstPlotDeclarationPtr declaration
   );
 
   //! Updates the display of the step's run time measurements.
@@ -303,9 +308,13 @@ private:
 
   void addDataItemFor(cedar::proc::DataSlotPtr slot);
 
-  QWidget* createDockWidget(const std::string& title, QWidget* pPlot);
+  QWidget* createDockWidgetForPlots(const std::string& title, cedar::proc::gui::PlotWidget* pPlotWidget, const QPoint& position);
+
+  QWidget* createDockWidget(const std::string& title, QWidget* pWidget);
 
   void addPlotAllAction(QMenu& menu, const QPoint& plotPosition);
+
+  void writeOpenChildWidgets(cedar::aux::ConfigurationNode& node) const;
 
 private slots:
   void displayStyleMenuTriggered(QAction* pAction);
@@ -332,7 +341,7 @@ protected:
   // none yet
 private:
   //!@brief the represented step
-  cedar::proc::StepPtr mStep;
+  cedar::proc::StepPtr mpStep;
 
   //!@brief a map of all data slots of the current step
   DataSlotMap mSlotMap;
