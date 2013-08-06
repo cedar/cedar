@@ -170,6 +170,10 @@ cedar::proc::gui::StepItem::Decoration::Decoration
                    icon,
                    this->mpRectangle
                  );
+
+  // setting this cache mode makes sure that when writing out an svg file, the icon will not be pixelized
+  this->mpIcon->setCacheMode(QGraphicsItem::NoCache);
+
   this->mpIcon->setToolTip(description);
 
   qreal h = this->mpIcon->boundingRect().height();
@@ -470,6 +474,10 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
     this->mpIconDisplay = NULL;
   }
   this->mpIconDisplay = new QGraphicsSvgItem(elem_decl->determinedIconPath(), this);
+
+  // setting this cache mode makes sure that when writing out an svg file, the icon will not be pixelized
+  this->mpIconDisplay->setCacheMode(QGraphicsItem::NoCache);
+
   this->updateIconGeometry();
 
   this->addDataItems();
