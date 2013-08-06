@@ -1901,12 +1901,11 @@ void cedar::proc::Network::processPromotedSlots()
       {
         this->getElement<cedar::proc::Element>(child);
       }
+      catch (const cedar::aux::InvalidNameException& exc)
+      {
+      }
       catch (cedar::aux::ExceptionBase& exc) // remove promoted slot
       {
-        if (typeid(exc) != typeid(cedar::aux::InvalidNameException))
-        {
-          throw exc;
-        }
         types_delete_later.push_back(cedar::proc::DataRole::type().getFromPrettyString(slot_role));
         slots_delete_later.push_back(slot_name);
       }

@@ -134,22 +134,30 @@ public:
   //!@brief Returns the actual icon for the element.
   QIcon getIcon() const
   {
+    return QIcon(this->determinedIconPath());
+  }
+
+  /*! Returns the path for the icon to use; this will also return special icons if there is an error with the specified
+   * icons.
+   */
+  QString determinedIconPath() const
+  {
     QResource existance_test(QString::fromStdString(this->getIconPath()));
     if (existance_test.isValid())
     {
       auto icon = QIcon(QString::fromStdString(this->getIconPath()));
       if (icon.isNull())
       {
-        return QIcon(":/steps/no_icon.svg");
+        return ":/steps/no_icon.svg";
       }
       else
       {
-        return icon;
+        return QString::fromStdString(this->getIconPath());
       }
     }
     else
     {
-      return QIcon(":/steps/broken_icon.svg");
+      return ":/steps/broken_icon.svg";
     }
   }
 

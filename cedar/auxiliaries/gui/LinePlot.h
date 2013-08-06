@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,35 +22,28 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        LinePlot.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2013 07 18
+    Maintainer:  Kai Kuchenbecker
+    Email:       kai.kuchenbecker@ini.ruhr-uni-bochum.de
+    Date:        2013 07 30
 
-    Description: Namespace file for cedar::test.
+    Description: Old Header for QwtLinePlot
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_TESTING_UTILITIES_NAMESPACE_H
-#define CEDAR_TESTING_UTILITIES_NAMESPACE_H
+#ifndef CEDAR_AUX_GUI_LINE_PLOT_H
+#define CEDAR_AUX_GUI_LINE_PLOT_H
 
+#include "cedar/configuration.h"
 // CEDAR INCLUDES
-#include "cedar/testingUtilities/lib.h"
+#include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/gui/QwtLinePlot.h"
 
 // SYSTEM INCLUDES
+#warning Including this header is deprecated; use cedar/auxiliaries/gui/QwtLinePlot.h instead.
 
-namespace cedar
-{
-  /*!@brief Namespace that encapsulates functionality shared across multiple unit/interactive tests.
-   *
-   *        This is an internal namespace of cedar. Functionality in here should not be used outside of unit tests!
-   */
-  namespace test
-  {
-  }
-}
+#endif // CEDAR_AUX_GUI_LINE_PLOT_H
 
-#endif // CEDAR_TESTING_UTILITIES_NAMESPACE_H

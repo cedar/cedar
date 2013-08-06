@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PluginProxy.h
+    File:        AbsoluteValue.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 22
+    Date:        2013 08 02
 
     Description:
 
@@ -34,61 +34,41 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_PLUGIN_PROXY_H
-#define CEDAR_PROC_PLUGIN_PROXY_H
+#ifndef CEDAR_PROC_STEPS_ABSOLUTE_VALUE_H
+#define CEDAR_PROC_STEPS_ABSOLUTE_VALUE_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
+#include "cedar/processing/steps/namespace.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
-#include <string>
 
-#ifdef CEDAR_OS_WINDOWS
-#include <Windows.h>
-#endif // CEDAR_OS_WINDOWS
 
-/*!@brief A class that encapsulates the OS dependent functionality for dynamically loading libraries.
+/*!@brief   Computes the absolute value of its input.
+ *
+ * @remarks This step declares the following interface:
+ *          input - any matrix data
+ *          absolute value - the absolute value of the input
+ *
+ *          This step has no parameters.
  */
-class cedar::proc::PluginProxy
+class cedar::proc::steps::AbsoluteValue : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  typedef void (*PluginInterfaceMethod)(cedar::aux::PluginDeclarationListPtr);
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  PluginProxy();
-  //!@brief Some other constructor.
-  PluginProxy(const std::string& file);
-
-  //!@brief Destructor
-  ~PluginProxy();
+  AbsoluteValue();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief loaded a shared/dynamic library from a file path
-  void load(const std::string& file);
-
-  //! Actually declares the contents of the plugin.
-  void declare();
-
-  //!@brief get declaration of this proxy
-  cedar::aux::PluginDeclarationListPtr getDeclaration();
-
-  /*!@brief Returns the canonical name of a plugin based on its filepath
-   */
-  static std::string getPluginNameFromPath(const std::string& path);
-
-#ifdef CEDAR_OS_UNIX
-  static void abortHandler(int signal);
-#endif // CEDAR_OS_UNIX
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -100,41 +80,30 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief search known directories for this plugin.
-  std::string findPluginFile(const std::string& file) const;
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
 
-  //!@brief Searches for the plugin description file.
-  std::string findPluginDescription(const std::string& plugin_path) const;
-
-#ifdef CEDAR_OS_WINDOWS
-  std::string getLastError();
-#endif // CEDAR_OS_WINDOWS
+  //!@brief Updates the output matrix.
+  void compute(const cedar::proc::Arguments& arguments);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief MatrixData representing the input. Storing it like this saves time during computation.
+  cedar::aux::ConstMatDataPtr mInput;
+
+  //!@brief The data containing the output.
+  cedar::aux::MatDataPtr mOutput;
 private:
-  //!@brief plugin declaration
-  cedar::aux::PluginDeclarationListPtr mDeclaration;
-  //!@brief file path to plugin
-  std::string mFileName;
 
-  //! Handle to the dynamically loaded library.
-#ifdef CEDAR_OS_UNIX
-  void *mpLibHandle;
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
 
-  /*! The plugin that is currently being loaded -- used to report to the user if a SIGABRT was caught during plugin
-   *  loading
-   */
-  static std::string mPluginBeingLoaded;
-#elif defined CEDAR_OS_WINDOWS
-  HMODULE mpLibHandle;
-#else
-#error Implement me for your os!
-#endif
-}; // class cedar::proc::PluginProxy
+private:
 
-#endif // CEDAR_PROC_PLUGIN_PROXY_H
+}; // class cedar::proc::steps::AbsoluteValue
 
+#endif // CEDAR_PROC_STEPS_ABSOLUTE_VALUE_H

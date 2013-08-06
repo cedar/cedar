@@ -41,7 +41,6 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Arguments.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Network.h"
 #include "cedar/auxiliaries/BoolParameter.h"
@@ -94,7 +93,7 @@ _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 
-  this->registerFunction("reset", boost::bind(&cedar::proc::Step::callReset, this));
+  this->registerFunction("reset", boost::bind(&cedar::proc::Step::callReset, this), false);
 }
 
 cedar::proc::Step::~Step()
@@ -184,13 +183,13 @@ void cedar::proc::Step::setAutoLockInputsAndOutputs(bool autoLock)
   this->mAutoLockInputsAndOutputs = autoLock;
 }
 
-void cedar::proc::Step::registerFunction(const std::string& actionName, boost::function<void()> function)
+void cedar::proc::Step::registerFunction(const std::string& actionName, boost::function<void()> function, bool autoLock)
 {
   if (this->mActions.find(actionName) != this->mActions.end())
   {
     CEDAR_THROW(cedar::aux::InvalidNameException, "Duplicate action name: " + actionName);
   }
-  this->mActions[actionName] = function;
+  this->mActions[actionName] = std::make_pair(function, autoLock);
 }
 
 void cedar::proc::Step::callAction(const std::string& name)
@@ -204,10 +203,23 @@ void cedar::proc::Step::callAction(const std::string& name)
   }
 
   // get the functor
-  boost::function<void()>& function = iter->second;
+  boost::function<void()>& function = iter->second.first;
+
+  bool autolock = iter->second.second;
+  if (autolock)
+  {
+    // lock the step
+    this->lock(cedar::aux::LOCK_TYPE_WRITE);
+  }
 
   // call it
   function();
+
+  if (autolock)
+  {
+    // unlock the step
+    this->unlock();
+  }
 }
 
 const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const

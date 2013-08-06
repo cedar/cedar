@@ -52,21 +52,32 @@ int testZeroness()
   T first = 0.0;
   if (!cedar::aux::math::isZero(first))
   {
-    std::cout << "error in isZero()" << std::endl;
+    std::cout << "error in isZero():" << __LINE__ << std::endl;
     errors++;
   }
 
   T second = 1e-10;
   if (!cedar::aux::math::isZero(second))
   {
-    std::cout << "error in isZero()" << std::endl;
+    std::cout << "error in isZero():" << __LINE__ << std::endl;
+    errors++;
+  }
+  if (!cedar::aux::math::isZero(-second))
+  {
+    std::cout << "error in isZero():" << __LINE__ << std::endl;
     errors++;
   }
 
   T third = 1e-8;
   if (cedar::aux::math::isZero(third))
   {
-    std::cout << "error in isZero()" << std::endl;
+    std::cout << "error in isZero():" << __LINE__ << std::endl;
+    errors++;
+  }
+  
+  if (cedar::aux::math::isZero(-third))
+  {
+    std::cout << "error in isZero():" << __LINE__ << std::endl;
     errors++;
   }
 
