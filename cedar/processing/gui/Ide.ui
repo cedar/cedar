@@ -165,7 +165,7 @@
      <x>0</x>
      <y>0</y>
      <width>988</width>
-     <height>23</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -319,8 +319,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>121</width>
-          <height>424</height>
+          <width>115</width>
+          <height>458</height>
          </rect>
         </property>
         <attribute name="label">
@@ -332,8 +332,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>98</width>
-          <height>28</height>
+          <width>96</width>
+          <height>26</height>
          </rect>
         </property>
         <attribute name="label">
@@ -389,6 +389,7 @@
    <addaction name="mpActionBoostControl"/>
    <addaction name="separator"/>
    <addaction name="mpActionToggleSmartConnections"/>
+   <addaction name="mpActionCloseAllPlots"/>
   </widget>
   <action name="mpActionNew">
    <property name="text">
@@ -618,6 +619,18 @@
    </property>
    <property name="toolTip">
     <string>toggle smart connections</string>
+   </property>
+  </action>
+  <action name="mpActionCloseAllPlots">
+   <property name="icon">
+    <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
+     <normaloff>:/cedar/auxiliaries/gui/error.svg</normaloff>:/cedar/auxiliaries/gui/error.svg</iconset>
+   </property>
+   <property name="text">
+    <string>closes all plots</string>
+   </property>
+   <property name="toolTip">
+    <string>closes all plots</string>
    </property>
   </action>
  </widget>

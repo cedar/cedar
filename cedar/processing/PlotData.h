@@ -74,14 +74,9 @@ public:
   (
     cedar::proc::DataRole::Id id = cedar::proc::DataRole::OUTPUT,
     const std::string& name = "",
-    bool ignoreIfMissing = false
-  )
-  :
-  mpId(new cedar::aux::EnumParameter(this, "id", cedar::proc::DataRole::typePtr(), id)),
-  mpName(new cedar::aux::StringParameter(this, "name", name)),
-  mpIgnoreIfMissing(new cedar::aux::BoolParameter(this, "ignoreIfMissing", ignoreIfMissing))
-  {
-  }
+    bool ignoreIfMissing = false,
+    const std::string& plotDeclaration = ""
+  );
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -114,6 +109,8 @@ private:
   cedar::aux::StringParameterPtr mpName;
   //! If true, no exception will be thrown if the data cannot be found.
   cedar::aux::BoolParameterPtr mpIgnoreIfMissing;
+  //! Plot Type to be used to plot the data
+  cedar::aux::StringParameterPtr mpPlotDeclaration;
 
 }; // cedar::proc::PlotData
 

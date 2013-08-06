@@ -68,8 +68,7 @@ public:
   //!@brief The standard constructor.
   PlotWidget(
     cedar::proc::StepPtr step,
-    const cedar::proc::ElementDeclaration::DataList& data,
-    cedar::aux::gui::ConstPlotDeclarationPtr declaration = cedar::aux::gui::ConstPlotDeclarationPtr()
+    const cedar::proc::ElementDeclaration::DataList& data
   );
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -79,14 +78,21 @@ private:
   struct LabeledPlot
   {
     // constructor
-    LabeledPlot(QLabel* pLabel, cedar::aux::gui::PlotInterface* pPlotter)
+    LabeledPlot(QLabel* pLabel, cedar::aux::gui::ConstPlotDeclarationPtr pPlotDecl = cedar::aux::gui::ConstPlotDeclarationPtr())
     :
-    mpPlotter(pPlotter),
-    mpLabel(pLabel)
-    {};
+    mpPlotDeclaration(pPlotDecl),
+    mpLabel(pLabel),
+    mpPlotter(NULL)
+    {
+      if(mpPlotDeclaration)
+      {
+        mpPlotter = mpPlotDeclaration->createPlot();
+      }
+    };
     // members
-    cedar::aux::gui::PlotInterface* mpPlotter;
+    cedar::aux::gui::ConstPlotDeclarationPtr mpPlotDeclaration;
     QLabel * mpLabel;
+    cedar::aux::gui::PlotInterface* mpPlotter;
   };
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -114,7 +120,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void fillGridWithPlots();
-  bool createAndAddPlotToGrid(cedar::aux::DataPtr pData, const std::string& title, int row, int column);
+  bool createAndAddPlotToGrid(cedar::aux::gui::ConstPlotDeclarationPtr decl, cedar::aux::DataPtr pData, const std::string& title, int row, int column);
   bool tryAppendDataToPlot(cedar::aux::DataPtr pData, const std::string& title);
   cedar::aux::ConfigurationNode serialize(const cedar::proc::ElementDeclaration::DataList& dataList) const;
 
@@ -125,10 +131,9 @@ private:
 protected:
   // none yet
 private:
-  const cedar::proc::ElementDeclaration::DataList mData;
+  cedar::proc::ElementDeclaration::DataList mData;
   cedar::proc::StepPtr mpStep;
   LabeledPlot mLabeledPlot;
-  cedar::aux::gui::ConstPlotDeclarationPtr mpPlotDeclaration;
   int mGridSpacing;
   int mColumns;
   QGridLayout* mpLayout;

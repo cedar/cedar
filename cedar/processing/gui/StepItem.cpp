@@ -178,10 +178,8 @@ cedar::proc::gui::StepItem::Decoration::Decoration
 
 cedar::proc::gui::StepItem::~StepItem()
 {
-  for(auto it = mChildWidgets.begin(); it != mChildWidgets.end(); ++it)
-  {
-    (*it)->close();
-  }
+  this->closeAllChildWidgets();
+
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
   mStateChangedConnection.disconnect();
@@ -876,9 +874,9 @@ void cedar::proc::gui::StepItem::showPlot
 {
   // create data-List
   cedar::proc::ElementDeclaration::DataList data_list;
-  data_list.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(role.id(), dataName, false)));
+  data_list.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(role.id(), dataName, false, declaration->getClassName())));
 
-  auto p_plot_widget = new cedar::proc::gui::PlotWidget(this->mpStep, data_list, declaration);
+  auto p_plot_widget = new cedar::proc::gui::PlotWidget(this->mpStep, data_list);
   auto p_dock_widget = this->createDockWidgetForPlots(this->mpStep->getName(), p_plot_widget, position);
 
   p_dock_widget->show();
@@ -934,6 +932,9 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   QMenu *p_advanced_plotting = menu.addMenu("advanced plotting");
   p_advanced_plotting->setIcon(QIcon(":/menus/plot_advanced.svg"));
 
+  QAction* p_close_all_plots = menu.addAction("close all plots");
+  p_close_all_plots->setIcon(QIcon(":/menus/plot_all.svg"));
+  QObject::connect(p_close_all_plots, SIGNAL(triggered()), this, SLOT(closeAllPlots()));
 
   menu.addSeparator(); // ----------------------------------------------------------------------------------------------
 
@@ -1391,4 +1392,18 @@ void cedar::proc::gui::StepItem::addPlotWidget(cedar::proc::gui::PlotWidget* pPl
   auto p_dock_widget = this->createDockWidgetForPlots(this->mpStep->getName(), pPlotWidget, position);
   p_dock_widget->resize(width, height);
   p_dock_widget->show();
+}
+
+void cedar::proc::gui::StepItem::closeAllPlots()
+{
+  this->closeAllChildWidgets();
+}
+
+void cedar::proc::gui::StepItem::closeAllChildWidgets()
+{
+  for(auto it = mChildWidgets.begin(); it != mChildWidgets.end(); ++it)
+  {
+    (*it)->close();
+  }
+  // mChildWidgets is emptied through close event.
 }
