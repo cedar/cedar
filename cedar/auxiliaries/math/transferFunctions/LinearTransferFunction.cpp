@@ -67,7 +67,9 @@ namespace
 
 cedar::aux::math::LinearTransferFunction::LinearTransferFunction()
 :
-cedar::aux::math::TransferFunction()
+cedar::aux::math::TransferFunction(),
+_mFactor(new cedar::aux::DoubleParameter(this, "factor", 1.0)),
+_mOffset(new cedar::aux::DoubleParameter(this, "offset", 0.0))
 {
 }
 
@@ -77,5 +79,5 @@ cedar::aux::math::TransferFunction()
 
 double cedar::aux::math::LinearTransferFunction::compute(double value) const
 {
-  return value;
+  return this->getFactor() * value + this->getOffset();
 }

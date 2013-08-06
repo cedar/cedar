@@ -54,6 +54,7 @@ namespace cedar
     namespace steps
     {
       //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_PROC_CLASS(AbsoluteValue);
       CEDAR_DECLARE_PROC_CLASS(TransformationDirection);
       CEDAR_DECLARE_PROC_CLASS(TransformationType);
       CEDAR_DECLARE_PROC_CLASS(ComponentMultiply);

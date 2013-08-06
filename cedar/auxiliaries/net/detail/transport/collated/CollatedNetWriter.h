@@ -129,11 +129,11 @@ public:
 #endif
 
     // verify matrix size (or generate the header for further checks)
-    if (!checkCollatedDataForWrite(t, mElementWrapper.prepare().header() ) )
+    if (!checkCollatedDataForWrite(t, mElementWrapper.prepare().header()))
     {
-      CEDAR_THROW( cedar::aux::net::NetUnexpectedDataException,
-                   "matrix has wrong size - you wrote matrices of "
-                   "different size/type before!" );
+      CEDAR_THROW(cedar::aux::net::NetUnexpectedDataException,
+                  "matrix has wrong size - you wrote matrices of "
+                  "different size/type before!");
       return;
     }
 
@@ -148,4 +148,3 @@ public:
 } } } } // end namespaces
 
 #endif
-

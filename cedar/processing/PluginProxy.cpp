@@ -36,9 +36,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/PluginProxy.h"
-#include "cedar/auxiliaries/PluginDeclarationList.h"
-#include "cedar/processing/Manager.h"
+#include "cedar/processing/FrameworkSettings.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/PluginDeclarationList.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/configuration.h"
 
@@ -91,6 +91,14 @@ cedar::proc::PluginProxy::~PluginProxy()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::PluginProxy::declare()
+{
+  if (this->getDeclaration())
+  {
+    this->getDeclaration()->declareAll();
+  }
+}
 
 std::string cedar::proc::PluginProxy::getPluginNameFromPath(const std::string& path)
 {

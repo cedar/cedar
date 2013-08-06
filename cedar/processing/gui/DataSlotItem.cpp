@@ -48,7 +48,6 @@
 #include "cedar/processing/PromotedOwnedData.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/DataRole.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/Network.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/MatData.h"
@@ -93,8 +92,10 @@ mMagneticScale(1.0)
     {
       this->setOutlineColor(QColor(140, 140, 140));
     }
-    mSlotConnection = ext_data->connectToValidityChangedSignal(boost::bind(&cedar::proc::gui::DataSlotItem::updateConnections, this));
+    mSlotConnection = ext_data->connectToValidityChangedSignal(boost::bind(&cedar::proc::gui::DataSlotItem::translateValidityChangedSignal, this));
   }
+
+  QObject::connect(this, SIGNAL(connectionValidityChanged()), this, SLOT(updateConnectionValidity()));
 
   // data slots never snap to the grid; they are attached to the parent.
   this->setSnapToGrid(false);
@@ -309,7 +310,12 @@ void cedar::proc::gui::DataSlotItem::generateTooltip()
   this->setToolTip(tool_tip);
 }
 
-void cedar::proc::gui::DataSlotItem::updateConnections()
+void cedar::proc::gui::DataSlotItem::translateValidityChangedSignal()
+{
+  emit this->connectionValidityChanged();
+}
+
+void cedar::proc::gui::DataSlotItem::updateConnectionValidity()
 {
   auto connections =  this->getConnections();
   for (unsigned int i = 0; i < connections.size(); ++i)

@@ -47,7 +47,6 @@
 #include "cedar/processing/gui/exceptions.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataSlot.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/DataConnection.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Data.h"

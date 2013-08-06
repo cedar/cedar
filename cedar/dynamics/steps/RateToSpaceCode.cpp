@@ -255,6 +255,6 @@ void cedar::dyn::RateToSpaceCode::outputSizesChanged()
   }
   cv::Mat new_matrix(static_cast<int>(mDimensionality), &(sizes_signed.front()), CV_32F);
   this->mOutput->setData(new_matrix);
-  this->recompute();
   this->emitOutputPropertiesChangedSignal("output");
+  this->recompute();
 }

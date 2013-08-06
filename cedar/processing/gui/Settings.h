@@ -157,6 +157,9 @@ public:
   //!@brief saves the UI settings
   void save();
 
+  //! Loads the plugins set to be loaded by default.
+  void loadDefaultPlugins();
+
   //!@brief returns a list of all plugins that should be loaded on start-up
   const std::set<std::string>& pluginsToLoad();
   //!@brief adds a plugin to the list of plugins that are loaded on start-up
