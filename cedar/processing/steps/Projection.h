@@ -140,6 +140,11 @@ public:
     this->_mOutputDimensionality->setValue(dimensionality);
   }
 
+  inline void setOutputDimensionSizes(unsigned int dimension, unsigned int size)
+  {
+    this->_mOutputDimensionSizes->set(dimension, size);
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
