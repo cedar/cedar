@@ -109,6 +109,15 @@ _mIsCyclic(new cedar::aux::BoolParameter(this, "cyclic", false))
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+void cedar::proc::sources::GaussInput::setDimensionality(unsigned int dimensionality)
+{
+  this->_mDimensionality->setValue(dimensionality);
+}
+
+void cedar::proc::sources::GaussInput::setSize(unsigned int dimension, unsigned int size)
+{
+  this->_mSizes->set(dimension, size);
+}
 
 void cedar::proc::sources::GaussInput::setCenter(unsigned int dimension, double center)
 {
