@@ -68,7 +68,8 @@ namespace cedar
     CEDAR_TESTING_UTILITIES_LIB_EXPORT void test_time
                                        (
                                          std::string id,
-                                         std::function<void()> fun
+                                         std::function<void()> fun,
+                                         unsigned int repetitions = 1
                                        );
   }
 }
