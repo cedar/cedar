@@ -86,6 +86,12 @@ public:
   //!@brief Returns the amplitude of the Gauss input.
   double getAmplitude() const;
 
+  //! Sets the dimensionality of the Gauss input.
+  void setDimensionality(unsigned int dimensionality);
+
+  //! Sets the size of the Gauss in the given dimension.
+  void setSize(unsigned int dimension, unsigned int size);
+
 public slots:
   //!@brief a slot that is triggered if any of the Gauss function parameters are changed
   void updateMatrix();
