@@ -65,6 +65,8 @@ namespace cedar
       class CEDAR_AUX_LIB_EXPORT PropertyPane;
       CEDAR_DECLARE_AUX_CLASS(Parameter);
 
+      class CEDAR_AUX_LIB_EXPORT Configurable;
+
       class CEDAR_AUX_LIB_EXPORT BoolParameter;
       class CEDAR_AUX_LIB_EXPORT BoolVectorParameter;
       class CEDAR_AUX_LIB_EXPORT DirectoryParameter;
