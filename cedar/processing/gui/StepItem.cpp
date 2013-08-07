@@ -951,10 +951,9 @@ void cedar::proc::gui::StepItem::openActionsDock()
 
 void cedar::proc::gui::StepItem::openPropertiesNewWidget()
 {
-  QDockWidget *p_widget = this->createDockWidget("Properties");
   cedar::aux::gui::Configurable* props = new cedar::aux::gui::Configurable();
-  p_widget->setWidget(props);
   props->display(this->getStep());
+  auto p_widget = this->createDockWidget("Properties", props);
   p_widget->show();
 }
 
