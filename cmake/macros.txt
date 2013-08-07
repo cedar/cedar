@@ -169,7 +169,7 @@ macro(cedar_add_test)
   endif (test_AUTOMATIC)
   
   # link all cedar and third party libraries into the unit test executable
-  target_link_libraries(${testExecutableName} ${CEDAR_LIBS} cedartesting ${CEDAR_THIRD_PARTY_LIBS})
+  target_link_libraries(${testExecutableName} ${CEDAR_LIBS} cedartesting_utilities ${CEDAR_THIRD_PARTY_LIBS})
   
   # change the runtime output directory back to the original value
   set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${originalRuntimeOutputDirectory})
