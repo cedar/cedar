@@ -623,8 +623,8 @@
   </action>
   <action name="mpActionCloseAllPlots">
    <property name="icon">
-    <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
-     <normaloff>:/cedar/auxiliaries/gui/error.svg</normaloff>:/cedar/auxiliaries/gui/error.svg</iconset>
+    <iconset resource="icons/cedar_proc_gui_icons.qrc">
+     <normaloff>:/toolbaricons/close_all_plots.svg</normaloff>:/toolbaricons/close_all_plots.svg</iconset>
    </property>
    <property name="text">
     <string>closes all plots</string>
