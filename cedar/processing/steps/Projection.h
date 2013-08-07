@@ -135,8 +135,10 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief computes the projected output whenever this step is triggered
-  void compute(const cedar::proc::Arguments& arguments);
+  inline void setOutputDimensionality(unsigned int dimensionality)
+  {
+    this->_mOutputDimensionality->setValue(dimensionality);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -161,6 +163,9 @@ protected slots:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief computes the projected output whenever this step is triggered
+  void compute(const cedar::proc::Arguments& arguments);
+
   //!@brief this function is triggered whenever a new connection is connected as an input to the projection step
   void inputConnectionChanged(const std::string& inputName);
   //!@brief initializes or reconfigures the output matrix
