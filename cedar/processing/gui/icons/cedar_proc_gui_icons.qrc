@@ -56,6 +56,7 @@
     <file>toolbaricons/hide_triggers.svg</file>
     <file>toolbaricons/standard_connections.svg</file>
     <file>toolbaricons/smart_connections.svg</file>
+    <file>toolbaricons/close_all_plots.svg</file>
     <file>processing_ide_app_icon.svg</file>
     <file>processing_ide_app_icon_48.png</file>
   </qresource>
