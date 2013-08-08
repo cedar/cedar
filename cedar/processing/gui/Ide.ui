@@ -584,7 +584,7 @@
     <string>Single-step each trigger</string>
    </property>
    <property name="toolTip">
-    <string>do a singles step with each trigger</string>
+    <string>execute a single step with each trigger</string>
    </property>
    <property name="shortcut">
     <string>Ctrl++</string>
