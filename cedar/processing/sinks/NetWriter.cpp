@@ -122,7 +122,7 @@ void cedar::proc::sinks::NetWriter::connect()
     catch (cedar::aux::net::NetMissingRessourceException& e)
     {
       // somehow YARP doesnt work ... :( typically fatal.
-      this->setState(cedar::proc::Step::STATE_EXCEPTION, "Yarp exception: " + e.exceptionInfo());
+      this->setState(cedar::proc::Step::STATE_EXCEPTION, "Network communication exception: " + e.exceptionInfo());
       throw (e); // lets try this ...
     }
   }
@@ -155,7 +155,7 @@ void cedar::proc::sinks::NetWriter::compute(const cedar::proc::Arguments&)
   catch (cedar::aux::net::NetMissingRessourceException& e)
   {
     // somehow YARP doesnt work ... :( typically fatal.
-    this->setState(cedar::proc::Step::STATE_EXCEPTION, "Yarp exception: " + e.exceptionInfo());
+    this->setState(cedar::proc::Step::STATE_EXCEPTION, "Network communication exception: " + e.exceptionInfo());
     throw (e); // lets try this ...
   }
 }
