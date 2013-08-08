@@ -213,6 +213,17 @@ void test_step(cedar::proc::NetworkPtr network, TriggerTestPtr step)
       );
       ++num_superfluous_triggers;
     }
+
+    if (trigger_count < 1)
+    {
+      cedar::aux::LogSingleton::getInstance()->error
+      (
+        "Step \"" + trigger_test->getName() + "\" was not triggered enough ("
+          + cedar::aux::toString(trigger_count) + " times instead of 1 time)",
+        ""
+      );
+      ++global_errors;
+    }
   }
 }
 
