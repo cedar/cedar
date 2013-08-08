@@ -126,6 +126,7 @@ public:
 CEDAR_GENERATE_POINTER_TYPES(TriggerTest);
 
 int global_errors = 0;
+int num_superfluous_triggers = 0;
 
 void insert_triggered_children(TriggerTestPtr step, std::set<TriggerTestPtr>& triggered)
 {
@@ -210,6 +211,7 @@ void test_step(cedar::proc::NetworkPtr network, TriggerTestPtr step)
           + cedar::aux::toString(trigger_count) + " times)",
         ""
       );
+      ++num_superfluous_triggers;
     }
   }
 }
@@ -260,17 +262,17 @@ int main(int argc, char** argv)
   QCoreApplication* app;
   app = new QCoreApplication(argc,argv);
 
-  run_test();
-  /*auto testThread = new cedar::aux::CallFunctionInThread(run_test);
+  auto testThread = new cedar::aux::CallFunctionInThread(run_test);
 
   QObject::connect(testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection);  // alternatively: call app->quit() in runTests()
 
   testThread->start();
   app->exec();
 
-  delete testThread;*/
+  delete testThread;
   delete app;
 
+  std::cout << "Superfluous trigger calls: " << num_superfluous_triggers << std::endl;
   std::cout << "Test finished with " << global_errors << " error(s)." << std::endl;
 
   return global_errors;
