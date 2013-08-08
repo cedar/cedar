@@ -73,7 +73,7 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/net_reader.svg");
-    declaration->setDescription("Reads a matrix from a yarp port.");
+    declaration->setDescription("Reads a matrix from the local network.");
 
     declaration->declare();
 

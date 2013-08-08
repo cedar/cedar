@@ -69,7 +69,7 @@ namespace
       )
     );
     input_declaration->setIconPath(":/steps/net_writer.svg");
-    input_declaration->setDescription("Writes incoming matrices to a yarp port.");
+    input_declaration->setDescription("Writes incoming matrices to the local network.");
 
     input_declaration->declare();
 
