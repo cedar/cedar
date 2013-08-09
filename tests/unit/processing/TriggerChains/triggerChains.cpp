@@ -248,7 +248,7 @@ void test_step(cedar::proc::NetworkPtr network, TriggerTestPtr step)
           ++global_errors;
         }
       }
-      else
+      else if (step != trigger_test)
       {
         if (trigger_count > 0)
         {
@@ -297,9 +297,13 @@ void run_test()
     network->add(boost::make_shared<TriggerTest>(), "step3");
     network->add(boost::make_shared<TriggerTest>(), "step4");
 
+    std::cout << "Connecting step1.out -> step2.in1" << std::endl;
     network->connectSlots("step1.out", "step2.in1");
+    std::cout << "Connecting step1.out -> step3.in1" << std::endl;
     network->connectSlots("step1.out", "step3.in1");
+    std::cout << "Connecting step2.out -> step4.in1" << std::endl;
     network->connectSlots("step2.out", "step4.in1");
+    std::cout << "Connecting step3.out -> step4.in1" << std::endl;
     network->connectSlots("step3.out", "step4.in2");
 
     test_network(network);
