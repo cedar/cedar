@@ -105,8 +105,25 @@ public:
       this->mDataOut->setData(std::min(data1, data2));
     }
 
-    std::cout << this->getName() << " triggered; data1 = " << data1 << ", data2 = " << data2 << ", data_out = "
-        << this->mDataOut->getData() << std::endl;
+    std::cout << this->getName() << " triggered; data1 = ";
+    if (data1 < std::numeric_limits<unsigned int>::max())
+    {
+      std::cout << data1;
+    }
+    else
+    {
+      std::cout << "n/a";
+    }
+    std::cout << ", data2 = ";
+    if (data2 < std::numeric_limits<unsigned int>::max())
+    {
+      std::cout << data2;
+    }
+    else
+    {
+      std::cout << "n/a";
+    }
+    std::cout << ", data_out = " << this->mDataOut->getData() << std::endl;
   }
 
   void resetData()
