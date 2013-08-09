@@ -203,43 +203,64 @@ void test_step(cedar::proc::NetworkPtr network, TriggerTestPtr step)
   step->onTrigger();
 
   // check all triggered steps for being up-to-date (they should be after being triggered.
-  for (auto iter = triggered.begin(); iter != triggered.end(); ++iter)
+
+  for (auto iter = network->getElements().begin(); iter != network->getElements().end(); ++iter)
   {
-    auto trigger_test = *iter;
-
-    auto value = trigger_test->mDataOut->getData();
-    if (value != 1)
+    cedar::proc::ElementPtr element = iter->second;
+    if (auto trigger_test = boost::dynamic_pointer_cast<TriggerTest>(element))
     {
-      cedar::aux::LogSingleton::getInstance()->error
-      (
-        "Data of step \"" + trigger_test->getName()
-          + "\" is not up-to-date (is " + cedar::aux::toString(value) + " instead of 1)",
-        ""
-      );
-      ++global_errors;
-    }
+      bool is_triggered = triggered.find(trigger_test) != triggered.end();
 
-    auto trigger_count = trigger_test->mTriggerCount;
-    if (trigger_count > 1)
-    {
-      cedar::aux::LogSingleton::getInstance()->warning
-      (
-        "Step \"" + trigger_test->getName() + "\" was triggered more than once ("
-          + cedar::aux::toString(trigger_count) + " times)",
-        ""
-      );
-      ++num_superfluous_triggers;
-    }
+      auto value = trigger_test->mDataOut->getData();
+      if (is_triggered && value != 1)
+      {
+        cedar::aux::LogSingleton::getInstance()->error
+        (
+          "Data of step \"" + trigger_test->getName()
+            + "\" is not up-to-date (is " + cedar::aux::toString(value) + " instead of 1)",
+          ""
+        );
+        ++global_errors;
+      }
 
-    if (trigger_count < 1)
-    {
-      cedar::aux::LogSingleton::getInstance()->error
-      (
-        "Step \"" + trigger_test->getName() + "\" was not triggered enough ("
-          + cedar::aux::toString(trigger_count) + " times instead of 1 time)",
-        ""
-      );
-      ++global_errors;
+      auto trigger_count = trigger_test->mTriggerCount;
+      if (is_triggered)
+      {
+        if (trigger_count > 1)
+        {
+          cedar::aux::LogSingleton::getInstance()->warning
+          (
+            "Step \"" + trigger_test->getName() + "\" was triggered more than once ("
+              + cedar::aux::toString(trigger_count) + " times)",
+            ""
+          );
+          ++num_superfluous_triggers;
+        }
+
+        if (trigger_count < 1)
+        {
+          cedar::aux::LogSingleton::getInstance()->error
+          (
+            "Step \"" + trigger_test->getName() + "\" was not triggered enough ("
+              + cedar::aux::toString(trigger_count) + " times instead of 1 time)",
+            ""
+          );
+          ++global_errors;
+        }
+      }
+      else
+      {
+        if (trigger_count > 0)
+        {
+          cedar::aux::LogSingleton::getInstance()->error
+          (
+            "Step \"" + trigger_test->getName() + "\" was triggered even though it should not have been ("
+              + cedar::aux::toString(trigger_count) + " times)",
+            ""
+          );
+          ++global_errors;
+        }
+      }
     }
   }
 }
