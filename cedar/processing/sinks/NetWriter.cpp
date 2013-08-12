@@ -84,6 +84,7 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::sinks::NetWriter::NetWriter()
 :
+cedar::proc::Step(false, true),
 // outputs
 mInput(new cedar::aux::MatData(cv::Mat())),
 mWriter(),
