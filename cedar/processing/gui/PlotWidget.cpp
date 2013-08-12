@@ -127,17 +127,21 @@ void cedar::proc::gui::PlotWidget::fillGridWithPlots()
           }
         }
         if
+          // if no plotter exists or the declaration demands a different plotter or we cannot append
+          // the data to the current plotter, we have to create a new plotter and have it plot the data
          (
             mLabeledPlot.mpPlotter == NULL
-            || mLabeledPlot.mpPlotDeclaration->getClassName() != plot_declaration
+            || 
+              (
+                plot_declaration != ""
+                && mLabeledPlot.mpPlotDeclaration->getClassName() != plot_declaration
+              )
             ||
               !(
                 dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(mLabeledPlot.mpPlotter)
                 && static_cast<cedar::aux::gui::MultiPlotInterface*>(mLabeledPlot.mpPlotter)->canAppend(p_data)
               )
           )
-        // if no plotter exists or the declaration demands a different plotter or we cannot append
-        // the data to the current plotter, we have to create a new plotter and have it plot the data
         {
           count += createAndAddPlotToGrid(decl, p_data, title, row, column) ? 1 : 0;
         }
