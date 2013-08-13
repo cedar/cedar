@@ -137,6 +137,8 @@ current testing
     architectures - this mode is fully automatic, so there's now way to move any lines around by hand.
   - DataSlots now scale when you drag a connection close to them. You can configure (and disable) this behavior in the
     tools -> settings -> user interface menu of the processingIde.
+  - Please note that step icons can now only have the svg format. If you have an icon in a different format, please
+    embed it in a svg file using, e.g., inkscape.
 
 - cedar::dyn
   - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   
