@@ -70,6 +70,7 @@ namespace cedar
       CEDAR_DECLARE_PROC_CLASS(StaticGain);
       CEDAR_DECLARE_PROC_CLASS(Sum);
       CEDAR_DECLARE_PROC_CLASS(Switch);
+      CEDAR_DECLARE_PROC_CLASS(Threshold);
       CEDAR_DECLARE_PROC_CLASS(TransferFunction);
 
 #ifdef CEDAR_USE_YARP
