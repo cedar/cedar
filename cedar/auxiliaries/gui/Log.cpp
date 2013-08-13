@@ -81,7 +81,7 @@ QTabWidget(pParent)
   this->setContextMenuPolicy(Qt::CustomContextMenu);
   connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(showContextMenu(const QPoint&)));
 
-  this->startTimer(250);
+  this->startTimer(3000);
 }
 
 cedar::aux::gui::Log::~Log()
@@ -128,16 +128,23 @@ void cedar::aux::gui::Log::outdateAllMessages(QTableWidget* pPane)
 
 void cedar::aux::gui::Log::updatePaneCurrentness(QTableWidget* pPane)
 {
-  int threshold = 200;
-  int delta = -5;
+  int threshold_high = 240;
+  int threshold_low = 200;
+  int delta_high = -5;
+  int delta_low = -1;
 
   //!@todo This can be made faster by remembering for each pane where the last above-threshold message was and then starting from there.
   for (int i = 0; i < pPane->rowCount(); ++i)
   {
     int currentness = this->getMessageCurrentness(pPane, i);
-    if (currentness > threshold)
+
+    if (currentness > threshold_high)
     {
-      this->setMessageCurrentness(pPane, i, currentness + delta);
+      this->setMessageCurrentness(pPane, i, currentness + delta_high);
+    }
+    else if (currentness > threshold_low)
+    {
+      this->setMessageCurrentness(pPane, i, currentness + delta_low);
     }
   }
 }
