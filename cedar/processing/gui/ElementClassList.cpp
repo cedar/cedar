@@ -47,6 +47,9 @@
 // SYSTEM INCLUDES
 #include <QApplication>
 #include <QResource>
+#include <QPainter>
+#include <QPixmap>
+#include <QIcon>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -92,16 +95,44 @@ void cedar::proc::gui::ElementClassList::showList(const cedar::proc::ElementMana
     QListWidgetItem *p_item = new QListWidgetItem(label);
     p_item->setFlags(p_item->flags() | Qt::ItemIsDragEnabled);
 
-    p_item->setIcon(elem_decl->getIcon());
+    QSize icon_size = this->iconSize();
+    int decoration_size = 12;
 
-    QString class_description;
-    class_description += "<nobr>class <big><b>" + QString::fromStdString(only_class_name) + "</b></big></nobr>";
+    QIcon icon = elem_decl->getIcon();
+    std::vector<QString> decorations;
+    if (!class_id->getSource().empty())
+    {
+      decorations.push_back(":/decorations/from_plugin.svg");
+    }
 
     if (class_id->isDeprecated())
     {
-      class_description += "<br /><div align=\"right\"><b>DEPRECATED</b></div>";
-      p_item->setBackground(QApplication::palette().brush(QPalette::Dark));
+      decorations.push_back(":/cedar/auxiliaries/gui/warning.svg");
     }
+
+    QPixmap result(icon_size);
+    result.fill(Qt::transparent);
+    QPixmap icon_pm = icon.pixmap(icon_size);
+
+    {
+      QPainter overlayer(&result);
+      overlayer.drawPixmap(0, 0, icon_pm);
+
+      for (size_t i = 0; i < decorations.size(); ++i)
+      {
+        QIcon decoration(decorations.at(i));
+        overlayer.drawPixmap
+                  (
+                    icon_size.width() - decoration_size, icon_size.height() - (i + 1) * decoration_size,
+                    decoration.pixmap(decoration_size, decoration_size)
+                  );
+      }
+    }
+
+    p_item->setIcon(QIcon(result));
+
+    QString class_description;
+    class_description += "<nobr>class <big><b>" + QString::fromStdString(only_class_name) + "</b></big></nobr>";
 
     class_description += "<hr />";
     class_description += "<div align=\"right\"><nobr><small><i>" + QString::fromStdString(class_id->getClassName()) + "</i></small></nobr></div>";
