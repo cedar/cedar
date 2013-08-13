@@ -146,7 +146,10 @@ void cedar::proc::steps::Threshold::inputConnectionChanged(const std::string& in
     this->mLowerThreshold->copyAnnotationsFrom(this->mInputImage);
     this->mUpperThreshold->copyAnnotationsFrom(this->mInputImage);
 
-    CEDAR_ASSERT(input.channels() == 1);
+    if(input.channels() != 1)
+    {
+      return;
+    }
 
     int depth = 8;
     switch (input.depth())
@@ -162,6 +165,8 @@ void cedar::proc::steps::Threshold::inputConnectionChanged(const std::string& in
       default:
         CEDAR_THROW(cedar::aux::UnhandledValueException, "The matrix depth is not handled.");
     }
+
+    this->emitOutputPropertiesChangedSignal("thresholded input");
   }
 }
 
