@@ -324,6 +324,7 @@ void cedar::proc::gui::Ide::selectAll()
 
 void cedar::proc::gui::Ide::resetRootNetwork()
 {
+  this->getLog()->outdateAllMessages();
   this->mNetwork->getNetwork()->reset();
 }
 
