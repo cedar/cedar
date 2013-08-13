@@ -144,11 +144,29 @@ void cedar::proc::steps::Histogram::inputConnectionChanged(const std::string& in
   cedar::aux::ConstDataPtr data = this->getInput(inputName);
   if (inputName == "input")
   {
-    this->mInputImage = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
+    this->mInputImage.reset();
+
+    if (auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
+    {
+      if (mat_data->isEmpty())
+      {
+        return;
+      }
+      this->mInputImage = mat_data;
+    }
   }
   else if (inputName == "mask")
   {
-    this->mMask = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data);
+    this->mMask.reset();
+
+    if (auto mat_data = boost::dynamic_pointer_cast<cedar::aux::ConstMatData>(data))
+    {
+      if (mat_data->isEmpty())
+      {
+        return;
+      }
+      this->mMask = mat_data;
+    }
   }
 }
 

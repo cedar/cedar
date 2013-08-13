@@ -139,6 +139,11 @@ void cedar::proc::steps::Threshold::inputConnectionChanged(const std::string& in
   if (this->mInputImage)
   {
     const cv::Mat& input = this->mInputImage->getData();
+    if (this->mInputImage->getDimensionality() > 2)
+    {
+      return;
+    }
+
     this->mThresholdedImage->getData() = cv::Mat(input.rows, input.cols, input.type());
     this->mLowerThreshold->getData() = cv::Mat(input.rows, input.cols, input.type());
     this->mUpperThreshold->getData() = cv::Mat(input.rows, input.cols, input.type());
