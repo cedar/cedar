@@ -126,3 +126,7 @@ void cedar::aux::PluginDeclaration::customRead(const cedar::aux::ConfigurationNo
   // empty default implementation, override in derived classes to read custom information
 }
 
+void cedar::aux::PluginDeclaration::setSource(const std::string& source)
+{
+  this->mSource = source;
+}

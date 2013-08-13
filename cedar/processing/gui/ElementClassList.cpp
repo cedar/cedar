@@ -118,6 +118,12 @@ void cedar::proc::gui::ElementClassList::showList(const cedar::proc::ElementMana
       class_description += QString::fromStdString(class_id->getDeprecationDescription());
     }
 
+    if (!class_id->getSource().empty())
+    {
+      class_description += "<br /><b>From plugin:</b> "
+                           + QString::fromStdString(class_id->getSource());
+    }
+
     p_item->setToolTip(class_description);
 
     p_item->setData(Qt::UserRole, QVariant(class_id->getClassName().c_str()));
