@@ -525,10 +525,8 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
   {
     if (auto p_ide = dynamic_cast<cedar::proc::gui::Ide*>(this->mpMainWindow))
     {
-      p_ide->getLog()->outdateAllMessages();
+      p_ide->resetRootNetwork();
     }
-
-    this->mNetwork->getNetwork()->reset();
   }
   else if (a != NULL)
   {
