@@ -21,6 +21,7 @@
     <file>steps/field_temp.svg</file>
     <file>steps/flip.svg</file>
     <file>steps/gauss_input.svg</file>
+    <file>steps/histogram.svg</file>
     <file>steps/rate_matrix_to_space_code.svg</file>
     <file>steps/rate_to_space_code.svg</file>
     <file>steps/serial_order.svg</file>
