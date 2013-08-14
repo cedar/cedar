@@ -1495,18 +1495,6 @@ void cedar::proc::Network::writeDataConnection
   root.push_back(cedar::aux::ConfigurationNode::value_type("", connection_node));
 }
 
-void cedar::proc::Network::readDataConnection(const cedar::aux::ConfigurationNode& root)
-{
-  std::string source = root.get<std::string>("source");
-  std::string target = root.get<std::string>("target");
-
-#ifdef DEBUG_FILE_READING
-  std::cout << "Connecting data: source = \"" << source
-            << "\", target = \"" << target << "\"" << std::endl;
-#endif // DEBUG_FILE_READING
-  this->connectSlots(source, target);
-}
-
 void cedar::proc::Network::writeDataConnections(cedar::aux::ConfigurationNode& root) const
 {
   for (DataConnectionVector::const_iterator iter = mDataConnections.begin(); iter != mDataConnections.end(); ++iter)
@@ -1521,21 +1509,27 @@ void cedar::proc::Network::readDataConnections
        std::vector<std::string>& exceptions
      )
 {
-#ifdef DEBUG_FILE_READING
-  std::cout << "Reading data connections." << std::endl;
-#endif // DEBUG_FILE_READING
-
   for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
       iter != root.end();
       ++iter)
   {
+    std::string source = iter->second.get<std::string>("source");
+    std::string target = iter->second.get<std::string>("target");
     try
     {
-      this->readDataConnection(iter->second);
+      this->connectSlots(source, target);
     }
     catch (cedar::aux::ExceptionBase& e)
     {
-      exceptions.push_back(e.exceptionInfo());
+      std::string info = "Exception occurred while connecting \"" + source + "\" to \"" + target + "\": "
+                         + e.exceptionInfo();
+      exceptions.push_back(info);
+    }
+    catch (const std::exception& e)
+    {
+      std::string info = "Exception occurred while connecting \"" + source + "\" to \"" + target + "\": "
+                         + std::string(e.what());
+      exceptions.push_back(info);
     }
   }
 }
