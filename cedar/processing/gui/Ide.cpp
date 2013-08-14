@@ -53,7 +53,6 @@
 #include "cedar/processing/gui/PluginManagerDialog.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/exceptions.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
@@ -140,6 +139,8 @@ mpBoostControl(NULL)
   QObject::connect(this->mpActionSettings, SIGNAL(triggered()), this, SLOT(showSettingsDialog()));
   QObject::connect(this->mpActionShowHideGrid, SIGNAL(toggled(bool)), this, SLOT(toggleGrid(bool)));
   QObject::connect(this->mpActionToggleSmartConnections, SIGNAL(toggled(bool)), this, SLOT(toggleSmartConnections(bool)));
+  QObject::connect(this->mpActionCloseAllPlots, SIGNAL(triggered()), this, SLOT(closeAllPlots()));
+  
 
   QObject::connect
   (
@@ -323,6 +324,7 @@ void cedar::proc::gui::Ide::selectAll()
 
 void cedar::proc::gui::Ide::resetRootNetwork()
 {
+  this->getLog()->outdateAllMessages();
   this->mNetwork->getNetwork()->reset();
 }
 
@@ -453,7 +455,7 @@ void cedar::proc::gui::Ide::restoreSettings()
 
 void cedar::proc::gui::Ide::loadDefaultPlugins()
 {
-  cedar::proc::ManagerSingleton::getInstance()->loadDefaultPlugins();
+  cedar::proc::gui::SettingsSingleton::getInstance()->loadDefaultPlugins();
 }
 
 void cedar::proc::gui::Ide::showLoadPluginDialog()
@@ -463,7 +465,7 @@ void cedar::proc::gui::Ide::showLoadPluginDialog()
 
   if (res == QDialog::Accepted && p_dialog->plugin())
   {
-    cedar::proc::ManagerSingleton::getInstance()->load(p_dialog->plugin());
+    p_dialog->plugin()->declare();
     this->resetStepList();
   }
 
@@ -905,4 +907,13 @@ void cedar::proc::gui::Ide::showTriggerConnections(bool show)
 void cedar::proc::gui::Ide::toggleSmartConnections(bool smart)
 {
   this->mNetwork->toggleSmartConnectionMode(smart);
+}
+
+void cedar::proc::gui::Ide::closeAllPlots()
+{
+  auto steps = this->mNetwork->getScene()->getStepMap();
+  for(auto it = steps.begin(); it != steps.end(); ++it)
+  {
+    it->second->closeAllPlots();
+  }
 }

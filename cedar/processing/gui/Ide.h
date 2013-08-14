@@ -209,6 +209,15 @@ public slots:
   //!@brief toggle smart connections
   void toggleSmartConnections(bool smart);
 
+  //!@brief closes all plot windows of every step
+  void closeAllPlots();
+
+  //! Returns the log widget of this ide.
+  cedar::aux::gui::Log* getLog() const
+  {
+    return this->mpLog;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

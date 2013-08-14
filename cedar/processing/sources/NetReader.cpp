@@ -73,7 +73,7 @@ namespace
       )
     );
     declaration->setIconPath(":/steps/net_reader.svg");
-    declaration->setDescription("Reads a matrix from a yarp port.");
+    declaration->setDescription("Reads a matrix from the local network.");
 
     declaration->declare();
 
@@ -146,24 +146,6 @@ void cedar::proc::sources::NetReader::connect()
       throw e; // lets try this ...
     }
   }
-  // now receive a matrix and tell subsequent steps that the matrix size is known now
-  try
-  {
-    this->mOutput->setData(mReader->read());
-    this->emitOutputPropertiesChangedSignal("output");
-  }
-  catch(cedar::aux::net::NetWaitingForWriterException& e)
-  {
-    // no writer instantiated yet? ignore
-    // CHANGE NOTHING
-    return;
-  }
-  catch (cedar::aux::net::NetUnexpectedDataException& e)
-  {
-    // communication problem? ignore
-    // CHANGE NOTHING
-    return;
-  }
 }
 
 void cedar::proc::sources::NetReader::onStart()
@@ -188,6 +170,7 @@ void cedar::proc::sources::NetReader::compute(const cedar::proc::Arguments&)
   try
   {
     this->mOutput->setData(mReader->read());
+    //!@todo: this->emitOutputPropertiesChangedSignal("output"); //dead-locks, seeissue #626
   }
   catch (cedar::aux::net::NetWaitingForWriterException& e)
   {

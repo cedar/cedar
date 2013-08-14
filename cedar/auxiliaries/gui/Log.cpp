@@ -80,6 +80,8 @@ QTabWidget(pParent)
   );
   this->setContextMenuPolicy(Qt::CustomContextMenu);
   connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(showContextMenu(const QPoint&)));
+
+  this->startTimer(3000);
 }
 
 cedar::aux::gui::Log::~Log()
@@ -90,6 +92,86 @@ cedar::aux::gui::Log::~Log()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::Log::timerEvent(QTimerEvent*)
+{
+  for (auto pane_iter = this->mpPanes.begin(); pane_iter != this->mpPanes.end(); ++pane_iter)
+  {
+    QTableWidget* p_table = pane_iter->second;
+    this->updatePaneCurrentness(p_table);
+  }
+
+  this->updatePaneCurrentness(this->mpDefaultPane);
+}
+
+void cedar::aux::gui::Log::outdateAllMessages()
+{
+  for (auto pane_iter = this->mpPanes.begin(); pane_iter != this->mpPanes.end(); ++pane_iter)
+  {
+    QTableWidget* p_table = pane_iter->second;
+    this->outdateAllMessages(p_table);
+  }
+
+  this->outdateAllMessages(this->mpDefaultPane);
+}
+
+void cedar::aux::gui::Log::outdateAllMessages(QTableWidget* pPane)
+{
+  int threshold = 200;
+
+  //!@todo This can be made faster by remembering for each pane where the last above-threshold message was and then starting from there.
+  for (int i = 0; i < pPane->rowCount(); ++i)
+  {
+    this->setMessageCurrentness(pPane, i, threshold);
+  }
+}
+
+void cedar::aux::gui::Log::updatePaneCurrentness(QTableWidget* pPane)
+{
+  int threshold_high = 240;
+  int threshold_low = 200;
+  int delta_high = -5;
+  int delta_low = -1;
+
+  //!@todo This can be made faster by remembering for each pane where the last above-threshold message was and then starting from there.
+  for (int i = 0; i < pPane->rowCount(); ++i)
+  {
+    int currentness = this->getMessageCurrentness(pPane, i);
+
+    if (currentness > threshold_high)
+    {
+      this->setMessageCurrentness(pPane, i, currentness + delta_high);
+    }
+    else if (currentness > threshold_low)
+    {
+      this->setMessageCurrentness(pPane, i, currentness + delta_low);
+    }
+  }
+}
+
+int cedar::aux::gui::Log::getMessageCurrentness(QTableWidget* pPane, int message)
+{
+  auto item = pPane->item(message, 0);
+
+  const QBrush& background = item->background();
+  return background.color().red();
+}
+
+void cedar::aux::gui::Log::setMessageCurrentness(QTableWidget* pPane, int message, int currentness)
+{
+  for (int i = 0; i < pPane->columnCount(); ++i)
+  {
+    QColor background(currentness, currentness, currentness);
+    if (auto item = pPane->item(message, i))
+    {
+      item->setBackground(QBrush(background));
+    }
+    else if (auto widget = pPane->cellWidget(message, i))
+    {
+      widget->setStyleSheet("background-color: 255, 0, 0");
+    }
+  }
+}
 
 void cedar::aux::gui::Log::installHandlers(bool removeMessages)
 {
@@ -174,6 +256,8 @@ void cedar::aux::gui::Log::postMessage
   {
     p_title_item = new QTableWidgetItem(QIcon(icon), title);
   }
+
+  p_title_item->setBackground(QBrush(Qt::white));
 
   QLabel* p_message_item = new QLabel(message);
   p_message_item->setWordWrap(true);

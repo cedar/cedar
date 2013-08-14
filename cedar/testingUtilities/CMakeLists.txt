@@ -34,7 +34,7 @@
 #
 #=======================================================================================================================
 
-cedar_add_library(cedartesting
+cedar_add_library(cedartesting_utilities
                   LINK_LIBRARIES
                   cedarproc
                   cedaraux

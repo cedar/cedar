@@ -41,7 +41,6 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Arguments.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Network.h"
 #include "cedar/auxiliaries/BoolParameter.h"
