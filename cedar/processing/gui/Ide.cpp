@@ -142,45 +142,6 @@ mpBoostControl(NULL)
   QObject::connect(this->mpActionCloseAllPlots, SIGNAL(triggered()), this, SLOT(closeAllPlots()));
   
 
-  QObject::connect
-  (
-    this->mpZoomSlider,
-    SIGNAL(valueChanged(int)),
-    this->mpProcessingDrawer,
-    SLOT(setZoomLevel(int))
-  );
-
-  QObject::connect
-  (
-    this->mpProcessingDrawer,
-    SIGNAL(zoomLevelChanged(double)),
-    this,
-    SLOT(zoomLevelSet(double))
-  );
-
-  QObject::connect
-  (
-    this->mpResetZoom,
-    SIGNAL(clicked()),
-    this,
-    SLOT(resetZoomLevel())
-  );
-
-  QObject::connect
-  (
-    this->mpZoomPlus,
-    SIGNAL(clicked()),
-    this,
-    SLOT(increaseZoomLevel())
-  );
-
-  QObject::connect
-  (
-    this->mpZoomMinus,
-    SIGNAL(clicked()),
-    this,
-    SLOT(decreaseZoomLevel())
-  );
 
   this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
@@ -194,9 +155,6 @@ mpBoostControl(NULL)
                    this,
                    SLOT(fillRecentFilesList()));
   fillRecentFilesList();
-
-  this->zoomLevelSet(this->mpProcessingDrawer->getZoomLevel());
-
 
   QObject::connect(mpActionAbout,
                    SIGNAL(triggered()),
@@ -369,40 +327,6 @@ void cedar::proc::gui::Ide::showSettingsDialog()
 {
   cedar::proc::gui::SettingsDialog *p_settings = new cedar::proc::gui::SettingsDialog(this);
   p_settings->show();
-}
-
-void cedar::proc::gui::Ide::increaseZoomLevel()
-{
-  int delta = this->mpZoomSlider->pageStep();
-  this->mpZoomSlider->setValue(this->mpZoomSlider->value() + delta);
-}
-
-void cedar::proc::gui::Ide::decreaseZoomLevel()
-{
-  int delta = this->mpZoomSlider->pageStep();
-  this->mpZoomSlider->setValue(this->mpZoomSlider->value() - delta);
-}
-
-void cedar::proc::gui::Ide::resetZoomLevel()
-{
-  this->mpZoomSlider->setValue(100);
-}
-
-void cedar::proc::gui::Ide::zoomLevelSet(double zoomLevel)
-{
-  int zoom_level = static_cast<int>(zoomLevel * 100.0);
-  this->mpZoomDisplay->setText(QString("%1%").arg(zoom_level));
-
-  if (this->mpZoomSlider->value() != zoom_level)
-  {
-    this->mpZoomSlider->setValue(zoom_level);
-
-    // if the slider's value wasn't changed, apply the slider's value (this happens when the new value is out of range)
-    if (this->mpZoomSlider->value() != zoom_level)
-    {
-      this->mpProcessingDrawer->setZoomLevel(this->mpZoomSlider->value());
-    }
-  }
 }
 
 void cedar::proc::gui::Ide::toggleGrid(bool triggered)
