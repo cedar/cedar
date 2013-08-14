@@ -41,7 +41,7 @@
 #include "cedar/processing/steps/Histogram.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/math/tools.h"
-#include "cedar/auxiliaries/annotation/DiscreteCoordinates.h"
+#include "cedar/auxiliaries/annotation/DiscreteMetric.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 
@@ -121,7 +121,7 @@ _mNormalizationType
 
   this->declareOutput("histogram", this->mHistogram);
 
-  this->mHistogram->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteCoordinates>());
+  this->mHistogram->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteMetric>());
 
   QObject::connect(this->_mBins.get(), SIGNAL(valueChanged()), this, SLOT(numberOfBinsChanged()));
   QObject::connect(this->_mRangeLower.get(), SIGNAL(valueChanged()), this, SLOT(recompute()));

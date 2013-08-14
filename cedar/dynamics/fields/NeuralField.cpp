@@ -44,7 +44,7 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
-#include "cedar/auxiliaries/annotation/DiscreteCoordinates.h"
+#include "cedar/auxiliaries/annotation/DiscreteMetric.h"
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
@@ -290,11 +290,11 @@ void cedar::dyn::NeuralField::discreteMetricChanged()
   {
     if (this->_mDiscreteMetric->getValue() == true)
     {
-      data_items.at(i)->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteCoordinates>());
+      data_items.at(i)->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteMetric>());
     }
     else
     {
-      data_items.at(i)->removeAnnotations<cedar::aux::annotation::DiscreteCoordinates>();
+      data_items.at(i)->removeAnnotations<cedar::aux::annotation::DiscreteMetric>();
     }
   }
 }
