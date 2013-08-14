@@ -44,6 +44,8 @@
 // SYSTEM INCLUDES
 #include <QResizeEvent>
 #include <QScrollBar>
+#include <QHBoxLayout>
+#include <QPushButton>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -70,6 +72,8 @@ mpScrollTimer(new QTimer(this))
   this->mpScrollTimer->setSingleShot(false);
   QObject::connect(this->mpScrollTimer, SIGNAL(timeout()), this, SLOT(scrollTimerEvent()));
 
+  this->createZoomWidget();
+
   this->setZoomLevel(100);
 }
 
@@ -81,6 +85,114 @@ cedar::proc::gui::View::~View()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::View::createZoomWidget()
+{
+  // minus button
+  auto p_zoom_minus = new QPushButton("-");
+  p_zoom_minus->setMaximumSize(QSize(15, 15));
+  p_zoom_minus->setAutoRepeat(true);
+
+  // slider
+  this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+  this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+  this->mpZoomLevelSlider = new QSlider();
+  this->mpZoomLevelSlider->setMinimum(25);
+  this->mpZoomLevelSlider->setMaximum(175);
+  this->mpZoomLevelSlider->setValue(100);
+  this->mpZoomLevelSlider->setOrientation(Qt::Horizontal);
+  this->mpZoomLevelSlider->setInvertedAppearance(false);
+  this->mpZoomLevelSlider->setInvertedControls(false);
+  this->mpZoomLevelSlider->setTickPosition(QSlider::NoTicks);
+
+  // plus button
+  auto p_zoom_plus = new QPushButton("+");
+  p_zoom_plus->setMaximumSize(QSize(15, 15));
+
+  // zoom value display
+  this->mpZoomLevelDisplay = new QLineEdit();
+  this->mpZoomLevelDisplay->setMaximumSize(QSize(60, 20));
+  this->mpZoomLevelDisplay->setReadOnly(true);
+
+  // reset button
+  auto p_reset_zoom = new QPushButton("100%");
+  QSizePolicy size_policy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+  size_policy.setHorizontalStretch(0);
+  size_policy.setVerticalStretch(0);
+  size_policy.setHeightForWidth(p_reset_zoom->sizePolicy().hasHeightForWidth());
+  p_reset_zoom->setSizePolicy(size_policy);
+  p_reset_zoom->setMaximumSize(QSize(50, 20));
+
+  // create widget that contains all of the above
+  auto p_widget = new QWidget();
+  auto p_layout = new QHBoxLayout();
+  p_widget->setLayout(p_layout);
+
+  p_layout->addWidget(p_zoom_minus);
+  p_layout->addWidget(this->mpZoomLevelSlider);
+  p_layout->addWidget(p_zoom_plus);
+  p_layout->addWidget(this->mpZoomLevelDisplay);
+  p_layout->addWidget(p_reset_zoom);
+
+  p_layout->setContentsMargins(0, 0, 0, 0);
+
+  // add widget to lower right corner of the scroll area
+  auto widget_sp = p_widget->sizePolicy();
+  widget_sp.setHorizontalStretch(0);
+  p_widget->setSizePolicy(widget_sp);
+  auto scrollbar_sp = this->horizontalScrollBar()->sizePolicy();
+  scrollbar_sp.setHorizontalStretch(1);
+  this->horizontalScrollBar()->setSizePolicy(scrollbar_sp);
+
+  this->addScrollBarWidget(p_widget, Qt::AlignRight);
+
+  this->zoomLevelSet(this->getZoomLevel());
+
+  // slots
+  QObject::connect(this->mpZoomLevelSlider, SIGNAL(valueChanged(int)), this, SLOT(setZoomLevel(int)));
+
+  QObject::connect(this, SIGNAL(zoomLevelChanged(double)), this, SLOT(zoomLevelSet(double)));
+
+  QObject::connect(p_reset_zoom, SIGNAL(clicked()), this, SLOT(resetZoomLevel()));
+
+  QObject::connect(p_zoom_plus, SIGNAL(clicked()), this, SLOT(increaseZoomLevel()));
+
+  QObject::connect(p_zoom_minus, SIGNAL(clicked()), this, SLOT(decreaseZoomLevel()));
+}
+
+void cedar::proc::gui::View::increaseZoomLevel()
+{
+  int delta = this->mpZoomLevelSlider->pageStep();
+  this->mpZoomLevelSlider->setValue(this->mpZoomLevelSlider->value() + delta);
+}
+
+void cedar::proc::gui::View::decreaseZoomLevel()
+{
+  int delta = this->mpZoomLevelSlider->pageStep();
+  this->mpZoomLevelSlider->setValue(this->mpZoomLevelSlider->value() - delta);
+}
+
+void cedar::proc::gui::View::resetZoomLevel()
+{
+  this->mpZoomLevelSlider->setValue(100);
+}
+
+void cedar::proc::gui::View::zoomLevelSet(double zoomLevel)
+{
+  int zoom_level = static_cast<int>(zoomLevel * 100.0);
+  this->mpZoomLevelDisplay->setText(QString("%1%").arg(zoom_level));
+
+  if (this->mpZoomLevelSlider->value() != zoom_level)
+  {
+    this->mpZoomLevelSlider->setValue(zoom_level);
+
+    // if the slider's value wasn't changed, apply the slider's value (this happens when the new value is out of range)
+    if (this->mpZoomLevelSlider->value() != zoom_level)
+    {
+      this->setZoomLevel(this->mpZoomLevelSlider->value());
+    }
+  }
+}
 
 void cedar::proc::gui::View::wheelEvent(QWheelEvent *pEvent)
 {
