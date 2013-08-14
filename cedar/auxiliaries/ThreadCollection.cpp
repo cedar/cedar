@@ -99,7 +99,3 @@ unsigned int cedar::aux::ThreadCollection::size()
   QReadLocker locker(mpListLock);
   return mThreads.size();
 }
-
-
-
-

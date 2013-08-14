@@ -61,17 +61,17 @@ cedar::aux::Data::~Data()
 }
 
 
-void cedar::aux::Data::serializeData(std::ostream& /*stream*/)
+void cedar::aux::Data::serializeData(std::ostream& /*stream*/) const
 {
   CEDAR_THROW(cedar::aux::NotImplementedException,"serializeData function not implemented for this type of data");
 }
 
-void cedar::aux::Data::serializeHeader(std::ostream& /*stream*/)
+void cedar::aux::Data::serializeHeader(std::ostream& /*stream*/) const
 {
   CEDAR_THROW(cedar::aux::NotImplementedException,"serializeHeader function not implemented for this type of data");
 }
 
-cedar::aux::DataPtr cedar::aux::Data::clone()
+cedar::aux::DataPtr cedar::aux::Data::clone() const
 {
   CEDAR_THROW(cedar::aux::NotImplementedException,"Clone function not implemented for this type of data");
 }

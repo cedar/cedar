@@ -54,12 +54,11 @@
 #include <QReadWriteLock>
 #include <QTime>
 #include <fstream>
-#include <sys/stat.h>
 
 
 
 
-  /*!@brief Singleton class for recording and saving the data generated in a network to disk.
+  /*!@brief Singleton class for recording and saving the data registered to disk.
    */
 class cedar::aux::Recorder : public cedar::aux::LoopedThread
 {
@@ -74,55 +73,55 @@ class cedar::aux::Recorder : public cedar::aux::LoopedThread
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  private:
-    //!@brief The private constructor for singleton usage.
-    Recorder();
-  public:
-    //!@brief The Destructor.
-    ~Recorder();
+private:
+  //!@brief The private constructor for singleton usage.
+  Recorder();
+public:
+  //!@brief The Destructor.
+  ~Recorder();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-  public:
-     /*!@brief Can be called to register a DataPtr to be recorded.
-      *
-      *             It will create a new thread which will record the data in the specified interval.
-      *             Recording will only start when cedar::aux::Recorder::start() is called. If name is already
-      *             exist in the Recorder, the DataPtr will not be registered.
-      *
-      */
-    void registerData(const cedar::aux::DataPtr toSpectate, int recordIntv, const std::string& name);
+public:
+  /*!@brief Can be called to register a DataPtr to be recorded.
+   *
+   *             It will create a new thread which will record the data in the specified interval.
+   *             Recording will only start when cedar::aux::Recorder::start() is called. If name is already
+   *             exist in the Recorder, the DataPtr will not be registered.
+   *
+   */
+  void registerData(cedar::aux::ConstDataPtr toSpectate, int recordIntv, const std::string& name);
 
-    /*!@brief Used to unregister a DataPtr to stop him from beeing recorded.
-     *
-     */
-    void unregisterData(const std::string& name);
+  /*!@brief Used to unregister a DataPtr to stop him from beeing recorded.
+   *
+   */
+  void unregisterData(const std::string& name);
 
-    /*!@brief Unregister all DataPtr.
-     *
-     */
-    void clear();
+  /*!@brief Unregister all DataPtr.
+   *
+   */
+  void clear();
 
 
-    //!@brief Sets the OutputDirectory
-    void setOutputDirectory(const std::string& path);
+  //!@brief Sets the directory the recorded data will be written to.
+  void setOutputDirectory(const std::string& path);
 
-    //!@brief Gets the OutputDirectory
-    const std::string& getOutputDirectory();
+  //!@brief Gets the OutputDirectory
+  std::string getOutputDirectory();
 
-    //!@brief Returns the elapsed time in ms since the REcorder thread has been started.
-    int getTimeStamp();
+  //!@brief Returns the elapsed time in ms since the REcorder thread has been started.
+  int getTimeStamp();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
-  protected:
-   /*!@brief Starts the recorder thread.
-   *
-   *              By calling start, every registered observer thread will automatically be started.
-   *              Additionally all files will be created and filled with headers.
-   */
+protected:
+  /*!@brief Starts the recorder thread.
+  *
+  *              By calling start, every registered observer thread will automatically be started.
+  *              Additionally all files will be created and filled with headers.
+  */
   void applyStart();
 
   /*!@brief Stops the recorder thread.
@@ -134,29 +133,29 @@ class cedar::aux::Recorder : public cedar::aux::LoopedThread
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-  private:
-    //!@brief Calls write in the specified interval.
-    void step(double time);
+private:
+  //!@brief Calls write in the specified interval.
+  void step(double time);
 
-    //!@brief Creates a new Output directory
-    void createOutputDirectory();
+  //!@brief Creates a new Output directory
+  void createOutputDirectory();
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // members
-  //--------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------
+// members
+//--------------------------------------------------------------------------------------------------------------------
 
-  protected:
-    // none yet
+protected:
+  // none yet
 
-  private:
-    //!@brief The registered DataSpectaors.
-    cedar::aux::ThreadCollection mDataSpectatorCollection;
+private:
+  //!@brief The registered DataSpectaors.
+  cedar::aux::ThreadCollection mDataSpectatorCollection;
 
-    //!@brief The output directory.
-    std::string mOutputDirectory;
+  //!@brief The output directory.
+  std::string mOutputDirectory;
 
-    //!@brief Counts the time from when the recorder is started.
-    QTime mTime;
+  //!@brief Counts the time from when the recorder is started.
+  QTime mStartTime;
 };
 
 
