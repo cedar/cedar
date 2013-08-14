@@ -91,16 +91,12 @@ public:
    *             exist in the Recorder, the DataPtr will not be registered.
    *
    */
-  void registerData(cedar::aux::ConstDataPtr toSpectate, int recordIntv, const std::string& name);
+  void registerData(cedar::aux::ConstDataPtr toSpectate, unsigned  int recordIntv, const std::string& name);
 
-  /*!@brief Used to unregister a DataPtr to stop him from beeing recorded.
-   *
-   */
+  //!@brief Used to unregister a DataPtr to stop him from beeing recorded.
   void unregisterData(const std::string& name);
 
-  /*!@brief Unregister all DataPtr.
-   *
-   */
+  //!@brief Unregister all DataPtr.
   void clear();
 
 
@@ -113,6 +109,10 @@ public:
   //!@brief Returns the elapsed time in ms since the REcorder thread has been started.
   int getTimeStamp();
 
+  /*!@brief Change the record interval of 'name'
+   *          If 'name' is not a registered it will throw an UnknownNameExeption.
+   */
+  void setRecordIntervalTime(const std::string& name, unsigned int recordIntv);
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
