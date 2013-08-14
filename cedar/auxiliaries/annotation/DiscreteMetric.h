@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DiscreteCoordinates.h
+    File:        DiscreteMetric.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_ANNOTATION_DISCRETE_COORDINATES_H
-#define CEDAR_AUX_ANNOTATION_DISCRETE_COORDINATES_H
+#ifndef CEDAR_AUX_ANNOTATION_DISCRETE_METRIC_H
+#define CEDAR_AUX_ANNOTATION_DISCRETE_METRIC_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
@@ -49,10 +49,10 @@
 
 /*!@brief An annotation that indicates disparity data.
  */
-class cedar::aux::annotation::DiscreteCoordinates
+class cedar::aux::annotation::DiscreteMetric
 :
 public cedar::aux::annotation::Annotation,
-public cedar::aux::Cloneable<cedar::aux::annotation::DiscreteCoordinates, cedar::aux::annotation::Annotation>
+public cedar::aux::Cloneable<cedar::aux::annotation::DiscreteMetric, cedar::aux::annotation::Annotation>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -91,7 +91,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::annotation::DiscreteCoordinates
+}; // class cedar::aux::annotation::DiscreteMetric
 
-#endif // CEDAR_AUX_ANNOTATION_DISCRETE_COORDINATES_H
+#endif // CEDAR_AUX_ANNOTATION_DISCRETE_METRIC_H
 
