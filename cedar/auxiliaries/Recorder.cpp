@@ -71,7 +71,7 @@ void cedar::aux::Recorder::step(double)
   }
 }
 
-void cedar::aux::Recorder::registerData(cedar::aux::ConstDataPtr toSpectate, int recordIntv, const std::string& name)
+void cedar::aux::Recorder::registerData(cedar::aux::ConstDataPtr toSpectate, unsigned int recordIntv, const std::string& name)
 {
 
   //check if Name is not already in use
@@ -173,5 +173,19 @@ int cedar::aux::Recorder::getTimeStamp()
   return mStartTime.elapsed();
 }
 
-
-
+void cedar::aux::Recorder::setRecordIntervalTime(const std::string& name, unsigned int recordIntv)
+{
+  bool found = false;
+  for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  {
+    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
+    if(spec->getName() == name)
+    {
+      spec->setStepSize(recordIntv);
+      found = true;
+      break;
+    }
+  }
+  if(!found)
+    CEDAR_THROW(cedar::aux::UnknownNameException,"The DatPtr named "+name+" is not registered.");
+}
