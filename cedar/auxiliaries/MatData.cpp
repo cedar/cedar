@@ -46,15 +46,10 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include <boost/lexical_cast.hpp>
-#include<iostream>
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::MatData::~MatData()
-{
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -105,32 +100,26 @@ std::string cedar::aux::MatData::getDescription() const
   return description;
 }
 
-void cedar::aux::MatData::serializeData(std::ostream& stream)
+void cedar::aux::MatData::serializeData(std::ostream& stream) const
 {
-
-  // todo input parameter stream
   this->lockForRead();
 
   //creating index that addresses an element in the n dimensional Mat
-  std::vector<int> index;
-  for( int k=0; k<mData.dims; k++ )
-  {
-    index.push_back(0);
-  }
+  std::vector<int> index( mData.dims, 0 );
 
   //iterate  as long the last dimension has exceeded
   while(index[mData.dims-1] < mData.size[mData.dims-1])
   {
-    // get memory address of the element
+    // get memory address of the element.
     uchar* element = mData.data;
-    for(int i =0; i <mData.dims;i++)
+    for(int i = 0; i < mData.dims; i++)
     {
+      //Addresses an element of the Mat. See OpenCv Documentation.
       element += mData.step[i]*index[i];
     }
     //check data type
-    for(int i=0;i<mData.channels();i++)
+    for(int i = 0; i < mData.channels(); i++)
     {
-      //todo top
       switch(mData.depth())
       {
         case CV_8U:
@@ -186,7 +175,7 @@ void cedar::aux::MatData::serializeData(std::ostream& stream)
   this->unlock();
 }
 
-void cedar::aux::MatData::serializeHeader(std::ostream& stream)
+void cedar::aux::MatData::serializeHeader(std::ostream& stream) const
 {
   this->lockForRead();
   stream << "Mat" << ",";
@@ -199,7 +188,7 @@ void cedar::aux::MatData::serializeHeader(std::ostream& stream)
   this->unlock();
 }
 
-cedar::aux::DataPtr cedar::aux::MatData::clone()
+cedar::aux::DataPtr cedar::aux::MatData::clone() const
 {
   lockForRead();
   MatDataPtr cloned(new MatData(mData.clone()));

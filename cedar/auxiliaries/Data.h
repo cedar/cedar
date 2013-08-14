@@ -73,10 +73,10 @@ public:
 public:
   //!@brief Returns a string that contains the data in CSV format. Should be overridden for all inheriting classes.
   // Todo: Extend parameter for different Format(e. g. CSV, XML, BINARY).
-  virtual void serializeData(std::ostream& stream);
+  virtual void serializeData(std::ostream& stream) const;
   //!@brief Returns a string that describes the data in CSV format. Should be overridden for all inheriting classes.
-  virtual void serializeHeader(std::ostream& stream);
-  virtual DataPtr clone();
+  virtual void serializeHeader(std::ostream& stream) const;
+  virtual DataPtr clone() const;
   //!@brief Returns the lock associated with this data object.
   QReadWriteLock& getLock();
 

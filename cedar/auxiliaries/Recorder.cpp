@@ -48,13 +48,13 @@
 #include <QDateTime>
 #include <boost/filesystem.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-# include <boost/pointer_cast.hpp>
+#include <boost/pointer_cast.hpp>
 //------------------------------------------------------------------------------
 // constructors and destructor
 //------------------------------------------------------------------------------
 cedar::aux::Recorder::Recorder()
 {
-  mOutputDirectory = "";
+  mOutputDirectory = "Unknown";
 }
 
 cedar::aux::Recorder:: ~Recorder()
@@ -71,7 +71,7 @@ void cedar::aux::Recorder::step(double)
   }
 }
 
-void cedar::aux::Recorder::registerData(const cedar::aux::DataPtr toSpectate, int recordIntv,const  std::string& name)
+void cedar::aux::Recorder::registerData(cedar::aux::ConstDataPtr toSpectate, int recordIntv, const std::string& name)
 {
 
   //check if Name is not already in use
@@ -89,10 +89,10 @@ void cedar::aux::Recorder::registerData(const cedar::aux::DataPtr toSpectate, in
 
   // create new DataSpectaor and push it to the DataSpectator list
   cedar::aux::DataSpectatorPtr spec
-    = cedar::aux::DataSpectatorPtr(new cedar::aux::DataSpectator(toSpectate,recordIntv,name));
+    = cedar::aux::DataSpectatorPtr(new cedar::aux::DataSpectator(toSpectate, recordIntv, name));
   mDataSpectatorCollection.addThread(spec);
 
-  // When Recorder is already running write the data header to file.
+  // If Recorder is already running, also start the new DataSpectator
   if(this->isRunning())
   {
     spec->start();
@@ -103,14 +103,14 @@ void cedar::aux::Recorder::registerData(const cedar::aux::DataPtr toSpectate, in
 void cedar::aux::Recorder::unregisterData(const std::string& name)
 {
   for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  {
+    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
+    if(spec->getName() == name)
     {
-      cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-      if(spec->getName() == name)
-      {
-        mDataSpectatorCollection.remove(i);
-        break;
-      }
+      mDataSpectatorCollection.remove(i);
+      break;
     }
+  }
 }
 
 void cedar::aux::Recorder::createOutputDirectory()
@@ -126,7 +126,7 @@ void cedar::aux::Recorder::applyStart()
   this->createOutputDirectory();
 
   //start the timer.
-  mTime.start();
+  mStartTime.start();
 
   //find the minimal time to write to file. This should the smallest stepTime in the DataSpectator Threads.
   int min = 1000;
@@ -142,8 +142,6 @@ void cedar::aux::Recorder::applyStart()
 
   //start all DataSpectators.
   mDataSpectatorCollection.startAll();
-
-
 }
 
 void cedar::aux::Recorder::applyStop(bool /*suppressWarning*/)
@@ -165,14 +163,14 @@ void cedar::aux::Recorder::setOutputDirectory(const std::string& path)
   this->mOutputDirectory = path;
 }
 
-const std::string& cedar::aux::Recorder::getOutputDirectory()
+std::string cedar::aux::Recorder::getOutputDirectory()
 {
   return this->mOutputDirectory;
 }
 
 int cedar::aux::Recorder::getTimeStamp()
 {
-  return mTime.elapsed();
+  return mStartTime.elapsed();
 }
 
 

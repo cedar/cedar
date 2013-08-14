@@ -43,9 +43,9 @@
 
 //System includes
 #include <vector>
-#include<qreadwritelock.h>
+#include <qreadwritelock.h>
 
-/*!@brief This class can be used for a collection of Threads.
+/*!@brief This class manages multiple threads.
  *            It provides some functions and tools for easily start, stop and access the threads.
  */
 class cedar::aux::ThreadCollection
@@ -58,10 +58,8 @@ public:
   //!@brief The constructor.
   ThreadCollection();
 
-
   //!@brief The destructor.
-  virtual ~ThreadCollection();
-
+   ~ThreadCollection();
 
   //----------------------------------------------------------------------------
   // public methods
@@ -77,7 +75,6 @@ public:
   //!@brief Stops all threads in the ThreadCollection.
   void stopAll();
 
-
   //!@brief Removes all threads from the ThreadCollection.
   void removeAll();
 
@@ -88,13 +85,12 @@ public:
   unsigned int size();
 
   //!@brief Returns thread i of the ThreadCollection and cast it to T.
-  template <typename T> boost::shared_ptr<T>
-  get(unsigned int index)
+  template <typename T>
+  boost::shared_ptr<T> get(unsigned int index)
   {
     QReadLocker locker(mpListLock);
     return boost::static_pointer_cast<T>(mThreads[index]);
   }
-
 
   //----------------------------------------------------------------------------
   // private members
