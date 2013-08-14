@@ -142,6 +142,11 @@ private:
   virtual void onDeclare() const
   {
     PluginFactoryManager::getInstance()->template registerType<PluginClassPtr>(this->mClassName);
+
+    if (this->isDeprecated())
+    {
+      PluginFactoryManager::getInstance()->template deprecate<PluginClassPtr>();
+    }
   }
 
   //--------------------------------------------------------------------------------------------------------------------
