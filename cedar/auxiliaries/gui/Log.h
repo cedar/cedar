@@ -138,6 +138,8 @@ signals:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
+private slots:
+  void scrollBarRangeChanged(int min, int max);
 private:
   void addPane(cedar::aux::LOG_LEVEL level, const std::string& title, const std::string& icon = "");
 
@@ -179,6 +181,7 @@ private:
 
   std::map<cedar::aux::LOG_LEVEL, QTableWidget*> mpPanes;
   std::map<cedar::aux::LOG_LEVEL, std::string> mIcons;
+  std::map<QScrollBar*, int> mMaxScrollBarRange;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

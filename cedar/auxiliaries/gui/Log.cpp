@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/logFilter/All.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/Settings.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 #include <QHeaderView>
@@ -92,6 +93,27 @@ cedar::aux::gui::Log::~Log()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::Log::scrollBarRangeChanged(int, int max)
+{
+  auto p_scroll_bar = cedar::aux::asserted_cast<QScrollBar*>(QObject::sender());
+
+  bool scroll_down = false;
+
+  auto max_iter = mMaxScrollBarRange.find(p_scroll_bar);
+  // either there is no record of a maximum, or the scroll bar was at its previous maximum
+  if (max_iter == mMaxScrollBarRange.end() || p_scroll_bar->value() == max_iter->second)
+  {
+    scroll_down = true;
+  }
+
+  if (scroll_down)
+  {
+    p_scroll_bar->setValue(max);
+  }
+
+  mMaxScrollBarRange[p_scroll_bar] = max;
+}
 
 void cedar::aux::gui::Log::timerEvent(QTimerEvent*)
 {
@@ -220,6 +242,9 @@ QTableWidget* cedar::aux::gui::Log::addPane(const std::string& title, const std:
     this->addTab(widget, icon, QString::fromStdString(title));
   }
 
+  CEDAR_DEBUG_ASSERT(widget->verticalScrollBar() != NULL);
+  QObject::connect(widget->verticalScrollBar(), SIGNAL(rangeChanged(int, int)), this, SLOT(scrollBarRangeChanged(int, int)));
+
   QStringList columns;
   widget->setColumnCount(2);
   columns << "title" << "message";
@@ -240,9 +265,6 @@ void cedar::aux::gui::Log::postMessage
   const QString& icon
 )
 {
-  QScrollBar* p_scroll_bar = pTable->verticalScrollBar();
-  bool scroll_down = (p_scroll_bar != NULL && p_scroll_bar->value() >= p_scroll_bar->maximum());
-
   Qt::ItemFlags item_flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
   int row = pTable->rowCount();
   pTable->insertRow(row);
@@ -268,13 +290,6 @@ void cedar::aux::gui::Log::postMessage
   pTable->setItem(row, 0, p_title_item);
   pTable->setCellWidget(row, 1, p_message_item);
   pTable->resizeRowToContents(row);
-
-  if (scroll_down)
-  {
-    CEDAR_DEBUG_ASSERT(p_scroll_bar != NULL);
-
-    p_scroll_bar->setValue(p_scroll_bar->maximum());
-  }
 }
 
 void cedar::aux::gui::Log::message
