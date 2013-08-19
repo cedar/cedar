@@ -75,16 +75,10 @@ void cedar::aux::Recorder::registerData(cedar::aux::ConstDataPtr toSpectate, uns
 {
 
   //check if Name is not already in use
-  for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  if(isRegistered(name))
   {
-    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
-
-    //ToDO check DataPtr
-    if(spec->getName() == name)
-    {
-      CEDAR_THROW(cedar::aux::DuplicateNameException,"The data with name "+name+" is already registered");
-      return;
-    }
+    CEDAR_THROW(cedar::aux::DuplicateNameException,"The data with name "+name+" is already registered");
+    return;
   }
 
   // create new DataSpectaor and push it to the DataSpectator list
@@ -188,4 +182,30 @@ void cedar::aux::Recorder::setRecordIntervalTime(const std::string& name, unsign
   }
   if(!found)
     CEDAR_THROW(cedar::aux::UnknownNameException,"The DatPtr named "+name+" is not registered.");
+}
+
+int cedar::aux::Recorder::getRecordIntervalTime(const std::string& name)
+{
+  for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  {
+    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
+    if(spec->getName() == name)
+    {
+      return spec->getRecordIntervalTime();
+    }
+  }
+  return -1;
+}
+
+bool cedar::aux::Recorder::isRegistered(const std::string& name)
+{
+  for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  {
+    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
+    if(spec->getName() == name)
+    {
+      return true;
+    }
+  }
+  return false;
 }

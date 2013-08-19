@@ -113,6 +113,14 @@ public:
    *          If 'name' is not a registered it will throw an UnknownNameExeption.
    */
   void setRecordIntervalTime(const std::string& name, unsigned int recordIntv);
+
+  /*!@brief Returns the specified record interval of the DataPtr 'name' in ms.
+   *         It will return -1 if name was not registered
+   */
+  int getRecordIntervalTime(const std::string& name);
+
+  //!@brief Checks if a DataPtr with a certain name is registered.
+  bool isRegistered(const std::string& name);
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
