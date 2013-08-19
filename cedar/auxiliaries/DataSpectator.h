@@ -101,6 +101,9 @@ public:
 
   //!@brief Gets the unique Name.
   const std::string& getName();
+
+  //!@brief Returns the record interval for this DataPtr.
+  int getRecordIntervalTime();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

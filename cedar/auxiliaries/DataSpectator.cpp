@@ -175,3 +175,7 @@ cedar::aux::ConstDataPtr cedar::aux::DataSpectator::getData()
   return this->mData;
 }
 
+int cedar::aux::DataSpectator::getRecordIntervalTime()
+{
+  return this->getStepSize();
+}
