@@ -26,7 +26,7 @@ List of changes                                                                 
    Institute:   Ruhr-Universitaet Bochum
                 Institut fuer Neuroinformatik
 
-   File:        changelog.txt
+   File:        changelog.md
 
    Maintainer:  all cedar developers
    Email:       cedar@ini.rub.de
