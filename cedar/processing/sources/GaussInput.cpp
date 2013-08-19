@@ -137,18 +137,25 @@ void cedar::proc::sources::GaussInput::setAmplitude(double amplitude)
 
 void cedar::proc::sources::GaussInput::compute(const cedar::proc::Arguments&)
 {
-  this->mOutput->setData
-                 (
-                   cedar::aux::math::gaussMatrix
+  try
+  {
+    this->mOutput->setData
                    (
-                     _mDimensionality->getValue(),
-                     _mSizes->getValue(),
-                     _mAmplitude->getValue(),
-                     _mSigmas->getValue(),
-                     _mCenters->getValue(),
-                     _mIsCyclic->getValue()
-                   )
-                 );
+                     cedar::aux::math::gaussMatrix
+                     (
+                       _mDimensionality->getValue(),
+                       _mSizes->getValue(),
+                       _mAmplitude->getValue(),
+                       _mSigmas->getValue(),
+                       _mCenters->getValue(),
+                       _mIsCyclic->getValue()
+                     )
+                   );
+  }
+  catch (std::out_of_range& exc)
+  {
+    // this might happen if GaussInput is triggered and dimensionality is changed, just ignore
+  }
 }
 
 void cedar::proc::sources::GaussInput::updateMatrix()
@@ -158,7 +165,6 @@ void cedar::proc::sources::GaussInput::updateMatrix()
 
 void cedar::proc::sources::GaussInput::updateDimensionality()
 {
-  this->lock(cedar::aux::LOCK_TYPE_READ);
   int new_dimensionality = static_cast<int>(_mDimensionality->getValue());
   _mSigmas->resize(new_dimensionality, _mSigmas->getDefaultValue());
   _mSigmas->setDefaultSize(new_dimensionality);
@@ -166,7 +172,7 @@ void cedar::proc::sources::GaussInput::updateDimensionality()
   _mCenters->setDefaultSize(new_dimensionality);
   _mSizes->resize(new_dimensionality, _mSizes->getDefaultValue());
   _mSizes->setDefaultSize(new_dimensionality);
-//  this->lock(cedar::aux::LOCK_TYPE_READ);
+  this->lock(cedar::aux::LOCK_TYPE_READ);
   this->compute(cedar::proc::Arguments());
   this->unlock();
   this->emitOutputPropertiesChangedSignal("Gauss input");
