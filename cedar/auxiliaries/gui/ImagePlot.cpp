@@ -311,7 +311,7 @@ void cedar::aux::gui::ImagePlot::ImageDisplay::mousePressEvent(QMouseEvent* pEve
     return;
 
   QReadLocker locker(&this->mData->getLock());
-  
+
   const cv::Mat& matrix = this->mData->getData();
 
   if (matrix.empty())
@@ -386,6 +386,11 @@ void cedar::aux::gui::ImagePlot::ImageDisplay::mousePressEvent(QMouseEvent* pEve
   locker.unlock();
 
   QToolTip::showText(pEvent->globalPos(), info_text);
+
+  if (mpImagePlot != NULL)
+  {
+    mpImagePlot->emitImageClicked( label_x, label_y, image_x, image_y );
+  }
 }
 
 //!@cond SKIPPED_DOCUMENTATION
@@ -754,6 +759,11 @@ void cedar::aux::gui::ImagePlot::plot(cedar::aux::ConstDataPtr data, const std::
     this->mTimerId = this->startTimer(70);
     CEDAR_DEBUG_ASSERT(mTimerId != 0);
   }
+}
+
+void cedar::aux::gui::ImagePlot::emitImageClicked(int label_x, int label_y, int image_x, int image_y)
+{
+  emit imageClicked(label_x, label_y, image_x, image_y);
 }
 
 void cedar::aux::gui::ImagePlot::resizeEvent(QResizeEvent * /*pEvent*/)
