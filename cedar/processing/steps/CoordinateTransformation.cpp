@@ -274,8 +274,13 @@ void cedar::proc::steps::CoordinateTransformation::transformDirectionChanged()
 void cedar::proc::steps::CoordinateTransformation::compute(const cedar::proc::Arguments&)
 {
   const cv::Mat& input = mInput->getData();
-
   cv::Mat& output = mOutput->getData();
+
+  //if the input is an empty matrix, coordinate transformation cannot be done
+  if (input.empty())
+  {
+    return;
+  }
 
   cv::remap
   (
@@ -292,17 +297,12 @@ void cedar::proc::steps::CoordinateTransformation::compute(const cedar::proc::Ar
 void cedar::proc::steps::CoordinateTransformation::recompute()
 {
   this->createMap();
+  emitOutputPropertiesChangedSignal("result");
   this->onTrigger();
 }
 
 void cedar::proc::steps::CoordinateTransformation::createMap()
 {
-  //remember old values to recognize if output properties changed
-  cv::Mat output = mOutput->getData();
-  int output_rows = output.rows;
-  int output_cols = output.cols;
-  int output_type = output.type();
-  
   switch(_mTransformationDirection->getValue())
   {
     case TransformationDirection::Forward:
@@ -338,11 +338,6 @@ void cedar::proc::steps::CoordinateTransformation::createMap()
     default:
       CEDAR_THROW(cedar::aux::UnknownTypeException, "Selected coordinate transformation direction unknown.");
       break;
-  }
-  output = mOutput->getData();
-  if (output_rows != output.rows || output_cols != output.cols || output_type != output.type())
-  {
-    emitOutputPropertiesChangedSignal("result");
   }
 }
 
@@ -554,9 +549,22 @@ void cedar::proc::steps::CoordinateTransformation::inputConnectionChanged(const 
     return;
   }
 
+  //remember old values to recognize if output properties changed
+  cv::Mat output = mOutput->getData();
+  int output_rows = output.rows;
+  int output_cols = output.cols;
+  int output_type = output.type();
+  
+  this->createMap();
   this->mOutput->copyAnnotationsFrom(this->mInput);
   this->applyAnnotations();
-  this->createMap();
+
+  //trigger revalidation if output parameters changed
+  output = mOutput->getData();
+  if (output_rows != output.rows || output_cols != output.cols || output_type != output.type())
+  {
+    emitOutputPropertiesChangedSignal("result");
+  }
 }
 
 void cedar::proc::steps::CoordinateTransformation::changeNumberOfRows()
