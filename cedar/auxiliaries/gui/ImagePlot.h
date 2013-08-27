@@ -210,9 +210,6 @@ signals:
   //!@brief Signals the worker thread to convert the data to the plot's internal format.
   void convert();
 
-  //!@brief Forwards the MousePressEvent signal of the nested Class.
-  void imageClicked(int label_x, int label_y, int image_x, int image_y);
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -223,10 +220,6 @@ protected:
 
   //!@brief create and handle the context menu
   void contextMenuEvent(QContextMenuEvent *pEvent);
-
-  /*!@brief Emits the signal imageClicked to forward the MousePressEvent signal of the nested ImageDisplay.
-   */
-  void emitImageClicked(int label_x, int label_y, int image_x, int image_y);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
