@@ -1238,7 +1238,7 @@ void cedar::proc::gui::StepItem::openDefinedPlotAction()
   }
 
   auto p_plot_widget = new PlotWidget(this->mStep, elem_decl->definedPlots()[list_index].mData);
-  auto p_dock_widget = this->createDockWidgetForPlots(plot_name, p_plot_widget, p_action->data().toPoint());
+  auto p_dock_widget = this->createDockWidgetForPlots(this->mStep->getName(), p_plot_widget, p_action->data().toPoint());
   
   p_dock_widget->show();
 }
