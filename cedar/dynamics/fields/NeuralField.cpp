@@ -167,7 +167,7 @@ _mDimensionality
     this,
     "dimensionality",
     2,
-    cedar::aux::UIntParameter::LimitType::positiveZero(1000)
+    cedar::aux::UIntParameter::LimitType::positiveZero(4)
   )
 ),
 _mSizes
@@ -178,7 +178,7 @@ _mSizes
     "sizes",
     2,
     10,
-    cedar::aux::UIntParameter::LimitType::positive(1000)
+    cedar::aux::UIntParameter::LimitType::positive(5000)
   )
 ),
 _mInputNoiseGain
