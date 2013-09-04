@@ -621,7 +621,7 @@ void cedar::dyn::NeuralField::dimensionalityChanged()
 {
   this->_mSizes->resize(this->getDimensionality(), _mSizes->getDefaultValue());
 #ifdef CEDAR_USE_FFTW
-  if (this->getDimensionality() == 3)
+  if (this->getDimensionality() >= 3)
   {
     this->_mLateralKernelConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
     this->_mNoiseCorrelationKernelConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));

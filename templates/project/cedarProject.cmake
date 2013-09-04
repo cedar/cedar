@@ -68,7 +68,7 @@ if(CEDAR_HOME)
   link_directories("${CEDAR_HOME}/${CEDAR_LIB_DIR}")
   
   # includes and libraries of external dependencies
-  include("${CEDAR_HOME}/build/cedar_configuration.cmake")
+  include("${CEDAR_HOME}/${CEDAR_BUILD_DIR}/cedar_configuration.cmake")
   
 elseif(CEDAR_HOME_INSTALLED)
   message("-- Using installed cedar version in ${CEDAR_HOME_INSTALLED}")
