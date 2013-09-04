@@ -440,7 +440,7 @@ void cedar::aux::gui::QwtLinePlot::showLegend(bool show)
   if (show)
   {
     // show legend
-    auto *p_legend = this->mpPlot->legend();
+    auto p_legend = this->mpPlot->legend();
     if (p_legend == NULL)
     {
       p_legend = new QwtLegend();
