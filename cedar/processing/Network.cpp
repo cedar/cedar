@@ -66,10 +66,6 @@
 #include <boost/make_shared.hpp>
 #include <algorithm>
 
-// Define that helps to debug file reading.
-//#define DEBUG_FILE_READING
-//#define DEBUG_FILE_WRITING
-
 //----------------------------------------------------------------------------------------------------------------------
 // register the class
 //----------------------------------------------------------------------------------------------------------------------
@@ -1184,9 +1180,6 @@ void cedar::proc::Network::writeSteps(cedar::aux::ConfigurationNode& steps) cons
     // if this is a step, write this to the configuration tree
     if (cedar::proc::StepPtr step = boost::dynamic_pointer_cast<cedar::proc::Step>(iter->second))
     {
-#ifdef DEBUG_FILE_WRITING
-      std::cout << "Saving " << iter->first << "." << std::endl;
-#endif
       std::string class_name = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(step);
       cedar::aux::ConfigurationNode step_node;
       step->writeConfiguration(step_node);
@@ -1201,20 +1194,12 @@ void cedar::proc::Network::readSteps
        std::vector<std::string>& exceptions
      )
 {
-#ifdef DEBUG_FILE_READING
-  std::cout << "Reading steps." << std::endl;
-#endif // DEBUG_FILE_READING
-
   for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
       iter != root.end();
       ++iter)
   {
     const std::string class_id = iter->first;
     const cedar::aux::ConfigurationNode& step_node = iter->second;
-
-  #ifdef DEBUG_FILE_READING
-    std::cout << "Reading step of type " << class_id << std::endl;
-  #endif // DEBUG_FILE_READING
 
     cedar::proc::ElementPtr step;
     try
@@ -1258,9 +1243,6 @@ void cedar::proc::Network::writeTriggers(cedar::aux::ConfigurationNode& triggers
     // if this is a trigger, write this to the configuration tree
     if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(iter->second))
     {
-#ifdef DEBUG_FILE_WRITING
-      std::cout << "Saving " << iter->first << "." << std::endl;
-#endif
       std::string class_name = cedar::proc::ElementManagerSingleton::getInstance()->getTypeId(trigger);
       cedar::aux::ConfigurationNode trigger_node;
       trigger->writeConfiguration(trigger_node);
@@ -1275,20 +1257,12 @@ void cedar::proc::Network::readTriggers
        std::vector<std::string>& exceptions
      )
 {
-#ifdef DEBUG_FILE_READING
-  std::cout << "Reading triggers." << std::endl;
-#endif // DEBUG_FILE_READING
-
   for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
       iter != root.end();
       ++iter)
   {
     const std::string& class_id = iter->first;
     const cedar::aux::ConfigurationNode& trigger_node = iter->second;
-
-#ifdef DEBUG_FILE_READING
-    std::cout << "Reading trigger of type " << class_id << std::endl;
-#endif // DEBUG_FILE_READING
 
     cedar::proc::TriggerPtr trigger;
     try
@@ -1381,9 +1355,6 @@ void cedar::proc::Network::writeNetworks(cedar::aux::ConfigurationNode& networks
     // if this is a network, write this to the configuration tree
     if (cedar::proc::NetworkPtr network = boost::dynamic_pointer_cast<cedar::proc::Network>(iter->second))
     {
-#ifdef DEBUG_FILE_WRITING
-      std::cout << "Saving " << iter->first << "." << std::endl;
-#endif
       cedar::aux::ConfigurationNode network_node;
       network->writeConfiguration(network_node);
       networks.push_back(cedar::aux::ConfigurationNode::value_type(iter->first, network_node));
@@ -1397,20 +1368,12 @@ void cedar::proc::Network::readNetworks
        std::vector<std::string>& exceptions
      )
 {
-#ifdef DEBUG_FILE_READING
-  std::cout << "Reading networks." << std::endl;
-#endif // DEBUG_FILE_READING
-
   for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
       iter != root.end();
       ++iter)
   {
     const std::string& network_name = iter->first;
     const cedar::aux::ConfigurationNode& network_node = iter->second;
-
-#ifdef DEBUG_FILE_READING
-    std::cout << "Reading network named " << network_name << std::endl;
-#endif // DEBUG_FILE_READING
 
     cedar::proc::NetworkPtr network;
 
