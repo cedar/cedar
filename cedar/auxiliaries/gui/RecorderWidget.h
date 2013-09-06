@@ -81,8 +81,12 @@ public slots:
   //!@brief Resets this widget
   void resetContents();
 
+  //!@brief Unregister all slots of this step;
   void unregister(cedar::proc::StepPtr pStep);
 
+  /*!@brief If the name of a Step has changed all slots have to unregister in the recoder and 
+   *registered with the new name.
+   */
   void updateName();
 
   //--------------------------------------------------------------------------------------------------------------------
