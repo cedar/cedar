@@ -96,6 +96,9 @@ public:
   //!@brief Used to unregister a DataPtr to stop him from beeing recorded.
   void unregisterData(const std::string& name);
 
+  //!@brief Used to unregister a DataPtr to stop him from beeing recorded.
+   void unregisterData(cedar::aux::ConstDataPtr);
+
   //!@brief Unregister all DataPtr.
   void clear();
 
@@ -119,8 +122,20 @@ public:
    */
   int getRecordIntervalTime(const std::string& name);
 
+
+
+  /*!@brief Returns the specified record interval of the DataPtr in ms.
+   *         It will return -1 if name was not registered
+   */
+  int getRecordIntervalTime(cedar::aux::ConstDataPtr data);
+
+
   //!@brief Checks if a DataPtr with a certain name is registered.
   bool isRegistered(const std::string& name);
+
+
+  //!@brief Checks if a DataPtr with a certain DataPtr is registered.
+  bool isRegistered(cedar::aux::ConstDataPtr data);
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

@@ -132,7 +132,7 @@ public:
 
     // check if typename exists
     auto record_iter = mRegisteredFactories.find(name);
-    if (record_iter != mRegisteredFactories.end())
+    if (record_iter == mRegisteredFactories.end())
     {
       CEDAR_THROW(cedar::aux::UnknownTypeException, "The type \"" + name + "\" is not registered.");
     }

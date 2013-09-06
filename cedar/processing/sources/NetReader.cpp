@@ -170,7 +170,7 @@ void cedar::proc::sources::NetReader::compute(const cedar::proc::Arguments&)
   try
   {
     this->mOutput->setData(mReader->read());
-    //!@todo: this->emitOutputPropertiesChangedSignal("output"); //dead-locks, seeissue #626
+    //!@todo: this->emitOutputPropertiesChangedSignal("output"); //dead-locks, see issue #626
   }
   catch (cedar::aux::net::NetWaitingForWriterException& e)
   {

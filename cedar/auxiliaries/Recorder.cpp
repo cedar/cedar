@@ -107,6 +107,20 @@ void cedar::aux::Recorder::unregisterData(const std::string& name)
   }
 }
 
+void cedar::aux::Recorder::unregisterData(cedar::aux::ConstDataPtr data)
+{
+  for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  {
+    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
+    if(spec->getData() == data)
+    {
+      mDataSpectatorCollection.remove(i);
+      break;
+    }
+  }
+}
+
+
 void cedar::aux::Recorder::createOutputDirectory()
 {
   mOutputDirectory = QDateTime::currentDateTime().toString("yy.MM.dd hh-mm-ss").toStdString();
@@ -197,12 +211,38 @@ int cedar::aux::Recorder::getRecordIntervalTime(const std::string& name)
   return -1;
 }
 
+int cedar::aux::Recorder::getRecordIntervalTime(cedar::aux::ConstDataPtr data)
+{
+  for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  {
+    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
+    if(spec->getData() == data)
+    {
+      return spec->getRecordIntervalTime();
+    }
+  }
+  return -1;
+}
+
 bool cedar::aux::Recorder::isRegistered(const std::string& name)
 {
   for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
     cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
     if(spec->getName() == name)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool cedar::aux::Recorder::isRegistered(cedar::aux::ConstDataPtr data)
+{
+  for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  {
+    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
+    if(spec->getData() == data)
     {
       return true;
     }
