@@ -217,7 +217,7 @@ void cedar::aux::gui::RecorderWidget::updateName()
         if(cedar::aux::RecorderSingleton::getInstance()->isRegistered(buffer_slots[i]->getData()))
         {
           cedar::aux::RecorderSingleton::getInstance()->renameRegisteredData(
-            buffer_slots[i]->getData()), 
+            buffer_slots[i]->getData(), 
             pStep->getName()+"_"+buffer_slots[i]->getName()
           );
         }
@@ -233,7 +233,7 @@ void cedar::aux::gui::RecorderWidget::updateName()
         if(cedar::aux::RecorderSingleton::getInstance()->isRegistered(output_slots[i]->getData()))
         {
           cedar::aux::RecorderSingleton::getInstance()->renameRegisteredData(
-            buffer_slots[i]->getData()), 
+            output_slots[i]->getData(), 
             pStep->getName()+"_"+output_slots[i]->getName()
           );
         }
