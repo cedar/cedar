@@ -28,7 +28,7 @@
     Email:       christian.bodenstein@ini.rub.de
     Date:        2013 6 12
 
-    Description: Implements all unit tests for the @em cedar::aux::Recorder class.
+    Description: Implements all unit tests for the @em cedar::aux::RecorderWidget class.
 
     Credits:
 
@@ -46,6 +46,10 @@ unsigned int errors;
 
 void run_test()
 {
+  errors = 1;
+  cedar::dyn::NeuralFieldPtr field = boost::shared_ptr<cedar::dyn::NeuralField>(new cedar::dyn::NeuralField());
+  cedar::aux::gui::RecorderWidget recorder;
+  recorder.setStep(field);
   errors = 0;
 }
 
@@ -57,14 +61,8 @@ int main(int argc, char* argv[])
 
   auto testThread = new cedar::aux::CallFunctionInThread(run_test);
 
-//  QObject::connect( testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection );  // alternatively: call app->quit() in runTests()
+  QObject::connect( testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection );  // alternatively: call app->quit() in runTests()
 
-  cedar::dyn::NeuralFieldPtr field = boost::shared_ptr<cedar::dyn::NeuralField>(new cedar::dyn::NeuralField());
-  cedar::aux::gui::RecorderWidget recorder;
-  recorder.resize(500, 600);
-  recorder.setWindowTitle("Recorder");
-  recorder.show();
-  recorder.setStep(field);
 
   testThread->start();
   app->exec();
