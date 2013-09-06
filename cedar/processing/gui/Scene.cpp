@@ -116,12 +116,17 @@ void cedar::proc::gui::Scene::setConfigurableWidget(cedar::aux::gui::PropertyPan
   this->mpConfigurableWidget = pConfigurableWidget;
 }
 
+void cedar::proc::gui::Scene::setRecorderWidget(cedar::aux::gui::RecorderWidget *pRecorderWidget)
+{
+  this->mpRecorderWidget = pRecorderWidget;
+}
+
 void cedar::proc::gui::Scene::itemSelected()
 {
   using cedar::proc::Step;
   using cedar::proc::Manager;
 
-  if (this->mpConfigurableWidget == NULL)
+  if (this->mpConfigurableWidget == NULL || this->mpRecorderWidget==NULL)
   {
     return;
   }
@@ -135,12 +140,18 @@ void cedar::proc::gui::Scene::itemSelected()
       if (p_item->getElement())
       {
         this->mpConfigurableWidget->display(p_item->getElement());
+      
+        if(cedar::proc::StepPtr castedStep = boost::dynamic_pointer_cast<cedar::proc::Step>(p_item->getElement()))
+        {
+          this->mpRecorderWidget->setStep(castedStep);
+        }
       }
     }
   }
   else
   {
     this->mpConfigurableWidget->resetContents();
+    this->mpRecorderWidget->resetContents();
   }
 }
 
@@ -955,6 +966,9 @@ void cedar::proc::gui::Scene::removeStepItem(cedar::proc::gui::StepItem* pStep)
   this->mStepMap.erase(mStepMap.find(pStep->getStep().get()));
   CEDAR_DEBUG_ASSERT(this->mElementMap.find(pStep->getStep().get()) != this->mElementMap.end());
   this->mElementMap.erase(mElementMap.find(pStep->getStep().get()));
+
+  //unregister this step in th recorder
+  this->mpRecorderWidget->unregister(pStep->getStep());
 }
 
 cedar::proc::gui::NetworkPtr cedar::proc::gui::Scene::getRootNetwork()

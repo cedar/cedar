@@ -74,6 +74,8 @@ cedar_add_library(cedaraux
   gui/ObjectParameter.h
   gui/ObjectListParameter.h
   gui/Parameter.h
+  gui/RecorderWidget.h
+  gui/RecorderProperty.h
   gui/LocalCoordinateFrameWidget.h
   gui/ObjectVisualizationWidget.h
   gui/Viewer.h
