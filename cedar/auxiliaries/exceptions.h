@@ -229,5 +229,12 @@ class cedar::aux::NotImplementedException: public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::NotImplementedException
 
+/*!@brief An exception that is thrown, when thread is running and a operation
+ * is called which not allow this.
+ */
+class cedar::aux::ThreadRunningExeption: public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::NotImplementedException
+
 
 #endif // CEDAR_AUX_EXCEPTIONS_H
