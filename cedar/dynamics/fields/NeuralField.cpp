@@ -46,6 +46,8 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/annotation/DiscreteMetric.h"
 #include "cedar/auxiliaries/convolution/Convolution.h"
+#include "cedar/auxiliaries/convolution/FFTW.h"
+#include "cedar/auxiliaries/convolution/OpenCV.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
 #include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h"
@@ -165,7 +167,7 @@ _mDimensionality
     this,
     "dimensionality",
     2,
-    cedar::aux::UIntParameter::LimitType::positiveZero(1000)
+    cedar::aux::UIntParameter::LimitType::positiveZero(4)
   )
 ),
 _mSizes
@@ -176,7 +178,7 @@ _mSizes
     "sizes",
     2,
     10,
-    cedar::aux::UIntParameter::LimitType::positive(1000)
+    cedar::aux::UIntParameter::LimitType::positive(5000)
   )
 ),
 _mInputNoiseGain
@@ -618,6 +620,13 @@ bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) con
 void cedar::dyn::NeuralField::dimensionalityChanged()
 {
   this->_mSizes->resize(this->getDimensionality(), _mSizes->getDefaultValue());
+#ifdef CEDAR_USE_FFTW
+  if (this->getDimensionality() >= 3)
+  {
+    this->_mLateralKernelConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
+    this->_mNoiseCorrelationKernelConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
+  }
+#endif // CEDAR_USE_FFTW
   this->updateMatrices();
 }
 
