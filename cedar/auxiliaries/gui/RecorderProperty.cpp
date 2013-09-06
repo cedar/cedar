@@ -48,7 +48,8 @@ cedar::aux::gui::RecorderProperty::RecorderProperty(const std::string& stepName,
   mStepName = stepName;
   mName = slot->getName();
   mData = slot->getData();
-  bool registered = cedar::aux::RecorderSingleton::getInstance()->isRegistered(mStepName+"_"+mName);
+  bool registered = cedar::aux::RecorderSingleton::getInstance()->isRegistered(mData);
+  std::cout << mName << " is registered: " << registered << std::endl;
 
   //Create name.
   QLabel* label = new QLabel(QString(mName.c_str()));
@@ -96,7 +97,10 @@ void cedar::aux::gui::RecorderProperty::registerRecordData(int status)
 {  
   if(status)
   {
-    cedar::aux::RecorderSingleton::getInstance()->registerData(mData, mStepSizeValue, mStepName+"_"+mName);
+    if(!cedar::aux::RecorderSingleton::getInstance()->isRegistered(mStepName+"_"+mName))
+    {
+      cedar::aux::RecorderSingleton::getInstance()->registerData(mData, mStepSizeValue, mStepName+"_"+mName);
+    }
     mStepSize->setEnabled(true);
   }
   else

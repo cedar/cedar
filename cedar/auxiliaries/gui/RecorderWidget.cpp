@@ -214,14 +214,12 @@ void cedar::aux::gui::RecorderWidget::updateName()
       const cedar::proc::Connectable::SlotList  buffer_slots= pStep->getOrderedDataSlots(cedar::proc::DataRole::BUFFER);
       for(unsigned int i = 0; i < buffer_slots.size(); i++)
       {
-        if(cedar::aux::RecorderSingleton::getInstance()->isRegistered(buffer_slots[i].getData()))
+        if(cedar::aux::RecorderSingleton::getInstance()->isRegistered(buffer_slots[i]->getData()))
         {
-          cedar::aux::RecorderSingleton::getInstance()->registerData(
-            buffer_slots[i].getData(),
-            cedar::aux::RecorderSingleton::getInstance()->getRecordIntervalTime(buffer_slots[i].getData()),
+          cedar::aux::RecorderSingleton::getInstance()->renameRegisteredData(
+            buffer_slots[i]->getData()), 
             pStep->getName()+"_"+buffer_slots[i]->getName()
           );
-          cedar::aux::RecorderSingleton::getInstance()->unregisterData(buffer_slots[i].getData());
         }
       }
     }
@@ -232,14 +230,12 @@ void cedar::aux::gui::RecorderWidget::updateName()
       const cedar::proc::Connectable::SlotList  output_slots= pStep->getOrderedDataSlots(cedar::proc::DataRole::OUTPUT);
       for(unsigned int i = 0; i < output_slots.size(); i++)
       {
-        if(cedar::aux::RecorderSingleton::getInstance()->isRegistered(output_slots[i].getData()))
+        if(cedar::aux::RecorderSingleton::getInstance()->isRegistered(output_slots[i]->getData()))
         {
-          cedar::aux::RecorderSingleton::getInstance()->registerData(
-            output_slots[i].getData(),
-            cedar::aux::RecorderSingleton::getInstance()->getRecordIntervalTime(output_slots[i].getData()),
+          cedar::aux::RecorderSingleton::getInstance()->renameRegisteredData(
+            buffer_slots[i]->getData()), 
             pStep->getName()+"_"+output_slots[i]->getName()
           );
-          cedar::aux::RecorderSingleton::getInstance()->unregisterData(buffer_slots[i].getData());
         }
       }
     }    
