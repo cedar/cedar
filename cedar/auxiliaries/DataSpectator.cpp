@@ -170,6 +170,12 @@ const std::string& cedar::aux::DataSpectator::getName()
   return this->mName;
 }
 
+
+void cedar::aux::DataSpectator::setName(const std::string& name)
+{
+  this->mName = name;
+}
+
 cedar::aux::ConstDataPtr cedar::aux::DataSpectator::getData()
 {
   return this->mData;

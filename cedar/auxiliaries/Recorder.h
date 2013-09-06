@@ -136,6 +136,9 @@ public:
 
   //!@brief Checks if a DataPtr with a certain DataPtr is registered.
   bool isRegistered(cedar::aux::ConstDataPtr data);
+
+  //!@brief Changes the name of the DataPtr.
+  void renameRegisteredData(cedar::aux::ConstDataPtr data, const std::string& newName);
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
