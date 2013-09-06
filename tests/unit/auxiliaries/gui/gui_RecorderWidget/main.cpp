@@ -62,8 +62,6 @@ int main(int argc, char* argv[])
   auto testThread = new cedar::aux::CallFunctionInThread(run_test);
 
   QObject::connect( testThread, SIGNAL(finishedThread()), app, SLOT(quit()), Qt::QueuedConnection );  // alternatively: call app->quit() in runTests()
-
-
   testThread->start();
   app->exec();
 
