@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011, 2012, 2013 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,87 +22,88 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MatData.h
+    File:        DataSpectator.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 12 09
+    Maintainer:  Christian Bodenstein
+    Email:       christian.bodenstein@ini.ruhr-uni-bochum.de
+    Date:        2013 07 01
 
-    Description: This is a dummy header for the typedef MatData (which is actually a cedar::aux::DataTemplate<cv::Mat>).
+    Description: The Recorder uses this class to observe the registered DataPtr.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MAT_DATA_H
-#define CEDAR_AUX_MAT_DATA_H
+
+#ifndef CEDAR_AUX_DATASPECTATOR_H_
+#define CEDAR_AUX_DATASPECTATOR_H_
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/LoopedThread.h"
 
 // SYSTEM INCLUDES
-#include <QReadWriteLock>
+#include <QTime>
+#include <string>
+#include <fstream>
 
-/*!@brief Data containing matrices.
+/*!@brief The Recorder uses this class to observe the registered DataPtr.
+ *      This class copy the observed DataPtr on each time step and stores the copy with time stamp in a queue. The
+ *      recorder can access this queue and write the elements to disk.
  */
-class cedar::aux::MatData : public cedar::aux::DataTemplate<cv::Mat>
+class cedar::aux::DataSpectator : public cedar::aux::LoopedThread
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // friends
   //--------------------------------------------------------------------------------------------------------------------
+
+  /* Recorder should be the only class that could create a DataSpectator. THus the constructor is private,
+   * Recorder must be a friend class.
+   */
+  friend Recorder;
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  typedef cedar::aux::DataTemplate<cv::Mat> Super;
+//!@brief A data structure to store all the DataPtr with time stamp (in ms) in a list.
+  struct recordData
+  {
+    unsigned int mRecordTime;
+    cedar::aux::DataPtr mData;
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  MatData()
-  {
-  }
+  ~DataSpectator();
+private:
+  /*!@brief The private Constructor. Can only called by friend classes such as cedar::aux::Recorder. recordIntv should
+   * be passed in ms. name is a unique name for this DataPtr, so a file with this name can be created in the output
+   * dictionary.*/
+  DataSpectator(cedar::aux::ConstDataPtr toSpectate, int recordIntv, const std::string& name);
 
-
-  //!@brief This constructor initializes the internal data to a value.
-  MatData(const cv::Mat& value)
-  :
-  cedar::aux::DataTemplate<cv::Mat>(value)
-  {
-  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void serializeData(std::ostream& stream) const;
-  void serializeHeader(std::ostream& stream) const;
-  cedar::aux::DataPtr clone() const;
+  //!@brief Gets the DataPtr.
+  cedar::aux::ConstDataPtr getData();
 
-  std::string getDescription() const;
+  //!@brief Starts the DataSpectator: Before starting the output file will be opened and the header be written.
+  void applyStart();
 
-  /*!@brief Returns the dimensionality of the matrix stored in this data.
-   *
-   * @remarks Calls cedar::aux::math::getDimensionalityOf(this->getData()) to determine the dimensionality.
-   */
-  unsigned int getDimensionality() const;
+  //!@brief Stops the DataSpactator. Before stopping all RecordDatas in the queue will be written to disk.
+  void applyStop(bool suppressWarning);
 
-  //! Convenience method that returns the opencv-type of the stored matrix.
-  inline int getCvType() const
-  {
-    return this->getData().type();
-  }
+  //!@brief Gets the unique Name.
+  const std::string& getName();
 
-  //! Checks if the matrix is empty.
-  bool isEmpty() const
-  {
-    return this->getData().empty();
-  }
-
+  //!@brief Returns the record interval for this DataPtr.
+  int getRecordIntervalTime();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -113,17 +114,49 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief Calls record() each time step. Inherited from Looped Thread.
+  void step(double time);
+
+  //!@brief Writes the header for the DataPtr to the output file.
+  void writeHeader();
+
+  //!@brief Writes the first element of the RecordData queue to the output file.
+  void writeFirstRecordData();
+
+  //!@brief Writes the whole RecordData queue to the output file.
+  void writeAllRecordData();
+
+  //!@brief Copies the DataPtr and stores it as new RecordData in the queue.
+  void record();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+
 protected:
   // none yet
 
 private:
-  // none yet
+  //!@brief The pointer to the Data.
+  cedar::aux::ConstDataPtr mData;
 
-}; // class cedar::aux::MatData
+  //!@brief The path for storing the recorded Data. This is the full output path including the file name.
+  std::string mOutputPath;
 
-#endif // CEDAR_AUX_MAT_DATA_H
+  //!@brief The output stream to mOutputPath.
+  std::ofstream mOutputStream;
+
+  //!@brief The Lock for mOutputStream.
+  QReadWriteLock* mpOfstreamLock;
+
+  //!@brief This queue will be write to disk every time step is called.
+  std::list<recordData> mDataQueue;
+
+  //!@brief Locks mDataQueue.
+  QReadWriteLock* mpQueueLock;
+
+  //!@brief Unique name of the DataPtr.
+  std::string mName;
+};
+
+#endif // CEDAR_AUX_DATASPECTATOR_H_
