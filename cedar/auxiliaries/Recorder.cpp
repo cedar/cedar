@@ -249,3 +249,15 @@ bool cedar::aux::Recorder::isRegistered(cedar::aux::ConstDataPtr data)
   }
   return false;
 }
+
+void cedar::aux::Recorder::renameRegisteredData(cedar::aux::ConstDataPtr data, const std::string& newName)
+{
+  for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
+  {
+    cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
+    if(spec->getData() == data)
+    {
+      spec->setName(newName);
+    }
+  }
+}

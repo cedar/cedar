@@ -102,6 +102,9 @@ public:
   //!@brief Gets the unique Name.
   const std::string& getName();
 
+  //!@brief Sets the unique Name.
+  void setName(const std::string& name);
+
   //!@brief Returns the record interval for this DataPtr.
   int getRecordIntervalTime();
   //--------------------------------------------------------------------------------------------------------------------
