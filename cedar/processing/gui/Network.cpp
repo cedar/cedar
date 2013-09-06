@@ -47,7 +47,6 @@
 #include "cedar/processing/gui/exceptions.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataSlot.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/DataConnection.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Data.h"
@@ -462,6 +461,7 @@ void cedar::proc::gui::Network::read(const std::string& source)
   }
   catch (boost::property_tree::ptree_bad_path& exc) // doesn't exist yet
   {
+    //!TODO: this weaves control-flow logic into exceptions, that's not proper!
     this->toggleSmartConnectionMode(false);
   }
 }
@@ -469,11 +469,33 @@ void cedar::proc::gui::Network::read(const std::string& source)
 void cedar::proc::gui::Network::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   this->cedar::proc::gui::GraphicsBase::readConfiguration(node);
+  auto plot_list = node.find("open plots");
+  if(plot_list != node.not_found())
+  {
+    this->readOpenPlots(plot_list->second);
+  }
+}
+
+void cedar::proc::gui::Network::readOpenPlots(const cedar::aux::ConfigurationNode& node)
+{
+  for(auto it = node.begin(); it != node.end(); ++it)
+  {
+    std::string step_name = cedar::proc::gui::PlotWidget::getStepNameFromConfiguration(it->second);
+    auto step = this->getNetwork()->getElement<cedar::proc::Step>(step_name);
+    auto step_item = this->mpScene->getStepItemFor(step.get());
+    cedar::proc::gui::PlotWidget::createAndShowFromConfiguration(it->second, step_item);
+  }
 }
 
 void cedar::proc::gui::Network::writeConfiguration(cedar::aux::ConfigurationNode& root) const
 {
   root.put("network", this->mNetwork->getName());
+  cedar::aux::ConfigurationNode node;
+  for(auto it = this->mpScene->getStepMap().begin(); it != this->mpScene->getStepMap().end(); ++it)
+  {
+    it->second->writeOpenChildWidgets(node);
+  }
+  root.put_child("open plots", node);
   this->cedar::proc::gui::GraphicsBase::writeConfiguration(root);
 }
 

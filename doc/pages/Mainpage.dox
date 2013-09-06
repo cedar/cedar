@@ -23,7 +23,8 @@ developers' guide @endlink.
 
 @section Installation Installing cedar
 Please refer to the @ref readme page or the readme.md file in the root of the repository to find instructions on how to
-install cedar.
+install cedar. If you are experiencing troubles during installation or use of cedar, please take a look at our 
+@ref troubleshooting document (also found as troubleshooting.md in the root directory of cedar).
 
 @section VersionNotes Version notes
 Version notes can be found in the @ref changelog (or the changelog.md in the root directory of cedar). This also

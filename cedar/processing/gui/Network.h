@@ -206,6 +206,8 @@ private:
 
   void processElementRemovedSignal(cedar::proc::ConstElementPtr);
 
+  void readOpenPlots(const cedar::aux::ConfigurationNode& node);
+
 private slots:
   //!@brief Updates the label of the network.
   void networkNameChanged();

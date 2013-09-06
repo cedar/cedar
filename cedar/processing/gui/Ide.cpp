@@ -53,7 +53,6 @@
 #include "cedar/processing/gui/PluginManagerDialog.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/exceptions.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
@@ -140,46 +139,9 @@ mpBoostControl(NULL)
   QObject::connect(this->mpActionSettings, SIGNAL(triggered()), this, SLOT(showSettingsDialog()));
   QObject::connect(this->mpActionShowHideGrid, SIGNAL(toggled(bool)), this, SLOT(toggleGrid(bool)));
   QObject::connect(this->mpActionToggleSmartConnections, SIGNAL(toggled(bool)), this, SLOT(toggleSmartConnections(bool)));
+  QObject::connect(this->mpActionCloseAllPlots, SIGNAL(triggered()), this, SLOT(closeAllPlots()));
+  
 
-  QObject::connect
-  (
-    this->mpZoomSlider,
-    SIGNAL(valueChanged(int)),
-    this->mpProcessingDrawer,
-    SLOT(setZoomLevel(int))
-  );
-
-  QObject::connect
-  (
-    this->mpProcessingDrawer,
-    SIGNAL(zoomLevelChanged(double)),
-    this,
-    SLOT(zoomLevelSet(double))
-  );
-
-  QObject::connect
-  (
-    this->mpResetZoom,
-    SIGNAL(clicked()),
-    this,
-    SLOT(resetZoomLevel())
-  );
-
-  QObject::connect
-  (
-    this->mpZoomPlus,
-    SIGNAL(clicked()),
-    this,
-    SLOT(increaseZoomLevel())
-  );
-
-  QObject::connect
-  (
-    this->mpZoomMinus,
-    SIGNAL(clicked()),
-    this,
-    SLOT(decreaseZoomLevel())
-  );
 
   this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
@@ -193,9 +155,6 @@ mpBoostControl(NULL)
                    this,
                    SLOT(fillRecentFilesList()));
   fillRecentFilesList();
-
-  this->zoomLevelSet(this->mpProcessingDrawer->getZoomLevel());
-
 
   QObject::connect(mpActionAbout,
                    SIGNAL(triggered()),
@@ -323,6 +282,7 @@ void cedar::proc::gui::Ide::selectAll()
 
 void cedar::proc::gui::Ide::resetRootNetwork()
 {
+  this->getLog()->outdateAllMessages();
   this->mNetwork->getNetwork()->reset();
 }
 
@@ -367,40 +327,6 @@ void cedar::proc::gui::Ide::showSettingsDialog()
 {
   cedar::proc::gui::SettingsDialog *p_settings = new cedar::proc::gui::SettingsDialog(this);
   p_settings->show();
-}
-
-void cedar::proc::gui::Ide::increaseZoomLevel()
-{
-  int delta = this->mpZoomSlider->pageStep();
-  this->mpZoomSlider->setValue(this->mpZoomSlider->value() + delta);
-}
-
-void cedar::proc::gui::Ide::decreaseZoomLevel()
-{
-  int delta = this->mpZoomSlider->pageStep();
-  this->mpZoomSlider->setValue(this->mpZoomSlider->value() - delta);
-}
-
-void cedar::proc::gui::Ide::resetZoomLevel()
-{
-  this->mpZoomSlider->setValue(100);
-}
-
-void cedar::proc::gui::Ide::zoomLevelSet(double zoomLevel)
-{
-  int zoom_level = static_cast<int>(zoomLevel * 100.0);
-  this->mpZoomDisplay->setText(QString("%1%").arg(zoom_level));
-
-  if (this->mpZoomSlider->value() != zoom_level)
-  {
-    this->mpZoomSlider->setValue(zoom_level);
-
-    // if the slider's value wasn't changed, apply the slider's value (this happens when the new value is out of range)
-    if (this->mpZoomSlider->value() != zoom_level)
-    {
-      this->mpProcessingDrawer->setZoomLevel(this->mpZoomSlider->value());
-    }
-  }
 }
 
 void cedar::proc::gui::Ide::toggleGrid(bool triggered)
@@ -453,7 +379,7 @@ void cedar::proc::gui::Ide::restoreSettings()
 
 void cedar::proc::gui::Ide::loadDefaultPlugins()
 {
-  cedar::proc::ManagerSingleton::getInstance()->loadDefaultPlugins();
+  cedar::proc::gui::SettingsSingleton::getInstance()->loadDefaultPlugins();
 }
 
 void cedar::proc::gui::Ide::showLoadPluginDialog()
@@ -463,7 +389,7 @@ void cedar::proc::gui::Ide::showLoadPluginDialog()
 
   if (res == QDialog::Accepted && p_dialog->plugin())
   {
-    cedar::proc::ManagerSingleton::getInstance()->load(p_dialog->plugin());
+    p_dialog->plugin()->declare();
     this->resetStepList();
   }
 
@@ -905,4 +831,13 @@ void cedar::proc::gui::Ide::showTriggerConnections(bool show)
 void cedar::proc::gui::Ide::toggleSmartConnections(bool smart)
 {
   this->mNetwork->toggleSmartConnectionMode(smart);
+}
+
+void cedar::proc::gui::Ide::closeAllPlots()
+{
+  auto steps = this->mNetwork->getScene()->getStepMap();
+  for(auto it = steps.begin(); it != steps.end(); ++it)
+  {
+    it->second->closeAllPlots();
+  }
 }

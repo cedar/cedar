@@ -60,7 +60,7 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(ColorSpace);
       CEDAR_DECLARE_AUX_CLASS(Depth);
       CEDAR_DECLARE_AUX_CLASS(Dimensions);
-      CEDAR_DECLARE_AUX_CLASS(DiscreteCoordinates);
+      CEDAR_DECLARE_AUX_CLASS(DiscreteMetric);
       CEDAR_DECLARE_AUX_CLASS(Disparity);
       //!@endcond
     }

@@ -447,10 +447,6 @@ private:
    */
   void writeNetworks(cedar::aux::ConfigurationNode& root) const;
 
-  /*!@brief Reads a data connection from a configuration node and adds it to the network.
-   */
-  void readDataConnection(const cedar::aux::ConfigurationNode& root);
-
   /*!@brief Writes a data connection to the configuration node.
    */
   void writeDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::DataConnectionPtr connection) const;

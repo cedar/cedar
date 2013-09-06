@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/DataRole.h"
+#include "cedar/processing/PlotData.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/FactoryDerived.h"
@@ -62,40 +63,11 @@
 class cedar::proc::ElementDeclaration : public cedar::aux::PluginDeclarationBaseTemplate<cedar::proc::ElementPtr>
 {
 public:
-  //! Holds information about data in a custom step plot.
-  struct PlotData
-  {
-    /*! Constructor.
-     *
-     * @param id Role of the data to be plotted.
-     * @param name Name of the data slot of the step whose data is to be plotted.
-     * @param ignoreIfMissing If true, no warning will be generated if the slot is missing.
-     */
-    PlotData
-    (
-      cedar::proc::DataRole::Id id = cedar::proc::DataRole::OUTPUT,
-      const std::string& name = "",
-      bool ignoreIfMissing = false
-    )
-    :
-    mId(id),
-    mName(name),
-    mIgnoreIfMissing(ignoreIfMissing)
-    {
-    }
-
-    //! Role of the data to be plotted.
-    cedar::proc::DataRole::Id mId;
-
-    //! Name of the data to be plotted.
-    std::string mName;
-
-    //! If true, no exception will be thrown if the data cannot be found.
-    bool mIgnoreIfMissing;
-  };
-
+  //! PlotData struct is replaced by cedar::proc::PlotData
+  CEDAR_DECLARE_DEPRECATED(typedef cedar::proc::PlotData PlotData);
+  
   //!@brief list that pairs a data role with the desired plot
-  typedef std::vector<PlotData> DataList;
+  typedef std::vector<cedar::proc::PlotDataPtr> DataList;
 
   /*!@brief Structure that holds information about custom plots defined for a processing step.
    */
@@ -116,7 +88,7 @@ public:
     //! Appends data to the list of items to plot.
     void appendData(cedar::proc::DataRole::Id id, const std::string& dataName, bool ignoreIfMissing = false)
     {
-      this->mData.push_back(PlotData(id, dataName, ignoreIfMissing));
+      this->mData.push_back(cedar::proc::PlotDataPtr(new cedar::proc::PlotData(id, dataName, ignoreIfMissing)));
     }
 
     //! Name of the plot.
@@ -162,22 +134,30 @@ public:
   //!@brief Returns the actual icon for the element.
   QIcon getIcon() const
   {
+    return QIcon(this->determinedIconPath());
+  }
+
+  /*! Returns the path for the icon to use; this will also return special icons if there is an error with the specified
+   * icons.
+   */
+  QString determinedIconPath() const
+  {
     QResource existance_test(QString::fromStdString(this->getIconPath()));
     if (existance_test.isValid())
     {
       auto icon = QIcon(QString::fromStdString(this->getIconPath()));
       if (icon.isNull())
       {
-        return QIcon(":/steps/no_icon.svg");
+        return ":/steps/no_icon.svg";
       }
       else
       {
-        return icon;
+        return QString::fromStdString(this->getIconPath());
       }
     }
     else
     {
-      return QIcon(":/steps/broken_icon.svg");
+      return ":/steps/broken_icon.svg";
     }
   }
 
