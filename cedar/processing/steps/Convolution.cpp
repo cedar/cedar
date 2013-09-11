@@ -170,8 +170,12 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Convolution::determineInputV
   // First, let's make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(slot->getName() == "matrix" || slot->getName() == "kernel");
 
-  if (boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
+  if (cedar::aux::ConstMatDataPtr mat = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data))
   {
+    if (mat->getData().empty())
+    {
+      return cedar::proc::DataSlot::VALIDITY_ERROR;
+    }
     // Mat data is accepted.
     return cedar::proc::DataSlot::VALIDITY_VALID;
   }
