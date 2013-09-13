@@ -41,6 +41,8 @@
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/SetParameter.h"
+#include "cedar/auxiliaries/StringVectorParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -81,6 +83,21 @@ public:
   //! Whether or not memory output is generated.
   bool getMemoryDebugOutput();
 
+  //!@brief returns a list of all plugins that should be loaded on start-up
+  const std::set<std::string>& pluginsToLoad();
+
+  //! Returns the plugins search paths.
+  const std::vector<std::string>& getSearchPaths() const;
+
+  //!@brief adds a plugin to the list of plugins that are loaded on start-up
+  void addPluginToLoad(const std::string& path);
+
+  //!@brief removes a plugin from the list of plugins that are loaded on start-up
+  void removePluginToLoad(const std::string& path);
+
+  //! Loads the plugins set to be loaded by default.
+  void loadDefaultPlugins();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -107,6 +124,12 @@ private:
 protected:
   //!@brief Parameter representing the plugin workspace.
   cedar::aux::BoolParameterPtr _mMemoryDebugOutput;
+
+  //!@brief List of plugins that should be loaded on startup.
+  cedar::aux::StringSetParameterPtr _mPluginsToLoad;
+
+  //! List of all the directories to search for plugins.
+  cedar::aux::StringVectorParameterPtr _mPluginSearchPaths;
 
 private:
   // none yet

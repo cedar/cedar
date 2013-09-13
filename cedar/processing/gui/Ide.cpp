@@ -55,6 +55,7 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/assert.h"
@@ -379,7 +380,7 @@ void cedar::proc::gui::Ide::restoreSettings()
 
 void cedar::proc::gui::Ide::loadDefaultPlugins()
 {
-  cedar::proc::gui::SettingsSingleton::getInstance()->loadDefaultPlugins();
+  cedar::aux::SettingsSingleton::getInstance()->loadDefaultPlugins();
 }
 
 void cedar::proc::gui::Ide::showLoadPluginDialog()

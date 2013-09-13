@@ -157,16 +157,6 @@ public:
   //!@brief saves the UI settings
   void save();
 
-  //! Loads the plugins set to be loaded by default.
-  void loadDefaultPlugins();
-
-  //!@brief returns a list of all plugins that should be loaded on start-up
-  const std::set<std::string>& pluginsToLoad();
-  //!@brief adds a plugin to the list of plugins that are loaded on start-up
-  void addPluginToLoad(const std::string& path);
-  //!@brief removes a plugin from the list of plugins that are loaded on start-up
-  void removePluginToLoad(const std::string& path);
-
   //!@brief returns the settings concerning the docking behavior for the log widget
   DockSettingsPtr logSettings();
   //!@brief returns the settings concerning the docking behavior for the tools widget
@@ -266,9 +256,6 @@ protected:
   // none yet
 
 private:
-  //!@brief List of plugins that should be loaded on startup.
-  cedar::aux::StringSetParameterPtr mPluginsToLoad;
-
   //!@brief the settings concerning the docking behavior for the log widget
   DockSettingsPtr mLog;
 
