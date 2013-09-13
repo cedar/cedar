@@ -118,6 +118,7 @@ namespace cedar
     //!@endcond
 
     //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_DECLARE_AUX_CLASS(PluginProxy);
     CEDAR_DECLARE_AUX_CLASS(PluginDeclaration);
     CEDAR_DECLARE_AUX_CLASS(PluginDeclarationList);
     template <class BaseClassPtr> class PluginDeclarationBaseTemplate;
@@ -234,6 +235,8 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(NullPointerException);
     CEDAR_DECLARE_AUX_CLASS(ParameterNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(ParseException);
+    CEDAR_DECLARE_AUX_CLASS(PluginException);
+    CEDAR_DECLARE_AUX_CLASS(PluginNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(RangeException);
     CEDAR_DECLARE_AUX_CLASS(ResourceNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(TypeMismatchException);

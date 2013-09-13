@@ -37,7 +37,8 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/PluginManagerDialog.h"
 #include "cedar/processing/gui/Settings.h"
-#include "cedar/processing/FrameworkSettings.h"
+#include "cedar/auxiliaries/SetParameter.h"
+#include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
@@ -68,25 +69,16 @@ QDialog(pParent)
 
 void cedar::proc::gui::PluginManagerDialog::populate()
 {
-  const std::set<std::string>& plugins_to_load = cedar::proc::gui::SettingsSingleton::getInstance()->pluginsToLoad();
+  const std::set<std::string>& plugins_to_load = cedar::aux::SettingsSingleton::getInstance()->pluginsToLoad();
   for (std::set<std::string>::const_iterator iter = plugins_to_load.begin(); iter != plugins_to_load.end(); ++iter)
   {
     this->addPlugin(*iter);
-  }
-
-  const std::set<std::string>& known_plugins = cedar::proc::FrameworkSettingsSingleton::getInstance()->getKnownPlugins();
-  for (std::set<std::string>::const_iterator iter = known_plugins.begin(); iter != known_plugins.end(); ++iter)
-  {
-    if (plugins_to_load.find(*iter) == plugins_to_load.end())
-    {
-      this->addPlugin(*iter);
-    }
   }
 }
 
 void cedar::proc::gui::PluginManagerDialog::addPlugin(const std::string& path)
 {
-  const std::set<std::string>& plugins_to_load = cedar::proc::gui::SettingsSingleton::getInstance()->pluginsToLoad();
+  const std::set<std::string>& plugins_to_load = cedar::aux::SettingsSingleton::getInstance()->pluginsToLoad();
 
   int row = this->mpPluginList->rowCount();
   this->mpPluginList->insertRow(row);
@@ -109,7 +101,6 @@ void cedar::proc::gui::PluginManagerDialog::addPlugin(const std::string& path)
 
 void cedar::proc::gui::PluginManagerDialog::removePlugins()
 {
-  cedar::proc::FrameworkSettingsPtr known_plugins = cedar::proc::FrameworkSettingsSingleton::getInstance();
   unsigned int deleted_items = 0;
   for (int row = 0; row < this->mpPluginList->rowCount(); ++row)
   {
@@ -128,9 +119,8 @@ void cedar::proc::gui::PluginManagerDialog::removePlugins()
     {
       if (p_cb->isChecked())
       {
-        cedar::proc::gui::SettingsSingleton::getInstance()->removePluginToLoad(path);
+        cedar::aux::SettingsSingleton::getInstance()->removePluginToLoad(path);
       }
-      known_plugins->removeKnownPlugin(path);
       ++deleted_items;
     }
   }

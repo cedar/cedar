@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        FrameworkSettings.h
+    File:        PluginProxy.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 26
+    Date:        2011 07 22
 
     Description:
 
@@ -34,72 +34,61 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_FRAMEWORK_SETTINGS_H
-#define CEDAR_PROC_FRAMEWORK_SETTINGS_H
+#ifndef CEDAR_AUX_PLUGIN_PROXY_H
+#define CEDAR_AUX_PLUGIN_PROXY_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
-#include <set>
+#include <string>
 
+#ifdef CEDAR_OS_WINDOWS
+#include <Windows.h>
+#endif // CEDAR_OS_WINDOWS
 
-/*!@brief A singleton class for storing user-specific parameters related to the processing framework.
+/*!@brief A class that encapsulates the OS dependent functionality for dynamically loading libraries.
  */
-class cedar::proc::FrameworkSettings : public cedar::aux::Configurable
+class cedar::aux::PluginProxy
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // friend
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::proc::gui::FrameworkSettings;
-  friend class cedar::aux::Singleton<cedar::proc::FrameworkSettings>;
+private:
+  typedef void (*PluginInterfaceMethod)(cedar::aux::PluginDeclarationListPtr);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  //!@brief The standard constructor.
-  FrameworkSettings();
-
 public:
-  //!@brief The destructor.
-  ~FrameworkSettings();
+  //!@brief The standard constructor.
+  PluginProxy();
+  //!@brief Some other constructor.
+  PluginProxy(const std::string& file);
+
+  //!@brief Destructor
+  ~PluginProxy();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Loads the settings from a file in the user's home directory.
-   */
-  void load();
+  //!@brief loaded a shared/dynamic library from a file path
+  void load(const std::string& pluginName);
 
-  /*!@brief Saves the settings to a file in the user's home directory.
-   */
-  void save();
+  //! Actually declares the contents of the plugin.
+  void declare();
 
-  /*!@brief Adds a plugin to the list of plugins known by the processing framework.
-   */
-  void addKnownPlugin(const std::string& file);
+  //!@brief get declaration of this proxy
+  cedar::aux::PluginDeclarationListPtr getDeclaration();
 
-  /*!@brief Removes a plugin from the list of plugins known by the processing framework.
+  /*!@brief Returns the canonical name of a plugin based on its filepath
    */
-  void removeKnownPlugin(const std::string& file);
+  static std::string getPluginNameFromPath(const std::string& path);
 
-  /*!@brief Returns the set of plugins known by the processing framework.
-   */
-  const std::set<std::string>& getKnownPlugins() const;
-
-  /*!@brief Returns the set of plugin directories known by the processing framework.
-   */
-  const std::set<std::string>& getPluginDirectories() const;
-
-  /*!@brief Returns the plugin workspace directory.
-   *
-   *        This is the first directoriy searched for a plugin.
-   */
-  std::string getPluginWorkspace() const;
+#ifdef CEDAR_OS_UNIX
+  static void abortHandler(int signal);
+#endif // CEDAR_OS_UNIX
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -111,7 +100,18 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief search known directories for this plugin.
+  std::string findPlugin(const std::string& pluginName) const;
+
+  //!@brief search for this plugin in the given workspace.
+  std::string findPlugin(const std::string& pluginName, const std::string& workspace) const;
+
+  //!@brief Searches for the plugin description file.
+  std::string findPluginDescription(const std::string& plugin_path) const;
+
+#ifdef CEDAR_OS_WINDOWS
+  std::string getLastError();
+#endif // CEDAR_OS_WINDOWS
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -119,26 +119,25 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  //!@brief plugin declaration
+  cedar::aux::PluginDeclarationListPtr mDeclaration;
+  //!@brief file path to plugin
+  std::string mFileName;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  //!@brief Parameter representing the plugin workspace.
-  cedar::aux::DirectoryParameterPtr mPluginWorkspace;
+  //! Handle to the dynamically loaded library.
+#ifdef CEDAR_OS_UNIX
+  void *mpLibHandle;
 
-  //!@brief List of directories to use when looking for plugins.
-  cedar::aux::StringSetParameterPtr mPluginIncludeDirectories;
+  /*! The plugin that is currently being loaded -- used to report to the user if a SIGABRT was caught during plugin
+   *  loading
+   */
+  static std::string mPluginBeingLoaded;
+#elif defined CEDAR_OS_WINDOWS
+  HMODULE mpLibHandle;
+#else
+#error Implement me for your os!
+#endif
+}; // class cedar::aux::PluginProxy
 
-  //!@brief List of known plugins.
-  cedar::aux::StringSetParameterPtr mKnownPlugins;
+#endif // CEDAR_AUX_PLUGIN_PROXY_H
 
-private:
-  // none yet
-
-}; // class cedar::proc::FrameworkSettings
-
-CEDAR_PROC_SINGLETON(FrameworkSettings);
-
-#endif // CEDAR_PROC_FRAMEWORK_SETTINGS_H

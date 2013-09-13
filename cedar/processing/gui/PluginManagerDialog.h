@@ -41,7 +41,6 @@
 #include "cedar/processing/gui/ui_PluginManagerDialog.h"
 
 #include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/PluginProxy.h"
 
 // SYSTEM INCLUDES
 #include <QDialog>

@@ -35,9 +35,9 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/processing/PluginProxy.h"
-#include "cedar/processing/FrameworkSettings.h"
-#include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/PluginProxy.h"
+#include "cedar/auxiliaries/Settings.h"
+#include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/PluginDeclarationList.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/configuration.h"
@@ -64,27 +64,27 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 #ifdef CEDAR_OS_UNIX
-std::string cedar::proc::PluginProxy::mPluginBeingLoaded = "";
+std::string cedar::aux::PluginProxy::mPluginBeingLoaded = "";
 #endif // CEDAR_OS_UNIX
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::PluginProxy::PluginProxy()
+cedar::aux::PluginProxy::PluginProxy()
 :
 mpLibHandle(NULL)
 {
 }
 
-cedar::proc::PluginProxy::PluginProxy(const std::string& file)
+cedar::aux::PluginProxy::PluginProxy(const std::string& pluginName)
 :
 mpLibHandle(NULL)
 {
-  this->load(file);
+  this->load(pluginName);
 }
 
-cedar::proc::PluginProxy::~PluginProxy()
+cedar::aux::PluginProxy::~PluginProxy()
 {
 }
 
@@ -92,7 +92,7 @@ cedar::proc::PluginProxy::~PluginProxy()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::PluginProxy::declare()
+void cedar::aux::PluginProxy::declare()
 {
   if (this->getDeclaration())
   {
@@ -100,7 +100,7 @@ void cedar::proc::PluginProxy::declare()
   }
 }
 
-std::string cedar::proc::PluginProxy::getPluginNameFromPath(const std::string& path)
+std::string cedar::aux::PluginProxy::getPluginNameFromPath(const std::string& path)
 {
   boost::filesystem::path plugin_path(path);
   std::string name;
@@ -122,9 +122,9 @@ std::string cedar::proc::PluginProxy::getPluginNameFromPath(const std::string& p
   return name;
 }
 
-std::string cedar::proc::PluginProxy::findPluginDescription(const std::string& plugin_path) const
+std::string cedar::aux::PluginProxy::findPluginDescription(const std::string& plugin_path) const
 {
-  std::string plugin_name = cedar::proc::PluginProxy::getPluginNameFromPath(plugin_path);
+  std::string plugin_name = cedar::aux::PluginProxy::getPluginNameFromPath(plugin_path);
   plugin_name += ".xml";
 
   // extract the path only
@@ -148,50 +148,53 @@ std::string cedar::proc::PluginProxy::findPluginDescription(const std::string& p
   return "";
 }
 
-std::string cedar::proc::PluginProxy::findPluginFile(const std::string& file) const
+std::string cedar::aux::PluginProxy::findPlugin(const std::string& pluginName) const
 {
-  std::string searched_locs;
-
-  searched_locs += file + "\n";
-  if (boost::filesystem::exists(file))
+  std::vector<std::string> searched_paths;
+  searched_paths.push_back(pluginName);
+  if (boost::filesystem::exists(pluginName))
   {
-    return file;
+    return pluginName;
   }
 
-  cedar::proc::FrameworkSettingsPtr settings = cedar::proc::FrameworkSettingsSingleton::getInstance();
-  std::string loc = settings->getPluginWorkspace() + "/" + file;
-  searched_locs += loc;
+  auto search_paths = cedar::aux::SettingsSingleton::getInstance()->getSearchPaths();
+  for (auto iter = search_paths.begin(); iter != search_paths.end(); ++iter)
+  {
+    try
+    {
+      const std::string& workspace = *iter;
+      return this->findPlugin(pluginName, workspace);
+    }
+    catch (const cedar::aux::PluginNotFoundException& not_found)
+    {
+      searched_paths.insert
+                     (
+                       searched_paths.end(),
+                       not_found.getSearchedPaths().begin(),
+                       not_found.getSearchedPaths().end()
+                     );
+    }
+  }
+
+  cedar::aux::PluginNotFoundException exception(searched_paths);
+  CEDAR_THROW_EXCEPTION(exception);
+}
+
+std::string cedar::aux::PluginProxy::findPlugin(const std::string& pluginName, const std::string& workspace) const
+{
+  std::string loc = workspace + "/" + pluginName;
+  std::vector<std::string> searched_paths;
+  searched_paths.push_back(loc);
   if (boost::filesystem::exists(loc))
   {
     return loc;
   }
-
-  std::string ret_path;
-  std::set<std::string>::const_iterator path = settings->getPluginDirectories().begin();
-  std::set<std::string>::const_iterator path_end = settings->getPluginDirectories().end();
-  if (path != path_end)
-  {
-    do
-    {
-      ret_path = (*path);
-      if (path->size() > 0 && path->at(path->size() - 1) != '/')
-      {
-        ret_path += '/';
-      }
-      ret_path += file;
-      searched_locs += ret_path + "\n";
-      ++path;
-    }
-    while (!boost::filesystem::exists(ret_path) && path != path_end);
-  }
-
-  CEDAR_THROW(cedar::proc::PluginException, "Could not load plugin: file not found. Searched locations: " + searched_locs);
-
-  return "";
+  cedar::aux::PluginNotFoundException exception(searched_paths);
+  CEDAR_THROW_EXCEPTION(exception);
 }
 
 #ifdef CEDAR_OS_UNIX
-void cedar::proc::PluginProxy::abortHandler(int)
+void cedar::aux::PluginProxy::abortHandler(int)
 {
   std::cout
       << "==================================================================" << std::endl
@@ -205,17 +208,17 @@ void cedar::proc::PluginProxy::abortHandler(int)
 }
 #endif // CEDAR_OS_UNIX
 
-void cedar::proc::PluginProxy::load(const std::string& file)
+void cedar::aux::PluginProxy::load(const std::string& pluginName)
 {
-  this->mFileName = this->findPluginFile(file);
+  this->mFileName = this->findPlugin(pluginName);
   
   // OS-Dependent code for loading the plugin.
   PluginInterfaceMethod p_interface = NULL;
 #ifdef CEDAR_OS_UNIX
 
-  mPluginBeingLoaded = file;
+  mPluginBeingLoaded = pluginName;
   void (*old_abrt_handle)(int);
-  old_abrt_handle = signal(SIGABRT, &cedar::proc::PluginProxy::abortHandler);
+  old_abrt_handle = signal(SIGABRT, &cedar::aux::PluginProxy::abortHandler);
 
   this->mpLibHandle = dlopen(this->mFileName.c_str(), RTLD_NOW | RTLD_GLOBAL);
 
@@ -225,27 +228,27 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   if (!this->mpLibHandle)
   {
     std::string dl_err = dlerror();
-    CEDAR_THROW(cedar::proc::PluginException, "Could not load plugin: dlopen failed. dlerror() returned " + dl_err);
+    CEDAR_THROW(cedar::aux::PluginException, "Could not load plugin: dlopen failed. dlerror() returned " + dl_err);
   }
 
 
   p_interface = reinterpret_cast<PluginInterfaceMethod>(dlsym(this->mpLibHandle, "pluginDeclaration"));
   if (!p_interface)
   {
-    CEDAR_THROW(cedar::proc::PluginException, "Error loading interface function: dlsym returned NULL.");
+    CEDAR_THROW(cedar::aux::PluginException, "Error loading interface function: dlsym returned NULL.");
   }
 
 #elif defined CEDAR_OS_WINDOWS
   this->mpLibHandle = LoadLibraryEx(this->mFileName.c_str(), NULL, 0);
   if (!this->mpLibHandle)
   {
-    CEDAR_THROW(cedar::proc::PluginException, "Could not load plugin: LoadLibraryEx failed: " + this->getLastError());
+    CEDAR_THROW(cedar::aux::PluginException, "Could not load plugin: LoadLibraryEx failed: " + this->getLastError());
   }
   
   p_interface = (PluginInterfaceMethod) (GetProcAddress(this->mpLibHandle, TEXT("pluginDeclaration")));
   if (!p_interface)
   {
-    CEDAR_THROW(cedar::proc::PluginException, "Error loading interface function: GetProcAddress failed: " + this->getLastError());
+    CEDAR_THROW(cedar::aux::PluginException, "Error loading interface function: GetProcAddress failed: " + this->getLastError());
   }
 #endif // CEDAR_OS_UNIX / CEDAR_OS_WINDOWS
   
@@ -264,23 +267,20 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   {
     cedar::aux::LogSingleton::getInstance()->debugMessage
     (
-      "no plugin description found for \"" + file + "\"",
-      "cedar::proc::PluginDeclaration::readDeclarations(const cedar::aux::ConfigurationNode&)"
+      "no plugin description found for \"" + pluginName + "\"",
+      "cedar::aux::PluginDeclaration::readDeclarations(const cedar::aux::ConfigurationNode&)"
     );
   }
-
-  // Finally, if nothing failed, add the plugin to the list of known plugins.
-  cedar::proc::FrameworkSettingsSingleton::getInstance()->addKnownPlugin(file);
 }
 
-cedar::proc::PluginDeclarationPtr cedar::proc::PluginProxy::getDeclaration()
+cedar::aux::PluginDeclarationListPtr cedar::aux::PluginProxy::getDeclaration()
 {
   return this->mDeclaration;
 }
 
 #ifdef CEDAR_OS_WINDOWS
 
-std::string cedar::proc::PluginProxy::getLastError()
+std::string cedar::aux::PluginProxy::getLastError()
 {
   LPVOID lpMsgBuf;
   DWORD dw = GetLastError(); 

@@ -90,6 +90,42 @@ class cedar::aux::ParameterNotFoundException : public cedar::aux::ExceptionBase
 {
 }; // class cedar::aux::ParameterNotFoundException
 
+/*!@brief Exception that occurs when a plugin is not found.
+ */
+class cedar::aux::PluginNotFoundException : public cedar::aux::ExceptionBase
+{
+public:
+  //! constructor
+  PluginNotFoundException(const std::vector<std::string>& searchedPaths)
+  :
+  mSearchedPaths(searchedPaths)
+  {
+  }
+
+  //! destructor that ensure that no exception is thrown
+  ~PluginNotFoundException() throw ()
+  {
+  }
+
+  //! get the messages of this exception
+  const std::vector<std::string>& getSearchedPaths() const
+  {
+    return this->mSearchedPaths;
+  }
+
+private:
+  std::vector<std::string> mSearchedPaths;
+}; // class cedar::aux::PluginNotFoundException
+
+/*!@brief Exception that occurs when a plugin cannot be loaded.
+ *
+ * @todo This exception is too generic.
+ */
+class cedar::aux::PluginException : public cedar::aux::ExceptionBase
+{
+}; // class cedar::aux::PluginException
+
+
 /*!@brief Exception that occurs when a unique id appears twice.
  */
 class cedar::aux::DuplicateIdException : public cedar::aux::ExceptionBase

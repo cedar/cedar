@@ -42,7 +42,6 @@
 #include "cedar/processing/gui/PluginLoadDialog.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/gui/Settings.h"
-#include "cedar/processing/FrameworkSettings.h"
 #include "cedar/auxiliaries/PluginDeclarationList.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/assert.h"
@@ -66,11 +65,6 @@ QDialog(pParent)
   this->mpFileNameEdit->lineEdit()->setReadOnly(true);
 
   this->mpFileNameEdit->addItem("");
-  const std::set<std::string>& known_plugins = cedar::proc::FrameworkSettingsSingleton::getInstance()->getKnownPlugins();
-  for (std::set<std::string>::const_iterator iter = known_plugins.begin(); iter != known_plugins.end(); ++iter)
-  {
-    this->mpFileNameEdit->addItem(iter->c_str());
-  }
 
   QObject::connect(this->mpBrowseButton, SIGNAL(clicked()), this, SLOT(browseFile()));
   QObject::connect(this->mpFileNameEdit, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(pluginFileChanged(const QString&)));
@@ -120,7 +114,7 @@ void cedar::proc::gui::PluginLoadDialog::pluginFileChanged(const QString& file)
 
 void cedar::proc::gui::PluginLoadDialog::loadFile(const std::string& file)
 {
-  mPlugin = cedar::proc::PluginProxyPtr(new cedar::proc::PluginProxy(file));
+  mPlugin = cedar::aux::PluginProxyPtr(new cedar::aux::PluginProxy(file));
 
   this->mpStepsList->clear();
 
@@ -132,7 +126,7 @@ void cedar::proc::gui::PluginLoadDialog::loadFile(const std::string& file)
   }
 }
 
-cedar::proc::PluginProxyPtr cedar::proc::gui::PluginLoadDialog::plugin()
+cedar::aux::PluginProxyPtr cedar::proc::gui::PluginLoadDialog::plugin()
 {
   return this->mPlugin;
 }

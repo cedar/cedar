@@ -41,7 +41,7 @@
 #include "cedar/processing/gui/ui_PluginLoadDialog.h"
 
 #include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/PluginProxy.h"
+#include "cedar/auxiliaries/PluginProxy.h"
 
 // SYSTEM INCLUDES
 #include <QDialog>
@@ -68,7 +68,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //! Returns the (loaded) plugin.
-  cedar::proc::PluginProxyPtr plugin();
+  cedar::aux::PluginProxyPtr plugin();
 
 public slots:
   /*!@brief Opens a file browser to locate the plugin to load.
@@ -100,7 +100,7 @@ protected:
   // none yet
 private:
   //! The loaded plugin.
-  cedar::proc::PluginProxyPtr mPlugin;
+  cedar::aux::PluginProxyPtr mPlugin;
 
 }; // class cedar::PluginLoadDialog
 
