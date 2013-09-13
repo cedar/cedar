@@ -57,7 +57,6 @@ QDialog(pParent)
 
   this->populate();
 
-  QObject::connect(this->mpButtonBox, SIGNAL(accepted()), this, SLOT(accepted()));
   QObject::connect(this->mpDeleteButton, SIGNAL(clicked()), this, SLOT(removePlugins()));
   this->mpDeleteButton->setEnabled(false);
 }
@@ -66,31 +65,6 @@ QDialog(pParent)
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-void cedar::proc::gui::PluginManagerDialog::accepted()
-{
-  for (int row = 0; row < this->mpPluginList->rowCount(); ++row)
-  {
-    QCheckBox *p_cb = dynamic_cast<QCheckBox*>(this->mpPluginList->cellWidget(row, 0));
-    CEDAR_DEBUG_ASSERT(p_cb != NULL);
-
-    QLabel* p_path = dynamic_cast<QLabel*>(this->mpPluginList->cellWidget(row, 3));
-    CEDAR_DEBUG_ASSERT(p_path != NULL);
-
-    std::string path = p_path->text().toStdString();
-
-    if (p_cb->isChecked())
-    {
-      cedar::proc::gui::SettingsSingleton::getInstance()->addPluginToLoad(path);
-    }
-    else
-    {
-      cedar::proc::gui::SettingsSingleton::getInstance()->removePluginToLoad(path);
-    }
-  }
-
-  this->accept();
-}
 
 void cedar::proc::gui::PluginManagerDialog::populate()
 {

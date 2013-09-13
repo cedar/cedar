@@ -68,17 +68,6 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-public slots:
-  /*!@brief Slot that is called when the dialog is closed by clicking ok.
-   */
-  void accepted();
-
-  //! Removes the plugins currently checked for deletion.
-  void removePlugins();
-
-  //! Enables or disables the delete button.
-  void toggleDeleteButton();
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -96,6 +85,13 @@ private:
   /*!@brief Adds a plugin to the list.
    */
   void addPlugin(const std::string& path);
+
+private slots:
+  //! Removes the plugins currently checked for deletion.
+  void removePlugins();
+
+  //! Enables or disables the delete button.
+  void toggleDeleteButton();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
