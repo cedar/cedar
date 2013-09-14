@@ -45,6 +45,7 @@
 #include <QCheckBox>
 #include <QPushButton>
 #include <QLabel>
+#include <QFileDialog>
 #include <set>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -60,6 +61,19 @@ QDialog(pParent)
 
   QObject::connect(this->mpDeleteButton, SIGNAL(clicked()), this, SLOT(removePlugins()));
   this->mpDeleteButton->setEnabled(false);
+
+  QObject::connect(this->mpAddPathBtn, SIGNAL(clicked()), this, SLOT(addSearchPathClicked()));
+  QObject::connect(this->mpRemoveSearchPathBtn, SIGNAL(clicked()), this, SLOT(removeSearchPathClicked()));
+
+  cedar::aux::SettingsSingleton::getInstance()->connectToPluginSearchPathAddedSignal
+  (
+    boost::bind(&cedar::aux::gui::PluginManagerDialog::addPluginSearchPath, this, _1)
+  );
+
+  cedar::aux::SettingsSingleton::getInstance()->connectToPluginSearchPathIndexRemovedSignal
+  (
+    boost::bind(&cedar::aux::gui::PluginManagerDialog::removePluginSearchPathIndex, this, _1)
+  );
 }
 
 
@@ -69,10 +83,41 @@ QDialog(pParent)
 
 void cedar::aux::gui::PluginManagerDialog::populate()
 {
+  // restore plugins to load from the settings
   const std::set<std::string>& plugins_to_load = cedar::aux::SettingsSingleton::getInstance()->pluginsToLoad();
   for (std::set<std::string>::const_iterator iter = plugins_to_load.begin(); iter != plugins_to_load.end(); ++iter)
   {
     this->addPlugin(*iter);
+  }
+
+  // restore search paths
+  auto search_paths = cedar::aux::SettingsSingleton::getInstance()->getPluginSearchPaths();
+  for (auto iter = search_paths.begin(); iter != search_paths.end(); ++iter)
+  {
+    this->addPluginSearchPath(*iter);
+  }
+}
+
+void cedar::aux::gui::PluginManagerDialog::addPluginSearchPath(const std::string& path)
+{
+  this->mpSearchPathList->addItem(QString::fromStdString(path));
+}
+
+void cedar::aux::gui::PluginManagerDialog::removePluginSearchPathIndex(size_t index)
+{
+  CEDAR_ASSERT(static_cast<int>(index) < this->mpSearchPathList->count());
+
+  this->mpSearchPathList->takeItem(static_cast<int>(index));
+}
+
+void cedar::aux::gui::PluginManagerDialog::removePluginSearchPath(const std::string& path)
+{
+  for (int row = this->mpSearchPathList->count() - 1; row >= 0; ++row)
+  {
+    if (this->mpSearchPathList->item(row)->text().toStdString() == path)
+    {
+      this->mpSearchPathList->takeItem(row);
+    }
   }
 }
 
@@ -145,4 +190,27 @@ void cedar::aux::gui::PluginManagerDialog::toggleDeleteButton()
     }
   }
   this->mpDeleteButton->setEnabled(false);
+}
+
+void cedar::aux::gui::PluginManagerDialog::addSearchPathClicked()
+{
+  QString dir = QFileDialog::getExistingDirectory(this, "select search path to add", "");
+  if (!dir.isEmpty())
+  {
+    cedar::aux::SettingsSingleton::getInstance()->addPluginSearchPath(dir.toStdString());
+  }
+}
+
+void cedar::aux::gui::PluginManagerDialog::removeSearchPathClicked()
+{
+  QList<QListWidgetItem*> selected = this->mpSearchPathList->selectedItems();
+
+  for (int i = 0; i < selected.size(); ++i)
+  {
+    int index = this->mpSearchPathList->row(selected[i]);
+    if (index >= 0)
+    {
+      cedar::aux::SettingsSingleton::getInstance()->removePluginSearchPath(index);
+    }
+  }
 }

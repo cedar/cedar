@@ -217,6 +217,14 @@ public:
     return ret;
   }
 
+  //! Erases the entry at the given index.
+  void eraseIndex(size_t index)
+  {
+    CEDAR_ASSERT(index < this->mValues.size());
+
+    this->mValues.erase(this->mValues.begin() + index);
+  }
+
   //!@brief Erase first occurrence of T entry
   void eraseFirst(const T& entry)
   {
