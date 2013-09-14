@@ -85,12 +85,24 @@ private:
    */
   void addPlugin(const std::string& path);
 
+  void addPluginSearchPath(const std::string& path);
+
+  void removePluginSearchPath(const std::string& path);
+
+  void removePluginSearchPathIndex(size_t index);
+
 private slots:
   //! Removes the plugins currently checked for deletion.
   void removePlugins();
 
   //! Enables or disables the delete button.
   void toggleDeleteButton();
+
+  //! Reacts to a click on the "add" button in the search paths tab.
+  void addSearchPathClicked();
+
+  //! Reacts to a click on the "remove" button in the search paths tab.
+  void removeSearchPathClicked();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -157,7 +157,7 @@ std::string cedar::aux::PluginProxy::findPlugin(const std::string& pluginName) c
     return pluginName;
   }
 
-  auto search_paths = cedar::aux::SettingsSingleton::getInstance()->getSearchPaths();
+  auto search_paths = cedar::aux::SettingsSingleton::getInstance()->getPluginSearchPaths();
   for (auto iter = search_paths.begin(); iter != search_paths.end(); ++iter)
   {
     try

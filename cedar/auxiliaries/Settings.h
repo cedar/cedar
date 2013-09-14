@@ -45,10 +45,10 @@
 #include "cedar/auxiliaries/StringVectorParameter.h"
 
 // SYSTEM INCLUDES
+#include <boost/signals2/signal.hpp>
+#include <boost/signals2/connection.hpp>
 
-/*!@brief A singleton class for storing user-specific parameters related to the processing framework.
- *
- * @todo  Write a widget for these settings.
+/*!@brief A singleton class for storing user-specific parameters related to the auxiliary library of cedar.
  */
 class cedar::aux::Settings : public cedar::aux::Configurable
 {
@@ -87,7 +87,16 @@ public:
   const std::set<std::string>& pluginsToLoad();
 
   //! Returns the plugins search paths.
-  const std::vector<std::string>& getSearchPaths() const;
+  const std::vector<std::string>& getPluginSearchPaths() const;
+
+  //! Adds a plugin search path.
+  void addPluginSearchPath(const std::string& path);
+
+  //! Removes all occurrences of the given plugin search path.
+  void removePluginSearchPath(const std::string& path);
+
+  //! Removes the plugin search path with the given index.
+  void removePluginSearchPath(size_t index);
 
   //!@brief adds a plugin to the list of plugins that are loaded on start-up
   void addPluginToLoad(const std::string& path);
@@ -97,6 +106,24 @@ public:
 
   //! Loads the plugins set to be loaded by default.
   void loadDefaultPlugins();
+
+  //! Connect to search path added signal
+  boost::signals2::connection connectToPluginSearchPathAddedSignal(boost::function<void (const std::string&)> slot)
+  {
+    return this->mPathAddedSignal.connect(slot);
+  }
+
+  //! Connect to search path removed signal
+  boost::signals2::connection connectToPluginSearchPathRemovedSignal(boost::function<void (const std::string&)> slot)
+  {
+    return this->mSearchPathRemovedSignal.connect(slot);
+  }
+
+  //! Connect to search path removed signal
+  boost::signals2::connection connectToPluginSearchPathIndexRemovedSignal(boost::function<void (size_t)> slot)
+  {
+    return this->mSearchPathIndexRemovedSignal.connect(slot);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -116,7 +143,11 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  boost::signals2::signal<void (const std::string&)> mPathAddedSignal;
+
+  boost::signals2::signal<void (const std::string&)> mSearchPathRemovedSignal;
+
+  boost::signals2::signal<void (size_t)> mSearchPathIndexRemovedSignal;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
