@@ -49,10 +49,9 @@
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/Network.h"
-#include "cedar/processing/gui/PluginLoadDialog.h"
-#include "cedar/processing/gui/PluginManagerDialog.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/gui/PluginManagerDialog.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/Settings.h"
@@ -135,7 +134,6 @@ mpBoostControl(NULL)
   QObject::connect(this->mpActionSave, SIGNAL(triggered()), this, SLOT(save()));
   QObject::connect(this->mpActionSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
   QObject::connect(this->mpActionLoad, SIGNAL(triggered()), this, SLOT(load()));
-  QObject::connect(this->mpActionLoadPlugin, SIGNAL(triggered()), this, SLOT(showLoadPluginDialog()));
   QObject::connect(this->mpActionManagePlugins, SIGNAL(triggered()), this, SLOT(showManagePluginsDialog()));
   QObject::connect(this->mpActionSettings, SIGNAL(triggered()), this, SLOT(showSettingsDialog()));
   QObject::connect(this->mpActionShowHideGrid, SIGNAL(toggled(bool)), this, SLOT(toggleGrid(bool)));
@@ -383,23 +381,9 @@ void cedar::proc::gui::Ide::loadDefaultPlugins()
   cedar::aux::SettingsSingleton::getInstance()->loadDefaultPlugins();
 }
 
-void cedar::proc::gui::Ide::showLoadPluginDialog()
-{
-  cedar::proc::gui::PluginLoadDialog* p_dialog = new cedar::proc::gui::PluginLoadDialog(this);
-  int res = p_dialog->exec();
-
-  if (res == QDialog::Accepted && p_dialog->plugin())
-  {
-    p_dialog->plugin()->declare();
-    this->resetStepList();
-  }
-
-  delete p_dialog;
-}
-
 void cedar::proc::gui::Ide::showManagePluginsDialog()
 {
-  cedar::proc::gui::PluginManagerDialog* p_dialog = new cedar::proc::gui::PluginManagerDialog(this);
+  cedar::aux::gui::PluginManagerDialog* p_dialog = new cedar::aux::gui::PluginManagerDialog(this);
   p_dialog->exec();
   delete p_dialog;
 }

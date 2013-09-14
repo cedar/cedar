@@ -35,8 +35,8 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/PluginManagerDialog.h"
-#include "cedar/processing/gui/Settings.h"
+#include "cedar/auxiliaries/gui/PluginManagerDialog.h"
+#include "cedar/auxiliaries/gui/Settings.h"
 #include "cedar/auxiliaries/SetParameter.h"
 #include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/assert.h"
@@ -50,7 +50,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::gui::PluginManagerDialog::PluginManagerDialog(QWidget *pParent)
+cedar::aux::gui::PluginManagerDialog::PluginManagerDialog(QWidget *pParent)
 :
 QDialog(pParent)
 {
@@ -67,7 +67,7 @@ QDialog(pParent)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::PluginManagerDialog::populate()
+void cedar::aux::gui::PluginManagerDialog::populate()
 {
   const std::set<std::string>& plugins_to_load = cedar::aux::SettingsSingleton::getInstance()->pluginsToLoad();
   for (std::set<std::string>::const_iterator iter = plugins_to_load.begin(); iter != plugins_to_load.end(); ++iter)
@@ -76,7 +76,7 @@ void cedar::proc::gui::PluginManagerDialog::populate()
   }
 }
 
-void cedar::proc::gui::PluginManagerDialog::addPlugin(const std::string& path)
+void cedar::aux::gui::PluginManagerDialog::addPlugin(const std::string& path)
 {
   const std::set<std::string>& plugins_to_load = cedar::aux::SettingsSingleton::getInstance()->pluginsToLoad();
 
@@ -99,7 +99,7 @@ void cedar::proc::gui::PluginManagerDialog::addPlugin(const std::string& path)
   this->mpPluginList->setCellWidget(row, 3, p_path);
 }
 
-void cedar::proc::gui::PluginManagerDialog::removePlugins()
+void cedar::aux::gui::PluginManagerDialog::removePlugins()
 {
   unsigned int deleted_items = 0;
   for (int row = 0; row < this->mpPluginList->rowCount(); ++row)
@@ -132,7 +132,7 @@ void cedar::proc::gui::PluginManagerDialog::removePlugins()
   }
 }
 
-void cedar::proc::gui::PluginManagerDialog::toggleDeleteButton()
+void cedar::aux::gui::PluginManagerDialog::toggleDeleteButton()
 {
   for (int row = 0; row < this->mpPluginList->rowCount(); ++row)
   {

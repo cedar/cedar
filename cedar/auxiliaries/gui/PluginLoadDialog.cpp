@@ -39,11 +39,11 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/PluginLoadDialog.h"
-#include "cedar/processing/ElementDeclaration.h"
-#include "cedar/processing/gui/Settings.h"
+#include "cedar/auxiliaries/gui/PluginLoadDialog.h"
 #include "cedar/auxiliaries/PluginDeclarationList.h"
+#include "cedar/auxiliaries/PluginDeclaration.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/gui/Settings.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
@@ -55,7 +55,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::gui::PluginLoadDialog::PluginLoadDialog(QWidget *pParent)
+cedar::aux::gui::PluginLoadDialog::PluginLoadDialog(QWidget *pParent)
 :
 QDialog(pParent)
 {
@@ -76,7 +76,7 @@ QDialog(pParent)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::PluginLoadDialog::browseFile()
+void cedar::aux::gui::PluginLoadDialog::browseFile()
 {
 #ifdef CEDAR_OS_LINUX
   QString filter = "Plugins (*.so)";
@@ -85,7 +85,7 @@ void cedar::proc::gui::PluginLoadDialog::browseFile()
 #elif defined CEDAR_OS_WINDOWS
   QString filter = "Plugins (*.dll)";
 #endif // CEDAR_OS_*
-  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::SettingsSingleton::getInstance()->lastPluginLoadDialogLocation();
+  auto last_dir = cedar::aux::gui::SettingsSingleton::getInstance()->lastPluginLoadDialogLocation();
   QString file = QFileDialog::getOpenFileName
                               (
                                 this, // parent = 0,
@@ -107,12 +107,12 @@ void cedar::proc::gui::PluginLoadDialog::browseFile()
   }
 }
 
-void cedar::proc::gui::PluginLoadDialog::pluginFileChanged(const QString& file)
+void cedar::aux::gui::PluginLoadDialog::pluginFileChanged(const QString& file)
 {
   this->loadFile(file.toStdString());
 }
 
-void cedar::proc::gui::PluginLoadDialog::loadFile(const std::string& file)
+void cedar::aux::gui::PluginLoadDialog::loadFile(const std::string& file)
 {
   mPlugin = cedar::aux::PluginProxyPtr(new cedar::aux::PluginProxy(file));
 
@@ -126,7 +126,7 @@ void cedar::proc::gui::PluginLoadDialog::loadFile(const std::string& file)
   }
 }
 
-cedar::aux::PluginProxyPtr cedar::proc::gui::PluginLoadDialog::plugin()
+cedar::aux::PluginProxyPtr cedar::aux::gui::PluginLoadDialog::plugin()
 {
   return this->mPlugin;
 }
