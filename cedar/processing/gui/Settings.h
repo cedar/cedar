@@ -171,9 +171,6 @@ public:
   //!@brief restores a state of the main window
   void restoreMainWindow(QMainWindow *pWindow);
 
-  //!@brief returns the last directory, from which a plugin was loaded
-  cedar::aux::DirectoryParameterPtr lastPluginLoadDialogLocation();
-
   //!@brief returns the last directory, from which an architecture was loaded
   cedar::aux::DirectoryParameterPtr lastArchitectureLoadDialogDirectory();
 
@@ -273,9 +270,6 @@ private:
 
   //!@brief list of bytes coming from Qt (minimized, maximized, ...)
   cedar::aux::StringParameterPtr mMainWindowState;
-
-  //!@brief Directory, where the PluginLoadDialog is supposed to open.
-  cedar::aux::DirectoryParameterPtr mPluginLoadDialogLocation;
 
   //!@brief Directory, where the load dialog for architectures is supposed to open.
   cedar::aux::DirectoryParameterPtr mArchitectureLoadDialogDirectory;

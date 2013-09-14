@@ -130,15 +130,6 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   this->addConfigurableChild("fileHistory", recent_files);
   this->_mMaxFileHistorySize = new cedar::aux::UIntParameter(recent_files.get(), "maximum history size", 10);
 
-  this->mPluginLoadDialogLocation = cedar::aux::DirectoryParameterPtr
-      (
-        new cedar::aux::DirectoryParameter
-        (
-          recent_files.get(),
-          "lastPluginLoadDialogLocation",
-          ""
-        )
-      );
   this->mArchitectureLoadDialogDirectory = cedar::aux::DirectoryParameterPtr
       (
         new cedar::aux::DirectoryParameter
@@ -248,11 +239,6 @@ cedar::aux::DirectoryParameterPtr cedar::proc::gui::Settings::lastArchitectureLo
 cedar::aux::DirectoryParameterPtr cedar::proc::gui::Settings::lastArchitectureExportDialogDirectory()
 {
   return this->mArchitectureExportDialogDirectory;
-}
-
-cedar::aux::DirectoryParameterPtr cedar::proc::gui::Settings::lastPluginLoadDialogLocation()
-{
-  return this->mPluginLoadDialogLocation;
 }
 
 void cedar::proc::gui::Settings::storeMainWindow(QMainWindow *pWindow)
