@@ -95,6 +95,8 @@ public:
    */
   const std::set<std::string>& getPluginDirectories() const;
 
+  std::string getRecorderWorkspace() const;
+
   /*!@brief Returns the plugin workspace directory.
    *
    *        This is the first directoriy searched for a plugin.
