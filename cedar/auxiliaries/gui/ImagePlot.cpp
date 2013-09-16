@@ -311,7 +311,7 @@ void cedar::aux::gui::ImagePlot::ImageDisplay::mousePressEvent(QMouseEvent* pEve
     return;
 
   QReadLocker locker(&this->mData->getLock());
-  
+
   const cv::Mat& matrix = this->mData->getData();
 
   if (matrix.empty())

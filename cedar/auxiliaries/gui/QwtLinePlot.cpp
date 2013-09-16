@@ -49,7 +49,7 @@
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
-#include "cedar/auxiliaries/annotation/DiscreteCoordinates.h"
+#include "cedar/auxiliaries/annotation/DiscreteMetric.h"
 
 // SYSTEM INCLUDES
 #include <boost/numeric/conversion/bounds.hpp>
@@ -194,7 +194,7 @@ void cedar::aux::gui::QwtLinePlot::applyStyle(cedar::aux::ConstDataPtr data, siz
   pCurve->setPen(pen);
 
   // Use symbols instead of curves for discrete data
-  if (data->hasAnnotation<cedar::aux::annotation::DiscreteCoordinates>())
+  if (data->hasAnnotation<cedar::aux::annotation::DiscreteMetric>())
   {
     pCurve->setStyle(QwtPlotCurve::NoCurve);
     QwtSymbol
@@ -440,7 +440,7 @@ void cedar::aux::gui::QwtLinePlot::showLegend(bool show)
   if (show)
   {
     // show legend
-    auto *p_legend = this->mpPlot->legend();
+    auto p_legend = this->mpPlot->legend();
     if (p_legend == NULL)
     {
       p_legend = new QwtLegend();

@@ -44,8 +44,10 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
-#include "cedar/auxiliaries/annotation/DiscreteCoordinates.h"
+#include "cedar/auxiliaries/annotation/DiscreteMetric.h"
 #include "cedar/auxiliaries/convolution/Convolution.h"
+#include "cedar/auxiliaries/convolution/FFTW.h"
+#include "cedar/auxiliaries/convolution/OpenCV.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
 #include "cedar/auxiliaries/math/transferFunctions/AbsSigmoid.h"
@@ -89,6 +91,15 @@ namespace
     field_plot_data.appendData(DataRole::OUTPUT, "activation", true);
     field_plot_data.appendData(DataRole::OUTPUT, "sigmoided activation");
     declaration->definePlot(field_plot_data);
+
+    // define field plot again, but this time with image plots
+    //!@todo different icon
+    ElementDeclaration::PlotDefinition field_image_plot_data("field plot (image)", ":/cedar/dynamics/gui/field_image_plot.svg");
+    field_image_plot_data.mData.push_back(boost::make_shared<cedar::proc::PlotData>(DataRole::BUFFER, "input sum", false, "cedar::aux::gui::ImagePlot"));
+    field_image_plot_data.mData.push_back(boost::make_shared<cedar::proc::PlotData>(DataRole::BUFFER, "activation", true, "cedar::aux::gui::ImagePlot"));
+    field_image_plot_data.mData.push_back(boost::make_shared<cedar::proc::PlotData>(DataRole::OUTPUT, "activation", true, "cedar::aux::gui::ImagePlot"));
+    field_image_plot_data.mData.push_back(boost::make_shared<cedar::proc::PlotData>(DataRole::OUTPUT, "sigmoided activation", false, "cedar::aux::gui::ImagePlot"));
+    declaration->definePlot(field_image_plot_data);
 
     ElementDeclaration::PlotDefinition kernel_plot_data("kernel", ":/cedar/dynamics/gui/kernel_plot.svg");
     kernel_plot_data.appendData(DataRole::BUFFER, "lateral kernel");
@@ -156,7 +167,7 @@ _mDimensionality
     this,
     "dimensionality",
     2,
-    cedar::aux::UIntParameter::LimitType::positiveZero(1000)
+    cedar::aux::UIntParameter::LimitType::positiveZero(4)
   )
 ),
 _mSizes
@@ -167,7 +178,7 @@ _mSizes
     "sizes",
     2,
     10,
-    cedar::aux::UIntParameter::LimitType::positive(1000)
+    cedar::aux::UIntParameter::LimitType::positive(5000)
   )
 ),
 _mInputNoiseGain
@@ -281,11 +292,11 @@ void cedar::dyn::NeuralField::discreteMetricChanged()
   {
     if (this->_mDiscreteMetric->getValue() == true)
     {
-      data_items.at(i)->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteCoordinates>());
+      data_items.at(i)->setAnnotation(boost::make_shared<cedar::aux::annotation::DiscreteMetric>());
     }
     else
     {
-      data_items.at(i)->removeAnnotations<cedar::aux::annotation::DiscreteCoordinates>();
+      data_items.at(i)->removeAnnotations<cedar::aux::annotation::DiscreteMetric>();
     }
   }
 }
@@ -609,6 +620,13 @@ bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) con
 void cedar::dyn::NeuralField::dimensionalityChanged()
 {
   this->_mSizes->resize(this->getDimensionality(), _mSizes->getDefaultValue());
+#ifdef CEDAR_USE_FFTW
+  if (this->getDimensionality() >= 3)
+  {
+    this->_mLateralKernelConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
+    this->_mNoiseCorrelationKernelConvolution->setEngine(cedar::aux::conv::FFTWPtr(new cedar::aux::conv::FFTW()));
+  }
+#endif // CEDAR_USE_FFTW
   this->updateMatrices();
 }
 

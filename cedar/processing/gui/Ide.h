@@ -154,22 +154,6 @@ public slots:
    */
   void recentFileItemTriggered();
 
-  /*!@brief Reacts to changes in the zoom level.
-   */
-  void zoomLevelSet(double zoomLevel);
-
-  /*!@brief Resets the zoom level to 100%.
-   */
-  void resetZoomLevel();
-
-  /*!@brief Increases the zoom level.
-   */
-  void increaseZoomLevel();
-
-  /*!@brief Decreases the zoom level.
-   */
-  void decreaseZoomLevel();
-
   /*!@brief Returns the architecture view used by the ide.
    */
   cedar::proc::gui::View* getArchitectureView();
@@ -211,6 +195,13 @@ public slots:
 
   //!@brief closes all plot windows of every step
   void closeAllPlots();
+
+  //! Returns the log widget of this ide.
+  cedar::aux::gui::Log* getLog() const
+  {
+    return this->mpLog;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

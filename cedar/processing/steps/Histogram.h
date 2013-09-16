@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Log.h
+    File:        Histogram.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 04 13
+    Date:        2013 08 13
 
     Description:
 
@@ -34,140 +34,120 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_LOG_H
-#define CEDAR_AUX_GUI_LOG_H
+#ifndef CEDAR_PROC_STEPS_HISTOGRAM_H
+#define CEDAR_PROC_STEPS_HISTOGRAM_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/LogInterface.h"
+#include "cedar/processing/steps/namespace.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/EnumType.h"
+#include "cedar/auxiliaries/EnumParameter.h"
 
 // SYSTEM INCLUDES
-#include <QTabWidget>
-#include <QTableWidget>
-#include <QGraphicsSceneContextMenuEvent>
 
 
-/*!@brief A default log widget.
+/*!@brief Calculates a histogram out of its input image.
  */
-class cedar::aux::gui::Log : public QTabWidget
+class cedar::proc::steps::Histogram : public cedar::proc::Step
 {
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  class LogInterface : public cedar::aux::LogInterface
+public:
+  class Normalization
   {
     public:
-      LogInterface(Log* pLog)
-      :
-      mpLog(pLog)
+      typedef cedar::aux::EnumId Id;
+      typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+
+    public:
+      static void construct()
       {
+        mType.type()->def(cedar::aux::Enum(None, "None"));
+        mType.type()->def(cedar::aux::Enum(ImageSize, "ImageSize", "Image Size"));
+        mType.type()->def(cedar::aux::Enum(Maximum, "Maximum"));
       }
 
-      void message
-      (
-        cedar::aux::LOG_LEVEL level,
-        const std::string& message,
-        const std::string& title
-      )
+      static const cedar::aux::EnumBase& type()
       {
-        this->mpLog->message(level, message, title);
+        return *mType.type();
       }
+
+      static const TypePtr& typePtr()
+      {
+        return mType.type();
+      }
+
+    public:
+      static const Id None = 0;
+      static const Id ImageSize = 1;
+      static const Id Maximum = 2;
 
     private:
-      Log* mpLog;
+      static cedar::aux::EnumType<Normalization> mType;
   };
-
-  CEDAR_GENERATE_POINTER_TYPES(LogInterface);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Log(QWidget *pParent = NULL);
-
-  //!@brief Destructor
-  ~Log();
+  Histogram();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief log a message with a given log level
-  void message
-  (
-    cedar::aux::LOG_LEVEL level,
-    const std::string& message,
-    const std::string& title
-  );
+  //!@brief Returns the number of bins of the histogram.
+  inline unsigned int getNumBins() const
+  {
+    return this->_mBins->getValue();
+  }
 
-  /*!@brief Installs the handlers that redirect log messages to this widget.
-   *
-   *        Before calling this method, the log will not display anything. Also, remember to uninstall them when the
-   *        log's parent is destroyed!
-   */
-  void installHandlers(bool removeMessages = true);
+  //!@brief Returns the lower range of the histogram.
+  inline double getRangeLower() const
+  {
+    return this->_mRangeLower->getValue();
+  }
 
-  /*!@brief Removes the handlers that redirect log messages to this widget.
-   */
-  void uninstallHandlers();
-
-  //! Marks all log messages as outdated.
-  void outdateAllMessages();
-
-public slots:
-  //! Opens the context menu.
-  void showContextMenu(const QPoint& point);
+  //!@brief Returns the upper range of the histogram.
+  inline double getRangeUpper() const
+  {
+    return this->_mRangeUpper->getValue();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void timerEvent(QTimerEvent* pEvent);
-
-signals:
-  //!@brief signals reception of a signal
-  void messageReceived(int type, QString title, QString message);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private slots:
-  void scrollBarRangeChanged(int min, int max);
 private:
-  void addPane(cedar::aux::LOG_LEVEL level, const std::string& title, const std::string& icon = "");
+  void compute(const cedar::proc::Arguments&);
 
-  QTableWidget* addPane(const std::string& title, const std::string& icon = "");
+  void inputConnectionChanged(const std::string& inputName);
 
-  void postMessage
+  cedar::proc::DataSlot::VALIDITY determineInputValidity
   (
-    QTableWidget* pTable,
-    const QString& message,
-    const QString& title,
-    const QString& icon = ""
-  );
-
-  //! Returns an (arbitrary) number representing a message's currentness (i.e., how old it is).
-  int getMessageCurrentness(QTableWidget* pPane, int message);
-
-  //! Sets an (arbitrary) number representing a message's currentness (i.e., how old it is).
-  void setMessageCurrentness(QTableWidget* pPane, int message, int currentness);
-
-  //! Updates the currentness of all items in the pane.
-  void updatePaneCurrentness(QTableWidget* pPane);
-
-  //! Outdates all messages in the given pane.
-  void outdateAllMessages(QTableWidget* pPane);
+    cedar::proc::ConstDataSlotPtr,
+    cedar::aux::ConstDataPtr data
+  ) const;
 
 private slots:
-  void printMessage(int type, QString title, QString message);
+  void recompute();
 
+  void numberOfBinsChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -175,13 +155,22 @@ private slots:
 protected:
   // none yet
 private:
-  QTableWidget* mpDefaultPane;
+  // inputs
+  //! Input image from which to take the histogram.
+  cedar::aux::ConstMatDataPtr mInputImage;
 
-  LogInterfacePtr mLogger;
+  //! Optional mask. If set, only pixels where the mask is non-zero are counted for the histogram.
+  cedar::aux::ConstMatDataPtr mMask;
 
-  std::map<cedar::aux::LOG_LEVEL, QTableWidget*> mpPanes;
-  std::map<cedar::aux::LOG_LEVEL, std::string> mIcons;
-  std::map<QScrollBar*, int> mMaxScrollBarRange;
+  // buffers
+  //! Raw (unnormalized) histogram.
+  cedar::aux::MatDataPtr mRawHistogram;
+
+  // outputs
+  //! Histogram of values in the input.
+  cedar::aux::MatDataPtr mHistogram;
+
+  double mMaxValue;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -190,9 +179,19 @@ protected:
   // none yet
 
 private:
-  // none yet
+  //! The number of bins in the histogram.
+  cedar::aux::UIntParameterPtr _mBins;
 
-}; // class cedar::aux::gui::Log
+  //! The lower limit of the first bin of the histogram.
+  cedar::aux::DoubleParameterPtr _mRangeLower;
 
-#endif // CEDAR_AUX_GUI_LOG_H
+  //! The upper limit of the last bin of the histogram.
+  cedar::aux::DoubleParameterPtr _mRangeUpper;
+
+  //! The normalization type
+  cedar::aux::EnumParameterPtr _mNormalizationType;
+
+}; // class cedar::proc::steps::Histogram
+
+#endif // CEDAR_PROC_STEPS_HISTOGRAM_H
 

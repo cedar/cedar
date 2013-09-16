@@ -249,8 +249,9 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   }
 #endif // CEDAR_OS_UNIX / CEDAR_OS_WINDOWS
   
-  this->mDeclaration = cedar::proc::PluginDeclarationPtr(new cedar::proc::PluginDeclaration());
+  this->mDeclaration = cedar::aux::PluginDeclarationListPtr(new cedar::aux::PluginDeclarationList());
   (*p_interface)(this->mDeclaration);
+  this->mDeclaration->setSource(this->mFileName);
 
   // try to load the plugin description file
   std::string description = this->findPluginDescription(this->mFileName);

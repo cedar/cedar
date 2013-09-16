@@ -63,6 +63,7 @@ namespace cedar
       CEDAR_DECLARE_PROC_CLASS(Convolution);
       CEDAR_DECLARE_PROC_CLASS(ColorConversion);
       CEDAR_DECLARE_PROC_CLASS(Flip);
+      CEDAR_DECLARE_PROC_CLASS(Histogram);
       CEDAR_DECLARE_PROC_CLASS(MatrixMultiply);
       CEDAR_DECLARE_PROC_CLASS(MatrixTypeConverter);
       CEDAR_DECLARE_PROC_CLASS(Projection);
@@ -70,6 +71,7 @@ namespace cedar
       CEDAR_DECLARE_PROC_CLASS(StaticGain);
       CEDAR_DECLARE_PROC_CLASS(Sum);
       CEDAR_DECLARE_PROC_CLASS(Switch);
+      CEDAR_DECLARE_PROC_CLASS(Threshold);
       CEDAR_DECLARE_PROC_CLASS(TransferFunction);
 
 #ifdef CEDAR_USE_YARP

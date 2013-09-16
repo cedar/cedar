@@ -1,4 +1,4 @@
-Readme                                                                                                         {#readme}
+Readme
 ======
 
 # License
@@ -129,13 +129,10 @@ environment.
     
     sudo ln -s "/usr/local/Cellar/qwt/[__VERSION__]/lib/qwt.framework/Versions/6/qwt" "/usr/local/Cellar/qwt/[__VERSION__]/lib/qwt.framework/qwt"
 
-#### Install GCC (do not use Clang)
-To compile cedar you should **use the GCC compiler**. To install the GCC
-compiler version 4.2 open *XCode*, go to *Preferences* -> *Downloads* and install the
-*Command Line Tools*. Note however, that GCC 4.2 does not support C++11. The
-unstable version of cedar uses C++11 features. If you would like to compile
-the *unstable* branch of cedar, you need to install GCC 4.7.2. Homebrew provides a
-[formula](https://github.com/Homebrew/homebrew-dupes/blob/master/gcc.rb) for it.
+#### Install GCC (optional)
+**NOTE: You can try to compile cedar with Clang. If you run into problems, updating to the newest Clang version might solve them.**
+
+To compile cedar **we recommend** using the GCC compiler version 4.4.5 or newer. The probably the easiest way to install GCC on Mac OSX is to use the Homebrew [formula](https://github.com/Homebrew/homebrew-dupes/blob/master/gcc.rb).
 Follow its instructions to install homebrew/dupes/gcc. When configuring cedar with
 CMake, change the compiler to GCC. You can do this by using *ccmake*: Switch to
 advanced mode and then set the value of `CMAKE_CXX_COMPILER` to `/usr/bin/llvm-g++`.

@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Log.h
+    File:        Threshold.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 04 13
+    Date:        2013 08 13
 
     Description:
 
@@ -34,140 +34,70 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_LOG_H
-#define CEDAR_AUX_GUI_LOG_H
+#ifndef CEDAR_PROC_STEPS_THRESHOLD_H
+#define CEDAR_PROC_STEPS_THRESHOLD_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/LogInterface.h"
+#include "cedar/processing/steps/namespace.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
-#include <QTabWidget>
-#include <QTableWidget>
-#include <QGraphicsSceneContextMenuEvent>
 
 
-/*!@brief A default log widget.
+/*!@brief Applies a threshold to its input.
  */
-class cedar::aux::gui::Log : public QTabWidget
+class cedar::proc::steps::Threshold : public cedar::proc::Step
 {
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  class LogInterface : public cedar::aux::LogInterface
-  {
-    public:
-      LogInterface(Log* pLog)
-      :
-      mpLog(pLog)
-      {
-      }
-
-      void message
-      (
-        cedar::aux::LOG_LEVEL level,
-        const std::string& message,
-        const std::string& title
-      )
-      {
-        this->mpLog->message(level, message, title);
-      }
-
-    private:
-      Log* mpLog;
-  };
-
-  CEDAR_GENERATE_POINTER_TYPES(LogInterface);
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Log(QWidget *pParent = NULL);
-
-  //!@brief Destructor
-  ~Log();
+  Threshold();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief log a message with a given log level
-  void message
-  (
-    cedar::aux::LOG_LEVEL level,
-    const std::string& message,
-    const std::string& title
-  );
-
-  /*!@brief Installs the handlers that redirect log messages to this widget.
-   *
-   *        Before calling this method, the log will not display anything. Also, remember to uninstall them when the
-   *        log's parent is destroyed!
-   */
-  void installHandlers(bool removeMessages = true);
-
-  /*!@brief Removes the handlers that redirect log messages to this widget.
-   */
-  void uninstallHandlers();
-
-  //! Marks all log messages as outdated.
-  void outdateAllMessages();
-
-public slots:
-  //! Opens the context menu.
-  void showContextMenu(const QPoint& point);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void timerEvent(QTimerEvent* pEvent);
-
-signals:
-  //!@brief signals reception of a signal
-  void messageReceived(int type, QString title, QString message);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private slots:
-  void scrollBarRangeChanged(int min, int max);
+  void applyLowerThesholdChanged();
+
+  void applyUpperThesholdChanged();
+
+  void recalculate();
+
 private:
-  void addPane(cedar::aux::LOG_LEVEL level, const std::string& title, const std::string& icon = "");
+  void compute(const cedar::proc::Arguments&);
 
-  QTableWidget* addPane(const std::string& title, const std::string& icon = "");
-
-  void postMessage
+  cedar::proc::DataSlot::VALIDITY determineInputValidity
   (
-    QTableWidget* pTable,
-    const QString& message,
-    const QString& title,
-    const QString& icon = ""
-  );
+    cedar::proc::ConstDataSlotPtr,
+    cedar::aux::ConstDataPtr data
+  ) const;
 
-  //! Returns an (arbitrary) number representing a message's currentness (i.e., how old it is).
-  int getMessageCurrentness(QTableWidget* pPane, int message);
-
-  //! Sets an (arbitrary) number representing a message's currentness (i.e., how old it is).
-  void setMessageCurrentness(QTableWidget* pPane, int message, int currentness);
-
-  //! Updates the currentness of all items in the pane.
-  void updatePaneCurrentness(QTableWidget* pPane);
-
-  //! Outdates all messages in the given pane.
-  void outdateAllMessages(QTableWidget* pPane);
-
-private slots:
-  void printMessage(int type, QString title, QString message);
-
+  void inputConnectionChanged(const std::string& inputName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -175,13 +105,23 @@ private slots:
 protected:
   // none yet
 private:
-  QTableWidget* mpDefaultPane;
+  // inputs
+  //! Input image (cached for performance).
+  cedar::aux::ConstMatDataPtr mInputImage;
 
-  LogInterfacePtr mLogger;
+  // buffers
+  //! Input image after lower threshold has been applied.
+  cedar::aux::MatDataPtr mLowerThreshold;
 
-  std::map<cedar::aux::LOG_LEVEL, QTableWidget*> mpPanes;
-  std::map<cedar::aux::LOG_LEVEL, std::string> mIcons;
-  std::map<QScrollBar*, int> mMaxScrollBarRange;
+  //! Input image after upper threshold has been applied.
+  cedar::aux::MatDataPtr mUpperThreshold;
+
+  // outputs
+  //! Input image after all selected thresholds have been applied.
+  cedar::aux::MatDataPtr mThresholdedImage;
+
+  //! Value to write where the image exceeds the threshold.
+  double mMaxValue;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -190,9 +130,19 @@ protected:
   // none yet
 
 private:
-  // none yet
+  //! Whether or not to apply the lower threshold.
+  cedar::aux::BoolParameterPtr mApplyLowerThreshold;
 
-}; // class cedar::aux::gui::Log
+  //! Whether or not to apply the upper threshold.
+  cedar::aux::BoolParameterPtr mApplyUpperThreshold;
 
-#endif // CEDAR_AUX_GUI_LOG_H
+  //! Lower threshold.
+  cedar::aux::UIntParameterPtr _mLowerThresholdValue;
+
+  //! Upper threshold.
+  cedar::aux::UIntParameterPtr _mUpperThresholdValue;
+
+}; // class cedar::proc::steps::Threshold
+
+#endif // CEDAR_PROC_STEPS_THRESHOLD_H
 
