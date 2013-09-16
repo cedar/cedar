@@ -1,4 +1,4 @@
-Readme                                                                                                         {#readme}
+Readme
 ======
 
 # License
