@@ -38,9 +38,9 @@
 #define RECORDERPROPERTY_H_
 
 // CEDAR INCLUDES
-#include <cedar/processing/gui/namespace.h>
-#include <cedar/auxiliaries/Data.h>
-#include <cedar/processing/DataSlot.h>
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/auxiliaries/Data.h"
+#include "cedar/processing/DataSlot.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
@@ -95,7 +95,7 @@ private:
   cedar::aux::ConstDataPtr mData;
 
   //!@brief Stores the record interval of the slot. Is changed by the mStepSize spin box.
-  int mStepSizeValue;
+  unsigned int mStepSizeValue;
 
 };
 

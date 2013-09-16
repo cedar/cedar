@@ -56,6 +56,7 @@ QWidget(pParent)
 
   cedar::proc::FrameworkSettingsPtr settings = cedar::proc::FrameworkSettingsSingleton::getInstance();
   this->mpPluginWorkspaceEdit->setParameter(settings->mPluginWorkspace);
+  this->mpRecorderWorkspaceEdit->setParameter(settings->mRecorderWorkspace);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

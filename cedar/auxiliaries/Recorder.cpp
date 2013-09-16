@@ -77,7 +77,6 @@ void cedar::aux::Recorder::registerData(cedar::aux::ConstDataPtr toSpectate, uns
   if(isRegistered(name))
   {
     CEDAR_THROW(cedar::aux::DuplicateNameException,"The data with name "+name+" is already registered");
-    return;
   }
 
   // create new DataSpectaor and push it to the DataSpectator list
@@ -134,14 +133,16 @@ void cedar::aux::Recorder::createOutputDirectory()
 
 void cedar::aux::Recorder::applyStart()
 {
-
-  //Generate output directory
-  this->createOutputDirectory();
+  if(mDataSpectatorCollection.size() > 0)
+  {
+    //Generate output directory
+    this->createOutputDirectory();
+  }
 
   //start the timer.
   mStartTime.start();
 
-  //find the minimal time to write to file. This should the smallest stepTime in the DataSpectator Threads.
+  //find the minimal time to write to file. This should the smallest stepTime in the DataSpectator threads.
   int min = 1000;
   for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
@@ -182,12 +183,12 @@ void cedar::aux::Recorder::setOutputDirectory(const std::string& path)
   this->mOutputDirectory = path;
 }
 
-std::string cedar::aux::Recorder::getOutputDirectory()
+std::string cedar::aux::Recorder::getOutputDirectory() const
 {
   return this->mOutputDirectory;
 }
 
-int cedar::aux::Recorder::getTimeStamp()
+int cedar::aux::Recorder::getTimeStamp() const
 {
   return mStartTime.elapsed();
 }
@@ -197,22 +198,19 @@ void cedar::aux::Recorder::setRecordIntervalTime(const std::string& name, unsign
   //throw exception if running
   if(isRunning())
     CEDAR_THROW(cedar::aux::ThreadRunningExeption,"Cannot change record inerval while recorder is running");
-  bool found = false;
   for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
     cedar::aux::DataSpectatorPtr spec = mDataSpectatorCollection.get<DataSpectator>(i);
     if(spec->getName() == name)
     {
       spec->setStepSize(recordIntv);
-      found = true;
-      break;
+      return;
     }
   }
-  if(!found)
-    CEDAR_THROW(cedar::aux::UnknownNameException,"The DatPtr named "+name+" is not registered.");
+  CEDAR_THROW(cedar::aux::UnknownNameException,"The DatPtr named "+name+" is not registered.");
 }
 
-int cedar::aux::Recorder::getRecordIntervalTime(const std::string& name)
+unsigned int cedar::aux::Recorder::getRecordIntervalTime(const std::string& name) const
 {
   for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
@@ -222,10 +220,10 @@ int cedar::aux::Recorder::getRecordIntervalTime(const std::string& name)
       return spec->getRecordIntervalTime();
     }
   }
-  return -1;
+  CEDAR_THROW(cedar::aux::UnknownNameException,"The DatPtr named "+name+" is not registered.");
 }
 
-int cedar::aux::Recorder::getRecordIntervalTime(cedar::aux::ConstDataPtr data)
+unsigned int cedar::aux::Recorder::getRecordIntervalTime(cedar::aux::ConstDataPtr data) const
 {
   for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
@@ -235,10 +233,10 @@ int cedar::aux::Recorder::getRecordIntervalTime(cedar::aux::ConstDataPtr data)
       return spec->getRecordIntervalTime();
     }
   }
-  return -1;
+  CEDAR_THROW(cedar::aux::UnknownNameException,"The DatPtr is not registered.");
 }
 
-bool cedar::aux::Recorder::isRegistered(const std::string& name)
+bool cedar::aux::Recorder::isRegistered(const std::string& name) const
 {
   for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {
@@ -251,7 +249,7 @@ bool cedar::aux::Recorder::isRegistered(const std::string& name)
   return false;
 }
 
-bool cedar::aux::Recorder::isRegistered(cedar::aux::ConstDataPtr data)
+bool cedar::aux::Recorder::isRegistered(cedar::aux::ConstDataPtr data) const
 {
   for(unsigned int i = 0; i < mDataSpectatorCollection.size(); i++)
   {

@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/testingUtilities/measurementFunctions.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 //SYSTEM INCLUDES
 #include <iostream>
@@ -68,7 +69,7 @@ void record()
 
 
   cedar::aux::RecorderSingleton::getInstance()->start();
-  usleep(1000*1000*5);
+  cedar::aux::sleep(5);
   cedar::aux::RecorderSingleton::getInstance()->stop();
 
 

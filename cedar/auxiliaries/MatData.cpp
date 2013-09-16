@@ -46,6 +46,8 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include<QReadLocker>
+#include<QReadWriteLock>
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -102,10 +104,9 @@ std::string cedar::aux::MatData::getDescription() const
 
 void cedar::aux::MatData::serializeData(std::ostream& stream) const
 {
-  this->lockForRead();
-
+  QReadLocker locker(this->mpLock);
   //creating index that addresses an element in the n dimensional Mat
-  std::vector<int> index( mData.dims, 0 );
+  std::vector<int> index(mData.dims, 0);
 
   //iterate  as long the last dimension has exceeded
   while(index[mData.dims-1] < mData.size[mData.dims-1])
@@ -162,22 +163,20 @@ void cedar::aux::MatData::serializeData(std::ostream& stream) const
 
     //increase index
     index[0]++;
-    for(int i =0; i < mData.dims-1;i++)
+    for(int i =0; i < mData.dims-1; i++)
     {
-      if(index[i]>=mData.size[i])
+      if(index[i] >= mData.size[i])
       {
         index[i]=0;
         index[i+1]++;
       }
     }
   }
-
-  this->unlock();
 }
 
 void cedar::aux::MatData::serializeHeader(std::ostream& stream) const
 {
-  this->lockForRead();
+  QReadLocker locker(this->mpLock);
   stream << "Mat" << ",";
   stream << mData.type() << ",";
   stream << mData.dims << ",";
@@ -185,12 +184,11 @@ void cedar::aux::MatData::serializeHeader(std::ostream& stream) const
   {
     stream << mData.size[i] << ",";
   }
-  this->unlock();
 }
 
 cedar::aux::DataPtr cedar::aux::MatData::clone() const
 {
-  lockForRead();
+  QReadLocker locker(this->mpLock);
   MatDataPtr cloned(new MatData(mData.clone()));
   unlock();
   return cloned;

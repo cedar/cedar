@@ -128,6 +128,9 @@ protected:
   //!@brief Parameter representing the plugin workspace.
   cedar::aux::DirectoryParameterPtr mPluginWorkspace;
 
+  //!@brief Parameter representing where recorded files will be saved.
+  cedar::aux::DirectoryParameterPtr mRecorderWorkspace;
+
   //!@brief List of directories to use when looking for plugins.
   cedar::aux::StringSetParameterPtr mPluginIncludeDirectories;
 

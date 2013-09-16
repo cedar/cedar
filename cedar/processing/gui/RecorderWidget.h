@@ -39,11 +39,11 @@
 #define RECORDERWIDGET_H_
 
 // CEDAR INCLUDES
-#include <cedar/processing/gui/namespace.h>
-#include <cedar/processing/Step.h>
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/Step.h"
 
 // SYSTEM INCLUDES
-#include <qwidget.h>
+#include <QWidget>
 #include <QVBoxLayout>
 
 /*!@brief GUI representation for the recorder tool.
