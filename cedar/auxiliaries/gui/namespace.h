@@ -61,8 +61,6 @@ namespace cedar
       CEDAR_DECLARE_DEPRECATED(typedef ObjectVisualizationWidget RigidBodyVisualizationWidget);
       CEDAR_DECLARE_AUX_CLASS(SceneWidget);
       CEDAR_DECLARE_AUX_CLASS(Viewer);
-      CEDAR_DECLARE_AUX_CLASS(RecorderWidget);
-      CEDAR_DECLARE_AUX_CLASS(RecorderProperty);
 
       class CEDAR_AUX_LIB_EXPORT PropertyPane;
       CEDAR_DECLARE_AUX_CLASS(Parameter);

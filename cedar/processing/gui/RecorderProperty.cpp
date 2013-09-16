@@ -42,7 +42,7 @@
 // SYSTEM INCLUDES
 #include <QLabel>
 
-cedar::aux::gui::RecorderProperty::RecorderProperty(const std::string& stepName, cedar::proc::DataSlotPtr slot)
+cedar::proc::gui::RecorderProperty::RecorderProperty(const std::string& stepName, cedar::proc::DataSlotPtr slot)
 {
   //Get slot porpertys.
   mStepName = stepName;
@@ -83,7 +83,7 @@ cedar::aux::gui::RecorderProperty::RecorderProperty(const std::string& stepName,
   
 }
 
-cedar::aux::gui::RecorderProperty::~RecorderProperty()
+cedar::proc::gui::RecorderProperty::~RecorderProperty()
 {  
   QLayoutItem *item;
   while((item = this->takeAt(0))) 
@@ -92,7 +92,7 @@ cedar::aux::gui::RecorderProperty::~RecorderProperty()
   }
 }
 
-void cedar::aux::gui::RecorderProperty::registerRecordData(int status)
+void cedar::proc::gui::RecorderProperty::registerRecordData(int status)
 {  
   if(status)
   {
@@ -109,7 +109,7 @@ void cedar::aux::gui::RecorderProperty::registerRecordData(int status)
   }   
 }
 
-void cedar::aux::gui::RecorderProperty::updateStepSize(int value)
+void cedar::proc::gui::RecorderProperty::updateStepSize(int value)
 {
   mStepSizeValue = (int)value;
   cedar::aux::RecorderSingleton::getInstance()->setRecordIntervalTime(mStepName+"_"+mName, (unsigned int)value);

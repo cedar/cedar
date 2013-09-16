@@ -28,26 +28,29 @@
     Email:       christian.bodenstein@ini.rub.de
     Date:        2013 08 19
 
-    Description: Header for the @em cedar::aux::gui::RecorderProperty class.
+    Description: Header for the @em cedar::aux::gui::RecorderWidget class.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef RECORDERPROPERTY_H_
-#define RECORDERPROPERTY_H_
+
+#ifndef RECORDERWIDGET_H_
+#define RECORDERWIDGET_H_
 
 // CEDAR INCLUDES
-#include <cedar/auxiliaries/gui/namespace.h>
-#include <cedar/auxiliaries/Data.h>
-#include <cedar/processing/DataSlot.h>
+#include <cedar/processing/gui/namespace.h>
+#include <cedar/processing/Step.h>
 
 // SYSTEM INCLUDES
-#include <QHBoxLayout>
-#include <QSpinBox>
-#include <QCheckBox>
+#include <qwidget.h>
+#include <QVBoxLayout>
 
-class cedar::aux::gui::RecorderProperty : public QHBoxLayout
+/*!@brief GUI representation for the recorder tool.
+  */
+class cedar::proc::gui::RecorderWidget
+:
+public QWidget
 {
   //----------------------------------------------------------------------------
   // macros
@@ -59,44 +62,58 @@ class cedar::aux::gui::RecorderProperty : public QHBoxLayout
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The public constructor.
-  RecorderProperty(const std::string& stepName, cedar::proc::DataSlotPtr slot);
+  RecorderWidget();
 
-  //!@brief The public destructor. 
-  ~RecorderProperty();
+  //!@brief The public constructor.
+  RecorderWidget( QWidget* pParent);
+
+  //!@brief The public destructor.
+  ~RecorderWidget();
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // public methods
+  //--------------------------------------------------------------------------------------------------------------------
+public slots:
+  //!@brief Sets the obtained step and recreating the widget to set the record parameters.
+  void setStep(cedar::proc::StepPtr step);
+ 
+  //!@brief Resets this widget
+  void resetContents();
+
+  //!@brief Unregister all slots of this step;
+  void unregister(cedar::proc::StepPtr pStep);
+
+  /*!@brief If the name of a Step has changed all slots have to unregister in the recoder and 
+   *registered with the new name.
+   */
+  void updateName();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-private slots:
-  //!@brief Register this slot in the recorder. 
-  void registerRecordData(int status);
+private:
+  //!@brief Updates the GUI.
+  void refreshWidget();
 
-  //!@brief Informs the recorder that the step size for this slot has changed. 
-  void updateStepSize(int value);
+  //!@brief Resets the widget and its GUI elements.
+  void clearLayout();
 
+  //!@brief Create the headers for the Widget.
+  void createHeader(const std::string& name);
+
+  //!@brief Create a header for a role section.
+  void createRoleSection(const std::string& name);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief the name of the step.
-  std::string mStepName;
+  //!@brief The step currently displayed.
+  cedar::proc::StepPtr mStepToConfigure;
 
-  //!@brief The name of the slot. 
-  std::string mName;
-
-  //!@brief A check box for register and unregister the slot.
-  QCheckBox* mCheckBox;
-
-  //!@brief A spin box to set the record interval of the slot.
-  QSpinBox* mStepSize; 
-
-  //!@brief The pointer to the data of the slot.
-  cedar::aux::ConstDataPtr mData;
-
-  //!@brief Stores the record interval of the slot. Is changed by the mStepSize spin box.
-  int mStepSizeValue;
+  //!@brief The layout for this widget.
+  QVBoxLayout* mMainLayout;
 
 };
 
-#endif /* RECORDERPROPERTY_H_ */
+#endif /* RECORDERWIDGET_H_ */

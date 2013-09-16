@@ -38,7 +38,7 @@
 #include "RecorderWidget.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/processing/DataSlot.h"
-#include "cedar/auxiliaries/gui/RecorderProperty.h"
+#include "cedar/processing/gui/RecorderProperty.h"
 #include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES
@@ -46,31 +46,31 @@
 #include <qlabel.h>
 #include <QSpinBox>
 #include <QHBoxLayout>
-cedar::aux::gui::RecorderWidget::RecorderWidget()
+cedar::proc::gui::RecorderWidget::RecorderWidget()
 {
   mMainLayout = new QVBoxLayout();
 }
 
-cedar::aux::gui::RecorderWidget::RecorderWidget( QWidget* pParent)
+cedar::proc::gui::RecorderWidget::RecorderWidget( QWidget* pParent)
 :
 QWidget(pParent)
 {
   mMainLayout = new QVBoxLayout();
 }
 
-cedar::aux::gui::RecorderWidget::~RecorderWidget()
+cedar::proc::gui::RecorderWidget::~RecorderWidget()
 {
   delete mMainLayout;
 }
 
 
-void cedar::aux::gui::RecorderWidget::setStep(cedar::proc::StepPtr step)
+void cedar::proc::gui::RecorderWidget::setStep(cedar::proc::StepPtr step)
 {
     this->mStepToConfigure = step;
     connect(step.get(), SIGNAL(nameChanged()), this, SLOT(updateName()));
     refreshWidget();
 }
-void cedar::aux::gui::RecorderWidget::refreshWidget()
+void cedar::proc::gui::RecorderWidget::refreshWidget()
 {
   //reset the widget
   clearLayout();
@@ -111,7 +111,7 @@ void cedar::aux::gui::RecorderWidget::refreshWidget()
   this->setLayout(this->mMainLayout);
 }
 
-void cedar::aux::gui::RecorderWidget::clearLayout()
+void cedar::proc::gui::RecorderWidget::clearLayout()
 { 
   QLayoutItem *item;
   while((item = mMainLayout->takeAt(0))!=0) 
@@ -125,13 +125,13 @@ void cedar::aux::gui::RecorderWidget::clearLayout()
   }
 }
 
-void cedar::aux::gui::RecorderWidget::resetContents()
+void cedar::proc::gui::RecorderWidget::resetContents()
 {
   //reset the widget
   clearLayout();
 }
 
-void cedar::aux::gui::RecorderWidget::createHeader(const std::string& name)
+void cedar::proc::gui::RecorderWidget::createHeader(const std::string& name)
 {  
   QHBoxLayout* stepNameLayout = new QHBoxLayout();
   //Create step name.
@@ -165,7 +165,7 @@ void cedar::aux::gui::RecorderWidget::createHeader(const std::string& name)
   mMainLayout->addLayout(spacerLayout);
 }
 
-void cedar::aux::gui::RecorderWidget::createRoleSection(const std::string& name)
+void cedar::proc::gui::RecorderWidget::createRoleSection(const std::string& name)
 {     
   QHBoxLayout* roleFontLayout = new QHBoxLayout();
 
@@ -181,7 +181,7 @@ void cedar::aux::gui::RecorderWidget::createRoleSection(const std::string& name)
 }
 
 
-void cedar::aux::gui::RecorderWidget::unregister(cedar::proc::StepPtr pStep)
+void cedar::proc::gui::RecorderWidget::unregister(cedar::proc::StepPtr pStep)
 {
   //unregister buffers
   if(mStepToConfigure->hasRole(cedar::proc::DataRole::BUFFER))
@@ -204,7 +204,7 @@ void cedar::aux::gui::RecorderWidget::unregister(cedar::proc::StepPtr pStep)
   }
 }
 
-void cedar::aux::gui::RecorderWidget::updateName()
+void cedar::proc::gui::RecorderWidget::updateName()
 {
   if (cedar::proc::Step *pStep = dynamic_cast<cedar::proc::Step*>(QObject::sender()))
   {

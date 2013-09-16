@@ -257,7 +257,7 @@
      <item>
       <widget class="QTabWidget" name="tabWidget_2">
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tab_2">
         <attribute name="title">
@@ -275,7 +275,7 @@
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
-          <widget class="cedar::aux::gui::RecorderWidget" name="mpRecorderWidget" native="true"/>
+          <widget class="cedar::proc::gui::RecorderWidget" name="mpRecorderWidget" native="true"/>
          </item>
         </layout>
        </widget>
@@ -597,9 +597,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>cedar::aux::gui::RecorderWidget</class>
+   <class>cedar::proc::gui::RecorderWidget</class>
    <extends>QWidget</extends>
-   <header>cedar/auxiliaries/gui/RecorderWidget.h</header>
+   <header>cedar/processing/gui/RecorderWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
