@@ -39,6 +39,7 @@
 #include "Recorder.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/ThreadWrapper.h"
+#include "cedar/processing/FrameworkSettings.h"
 
 // SYSTEM INCLUDES
 #include <list>
@@ -127,7 +128,8 @@ void cedar::aux::Recorder::unregisterData(cedar::aux::ConstDataPtr data)
 
 void cedar::aux::Recorder::createOutputDirectory()
 {
-  mOutputDirectory = QDateTime::currentDateTime().toString("yy.MM.dd hh-mm-ss").toStdString();
+  cedar::proc::FrameworkSettingsPtr settings = cedar::proc::FrameworkSettingsSingleton::getInstance();
+  mOutputDirectory = settings->getRecorderWorkspace() + "/" + QDateTime::currentDateTime().toString("yy.MM.dd hh-mm-ss").toStdString();
   boost::filesystem::create_directories(mOutputDirectory);
 }
 

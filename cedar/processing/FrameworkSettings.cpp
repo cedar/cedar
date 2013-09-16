@@ -93,7 +93,7 @@ cedar::aux::Configurable()
                            (
                              plugin_group.get(),
                              "recorderWorkspace",
-                              cedar::aux::getUserHomeDirectory() + "/cedar records/"
+                              cedar::aux::getUserHomeDirectory() + "/cedarRecords/"
                            )
                        );
 
@@ -170,6 +170,10 @@ const std::set<std::string>& cedar::proc::FrameworkSettings::getKnownPlugins() c
 const std::set<std::string>& cedar::proc::FrameworkSettings::getPluginDirectories() const
 {
   return this->mPluginIncludeDirectories->get();
+}
+std::string cedar::proc::FrameworkSettings::getRecorderWorkspace() const
+{
+  return this->mRecorderWorkspace->getValue().absolutePath().toStdString();
 }
 
 std::string cedar::proc::FrameworkSettings::getPluginWorkspace() const
