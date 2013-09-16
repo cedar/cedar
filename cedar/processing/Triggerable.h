@@ -44,11 +44,17 @@
 #include <QObject>
 #include <QReadWriteLock>
 #include <boost/signals2.hpp>
+#include <set>
 
 /*!@brief Interface for all classes that can be triggered.
  */
 class cedar::proc::Triggerable
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::Trigger;
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -84,7 +90,7 @@ public:
 public:
   /*!@brief handles an external trigger signal.
    * @param args arguments that should be passed to the Triggerable.
-   * @param pSender The trigger that sent the trigger signal.
+   * @param pSender The trigger that sent the trigger signal. If this is null, the trigger chain will be processed.
    */
   virtual void onTrigger
                (
@@ -140,6 +146,12 @@ public:
   //!@brief Waits for the trigger signal to be finished.
   virtual void waitForProcessing() = 0;
 
+  //! Returns true if there is at least one trigger triggering this triggerable.
+  inline bool isTriggered() const
+  {
+    return this->mTriggersListenedTo.size() > 0;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -174,6 +186,12 @@ private:
   //!@brief Method that gets called once by cedar::proc::LoopedTrigger after it stops.
   virtual void onStop();
 
+  //! Adds a trigger from the list of triggers triggering this triggerable.
+  void triggeredBy(cedar::proc::TriggerPtr trigger);
+
+  //! Removes a trigger from the list of triggers triggering this triggerable.
+  void noLongerTriggeredBy(cedar::proc::TriggerPtr trigger);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -183,6 +201,10 @@ protected:
 
   //!@brief If set, this is the trigger that triggers the step.
   cedar::proc::TriggerWeakPtr mParentTrigger;
+
+  //! The triggers this step is triggered by.
+  //!@todo Unify this with mParentTrigger
+  std::set<TriggerWeakPtr> mTriggersListenedTo;
 
   //!@brief current state of this step, taken from cedar::processing::Step::State
   State mState;
