@@ -37,7 +37,7 @@
        <attribute name="title">
         <string>architecture</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,0">
+       <layout class="QGridLayout" name="gridLayout_2" rowstretch="1">
         <property name="margin">
          <number>0</number>
         </property>
@@ -244,7 +244,7 @@
     <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>
    <property name="windowTitle">
-    <string>Properties</string>
+    <string>Settings</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -255,7 +255,31 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="cedar::proc::gui::PropertyPane" name="mpPropertyTable"/>
+      <widget class="QTabWidget" name="tabWidget_2">
+       <property name="currentIndex">
+        <number>1</number>
+       </property>
+       <widget class="QWidget" name="tab_2">
+        <attribute name="title">
+         <string>Properties</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_6">
+         <item>
+          <widget class="cedar::proc::gui::PropertyPane" name="mpPropertyTable"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab_3">
+        <attribute name="title">
+         <string>Recorder</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="cedar::proc::gui::RecorderWidget" name="mpRecorderWidget" native="true"/>
+         </item>
+        </layout>
+       </widget>
+      </widget>
      </item>
     </layout>
    </widget>
@@ -278,6 +302,8 @@
    <addaction name="separator"/>
    <addaction name="mpThreadsStartAll"/>
    <addaction name="mpThreadsStopAll"/>
+   <addaction name="separator"/>
+   <addaction name="mpActionRecord"/>
    <addaction name="separator"/>
    <addaction name="mpThreadsSingleStep"/>
    <addaction name="mpActionBoostControl"/>
@@ -527,6 +553,25 @@
     <string>closes all plots</string>
    </property>
   </action>
+  <action name="mpActionRecord">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../auxiliaries/gui/icons/cedar_aux_gui_icons.qrc">
+     <normaloff>:/cedar/auxiliaries/gui/record.svg</normaloff>
+     <normalon>:/cedar/auxiliaries/gui/recordStop.svg</normalon>
+     <activeoff>:/cedar/auxiliaries/gui/record.svg</activeoff>
+     <activeon>:/cedar/auxiliaries/gui/recordStop.svg</activeon>
+     <selectedon>:/cedar/auxiliaries/gui/recordStop.svg</selectedon>:/cedar/auxiliaries/gui/record.svg</iconset>
+   </property>
+   <property name="text">
+    <string>record</string>
+   </property>
+   <property name="toolTip">
+    <string notr="true">Record all registered slots.</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -549,6 +594,12 @@
    <class>cedar::aux::gui::Log</class>
    <extends>QWidget</extends>
    <header>cedar/auxiliaries/gui/Log.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>cedar::proc::gui::RecorderWidget</class>
+   <extends>QWidget</extends>
+   <header>cedar/processing/gui/RecorderWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
