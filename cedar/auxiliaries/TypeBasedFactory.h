@@ -94,7 +94,7 @@ private:
   {
     bool matches(KeyBasePtr pointer) const
     {
-      return boost::dynamic_pointer_cast<T>(pointer);
+      return !!boost::dynamic_pointer_cast<T>(pointer);
     }
   };
 
