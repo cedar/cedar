@@ -37,7 +37,7 @@
 #include <iostream>
 #include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/dynamics/fields/NeuralField.h"
-#include "cedar/auxiliaries/gui/RecorderWidget.h"
+#include "cedar/processing/gui/RecorderWidget.h"
 #include "qapplication.h"
 #include  <string>
 
@@ -48,7 +48,7 @@ void run_test()
 {
   errors = 1;
   cedar::dyn::NeuralFieldPtr field = boost::shared_ptr<cedar::dyn::NeuralField>(new cedar::dyn::NeuralField());
-  cedar::aux::gui::RecorderWidget recorder;
+  cedar::proc::gui::RecorderWidget recorder;
   recorder.setStep(field);
   errors = 0;
 }

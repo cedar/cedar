@@ -264,7 +264,7 @@ public:
 
   /*!@brief Sets the widget used for displaying/editing the record parameters.
    */
-  void setRecorderWidget(cedar::aux::gui::RecorderWidget *pRecorderWidget);
+  void setRecorderWidget(cedar::proc::gui::RecorderWidget *pRecorderWidget);
 
   /*!@brief Exports the scene to an svg file
    */
@@ -392,7 +392,7 @@ private:
   cedar::aux::gui::PropertyPane *mpConfigurableWidget;
 
   //! The widget used to display record settings of steps when they are selected in the scene. May be null.
-  cedar::aux::gui::RecorderWidget *mpRecorderWidget;
+  cedar::proc::gui::RecorderWidget *mpRecorderWidget;
 
 }; // class ProcessingScene
 

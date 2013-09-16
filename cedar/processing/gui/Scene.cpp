@@ -116,7 +116,7 @@ void cedar::proc::gui::Scene::setConfigurableWidget(cedar::aux::gui::PropertyPan
   this->mpConfigurableWidget = pConfigurableWidget;
 }
 
-void cedar::proc::gui::Scene::setRecorderWidget(cedar::aux::gui::RecorderWidget *pRecorderWidget)
+void cedar::proc::gui::Scene::setRecorderWidget(cedar::proc::gui::RecorderWidget *pRecorderWidget)
 {
   this->mpRecorderWidget = pRecorderWidget;
 }
