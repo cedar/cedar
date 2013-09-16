@@ -36,7 +36,7 @@
 
 
 // CEDAR INCLUDES
-#include "RecorderProperty.h"
+#include "cedar/processing/gui/RecorderProperty.h"
 #include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES
@@ -44,7 +44,7 @@
 
 cedar::proc::gui::RecorderProperty::RecorderProperty(const std::string& stepName, cedar::proc::DataSlotPtr slot)
 {
-  //Get slot porpertys.
+  //Get slot properties.
   mStepName = stepName;
   mName = slot->getName();
   mData = slot->getData();
@@ -70,16 +70,19 @@ cedar::proc::gui::RecorderProperty::RecorderProperty(const std::string& stepName
   mStepSize = new QSpinBox();
   mStepSize->setMaximum(1000);
   mStepSize->setMinimum(0);  
-  if(registered)
+  if (registered)
+  {
     mStepSize->setValue(cedar::aux::RecorderSingleton::getInstance()->getRecordIntervalTime(mStepName+"_"+mName));  
+  }
   else
+  {
     mStepSize->setValue(200); 
     mStepSizeValue= 200;
+  }
   mStepSize->setEnabled(registered);
   connect(mStepSize, SIGNAL(valueChanged(int)), this, SLOT(updateStepSize(int)));
+  mStepSize->setSuffix(" ms");
   this->addWidget(mStepSize);
-  QLabel* ms = new QLabel(QString("ms"));
-  this->addWidget(ms);
   
 }
 
@@ -112,5 +115,5 @@ void cedar::proc::gui::RecorderProperty::registerRecordData(int status)
 void cedar::proc::gui::RecorderProperty::updateStepSize(int value)
 {
   mStepSizeValue = (int)value;
-  cedar::aux::RecorderSingleton::getInstance()->setRecordIntervalTime(mStepName+"_"+mName, (unsigned int)value);
+  cedar::aux::RecorderSingleton::getInstance()->setRecordIntervalTime(mStepName+"_"+mName, static_cast<unsigned int>(value));
 }

@@ -87,6 +87,16 @@ cedar::aux::Configurable()
                           )
                         );
 
+  mRecorderWorkspace = cedar::aux::DirectoryParameterPtr
+                       (
+                           new cedar::aux::DirectoryParameter
+                           (
+                             plugin_group.get(),
+                             "recorderWorkspace",
+                              cedar::aux::getUserHomeDirectory() + "/cedar records/"
+                           )
+                       );
+
   try
   {
     this->load();

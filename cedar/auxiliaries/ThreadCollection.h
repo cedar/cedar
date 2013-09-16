@@ -82,11 +82,11 @@ public:
   void remove(int index);
 
   //!@brief Returns the number of Threads in the ThreadCollection.
-  unsigned int size();
+  unsigned int size() const;
 
   //!@brief Returns thread i of the ThreadCollection and cast it to T.
   template <typename T>
-  boost::shared_ptr<T> get(unsigned int index)
+  boost::shared_ptr<T> get(unsigned int index) const
   {
     QReadLocker locker(mpListLock);
     return boost::static_pointer_cast<T>(mThreads[index]);

@@ -43,7 +43,7 @@
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/ThreadCollection.h"
-#include "DataSpectator.h"
+#include "cedar/auxiliaries/DataSpectator.h"
 
 
 // SYSTEM INCLUDES
@@ -107,10 +107,10 @@ public:
   void setOutputDirectory(const std::string& path);
 
   //!@brief Gets the OutputDirectory
-  std::string getOutputDirectory();
+  std::string getOutputDirectory() const;
 
   //!@brief Returns the elapsed time in ms since the REcorder thread has been started.
-  int getTimeStamp();
+  int getTimeStamp() const;
 
   /*!@brief Change the record interval of 'name'
    *          If 'name' is not a registered it will throw an UnknownNameExeption.
@@ -120,22 +120,22 @@ public:
   /*!@brief Returns the specified record interval of the DataPtr 'name' in ms.
    *         It will return -1 if name was not registered
    */
-  int getRecordIntervalTime(const std::string& name);
+  unsigned int getRecordIntervalTime(const std::string& name) const;
 
 
 
   /*!@brief Returns the specified record interval of the DataPtr in ms.
    *         It will return -1 if name was not registered
    */
-  int getRecordIntervalTime(cedar::aux::ConstDataPtr data);
+  unsigned int getRecordIntervalTime(cedar::aux::ConstDataPtr data) const;
 
 
   //!@brief Checks if a DataPtr with a certain name is registered.
-  bool isRegistered(const std::string& name);
+  bool isRegistered(const std::string& name) const;
 
 
   //!@brief Checks if a DataPtr with a certain DataPtr is registered.
-  bool isRegistered(cedar::aux::ConstDataPtr data);
+  bool isRegistered(cedar::aux::ConstDataPtr data) const;
 
   //!@brief Changes the name of the DataPtr.
   void renameRegisteredData(cedar::aux::ConstDataPtr data, const std::string& newName);
@@ -191,10 +191,10 @@ private:
 namespace cedar
 {
   namespace aux
-    {
-      CEDAR_INSTANTIATE_PROC_TEMPLATE(cedar::aux::Singleton<Recorder>);
-      typedef cedar::aux::Singleton<Recorder> RecorderSingleton;
-    }
+  {
+    CEDAR_INSTANTIATE_PROC_TEMPLATE(cedar::aux::Singleton<Recorder>);
+    typedef cedar::aux::Singleton<Recorder> RecorderSingleton;
+  }
 }
 
 #endif // CEDAR_AUX_RECORDER_H

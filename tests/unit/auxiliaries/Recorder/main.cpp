@@ -34,12 +34,14 @@
 
 ======================================================================================================================*/
 
-#include <iostream>
-#include <cedar/processing/namespace.h>
-#include <cedar/auxiliaries/Recorder.h>
-#include <boost/shared_ptr.hpp>
+#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/Recorder.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/CallFunctionInThread.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
+
+#include <iostream>
+#include <boost/shared_ptr.hpp>
 #include  <string>
 
 unsigned int errors;
@@ -81,7 +83,7 @@ void run_test()
 
   //Start Recorder - wait 5 secs -stop Recorder
   cedar::aux::RecorderSingleton::getInstance()->start();
-  usleep(1000*1000*5);
+  cedar::aux::sleep(5);
   cedar::aux::RecorderSingleton::getInstance()->stop();
 
 

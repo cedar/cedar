@@ -52,7 +52,6 @@ cedar::aux::DataSpectator::DataSpectator(cedar::aux::ConstDataPtr toSpectate, in
   this->setStepSize(recordIntv);
   mName = name;
   mData = toSpectate;
-  QWriteLocker locker(mpOfstreamLock);
 }
 
 
@@ -122,7 +121,7 @@ void cedar::aux::DataSpectator::writeFirstRecordData()
     size = mDataQueue.size();
   }
 
-  if(size > 0)
+  if (size > 0)
   {
     // Save data to disk.
     recordData data;
@@ -136,7 +135,7 @@ void cedar::aux::DataSpectator::writeFirstRecordData()
       QWriteLocker locker(mpOfstreamLock);
       mOutputStream << data.mRecordTime << ",";
       data.mData->serializeData(mOutputStream);
-      mOutputStream   << std::endl;
+      mOutputStream << std::endl;
     }
   }
 }
@@ -148,7 +147,7 @@ void cedar::aux::DataSpectator::writeAllRecordData()
 
   QWriteLocker locker(mpQueueLock);
 
-  while(mDataQueue.size() > 0)
+  while (mDataQueue.size() > 0)
   {
     recordData data;
     data = mDataQueue.front();
@@ -157,7 +156,7 @@ void cedar::aux::DataSpectator::writeAllRecordData()
       QWriteLocker locker(mpOfstreamLock);
       mOutputStream << data.mRecordTime << ",";
       data.mData->serializeData(mOutputStream);
-      mOutputStream   << std::endl;
+      mOutputStream << std::endl;
     }
     mDataQueue.pop_front();
 

@@ -35,20 +35,21 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "RecorderWidget.h"
+#include "cedar/processing/gui/RecorderWidget.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/gui/RecorderProperty.h"
 #include "cedar/auxiliaries/Recorder.h"
 
 // SYSTEM INCLUDES
-#include <qcheckbox.h>
-#include <qlabel.h>
+#include <QCheckBox>
+#include <QLabel>
 #include <QSpinBox>
 #include <QHBoxLayout>
 cedar::proc::gui::RecorderWidget::RecorderWidget()
 {
   mMainLayout = new QVBoxLayout();
+  this->setLayout(this->mMainLayout);
 }
 
 cedar::proc::gui::RecorderWidget::RecorderWidget( QWidget* pParent)
@@ -56,6 +57,7 @@ cedar::proc::gui::RecorderWidget::RecorderWidget( QWidget* pParent)
 QWidget(pParent)
 {
   mMainLayout = new QVBoxLayout();
+  this->setLayout(this->mMainLayout);
 }
 
 cedar::proc::gui::RecorderWidget::~RecorderWidget()
@@ -108,7 +110,6 @@ void cedar::proc::gui::RecorderWidget::refreshWidget()
     }
   }
   mMainLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-  this->setLayout(this->mMainLayout);
 }
 
 void cedar::proc::gui::RecorderWidget::clearLayout()
@@ -133,51 +134,51 @@ void cedar::proc::gui::RecorderWidget::resetContents()
 
 void cedar::proc::gui::RecorderWidget::createHeader(const std::string& name)
 {  
-  QHBoxLayout* stepNameLayout = new QHBoxLayout();
+  QHBoxLayout* step_name_layout = new QHBoxLayout();
   //Create step name.
-  QLabel* stepName = new QLabel(QString(name.c_str()));
-  stepName->setFont(QFont("Arial", 12, QFont::Bold));
-  stepNameLayout->addWidget(stepName);
+  QLabel* step_name = new QLabel(QString(name.c_str()));
+  step_name->setFont(QFont("Arial", 12, QFont::Bold));
+  step_name_layout->addWidget(step_name);
 
-  mMainLayout->addLayout(stepNameLayout);
+  mMainLayout->addLayout(step_name_layout);
   
 
-  QHBoxLayout* rowHeaders = new QHBoxLayout();
+  QHBoxLayout* row_headers = new QHBoxLayout();
   //Create header for the slot names.
   QLabel* label = new QLabel(QString("Slot name"));
-  rowHeaders->addWidget(label);
+  row_headers->addWidget(label);
   
   //Create spacer.
   QWidget* empty= new QWidget();
   empty->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Maximum);  
-  rowHeaders->addWidget(empty);
+  row_headers->addWidget(empty);
 
   //Create row header for record time.
   QLabel* label2 = new QLabel(QString("Record interval"));
-  rowHeaders->addWidget(label2);
-  mMainLayout->addLayout(rowHeaders);
+  row_headers->addWidget(label2);
+  mMainLayout->addLayout(row_headers);
 
   //Create spacer row.
-  QHBoxLayout* spacerLayout = new QHBoxLayout();
+  QHBoxLayout* spacer_layout = new QHBoxLayout();
   QWidget* empty2= new QWidget();
   empty2->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Maximum);  
-  spacerLayout->addWidget(empty2);
-  mMainLayout->addLayout(spacerLayout);
+  spacer_layout->addWidget(empty2);
+  mMainLayout->addLayout(spacer_layout);
 }
 
 void cedar::proc::gui::RecorderWidget::createRoleSection(const std::string& name)
 {     
-  QHBoxLayout* roleFontLayout = new QHBoxLayout();
+  QHBoxLayout* role_font_layout = new QHBoxLayout();
 
   //Create role name.
-  QFont roleFont("Arial", 10);
-  roleFont.setUnderline(true);
-  roleFont.setBold(true);
-  QLabel* roleName = new QLabel(QString(name.c_str()));
-  roleName->setFont(roleFont);
-  roleFontLayout->addWidget(roleName);
+  QFont role_font("Arial", 10);
+  role_font.setUnderline(true);
+  role_font.setBold(true);
+  QLabel* role_name = new QLabel(QString(name.c_str()));
+  role_name->setFont(role_font);
+  role_font_layout->addWidget(role_name);
 
-  mMainLayout->addLayout(roleFontLayout);
+  mMainLayout->addLayout(role_font_layout);
 }
 
 
