@@ -444,7 +444,7 @@ public:
       template <class T>
       bool derivesFrom() const
       {
-        return !!boost::dynamic_pointer_cast<const T>(this->mProbeInstance);
+        return static_cast<bool>(boost::dynamic_pointer_cast<const T>(this->mProbeInstance));
       }
 
       /*!@brief Counts all nodes connected to this node (directly and transitively).
@@ -709,7 +709,7 @@ private:
        */
       bool matchesDerived(ConstRootTypePtr instance) const
       {
-        return !!boost::dynamic_pointer_cast<const T>(instance);
+        return static_cast<bool>(boost::dynamic_pointer_cast<const T>(instance));
       }
   };
 
