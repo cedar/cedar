@@ -83,6 +83,10 @@ namespace cedar
 
     template <class ClonedT, class ReturnedT> class Cloneable;
 
+    template <typename NodePayloadT = void*, typename EdgePayloadT = void*> class GraphTemplate;
+
+    typedef GraphTemplate<> Graph;
+
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(LogFile);
     CEDAR_DECLARE_AUX_CLASS(MatrixIterator);
