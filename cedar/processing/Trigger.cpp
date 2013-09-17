@@ -45,6 +45,7 @@
 #include "cedar/processing/Element.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/auxiliaries/GraphTemplate.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 
@@ -55,36 +56,6 @@
 
 // MACROS
 //#define DEBUG_TRIGGERING
-
-
-//----------------------------------------------------------------------------------------------------------------------
-// register the trigger class
-//----------------------------------------------------------------------------------------------------------------------
-
-// for now, we don't need to use the trigger as it is not useful (and just leads to confusion)
-//namespace
-//{
-//  bool declare()
-//  {
-//    using cedar::proc::ElementDeclarationPtr;
-//    using cedar::proc::ElementDeclarationTemplate;
-//
-//    ElementDeclarationPtr trigger_declaration
-//    (
-//      new ElementDeclarationTemplate<cedar::proc::Trigger>
-//      (
-//        "Triggers",
-//        "cedar.processing.Trigger"
-//      )
-//    );
-//    trigger_declaration->setIconPath(":/triggers/trigger.svg");
-//    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(trigger_declaration);
-//
-//    return true;
-//  }
-//
-//  bool declared = declare();
-//}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -118,8 +89,68 @@ cedar::proc::Trigger::~Trigger()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::proc::Triggerable*>& graph)
+{
+  // root node corresponding to this trigger
+  std::vector<cedar::proc::Triggerable*> to_explore;
+
+  auto this_node = graph.addNodeForPayload(this);
+
+  {
+    QReadLocker lock(&this->mpListenersLock);
+    for (auto iter = this->mListeners.begin(); iter != this->mListeners.end(); ++iter)
+    {
+      auto listener = *iter;
+      to_explore.push_back(listener.get());
+      auto listener_node = graph.addNodeForPayload(listener.get());
+      graph.addEdge(this_node, listener_node);
+    }
+  }
+
+  while(!to_explore.empty())
+  {
+    cedar::proc::Triggerable* source = to_explore.back();
+    to_explore.pop_back();
+
+    if (!graph.hasNodeForPayload(source))
+    {
+      graph.addNodeForPayload(source);
+    }
+
+    auto source_node = graph.getNodeByPayload(source);
+
+    // get the done trigger
+    cedar::proc::TriggerPtr done_trigger = source->getFinishedTrigger();
+
+    QReadLocker lock(&done_trigger->mpListenersLock);
+    // append all listeners of this step; they all have a distance of one, because they follow this step directly
+    for (auto iter = done_trigger->mListeners.begin(); iter != done_trigger->mListeners.end(); ++iter)
+    {
+      auto listener = *iter;
+      if (!graph.hasNodeForPayload(listener.get()))
+      {
+        graph.addNodeForPayload(listener.get());
+        to_explore.push_back(listener.get());
+      }
+
+      auto listener_node = graph.getNodeByPayload(listener.get());
+      graph.addEdge(source_node, listener_node);
+    }
+  }
+}
+
 void cedar::proc::Trigger::updateTriggeringOrder(bool recurseUp, bool recurseDown)
 {
+  // build the triggering graph for this trigger
+  cedar::aux::GraphTemplate<cedar::proc::Triggerable*> graph;
+  this->buildTriggerGraph(graph);
+
+  // test for cycle
+  if (graph.testForCycle())
+  {
+    CEDAR_ASSERT(false && "Cycle detected.");
+  }
+
   //!@todo Can this take pre-computed results from other triggers into account? Otherwise, multiple triggers might calculate the same thing over and over again.
   QReadLocker lock(&mpListenersLock);
   std::map<cedar::proc::TriggerablePtr, unsigned int> distance_map;
@@ -139,6 +170,8 @@ void cedar::proc::Trigger::updateTriggeringOrder(bool recurseUp, bool recurseDow
     // take out first element still to be explored
     cedar::proc::TriggerablePtr current = to_explore.back();
     to_explore.pop_back();
+
+    // determine the distance of the current element
     auto current_dist_iter = distance_map.find(current);
     CEDAR_DEBUG_ASSERT(current_dist_iter != distance_map.end());
     auto current_distance = current_dist_iter->second;
