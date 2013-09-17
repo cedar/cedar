@@ -1,4 +1,4 @@
-List of changes                                                                                             {#changelog}
+List of changes
 ===============
 
  <!--
