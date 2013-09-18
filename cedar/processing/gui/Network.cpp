@@ -178,6 +178,15 @@ cedar::proc::gui::Network::~Network()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::Network::duplicate(const QPointF& scenePos, const std::string& elementName, const std::string& newName)
+{
+  std::string new_name = this->getNetwork()->duplicate(elementName, newName);
+
+  auto duplicate = this->getNetwork()->getElement(new_name);
+  auto duplicate_ui = this->getScene()->getGraphicsItemFor(duplicate.get());
+  duplicate_ui->setPos(scenePos);
+}
+
 void cedar::proc::gui::Network::networkNameChanged()
 {
   this->mpNameDisplay->setPlainText(QString::fromStdString(this->getNetwork()->getName()));
