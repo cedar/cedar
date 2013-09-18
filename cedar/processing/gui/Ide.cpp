@@ -259,6 +259,10 @@ void cedar::proc::gui::Ide::exportSvg()
 
 void cedar::proc::gui::Ide::duplicateStep()
 {
+  // get current mouse position
+  QPoint mouse_pos = this->getArchitectureView()->mapFromGlobal(QCursor::pos());
+  QPointF new_pos = this->getArchitectureView()->mapToScene(mouse_pos);
+
   QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
   for (int i = 0; i < selected_items.size(); ++i)
   {
@@ -266,10 +270,11 @@ void cedar::proc::gui::Ide::duplicateStep()
     {
       try
       {
-        this->mNetwork->getNetwork()->duplicate(p_base->getElement()->getName());
+        this->mNetwork->duplicate(new_pos, p_base->getElement()->getName());
       }
       catch (cedar::aux::ExceptionBase& exc)
       {
+        //!@todo Properly display an error message to the user.
       }
     }
   }
