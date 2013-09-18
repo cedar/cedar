@@ -141,7 +141,7 @@ private:
     this->mpOwner = owner;
   }
 
-  void buildTriggerGraph(cedar::aux::GraphTemplate<cedar::proc::Triggerable*>& graph);
+  void buildTriggerGraph(cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

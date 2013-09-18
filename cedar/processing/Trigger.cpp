@@ -54,8 +54,6 @@
 #include <QWriteLocker>
 #include <algorithm>
 
-// MACROS
-//#define DEBUG_TRIGGERING
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -89,27 +87,29 @@ cedar::proc::Trigger::~Trigger()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::proc::Triggerable*>& graph)
+void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr>& graph)
 {
   // root node corresponding to this trigger
-  std::vector<cedar::proc::Triggerable*> to_explore;
+  std::vector<cedar::proc::TriggerablePtr> to_explore;
 
-  auto this_node = graph.addNodeForPayload(this);
+  auto this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
+
+  auto this_node = graph.addNodeForPayload(this_ptr);
 
   {
     QReadLocker lock(&this->mpListenersLock);
     for (auto iter = this->mListeners.begin(); iter != this->mListeners.end(); ++iter)
     {
       auto listener = *iter;
-      to_explore.push_back(listener.get());
-      auto listener_node = graph.addNodeForPayload(listener.get());
+      to_explore.push_back(listener);
+      auto listener_node = graph.addNodeForPayload(listener);
       graph.addEdge(this_node, listener_node);
     }
   }
 
   while(!to_explore.empty())
   {
-    cedar::proc::Triggerable* source = to_explore.back();
+    cedar::proc::TriggerablePtr source = to_explore.back();
     to_explore.pop_back();
 
     if (!graph.hasNodeForPayload(source))
@@ -127,13 +127,13 @@ void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::pr
     for (auto iter = done_trigger->mListeners.begin(); iter != done_trigger->mListeners.end(); ++iter)
     {
       auto listener = *iter;
-      if (!graph.hasNodeForPayload(listener.get()))
+      if (!graph.hasNodeForPayload(listener))
       {
-        graph.addNodeForPayload(listener.get());
-        to_explore.push_back(listener.get());
+        graph.addNodeForPayload(listener);
+        to_explore.push_back(listener);
       }
 
-      auto listener_node = graph.getNodeByPayload(listener.get());
+      auto listener_node = graph.getNodeByPayload(listener);
       graph.addEdge(source_node, listener_node);
     }
   }
@@ -142,69 +142,37 @@ void cedar::proc::Trigger::buildTriggerGraph(cedar::aux::GraphTemplate<cedar::pr
 void cedar::proc::Trigger::updateTriggeringOrder(bool recurseUp, bool recurseDown)
 {
   // build the triggering graph for this trigger
-  cedar::aux::GraphTemplate<cedar::proc::Triggerable*> graph;
+  cedar::aux::GraphTemplate<cedar::proc::TriggerablePtr> graph;
   this->buildTriggerGraph(graph);
 
   // test for cycle
   if (graph.testForCycle())
   {
+    //!@todo Fix & reenable this
     CEDAR_ASSERT(false && "Cycle detected.");
   }
 
-  //!@todo Can this take pre-computed results from other triggers into account? Otherwise, multiple triggers might calculate the same thing over and over again.
-  QReadLocker lock(&mpListenersLock);
-  std::map<cedar::proc::TriggerablePtr, unsigned int> distance_map;
-
-  std::vector<cedar::proc::TriggerablePtr> to_explore;
-
   // append all listeners of this step; they all have a distance of one, because they follow this step directly
-  for (auto iter = this->mListeners.begin(); iter != this->mListeners.end(); ++iter)
-  {
-    auto listener = *iter;
-    to_explore.push_back(listener);
-    distance_map[listener] = 1;
-  }
-
-  while (!to_explore.empty())
-  {
-    // take out first element still to be explored
-    cedar::proc::TriggerablePtr current = to_explore.back();
-    to_explore.pop_back();
-
-    // determine the distance of the current element
-    auto current_dist_iter = distance_map.find(current);
-    CEDAR_DEBUG_ASSERT(current_dist_iter != distance_map.end());
-    auto current_distance = current_dist_iter->second;
-
-    // iterate over all its done-listeners
-    cedar::proc::TriggerPtr done = current->getFinishedTrigger();
-
-    for (auto iter = done->mListeners.begin(); iter != done->mListeners.end(); ++iter)
-    {
-      auto done_listening = *iter;
-      auto dist_iter = distance_map.find(done_listening);
-
-      if (dist_iter == distance_map.end())
-      {
-        distance_map[done_listening] = current_distance + 1;
-      }
-      else
-      {
-        dist_iter->second = std::max(current_distance + 1, dist_iter->second);
-      }
-
-      //!@todo This might run into an infinite loop, but only if there is a cycle in the triggering anyway
-      to_explore.push_back(done_listening);
-    }
-  }
+  //!@todo Can this take results from other triggers into account? Otherwise, multiple triggers might calculate the same thing over and over again.
+  cedar::proc::TriggerPtr this_ptr = boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this());
+  auto this_node = graph.getNodeByPayload(this_ptr);
+  auto distances = graph.getMaximumDistance(this_node);
 
   // we (should) now have a map assigning a distance to all triggerables triggered by this trigger
   // now we need to transform it to a usable structures
   this->mTriggeringOrder.clear();
 
-  for (auto dist_iter = distance_map.begin(); dist_iter != distance_map.end(); ++dist_iter)
+  for (auto dist_iter = distances.begin(); dist_iter != distances.end(); ++dist_iter)
   {
-    auto triggerable = dist_iter->first;
+    auto node = dist_iter->first;
+    auto triggerable = node->getPayload();
+
+    // root node has no pointer
+    if (!triggerable)
+    {
+      continue;
+    }
+
     auto distance = dist_iter->second;
     auto iter = this->mTriggeringOrder.find(distance);
     if (iter == this->mTriggeringOrder.end())
@@ -222,10 +190,13 @@ void cedar::proc::Trigger::updateTriggeringOrder(bool recurseUp, bool recurseDow
   {
     for (auto iter = this->mListeners.begin(); iter != this->mListeners.end(); ++iter)
     {
-      auto listener = *iter;
+      cedar::proc::TriggerablePtr listener = *iter;
 
-      cedar::proc::TriggerPtr done = listener->getFinishedTrigger();
-      done->updateTriggeringOrder(false, true);
+      if (listener->mFinished)
+      {
+        cedar::proc::TriggerPtr done = listener->mFinished;
+        done->updateTriggeringOrder(false, true);
+      }
     }
   }
 
@@ -265,18 +236,6 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
       triggerable->onTrigger(arguments, this_ptr);
     }
   }
-//
-//  for (size_t i = 0; i < this->mListeners.size(); ++i)
-//  {
-//#ifdef DEBUG_TRIGGERING
-//        std::cout << "Trigger " << this->getName() << " triggers " << this->mListeners.at(i)->getName() << std::endl;
-//#endif // DEBUG_TRIGGERING
-//    this->mListeners.at(i)->onTrigger
-//                            (
-//                              arguments,
-//                              boost::static_pointer_cast<cedar::proc::Trigger>(this->shared_from_this())
-//                            );
-//  }
 }
 
 void cedar::proc::Trigger::onTrigger(cedar::proc::ArgumentsPtr, cedar::proc::TriggerPtr)
@@ -294,6 +253,8 @@ void cedar::proc::Trigger::addListener(cedar::proc::TriggerablePtr triggerable)
   {
     this->mListeners.push_back(triggerable);
     triggerable->triggeredBy(this_ptr);
+    
+    //!@todo Can this be removed (because MultiTriggers don't exist anymore)
     if (cedar::proc::TriggerPtr trigger = boost::dynamic_pointer_cast<cedar::proc::Trigger>(triggerable))
     {
       trigger->notifyConnected(this_ptr);

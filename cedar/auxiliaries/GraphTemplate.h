@@ -184,25 +184,22 @@ public:
     return node;
   }
 
+  /*!@brief Tests for cycles in the graph.
+   */
   bool testForCycle() const
   {
-    for (auto iter = this->mNodesById.begin(); iter != this->mNodesById.end(); ++iter)
-    {
-      NodePtr node = iter->second;
+    // determine strongly connected components
+    std::vector<std::set<NodePtr> > strongly_connected_components = tarjan();
 
-      if (this->testNodeForCylce(node))
+    // per definition, if all strongly connected components consist of only one node, the graph is acyclic
+    for (auto iter = strongly_connected_components.begin(); iter != strongly_connected_components.end(); ++iter)
+    {
+      if (iter->size() > 1)
       {
         return true;
       }
     }
-
     return false;
-  }
-
-  bool testNodeForCylce(NodePtr fromNode) const
-  {
-    std::set<NodePtr> visited;
-    return this->testNodeForCylce(fromNode, visited);
   }
 
   std::vector<NodePtr> getDirectSuccessors(NodePtr source) const
@@ -235,7 +232,134 @@ public:
 
     std::vector<NodePtr> to_explore;
 
+    // initialize
+    to_explore.push_back(from);
+    distances[from] = 0;
+
+    while (!to_explore.empty())
+    {
+      // take out first element still to be explored
+      NodePtr current = to_explore.back();
+      to_explore.pop_back();
+
+      // determine the distance of the current element
+      auto current_dist_iter = distances.find(current);
+      CEDAR_DEBUG_ASSERT(current_dist_iter != distances.end());
+      auto current_distance = current_dist_iter->second;
+
+      // iterate over all its direct successors
+      auto successors = this->getDirectSuccessors(current);
+      for (auto iter = successors.begin(); iter != successors.end(); ++iter)
+      {
+        auto successor = *iter;
+        auto dist_iter = distances.find(successor);
+
+        if (dist_iter == distances.end())
+        {
+          distances[successor] = current_distance + 1;
+        }
+        else
+        {
+          dist_iter->second = std::max(current_distance + 1, dist_iter->second);
+        }
+
+        to_explore.push_back(successor);
+      }
+    }
+
     return distances;
+  }
+
+  /*! @brief  Implements Tarjan's algorithm for separating the graph's strongly connected components.
+   *
+   * @return  A list of sets of nodes, where each set is a strongly connected component.
+   *
+   * @remarks If each strongly connected component contains one node, the graph is acyclic.
+   *
+   * @see     http://en.wikipedia.org/wiki/Tarjan%E2%80%99s_strongly_connected_components_algorithm#The_algorithm_in_pseudocode
+   */
+  std::vector<std::set<NodePtr> > tarjan() const
+  {
+    std::vector<std::set<NodePtr> > strongly_connected_components;
+
+    unsigned int index = 0;
+    std::map<NodePtr, unsigned int> node_index;
+    std::map<NodePtr, unsigned int> low_link;
+    std::vector<NodePtr> node_stack;
+
+    for (auto node_iter = this->mNodesById.begin(); node_iter != this->mNodesById.end(); ++node_iter)
+    {
+      NodePtr node = node_iter->second;
+
+      if (node_index.find(node) == node_index.end())
+      {
+        this->tarjanStrongconnect(node, index, node_index, low_link, node_stack, strongly_connected_components);
+      }
+    }
+
+    return strongly_connected_components;
+  }
+
+  /*! A helper function for Tarjan's algorithm.
+   *
+   * @see     http://en.wikipedia.org/wiki/Tarjan%E2%80%99s_strongly_connected_components_algorithm#The_algorithm_in_pseudocode
+   */
+  void tarjanStrongconnect
+      (
+        NodePtr node,
+        unsigned int& index,
+        std::map<NodePtr, unsigned int>& nodeIndex,
+        std::map<NodePtr, unsigned int>& lowLink,
+        std::vector<NodePtr>& nodeStack,
+        std::vector<std::set<NodePtr> >& stronglyConnectedComponents
+      )
+      const
+  {
+    nodeIndex[node] = index;
+    lowLink[node] = index;
+    index += 1;
+    nodeStack.push_back(node);
+
+    auto successors = this->getDirectSuccessors(node);
+
+    for (auto suc_iter = successors.begin(); suc_iter != successors.end(); ++suc_iter)
+    {
+      NodePtr successor = *suc_iter;
+
+      auto node_index_iter = nodeIndex.find(successor);
+      if (node_index_iter == nodeIndex.end())
+      {
+        // calculate strongly connected components of successor
+        tarjanStrongconnect(successor, index, nodeIndex, lowLink, nodeStack, stronglyConnectedComponents);
+
+        CEDAR_DEBUG_ASSERT(lowLink.find(successor) != lowLink.end());
+        lowLink[node] = std::min(lowLink[node], lowLink[successor]);
+      }
+      else
+      {
+        // see if the successor is already in the node stack
+        auto iter = std::find(nodeStack.begin(), nodeStack.end(), successor);
+        if (iter != nodeStack.end())
+        {
+          CEDAR_DEBUG_ASSERT(nodeIndex.find(successor) != nodeIndex.end());
+          lowLink[node] = std::min(lowLink[node], nodeIndex[successor]);
+        }
+      }
+    }
+
+    if (lowLink[node] == nodeIndex[node])
+    {
+      // start new strongly connected component
+      stronglyConnectedComponents.push_back(std::set<NodePtr>());
+
+      NodePtr top;
+      while (top != node)
+      {
+        top = nodeStack.back();
+        nodeStack.pop_back();
+        stronglyConnectedComponents.back().insert(top);
+      }
+    }
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -302,31 +426,6 @@ private:
     //!@todo Throw node not in graph exception
     CEDAR_ASSERT(iter != this->mIdsByNode.end());
     return iter->second;
-  }
-
-  bool testNodeForCylce(NodePtr fromNode, std::set<NodePtr>& visited) const
-  {
-    std::vector<NodePtr> successors = this->getDirectSuccessors(fromNode);
-
-    for (size_t i = 0; i < successors.size(); ++i)
-    {
-      NodePtr successor = successors.at(i);
-
-      // if the node was already visited, we found a cycle
-      if (visited.find(successor) != visited.end())
-      {
-        return true;
-      }
-
-      visited.insert(successor);
-
-      if (this->testNodeForCylce(successor, visited))
-      {
-        return true;
-      }
-    }
-
-    return false;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
