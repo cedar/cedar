@@ -156,6 +156,13 @@ public:
   :
   mExceptionInfos(exception_infos)
   {
+    std::string message = "One or more exceptions occurred while loading the architecture. They are:";
+    for (size_t i = 0; i < this->mExceptionInfos.size(); ++i)
+    {
+      message += "\n";
+      message += this->mExceptionInfos.at(i);
+    }
+    this->setMessage(message);
   }
 
   //! destructor that ensure that no exception is thrown
