@@ -42,6 +42,7 @@
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/gui/Settings.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/casts.h"
@@ -159,6 +160,11 @@ bool cedar::proc::gui::Connection::isTriggerConnection() const
 void cedar::proc::gui::Connection::setHighlightedBySelection(bool highlight)
 {
   mHighlight = highlight;
+
+  if (!cedar::proc::gui::SettingsSingleton::getInstance()->getHighlightConnections())
+  {
+    return;
+  }
 
   QColor col;
   if (highlight)
@@ -381,7 +387,7 @@ QColor cedar::proc::gui::Connection::highlightColor(const QColor& source) const
       (
         std::fmod(source.hsvHueF() + 0.01, 1.0),
         std::max(0.0, source.hsvSaturationF()),
-        std::max(0.0, source.valueF() - 0.4)
+        std::max(0.0, source.valueF() - 0.2)
       );
 }
 
@@ -391,7 +397,7 @@ void cedar::proc::gui::Connection::paint(QPainter *pPainter, const QStyleOptionG
 
   QPen pen = this->pen();
 
-  if (this->mHighlight)
+  if (this->mHighlight && cedar::proc::gui::SettingsSingleton::getInstance()->getHighlightConnections())
   {
     QColor new_color = this->highlightColor(pen.color());
 

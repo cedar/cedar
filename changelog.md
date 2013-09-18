@@ -139,6 +139,8 @@ current testing
     tools -> settings -> user interface menu of the processingIde.
   - Please note that step icons can now only have the svg format. If you have an icon in a different format, please
     embed it in a svg file using, e.g., inkscape.
+  - Connections of selected steps in the processingIde are now hightlighted. This behavior is active by default and can
+    be disabled in the settings menu.
 
 - cedar::dyn
   - The SpaceToRateCode step is now stable in any situation (i.e., for any time scale > 0, for any kind of input.)   
