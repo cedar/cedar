@@ -188,18 +188,26 @@ public:
    */
   bool testForCycle() const
   {
+    return !(this->getCycleComponents().empty());
+  }
+
+  /*! Returns a list of all the strongly connected components with more than one node (i.e., all cycles)
+   */
+  std::vector<std::set<NodePtr> > getCycleComponents()
+  {
     // determine strongly connected components
     std::vector<std::set<NodePtr> > strongly_connected_components = tarjan();
+    std::vector<std::set<NodePtr> > cycles;
 
     // per definition, if all strongly connected components consist of only one node, the graph is acyclic
     for (auto iter = strongly_connected_components.begin(); iter != strongly_connected_components.end(); ++iter)
     {
       if (iter->size() > 1)
       {
-        return true;
+        cycles.push_back(*iter);
       }
     }
-    return false;
+    return cycles;
   }
 
   std::vector<NodePtr> getDirectSuccessors(NodePtr source) const

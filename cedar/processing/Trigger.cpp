@@ -146,10 +146,22 @@ void cedar::proc::Trigger::updateTriggeringOrder(bool recurseUp, bool recurseDow
   this->buildTriggerGraph(graph);
 
   // test for cycle
-  if (graph.testForCycle())
+  auto cycles = graph.getCycleComponents();
+  if (!cycles.empty())
   {
-    //!@todo Fix & reenable this
-    CEDAR_ASSERT(false && "Cycle detected.");
+    std::vector<std::set<cedar::proc::TriggerablePtr> > triggerable_cycles;
+    triggerable_cycles.resize(cycles.size());
+    for (size_t i = 0; i < cycles.size(); ++i)
+    {
+      for (auto iter = cycles.at(i).begin(); iter != cycles.at(i).end(); ++iter)
+      {
+        auto node = *iter;
+        triggerable_cycles.at(i).insert(node->getPayload());
+      }
+    }
+
+    cedar::proc::TriggerCycleException exception(triggerable_cycles);
+    CEDAR_THROW_EXCEPTION(exception);
   }
 
   // append all listeners of this step; they all have a distance of one, because they follow this step directly
