@@ -397,7 +397,12 @@ void cedar::proc::gui::Connection::paint(QPainter *pPainter, const QStyleOptionG
 
   QPen pen = this->pen();
 
-  if (this->mHighlight && cedar::proc::gui::SettingsSingleton::getInstance()->getHighlightConnections())
+  if
+  (
+    !this->isSelected()
+    && this->mHighlight
+    && cedar::proc::gui::SettingsSingleton::getInstance()->getHighlightConnections()
+  )
   {
     QColor new_color = this->highlightColor(pen.color());
 
