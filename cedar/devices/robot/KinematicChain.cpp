@@ -43,7 +43,7 @@
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/math/constants.h"
-#include "cedar/processing/exceptions.h" // for DuplicateNameException
+#include "cedar/auxiliaries/exceptions.h" // for DuplicateNameException
 
 // SYSTEM INCLUDES
 #include <boost/lexical_cast.hpp>
@@ -1172,7 +1172,7 @@ void cedar::dev::robot::KinematicChain::addInitialConfiguration(const std::strin
   auto found = mInitialConfigurations.find(name);
   if (found != mInitialConfigurations.end())
   {
-    CEDAR_THROW( cedar::proc::DuplicateNameException , 
+    CEDAR_THROW( cedar::aux::DuplicateNameException,
                  "You are adding the initial configuration name '"
                    + name + "' which already exists. Delete it first." );
   }
