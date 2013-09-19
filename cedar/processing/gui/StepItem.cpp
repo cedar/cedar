@@ -540,6 +540,11 @@ void cedar::proc::gui::StepItem::readConfiguration(const cedar::aux::Configurati
     std::string style = style_iter->second.get_value<std::string>();
     this->setDisplayMode(cedar::proc::gui::StepItem::DisplayMode::type().get(style));
   }
+  else
+  {
+    // apply settings for the currently selected (default) display mode
+    this->setDisplayMode(this->mDisplayMode);
+  }
 }
 
 void cedar::proc::gui::StepItem::writeConfiguration(cedar::aux::ConfigurationNode& root) const
