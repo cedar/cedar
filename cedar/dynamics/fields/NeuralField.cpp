@@ -500,9 +500,6 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   const double& h = mRestingLevel->getValue();
   const double& tau = mTau->getValue();
   const double& global_inhibition = mGlobalInhibition->getValue();
-  // having a pointer to the convolution in the same scope as the reference prevents the object from being deleted.
-  cedar::aux::conv::ConvolutionPtr convolution_ptr = this->getConvolution();
-  cedar::aux::conv::Convolution& lateral_convolution = *convolution_ptr;
 
   boost::shared_ptr<QReadLocker> activation_read_locker;
   if (this->activationIsOutput())
@@ -517,6 +514,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   {
     cv::randn(neural_noise, cv::Scalar(0), cv::Scalar(1));
     neural_noise = this->_mNoiseCorrelationKernelConvolution->convolve(neural_noise);
+
     //!@todo not sure, if dividing time by 1000 (which is an implicit tau) makes any sense or should be a parameter
     //!@todo not sure what sqrt(time) does here (i.e., within the sigmoid); check if this is correct, and, if so, explain it
     sigmoid_u = _mSigmoid->getValue()->compute<float>
@@ -534,7 +532,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   sigmoid_u_lock.unlock();
 
   QReadLocker sigmoid_u_readlock(&this->mSigmoidalActivation->getLock());
-  lateral_interaction = lateral_convolution(sigmoid_u);
+  lateral_interaction = this->_mLateralKernelConvolution->convolve(sigmoid_u);
 
   this->updateInputSum();
 
