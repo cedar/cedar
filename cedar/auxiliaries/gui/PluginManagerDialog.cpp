@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/PluginManagerDialog.h"
+#include "cedar/auxiliaries/gui/PluginLoadDialog.h"
 #include "cedar/auxiliaries/gui/Settings.h"
 #include "cedar/auxiliaries/SetParameter.h"
 #include "cedar/auxiliaries/Settings.h"
@@ -74,6 +75,14 @@ QDialog(pParent)
   (
     boost::bind(&cedar::aux::gui::PluginManagerDialog::removePluginSearchPathIndex, this, _1)
   );
+
+
+  QObject::connect(this->mpAddPluginBtn, SIGNAL(clicked()), this, SLOT(addPluginClicked()));
+
+  cedar::aux::SettingsSingleton::getInstance()->connectToPluginAddedSignal
+  (
+    boost::bind(&cedar::aux::gui::PluginManagerDialog::addPlugin, this, _1)
+  );
 }
 
 
@@ -84,8 +93,8 @@ QDialog(pParent)
 void cedar::aux::gui::PluginManagerDialog::populate()
 {
   // restore plugins to load from the settings
-  const std::set<std::string>& plugins_to_load = cedar::aux::SettingsSingleton::getInstance()->pluginsToLoad();
-  for (std::set<std::string>::const_iterator iter = plugins_to_load.begin(); iter != plugins_to_load.end(); ++iter)
+  auto known_plugins = cedar::aux::SettingsSingleton::getInstance()->getKnownPlugins();
+  for (auto iter = known_plugins.begin(); iter != known_plugins.end(); ++iter)
   {
     this->addPlugin(*iter);
   }
@@ -121,27 +130,36 @@ void cedar::aux::gui::PluginManagerDialog::removePluginSearchPath(const std::str
   }
 }
 
-void cedar::aux::gui::PluginManagerDialog::addPlugin(const std::string& path)
+void cedar::aux::gui::PluginManagerDialog::addPluginClicked()
 {
-  const std::set<std::string>& plugins_to_load = cedar::aux::SettingsSingleton::getInstance()->pluginsToLoad();
+  auto p_dialog = new cedar::aux::gui::PluginLoadDialog(this);
+  int r = p_dialog->exec();
 
+  if (r == QDialog::Accepted)
+  {
+    cedar::aux::SettingsSingleton::getInstance()->addPlugin(p_dialog->plugin());
+  }
+
+  delete p_dialog;
+}
+
+void cedar::aux::gui::PluginManagerDialog::addPlugin(const std::string& plugin)
+{
   int row = this->mpPluginList->rowCount();
   this->mpPluginList->insertRow(row);
 
   QCheckBox* p_cb = new QCheckBox();
-  p_cb->setChecked(plugins_to_load.find(path) != plugins_to_load.end());
+  p_cb->setChecked(cedar::aux::SettingsSingleton::getInstance()->isPluginLoadedOnStartup(plugin));
   this->mpPluginList->setCellWidget(row, 0, p_cb);
 
-  QCheckBox* p_delete = new QCheckBox();
-  p_delete->setChecked(false);
-  QObject::connect(p_delete, SIGNAL(stateChanged(int)), this, SLOT(toggleDeleteButton()));
-  this->mpPluginList->setCellWidget(row, 1, p_delete);
+  QLabel* p_name = new QLabel(QString::fromStdString(plugin));
+  this->mpPluginList->setCellWidget(row, 1, p_name);
 
-  QLabel* p_name = new QLabel();
-  this->mpPluginList->setCellWidget(row, 2, p_name);
-
+  //!@todo Add path that is found by the plugin system, update if search paths are changed.
+  /*
   QLabel* p_path = new QLabel(path.c_str());
-  this->mpPluginList->setCellWidget(row, 3, p_path);
+  this->mpPluginList->setCellWidget(row, 2, p_path);
+  */
 }
 
 void cedar::aux::gui::PluginManagerDialog::removePlugins()

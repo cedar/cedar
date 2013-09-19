@@ -40,6 +40,7 @@
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/PluginDeclarationList.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/configuration.h"
 
 // SYSTEM INCLUDES
@@ -92,12 +93,51 @@ cedar::aux::PluginProxy::~PluginProxy()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::string cedar::aux::PluginProxy::getNormalizedSearchPath() const
+{
+  boost::filesystem::path plugin_path(this->mFileName);
+
+  std::string path = plugin_path.parent_path()
+
+#if (BOOST_VERSION / 100 % 1000 >= 46) // there was an interface change in boost
+                      .string()
+#endif
+                      ;
+
+  std::vector<std::string> subpaths_to_remove;
+  subpaths_to_remove.push_back(this->getPluginName());
+  subpaths_to_remove.push_back("build");
+  subpaths_to_remove.push_back("/");
+
+  for (auto iter = subpaths_to_remove.begin(); iter != subpaths_to_remove.end(); )
+  {
+    const std::string& subpath = *iter;
+    if (cedar::aux::endsWith(path, subpath))
+    {
+      path = path.substr(0, path.length() - subpath.length());
+      // restart search
+      iter = subpaths_to_remove.begin();
+    }
+    else
+    {
+      ++iter;
+    }
+  }
+
+  return path;
+}
+
 void cedar::aux::PluginProxy::declare()
 {
   if (this->getDeclaration())
   {
     this->getDeclaration()->declareAll();
   }
+}
+
+std::string cedar::aux::PluginProxy::getPluginName() const
+{
+  return cedar::aux::PluginProxy::getPluginNameFromPath(this->mFileName);
 }
 
 std::string cedar::aux::PluginProxy::getPluginNameFromPath(const std::string& path)

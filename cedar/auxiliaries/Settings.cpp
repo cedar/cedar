@@ -64,6 +64,13 @@ _mMemoryDebugOutput(new cedar::aux::BoolParameter(this, "memory debug output", f
                             (std::set<std::string>())
                           );
 
+  this->_mKnownPlugins = new cedar::aux::StringSetParameter
+                         (
+                           plugins.get(),
+                           "list",
+                           (std::set<std::string>())
+                         );
+
   this->_mPluginSearchPaths = new cedar::aux::StringVectorParameter
                               (
                                 plugins.get(),
@@ -105,6 +112,35 @@ cedar::aux::Settings::~Settings()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+const std::set<std::string>& cedar::aux::Settings::getKnownPlugins() const
+{
+  return this->_mKnownPlugins->get();
+}
+
+void cedar::aux::Settings::addPlugin(cedar::aux::PluginProxyPtr plugin)
+{
+  std::string search_path = plugin->getNormalizedSearchPath();
+
+  if (!this->_mPluginSearchPaths->contains(search_path))
+  {
+    cedar::aux::LogSingleton::getInstance()->message
+    (
+      "Plugin \"" + plugin->getPluginName() + "\" was not found in the current search paths. Adding its path.",
+      "cedar::aux::Settings::addPlugin(cedar::aux::PluginProxyPtr)"
+    );
+    this->addPluginSearchPath(search_path);
+  }
+
+  this->_mKnownPlugins->insert(plugin->getPluginName());
+  this->mPluginAddedSignal(plugin->getPluginName());
+}
+
+bool cedar::aux::Settings::isPluginLoadedOnStartup(const std::string& pluginName) const
+{
+  return this->_mPluginsToLoad->contains(pluginName);
+}
+
 
 void cedar::aux::Settings::loadDefaultPlugins()
 {

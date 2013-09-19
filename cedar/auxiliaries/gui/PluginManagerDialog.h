@@ -83,7 +83,7 @@ private:
 
   /*!@brief Adds a plugin to the list.
    */
-  void addPlugin(const std::string& path);
+  void addPlugin(const std::string& plugin);
 
   void addPluginSearchPath(const std::string& path);
 
@@ -103,6 +103,8 @@ private slots:
 
   //! Reacts to a click on the "remove" button in the search paths tab.
   void removeSearchPathClicked();
+
+  void addPluginClicked();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
