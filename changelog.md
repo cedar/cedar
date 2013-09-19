@@ -67,6 +67,7 @@ known issues
   - Some of the interactive Caren tests may not run if you do not have the corresponding meshes.
   - Toggling the smart connections mode doesn't improve trigger connections. In fact, they are more strange than in
     standard mode. For now, triggers and their strange connections can be hidden with Ctrl+T during smart mode.
+  - Using the field plot and switching dimensionality might lead to messed up plots. Please reopen the field plot.
       
 Unreleased changes
 ==================
