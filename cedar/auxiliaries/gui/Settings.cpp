@@ -37,9 +37,11 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/Settings.h"
 #include "cedar/auxiliaries/systemFunctions.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/filesystem.hpp>
 #include <QMainWindow>
 
 //----------------------------------------------------------------------------------------------------------------------

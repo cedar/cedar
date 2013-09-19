@@ -82,6 +82,12 @@ public:
   //!@brief get declaration of this proxy
   cedar::aux::PluginDeclarationListPtr getDeclaration();
 
+  //! Returns the name of the plugin.
+  std::string getPluginName() const;
+
+  //! Returns the normalized search path to be used for this plugin.
+  std::string getNormalizedSearchPath() const;
+
   /*!@brief Returns the canonical name of a plugin based on its filepath
    */
   static std::string getPluginNameFromPath(const std::string& path);

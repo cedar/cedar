@@ -89,6 +89,9 @@ public:
   //! Returns the plugins search paths.
   const std::vector<std::string>& getPluginSearchPaths() const;
 
+  //! Returns a list of known plugins
+  const std::set<std::string>& getKnownPlugins() const;
+
   //! Adds a plugin search path.
   void addPluginSearchPath(const std::string& path);
 
@@ -107,6 +110,9 @@ public:
   //! Loads the plugins set to be loaded by default.
   void loadDefaultPlugins();
 
+  //! Returns true if the plugin is loaded on startup, false otherwise.
+  bool isPluginLoadedOnStartup(const std::string& pluginName) const;
+
   //! Connect to search path added signal
   boost::signals2::connection connectToPluginSearchPathAddedSignal(boost::function<void (const std::string&)> slot)
   {
@@ -124,6 +130,15 @@ public:
   {
     return this->mSearchPathIndexRemovedSignal.connect(slot);
   }
+
+  //! Connect to plugin added signal
+  boost::signals2::connection connectToPluginAddedSignal(boost::function<void (const std::string&)> slot)
+  {
+    return this->mPluginAddedSignal.connect(slot);
+  }
+
+  //! Adds a plugin specified by the given path.
+  void addPlugin(cedar::aux::PluginProxyPtr plugin);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -149,6 +164,8 @@ private:
 
   boost::signals2::signal<void (size_t)> mSearchPathIndexRemovedSignal;
 
+  boost::signals2::signal<void (const std::string&)> mPluginAddedSignal;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -158,6 +175,9 @@ protected:
 
   //!@brief List of plugins that should be loaded on startup.
   cedar::aux::StringSetParameterPtr _mPluginsToLoad;
+
+  //!@brief List of plugins known to the system.
+  cedar::aux::StringSetParameterPtr _mKnownPlugins;
 
   //! List of all the directories to search for plugins.
   cedar::aux::StringVectorParameterPtr _mPluginSearchPaths;
