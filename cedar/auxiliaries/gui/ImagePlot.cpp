@@ -610,6 +610,10 @@ cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix, bool limits,
         break;
     }
   }
+  else
+  {
+    in_converted = matrix;
+  }
 
   cv::Mat converted = cv::Mat(matrix.rows, matrix.cols, CV_8UC3);
 
@@ -631,7 +635,7 @@ cv::Mat cedar::aux::gui::ImagePlot::colorizedMatrix(cv::Mat matrix, bool limits,
     }
   }
 
-  if (!limits)
+  if (limits)
   {
     cv::Mat min_vals = (matrix < min);
     cv::Mat max_vals = (matrix > max);
@@ -721,7 +725,7 @@ cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) con
         min = this->mValueLimits.getLower();
         max = this->mValueLimits.getUpper();
       }
-      return cedar::aux::gui::ImagePlot::colorizedMatrix(in, this->mAutoScaling, min, max);
+      return cedar::aux::gui::ImagePlot::colorizedMatrix(in, !this->mAutoScaling, min, max);
     }
   }
 }
