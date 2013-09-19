@@ -57,6 +57,7 @@
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/CallFunctionInThread.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
@@ -417,6 +418,22 @@ void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
   this->mNetwork->addElementsToScene();
   this->mpPropertyTable->resetContents();
 
+  this->mStartThreadsCaller = cedar::aux::CallFunctionInThreadPtr
+      (
+        new cedar::aux::CallFunctionInThread
+        (
+          boost::bind(&cedar::proc::Network::startTriggers, this->mNetwork->getNetwork(), true)
+        )
+      );
+
+  this->mStopThreadsCaller = cedar::aux::CallFunctionInThreadPtr
+      (
+        new cedar::aux::CallFunctionInThread
+        (
+          boost::bind(&cedar::proc::Network::stopTriggers, this->mNetwork->getNetwork(), true)
+        )
+      );
+
   if (this->mpConsistencyChecker != NULL)
   {
     this->mpConsistencyChecker->setNetwork(network);
@@ -582,7 +599,9 @@ void cedar::proc::gui::Ide::notify(const QString& message)
 
 void cedar::proc::gui::Ide::startThreads()
 {
-  this->mNetwork->getNetwork()->startTriggers();
+  CEDAR_DEBUG_ASSERT(this->mStartThreadsCaller);
+  // calls this->mNetwork->getNetwork()->startTriggers()
+  this->mStartThreadsCaller->start();
 }
 
 void cedar::proc::gui::Ide::stepThreads()
@@ -599,7 +618,9 @@ void cedar::proc::gui::Ide::stepThreads()
 
 void cedar::proc::gui::Ide::stopThreads()
 {
-  this->mNetwork->getNetwork()->stopTriggers();
+  CEDAR_DEBUG_ASSERT(this->mStopThreadsCaller);
+  // calls this->mNetwork->getNetwork()->stopTriggers()
+  this->mStopThreadsCaller->start();
 }
 
 void cedar::proc::gui::Ide::newFile()
