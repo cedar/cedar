@@ -100,6 +100,13 @@ public:
   :
   mSearchedPaths(searchedPaths)
   {
+    std::string message = "The following paths were searched:";
+    for (size_t i = 0; i < searchedPaths.size(); ++i)
+    {
+      message += "\n";
+      message += searchedPaths.at(i);
+    }
+    this->setMessage(message);
   }
 
   //! destructor that ensure that no exception is thrown

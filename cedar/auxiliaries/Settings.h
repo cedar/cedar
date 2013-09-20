@@ -126,6 +126,12 @@ public:
   }
 
   //! Connect to search path removed signal
+  boost::signals2::connection connectToPluginSearchPathsChangedSignal(boost::function<void ()> slot)
+  {
+    return this->mSearchPathsChangedSignal.connect(slot);
+  }
+
+  //! Connect to search path removed signal
   boost::signals2::connection connectToPluginSearchPathIndexRemovedSignal(boost::function<void (size_t)> slot)
   {
     return this->mSearchPathIndexRemovedSignal.connect(slot);
@@ -173,9 +179,13 @@ private:
 
   boost::signals2::signal<void (size_t)> mSearchPathIndexRemovedSignal;
 
+  boost::signals2::signal<void ()> mSearchPathsChangedSignal;
+
   boost::signals2::signal<void (const std::string&)> mPluginAddedSignal;
 
   boost::signals2::signal<void (const std::string&)> mPluginRemovedSignal;
+
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
