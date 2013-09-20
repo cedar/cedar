@@ -56,6 +56,7 @@
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/Settings.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
+#include "cedar/auxiliaries/PluginProxy.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -177,6 +178,11 @@ mpBoostControl(NULL)
   QObject::connect(mpActionToggleTriggerVisibility, SIGNAL(triggered(bool)), this, SLOT(showTriggerConnections(bool)));
   QObject::connect(mpActionArchitectureConsistencyCheck, SIGNAL(triggered()), this, SLOT(showConsistencyChecker()));
   QObject::connect(mpActionBoostControl, SIGNAL(triggered()), this, SLOT(showBoostControl()));
+
+  cedar::aux::PluginProxy::connectToPluginDeclaredSignal
+  (
+    boost::bind(&cedar::proc::gui::Ide::resetStepList, this)
+  );
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -415,6 +421,7 @@ void cedar::proc::gui::Ide::architectureToolFinished()
 
 void cedar::proc::gui::Ide::resetStepList()
 {
+  //!@todo This should become its own widget
   using cedar::proc::Manager;
 
   std::set<std::string> categories = ElementManagerSingleton::getInstance()->listCategories();
