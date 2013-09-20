@@ -65,6 +65,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDialogButtonBox>
+#include <QMessageBox>
 #include <boost/property_tree/detail/json_parser_error.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -664,6 +665,90 @@ void cedar::proc::gui::Ide::loadFile(QString file)
                                              "Loading file: " + file.toStdString(),
                                              "void cedar::proc::gui::Ide::loadFile(QString)"
                                            );
+
+  // check if all required plugins are loaded
+  auto required_plugins = cedar::proc::Network::getRequiredPlugins(file.toStdString());
+  std::set<std::string> plugins_not_found;
+  std::set<std::string> plugins_not_loaded;
+  for (auto iter = required_plugins.begin(); iter != required_plugins.end(); ++iter)
+  {
+    const std::string& plugin_name = *iter;
+    if (!cedar::aux::PluginProxy::canFindPlugin(plugin_name))
+    {
+      plugins_not_found.insert(plugin_name);
+    }
+    else if (!cedar::aux::PluginProxy::getPlugin(plugin_name)->isDeclared())
+    {
+      plugins_not_loaded.insert(plugin_name);
+    }
+  }
+
+  if (!plugins_not_found.empty())
+  {
+    auto p_message(new QMessageBox(this));
+
+    p_message->setWindowTitle("Missing plugins");
+    p_message->setText("Some plugins required for this architecture were not found. Continue?");
+
+    QString details = "The plugins not found are:";
+    for (auto iter = plugins_not_found.begin(); iter != plugins_not_found.end(); ++iter)
+    {
+      details += "\n";
+      details += QString::fromStdString(*iter);
+    }
+
+    p_message->setDetailedText(details);
+
+    p_message->addButton(QMessageBox::Yes);
+    p_message->addButton(QMessageBox::No);
+
+    int r = p_message->exec();
+
+    delete p_message;
+
+    if (r == QMessageBox::No)
+    {
+      return;
+    }
+  }
+
+  if (!plugins_not_loaded.empty())
+  {
+    auto p_message(new QMessageBox(this));
+
+    p_message->setWindowTitle("Unloaded plugins");
+    p_message->setText("Some plugins required for this architecture were not loaded. Load them?");
+
+    QString details = "The plugins not found are:";
+    for (auto iter = plugins_not_loaded.begin(); iter != plugins_not_loaded.end(); ++iter)
+    {
+      details += "\n";
+      details += QString::fromStdString(*iter);
+    }
+
+    p_message->setDetailedText(details);
+
+    p_message->addButton(QMessageBox::Yes);
+    p_message->addButton(QMessageBox::No);
+    p_message->addButton(QMessageBox::Cancel);
+
+    int r = p_message->exec();
+
+    delete p_message;
+
+    if (r == QMessageBox::Cancel)
+    {
+      return;
+    }
+    if (r == QMessageBox::Yes)
+    {
+      for (auto iter = plugins_not_loaded.begin(); iter != plugins_not_loaded.end(); ++iter)
+      {
+        auto plugin_name = *iter;
+        cedar::aux::PluginProxy::getPlugin(plugin_name)->declare();
+      }
+    }
+  }
 
   // reset scene
   this->mpProcessingDrawer->getScene()->reset();

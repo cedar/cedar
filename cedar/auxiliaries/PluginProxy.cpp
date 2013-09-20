@@ -215,6 +215,19 @@ std::string cedar::aux::PluginProxy::findPluginDescription(const std::string& pl
   return "";
 }
 
+bool cedar::aux::PluginProxy::canFindPlugin(const std::string& pluginName)
+{
+  try
+  {
+    cedar::aux::PluginProxy::findPlugin(pluginName);
+    return true;
+  }
+  catch (cedar::aux::PluginNotFoundException)
+  {
+    return false;
+  }
+}
+
 std::string cedar::aux::PluginProxy::findPlugin(const std::string& pluginName)
 {
   std::vector<std::string> searched_paths;
