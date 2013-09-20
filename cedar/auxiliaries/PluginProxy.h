@@ -78,7 +78,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief loaded a shared/dynamic library from a file path
-  void load(const std::string& pluginName);
+  void load();
 
   //! Actually declares the contents of the plugin.
   void declare();

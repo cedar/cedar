@@ -36,7 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/PluginManagerDialog.h"
-#include "cedar/auxiliaries/gui/PluginLoadDialog.h"
+#include "cedar/auxiliaries/gui/PluginInfoDialog.h"
 #include "cedar/auxiliaries/gui/Settings.h"
 #include "cedar/auxiliaries/SetParameter.h"
 #include "cedar/auxiliaries/Settings.h"
@@ -70,6 +70,9 @@ QDialog(pParent)
 
   QObject::connect(this->mpLoadSelectedPluginsBtn, SIGNAL(clicked()), this, SLOT(loadSelectedPlugins()));
   this->mpLoadSelectedPluginsBtn->setEnabled(false);
+
+  QObject::connect(this->mpSelectedPluginInfo, SIGNAL(clicked()), this, SLOT(openInfoDialog()));
+  this->mpSelectedPluginInfo->setEnabled(false);
 
   QObject::connect(this->mpAddPathBtn, SIGNAL(clicked()), this, SLOT(addSearchPathClicked()));
   QObject::connect(this->mpRemoveSearchPathBtn, SIGNAL(clicked()), this, SLOT(removeSearchPathClicked()));
@@ -327,6 +330,24 @@ int cedar::aux::gui::PluginManagerDialog::getPluginRowFromName(const std::string
   CEDAR_THROW(cedar::aux::UnknownNameException, "Cannot find the plugin \"" + pluginName + "\".");
 }
 
+void cedar::aux::gui::PluginManagerDialog::openInfoDialog()
+{
+  QList<QTableWidgetSelectionRange> ranges = this->mpPluginList->selectedRanges();
+  for (int i = 0; i < ranges.size(); ++i)
+  {
+    const QTableWidgetSelectionRange& range = ranges.at(i);
+
+    for (int row = range.topRow(); row <= range.bottomRow(); ++row)
+    {
+      std::string plugin_name = this->getPluginNameFromRow(row);
+      auto plugin = cedar::aux::PluginProxy::getPlugin(plugin_name);
+
+      auto dialog = new cedar::aux::gui::PluginInfoDialog(this, plugin);
+      dialog->exec();
+    }
+  }
+}
+
 void cedar::aux::gui::PluginManagerDialog::loadSelectedPlugins()
 {
   QList<QTableWidgetSelectionRange> ranges = this->mpPluginList->selectedRanges();
@@ -370,10 +391,13 @@ void cedar::aux::gui::PluginManagerDialog::removeSelectedPlugins()
 
 void cedar::aux::gui::PluginManagerDialog::toggleSelectedPluginsButtons()
 {
-  bool enable = (this->mpPluginList->selectedRanges().size() > 0);
+  bool multiple_selected = (this->mpPluginList->selectedRanges().size() > 0);
+  bool single_selected = (this->mpPluginList->selectedRanges().size() == 1);
 
-  this->mpDeleteButton->setEnabled(enable);
-  this->mpLoadSelectedPluginsBtn->setEnabled(enable);
+  this->mpDeleteButton->setEnabled(multiple_selected);
+  this->mpLoadSelectedPluginsBtn->setEnabled(multiple_selected);
+
+  this->mpSelectedPluginInfo->setEnabled(single_selected);
 }
 
 void cedar::aux::gui::PluginManagerDialog::addSearchPathClicked()
