@@ -114,7 +114,7 @@ void cedar::aux::gui::PluginLoadDialog::pluginFileChanged(const QString& file)
 
 void cedar::aux::gui::PluginLoadDialog::loadFile(const std::string& file)
 {
-  mPlugin = cedar::aux::PluginProxyPtr(new cedar::aux::PluginProxy(file));
+  mPlugin = cedar::aux::PluginProxy::getPlugin(file);
 
   this->mpStepsList->clear();
 

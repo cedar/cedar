@@ -182,7 +182,8 @@ void cedar::aux::Settings::loadDefaultPlugins()
     try
     {
       action = "opening";
-      cedar::aux::PluginProxyPtr plugin(new cedar::aux::PluginProxy(*iter));
+      const std::string& plugin_name = *iter;
+      cedar::aux::PluginProxyPtr plugin = cedar::aux::PluginProxy::getPlugin(plugin_name);
       action = "loading";
       plugin->declare();
       cedar::aux::LogSingleton::getInstance()->message

@@ -96,16 +96,20 @@ private:
 
   std::string getPluginNameFromRow(int row) const;
 
+  int getPluginRowFromName(const std::string& pluginName) const;
+
   void updatePluginPath(int row);
 
   void updatePluginPaths();
+
+  void pluginDeclared(const std::string& pluginName);
 
 private slots:
   //! Removes the plugins currently checked for deletion.
   void removeSelectedPlugins();
 
-  //! Enables or disables the delete button.
-  void toggleDeleteButton();
+  //! Enables or disables the buttons that operate on a selection of plugins.
+  void toggleSelectedPluginsButtons();
 
   //! Reacts to a click on the "add" button in the search paths tab.
   void addSearchPathClicked();
@@ -116,6 +120,8 @@ private slots:
   void addPluginClicked();
 
   void loadOnStartupCheckboxToggled(bool loaded);
+
+  void loadSelectedPlugins();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
