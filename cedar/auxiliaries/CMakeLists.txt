@@ -76,7 +76,7 @@ cedar_add_library(cedaraux
   gui/Parameter.h
   gui/LocalCoordinateFrameWidget.h
   gui/ObjectVisualizationWidget.h
-  gui/PluginLoadDialog.h
+  gui/PluginInfoDialog.h
   gui/PluginManagerDialog.h
   gui/Viewer.h
   gui/SceneWidget.h

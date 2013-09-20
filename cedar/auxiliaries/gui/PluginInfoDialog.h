@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PluginLoadDialog.h
+    File:        PluginInfoDialog.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
@@ -34,11 +34,11 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_PLUGIN_LOAD_DIALOG_H
-#define CEDAR_AUX_GUI_PLUGIN_LOAD_DIALOG_H
+#ifndef CEDAR_AUX_GUI_PLUGIN_INFO_DIALOG_H
+#define CEDAR_AUX_GUI_PLUGIN_INFO_DIALOG_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/ui_PluginLoadDialog.h"
+#include "cedar/auxiliaries/gui/ui_PluginInfoDialog.h"
 
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/PluginProxy.h"
@@ -49,7 +49,7 @@
 
 /*!@brief A dialog for loading a plugin.
  */
-class cedar::aux::gui::PluginLoadDialog : public QDialog, public Ui_PluginLoadDialog
+class cedar::aux::gui::PluginInfoDialog : public QDialog, public Ui_PluginInfoDialog
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -61,7 +61,7 @@ class cedar::aux::gui::PluginLoadDialog : public QDialog, public Ui_PluginLoadDi
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  PluginLoadDialog(QWidget *pParent = NULL);
+  PluginInfoDialog(QWidget *pParent, cedar::aux::PluginProxyPtr plugin);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -69,15 +69,6 @@ public:
 public:
   //! Returns the (loaded) plugin.
   cedar::aux::PluginProxyPtr plugin();
-
-public slots:
-  /*!@brief Opens a file browser to locate the plugin to load.
-   */
-  void browseFile();
-
-  /*!@brief Reacts to a change in the plugin file line edit.
-   */
-  void pluginFileChanged(const QString& file);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -91,7 +82,13 @@ protected:
 private:
   /*!@brief Loads a plugin file.
    */
-  void loadFile(const std::string& file);
+  void updateWidgets();
+
+  int addCategoryPage(const std::string& categoryName);
+
+  int getCategoryPageId(const std::string& category) const;
+
+  void addDeclarationToPage(int pageId, cedar::aux::PluginDeclarationPtr declaration);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -102,6 +99,6 @@ private:
   //! The loaded plugin.
   cedar::aux::PluginProxyPtr mPlugin;
 
-}; // class cedar::aux::PluginLoadDialog
+}; // class cedar::aux::PluginInfoDialog
 
-#endif // CEDAR_AUX_GUI_PLUGIN_LOAD_DIALOG_H
+#endif // CEDAR_AUX_GUI_PLUGIN_INFO_DIALOG_H

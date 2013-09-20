@@ -87,7 +87,7 @@ cedar::aux::PluginProxy::PluginProxy(const std::string& pluginName)
 mIsDeclared(false),
 mpLibHandle(NULL)
 {
-  this->load(pluginName);
+  this->mFileName = this->findPlugin(pluginName);
 }
 
 cedar::aux::PluginProxy::~PluginProxy()
@@ -149,6 +149,11 @@ std::string cedar::aux::PluginProxy::getNormalizedSearchPath() const
 
 void cedar::aux::PluginProxy::declare()
 {
+  if (!this->getDeclaration())
+  {
+    this->load();
+  }
+
   if (this->getDeclaration())
   {
     this->getDeclaration()->declareAll();
@@ -313,15 +318,13 @@ void cedar::aux::PluginProxy::abortHandler(int)
 }
 #endif // CEDAR_OS_UNIX
 
-void cedar::aux::PluginProxy::load(const std::string& pluginName)
+void cedar::aux::PluginProxy::load()
 {
-  this->mFileName = this->findPlugin(pluginName);
-  
   // OS-Dependent code for loading the plugin.
   PluginInterfaceMethod p_interface = NULL;
 #ifdef CEDAR_OS_UNIX
 
-  mPluginBeingLoaded = pluginName;
+  mPluginBeingLoaded = this->mFileName;
   void (*old_abrt_handle)(int);
   old_abrt_handle = signal(SIGABRT, &cedar::aux::PluginProxy::abortHandler);
 
@@ -372,7 +375,7 @@ void cedar::aux::PluginProxy::load(const std::string& pluginName)
   {
     cedar::aux::LogSingleton::getInstance()->debugMessage
     (
-      "no plugin description found for \"" + pluginName + "\"",
+      "no plugin description found for \"" + this->mFileName + "\"",
       "cedar::aux::PluginDeclaration::readDeclarations(const cedar::aux::ConfigurationNode&)"
     );
   }

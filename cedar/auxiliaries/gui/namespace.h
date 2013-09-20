@@ -97,7 +97,7 @@ namespace cedar
       /* Exceptions */
       class CEDAR_AUX_LIB_EXPORT InvalidPlotData;
 
-      class CEDAR_AUX_LIB_EXPORT PluginLoadDialog;
+      class CEDAR_AUX_LIB_EXPORT PluginInfoDialog;
       class CEDAR_AUX_LIB_EXPORT PluginManagerDialog;
       //!@endcond
 

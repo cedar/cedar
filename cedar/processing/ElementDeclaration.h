@@ -119,6 +119,11 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  std::string getPluginType() const
+  {
+    return "processing step";
+  }
+
   //!@brief set path to icon included in the graphical representation of this element
   void setIconPath(const std::string& path)
   {

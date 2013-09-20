@@ -86,6 +86,9 @@ public:
     return this->mCategory;
   }
 
+  //! Returns the type of the declaration (plot, element, ...)
+  virtual std::string getPluginType() const;
+
   /*!@brief Marks the declared type as deprecated.
    */
   void deprecate(const std::string& description = "")
