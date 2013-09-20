@@ -108,6 +108,9 @@ public:
   static void abortHandler(int signal);
 #endif // CEDAR_OS_UNIX
 
+  //! Whether or not a path can be found for the given plugin name.
+  static bool canFindPlugin(const std::string& pluginName);
+
   //!@brief search known directories for this plugin.
   static std::string findPlugin(const std::string& pluginName);
 
