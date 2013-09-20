@@ -294,6 +294,19 @@ public:
     return this->mValues.size();
   }
 
+  //! Swaps the given elements.
+  void swap(size_t first, size_t second)
+  {
+    CEDAR_ASSERT(first < this->mValues.size());
+    CEDAR_ASSERT(second < this->mValues.size());
+
+    T helper = this->mValues.at(first);
+    this->mValues[first] = this->mValues.at(second);
+    this->mValues[second] = helper;
+
+    this->emitChangedSignal();
+  }
+
   /*!@brief resize the vector to a new size and initialize new entries to the given value
    * @param size the new size of the vector
    * @param value the default value used to initialize new entries

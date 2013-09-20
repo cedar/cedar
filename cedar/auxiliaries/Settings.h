@@ -149,11 +149,20 @@ public:
     return this->mPluginRemovedSignal.connect(slot);
   }
 
+  //! Connect to signal that is emitted whenver search paths are swapped.
+  boost::signals2::connection connectToSearchPathsSwappedSignal(boost::function<void (unsigned int, unsigned int)> slot)
+  {
+    return this->mSearchPathsSwappedSignal.connect(slot);
+  }
+
   //! Adds the given plugin to the settings plugin.
   void addPlugin(cedar::aux::PluginProxyPtr plugin);
 
   //! Removes the given plugin from the settings.
   void removePlugin(const std::string& pluginName);
+
+  //! Swaps the order of the given plugin paths.
+  void swapPluginSearchPaths(unsigned int first, unsigned int second);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -185,6 +194,7 @@ private:
 
   boost::signals2::signal<void (const std::string&)> mPluginRemovedSignal;
 
+  boost::signals2::signal<void (unsigned int, unsigned int)> mSearchPathsSwappedSignal;
 
 
   //--------------------------------------------------------------------------------------------------------------------
