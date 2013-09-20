@@ -47,6 +47,13 @@
       </spacer>
      </item>
      <item>
+      <widget class="QPushButton" name="mpReadInfoBtn">
+       <property name="text">
+        <string>read info</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="mpLoadBtn">
        <property name="text">
         <string>load</string>

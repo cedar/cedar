@@ -62,6 +62,8 @@ mPlugin(plugin)
   this->setWindowTitle(QString::fromStdString(plugin->getPluginName()));
 
   this->updateWidgets();
+
+  QObject::connect(this->mpReadInfoBtn, SIGNAL(clicked()), this, SLOT(readInfo()));
 }
 
 
@@ -82,9 +84,9 @@ void cedar::aux::gui::PluginInfoDialog::updateWidgets()
 
   this->mpLoadBtn->setEnabled(!this->mPlugin->isDeclared());
 
-  // TODO iterate over all declarations, insert into lists
   if (this->mPlugin->getDeclaration())
   {
+    this->mpReadInfoBtn->setEnabled(false);
     auto declarations = this->mPlugin->getDeclaration();
     for (size_t i = 0; i < declarations->size(); ++i)
     {
@@ -104,6 +106,10 @@ void cedar::aux::gui::PluginInfoDialog::updateWidgets()
 
       this->addDeclarationToPage(cat_id, declaration);
     }
+  }
+  else
+  {
+    this->mpReadInfoBtn->setEnabled(true);
   }
 }
 
@@ -142,4 +148,10 @@ int cedar::aux::gui::PluginInfoDialog::addCategoryPage(const std::string& catego
 cedar::aux::PluginProxyPtr cedar::aux::gui::PluginInfoDialog::plugin()
 {
   return this->mPlugin;
+}
+
+void cedar::aux::gui::PluginInfoDialog::readInfo()
+{
+  this->mPlugin->load();
+  this->updateWidgets();
 }
