@@ -96,6 +96,8 @@ private:
 
   std::string getPluginNameFromRow(int row) const;
 
+  void updatePluginPath(int row);
+
 private slots:
   //! Removes the plugins currently checked for deletion.
   void removeSelectedPlugins();

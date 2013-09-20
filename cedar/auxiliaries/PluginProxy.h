@@ -96,6 +96,12 @@ public:
   static void abortHandler(int signal);
 #endif // CEDAR_OS_UNIX
 
+  //!@brief search known directories for this plugin.
+  static std::string findPlugin(const std::string& pluginName);
+
+  //!@brief search for this plugin in the given workspace.
+  static std::string findPlugin(const std::string& pluginName, const std::string& workspace);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -106,12 +112,6 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief search known directories for this plugin.
-  std::string findPlugin(const std::string& pluginName) const;
-
-  //!@brief search for this plugin in the given workspace.
-  std::string findPlugin(const std::string& pluginName, const std::string& workspace) const;
-
   //!@brief Searches for the plugin description file.
   std::string findPluginDescription(const std::string& plugin_path) const;
 

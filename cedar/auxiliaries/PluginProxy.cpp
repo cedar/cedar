@@ -188,7 +188,7 @@ std::string cedar::aux::PluginProxy::findPluginDescription(const std::string& pl
   return "";
 }
 
-std::string cedar::aux::PluginProxy::findPlugin(const std::string& pluginName) const
+std::string cedar::aux::PluginProxy::findPlugin(const std::string& pluginName)
 {
   std::vector<std::string> searched_paths;
   searched_paths.push_back(pluginName);
@@ -203,7 +203,7 @@ std::string cedar::aux::PluginProxy::findPlugin(const std::string& pluginName) c
     try
     {
       const std::string& workspace = *iter;
-      return this->findPlugin(pluginName, workspace);
+      return cedar::aux::PluginProxy::findPlugin(pluginName, workspace);
     }
     catch (const cedar::aux::PluginNotFoundException& not_found)
     {
@@ -220,15 +220,58 @@ std::string cedar::aux::PluginProxy::findPlugin(const std::string& pluginName) c
   CEDAR_THROW_EXCEPTION(exception);
 }
 
-std::string cedar::aux::PluginProxy::findPlugin(const std::string& pluginName, const std::string& workspace) const
+std::string cedar::aux::PluginProxy::findPlugin(const std::string& pluginName, const std::string& workspace)
 {
-  std::string loc = workspace + "/" + pluginName;
+  std::string plugin_filename;
+
+#ifdef CEDAR_OS_LINUX
+  plugin_filename = "lib";
+  plugin_filename += pluginName;
+  plugin_filename += ".so";
+#elif CEDAR_OS_APPLE
+  plugin_filename = "lib";
+  plugin_filename += pluginName;
+  plugin_filename += ".dylib";
+#elif CEDAR_OS_WINDOWS
+  plugin_filename += pluginName;
+  plugin_filename += ".dll";
+#endif
+
+  std::string loc = workspace + "/" + plugin_filename;
   std::vector<std::string> searched_paths;
   searched_paths.push_back(loc);
   if (boost::filesystem::exists(loc))
   {
     return loc;
   }
+
+  std::vector<std::string> subpaths_to_search;
+  subpaths_to_search.push_back("build");
+  subpaths_to_search.push_back(pluginName);
+
+  for (size_t i = 0; i < subpaths_to_search.size(); ++i)
+  {
+    const std::string& subpath = subpaths_to_search.at(i);
+    std::string full_subpath = workspace + "/" + subpath;
+    if (boost::filesystem::exists(full_subpath))
+    {
+      try
+      {
+        // recursively check the subpath for the plugin
+        return findPlugin(pluginName, full_subpath);
+      }
+      catch (const cedar::aux::PluginNotFoundException& e)
+      {
+        searched_paths.insert
+                       (
+                         searched_paths.end(),
+                         e.getSearchedPaths().begin(),
+                         e.getSearchedPaths().end()
+                       );
+      }
+    }
+  }
+
   cedar::aux::PluginNotFoundException exception(searched_paths);
   CEDAR_THROW_EXCEPTION(exception);
 }
