@@ -68,18 +68,23 @@
 std::string cedar::aux::PluginProxy::mPluginBeingLoaded = "";
 #endif // CEDAR_OS_UNIX
 
+std::map<std::string, cedar::aux::PluginProxyPtr> cedar::aux::PluginProxy::mPluginMap;
+boost::signals2::signal<void (const std::string&)> cedar::aux::PluginProxy::mPluginDeclaredSignal;
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::aux::PluginProxy::PluginProxy()
 :
+mIsDeclared(false),
 mpLibHandle(NULL)
 {
 }
 
 cedar::aux::PluginProxy::PluginProxy(const std::string& pluginName)
 :
+mIsDeclared(false),
 mpLibHandle(NULL)
 {
   this->load(pluginName);
@@ -92,6 +97,21 @@ cedar::aux::PluginProxy::~PluginProxy()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::PluginProxyPtr cedar::aux::PluginProxy::getPlugin(const std::string pluginName)
+{
+  auto iter = mPluginMap.find(pluginName);
+  if (iter != mPluginMap.end())
+  {
+    return iter->second;
+  }
+  else
+  {
+    cedar::aux::PluginProxyPtr plugin(new cedar::aux::PluginProxy(pluginName));
+    mPluginMap[plugin->getPluginName()] = plugin;
+    return plugin;
+  }
+}
 
 std::string cedar::aux::PluginProxy::getNormalizedSearchPath() const
 {
@@ -132,6 +152,8 @@ void cedar::aux::PluginProxy::declare()
   if (this->getDeclaration())
   {
     this->getDeclaration()->declareAll();
+    this->mIsDeclared = true;
+    this->mPluginDeclaredSignal(this->getPluginName());
   }
 }
 
