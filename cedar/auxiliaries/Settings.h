@@ -137,8 +137,17 @@ public:
     return this->mPluginAddedSignal.connect(slot);
   }
 
-  //! Adds a plugin specified by the given path.
+  //! Connect to plugin removed signal
+  boost::signals2::connection connectToPluginRemovedSignal(boost::function<void (const std::string&)> slot)
+  {
+    return this->mPluginRemovedSignal.connect(slot);
+  }
+
+  //! Adds the given plugin to the settings plugin.
   void addPlugin(cedar::aux::PluginProxyPtr plugin);
+
+  //! Removes the given plugin from the settings.
+  void removePlugin(const std::string& pluginName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -165,6 +174,8 @@ private:
   boost::signals2::signal<void (size_t)> mSearchPathIndexRemovedSignal;
 
   boost::signals2::signal<void (const std::string&)> mPluginAddedSignal;
+
+  boost::signals2::signal<void (const std::string&)> mPluginRemovedSignal;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
