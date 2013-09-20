@@ -362,7 +362,7 @@ void cedar::aux::PluginProxy::load()
   
   this->mDeclaration = cedar::aux::PluginDeclarationListPtr(new cedar::aux::PluginDeclarationList());
   (*p_interface)(this->mDeclaration);
-  this->mDeclaration->setSource(this->mFileName);
+  this->mDeclaration->setSource(this->getPluginName());
 
   // try to load the plugin description file
   std::string description = this->findPluginDescription(this->mFileName);
