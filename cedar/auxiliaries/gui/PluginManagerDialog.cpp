@@ -338,7 +338,11 @@ void cedar::aux::gui::PluginManagerDialog::loadSelectedPlugins()
     {
       std::string plugin_name = this->getPluginNameFromRow(row);
       auto plugin = cedar::aux::PluginProxy::getPlugin(plugin_name);
-      plugin->declare();
+
+      if (!plugin->isDeclared())
+      {
+        plugin->declare();
+      }
     }
   }
 }
