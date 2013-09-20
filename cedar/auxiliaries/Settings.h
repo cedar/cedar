@@ -102,10 +102,10 @@ public:
   void removePluginSearchPath(size_t index);
 
   //!@brief adds a plugin to the list of plugins that are loaded on start-up
-  void addPluginToLoad(const std::string& path);
+  void addPluginToLoad(const std::string& pluginName);
 
   //!@brief removes a plugin from the list of plugins that are loaded on start-up
-  void removePluginToLoad(const std::string& path);
+  void removePluginToLoad(const std::string& pluginName);
 
   //! Loads the plugins set to be loaded by default.
   void loadDefaultPlugins();

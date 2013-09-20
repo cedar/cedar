@@ -163,6 +163,7 @@ void cedar::aux::gui::PluginManagerDialog::addPlugin(const std::string& pluginNa
   QCheckBox* p_cb = new QCheckBox();
   p_cb->setChecked(cedar::aux::SettingsSingleton::getInstance()->isPluginLoadedOnStartup(pluginName));
   this->mpPluginList->setCellWidget(row, 0, p_cb);
+  QObject::connect(p_cb, SIGNAL(toggled(bool)), this, SLOT(loadOnStartupCheckboxToggled(bool)));
 
   QLabel* p_name = new QLabel(QString::fromStdString(pluginName));
   this->mpPluginList->setCellWidget(row, 1, p_name);
@@ -172,6 +173,36 @@ void cedar::aux::gui::PluginManagerDialog::addPlugin(const std::string& pluginNa
 
   this->updatePluginPath(row);
 }
+
+void cedar::aux::gui::PluginManagerDialog::loadOnStartupCheckboxToggled(bool loaded)
+{
+  QCheckBox* p_sender = dynamic_cast<QCheckBox*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(p_sender != NULL);
+
+  // find out which checkbox sent the signal
+  int row;
+  for (row = 0; row < this->mpPluginList->rowCount(); ++row)
+  {
+    if (this->mpPluginList->cellWidget(row, 0) == p_sender)
+    {
+      break;
+    }
+  }
+
+  // get name of the corresponding plugin
+  std::string plugin_name = this->getPluginNameFromRow(row);
+
+  // set the auto-load state the plugin
+  if (loaded)
+  {
+    cedar::aux::SettingsSingleton::getInstance()->addPluginToLoad(plugin_name);
+  }
+  else
+  {
+    cedar::aux::SettingsSingleton::getInstance()->removePluginToLoad(plugin_name);
+  }
+}
+
 
 void cedar::aux::gui::PluginManagerDialog::updatePluginPaths()
 {
