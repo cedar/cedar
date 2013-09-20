@@ -47,6 +47,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QFileDialog>
+#include <QToolTip>
 #include <set>
 
 #define PLUGIN_MANAGER_STARTUP_LOAD_ROW 0
@@ -127,12 +128,30 @@ QDialog(pParent)
 
   this->mpUpButton->setEnabled(false);
   this->mpDownBtn->setEnabled(false);
+
+  QObject::connect(this->mpHelpBtn, SIGNAL(clicked()), this, SLOT(showSearchPathHelp()));
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::PluginManagerDialog::showSearchPathHelp()
+{
+  QToolTip::showText
+  (
+    this->mpHelpBtn->mapToGlobal
+    (
+      QPoint
+      (
+        this->mpHelpBtn->width(),
+        this->mpHelpBtn->height()
+      )
+    ),
+    this->mpHelpBtn->toolTip()
+  );
+}
 
 void cedar::aux::gui::PluginManagerDialog::selectedSearchPathChanged()
 {
