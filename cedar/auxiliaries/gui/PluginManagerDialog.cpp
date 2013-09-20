@@ -123,12 +123,28 @@ QDialog(pParent)
 
   QObject::connect(this->mpUpButton, SIGNAL(clicked()), this, SLOT(moveSelectedSearchPathUp()));
   QObject::connect(this->mpDownBtn, SIGNAL(clicked()), this, SLOT(moveSelectedSearchPathDown()));
+  QObject::connect(this->mpSearchPathList, SIGNAL(currentRowChanged(int)), this, SLOT(selectedSearchPathChanged()));
+
+  this->mpUpButton->setEnabled(false);
+  this->mpDownBtn->setEnabled(false);
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::PluginManagerDialog::selectedSearchPathChanged()
+{
+  if (this->mpSearchPathList->currentRow() < 0)
+  {
+    this->mpUpButton->setEnabled(true);
+    this->mpDownBtn->setEnabled(true);
+  }
+
+  this->mpUpButton->setEnabled(this->mpSearchPathList->currentRow() > 0);
+  this->mpDownBtn->setEnabled(this->mpSearchPathList->currentRow() < this->mpSearchPathList->count() - 1);
+}
 
 void cedar::aux::gui::PluginManagerDialog::swapSearchPaths(unsigned int uFirst, unsigned int uSecond)
 {
@@ -221,6 +237,7 @@ void cedar::aux::gui::PluginManagerDialog::populate()
 void cedar::aux::gui::PluginManagerDialog::addPluginSearchPath(const std::string& path)
 {
   this->mpSearchPathList->addItem(QString::fromStdString(path));
+  this->selectedSearchPathChanged();
 }
 
 void cedar::aux::gui::PluginManagerDialog::removePluginSearchPathIndex(size_t index)
@@ -239,6 +256,8 @@ void cedar::aux::gui::PluginManagerDialog::removePluginSearchPath(const std::str
       this->mpSearchPathList->takeItem(row);
     }
   }
+
+  this->selectedSearchPathChanged();
 }
 
 void cedar::aux::gui::PluginManagerDialog::addPluginClicked()
