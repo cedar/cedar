@@ -150,23 +150,41 @@ void cedar::aux::gui::PluginManagerDialog::addPluginClicked()
   delete p_dialog;
 }
 
-void cedar::aux::gui::PluginManagerDialog::addPlugin(const std::string& plugin)
+void cedar::aux::gui::PluginManagerDialog::addPlugin(const std::string& pluginName)
 {
   int row = this->mpPluginList->rowCount();
   this->mpPluginList->insertRow(row);
 
   QCheckBox* p_cb = new QCheckBox();
-  p_cb->setChecked(cedar::aux::SettingsSingleton::getInstance()->isPluginLoadedOnStartup(plugin));
+  p_cb->setChecked(cedar::aux::SettingsSingleton::getInstance()->isPluginLoadedOnStartup(pluginName));
   this->mpPluginList->setCellWidget(row, 0, p_cb);
 
-  QLabel* p_name = new QLabel(QString::fromStdString(plugin));
+  QLabel* p_name = new QLabel(QString::fromStdString(pluginName));
   this->mpPluginList->setCellWidget(row, 1, p_name);
 
-  //!@todo Add path that is found by the plugin system, update if search paths are changed.
-  /*
-  QLabel* p_path = new QLabel(path.c_str());
+  QLabel* p_path = new QLabel();
   this->mpPluginList->setCellWidget(row, 2, p_path);
-  */
+
+  this->updatePluginPath(row);
+}
+
+void cedar::aux::gui::PluginManagerDialog::updatePluginPath(int row)
+{
+  QLabel* p_path = dynamic_cast<QLabel*>(this->mpPluginList->cellWidget(row, 2));
+  CEDAR_DEBUG_ASSERT(p_path != NULL);
+
+  std::string plugin_name = this->getPluginNameFromRow(row);
+
+  try
+  {
+    std::string plugin_path = cedar::aux::PluginProxy::findPlugin(plugin_name);
+    p_path->setText(QString::fromStdString(plugin_path));
+  }
+  catch (const cedar::aux::PluginNotFoundException& e)
+  {
+    p_path->setText("(not found)");
+    p_path->setToolTip(QString::fromStdString(e.exceptionInfo()));
+  }
 }
 
 void cedar::aux::gui::PluginManagerDialog::removePlugin(const std::string& pluginName)
