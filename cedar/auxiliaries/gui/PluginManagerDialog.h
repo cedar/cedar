@@ -85,15 +85,20 @@ private:
    */
   void addPlugin(const std::string& plugin);
 
+  //! Removes the plugin with the given name from the UI.
+  void removePlugin(const std::string& pluginName);
+
   void addPluginSearchPath(const std::string& path);
 
   void removePluginSearchPath(const std::string& path);
 
   void removePluginSearchPathIndex(size_t index);
 
+  std::string getPluginNameFromRow(int row) const;
+
 private slots:
   //! Removes the plugins currently checked for deletion.
-  void removePlugins();
+  void removeSelectedPlugins();
 
   //! Enables or disables the delete button.
   void toggleDeleteButton();

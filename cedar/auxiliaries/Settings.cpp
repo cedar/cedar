@@ -132,8 +132,39 @@ void cedar::aux::Settings::addPlugin(cedar::aux::PluginProxyPtr plugin)
     this->addPluginSearchPath(search_path);
   }
 
-  this->_mKnownPlugins->insert(plugin->getPluginName());
-  this->mPluginAddedSignal(plugin->getPluginName());
+  const std::string& name = plugin->getPluginName();
+  if (this->_mKnownPlugins->get().find(name) == this->_mKnownPlugins->get().end())
+  {
+    this->_mKnownPlugins->insert(plugin->getPluginName());
+    this->mPluginAddedSignal(plugin->getPluginName());
+  }
+  else
+  {
+    cedar::aux::LogSingleton::getInstance()->message
+    (
+      "Plugin \"" + plugin->getPluginName() + "\" is already known.",
+      "cedar::aux::Settings::addPlugin(cedar::aux::PluginProxyPtr)"
+    );
+  }
+}
+
+void cedar::aux::Settings::removePlugin(const std::string& pluginName)
+{
+  auto iter = this->_mKnownPlugins->get().find(pluginName);
+  if (iter == this->_mKnownPlugins->get().end())
+  {
+    //!@todo Should this be a UnknownPluginException?
+    CEDAR_THROW(cedar::aux::UnknownNameException, "The plugin \"" + pluginName + "\" is not known.");
+  }
+
+  auto load_iter = this->_mPluginsToLoad->get().find(pluginName);
+  if (load_iter != this->_mPluginsToLoad->get().end())
+  {
+    this->_mPluginsToLoad->get().erase(load_iter);
+  }
+
+  this->_mKnownPlugins->get().erase(iter);
+  this->mPluginRemovedSignal(pluginName);
 }
 
 bool cedar::aux::Settings::isPluginLoadedOnStartup(const std::string& pluginName) const

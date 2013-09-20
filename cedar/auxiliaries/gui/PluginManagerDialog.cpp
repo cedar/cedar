@@ -60,7 +60,7 @@ QDialog(pParent)
 
   this->populate();
 
-  QObject::connect(this->mpDeleteButton, SIGNAL(clicked()), this, SLOT(removePlugins()));
+  QObject::connect(this->mpDeleteButton, SIGNAL(clicked()), this, SLOT(removeSelectedPlugins()));
   this->mpDeleteButton->setEnabled(false);
 
   QObject::connect(this->mpAddPathBtn, SIGNAL(clicked()), this, SLOT(addSearchPathClicked()));
@@ -83,6 +83,13 @@ QDialog(pParent)
   (
     boost::bind(&cedar::aux::gui::PluginManagerDialog::addPlugin, this, _1)
   );
+
+  cedar::aux::SettingsSingleton::getInstance()->connectToPluginRemovedSignal
+  (
+    boost::bind(&cedar::aux::gui::PluginManagerDialog::removePlugin, this, _1)
+  );
+
+  QObject::connect(mpPluginList, SIGNAL(itemSelectionChanged()), this, SLOT(toggleDeleteButton()));
 }
 
 
@@ -162,52 +169,67 @@ void cedar::aux::gui::PluginManagerDialog::addPlugin(const std::string& plugin)
   */
 }
 
-void cedar::aux::gui::PluginManagerDialog::removePlugins()
+void cedar::aux::gui::PluginManagerDialog::removePlugin(const std::string& pluginName)
 {
-  unsigned int deleted_items = 0;
+  std::vector<int> rows_to_remove;
   for (int row = 0; row < this->mpPluginList->rowCount(); ++row)
   {
-    QCheckBox* p_cb = dynamic_cast<QCheckBox*>(this->mpPluginList->cellWidget(row, 0));
-    CEDAR_DEBUG_ASSERT(p_cb != NULL);
-
-    QCheckBox* p_delete = dynamic_cast<QCheckBox*>(this->mpPluginList->cellWidget(row, 1));
-    CEDAR_DEBUG_ASSERT(p_delete != NULL);
-
-    QLabel* p_path = dynamic_cast<QLabel*>(this->mpPluginList->cellWidget(row, 3));
-    CEDAR_DEBUG_ASSERT(p_path != NULL);
-
-    std::string path = p_path->text().toStdString();
-
-    if (p_delete->isChecked())
+    if (this->getPluginNameFromRow(row) == pluginName)
     {
-      if (p_cb->isChecked())
-      {
-        cedar::aux::SettingsSingleton::getInstance()->removePluginToLoad(path);
-      }
-      ++deleted_items;
+      rows_to_remove.push_back(row);
     }
   }
-  if (deleted_items)
+
+  // erase rows, starting from the last ones (so the other ones don't get shifted)
+  for (size_t i = 0; i < rows_to_remove.size(); ++i)
   {
-    this->mpPluginList->setRowCount(0);
-    this->populate();
-    this->mpDeleteButton->setEnabled(false);
+    this->mpPluginList->removeRow(rows_to_remove.at(i));
+  }
+}
+
+std::string cedar::aux::gui::PluginManagerDialog::getPluginNameFromRow(int row) const
+{
+  CEDAR_DEBUG_ASSERT(this->mpPluginList->rowCount() > row);
+  CEDAR_DEBUG_ASSERT(this->mpPluginList->columnCount() > 1);
+
+  auto p_widget = dynamic_cast<QLabel*>(this->mpPluginList->cellWidget(row, 1));
+
+  CEDAR_DEBUG_ASSERT(p_widget != NULL);
+
+  return p_widget->text().toStdString();
+}
+
+void cedar::aux::gui::PluginManagerDialog::removeSelectedPlugins()
+{
+  std::vector<std::string> to_remove;
+
+  QList<QTableWidgetSelectionRange> ranges = this->mpPluginList->selectedRanges();
+  for (int i = 0; i < ranges.size(); ++i)
+  {
+    const QTableWidgetSelectionRange& range = ranges.at(i);
+
+    for (int row = range.topRow(); row <= range.bottomRow(); ++row)
+    {
+      to_remove.push_back(this->getPluginNameFromRow(row));
+    }
+  }
+
+  for (size_t i = 0; i < to_remove.size(); ++i)
+  {
+    cedar::aux::SettingsSingleton::getInstance()->removePlugin(to_remove.at(i));
   }
 }
 
 void cedar::aux::gui::PluginManagerDialog::toggleDeleteButton()
 {
-  for (int row = 0; row < this->mpPluginList->rowCount(); ++row)
+  if (this->mpPluginList->selectedRanges().size() > 0)
   {
-    QCheckBox* p_delete = dynamic_cast<QCheckBox*>(this->mpPluginList->cellWidget(row, 1));
-    CEDAR_DEBUG_ASSERT(p_delete != NULL);
-    if (p_delete->isChecked())
-    {
-      this->mpDeleteButton->setEnabled(true);
-      return;
-    }
+    this->mpDeleteButton->setEnabled(true);
   }
-  this->mpDeleteButton->setEnabled(false);
+  else
+  {
+    this->mpDeleteButton->setEnabled(false);
+  }
 }
 
 void cedar::aux::gui::PluginManagerDialog::addSearchPathClicked()
