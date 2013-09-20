@@ -111,6 +111,10 @@ QDialog(pParent)
   (
     boost::bind(&cedar::aux::gui::PluginManagerDialog::pluginDeclared ,this, _1)
   );
+
+  this->mpPluginList->horizontalHeader()->setResizeMode(0, QHeaderView::ResizeToContents);
+  this->mpPluginList->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
+  this->mpPluginList->horizontalHeader()->resizeSection(2, 250);
 }
 
 
@@ -279,6 +283,7 @@ void cedar::aux::gui::PluginManagerDialog::updatePluginPath(int row)
   {
     std::string plugin_path = cedar::aux::PluginProxy::findPlugin(plugin_name);
     p_path->setText(QString::fromStdString(plugin_path));
+    p_path->setToolTip(QString::fromStdString(plugin_path));
   }
   catch (const cedar::aux::PluginNotFoundException& e)
   {
