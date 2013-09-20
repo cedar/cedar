@@ -169,15 +169,36 @@ void cedar::aux::gui::PluginManagerDialog::removePluginSearchPath(const std::str
 
 void cedar::aux::gui::PluginManagerDialog::addPluginClicked()
 {
-  auto p_dialog = new cedar::aux::gui::PluginLoadDialog(this);
-  int r = p_dialog->exec();
+#ifdef CEDAR_OS_LINUX
+  QString filter = "Plugins (*.so)";
+#elif defined CEDAR_OS_APPLE
+  QString filter = "Plugins (*.dylib)";
+#elif defined CEDAR_OS_WINDOWS
+  QString filter = "Plugins (*.dll)";
+#endif // CEDAR_OS_*
 
-  if (r == QDialog::Accepted)
+  auto last_dir = cedar::aux::gui::SettingsSingleton::getInstance()->lastPluginLoadDialogLocation();
+  QString file = QFileDialog::getOpenFileName
+                              (
+                                this, // parent = 0,
+                                "Select a plugin to add.",
+#if QT_VERSION >= 0x050000
+                                "/",
+#else
+                                last_dir->getValue().absolutePath(),
+#endif
+                                filter
+                              );
+
+  if (!file.isEmpty())
   {
-    cedar::aux::SettingsSingleton::getInstance()->addPlugin(p_dialog->plugin());
-  }
+    cedar::aux::PluginProxyPtr plugin = cedar::aux::PluginProxy::getPlugin(file.toStdString());
+    cedar::aux::SettingsSingleton::getInstance()->addPlugin(plugin);
+    plugin->declare();
 
-  delete p_dialog;
+    QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
+    last_dir->setValue(path);
+  }
 }
 
 void cedar::aux::gui::PluginManagerDialog::addPlugin(const std::string& pluginName)
