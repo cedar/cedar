@@ -76,6 +76,11 @@ QDialog(pParent)
     boost::bind(&cedar::aux::gui::PluginManagerDialog::removePluginSearchPathIndex, this, _1)
   );
 
+  cedar::aux::SettingsSingleton::getInstance()->connectToPluginSearchPathsChangedSignal
+  (
+    boost::bind(&cedar::aux::gui::PluginManagerDialog::updatePluginPaths, this)
+  );
+
 
   QObject::connect(this->mpAddPluginBtn, SIGNAL(clicked()), this, SLOT(addPluginClicked()));
 
@@ -166,6 +171,14 @@ void cedar::aux::gui::PluginManagerDialog::addPlugin(const std::string& pluginNa
   this->mpPluginList->setCellWidget(row, 2, p_path);
 
   this->updatePluginPath(row);
+}
+
+void cedar::aux::gui::PluginManagerDialog::updatePluginPaths()
+{
+  for (int row = 0; row < this->mpPluginList->rowCount(); ++row)
+  {
+    this->updatePluginPath(row);
+  }
 }
 
 void cedar::aux::gui::PluginManagerDialog::updatePluginPath(int row)

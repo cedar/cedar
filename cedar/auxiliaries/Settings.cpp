@@ -223,18 +223,21 @@ void cedar::aux::Settings::addPluginSearchPath(const std::string& path)
 {
   this->_mPluginSearchPaths->pushBack(path);
   mPathAddedSignal(path);
+  mSearchPathsChangedSignal();
 }
 
 void cedar::aux::Settings::removePluginSearchPath(const std::string& path)
 {
   this->_mPluginSearchPaths->eraseAll(path);
   this->mSearchPathRemovedSignal(path);
+  mSearchPathsChangedSignal();
 }
 
 void cedar::aux::Settings::removePluginSearchPath(size_t index)
 {
   this->_mPluginSearchPaths->eraseIndex(index);
   mSearchPathIndexRemovedSignal(index);
+  mSearchPathsChangedSignal();
 }
 
 

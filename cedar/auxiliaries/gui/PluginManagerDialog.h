@@ -98,6 +98,8 @@ private:
 
   void updatePluginPath(int row);
 
+  void updatePluginPaths();
+
 private slots:
   //! Removes the plugins currently checked for deletion.
   void removeSelectedPlugins();
