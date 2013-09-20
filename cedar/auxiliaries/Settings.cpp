@@ -113,6 +113,14 @@ cedar::aux::Settings::~Settings()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::Settings::swapPluginSearchPaths(unsigned int first, unsigned int second)
+{
+  this->_mPluginSearchPaths->swap(first, second);
+
+  this->mSearchPathsSwappedSignal(first, second);
+  this->mSearchPathsChangedSignal();
+}
+
 const std::set<std::string>& cedar::aux::Settings::getKnownPlugins() const
 {
   return this->_mKnownPlugins->get();

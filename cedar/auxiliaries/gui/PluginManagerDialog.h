@@ -104,6 +104,8 @@ private:
 
   void pluginDeclared(const std::string& pluginName);
 
+  void swapSearchPaths(unsigned int first, unsigned int second);
+
 private slots:
   //! Removes the plugins currently checked for deletion.
   void removeSelectedPlugins();
@@ -124,6 +126,10 @@ private slots:
   void loadSelectedPlugins();
 
   void openInfoDialog();
+
+  void moveSelectedSearchPathUp();
+
+  void moveSelectedSearchPathDown();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

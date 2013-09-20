@@ -87,6 +87,11 @@ QDialog(pParent)
     boost::bind(&cedar::aux::gui::PluginManagerDialog::removePluginSearchPathIndex, this, _1)
   );
 
+  cedar::aux::SettingsSingleton::getInstance()->connectToSearchPathsSwappedSignal
+  (
+    boost::bind(&cedar::aux::gui::PluginManagerDialog::swapSearchPaths, this, _1, _2)
+  );
+
   cedar::aux::SettingsSingleton::getInstance()->connectToPluginSearchPathsChangedSignal
   (
     boost::bind(&cedar::aux::gui::PluginManagerDialog::updatePluginPaths, this)
@@ -115,12 +120,74 @@ QDialog(pParent)
   this->mpPluginList->horizontalHeader()->setResizeMode(0, QHeaderView::ResizeToContents);
   this->mpPluginList->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
   this->mpPluginList->horizontalHeader()->resizeSection(2, 250);
+
+  QObject::connect(this->mpUpButton, SIGNAL(clicked()), this, SLOT(moveSelectedSearchPathUp()));
+  QObject::connect(this->mpDownBtn, SIGNAL(clicked()), this, SLOT(moveSelectedSearchPathDown()));
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::PluginManagerDialog::swapSearchPaths(unsigned int uFirst, unsigned int uSecond)
+{
+  int first = static_cast<int>(uFirst);
+  int second = static_cast<int>(uSecond);
+
+  bool first_selected = (this->mpSearchPathList->currentRow() == first);
+  bool second_selected = (this->mpSearchPathList->currentRow() == second);
+
+  QListWidgetItem* p_first = this->mpSearchPathList->item(first);
+  QListWidgetItem* p_second = this->mpSearchPathList->item(second);
+
+  QString text_first = p_first->text();
+  p_first->setText(p_second->text());
+  p_second->setText(text_first);
+
+  if (first_selected)
+  {
+    this->mpSearchPathList->setCurrentRow(second);
+  }
+  if (second_selected)
+  {
+    this->mpSearchPathList->setCurrentRow(first);
+  }
+}
+
+void cedar::aux::gui::PluginManagerDialog::moveSelectedSearchPathUp()
+{
+  int selected_index = this->mpSearchPathList->currentRow();
+
+  // can't move if it is already at the top
+  if (selected_index < 1)
+  {
+    return;
+  }
+
+  cedar::aux::SettingsSingleton::getInstance()->swapPluginSearchPaths
+  (
+    static_cast<unsigned int>(selected_index),
+    static_cast<unsigned int>(selected_index - 1)
+  );
+}
+
+void cedar::aux::gui::PluginManagerDialog::moveSelectedSearchPathDown()
+{
+  int selected_index = this->mpSearchPathList->currentRow();
+
+  // can't move if it is already at the top
+  if (selected_index >= this->mpSearchPathList->count() - 1)
+  {
+    return;
+  }
+
+  cedar::aux::SettingsSingleton::getInstance()->swapPluginSearchPaths
+  (
+    static_cast<unsigned int>(selected_index),
+    static_cast<unsigned int>(selected_index + 1)
+  );
+}
 
 void cedar::aux::gui::PluginManagerDialog::pluginDeclared(const std::string& pluginName)
 {
