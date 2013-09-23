@@ -91,7 +91,8 @@ namespace cedar
         CONNECT_ERROR,
         CONNECT_WARNING,
         CONNECT_NO,
-        CONNECT_UNKNOWN
+        CONNECT_UNKNOWN,
+        CONNECT_NOT_SET
       };
     }
   }
