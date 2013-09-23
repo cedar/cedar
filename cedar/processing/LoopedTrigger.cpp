@@ -42,7 +42,6 @@
 // CEDAR INCLUDES
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/StepTime.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/processing/Network.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
@@ -159,12 +158,6 @@ void cedar::proc::LoopedTrigger::applyStart()
 
   emit triggerStarting();
 
-  int count = 0;
-  while (QApplication::hasPendingEvents() && ++count < 500)
-  {
-    QApplication::processEvents();
-  }
-
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
     this->mListeners.at(i)->callOnStart();
@@ -189,12 +182,6 @@ void cedar::proc::LoopedTrigger::applyStop(bool)
   locker.unlock();
 
   emit triggerStopping();
-
-  int count = 0;
-  while (QApplication::hasPendingEvents() && ++count < 500)
-  {
-    QApplication::processEvents();
-  }
 
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {

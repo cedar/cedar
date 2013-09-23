@@ -273,6 +273,7 @@ if(CEDAR_USE_FFTW)
   else(FFTW_FOUND)
     message("-- FFTW was not found.")
     set(CEDAR_USE_FFTW OFF)
+    set(FFTW_INCLUDE_DIRS "")
   endif(FFTW_FOUND)
 endif(CEDAR_USE_FFTW)
 

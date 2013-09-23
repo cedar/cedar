@@ -40,7 +40,6 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/FrameworkSettings.h"
 #include "cedar/processing/FrameworkSettings.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 
 // SYSTEM INCLUDES

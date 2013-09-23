@@ -144,6 +144,9 @@ public:
     return this->mDeclarations.at(i);
   }
 
+  //! Sets the source of the plugin list. Only set after the list has been populated!
+  void setSource(const std::string& source);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

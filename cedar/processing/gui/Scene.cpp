@@ -46,6 +46,7 @@
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/Network.h"
 #include "cedar/processing/gui/View.h"
+#include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/PromotedExternalData.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/gui/ExceptionDialog.h"
@@ -168,10 +169,20 @@ void cedar::proc::gui::Scene::reset()
 
 const cedar::proc::gui::Scene::StepMap& cedar::proc::gui::Scene::stepMap() const
 {
+  return this->getStepMap();
+}
+
+const cedar::proc::gui::Scene::StepMap& cedar::proc::gui::Scene::getStepMap() const
+{
   return this->mStepMap;
 }
 
 const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::triggerMap() const
+{
+  return this->getTriggerMap();
+}
+
+const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::getTriggerMap() const
 {
   return this->mTriggerMap;
 }
@@ -512,7 +523,10 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
 
   if (a == p_reset)
   {
-    this->mNetwork->getNetwork()->reset();
+    if (auto p_ide = dynamic_cast<cedar::proc::gui::Ide*>(this->mpMainWindow))
+    {
+      p_ide->resetRootNetwork();
+    }
   }
   else if (a != NULL)
   {

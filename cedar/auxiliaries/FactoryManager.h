@@ -68,6 +68,12 @@ private:
 
   typedef std::map<std::string, std::vector<FactoryTypePtr> > CategoryMap;
 
+  struct FactoryRecord
+  {
+    FactoryTypePtr factory;
+    bool deprecated;
+  };
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -103,9 +109,35 @@ public:
     }
 
     FactoryTypePtr factory(new cedar::aux::FactoryDerived<BaseTypePtr, TypePtr>());
-    mRegisteredFactories[used_type_name] = factory;
+    FactoryRecord factory_record;
+    factory_record.factory = factory;
+    factory_record.deprecated = false;
+    mRegisteredFactories[used_type_name] = factory_record;
 
     return true;
+  }
+
+  //! Deprecates the given class.
+  template <class TypePtr>
+  void deprecate()
+  {
+    std::string generated_name = this->getTypeKey<TypePtr>();
+    auto name_iter = mTypeNameMapping.find(generated_name);
+    if (name_iter == mTypeNameMapping.end())
+    {
+      CEDAR_THROW(cedar::aux::UnknownTypeException, "No factory is known for the type \"" + generated_name + "\".");
+    }
+
+    const std::string& name = name_iter->second;
+
+    // check if typename exists
+    auto record_iter = mRegisteredFactories.find(name);
+    if (record_iter == mRegisteredFactories.end())
+    {
+      CEDAR_THROW(cedar::aux::UnknownTypeException, "The type \"" + name + "\" is not registered.");
+    }
+
+    record_iter->second.deprecated = true;
   }
 
   //! Adds a deprecated name for the given type.
@@ -174,7 +206,17 @@ public:
       }
     }
 
-    return iter->second->allocate();
+    auto factory_record = iter->second;
+    if (factory_record.deprecated)
+    {
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Allocating deprecated type \"" + typeName + "\".",
+        "cedar::aux::FactoryManager::allocate(const std::string& typeName)"
+      );
+    }
+
+    return factory_record.factory->allocate();
   }
 
   //!@brief look up the type id of an object
@@ -200,12 +242,7 @@ public:
   //!@brief list all types registered at the factory manager
   void listTypes(std::vector<std::string>& types) const
   {
-    for
-    (
-      typename std::map<std::string, FactoryTypePtr>::const_iterator iter = this->mRegisteredFactories.begin();
-      iter != this->mRegisteredFactories.end();
-      ++iter
-    )
+    for(auto iter = this->mRegisteredFactories.begin(); iter != this->mRegisteredFactories.end(); ++iter)
     {
       types.push_back(iter->first);
     }
@@ -233,7 +270,7 @@ private:
 protected:
   // none yet
 private:
-  std::map<std::string, FactoryTypePtr> mRegisteredFactories;
+  std::map<std::string, FactoryRecord> mRegisteredFactories;
 
   std::map<std::string, std::string> mTypeNameMapping;
 

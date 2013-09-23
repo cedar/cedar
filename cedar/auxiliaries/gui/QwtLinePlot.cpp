@@ -49,7 +49,7 @@
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
-#include "cedar/auxiliaries/annotation/DiscreteCoordinates.h"
+#include "cedar/auxiliaries/annotation/DiscreteMetric.h"
 
 // SYSTEM INCLUDES
 #include <boost/numeric/conversion/bounds.hpp>
@@ -122,7 +122,11 @@ cedar::aux::math::Limits<double> cedar::aux::gui::QwtLinePlot::getXLimits() cons
 {
   cedar::aux::math::Limits<double> limits;
 
+#if QWT_VERSION >= 0x060100
+  const QwtScaleDiv* p_interval = &this->mpPlot->axisScaleDiv(QwtPlot::xBottom);
+#else
   QwtScaleDiv* p_interval = this->mpPlot->axisScaleDiv(QwtPlot::xBottom);
+#endif
   limits.setLower(p_interval->lowerBound());
   limits.setUpper(p_interval->upperBound());
   return limits;
@@ -132,7 +136,11 @@ cedar::aux::math::Limits<double> cedar::aux::gui::QwtLinePlot::getYLimits() cons
 {
   cedar::aux::math::Limits<double> limits;
 
+#if QWT_VERSION >= 0x060100
+  const QwtScaleDiv* p_interval = &this->mpPlot->axisScaleDiv(QwtPlot::yLeft);
+#else
   QwtScaleDiv* p_interval = this->mpPlot->axisScaleDiv(QwtPlot::yLeft);
+#endif
   limits.setLower(p_interval->lowerBound());
   limits.setUpper(p_interval->upperBound());
   return limits;
@@ -194,7 +202,7 @@ void cedar::aux::gui::QwtLinePlot::applyStyle(cedar::aux::ConstDataPtr data, siz
   pCurve->setPen(pen);
 
   // Use symbols instead of curves for discrete data
-  if (data->hasAnnotation<cedar::aux::annotation::DiscreteCoordinates>())
+  if (data->hasAnnotation<cedar::aux::annotation::DiscreteMetric>())
   {
     pCurve->setStyle(QwtPlotCurve::NoCurve);
     QwtSymbol
@@ -440,7 +448,7 @@ void cedar::aux::gui::QwtLinePlot::showLegend(bool show)
   if (show)
   {
     // show legend
-    QwtLegend *p_legend = this->mpPlot->legend();
+    auto p_legend = this->mpPlot->legend();
     if (p_legend == NULL)
     {
       p_legend = new QwtLegend();

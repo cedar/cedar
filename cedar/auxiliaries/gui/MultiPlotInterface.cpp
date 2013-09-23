@@ -54,5 +54,11 @@ cedar::aux::gui::PlotInterface(pParent)
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::aux::gui::MultiPlotInterface::append(cedar::aux::ConstDataPtr data, const std::string& title)
 {
+  this->mDataMap[data] = title;
   this->doAppend(data, title);
+}
+
+const cedar::aux::gui::MultiPlotInterface::DataMap& cedar::aux::gui::MultiPlotInterface::getDataMap() const
+{
+  return this->mDataMap;
 }

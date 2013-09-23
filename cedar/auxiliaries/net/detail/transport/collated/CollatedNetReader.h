@@ -196,7 +196,7 @@ public:
       {
         CEDAR_THROW( cedar::aux::net::NetUnexpectedDataException,
                      "matrix has wrong size - you wrote matrices of "
-                     "different size/type before! try to reset." );
+                     "different size/type before! Try to reset." );
       }
 #endif
 

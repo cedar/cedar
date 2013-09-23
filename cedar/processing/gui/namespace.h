@@ -66,6 +66,7 @@ namespace cedar
       class CEDAR_PROC_LIB_EXPORT IdeApplication;
       class CEDAR_PROC_LIB_EXPORT MatrixPlotInterface;
       CEDAR_DECLARE_PROC_CLASS(Network);
+      CEDAR_DECLARE_PROC_CLASS(PlotWidget);
       class CEDAR_PROC_LIB_EXPORT PluginLoadDialog;
       class CEDAR_PROC_LIB_EXPORT PropertyPane;
       class CEDAR_PROC_LIB_EXPORT PluginManagerDialog;

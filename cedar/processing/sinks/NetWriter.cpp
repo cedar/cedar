@@ -69,7 +69,7 @@ namespace
       )
     );
     input_declaration->setIconPath(":/steps/net_writer.svg");
-    input_declaration->setDescription("Writes incoming matrices to a yarp port.");
+    input_declaration->setDescription("Writes incoming matrices to the local network.");
 
     input_declaration->declare();
 
@@ -84,6 +84,7 @@ namespace
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::sinks::NetWriter::NetWriter()
 :
+cedar::proc::Step(false, true),
 // outputs
 mInput(new cedar::aux::MatData(cv::Mat())),
 mWriter(),
@@ -122,7 +123,7 @@ void cedar::proc::sinks::NetWriter::connect()
     catch (cedar::aux::net::NetMissingRessourceException& e)
     {
       // somehow YARP doesnt work ... :( typically fatal.
-      this->setState(cedar::proc::Step::STATE_EXCEPTION, "Yarp exception: " + e.exceptionInfo());
+      this->setState(cedar::proc::Step::STATE_EXCEPTION, "Network communication exception: " + e.exceptionInfo());
       throw (e); // lets try this ...
     }
   }
@@ -152,10 +153,14 @@ void cedar::proc::sinks::NetWriter::compute(const cedar::proc::Arguments&)
   {
     mWriter->write(mInput->getData());
   }
+  // note, we could catch NetUnexpectedDataException here (which is thrown when 
+  // the matrix changes size) but that is more than a validation error, because
+  // it also breaks the architecture on the receiving side. Prefer a big,
+  // horrible and noticeable exception for the moment.
   catch (cedar::aux::net::NetMissingRessourceException& e)
   {
     // somehow YARP doesnt work ... :( typically fatal.
-    this->setState(cedar::proc::Step::STATE_EXCEPTION, "Yarp exception: " + e.exceptionInfo());
+    this->setState(cedar::proc::Step::STATE_EXCEPTION, "Network communication exception: " + e.exceptionInfo());
     throw (e); // lets try this ...
   }
 }
