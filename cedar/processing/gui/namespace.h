@@ -79,6 +79,8 @@ namespace cedar
       class CEDAR_PROC_LIB_EXPORT UiSettings;
       class CEDAR_PROC_LIB_EXPORT View;
       class CEDAR_PROC_LIB_EXPORT ProjectionMappingParameter;
+      class CEDAR_PROC_LIB_EXPORT RecorderWidget;
+      class CEDAR_PROC_LIB_EXPORT RecorderProperty;
 
       /* Exceptions */
       class CEDAR_PROC_LIB_EXPORT InvalidModeException;
