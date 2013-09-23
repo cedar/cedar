@@ -761,7 +761,7 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
   }
 }
 
-void cedar::proc::Network::duplicate(const std::string& elementName, const std::string& newName)
+std::string cedar::proc::Network::duplicate(const std::string& elementName, const std::string& newName)
 {
   try
   {
@@ -786,6 +786,8 @@ void cedar::proc::Network::duplicate(const std::string& elementName, const std::
     new_elem->setName(modified_name);
     // add to network
     this->add(new_elem);
+
+    return modified_name;
   }
   catch (cedar::aux::InvalidNameException& exc)
   {
