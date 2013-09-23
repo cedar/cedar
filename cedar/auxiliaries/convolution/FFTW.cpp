@@ -140,7 +140,15 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
   }
   for (unsigned int dim = 0 ; dim < cedar::aux::math::getDimensionalityOf(matrix) - 1; ++dim)
   {
-    CEDAR_ASSERT(matrix.size[dim] >= kernel.size[dim])
+    if (matrix.size[dim] < kernel.size[dim])
+    {
+      CEDAR_THROW
+      (
+        cedar::aux::RangeException,
+        "Kernel size is too big for FFTW convolution, "
+        "please decrease kernel size or switch to different convolution engine."
+      );
+    }
   }
 
   cv::Mat matrix_64;

@@ -276,6 +276,12 @@ private:
   //! In which the user specifies the time step for single-step functionality.
   QDoubleSpinBox* mpCustomTimeStep;
 
+  //! Used for starting all triggers in a separate thread
+  cedar::aux::CallFunctionInThreadPtr mStartThreadsCaller;
+
+  //! Used for stopping all triggers in a separate thread
+  cedar::aux::CallFunctionInThreadPtr mStopThreadsCaller;
+
 }; // class cedar::MainWindow
 
 #endif // CEDAR_PROC_GUI_MAIN_WINDOW_H

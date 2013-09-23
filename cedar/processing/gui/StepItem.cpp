@@ -209,6 +209,19 @@ cedar::proc::gui::StepItem::~StepItem()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::StepItem::itemSelected(bool selected)
+{
+  for (auto role_iter = this->mSlotMap.begin(); role_iter != this->mSlotMap.end(); ++role_iter)
+  {
+    auto slot_map = role_iter->second;
+    for (auto slot_iter = slot_map.begin(); slot_iter != slot_map.end(); ++slot_iter)
+    {
+      auto slot = slot_iter->second;
+      slot->setHighlightedBySelection(selected);
+    }
+  }
+}
+
 void cedar::proc::gui::StepItem::demagnetizeSlots()
 {
   auto slot_map_iter = this->mSlotMap.find(cedar::proc::DataRole::INPUT);
@@ -526,6 +539,11 @@ void cedar::proc::gui::StepItem::readConfiguration(const cedar::aux::Configurati
   {
     std::string style = style_iter->second.get_value<std::string>();
     this->setDisplayMode(cedar::proc::gui::StepItem::DisplayMode::type().get(style));
+  }
+  else
+  {
+    // apply settings for the currently selected (default) display mode
+    this->setDisplayMode(this->mDisplayMode);
   }
 }
 
