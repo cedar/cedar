@@ -125,6 +125,8 @@ private:
   //!@brief vector filled with standard colors
   static Qwt3D::ColorVector mStandardColorVector;
 
+  std::string mTitle;
+
 }; // class cedar::aux::gui::MatrixPlot
 
 #endif // CEDAR_AUX_GUI_MATRIX_PLOT_H

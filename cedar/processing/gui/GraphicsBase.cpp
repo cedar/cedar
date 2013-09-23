@@ -482,6 +482,10 @@ const QColor& cedar::proc::gui::GraphicsBase::getValidityColor(ConnectValidity v
   }
 }
 
+void cedar::proc::gui::GraphicsBase::itemSelected(bool)
+{
+  // empty default implementation
+}
 
 QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, const QVariant & value)
 {
@@ -509,6 +513,12 @@ QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, c
     case QGraphicsItem::ItemPositionHasChanged:
     {
       this->updateConnections();
+      break;
+    }
+
+    case QGraphicsItem::ItemSelectedHasChanged:
+    {
+      this->itemSelected(value.toBool());
       break;
     }
 

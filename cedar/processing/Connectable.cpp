@@ -322,7 +322,39 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Connectable::getInputValidity(cedar
     else
     {
       this->lockAll(cedar::aux::LOCK_TYPE_READ);
-      validity = this->checkInputValidity(slot, data);
+      auto external_data_slot = cedar::aux::asserted_pointer_cast<cedar::proc::ExternalData>(slot);
+      validity = cedar::proc::DataSlot::VALIDITY_VALID;
+      for (unsigned int i = 0; i < external_data_slot->getDataCount(); ++i)
+      {
+        auto sub_data = external_data_slot->getData(i);
+        cedar::proc::DataSlot::VALIDITY sub_data_validity = this->checkInputValidity(slot, sub_data);
+        switch (sub_data_validity)
+        {
+          case cedar::proc::DataSlot::VALIDITY_UNKNOWN:
+            cedar::aux::LogSingleton::getInstance()->warning
+            (
+              "Connectable \"" + this->getName() + "\" returned VALIDITY_UNKNOWN for slot \""
+               + slot->getName() + "\". This should not happen.",
+              "cedar::proc::Connectable::getInputValidity(cedar::proc::DataSlotPtr)"
+            );
+          case cedar::proc::DataSlot::VALIDITY_VALID:
+            // doesn't change anything: if it is already valid, it stays valid, same for warning, error
+            break;
+
+          case cedar::proc::DataSlot::VALIDITY_WARNING:
+            // errors stay, warnings override valid
+            if (validity != cedar::proc::DataSlot::VALIDITY_ERROR)
+            {
+              validity = cedar::proc::DataSlot::VALIDITY_WARNING;
+            }
+            break;
+
+          case cedar::proc::DataSlot::VALIDITY_ERROR:
+            // the whole slot is invalid if one data gives an error
+            validity = cedar::proc::DataSlot::VALIDITY_ERROR;
+            break;
+        }
+      }
       this->unlockAll();
     }
 

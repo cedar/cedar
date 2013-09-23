@@ -128,6 +128,9 @@ public:
     return this->mMagneticScale;
   }
 
+  //! Sets whether the connections of this item are highlighted due to one of its owners being selected.
+  void setHighlightedBySelection(bool highlight);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
