@@ -48,10 +48,11 @@
  */
 class cedar::aux::gui::MultiPlotInterface : public cedar::aux::gui::PlotInterface
 {
+public:
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-
+  typedef std::map<cedar::aux::ConstDataPtr, std::string> DataMap;
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -73,6 +74,8 @@ public:
   //!@brief check if given data can be appended to a plot
   virtual bool canAppend(cedar::aux::ConstDataPtr data) const = 0;
 
+  const DataMap& getDataMap() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -92,7 +95,7 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  DataMap mDataMap;
 }; // class cedar::aux::gui::MultiPlotInterface
 
 #endif // CEDAR_AUX_GUI_MULTI_PLOT_INTERFACE_H

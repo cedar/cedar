@@ -100,7 +100,8 @@ Qwt3D::ColorVector cedar::aux::gui::MatrixPlot::mStandardColorVector;
 cedar::aux::gui::MatrixPlot::MatrixPlot(QWidget *pParent)
 :
 cedar::aux::gui::MultiPlotInterface(pParent),
-mpCurrentPlotWidget(NULL)
+mpCurrentPlotWidget(NULL),
+mTitle("")
 {
   QVBoxLayout *p_layout = new QVBoxLayout();
   this->setLayout(p_layout);
@@ -121,7 +122,7 @@ bool cedar::aux::gui::MatrixPlot::canAppend(cedar::aux::ConstDataPtr data) const
   }
   else if
   (
-    cedar::aux::gui::MultiPlotInterface *p_multi_plot
+    cedar::aux::gui::MultiPlotInterface* p_multi_plot
       = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlotWidget)
   )
   {
@@ -141,6 +142,7 @@ void cedar::aux::gui::MatrixPlot::doAppend(cedar::aux::ConstDataPtr data, const 
 
   CEDAR_DEBUG_ASSERT(p_multi_plot != NULL);
   p_multi_plot->append(data, title);
+  mTitle = title;
 }
 
 void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std::string& title)
@@ -160,6 +162,10 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
 
   const cv::Mat& mat = this->mData->getData();
   unsigned int dims = cedar::aux::math::getDimensionalityOf(mat);
+  if (mat.empty())
+  {
+    dims = std::numeric_limits<unsigned int>::max();
+  }
 
   switch (dims)
   {
@@ -190,16 +196,26 @@ void cedar::aux::gui::MatrixPlot::plot(cedar::aux::ConstDataPtr data, const std:
       break;
     }
 
+    case std::numeric_limits<unsigned int>::max():
+    {
+      std::string message = "The matrix plot widget can not handle empty matrices.";
+      message += "\nPress here to refresh the plot after you have changed the dimensionality.";
+      this->mpCurrentPlotWidget = new QPushButton(QString::fromStdString(message));
+      connect(this->mpCurrentPlotWidget, SIGNAL(pressed()), this, SLOT(processChangedData()));
+      break;
+    }
+
     default:
     {
       std::string message = "The matrix plot widget can not handle a matrix with the given dimensionality (";
       message += cedar::aux::toString(mat.dims);
-      message += "\nPress here to refresh the plot after you have changed the dimensionality.";
+      message += ").\nPress here to refresh the plot after you have changed the dimensionality.";
       this->mpCurrentPlotWidget = new QPushButton(QString::fromStdString(message));
       connect(this->mpCurrentPlotWidget, SIGNAL(pressed()), this, SLOT(processChangedData()));
     }
   }
   this->layout()->addWidget(this->mpCurrentPlotWidget);
+  mTitle = title;
 }
 
 const Qwt3D::ColorVector& cedar::aux::gui::MatrixPlot::getStandardColorVector()
@@ -249,5 +265,32 @@ const Qwt3D::ColorVector& cedar::aux::gui::MatrixPlot::getStandardColorVector()
 
 void cedar::aux::gui::MatrixPlot::processChangedData()
 {
-  this->plot(this->mData, "");
+  if (mpCurrentPlotWidget)
+  {
+    if
+    (
+      cedar::aux::gui::MultiPlotInterface* p_multi
+        = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(mpCurrentPlotWidget)
+    )
+    {
+      // first, recover data from multiplot
+      cedar::aux::gui::MultiPlotInterface::DataMap map = p_multi->getDataMap();
+      auto iter = map.begin();
+      if (iter != map.end())
+      {
+        this->plot(iter->first, iter->second);
+        if (dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(mpCurrentPlotWidget))
+        {
+          for (auto rest = ++iter; rest != map.end(); ++rest)
+          {
+            this->append(rest->first, rest->second);
+          }
+        }
+      }
+    }
+    else
+    {
+      this->plot(this->mData, mTitle);
+    }
+  }
 }
