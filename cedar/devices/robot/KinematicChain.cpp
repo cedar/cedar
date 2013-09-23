@@ -1172,9 +1172,12 @@ void cedar::dev::robot::KinematicChain::addInitialConfiguration(const std::strin
   auto found = mInitialConfigurations.find(name);
   if (found != mInitialConfigurations.end())
   {
-    CEDAR_THROW( cedar::aux::DuplicateNameException,
-                 "You are adding the initial configuration name '"
-                   + name + "' which already exists. Delete it first." );
+    CEDAR_THROW
+    (
+      cedar::aux::DuplicateNameException,
+      "You are adding the initial configuration name '"
+      + name + "' which already exists. Delete it first."
+    );
   }
 
   mInitialConfigurations[ name ] = config.clone();

@@ -124,6 +124,9 @@ cedar::aux::gui::detail::ImagePlotLegend::ImagePlotLegend()
   this->mpMin = new QLabel("min");
   this->mpMax = new QLabel("max");
 
+  this->mpMin->setMinimumWidth(35);
+  this->mpMax->setMinimumWidth(35);
+
   auto p_gradient = new QFrame();
   p_gradient->setSizePolicy(QSizePolicy::Fixed, p_gradient->sizePolicy().verticalPolicy());
   p_gradient->setFixedWidth(20);
@@ -139,9 +142,11 @@ cedar::aux::gui::detail::ImagePlotLegend::ImagePlotLegend()
   p_gradient->setPalette(palette);
 
   auto p_layout = new QGridLayout();
+  p_layout->setContentsMargins(1, 1, 1, 1);
   p_layout->addWidget(p_gradient, 0, 0, 3, 1);
   p_layout->addWidget(this->mpMax, 0, 1);
   p_layout->addWidget(this->mpMin, 2, 1);
+  p_layout->setColumnStretch(1, 1);
   p_layout->setRowStretch(1, 1);
   this->setLayout(p_layout);
 }
@@ -210,8 +215,15 @@ void cedar::aux::gui::ImagePlot::setAutomaticScaling()
 
 void cedar::aux::gui::detail::ImagePlotLegend::updateMinMax(double min, double max)
 {
-  this->mpMin->setText(QString("%1").arg(min));
-  this->mpMax->setText(QString("%1").arg(max));
+  int precision = 2;
+  double diff = std::abs(max - min);
+  double log = std::log10(diff);
+  if (log < 0)
+  {
+    precision = std::max(precision, static_cast<int>(std::round(std::abs(log))));
+  }
+  this->mpMin->setText(QString("%1").arg(min, 0, 'g', precision));
+  this->mpMax->setText(QString("%1").arg(max, 0, 'g', precision));
 }
 
 void cedar::aux::gui::ImagePlot::contextMenuEvent(QContextMenuEvent *pEvent)
